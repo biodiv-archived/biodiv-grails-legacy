@@ -1,0 +1,604 @@
+html * {
+	margin: 0;
+	/*padding: 0; SELECT NOT DISPLAYED CORRECTLY IN FIREFOX */
+}
+
+/* GENERAL */
+.spinner {
+	padding: 5px;
+	position: absolute;
+	right: 0;
+}
+
+body {
+	color: #333;
+	font: 12px Arial, Helvetica, sans-serif;
+	width: 100%;
+}
+
+#grailsLogo {
+	padding: 20px;
+}
+
+a {
+	text-decoration: none;
+}
+
+#species_main_wrapper .readmore {
+	float: none;
+	margin: 0px;
+}
+
+#species_main_wrapper a.readmore {
+	cursor: pointer;
+	font-weight: bold;
+}
+
+ul {
+	list-style-type: none;
+	padding-left: 2px;
+}
+
+input,select,textarea {
+	background-color: #fcfcfc;
+	border: 1px solid #ccc;
+	font: 12px Arial, Helvetica, sans-serif;
+	margin: 2px 0;
+	padding: 2px 4px;
+}
+
+select {
+	padding: 2px 2px 2px 0;
+}
+
+textarea {
+	width: 250px;
+	height: 150px;
+	vertical-align: top;
+}
+
+input:focus,select:focus,textarea:focus {
+	border: 1px solid #b2d1ff;
+}
+
+.body {
+	float: left;
+	margin: 10 15px 10px 15px;
+	width: 100%;
+}
+
+/* NAVIGATION MENU */
+.nav { /*color: #666;
+	border: 1px solid #ccc;
+	border-style: solid none solid none;
+	margin-top: 5px;
+	padding: 7px 5px;
+	margin-left: 10px;*/
+	background: #fff url(../images/skin/shadow.jpg) repeat-x center;
+	padding: 3px;
+	margin-top: 10px;
+	border-bottom: 5px solid #A9DA92;
+	border-top: 5px solid #EB8F00;
+}
+
+.menuButton {
+	font-size: 15px;
+	font-weight: bold;
+	color: blue;
+}
+
+.nav .active {
+	/*background: url('../images/arrow-down.png') center bottom no-repeat;*/
+	background-color: #fff;
+}
+
+.nav .current {
+	padding-top: 0px;
+	padding-bottom: 0px;
+	background-color: #fff;
+}
+
+.nav .current a {
+	background: url('../images/arrow-down.png') center bottom no-repeat
+		transparent;
+	text-decoration: underline;
+	background-position: 50% -80%;
+}
+
+.menuButton a {
+	color: #333;
+	padding: 4px 6px;
+	padding-left: 20px;
+}
+
+.menuButton a.home {
+	background: url(../images/skin/house.png) center left no-repeat;
+	color: #333;
+	padding-left: 25px;
+}
+
+.menuButton a.list {
+	background: url(../images/skin/database_table.png) center left no-repeat;
+	color: #333;
+	padding-left: 25px;
+}
+
+.menuButton a.create {
+	background: url(../images/skin/database_add.png) center left no-repeat;
+	color: #333;
+	padding-left: 25px;
+}
+
+/* MESSAGES AND ERRORS */
+.message {
+	background: #f3f8fc url(../images/skin/information.png) 8px 50%
+		no-repeat;
+	border: 1px solid #b2d1ff;
+	color: #006dba;
+	padding: 5px 5px 5px 30px
+}
+
+/* TABLES */
+.odd {
+	background: #f7f7f7;
+}
+
+.even {
+	background: #fff;
+}
+
+/* LIST */
+.list table {
+	border-collapse: collapse;
+}
+
+.list th,.list td {
+	border-left: 1px solid #ddd;
+}
+
+.list th:hover,.list tr:hover {
+	background: #b2d1ff;
+}
+
+/* PAGINATION */
+.paginateButtons {
+	background: #fff url(../images/skin/shadow.jpg) bottom repeat-x;
+	color: #666;
+	font-size: 10px;
+	overflow: hidden;
+	padding: 10px 3px;
+}
+
+.paginateButtons a {
+	background: #fff;
+	border: 1px solid #ccc;
+	border-color: #ccc #aaa #aaa #ccc;
+	color: #666;
+	margin: 0 3px;
+	padding: 2px 6px;
+}
+
+/* .paginateBar {
+	color: #666;
+	font-size: 9px;
+	width: 50px;
+	padding: 10px 3px;
+	position: fixed;
+	
+	height: '100%',
+}
+
+.paginateBar ul {
+	float: left;
+	background: white;
+	padding: 0;
+	text-align: center;
+	border: 1px solid #CCC;
+	list-style: none;
+	margin: 0;
+	z-index: 99;
+}
+
+.paginateBar li {
+	list-style: none;
+	margin: 0;
+	padding: 5px 3px;
+}
+
+.paginateBar a {
+	background: #fff;
+	border: 1px solid #ccc;
+	border-color: #ccc #aaa #aaa #ccc;
+	color: #666;
+	margin: 0 3px;
+	padding: 2px 6px;
+}
+*/
+.paginateButtons span {
+	padding: 2px 3px;
+}
+
+/* DIALOG */
+.dialog table {
+	padding: 5px 0;
+}
+
+.prop {
+	padding: 5px;
+}
+
+.prop .name {
+	text-align: left;
+	width: 15%;
+	white-space: nowrap;
+	font-weight: bold;
+}
+
+.prop .value {
+	text-align: left;
+	padding-left: 20px;
+}
+
+/* ACTION BUTTONS */
+.buttons {
+	background: #fff url(../images/skin/shadow.jpg) bottom repeat-x;
+	border: 1px solid #ccc;
+	color: #666;
+	font-size: 10px;
+	margin-top: 5px;
+	overflow: hidden;
+	padding: 0;
+}
+
+.buttons input {
+	background: #fff;
+	border: 0;
+	color: #333;
+	cursor: pointer;
+	font-size: 10px;
+	font-weight: bold;
+	margin-left: 3px;
+	overflow: visible;
+	padding: 2px 6px;
+}
+
+.buttons input.delete {
+	background: transparent url(../images/skin/database_delete.png) 5px 50%
+		no-repeat;
+	padding-left: 28px;
+}
+
+.buttons input.edit {
+	background: transparent url(../images/skin/database_edit.png) 5px 50%
+		no-repeat;
+	padding-left: 28px;
+}
+
+.buttons input.save {
+	background: transparent url(../images/skin/database_save.png) 5px 50%
+		no-repeat;
+	padding-left: 28px;
+}
+
+.buttons input.history {
+	background: transparent url(../images/skin/history.png) 5px 50%
+		no-repeat;
+	padding-left: 28px;
+}
+
+.figure {
+	font-size: 80%;
+	text-align: center;
+	font-style: italic;
+	position: relative !important;
+}
+
+.header {
+	text-align: "left";
+	color: #48802c;
+	font-weight: bold;
+	margin: .8em 0 .3em 0;
+}
+
+#speciesFieldContainer {
+	border: thick silver solid;
+	margin: 2px 0;
+	padding: 10px 4px;
+	/*margin-left: 250px;*/
+}
+
+.speciesField {
+	padding: 0px 10px;
+}
+
+.icon {
+	padding: 1.5px;
+	width: 50px;
+	height: 50px;
+}
+
+.license .icon {
+	width: 60px;
+	height: 25px;
+	padding: 1.5px;
+	float: right;
+}
+
+.thumbwrap .icons .icon {
+	width: 20px;
+	height: 20px;
+}
+
+/* .toolbar .icon { */
+/* 	height : 16px; */
+/* 	width: 16px; */
+/* } */
+
+/* .ui-icon-help { */
+/* 	background: url(../images/skin/icon-help.png) no-repeat; */
+/* 	float: right; */
+/* 	margin-left: .3em;								 */
+/* } */
+.ui-icon-info {
+	background-image: url("../images/by.png");
+	background-repeat: no-repeat;
+	background-position: 0 0;
+	height: 16px;
+	width: 16px;
+	cursor: pointer;
+	float: right;
+}
+
+.ui-icon-info:hover {
+	background-position: 0 0;
+}
+
+.ui-icon-edit {
+	background-image: url("../images/edit.png");
+	background-repeat: no-repeat;
+	background-position: 0 0;
+	height: 16px;
+	width: 16px;
+	cursor: pointer;
+	float: right;
+}
+
+.ui-icon-edit:hover {
+	background-position: 0 0;
+}
+
+.ui-icon-help {
+	background-image: url("../images/help.png");
+	background-repeat: no-repeat;
+	background-position: 0 0;
+	height: 16px;
+	width: 16px;
+	cursor: pointer;
+	float: right;
+}
+
+.ui-icon-help:hover {
+	background-position: s0 0;
+}
+
+.content {
+	border: 1px solid #ccc;
+}
+
+.mainImage {
+	width: 340px;
+	height: 287px;
+}
+
+.toolbar {
+	position: relative
+}
+
+.toolbarIconContent {
+	border: 1px solid #AEAEAE;
+	background-color: #FAFAFA;
+	padding: 10px;
+	position: absolute;
+	width: 90%;
+	box-shadow: 3px 3px 7px #555555;
+	font-size: 0.8em;
+	font-style: normal;
+	z-index: 100;
+	margin-top: 18px;
+	right: 0
+}
+
+.toolbar_link:hover {
+	background-position: 0 0;
+}
+
+.toolbar a.close {
+	background: url(../images/skin/close.png) no-repeat;
+	cursor: pointer;
+	float: right;
+}
+
+.toolbar a.close:hover {
+	text-decoration: underline;
+}
+
+.topposition {
+	position: fixed;
+	top: 0;
+	float: left;
+}
+
+.olLayerGoogleCopyright {
+	display: none;
+}
+
+#content {
+	padding: 0px;
+}
+
+.rank {
+	color: #666;
+}
+
+.rank6,.rank7,.rank8,.speciesName {
+	font-style: italic;
+}
+
+.taxonExpandAll {
+	cursor: pointer;
+	font-weight: bold;
+}
+
+.attributionBlock {
+	position: relative;
+}
+
+.help {
+	position: relative;
+}
+
+.thumbwrap  .figure {
+	display: -moz-inline-box;
+	display: inline-block;
+	/*\*/
+	vertical-align: top; /**/
+	margin: 0 7px 15px 7px;
+	/*border: 1px solid #999;*/
+	padding: 0;
+	position: relative;
+	text-align: center;
+	font-style: italic;
+}
+/*  Moz: NO border qui altrimenti difficolta' con width, table altrimenti problemi a text resize (risolubili con refresh) */
+.thumbwrap  .figure>div { /*\*/
+	display: table; /**/
+	width: 200px;
+}
+
+.thumbwrap .figure a {
+	display: block;
+	text-decoration: none;
+	color: #000;
+	/*background-color: #ffe;*/
+	cursor: pointer;
+}
+/*\*/
+.thumbwrap  .figure .wrimg {
+	display: table-cell;
+	vertical-align: middle;
+	width: 200px;
+	height: 200px;
+}
+/**/
+.thumbwrap .figure a:hover {
+	
+}
+
+/*\*/ /*/
+* html .thumbwrap li .wrimg {
+	display: block;
+	font-size: 1px;
+}
+* html .thumbwrap .wrimg span {
+	display: inline-block;
+	vertical-align: middle;
+	height: 200px;
+	width: 1px;
+}
+/**/
+.thumbwrap .figure .caption {
+	background-color: white;
+	bottom: 0 !important;
+	left: 0;
+	max-height: 50%;
+	opacity: 0.8;
+	overflow: auto;
+	padding: 3px 0;
+	position: absolute !important;
+	width: 200px;
+}
+
+/* top ib e hover Op < 9.5 */
+@media all and (min-width: 0px) {
+	html:first-child .thumbwrap a {
+		display: inline-block;
+		vertical-align: top;
+	}
+	html:first-child .thumbwrap {
+		border-collapse: collapse;
+		display: inline-block; /* non deve avere margin */
+	}
+}
+
+img {
+	border-width: 0px;
+}
+
+/*.menuButton form {
+	text-align: right;
+	display : inline;
+}*/
+.breadcrumb,.commonName {
+	color: #666666;
+	font-weight: bold;
+}
+
+.searchButton {
+	background: url(../images/search.png) left no-repeat;
+	width: 22px;
+	border: none;
+}
+
+.taxonBrowser {
+	background: url(../images/tree.png) left no-repeat;
+	border: none;
+}
+
+.contribute {
+	background: url(../images/contribute.gif) left no-repeat;
+	border: none;
+}
+
+.speciesList {
+	background: url(../images/list.png) left no-repeat;
+	border: none;
+}
+
+.demo {
+	background: url(../images/demo-1.png) left no-repeat;
+	border: none;
+	padding-left: 30px;
+	padding-top: 5px;
+	padding-bottom: 0px;
+}
+
+.indent {
+	margin-left: 10px;
+}
+
+.searchResults .thumbwrap {
+	float: left;
+}
+
+.facets { /*border-right:1px solid #999999;*/
+	
+}
+
+.facets .facet_name {
+	font-weight: bold;
+}
+
+.ui-autocomplete {
+	max-height: 400px;
+	overflow-y: auto;
+	/* prevent horizontal scrollbar */
+	overflow-x: hidden;
+	/* add padding to account for vertical scrollbar */
+	padding-right: 20px;
+}
+/* IE 6 doesn't support max-height
+	 * we use height instead, but this forces the menu to always be this tall
+	 */
+* html .ui-autocomplete {
+	height: 400px;
+}

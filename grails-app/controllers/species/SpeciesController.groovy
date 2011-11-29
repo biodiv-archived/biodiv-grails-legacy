@@ -1,0 +1,295 @@
+package species
+
+import java.sql.ResultSet;
+
+import species.TaxonomyDefinition.TaxonomyRank;
+import species.formatReader.SpreadsheetReader;
+import species.sourcehandler.MappedSpreadsheetConverter;
+import species.sourcehandler.SpreadsheetConverter;
+import species.sourcehandler.XMLConverter;
+import grails.converters.JSON;
+import grails.converters.XML;
+import grails.web.JSONBuilder;
+import groovy.sql.GroovyRowResult;
+import groovy.sql.Sql
+import groovy.xml.MarkupBuilder;
+
+class SpeciesController {
+
+	def dataSource
+
+	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
+
+	def index = {
+		redirect(action: "list", params: params)
+	}
+
+	def list = {
+		cache "taxonomy_results"
+		params.startsWith = params.startsWith?:"A"
+		if (params.startsWith) {
+			[speciesInstanceList: Species.findAllByTitleLike('<i>'+params.startsWith+'%'), speciesInstanceTotal: Species.count()]
+		} else {
+			//Not being used for now
+			params.max = Math.min(params.max ? params.int('max') : 10, 100)
+			[speciesInstanceList: Species.list(params), speciesInstanceTotal: Species.count()]
+		}
+	}
+
+	def listXML = {
+		cache "taxonomy_results"
+		params.max = Math.min(params.max ? params.int('max') : 10, 100)
+		def speciesList = Species.list(params) as XML;
+		def writer = new StringWriter ();
+		def result = new MarkupBuilder(writer);
+		result.response() {
+			numspecies (Species.count())
+			result.mkp.yieldUnescaped (speciesList.toString() - "<?xml version=\"1.0\" encoding=\"UTF-8\"?>")
+		}
+		render(contentType: "text/xml", text:writer.toString())
+	}
+
+	def create = {
+		def speciesInstance = new Species()
+		speciesInstance.properties = params
+		return [speciesInstance: speciesInstance]
+	}
+
+	def save = {
+		def speciesInstance = new Species(params)
+		if (speciesInstance.save(flush: true)) {
+			flash.message = "${message(code: 'default.created.message', args: [message(code: 'species.label', default: 'Species'), speciesInstance.id])}"
+			redirect(action: "show", id: speciesInstance.id)
+		}
+		else {
+			render(view: "create", model: [speciesInstance: speciesInstance])
+		}
+	}
+
+	def show = {
+		cache "content"
+		def speciesInstance = Species.get(params.id)
+		if (!speciesInstance) {
+			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'species.label', default: 'Species'), params.id])}"
+			redirect(action: "list")
+		}
+		else {
+			def c = Field.createCriteria();
+			def fields = c.list(){
+				and{ order('displayOrder','asc') }
+			};
+			Map map = getTreeMap(fields);
+			map = mapSpeciesInstanceFields(speciesInstance, speciesInstance.fields, map);
+			[speciesInstance: speciesInstance, fields:map]
+		}
+	}
+
+	private Map getTreeMap(List fields) {
+		Map map = new LinkedHashMap();
+		for(Field field : fields) {
+			Map finalLoc;
+			Map conceptMap, categoryMap, subCategoryMap;
+			if(field.concept && !field.concept.equals("")) {
+				if(map.containsKey(field.concept)) {
+					conceptMap = map.get(field.concept);
+				} else {
+					conceptMap = new LinkedHashMap();
+					map.put(field.concept, conceptMap);
+				}
+				finalLoc = conceptMap;
+
+
+				if(field.category && !field.category.equals("")) {
+					if(conceptMap.containsKey(field.category)) {
+						categoryMap = conceptMap.get(field.category);
+					} else {
+						categoryMap = new LinkedHashMap();
+						conceptMap.put(field.category, categoryMap);
+					}
+					finalLoc = categoryMap;
+
+					if(field.subCategory && !field.subCategory.equals("")) {
+						if(categoryMap.containsKey(field.subCategory)) {
+							subCategoryMap = categoryMap.get(field.subCategory);
+						} else {
+							subCategoryMap = new LinkedHashMap();
+							categoryMap.put(field.subCategory, subCategoryMap);
+						}
+						finalLoc = subCategoryMap;
+					}
+				}
+				finalLoc.put ("field", field);
+			}
+		}
+
+		return map;
+	}
+
+	private Map mapSpeciesInstanceFields(Species speciesInstance, Collection speciesFields, Map map) {
+
+		for (SpeciesField sField : speciesFields) {
+			Map finalLoc;
+			if(map.containsKey(sField.field.concept)) {
+				finalLoc = map.get(sField.field.concept);
+				if(finalLoc.containsKey(sField.field.category)) {
+					finalLoc = finalLoc.get(sField.field.category);
+					if(sField.field.subCategory && finalLoc.containsKey(sField.field.subCategory)) {
+						finalLoc = finalLoc.get(sField.field.subCategory);
+					}
+				}
+			}
+			if(finalLoc.containsKey('field')) {
+				finalLoc.put('speciesFieldInstance', sField);
+				/*
+				def sfList;
+				if(!(sfList = finalLoc.get('speciesFieldInstance'))) {
+					sfList = new ArrayList(); 
+				} 
+				sfList.add(sField);
+				finalLoc.put('speciesFieldInstance', sfList);
+				*/
+			}
+		}
+
+		//remove empty information hierarchy
+		Map newMap = new LinkedHashMap();
+		for(concept in map) {
+			//log.debug "Concept : "+concept
+			Map newConceptMap = new LinkedHashMap();
+			if(hasContent(concept.value.get('speciesFieldInstance'))) {
+				newConceptMap.put('speciesFieldInstance', concept.value.get('speciesFieldInstance'));
+			}
+			for(category in concept.value) {
+				Map newCategoryMap = new LinkedHashMap();
+				//log.debug "Category : "+category
+				if(category.key.equals("field") || category.key.equals("speciesFieldInstance") )  {
+					continue;
+				} else if(category.key.equals("Occurrence Records") || category.key.equals("References") ) {
+					boolean show = false;
+					if(category.key.equals("References")) {
+						for(f in speciesInstance.fields) {
+							if(f.references) {
+								show = true;
+								break;
+							}
+						}
+					} else {
+						show = true;
+					}
+					if(show) {
+						newConceptMap.put(category.key, category.value);
+					}
+				} else if(hasContent(category.value.get('speciesFieldInstance'))) {
+					newCategoryMap.put('speciesFieldInstance', category.value.get('speciesFieldInstance'));
+				}
+				for(subCategory in category.value) {
+
+					//log.debug "subCategory : "+subCategory;
+					if(subCategory.key.equals("field") || subCategory.key.equals("speciesFieldInstance")) continue;
+
+					if((subCategory.key.equals("Global Distribution Geographic Entity") && speciesInstance.globalDistributionEntities.size()>0)  ||
+					(subCategory.key.equals("Global Endemicity Geographic Entity") && speciesInstance.globalEndemicityEntities.size()>0)||
+					hasContent(subCategory.value.get('speciesFieldInstance'))) {
+						//(subCategory.key.equals("Indian Distribution Geographic Entity") && speciesInstance.indianDistributionEntities.size()>0) ||
+						//(subCategory.key.equals("Indian Endemicity Geographic Entity") && speciesInstance.indianEndemicityEntities.size()>0)||
+						newCategoryMap.put(subCategory.key, subCategory.value)
+					}
+				}
+				//log.debug 'NSC : '+newCategoryMap
+
+				if(newCategoryMap.size() != 0) {
+					newConceptMap.put(category.key, newCategoryMap)
+				}
+				//log.debug "NC : "+newConceptMap;
+			}
+			if(newConceptMap.size() != 0) {
+				newMap.put(concept.key, newConceptMap)
+			}
+		}
+		//log.debug newMap;
+		return newMap;
+		//return map;
+	}
+	
+	private boolean hasContent(speciesFieldInstances) {
+		for(speciesFieldInstance in speciesFieldInstances) {
+			if(speciesFieldInstance.description) {
+				return true
+			}
+		}
+		return false;
+	}
+
+	def edit = {
+		def speciesInstance = Species.get(params.id)
+		if (!speciesInstance) {
+			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'species.label', default: 'Species'), params.id])}"
+			redirect(action: "list")
+		}
+		else {
+			return [speciesInstance: speciesInstance]
+		}
+	}
+
+	def update = {
+		def speciesInstance = Species.get(params.id)
+		if (speciesInstance) {
+			if (params.version) {
+				def version = params.version.toLong()
+				if (speciesInstance.version > version) {
+
+					speciesInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [
+						message(code: 'species.label', default: 'Species')]
+					as Object[], "Another user has updated this Species while you were editing")
+					render(view: "edit", model: [speciesInstance: speciesInstance])
+					return
+				}
+			}
+			speciesInstance.properties = params
+			if (!speciesInstance.hasErrors() && speciesInstance.save(flush: true)) {
+				flash.message = "${message(code: 'default.updated.message', args: [message(code: 'species.label', default: 'Species'), speciesInstance.id])}"
+				redirect(action: "show", id: speciesInstance.id)
+			}
+			else {
+				render(view: "edit", model: [speciesInstance: speciesInstance])
+			}
+		}
+		else {
+			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'species.label', default: 'Species'), params.id])}"
+			redirect(action: "list")
+		}
+	}
+
+	def delete = {
+		def speciesInstance = Species.get(params.id)
+		if (speciesInstance) {
+			try {
+				speciesInstance.delete(flush: true)
+				flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'species.label', default: 'Species'), params.id])}"
+				redirect(action: "list")
+			}
+			catch (org.springframework.dao.DataIntegrityViolationException e) {
+				flash.message = "${message(code: 'default.not.deleted.message', args: [message(code: 'species.label', default: 'Species'), params.id])}"
+				redirect(action: "show", id: params.id)
+			}
+		}
+		else {
+			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'species.label', default: 'Species'), params.id])}"
+			redirect(action: "list")
+		}
+	}
+
+	def count = {
+		cache "search_results"
+		render Species.count();
+	}
+
+	def taxonBrowser = {
+		render (view:"taxonBrowser");
+	}
+
+	def contribute = {
+		render (view:"contribute");
+	}
+
+}
