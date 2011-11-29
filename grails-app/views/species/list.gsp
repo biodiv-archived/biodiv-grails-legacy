@@ -36,7 +36,7 @@ $(document).ready(function(){
 							<span class="wrimg"> <span></span> <g:if
 									test="${(new File(grailsApplication.config.speciesPortal.images.rootDir+thumbnailPath)).exists()}">
 									<img
-										src="${createLinkTo(dir: 'images/resources/', base:grailsApplication.config.speciesPortal.images.serverURL,
+										src="${createLinkTo(dir: 'images/', base:grailsApplication.config.speciesPortal.images.serverURL,
 											file: thumbnailPath)}" />
 								</g:if>
 								<g:else>

@@ -157,7 +157,7 @@ else {
 speciesPortal {
 	data.rootDir = "${userHome}/species/data"
 
-	images.rootDir = "${userHome}/species/images/resources/"
+	images.rootDir = "${userHome}/species/images/"
 	images.uploadDir = "${userHome}/sravanthi/projects/westernghats/images"
 	images.serverURL = "http://localhost/${appName}"
 

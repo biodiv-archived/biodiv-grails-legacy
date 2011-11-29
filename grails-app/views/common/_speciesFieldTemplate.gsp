@@ -48,10 +48,10 @@
 						</div><div>
 								<%def imagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, '_th.jpg')%>					
 								<a target="_blank"
-									href="${createLinkTo(dir: 'images/resources/', file: r.fileName.trim(), base:grailsApplication.config.speciesPortal.images.serverURL)}">
+									href="${createLinkTo(dir: 'images/', file: r.fileName.trim(), base:grailsApplication.config.speciesPortal.images.serverURL)}">
 									<span class="wrimg"> <span></span> <img
 										class="galleryImage"
-										src="${createLinkTo(dir: 'images/resources/', file: imagePath, base:grailsApplication.config.speciesPortal.images.serverURL)}"
+										src="${createLinkTo(dir: 'images/', file: imagePath, base:grailsApplication.config.speciesPortal.images.serverURL)}"
 										title="${r?.description}" /> </span> 
 								</a>
 								<span class="caption">

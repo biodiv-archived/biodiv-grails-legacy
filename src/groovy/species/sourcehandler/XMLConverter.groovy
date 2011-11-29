@@ -494,10 +494,10 @@ class XMLConverter extends SourceConverter {
 	}
 
 	File getImagesRootFolder(File imageFile) {
-		def root = new File(config.speciesPortal.images.rootDir + File.separator + s.taxonConcept.name);
+		def root = new File(config.speciesPortal.images.rootDir , s.taxonConcept.name);
 		if(!root.exists()) {
 			if(!root.mkdir()) {
-				log.error "COULD NOT CREATE IMAGES DIR FOR SPECIES : "+s.taxonConcept.name;
+				log.error "COULD NOT CREATE IMAGES DIR FOR SPECIES : "+root.getAbsolutePath();
 			};
 		}
 		return root;

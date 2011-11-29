@@ -184,32 +184,7 @@
 								</g:elseif>
 								<g:elseif
 									test="${category.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY) || category.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.CATALOGUE_OF_LIFE_TAXONOMIC_HIERARCHY)}">
-									<div>
-										<g:set var="showFlag" value="true" />
-										<g:collect in="${category.value}"
-											expr="${it.value.get('speciesFieldInstance')}">
-											<g:if test="${showFlag}">
-												<g:showSpeciesFieldToolbar
-													model="['speciesFieldInstance':it]" />
-												<%showFlag = false; %>
-											</g:if>
-											<div class="">
-												<span class="grid_3"><b> ${it?.field?.subCategory}
-												</b> </span> 
-												
-												<g:if test="${it?.taxonDefinition?.rank == species.TaxonomyDefinition.TaxonomyRank.SPECIES.ordinal()}">
-													<span class='speciesName rank${it?.taxonDefinition?.rank}'>${it?.taxonDefinition?.name} </span>
-												</g:if>
-												<g:elseif test="${it?.taxonDefinition?.rank == species.TaxonomyDefinition.TaxonomyRank.GENUS.ordinal() || it?.taxonDefinition?.rank == species.TaxonomyDefinition.TaxonomyRank.SUB_GENUS.ordinal()}">
-													<span class='rank${it?.taxonDefinition?.rank}'>${it?.taxonDefinition?.name} </span>
-												</g:elseif>
-												<g:else> 
-													<span>${it?.taxonDefinition?.name}</span>
-												</g:else>
-												
-											</div>
-										</g:collect>
-									</div>
+									
 								</g:elseif>
 								<g:else>
 									<g:each in="${category.value}">

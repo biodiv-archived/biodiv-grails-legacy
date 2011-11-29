@@ -382,10 +382,10 @@ var heirarchyLevelFormatter = function(el, cellVal, opts) {
 								<%def gallImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, '_gall.jpg')%>						
 								<%def gallThumbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, '_gall_th.jpg')%>
 								<a target="_blank"
-									rel="${createLinkTo(dir: 'images/resources/', file: r.fileName.trim(), base:grailsApplication.config.speciesPortal.images.serverURL)}"
-									href="${createLinkTo(dir: 'images/resources/', file: gallImagePath, base:grailsApplication.config.speciesPortal.images.serverURL)}">
+									rel="${createLinkTo(dir: 'images/', file: r.fileName.trim(), base:grailsApplication.config.speciesPortal.images.serverURL)}"
+									href="${createLinkTo(dir: 'images/', file: gallImagePath, base:grailsApplication.config.speciesPortal.images.serverURL)}">
 									<img class="galleryImage"
-									src="${createLinkTo(dir: 'images/resources/', file: gallThumbImagePath, base:grailsApplication.config.speciesPortal.images.serverURL)}"
+									src="${createLinkTo(dir: 'images/', file: gallThumbImagePath, base:grailsApplication.config.speciesPortal.images.serverURL)}"
 									title="${r?.description}" /> </a>
 
 									<g:imageAttribution model="['resource':r]"/>
@@ -464,7 +464,7 @@ var heirarchyLevelFormatter = function(el, cellVal, opts) {
 				<ul style="list-style: none;">
 					<g:each in="${fields}" var="concept">
 						<g:if
-							test="${concept.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.TAXONRECORDID) || concept.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.GLOBALUNIQUEIDENTIFIER) || concept.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.TAXON_RECORD_NAME)}">
+							test="${concept.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.TAXONRECORDID) || concept.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.GLOBALUNIQUEIDENTIFIER) || concept.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.NOMENCLATURE_AND_CLASSIFICATION)}">
 						</g:if>
 						<g:else>
 							<hr />
