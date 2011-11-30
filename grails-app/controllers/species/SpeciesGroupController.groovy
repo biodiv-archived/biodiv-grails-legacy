@@ -34,12 +34,22 @@ class SpeciesGroupController {
 
     def show = {
         def speciesGroupInstance = SpeciesGroup.get(params.id)
+		def groupsConfig = grailsApplication.config.speciesPortal.group
+		
         if (!speciesGroupInstance) {
             flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'speciesGroup.label', default: 'SpeciesGroup'), params.id])}"
             redirect(action: "list")
-        } else {
-            [speciesGroupInstance: speciesGroupInstance]
-        }
+        } else if (speciesGroupInstance.name.equalsIgnoreCase(groupsConfig.ALL)) {
+			TaxonomyDefinition.list().each {
+				speciesGroupInstance.addToTaxonConcept(it);
+			}
+        } else if (speciesGroupInstance.name.equalsIgnoreCase(groupsConfig.OTHERS)) {
+			TaxonomyDefinition.findAllByGroupIsNull().each {
+				speciesGroupInstance.addToTaxonConcept(it);
+			}
+        } 
+		
+        [speciesGroupInstance: speciesGroupInstance]
     }
 
     def edit = {

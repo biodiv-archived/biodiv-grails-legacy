@@ -106,59 +106,28 @@ class GroupHandlerService {
 						sqlRestriction ("path like '"+reg.path.replaceAll("_", "!_")+"!_%' escape '!'");
 					}
 
-					batch.addAll(r.collect {it.taxonDefinition});
-					if(batch.size() == 20) {
-						noOfUpdations += updateGroup(batch, group);
-						batch.clear();
+					r.taxonDefinition.each { concept ->
+						if(concept.group != group) {
+							concept.group = group;
+							if(concept.save()) {
+								noOfUpdations++;
+							} else {
+								concept.errors.allErrors.each { log.error it }
+								log.error "Coundn't update group for concept : "+concept;
+							}
+						}
+						if(noOfUpdations % 20 == 0) {
+							log.debug "Saved group for ${noOfUpdations} taxonConcepts"
+							cleanUpGorm();
+						}
 					}
 				}
-				noOfUpdations += updateGroup(batch, group);
-				batch.clear();
+				cleanUpGorm();
 			}
 			log.debug "Time taken to save : "+((System.currentTimeMillis() - startTime)/1000) + "(sec)"
 			log.debug "Updated group for ${noOfUpdations} taxonConcentps in total"
 		}
 		return noOfUpdations;
-	}
-
-	/**
-	 * updates group for the concepts in the hierarchy
-	 * @param batch
-	 * @param group
-	 * @return
-	 */
-	int updateGroup(List<TaxonomyDefinition> batch, SpeciesGroup group) {
-		int noOfUpdations = 0;
-		println batch
-		TaxonomyDefinition.withTransaction { status ->
-			batch.eachWithIndex { TaxonomyDefinition concept, index ->
-				if(concept.group != group) {
-					concept.group = group;
-					if(concept.save()) {
-						noOfUpdations++;
-					} else {
-						concept.errors.allErrors.each { log.error it }
-						log.error "Coundn't update group for concept : "+concept;
-					}
-				}
-				if (index % 20 == 0) {
-					log.debug "Saved group for ${index} taxonConcepts"
-					cleanUpGorm();
-				}
-			}
-		}
-		return noOfUpdations;
-	}
-
-	/**
-	 * 
-	 * @param taxonConcept
-	 * @return
-	 */
-	List<TaxonomyDefinition> getChildConcepts(TaxonomyDefinition taxonConcept) {
-		List<TaxonomyDefinition> result = [];
-
-		return result;
 	}
 
 	/**
@@ -170,14 +139,11 @@ class GroupHandlerService {
 		if(taxonConcept.group) {
 			return taxonConcept.group;
 		} else {
-			//get hierarchy & chk for it in groups
+			//TODO:get hierarchy & chk for it in groups
 		}
 		return null;
 	}
 
-	/**
-	 * 
-	 */
 	/**
 	 *
 	 */

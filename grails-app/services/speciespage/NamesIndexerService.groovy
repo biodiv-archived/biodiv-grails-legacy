@@ -112,7 +112,7 @@ class NamesIndexerService {
 		def species = Species.findByTaxonConcept(taxonConcept);
 		def icon = species?.mainImage()?.fileName;
 		if(icon) {
-			icon = grailsApplication.config.speciesPortal.images.serverURL + "/images/resources/" + icon;
+			icon = grailsApplication.config.speciesPortal.images.serverURL + "/images/" + icon;
 			icon = icon.replaceFirst(/\.[a-zA-Z]{3,4}$/, '_gall_th.jpg');
 		}
 		return icon;

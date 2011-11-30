@@ -17,7 +17,7 @@ import groovyx.net.http.Method;
 class NamesParser {
 
 	private static final log = LogFactory.getLog(this);
-
+	def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 	/**
 	 * max 5000 
 	 * @param names
@@ -50,7 +50,7 @@ class NamesParser {
 	private def gniNamesParser(names) {
 		def parsedJSON;
 		def http = new HTTPBuilder()
-		http.request(  'http://gni.globalnames.org', Method.POST, ContentType.JSON) {
+		http.request(  config.speciesPortal.names.parser.serverURL, Method.POST, ContentType.JSON) {
 			uri.path = 'parsers.json'
 			body = [ names : names ]
 

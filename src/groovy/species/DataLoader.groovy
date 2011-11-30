@@ -81,66 +81,69 @@ class DataLoader {
 		log.debug "Uploading classifications done"
 	}
 
-	void uploadMappedSpreadsheet (String file, String mappingFile, int mappingSheetNo, int mappingHeaderRowNo, int contentSheetNo, int contentHeaderRowNo) {
+	int uploadMappedSpreadsheet (String file, String mappingFile, int mappingSheetNo, int mappingHeaderRowNo, int contentSheetNo, int contentHeaderRowNo) {
 		log.debug "Uploading mapped spreadsheet : "+file;
 		List<Species> species = MappedSpreadsheetConverter.getInstance().convertSpecies(file, mappingFile, mappingSheetNo, mappingHeaderRowNo, contentSheetNo, contentHeaderRowNo);
-		saveSpecies(species);
+		return saveSpecies(species);
 	}
 
-	void uploadSpreadsheet (String file, int contentSheetNo, int contentHeaderRowNo, int imageMetadataSheetNo, int imageMetaDataHeaderRowNo) {
+	int uploadSpreadsheet (String file, int contentSheetNo, int contentHeaderRowNo, int imageMetadataSheetNo, int imageMetaDataHeaderRowNo) {
 		log.debug "Uploading spreadsheet : "+file;
 		List<Species> species = SpreadsheetConverter.getInstance().convertSpecies(file, contentSheetNo, contentHeaderRowNo, imageMetadataSheetNo, imageMetaDataHeaderRowNo);
-		saveSpecies(species);
+		return saveSpecies(species);
 	}
 
-	void uploadNewSpreadsheet (String file) {
+	int uploadNewSpreadsheet (String file) {
 		log.debug "Uploading new spreadsheet : "+file;
 		List<Species> species = NewSpreadsheetConverter.getInstance().convertSpecies(file);
-		saveSpecies(species);
+		return saveSpecies(species);
 	}
 
-	void uploadKeyStoneData (String connectionUrl, String userName, String password, String mappingFile, int mappingSheetNo, int mappingHeaderRowNo) {
+	int uploadKeyStoneData (String connectionUrl, String userName, String password, String mappingFile, int mappingSheetNo, int mappingHeaderRowNo) {
 		log.debug "Uploading keystone data";
 		List<Species> species = KeyStoneDataConverter.getInstance().convertSpecies(connectionUrl, userName, password, mappingFile, mappingSheetNo, mappingHeaderRowNo);
-		saveSpecies(species);
+		return saveSpecies(species);
 	}
 
-	boolean saveSpecies(List species) {
+	int saveSpecies(List species) {
 		log.debug "Saving species : "+species.size()
-		def startTime = System.nanoTime()
+		int noOfInsertions = 0;
+		def startTime = System.currentTimeMillis()
 		List <Species> batch =[]
 		species.each {
 			batch.add(it);
 			if(batch.size()>10){
-				saveSpeciesBatch(batch);
+				noOfInsertions += saveSpeciesBatch(batch);
 				batch.clear();
 				return
 			}
 		}
 		if(batch.size() > 0) {
-			saveSpeciesBatch(batch);
+			noOfInsertions += saveSpeciesBatch(batch);
 			batch.clear();
 		}
-		def endTime =  System.nanoTime()
-		def diff = (endTime-startTime)/1000000000
-		log.debug "Time taken to save : "+diff + "(sec)"
+		log.debug "Time taken to save : "+(( System.currentTimeMillis()-startTime)/1000) + "(sec)"
 
-		log.debug "Publishing to search index"
+		//log.debug "Publishing to search index"
 		//def searchIndexManager = new SearchIndexManager();
 		//searchIndexManager.publishSearchIndex(species);
+		return noOfInsertions;
 	}
 
-	void saveSpeciesBatch(List<Species> batch) {
+	int saveSpeciesBatch(List<Species> batch) {
+		int noOfInsertions = 0;
 		Species.withTransaction {
 			for(Species s in batch) {
 				if(!s.save()) {
 					s.errors.allErrors.each { log.error it }
+				} else {
+					noOfInsertions++;
 				}
 			}
 		}
 		log.debug "Saved batch"
 		//TODO : probably required to clear hibernate cache	
 		//Reference : http://naleid.com/blog/2009/10/01/batch-import-performance-with-grails-and-mysql/
-		
+		return noOfInsertions;
 	}
 }

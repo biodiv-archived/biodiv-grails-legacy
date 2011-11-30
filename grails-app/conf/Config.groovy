@@ -158,10 +158,10 @@ speciesPortal {
 	data.rootDir = "${userHome}/species/data"
 
 	images.rootDir = "${userHome}/species/images/"
-	images.uploadDir = "${userHome}/sravanthi/projects/westernghats/images"
+	images.uploadDir = "${images.rootDir}/uploads"
 	images.serverURL = "http://localhost/${appName}"
 
-
+	names.parser.serverURL = "http://gni.globalnames.org"
 	search {
 		serverURL = "http://localhost:8090/solr/species"
 		queueSize = 1000
@@ -202,7 +202,7 @@ speciesPortal {
 		IOC_TAXONOMIC_HIERARCHY = 'IOC Taxonomy Hierarchy (2009)'
 		EBIRD_TAXONOMIC_HIERARCHY = 'eBird Taxonomy Hierarchy (2010)'
 		OBC_TAXONOMIC_HIERARCHY = 'OBC Taxonomy Hierarchy (2001)'
-		FLOWERS_OF_INDIA_TAXONOMIC_HIERARCHY = 'Flowers of India Taxonomy Hierarchy (2001)'
+		FLOWERS_OF_INDIA_TAXONOMIC_HIERARCHY = 'Flowers of India Taxonomy Hierarchy'
 
 		COMMON_NAME = "Common Name"
 		SYNONYMS = "Synonyms"
@@ -235,7 +235,10 @@ speciesPortal {
 		AUDIO = "audio"
 		VIDEO = "video"
 	}
-
+	group {
+		ALL = "All"
+		OTHERS = "others"
+	}
 	searchFields {
 		ID = "id"
 		GUID = "guid"
@@ -289,22 +292,22 @@ speciesPortal.validCrossDomainOrigins = [
 
 environments {
 	development {
+		
 		grails.serverURL = "http://localhost:8080/${appName}"
 		speciesPortal {
+			data.rootDir = "${userHome}/git/biodiv/species/data"
+			images.rootDir = "${userHome}/git/biodiv/species/images/"
+			images.uploadDir = "${images.rootDir}/uploads"
 			search.serverURL = "http://localhost:8090/solr/species"
-
-			//uiperformance.enabled = false
 		}
 		google.analytics.enabled = false
 	}
 	test {
 		grails.serverURL = "http://localhost:8080/${appName}"
-
 		google.analytics.enabled = false
 	}
 	production {
 		grails.serverURL = "http://localhost:8080/${appName}"
-
 		google.analytics.enabled = false
 	}
 
@@ -316,14 +319,7 @@ environments {
 			search.serverURL="http://saturn.strandls.com:8080/solr/species"
 			grails.project.war.file = "/data/jetty-6.1.26/webapps/${appName}.war"
 		}
-		google.analytics.webPropertyID = "UA-xxxxxx-x"
 		google.analytics.enabled = false
-		google.analytics.customTrackingCode = [
-			[_setDetectFlash: false],
-			[_setCampaignCookieTimeout: 31536000000],
-			"_trackPageview",
-			"_trackPageLoadTime"
-		]
 	}
 
 	pamba {
