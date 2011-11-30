@@ -6,7 +6,7 @@ import species.Resource.ResourceType;
 
 class Species {
 
-	String title;
+	String title; 
 	String guid;
 	TaxonomyDefinition taxonConcept;
 	

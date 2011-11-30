@@ -73,17 +73,23 @@ class GroupHandlerService {
 			SpeciesGroup group = addGroup(name, parentGroup);
 			if(group && taxonConcept) {
 				updateGroup(taxonConcept, group);
-			} 
+			}
 		}
 	}
 
+	/**
+	 * Updates group for taxonConcept and all concepts below this under any of the hierarchies
+	 * @param taxonConcept
+	 * @param group
+	 * @return
+	 */
 	int updateGroup(TaxonomyDefinition taxonConcept, SpeciesGroup group) {
 		log.debug "Updating group associations for taxon concept : "+taxonConcept;
 		int noOfUpdations = 0;
 
 		if(taxonConcept && group) {
 			def startTime = System.currentTimeMillis();
-			
+
 			taxonConcept.group = group;
 			if(taxonConcept.save()) {
 				noOfUpdations++;
@@ -91,9 +97,41 @@ class GroupHandlerService {
 				taxonConcept.errors.allErrors.each { log.error it }
 			}
 
-			List childConcepts = getChildConcepts(taxonConcept);
-			childConcepts.eachWithIndex { TaxonomyRegistry registry, index ->
-				TaxonomyDefinition concept = registry.taxonDefinition;
+			if(taxonConcept) {
+				List batch = new ArrayList();
+				TaxonomyRegistry.findAllByTaxonDefinition(taxonConcept).each { TaxonomyRegistry reg ->
+					//TODO : better way : http://stackoverflow.com/questions/673508/using-hibernate-criteria-is-there-a-way-to-escape-special-characters
+					def c = TaxonomyRegistry.createCriteria();
+					def r = c.list {
+						sqlRestriction ("path like '"+reg.path.replaceAll("_", "!_")+"!_%' escape '!'");
+					}
+
+					batch.addAll(r.collect {it.taxonDefinition});
+					if(batch.size() == 20) {
+						noOfUpdations += updateGroup(batch, group);
+						batch.clear();
+					}
+				}
+				noOfUpdations += updateGroup(batch, group);
+				batch.clear();
+			}
+			log.debug "Time taken to save : "+((System.currentTimeMillis() - startTime)/1000) + "(sec)"
+			log.debug "Updated group for ${noOfUpdations} taxonConcentps in total"
+		}
+		return noOfUpdations;
+	}
+
+	/**
+	 * updates group for the concepts in the hierarchy
+	 * @param batch
+	 * @param group
+	 * @return
+	 */
+	int updateGroup(List<TaxonomyDefinition> batch, SpeciesGroup group) {
+		int noOfUpdations = 0;
+		println batch
+		TaxonomyDefinition.withTransaction { status ->
+			batch.eachWithIndex { TaxonomyDefinition concept, index ->
 				if(concept.group != group) {
 					concept.group = group;
 					if(concept.save()) {
@@ -108,9 +146,6 @@ class GroupHandlerService {
 					cleanUpGorm();
 				}
 			}
-			cleanUpGorm();
-			log.debug "Time taken to save : "+((System.currentTimeMillis() - startTime)/1000) + "(sec)"
-			log.debug "Updated group for ${noOfUpdations} taxonConcentps in total"
 		}
 		return noOfUpdations;
 	}
@@ -122,16 +157,7 @@ class GroupHandlerService {
 	 */
 	List<TaxonomyDefinition> getChildConcepts(TaxonomyDefinition taxonConcept) {
 		List<TaxonomyDefinition> result = [];
-		if(taxonConcept) {
-			TaxonomyRegistry.findAllByTaxonDefinition(taxonConcept).each { reg ->
-				//TODO : better way : http://stackoverflow.com/questions/673508/using-hibernate-criteria-is-there-a-way-to-escape-special-characters
-				def c = TaxonomyRegistry.createCriteria();
-				def r = c.list {
-					sqlRestriction ("path like '"+reg.path.replaceAll("_", "!_")+"!_%' escape '!'");
-				}
-				result.addAll(r);
-			}
-		}
+
 		return result;
 	}
 

@@ -1,5 +1,6 @@
 package speciespage
 
+import species.Species;
 import species.search.SearchIndexManager;
 
 class SearchService {
@@ -18,4 +19,7 @@ class SearchService {
 		return searchIndexManager.terms(query)
 	}
 
+	def publishSearchIndex(List<Species> species) {
+		return searchIndexManager.publishSearchIndex(species);
+	}
 }

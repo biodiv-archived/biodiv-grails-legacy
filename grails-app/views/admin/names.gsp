@@ -21,9 +21,15 @@
 
 		<div class="grid_16">
 			<div>
-				<a href="${createLink(action:'reloadNames')}">Reload Names</a><br/>
-				<a href="${createLink(action:'reloadNamesIndex')}">Reload Names Index</a>
-			
+			<ul>
+				<li><a href="${createLink(action:'setup')}">Setup the db by loading all definitions</a></li>
+				<li><a href="${createLink(action:'loadData')}">Load sample data</a></li>
+				<li><a href="${createLink(action:'loadNames')}">Load sample names</a></li>
+				<li><a href="${createLink(action:'reloadNames')}">Sync names and recommendations</a></li>
+				<li><a href="${createLink(action:'reloadSearchIndex')}">Recreate search index</a>
+				<li><a href="${createLink(action:'reloadNamesIndex')}">Recreate names index</a>
+				<li><a href="${createLink(action:'updateGroups')}">Update groups for taxon concepts</a></li>
+			</ul>
 			</div>
 		</div>
 	</div>

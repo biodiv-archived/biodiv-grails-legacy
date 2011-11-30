@@ -357,7 +357,8 @@ navigation.dashboard = [
 			[controller:'observation', title:'Browse', order:1, action:'list'],
 			[controller:'observation', title:'Add Observation', order:10, action:"create"],
 		]],
-	[group:'search', order:50, controller:'search', title:'Advanced Search', action:'advSelect']
+	[group:'search', order:50, controller:'search', title:'Advanced Search', action:'advSelect'],
+	[group:'admin', order:60, controller:'admin', title:'Admin', action:'index']
 ]
 
 ckeditor  = {
