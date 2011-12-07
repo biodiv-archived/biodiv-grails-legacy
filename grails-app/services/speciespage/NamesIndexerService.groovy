@@ -105,7 +105,7 @@ class NamesIndexerService {
 			String term = charTermAttribute.toString()?.replaceAll("\u00A0|\u2007|\u202F", " ");
 			log.debug "Adding name term : "+term
 			synchronized(lookup) {
-				success |= lookup.add(term, new Record(originalName:reco.name, canonicalForm:reco.taxonConcept.canonicalForm, icon:icon, wt:wt));
+				success |= lookup.add(term, new Record(originalName:reco.name, canonicalForm:reco.taxonConcept?.canonicalForm, icon:icon, wt:wt));
 			}
 		}
 		return success;
@@ -159,16 +159,12 @@ class NamesIndexerService {
 	 */
 	synchronized boolean load(String storeDir) {
 		File f = new File(storeDir, FILENAME);
-		if(!f.exists()) {
+		if(!f.exists() || !f.canRead()) {
 			rebuild();
 		} else {
-			File data = new File(f, FILENAME);
-			if (!data.exists() || !data.canRead()) {
-				return false;
-			}
 			log.debug "Loading autocomplete index from : "+f.getAbsolutePath();
 			def startTime = System.currentTimeMillis()
-			data.withObjectInputStream(lookup.getClass().classLoader){ ois ->
+			f.withObjectInputStream(lookup.getClass().classLoader){ ois ->
 				lookup = ois.readObject( )
 			}
 			log.debug "Loading autocomplete index done";

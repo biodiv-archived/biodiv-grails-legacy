@@ -24,7 +24,7 @@ class Species {
 		taxonomyRegistry sort:'taxonDefinition'
 	}
 
-	Resource mainImage() {
+	Resource mainImage() { 
 		def images = getImages();
 		return images?images[0]:null;
 	}

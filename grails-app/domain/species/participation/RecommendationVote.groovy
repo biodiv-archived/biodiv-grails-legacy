@@ -18,6 +18,9 @@ class RecommendationVote {
 			this.value = value;
 		}
 		
+		static list() {
+			return [CERTAIN, UNSURE, DONT_KNOW];
+		}
 		String value() {
 			return this.value;
 		}
@@ -32,7 +35,7 @@ class RecommendationVote {
 	
 	static constraints = {
 		recommendation(unique:['author', 'observation']);
-		votedOn(max:new Date());
+		votedOn validator : {val -> val < new Date()};
 	}
 	
 	static mapping = {

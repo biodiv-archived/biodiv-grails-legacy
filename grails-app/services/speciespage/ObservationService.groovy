@@ -4,9 +4,10 @@ import java.util.Date;
 
 import species.Resource;
 import species.Resource.ResourceType;
+import species.SpeciesGroup;
+import species.TaxonomyDefinition;
 import species.auth.SUser;
 import species.participation.Observation;
-import species.participation.ObservationException;
 import species.participation.Recommendation;
 import species.participation.RecommendationVote;
 import species.participation.RecommendationVote.ConfidenceType;
@@ -25,6 +26,7 @@ class ObservationService {
 	 * @return
 	 */
 	Observation createObservation(params) {
+		log.debug "Creating observations from params : "+params
 		Observation observation = new Observation();
 
 		
@@ -36,6 +38,7 @@ class ObservationService {
 			observation.url = params.url;
 		}
 		
+		observation.group = SpeciesGroup.get(params.group?.id);
 		observation.notes = params.notes;
 		observation.observedOn = params.observedOn?:new Date();
 		
@@ -56,7 +59,7 @@ class ObservationService {
 	 */
 	RecommendationVote getRecommendationVote(params) {
 		def observation = Observation.get(params.obvId);
-		def reco = getRecommendation(params);
+		def reco = getRecommendation(params.recoName, params.canName);
 		def author = params.author;
 		ConfidenceType confidence = getConfidenceType(params.confidence);
 		return getRecommendationVote(observation, reco, author, confidence);
@@ -78,8 +81,8 @@ class ObservationService {
 	 * 	
 	 */
 	RecommendationVote createRecommendationVote(params) {
-		def observation = Observation.get(params.obvId);
-		def reco = getRecommendation(params);
+		def observation = params.observation?:Observation.get(params.obvId);
+		def reco = getRecommendation(params.recoName, params.canName);
 		def author = params.author;
 		ConfidenceType confidence = getConfidenceType(params.confidence);
 		return new RecommendationVote(observation:observation, recommendation:reco, author:author, confidence:confidence);
@@ -88,14 +91,27 @@ class ObservationService {
 	 * 
 	 * @return
 	 */
-	private Recommendation getRecommendation(params) {
-		def reco;
-		if(params.recoId) {
-			reco = Recommendation.get(params.recoId)
-		} else {
-			reco = new Recommendation(name:params.recoName);
+	private Recommendation getRecommendation(recoName, canName) {
+		def reco, taxonConcept;
+		if(canName) {
+			//findBy returns first...assuming taxon concepts wont hv same canonical name and different rank 
+			taxonConcept = TaxonomyDefinition.findByCanonicalFormIlike(canName);
+		}
+		
+		if(recoName) {
+			//CHK:doing findBy...getting first name by this canonical form
+			def c = Recommendation.createCriteria();
+			reco = c.get {
+				ilike('name', recoName);
+				(taxonConcept) ? eq('taxonConcept', taxonConcept) : isNull('taxonConcept');
+			}
+		}
+		
+		if(!reco) {
+			reco = new Recommendation(name:recoName, taxonConcept:taxonConcept);
 			recommendationService.save(reco);
 		}
+		
 		return reco;
 	}
 
@@ -104,7 +120,6 @@ class ObservationService {
 	 */
 	private List<Resource> saveResources(Observation observation, resourcesXML) {
 		XMLConverter converter = new XMLConverter();
-		println resourcesXML;
 		converter.setResourcesRootDir(grailsApplication.config.speciesPortal.observations.rootDir);
 		def relImagesContext = resourcesXML.images.image?.getAt(0)?.fileName?.getAt(0)?.text()?.replace(grailsApplication.config.speciesPortal.observations.rootDir.toString(), "")?:""
 		relImagesContext = new File(relImagesContext).getParent();
@@ -119,7 +134,7 @@ class ObservationService {
 	ConfidenceType getConfidenceType(String confidenceType) {
 		if(!confidenceType) return null;
 		for(ConfidenceType type : ConfidenceType) {
-			if(type.value().equals(confidenceType)) {
+			if(type.name().equals(confidenceType)) {
 				return type;
 			}
 		}

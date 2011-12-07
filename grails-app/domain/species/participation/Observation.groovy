@@ -4,6 +4,7 @@ import grails.plugins.springsecurity.Secured
 
 import species.Contributor;
 import species.Resource;
+import species.SpeciesGroup;
 import species.auth.SUser;
 
 class Observation {
@@ -34,13 +35,14 @@ class Observation {
 	Date observedOn;
 	Date createdOn = new Date();
 	String notes;
+	SpeciesGroup group;
 	
 	static hasMany = [resource:Resource, recommendationVote:RecommendationVote];
 
 	static constraints = {
 		notes nullable:true
 		resource validator : { val, obj -> val && val.size() > 0 }
-		observedOn (max:new Date())
+		observedOn validator : {val -> val < new Date()}
 		notes (size:0..400)
 	}
 

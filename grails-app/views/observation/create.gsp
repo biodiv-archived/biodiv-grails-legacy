@@ -1,6 +1,7 @@
 <%@page import="species.License"%>
 <%@page import="species.License.LicenseType"%>
 <%@ page import="species.participation.Observation"%>
+
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -128,6 +129,17 @@
 									
 									<reco:create/>
 								</td>
+							</tr>
+							
+							<tr class="prop">
+								<td valign="top" class="name"><label for="group"><g:message
+											code="observation.group.label" default="Group" /> </label>
+								</td>
+								<td valign="top"
+									class="value ${hasErrors(bean: observationInstance, field: 'group', 'errors')}">
+									<g:select name="group.id" from="${species.SpeciesGroup.list()}"
+										optionKey="id" optionValue="name"
+										value="${observationInstance?.group?.id}" class="ui-widget-content ui-corner-all"/></td>
 							</tr>
 							
 							<tr class="prop">

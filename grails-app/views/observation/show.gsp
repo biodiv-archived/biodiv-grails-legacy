@@ -1,5 +1,6 @@
 
 <%@ page import="species.participation.Observation"%>
+<%@ page import="species.participation.Recommendation"%>
 <%@ page import="species.participation.RecommendationVote"%>
 <html>
 <head>
@@ -79,18 +80,19 @@
 			
 			<div class="grid_16 recommendations">
 			<%
-				def recos = RecommendationVote.createCriteria().list { 
+				def result = RecommendationVote.createCriteria().list { 
 					projections {
 						groupProperty("recommendation")
-						count("id")
+						count 'id', 'voteCount'
 					}
 					eq('observation', observationInstance)
+					order 'voteCount'
 				}
 			 %>
-			 <g:if test="${recos}">
-			 	<g:message code="recommendations.no.message",  args="[recos.size()]" />
-				<g:each in="${recos}" var="reco">
-					<reco:show model="['recommendationInstance':reco]"/>
+			 <g:if test="${result}">
+			 	<g:message code="recommendations.no.message",  args="[result.size()]" />
+				<g:each in="${result}" var="r">
+					<reco:show model="['recommendationInstance':r[0], 'voteCount':r[1]]"/>
 				</g:each>
 			</g:if>
 			<g:else>

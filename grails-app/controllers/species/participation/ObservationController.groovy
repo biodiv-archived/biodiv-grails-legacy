@@ -44,8 +44,11 @@ class ObservationController {
 			if(!observationInstance.hasErrors() && observationInstance.save(flush:true)) {
 				//flash.message = "${message(code: 'default.created.message', args: [message(code: 'observation.label', default: 'Observation'), observationInstance.id])}"
 				log.debug "Successfully created observation : "+observationInstance
+				
 				params.obvId = observationInstance.id
-				def recommendationVoteInstance = new RecommendationVote(params)
+				
+				//Saves recommendation if its not present
+				def recommendationVoteInstance = observationService.createRecommendationVote(params)
 
 				if (recommendationVoteInstance.save(flush: true)) {
 					log.debug "Successfully added reco vote : "+recommendationVoteInstance
@@ -53,6 +56,7 @@ class ObservationController {
 					redirect(action: "show", id: observationInstance.id);
 				}
 				else {
+					log.error recommendationVoteInstance.errors.each { log.error it }
 					render(view: "show", model: [observationInstance:observationInstance, recommendationVoteInstance: recommendationVoteInstance])
 				}
 			} else {

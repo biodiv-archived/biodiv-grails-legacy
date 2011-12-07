@@ -72,36 +72,6 @@
 			<attribute name="com.springsource.sts.grails.core.SOURCE_FOLDER" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="src" path=".link_to_grails_plugins/file-uploader-1.2.1/grails-app/controllers">
-		<attributes>
-			<attribute name="com.springsource.sts.grails.core.SOURCE_FOLDER" value="true"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="src" path=".link_to_grails_plugins/file-uploader-1.2.1/grails-app/domain">
-		<attributes>
-			<attribute name="com.springsource.sts.grails.core.SOURCE_FOLDER" value="true"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="src" path=".link_to_grails_plugins/file-uploader-1.2.1/grails-app/i18n">
-		<attributes>
-			<attribute name="com.springsource.sts.grails.core.SOURCE_FOLDER" value="true"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="src" path=".link_to_grails_plugins/file-uploader-1.2.1/grails-app/services">
-		<attributes>
-			<attribute name="com.springsource.sts.grails.core.SOURCE_FOLDER" value="true"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="src" path=".link_to_grails_plugins/file-uploader-1.2.1/grails-app/taglib">
-		<attributes>
-			<attribute name="com.springsource.sts.grails.core.SOURCE_FOLDER" value="true"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="src" path=".link_to_grails_plugins/file-uploader-1.2.1/src/groovy">
-		<attributes>
-			<attribute name="com.springsource.sts.grails.core.SOURCE_FOLDER" value="true"/>
-		</attributes>
-	</classpathentry>
 	<classpathentry kind="src" path=".link_to_grails_plugins/google-analytics-1.0/grails-app/taglib">
 		<attributes>
 			<attribute name="com.springsource.sts.grails.core.SOURCE_FOLDER" value="true"/>

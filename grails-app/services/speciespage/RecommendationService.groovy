@@ -23,7 +23,8 @@ class RecommendationService {
 	static transactional = false
 
 	/**
-	 * 
+	 * TODO:Bind this call to recommendation domain object save
+	 * as a recommendation can be saved with out being indexed
 	 * @param reco
 	 * @return
 	 */

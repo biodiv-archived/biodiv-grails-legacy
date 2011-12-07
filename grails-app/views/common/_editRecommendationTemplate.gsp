@@ -1,3 +1,4 @@
+<%@ page import="species.participation.RecommendationVote.ConfidenceType" %>
 <!-- TODO change this r:script which is used by resources framework for script not to be repeated multiple times -->
 <g:javascript>
 
@@ -36,13 +37,14 @@ $(document).ready(function() {
 					}
 				});
 			},focus: function( event, ui ) {
+				$("#canName").val("");
 				$( "#name" ).val( ui.item.label.replace(/<.*?>/g,"") );
 				return false;
 			},
 			select: function( event, ui ) {
 				$( "#name" ).val( ui.item.label.replace(/<.*?>/g,"") );
-				$( "#name-id" ).val( ui.item.value );
-				$( "#name-description" ).html( ui.item.desc ? ui.item.desc : "" );
+				$( "#canName" ).val( ui.item.value );
+				$( "#name-description" ).html( ui.item.value ? ui.item.label.replace(/<.*?>/g,"")+" ("+ui.item.value+")" : "" );
 				ui.item.icon ? $( "#name-icon" ).attr( "src",  ui.item.icon).show() : $( "#name-icon" ).hide();
 				return false;
 			}
@@ -73,18 +75,26 @@ $(document).ready(function() {
 		class="value ${hasErrors(bean: recommendationInstance, field: 'name', 'errors')}">
 	</div>
 	<div>
-		<div id="nameContainer" class="grid_4 prop">
-			<label class="name">Suggest Name </label> <input type="text"
-				name="query" name="name" id="name"
-				value="${recommendationInstance?.name}" size="40"
-				class="grid_4 value text ui-widget-content ui-corner-all" /> <input
-				type="hidden" id="name-id" />
+		<div id="nameContainer" class="prop">
+			<input type="text"
+				name="recoName" id="name"
+				value="${recommendationInstance?.name}" 
+				class="value text ui-widget-content ui-corner-all" /> 
+			<input
+				type="hidden" name="canName" id="canName" /> 
+			<select name="confidence" class="value ui-corner-all">
+				<g:each in="${ConfidenceType.list()}" var="l">
+					<option value="${l}">						
+						${l.value()}
+					</option>
+				</g:each>
+			</select>
 		</div>
-		<br />
 		<div class="grid_16">
 			<img id="name-icon" src="" class="ui-state-default icon"
 				style="float: left; display: none;" />
 			<p id="name-description"></p>
 		</div>
+		
 	</div>
 </div>
