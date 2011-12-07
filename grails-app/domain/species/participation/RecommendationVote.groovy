@@ -2,6 +2,7 @@ package species.participation
 
 import species.Contributor;
 import species.TaxonomyDefinition;
+import species.auth.SUser;
 
 
 class RecommendationVote {
@@ -22,19 +23,20 @@ class RecommendationVote {
 		}
 	}
 	
-	Contributor author;
+	SUser author;
 	Recommendation recommendation;
 	ConfidenceType confidence;
-	Date votedOn;
+	Date votedOn = new Date();
 	
 	static belongsTo = [observation:Observation];
 	
 	static constraints = {
-		recommendation(unique:['author']);
+		recommendation(unique:['author', 'observation']);
+		votedOn(max:new Date());
 	}
 	
 	static mapping = {
-		version:false;
+		
 	}
 
 }

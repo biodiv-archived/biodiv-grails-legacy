@@ -32,16 +32,16 @@ $(document).ready(function(){
 					<li class="figure" style="max-height: 220px;"><g:link
 							action="show" id="${speciesInstance.id}">
 							<g:set var="mainImage" value="${speciesInstance.mainImage()}" />
-							<%def thumbnailPath = mainImage?.fileName?.replaceFirst(/\.[a-zA-Z]{3,4}$/, '_th.jpg')%>
+							<%def thumbnailPath = mainImage?.fileName?.replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.thumbnail.suffix)%>
 							<span class="wrimg"> <span></span> <g:if
-									test="${(new File(grailsApplication.config.speciesPortal.images.rootDir+thumbnailPath)).exists()}">
+									test="${(new File(grailsApplication.config.speciesPortal.resources.rootDir+thumbnailPath)).exists()}">
 									<img
-										src="${createLinkTo(dir: 'images/', base:grailsApplication.config.speciesPortal.images.serverURL,
+										src="${createLinkTo(dir: 'images/', base:grailsApplication.config.speciesPortal.resources.serverURL,
 											file: thumbnailPath)}" />
 								</g:if>
 								<g:else>
 									<img class="galleryImage"
-										src="${createLinkTo(dir: 'images/', file:"no-image.jpg", base:grailsApplication.config.speciesPortal.images.serverURL)}"
+										src="${createLinkTo(dir: 'images/', file:"no-image.jpg", base:grailsApplication.config.speciesPortal.resources.serverURL)}"
 										title="You can contribute!!!" />
 								</g:else> </span>
 						</g:link> <span class='caption'> ${speciesInstance.taxonConcept.italicisedForm}

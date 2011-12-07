@@ -82,6 +82,7 @@ log4j = {
 			'net.sf.ehcache.hibernate'
 
 	warn   'org.mortbay.log'
+			'resource'
 	debug	'species',
 			'speciespage',
 			'grails.app'
@@ -155,13 +156,39 @@ else {
 
 
 speciesPortal {
-	data.rootDir = "${userHome}/species/data"
+	app.rootDir = "${userHome}/species"
+	data.rootDir = "${app.rootDir}/data"
+	resources {
+		rootDir = "${app.rootDir}/images"
+		serverURL = "http://localhost/${appName}"
+		images {
+			defaultType = "jpg"
+			thumbnail {
+				suffix = "_th"+".${defaultType}"
+				width = 200
+				height = 200
+			}
+			
+			gallery {
+				suffix = "_gall"+".${defaultType}"
+				width = 500
+				height = 300
+			
+			}
+			galleryThumbnail {
+				suffix = "_gall_th"+".${defaultType}"
+				width = 50
+				height = 50
+			}
+		}
+	}
+	observations {
+		rootDir = "${app.rootDir}/observations"
+		serverURL = "http://localhost/${appName}/observations"
+	}
 
-	images.rootDir = "${userHome}/species/images/"
-	images.uploadDir = "${images.rootDir}/uploads"
-	images.serverURL = "http://localhost/${appName}"
-
-	names.parser.serverURL = "http://gni.globalnames.org"
+	names.parser.serverURL = "192.168.4.217"
+	names.parser.port = 4334
 	search {
 		serverURL = "http://localhost:8090/solr/species"
 		queueSize = 1000
@@ -277,7 +304,6 @@ speciesPortal {
 		SPECIES_ID = "species_id"
 		AUTOCOMPLETE = "autocomplete"
 	}
-
 }
 
 speciesPortal.validCrossDomainOrigins = [
@@ -295,9 +321,6 @@ environments {
 		
 		grails.serverURL = "http://localhost:8080/${appName}"
 		speciesPortal {
-			data.rootDir = "${userHome}/git/biodiv/species/data"
-			images.rootDir = "${userHome}/git/biodiv/species/images/"
-			images.uploadDir = "${images.rootDir}/uploads"
 			search.serverURL = "http://localhost:8090/solr/species"
 		}
 		google.analytics.enabled = false
@@ -314,7 +337,7 @@ environments {
 	saturn {
 		grails.serverURL = "http://saturn.strandls.com:8080/${appName}"
 		speciesPortal {
-			images.serverURL = "http://saturn.strandls.com/${appName}"
+			resources.serverURL = "http://saturn.strandls.com/${appName}"
 
 			search.serverURL="http://saturn.strandls.com:8080/solr/species"
 			grails.project.war.file = "/data/jetty-6.1.26/webapps/${appName}.war"
@@ -325,7 +348,7 @@ environments {
 	pamba {
 		grails.serverURL = "http://pamba.strandls.com:8080/${appName}"
 		speciesPortal {
-			images.serverURL = "http://pamba.strandls.com/${appName}"
+			resources.serverURL = "http://pamba.strandls.com/${appName}"
 
 			search.serverURL="http://pamba.strandls.com:8080/solr/species"
 		}
@@ -417,5 +440,51 @@ ckeditor  = {
 }
 
 
+jquery {
+	sources = 'jquery'
+	coreSuffix = 'core'
+	cssFolder = 'theme'
+	cssDefault = 'base'
+	minFolder = 'minified'
+	minExtentsion = 'min'
+}
+
+grails.resources.uri.prefix="${grails.serverURL}/static/"
+grails.resources.debug = false
+grails.resources.modules = {
+	core {
+		dependsOn 'jquery-ui'
+	}
+	// Define reference to custom jQuery UI theme
+	overrides {
+		'jquery-theme' {
+			resource id: 'theme', url: 'css/custom-theme/jquery-ui-.custom.css'
+		}
+	}
+	
+//	'jquery' {
+//		resource url:'js/jquery/jquery-1.4.2-min.js', nominify:true, disposition:'head'
+//	}
+//	'jquery-ui' {
+//		dependsOn 'jquery'
+//		resource url:[dir:'js/jquery-ui', file:'jquery-ui-1.8-min.js'], nominify:true
+//		resource url:[dir:'js/jquery-ui', file:'jquery-ui-1.8-min.css'],
+//				nominify:true, attrs:[media:'screen,projection']
+//	}
+//	'blueprint' {
+//		resource url:[dir:'css/blueprint',file:'screen.css'], attrs:[media:'screen,projection']
+//		resource url:[dir:'css/blueprint',file:'print.css'], attrs:[media:'print']
+//		resource url:[dir:'css/blueprint',file:'ie.css'], attrs:[media:'screen,projection'],
+//			  wrapper: { s -> "<!--[if lt IE 8]>$s<![endif]-->" }
+//	}
+//	'app' {
+//		resource 'css/main.css'
+//		resource 'js/application.js'
+//	}
+}
 
 
+// Added by the Spring Security Core plugin:
+grails.plugins.springsecurity.userLookup.userDomainClassName = 'species.auth.SUser'
+grails.plugins.springsecurity.userLookup.authorityJoinClassName = 'species.auth.SUserRole'
+grails.plugins.springsecurity.authority.className = 'species.auth.Role'

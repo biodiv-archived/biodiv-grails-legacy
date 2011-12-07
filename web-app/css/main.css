@@ -138,7 +138,46 @@ input:focus,select:focus,textarea:focus {
 	padding: 5px 5px 5px 30px
 }
 
+div.errors {
+    background: #fff3f3;
+    border: 1px solid red;
+    color: #cc0000;
+    margin: 10px 0 5px 0;
+    padding: 5px 0 5px 0;
+}
+
+div.errors ul {
+    list-style: none;
+    padding: 0;
+}
+div.errors li {
+        background: url(../images/skin/exclamation.png) 8px 0% no-repeat;
+    line-height: 16px;
+    padding-left: 30px;
+}
+
+td.errors select {
+    border: 1px solid red;
+}
+td.errors input {
+    border: 1px solid red;
+}
+td.errors textarea {
+    border: 1px solid red;
+}
+
 /* TABLES */
+th.asc a, th.desc a {
+    background-position: right;
+    background-repeat: no-repeat;
+}
+th.asc a {
+    background-image: url(../images/skin/sorted_asc.gif);
+}
+th.desc a {
+    background-image: url(../images/skin/sorted_desc.gif);
+}
+
 .odd {
 	background: #f7f7f7;
 }
@@ -178,7 +217,7 @@ input:focus,select:focus,textarea:focus {
 	padding: 2px 6px;
 }
 
-/* .paginateBar {
+.paginateBar {
 	color: #666;
 	font-size: 9px;
 	width: 50px;
@@ -213,7 +252,7 @@ input:focus,select:focus,textarea:focus {
 	margin: 0 3px;
 	padding: 2px 6px;
 }
-*/
+
 .paginateButtons span {
 	padding: 2px 3px;
 }
@@ -470,7 +509,7 @@ input:focus,select:focus,textarea:focus {
 	font-style: italic;
 }
 /*  Moz: NO border qui altrimenti difficolta' con width, table altrimenti problemi a text resize (risolubili con refresh) */
-.thumbwrap  .figure>div { /*\*/
+.thumbwrap  .figure > div { /*\*/
 	display: table; /**/
 	width: 200px;
 }
@@ -601,4 +640,43 @@ img {
 	 */
 * html .ui-autocomplete {
 	height: 400px;
+}
+
+.ui-autocomplete-category {
+	font-weight: bold;
+	padding: .2em .4em;
+	margin: .8em 0 .2em;
+	line-height: 1.5;
+}
+
+.heading {
+	background: #fff url(../images/skin/shadow.jpg) repeat-x center;
+	padding: 3px;
+	border-bottom: 3px solid #A9DA92;
+}
+
+.sidebar {
+	/*position: relative;
+	width: 300px;*/
+	float: right;
+	margin: 54px 0 30px;
+}
+
+.recommendations, .observations {
+	/*background: #fff url(../images/skin/shadow.jpg) repeat-x center;*/
+	margin-top: 30px;
+	padding:10px;
+	/*border-bottom: 3px solid #A9DA92;*/
+}
+
+.observation .addedResource, .observation .snippet {
+	display:block;
+	margin-top: 10px;
+	border-bottom: 3px solid #A9DA92;
+	padding:5px;
+}
+
+.observation .adedResource .figure, .observation .figure {
+	padding-right:10px; 
+	border-right:2px solid #A9DA92;
 }

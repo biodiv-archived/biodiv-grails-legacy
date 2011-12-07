@@ -65,8 +65,6 @@
 
 <g:javascript src="jquery.collapser/jquery.collapser.min.js"
 	base="${grailsApplication.config.grails.serverURL+'/js/'}" />
-<g:javascript src="readmore/readmore.js"
-	base="${grailsApplication.config.grails.serverURL+'/js/'}" />
 <g:javascript src="floating-1.7.js"
 	base="${grailsApplication.config.grails.serverURL+'/js/'}" />
 <!-- 
@@ -379,13 +377,13 @@ var heirarchyLevelFormatter = function(el, cellVal, opts) {
 						<g:if test="${speciesInstance.getImages()}">
 							<g:each in="${speciesInstance.getImages()}" var="r">
 							
-								<%def gallImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, '_gall.jpg')%>						
-								<%def gallThumbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, '_gall_th.jpg')%>
+								<%def gallImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.gallery.suffix)%>
+								<%def gallThumbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.galleryThumbnail.suffix)%>
 								<a target="_blank"
-									rel="${createLinkTo(dir: 'images/', file: r.fileName.trim(), base:grailsApplication.config.speciesPortal.images.serverURL)}"
-									href="${createLinkTo(dir: 'images/', file: gallImagePath, base:grailsApplication.config.speciesPortal.images.serverURL)}">
+									rel="${createLinkTo(dir: 'images/', file: r.fileName.trim(), base:grailsApplication.config.speciesPortal.resources.serverURL)}"
+									href="${createLinkTo(dir: 'images/', file: gallImagePath, base:grailsApplication.config.speciesPortal.resources.serverURL)}">
 									<img class="galleryImage"
-									src="${createLinkTo(dir: 'images/', file: gallThumbImagePath, base:grailsApplication.config.speciesPortal.images.serverURL)}"
+									src="${createLinkTo(dir: 'images/', file: gallThumbImagePath, base:grailsApplication.config.speciesPortal.resources.serverURL)}"
 									title="${r?.description}" /> </a>
 
 									<g:imageAttribution model="['resource':r]"/>
@@ -393,7 +391,7 @@ var heirarchyLevelFormatter = function(el, cellVal, opts) {
 							</g:if>
 							<g:else>
 									<img class="galleryImage"
-									src="${createLinkTo(dir: 'images/', file:"no-image.jpg", base:grailsApplication.config.speciesPortal.images.serverURL)}"
+									src="${createLinkTo(dir: 'images/', file:"no-image.jpg", base:grailsApplication.config.speciesPortal.resources.serverURL)}"
 									title="You can contribute!!!" />
 							
 							</g:else>

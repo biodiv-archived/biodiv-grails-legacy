@@ -1,7 +1,10 @@
 package species.participation
 
+import grails.plugins.springsecurity.Secured
+
 import species.Contributor;
 import species.Resource;
+import species.auth.SUser;
 
 class Observation {
 
@@ -26,22 +29,32 @@ class Observation {
 			return this.value;
 		}
 	}
-
-
-	String url;
-	Contributor author;
+	
+	SUser author;
 	Date observedOn;
-	Date createdOn;
-	OccurrenceRecord occRec;
+	Date createdOn = new Date();
 	String notes;
 	
 	static hasMany = [resource:Resource, recommendationVote:RecommendationVote];
 
 	static constraints = {
+		notes nullable:true
+		resource validator : { val, obj -> val && val.size() > 0 }
+		observedOn (max:new Date())
+		notes (size:0..400)
 	}
 
 	static mapping = {
 		version : false;
 		notes type:'text'
+	}
+	
+	Resource mainImage() {
+		//TODO: return resources in rating order and choose first
+		Iterator iterator = resource?.iterator();
+		if(iterator.hasNext()) {
+			return iterator.next();
+		}
+		return null;
 	}
 }

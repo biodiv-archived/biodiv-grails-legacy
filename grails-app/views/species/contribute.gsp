@@ -21,7 +21,7 @@
 			<ol>
 				<li><b>Multiple species pages in one spreadsheet</b> : Download
 					the xlsx spreadsheet <a
-					href="${createLinkTo(dir: '/static/templates/spreadsheet/', file:'speciesTemplateSimple_v2.xlsx' , base:grailsApplication.config.speciesPortal.images.serverURL)}">here</a>,
+					href="${createLinkTo(dir: '/static/templates/spreadsheet/', file:'speciesTemplateSimple_v2.xlsx' , base:grailsApplication.config.speciesPortal.resources.serverURL)}">here</a>,
 					fill in multiple species descriptions in the spreadsheet, have a
 					directory of images, zip the directory and send it to us <span
 					class="mailme">team(at)thewesternghats(dot)in</span>
@@ -31,7 +31,7 @@
 					elaborate information on species and are compiling information from
 					many sources with different attributions and different licenses,
 					you will have to use the expanded spreadsheet <a
-					href="${createLinkTo(dir: '/static/templates/spreadsheet/', file:'speciesTemplateExpanded_v2.xlsx' , base:grailsApplication.config.speciesPortal.images.serverURL)}">here</a>.
+					href="${createLinkTo(dir: '/static/templates/spreadsheet/', file:'speciesTemplateExpanded_v2.xlsx' , base:grailsApplication.config.speciesPortal.resources.serverURL)}">here</a>.
 					The expanded spreadsheet will allow you to fill in all the species
 					pages fields available on the portal with appropriate attribution
 					and license. Mail the completed species page to us <span
@@ -48,11 +48,11 @@
 			<h3>Downloads</h3>
 			<ol>
 				<li><a
-					href="${createLinkTo(dir: '/static/templates/spreadsheet/', file:'speciesTemplateSimple_v2.xlsx' , base:grailsApplication.config.speciesPortal.images.serverURL)}">Simple
+					href="${createLinkTo(dir: '/static/templates/spreadsheet/', file:'speciesTemplateSimple_v2.xlsx' , base:grailsApplication.config.speciesPortal.resources.serverURL)}">Simple
 						Species Template</a>
 				</li>
 				<li><a
-					href="${createLinkTo(dir: '/static/templates/spreadsheet/', file:'speciesTemplateExpanded_v2.xlsx' , base:grailsApplication.config.speciesPortal.images.serverURL)}">Expanded
+					href="${createLinkTo(dir: '/static/templates/spreadsheet/', file:'speciesTemplateExpanded_v2.xlsx' , base:grailsApplication.config.speciesPortal.resources.serverURL)}">Expanded
 						Species Template</a>
 				</li>
 			</ol>

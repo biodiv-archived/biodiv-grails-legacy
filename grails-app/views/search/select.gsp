@@ -73,7 +73,7 @@ $(document).ready(function(){
 										id="${speciesInstance.id}">
 										<g:set var="mainImage" value="${speciesInstance.mainImage()}" />
 										<span class="wrimg"> <span></span> <img
-											src="${createLinkTo(dir: 'images/', base:grailsApplication.config.speciesPortal.images.serverURL,
+											src="${createLinkTo(dir: 'images/', base:grailsApplication.config.speciesPortal.resources.serverURL,
 											file: mainImage?.fileName.replace('.', '_200x200.'))}" />
 										</span>
 									</g:link>

@@ -1,13 +1,20 @@
 package species.participation
 
-import species.participation.Observation;
+import groovy.util.Node
+
+import org.springframework.web.multipart.MultipartHttpServletRequest
+import grails.plugins.springsecurity.Secured
+import species.sourcehandler.XMLConverter
+import species.utils.ImageUtils
 
 class ObservationController {
 
 	def grailsApplication;
-	
-	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
-	
+	def observationService;
+	def springSecurityService;
+
+	static allowedMethods = [update: "POST", delete: "POST"]
+
 	def index = {
 		redirect(action: "list", params: params)
 	}
@@ -17,20 +24,42 @@ class ObservationController {
 		[observationInstanceList: Observation.list(params), observationInstanceTotal: Observation.count()]
 	}
 
+	@Secured(['ROLE_USER'])
 	def create = {
 		def observationInstance = new Observation()
 		observationInstance.properties = params
 		return [observationInstance: observationInstance]
 	}
 
+	@Secured(['ROLE_USER'])
 	def save = {
-		def observationInstance = new Observation(params)
-		if (observationInstance.save(flush: true)) {
-			flash.message = "${message(code: 'default.created.message', args: [message(code: 'observation.label', default: 'Observation'), observationInstance.id])}"
-			redirect(action: "show", id: observationInstance.id)
-		}
-		else {
-			render(view: "create", model: [observationInstance: observationInstance])
+		if(request.method == 'POST') {
+			log.debug params;
+			//TODO:edit also calls here...handle that wrt other domain objects
+
+			params.author = springSecurityService.currentUser;
+
+			def observationInstance =  observationService.createObservation(params);
+
+			if(!observationInstance.hasErrors() && observationInstance.save(flush:true)) {
+				//flash.message = "${message(code: 'default.created.message', args: [message(code: 'observation.label', default: 'Observation'), observationInstance.id])}"
+				log.debug "Successfully created observation : "+observationInstance
+				params.obvId = observationInstance.id
+				def recommendationVoteInstance = new RecommendationVote(params)
+
+				if (recommendationVoteInstance.save(flush: true)) {
+					log.debug "Successfully added reco vote : "+recommendationVoteInstance
+					//flash.message = "${message(code: 'default.created.message', args: [message(code: 'recommendationVote.label', default: 'RecommendationVote'), recommendationVoteInstance.id])}"
+					redirect(action: "show", id: observationInstance.id);
+				}
+				else {
+					render(view: "show", model: [observationInstance:observationInstance, recommendationVoteInstance: recommendationVoteInstance])
+				}
+			} else {
+				render(view: "create", model: [observationInstance: observationInstance])
+			}
+		} else {
+			render(view: "create")
 		}
 	}
 
@@ -45,6 +74,7 @@ class ObservationController {
 		}
 	}
 
+	@Secured(['ROLE_USER'])
 	def edit = {
 		def observationInstance = Observation.get(params.id)
 		if (!observationInstance) {
@@ -56,6 +86,7 @@ class ObservationController {
 		}
 	}
 
+	@Secured(['ROLE_USER'])
 	def update = {
 		def observationInstance = Observation.get(params.id)
 		if (observationInstance) {
@@ -85,6 +116,7 @@ class ObservationController {
 		}
 	}
 
+	@Secured(['ROLE_ADMIN'])
 	def delete = {
 		def observationInstance = Observation.get(params.id)
 		if (observationInstance) {
@@ -104,25 +136,81 @@ class ObservationController {
 		}
 	}
 
-	def upload = {
-		def f = request.getFile('imageFile')
-		if(!f.empty) {
-			//TODO: if multiple requests with same file name are gng on ||ly this file will get corrupted.
-			String dir = grailsApplication.config.speciesPortal.images.rootDir + File.separator + "observations"
+	@Secured(['ROLE_USER'])
+	def upload_resource = {
+		log.debug params;
+
+		if(request instanceof MultipartHttpServletRequest) {
+			MultipartHttpServletRequest multiRequest = (MultipartHttpServletRequest) request;
+
+			def resourcesInfo = [];
+			def rootDir = grailsApplication.config.speciesPortal.observations.rootDir
+			File obvDir;
+			String message;
 			
-			def obvDir = new File(dir);
-			if(!obvDir.exists()) {
-				obvDir.mkdir();
+			if(!params.resources) {
+				message = "${message(code: 'resource.attachment.missing.message')}";
 			}
-			
-			File file = new File(obvDir, UUID.randomUUID());
-			f.transferTo( file );
-			flash.message = 'Image uploaded'
-			response.sendError(200,'Done');
-		}
-		else {
-			flash.message = 'file cannot be empty'
-			render(view:'uploadForm')
+
+			params.resources.each { f ->
+				log.debug "Saving observation file ${f.originalFilename}"
+
+				// List of OK mime-types
+				//TODO Move to config
+				def okcontents = [
+					'image/png',
+					'image/jpeg',
+					'image/gif',
+					'image/jpg'
+				]
+
+				if (! okcontents.contains(f.contentType)) {
+					message = "${message(code: 'resource.file.invalid.extension.message', args: [okcontents, f.originalFilename])}"
+				}
+				else if(f.size > 104857600) { //100MB
+					message = "${message(code: 'resource.file.invalid.extension.message', args: [104857600/1024, f.originalFilename,f.size/1024 ], default:'File size cannot exceed ${104857600/1024}KB')}";
+				}
+				else if(f.empty) { 
+					message = "${message(code: 'file.empty.message', default:'File cannot be empty')}";
+				}
+				else {
+					if(!obvDir) {
+						if(!params.obvDir) {
+							obvDir = new File(rootDir);
+							if(!obvDir.exists()) {
+								obvDir.mkdir();
+							}
+							obvDir = new File(obvDir, UUID.randomUUID().toString());
+							obvDir.mkdir();
+						} else {
+							obvDir = new File(params.obvDir);
+						}
+					}
+
+					File file = new File(obvDir, f.originalFilename);
+					f.transferTo( file );
+					ImageUtils.createScaledImages(file, obvDir);
+					resourcesInfo.add([fileName:file.name, size:f.size]);
+				}
+			}
+			log.debug resourcesInfo
+			// render some XML markup to the response
+			if(obvDir && resourcesInfo) {
+				render(contentType:"text/xml") {
+					observations {
+						dir(obvDir.absolutePath.replace(rootDir, ""))
+						resources {
+							for(r in resourcesInfo) {
+								image('fileName':r.fileName, 'size':r.size){}
+							}
+						}
+					}
+				}
+			} else {
+				response.setStatus(500)
+				render message
+			}
 		}
 	}
+
 }

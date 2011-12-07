@@ -23,7 +23,6 @@ class SpeciesField {
 		CHILDREN("Children"), 
 		GENERAL_PUBLIC("General Audience"), 
 		EXPERT_USERS("Expert"),
-		ALL("All");
 		
 		private String value;
 		

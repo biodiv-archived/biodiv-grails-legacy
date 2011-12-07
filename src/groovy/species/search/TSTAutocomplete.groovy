@@ -2,7 +2,9 @@ package species.search
 
 import java.util.*;
 
-public class TSTAutocomplete {
+public class TSTAutocomplete implements Serializable {
+
+	private static final long serialVersionUID = 7526472295622776156L;
 
 	/**
 	 * Inserting keys in TST in the order middle,small,big (lexicographic measure)
@@ -53,7 +55,12 @@ public class TSTAutocomplete {
 				currentNode.eqKid = insert(currentNode.eqKid, s, val, x + 1);
 			} else {
 				currentNode.token = s;
-				currentNode.val = val;
+				if(val) {
+					if(currentNode.val == null) {
+						currentNode.val = [];
+					}
+					currentNode.val.add(val);
+				}
 				return currentNode;
 			}
 		} else if (currentNode.splitchar > s.charAt(x)) {
@@ -63,7 +70,13 @@ public class TSTAutocomplete {
 				currentNode.eqKid = insert(currentNode.eqKid, s, val, x + 1);
 			} else {
 				currentNode.token = s;
-				currentNode.val = val;
+				
+				if(val) {
+					if(currentNode.val == null) {
+						currentNode.val = [];
+					}
+					currentNode.val.add(val);
+				}
 				return currentNode;
 			}
 		} else {

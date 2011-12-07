@@ -14,11 +14,11 @@ class Species {
 	
 	static hasMany = [fields: SpeciesField, globalDistributionEntities:GeographicEntity, globalEndemicityEntities:GeographicEntity, taxonomyRegistry:TaxonomyRegistry, resources:Resource];
 
-	static constraints = {
+	static constraints = { 
 		guid(blank: false, unique: true);
 	}
 
-	static mapping = {
+	static mapping = { 
 		fields sort : 'field'
 		commonNames sort:'language'
 		taxonomyRegistry sort:'taxonDefinition'
@@ -32,7 +32,7 @@ class Species {
 	List<Resource> getImages() {
 		List<Resource> images = new ArrayList<Resource>();
 		resources.each { resource ->
-			
+			 
 			if(resource.type == species.Resource.ResourceType.IMAGE) {
 				images.add(resource);
 			}

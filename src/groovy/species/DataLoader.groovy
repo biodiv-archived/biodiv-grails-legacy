@@ -4,11 +4,13 @@ import java.util.List;
 
 import org.apache.commons.logging.LogFactory;
 
+import species.License.LicenseType;
 import species.formatReader.SpreadsheetReader;
 import species.sourcehandler.KeyStoneDataConverter;
 import species.sourcehandler.MappedSpreadsheetConverter;
 import species.sourcehandler.NewSpreadsheetConverter;
 import species.sourcehandler.SpreadsheetConverter;
+import species.sourcehandler.XMLConverter;
 import species.search.SearchIndexManager;
 
 class DataLoader {
@@ -81,6 +83,13 @@ class DataLoader {
 		log.debug "Uploading classifications done"
 	}
 
+	void uploadLicences () {
+		XMLConverter converter = new XMLConverter();
+		LicenseType.toList().each { licType ->
+			converter.getLicenseByType(licType, true);
+		}
+	}
+	
 	int uploadMappedSpreadsheet (String file, String mappingFile, int mappingSheetNo, int mappingHeaderRowNo, int contentSheetNo, int contentHeaderRowNo) {
 		log.debug "Uploading mapped spreadsheet : "+file;
 		List<Species> species = MappedSpreadsheetConverter.getInstance().convertSpecies(file, mappingFile, mappingSheetNo, mappingHeaderRowNo, contentSheetNo, contentHeaderRowNo);

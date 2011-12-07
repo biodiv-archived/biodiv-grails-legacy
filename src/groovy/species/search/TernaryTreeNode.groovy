@@ -26,5 +26,13 @@ class TernaryTreeNode implements Serializable {
 		 */
 		String token;
 		Object val;
+		/* (non-Javadoc)
+		 * @see java.lang.Object#toString()
+		 */
+		@Override
+		public String toString() {
+			return """TernaryTreeNode [splitchar=${splitchar}, loKid=${loKid}, eqKid=${eqKid}, hiKid=${hiKid}, token=${token}, val=${val}]""";
+		}
+		
 			
 }

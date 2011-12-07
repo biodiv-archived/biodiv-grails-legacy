@@ -5,6 +5,7 @@ import org.apache.commons.logging.LogFactory;
 import species.TaxonomyDefinition.TaxonomyRank;
 import species.utils.Utils;
 
+import grails.converters.JSON;
 import groovyx.net.http.HTTPBuilder;
 import groovyx.net.http.ContentType;
 import groovyx.net.http.Method;
@@ -30,14 +31,14 @@ class NamesParser {
 		for(name in names) {
 			cleanNames.add(Utils.cleanName(name));
 		}
-		
+
 		if(cleanNames) {
-			def parsedNamesJSON = gniNamesParser(cleanNames.join("\n"));
+			def parsedNamesJSON = gniNamesParser(cleanNames);
 			parsedNames.addAll(getParsedNames(parsedNamesJSON));
 			cleanNames.clear();
 			log.debug "Finished parsing rest of the names";
 		}
-		
+
 		return parsedNames;
 	}
 
@@ -47,21 +48,38 @@ class NamesParser {
 	 * @param names
 	 * @return On success returns parsed names information in JSON format. Otherwise returns null.
 	 */
-	private def gniNamesParser(names) {
-		def parsedJSON;
-		def http = new HTTPBuilder()
-		http.request(  config.speciesPortal.names.parser.serverURL, Method.POST, ContentType.JSON) {
-			uri.path = 'parsers.json'
-			body = [ names : names ]
+	//	private def gniNamesParser(names) {
+	//		def parsedJSON;
+	//		def http = new HTTPBuilder()
+	//		http.request(  config.speciesPortal.names.parser.serverURL, Method.POST, ContentType.JSON) {
+	//			uri.path = 'parsers.json'
+	//			body = [ names : names ]
+	//
+	//			response.success = { resp, json ->
+	//				if(resp.isSuccess()) {
+	//					log.debug "GNI parser result : "+json
+	//					parsedJSON = json
+	//				}
+	//			}
+	//			response.failure = { resp ->  log.error 'GNIParser request failed' }
+	//		}
+	//		return parsedJSON;
+	//	}
 
-			response.success = { resp, json ->
-				if(resp.isSuccess()) {
-					log.debug "GNI parser result : "+json
-					parsedJSON = json
-				}
+	private def gniNamesParser(names) {
+		def parsedJSON = []
+		log.debug "Opening a socket connection to ${config.speciesPortal.names.parser.serverURL}:${config.speciesPortal.names.parser.port}";
+		def s = new Socket(config.speciesPortal.names.parser.serverURL, config.speciesPortal.names.parser.port);
+		s.withStreams { input, output ->
+			names.each { name ->
+				println "sending ${name}"
+				output << name + "\n"
+				def result = input.newReader().readLine()
+				println result;
+				parsedJSON.add(JSON.parse(result));
 			}
-			response.failure = { resp ->  log.error 'GNIParser request failed' }
 		}
+		s.close();
 		return parsedJSON;
 	}
 
@@ -78,12 +96,12 @@ class NamesParser {
 				if(sciName.parsed) {
 					def hybridName;
 					if(sciName.hybrid) {
-//						log.debug "Creating a hybrid name"
-//						hybridName = new HybridName();
-//						hybridName.canonicalForm = sciName.canonical;
-//						hybridName.normalizedForm = sciName.normalized;
-//						hybridName.italicisedForm = getItalicisedForm(sciName);
-//						hybridName.name = sciName.verbatim;
+						//						log.debug "Creating a hybrid name"
+						//						hybridName = new HybridName();
+						//						hybridName.canonicalForm = sciName.canonical;
+						//						hybridName.normalizedForm = sciName.normalized;
+						//						hybridName.italicisedForm = getItalicisedForm(sciName);
+						//						hybridName.name = sciName.verbatim;
 					}
 
 					def parsedName;
@@ -111,39 +129,39 @@ class NamesParser {
 							}
 						}
 
-//						if(part.infraSpecies?.combinationAuthorTeam?.author) {
-//							for( author in part.infraSpecies.combinationAuthorTeam.author[0][0]) {
-//								parsedName.addToAuthors(author);
-//							}
-//						}
-//
-//						if(part.infraSpecies?.basionymAuthorTeam?.author) {
-//							for(author in part.infraSpecies.basionymAuthorTeam.author[0][0]) {
-//								parsedName.addToBasionymAuthors(author);
-//							}
-//						}
+						//						if(part.infraSpecies?.combinationAuthorTeam?.author) {
+						//							for( author in part.infraSpecies.combinationAuthorTeam.author[0][0]) {
+						//								parsedName.addToAuthors(author);
+						//							}
+						//						}
+						//
+						//						if(part.infraSpecies?.basionymAuthorTeam?.author) {
+						//							for(author in part.infraSpecies.basionymAuthorTeam.author[0][0]) {
+						//								parsedName.addToBasionymAuthors(author);
+						//							}
+						//						}
 
 						if(part.species?.combinationAuthorTeam?.year)
 							parsedName.addToYear(part.species.combinationAuthorTeam.year[0][0].toString());
 						if(part.species?.basionymAuthorTeam?.year)
 							parsedName.addToYear(part.species.basionymAuthorTeam.year[0][0].toString());
-//						if(part.infraSpecies?.combinationAuthorTeam?.year)
-//							parsedName.addToYear(part.infraSpecies.combinationAuthorTeam.year[0][0]);
-//						if(part.infraSpecies?.basionymAuthorTeam?.year)
-//							parsedName.addToBasionymYear(part.infraSpecies.basionymAuthorTeam.year[0][0]);
+						//						if(part.infraSpecies?.combinationAuthorTeam?.year)
+						//							parsedName.addToYear(part.infraSpecies.combinationAuthorTeam.year[0][0]);
+						//						if(part.infraSpecies?.basionymAuthorTeam?.year)
+						//							parsedName.addToBasionymYear(part.infraSpecies.basionymAuthorTeam.year[0][0]);
 
 						//ignoring rank;
 						//ignoring cultivar name type
 
 						if(sciName.hybrid) {
 							//hybridName.addToNames(parsedName);
-						} 
+						}
 					}
 
 					if(sciName.hybrid) {
 						//parsedNames.add(hybridName);
 					} //else {
-						parsedNames.add(parsedName);
+					parsedNames.add(parsedName);
 					//}
 				} else {
 					log.warn "Name is not parsed : "+sciName.verbatim
@@ -172,7 +190,7 @@ class NamesParser {
 			} else if(e.getValue()[0].equals("year")) {
 				flags.set(Integer.parseInt(e.key));
 				flags.set(e.getValue()[1]);
-			} 
+			}
 		};
 		//collecting all abbreviations positions to remove from italics
 		def matcher = name =~ /\s[a-z]+\./

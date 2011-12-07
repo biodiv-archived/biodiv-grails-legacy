@@ -1,5 +1,7 @@
 package speciespage
 
+import groovy.sql.Sql;
+
 import org.apache.commons.logging.LogFactory
 
 import species.CommonNames
@@ -109,22 +111,24 @@ class NamesLoaderService {
 		def recos = new ArrayList<Recommendation>();
 		int offset = 0;
 		int noOfNames = 0;
-		while(true) {
-			def synonyms = Synonyms.findAll("from Synonyms as synonym where synonym.taxonConcept not in (select reco.taxonConcept from Recommendation as reco)", [max:NAME_BATCH_TO_LOAD, offset:offset])
-			//def synonyms = Synonyms.list(max:NAME_BATCH_TO_LOAD, offset:offset);
-			if(!synonyms) break;
+		def conn = new Sql(sessionFactory.currentSession.connection())
+		//while(true) {		
+			def synonyms = conn.rows("select n.name as name, n.taxon_concept_id as taxonConcept from synonyms n left outer join recommendation r on n.name = r.name and n.taxon_concept_id = r.taxon_concept_id where r.name is null")
+			//def synonyms = Synonyms.findAll("from Synonyms as synonym left join Recommendation as recommendation with synonym.name = recommendation.name and synonym.taxonConcept = recommendation.taxonConcept where r.name is null)", [max:NAME_BATCH_TO_LOAD, offset:offset]);  
+			//if(!synonyms) break;
 			synonyms.each { synonym ->
-				recos.add(new Recommendation(name:synonym.name, taxonConcept:synonym.taxonConcept));
+				recos.add(new Recommendation(name:synonym.name, taxonConcept:TaxonomyDefinition.get(synonym.taxonconcept)));
 				if(recos.size() >= RECO_BATCH_TO_SAVE) {
 					recommendationService.save(recos);
 					recos.clear();
 				}
+				noOfNames++
 			}
-			noOfNames++
+			
 			offset = offset + synonyms.size();
-		}
+		//}
 		recommendationService.save(recos);
-		log.debug "Importing synonyms into recommendations done"
+		log.debug "Imported synonyms into recommendations : "+noOfNames
 		return noOfNames;
 	}
 
@@ -136,22 +140,24 @@ class NamesLoaderService {
 		log.debug "Importing common names into recommendations"
 		def recos = new ArrayList<Recommendation>();
 		int offset = 0, noOfNames = 0;
-		while(true) {
-			def commonNames = CommonNames.findAll("from CommonNames as commonName where commonName.taxonConcept not in (select reco.taxonConcept from Recommendation as reco)", [max:NAME_BATCH_TO_LOAD, offset:offset])
-			//def commonNames = CommonNames.list(max:NAME_BATCH_TO_LOAD, offset:offset);
-			if(!commonNames) break;
+		def conn = new Sql(sessionFactory.currentSession.connection())
+		//while(true) {			
+			def commonNames = conn.rows("select n.name as name, n.taxon_concept_id as taxonConcept from common_names n left outer join recommendation r on n.name = r.name and n.taxon_concept_id = r.taxon_concept_id where r.name is null")
+			//if(!commonNames) break;
+			
 			commonNames.each { cName ->
-				recos.add(new Recommendation(name:cName.name, taxonConcept:cName.taxonConcept));
+				recos.add(new Recommendation(name:cName.name, taxonConcept:TaxonomyDefinition.get(cName.taxonconcept)));
 				if(recos.size() >= RECO_BATCH_TO_SAVE) {
 					recommendationService.save(recos);
 					recos.clear();
 				}
+				noOfNames++
 			}
-			noOfNames++
+			
 			offset =  offset + commonNames.size();
-		}
+		//}
 		recommendationService.save(recos);
-		log.debug "Importing common names into recommendations done"
+		log.debug "Imported common names into recommendations : "+noOfNames
 		return noOfNames
 	}
 

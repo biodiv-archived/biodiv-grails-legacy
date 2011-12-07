@@ -16,7 +16,7 @@ class Record implements Comparable<Record>, Serializable {
 	String canonicalForm;
 	
 	int compareTo(Record r) {
-		if(equals(r)) return 0;
+		if(this.equals(r)) return 0;
 		return this.name.compareTo(r.name)
 	}
 
@@ -42,7 +42,7 @@ class Record implements Comparable<Record>, Serializable {
 	 */
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj) {
+		if (this.is(obj)) {
 			return true;
 		}
 		if (obj == null) {

@@ -110,6 +110,7 @@ class GroupHandlerService {
 						if(concept.group != group) {
 							concept.group = group;
 							if(concept.save()) {
+								log.debug "Setting group as ${group} for taxonConcept ${concept}"
 								noOfUpdations++;
 							} else {
 								concept.errors.allErrors.each { log.error it }

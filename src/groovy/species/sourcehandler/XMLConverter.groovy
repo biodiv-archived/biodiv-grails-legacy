@@ -37,6 +37,7 @@ class XMLConverter extends SourceConverter {
 	def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 	def fieldsConfig = config.speciesPortal.fields
 	NamesParser namesParser;
+	String resourcesRootDir = config.speciesPortal.resources.rootDir;
 
 	private Species s;
 
@@ -86,7 +87,7 @@ class XMLConverter extends SourceConverter {
 
 			//getting classification hierarchies and saving these taxon definitions
 			List<TaxonomyRegistry> taxonHierarchy = getClassifications(species.children(), speciesName);
-			
+
 			//taxonConcept is being taken from only author contributed taxonomy hierarchy
 			TaxonomyDefinition taxonConcept = getTaxonConcept(taxonHierarchy, Classification.findByName(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY));
 
@@ -127,7 +128,8 @@ class XMLConverter extends SourceConverter {
 					}
 				}
 
-				createMedia(s, species);
+				List<Resource> resources = createMedia(species, s.taxonConcept.name);
+				resources.each { s.addToResources(it); }
 
 				for(Node fieldNode : species.children()) {
 					if(fieldNode.name().equals("field")) {
@@ -347,17 +349,21 @@ class XMLConverter extends SourceConverter {
 	 * @param createNew
 	 * @return
 	 */
-	private License getLicenseByType(String licenseType, boolean createNew) {
+	License getLicenseByType(licenseType, boolean createNew) {
 		if(!licenseType) return null;
-
-		licenseType = licenseType?.trim();
+		
 		LicenseType type;
-		for(LicenseType t : LicenseType) {
-			if(t.value().equals(licenseType)) {
-				type = t;
-				break;
+		if(licenseType instanceof LicenseType) {
+			type = licenseType
+		} else {
+			licenseType = licenseType?.toString().trim();
+			for(LicenseType t : LicenseType) {
+				if(t.value().equals(licenseType)) {
+					type = t;
+					break;
+				}
 			}
-		}
+		} 
 
 		if(!type) return null;
 
@@ -408,20 +414,25 @@ class XMLConverter extends SourceConverter {
 	/**
 	 * Creates media instances and associates them with species
 	 * @param s species domain object that is to be populated
-	 * @param species an xml havinf media nodes
+	 * @param species an xml having media nodes
 	 */
-	private void createMedia(s, species) {
-		//saving media
-		def imagesNode = species.images;
-		def iconsNode = species.icons;
-		def audiosNode = species.audios;
-		def videosNode = species.videos;
+	List<Resource> createMedia(resourcesXML, String relResFolder) {
+		List<Resource> resources = [];
 
-		createResourceByType(s, imagesNode[0], ResourceType.IMAGE);
-		//createResourceByType(s, iconsNode, ResourceType.ICON);
-		//createResourceByType(s, audiosNode, ResourceType.AUDIO);
-		//createResourceByType(s, videosNode, ResourceType.VIDEO);
+		if(resourcesXML) {
+			//saving media
+			def imagesNode = resourcesXML.images;
+			def iconsNode = resourcesXML.icons;
+			def audiosNode = resourcesXML.audios;
+			def videosNode = resourcesXML.videos;
 
+			resources.addAll(createResourceByType(imagesNode[0], ResourceType.IMAGE, relResFolder));
+			//resources.addAll(createResourceByType(iconsNode, ResourceType.ICON));
+			//resources.addAll(createResourceByType(audiosNode, ResourceType.AUDIO));
+			//resources.addAll(createResourceByType(videosNode, ResourceType.VIDEO));
+		}
+
+		return resources;
 	}
 
 	/**
@@ -430,20 +441,29 @@ class XMLConverter extends SourceConverter {
 	 * @param resourceNode xml giving resource details
 	 * @param resourceType type of the resource
 	 */
-	private void createResourceByType(Species s, Node resourceNode, ResourceType resourceType) {
+	private List<Resource> createResourceByType(Node resourceNode, ResourceType resourceType, String relResFolder) {
+		List<Resource> resources = [];
 		switch(resourceType) {
 			case ResourceType.IMAGE:
-				resourceNode?.image.each { if(!it?.id) createImage(s, it); }
+				resourceNode?.image.each { 
+					if(!it?.id) { 
+						def resource = createImage(it, relResFolder);
+						if(resource) {
+							resources.add(resource);
+						} 
+					}
+				}
 				break;
 			case ResourceType.ICON:
-				resourceNode?.icon.each { if(!it?.id) createIcon(s, it); }
+				resourceNode?.icon.each { if(!it?.id) resources.add(createIcon(it)); }
 				break;
 			case ResourceType.AUDIO:
-				resourceNode?.audio.each { if(!it?.id) createAudio(s, it); }
+				resourceNode?.audio.each { if(!it?.id) resources.add(createAudio(it)); }
 				break;
 			case ResourceType.VIDEO:
-				resourceNode?.video.each { if(!it?.id) createVideo(s, it); }
+				resourceNode?.video.each { if(!it?.id) resources.add(createVideo(it)); }
 		}
+		return resources;
 	}
 
 	/**
@@ -452,21 +472,33 @@ class XMLConverter extends SourceConverter {
 	 * @param imageNode
 	 * @return
 	 */
-	private Resource createImage(Species s, Node imageNode) {
-		def tempFile = getImageFile(imageNode);
+	private Resource createImage(Node imageNode, String relImagesFolder) {
+	
+		File tempFile = getImageFile(imageNode);
 		def sourceUrl = imageNode.source?.text() ? imageNode.source?.text() : "";
+		
 		log.debug "Creating image resource : "+tempFile;
 
-		if(tempFile) {
+		if(tempFile && tempFile.exists()) {
 			//copying file
-			File root = getImagesRootFolder(tempFile);
+			relImagesFolder = relImagesFolder.replaceAll("\\s+","_");
+
+			File root = new File(resourcesRootDir , relImagesFolder.replaceAll("\\s+","_"));
+			if(!root.exists() && !root.mkdir()) {
+				log.error "COULD NOT CREATE DIR FOR SPECIES : "+root.getAbsolutePath();
+			}
+			
 			File imageFile = new File(root, tempFile.getName());
 			if(!imageFile.exists()) {
-				Utils.copy(tempFile, imageFile);
-				ImageUtils.createScaledImages(imageFile, root);
+				try {
+					Utils.copy(tempFile, imageFile);
+					ImageUtils.createScaledImages(imageFile, imageFile.getParentFile());
+				} catch(FileNotFoundException e) {
+					log.error "File not found : "+tempFile.absolutePath;
+				}
 			}
 
-			String path = s.taxonConcept.name + File.separator + imageFile.getName()
+			String path = imageFile.absolutePath.replace(resourcesRootDir, "");
 
 			def fieldCriteria = Resource.createCriteria();
 			def res = fieldCriteria.get {
@@ -479,31 +511,33 @@ class XMLConverter extends SourceConverter {
 			}
 
 			if(!res) {
-				def attributors = getAttributions(imageNode, true);
-				res = new Resource(type : ResourceType.IMAGE, fileName:path, url:sourceUrl, description:imageNode.caption?.text(), license:getLicenses(imageNode, true), contributor:getContributors(imageNode, true), mimeType:imageNode.mimeType?.text());
-				for(Contributor con : attributors) {
+				res = new Resource(type : ResourceType.IMAGE, fileName:path, url:sourceUrl, description:imageNode.caption?.text(), mimeType:imageNode.mimeType?.text());
+				for(Contributor con : getContributors(imageNode, true)) {
+					res.addToContributors(con);
+				}
+				for(Contributor con : getAttributions(imageNode, true)) {
 					res.addToAttributors(con);
+				}
+				for(License l : getLicenses(imageNode, true)) {
+					res.addToLicenses(l);
 				}
 			}
 
-			s.addToResources(res);
+			//s.addToResources(res);
 			imageNode.appendNode("resource", res);
-
+			log.debug "Successfully created resource";
 			return res;
+		} else {
+			log.error "File not found : "+tempFile?.absolutePath;
 		}
 	}
 
-	File getImagesRootFolder(File imageFile) {
-		def root = new File(config.speciesPortal.images.rootDir , s.taxonConcept.name);
-		if(!root.exists()) {
-			if(!root.mkdir()) {
-				log.error "COULD NOT CREATE IMAGES DIR FOR SPECIES : "+root.getAbsolutePath();
-			};
-		}
-		return root;
-	}
-
-	File getImageFile(imageNode) {
+	/**
+	 * imageNode has image metadata and absolute path for the file
+	 * @param imageNode
+	 * @return
+	 */
+	File getImageFile(Node imageNode) {
 		String fileName = imageNode?.fileName?.text()?.trim();
 		String sourceUrl = imageNode.source?.text();
 		if(!fileName && !sourceUrl) return;
@@ -526,20 +560,18 @@ class XMLConverter extends SourceConverter {
 		return tempFile;
 	}
 
-	private Resource createIcon(Species s, Node iconNode) {
+	private Resource createIcon(Node iconNode) {
 		String fileName = iconNode.text()?.trim();
 		log.debug "Creating icon : "+fileName;
 
 		def res = new Resource(type : ResourceType.ICON, fileName:fileName);
-		s.addToIcons(res);
 		res.save(flush:true);
 		res.errors.each { log.error it }
-		s.addResources(res);
 		iconNode.appendNode("resource", res);
 		return res;
 	}
 
-	private Resource createAudio(Species s, Node audioNode) {
+	private Resource createAudio(Node audioNode) {
 		String fileName = imageNode.get("fileName");
 
 		//		def fieldCriteria = Resource.createCriteria();
@@ -555,15 +587,12 @@ class XMLConverter extends SourceConverter {
 		for(Contributor con : attributors) {
 			res.addToAttributors(con);
 		}
-		res.save(flush:true);
-		res.errors.each { log.error it }
 		//		}
-		s.addToAudio(res);
 		audioNode.appendNode("resource", res);
 		return res;
 	}
 
-	private Resource createVideo(Species s, Node videoNode) {
+	private Resource createVideo(Node videoNode) {
 		String fileName = imageNode.get("fileName");
 
 		//		def fieldCriteria = Resource.createCriteria();
@@ -579,10 +608,7 @@ class XMLConverter extends SourceConverter {
 		for(Contributor con : attributors) {
 			res.addToAttributors(con);
 		}
-		res.save(flush:true);
-		res.errors.each { log.error it }
 		//		}
-		s.addToVideo(res);
 		videoNode.appendNode("resource", res);
 		return res;
 	}
@@ -933,9 +959,9 @@ class XMLConverter extends SourceConverter {
 	 */
 	private List<TaxonomyRegistry> getTaxonHierarchy(List fieldNodes, Classification classification, String scientificName) {
 		log.debug "Getting classification hierarchy : "+classification.name;
-		
+
 		List<TaxonomyRegistry> taxonEntities = new ArrayList<TaxonomyRegistry>();
-		
+
 		List<String> names = new ArrayList<String>();
 		List<TaxonomyDefinition> parsedNames;
 		fieldNodes.each { fieldNode ->
@@ -945,7 +971,7 @@ class XMLConverter extends SourceConverter {
 			}
 		}
 		parsedNames = namesParser.parse(names);
-		
+
 		int i=0;
 		fieldNodes.each { fieldNode ->
 			log.debug "Adding taxonomy registry from node: "+fieldNode;
@@ -963,7 +989,7 @@ class XMLConverter extends SourceConverter {
 				def parsedName = parsedNames.get(i++);
 				if(parsedName?.canonicalForm) {
 					//TODO: IMP equality of given name with the one in db should include synonyms of taxonconcepts
-					//i.e., parsedName.canonicalForm == taxonomyDefinition.canonicalForm or Synonym.canonicalForm 
+					//i.e., parsedName.canonicalForm == taxonomyDefinition.canonicalForm or Synonym.canonicalForm
 					def taxonCriteria = TaxonomyDefinition.createCriteria();
 					TaxonomyDefinition taxon = taxonCriteria.get {
 						eq("rank", rank);
@@ -977,7 +1003,7 @@ class XMLConverter extends SourceConverter {
 						taxon.errors.each { log.error it }
 					}
 
-					
+
 					def ent = new TaxonomyRegistry();
 					ent.taxonDefinition = taxon
 					ent.classification = classification;
@@ -991,7 +1017,7 @@ class XMLConverter extends SourceConverter {
 						eq("path", ent.path);
 						eq("classification", ent.classification);
 					}
-					
+
 					if(registry) {
 						log.debug "Taxon registry already exists";
 						taxonEntities.add(registry);
@@ -1048,7 +1074,7 @@ class XMLConverter extends SourceConverter {
 	 */
 	TaxonomyDefinition getTaxonConcept(List taxonomyRegistry, Classification classification) {
 		def taxonConcept, max = 0;
-		
+
 		taxonomyRegistry.each { tReg ->
 			if(tReg.classification == classification && tReg.taxonDefinition.rank >= max) {
 				taxonConcept = tReg.taxonDefinition;
@@ -1119,7 +1145,7 @@ class XMLConverter extends SourceConverter {
 		//		synonyms, commonNames, globalDistributionEntities, globalEndemicityEntities,
 		//		taxonomyRegistry;
 	}
-	
+
 	private String cleanSciName(String scientificName) {
 		def cleanSciName = Utils.cleanName(scientificName);
 		if(cleanSciName =~ /s\.\s*str\./) {

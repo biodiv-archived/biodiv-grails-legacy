@@ -171,7 +171,7 @@ class NewSpreadsheetConverter extends SourceConverter {
 		Node images = new Node(speciesElement, "images");
 		def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 		String uploadDir = config.speciesPortal.images.uploadDir;
-		imageMetaData.each{ imageData ->
+		imageMetaData.each { imageData ->
 			Node image = new Node(images, "image");
 			String refKey = imageData.get("imageno.");
 			if(refKey) {

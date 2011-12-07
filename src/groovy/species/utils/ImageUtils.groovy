@@ -11,19 +11,29 @@ import org.apache.commons.logging.LogFactory;
 class ImageUtils {
 
 	private static final log = LogFactory.getLog(this);
-
+	
+	
 	//TODO: chk synchronization probs ... static blocks
+	/**
+	 * Creates scaled versions of given image in the directory.
+	 * Converts image to jpg 
+	 * Uses suffixes as defined in Config.
+	 * @param imageFile
+	 * @param dir
+	 */
 	static void createScaledImages(File imageFile, File dir) {
 		log.debug "Creating scaled versions of image : "+imageFile.getAbsolutePath();
-
+		
+		def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.resources.images
+		
 		log.debug "Creating thumbnail image";
-		ImageUtils.convert(imageFile, new File(dir, imageFile.getName().tokenize(".")[0]+"_th.jpg"), 200, 200, 100);
+		ImageUtils.convert(imageFile, new File(dir, imageFile.getName().tokenize(".")[0] + config.thumbnail.suffix), config.thumbnail.width, config.thumbnail.height, 100);
 
 		log.debug "Creating gallery image";
-		ImageUtils.convert(imageFile, new File(dir, imageFile.getName().tokenize(".")[0]+"_gall.jpg"), 500, 300, 100);
+		ImageUtils.convert(imageFile, new File(dir, imageFile.getName().tokenize(".")[0] + config.gallery.suffix), config.gallery.width, config.gallery.height, 100);
 
 		log.debug "Creating gallery thumbnail image";
-		ImageUtils.convert(imageFile, new File(dir, imageFile.getName().tokenize(".")[0]+"_gall_th.jpg"), 50, 50, 100);
+		ImageUtils.convert(imageFile, new File(dir, imageFile.getName().tokenize(".")[0] + config.galleryThumbnail.suffix), config.galleryThumbnail.width, config.galleryThumbnail.height, 100);
 	}
 	
 	/**

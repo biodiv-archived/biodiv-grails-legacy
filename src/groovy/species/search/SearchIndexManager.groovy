@@ -46,7 +46,6 @@ class SearchIndexManager {
 	private void initializeSearchServerConnection() {
 
 		def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.search
-		//File root = new File(config.speciesPortal.images.rootDir + File.separator + speciesName);
 
 		//Uses an internal MultiThreadedHttpConnectionManager to manage http connections
 		if(!_server) {

@@ -1,5 +1,6 @@
 package species.participation
 
+import grails.plugins.springsecurity.Secured
 import grails.converters.JSON
 import java.util.List;
 
@@ -26,12 +27,14 @@ class RecommendationController {
         [recommendationInstanceList: Recommendation.list(params), recommendationInstanceTotal: Recommendation.count()]
     }
 
+	@Secured(['ROLE_USER'])
     def create = {
         def recommendationInstance = new Recommendation()
         recommendationInstance.properties = params
         return [recommendationInstance: recommendationInstance]
     }
 
+	@Secured(['ROLE_USER'])
     def save = {
         def recommendationInstance = new Recommendation(params)
         if (recomendationService.save(recommendationInstance)) {
@@ -54,6 +57,7 @@ class RecommendationController {
         }
     }
 
+	@Secured(['ROLE_USER'])
     def edit = {
         def recommendationInstance = Recommendation.get(params.id)
         if (!recommendationInstance) {
@@ -65,6 +69,7 @@ class RecommendationController {
         }
     }
 
+	@Secured(['ROLE_USER'])
     def update = {
         def recommendationInstance = Recommendation.get(params.id)
         if (recommendationInstance) {
@@ -94,6 +99,7 @@ class RecommendationController {
         }
     }
 
+	@Secured(['ROLE_ADMIN'])
     def delete = {
         def recommendationInstance = Recommendation.get(params.id)
         if (recommendationInstance) {
@@ -119,14 +125,18 @@ class RecommendationController {
 		
 		def result = new ArrayList();
 
-		def terms = namesIndexerService.suggest(params);
-		terms.each { term ->
-			String name = term.name.replaceFirst(/(?i)${params.term}/, "<b>"+params.term+"</b>");
-			String highlightedName = term.originalName.replaceFirst(/(?i)${term.name}/, name);
-			result.add([value:term.canonicalForm, label:highlightedName, desc:term.canonicalForm, icon:term.icon, "category":grailsApplication.config.speciesPortal.fields.SCIENTIFIC_NAME]);
+		def lookupResults = namesIndexerService.suggest(params);
+		lookupResults.each { lookupResult ->
+			def term = lookupResult.key;
+			def record = lookupResult.value;
+			int index = term.toLowerCase().indexOf(params.term.toLowerCase());
+			
+			String name = term.replaceFirst(/(?i)${params.term}/, "<b>"+params.term+"</b>");
+			String highlightedName = record.originalName.replaceFirst(/(?i)${term}/, name);
+			result.add([value:record.canonicalForm, label:highlightedName, desc:record.canonicalForm, icon:record.icon, "category":grailsApplication.config.speciesPortal.fields.SCIENTIFIC_NAME]);
 		}
 		
-		log.debug result;
+		log.debug "suggestion : "+result;
 		render result as JSON
 	}
 	

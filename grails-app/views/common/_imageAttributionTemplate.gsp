@@ -1,6 +1,6 @@
 <g:if test="${resource}">
 	<div class="notes" style="text-align: left;">
-		<g:if test="${resource.attributors.size() > 0}">
+		<g:if test="${resource.attributors?.size() > 0}">
 			<b>Attributions:</b>
 			<ol>
 				<g:each in="${resource.attributors}" var="a">

@@ -33,7 +33,6 @@ class Resource {
 	
 	static mapping = {
 		description type:'text';
-		version : false
 	}
 	
     static constraints = {
@@ -41,5 +40,6 @@ class Resource {
 		url(nullable:true);
 		description(nullable:true);
 		mimeType(nullable:true);
+		licenses  validator : { val, obj -> val && val.size() > 0 }
     }
 }
