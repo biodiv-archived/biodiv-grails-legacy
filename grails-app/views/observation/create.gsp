@@ -14,15 +14,10 @@
 		args="[entityName]" /></title>
 
 <link rel="stylesheet" type="text/css" media="all"
-	href="${resource(dir:'js/galleria/themes/classic/',file:'galleria.classic.css', absolute:true)}" />
-<link rel="stylesheet" type="text/css" media="all"
 	href="${resource(dir:'css',file:'jquery.rating.css', absolute:true)}" />
 
 <g:javascript src="jsrender.js"
 	base="${grailsApplication.config.grails.serverURL+'/js/'}"></g:javascript>
-
-<g:javascript src="galleria/galleria-1.2.4.min.js"
-	base="${grailsApplication.config.grails.serverURL+'/js/'}" />
 
 </head>
 <body>
@@ -46,8 +41,8 @@
 
 			<form id="upload_resource" enctype="multipart/form-data">
 				<!-- TODO multiple attribute is HTML5. need to chk if this gracefully falls back to default in non compatible browsers -->
-				<input type="file" name="resources" multiple="multiple" /> <input
-					type="submit" name="Attach" value="Attach" />
+				<input type="file" id="attachFiles" name="resources" multiple="multiple"  accept="image/*"/>
+				<span class="msg"></span> 
 			</form>
 
 
@@ -63,7 +58,7 @@
 
 								<div class='figure'
 									style='max-height: 220px; max-width: 200px; float: left; padding-right:10px;'>
-									<span class='wrimg'> <img
+									<span> <img
 										src='${createLinkTo(file: thumbnail, base:grailsApplication.config.speciesPortal.observations.serverURL)}' />
 									</span>
 								</div>
@@ -92,7 +87,9 @@
 											class="star" type="radio" name="rrating.${i}" value="5"
 											title="Best" />
 									</div>
-								</div></li>
+								</div>
+								<a href="#" class="resourceRemove">Remove</a>
+							</li>
 						<g:set var="i" value="${i+1}" />
 						</g:each>
 					</ul>
@@ -169,7 +166,7 @@
 	<script id="metadataTmpl" type="text/x-jquery-tmpl">
 	<li class="addedResource grid_16">
 		<div class='figure' style='max-height: 220px; max-width: 200px;float: left;padding-right:10px;'>
-			<span class='wrimg' > 
+			<span> 
 				<img src='{{=thumbnail}}' /> 
 			</span>
 		</div>
@@ -196,47 +193,28 @@
 								title="Best" />
 			</div>
 		</div>
+		<a href="#" onclick="removeResource(event)">Remove</a>
 	</li>
 	
 </script>
 
 	<g:javascript>
 	
-	Galleria.loadTheme('${resource(dir:'js/galleria/themes/classic/',file:'galleria.classic.min.js', absolute:true)}');
 	
 	$(document).ready(function(){
-	
-		$('#gallery1').galleria({
-			height : 400,
-			carousel : true,
-			transition : 'fadeslide',
-			image_pan_smoothness : 5,
-			showInfo : true,
-			dataSelector : "img.galleryImage",
-			debug : true,
-			thumbQuality : false,
-			maxScaleRatio : 1,
-			minScaleRatio : 1,
-	
-			dataConfig : function(img) {
-				return {
-					// tell Galleria to grab the content from the .desc div as caption
-					description : $(img).parent().next('.notes').html()
-				};
-			},
-			extend : function(options) {
-				// listen to when an image is shown
-				this.bind('image', function(e) {
-					// lets make galleria open a lightbox when clicking the main
-					// image:
-					$(e.imageTarget).click(this.proxy(function() {
-						this.openLightbox();
-					}));
-				});
-			}
+		$('#attachFiles').change(function(e){
+  			$('#upload_resource').submit().find("span.msg").html("Uploading... Please wait...");
 		});
-	
-		$('#upload_resource').ajaxForm({ 
+       			
+       	
+     	//TODO:not geting called verify....
+     	$("#attachFiles").ajaxStart(function(){
+			var offset = $(this).offset();  				
+   			$("#spinner").css({left:offset.left+$(this).width(), top:offset.top-6}).show();
+   			return false;
+ 		});  
+     		
+     	$('#upload_resource').ajaxForm({ 
 			url:'${createLink(controller:'observation', action:'upload_resource')}',
 			dataType: 'xml',//could not parse json wih this form plugin 
 			clearForm: true,
@@ -245,8 +223,8 @@
 			beforeSubmit: function(formData, jqForm, options) {
 				return true;
 			}, 
-			success: function(responseXML, statusText, xhr, $form) {
-				var gallery = Galleria.get(0);
+			success: function(responseXML, statusText, xhr, form) {
+				$(form).find("span.msg").html("");
 				var rootDir = '${grailsApplication.config.speciesPortal.observations.serverURL}'
 				var obvDir = $(responseXML).find('dir').text();
 				var images = []
@@ -256,15 +234,6 @@
 					var size = $(this).attr('size');
 					var image = rootDir + obvDir + "/" + fileName.replace(/\.[a-zA-Z]{3,4}$/, "${grailsApplication.config.speciesPortal.resources.images.gallery.suffix}");
 					var thumbnail = rootDir + obvDir + "/" + fileName.replace(/\.[a-zA-Z]{3,4}$/, "${grailsApplication.config.speciesPortal.resources.images.thumbnail.suffix}");
-  					/*gallery.push({
-  						image : image,
-  						thumb : thumbnail,
-  						big : rootDir + "/" + this.fileName,
-  						link : rootDir + "/" + this.fileName,
-  						description : 'Size : ' + size/1024 + '(KB)' 
-  					});
-  					gallery.show(gallery.getNext());
-  					*/
   					images.push({i:++i, file:obvDir + "/" + fileName, thumbnail:thumbnail, title:fileName});
 				});
 				
@@ -288,8 +257,14 @@
 						messageNode.text(xhr.responseText);
 					}                  
             } 
-     	});    	
+     	});  
+     	
 	});
+		
+	function removeResource(event) {
+		$(event.target).parent().remove();
+	}
+	
 </g:javascript>
 </body>
 </html>

@@ -23,18 +23,20 @@
             <div class="list">
                 <table>
                      <tbody>
-                    <g:each in="${speciesGroupInstance.taxonConcept}" status="i" var="taxonomyDefinitionInstance">
-                        <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-                        	<g:set var="species" value="${Species.findByTaxonConcept(taxonomyDefinitionInstance)}" />
-                        	<g:if test="${species}">
-                            	<td><g:link controller="species" action="show" id="${species.id}">${taxonomyDefinitionInstance.italicisedForm}</g:link></td>
-                            </g:if>
-                            <g:else>
-                            	<td>${taxonomyDefinitionInstance.italicisedForm}</td>
-                            </g:else>
-                        
-                        </tr>
-                    </g:each>
+                    	<g:each in="${speciesGroupInstance.taxonConcept}" status="i" var="taxonomyDefinitionInstance">
+	                        <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
+	                        	
+	                        	<td>${taxonomyDefinitionInstance.italicisedForm}</td>
+	                        	
+	                        	<g:set var="species" value="${Species.findAllByTaxonConcept(taxonomyDefinitionInstance)}" />
+	                        	<g:if test="${species}">
+	                        		<g:each in="${species}" var="s">
+	                            		&nbsp;&nbsp;<td><g:link controller="species" action="show" id="${s.id}">${s.title}</g:link></td>
+	                            	</g:each>
+	                            </g:if>
+	                            
+	                        </tr>
+                    	</g:each>
                     </tbody>
                 </table>
             </div>

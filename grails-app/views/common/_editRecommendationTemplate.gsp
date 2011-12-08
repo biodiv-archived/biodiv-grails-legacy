@@ -44,8 +44,8 @@ $(document).ready(function() {
 			select: function( event, ui ) {
 				$( "#name" ).val( ui.item.label.replace(/<.*?>/g,"") );
 				$( "#canName" ).val( ui.item.value );
-				$( "#name-description" ).html( ui.item.value ? ui.item.label.replace(/<.*?>/g,"")+" ("+ui.item.value+")" : "" );
-				ui.item.icon ? $( "#name-icon" ).attr( "src",  ui.item.icon).show() : $( "#name-icon" ).hide();
+				//$( "#name-description" ).html( ui.item.value ? ui.item.label.replace(/<.*?>/g,"")+" ("+ui.item.value+")" : "" );
+				//ui.item.icon ? $( "#name-icon" ).attr( "src",  ui.item.icon).show() : $( "#name-icon" ).hide();
 				return false;
 			}
 	}).data( "catcomplete" )._renderItem = function( ul, item ) {
@@ -64,37 +64,31 @@ $(document).ready(function() {
 					.appendTo( ul );
 			}
 		};
+		
+		$("#name").ajaxStart(function(){
+			var offset = $(this).offset();  				
+   			$("#spinner").css({left:offset.left+$(this).width(), top:offset.top-6}).show();
+   			return false;
+ 		});	
 	
 });
 
 	
 </g:javascript>
 
-<div class="recommendation">
-	<div
-		class="value ${hasErrors(bean: recommendationInstance, field: 'name', 'errors')}">
-	</div>
-	<div>
-		<div id="nameContainer" class="prop">
-			<input type="text"
-				name="recoName" id="name"
-				value="${recommendationInstance?.name}" 
-				class="value text ui-widget-content ui-corner-all" /> 
-			<input
-				type="hidden" name="canName" id="canName" /> 
-			<select name="confidence" class="value ui-corner-all">
-				<g:each in="${ConfidenceType.list()}" var="l">
-					<option value="${l}">						
-						${l.value()}
-					</option>
-				</g:each>
-			</select>
-		</div>
-		<div class="grid_16">
-			<img id="name-icon" src="" class="ui-state-default icon"
-				style="float: left; display: none;" />
-			<p id="name-description"></p>
-		</div>
+<div
+	id="nameContainer" class="recommendation ${hasErrors(bean: recommendationInstance, field: 'name', 'errors')}">
+	<input type="text" name="recoName" id="name"
+		value="${recommendationInstance?.name}"
+		class="value text ui-widget-content ui-corner-all" /> <input
+		type="hidden" name="canName" id="canName" /> 
 		
-	</div>
+	<select
+		name="confidence" class="value ui-corner-all">
+		<g:each in="${ConfidenceType.list()}" var="l">
+			<option value="${l}">
+				${l.value()}
+			</option>
+		</g:each>
+	</select>
 </div>

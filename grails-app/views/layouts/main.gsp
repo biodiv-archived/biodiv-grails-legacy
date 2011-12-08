@@ -63,7 +63,7 @@ jQuery(document).ready(function($) {
 			Your web browser must have JavaScript enabled in order for this
 			application to display correctly.</div>
 	</noscript>
-	<div id="spinner" class="spinner" style="display: none;">
+	<div id="spinner" class="spinner">
 		<img src="${resource(dir:'images',file:'spinner.gif', absolute:true)}"
 			alt="${message(code:'spinner.alt',default:'Loading...')}" />
 	</div>
@@ -133,8 +133,20 @@ jQuery(document).ready(function($) {
 			};
 			
 			// bind form using 'ajaxForm' var form =
-			$('#ajaxLoginForm').ajaxForm(options); 
-			}); 
+			$('#ajaxLoginForm').ajaxForm(options);
+			
+			$('#spinner')
+				.hide()  // hide it initially
+    			.ajaxStart(function() { 
+    				$("html").addClass('busy');
+    				$(this).offset({left:($('body').width()/2), top:($('body').height()/2)});
+        			$(this).show();
+    			})
+    			.ajaxStop(function() {
+    				$("html").removeClass('busy');
+        			$(this).hide();
+    			});
+		}); 
 			
 			function showLogin() {
 				$('#ajaxLogin').show(); 

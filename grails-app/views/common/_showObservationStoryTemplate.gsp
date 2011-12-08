@@ -16,17 +16,17 @@
 				${observationInstance.author.username}
 			</g:link>
 		</p>
-	</div>
-	<div>
 		<p class="prop">
 			<span class="name">Observed on</span> <span class="value"><g:formatDate
 					format="MMMMM dd, yyyy" date="${observationInstance.observedOn}" />
 			</span>
 		</p>
-	</div>
-
-	<div class="readmore">
 		<p class="prop">
+			<span class="name">Group</span> <span class="value"><g:link
+					controller="speciesGroup" action="show" id="${observationInstance.group?.id }">${observationInstance.group?.name }</g:link>
+			</span>
+		</p>
+		<p class="prop readmore">
 			<span class="name">Description </span> <span class="value"> ${observationInstance.notes}
 			</span>
 		</p>

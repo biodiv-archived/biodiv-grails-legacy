@@ -3,6 +3,7 @@ dataSource {
     driverClassName = "org.postgresql.Driver"
     username = "postgres"
     password = "postgres123"
+	logSql = true
 }
 
 hibernate {

@@ -8,6 +8,7 @@ html * {
 	padding: 5px;
 	position: absolute;
 	right: 0;
+	z-index:1000;
 }
 
 body {
@@ -680,3 +681,10 @@ img {
 	padding-right:10px; 
 	border-right:2px solid #A9DA92;
 }
+
+html.busy, html.busy * {  
+  cursor: wait !important;  
+}
+
+.rating {
+	padding : 5px;

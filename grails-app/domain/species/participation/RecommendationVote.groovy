@@ -34,7 +34,7 @@ class RecommendationVote {
 	static belongsTo = [observation:Observation];
 	
 	static constraints = {
-		recommendation(unique:['author', 'observation']);
+		recommendation(unique:['author', 'observation', 'confidence']);
 		votedOn validator : {val -> val < new Date()};
 	}
 	

@@ -135,7 +135,7 @@ class RecommendationController {
 			String highlightedName = record.originalName.replaceFirst(/(?i)${term}/, name);
 			result.add([value:record.canonicalForm, label:highlightedName, desc:record.canonicalForm, icon:record.icon, "category":grailsApplication.config.speciesPortal.fields.SCIENTIFIC_NAME]);
 		}
-		
+		//Thread.sleep(10000);
 		log.debug "suggestion : "+result;
 		render result as JSON
 	}

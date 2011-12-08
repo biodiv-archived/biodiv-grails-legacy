@@ -44,21 +44,10 @@ class ObservationController {
 			if(!observationInstance.hasErrors() && observationInstance.save(flush:true)) {
 				//flash.message = "${message(code: 'default.created.message', args: [message(code: 'observation.label', default: 'Observation'), observationInstance.id])}"
 				log.debug "Successfully created observation : "+observationInstance
-				
-				params.obvId = observationInstance.id
-				
-				//Saves recommendation if its not present
-				def recommendationVoteInstance = observationService.createRecommendationVote(params)
 
-				if (recommendationVoteInstance.save(flush: true)) {
-					log.debug "Successfully added reco vote : "+recommendationVoteInstance
-					//flash.message = "${message(code: 'default.created.message', args: [message(code: 'recommendationVote.label', default: 'RecommendationVote'), recommendationVoteInstance.id])}"
-					redirect(action: "show", id: observationInstance.id);
-				}
-				else {
-					log.error recommendationVoteInstance.errors.each { log.error it }
-					render(view: "show", model: [observationInstance:observationInstance, recommendationVoteInstance: recommendationVoteInstance])
-				}
+				params.obvId = observationInstance.id
+
+				redirect(action: 'addRecommendationVote', params:params);
 			} else {
 				render(view: "create", model: [observationInstance: observationInstance])
 			}
@@ -106,11 +95,14 @@ class ObservationController {
 				}
 			}
 			observationInstance.properties = params
-			if (!observationInstance.hasErrors() && observationInstance.save(flush: true)) {
-				flash.message = "${message(code: 'default.updated.message', args: [message(code: 'observation.label', default: 'Observation'), observationInstance.id])}"
-				redirect(action: "show", id: observationInstance.id)
-			}
-			else {
+			try {
+				if (!observationInstance.hasErrors() && observationInstance.save(flush: true)) {
+					flash.message = "${message(code: 'default.updated.message', args: [message(code: 'observation.label', default: 'Observation'), observationInstance.id])}"
+					redirect(action: "show", id: observationInstance.id)
+				}
+				else {
+					render(view: "edit", model: [observationInstance: observationInstance])
+				}}catch(e) {
 				render(view: "edit", model: [observationInstance: observationInstance])
 			}
 		}
@@ -151,7 +143,7 @@ class ObservationController {
 			def rootDir = grailsApplication.config.speciesPortal.observations.rootDir
 			File obvDir;
 			String message;
-			
+
 			if(!params.resources) {
 				message = "${message(code: 'resource.attachment.missing.message')}";
 			}
@@ -174,7 +166,7 @@ class ObservationController {
 				else if(f.size > 104857600) { //100MB
 					message = "${message(code: 'resource.file.invalid.extension.message', args: [104857600/1024, f.originalFilename,f.size/1024 ], default:'File size cannot exceed ${104857600/1024}KB')}";
 				}
-				else if(f.empty) { 
+				else if(f.empty) {
 					message = "${message(code: 'file.empty.message', default:'File cannot be empty')}";
 				}
 				else {
@@ -214,6 +206,38 @@ class ObservationController {
 				response.setStatus(500)
 				render message
 			}
+		}
+	}
+
+	/**
+	 * adds a recommendation and 1 vote to it attributed to the logged in user
+	 * saves recommendation if it doesn't exist
+	 */
+	@Secured(['ROLE_USER'])
+	def addRecommendationVote = {
+		log.debug params;
+
+		params.author = springSecurityService.currentUser;
+
+		if(params.obvId) {
+			//Saves recommendation if its not present
+			def recommendationVoteInstance = observationService.createRecommendationVote(params)
+			def observationInstance = Observation.get(params.obvId);
+
+			try {
+				if (recommendationVoteInstance.save(flush: true)) {
+					log.debug "Successfully added reco vote : "+recommendationVoteInstance
+					redirect(action: "show", id: observationInstance.id);
+				}
+				else {
+					render(view: "show", model: [observationInstance:observationInstance, recommendationVoteInstance: recommendationVoteInstance])
+				}
+			} catch(e) {
+				render(view: "show", model: [observationInstance:observationInstance, recommendationVoteInstance: recommendationVoteInstance])
+			}
+		} else {
+			flash.message  = "${message(code: 'observation.invalid', default:'Invalid observation')}"
+			redirect(action: "list")
 		}
 	}
 

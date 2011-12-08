@@ -32,15 +32,11 @@
 					${flash.message}
 				</div>
 			</g:if>
-
+			<br/>
 			<div class="grid_10">
 				<div id="resourceTabs">
 					<ul>
 						<li><a href="#resourceTabs-1">Images</a>
-						</li>
-						<li><a href="#resourceTabs-2">Audio</a>
-						</li>
-						<li><a href="#resourceTabs-3">Video</a>
 						</li>
 					</ul>
 					<div id="resourceTabs-1">
@@ -70,8 +66,6 @@
 						</div>
 
 					</div>
-					<div id="resourceTabs-2">There is no audio.</div>
-					<div id="resourceTabs-3">There is no video.</div>
 				</div>
 
 			</div>
@@ -79,27 +73,39 @@
 			<obv:showStory model="['observationInstance':observationInstance]"/>
 			
 			<div class="grid_16 recommendations">
-			<%
-				def result = RecommendationVote.createCriteria().list { 
-					projections {
-						groupProperty("recommendation")
-						count 'id', 'voteCount'
-					}
-					eq('observation', observationInstance)
-					order 'voteCount'
-				}
-			 %>
-			 <g:if test="${result}">
-			 	<g:message code="recommendations.no.message",  args="[result.size()]" />
-				<g:each in="${result}" var="r">
-					<reco:show model="['recommendationInstance':r[0], 'voteCount':r[1]]"/>
-				</g:each>
-			</g:if>
-			<g:else>
-				<g:message code="recommendations.zero.message"/> 
-			</g:else>
-				<br/>
-				<reco:create model="['recommendationInstance':recommendationInstance]"/>
+				<div class="recoSummary">
+					<%
+						//TODO:move this piece to taglib and place this code in service
+						def result = RecommendationVote.createCriteria().list { 
+							projections {
+								groupProperty("recommendation")
+								groupProperty("confidence")
+								count 'id', 'voteCount'
+							}
+							eq('observation', observationInstance)
+							order 'voteCount'
+						}
+					 %>
+					 
+					 <g:if test="${result}">
+					 	<g:message code="recommendations.no.message",  args="[result.size()]" />
+					 		<ul>
+							<g:each in="${result}" var="r">
+								<li>${r[0]?.taxonConcept?.italicisedForm?:r[0].name} (Votes ${r[2]} saying "${r[1].value()}")</li> 
+							</g:each>
+							</ul>
+					</g:if>
+					<g:else>
+						<g:message code="recommendations.zero.message"/> 
+					</g:else>
+					<br/>
+					<form id="addRecommendation" action="${createLink(controller:'observation', action:'addRecommendationVote')}"
+						method="GET">
+						<reco:create model="['recommendationInstance':recommendationInstance]"/>
+						<input type="hidden" name='obvId' value="${observationInstance.id}"/>					
+						<input type="submit" value="Add"/>
+					</form>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -117,37 +123,35 @@
 		});
 		
 		$('#gallery1').galleria({
-		height : 400,
-		preload : 1,
-		carousel : true,
-		transition : 'pulse',
-		image_pan_smoothness : 5,
-		showInfo : true,
-		dataSelector : "img.galleryImage",
-		debug : false,
-		thumbQuality : false,
-		maxScaleRatio : 1,
-		minScaleRatio : 1,
-
-		dataConfig : function(img) {
-			return {
-				// tell Galleria to grab the content from the .desc div as caption
-				description : $(img).parent().next('.notes').html()
-			};
-		},
-		extend : function(options) {
-			// listen to when an image is shown
-			this.bind('image', function(e) {
-				// lets make galleria open a lightbox when clicking the main
-				// image:
-				$(e.imageTarget).click(this.proxy(function() {
-					this.openLightbox();
-				}));
-			});
-		}
-
-	});
-
+			height : 400,
+			preload : 1,
+			carousel : true,
+			transition : 'pulse',
+			image_pan_smoothness : 5,
+			showInfo : true,
+			dataSelector : "img.galleryImage",
+			debug : false,
+			thumbQuality : false,
+			maxScaleRatio : 1,
+			minScaleRatio : 1,
+	
+			dataConfig : function(img) {
+				return {
+					// tell Galleria to grab the content from the .desc div as caption
+					description : $(img).parent().next('.notes').html()
+				};
+			},
+			extend : function(options) {
+				// listen to when an image is shown
+				this.bind('image', function(e) {
+					// lets make galleria open a lightbox when clicking the main
+					// image:
+					$(e.imageTarget).click(this.proxy(function() {
+						this.openLightbox();
+					}));
+				});
+			}
+		});
 	});
 </g:javascript>
 

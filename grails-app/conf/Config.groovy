@@ -80,9 +80,9 @@ log4j = {
 			'org.springframework',
 			'org.hibernate',
 			'net.sf.ehcache.hibernate'
-
-	warn   'org.mortbay.log'
-			'resource'
+	
+	warn   'org.mortbay.log',
+			"org.grails.plugin.resource"
 	debug	'species',
 			'speciespage',
 			'grails.app'
