@@ -21,6 +21,30 @@
 
 </head>
 <body>
+	<div id="fb-root"></div>
+	<script>
+  window.fbAsyncInit = function() {
+    FB.init({
+      appId      : '308606395828381', // App ID
+      channelUrl : '//localhost.local/biodiv/channel.html', // Channel File
+      status     : true, // check login status
+      cookie     : true, // enable cookies to allow the server to access the session
+      oauth      : true, // enable OAuth 2.0
+      xfbml      : true  // parse XFBML
+    });
+
+    // Additional initialization code here
+  };
+
+  // Load the SDK Asynchronously
+  (function(d){
+     var js, id = 'facebook-jssdk'; if (d.getElementById(id)) {return;}
+     js = d.createElement('script'); js.id = id; js.async = true;
+     js.src = "//connect.facebook.net/en_US/all.js";
+     d.getElementsByTagName('head')[0].appendChild(js);
+   }(document));
+</script>
+
 	<div class="container_16">
 		<div class="observation  grid_16">
 			<h1>
@@ -36,7 +60,7 @@
 			<div class="grid_10">
 				<div id="resourceTabs">
 					<ul>
-						<li><a href="#resourceTabs-1">Images</a>
+						<li><a href="#resourceTabs-1" style="height:0px"></a>
 						</li>
 					</ul>
 					<div id="resourceTabs-1">
@@ -79,7 +103,8 @@
 						def result = RecommendationVote.createCriteria().list { 
 							projections {
 								groupProperty("recommendation")
-								groupProperty("confidence")
+								groupProperty("author")
+								min 'votedOn', 'votedOn'
 								count 'id', 'voteCount'
 							}
 							eq('observation', observationInstance)
@@ -91,21 +116,45 @@
 					 	<g:message code="recommendations.no.message",  args="[result.size()]" />
 					 		<ul>
 							<g:each in="${result}" var="r">
-								<li>${r[0]?.taxonConcept?.italicisedForm?:r[0].name} (Votes ${r[2]} saying "${r[1].value()}")</li> 
+								<li>
+									${r[0]?.taxonConcept?.italicisedForm?:r[0].name} By <g:link
+										controller="sUser" action="show" id="${r[1].id}">
+										${r[1].username}
+									</g:link> on <g:formatDate format="MMMMM dd, yyyy" date="${r[2]}" />
+									with votes ${r[3]}
+								</li>
 							</g:each>
-							</ul>
+						</ul>
 					</g:if>
 					<g:else>
 						<g:message code="recommendations.zero.message"/> 
 					</g:else>
 					<br/>
+					<div>
+					<g:hasErrors bean="${recommendationInstance}">
+						<div class="errors">
+							<g:renderErrors bean="${recommendationInstance}" as="list" />
+						</div>
+					</g:hasErrors>
+					<g:hasErrors bean="${recommendationVoteInstance}">
+						<div class="errors">
+							<g:renderErrors bean="${recommendationVoteInstance}" as="list" />
+						</div>
+					</g:hasErrors>
+					
 					<form id="addRecommendation" action="${createLink(controller:'observation', action:'addRecommendationVote')}"
 						method="GET">
 						<reco:create model="['recommendationInstance':recommendationInstance]"/>
 						<input type="hidden" name='obvId' value="${observationInstance.id}"/>					
 						<input type="submit" value="Add"/>
 					</form>
+					</div>
 				</div>
+			</div>
+		
+			<div class="grid_10 comments">
+				<fb:like send="true" width="450" show_faces="true"></fb:like>
+				<div class="fb-comments" data-href="${createLink(controller:'observation', action:'show', id:observationInstance.id, base:'http://localhost.local/biodiv')}" data-num-posts="10" data-width="600"></div>
 			</div>
 		</div>
 	</div>
