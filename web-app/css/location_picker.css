@@ -1,0 +1,122 @@
+#address {
+    font-family: arial,sans-serif;
+    font-size: 17px;
+    font-size-adjust: none;
+    font-stretch: normal;
+    font-style: normal;
+    font-variant: normal;
+    font-weight: normal;
+    height: 2em !important;
+    line-height: 2em !important;
+    left: 0;
+    margin: 10 0 20 0;
+    outline: medium none;
+    overflow: hidden;
+    padding: 10px;
+    width: 95%;
+    z-index: 5;
+    border: 1px solid #CCCCCC;
+    box-shadow: 0 1px 4px #CCCCCC inset;
+}    
+
+#map_canvas {
+    width:400px;
+    height:300px;     
+    clear:both;       
+}
+
+#location_picker {
+clear:both;    
+width: 900px;      
+background: #f5f5f1;       
+box-radius: 7px;
+margin: 10px;
+}
+
+#selection_box {
+border: 1px solid #e5e5e5;
+padding:10px;      
+margin:10px;        
+background: #fcfcfc;       
+float:left;            
+}
+
+.row {
+clear: both;
+padding-top: 0;
+font-family: Arial,Helvetica,sans-serif;
+font-size: 12px;
+}
+
+.label {
+float: left;
+padding-right: 5px;
+text-align: right;
+width: 150px;
+}
+
+.value {
+float: left;
+text-align: left;
+width: 170px;
+}
+
+#side_bar {
+float:left;
+width:400px;      
+padding:10px;      
+}
+
+#map_area {
+float:left;
+border: 3px solid #ffffff;
+box-shadow: 0 3px 3px #5e5e5e;        
+}
+
+.ui-widget-content {
+width:390px;
+}
+
+.button {
+margin-bottom: 2px;    
+border: 1px solid #e5e5e5;
+padding: 2px;        
+cursor: pointer;
+font-family: arial,sans-serif;
+font-size: 0.9em;
+font-size-adjust: none;
+font-stretch: normal;
+font-style: normal;
+font-variant: normal;
+font-weight: normal;        
+color: #424242;            
+background: #f5f5f0;    
+height:40px;            
+}
+
+.button:hover {
+background: #c8e6ed;    
+}
+
+
+.thumbnail {
+float:left;
+width: 80px;
+height: 80px;       
+}
+
+#result_box {
+clear: both;
+border: 0px solid #e5e5e5;       
+height: 100px;        
+padding: 10px;
+margin: 10px;         
+}
+
+#selected_place_name {
+width: 500px;
+}
+
+.button_no_icon {
+padding: 10px;
+}
