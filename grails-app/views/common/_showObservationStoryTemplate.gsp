@@ -30,5 +30,40 @@
 			<span class="name">Description </span> <p class="value readmore"> ${observationInstance.notes}
 			</p>
 		</p>
+		<p class="prop">
+			<span class="name">Place name</span> <span class="value"> ${observationInstance.placeName}
+			</span>
+		</p>
+                <p class="prop">
+			<span class="name">Latitude</span> <span class="value"> ${observationInstance.latitude}
+			</span>
+		</p>
+                <p class="prop">
+			<span class="name">Longitude</span> <span class="value"> ${observationInstance.longitude}
+			</span>
+		</p>
+                <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=true"></script>
+                <script>
+                $(document).ready(function() {
+                  var latlng = new google.maps.LatLng(${observationInstance.latitude}, ${observationInstance.longitude});
+                  var options = {
+                    zoom: 4,
+                    center: latlng,
+                    mapTypeId: google.maps.MapTypeId.HYBRID
+                  };
+                  var map = new google.maps.Map(document.getElementById("map_canvas_${observationInstance.id}"), options);
+                  var marker = new google.maps.Marker({
+                    map: map,
+                    draggable: false
+                  });
+                
+                  marker.setPosition(latlng);
+                  map.setCenter(latlng);
+
+                });
+                </script>
+                <div id="map_canvas_${observationInstance.id}" style="height:170px;"></div>
+
+
 	</div>
 </div>

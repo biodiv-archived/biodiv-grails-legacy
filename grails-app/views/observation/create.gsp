@@ -15,6 +15,13 @@
 
 <link rel="stylesheet" type="text/css" media="all"
 	href="${resource(dir:'css',file:'jquery.rating.css', absolute:true)}" />
+<link rel="stylesheet" href="${resource(dir:'css',file:'jquery-ui.css', absolute:true)}" type="text/css" media="all" />
+<link rel="stylesheet" href="${resource(dir:'css',file:'location_picker.css', absolute:true)}" type="text/css" media="all" />
+
+<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=true"></script>
+<script type="text/javascript" src="http://localhost:8080/biodiv/js/jquery/jquery.exif.js"></script>
+<script type="text/javascript" src="http://localhost:8080/biodiv/js/jquery/jquery.watermark.min.js"></script>
+<script type="text/javascript" src="http://localhost:8080/biodiv/js/location/location-picker.js"></script>
 
 <g:javascript src="jsrender.js"
 	base="${grailsApplication.config.grails.serverURL+'/js/'}"></g:javascript>
@@ -59,7 +66,7 @@
 								<div class='figure'
 									style='max-height: 220px; max-width: 200px; float: left; padding-right:10px;'>
 									<span> <img
-										src='${createLinkTo(file: thumbnail, base:grailsApplication.config.speciesPortal.observations.serverURL)}' />
+										src='${createLinkTo(file: thumbnail, base:grailsApplication.config.speciesPortal.observations.serverURL)}' class='geotagged_image' exif='true'/>
 									</span>
 								</div>
 
@@ -149,6 +156,48 @@
 										class="text ui-corner-all" />
 								</td>
 							</tr>
+                                                        <tr class="prop">
+								<td valign="top" class="name"><label for="notes">Location</label></td>
+								<td valign="top">
+                                                                <div id="location_picker">
+                                                        <div id="selection_box">
+                                                            <div id="side_bar">
+                                                                <input id="address"  type="text" size="70" title="Find by place name"/><br>
+                                                                <div id="geotagged_images"></div>
+                                                                <div id="current_location" class="button"><div style="padding:10px">Use current location</div></div>
+                                                            </div>
+
+                                                            <div id="map_area">
+                                                                <div id="map_canvas" ></div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div id="result_box">
+                                                            <div class="row">
+                                                                <span class="label">Place name:</span>
+                                                                <input id="place_name" type="text" name="place_name"></input>
+                                                            </div>
+                                                            <div class="row">
+                                                                <span class="label">Reverse geocoded name:</span>
+                                                                <div class="value" id="reverse_geocoded_name"></div>
+                                                                <input id="reverse_geocoded_name_field" type="hidden" name="reverse_geocoded_name"></input>
+                                                            </div>
+                                                            <div class="row">
+                                                                <span class="label">Latitude:</span>
+                                                                <div class="value" id="latitude"></div>
+                                                                <input id="latitude_field" type="hidden" name="latitude"></input>
+                                                            </div>
+                                                            <div class="row">
+                                                                <span class="label">Longitude:</span>
+                                                                <div class="value" id="longitude"></div>
+                                                                <input id="longitude_field" type="hidden" name="longitude"></input>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+								</td>
+							</tr>
+
 
 						</tbody>
 					</table>
@@ -167,7 +216,7 @@
 	<li class="addedResource grid_16">
 		<div class='figure' style='max-height: 220px; max-width: 200px;float: left;padding-right:10px;'>
 			<span> 
-				<img src='{{=thumbnail}}' /> 
+				<img src='{{=thumbnail}}' class='geotagged_image' exif='true'/> 
 			</span>
 		</div>
 				
@@ -247,8 +296,8 @@
 						}
 					});
 				})
-				
 				$( "#imagesList" ).append (metadataEle);
+                                window.setTimeout(update_geotagged_images_list, 10);
 			}, error:function (xhr, ajaxOptions, thrownError){
 					var messageNode = $(".message .resources") 
 					if(messageNode.length == 0 ) {

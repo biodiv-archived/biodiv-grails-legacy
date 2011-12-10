@@ -37,6 +37,10 @@ class Observation {
 	String notes;
 	SpeciesGroup group;
 	int rating;
+        String placeName;
+        String reverseGeocodedName;
+        float latitude;
+        float longitude;
 	
 	static hasMany = [resource:Resource, recommendationVote:RecommendationVote];
 
