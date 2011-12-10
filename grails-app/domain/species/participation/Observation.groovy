@@ -36,6 +36,10 @@ class Observation {
 	Date createdOn = new Date();
 	String notes;
 	SpeciesGroup group;
+        String placeName;
+        String reverseGeocodedName;
+        float latitude;
+        float longitude;
 	
 	static hasMany = [resource:Resource, recommendationVote:RecommendationVote];
 
