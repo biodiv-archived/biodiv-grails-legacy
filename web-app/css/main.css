@@ -264,13 +264,12 @@ th.desc a {
 }
 
 .prop {
-	padding: 5px;
 }
 
 .prop .name {
+        float: left;
 	text-align: left;
-	width: 15%;
-	white-space: nowrap;
+	width: 7em;
 	font-weight: bold;
 }
 
@@ -663,12 +662,31 @@ img {
 	margin: 54px 0 30px;
 }
 
-.recommendations, .observations {
+.recommendations {
+	margin-top: 10px;
+	padding:10px;
+        background: #d4edc9;     
+        border-radius:7px;            
+}
+
+.observation_story {
+margin: 10px;
+}
+
+.observation_location {
+	margin-top: 10px;
+	padding:10px;
+        background: #f5f5f5;     
+        border-radius:7px;            
+}
+
+.observations {
 	/*background: #fff url(../images/skin/shadow.jpg) repeat-x center;*/
-	margin-top: 30px;
+	margin-top: 10px;
 	padding:10px;
 	/*border-bottom: 3px solid #A9DA92;*/
 }
+
 
 .observation .addedResource, .observation .snippet {
 	display:block;
@@ -682,9 +700,44 @@ img {
 	border-right:2px solid #A9DA92;
 }
 
+.comments {
+border-top: 1px solid #eeeeee;
+padding-top: 20px;
+}
+
 html.busy, html.busy * {  
   cursor: wait !important;  
 }
 
 .rating {
 	padding : 5px;
+}
+
+.big_wrapper {
+    padding-top: 20px;
+    padding: 10px;
+    box-shadow: 0 7px 7px #7e7e7e;         
+    border: 1px solid #cecece;
+    margin-top: 10px;
+    margin-bottom: 20px;
+}                  
+
+#resourceTabs {
+border: 0;
+}
+
+#resourceTabs ul {
+border: 0;    
+}
+
+#resourceTabs ul li {
+border: 0;    
+}
+
+#resourceTabs-1 {
+border: 0;
+}
+
+.galleria-counter {
+display: none !important;
+}

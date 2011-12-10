@@ -45,11 +45,11 @@
    }(document));
 </script>
 
-	<div class="container_16">
+	<div class="container_16 big_wrapper">
 		<div class="observation  grid_16">
-			<h1>
+			<!--h1>
 				<g:message code="default.show.label" args="[entityName]" />
-			</h1>
+			</h1-->
 
 			<g:if test="${flash.message}">
 				<div class="message">
@@ -57,105 +57,117 @@
 				</div>
 			</g:if>
 			<br/>
+
 			<div class="grid_10">
-				<div id="resourceTabs">
-					<ul>
-						<li><a href="#resourceTabs-1" style="height:0px"></a>
-						</li>
-					</ul>
-					<div id="resourceTabs-1">
-						<div id="gallery1">
-							<g:if test="${observationInstance.resource}">
-								<g:each in="${observationInstance.resource}" var="r">
+                            <div class="grid_10">
+                                    <div id="resourceTabs">
+                                            <ul>
+                                                    <li><a href="#resourceTabs-1" style="height:0px"></a>
+                                                    </li>
+                                            </ul>
+                                            <div id="resourceTabs-1">
+                                                    <div id="gallery1">
+                                                            <g:if test="${observationInstance.resource}">
+                                                                    <g:each in="${observationInstance.resource}" var="r">
 
-									<%def gallImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.gallery.suffix)%>
-									<%def gallThumbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.galleryThumbnail.suffix)%>
-									<a target="_blank"
-										rel="${createLinkTo(file: r.fileName.trim(), base:grailsApplication.config.speciesPortal.observations.serverURL)}"
-										href="${createLinkTo(file: gallImagePath, base:grailsApplication.config.speciesPortal.observations.serverURL)}">
-										<img class="galleryImage"
-										src="${createLinkTo(file: gallThumbImagePath, base:grailsApplication.config.speciesPortal.observations.serverURL)}"
-										title="${r?.description}" /> </a>
+                                                                            <%def gallImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.gallery.suffix)%>
+                                                                            <%def gallThumbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.galleryThumbnail.suffix)%>
+                                                                            <a target="_blank"
+                                                                                    rel="${createLinkTo(file: r.fileName.trim(), base:grailsApplication.config.speciesPortal.observations.serverURL)}"
+                                                                                    href="${createLinkTo(file: gallImagePath, base:grailsApplication.config.speciesPortal.observations.serverURL)}">
+                                                                                    <img class="galleryImage"
+                                                                                    src="${createLinkTo(file: gallThumbImagePath, base:grailsApplication.config.speciesPortal.observations.serverURL)}"
+                                                                                    title="${r?.description}" /> </a>
 
-									<g:imageAttribution model="['resource':r]" />
-								</g:each>
-							</g:if>
-							<g:else>
-								<img class="galleryImage"
-									src="${createLinkTo(dir: 'images/', file:"no-image.jpg", base:grailsApplication.config.speciesPortal.resources.serverURL)}"
-									title="You can contribute!!!" />
+                                                                            <g:imageAttribution model="['resource':r]" />
+                                                                    </g:each>
+                                                            </g:if>
+                                                            <g:else>
+                                                                    <img class="galleryImage"
+                                                                            src="${createLinkTo(dir: 'images/', file:"no-image.jpg", base:grailsApplication.config.speciesPortal.resources.serverURL)}"
+                                                                            title="You can contribute!!!" />
 
-							</g:else>
+                                                            </g:else>
 
-						</div>
+                                                    </div>
 
-					</div>
-				</div>
+                                            </div>
+                                    </div>
 
+                            </div>
+
+                            <!--  static species content -->
+                            <obv:showStory model="['observationInstance':observationInstance]"/>
+
+                            <div class="grid_10 comments">
+                                    <fb:like send="true" width="450" show_faces="true"></fb:like>
+                                    <div class="fb-comments grid_10" data-href="${createLink(controller:'observation', action:'show', id:observationInstance.id, base:'http://localhost.local/biodiv')}" data-num-posts="10"></div>
+                            </div>
 			</div>
-			<!--  static species content -->
-			<obv:showStory model="['observationInstance':observationInstance]"/>
-			
-			<div class="grid_16 recommendations">
-				<div class="recoSummary">
-					<%
-						//TODO:move this piece to taglib and place this code in service
-						def result = RecommendationVote.createCriteria().list { 
-							projections {
-								groupProperty("recommendation")
-								groupProperty("author")
-								min 'votedOn', 'votedOn'
-								count 'id', 'voteCount'
-							}
-							eq('observation', observationInstance)
-							order 'voteCount'
-						}
-					 %>
-					 
-					 <g:if test="${result}">
-					 	<g:message code="recommendations.no.message",  args="[result.size()]" />
-					 		<ul>
-							<g:each in="${result}" var="r">
-								<li>
-									${r[0]?.taxonConcept?.italicisedForm?:r[0].name} By <g:link
-										controller="sUser" action="show" id="${r[1].id}">
-										${r[1].username}
-									</g:link> on <g:formatDate format="MMMMM dd, yyyy" date="${r[2]}" />
-									with votes ${r[3]}
-								</li>
-							</g:each>
-						</ul>
-					</g:if>
-					<g:else>
-						<g:message code="recommendations.zero.message"/> 
-					</g:else>
-					<br/>
-					<div>
-					<g:hasErrors bean="${recommendationInstance}">
-						<div class="errors">
-							<g:renderErrors bean="${recommendationInstance}" as="list" />
-						</div>
-					</g:hasErrors>
-					<g:hasErrors bean="${recommendationVoteInstance}">
-						<div class="errors">
-							<g:renderErrors bean="${recommendationVoteInstance}" as="list" />
-						</div>
-					</g:hasErrors>
-					
-					<form id="addRecommendation" action="${createLink(controller:'observation', action:'addRecommendationVote')}"
-						method="GET">
-						<reco:create model="['recommendationInstance':recommendationInstance]"/>
-						<input type="hidden" name='obvId' value="${observationInstance.id}"/>					
-						<input type="submit" value="Add"/>
-					</form>
-					</div>
-				</div>
+
+			<div class="grid_5">
+                            <obv:showRating model="['observationInstance':observationInstance]"/>
+                            
+                            <div class="grid_5 recommendations">
+                                    <div class="recoSummary">
+                                            <%
+                                                    //TODO:move this piece to taglib and place this code in service
+                                                    def result = RecommendationVote.createCriteria().list { 
+                                                            projections {
+                                                                    groupProperty("recommendation")
+                                                                    groupProperty("author")
+                                                                    min 'votedOn', 'votedOn'
+                                                                    count 'id', 'voteCount'
+                                                            }
+                                                            eq('observation', observationInstance)
+                                                            order 'voteCount'
+                                                    }
+                                             %>
+                                             
+                                             <g:if test="${result}">
+                                                    <g:message code="recommendations.no.message",  args="[result.size()]" />
+                                                            <ul>
+                                                            <g:each in="${result}" var="r">
+                                                                    <li>
+                                                                            ${r[0]?.taxonConcept?.italicisedForm?:r[0].name} By <g:link
+                                                                                    controller="sUser" action="show" id="${r[1].id}">
+                                                                                    ${r[1].username}
+                                                                            </g:link> on <g:formatDate format="MMMMM dd, yyyy" date="${r[2]}" />
+                                                                            with votes ${r[3]}
+                                                                    </li>
+                                                            </g:each>
+                                                    </ul>
+                                            </g:if>
+                                            <g:else>
+                                                    <g:message code="recommendations.zero.message"/> 
+                                            </g:else>
+                                            <br/>
+                                            <div>
+                                            <g:hasErrors bean="${recommendationInstance}">
+                                                    <div class="errors">
+                                                            <g:renderErrors bean="${recommendationInstance}" as="list" />
+                                                    </div>
+                                            </g:hasErrors>
+                                            <g:hasErrors bean="${recommendationVoteInstance}">
+                                                    <div class="errors">
+                                                            <g:renderErrors bean="${recommendationVoteInstance}" as="list" />
+                                                    </div>
+                                            </g:hasErrors>
+                                            
+                                            <form id="addRecommendation" action="${createLink(controller:'observation', action:'addRecommendationVote')}"
+                                                    method="GET">
+                                                    <reco:create model="['recommendationInstance':recommendationInstance]"/>
+                                                    <input type="hidden" name='obvId' value="${observationInstance.id}"/>					
+                                                    <input type="submit" value="Add"/>
+                                            </form>
+                                            </div>
+                                    </div>
+                            </div>
+
+                            <obv:showLocation model="['observationInstance':observationInstance]"/>
 			</div>
+
 		
-			<div class="grid_10 comments">
-				<fb:like send="true" width="450" show_faces="true"></fb:like>
-				<div class="fb-comments" data-href="${createLink(controller:'observation', action:'show', id:observationInstance.id, base:'http://localhost.local/biodiv')}" data-num-posts="10" data-width="600"></div>
-			</div>
 		</div>
 	</div>
 	<g:javascript>
