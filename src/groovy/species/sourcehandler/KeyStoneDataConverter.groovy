@@ -187,7 +187,7 @@ class KeyStoneDataConverter extends SourceConverter {
 	private void attachMetadata(Node data, postId, Map mappedField) {
 		new Node(data, "contributor", "opendata@keystone-foundation.org");
 		new Node(data, "attribution", "Keystone Foundation");
-		new Node(data, "license", "BY-NC");
+		new Node(data, "license", "CC BY-NC");
 	}
 
 	/**

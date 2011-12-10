@@ -1,5 +1,5 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html>
+<html xmlns:fb="http://ogp.me/ns/fb#">
 <head>
 <title>Species Portal</title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -153,7 +153,7 @@ jQuery(document).ready(function($) {
 			} 
 			
 			function cancelLogin() {
-				//Form.enable(document.ajaxLoginForm); $('#ajaxLogin').hide(); 
+				$('#ajaxLogin').hide(); 
 			}
 
 			function authAjax() { 
@@ -163,5 +163,8 @@ jQuery(document).ready(function($) {
 			}
 			 
 	</g:javascript>
+	
+	
+	
 </body>
 </html>

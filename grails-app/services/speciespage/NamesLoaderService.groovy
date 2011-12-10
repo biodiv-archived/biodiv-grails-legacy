@@ -45,6 +45,7 @@ class NamesLoaderService {
 		log.debug "Importing existing taxon definitions into recommendations"
 
 		if(cleanAndUpdate) {
+			//TODO:Handle cascading delete recommendations 
 			recommendationService.deleteAll();
 		}
 		

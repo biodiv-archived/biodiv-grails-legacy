@@ -29,13 +29,16 @@
 	                        	<td>${taxonomyDefinitionInstance.italicisedForm}</td>
 	                        	
 	                        	<g:set var="species" value="${Species.findAllByTaxonConcept(taxonomyDefinitionInstance)}" />
-	                        	<g:if test="${species}">
-	                        		<g:each in="${species}" var="s">
-	                            		&nbsp;&nbsp;<td><g:link controller="species" action="show" id="${s.id}">${s.title}</g:link></td>
-	                            	</g:each>
-	                            </g:if>
+	                        	
 	                            
 	                        </tr>
+	                        <g:if test="${species}">
+	                        	<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
+	                        		<g:each in="${species}" var="s">
+	                            		<td>&nbsp;&gt;&nbsp;<g:link controller="species" action="show" id="${s.id}">${s.title}</g:link></td>
+	                            	</g:each>
+	                            <tr/>
+	                        </g:if>
                     	</g:each>
                     </tbody>
                 </table>

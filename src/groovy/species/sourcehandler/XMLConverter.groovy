@@ -77,6 +77,7 @@ class XMLConverter extends SourceConverter {
 		if(!species) return null;
 
 		try {
+			log.debug "Creating/Updating species"
 			s = new Species();
 
 			removeInvalidNode(species);
@@ -96,11 +97,12 @@ class XMLConverter extends SourceConverter {
 			s.taxonConcept = taxonConcept ?: getTaxonConceptFromName(speciesName);
 
 			if(s.taxonConcept) {
+				
 				s.title = s.taxonConcept.italicisedForm;
 
 				//taxonconcept is being used as guid
 				s.guid = constructGUID(s);
-
+				
 				//a species page with guid as taxon concept is considered as duplicate
 				Species existingSpecies = findDuplicateSpecies(s);
 
@@ -128,7 +130,7 @@ class XMLConverter extends SourceConverter {
 					}
 				}
 
-				List<Resource> resources = createMedia(species, s.taxonConcept.name);
+				List<Resource> resources = createMedia(species, s.taxonConcept.canonicalForm);
 				resources.each { s.addToResources(it); }
 
 				for(Node fieldNode : species.children()) {
@@ -231,7 +233,7 @@ class XMLConverter extends SourceConverter {
 		for(Node dataNode : fieldNode.data) {
 			String data = getData(dataNode);
 			List<Contributor> contributors = getContributors(dataNode, true);
-			List<License> licenses = getLicenses(dataNode, true);
+			List<License> licenses = getLicenses(dataNode, false);
 			List<AudienceType> audienceTypes = getAudienceTypes(dataNode, true);
 			List<Resource> resources = getResources(dataNode, imagesNode, iconsNode, audiosNode, videosNode);
 			List<Reference> references = getReferences(dataNode, true);
@@ -339,6 +341,9 @@ class XMLConverter extends SourceConverter {
 			} else {
 				log.warn "NOT A SUPPORTED LICENSE TYPE: "+licenseType;
 			}
+		}
+		if(!licenses) {
+			licenses.add(getLicenseByType(LicenseType.CC_BY, createNew));
 		}
 		return licenses;
 	}
@@ -473,7 +478,6 @@ class XMLConverter extends SourceConverter {
 	 * @return
 	 */
 	private Resource createImage(Node imageNode, String relImagesFolder) {
-	
 		File tempFile = getImageFile(imageNode);
 		def sourceUrl = imageNode.source?.text() ? imageNode.source?.text() : "";
 		
@@ -481,14 +485,15 @@ class XMLConverter extends SourceConverter {
 
 		if(tempFile && tempFile.exists()) {
 			//copying file
-			relImagesFolder = relImagesFolder.replaceAll("\\s+","_");
-
-			File root = new File(resourcesRootDir , relImagesFolder.replaceAll("\\s+","_"));
+			relImagesFolder = Utils.cleanFileName(relImagesFolder.trim());
+			
+			File root = new File(resourcesRootDir , relImagesFolder);
 			if(!root.exists() && !root.mkdir()) {
 				log.error "COULD NOT CREATE DIR FOR SPECIES : "+root.getAbsolutePath();
 			}
+			log.debug "in dir : "+root.absolutePath;
 			
-			File imageFile = new File(root, tempFile.getName());
+			File imageFile = new File(root, Utils.cleanFileName(tempFile.getName()));
 			if(!imageFile.exists()) {
 				try {
 					Utils.copy(tempFile, imageFile);
@@ -545,7 +550,7 @@ class XMLConverter extends SourceConverter {
 		File tempFile;
 		if(!fileName) {
 			//downloading from web
-			def tempdir = new File(System.getProperty("java.io.tmpdir"), "speciesimages");
+			def tempdir = new File(grailsApplication.config.speciesPortal.images.uploadDir, "speciesimages");
 			if(!tempdir.exists()) {
 				tempdir.mkdir();
 			}
@@ -564,7 +569,9 @@ class XMLConverter extends SourceConverter {
 		String fileName = iconNode.text()?.trim();
 		log.debug "Creating icon : "+fileName;
 
+		def l = getLicenseByType(LicenseType.CC_PUBLIC_DOMAIN, false);
 		def res = new Resource(type : ResourceType.ICON, fileName:fileName);
+		res.addToLicenses(l);
 		res.save(flush:true);
 		res.errors.each { log.error it }
 		iconNode.appendNode("resource", res);
@@ -672,6 +679,8 @@ class XMLConverter extends SourceConverter {
 			if(!res) {
 				log.debug "Creating icon : "+fileName
 				res = new Resource(type : ResourceType.ICON, fileName:fileName);
+				def l = getLicenseByType(LicenseType.CC_PUBLIC_DOMAIN, false);
+				res.addToLicenses(l);
 				res.save(flush:true);
 				res.errors.each { log.error it }
 			}
@@ -966,6 +975,11 @@ class XMLConverter extends SourceConverter {
 		List<TaxonomyDefinition> parsedNames;
 		fieldNodes.each { fieldNode ->
 			String name = getData(fieldNode.data);
+			int rank = getTaxonRank(fieldNode?.subcategory?.text());
+			if(classification.name.equalsIgnoreCase(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY) && rank == TaxonomyRank.SPECIES.ordinal()) {
+				def cleanSciName = cleanSciName(scientificName);
+				name = cleanSciName
+			}
 			if(name) {
 				names.add(name);
 			}

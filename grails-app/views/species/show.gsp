@@ -249,25 +249,27 @@ $(document).ready(function(){
     	 showSpeciesField($(".defaultSpeciesField").attr("id"))
      }
   	
-  	loadIFrame();
-  	initializeCKEditor();	
+  	//loadIFrame();
+  	//initializeCKEditor();	
   	// bind click event on delete buttons using jquery live
   	$('.del-reference').live('click', deleteReferenceHandler);
 });
 
-function createTaxonHierarchy(taxonHierarchyId) {
+$("#taxaHierarchy").change(function() {
+	console.log($(this))
+	console.log($('#taxaHierarchy option:selected').val());
+});
 
-	
-}
-
-function showTaxonHierarchy(taxonHierarchyId, classificationName, data) {
+function showTaxonHierarchy(taxonHierarchyId, classificationName) {
+	var taxonHierarchy = $("#"+taxonHierarchyId); 
 	var grid = $("#"+taxonHierarchyId).jqGrid({
+		url:'${createLink(controller:'data', action:'listHierarchy')}',
 		datatype: "xml",
    		colNames:['Id', classificationName,'#Species', 'SpeciesId'],
    		colModel:[
    			{name:'id',index:'id',hidden:true},
    			{name:'name',index:'name',formatter:heirarchyLevelFormatter, width:275},
-   			{name:'count',index:'count',width:50},
+   			{name:'count', index:'count', width:50, hidden:true},
    			{name:'speciesId',index:'speciesId', hidden:true}
    		],
    		atoWidth:true,
@@ -277,7 +279,7 @@ function showTaxonHierarchy(taxonHierarchyId, classificationName, data) {
    		ExpandColumn : 'name',
    		ExpandColClick  : true,
    		treeGridModel: 'adjacency',
-        postData:{n_level:-1, expand_species:true, speciesid:${speciesInstance.id}},
+        postData:{n_level:-1, expand_species:true, speciesid:${speciesInstance.id}, classSystem:classificationName},
         sortable:false,
         loadComplete:function(data) {
         	var postData = $("#"+taxonHierarchyId).getGridParam('postData');
@@ -285,12 +287,6 @@ function showTaxonHierarchy(taxonHierarchyId, classificationName, data) {
         	postData["expand_all"] = false;
 	    }
 	});
-	
-	var rows = data.getElementsByTagName('row')
-	for (var i = 0; i < rows.length; i++) {
-        grid.addChildNode(rows[i].childNodes[0].nodeValue, rows[i].childNodes[5].nodeValue, rows[i]);
-    }
-	
 }
 
 var heirarchyLevelFormatter = function(el, cellVal, opts) {
@@ -435,17 +431,19 @@ var heirarchyLevelFormatter = function(el, cellVal, opts) {
 
 			<!--  static species content -->
 			<div class="grid_6 classifications">
-				<g:each in="${Classification.list()}" var="classification">
-					<div class="taxonomyBrowser_${classification.id}">
-						<g:remoteLink action="listHierarchy" controller="data" 
-							on404="alert('not found');" params="[n_level:-1, expand_species:true, speciesid:speciesInstance.id, classSystem:classification.name]"
-							onSuccess = "showTaxonHierarchy('taxonHierarchy_${classification.id}', '${classification.name }',data)">
-								${classification.name}
-						</g:remoteLink>
-						<table id="taxonHierarchy_${classification.id}"></table>
-					</div>
+				<select name="taxaHierarchy" id="taxaHierarchy" class="value ui-corner-all">
+					<g:each in="${Classification.list()}" var="classification">
+						<option value="${classification.id}">
+							${classification.name}
+						</option>
+					</g:each>
+				</select>
+				
+				<div class="taxonomyBrowser">						
+					<table id="taxonHierarchy"></table>
+				</div>
 					<br />
-				</g:each>				
+								
 
 				<div class="readmore" style="float:left;">
 					${speciesInstance.findSummary() }
@@ -546,6 +544,21 @@ var heirarchyLevelFormatter = function(el, cellVal, opts) {
 							</g:each>
 						</table>
 					</g:if>
+				</div>
+				<br/>
+				<div class="ui-widget">
+					<div class="speciesFieldHeader ui-dialog-titlebar ui-corner-all ui-helper-clearfix ui-widget-header">
+						<span class="ui-icon ui-icon-circle-triangle-s" style="float: left; margin-right: .3em;"></span>
+						<a href="#externalLinks">External Links</a> 
+					</div>
+					<div class="ui-widget-content">
+						<ul>
+						<li><a target="_blank"
+								href="http://www.ubio.org/browser/search.php?search_all=${speciesInstance.taxonConcept.binomialForm?:speciesInstance.taxonConcept.canonicalForm}">
+							Search on uBio
+						</a></li>
+						</ul>
+					</div>
 				</div>
 			</div>
 			</div>

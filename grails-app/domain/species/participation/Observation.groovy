@@ -36,6 +36,7 @@ class Observation {
 	Date createdOn = new Date();
 	String notes;
 	SpeciesGroup group;
+	int rating;
 	
 	static hasMany = [resource:Resource, recommendationVote:RecommendationVote];
 

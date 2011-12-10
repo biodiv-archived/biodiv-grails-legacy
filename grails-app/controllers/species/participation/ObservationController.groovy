@@ -230,6 +230,7 @@ class ObservationController {
 					redirect(action: "show", id: observationInstance.id);
 				}
 				else {
+					recommendationVoteInstance.errors.allErrors.each { log.error it }
 					render(view: "show", model: [observationInstance:observationInstance, recommendationVoteInstance: recommendationVoteInstance])
 				}
 			} catch(e) {

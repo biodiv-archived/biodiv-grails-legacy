@@ -96,15 +96,17 @@ class ObservationService {
 		if(canName) {
 			//findBy returns first...assuming taxon concepts wont hv same canonical name and different rank 
 			taxonConcept = TaxonomyDefinition.findByCanonicalFormIlike(canName);
+			reco = Recommendation.findByNameIlike(taxonConcept.canonicalForm);
+			log.debug "Found taxonConcept : "+taxonConcept;
 		}
 		
-		if(recoName) {
-			//CHK:doing findBy...getting first name by this canonical form
+		else if(recoName) {
 			def c = Recommendation.createCriteria();
-			reco = c.get {
+			def result = c.list {
 				ilike('name', recoName);
 				(taxonConcept) ? eq('taxonConcept', taxonConcept) : isNull('taxonConcept');
 			}
+			reco = result?result[0]:null;
 		}
 		
 		if(!reco) {

@@ -26,9 +26,9 @@
 					controller="speciesGroup" action="show" id="${observationInstance.group?.id }">${observationInstance.group?.name }</g:link>
 			</span>
 		</p>
-		<p class="prop readmore">
-			<span class="name">Description </span> <span class="value"> ${observationInstance.notes}
-			</span>
+		<p class="prop">
+			<span class="name">Description </span> <p class="value readmore"> ${observationInstance.notes}
+			</p>
 		</p>
 	</div>
 </div>

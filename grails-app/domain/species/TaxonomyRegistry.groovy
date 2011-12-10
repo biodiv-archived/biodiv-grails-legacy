@@ -7,16 +7,16 @@ class TaxonomyRegistry {
 	String path;
 	Classification classification;
 
-	static belongsTo = [species:Species];
+	//static belongsTo = [species:Species];
 	
 	static constraints = {
 		parentTaxon(nullable:true);
-		species(nullable:true);
+		//species(nullable:true);
 	}
 
 	static mappings = {
 		version : false
-		taxonDefinition(unique:['classification', 'species'])
+		taxonDefinition(unique:['classification', 'path'])
 	}
 	
 }

@@ -103,7 +103,6 @@
 						def result = RecommendationVote.createCriteria().list { 
 							projections {
 								groupProperty("recommendation")
-								groupProperty("author")
 								min 'votedOn', 'votedOn'
 								count 'id', 'voteCount'
 							}

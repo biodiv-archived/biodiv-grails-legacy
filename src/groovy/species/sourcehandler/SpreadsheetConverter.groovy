@@ -27,6 +27,9 @@ import species.formatReader.SpreadsheetReader;
 class SpreadsheetConverter extends SourceConverter {
 	protected static SourceConverter _instance;
 	
+	def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+	def fieldsConfig = config.speciesPortal.fields
+	
 	private SpreadsheetConverter() {
 	}
 
@@ -55,23 +58,23 @@ class SpreadsheetConverter extends SourceConverter {
 		while(iter.hasNext()) {
 			Map row = iter.next();
 			Node field = new Node(speciesElement, "field");
-			Node concept = new Node(field, "concept", row.get("concept"));
-			Node category = new Node(field, "category", row.get("category"));
-			Node subcategory = new Node(field, "subcategory", row.get("subcategory"));
-			if(row.get('category')?.equalsIgnoreCase('Synonyms')) {
-				if(row.get('subcategory')?.equalsIgnoreCase('Name(s)')) {
+			Node concept = new Node(field, fieldsConfig.CONCEPT, row.get(fieldsConfig.CONCEPT));
+			Node category = new Node(field, fieldsConfig.CATEGORY, row.get(fieldsConfig.CATEGORY));
+			Node subcategory = new Node(field, fieldsConfig.SUBCATEGORY, row.get(fieldsConfig.SUBCATEGORY));
+			if(row.get(fieldsConfig.CATEGORY)?.equalsIgnoreCase(fieldsConfig.SYNONYMS)) {
+				if(row.get(fieldsConfig.SUBCATEGORY)?.equalsIgnoreCase('Name(s)')) {
 					Map relationshipsRow = iter.next();
 					createSynonyms(field, getDescription(row), row, relationshipsRow);
 				}
-			} else if(row.get('category')?.equalsIgnoreCase('Common Name')) {
+			} else if(row.get(fieldsConfig.CATEGORY)?.equalsIgnoreCase('Common Name')) {
 				createCommonNames(field, getDescription(row), row);
-			} else if(row.get('subcategory')?.equalsIgnoreCase('Global Distribution Geographic Entity')) {
+			} else if(row.get(fieldsConfig.SUBCATEGORY)?.equalsIgnoreCase('Global Distribution Geographic Entity')) {
 				createCountryGeoEntity(field, getDescription(row), row);
-			} else if(row.get('subcategory')?.equalsIgnoreCase('Indian Distribution Geographic Entity')) {
+			} else if(row.get(fieldsConfig.SUBCATEGORY)?.equalsIgnoreCase('Indian Distribution Geographic Entity')) {
 				createCountryGeoEntity(field, getDescription(row), row);
-			} else if(row.get('subcategory')?.equalsIgnoreCase('Global Endemicity Geographic Entity')) {
+			} else if(row.get(fieldsConfig.SUBCATEGORY)?.equalsIgnoreCase('Global Endemicity Geographic Entity')) {
 				createCountryGeoEntity(field, getDescription(row), row);
-			} else if(row.get('subcategory')?.equalsIgnoreCase('Indian Endemicity Geographic Entity')) {
+			} else if(row.get(fieldsConfig.SUBCATEGORY)?.equalsIgnoreCase('Indian Endemicity Geographic Entity')) {
 				createCountryGeoEntity(field, getDescription(row), row);
 			} else {
 				createDataNode(field, getDescription(row), row);

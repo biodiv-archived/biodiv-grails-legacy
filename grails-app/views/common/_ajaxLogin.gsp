@@ -19,6 +19,7 @@
       <p>
          <a href='javascript:void(0)' onclick='authAjax(); return false;'>Login</a>
          <a href='javascript:void(0)' onclick='cancelLogin(); return false;'>Cancel</a>
+         <!-- facebookAuth:connect permissions="email,user_about_me"/-->
       </p>
    </form>
     <div style='display: none; text-align: left;' id='loginMessage'></div>

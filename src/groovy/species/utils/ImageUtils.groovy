@@ -26,14 +26,21 @@ class ImageUtils {
 		
 		def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.resources.images
 		
+		String fileName = Utils.cleanFileName(imageFile.getName());
+		int lastIndex = fileName.lastIndexOf('.');
+		
 		log.debug "Creating thumbnail image";
-		ImageUtils.convert(imageFile, new File(dir, imageFile.getName().tokenize(".")[0] + config.thumbnail.suffix), config.thumbnail.width, config.thumbnail.height, 100);
+		def extension = config.thumbnail.suffix
+		String name = fileName.substring(0, lastIndex);
+		ImageUtils.convert(imageFile, new File(dir, name+extension ), config.thumbnail.width, config.thumbnail.height, 100);
 
 		log.debug "Creating gallery image";
-		ImageUtils.convert(imageFile, new File(dir, imageFile.getName().tokenize(".")[0] + config.gallery.suffix), config.gallery.width, config.gallery.height, 100);
+		extension = config.gallery.suffix
+		ImageUtils.convert(imageFile, new File(dir, name+extension), config.gallery.width, config.gallery.height, 100);
 
 		log.debug "Creating gallery thumbnail image";
-		ImageUtils.convert(imageFile, new File(dir, imageFile.getName().tokenize(".")[0] + config.galleryThumbnail.suffix), config.galleryThumbnail.width, config.galleryThumbnail.height, 100);
+		extension = config.galleryThumbnail.suffix
+		ImageUtils.convert(imageFile, new File(dir, name+extension), config.galleryThumbnail.width, config.galleryThumbnail.height, 100);
 	}
 	
 	/**
@@ -95,7 +102,7 @@ class ImageUtils {
 
 		def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 		command.add(config.jpegOptimProg);
-		command.add("--strip-all");
+		//command.add("--strip-all");// we are reading location tags so commenting for now
 		command.add(file.getAbsolutePath());
 
 		log.debug command;
