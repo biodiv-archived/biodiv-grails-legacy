@@ -44,7 +44,7 @@ $(document).ready(function(){
 		<g:hiddenField name="hl.fl" value="message" />
 		<g:hiddenField name="hl.snippets" value="3" />
 		 -->
-		<span class="button"> <input id="search"  class="searchButton" type="submit"
+		<span> <input id="search"  class="searchButton" type="submit"
 			value="">
 			<!-- a href="${createLink(controller:'search', action:'advSelect') }" class="search">Advanced Search</a--> </span>
 

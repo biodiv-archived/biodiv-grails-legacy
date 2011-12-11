@@ -27,6 +27,8 @@
 	href="${resource(dir:'css',file:'navigation.css', absolute:true)}" />
 <link rel="stylesheet" type="text/css" media="all"
 	href="${resource(dir:'css',file:'jquery.rating.css', absolute:true)}" />
+<link rel="stylesheet"
+	href="${resource(dir:'css',file:'wg.css', absolute:true)}" />
 
 <!-- script type="text/javascript"
 	src="${resource(dir:'plugins',file:'jquery-ui-1.8.15/jquery-ui/js/jquery-ui-1.8.15.custom.min.js', absolute:true)}"></script-->
@@ -68,6 +70,30 @@ jQuery(document).ready(function($) {
 			alt="${message(code:'spinner.alt',default:'Loading...')}" />
 	</div>
 
+        <!--div id="top_nav_bar">
+            <ul>
+            <li id="maps_nav_link" title="Maps" onclick="location.href='http://thewesternghats.in/map'">Maps</li>
+            <li id="checklists_nav_link" title="Checklists" onclick="location.href='http://thewesternghats.in/browsechecklists'">Checklists</li>
+            <li id="collaborate_nav_link" title="Collaborate" onclick="location.href='http://thewesternghats.in/collaborate-wg'">Collaborate</li>
+            <li id="species_nav_link" title="Species" onclick="location.href='http://thewesternghats.in/speciespage/species/list'">Species</li>
+            <li id="themes_nav_link" title="Themes" onclick="location.href='http://thewesternghats.in/themepages/list'">Themes</li>
+            <li id="about_nav_link" title="About" onclick="location.href='http://thewesternghats.in/about/western-ghats'">About</li>
+            </ul>
+        </div-->
+
+        <!-- Branding -->
+        <div id="branding">
+                <!-- Logo -->
+                <div id="logo">
+                        <a href="http://thewesternghats.in">
+                                <img src="http://thewesternghats.in/sites/all/themes/wg/images/map-logo.gif" alt="western ghats" id="wg_logo"/>
+                        </a>
+                </div>
+                <!-- Logo ends -->
+        </div>
+        <!-- Branding ends -->
+
+
 	<div>
 		<span id='loginLink'
 			style='position: relative; margin-right: 30px; float: right'>
@@ -88,7 +114,7 @@ jQuery(document).ready(function($) {
 			<div id="menu" class="ui-corner-all">
 				<div class="demo" style="float: right; margin-right: .3em;"
 					title="These are demo pages">These are demo pages</div>
-				<div class="menuButton" style="float: right;">
+				<div class="menuButton" style="float: left; margin:10px;">
 					<g:searchBox />
 				</div>
 				<sNav:render group="dashboard" subitems="true" />

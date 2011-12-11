@@ -36,6 +36,13 @@ a {
 	text-decoration: none;
 }
 
+#loginLink {
+margin-right: 30px;
+position: absolute !important;
+right: -10px;
+top: 10px;
+}
+
 #species_main_wrapper .readmore {
 	float: none;
 	margin: 0px;
@@ -619,9 +626,12 @@ img {
 }
 
 .searchButton {
-	background: url(../images/search.png) left no-repeat;
-	width: 22px;
-	border: none;
+	background: url(../images/search.png) no-repeat scroll center center transparent;
+	width: 42px;
+	border: 1px solid #aeaeae;
+        border-radius:5px;
+        background-color:#ffffff;
+        box-shadow: 0 0 4px rgba(0, 0, 0, 0.25) inset;
 }
 
 .taxonBrowser {
@@ -876,3 +886,14 @@ max-width:660px;
     margin:20px;      
 }
 
+.voteDetails {
+    background-color: #FAFAFA;
+    border: 1px solid #AEAEAE;
+    box-shadow: 3px 3px 7px #555555;
+    font-size: 0.8em;
+    padding: 10px;
+    position: absolute;
+    width: 220px;
+    z-index: 100;
+    display: none;
+}
