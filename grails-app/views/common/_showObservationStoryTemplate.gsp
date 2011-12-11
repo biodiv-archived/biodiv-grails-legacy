@@ -1,6 +1,7 @@
 
 <div class="grid_10 observation_story">
 	<div>
+                <img class="group_icon" src="${grailsApplication.config.grails.serverURL+'/images/group_icons/'}${observationInstance.group?.name?.replaceAll(/ /, '_')}.png" title="${observationInstance.group?.name}"/>
 		<p class="prop">
 			<span class="name">By </span>
 			<div class="value">
@@ -15,11 +16,11 @@
 					format="MMMMM dd, yyyy" date="${observationInstance.observedOn}" />
 			</div>
 		</p>
-		<p class="prop">
+		<!--p class="prop">
 			<span class="name">Group</span> <div class="value"><g:link
 					controller="speciesGroup" action="show" id="${observationInstance.group?.id }">${observationInstance.group?.name }</g:link>
 			</div>
-		</p>
+		</p-->
 		<p class="prop readmore">
 			<span class="name">Description </span> <div class="value"> ${observationInstance.notes}
 			</div>

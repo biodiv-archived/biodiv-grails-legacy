@@ -897,3 +897,10 @@ max-width:660px;
     z-index: 100;
     display: none;
 }
+
+.group_icon {
+float: right;
+border: 1px solid #666666;       
+border-radius:7px;        
+background-color: #666666;
+}
