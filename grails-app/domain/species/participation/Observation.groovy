@@ -37,7 +37,6 @@ class Observation {
 	String notes;
 	SpeciesGroup group;
         String placeName;
-        String reverseGeocodedName;
         float latitude;
         float longitude;
 	

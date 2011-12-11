@@ -1,5 +1,5 @@
 
-<div class="snippet grid_16">
+<div class="snippet grid_15">
 	<g:set var="mainImage" value="${observationInstance.mainImage()}" />
 	<div class="figure"
 		style="float: left; max-height: 220px; max-width: 200px">
@@ -24,4 +24,10 @@
 		</g:else>
 	</div>
 	<obv:showStory model="['observationInstance':observationInstance]"></obv:showStory>
+        <div class="grid_10">
+        <p class="prop">
+	    <span class="name">Place name</span> <div class="value"> ${observationInstance.placeName}</div>
+	</p>
+        </div>
+
 </div>

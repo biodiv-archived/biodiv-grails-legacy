@@ -41,7 +41,7 @@ function set_location(lat, lng) {
         geocoder.geocode({'latLng': marker.getPosition()}, function(results, status) {
             if (status == google.maps.GeocoderStatus.OK) {
                 if (results[0]) {
-                    $('#reverse_geocoded_name').html(results[0].formatted_address);
+                    $('#place_name').val(results[0].formatted_address);
                     $('#latitude').html(marker.getPosition().lat());
                     $('#longitude').html(marker.getPosition().lng());
                     $('#reverse_geocoded_name_field').val(results[0].formatted_address);
@@ -153,7 +153,7 @@ $(document).ready(function() {
     geocoder.geocode({'latLng': marker.getPosition()}, function(results, status) {
       if (status == google.maps.GeocoderStatus.OK) {
         if (results[0]) {
-          $('#reverse_geocoded_name').html(results[0].formatted_address);
+          $('#place_name').val(results[0].formatted_address);
           $('#latitude').html(marker.getPosition().lat());
           $('#longitude').html(marker.getPosition().lng());
           $('#reverse_geocoded_name_field').val(results[0].formatted_address);
@@ -174,7 +174,7 @@ $(document).ready(function() {
    geocoder.geocode({'latLng': marker.getPosition()}, function(results, status) {
       if (status == google.maps.GeocoderStatus.OK) {
         if (results[0]) {
-          $('#reverse_geocoded_name').html(results[0].formatted_address);
+          $('#place_name').val(results[0].formatted_address);
         }
       }
     });
@@ -191,7 +191,7 @@ $(document).ready(function() {
       geocoder.geocode({'latLng': marker.getPosition()}, function(results, status) {
       if (status == google.maps.GeocoderStatus.OK) {
         if (results[0]) {
-          $('#reverse_geocoded_name').html(results[0].formatted_address);
+          $('#place_name').val(results[0].formatted_address);
         }
       }
     });
@@ -229,7 +229,7 @@ $(document).ready(function() {
       geocoder.geocode({'latLng': marker.getPosition()}, function(results, status) {
       if (status == google.maps.GeocoderStatus.OK) {
         if (results[0]) {
-          $('#reverse_geocoded_name').html(results[0].formatted_address);
+          $('#place_name').val(results[0].formatted_address);
         }
       }
     });
