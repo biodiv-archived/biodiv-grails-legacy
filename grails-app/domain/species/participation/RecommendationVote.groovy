@@ -36,6 +36,7 @@ class RecommendationVote {
 	static constraints = {
 		recommendation(unique:['author', 'observation', 'confidence']);
 		votedOn validator : {val -> val < new Date()};
+		confidence(nullable:true);
 	}
 	
 	static mapping = {

@@ -225,7 +225,7 @@ class ObservationController {
 			//Saves recommendation if its not present
 			def recommendationVoteInstance = observationService.createRecommendationVote(params)
 			def observationInstance = Observation.get(params.obvId);
-
+			log.debug params;
 			try {
 				if (recommendationVoteInstance.save(flush: true)) {
 					log.debug "Successfully added reco vote : "+recommendationVoteInstance
@@ -249,6 +249,5 @@ class ObservationController {
 		log.debug params;
 		def votes = RecommendationVote.findAll("from RecommendationVote as recoVote where recoVote.recommendation.id = :recoId and recoVote.observation.id = :obvId order by recoVote.votedOn desc", [recoId:params.long('recoId'), obvId:params.long('obvId')]);
 		render (template:"/common/voteDetails", model:[votes:votes]);
-		
 	}
 }

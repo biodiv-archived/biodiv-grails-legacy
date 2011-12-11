@@ -66,4 +66,7 @@ class TaxonomyDefinition {
 		version false;
 	}
 
+	Long findSpeciesId() {
+		return Species.findByTaxonConcept(this)?.id;
+	}
 }

@@ -550,7 +550,7 @@ class XMLConverter extends SourceConverter {
 		File tempFile;
 		if(!fileName) {
 			//downloading from web
-			def tempdir = new File(grailsApplication.config.speciesPortal.images.uploadDir, "speciesimages");
+			def tempdir = new File(config.speciesPortal.images.uploadDir, "images");
 			if(!tempdir.exists()) {
 				tempdir.mkdir();
 			}

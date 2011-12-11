@@ -26,7 +26,6 @@
   window.fbAsyncInit = function() {
     FB.init({
       appId      : '308606395828381', // App ID
-      channelUrl : '//localhost.local/biodiv/channel.html', // Channel File
       status     : true, // check login status
       cookie     : true, // enable cookies to allow the server to access the session
       oauth      : true, // enable OAuth 2.0
@@ -101,7 +100,7 @@
 				<div class="grid_10 comments">
 					<fb:like send="true" width="450" show_faces="true"></fb:like>
 					<div class="fb-comments grid_10"
-						data-href="${createLink(controller:'observation', action:'show', id:observationInstance.id, base:'http://localhost.local/biodiv')}"
+						data-href="${createLink(controller:'observation', action:'show', id:observationInstance.id)}"
 						data-num-posts="10"></div>
 				</div>
 			</div>
@@ -131,12 +130,13 @@
                                                         <g:set var="index" value="0"/>
 								<g:each in="${result}" var="r">
 									<li><g:if test="${r[0]?.taxonConcept?.canonicalForm}">
-											<g:link controller="species" action="show" id="">
+											<g:link controller="species" action="show" id="${r[0]?.taxonConcept?.findSpeciesId()}">
 												${r[0]?.taxonConcept?.canonicalForm}
 											</g:link>
 										</g:if> <g:else>
                                                                     	${r[0].name}
                                                                     </g:else> By
+
 										
 										<%def recoVote = RecommendationVote.withCriteria {
 											eq('recommendation', r[0])
@@ -150,6 +150,10 @@
 											${recoVote?.author.username}
 										</g:link> on <g:formatDate format="MMMMM dd, yyyy" date="${recoVote?.votedOn}" />
 										with
+
+										
+    									
+
                                                                                 <g:javascript>
                                                                                     $(document).ready(function(){
                                                                                         $('#voteCountLink_${index}').click(function() {
@@ -166,6 +170,9 @@
 										<span id="voteCountLink_${index}"><g:remoteLink action="voteDetails" controller="observation" update="voteDetails_${index}" 
     										params="['obvId':observationInstance.id, recoId:r[0].id]">votes ${r[1]}</g:remoteLink></span>
     									<div id="voteDetails_${index}" class="voteDetails"></div>
+    									<span style="float:right;"><g:remoteLink action="addRecommendationVote" controller="observation"  
+    										params="['obvId':observationInstance.id, recoId:r[0].id]" on401="showLogin();">I agree</g:remoteLink></span>
+
 									</li>
                                                                         <g:set var="index" value="${index + 1}"/>
 								</g:each>
