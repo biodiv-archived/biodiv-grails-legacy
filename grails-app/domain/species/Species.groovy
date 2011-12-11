@@ -32,7 +32,6 @@ class Species {
 	List<Resource> getImages() { 
 		List<Resource> images = new ArrayList<Resource>();
 		resources.each { resource ->
-			 
 			if(resource.type == species.Resource.ResourceType.IMAGE) {
 				images.add(resource);
 			}

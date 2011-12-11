@@ -3,6 +3,8 @@ package species.participation
 import groovy.util.Node
 
 import org.springframework.web.multipart.MultipartHttpServletRequest
+
+import grails.converters.JSON;
 import grails.plugins.springsecurity.Secured
 import species.sourcehandler.XMLConverter
 import species.utils.ImageUtils
@@ -242,4 +244,13 @@ class ObservationController {
 		}
 	}
 
+	@Secured(['ROLE_USER'])
+	def getVoteDetails() {
+		log.debug params;
+		def votes = RecommendationVote.findAll("from RecommendationVote as recoVote where recoVote.recommendation = :recoId and recoVote.observation = :obvId", [recoId:recoId, obvId:obvId]);
+	
+		println votes;
+		render votes as JSON;
+		
+	}
 }

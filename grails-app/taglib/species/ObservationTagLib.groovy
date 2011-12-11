@@ -27,4 +27,16 @@ class ObservationTagLib {
 			out << render(template:"/common/showObservationStoryTemplate", model:attrs.model);
 		}
 	}
+
+	def showRating = {attrs, body->
+		if(attrs.model.observationInstance) {
+			out << render(template:"/common/showObservationRatingTemplate", model:attrs.model);
+		}
+	}
+
+	def showLocation = {attrs, body->
+		if(attrs.model.observationInstance) {
+			out << render(template:"/common/showObservationLocationTemplate", model:attrs.model);
+		}
+	}
 }

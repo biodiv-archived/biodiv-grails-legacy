@@ -100,8 +100,14 @@ class ObservationService {
 		if(canName) {
 			//findBy returns first...assuming taxon concepts wont hv same canonical name and different rank 
 			taxonConcept = TaxonomyDefinition.findByCanonicalFormIlike(canName);
+			log.debug "Resolving recoName to canName : "+taxonConcept.canonicalForm
 			reco = Recommendation.findByNameIlike(taxonConcept.canonicalForm);
 			log.debug "Found taxonConcept : "+taxonConcept;
+			log.debug "Found reco : "+reco;
+			if(!reco) {
+				reco = new Recommendation(name:taxonConcept.canonicalForm, taxonConcept:taxonConcept);
+				recommendationService.save(reco);
+			}
 		}
 		
 		else if(recoName) {
