@@ -107,7 +107,9 @@
 
 
 			<div class="grid_5">
-				<obv:showRating model="['observationInstance':observationInstance]" />
+
+				<obv:showLocation
+					model="['observationInstance':observationInstance]" />
 
 				<div class="grid_5 recommendations">
 					<div class="recoSummary">
@@ -208,8 +210,7 @@
 					</div>
 				</div>
 
-				<obv:showLocation
-					model="['observationInstance':observationInstance]" />
+				<obv:showRating model="['observationInstance':observationInstance]" />
 
 			</div>
 
