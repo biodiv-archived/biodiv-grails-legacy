@@ -30,7 +30,7 @@ $(document).ready(function(){
    		colModel:[
    			{name:'id',index:'id',hidden:true},
    			{name:'name',index:'name',formatter:heirarchyLevelFormatter},
-   			{name:'count',index:'count',width:50},
+   			{name:'count',index:'count',width:50, hidden:true},
    			{name:'speciesId',index:'speciesId', hidden:true}
    		],
    		width: '100%',
@@ -80,7 +80,8 @@ heirarchyLevelFormatter = function(el, cellVal, opts) {
 	}
 	
 	if(level == ${TaxonomyRank.SPECIES.ordinal() }) {
-		el = "<a href='${createLink(action:"show")}/"+speciesId+"'>"+el+"</a>";
+		//el = "<a href='${createLink(action:"show")}/"+speciesId+"'>"+el+"</a>";
+		
 	} else {
 		// el = "<a // href='${createLink(action:"taxon")}/"+taxonId+"'	class='rank"+level+"'>"+levelTxt+": // "+el+"</a>";
 		el = levelTxt+": "+"<span class='rank"+level+"'>"+el+"&nbsp;<a class='taxonExpandAll' onClick='expandAll(\""+cellVal.rowId+"\")'>+</a></span>"

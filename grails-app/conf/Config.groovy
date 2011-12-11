@@ -82,7 +82,7 @@ log4j = {
 			'net.sf.ehcache.hibernate'
 	
 	warn   'org.mortbay.log',
-			"org.grails.plugin.resource"
+			'org.grails.plugin.resource'
 	debug	'species',
 			'speciespage',
 			'grails.app'
@@ -187,7 +187,8 @@ speciesPortal {
 		serverURL = "http://localhost/${appName}/observations"
 	}
 
-	names.parser.serverURL = "192.168.4.217"
+	//names.parser.serverURL = "192.168.4.217"
+	names.parser.serverURL = "127.0.0.1"
 	names.parser.port = 4334
 	search {
 		serverURL = "http://localhost:8090/solr/species"
@@ -488,3 +489,14 @@ grails.resources.modules = {
 grails.plugins.springsecurity.userLookup.userDomainClassName = 'species.auth.SUser'
 grails.plugins.springsecurity.userLookup.authorityJoinClassName = 'species.auth.SUserRole'
 grails.plugins.springsecurity.authority.className = 'species.auth.Role'
+
+
+grails.plugins.springsecurity.facebook.appId='308606395828381'
+grails.plugins.springsecurity.facebook.secret='7ddb140cd81ff6b9be38853a0f43d6d3'
+grails.plugins.springsecurity.facebook.bean.dao='facebookAuthDaoImpl'
+
+
+
+grails.plugins.springsecurity.facebook.appId='308606395828381'
+grails.plugins.springsecurity.facebook.secret='7ddb140cd81ff6b9be38853a0f43d6d3'
+grails.plugins.springsecurity.facebook.bean.dao='facebookAuthDaoImpl'

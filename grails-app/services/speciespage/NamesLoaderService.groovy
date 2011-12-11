@@ -45,17 +45,18 @@ class NamesLoaderService {
 		log.debug "Importing existing taxon definitions into recommendations"
 
 		if(cleanAndUpdate) {
+			//TODO:Handle cascading delete recommendations 
 			recommendationService.deleteAll();
 		}
 		
 		int offset = 0;
 		int noOfNames = 0;
 		def recos = new ArrayList<Recommendation>();
-		while(true) {
-			def taxonConcepts = TaxonomyDefinition.findAll("from TaxonomyDefinition as taxonConcept where taxonConcept not in (select reco.taxonConcept from Recommendation as reco) and taxonConcept.rank >= :minRank", [minRank:minRankToImport, max:NAME_BATCH_TO_LOAD, offset:offset])
-			//def taxonConcepts = TaxonomyDefinition.findAllByRankGreaterThanEquals(minRankToImport, [max:NAME_BATCH_TO_LOAD, offset:offset]);
+		//while(true) {
+			//def taxonConcepts = TaxonomyDefinition.findAll("from TaxonomyDefinition as taxonConcept where taxonConcept not in (select reco.taxonConcept from Recommendation as reco) and taxonConcept.rank >= :minRank", [minRank:minRankToImport, max:NAME_BATCH_TO_LOAD, offset:offset])
+			def taxonConcepts = TaxonomyDefinition.findAllByRankGreaterThanEquals(minRankToImport);
 
-			if(!taxonConcepts) break; //no more results;
+			//if(!taxonConcepts) break; //no more results;
 
 			taxonConcepts.each { taxonConcept ->
 				if(taxonConcept.name) {
@@ -67,14 +68,6 @@ class NamesLoaderService {
 					if(taxonConcept.binomialForm && !taxonConcept.binomialForm.equals(taxonConcept.canonicalForm)) 
 						recos.add(new Recommendation(name:taxonConcept.binomialForm, taxonConcept:taxonConcept));
 					// TODO giving species subspecies options to parent taxonEntries
-					//			if(taxonConcept.rank >= minRankToSpread) {
-					//				//associating these names with its parents
-					//				def taxonRegistry = TaxonomyRegistry.findAllByTaxonDefinition(taxonConcept);
-					//				taxonRegistry.each { reg ->
-					//					def parent = reg.parentTaxon
-					//
-					//				}
-					//			}
 					noOfNames++;
 				}
 				if(recos.size() >= RECO_BATCH_TO_SAVE) {
@@ -83,7 +76,7 @@ class NamesLoaderService {
 				}
 			}
 			offset = offset + taxonConcepts.size();
-		}
+		//}
 
 //		while(true) {
 //			def taxonConcepts = TaxonomyDefinition.findAll("from TaxonomyDefinition as taxonConcept where taxonConcept not in (select reco.taxonConcept from Recommendation as reco) and taxonConcept.rank < :minRank", [minRank:minRankToSpread, max:NAME_BATCH_TO_LOAD, offset:offset])

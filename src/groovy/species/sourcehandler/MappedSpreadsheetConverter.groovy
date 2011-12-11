@@ -35,6 +35,7 @@ class MappedSpreadsheetConverter extends SourceConverter {
 		NodeBuilder builder = NodeBuilder.newInstance();
 		int i=0;
 		for(Map speciesContent : content) {
+			log.debug speciesContent;
 			Node speciesElement = builder.createNode("species");
 			for(Map mappedField : mappingConfig) {
 				String fieldName = mappedField.get("field name(s)")
@@ -90,7 +91,9 @@ class MappedSpreadsheetConverter extends SourceConverter {
 					}
 				}
 			}
-			log.debug speciesElement;
+			//log.debug "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
+			//log.debug speciesElement;
+			//log.debug "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
 			XMLConverter converter = new XMLConverter();
 			Species s = converter.convertSpecies(speciesElement)
 			if(s)
@@ -228,13 +231,19 @@ class MappedSpreadsheetConverter extends SourceConverter {
 		boolean incremental = result.get("incremental") ? new Boolean(result.get("incremental")) : false
 		int imagesMetaDataSheet = result.get("imagesmetadatasheet") ? Integer.parseInt(result.get("imagesmetadatasheet")?.toString()):-1;
 		if(imagesMetaDataSheet != -1) {
+			//TODO:This is getting repeated for every row in spreadsheet costly
 			List<Map> imagesMetaData = SpreadsheetReader.readSpreadSheet(file, imagesMetaDataSheet, 0);
-			createImages(images, imagesMetaData);
+			fieldName.split(",").eachWithIndex { t, index ->
+				String txt = speciesContent.get(t);
+				txt.split(delimiter).each { loc->
+					createImages(images, loc, imagesMetaData);
+				}
+			}
 		} else {
 			List<String> groupValues = new ArrayList<String>();
 			fieldName.split(",").eachWithIndex { t, index ->
 				String txt = speciesContent.get(t);
-				if (index != 0 && index%group == 0) {
+				if (index != 0 && index % group == 0) {
 					populateImageNode(images, groupValues, delimiter, location, source, caption, attribution, license, name, incremental);
 					groupValues = new ArrayList<String>();
 				}
@@ -288,20 +297,23 @@ class MappedSpreadsheetConverter extends SourceConverter {
 		}
 	}
 
-	private void createImages(Node images, List<Map> imageMetaData) {
+	private void createImages(Node images, String id, List<Map> imageMetaData) {
 		def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 		String uploadDir = config.speciesPortal.images.uploadDir;
 		imageMetaData.each { imageData ->
-			Node image = new Node(images, "image");
+			println "+++"+imageData.get("id")
 			String refKey = imageData.get("id");
-			String loc = imageData.get("imageno.");
-			File file = new File(uploadDir, cleanLoc(loc));
-			new Node(image, "refKey", refKey);
-			new Node(image, "fileName", file.getAbsolutePath());
-			new Node(image, "source", imageData.get("source"));
-			new Node(image, "caption", imageData.get("possiblecaption"));
-			new Node(image, "attribution", imageData.get("attribution"));
-			new Node(image, "license", imageData.get("license"));
+			if(refKey.trim().equals(id.trim())) {
+				Node image = new Node(images, "image");
+				String loc = imageData.get("imageno.");
+				File file = new File(uploadDir, cleanLoc(loc));
+				new Node(image, "refKey", refKey);
+				new Node(image, "fileName", file.getAbsolutePath());
+				new Node(image, "source", imageData.get("source"));
+				new Node(image, "caption", imageData.get("possiblecaption"));
+				new Node(image, "attribution", imageData.get("attribution"));
+				new Node(image, "license", imageData.get("license"));
+			}
 		}
 	}
 	

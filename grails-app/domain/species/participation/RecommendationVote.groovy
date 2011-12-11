@@ -10,7 +10,6 @@ class RecommendationVote {
 	public enum ConfidenceType {
 		CERTAIN("I am certain"),
 		UNSURE("I am unsure"),
-		DONT_KNOW("I dont know");
 		
 		private String value;
 		
@@ -19,7 +18,7 @@ class RecommendationVote {
 		}
 		
 		static list() {
-			return [CERTAIN, UNSURE, DONT_KNOW];
+			return [CERTAIN, UNSURE];
 		}
 		String value() {
 			return this.value;
@@ -30,6 +29,7 @@ class RecommendationVote {
 	Recommendation recommendation;
 	ConfidenceType confidence;
 	Date votedOn = new Date();
+	float userWeight;
 	
 	static belongsTo = [observation:Observation];
 	

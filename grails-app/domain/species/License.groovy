@@ -17,7 +17,8 @@ class License {
 		CC_BY_NC("CC BY-NC"),
 		CC_BY_SA("CC BY-SA"),
 		CC_BY_NC_SA("CC BY-NC-SA"),
-		CC_BY_NC_ND("CC BY-NC-ND");
+		CC_BY_NC_ND("CC BY-NC-ND"),
+		RESTRICTED("Restricted");
 
 		private String value;
 
@@ -36,7 +37,8 @@ class License {
 				CC_BY_NC,
 				CC_BY_SA,
 				CC_BY_NC_SA,
-				CC_BY_NC_ND ]
+				CC_BY_NC_ND, 
+				RESTRICTED ]
 		}
 
 		public String toString() {
@@ -45,10 +47,11 @@ class License {
 	}
 
 	LicenseType name;
-	URL url;
+	String url;
 
 	static constraints = {
 		name (blank:false, unique:true);
+		url(nullable:true);
 	}
 
 	static mapping = { version false; }

@@ -36,6 +36,7 @@ class Observation {
 	Date createdOn = new Date();
 	String notes;
 	SpeciesGroup group;
+	int rating;
         String placeName;
         float latitude;
         float longitude;

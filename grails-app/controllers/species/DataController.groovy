@@ -99,14 +99,17 @@ class DataController {
 		}
 		rs.each { r ->
 			r.put('expanded', false);
+			
 			if(r.rank == TaxonomyRank.SPECIES.ordinal()) {
-				def speciesId = r.speciesid !=-1 ? r.speciesid: getSpeciesId(r.name, r.taxonid, r.path, classSystem);
-				r.put("speciesid", speciesId)
-				r.put('name', getSpeciesName(speciesId))
+				//def speciesId = r.speciesid !=-1 ? r.speciesid: getSpeciesId(r.name, r.taxonid, r.path, classSystem);
+				//r.put("speciesid", speciesId)
+				//r.put('name', getSpeciesName(speciesId))
+				r.put('count', 1);
 			}
 			resultSet.add(r);
 			if(expandAll || (taxonIds && taxonIds.contains(r.taxonid))) {
 				if(r.rank < TaxonomyRank.SPECIES.ordinal()) {
+					//r.put('count', getCount(r.path, classSystem));
 					r.put('expanded', true);
 					getHierarchyNodes(resultSet, r.rank+1, r.path, classSystem, expandAll, taxonIds);
 				}
@@ -169,6 +172,28 @@ class DataController {
 	}
 
 	/**
+	*
+	* @param speciesId
+	* @param classSystem
+	* @return
+	*/
+   private int getCount(String parentId, String classSystem) {
+	   def sql = new Sql(dataSource)
+	   def rs = sql.rows("select count(*) as count \
+		   from taxonomy_registry s, \
+			   classification f, \
+			   taxonomy_definition t \
+		   where \
+			   s.taxon_definition_id = t.id and \
+			   s.classification_id = f.id and \
+			   f.name = :classSystem and \
+		   		s.path ~ '^"+parentId+"_[0-9_]+\$' " +
+				" group by t.rank \
+			having t.rank = :rank", [classSystem:classSystem, rank:TaxonomyRank.SPECIES.ordinal()])
+	   return rs[0]?.count;
+   }
+
+	/**
 	 * render t as XML;
 	 * @param rs
 	 * @param classSystem
@@ -191,7 +216,7 @@ class DataController {
 				}
 				row(id:r.path) {
 					cell(r.path)
-					cell (r.name)
+					cell (r.name.trim())
 					cell (r.count)
 					cell (r.speciesid?:"")
 					cell (r.rank)

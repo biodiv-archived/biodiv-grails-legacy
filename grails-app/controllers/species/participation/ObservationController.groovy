@@ -3,6 +3,8 @@ package species.participation
 import groovy.util.Node
 
 import org.springframework.web.multipart.MultipartHttpServletRequest
+
+import grails.converters.JSON;
 import grails.plugins.springsecurity.Secured
 import species.sourcehandler.XMLConverter
 import species.utils.ImageUtils
@@ -230,6 +232,7 @@ class ObservationController {
 					redirect(action: "show", id: observationInstance.id);
 				}
 				else {
+					recommendationVoteInstance.errors.allErrors.each { log.error it }
 					render(view: "show", model: [observationInstance:observationInstance, recommendationVoteInstance: recommendationVoteInstance])
 				}
 			} catch(e) {
@@ -241,4 +244,11 @@ class ObservationController {
 		}
 	}
 
+	@Secured(['ROLE_USER'])
+	def voteDetails = {
+		log.debug params;
+		def votes = RecommendationVote.findAll("from RecommendationVote as recoVote where recoVote.recommendation.id = :recoId and recoVote.observation.id = :obvId order by recoVote.votedOn desc", [recoId:params.long('recoId'), obvId:params.long('obvId')]);
+		render (template:"/common/voteDetails", model:[votes:votes]);
+		
+	}
 }

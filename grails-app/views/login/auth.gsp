@@ -113,6 +113,7 @@
 				<input type='submit' id="submit" value='${message(code: "springSecurity.login.button")}'/>
 			</p>
 		</form>
+		<!-- facebookAuth:connect permissions="email,user_about_me"/-->
 	</div>
 </div>
 <script type='text/javascript'>
