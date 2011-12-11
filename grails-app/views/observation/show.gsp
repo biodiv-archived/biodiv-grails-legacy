@@ -119,7 +119,7 @@
                                                                     count 'id', 'voteCount'
                                                             }
                                                             eq('observation', observationInstance)
-                                                            order 'voteCount'
+                                                            order 'voteCount', 'desc'
                                                     }
                                              %>
 
@@ -168,10 +168,10 @@
 
 
 										<span id="voteCountLink_${index}"><g:remoteLink action="voteDetails" controller="observation" update="voteDetails_${index}" 
-    										params="['obvId':observationInstance.id, recoId:r[0].id]">votes ${r[1]}</g:remoteLink></span>
+    										params="['obvId':observationInstance.id, recoId:r[0].id]">votes <span id="votes_${index}">${r[1]}</span></g:remoteLink></span>
     									<div id="voteDetails_${index}" class="voteDetails"></div>
-    									<span style="float:right;"><g:remoteLink action="addRecommendationVote" controller="observation"  
-    										params="['obvId':observationInstance.id, recoId:r[0].id]" on401="showLogin();">I agree</g:remoteLink></span>
+    									<span style="float:right;"><g:remoteLink action="addAgreeRecommendationVote" controller="observation"  
+    										params="['obvId':observationInstance.id, 'recoId':r[0].id, 'currentVotes':r[1]]" on401="showLogin();" onSuccess="jQuery('#votes_${index}').html(data)">I agree</g:remoteLink></span>
 
 									</li>
                                                                         <g:set var="index" value="${index + 1}"/>

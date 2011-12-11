@@ -244,7 +244,41 @@ class ObservationController {
 		}
 	}
 
-	@Secured(['ROLE_USER'])
+	/**
+	* adds a recommendation and 1 vote to it attributed to the logged in user
+	* saves recommendation if it doesn't exist
+	*/
+   @Secured(['ROLE_USER'])
+   def addAgreeRecommendationVote = {
+	   log.debug params;
+
+	   params.author = springSecurityService.currentUser;
+
+	   if(params.obvId) {
+		   //Saves recommendation if its not present
+		   def recommendationVoteInstance = observationService.createRecommendationVote(params)
+		   def observationInstance = Observation.get(params.obvId);
+		   log.debug params;
+		   try {
+			   if (recommendationVoteInstance.save(flush: true)) {
+				   log.debug "Successfully added reco vote : "+recommendationVoteInstance
+				   render String.valueOf(++params.int('currentVotes')).encodeAsHTML();
+			   }
+			   else {
+				   recommendationVoteInstance.errors.allErrors.each { log.error it }
+				   render String.valueOf(params.int('currentVotes')).encodeAsHTML();
+			   }
+		   } catch(e) {
+		   		e.printStackTrace();
+				render String.valueOf(params.int('currentVotes')).encodeAsHTML();
+		   }
+	   } else {
+		   flash.message  = "${message(code: 'observation.invalid', default:'Invalid observation')}"
+		   render String.valueOf(params.int('currentVotes')).encodeAsHTML();
+	   }
+	   
+   }
+   
 	def voteDetails = {
 		log.debug params;
 		def votes = RecommendationVote.findAll("from RecommendationVote as recoVote where recoVote.recommendation.id = :recoId and recoVote.observation.id = :obvId order by recoVote.votedOn desc", [recoId:params.long('recoId'), obvId:params.long('obvId')]);
