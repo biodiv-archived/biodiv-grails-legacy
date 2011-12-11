@@ -149,8 +149,9 @@
 											${recoVote?.author.username}
 										</g:link> on <g:formatDate format="MMMMM dd, yyyy" date="${recoVote?.votedOn}" />
 										with
-										<g:remoteLink action="voteDetails" controller="observation" update="success" 
+										<g:remoteLink action="voteDetails" controller="observation" update="voteDetails" 
     										params="['obvId':observationInstance.id, recoId:r[0].id]">votes ${r[1]}</g:remoteLink>
+    									<div id="voteDetails"></div>
 									</li>
 								</g:each>
 							</ul>
