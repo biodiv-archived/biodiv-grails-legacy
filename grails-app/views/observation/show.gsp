@@ -26,7 +26,6 @@
   window.fbAsyncInit = function() {
     FB.init({
       appId      : '308606395828381', // App ID
-      channelUrl : '//localhost.local/biodiv/channel.html', // Channel File
       status     : true, // check login status
       cookie     : true, // enable cookies to allow the server to access the session
       oauth      : true, // enable OAuth 2.0
@@ -101,7 +100,7 @@
 				<div class="grid_10 comments">
 					<fb:like send="true" width="450" show_faces="true"></fb:like>
 					<div class="fb-comments grid_10"
-						data-href="${createLink(controller:'observation', action:'show', id:observationInstance.id, base:'http://localhost.local/biodiv')}"
+						data-href="${createLink(controller:'observation', action:'show', id:observationInstance.id)}"
 						data-num-posts="10"></div>
 				</div>
 			</div>
