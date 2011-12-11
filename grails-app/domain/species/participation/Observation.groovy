@@ -38,7 +38,6 @@ class Observation {
 	SpeciesGroup group;
 	int rating;
         String placeName;
-        String reverseGeocodedName;
         float latitude;
         float longitude;
 	

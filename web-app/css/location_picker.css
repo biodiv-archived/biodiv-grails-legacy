@@ -13,24 +13,23 @@
     outline: medium none;
     overflow: hidden;
     padding: 10px;
-    width: 95%;
+    width: 90%;
     z-index: 5;
     border: 1px solid #CCCCCC;
     box-shadow: 0 1px 4px #CCCCCC inset;
 }    
 
 #map_canvas {
-    width:400px;
-    height:300px;     
+    width:250px;
+    height:250px;     
     clear:both;       
 }
 
 #location_picker {
 clear:both;    
-width: 900px;      
+width: 660px;      
 background: #f5f5f1;       
 box-radius: 7px;
-margin: 10px;
 }
 
 #selection_box {
@@ -55,7 +54,7 @@ text-align: right;
 width: 150px;
 }
 
-.value {
+.location_picker_value {
 float: left;
 text-align: left;
 width: 170px;
@@ -63,8 +62,8 @@ width: 170px;
 
 #side_bar {
 float:left;
-width:400px;      
-padding:10px;      
+width:350px;      
+padding:5px;      
 }
 
 #map_area {
@@ -77,7 +76,7 @@ box-shadow: 0 3px 3px #5e5e5e;
 width:390px;
 }
 
-.button {
+.location_picker_button {
 margin-bottom: 2px;    
 border: 1px solid #e5e5e5;
 padding: 2px;        
@@ -92,9 +91,10 @@ font-weight: normal;
 color: #424242;            
 background: #f5f5f0;    
 height:40px;            
+width:95%;       
 }
 
-.button:hover {
+.location_picker_button:hover {
 background: #c8e6ed;    
 }
 
@@ -119,4 +119,8 @@ width: 500px;
 
 .button_no_icon {
 padding: 10px;
+}
+
+input#place_name {
+width:50%;
 }

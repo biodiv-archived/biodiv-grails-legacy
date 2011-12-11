@@ -11,7 +11,7 @@
 </head>
 <body>
 	<div class="container_16">
-		<div class="grid_16">
+		<div class="grid_16 big_wrapper">
 			<h1>
 				<g:message code="default.list.label" args="[entityName]" />
 			</h1>
