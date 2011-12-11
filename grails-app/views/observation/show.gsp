@@ -130,12 +130,12 @@
 							<ul>
 								<g:each in="${result}" var="r">
 									<li><g:if test="${r[0]?.taxonConcept?.canonicalForm}">
-											<g:link controller="species" action="show" id="">
+											<g:link controller="species" action="show" id="${r[0]?.taxonConcept?.findSpeciesId()}">
 												${r[0]?.taxonConcept?.canonicalForm}
 											</g:link>
 										</g:if> <g:else>
-                                                                    	r[0].name
-                                                                    </g:else> By
+                                             ${r[0].name}
+                                        </g:else> By
 										
 										<%def recoVote = RecommendationVote.withCriteria {
 											eq('recommendation', r[0])
@@ -150,8 +150,10 @@
 										</g:link> on <g:formatDate format="MMMMM dd, yyyy" date="${recoVote?.votedOn}" />
 										with
 										<g:remoteLink action="voteDetails" controller="observation" update="voteDetails" 
-    										params="['obvId':observationInstance.id, recoId:r[0].id]">votes ${r[1]}</g:remoteLink>
+    										params="['obvId':observationInstance.id, recoId:r[0].id]" on401="showLogin();">votes ${r[1]}</g:remoteLink>
     									<div id="voteDetails"></div>
+    									<span><g:remoteLink action="addRecommendationVote" controller="observation"  
+    										params="['obvId':observationInstance.id, recoId:r[0].id]" on401="showLogin();">I agree</g:remoteLink></span>
 									</li>
 								</g:each>
 							</ul>

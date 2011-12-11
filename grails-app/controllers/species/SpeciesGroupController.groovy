@@ -9,7 +9,7 @@ class SpeciesGroupController {
 	}
 
 	def list = {
-		def allGroup = SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.ALL)?.id
+		def allGroup = SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.ALL)
 		if(allGroup) {
 			params.id = allGroup.id
 			redirect (action:'show', params:params)

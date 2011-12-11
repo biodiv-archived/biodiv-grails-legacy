@@ -187,8 +187,8 @@ speciesPortal {
 		serverURL = "http://localhost/${appName}/observations"
 	}
 
-	//names.parser.serverURL = "192.168.4.217"
-	names.parser.serverURL = "127.0.0.1"
+	names.parser.serverURL = "192.168.4.217"
+	//names.parser.serverURL = "127.0.0.1"
 	names.parser.port = 4334
 	search {
 		serverURL = "http://localhost:8090/solr/species"

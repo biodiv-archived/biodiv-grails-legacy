@@ -60,7 +60,7 @@ $(document).ready(function() {
 				}  
 				return $( "<li class='grid_4' style='list-style:none;'></li>" )
 					.data( "item.autocomplete", item )
-					.append( "<img src='" + item.icon+"' class='ui-state-default icon' style='float:left' /><a>" + item.label + "<br>(" + item.desc + ")</a>" )
+					.append( "<img src='" + item.icon+"' class='ui-state-default icon' style='float:left' /><a>" + item.label + ((item.desc)?'<br>(" + item.desc + ")':'')+"</a>" )
 					.appendTo( ul );
 			}
 		};

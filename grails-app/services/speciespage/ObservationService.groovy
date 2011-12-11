@@ -64,7 +64,7 @@ class ObservationService {
 		def observation = Observation.get(params.obvId);
 		def reco = getRecommendation(params.recoName, params.canName);
 		def author = params.author;
-		ConfidenceType confidence = getConfidenceType(params.confidence);
+		ConfidenceType confidence = getConfidenceType(params.confidence?:ConfidenceType.CERTAIN.name());
 		return getRecommendationVote(observation, reco, author, confidence);
 	}
 
@@ -85,9 +85,14 @@ class ObservationService {
 	 */
 	RecommendationVote createRecommendationVote(params) {
 		def observation = params.observation?:Observation.get(params.obvId);
-		def reco = getRecommendation(params.recoName, params.canName);
+		def reco;
+		if(params.recoId) 
+			reco = Recommendation.get(params.long('recoId'));
+		else
+			reco = getRecommendation(params.recoName, params.canName);
 		def author = params.author;
-		ConfidenceType confidence = getConfidenceType(params.confidence);
+		ConfidenceType confidence = getConfidenceType(params.confidence?:ConfidenceType.CERTAIN.name());
+		log.debug params;
 		return new RecommendationVote(observation:observation, recommendation:reco, author:author, confidence:confidence);
 	}
 	/**
