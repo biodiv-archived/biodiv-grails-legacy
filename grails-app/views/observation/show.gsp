@@ -128,13 +128,14 @@
 							<g:message code="recommendations.no.message"
 								,  args="[result.size()]" />
 							<ul>
+                                                        <g:set var="index" value="0"/>
 								<g:each in="${result}" var="r">
 									<li><g:if test="${r[0]?.taxonConcept?.canonicalForm}">
 											<g:link controller="species" action="show" id="">
 												${r[0]?.taxonConcept?.canonicalForm}
 											</g:link>
 										</g:if> <g:else>
-                                                                    	r[0].name
+                                                                    	${r[0].name}
                                                                     </g:else> By
 										
 										<%def recoVote = RecommendationVote.withCriteria {
@@ -149,11 +150,26 @@
 											${recoVote?.author.username}
 										</g:link> on <g:formatDate format="MMMMM dd, yyyy" date="${recoVote?.votedOn}" />
 										with
-										<g:remoteLink action="voteDetails" controller="observation" update="voteDetails" 
-    										params="['obvId':observationInstance.id, recoId:r[0].id]">votes ${r[1]}</g:remoteLink>
-    									<div id="voteDetails"></div>
+                                                                                <g:javascript>
+                                                                                    $(document).ready(function(){
+                                                                                        $('#voteCountLink_${index}').click(function() {
+                                                                                                $('#voteDetails_${index}').show();
+                                                                                        });
+
+                                                                                        $('#voteDetails_${index}').mouseout(function(){
+                                                                                                $('#voteDetails_${index}').hide();
+                                                                                                });
+                                                                                    });
+                                                                                </g:javascript>
+
+
+										<span id="voteCountLink_${index}"><g:remoteLink action="voteDetails" controller="observation" update="voteDetails_${index}" 
+    										params="['obvId':observationInstance.id, recoId:r[0].id]">votes ${r[1]}</g:remoteLink></span>
+    									<div id="voteDetails_${index}" class="voteDetails"></div>
 									</li>
+                                                                        <g:set var="index" value="${index + 1}"/>
 								</g:each>
+
 							</ul>
 						</g:if>
 						<g:else>
@@ -236,6 +252,14 @@
 				});
 			}
 		});
+
+                $('#voteCountLink').click(function() {
+                        $('#voteDetails').show();
+                        });
+
+                $('#voteDetails').mouseout(function(){
+                        $('#voteDetails').hide();
+                        });
 	});
 </g:javascript>
 

@@ -886,3 +886,14 @@ max-width:660px;
     margin:20px;      
 }
 
+.voteDetails {
+    background-color: #FAFAFA;
+    border: 1px solid #AEAEAE;
+    box-shadow: 3px 3px 7px #555555;
+    font-size: 0.8em;
+    padding: 10px;
+    position: absolute;
+    width: 220px;
+    z-index: 100;
+    display: none;
+}
