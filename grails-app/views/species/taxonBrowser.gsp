@@ -80,7 +80,7 @@ heirarchyLevelFormatter = function(el, cellVal, opts) {
 	}
 	
 	if(level == ${TaxonomyRank.SPECIES.ordinal() }) {
-		//el = "<a href='${createLink(action:"show")}/"+speciesId+"'>"+el+"</a>";
+		el = "<a href='${createLink(action:"show")}/"+speciesId+"'>"+el+"</a>";
 		
 	} else {
 		// el = "<a // href='${createLink(action:"taxon")}/"+taxonId+"'	class='rank"+level+"'>"+levelTxt+": // "+el+"</a>";

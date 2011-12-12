@@ -8,6 +8,7 @@ import grails.converters.JSON;
 import grails.plugins.springsecurity.Secured
 import species.sourcehandler.XMLConverter
 import species.utils.ImageUtils
+import species.utils.Utils;
 
 class ObservationController {
 
@@ -185,7 +186,7 @@ class ObservationController {
 						}
 					}
 
-					File file = new File(obvDir, f.originalFilename);
+					File file = new File(obvDir, Utils.cleanFileName(f.originalFilename));
 					f.transferTo( file );
 					ImageUtils.createScaledImages(file, obvDir);
 					resourcesInfo.add([fileName:file.name, size:f.size]);

@@ -1,5 +1,7 @@
 package species
 
+import species.utils.Utils;
+
 class TaxonomyDefinition {
 
 	public enum TaxonomyRank {
@@ -68,5 +70,9 @@ class TaxonomyDefinition {
 
 	Long findSpeciesId() {
 		return Species.findByTaxonConcept(this)?.id;
+	}
+	
+	void setName(String name) {
+		this.name = Utils.cleanName(name);
 	}
 }

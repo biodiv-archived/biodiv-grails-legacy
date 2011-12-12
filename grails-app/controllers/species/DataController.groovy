@@ -101,10 +101,12 @@ class DataController {
 			r.put('expanded', false);
 			
 			if(r.rank == TaxonomyRank.SPECIES.ordinal()) {
-				//def speciesId = r.speciesid !=-1 ? r.speciesid: getSpeciesId(r.name, r.taxonid, r.path, classSystem);
-				//r.put("speciesid", speciesId)
-				//r.put('name', getSpeciesName(speciesId))
-				r.put('count', 1);
+				def species = getSpecies(r.taxonid);
+				if(species) {
+					r.put("speciesid", species.id)
+					r.put('name', species.title)
+					r.put('count', 1);
+				}
 			}
 			resultSet.add(r);
 			if(expandAll || (taxonIds && taxonIds.contains(r.taxonid))) {
@@ -125,9 +127,11 @@ class DataController {
 	 * @param classSystem
 	 * @return
 	 */
-	private getSpeciesId(String name, long taxonId, String path, String classSystem) {
+	private getSpecies(long taxonId) {
 		def sql = new Sql(dataSource)
 		int level = TaxonomyRank.SPECIES.ordinal();
+		return Species.find("from Species as s where s.taxonConcept.id = :taxonId", [taxonId:taxonId]);
+		/*
 		def rs = sql.rows("select s.species_id as speciesid \
 			from taxonomy_registry s, classification f, taxonomy_definition t \
 			where \
@@ -139,6 +143,7 @@ class DataController {
 				t.id = :taxonId and \
 				s.path = :path", [level:level, taxonId:taxonId, name:name, path:path, classSystem:classSystem]);
 		return rs[0]?.speciesid;
+		*/
 	}
 
 	/**
