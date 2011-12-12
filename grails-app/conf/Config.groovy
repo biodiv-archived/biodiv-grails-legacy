@@ -160,7 +160,8 @@ speciesPortal {
 	data.rootDir = "${app.rootDir}/data"
 	resources {
 		rootDir = "${app.rootDir}/images"
-		serverURL = "http://localhost/${appName}"
+		serverURL = "http://localhost:8080/${appName}/${appName}/images"
+		//serverURL = "http://localhost/${appName}/images"
 		images {
 			defaultType = "jpg"
 			thumbnail {
@@ -184,7 +185,8 @@ speciesPortal {
 	}
 	observations {
 		rootDir = "${app.rootDir}/observations"
-		serverURL = "http://localhost/${appName}/observations"
+		serverURL = "http://localhost:8080/${appName}/observations"
+		//serverURL = "http://localhost/${appName}/observations"
 	}
 
 	names.parser.serverURL = "192.168.4.217"

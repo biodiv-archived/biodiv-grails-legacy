@@ -170,9 +170,9 @@
                                                                 <div id="location_picker">
                                                         <div id="selection_box">
                                                             <div id="side_bar">
-                                                                <input id="address"  type="text" size="70" title="Find by place name"/><br>
+                                                                <input id="address"  type="text" size="70" title="Find by place name"/><br/>
+                                                                <div id="current_location" class="location_picker_button"><div style="padding:10px">Use current location</div></div><br/>
                                                                 <div id="geotagged_images"></div>
-                                                                <div id="current_location" class="location_picker_button"><div style="padding:10px">Use current location</div></div>
                                                             </div>
 
                                                             <div id="map_area">
@@ -317,9 +317,12 @@
 							//$(this.form).ajaxSubmit();
 						}
 					});
+					$('.geotagged_image', this).load(function(){
+						update_geotagged_images_list($(this));		
+					});
 				})
 				$( "#imagesList" ).append (metadataEle);
-                                window.setTimeout(update_geotagged_images_list, 10);
+                
 			}, error:function (xhr, ajaxOptions, thrownError){
 					var messageNode = $(".message .resources") 
 					if(messageNode.length == 0 ) {
@@ -333,7 +336,7 @@
 	});
 		
 	function removeResource(event) {
-		$(event.target).parent().remove();
+		$(event.target).parent().parent('.addedResource').remove();
 	}
 	
 </g:javascript>

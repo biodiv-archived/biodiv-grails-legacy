@@ -14,7 +14,7 @@ class Species {
 	
 	static hasMany = [fields: SpeciesField, globalDistributionEntities:GeographicEntity, globalEndemicityEntities:GeographicEntity, taxonomyRegistry:TaxonomyRegistry, resources:Resource];
 
-	static constraints = { 
+	static constraints = {
 		guid(blank: false, unique: true);
 	}
 

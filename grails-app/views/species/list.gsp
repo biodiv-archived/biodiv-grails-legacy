@@ -36,12 +36,12 @@ $(document).ready(function(){
 							<span class="wrimg"> <span></span> <g:if
 									test="${(new File(grailsApplication.config.speciesPortal.resources.rootDir+thumbnailPath)).exists()}">
 									<img
-										src="${createLinkTo(dir: 'images/', base:grailsApplication.config.speciesPortal.resources.serverURL,
+										src="${createLinkTo( base:grailsApplication.config.speciesPortal.resources.serverURL,
 											file: thumbnailPath)}" />
 								</g:if>
 								<g:else>
 									<img class="galleryImage"
-										src="${createLinkTo(dir: 'images/', file:"no-image.jpg", base:grailsApplication.config.speciesPortal.resources.serverURL)}"
+										src="${createLinkTo( file:"no-image.jpg", base:grailsApplication.config.speciesPortal.resources.serverURL)}"
 										title="You can contribute!!!" />
 								</g:else> </span>
 						</g:link> <span class='caption'> ${speciesInstance.taxonConcept.italicisedForm}

@@ -237,6 +237,7 @@ class ObservationController {
 					render(view: "show", model: [observationInstance:observationInstance, recommendationVoteInstance: recommendationVoteInstance])
 				}
 			} catch(e) {
+				e.printStackTrace()
 				render(view: "show", model: [observationInstance:observationInstance, recommendationVoteInstance: recommendationVoteInstance])
 			}
 		} else {
