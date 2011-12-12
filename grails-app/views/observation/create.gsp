@@ -313,7 +313,7 @@
 					});
 				})
 				$( "#imagesList" ).append (metadataEle);
-                                window.setTimeout(update_geotagged_images_list, 10);
+                                window.setTimeout(update_geotagged_images_list, 1000);
 			}, error:function (xhr, ajaxOptions, thrownError){
 					var messageNode = $(".message .resources") 
 					if(messageNode.length == 0 ) {

@@ -64,24 +64,30 @@ function convert_DMS_to_DD(days, minutes, seconds, direction) {
 
 function update_geotagged_images_list() {
     var html = '';
+
     $('.geotagged_image').each(function() {
-        var latlng = get_latlng_from_image(this); 
+        get_latlng_from_image(this, function(img, latlng){ 
         if (latlng) {
             var func = "set_location(" + latlng + ")";
-            html = html + '<div class="button" onclick="' + func + '"><div style="width:40px; height:40px;float:left;"><img style="width:100%; height:100%;" src="' + this.src + '"/></div><div style="float:left; padding:10px;">Use this geotagged image to detect location</div></div>';
+            html = html + '<div class="location_picker_button" onclick="' + func + '"><div style="width:40px; height:40px;float:left;"><img style="width:100%; height:100%;" src="' + img.src + '"/></div><div style="float:left; padding:10px;">Use this geotagged image to detect location</div></div>';
         }
+        });
     });
-
-
-    $('#geotagged_images').html(html);
+    
+    window.setTimeout(function() {
+            $('#geotagged_images').html(html);
+            }, 2000);
 }
 
-function get_latlng_from_image(img) {
+function get_latlng_from_image(img, fnCallback) {
         
+        $(img).exifLoad(function() {
         var gps_lat = $(img).exif("GPSLatitude");
         var gps_lng = $(img).exif("GPSLongitude");
         var gps_lat_ref = $(img).exif("GPSLatitudeRef");
         var gps_lng_ref = $(img).exif("GPSLongitudeRef");
+
+        var latlng;
 
         if (gps_lat != '' && gps_lng != ''){
             var lat_dms = gps_lat.last();
@@ -91,9 +97,12 @@ function get_latlng_from_image(img) {
             latitude = lat;
             longitude = lng;
             //set_location(lat, lng);
-            return lat + ", " + lng
+            latlng = lat + ", " + lng
         } 
-       
+
+        if (fnCallback) fnCallback(img, latlng);
+        });
+        
      /*
       geocoder.geocode({'latLng': marker.getPosition()}, function(results, status) {
       if (status == google.maps.GeocoderStatus.OK) {
