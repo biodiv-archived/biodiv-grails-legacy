@@ -705,7 +705,7 @@ img {
 	/*position: relative;
 	width: 300px;*/
 	float: right;
-	margin: 54px 0 30px;
+	margin: 10px;
 }
 
 .recommendations {
@@ -804,10 +804,12 @@ display: none !important;
 
 .galleria-info {
 box-shadow: 3px 3px 3px #000000;
-left: 20px !important;
-opacity: 0.6 !important;
-top: 20px !important;
+opacity: 0.9 !important;
 width: 70% !important;
+}
+
+.galleria-container img {
+box-shadow: 0 3px 3px #666666;
 }
 
 .galleria-container {
@@ -816,9 +818,16 @@ border-radius: 7px;
 box-shadow: 0 0 4px rgba(0, 0, 0, 0.25), 0 3px 4px rgba(0, 0, 0, 0.3);
 }
 
-.galleria-container img {
-width: 100% !important;
-height: 100% !important;       
+.galleria-info-link {
+border: 1px solid #aeaeae;
+}
+
+.galleria-thumbnails img {
+opacity: 0.5 !important;
+}
+
+.galleria-thumbnails img:hover {
+opacity: 0.9 !important;
 }
 
 .fb_edge_widget_with_comment {
