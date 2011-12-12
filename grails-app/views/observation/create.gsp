@@ -18,10 +18,10 @@
 <link rel="stylesheet" href="${resource(dir:'css',file:'jquery-ui.css', absolute:true)}" type="text/css" media="all" />
 <link rel="stylesheet" href="${resource(dir:'css',file:'location_picker.css', absolute:true)}" type="text/css" media="all" />
 
-<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=true"></script>
-<script type="text/javascript" src="http://localhost:8080/biodiv/js/jquery/jquery.exif.js"></script>
-<script type="text/javascript" src="http://localhost:8080/biodiv/js/jquery/jquery.watermark.min.js"></script>
-<script type="text/javascript" src="http://localhost:8080/biodiv/js/location/location-picker.js"></script>
+<script src="http://maps.google.com/maps/api/js?sensor=true"></script>
+<g:javascript src="jquery/jquery.exif.js" base="${grailsApplication.config.grails.serverURL+'/js/'}"></g:javascript>
+<g:javascript src="jquery/jquery.watermark.min.js" base="${grailsApplication.config.grails.serverURL+'/js/'}"></g:javascript>
+<g:javascript src="location/location-picker.js" base="${grailsApplication.config.grails.serverURL+'/js/'}"></g:javascript>
 
 <g:javascript src="jsrender.js"
 	base="${grailsApplication.config.grails.serverURL+'/js/'}"></g:javascript>
@@ -120,7 +120,7 @@
 
 							<tr class="prop">
 								<th valign="top" ><h3><label for="observedOn"><g:message
-											code="observation.observedOn.label" default="Observed On" />
+											code="observation.observedOn.label" default="Observed on" />
 								</label></h3>
 								</th>
 								<td valign="top"
@@ -137,9 +137,14 @@
 								</th>
 								<td valign="top"
 									class="value ${hasErrors(bean: observationInstance, field: 'group', 'errors')}">
-									<g:select name="group.id" from="${species.SpeciesGroup.list()}"
-										optionKey="id" optionValue="name"
-										value="${observationInstance?.group?.id}" class="ui-widget-content ui-corner-all"/></td>
+									<select name="group.id" class="ui-widget-content ui-corner-all" >
+										<g:each in="${species.SpeciesGroup.list()}" var="g">
+											<g:if test="${!g.name.equals(grailsApplication.config.speciesPortal.group.ALL)}">
+												<option value="${g.id}" ${(g.id == observationInstance?.group?.id)?'selected':''}>${g.name}</option>
+											</g:if>
+										</g:each>							
+									</select>
+								</td>
 							</tr>
 
 							<tr class="prop">
@@ -159,17 +164,7 @@
 							</tr>
 							
 												
-							<tr class="prop">
-								<th valign="top" ><h3><label for="notes"><g:message
-											code="observation.notes.label" default="Notes" /> </label></h3><br />
-									(Max: 400 characters)</th>
-								<td valign="top"
-									class="value ${hasErrors(bean: observationInstance, field: 'notes', 'errors')}">
-									<g:textArea name="notes" value="${observationInstance?.notes}"
-										class="text ui-corner-all" />
-								</td>
-							</tr>
-                                                        <tr class="prop">
+                            <tr class="prop">
 								<th valign="top" ><h3><label for="notes">Location</label></h3></th>
 								<td valign="top">
                                                                 <div id="location_picker">
@@ -208,6 +203,17 @@
                                                         </div>
                                                     </div>
 
+								</td>
+							</tr>
+
+							<tr class="prop">
+								<th valign="top" ><h3><label for="notes"><g:message
+											code="observation.notes.label" default="Notes" /> </label></h3><br />
+									(Max: 400 characters)</th>
+								<td valign="top"
+									class="value ${hasErrors(bean: observationInstance, field: 'notes', 'errors')}">
+									<g:textArea name="notes" value="${observationInstance?.notes}"
+										class="text ui-corner-all" />
 								</td>
 							</tr>
 

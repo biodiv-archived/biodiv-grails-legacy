@@ -14,5 +14,6 @@ class SpeciesGroup {
 	
 	static mapping = {
 		version  false;
+		sort name:"asc"
 	}
 }

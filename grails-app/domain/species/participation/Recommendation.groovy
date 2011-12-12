@@ -1,6 +1,8 @@
 package species.participation
 
 import species.TaxonomyDefinition;
+import species.auth.Role;
+import species.utils.Utils;
 
 class Recommendation {
 	
@@ -16,6 +18,9 @@ class Recommendation {
 	static mapping = { 
 		version false; 
 	}
-	
+
+	void setName(String name) {
+		this.name = Utils.cleanName(name);
+	}	
 	
 }
