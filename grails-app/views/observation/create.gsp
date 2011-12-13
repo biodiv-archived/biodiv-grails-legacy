@@ -322,7 +322,6 @@
 					});
 				})
 				$( "#imagesList" ).append (metadataEle);
-                
 			}, error:function (xhr, ajaxOptions, thrownError){
 					var messageNode = $(".message .resources") 
 					if(messageNode.length == 0 ) {

@@ -64,13 +64,15 @@ function convert_DMS_to_DD(days, minutes, seconds, direction) {
 
 function update_geotagged_images_list() {
     var html = '';
+
     $('.geotagged_image').each(function() {
+
     	var image = $(this);
     	$(this).exifLoad(function() {
     		var latlng = get_latlng_from_image(image); 
             if (latlng) {
                 var func = "set_location(" + latlng.lat+"," +latlng.lng+ ")";
-                html = html + '<div class="button" onclick="' + func + '"><div style="width:40px; height:40px;float:left;"><img style="width:100%; height:100%;" src="' + this.src + '"/></div><div style="float:left; padding:10px;">Use this geotagged image to detect location</div></div>';
+                html = html + '<div class="location_picker_button" onclick="' + func + '"><div style="width:40px; height:40px;float:left;"><img style="width:100%; height:100%;" src="' + this.src + '"/></div><div style="float:left; padding:10px;">Use this geotagged image to detect location</div></div>';
             	//set_location(latlng.lat, latlng.lng);
             }
     	})
@@ -82,14 +84,10 @@ function update_geotagged_images_list() {
 function update_geotagged_images_list(image) {
     	$(image).exifLoad(function() {
     		var latlng = get_latlng_from_image(image); 
-            if (latlng) {
-            	console.log(latlng)
+            if (latlng) {            	
             	var func = "set_location(" + latlng.lat+"," +latlng.lng+ ")";
-                var html = '<div class="button" style="display:block;margin:1px;" onclick="' + func + '"><div style="width:40px; height:40px;float:left;"><img style="width:100%; height:100%;" src="' + $(image).attr('src') + '"/></div><div style="float:left; padding:2px;font-size:">Use this image\'s location</div></div>';
-                console.log($(image));
-                //$(image).parent().parent().next('.metadata').append(html)
+                var html = '<div class="location_picker_button" style="display:block;margin:1px;" onclick="' + func + '"><div style="width:40px; height:40px;float:left;"><img style="width:100%; height:100%;" src="' + $(image).attr('src') + '"/></div><div style="float:left; padding:2px;font-size:">Use this image\'s location</div></div>';
                 $("#geotagged_images").append(html);
-            	//set_location(latlng.lat, latlng.lng);
             }
     	})
 }
@@ -101,6 +99,8 @@ function get_latlng_from_image(img) {
         var gps_lat_ref = $(img).exif("GPSLatitudeRef");
         var gps_lng_ref = $(img).exif("GPSLongitudeRef");
 
+        var latlng;
+
         if (gps_lat != '' && gps_lng != ''){
             var lat_dms = gps_lat.last();
             var lng_dms = gps_lng.last();
@@ -110,17 +110,10 @@ function get_latlng_from_image(img) {
             longitude = lng;
             //set_location(lat, lng);
             return {lat:lat ,lng: lng}
-        } 
-       
-     /*
-      geocoder.geocode({'latLng': marker.getPosition()}, function(results, status) {
-      if (status == google.maps.GeocoderStatus.OK) {
-        if (results[0]) {
-          $('#address').val(results[0].formatted_address);
+
         }
-      }
-    });
-    */
+        
+
 }
 
 

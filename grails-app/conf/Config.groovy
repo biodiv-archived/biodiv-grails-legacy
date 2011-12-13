@@ -185,7 +185,7 @@ speciesPortal {
 	}
 	observations {
 		rootDir = "${app.rootDir}/observations"
-		serverURL = "http://localhost:8080/${appName}/observations"
+		serverURL = "http://localhost:8080/${appName}/${appName}/observations"
 		//serverURL = "http://localhost/${appName}/observations"
 	}
 
