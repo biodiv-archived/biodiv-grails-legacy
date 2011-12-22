@@ -18,6 +18,8 @@
 	base="${grailsApplication.config.grails.serverURL+'/js/'}" />
 <g:javascript src="jquery/jquery.jqDock-1.8/jquery.jqDock.min.js"
 	base="${grailsApplication.config.grails.serverURL+'/js/'}" />
+<g:javascript src="species/main.js"
+	base="${grailsApplication.config.grails.serverURL+'/js/'}" />
 
 <g:javascript>
 
@@ -84,20 +86,11 @@ heirarchyLevelFormatter = function(el, cellVal, opts) {
 		
 	} else {
 		// el = "<a // href='${createLink(action:"taxon")}/"+taxonId+"'	class='rank"+level+"'>"+levelTxt+": // "+el+"</a>";
-		el = levelTxt+": "+"<span class='rank"+level+"'>"+el+"&nbsp;<a class='taxonExpandAll' onClick='expandAll(\""+cellVal.rowId+"\")'>+</a></span>"
+		el = levelTxt+": "+"<span class='rank"+level+"'>"+el+"&nbsp;<a class='taxonExpandAll' onClick='expandAll(\"grid\", \""+cellVal.rowId+"\")'>+</a></span>"
 	}
 	return el;	   
 }
 
-function expandAll(rowId) {
-	var grid = $("#grid");
-	var rowData = grid.getRowData(rowId);
-	if(!grid.isNodeLoaded(rowData) || grid.isNodeLoaded(rowData) == 'false') {
-		var postData = grid.getGridParam('postData');
-		postData.expand_all = true;
-		$("#"+rowId+" div.treeclick").trigger('click');
-	}		
-}
 </g:javascript>
 </head>
 <body>

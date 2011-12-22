@@ -30,6 +30,7 @@ class DataController {
 	 * 
 	 */
 	def listHierarchy = {
+		log.debug params;
 		cache "taxonomy_results"
 		includeOriginHeader();
 		
@@ -63,7 +64,7 @@ class DataController {
 		def sql = new Sql(dataSource)
 		def rs;
 		if(!parentId) {
-			rs = sql.rows("select t.id as taxonid, count(*) as count, 0 as rank, t.name as name,-1 as speciesid, s.path as path \
+			rs = sql.rows("select t.id as taxonid, count(*) as count, 0 as rank, t.name as name, s.path as path \
 			from taxonomy_registry s, \
 				classification f, \
 				taxonomy_definition t \
@@ -76,7 +77,7 @@ class DataController {
 			group by s.path, t.id, t.rank, t.name  ", [classSystem:classSystem])
 		}
 		else if(level == TaxonomyRank.SPECIES.ordinal()) {
-			rs = sql.rows("select t.id as taxonid,  1 as count, t.rank as rank, t.name as name, s.species_id as speciesid, s.path as path \
+			rs = sql.rows("select t.id as taxonid,  1 as count, t.rank as rank, t.name as name,  s.path as path \
 			from taxonomy_registry s, classification f, taxonomy_definition t \
 			where \
 				s.taxon_definition_id = t.id and \
@@ -85,7 +86,7 @@ class DataController {
 				t.rank = "+level+" and \
 				s.path ~ '^"+parentId+"_[0-9]+\$' " , [classSystem:classSystem]);
 		} else {
-			rs = sql.rows("select t.id as taxonid, count(*) as count, t.rank as rank, t.name as name, -1 as speciesid, s.path as path \
+			rs = sql.rows("select t.id as taxonid, count(*) as count, t.rank as rank, t.name as name,  s.path as path \
 			from taxonomy_registry s, \
 				classification f, \
 				taxonomy_definition t \
@@ -99,7 +100,7 @@ class DataController {
 		}
 		rs.each { r ->
 			r.put('expanded', false);
-			
+			r.put("speciesid", -1)
 			if(r.rank == TaxonomyRank.SPECIES.ordinal()) {
 				def species = getSpecies(r.taxonid);
 				if(species) {
@@ -162,18 +163,30 @@ class DataController {
 	 * @param classSystem
 	 * @return
 	 */
-	private List getSpeciesHierarchyTaxonIds(int speciesId, String classSystem) {
+	private List getSpeciesHierarchyTaxonIds(Long taxonId, String classSystem) {
 		def sql = new Sql(dataSource)
-		def rs = sql.rows("select t.id as taxonid \
-			from taxonomy_registry s, \
-				classification f, \
-				taxonomy_definition t \
-			where \
-				s.taxon_definition_id = t.id and \
-				s.classification_id = f.id and \
-				f.name = :classSystem and \
-				s.species_id = :speciesId", [speciesId:speciesId, classSystem:classSystem])
-		return rs.collect {it.taxonid};
+		String s = """select s.path as path 
+			from taxonomy_registry s, 
+				classification f, 
+				taxonomy_definition t 
+			where 
+				s.taxon_definition_id = t.id and 
+				s.classification_id = f.id and 
+				f.name = :classSystem and 
+				s.path like '%!_"""+taxonId+"' escape '!'";
+			
+		def rs = sql.rows(s, [taxonId:taxonId, classSystem:classSystem])
+		def paths = rs.collect {it.path};
+		
+		
+		def result = [];
+		 paths.each {
+			 it.tokenize("_").each {
+				 result.add(Long.parseLong(it));
+			 }
+		 }
+		return result;
+//		return [Species.get(speciesId).id]
 	}
 
 	/**
@@ -223,7 +236,7 @@ class DataController {
 					cell(r.path)
 					cell (r.name.trim())
 					cell (r.count)
-					cell (r.speciesid?:"")
+					cell (r["speciesid"])
 					cell (r.rank)
 					cell (parentPath)
 					cell (r.rank == TaxonomyRank.SPECIES.ordinal() ? true : false)

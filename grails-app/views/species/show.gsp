@@ -249,45 +249,45 @@ $(document).ready(function(){
     	 showSpeciesField($(".defaultSpeciesField").attr("id"))
      }
   	
-  	//loadIFrame();
-  	//initializeCKEditor();	
-  	// bind click event on delete buttons using jquery live
-  	$('.del-reference').live('click', deleteReferenceHandler);
-});
-
-$("#taxaHierarchy").change(function() {
-	console.log($(this))
-	console.log($('#taxaHierarchy option:selected').val());
-});
-
-function showTaxonHierarchy(taxonHierarchyId, classificationName) {
-	var taxonHierarchy = $("#"+taxonHierarchyId); 
-	var grid = $("#"+taxonHierarchyId).jqGrid({
+  	$('#taxonHierarchy').jqGrid({
 		url:'${createLink(controller:'data', action:'listHierarchy')}',
 		datatype: "xml",
-   		colNames:['Id', classificationName,'#Species', 'SpeciesId'],
+   		colNames:['Id', '','#Species', 'SpeciesId'],
    		colModel:[
    			{name:'id',index:'id',hidden:true},
-   			{name:'name',index:'name',formatter:heirarchyLevelFormatter, width:275},
+   			{name:'name',index:'name',formatter:heirarchyLevelFormatter, width:300},
    			{name:'count', index:'count', width:50, hidden:true},
    			{name:'speciesId',index:'speciesId', hidden:true}
    		],
-   		atoWidth:true,
+   		
    		height:350,        	
     	scrollOffset: 0,
    		treeGrid: true,
    		ExpandColumn : 'name',
    		ExpandColClick  : true,
    		treeGridModel: 'adjacency',
-        postData:{n_level:-1, expand_species:true, speciesid:${speciesInstance.id}, classSystem:classificationName},
+        postData:{n_level:-1, expand_species:true, speciesid:${speciesInstance.taxonConcept?.id}, classSystem:$.trim($('#taxaHierarchy option:selected').text())},
         sortable:false,
         loadComplete:function(data) {
-        	var postData = $("#"+taxonHierarchyId).getGridParam('postData');
+        	var postData = $("#taxonHierarchy").getGridParam('postData');
 			postData["expand_species"] = false;
         	postData["expand_all"] = false;
 	    }
 	});
-}
+
+	$("#taxaHierarchy").change(function() {
+		var postData = $("#taxonHierarchy").getGridParam('postData');
+		postData["expand_species"] = true;
+		postData["expand_all"] = false;
+		postData["classSystem"] = $.trim($('#taxaHierarchy option:selected').text());
+        $('#taxonHierarchy').trigger("reloadGrid");
+	});
+	
+  	//loadIFrame();
+  	//initializeCKEditor();	
+  	// bind click event on delete buttons using jquery live
+  	$('.del-reference').live('click', deleteReferenceHandler);
+});
 
 var heirarchyLevelFormatter = function(el, cellVal, opts) {
 	var cells = $(opts).find('cell')
@@ -320,7 +320,7 @@ var heirarchyLevelFormatter = function(el, cellVal, opts) {
 	} else {
 		// el = "<a href='${createLink(action:"taxon")}/"+taxonId+"'
 		// class='rank"+level+"'>"+levelTxt+": "+el+"</a>";
-		el = levelTxt+": "+"<span class='rank"+level+"'>"+el+"&nbsp;<a class='taxonExpandAll' onClick='expandAll(\""+cellVal.rowId+"\")'>+</a> </span>"
+		el = levelTxt+": "+"<span class='rank"+level+"'>"+el+"&nbsp;<a class='taxonExpandAll' onClick='expandAll(\"taxonHierarchy\", \""+cellVal.rowId+"\")'>+</a> </span>"
 	}
 	return el;	   
 }			

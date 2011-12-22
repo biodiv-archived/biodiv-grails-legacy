@@ -228,7 +228,7 @@ class ObservationController {
 			def observationInstance = Observation.get(params.obvId);
 			log.debug params;
 			try {
-				if (recommendationVoteInstance.save(flush: true)) {
+				if (!recommendationVoteInstance.hasErrors() && recommendationVoteInstance.save(flush: true)) {
 					log.debug "Successfully added reco vote : "+recommendationVoteInstance
 					redirect(action: "show", id: observationInstance.id);
 				}

@@ -125,7 +125,9 @@ class ObservationService {
 		
 		if(!reco) {
 			reco = new Recommendation(name:recoName, taxonConcept:taxonConcept);
-			recommendationService.save(reco);
+			if(!recommendationService.save(reco)) {
+				reco = null;
+			}
 		}
 		
 		return reco;

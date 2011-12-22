@@ -1,7 +1,7 @@
 
 <div class="grid_10 observation_story">
 	<div>
-                <img class="group_icon" src="${grailsApplication.config.grails.serverURL+'/images/group_icons/'}${observationInstance.group?.name?.replaceAll(/ /, '_')}.png" title="${observationInstance.group?.name}"/>
+                <img class="group_icon" src="${grailsApplication.config.grails.serverURL+'/images/group_icons/'}${observationInstance.group?.name?.trim().replaceAll(/ /, '_')}.png" title="${observationInstance.group?.name}"/>
 		<p class="prop">
 			<span class="name">By </span>
 			<div class="value">

@@ -113,8 +113,8 @@ var updateEditorContent = function() {
 	}
 }
 
-var expandAll = function(rowId) {
-	var grid = $("#authorTaxo");
+var expandAll = function(gridId, rowId) {
+	var grid = $("#"+gridId);
 	var rowData = grid.getRowData(rowId);
 	if (!grid.isNodeLoaded(rowData) || grid.isNodeLoaded(rowData) == 'false') {
 		var postData = grid.getGridParam('postData');
