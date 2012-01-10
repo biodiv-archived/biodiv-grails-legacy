@@ -342,18 +342,23 @@ environments {
 
 	saturn {
 		grails.serverURL = "http://saturn.strandls.com:8080/${appName}"
-		jpegOptimProg = "/usr/local/bin/jpegoptim";
+		jpegOptimProg = "/usr/bin/jpegoptim";
 		speciesPortal {
 			app.rootDir = "/data/species"
 			data.rootDir = "${app.rootDir}/data"
 
 			resources {
 				rootDir = "${app.rootDir}/images"
-				serverURL = "http://saturn.strandls.com/${appName}"
+				serverURL = "http://saturn.strandls.com/${appName}/images"
 			}
 
 			nameSearch.indexStore = "${app.rootDir}/data/names"
-			observations.rootDir = "${app.rootDir}/observations"
+
+			observations {
+				rootDir = "${app.rootDir}/observations"
+				serverURL = "http://saturn.strandls.com:8080/${appName}/${appName}/observations"
+				//serverURL = "http://localhost/${appName}/observations"
+			}
 			search.serverURL="http://saturn.strandls.com:8080/solr/species"
 			grails.project.war.file = "/data/jetty-6.1.26/webapps/${appName}.war"
 		}
@@ -369,10 +374,14 @@ environments {
 
 			resources {
 				rootDir = "${app.rootDir}/images"
-				serverURL = "http://pamba.strandls.com/${appName}"
+				serverURL = "http://pamba.strandls.com/${appName}/images"
 			}
 			nameSearch.indexStore = "${app.rootDir}/data/names"
-			observations.rootDir = "${app.rootDir}/observations"
+			observations {
+				rootDir = "${app.rootDir}/observations"
+				serverURL = "http://pamba.strandls.com:8080/${appName}/${appName}/observations"
+				//serverURL = "http://localhost/${appName}/observations"
+			}
 			search.serverURL="http://pamba.strandls.com:8080/solr/species"
 		}
 		google.analytics.webPropertyID = "UA-xxxxxx-x"
