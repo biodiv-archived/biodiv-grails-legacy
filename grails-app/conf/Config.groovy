@@ -322,6 +322,8 @@ speciesPortal.validCrossDomainOrigins = [
 ]
 
 //uiperformance.enabled = false
+imageConverterProg = "/usr/bin/convert";
+jpegOptimProg = "/usr/local/bin/jpegoptim";
 
 environments {
 	development {
@@ -340,6 +342,7 @@ environments {
 
 	saturn {
 		grails.serverURL = "http://saturn.strandls.com:8080/${appName}"
+		jpegOptimProg = "/usr/local/bin/jpegoptim";
 		speciesPortal {
 			app.rootDir = "/data/species"
 			data.rootDir = "${app.rootDir}/data"
@@ -359,6 +362,7 @@ environments {
 
 	pamba {
 		grails.serverURL = "http://pamba.strandls.com:8080/${appName}"
+		jpegOptimProg = "/usr/bin/jpegoptim";
 		speciesPortal {
 			app.rootDir = "/data/species"
 			data.rootDir = "${app.rootDir}/data"
@@ -381,9 +385,6 @@ environments {
 		]
 	}
 }
-
-imageConverterProg = "/usr/bin/convert";
-jpegOptimProg = "/usr/local/bin/jpegoptim";
 
 navigation.dashboard = [
 	[controller:'species', title:'Thumbnail Gallery', order:1, action:"list"],
