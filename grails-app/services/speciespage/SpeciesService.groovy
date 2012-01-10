@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.List
 
 import org.apache.commons.logging.LogFactory
+import org.codehaus.groovy.grails.commons.ApplicationHolder;
 import org.hibernate.exception.ConstraintViolationException;
 
 import species.Classification
@@ -32,7 +33,8 @@ class SpeciesService {
 	def grailsApplication;
 	def groupHandlerService;
 	def namesLoaderService;
-
+	def sessionFactory;
+	
 	static int BATCH_SIZE = 10;
 
 	/**
@@ -155,7 +157,7 @@ class SpeciesService {
 			noOfInsertions += saveSpeciesBatch(batch);
 			batch.clear();
 		}
-		cleanUpGorm();
+		
 		log.debug "Time taken to save : "+(( System.currentTimeMillis()-startTime)/1000) + "(sec)"
 		
 		//log.debug "Publishing to search index"
@@ -165,6 +167,8 @@ class SpeciesService {
 		} catch(e) {
 			e.printStackTrace()
 		}
+		
+		cleanUpGorm();
 		
 		try{
 			groupHandlerService.loadGroups(grailsApplication.config.speciesPortal.data.rootDir+"/templates/Groups.xlsx", 0, 0);
@@ -227,7 +231,9 @@ class SpeciesService {
 	 *
 	 */
 	private void cleanUpGorm() {
-		def hibSession = sessionFactory?.getCurrentSession()
+		
+		def hibSession = sessionFactory?.getCurrentSession();
+		
 		if(hibSession) {
 			log.debug "Flushing and clearing session"
 			try {
