@@ -39,17 +39,19 @@ class Species {
 		if(!reprImage) {
 			def images = getImages();
 			reprImage = images ? images[0]:null;
-			if(reprImage) {
-				if(!this.save(flush:true)) {
+			println '++++++++++++'
+			if(reprImage && !reprImage.fileName.equals("no-image.jpg")) {
+				println reprImage;
+				if(!this.save()) {
 					this.errors.each { log.error it }
 				}
 			}			
 		}
 		
-		if(!(new File(grailsApplication.config.speciesPortal.resources.rootDir+reprImage.fileName.trim())).exists()) {
-			return new Resource(fileName:"no-image.jpg", type:ResourceType.IMAGE, title:"You can contribute!!!");
+		if(reprImage && (new File(grailsApplication.config.speciesPortal.resources.rootDir+reprImage.fileName.trim())).exists()) {
+			return reprImage;			
 		} else {
-			return reprImage;
+			return new Resource(fileName:"no-image.jpg", type:ResourceType.IMAGE, title:"You can contribute!!!");
 		}
 	}
 
@@ -60,10 +62,11 @@ class Species {
 				images.add(resource);
 			}
 		};
-		if(!images) {
-			return [new Resource(fileName:"no-image.jpg", type:ResourceType.IMAGE, title:"You can contribute!!!")];	
+		if(images) {
+			return images;	
 		} else {
-			return images;
+		//
+			//return [new Resource(fileName:"no-image.jpg", type:ResourceType.IMAGE, title:"You can contribute!!!")];
 		}
 	}
 

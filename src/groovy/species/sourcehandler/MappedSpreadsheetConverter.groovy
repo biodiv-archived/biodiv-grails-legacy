@@ -35,7 +35,7 @@ class MappedSpreadsheetConverter extends SourceConverter {
 		NodeBuilder builder = NodeBuilder.newInstance();
 		int i=0;
 		for(Map speciesContent : content) {
-			log.debug speciesContent;
+			//log.debug speciesContent;
 			Node speciesElement = builder.createNode("species");
 			for(Map mappedField : mappingConfig) {
 				String fieldName = mappedField.get("field name(s)")
@@ -91,9 +91,9 @@ class MappedSpreadsheetConverter extends SourceConverter {
 					}
 				}
 			}
-			log.debug "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
-			log.debug speciesElement;
-			log.debug "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
+			//log.debug "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
+			//log.debug speciesElement;
+			//log.debug "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
 			XMLConverter converter = new XMLConverter();
 			Species s = converter.convertSpecies(speciesElement)
 			if(s)

@@ -968,8 +968,8 @@ class XMLConverter extends SourceConverter {
 		classifications.each {
 			List taxonNodes = getNodesFromCategory(speciesNodes, it.name);
 			def t = getTaxonHierarchy(taxonNodes, it, scientificName);
-			cleanUpGorm();
 			if(t) {
+				cleanUpGorm();
 				taxonHierarchies.addAll(t);
 			}
 		}

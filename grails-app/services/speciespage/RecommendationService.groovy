@@ -61,7 +61,8 @@ class RecommendationService {
 				cleanUpGorm();
 			}
 		}
-		cleanUpGorm();
+		if(noOfRecords)
+			cleanUpGorm();
 		log.debug "Time taken to save : "+((System.currentTimeMillis() - startTime)/1000) + "(sec)"
 		log.debug "Persisted ${noOfRecords} recommendations in total"
 		return noOfRecords;

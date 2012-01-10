@@ -242,6 +242,7 @@ speciesPortal {
 		GLOBAL_DISTRIBUTION_GEOGRAPHIC_ENTITY = "Global Distribution Geographic Entity"
 		GLOBAL_ENDEMICITY_GEOGRAPHIC_ENTITY = "Global Endemicity Geographic Entity"
 		TAXONOMIC_HIERARCHY = "Taxonomy Hierarchy"
+		FAMILY = "Family"
 		GENUS = "Genus"
 		SUB_GENUS = "Sub-Genus"
 		SPECIES = "Species"
