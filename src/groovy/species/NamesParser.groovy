@@ -72,10 +72,10 @@ class NamesParser {
 		def s = new Socket(config.speciesPortal.names.parser.serverURL, config.speciesPortal.names.parser.port);
 		s.withStreams { input, output ->
 			names.each { name ->
-				println "sending ${name}"
+				log.debug "sending ${name}"
 				output << name + "\n"
 				def result = input.newReader().readLine()
-				println result;
+				log.debug result;
 				parsedJSON.add(JSON.parse(result));
 			}
 		}
@@ -106,6 +106,7 @@ class NamesParser {
 
 					def parsedName;
 					sciName.details.each { part ->
+						sciName.verbatim = sciName.verbatim.replaceAll("\n", "");
 						parsedName = new TaxonomyDefinition();
 						if(sciName.canonical) parsedName.canonicalForm = sciName.canonical;
 						if(sciName.normalized) parsedName.normalizedForm = sciName.normalized;

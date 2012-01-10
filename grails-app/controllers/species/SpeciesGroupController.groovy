@@ -1,5 +1,7 @@
 package species
 
+import species.groups.SpeciesGroup;
+
 class SpeciesGroupController {
 
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]

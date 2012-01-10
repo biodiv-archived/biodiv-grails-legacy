@@ -6,6 +6,7 @@ $(document).ready(function(){
 	var cache = {},
 		lastXhr;
 	$("#searchTextField").autocomplete({
+	 	 appendTo: '#mainSearchForm',
 		 source:function( request, response ) {
 				var term = request.term;
 				if ( term in cache ) {
@@ -27,6 +28,7 @@ $(document).ready(function(){
 	});
 });
 </g:javascript>
+	<div id="mainSearchForm">
 	<form method="get"
 		action="${createLink(controller:'search', action:'select') }"
 		id="searchbox" class="searchbox">
@@ -49,3 +51,4 @@ $(document).ready(function(){
 			<!-- a href="${createLink(controller:'search', action:'advSelect') }" class="search">Advanced Search</a--> </span>
 
 	</form>
+	</div>

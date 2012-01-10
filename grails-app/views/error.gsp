@@ -1,34 +1,21 @@
 <html>
   <head>
-	  <title>Runtime Exception</title>
-	  <style type="text/css">
-	  		.message {
-	  			border: 1px solid black;
-	  			padding: 5px;
-	  			background-color:#E9E9E9;
-	  		}
-	  		.stack {
-	  			border: 1px solid black;
-	  			padding: 5px;
-	  			overflow:auto;
-	  			height: 300px;
-	  		}
-	  		.snippet {
-	  			padding: 5px;
-	  			background-color:white;
-	  			border:1px solid black;
-	  			margin:3px;
-	  			font-family:courier;
-	  		}
-	  </style>
+	  <title>Error</title>
+	<g:javascript src="species/util.js"
+	base="${grailsApplication.config.grails.serverURL+'/js/'}" />
   </head>
 
   <body>
   <div class="container_16">
-    <h1>Runtime Exception</h1>
-    <h2>Error Details</h2>
-
-  	<div class="message">
+    
+    <div class="grid_16 ui-state-error">
+    
+	<p class="ui-state-error-text">
+		Oops!!! There seems to be some problem. <br/>
+		Please mail us a bug report here <span
+					class="mailme">team(at)thewesternghats(dot)in</span>
+	</p>
+  	<!-- div class="message ">
 		<strong>Error ${request.'javax.servlet.error.status_code'}:</strong> ${request.'javax.servlet.error.message'.encodeAsHTML()}<br/>
 		<strong>Servlet:</strong> ${request.'javax.servlet.error.servlet_name'}<br/>
 		<strong>URI:</strong> ${request.'javax.servlet.error.request_uri'}<br/>
@@ -51,6 +38,7 @@
 	      <pre><g:each in="${exception.stackTraceLines}">${it.encodeAsHTML()}<br/></g:each></pre>
 	    </div>
 	</g:if>
+	</div-->
 	</div>
   </body>
 </html>

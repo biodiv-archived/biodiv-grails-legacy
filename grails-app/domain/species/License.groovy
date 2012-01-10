@@ -14,11 +14,12 @@ class License {
 	public enum LicenseType {
 		CC_PUBLIC_DOMAIN("Public Domain"),
 		CC_BY("CC BY"),
-		CC_BY_NC("CC BY-NC"),
 		CC_BY_SA("CC BY-SA"),
+		CC_BY_ND("CC BY-ND"),
+		CC_BY_NC("CC BY-NC"),		
 		CC_BY_NC_SA("CC BY-NC-SA"),
 		CC_BY_NC_ND("CC BY-NC-ND"),
-		RESTRICTED("Restricted");
+		COPYRIGHT("Copyright");
 
 		private String value;
 
@@ -34,11 +35,12 @@ class License {
 			return [
 				CC_PUBLIC_DOMAIN,
 				CC_BY,
-				CC_BY_NC,
 				CC_BY_SA,
+				CC_BY_ND,
+				CC_BY_NC,				
 				CC_BY_NC_SA,
 				CC_BY_NC_ND, 
-				RESTRICTED ]
+				COPYRIGHT ]
 		}
 
 		public String toString() {

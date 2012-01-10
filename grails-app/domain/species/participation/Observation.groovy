@@ -4,8 +4,8 @@ import grails.plugins.springsecurity.Secured
 
 import species.Contributor;
 import species.Resource;
-import species.SpeciesGroup;
 import species.auth.SUser;
+import species.groups.SpeciesGroup;
 
 class Observation {
 

@@ -1,5 +1,6 @@
 package species
 
+import org.apache.commons.logging.LogFactory;
 import org.codehaus.groovy.grails.commons.ConfigurationHolder;
 
 import species.Resource.ResourceType;
@@ -9,24 +10,47 @@ class Species {
 	String title; 
 	String guid;
 	TaxonomyDefinition taxonConcept;
+	Resource reprImage;
+	
+	def grailsApplication;
+	
+	private static final log = LogFactory.getLog(this);
 	
 	def fieldsConfig = ConfigurationHolder.config.speciesPortal.fields
 	
-	static hasMany = [fields: SpeciesField, globalDistributionEntities:GeographicEntity, globalEndemicityEntities:GeographicEntity, taxonomyRegistry:TaxonomyRegistry, resources:Resource];
+	static hasMany = [fields: SpeciesField, 
+		globalDistributionEntities:GeographicEntity, 
+		globalEndemicityEntities:GeographicEntity, 
+		indianDistributionEntities:GeographicEntity, 
+		indianEndemicityEntities:GeographicEntity, 
+		taxonomyRegistry:TaxonomyRegistry, 
+		resources:Resource];
 
 	static constraints = {
 		guid(blank: false, unique: true);
+		reprImage(nullable:true);
 	}
 
-	static mapping = { 
+	static mapping = {
 		fields sort : 'field'
-		commonNames sort:'language'
-		taxonomyRegistry sort:'taxonDefinition'
 	}
 
 	Resource mainImage() {  
-		def images = getImages();
-		return images?images[0]:null;
+		if(!reprImage) {
+			def images = getImages();
+			reprImage = images ? images[0]:null;
+			if(reprImage) {
+				if(!this.save(flush:true)) {
+					this.errors.each { log.error it }
+				}
+			}			
+		}
+		
+		if(!(new File(grailsApplication.config.speciesPortal.resources.rootDir+reprImage.fileName.trim())).exists()) {
+			return new Resource(fileName:"no-image.jpg", type:ResourceType.IMAGE, title:"You can contribute!!!");
+		} else {
+			return reprImage;
+		}
 	}
 
 	List<Resource> getImages() { 
@@ -36,7 +60,11 @@ class Species {
 				images.add(resource);
 			}
 		};
-		return images;
+		if(!images) {
+			return [new Resource(fileName:"no-image.jpg", type:ResourceType.IMAGE, title:"You can contribute!!!")];	
+		} else {
+			return images;
+		}
 	}
 
 	List<Resource> getIcons() {
