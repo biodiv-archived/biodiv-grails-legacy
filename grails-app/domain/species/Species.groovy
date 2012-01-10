@@ -7,12 +7,12 @@ import species.Resource.ResourceType;
 
 class Species {
 
-	String title; 
+	String title;  
 	String guid;
 	TaxonomyDefinition taxonConcept;
 	Resource reprImage;
 	
-	def grailsApplication;
+	def grailsApplication; 
 	
 	private static final log = LogFactory.getLog(this);
 	

@@ -1240,7 +1240,7 @@ class XMLConverter extends SourceConverter {
 		   } catch(ConstraintViolationException e) {
 			   e.printStackTrace()
 		   }
-		   hibSession.clear()
+//		   hibSession.clear()
 	   }
    }
 }

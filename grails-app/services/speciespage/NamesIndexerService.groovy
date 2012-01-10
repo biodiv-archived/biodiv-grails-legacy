@@ -34,7 +34,7 @@ class NamesIndexerService {
 	 * Existing lookup is present 
 	 */
 	void rebuild() {
-		log.debug "Publishing names autocomplete index";
+		log.debug "Publishing names to autocomplete index";
 		Lookup lookup1 = new TSTLookup();
 
 		setDirty(false);

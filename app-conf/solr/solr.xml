@@ -30,6 +30,5 @@
   -->
   <cores adminPath="/admin/cores">
     <core name="species" instanceDir="species" />
-    <!--core name="recordsCore" instanceDir="recordsCore" /-->
   </cores>
 </solr>

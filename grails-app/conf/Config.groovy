@@ -341,6 +341,7 @@ environments {
 	saturn {
 		grails.serverURL = "http://saturn.strandls.com:8080/${appName}"
 		speciesPortal {
+			app.rootDir = "/data/species"
 			data.rootDir = "${app.rootDir}/data"
 
 			resources {
@@ -348,7 +349,8 @@ environments {
 				serverURL = "http://saturn.strandls.com/${appName}"
 			}
 
-
+			nameSearch.indexStore = "${app.rootDir}/data/names"
+			observations.rootDir = "${app.rootDir}/observations"
 			search.serverURL="http://saturn.strandls.com:8080/solr/species"
 			grails.project.war.file = "/data/jetty-6.1.26/webapps/${appName}.war"
 		}
@@ -365,7 +367,8 @@ environments {
 				rootDir = "${app.rootDir}/images"
 				serverURL = "http://pamba.strandls.com/${appName}"
 			}
-
+			nameSearch.indexStore = "${app.rootDir}/data/names"
+			observations.rootDir = "${app.rootDir}/observations"
 			search.serverURL="http://pamba.strandls.com:8080/solr/species"
 		}
 		google.analytics.webPropertyID = "UA-xxxxxx-x"
