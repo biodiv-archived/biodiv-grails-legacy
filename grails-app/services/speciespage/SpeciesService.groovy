@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.List
 
 import org.apache.commons.logging.LogFactory
+import org.hibernate.exception.ConstraintViolationException;
 
 import species.Classification
 import species.Country
@@ -154,8 +155,9 @@ class SpeciesService {
 			noOfInsertions += saveSpeciesBatch(batch);
 			batch.clear();
 		}
+		cleanUpGorm();
 		log.debug "Time taken to save : "+(( System.currentTimeMillis()-startTime)/1000) + "(sec)"
-
+		
 		//log.debug "Publishing to search index"
 		def searchIndexManager = new SearchIndexManager();
 		try {
@@ -218,6 +220,23 @@ class SpeciesService {
 			saveSpecies([s]);
 		}
 		return s;
+	}
+	
+	
+	/**
+	 *
+	 */
+	private void cleanUpGorm() {
+		def hibSession = sessionFactory?.getCurrentSession()
+		if(hibSession) {
+			log.debug "Flushing and clearing session"
+			try {
+				hibSession.flush()
+			} catch(ConstraintViolationException e) {
+				e.printStackTrace()
+			}
+			hibSession.clear()
+		}
 	}
 
 }
