@@ -1,5 +1,5 @@
 
-<%@ page import="species.SpeciesGroup" %>
+<%@ page import="species.groups.SpeciesGroup" %>
 <%@ page import="species.Species" %>
 <html>
     <head>

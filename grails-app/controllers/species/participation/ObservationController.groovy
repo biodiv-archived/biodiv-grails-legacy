@@ -253,7 +253,7 @@ class ObservationController {
    @Secured(['ROLE_USER'])
    def addAgreeRecommendationVote = {
 	   log.debug params;
-
+	   Thread.sleep(1000)
 	   params.author = springSecurityService.currentUser;
 
 	   if(params.obvId) {

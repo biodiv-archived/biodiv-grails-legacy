@@ -1,5 +1,6 @@
 package species
 
+import species.groups.SpeciesGroup;
 import species.utils.Utils;
 
 class TaxonomyDefinition {
@@ -74,5 +75,16 @@ class TaxonomyDefinition {
 	
 	void setName(String name) {
 		this.name = Utils.cleanName(name);
+	}
+	
+	List<TaxonomyRegistry> parentTaxon() {
+		List<TaxonomyRegistry> result = [];
+		TaxonomyRegistry.findAllByTaxonDefinition(this).each { TaxonomyRegistry reg ->
+			//TODO : better way : http://stackoverflow.com/questions/673508/using-hibernate-criteria-is-there-a-way-to-escape-special-characters
+			reg.path.tokenize('_').each { taxonDefinitionId ->
+				result.add(TaxonomyDefinition.get(Long.parseLong(taxonDefinitionId)));
+			}
+		}
+		return result;
 	}
 }

@@ -3,10 +3,12 @@ package speciespage
 import org.apache.commons.logging.LogFactory;
 
 import species.Classification;
-import species.SpeciesGroup;
 import species.TaxonomyDefinition;
+import species.TaxonomyDefinition.TaxonomyRank;
 import species.TaxonomyRegistry;
 import species.formatReader.SpreadsheetReader;
+import species.groups.SpeciesGroup;
+import species.groups.SpeciesGroupMapping;
 import species.sourcehandler.XMLConverter;
 
 class GroupHandlerService {
@@ -18,38 +20,8 @@ class GroupHandlerService {
 	def grailsApplication
 	def sessionFactory
 
-	/**
-	 * 
-	 * @param name
-	 * @param taxonConcept
-	 * @param classification
-	 * @param parentGroup
-	 * @return
-	 */
-	SpeciesGroup addGroup(String name, SpeciesGroup parentGroup) {
-
-		if(name) {
-			SpeciesGroup group = SpeciesGroup.findByName(name);
-
-			if(!group) {
-				if(parentGroup) {
-					group = new SpeciesGroup(name:name, parentGroup:parentGroup);
-					if(group.save(flush:true)) {
-						//success = true;
-					} else {
-						log.error "Unable to save group : "+name;
-					}
-				} else {
-					log.error "Coudn't save the group as parentGroupName is inappropriate"
-				}
-			}
-			return group;
-		}
-		else {
-			log.error "Group is not defined : " + name;
-		}
-	}
-
+	static int GROUP_UPDATION_BATCH = 20;
+	
 	/**
 	 * 
 	 * @param file
@@ -70,13 +42,51 @@ class GroupHandlerService {
 			int taxonRank = XMLConverter.getTaxonRank(rank);
 			TaxonomyDefinition taxonConcept = TaxonomyDefinition.findByCanonicalFormAndRank(canonicalName, taxonRank);
 			SpeciesGroup parentGroup = SpeciesGroup.findByName(parentGroupName);
-			SpeciesGroup group = addGroup(name, parentGroup);
+			SpeciesGroupMapping speciesGroupMapping = new SpeciesGroupMapping(taxonName:canonicalName, rank:taxonRank, taxonConcept:taxonConcept);
+			SpeciesGroup group = addGroup(name, parentGroup, speciesGroupMapping);
 			if(group && taxonConcept) {
 				updateGroup(taxonConcept, group);
 			}
 		}
 	}
 
+	/**
+	 * Adds a group with given name and associates given mappings
+	 * @param name
+	 * @param parentGroup
+	 * @return
+	 */
+	SpeciesGroup addGroup(String name, SpeciesGroup parentGroup, SpeciesGroupMapping speciesGroupMapping) {
+		if(name) {
+			SpeciesGroup group = SpeciesGroup.findByName(name);
+
+			if(!group) {
+				group = new SpeciesGroup(name:name, parentGroup:parentGroup);
+			}
+
+			def mapping = SpeciesGroupMapping.findByTaxonNameAndRank(speciesGroupMapping.taxonName, speciesGroupMapping.rank);
+			if(!mapping) {
+				group.addToSpeciesGroupMapping(speciesGroupMapping);
+				if(!group.save(flush:true)) {
+					log.error "Unable to save group : "+name;
+					group.errors.allErrors.each { log.error it }
+				}
+			}
+			return group;
+		}
+		else {
+			log.error "Group name cannot be empty";
+		}
+	}
+
+	/**
+	 * Tries to deduce group for the taxon concept based on its hierarchy 
+	 * and updates group for itself and all of its child concepts   
+	 */
+	int updateGroup(TaxonomyDefinition taxonConcept) {
+		return updateGroup(taxonConcept, getGroup(taxonConcept));
+	}
+	
 	/**
 	 * Updates group for taxonConcept and all concepts below this under any of the hierarchies
 	 * @param taxonConcept
@@ -90,40 +100,50 @@ class GroupHandlerService {
 		if(taxonConcept && group) {
 			def startTime = System.currentTimeMillis();
 
-			taxonConcept.group = group;
-			if(taxonConcept.save()) {
-				noOfUpdations++;
-			} else {
-				taxonConcept.errors.allErrors.each { log.error it }
+			if(!group.equals(taxonConcept.group)) {
+				taxonConcept.group = group;
+				if(taxonConcept.save()) {
+					log.debug "Setting group '${group.name}' for taxonConcept '${taxonConcept.name}'"
+					noOfUpdations++;
+				} else {
+					taxonConcept.errors.allErrors.each { log.error it }
+				}
 			}
 
-			if(taxonConcept) {
-				List batch = new ArrayList();
-				TaxonomyRegistry.findAllByTaxonDefinition(taxonConcept).each { TaxonomyRegistry reg ->
-					//TODO : better way : http://stackoverflow.com/questions/673508/using-hibernate-criteria-is-there-a-way-to-escape-special-characters
-					def c = TaxonomyRegistry.createCriteria();
-					def r = c.list {
-						sqlRestriction ("path like '"+reg.path.replaceAll("_", "!_")+"!_%' escape '!'");
-					}
-
-					r.taxonDefinition.each { concept ->
-						if(concept.group != group) {
-							concept.group = group;
-							if(concept.save()) {
-								log.debug "Setting group as ${group} for taxonConcept ${concept}"
-								noOfUpdations++;
-							} else {
-								concept.errors.allErrors.each { log.error it }
-								log.error "Coundn't update group for concept : "+concept;
-							}
+			List batch = new ArrayList();
+			TaxonomyRegistry.findAllByTaxonDefinition(taxonConcept).each { TaxonomyRegistry reg ->
+				//TODO : better way : http://stackoverflow.com/questions/673508/using-hibernate-criteria-is-there-a-way-to-escape-special-characters
+				def c = TaxonomyRegistry.createCriteria();
+				def r = c.scroll {
+					sqlRestriction ("path like '"+reg.path.replaceAll("_", "!_")+"!_%' escape '!'");
+				}
+				
+				//updating group for all child taxon
+				boolean flag = false;
+				while(r.next()) {
+					TaxonomyDefinition concept = r.get(0).taxonDefinition;
+					if(!group.equals(concept.group)) {
+						concept.group = group;
+						if(concept.save()) {
+							log.debug "Setting group '${group.name}' for taxonConcept '${concept.name}'"
+							noOfUpdations++;
+							flag = true;
+						} else {
+							concept.errors.allErrors.each { log.error it }
+							log.error "Coundn't update group for concept : "+concept;
 						}
-						if(noOfUpdations % 20 == 0) {
-							log.debug "Saved group for ${noOfUpdations} taxonConcepts"
-							cleanUpGorm();
-						}
+					} 
+					if(flag && noOfUpdations % GROUP_UPDATION_BATCH == 0) {
+						log.debug "Saved group for ${noOfUpdations} taxonConcepts"
+						cleanUpGorm();
+						flag = false;
 					}
 				}
-				cleanUpGorm();
+				if(noOfUpdations && flag) {
+					log.debug "Saved group for ${noOfUpdations} taxonConcepts"
+					cleanUpGorm();
+				}
+				r.close();
 			}
 			log.debug "Time taken to save : "+((System.currentTimeMillis() - startTime)/1000) + "(sec)"
 			log.debug "Updated group for ${noOfUpdations} taxonConcentps in total"
@@ -138,13 +158,49 @@ class GroupHandlerService {
 	 */
 	SpeciesGroup getGroup(TaxonomyDefinition taxonConcept) {
 		if(taxonConcept.group) {
+			log.debug "Returning already assigned spcies group"
 			return taxonConcept.group;
 		} else {
-			//TODO:get hierarchy & chk for it in groups
+			SpeciesGroup group = getGroupByMapping(taxonConcept);
+			if(group) {
+				return group;
+			} else {
+				return getGroupByHierarchy(taxonConcept, taxonConcept.parentTaxon());
+			}
 		}
-		return null;
 	}
 
+	/**
+	 * returns the groups if there is a match with mappings defined 
+	 */
+	private SpeciesGroup getGroupByMapping(TaxonomyDefinition taxonConcept) {
+		log.debug "Finding if the taxon name has a species_group_mapping"
+		def speciesGroupMappings = SpeciesGroupMapping.listOrderByRank('desc');
+		SpeciesGroup group;
+		speciesGroupMappings.each { mapping ->
+			if((taxonConcept == mapping.taxonConcept || taxonConcept.name.equals(mapping.taxonName)) && taxonConcept.rank == mapping.rank) {
+				group = mapping.speciesGroup;
+			}
+		}
+		return group;
+	}
+
+	/**
+	* returns the group for the closest ancestor.
+	*/
+   private SpeciesGroup getGroupByHierarchy(TaxonomyDefinition taxonConcept, List<TaxonomyDefinition> parentTaxon) {
+	   log.debug "Trying to derive species group from hierarchy. Finding group for closest ancestor"
+	   int rank = TaxonomyRank.KINGDOM.ordinal();
+	   SpeciesGroup group;
+	   parentTaxon.each {parentTaxonDefinition ->
+		   if(parentTaxonDefinition.group && parentTaxonDefinition.rank < taxonConcept.rank && parentTaxonDefinition.rank > rank) {
+			   rank = parentTaxonDefinition.rank;
+			   group = parentTaxonDefinition.group;
+		   }
+		   //TODO: can update group for parents as well
+	   }
+	   return group;
+   }
 	/**
 	 *
 	 */

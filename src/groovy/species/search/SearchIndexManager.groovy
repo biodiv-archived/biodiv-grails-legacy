@@ -14,8 +14,10 @@ import org.apache.solr.client.solrj.SolrQuery
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.client.solrj.SolrServerException;
 
+import species.CommonNames;
 import species.NamesParser;
 import species.Species;
+import species.Synonyms;
 import species.TaxonomyDefinition;
 import species.TaxonomyDefinition.TaxonomyRank;
 
@@ -82,50 +84,40 @@ class SearchIndexManager {
 			SolrInputDocument doc = new SolrInputDocument();
 			doc.addField(searchFieldsConfig.ID, s.id.toString());
 			doc.addField(searchFieldsConfig.GUID, s.guid);
-//			if(s.name instanceof HybridName) {
-//				if(s.name.canonicalForm) doc.addField(searchFieldsConfig.CANONICAL_NAME, s.name.canonicalForm);
-//				//if(s.name.uninominal) doc.addField(searchFieldsConfig.UNINOMIAL, s.name.uninominal);
-//				if(s.name.normalizedForm) doc.addField(searchFieldsConfig.NAME, s.name.normalizedForm);
-//				for(partialName in s.name) {
-//					addNameToDoc(doc, s.name);
-//				}
-//			} else {
-				addNameToDoc(doc, s.taxonConcept);
-//			}
+			addNameToDoc(doc, s.taxonConcept);
+				
+			def syns = Synonyms.findAllByTaxonConcept(s.taxonConcept)
+			syns.each { syn ->
+				doc.addField(searchFieldsConfig.NAME, syn.name);
+			}
+			
+			def commonNames = CommonNames.findAllByTaxonConcept(s.taxonConcept);
+			commonNames.each { commonName ->
+				doc.addField(searchFieldsConfig.NAME, commonName.name);
+			}
 
+			s.globalDistributionEntities.each {
+				doc.addField(searchFieldsConfig.LOCATION, it.country.countryName);
+			} 
+			s.globalEndemicityEntities.each {
+				doc.addField(searchFieldsConfig.LOCATION, it.country.countryName);
+			}
+			s.indianDistributionEntities.each {
+				doc.addField(searchFieldsConfig.LOCATION, it.country.countryName);
+			}
+			s.indianEndemicityEntities.each {
+				doc.addField(searchFieldsConfig.LOCATION, it.country.countryName);
+			}
+			s.taxonomyRegistry.each { 
+				doc.addField(searchFieldsConfig.TAXON, it.taxonDefinition.name);
+			}
+				
 			String message = "";
 			s.fields.each { field ->
 				boolean copyDesc = true;
 				String concept = field.field.concept;
 				String category = field.field.category;
 				String subcategory = field.field.subCategory;
-
-				if(category && category.equalsIgnoreCase(fieldsConfig.COMMON_NAME)) {
-					copyDesc = false;
-					doc.addField(searchFieldsConfig.COMMON_NAME, field.name);
-				} else if(category && category.equalsIgnoreCase(fieldsConfig.SYNONYMS)) {
-					copyDesc = false;
-					//doc.addField(searchFieldsConfig.NAME, field.name);
-//					if(field.name instanceof HybridName) {
-//						if(field.name.canonicalForm) doc.addField(searchFieldsConfig.CANONICAL_NAME, field.name.canonicalForm);
-//						//if(field.name.uninominal) doc.addField(searchFieldsConfig.UNINOMIAL, field.name.uninominal);
-//						if(field.name.normalizedForm) doc.addField(searchFieldsConfig.NAME, field.name.normalizedForm);
-//						for(partialName in field.name) {
-//							addNameToDoc(doc, field.name);
-//						}
-//					} else {
-						addNameToDoc(doc, field.name);
-//					}		
-				} else if(subcategory && subcategory.equalsIgnoreCase(fieldsConfig.GLOBAL_DISTRIBUTION_GEOGRAPHIC_ENTITY)) {
-					copyDesc = false;
-					doc.addField(searchFieldsConfig.LOCATION, field.country.countryName);
-				} else if(subcategory && subcategory.equalsIgnoreCase(fieldsConfig.GLOBAL_ENDEMICITY_GEOGRAPHIC_ENTITY)) {
-					copyDesc = false;
-					doc.addField(searchFieldsConfig.LOCATION, field.country.countryName);
-				} else if(category && category.toLowerCase().contains(fieldsConfig.TAXONOMIC_HIERARCHY)) {
-					copyDesc = false;
-					doc.addField(searchFieldsConfig.TAXON, field.taxonDefinition.name);
-				}
 
 				field.contributors.each { contributor ->
 					if(contributor.name)
@@ -157,7 +149,7 @@ class SearchIndexManager {
 
 		}
 
-		log.debug docs;
+		//log.debug docs;
 
 		try {
 			_server.add(docs);

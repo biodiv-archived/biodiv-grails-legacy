@@ -42,8 +42,7 @@ class Utils {
 	 * @return
 	 */
 	static String cleanName(String name) {
-		name = name?.replaceAll(/<.*?>/, '').replaceAll("\\s+", " ").replaceAll("\u00A0|\u2007|\u202F", " ").trim();
-		return name;
+		return name?.replaceAll(/<.*?>/, '').replaceAll("\u00A0|\u2007|\u202F", " ").replaceAll("\\n","").replaceAll("\\s+", " ").trim();
 	}
 	
 	static String cleanFileName(String name) {

@@ -5,6 +5,8 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <!-- link rel="stylesheet" type="text/css" media="all"
 	href="${resource(dir:'plugins',file:'jquery-ui-1.8.15/jquery-ui/themes/ui-lightness/jquery-ui-1.8.15.custom.css', absolute:true)}" /-->
+<link rel="stylesheet" type="text/css" media="all"
+	href="${resource(dir:'css',file:'jquery-ui.css', absolute:true)}" />
 
 <r:require module="jquery-ui" />
 
@@ -16,19 +18,18 @@
 	href="${resource(dir:'css',file:'auth.css', absolute:true)}" />
 <link rel="stylesheet" type="text/css" media="all"
 	href="${resource(dir:'css',file:'reset.css', absolute:true)}" />
-<link rel="stylesheet"
-	href="${resource(dir:'css',file:'main.css', absolute:true)}" />
 <link rel="stylesheet" type="text/css" media="all"
 	href="${resource(dir:'css',file:'text.css', absolute:true)}" />
 <link rel="stylesheet" type="text/css" media="all"
 	href="${resource(dir:'css',file:'960.css', absolute:true)}" />
 <sNav:resources override="true" />
+<link rel="stylesheet"
+	href="${resource(dir:'css',file:'main.css', absolute:true)}" />
 <link rel="stylesheet" type="text/css"
 	href="${resource(dir:'css',file:'navigation.css', absolute:true)}" />
 <link rel="stylesheet" type="text/css" media="all"
 	href="${resource(dir:'css',file:'jquery.rating.css', absolute:true)}" />
-<link rel="stylesheet"
-	href="${resource(dir:'css',file:'wg.css', absolute:true)}" />
+
 
 <!-- script type="text/javascript"
 	src="${resource(dir:'plugins',file:'jquery-ui-1.8.15/jquery-ui/js/jquery-ui-1.8.15.custom.min.js', absolute:true)}"></script-->
@@ -56,8 +57,11 @@ jQuery(document).ready(function($) {
 <g:layoutHead />
 <ga:trackPageview />
 
+<!-- script src="http://cdn.wibiya.com/Toolbars/dir_1100/Toolbar_1100354/Loader_1100354.js" type="text/javascript"></script><noscript><a href="http://www.wibiya.com/">Web Toolbar by Wibiya</a></noscript--> 
+
 </head>
 <body>
+<%//request.cookies.each{println it.name+" : "+it.value}%>
 	<!-- RECOMMENDED if your web app will not function without JavaScript enabled -->
 	<noscript>
 		<div
@@ -65,7 +69,7 @@ jQuery(document).ready(function($) {
 			Your web browser must have JavaScript enabled in order for this
 			application to display correctly.</div>
 	</noscript>
-	<div id="spinner" class="spinner">
+	<div id="spinner" class="spinner" style="display:none;">
 		<img src="${resource(dir:'images',file:'spinner.gif', absolute:true)}"
 			alt="${message(code:'spinner.alt',default:'Loading...')}" />
 	</div>
@@ -81,20 +85,8 @@ jQuery(document).ready(function($) {
             </ul>
         </div-->
 
-        <!-- Branding -->
-        <div id="branding">
-                <!-- Logo -->
-                <div id="logo">
-                        <a href="http://thewesternghats.in">
-                                <img src="http://thewesternghats.in/sites/all/themes/wg/images/map-logo.gif" alt="western ghats" id="wg_logo"/>
-                        </a>
-                </div>
-                <!-- Logo ends -->
-        </div>
-        <!-- Branding ends -->
 
-
-	<div>
+	<!-- div>
 		<span id='loginLink'
 			style='position: relative; margin-right: 30px; float: right'>
 			<sec:ifLoggedIn>
@@ -104,20 +96,42 @@ jQuery(document).ready(function($) {
 			</sec:ifNotLoggedIn> </span>
 		<g:render template='/common/ajaxLogin' />
 		<br />
-	</div>
+	</div-->
 
 
 
 	<div id="species_main_wrapper">
+		<div id="fb-root"></div>
+		<script>
+		  window.fbAsyncInit = function() {
+		    FB.init({
+		      appId      : '308606395828381', // App ID
+		      status     : true, // check login status
+		      cookie     : true, // enable cookies to allow the server to access the session
+		      oauth      : true, // enable OAuth 2.0
+		      xfbml      : true  // parse XFBML
+		    });
+		
+		    // Additional initialization code here
+		  };
+		
+		  // Load the SDK Asynchronously
+		  (function(d){
+		     var js, id = 'facebook-jssdk'; if (d.getElementById(id)) {return;}
+		     js = d.createElement('script'); js.id = id; js.async = true;
+		     js.src = "//connect.facebook.net/en_US/all.js";
+		     d.getElementsByTagName('head')[0].appendChild(js);
+		   }(document));
+		</script>
 		<div class="container_12">
-
-			<div id="menu" class="ui-corner-all">
+			<div id="menu" class="grid_12 ui-corner-all">
 				<div class="demo" style="float: right; margin-right: .3em;"
-					title="These are demo pages">These are demo pages</div>
-				<div class="menuButton" style="float: left; margin:10px;">
+					title="These are demo pages">These are demo pages</div><br/>
+				<sNav:render group="dashboard" subitems="true" />
+				<div style="float: right; margin:10px;">
 					<g:searchBox />
 				</div>
-				<sNav:render group="dashboard" subitems="true" />
+				
 			</div>
 			<br />
 		</div>

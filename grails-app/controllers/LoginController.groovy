@@ -12,6 +12,10 @@ import org.springframework.security.core.context.SecurityContextHolder as SCH
 import org.springframework.security.web.WebAttributes
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 
+import species.auth.Role;
+import species.auth.SUser;
+import species.auth.SUserRole;
+
 class LoginController {
 
 	/**
@@ -24,6 +28,8 @@ class LoginController {
 	 */
 	def springSecurityService
 
+	def grailsApplicaiton
+	
 	/**
 	 * Default action; redirects to 'defaultTargetUrl' if logged in, /login/auth otherwise.
 	 */
@@ -40,7 +46,6 @@ class LoginController {
 	 * Show the login page.
 	 */
 	def auth = {
-
 		def config = SpringSecurityUtils.securityConfig
 
 		if (springSecurityService.isLoggedIn()) {
@@ -130,5 +135,18 @@ class LoginController {
 	 */
 	def ajaxDenied = {
 		render([error: 'access denied'] as JSON)
+	}
+	
+	def authFromDrupal = {
+		def config = SpringSecurityUtils.securityConfig
+		
+		if (springSecurityService.isLoggedIn()) {
+			redirect uri: config.successHandler.defaultTargetUrl
+			return
+		}
+		String postUrl = "${grailsApplication.config.grails.serverURL}${config.apf.filterProcessesUrl}"
+		println grailsApplication.config.speciesPortal.drupal.getAuthentication
+		println postUrl;
+		redirect (url: grailsApplication.config.speciesPortal.drupal.getAuthentication, params:['postUrl':postUrl]);
 	}
 }

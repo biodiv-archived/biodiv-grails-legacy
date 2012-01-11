@@ -4,9 +4,9 @@ import java.util.Date;
 
 import species.Resource;
 import species.Resource.ResourceType;
-import species.SpeciesGroup;
 import species.TaxonomyDefinition;
 import species.auth.SUser;
+import species.groups.SpeciesGroup;
 import species.participation.Observation;
 import species.participation.Recommendation;
 import species.participation.RecommendationVote;

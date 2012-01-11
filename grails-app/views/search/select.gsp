@@ -1,11 +1,13 @@
 
 
 <%@ page import="species.Species"%>
+<%@ page import="species.Language"%>
+<%@ page import="species.CommonNames"%>
 <html>
 <head>
 
 <meta name="layout" content="main" />
-<r:require module="jquery-ui"/>
+<r:require module="jquery-ui" />
 
 <title>Search Species</title>
 <g:javascript src="readmore/readmore.js"
@@ -44,7 +46,7 @@ $(document).ready(function(){
 
 					</div>
 					<br />
-					<div class="facets grid_2">
+					<!-- div class="facets grid_2">
 						<g:each in="${facets}" var="facet">
 							<g:if test="${facet.getValues()}">
 								<div class="facet_name">
@@ -60,8 +62,8 @@ $(document).ready(function(){
 								<br/>
 							</g:if>
 						</g:each>
-					</div>
-					<ul class="thumbwrap grid_9">
+					</div-->
+					<ul class="thumbwrap grid_12">
 
 						<g:each in="${speciesInstanceList}" status="i"
 							var="speciesInstance">
@@ -72,18 +74,26 @@ $(document).ready(function(){
 									<g:link action="show" controller="species"
 										id="${speciesInstance.id}">
 										<g:set var="mainImage" value="${speciesInstance.mainImage()}" />
-										<span class="wrimg"> <span></span> <img
-											src="${createLinkTo(dir: 'images/', base:grailsApplication.config.speciesPortal.resources.serverURL,
-											file: mainImage?.fileName.replace('.', '_200x200.'))}" />
-										</span>
+										<%def thumbnailPath = mainImage?.fileName?.replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.thumbnail.suffix)%>
+										<span class="wrimg"> <span></span> <g:if
+												test="${(new File(grailsApplication.config.speciesPortal.resources.rootDir+thumbnailPath)).exists()}">
+												<img
+													src="${createLinkTo( base:grailsApplication.config.speciesPortal.resources.serverURL,
+											file: thumbnailPath)}" />
+											</g:if> <g:else>
+												<img class="galleryImage"
+													src="${createLinkTo(file:"no-image.jpg", base:grailsApplication.config.speciesPortal.resources.serverURL)}"
+													title="You can contribute!!!" />
+
+											</g:else> </span>
 									</g:link>
 								</div>
 								<h6>
 									<g:link action="show" controller="species"
 										id="${speciesInstance.id}">
-										${speciesInstance.getName() }
+										${speciesInstance.taxonConcept.italicisedForm }
 									</g:link>
-								</h6> <%def engCommonName=speciesInstance.commonNames?.find{name -> name.language.threeLetterCode.equals('eng')}?.name%>
+								</h6> <%def engCommonName=CommonNames.findByTaxonConceptAndLanguage(speciesInstance.taxonConcept, Language.findByThreeLetterCode('eng'))?.name%>
 								<g:if test="${engCommonName}">
 									<b class="commonName"> ${engCommonName} </b>
 								</g:if>
@@ -107,18 +117,17 @@ $(document).ready(function(){
 								</div>
 
 								<div class="breadcrumb">
-									<%def sortedTaxonReg = speciesInstance.taxonomyRegistry.asList().sort{it.taxonDefinition.rank} %>
+									<%def sortedTaxonReg = speciesInstance.taxonomyRegistry.asList().sort {it.taxonDefinition.rank} %>
 									<g:each in="${sortedTaxonReg}" var="taxonReg">
 										<g:if
-											test="${taxonReg.field.category.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY) }">
+											test="${taxonReg.classification.name.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY) }">
 											<span class='rank${taxonReg.taxonDefinition.rank}'> ${taxonReg.taxonDefinition.name}
 											</span>
 											<g:if test="${taxonReg.taxonDefinition.rank<8}">></g:if>
 
 										</g:if>
 									</g:each>
-								</div>
-							</li>
+								</div></li>
 							<hr />
 						</g:each>
 					</ul>

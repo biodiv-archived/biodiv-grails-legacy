@@ -38,15 +38,15 @@ class DataController {
 		def parentId = params.nodeid  ?: null
 		def expandAll = params.expand_all  ? (new Boolean(params.expand_all)).booleanValue(): false
 		def expandSpecies = params.expand_species  ? (new Boolean(params.expand_species)).booleanValue(): false
-		String classSystem = params.classSystem ?: grailsApplication.config.speciesPortal.fields.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY;
+		long classSystem = params.classSystem ? Long.parseLong(params.classSystem): Classification.getByName(grailsApplication.config.speciesPortal.fields.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY).id;
 		def speciesid = params.speciesid ? Integer.parseInt(params.speciesid) : null
 
 		def rs = new ArrayList<GroovyRowResult>();
 		if(expandSpecies) {
 			def taxonIds = getSpeciesHierarchyTaxonIds(speciesid, classSystem)
-			getHierarchyNodes(rs, 0, null, classSystem, false, taxonIds);
+			getHierarchyNodes(rs, 0, 8, null, classSystem, false, taxonIds);
 		} else {
-			getHierarchyNodes(rs, level, parentId, classSystem, expandAll, null);
+			getHierarchyNodes(rs, level, level+3, parentId, classSystem, expandAll, null);
 		}
 		render(contentType: "text/xml", text:buildHierarchyResult(rs, classSystem))
 	}
@@ -60,7 +60,7 @@ class DataController {
 	 * @param expandAll
 	 * @param taxonIds
 	 */
-	private void getHierarchyNodes(List<GroovyRowResult> resultSet, int level, String parentId, String classSystem, boolean expandAll, List taxonIds) {
+	private void getHierarchyNodes(List<GroovyRowResult> resultSet, int level, int tillLevel, String parentId, long classSystem, boolean expandAll, List taxonIds) {
 		def sql = new Sql(dataSource)
 		def rs;
 		if(!parentId) {
@@ -70,8 +70,7 @@ class DataController {
 				taxonomy_definition t \
 			where \
 				s.taxon_definition_id = t.id and \
-				s.classification_id = f.id and \
-				f.name = :classSystem and \
+				s.classification_id = :classSystem and \
 				t.rank = 0 and \
 				s.parent_taxon_id is null \
 			group by s.path, t.id, t.rank, t.name  ", [classSystem:classSystem])
@@ -81,8 +80,7 @@ class DataController {
 			from taxonomy_registry s, classification f, taxonomy_definition t \
 			where \
 				s.taxon_definition_id = t.id and \
-				s.classification_id = f.id and \
-				f.name = :classSystem and \
+				s.classification_id = :classSystem and \
 				t.rank = "+level+" and \
 				s.path ~ '^"+parentId+"_[0-9]+\$' " , [classSystem:classSystem]);
 		} else {
@@ -92,8 +90,7 @@ class DataController {
 				taxonomy_definition t \
 			where \
 				s.taxon_definition_id = t.id and \
-				s.classification_id = f.id and \
-				f.name = :classSystem and \
+				s.classification_id = :classSystem and \
 				s.path ~ '^"+parentId+"_[0-9]+\$' " +
 					" group by s.path, t.rank, t.name, t.id \
 			order by t.id, t.rank", [classSystem:classSystem])
@@ -113,8 +110,10 @@ class DataController {
 			if(expandAll || (taxonIds && taxonIds.contains(r.taxonid))) {
 				if(r.rank < TaxonomyRank.SPECIES.ordinal()) {
 					//r.put('count', getCount(r.path, classSystem));
-					r.put('expanded', true);
-					getHierarchyNodes(resultSet, r.rank+1, r.path, classSystem, expandAll, taxonIds);
+					if(r.rank+1 <= tillLevel) {
+						r.put('expanded', true);
+						getHierarchyNodes(resultSet, r.rank+1, tillLevel, r.path, classSystem, expandAll, taxonIds)
+					}
 				}
 			}
 		}
@@ -163,16 +162,14 @@ class DataController {
 	 * @param classSystem
 	 * @return
 	 */
-	private List getSpeciesHierarchyTaxonIds(Long taxonId, String classSystem) {
+	private List getSpeciesHierarchyTaxonIds(Long taxonId, long classSystem) {
 		def sql = new Sql(dataSource)
 		String s = """select s.path as path 
 			from taxonomy_registry s, 
-				classification f, 
 				taxonomy_definition t 
 			where 
 				s.taxon_definition_id = t.id and 
-				s.classification_id = f.id and 
-				f.name = :classSystem and 
+				s.classification_id = :classSystem and 
 				s.path like '%!_"""+taxonId+"' escape '!'";
 			
 		def rs = sql.rows(s, [taxonId:taxonId, classSystem:classSystem])

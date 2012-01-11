@@ -16,6 +16,7 @@ $(document).ready(function(){
 	$('#advSearchBox :input').each(function(index, ele) {
 		var field = $(this).attr('name');
 		$(this).autocomplete({			
+			appentTO:"#advSearchForm",
 		 	source:'${createLink(action: 'terms', controller:'search')}'+'?field='+field
 		});
 	});
@@ -27,7 +28,7 @@ $(document).ready(function(){
 
 	<div class="container_12">
 
-		<div class="grid_12">
+		<div class="grid_12" id="advSearchForm">
 
 			<form method="get"
 				action="${createLink(controller:'search', action:'advSelect') }"
@@ -40,57 +41,12 @@ $(document).ready(function(){
 								name="name" class="text ui-widget-content ui-corner-all"
 								title="Field for searching using a taxon name" /></td>
 						</tr>
-
-						<tr class="prop indent">
-							<td valign="top" class="name">Common Name</td>
+						<tr class="prop">
+							<td valign="top" class="name">Taxon Hierarchy</td>
 							<td valign="top" class="value"><input type="text" size="40"
-								name="common_name"
+								name="taxon" value=""
 								class="text ui-widget-content ui-corner-all"
-								title="Field for searching using a taxon common name" />
-							</td>
-						</tr>
-						<tr class="prop indent">
-							<td valign="top" class="name">Canonical Name</td>
-							<td valign="top" class="value"><input type="text" size="40"
-								name="canonical_name"
-								class="text ui-widget-content ui-corner-all"
-								title="Field for searching using a taxon canonical name" />
-							</td>
-						</tr>
-						<tr class="prop indent">
-							<td valign="top" class="name">Uninomial</td>
-							<td valign="top" class="value"><input type="text" size="40"
-								name="uninomial" class="text ui-widget-content ui-corner-all"
-								title="Field for searching using uninomial name" />
-							</td>
-						</tr>
-						<tr class="prop indent">
-							<td valign="top" class="name">Genus</td>
-							<td valign="top" class="value"><input type="text" size="40"
-								name="genus" class="text ui-widget-content ui-corner-all"
-								title="Field for searching using genus" />
-							</td>
-						</tr>
-						<tr class="prop indent">
-							<td valign="top" class="name">InfraGenus</td>
-							<td valign="top" class="value"><input type="text" size="40"
-								name="infragenus" class="text ui-widget-content ui-corner-all"
-								title="Field for searching using infragenus" />
-							</td>
-						</tr>
-						<tr class="prop indent">
-							<td valign="top" class="name">Species</td>
-							<td valign="top" class="value"><input type="text" size="40"
-								name="species" class="text ui-widget-content ui-corner-all"
-								title="Field for searching using species epithet" />
-							</td>
-						</tr>
-						<tr class="prop indent">
-							<td valign="top" class="name">InfraSpecies</td>
-							<td valign="top" class="value"><input type="text" size="40"
-								name="infraspecies" class="text ui-widget-content ui-corner-all"
-								title="Field for searching using a infraspecies" />
-							</td>
+								title="Field for searching taxon hierarchy" /></td>
 						</tr>
 						<tr class="prop indent">
 							<td valign="top" class="name">Species Author</td>
@@ -105,14 +61,7 @@ $(document).ready(function(){
 								name="year" class="text ui-widget-content ui-corner-all"
 								title="Field for searching using year of finding the species and basionym year" />
 							</td>
-						</tr>
-						<tr class="prop">
-							<td valign="top" class="name">Taxon Hierarchy</td>
-							<td valign="top" class="value"><input type="text" size="40"
-								name="taxon" value=""
-								class="text ui-widget-content ui-corner-all"
-								title="Field for searching taxon hierarchy" /></td>
-						</tr>
+						</tr>						
 						<tr class="prop">
 							<td valign="top" class="name">Content</td>
 							<td valign="top" class="value"><input type="text" size="40"

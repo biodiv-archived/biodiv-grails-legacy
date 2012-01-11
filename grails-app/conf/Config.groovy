@@ -69,7 +69,7 @@ log4j = {
 	//    console name:'stdout', layout:pattern(conversionPattern: '%c{2} %m%n')
 	//}
 
-	error  'org.codehaus.groovy.grails.web.servlet',  //  controllers
+	error   'org.codehaus.groovy.grails.web.servlet',  //  controllers
 			'org.codehaus.groovy.grails.web.pages', //  GSP
 			'org.codehaus.groovy.grails.web.sitemesh', //  layouts
 			'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
@@ -77,14 +77,15 @@ log4j = {
 			'org.codehaus.groovy.grails.commons', // core / classloading
 			'org.codehaus.groovy.grails.plugins', // plugins
 			'org.codehaus.groovy.grails.orm.hibernate', // hibernate integration
-			'org.springframework',
+
 			'org.hibernate',
 			'net.sf.ehcache.hibernate'
-	
+
 	warn   'org.mortbay.log',
 			'org.grails.plugin.resource'
 	debug	'species',
 			'speciespage',
+			'org.springframework.security',
 			'grails.app'
 
 }
@@ -160,7 +161,7 @@ speciesPortal {
 	data.rootDir = "${app.rootDir}/data"
 	resources {
 		rootDir = "${app.rootDir}/images"
-		serverURL = "http://localhost:8080/${appName}/${appName}/images"
+		serverURL = "http://localhost/${appName}/images"
 		//serverURL = "http://localhost/${appName}/images"
 		images {
 			defaultType = "jpg"
@@ -169,12 +170,12 @@ speciesPortal {
 				width = 200
 				height = 200
 			}
-			
+
 			gallery {
 				suffix = "_gall"+".${defaultType}"
 				width = 500
 				height = 300
-			
+
 			}
 			galleryThumbnail {
 				suffix = "_gall_th"+".${defaultType}"
@@ -189,7 +190,7 @@ speciesPortal {
 		//serverURL = "http://localhost/${appName}/observations"
 	}
 
-	names.parser.serverURL = "192.168.4.217"
+	names.parser.serverURL = "saturn.strandls.com"
 	//names.parser.serverURL = "127.0.0.1"
 	names.parser.port = 4334
 	search {
@@ -206,7 +207,7 @@ speciesPortal {
 	}
 	nameSearch {
 		serverURL = "http://localhost:8090/solr/names"
-		indexStore = "${userHome}/species/data/names"
+		indexStore = "${app.rootDir}/data/names"
 		queueSize = 1000
 		threadCount = 3
 		soTimeout = 1000;
@@ -236,9 +237,12 @@ speciesPortal {
 
 		COMMON_NAME = "Common Name"
 		SYNONYMS = "Synonyms"
+		INDIAN_DISTRIBUTION_GEOGRAPHIC_ENTITY = "Indian Distribution Geographic Entity"
+		INDIAN_ENDEMICITY_GEOGRAPHIC_ENTITY = "Indian Endemicity Geographic Entity"
 		GLOBAL_DISTRIBUTION_GEOGRAPHIC_ENTITY = "Global Distribution Geographic Entity"
 		GLOBAL_ENDEMICITY_GEOGRAPHIC_ENTITY = "Global Endemicity Geographic Entity"
 		TAXONOMIC_HIERARCHY = "Taxonomy Hierarchy"
+		FAMILY = "Family"
 		GENUS = "Genus"
 		SUB_GENUS = "Sub-Genus"
 		SPECIES = "Species"
@@ -307,6 +311,7 @@ speciesPortal {
 		SPECIES_ID = "species_id"
 		AUTOCOMPLETE = "autocomplete"
 	}
+	drupal { getAuthentication = "http://ibp.panchgani.strandls.com/getAuthentication.php" }
 }
 
 speciesPortal.validCrossDomainOrigins = [
@@ -318,14 +323,13 @@ speciesPortal.validCrossDomainOrigins = [
 ]
 
 //uiperformance.enabled = false
+imageConverterProg = "/usr/bin/convert";
+jpegOptimProg = "/usr/local/bin/jpegoptim";
 
 environments {
 	development {
-		
 		grails.serverURL = "http://localhost:8080/${appName}"
-		speciesPortal {
-			search.serverURL = "http://localhost:8090/solr/species"
-		}
+		speciesPortal { search.serverURL = "http://localhost:8090/solr/species" }
 		google.analytics.enabled = false
 	}
 	test {
@@ -339,9 +343,23 @@ environments {
 
 	saturn {
 		grails.serverURL = "http://saturn.strandls.com:8080/${appName}"
+		jpegOptimProg = "/usr/bin/jpegoptim";
 		speciesPortal {
-			resources.serverURL = "http://saturn.strandls.com/${appName}"
+			app.rootDir = "/data/species"
+			data.rootDir = "${app.rootDir}/data"
 
+			resources {
+				rootDir = "${app.rootDir}/images"
+				serverURL = "http://saturn.strandls.com/${appName}/images"
+			}
+
+			nameSearch.indexStore = "${app.rootDir}/data/names"
+
+			observations {
+				rootDir = "${app.rootDir}/observations"
+				serverURL = "http://saturn.strandls.com:8080/${appName}/${appName}/observations"
+				//serverURL = "http://localhost/${appName}/observations"
+			}
 			search.serverURL="http://saturn.strandls.com:8080/solr/species"
 			grails.project.war.file = "/data/jetty-6.1.26/webapps/${appName}.war"
 		}
@@ -350,9 +368,21 @@ environments {
 
 	pamba {
 		grails.serverURL = "http://pamba.strandls.com:8080/${appName}"
+		jpegOptimProg = "/usr/bin/jpegoptim";
 		speciesPortal {
-			resources.serverURL = "http://pamba.strandls.com/${appName}"
+			app.rootDir = "/data/species"
+			data.rootDir = "${app.rootDir}/data"
 
+			resources {
+				rootDir = "${app.rootDir}/images"
+				serverURL = "http://pamba.strandls.com/${appName}/images"
+			}
+			nameSearch.indexStore = "${app.rootDir}/data/names"
+			observations {
+				rootDir = "${app.rootDir}/observations"
+				serverURL = "http://pamba.strandls.com:8080/${appName}/${appName}/observations"
+				//serverURL = "http://localhost/${appName}/observations"
+			}
 			search.serverURL="http://pamba.strandls.com:8080/solr/species"
 		}
 		google.analytics.webPropertyID = "UA-xxxxxx-x"
@@ -366,21 +396,29 @@ environments {
 	}
 }
 
-imageConverterProg = "/usr/bin/convert";
-jpegOptimProg = "/usr/local/bin/jpegoptim";
-
 navigation.dashboard = [
-	[group:'species', controller:'species', order:10, title:'Species', action:'list', subItems:[
-			[controller:'species', title:'Thumbnail Gallery', order:1, action:"list"],
-			[controller:'species', title:'Taxonomy Browser', order:10, action:'taxonBrowser'],
-			[controller:'species', title:'Contribute', order:20, action:'contribute']
-		]],
-	[group:'observation', order:40, controller:'observation', title:'Observations', action:'list', subItems:[
-			[controller:'observation', title:'Browse', order:1, action:'list'],
-			[controller:'observation', title:'Add Observation', order:10, action:"create"],
-		]],
-	[group:'search', order:50, controller:'search', title:'Advanced Search', action:'advSelect'],
-	[group:'admin', order:60, controller:'admin', title:'Admin', action:'index']
+	[controller:'species', title:'Thumbnail Gallery', order:1, action:"list"],
+	[controller:'species', title:'Taxonomy Browser', order:10, action:'taxonBrowser'],
+	[controller:'search', title:'Advanced Search',order:20, action:'advSelect'],
+	[controller:'species', title:'Contribute', order:30, action:'contribute']
+
+	/*[group:'species', controller:'species', order:10, title:'Species', action:'list', subItems:[
+	 [controller:'species', title:'Thumbnail Gallery', order:1, action:"list"],
+	 [controller:'species', title:'Taxonomy Browser', order:10, action:'taxonBrowser'],
+	 [controller:'species', title:'Contribute', order:20, action:'contribute']
+	 ]],
+	 [group:'observation', order:40, controller:'observation', title:'Observations', action:'list', subItems:[
+	 [controller:'observation', title:'Browse', order:1, action:'list'],
+	 [controller:'observation', title:'Add Observation', order:10, action:"create"],
+	 ]],
+	 [group:'search', order:50, controller:'search', title:'Advanced Search', action:'advSelect'],
+	 [group:'admin', order:60, controller:'admin', title:'Admin', action:'index']
+	 */
+]
+
+navigation.gallery = [
+	[controller:'species', title:'Images', order:1, action:"images"],
+	[controller:'species', title:'Images from Google', order:10, action:'imagesFromGoogle'],
 ]
 
 ckeditor  = {
@@ -452,38 +490,35 @@ jquery {
 	minExtentsion = 'min'
 }
 
-grails.resources.uri.prefix="${grails.serverURL}/static/"
 grails.resources.debug = false
 grails.resources.modules = {
-	core {
-		dependsOn 'jquery-ui'
-	}
+	core { dependsOn 'jquery-ui' }
 	// Define reference to custom jQuery UI theme
 	overrides {
 		'jquery-theme' {
 			resource id: 'theme', url: 'css/custom-theme/jquery-ui-.custom.css'
 		}
 	}
-	
-//	'jquery' {
-//		resource url:'js/jquery/jquery-1.4.2-min.js', nominify:true, disposition:'head'
-//	}
-//	'jquery-ui' {
-//		dependsOn 'jquery'
-//		resource url:[dir:'js/jquery-ui', file:'jquery-ui-1.8-min.js'], nominify:true
-//		resource url:[dir:'js/jquery-ui', file:'jquery-ui-1.8-min.css'],
-//				nominify:true, attrs:[media:'screen,projection']
-//	}
-//	'blueprint' {
-//		resource url:[dir:'css/blueprint',file:'screen.css'], attrs:[media:'screen,projection']
-//		resource url:[dir:'css/blueprint',file:'print.css'], attrs:[media:'print']
-//		resource url:[dir:'css/blueprint',file:'ie.css'], attrs:[media:'screen,projection'],
-//			  wrapper: { s -> "<!--[if lt IE 8]>$s<![endif]-->" }
-//	}
-//	'app' {
-//		resource 'css/main.css'
-//		resource 'js/application.js'
-//	}
+
+	//	'jquery' {
+	//		resource url:"js/jquery/jquery-1.7.min.js", nominify:true, disposition:'head'
+	//	}
+	//	'jquery-ui' {
+	//		dependsOn 'jquery'
+	//		resource url:[dir:"js/jquery-ui", file:'jquery-ui-1.8-min.js'], nominify:true
+	//		resource url:[dir:"js/jquery-ui", file:'jquery-ui-1.8-min.css'],
+	//				nominify:true, attrs:[media:'screen,projection']
+	//	}
+	//	'blueprint' {
+	//		resource url:[dir:'css/blueprint',file:'screen.css'], attrs:[media:'screen,projection']
+	//		resource url:[dir:'css/blueprint',file:'print.css'], attrs:[media:'print']
+	//		resource url:[dir:'css/blueprint',file:'ie.css'], attrs:[media:'screen,projection'],
+	//			  wrapper: { s -> "<!--[if lt IE 8]>$s<![endif]-->" }
+	//	}
+	//	'app' {
+	//		resource 'css/main.css'
+	//		resource 'js/application.js'
+	//	}
 }
 
 
@@ -491,14 +526,18 @@ grails.resources.modules = {
 grails.plugins.springsecurity.userLookup.userDomainClassName = 'species.auth.SUser'
 grails.plugins.springsecurity.userLookup.authorityJoinClassName = 'species.auth.SUserRole'
 grails.plugins.springsecurity.authority.className = 'species.auth.Role'
+//grails.plugins.springsecurity.auth.loginFormUrl = "/login/authFromDrupal"
+grails.plugins.springsecurity.auth.defaultRoleNames = ['ROLE_USER']
+//grails.plugins.springsecurity.apf.filterProcessesUrl = '/j_drupal_spring_security_check'
+grails.plugins.springsecurity.providerNames = [
+	//	        'drupalAuthentiactionProvider',
+	'daoAuthenticationProvider',
+	'anonymousAuthenticationProvider',
+	'rememberMeAuthenticationProvider'
+];
 
+//
+//grails.plugins.springsecurity.facebook.appId='308606395828381'
+//grails.plugins.springsecurity.facebook.secret='7ddb140cd81ff6b9be38853a0f43d6d3'
+//grails.plugins.springsecurity.facebook.bean.dao='facebookAuthDaoImpl'
 
-grails.plugins.springsecurity.facebook.appId='308606395828381'
-grails.plugins.springsecurity.facebook.secret='7ddb140cd81ff6b9be38853a0f43d6d3'
-grails.plugins.springsecurity.facebook.bean.dao='facebookAuthDaoImpl'
-
-
-
-grails.plugins.springsecurity.facebook.appId='308606395828381'
-grails.plugins.springsecurity.facebook.secret='7ddb140cd81ff6b9be38853a0f43d6d3'
-grails.plugins.springsecurity.facebook.bean.dao='facebookAuthDaoImpl'

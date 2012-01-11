@@ -14,7 +14,7 @@ class MappedSpreadsheetConverter extends SourceConverter {
 
 	protected static SourceConverter _instance;
 	private static final log = LogFactory.getLog(this);
-	
+
 	private MappedSpreadsheetConverter() {
 	}
 
@@ -35,7 +35,7 @@ class MappedSpreadsheetConverter extends SourceConverter {
 		NodeBuilder builder = NodeBuilder.newInstance();
 		int i=0;
 		for(Map speciesContent : content) {
-			log.debug speciesContent;
+			//log.debug speciesContent;
 			Node speciesElement = builder.createNode("species");
 			for(Map mappedField : mappingConfig) {
 				String fieldName = mappedField.get("field name(s)")
@@ -114,49 +114,59 @@ class MappedSpreadsheetConverter extends SourceConverter {
 
 	private void attachMetadata(Node data, Map speciesContent, Map mappedField) {
 
-		String contributorField = mappedField.get("contributor");
-		if(contributorField) {
-			String contributors = speciesContent.get(contributorField.toLowerCase())
-			String delimiter = mappedField.get("content delimiter") ?: "\n";
-			contributors.split(delimiter).each {
-				new Node(data, "contributor", it);
+		String contributorFields = mappedField.get("contributor");
+		if(contributorFields) {
+			contributorFields.split(",").each { contributorField ->
+				String contributors = speciesContent.get(contributorField.toLowerCase())
+				String delimiter = mappedField.get("content delimiter") ?: "\n";
+				contributors?.split(delimiter).each {
+					new Node(data, "contributor", it);
+				}
 			}
 		}
 
-		String attributionField = mappedField.get("attributions");
-		if(attributionField) {
-			String attribution = speciesContent.get(attributionField.toLowerCase())
-			String delimiter = mappedField.get("content delimiter") ?: "\n";
-			attribution.split(delimiter).each {
-				new Node(data, "attribution", it);
+		String attributionFields = mappedField.get("attributions");
+		if(attributionFields) {
+			attributionFields.split(",").each { attributionField ->
+				String attribution = speciesContent.get(attributionField.toLowerCase())
+				String delimiter = mappedField.get("content delimiter") ?: "\n";
+				attribution?.split(delimiter).each {
+					new Node(data, "attribution", it);
+				}
 			}
 		}
 
-		String licenseField = mappedField.get("license");
-		if(licenseField) {
-			String licenses = speciesContent.get(licenseField.toLowerCase());
-			String delimiter = mappedField.get("content delimiter") ?: ",|;|\n";
-			licenses.split(delimiter).each {
-				new Node(data, "license", it);
+		String licenseFields = mappedField.get("license");
+		if(licenseFields) {
+			licenseFields.split(",").each { licenseField ->
+				String licenses = speciesContent.get(licenseField.toLowerCase());
+				String delimiter = mappedField.get("content delimiter") ?: ",|;|\n";
+				licenses?.split(delimiter).each {
+					new Node(data, "license", it);
+				}
 			}
 		}
 
-		String audienceTypeField = mappedField.get("audience");
-		if(audienceTypeField) {
-			String audience = speciesContent.get(audienceTypeField.toLowerCase());
-			String delimiter = mappedField.get("content delimiter") ?: ",|;|\n";
-			audience.split(delimiter).each {
-				new Node(data, "audienceType", it);
+		String audienceTypeFields = mappedField.get("audience");
+		if(audienceTypeFields) {
+			audienceTypeFields.split(",").each { audienceTypeField ->
+				String audience = speciesContent.get(audienceTypeField.toLowerCase());
+				String delimiter = mappedField.get("content delimiter") ?: ",|;|\n";
+				audience?.split(delimiter).each {
+					new Node(data, "audienceType", it);
+				}
 			}
 		}
 
-		String referenceField = mappedField.get("references");
-		if(referenceField) {
-			String references = speciesContent.get(referenceField.toLowerCase());
-			String delimiter = mappedField.get("content delimiter") ?: "\n";
-			references.split(delimiter).each {
-				Node refNode = new Node(data, "reference");
-				getReferenceNode(refNode, it);
+		String referenceFields = mappedField.get("references");
+		if(referenceFields) {
+			referenceFields.split(",").each { referenceField ->
+				String references = speciesContent.get(referenceField.toLowerCase());
+				String delimiter = mappedField.get("content delimiter") ?: "\n";
+				references?.split(delimiter).each {
+					Node refNode = new Node(data, "reference");
+					getReferenceNode(refNode, it);
+				}
 			}
 		}
 
@@ -166,7 +176,7 @@ class MappedSpreadsheetConverter extends SourceConverter {
 				String images = speciesContent.get(imageField.toLowerCase());
 				if(images) {
 					def imagesNode = data;
-					if(images) imagesNode = new Node(data, "images");
+					imagesNode = new Node(data, "images");
 					String delimiter = mappedField.get("content delimiter") ?: "\n|\\s{3,}";
 					images.split(delimiter).each {
 						String loc = cleanLoc(it)
@@ -201,7 +211,7 @@ class MappedSpreadsheetConverter extends SourceConverter {
 						txt = "<h6>"+txt+"</h6>";
 					else {
 						txt = "<p>"+txt+"</p>";
-						if(includeHeadings) txt = "<h6>"+t.trim()+"</h6>"+txt; 
+						if(includeHeadings) txt = "<h6>"+t.trim()+"</h6>"+txt;
 					}
 					if(con)
 						con += txt;
@@ -235,7 +245,7 @@ class MappedSpreadsheetConverter extends SourceConverter {
 			List<Map> imagesMetaData = SpreadsheetReader.readSpreadSheet(file, imagesMetaDataSheet, 0);
 			fieldName.split(",").eachWithIndex { t, index ->
 				String txt = speciesContent.get(t);
-				txt.split(delimiter).each { loc->
+				txt.tokenize(delimiter).each { loc->
 					createImages(images, loc, imagesMetaData);
 				}
 			}
@@ -297,13 +307,12 @@ class MappedSpreadsheetConverter extends SourceConverter {
 		}
 	}
 
-	private void createImages(Node images, String id, List<Map> imageMetaData) {
+	private void createImages(Node images, String imageId, List<Map> imageMetaData) {
 		def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 		String uploadDir = config.speciesPortal.images.uploadDir;
 		imageMetaData.each { imageData ->
-			println "+++"+imageData.get("id")
 			String refKey = imageData.get("id");
-			if(refKey.trim().equals(id.trim())) {
+			if(refKey.trim().equals(imageId.trim())) {
 				Node image = new Node(images, "image");
 				String loc = imageData.get("imageno.");
 				File file = new File(uploadDir, cleanLoc(loc));
@@ -316,11 +325,11 @@ class MappedSpreadsheetConverter extends SourceConverter {
 			}
 		}
 	}
-	
+
 	private String cleanLoc(String loc) {
 		return loc.replaceAll("\\\\", File.separator);
 	}
-	
+
 	private getReferenceNode(Node refNode, String text) {
 		if(text.startsWith("http://")) {
 			new Node(refNode, "url", text);

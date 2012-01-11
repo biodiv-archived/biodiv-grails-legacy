@@ -21,7 +21,7 @@ class KeyStoneDataConverter extends SourceConverter {
 
 	protected static SourceConverter _instance;
 	private static final log = LogFactory.getLog(this);
-	
+
 	private KeyStoneDataConverter() {
 	}
 
@@ -44,25 +44,27 @@ class KeyStoneDataConverter extends SourceConverter {
 	 * @return
 	 */
 	public List<Species> convertSpecies(String connectionUrl, String userName, String password, String mappingFile, int mappingSheetNo, int mappingHeaderRowNo) {
+
 		List<Map> mappingConfig = SpreadsheetReader.readSpreadSheet(mappingFile, mappingSheetNo, mappingHeaderRowNo);
-		
+
 		def sql = Sql.newInstance(connectionUrl, userName,
-				password, "com.mysql.jdbc.Driver");		
-		
+				password, "com.mysql.jdbc.Driver");
+
 		def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.search
 		def fieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.fields
-			
+
 		List<Species> species = new ArrayList<Species>();
-		
+
 		NodeBuilder builder = NodeBuilder.newInstance();
-		
+
 		int i=0;
 		sql.eachRow("select * from wp_posts where post_status='publish'") { row ->
 			if(validRow(row, sql)) {
 				log.debug "Reading post : "+row.post_title;
 				Node speciesElement = builder.createNode("species");
-				
+
 				List metadataRows = sql.rows("select * from wp_postmeta where post_id="+row.id +" and meta_value != ''");
+				String sciName;
 				
 				for(Map mappedField : mappingConfig) {
 					String fieldName = mappedField.get("field name(s)")
@@ -76,7 +78,8 @@ class KeyStoneDataConverter extends SourceConverter {
 						Node category = new Node(field, fieldsConfig.CATEGORY, mappedField.get(fieldsConfig.CATEGORY));
 						Node subcategory = new Node(field, fieldsConfig.SUBCATEGORY, mappedField.get(fieldsConfig.SUBCATEGORY));
 						if(mappedField.get(fieldsConfig.SUBCATEGORY)?.equalsIgnoreCase(fieldsConfig.SCIENTIFIC_NAME)) {
-							createDataNode(field, row.post_title, row.id, mappedField);
+							sciName = row.post_title
+							createDataNode(field, sciName, row.id, mappedField);
 						} else if (customFormat && mappedField.get(fieldsConfig.CATEGORY)?.equalsIgnoreCase(fieldsConfig.IMAGES)) {
 							//Node images = getImages(file, fieldName, customFormat, delimiter, speciesContent, speciesElement);
 						} else if (customFormat && category.text().equalsIgnoreCase(fieldsConfig.ICONS)) {
@@ -88,15 +91,15 @@ class KeyStoneDataConverter extends SourceConverter {
 						} else if (customFormat && category.text().equalsIgnoreCase(fieldsConfig.VIDEO)) {
 							//Node images = getVideo(fieldName, customFormat, speciesContent);
 							//new Node(speciesElement, video);
-						} else if (customFormat && category.text().equalsIgnoreCase(fieldsConfig.COMMON_NAME)) {
+						}  else if (customFormat && category.text().equalsIgnoreCase(fieldsConfig.COMMON_NAME)) {
 							fieldName.split(",").eachWithIndex { t, index ->
 								String txt = getContent(metadataRows, t.toLowerCase().trim());
 								if(txt) {
-								txt.split(",|;").each {
-									Node data = createDataNode(field, it, row.id, mappedField);
-									Node language = new Node(data, "language");
-									Node name = new Node(language, "name", t.toLowerCase().trim());
-								}
+									txt.split(",|;").each {
+										Node data = createDataNode(field, it, row.id, mappedField);
+										Node language = new Node(data, "language");
+										Node name = new Node(language, "name", t.toLowerCase().trim());
+									}
 								}
 							}
 						} else if(customFormat) {
@@ -117,6 +120,25 @@ class KeyStoneDataConverter extends SourceConverter {
 						}
 					}
 				}
+				
+				//Adding taxon hierarchy
+				String family = getFamily(sql, row.id)
+				if(family) {
+					Node field = new Node(speciesElement, "field");
+					Node concept = new Node(field, fieldsConfig.CONCEPT, fieldsConfig.NOMENCLATURE_AND_CLASSIFICATION);
+					Node category = new Node(field, fieldsConfig.CATEGORY, fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY);
+					Node subcategory = new Node(field, fieldsConfig.SUBCATEGORY, fieldsConfig.FAMILY);
+					log.debug "Adding Family : "+family;
+					createDataNode(field, family, row.id, null);
+					
+					field = new Node(speciesElement, "field");
+					concept = new Node(field, fieldsConfig.CONCEPT, fieldsConfig.NOMENCLATURE_AND_CLASSIFICATION);
+					category = new Node(field, fieldsConfig.CATEGORY, fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY);
+					subcategory = new Node(field, fieldsConfig.SUBCATEGORY, fieldsConfig.SPECIES);
+					log.debug "Adding Species  : "+sciName;
+					createDataNode(field, sciName, row.id, null);
+				}
+				
 				createImages(speciesElement, sql, row.id);
 				log.debug speciesElement;
 				XMLConverter converter = new XMLConverter();
@@ -125,11 +147,11 @@ class KeyStoneDataConverter extends SourceConverter {
 					species.add(s);
 			} else {
 				log.debug "NOT A VALID ROW : "+row;
-			}			
+			}
 		}
 		return species;
 	}
-	
+
 	/**
 	 * 
 	 * @param metadataRows
@@ -137,6 +159,7 @@ class KeyStoneDataConverter extends SourceConverter {
 	 * @return
 	 */
 	private String getContent(List<GroovyRowResult> metadataRows, String fieldName) {
+		if(!metadataRows) return null;
 		String content;
 		metadataRows.each { metadataRow ->
 			String key = metadataRow.meta_key;
@@ -146,7 +169,7 @@ class KeyStoneDataConverter extends SourceConverter {
 		}
 		return content;
 	}
-	
+
 	/**
 	 * 
 	 * @param row
@@ -161,7 +184,7 @@ class KeyStoneDataConverter extends SourceConverter {
 			return false;
 		}
 	}
-	
+
 	/**
 	 * 
 	 * @param field
@@ -245,7 +268,7 @@ class KeyStoneDataConverter extends SourceConverter {
 	private void createImages(Node speciesElement, sql, postId) {
 		Node images = new Node(speciesElement, "images");
 		def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
-		
+
 		List imagesData = sql.rows("select post_content from wp_posts where id="+postId+" and post_status = 'publish'");
 		def xmlParser = new XmlParser();
 		def set = new HashSet();
@@ -261,13 +284,26 @@ class KeyStoneDataConverter extends SourceConverter {
 			}
 		}
 		log.debug "Found following image paths : "+set;
-		
-		
+
+
 		if(set) {
 			set.each { imagePath ->
 				Node image = new Node(images, "image");
 				new Node(image, "source", imagePath);
 			}
-		}		
+		}
+	}
+
+
+	/**
+	 * Using following sql to export sciName and family 
+	 * select t.name as sciName, t2.name as family from taxonomy_definition t, taxonomy_registry r , taxonomy_registry r2 , taxonomy_definition t2 where t.rank = 8 and t.id = r.taxon_definition_id  and r.parent_taxon_id = r2.id and r2.taxon_definition_id = t2.id;
+	 * @param sql
+	 * @param rowId
+	 * @return
+	 */
+	private String getFamily(sql, rowId) {
+		List result = sql.rows("select w1.object_id, w1.term_taxonomy_id, w2.term_id, w3.name from wp_term_relationships as w1 ,wp_term_taxonomy as w2, wp_terms w3 where  w1.term_taxonomy_id = w2.term_taxonomy_id and w2.term_id = w3.term_id and w3.term_id not in (1,2,27,32,33,34,48,49,50,51,52,64) and w1.object_id="+rowId);
+		return result?result[0].name:null;
 	}
 }

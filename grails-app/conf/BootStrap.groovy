@@ -1,11 +1,19 @@
-import species.SpeciesGroup;
-import species.auth.Role;
-import species.auth.SUser;
-import species.auth.SUserRole;
+import org.apache.commons.logging.LogFactory;
+import org.codehaus.groovy.grails.plugins.springsecurity.SecurityFilterPosition
+import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
+
+import species.Field;
+import species.auth.Role
+import species.auth.SUser
+import species.auth.SUserRole
+import species.groups.SpeciesGroup;
 
 class BootStrap {
 
+	private static final log = LogFactory.getLog(this);
+	
 	def grailsApplication
+	def setupService;
 	def namesIndexerService
 	def navigationService
 	def springSecurityService
@@ -14,11 +22,20 @@ class BootStrap {
 	 * 
 	 */
 	def init = { servletContext ->
+		initDefs();
 		initUsers();
-		initGroups();
+		//initGroups();
 		initNames();
+		initFilters();
 	}
 
+	def initDefs() {
+		if(Field.count() == 0) {
+			log.debug ("Initializing db.")
+			setupService.setupDefs()
+		}
+	}
+	
 	/**
 	 * 
 	 * @return
@@ -84,6 +101,13 @@ class BootStrap {
 		namesIndexerService.load(indexStoreDir);
 	}
 
+	/**
+	 * 
+	 */
+	def initFilters() {
+		SpringSecurityUtils.clientRegisterFilter('drupalAuthDirectFilter', SecurityFilterPosition.CAS_FILTER.order + 1);
+	}
+	
 	/**
 	 * 
 	 */

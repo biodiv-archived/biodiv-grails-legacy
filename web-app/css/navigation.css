@@ -33,7 +33,7 @@ Just change the color-values to apply your own color-scheme.
     clear: both;
     margin: 1em 0;
     font-size: 12px;
-    overflow: hidden; /* Clearing floats */
+    /*overflow: hidden;*/ /* Clearing floats */
 }
 
 .navigation li {

@@ -14,6 +14,8 @@ import groovy.sql.GroovyRowResult;
 import groovy.sql.Sql
 import groovy.xml.MarkupBuilder;
 
+import grails.plugins.springsecurity.Secured
+
 class SpeciesController {
 
 	def dataSource
@@ -127,6 +129,8 @@ class SpeciesController {
 
 	private Map mapSpeciesInstanceFields(Species speciesInstance, Collection speciesFields, Map map) {
 
+		def config = grailsApplication.config.speciesPortal.fields
+		
 		for (SpeciesField sField : speciesFields) {
 			Map finalLoc;
 			if(map.containsKey(sField.field.concept)) {
@@ -141,13 +145,13 @@ class SpeciesController {
 			if(finalLoc.containsKey('field')) {
 				finalLoc.put('speciesFieldInstance', sField);
 				/*
-				def sfList;
-				if(!(sfList = finalLoc.get('speciesFieldInstance'))) {
-					sfList = new ArrayList(); 
-				} 
-				sfList.add(sField);
-				finalLoc.put('speciesFieldInstance', sfList);
-				*/
+				 def sfList;
+				 if(!(sfList = finalLoc.get('speciesFieldInstance'))) {
+				 sfList = new ArrayList(); 
+				 } 
+				 sfList.add(sField);
+				 finalLoc.put('speciesFieldInstance', sfList);
+				 */
 			}
 		}
 
@@ -164,9 +168,9 @@ class SpeciesController {
 				//log.debug "Category : "+category
 				if(category.key.equals("field") || category.key.equals("speciesFieldInstance") )  {
 					continue;
-				} else if(category.key.equals("Occurrence Records") || category.key.equals("References") ) {
+				} else if(category.key.equals(config.OCCURRENCE_RECORDS) || category.key.equals(config.REFERENCES) ) {
 					boolean show = false;
-					if(category.key.equals("References")) {
+					if(category.key.equals(config.REFERENCES)) {
 						for(f in speciesInstance.fields) {
 							if(f.references) {
 								show = true;
@@ -187,11 +191,12 @@ class SpeciesController {
 					//log.debug "subCategory : "+subCategory;
 					if(subCategory.key.equals("field") || subCategory.key.equals("speciesFieldInstance")) continue;
 
-					if((subCategory.key.equals("Global Distribution Geographic Entity") && speciesInstance.globalDistributionEntities.size()>0)  ||
-					(subCategory.key.equals("Global Endemicity Geographic Entity") && speciesInstance.globalEndemicityEntities.size()>0)||
+					if((subCategory.key.equals(config.GLOBAL_DISTRIBUTION_GEOGRAPHIC_ENTITY) && speciesInstance.globalDistributionEntities.size()>0)  ||
+					(subCategory.key.equals(config.GLOBAL_ENDEMICITY_GEOGRAPHIC_ENTITY) && speciesInstance.globalEndemicityEntities.size()>0)|| 
+					(subCategory.key.equals(config.INDIAN_DISTRIBUTION_GEOGRAPHIC_ENTITY) && speciesInstance.indianDistributionEntities.size()>0) ||
+					(subCategory.key.equals(config.INDIAN_ENDEMICITY_GEOGRAPHIC_ENTITY) && speciesInstance.indianEndemicityEntities.size()>0)||
 					hasContent(subCategory.value.get('speciesFieldInstance'))) {
-						//(subCategory.key.equals("Indian Distribution Geographic Entity") && speciesInstance.indianDistributionEntities.size()>0) ||
-						//(subCategory.key.equals("Indian Endemicity Geographic Entity") && speciesInstance.indianEndemicityEntities.size()>0)||
+
 						newCategoryMap.put(subCategory.key, subCategory.value)
 					}
 				}
@@ -210,7 +215,7 @@ class SpeciesController {
 		return newMap;
 		//return map;
 	}
-	
+
 	private boolean hasContent(speciesFieldInstances) {
 		for(speciesFieldInstance in speciesFieldInstances) {
 			if(speciesFieldInstance.description) {
@@ -291,5 +296,5 @@ class SpeciesController {
 	def contribute = {
 		render (view:"contribute");
 	}
-
+	
 }
