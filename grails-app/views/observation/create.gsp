@@ -1,6 +1,7 @@
 <%@page import="species.License"%>
 <%@page import="species.License.LicenseType"%>
 <%@ page import="species.participation.Observation"%>
+<%@ page import="species.groups.SpeciesGroup"%>
 
 <html>
 <head>
@@ -138,7 +139,7 @@
 								<td valign="top"
 									class="value ${hasErrors(bean: observationInstance, field: 'group', 'errors')}">
 									<select name="group.id" class="ui-widget-content ui-corner-all" >
-										<g:each in="${species.SpeciesGroup.list()}" var="g">
+										<g:each in="${species.groups.SpeciesGroup.list()}" var="g">
 											<g:if test="${!g.name.equals(grailsApplication.config.speciesPortal.group.ALL)}">
 												<option value="${g.id}" ${(g.id == observationInstance?.group?.id)?'selected':''}>${g.name}</option>
 											</g:if>
