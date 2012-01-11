@@ -41,9 +41,11 @@ class ObservationService {
 		observation.group = SpeciesGroup.get(params.group?.id);
 		observation.notes = params.notes;
 		observation.observedOn = params.observedOn?:new Date();
-                observation.placeName = params.place_name;
-                observation.latitude = Float.parseFloat(params.latitude);
-                observation.longitude = Float.parseFloat(params.longitude);
+        observation.placeName = params.place_name;
+		observation.reverseGeocodedName = params.place_name;
+		observation.location = 'POINT(' + params.longitude + ' ' + params.latitude + ')'
+        observation.latitude = Float.parseFloat(params.latitude);
+        observation.longitude = Float.parseFloat(params.longitude);
 		
 		def resourcesXML = createResourcesXML(params);
 		def resources = saveResources(observation, resourcesXML);

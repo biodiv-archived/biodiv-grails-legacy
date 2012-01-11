@@ -102,7 +102,15 @@ var showOccurence = function(speciesName) {
 		styles : '',
 		cql_filter : "species_name='" + speciesName + "'",
 		opacity : 0.7
-	} ]
+	},
+	{
+		title : 'Observation',
+		layers : 'ibp:observation_locations',
+		styles : '',
+		cql_filter : "species_name='" + speciesName + "'",
+		opacity : 0.7
+	}
+	]
 	showMap("map1311326056727", mapOptions, layersOptions)
 }
 
