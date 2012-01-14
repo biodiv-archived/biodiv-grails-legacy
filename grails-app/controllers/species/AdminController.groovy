@@ -95,9 +95,10 @@ class AdminController {
 	}
 
 	def updateGroups = {
+		int noOfUpdations = 0;
 		try {
-			groupHandlerService.loadGroups(grailsApplication.config.speciesPortal.data.rootDir+"/templates/Groups.xlsx", 0, 0);
-			flash.message = "Successfully updated all taxonconcept group associations"
+			noOfUpdations = groupHandlerService.updateGroups();
+			flash.message = "Successfully updated group associations for taxonConcepts ${noOfUpdations}"
 		} catch(e) {
 			e.printStackTrace();
 			flash.message = e.getMessage()
@@ -107,8 +108,8 @@ class AdminController {
 	
 	def updateExternalLinks = {
 		try {
-			externalLinksService.updateExternalLinks();
-			flash.message = "Successfully updated all externalLinks"
+			int noOfUpdations = externalLinksService.updateExternalLinks();
+			flash.message = "Successfully updated externalLinks for taxonConcepts ${noOfUpdations}"
 		} catch(e) {
 			e.printStackTrace();
 			flash.message = e.getMessage()

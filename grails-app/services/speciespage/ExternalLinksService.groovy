@@ -23,6 +23,7 @@ class ExternalLinksService {
 		int limit = BATCH_SIZE;
 		int offset = 0;
 		int noOfUpdations = 0;
+		int noOfFailures = 0;
 		
 		while(true) {
 			def taxonConcepts = TaxonomyDefinition.findAll("from TaxonomyDefinition as taxonomyDefinition where taxonomyDefinition.rank = :speciesTaxonRank and taxonomyDefinition.externalLinks is null",[speciesTaxonRank:TaxonomyRank.SPECIES.ordinal()],[max:limit, offset:offset]);
@@ -30,14 +31,20 @@ class ExternalLinksService {
 			if(!taxonConcepts) break;
 			
 			taxonConcepts.eachWithIndex { taxonConcept, index ->
-				noOfUpdations += (updateExternalLinks(taxonConcept)) ? 1 : 0;
+				if(updateExternalLinks(taxonConcept)) {
+					noOfUpdations ++;
+				} else {
+					noOfFailures++;
+				}	
 			}
 			log.debug "Updated external links for taxonConcepts ${noOfUpdations}"
 			cleanUpGorm();
-			offset = offset + limit;
+			offset = noOfFailures;
+		}
+		if(noOfUpdations) {
+			cleanUpGorm();
 		}
 		log.debug "Updated external links for taxonConcepts ${noOfUpdations} in total"
-		cleanUpGorm();
 		return noOfUpdations;
 	}
 

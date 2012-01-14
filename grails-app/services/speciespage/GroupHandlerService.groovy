@@ -23,7 +23,7 @@ class GroupHandlerService {
 
 	static int GROUP_UPDATION_BATCH = 20;
 
-	def speciesGroupMappings = SpeciesGroupMapping.listOrderByRank('desc');
+	def speciesGroupMappings;
 
 
 	/**
@@ -91,26 +91,36 @@ class GroupHandlerService {
 		int noOfUpdations = 0;
 		int offset = 0;
 		int limit = GROUP_UPDATION_BATCH;
-
+		int noOfFailures = 0;
+		
 		def taxonConcepts;
+		
+		long startTime = System.currentTimeMillis();
 		while(true) {
 			taxonConcepts = TaxonomyDefinition.findAll("from TaxonomyDefinition as t where t.rank = :rank and t.group is null",
-					[rank: TaxonomyRank.SPECIES.ordinal()], [max: limit, offset: offset]);
-
+					[rank: TaxonomyRank.SPECIES.ordinal()], [max:limit, offset:offset]);
+			
 			if(!taxonConcepts) break;
-
+			
 			taxonConcepts.each { taxonConcept ->
 				if(updateGroup(taxonConcept)) {
 					noOfUpdations ++;
+				} else {
+					noOfFailures++;
 				}
 			}
-			offset = offset + limit;
+			
+			offset = noOfFailures; 
 			cleanUpGorm();
+			log.debug "Updated group for taxonConcepts ${noOfUpdations}"
 		}
 
 		if(noOfUpdations) {
 			cleanUpGorm();
+			log.debug "Updated group for taxonConcepts ${noOfUpdations} in total"
 		}
+		
+		log.debug "Time taken to update groups for taxonConcepts ${noOfUpdations} is ${System.currentTimeMillis()-startTime}(msec)";
 		return noOfUpdations;
 	}
 
@@ -168,44 +178,6 @@ class GroupHandlerService {
 					taxonConcept.errors.allErrors.each { log.error it }
 				}
 			}
-
-			//			List batch = new ArrayList();
-			//			TaxonomyRegistry.findAllByTaxonDefinition(taxonConcept).each { TaxonomyRegistry reg ->
-			//				//TODO : better way : http://stackoverflow.com/questions/673508/using-hibernate-criteria-is-there-a-way-to-escape-special-characters
-			//				def c = TaxonomyRegistry.createCriteria();
-			//				def r = c.scroll {
-			//					sqlRestriction ("path like '"+reg.path.replaceAll("_", "!_")+"!_%' escape '!'");
-			//				}
-			//
-			//				//updating group for all child taxon
-			//				boolean flag = false;
-			//				while(r.next()) {
-			//					TaxonomyDefinition concept = r.get(0).taxonDefinition;
-			//					if(!group.equals(concept.group)) {
-			//						concept.group = group;
-			//						if(concept.save()) {
-			//							log.debug "Setting group '${group.name}' for taxonConcept '${concept.name}'"
-			//							noOfUpdations++;
-			//							flag = true;
-			//						} else {
-			//							concept.errors.allErrors.each { log.error it }
-			//							log.error "Coundn't update group for concept : "+concept;
-			//						}
-			//					}
-			//					if(flag && noOfUpdations % GROUP_UPDATION_BATCH == 0) {
-			//						log.debug "Saved group for ${noOfUpdations} taxonConcepts"
-			//						cleanUpGorm();
-			//						flag = false;
-			//					}
-			//				}
-			//				if(noOfUpdations && flag) {
-			//					log.debug "Saved group for ${noOfUpdations} taxonConcepts"
-			//					cleanUpGorm();
-			//				}
-			//				r.close();
-			//			}
-			//			log.debug "Time taken to save : "+((System.currentTimeMillis() - startTime)/1000) + "(sec)"
-			//			log.debug "Updated group for ${noOfUpdations} taxonConcentps in total"
 		}
 		return noOfUpdations ?: false;
 	}
@@ -215,6 +187,10 @@ class GroupHandlerService {
 	 */
 	private SpeciesGroup getGroupByMapping(TaxonomyDefinition taxonConcept) {
 		SpeciesGroup group;
+		if(!speciesGroupMappings) {
+			speciesGroupMappings = SpeciesGroupMapping.listOrderByRank('desc');
+		}
+		
 		speciesGroupMappings.each { mapping ->
 			if((taxonConcept.name.trim().equals(mapping.taxonName)) && taxonConcept.rank == mapping.rank) {
 				group = mapping.speciesGroup;
@@ -231,10 +207,10 @@ class GroupHandlerService {
 		int rank = TaxonomyRank.KINGDOM.ordinal();
 
 		SpeciesGroup group;
-		parentTaxon.sort { it.rank }.reverse();
+		parentTaxon.sort { it.rank };
 
-
-		for(int i=0; i<parentTaxon.size(); i++) {
+		log.debug "Parent Taxon : "+parentTaxon 
+		for(int i=parentTaxon.size() -1; i>=0; i--) {
 			group = getGroupByMapping(parentTaxon.get(i))
 			if(group) {
 				break;
