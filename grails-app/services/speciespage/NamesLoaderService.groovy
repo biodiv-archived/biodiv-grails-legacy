@@ -49,36 +49,37 @@ class NamesLoaderService {
 			recommendationService.deleteAll();
 		}
 
+		int limit = BATCH_SIZE;
 		int offset = 0;
 		int noOfNames = 0;
 		def recos = new ArrayList<Recommendation>();
 		def conn = new Sql(sessionFactory.currentSession.connection())
-		//while(true) {
-		//def taxonConcepts = TaxonomyDefinition.findAll("from TaxonomyDefinition as taxonConcept where taxonConcept not in (select reco.taxonConcept from Recommendation as reco) and taxonConcept.rank >= :minRank", [minRank:minRankToImport])
-		//def taxonConcepts = TaxonomyDefinition.findAllByRankGreaterThanEquals(minRankToImport);
-		def taxonConcepts = conn.rows("select t.name as name, t.canonical_Form as canonicalForm, t.normalized_Form as normalizedForm, t.binomial_Form as binomialForm, t.id as id from Taxonomy_Definition as t left outer join recommendation r on t.id = r.taxon_concept_id where r.name is null");
-		//if(!taxonConcepts) break; //no more results;
+		while(true) {
+			//def taxonConcepts = TaxonomyDefinition.findAll("from TaxonomyDefinition as taxonConcept where taxonConcept not in (select reco.taxonConcept from Recommendation as reco) and taxonConcept.rank >= :minRank", [minRank:minRankToImport])
+			//def taxonConcepts = TaxonomyDefinition.findAllByRankGreaterThanEquals(minRankToImport);
+			def taxonConcepts = conn.rows("select t.name as name, t.canonical_Form as canonicalForm, t.normalized_Form as normalizedForm, t.binomial_Form as binomialForm, t.id as id from Taxonomy_Definition as t left outer join recommendation r on t.id = r.taxon_concept_id where r.name is null limit "+limit+" offset "+offset);
+			if(!taxonConcepts) break; //no more results;
 
-		taxonConcepts.each { taxonConcept ->
-			 
-			if(taxonConcept.name) {
-				recos.add(new Recommendation(name:taxonConcept.name, taxonConcept:TaxonomyDefinition.get(taxonConcept.id)));
-				if(!taxonConcept.name.equals(taxonConcept.canonicalform))
-					recos.add(new Recommendation(name:taxonConcept.canonicalform, taxonConcept:TaxonomyDefinition.get(taxonConcept.id)));
-				if(!taxonConcept.name.equals(taxonConcept.normalizedform))
-					recos.add(new Recommendation(name:taxonConcept.normalizedform, taxonConcept:TaxonomyDefinition.get(taxonConcept.id)));
-				if(taxonConcept.binomialform && !taxonConcept.binomialform.equals(taxonConcept.canonicalform))
-					recos.add(new Recommendation(name:taxonConcept.binomialform, taxonConcept:TaxonomyDefinition.get(taxonConcept.id)));
-				// TODO giving species subspecies options to parent taxonEntries
-				noOfNames++;
-			}
-			if(recos.size() >= RECO_BATCH_TO_SAVE) {
+			taxonConcepts.each { taxonConcept ->
+
+				if(taxonConcept.name) {
+					def taxonObj = TaxonomyDefinition.get(taxonConcept.id)
+					recos.add(new Recommendation(name:taxonConcept.name, taxonConcept:taxonObj));
+					if(!taxonConcept.name.equals(taxonConcept.canonicalform))
+						recos.add(new Recommendation(name:taxonConcept.canonicalform, taxonConcept:taxonObj));
+					if(!taxonConcept.name.equals(taxonConcept.normalizedform))
+						recos.add(new Recommendation(name:taxonConcept.normalizedform, taxonConcept:taxonObj));
+					if(taxonConcept.binomialform && !taxonConcept.binomialform.equals(taxonConcept.canonicalform))
+						recos.add(new Recommendation(name:taxonConcept.binomialform, taxonConcept:taxonObj));
+					// TODO giving species subspecies options to parent taxonEntries
+					noOfNames++;
+				}
+
 				recommendationService.save(recos);
 				recos.clear();
 			}
+			offset = offset + limit;
 		}
-		offset = offset + taxonConcepts.size();
-		//}
 
 		//		while(true) {
 		//			def taxonConcepts = TaxonomyDefinition.findAll("from TaxonomyDefinition as taxonConcept where taxonConcept not in (select reco.taxonConcept from Recommendation as reco) and taxonConcept.rank < :minRank", [minRank:minRankToSpread, max:NAME_BATCH_TO_LOAD, offset:offset])

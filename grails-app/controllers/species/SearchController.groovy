@@ -55,7 +55,9 @@ class SearchController {
 			Iterator iter = queryResponse.getResults().listIterator();
 			while(iter.hasNext()) {
 				def doc = iter.next();
-				speciesInstanceList.add(Species.get(doc.getFieldValue("id")));
+				def speciesInstance = Species.get(doc.getFieldValue("id"));
+				if(speciesInstance)
+					speciesInstanceList.add(speciesInstance);
 			}
 			log.debug(queryResponse.getFacetFields());
 			[responseHeader:queryResponse.responseHeader, total:queryResponse.getResults().getNumFound(), speciesInstanceList:speciesInstanceList, snippets:queryResponse.getHighlighting(), facets:queryResponse.getFacetFields()];

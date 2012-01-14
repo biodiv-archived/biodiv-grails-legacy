@@ -16,45 +16,59 @@ $(document).ready(function(){
 </g:javascript>
 </head>
 <body>
-	<div class="container_12">
+	<div class="container_16">
 
-		<div class="grid_12">
-
-			<div class="paginateButtons">
-				<center>
-					<g:paginateOnAlphabet total="${speciesInstanceTotal}" />
-				</center>
-			</div>
-			<br />
-			<ul class="thumbwrap" style="width: 100%; text-align: center;">
-				<g:each in="${speciesInstanceList}" status="i" var="speciesInstance">
-
-					<li class="figure" style="max-height: 220px;"><g:link
-							action="show" id="${speciesInstance.id}">
-							<g:set var="mainImage" value="${speciesInstance.mainImage()}" />
-							<%def thumbnailPath = mainImage?.fileName?.replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.thumbnail.suffix)%>
-							<span class="wrimg"> <span></span> <g:if
-									test="${(new File(grailsApplication.config.speciesPortal.resources.rootDir+thumbnailPath)).exists()}">
-									<img
-										src="${createLinkTo( base:grailsApplication.config.speciesPortal.resources.serverURL,
-											file: thumbnailPath)}" />
-								</g:if>
-								<g:else>
-									<img class="galleryImage"
-										src="${createLinkTo( file:"no-image.jpg", base:grailsApplication.config.speciesPortal.resources.serverURL)}"
-										title="You can contribute!!!" />
-								</g:else> </span>
-						</g:link> <span class='caption'> ${speciesInstance.taxonConcept.italicisedForm}
-					</span></li>
-				</g:each>
-			</ul>
-			<br />
-			<div class="paginateButtons">
-				<center>
-					<g:paginateOnAlphabet total="${speciesInstanceTotal}" />
-				</center>
-			</div>
+		<div class="paginateButtons grid_16">
+			<center>
+				<g:paginateOnAlphabet total="${speciesInstanceTotal}" />
+			</center>
 		</div>
+		<br /> <br/><br/>
+
+		<div class="grid_16" align="center">
+			<g:set var="columnSize"
+				value="${Math.ceil(speciesInstanceList.size()/3)}" />
+
+			<g:each in="${speciesInstanceList}" status="i" var="speciesInstance">
+
+				<g:if test="${i%columnSize == 0}">
+					<ul class="thumbwrap grid_5" style="list-style: none;text-align:left">
+				</g:if>
+				<li class="grid_4"><g:link action="show"
+						id="${speciesInstance.id}">
+
+						<g:set var="mainImage" value="${speciesInstance.mainImage()}" />
+						<%def thumbnailPath = mainImage?.fileName?.replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.galleryThumbnail.suffix)%>
+
+						<img class="icon" style="float: left;"
+							src="${createLinkTo( base:grailsApplication.config.speciesPortal.resources.serverURL,
+											file: thumbnailPath)}" />
+						<span class="caption"> ${speciesInstance.taxonConcept.italicisedForm}
+						</span>
+					</g:link>
+				</li>
+				<g:if test="${(i+1)%columnSize == 0}">
+					</ul>
+				</g:if>
+			</g:each>
+			</ul>
+		</div>
+		<br />
+
+		<div class="paginateButtons  grid_16">
+			<center>
+				<g:paginate total="${speciesInstanceTotal}"
+					params="['startsWith':params.startsWith]" max="50" maxsteps="10" />
+			</center>
+		</div>
+		<br />
+		<div class="paginateButtons grid_16">
+			<center>
+				<g:paginateOnAlphabet total="${speciesInstanceTotal}" />
+			</center>
+		</div>
+
+	</div>
 	</div>
 
 </body>

@@ -52,7 +52,10 @@ class TaxonomyDefinition {
 	String italicisedForm;
 	String binomialForm;
 	SpeciesGroup group;
-
+	String threatenedStatus;
+	ExternalLinks externalLinks;
+	
+	
 	static hasMany = [author:String, year:String]
 	
 	static constraints = {
@@ -62,6 +65,8 @@ class TaxonomyDefinition {
 		italicisedForm nullable:true;
 		binomialForm nullable:true;
 		group nullable:true;
+		threatenedStatus nullable:true;
+		externalLinks nullable:true;
 	}
 	
 	static mapping = {
@@ -77,6 +82,10 @@ class TaxonomyDefinition {
 		this.name = Utils.cleanName(name);
 	}
 	
+	/**
+	 * Returns parents as per all classifications
+	 * @return
+	 */
 	List<TaxonomyRegistry> parentTaxon() {
 		List<TaxonomyRegistry> result = [];
 		TaxonomyRegistry.findAllByTaxonDefinition(this).each { TaxonomyRegistry reg ->

@@ -1,7 +1,7 @@
 
 <%@page import="species.Reference"%>
 <%@page import="species.TaxonomyDefinition.TaxonomyRank"%>
-<div class="ui-corner-all <%=sparse?'':'menubutton'%>">
+<div class="ui-widget  <%=sparse?'':'menubutton'%>">
 	<g:set var="fieldCounter" value="${1}" />
 	<a href="#content" <%=sparse?'style=\"display:none\"':''%>> ${concept.key} </a>
 
@@ -9,13 +9,15 @@
 	<div
 		class="speciesConcept <%=concept.key.equals(grailsApplication.config.speciesPortal.fields.OVERVIEW)?'defaultSpeciesConcept':''%>"
 		id="speciesConcept${conceptCounter++}" <%=sparse?'':'style=\"display:none\"'%>>
-		<h3>
-			${concept.key}
-		</h3>
+		<div class="speciesFieldHeader ui-dialog-titlebar  ui-helper-clearfix ui-widget-header">
+						<span class="ui-icon ui-icon-circle-triangle-s" style="float: left; margin-right: .3em;"></span>
+							<a href="#taxonRecordName"> ${concept.key}</a> 
+		</div>
+		
 
 		<!-- speciesField section -->
 		<div id="speciesField${conceptCounter}.${fieldCounter++}"
-			class="speciesField">
+			class="speciesField ui-widget-content">
 
 			<g:if test="${concept.value.containsKey('speciesFieldInstance')}">
 				<g:showSpeciesField
@@ -23,22 +25,22 @@
 			</g:if>
 			<g:else>
 				<g:each in="${concept.value}" var="category">
+					<br/>
 					<g:if test="${!category.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.SUMMARY) }">
 
 						<div class="" style="clear:both">
 							<div
-								class="speciesFieldHeader ui-dialog-titlebar ui-corner-all ui-helper-clearfix ui-widget-header">
+								class="speciesFieldHeader category-header ui-dialog-titlebar  ui-helper-clearfix ">
 
 
-								<span class="ui-icon ui-icon-circle-triangle-s"
-									style="float: left; margin-right: .3em;"></span> <a class=""
-									href="#speciesField${conceptCounter}.${fieldCounter}"> ${category.key}
+								<a class="category-header-heading"
+									href="#speciesField${conceptCounter}.${fieldCounter}"><h4> ${category.key} </h4>
 								</a>
 
 							</div>
 
 							<div id="speciesField${conceptCounter}.${fieldCounter++}"
-								class="<%=category.key.equals(grailsApplication.config.speciesPortal.fields.BRIEF)?'defaultSpeciesField speciesField':'speciesField'%> ui-corner-all">
+								class="<%=category.key.equals(grailsApplication.config.speciesPortal.fields.BRIEF)?'defaultSpeciesField':''%> speciesField  ">
 
 								<g:if test="${category.value.containsKey('speciesFieldInstance') || category.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.OCCURRENCE_RECORDS) || category.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.REFERENCES)}">
 									<g:if test="${category.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.COMMON_NAME)}">
@@ -199,6 +201,7 @@
 									</g:each>
 								</g:else>
 							</div>
+							<br/>
 						</div>
 					</g:if>
 				</g:each>

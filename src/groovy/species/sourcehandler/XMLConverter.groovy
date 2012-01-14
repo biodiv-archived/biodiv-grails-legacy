@@ -1174,7 +1174,7 @@ class XMLConverter extends SourceConverter {
 	 * @param s
 	 * @return
 	 */
-	Species findDuplicateSpecies(s) {
+	static Species findDuplicateSpecies(s) {
 		return Species.findByGuid(s.guid);
 	}
 

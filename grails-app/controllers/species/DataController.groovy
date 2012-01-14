@@ -34,7 +34,7 @@ class DataController {
 		cache "taxonomy_results"
 		includeOriginHeader();
 		
-		def level = params.n_level ? Integer.parseInt(params.n_level)+1 : null
+		int level = params.n_level ? Integer.parseInt(params.n_level)+1 : 0
 		def parentId = params.nodeid  ?: null
 		def expandAll = params.expand_all  ? (new Boolean(params.expand_all)).booleanValue(): false
 		def expandSpecies = params.expand_species  ? (new Boolean(params.expand_species)).booleanValue(): false

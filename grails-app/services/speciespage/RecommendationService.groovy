@@ -21,6 +21,7 @@ class RecommendationService {
 	def namesIndexerService;
 
 	static transactional = false
+	static int BATCH_SIZE = 20
 
 	/**
 	 * TODO:Bind this call to recommendation domain object save
@@ -56,7 +57,7 @@ class RecommendationService {
 				reco.errors.allErrors.each { log.error it }
 				log.error "Coundn't save the recommendation : "+reco				
 			}
-			if (index % 20 == 0) {
+			if (index % BATCH_SIZE == 0) {
 				log.debug "Persisted ${index} recommendations"
 				cleanUpGorm();
 			}

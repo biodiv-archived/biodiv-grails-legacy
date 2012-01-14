@@ -13,7 +13,8 @@ html * {
 
 body {
 	color: #333;
-	font: 13px/1.5 'Helvetica Neue', Arial, 'Liberation Sans', FreeSans, sans-serif;
+/* 	font: 13px/1.5 'Helvetica Neue', Arial, 'Liberation Sans', FreeSans, sans-serif; */
+	font : 15px/1.5 Georgia, "Times New Roman", Times, serif;
 	width: 100%;
 	/*background-color: #f7f7f7;*/
 }
@@ -316,7 +317,7 @@ th.name {
 .prop .name {
 	float: left;
 	text-align: left;
-	width: 7em;
+	width: 10em;
 	font-weight: bold;
 	color: #676767;
 }
@@ -913,7 +914,13 @@ textarea#notes {
 }
 
 .group_icon {
-	float: right;
+	border: 1px solid #666666;
+	border-radius: 7px;
+	background-color: #666666;
+}
+
+.species_group_icon {
+	float:right;
 	border: 1px solid #666666;
 	border-radius: 7px;
 	background-color: #666666;
@@ -923,3 +930,6 @@ textarea#notes {
 	color: #12C;
 	cursor: pointer;
 }
+
+.category-header-heading {
+	border:none;

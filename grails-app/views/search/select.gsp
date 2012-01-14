@@ -64,7 +64,6 @@ $(document).ready(function(){
 						</g:each>
 					</div-->
 					<ul class="thumbwrap grid_12">
-
 						<g:each in="${speciesInstanceList}" status="i"
 							var="speciesInstance">
 							<li style="list-style: none; margin-left: 0px;">
@@ -75,17 +74,11 @@ $(document).ready(function(){
 										id="${speciesInstance.id}">
 										<g:set var="mainImage" value="${speciesInstance.mainImage()}" />
 										<%def thumbnailPath = mainImage?.fileName?.replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.thumbnail.suffix)%>
-										<span class="wrimg"> <span></span> <g:if
-												test="${(new File(grailsApplication.config.speciesPortal.resources.rootDir+thumbnailPath)).exists()}">
+										<span class="wrimg"> <span></span>
 												<img
 													src="${createLinkTo( base:grailsApplication.config.speciesPortal.resources.serverURL,
 											file: thumbnailPath)}" />
-											</g:if> <g:else>
-												<img class="galleryImage"
-													src="${createLinkTo(file:"no-image.jpg", base:grailsApplication.config.speciesPortal.resources.serverURL)}"
-													title="You can contribute!!!" />
-
-											</g:else> </span>
+											</span>
 									</g:link>
 								</div>
 								<h6>

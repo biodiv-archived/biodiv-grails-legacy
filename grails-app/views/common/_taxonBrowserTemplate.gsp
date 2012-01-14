@@ -4,6 +4,8 @@
 
 <g:javascript>
 $(document).ready(function() {
+	
+	
   	$('#taxonHierarchy').jqGrid({
 		url:'${createLink(controller:'data', action:'listHierarchy')}',
 		datatype: "xml",
@@ -14,8 +16,8 @@ $(document).ready(function() {
    			{name:'count', index:'count', width:50, hidden:true},
    			{name:'speciesId',index:'speciesId', hidden:true}
    		],   		
-   		width: '100%',
-    	height: '100%',
+   		width: "${width?:'100%'}",
+    	height: "${height?:'100%'}",
     	autowidth:true,
     	scrollOffset: 0,     	
     	scrollOffset: 0,
@@ -39,6 +41,8 @@ $(document).ready(function() {
 		postData["classSystem"] = $.trim($('#taxaHierarchy option:selected').val());
         $('#taxonHierarchy').trigger("reloadGrid");
 	});
+	
+	$('.ui-jqgrid-hdiv').hide();
 });
 
 var heirarchyLevelFormatter = function(el, cellVal, opts) {
@@ -77,15 +81,18 @@ var heirarchyLevelFormatter = function(el, cellVal, opts) {
 	return el;	   
 }			
 </g:javascript>
-<select name="taxaHierarchy" id="taxaHierarchy"
-	class="value ui-corner-all">
-	<g:each in="${Classification.list()}" var="classification">
-		<option value="${classification.id}">
-			${classification.name}
-		</option>
-	</g:each>
-</select>
+
 
 <div class="taxonomyBrowser">
+	
+	<select name="taxaHierarchy" id="taxaHierarchy"
+		class="value ui-corner-all">
+		<g:each in="${Classification.list()}" var="classification">
+			<option value="${classification.id}">
+				${classification.name}
+			</option>
+		</g:each>
+	</select>
+	
 	<table id="taxonHierarchy"></table>
 </div>

@@ -13,6 +13,7 @@ class AdminController {
 	def namesIndexerService;
 	def groupHandlerService;
 	def sessionFactory;
+	def externalLinksService;
 
 	/**
 	 * 
@@ -97,6 +98,17 @@ class AdminController {
 		try {
 			groupHandlerService.loadGroups(grailsApplication.config.speciesPortal.data.rootDir+"/templates/Groups.xlsx", 0, 0);
 			flash.message = "Successfully updated all taxonconcept group associations"
+		} catch(e) {
+			e.printStackTrace();
+			flash.message = e.getMessage()
+		}
+		redirect(action: "index")
+	}
+	
+	def updateExternalLinks = {
+		try {
+			externalLinksService.updateExternalLinks();
+			flash.message = "Successfully updated all externalLinks"
 		} catch(e) {
 			e.printStackTrace();
 			flash.message = e.getMessage()

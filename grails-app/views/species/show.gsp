@@ -35,7 +35,7 @@
 </style><![endif]--> 
 
 <link rel="stylesheet" type="text/css" media="all"
-	href="${resource(dir:'js/galleria/themes/classic/',file:'galleria.classic.css', absolute:true)}" />
+	href="${resource(dir:'js/galleria/1.2.6/themes/classic/',file:'galleria.classic.css', absolute:true)}" />
 
 <g:set var="sparse" value="${Boolean.TRUE}" />
 <g:set var="entityName"
@@ -60,8 +60,9 @@
 	src="/sites/all/themes/wg/scripts/OpenLayers-2.10/OpenLayers.js"></script>
 <script type="text/javascript" src="/sites/all/themes/wg/scripts/am.js"></script>
 
-<g:javascript src="galleria/galleria-1.2.4.min.js"
+<g:javascript src="galleria/1.2.6/galleria-1.2.6.min.js"
 	base="${grailsApplication.config.grails.serverURL+'/js/'}" />
+<g:javascript src="galleria/1.2.6/plugins/flickr/galleria.flickr.min.js"></g:javascript>
 
 <g:javascript src="jquery.collapser/jquery.collapser.min.js"
 	base="${grailsApplication.config.grails.serverURL+'/js/'}" />
@@ -88,51 +89,50 @@ function getOccurrenceCount(data) {
 
 
 <g:javascript>
-$(document).ready(function() {
-	$("#resourceTabs").tabs();
+google.load("search", "1");
+Galleria.loadTheme('${resource(dir:'js/galleria/1.2.6/themes/classic/',file:'galleria.classic.min.js', absolute:true)}');
+
+$(document).ready(function(){
+	var tabs = $("#resourceTabs").tabs();
+	
 	$(".readmore").readmore({
 		substr_len : 400,
 		more_link : '<a class="more readmore">&nbsp;More</a>'
 	});
 
-	//TODO:load gallery  images by ajax call getting response in json  
-	$('#gallery1').galleria({
-		height : 400,
-		preload : 1,
-		carousel : true,
-		transition : 'pulse',
-		image_pan_smoothness : 5,
-		showInfo : true,
-		dataSelector : "img.galleryImage",
-		debug : false,
-		thumbQuality : false,
-		maxScaleRatio : 1,
-		minScaleRatio : 1,
-
-		dataConfig : function(img) {
-			return {
-				// tell Galleria to grab the content from the .desc div as caption
-				description : $(img).parent().next('.notes').html()
-			};
-		},
-		extend : function(options) {
-			// listen to when an image is shown
-			this.bind('image', function(e) {
-				// lets make galleria open a lightbox when clicking the main
-				// image:
-				$(e.imageTarget).click(this.proxy(function() {
-					this.openLightbox();
-				}));
-			});
-		}
-
-	});
-});	
-
-google.load("search", "1");
-Galleria.loadTheme('${resource(dir:'js/galleria/themes/classic/',file:'galleria.classic.min.js', absolute:true)}');
-
-$(document).ready(function(){
+	if($("#resourceTabs-1 img").length > 0) {
+		//TODO:load gallery  images by ajax call getting response in json  
+		$('#gallery1').galleria({
+			height : 400,
+			preload : 1,
+			carousel : true,
+			transition : 'pulse',
+			image_pan_smoothness : 5,
+			showInfo : true,
+			dataSelector : "img.galleryImage",
+			debug : false,
+			thumbQuality : false,
+			maxScaleRatio : 1,
+			minScaleRatio : 1,
+	
+			dataConfig : function(img) {
+				return {
+					// tell Galleria to grab the content from the .desc div as caption
+					description : $(img).parent().next('.notes').html()
+				};
+			},
+			extend : function(options) {
+				// listen to when an image is shown
+				this.bind('image', function(e) {
+					$(e.imageTarget).click(this.proxy(function() {
+						this.openLightbox();
+					}));
+				});
+			}
+		});		
+	} else {
+		$("#resourceTabs").tabs("remove", 0);
+	}
 
 	$('div.speciesFieldHeader').collapser({
 		target: 'next',
@@ -185,6 +185,20 @@ $(document).ready(function(){
 
 	$(".defaultSpeciesConcept").prev("a").trigger('click');	
 
+	
+	var flickr = new Galleria.Flickr();
+	flickr.tags('${speciesName}', function(data) {
+    	$('#gallery3').galleria({
+    		height:400,
+			carousel:true,
+			transition:'pulse',
+			image_pan_smoothness:5,
+			showInfo:true,
+			dataSource: data,
+			debug: false,
+			clicknext:true
+    	});
+	});
 	
 	$("#googleImages").click(function() {
 		$( "#resourceTabs-4 input:submit").button();
@@ -253,6 +267,9 @@ $(document).ready(function(){
   	//initializeCKEditor();	
   	// bind click event on delete buttons using jquery live
   	$('.del-reference').live('click', deleteReferenceHandler);
+  	if($("#resourceTabs-1 img").length == 1) {
+  		$("#flickrImages").click();
+  	}
 });
 
 </g:javascript>
@@ -290,8 +307,8 @@ $(document).ready(function(){
 				<div id="resourceTabs">
 					<ul>
 						<li><a href="#resourceTabs-1">Images</a></li>
-						<li><a id="googleImages" href="#resourceTabs-4">Images
-								from Google</a></li>
+						<li><a id="flickrImages" href="#resourceTabs-3">Flickr Images</a></li>
+						<li><a id="googleImages" href="#resourceTabs-4">Google Images</a></li>
 					</ul>
 					<div id="resourceTabs-1">
 						<div id="gallery1">
@@ -299,12 +316,22 @@ $(document).ready(function(){
 						</div>
 
 					</div>
-					<div id="resourceTabs-4">
+					<div id="resourceTabs-3">
+						
+						<div id="gallery3"></div>
+						<div id="flickrBranding"></div>
+						<div id="googleBranding"></div><br/>
 						<div class="message ui-corner-all">This portal is not
 							responsible for the accuracy or completeness of data presented at
 							other web sites.</div>
+					</div>
+					<div id="resourceTabs-4">
+						
 						<div id="gallery2"></div>
-						<div id="googleBranding"></div>
+						<div id="googleBranding"></div><br/>
+						<div class="message ui-corner-all">This portal is not
+							responsible for the accuracy or completeness of data presented at
+							other web sites.</div>
 						<div>
 							<center>
 							<form method="get" action="http://images.google.com/images"
@@ -319,13 +346,35 @@ $(document).ready(function(){
 				</div>
 				<br />
 				<!-- species page icons -->
-				<div class="grid_14 icons">
+				<div class="grid_9 icons">
 
+							<div>
 							<g:each in="${speciesInstance.getIcons()}" var="r">
 									<img class="icon" href="${href}"
 										src="${createLinkTo(dir: 'images/icons', file: r.fileName.trim(), absolute:true)}"
 										title="${r?.description}" />
 							</g:each>
+							
+							
+							
+							 <img class="group_icon species_group_icon" src="${createLinkTo(dir: 'images/group_icons', file: speciesInstance.taxonConcept.group?.name?.trim().replaceAll(/ /, '_')+".png", absolute:true)}" 
+							  title="${speciesInstance.taxonConcept.group?.name}"/>
+							  
+							  <g:if test="${speciesInstance.taxonConcept.threatenedStatus}">
+							  		<s:showThreatenedStatus model="['threatenedStatus':speciesInstance.taxonConcept.threatenedStatus]"/>
+							  </g:if>
+							</div>
+							
+							<div>
+							<g:each in="${speciesInstance.taxonConcept.externalLinks}" var="r">
+								<g:each in="${['eolId', 'iucnId']}" var="extLinkKey">
+									<g:if test="${r[extLinkKey]}">
+										<s:showExternalLink model="['key':extLinkKey, 'externalLinks':r, 'taxonConcept':speciesInstance.taxonConcept]"/>										
+									</g:if>	
+								</g:each>
+								<s:showExternalLink model="['key':'wikipedia', 'externalLinks':r, 'taxonConcept':speciesInstance.taxonConcept]"/>	
+							</g:each>
+							</div>
 				</div>
 				<div id="tagcloud"></div>
 
@@ -333,7 +382,7 @@ $(document).ready(function(){
 
 			<!--  static species content -->
 			<div class="grid_6 classifications">
-				<t:showTaxonBrowser model="['expandSpecies':true, 'expandAll':false, 'speciesId':speciesInstance.taxonConcept?.id]"/>
+				<t:showTaxonBrowser model="['expandSpecies':true, 'expandAll':false, 'speciesId':speciesInstance.taxonConcept?.id, height:400]"/>
 				<br />					
 
 				<div class="readmore" style="float:left;">
@@ -347,68 +396,60 @@ $(document).ready(function(){
 
 		<!-- species toc and content -->
 		<div class="container_16" id="content">
-			<div id="fieldstoc" class="<%=sparse?'grid_12':'grid_4'%>">
-				<ul style="list-style: none;">
-					<g:each in="${fields}" var="concept">
-						<g:if
-							test="${concept.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.TAXONRECORDID) || concept.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.GLOBALUNIQUEIDENTIFIER) || concept.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.NOMENCLATURE_AND_CLASSIFICATION)}">
-						</g:if>
-						<g:else>
-							<hr />
-							<g:if test="${sparse}">
-								<li style="clear: both; margin-left: 0px">
-							</g:if>
-							<g:else>
-								<li class="nav ui-state-default ui-corner-all"
-									onClick="showSpeciesConcept('${conceptCounter}'); showSpeciesField('${conceptCounter}.${fieldCounter}')">
-							</g:else>
-							<g:showSpeciesConcept
-								model="['speciesInstance':speciesInstance, 'concept':concept, 'conceptCounter':conceptCounter, 'sparse':sparse]" />
-							</li>
-							<%conceptCounter++%>
-						</g:else>
-					</g:each>
-				</ul>
-			</div>
-			<div class="grid_4" style="float:right;margin-left: .3em;">
+			<div class="grid_16" style="float:left;margin-right: .3em;">
+				<%def nameRecords = fields.get(grailsApplication.config.speciesPortal.fields.NOMENCLATURE_AND_CLASSIFICATION)?.get(grailsApplication.config.speciesPortal.fields.TAXON_RECORD_NAME).collect{it.value.get('speciesFieldInstance')} %>
+				<g:if test="${nameRecords}">
 				<div class="ui-widget">
-					<div class="speciesFieldHeader ui-dialog-titlebar ui-corner-all ui-helper-clearfix ui-widget-header">
+					<div class="speciesFieldHeader ui-dialog-titlebar ui-helper-clearfix ui-widget-header">
 						<span class="ui-icon ui-icon-circle-triangle-s" style="float: left; margin-right: .3em;"></span>
 							<a href="#taxonRecordName"> Taxon Record Name</a> 
 					</div>
 					<div class="ui-widget-content">
-						<g:collect in="${fields.get(grailsApplication.config.speciesPortal.fields.NOMENCLATURE_AND_CLASSIFICATION).get(grailsApplication.config.speciesPortal.fields.TAXON_RECORD_NAME)}"
-							expr="${it.value.get('speciesFieldInstance')}">
-
-							<div class="prop"> 
+						<table>
+						<g:each in="${nameRecords}">
+							<tr class="prop">
+								<td><span class="grid_3 name">${it?.field?.subCategory} </span></td><td> ${speciesInstance.taxonConcept.italicisedForm}</td> 
 								<g:if test="${it?.field?.subCategory?.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.REFERENCES)}">
-									<span class="name">${it?.field?.subCategory}</span> : <a href="${it?.description}" target="_blank"> ${it?.description}</a>
+									<td><span class="grid_3 name">${it?.field?.subCategory} </span></td> <td><a href="${it?.description}" target="_blank"> ${it?.description}</a></td>
 								</g:if> 
 								<g:elseif test="${it?.field?.subCategory?.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.GENERIC_SPECIFIC_NAME)}">
-									<span class="name">${it?.field?.subCategory}</span> : <a href="#" class="speciesName"> ${it?.description} </a>
-
+									<td><span class="grid_3 name">${it?.field?.subCategory} </span> </td> <td>${it?.description}</td>
+								</g:elseif> 
+								<g:elseif test="${it?.field?.subCategory?.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.SCIENTIFIC_NAME)}">
+									
 								</g:elseif> 
 								<g:else>
-									<span class="name">${it?.field?.subCategory}</span> : ${it?.description}
+									<td><span class="grid_3 name">${it?.field?.subCategory} </span></td> <td> ${it?.description}</td>
 								</g:else> 
-							</div>
-						</g:collect>
+							</tr>
+						</g:each>
+						</table>
 					</div>
 				</div>
 				<br/>
+				</g:if>
+				
+				<!-- Synonyms -->
+				<%def synonyms = Synonyms.findAllByTaxonConcept(speciesInstance.taxonConcept) %>
+				<g:if test="${synonyms }">
 				<div class="ui-widget">
-					<div class="speciesFieldHeader ui-dialog-titlebar ui-corner-all ui-helper-clearfix ui-widget-header">
+					<div class="speciesFieldHeader ui-dialog-titlebar ui-helper-clearfix ui-widget-header">
 						<span class="ui-icon ui-icon-circle-triangle-s" style="float: left; margin-right: .3em;"></span>
 						<a href="#synonyms"> Synonyms</a> 
 					</div>
 					<div class="ui-widget-content">
-						<g:each in="${Synonyms.findAllByTaxonConcept(speciesInstance.taxonConcept)}" var="synonym">
-							<div class="prop"><span class="name">${synonym?.relationship?.value()}</span> : <a class="speciesName" href="#"> ${synonym?.name} </a> </div>
+						<table>
+						<g:each in="${synonyms}" var="synonym">
+						<tr><td class="prop">
+							<span class="grid_3 name">${synonym?.relationship?.value()} </span></td><td> <a class="speciesName" href="#"> ${synonym?.name} </a> </td></tr>
 						</g:each>
+						</table>
 					</div>
 				</div>
 				<br/>
-				<div class="ui-widget">
+				</g:if>
+				
+				<!-- Common Names -->
 				<%
 					Map names = new LinkedHashMap();
 					CommonNames.findAllByTaxonConcept(speciesInstance.taxonConcept).each(){
@@ -419,44 +460,71 @@ $(document).ready(function(){
 						names.get(languageName).add(it)
 					};
 				%>
-				<div class="speciesFieldHeader ui-dialog-titlebar ui-corner-all ui-helper-clearfix ui-widget-header">
-					<span class="ui-icon ui-icon-circle-triangle-s" style="float: left; margin-right: .3em;"></span>
-					<a href="#commonNames"> Common Names</a> 
-				</div>
-				<div class="ui-widget-content">
-					<g:if test="${names}">
-						<table>
-							<g:each in="${names}">
-							<tr><td class="prop">
-								<span class="name">${it.key}</span> : <g:each in="${it.value}">
-											<a href="#" class="speciesName"> ${it.name}, </a>
-										</g:each></td>
-								</tr>
-							</g:each>
-						</table>
-					</g:if>
-				</div>
-				<br/>
+				<g:if test="${names}">
 				<div class="ui-widget">
-					<div class="speciesFieldHeader ui-dialog-titlebar ui-corner-all ui-helper-clearfix ui-widget-header">
+				
+					<div class="speciesFieldHeader ui-dialog-titlebar ui-helper-clearfix ui-widget-header">
 						<span class="ui-icon ui-icon-circle-triangle-s" style="float: left; margin-right: .3em;"></span>
-						<a href="#externalLinks">External Links</a> 
+						<a href="#commonNames"> Common Names</a> 
 					</div>
 					<div class="ui-widget-content">
-						<ul>
-						<li><a target="_blank"
-								href="http://www.ubio.org/browser/search.php?search_all=${speciesInstance.taxonConcept.binomialForm?:speciesInstance.taxonConcept.canonicalForm}">
-							Search on uBio
-						</a></li>
-						</ul>
+						
+							<table>
+								<g:each in="${names}">
+								<tr><td class="prop">
+									<span class="grid_3 name">${it.key} </span></td> 
+									<td><g:each in="${it.value}"  status="i" var ="n">
+												 ${n.name}
+												 <g:if test="${i < it.value.size()-1}">,</g:if>
+											</g:each></td>
+									</tr>
+								</g:each>
+							</table>
+						
 					</div>
 				</div>
+				<br/>
+				</g:if>
+				<!-- Common Names End-->
+				
+			
+			
 			</div>
+			
+			
+			<div id="fieldstoc" class="<%=sparse?'grid_16':'grid_4'%>">
+				<ul style="list-style: none;">
+					<g:each in="${fields}" var="concept">
+						<g:if
+							test="${concept.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.TAXONRECORDID) || concept.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.GLOBALUNIQUEIDENTIFIER) || concept.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.NOMENCLATURE_AND_CLASSIFICATION)}">
+						</g:if>
+						<g:else>
+							
+							<g:if test="${sparse}">
+								<li style="clear: both; margin-left: 0px">
+							</g:if>
+							<g:else>
+								<li class="nav ui-state-default"
+									onClick="showSpeciesConcept('${conceptCounter}'); showSpeciesField('${conceptCounter}.${fieldCounter}')">
+							</g:else>
+							<g:showSpeciesConcept
+								model="['speciesInstance':speciesInstance, 'concept':concept, 'conceptCounter':conceptCounter, 'sparse':sparse]" />
+							</li>
+							<br/>
+							<%conceptCounter++%>
+						</g:else>
+					</g:each>
+				</ul>
 			</div>
+			
 			<g:if test="${!sparse}">
-				<div id="speciesFieldContainer" class="ui-corner-all grid_12"></div>
+				<div id="speciesFieldContainer" class="grid_12"></div>
 			</g:if>
-		</div>
+
+	</div>
+		
+		
+			
 	
 
 </body>

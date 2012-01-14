@@ -30,11 +30,15 @@ class SpeciesController {
 		cache "taxonomy_results"
 		params.startsWith = params.startsWith?:"A"
 		if (params.startsWith) {
-			[speciesInstanceList: Species.findAllByTitleLike('<i>'+params.startsWith+'%'), speciesInstanceTotal: Species.count()]
+			params.max = Math.min(params.max ? params.int('max') : 50, 100);
+			params.offset = params.offset ? params.int('offset') : 0
+			def speciesInstanceList = Species.findAllByTitleLike("<i>${params.startsWith}%", [sort:'title', max:params.max, offset:params.offset]);
+			int count = Species.countByTitleLike('<i>'+params.startsWith+'%')
+			return [speciesInstanceList: speciesInstanceList, speciesInstanceTotal: count]
 		} else {
 			//Not being used for now
-			params.max = Math.min(params.max ? params.int('max') : 10, 100)
-			[speciesInstanceList: Species.list(params), speciesInstanceTotal: Species.count()]
+			params.max = Math.min(params.max ? params.int('max') : 50, 100)
+			return [speciesInstanceList: Species.list(params), speciesInstanceTotal: Species.count()]
 		}
 	}
 
@@ -130,7 +134,7 @@ class SpeciesController {
 	private Map mapSpeciesInstanceFields(Species speciesInstance, Collection speciesFields, Map map) {
 
 		def config = grailsApplication.config.speciesPortal.fields
-		
+
 		for (SpeciesField sField : speciesFields) {
 			Map finalLoc;
 			if(map.containsKey(sField.field.concept)) {
@@ -192,7 +196,7 @@ class SpeciesController {
 					if(subCategory.key.equals("field") || subCategory.key.equals("speciesFieldInstance")) continue;
 
 					if((subCategory.key.equals(config.GLOBAL_DISTRIBUTION_GEOGRAPHIC_ENTITY) && speciesInstance.globalDistributionEntities.size()>0)  ||
-					(subCategory.key.equals(config.GLOBAL_ENDEMICITY_GEOGRAPHIC_ENTITY) && speciesInstance.globalEndemicityEntities.size()>0)|| 
+					(subCategory.key.equals(config.GLOBAL_ENDEMICITY_GEOGRAPHIC_ENTITY) && speciesInstance.globalEndemicityEntities.size()>0)||
 					(subCategory.key.equals(config.INDIAN_DISTRIBUTION_GEOGRAPHIC_ENTITY) && speciesInstance.indianDistributionEntities.size()>0) ||
 					(subCategory.key.equals(config.INDIAN_ENDEMICITY_GEOGRAPHIC_ENTITY) && speciesInstance.indianEndemicityEntities.size()>0)||
 					hasContent(subCategory.value.get('speciesFieldInstance'))) {
@@ -296,5 +300,5 @@ class SpeciesController {
 	def contribute = {
 		render (view:"contribute");
 	}
-	
+
 }

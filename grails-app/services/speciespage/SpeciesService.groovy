@@ -34,6 +34,7 @@ class SpeciesService {
 	def groupHandlerService;
 	def namesLoaderService;
 	def sessionFactory;
+	def externalLinksService;
 	
 	static int BATCH_SIZE = 10;
 
@@ -44,18 +45,6 @@ class SpeciesService {
 	def loadData() {
 		def dataLoader = new DataLoader();
 		int noOfInsertions = 0;
-
-		grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/speciespageszip/mango/mango";
-		noOfInsertions += uploadSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/speciespageszip/mango/mango/MangoMangifera_indica_prabha_v4 (copy).xlsx", 0, 0, 1, 4);
-
-		grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/speciespageszip/grey_falcolin";
-		noOfInsertions += uploadSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/speciespageszip/grey_falcolin/GreyFrancolin_v4.xlsx", 0, 0, 1, 4);
-
-		grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/Rufous Woodpecker/images";
-		noOfInsertions += uploadNewSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/Rufous Woodpecker/RufousWoodepecker_v4_1.xlsm");
-
-		grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/Eurasian Curlew/png ec";
-		noOfInsertions += uploadNewSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/Eurasian Curlew/EurasianCurlew_v4_2.xlsm");
 
 		grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/images";
 		noOfInsertions += uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/Dung_beetle_Species_pages_IBP_v13.xlsx", grailsApplication.config.speciesPortal.data.rootDir+"/mappings/dungbeetles_mapping.xlsx", 0, 0, 0, 0);
@@ -72,7 +61,19 @@ class SpeciesService {
 
 		grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/speciespages";
 		noOfInsertions += uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/speciespages/species accounts188_v2.xlsx", grailsApplication.config.speciesPortal.data.rootDir+"/mappings/speciesaccount188_mapping_v1.xlsx", 0, 0, 0, 0);
-		
+
+		grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/speciespageszip/mango/mango";
+		noOfInsertions += uploadSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/speciespageszip/mango/mango/MangoMangifera_indica_prabha_v4 (copy).xlsx", 0, 0, 1, 4);
+
+		grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/speciespageszip/grey_falcolin";
+		noOfInsertions += uploadSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/speciespageszip/grey_falcolin/GreyFrancolin_v4.xlsx", 0, 0, 1, 4);
+
+		grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/Rufous Woodpecker/images";
+		noOfInsertions += uploadNewSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/Rufous Woodpecker/RufousWoodepecker_v4_1.xlsm");
+
+		grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/Eurasian Curlew/png ec";
+		noOfInsertions += uploadNewSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/Eurasian Curlew/EurasianCurlew_v4_2.xlsm");
+
 		return noOfInsertions;
 	}
 
@@ -147,7 +148,7 @@ class SpeciesService {
 		List <Species> batch =[]
 		species.each {
 			batch.add(it);
-			if(batch.size()>BATCH_SIZE){
+			if(batch.size() > BATCH_SIZE){
 				noOfInsertions += saveSpeciesBatch(batch);
 				batch.clear();
 				return
@@ -170,17 +171,8 @@ class SpeciesService {
 		
 		cleanUpGorm();
 		
-		try{
-			groupHandlerService.loadGroups(grailsApplication.config.speciesPortal.data.rootDir+"/templates/Groups.xlsx", 0, 0);
-		} catch(e) {
-			e.printStackTrace()
-		}
+		//postProcessSpecies(species);		
 		
-		try{
-			namesLoaderService.syncNamesAndRecos(false);
-		} catch(e) {
-			e.printStackTrace()
-		}
 		return noOfInsertions;
 	}
 
@@ -193,6 +185,7 @@ class SpeciesService {
 		int noOfInsertions = 0;
 		Species.withTransaction {
 			for(Species s in batch) {
+				//externalLinksService.updateExternalLinks(s.taxonConcept);
 				if(!s.save()) {
 					s.errors.allErrors.each { log.error it }
 				} else {
@@ -219,13 +212,29 @@ class SpeciesService {
 		s.title = s.taxonConcept.italicisedForm;
 		s.guid = converter.constructGUID(s);
 
-		Species existingSpecies = converter.findDuplicateSpecies(s);
-		if(!existingSpecies) {
-			saveSpecies([s]);
-		}
+		
 		return s;
 	}
 	
+	
+	/**
+	 * 
+	 */
+	def postProcessSpecies(List<Species> species) {
+		//TODO: got to move this to the end of taxon creation
+		try{
+			groupHandlerService.updateGroups(species);
+		} catch(e) {
+			e.printStackTrace()
+		}
+		
+		try{
+			namesLoaderService.syncNamesAndRecos(false);
+		} catch(e) {
+			e.printStackTrace()
+		}
+		
+	}
 	
 	/**
 	 *

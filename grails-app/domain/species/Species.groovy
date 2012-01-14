@@ -4,6 +4,7 @@ import org.apache.commons.logging.LogFactory;
 import org.codehaus.groovy.grails.commons.ConfigurationHolder;
 
 import species.Resource.ResourceType;
+import species.groups.SpeciesGroup;
 
 class Species {
 
@@ -11,6 +12,7 @@ class Species {
 	String guid;
 	TaxonomyDefinition taxonConcept;
 	Resource reprImage;
+	Integer percentOfInfo;
 	
 	def grailsApplication; 
 	
@@ -29,6 +31,7 @@ class Species {
 	static constraints = {
 		guid(blank: false, unique: true);
 		reprImage(nullable:true);
+		percentOfInfo(nullable:true);
 	}
 
 	static mapping = {
@@ -36,12 +39,10 @@ class Species {
 	}
 
 	Resource mainImage() {  
-		if(!reprImage) {
+		if(!reprImage) { 
 			def images = getImages();
 			reprImage = images ? images[0]:null;
-			println '++++++++++++'
 			if(reprImage && !reprImage.fileName.equals("no-image.jpg")) {
-				println reprImage;
 				if(!this.save()) {
 					this.errors.each { log.error it }
 				}
@@ -51,7 +52,10 @@ class Species {
 		if(reprImage && (new File(grailsApplication.config.speciesPortal.resources.rootDir+reprImage.fileName.trim())).exists()) {
 			return reprImage;			
 		} else {
-			return new Resource(fileName:"no-image.jpg", type:ResourceType.IMAGE, title:"You can contribute!!!");
+		println grailsApplication.config.speciesPortal.group.OTHERS
+			SpeciesGroup group = this.taxonConcept.group?:SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.OTHERS)
+			String name = group.name?.trim()?.replaceAll(/ /, '_')
+			return new Resource(fileName:"group_icons/${name ? name+'.png': '../no-image.jpg'}", type:ResourceType.IMAGE, title:"You can contribute!!!");
 		}
 	}
 

@@ -21,40 +21,43 @@ class TaxonService {
 	def groupHandlerService;
 	def namesLoaderService;
 	def speciesService;
+	def externalLinksService;
 	
-	static int BATCH_SIZE = 500;
+	static int BATCH_SIZE = 100;
 
 	/**
 	 * 
 	 * @return
 	 */
 	def loadTaxon(boolean createSpeciesStubsFlag) {
-		loadFlowersOfIndia();
-		loadEFlora();
-		loadFishBase();
-		loadGBIF();
-		loadIBP();
-		cleanUpGorm();
-		
-		groupHandlerService.loadGroups(grailsApplication.config.speciesPortal.data.rootDir+"/templates/Groups.xlsx", 0, 0);		
-		namesLoaderService.syncNamesAndRecos(false);
-		
-		if(createSpeciesStubsFlag) {
-			createSpeciesStubs();
-		}
+				loadFlowersOfIndia(grailsApplication.config.speciesPortal.data.rootDir+"/dictionaries/FlowersByBotanicalNames.xls", 0, 0);
+				loadFishBase(grailsApplication.config.speciesPortal.data.rootDir+"/dictionaries/fishbase_30_11_2011.xls", 0, 0);
+				loadGBIF(grailsApplication.config.speciesPortal.data.rootDir+"/dictionaries/GBIF taxonomy-search-13208373774487451330519969730577/taxonomy-search-1320837377448.txt");
+				loadEFlora(grailsApplication.config.speciesPortal.data.rootDir+"/dictionaries/eflora_data_CN.xlsx", 0, 0);
+//				loadIBP("jdbc:postgresql://localhost:5432/ibp", "postgres", "postgres123", "org.postgresql.Driver");
+				loadIUCNRedList(grailsApplication.config.speciesPortal.data.rootDir+"/dictionaries/IUCNRedList-India-12-01-2012.xlsx", 0, 0);
+				cleanUpGorm();
+//		
+//		//		groupHandlerService.updateGroups();
+//		//		namesLoaderService.syncNamesAndRecos(false);
+//		//
+				if(createSpeciesStubsFlag) {
+					createSpeciesStubs();
+				}
+//				externalLinksService.updateExternalLinks();
 	}
 
 	/**
 	 * 
 	 * @return
 	 */
-	def loadFlowersOfIndia() {
+	def loadFlowersOfIndia(String file, int sheetNo, int headerRowNo) {
 		NodeBuilder builder = NodeBuilder.newInstance();
 		XMLConverter converter = new XMLConverter();
 
-		List<Map> content;
-		//flowersOfIndia
-		content = SpreadsheetReader.readSpreadSheet(grailsApplication.config.speciesPortal.data.rootDir+"/dictionaries/FlowersByBotanicalNames.xls", 0, 0);
+		List<Map> content = SpreadsheetReader.readSpreadSheet(file, sheetNo, headerRowNo);
+		def c = Classification.findByName(grailsApplication.config.speciesPortal.fields.FLOWERS_OF_INDIA_TAXONOMIC_HIERARCHY)
+		
 		int i=0;
 		for (Map row : content) {
 			String name = row.get("botanical name");
@@ -75,9 +78,6 @@ class TaxonService {
 				new Node(taxon2, "data", name)
 				taxonEntries.add(taxon2);
 			}
-
-
-			def c = Classification.findByName(grailsApplication.config.speciesPortal.fields.FLOWERS_OF_INDIA_TAXONOMIC_HIERARCHY)
 
 			List<TaxonomyRegistry> registry = saveTaxonEntries(converter, taxonEntries, c, name);
 
@@ -105,14 +105,13 @@ class TaxonService {
 	 * 
 	 * @return
 	 */
-	def loadEFlora() {
+	def loadEFlora(String file, int sheetNo, int headerRowNo) {
 		NodeBuilder builder = NodeBuilder.newInstance();
 		XMLConverter converter = new XMLConverter();
 
-		List<Map> content;
-
-		//eflora
-		content = SpreadsheetReader.readSpreadSheet(grailsApplication.config.speciesPortal.data.rootDir+"/dictionaries/eflora_data_CN.xlsx", 0, 0);
+		List<Map> content = SpreadsheetReader.readSpreadSheet(file, sheetNo, headerRowNo);
+		def c = Classification.findByName(grailsApplication.config.speciesPortal.fields.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY)
+		
 		int i=0;
 		for (Map row : content) {
 			String name = row.get("scientific_names");
@@ -137,7 +136,7 @@ class TaxonService {
 				taxonEntries.add(taxon1);
 			}
 
-			def c = Classification.findByName(grailsApplication.config.speciesPortal.fields.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY)
+			
 			List<TaxonomyRegistry> registry = saveTaxonEntries(converter, taxonEntries, c, name);
 
 			def taxonConcept = converter.getTaxonConcept(registry, c);
@@ -176,15 +175,13 @@ class TaxonService {
 	 * 
 	 * @return
 	 */
-	def loadFishBase() {
+	def loadFishBase(String file, int sheetNo, int headerRowNo) {
 		NodeBuilder builder = NodeBuilder.newInstance();
 		XMLConverter converter = new XMLConverter();
 
-		List<Map> content;
-
-		//fishbase
 		int i=0;
-		content = SpreadsheetReader.readSpreadSheet(grailsApplication.config.speciesPortal.data.rootDir+"/dictionaries/fishbase_30_11_2011.xls", 0, 0);
+		List<Map> content = SpreadsheetReader.readSpreadSheet(file, sheetNo, headerRowNo);
+		def c = Classification.findByName(grailsApplication.config.speciesPortal.fields.FISHBASE_TAXONOMIC_HIERARCHY)
 		for (Map row : content) {
 			String name = row.get("species");
 			String author = row.get("author");
@@ -239,7 +236,7 @@ class TaxonService {
 				taxonEntries.add(taxon1);
 			}
 
-			def c = Classification.findByName(grailsApplication.config.speciesPortal.fields.FISHBASE_TAXONOMIC_HIERARCHY)
+			
 			List<TaxonomyRegistry> registry = saveTaxonEntries(converter, taxonEntries, c, name);
 
 			def taxonConcept = converter.getTaxonConcept(registry, c);
@@ -263,7 +260,7 @@ class TaxonService {
 								new Node(commonNameNode, "data", it);
 						}
 					}
-				}				
+				}
 			}
 			converter.createCommonNames(commonNameNode, taxonConcept);
 			i++;
@@ -276,17 +273,16 @@ class TaxonService {
 	 * 
 	 * @return
 	 */
-	def loadGBIF() {
+	def loadGBIF(String gbifTaxaFile) {
 		NodeBuilder builder = NodeBuilder.newInstance();
 		XMLConverter converter = new XMLConverter();
 
-		List<Map> content;
-
-		//gbif
-		String gbifTaxaFile = grailsApplication.config.speciesPortal.data.rootDir+"/dictionaries/GBIF taxonomy-search-13208373774487451330519969730577/taxonomy-search-1320837377448.txt"
+		
+		Classification c = Classification.findByName(grailsApplication.config.speciesPortal.fields.GBIF_TAXONOMIC_HIERARCHY);
+		
 		List taxonEntries = new ArrayList();
 		new File(gbifTaxaFile).splitEachLine("\\t") { fields ->
-			String name = fields[2] + " " + fields[4];
+			String name = fields[12] + " " + fields[4];
 			String kingdom = fields[6];
 			String phylum = fields[7];
 			String klass = fields[8];
@@ -322,9 +318,22 @@ class TaxonService {
 			new Node(taxon1, "subcategory", "species")
 			new Node(taxon1, "data", name)
 			taxonEntries.add(taxon1)
-			
-			List<TaxonomyRegistry> registry = saveTaxonEntries(converter, taxonEntries, Classification.findByName(grailsApplication.config.speciesPortal.fields.GBIF_TAXONOMIC_HIERARCHY), "");
+
+			List<TaxonomyRegistry> registry = saveTaxonEntries(converter, taxonEntries, c, "");
 			taxonEntries.clear();
+			
+			def taxonConcept = converter.getTaxonConcept(registry, c);
+			
+			// populating gbif id
+			if(fields[13]) {
+				externalLinksService.updateExternalLink(taxonConcept, "gbif", String.valueOf((int) Float.parseFloat(fields[13])), false);
+			}
+			
+			taxonConcept = taxonConcept.merge();
+			if(!taxonConcept.save()) {
+				taxonConcept.errors.each { log.error it}
+			}
+			
 		}
 	}
 
@@ -332,33 +341,32 @@ class TaxonService {
 	 * 
 	 * @return
 	 */
-	def loadIBP() {
+	def loadIBP(String dbUrl, String userName, String password, String driverClass) {
 		NodeBuilder builder = NodeBuilder.newInstance();
 		XMLConverter converter = new XMLConverter();
 
-		List<Map> content;
 		def taxonEntries;
 
 		//ibp
-		def sql = Sql.newInstance("jdbc:postgresql://localhost:5432/ibp", "postgres", "postgres123", "org.postgresql.Driver");
+		def sql = Sql.newInstance(dbUrl, userName, password, driverClass);
 		sql.eachRow("select * from birdspecies_list") { row ->
 			String name = row.ibp_scientific_name;
 			taxonEntries = new ArrayList();
 
-			//iucn hierarchy
-			Node taxon1;
-			if(row.iucn_2010_family && !row.iucn_2010_family.equalsIgnoreCase("NA") && !row.iucn_2010_family.equalsIgnoreCase("null")) {
-				taxon1 = builder.createNode("field");
-				new Node(taxon1, "category", grailsApplication.config.speciesPortal.fields.IUCN_TAXONOMIC_HIERARCHY)
-				new Node(taxon1, "subcategory", "family")
-				new Node(taxon1, "data", row.iucn_2010_family)
-				taxonEntries.add(taxon1);
-			}
-			taxon1 = builder.createNode("field");
-			new Node(taxon1, "category", grailsApplication.config.speciesPortal.fields.IUCN_TAXONOMIC_HIERARCHY)
-			new Node(taxon1, "subcategory", "species")
-			new Node(taxon1, "data", name)
-			taxonEntries.add(taxon1);
+//			//iucn hierarchy
+//			Node taxon1;
+//			if(row.iucn_2010_family && !row.iucn_2010_family.equalsIgnoreCase("NA") && !row.iucn_2010_family.equalsIgnoreCase("null")) {
+//				taxon1 = builder.createNode("field");
+//				new Node(taxon1, "category", grailsApplication.config.speciesPortal.fields.IUCN_TAXONOMIC_HIERARCHY)
+//				new Node(taxon1, "subcategory", "family")
+//				new Node(taxon1, "data", row.iucn_2010_family)
+//				taxonEntries.add(taxon1);
+//			}
+//			taxon1 = builder.createNode("field");
+//			new Node(taxon1, "category", grailsApplication.config.speciesPortal.fields.IUCN_TAXONOMIC_HIERARCHY)
+//			new Node(taxon1, "subcategory", "species")
+//			new Node(taxon1, "data", name)
+//			taxonEntries.add(taxon1);
 
 			//wiki
 			if(row.wikipedia_nov2010_kingdom && !row.wikipedia_nov2010_kingdom.equalsIgnoreCase("NA") && !row.wikipedia_nov2010_kingdom.equalsIgnoreCase("null")) {
@@ -529,6 +537,7 @@ class TaxonService {
 			List<TaxonomyRegistry> registry = converter.getClassifications(taxonEntries, name);
 
 			def taxonConcept = converter.getTaxonConcept(registry,  Classification.findByName(grailsApplication.config.speciesPortal.fields.IUCN_TAXONOMIC_HIERARCHY));
+			
 
 			//synonyms
 			HashSet synonyms = new HashSet();
@@ -573,6 +582,130 @@ class TaxonService {
 	}
 
 	/**
+	 *
+	 * @return
+	 */
+	def loadIUCNRedList(String file, int sheetNo, int headerRowNo) {
+		NodeBuilder builder = NodeBuilder.newInstance();
+		XMLConverter converter = new XMLConverter();
+
+		List<TaxonomyDefinition> taxonEntries = [];
+		List<Map> content = SpreadsheetReader.readSpreadSheet(file, sheetNo, headerRowNo);
+
+		Classification c = Classification.findByName(grailsApplication.config.speciesPortal.fields.IUCN_TAXONOMIC_HIERARCHY);
+		
+		for (Map row : content) {
+			
+			String name = row.get("genus")+" "+row.get("species")+" "+row.get("authority")+" "+row.get("infraspecific rank")+" "+row.get("infraspecific name")+" "+row.get("infraspecific authority");
+			String kingdom = row.get("kingdom").toLowerCase().capitalize();
+			String phylum = row.get("phylum").toLowerCase().capitalize();
+			String klass = row.get("class").toLowerCase().capitalize();
+			String order = row.get("order").toLowerCase().capitalize();
+			String family = row.get("family").toLowerCase().capitalize();
+			String genus = row.get("genus");
+			
+			Node taxon1;
+			if(kingdom) {
+				taxon1 = builder.createNode("field");
+				new Node(taxon1, "subcategory", "kingdom")
+				new Node(taxon1, "data", kingdom)
+				taxonEntries.add(taxon1)
+			}
+
+			if(phylum) {
+				taxon1 = builder.createNode("field");
+				new Node(taxon1, "subcategory", "phylum")
+				new Node(taxon1, "data", phylum)
+				taxonEntries.add(taxon1)
+			}
+
+			if(klass) {
+				taxon1 = builder.createNode("field");
+				new Node(taxon1, "subcategory", "class")
+				new Node(taxon1, "data", klass)
+				taxonEntries.add(taxon1)
+			}
+
+			if(order) {
+				taxon1 = builder.createNode("field");
+				new Node(taxon1, "subcategory", "order")
+				new Node(taxon1, "data", order)
+				taxonEntries.add(taxon1)
+			}
+
+			if(family) {
+				taxon1 = builder.createNode("field");
+				new Node(taxon1, "subcategory", "family")
+				new Node(taxon1, "data", family)
+				taxonEntries.add(taxon1)
+			}
+
+			if(genus) {
+				taxon1 = builder.createNode("field");
+				new Node(taxon1, "subcategory", "genus")
+				new Node(taxon1, "data", genus)
+				taxonEntries.add(taxon1)
+			}
+
+			if(name) {
+				taxon1 = builder.createNode("field");
+				new Node(taxon1, "subcategory", "species")
+				new Node(taxon1, "data", name)
+				taxonEntries.add(taxon1)
+			}
+
+			List<TaxonomyRegistry> registry = saveTaxonEntries(converter, taxonEntries, c, name);
+			taxonEntries.clear();
+
+			def taxonConcept = converter.getTaxonConcept(registry, c);
+			
+			// populating threatened status 
+			if(row.get("red list status")) {
+				taxonConcept.threatenedStatus = row.get("red list status");
+				log.debug "Setting threatened status to "+taxonConcept.threatenedStatus
+//				if(!taxonConcept.save()) {
+//					taxonConcept.errors.each { log.error it}
+//				}
+			}
+			
+			// populating iucn id
+			if(row.get("species id")) {
+				externalLinksService.updateExternalLink(taxonConcept, "iucn", String.valueOf((int) Float.parseFloat(row.get("species id"))), false);
+			}
+			
+			taxonConcept = taxonConcept.merge();
+			if(!taxonConcept.save()) {
+				taxonConcept.errors.each { log.error it}	
+			}
+			
+			//synonyms
+			String synonyms = row.get("Synonyms")
+			if(synonyms) {
+				Node synonymsNode = builder.createNode("field");
+				synonyms.tokenize('|').each { syn ->
+					new Node(synonymsNode, "data", syn.trim());
+				}
+				converter.createSynonyms(synonymsNode, taxonConcept);
+			}
+
+
+			//commonnames
+			String commonNames = row.get("Common names (Eng)")
+			if(commonNames) {
+				Node commonNameNode = builder.createNode("field");
+				commonNames.tokenize(',').each { commonName ->
+					Node data = new Node(commonNameNode, "data", commonName.trim());
+					Node language = new Node(data, "language");
+					new Node(language, "name", "English");
+				}
+				converter.createCommonNames(commonNameNode, taxonConcept);
+			}
+			
+			
+		}
+	}
+
+	/**
 	 * 
 	 */
 	private List<TaxonomyRegistry> saveTaxonEntries(converter, List taxonEntries, Classification c, String name) {
@@ -582,6 +715,9 @@ class TaxonService {
 		//	e.save(flush:true);
 		//	e.errors.each { println it }
 		//}
+		if(!c.isAttached()) {
+			c.attach();
+		}
 		return registry;
 	}
 
@@ -589,14 +725,33 @@ class TaxonService {
 	 * Creates stub species pages for all taxonconcepts without one
 	 */
 	def createSpeciesStubs() {
-		def taxonConcepts = TaxonomyDefinition.findAll("from TaxonomyDefinition as taxonomyDefinition where taxonomyDefinition.rank = :speciesTaxonRank and not (taxonomyDefinition.id) in (select s.taxonConcept from Species as s)",[speciesTaxonRank:TaxonomyRank.SPECIES.ordinal()]);
+		log.debug "Creating stubs for species stubs for all taxon concepts with out one"
+		int notOfStubs = 0;
+
+		//TODO: hanging when result is null
+		def taxonConcepts = TaxonomyDefinition.findAll(
+			"from TaxonomyDefinition as taxonomyDefinition left outer join Species as s on s.taxonConcept = taxonomyDefinition where taxonomyDefinition.rank = :speciesTaxonRank and s.id is null",[speciesTaxonRank:TaxonomyRank.SPECIES.ordinal()]); 
+		//TaxonomyDefinition.executeQuery("select * from taxonomy_definition t left outer join species s on s.taxon_concept_id = t.id where s.id is null and t.rank = :speciesTaxonRank", [speciesTaxonRank:TaxonomyRank.SPECIES.ordinal()]);
+			
+		List<Species> s = [];
 		taxonConcepts.eachWithIndex { taxonConcept, index ->
-			speciesService.createSpeciesStub(taxonConcept);
-			if(index % BATCH_SIZE == 0) {
-				cleanUpGorm();
+			def species = speciesService.createSpeciesStub(taxonConcept);
+
+			Species existingSpecies = Species.findByTaxonConcept(taxonConcept);
+			if(!existingSpecies) {
+				s.add(species);
+			}
+
+			if(s.size() % BATCH_SIZE == 0) {
+				notOfStubs += speciesService.saveSpecies(s);
+				s.clear();
 			}
 		}
-		cleanUpGorm();
+
+		if(s) {
+			notOfStubs += speciesService.saveSpecies(s);
+			s.clear();
+		}
 	}
 
 	/**
