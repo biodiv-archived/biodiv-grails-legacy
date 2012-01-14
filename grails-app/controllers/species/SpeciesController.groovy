@@ -170,7 +170,7 @@ class SpeciesController {
 			for(category in concept.value) {
 				Map newCategoryMap = new LinkedHashMap();
 				//log.debug "Category : "+category
-				if(category.key.equals("field") || category.key.equals("speciesFieldInstance") )  {
+				if(category.key.equals("field") || category.key.equals("speciesFieldInstance") || category.key.equalsIgnoreCase('Species Resources'))  {
 					continue;
 				} else if(category.key.equals(config.OCCURRENCE_RECORDS) || category.key.equals(config.REFERENCES) ) {
 					boolean show = false;

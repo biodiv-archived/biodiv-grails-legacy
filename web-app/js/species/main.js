@@ -144,8 +144,8 @@ var getGoogleImages = function(imageSearch, page) {
 	if (page >= 8)
 		return;
 	imageSearch.gotoPage(page);
-	var gallery = Galleria.get(1); // gallery is now the first galleria
-	// instance
+	var galleries = Galleria.get();
+	var gallery = galleries[galleries.length -1]; // gallery is now the first galleria
 
 	imageSearch
 			.setSearchCompleteCallback(

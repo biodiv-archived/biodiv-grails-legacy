@@ -187,17 +187,19 @@ $(document).ready(function(){
 
 	
 	var flickr = new Galleria.Flickr();
-	flickr.tags('${speciesName}', function(data) {
-    	$('#gallery3').galleria({
-    		height:400,
-			carousel:true,
-			transition:'pulse',
-			image_pan_smoothness:5,
-			showInfo:true,
-			dataSource: data,
-			debug: false,
-			clicknext:true
-    	});
+	$("#flickrImages").click(function() {
+		flickr.tags('${speciesName}', function(data) {
+	    	$('#gallery3').galleria({
+	    		height:400,
+				carousel:true,
+				transition:'pulse',
+				image_pan_smoothness:5,
+				showInfo:true,
+				dataSource: data,
+				debug: false,
+				clicknext:true
+	    	});
+		});
 	});
 	
 	$("#googleImages").click(function() {
@@ -267,7 +269,7 @@ $(document).ready(function(){
   	//initializeCKEditor();	
   	// bind click event on delete buttons using jquery live
   	$('.del-reference').live('click', deleteReferenceHandler);
-  	if($("#resourceTabs-1 img").length == 1) {
+  	if($("#resourceTabs-1 img").length == 0) {
   		$("#flickrImages").click();
   	}
 });
@@ -346,36 +348,34 @@ $(document).ready(function(){
 				</div>
 				<br />
 				<!-- species page icons -->
-				<div class="grid_9 icons">
+				<div class="grid_10">
 
 							<div>
+							
 							<g:each in="${speciesInstance.getIcons()}" var="r">
-									<img class="icon" href="${href}"
+									<img class="group_icon" href="${href}"
 										src="${createLinkTo(dir: 'images/icons', file: r.fileName.trim(), absolute:true)}"
 										title="${r?.description}" />
 							</g:each>
-							
-							
-							
-							 <img class="group_icon species_group_icon" src="${createLinkTo(dir: 'images/group_icons', file: speciesInstance.taxonConcept.group?.name?.trim()?.replaceAll(/ /, '_')+".png", absolute:true)}" 
-							  title="${speciesInstance.taxonConcept.group?.name}"/>
-							  
-							  <g:if test="${speciesInstance.taxonConcept.threatenedStatus}">
-							  		<s:showThreatenedStatus model="['threatenedStatus':speciesInstance.taxonConcept.threatenedStatus]"/>
-							  </g:if>
-							</div>
-							
-							<div>
 							<g:each in="${speciesInstance.taxonConcept.externalLinks}" var="r">
 								<g:each in="${['eolId', 'iucnId']}" var="extLinkKey">
 									<g:if test="${r[extLinkKey]}">
 										<s:showExternalLink model="['key':extLinkKey, 'externalLinks':r, 'taxonConcept':speciesInstance.taxonConcept]"/>										
 									</g:if>	
 								</g:each>
-								<s:showExternalLink model="['key':'wikipedia', 'externalLinks':r, 'taxonConcept':speciesInstance.taxonConcept]"/>	
+									
 							</g:each>
+							<s:showExternalLink model="['key':'wikipedia', 'taxonConcept':speciesInstance.taxonConcept]"/>
+							
+							
+							 <img class="group_icon species_group_icon" src="${createLinkTo(dir: 'images/group_icons', file: speciesInstance.fetchSpeciesGroup()?.name?.trim()?.replaceAll(/ /, '_')+".png", absolute:true)}" 
+							  title="${speciesInstance.fetchSpeciesGroup()?.name}"/>
+							  
+							  <g:if test="${speciesInstance.taxonConcept.threatenedStatus}">
+							  		<s:showThreatenedStatus model="['threatenedStatus':speciesInstance.taxonConcept.threatenedStatus]"/>
+							  </g:if>
 							</div>
-				</div>
+					</div>
 				<div id="tagcloud"></div>
 
 			</div>
@@ -406,14 +406,17 @@ $(document).ready(function(){
 					</div>
 					<div class="ui-widget-content">
 						<table>
+						<tr class="prop">
+								<td><span class="grid_3 name">${grailsApplication.config.speciesPortal.fields.SCIENTIFIC_NAME }</span></td><td> ${speciesInstance.taxonConcept.italicisedForm}</td>
+						</tr>
 						<g:each in="${nameRecords}">
 							<tr class="prop">
-								<td><span class="grid_3 name">${it?.field?.subCategory} </span></td><td> ${speciesInstance.taxonConcept.italicisedForm}</td> 
+							 
 								<g:if test="${it?.field?.subCategory?.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.REFERENCES)}">
 									<td><span class="grid_3 name">${it?.field?.subCategory} </span></td> <td><a href="${it?.description}" target="_blank"> ${it?.description}</a></td>
 								</g:if> 
 								<g:elseif test="${it?.field?.subCategory?.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.GENERIC_SPECIFIC_NAME)}">
-									<td><span class="grid_3 name">${it?.field?.subCategory} </span> </td> <td>${it?.description}</td>
+									
 								</g:elseif> 
 								<g:elseif test="${it?.field?.subCategory?.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.SCIENTIFIC_NAME)}">
 									
@@ -441,7 +444,7 @@ $(document).ready(function(){
 						<table>
 						<g:each in="${synonyms}" var="synonym">
 						<tr><td class="prop">
-							<span class="grid_3 name">${synonym?.relationship?.value()} </span></td><td> <a class="speciesName" href="#"> ${synonym?.name} </a> </td></tr>
+							<span class="grid_3 name">${synonym?.relationship?.value()} </span></td><td> ${synonym?.name}  </td></tr>
 						</g:each>
 						</table>
 					</div>

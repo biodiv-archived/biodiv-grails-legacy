@@ -117,7 +117,7 @@
 										references = refs.values();
 										%>
 										<g:if test="${references }">
-											<ol>
+											<ol class="references">
 												<g:each in="${references}" var="r">
 													<li><g:if test="${r.url}">
 															<a href="${r.url}" target="_blank"> ${r.title?r.title:r.url}
@@ -157,29 +157,7 @@
 									</div>
 
 								</g:if>
-								<g:elseif
-									test="${category.key.equalsIgnoreCase('Species Resources')}">
-									<ol>
-										<g:collect in="${category.value}"
-											expr="${it.value.get('speciesFieldInstance')}">
-											<g:if test="${it?.description }">
-												<li><a href="${it?.description}" target="_blank"> <g:if
-															test="${it?.resources?.size()>0}">
-															<g:each in="${it.resources}" var="r">
-																<g:if
-																	test="${r.type == species.Resource.ResourceType.ICON}">
-																	<img class="icon"
-																		src="${createLinkTo(dir: 'images/icons', file:r.fileName.trim(), absolute:true)}" />
-																</g:if>
-															</g:each>
-														</g:if> ${it?.field?.subCategory} </a>
-												</li>
-												<br />
-											</g:if>
-										</g:collect>
-									</ol>
 
-								</g:elseif>
 								<g:elseif
 									test="${category.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.TAXON_RECORD_NAME)}">
 									<!-- ignore -->

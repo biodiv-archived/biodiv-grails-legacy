@@ -8,9 +8,14 @@
 <link rel="stylesheet" type="text/css" media="all"
 	href="${resource(dir:'css',file:'jquery-ui.css', absolute:true)}" />
 
-<r:require module="jquery-ui" />
+<!-- r:require module="jquery-ui" /-->
 
-<r:layoutResources />
+<!-- r:layoutResources /-->
+<!-- sNav:resources override="true" /-->
+
+<script src="${resource(dir:'plugins',file:'jquery-1.7/js/jquery/jquery-1.7.min.js', absolute:true)}" type="text/javascript" ></script>
+<script src="${resource(dir:'plugins',file:'jquery-ui-1.8.15/jquery-ui/js/jquery-ui-1.8.15.custom.min.js', absolute:true)}" type="text/javascript" ></script>
+
 <link rel="stylesheet" type="text/css" media="screen"
 	href="${resource(dir:'js/jquery/jquery.jqGrid-4.1.2/css',file:'ui.jqgrid.css', absolute:true)}" />
 
@@ -22,7 +27,7 @@
 	href="${resource(dir:'css',file:'text.css', absolute:true)}" />
 <link rel="stylesheet" type="text/css" media="all"
 	href="${resource(dir:'css',file:'960.css', absolute:true)}" />
-<sNav:resources override="true" />
+
 <link rel="stylesheet"
 	href="${resource(dir:'css',file:'main.css', absolute:true)}" />
 <link rel="stylesheet" type="text/css"

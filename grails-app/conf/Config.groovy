@@ -77,7 +77,7 @@ log4j = {
 			'org.codehaus.groovy.grails.commons', // core / classloading
 			'org.codehaus.groovy.grails.plugins', // plugins
 			'org.codehaus.groovy.grails.orm.hibernate', // hibernate integration
-
+			'org.springframework.security',
 			'org.hibernate',
 			'net.sf.ehcache.hibernate'
 
@@ -85,7 +85,7 @@ log4j = {
 			'org.grails.plugin.resource'
 	debug	'species',
 			'speciespage',
-			'org.springframework.security',
+
 			'grails.app'
 
 }
@@ -190,8 +190,7 @@ speciesPortal {
 		//serverURL = "http://localhost/${appName}/observations"
 	}
 
-	names.parser.serverURL = "saturn.strandls.com"
-	//names.parser.serverURL = "127.0.0.1"
+	//names.parser.serverURL = "saturn.strandls.com"
 	names.parser.port = 4334
 	search {
 		serverURL = "http://localhost:8090/solr/species"
@@ -331,6 +330,7 @@ environments {
 		grails.serverURL = "http://localhost:8080/${appName}"
 		speciesPortal { search.serverURL = "http://localhost:8090/solr/species" }
 		google.analytics.enabled = false
+		names.parser.serverURL = "127.0.0.1"
 	}
 	test {
 		grails.serverURL = "http://localhost:8080/${appName}"

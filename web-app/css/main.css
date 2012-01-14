@@ -19,6 +19,10 @@ body {
 	/*background-color: #f7f7f7;*/
 }
 
+.ui-widget {
+    font : 15px/1.5 Georgia, "Times New Roman", Times, serif;
+}
+
 h1 {
 	padding: 10px;
 	margin: 10px;
@@ -397,6 +401,7 @@ th.name {
 
 .speciesField {
 	padding: 0px 10px;
+	overflow:hidden;
 }
 
 .icon {
@@ -789,7 +794,7 @@ html.busy,html.busy * {
 }
 
 #resourceTabs {
-	border: 0;
+/* 	border: 0; */
 }
 
 #resourceTabs ul {
@@ -915,8 +920,8 @@ textarea#notes {
 
 .group_icon {
 	border: 1px solid #666666;
-	border-radius: 7px;
-	background-color: #666666;
+/* 	border-radius: 7px; */
+/* 	background-color: #666666; */
 }
 
 .species_group_icon {
@@ -933,3 +938,13 @@ textarea#notes {
 
 .category-header-heading {
 	border:none;
+}
+
+.references {
+	padding : 0px 30px;
+}
+
+.attributionBlock  a, .references  a {
+	color:#12C;
+	cursor:pointer;
+}

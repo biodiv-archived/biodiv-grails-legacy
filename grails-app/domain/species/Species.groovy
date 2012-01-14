@@ -53,7 +53,7 @@ class Species {
 		if(reprImage && (new File(grailsApplication.config.speciesPortal.resources.rootDir+reprImage.fileName.trim())).exists()) {
 			return reprImage;			
 		} else {
-			SpeciesGroup group = this.taxonConcept.group?:SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.OTHERS)
+			SpeciesGroup group = fetchSpeciesGroup();
 			String name = group.name?.trim()?.replaceAll(/ /, '_')
 			return new Resource(fileName:"group_icons/${name ? name+'.png': '../no-image.jpg'}", type:ResourceType.IMAGE, title:"You can contribute!!!");
 		}
@@ -78,7 +78,7 @@ class Species {
 		def icons = new ArrayList<Resource>();
 		resources.each {
 			if(it?.type == species.Resource.ResourceType.ICON) {
-				images.add(it);
+				icons.add(it);
 			}
 		}
 		return icons;
@@ -98,4 +98,7 @@ class Species {
 		return f?.description;
 	}
 	
+	SpeciesGroup fetchSpeciesGroup() {
+		return this.taxonConcept.group?:SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.OTHERS); 
+	}
 }
