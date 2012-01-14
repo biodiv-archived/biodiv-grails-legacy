@@ -357,7 +357,7 @@ $(document).ready(function(){
 							
 							
 							
-							 <img class="group_icon species_group_icon" src="${createLinkTo(dir: 'images/group_icons', file: speciesInstance.taxonConcept.group?.name?.trim().replaceAll(/ /, '_')+".png", absolute:true)}" 
+							 <img class="group_icon species_group_icon" src="${createLinkTo(dir: 'images/group_icons', file: speciesInstance.taxonConcept.group?.name?.trim()?.replaceAll(/ /, '_')+".png", absolute:true)}" 
 							  title="${speciesInstance.taxonConcept.group?.name}"/>
 							  
 							  <g:if test="${speciesInstance.taxonConcept.threatenedStatus}">

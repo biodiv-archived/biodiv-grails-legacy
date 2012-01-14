@@ -3,6 +3,7 @@ package species
 import org.apache.commons.logging.LogFactory;
 import org.codehaus.groovy.grails.commons.ConfigurationHolder;
 
+import species.Resource;
 import species.Resource.ResourceType;
 import species.groups.SpeciesGroup;
 
@@ -52,7 +53,6 @@ class Species {
 		if(reprImage && (new File(grailsApplication.config.speciesPortal.resources.rootDir+reprImage.fileName.trim())).exists()) {
 			return reprImage;			
 		} else {
-		println grailsApplication.config.speciesPortal.group.OTHERS
 			SpeciesGroup group = this.taxonConcept.group?:SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.OTHERS)
 			String name = group.name?.trim()?.replaceAll(/ /, '_')
 			return new Resource(fileName:"group_icons/${name ? name+'.png': '../no-image.jpg'}", type:ResourceType.IMAGE, title:"You can contribute!!!");

@@ -30,10 +30,10 @@ class TaxonService {
 	 * @return
 	 */
 	def loadTaxon(boolean createSpeciesStubsFlag) {
-				loadFlowersOfIndia(grailsApplication.config.speciesPortal.data.rootDir+"/dictionaries/FlowersByBotanicalNames.xls", 0, 0);
-				loadFishBase(grailsApplication.config.speciesPortal.data.rootDir+"/dictionaries/fishbase_30_11_2011.xls", 0, 0);
-				loadGBIF(grailsApplication.config.speciesPortal.data.rootDir+"/dictionaries/GBIF taxonomy-search-13208373774487451330519969730577/taxonomy-search-1320837377448.txt");
-				loadEFlora(grailsApplication.config.speciesPortal.data.rootDir+"/dictionaries/eflora_data_CN.xlsx", 0, 0);
+//				loadFlowersOfIndia(grailsApplication.config.speciesPortal.data.rootDir+"/dictionaries/FlowersByBotanicalNames.xls", 0, 0);
+//				loadFishBase(grailsApplication.config.speciesPortal.data.rootDir+"/dictionaries/fishbase_30_11_2011.xls", 0, 0);
+//				loadGBIF(grailsApplication.config.speciesPortal.data.rootDir+"/dictionaries/GBIF taxonomy-search-13208373774487451330519969730577/taxonomy-search-1320837377448.txt");
+//				loadEFlora(grailsApplication.config.speciesPortal.data.rootDir+"/dictionaries/eflora_data_CN.xlsx", 0, 0);
 //				loadIBP("jdbc:postgresql://localhost:5432/ibp", "postgres", "postgres123", "org.postgresql.Driver");
 				loadIUCNRedList(grailsApplication.config.speciesPortal.data.rootDir+"/dictionaries/IUCNRedList-India-12-01-2012.xlsx", 0, 0);
 				cleanUpGorm();
@@ -82,7 +82,10 @@ class TaxonService {
 			List<TaxonomyRegistry> registry = saveTaxonEntries(converter, taxonEntries, c, name);
 
 			def taxonConcept = converter.getTaxonConcept(registry, c);
-
+			if(!taxonConcept.isAttached()) {
+				taxonConcept.attach();
+			}
+			
 			//synonyms
 			Node synonymsNode = builder.createNode("field");
 			synonyms.tokenize(',').each { syn ->
@@ -140,7 +143,10 @@ class TaxonService {
 			List<TaxonomyRegistry> registry = saveTaxonEntries(converter, taxonEntries, c, name);
 
 			def taxonConcept = converter.getTaxonConcept(registry, c);
-
+			if(!taxonConcept.isAttached()) {
+				taxonConcept.attach();
+			}
+			
 			//synonyms
 			Node synonymsNode = builder.createNode("field");
 			synonyms.tokenize(',').each { syn ->
@@ -240,7 +246,10 @@ class TaxonService {
 			List<TaxonomyRegistry> registry = saveTaxonEntries(converter, taxonEntries, c, name);
 
 			def taxonConcept = converter.getTaxonConcept(registry, c);
-
+			if(!taxonConcept.isAttached()) {
+				taxonConcept.attach();
+			}
+			
 			//commonnames
 			Node commonNameNode = builder.createNode("field");
 			commonName.split(',').each { part ->
@@ -323,6 +332,9 @@ class TaxonService {
 			taxonEntries.clear();
 			
 			def taxonConcept = converter.getTaxonConcept(registry, c);
+			if(!taxonConcept.isAttached()) {
+				taxonConcept.attach();
+			}
 			
 			// populating gbif id
 			if(fields[13]) {
@@ -537,7 +549,9 @@ class TaxonService {
 			List<TaxonomyRegistry> registry = converter.getClassifications(taxonEntries, name);
 
 			def taxonConcept = converter.getTaxonConcept(registry,  Classification.findByName(grailsApplication.config.speciesPortal.fields.IUCN_TAXONOMIC_HIERARCHY));
-			
+			if(!taxonConcept.isAttached()) {
+				taxonConcept.attach();
+			}
 
 			//synonyms
 			HashSet synonyms = new HashSet();
@@ -658,6 +672,9 @@ class TaxonService {
 			taxonEntries.clear();
 
 			def taxonConcept = converter.getTaxonConcept(registry, c);
+			if(!taxonConcept.isAttached()) {
+				taxonConcept.attach();
+			}
 			
 			// populating threatened status 
 			if(row.get("red list status")) {

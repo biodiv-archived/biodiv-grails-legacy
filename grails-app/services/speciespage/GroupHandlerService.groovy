@@ -216,9 +216,6 @@ class GroupHandlerService {
 	private SpeciesGroup getGroupByMapping(TaxonomyDefinition taxonConcept) {
 		SpeciesGroup group;
 		speciesGroupMappings.each { mapping ->
-			if(!mapping.isAttached()) {
-				mapping.attach();
-			}
 			if((taxonConcept.name.trim().equals(mapping.taxonName)) && taxonConcept.rank == mapping.rank) {
 				group = mapping.speciesGroup;
 			}
@@ -255,7 +252,11 @@ class GroupHandlerService {
 			log.debug "Flushing and clearing session"
 			hibSession.flush()
 			hibSession.clear()
-			speciesGroupMappings = SpeciesGroupMapping.listOrderByRank('desc');
+			speciesGroupMappings.each { mapping ->
+				if(!mapping.isAttached()) {
+					mapping.attach();
+				}
+			}			
 		}
 	}
 }
