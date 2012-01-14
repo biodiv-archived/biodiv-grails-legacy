@@ -190,7 +190,7 @@ speciesPortal {
 		//serverURL = "http://localhost/${appName}/observations"
 	}
 
-	//names.parser.serverURL = "saturn.strandls.com"
+	names.parser.serverURL = "saturn.strandls.com"
 	names.parser.port = 4334
 	search {
 		serverURL = "http://localhost:8090/solr/species"
@@ -328,9 +328,12 @@ jpegOptimProg = "/usr/local/bin/jpegoptim";
 environments {
 	development {
 		grails.serverURL = "http://localhost:8080/${appName}"
-		speciesPortal { search.serverURL = "http://localhost:8090/solr/species" }
+		speciesPortal { 
+			search.serverURL = "http://localhost:8090/solr/species"
+			names.parser.serverURL = "127.0.0.1"
+		}		
 		google.analytics.enabled = false
-		names.parser.serverURL = "127.0.0.1"
+		
 	}
 	test {
 		grails.serverURL = "http://localhost:8080/${appName}"
