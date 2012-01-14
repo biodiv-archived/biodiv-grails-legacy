@@ -191,7 +191,7 @@ speciesPortal {
 	}
 
 	names.parser.serverURL = "saturn.strandls.com"
-	names.parser.serverURL = "127.0.0.1"
+	//names.parser.serverURL = "127.0.0.1"
 	names.parser.port = 4334
 	search {
 		serverURL = "http://localhost:8090/solr/species"
