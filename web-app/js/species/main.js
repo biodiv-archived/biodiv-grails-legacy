@@ -152,12 +152,13 @@ var getGoogleImages = function(imageSearch, page) {
 					this,
 					function() {
 						for ( var i = 0; i < imageSearch.results.length; i++) {
+							var url = imageSearch.results[i].url.replace(/%2520/g, " ")
 							gallery
 									.push({
-										image : imageSearch.results[i].url,
+										image : url,
 										title : imageSearch.results[i].titleNoFormatting,
 										description : "<div class='notes'><a href="
-												+ imageSearch.results[i].url
+												+ url
 												+ " target='_blank'><b>View image source</b> </a></div>"
 									})
 						}

@@ -62,7 +62,8 @@
 
 <g:javascript src="galleria/1.2.6/galleria-1.2.6.min.js"
 	base="${grailsApplication.config.grails.serverURL+'/js/'}" />
-<g:javascript src="galleria/1.2.6/plugins/flickr/galleria.flickr.min.js"></g:javascript>
+<g:javascript src="galleria/1.2.6/plugins/flickr/galleria.flickr.min.js"
+base="${grailsApplication.config.grails.serverURL+'/js/'}"></g:javascript>
 
 <g:javascript src="jquery.collapser/jquery.collapser.min.js"
 	base="${grailsApplication.config.grails.serverURL+'/js/'}" />
@@ -189,16 +190,21 @@ $(document).ready(function(){
 	var flickr = new Galleria.Flickr();
 	$("#flickrImages").click(function() {
 		flickr.tags('${speciesName}', function(data) {
-	    	$('#gallery3').galleria({
-	    		height:400,
-				carousel:true,
-				transition:'pulse',
-				image_pan_smoothness:5,
-				showInfo:true,
-				dataSource: data,
-				debug: false,
-				clicknext:true
-	    	});
+			if(data.length) {
+		    	$('#gallery3').galleria({
+		    		height:400,
+					carousel:true,
+					transition:'pulse',
+					image_pan_smoothness:5,
+					showInfo:true,
+					dataSource: data,
+					debug: false,
+					clicknext:true
+		    	});
+	    	} else {
+	    		$("#resourceTabs").tabs("remove", 0);
+		  		$("#googleImages").click();
+	    	}
 		});
 	});
 	
@@ -272,6 +278,8 @@ $(document).ready(function(){
   	if($("#resourceTabs-1 img").length == 0) {
   		$("#flickrImages").click();
   	}
+  	
+  	
 });
 
 </g:javascript>
@@ -321,8 +329,7 @@ $(document).ready(function(){
 					<div id="resourceTabs-3">
 						
 						<div id="gallery3"></div>
-						<div id="flickrBranding"></div>
-						<div id="googleBranding"></div><br/>
+						<div id="flickrBranding"></div><br/>
 						<div class="message ui-corner-all">This portal is not
 							responsible for the accuracy or completeness of data presented at
 							other web sites.</div>

@@ -300,7 +300,9 @@ class TaxonService {
 		Classification c = Classification.findByName(grailsApplication.config.speciesPortal.fields.GBIF_TAXONOMIC_HIERARCHY);
 		
 		List taxonEntries = new ArrayList();
+		int i=0;
 		new File(gbifTaxaFile).splitEachLine("\\t") { fields ->
+			if(i++>0) {
 			String name = fields[12] + " " + fields[4];
 			String kingdom = fields[6];
 			String phylum = fields[7];
@@ -356,6 +358,7 @@ class TaxonService {
 				taxonConcept.errors.each { log.error it}
 			}
 			cleanUpGorm();
+			}
 		}
 	}
 
@@ -759,10 +762,11 @@ class TaxonService {
 		int notOfStubs = 0;
 
 		//TODO: hanging when result is null
-		def taxonConcepts = TaxonomyDefinition.findAll(
-			"from TaxonomyDefinition as taxonomyDefinition left outer join Species as s on s.taxonConcept = taxonomyDefinition where taxonomyDefinition.rank = :speciesTaxonRank and s.id is null",[speciesTaxonRank:TaxonomyRank.SPECIES.ordinal()]); 
+//		def taxonConcepts = TaxonomyDefinition.findAll(
+//			"from TaxonomyDefinition as taxonomyDefinition left outer join Species as s on s.taxonConcept = taxonomyDefinition where taxonomyDefinition.rank = :speciesTaxonRank and s.id is null",[speciesTaxonRank:TaxonomyRank.SPECIES.ordinal()]); 
 		//TaxonomyDefinition.executeQuery("select * from taxonomy_definition t left outer join species s on s.taxon_concept_id = t.id where s.id is null and t.rank = :speciesTaxonRank", [speciesTaxonRank:TaxonomyRank.SPECIES.ordinal()]);
-			
+		def taxonConcepts = TaxonomyDefinition.findAll("from TaxonomyDefinition as taxonomyDefinition where taxonomyDefinition.rank = :speciesTaxonRank and not (taxonomyDefinition.id) in (select s.taxonConcept from Species as s)",[speciesTaxonRank:TaxonomyRank.SPECIES.ordinal()]);
+		
 		List<Species> s = [];
 		taxonConcepts.eachWithIndex { taxonConcept, index ->
 			def species = speciesService.createSpeciesStub(taxonConcept);
