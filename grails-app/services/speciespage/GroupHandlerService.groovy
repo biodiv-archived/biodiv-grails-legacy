@@ -21,7 +21,7 @@ class GroupHandlerService {
 	def grailsApplication
 	def sessionFactory
 
-	static int GROUP_UPDATION_BATCH = 20;
+	static int BATCH_SIZE = 20;
 
 	def speciesGroupMappings;
 
@@ -90,36 +90,44 @@ class GroupHandlerService {
 	int updateGroups() {
 		int noOfUpdations = 0;
 		int offset = 0;
-		int limit = GROUP_UPDATION_BATCH;
-		int noOfFailures = 0;
+		int limit = 50000;
 		
 		def taxonConcepts;
 		
 		long startTime = System.currentTimeMillis();
+		int count = 0;
+		
 		while(true) {
-			taxonConcepts = TaxonomyDefinition.findAll("from TaxonomyDefinition as t where t.rank = :rank and t.group is null",
+			taxonConcepts = TaxonomyDefinition.findAll("from TaxonomyDefinition as t where t.rank = :rank",
 					[rank: TaxonomyRank.SPECIES.ordinal()], [max:limit, offset:offset]);
-			
-			if(!taxonConcepts) break;
+			if(!taxonConcepts){				
+				 break;
+			}
 			
 			taxonConcepts.each { taxonConcept ->
-				if(updateGroup(taxonConcept)) {
-					noOfUpdations ++;
-				} else {
-					noOfFailures++;
+				println taxonConcept;
+				if(!taxonConcept.group && updateGroup(taxonConcept)) {
+					count ++;
 				}
 			}
 			
-			offset = noOfFailures; 
-			cleanUpGorm();
-			log.debug "Updated group for taxonConcepts ${noOfUpdations}"
-		}
-
-		if(noOfUpdations) {
-			cleanUpGorm();
-			log.debug "Updated group for taxonConcepts ${noOfUpdations} in total"
+			
+			if(count && count == BATCH_SIZE) {
+				cleanUpGorm();
+				noOfUpdations += count;
+				count = 0;
+				log.debug "Updated group for taxonConcepts ${noOfUpdations}"
+			}
+			offset += limit;
 		}
 		
+
+		if(count) {
+			cleanUpGorm();
+			noOfUpdations += count;
+		}
+		
+		log.debug "Updated group for taxonConcepts ${noOfUpdations} in total"
 		log.debug "Time taken to update groups for taxonConcepts ${noOfUpdations} is ${System.currentTimeMillis()-startTime}(msec)";
 		return noOfUpdations;
 	}
@@ -137,7 +145,7 @@ class GroupHandlerService {
 			if(updateGroup(s.taxonConcept)) {
 				noOfUpdations ++;
 			}
-			if(noOfUpdations % GROUP_UPDATION_BATCH == 0) {
+			if(noOfUpdations % BATCH_SIZE == 0) {
 				cleanUpGorm();
 			}
 		}
@@ -164,7 +172,7 @@ class GroupHandlerService {
 	 * @return
 	 */
 	boolean updateGroup(TaxonomyDefinition taxonConcept, SpeciesGroup group) {
-		//log.debug "Updating group associations for taxon concept : "+taxonConcept;
+		log.debug "Updating group associations for taxon concept : "+taxonConcept;
 		int noOfUpdations = 0;
 
 		if(taxonConcept && group) {

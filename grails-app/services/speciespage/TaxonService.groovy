@@ -36,11 +36,12 @@ class TaxonService {
 				loadEFlora(grailsApplication.config.speciesPortal.data.rootDir+"/dictionaries/eflora_data_CN.xlsx", 0, 0);
 //				loadIBP("jdbc:postgresql://localhost:5432/ibp", "postgres", "postgres123", "org.postgresql.Driver");
 				loadIUCNRedList(grailsApplication.config.speciesPortal.data.rootDir+"/dictionaries/IUCNRedList-India-12-01-2012.xlsx", 0, 0);
+				loadKeystone(grailsApplication.config.speciesPortal.data.rootDir+"/dictionaries/Keystone_v1.xls", 0, 0);
 				cleanUpGorm();
-//		
-//		//		groupHandlerService.updateGroups();
-//		//		namesLoaderService.syncNamesAndRecos(false);
-//		//
+		
+		//		groupHandlerService.updateGroups();
+		//		namesLoaderService.syncNamesAndRecos(false);
+
 				if(createSpeciesStubsFlag) {
 					createSpeciesStubs();
 				}
@@ -192,69 +193,11 @@ class TaxonService {
 		def c = Classification.findByName(grailsApplication.config.speciesPortal.fields.FISHBASE_TAXONOMIC_HIERARCHY)
 		for (Map row : content) {
 			String name = row.get("species");
-			String author = row.get("author");
-			String kingdom = row.get("kingdom")
-			String phylum = row.get("phylum")
-			String klass = row.get("class")
-			String order = row.get("order")
-			String family = row.get("family")
-			String genus = row.get("genus")
 			String commonName = row.get("common names")
-
-			List taxonEntries = new ArrayList();
-			Node taxon1
-			if(kingdom) {
-				taxon1 = builder.createNode("field");
-				new Node(taxon1, "subcategory", "kingdom")
-				new Node(taxon1, "data", kingdom)
-				taxonEntries.add(taxon1);
-			}
-
-			if(phylum) {
-				taxon1 = builder.createNode("field");
-				new Node(taxon1, "subcategory", "phylum")
-				new Node(taxon1, "data", phylum)
-				taxonEntries.add(taxon1);
-			}
-
-			if(klass) {
-				taxon1 = builder.createNode("field");
-				new Node(taxon1, "subcategory", "class")
-				new Node(taxon1, "data", klass)
-				taxonEntries.add(taxon1);
-			}
-
-			if(order) {
-				taxon1 = builder.createNode("field");
-				new Node(taxon1, "subcategory", "order")
-				new Node(taxon1, "data", order)
-				taxonEntries.add(taxon1);
-			}
-
-			if(family) {
-				taxon1 = builder.createNode("field");
-				new Node(taxon1, "subcategory", "family")
-				new Node(taxon1, "data", family)
-				taxonEntries.add(taxon1);
-			}
-
-			if(genus) {
-				taxon1 = builder.createNode("field");
-				new Node(taxon1, "subcategory", "family")
-				new Node(taxon1, "data", genus)
-				taxonEntries.add(taxon1);
-			}
 			
-			if(name) {
-				taxon1 = builder.createNode("field");
-				new Node(taxon1, "subcategory", "species")
-				new Node(taxon1, "data", name+" "+author)
-				taxonEntries.add(taxon1);
-			}
-
-			
+			def taxonEntries = getTaxonNodes(builder, row);
 			List<TaxonomyRegistry> registry = saveTaxonEntries(converter, taxonEntries, c, name);
-
+			
 			def taxonConcept = converter.getTaxonConcept(registry, c);
 			if(!taxonConcept.isAttached()) {
 				taxonConcept.attach();
@@ -288,6 +231,71 @@ class TaxonService {
 
 	}
 
+	private List getTaxonNodes(NodeBuilder builder, Map row) {
+		String name = row.get("species") +" "+ (row.get("author")?:"");
+		String kingdom = row.get("kingdom").toLowerCase().capitalize()
+		String phylum = row.get("phylum").toLowerCase().capitalize()
+		String klass = row.get("class").toLowerCase().capitalize()
+		String order = row.get("order").toLowerCase().capitalize()
+		String family = row.get("family").toLowerCase().capitalize()
+		String genus = row.get("genus").toLowerCase().capitalize()
+		
+
+		List taxonEntries = new ArrayList();
+		Node taxon1
+		if(kingdom) {
+			taxon1 = builder.createNode("field");
+			new Node(taxon1, "subcategory", "kingdom")
+			new Node(taxon1, "data", kingdom)
+			taxonEntries.add(taxon1);
+		}
+
+		if(phylum) {
+			taxon1 = builder.createNode("field");
+			new Node(taxon1, "subcategory", "phylum")
+			new Node(taxon1, "data", phylum)
+			taxonEntries.add(taxon1);
+		}
+
+		if(klass) {
+			taxon1 = builder.createNode("field");
+			new Node(taxon1, "subcategory", "class")
+			new Node(taxon1, "data", klass)
+			taxonEntries.add(taxon1);
+		}
+
+		if(order) {
+			taxon1 = builder.createNode("field");
+			new Node(taxon1, "subcategory", "order")
+			new Node(taxon1, "data", order)
+			taxonEntries.add(taxon1);
+		}
+
+		if(family) {
+			taxon1 = builder.createNode("field");
+			new Node(taxon1, "subcategory", "family")
+			new Node(taxon1, "data", family)
+			taxonEntries.add(taxon1);
+		}
+
+		if(genus) {
+			taxon1 = builder.createNode("field");
+			new Node(taxon1, "subcategory", "family")
+			new Node(taxon1, "data", genus)
+			taxonEntries.add(taxon1);
+		}
+		
+		if(name) {
+			taxon1 = builder.createNode("field");
+			new Node(taxon1, "subcategory", "species")
+			new Node(taxon1, "data", name.trim())
+			taxonEntries.add(taxon1);
+		}
+
+		
+		return taxonEntries;
+
+	}
 	/**
 	 * 
 	 * @return
@@ -736,6 +744,26 @@ class TaxonService {
 			
 			
 		}
+	}
+	
+		/**
+	 * 
+	 * @return
+	 */
+	def loadKeystone(String file, int sheetNo, int headerRowNo) {
+		NodeBuilder builder = NodeBuilder.newInstance();
+		XMLConverter converter = new XMLConverter();
+
+		int i=0;
+		List<Map> content = SpreadsheetReader.readSpreadSheet(file, sheetNo, headerRowNo);
+		def c = Classification.findByName(grailsApplication.config.speciesPortal.fields.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY)
+		for (Map row : content) {
+			String name = row.get("species");
+			def taxonEntries = getTaxonNodes(builder, row);
+			List<TaxonomyRegistry> registry = saveTaxonEntries(converter, taxonEntries, c, name);
+			cleanUpGorm();
+		}
+
 	}
 
 	/**

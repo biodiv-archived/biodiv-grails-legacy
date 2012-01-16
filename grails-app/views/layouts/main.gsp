@@ -108,6 +108,7 @@ jQuery(document).ready(function($) {
 	<div id="species_main_wrapper">
 		<div id="fb-root"></div>
 		<script>
+		/*
 		  window.fbAsyncInit = function() {
 		    FB.init({
 		      appId      : '308606395828381', // App ID
@@ -127,6 +128,7 @@ jQuery(document).ready(function($) {
 		     js.src = "//connect.facebook.net/en_US/all.js";
 		     d.getElementsByTagName('head')[0].appendChild(js);
 		   }(document));
+		  */
 		</script>
 		<div class="container_12">
 			<div id="menu" class="grid_12 ui-corner-all">

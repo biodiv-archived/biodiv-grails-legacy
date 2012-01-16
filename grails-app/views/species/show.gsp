@@ -63,7 +63,7 @@
 <g:javascript src="galleria/1.2.6/galleria-1.2.6.min.js"
 	base="${grailsApplication.config.grails.serverURL+'/js/'}" />
 <g:javascript src="galleria/1.2.6/plugins/flickr/galleria.flickr.min.js"
-base="${grailsApplication.config.grails.serverURL+'/js/'}"></g:javascript>
+	base="${grailsApplication.config.grails.serverURL+'/js/'}"></g:javascript>
 
 <g:javascript src="jquery.collapser/jquery.collapser.min.js"
 	base="${grailsApplication.config.grails.serverURL+'/js/'}" />
