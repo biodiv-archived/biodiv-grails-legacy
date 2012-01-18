@@ -47,6 +47,7 @@ class DataController {
 			classSystem = null;
 		}
 
+		long startTime = System.currentTimeMillis();
 		def rs = new ArrayList<GroovyRowResult>();
 		if(expandSpecies) {
 			def taxonIds = getSpeciesHierarchyTaxonIds(speciesid, classSystem)
@@ -54,7 +55,7 @@ class DataController {
 		} else {
 			getHierarchyNodes(rs, level, level+3, parentId, classSystem, expandAll, expandSpecies, null);
 		}
-		log.debug "Building taxon hierarchy tree"
+		log.debug "Time taken to build hierarchy : ${(System.currentTimeMillis()- startTime)/1000}(sec)"
 		render(contentType: "text/xml", text:buildHierarchyResult(rs, classSystem))
 	}
 
@@ -134,7 +135,7 @@ class DataController {
 				rs = sql.rows(sqlStr)
 			}
 		}
-		log.debug "Time taken to execute taxon hierarchy query : ${(System.currentTimeMillis()- startTime)/1000}(msec)"
+		log.debug "Time taken to execute taxon hierarchy query : ${(System.currentTimeMillis()- startTime)/1000}(sec)"
 		log.debug "SQL for taxon hierarchy : "+sqlStr;
 		rs.each { r ->
 			r.put('expanded', false);

@@ -40,11 +40,15 @@ class Species {
 	}
 
 	Resource mainImage() {  
-		if(!reprImage) { 
-			def images = getImages();
-			reprImage = images ? images[0]:null;
-			if(reprImage && !reprImage.fileName.equals("no-image.jpg")) {
-				if(!this.save()) {
+		if(!reprImage) {
+			log.debug "Saving representative image for species"; 
+			def images = this.getImages();
+			this.reprImage = images ? images[0]:null;
+			println images
+			println '----------'
+			println reprImage
+			if(reprImage) {
+				if(!this.save(flush:true)) {
 					this.errors.each { log.error it }
 				}
 			}			
@@ -59,8 +63,12 @@ class Species {
 
 	List<Resource> getImages() { 
 		List<Resource> images = new ArrayList<Resource>();
+		
+		if(reprImage) {
+			images.add(reprImage);
+		}
 		resources.each { resource ->
-			if(resource.type == species.Resource.ResourceType.IMAGE) {
+			if(resource.type == species.Resource.ResourceType.IMAGE && resource.id != reprImage?.id) {
 				images.add(resource);
 			}
 		};

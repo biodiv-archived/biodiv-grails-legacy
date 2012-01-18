@@ -49,7 +49,7 @@ $(document).ready(function() {
 	});
 	 $('#cInfo').html($("#c-"+$('#taxaHierarchy option:selected').val()).html());
 	$('.ui-jqgrid-hdiv').hide();
-	$('#taxonHierarchy').parents('div.ui-jqgrid-bdiv').css("max-height","450px");
+	$('#taxonHierarchy').parents('div.ui-jqgrid-bdiv').css("max-height","425px");
 });
 
 var heirarchyLevelFormatter = function(el, cellVal, opts) {

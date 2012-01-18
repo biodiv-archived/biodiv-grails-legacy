@@ -102,6 +102,9 @@ $(document).ready(function(){
 	});
 
 	if($("#resourceTabs-1 img").length > 0) {
+	
+		
+	
 		//TODO:load gallery  images by ajax call getting response in json  
 		$('#gallery1').galleria({
 			height : 400,
@@ -121,16 +124,9 @@ $(document).ready(function(){
 					// tell Galleria to grab the content from the .desc div as caption
 					description : $(img).parent().next('.notes').html()
 				};
-			},
-			extend : function(options) {
-				// listen to when an image is shown
-				this.bind('image', function(e) {
-					$(e.imageTarget).click(this.proxy(function() {
-						this.openLightbox();
-					}));
-				});
 			}
-		});		
+		});	
+			
 	} else {
 		$("#resourceTabs").tabs("remove", 0);
 	}
@@ -203,15 +199,16 @@ $(document).ready(function(){
 			});
 	});
 
-	// Create a search control
-	var searchControl = new google.search.SearchControl();
-	// Add in a full set of searchers
-	var imageSearch = new google.search.ImageSearch();
-	imageSearch.setResultSetSize(8);
-	imageSearch.setNoHtmlGeneration();
-	google.search.Search.getBranding(document.getElementById("googleBranding"));
+	var imageSearch;
 	var googleGallery;
 	var createGoogleGallery = function() {
+		// Create a search control
+		var searchControl = new google.search.SearchControl();
+		// Add in a full set of searchers
+		imageSearch = new google.search.ImageSearch();
+		imageSearch.setResultSetSize(8);
+		imageSearch.setNoHtmlGeneration();
+		google.search.Search.getBranding(document.getElementById("googleBranding"));
 		$('#gallery2').galleria({
 			height:400,
 			carousel:true,

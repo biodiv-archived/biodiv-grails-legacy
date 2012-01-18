@@ -39,7 +39,7 @@ $(document).ready(function(){
 			<g:each in="${speciesInstanceList}" status="i" var="speciesInstance">
 
 				<g:if test="${i%columnSize == 0}">
-					<ul class="thumbwrap grid_5" style="list-style: none;text-align:left">
+					<ul class="speciesList thumbwrap grid_5" style="list-style: none;text-align:left">
 				</g:if>
 				<li class="grid_4"><g:link action="show"
 						id="${speciesInstance.id}">
@@ -51,8 +51,8 @@ $(document).ready(function(){
 							src="${createLinkTo( base:grailsApplication.config.speciesPortal.resources.serverURL,
 											file: thumbnailPath)}" title=" ${speciesInstance.taxonConcept.italicisedForm}"/>
 						
-						<span class="caption"> ${speciesInstance.taxonConcept.italicisedForm}
-						</span>
+						<p class="caption" style="margin-left:50px;"> ${speciesInstance.taxonConcept.italicisedForm}
+						</p>
 					</g:link>
 				</li>
 				<g:if test="${(i+1)%columnSize == 0}">
