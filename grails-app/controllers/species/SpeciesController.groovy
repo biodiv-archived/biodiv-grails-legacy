@@ -4,6 +4,7 @@ import java.sql.ResultSet;
 
 import species.TaxonomyDefinition.TaxonomyRank;
 import species.formatReader.SpreadsheetReader;
+import species.groups.SpeciesGroup;
 import species.sourcehandler.MappedSpreadsheetConverter;
 import species.sourcehandler.SpreadsheetConverter;
 import species.sourcehandler.XMLConverter;
@@ -19,7 +20,8 @@ import grails.plugins.springsecurity.Secured
 class SpeciesController {
 
 	def dataSource
-
+	def grailsApplication
+	
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
 	def index = {
@@ -29,11 +31,21 @@ class SpeciesController {
 	def list = {
 		cache "taxonomy_results"
 		params.startsWith = params.startsWith?:"A"
-		if (params.startsWith) {
-			params.max = Math.min(params.max ? params.int('max') : 50, 100);
-			params.offset = params.offset ? params.int('offset') : 0
-			def speciesInstanceList = Species.findAllByTitleLike("<i>${params.startsWith}%", [sort:'title', max:params.max, offset:params.offset]);
-			int count = Species.countByTitleLike('<i>'+params.startsWith+'%')
+		def allGroup = SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.ALL);
+		params.sGroup = params.sGroup?SpeciesGroup.get(params.sGroup):allGroup
+		params.max = Math.min(params.max ? params.int('max') : 50, 100);
+		params.offset = params.offset ? params.int('offset') : 0
+		
+		if (params.startsWith && params.sGroup) {
+			def speciesInstanceList;
+			if(params.sGroup == allGroup) {
+				speciesInstanceList = Species.findAllByTitleLike("<i>${params.startsWith}%", [sort:'title', max:params.max, offset:params.offset]);
+				int count = Species.countByTitleLike('<i>'+params.startsWith+'%')
+			} else {
+				speciesInstanceList = Species.findAll("from Species as s, TaxonomyDefinition as t where title like '${params.startsWith}%' and s.taxonConcept = t and t.group = :sGroup",[sGroup:params.sGroup], [max:params.max, offset:params.offset]);
+				println speciesInstanceList
+				int count = 100
+			}
 			return [speciesInstanceList: speciesInstanceList, speciesInstanceTotal: count]
 		} else {
 			//Not being used for now

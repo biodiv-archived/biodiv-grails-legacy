@@ -9,18 +9,19 @@ $(document).ready(function() {
   	$('#taxonHierarchy').jqGrid({
 		url:'${createLink(controller:'data', action:'listHierarchy')}',
 		datatype: "xml",
-   		colNames:['Id', '','#Species', 'SpeciesId'],
+   		colNames:['Id', '','#Species', 'SpeciesId', 'Class System'],
    		colModel:[
    			{name:'id',index:'id',hidden:true},
    			{name:'name',index:'name',formatter:heirarchyLevelFormatter, width:300},
    			{name:'count', index:'count', width:50, hidden:true},
-   			{name:'speciesId',index:'speciesId', hidden:true}
+   			{name:'speciesId',index:'speciesId', hidden:true},
+   			{name:'classSystem', index:'classSystem', width:50, hidden:true}
    		],   		
    		width: "${width?:'100%'}",
-    	height: "${height?:'100%'}",
-    	autowidth:true,
-    	scrollOffset: 0,     	
+    	height: "${height?:'100%'}", 
+    	autowidth:true,   	
     	scrollOffset: 0,
+    	loadui:'block',
    		treeGrid: true,
    		ExpandColumn : 'name',
    		ExpandColClick  : true,
@@ -31,25 +32,31 @@ $(document).ready(function() {
         	var postData = $("#taxonHierarchy").getGridParam('postData');
 			postData["expand_species"] = false;
         	postData["expand_all"] = false;
-	    }
+	    },
+	    loadError : function(xhr, status, error) {
+	    	alert(error)
+	    }, 
 	});
 
 	$("#taxaHierarchy").change(function() {
 		var postData = $("#taxonHierarchy").getGridParam('postData');
 		postData["expand_species"] = ${expandSpecies?:false};
 		postData["expand_all"] = ${expandAll?:false};
-		postData["classSystem"] = $.trim($('#taxaHierarchy option:selected').val());
+		var selectedClassification = $('#taxaHierarchy option:selected').val();
+		postData["classSystem"] = $.trim(selectedClassification);
         $('#taxonHierarchy').trigger("reloadGrid");
+        $('#cInfo').html($("#c-"+$('#taxaHierarchy option:selected').val()).html());
 	});
-	
+	 $('#cInfo').html($("#c-"+$('#taxaHierarchy option:selected').val()).html());
 	$('.ui-jqgrid-hdiv').hide();
+	$('#taxonHierarchy').parents('div.ui-jqgrid-bdiv').css("max-height","450px");
 });
 
 var heirarchyLevelFormatter = function(el, cellVal, opts) {
 	var cells = $(opts).find('cell')
 	var taxonId = $(cells[0]).text().trim()
 	var speciesId = $(cells[3]).text().trim()
-	var level = $(cells[4]).text()
+	var level = $(cells[5]).text()
 	var levelTxt;
 	if(level == ${TaxonomyRank.KINGDOM.ordinal()} ) {
 		levelTxt = "<span class='rank'>${TaxonomyRank.KINGDOM}</span>"
@@ -62,7 +69,7 @@ var heirarchyLevelFormatter = function(el, cellVal, opts) {
 	} else if(level == ${TaxonomyRank.FAMILY.ordinal() }) {
 		levelTxt = "<span class='rank'>${TaxonomyRank.FAMILY}</span>"
 	} else if(level == ${TaxonomyRank.SUB_FAMILY.ordinal()} ) {
-		levelTxt = "<span class='rank'>${TaxonomyRank.SUB_FAMILY}</span>"
+		levelTxt = "<span class='rank'>${TaxonomyRank.SUB_FAMILY} </span>"
 	} else if(level == ${TaxonomyRank.GENUS.ordinal() }) {
 		levelTxt = "<span class='rank'>${TaxonomyRank.GENUS}</span>"
 	} else if(level == ${TaxonomyRank.SUB_GENUS.ordinal()} ) {
@@ -85,14 +92,33 @@ var heirarchyLevelFormatter = function(el, cellVal, opts) {
 
 <div class="taxonomyBrowser">
 	
-	<select name="taxaHierarchy" id="taxaHierarchy"
-		class="value ui-corner-all">
-		<g:each in="${Classification.list()}" var="classification">
-			<option value="${classification.id}">
-				${classification.name}
-			</option>
-		</g:each>
-	</select>
+		<g:set var="classifications" value="${Classification.list()}" />
+		<select name="taxaHierarchy" id="taxaHierarchy"
+			class="value ui-corner-all">
+			<g:each in="${classifications}" var="classification">
+				<option value="${classification.id}">
+					${classification.name}
+				</option>
+			</g:each>
+		</select>
+		<div class="attributionBlock">
+			<span class="ui-icon-info ui-icon-control " title="Show details"
+				style="float: right;"></span>
+			<div class="ui-corner-all toolbarIconContent attribution"
+				style="display: none;">
+				<a class="ui-icon ui-icon-close" style="float: right;"></a> <span
+					id="cInfo"></span>
+				<g:each in="${classifications}" var="classification">
+					<p id="c-${classification.id}" style="display: none;">
+						${classification.citation}
+					</p>
+				</g:each>
+
+			</div>
+		</div>
 	
+
+	<br />
+
 	<table id="taxonHierarchy"></table>
 </div>

@@ -1,5 +1,6 @@
 <%@page import="species.TaxonomyDefinition.TaxonomyRank"%>
 <%@ page import="species.Species"%>
+<%@ page import="species.groups.SpeciesGroup"%>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html" />
@@ -17,6 +18,12 @@ $(document).ready(function(){
 </head>
 <body>
 	<div class="container_16">
+
+		<!-- div class="paginateButtons grid_16">
+			<center>
+				<g:paginateOnSpeciesGroup/>
+			</center>
+		</div-->
 
 		<div class="paginateButtons grid_16">
 			<center>
@@ -42,7 +49,8 @@ $(document).ready(function(){
 
 						<img class="icon" style="float: left;"
 							src="${createLinkTo( base:grailsApplication.config.speciesPortal.resources.serverURL,
-											file: thumbnailPath)}" />
+											file: thumbnailPath)}" title=" ${speciesInstance.taxonConcept.italicisedForm}"/>
+						
 						<span class="caption"> ${speciesInstance.taxonConcept.italicisedForm}
 						</span>
 					</g:link>
@@ -62,6 +70,7 @@ $(document).ready(function(){
 			</center>
 		</div>
 		<br />
+		
 		<div class="paginateButtons grid_16">
 			<center>
 				<g:paginateOnAlphabet total="${speciesInstanceTotal}" />

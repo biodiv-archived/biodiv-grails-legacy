@@ -37,7 +37,8 @@ class SpeciesService {
 	def externalLinksService;
 	
 	static int BATCH_SIZE = 10;
-
+	int noOfFields = Field.count();
+	
 	/**
 	 * 
 	 * @return
@@ -186,6 +187,7 @@ class SpeciesService {
 		Species.withTransaction {
 			for(Species s in batch) {
 				//externalLinksService.updateExternalLinks(s.taxonConcept);
+				s.percentOfInfo = calculatePercentOfInfo(s);
 				if(!s.save()) {
 					s.errors.allErrors.each { log.error it }
 				} else {
@@ -234,6 +236,14 @@ class SpeciesService {
 			e.printStackTrace()
 		}
 		
+	}
+	
+	
+	/**
+	 * 
+	 */
+	private float calculatePercentOfInfo(Species s) {
+		return s.fields.size()/noOfFields;
 	}
 	
 	/**

@@ -152,31 +152,6 @@ $(document).ready(function(){
 		}
 	);
 
-	$(".ui-icon-control").click(function() {
-		var div = $(this).siblings("div.toolbarIconContent");
-		if (div.is(":visible")) {
-			div.hide(400);
-		} else {
-			div.slideDown("slow");	
-			// div.css("float","right");
-			if(div.offset().left < 0) {
-				div.offset({left:div.parent().offset().left});					
-			}
-		}
-	});
-
-	$(".ui-icon-edit").click(function() {
-		var ele =$(this).siblings("div.toolbarIconContent").find("textArea.fieldEditor");
-		if(ele) { 
-			ele.ckeditor(function(){}, {customConfig:"${resource(dir:'js',file:'ckEditorConfig.js', absolute:true)}"});
-			CKEDITOR.replace( ele.attr('id') );
-		}
-	});
-
-	$("a.ui-icon-close").click(function() {
-		$(this).parent().hide("slow");
-	})
-
     $(".speciesField").each(function() {
 	    if(jQuery.trim($(this).text()).length == 0) {
 		    $(this).prev("div.speciesFieldHeader").children("span").removeClass("ui-icon ui-icon-circle-triangle-s")
@@ -187,75 +162,83 @@ $(document).ready(function(){
 	$(".defaultSpeciesConcept").prev("a").trigger('click');	
 
 	
-	var flickr = new Galleria.Flickr();
-	$("#flickrImages").click(function() {
-		flickr.tags('${speciesName}', function(data) {
-			if(data.length) {
-		    	$('#gallery3').galleria({
+	var galleries = Galleria.get();
+	$('#gallery3').galleria({
 		    		height:400,
 					carousel:true,
 					transition:'pulse',
 					image_pan_smoothness:5,
 					showInfo:true,
-					dataSource: data,
+					dataSource : [],
 					debug: false,
 					clicknext:true
 		    	});
-	    	} else {
-	    		$("#resourceTabs").tabs("remove", 0);
-		  		$("#googleImages").click();
-	    	}
-		});
+	//TODO:some dirty piece of code..find a way to get galleries by name
+	var flickrGallery;
+	if(!flickrGallery) {
+		if(galleries.length === 1) {
+			flickrGallery = Galleria.get(0);
+		} else {
+			flickrGallery = Galleria.get(1);
+		}
+	}
+	
+	var flickr = new Galleria.Flickr();
+	$("#flickrImages").click(function() {
+		if(!flickrGallery.getData()) {
+			flickr.setOptions({
+    			max: 20,
+    			description:true
+			})._find({tags:'${speciesName}'}, function(data) {
+				if(data.length) {
+			    	flickrGallery.load(data);
+		    	} else {
+		    		$("#resourceTabs").tabs("remove", 0);
+			  		$("#googleImages").click();
+		    	}
+			});
+		}
 	});
+
+	// Create a search control
+	var searchControl = new google.search.SearchControl();
+	// Add in a full set of searchers
+	var imageSearch = new google.search.ImageSearch();
+	imageSearch.setResultSetSize(8);
+	imageSearch.setNoHtmlGeneration();
+	google.search.Search.getBranding(document.getElementById("googleBranding"));
+	$('#gallery2').galleria({
+		height:400,
+		carousel:true,
+		transition:'pulse',
+		image_pan_smoothness:5,
+		showInfo:true,
+		dataSource:[],
+		debug: false,
+		clicknext:true,
+		dataConfig: function(img) {
+	        return {
+	            description: $(img).next('.notes').html() 
+	        };
+	    }, extend: function(options) {
+	        this.bind("loadstart", function(e) {
+	            if ( (e.index + 1) % 8 === 0 && e.index < 64 	) {
+	            	getGoogleImages(imageSearch, (e.index + 1) / 8);
+	            }					            
+	        });
+	    }
+	});
+	    
+	//TODO:some dirty piece of code..find a way to get galleries by name
+	galleries = Galleria.get();
+	var googleGallery = galleries[galleries.length - 1];
 	
 	$("#googleImages").click(function() {
-		$( "#resourceTabs-4 input:submit").button();
-		// Create a search control
-		var searchControl = new google.search.SearchControl();
-
-		// Add in a full set of searchers
-		var imageSearch = new google.search.ImageSearch();
-	    imageSearch.setResultSetSize(8);
-	    imageSearch.setNoHtmlGeneration();
-	    google.search.Search.getBranding(document.getElementById("googleBranding"));
-	    
-	    
-		$('#gallery2').galleria({
-			height:400,
-			carousel:true,
-			transition:'pulse',
-			image_pan_smoothness:5,
-			showInfo:true,
-			dataSource:[],
-			debug: false,
-			clicknext:true,
-			dataConfig: function(img) {
-		        return {
-		            description: $(img).next('.notes').html() // tell Galleria
-																// to grab the
-																// content from
-																// the .desc div
-																// as caption
-		        };
-		    }, extend: function(options) {
-		        // listen to when an image is shown
-		        this.bind('image', function(e) {
-		            // lets make galleria open a lightbox when clicking the main
-					// image:
-		            $(e.imageTarget).click(this.proxy(function() {
-		               this.openLightbox();
-		            }));
-		        });
-		        
-		        this.bind("loadstart", function(e) {
-		            if ( (e.index + 1) % 8 === 0 && e.index < 64 	) {
-		            	getGoogleImages(imageSearch, (e.index + 1) / 8);
-		            }					            
-		        });
-		    }
-		});    
-		imageSearch.execute('${speciesName}');
-		getGoogleImages(imageSearch, 0);	    
+		if(!googleGallery.getData()) {
+			$( "#resourceTabs-4 input:submit").button();
+			imageSearch.execute('${speciesName}');
+			getGoogleImages(imageSearch, 0);
+		}	    
 	});
             
      if(${sparse}) {
@@ -275,11 +258,21 @@ $(document).ready(function(){
   	//initializeCKEditor();	
   	// bind click event on delete buttons using jquery live
   	$('.del-reference').live('click', deleteReferenceHandler);
-  	if($("#resourceTabs-1 img").length == 0) {
+  	if(${speciesInstance.getImages()?.size()?:0} == 0) {
   		$("#flickrImages").click();
   	}
   	
-  	
+  	// bind the method to Galleria.ready
+	Galleria.ready(function(options) {
+        // listen to when an image is shown
+        this.bind('image', function(e) {
+            // lets make galleria open a lightbox when clicking the main
+			// image:
+            $(e.imageTarget).click(this.proxy(function() {
+               this.openLightbox();
+            }));
+        });
+	});
 });
 
 </g:javascript>
@@ -330,17 +323,13 @@ $(document).ready(function(){
 						
 						<div id="gallery3"></div>
 						<div id="flickrBranding"></div><br/>
-						<div class="message ui-corner-all">This portal is not
-							responsible for the accuracy or completeness of data presented at
-							other web sites.</div>
+						<div class="message ui-corner-all">These images are fetched from other sites and may contain some irrevelant images. Please use them at your own discretion.</div>
 					</div>
 					<div id="resourceTabs-4">
 						
 						<div id="gallery2"></div>
 						<div id="googleBranding"></div><br/>
-						<div class="message ui-corner-all">This portal is not
-							responsible for the accuracy or completeness of data presented at
-							other web sites.</div>
+						<div class="message ui-corner-all">These images are fetched from other sites and may contain some irrevelant images. Please use them at your own discretion.</div>
 						<div>
 							<center>
 							<form method="get" action="http://images.google.com/images"
@@ -389,7 +378,7 @@ $(document).ready(function(){
 
 			<!--  static species content -->
 			<div class="grid_6 classifications">
-				<t:showTaxonBrowser model="['expandSpecies':true, 'expandAll':false, 'speciesId':speciesInstance.taxonConcept?.id, height:400]"/>
+				<t:showTaxonBrowser model="['expandSpecies':true, 'expandAll':false, 'speciesId':speciesInstance.taxonConcept?.id]"/>
 				<br />					
 
 				<div class="readmore" style="float:left;">
@@ -469,6 +458,12 @@ $(document).ready(function(){
 						}
 						names.get(languageName).add(it)
 					};
+				
+					names = names.sort();
+					names.each { key, list ->
+						list.sort();						
+					}
+					
 				%>
 				<g:if test="${names}">
 				<div class="ui-widget">
@@ -484,8 +479,7 @@ $(document).ready(function(){
 								<tr><td class="prop">
 									<span class="grid_3 name">${it.key} </span></td> 
 									<td><g:each in="${it.value}"  status="i" var ="n">
-												 ${n.name}
-												 <g:if test="${i < it.value.size()-1}">,</g:if>
+												 ${n.name}<g:if test="${i < it.value.size()-1}">,</g:if>
 											</g:each></td>
 									</tr>
 								</g:each>

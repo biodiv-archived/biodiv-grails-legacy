@@ -13,7 +13,7 @@ class Species {
 	String guid;
 	TaxonomyDefinition taxonConcept;
 	Resource reprImage;
-	Integer percentOfInfo;
+	Float percentOfInfo;
 	
 	def grailsApplication; 
 	
@@ -54,8 +54,12 @@ class Species {
 			return reprImage;			
 		} else {
 			SpeciesGroup group = fetchSpeciesGroup();
-			String name = group.name?.trim()?.replaceAll(/ /, '_')
-			return new Resource(fileName:"group_icons/${name ? name+'.png': '../no-image.jpg'}", type:ResourceType.IMAGE, title:"You can contribute!!!");
+			String name = group.name?.trim()?.replaceAll(/ /, '_')?.plus('.png');
+			boolean iconPresent = (new File(grailsApplication.config.speciesPortal.resources.rootDir+"/group_icons/${name?.trim()}")).exists()
+			if(!iconPresent) {
+				name = SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.OTHERS).name?.trim()?.replaceAll(/ /, '_')?.plus('.png');
+			}
+			return new Resource(fileName:"group_icons/${name}", type:ResourceType.IMAGE, title:"You can contribute!!!");
 		}
 	}
 
