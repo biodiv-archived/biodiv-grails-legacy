@@ -13,7 +13,7 @@ class Species {
 	String guid;
 	TaxonomyDefinition taxonConcept;
 	Resource reprImage;
-	Integer percentOfInfo;
+	Float percentOfInfo;
 	
 	def grailsApplication; 
 	
@@ -40,11 +40,15 @@ class Species {
 	}
 
 	Resource mainImage() {  
-		if(!reprImage) { 
-			def images = getImages();
-			reprImage = images ? images[0]:null;
-			if(reprImage && !reprImage.fileName.equals("no-image.jpg")) {
-				if(!this.save()) {
+		if(!reprImage) {
+			log.debug "Saving representative image for species"; 
+			def images = this.getImages();
+			this.reprImage = images ? images[0]:null;
+			println images
+			println '----------'
+			println reprImage
+			if(reprImage) {
+				if(!this.save(flush:true)) {
 					this.errors.each { log.error it }
 				}
 			}			
@@ -53,16 +57,18 @@ class Species {
 		if(reprImage && (new File(grailsApplication.config.speciesPortal.resources.rootDir+reprImage.fileName.trim())).exists()) {
 			return reprImage;			
 		} else {
-			SpeciesGroup group = fetchSpeciesGroup();
-			String name = group.name?.trim()?.replaceAll(/ /, '_')
-			return new Resource(fileName:"group_icons/${name ? name+'.png': '../no-image.jpg'}", type:ResourceType.IMAGE, title:"You can contribute!!!");
+			fetchSpeciesGroupIcon();			
 		}
 	}
 
 	List<Resource> getImages() { 
 		List<Resource> images = new ArrayList<Resource>();
+		
+		if(reprImage) {
+			images.add(reprImage);
+		}
 		resources.each { resource ->
-			if(resource.type == species.Resource.ResourceType.IMAGE) {
+			if(resource.type == species.Resource.ResourceType.IMAGE && resource.id != reprImage?.id) {
 				images.add(resource);
 			}
 		};
@@ -100,5 +106,17 @@ class Species {
 	
 	SpeciesGroup fetchSpeciesGroup() {
 		return this.taxonConcept.group?:SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.OTHERS); 
+	}
+	
+	//TODO:remove this function after getting icons for all groups
+	Resource fetchSpeciesGroupIcon() {
+		SpeciesGroup group = fetchSpeciesGroup();
+		String name = group.name?.trim()?.replaceAll(/ /, '_')?.plus('.png');
+		boolean iconPresent = (new File(grailsApplication.config.speciesPortal.resources.rootDir+"/group_icons/${name?.trim()}")).exists()
+		if(!iconPresent) {
+			name = SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.OTHERS).name?.trim()?.replaceAll(/ /, '_')?.plus('.png');
+		}
+		return new Resource(fileName:"group_icons/${name}", type:ResourceType.ICON, title:"You can contribute!!!");
+		
 	}
 }

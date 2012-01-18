@@ -218,6 +218,7 @@ speciesPortal {
 		maxRetries = 1;
 	}
 	fields  {
+		COMBINED_TAXONOMIC_HIERARCHY = "Combined Taxonomy Hierarchy"
 		AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY = "Author Contributed Taxonomy Hierarchy"
 		GBIF_TAXONOMIC_HIERARCHY = "GBIF Taxonomy Hierarchy"
 		CATALOGUE_OF_LIFE_TAXONOMIC_HIERARCHY = 'Catalogue of Life Taxonomy Hierarchy'

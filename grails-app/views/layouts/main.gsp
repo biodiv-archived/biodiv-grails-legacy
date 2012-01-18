@@ -67,13 +67,7 @@ jQuery(document).ready(function($) {
 </head>
 <body>
 <%//request.cookies.each{println it.name+" : "+it.value}%>
-	<!-- RECOMMENDED if your web app will not function without JavaScript enabled -->
-	<noscript>
-		<div
-			style="width: 22em; position: absolute; left: 50%; margin-left: -11em; color: red; background-color: white; border: 1px solid red; padding: 4px; font-family: sans-serif">
-			Your web browser must have JavaScript enabled in order for this
-			application to display correctly.</div>
-	</noscript>
+	
 	<div id="spinner" class="spinner" style="display:none;">
 		<img src="${resource(dir:'images',file:'spinner.gif', absolute:true)}"
 			alt="${message(code:'spinner.alt',default:'Loading...')}" />
@@ -160,8 +154,9 @@ jQuery(document).ready(function($) {
 			});
 		
 			var offset = $('#loginLink').offset();
-			$('#ajaxLogin').offset({left:offset.left-$('#ajaxLogin').width()+$('#loginLink').width(), top:offset.top});
-			
+			if(offset) {
+				$('#ajaxLogin').offset({left:offset.left-$('#ajaxLogin').width()+$('#loginLink').width(), top:offset.top});
+			}
 	   		var options = { 
 	   		 	type:'POST', 
 		        dataType: 'json',
@@ -193,6 +188,34 @@ jQuery(document).ready(function($) {
     				$("html").removeClass('busy');
         			$(this).hide();
     			});
+    			
+    		
+				$(".ui-icon-control").click(function() {
+					var div = $(this).siblings("div.toolbarIconContent");
+					if (div.is(":visible")) {
+						div.hide(400);
+					} else {
+						div.slideDown("slow");	
+						// div.css("float","right");
+						if(div.offset().left < 0) {
+							div.offset({left:div.parent().offset().left});					
+						}
+					}
+				});
+			
+				$(".ui-icon-edit").click(function() {
+					var ele =$(this).siblings("div.toolbarIconContent").find("textArea.fieldEditor");
+					if(ele) { 
+						ele.ckeditor(function(){}, {customConfig:"${resource(dir:'js',file:'ckEditorConfig.js', absolute:true)}"});
+						CKEDITOR.replace( ele.attr('id') );
+					}
+				});
+			
+				$("a.ui-icon-close").click(function() {
+					$(this).parent().hide("slow");
+				})
+			    			
+    			
 		}); 
 			
 			function showLogin() {

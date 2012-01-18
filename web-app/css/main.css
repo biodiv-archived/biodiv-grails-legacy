@@ -66,7 +66,7 @@ ul {
 input,select,textarea {
 	background-color: #fcfcfc;
 	border: 1px solid #ccc;
-	font: 12px Arial, Helvetica, sans-serif;
+/* 	font: 12px Arial, Helvetica, sans-serif; */
 	margin: 2px 0;
 	padding: 2px 4px;
 }
@@ -659,21 +659,6 @@ img {
 	height: 26px;
 }
 
-.taxonBrowser {
-	background: url(../images/tree.png) left no-repeat;
-	border: none;
-}
-
-.contribute {
-	background: url(../images/contribute.gif) left no-repeat;
-	border: none;
-}
-
-.speciesList {
-	background: url(../images/list.png) left no-repeat;
-	border: none;
-}
-
 .demo {
 	background: url(../images/demo-1.png) left no-repeat;
 	border: none;
@@ -1033,4 +1018,9 @@ ul.thumbwrap li a {
 #menu {
 	margin-bottom: 15px;
 	
+}
+
+.speciesList .caption{
+	margin-left:50px;
+	padding-left:5px;
 }

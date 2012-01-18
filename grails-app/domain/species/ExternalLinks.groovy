@@ -10,7 +10,7 @@ class ExternalLinks {
 	String colId
 	
 	Date eolFetchDate;
-	Integer noOfDataObjects = 0;
+	Integer noOfDataObjects;
 	
 	static belongsTo = [taxonConcept:TaxonomyDefinition];
 	

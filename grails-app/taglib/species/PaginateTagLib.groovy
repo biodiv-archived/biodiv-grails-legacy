@@ -2,7 +2,52 @@ package species
 
 import org.springframework.web.servlet.support.RequestContextUtils;
 
+import species.groups.SpeciesGroup;
+
 class PaginateTagLib {
+	
+	def grailsApplication;
+
+	def paginateOnSpeciesGroup = { attrs ->
+		def writer = out
+		
+		def messageSource = grailsAttributes.messageSource
+		def locale = RequestContextUtils.getLocale(request)
+
+		def action = (attrs.action ? attrs.action : (params.action ? params.action : "list"))
+
+		def linkParams = [:]
+		if (attrs.params) linkParams.putAll(attrs.params)
+		if (params.sort) linkParams.sort = params.sort
+		if (params.order) linkParams.order = params.order
+
+		def linkTagAttrs = [action:action]
+		if (attrs.controller) {
+			linkTagAttrs.controller = attrs.controller
+		}
+		if (attrs.id != null) {
+			linkTagAttrs.id = attrs.id
+		}
+		if (attrs.fragment != null) {
+			linkTagAttrs.fragment = attrs.fragment
+		}
+		linkTagAttrs.params = linkParams
+
+		def speciesGroupId = params.startsWith ?: SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.ALL).id;
+		
+		// display paginate steps
+		SpeciesGroup.list().each { sGroup ->
+			if (sGroup.id == speciesGroupId) {
+				writer << "<span class=\"currentStep\">${sGroup.name}</span>"
+			}
+			else {
+				//linkParams.offset = (i - 1) * max
+				linkParams.sGroup = sGroup.id;
+				writer << link(linkTagAttrs.clone()) {sGroup.name}
+			}
+		}
+	}
+	
 	def paginateOnAlphabet = { attrs ->
 		def writer = out
 		if (attrs.total == null) {
