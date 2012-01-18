@@ -98,8 +98,8 @@ $(document).ready(function(){
 				<g:hiddenField name="sort" value="score desc" />
 				<g:hiddenField name="fl" value="id, name" />
 
-				<span class="button"> <input id="advSearch" type="submit"
-					value="Search"> </span>
+				<div style="float: right"> <input id="advSearch" type="submit"
+					value="Search"> </div>
 
 			</form>
 		</div>

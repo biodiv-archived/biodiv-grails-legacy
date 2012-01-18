@@ -51,7 +51,7 @@ $(document).ready(function(){
 							src="${createLinkTo( base:grailsApplication.config.speciesPortal.resources.serverURL,
 											file: thumbnailPath)}" title=" ${speciesInstance.taxonConcept.italicisedForm}"/>
 						
-						<p class="caption" style="margin-left:50px;"> ${speciesInstance.taxonConcept.italicisedForm}
+						<p class="caption"> ${speciesInstance.taxonConcept.italicisedForm}
 						</p>
 					</g:link>
 				</li>
