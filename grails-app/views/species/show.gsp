@@ -174,7 +174,7 @@ $(document).ready(function(){
 	});
 
 	$("a.ui-icon-close").click(function() {
-		$(this).parent().hide("slow");
+		$(this).parent().fadeOut(600);
 	})
 
     $(".speciesField").each(function() {
@@ -279,6 +279,13 @@ $(document).ready(function(){
   		$("#flickrImages").click();
   	}
   	
+  	$('.thumbwrap .figure').hover(
+  	function(){
+  		$(this).children('.attributionBlock').css('visibility', 'visible');
+  	
+  	},function(){
+  		$(this).children('.attributionBlock').css('visibility', 'hidden');
+  	});
   	
 });
 
@@ -305,7 +312,7 @@ $(document).ready(function(){
 
 			<div class="grid_16">
 
-				<h2 style="color: black;">
+				<h2 style="padding: 5px; color: black; text-shadow: 2px 2px 2px #c6c6c6;">
 					${speciesInstance.taxonConcept.italicisedForm }
 				</h2>
 
