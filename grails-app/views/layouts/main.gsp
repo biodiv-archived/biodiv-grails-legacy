@@ -135,7 +135,7 @@ jQuery(document).ready(function($) {
 				<div class="demo" style="float: right; margin-right: .3em;"
 					title="These are demo pages">These are demo pages</div><br/>
 				<sNav:render group="dashboard" subitems="true" />
-				<div style="float: right; margin:10px;">
+				<div style="float: right;">
 					<g:searchBox />
 				</div>
 				
