@@ -7,15 +7,12 @@
 <head>
 
 <meta name="layout" content="main" />
-<r:require module="jquery-ui" />
 
 <title>Search Species</title>
-<g:javascript src="readmore/readmore.js"
-	base="${grailsApplication.config.grails.serverURL+'/js/'}" />
+
 <g:javascript>
 
 $(document).ready(function(){
-	
 	$(".readmore").readmore({
 		substr_len : 400,
 		more_link : '<a class="more readmore">&nbsp;More</a>'
@@ -77,7 +74,7 @@ $(document).ready(function(){
 										<span class="wrimg"> <span></span>
 												<img
 													src="${createLinkTo( base:grailsApplication.config.speciesPortal.resources.serverURL,
-											file: thumbnailPath)}" />
+											file: thumbnailPath)}" title="${speciesInstance.taxonConcept.name }" />
 											</span>
 									</g:link>
 								</div>

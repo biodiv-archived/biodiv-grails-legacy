@@ -53,13 +53,7 @@ class Species {
 		if(reprImage && (new File(grailsApplication.config.speciesPortal.resources.rootDir+reprImage.fileName.trim())).exists()) {
 			return reprImage;			
 		} else {
-			SpeciesGroup group = fetchSpeciesGroup();
-			String name = group.name?.trim()?.replaceAll(/ /, '_')?.plus('.png');
-			boolean iconPresent = (new File(grailsApplication.config.speciesPortal.resources.rootDir+"/group_icons/${name?.trim()}")).exists()
-			if(!iconPresent) {
-				name = SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.OTHERS).name?.trim()?.replaceAll(/ /, '_')?.plus('.png');
-			}
-			return new Resource(fileName:"group_icons/${name}", type:ResourceType.IMAGE, title:"You can contribute!!!");
+			fetchSpeciesGroupIcon();			
 		}
 	}
 
@@ -104,5 +98,17 @@ class Species {
 	
 	SpeciesGroup fetchSpeciesGroup() {
 		return this.taxonConcept.group?:SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.OTHERS); 
+	}
+	
+	//TODO:remove this function after getting icons for all groups
+	Resource fetchSpeciesGroupIcon() {
+		SpeciesGroup group = fetchSpeciesGroup();
+		String name = group.name?.trim()?.replaceAll(/ /, '_')?.plus('.png');
+		boolean iconPresent = (new File(grailsApplication.config.speciesPortal.resources.rootDir+"/group_icons/${name?.trim()}")).exists()
+		if(!iconPresent) {
+			name = SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.OTHERS).name?.trim()?.replaceAll(/ /, '_')?.plus('.png');
+		}
+		return new Resource(fileName:"group_icons/${name}", type:ResourceType.ICON, title:"You can contribute!!!");
+		
 	}
 }

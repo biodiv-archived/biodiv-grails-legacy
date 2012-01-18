@@ -161,43 +161,46 @@ $(document).ready(function(){
 
 	$(".defaultSpeciesConcept").prev("a").trigger('click');	
 
-	
-	var galleries = Galleria.get();
-	$('#gallery3').galleria({
-		    		height:400,
-					carousel:true,
-					transition:'pulse',
-					image_pan_smoothness:5,
-					showInfo:true,
-					dataSource : [],
-					debug: false,
-					clicknext:true
-		    	});
-	//TODO:some dirty piece of code..find a way to get galleries by name
 	var flickrGallery;
-	if(!flickrGallery) {
+	var createFlickrGallery = function(data) {
+		$('#gallery3').galleria({
+			    		height:400,
+						carousel:true,
+						transition:'pulse',
+						image_pan_smoothness:5,
+						showInfo:true,
+						dataSource : data,
+						debug: false,
+						clicknext:true
+			    	});
+		//TODO:some dirty piece of code..find a way to get galleries by name
+		var galleries = Galleria.get();	
 		if(galleries.length === 1) {
 			flickrGallery = Galleria.get(0);
 		} else {
 			flickrGallery = Galleria.get(1);
 		}
+		return flickrGallery;
 	}
 	
 	var flickr = new Galleria.Flickr();
 	$("#flickrImages").click(function() {
-		if(!flickrGallery.getData()) {
 			flickr.setOptions({
     			max: 20,
     			description:true
 			})._find({tags:'${speciesName}'}, function(data) {
-				if(data.length) {
-			    	flickrGallery.load(data);
-		    	} else {
-		    		$("#resourceTabs").tabs("remove", 0);
-			  		$("#googleImages").click();
-		    	}
+				if(data.length != 0) {
+					if(!flickrGallery) {
+						flickrGallery = createFlickrGallery(data);
+					} else {
+						flickrGallery.load(data);
+					}	    			
+				} else {
+				  	$("#flickrImages").hide();
+			    	$("#resourceTabs-3").hide();
+				  	$("#googleImages").click();				  	
+			  	}
 			});
-		}
 	});
 
 	// Create a search control
@@ -207,33 +210,38 @@ $(document).ready(function(){
 	imageSearch.setResultSetSize(8);
 	imageSearch.setNoHtmlGeneration();
 	google.search.Search.getBranding(document.getElementById("googleBranding"));
-	$('#gallery2').galleria({
-		height:400,
-		carousel:true,
-		transition:'pulse',
-		image_pan_smoothness:5,
-		showInfo:true,
-		dataSource:[],
-		debug: false,
-		clicknext:true,
-		dataConfig: function(img) {
-	        return {
-	            description: $(img).next('.notes').html() 
-	        };
-	    }, extend: function(options) {
-	        this.bind("loadstart", function(e) {
-	            if ( (e.index + 1) % 8 === 0 && e.index < 64 	) {
-	            	getGoogleImages(imageSearch, (e.index + 1) / 8);
-	            }					            
-	        });
-	    }
-	});
-	    
-	//TODO:some dirty piece of code..find a way to get galleries by name
-	galleries = Galleria.get();
-	var googleGallery = galleries[galleries.length - 1];
+	var googleGallery;
+	var createGoogleGallery = function() {
+		$('#gallery2').galleria({
+			height:400,
+			carousel:true,
+			transition:'pulse',
+			image_pan_smoothness:5,
+			showInfo:true,
+			dataSource:[],
+			debug: false,
+			clicknext:true,
+			dataConfig: function(img) {
+		        return {
+		            description: $(img).next('.notes').html() 
+		        };
+		    }, extend: function(options) {
+		        this.bind("loadstart", function(e) {
+		            if ( (e.index + 1) % 8 === 0 && e.index < 64 	) {
+		            	getGoogleImages(imageSearch, (e.index + 1) / 8);
+		            }					            
+		        });
+		    }
+		});
+		//TODO:some dirty piece of code..find a way to get galleries by name
+		var galleries = Galleria.get();
+		return galleries[galleries.length - 1];
+	}
 	
 	$("#googleImages").click(function() {
+		if(!googleGallery) {
+			googleGallery = createGoogleGallery();
+		}
 		if(!googleGallery.getData()) {
 			$( "#resourceTabs-4 input:submit").button();
 			imageSearch.execute('${speciesName}');
@@ -253,14 +261,6 @@ $(document).ready(function(){
     	 showSpeciesConcept($(".defaultSpeciesConcept").attr("id"))
     	 showSpeciesField($(".defaultSpeciesField").attr("id"))
      }
-	
-  	//loadIFrame();
-  	//initializeCKEditor();	
-  	// bind click event on delete buttons using jquery live
-  	$('.del-reference').live('click', deleteReferenceHandler);
-  	if(${speciesInstance.getImages()?.size()?:0} == 0) {
-  		$("#flickrImages").click();
-  	}
   	
   	// bind the method to Galleria.ready
 	Galleria.ready(function(options) {
@@ -273,6 +273,14 @@ $(document).ready(function(){
             }));
         });
 	});
+
+  	//loadIFrame();
+  	//initializeCKEditor();	
+  	// bind click event on delete buttons using jquery live
+  	$('.del-reference').live('click', deleteReferenceHandler);
+  	if(${speciesInstance.getImages()?.size()?:0} == 0) {
+  		$("#flickrImages").click();
+  	}
 });
 
 </g:javascript>
@@ -364,7 +372,7 @@ $(document).ready(function(){
 							<s:showExternalLink model="['key':'wikipedia', 'taxonConcept':speciesInstance.taxonConcept]"/>
 							
 							
-							 <img class="group_icon species_group_icon" src="${createLinkTo(dir: 'images/group_icons', file: speciesInstance.fetchSpeciesGroup()?.name?.trim()?.replaceAll(/ /, '_')+".png", absolute:true)}" 
+							 <img class="group_icon species_group_icon" src="${createLinkTo(dir: 'images', file: speciesInstance.fetchSpeciesGroupIcon()?.fileName?.trim(), absolute:true)}" 
 							  title="${speciesInstance.fetchSpeciesGroup()?.name}"/>
 							  
 							  <g:if test="${speciesInstance.taxonConcept.threatenedStatus}">

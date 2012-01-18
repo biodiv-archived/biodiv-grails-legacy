@@ -13,13 +13,13 @@ $(document).ready(function() {
    		colModel:[
    			{name:'id',index:'id',hidden:true},
    			{name:'name',index:'name',formatter:heirarchyLevelFormatter, width:300},
-   			{name:'count', index:'count', width:50, hidden:true},
+   			{name:'count', index:'count', hidden:true},
    			{name:'speciesId',index:'speciesId', hidden:true},
-   			{name:'classSystem', index:'classSystem', width:50, hidden:true}
+   			{name:'classSystem', index:'classSystem', hidden:true}
    		],   		
    		width: "${width?:'100%'}",
     	height: "${height?:'100%'}", 
-    	autowidth:true,   	
+    	autowidth:true,   
     	scrollOffset: 0,
     	loadui:'block',
    		treeGrid: true,

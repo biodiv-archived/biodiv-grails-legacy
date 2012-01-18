@@ -152,7 +152,8 @@ var getGoogleImages = function(imageSearch, page) {
 					this,
 					function() {
 						for ( var i = 0; i < imageSearch.results.length; i++) {
-							var url = imageSearch.results[i].url.replace(/%2520/g, " ")
+							//var url = imageSearch.results[i].url.replace(/%2520/g, " ")
+							var url = decodeURIComponent(imageSearch.results[i].url);
 							gallery
 									.push({
 										image : url,
