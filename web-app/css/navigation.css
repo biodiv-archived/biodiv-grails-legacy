@@ -38,7 +38,7 @@ Just change the color-values to apply your own color-scheme.
 
 .navigation li {
     float: left;
-    margin-left:2px;
+    margin-left:4px;
     /* border: 1px solid #888; */
     /* border-left-color: #bbb; */
 }
