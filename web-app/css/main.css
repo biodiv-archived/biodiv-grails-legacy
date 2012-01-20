@@ -435,6 +435,7 @@ th.name {
 .thumbwrap .icons .icon {
 	width: 20px;
 	height: 20px;
+	display: inline;
 }
 
 /* .toolbar .icon { */
@@ -509,7 +510,7 @@ th.name {
 	position: absolute;
 	min-width: 300px;
 	max-width: 600px;
-	box-shadow: 3px 3px 7px #555555;
+	box-shadow: 0 1px 3px #c6c6c6;
 	font-size: 0.8em;
 	font-style: normal;
 	z-index: 100;
@@ -959,7 +960,7 @@ ul.thumbwrap li.grid_5 {
     border-right: 1px solid #C6C6C6;
     border-left: 1px solid #e5e5e5;
     border-top: 1px solid #e5e5e5;
-    height: 80px;
+    height: 65px;
     background-color: #f8f8f8;
 }
 
@@ -973,13 +974,9 @@ ul.thumbwrap li a {
     font-weight: bold;
     overflow: hidden;
     display: block;
-    width: 100%;
-    height: 100%;
 }
 
-    text-shadow: 1px 1px 1px #666666;
-}
-
+	
 .taxonomyBrowser {
 	background-color: #D4EDC9;	
 	border-radius: 5px;
@@ -1070,4 +1067,12 @@ td input.text:focus {
     margin-right: 5px;
     padding-left: 5px;
     padding-right: 20px;
+}
+
+.searchSnippet {
+	position: relative;	
+}
+
+.searchSnippet .toolbarIconContent {
+	left: 0;
 }

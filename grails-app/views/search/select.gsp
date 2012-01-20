@@ -13,10 +13,10 @@
 <g:javascript>
 
 $(document).ready(function(){
-	$(".readmore").readmore({
-		substr_len : 300,
-		more_link : '<a class="more readmore">&nbsp;More</a>'
-	});
+	//$(".readmore").readmore({
+	//	substr_len : 300,
+	//	more_link : '<a class="more readmore">&nbsp;More</a>'
+	//});
 
 });
 
@@ -128,7 +128,12 @@ $(document).ready(function(){
 									</div>
 	
 									<div class="readmore">
-										${speciesInstance.findSummary()}
+										  <g:if test="${speciesInstance.findSummary().length() > 300}">
+												${speciesInstance.findSummary()[0..300] + ' ...'}
+										  </g:if>
+										  <g:else>
+												${speciesInstance.findSummary()}
+										  </g:else>
 									</div>
 	
 									<div class="breadcrumb">
