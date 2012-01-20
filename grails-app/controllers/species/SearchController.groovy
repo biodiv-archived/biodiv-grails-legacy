@@ -3,6 +3,8 @@ package species
 import grails.converters.JSON;
 import org.apache.solr.common.util.NamedList
 
+import species.utils.Utils;
+
 
 /**
  * 
@@ -13,23 +15,23 @@ class SearchController {
 
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 	def searchService;
-	
+	def namesIndexerService;
 	/**
 	 * Default action : select
 	 */
 	def index = {
 		render (view:"select");
 	}
-	
+
 	/**
 	 * 
 	 */
 	def select = {
 		log.debug params;
 		def searchFieldsConfig = grailsApplication.config.speciesPortal.searchFields
-		
+
 		if(params.query) {
-			params.q = params.query;
+			params.q = Utils.cleanSearchQuery(params.query);
 			params.remove('query');
 			params['start'] = params['start']?:"0";
 			params['rows'] = params['rows']?:"10";
@@ -48,7 +50,7 @@ class SearchController {
 			paramsList.add('facet.field', searchFieldsConfig.SPECIES)
 			paramsList.add('facet.field', searchFieldsConfig.AUTHOR)
 			paramsList.add('facet.field', searchFieldsConfig.YEAR)
-			
+
 			log.debug "Along with faceting params : "+paramsList;
 			def queryResponse = searchService.search(paramsList);
 			List<Species> speciesInstanceList = new ArrayList<Species>();
@@ -65,7 +67,7 @@ class SearchController {
 			[params:params, speciesInstanceList:[]];
 		}
 	}
-	
+
 	/**
 	 * 
 	 */
@@ -76,8 +78,8 @@ class SearchController {
 		for(field in params) {
 			if(!(field.key ==~ /action|controller|sort|fl|start|rows/) && field.value) {
 				query = query + " " + field.key + ': "'+field.value+'"';
-				newParams[field.key] = field.value; 	
-			}			
+				newParams[field.key] = field.value;
+			}
 		}
 		if(query) {
 			newParams['query'] = query;
@@ -86,18 +88,45 @@ class SearchController {
 		render (view:'advSelect', params:newParams);
 	}
 
+	def nameTerms = {
+		log.debug params;
+		params.field = params.field?:"autocomplete";
+		List result = new ArrayList();
+
+		def namesLookupResults = namesIndexerService.suggest(params)
+		result.addAll(namesLookupResults);
+
+		//		def queryResponse = searchService.terms(params);
+		//		NamedList tags = (NamedList) ((NamedList)queryResponse.getResponse().terms)[params.field];
+		//
+		//		for (Iterator iterator = tags.iterator(); iterator.hasNext();) {
+		//			Map.Entry tag = (Map.Entry) iterator.next();
+		//			result.add([value:tag.getKey().toString(), label:tag.getKey().toString(),  "category":"General"]);
+		//		}
+		render result as JSON;
+
+	}
+
 	/**
 	 * 
 	 */
 	def terms = {
 		log.debug params;
 		params.field = params.field?:"autocomplete";
-		def queryResponse = searchService.terms(params);
-		NamedList tags = (NamedList) ((NamedList)queryResponse.getResponse().terms)[params.field];
-		List<String> result = new ArrayList<String>();
-		for (Iterator iterator = tags.iterator(); iterator.hasNext();) {
-			Map.Entry tag = (Map.Entry) iterator.next();
-			result.add(tag.getKey().toString());
+		List result = new ArrayList();
+
+		if(params.field == "autocomplete" || params.field == 'name' || params.field == 'taxon') {
+			def namesLookupResults = namesIndexerService.suggest(params)
+			result.addAll(namesLookupResults);
+		} else {
+
+			def queryResponse = searchService.terms(params);
+			NamedList tags = (NamedList) ((NamedList)queryResponse.getResponse().terms)[params.field];
+
+			for (Iterator iterator = tags.iterator(); iterator.hasNext();) {
+				Map.Entry tag = (Map.Entry) iterator.next();
+				result.add([value:tag.getKey().toString(), label:tag.getKey().toString(),  "category":"General"]);
+			}
 		}
 		render result as JSON;
 	}

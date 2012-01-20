@@ -19,11 +19,11 @@ $(document).ready(function(){
 <body>
 	<div class="container_16">
 
-		<!-- div class="paginateButtons grid_16">
+		<div class="paginateButtons grid_16">
 			<center>
 				<g:paginateOnSpeciesGroup/>
 			</center>
-		</div-->
+		</div>
 
 		<div class="paginateButtons grid_16">
 			<center>

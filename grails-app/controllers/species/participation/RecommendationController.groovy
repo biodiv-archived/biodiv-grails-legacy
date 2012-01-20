@@ -121,23 +121,7 @@ class RecommendationController {
 	
 	
 	def suggest = {
-		log.debug "Suggest name using params : "+params
-		
-		def result = new ArrayList();
-
-		def lookupResults = namesIndexerService.suggest(params);
-		lookupResults.each { lookupResult ->
-			def term = lookupResult.key;
-			def record = lookupResult.value;
-			int index = term.toLowerCase().indexOf(params.term.toLowerCase());
-			
-			String name = term.replaceFirst(/(?i)${params.term}/, "<b>"+params.term+"</b>");
-			String highlightedName = record.originalName.replaceFirst(/(?i)${term}/, name);
-			result.add([value:record.canonicalForm, label:record.originalName, desc:record.canonicalForm, icon:record.icon, "category":""]);
-		}
-		//Thread.sleep(10000);
-		log.debug "suggestion : "+result;
-		render result as JSON
+		render namesIndexerService.suggest(params) as JSON;
 	}
 	
 }

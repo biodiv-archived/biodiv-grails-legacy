@@ -62,8 +62,11 @@ class RecommendationService {
 				cleanUpGorm();
 			}
 		}
-		if(noOfRecords)
+		if(noOfRecords) {
+			def indexStoreDir = grailsApplication.config.speciesPortal.nameSearch.indexStore;
+			namesIndexerService.store(indexStoreDir);
 			cleanUpGorm();
+		}
 		log.debug "Time taken to save : "+((System.currentTimeMillis() - startTime)/1000) + "(sec)"
 		log.debug "Persisted ${noOfRecords} recommendations in total"
 		return noOfRecords;

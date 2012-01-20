@@ -33,7 +33,7 @@ class SpeciesController {
 		params.startsWith = params.startsWith?:"A"
 		def allGroup = SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.ALL);
 		params.sGroup = params.sGroup?SpeciesGroup.get(params.sGroup):allGroup
-		params.max = Math.min(params.max ? params.int('max') : 50, 100);
+		params.max = Math.min(params.max ? params.int('max') : 51, 100);
 		params.offset = params.offset ? params.int('offset') : 0
 		int count = 0;
 		if (params.startsWith && params.sGroup) {
@@ -48,7 +48,7 @@ class SpeciesController {
 			return [speciesInstanceList: speciesInstanceList, speciesInstanceTotal: count]
 		} else {
 			//Not being used for now
-			params.max = Math.min(params.max ? params.int('max') : 50, 100)
+			params.max = Math.min(params.max ? params.int('max') : 51, 100)
 			return [speciesInstanceList: Species.list(params), speciesInstanceTotal: Species.count()]
 		}
 	}

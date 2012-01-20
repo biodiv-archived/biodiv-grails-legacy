@@ -52,7 +52,7 @@ class NamesIndexerService {
 			}
 		}
 
-		synchronized(lookup) {
+		synchronized(kk) {
 			lookup = lookup1;
 		}
 		
@@ -92,7 +92,8 @@ class NamesIndexerService {
 
 		boolean success = false;
 
-		def icon = getIcon(reco.taxonConcept);
+		def species = getSpecies(reco.taxonConcept);
+		def icon = species?.mainImage()?.fileName;
 		log.debug "Generating ngrams"
 		def tokenStream = analyzer.tokenStream("name", new StringReader(reco.name));
 		OffsetAttribute offsetAttribute = tokenStream.getAttribute(OffsetAttribute.class);
@@ -105,23 +106,15 @@ class NamesIndexerService {
 			String term = charTermAttribute.toString()?.replaceAll("\u00A0|\u2007|\u202F", " ");
 			log.debug "Adding name term : "+term
 			synchronized(lookup) {
-				success |= lookup.add(term, new Record(originalName:reco.name, canonicalForm:reco.taxonConcept?.canonicalForm, icon:icon, wt:wt));
+				success |= lookup.add(term, new Record(originalName:reco.name, canonicalForm:reco.taxonConcept?.canonicalForm, icon:icon, wt:wt, speciesId:species?.id));
 			}
 		}
 		return success;
 	}
 
-	private String getIcon(TaxonomyDefinition taxonConcept) {
-		if(!taxonConcept) return "";
-
-		log.debug "Getting icon"
-		def species = Species.findByTaxonConcept(taxonConcept);
-		def icon = species?.mainImage()?.fileName;
-		if(icon) {
-			icon = grailsApplication.config.speciesPortal.resources.serverURL + "/images/" + icon;
-			icon = icon.replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.galleryThumbnail.suffix);
-		}
-		return icon;
+	private Species getSpecies(TaxonomyDefinition taxonConcept) {
+		if(!taxonConcept) return null;		
+		return Species.findByTaxonConcept(taxonConcept);
 	}
 
 	/**
@@ -145,10 +138,27 @@ class NamesIndexerService {
 	 * @param query
 	 * @return
 	 */
-	def suggest(query) {
-		log.debug "Running term query : "+query
-		List<LookupResult> result = lookup.lookup(query.term.toLowerCase(), false, 10);
-		log.debug "terms result : "+result
+	def suggest(params) {
+		log.debug "Suggest name using params : "+params
+		List<LookupResult> lookupResults = lookup.lookup(params.term.toLowerCase(), true, 10);		
+		
+		def result = new ArrayList();
+		lookupResults.each { lookupResult ->
+			def term = lookupResult.key;
+			def record = lookupResult.value;
+			int index = term.toLowerCase().indexOf(params.term.toLowerCase());
+			
+			String name = term.replaceFirst(/(?i)${params.term}/, "<b>"+params.term+"</b>");
+			String highlightedName = record.originalName.replaceFirst(/(?i)${term}/, name);
+			String icon = record.icon;
+			if(icon) {
+				icon = grailsApplication.config.speciesPortal.resources.serverURL + "/" + icon;
+				icon = icon.replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.galleryThumbnail.suffix);
+			}
+			result.add([value:record.canonicalForm, label:highlightedName, desc:record.canonicalForm, icon:icon, speciesId:record.speciesId, "category":"Names"]);
+		}
+		//Thread.sleep(10000);
+		log.debug "suggestion : "+result;
 		return result;
 	}
 

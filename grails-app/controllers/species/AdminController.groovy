@@ -61,8 +61,8 @@ class AdminController {
 
 	def reloadNames = {
 		try {
-			log.debug "Reloading all names into recommendations"
-			namesLoaderService.syncNamesAndRecos(true);
+			log.debug "Syncing names into recommendations"
+			namesLoaderService.syncNamesAndRecos(false);
 			flash.message = "Successfully loaded all names into recommendations"
 		} catch(e) {
 			e.printStackTrace();
