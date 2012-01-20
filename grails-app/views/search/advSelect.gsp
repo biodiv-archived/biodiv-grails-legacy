@@ -16,15 +16,17 @@ $(document).ready(function(){
 	
 	$('#advSearchBox :input').each(function(index, ele) {
 		var field = $(this).attr('name');
-		$(this).autocomplete({			
-			appentTO:"#advSearchForm",
-		 	source:'${createLink(action: 'terms', controller:'search')}'+'?field='+field
-		});
+		if(field != 'name') {
+			$(this).autocomplete({			
+				appentTO:"#advSearchForm",
+			 	source:'${createLink(action: 'terms', controller:'search')}'+'?field='+field
+			});
+		}
 	});
 
 var cache = {},
 		lastXhr;
-	$("#searchTextField").catcomplete({
+	$("#advSearchTextField").catcomplete({
 	 	 appendTo: '#mainSearchForm',
 		 source:function( request, response ) {
 				var term = request.term;
@@ -41,11 +43,11 @@ var cache = {},
 				});
 			},focus: function( event, ui ) {
 				$("#canName").val("");
-				$( "#searchTextField" ).val( ui.item.label.replace(/<.*?>/g,"") );
+				$( "#advSearchTextField" ).val( ui.item.label.replace(/<.*?>/g,"") );
 				return false;
 			},
 			select: function( event, ui ) {
-				$( "#searchTextField" ).val( ui.item.label.replace(/<.*?>/g,"") );
+				$( "#advSearchTextField" ).val(  'canonical_name:"'+ui.item.value+'" '+ui.item.label.replace(/<.*?>/g,'' ));
 				$( "#canName" ).val( ui.item.value );
 				//$( "#name-description" ).html( ui.item.value ? ui.item.label.replace(/<.*?>/g,"")+" ("+ui.item.value+")" : "" );
 				//ui.item.icon ? $( "#name-icon" ).attr( "src",  ui.item.icon).show() : $( "#name-icon" ).hide();
@@ -84,28 +86,28 @@ var cache = {},
 						<tr class="prop">
 							<td valign="top" class="name">Name</td>
 							<td valign="top" class="value"><input type="text" size="40"
-								name="name" id="searchTextField" class="text ui-widget-content ui-corner-all"
-								title="Field for searching using a taxon name" /></td>
+								name="name" id="advSearchTextField" class="text ui-widget-content ui-corner-all"
+								title="Search using species name" /></td>
 						</tr>
 						<tr class="prop">
 							<td valign="top" class="name">Taxon Hierarchy</td>
 							<td valign="top" class="value"><input type="text" size="40"
 								name="taxon" value=""
 								class="text ui-widget-content ui-corner-all"
-								title="Field for searching taxon hierarchy" /></td>
+								title="Search using taxon hierarchy" /></td>
 						</tr>
 						<tr class="prop indent">
 							<td valign="top" class="name">Species Author</td>
 							<td valign="top" class="value"><input type="text" size="40"
 								name="author" class="text ui-widget-content ui-corner-all"
-								title="Field for searching using species author and basionym author" />
+								title="Search using species author and basionym author" />
 							</td>
 						</tr>
 						<tr class="prop indent">
 							<td valign="top" class="name">Year</td>
 							<td valign="top" class="value"><input type="text" size="40"
 								name="year" class="text ui-widget-content ui-corner-all"
-								title="Field for searching using year of finding the species and basionym year" />
+								title="Search using year of finding the species and basionym year" />
 							</td>
 						</tr>						
 						<tr class="prop">
@@ -113,7 +115,7 @@ var cache = {},
 							<td valign="top" class="value"><input type="text" size="40"
 								name="text" value=""
 								class="text ui-widget-content ui-corner-all"
-								title="Field to search all text content" /></td>
+								title="Search all text content" /></td>
 						</tr>
 						<tr class="prop">
 							<td valign="top" class="name">Contributor</td>

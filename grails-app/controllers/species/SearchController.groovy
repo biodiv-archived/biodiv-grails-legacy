@@ -76,9 +76,14 @@ class SearchController {
 		String query  = "";
 		def newParams = [:]
 		for(field in params) {
-			if(!(field.key ==~ /action|controller|sort|fl|start|rows/) && field.value) {
-				query = query + " " + field.key + ': "'+field.value+'"';
-				newParams[field.key] = field.value;
+			if(!(field.key ==~ /action|controller|sort|fl|start|rows/) && field.value ) {
+				if(field.key.equalsIgnoreCase('name')) {
+					newParams[field.key] = field.value;
+					query = query + " " +field.value;
+				} else {
+					newParams[field.key] = field.value;
+					query = query + " " + field.key + ': "'+field.value+'"';
+				}
 			}
 		}
 		if(query) {
@@ -96,13 +101,13 @@ class SearchController {
 		def namesLookupResults = namesIndexerService.suggest(params)
 		result.addAll(namesLookupResults);
 
-		//		def queryResponse = searchService.terms(params);
-		//		NamedList tags = (NamedList) ((NamedList)queryResponse.getResponse().terms)[params.field];
-		//
-		//		for (Iterator iterator = tags.iterator(); iterator.hasNext();) {
-		//			Map.Entry tag = (Map.Entry) iterator.next();
-		//			result.add([value:tag.getKey().toString(), label:tag.getKey().toString(),  "category":"General"]);
-		//		}
+				def queryResponse = searchService.terms(params);
+				NamedList tags = (NamedList) ((NamedList)queryResponse.getResponse().terms)[params.field];
+		
+				for (Iterator iterator = tags.iterator(); iterator.hasNext();) {
+					Map.Entry tag = (Map.Entry) iterator.next();
+					result.add([value:tag.getKey().toString(), label:tag.getKey().toString(),  "category":"General"]);
+				}
 		render result as JSON;
 
 	}
@@ -115,7 +120,7 @@ class SearchController {
 		params.field = params.field?:"autocomplete";
 		List result = new ArrayList();
 
-		if(params.field == "autocomplete" || params.field == 'name' || params.field == 'taxon') {
+		if(params.field == "autocomplete" || params.field == 'name') {
 			def namesLookupResults = namesIndexerService.suggest(params)
 			result.addAll(namesLookupResults);
 		} else {
