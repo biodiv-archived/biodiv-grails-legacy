@@ -12,6 +12,8 @@ import grails.web.JSONBuilder;
 import groovy.sql.GroovyRowResult;
 import groovy.sql.Sql
 import groovy.xml.MarkupBuilder;
+import java.util.List;
+import java.util.Map;
 
 
 class DataController {
@@ -50,8 +52,9 @@ class DataController {
 		long startTime = System.currentTimeMillis();
 		def rs = new ArrayList<GroovyRowResult>();
 		if(expandSpecies) {
-			def taxonIds = getSpeciesHierarchyTaxonIds(speciesid, classSystem)
-			getHierarchyNodes(rs, 0, 8, null, classSystem, false, expandSpecies, taxonIds);
+			//def taxonIds = getSpeciesHierarchyTaxonIds(speciesid, classSystem)
+			//getHierarchyNodes(rs, 0, 8, null, classSystem, false, expandSpecies, taxonIds);
+			getSpeciesHierarchy(speciesid, rs, classSystem);
 		} else {
 			getHierarchyNodes(rs, level, level+3, parentId, classSystem, expandAll, expandSpecies, null);
 		}
@@ -140,28 +143,17 @@ class DataController {
 		rs.each { r ->
 			r.put('expanded', false);
 			r.put("speciesid", -1)
-			if(r.rank == TaxonomyRank.SPECIES.ordinal()) {
-				def species = getSpecies(r.taxonid);
-				if(species) {
-					r.put("speciesid", species.id)
-					r.put('name', species.title)
-					r.put('count', 1);
-				}
-			}
+			populateSpeciesDetails(r.taxonid, r);
 			
-			if(expandAll || expandSpecies) {
-				if((taxonIds && taxonIds.contains(r.taxonid))) {
-					resultSet.add(r);
-					if(r.rank < TaxonomyRank.SPECIES.ordinal()) {
-						//r.put('count', getCount(r.path, classSystem));
-						if(r.rank+1 <= tillLevel) {
-							r.put('expanded', true);
-							getHierarchyNodes(resultSet, r.rank+1, tillLevel, r.path, classSystem, expandAll, expandSpecies, taxonIds)
-						}
+			resultSet.add(r);
+			if(expandAll || (taxonIds && taxonIds.contains(r.taxonid))) {
+				if(r.rank < TaxonomyRank.SPECIES.ordinal()) {
+					//r.put('count', getCount(r.path, classSystem));
+					if(r.rank+1 <= tillLevel) {
+						r.put('expanded', true);
+						getHierarchyNodes(resultSet, r.rank+1, tillLevel, r.path, classSystem, expandAll, expandSpecies, taxonIds)
 					}
 				}
-			} else {
-				resultSet.add(r);
 			}
 		}
 	}
@@ -178,19 +170,6 @@ class DataController {
 		def sql = new Sql(dataSource)
 		int level = TaxonomyRank.SPECIES.ordinal();
 		return Species.find("from Species as s where s.taxonConcept.id = :taxonId", [taxonId:taxonId]);
-		/*
-		 def rs = sql.rows("select s.species_id as speciesid \
-		 from taxonomy_registry s, classification f, taxonomy_definition t \
-		 where \
-		 s.taxon_definition_id = t.id and \
-		 s.classification_id = f.id and \
-		 f.name = :classSystem and \
-		 t.rank = :level and \
-		 t.name = :name and \
-		 t.id = :taxonId and \
-		 s.path = :path", [level:level, taxonId:taxonId, name:name, path:path, classSystem:classSystem]);
-		 return rs[0]?.speciesid;
-		 */
 	}
 
 	/**
@@ -239,7 +218,7 @@ class DataController {
 	}
 
 	/**
-	 *
+	 * todo:CORRECT THIS
 	 * @param speciesId
 	 * @param classSystem
 	 * @return
@@ -258,6 +237,68 @@ class DataController {
 		return rs[0]?.count;
 	}
 
+	/**
+	 * 
+	 */
+	
+	private List getSpeciesHierarchy(Long speciesTaxonId, List rs, Long classSystem) {
+		List speciesHier = [];
+		int minHierarchySize = 6;
+		TaxonomyDefinition taxonConcept = TaxonomyDefinition.get(speciesTaxonId);
+		if(classSystem) {
+			Classification classification = Classification.get(classSystem);
+			TaxonomyRegistry.findAllByTaxonDefinitionAndClassification(taxonConcept, classification).each {reg ->
+				def list = [] 
+				while(reg != null) {
+					def result = ['count':1, 'rank':reg.taxonDefinition.rank, 'name':reg.taxonDefinition.name, 'path':reg.path, 'classSystem':classSystem, 'expanded':true]
+					populateSpeciesDetails(speciesTaxonId, result);
+					list.add(result);
+					reg = reg.parentTaxon;
+				}
+				if(list.size() >= minHierarchySize) {
+					list = list.sort {it.rank};
+					speciesHier.addAll(list);
+				}
+			}
+		} else {
+			TaxonomyRegistry.findAllByTaxonDefinition(taxonConcept).each { reg ->
+				def list = [];
+				while(reg != null) {					
+					def result = ['count':1, 'rank':reg.taxonDefinition.rank, 'name':reg.taxonDefinition.name, 'path':reg.path, 'classSystem':classSystem, 'expanded':true]
+					populateSpeciesDetails(speciesTaxonId, result);
+					list.add(result);					
+					reg = reg.parentTaxon;
+				}
+				if(list.size() >= minHierarchySize) {
+					list = list.sort {it.rank};
+					speciesHier.addAll(list);
+				}				
+			}
+		}
+		
+		//removing duplicate path elements
+		def temp = new HashSet();
+		speciesHier.each { map ->
+			if(!temp.contains(map.path)) {
+				temp.add(map.path);
+				rs.add(map);
+				
+			}
+		}
+		log.debug rs;
+	}
+	
+	/**
+	 * 
+	 */
+	private void populateSpeciesDetails(Long speciesTaxonId, Map result) {
+		if(result.rank == TaxonomyRank.SPECIES.ordinal()) {
+			def species = getSpecies(speciesTaxonId);
+			result.put("speciesid", species.id)
+			result.put('name', species.title)
+			result.put('count', 1);
+		}
+	}
 	/**
 	 * render t as XML;
 	 * @param rs

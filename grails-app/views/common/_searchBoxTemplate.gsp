@@ -26,10 +26,15 @@ $(document).ready(function(){
 				return false;
 			},
 			select: function( event, ui ) {
-				$( "#searchTextField" ).val( 'canonical_name:"'+ui.item.value+'" '+ui.item.label.replace(/<.*?>/g,'') );
+				if( ui.item.category == 'Name') {
+					$( "#searchTextField" ).val( 'canonical_name:"'+ui.item.value+'" '+ui.item.label.replace(/<.*?>/g,'') );
+				} else {
+					$( "#searchTextField" ).val( ui.item.label.replace(/<.*?>/g,'') );
+				}
 				$( "#canName" ).val( ui.item.value );
 				//$( "#name-description" ).html( ui.item.value ? ui.item.label.replace(/<.*?>/g,"")+" ("+ui.item.value+")" : "" );
 				//ui.item.icon ? $( "#name-icon" ).attr( "src",  ui.item.icon).show() : $( "#name-icon" ).hide();
+				$( "#searchbox" ).submit();
 				return false;
 			}
 	}).data( "catcomplete" )._renderItem = function( ul, item ) {

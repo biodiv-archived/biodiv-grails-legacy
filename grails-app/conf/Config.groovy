@@ -401,7 +401,7 @@ environments {
 }
 
 navigation.dashboard = [
-	[controller:'species', title:'Thumbnail Gallery', order:1, action:"list"],
+	[controller:'species', title:'Species Gallery', order:1, action:"list"],
 	[controller:'species', title:'Taxonomy Browser', order:10, action:'taxonBrowser'],
 	[controller:'search', title:'Advanced Search',order:20, action:'advSelect'],
 	[controller:'species', title:'Contribute', order:30, action:'contribute']
@@ -420,10 +420,10 @@ navigation.dashboard = [
 	 */
 ]
 
-navigation.gallery = [
+/*navigation.gallery = [
 	[controller:'species', title:'Images', order:1, action:"images"],
 	[controller:'species', title:'Images from Google', order:10, action:'imagesFromGoogle'],
-]
+]*/
 
 ckeditor  = {
 	skipAllowedItemsCheck = false

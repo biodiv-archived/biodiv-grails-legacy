@@ -191,7 +191,7 @@ jQuery(document).ready(function($) {
 			
 			$('#spinner')
 				.hide()  // hide it initially
-    			.ajaxStart(function() { 
+    			/*.ajaxStart(function() { 
     				$("html").addClass('busy');
     				$(this).offset({left:($('body').width()/2), top:($('body').height()/2)});
         			$(this).show();
@@ -199,7 +199,7 @@ jQuery(document).ready(function($) {
     			.ajaxStop(function() {
     				$("html").removeClass('busy');
         			$(this).hide();
-    			});
+    			});*/
     			
     		
 				$(".ui-icon-control").click(function() {

@@ -12,8 +12,8 @@ $(document).ready(function() {
    		colNames:['Id', '','#Species', 'SpeciesId', 'Class System'],
    		colModel:[
    			{name:'id',index:'id',hidden:true},
-   			{name:'name',index:'name',formatter:heirarchyLevelFormatter, width:300},
-   			{name:'count', index:'count', hidden:true},
+   			{name:'name',index:'name',formatter:heirarchyLevelFormatter},
+   			{name:'count', index:'count',hidden:true, width:50},
    			{name:'speciesId',index:'speciesId', hidden:true},
    			{name:'classSystem', index:'classSystem', hidden:true}
    		],   		
@@ -21,6 +21,7 @@ $(document).ready(function() {
     	height: "${height?:'100%'}", 
     	autowidth:true,   
     	scrollOffset: 0,
+    	
     	loadui:'block',
    		treeGrid: true,
    		ExpandColumn : 'name',
@@ -78,12 +79,18 @@ var heirarchyLevelFormatter = function(el, cellVal, opts) {
 		levelTxt = ""
 	}
 
+	//el+= taxonId;
 	if(level == ${TaxonomyRank.SPECIES.ordinal() }) {
 		el = "<a href='${createLink(action:"show")}/"+speciesId+"'>"+el+"</a>";
 	} else {
 		// el = "<a href='${createLink(action:"taxon")}/"+taxonId+"'
 		// class='rank"+level+"'>"+levelTxt+": "+el+"</a>";
-		el = levelTxt+": "+"<span class='rank"+level+"'>"+el+"&nbsp;<a class='taxonExpandAll' onClick='expandAll(\"taxonHierarchy\", \""+cellVal.rowId+"\")'>+</a> </span>"
+		el = levelTxt+": "+"<span class='rank"+level+"'>"+el;
+		
+		if(${expandAllIcon?:true}) {
+			el += "&nbsp;<a class='taxonExpandAll' onClick='expandAll(\"taxonHierarchy\", \""+cellVal.rowId+"\")'>+</a>";
+		}
+		el+= "</span>"
 	}
 	return el;	   
 }			

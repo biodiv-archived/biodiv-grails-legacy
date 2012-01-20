@@ -399,7 +399,7 @@ $(document).ready(function(){
 
 			<!--  static species content -->
 			<div class="grid_6 classifications">
-				<t:showTaxonBrowser model="['expandSpecies':true, 'expandAll':false, 'speciesId':speciesInstance.taxonConcept?.id]"/>
+				<t:showTaxonBrowser model="['expandSpecies':true, 'expandAll':false, 'speciesId':speciesInstance.taxonConcept?.id, expandAllIcon:false]"/>
 				<br />					
 
 				<div class="readmore" style="float:left;">

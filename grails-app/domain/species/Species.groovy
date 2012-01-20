@@ -118,7 +118,7 @@ class Species {
 		
 	}
 	
-	Map<Classification, List<TaxonomyRegistry>> fetchTaxonomyRegistry() {
+	Map<Classification, List<TaxonomyDefinition>> fetchTaxonomyRegistry() {
 		return this.taxonConcept.parentTaxonRegistry();
 	}
 	
