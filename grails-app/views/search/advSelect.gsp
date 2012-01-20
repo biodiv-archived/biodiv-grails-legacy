@@ -76,7 +76,7 @@ var cache = {},
 
 	<div class="container_12">
 
-		<div class="grid_12" id="advSearchForm">
+		<div class="grid_11" id="advSearchForm">
 
 			<form method="get"
 				action="${createLink(controller:'search', action:'advSelect') }"
