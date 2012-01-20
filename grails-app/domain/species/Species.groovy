@@ -117,4 +117,9 @@ class Species {
 		return new Resource(fileName:"group_icons/${name}", type:ResourceType.ICON, title:"You can contribute!!!");
 		
 	}
+	
+	Map<Classification, List<TaxonomyRegistry>> fetchTaxonomyRegistry() {
+		return this.taxonConcept.parentTaxonRegistry();
+	}
+	
 }
