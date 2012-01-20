@@ -128,11 +128,12 @@ $(document).ready(function(){
 									</div>
 	
 									<div class="readmore">
-										  <g:if test="${speciesInstance.findSummary().length() > 300}">
-												${speciesInstance.findSummary()[0..300] + ' ...'}
+									      <g:set var="summary" value="${speciesInstance.findSummary()}"></g:set>
+										  <g:if test="${summary != null && summary.length() > 300}">
+												${summary[0..300] + ' ...'}
 										  </g:if>
 										  <g:else>
-												${speciesInstance.findSummary()}
+												${summary?:''}
 										  </g:else>
 									</div>
 	
