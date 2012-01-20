@@ -27,7 +27,7 @@
 				<br/>
 				<li><a href="${createLink(action:'updateGroups')}">Update groups for taxon concepts</a></li>
 				<li><a href="${createLink(action:'updateExternalLinks')}">Update external links for taxon concepts</a></li>
-				<li><a href="${createLink(action:'reloadNames')}">Update names and recommendations</a></li>
+				<li><a href="${createLink(action:'reloadNames')}">Sync names and recommendations</a></li>
 				
 				<br/>
 				<li><a href="${createLink(action:'reloadNamesIndex')}">Recreate names index</a>

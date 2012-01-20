@@ -1,5 +1,7 @@
 package species
 
+import java.util.List;
+
 import species.groups.SpeciesGroup;
 import species.utils.Utils;
 
@@ -54,10 +56,10 @@ class TaxonomyDefinition {
 	SpeciesGroup group;
 	String threatenedStatus;
 	ExternalLinks externalLinks;
-	
-	
+
+
 	static hasMany = [author:String, year:String]
-	
+
 	static constraints = {
 		name(blank:false)
 		canonicalForm (nullable:true, unique:['rank']);
@@ -68,7 +70,7 @@ class TaxonomyDefinition {
 		threatenedStatus nullable:true;
 		externalLinks nullable:true;
 	}
-	
+
 	static mapping = {
 		sort "rank"
 		version false;
@@ -77,22 +79,39 @@ class TaxonomyDefinition {
 	Long findSpeciesId() {
 		return Species.findByTaxonConcept(this)?.id;
 	}
-	
+
 	void setName(String name) {
 		this.name = Utils.cleanName(name);
 	}
-	
+
 	/**
 	 * Returns parents as per all classifications
 	 * @return
 	 */
-	List<TaxonomyRegistry> parentTaxon() {
-		List<TaxonomyRegistry> result = [];
+	List<TaxonomyDefinition> parentTaxon() {
+		List<TaxonomyDefinition> result = [];
 		TaxonomyRegistry.findAllByTaxonDefinition(this).each { TaxonomyRegistry reg ->
 			//TODO : better way : http://stackoverflow.com/questions/673508/using-hibernate-criteria-is-there-a-way-to-escape-special-characters
 			reg.path.tokenize('_').each { taxonDefinitionId ->
 				result.add(TaxonomyDefinition.get(Long.parseLong(taxonDefinitionId)));
 			}
+		}
+		return result;
+	}
+
+	/**
+	 * Returns parents as per all classifications
+	 * @return
+	 */
+	Map<Classification, List<TaxonomyDefinition>> parentTaxonRegistry() {
+		Map<List<TaxonomyDefinition>> result = [:];
+		TaxonomyRegistry.findAllByTaxonDefinition(this).each { TaxonomyRegistry reg ->
+			//TODO : better way : http://stackoverflow.com/questions/673508/using-hibernate-criteria-is-there-a-way-to-escape-special-characters
+			def l = []
+			reg.path.tokenize('_').each { taxonDefinitionId ->
+				l.add(TaxonomyDefinition.get(Long.parseLong(taxonDefinitionId)));
+			}
+			result.put(reg.classification , l);
 		}
 		return result;
 	}

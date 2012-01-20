@@ -50,7 +50,9 @@ class TSTLookup<E> extends Lookup<E> implements Serializable {
 	 */
 	List<LookupResult> lookup(String key, boolean onlyMorePopular, int num) {
 		List<TernaryTreeNode> list = autocomplete.prefixCompletion(root, key, 0);
-
+		key = key.toLowerCase();
+		//println "-----------------"
+		//println key;
 		List<LookupResult> res = new ArrayList<LookupResult>();
 		if (list == null || list.size() == 0) {
 			return res;
@@ -62,9 +64,23 @@ class TSTLookup<E> extends Lookup<E> implements Serializable {
 			LookupPriorityQueue queue = new LookupPriorityQueue(num);
 			for (TernaryTreeNode ttn : list) {
 				for (obj in ttn.val) {
+					//println obj.originalName+"   "+obj.canonicalForm+"  "+obj.wt
 					if(!added.contains(obj)) {
 						added.add(obj);
-						queue.insertWithOverflow(new LookupResult(ttn.token, obj));
+						//TODO:Hack to push records with exact prefix to the top
+						//clone not supported 
+						def record = new Record()
+						record.metaClass.properties.each{
+							if (it.name != 'metaClass' && it.name != 'class')
+							  it.setProperty(record, obj.metaClass.getProperty(obj, it.name))
+						 }
+						//println record
+						//println record.originalName+"  "+record.canonicalForm+"  "+record.wt
+						if(record.originalName.toLowerCase().startsWith(key)) {
+							//println "incrementing wt by 3"
+							record.wt += 3;
+						}
+						queue.insertWithOverflow(new LookupResult(ttn.token, record));
 					}
 				}
 			}
@@ -73,7 +89,7 @@ class TSTLookup<E> extends Lookup<E> implements Serializable {
 			}
 		} else {
 			for (int i = 0; i < maxCnt; i++) {
-				TernaryTreeNode ttn = list.get(i);
+				TernaryTreeNode ttn = list.get(i);				
 				for (obj in ttn.val) {
 					if(!added.contains(obj)) {
 						added.add(obj);

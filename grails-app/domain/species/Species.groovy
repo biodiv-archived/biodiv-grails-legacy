@@ -41,13 +41,11 @@ class Species {
 
 	Resource mainImage() {  
 		if(!reprImage) {
-			log.debug "Saving representative image for species"; 
+			 
 			def images = this.getImages();
 			this.reprImage = images ? images[0]:null;
-			println images
-			println '----------'
-			println reprImage
 			if(reprImage) {
+				log.debug "Saving representative image for species";
 				if(!this.save(flush:true)) {
 					this.errors.each { log.error it }
 				}
@@ -119,4 +117,9 @@ class Species {
 		return new Resource(fileName:"group_icons/${name}", type:ResourceType.ICON, title:"You can contribute!!!");
 		
 	}
+	
+	Map<Classification, List<TaxonomyRegistry>> fetchTaxonomyRegistry() {
+		return this.taxonConcept.parentTaxonRegistry();
+	}
+	
 }

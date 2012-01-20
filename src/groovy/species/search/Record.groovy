@@ -9,6 +9,7 @@ class Record implements Comparable<Record>, Serializable {
 	
 	private static final long serialVersionUID = 7526472295622776147L;
 	
+	Long speciesId;
 	String name;
 	String originalName;
 	String icon;

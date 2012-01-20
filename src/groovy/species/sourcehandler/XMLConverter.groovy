@@ -782,8 +782,10 @@ class XMLConverter extends SourceConverter {
 		refs.each {
 			String title = it?.title?.text().trim();
 			String url = it?.url?.text().trim();
-			def ref = new Reference(title:title, url:url);
-			references.add(ref);
+			if(title || url) {
+				def ref = new Reference(title:title, url:url);
+				references.add(ref);
+			}
 		}
 
 		return references;

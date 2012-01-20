@@ -14,7 +14,7 @@
 
 $(document).ready(function(){
 	$(".readmore").readmore({
-		substr_len : 400,
+		substr_len : 300,
 		more_link : '<a class="more readmore">&nbsp;More</a>'
 	});
 
@@ -79,48 +79,63 @@ $(document).ready(function(){
 									</g:link>
 								</div>
 								<div class="searchSnippet">
-								<h6>
-									<g:link action="show" controller="species"
-										id="${speciesInstance.id}">
-										${speciesInstance.taxonConcept.italicisedForm }
-									</g:link>
-								</h6> <%def engCommonName=CommonNames.findByTaxonConceptAndLanguage(speciesInstance.taxonConcept, Language.findByThreeLetterCode('eng'))?.name%>
-								<g:if test="${engCommonName}">
-									<b class="commonName"> ${engCommonName} </b>
-								</g:if>
-								<div class="icons">
-									<g:collect in="${speciesInstance}"
-										expr="${it.fields.resources}" var="resourcesCollection">
-										<g:each in="${resourcesCollection}" var="rs">
-											<g:each in="${rs}" var="r">
-												<g:if test="${r.type == species.Resource.ResourceType.ICON}">
-													<img class="icon" href="${href}"
-														src="${createLinkTo(dir: 'images/icons', file: r.fileName.trim(), absolute:true)}"
-														title="${r?.description}" />
-												</g:if>
+									<h6>
+										<g:link action="show" controller="species"
+											id="${speciesInstance.id}">
+											${speciesInstance.taxonConcept.italicisedForm }
+										</g:link>
+									</h6> <%def engCommonName=CommonNames.findByTaxonConceptAndLanguage(speciesInstance.taxonConcept, Language.findByThreeLetterCode('eng'))?.name%>
+									<g:if test="${engCommonName}">
+										<b class="commonName"> ${engCommonName} </b>
+									</g:if>
+									<div class="icons">
+										<g:collect in="${speciesInstance}"
+											expr="${it.fields.resources}" var="resourcesCollection">
+											<g:each in="${resourcesCollection}" var="rs">
+												<g:each in="${rs}" var="r">
+													<g:if test="${r.type == species.Resource.ResourceType.ICON}">
+														<img class="icon" href="${href}"
+															src="${createLinkTo(dir: 'images/icons', file: r.fileName.trim(), absolute:true)}"
+															title="${r?.description}" />
+													</g:if>
+												</g:each>
 											</g:each>
-										</g:each>
-									</g:collect>
-								</div>
-
-								<div class="readmore">
-									${speciesInstance.findSummary()}
-								</div>
-
-								<div class="breadcrumb">
-									<%def sortedTaxonReg = speciesInstance.taxonomyRegistry.asList().sort {it.taxonDefinition.rank} %>
-									<g:each in="${sortedTaxonReg}" var="taxonReg">
-										<g:if
-											test="${taxonReg.classification.name.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY) }">
-											<span class='rank${taxonReg.taxonDefinition.rank}'> ${taxonReg.taxonDefinition.name}
+										</g:collect>
+										
+		
+										<g:each in="${speciesInstance.fetchTaxonomyRegistry()}">
+											<span>
+											<a  class="taxaHierarchy icon ui-icon-control" title="${it.key.name}"></a>
+											<%def sortedTaxon = it.value.sort {it.rank} %>
+											<div class="ui-corner-all toolbarIconContent attribution" style="display: none;">
+												<a class="ui-icon ui-icon-close" style="float: right;"></a> 
+												<g:each in="${sortedTaxon}" var="taxonDefinition">											
+														<span class='rank${taxonDefinition.rank} breadcrumb'> ${taxonDefinition.italicisedForm}
+														</span>
+														<g:if test="${taxonDefinition.rank<8}">></g:if>
+												</g:each> 
+											</div>
 											</span>
-											<g:if test="${taxonReg.taxonDefinition.rank<8}">></g:if>
-
-										</g:if>
-									</g:each>
+										</g:each>
+										
+										
+										<img class="group_icon species_group_icon" src="${createLinkTo(dir: 'images', file: speciesInstance.fetchSpeciesGroupIcon()?.fileName?.trim(), absolute:true)}" 
+										  title="${speciesInstance.fetchSpeciesGroup()?.name}"/>
+										  
+										  <g:if test="${speciesInstance.taxonConcept.threatenedStatus}">
+										  		<s:showThreatenedStatus model="['threatenedStatus':speciesInstance.taxonConcept.threatenedStatus]"/>
+										  </g:if>
+									</div>
+	
+									<div class="readmore">
+										${speciesInstance.findSummary()}
+									</div>
+	
+									<div class="breadcrumb">
+										
+									</div>
 								</div>
-								</div>
-								</li>
+							</li>
 						</g:each>
 					</ul>
 				</div>

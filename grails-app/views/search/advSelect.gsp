@@ -3,24 +3,72 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="main" />
-<r:require module="jquery-ui"/>
+
 <title>Advance Search</title>
 
 <g:javascript>
 
 $(document).ready(function(){
+	
 	$( "#advSearch" ).button().click(function() {
 			$( "#advSearchBox" ).submit();
 	});
 	
 	$('#advSearchBox :input').each(function(index, ele) {
 		var field = $(this).attr('name');
-		$(this).autocomplete({			
-			appentTO:"#advSearchForm",
-		 	source:'${createLink(action: 'terms', controller:'search')}'+'?field='+field
-		});
+		if(field != 'name') {
+			$(this).autocomplete({			
+				appentTO:"#advSearchForm",
+			 	source:'${createLink(action: 'terms', controller:'search')}'+'?field='+field
+			});
+		}
 	});
-	
+
+var cache = {},
+		lastXhr;
+	$("#advSearchTextField").catcomplete({
+	 	 appendTo: '#mainSearchForm',
+		 source:function( request, response ) {
+				var term = request.term;
+				if ( term in cache ) {
+					response( cache[ term ] );
+					return;
+				}
+
+				lastXhr = $.getJSON( "${createLink(action: 'nameTerms', controller:'search')}", request, function( data, status, xhr ) {
+					cache[ term ] = data;
+					if ( xhr === lastXhr ) {
+						response( data );
+					}
+				});
+			},focus: function( event, ui ) {
+				$("#canName").val("");
+				$( "#advSearchTextField" ).val( ui.item.label.replace(/<.*?>/g,"") );
+				return false;
+			},
+			select: function( event, ui ) {
+				$( "#advSearchTextField" ).val(  'canonical_name:"'+ui.item.value+'" '+ui.item.label.replace(/<.*?>/g,'' ));
+				$( "#canName" ).val( ui.item.value );
+				//$( "#name-description" ).html( ui.item.value ? ui.item.label.replace(/<.*?>/g,"")+" ("+ui.item.value+")" : "" );
+				//ui.item.icon ? $( "#name-icon" ).attr( "src",  ui.item.icon).show() : $( "#name-icon" ).hide();
+				return false;
+			}
+	}).data( "catcomplete" )._renderItem = function( ul, item ) {
+			if(item.category == "General") {
+				return $( "<li class='grid_4'  style='list-style:none;'></li>" )
+					.data( "item.autocomplete", item )
+					.append( "<a>" + item.label + "</a>" )
+					.appendTo( ul );
+			} else {
+				if(!item.icon) {
+					item.icon =  "${createLinkTo(file:"no-image.jpg", base:grailsApplication.config.speciesPortal.resources.serverURL)}"
+				}  
+				return $( "<li class='grid_4' style='list-style:none;'></li>" )
+					.data( "item.autocomplete", item )
+					.append( "<img src='" + item.icon+"' class='ui-state-default icon' style='float:left' /><a>" + item.label + ((item.desc)?'<br>(' + item.desc + ')':'')+"</a>" )
+					.appendTo( ul );
+			}
+		};	
 });
 </g:javascript>
 </head>
@@ -38,28 +86,28 @@ $(document).ready(function(){
 						<tr class="prop">
 							<td valign="top" class="name">Name</td>
 							<td valign="top" class="value"><input type="text" size="40"
-								name="name" class="text ui-widget-content ui-corner-all"
-								title="Field for searching using a taxon name" /></td>
+								name="name" id="advSearchTextField" class="text ui-widget-content ui-corner-all"
+								title="Search using species name" /></td>
 						</tr>
 						<tr class="prop">
 							<td valign="top" class="name">Taxon Hierarchy</td>
 							<td valign="top" class="value"><input type="text" size="40"
 								name="taxon" value=""
 								class="text ui-widget-content ui-corner-all"
-								title="Field for searching taxon hierarchy" /></td>
+								title="Search using taxon hierarchy" /></td>
 						</tr>
 						<tr class="prop indent">
 							<td valign="top" class="name">Species Author</td>
 							<td valign="top" class="value"><input type="text" size="40"
 								name="author" class="text ui-widget-content ui-corner-all"
-								title="Field for searching using species author and basionym author" />
+								title="Search using species author and basionym author" />
 							</td>
 						</tr>
 						<tr class="prop indent">
 							<td valign="top" class="name">Year</td>
 							<td valign="top" class="value"><input type="text" size="40"
 								name="year" class="text ui-widget-content ui-corner-all"
-								title="Field for searching using year of finding the species and basionym year" />
+								title="Search using year of finding the species and basionym year" />
 							</td>
 						</tr>						
 						<tr class="prop">
@@ -67,7 +115,7 @@ $(document).ready(function(){
 							<td valign="top" class="value"><input type="text" size="40"
 								name="text" value=""
 								class="text ui-widget-content ui-corner-all"
-								title="Field to search all text content" /></td>
+								title="Search all text content" /></td>
 						</tr>
 						<tr class="prop">
 							<td valign="top" class="name">Contributor</td>

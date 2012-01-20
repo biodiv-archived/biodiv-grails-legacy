@@ -5,7 +5,7 @@ $(document).ready(function(){
 	
 	var cache = {},
 		lastXhr;
-	$("#searchTextField").autocomplete({
+	$("#searchTextField").catcomplete({
 	 	 appendTo: '#mainSearchForm',
 		 source:function( request, response ) {
 				var term = request.term;
@@ -14,14 +14,40 @@ $(document).ready(function(){
 					return;
 				}
 
-				lastXhr = $.getJSON( "${createLink(action: 'terms', controller:'search')}", request, function( data, status, xhr ) {
+				lastXhr = $.getJSON( "${createLink(action: 'nameTerms', controller:'search')}", request, function( data, status, xhr ) {
 					cache[ term ] = data;
 					if ( xhr === lastXhr ) {
 						response( data );
 					}
 				});
+			},focus: function( event, ui ) {
+				$("#canName").val("");
+				$( "#searchTextField" ).val( ui.item.label.replace(/<.*?>/g,"") );
+				return false;
+			},
+			select: function( event, ui ) {
+				$( "#searchTextField" ).val( 'canonical_name:"'+ui.item.value+'" '+ui.item.label.replace(/<.*?>/g,'') );
+				$( "#canName" ).val( ui.item.value );
+				//$( "#name-description" ).html( ui.item.value ? ui.item.label.replace(/<.*?>/g,"")+" ("+ui.item.value+")" : "" );
+				//ui.item.icon ? $( "#name-icon" ).attr( "src",  ui.item.icon).show() : $( "#name-icon" ).hide();
+				return false;
 			}
-	});
+	}).data( "catcomplete" )._renderItem = function( ul, item ) {
+			if(item.category == "General") {
+				return $( "<li class='grid_4'  style='list-style:none;'></li>" )
+					.data( "item.autocomplete", item )
+					.append( "<a>" + item.label + "</a>" )
+					.appendTo( ul );
+			} else {
+				if(!item.icon) {
+					item.icon =  "${createLinkTo(file:"no-image.jpg", base:grailsApplication.config.speciesPortal.resources.serverURL)}"
+				}  
+				return $( "<li class='grid_4' style='list-style:none;'></li>" )
+					.data( "item.autocomplete", item )
+					.append( "<img src='" + item.icon+"' class='ui-state-default icon' style='float:left' /><a>" + item.label + ((item.desc)?'<br>(' + item.desc + ')':'')+"</a>" )
+					.appendTo( ul );
+			}
+		};;
 	
 	$( "#search" ).click(function() {
 			$( "#searchbox" ).submit();
