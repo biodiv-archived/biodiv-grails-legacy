@@ -507,7 +507,8 @@ th.name {
 	background-color: #FAFAFA;
 	padding: 10px;
 	position: absolute;
-	width: 90%;
+	min-width: 300px;
+	max-width: 600px;
 	box-shadow: 3px 3px 7px #555555;
 	font-size: 0.8em;
 	font-style: normal;
@@ -932,7 +933,6 @@ textarea#notes {
 	float:right;
 	border: 1px solid #666666;
 	border-radius: 7px;
-	background-color: #666666;
 }
 
 .mailme {
@@ -969,10 +969,12 @@ ul.thumbwrap li:hover{
 }
 
 ul.thumbwrap li a {
-    color: #262626;
+    color: #333333;
     font-weight: bold;
     overflow: hidden;
-    text-shadow: 1px 1px 1px #aaaaaa;
+    display: block;
+    width: 100%;
+    height: 100%;
 }
 
     text-shadow: 1px 1px 1px #666666;
@@ -1058,6 +1060,10 @@ td input.text:focus {
 	opacity: 0.9;
 }
 
+#gbox_taxonHierarchy {
+	margin-top: 10px;
+	
+}
 .taxaHierarchy {
 	background: transparent url(../images/tree.png) 5px 50% no-repeat;
     margin-left: 0;

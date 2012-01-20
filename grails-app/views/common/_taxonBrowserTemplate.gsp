@@ -97,7 +97,7 @@ var heirarchyLevelFormatter = function(el, cellVal, opts) {
 </g:javascript>
 
 
-<div class="taxonomyBrowser">
+<div class="taxonomyBrowser" style="position: relative;">
 	
 		<g:set var="classifications" value="${Classification.list()}" />
 		<select name="taxaHierarchy" id="taxaHierarchy"
@@ -110,7 +110,7 @@ var heirarchyLevelFormatter = function(el, cellVal, opts) {
 		</select>
 		<div class="attributionBlock">
 			<span class="ui-icon-info ui-icon-control " title="Show details"
-				style="float: right;"></span>
+				style="position: absolute; top: 0; right: 0; margin 10px;"></span>
 			<div class="ui-corner-all toolbarIconContent attribution"
 				style="display: none;">
 				<a class="ui-icon ui-icon-close" style="float: right;"></a> <span
