@@ -141,15 +141,29 @@ class NamesIndexerService {
 	def suggest(params) {
 		log.debug "Suggest name using params : "+params
 		List<LookupResult> lookupResults = lookup.lookup(params.term.toLowerCase(), true, 10);		
-		
+		println lookupResults
 		def result = new ArrayList();
 		lookupResults.each { lookupResult ->
 			def term = lookupResult.key;
-			def record = lookupResult.value;
-			int index = term.toLowerCase().indexOf(params.term.toLowerCase());
+			def record = lookupResult.value;			
 			
-			String name = term.replaceFirst(/(?i)${params.term}/, "<b>"+params.term+"</b>");
-			String highlightedName = record.originalName.replaceFirst(/(?i)${term}/, name);
+//			String name = term.replaceFirst(/(?i)${params.term}/, "<b>"+params.term+"</b>");
+//			String highlightedName = record.originalName.replaceFirst(/(?i)${term}/, name);
+			int index = record.originalName.toLowerCase().indexOf(params.term.toLowerCase());
+			
+			//TODO:StringBuilder
+			String name = new String();
+			for(int i=0; i<record.originalName.size(); i++) {
+				if(i == index) {
+					name += "<b>"
+				}
+				name += record.originalName.charAt(i);
+				if(i == index+params.term.length()-1) {
+					name += "</b>"
+				}
+			}
+			
+			String highlightedName = name.toString();
 			String icon = record.icon;
 			if(icon) {
 				icon = grailsApplication.config.speciesPortal.resources.serverURL + "/" + icon;
@@ -157,7 +171,6 @@ class NamesIndexerService {
 			}
 			result.add([value:record.canonicalForm, label:highlightedName, desc:record.canonicalForm, icon:icon, speciesId:record.speciesId, "category":"Names"]);
 		}
-		//Thread.sleep(10000);
 		log.debug "suggestion : "+result;
 		return result;
 	}

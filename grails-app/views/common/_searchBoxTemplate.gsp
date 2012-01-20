@@ -26,7 +26,8 @@ $(document).ready(function(){
 				return false;
 			},
 			select: function( event, ui ) {
-				if( ui.item.category == 'Name') {
+				console.log(ui.item.category);
+				if( ui.item.category == 'Names') {
 					$( "#searchTextField" ).val( 'canonical_name:"'+ui.item.value+'" '+ui.item.label.replace(/<.*?>/g,'') );
 				} else {
 					$( "#searchTextField" ).val( ui.item.label.replace(/<.*?>/g,'') );

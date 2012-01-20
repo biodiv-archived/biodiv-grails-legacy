@@ -1,6 +1,8 @@
 package species
 
 import grails.converters.JSON;
+
+import org.apache.solr.common.SolrException;
 import org.apache.solr.common.util.NamedList
 
 import species.utils.Utils;
@@ -52,17 +54,22 @@ class SearchController {
 			paramsList.add('facet.field', searchFieldsConfig.YEAR)
 
 			log.debug "Along with faceting params : "+paramsList;
-			def queryResponse = searchService.search(paramsList);
-			List<Species> speciesInstanceList = new ArrayList<Species>();
-			Iterator iter = queryResponse.getResults().listIterator();
-			while(iter.hasNext()) {
-				def doc = iter.next();
-				def speciesInstance = Species.get(doc.getFieldValue("id"));
-				if(speciesInstance)
-					speciesInstanceList.add(speciesInstance);
+			try {
+				def queryResponse = searchService.search(paramsList);
+				List<Species> speciesInstanceList = new ArrayList<Species>();
+				Iterator iter = queryResponse.getResults().listIterator();
+				while(iter.hasNext()) {
+					def doc = iter.next();
+					def speciesInstance = Species.get(doc.getFieldValue("id"));
+					if(speciesInstance)
+						speciesInstanceList.add(speciesInstance);
+				}
+				log.debug(queryResponse.getFacetFields());
+				[responseHeader:queryResponse.responseHeader, total:queryResponse.getResults().getNumFound(), speciesInstanceList:speciesInstanceList, snippets:queryResponse.getHighlighting(), facets:queryResponse.getFacetFields()];
+			} catch(SolrException e) {
+				e.printStackTrace();
+				[params:params, speciesInstanceList:[]];
 			}
-			log.debug(queryResponse.getFacetFields());
-			[responseHeader:queryResponse.responseHeader, total:queryResponse.getResults().getNumFound(), speciesInstanceList:speciesInstanceList, snippets:queryResponse.getHighlighting(), facets:queryResponse.getFacetFields()];
 		} else {
 			[params:params, speciesInstanceList:[]];
 		}
