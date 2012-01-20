@@ -41,17 +41,17 @@ $(document).ready(function(){
 				<g:if test="${i%columnSize == 0}">
 					<ul class="speciesList thumbwrap grid_5" style="list-style: none;text-align:left">
 				</g:if>
-				<li class="grid_4"><g:link action="show"
+				<li class="grid_5"><g:link action="show"
 						id="${speciesInstance.id}">
 
 						<g:set var="mainImage" value="${speciesInstance.mainImage()}" />
 						<%def thumbnailPath = mainImage?.fileName?.replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.galleryThumbnail.suffix)%>
 
-						<img class="icon" style="float: left;"
+						<img class="icon" style="float: right;"
 							src="${createLinkTo( base:grailsApplication.config.speciesPortal.resources.serverURL,
 											file: thumbnailPath)}" title=" ${speciesInstance.taxonConcept.italicisedForm}"/>
 						
-						<p class="caption" style="margin-left:50px;"> ${speciesInstance.taxonConcept.italicisedForm}
+						<p class="caption"> ${speciesInstance.taxonConcept.italicisedForm}
 						</p>
 					</g:link>
 				</li>
@@ -77,7 +77,6 @@ $(document).ready(function(){
 			</center>
 		</div>
 
-	</div>
 	</div>
 
 </body>

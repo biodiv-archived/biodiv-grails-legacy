@@ -14,7 +14,7 @@ Just change the color-values to apply your own color-scheme.
 .navigation li a:hover { background-color: #999; }                  /* Background-color of hovered item */
 .navigation li a { color: #fff; }                                   /* Text color */
 .navigation li a:hover { color: #fff; }                             /* Text color on hovering */
-.navigation li { border: 1px solid #888; }                          /* Border color */
+.navigation li { border: 0px solid #888; }                          /* Border color */
 .navigation li.navigation_first { border-left-color: #888; }        /* Border color. Typically same as above */
 .navigation li { border-left-color: #bbb; }                         /* Highlight border-color */
 .navigation li.navigation_active { border-left-color: #555; }       /* Highlight border-color of active item */
@@ -32,13 +32,13 @@ Just change the color-values to apply your own color-scheme.
     list-style-type: none;
     clear: both;
     margin: 1em 0;
-    font-size: 12px;
+    font-size: 13px;
     /*overflow: hidden;*/ /* Clearing floats */
 }
 
 .navigation li {
     float: left;
-    margin-left:2px;
+    margin-left:4px;
     /* border: 1px solid #888; */
     /* border-left-color: #bbb; */
 }
@@ -54,8 +54,17 @@ Just change the color-values to apply your own color-scheme.
     text-decoration: none;
     /* background-color: #aaa; */
     /* color: #fff; */
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    color: #444444;
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+    text-shadow: 1px 1px 1px #aaaaaa;
+    font-weight: bold;
 }
 .navigation li a:hover {
+    background-color: rgba(128, 128, 128, 0.1);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    color: #111111;
     /* background-color: #999; */
 }
 .navigation li.navigation_active a {

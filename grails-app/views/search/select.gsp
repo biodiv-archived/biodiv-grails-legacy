@@ -60,13 +60,13 @@ $(document).ready(function(){
 							</g:if>
 						</g:each>
 					</div-->
-					<ul class="thumbwrap grid_12">
+					<ul class="thumbwrap grid_12" style="margin-top:10px; margin-bottom: 10px;">
 						<g:each in="${speciesInstanceList}" status="i"
 							var="speciesInstance">
-							<li style="list-style: none; margin-left: 0px;">
+							<li style="list-style: none; margin-left: 0px; height: 220px; overflow: hidden; border-bottom: 1px solid #c6c6c6; background-color: #fdfdfd;">
 
 								<div class="figure"
-									style="float: left; max-height: 220px; max-width: 200px">
+									style="clear: both; float: left; max-height: 220px; max-width: 200px; padding: 10px;">
 									<g:link action="show" controller="species"
 										id="${speciesInstance.id}">
 										<g:set var="mainImage" value="${speciesInstance.mainImage()}" />
@@ -78,6 +78,7 @@ $(document).ready(function(){
 											</span>
 									</g:link>
 								</div>
+								<div class="searchSnippet">
 								<h6>
 									<g:link action="show" controller="species"
 										id="${speciesInstance.id}">
@@ -117,8 +118,9 @@ $(document).ready(function(){
 
 										</g:if>
 									</g:each>
-								</div></li>
-							<hr />
+								</div>
+								</div>
+								</li>
 						</g:each>
 					</ul>
 				</div>

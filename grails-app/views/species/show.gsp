@@ -278,6 +278,23 @@ $(document).ready(function(){
   	if(${speciesInstance.getImages()?.size()?:0} == 0) {
   		$("#flickrImages").click();
   	}
+  	
+  	$('.thumbwrap .figure').hover(
+  	function(){
+  		$(this).children('.attributionBlock').css('visibility', 'visible');
+  	
+  	},function(){
+  		$(this).children('.attributionBlock').css('visibility', 'hidden');
+  	});
+  	
+  	$('.attribution').mouseleave(function(){
+  		$(this).hide();
+  	});
+  	
+  	$('.helpContent').mouseleave(function(){
+  		$(this).hide();
+  	});
+  	
 });
 
 </g:javascript>
@@ -303,7 +320,7 @@ $(document).ready(function(){
 
 			<div class="grid_16">
 
-				<h2 style="color: black;">
+				<h2 style="padding: 5px; color: black; text-shadow: 1px 1px 2px #c6c6c6;">
 					${speciesInstance.taxonConcept.italicisedForm }
 				</h2>
 

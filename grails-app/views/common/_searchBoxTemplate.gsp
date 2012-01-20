@@ -59,7 +59,7 @@ $(document).ready(function(){
 		action="${createLink(controller:'search', action:'select') }"
 		id="searchbox" class="searchbox">
 		<input type="text" name="query" id="searchTextField" value=""
-			size="40" class="text ui-widget-content ui-corner-all"
+			size="26" class="text ui-widget-content ui-corner-all"
 			title="Enter your searck key" />
 
 		<g:hiddenField name="start" value="0" />
