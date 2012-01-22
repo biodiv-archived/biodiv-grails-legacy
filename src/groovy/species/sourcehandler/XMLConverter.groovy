@@ -1069,6 +1069,7 @@ class XMLConverter extends SourceConverter {
 						log.debug "Taxon registry already exists : "+registry;
 						taxonEntities.add(registry);
 					} else {
+						log.debug "Saving taxon registry entity : "+ent;
 						if(!ent.save()) {
 							ent.errors.each { log.error it }
 						}

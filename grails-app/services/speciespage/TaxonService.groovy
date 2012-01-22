@@ -36,7 +36,7 @@ class TaxonService {
 				loadEFlora(grailsApplication.config.speciesPortal.data.rootDir+"/dictionaries/eflora_data_CN.xlsx", 0, 0);
 //				loadIBP("jdbc:postgresql://localhost:5432/ibp", "postgres", "postgres123", "org.postgresql.Driver");
 				loadIUCNRedList(grailsApplication.config.speciesPortal.data.rootDir+"/dictionaries/IUCNRedList-India-12-01-2012.xlsx", 0, 0);
-				loadKeystone(grailsApplication.config.speciesPortal.data.rootDir+"/dictionaries/Keystone_v1.xls", 0, 0);
+//				loadKeystone(grailsApplication.config.speciesPortal.data.rootDir+"/dictionaries/Keystone_v1.xls", 0, 0);
 				cleanUpGorm();
 		
 		//		groupHandlerService.updateGroups();
@@ -358,7 +358,7 @@ class TaxonService {
 			
 			// populating gbif id
 			if(fields[13]) {
-				externalLinksService.updateExternalLink(taxonConcept, "gbif", String.valueOf((int) Float.parseFloat(fields[13])), false);
+				externalLinksService.updateExternalLink(taxonConcept, "gbif", (Double.parseDouble(fields[13]).intValue()).toString(), false);
 			}
 			
 			taxonConcept = taxonConcept.merge();
@@ -709,7 +709,7 @@ class TaxonService {
 			
 			// populating iucn id
 			if(row.get("species id")) {
-				externalLinksService.updateExternalLink(taxonConcept, "iucn", String.valueOf((int) Float.parseFloat(row.get("species id"))), false);
+				externalLinksService.updateExternalLink(taxonConcept, "iucn", (Double.parseDouble(row.get("species id")).intValue()).toString(), false);
 			}
 			
 			taxonConcept = taxonConcept.merge();
