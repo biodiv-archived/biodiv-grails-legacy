@@ -37,7 +37,7 @@
 			</g:else>
 				<g:each in="${speciesFieldInstance.resources}" var="r">
 					<g:if test="${r.type == species.Resource.ResourceType.IMAGE}">
-						<li class="figure" style="list-style:none;float: right; max-height: 220px;"><div class="attributionBlock">
+						<li class="figure" style="list-style:none;float: right;"><div class="attributionBlock">
 							<span class="ui-icon-info ui-icon-control " title="Show details"
 								style="float: right;"></span>
 							<div class="grid_3 ui-corner-all toolbarIconContent attribution"
