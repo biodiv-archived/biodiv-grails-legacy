@@ -34,7 +34,7 @@ class DataController {
 	 */
 	def listHierarchy = {
 		log.debug params;
-		cache "taxonomy_results"
+		//cache "taxonomy_results"
 		includeOriginHeader();
 
 		int level = params.n_level ? Integer.parseInt(params.n_level)+1 : 0

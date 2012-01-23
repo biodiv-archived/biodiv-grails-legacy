@@ -29,7 +29,7 @@ class SpeciesController {
 	}
 
 	def list = {
-		cache "taxonomy_results"
+		//cache "taxonomy_results"
 		params.startsWith = params.startsWith?:"A"
 		def allGroup = SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.ALL);
 		params.sGroup = params.sGroup?SpeciesGroup.get(params.sGroup):allGroup
@@ -54,7 +54,7 @@ class SpeciesController {
 	}
 
 	def listXML = {
-		cache "taxonomy_results"
+		//cache "taxonomy_results"
 		params.max = Math.min(params.max ? params.int('max') : 10, 100)
 		def speciesList = Species.list(params) as XML;
 		def writer = new StringWriter ();
@@ -84,7 +84,7 @@ class SpeciesController {
 	}
 
 	def show = {
-		cache "content"
+		//cache "content"
 		def speciesInstance = Species.get(params.id)
 		if (!speciesInstance) {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'species.label', default: 'Species'), params.id])}"
@@ -300,7 +300,7 @@ class SpeciesController {
 	}
 
 	def count = {
-		cache "search_results"
+		//cache "search_results"
 		render Species.count();
 	}
 

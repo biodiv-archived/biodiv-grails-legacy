@@ -80,12 +80,13 @@ log4j = {
 			'org.springframework.security',
 			'org.hibernate',
 			'net.sf.ehcache.hibernate'
+			//'grails.plugin'
 
-	warn   'org.mortbay.log',
-			'org.grails.plugin.resource'
+	warn   'org.mortbay.log'
+
 	debug	'species',
 			'speciespage',
-
+			'org.grails.plugin.resource',
 			'grails.app'
 
 }
@@ -494,36 +495,39 @@ jquery {
 	minExtentsion = 'min'
 }
 
-grails.resources.debug = false
-grails.resources.modules = {
-	core { dependsOn 'jquery-ui' }
-	// Define reference to custom jQuery UI theme
-	overrides {
-		'jquery-theme' {
-			resource id: 'theme', url: 'css/custom-theme/jquery-ui-.custom.css'
-		}
-	}
-
-	//	'jquery' {
-	//		resource url:"js/jquery/jquery-1.7.min.js", nominify:true, disposition:'head'
-	//	}
-	//	'jquery-ui' {
-	//		dependsOn 'jquery'
-	//		resource url:[dir:"js/jquery-ui", file:'jquery-ui-1.8-min.js'], nominify:true
-	//		resource url:[dir:"js/jquery-ui", file:'jquery-ui-1.8-min.css'],
-	//				nominify:true, attrs:[media:'screen,projection']
-	//	}
-	//	'blueprint' {
-	//		resource url:[dir:'css/blueprint',file:'screen.css'], attrs:[media:'screen,projection']
-	//		resource url:[dir:'css/blueprint',file:'print.css'], attrs:[media:'print']
-	//		resource url:[dir:'css/blueprint',file:'ie.css'], attrs:[media:'screen,projection'],
-	//			  wrapper: { s -> "<!--[if lt IE 8]>$s<![endif]-->" }
-	//	}
-	//	'app' {
-	//		resource 'css/main.css'
-	//		resource 'js/application.js'
-	//	}
-}
+//grails.resources.debug = false
+//grails.resources.adhoc.patterns.excludes = ["*.css"]
+//grails.resources.mappers.hashandcache.excludes = ["**/*.css"]
+//
+//grails.resources.modules = {
+//	core { dependsOn 'jquery-ui' }
+//	// Define reference to custom jQuery UI theme
+//	overrides {
+//		'jquery-theme' {
+//			resource id: 'theme', url: 'css/custom-theme/jquery-ui-.custom.css'
+//		}
+//	}
+//
+//	//	'jquery' {
+//	//		resource url:"js/jquery/jquery-1.7.min.js", nominify:true, disposition:'head'
+//	//	}
+//	//	'jquery-ui' {
+//	//		dependsOn 'jquery'
+//	//		resource url:[dir:"js/jquery-ui", file:'jquery-ui-1.8-min.js'], nominify:true
+//	//		resource url:[dir:"js/jquery-ui", file:'jquery-ui-1.8-min.css'],
+//	//				nominify:true, attrs:[media:'screen,projection']
+//	//	}
+//	//	'blueprint' {
+//	//		resource url:[dir:'css/blueprint',file:'screen.css'], attrs:[media:'screen,projection']
+//	//		resource url:[dir:'css/blueprint',file:'print.css'], attrs:[media:'print']
+//	//		resource url:[dir:'css/blueprint',file:'ie.css'], attrs:[media:'screen,projection'],
+//	//			  wrapper: { s -> "<!--[if lt IE 8]>$s<![endif]-->" }
+//	//	}
+//	//	'app' {
+//	//		resource 'css/main.css'
+//	//		resource 'js/application.js'
+//	//	}
+//}
 
 
 // Added by the Spring Security Core plugin:

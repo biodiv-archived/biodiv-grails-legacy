@@ -49,7 +49,7 @@ $(document).ready(function(){
 
 						<img class="icon" style="float: right;"
 							src="${createLinkTo( base:grailsApplication.config.speciesPortal.resources.serverURL,
-											file: thumbnailPath)}" title=" ${speciesInstance.taxonConcept.italicisedForm}"/>
+											file: thumbnailPath)}" title=" ${speciesInstance.taxonConcept.name}"/>
 						
 						<p class="caption"> ${speciesInstance.taxonConcept.italicisedForm}
 						</p>

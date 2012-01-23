@@ -13,9 +13,9 @@ class Species {
 	String guid;
 	TaxonomyDefinition taxonConcept;
 	Resource reprImage;
-	Float percentOfInfo;
+	Float percentOfInfo; 
 	
-	def grailsApplication; 
+	def grailsApplication;
 	
 	private static final log = LogFactory.getLog(this);
 	
