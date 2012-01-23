@@ -55,8 +55,8 @@ $(document).ready(function() {
 
 var heirarchyLevelFormatter = function(el, cellVal, opts) {
 	var cells = $(opts).find('cell')
-	var taxonId = $(cells[0]).text().trim()
-	var speciesId = $(cells[3]).text().trim()
+	var taxonId = $.trim($(cells[0]).text())
+	var speciesId = $.trim($(cells[3]).text())
 	var level = $(cells[5]).text()
 	var levelTxt;
 	if(level == ${TaxonomyRank.KINGDOM.ordinal()} ) {
