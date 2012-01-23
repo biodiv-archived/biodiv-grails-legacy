@@ -376,7 +376,7 @@ $(document).ready(function(){
 										title="${r?.description}" />
 							</g:each>
 							<g:each in="${speciesInstance.taxonConcept.externalLinks}" var="r">
-								<g:each in="${['eolId', 'iucnId', 'gbifId']}" var="extLinkKey">
+								<g:each in="${['eolId', 'iucnId']}" var="extLinkKey">
 									<g:if test="${r[extLinkKey]}">
 										<s:showExternalLink model="['key':extLinkKey, 'externalLinks':r, 'taxonConcept':speciesInstance.taxonConcept]"/>										
 									</g:if>	
@@ -421,7 +421,7 @@ $(document).ready(function(){
 						<span class="ui-icon ui-icon-circle-triangle-s" style="float: left; margin-right: .3em;"></span>
 							<a href="#taxonRecordName"> Taxon Record Name</a> 
 					</div>
-					<div class="ui-widget-content">
+					<div class="ui-widget-content speciesField">
 						<table>
 						<tr class="prop">
 								<td><span class="grid_3 name">${grailsApplication.config.speciesPortal.fields.SCIENTIFIC_NAME }</span></td><td> ${speciesInstance.taxonConcept.italicisedForm}</td>
@@ -457,7 +457,7 @@ $(document).ready(function(){
 						<span class="ui-icon ui-icon-circle-triangle-s" style="float: left; margin-right: .3em;"></span>
 						<a href="#synonyms"> Synonyms</a> 
 					</div>
-					<div class="ui-widget-content">
+					<div class="ui-widget-content speciesField">
 						<table>
 						<g:each in="${synonyms}" var="synonym">
 						<tr><td class="prop">
@@ -493,7 +493,7 @@ $(document).ready(function(){
 						<span class="ui-icon ui-icon-circle-triangle-s" style="float: left; margin-right: .3em;"></span>
 						<a href="#commonNames"> Common Names</a> 
 					</div>
-					<div class="ui-widget-content">
+					<div class="ui-widget-content speciesField">
 						
 							<table>
 								<g:each in="${names}">

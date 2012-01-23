@@ -26,7 +26,6 @@ $(document).ready(function(){
 				return false;
 			},
 			select: function( event, ui ) {
-				console.log(ui.item.category);
 				if( ui.item.category == 'Names') {
 					$( "#searchTextField" ).val( 'canonical_name:"'+ui.item.value+'" '+ui.item.label.replace(/<.*?>/g,'') );
 				} else {
@@ -66,7 +65,7 @@ $(document).ready(function(){
 		id="searchbox" class="searchbox">
 		<input type="text" name="query" id="searchTextField" value=""
 			size="26" class="text ui-widget-content ui-corner-all"
-			title="Enter your searck key" />
+			title="Enter your search key" />
 
 		<g:hiddenField name="start" value="0" />
 		<g:hiddenField name="rows" value="10" />

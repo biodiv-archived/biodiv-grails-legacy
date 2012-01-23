@@ -36,7 +36,7 @@ class TaxonService {
 				loadEFlora(grailsApplication.config.speciesPortal.data.rootDir+"/dictionaries/eflora_data_CN.xlsx", 0, 0);
 //				loadIBP("jdbc:postgresql://localhost:5432/ibp", "postgres", "postgres123", "org.postgresql.Driver");
 				loadIUCNRedList(grailsApplication.config.speciesPortal.data.rootDir+"/dictionaries/IUCNRedList-India-12-01-2012.xlsx", 0, 0);
-//				loadKeystone(grailsApplication.config.speciesPortal.data.rootDir+"/dictionaries/Keystone_v1.xls", 0, 0);
+				loadKeystone(grailsApplication.config.speciesPortal.data.rootDir+"/dictionaries/Keystone_v1.xls", 0, 0);
 				cleanUpGorm();
 		
 		//		groupHandlerService.updateGroups();
