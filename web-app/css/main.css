@@ -500,7 +500,6 @@ th.name {
 }
 
 .toolbar {
-	position: relative
 }
 
 .toolbarIconContent {
@@ -565,7 +564,6 @@ th.name {
 }
 
 .help {
-	position: relative;
 }
 
 .thumbwrap  .figure {
