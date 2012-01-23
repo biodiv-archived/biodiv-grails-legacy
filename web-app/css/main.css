@@ -655,8 +655,7 @@ img {
 }
 
 .searchButton {
-	background: url(../images/search.png) no-repeat scroll center center
-		transparent;
+	background: url(../images/search.png) no-repeat scroll center transparent;
 	width: 42px;
 	border: 1px solid #aeaeae;
 	border-radius: 5px;
@@ -1062,7 +1061,7 @@ td input.text:focus {
 	
 }
 .taxaHierarchy {
-	background: transparent url(../images/tree.png) 5px 50% no-repeat;
+	background: url(../images/tree.png) 5px 50% no-repeat;
     margin-left: 0;
     margin-right: 5px;
     padding-left: 5px;
