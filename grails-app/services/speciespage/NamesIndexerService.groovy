@@ -55,7 +55,7 @@ class NamesIndexerService {
 		synchronized(kk) {
 			lookup = lookup1;
 		}
-		
+
 		log.info "Added recos : ${noOfRecosAdded}";
 		log.info "Time taken to rebuild index : "+((System.currentTimeMillis() - startTime)/1000) + "(sec)"
 
@@ -113,7 +113,7 @@ class NamesIndexerService {
 	}
 
 	private Species getSpecies(TaxonomyDefinition taxonConcept) {
-		if(!taxonConcept) return null;		
+		if(!taxonConcept) return null;
 		return Species.findByTaxonConcept(taxonConcept);
 	}
 
@@ -140,36 +140,38 @@ class NamesIndexerService {
 	 */
 	def suggest(params) {
 		log.info "Suggest name using params : "+params
-		List<LookupResult> lookupResults = lookup.lookup(params.term.toLowerCase(), true, 10);		
-		println lookupResults
 		def result = new ArrayList();
-		lookupResults.each { lookupResult ->
-			def term = lookupResult.key;
-			def record = lookupResult.value;			
-			
-//			String name = term.replaceFirst(/(?i)${params.term}/, "<b>"+params.term+"</b>");
-//			String highlightedName = record.originalName.replaceFirst(/(?i)${term}/, name);
-			int index = record.originalName.toLowerCase().indexOf(params.term.toLowerCase());
-			
-			//TODO:StringBuilder
-			String name = new String();
-			for(int i=0; i<record.originalName.size(); i++) {
-				if(i == index) {
-					name += "<b>"
+		if(params.term) {
+			List<LookupResult> lookupResults = lookup.lookup(params.term.toLowerCase(), true, 10);
+
+			lookupResults.each { lookupResult ->
+				def term = lookupResult.key;
+				def record = lookupResult.value;
+
+				//			String name = term.replaceFirst(/(?i)${params.term}/, "<b>"+params.term+"</b>");
+				//			String highlightedName = record.originalName.replaceFirst(/(?i)${term}/, name);
+				int index = record.originalName.toLowerCase().indexOf(params.term.toLowerCase());
+
+				//TODO:StringBuilder
+				String name = new String();
+				for(int i=0; i<record.originalName.size(); i++) {
+					if(i == index) {
+						name += "<b>"
+					}
+					name += record.originalName.charAt(i);
+					if(i == index+params.term.length()-1) {
+						name += "</b>"
+					}
 				}
-				name += record.originalName.charAt(i);
-				if(i == index+params.term.length()-1) {
-					name += "</b>"
+
+				String highlightedName = name.toString();
+				String icon = record.icon;
+				if(icon) {
+					icon = grailsApplication.config.speciesPortal.resources.serverURL + "/" + icon;
+					icon = icon.replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.galleryThumbnail.suffix);
 				}
+				result.add([value:record.canonicalForm, label:highlightedName, desc:record.canonicalForm, icon:icon, speciesId:record.speciesId, "category":"Names"]);
 			}
-			
-			String highlightedName = name.toString();
-			String icon = record.icon;
-			if(icon) {
-				icon = grailsApplication.config.speciesPortal.resources.serverURL + "/" + icon;
-				icon = icon.replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.galleryThumbnail.suffix);
-			}
-			result.add([value:record.canonicalForm, label:highlightedName, desc:record.canonicalForm, icon:icon, speciesId:record.speciesId, "category":"Names"]);
 		}
 		log.debug "suggestion : "+result;
 		return result;
@@ -209,7 +211,7 @@ class NamesIndexerService {
 		if (!f.exists() || !f.isDirectory() || !f.canWrite()) {
 			return false;
 		}
-		
+
 		def startTime = System.currentTimeMillis();
 		File data = new File(f, FILENAME);
 		data.withObjectOutputStream { oos ->

@@ -34,10 +34,10 @@ class SpeciesService {
 	def sessionFactory;
 	def externalLinksService;
 	def searchService;
-	
+
 	static int BATCH_SIZE = 10;
 	int noOfFields = Field.count();
-	
+
 	/**
 	 * 
 	 * @return
@@ -157,21 +157,21 @@ class SpeciesService {
 			noOfInsertions += saveSpeciesBatch(batch);
 			batch.clear();
 		}
-		
+
 		log.info "Time taken to save : "+(( System.currentTimeMillis()-startTime)/1000) + "(sec)"
-		
+
 		//log.debug "Publishing to search index"
-		
+
 		try {
 			searchService.publishSearchIndex(species);
 		} catch(e) {
 			e.printStackTrace()
 		}
-		
+
 		cleanUpGorm();
-		
-		//postProcessSpecies(species);		
-		
+
+		//postProcessSpecies(species);
+
 		return noOfInsertions;
 	}
 
@@ -212,11 +212,11 @@ class SpeciesService {
 		s.title = s.taxonConcept.italicisedForm;
 		s.guid = converter.constructGUID(s);
 
-		
+
 		return s;
 	}
-	
-	
+
+
 	/**
 	 * 
 	 */
@@ -227,30 +227,47 @@ class SpeciesService {
 		} catch(e) {
 			e.printStackTrace()
 		}
-		
+
 		try{
 			namesLoaderService.syncNamesAndRecos(false);
 		} catch(e) {
 			e.printStackTrace()
 		}
-		
+
 	}
-	
-	
+
+	/**
+	 *
+	 */
+	def computeInfoRichness() {
+		log.info "Computing information richness"
+		int limit=BATCH_SIZE, offset = 0, noOfUpdations = 0;
+		def species;
+		def startTime = System.currentTimeMillis()
+		while(true) {
+			species = Species.list(max:limit, offset:offset);
+			if(!species) break;
+			noOfUpdations += saveSpeciesBatch(species);
+			species.clear();
+			offset += limit;
+		}
+		log.info "Time taken to update info richness for species ${noOfUpdations} is ${System.currentTimeMillis()-startTime}(msec)";
+	}
+
 	/**
 	 * 
 	 */
-	private float calculatePercentOfInfo(Species s) {
-		return s.fields.size()/noOfFields;
+	protected float calculatePercentOfInfo(Species s) {
+		return s.fields.size();
 	}
-	
+
 	/**
 	 *
 	 */
 	private void cleanUpGorm() {
-		
+
 		def hibSession = sessionFactory?.getCurrentSession();
-		
+
 		if(hibSession) {
 			log.debug "Flushing and clearing session"
 			try {

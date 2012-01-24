@@ -29,14 +29,17 @@ class SearchService {
 	
 	private SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 	
-	static int BATCH_SIZE = 20;
+	static int BATCH_SIZE = 50;
 
 	/**
 	 * 
 	 */
 	def publishSearchIndex() {
 		log.info "Initializing publishing to search index"
-		int limit=BATCH_SIZE, offset = 0;
+		
+		//TODO: change limit
+		int limit=Species.count()+1, offset = 0;
+		
 		def species;
 		def startTime = System.currentTimeMillis()
 		while(true) {

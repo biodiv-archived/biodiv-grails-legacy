@@ -21,7 +21,7 @@ class SpeciesController {
 
 	def dataSource
 	def grailsApplication
-	
+
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
 	def index = {
@@ -66,12 +66,14 @@ class SpeciesController {
 		render(contentType: "text/xml", text:writer.toString())
 	}
 
+	@Secured(['ROLE_USER'])
 	def create = {
 		def speciesInstance = new Species()
 		speciesInstance.properties = params
 		return [speciesInstance: speciesInstance]
 	}
 
+	@Secured(['ROLE_USER'])
 	def save = {
 		def speciesInstance = new Species(params)
 		if (speciesInstance.save(flush: true)) {
@@ -240,17 +242,25 @@ class SpeciesController {
 		return false;
 	}
 
+	@Secured(['ROLE_USER'])
 	def edit = {
-		def speciesInstance = Species.get(params.id)
-		if (!speciesInstance) {
-			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'species.label', default: 'Species'), params.id])}"
-			redirect(action: "list")
-		}
-		else {
-			return [speciesInstance: speciesInstance]
+		if(params.id) {
+			def speciesInstance = Species.get(params.id)
+			if (!speciesInstance) {
+				flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'species.label', default: 'Species'), params.id])}"
+				redirect(action: "list")
+			}
+			else {
+				return [speciesInstance: speciesInstance]
+			}
+		} else {
+			//Not being used for now
+			params.max = Math.min(params.max ? params.int('max') : 10, 100)
+			return [speciesInstanceList: Species.list(params), speciesInstanceTotal: Species.count()]
 		}
 	}
 
+	@Secured(['ROLE_USER'])
 	def update = {
 		def speciesInstance = Species.get(params.id)
 		if (speciesInstance) {
@@ -280,6 +290,7 @@ class SpeciesController {
 		}
 	}
 
+	@Secured(['ROLE_ADMIN'])
 	def delete = {
 		def speciesInstance = Species.get(params.id)
 		if (speciesInstance) {
