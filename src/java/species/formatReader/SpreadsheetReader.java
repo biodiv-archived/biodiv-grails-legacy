@@ -26,16 +26,16 @@ public class SpreadsheetReader {
 	private static final Log log = LogFactory.getLog(SpreadsheetReader.class);
 	
 	public static List<List<Map>> readSpreadSheet(String file) {
-		log.debug("Reading spreadsheet "+file);
+		log.info("Reading spreadsheet "+file);
 		List<List<Map>> sheetContent = new ArrayList<List<Map>>();
 		InputStream inp;
 		try {
 			inp = new FileInputStream(file);
 			Workbook wb = WorkbookFactory.create(inp);
 			for (int i = 0; i < wb.getNumberOfSheets(); i++) {
-				log.debug("Reading sheet : "+i);
+				log.info("Reading sheet : "+i);
 				List<Map> content = readSpreadSheet(wb, i, 0);
-				log.debug("Reading sheet : "+i+" done");
+				log.info("Reading sheet : "+i+" done");
 				sheetContent.add(content);
 			}
 		} catch (FileNotFoundException e) {

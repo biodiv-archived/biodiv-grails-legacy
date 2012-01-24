@@ -27,12 +27,12 @@ class NamesLoaderService {
 	 * @param cleanAndUpdate
 	 */
 	int syncNamesAndRecos(boolean cleanAndUpdate) {
-		log.debug "Synching names and recommendations"
+		log.info "Synching names and recommendations"
 		int noOfNames = 0;
 		noOfNames += syncRecosFromTaxonConcepts(3, 3, cleanAndUpdate);
 		noOfNames += syncSynonyms();
 		noOfNames += syncCommonNames();
-		log.debug "No of names synched : "+noOfNames
+		log.info "No of names synched : "+noOfNames
 		return noOfNames;
 	}
 
@@ -42,7 +42,7 @@ class NamesLoaderService {
 	 * @param minRankToSpread : the names of higher rank get same suggestion of the concept at this level
 	 */
 	int syncRecosFromTaxonConcepts(int minRankToImport, int minRankToSpread, boolean cleanAndUpdate) {
-		log.debug "Importing existing taxon definitions into recommendations"
+		log.info "Importing existing taxon definitions into recommendations"
 
 		if(cleanAndUpdate) {
 			//TODO:Handle cascading delete recommendations
@@ -89,7 +89,7 @@ class NamesLoaderService {
 	 * @return
 	 */
 	int syncSynonyms() {
-		log.debug "Importing synonyms into recommendations"
+		log.info "Importing synonyms into recommendations"
 		def recos = new ArrayList<Recommendation>();
 		int offset = 0, noOfNames = 0, limit = BATCH_SIZE;
 		def conn = new Sql(sessionFactory.currentSession.connection())
@@ -107,7 +107,7 @@ class NamesLoaderService {
 			recos.clear();
 			if(!synonyms) break;
 		}
-		log.debug "Imported synonyms into recommendations : "+noOfNames
+		log.info "Imported synonyms into recommendations : "+noOfNames
 		return noOfNames;
 	}
 
@@ -116,7 +116,7 @@ class NamesLoaderService {
 	 * @return
 	 */
 	def syncCommonNames() {
-		log.debug "Importing common names into recommendations"
+		log.info "Importing common names into recommendations"
 		def recos = new ArrayList<Recommendation>();
 		int offset = 0, noOfNames = 0, limit=BATCH_SIZE;
 		def conn = new Sql(sessionFactory.currentSession.connection())
@@ -132,7 +132,7 @@ class NamesLoaderService {
 			if(!commonNames) break;
 		}
 		recommendationService.save(recos);
-		log.debug "Imported common names into recommendations : "+noOfNames
+		log.info "Imported common names into recommendations : "+noOfNames
 		return noOfNames
 	}
 

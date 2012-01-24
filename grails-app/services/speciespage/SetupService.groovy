@@ -4,7 +4,6 @@ import org.apache.commons.logging.LogFactory;
 
 import species.Classification
 import species.Country
-import species.DataLoader
 import species.Field
 import species.Language
 import species.License.LicenseType
@@ -48,7 +47,7 @@ class SetupService {
 	 * @param fieldDefinitionsFile
 	 */
 	void uploadFields(String fieldDefinitionsFile) {
-		log.debug "Uploading field definitions"
+		log.info "Uploading field definitions"
 		populateFields(fieldDefinitionsFile, 0, 0);
 	}
 
@@ -91,7 +90,7 @@ class SetupService {
 	 * @param languagesFile
 	 */
 	void uploadLanguages (String languagesFile) {
-		log.debug "Uploading languages"
+		log.info "Uploading languages"
 		new File(languagesFile).splitEachLine("\\t") {
 			def fields = it;
 			def lang = new Language (threeLetterCode:fields[0].replaceAll("\"",""), twoLetterCode:fields[1].replaceAll("\"",""), name:fields[2].replaceAll("\"",""));
@@ -105,7 +104,7 @@ class SetupService {
 	 * @param countriesFile
 	 */
 	void uploadCountries (String countriesFile) {
-		log.debug "Uploading countries"
+		log.info "Uploading countries"
 		new File(countriesFile).splitEachLine("\\t") {
 			def fields = it;
 			def country = new Country(countryName:fields[1].replaceAll("\"",""), twoLetterCode:fields[0].replaceAll("\"",""));
@@ -121,7 +120,7 @@ class SetupService {
 	 * @param contentHeaderRowNo
 	 */
 	void uploadClassifications (String classificationsFile, int contentSheetNo, int contentHeaderRowNo) {
-		log.debug "Uploading classifications"
+		log.info "Uploading classifications"
 		List<Map> content = SpreadsheetReader.readSpreadSheet(classificationsFile, contentSheetNo, contentHeaderRowNo);
 		for (Map row : content) {
 			def classification = Classification.findByName(row.get('name'));

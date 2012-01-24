@@ -37,14 +37,14 @@ class ExternalLinksService {
 					noOfFailures++;
 				}	
 			}
-			log.debug "Updated external links for taxonConcepts ${noOfUpdations}"
+			log.info "Updated external links for taxonConcepts ${noOfUpdations}"
 			cleanUpGorm();
 			offset += limit;
 		}
 		if(noOfUpdations) {
 			cleanUpGorm();
 		}
-		log.debug "Updated external links for taxonConcepts ${noOfUpdations} in total"
+		log.info "Updated external links for taxonConcepts ${noOfUpdations} in total"
 		return noOfUpdations;
 	}
 

@@ -16,8 +16,6 @@ class GroupHandlerService {
 
 	static transactional = false
 
-	private static final log = LogFactory.getLog(this);
-
 	def grailsApplication
 	def sessionFactory
 
@@ -34,7 +32,7 @@ class GroupHandlerService {
 	 * @return
 	 */
 	def loadGroups(String file, contentSheetNo, contentHeaderRowNo) {
-		log.debug "Loading groups and their association with species";
+		log.info "Loading groups and their association with species";
 		List<Map> content = SpreadsheetReader.readSpreadSheet(file, contentSheetNo, contentHeaderRowNo);
 		//TODO:sort groups in name and rank order
 		content.each { row ->
@@ -116,7 +114,7 @@ class GroupHandlerService {
 				cleanUpGorm();
 				noOfUpdations += count;
 				count = 0;
-				log.debug "Updated group for taxonConcepts ${noOfUpdations}"
+				log.info "Updated group for taxonConcepts ${noOfUpdations}"
 			}
 			offset += limit;
 		}
@@ -127,8 +125,8 @@ class GroupHandlerService {
 			noOfUpdations += count;
 		}
 		
-		log.debug "Updated group for taxonConcepts ${noOfUpdations} in total"
-		log.debug "Time taken to update groups for taxonConcepts ${noOfUpdations} is ${System.currentTimeMillis()-startTime}(msec)";
+		log.info "Updated group for taxonConcepts ${noOfUpdations} in total"
+		log.info "Time taken to update groups for taxonConcepts ${noOfUpdations} is ${System.currentTimeMillis()-startTime}(msec)";
 		return noOfUpdations;
 	}
 
@@ -172,7 +170,7 @@ class GroupHandlerService {
 	 * @return
 	 */
 	boolean updateGroup(TaxonomyDefinition taxonConcept, SpeciesGroup group) {
-		log.debug "Updating group associations for taxon concept : "+taxonConcept;
+		log.info "Updating group associations for taxon concept : "+taxonConcept;
 		int noOfUpdations = 0;
 
 		if(taxonConcept && group) {
@@ -180,7 +178,7 @@ class GroupHandlerService {
 			if(!group.equals(taxonConcept.group)) {
 				taxonConcept.group = group;
 				if(taxonConcept.save()) {
-					log.debug "Setting group '${group.name}' for taxonConcept '${taxonConcept.name}'"
+					log.info "Setting group '${group.name}' for taxonConcept '${taxonConcept.name}'"
 					noOfUpdations++;
 				} else {
 					taxonConcept.errors.allErrors.each { log.error it }

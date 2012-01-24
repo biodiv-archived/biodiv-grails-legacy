@@ -11,7 +11,6 @@ import species.CommonNames;
 import species.Synonyms;
 import species.TaxonomyDefinition;
 import species.participation.Recommendation;
-import species.search.SearchIndexManager;
 
 class RecommendationService {
 
@@ -45,7 +44,7 @@ class RecommendationService {
 	 * @return
 	 */
 	int save(List<Recommendation> recos) {
-		log.debug "Saving recos : "+recos.size()
+		log.info "Saving recos : "+recos.size()
 
 		int noOfRecords = 0;
 		def startTime = System.currentTimeMillis()
@@ -67,8 +66,8 @@ class RecommendationService {
 			namesIndexerService.store(indexStoreDir);
 			cleanUpGorm();
 		}
-		log.debug "Time taken to save : "+((System.currentTimeMillis() - startTime)/1000) + "(sec)"
-		log.debug "Persisted ${noOfRecords} recommendations in total"
+		log.info "Time taken to save : "+((System.currentTimeMillis() - startTime)/1000) + "(sec)"
+		log.info "Persisted ${noOfRecords} recommendations in total"
 		return noOfRecords;
 	}
 

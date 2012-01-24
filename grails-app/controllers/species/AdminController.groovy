@@ -74,7 +74,7 @@ class AdminController {
 
 	def reloadSearchIndex = {
 		try {
-			searchService.publishSearchIndex(Species.list());
+			searchService.publishSearchIndex();
 			flash.message = "Successfully created search index"
 		} catch(e) {
 			e.printStackTrace();

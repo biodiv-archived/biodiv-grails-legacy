@@ -1,3 +1,5 @@
+import org.apache.solr.client.solrj.impl.StreamingUpdateSolrServer;
+
 // Place your Spring DSL code here
 beans = {
 	//userDetailsService(species.auth.drupal.DrupalUserDetailsService);
@@ -16,5 +18,22 @@ beans = {
 	}
 	
 	drupalAuthDao(species.auth.drupal.DrupalAuthDao)
+	
+	def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.search
+	solrServer(org.apache.solr.client.solrj.impl.StreamingUpdateSolrServer,config.serverURL, config.queueSize, config.threadCount ) { 
+		setSoTimeout(config.soTimeout);
+		setConnectionTimeout(config.connectionTimeout);
+		setDefaultMaxConnectionsPerHost(config.defaultMaxConnectionsPerHost);
+		setMaxTotalConnections(config.maxTotalConnections);
+		setFollowRedirects(config.followRedirects);
+		setAllowCompression(config.allowCompression);
+		setMaxRetries(config.maxRetries);
+		//setParser(new XMLResponseParser()); // binary parser is used by default
+		log.debug "Initialized search server to "+config.serverURL
+	}
+
+	searchService(speciespage.SearchService) { 
+		solrServer = ref('solrServer');		
+	}
 	
 }

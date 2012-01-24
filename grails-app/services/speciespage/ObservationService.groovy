@@ -26,7 +26,7 @@ class ObservationService {
 	 * @return
 	 */
 	Observation createObservation(params) {
-		log.debug "Creating observations from params : "+params
+		log.info "Creating observations from params : "+params
 		Observation observation = new Observation();
 
 		

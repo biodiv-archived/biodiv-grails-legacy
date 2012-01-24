@@ -80,13 +80,12 @@ log4j = {
 			'org.springframework.security',
 			'org.hibernate',
 			'net.sf.ehcache.hibernate'
-			//'grails.plugin'
+			'grails.plugin'
 
 	warn   'org.mortbay.log'
 
-	debug	'species',
+	info	'species',
 			'speciespage',
-			'org.grails.plugin.resource',
 			'grails.app'
 
 }
@@ -372,7 +371,7 @@ environments {
 	}
 
 	pamba {
-		grails.serverURL = "http://pamba.strandls.com:8080/${appName}"
+		grails.serverURL = "http://thewesternghats.in:8080/${appName}"
 		jpegOptimProg = "/usr/bin/jpegoptim";
 		speciesPortal {
 			app.rootDir = "/data/species"
@@ -380,15 +379,15 @@ environments {
 
 			resources {
 				rootDir = "${app.rootDir}/images"
-				serverURL = "http://pamba.strandls.com/${appName}/images"
+				serverURL = "http://thewesternghats.in/${appName}/images"
 			}
 			nameSearch.indexStore = "${app.rootDir}/data/names"
 			observations {
 				rootDir = "${app.rootDir}/observations"
-				serverURL = "http://pamba.strandls.com:8080/${appName}/${appName}/observations"
+				serverURL = "http://thewesternghats.in:8080/${appName}/${appName}/observations"
 				//serverURL = "http://localhost/${appName}/observations"
 			}
-			search.serverURL="http://pamba.strandls.com:8080/solr/species"
+			search.serverURL="http://thewesternghats.in:8080/solr/species"
 		}
 		google.analytics.webPropertyID = "UA-xxxxxx-x"
 		google.analytics.enabled = false

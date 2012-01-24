@@ -254,7 +254,12 @@
 
 		<field name="autocomplete" type="textSpell" indexed="true" stored="true" multiValued="true" />
 		<copyField source="*_exact" dest="autocomplete" />
-		<copyField source="text" dest="autocomplete" />
+		<copyField source="contributor" dest="autocomplete" />
+		<copyField source="location" dest="autocomplete" />
+		<copyField source="attribution" dest="autocomplete" />
+		<copyField source="reference" dest="autocomplete" />
+		<copyField source="name" dest="autocomplete" />
+		<copyField source="taxon" dest="autocomplete" />
 
 		<dynamicField name="*" type="text" indexed="true" stored="true"
 			multiValued="true" />

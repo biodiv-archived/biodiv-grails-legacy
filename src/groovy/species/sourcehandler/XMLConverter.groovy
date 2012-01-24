@@ -83,7 +83,7 @@ class XMLConverter extends SourceConverter {
 		if(!species) return null;
 
 		try {
-			log.debug "Creating/Updating species"
+			log.info "Creating/Updating species"
 			s = new Species();
 
 			removeInvalidNode(species);

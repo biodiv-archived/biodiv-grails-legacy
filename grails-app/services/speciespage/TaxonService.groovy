@@ -30,6 +30,7 @@ class TaxonService {
 	 * @return
 	 */
 	def loadTaxon(boolean createSpeciesStubsFlag) {
+		log.info("Loading taxon information");
 				loadFlowersOfIndia(grailsApplication.config.speciesPortal.data.rootDir+"/dictionaries/FlowersByBotanicalNames.xls", 0, 0);
 				loadFishBase(grailsApplication.config.speciesPortal.data.rootDir+"/dictionaries/fishbase_30_11_2011.xls", 0, 0);
 				loadGBIF(grailsApplication.config.speciesPortal.data.rootDir+"/dictionaries/GBIF taxonomy-search-13208373774487451330519969730577/taxonomy-search-1320837377448.txt");
@@ -786,7 +787,7 @@ class TaxonService {
 	 * Creates stub species pages for all taxonconcepts without one
 	 */
 	def createSpeciesStubs() {
-		log.debug "Creating stubs for species stubs for all taxon concepts with out one"
+		log.info "Creating stubs for species stubs for all taxon concepts with out one"
 		int notOfStubs = 0;
 
 		//TODO: hanging when result is null

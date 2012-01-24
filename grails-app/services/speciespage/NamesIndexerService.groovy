@@ -34,7 +34,7 @@ class NamesIndexerService {
 	 * Existing lookup is present 
 	 */
 	void rebuild() {
-		log.debug "Publishing names to autocomplete index";
+		log.info "Publishing names to autocomplete index";
 		Lookup lookup1 = new TSTLookup();
 
 		setDirty(false);
@@ -56,8 +56,8 @@ class NamesIndexerService {
 			lookup = lookup1;
 		}
 		
-		log.debug "Added recos : ${noOfRecosAdded}";
-		log.debug "Time taken to rebuild index : "+((System.currentTimeMillis() - startTime)/1000) + "(sec)"
+		log.info "Added recos : ${noOfRecosAdded}";
+		log.info "Time taken to rebuild index : "+((System.currentTimeMillis() - startTime)/1000) + "(sec)"
 
 		def indexStoreDir = grailsApplication.config.speciesPortal.nameSearch.indexStore;
 		store(indexStoreDir);
@@ -83,7 +83,7 @@ class NamesIndexerService {
 	 */
 	private boolean add(Recommendation reco, Analyzer analyzer, lookup) {
 		if(isDirty()) {
-			log.debug "Rebuilding index as its dirty"
+			log.info "Rebuilding index as its dirty"
 			rebuild();
 			return;
 		}
@@ -139,7 +139,7 @@ class NamesIndexerService {
 	 * @return
 	 */
 	def suggest(params) {
-		log.debug "Suggest name using params : "+params
+		log.info "Suggest name using params : "+params
 		List<LookupResult> lookupResults = lookup.lookup(params.term.toLowerCase(), true, 10);		
 		println lookupResults
 		def result = new ArrayList();
@@ -185,13 +185,13 @@ class NamesIndexerService {
 		if(!f.exists() || !f.canRead()) {
 			rebuild();
 		} else {
-			log.debug "Loading autocomplete index from : "+f.getAbsolutePath();
+			log.info "Loading autocomplete index from : "+f.getAbsolutePath();
 			def startTime = System.currentTimeMillis()
 			f.withObjectInputStream(lookup.getClass().classLoader){ ois ->
 				lookup = ois.readObject( )
 			}
-			log.debug "Loading autocomplete index done";
-			log.debug "Time taken to load names index : "+((System.currentTimeMillis() - startTime)/1000) + "(sec)"
+			log.info "Loading autocomplete index done";
+			log.info "Time taken to load names index : "+((System.currentTimeMillis() - startTime)/1000) + "(sec)"
 			return true;
 		}
 	}
@@ -215,7 +215,7 @@ class NamesIndexerService {
 		data.withObjectOutputStream { oos ->
 			oos.writeObject(lookup);
 		}
-		log.debug "Time taken to store index : "+((System.currentTimeMillis() - startTime)/1000) + "(sec)"
+		log.info "Time taken to store index : "+((System.currentTimeMillis() - startTime)/1000) + "(sec)"
 		return true;
 	}
 

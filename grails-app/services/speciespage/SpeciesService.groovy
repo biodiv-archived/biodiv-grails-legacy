@@ -10,14 +10,12 @@ import org.hibernate.exception.ConstraintViolationException;
 
 import species.Classification
 import species.Country
-import species.DataLoader
 import species.Field
 import species.Language
 import species.Species
 import species.TaxonomyDefinition;
 import species.License.LicenseType
 import species.formatReader.SpreadsheetReader
-import species.search.SearchIndexManager
 import species.sourcehandler.KeyStoneDataConverter
 import species.sourcehandler.MappedSpreadsheetConverter
 import species.sourcehandler.NewSpreadsheetConverter
@@ -35,6 +33,7 @@ class SpeciesService {
 	def namesLoaderService;
 	def sessionFactory;
 	def externalLinksService;
+	def searchService;
 	
 	static int BATCH_SIZE = 10;
 	int noOfFields = Field.count();
@@ -44,7 +43,6 @@ class SpeciesService {
 	 * @return
 	 */
 	def loadData() {
-		def dataLoader = new DataLoader();
 		int noOfInsertions = 0;
 
 		grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/images";
@@ -90,7 +88,7 @@ class SpeciesService {
 	 * @return
 	 */
 	int uploadMappedSpreadsheet (String file, String mappingFile, int mappingSheetNo, int mappingHeaderRowNo, int contentSheetNo, int contentHeaderRowNo) {
-		log.debug "Uploading mapped spreadsheet : "+file;
+		log.info "Uploading mapped spreadsheet : "+file;
 		List<Species> species = MappedSpreadsheetConverter.getInstance().convertSpecies(file, mappingFile, mappingSheetNo, mappingHeaderRowNo, contentSheetNo, contentHeaderRowNo);
 		return saveSpecies(species);
 	}
@@ -105,7 +103,7 @@ class SpeciesService {
 	 * @return
 	 */
 	int uploadSpreadsheet (String file, int contentSheetNo, int contentHeaderRowNo, int imageMetadataSheetNo, int imageMetaDataHeaderRowNo) {
-		log.debug "Uploading spreadsheet : "+file;
+		log.info "Uploading spreadsheet : "+file;
 		List<Species> species = SpreadsheetConverter.getInstance().convertSpecies(file, contentSheetNo, contentHeaderRowNo, imageMetadataSheetNo, imageMetaDataHeaderRowNo);
 		return saveSpecies(species);
 	}
@@ -116,7 +114,7 @@ class SpeciesService {
 	 * @return
 	 */
 	int uploadNewSpreadsheet (String file) {
-		log.debug "Uploading new spreadsheet : "+file;
+		log.info "Uploading new spreadsheet : "+file;
 		List<Species> species = NewSpreadsheetConverter.getInstance().convertSpecies(file);
 		return saveSpecies(species);
 	}
@@ -132,7 +130,7 @@ class SpeciesService {
 	 * @return
 	 */
 	int uploadKeyStoneData (String connectionUrl, String userName, String password, String mappingFile, int mappingSheetNo, int mappingHeaderRowNo) {
-		log.debug "Uploading keystone data";
+		log.info "Uploading keystone data";
 		List<Species> species = KeyStoneDataConverter.getInstance().convertSpecies(connectionUrl, userName, password, mappingFile, mappingSheetNo, mappingHeaderRowNo);
 		return saveSpecies(species);
 	}
@@ -143,7 +141,7 @@ class SpeciesService {
 	 * @return
 	 */
 	int saveSpecies(List species) {
-		log.debug "Saving species : "+species.size()
+		log.info "Saving species : "+species.size()
 		int noOfInsertions = 0;
 		def startTime = System.currentTimeMillis()
 		List <Species> batch =[]
@@ -160,12 +158,12 @@ class SpeciesService {
 			batch.clear();
 		}
 		
-		log.debug "Time taken to save : "+(( System.currentTimeMillis()-startTime)/1000) + "(sec)"
+		log.info "Time taken to save : "+(( System.currentTimeMillis()-startTime)/1000) + "(sec)"
 		
 		//log.debug "Publishing to search index"
-		def searchIndexManager = new SearchIndexManager();
+		
 		try {
-			searchIndexManager.publishSearchIndex(species);
+			searchService.publishSearchIndex(species);
 		} catch(e) {
 			e.printStackTrace()
 		}
