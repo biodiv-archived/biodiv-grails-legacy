@@ -245,8 +245,10 @@ class MappedSpreadsheetConverter extends SourceConverter {
 			List<Map> imagesMetaData = SpreadsheetReader.readSpreadSheet(file, imagesMetaDataSheet, 0);
 			fieldName.split(",").eachWithIndex { t, index ->
 				String txt = speciesContent.get(t);
-				txt.tokenize(delimiter).each { loc->
-					createImages(images, loc, imagesMetaData);
+				txt.split(delimiter).each { loc ->
+					if(loc) {
+						createImages(images, loc, imagesMetaData);
+					}
 				}
 			}
 		} else {

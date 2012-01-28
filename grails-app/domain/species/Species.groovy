@@ -36,6 +36,7 @@ class Species {
 	}
 
 	static mapping = {
+		id generator:'species.utils.PrefillableUUIDHexGenerator'
 		fields sort : 'field'
 	}
 
