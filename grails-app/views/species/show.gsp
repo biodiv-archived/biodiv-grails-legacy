@@ -103,8 +103,6 @@ $(document).ready(function(){
 
 	if($("#resourceTabs-1 img").length > 0) {
 	
-		
-	
 		//TODO:load gallery  images by ajax call getting response in json  
 		$('#gallery1').galleria({
 			height : 400,
@@ -192,9 +190,9 @@ $(document).ready(function(){
 						flickrGallery.load(data);
 					}	    			
 				} else {
-				  	$("#flickrImages").hide();
-			    	$("#resourceTabs-3").hide();
-				  	$("#googleImages").click();				  	
+				  	//$("#flickrImages").hide();
+			    	//$("#resourceTabs-3").hide();
+				  	//$("#googleImages").click();				  	
 			  	}
 			});
 	});
@@ -275,17 +273,18 @@ $(document).ready(function(){
   	//initializeCKEditor();	
   	// bind click event on delete buttons using jquery live
   	$('.del-reference').live('click', deleteReferenceHandler);
-  	if(${speciesInstance.getImages()?.size()?:0} == 0) {
-  		$("#flickrImages").click();
-  	}
+//  	if($("#resourceTabs-1 img").length === 0) {
+//  		$("#flickrImages").click();
+//  	}
   	
   	$('.thumbwrap .figure').hover(
-  	function(){
-  		$(this).children('.attributionBlock').css('visibility', 'visible');
-  	
-  	},function(){
-  		$(this).children('.attributionBlock').css('visibility', 'hidden');
-  	});
+	  	function(){
+	  		$(this).children('.attributionBlock').css('visibility', 'visible');
+	  	
+	  	},function(){
+	  		$(this).children('.attributionBlock').css('visibility', 'hidden');
+	  	}
+	  );
   	
   	$('.attribution').mouseleave(function(){
   		$(this).hide();
@@ -337,7 +336,14 @@ $(document).ready(function(){
 					</ul>
 					<div id="resourceTabs-1">
 						<div id="gallery1">
-							<s:showSpeciesImages model="['speciesInstance':speciesInstance]"></s:showSpeciesImages>							
+							<g:if test="${speciesInstance.getImages()}">
+								<s:showSpeciesImages model="['speciesInstance':speciesInstance]"></s:showSpeciesImages>
+							</g:if>
+							<g:else>
+								<% def fileName = speciesInstance.fetchSpeciesGroupIcon()?.fileName?.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.thumbnail.suffix); %>
+								<img class="group_icon galleryImage" src="${createLinkTo(dir: 'images', file: fileName, absolute:true)}" 
+							  		title="Contribute!!!"/>
+							</g:else>							
 						</div>
 
 					</div>

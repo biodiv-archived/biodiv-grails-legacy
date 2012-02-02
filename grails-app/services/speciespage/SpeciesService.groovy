@@ -288,7 +288,7 @@ class SpeciesService {
 		//TODO: int reviewedFields = 
 		int richness = s.fields.size() + s.globalDistributionEntities.size() + s.globalEndemicityEntities.size() + s.indianDistributionEntities.size() + s.indianEndemicityEntities.size();
 		richness += noOfMultimedia;
-		richness += textSize;
+		//richness += textSize;
 		return richness;
 		
 	}

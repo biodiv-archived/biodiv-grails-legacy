@@ -157,10 +157,8 @@ $(document).ready(function(){
 				value="${Math.ceil(speciesInstanceList.size()/3)}" />
 			<g:each in="${speciesInstanceList}" status="i" var="speciesInstance">
 
-				<g:if test="${i%columnSize == 0}">
 					<ul class="speciesList thumbwrap grid_5"
 						style="list-style: none; text-align: left">
-				</g:if>
 				<li class="grid_5"><g:link action="show"
 						id="${speciesInstance.id}">
 
@@ -177,9 +175,7 @@ $(document).ready(function(){
 						</p>
 					</g:link>
 				</li>
-				<g:if test="${(i+1)%columnSize == 0}">
 					</ul>
-				</g:if>
 			</g:each>
 			</ul>
 		</div>

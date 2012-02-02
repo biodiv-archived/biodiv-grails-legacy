@@ -103,7 +103,6 @@ class GroupHandlerService {
 			}
 			
 			taxonConcepts.each { taxonConcept ->
-				println taxonConcept;
 				if(!taxonConcept.group && updateGroup(taxonConcept)) {
 					count ++;
 				}
