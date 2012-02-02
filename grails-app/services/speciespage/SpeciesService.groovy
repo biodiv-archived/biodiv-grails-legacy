@@ -9,12 +9,16 @@ import org.codehaus.groovy.grails.commons.ApplicationHolder;
 import org.hibernate.exception.ConstraintViolationException;
 
 import species.Classification
+import species.CommonNames;
 import species.Country
 import species.Field
 import species.Language
 import species.Species
+import species.SpeciesField;
+import species.Synonyms;
 import species.TaxonomyDefinition;
 import species.License.LicenseType
+import species.TaxonomyRegistry;
 import species.formatReader.SpreadsheetReader
 import species.sourcehandler.KeyStoneDataConverter
 import species.sourcehandler.MappedSpreadsheetConverter
@@ -241,7 +245,7 @@ class SpeciesService {
 	 */
 	def computeInfoRichness() {
 		log.info "Computing information richness"
-		int limit=BATCH_SIZE, offset = 0, noOfUpdations = 0;
+		int limit=Species.count(), offset = 0, noOfUpdations = 0;
 		def species;
 		def startTime = System.currentTimeMillis()
 		while(true) {
@@ -255,10 +259,38 @@ class SpeciesService {
 	}
 
 	/**
-	 * 
+	 * EOL automatically calculates some statistics about its pages. These statistics recalculate every day or two.
+		
+		Richness Score
+		Richness Score is a composite of many different factors:
+		
+		how much text a page has
+		how many multimedia or map files are available
+		how many different topics are covered
+		how many different sources contribute information
+		whether information has been reviewed or not
+
 	 */
 	protected float calculatePercentOfInfo(Species s) {
-		return s.fields.size();
+//		int synonyms = Synonyms.countByTaxonConcept(s.taxonConcept);
+//		int commonNames = CommonNames.countByTaxonConcept(s.taxonConcept);
+//		def authClassification = Classification.findByName(grailsApplication.config.speciesPortal.fields.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY)
+//		int taxaHierarchies = TaxonomyRegistry.countByTaxonDefinitionAndClassification(s.taxonConcept, authClassification);
+		//TODO: int occRecords =
+		//TODO: observations =  
+		int textSize = 0;
+		s.fields.each { field ->
+			textSize += field.description?.length();
+		}
+		
+		int noOfMultimedia = s.resources.size();
+		//int diffSources = 
+		//TODO: int reviewedFields = 
+		int richness = s.fields.size() + s.globalDistributionEntities.size() + s.globalEndemicityEntities.size() + s.indianDistributionEntities.size() + s.indianEndemicityEntities.size();
+		richness += noOfMultimedia;
+		richness += textSize;
+		return richness;
+		
 	}
 
 	/**

@@ -30,20 +30,28 @@ class SpeciesController {
 
 	def list = {
 		//cache "taxonomy_results"
+		log.debug params
 		params.startsWith = params.startsWith?:"A"
 		def allGroup = SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.ALL);
-		params.sGroup = params.sGroup?SpeciesGroup.get(params.sGroup):allGroup
+		params.sGroup = params.sGroup ?: allGroup.id+""
 		params.max = Math.min(params.max ? params.int('max') : 51, 100);
 		params.offset = params.offset ? params.int('offset') : 0
+		params.sort = params.sort?:"percentOfInfo"
+		params.order = params.sort.equals("percentOfInfo")?"desc":params.sort.equals("title")?"asc":"asc"
+		
+		log.debug params
+		def groupIds = params.sGroup.tokenize(',')?.collect {Long.parseLong(it)}
+			 
 		int count = 0;
 		if (params.startsWith && params.sGroup) {
 			def speciesInstanceList;
-			if(params.sGroup == allGroup) {
-				speciesInstanceList = Species.findAllByTitleLike("<i>${params.startsWith}%", [sort:'title', max:params.max, offset:params.offset]);
+			if(groupIds.size() == 1 && groupIds[0] == allGroup.id) {
+				speciesInstanceList = Species.findAllByTitleLike("<i>${params.startsWith}%", [sort:params.sort, order:params.order, max:params.max, offset:params.offset]);
 				count = Species.countByTitleLike('<i>'+params.startsWith+'%')
 			} else {
-				speciesInstanceList = Species.findAll("from Species as s, TaxonomyDefinition as t where title like '${params.startsWith}%' and s.taxonConcept = t and t.group = :sGroup",[sGroup:params.sGroup], [max:params.max, offset:params.offset]);
-				count = 100
+				speciesInstanceList = Species.executeQuery("select s from Species s, TaxonomyDefinition t where title like '<i>${params.startsWith}%' and s.taxonConcept = t and t.group.id  in (:sGroup) order by s.${params.sort} ${params.order}",[sGroup:groupIds], [max:params.max, offset:params.offset]);
+				def rs = Species.executeQuery("select count(*) as count from Species s, TaxonomyDefinition t where s.title like '<i>${params.startsWith}%' and s.taxonConcept = t and t.group.id  in (:sGroup)",[sGroup:groupIds]);
+				count = rs[0];
 			}
 			return [speciesInstanceList: speciesInstanceList, speciesInstanceTotal: count]
 		} else {
@@ -313,6 +321,11 @@ class SpeciesController {
 	def count = {
 		//cache "search_results"
 		render Species.count();
+	}
+
+	def countSpeciesWithRichness = {
+		//cache "search_results"
+		render Species.countByPercentOfInfoGreaterThan(0);
 	}
 
 	def taxonBrowser = {

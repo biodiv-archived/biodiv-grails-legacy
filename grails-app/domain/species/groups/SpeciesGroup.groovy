@@ -1,11 +1,18 @@
 package species.groups
 
+import java.util.List;
+import java.util.Map;
+
+import species.Classification;
+import species.Resource.ResourceType;
 import species.TaxonomyDefinition;
+import species.Resource;
 
 class SpeciesGroup {
 
 	String name;
 	SpeciesGroup parentGroup;
+	def grailsApplication;
 	
 	static hasMany = [taxonConcept:TaxonomyDefinition, speciesGroupMapping:SpeciesGroupMapping]
 	
@@ -17,6 +24,15 @@ class SpeciesGroup {
 	static mapping = {
 		version  false;
 		sort name:"asc"
+	}
+	
+	Resource icon() {
+		String name = this.name?.trim()?.replaceAll(/ /, '_')?.plus('.png');
+		boolean iconPresent = (new File(grailsApplication.config.speciesPortal.resources.rootDir+"/group_icons/${name?.trim()}")).exists()
+		if(!iconPresent) {
+			name = SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.OTHERS).name?.trim()?.replaceAll(/ /, '_')?.plus('.png');
+		}
+		return new Resource(fileName:"group_icons/${name}", type:ResourceType.ICON, title:"You can contribute!!!");
 	}
 
 	/* (non-Javadoc)

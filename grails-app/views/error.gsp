@@ -3,6 +3,7 @@
 	  <title>Error</title>
 	<g:javascript src="species/util.js"
 	base="${grailsApplication.config.grails.serverURL+'/js/'}" />
+	<meta name="layout" content="main" />
   </head>
 
   <body>
@@ -10,11 +11,19 @@
     
     <div class="grid_16 ui-state-error">
     
-	<p class="ui-state-error-text">
+	<p class="message">
 		Oops!!! There seems to be some problem. <br/>
-		Please mail us a bug report here <span
-					class="mailme">team(at)thewesternghats(dot)in</span>
+		Please mail us the following message as bug report here <span
+					class="mailme">team(at)thewesternghats(dot)in</span><br/><br/>
+					
+		
+		
+					
+					
 	</p>
+	<div class="ui-state-error-text">
+	<strong>Error ${request.'javax.servlet.error.status_code'}:</strong> ${request.'javax.servlet.error.message'.encodeAsHTML()}<br/>
+	</div>
   	<!-- div class="message ">
 		<strong>Error ${request.'javax.servlet.error.status_code'}:</strong> ${request.'javax.servlet.error.message'.encodeAsHTML()}<br/>
 		<strong>Servlet:</strong> ${request.'javax.servlet.error.servlet_name'}<br/>

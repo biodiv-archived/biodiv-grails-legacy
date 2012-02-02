@@ -241,7 +241,7 @@ class XMLConverter extends SourceConverter {
 		List<SpeciesField> speciesFields = new ArrayList<SpeciesField>();
 		def field = getField(fieldNode, false);
 		if(field == null) {
-			log.warn "NO SUCH FIELD";
+			log.warn "NO SUCH FIELD : "+field;
 			return;
 		}
 		for(Node dataNode : fieldNode.data) {

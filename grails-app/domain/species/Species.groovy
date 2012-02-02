@@ -1,5 +1,7 @@
 package species
 
+import java.util.Date;
+
 import org.apache.commons.logging.LogFactory;
 import org.codehaus.groovy.grails.commons.ConfigurationHolder;
 
@@ -14,6 +16,8 @@ class Species {
 	TaxonomyDefinition taxonConcept;
 	Resource reprImage;
 	Float percentOfInfo; 
+	Date updatedOn;
+	Date createdOn = new Date();
 	
 	def grailsApplication;
 	
@@ -33,6 +37,7 @@ class Species {
 		guid(blank: false, unique: true);
 		reprImage(nullable:true);
 		percentOfInfo(nullable:true);
+		updatedOn(nullable:true);
 	}
 
 	static mapping = {
@@ -110,13 +115,7 @@ class Species {
 	//TODO:remove this function after getting icons for all groups
 	Resource fetchSpeciesGroupIcon() {
 		SpeciesGroup group = fetchSpeciesGroup();
-		String name = group.name?.trim()?.replaceAll(/ /, '_')?.plus('.png');
-		boolean iconPresent = (new File(grailsApplication.config.speciesPortal.resources.rootDir+"/group_icons/${name?.trim()}")).exists()
-		if(!iconPresent) {
-			name = SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.OTHERS).name?.trim()?.replaceAll(/ /, '_')?.plus('.png');
-		}
-		return new Resource(fileName:"group_icons/${name}", type:ResourceType.ICON, title:"You can contribute!!!");
-		
+		return group.icon();
 	}
 	
 	Map<Classification, List<TaxonomyDefinition>> fetchTaxonomyRegistry() {

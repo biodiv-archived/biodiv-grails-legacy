@@ -84,7 +84,7 @@ log4j = {
 
 	warn   'org.mortbay.log'
 
-	info	'species',
+	debug	'species',
 			'speciespage',
 			'grails.app'
 
