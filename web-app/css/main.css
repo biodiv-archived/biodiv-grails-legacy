@@ -1072,3 +1072,60 @@ td input.text:focus {
 .searchSnippet .toolbarIconContent {
 	left: 0;
 }
+
+#speciesGroupFilter .ui-button {
+	background: none;
+	border: 0;
+	opacity: 0.4;
+}
+
+#speciesGroupFilter .ui-button:hover {
+	opacity: 0.9;
+}
+
+#speciesGroupFilter .ui-button-text {
+	padding: 3px;
+}
+
+#speciesGroupFilter .ui-state-active {
+	opacity: 1;
+	border-bottom: 3px solid #aeaeae;
+	border-radius: 0;
+}
+
+#speciesGroupFilter {
+	background-color: #F7F7F7;
+    border-radius: 5px 5px 5px 5px;
+    float: left;
+    margin: 5px 20px;
+    padding: 5px 20px;
+}
+
+.toolbar div {
+	margin: 5px 20px;
+	padding: 5px 20px;
+}
+
+
+ul.thumbwrap li.rich_species_content {
+	opacity: 1;
+	background-color: #fafadf;
+}
+
+ul.thumbwrap li.poor_species_content {
+	opacity: 0.8;
+	background-color: #fafafa;
+	position: relative;
+}
+
+ul.thumbwrap li.poor_species_content a{
+	color: #7e7e7e;
+}
+
+ul.thumbwrap li.poor_species_content div.poor_species_content{
+	padding: 0 10px;
+	background-color: #F9EDBE;
+	bottom: 0px;
+	position: absolute;
+	border: 1px solid #F0C36D;
+}

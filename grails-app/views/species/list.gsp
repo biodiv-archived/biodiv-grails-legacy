@@ -83,6 +83,13 @@ $(document).ready(function(){
 	    }
 	  }
 	}
+	
+	$('li.poor_species_content').hover(function(){
+		$(this).children('.poor_species_content').slideDown(200);
+	}, function(){
+		$(this).children('.poor_species_content').slideUp(200);
+	}
+	);
 });
 </g:javascript>
 </head>
@@ -159,9 +166,13 @@ $(document).ready(function(){
 
 					<ul class="speciesList thumbwrap grid_5"
 						style="list-style: none; text-align: left">
-				<li class="grid_5"><g:link action="show"
-						id="${speciesInstance.id}">
-
+				<g:if test="${speciesInstance.percentOfInfo > 0}">		
+					<li class="grid_5 rich_species_content">
+				</g:if>
+				<g:else>
+					<li class="grid_5 poor_species_content">
+				</g:else>
+					    <g:link action="show" id="${speciesInstance.id}">
 						<g:set var="mainImage" value="${speciesInstance.mainImage()}" />
 						<%def thumbnailPath = mainImage?.fileName?.replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.galleryThumbnail.suffix)%>
 
@@ -174,6 +185,7 @@ $(document).ready(function(){
 							${speciesInstance.taxonConcept.italicisedForm}
 						</p>
 					</g:link>
+					<div class="poor_species_content" style="display:none;">Missing most information</div>
 				</li>
 					</ul>
 			</g:each>
