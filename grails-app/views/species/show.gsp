@@ -321,7 +321,7 @@ $(document).ready(function(){
 				<div
 					class="poor_species_content ui-state-highlight ui-corner-all grid_16">
 					<span class="ui-icon-info" style="float: left; margin-right: .3em;"></span>
-					Very little information. Please <g:link action="contribute" controller="species">contribute</g:link>.
+					Very little information. Please <span><g:link action="contribute" controller="species">contribute.</g:link></span>
 					
 				</div>
 			</g:if>
