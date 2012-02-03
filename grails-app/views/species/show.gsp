@@ -311,7 +311,7 @@ $(document).ready(function(){
 		<div class="container_16">
 			<g:if test="${flash.message}">
 				<div
-					class="ui-state-highlight ui-corner-all">
+					class="ui-state-highlight ui-corner-all grid_16">
 					<span class="ui-icon-info" style="float: left; margin-right: .3em;"></span>
 					${flash.message}
 					
@@ -319,7 +319,7 @@ $(document).ready(function(){
 			</g:if>
 			<g:if test="${!speciesInstance.percentOfInfo}">
 				<div
-					class="poor_species_content ui-state-highlight ui-corner-all">
+					class="poor_species_content ui-state-highlight ui-corner-all grid_16">
 					<span class="ui-icon-info" style="float: left; margin-right: .3em;"></span>
 					Very little information. Please <g:link action="contribute" controller="species">contribute</g:link>.
 					
@@ -413,7 +413,7 @@ $(document).ready(function(){
 
 			<!--  static species content -->
 			<div class="grid_6 classifications">
-				<t:showTaxonBrowser model="['expandSpecies':true, 'expandAll':false, 'speciesId':speciesInstance.taxonConcept?.id, expandAllIcon:false]"/>
+				<t:showTaxonBrowser model="['speciesInstance':speciesInstance, 'expandSpecies':true, 'expandAll':false, 'speciesId':speciesInstance.taxonConcept?.id, expandAllIcon:false]"/>
 				<br />					
 
 				<div class="readmore" style="float:left;">

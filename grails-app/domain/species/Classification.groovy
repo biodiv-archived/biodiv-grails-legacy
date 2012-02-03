@@ -12,5 +12,6 @@ class Classification {
 	
 	static mapping = {
 		version : false;
+		sort name:"asc"
 	}
 }
