@@ -311,12 +311,20 @@ $(document).ready(function(){
 		<div class="container_16">
 			<g:if test="${flash.message}">
 				<div
-					class="ui-state-highlight ui-corner-all grid_10 prefix_3 suffix_3">
+					class="ui-state-highlight ui-corner-all">
 					<span class="ui-icon-info" style="float: left; margin-right: .3em;"></span>
 					${flash.message}
+					
 				</div>
 			</g:if>
-
+			<g:if test="${!speciesInstance.percentOfInfo}">
+				<div
+					class="poor_species_content ui-state-highlight ui-corner-all">
+					<span class="ui-icon-info" style="float: left; margin-right: .3em;"></span>
+					Very little information. Please <g:link action="contribute" controller="species">contribute</g:link>.
+					
+				</div>
+			</g:if>
 			<div class="grid_16">
 
 				<h2 style="padding: 5px; color: black; text-shadow: 1px 1px 2px #c6c6c6;">

@@ -121,10 +121,14 @@ var updateEditorContent = function() {
 	}
 }
 
-var expandAll = function(gridId, rowId) {
+var expandAll = function(gridId, rowId, force) {
 	var grid = $("#"+gridId);
 	var rowData = grid.getRowData(rowId);
-	if (!grid.isNodeLoaded(rowData) || grid.isNodeLoaded(rowData) == 'false') {
+	if(force) {
+		//grid.delTreeNode(rowId);
+	}
+	
+	if (!grid.isNodeLoaded(rowData) || grid.isNodeLoaded(rowData) == 'false' || force) {
 		var postData = grid.getGridParam('postData');
 		postData["expand_all"] = true;
 		grid.expandRow(rowData);

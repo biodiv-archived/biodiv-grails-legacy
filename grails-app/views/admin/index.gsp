@@ -32,7 +32,7 @@
 				<br/>
 				<li><a href="${createLink(action:'reloadNamesIndex')}">Recreate names index</a>
 				<li><a href="${createLink(action:'reloadSearchIndex')}">Recreate search index</a>			
-				
+				<li><a href="${createLink(action:'recomputeInfoRichness')}">Recompute information richness</a></li>				
 			</ul>
 			</div>
 		</div>

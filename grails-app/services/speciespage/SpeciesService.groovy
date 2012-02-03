@@ -283,10 +283,10 @@ class SpeciesService {
 			textSize += field.description?.length();
 		}
 		
-		int noOfMultimedia = s.resources.size();
+		int noOfMultimedia = s.resources?.size()?:0;
 		//int diffSources = 
 		//TODO: int reviewedFields = 
-		int richness = s.fields.size() + s.globalDistributionEntities.size() + s.globalEndemicityEntities.size() + s.indianDistributionEntities.size() + s.indianEndemicityEntities.size();
+		int richness = s.fields?.size()?:0 + s.globalDistributionEntities?.size()?:0 + s.globalEndemicityEntities?.size()?:0 + s.indianDistributionEntities?.size()?:0 + s.indianEndemicityEntities?.size()?:0;
 		richness += noOfMultimedia;
 		//richness += textSize;
 		return richness;

@@ -185,7 +185,7 @@ $(document).ready(function(){
 							${speciesInstance.taxonConcept.italicisedForm}
 						</p>
 					</g:link>
-					<div class="poor_species_content" style="display:none;">Missing most information</div>
+					<div class="poor_species_content" style="display:none;">Very little information. Please <g:link action="contribute" controller="species">contribute</g:link>.</div>
 				</li>
 					</ul>
 			</g:each>

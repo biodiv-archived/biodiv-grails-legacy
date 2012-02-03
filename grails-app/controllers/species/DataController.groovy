@@ -143,6 +143,7 @@ class DataController {
 		rs.each { r ->
 			r.put('expanded', false);
 			r.put("speciesid", -1)
+			r.put('loaded', false);
 			populateSpeciesDetails(r.taxonid, r);
 			
 			resultSet.add(r);
@@ -151,6 +152,7 @@ class DataController {
 					//r.put('count', getCount(r.path, classSystem));
 					if(r.rank+1 <= tillLevel) {
 						r.put('expanded', true);
+						r.put('loaded', true);
 						getHierarchyNodes(resultSet, r.rank+1, tillLevel, r.path, classSystem, expandAll, expandSpecies, taxonIds)
 					}
 				}
@@ -250,7 +252,7 @@ class DataController {
 			TaxonomyRegistry.findAllByTaxonDefinitionAndClassification(taxonConcept, classification).each {reg ->
 				def list = [] 
 				while(reg != null) {
-					def result = ['count':1, 'rank':reg.taxonDefinition.rank, 'name':reg.taxonDefinition.name, 'path':reg.path, 'classSystem':classSystem, 'expanded':true]
+					def result = ['count':1, 'rank':reg.taxonDefinition.rank, 'name':reg.taxonDefinition.name, 'path':reg.path, 'classSystem':classSystem, 'expanded':true, 'loaded':true]
 					populateSpeciesDetails(speciesTaxonId, result);
 					list.add(result);
 					reg = reg.parentTaxon;
@@ -264,7 +266,7 @@ class DataController {
 			TaxonomyRegistry.findAllByTaxonDefinition(taxonConcept).each { reg ->
 				def list = [];
 				while(reg != null) {					
-					def result = ['count':1, 'rank':reg.taxonDefinition.rank, 'name':reg.taxonDefinition.name, 'path':reg.path, 'classSystem':classSystem, 'expanded':true]
+					def result = ['count':1, 'rank':reg.taxonDefinition.rank, 'name':reg.taxonDefinition.name, 'path':reg.path, 'classSystem':classSystem, 'expanded':true, 'loaded':true]
 					populateSpeciesDetails(speciesTaxonId, result);
 					list.add(result);					
 					reg = reg.parentTaxon;
@@ -330,7 +332,7 @@ class DataController {
 					cell (parentPath)
 					cell (r.rank == TaxonomyRank.SPECIES.ordinal() ? true : false)
 					cell (r.expanded?:false) //for expanded
-					cell (r.expanded?true:false) //for loaded
+					cell (r.loaded?:false) //for loaded
 				}
 			}
 			records (size)

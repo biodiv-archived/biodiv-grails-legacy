@@ -87,9 +87,9 @@ var heirarchyLevelFormatter = function(el, cellVal, opts) {
 		// class='rank"+level+"'>"+levelTxt+": "+el+"</a>";
 		el = levelTxt+": "+"<span class='rank"+level+"'>"+el;
 		
-		if(${expandAllIcon?:true}) {
-			el += "&nbsp;<a class='taxonExpandAll' onClick='expandAll(\"taxonHierarchy\", \""+cellVal.rowId+"\")'>+</a>";
-		}
+		//if(${expandAllIcon}) {
+			el += "&nbsp;<a class='taxonExpandAll' onClick='expandAll(\"taxonHierarchy\", \""+cellVal.rowId+"\", true)'>+</a>";
+		//}
 		el+= "</span>"
 	}
 	return el;	   

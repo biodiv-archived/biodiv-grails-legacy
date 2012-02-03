@@ -117,4 +117,14 @@ class AdminController {
 		redirect(action: "index")
 	}
 
+	def recomputeInfoRichness = {
+		try {
+			speciesService.computeInfoRichness();
+			flash.message = "Successfully updated species information richness"
+		} catch(e) {
+			e.printStackTrace();
+			flash.message = e.getMessage()
+		}
+		redirect(action: "index")
+	}
 }
