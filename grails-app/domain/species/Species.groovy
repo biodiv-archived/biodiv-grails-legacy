@@ -127,10 +127,15 @@ class Species {
 		def combinedHierarchy = Classification.findByName(grailsApplication.config.speciesPortal.fields.COMBINED_TAXONOMIC_HIERARCHY);
 		classifications.add(combinedHierarchy);
 		def reg = TaxonomyRegistry.findAllByTaxonDefinition(this.taxonConcept);
-		reg.collect(classifications) { it.classification }
+		reg.each {
+			if(it.path.split('_').length >= 6) {
+				classifications.add(it.classification);
+			}
+		}
 		//Ordering has to figured out. Sort is a vague criteria. 
 		//Added just to get Author contributed as first result if present 
-		classifications.sort {it.name};
+		classifications = classifications.sort {it.name};
+		
 		return classifications;
 	}
 }

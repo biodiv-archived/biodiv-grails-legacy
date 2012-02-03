@@ -57,9 +57,9 @@ class SpeciesController {
 			} else {
 				if(params.startsWith == "A-Z") {
 					query = "select s from Species s, TaxonomyDefinition t where s.taxonConcept = t and t.group.id  in (:sGroup) order by s.${params.sort} ${params.order}"
-					countQuery = "select count(*) as count from Species s, TaxonomyDefinition t where s.title like '<i>${params.startsWith}%' and s.taxonConcept = t and t.group.id  in (:sGroup)";
+					countQuery = "select count(*) as count from Species s, TaxonomyDefinition t where s.taxonConcept = t and t.group.id  in (:sGroup)";
 				} else {
-					query = "select s from Species s, TaxonomyDefinition t where s.taxonConcept = t and t.group.id  in (:sGroup) order by s.${params.sort} ${params.order}"
+					query = "select s from Species s, TaxonomyDefinition t where title like '<i>${params.startsWith}%' and s.taxonConcept = t and t.group.id  in (:sGroup) order by s.${params.sort} ${params.order}"
 					countQuery = "select count(*) as count from Species s, TaxonomyDefinition t where s.title like '<i>${params.startsWith}%' and s.taxonConcept = t and t.group.id  in (:sGroup)";
 				}
 			}
