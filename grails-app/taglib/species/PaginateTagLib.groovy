@@ -76,17 +76,28 @@ class PaginateTagLib {
 		}
 		linkTagAttrs.params = linkParams
 
-		String startsWith = params.startsWith ?: "A";
+		String startsWith = params.startsWith ?: "A-Z";
 		int currentstep = startsWith.charAt(0) - 65;
+		if(startsWith == "A-Z") {
+			currentstep = -1;
+		}
 		// display paginate steps
-		(0..25).each { i ->
-			if (currentstep == i) {
+		(-1..25).each { i ->
+			if(i == -1 && currentstep == i) {
+				writer << "<span class=\"currentStep\">A-Z</span>"
+			}
+			else if (currentstep == i) {
 				writer << "<span class=\"currentStep\">${Character.toChars(i+65)[0]}</span>"
 			}
 			else {
-				//linkParams.offset = (i - 1) * max
-				linkParams.startsWith = Character.toChars(i+65)[0];
-				writer << link(linkTagAttrs.clone()) {Character.toChars(i+65)[0]}
+				if(i==-1) {
+					linkParams.startsWith = 'A-Z';
+					writer << link(linkTagAttrs.clone()) {'A-Z'}
+				} else {
+					//linkParams.offset = (i - 1) * max
+					linkParams.startsWith = Character.toChars(i+65)[0];
+					writer << link(linkTagAttrs.clone()) {Character.toChars(i+65)[0]}
+				}
 			}
 		}
 	}

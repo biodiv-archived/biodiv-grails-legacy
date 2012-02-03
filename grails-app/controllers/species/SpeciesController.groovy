@@ -31,7 +31,7 @@ class SpeciesController {
 	def list = {
 		//cache "taxonomy_results"
 		log.debug params
-		params.startsWith = params.startsWith?:"A"
+		params.startsWith = params.startsWith?:"A-Z"
 		def allGroup = SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.ALL);
 		params.sGroup = params.sGroup ?: allGroup.id+""
 		params.max = Math.min(params.max ? params.int('max') : 51, 100);
@@ -44,13 +44,34 @@ class SpeciesController {
 			 
 		int count = 0;
 		if (params.startsWith && params.sGroup) {
+			String query, countQuery;
+			
+			if(groupIds.size() == 1 && groupIds[0] == allGroup.id) {
+				if(params.startsWith == "A-Z") {
+					query = "select s from Species s order by s.${params.sort} ${params.order}";
+					countQuery = "select count(*) as count from Species s"
+				} else {
+					query = "select s from Species s where s.title like '<i>${params.startsWith}%' order by s.${params.sort} ${params.order}";
+					countQuery = "select count(*) as count from Species s where s.title like '<i>${params.startsWith}%'"
+				}
+			} else {
+				if(params.startsWith == "A-Z") {
+					query = "select s from Species s, TaxonomyDefinition t where s.taxonConcept = t and t.group.id  in (:sGroup) order by s.${params.sort} ${params.order}"
+					countQuery = "select count(*) as count from Species s, TaxonomyDefinition t where s.title like '<i>${params.startsWith}%' and s.taxonConcept = t and t.group.id  in (:sGroup)";
+				} else {
+					query = "select s from Species s, TaxonomyDefinition t where s.taxonConcept = t and t.group.id  in (:sGroup) order by s.${params.sort} ${params.order}"
+					countQuery = "select count(*) as count from Species s, TaxonomyDefinition t where s.title like '<i>${params.startsWith}%' and s.taxonConcept = t and t.group.id  in (:sGroup)";
+				}
+			}
+			
 			def speciesInstanceList;
 			if(groupIds.size() == 1 && groupIds[0] == allGroup.id) {
-				speciesInstanceList = Species.findAllByTitleLike("<i>${params.startsWith}%", [sort:params.sort, order:params.order, max:params.max, offset:params.offset]);
-				count = Species.countByTitleLike('<i>'+params.startsWith+'%')
+				speciesInstanceList = Species.executeQuery(query, [max:params.max, offset:params.offset]);
+				def rs = Species.executeQuery(countQuery)
+				count = rs[0];
 			} else {
-				speciesInstanceList = Species.executeQuery("select s from Species s, TaxonomyDefinition t where title like '<i>${params.startsWith}%' and s.taxonConcept = t and t.group.id  in (:sGroup) order by s.${params.sort} ${params.order}",[sGroup:groupIds], [max:params.max, offset:params.offset]);
-				def rs = Species.executeQuery("select count(*) as count from Species s, TaxonomyDefinition t where s.title like '<i>${params.startsWith}%' and s.taxonConcept = t and t.group.id  in (:sGroup)",[sGroup:groupIds]);
+				speciesInstanceList = Species.executeQuery(query, [sGroup:groupIds], [max:params.max, offset:params.offset]);
+				def rs = Species.executeQuery(countQuery,[sGroup:groupIds]);
 				count = rs[0];
 			}
 			return [speciesInstanceList: speciesInstanceList, speciesInstanceTotal: count]

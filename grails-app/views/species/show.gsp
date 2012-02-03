@@ -47,7 +47,7 @@
 
 <g:javascript src="jquery/jquery.jqGrid-4.1.2/js/i18n/grid.locale-en.js"
 	base="${grailsApplication.config.grails.serverURL+'/js/'}" />
-<g:javascript src="jquery/jquery.jqGrid-4.1.2/js/jquery.jqGrid.min.js"
+<g:javascript src="jquery/jquery.jqGrid-4.1.2/js/jquery.jqGrid.src.js"
 	base="${grailsApplication.config.grails.serverURL+'/js/'}" />
 
 <script
@@ -321,7 +321,7 @@ $(document).ready(function(){
 				<div
 					class="poor_species_content ui-state-highlight ui-corner-all grid_16">
 					<span class="ui-icon-info" style="float: left; margin-right: .3em;"></span>
-					Very little information. Please <span><g:link action="contribute" controller="species">contribute.</g:link></span>
+					No information yet.
 					
 				</div>
 			</g:if>

@@ -11,7 +11,7 @@ $(document).ready(function() {
 		datatype: "xml",
    		colNames:['Id', '','#Species', 'SpeciesId', 'Class System'],
    		colModel:[
-   			{name:'id',index:'id',hidden:true},
+   			{name:'_id_',index:'_id_',hidden:true},
    			{name:'name',index:'name',formatter:heirarchyLevelFormatter},
    			{name:'count', index:'count',hidden:true, width:50},
    			{name:'speciesId',index:'speciesId', hidden:true},
@@ -21,7 +21,6 @@ $(document).ready(function() {
     	height: "${height?:'100%'}", 
     	autowidth:true,   
     	scrollOffset: 0,
-    	
     	loadui:'block',
    		treeGrid: true,
    		ExpandColumn : 'name',
@@ -87,9 +86,9 @@ var heirarchyLevelFormatter = function(el, cellVal, opts) {
 		// class='rank"+level+"'>"+levelTxt+": "+el+"</a>";
 		el = levelTxt+": "+"<span class='rank"+level+"'>"+el;
 		
-		//if(${expandAllIcon}) {
+		if(${expandAllIcon}) {
 			el += "&nbsp;<a class='taxonExpandAll' onClick='expandAll(\"taxonHierarchy\", \""+cellVal.rowId+"\", true)'>+</a>";
-		//}
+		}
 		el+= "</span>"
 	}
 	return el;	   

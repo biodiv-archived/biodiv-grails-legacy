@@ -125,10 +125,16 @@ var expandAll = function(gridId, rowId, force) {
 	var grid = $("#"+gridId);
 	var rowData = grid.getRowData(rowId);
 	if(force) {
-		//grid.delTreeNode(rowId);
+		/*var children = grid.getNodeChildren(rowData);
+		for ( var i = 0; i < children.length; i++) {
+			grid.delTreeNode(children[i].id);	
+		}
+		rowData['expanded'] = 'false';
+		rowData['loaded'] = 'false';
+		*/
 	}
 	
-	if (!grid.isNodeLoaded(rowData) || grid.isNodeLoaded(rowData) == 'false' || force) {
+	if (!grid.isNodeLoaded(rowData) || grid.isNodeLoaded(rowData) == 'false') {
 		var postData = grid.getGridParam('postData');
 		postData["expand_all"] = true;
 		grid.expandRow(rowData);

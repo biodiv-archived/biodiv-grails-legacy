@@ -130,7 +130,7 @@ class Species {
 		reg.collect(classifications) { it.classification }
 		//Ordering has to figured out. Sort is a vague criteria. 
 		//Added just to get Author contributed as first result if present 
-		classifications.sort();
+		classifications.sort {it.name};
 		return classifications;
 	}
 }

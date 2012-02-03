@@ -104,7 +104,6 @@ $(document).ready(function(){
 		<br />
 		<br />
 
-
 		<div class="gallerytoolbar grid_16" >
 			<div id="speciesGroupFilter" style="float: left;">
 				<center>
@@ -185,7 +184,7 @@ $(document).ready(function(){
 							${speciesInstance.taxonConcept.italicisedForm}
 						</p>
 					</g:link>
-					<div class="poor_species_content" style="display:none;">Very little information. Please <g:link action="contribute" controller="species">contribute.</g:link></div>
+					<div class="poor_species_content" style="display:none;">No information yet</div>
 				</li>
 					</ul>
 			</g:each>
