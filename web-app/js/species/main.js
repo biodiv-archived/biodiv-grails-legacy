@@ -133,14 +133,14 @@ var expandAll = function(gridId, rowId, force) {
 		rowData['loaded'] = 'false';
 		*/
 	}
-	
 	if (!grid.isNodeLoaded(rowData) || grid.isNodeLoaded(rowData) == 'false') {
 		var postData = grid.getGridParam('postData');
-		postData["expand_all"] = true;
+		if(grid.getNodeChildren(rowData).length == 0)
+			postData["expand_all"] = true;
 		grid.expandRow(rowData);
 		grid.expandNode(rowData);
 		//$("#" + rowId + " div.treeclick").trigger('click');
-	}
+	} 
 }
 
 var initializeCKEditor = function() {

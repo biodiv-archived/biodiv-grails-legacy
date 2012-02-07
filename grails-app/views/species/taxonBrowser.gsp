@@ -14,7 +14,7 @@
 
 <g:javascript src="jquery/jquery.jqGrid-4.1.2/js/i18n/grid.locale-en.js"
 	base="${grailsApplication.config.grails.serverURL+'/js/'}" />
-<g:javascript src="jquery/jquery.jqGrid-4.1.2/js/jquery.jqGrid.min.js"
+<g:javascript src="jquery/jquery.jqGrid-4.1.2/js/jquery.jqGrid.src.js"
 	base="${grailsApplication.config.grails.serverURL+'/js/'}" />
 <g:javascript src="jquery/jquery.jqDock-1.8/jquery.jqDock.min.js"
 	base="${grailsApplication.config.grails.serverURL+'/js/'}" />

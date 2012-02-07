@@ -379,7 +379,7 @@ environments {
 
 			resources {
 				rootDir = "${app.rootDir}/images"
-				serverURL = "http://thewesternghats.in/${appName}/images"
+				serverURL = "http://pamba.strandls.com/${appName}/images"
 			}
 			nameSearch.indexStore = "${app.rootDir}/data/names"
 			observations {
