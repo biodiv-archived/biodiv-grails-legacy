@@ -97,7 +97,7 @@ jQuery(document).ready(function($) {
         </div-->
 
 
-	<!-- div>
+	<div>
 		<span id='loginLink'
 			style='position: relative; margin-right: 30px; float: right'>
 			<sec:ifLoggedIn>
@@ -107,7 +107,7 @@ jQuery(document).ready(function($) {
 			</sec:ifNotLoggedIn> </span>
 		<g:render template='/common/ajaxLogin' />
 		<br />
-	</div-->
+	</div>
 
 
 
@@ -191,7 +191,7 @@ jQuery(document).ready(function($) {
 			
 			$('#spinner')
 				.hide()  // hide it initially
-    			/*.ajaxStart(function() { 
+    			.ajaxStart(function() { 
     				$("html").addClass('busy');
     				$(this).offset({left:($('body').width()/2), top:($('body').height()/2)});
         			$(this).show();
@@ -199,7 +199,7 @@ jQuery(document).ready(function($) {
     			.ajaxStop(function() {
     				$("html").removeClass('busy');
         			$(this).hide();
-    			});*/
+    			});
     			
     		
 				$(".ui-icon-control").click(function() {

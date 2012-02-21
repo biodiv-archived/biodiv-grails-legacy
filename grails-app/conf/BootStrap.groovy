@@ -25,7 +25,7 @@ class BootStrap {
 		initDefs();
 		initUsers();
 		//initGroups();
-		initNames();
+		//initNames();
 		initFilters();
 	}
 
@@ -105,7 +105,7 @@ class BootStrap {
 	 * 
 	 */
 	def initFilters() {
-		SpringSecurityUtils.clientRegisterFilter('drupalAuthDirectFilter', SecurityFilterPosition.CAS_FILTER.order + 1);
+		SpringSecurityUtils.clientRegisterFilter('drupalAuthCookieFilter', SecurityFilterPosition.CAS_FILTER.order + 1);
 	}
 	
 	/**

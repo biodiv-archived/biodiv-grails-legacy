@@ -7,6 +7,7 @@ import org.springframework.security.authentication.AbstractAuthenticationToken
 public class DrupalAuthToken extends AbstractAuthenticationToken implements Authentication {
 	
 	long uid
+	String username;
 	String code = "password"
     Object principal
 	

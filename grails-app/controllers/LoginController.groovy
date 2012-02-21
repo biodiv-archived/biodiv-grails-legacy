@@ -47,12 +47,10 @@ class LoginController {
 	 */
 	def auth = {
 		def config = SpringSecurityUtils.securityConfig
-
 		if (springSecurityService.isLoggedIn()) {
 			redirect uri: config.successHandler.defaultTargetUrl
 			return
 		}
-
 		String view = 'auth'
 		String postUrl = "${request.contextPath}${config.apf.filterProcessesUrl}"
 		render view: view, model: [postUrl: postUrl,
@@ -145,8 +143,18 @@ class LoginController {
 			return
 		}
 		String postUrl = "${grailsApplication.config.grails.serverURL}${config.apf.filterProcessesUrl}"
-		println grailsApplication.config.speciesPortal.drupal.getAuthentication
-		println postUrl;
-		redirect (url: grailsApplication.config.speciesPortal.drupal.getAuthentication, params:['postUrl':postUrl]);
+		def urlpath = grailsApplication.config.speciesPortal.drupal.getAuthentication;
+		request.cookies.each {
+			response.addCookie(it)
+		}
+		def qStr = "";
+		def reqParams = ['postUrl':postUrl, 'spring-security-redirect':request.getHeader('referer')]
+		reqParams.each { k,v -> qStr += "$k=${v.encodeAsURL()}&" }
+		println '------------------------';
+		String host = request.getRequestURL();
+		//TODO : not a clean way to construct drupal host url
+		host = host.substring(0,host.indexOf(':8080') );
+			
+		redirect (url: host+urlpath + "?" + qStr);
 	}
 }

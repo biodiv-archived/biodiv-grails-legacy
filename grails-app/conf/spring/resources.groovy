@@ -1,4 +1,8 @@
 import org.apache.solr.client.solrj.impl.StreamingUpdateSolrServer;
+import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
+
+import species.auth.drupal.DrupalAuthCookieFilter;
+import species.auth.drupal.DrupalAuthUtils;
 
 // Place your Spring DSL code here
 beans = {
@@ -8,13 +12,19 @@ beans = {
 		drupalAuthDao = ref('drupalAuthDao')
 	}
 	//springSecurityUiService(com.strandls.avadis.auth.DummySpringSecurityUiService);
-	drupalAuthDirectFilter(species.auth.drupal.DrupalAuthDirectFilter, '/j_drupal_spring_security_check') {
+//	drupalAuthDirectFilter(species.auth.drupal.DrupalAuthDirectFilter, '/j_drupal_spring_security_check') {
+//		authenticationManager = ref('authenticationManager')
+//		sessionAuthenticationStrategy = ref('sessionAuthenticationStrategy')
+//		authenticationSuccessHandler = ref('authenticationSuccessHandler')
+//		authenticationFailureHandler = ref('authenticationFailureHandler')
+//		rememberMeServices = ref('rememberMeServices')
+//		authenticationDetailsSource = ref('authenticationDetailsSource')
+//	}
+	drupalAuthUtils(DrupalAuthUtils);
+	drupalAuthCookieFilter(DrupalAuthCookieFilter) {
 		authenticationManager = ref('authenticationManager')
-		sessionAuthenticationStrategy = ref('sessionAuthenticationStrategy')
-		authenticationSuccessHandler = ref('authenticationSuccessHandler')
-		authenticationFailureHandler = ref('authenticationFailureHandler')
-		rememberMeServices = ref('rememberMeServices')
-		authenticationDetailsSource = ref('authenticationDetailsSource')
+		drupalAuthUtils = ref('drupalAuthUtils')
+		logoutUrl =  SpringSecurityUtils.securityConfig.logout.filterProcessesUrl
 	}
 	
 	drupalAuthDao(species.auth.drupal.DrupalAuthDao)

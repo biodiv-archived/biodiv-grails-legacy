@@ -145,7 +145,7 @@ class ObservationController {
 			def resourcesInfo = [];
 			def rootDir = grailsApplication.config.speciesPortal.observations.rootDir
 			File obvDir;
-			String message;
+			def message;
 
 			if(!params.resources) {
 				message = "${message(code: 'resource.attachment.missing.message')}";
@@ -207,8 +207,13 @@ class ObservationController {
 				}
 			} else {
 				response.setStatus(500)
-				render message
+				message = [error:message]
+				render message as JSON
 			}
+		} else {
+			response.setStatus(500)
+			def message = [error:"${message(code: 'no.file.attached', default:'No file is attached')}"]
+			render message as JSON
 		}
 	}
 

@@ -324,6 +324,9 @@
 				})
 				$( "#imagesList" ).append (metadataEle);
 			}, error:function (xhr, ajaxOptions, thrownError){
+			console.log(xhr);
+			console.log(ajaxOptions);
+			console.log(thrownError);
 					var messageNode = $(".message .resources") 
 					if(messageNode.length == 0 ) {
 						$("#upload_resource").prepend('<div class="message">'+xhr.responseText+'</div>');

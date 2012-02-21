@@ -27,21 +27,11 @@ class DrupalAuthDirectFilter extends AbstractAuthenticationProcessingFilter {
 	
 	public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) {
 		log.debug request
-		request.getHeaderNames().each {
-			println it;
-			println request.getHeader(it)
-		}
 		
-		println request.getRemoteUser();
-		println request.requestURI;
-		
-		log.debug request.getParameterNames();
 		Map params = [:]
 		request.getParameterNames().each {
-			println it;
 			params[it] = request.getParameter(it)
 		}
-		
 		log.debug params;
 		
 		if (params.uid == null) {
@@ -50,6 +40,7 @@ class DrupalAuthDirectFilter extends AbstractAuthenticationProcessingFilter {
 
 		DrupalAuthToken authRequest = new DrupalAuthToken (
 				uid: Long.parseLong(params.uid),
+				username:params.name,
 				code: params.code
 		);
 		log.debug authRequest;

@@ -69,23 +69,25 @@ log4j = {
 	//    console name:'stdout', layout:pattern(conversionPattern: '%c{2} %m%n')
 	//}
 
-	error   'org.codehaus.groovy.grails.web.servlet',  //  controllers
-			'org.codehaus.groovy.grails.web.pages', //  GSP
+	error  	'org.codehaus.groovy.grails.web.pages', //  GSP
 			'org.codehaus.groovy.grails.web.sitemesh', //  layouts
 			'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
 			'org.codehaus.groovy.grails.web.mapping', // URL mapping
 			'org.codehaus.groovy.grails.commons', // core / classloading
 			'org.codehaus.groovy.grails.plugins', // plugins
-			'org.codehaus.groovy.grails.orm.hibernate', // hibernate integration
-			'org.springframework.security',
+			'org.codehaus.groovy.grails.orm.hibernate', // hibernate integration	
 			'org.hibernate',
 			'net.sf.ehcache.hibernate'
-			'grails.plugin'
+			
 
 	warn   'org.mortbay.log'
 
 	debug	'species',
 			'speciespage',
+			'org.springframework.security',
+			'org.codehaus.groovy.grails.web.servlet',  //  controllers
+			'grails.plugin',
+			
 			'grails.app'
 
 }
@@ -186,7 +188,7 @@ speciesPortal {
 	}
 	observations {
 		rootDir = "${app.rootDir}/observations"
-		serverURL = "http://localhost:8080/${appName}/${appName}/observations"
+		serverURL = "http://localhost:8080/${appName}/observations"
 		//serverURL = "http://localhost/${appName}/observations"
 	}
 
@@ -311,7 +313,9 @@ speciesPortal {
 		SPECIES_ID = "species_id"
 		AUTOCOMPLETE = "autocomplete"
 	}
-	drupal { getAuthentication = "http://ibp.panchgani.strandls.com/getAuthentication.php" }
+	drupal {
+		getAuthentication = "/getAuthentication.php"
+	}
 }
 
 speciesPortal.validCrossDomainOrigins = [
@@ -324,7 +328,7 @@ speciesPortal.validCrossDomainOrigins = [
 
 //uiperformance.enabled = false
 imageConverterProg = "/usr/bin/convert";
-jpegOptimProg = "/usr/local/bin/jpegoptim";
+jpegOptimProg = "/usr/bin/jpegoptim";
 
 environments {
 	development {
@@ -361,7 +365,7 @@ environments {
 
 			observations {
 				rootDir = "${app.rootDir}/observations"
-				serverURL = "http://saturn.strandls.com:8080/${appName}/${appName}/observations"
+				serverURL = "http://saturn.strandls.com:8080/${appName}/observations"
 				//serverURL = "http://localhost/${appName}/observations"
 			}
 			search.serverURL="http://saturn.strandls.com:8080/solr/species"
@@ -379,15 +383,16 @@ environments {
 
 			resources {
 				rootDir = "${app.rootDir}/images"
-				serverURL = "http://thewesternghats.in/${appName}/images"
+				serverURL = "http://pamba.strandls.com/${appName}/images"
 			}
 			nameSearch.indexStore = "${app.rootDir}/data/names"
 			observations {
 				rootDir = "${app.rootDir}/observations"
-				serverURL = "http://thewesternghats.in:8080/${appName}/${appName}/observations"
+				serverURL = "http://thewesternghats.in:8080/${appName}/observations"
 				//serverURL = "http://localhost/${appName}/observations"
 			}
 			search.serverURL="http://thewesternghats.in:8080/solr/species"
+		
 		}
 		google.analytics.webPropertyID = "UA-xxxxxx-x"
 		google.analytics.enabled = false
@@ -401,12 +406,12 @@ environments {
 }
 
 navigation.dashboard = [
-	[controller:'species', title:'Species Gallery', order:1, action:"list"],
+/*	[controller:'species', title:'Species Gallery', order:1, action:"list"],
 	[controller:'species', title:'Taxonomy Browser', order:10, action:'taxonBrowser'],
 	[controller:'search', title:'Advanced Search',order:20, action:'advSelect'],
 	[controller:'species', title:'Contribute', order:30, action:'contribute']
-
-	/*[group:'species', controller:'species', order:10, title:'Species', action:'list', subItems:[
+*/
+	[group:'species', controller:'species', order:10, title:'Species', action:'list', subItems:[
 	 [controller:'species', title:'Thumbnail Gallery', order:1, action:"list"],
 	 [controller:'species', title:'Taxonomy Browser', order:10, action:'taxonBrowser'],
 	 [controller:'species', title:'Contribute', order:20, action:'contribute']
@@ -417,7 +422,7 @@ navigation.dashboard = [
 	 ]],
 	 [group:'search', order:50, controller:'search', title:'Advanced Search', action:'advSelect'],
 	 [group:'admin', order:60, controller:'admin', title:'Admin', action:'index']
-	 */
+	 
 ]
 
 /*navigation.gallery = [
@@ -533,11 +538,12 @@ jquery {
 grails.plugins.springsecurity.userLookup.userDomainClassName = 'species.auth.SUser'
 grails.plugins.springsecurity.userLookup.authorityJoinClassName = 'species.auth.SUserRole'
 grails.plugins.springsecurity.authority.className = 'species.auth.Role'
-//grails.plugins.springsecurity.auth.loginFormUrl = "/login/authFromDrupal"
+grails.plugins.springsecurity.auth.loginFormUrl = "/login/authFromDrupal"
+
 grails.plugins.springsecurity.auth.defaultRoleNames = ['ROLE_USER']
-//grails.plugins.springsecurity.apf.filterProcessesUrl = '/j_drupal_spring_security_check'
+grails.plugins.springsecurity.apf.filterProcessesUrl = '/j_drupal_spring_security_check'
 grails.plugins.springsecurity.providerNames = [
-	//	        'drupalAuthentiactionProvider',
+	'drupalAuthentiactionProvider',
 	'daoAuthenticationProvider',
 	'anonymousAuthenticationProvider',
 	'rememberMeAuthenticationProvider'

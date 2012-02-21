@@ -25,7 +25,7 @@ public class DrupalAuthenticationProvider implements AuthenticationProvider {
 		if(authentication instanceof DrupalAuthToken) {
 			DrupalAuthToken authRequest = (DrupalAuthToken) authentication
 
-			SUser user = drupalAuthDao.findUser(authRequest.uid as Long)
+			SUser user = drupalAuthDao.findUser(authRequest.uid)
 
 			if (user == null) {
 				//log.debug "New person $authRequest.uid"

@@ -34,8 +34,10 @@ $(document).ready(function() {
         	postData["expand_all"] = false;
 	    },
 	    loadError : function(xhr, status, error) {
+	    	console.log(status);
+	    	console.log(xhr);	    
 	    	alert(error)
-	    }, 
+	    }
 	});
 
 	$("#taxaHierarchy").change(function() {

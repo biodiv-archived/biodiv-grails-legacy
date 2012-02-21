@@ -25,7 +25,7 @@ class Species {
 	
 	def fieldsConfig = ConfigurationHolder.config.speciesPortal.fields
 	
-	static hasMany = [fields: SpeciesField, 
+	static hasMany = [fields: SpeciesField,
 		globalDistributionEntities:GeographicEntity, 
 		globalEndemicityEntities:GeographicEntity, 
 		indianDistributionEntities:GeographicEntity, 
