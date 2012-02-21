@@ -323,7 +323,8 @@ class DataController {
 				if(r.path && r.path.lastIndexOf("_")!=-1) {
 					parentPath = r.path.substring(0, r.path.lastIndexOf("_"))
 				}
-				row(_id_:r.path) {
+				row(id:r.path) {
+					cell(r.path)
 					cell(r.path)
 					cell (r.name.trim())
 					cell (r.count)

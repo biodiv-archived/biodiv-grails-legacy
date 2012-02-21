@@ -9,9 +9,10 @@ $(document).ready(function() {
   	$('#taxonHierarchy').jqGrid({
 		url:'${createLink(controller:'data', action:'listHierarchy')}',
 		datatype: "xml",
-   		colNames:['Id', '','#Species', 'SpeciesId', 'Class System'],
+   		colNames:['Id', '_Id_', '', '#Species', 'SpeciesId', 'Class System'],
    		colModel:[
-   			{name:'_id_',index:'_id_',hidden:true},
+   			{name:'id',index:'id',hidden:true},
+   			{name:'_id_',index:'id',hidden:true},
    			{name:'name',index:'name',formatter:heirarchyLevelFormatter},
    			{name:'count', index:'count',hidden:true, width:50},
    			{name:'speciesId',index:'speciesId', hidden:true},
@@ -37,7 +38,7 @@ $(document).ready(function() {
 	    	console.log(status);
 	    	console.log(xhr);	    
 	    	alert(error)
-	    }
+	    } 
 	});
 
 	$("#taxaHierarchy").change(function() {
@@ -57,8 +58,8 @@ $(document).ready(function() {
 var heirarchyLevelFormatter = function(el, cellVal, opts) {
 	var cells = $(opts).find('cell')
 	var taxonId = $.trim($(cells[0]).text())
-	var speciesId = $.trim($(cells[3]).text())
-	var level = $(cells[5]).text()
+	var speciesId = $.trim($(cells[4]).text())
+	var level = $(cells[6]).text()
 	var levelTxt;
 	if(level == ${TaxonomyRank.KINGDOM.ordinal()} ) {
 		levelTxt = "<span class='rank'>${TaxonomyRank.KINGDOM}</span>"
@@ -88,7 +89,7 @@ var heirarchyLevelFormatter = function(el, cellVal, opts) {
 		// class='rank"+level+"'>"+levelTxt+": "+el+"</a>";
 		el = levelTxt+": "+"<span class='rank"+level+"'>"+el;
 		
-		if(${expandAllIcon?true:false}) {
+		if(${expandAllIcon == false?false:true}) {
 			el += "&nbsp;<a class='taxonExpandAll' onClick='expandAll(\"taxonHierarchy\", \""+cellVal.rowId+"\", true)'>+</a>";
 		}
 		el+= "</span>"

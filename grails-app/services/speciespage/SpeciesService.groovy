@@ -282,7 +282,6 @@ class SpeciesService {
 		s.fields.each { field ->
 			textSize += field.description?.length();
 		}
-		
 		int noOfMultimedia = s.resources?.size()?:0;
 		//int diffSources = 
 		//TODO: int reviewedFields = 
