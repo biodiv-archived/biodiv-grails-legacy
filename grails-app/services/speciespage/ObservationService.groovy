@@ -46,6 +46,8 @@ class ObservationService {
 		observation.location = 'POINT(' + params.longitude + ' ' + params.latitude + ')'
         observation.latitude = Float.parseFloat(params.latitude);
         observation.longitude = Float.parseFloat(params.longitude);
+        observation.locationAccuracy = params.location_accuracy;
+		//observation.geoPrivacy = params.geo_privacy;
 		
 		def resourcesXML = createResourcesXML(params);
 		def resources = saveResources(observation, resourcesXML);
