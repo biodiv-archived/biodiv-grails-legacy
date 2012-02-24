@@ -1,5 +1,5 @@
 
-<div class="grid_5 observation_location sidebar">
+<div class="grid_5 observation_location">
 	<div>
 		<p class="prop">
 			<span class="name">Place name</span> <div class="value"> ${observationInstance.placeName}
