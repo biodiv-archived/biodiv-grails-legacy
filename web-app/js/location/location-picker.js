@@ -32,6 +32,8 @@ function initialize(){
 }
 
 function set_location(lat, lng) {
+	
+		$(".location_picker_button").removeClass("active_location_picker_button");
         $("#latitude").html(lat);
         $("#longitude").html(lng);
         var location = new google.maps.LatLng(lat, lng);
@@ -42,6 +44,7 @@ function set_location(lat, lng) {
             if (status == google.maps.GeocoderStatus.OK) {
                 if (results[0]) {
                     $('#place_name').val(results[0].formatted_address);
+                    $('#reverse_geocoded_name').html(results[0].formatted_address);
                     $('#latitude').html(marker.getPosition().lat());
                     $('#longitude').html(marker.getPosition().lng());
                     $('#reverse_geocoded_name_field').val(results[0].formatted_address);
@@ -85,9 +88,10 @@ function update_geotagged_images_list(image) {
     	$(image).exifLoad(function() {
     		var latlng = get_latlng_from_image(image); 
             if (latlng) {            	
-            	var func = "set_location(" + latlng.lat+"," +latlng.lng+ ")";
-                var html = '<div class="location_picker_button" style="display:block;margin:1px;" onclick="' + func + '"><div style="width:40px; height:40px;float:left;"><img style="width:100%; height:100%;" src="' + $(image).attr('src') + '"/></div><div style="float:left; padding:2px;font-size:">Use this image\'s location</div></div>';
+            	var func = "set_location(" + latlng.lat+"," +latlng.lng+ "); $(this).addClass('active_location_picker_button')";
+                var html = '<div class="location_picker_button" style="display:block;" onclick="' + func + '"><div style="width:40px; height:40px;float:left;"><img style="width:100%; height:100%;" src="' + $(image).attr('src') + '"/></div><div style="float:left; padding:2px;font-size:">Use this image\'s location</div></div>';
                 $("#geotagged_images").append(html);
+                $("#geotagged_images").trigger('update_map');
             }
     	})
 }
@@ -119,7 +123,7 @@ function get_latlng_from_image(img) {
 
 $(document).ready(function() { 
   
-  $('#address').watermark('Where did you found this observation?');
+  $('#address').watermark('Search');
 
   initialize();
   //window.setTimeout(update_geotagged_images_list, 10);
@@ -165,6 +169,7 @@ $(document).ready(function() {
       if (status == google.maps.GeocoderStatus.OK) {
         if (results[0]) {
           $('#place_name').val(results[0].formatted_address);
+          $('#reverse_geocoded_name').html(results[0].formatted_address);
           $('#latitude').html(marker.getPosition().lat());
           $('#longitude').html(marker.getPosition().lng());
           $('#reverse_geocoded_name_field').val(results[0].formatted_address);
@@ -181,6 +186,7 @@ $(document).ready(function() {
         var lat = position.coords.latitude;
         var lng = position.coords.longitude;
         set_location(lat, lng);
+        $('#current_location').addClass('active_location_picker_button');  
         $('#location_info').html('Using auto-detected current location');
    geocoder.geocode({'latLng': marker.getPosition()}, function(results, status) {
       if (status == google.maps.GeocoderStatus.OK) {
@@ -213,6 +219,7 @@ $(document).ready(function() {
   }
 
   $('#current_location').click(function() {
+	
     if (navigator.geolocation) {
         /* geolocation is available */
         navigator.geolocation.getCurrentPosition(onSuccess, onError);
@@ -248,4 +255,17 @@ $(document).ready(function() {
 
     });
 
+    /*
+     $('#map_area').hover(function(){
+    	$(this).animate({right: -10, top: -10}, 600);
+    	$('#map_canvas').animate({height: 300, width: 300}, 600);
+    }, function(){
+    	$(this).animate({right: 10, top: 10}, 600);
+    	$('#map_canvas').animate({height: 250, width: 250}, 600);
+    });
+    */
+    
+    $('#geotagged_images').on('update_map', function() {
+    	$(this).children(":first").trigger("click");
+    });
 });

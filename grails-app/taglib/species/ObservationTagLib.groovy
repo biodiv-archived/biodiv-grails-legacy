@@ -7,36 +7,36 @@ class ObservationTagLib {
 	def grailsApplication
 	
 	def create = {attrs, body ->
-		out << render(template:"/common/editObservationTemplate", model:attrs.model);
+		out << render(template:"/common/observation/editObservationTemplate", model:attrs.model);
 	}
 	
 	def show = {attrs, body->
 		if(attrs.model.observationInstance) {
-			out << render(template:"/common/showObservationTemplate", model:attrs.model);
+			out << render(template:"/common/observation/showObservationTemplate", model:attrs.model);
 		}
 	}
 	
 	def showSnippet = {attrs, body->
 		if(attrs.model.observationInstance) {
-			out << render(template:"/common/showObservationSnippetTemplate", model:attrs.model);
+			out << render(template:"/common/observation/showObservationSnippetTemplate", model:attrs.model);
 		}
 	}
 	
 	def showStory = {attrs, body->
 		if(attrs.model.observationInstance) {
-			out << render(template:"/common/showObservationStoryTemplate", model:attrs.model);
+			out << render(template:"/common/observation/showObservationStoryTemplate", model:attrs.model);
 		}
 	}
 
 	def showRating = {attrs, body->
 		if(attrs.model.observationInstance) {
-			out << render(template:"/common/showObservationRatingTemplate", model:attrs.model);
+			out << render(template:"/common/observation/showObservationRatingTemplate", model:attrs.model);
 		}
 	}
 
 	def showLocation = {attrs, body->
 		if(attrs.model.observationInstance) {
-			out << render(template:"/common/showObservationLocationTemplate", model:attrs.model);
+			out << render(template:"/common/observation/showObservationLocationTemplate", model:attrs.model);
 		}
 	}
 }

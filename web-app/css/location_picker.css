@@ -16,20 +16,27 @@
     width: 90%;
     z-index: 5;
     border: 1px solid #CCCCCC;
-    box-shadow: 0 1px 4px #CCCCCC inset;
+    box-shadow: 0 1px 4px #CCCCCC;
 }    
 
+#address:hover {
+    box-shadow: 0 1px 4px #CCCCCC inset;
+}
+
 #map_canvas {
-    width:250px;
-    height:250px;     
-    clear:both;       
+    width:400px;
+    height:300px;     
+    clear:both; 
+    position: relative;      
 }
 
 #location_picker {
 clear:both;    
-width: 660px;      
+width: auto;      
 background: #f5f5f1;       
 box-radius: 7px;
+position: relative;
+padding: 10px;
 }
 
 #selection_box {
@@ -37,43 +44,44 @@ border: 1px solid #e5e5e5;
 padding:10px;      
 margin:10px;        
 background: #fcfcfc;       
-float:left;            
+float:left;
+min-height: 300px;
 }
 
 .row {
 clear: both;
-padding-top: 0;
-font-family: Arial,Helvetica,sans-serif;
-font-size: 12px;
 }
 
 .label {
 float: left;
 padding-right: 5px;
 text-align: right;
+font-weight: bold;
 width: 150px;
 }
 
 .location_picker_value {
 float: left;
 text-align: left;
-width: 170px;
+width: 400px;
+height: 20px;
+overflow: hidden;
 }
 
 #side_bar {
 float:left;
-width:350px;      
 padding:5px;      
 }
 
 #map_area {
 float:left;
 border: 3px solid #ffffff;
-box-shadow: 0 3px 3px #5e5e5e;        
-}
-
-.ui-widget-content {
-width:390px;
+box-shadow: 0 3px 3px #5e5e5e;
+position: absolute;
+right: 15px;
+top: 15px;
+box-shadow: 0 3px 3px #5e5e5e;
+margin:10px;
 }
 
 .location_picker_button {
@@ -108,7 +116,6 @@ height: 80px;
 #result_box {
 clear: both;
 border: 0px solid #e5e5e5;       
-height: 100px;        
 padding: 10px;
 margin: 10px;         
 }
@@ -121,6 +128,6 @@ width: 500px;
 padding: 10px;
 }
 
-input#place_name {
-width:50%;
+.active_location_picker_button {
+background: #c8c6ed;    
 }

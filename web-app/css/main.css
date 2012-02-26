@@ -64,7 +64,6 @@ ul {
 }
 
 input,select,textarea {
-	background-color: #fcfcfc;
 	border: 1px solid #ccc;
 /* 	font: 12px Arial, Helvetica, sans-serif; */
 	margin: 5px 0;
@@ -340,7 +339,6 @@ th.name {
 .prop .value {
 	text-align: left;
 	padding-left: 20px;
-	border: 0;
 }
 
 /* ACTION BUTTONS */
@@ -747,12 +745,20 @@ img {
 	/*border-bottom: 3px solid #A9DA92;*/
 }
 
-.observation .addedResource,.observation .snippet {
+.observation .addedResource {
+	display: block;
+	margin: 10px;
+	padding: 5px;
+	border-radius: 7px;
+	background-color: #fbfbfb;
+        position: relative;
+}
+
+.observation .snippet {
 	display: block;
 	margin: 10px;
 	border: 1px solid #e5e5e5;
 	padding: 5px;
-	box-shadow: 0 0 4px rgba(0, 0, 0, 0.25), 0 3px 4px rgba(0, 0, 0, 0.3);
 	border-radius: 7px;
 	background-color: #fbfbfb;
 }
@@ -762,9 +768,7 @@ img {
 		rgba(0, 127, 0, 0.3);
 }
 
-.observation .adedResource .figure,.observation .figure {
-	padding-right: 10px;
-	border-right: 1px solid #e5e5e5;
+.observation .addedResource .figure,.observation .figure {
 }
 
 .comments {
@@ -788,9 +792,9 @@ html.busy,html.busy * {
 	border: 1px solid #cecece;
 	margin-top: 10px;
 	margin-bottom: 20px;
-	box-shadow: 0 0 4px rgba(0, 0, 0, 0.25), 0 3px 4px rgba(0, 0, 0, 0.3);
 	opacity: 1.0;
-	background-color: #ffffff;
+	background-color: #fbfbfb;
+        border-radius: 5px;
 }
 
 #resourceTabs {
@@ -853,9 +857,9 @@ html.busy,html.busy * {
 }
 
 textarea#notes {
-	width: 660px;
-	min-width: 660px;
-	max-width: 660px;
+	width: 100%;
+	min-width: 100%;
+	max-width: 100%;
 }
 
 .button-red {
@@ -994,7 +998,6 @@ ul.thumbwrap li a {
 
 .ui-widget-content {
 	border-radius: 5px;
-	box-shadow: 0 0 4px rgba(0, 0, 0, 0.25), 0 3px 4px rgba(0, 0, 0, 0.3);
 }
 
 .thumbwrap .searchSnippet {
@@ -1128,4 +1131,120 @@ ul.thumbwrap li.poor_species_content div.poor_species_content{
 	bottom: 0px;
 	position: absolute;
 	border: 1px solid #F0C36D;
+}
+
+#location_confidence {
+	margin-top: 20px;
+	
+}
+
+#ui-datepicker-div {
+	width: auto;	
+}
+
+.section {
+background-color:#e5e5e5;
+margin:10px;
+padding: 20px;       
+border-radius: 5px;         
+clear:both;
+position: relative;      
+overflow: auto;          
+}
+
+.section h3 {
+color: #424242;
+padding-bottom: 10px;       
+}
+
+.section label {
+float: left;
+font-weight: bold;
+padding-right: 15px;
+text-align: right;
+width: 250px;
+}
+
+.section .ui-widget-content {
+margin:0;    
+}
+
+#upload_resource #pseudobutton {
+font-weight:bold;
+z-index:1;
+width:100px;
+margin:15px 15px 5px;
+}
+
+#upload_resource #pseudobutton:hover {
+border: 1px solid #4D90FE;    
+}
+
+#upload_resource #attachFiles {
+position:relative;
+left:-421px;
+-moz-opacity:0 ;
+filter:alpha(opacity: 0);
+opacity: 0;
+z-index: 2;
+font-size: 29px;
+height: 29px;
+}
+
+.close_button {
+background: url(../images/close.png) no-repeat center left; 
+width: 24px;
+height: 24px;       
+position: absolute;
+right: -10px;
+top: -10px;       
+opacity:0.7;    
+}
+
+.close_button:hover {
+opacity:1;    
+}
+
+.addedResource .metadata {
+font-size: 0.9em;    
+}
+
+.addedResource .metadata label {
+width: 50px;
+text-align: right;       
+padding:0;
+margin:2px;        
+padding-right:5px;       
+}
+
+.addedResource .metadata input {
+width: 120px;
+font-size: 0.9em;    
+margin:2px;        
+}
+
+.addedResource .metadata select {
+font-size: 0.9em;    
+margin:2px;        
+}
+
+#upload_button {
+box-shadow: 0 1px 0 #FFFFFF;
+height: 30px;
+margin: 0;
+padding-left: 12px;
+padding-right: 12px;
+background-color: #FD9A0F;
+background-image: -moz-linear-gradient(center top , #FEE94F 0pt, #FD9A0F 100%);
+background-repeat: repeat-x;
+border-color: #FFAA22;
+font-weight: bold;    
+}
+
+img.ui-datepicker-trigger{
+padding: 3px;
+}
+
+.ui-autocomplete {
+position: fixed !important;
 }

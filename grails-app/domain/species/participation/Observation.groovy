@@ -42,6 +42,8 @@ class Observation {
 	String location;
 	float latitude;
     float longitude;
+	boolean geoPrivacy = false;
+	String locationAccuracy;
 	
 	static hasMany = [resource:Resource, recommendationVote:RecommendationVote];
 

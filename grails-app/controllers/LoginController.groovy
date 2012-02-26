@@ -29,7 +29,7 @@ class LoginController {
 	def springSecurityService
 
 	def grailsApplicaiton
-	
+
 	/**
 	 * Default action; redirects to 'defaultTargetUrl' if logged in, /login/auth otherwise.
 	 */
@@ -54,7 +54,7 @@ class LoginController {
 		String view = 'auth'
 		String postUrl = "${request.contextPath}${config.apf.filterProcessesUrl}"
 		render view: view, model: [postUrl: postUrl,
-		                           rememberMeParameter: config.rememberMe.parameter]
+					rememberMeParameter: config.rememberMe.parameter]
 	}
 
 	/**
@@ -70,7 +70,7 @@ class LoginController {
 	 */
 	def denied = {
 		if (springSecurityService.isLoggedIn() &&
-				authenticationTrustResolver.isRememberMe(SCH.context?.authentication)) {
+		authenticationTrustResolver.isRememberMe(SCH.context?.authentication)) {
 			// have cookie but the page is guarded with IS_AUTHENTICATED_FULLY
 			redirect action: 'full', params: params
 		}
@@ -82,8 +82,8 @@ class LoginController {
 	def full = {
 		def config = SpringSecurityUtils.securityConfig
 		render view: 'auth', params: params,
-			model: [hasCookie: authenticationTrustResolver.isRememberMe(SCH.context?.authentication),
-			        postUrl: "${request.contextPath}${config.apf.filterProcessesUrl}"]
+				model: [hasCookie: authenticationTrustResolver.isRememberMe(SCH.context?.authentication),
+					postUrl: "${request.contextPath}${config.apf.filterProcessesUrl}"]
 	}
 
 	/**
@@ -134,29 +134,33 @@ class LoginController {
 	def ajaxDenied = {
 		render([error: 'access denied'] as JSON)
 	}
-	
+
 	def authFromDrupal = {
 		def config = SpringSecurityUtils.securityConfig
-		
+
 		if (springSecurityService.isLoggedIn()) {
 			redirect uri: config.successHandler.defaultTargetUrl
 			return
 		}
-		//String postUrl = "/${grailsApplication.metadata['app.name']}${config.apf.filterProcessesUrl}"
-		def urlpath = grailsApplication.config.speciesPortal.drupal.getAuthentication;
-		request.cookies.each {
-			response.addCookie(it)
+		//		//String postUrl = "/${grailsApplication.metadata['app.name']}${config.apf.filterProcessesUrl}"
+		//		def urlpath = grailsApplication.config.speciesPortal.drupal.getAuthentication;
+		//		request.cookies.each {
+		//			response.addCookie(it)
+		//		}
+		//		def qStr = "";
+		//		def reqParams = ['spring-security-redirect':request.getHeader('referer')]
+		//		reqParams.each { k,v -> qStr += "$k=${v.encodeAsURL()}&" }
+		//		String host = request.getRequestURL();
+		//		//TODO : not a clean way to construct drupal host url
+		//		host = host.substring(0,host.indexOf(':8080') );
+		//
+		//		//redirect (url: host+urlpath + "?" + qStr);
+
+		if(request.getHeader('Host').contains(':8080')) {
+			redirect (action:'auth');
+		} else {
+			response.setHeader 'Location', request.getHeader('referer')
+			response.sendError HttpServletResponse.SC_UNAUTHORIZED
 		}
-		def qStr = "";
-		def reqParams = ['spring-security-redirect':request.getHeader('referer')]
-		reqParams.each { k,v -> qStr += "$k=${v.encodeAsURL()}&" }
-		String host = request.getRequestURL();
-		//TODO : not a clean way to construct drupal host url
-		host = host.substring(0,host.indexOf(':8080') );
-			
-		//redirect (url: host+urlpath + "?" + qStr);
-		
-		response.setHeader 'Location', request.getHeader('referer')
-		response.sendError HttpServletResponse.SC_UNAUTHORIZED
 	}
 }
