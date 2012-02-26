@@ -272,7 +272,8 @@ class ObservationController {
 		log.debug params;
 
 		params.author = springSecurityService.currentUser;
-
+		boolean success = false;
+		
 		if(params.obvId) {
 			//Saves recommendation if its not present
 			def recommendationVoteInstance = observationService.createRecommendationVote(params)
@@ -281,21 +282,24 @@ class ObservationController {
 			try {
 				if (recommendationVoteInstance.save(flush: true)) {
 					log.debug "Successfully added reco vote : "+recommendationVoteInstance
-					render String.valueOf(++params.int('currentVotes')).encodeAsHTML();
+					success = true;
+					def result = ['votes':++params.int('currentVotes')];
+					render result as JSON;
 				}
 				else {
 					recommendationVoteInstance.errors.allErrors.each { log.error it }
-					render String.valueOf(params.int('currentVotes')).encodeAsHTML();
+					
 				}
 			} catch(e) {
 				e.printStackTrace();
-				render String.valueOf(params.int('currentVotes')).encodeAsHTML();
 			}
 		} else {
 			flash.message  = "${message(code: 'observation.invalid', default:'Invalid observation')}"
-			render String.valueOf(params.int('currentVotes')).encodeAsHTML();
 		}
-
+		if(!success) {
+			def result = ['votes':params.int('currentVotes')];
+			render result as JSON;
+		}
 	}
 
 	def voteDetails = {

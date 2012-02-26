@@ -246,10 +246,11 @@ request.cookies.each{println it.name+" : "+it.value}
 			    			
     			
 		}); 
-			
-			function showLogin() {
+			<%if(!grailsApplication.config.checkin.drupal) {%>
+			function show_login_dialog() {
 				$('#ajaxLogin').show(); 
 			} 
+			<%} %>
 			
 			function cancelLogin() {
 				$('#ajaxLogin').hide(); 

@@ -91,49 +91,41 @@
 				<div class="grid_5 recommendations">
 					<div class="recoSummary">
 						<%
-                                                    //TODO:move this piece to taglib and place this code in service
-                                                    def result = RecommendationVote.createCriteria().list { 
-                                                            projections {
-                                                                    groupProperty("recommendation")
-                                                                    count 'id', 'voteCount'
-                                                            }
-                                                            eq('observation', observationInstance)
-                                                            order 'voteCount', 'desc'
-                                                    }
-                                             %>
+					//TODO:move this piece to taglib and place this code in service
+					def result = RecommendationVote.createCriteria().list { 
+                    	projections {
+                        	groupProperty("recommendation")
+                            count 'id', 'voteCount'
+                        }
+                        eq('observation', observationInstance)
+                        order 'voteCount', 'desc'
+                    }%>
 
 						<g:if test="${result}">
 							<g:message code="recommendations.no.message"
 								,  args="[result.size()]" />
 							<ul>
-                                                        <g:set var="index" value="0"/>
+								<g:set var="index" value="0" />
 								<g:each in="${result}" var="r">
 									<li><g:if test="${r[0]?.taxonConcept?.canonicalForm}">
-											<g:link controller="species" action="show" id="${r[0]?.taxonConcept?.findSpeciesId()}">
+											<g:link controller="species" action="show"
+												id="${r[0]?.taxonConcept?.findSpeciesId()}">
 												${r[0]?.taxonConcept?.canonicalForm}
 											</g:link>
 										</g:if> <g:else>
-                                                                    	${r[0].name}
-                                                                    </g:else> By
-
-										
-										<%def recoVote = RecommendationVote.withCriteria {
+											${r[0].name}
+										</g:else> By <%def recoVote = RecommendationVote.withCriteria {
 											eq('recommendation', r[0])
 											eq('observation', observationInstance)
 											min('votedOn')
 											
 										}
 										recoVote = recoVote.getAt(0)
-										%>
-										<g:link controller="sUser" action="show" id="${recoVote?.author.id}">
+										%> <g:link controller="sUser" action="show"
+											id="${recoVote?.author.id}">
 											${recoVote?.author.username}
-										</g:link> on <g:formatDate format="MMMMM dd, yyyy" date="${recoVote?.votedOn}" />
-										with
-
-										
-    									
-
-                                                                                <g:javascript>
+										</g:link> on <g:formatDate format="MMMMM dd, yyyy"
+											date="${recoVote?.votedOn}" /> with <g:javascript>
                                                                                     $(document).ready(function(){
                                                                                         $('#voteCountLink_${index}').click(function() {
                                                                                                 $('#voteDetails_${index}').show();
@@ -143,17 +135,24 @@
                                                                                                 $('#voteDetails_${index}').hide();
                                                                                                 });
                                                                                     });
-                                                                                </g:javascript>
-
-
-										<span id="voteCountLink_${index}"><g:remoteLink action="voteDetails" controller="observation" update="voteDetails_${index}" 
-    										params="['obvId':observationInstance.id, recoId:r[0].id]">votes <span id="votes_${index}">${r[1]}</span></g:remoteLink></span>
-    									<div id="voteDetails_${index}" class="voteDetails"></div>
-    									<span style="float:right;"><g:remoteLink action="addAgreeRecommendationVote" controller="observation"  
-    										params="['obvId':observationInstance.id, 'recoId':r[0].id, 'currentVotes':r[1]]" on401="showLogin();" onSuccess="jQuery('#votes_${index}').html(data);return false;">I agree</g:remoteLink></span>
-
+                                            </g:javascript> <span
+										id="voteCountLink_${index}">
+										votes <span
+													id="votes_${index}"> ${r[1]} </span></span>
+										<span
+										style="float: right;">
+										<g:remoteLink
+												action="addAgreeRecommendationVote" controller="observation"
+												params="['obvId':observationInstance.id, 'recoId':r[0].id, 'currentVotes':r[1]]"
+												onSuccess="jQuery('#votes_${index}').html(data.votes);return false;"
+												onFailure="console.log (XMLHttpRequest); if(XMLHttpRequest.status == 401 || XMLHttpRequest.status == 200) {
+	    		show_login_dialog();
+	    	} else {	    
+	    		alert(errorThrown);
+	    	}return false;">I agree</g:remoteLink>
+									</span>
 									</li>
-                                                                        <g:set var="index" value="${index + 1}"/>
+									<g:set var="index" value="${index + 1}" />
 								</g:each>
 
 							</ul>
@@ -187,7 +186,7 @@
 					</div>
 				</div>
 
-				<obv:showRating model="['observationInstance':observationInstance]" />
+				<!-- obv:showRating model="['observationInstance':observationInstance]" /-->
 
 			</div>
 

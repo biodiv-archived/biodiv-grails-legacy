@@ -1,5 +1,6 @@
 import grails.converters.JSON
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse
 
 import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
@@ -155,12 +156,14 @@ class LoginController {
 		//		host = host.substring(0,host.indexOf(':8080') );
 		//
 		//		//redirect (url: host+urlpath + "?" + qStr);
-
-		if(request.getHeader('Host').contains(':8080')) {
-			redirect (action:'auth');
-		} else {
+		def openIdProvider = request.cookies.find { Cookie c ->
+			return c.name == ('openid_provider');
+		}
+		if(grailsApplication.config.checkin.drupal) {
 			response.setHeader 'Location', request.getHeader('referer')
 			response.sendError HttpServletResponse.SC_UNAUTHORIZED
+		} else {
+			redirect (action:'auth');
 		}
 	}
 }

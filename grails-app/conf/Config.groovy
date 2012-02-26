@@ -557,3 +557,5 @@ grails.plugins.springsecurity.providerNames = [
 //multipart requests stream cant be read twice.
 //grails.disableCommonsMultipart=true
 //grails.web.disable.multipart=true
+
+checkin.drupal = true;

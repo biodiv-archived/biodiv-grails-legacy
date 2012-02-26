@@ -35,9 +35,7 @@ $(document).ready(function() {
         	postData["expand_all"] = false;
 	    },
 	    loadError : function(xhr, status, error) {
-	    	if(xhr.status == 401) {
-	    		showLogin();
-	    	} else if(xhr.status == 200) {
+	    	if(xhr.status == 401 || xhr.status == 200) {
 	    		show_login_dialog();
 	    	} else {	    
 	    		alert(error)
