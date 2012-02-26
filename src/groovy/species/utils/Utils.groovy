@@ -1,9 +1,18 @@
 package species.utils
 
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileItemFactory;
+import org.apache.commons.fileupload.FileUploadException;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import java.io.File;
 import java.io.IOException;
 
+import javax.servlet.ServletRequest;
+import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
+import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 class Utils {
 
@@ -44,15 +53,49 @@ class Utils {
 	static String cleanName(String name) {
 		return name?.replaceAll(/<.*?>/, '').replaceAll("\u00A0|\u2007|\u202F", " ").replaceAll("\\n","").replaceAll("\\s+", " ").trim();
 	}
-	
+
 	static String cleanFileName(String name) {
 		name = name?.replaceAll("\u00A0|\u2007|\u202F", " ").replaceAll("\\s+", "_").trim();
 		return name;
 	}
-	
+
 	static String cleanSearchQuery(String name) {
 		name = cleanName(name);
 		name = name.replaceAll("[^\\x20-\\x7e]", "");	//removing all non ascii characters
 		return name;
+	}
+
+	static void populateHttpServletRequestParams(ServletRequest request, Map params) {
+		try {
+			if (ServletFileUpload.isMultipartContent(request)) {
+				//TODO
+				/*
+				FileItemFactory factory = new DiskFileItemFactory();
+				ServletFileUpload upload = new ServletFileUpload(factory);
+				Iterator items = upload.parseRequest(request).iterator();
+				while (items.hasNext()) {
+					FileItem thisItem = (FileItem) items.next();
+					if (thisItem.isFormField()) {
+						params[thisItem.getFieldName()] = thisItem.getString();
+					}
+				}*/
+//				println request.multiFileMap;
+//				CommonsMultipartResolver res = new CommonsMultipartResolver();
+//				request = res.resolveMultipart(request);
+//				request.getParameterMap().each { fieldName, files ->
+//					if (files.size() == 1) {
+//						params.put(fieldName, files.first())
+//					} else {
+//						params.put(fieldName, files)
+//					}
+//				}
+			} else {
+				request.getParameterNames().each {
+					params[it] = request.getParameter(it)
+				}
+			}
+		} catch (FileUploadException e) {
+			e.printStackTrace();
+		}
 	}
 }

@@ -1,7 +1,7 @@
 <div id='ajaxLogin'>
 	<div class='inner'>
 		<div class='fheader'>Please Login..</div>
-		<form action='${request.contextPath}/j_spring_security_check'
+		<form action='${request.contextPath}${grailsApplication.config.grails.plugins.springsecurity.apf.filterProcessesUrl}'
 			method='POST' id='ajaxLoginForm' name='ajaxLoginForm' class='cssform'>
 			<p>
 				<label for='username'>Login ID</label> <input type='text'

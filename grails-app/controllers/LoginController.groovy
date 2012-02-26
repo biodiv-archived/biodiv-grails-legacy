@@ -142,19 +142,21 @@ class LoginController {
 			redirect uri: config.successHandler.defaultTargetUrl
 			return
 		}
-		String postUrl = "${grailsApplication.config.grails.serverURL}${config.apf.filterProcessesUrl}"
+		//String postUrl = "/${grailsApplication.metadata['app.name']}${config.apf.filterProcessesUrl}"
 		def urlpath = grailsApplication.config.speciesPortal.drupal.getAuthentication;
 		request.cookies.each {
 			response.addCookie(it)
 		}
 		def qStr = "";
-		def reqParams = ['postUrl':postUrl, 'spring-security-redirect':request.getHeader('referer')]
+		def reqParams = ['spring-security-redirect':request.getHeader('referer')]
 		reqParams.each { k,v -> qStr += "$k=${v.encodeAsURL()}&" }
-		println '------------------------';
 		String host = request.getRequestURL();
 		//TODO : not a clean way to construct drupal host url
 		host = host.substring(0,host.indexOf(':8080') );
 			
-		redirect (url: host+urlpath + "?" + qStr);
+		//redirect (url: host+urlpath + "?" + qStr);
+		
+		response.setHeader 'Location', request.getHeader('referer')
+		response.sendError HttpServletResponse.SC_UNAUTHORIZED
 	}
 }

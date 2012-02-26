@@ -35,9 +35,14 @@ $(document).ready(function() {
         	postData["expand_all"] = false;
 	    },
 	    loadError : function(xhr, status, error) {
-	    	console.log(status);
-	    	console.log(xhr);	    
-	    	alert(error)
+	    	if(xhr.status == 401) {
+	    		showLogin();
+	    	} else if(xhr.status == 200) {
+	    		show_login_dialog();
+	    	} else {	    
+	    		alert(error)
+	    	}
+	    	
 	    } 
 	});
 

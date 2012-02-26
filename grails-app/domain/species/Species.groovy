@@ -68,7 +68,7 @@ class Species {
 	List<Resource> getImages() { 
 		List<Resource> images = new ArrayList<Resource>();
 		
-		if(reprImage) {
+		if(reprImage) { 
 			images.add(reprImage);
 		}
 		resources.each { resource ->

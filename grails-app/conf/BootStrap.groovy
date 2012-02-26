@@ -22,10 +22,11 @@ class BootStrap {
 	 * 
 	 */
 	def init = { servletContext ->
+		//grailsApplication.config.'grails.web.disable.multipart' = true
 		initDefs();
 		initUsers();
 		//initGroups();
-		//initNames();
+		initNames();
 		initFilters();
 	}
 

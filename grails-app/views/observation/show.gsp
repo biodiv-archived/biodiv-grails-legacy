@@ -11,12 +11,12 @@
 <title><g:message code="default.show.label" args="[entityName]" />
 </title>
 <link rel="stylesheet" type="text/css" media="all"
-	href="${resource(dir:'js/galleria/themes/classic/',file:'galleria.classic.css', absolute:true)}" />
+	href="${resource(dir:'js/galleria/1.2.6/themes/classic/',file:'galleria.classic.css', absolute:true)}" />
 
 <g:javascript src="jsrender.js"
 	base="${grailsApplication.config.grails.serverURL+'/js/'}"></g:javascript>
 
-<g:javascript src="galleria/galleria-1.2.4.min.js"
+<g:javascript src="galleria/1.2.6/galleria-1.2.6.min.js"
 	base="${grailsApplication.config.grails.serverURL+'/js/'}" />
 
 </head>
@@ -196,7 +196,7 @@
 	</div>
 	<g:javascript>
 	
-	Galleria.loadTheme('${resource(dir:'js/galleria/themes/classic/',file:'galleria.classic.min.js', absolute:true)}');
+	Galleria.loadTheme('${resource(dir:'js/galleria/1.2.6/themes/classic/',file:'galleria.classic.min.js', absolute:true)}');
 	
 	$(document).ready(function(){
 		

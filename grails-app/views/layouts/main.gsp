@@ -78,7 +78,24 @@ jQuery(document).ready(function($) {
 
 </head>
 <body>
-<%//request.cookies.each{println it.name+" : "+it.value}%>
+<%
+/*
+println '--------------------------------------'
+print "params : "
+println params;
+print "Cookies : "
+request.cookies.each{println it.name+" : "+it.value}
+print "SessionId : "
+println request.getRequestedSessionId();
+def enames = request.getHeaderNames();
+   while (enames.hasMoreElements()) {
+	  String name = (String) enames.nextElement();
+	  String value = request.getHeader(name);
+	  println name+":"+value;
+   }
+request.cookies.each{println it.name+" : "+it.value}
+*/
+%>
 	
 	<div id="spinner" class="spinner" style="display:none;">
 		<img src="${resource(dir:'images',file:'spinner.gif', absolute:true)}"
@@ -114,10 +131,10 @@ jQuery(document).ready(function($) {
 	<div id="species_main_wrapper">
 		<div id="fb-root"></div>
 		<script>
-		/*
+		
 		  window.fbAsyncInit = function() {
 		    FB.init({
-		      appId      : '308606395828381', // App ID
+		      appId      : '327308053982589', // App ID
 		      status     : true, // check login status
 		      cookie     : true, // enable cookies to allow the server to access the session
 		      oauth      : true, // enable OAuth 2.0
@@ -134,7 +151,7 @@ jQuery(document).ready(function($) {
 		     js.src = "//connect.facebook.net/en_US/all.js";
 		     d.getElementsByTagName('head')[0].appendChild(js);
 		   }(document));
-		  */
+		  
 		</script>
 		<div class="container_12">
 			<div id="menu" class="grid_12 ui-corner-all">

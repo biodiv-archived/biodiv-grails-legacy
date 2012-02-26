@@ -2,6 +2,7 @@ package species.participation
 
 import groovy.util.Node
 
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.springframework.web.multipart.MultipartHttpServletRequest
 
 import grails.converters.JSON;
@@ -31,11 +32,12 @@ class ObservationController {
 	def create = {
 		def observationInstance = new Observation()
 		observationInstance.properties = params
-		return [observationInstance: observationInstance]
+		return [observationInstance: observationInstance, 'springSecurityService':springSecurityService]
 	}
 
 	@Secured(['ROLE_USER'])
 	def save = {
+		log.debug params;
 		if(request.method == 'POST') {
 			log.debug params;
 			//TODO:edit also calls here...handle that wrt other domain objects
@@ -52,10 +54,11 @@ class ObservationController {
 
 				redirect(action: 'addRecommendationVote', params:params);
 			} else {
-				render(view: "create", model: [observationInstance: observationInstance])
+				observationInstance.errors.allErrors.each { log.error it } 
+				redirect(view: "create", model: [observationInstance: observationInstance])
 			}
 		} else {
-			render(view: "create")
+			redirect(view: "create")
 		}
 	}
 
@@ -135,84 +138,93 @@ class ObservationController {
 		}
 	}
 
-	@Secured(['ROLE_USER'])
+//	@Secured(['ROLE_USER'])
 	def upload_resource = {
 		log.debug params;
 
-		if(request instanceof MultipartHttpServletRequest) {
-			MultipartHttpServletRequest multiRequest = (MultipartHttpServletRequest) request;
+		try {
+			if(ServletFileUpload.isMultipartContent(request)) {
+				MultipartHttpServletRequest multiRequest = (MultipartHttpServletRequest) request;
+				def rs = [:]
+				Utils.populateHttpServletRequestParams(request, rs);
+				println "^^^^ : "+rs;
+				def resourcesInfo = [];
+				def rootDir = grailsApplication.config.speciesPortal.observations.rootDir
+				File obvDir;
+				def message;
 
-			def resourcesInfo = [];
-			def rootDir = grailsApplication.config.speciesPortal.observations.rootDir
-			File obvDir;
-			def message;
-
-			if(!params.resources) {
-				message = "${message(code: 'resource.attachment.missing.message')}";
-			}
-
-			params.resources.each { f ->
-				log.debug "Saving observation file ${f.originalFilename}"
-
-				// List of OK mime-types
-				//TODO Move to config
-				def okcontents = [
-					'image/png',
-					'image/jpeg',
-					'image/gif',
-					'image/jpg'
-				]
-
-				if (! okcontents.contains(f.contentType)) {
-					message = "${message(code: 'resource.file.invalid.extension.message', args: [okcontents, f.originalFilename])}"
+				if(!params.resources) {
+					message = "${message(code: 'no.file.attached', default:'No file is attached')}"
 				}
-				else if(f.size > 104857600) { //100MB
-					message = "${message(code: 'resource.file.invalid.extension.message', args: [104857600/1024, f.originalFilename,f.size/1024 ], default:'File size cannot exceed ${104857600/1024}KB')}";
-				}
-				else if(f.empty) {
-					message = "${message(code: 'file.empty.message', default:'File cannot be empty')}";
-				}
-				else {
-					if(!obvDir) {
-						if(!params.obvDir) {
-							obvDir = new File(rootDir);
-							if(!obvDir.exists()) {
+
+				params.resources.each { f ->
+					log.debug "Saving observation file ${f.originalFilename}"
+
+					// List of OK mime-types
+					//TODO Move to config
+					def okcontents = [
+						'image/png',
+						'image/jpeg',
+						'image/gif',
+						'image/jpg'
+					]
+
+					if (! okcontents.contains(f.contentType)) {
+						message = "${message(code: 'resource.file.invalid.extension.message', args: [okcontents, f.originalFilename])}"
+					}
+					else if(f.size > grailsApplication.config.speciesPortal.observations.MAX_IMAGE_SIZE) {
+						message = "${message(code: 'resource.file.invalid.extension.message', args: [grailsApplication.config.speciesPortal.observations.MAX_IMAGE_SIZE/1024, f.originalFilename,f.size/1024 ], default:'File size cannot exceed ${104857600/1024}KB')}";
+					}
+					else if(f.empty) {
+						message = "${message(code: 'file.empty.message', default:'File cannot be empty')}";
+					}
+					else {
+						if(!obvDir) {
+							if(!params.obvDir) {
+								obvDir = new File(rootDir);
+								if(!obvDir.exists()) {
+									obvDir.mkdir();
+								}
+								obvDir = new File(obvDir, UUID.randomUUID().toString());
 								obvDir.mkdir();
+							} else {
+								obvDir = new File(params.obvDir);
 							}
-							obvDir = new File(obvDir, UUID.randomUUID().toString());
-							obvDir.mkdir();
-						} else {
-							obvDir = new File(params.obvDir);
 						}
-					}
 
-					File file = new File(obvDir, Utils.cleanFileName(f.originalFilename));
-					f.transferTo( file );
-					ImageUtils.createScaledImages(file, obvDir);
-					resourcesInfo.add([fileName:file.name, size:f.size]);
+						File file = new File(obvDir, Utils.cleanFileName(f.originalFilename));
+						f.transferTo( file );
+						ImageUtils.createScaledImages(file, obvDir);
+						resourcesInfo.add([fileName:file.name, size:f.size]);
+					}
 				}
-			}
-			log.debug resourcesInfo
-			// render some XML markup to the response
-			if(obvDir && resourcesInfo) {
-				render(contentType:"text/xml") {
-					observations {
-						dir(obvDir.absolutePath.replace(rootDir, ""))
-						resources {
-							for(r in resourcesInfo) {
-								image('fileName':r.fileName, 'size':r.size){}
+				log.debug resourcesInfo
+				// render some XML markup to the response
+				if(obvDir && resourcesInfo) {
+					render(contentType:"text/xml") {
+						observations {
+							dir(obvDir.absolutePath.replace(rootDir, ""))
+							resources {
+								for(r in resourcesInfo) {
+									image('fileName':r.fileName, 'size':r.size){}
+								}
 							}
 						}
 					}
+				} else {
+					response.setStatus(500)
+					message = [error:message]
+					render message as JSON
 				}
 			} else {
 				response.setStatus(500)
-				message = [error:message]
+				def message = [error:"${message(code: 'no.file.attached', default:'No file is attached')}"]
 				render message as JSON
 			}
-		} else {
+		} catch(e) {
+			e.printStackTrace();
 			response.setStatus(500)
-			def message = [error:"${message(code: 'no.file.attached', default:'No file is attached')}"]
+			def message = [error:"${message(code: 'error', default:'Error while processing the request.')}"]
 			render message as JSON
 		}
 	}
@@ -252,40 +264,40 @@ class ObservationController {
 	}
 
 	/**
-	* adds a recommendation and 1 vote to it attributed to the logged in user
-	* saves recommendation if it doesn't exist
-	*/
-   @Secured(['ROLE_USER'])
-   def addAgreeRecommendationVote = {
-	   log.debug params;
+	 * adds a recommendation and 1 vote to it attributed to the logged in user
+	 * saves recommendation if it doesn't exist
+	 */
+	@Secured(['ROLE_USER'])
+	def addAgreeRecommendationVote = {
+		log.debug params;
 
-	   params.author = springSecurityService.currentUser;
+		params.author = springSecurityService.currentUser;
 
-	   if(params.obvId) {
-		   //Saves recommendation if its not present
-		   def recommendationVoteInstance = observationService.createRecommendationVote(params)
-		   def observationInstance = Observation.get(params.obvId);
-		   log.debug params;
-		   try {
-			   if (recommendationVoteInstance.save(flush: true)) {
-				   log.debug "Successfully added reco vote : "+recommendationVoteInstance
-				   render String.valueOf(++params.int('currentVotes')).encodeAsHTML();
-			   }
-			   else {
-				   recommendationVoteInstance.errors.allErrors.each { log.error it }
-				   render String.valueOf(params.int('currentVotes')).encodeAsHTML();
-			   }
-		   } catch(e) {
-		   		e.printStackTrace();
+		if(params.obvId) {
+			//Saves recommendation if its not present
+			def recommendationVoteInstance = observationService.createRecommendationVote(params)
+			def observationInstance = Observation.get(params.obvId);
+			log.debug params;
+			try {
+				if (recommendationVoteInstance.save(flush: true)) {
+					log.debug "Successfully added reco vote : "+recommendationVoteInstance
+					render String.valueOf(++params.int('currentVotes')).encodeAsHTML();
+				}
+				else {
+					recommendationVoteInstance.errors.allErrors.each { log.error it }
+					render String.valueOf(params.int('currentVotes')).encodeAsHTML();
+				}
+			} catch(e) {
+				e.printStackTrace();
 				render String.valueOf(params.int('currentVotes')).encodeAsHTML();
-		   }
-	   } else {
-		   flash.message  = "${message(code: 'observation.invalid', default:'Invalid observation')}"
-		   render String.valueOf(params.int('currentVotes')).encodeAsHTML();
-	   }
-	   
-   }
-   
+			}
+		} else {
+			flash.message  = "${message(code: 'observation.invalid', default:'Invalid observation')}"
+			render String.valueOf(params.int('currentVotes')).encodeAsHTML();
+		}
+
+	}
+
 	def voteDetails = {
 		log.debug params;
 		def votes = RecommendationVote.findAll("from RecommendationVote as recoVote where recoVote.recommendation.id = :recoId and recoVote.observation.id = :obvId order by recoVote.votedOn desc", [recoId:params.long('recoId'), obvId:params.long('obvId')]);

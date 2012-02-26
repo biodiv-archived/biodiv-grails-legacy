@@ -38,7 +38,7 @@ class ObservationService {
 			observation.url = params.url;
 		}
 		
-		observation.group = SpeciesGroup.get(params.group?.id);
+		observation.group = SpeciesGroup.get(params.group_id);
 		observation.notes = params.notes;
 		observation.observedOn = params.observedOn?:new Date();
         observation.placeName = params.place_name;
@@ -170,19 +170,36 @@ class ObservationService {
 		def resources = builder.createNode("resources");
 		Node images = new Node(resources, "images");
 		String uploadDir =  grailsApplication.config.speciesPortal.observations.rootDir;
-		params.file?.each { key, file ->
+		List files = [];
+		List titles = [];
+		List licenses = [];
+		params.each { key, val ->
+			int index = -1;
+			if(key.startsWith('file_')) {
+				index = Integer.parseInt(key.substring(key.lastIndexOf('_')+1));
+				
+			}
+			if(index != -1) {
+				int i = index - 1;
+				files.add(i, val);
+				titles.add(i, params.get('title_'+index));
+				licenses.add(i, params.get('license_'+index));
+			}
+		}
+		files.eachWithIndex { file, key ->
 			Node image = new Node(images, "image");
 			if(file) {
 				File f = new File(uploadDir, file);
 				new Node(image, "fileName", f.absolutePath);
 				//new Node(image, "source", imageData.get("source"));
-				new Node(image, "caption", params?.title?.getAt(key));
+				new Node(image, "caption", titles.getAt(key));
 				new Node(image, "contributor", params.author.username);
-				new Node(image, "license", params?.license?.getAt(key));
+				new Node(image, "license", licenses.getAt(key));
 			} else {
 				log.warn("No reference key for image : "+key);
 			}
 		}
 		return resources;
 	}
+	
 }

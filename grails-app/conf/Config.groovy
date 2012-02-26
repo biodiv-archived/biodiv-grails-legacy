@@ -188,8 +188,9 @@ speciesPortal {
 	}
 	observations {
 		rootDir = "${app.rootDir}/observations"
-		serverURL = "http://localhost:8080/${appName}/observations"
+		serverURL = "http://localhost/${appName}/observations"
 		//serverURL = "http://localhost/${appName}/observations"
+		MAX_IMAGE_SIZE = 104857600
 	}
 
 	names.parser.serverURL = "saturn.strandls.com"
@@ -351,7 +352,6 @@ environments {
 
 	saturn {
 		grails.serverURL = "http://saturn.strandls.com:8080/${appName}"
-		jpegOptimProg = "/usr/bin/jpegoptim";
 		speciesPortal {
 			app.rootDir = "/data/species"
 			data.rootDir = "${app.rootDir}/data"
@@ -365,7 +365,7 @@ environments {
 
 			observations {
 				rootDir = "${app.rootDir}/observations"
-				serverURL = "http://saturn.strandls.com:8080/${appName}/observations"
+				serverURL = "http://saturn.strandls.com/${appName}/observations"
 				//serverURL = "http://localhost/${appName}/observations"
 			}
 			search.serverURL="http://saturn.strandls.com:8080/solr/species"
@@ -376,7 +376,6 @@ environments {
 
 	pamba {
 		grails.serverURL = "http://thewesternghats.in:8080/${appName}"
-		jpegOptimProg = "/usr/bin/jpegoptim";
 		speciesPortal {
 			app.rootDir = "/data/species"
 			data.rootDir = "${app.rootDir}/data"
@@ -388,7 +387,7 @@ environments {
 			nameSearch.indexStore = "${app.rootDir}/data/names"
 			observations {
 				rootDir = "${app.rootDir}/observations"
-				serverURL = "http://thewesternghats.in:8080/${appName}/observations"
+				serverURL = "http://pamba.strandls.com/${appName}/observations"
 				//serverURL = "http://localhost/${appName}/observations"
 			}
 			search.serverURL="http://thewesternghats.in:8080/solr/species"
@@ -554,3 +553,7 @@ grails.plugins.springsecurity.providerNames = [
 //grails.plugins.springsecurity.facebook.secret='7ddb140cd81ff6b9be38853a0f43d6d3'
 //grails.plugins.springsecurity.facebook.bean.dao='facebookAuthDaoImpl'
 
+//disabling as uid and name params sent for drupalauthcookiefilter needs to be parsed and
+//multipart requests stream cant be read twice.
+//grails.disableCommonsMultipart=true
+//grails.web.disable.multipart=true
