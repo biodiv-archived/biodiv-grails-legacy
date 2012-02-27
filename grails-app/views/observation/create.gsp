@@ -77,7 +77,7 @@
 					<h3>What did you observe?</h3>
 					<label for="group"><g:message
 							code="observation.group.label" default="Group" />
-					</label> <select name="group.id" class="ui-widget-content ui-corner-all">
+					</label> <select name="group_id" class="ui-widget-content ui-corner-all">
 						<g:each in="${species.groups.SpeciesGroup.list()}" var="g">
 							<g:if
 								test="${!g.name.equals(grailsApplication.config.speciesPortal.group.ALL)}">
@@ -264,8 +264,7 @@
  		});  
      		
      	$('#upload_resource').ajaxForm({ 
-			//url:'${createLink(controller:'observation', action:'upload_resource')}',
-			url:'http://wgp.panchgani.strandls.com/biodiv/observation/upload_resource',
+			url:'${createLink(controller:'observation', action:'upload_resource')}',
 			dataType: 'xml',//could not parse json wih this form plugin 
 			clearForm: true,
 			resetForm: true,
