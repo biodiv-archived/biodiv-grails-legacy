@@ -22,6 +22,9 @@
 <link rel="stylesheet"
 	href="${resource(dir:'css',file:'location_picker.css', absolute:true)}"
 	type="text/css" media="all" />
+<link rel="stylesheet"
+	href="${resource(dir:'css',file:'tagit/tagit-custom.css', absolute:true)}"
+	type="text/css" media="all" />	
 
 <script src="http://maps.google.com/maps/api/js?sensor=true"></script>
 <g:javascript src="jquery/jquery.exif.js"
@@ -33,7 +36,9 @@
 
 <g:javascript src="jsrender.js"
 	base="${grailsApplication.config.grails.serverURL+'/js/'}"></g:javascript>
-
+	
+<g:javascript src="tagit.js"
+	base="${grailsApplication.config.grails.serverURL+'/js/'}"></g:javascript>
 </head>
 <body>
 	<div class="container_16">
@@ -102,7 +107,16 @@
 					<label for="observedOn"><g:message
 							code="observation.observedOn.label" default="Observed on" />
 					</label> <input type="text" id="observedOn">
-
+					
+					<br/>
+					Tags:
+					<div class="create_tags">
+						<ul name="tags">
+							<g:each in="${observationInstance.tags}">
+								<li>${it}</li>
+							</g:each>
+    					</ul>
+  					</div>
 
 					<div class="resources">
 						<ul id="imagesList" class="thumbwrap"
@@ -314,7 +328,7 @@
         var prettyDate =(currDate.getMonth()+1) + '/' + currDate.getDate() + '/' +  currDate.getFullYear();
         $("#observedOn").val(prettyDate);
 
-     	
+     	$("ul[name='tags']").tagit({select:true, tagSource: "${g.createLink(action: 'tags')}"});
 	});
 		
 	function removeResource(event) {

@@ -1,5 +1,6 @@
 package species.participation
 
+import org.grails.taggable.*
 import groovy.util.Node
 
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
@@ -25,7 +26,13 @@ class ObservationController {
 
 	def list = {
 		params.max = Math.min(params.max ? params.int('max') : 10, 100)
-		[observationInstanceList: Observation.list(params), observationInstanceTotal: Observation.count()]
+		
+		if (params.tag != null) {
+			def observationsByTag = Observation.findAllByTag(params.tag)
+			[observationInstanceList: observationsByTag, observationInstanceTotal: observationsByTag.count()]
+		}else{ 
+			[observationInstanceList: Observation.list(params), observationInstanceTotal: Observation.count()]
+		}
 	}
 
 	@Secured(['ROLE_USER'])
@@ -45,12 +52,15 @@ class ObservationController {
 			params.author = springSecurityService.currentUser;
 
 			def observationInstance =  observationService.createObservation(params);
-
+			
+			
 			if(!observationInstance.hasErrors() && observationInstance.save(flush:true)) {
 				//flash.message = "${message(code: 'default.created.message', args: [message(code: 'observation.label', default: 'Observation'), observationInstance.id])}"
 				log.debug "Successfully created observation : "+observationInstance
 
 				params.obvId = observationInstance.id
+				
+				observationInstance.setTags(Arrays.asList(params.tags));
 
 				redirect(action: 'addRecommendationVote', params:params);
 			} else {
@@ -307,4 +317,10 @@ class ObservationController {
 		def votes = RecommendationVote.findAll("from RecommendationVote as recoVote where recoVote.recommendation.id = :recoId and recoVote.observation.id = :obvId order by recoVote.votedOn desc", [recoId:params.long('recoId'), obvId:params.long('obvId')]);
 		render (template:"/common/voteDetails", model:[votes:votes]);
 	}
+	
+	def tags = {
+		log.debug params;
+		render Tag.findAllByNameIlike("${params.term}%")*.name as JSON
+	}
+	
 }

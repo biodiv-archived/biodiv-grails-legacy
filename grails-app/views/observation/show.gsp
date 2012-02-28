@@ -12,12 +12,18 @@
 </title>
 <link rel="stylesheet" type="text/css" media="all"
 	href="${resource(dir:'js/galleria/1.2.6/themes/classic/',file:'galleria.classic.css', absolute:true)}" />
+<link rel="stylesheet"
+	href="${resource(dir:'css',file:'tagit/tagit-custom.css', absolute:true)}"
+	type="text/css" media="all" />
 
 <g:javascript src="jsrender.js"
 	base="${grailsApplication.config.grails.serverURL+'/js/'}"></g:javascript>
 
 <g:javascript src="galleria/1.2.6/galleria-1.2.6.min.js"
 	base="${grailsApplication.config.grails.serverURL+'/js/'}" />
+
+<g:javascript src="tagit.js"
+	base="${grailsApplication.config.grails.serverURL+'/js/'}"></g:javascript>
 
 </head>
 <body>
@@ -74,6 +80,16 @@
 				<!--  static species content -->
 				<obv:showStory model="['observationInstance':observationInstance]" />
 
+
+				Tags:
+				<div class="view_tags">
+						<ul name="tags">
+							<g:each in="${observationInstance.tags}">
+								<li>${it}</li>
+							</g:each>
+    					</ul>
+  				</div>
+  					
 				<div class="grid_10 comments">
 					<fb:like send="true" width="450" show_faces="true"></fb:like>
 					<div class="fb-comments grid_10"
@@ -244,6 +260,13 @@
                 $('#voteDetails').mouseout(function(){
                         $('#voteDetails').hide();
                         });
+                        
+         $("ul[name='tags']").tagit({select:true,  tagSource: "${g.createLink(action: 'tags')}"});
+         
+         $("li.tagit-choice").click(function(){
+         	var tg = $(this).contents().first().text();
+         	window.location.href = "${g.createLink(action: 'tagged')}/" + tg ;
+         });
 	});
 </g:javascript>
 

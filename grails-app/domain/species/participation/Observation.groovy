@@ -1,5 +1,6 @@
 package species.participation
 
+import org.grails.taggable.*
 import grails.plugins.springsecurity.Secured
 
 import species.Contributor;
@@ -7,7 +8,7 @@ import species.Resource;
 import species.auth.SUser;
 import species.groups.SpeciesGroup;
 
-class Observation {
+class Observation implements Taggable{
 
 	public enum OccurrenceStatus {
 		ABSENT ("Aabsent"),	//http://rs.gbif.org/terms/1.0/occurrenceStatus#absent
