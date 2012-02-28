@@ -723,7 +723,6 @@ img {
 	padding: 10px;
 	background-color: #d4edc9;
 	border-radius: 7px;
-	box-shadow: 0 0 4px rgba(0, 0, 0, 0.25), 0 3px 4px rgba(0, 0, 0, 0.3);
 }
 
 .observation_story {
@@ -735,7 +734,7 @@ img {
 	padding: 10px;
 	background-color: #f5f5f5;
 	border-radius: 7px;
-	box-shadow: 0 0 4px rgba(0, 0, 0, 0.25), 0 3px 4px rgba(0, 0, 0, 0.3);
+	box-shadow: 0 0 2px rgba(0, 0, 0, 0.25), 0 1px 4px rgba(0, 0, 0, 0.3);
 }
 
 .observations {
@@ -1153,8 +1152,7 @@ overflow: auto;
 }
 
 .section h3 {
-color: #424242;
-padding-bottom: 10px;       
+color: #111111;
 }
 
 .section label {
@@ -1241,10 +1239,3 @@ border-color: #FFAA22;
 font-weight: bold;    
 }
 
-img.ui-datepicker-trigger{
-padding: 3px;
-}
-
-.ui-autocomplete {
-position: fixed !important;
-}
