@@ -60,7 +60,9 @@ class ObservationController {
 
 				params.obvId = observationInstance.id
 				
-				observationInstance.setTags(Arrays.asList(params.tags));
+				def tags = (params.tags != null) ? Arrays.asList(params.tags) : new ArrayList();
+				
+				observationInstance.setTags(tags);
 
 				redirect(action: 'addRecommendationVote', params:params);
 			} else {
