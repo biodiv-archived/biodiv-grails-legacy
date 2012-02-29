@@ -1,5 +1,7 @@
 #address {
     width: 95%;
+    margin-bottom: 5px;
+    
 }    
 
 #map_canvas {
@@ -29,6 +31,8 @@ min-height: 300px;
 
 .row {
 clear: both;
+padding-top:3px;
+padding-bottom:3px;
 }
 
 .label {
@@ -68,17 +72,10 @@ margin-bottom: 2px;
 border: 1px solid #e5e5e5;
 padding: 2px;        
 cursor: pointer;
-font-family: arial,sans-serif;
-font-size: 0.9em;
-font-size-adjust: none;
-font-stretch: normal;
-font-style: normal;
-font-variant: normal;
-font-weight: normal;        
+font-weight: bold;        
 color: #424242;            
 background: #f5f5f0;    
 height:40px;            
-width:95%;       
 }
 
 .location_picker_button:hover {
@@ -108,5 +105,23 @@ padding: 10px;
 }
 
 .active_location_picker_button {
-background: #c8c6ed;    
+background: #D14836;
+color: #eeeeee;
+}
+
+#geotagged_images {
+margin-top: 20px;	
+}
+
+#geotagged_images .title {
+font-weight: bold;	
+}
+
+#geotagged_images .msg {
+font-size: 0.9em;
+font-style: italic;
+}
+
+#current_location.location_picker_button {
+width: 150px;	
 }

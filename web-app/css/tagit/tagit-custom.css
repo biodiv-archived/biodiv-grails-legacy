@@ -46,13 +46,8 @@
 ul.tagit {
     cursor: text;
     overflow: auto;
-    font-size: 14px;
-    width: 97%;
     padding: 3px;
-    margin-top: 2px;
-    margin-right: 6px;
-    margin-bottom: 16px;
-    border: 1px solid #E5E5E5;
+    border: 1px solid #cccccc;
     background: #fff;
     color: #555;
 }
