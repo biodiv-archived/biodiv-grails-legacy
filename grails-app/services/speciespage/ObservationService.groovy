@@ -99,10 +99,63 @@ class ObservationService {
 		log.debug params;
 		return new RecommendationVote(observation:observation, recommendation:reco, author:author, confidence:confidence);
 	}
+	
+	
+	String getSpeciesName(obvId){
+		def speciesList = []
+		Observation.read(obvId).recommendationVote.each{speciesList << it.recommendation.name}
+		//log.debug "==== " + speciesList
+		return getMaxRepeatedElementFromList(speciesList)
+	}
+	
+	List getRelatedObservation(speciesName, params){
+		def recId = Recommendation.findByName(speciesName).id
+		//log.debug "==== recommendation id " + recId
+		def query = "select recVote.observation from RecommendationVote recVote where recVote.recommendation.id = :recId and recVote.observation.id != :parentObv  order by recVote.votedOn desc "
+		def m = [parentObv:params.id.toLong(), recId:recId, max:params.limit.toInteger(), offset:params.offset.toInteger()]
+		return createUrlList(RecommendationVote.executeQuery(query, m).unique())
+	}
 	/**
 	 * 
 	 * @return
 	 */
+	private static List createUrlList(observations){
+		List urlList = []
+		for(obv in observations){
+			def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+			def image = obv.mainImage()
+			def imagePath = image.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, config.speciesPortal.resources.images.galleryThumbnail.suffix)
+			def imageLink = config.speciesPortal.observations.serverURL + "/" +  imagePath
+			urlList.add(["obvId":obv.id, "imageLink":imageLink, "imageTitle": image.fileName])
+		}
+		return urlList
+	}
+	
+	
+	private static getMaxRepeatedElementFromList(list){
+		list.sort()
+		def max = 1
+		def currentElement = list[0]
+		def maxElement = currentElement
+		def currentCounter = 0
+		for(spe in list){
+			if(spe == currentElement){
+				currentCounter++
+			}else{
+				if(currentCounter > max){
+					maxElement = currentElement
+				}
+				currentElement = spe
+				currentCounter = 1
+			}
+		}
+		if(currentCounter > max){
+			maxElement = currentElement
+		}
+		
+		return maxElement
+	}
+	
 	private Recommendation getRecommendation(recoName, canName) {
 		def reco, taxonConcept;
 		if(canName) {
@@ -203,5 +256,7 @@ class ObservationService {
 		}
 		return resources;
 	}
+	
+	
 	
 }
