@@ -28,6 +28,12 @@ class ObservationTagLib {
 		}
 	}
 
+	def showRelatedStory = {attrs, body->
+		if(attrs.model.observationInstance) {
+			out << render(template:"/common/observation/showObservationRelatedStoryTemplate", model:attrs.model);
+		}
+	}
+	
 	def showRating = {attrs, body->
 		if(attrs.model.observationInstance) {
 			out << render(template:"/common/observation/showObservationRatingTemplate", model:attrs.model);

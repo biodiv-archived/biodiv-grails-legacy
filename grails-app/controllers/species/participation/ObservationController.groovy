@@ -307,4 +307,16 @@ class ObservationController {
 		def votes = RecommendationVote.findAll("from RecommendationVote as recoVote where recoVote.recommendation.id = :recoId and recoVote.observation.id = :obvId order by recoVote.votedOn desc", [recoId:params.long('recoId'), obvId:params.long('obvId')]);
 		render (template:"/common/voteDetails", model:[votes:votes]);
 	}
+	
+	@Secured(['ROLE_USER'])
+	def getRelatedObservation = {
+		log.debug params;
+		def obvId = params.id.toLong() 
+		def speciesName = observationService.getSpeciesName(obvId)
+		log.debug speciesName
+		def relatedObv = observationService.getRelatedObservation(speciesName, params)
+		render relatedObv as JSON
+	}
+	
+	
 }

@@ -12,12 +12,25 @@
 </title>
 <link rel="stylesheet" type="text/css" media="all"
 	href="${resource(dir:'js/galleria/1.2.6/themes/classic/',file:'galleria.classic.css', absolute:true)}" />
+<!--
+  jCarousel skin stylesheet
+--> 
+<link rel="stylesheet" type="text/css" media="all"
+	href="${resource(dir:'js/jquery/jquery.jcarousel-0.2.8/themes/classic/',file:'skin.css', absolute:true)}" />
+
 
 <g:javascript src="jsrender.js"
 	base="${grailsApplication.config.grails.serverURL+'/js/'}"></g:javascript>
 
 <g:javascript src="galleria/1.2.6/galleria-1.2.6.min.js"
 	base="${grailsApplication.config.grails.serverURL+'/js/'}" />
+
+<g:javascript src="jquery/jquery.jcarousel-0.2.8/jquery.jcarousel.js"
+	base="${grailsApplication.config.grails.serverURL+'/js/'}" />
+
+<g:javascript src="species/carousel.js"
+	base="${grailsApplication.config.grails.serverURL+'/js/'}" />
+
 
 </head>
 <body>
@@ -33,9 +46,11 @@
 				</div>
 			</g:if>
 			<br />
-
+			
 			<div class="grid_10">
+				
 				<div class="grid_10">
+				
 					<div id="resourceTabs">
 						<ul>
 							<li><a href="#resourceTabs-1" style="height: 0px"></a></li>
@@ -73,7 +88,8 @@
 
 				<!--  static species content -->
 				<obv:showStory model="['observationInstance':observationInstance]" />
-
+				
+	
 				<div class="grid_10 comments">
 					<fb:like send="true" width="450" show_faces="true"></fb:like>
 					<div class="fb-comments grid_10"
@@ -187,7 +203,9 @@
 				</div>
 
 				<!-- obv:showRating model="['observationInstance':observationInstance]" /-->
-
+				<!--  static species content -->
+				<obv:showRelatedStory model="['observationInstance':observationInstance, 'controller':'observation', 'action':'getRelatedObservation', 'id':'a']" />
+			
 			</div>
 
 
