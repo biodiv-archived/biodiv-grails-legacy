@@ -22,6 +22,9 @@
 <link rel="stylesheet"
 	href="${resource(dir:'css',file:'location_picker.css', absolute:true)}"
 	type="text/css" media="all" />
+<link rel="stylesheet"
+	href="${resource(dir:'css',file:'tagit/tagit-custom.css', absolute:true)}"
+	type="text/css" media="all" />	
 
 <script src="http://maps.google.com/maps/api/js?sensor=true"></script>
 <g:javascript src="jquery/jquery.exif.js"
@@ -33,7 +36,9 @@
 
 <g:javascript src="jsrender.js"
 	base="${grailsApplication.config.grails.serverURL+'/js/'}"></g:javascript>
-
+	
+<g:javascript src="tagit.js"
+	base="${grailsApplication.config.grails.serverURL+'/js/'}"></g:javascript>
 </head>
 <body>
 	<div class="container_16">
@@ -75,6 +80,8 @@
 
 				<div class="section">
 					<h3>What did you observe?</h3>
+					
+					<div class="row">
 					<label for="group"><g:message
 							code="observation.group.label" default="Group" />
 					</label> <select name="group_id" class="ui-widget-content ui-corner-all">
@@ -87,7 +94,10 @@
 								</option>
 							</g:if>
 						</g:each>
-					</select> <br /> <label for="recommendationVote"><g:message
+					</select>
+					</div>
+					<div class="row">
+					<label for="recommendationVote"><g:message
 							code="observation.recommendationVote.label"
 							default="Species name" />
 					</label>
@@ -98,11 +108,36 @@
 					</g:hasErrors>
 
 					<reco:create />
+					</div>
 
+					<div class="row">
 					<label for="observedOn"><g:message
 							code="observation.observedOn.label" default="Observed on" />
 					</label> <input type="text" id="observedOn">
-
+					</div>
+					
+					<div class="row">
+						<label>Habitat</label>
+  					<div id="habitat_list">
+  						<select class="ui-widget-content">
+							<option>None</option>
+							<option>Forest</option>
+							<option>Savanna</option>
+							<option>Shrubland</option>
+							<option>Grassland</option>
+							<option>Wetlands</option>
+							<option>Rocky Areas</option>
+							<option>Caves and Subterranean Habitats</option>
+							<option>Desert</option>
+							<option>Marine</option>
+							<option>Artificial - Terrestrial</option>
+							<option>Artificial - Aquatic</option>
+							<option>Introduced Vegetation</option>
+							<option>Other</option>
+							<option>Unknown</option>
+						</select>	
+  					</div>	
+  					</div>
 
 					<div class="resources">
 						<ul id="imagesList" class="thumbwrap"
@@ -143,6 +178,8 @@
 
 
 				</div>
+				
+
 				<div class="section">
 					<h3>Where did you find this observation?</h3>
 					<div id="location_picker">
@@ -153,7 +190,11 @@
 								<div id="current_location" class="location_picker_button">
 									<div style="padding: 10px">Use current location</div>
 								</div>
-								<div id="geotagged_images"></div>
+							
+								<div id="geotagged_images">
+									<div class="title" style="display:none">Use location from geo-tagged image:</div>  	
+									<div class="msg" style="display:none">Select image if you want to use location information embedded in it</div>  	
+								</div>
 							</div>
 
 							<div id="map_area">
@@ -163,7 +204,7 @@
 
 						<div id="result_box">
 							<div class="row">
-								<label>Place name</label> <input id="place_name" type="text"
+								<label>Location title</label> <input id="place_name" type="text"
 									name="place_name"></input>
 							</div>
 							<div class="row">
@@ -197,7 +238,19 @@
 					</div>
 
 				</div>
-
+				<div class="section" style="overflow:visible">
+				
+					<h3>Tags</h3>
+					<div class="create_tags">
+						<ul name="tags">
+							<g:each in="${observationInstance.tags}">
+								<li>${it}</li>
+							</g:each>
+    					</ul>
+  					</div>
+  					
+	
+				</div>
 				<div class="section">
 					<h3>Notes</h3>
 					<!--label for="notes"><g:message code="observation.notes.label" default="Notes" /></label-->
@@ -314,7 +367,7 @@
         var prettyDate =(currDate.getMonth()+1) + '/' + currDate.getDate() + '/' +  currDate.getFullYear();
         $("#observedOn").val(prettyDate);
 
-     	
+     	$("ul[name='tags']").tagit({select:true, tagSource: "${g.createLink(action: 'tags')}"});
 	});
 		
 	function removeResource(event) {

@@ -320,7 +320,6 @@ class ObservationController {
 		render (template:"/common/voteDetails", model:[votes:votes]);
 	}
 	
-	@Secured(['ROLE_USER'])
 	def getRelatedObservation = {
 		log.debug params;
 		def obvId = params.id.toLong() 
