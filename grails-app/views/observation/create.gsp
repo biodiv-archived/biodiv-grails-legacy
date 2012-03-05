@@ -41,7 +41,7 @@
 	base="${grailsApplication.config.grails.serverURL+'/js/'}"></g:javascript>
 </head>
 <body>
-	<div class="container_16 big_wrapper">
+	<div class="container_16 big_wrapper" style="border:0; background-color:#ffffff; padding:0;">
             
             <div class="grid_16">
         	<h1>
