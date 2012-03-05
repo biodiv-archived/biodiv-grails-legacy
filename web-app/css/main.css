@@ -66,7 +66,7 @@ ul {
 input,select,textarea {
 	border: 1px solid #ccc;
 /* 	font: 12px Arial, Helvetica, sans-serif; */
-    padding: 3px;
+    padding: 5px;
 }
 
 select {
@@ -318,10 +318,6 @@ th.name {
 	width: 200px;
 }
 
-.prop {
-	border-bottom: 1px solid #f9f9f9;	
-}
-
 .prop .name {
 	float: left;
 	text-align: left;
@@ -337,7 +333,6 @@ th.name {
 	
 .prop .value {
 	text-align: left;
-	padding-left: 20px;
 }
 
 /* ACTION BUTTONS */
@@ -567,12 +562,12 @@ th.name {
 	display: inline-block;
 	/*\*/
 	vertical-align: top; /**/
-	margin: 0 7px 15px 7px;
 	/*border: 1px solid #999;*/
 	padding: 0;
 	position: relative;
 	text-align: center;
 	font-style: italic;
+        margin-bottom: 2px;
 }
 /*  Moz: NO border qui altrimenti difficolta' con width, table altrimenti problemi a text resize (risolubili con refresh) */
 .thumbwrap  .figure>div { /*\*/
@@ -793,6 +788,8 @@ html.busy,html.busy * {
 	opacity: 1.0;
 	background-color: #fbfbfb;
         border-radius: 5px;
+        padding-left:10px;
+        padding-right:10px;        
 }
 
 #resourceTabs {
@@ -1138,20 +1135,24 @@ ul.thumbwrap li.poor_species_content div.poor_species_content{
 
 #ui-datepicker-div {
 	width: auto;	
+        z-index: 4 !important;       
+}
+
+.super-section {
+background-color:#e5e5e5;
+border-radius: 5px;
+margin-bottom:10px;
 }
 
 .section {
-background-color:#e5e5e5;
-margin:10px;
-padding: 20px;       
-border-radius: 5px;         
-clear:both;
-position: relative;      
-overflow: auto;          
+margin-bottom: 10px;
+padding-bottom:20px;
+padding-top:20px;
 }
 
 .section h3 {
 color: #111111;
+padding: 10px;
 }
 
 .section label {
@@ -1159,7 +1160,11 @@ float: left;
 font-weight: bold;
 padding-right: 15px;
 text-align: right;
-width: 250px;
+width: 160px;
+}
+
+.section .section-item {
+padding:10px;	
 }
 
 .section .ui-widget-content {
@@ -1193,8 +1198,8 @@ background: url(../images/close.png) no-repeat center left;
 width: 24px;
 height: 24px;       
 position: absolute;
-right: -10px;
-top: -10px;       
+right: -3px;
+top: -3px;       
 opacity:0.7;    
 }
 
@@ -1223,6 +1228,8 @@ margin:2px;
 .addedResource .metadata select {
 font-size: 0.9em;    
 margin:2px;        
+float:right;       
+margin-top:7px;      
 }
 
 #upload_button {
@@ -1240,19 +1247,56 @@ font-weight: bold;
 
 .row {
 clear: both;
-padding-top:3px;
-padding-bottom:3px;
+padding:3px 10px 3px 10px;
 }
 
 .row img.ui-datepicker-trigger {
 padding-left:5px;	
 }
 
-.section2{
-    background-color: #E5E5E5;
-    border-radius: 5px 5px 5px 5px;
-    clear: both;
-    margin: 10px;
-    padding: 20px;
-    position: relative;
+#group_options{
+cursor: default;    
+}
+
+#group_options li:hover {
+background-color: #c4cccf;
+}
+
+#habitat_options{
+cursor: default;    
+}
+
+#habitat_options li:hover {
+background-color: #c4cccf;
+}
+
+.habitat_option {
+display:inline-block;
+padding:5px;
+width: 160px;        
+}
+
+.display_value {
+padding-left:10px;
+}
+
+.selected_value {
+border: 1px solid #aeaeae;    
+}
+
+.selected_value:hover {
+background-color: #fbfbfb !important;    
+}
+
+#addObservation #imagesList {
+background-color: #d5d5d5;
+border-bottom: 1px solid #9E9E9E;
+border-top: 1px solid #9E9E9E;
+box-shadow: 0 2px 11px -3px inset;
+padding: 10px;
+min-height: 212px;         
+}
+
+.msg {
+padding-left: 10px;
 }
