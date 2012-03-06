@@ -189,10 +189,10 @@
                 <div class="grid_16 section" style="padding-top:50px;">
                    <div class="resources">
                         <ul id="imagesList" class="thumbwrap"
-                                style='list-style: none; margin-left: 0px;'>
+                                style='list-style: none; margin-left: 0px;background:url("${resource(dir:'images',file:'add-photo.png', absolute:true)}")'>
                                 <g:set var="i" value="0" />
                                 <g:each in="${observationInstance?.resource}" var="r">
-                                        <li class="addedResource" style="float:left; width:160px; display:inline-block; margin:2px;position:relative; padding:10px;">
+                                        <li class="addedResource" style="float:left; width:220px; display:inline-block; margin:2px;position:relative; padding:10px;">
                                                 <%def thumbnail = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.thumbnail.suffix)%>
                                                 <div class='figure'
                                                         style='max-height: 220px; max-width: 160px;'>
@@ -222,15 +222,29 @@
                                 </g:each>
 
                         </ul>
-                                   </div>
 
+                                   </div>
+                                   
                 </div>
             </div>
 
             <div class="container_16 super-section">    
                 <div class="grid_8 section" style="clear:both">
                     <h3>Where did you find this observation?</h3>
-                 
+               
+                     <div style="position:relative; left:20px; padding:20px 10px; margin-bottom:10px; background-color:#f7f7f7; border-radius:5px 0 0 5px;">   
+                     <input id="address" type="text" title="Find by place name" class="section-item"/>
+                     <div id="current_location" class="section-item" style="float:right">
+                        <a href="#" onclick="return false;">Use current location</a>
+                     </div>
+                     <div id="geotagged_images" class="section-item">
+                        <div class="title" style="display:none">Use location from geo-tagged image:</div>  	
+                        <div class="msg" style="display:none">Select image if you want to use location information embedded in it</div>  	
+                    </div>
+                    </div>
+
+
+
                     <div class="row">
                         <label>Location title</label> <input id="place_name" type="text"
                                     name="place_name"></input>
@@ -264,17 +278,8 @@
                     </div>
 
                 </div>
-                <div class="grid_8 section" style="margin:10px; background-color:#f7f7f7; border-radius:5px;">
-                    <div id="geotagged_images" class="section-item">
-                        <div class="title" style="display:none">Use location from geo-tagged image:</div>  	
-                        <div class="msg" style="display:none">Select image if you want to use location information embedded in it</div>  	
-                    </div>
-
-                    <div id="current_location" class="section-item" style="float:right">
-                        <a href="#" onclick="return false;">Use current location</a>
-                    </div>
-                    <input id="address" type="text" title="Find by place name" class="section-item"/>
-
+                <div class="grid_8 section" style="margin:30px 10px 10px; background-color:#f7f7f7; border-radius:5px;">
+                   
                     <div id="map_area">
                         <div id="map_canvas"></div>
                     </div>
