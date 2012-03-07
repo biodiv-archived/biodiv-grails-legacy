@@ -47,6 +47,7 @@ class BootStrap {
 		createOrUpdateUser('janaki', 'janaki', false);
 		createOrUpdateUser('prabha', 'prabha', false);
 		createOrUpdateUser('rahool', 'rahool', false);
+		createOrUpdateUser('sandeept', 'sandeept', false);
 	}
 
 	/**
