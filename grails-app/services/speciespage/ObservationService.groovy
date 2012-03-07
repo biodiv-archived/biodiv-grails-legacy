@@ -132,22 +132,37 @@ class ObservationService {
 		def query = ""
 		def obvs = null
 		//if filter group is all 
-		if(groupId == 830){
+		def groupIds = getSpeciesGroupIds(groupId)
+		if(!groupIds) {
 			query = "from Observation as obv order by obv.createdOn desc"
 			obvs = Observation.findAll(query, [max:params.limit.toInteger(), offset:params.offset.toInteger()])
-		}else if(groupId == 831){
+		}else if(groupIds instanceof List){
 			//if group is others
-			def groupNameList = ['Animals', 'Arachnids', 'Archaea', 'Bacteria', 'Chromista', 'Viruses', 'Kingdom Protozoa', 'Mullusks', 'Others']
-			def groupIds = SpeciesGroup.executeQuery("select distinct sg.id from SpeciesGroup sg where sg.name is null or sg.name in (:groupNameList)", [groupNameList:groupNameList])
 			query = "from Observation as obv where obv.group.id in (:groupIds) order by obv.createdOn desc"
 			obvs = Observation.findAll(query, [groupIds:groupIds, max:params.limit.toInteger(), offset:params.offset.toInteger()])
 		}else{
 			query = "from Observation as obv where obv.group.id = :groupId order by obv.createdOn desc"
-			obvs = Observation.findAll(query, [groupId:groupId, max:params.limit.toInteger(), offset:params.offset.toInteger()])
+			obvs = Observation.findAll(query, [groupId:groupIds, max:params.limit.toInteger(), offset:params.offset.toInteger()])
 		}
 		log.debug(" == obv size " + obvs.size())
 		return createUrlList(obvs)
 	}
+	
+	Object getSpeciesGroupIds(groupId){
+		def groupName = SpeciesGroup.read(groupId).name
+		//if filter group is all
+		if(groupName == grailsApplication.config.speciesPortal.group.ALL){
+			return null
+		}else if(groupName == grailsApplication.config.speciesPortal.group.OTHERS){
+			//if group is others
+			def groupNameList = ['Animals', 'Arachnids', 'Archaea', 'Bacteria', 'Chromista', 'Viruses', 'Kingdom Protozoa', 'Mullusks', 'Others']
+			def groupIds = SpeciesGroup.executeQuery("select distinct sg.id from SpeciesGroup sg where sg.name is null or sg.name in (:groupNameList)", [groupNameList:groupNameList])
+			return groupIds
+		}else{
+			return groupId
+		}
+	}
+	
 	
 	String getSpeciesName(obvId){
 		def speciesList = []
