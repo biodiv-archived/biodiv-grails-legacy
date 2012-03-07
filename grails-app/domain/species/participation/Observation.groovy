@@ -45,6 +45,7 @@ class Observation implements Taggable{
     float longitude;
 	boolean geoPrivacy = false;
 	String locationAccuracy;
+	String habitat;
 	
 	static hasMany = [resource:Resource, recommendationVote:RecommendationVote];
 

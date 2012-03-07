@@ -48,6 +48,7 @@ class ObservationService {
         observation.longitude = Float.parseFloat(params.longitude);
         observation.locationAccuracy = params.location_accuracy;
 		observation.geoPrivacy = false;
+		observation.habitat = params.habitat;
 		
 		def resourcesXML = createResourcesXML(params);
 		def resources = saveResources(observation, resourcesXML);
