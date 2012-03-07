@@ -36,17 +36,18 @@ $(document).ready(function() {
 			}
 	}).data( "catcomplete" )._renderItem = function( ul, item ) {
 			if(item.category == "General") {
-				return $( "<li class='grid_4'  style='list-style:none;'></li>" )
+				return $( "<li class='grid_4'  style='display:inline-block;width:220px;clear:none;padding:5px;'></li>" )
 					.data( "item.autocomplete", item )
-					.append( "<a>" + item.label + "</a>" )
+					.append( "<a style='height:50px;padding-left:60px;border:0;'>" + item.label + "</a>" )
 					.appendTo( ul );
 			} else {
 				if(!item.icon) {
-					item.icon =  "${createLinkTo(dir: 'images/', file:"no-image.jpg", base:grailsApplication.config.speciesPortal.resources.serverURL)}"
+					item.icon =  "${resource(dir:'images',file:'no-image.jpg', absolute:true)}"
+                                            //${createLinkTo(dir: 'images/', file:"no-image.jpg", base:grailsApplication.config.speciesPortal.resources.serverURL)}"
 				}  
-				return $( "<li class='grid_4' style='list-style:none;'></li>" )
+				return $( "<li class='grid_4' style='display:inline-block;width:220px;clear:none;padding:5px;'></li>" )
 					.data( "item.autocomplete", item )
-					.append( "<img src='" + item.icon+"' class='ui-state-default icon' style='float:left' /><a>" + item.label + ((item.desc)?'<br>(' + item.desc + ')':'')+"</a>" )
+					.append( "<img src='" + item.icon+"' class='ui-state-default' style='float:left' /><a style='height:50px;padding-left:60px;border:0;'>" + item.label + ((item.desc)?'<br>(' + item.desc + ')':'')+"</a>" )
 					.appendTo( ul );
 			}
 		};
@@ -61,6 +62,12 @@ $(document).ready(function() {
 
 	
 </g:javascript>
+
+<style>
+#nameContainer ul {
+width:690px;
+}
+</style>
 
 <div
 	id="nameContainer" class="recommendation ${hasErrors(bean: recommendationInstance, field: 'name', 'errors')}">
