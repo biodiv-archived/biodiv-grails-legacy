@@ -5,11 +5,15 @@
 		<p class="prop">
 			<span class="name">By </span>
 			<div class="value">
-			<g:link controller="sUser" action="show"
-				id="${observationInstance.author.id}">
-				${observationInstance.author.username}
-			</g:link>
-                        </div>
+				<g:link controller="sUser" action="show"
+					id="${observationInstance.author.id}">
+					${observationInstance.author.username}
+				</g:link>
+			</div>
+		</p>
+		<p class="prop">
+			<span class="name">Habitat </span>
+			<div class="value">${observationInstance.habitat}</div>
 		</p>
 		<p class="prop">
 			<span class="name">Observed on</span> <div class="value"><g:formatDate
