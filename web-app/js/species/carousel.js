@@ -1,7 +1,9 @@
 var itemLoadCallback = function(carousel, state) {
 	var params = {
 		"limit" : carousel.last - carousel.first + 1,
-		"offset" : carousel.first - 1
+		"offset" : carousel.first - 1,
+		"filterProperty": carousel.options.filterProperty,
+		"filterPropertyValue": carousel.options.filterPropertyValue
 	}
 	if (state == 'prev')
 		return;
@@ -20,7 +22,7 @@ var itemAddCallback = function(carousel, first, last, data) {
 			carousel.add(actualIndex, getItemHTML(items[i]));
 		}
 	}
-	carousel.size(first + items.length);
+	//carousel.size(first + items.length);
 };
 
 /**
@@ -30,4 +32,10 @@ var getItemHTML = function(item){
 	var imageTag = '<img src="' + item.imageLink + '" title="' + item.imageTitle  +'" width="75" height="75" alt="" />';
 	return '<a href=' + item.obvId + '>' + imageTag + '</a>';
 };
+
+var reloadCarousel = function(carousel, fitlerProperty, filterPropertyValue){
+	carousel.options.filterProperty = fitlerProperty;
+	carousel.options.filterPropertyValue = filterPropertyValue;
+	carousel.reset();
+}
  

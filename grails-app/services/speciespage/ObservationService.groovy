@@ -100,20 +100,67 @@ class ObservationService {
 		return new RecommendationVote(observation:observation, recommendation:reco, author:author, confidence:confidence);
 	}
 	
+	List getRelatedObservation(params){
+		def obvId = params.id.toLong()
+		def property = params.filterPropery
+		def propertyValue = Observation.read(obvId)[property]
+		def query = "from Observation as obv where obv." + property + " like :propertyValuee and obv.id != :parentObvId order by obv.createdOn desc"
+		def obvs = Observation.findAll(query, [propertyValue:propertyValue, parentObvId:params.id.toLong(), max:params.limit.toInteger(), offset:params.offset.toInteger()])
+		return createUrlList(obvs)
+	}
+	
+	List getRelatedObservationBySpeciesName(params){
+		def obvId = params.id.toLong()
+		def speciesName = getSpeciesName(obvId)
+		log.debug speciesName
+		return getRelatedObservationBySpeciesName(speciesName, params)
+	}
+//	
+//	List getRelatedObservationBySpeciesGroup(params){
+//		def obvId = params.id.toLong()
+//		def groupId = Observation.read(obvId).group.id
+//		log.debug(groupId)
+//		def query = "from Observation as obv where obv.group.id = :groupId and obv.id != :parentObvId order by obv.createdOn desc"
+//		def obvs = Observation.findAll(query, [groupId:groupId, parentObvId:params.id.toLong(), max:params.limit.toInteger(), offset:params.offset.toInteger()])
+//		return createUrlList(obvs)
+//	}
+	
+	List getRelatedObservationBySpeciesGroup(params){
+		def groupId = params.filterPropertyValue.toLong()
+		log.debug(groupId)
+		
+		def query = ""
+		def obvs = null
+		//if filter group is all 
+		if(groupId == 830){
+			query = "from Observation as obv order by obv.createdOn desc"
+			obvs = Observation.findAll(query, [max:params.limit.toInteger(), offset:params.offset.toInteger()])
+		}else if(groupId == 831){
+			//if group is others
+			def groupNameList = ['Animals', 'Arachnids', 'Archaea', 'Bacteria', 'Chromista', 'Viruses', 'Kingdom Protozoa', 'Mullusks', 'Others']
+			def groupIds = SpeciesGroup.executeQuery("select distinct sg.id from SpeciesGroup sg where sg.name is null or sg.name in (:groupNameList)", [groupNameList:groupNameList])
+			query = "from Observation as obv where obv.group.id in (:groupIds) order by obv.createdOn desc"
+			obvs = Observation.findAll(query, [groupIds:groupIds, max:params.limit.toInteger(), offset:params.offset.toInteger()])
+		}else{
+			query = "from Observation as obv where obv.group.id = :groupId order by obv.createdOn desc"
+			obvs = Observation.findAll(query, [groupId:groupId, max:params.limit.toInteger(), offset:params.offset.toInteger()])
+		}
+		log.debug(" == obv size " + obvs.size())
+		return createUrlList(obvs)
+	}
 	
 	String getSpeciesName(obvId){
 		def speciesList = []
 		Observation.read(obvId).recommendationVote.each{speciesList << it.recommendation.name}
-		//log.debug "==== " + speciesList
 		return getMaxRepeatedElementFromList(speciesList)
 	}
 	
-	List getRelatedObservation(speciesName, params){
+	List getRelatedObservationBySpeciesName(speciesName, params){
 		def recId = Recommendation.findByName(speciesName).id
-		//log.debug "==== recommendation id " + recId
 		def query = "select recVote.observation from RecommendationVote recVote where recVote.recommendation.id = :recId and recVote.observation.id != :parentObv  order by recVote.votedOn desc "
 		def m = [parentObv:params.id.toLong(), recId:recId, max:params.limit.toInteger(), offset:params.offset.toInteger()]
-		return createUrlList(RecommendationVote.executeQuery(query, m).unique())
+		//return createUrlList(RecommendationVote.executeQuery(query, m).unique())
+		return createUrlList(RecommendationVote.executeQuery(query, m))
 	}
 	/**
 	 * 

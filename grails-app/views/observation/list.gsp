@@ -15,6 +15,9 @@
 			<h1>
 				<g:message code="default.list.label" args="[entityName]" />
 			</h1>
+			<g:set var="carouselId" value="a" />
+			<obv:showGroupFilter model="['observationInstance':observationInstance,'carousel_id': carouselId]" />
+			<obv:showRelatedStory model="['observationId': null, 'controller':'observation', 'action':'getRelatedObservation', 'filterProperty': 'speciesGroup' , 'filterPropertyValue': 830 ,'id':carouselId]" />
 			<g:if test="${flash.message}">
 				<div class="message">
 					${flash.message}
@@ -30,7 +33,7 @@
 						</div>
 					</div>
 				</div>
-			<div class="paginateButtons">
+			<div class="paginateButtons"  style="clear:both">
 				<g:paginate total="${observationInstanceTotal}" max="2"/>
 			</div>
 		</div>

@@ -322,10 +322,14 @@ class ObservationController {
 	
 	def getRelatedObservation = {
 		log.debug params;
-		def obvId = params.id.toLong() 
-		def speciesName = observationService.getSpeciesName(obvId)
-		log.debug speciesName
-		def relatedObv = observationService.getRelatedObservation(speciesName, params)
+		def relatedObv;
+		if(params.filterProperty == "speciesName"){
+			relatedObv = observationService.getRelatedObservationBySpeciesName(params)
+		}else if(params.filterProperty == "speciesGroup"){
+			relatedObv = observationService.getRelatedObservationBySpeciesGroup(params)
+		}else{
+			relatedObv = observationService.getRelatedObservation(params)
+		}
 		render relatedObv as JSON
 	}
 	
