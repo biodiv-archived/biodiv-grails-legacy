@@ -19,6 +19,8 @@ class UrlMappings {
 				// apply constraints here
 			}
 		}
+		
+		"/observation/tagged/$tag?"(controller: "observation", action: "list")
 
 		"/"(view:"/index")
 		"500"(view:'/error')

@@ -16,7 +16,7 @@ class SUser {
 		password blank: false
 	}
 	
-	
+	static hasMany = [openIds: OpenID]
 	
 	static mapping = {
 		/*

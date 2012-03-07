@@ -120,7 +120,7 @@ request.cookies.each{println it.name+" : "+it.value}
 			<sec:ifLoggedIn>
          	Logged in as <sec:username /> (<g:link controller='logout'>Logout</g:link>)
       		</sec:ifLoggedIn> <sec:ifNotLoggedIn>
-				<a href='#' onclick='showLogin(); return false;'>Login</a>
+				<a href='#' onclick='show_login_dialog();  return false'>Login</a>
 			</sec:ifNotLoggedIn> </span>
 		<g:render template='/common/ajaxLogin' />
 		<br />

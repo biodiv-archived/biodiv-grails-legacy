@@ -1,5 +1,6 @@
 package species.participation
 
+import org.grails.taggable.*
 import groovy.util.Node
 
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
@@ -25,7 +26,13 @@ class ObservationController {
 
 	def list = {
 		params.max = Math.min(params.max ? params.int('max') : 10, 100)
-		[observationInstanceList: Observation.list(params), observationInstanceTotal: Observation.count()]
+
+		if (params.tag != null) {
+			def observationsByTag = Observation.findAllByTag(params.tag)
+			[observationInstanceList: observationsByTag, observationInstanceTotal: observationsByTag.count()]
+		}else{
+			[observationInstanceList: Observation.list(params), observationInstanceTotal: Observation.count()]
+		}
 	}
 
 	@Secured(['ROLE_USER'])
@@ -44,19 +51,29 @@ class ObservationController {
 
 			params.author = springSecurityService.currentUser;
 
-			def observationInstance =  observationService.createObservation(params);
+			try {
+				def observationInstance =  observationService.createObservation(params);
 
-			if(!observationInstance.hasErrors() && observationInstance.save(flush:true)) {
-				//flash.message = "${message(code: 'default.created.message', args: [message(code: 'observation.label', default: 'Observation'), observationInstance.id])}"
-				log.debug "Successfully created observation : "+observationInstance
+				if(!observationInstance.hasErrors() && observationInstance.save(flush:true)) {
+					//flash.message = "${message(code: 'default.created.message', args: [message(code: 'observation.label', default: 'Observation'), observationInstance.id])}"
+					log.debug "Successfully created observation : "+observationInstance
 
-				params.obvId = observationInstance.id
+					params.obvId = observationInstance.id
 
-				redirect(action: 'addRecommendationVote', params:params);
-			} else {
-				observationInstance.errors.allErrors.each { log.error it } 
-				redirect(view: "create", model: [observationInstance: observationInstance])
-			}
+					def tags = (params.tags != null) ? Arrays.asList(params.tags) : new ArrayList();
+
+					observationInstance.setTags(tags);
+
+					redirect(action: 'addRecommendationVote', params:params);
+				} else {
+					observationInstance.errors.allErrors.each { log.error it }
+					redirect(view: "create", model: [observationInstance: observationInstance])
+				}
+			} catch(e) {
+				e.printStackTrace();
+				flash.message = "${message(code: 'error')}";
+				redirect(view: "create")
+			} 
 		} else {
 			redirect(view: "create")
 		}
@@ -274,7 +291,7 @@ class ObservationController {
 
 		params.author = springSecurityService.currentUser;
 		boolean success = false;
-		
+
 		if(params.obvId) {
 			//Saves recommendation if its not present
 			def recommendationVoteInstance = observationService.createRecommendationVote(params)
@@ -289,7 +306,7 @@ class ObservationController {
 				}
 				else {
 					recommendationVoteInstance.errors.allErrors.each { log.error it }
-					
+
 				}
 			} catch(e) {
 				e.printStackTrace();
@@ -308,4 +325,24 @@ class ObservationController {
 		def votes = RecommendationVote.findAll("from RecommendationVote as recoVote where recoVote.recommendation.id = :recoId and recoVote.observation.id = :obvId order by recoVote.votedOn desc", [recoId:params.long('recoId'), obvId:params.long('obvId')]);
 		render (template:"/common/voteDetails", model:[votes:votes]);
 	}
+
+	def getRelatedObservation = {
+		log.debug params;
+		def relatedObv;
+		if(params.filterProperty == "speciesName"){
+			relatedObv = observationService.getRelatedObservationBySpeciesName(params)
+		}else if(params.filterProperty == "speciesGroup"){
+			relatedObv = observationService.getRelatedObservationBySpeciesGroup(params)
+		}else{
+			relatedObv = observationService.getRelatedObservation(params)
+		}
+		render relatedObv as JSON
+	}
+
+
+	def tags = {
+		log.debug params;
+		render Tag.findAllByNameIlike("${params.term}%")*.name as JSON
+	}
+
 }

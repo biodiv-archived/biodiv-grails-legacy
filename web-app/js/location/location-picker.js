@@ -43,7 +43,7 @@ function set_location(lat, lng) {
         geocoder.geocode({'latLng': marker.getPosition()}, function(results, status) {
             if (status == google.maps.GeocoderStatus.OK) {
                 if (results[0]) {
-                    $('#place_name').val(results[0].formatted_address);
+                    //$('#place_name').val(results[0].formatted_address);
                     $('#reverse_geocoded_name').html(results[0].formatted_address);
                     $('#latitude').html(marker.getPosition().lat());
                     $('#longitude').html(marker.getPosition().lng());
@@ -89,7 +89,9 @@ function update_geotagged_images_list(image) {
     		var latlng = get_latlng_from_image(image); 
             if (latlng) {            	
             	var func = "set_location(" + latlng.lat+"," +latlng.lng+ "); $(this).addClass('active_location_picker_button')";
-                var html = '<div class="location_picker_button" style="display:block;" onclick="' + func + '"><div style="width:40px; height:40px;float:left;"><img style="width:100%; height:100%;" src="' + $(image).attr('src') + '"/></div><div style="float:left; padding:2px;font-size:">Use this image\'s location</div></div>';
+                var html = '<div class="location_picker_button" style="display:inline-block; width:40px;" onclick="' + func + '"><div style="width:40px; height:40px;float:left;"><img style="width:100%; height:100%;" src="' + $(image).attr('src') + '"/></div><div style="float:left; padding:2px;font-size:"></div></div>';
+                $("#geotagged_images>.title").show();
+                $("#geotagged_images>.msg").show();
                 $("#geotagged_images").append(html);
                 $("#geotagged_images").trigger('update_map');
             }
@@ -168,7 +170,7 @@ $(document).ready(function() {
     geocoder.geocode({'latLng': marker.getPosition()}, function(results, status) {
       if (status == google.maps.GeocoderStatus.OK) {
         if (results[0]) {
-          $('#place_name').val(results[0].formatted_address);
+          //$('#place_name').val(results[0].formatted_address);
           $('#reverse_geocoded_name').html(results[0].formatted_address);
           $('#latitude').html(marker.getPosition().lat());
           $('#longitude').html(marker.getPosition().lng());
