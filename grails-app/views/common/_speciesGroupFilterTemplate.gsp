@@ -65,7 +65,7 @@ $(document).ready(function(){
 	);
 });
 </g:javascript>
-<div id="speciesGroupFilter" style="float: left;">
+<div id="speciesGroupFilter" style="clear:both">
 	<center>
 		<!-- g:paginateOnSpeciesGroup/-->
 		<%def othersIds = "" %>
