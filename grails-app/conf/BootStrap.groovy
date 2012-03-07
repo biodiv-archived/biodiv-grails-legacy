@@ -43,10 +43,10 @@ class BootStrap {
 	 */
 	def initUsers() {
 		createOrUpdateUser('admin', 'admin', true);
-		createOrUpdateUser('sravanthi', 'sra123', true);
-		createOrUpdateUser('janaki', 'janaki', false);
-		createOrUpdateUser('prabha', 'prabha', false);
-		createOrUpdateUser('rahool', 'rahool', false);
+//		createOrUpdateUser('sravanthi', 'sra123', true);
+//		createOrUpdateUser('janaki', 'janaki', false);
+//		createOrUpdateUser('prabha', 'prabha', false);
+//		createOrUpdateUser('rahool', 'rahool', false);
 	}
 
 	/**
@@ -106,7 +106,9 @@ class BootStrap {
 	 * 
 	 */
 	def initFilters() {
-		SpringSecurityUtils.clientRegisterFilter('drupalAuthCookieFilter', SecurityFilterPosition.CAS_FILTER.order + 1);
+		if(grailsApplication.config.checkin.drupal) {
+			SpringSecurityUtils.clientRegisterFilter('drupalAuthCookieFilter', SecurityFilterPosition.CAS_FILTER.order + 1);
+		}
 	}
 	
 	/**

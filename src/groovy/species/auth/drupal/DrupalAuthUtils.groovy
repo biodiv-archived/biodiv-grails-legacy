@@ -22,51 +22,22 @@ class DrupalAuthUtils {
 
 	private static def log = Logger.getLogger(this)
 
-	String apiKey
-	String secret
-	String applicationId
-
 	DrupalAuthToken build(request) {
 		Map params = [:];
 		Utils.populateHttpServletRequestParams(request, params);
 		
 		log.debug "Params : "+params;
+		
 		if (params.uid == null) {
 			throw new BadCredentialsException("Uid cannot be null");
 		}
 
 		DrupalAuthToken authRequest = new DrupalAuthToken (
-		uid: Long.parseLong(params.uid),
-		username:params.name,
-		code: params.code
+			Long.parseLong(params.uid),
+			params.j_username,
+			params.j_username
 		);
 		return authRequest;
-		/*if (!signedRequest) {
-		 return null
-		 }
-		 String[] signedRequestParts = signedRequest.split('\\.')
-		 if (signedRequestParts.length != 2) {
-		 throw new BadCredentialsException("Invalid Signed Request")
-		 }
-		 String jsonData = new String(Base64.decodeBase64(signedRequestParts[1].getBytes()), 'UTF-8')
-		 def json = JSON.parse(jsonData)
-		 if (json.algorithm != 'HMAC-SHA256') {
-		 throw new BadCredentialsException("Unknown hashing algorightm: $json.algorithm")
-		 }
-		 //log.debug("Payload: $jsonData")
-		 if (!verifySign(signedRequestParts[0], signedRequestParts[1])) {
-		 throw new BadCredentialsException("Invalid signature")
-		 } else {
-		 log.debug "Signature is ok"
-		 }
-		 String code = json.code?.toString()
-		 DrupalAuthToken token = new DrupalAuthToken (
-		 uid: Long.parseLong(json.user_id.toString()),
-		 code: code
-		 )
-		 token.authenticated = true
-		 return token
-		 */
 	}
 
 	public Cookie getAuthCookie(HttpServletRequest request) {
@@ -76,7 +47,5 @@ class DrupalAuthUtils {
 			return it.name.startsWith('SESS');
 		}
 	}
-
-
 
 }

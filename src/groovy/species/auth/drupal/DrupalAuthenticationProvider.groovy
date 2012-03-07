@@ -1,15 +1,14 @@
 package species.auth.drupal
 
-import org.springframework.security.core.Authentication
-import org.springframework.security.authentication.AuthenticationProvider
-import org.springframework.security.core.userdetails.UserDetails
-import org.springframework.security.core.GrantedAuthority
-import org.springframework.security.core.authority.GrantedAuthorityImpl
-import org.springframework.security.core.userdetails.User
 import org.apache.log4j.Logger
-import org.codehaus.groovy.grails.plugins.springsecurity.GrailsUser;
+import org.codehaus.groovy.grails.plugins.springsecurity.GrailsUser
+import org.springframework.security.authentication.AuthenticationProvider
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.Authentication
+import org.springframework.security.core.AuthenticationException
+import org.springframework.security.core.userdetails.UserDetails
 
-import species.auth.SUser;
+import species.auth.SUser
 
 public class DrupalAuthenticationProvider implements AuthenticationProvider {
 
@@ -19,11 +18,15 @@ public class DrupalAuthenticationProvider implements AuthenticationProvider {
 
 	boolean createNew = true
 
-	public Authentication authenticate(Authentication authentication) {
+	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
 		log.debug "Authenticating drupal user using token : "+authentication;
-		
+
 		if(authentication instanceof DrupalAuthToken) {
 			DrupalAuthToken authRequest = (DrupalAuthToken) authentication
+
+			if(!authRequest.uid) {
+				throw new BadCredentialsException("Drupal UID is missing");
+			}
 
 			SUser user = drupalAuthDao.findUser(authRequest.uid)
 
@@ -37,15 +40,9 @@ public class DrupalAuthenticationProvider implements AuthenticationProvider {
 				}
 			}
 			if (user != null) {
-				UserDetails userDetails = createUserDetails(user, authRequest.code)
-
-				authRequest.details = userDetails
-				authRequest.principal = userDetails
-				authRequest.authorities = userDetails.getAuthorities()
-			} else {
-				authRequest.authenticated = false
-			}
-			return authRequest
+				UserDetails userDetails = createUserDetails(user, authRequest.getCredentials().toString());
+				return new DrupalAuthToken(userDetails, authRequest.getCredentials(), userDetails.getAuthorities()) 
+			} 
 		}
 		return null;
 	}

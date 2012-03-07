@@ -87,7 +87,7 @@ log4j = {
 			'org.springframework.security',
 			'org.codehaus.groovy.grails.web.servlet',  //  controllers
 			'grails.plugin',
-			
+			 'org.springframework.security.web',
 			'grails.app'
 
 }
@@ -541,12 +541,15 @@ grails.plugins.springsecurity.auth.loginFormUrl = "/login/authFromDrupal"
 
 grails.plugins.springsecurity.auth.defaultRoleNames = ['ROLE_USER']
 grails.plugins.springsecurity.apf.filterProcessesUrl = '/j_drupal_spring_security_check'
+grails.plugins.springsecurity.successHandler.useReferer = true
 grails.plugins.springsecurity.providerNames = [
 	'drupalAuthentiactionProvider',
 	'daoAuthenticationProvider',
 	'anonymousAuthenticationProvider',
 	'rememberMeAuthenticationProvider'
 ];
+
+//grails.plugins.springsecurity.openid.nonceMaxSeconds =  600;
 
 //
 //grails.plugins.springsecurity.facebook.appId='308606395828381'
@@ -558,4 +561,5 @@ grails.plugins.springsecurity.providerNames = [
 //grails.disableCommonsMultipart=true
 //grails.web.disable.multipart=true
 
-checkin.drupal = true;
+checkin.drupal = false;
+grails.plugins.springsecurity.openid.domainClass = 'species.auth.OpenID'

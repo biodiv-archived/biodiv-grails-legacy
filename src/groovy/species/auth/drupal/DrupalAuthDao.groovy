@@ -23,8 +23,8 @@ class DrupalAuthDao {
 
     SUser create(DrupalAuthToken token) {
         SUser user = SUser.newInstance()
-		user.username = token.username;
-        user.password = token.username;
+		user.username = token.getPrincipal().toString();
+        user.password = token.getCredentials().toString();
         user.id = token.uid
 		boolean success = false;
 		boolean created = SUser.withTransaction { status ->

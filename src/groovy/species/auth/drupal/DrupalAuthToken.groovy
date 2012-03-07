@@ -1,28 +1,41 @@
 package species.auth.drupal
 
-import org.springframework.security.core.GrantedAuthority
-import org.springframework.security.core.Authentication
-import org.springframework.security.authentication.AbstractAuthenticationToken
+import java.util.Collection
 
-public class DrupalAuthToken extends AbstractAuthenticationToken implements Authentication {
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.springframework.security.core.GrantedAuthority
+
+public class DrupalAuthToken extends UsernamePasswordAuthenticationToken {
 	
 	long uid
-	String username;
-	String code = "password"
-    Object principal
 	
-	Collection<GrantedAuthority> authorities
-	
-	def DrupalAuthToken() {
-		super([] as Collection<GrantedAuthority>);
-	}	
-
-	public Object getCredentials() {
-		return uid;
+	public DrupalAuthToken(long uid, Object principal, Object credentials) {
+		super(principal, credentials);
+		this.uid = uid
 	}
-
-    String toString() {
-        return "Principal: $principal, uid: $uid, roles: ${authorities.collect { it.authority}}"
-    }
+	
+	
+	public DrupalAuthToken(Object principal, Object credentials, Collection<? extends GrantedAuthority> authorities) {
+		super(principal, credentials, authorities);
+		this.uid = uid;
+	}
+	
+//	String username;
+//	String code = "password"
+//    Object principal
+//	
+//	Collection<GrantedAuthority> authorities
+//	
+//	def DrupalAuthToken() {
+//		super([] as Collection<GrantedAuthority>);
+//	}	
+//
+//	public Object getCredentials() {
+//		return uid;
+//	}
+//
+//    String toString() {
+//        return "Principal: $principal, uid: $uid, roles: ${authorities.collect { it.authority}}"
+//    }
 
 }

@@ -15,7 +15,9 @@ class SUser {
 		username blank: false, unique: true
 		password blank: false
 	}
-
+	
+	
+	
 	static mapping = {
 		/*
 		 * Just keep in mind that the UUIDHexGenerator is not generating globally unique identifiers, 

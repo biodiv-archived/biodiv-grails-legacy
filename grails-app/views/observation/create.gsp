@@ -1,3 +1,4 @@
+<%@page import="org.springframework.web.context.request.RequestContextHolder"%>
 <%@page import="species.License"%>
 <%@page import="species.License.LicenseType"%>
 <%@ page import="species.participation.Observation"%>
@@ -264,13 +265,12 @@
  		});  
      		
      	$('#upload_resource').ajaxForm({ 
-			//url:'${createLink(controller:'observation', action:'upload_resource')}',
-			url:'http://wgp.panchgani.strandls.com/biodiv/observation/upload_resource',
+			url:'${createLink(controller:'observation', action:'upload_resource', params:['jsessionid':RequestContextHolder.currentRequestAttributes().getSessionId()])}',
 			dataType: 'xml',//could not parse json wih this form plugin 
 			clearForm: true,
 			resetForm: true,
 			type: 'POST',
-			data: {uid:'${springSecurityService.getCurrentUser().id}', name:'${springSecurityService.getCurrentUser().username}'}, 
+			 
 			beforeSubmit: function(formData, jqForm, options) {
 				return true;
 			}, 
@@ -297,16 +297,13 @@
 				})
 				$( "#imagesList" ).append (metadataEle);
 			}, error:function (xhr, ajaxOptions, thrownError){
-					console.log(xhr);
-					console.log(ajaxOptions);
-					console.log(thrownError);
-					$('#upload_resource').find("span.msg").html("Uploading... Please wait...");
+					$('#upload_resource').find("span.msg").html("");
 					var messageNode = $(".message .resources") 
-					var response = $.parseJSON(xhr.responseText);
+					var response = $.parseJSON(xhr.responseText);					
 					if(messageNode.length == 0 ) {
-						$("#upload_resource").prepend('<div class="message">'+response.error+'</div>');
+						$("#upload_resource").prepend('<div class="message">'+(response?response.error:"Error")+'</div>');
 					} else {
-						messageNode.append(response.error);
+						messageNode.append(response?response.error:"Error");
 					}
             } 
      	});  

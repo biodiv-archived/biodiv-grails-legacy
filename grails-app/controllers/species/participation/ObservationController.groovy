@@ -138,7 +138,7 @@ class ObservationController {
 		}
 	}
 
-//	@Secured(['ROLE_USER'])
+	@Secured(['ROLE_USER'])
 	def upload_resource = {
 		log.debug params;
 
@@ -251,7 +251,7 @@ class ObservationController {
 				}
 				else {
 					recommendationVoteInstance.errors.allErrors.each { log.error it }
-					render(view: "show", model: [observationInstance:observationInstance, recommendationVoteInstance: recommendationVoteInstance])
+					render (view: "show", model: [observationInstance:observationInstance, recommendationVoteInstance: recommendationVoteInstance])
 				}
 			} catch(e) {
 				e.printStackTrace()
@@ -259,6 +259,7 @@ class ObservationController {
 			}
 		} else {
 			flash.message  = "${message(code: 'observation.invalid', default:'Invalid observation')}"
+			log.error flash.message;
 			redirect(action: "list")
 		}
 	}
