@@ -26,15 +26,48 @@ class ObservationController {
 
 	def list = {
 		params.max = Math.min(params.max ? params.int('max') : 10, 100)
-
-		if (params.tag != null) {
-			def observationsByTag = Observation.findAllByTag(params.tag)
-			[observationInstanceList: observationsByTag, observationInstanceTotal: observationsByTag.count()]
-		}else{
-			[observationInstanceList: Observation.list(params), observationInstanceTotal: Observation.count()]
+		params.offset 
+		def whereAdded = false
+		def query = " from Observation as obv " 
+		def queryParams = [:]
+		def filterQuery = ""
+		if(params.sGroup){
+			params.sGroup = params.sGroup.toLong()
+			def groupIds = observationService.getSpeciesGroupIds(params.sGroup)
+			if(!groupIds){
+				log.debug("No groups for id " + params.sGroup)
+			}else if(groupIds instanceof List){
+				filterQuery += " where obv.group.id in (:groupIds) "
+				queryParams["groupIds"] = groupIds
+			}else{
+				filterQuery += " where obv.group.id = :groupId "
+				queryParams["groupId"] = groupIds
+			}
 		}
+		
+		if(params.tag){
+			(filterQuery == "")? (filterQuery += " where obv.tag like :tag ") : (filterQuery += " and obv.tag like :tag ")
+			queryParams["tag"] = params.tag
+		}
+		
+		if(params.habitat){
+			(filterQuery == "")? (filterQuery += " where obv.habitat like :habitat ") : (filterQuery += " and obv.habitat like :habitat ")
+			queryParams["habitat"] = params.habitat
+		}
+		
+		def orderByClause = "order by obv." + (params.sort ? params.sort : "createdOn") +  " desc"
+		
+		query += filterQuery + orderByClause
+		def count = Observation.findAll(query, queryParams).size()
+		queryParams["max"] = params.max
+		if(params.offset){
+			queryParams["offset"] = params.offset.toInteger()
+		}
+		log.debug("===============query =======" + query)
+		log.debug("===============params =====" + queryParams)	
+		def observationInstanceList = Observation.findAll(query, queryParams)
+		[observationInstanceList: observationInstanceList, observationInstanceTotal: count]
 	}
-
 	@Secured(['ROLE_USER'])
 	def create = {
 		def observationInstance = new Observation()

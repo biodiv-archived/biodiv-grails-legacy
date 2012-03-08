@@ -6,63 +6,7 @@
 
 $(document).ready(function(){
 
-	$( "#speciesGroupFilter" ).buttonset();
-	$('#speciesGroupFilter label[value$="${params.sGroup}"]').each (function() {
-			$(this).attr('aria-pressed', 'true').addClass('ui-state-hover').addClass('ui-state-active');
-	});
 	
-	
-	function updateGallery(target) {
-		var a = $('<a href="'+target+'"></a>');
-		var url = a.url();
-		var params = url.param();
-		var grp = ''; 
-		$('#speciesGroupFilter label').each (function() {
-			if($(this).attr('aria-pressed') === 'true') {
-				grp += $(this).attr('value') + ',';
-			}
-		});
-		
-		grp = grp.replace(/\s*\,\s*$/,'');
-		if(grp) {
-			params['sGroup'] = grp;//$('#speciesGalleryFilter option:selected').val().toString();
-		}
-		
-		console.log("group == " + params['sGroup']);
-		 
-		var carousel = jQuery('#carousel_${carousel_id}').data('jcarousel');
-		reloadCarousel(carousel, "speciesGroup", params['sGroup']);
-	}
-	
-	$('#speciesGroupFilter input').change(function(){
-		updateGallery(window.location.pathname + window.location.search);
-		return false;
-	});
-	
-	//Ref: http://stackoverflow.com/questions/1421584/how-can-i-simulate-a-click-to-an-anchor-tag/1421968#1421968
-	function fakeClick(event, anchorObj) {
-	  if (anchorObj.click) {
-	    anchorObj.click()
-	  } else if(document.createEvent) {
-	    if(event.target !== anchorObj) {
-	      var evt = document.createEvent("MouseEvents"); 
-	      evt.initMouseEvent("click", true, true, window, 
-	          0, 0, 0, 0, 0, false, false, false, false, 0, null); 
-	      var allowDefault = anchorObj.dispatchEvent(evt);
-	      // you can check allowDefault for false to see if
-	      // any handler called evt.preventDefault().
-	      // Firefox will *not* redirect to anchorObj.href
-	      // for you. However every other browser will.
-	    }
-	  }
-	}
-	
-	$('li.poor_species_content').hover(function(){
-		$(this).children('.poor_species_content').slideDown(200);
-	}, function(){
-		$(this).children('.poor_species_content').slideUp(200);
-	}
-	);
 });
 </g:javascript>
 <div id="speciesGroupFilter" style="clear:both">
