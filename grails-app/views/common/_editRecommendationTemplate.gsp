@@ -76,12 +76,12 @@ width:690px;
 		class="value text ui-widget-content ui-corner-all" /> <input
 		type="hidden" name="canName" id="canName" /> 
 		
-	<select
+	<!-- select
 		name="confidence" class="value ui-corner-all">
 		<g:each in="${ConfidenceType.list()}" var="l">
 			<option value="${l}">
 				${l.value()}
 			</option>
 		</g:each>
-	</select>
+	</select-->
 </div>

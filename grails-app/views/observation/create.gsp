@@ -41,7 +41,7 @@
 	base="${grailsApplication.config.grails.serverURL+'/js/'}"></g:javascript>
 </head>
 <body>
-	<div class="container_16 big_wrapper" style="border:0; background-color:#ffffff; padding:0;">
+	<div class="container_16 big_wrapper">
             
             <div class="grid_16">
         	<h1>
@@ -63,7 +63,7 @@
             </div>
 
             <form id="upload_resource" enctype="multipart/form-data"
-                    style="position: relative; float: left; z-index: 2; left: 20px; top: 300px;">
+                    style="position: relative; float: left; z-index: 2; left: 20px; top: 360px;">
                     <!-- TODO multiple attribute is HTML5. need to chk if this gracefully falls back to default in non compatible browsers -->
                     <input type="button" class="red" id="upload_button"
                             value="Add photo">
@@ -80,9 +80,9 @@
 	        method="POST">
 
             <div class="container_16 super-section" style="clear:both;">    
-                <div class="grid_10 section" style="position:relative;overflow:visible;">
+                <div class="grid_16 section bold_section" style="position:relative;overflow:visible;">
                     <h3>What did you observe?</h3>
-                        <div class="row" style="height: 40px;">
+                        <div class="row">
                             <label for="group"><g:message
                                             code="observation.group.label" default="Group" />
                             </label> <!--select name="group_id" class="ui-widget-content ui-corner-all">
@@ -96,8 +96,8 @@
                                             </g:if>
                                     </g:each>
                             </select-->
-                            <div id="groups_div" style="position:absolute;left: 185px; width:550px;z-index:3;">
-                            <div id="selected_group" class="selected_value" style="background-color:#fbfbfb; width: 195px;padding:5px;background: url('http://localhost:8080/biodiv/images/arrow-down.png') no-repeat scroll 96% 50%; cursor: default;"><img src="${resource(dir:'images/group_icons',file:'All.png', absolute:true)}"/><span class="display_value">Select group</span></div>
+                            <div id="groups_div" class="bold_dropdown" style="z-index:3;">
+                            <div id="selected_group" class="selected_value"><img src="${resource(dir:'images/group_icons',file:'All.png', absolute:true)}"/><span class="display_value">Select group</span></div>
                             <div id="group_options" style="background-color:#fbfbfb;box-shadow:0 8px 6px -6px black; border-radius: 0 5px 5px 5px;display:none;">
                                     <ul>
                                     <g:each in="${species.groups.SpeciesGroup.list()}" var="g">
@@ -113,7 +113,7 @@
                             <input id="group_id" type="hidden" name="group_id"></input>
                         </div>
 
-                        <div class="row" style="height:40px;">
+                        <div class="row">
                                 <label>Habitat</label>
                             <div id="habitat_list">
                                 <!--select class="ui-widget-content">
@@ -134,8 +134,8 @@
                                         <option>Unknown</option>
                                 </select-->	
                             
-                                <div id="habitat_div" style="position:absolute;left: 185px; width:550px;z-index:2;">
-                                    <div id="selected_habitat" class="selected_value" style="background-color:#fbfbfb; width: 195px;padding:5px;background: url('http://localhost:8080/biodiv/images/arrow-down.png') no-repeat scroll 96% 50%; cursor: default;"><img src="${resource(dir:'images/group_icons',file:'All.png', absolute:true)}"/><span class="display_value">Select habitat</span></div>
+                                <div id="habitat_div" class="bold_dropdown" style="z-index:2;">
+                                    <div id="selected_habitat" class="selected_value"><img src="${resource(dir:'images/group_icons',file:'All.png', absolute:true)}"/><span class="display_value">Select habitat</span></div>
                                         <div id="habitat_options" style="background-color:#fbfbfb;box-shadow:0 8px 6px -6px black; border-radius: 0 5px 5px 5px;display:none;">
                                             <ul>
                                                 <li class="habitat_option"><img src="${resource(dir:'images/group_icons',file:'All.png', absolute:true)}"/><span class="display_value">Forest</span></li>
