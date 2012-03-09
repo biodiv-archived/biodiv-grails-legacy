@@ -1,8 +1,13 @@
 
 <div class="grid_10 observation_story">
 	<div>
-                <img class="group_icon" src="${grailsApplication.config.grails.serverURL+'/images/group_icons/'}${observationInstance.group?.name?.trim().replaceAll(/ /, '_')}.png" title="${observationInstance.group?.name}"/>
-		<p class="prop">
+        <img class="species_group_icon" src="${createLinkTo(dir: 'images', file: observationInstance.group.icon()?.fileName?.trim(), absolute:true)}" title="${observationInstance.group?.name}"/>
+        
+        <g:if test="${observationInstance.habitat}">
+        	<img class="habitat_icon species_group_icon" src="${resource(dir:'images/group_icons',file:observationInstance.habitat+'.png', absolute:true)}" title="${observationInstance.habitat}"/>
+        </g:if>
+        
+		<div class="prop">
 			<span class="name">By </span>
 			<div class="value">
 				<g:link controller="sUser" action="show"
@@ -10,24 +15,27 @@
 					${observationInstance.author.username}
 				</g:link>
 			</div>
-		</p>
-		<p class="prop">
-			<span class="name">Habitat </span>
-			<div class="value">${observationInstance.habitat}</div>
-		</p>
-		<p class="prop">
+		</div>
+		
+		<div class="prop">
 			<span class="name">Observed on</span> <div class="value"><g:formatDate
 					format="MMMMM dd, yyyy" date="${observationInstance.observedOn}" />
 			</div>
-		</p>
-		<!--p class="prop">
-			<span class="name">Group</span> <div class="value"><g:link
-					controller="speciesGroup" action="show" id="${observationInstance.group?.id }">${observationInstance.group?.name }</g:link>
-			</div>
-		</p-->
-		<p class="prop readmore">
+		</div>
+		
+		<div class="prop readmore">
 			<span class="name">Description </span> <div class="value"> ${observationInstance.notes}
 			</div>
-		</p>
+		</div>
+
+		<div class="view_tags">
+			<ul name="tags">
+				<g:each in="${observationInstance.tags}">
+					<li>
+						${it}
+					</li>
+				</g:each>
+			</ul>
+		</div>
 	</div>
 </div>

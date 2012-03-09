@@ -26,48 +26,51 @@ class ObservationController {
 
 	def list = {
 		params.max = Math.min(params.max ? params.int('max') : 10, 100)
-		params.offset 
+		params.offset
+
 		def whereAdded = false
-		def query = " from Observation as obv " 
+		def query = " from Observation as obv "
 		def queryParams = [:]
 		def filterQuery = ""
-		if(params.sGroup){
+
+		if(params.sGroup) {
 			params.sGroup = params.sGroup.toLong()
 			def groupIds = observationService.getSpeciesGroupIds(params.sGroup)
-			if(!groupIds){
+			if(!groupIds) {
 				log.debug("No groups for id " + params.sGroup)
-			}else if(groupIds instanceof List){
-				filterQuery += " where obv.group.id in (:groupIds) "
+			} else if(groupIds instanceof List){
+				filterQuery += " where obv.group.id in (:groupIds) or obv.group is null "
 				queryParams["groupIds"] = groupIds
-			}else{
+			} else {
 				filterQuery += " where obv.group.id = :groupId "
 				queryParams["groupId"] = groupIds
 			}
 		}
-		
-		if(params.tag){
+
+		if(params.tag) {
 			(filterQuery == "")? (filterQuery += " where obv.tag like :tag ") : (filterQuery += " and obv.tag like :tag ")
 			queryParams["tag"] = params.tag
 		}
-		
-		if(params.habitat){
+
+		if(params.habitat) {
 			(filterQuery == "")? (filterQuery += " where obv.habitat like :habitat ") : (filterQuery += " and obv.habitat like :habitat ")
 			queryParams["habitat"] = params.habitat
 		}
-		
+
 		def orderByClause = "order by obv." + (params.sort ? params.sort : "createdOn") +  " desc"
-		
+
 		query += filterQuery + orderByClause
 		def count = Observation.findAll(query, queryParams).size()
 		queryParams["max"] = params.max
-		if(params.offset){
+
+		if(params.offset) {
 			queryParams["offset"] = params.offset.toInteger()
 		}
-		log.debug("===============query =======" + query)
-		log.debug("===============params =====" + queryParams)	
+
 		def observationInstanceList = Observation.findAll(query, queryParams)
 		[observationInstanceList: observationInstanceList, observationInstanceTotal: count]
 	}
+
 	@Secured(['ROLE_USER'])
 	def create = {
 		def observationInstance = new Observation()
@@ -106,7 +109,7 @@ class ObservationController {
 				e.printStackTrace();
 				flash.message = "${message(code: 'error')}";
 				redirect(view: "create")
-			} 
+			}
 		} else {
 			redirect(view: "create")
 		}
@@ -353,6 +356,44 @@ class ObservationController {
 		}
 	}
 
+	/**
+	 * 
+	 */
+	def getRecommendationVotes = {
+		log.debug params;
+		params.max = Math.min(params.max ? params.int('max') : 10, 100)
+		params.offset = params.offset ? params.long('offset'): 0
+		
+		def observationInstance = Observation.get(params.id)
+		if (observationInstance) {
+			try {
+				def results = observationInstance.getRecommendationVotes(params.max, params.offset);
+				log.debug "======="
+				log.debug results;
+				if(results.size() > 0) {
+					render (template:"/common/observation/showObservationRecosTemplate", model:['observationInstance':observationInstance, 'result':results]);
+				} else {
+					response.setStatus(500)
+					def message = "${message(code: 'recommendations.zero.message', default:'No recommendations made. Please suggest')}"
+					render message
+				}
+			} catch(e){
+				e.printStackTrace();
+				response.setStatus(500)
+				def message = "${message(code: 'error', default:'Error while processing the request.')}"
+				render message
+			}
+		}
+		else {
+			response.setStatus(500)
+			def message = "${message(code: 'error', default:'Error while processing the request.')}"
+			render message
+		}
+	}
+
+	/**
+	 * 
+	 */
 	def voteDetails = {
 		log.debug params;
 		def votes = RecommendationVote.findAll("from RecommendationVote as recoVote where recoVote.recommendation.id = :recoId and recoVote.observation.id = :obvId order by recoVote.votedOn desc", [recoId:params.long('recoId'), obvId:params.long('obvId')]);

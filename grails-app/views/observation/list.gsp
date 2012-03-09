@@ -109,6 +109,8 @@
 			updateGallery($(this).attr('href'));
 			return false;
 		});
+		
+		$("ul[name='tags']").tagit({select:true,  tagSource: "${g.createLink(action: 'tags')}"});
 	});
 	</g:javascript>
 </body>

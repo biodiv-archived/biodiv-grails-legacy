@@ -110,11 +110,17 @@ class ObservationService {
 		return createUrlList(obvs)
 	}
 	
+	/**
+	 * 
+	 * @param params
+	 * @return
+	 */
 	List getRelatedObservationBySpeciesName(params){
 		def obvId = params.id.toLong()
-		def speciesName = getSpeciesName(obvId)
-		log.debug speciesName
-		return getRelatedObservationBySpeciesName(speciesName, params)
+		List<String> speciesNames = getSpeciesNames(obvId)
+		log.debug speciesNames
+		log.debug speciesNames.getClass();
+		return getRelatedObservationBySpeciesNames(speciesNames, params)
 	}
 //	
 //	List getRelatedObservationBySpeciesGroup(params){
@@ -126,6 +132,11 @@ class ObservationService {
 //		return createUrlList(obvs)
 //	}
 	
+	/**
+	 * 
+	 * @param params
+	 * @return
+	 */
 	List getRelatedObservationBySpeciesGroup(params){
 		def groupId = params.filterPropertyValue.toLong()
 		log.debug(groupId)
@@ -139,7 +150,7 @@ class ObservationService {
 			obvs = Observation.findAll(query, [max:params.limit.toInteger(), offset:params.offset.toInteger()])
 		}else if(groupIds instanceof List){
 			//if group is others
-			query = "from Observation as obv where obv.group.id in (:groupIds) order by obv.createdOn desc"
+			query = "from Observation as obv where obv.group is null or obv.group.id in (:groupIds) order by obv.createdOn desc"
 			obvs = Observation.findAll(query, [groupIds:groupIds, max:params.limit.toInteger(), offset:params.offset.toInteger()])
 		}else{
 			query = "from Observation as obv where obv.group.id = :groupId order by obv.createdOn desc"
@@ -149,6 +160,11 @@ class ObservationService {
 		return createUrlList(obvs)
 	}
 	
+	/**
+	 * 
+	 * @param groupId
+	 * @return
+	 */
 	Object getSpeciesGroupIds(groupId){
 		def groupName = SpeciesGroup.read(groupId).name
 		//if filter group is all
@@ -157,27 +173,41 @@ class ObservationService {
 		}else if(groupName == grailsApplication.config.speciesPortal.group.OTHERS){
 			//if group is others
 			def groupNameList = ['Animals', 'Arachnids', 'Archaea', 'Bacteria', 'Chromista', 'Viruses', 'Kingdom Protozoa', 'Mullusks', 'Others']
-			def groupIds = SpeciesGroup.executeQuery("select distinct sg.id from SpeciesGroup sg where sg.name is null or sg.name in (:groupNameList)", [groupNameList:groupNameList])
+			def groupIds = SpeciesGroup.executeQuery("select distinct sg.id from SpeciesGroup sg where sg.name in (:groupNameList)", [groupNameList:groupNameList])
 			return groupIds
 		}else{
 			return groupId
 		}
 	}
 	
-	
-	String getSpeciesName(obvId){
-		def speciesList = []
-		Observation.read(obvId).recommendationVote.each{speciesList << it.recommendation.name}
-		return getMaxRepeatedElementFromList(speciesList)
+
+	/**
+	 * 	
+	 * @param obvId
+	 * @return
+	 */
+	List<String> getSpeciesNames(obvId){
+		return Observation.read(obvId).getSpecies();
 	}
 	
-	List getRelatedObservationBySpeciesName(speciesName, params){
-		def recId = Recommendation.findByName(speciesName).id
-		def query = "select recVote.observation from RecommendationVote recVote where recVote.recommendation.id = :recId and recVote.observation.id != :parentObv  order by recVote.votedOn desc "
-		def m = [parentObv:params.id.toLong(), recId:recId, max:params.limit.toInteger(), offset:params.offset.toInteger()]
+	/**
+	 * 
+	 * @param speciesName
+	 * @param params
+	 * @return
+	 */
+	List getRelatedObservationBySpeciesNames(List<String> speciesNames, params) {
+		if(!speciesNames) {
+			return [];
+		}
+		//def recId = Recommendation.findByName(speciesName).id
+		def recIds = Recommendation.executeQuery("select rec.id from Recommendation as rec where rec.name in (:speciesNames)", [speciesNames:speciesNames]);
+		def query = "select recVote.observation from RecommendationVote recVote where recVote.recommendation.id in (:recIds) and recVote.observation.id != :parentObv  order by recVote.votedOn desc "
+		def m = [parentObv:params.id.toLong(), recIds:recIds, max:params.limit.toInteger(), offset:params.offset.toInteger()]
 		//return createUrlList(RecommendationVote.executeQuery(query, m).unique())
 		return createUrlList(RecommendationVote.executeQuery(query, m))
 	}
+	
 	/**
 	 * 
 	 * @return
@@ -192,31 +222,6 @@ class ObservationService {
 			urlList.add(["obvId":obv.id, "imageLink":imageLink, "imageTitle": image.fileName])
 		}
 		return urlList
-	}
-	
-	
-	private static getMaxRepeatedElementFromList(list){
-		list.sort()
-		def max = 1
-		def currentElement = list[0]
-		def maxElement = currentElement
-		def currentCounter = 0
-		for(spe in list){
-			if(spe == currentElement){
-				currentCounter++
-			}else{
-				if(currentCounter > max){
-					maxElement = currentElement
-				}
-				currentElement = spe
-				currentCounter = 1
-			}
-		}
-		if(currentCounter > max){
-			maxElement = currentElement
-		}
-		
-		return maxElement
 	}
 	
 	private Recommendation getRecommendation(recoName, canName) {

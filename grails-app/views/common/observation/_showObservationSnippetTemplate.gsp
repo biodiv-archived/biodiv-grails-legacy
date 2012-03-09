@@ -4,8 +4,9 @@
 	<div class="figure"
 		style="float: left; max-height: 220px; max-width: 200px">
 		<%def imagePath = mainImage.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.thumbnail.suffix)%>
-		<g:if test="${(new File(grailsApplication.config.speciesPortal.observations.rootDir + imagePath)).exists()}">
-			
+		<g:if
+			test="${(new File(grailsApplication.config.speciesPortal.observations.rootDir + imagePath)).exists()}">
+
 
 			<g:link action="show" controller="observation"
 				id="${observationInstance.id}">
@@ -24,10 +25,13 @@
 		</g:else>
 	</div>
 	<obv:showStory model="['observationInstance':observationInstance]"></obv:showStory>
-        <div class="grid_10">
-        <p class="prop">
-	    <span class="name">Place name</span> <div class="value"> ${observationInstance.placeName}</div>
-	</p>
-        </div>
+	<div class="grid_10">
+		<p class="prop">
+			<span class="name">Place name</span>
+		<div class="value">
+			${observationInstance.placeName}
+		</div>
+		</p>
+	</div>
 
 </div>
