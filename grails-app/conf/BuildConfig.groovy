@@ -39,7 +39,7 @@ grails.project.dependency.resolution = {
 	   compile group:'org.apache.poi', name:'poi-contrib', version:'3.6'
 	   compile group:'org.apache.poi', name:'poi-scratchpad', version:'3.7'
 	   compile(group:'org.apache.poi', name:'poi-ooxml', version:'3.7')
-	   //compile 'org.springframework.social:spring-social-core:1.0.0.RELEASE'
-	   //compile 'org.springframework.social:spring-social-facebook:1.0.0.RELEASE'
+	   compile 'org.springframework.social:spring-social-core:1.0.0.RELEASE'
+	   compile 'org.springframework.social:spring-social-facebook:1.0.0.RELEASE'
     }
 }

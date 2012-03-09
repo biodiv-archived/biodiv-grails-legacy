@@ -537,16 +537,16 @@ jquery {
 grails.plugins.springsecurity.userLookup.userDomainClassName = 'species.auth.SUser'
 grails.plugins.springsecurity.userLookup.authorityJoinClassName = 'species.auth.SUserRole'
 grails.plugins.springsecurity.authority.className = 'species.auth.Role'
-grails.plugins.springsecurity.auth.loginFormUrl = "/login/authFromDrupal"
+//grails.plugins.springsecurity.auth.loginFormUrl = "/login/authFromDrupal"
 
-grails.plugins.springsecurity.auth.defaultRoleNames = ['ROLE_USER']
-grails.plugins.springsecurity.apf.filterProcessesUrl = '/j_drupal_spring_security_check'
-grails.plugins.springsecurity.providerNames = [
-	'drupalAuthentiactionProvider',
-	'daoAuthenticationProvider',
-	'anonymousAuthenticationProvider',
-	'rememberMeAuthenticationProvider'
-];
+//grails.plugins.springsecurity.auth.defaultRoleNames = ['ROLE_USER']
+//grails.plugins.springsecurity.apf.filterProcessesUrl = '/j_drupal_spring_security_check'
+//grails.plugins.springsecurity.providerNames = [
+//	'drupalAuthentiactionProvider',
+//	'daoAuthenticationProvider',
+//	'anonymousAuthenticationProvider',
+//	'rememberMeAuthenticationProvider'
+//];
 
 //
 //grails.plugins.springsecurity.facebook.appId='308606395828381'
@@ -559,3 +559,12 @@ grails.plugins.springsecurity.providerNames = [
 //grails.web.disable.multipart=true
 
 checkin.drupal = true;
+
+grails.plugins.springsecurity.openid.domainClass = 'species.auth.OpenID'
+grails.plugins.springsecurity.rememberMe.persistent = true
+grails.plugins.springsecurity.rememberMe.persistentToken.domainClassName = 'species.auth.PersistentLogin'
+
+
+grails.plugins.springsecurity.facebook.domain.classname='species.auth.FacebookUser'
+grails.plugins.springsecurity.facebook.appId='310694198984953'
+grails.plugins.springsecurity.facebook.secret='eedf76e46272190fbd26e578ae764a60'
