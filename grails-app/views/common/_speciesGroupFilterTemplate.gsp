@@ -1,7 +1,7 @@
 <%@ page import="species.groups.SpeciesGroup"%>
 <g:javascript src="jquery/jquery.url.js"
 	base="${grailsApplication.config.grails.serverURL+'/js/'}" />
-	
+
 <g:javascript>
 
 $(document).ready(function(){
@@ -9,7 +9,7 @@ $(document).ready(function(){
 	
 });
 </g:javascript>
-<div id="speciesGroupFilter" style="clear:both">
+<div id="speciesGroupFilter" style="clear: both">
 	<center>
 		<!-- g:paginateOnSpeciesGroup/-->
 		<%def othersIds = "" %>
@@ -36,4 +36,17 @@ $(document).ready(function(){
 			src="${createLinkTo(dir: 'images', file: sGroup.icon()?.fileName?.trim(), absolute:true)}"
 			title="${sGroup.name}" /> </label>
 	</center>
+
+</div>
+<div id="habitatFilter" style="clear: both">
+		<!-- g:paginateOnhabitat/-->
+		<g:each in="${species.Habitat.list()}" var="habitat" status="i">
+				<input type="radio" name="habitatFilter"
+					id="habitatFilter${i}" value="${habitat.name}"
+					style="display: none" />
+				<label for="habitatFilter${i}" value="${habitat.name}"><img
+					class="group_icon"
+					src="${resource(dir:'images/group_icons',file:'All.png', absolute:true)}"
+					title="${habitat.name}" /> </label>
+		</g:each>
 </div>

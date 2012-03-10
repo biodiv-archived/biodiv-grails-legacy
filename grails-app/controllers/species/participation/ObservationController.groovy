@@ -63,8 +63,8 @@ class ObservationController {
 		if(params.offset){
 			queryParams["offset"] = params.offset.toInteger()
 		}
-		log.debug("===============query =======" + query)
-		log.debug("===============params =====" + queryParams)	
+		//log.error("===============query =======" + query)
+		//log.error("===============params =====" + queryParams)	
 		def observationInstanceList = Observation.findAll(query, queryParams)
 		[observationInstanceList: observationInstanceList, observationInstanceTotal: count]
 	}

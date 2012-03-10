@@ -45,6 +45,11 @@
 		$('#speciesGroupFilter label[value$="${params.sGroup}"]').each (function() {
 				$(this).attr('aria-pressed', 'true').addClass('ui-state-hover').addClass('ui-state-active');
 		});
+		$( "#habitatFilter" ).buttonset();
+		
+		$('#habitatFilter label[value$="${params.habitat}"]').each (function() {
+				$(this).attr('aria-pressed', 'true').addClass('ui-state-hover').addClass('ui-state-active');
+		});
 		
 		
 		function getSelectedGroup() {
@@ -59,6 +64,19 @@
 			return grp;	
 		} 
 		
+		function getSelectedHabitat() {
+			var hbt = ''; 
+			$('#habitatFilter label').each (function() {
+				if($(this).attr('aria-pressed') === 'true') {
+					hbt += $(this).attr('value') + ',';
+				}
+			});
+			
+			hbt = hbt.replace(/\s*\,\s*$/,'');
+			return hbt;	
+		} 
+		
+		
 		function getFilterParameters(url, limit, offset) {
 			
 			var params = url.param();
@@ -71,6 +89,11 @@
 			var grp = getSelectedGroup();
 			if(grp) {
 				params['sGroup'] = grp;
+			}
+			
+			var habitat = getSelectedHabitat();
+			if(habitat) {
+				params['habitat'] = habitat;
 			}
 			
 			if(limit != undefined) {
@@ -104,6 +127,12 @@
 			updateGallery(undefined, 5, 0);
 			return false;
 		});
+		
+		$('#habitatFilter input').change(function(){
+			updateGallery(undefined, 5, 0);
+			return false;
+		});
+		
 		
 		$(".paginateButtons a").click(function() {
 			updateGallery($(this).attr('href'));
