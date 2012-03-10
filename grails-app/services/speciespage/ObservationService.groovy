@@ -110,7 +110,7 @@ class ObservationService {
 		return createUrlList(obvs)
 	}
 	
-	List getRelatedObservationBySpeciesName(params){
+	Map getRelatedObservationBySpeciesName(params){
 		def obvId = params.id.toLong()
 		def speciesName = getSpeciesName(obvId)
 		log.debug speciesName
@@ -171,12 +171,12 @@ class ObservationService {
 		return getMaxRepeatedElementFromList(speciesList)
 	}
 	
-	List getRelatedObservationBySpeciesName(speciesName, params){
+	Map getRelatedObservationBySpeciesName(speciesName, params){
 		def recId = Recommendation.findByName(speciesName).id
 		def query = "select recVote.observation from RecommendationVote recVote where recVote.recommendation.id = :recId and recVote.observation.id != :parentObv  order by recVote.votedOn desc "
 		def m = [parentObv:params.id.toLong(), recId:recId, max:params.limit.toInteger(), offset:params.offset.toInteger()]
 		//return createUrlList(RecommendationVote.executeQuery(query, m).unique())
-		return createUrlList(RecommendationVote.executeQuery(query, m))
+		return ["observations":createUrlList(RecommendationVote.executeQuery(query, m)), "count":5]
 	}
 	/**
 	 * 

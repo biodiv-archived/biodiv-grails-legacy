@@ -138,22 +138,10 @@
                                     <div id="selected_habitat" class="selected_value" style="background-color:#fbfbfb; width: 195px;padding:5px;background: url('http://localhost:8080/biodiv/images/arrow-down.png') no-repeat scroll 96% 50%; cursor: default;"><img src="${resource(dir:'images/group_icons',file:'All.png', absolute:true)}"/><span class="display_value">Select habitat</span></div>
                                         <div id="habitat_options" style="background-color:#fbfbfb;box-shadow:0 8px 6px -6px black; border-radius: 0 5px 5px 5px;display:none;">
                                             <ul>
-                                                <li class="habitat_option"><img src="${resource(dir:'images/group_icons',file:'All.png', absolute:true)}"/><span class="display_value">Forest</span></li>
-                                                <li class="habitat_option"><img src="${resource(dir:'images/group_icons',file:'All.png', absolute:true)}"/><span class="display_value">Savanna</span></li>
-                                                <li class="habitat_option"><img src="${resource(dir:'images/group_icons',file:'All.png', absolute:true)}"/><span class="display_value">Shrubland</span></li>
-                                                <li class="habitat_option"><img src="${resource(dir:'images/group_icons',file:'All.png', absolute:true)}"/><span class="display_value">Grassland</span></li>
-                                                <li class="habitat_option"><img src="${resource(dir:'images/group_icons',file:'All.png', absolute:true)}"/><span class="display_value">Wetlands</span></li>
-                                                <li class="habitat_option"><img src="${resource(dir:'images/group_icons',file:'All.png', absolute:true)}"/><span class="display_value">Rocky Areas</span></li>
-                                                <li class="habitat_option"><img src="${resource(dir:'images/group_icons',file:'All.png', absolute:true)}"/><span class="display_value">Caves and Subterranean Habitats</span></li>
-                                                <li class="habitat_option"><img src="${resource(dir:'images/group_icons',file:'All.png', absolute:true)}"/><span class="display_value">Desert</span></li>
-                                                <li class="habitat_option"><img src="${resource(dir:'images/group_icons',file:'All.png', absolute:true)}"/><span class="display_value">Marine</span></li>
-                                                <li class="habitat_option"><img src="${resource(dir:'images/group_icons',file:'All.png', absolute:true)}"/><span class="display_value">Artificial - Terrestrial</span></li>
-                                                <li class="habitat_option"><img src="${resource(dir:'images/group_icons',file:'All.png', absolute:true)}"/><span class="display_value">Artificial - Aquatic</span></li>
-                                                <li class="habitat_option"><img src="${resource(dir:'images/group_icons',file:'All.png', absolute:true)}"/><span class="display_value">Introduced Vegetation</span></li>
-                                                <li class="habitat_option"><img src="${resource(dir:'images/group_icons',file:'All.png', absolute:true)}"/><span class="display_value">Other</span></li>
-                                                <li class="habitat_option"><img src="${resource(dir:'images/group_icons',file:'All.png', absolute:true)}"/><span class="display_value">Unknown</span></li>
-
-                                            </ul>
+                                            	<g:each in="${species.Habitat.list()}" var="h">
+                                            		<li class="habitat_option"><img src="${resource(dir:'images/group_icons',file:'All.png', absolute:true)}"/><span class="display_value">${h.name}</span></li>
+                                    			</g:each>
+                                        	</ul>
                                         </div>
                                     </div>
                                 </div>	
