@@ -46,6 +46,10 @@ class License {
 		public String toString() {
 			return this.value();
 		}
+		
+		public String getIconFilename(){
+			return this.value().replaceAll(/ /, "_").replaceAll('.') { it.toLowerCase()}
+		}
 	}
 
 	LicenseType name;

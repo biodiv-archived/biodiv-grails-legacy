@@ -742,7 +742,7 @@ img {
 	margin: 10px;
 	padding: 5px;
 	border-radius: 7px;
-	background-color: #fbfbfb;
+	background-color: #ffffff;
         position: relative;
 }
 
@@ -1297,7 +1297,7 @@ background-color: #fbfbfb !important;
 
 #addObservation #imagesList {
 background-color: #eeeeee;
-border-bottom: 1px solid #9E9E9E;
+borderdisplay_value-bottom: 1px solid #9E9E9E;
 border-top: 1px solid #9E9E9E;
 box-shadow: 0 2px 11px -3px inset;
 padding: 10px;

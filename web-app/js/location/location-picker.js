@@ -34,8 +34,8 @@ function initialize(){
 function set_location(lat, lng) {
 	
 		$(".location_picker_button").removeClass("active_location_picker_button");
-        $("#latitude").html(lat);
-        $("#longitude").html(lng);
+        $("#latitude").html(lat.toFixed(2));
+        $("#longitude").html(lng.toFixed(2));
         var location = new google.maps.LatLng(lat, lng);
         marker.setPosition(location);
         map.setCenter(location);
@@ -45,8 +45,8 @@ function set_location(lat, lng) {
                 if (results[0]) {
                     //$('#place_name').val(results[0].formatted_address);
                     $('#reverse_geocoded_name').html(results[0].formatted_address);
-                    $('#latitude').html(marker.getPosition().lat());
-                    $('#longitude').html(marker.getPosition().lng());
+                    $('#latitude').html(marker.getPosition().lat().toFixed(2));
+                    $('#longitude').html(marker.getPosition().lng().toFixed(2));
                     $('#reverse_geocoded_name_field').val(results[0].formatted_address);
                     $('#latitude_field').val(marker.getPosition().lat());
                     $('#longitude_field').val(marker.getPosition().lng());
@@ -172,8 +172,8 @@ $(document).ready(function() {
         if (results[0]) {
           //$('#place_name').val(results[0].formatted_address);
           $('#reverse_geocoded_name').html(results[0].formatted_address);
-          $('#latitude').html(marker.getPosition().lat());
-          $('#longitude').html(marker.getPosition().lng());
+          $('#latitude').html(marker.getPosition().lat().toFixed(2));
+          $('#longitude').html(marker.getPosition().lng().toFixed(2));
           $('#reverse_geocoded_name_field').val(results[0].formatted_address);
           $('#latitude_field').val(marker.getPosition().lat());
           $('#longitude_field').val(marker.getPosition().lng());
@@ -193,7 +193,7 @@ $(document).ready(function() {
    geocoder.geocode({'latLng': marker.getPosition()}, function(results, status) {
       if (status == google.maps.GeocoderStatus.OK) {
         if (results[0]) {
-          $('#place_name').val(results[0].formatted_address);
+          //$('#place_name').val(results[0].formatted_address);
         }
       }
     });
