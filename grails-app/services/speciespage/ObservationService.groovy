@@ -172,11 +172,15 @@ class ObservationService {
 	}
 	
 	Map getRelatedObservationBySpeciesName(speciesName, params){
+		println "speciesName  ==== " + speciesName
 		def recId = Recommendation.findByName(speciesName).id
+		def countQuery = "select count(*) from RecommendationVote recVote where recVote.recommendation.id = :recId and recVote.observation.id != :parentObv"
+		def countParams = [parentObv:params.id.toLong(), recId:recId]
+		def count = RecommendationVote.executeQuery(countQuery, countParams)
 		def query = "select recVote.observation from RecommendationVote recVote where recVote.recommendation.id = :recId and recVote.observation.id != :parentObv  order by recVote.votedOn desc "
 		def m = [parentObv:params.id.toLong(), recId:recId, max:params.limit.toInteger(), offset:params.offset.toInteger()]
 		//return createUrlList(RecommendationVote.executeQuery(query, m).unique())
-		return ["observations":createUrlList(RecommendationVote.executeQuery(query, m)), "count":5]
+		return ["observations":createUrlList(RecommendationVote.executeQuery(query, m)), "count":count]
 	}
 	/**
 	 * 
