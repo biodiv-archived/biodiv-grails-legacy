@@ -17,6 +17,7 @@ body {
 /*	font : 15px/1.5 Georgia, "Times New Roman", Times, serif;*/
 	width: 100%;
 	/*background-color: #f7f7f7;*/
+	background-image:url('../images/canvas.png');
 }
 
 .ui-widget {
@@ -24,13 +25,11 @@ body {
 }
 
 h1 {
-	padding: 10px;
-	margin: 10px;
-	border-bottom: 1px solid #dedede;
-	color: #eeeeee;
-	background-color: #8D9B87;
-	border-radius: 7px;
-	box-shadow: 0 0 4px rgba(0, 0, 0, 0.25), 0 3px 4px rgba(0, 0, 0, 0.3);
+	color: #333333;
+    font-size: 180%;
+    font-weight: normal;
+    margin-bottom: 0;
+    padding-bottom: 7px;
 }
 
 #grailsLogo {
@@ -1171,6 +1170,10 @@ padding:10px;
 margin:0;    
 }
 
+.bold_section label {
+width: 300px;
+}
+
 #upload_resource #pseudobutton {
 font-weight:bold;
 z-index:1;
@@ -1250,6 +1253,10 @@ clear: both;
 padding:3px 10px 3px 10px;
 }
 
+.bold_section .row{
+	height:50px;
+}
+
 .row img.ui-datepicker-trigger {
 padding-left:5px;	
 }
@@ -1299,4 +1306,25 @@ min-height: 212px;
 
 .msg {
 padding-left: 10px;
+}
+
+.bold_dropdown {
+position:absolute;
+left: 325px;
+width:550px
+}
+
+.bold_dropdown .selected_value {
+background-color:#fbfbfb;
+width: 195px;
+padding:5px;
+cursor: default;
+background: url('http://localhost:8080/biodiv/images/arrow-down.png') no-repeat scroll 96% 50%;
+border: 1px solid #9e9e9e;
+font-size: 1em;
+font-weight: bold;
+}
+
+.bold_section input {
+width:195px;	
 }
