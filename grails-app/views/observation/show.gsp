@@ -48,9 +48,9 @@
 				<div class="grid_10">
 				
 					<div id="resourceTabs">
-						<ul>
+						<!--ul>
 							<li><a href="#resourceTabs-1" style="height: 0px"></a></li>
-						</ul>
+						</ul-->
 						<div id="resourceTabs-1">
 							<div id="gallery1">
 								<g:if test="${observationInstance.resource}">
