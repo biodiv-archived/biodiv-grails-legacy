@@ -317,12 +317,17 @@ th.name {
 	width: 200px;
 }
 
+.prop {
+clear:both;
+}
+
 .prop .name {
 	float: left;
 	text-align: left;
 	width: 10em;
 	font-weight: bold;
 	color: #676767;
+               
 }
 
 #advSearchForm .prop .name {
@@ -719,7 +724,8 @@ img {
 }
 
 .observation_story {
-	margin: 10px;
+	margin: 0;
+        padding: 15px 15px 5px;        
 }
 
 .observation_location {
@@ -748,16 +754,14 @@ img {
 
 .observation .snippet {
 	display: block;
-	margin: 10px;
-	border: 1px solid #e5e5e5;
-	padding: 5px;
-	border-radius: 7px;
-	background-color: #fbfbfb;
+	margin: 5px;
+	border: 1px solid #f0f0f0;
+	padding: 15px 15px 5px;
+	background-color: #ffffff;
 }
 
 .observation .snippet:hover {
-	box-shadow: 0 0 4px rgba(0, 127, 0, 0.25), 0 3px 4px
-		rgba(0, 127, 0, 0.3);
+	box-shadow: 0 8px 6px -6px black; 
 }
 
 .observation .addedResource .figure,.observation .figure {
@@ -785,7 +789,7 @@ html.busy,html.busy * {
 	margin-top: 10px;
 	margin-bottom: 20px;
 	opacity: 1.0;
-	background-color: #fbfbfb;
+	background-color: #f9f9f9;
         border-radius: 5px;
         padding-left:10px;
         padding-right:10px;        
@@ -1004,9 +1008,7 @@ ul.thumbwrap li a {
 }
 
 .thumbwrap .figure img {
-	border-radius: 5px 5px 5px 5px;
     border-width: 0;
-    box-shadow: 0 1px 3px #666666;
 }
 
 #searchTextField {
@@ -1139,7 +1141,7 @@ ul.thumbwrap li.poor_species_content div.poor_species_content{
 }
 
 .super-section {
-background-color:#e5e5e5;
+background-color:#ebebeb;
 border-radius: 5px;
 margin-bottom:10px;
 }
@@ -1255,7 +1257,7 @@ padding:3px 10px 3px 10px;
 }
 
 .bold_section .row{
-	height:50px;
+height:42px;
 }
 
 .row img.ui-datepicker-trigger {
@@ -1317,7 +1319,7 @@ width:550px
 
 .bold_dropdown .selected_value {
 background-color:#fbfbfb;
-width: 195px;
+width: 300px;
 padding:5px;
 cursor: default;
 background: url('http://localhost:8080/biodiv/images/arrow-down.png') no-repeat scroll 96% 50%;
@@ -1327,5 +1329,27 @@ font-weight: bold;
 }
 
 .bold_section input {
-width:195px;	
+width:300px;	
+}
+
+.license_options {
+background-color:#ffffff;
+box-shadow:0 8px 6px -6px black;
+display:none;
+position:absolute;
+z-index:7;
+border-width:0 1px 1px 1px;
+}
+
+ul.thumbwrap .license_options li{
+opacity:0.6;
+}
+
+ul.thumbwrap .license_options li:hover {
+box-shadow:0 8px 6px -6px black;
+opacity:1;
+}
+
+.licence_div img{
+padding:5px;
 }

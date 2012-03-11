@@ -1,5 +1,5 @@
 
-<div class="grid_10 observation_story">
+<div class="grid_8 observation_story">
 	<div>
         <img class="species_group_icon" src="${createLinkTo(dir: 'images', file: observationInstance.group.icon()?.fileName?.trim(), absolute:true)}" title="${observationInstance.group?.name}"/>
         

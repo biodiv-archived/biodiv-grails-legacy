@@ -24,7 +24,7 @@
 				</div>
 			</g:if>
 			<div class="list">
-					<div class="observations thumbwrap grid_16">
+					<div class="observations thumbwrap grid_12">
 						<div class="observation">
 							<g:each in="${observationInstanceList}" status="i"
 								var="observationInstance">

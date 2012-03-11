@@ -64,10 +64,10 @@
             </div>
 
             <form id="upload_resource" enctype="multipart/form-data"
-                    style="position: relative; float: left; z-index: 2; left: 20px; top: 360px;">
+                    style="position: relative; float: left; z-index: 2; left: 20px; top: 320px;" title="Add a photo for this observation">
                     <!-- TODO multiple attribute is HTML5. need to chk if this gracefully falls back to default in non compatible browsers -->
                     <input type="button" class="red" id="upload_button"
-                            value="Add photo">
+                            value="Add photo" >
                     <div
                             style="overflow: hidden; width: 100px; height: 49px; position: absolute; left: 0px; top: 0px;">
                             <input type="file" id="attachFiles" name="resources"
@@ -148,7 +148,7 @@
 								<input id="habitat" type="hidden" name="habitat"></input>
                             </div>
 
-                        <div class="row">
+                        <div class="row" style="margin-top:20px;height:auto;">
                             <label for="recommendationVote"><g:message
                                             code="observation.recommendationVote.label"
                                             default="Species name" />
@@ -161,8 +161,6 @@
 
                             <reco:create />
                         </div>
-
-
 
                         <div class="row">
                             <label for="observedOn"><g:message
@@ -337,9 +335,9 @@
 					<option value="${l.name.value()}" ${(l.name.value().equals(LicenseType.CC_BY.value()))?'selected':''}>${l?.name.value()}</option>
 				</g:each>							
 			</select><br/-->
-                            <div id="license_div_{{=i}}" style="z-index:2;cursor:pointer;">
-                                    <div id="selected_license_{{=i}}" onclick="$(this).next().show();"><img src="${resource(dir:'images/license',file:'cc_by.png', absolute:true)}"/></div>
-                                        <div id="license_options_{{=i}}" style="background-color:#fbfbfb;box-shadow:0 8px 6px -6px black; border-radius: 0 5px 5px 5px;display:none;position:absolute;z-index:7;width:160px;border-width:0 1px 1px 1px;">                                       <ul>
+                            <div id="license_div_{{=i}}" class="licence_div" style="z-index:2;cursor:pointer;">
+                                    <div id="selected_license_{{=i}}" onclick="$(this).next().show();"><img src="${resource(dir:'images/license',file:'cc_by.png', absolute:true)}" title="Set a license for this image"/></div>
+                                        <div id="license_options_{{=i}}" class="license_options">                                       <ul>
                                             	<g:each in="${species.License.list()}" var="l">
 
                                             		<li class="license_option" onclick="$('#license_{{=i}}').val($(this).text());$('#selected_license_{{=i}}').html($(this).html());$('#license_options_{{=i}}').hide();"><img src="${resource(dir:'images/license',file:l?.name.getIconFilename()+'.png', absolute:true)}"/><!--span class="display_value">${l?.name.value()}</span--></li>
@@ -481,7 +479,10 @@
                 $("#habitat_options").hide();
                 $("#selected_habitat").css({'background-color':'#e5e5e5', 'border-bottom-color':'#aeaeae'});
         });
-        
+       
+        $("#name").watermark("Recommend a species name");
+        $("#place_name").watermark("Set a title for this location");
+        $(".tagit-input").watermark("Add some tags");
 
 	});
 
