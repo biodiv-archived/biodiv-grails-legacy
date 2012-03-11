@@ -1352,3 +1352,9 @@ opacity:1;
 .licence_div img{
 padding:5px;
 }
+
+.related_observation {
+border-radius: 7px 7px 7px 7px;
+margin-top: 10px;
+padding: 10px;
+}

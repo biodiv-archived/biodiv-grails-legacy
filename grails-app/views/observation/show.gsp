@@ -84,8 +84,7 @@
 
 				<!--  static species content -->
 				<obv:showStory model="['observationInstance':observationInstance]" />
-				Tags:
-				<div class="view_tags">
+				<div class="view_tags" style="clear:both;">
 						<ul name="tags">
 							<g:each in="${observationInstance.tags}">
 								<li>${it}</li>

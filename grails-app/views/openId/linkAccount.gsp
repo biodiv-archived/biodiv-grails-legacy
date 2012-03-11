@@ -14,7 +14,7 @@ font-weight: bold;
 
 <body>
 
-<div class='container_16'>
+<div class='container_16 big_wrapper'>
 
 	<h4>Enter your username and password to link with this OpenID</h4>
 
