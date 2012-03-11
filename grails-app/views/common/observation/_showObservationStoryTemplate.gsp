@@ -1,5 +1,5 @@
 
-<div class="grid_10 observation_story">
+<div class="grid_8 observation_story">
 	<div>
                 <img class="group_icon" src="${grailsApplication.config.grails.serverURL+'/images/group_icons/'}${observationInstance.group?.name?.trim().replaceAll(/ /, '_')}.png" title="${observationInstance.group?.name}"/>
 		<p class="prop">
