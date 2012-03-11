@@ -5,8 +5,10 @@ import org.apache.commons.logging.LogFactory;
 import species.Classification
 import species.Country
 import species.Field
+import species.Habitat
 import species.Language
 import species.License.LicenseType
+import species.Habitat.HabitatType
 import species.formatReader.SpreadsheetReader
 import species.groups.SpeciesGroup
 import species.sourcehandler.XMLConverter
@@ -17,6 +19,8 @@ class SetupService {
 
 	static transactional = false
 
+
+	
 	def grailsApplication;
 	def groupHandlerService;
 	def taxonService;
@@ -31,6 +35,7 @@ class SetupService {
 		uploadCountries(grailsApplication.config.speciesPortal.data.rootDir+"/templates/Countries_ISO-3166-1.csv");
 		uploadClassifications(grailsApplication.config.speciesPortal.data.rootDir+"/templates/Classifications.xlsx", 0, 0);
 		uploadLicences();
+		uploadHabitats();
 
 		def allGroup = new SpeciesGroup(name:"All");
 		allGroup.save(flush:true, failOnError:true);
@@ -42,6 +47,13 @@ class SetupService {
 		//taxonService.loadTaxon();
 	}
 
+	void uploadHabitats(){
+		log.info " uploading habitats"
+		HabitatType.toList().each { hbType ->
+			new Habitat(name:hbType.toString()).save(flush:true);
+		}
+	}
+	
 	/**
 	 *
 	 * @param fieldDefinitionsFile

@@ -115,7 +115,7 @@ class ObservationService {
 	 * @param params
 	 * @return
 	 */
-	List getRelatedObservationBySpeciesName(params){
+	Map getRelatedObservationBySpeciesName(params){
 		def obvId = params.id.toLong()
 		List<String> speciesNames = getSpeciesNames(obvId)
 		log.debug speciesNames
@@ -190,22 +190,23 @@ class ObservationService {
 		return Observation.read(obvId).getSpecies();
 	}
 	
+<<<<<<< HEAD
 	/**
 	 * 
 	 * @param speciesName
 	 * @param params
 	 * @return
 	 */
-	List getRelatedObservationBySpeciesNames(List<String> speciesNames, params) {
-		if(!speciesNames) {
-			return [];
-		}
-		//def recId = Recommendation.findByName(speciesName).id
-		def recIds = Recommendation.executeQuery("select rec.id from Recommendation as rec where rec.name in (:speciesNames)", [speciesNames:speciesNames]);
-		def query = "select recVote.observation from RecommendationVote recVote where recVote.recommendation.id in (:recIds) and recVote.observation.id != :parentObv  order by recVote.votedOn desc "
-		def m = [parentObv:params.id.toLong(), recIds:recIds, max:params.limit.toInteger(), offset:params.offset.toInteger()]
+	Map getRelatedObservationBySpeciesName(speciesName, params){
+		println "speciesName  ==== " + speciesName
+		def recId = Recommendation.findByName(speciesName).id
+		def countQuery = "select count(*) from RecommendationVote recVote where recVote.recommendation.id = :recId and recVote.observation.id != :parentObv"
+		def countParams = [parentObv:params.id.toLong(), recId:recId]
+		def count = RecommendationVote.executeQuery(countQuery, countParams)
+		def query = "select recVote.observation from RecommendationVote recVote where recVote.recommendation.id = :recId and recVote.observation.id != :parentObv  order by recVote.votedOn desc "
+		def m = [parentObv:params.id.toLong(), recId:recId, max:params.limit.toInteger(), offset:params.offset.toInteger()]
 		//return createUrlList(RecommendationVote.executeQuery(query, m).unique())
-		return createUrlList(RecommendationVote.executeQuery(query, m))
+		return ["observations":createUrlList(RecommendationVote.executeQuery(query, m)), "count":count]
 	}
 	
 	/**

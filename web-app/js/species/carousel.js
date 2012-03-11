@@ -9,20 +9,23 @@ var itemLoadCallback = function(carousel, state) {
 		return;
 
 	var jqxhr = $.get(carousel.options.url, params, function(data) {
-		itemAddCallback(carousel, carousel.first, carousel.last, data);
+		itemAddCallback(carousel, carousel.first, carousel.last, data, state);
 	});
 	// jqxhr.error(function() { alert("error"); });
 }
 
-var itemAddCallback = function(carousel, first, last, data) {
-	var items = data;
+var itemAddCallback = function(carousel, first, last, data, state) {
+	var items = data["observations"];
 	for (i = 0; i < items.length; i++) {
 		var actualIndex = first + i
 		if (!carousel.has(actualIndex)) {
 			carousel.add(actualIndex, getItemHTML(items[i]));
 		}
 	}
-	//carousel.size(first + items.length);
+	if(state == 'init'){
+		console.log("init state");
+		carousel.size(data["count"]);
+	}
 };
 
 /**

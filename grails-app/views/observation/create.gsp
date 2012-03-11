@@ -42,7 +42,7 @@
 	base="${grailsApplication.config.grails.serverURL+'/js/'}"></g:javascript>
 </head>
 <body>
-	<div class="container_16 big_wrapper" style="border:0; background-color:#ffffff; padding:0;">
+	<div class="container_16 big_wrapper">
             
             <div class="grid_16">
         	<h1>
@@ -64,7 +64,7 @@
             </div>
 
             <form id="upload_resource" enctype="multipart/form-data"
-                    style="position: relative; float: left; z-index: 2; left: 20px; top: 300px;">
+                    style="position: relative; float: left; z-index: 2; left: 20px; top: 360px;">
                     <!-- TODO multiple attribute is HTML5. need to chk if this gracefully falls back to default in non compatible browsers -->
                     <input type="button" class="red" id="upload_button"
                             value="Add photo">
@@ -81,9 +81,9 @@
 	        method="POST">
 
             <div class="container_16 super-section" style="clear:both;">    
-                <div class="grid_10 section" style="position:relative;overflow:visible;">
+                <div class="grid_16 section bold_section" style="position:relative;overflow:visible;">
                     <h3>What did you observe?</h3>
-                        <div class="row" style="height: 40px;">
+                        <div class="row">
                             <label for="group"><g:message
                                             code="observation.group.label" default="Group" />
                             </label> <!--select name="group_id" class="ui-widget-content ui-corner-all">
@@ -97,8 +97,8 @@
                                             </g:if>
                                     </g:each>
                             </select-->
-                            <div id="groups_div" style="position:absolute;left: 185px; width:550px;z-index:3;">
-                            <div id="selected_group" class="selected_value" style="background-color:#fbfbfb; width: 195px;padding:5px;background: url('../images/arrow-down.png') no-repeat scroll 96% 50%; cursor: default;"><img src="${resource(dir:'images/group_icons',file:'All.png', absolute:true)}"/><span class="display_value">Select group</span></div>
+                            <div id="groups_div" class="bold_dropdown" style="z-index:3;">
+                            <div id="selected_group" class="selected_value"><img src="${resource(dir:'images/group_icons',file:'All.png', absolute:true)}"/><span class="display_value">Select group</span></div>
                             <div id="group_options" style="background-color:#fbfbfb;box-shadow:0 8px 6px -6px black; border-radius: 0 5px 5px 5px;display:none;">
                                     <ul>
                                     <g:each in="${species.groups.SpeciesGroup.list()}" var="g">
@@ -114,7 +114,7 @@
                             <input id="group_id" type="hidden" name="group_id"></input>
                         </div>
 
-                        <div class="row" style="height:40px;">
+                        <div class="row">
                                 <label>Habitat</label>
                             <div id="habitat_list">
                                 <!--select class="ui-widget-content">
@@ -135,26 +135,13 @@
                                         <option>Unknown</option>
                                 </select-->	
                             
-                                <div id="habitat_div" style="position:absolute;left: 185px; width:550px;z-index:2;">
-                                    <div id="selected_habitat" class="selected_value" style="background-color:#fbfbfb; width: 195px;padding:5px;background: url('../images/arrow-down.png') no-repeat scroll 96% 50%; cursor: default;"><img src="${resource(dir:'images/group_icons',file:'All.png', absolute:true)}"/><span class="display_value">Select habitat</span></div>
-                                        <div id="habitat_options" style="background-color:#fbfbfb;box-shadow:0 8px 6px -6px black; border-radius: 0 5px 5px 5px;display:none;">
-                                            <ul>
-                                                <li class="habitat_option"><img src="${resource(dir:'images/group_icons',file:'All.png', absolute:true)}"/><span class="display_value">Forest</span></li>
-                                                <li class="habitat_option"><img src="${resource(dir:'images/group_icons',file:'All.png', absolute:true)}"/><span class="display_value">Savanna</span></li>
-                                                <li class="habitat_option"><img src="${resource(dir:'images/group_icons',file:'All.png', absolute:true)}"/><span class="display_value">Shrubland</span></li>
-                                                <li class="habitat_option"><img src="${resource(dir:'images/group_icons',file:'All.png', absolute:true)}"/><span class="display_value">Grassland</span></li>
-                                                <li class="habitat_option"><img src="${resource(dir:'images/group_icons',file:'All.png', absolute:true)}"/><span class="display_value">Wetlands</span></li>
-                                                <li class="habitat_option"><img src="${resource(dir:'images/group_icons',file:'All.png', absolute:true)}"/><span class="display_value">Rocky Areas</span></li>
-                                                <li class="habitat_option"><img src="${resource(dir:'images/group_icons',file:'All.png', absolute:true)}"/><span class="display_value">Caves and Subterranean Habitats</span></li>
-                                                <li class="habitat_option"><img src="${resource(dir:'images/group_icons',file:'All.png', absolute:true)}"/><span class="display_value">Desert</span></li>
-                                                <li class="habitat_option"><img src="${resource(dir:'images/group_icons',file:'All.png', absolute:true)}"/><span class="display_value">Marine</span></li>
-                                                <li class="habitat_option"><img src="${resource(dir:'images/group_icons',file:'All.png', absolute:true)}"/><span class="display_value">Artificial - Terrestrial</span></li>
-                                                <li class="habitat_option"><img src="${resource(dir:'images/group_icons',file:'All.png', absolute:true)}"/><span class="display_value">Artificial - Aquatic</span></li>
-                                                <li class="habitat_option"><img src="${resource(dir:'images/group_icons',file:'All.png', absolute:true)}"/><span class="display_value">Introduced Vegetation</span></li>
-                                                <li class="habitat_option"><img src="${resource(dir:'images/group_icons',file:'All.png', absolute:true)}"/><span class="display_value">Other</span></li>
-                                                <li class="habitat_option"><img src="${resource(dir:'images/group_icons',file:'All.png', absolute:true)}"/><span class="display_value">Unknown</span></li>
-
-                                            </ul>
+                                <div id="habitat_div" class="bold_dropdown" style="z-index:2;">
+                                    <div id="selected_habitat" class="selected_value"><img src="${resource(dir:'images/group_icons',file:'All.png', absolute:true)}"/><span class="display_value">Select habitat</span></div>
+                                        <div id="habitat_options" style="background-color:#fbfbfb;box-shadow:0 8px 6px -6px black; border-radius: 0 5px 5px 5px;display:none;">                                       <ul>
+                                            	<g:each in="${species.Habitat.list()}" var="h">
+                                            		<li class="habitat_option"><img src="${resource(dir:'images/group_icons',file:'All.png', absolute:true)}"/><span class="display_value">${h.name}</span></li>
+                                    			</g:each>
+                                        	</ul>
                                         </div>
                                     </div>
                                 </div>	
@@ -207,7 +194,7 @@
                                                         <!--label class="name grid_2">Title </label><input
                                                                 name="title.${i}" type="text" size='18'
                                                                 class='value ui-corner-all' value='${r.description}' /><br /-->
-                                                        <!--label class="name grid_2">License </label--> <select
+                                                        <!--label class="name grid_2">License </label--> <!--select
                                                                 name="license.${i}" class="value ui-corner-all">
                                                                 <g:each in="${species.License.list()}" var="l">
                                                                         <option value="${l.name.value()}"
@@ -215,7 +202,20 @@
                                                                                 ${l?.name.value()}
                                                                         </option>
                                                                 </g:each>
-                                                        </select> <br />
+                                                        </select> <br /-->
+                                                           <div id="license_div" style="z-index:2;">
+                                                                    <div id="selected_license" class="selected_value"><img src="${resource(dir:'images/group_icons',file:'All.png', absolute:true)}"/><span class="display_value">Copyright</span></div>
+                                                                        <div id="license_options" style="background-color:#fbfbfb;box-shadow:0 8px 6px -6px black; border-radius: 0 5px 5px 5px;display:none;">                                       <ul>
+                                                                                <g:each in="${species.License.list()}" var="l">
+                                                                                        <li class="license_option"><img src="${resource(dir:'images/group_icons',file:'All.png', absolute:true)}"/><span class="display_value">${l?.name.value()}</span></li>
+                                                                                        </g:each>
+                                                                                </ul>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>	
+								<input id="license" type="hidden" name="license"></input>
+                                                            </div>
+
 
                                                 </div> <a href="#" class="resourceRemove">Remove</a></li>
                                         <g:set var="i" value="${i+1}" />
@@ -250,7 +250,19 @@
                                     name="place_name"></input>
                     </div>
                     <div class="row">
-                            <label>Reverse geocoded name</label>
+                            <label>Accuracy</label> <input type="radio"
+                                    name="location_accuracy" value="Accurate">Accurate <input
+                                    type="radio" name="location_accuracy" value="Approximate"
+                                    checked>Approximate<br />
+                    </div>
+
+                    <div class="row" style="margin-bottom:20px;">
+                            <label>Hide precise location?</label> <input type="checkbox"
+                                    name="geo_privacy" value="geo_privacy" />Hide<br />
+                    </div>
+                    <hr>
+                    <div class="row" style="margin-top:20px;">
+                            <label>Geocode name</label>
                             <div class="location_picker_value" id="reverse_geocoded_name"></div>
                             <input id="reverse_geocoded_name_field" type="hidden"
                                     name="reverse_geocoded_name"></input>
@@ -265,18 +277,7 @@
                             <div class="location_picker_value" id="longitude"></div>
                             <input id="longitude_field" type="hidden" name="longitude"></input>
                     </div>
-                    <div class="row">
-                            <label>Accuracy</label> <input type="radio"
-                                    name="location_accuracy" value="Accurate">Accurate <input
-                                    type="radio" name="location_accuracy" value="Approximate"
-                                    checked>Approximate<br />
-                    </div>
-
-                    <div class="row">
-                            <label>Hide precise location?</label> <input type="checkbox"
-                                    name="geo_privacy" value="geo_privacy" />Hide<br />
-                    </div>
-
+              
                 </div>
                 <div class="grid_8 section" style="margin:30px 10px 10px; background-color:#f7f7f7; border-radius:5px;">
                    
@@ -290,7 +291,7 @@
             </div>    
             <div class="container_16 super-section">    
                 <div class="grid_8 section" style="clear:both">
-                    <h3>Describe your observation</h3>
+                    <h3>Describe your observation!</h3>
                     <!--label for="notes"><g:message code="observation.notes.label" default="Notes" /></label-->
                     <label style="text-align:left;padding-left:10px;width:auto;">Notes</label> (Max: 400 characters)<br/>
                     <div class="section-item">
@@ -319,23 +320,37 @@
 
 		<!--====== Template ======-->
 		<script id="metadataTmpl" type="text/x-jquery-tmpl">
-	<li class="addedResource" style="width:220px; display:inline-block; margin:2px;position:relative;padding:2px;">
-		<div class='figure' style='max-height: 220px; max-width: 220px;'>
+	<li class="addedResource" style="width:220px; display:inline-block; margin:2px;position:relative;padding:2px;background-color:#ffffff;">
+		<div class='figure' style='max-height: 165px; max-width: 220px; overflow:hidden;'>
 			<span> 
 				<img style="width:220px;" src='{{=thumbnail}}' class='geotagged_image' exif='true'/> 
 			</span>
 		</div>
 				
-		<div class='metadata prop'>
+		<div class='metadata prop' style="position:relative; top:15px;">
 			<input name="file_{{=i}}" type="hidden" value='{{=file}}'/>
 			<!--label class="name grid_2">Title </label><input name="title_{{=i}}" type="text" size='18' class='value ui-corner-all' value='{{=title}}'/><br/-->
 			
 			<!--label class="name grid_2">License </label-->
-			<select name="license_{{=i}}" class="value ui-corner-all" >
+			<!--select name="license_{{=i}}" class="value ui-corner-all" >
 				<g:each in="${species.License.list()}" var="l">
 					<option value="${l.name.value()}" ${(l.name.value().equals(LicenseType.CC_BY.value()))?'selected':''}>${l?.name.value()}</option>
 				</g:each>							
-			</select><br/>
+			</select><br/-->
+                            <div id="license_div_{{=i}}" style="z-index:2;cursor:pointer;">
+                                    <div id="selected_license_{{=i}}" onclick="$(this).next().show();"><img src="${resource(dir:'images/license',file:'cc_by.png', absolute:true)}"/></div>
+                                        <div id="license_options_{{=i}}" style="background-color:#fbfbfb;box-shadow:0 8px 6px -6px black; border-radius: 0 5px 5px 5px;display:none;position:absolute;z-index:7;width:160px;border-width:0 1px 1px 1px;">                                       <ul>
+                                            	<g:each in="${species.License.list()}" var="l">
+
+                                            		<li class="license_option" onclick="$('#license_{{=i}}').val($(this).text());$('#selected_license_{{=i}}').html($(this).html());$('#license_options_{{=i}}').hide();"><img src="${resource(dir:'images/license',file:l?.name.getIconFilename()+'.png', absolute:true)}"/><!--span class="display_value">${l?.name.value()}</span--></li>
+                                    			</g:each>
+                                        	</ul>
+                                        </div>
+                                    </div>
+                                </div>	
+								<input id="license_{{=i}}" type="hidden" name="license_{{=i}}"></input>
+                            </div>
+
 
 		</div>
                 <br/>
@@ -466,7 +481,7 @@
                 $("#habitat_options").hide();
                 $("#selected_habitat").css({'background-color':'#e5e5e5', 'border-bottom-color':'#aeaeae'});
         });
-
+        
 
 	});
 
