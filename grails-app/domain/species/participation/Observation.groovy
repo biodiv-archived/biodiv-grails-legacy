@@ -17,6 +17,8 @@ class Observation implements Taggable{
 	 */
 	def dataSource
 	
+	def grailsApplication;
+	
 	public enum OccurrenceStatus {
 		ABSENT ("Aabsent"),	//http://rs.gbif.org/terms/1.0/occurrenceStatus#absent
 		CASUAL ("Casual"),	// http://rs.gbif.org/terms/1.0/occurrenceStatus#casual
@@ -72,12 +74,18 @@ class Observation implements Taggable{
 	 * TODO: return resources in rating order and choose first
 	 * @return
 	 */
-	Resource mainImage() {		
+	Resource mainImage() {
+		def reprImage;		
 		Iterator iterator = resource?.iterator();
 		if(iterator.hasNext()) {
-			return iterator.next();
+			reprImage = iterator.next();
 		}
-		return null;
+		
+		if(reprImage && (new File(grailsApplication.config.speciesPortal.resources.rootDir+reprImage.fileName.trim())).exists()) {
+			return reprImage;
+		} else {
+			return null;			
+		}
 	}
 
 	/**
@@ -133,9 +141,12 @@ class Observation implements Taggable{
 	def getRecommendationVotes(int limit, long offset) {
 		if(limit <= 0) limit = 3;
 	
+		println limit;
+		println offset;
+		
 		def sql =  Sql.newInstance(dataSource);
 		
-		 def recoVoteCount = sql.rows("select recoVote.recommendation_id as recoId, count(*) as votecount from recommendation_vote as recoVote where recoVote.observation_id = :obvId group by recoVote.recommendation_id order by votecount desc", [obvId:this.id, max:limit, offset:offset])
+		 def recoVoteCount = sql.rows("select recoVote.recommendation_id as recoId, count(*) as votecount from recommendation_vote as recoVote where recoVote.observation_id = :obvId group by recoVote.recommendation_id order by votecount desc limit :max offset :offset", [obvId:this.id, max:limit, offset:offset])
 		 	
 //		def recoVoteCount = RecommendationVote.executeQuery("select recoVote.recommendation.id as recoId, count(*) as votecount from RecommendationVote as recoVote where recoVote.observation.id = :obvId group by recoVote.recommendation", [obvId:this.id]);
 		
@@ -171,6 +182,6 @@ class Observation implements Taggable{
 			map.put("noOfVotes", recoVote[1]);
 			result.add(map);
 		}
-		return result;
+		return ['recoVotes':result, 'totalVotes':this.recommendationVote.size()];
 	}
 }

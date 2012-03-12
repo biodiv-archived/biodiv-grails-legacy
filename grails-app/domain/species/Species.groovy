@@ -19,7 +19,7 @@ class Species {
 	Date updatedOn;
 	Date createdOn = new Date();
 	
-	def grailsApplication; 
+	def grailsApplication;
 	
 	private static final log = LogFactory.getLog(this);
 	

@@ -42,14 +42,26 @@ class GroupHandlerService {
 			String parentGroupName = row.get("parent group");
 
 			int taxonRank = XMLConverter.getTaxonRank(rank);
-			TaxonomyDefinition taxonConcept = TaxonomyDefinition.findByCanonicalFormAndRank(canonicalName, taxonRank);
-			SpeciesGroup parentGroup = SpeciesGroup.findByName(parentGroupName);
-			SpeciesGroupMapping speciesGroupMapping = new SpeciesGroupMapping(taxonName:canonicalName, rank:taxonRank, taxonConcept:taxonConcept);
-			SpeciesGroup group = addGroup(name, parentGroup, speciesGroupMapping);
+			addGroup(name, parentGroupName, canonicalName, taxonRank);
 		}
 		updateGroups();
 	}
 
+	/**
+	 * 
+	 * @param name
+	 * @param parentGroupName
+	 * @param taxonName
+	 * @param taxonRank
+	 * @return
+	 */
+	SpeciesGroup addGroup(String name, String parentGroupName, String taxonName, int taxonRank) {
+		SpeciesGroup parentGroup = SpeciesGroup.findByName(parentGroupName);
+		TaxonomyDefinition taxonConcept = TaxonomyDefinition.findByCanonicalFormAndRank(taxonName, taxonRank);
+		SpeciesGroupMapping speciesGroupMapping = new SpeciesGroupMapping(taxonName:taxonName, rank:taxonRank, taxonConcept:taxonConcept);
+		return addGroup(name, parentGroup, speciesGroupMapping);
+	}
+	
 	/**
 	 * Adds a group with given name and associates given mappings
 	 * @param name

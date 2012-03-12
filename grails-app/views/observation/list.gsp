@@ -8,6 +8,12 @@
 	value="${message(code: 'observation.label', default: 'Observations')}" />
 <title><g:message code="default.list.label" args="[entityName]" />
 </title>
+<link rel="stylesheet"
+	href="${resource(dir:'css',file:'tagit/tagit-custom.css', absolute:true)}"
+	type="text/css" media="all" />
+<g:javascript src="tagit.js"
+	base="${grailsApplication.config.grails.serverURL+'/js/'}"></g:javascript>
+
 </head>
 <body>
 	<div class="container_16">
@@ -15,42 +21,48 @@
 			<h1>
 				<g:message code="default.list.label" args="[entityName]" />
 			</h1>
-			<g:set var="carouselId" value="a" />
-			<!-- obv:showRelatedStory model="['observationId': null, 'controller':'observation', 'action':'getRelatedObservation', 'filterProperty': 'speciesGroup' , 'filterPropertyValue': 830 ,'id':carouselId]" /-->
-			<obv:showGroupFilter model="['observationInstance':observationInstance]" />
+			
 			<g:if test="${flash.message}">
 				<div class="message">
 					${flash.message}
 				</div>
 			</g:if>
+			
+			<g:set var="carouselId" value="a" />
+			<!-- obv:showRelatedStory model="['observationId': null, 'controller':'observation', 'action':'getRelatedObservation', 'filterProperty': 'speciesGroup' , 'filterPropertyValue': 830 ,'id':carouselId]" /-->
+			
+			<obv:showGroupFilter
+				model="['observationInstance':observationInstance]" />
+				
+			
+			<div style="clear:both"></div>
 			<div class="list">
-					<div class="observations thumbwrap grid_12">
-						<div class="observation">
-							<g:each in="${observationInstanceList}" status="i"
-								var="observationInstance">
-								<obv:showSnippet model="['observationInstance':observationInstance]"></obv:showSnippet>
-							</g:each>
-						</div>
+				<div class="observations thumbwrap">
+					<div class="observation grid_12">
+						<g:each in="${observationInstanceList}" status="i"
+							var="observationInstance">
+							<obv:showSnippet
+								model="['observationInstance':observationInstance]"></obv:showSnippet>
+						</g:each>
+					</div>
+					
+					<div>
+						<h5>
+							<g:message code="default.tagcloud.label" args="['Tag Cloud']" />
+						</h5>
+						<tc:tagCloud controller="observation" action="tagged" bean="${Observation}" style 
+						color="${[start: '#660', end: '#99f']}"/>
 					</div>
 				</div>
-			<div class="paginateButtons"  style="clear:both">
-				<g:paginate total="${observationInstanceTotal}" max="2"/>
+			</div>
+			
+			<div class="paginateButtons" style="clear: both">
+				<g:paginate total="${observationInstanceTotal}" max="2" />
 			</div>
 		</div>
 	</div>
 	<g:javascript>	
 	$(document).ready(function(){
-		$( "#speciesGroupFilter" ).buttonset();
-		
-		$('#speciesGroupFilter label[value$="${params.sGroup}"]').each (function() {
-				$(this).attr('aria-pressed', 'true').addClass('ui-state-hover').addClass('ui-state-active');
-		});
-		$( "#habitatFilter" ).buttonset();
-		
-		$('#habitatFilter label[value$="${params.habitat}"]').each (function() {
-				$(this).attr('aria-pressed', 'true').addClass('ui-state-hover').addClass('ui-state-active');
-		});
-		
 		
 		function getSelectedGroup() {
 			var grp = ''; 
@@ -140,6 +152,12 @@
 		});
 		
 		$("ul[name='tags']").tagit({select:true,  tagSource: "${g.createLink(action: 'tags')}"});
+         
+         $("li.tagit-choice").click(function(){
+         	var tg = $(this).contents().first().text();
+         	window.location.href = "${g.createLink(action: 'tagged')}/" + tg ;
+         });
+         
 	});
 	</g:javascript>
 </body>

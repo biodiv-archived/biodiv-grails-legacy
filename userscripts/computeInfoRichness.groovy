@@ -1,4 +1,5 @@
 import speciespage.SpeciesService;
 
-def speciesService = ctx.getBean("speciesService");
-speciesService.computeInfoRichness();
+def speciesservice = ctx.getbean("speciesService");
+speciesservice.computeinforichness();
+

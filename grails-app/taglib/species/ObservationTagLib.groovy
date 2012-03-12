@@ -48,4 +48,16 @@ class ObservationTagLib {
 			out << render(template:"/common/observation/showObservationLocationTemplate", model:attrs.model);
 		}
 	}
+	
+	def showTags = {attrs, body->
+		if(attrs.model.observationInstance) {
+			out << render(template:"/common/observation/showObservationTagsTemplate", model:attrs.model);
+		}
+	}
+
+	def showObvStats = {attrs, body->
+		if(attrs.model.observationInstance) {
+			out << render(template:"/common/observation/showObservationStatsTemplate", model:attrs.model);
+		}
+	}
 }

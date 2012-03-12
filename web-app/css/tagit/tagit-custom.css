@@ -143,6 +143,7 @@ display:none;
     color: #555;
     background-color: transparent;
     border: 0;
+    clear:both;
 }
 
 .view_tags ul.tagit li.tagit-choice {

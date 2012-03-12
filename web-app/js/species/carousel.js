@@ -23,7 +23,6 @@ var itemAddCallback = function(carousel, first, last, data, state) {
 		}
 	}
 	if(state == 'init'){
-		console.log("init state");
 		carousel.size(data["count"]);
 	}
 };

@@ -77,17 +77,16 @@ log4j = {
 			'org.codehaus.groovy.grails.plugins', // plugins
 			'org.codehaus.groovy.grails.orm.hibernate', // hibernate integration	
 			'org.hibernate',
-			'net.sf.ehcache.hibernate'
-			
+			'net.sf.ehcache.hibernate',
+			'org.springframework.security',
+			'org.codehaus.groovy.grails.web.servlet',  //  controllers
+			'grails.plugin',
+			 'org.springframework.security.web'
 
 	warn   'org.mortbay.log'
 
 	debug	'species',
-			'speciespage',
-			'org.springframework.security',
-			'org.codehaus.groovy.grails.web.servlet',  //  controllers
-			'grails.plugin',
-			 'org.springframework.security.web',
+			'speciespage',			
 			'grails.app'
 
 }

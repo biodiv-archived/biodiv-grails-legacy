@@ -66,24 +66,6 @@ $(document).ready(function(){
 		return false;
 	});
 	
-	//Ref: http://stackoverflow.com/questions/1421584/how-can-i-simulate-a-click-to-an-anchor-tag/1421968#1421968
-	function fakeClick(event, anchorObj) {
-	  if (anchorObj.click) {
-	    anchorObj.click()
-	  } else if(document.createEvent) {
-	    if(event.target !== anchorObj) {
-	      var evt = document.createEvent("MouseEvents"); 
-	      evt.initMouseEvent("click", true, true, window, 
-	          0, 0, 0, 0, 0, false, false, false, false, 0, null); 
-	      var allowDefault = anchorObj.dispatchEvent(evt);
-	      // you can check allowDefault for false to see if
-	      // any handler called evt.preventDefault().
-	      // Firefox will *not* redirect to anchorObj.href
-	      // for you. However every other browser will.
-	    }
-	  }
-	}
-	
 	$('li.poor_species_content').hover(function(){
 		$(this).children('.poor_species_content').slideDown(200);
 	}, function(){
@@ -105,13 +87,13 @@ $(document).ready(function(){
 		<br />
 
 		<div class="gallerytoolbar grid_16" >
-			<div id="speciesGroupFilter" style="float: left;">
+			<div id="speciesGroupFilter" class="filterBar" style="float: left;">
 				<center>
 					<!-- g:paginateOnSpeciesGroup/-->
 					<%def othersIds = "" %>
 					<g:each in="${SpeciesGroup.list() }" var="sGroup" status="i">
 						<g:if
-							test="${sGroup.name.equals('Animals') || sGroup.name.equals('Arachnids') || sGroup.name.equals('Archaea') || sGroup.name.equals('Bacteria') || sGroup.name.equals('Chromista') || sGroup.name.equals('Viruses') || sGroup.name.equals('Kingdom Protozoa') || sGroup.name.equals('Mullusks') || sGroup.name.equals('Others')}">
+							test="${sGroup.name.equals('Mullusks') || sGroup.name.equals('Others')}">
 							<%othersIds += sGroup.id+',' %>
 						</g:if>
 						<g:else>

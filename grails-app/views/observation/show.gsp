@@ -66,7 +66,7 @@
 								</g:if>
 								<g:else>
 									<img class="galleryImage"
-										src="${createLinkTo(dir: 'images/', file:"no-image.jpg", base:grailsApplication.config.speciesPortal.resources.serverURL)}"
+										src="${createLinkTo(file:"no-image.jpg", base:grailsApplication.config.speciesPortal.resources.serverURL)}"
 										title="You can contribute!!!" />
 
 								</g:else>
@@ -82,7 +82,7 @@
 				<div class="grid_10 comments">
 					<fb:like send="true" width="450" show_faces="true"></fb:like>
 					<div class="fb-comments grid_10"
-						data-href="${createLink(controller:'observation', action:'show', id:observationInstance.id)}"
+						data-href="${createLink(controller:'observation', action:'show', id:observationInstance.id, absolute:true)}"
 						data-num-posts="10"></div>
 				</div>
 			</div>
@@ -97,7 +97,7 @@
 					<div>
 						<div><!-- g:message code="recommendations.no.message"
 								,  args="[result.size()]" /-->
-							<ul id="recoSummary">
+							<ul id="recoSummary" class="pollBars">
 								
 							</ul>
 							<div id="seeMoreMessage" class="message"></div>
@@ -131,6 +131,7 @@
 				<!-- obv:showRating model="['observationInstance':observationInstance]" /-->
 				<!--  static species content -->
 				<obv:showRelatedStory model="['observationInstance':observationInstance, 'observationId': observationInstance.id, 'controller':'observation', 'action':'getRelatedObservation', 'filterProperty': 'speciesName', 'id':'a']" />
+				<!-- obv:showObvStats  model="['observationInstance':observationInstance]"/-->
 			</div>
 
 
@@ -195,20 +196,27 @@
          	window.location.href = "${g.createLink(action: 'tagged')}/" + tg ;
          });
          
+         var max = 3, offset = 0;
          $("#seeMore").click(function() {
          	$.ajax({
 				url: "${createLink(controller:'observation', action:'getRecommendationVotes', id:observationInstance.id) }",
 				method: "GET",
-				dataType: "html",
-				data: {limit:${params.limit?params.limit+3:3} , offset:${params.limit?:0}},	
-				success: function(html) {
-					$("#recoSummary").append(html);		
+				dataType: "json",
+				data: {max:max , offset:offset},	
+				success: function(responseJSON) {
+					offset = offset += responseJSON.max;
+					$("#recoSummary").append(responseJSON.html);		
 				}, statusCode: {
 	    			401: function() {
 	    				show_login_dialog();
 	    			}	    				    			
 	    		}, error: function(xhr, status, error) {
-					$("#seeMoreMessage").html(xhr.responseText ? xhr.responseText : "Error").show();;
+	    			var msg = $.parseJSON(xhr.responseText);
+	    			if(msg.info) {
+						$("#seeMoreMessage").html(msg.info).show().removeClass('error').addClass('message');
+					} else {
+						$("#seeMoreMessage").html(msg.error ? msg.error : "Error").show().removeClass('message').addClass('error');
+					}
 			   	}
 			});
          });

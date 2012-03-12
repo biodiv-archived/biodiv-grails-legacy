@@ -427,7 +427,7 @@ clear:both;
 	float: right;
 }
 
-.thumbwrap .icons .icon {
+.thumbwrap > .icon {
 	width: 20px;
 	height: 20px;
 	display: inline;
@@ -725,7 +725,8 @@ img {
 
 .observation_story {
 	margin: 0;
-        padding: 15px 15px 5px;        
+    padding: 15px 15px 5px;
+    clear:both;        
 }
 
 .observation_location {
@@ -1073,27 +1074,27 @@ td input.text:focus {
 	left: 0;
 }
 
-#speciesGroupFilter .ui-button {
+.filterBar .ui-button {
 	background: none;
 	border: 0;
 	opacity: 0.4;
 }
 
-#speciesGroupFilter .ui-button:hover {
+.filterBar .ui-button:hover {
 	opacity: 0.9;
 }
 
-#speciesGroupFilter .ui-button-text {
+.filterBar .ui-button-text {
 	padding: 3px;
 }
 
-#speciesGroupFilter .ui-state-active {
+.filterBar .ui-state-active {
 	opacity: 1;
 	border-bottom: 3px solid #aeaeae;
 	border-radius: 0;
 }
 
-#speciesGroupFilter {
+.filterBar {
 	background-color: #F7F7F7;
     border-radius: 5px 5px 5px 5px;
     float: left;

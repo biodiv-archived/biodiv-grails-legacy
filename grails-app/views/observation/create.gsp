@@ -1,4 +1,5 @@
-<%@page import="org.springframework.web.context.request.RequestContextHolder"%>
+<%@page
+	import="org.springframework.web.context.request.RequestContextHolder"%>
 <%@page import="species.License"%>
 <%@page import="species.License.LicenseType"%>
 <%@ page import="species.participation.Observation"%>
@@ -14,7 +15,8 @@
 <g:set var="entityName"
 	value="${message(code: 'observation.label', default: 'Observation')}" />
 <title><g:message code="default.create.label"
-		args="[entityName]" /></title>
+		args="[entityName]" />
+</title>
 
 
 <link rel="stylesheet"
@@ -25,7 +27,7 @@
 	type="text/css" media="all" />
 <link rel="stylesheet"
 	href="${resource(dir:'css',file:'tagit/tagit-custom.css', absolute:true)}"
-	type="text/css" media="all" />	
+	type="text/css" media="all" />
 
 <script src="http://maps.google.com/maps/api/js?sensor=true"></script>
 <g:javascript src="jquery/jquery.exif.js"
@@ -37,22 +39,22 @@
 
 <g:javascript src="jsrender.js"
 	base="${grailsApplication.config.grails.serverURL+'/js/'}"></g:javascript>
-	
+
 <g:javascript src="tagit.js"
 	base="${grailsApplication.config.grails.serverURL+'/js/'}"></g:javascript>
 </head>
 <body>
 	<div class="container_16 big_wrapper">
-            
-            <div class="grid_16">
-        	<h1>
-		    <!--g:message code="default.create.label" args="[entityName]" /-->
-		    Add an observation
-		</h1>
 
-                <g:if test="${flash.message}">
-                        <div class="message">
-                                ${flash.message}
+		<div class="grid_16">
+			<h1>
+				<!--g:message code="default.create.label" args="[entityName]" /-->
+				Add an observation
+			</h1>
+
+			<g:if test="${flash.message}">
+				<div class="message">
+					${flash.message}
                         </div>
                 </g:if>
 
@@ -98,13 +100,19 @@
                                     </g:each>
                             </select-->
                             <div id="groups_div" class="bold_dropdown" style="z-index:3;">
-                            <div id="selected_group" class="selected_value"><img src="${resource(dir:'images/group_icons',file:'All.png', absolute:true)}"/><span class="display_value">Select group</span></div>
+                            <div id="selected_group" class="selected_value">
+								<img
+									src="${createLinkTo(dir: 'images', file: SpeciesGroup.findByName('All').icon()?.fileName?.trim(), absolute:true)}" /><span class="display_value">Select group</span></div>
                             <div id="group_options" style="background-color:#fbfbfb;box-shadow:0 8px 6px -6px black; border-radius: 0 5px 5px 5px;display:none;">
                                     <ul>
                                     <g:each in="${species.groups.SpeciesGroup.list()}" var="g">
                                             <g:if
                                                     test="${!g.name.equals(grailsApplication.config.speciesPortal.group.ALL)}">
-                                                    <li class="group_option" style="display:inline-block;padding:5px;" value="${g.id}"><div style="width:160px;"><img src="${createLinkTo(dir: 'images', file: g.icon()?.fileName?.trim(), absolute:true)}"/><span class="display_value">${g.name}</span></div>
+                                                    <li class="group_option" style="display:inline-block;padding:5px;" value="${g.id}">
+                                                   		<div style="width:160px;">
+                                                    		<img src="${createLinkTo(dir: 'images', file: g.icon()?.fileName?.trim(), absolute:true)}"/>
+                                                    		<span class="display_value">${g.name}</span>
+                                                    	</div>
                                                     </li>
                                             </g:if>
                                     </g:each>

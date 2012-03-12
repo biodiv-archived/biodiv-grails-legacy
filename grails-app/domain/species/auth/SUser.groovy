@@ -1,8 +1,13 @@
 package species.auth
 
+import species.Resource;
+import species.Resource.ResourceType;
+
 class SUser {
 
 	transient springSecurityService
+	
+	def grailsApplication;
 	
 	String username
 	String password
@@ -46,5 +51,14 @@ class SUser {
 
 	protected void encodePassword() {
 		password = springSecurityService.encodePassword(password)
+	}
+	
+	def icon() {
+		String name = this.username?.trim()?.replaceAll(/ /, '_')?.plus('.png');
+		boolean iconPresent = (new File(grailsApplication.config.speciesPortal.resources.rootDir+"/users/${name?.trim()}")).exists()
+		if(!iconPresent) {
+			name = "user_small.png" 
+		}
+		return new Resource(fileName:"users/${name}", type:ResourceType.ICON, title:username);
 	}
 }

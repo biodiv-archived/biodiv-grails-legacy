@@ -362,7 +362,7 @@ class ObservationController {
 	 */
 	def getRecommendationVotes = {
 		log.debug params;
-		params.max = Math.min(params.max ? params.int('max') : 10, 100)
+		params.max = Math.min(params.max ? params.int('max') : 1, 10)
 		params.offset = params.offset ? params.long('offset'): 0
 		
 		def observationInstance = Observation.get(params.id)
@@ -371,24 +371,26 @@ class ObservationController {
 				def results = observationInstance.getRecommendationVotes(params.max, params.offset);
 				log.debug "======="
 				log.debug results;
-				if(results.size() > 0) {
-					render (template:"/common/observation/showObservationRecosTemplate", model:['observationInstance':observationInstance, 'result':results]);
+				if(results?.recoVotes.size() > 0) {
+					def html =  g.render(template:"/common/observation/showObservationRecosTemplate", model:['observationInstance':observationInstance, 'result':results.recoVotes, 'totalVotes':results.totalVotes]);
+					def result = ['html':html, 'max':params.max]
+					render result as JSON;
 				} else {
 					response.setStatus(500)
-					def message = "${message(code: 'recommendations.zero.message', default:'No recommendations made. Please suggest')}"
-					render message
+					def message = ['info' : "${message(code: 'recommendations.zero.message', default:'No recommendations made. Please suggest')}"];
+					render message as JSON
 				}
 			} catch(e){
 				e.printStackTrace();
 				response.setStatus(500)
-				def message = "${message(code: 'error', default:'Error while processing the request.')}"
-				render message
+				def message = ['error' : "${message(code: 'error', default:'Error while processing the request.')}"];
+				render message as JSON
 			}
 		}
 		else {
 			response.setStatus(500)
-			def message = "${message(code: 'error', default:'Error while processing the request.')}"
-			render message
+			def message = ['error':"${message(code: 'error', default:'Error while processing the request.')}"]
+			render message as JSON
 		}
 	}
 

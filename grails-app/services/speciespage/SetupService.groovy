@@ -50,7 +50,11 @@ class SetupService {
 	void uploadHabitats(){
 		log.info " uploading habitats"
 		HabitatType.toList().each { hbType ->
-			new Habitat(name:hbType.toString()).save(flush:true);
+			def habitat = new Habitat(name:hbType.toString());
+			println hbType;
+			if(!habitat.save(flush:true, failOnError: true)) {
+				habitat.errors.each { log.error it }
+			}
 		}
 	}
 	

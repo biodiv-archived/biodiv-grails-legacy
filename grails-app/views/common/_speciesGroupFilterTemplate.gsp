@@ -5,11 +5,21 @@
 <g:javascript>
 
 $(document).ready(function(){
-
+	$( "#speciesGroupFilter" ).buttonset();
+		
+	$('#speciesGroupFilter label[value$="${params.sGroup}"]').each (function() {
+			$(this).attr('aria-pressed', 'true').addClass('ui-state-hover').addClass('ui-state-active');
+	});
 	
+	$( "#habitatFilter" ).buttonset();
+	
+	$('#habitatFilter label[value$="${params.habitat}"]').each (function() {
+			$(this).attr('aria-pressed', 'true').addClass('ui-state-hover').addClass('ui-state-active');
+	});
+		
 });
 </g:javascript>
-<div id="speciesGroupFilter" style="clear: both">
+<div id="speciesGroupFilter" class="filterBar"  style="clear: both">
 	<center>
 		<!-- g:paginateOnSpeciesGroup/-->
 		<%def othersIds = "" %>
@@ -38,7 +48,7 @@ $(document).ready(function(){
 	</center>
 
 </div>
-<div id="habitatFilter" style="clear: both">
+<div id="habitatFilter" class="filterBar"  style="clear: both">
 		<!-- g:paginateOnhabitat/-->
 		<g:each in="${species.Habitat.list()}" var="habitat" status="i">
 				<input type="radio" name="habitatFilter"
