@@ -164,6 +164,7 @@ div.errors {
 	color: #cc0000;
 	margin: 10px 0 5px 0;
 	padding: 5px 0 5px 0;
+        word-wrap: break-word;         
 }
 
 div.errors ul {

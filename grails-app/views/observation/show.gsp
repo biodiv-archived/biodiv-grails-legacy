@@ -28,6 +28,15 @@
 <g:javascript src="tagit.js"
 	base="${grailsApplication.config.grails.serverURL+'/js/'}"></g:javascript>
 
+<style>
+#nameContainer {
+width: 80%;
+float:left;
+}
+#name {
+width:90%;
+}
+</style>
 </head>
 <body>
 	<div class="container_16 big_wrapper">
@@ -101,7 +110,7 @@
 								
 							</ul>
 							<div id="seeMoreMessage" class="message"></div>
-							<div id="seeMore">see more</div>
+							<div id="seeMore">more</div>
 						</div>
 						<div>
 							<g:hasErrors bean="${recommendationInstance}">
