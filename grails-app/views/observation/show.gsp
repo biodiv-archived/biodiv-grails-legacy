@@ -47,7 +47,7 @@
 				
 				<div class="grid_10">
 				
-					
+
 							<div id="gallery1">
 								<g:if test="${observationInstance.resource}">
 									<g:each in="${observationInstance.resource}" var="r">

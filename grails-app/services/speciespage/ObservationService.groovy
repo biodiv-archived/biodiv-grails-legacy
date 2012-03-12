@@ -172,14 +172,16 @@ class ObservationService {
 		//if filter group is all
 		if(groupName == grailsApplication.config.speciesPortal.group.ALL){
 			return null
-		}else if(groupName == grailsApplication.config.speciesPortal.group.OTHERS){
-			//if group is others
-			def groupNameList = ['Animals', 'Arachnids', 'Archaea', 'Bacteria', 'Chromista', 'Viruses', 'Kingdom Protozoa', 'Mullusks', 'Others']
-			def groupIds = SpeciesGroup.executeQuery("select distinct sg.id from SpeciesGroup sg where sg.name in (:groupNameList)", [groupNameList:groupNameList])
-			return groupIds
-		}else{
-			return groupId
 		}
+		return groupId
+//		}else if(groupName == grailsApplication.config.speciesPortal.group.OTHERS){
+//			//if group is others
+//			def groupNameList = ['Animals', 'Arachnids', 'Archaea', 'Bacteria', 'Chromista', 'Viruses', 'Kingdom Protozoa', 'Mullusks', 'Others']
+//			def groupIds = SpeciesGroup.executeQuery("select distinct sg.id from SpeciesGroup sg where sg.name is null or sg.name in (:groupNameList)", [groupNameList:groupNameList])
+//			return groupIds
+//		}else{
+//			return groupId
+//		}
 	}
 	
 

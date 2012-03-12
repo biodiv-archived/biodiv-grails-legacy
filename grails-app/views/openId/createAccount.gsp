@@ -13,7 +13,7 @@ font-weight: bold;
 
 <body>
 
-<div class='container_16'>
+<div class='container_16 big_wrapper'>
 
 	<h4>No user was found with that OpenID but you can register now and associate your OpenID with that account.</h4>
 

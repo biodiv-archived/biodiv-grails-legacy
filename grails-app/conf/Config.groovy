@@ -364,7 +364,7 @@ environments {
 
 			observations {
 				rootDir = "${app.rootDir}/observations"
-				serverURL = "http://saturn.strandls.com/${appName}/observations"
+				serverURL = "http://wgp.saturn.strandls.com/${appName}/observations"
 				//serverURL = "http://localhost/${appName}/observations"
 			}
 			search.serverURL="http://saturn.strandls.com:8080/solr/species"
@@ -569,3 +569,7 @@ grails.plugins.springsecurity.rememberMe.persistentToken.domainClassName = 'spec
 grails.plugins.springsecurity.facebook.domain.classname='species.auth.FacebookUser'
 grails.plugins.springsecurity.facebook.appId='310694198984953'
 grails.plugins.springsecurity.facebook.secret='eedf76e46272190fbd26e578ae764a60'
+
+grails.taggable.tag.autoImport=true
+grails.taggable.tagLink.autoImport=true
+

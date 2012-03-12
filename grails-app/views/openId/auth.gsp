@@ -83,87 +83,87 @@ opacity:0;
 </head>
 
 <body>
+<div class="container_16 big_wrapper">
+    <div class="openid-loginbox">
 
-<div class="openid-loginbox">
+            <g:if test='${flash.message}'>
+            <div class='login_message'>${flash.message}</div>
+            </g:if>
 
-	<g:if test='${flash.message}'>
-	<div class='login_message'>${flash.message}</div>
-	</g:if>
+            <table class='openid-loginbox-inner' cellpadding="0" cellspacing="0">
+                    <tr>
+                            <td class="openid-loginbox-title">
+                                    <table>
+                                            <tr>
+                                                    <td align="left">Sign in</td>
+                                            </tr>
+                                    </table>
+                            </td>
+                    </tr>
+                    <tr>
+                            <td>
+                            <div>
+                                    Sign in with:<br/>
+                                    <div class="sign_in_external_bttn" style="background-image:url('../images/external_providers.png'); background-position:0 0; width:100px; height:33px; cursor: pointer;margin-left:6px;">
+                                        <facebookAuth:connect permissions="email,user_about_me"/>
+                                    </div>
 
-	<table class='openid-loginbox-inner' cellpadding="0" cellspacing="0">
-		<tr>
-			<td class="openid-loginbox-title">
-				<table>
-					<tr>
-						<td align="left">Sign in</td>
-					</tr>
-				</table>
-			</td>
-		</tr>
-		<tr>
-			<td>
-                        <div>
-                                Sign in with:<br/>
-                                <div class="sign_in_external_bttn" style="background-image:url('../images/external_providers.png'); background-position:0 0; width:100px; height:33px; cursor: pointer;margin-left:6px;">
-                                    <facebookAuth:connect permissions="email,user_about_me"/>
-                                </div>
+                                    <div class="sign_in_external_bttn" >
+                                    <form action='${openIdPostUrl}' method='POST' autocomplete='off' name='openIdLoginForm'>
+                                                    <input type="hidden" name="${openidIdentifier}" class="openid-identifier" value="https://www.google.com/accounts/o8/id"/>
+                                                    <input type="submit" value="" style="background-image:url('../images/external_providers.png'); background-position:0 -33px; width:100px; height:33px; cursor: pointer; background-color:#ffffff; border:0;"/>
+                                    </form>
+                                    </div>
+                                    <div class="sign_in_external_bttn" style="background-image:url('../images/external_providers.png'); background-position:0 -133px; width:100px; height:33px; cursor: pointer;" onclick="showOpenIdForm();">
+                                    </div>
+                            </div>
+                            
+                            <div id='openidLogin' style="display:none; clear:both">
+                                    <form action='${openIdPostUrl}' method='POST' autocomplete='off' name='openIdLoginForm'>
+                                    <table class="openid-loginbox-userpass">
+                                            <tr><td>manually enter your OpenID</td></tr>
+                                            <tr>
+                                                    <td style="padding:3px;"><input type="text" name="${openidIdentifier}" class="openid-identifier"/><td colspan='2' class="openid-submit" align="center" style="padding:3px;"><input type="submit" value="Log in" /></td></td>
+                                            </tr>
+                                            <g:if test='${persistentRememberMe}'>
+                                            <!--tr>
+                                                    <td><label for='remember_me'>Remember me</label></td>
+                                                    <td>
+                                                            <input type='checkbox' name='${rememberMeParameter}' id='remember_me'/>
+                                                    </td>
+                                            </tr-->
+                                            </g:if>
+                                    </table>
+                                    </form>
+                            </div>
+                            
+                            <div id='formLogin' style='clear:both'>
 
-                                <div class="sign_in_external_bttn" >
-				<form action='${openIdPostUrl}' method='POST' autocomplete='off' name='openIdLoginForm'>
-						<input type="hidden" name="${openidIdentifier}" class="openid-identifier" value="https://www.google.com/accounts/o8/id"/>
-						<input type="submit" value="" style="background-image:url('../images/external_providers.png'); background-position:0 -33px; width:100px; height:33px; cursor: pointer; background-color:#ffffff; border:0;"/>
-                                </form>
-                                </div>
-                                <div class="sign_in_external_bttn" style="background-image:url('../images/external_providers.png'); background-position:0 -133px; width:100px; height:33px; cursor: pointer;" onclick="showOpenIdForm();">
-                                </div>
-                        </div>
-                        
-			<div id='openidLogin' style="display:none; clear:both">
-				<form action='${openIdPostUrl}' method='POST' autocomplete='off' name='openIdLoginForm'>
-				<table class="openid-loginbox-userpass">
-                                        <tr><td>manually enter your OpenID</td></tr>
-					<tr>
-						<td style="padding:3px;"><input type="text" name="${openidIdentifier}" class="openid-identifier"/><td colspan='2' class="openid-submit" align="center" style="padding:3px;"><input type="submit" value="Log in" /></td></td>
-					</tr>
-					<g:if test='${persistentRememberMe}'>
-					<!--tr>
-						<td><label for='remember_me'>Remember me</label></td>
-						<td>
-							<input type='checkbox' name='${rememberMeParameter}' id='remember_me'/>
-						</td>
-					</tr-->
-					</g:if>
-				</table>
-				</form>
-			</div>
-                        
-			<div id='formLogin' style='clear:both'>
+                                    <form action='${daoPostUrl}' method='POST' autocomplete='off' name='siteLoginForm'>
+                                    <table class="openid-loginbox-userpass">
+                                            <tr><td colspan=2>Or, sign in with your user account</td></tr>
+                                            <tr>
+                                                    <td><span style="font-weight:bold;">Username</span></td>
+                                                    <td><input type="text" name='j_username' id='username' /></td>
+                                            </tr>
+                                            <tr>
+                                                    <td><span style="font-weight:bold;">Password</span></td>
+                                                    <td><input type="password" name='j_password' id='password' /></td>
+                                            </tr>
+                                            <tr>
+                                                    <td colspan='2' class="openid-submit" align="center">
+                                                            <input type="submit" value="Log in" /> <input type='checkbox' name='${rememberMeParameter}' id='remember_me'/><label for='remember_me'>Remember me</label>
+                                                    </td>
+                                            </tr>
+                                    </table>
+                                    </form>
+                            </div>
 
-				<form action='${daoPostUrl}' method='POST' autocomplete='off' name='siteLoginForm'>
-				<table class="openid-loginbox-userpass">
-                                        <tr><td colspan=2>Or, sign in with your user account</td></tr>
-					<tr>
-						<td><span style="font-weight:bold;">Username</span></td>
-						<td><input type="text" name='j_username' id='username' /></td>
-					</tr>
-					<tr>
-						<td><span style="font-weight:bold;">Password</span></td>
-						<td><input type="password" name='j_password' id='password' /></td>
-					</tr>
-					<tr>
-						<td colspan='2' class="openid-submit" align="center">
-							<input type="submit" value="Log in" /> <input type='checkbox' name='${rememberMeParameter}' id='remember_me'/><label for='remember_me'>Remember me</label>
-						</td>
-					</tr>
-				</table>
-				</form>
-			</div>
-
-			</td>
-		</tr>
-	</table>
+                            </td>
+                    </tr>
+            </table>
+    </div>
 </div>
-
 <script>
 
 (function() { document.forms['siteLoginForm'].elements['username'].focus(); })();

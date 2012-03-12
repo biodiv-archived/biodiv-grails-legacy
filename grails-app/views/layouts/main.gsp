@@ -76,6 +76,73 @@ jQuery(document).ready(function($) {
 
 <!-- script src="http://cdn.wibiya.com/Toolbars/dir_1100/Toolbar_1100354/Loader_1100354.js" type="text/javascript"></script><noscript><a href="http://www.wibiya.com/">Web Toolbar by Wibiya</a></noscript--> 
 
+<style>
+#header {
+    background-color: #F7F7F7;
+    height: 80px;
+    width: 100%;
+    z-index: 2000;
+    font-family: Verdana,Helvetica,Sans-Serif;
+    color: #5E5E5E;
+    box-shadow: 0 6px 6px -6px #5E5E5E;       
+    border-bottom:1px solid #E5E5E5;
+}
+#wg_logo {
+    border: 0 none;
+    height: 80px;
+    width: auto;
+}
+#top_nav_bar {
+    font-size: 1em;
+    font-weight: bold;
+    left: 300px;
+    position: absolute;
+    top: 0;
+    z-index: 501;
+}
+#top_nav_bar ul {
+    list-style: none outside none;
+    margin-top:14px;
+    margin-bottom:14px;
+    font-size: 1.1em;
+    padding-left: 40px;
+}
+#top_nav_bar li {
+    cursor: pointer;
+    display: inline;
+    padding: 10px 10px 3px;
+}
+#top_nav_bar li#maps_nav_link:hover{
+background-color: #fafafa;
+border-bottom:3px solid #f0575a;
+}
+
+#top_nav_bar li#checklists_nav_link:hover{
+background-color: #fafafa;
+border-bottom:3px solid #7764a2;
+}
+
+#top_nav_bar li#collaborate_nav_link:hover{
+background-color: #fafafa;
+border-bottom:3px solid #145b9b;
+}
+
+#top_nav_bar li#species_nav_link:hover{
+background-color: #fafafa;
+border-bottom:3px solid #00a4be;
+}
+
+#top_nav_bar li#themes_nav_link:hover{
+background-color: #fafafa;
+border-bottom:3px solid #45a989;
+}
+
+#top_nav_bar li#about_nav_link:hover{
+background-color: #fafafa;
+border-bottom:3px solid #003846;
+}
+
+</style>
 </head>
 <body>
 <%
@@ -102,6 +169,27 @@ request.cookies.each{println it.name+" : "+it.value}
 			alt="${message(code:'spinner.alt',default:'Loading...')}" />
 	</div>
 
+        <div id="header">
+            <!-- Logo -->
+              <div id="logo">
+                <a href="/">
+                  <img id="wg_logo" alt="western ghats" src="/sites/all/themes/wg/images/map-logo.gif">
+                </a>
+              </div>
+            <!-- Logo ends -->
+
+            <div id="top_nav_bar">
+            <ul>
+            <li onclick="location.href='/map'" title="Maps" id="maps_nav_link">Maps</li>
+            <li onclick="location.href='/browsechecklists'" title="Checklists" id="checklists_nav_link">Checklists</li>
+            <li onclick="location.href='/collaborate-wg'" title="Collaborate" id="collaborate_nav_link">Collaborate</li>
+            <li onclick="location.href='/biodiv/species/list'" title="Species" id="species_nav_link">Species</li>
+            <li onclick="location.href='/themepages/list'" title="Themes" id="themes_nav_link">Themes</li>
+            <li onclick="location.href='/about/western-ghats'" title="About" id="about_nav_link">About</li>
+            </ul>
+            </div>
+
+        </div>
         <!--div id="top_nav_bar">
             <ul>
             <li id="maps_nav_link" title="Maps" onclick="location.href='http://thewesternghats.in/map'">Maps</li>

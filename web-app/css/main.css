@@ -797,9 +797,7 @@ html.busy,html.busy * {
 }
 
 #resourceTabs {
-	border: 1px solid #c6c6c6;
-	border-radius : 5px;
-/* 	border: 0; */
+	border: 0;
 }
 
 #resourceTabs ul {
@@ -1353,4 +1351,10 @@ opacity:1;
 
 .licence_div img{
 padding:5px;
+}
+
+.related_observation {
+border-radius: 7px 7px 7px 7px;
+margin-top: 10px;
+padding: 10px;
 }
