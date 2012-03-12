@@ -3,6 +3,7 @@ package species
 class Habitat {
 	
 	public enum HabitatType {
+		ALL("All"),
 		FOREST("Forest"),
 		SAVANNA("Savanna"),
 		SHRUBLAND("Shrubland"),
@@ -29,7 +30,7 @@ class Habitat {
 		}
 		
 		static def toList() {
-			return [FOREST, SAVANNA, SHRUBLAND, GRASSLAND, WETLANDS, ROCKY_AREAS, \
+			return [ALL, FOREST, SAVANNA, SHRUBLAND, GRASSLAND, WETLANDS, ROCKY_AREAS, \
 				CAVES_AND_SUBTERRANEAN_HABITATS, DESERT, MARINE, ARTIFICIAL_TERRESTRIAL, ARTIFICIAL_TERRESTRIAL, \
 				ARTIFICIAL_AQUATIC, INTRODUCED_VEGETATION, OTHER, UNKNOWN ]
 		}

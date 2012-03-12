@@ -11,6 +11,7 @@ import grails.plugins.springsecurity.Secured
 import species.sourcehandler.XMLConverter
 import species.utils.ImageUtils
 import species.utils.Utils;
+import species.groups.SpeciesGroup;
 
 class ObservationController {
 
@@ -26,31 +27,36 @@ class ObservationController {
 
 	def list = {
 		params.max = Math.min(params.max ? params.int('max') : 10, 100)
-		params.offset 
-		def whereAdded = false
-		def query = " from Observation as obv " 
+		params.sGroup = (params.sGroup)? params.sGroup : SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.ALL).id
+		params.habitat = (params.habitat)? params.habitat : grailsApplication.config.speciesPortal.group.ALL
+		
+		
+		def query = "select obv from Observation obv "
 		def queryParams = [:]
 		def filterQuery = ""
+		
 		if(params.sGroup){
 			params.sGroup = params.sGroup.toLong()
-			def groupIds = observationService.getSpeciesGroupIds(params.sGroup)
-			if(!groupIds){
+			def groupId = observationService.getSpeciesGroupIds(params.sGroup)
+			if(!groupId){
 				log.debug("No groups for id " + params.sGroup)
-			}else if(groupIds instanceof List){
-				filterQuery += " where obv.group.id in (:groupIds) "
-				queryParams["groupIds"] = groupIds
 			}else{
 				filterQuery += " where obv.group.id = :groupId "
-				queryParams["groupId"] = groupIds
+				queryParams["groupId"] = groupId
 			}
 		}
 		
 		if(params.tag){
-			(filterQuery == "")? (filterQuery += " where obv.tag like :tag ") : (filterQuery += " and obv.tag like :tag ")
+			query = "select obv from Observation obv,  TagLink tagLink "
+			(filterQuery == "")? (filterQuery += "  where ") : (filterQuery += "  and ")
+			filterQuery +=  " obv.id = tagLink.tagRef and tagLink.type like :tagType and tagLink.tag.name like :tag "
+			
 			queryParams["tag"] = params.tag
+			queryParams["tagType"] = 'observation'
 		}
 		
-		if(params.habitat){
+		
+		if(params.habitat && (params.habitat != grailsApplication.config.speciesPortal.group.ALL)){
 			(filterQuery == "")? (filterQuery += " where obv.habitat like :habitat ") : (filterQuery += " and obv.habitat like :habitat ")
 			queryParams["habitat"] = params.habitat
 		}
@@ -58,14 +64,17 @@ class ObservationController {
 		def orderByClause = "order by obv." + (params.sort ? params.sort : "createdOn") +  " desc"
 		
 		query += filterQuery + orderByClause
-		def count = Observation.findAll(query, queryParams).size()
+		def count = Observation.executeQuery(query, queryParams).size()
 		queryParams["max"] = params.max
 		if(params.offset){
 			queryParams["offset"] = params.offset.toInteger()
 		}
 		//log.error("===============query =======" + query)
 		//log.error("===============params =====" + queryParams)	
-		def observationInstanceList = Observation.findAll(query, queryParams)
+		def observationInstanceList = Observation.executeQuery(query, queryParams)
+		//log.error("================= result == " +observationInstanceList  )
+		//log.error("================= size  == " +observationInstanceList.size()  )
+		
 		[observationInstanceList: observationInstanceList, observationInstanceTotal: count]
 	}
 	@Secured(['ROLE_USER'])

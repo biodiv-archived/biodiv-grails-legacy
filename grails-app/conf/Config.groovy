@@ -82,7 +82,7 @@ log4j = {
 
 	warn   'org.mortbay.log'
 
-	debug	'species',
+	error	'species',
 			'speciespage',
 			'org.springframework.security',
 			'org.codehaus.groovy.grails.web.servlet',  //  controllers
@@ -336,7 +336,7 @@ environments {
 		grails.serverURL = "http://localhost:8080/${appName}"
 		speciesPortal { 
 			search.serverURL = "http://localhost:8090/solr/species"
-			names.parser.serverURL = "127.0.0.1"
+			names.parser.serverURL = "saturn"
 		}		
 		google.analytics.enabled = false
 		
@@ -558,7 +558,7 @@ grails.plugins.springsecurity.authority.className = 'species.auth.Role'
 //grails.disableCommonsMultipart=true
 //grails.web.disable.multipart=true
 
-checkin.drupal = true;
+checkin.drupal = false;
 
 grails.plugins.springsecurity.openid.domainClass = 'species.auth.OpenID'
 grails.plugins.springsecurity.rememberMe.persistent = true
@@ -568,3 +568,7 @@ grails.plugins.springsecurity.rememberMe.persistentToken.domainClassName = 'spec
 grails.plugins.springsecurity.facebook.domain.classname='species.auth.FacebookUser'
 grails.plugins.springsecurity.facebook.appId='310694198984953'
 grails.plugins.springsecurity.facebook.secret='eedf76e46272190fbd26e578ae764a60'
+
+grails.taggable.tag.autoImport=true
+grails.taggable.tagLink.autoImport=true
+
