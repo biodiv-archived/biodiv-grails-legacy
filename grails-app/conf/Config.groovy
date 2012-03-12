@@ -365,7 +365,7 @@ environments {
 
 			observations {
 				rootDir = "${app.rootDir}/observations"
-				serverURL = "http://saturn.strandls.com/${appName}/observations"
+				serverURL = "http://wgp.saturn.strandls.com/${appName}/observations"
 				//serverURL = "http://localhost/${appName}/observations"
 			}
 			search.serverURL="http://saturn.strandls.com:8080/solr/species"
