@@ -1353,8 +1353,13 @@ opacity:1;
 padding:5px;
 }
 
-.related_observation {
+.sidebar_section {
 border-radius: 7px 7px 7px 7px;
 margin-top: 10px;
 padding: 10px;
+}
+
+.sidebar_section .title {
+font-weight: bold;
+padding:5px;
 }

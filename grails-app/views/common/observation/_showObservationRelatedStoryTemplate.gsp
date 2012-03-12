@@ -62,12 +62,9 @@ $(document).ready(function() {
 .jcarousel-skin-ie7 .jcarousel-container-horizontal {
     padding: 0 25px;
 }
-.title {
-    font-weight:bold;
-}
 </style>
-<div class="grid_5 related_observation" style="clear:both">
-  <span class="title">Other observations of the same species</span>	
+<div class="grid_5 sidebar_section" style="clear:both">
+  <div class="title">Other observations of the same species</div>	
   <div id="carousel_${id}" class="jcarousel-skin-ie7"> 
     <ul> 
       <!-- The content will be dynamically loaded in here --> 
