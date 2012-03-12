@@ -82,7 +82,7 @@ log4j = {
 
 	warn   'org.mortbay.log'
 
-	error	'species',
+	debug	'species',
 			'speciespage',
 			'org.springframework.security',
 			'org.codehaus.groovy.grails.web.servlet',  //  controllers
@@ -336,7 +336,7 @@ environments {
 		grails.serverURL = "http://localhost:8080/${appName}"
 		speciesPortal { 
 			search.serverURL = "http://localhost:8090/solr/species"
-			names.parser.serverURL = "saturn"
+			names.parser.serverURL = "127.0.0.1"
 		}		
 		google.analytics.enabled = false
 		
@@ -558,7 +558,7 @@ grails.plugins.springsecurity.authority.className = 'species.auth.Role'
 //grails.disableCommonsMultipart=true
 //grails.web.disable.multipart=true
 
-checkin.drupal = false;
+checkin.drupal = true;
 
 grails.plugins.springsecurity.openid.domainClass = 'species.auth.OpenID'
 grails.plugins.springsecurity.rememberMe.persistent = true
