@@ -81,7 +81,7 @@ class Observation implements Taggable{
 			reprImage = iterator.next();
 		}
 		
-		if(reprImage && (new File(grailsApplication.config.speciesPortal.resources.rootDir+reprImage.fileName.trim())).exists()) {
+		if(reprImage && (new File(grailsApplication.config.speciesPortal.observations.rootDir+reprImage.fileName.trim())).exists()) {
 			return reprImage;
 		} else {
 			return null;			

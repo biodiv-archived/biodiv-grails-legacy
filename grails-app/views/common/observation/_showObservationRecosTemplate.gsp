@@ -35,7 +35,7 @@ font-weight: bold;
 	<g:each in="${result}" var="r">
 		<li class="reco_block">
                         <div>
-                            <span class="voteCount">${r.noOfVotes}<g:if test="${r.noOfVotes <= 1}"> user</g:if>
+                            <span class="voteCount"><span id="votes_${r.recoId}">${r.noOfVotes}</span><g:if test="${r.noOfVotes <= 1}"> user</g:if>
                             <g:else> users</g:else> think it is:</span> 
 			    <div style="width:${(r.noOfVotes/totalVotes)*100}%" class="pollbar"></div>
                          </div>
@@ -51,7 +51,7 @@ font-weight: bold;
 	                <div class="iAgree"> <g:remoteLink
 					action="addAgreeRecommendationVote" controller="observation"
 					params="['obvId':observationInstance.id, 'recoId':r.recoId, 'currentVotes':r.noOfVotes]"
-					onSuccess="jQuery('#votes_${recoId}').html(data.votes);return false;"
+					onSuccess="jQuery('#votes_${r.recoId}').html(data.votes);return false;"
 					onFailure="if(XMLHttpRequest.status == 401 || XMLHttpRequest.status == 200) {
 				    		show_login_dialog();
 				    	} else {	    
@@ -61,12 +61,14 @@ font-weight: bold;
 
 
 			<div class="users">
+				<g:each in="${r.authors}" var="author">
 				<g:link controller="sUser" action="show"
-					id="${r.authors.getAt(0)?.id}">
+					id="${author?.id}">
 					<img 
-						src="${createLinkTo(file: r.authors.getAt(0)?.icon()?.fileName?.trim(), base:grailsApplication.config.speciesPortal.resources.serverURL)}"
-						title="${r.authors.getAt(0)?.username}"/>
+						src="${createLinkTo(file: author?.icon()?.fileName?.trim(), base:grailsApplication.config.speciesPortal.resources.serverURL)}"
+						title="${author.username}"/>
 				</g:link>
+				</g:each>
 			</div>
 
                             
@@ -74,12 +76,12 @@ font-weight: bold;
 			
 		                        <g:javascript>
                         $(document).ready(function(){
-                                $('#voteCountLink_${recoId}').click(function() {
-                                        $('#voteDetails_${recoId}').show();
+                                $('#voteCountLink_${r.recoId}').click(function() {
+                                        $('#voteDetails_${r.recoId}').show();
                                 });
 
-                                $('#voteDetails_${recoId}').mouseout(function(){
-                                        $('#voteDetails_${recoId}').hide();
+                                $('#voteDetails_${r.recoId}').mouseout(function(){
+                                        $('#voteDetails_${r.recoId}').hide();
                                 });
                         });
                         </g:javascript>

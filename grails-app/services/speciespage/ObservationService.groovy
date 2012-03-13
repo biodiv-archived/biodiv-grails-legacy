@@ -202,7 +202,7 @@ class ObservationService {
 	 */
 	Map getRelatedObservationBySpeciesNames(List<String> speciesNames, params){
 		if(!speciesNames) {
-			return [];
+			return [:];
 		}
 		//println "speciesName  ==== " + speciesName
 		//def recId = Recommendation.findByName(speciesName).id
