@@ -60,12 +60,12 @@ font-weight: bold;
 		        </div> 
 
 
-			<div class="users thumbwrap">
+			<div class="users">
 				<g:link controller="sUser" action="show"
 					id="${r.authors.getAt(0)?.id}">
-					<img class="icon"
-						src="${createLinkTo(file: r.authors.getAt(0)?.icon()?.fileName?.trim(), absolute:true)}"
-						title="${r.authors.getAt(0)?.username}"/>${r.authors.getAt(0)?.username}
+					<img 
+						src="${createLinkTo(file: r.authors.getAt(0)?.icon()?.fileName?.trim(), base:grailsApplication.config.speciesPortal.resources.serverURL)}"
+						title="${r.authors.getAt(0)?.username}"/>
 				</g:link>
 			</div>
 

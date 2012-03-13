@@ -428,7 +428,7 @@ clear:both;
 	float: right;
 }
 
-.thumbwrap > .icon {
+.thumbwrap .icons .icon {
 	width: 20px;
 	height: 20px;
 	display: inline;

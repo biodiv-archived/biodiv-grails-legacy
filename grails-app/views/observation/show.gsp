@@ -140,7 +140,7 @@ width:90%;
 				<!-- obv:showRating model="['observationInstance':observationInstance]" /-->
 				<!--  static species content -->
 				<obv:showRelatedStory model="['observationInstance':observationInstance, 'observationId': observationInstance.id, 'controller':'observation', 'action':'getRelatedObservation', 'filterProperty': 'speciesName', 'id':'a']" />
-				<obv:showTagsSummary model="['observationInstance':observationInstance]" />
+				<!-- obv:showTagsSummary model="['observationInstance':observationInstance]" /-->
 				<!-- obv:showObvStats  model="['observationInstance':observationInstance]"/-->
 			</div>
 

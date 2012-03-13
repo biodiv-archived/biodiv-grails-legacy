@@ -1,12 +1,12 @@
 
 <div class="observation_story">
 		<img class="species_group_icon"
-			src="${createLinkTo(dir: 'images', file: observationInstance.group.icon()?.fileName?.trim(), absolute:true)}"
+			src="${createLinkTo(file: observationInstance.group.icon()?.fileName?.trim(), base:grailsApplication.config.speciesPortal.resources.serverURL)}"
 			title="${observationInstance.group?.name}" />
 
 		<g:if test="${observationInstance.habitat}">
 			<img class="habitat_icon species_group_icon"
-				src="${resource(dir:'images/group_icons',file:observationInstance.habitat+'.png', absolute:true)}"
+				src="${createLinkTo(dir: 'group_icons', file:'All.png', base:grailsApplication.config.speciesPortal.resources.serverURL)}"
 				title="${observationInstance.habitat}" />
 		</g:if>
 
@@ -35,5 +35,5 @@
 			</div>
 		</div>
 
-		<obv:showTags model="['observationInstance':observationInstance]" />
+		<obv:showTagsSummary model="['observationInstance':observationInstance]" />
 </div>
