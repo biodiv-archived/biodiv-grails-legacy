@@ -21,10 +21,23 @@ class ObservationTagLib {
 			out << render(template:"/common/observation/showObservationSnippetTemplate", model:attrs.model);
 		}
 	}
+
+        def showSnippetTablet = {attrs, body->
+		if(attrs.model.observationInstance) {
+			out << render(template:"/common/observation/showObservationSnippetTabletTemplate", model:attrs.model);
+		}
+	}
+
 	
 	def showStory = {attrs, body->
 		if(attrs.model.observationInstance) {
 			out << render(template:"/common/observation/showObservationStoryTemplate", model:attrs.model);
+		}
+	}
+
+	def showStoryTablet = {attrs, body->
+		if(attrs.model.observationInstance) {
+			out << render(template:"/common/observation/showObservationStoryTabletTemplate", model:attrs.model);
 		}
 	}
 
