@@ -65,4 +65,17 @@ class ObservationTagLib {
 			out << render(template:"/common/observation/showObservationStatsTemplate", model:attrs.model);
 		}
 	}
+	
+	def showTagsList = {attrs, body->
+			out << render(template:"/common/observation/showTagsListTemplate", model:attrs.model);
+	}
+	
+	def showTagsCloud = {attrs, body->
+		out << render(template:"/common/observation/showTagsCloudTemplate", model:attrs.model);
+	}
+	
+	def showAllTags = {attrs, body->
+		out << render(template:"/common/observation/showAllTagsTemplate", model:attrs.model);
+	}
+	
 }

@@ -38,7 +38,7 @@
 			<div style="clear:both"></div>
 			<div class="list">
 				<div class="observations thumbwrap">
-					<div class="observation grid_12">
+					<div class="observation grid_11">
 						<g:each in="${observationInstanceList}" status="i"
 							var="observationInstance">
 							<obv:showSnippet
@@ -47,11 +47,7 @@
 					</div>
 					
 					<div>
-						<h5>
-							<g:message code="default.tagcloud.label" args="['Tag Cloud']" />
-						</h5>
-						<tc:tagCloud controller="observation" action="tagged" bean="${Observation}" style 
-						color="${[start: '#660', end: '#99f']}"/>
+					<obv:showAllTags/>
 					</div>
 				</div>
 			</div>
