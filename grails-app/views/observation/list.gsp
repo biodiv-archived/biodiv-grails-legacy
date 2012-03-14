@@ -59,7 +59,7 @@
                                                 </div>       
 					</div>
 					
-					<div class="tags_section">
+					<div class="tags_section grid_4">
 					<obv:showAllTags/>
 					</div>
 				</div>

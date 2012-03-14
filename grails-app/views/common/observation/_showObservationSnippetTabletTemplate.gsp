@@ -24,7 +24,7 @@
 			</g:else>
 		</g:link>
 	</div>
-	<div class="grid_4" style="width:200px; padding:0; margin:0;">
+	<div class="grid_4 all_content" style="width:200px; padding:0; margin:0;">
 		<obv:showStoryTablet model="['observationInstance':observationInstance]"></obv:showStoryTablet>
 	</div>
 </div>

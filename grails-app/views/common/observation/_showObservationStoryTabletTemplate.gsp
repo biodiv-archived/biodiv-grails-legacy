@@ -1,10 +1,10 @@
 <g:javascript>
     $(document).ready(function(){
         $(".observation_story").hover(function(){
-                $('.more_info', this).show(); 
+                $('.more_info', this).slideDown('fast'); 
             },
             function(){
-                $('.more_info', this).hide(); 
+                $('.more_info', this).slideUp('fast'); 
             });
     });
 
@@ -45,12 +45,12 @@
 				${observationInstance.placeName}
 			</div>
 		</div>
-                <br/>
+        <br/>
 
 
-                <div class="more_info" style="position:absolute; display:none;background-color: #ffffff;width: 200px;z-index:2;box-shadow:0 8px 6px -6px black;">
+		<div class="more_info" style="position:absolute; display:none;background-color: #fbfbfb;width: 200px;z-index:2;box-shadow:0 8px 6px -6px black;">
 		    <obv:showTagsSummary model="['observationInstance':observationInstance]" />
-                </div>
+        </div>
 </div>
 
 

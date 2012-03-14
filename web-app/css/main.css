@@ -778,11 +778,13 @@ padding:0;
 }
 
 .observation .snippet:hover {
+	background-color: #fbfbfb;
 	box-shadow: 0 8px 6px -6px black; 
 }
 
 .observation .snippet.tablet:hover {
 	box-shadow:none; 
+	background-color: #fbfbfb;
 }
 
 .observation .addedResource .figure,.observation .figure {
@@ -1389,8 +1391,8 @@ padding:5px;
 
 .sidebar_section {
 margin-top: 10px;
-padding: 10px;
-border-bottom: 1px solid #cecece;         
+border-bottom: 1px solid #cecece;
+padding-bottom:10px;
 }
 
 .sidebar_section .title {
@@ -1466,5 +1468,6 @@ padding:5px;
 
 .tags_section {
 position:relative;
-top:20px;         
+top:20px;
+float:right;
 }
