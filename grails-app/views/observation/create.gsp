@@ -42,6 +42,8 @@
 
 <g:javascript src="tagit.js"
 	base="${grailsApplication.config.grails.serverURL+'/js/'}"></g:javascript>
+
+
 </head>
 <body>
 	<div class="container_16 big_wrapper">
@@ -180,7 +182,7 @@
 
 
                 <div class="grid_16 section">
-                   <div class="resources">
+                                      <div class="resources">
                         <ul id="imagesList" class="thumbwrap"
                                 style='list-style: none; margin-left: 0px;background:url("${resource(dir:'images',file:'species_canvas.png', absolute:true)}")'>
                                 <g:set var="i" value="0" />
@@ -226,7 +228,14 @@
                                                 </div> <a href="#" class="resourceRemove">Remove</a></li>
                                         <g:set var="i" value="${i+1}" />
                                 </g:each>
-                                <li id="add_file" class="addedResource" onclick="$('#attachFiles').select()[0].click();return false;"></li>
+                                <li id="add_file" class="addedResource" onclick="$('#attachFiles').select()[0].click();return false;">
+                                    <div class="progress">
+                                        <div id="translucent_box"></div >
+                                        <div id="progress_bar"></div >
+                                        <div id="progress_msg"></div >
+                                    </div>
+
+                                </li>
                         </ul>
 
                                    </div>
@@ -372,7 +381,7 @@
 	
         var mouse_inside_groups_div = false;        
         var mouse_inside_habitat_div = false;        
-        var add_file_button = '<li id="add_file" class="addedResource" onclick="$(\'#attachFiles\').select()[0].click();return false;"></li>';
+        var add_file_button = '<li id="add_file" class="addedResource" onclick="$(\'#attachFiles\').select()[0].click();return false;"><div class="progress"><div id="translucent_box"></div><div id="progress_bar"></div ><div id="progress_msg"></div ></div></li>';
 
 	
 	$(document).ready(function(){
@@ -389,7 +398,19 @@
  		}).ajaxStop(function() {
         			$("#loading").hide();
     		});  
-     		
+     	
+        function progressHandlingFunction(e){
+            if(e.lengthComputable){
+                var position = e.position || e.loaded;
+                var total = e.totalSize || e.total;
+
+                var percentVal = ((position/total)*100).toFixed(0) + '%';
+                $('#progress_bar').width(percentVal)
+                $('#translucent_box').width('100%')
+                $('#progress_msg').html('Uploaded '+percentVal);
+             }
+        }
+
      	$('#upload_resource').ajaxForm({ 
 			url:'${createLink(controller:'observation', action:'upload_resource', params:['jsessionid':RequestContextHolder.currentRequestAttributes().getSessionId()])}',
 			dataType: 'xml',//could not parse json wih this form plugin 
@@ -400,6 +421,14 @@
 			beforeSubmit: function(formData, jqForm, options) {
 				return true;
 			}, 
+                        xhr: function() {  // custom xhr
+                            myXhr = $.ajaxSettings.xhr();
+                            if(myXhr.upload){ // check if upload property exists
+                                myXhr.upload.addEventListener('progress', progressHandlingFunction, false); // for handling the progress of the upload
+                            }
+                            return myXhr;
+                        },
+
 			success: function(responseXML, statusText, xhr, form) {
 				$(form).find("span.msg").html("");
 				var rootDir = '${grailsApplication.config.speciesPortal.observations.serverURL}'
@@ -426,6 +455,7 @@
 				})
 				$( "#imagesList" ).append (metadataEle);
                                 $( "#imagesList" ).append (add_file_button);
+
 			}, error:function (xhr, ajaxOptions, thrownError){
 					$('#upload_resource').find("span.msg").html("");
 					var messageNode = $(".message .resources") 
@@ -435,7 +465,7 @@
 					} else {
 						messageNode.append(response?response.error:"Error");
 					}
-            } 
+                        } 
      	});  
 
         var currDate = new Date();

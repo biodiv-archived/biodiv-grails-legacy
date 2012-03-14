@@ -1498,3 +1498,15 @@ width: 220px;
 height: 220px;
 cursor: pointer;
 }
+
+.progress { 
+    border: 1px solid #DDDDDD;
+    border-radius: 3px 3px 3px 3px;
+    position: relative;
+    width: 220px;
+    height: 220px;       
+}
+#translucent_box {background-color:black; opacity:0.5; width:0%; height:210px; top:0px; position:absolute;}
+#progress_bar { background-color: lime; width:0%; height:10px; bottom:0px; position:absolute;}
+#progress_msg { position:absolute; display:inline-block; bottom:15px; left:30px; color:#ffffff; font-size: 1.5em; font-weight: bold; }
+
