@@ -7,9 +7,26 @@ html * {
 .spinner {
 	padding: 5px;
 	position: absolute;
-	right: 0;
+	right: 0 ;
 	z-index: 1000;
 }
+
+.loading {
+	padding: 5px;
+	position: fixed;
+	top: 0 ;
+	z-index: 1000;
+	width: 100%;
+	text-align: center;
+}
+
+.loading span {
+	background-color: #F9EDBE;
+	border: 1px solid #F0C36D;
+	padding: 3px 10px;
+	font-weight: bold;
+}
+
 
 body {
 	color: #333;
@@ -759,13 +776,13 @@ padding:0;
 	/*border-bottom: 3px solid #A9DA92;*/
 }
 
-.observation .addedResource {
-	display: block;
-	margin: 10px;
-	padding: 5px;
-	border-radius: 7px;
-	background-color: #ffffff;
-        position: relative;
+.resources .addedResource {
+	width:220px;
+	display:inline-block;
+	margin:2px;
+	position:relative;
+	padding:2px;
+	background-color:#ffffff;
 }
 
 .observation .snippet {
@@ -1470,4 +1487,14 @@ padding:5px;
 position:relative;
 top:20px;
 float:right;
+}
+
+#add_file {
+background-image:url('../images/add-photo.png');
+background-repeat: no-repeat;
+background-position: 10px 10px;
+padding: 0;
+width: 220px;
+height: 220px;
+cursor: pointer;
 }
