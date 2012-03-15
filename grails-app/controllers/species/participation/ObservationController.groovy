@@ -65,7 +65,7 @@ class ObservationController {
 		if(params.userId){
 			(filterQuery == "")? (filterQuery += " where ") : (filterQuery += " and ")
 			filterQuery += " obv.author.id = :userId "
-			queryParams["userId"] = params.userId.toInteger()
+			queryParams["userId"] = params.userId.toLong()
 		}
 
 		def orderByClause = "order by obv." + (params.sort ? params.sort : "createdOn") +  " desc"

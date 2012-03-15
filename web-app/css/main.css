@@ -1510,3 +1510,7 @@ cursor: pointer;
 #progress_bar { background-color: lime; width:0%; height:10px; bottom:0px; position:absolute;}
 #progress_msg { position:absolute; display:inline-block; bottom:15px; left:30px; color:#ffffff; font-size: 1.5em; font-weight: bold; }
 
+.observation_links {
+	padding:10px;
+	
+}

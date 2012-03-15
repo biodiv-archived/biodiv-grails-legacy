@@ -141,8 +141,8 @@ class Observation implements Taggable{
 	def getRecommendationVotes(int limit, long offset) {
 		if(limit <= 0) limit = 3;
 	
-		println limit;
-		println offset;
+//		println limit;
+//		println offset;
 		
 		def sql =  Sql.newInstance(dataSource);
 		

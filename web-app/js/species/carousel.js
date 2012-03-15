@@ -19,7 +19,6 @@ var itemAddCallback = function(carousel, first, last, data, state) {
 	for (i = 0; i < items.length; i++) {
 		var actualIndex = first + i
 		if (!carousel.has(actualIndex)) {
-			console.log(getItemHTML(items[i]));
 			carousel.add(actualIndex, getItemHTML(items[i]));
 		}
 	}

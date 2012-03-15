@@ -24,7 +24,7 @@
 		<div class="prop tablet">
 			<span class="name tablet">By </span>
 			<div class="value tablet">
-				<g:link controller="sUser" action="show"
+				<g:link controller="SUser" action="show"
 					id="${observationInstance.author.id}">
 					${observationInstance.author.username}
 				</g:link>
