@@ -38,20 +38,29 @@
 			<div style="clear:both"></div>
 			<div class="list">
 				<div class="observations thumbwrap">
-					<div class="observation grid_12">
+					<div class="observation grid_11">
+                                            <div id="list_view_bttn" class="list_style_button"></div> 
+                                            <div id="grid_view_bttn" class="grid_style_button active"></div>
+                                        </div>
+					<div class="observation grid_11">
+                                                <div id="grid_view" style="display:none;">
+						<g:each in="${observationInstanceList}" status="i"
+							var="observationInstance">
+							<obv:showSnippetTablet
+								model="['observationInstance':observationInstance]"></obv:showSnippetTablet>
+						</g:each>
+                                                </div>       
+                                                <div id="list_view">
 						<g:each in="${observationInstanceList}" status="i"
 							var="observationInstance">
 							<obv:showSnippet
 								model="['observationInstance':observationInstance]"></obv:showSnippet>
 						</g:each>
+                                                </div>       
 					</div>
 					
-					<div>
-						<h5>
-							<g:message code="default.tagcloud.label" args="['Tag Cloud']" />
-						</h5>
-						<tc:tagCloud controller="observation" action="tagged" bean="${Observation}" style 
-						color="${[start: '#660', end: '#99f']}"/>
+					<div class="tags_section grid_4">
+					<obv:showAllTags/>
 					</div>
 				</div>
 			</div>
@@ -158,6 +167,35 @@
          	window.location.href = "${g.createLink(action: 'tagged')}/" + tg ;
          });
          
+         	$('#list_view_bttn').click(function(){
+			$('#grid_view').hide();
+			$('#list_view').show();
+			$(this).addClass('active');
+			$('#grid_view_bttn').removeClass('active');
+			$.cookie("observation_listing", "list");
+		});
+		
+		$('#grid_view_bttn').click(function(){
+			$('#grid_view').show();
+			$('#list_view').hide();
+			$(this).addClass('active');
+			$('#list_view_bttn').removeClass('active');
+			$.cookie("observation_listing", "grid");
+		});
+		
+		if ($.cookie("observation_listing") == "grid") {
+			$('#grid_view').show();
+			$('#list_view').hide();
+			$('#grid_view_bttn').addClass('active');
+			$('#list_view_bttn').removeClass('active');
+		}else{
+			$('#list_view').show();
+			$('#grid_view').hide();
+			$('#grid_view_bttn').removeClass('active');
+			$('#list_view_bttn').addClass('active');
+		
+		}
+
 	});
 	</g:javascript>
 </body>

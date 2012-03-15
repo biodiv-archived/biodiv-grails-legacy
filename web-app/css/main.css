@@ -7,9 +7,26 @@ html * {
 .spinner {
 	padding: 5px;
 	position: absolute;
-	right: 0;
+	right: 0 ;
 	z-index: 1000;
 }
+
+.loading {
+	padding: 5px;
+	position: fixed;
+	top: 0 ;
+	z-index: 1000;
+	width: 100%;
+	text-align: center;
+}
+
+.loading span {
+	background-color: #F9EDBE;
+	border: 1px solid #F0C36D;
+	padding: 3px 10px;
+	font-weight: bold;
+}
+
 
 body {
 	color: #333;
@@ -322,6 +339,11 @@ th.name {
 clear:both;
 }
 
+.prop.tablet {
+font-size: 0.8em;
+padding-left:10px;
+}
+
 .prop .name {
 	float: left;
 	text-align: left;
@@ -329,6 +351,11 @@ clear:both;
 	font-weight: bold;
 	color: #676767;
                
+}
+
+.prop .name.tablet {
+width: auto;
+padding-right: 3px;       
 }
 
 #advSearchForm .prop .name {
@@ -730,6 +757,10 @@ img {
     clear:both;        
 }
 
+.observation_story.tablet {
+padding:0;
+}
+
 .observation_location {
 	margin-top: 0px;
 	padding: 10px;
@@ -745,13 +776,13 @@ img {
 	/*border-bottom: 3px solid #A9DA92;*/
 }
 
-.observation .addedResource {
-	display: block;
-	margin: 10px;
-	padding: 5px;
-	border-radius: 7px;
-	background-color: #ffffff;
-        position: relative;
+.resources .addedResource {
+	width:220px;
+	display:inline-block;
+	margin:2px;
+	position:relative;
+	padding:2px;
+	background-color:#ffffff;
 }
 
 .observation .snippet {
@@ -760,10 +791,17 @@ img {
 	border: 1px solid #f0f0f0;
 	padding: 15px 15px 5px;
 	background-color: #ffffff;
+        width:590px;
 }
 
 .observation .snippet:hover {
+	background-color: #fbfbfb;
 	box-shadow: 0 8px 6px -6px black; 
+}
+
+.observation .snippet.tablet:hover {
+	box-shadow:none; 
+	background-color: #fbfbfb;
 }
 
 .observation .addedResource .figure,.observation .figure {
@@ -895,8 +933,8 @@ textarea#notes {
 	background-image: -moz-linear-gradient(center top, #F5F5F5, #F1F1F1);
 	border: 1px solid rgba(0, 0, 0, 0.1);
 	border-radius: 2px 2px 2px 2px;
-	color: #444444;
-	cursor: default;
+	color: #777777;
+	cursor: pointer;
 	display: inline-block;
 	font-size: 16px;
 	font-weight: bold;
@@ -906,9 +944,23 @@ textarea#notes {
 	padding: 0 8px;
 	text-align: center;
 	text-decoration: none;
-	float: right;
-	margin: 20px;
+	margin: 5px;
 }
+
+.button:hover {
+	border: 1px solid #9e9e9e;
+}
+
+.button.small {
+	font-size: 12px;
+	height: 20px;
+	line-height: 20px;
+}
+
+.button.active {
+	color: #333333;
+        box-shadow: 0 1px 2px #5e5e5e inset;
+} 
 
 .voteDetails {
 	background-color: #FAFAFA;
@@ -1355,12 +1407,106 @@ padding:5px;
 }
 
 .sidebar_section {
-border-radius: 7px 7px 7px 7px;
 margin-top: 10px;
-padding: 10px;
+border-bottom: 1px solid #cecece;
+padding-bottom:10px;
 }
 
 .sidebar_section .title {
 font-weight: bold;
 padding:5px;
 }
+
+.tag_label {
+	background-color: #DEE7F8;
+	border: 1px solid #CAD8F3;
+	padding: 2px 13px 3px 4px;
+	border-radius: 5px 5px 5px 5px;
+	display: block;
+	float: left;
+	margin: 2px 5px 2px 0;
+	clear: both;
+}
+
+.tag_stats {
+	padding:3px;
+	border-left: 1px solid #9AB8F3;
+	color: #8e8e8e;
+}
+
+.tag_stat_div {
+	clear: both;
+}
+
+#tc_tagcloud {
+    font-weight: bold;
+    line-height: 200%;
+    text-align: justify;
+}
+
+.list_style_button {
+    background-image:url('../images/list_view.png');
+    background-repeat: no-repeat;
+    background-position: 0 -19px;
+    width: 19px;
+    height: 19px;      
+    float: right;        
+    margin-right: 10px;       
+    opacity:0.5;        
+    cursor:pointer;        
+}
+.grid_style_button {
+    background-image:url('../images/list_view.png');
+    background-repeat: no-repeat;
+    background-position: 0 0;
+    width: 19px;
+    height: 19px;      
+    float: right;        
+    margin-right: 5px;       
+    opacity:0.5;        
+    cursor:pointer;        
+}
+
+.grid_style_button:hover {
+    opacity:0.7;        
+}
+
+.list_style_button:hover {
+    opacity:0.7;        
+}
+
+.grid_style_button.active {
+    opacity:1;        
+}
+
+.list_style_button.active {
+    opacity:1;        
+}
+
+.tags_section {
+position:relative;
+top:20px;
+float:right;
+}
+
+#add_file {
+background-image:url('../images/add-photo.png');
+background-repeat: no-repeat;
+background-position: 10px 10px;
+padding: 0;
+width: 220px;
+height: 220px;
+cursor: pointer;
+}
+
+.progress { 
+    border: 1px solid #DDDDDD;
+    border-radius: 3px 3px 3px 3px;
+    position: relative;
+    width: 220px;
+    height: 220px;       
+}
+#translucent_box {background-color:black; opacity:0.5; width:0%; height:210px; top:0px; position:absolute;}
+#progress_bar { background-color: lime; width:0%; height:10px; bottom:0px; position:absolute;}
+#progress_msg { position:absolute; display:inline-block; bottom:15px; left:30px; color:#ffffff; font-size: 1.5em; font-weight: bold; }
+

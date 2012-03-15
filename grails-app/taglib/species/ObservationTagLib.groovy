@@ -21,10 +21,23 @@ class ObservationTagLib {
 			out << render(template:"/common/observation/showObservationSnippetTemplate", model:attrs.model);
 		}
 	}
+
+        def showSnippetTablet = {attrs, body->
+		if(attrs.model.observationInstance) {
+			out << render(template:"/common/observation/showObservationSnippetTabletTemplate", model:attrs.model);
+		}
+	}
+
 	
 	def showStory = {attrs, body->
 		if(attrs.model.observationInstance) {
 			out << render(template:"/common/observation/showObservationStoryTemplate", model:attrs.model);
+		}
+	}
+
+	def showStoryTablet = {attrs, body->
+		if(attrs.model.observationInstance) {
+			out << render(template:"/common/observation/showObservationStoryTabletTemplate", model:attrs.model);
 		}
 	}
 
@@ -65,4 +78,17 @@ class ObservationTagLib {
 			out << render(template:"/common/observation/showObservationStatsTemplate", model:attrs.model);
 		}
 	}
+	
+	def showTagsList = {attrs, body->
+			out << render(template:"/common/observation/showTagsListTemplate", model:attrs.model);
+	}
+	
+	def showTagsCloud = {attrs, body->
+		out << render(template:"/common/observation/showTagsCloudTemplate", model:attrs.model);
+	}
+	
+	def showAllTags = {attrs, body->
+		out << render(template:"/common/observation/showAllTagsTemplate", model:attrs.model);
+	}
+	
 }
