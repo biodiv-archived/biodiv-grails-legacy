@@ -44,6 +44,7 @@ class Observation implements Taggable{
 	SUser author;
 	Date observedOn;
 	Date createdOn = new Date();
+	Date lastUpdated;
 	String notes;
 	SpeciesGroup group;
 	int rating;
@@ -55,6 +56,7 @@ class Observation implements Taggable{
 	boolean geoPrivacy = false;
 	String locationAccuracy;
 	String habitat;
+	int visitCount = 0;
 
 	static hasMany = [resource:Resource, recommendationVote:RecommendationVote];
 
@@ -184,4 +186,22 @@ class Observation implements Taggable{
 		}
 		return ['recoVotes':result, 'totalVotes':this.recommendationVote.size()];
 	}
+	
+	def getRecommendationCount(){
+		Sql sql =  Sql.newInstance(dataSource);
+		def result = sql.rows("select count(distinct(recoVote.recommendation_id)) from recommendation_vote as recoVote where recoVote.observation_id = :obvId", [obvId:id])
+		return result[0]["count"]
+	}
+	
+	def daysAfterLastUpdate(){
+		return (new Date()).minus(lastUpdated) 
+	}
+	
+	def incrementPageVisit(){
+		visitCount++;
+		if(!save(flush:true)){
+			this.errors.allErrors.each { log.error it }
+		}
+	}
+	
 }

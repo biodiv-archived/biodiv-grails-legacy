@@ -137,6 +137,7 @@ class ObservationController {
 			redirect(action: "list")
 		}
 		else {
+			//observationInstance.incrementPageVisit();
 			[observationInstance: observationInstance]
 		}
 	}
@@ -437,5 +438,5 @@ class ObservationController {
 		log.debug params;
 		render Tag.findAllByNameIlike("${params.term}%")*.name as JSON
 	}
-
+	
 }
