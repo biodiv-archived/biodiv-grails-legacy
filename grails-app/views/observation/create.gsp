@@ -68,7 +68,7 @@
             </div>
 
             <form id="upload_resource" enctype="multipart/form-data"
-                    style="position: relative; float: left; z-index: 2; left: 20px; top: 320px; display: none;" title="Add a photo for this observation">
+                    style="position: relative; float: left; z-index: 2; left: 20px; top: 320px; visibility:hidden;" title="Add a photo for this observation">
                     <!-- TODO multiple attribute is HTML5. need to chk if this gracefully falls back to default in non compatible browsers -->
                     <input type="button" class="red" id="upload_button"
                             value="Add photo" >
@@ -381,7 +381,7 @@
 	
         var mouse_inside_groups_div = false;        
         var mouse_inside_habitat_div = false;        
-        var add_file_button = '<li id="add_file" class="addedResource" onclick="$(\'#attachFiles\').select()[0].click();return false;"><div class="progress"><div id="translucent_box"></div><div id="progress_bar"></div ><div id="progress_msg"></div ></div></li>';
+        var add_file_button = '<li id="add_file" class="addedResource" style="display:none;" onclick="$(\'#attachFiles\').select()[0].click();return false;"><div class="progress"><div id="translucent_box"></div><div id="progress_bar"></div ><div id="progress_msg"></div ></div></li>';
 
 	
 	$(document).ready(function(){
@@ -454,7 +454,8 @@
 					});
 				})
 				$( "#imagesList" ).append (metadataEle);
-                                $( "#imagesList" ).append (add_file_button);
+                $( "#imagesList" ).append (add_file_button);
+                $( "#add_file" ).fadeIn(3000);
 
 			}, error:function (xhr, ajaxOptions, thrownError){
 					$('#upload_resource').find("span.msg").html("");
