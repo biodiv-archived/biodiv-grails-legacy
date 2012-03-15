@@ -19,6 +19,7 @@ var itemAddCallback = function(carousel, first, last, data, state) {
 	for (i = 0; i < items.length; i++) {
 		var actualIndex = first + i
 		if (!carousel.has(actualIndex)) {
+			console.log(getItemHTML(items[i]));
 			carousel.add(actualIndex, getItemHTML(items[i]));
 		}
 	}
@@ -32,7 +33,7 @@ var itemAddCallback = function(carousel, first, last, data, state) {
  */
 var getItemHTML = function(item){
 	var imageTag = '<img src="' + item.imageLink + '" title="' + item.imageTitle  +'" width="75" height="75" alt="" />';
-	return '<a href=' + item.obvId + '>' + imageTag + '</a>';
+	return '<a href=/biodiv/observation/show/' + item.obvId + '>' + imageTag + '</a>';
 };
 
 var reloadCarousel = function(carousel, fitlerProperty, filterPropertyValue){

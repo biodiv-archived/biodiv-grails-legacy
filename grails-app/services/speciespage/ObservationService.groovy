@@ -124,6 +124,29 @@ class ObservationService {
 		log.debug speciesNames.getClass();
 		return getRelatedObservationBySpeciesNames(speciesNames, params)
 	}
+	/**
+	 * 
+	 * @param params
+	 * @return
+	 */
+	Map getRelatedObservationByUser(params){
+		//getting count
+		def queryParams = [:]
+		def countQuery = "select count(*) from Observation obv where obv.author.username like :userName "
+		queryParams["userName"] = SUser.read(params.filterPropertyValue.toInteger()).username
+		def count = Observation.executeQuery(countQuery, queryParams)
+		
+		
+		//getting observations
+		def query = "from Observation obv where obv.author.username like :userName "
+		def orderByClause = "order by obv." + (params.sort ? params.sort : "createdOn") +  " desc"
+		query += orderByClause
+		
+		queryParams["max"] = params.limit.toInteger()
+		queryParams["offset"] = params.offset.toInteger()
+		
+		return ["observations":createUrlList(Observation.findAll(query, queryParams)), "count":count]
+	}
 //	
 //	List getRelatedObservationBySpeciesGroup(params){
 //		def obvId = params.id.toLong()

@@ -29,7 +29,7 @@ class ObservationController {
 		params.max = Math.min(params.max ? params.int('max') : 10, 100)
 		params.sGroup = (params.sGroup)? params.sGroup : SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.ALL).id
 		params.habitat = (params.habitat)? params.habitat : grailsApplication.config.speciesPortal.group.ALL
-		
+		//params.userName = springSecurityService.currentUser.username;
 		
 		def query = "select obv from Observation obv "
 		def queryParams = [:]
@@ -60,6 +60,12 @@ class ObservationController {
 		if(params.habitat && (params.habitat != grailsApplication.config.speciesPortal.group.ALL)){
 			(filterQuery == "")? (filterQuery += " where obv.habitat like :habitat ") : (filterQuery += " and obv.habitat like :habitat ")
 			queryParams["habitat"] = params.habitat
+		}
+		
+		if(params.userId){
+			(filterQuery == "")? (filterQuery += " where ") : (filterQuery += " and ")
+			filterQuery += " obv.author.id = :userId "
+			queryParams["userId"] = params.userId.toInteger()
 		}
 
 		def orderByClause = "order by obv." + (params.sort ? params.sort : "createdOn") +  " desc"
@@ -418,6 +424,8 @@ class ObservationController {
 			relatedObv = observationService.getRelatedObservationBySpeciesName(params)
 		}else if(params.filterProperty == "speciesGroup"){
 			relatedObv = observationService.getRelatedObservationBySpeciesGroup(params)
+		}else if(params.filterProperty == "user"){
+			relatedObv = observationService.getRelatedObservationByUser(params)
 		}else{
 			relatedObv = observationService.getRelatedObservation(params)
 		}

@@ -13,7 +13,7 @@
 		<div class="prop">
 			<span class="name">By </span>
 			<div class="value">
-				<g:link controller="sUser" action="show"
+				<g:link controller="SUser" action="show"
 					id="${observationInstance.author.id}">
 					${observationInstance.author.username}
 				</g:link>
