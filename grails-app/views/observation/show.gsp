@@ -209,7 +209,7 @@ width:90%;
          
          $("li.tagit-choice").click(function(){
          	var tg = $(this).contents().first().text();
-         	window.location.href = "${g.createLink(action: 'tagged')}/" + tg ;
+         	window.location.href = "${g.createLink(action: 'list')}/?tag=" + tg 
          });
          
          var max = 3, offset = 0;
