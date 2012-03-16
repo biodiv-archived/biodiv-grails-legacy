@@ -1,9 +1,10 @@
 package speciespage
 
+import org.grails.taggable.Tag;
+import org.grails.taggable.TagLink;
+
 import species.participation.RecommendationVote.ConfidenceType;
-
 import java.util.Date;
-
 import species.Resource;
 import species.Resource.ResourceType;
 import species.TaxonomyDefinition;
@@ -355,6 +356,17 @@ class ObservationService {
 		return resources;
 	}
 	
+	List findAllTagsSortedByObservationCount(int max){
 	
-	
+		def tag_ids = TagLink.executeQuery("select tag.id from TagLink group by tag_id order by count(tag_id) desc", [max:max]);
+		
+		def tags = []
+		
+		for (tag_id in tag_ids){
+			tags.add(Tag.get(tag_id));		
+		}
+		
+		
+		return tags;
+	}
 }

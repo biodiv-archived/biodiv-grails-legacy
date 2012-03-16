@@ -3,7 +3,7 @@ package species
 class ObservationTagLib {
 	static namespace = "obv"
 	
-	//def observationService
+	def observationService
 	def grailsApplication
 	
 	def create = {attrs, body ->
@@ -80,7 +80,8 @@ class ObservationTagLib {
 	}
 	
 	def showTagsList = {attrs, body->
-			out << render(template:"/common/observation/showTagsListTemplate", model:attrs.model);
+			def tags = observationService.findAllTagsSortedByObservationCount(50);
+			out << render(template:"/common/observation/showTagsListTemplate", model:[tags:tags]);
 	}
 	
 	def showTagsCloud = {attrs, body->
@@ -90,5 +91,4 @@ class ObservationTagLib {
 	def showAllTags = {attrs, body->
 		out << render(template:"/common/observation/showAllTagsTemplate", model:attrs.model);
 	}
-	
 }

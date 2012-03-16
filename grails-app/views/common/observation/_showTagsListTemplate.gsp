@@ -3,7 +3,7 @@
 
 <div class="view_tags grid_4">
 	<ul class="tagit">
-		<g:each in="${Tag.findAll()}">
+		<g:each in="${tags}">
 			<li class="tagit-choice" style="padding:0 5px;clear:both;">
 				${it} <span class="tag_stats"> ${Observation.countByTag(it.name)}</span>
 			</li>
