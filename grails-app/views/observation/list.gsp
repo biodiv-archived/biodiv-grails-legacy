@@ -39,7 +39,8 @@
 			<div class="list">
 				<div class="observations thumbwrap">
 					<div class="observation grid_11">
-                                            <div id="list_view_bttn" class="list_style_button"></div> 
+											<div>Observations : ${observationInstanceTotal}</div>
+                                           <div id="list_view_bttn" class="list_style_button"></div> 
                                             <div id="grid_view_bttn" class="grid_style_button active"></div>
                                         </div>
 					<div class="observation grid_11">
@@ -61,6 +62,7 @@
 					
 					<div class="tags_section grid_4">
 					<obv:showAllTags/>
+					<obv:showGroupList/>
 					</div>
 				</div>
 			</div>
