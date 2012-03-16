@@ -164,7 +164,7 @@
          
          $("li.tagit-choice").click(function(){
          	var tg = $(this).contents().first().text();
-         	window.location.href = "${g.createLink(action: 'tagged')}/" + tg ;
+         	window.location.href = "${g.createLink(action: 'list')}/?tag=" + tg ;
          });
          
          	$('#list_view_bttn').click(function(){
