@@ -137,7 +137,7 @@ class ObservationController {
 			redirect(action: "list")
 		}
 		else {
-			//observationInstance.incrementPageVisit();
+			observationInstance.incrementPageVisit();
 			[observationInstance: observationInstance]
 		}
 	}

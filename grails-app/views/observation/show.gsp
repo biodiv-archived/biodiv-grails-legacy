@@ -142,8 +142,9 @@ width:90%;
 				<h6>Other observations of the same species</h6>	
 				<div class="grid_5 sidebar_section" style="clear:both">
 				<obv:showRelatedStory model="['observationInstance':observationInstance, 'observationId': observationInstance.id, 'controller':'observation', 'action':'getRelatedObservation', 'filterProperty': 'speciesName', 'id':'a']" />
-				<h8>Recommendations : ${observationInstance.getRecommendationCount()}</h8>	
-				<h8>Last Updated : ${observationInstance.daysAfterLastUpdate()} days before</h8>	
+				<div>Recommendations : ${observationInstance.getRecommendationCount()}</div>	
+				<div>Last Updated : ${observationInstance.daysAfterLastUpdate()} days before</div>	
+				<div>Visit Count : ${observationInstance.getPageVisitCount()}</div>	
 				
 				</div>
 				<!-- obv:showTagsSummary model="['observationInstance':observationInstance]" /-->
