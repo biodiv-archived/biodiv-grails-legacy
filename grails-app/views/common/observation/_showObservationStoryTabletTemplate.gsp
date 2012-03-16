@@ -45,12 +45,28 @@
 				${observationInstance.placeName}
 			</div>
 		</div>
-
-       <div class="prop tablet">
-			<div>Recommendations : ${observationInstance.getRecommendationCount()}</div>	
-			<div>Last Updated : ${observationInstance.daysAfterLastUpdate()} days before</div>	
-			<div>Visit Count : ${observationInstance.getPageVisitCount()}</div>
-	   </div>
+		
+		<div class="prop tablet">
+			<span class="name tablet">Recommendations</span>
+			<div class="value tablet">
+				${observationInstance.getRecommendationCount()}
+			</div>
+		</div>
+		
+		<div class="prop tablet">
+			<span class="name tablet">Last Updated</span>
+			<div class="value tablet">
+				${observationInstance.daysAfterLastUpdate()} days before
+			</div>
+		</div>
+		
+		<div class="prop tablet">
+			<span class="name tablet">Visit Count</span>
+			<div class="value tablet">
+				${observationInstance.getPageVisitCount()}
+			</div>
+		</div>
+		
        <br/>		
 
 		<div class="more_info" style="position:absolute; display:none;background-color: #fbfbfb;width: 200px;z-index:2;box-shadow:0 8px 6px -6px black;">

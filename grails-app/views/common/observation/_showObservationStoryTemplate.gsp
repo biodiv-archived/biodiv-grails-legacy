@@ -34,6 +34,27 @@
 				${observationInstance.placeName}
 			</div>
 		</div>
-
+		
+		<div class="prop">
+			<span class="name">Recommendations</span>
+			<div class="value">
+				${observationInstance.getRecommendationCount()}
+			</div>
+		</div>
+		
+		<div class="prop">
+			<span class="name">Last Updated</span>
+			<div class="value">
+				${observationInstance.daysAfterLastUpdate()} days before
+			</div>
+		</div>
+		
+		<div class="prop">
+			<span class="name">Visit Count</span>
+			<div class="value">
+				${observationInstance.getPageVisitCount()}
+			</div>
+		</div>
+		
 		<obv:showTagsSummary model="['observationInstance':observationInstance]" />
 </div>
