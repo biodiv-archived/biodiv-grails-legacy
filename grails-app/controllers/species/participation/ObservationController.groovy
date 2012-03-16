@@ -83,7 +83,7 @@ class ObservationController {
 		//log.error("================= result == " +observationInstanceList  )
 		//log.error("================= size  == " +observationInstanceList.size()  )
 		
-		[observationInstanceList: observationInstanceList, observationInstanceTotal: count]
+		[observationInstanceList: observationInstanceList, observationInstanceTotal: count, queryParams: queryParams]
 	}
 
 	@Secured(['ROLE_USER'])

@@ -1515,4 +1515,12 @@ cursor: pointer;
 	
 }
 
+.info-message {
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.info-message .highlight {
+	font-weight: bold;	
+}
 

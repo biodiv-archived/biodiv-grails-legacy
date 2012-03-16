@@ -1,5 +1,6 @@
 
 <%@ page import="species.participation.Observation"%>
+<%@ page import="species.groups.SpeciesGroup"%>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -39,7 +40,18 @@
 			<div class="list">
 				<div class="observations thumbwrap">
 					<div class="observation grid_11">
-											<div>Observations : ${observationInstanceTotal}</div>
+											<div class="info-message">
+												Showing <span class="highlight">${observationInstanceTotal} observation<g:if test="${observationInstanceTotal>1}">s</g:if></span>
+												<g:if test="${queryParams.groupId}">
+													of <span class="highlight">${SpeciesGroup.get(queryParams.groupId).name.toLowerCase()}</span> group
+												</g:if>
+												<g:if test="${queryParams.habitat}">
+													in <span class="highlight">${queryParams.habitat.toLowerCase()}</span> habitat
+												</g:if>
+												<g:if test="${queryParams.tag}">
+													tagged <span class="highlight">${queryParams.tag}</span>
+												</g:if>
+											</div>
                                            <div id="list_view_bttn" class="list_style_button"></div> 
                                             <div id="grid_view_bttn" class="grid_style_button active"></div>
                                         </div>
