@@ -139,14 +139,18 @@ width:90%;
 
 				<!-- obv:showRating model="['observationInstance':observationInstance]" /-->
 				<!--  static species content -->
-				<h6>Other observations of the same species</h6>	
 				<div class="grid_5 sidebar_section" style="clear:both">
+				<h6>Nearby observations</h6>	
+				<obv:showRelatedStory model="['observationInstance':observationInstance, 'observationId': observationInstance.id, 'controller':'observation', 'action':'getRelatedObservation', 'filterProperty': 'nearBy', 'id':'nearBy']" />
+				</div>
+				<div class="grid_5 sidebar_section" style="clear:both">
+				<h6>Other observations of the same species</h6>	
 				<obv:showRelatedStory model="['observationInstance':observationInstance, 'observationId': observationInstance.id, 'controller':'observation', 'action':'getRelatedObservation', 'filterProperty': 'speciesName', 'id':'a']" />
+				</div>
 				<div>Recommendations : ${observationInstance.getRecommendationCount()}</div>	
 				<div>Last Updated : ${observationInstance.daysAfterLastUpdate()} days before</div>	
 				<div>Visit Count : ${observationInstance.getPageVisitCount()}</div>	
 				
-				</div>
 				<!-- obv:showTagsSummary model="['observationInstance':observationInstance]" /-->
 				<!-- obv:showObvStats  model="['observationInstance':observationInstance]"/-->
 			</div>

@@ -95,4 +95,8 @@ class ObservationTagLib {
 	def showGroupList = {attrs, body->
 		out << render(template:"/common/observation/showGroupListTemplate", model:attrs.model);
 	}
+	
+	def showObservationsLocation = {attrs, body->
+		out << render(template:"/common/observation/showObservationMultipleLocationTemplate", model:attrs.model);
+	}
 }

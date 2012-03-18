@@ -34,8 +34,10 @@
 			
 			<obv:showGroupFilter
 				model="['observationInstance':observationInstance]" />
-				
 			
+			<obv:showObservationsLocation
+					model="['observationInstanceList':observationInstanceList]" />
+				
 			<div style="clear:both"></div>
 			<div class="list">
 				<div class="observations thumbwrap">

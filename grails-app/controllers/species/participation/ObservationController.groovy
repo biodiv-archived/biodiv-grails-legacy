@@ -427,6 +427,8 @@ class ObservationController {
 			relatedObv = observationService.getRelatedObservationBySpeciesGroup(params)
 		}else if(params.filterProperty == "user"){
 			relatedObv = observationService.getRelatedObservationByUser(params)
+		}else if(params.filterProperty == "nearBy"){
+			relatedObv = observationService.getNearbyObservations(params.id, 5)
 		}else{
 			relatedObv = observationService.getRelatedObservation(params)
 		}
