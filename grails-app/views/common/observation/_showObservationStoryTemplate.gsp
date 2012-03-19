@@ -9,25 +9,42 @@
 				src="${createLinkTo(dir: 'group_icons', file:'All.png', base:grailsApplication.config.speciesPortal.resources.serverURL)}"
 				title="${observationInstance.habitat}" />
 		</g:if>
-
+		
+		<a href=/biodiv/SUser/show/${observationInstance.author.id}>  
+		<img class="species_group_icon"
+			src="${createLinkTo(file: observationInstance.author.icon()?.fileName?.trim(), base:grailsApplication.config.speciesPortal.resources.serverURL)}"
+			title="${observationInstance.author.username}" />
+		</a>
+			
 		<div class="prop">
-			<span class="name">By </span>
+			<span class="name">Species Name</span>
 			<div class="value">
-				<g:link controller="SUser" action="show"
-					id="${observationInstance.author.id}">
-					${observationInstance.author.username}
-				</g:link>
+				<g:set var= "sNames" value="${observationInstance.getSpecies()}" />
+				<g:if test="${sNames.size() == 0}">
+					Unknown <a href="#">Help identify</a>  
+				</g:if>
+				<g:else>
+					${sNames.join(", ")}
+				</g:else>
 			</div>
-		</div>
+		</div>	
+			
+<%--		<div class="prop">--%>
+<%--			<span class="name">Observed on</span>--%>
+<%--			<div class="value">--%>
+<%--				<g:formatDate format="MMMMM dd, yyyy"--%>
+<%--					date="${observationInstance.observedOn}" />--%>
+<%--			</div>--%>
+<%--		</div>--%>
+<%--		--%>
 
 		<div class="prop">
-			<span class="name">Observed on</span>
+			<span class="name">Created on</span>
 			<div class="value">
 				<g:formatDate format="MMMMM dd, yyyy"
-					date="${observationInstance.observedOn}" />
+					date="${observationInstance.createdOn}" />
 			</div>
 		</div>
-
 		<div class="prop">
 			<span class="name">Place name</span>
 			<div class="value">
@@ -35,12 +52,12 @@
 			</div>
 		</div>
 		
-		<div class="prop">
-			<span class="name">Recommendations</span>
-			<div class="value">
-				${observationInstance.getRecommendationCount()}
-			</div>
-		</div>
+<%--		<div class="prop">--%>
+<%--			<span class="name">Recommendations</span>--%>
+<%--			<div class="value">--%>
+<%--				${observationInstance.getRecommendationCount()}--%>
+<%--			</div>--%>
+<%--		</div>--%>
 		
 		<div class="prop">
 			<span class="name">Last Updated</span>

@@ -60,3 +60,13 @@ $(document).ready(function(){
 					title="${habitat.name}" /> </label>
 		</g:each>
 </div>
+
+<div style="float: right;">
+Sort by <select name="observationSort" id="observationSort"
+		class="value ui-corner-all">
+		<option value="createdOn" 
+			${params.sort?.equals('createdOn')?'selected':''  }>Latest</option>
+		<!-- option value="visitCount"
+			${params.sort?.equals('visitCount')?'selected':'' }>Most Viewed</option -->
+		</select>
+</div>
