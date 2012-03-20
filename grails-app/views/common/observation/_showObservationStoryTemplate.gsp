@@ -19,12 +19,12 @@
 		<div class="prop">
 			<span class="name">Species Name</span>
 			<div class="value">
-				<g:set var= "sNames" value="${observationInstance.getSpecies()}" />
-				<g:if test="${sNames.size() == 0}">
-					Unknown <a href="#">Help identify</a>  
-				</g:if>
+				<g:set var= "sName" value="${observationInstance.maxVotedSpeciesName}" />
+					<g:if test="${sName == 'Unknown'}"> 
+						${sName} <a href="#">Help identify</a>  
+					</g:if>
 				<g:else>
-					${sNames.join(", ")}
+					${sName}
 				</g:else>
 			</div>
 		</div>	
@@ -62,7 +62,7 @@
 		<div class="prop">
 			<span class="name">Last Updated</span>
 			<div class="value">
-				${observationInstance.daysAfterLastUpdate()} days before
+				${observationInstance.daysAfterLastUpdate()} days ago
 			</div>
 		</div>
 		

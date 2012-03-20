@@ -26,20 +26,20 @@
 			src="${createLinkTo(file: observationInstance.author.icon()?.fileName?.trim(), base:grailsApplication.config.speciesPortal.resources.serverURL)}"
 			title="${observationInstance.author.username}" />
 		</a>
-			
+		
 		<div class="prop tablet">
 			<span class="name tablet">Species Name</span>
 			<div class="value tablet">
-				<g:set var= "sNames" value="${observationInstance.getSpecies()}" />
-				<g:if test="${sNames.size() == 0}">
-					Unknown <a href="#">Help identify</a>  
-				</g:if>
+				<g:set var= "sName" value="${observationInstance.maxVotedSpeciesName}" />
+					<g:if test="${sName == 'Unknown'}"> 
+						${sName} <a href="#">Help identify</a>  
+					</g:if>
 				<g:else>
-					${sNames.join(", ")}
+					${sName}
 				</g:else>
 			</div>
-		</div>
-			
+		</div>	
+		
 		<div class="prop tablet">
 			<span class="name tablet">Created on</span>
 			<div class="value tablet">

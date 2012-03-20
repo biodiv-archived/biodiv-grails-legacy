@@ -45,7 +45,7 @@ class Observation implements Taggable{
 	SUser author;
 	Date observedOn;
 	Date createdOn = new Date();
-	Date lastUpdated;
+	Date lastUpdated = new Date();
 	String notes;
 	SpeciesGroup group;
 	int rating;
@@ -57,12 +57,14 @@ class Observation implements Taggable{
 	boolean geoPrivacy = false;
 	String locationAccuracy;
 	String habitat;
-	//int visitCount = 0;
+	long visitCount = 0;
+	String maxVotedSpeciesName;
 
 	static hasMany = [resource:Resource, recommendationVote:RecommendationVote];
 
 	static constraints = {
 		notes nullable:true
+		maxVotedSpeciesName nullable:true
 		resource validator : { val, obj -> val && val.size() > 0 }
 		observedOn validator : {val -> val < new Date()}
 		notes (size:0..400)
@@ -71,6 +73,7 @@ class Observation implements Taggable{
 	static mapping = {
 		version : false;
 		notes type:'text'
+		autoTimestamp false
 	}
 
 	/**
@@ -98,9 +101,25 @@ class Observation implements Taggable{
 	List<String> getSpecies() {
 		def speciesList = [];
 		this.recommendationVote.each{speciesList << it.recommendation.name}
-		return this.getMaxRepeatedElementsFromList(speciesList)
+		return getMaxRepeatedElementsFromList(speciesList)
 	}
 
+	void calculateMaxVotedSpeciesName(){
+		List speciesList = getSpecies(); 
+		if(speciesList.isEmpty()){
+			maxVotedSpeciesName = "Unknown";
+		}else if(speciesList.size() == 1){
+			maxVotedSpeciesName = speciesList[0];
+		}else{
+			String query = "from RecommendationVote as recoVote where recoVote.recommendation.name in (:speciesList) order by recoVote.votedOn desc "
+			maxVotedSpeciesName = RecommendationVote.find(query, [speciesList:speciesList]).recommendation.name
+		}
+		
+		if(!save(flush:true)){
+			errors.allErrors.each { log.error it }
+		}
+	}
+	
 	/**
 	 * 
 	 * @param list
@@ -199,11 +218,21 @@ class Observation implements Taggable{
 	}
 	
 	def incrementPageVisit(){
-		VisitCounter.incrementPageVisit("" + getClass() + id);
+		visitCount++;
+		
+		if(!save(flush:true)){
+			this.errors.allErrors.each { log.error it }
+		}
+	}
+	
+	def beforeUpdate(){
+		if(isDirty() && !isDirty('visitCount')){
+			lastUpdated = new Date();
+		}
 	}
 	
 	def getPageVisitCount(){
-		return VisitCounter.getPageVisitCount("" + getClass() + id);
+		return visitCount;
 	}
 	
 	public static int getCountForGroup(groupId){

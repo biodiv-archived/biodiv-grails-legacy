@@ -67,7 +67,13 @@ class ObservationController {
 			filterQuery += " obv.author.id = :userId "
 			queryParams["userId"] = params.userId.toLong()
 		}
-
+		
+		if(params.speciesName){
+			(filterQuery == "")? (filterQuery += " where ") : (filterQuery += " and ")
+			filterQuery += " obv.maxVotedSpeciesName like :speciesName "
+			queryParams["speciesName"] = params.speciesName
+		}
+		
 		def orderByClause = "order by obv." + (params.sort ? params.sort : "createdOn") +  " desc"
 
 		query += filterQuery + orderByClause
@@ -316,6 +322,9 @@ class ObservationController {
 			try {
 				if (!recommendationVoteInstance.hasErrors() && recommendationVoteInstance.save(flush: true)) {
 					log.debug "Successfully added reco vote : "+recommendationVoteInstance
+					
+					//saving max voted species name for observation instance
+					observationInstance.calculateMaxVotedSpeciesName();
 					redirect(action: "show", id: observationInstance.id);
 				}
 				else {
@@ -353,6 +362,8 @@ class ObservationController {
 				if (recommendationVoteInstance.save(flush: true)) {
 					log.debug "Successfully added reco vote : "+recommendationVoteInstance
 					success = true;
+					
+					observationInstance.calculateMaxVotedSpeciesName();
 					def result = ['votes':++params.int('currentVotes')];
 					render result as JSON;
 				}
