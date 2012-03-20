@@ -1,5 +1,5 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns:fb="http://ogp.me/ns/fb#">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:fb="http://ogp.me/ns/fb#">
 <head>
 <title>Species Portal</title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -175,23 +175,13 @@ border-bottom:3px solid #003846;
             </div>
 
         </div>
-        <!--div id="top_nav_bar">
-            <ul>
-            <li id="maps_nav_link" title="Maps" onclick="location.href='http://thewesternghats.in/map'">Maps</li>
-            <li id="checklists_nav_link" title="Checklists" onclick="location.href='http://thewesternghats.in/browsechecklists'">Checklists</li>
-            <li id="collaborate_nav_link" title="Collaborate" onclick="location.href='http://thewesternghats.in/collaborate-wg'">Collaborate</li>
-            <li id="species_nav_link" title="Species" onclick="location.href='http://thewesternghats.in/speciespage/species/list'">Species</li>
-            <li id="themes_nav_link" title="Themes" onclick="location.href='http://thewesternghats.in/themepages/list'">Themes</li>
-            <li id="about_nav_link" title="About" onclick="location.href='http://thewesternghats.in/about/western-ghats'">About</li>
-            </ul>
-        </div-->
 
 
 	<div>
 		<span id='loginLink'
 			style='position: relative; margin-right: 30px; float: right'>
 			<sec:ifLoggedIn>
-         	Logged in as <sec:username /> (<a href="${createLink(controller:'logout')}" id="logout">Logout</a>)
+         	Logged in as <sec:username /> (<g:link controller='logout'>Logout</g:link>)
       		</sec:ifLoggedIn> <sec:ifNotLoggedIn>
 				<!--a href='#' onclick='show_login_dialog();  return false'>Login</a-->
 				<g:link controller='login'>Login</g:link>
@@ -219,7 +209,6 @@ border-bottom:3px solid #003846;
 		<g:layoutBody />
 	</div>
 
-	<r:layoutResources />
 	<g:javascript>
 		
 		$(document).ready(function(){

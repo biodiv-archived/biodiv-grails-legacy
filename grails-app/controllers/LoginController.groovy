@@ -71,8 +71,6 @@ class LoginController {
 	def authSuccess = {
 		def defaultSavedRequest = request.getSession()?.getAttribute(WebAttributes.SAVED_REQUEST)
 		if(defaultSavedRequest) {
-			def accessToken = params.token;
-			def uid = params.uid;
 			(new DefaultRedirectStrategy()).sendRedirect(request, response, defaultSavedRequest.getRedirectUrl());
 			return
 		}

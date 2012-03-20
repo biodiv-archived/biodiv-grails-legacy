@@ -89,51 +89,6 @@ td.openid-submit {
 	opacity: 0;
 }
 </style>
-<g:javascript>
-	window.fbAsyncInit = function() {
-	  FB.init({
-	    appId  : '${SpringSecurityUtils.securityConfig.facebook.appId}',
-	    status : true,
-	    cookie : true,
-	    xfbml  : true,
-	    oauth  : true,
-	    logging : true
-	  });
-	  
-	FB.Event.subscribe('edge.create',
-		function(response) {
-			alert('You liked the URL: ' + response);
-	});
-	
-	FB.Event.subscribe('auth.login',
-			function(response) {
-				console.log(response);
-				if(response.status == 'connected') {
-					window.location = "${createLink(controller:"login", action:'authSuccess')}?token="+response.authResponse.accessToken+"&uid="+response.authResponse.userID;
-				} else {
-					alert("Error in authenticating via Facebook");
-				}
-			}
-		);
-	/*FB.login(function(response) {
-   		if (response.authResponse) {
-     		console.log('Welcome!  Fetching your information.... ');
-     		  var access_token =   FB.getAuthResponse()['accessToken'];
-     			console.log('Access Token = '+ access_token);
-     		FB.api('/me', function(response) {
-     		console.log(response);
-      			console.log('Good to see you, ' + response.name + '.');
-     		});
-   		} else {
-     		console.log('User cancelled login or did not fully authorize.');
-   		}
- 	});*/
-	};
-	
-	
- 
-	(function(d){var js, id = 'facebook-jssdk'; if (d.getElementById(id)) {return;}js = d.createElement('script'); js.id = id; js.async = true;js.src = "//connect.facebook.net/en_US/all.js";d.getElementsByTagName('head')[0].appendChild(js);}(document));
-</g:javascript>
 </head>
 
 <body>
@@ -243,8 +198,39 @@ td.openid-submit {
 			</table>
 		</div>
 	</div>
-	<script>
-
+	<g:javascript>
+	window.fbAsyncInit = function() {
+		  FB.init({
+		    appId  : '${SpringSecurityUtils.securityConfig.facebook.appId}',
+		    channelUrl : "${grailsApplication.config.grails.serverURL}/channel.html",
+		    status : true,
+		    cookie : true,
+		    xfbml  : true,
+		    oauth  : true,
+		    logging : true
+		  });
+		  
+		FB.Event.subscribe('edge.create',
+			function(response) {
+				alert('You liked the URL: ' + response);
+		});
+		
+		FB.Event.subscribe('auth.login',
+				function(response) {
+					console.log(response);
+					if(response.status == 'connected') {
+						window.location = "${createLink(controller:'login', action:'authSuccess')}"
+					} else {
+						alert("Error in authenticating via Facebook");
+					}
+				}
+			);
+		
+		};
+		
+		
+	 
+		(function(d){var js, id = 'facebook-jssdk'; if (d.getElementById(id)) {return;}js = d.createElement('script'); js.id = id; js.async = true;js.src = "//connect.facebook.net/en_US/all.js";d.getElementsByTagName('head')[0].appendChild(js);}(document));
 		(function() { document.forms['siteLoginForm'].elements['username'].focus(); })();
 		
 		function showOpenIdForm() {
@@ -264,5 +250,5 @@ td.openid-submit {
 			}
 			openid = !openid;
 		}
-	</script>
+	</g:javascript>
 </body>
