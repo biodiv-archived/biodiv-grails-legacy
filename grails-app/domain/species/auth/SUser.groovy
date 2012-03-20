@@ -61,4 +61,9 @@ class SUser {
 		}
 		return new Resource(fileName:"users/${name}", type:ResourceType.ICON, title:username);
 	}
+	
+	@Override
+	String toString() {
+		return username;
+	}
 }

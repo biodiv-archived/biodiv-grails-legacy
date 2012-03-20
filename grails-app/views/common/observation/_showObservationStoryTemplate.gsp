@@ -1,5 +1,6 @@
 
 <div class="observation_story">
+		<div>
 		<img class="species_group_icon"
 			src="${createLinkTo(file: observationInstance.group.icon()?.fileName?.trim(), base:grailsApplication.config.speciesPortal.resources.serverURL)}"
 			title="${observationInstance.group?.name}" />
@@ -15,6 +16,7 @@
 			src="${createLinkTo(file: observationInstance.author.icon()?.fileName?.trim(), base:grailsApplication.config.speciesPortal.resources.serverURL)}"
 			title="${observationInstance.author.username}" />
 		</a>
+		</div>
 			
 		<div class="prop">
 			<span class="name">Species Name</span>

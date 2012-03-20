@@ -160,6 +160,7 @@ else {
 speciesPortal {
 	app.rootDir = "${userHome}/species"
 	data.rootDir = "${app.rootDir}/data"
+	domain = "localhost"
 	resources {
 		rootDir = "${app.rootDir}/images"
 		serverURL = "http://localhost/${appName}/images"
@@ -567,8 +568,13 @@ grails.plugins.springsecurity.rememberMe.persistentToken.domainClassName = 'spec
 
 
 grails.plugins.springsecurity.facebook.domain.classname='species.auth.FacebookUser'
+//wgp.saturn.strandls.com
 grails.plugins.springsecurity.facebook.appId='310694198984953'
 grails.plugins.springsecurity.facebook.secret='eedf76e46272190fbd26e578ae764a60'
+
+//wgp.panchgani.strandls.com
+//grails.plugins.springsecurity.facebook.appId='327308053982589'
+//grails.plugins.springsecurity.facebook.secret='f36074901fc24b904794692755796fd1'
 
 grails.taggable.tag.autoImport=true
 grails.taggable.tagLink.autoImport=true
