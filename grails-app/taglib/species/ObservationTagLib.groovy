@@ -3,7 +3,7 @@ package species
 class ObservationTagLib {
 	static namespace = "obv"
 	
-	//def observationService
+	def observationService
 	def grailsApplication
 	
 	def create = {attrs, body ->
@@ -21,10 +21,23 @@ class ObservationTagLib {
 			out << render(template:"/common/observation/showObservationSnippetTemplate", model:attrs.model);
 		}
 	}
+
+        def showSnippetTablet = {attrs, body->
+		if(attrs.model.observationInstance) {
+			out << render(template:"/common/observation/showObservationSnippetTabletTemplate", model:attrs.model);
+		}
+	}
+
 	
 	def showStory = {attrs, body->
 		if(attrs.model.observationInstance) {
 			out << render(template:"/common/observation/showObservationStoryTemplate", model:attrs.model);
+		}
+	}
+
+	def showStoryTablet = {attrs, body->
+		if(attrs.model.observationInstance) {
+			out << render(template:"/common/observation/showObservationStoryTabletTemplate", model:attrs.model);
 		}
 	}
 
@@ -64,5 +77,26 @@ class ObservationTagLib {
 		if(attrs.model.observationInstance) {
 			out << render(template:"/common/observation/showObservationStatsTemplate", model:attrs.model);
 		}
+	}
+	
+	def showTagsList = {attrs, body->
+			def tags = observationService.findAllTagsSortedByObservationCount(50);
+			out << render(template:"/common/observation/showTagsListTemplate", model:[tags:tags]);
+	}
+	
+	def showTagsCloud = {attrs, body->
+		out << render(template:"/common/observation/showTagsCloudTemplate", model:attrs.model);
+	}
+	
+	def showAllTags = {attrs, body->
+		out << render(template:"/common/observation/showAllTagsTemplate", model:attrs.model);
+	}
+
+	def showGroupList = {attrs, body->
+		out << render(template:"/common/observation/showGroupListTemplate", model:attrs.model);
+	}
+	
+	def showObservationsLocation = {attrs, body->
+		out << render(template:"/common/observation/showObservationMultipleLocationTemplate", model:attrs.model);
 	}
 }

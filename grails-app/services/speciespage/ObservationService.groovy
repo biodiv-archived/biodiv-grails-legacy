@@ -1,9 +1,12 @@
 package speciespage
 
+import groovy.sql.Sql 
+
+import org.grails.taggable.Tag;
+import org.grails.taggable.TagLink;
+
 import species.participation.RecommendationVote.ConfidenceType;
-
 import java.util.Date;
-
 import species.Resource;
 import species.Resource.ResourceType;
 import species.TaxonomyDefinition;
@@ -21,6 +24,7 @@ class ObservationService {
 
 	def recommendationService;
 	def grailsApplication;
+	def dataSource;
 	
 	/**
 	 * 
@@ -123,6 +127,29 @@ class ObservationService {
 		log.debug speciesNames
 		log.debug speciesNames.getClass();
 		return getRelatedObservationBySpeciesNames(speciesNames, params)
+	}
+	/**
+	 * 
+	 * @param params
+	 * @return
+	 */
+	Map getRelatedObservationByUser(params){
+		//getting count
+		def queryParams = [:]
+		def countQuery = "select count(*) from Observation obv where obv.author.username like :userName "
+		queryParams["userName"] = SUser.read(params.filterPropertyValue.toInteger()).username
+		def count = Observation.executeQuery(countQuery, queryParams)
+		
+		
+		//getting observations
+		def query = "from Observation obv where obv.author.username like :userName "
+		def orderByClause = "order by obv." + (params.sort ? params.sort : "createdOn") +  " desc"
+		query += orderByClause
+		
+		queryParams["max"] = params.limit.toInteger()
+		queryParams["offset"] = params.offset.toInteger()
+		
+		return ["observations":createUrlList(Observation.findAll(query, queryParams)), "count":count]
 	}
 //	
 //	List getRelatedObservationBySpeciesGroup(params){
@@ -232,6 +259,20 @@ class ObservationService {
 		return urlList
 	}
 	
+	private static List createUrlList2(observations){
+		List urlList = []
+		for(param in observations){
+			def obv = param['observation'] 
+			def title = param['title']
+			def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+			def image = obv.mainImage()
+			def imagePath = image.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, config.speciesPortal.resources.images.galleryThumbnail.suffix)
+			def imageLink = config.speciesPortal.observations.serverURL + "/" +  imagePath
+			urlList.add(["obvId":obv.id, "imageLink":imageLink, "imageTitle": title])
+		}
+		return urlList
+	}
+	
 	private Recommendation getRecommendation(recoName, canName) {
 		def reco, taxonConcept;
 		if(canName) {
@@ -332,6 +373,32 @@ class ObservationService {
 		return resources;
 	}
 	
+	List findAllTagsSortedByObservationCount(int max){
 	
+		def tag_ids = TagLink.executeQuery("select tag.id from TagLink group by tag_id order by count(tag_id) desc", [max:max]);
+		
+		def tags = []
+		
+		for (tag_id in tag_ids){
+			tags.add(Tag.get(tag_id));		
+		}
+		
+		
+		return tags;
+	}
 	
+	Map getNearbyObservations(String observationId, int limit){
+		
+		def sql =  Sql.newInstance(dataSource);
+		
+		def resultSet = sql.rows("select g2.id,  ROUND(ST_Distance_Sphere(g1.st_geomfromtext, g2.st_geomfromtext)/1000) as distance from observation_locations as g1, observation_locations as g2 where g1.id = :observationId and g1.id <> g2.id order by ST_Distance(g1.st_geomfromtext, g2.st_geomfromtext) limit :max", [observationId: Integer.parseInt(observationId), max:limit])
+		
+		def nearbyObservations = []
+		
+		for (row in resultSet){
+			nearbyObservations.add(["observation":Observation.findById(row.getProperty("id")), "title":"Found "+row.getProperty("distance")+" km away"])	
+		}
+		
+		return ["observations":createUrlList2(nearbyObservations)]
+	}
 }

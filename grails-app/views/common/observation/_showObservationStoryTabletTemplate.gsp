@@ -1,6 +1,16 @@
+<g:javascript>
+    $(document).ready(function(){
+        $(".observation_story").hover(function(){
+                $('.more_info', this).slideDown('fast'); 
+            },
+            function(){
+                $('.more_info', this).slideUp('fast'); 
+            });
+    });
 
-<div class="observation_story">
-		<div>
+</g:javascript>
+
+<div class="observation_story tablet">
 		<img class="species_group_icon"
 			src="${createLinkTo(file: observationInstance.group.icon()?.fileName?.trim(), base:grailsApplication.config.speciesPortal.resources.serverURL)}"
 			title="${observationInstance.group?.name}" />
@@ -16,11 +26,10 @@
 			src="${createLinkTo(file: observationInstance.author.icon()?.fileName?.trim(), base:grailsApplication.config.speciesPortal.resources.serverURL)}"
 			title="${observationInstance.author.username}" />
 		</a>
-		</div>
 			
-		<div class="prop">
-			<span class="name">Species Name</span>
-			<div class="value">
+		<div class="prop tablet">
+			<span class="name tablet">Species Name</span>
+			<div class="value tablet">
 				<g:set var= "sNames" value="${observationInstance.getSpecies()}" />
 				<g:if test="${sNames.size() == 0}">
 					Unknown <a href="#">Help identify</a>  
@@ -29,51 +38,49 @@
 					${sNames.join(", ")}
 				</g:else>
 			</div>
-		</div>	
+		</div>
 			
-<%--		<div class="prop">--%>
-<%--			<span class="name">Observed on</span>--%>
-<%--			<div class="value">--%>
-<%--				<g:formatDate format="MMMMM dd, yyyy"--%>
-<%--					date="${observationInstance.observedOn}" />--%>
-<%--			</div>--%>
-<%--		</div>--%>
-<%--		--%>
-
-		<div class="prop">
-			<span class="name">Created on</span>
-			<div class="value">
+		<div class="prop tablet">
+			<span class="name tablet">Created on</span>
+			<div class="value tablet">
 				<g:formatDate format="MMMMM dd, yyyy"
 					date="${observationInstance.createdOn}" />
 			</div>
 		</div>
-		<div class="prop">
-			<span class="name">Place name</span>
-			<div class="value">
+
+		<div class="prop tablet">
+			<span class="name tablet">Place name</span>
+			<div class="value tablet">
 				${observationInstance.placeName}
 			</div>
 		</div>
 		
-<%--		<div class="prop">--%>
-<%--			<span class="name">Recommendations</span>--%>
-<%--			<div class="value">--%>
+<%--		<div class="prop tablet">--%>
+<%--			<span class="name tablet">Recommendations</span>--%>
+<%--			<div class="value tablet">--%>
 <%--				${observationInstance.getRecommendationCount()}--%>
 <%--			</div>--%>
 <%--		</div>--%>
 		
-		<div class="prop">
-			<span class="name">Last Updated</span>
-			<div class="value">
+		<div class="prop tablet">
+			<span class="name tablet">Last Updated</span>
+			<div class="value tablet">
 				${observationInstance.daysAfterLastUpdate()} days before
 			</div>
 		</div>
 		
-		<div class="prop">
-			<span class="name">Visit Count</span>
-			<div class="value">
+		<div class="prop tablet">
+			<span class="name tablet">Visit Count</span>
+			<div class="value tablet">
 				${observationInstance.getPageVisitCount()}
 			</div>
 		</div>
 		
-		<obv:showTagsSummary model="['observationInstance':observationInstance]" />
+       <br/>		
+
+		<div class="more_info" style="position:absolute; display:none;background-color: #fbfbfb;width: 200px;z-index:2;box-shadow:0 8px 6px -6px black;">
+		    <obv:showTagsSummary model="['observationInstance':observationInstance]" />
+        </div>
 </div>
+
+

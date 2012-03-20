@@ -63,11 +63,8 @@ $(document).ready(function() {
     padding: 0 25px;
 }
 </style>
-<div class="grid_5 sidebar_section" style="clear:both">
-  <div class="title">Other observations of the same species</div>	
   <div id="carousel_${id}" class="jcarousel-skin-ie7"> 
     <ul> 
       <!-- The content will be dynamically loaded in here --> 
     </ul> 
-  </div> 
 </div>

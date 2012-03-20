@@ -139,7 +139,14 @@ width:90%;
 
 				<!-- obv:showRating model="['observationInstance':observationInstance]" /-->
 				<!--  static species content -->
+				<div class="grid_5 sidebar_section" style="clear:both">
+				<h6>Nearby observations</h6>	
+				<obv:showRelatedStory model="['observationInstance':observationInstance, 'observationId': observationInstance.id, 'controller':'observation', 'action':'getRelatedObservation', 'filterProperty': 'nearBy', 'id':'nearBy']" />
+				</div>
+				<div class="grid_5 sidebar_section" style="clear:both">
+				<h6>Other observations of the same species</h6>	
 				<obv:showRelatedStory model="['observationInstance':observationInstance, 'observationId': observationInstance.id, 'controller':'observation', 'action':'getRelatedObservation', 'filterProperty': 'speciesName', 'id':'a']" />
+				</div>
 				<!-- obv:showTagsSummary model="['observationInstance':observationInstance]" /-->
 				<!-- obv:showObvStats  model="['observationInstance':observationInstance]"/-->
 			</div>
@@ -203,7 +210,7 @@ width:90%;
          
          $("li.tagit-choice").click(function(){
          	var tg = $(this).contents().first().text();
-         	window.location.href = "${g.createLink(action: 'tagged')}/" + tg ;
+         	window.location.href = "${g.createLink(action: 'list')}/?tag=" + tg 
          });
          
          var max = 3, offset = 0;

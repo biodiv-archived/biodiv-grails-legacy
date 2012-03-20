@@ -52,11 +52,11 @@ $(document).ready(function() {
 			}
 		};
 		
-		$("#name").ajaxStart(function(){
-			var offset = $(this).offset();  				
-   			$("#spinner").css({left:offset.left+$(this).width(), top:offset.top-6}).show();
-   			return false;
- 		});	
+		//$("#name").ajaxStart(function(){
+		//	var offset = $(this).offset();  				
+   		//	$("#spinner").css({left:offset.left+$(this).width(), top:offset.top-6}).show();
+   		//	return false;
+ 		//});	
 	
 });
 

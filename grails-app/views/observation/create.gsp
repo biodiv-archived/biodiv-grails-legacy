@@ -42,6 +42,8 @@
 
 <g:javascript src="tagit.js"
 	base="${grailsApplication.config.grails.serverURL+'/js/'}"></g:javascript>
+
+
 </head>
 <body>
 	<div class="container_16 big_wrapper">
@@ -68,6 +70,7 @@
             <form id="upload_resource" enctype="multipart/form-data"
                     style="position: relative; float: left; z-index: 2; left: 20px; top: 320px;" title="Add a photo for this observation"
                     class="${hasErrors(bean: observationInstance, field: 'resource', 'errors')}">
+
                     <!-- TODO multiple attribute is HTML5. need to chk if this gracefully falls back to default in non compatible browsers -->
                     <input type="button" class="red" id="upload_button"
                             value="Add photo">
@@ -184,13 +187,13 @@
                     </div>
 
 
-                <div class="grid_16 section" style="padding-top:50px;">
-                   <div class="resources">
+                <div class="grid_16 section">
+                                      <div class="resources">
                         <ul id="imagesList" class="thumbwrap"
-                                style='list-style: none; margin-left: 0px;background:url("${resource(dir:'images',file:'add-photo.png', absolute:true)}")'>
+                                style='list-style: none; margin-left: 0px;background:url("${resource(dir:'images',file:'species_canvas.png', absolute:true)}")'>
                                 <g:set var="i" value="0" />
                                 <g:each in="${observationInstance?.resource}" var="r">
-                                        <li class="addedResource" style="float:left; width:220px; display:inline-block; margin:2px;position:relative; padding:10px;">
+                                        <li class="addedResource">
                                                 <%def thumbnail = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.thumbnail.suffix)%>
                                                 <div class='figure'
                                                         style='max-height: 220px; max-width: 160px;'>
@@ -231,7 +234,14 @@
                                                 </div> <a href="#" class="resourceRemove">Remove</a></li>
                                         <g:set var="i" value="${i+1}" />
                                 </g:each>
+                                <li id="add_file" class="addedResource" onclick="$('#attachFiles').select()[0].click();return false;">
+                                    <div class="progress">
+                                        <div id="translucent_box"></div >
+                                        <div id="progress_bar"></div >
+                                        <div id="progress_msg"></div >
+                                    </div>
 
+                                </li>
                         </ul>
 
                                    </div>
@@ -331,7 +341,7 @@
 
 		<!--====== Template ======-->
 		<script id="metadataTmpl" type="text/x-jquery-tmpl">
-	<li class="addedResource" style="width:220px; display:inline-block; margin:2px;position:relative;padding:2px;background-color:#ffffff;">
+	<li class="addedResource">
 		<div class='figure' style='max-height: 165px; max-width: 220px; overflow:hidden;'>
 			<span> 
 				<img style="width:220px;" src='{{=thumbnail}}' class='geotagged_image' exif='true'/> 
@@ -377,6 +387,8 @@
 	
         var mouse_inside_groups_div = false;        
         var mouse_inside_habitat_div = false;        
+        var add_file_button = '<li id="add_file" class="addedResource" style="display:none;" onclick="$(\'#attachFiles\').select()[0].click();return false;"><div class="progress"><div id="translucent_box"></div><div id="progress_bar"></div ><div id="progress_msg"></div ></div></li>';
+
 	
 	$(document).ready(function(){
 
@@ -387,10 +399,24 @@
      	//TODO:not geting called verify....
      	$("#attachFiles").ajaxStart(function(){
 			var offset = $(this).offset();  				
-   			$("#spinner").css({left:offset.left+$(this).width(), top:offset.top-6}).show();
+   			$("#loading").show();
    			return false;
- 		});  
-     		
+ 		}).ajaxStop(function() {
+        			$("#loading").hide();
+    		});  
+     	
+        function progressHandlingFunction(e){
+            if(e.lengthComputable){
+                var position = e.position || e.loaded;
+                var total = e.totalSize || e.total;
+
+                var percentVal = ((position/total)*100).toFixed(0) + '%';
+                $('#progress_bar').width(percentVal)
+                $('#translucent_box').width('100%')
+                $('#progress_msg').html('Uploaded '+percentVal);
+             }
+        }
+
      	$('#upload_resource').ajaxForm({ 
 			url:'${createLink(controller:'observation', action:'upload_resource', params:['jsessionid':RequestContextHolder.currentRequestAttributes().getSessionId()])}',
 			dataType: 'xml',//could not parse json wih this form plugin 
@@ -401,6 +427,14 @@
 			beforeSubmit: function(formData, jqForm, options) {
 				return true;
 			}, 
+                        xhr: function() {  // custom xhr
+                            myXhr = $.ajaxSettings.xhr();
+                            if(myXhr.upload){ // check if upload property exists
+                                myXhr.upload.addEventListener('progress', progressHandlingFunction, false); // for handling the progress of the upload
+                            }
+                            return myXhr;
+                        },
+
 			success: function(responseXML, statusText, xhr, form) {
 				$(form).find("span.msg").html("");
 				var rootDir = '${grailsApplication.config.speciesPortal.observations.serverURL}'
@@ -414,6 +448,9 @@
 					var thumbnail = rootDir + obvDir + "/" + fileName.replace(/\.[a-zA-Z]{3,4}$/, "${grailsApplication.config.speciesPortal.resources.images.thumbnail.suffix}");
   					images.push({i:++i, file:obvDir + "/" + fileName, thumbnail:thumbnail, title:fileName});
 				});
+
+                                $("#add_file").remove();
+                                
 				
 				var html = $( "#metadataTmpl" ).render( images );
 				var metadataEle = $(html)
@@ -423,6 +460,9 @@
 					});
 				})
 				$( "#imagesList" ).append (metadataEle);
+                $( "#imagesList" ).append (add_file_button);
+                $( "#add_file" ).fadeIn(3000);
+
 			}, error:function (xhr, ajaxOptions, thrownError){
 					$('#upload_resource').find("span.msg").html("");
 					var messageNode = $(".message .resources") 
@@ -432,7 +472,7 @@
 					} else {
 						messageNode.append(response?response.error:"Error");
 					}
-            } 
+                        } 
      	});  
 
         var currDate = new Date();

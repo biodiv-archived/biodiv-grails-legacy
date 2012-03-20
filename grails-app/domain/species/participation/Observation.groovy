@@ -5,6 +5,7 @@ import groovy.sql.Sql;
 import grails.converters.JSON;
 import grails.plugins.springsecurity.Secured
 
+import species.VisitCounter;
 import species.Contributor;
 import species.Resource;
 import species.auth.SUser;
@@ -44,6 +45,7 @@ class Observation implements Taggable{
 	SUser author;
 	Date observedOn;
 	Date createdOn = new Date();
+	Date lastUpdated;
 	String notes;
 	SpeciesGroup group;
 	int rating;
@@ -55,6 +57,7 @@ class Observation implements Taggable{
 	boolean geoPrivacy = false;
 	String locationAccuracy;
 	String habitat;
+	//int visitCount = 0;
 
 	static hasMany = [resource:Resource, recommendationVote:RecommendationVote];
 
@@ -140,7 +143,7 @@ class Observation implements Taggable{
 	 */
 	def getRecommendationVotes(int limit, long offset) {
 		if(limit <= 0) limit = 3;
-	
+
 		def sql =  Sql.newInstance(dataSource);
 		
 		 def recoVoteCount = sql.rows("select recoVote.recommendation_id as recoId, count(*) as votecount from recommendation_vote as recoVote where recoVote.observation_id = :obvId group by recoVote.recommendation_id order by votecount desc limit :max offset :offset", [obvId:this.id, max:limit, offset:offset])
@@ -181,4 +184,27 @@ class Observation implements Taggable{
 		}
 		return ['recoVotes':result, 'totalVotes':this.recommendationVote.size()];
 	}
+	
+	def getRecommendationCount(){
+		Sql sql =  Sql.newInstance(dataSource);
+		def result = sql.rows("select count(distinct(recoVote.recommendation_id)) from recommendation_vote as recoVote where recoVote.observation_id = :obvId", [obvId:id])
+		return result[0]["count"]
+	}
+	
+	def daysAfterLastUpdate(){
+		return (new Date()).minus(lastUpdated);
+	}
+	
+	def incrementPageVisit(){
+		VisitCounter.incrementPageVisit("" + getClass() + id);
+	}
+	
+	def getPageVisitCount(){
+		return VisitCounter.getPageVisitCount("" + getClass() + id);
+	}
+	
+	public static int getCountForGroup(groupId){
+		return Observation.executeQuery("select count(*) from Observation obv where obv.group.id = :groupId ", [groupId: groupId])[0]
+	}
+	
 }
