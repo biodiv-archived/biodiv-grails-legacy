@@ -1523,3 +1523,12 @@ cursor: pointer;
 	font-weight: bold;	
 }
 
+.loadMore {
+    width: 440px;
+    margin-left:100px;       
+    margin-top:50px;
+}
+
+.loadMore img{
+padding: 10px;
+}
