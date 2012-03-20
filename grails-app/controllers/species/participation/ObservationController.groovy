@@ -73,7 +73,13 @@ class ObservationController {
 			queryParams["userId"] = params.userId.toLong()
                         activeFilters["userId"] = params.habitat
 		}
-
+		
+		if(params.speciesName){
+			(filterQuery == "")? (filterQuery += " where ") : (filterQuery += " and ")
+			filterQuery += " obv.maxVotedSpeciesName like :speciesName "
+			queryParams["speciesName"] = params.speciesName
+		}
+		
 		def orderByClause = "order by obv." + (params.sort ? params.sort : "createdOn") +  " desc"
 
 		query += filterQuery + orderByClause
@@ -107,9 +113,9 @@ class ObservationController {
 			//TODO:edit also calls here...handle that wrt other domain objects
 
 			params.author = springSecurityService.currentUser;
-
+			def observationInstance;
 			try {
-				def observationInstance =  observationService.createObservation(params);
+				observationInstance =  observationService.createObservation(params);
 
 				if(!observationInstance.hasErrors() && observationInstance.save(flush:true)) {
 					//flash.message = "${message(code: 'default.created.message', args: [message(code: 'observation.label', default: 'Observation'), observationInstance.id])}"
@@ -124,15 +130,15 @@ class ObservationController {
 					redirect(action: 'addRecommendationVote', params:params);
 				} else {
 					observationInstance.errors.allErrors.each { log.error it }
-					redirect(view: "create", model: [observationInstance: observationInstance])
+					render(view: "create", model: [observationInstance: observationInstance])
 				}
 			} catch(e) {
 				e.printStackTrace();
 				flash.message = "${message(code: 'error')}";
-				redirect(view: "create")
+				render(view: "create", model: [observationInstance: observationInstance])
 			}
 		} else {
-			redirect(view: "create")
+			redirect(action: "create")
 		}
 	}
 
@@ -222,14 +228,13 @@ class ObservationController {
 				MultipartHttpServletRequest multiRequest = (MultipartHttpServletRequest) request;
 				def rs = [:]
 				Utils.populateHttpServletRequestParams(request, rs);
-				println "^^^^ : "+rs;
 				def resourcesInfo = [];
 				def rootDir = grailsApplication.config.speciesPortal.observations.rootDir
 				File obvDir;
 				def message;
 
 				if(!params.resources) {
-					message = "${message(code: 'no.file.attached', default:'No file is attached')}"
+					message = g.message(code: 'no.file.attached', default:'No file is attached')
 				}
 
 				params.resources.each { f ->
@@ -245,13 +250,13 @@ class ObservationController {
 					]
 
 					if (! okcontents.contains(f.contentType)) {
-						message = "${message(code: 'resource.file.invalid.extension.message', args: [okcontents, f.originalFilename])}"
+						message = g.message(code: 'resource.file.invalid.extension.message', args: [okcontents, f.originalFilename])
 					}
 					else if(f.size > grailsApplication.config.speciesPortal.observations.MAX_IMAGE_SIZE) {
-						message = "${message(code: 'resource.file.invalid.extension.message', args: [grailsApplication.config.speciesPortal.observations.MAX_IMAGE_SIZE/1024, f.originalFilename,f.size/1024 ], default:'File size cannot exceed ${104857600/1024}KB')}";
+						message = g.message(code: 'resource.file.invalid.extension.message', args: [grailsApplication.config.speciesPortal.observations.MAX_IMAGE_SIZE/1024, f.originalFilename,f.size/1024 ], default:'File size cannot exceed ${104857600/1024}KB');
 					}
 					else if(f.empty) {
-						message = "${message(code: 'file.empty.message', default:'File cannot be empty')}";
+						message = g.message(code: 'file.empty.message', default:'File cannot be empty');
 					}
 					else {
 						if(!obvDir) {
@@ -293,13 +298,13 @@ class ObservationController {
 				}
 			} else {
 				response.setStatus(500)
-				def message = [error:"${message(code: 'no.file.attached', default:'No file is attached')}"]
+				def message = [error:g.message(code: 'no.file.attached', default:'No file is attached')]
 				render message as JSON
 			}
 		} catch(e) {
 			e.printStackTrace();
 			response.setStatus(500)
-			def message = [error:"${message(code: 'error', default:'Error while processing the request.')}"]
+			def message = [error:g.message(code: 'error', default:'Error while processing the request.')]
 			render message as JSON
 		}
 	}
@@ -322,6 +327,9 @@ class ObservationController {
 			try {
 				if (!recommendationVoteInstance.hasErrors() && recommendationVoteInstance.save(flush: true)) {
 					log.debug "Successfully added reco vote : "+recommendationVoteInstance
+					
+					//saving max voted species name for observation instance
+					observationInstance.calculateMaxVotedSpeciesName();
 					redirect(action: "show", id: observationInstance.id);
 				}
 				else {
@@ -359,6 +367,8 @@ class ObservationController {
 				if (recommendationVoteInstance.save(flush: true)) {
 					log.debug "Successfully added reco vote : "+recommendationVoteInstance
 					success = true;
+					
+					observationInstance.calculateMaxVotedSpeciesName();
 					def result = ['votes':++params.int('currentVotes')];
 					render result as JSON;
 				}
@@ -397,20 +407,25 @@ class ObservationController {
 					def result = ['html':html, 'max':params.max]
 					render result as JSON;
 				} else {
-					response.setStatus(500)
-					def message = ['info' : "${message(code: 'recommendations.zero.message', default:'No recommendations made. Please suggest')}"];
+					response.setStatus(500);
+					def message = "";
+					if(params.offset > 0) {
+						message = [info: g.message(code: 'recommendations.nomore.message', default:'No more recommendations made. Please suggest')];
+					} else {
+						message = [info:g.message(code: 'recommendations.zero.message', default:'No recommendations made. Please suggest')];
+					}
 					render message as JSON
 				}
 			} catch(e){
 				e.printStackTrace();
-				response.setStatus(500)
-				def message = ['error' : "${message(code: 'error', default:'Error while processing the request.')}"];
+				response.setStatus(500);
+				def message = ['error' : g.message(code: 'error', default:'Error while processing the request.')];
 				render message as JSON
 			}
 		}
 		else {
 			response.setStatus(500)
-			def message = ['error':"${message(code: 'error', default:'Error while processing the request.')}"]
+			def message = ['error':g.message(code: 'error', default:'Error while processing the request.')]
 			render message as JSON
 		}
 	}
@@ -427,9 +442,9 @@ class ObservationController {
 	def getRelatedObservation = {
 		log.debug params;
 		def relatedObv;
-		if(params.filterProperty == "speciesName"){
+		if(params.filterProperty == "speciesName") {
 			relatedObv = observationService.getRelatedObservationBySpeciesName(params)
-		}else if(params.filterProperty == "speciesGroup"){
+		} else if(params.filterProperty == "speciesGroup"){
 			relatedObv = observationService.getRelatedObservationBySpeciesGroup(params)
 		}else if(params.filterProperty == "user"){
 			relatedObv = observationService.getRelatedObservationByUser(params)

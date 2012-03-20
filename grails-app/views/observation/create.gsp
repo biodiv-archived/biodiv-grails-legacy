@@ -61,17 +61,19 @@
                 </g:if>
 
                 <g:hasErrors bean="${observationInstance}">
-                        <div class="errors">
-                                <g:renderErrors bean="${observationInstance}" as="list" />
-                        </div>
+                	<div class="errors">
+                    	<g:renderErrors bean="${observationInstance}" as="list" />
+					</div>
                 </g:hasErrors>
             </div>
 
             <form id="upload_resource" enctype="multipart/form-data"
-                    style="position: relative; float: left; z-index: 2; left: 20px; top: 320px; visibility:hidden;" title="Add a photo for this observation">
+                    style="position: relative; float: left; z-index: 2; left: 20px; top: 320px;" title="Add a photo for this observation"
+                    class="${hasErrors(bean: observationInstance, field: 'resource', 'errors')}">
+
                     <!-- TODO multiple attribute is HTML5. need to chk if this gracefully falls back to default in non compatible browsers -->
                     <input type="button" class="red" id="upload_button"
-                            value="Add photo" >
+                            value="Add photo">
                     <div
                             style="overflow: hidden; width: 100px; height: 49px; position: absolute; left: 0px; top: 0px;">
                             <input type="file" id="attachFiles" name="resources"
@@ -102,24 +104,28 @@
                                     </g:each>
                             </select-->
                             <div id="groups_div" class="bold_dropdown" style="z-index:3;">
-                            <div id="selected_group" class="selected_value">
-								<img
-									src="${createLinkTo(dir: 'images', file: SpeciesGroup.findByName('All').icon()?.fileName?.trim(), absolute:true)}" /><span class="display_value">Select group</span></div>
-                            <div id="group_options" style="background-color:#fbfbfb;box-shadow:0 8px 6px -6px black; border-radius: 0 5px 5px 5px;display:none;">
-                                    <ul>
-                                    <g:each in="${species.groups.SpeciesGroup.list()}" var="g">
-                                            <g:if
-                                                    test="${!g.name.equals(grailsApplication.config.speciesPortal.group.ALL)}">
-                                                    <li class="group_option" style="display:inline-block;padding:5px;" value="${g.id}">
-                                                   		<div style="width:160px;">
-                                                    		<img src="${createLinkTo(dir: 'images', file: g.icon()?.fileName?.trim(), absolute:true)}"/>
-                                                    		<span class="display_value">${g.name}</span>
-                                                    	</div>
-                                                    </li>
-                                            </g:if>
-                                    </g:each>
-                                    </ul>
-                            </div>
+                            
+	                            <div id="selected_group" class="selected_value ${hasErrors(bean: observationInstance, field: 'group', 'errors')}">
+									<img
+										src="${createLinkTo(dir: 'images', file: SpeciesGroup.findByName('All').icon()?.fileName?.trim(), absolute:true)}" ></img>
+									<span class="display_value">Select group</span>
+								</div>
+	                            
+	                            <div id="group_options" style="background-color:#fbfbfb;box-shadow:0 8px 6px -6px black; border-radius: 0 5px 5px 5px;display:none;">
+	                                    <ul>
+	                                    	<g:each in="${species.groups.SpeciesGroup.list()}" var="g">
+	                                            <g:if
+	                                                    test="${!g.name.equals(grailsApplication.config.speciesPortal.group.ALL)}">
+	                                                    <li class="group_option" style="display:inline-block;padding:5px;" value="${g.id}">
+	                                                   		<div style="width:160px;">
+	                                                    		<img src="${createLinkTo(dir: 'images', file: g.icon()?.fileName?.trim(), absolute:true)}"/>
+	                                                    		<span class="display_value">${g.name}</span>
+	                                                    	</div>
+	                                                    </li>
+	                                            </g:if>
+	                                    	</g:each>
+	                                    </ul>
+	                            </div>
                             </div>
                             <input id="group_id" type="hidden" name="group_id"></input>
                         </div>

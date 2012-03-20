@@ -70,10 +70,12 @@ width:690px;
 </style>
 
 <div
-	id="nameContainer" class="recommendation ${hasErrors(bean: recommendationInstance, field: 'name', 'errors')}">
+	id="nameContainer" class="recommendation">
 	<input type="text" name="recoName" id="name"
 		value="${recommendationInstance?.name}"
-		class="value text ui-widget-content ui-corner-all" /> <input
+		class="value text ui-widget-content ui-corner-all ${hasErrors(bean: recommendationInstance, field: 'name', 'errors')} ${hasErrors(bean: recommendationVoteInstance, field: 'recommendation', 'errors')}" /> 
+	
+	<input
 		type="hidden" name="canName" id="canName" /> 
 		
 	<!-- select

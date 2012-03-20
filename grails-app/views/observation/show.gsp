@@ -126,10 +126,10 @@ width:90%;
 
 							<form id="addRecommendation"
 								action="${createLink(controller:'observation', action:'addRecommendationVote')}"
-								method="GET">
+								method="POST">
 								<reco:create
 									model="['recommendationInstance':recommendationInstance]" />
-								<input type="hidden" name='obvId'
+								<input type="hidden" name='obvId' 
 									value="${observationInstance.id}" /> <input type="submit"
 									value="Add" />
 							</form>

@@ -5,19 +5,15 @@ class Habitat {
 	public enum HabitatType {
 		ALL("All"),
 		FOREST("Forest"),
+		THICKET("Thicket"),
 		SAVANNA("Savanna"),
-		SHRUBLAND("Shrubland"),
 		GRASSLAND("Grassland"),
-		WETLANDS("Wetlands"),
-		ROCKY_AREAS("Rocky Areas"),
-		CAVES_AND_SUBTERRANEAN_HABITATS("Caves and Subterranean Habitats"),
+		SWAMP("Swamp"),
+		AQUATIC("Aquatic"),
 		DESERT("Desert"),
-		MARINE("Marine"),
-		ARTIFICIAL_TERRESTRIAL("Artificial - Terrestrial"),
-		ARTIFICIAL_AQUATIC("Artificial - Aquatic"),
-		INTRODUCED_VEGETATION("Introduced Vegetation"),
-		OTHER("Other"),
-		UNKNOWN("Unknown");
+		ROCKY("Rocky"),
+		AGRICULTURE("Agriculture"),
+		OTHERS("Others"),
 		
 		private String value;
 		
@@ -30,9 +26,9 @@ class Habitat {
 		}
 		
 		static def toList() {
-			return [ALL, FOREST, SAVANNA, SHRUBLAND, GRASSLAND, WETLANDS, ROCKY_AREAS, \
-				CAVES_AND_SUBTERRANEAN_HABITATS, DESERT, MARINE, ARTIFICIAL_TERRESTRIAL, \
-				ARTIFICIAL_AQUATIC, INTRODUCED_VEGETATION, OTHER, UNKNOWN ]
+			return [ALL, FOREST, THICKET, SAVANNA, GRASSLAND,   \
+				 SWAMP, AQUATIC, DESERT, ROCKY, AGRICULTURE,  \
+				  OTHERS]
 		}
 		
 		public String toString() {
