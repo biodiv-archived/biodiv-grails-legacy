@@ -1,11 +1,18 @@
 package species
 
+import species.utils.Utils;
+
 class SecurityFilters {
 
+	def grailsApplication;
+	
     def filters = {
         all(controller:'*', action:'*') {
             before = {
-//				println '--------------------------------------'
+				 	
+			
+				println '--------------------------------------'
+				grailsApplication.config.speciesPortal.domain = Utils.getDomain(request);
 //				print "params : "
 //				println params;
 //				print "Cookies : "

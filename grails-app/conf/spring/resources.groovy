@@ -2,6 +2,13 @@ import org.apache.solr.client.solrj.impl.StreamingUpdateSolrServer;
 import org.codehaus.groovy.grails.plugins.springsecurity.AjaxAwareAuthenticationSuccessHandler;
 import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
 import org.codehaus.groovy.grails.plugins.springsecurity.openid.OpenIdUserDetailsService;
+import org.springframework.social.connect.support.ConnectionFactoryRegistry;
+import org.springframework.social.facebook.api.Facebook;
+import org.springframework.social.facebook.connect.FacebookConnectionFactory;
+
+import com.the6hours.grails.springsecurity.facebook.FacebookAuthCookieFilter;
+
+import species.auth.FacebookAuthCookieLogoutHandler;
 
 import species.auth.drupal.DrupalAuthCookieFilter;
 import species.auth.drupal.DrupalAuthUtils;
@@ -13,16 +20,7 @@ beans = {
 		//userDetailsService = ref("userDetailsService");
 		drupalAuthDao = ref('drupalAuthDao')
 	}
-	//springSecurityUiService(com.strandls.avadis.auth.DummySpringSecurityUiService);
-//	drupalAuthDirectFilter(species.auth.drupal.DrupalAuthDirectFilter, '/j_drupal_spring_security_check') {
-//		authenticationManager = ref('authenticationManager')
-//		sessionAuthenticationStrategy = ref('sessionAuthenticationStrategy')
-//		authenticationSuccessHandler = ref('authenticationSuccessHandler')
-//		authenticationFailureHandler = ref('authenticationFailureHandler')
-//		rememberMeServices = ref('rememberMeServices')
-//		authenticationDetailsSource = ref('authenticationDetailsSource')
-//	}
-	
+
 	def conf = SpringSecurityUtils.securityConfig;
 	
 	authenticationSuccessHandler(AjaxAwareAuthenticationSuccessHandler) {
@@ -59,6 +57,7 @@ beans = {
 		grailsApplication = ref('grailsApplication')
 	}
 
+	def configRoot = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 	def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.search
 	solrServer(org.apache.solr.client.solrj.impl.StreamingUpdateSolrServer,config.serverURL, config.queueSize, config.threadCount ) { 
 		setSoTimeout(config.soTimeout);
@@ -76,4 +75,15 @@ beans = {
 		solrServer = ref('solrServer');		
 	}
 	
+	facebookAuthCookieLogout(FacebookAuthCookieLogoutHandler) {
+		facebookAuthUtils = ref('facebookAuthUtils')
+	}
+	SpringSecurityUtils.registerLogoutHandler('facebookAuthCookieLogout')
+	
+	facebookAuthCookieFilter(FacebookAuthCookieFilter) {
+		authenticationManager = ref('authenticationManager')
+		facebookAuthUtils = ref('facebookAuthUtils')
+		logoutUrl = 'j_spring_security_logout'
+	}
+
 }

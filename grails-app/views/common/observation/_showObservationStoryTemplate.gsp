@@ -1,5 +1,6 @@
 
 <div class="observation_story">
+		<div>
 		<img class="species_group_icon"
 			src="${createLinkTo(file: observationInstance.group.icon()?.fileName?.trim(), base:grailsApplication.config.speciesPortal.resources.serverURL)}"
 			title="${observationInstance.group?.name}" />
@@ -9,6 +10,7 @@
 				src="${createLinkTo(dir: 'group_icons', file:'All.png', base:grailsApplication.config.speciesPortal.resources.serverURL)}"
 				title="${observationInstance.habitat}" />
 		</g:if>
+		</div>
 
 		<div class="prop">
 			<span class="name">By </span>

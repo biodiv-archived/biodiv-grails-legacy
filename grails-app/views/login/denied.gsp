@@ -4,7 +4,11 @@
 </head>
 
 <body>
-<div class='body'>
-	<div class='errors'><g:message code="springSecurity.denied.message" /></div>
+<div>
+	<div class="container_16">
+		<div class="grid_16 errors">
+			<g:message code="springSecurity.denied.message" />
+		</div>
+	</div>
 </div>
 </body>

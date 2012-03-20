@@ -160,6 +160,7 @@ else {
 speciesPortal {
 	app.rootDir = "${userHome}/species"
 	data.rootDir = "${app.rootDir}/data"
+	domain = "localhost"
 	resources {
 		rootDir = "${app.rootDir}/images"
 		serverURL = "http://localhost/${appName}/images"

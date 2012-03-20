@@ -145,25 +145,7 @@ border-bottom:3px solid #003846;
 </style>
 </head>
 <body>
-<%
-/*
-println '--------------------------------------'
-print "params : "
-println params;
-print "Cookies : "
-request.cookies.each{println it.name+" : "+it.value}
-print "SessionId : "
-println request.getRequestedSessionId();
-def enames = request.getHeaderNames();
-   while (enames.hasMoreElements()) {
-	  String name = (String) enames.nextElement();
-	  String value = request.getHeader(name);
-	  println name+":"+value;
-   }
-request.cookies.each{println it.name+" : "+it.value}
-*/
-%>
-	
+
 	<div id="spinner" class="spinner" style="display:none;">
 		<img src="${resource(dir:'images',file:'spinner.gif', absolute:true)}"
 			alt="${message(code:'spinner.alt',default:'Loading...')}" />
@@ -206,10 +188,10 @@ request.cookies.each{println it.name+" : "+it.value}
 		<span id='loginLink'
 			style='position: relative; margin-right: 30px; float: right'>
 			<sec:ifLoggedIn>
-         	Logged in as <sec:username /> (<g:link controller='logout'>Logout</g:link>)
+         	Logged in as <sec:username /> (<a href="${createLink(controller:'logout')}" id="logout">Logout</a>)
       		</sec:ifLoggedIn> <sec:ifNotLoggedIn>
 				<!--a href='#' onclick='show_login_dialog();  return false'>Login</a-->
-				<a href='/biodiv/login'>Login</a>
+				<g:link controller='login'>Login</g:link>
 			</sec:ifNotLoggedIn> </span>
 		<g:render template='/common/ajaxLogin' />
 		<br />
@@ -218,30 +200,7 @@ request.cookies.each{println it.name+" : "+it.value}
 
 
 	<div id="species_main_wrapper">
-		<div id="fb-root"></div>
-		<script>
-		
-		  window.fbAsyncInit = function() {
-		    FB.init({
-		      appId      : '327308053982589', // App ID
-		      status     : true, // check login status
-		      cookie     : true, // enable cookies to allow the server to access the session
-		      oauth      : true, // enable OAuth 2.0
-		      xfbml      : true  // parse XFBML
-		    });
-		
-		    // Additional initialization code here
-		  };
-		
-		  // Load the SDK Asynchronously
-		  (function(d){
-		     var js, id = 'facebook-jssdk'; if (d.getElementById(id)) {return;}
-		     js = d.createElement('script'); js.id = id; js.async = true;
-		     js.src = "//connect.facebook.net/en_US/all.js";
-		     d.getElementsByTagName('head')[0].appendChild(js);
-		   }(document));
-		  
-		</script>
+	
 		<div class="container_12">
 			<div id="menu" class="grid_12 ui-corner-all">
 				<div class="demo" style="float: right; margin-right: .3em;"
@@ -350,7 +309,9 @@ request.cookies.each{println it.name+" : "+it.value}
 				$('#loginMessage').show(); 
 				$('#ajaxLoginForm').submit(); 
 			}
-			 
+			
+			if (typeof(console) == "undefined") { console = {}; } 
+			if (typeof(console.log) == "undefined") { console.log = function() { return 0; } }
 	</g:javascript>
 	
 	

@@ -141,9 +141,6 @@ class Observation implements Taggable{
 	def getRecommendationVotes(int limit, long offset) {
 		if(limit <= 0) limit = 3;
 	
-		println limit;
-		println offset;
-		
 		def sql =  Sql.newInstance(dataSource);
 		
 		 def recoVoteCount = sql.rows("select recoVote.recommendation_id as recoId, count(*) as votecount from recommendation_vote as recoVote where recoVote.observation_id = :obvId group by recoVote.recommendation_id order by votecount desc limit :max offset :offset", [obvId:this.id, max:limit, offset:offset])

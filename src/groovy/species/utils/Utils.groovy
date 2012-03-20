@@ -98,4 +98,18 @@ class Utils {
 			e.printStackTrace();
 		}
 	}
+	
+	static String getDomain(HttpServletRequest httpServletRequest) {
+		// maybe we are behind a proxy
+		String header = httpServletRequest.getHeader("X-Forwarded-Host");
+		if(header != null) {
+			// we are only interested in the first header entry
+			header = new StringTokenizer(header,",").nextToken().trim();
+		}
+		if(header == null) {
+			header = httpServletRequest.getHeader("Host");
+		}
+		header.replace("http://", "");
+		return header;
+	}
 }
