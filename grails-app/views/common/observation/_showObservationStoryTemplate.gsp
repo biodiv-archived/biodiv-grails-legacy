@@ -42,11 +42,9 @@
 
 		<div class="prop">
 			<span class="name">Created on</span>
-			<div class="value">
-				<g:formatDate format="MMMMM dd, yyyy"
-					date="${observationInstance.createdOn}" />
-			</div>
+			<obv:showDate model="['observationInstance':observationInstance, 'propertyName':'createdOn']" />
 		</div>
+		
 		<div class="prop">
 			<span class="name">Place name</span>
 			<div class="value">
@@ -63,9 +61,7 @@
 		
 		<div class="prop">
 			<span class="name">Last Updated</span>
-			<div class="value">
-				${observationInstance.daysAfterLastUpdate()} days ago
-			</div>
+			<obv:showDate model="['observationInstance':observationInstance, 'propertyName':'lastUpdated']" />
 		</div>
 		
 		<div class="prop">

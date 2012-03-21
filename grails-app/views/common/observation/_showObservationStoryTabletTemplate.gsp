@@ -42,10 +42,7 @@
 		
 		<div class="prop tablet">
 			<span class="name tablet">Created on</span>
-			<div class="value tablet">
-				<g:formatDate format="MMMMM dd, yyyy"
-					date="${observationInstance.createdOn}" />
-			</div>
+			<obv:showDate model="['observationInstance':observationInstance, 'propertyName':'createdOn']" />
 		</div>
 
 		<div class="prop tablet">
@@ -64,9 +61,7 @@
 		
 		<div class="prop tablet">
 			<span class="name tablet">Last Updated</span>
-			<div class="value tablet">
-				${observationInstance.daysAfterLastUpdate()} days before
-			</div>
+			<obv:showDate model="['observationInstance':observationInstance, 'propertyName':'lastUpdated']" />
 		</div>
 		
 		<div class="prop tablet">

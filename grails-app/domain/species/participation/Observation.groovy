@@ -5,6 +5,8 @@ import groovy.sql.Sql;
 import grails.converters.JSON;
 import grails.plugins.springsecurity.Secured
 
+
+
 import species.VisitCounter;
 import species.Contributor;
 import species.Resource;
@@ -45,7 +47,7 @@ class Observation implements Taggable{
 	SUser author;
 	Date observedOn;
 	Date createdOn = new Date();
-	Date lastUpdated = new Date();
+	Date lastUpdated = createdOn;
 	String notes;
 	SpeciesGroup group;
 	int rating;
@@ -210,9 +212,9 @@ class Observation implements Taggable{
 		return result[0]["count"]
 	}
 	
-	def daysAfterLastUpdate(){
-		return (new Date()).minus(lastUpdated);
-	}
+//	def daysAfterLastUpdate(){
+//		return (new Date()).minus(lastUpdated);
+//	}
 	
 	def incrementPageVisit(){
 		visitCount++;
@@ -235,5 +237,6 @@ class Observation implements Taggable{
 	public static int getCountForGroup(groupId){
 		return Observation.executeQuery("select count(*) from Observation obv where obv.group.id = :groupId ", [groupId: groupId])[0]
 	}
+	
 	
 }

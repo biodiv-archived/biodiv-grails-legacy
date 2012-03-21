@@ -110,8 +110,16 @@ class ObservationTagLib {
 	}
 	def showUserAddedTags = {attrs, body->
 		out << render(template:"/common/observation/showAllTagsTemplate", model:attrs.model);
-		//out << render(template:"/common/observation/showUserAddedTagsTemplate", model:attrs.model);
 	}
+	
+	////////////////////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////  Date related ///////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////////
+	
+	def showDate = {attrs, body->
+		out << render(template:"/common/observation/showDateTemplate",model:attrs.model);
+	}
+	
 	
 	
 }
