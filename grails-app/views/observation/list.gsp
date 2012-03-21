@@ -14,7 +14,10 @@
 	type="text/css" media="all" />
 <g:javascript src="tagit.js"
 	base="${grailsApplication.config.grails.serverURL+'/js/'}"></g:javascript>
-
+<g:javascript src="jquery.autopager-1.0.0.js"
+	base="${grailsApplication.config.grails.serverURL+'/js/jquery/'}"></g:javascript>
+<g:javascript src="jquery.infinitescroll.js"
+	base="${grailsApplication.config.grails.serverURL+'/js/jquery/'}"></g:javascript>
 </head>
 <body>
 	<div class="container_16">
@@ -28,9 +31,6 @@
 					${flash.message}
 				</div>
 			</g:if>
-			
-			<g:set var="carouselId" value="a" />
-			<!-- obv:showRelatedStory model="['observationId': null, 'controller':'observation', 'action':'getRelatedObservation', 'filterProperty': 'speciesGroup' , 'filterPropertyValue': 830 ,'id':carouselId]" /-->
 			
 			<obv:showGroupFilter
 				model="['observationInstance':observationInstance]" />
@@ -58,20 +58,23 @@
                                            <div id="grid_view_bttn" class="grid_style_button"></div>
                                         </div>
 					<div class="observation grid_11">
-                    <div id="grid_view">
-						<g:each in="${observationInstanceList}" status="i"
-							var="observationInstance">
-							<obv:showSnippetTablet
-								model="['observationInstance':observationInstance]"></obv:showSnippetTablet>
-						</g:each>
-                    </div>       
-                    <div id="list_view" style="display:none;">
-						<g:each in="${observationInstanceList}" status="i"
-							var="observationInstance">
-							<obv:showSnippet
-								model="['observationInstance':observationInstance]"></obv:showSnippet>
-						</g:each>
-                    </div>       
+						<div class="mainContent">
+		                                    <div class="grid_view">
+								<g:each in="${observationInstanceList}" status="i"
+									var="observationInstance">
+									<obv:showSnippetTablet
+										model="['observationInstance':observationInstance]"></obv:showSnippetTablet>
+								</g:each>
+                                                    </div>       
+                                                    <div class="list_view" style="display:none;">
+                                                                                <g:each in="${observationInstanceList}" status="i"
+                                                                                        var="observationInstance">
+                                                                                        <obv:showSnippet
+                                                                                                model="['observationInstance':observationInstance]"></obv:showSnippet>
+                                                                                </g:each>
+                                                    </div>       
+                                            </div>
+                                            <div class="button loadMore"><span class="progress" style="display:none;"><img src="${resource(dir:'images',file:'spinner.gif', absolute:true)}"/>Loading ... </span><span class="buttonTitle">Load more</span></div>
 					</div>
 					
 					<div class="tags_section grid_4">
@@ -79,14 +82,15 @@
 						<div id="tagList" class="grid_4 sidebar_section" style="display:none;">
 							<obv:showTagsList model="['tags':tags]" />
 						</div>	
-					<obv:showGroupList/>
+						<obv:showGroupList/>
+					</div>
+				        
+					<div class="paginateButtons" style="visibility:hidden; clear: both">
+						<g:paginate total="${observationInstanceTotal}" max="2" params="${activeFilters}"/>
 					</div>
 				</div>
 			</div>
 			
-			<div class="paginateButtons" style="clear: both">
-				<g:paginate total="${observationInstanceTotal}" max="2" />
-			</div>
 		</div>
 	</div>
 	<g:javascript>	
@@ -115,7 +119,22 @@
 			hbt = hbt.replace(/\s*\,\s*$/,'');
 			return hbt;	
 		} 
-		
+	
+		function getFilterParams(){
+			var params = {};
+			
+			var grp = getSelectedGroup();
+			if(grp) {
+				params['sGroup'] = grp;
+			}
+			
+			var habitat = getSelectedHabitat();
+			if(habitat) {
+				params['habitat'] = habitat;
+			}
+			
+			return params;		
+		}	
 		
 		function getFilterParameters(url, limit, offset) {
 			
@@ -139,6 +158,7 @@
 			if(limit != undefined) {
 				params['max'] = limit.toString();
 			}
+			
 			if(offset != undefined) {
 				params['offset'] = offset.toString();
 			}
@@ -164,17 +184,17 @@
 		}
 		
 		$('#speciesGroupFilter input').change(function(){
-			updateGallery(undefined, 5, 0);
+			updateGallery(undefined, 9, 0);
 			return false;
 		});
 		
 		$('#habitatFilter input').change(function(){
-			updateGallery(undefined, 5, 0);
+			updateGallery(undefined, 9, 0);
 			return false;
 		});
 		
 		$('#observationSort').change(function(){
-			updateGallery(undefined, 5, 0);
+			updateGallery(undefined, 9, 0);
 			return false;
 		});
 	
@@ -192,33 +212,64 @@
          });
          
          $('#list_view_bttn').click(function(){
-			$('#grid_view').hide();
-			$('#list_view').show();
+			$('.grid_view').hide();
+			$('.list_view').show();
 			$(this).addClass('active');
 			$('#grid_view_bttn').removeClass('active');
 			$.cookie("observation_listing", "list");
 		});
 		
 		$('#grid_view_bttn').click(function(){
-			$('#grid_view').show();
-			$('#list_view').hide();
+			$('.grid_view').show();
+			$('.list_view').hide();
 			$(this).addClass('active');
 			$('#list_view_bttn').removeClass('active');
 			$.cookie("observation_listing", "grid");
 		});
 		
 		if ($.cookie("observation_listing") == "list") {
-			$('#list_view').show();
-			$('#grid_view').hide();
+			$('.list_view').show();
+			$('.grid_view').hide();
 			$('#grid_view_bttn').removeClass('active');
 			$('#list_view_bttn').addClass('active');
 		}else{
-			$('#grid_view').show();
-			$('#list_view').hide();
+			$('.grid_view').show();
+			$('.list_view').hide();
 			$('#grid_view_bttn').addClass('active');
 			$('#list_view_bttn').removeClass('active');	
 		}
 
+		$.autopager({
+                 
+                    autoLoad: false,
+    		    // a selector that matches a element of next page link
+    		    link: 'div.paginateButtons a.nextLink',
+
+    		    // a selector that matches page contents
+    		    content: '.mainContent',
+    		
+    		    // a callback function to be triggered when loading start 
+		    start: function(current, next) {
+                        $(".loadMore .progress").show();
+                        $(".loadMore .buttonTitle").hide();
+		    },
+		
+		    // a function to be executed when next page was loaded. 
+		    // "this" points to the element of loaded content.
+		    load: function(current, next) {
+                        if (next.url == undefined){
+                            $(".loadMore").hide();
+                        }else{
+                            $(".loadMore .progress").hide();
+                            $(".loadMore .buttonTitle").show();
+                        }
+		    }
+		});
+	
+                $('.loadMore').click(function() {
+                    $.autopager('load');
+                    return false;
+                });
 	});
 	</g:javascript>
 </body>

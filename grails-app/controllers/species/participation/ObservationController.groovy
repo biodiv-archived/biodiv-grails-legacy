@@ -26,7 +26,7 @@ class ObservationController {
 	}
 
 	def list = {
-		params.max = Math.min(params.max ? params.int('max') : 10, 100)
+		params.max = Math.min(params.max ? params.int('max') : 9, 100)
 		params.sGroup = (params.sGroup)? params.sGroup : SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.ALL).id
 		params.habitat = (params.habitat)? params.habitat : grailsApplication.config.speciesPortal.group.ALL
 		//params.userName = springSecurityService.currentUser.username;
@@ -34,6 +34,8 @@ class ObservationController {
 		def query = "select obv from Observation obv "
 		def queryParams = [:]
 		def filterQuery = ""
+
+                def activeFilters = [:]
 		
 		if(params.sGroup){
 			params.sGroup = params.sGroup.toLong()
@@ -44,6 +46,7 @@ class ObservationController {
 
 				filterQuery += " where obv.group.id = :groupId "
 				queryParams["groupId"] = groupId
+                                activeFilters["sGroup"] = groupId
 			}
 		}
 		
@@ -54,18 +57,21 @@ class ObservationController {
 			
 			queryParams["tag"] = params.tag
 			queryParams["tagType"] = 'observation'
+                        activeFilters["tag"] = params.tag
 		}
 		
 		
 		if(params.habitat && (params.habitat != grailsApplication.config.speciesPortal.group.ALL)){
 			(filterQuery == "")? (filterQuery += " where obv.habitat like :habitat ") : (filterQuery += " and obv.habitat like :habitat ")
 			queryParams["habitat"] = params.habitat
+                        activeFilters["habitat"] = params.habitat
 		}
 		
 		if(params.userId){
 			(filterQuery == "")? (filterQuery += " where ") : (filterQuery += " and ")
 			filterQuery += " obv.author.id = :userId "
 			queryParams["userId"] = params.userId.toLong()
+                        activeFilters["userId"] = params.habitat
 		}
 		
 		if(params.speciesName){
@@ -88,8 +94,8 @@ class ObservationController {
 		def observationInstanceList = Observation.executeQuery(query, queryParams)
 		//log.error("================= result == " +observationInstanceList  )
 		//log.error("================= size  == " +observationInstanceList.size()  )
-		
-		[observationInstanceList: observationInstanceList, observationInstanceTotal: count, queryParams: queryParams]
+	        
+		[observationInstanceList: observationInstanceList, observationInstanceTotal: count, queryParams: queryParams, activeFilters:activeFilters]
 	}
 
 	@Secured(['ROLE_USER'])

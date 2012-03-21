@@ -137,8 +137,7 @@ input:focus,select:focus,textarea:focus {
 }
 
 .nav .current a {
-	background: transparent url('../images/arrow-down.png') no-repeat center
-		bottom;
+	background: transparent url('../images/arrow-down.png') no-repeat center bottom;
 	text-decoration: underline;
 	background-position: 50% -80%;
 }
@@ -1546,5 +1545,15 @@ ul.thumbwrap .license_options li:hover {
 }
 
 .info-message .highlight {
-	font-weight: bold;
+	font-weight: bold;	
+}
+
+.loadMore {
+    width: 440px;
+    margin-left:100px;       
+    margin-top:50px;
+}
+
+.loadMore img{
+padding: 10px;
 }
