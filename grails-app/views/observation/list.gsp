@@ -259,6 +259,7 @@
 		    // a function to be executed when next page was loaded. 
 		    // "this" points to the element of loaded content.
 		    load: function(current, next) {
+		    			$(".mainContent:last").hide().fadeIn(3000);
                         if (next.url == undefined){
                             $(".loadMore").hide();
                         }else{
