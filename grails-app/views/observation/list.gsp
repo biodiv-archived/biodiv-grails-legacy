@@ -74,7 +74,9 @@
                                                                                 </g:each>
                                                     </div>       
                                             </div>
-                                            <div class="button loadMore"><span class="progress" style="display:none;"><img src="${resource(dir:'images',file:'spinner.gif', absolute:true)}"/>Loading ... </span><span class="buttonTitle">Load more</span></div>
+                                            <g:if test="${observationInstanceTotal > queryParams.max}">
+                                            	<div class="button loadMore"><span class="progress" style="display:none;"><img src="${resource(dir:'images',file:'spinner.gif', absolute:true)}"/>Loading ... </span><span class="buttonTitle">Load more</span></div>
+                                            </g:if>
 					</div>
 					
 					<div class="tags_section grid_4">
@@ -184,17 +186,17 @@
 		}
 		
 		$('#speciesGroupFilter input').change(function(){
-			updateGallery(undefined, 9, 0);
+			updateGallery(undefined, ${queryParams.max}, 0);
 			return false;
 		});
 		
 		$('#habitatFilter input').change(function(){
-			updateGallery(undefined, 9, 0);
+			updateGallery(undefined, ${queryParams.max}, 0);
 			return false;
 		});
 		
 		$('#observationSort').change(function(){
-			updateGallery(undefined, 9, 0);
+			updateGallery(undefined, ${queryParams.max}, 0);
 			return false;
 		});
 	
