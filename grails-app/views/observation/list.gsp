@@ -75,7 +75,10 @@
 					</div>
 					
 					<div class="tags_section grid_4">
-					<obv:showAllTags/>
+						<obv:showAllTags/>
+						<div id="tagList" class="grid_4 sidebar_section" style="display:none;">
+							<obv:showTagsList model="['tags':tags]" />
+						</div>	
 					<obv:showGroupList/>
 					</div>
 				</div>

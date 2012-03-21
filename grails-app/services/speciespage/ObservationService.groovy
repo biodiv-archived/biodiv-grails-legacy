@@ -380,10 +380,8 @@ class ObservationService {
 		def tags = []
 		
 		for (tag_id in tag_ids){
-			tags.add(Tag.get(tag_id));		
+			tags.add(Tag.get(tag_id).name);		
 		}
-		
-		
 		return tags;
 	}
 	
@@ -401,4 +399,12 @@ class ObservationService {
 		
 		return ["observations":createUrlList2(nearbyObservations)]
 	}
+	
+	Set getAllTagsOfUser(userId){
+		List obvs = Observation.findAll("from Observation as obv where obv.author.id = :userId ", [userId :userId]);
+		Set tagSet = new HashSet();
+		obvs.each{ tagSet.addAll(it.tags) }
+		return tagSet;
+	}
+	
 }

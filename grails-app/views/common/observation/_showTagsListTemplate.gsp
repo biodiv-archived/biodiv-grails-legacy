@@ -5,7 +5,7 @@
 	<ul class="tagit">
 		<g:each in="${tags}">
 			<li class="tagit-choice" style="padding:0 5px;clear:both;">
-				${it} <span class="tag_stats"> ${Observation.countByTag(it.name)}</span>
+				${it} <span class="tag_stats"> ${Observation.countByTag(it)}</span>
 			</li>
 		</g:each>
 	</ul>

@@ -99,4 +99,19 @@ class ObservationTagLib {
 	def showObservationsLocation = {attrs, body->
 		out << render(template:"/common/observation/showObservationMultipleLocationTemplate", model:attrs.model);
 	}
+	
+	////////////////////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////  Tag List added by specific User ///////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////////
+	
+	def showAllTagsOfUser = {attrs, body->
+		def tags = observationService.getAllTagsOfUser(attrs.model.userId.toLong());
+		out << render(template:"/common/observation/showTagsListTemplate", model:[tags:tags]);
+	}
+	def showUserAddedTags = {attrs, body->
+		out << render(template:"/common/observation/showAllTagsTemplate", model:attrs.model);
+		//out << render(template:"/common/observation/showUserAddedTagsTemplate", model:attrs.model);
+	}
+	
+	
 }

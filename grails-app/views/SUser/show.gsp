@@ -34,11 +34,17 @@
 				href="${createLink(controller:'observation', action: 'list', params: [userId: fieldValue(bean: SUserInstance, field: "id")])}">All
 				observations</a>
 		</div>
+		
 		<div class="grid_15 userCreatedObservations" style="clear: both">
 			<obv:showRelatedStory
 				model="['controller':'observation', 'action':'getRelatedObservation', 'filterProperty': 'user', 'filterPropertyValue':SUserInstance.id, 'id':'a']" />
 		</div>
-
-	</div>
+		<div class="tags_section grid_4">
+			<obv:showUserAddedTags />
+			<div id="tagList" class="grid_4 sidebar_section" style="display:none;">
+				<obv:showAllTagsOfUser model="['userId':SUserInstance.id]" />
+			</div>	
+		</div>
+		</div>
 </body>
 </html>
