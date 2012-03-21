@@ -11,6 +11,7 @@
 </g:javascript>
 
 <div class="observation_story tablet">
+	<div class="observation-icons">
 		<img class="species_group_icon"
 			src="${createLinkTo(file: observationInstance.group.icon()?.fileName?.trim(), base:grailsApplication.config.speciesPortal.resources.serverURL)}"
 			title="${observationInstance.group?.name}" />
@@ -20,13 +21,8 @@
 				src="${createLinkTo(dir: 'group_icons', file:'All.png', base:grailsApplication.config.speciesPortal.resources.serverURL)}"
 				title="${observationInstance.habitat}" />
 		</g:if>
-		
-		<a href=/biodiv/SUser/show/${observationInstance.author.id}>  
-		<img class="species_group_icon"
-			src="${createLinkTo(file: observationInstance.author.icon()?.fileName?.trim(), base:grailsApplication.config.speciesPortal.resources.serverURL)}"
-			title="${observationInstance.author.username}" />
-		</a>
-		
+	</div>
+	
 		<div class="prop tablet">
 			<span class="name tablet">Species Name</span>
 			<div class="value tablet">
@@ -40,11 +36,7 @@
 			</div>
 		</div>	
 		
-		<div class="prop tablet">
-			<span class="name tablet">Created on</span>
-			<obv:showDate model="['observationInstance':observationInstance, 'propertyName':'createdOn']" />
-		</div>
-
+	
 		<div class="prop tablet">
 			<span class="name tablet">Place name</span>
 			<div class="value tablet">
@@ -52,12 +44,24 @@
 			</div>
 		</div>
 		
+		<div class="prop tablet">
+			<span class="name tablet">Latitude/Longitude</span>
+			<div class="value tablet">
+				<g:formatNumber number="${observationInstance.latitude}" type="number" maxFractionDigits="2" />, <g:formatNumber number="${observationInstance.longitude}" type="number" maxFractionDigits="2" />
+			</div>
+		</div>
 <%--		<div class="prop tablet">--%>
 <%--			<span class="name tablet">Recommendations</span>--%>
 <%--			<div class="value tablet">--%>
 <%--				${observationInstance.getRecommendationCount()}--%>
 <%--			</div>--%>
 <%--		</div>--%>
+		
+		<div class="prop tablet">
+			<span class="name tablet">Created on</span>
+			<obv:showDate model="['observationInstance':observationInstance, 'propertyName':'createdOn']" />
+		</div>
+		
 		
 		<div class="prop tablet">
 			<span class="name tablet">Last Updated</span>
@@ -70,6 +74,21 @@
 				${observationInstance.getPageVisitCount()}
 			</div>
 		</div>
+	
+		<div class="prop tablet">
+		<div class="user-icon">	
+		<a href=/biodiv/SUser/show/${observationInstance.author.id}>  
+		<img 
+			src="${createLinkTo(file: observationInstance.author.icon()?.fileName?.trim(), base:grailsApplication.config.speciesPortal.resources.serverURL)}"
+			title="${observationInstance.author.username}" />
+		</a>
+		</div>
+		<div class="username-value">
+				<a href=/biodiv/SUser/show/${observationInstance.author.id}>  ${observationInstance.author.username} </a>
+		</div>
+		</div>
+		
+		
 		
        <br/>		
 

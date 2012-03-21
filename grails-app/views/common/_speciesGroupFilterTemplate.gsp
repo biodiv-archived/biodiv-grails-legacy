@@ -66,6 +66,8 @@ Sort by <select name="observationSort" id="observationSort"
 		class="value ui-corner-all">
 		<option value="createdOn" 
 			${params.sort?.equals('createdOn')?'selected':''  }>Latest</option>
+		<option value="lastUpdated"
+			${params.sort?.equals('lastUpdated')?'selected':'' }>Last Updated</option>
 		<option value="visitCount"
 			${params.sort?.equals('visitCount')?'selected':'' }>Most Viewed</option>
 		</select>

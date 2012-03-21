@@ -1555,5 +1555,15 @@ ul.thumbwrap .license_options li:hover {
 }
 
 .loadMore img{
-padding: 10px;
+	padding: 10px;
+}
+.observation-icons {
+	float:left;
+	margin-bottom:10px;
+}
+.user-icon {
+	float: left;
+}
+.username-value{
+	padding-left:25px;
 }
