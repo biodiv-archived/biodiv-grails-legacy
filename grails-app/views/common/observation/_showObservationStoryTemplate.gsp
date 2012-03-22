@@ -71,20 +71,7 @@
 		</div>
 	</div>
 
-	<div class="prop">
-		<div class="user-icon">
-			<a href=/biodiv/SUser/show/${observationInstance.author.id}> <img
-				src="${createLinkTo(file: observationInstance.author.icon()?.fileName?.trim(), base:grailsApplication.config.speciesPortal.resources.serverURL)}"
-				title="${observationInstance.author.username}" /> </a>
-		</div>
-		<div class="username-value">
-			<a href=/biodiv/SUser/show/${observationInstance.author.id}> ${observationInstance.author.username}
-			</a>
-		</div>
-	</div>
-
-
-
+	<sUser:showUserSnippet model="['userInstance':observationInstance.author]"/>
 
 	<obv:showTagsSummary
 		model="['observationInstance':observationInstance]" />

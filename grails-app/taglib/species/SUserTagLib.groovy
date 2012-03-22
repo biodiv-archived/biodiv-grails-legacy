@@ -8,9 +8,12 @@ class SUserTagLib {
 	def renderProfileLink = { attrs ->
 		def currentUser = springSecurityService.getCurrentUser()
 		if(currentUser) {
-			out << "<a href='${createLink(controller:'SUser', action:'show', id:currentUser.id)}'>${currentUser.username}</a>"
+			out << showUserSnippet(model:['userInstance':currentUser]);
 		}
 	}
 	
+	def showUserSnippet = { attrs ->
+		out << render(template:"/common/showUserTemplate", model:attrs.model);
+	}
 	
 }

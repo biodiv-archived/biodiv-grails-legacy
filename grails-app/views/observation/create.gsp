@@ -18,10 +18,6 @@
 		args="[entityName]" />
 </title>
 
-
-<link rel="stylesheet"
-	href="${resource(dir:'css',file:'jquery-ui.css', absolute:true)}"
-	type="text/css" media="all" />
 <link rel="stylesheet"
 	href="${resource(dir:'css',file:'location_picker.css', absolute:true)}"
 	type="text/css" media="all" />
@@ -396,15 +392,7 @@
   			$('#upload_resource').submit().find("span.msg").html("Uploading... Please wait...");
 		});
        	
-     	//TODO:not geting called verify....
-     	$("#attachFiles").ajaxStart(function(){
-			var offset = $(this).offset();  				
-   			$("#loading").show();
-   			return false;
- 		}).ajaxStop(function() {
-        			$("#loading").hide();
-    		});  
-     	
+        	
         function progressHandlingFunction(e){
             if(e.lengthComputable){
                 var position = e.position || e.loaded;
@@ -418,7 +406,7 @@
         }
 
      	$('#upload_resource').ajaxForm({ 
-			url:'${createLink(controller:'observation', action:'upload_resource', params:['jsessionid':RequestContextHolder.currentRequestAttributes().getSessionId()])}',
+			url:'${createLink(controller:'observation', action:'upload_resource')}',
 			dataType: 'xml',//could not parse json wih this form plugin 
 			clearForm: true,
 			resetForm: true,

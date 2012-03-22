@@ -1565,5 +1565,11 @@ ul.thumbwrap .license_options li:hover {
 	float: left;
 }
 .username-value{
-	padding-left:25px;
+	float:left;
+}
+
+.small_profile_pic {
+	hieght:50px;
+	width:50px;
+	margin:5px;
 }

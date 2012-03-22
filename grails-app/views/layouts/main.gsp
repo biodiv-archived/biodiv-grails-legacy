@@ -42,8 +42,6 @@
 <link rel="stylesheet" type="text/css" media="all"
 	href="${resource(dir:'css',file:'jquery.rating.css', absolute:true)}" />
 
-<!-- script type="text/javascript"
-	src="${resource(dir:'plugins',file:'jquery-ui-1.8.15/jquery-ui/js/jquery-ui-1.8.15.custom.min.js', absolute:true)}"></script-->
 <g:javascript src="jquery/jquery.form.js"
 	base="${grailsApplication.config.grails.serverURL+'/js/'}"></g:javascript>
 <g:javascript src="jquery/jquery.rating.js"
@@ -195,7 +193,7 @@ border-bottom:3px solid #003846;
       		</sec:ifLoggedIn> <sec:ifNotLoggedIn>
 				<g:link controller='login'>Login</g:link>
 			</sec:ifNotLoggedIn> </span>
-		<g:render template='/common/ajaxLogin' />
+		<!-- g:render template='/common/ajaxLogin' /-->
 		<br />
 	</div>
 
