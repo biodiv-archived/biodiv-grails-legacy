@@ -8,6 +8,7 @@ grails.project.dependency.resolution = {
         // uncomment to disable ehcache
         // excludes 'ehcache'
 		excludes 'xml-apis', 'xercesImpl', 'xmlParserAPIs'
+
     }
 	
     log "warn" // log level of Ivy resolver, either 'error', 'warn', 'info', 'debug' or 'verbose'
@@ -39,7 +40,9 @@ grails.project.dependency.resolution = {
 	   compile group:'org.apache.poi', name:'poi-contrib', version:'3.6'
 	   compile group:'org.apache.poi', name:'poi-scratchpad', version:'3.7'
 	   compile(group:'org.apache.poi', name:'poi-ooxml', version:'3.7')
-	   compile 'org.springframework.social:spring-social-core:1.0.1.RELEASE'
-	   compile 'org.springframework.social:spring-social-facebook:1.0.1.RELEASE'
+	   compile ('org.springframework.social:spring-social-facebook:1.0.0.RELEASE') {
+		   excludes 'spring-web' 
+		   //'org.springframework.web-3.0.5.RELEASE', 'spring-aop-3.0.3.RELEASE', 'spring-beans-3.0.3.RELEASE','spring-core-3.0.3.RELEASE', 'spring-tx-3.0.3.RELEASE','spring-asm-3.0.3.RELEASE','spring-context-3.0.3.RELEASE', 'spring-expression-3.0.3.RELEASE','spring-web-3.0.3.RELEASE'
+	   }
     }
 }

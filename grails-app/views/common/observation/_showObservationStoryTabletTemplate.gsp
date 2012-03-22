@@ -23,7 +23,7 @@
 		
 		<a href=/biodiv/SUser/show/${observationInstance.author.id}>  
 		<img class="species_group_icon"
-			src="${createLinkTo(file: observationInstance.author.icon()?.fileName?.trim(), base:grailsApplication.config.speciesPortal.resources.serverURL)}"
+			src="${observationInstance.icon()}"
 			title="${observationInstance.author.username}" />
 		</a>
 		

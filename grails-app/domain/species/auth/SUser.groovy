@@ -10,17 +10,32 @@ class SUser {
 	def grailsApplication;
 	
 	String username
+	String name;
 	String password
 	boolean enabled
 	boolean accountExpired
 	boolean accountLocked
 	boolean passwordExpired
-
+	String email
+	Date dateCreated
+	Date lastLoginDate = new Date();
+	String profilePic
+	String website;
+	float timezone=0;//offset
+	String aboutMe;
+	String location;
+	
     static hasMany = [openIds: OpenID]
 
 	static constraints = {
 		username blank: false, unique: true
 		password blank: false
+		email email: true, blank: false, unique: true
+		profilePic nullable:true
+		website nullable:true
+		timezone nullable:true
+		aboutMe nullable:true
+		location nullable:true
 	}
 	
 	static mapping = {
@@ -33,6 +48,7 @@ class SUser {
 		 */
 		id generator:"species.utils.PrefillableUUIDHexGenerator"
 		password column: '`password`'
+		aboutMe type:"text";
 	}
 
 	Set<Role> getAuthorities() {
@@ -54,12 +70,10 @@ class SUser {
 	}
 	
 	def icon() {
-		String name = this.username?.trim()?.replaceAll(/ /, '_')?.plus('.png');
-		boolean iconPresent = (new File(grailsApplication.config.speciesPortal.resources.rootDir+"/users/${name?.trim()}")).exists()
-		if(!iconPresent) {
-			name = "user_small.png" 
-		}
-		return new Resource(fileName:"users/${name}", type:ResourceType.ICON, title:username);
+		if(profilePic) {
+			return profilePic;
+		} 
+		return g.createLinkTo(file: "users/user_small.png", base:grailsApplication.config.speciesPortal.resources.serverURL)
 	}
 	
 	@Override

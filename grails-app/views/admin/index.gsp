@@ -3,7 +3,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="layout" content="main" />
+<meta name="layout" content="admin" />
 <g:set var="entityName"
 	value="${message(code: 'name.label', default: 'Name')}" />
 <title><g:message code="default.create.label"

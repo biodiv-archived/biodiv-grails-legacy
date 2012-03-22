@@ -1,36 +1,62 @@
 package species.auth
 
+import grails.converters.JSON
+import grails.plugins.springsecurity.Secured;
+import grails.plugins.springsecurity.ui.SpringSecurityUiService
+import grails.util.GrailsNameUtils
+
+import java.util.List
+import java.util.Map
+
+import org.codehaus.groovy.grails.plugins.springsecurity.NullSaltSource
+import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
+import org.springframework.dao.DataIntegrityViolationException
+
+
 class SUserController {
 
+	def springSecurityService
+	
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
-
+	
     def index = {
         redirect(action: "list", params: params)
     }
 
+	@Secured(['ROLE_ADMIN'])
     def list = {
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
         [SUserInstanceList: SUser.list(params), SUserInstanceTotal: SUser.count()]
     }
 
+	@Secured(['ROLE_ADMIN'])
     def create = {
-        def SUserInstance = new SUser()
-        SUserInstance.properties = params
-        return [SUserInstance: SUserInstance]
+		def user = lookupUserClass().newInstance(params)
+		[user: user, authorityList: sortedRoles()]
     }
 
+	@Secured(['ROLE_ADMIN'])
     def save = {
-        def SUserInstance = new SUser(params)
-        if (SUserInstance.save(flush: true)) {
-            flash.message = "${message(code: 'default.created.message', args: [message(code: 'SUser.label', default: 'SUser'), SUserInstance.id])}"
-            redirect(action: "show", id: SUserInstance.id)
-        }
-        else {
-            render(view: "create", model: [SUserInstance: SUserInstance])
-        }
+      def user = lookupUserClass().newInstance(params)
+		if (params.password) {
+			String salt = saltSource instanceof NullSaltSource ? null : params.username
+			user.password = SpringSecurityUiService.encodePassword(params.password, salt)
+		}
+		if (!user.save(flush: true)) {
+			render view: 'create', model: [user: user, authorityList: sortedRoles()]
+			return
+		}
+
+		addRoles(user)
+		flash.message = "${message(code: 'default.created.message', args: [message(code: 'user.label', default: 'User'), user.id])}"
+		redirect action: edit, id: user.id
     }
 
     def show = {
+		if(!params.id) {
+			params.id = springSecurityService.currentUser?.id;
+		}
+		
         def SUserInstance = SUser.get(params.id)
         if (!SUserInstance) {
             flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'SUser.label', default: 'SUser'), params.id])}"
@@ -41,60 +67,205 @@ class SUserController {
         }
     }
 
+	@Secured(['ROLE_USER'])
     def edit = {
-        def SUserInstance = SUser.get(params.id)
-        if (!SUserInstance) {
-            flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'SUser.label', default: 'SUser'), params.id])}"
-            redirect(action: "list")
-        }
-        else {
-            return [SUserInstance: SUserInstance]
-        }
+       String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
+
+		def user = params.username ? lookupUserClass().findWhere((usernameFieldName): params.username) : null
+		if (!user) user = findById()
+		if (!user) return
+
+		return buildUserModel(user)
     }
 
+	@Secured(['ROLE_ADMIN'])
     def update = {
-        def SUserInstance = SUser.get(params.id)
-        if (SUserInstance) {
-            if (params.version) {
-                def version = params.version.toLong()
-                if (SUserInstance.version > version) {
-                    
-                    SUserInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [message(code: 'SUser.label', default: 'SUser')] as Object[], "Another user has updated this SUser while you were editing")
-                    render(view: "edit", model: [SUserInstance: SUserInstance])
-                    return
-                }
-            }
-            SUserInstance.properties = params
-            if (!SUserInstance.hasErrors() && SUserInstance.save(flush: true)) {
-                flash.message = "${message(code: 'default.updated.message', args: [message(code: 'SUser.label', default: 'SUser'), SUserInstance.id])}"
-                redirect(action: "show", id: SUserInstance.id)
-            }
-            else {
-                render(view: "edit", model: [SUserInstance: SUserInstance])
-            }
-        }
-        else {
-            flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'SUser.label', default: 'SUser'), params.id])}"
-            redirect(action: "list")
-        }
+        String passwordFieldName = SpringSecurityUtils.securityConfig.userLookup.passwordPropertyName
+
+		def user = findById()
+		if (!user) return
+		if (!versionCheck('user.label', 'User', user, [user: user])) {
+			return
+		}
+
+		def oldPassword = user."$passwordFieldName"
+		user.properties = params
+		if (params.password && !params.password.equals(oldPassword)) {
+			String salt = saltSource instanceof NullSaltSource ? null : params.username
+			user."$passwordFieldName" = springSecurityUiService.encodePassword(params.password, salt)
+		}
+
+		if (!user.save(flush: true)) {
+			render view: 'edit', model: buildUserModel(user)
+			return
+		}
+
+		String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
+
+		lookupUserRoleClass().removeAll user
+		addRoles user
+		userCache.removeUserFromCache user[usernameFieldName]
+		flash.message = "${message(code: 'default.updated.message', args: [message(code: 'user.label', default: 'User'), user.id])}"
+		redirect action: edit, id: user.id
     }
 
+	@Secured(['ROLE_ADMIN'])
     def delete = {
-        def SUserInstance = SUser.get(params.id)
-        if (SUserInstance) {
-            try {
-                SUserInstance.delete(flush: true)
-                flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'SUser.label', default: 'SUser'), params.id])}"
-                redirect(action: "list")
-            }
-            catch (org.springframework.dao.DataIntegrityViolationException e) {
-                flash.message = "${message(code: 'default.not.deleted.message', args: [message(code: 'SUser.label', default: 'SUser'), params.id])}"
-                redirect(action: "show", id: params.id)
-            }
-        }
-        else {
-            flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'SUser.label', default: 'SUser'), params.id])}"
-            redirect(action: "list")
-        }
+        def user = findById()
+		if (!user) return
+
+		String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
+		try {
+			lookupUserRoleClass().removeAll user
+			user.delete flush: true
+			userCache.removeUserFromCache user[usernameFieldName]
+			flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'user.label', default: 'User'), params.id])}"
+			redirect action: search
+		}
+		catch (DataIntegrityViolationException e) {
+			flash.error = "${message(code: 'default.not.deleted.message', args: [message(code: 'user.label', default: 'User'), params.id])}"
+			redirect action: edit, id: params.id
+		}
     }
+	
+	@Secured(['ROLE_ADMIN'])
+	def search = {
+		[enabled: 0, accountExpired: 0, accountLocked: 0, passwordExpired: 0]
+	}
+
+	@Secured(['ROLE_ADMIN'])
+	def userSearch = {
+
+		boolean useOffset = params.containsKey('offset')
+		setIfMissing 'max', 10, 100
+		setIfMissing 'offset', 0
+
+		def hql = new StringBuilder('FROM ').append(lookupUserClassName()).append(' u WHERE 1=1 ')
+		def queryParams = [:]
+
+		def userLookup = SpringSecurityUtils.securityConfig.userLookup
+		String usernameFieldName = userLookup.usernamePropertyName
+
+		for (name in [username: usernameFieldName]) {
+			if (params[name.key]) {
+				hql.append " AND LOWER(u.${name.value}) LIKE :${name.key}"
+				queryParams[name.key] = params[name.key].toLowerCase() + '%'
+			}
+		}
+
+		String enabledPropertyName = userLookup.enabledPropertyName
+		String accountExpiredPropertyName = userLookup.accountExpiredPropertyName
+		String accountLockedPropertyName = userLookup.accountLockedPropertyName
+		String passwordExpiredPropertyName = userLookup.passwordExpiredPropertyName
+
+		for (name in [enabled: enabledPropertyName,
+					  accountExpired: accountExpiredPropertyName,
+					  accountLocked: accountLockedPropertyName,
+					  passwordExpired: passwordExpiredPropertyName]) {
+			Integer value = params.int(name.key)
+			if (value) {
+				hql.append " AND u.${name.value}=:${name.key}"
+				queryParams[name.key] = value == 1
+			}
+		}
+
+		int totalCount = lookupUserClass().executeQuery("SELECT COUNT(DISTINCT u) $hql", queryParams)[0]
+
+		Integer max = params.int('max')
+		Integer offset = params.int('offset')
+
+		String orderBy = ''
+		if (params.sort) {
+			orderBy = " ORDER BY u.$params.sort ${params.order ?: 'ASC'}"
+		}
+
+		def results = lookupUserClass().executeQuery(
+				"SELECT DISTINCT u $hql $orderBy",
+				queryParams, [max: max, offset: offset])
+		def model = [results: results, totalCount: totalCount, searched: true]
+
+		// add query params to model for paging
+		for (name in ['username', 'enabled', 'accountExpired', 'accountLocked',
+					  'passwordExpired', 'sort', 'order']) {
+			 model[name] = params[name]
+		}
+
+		render view: 'search', model: model
+	}
+
+	/**
+	 * Ajax call used by autocomplete textfield.
+	 */
+	def ajaxUserSearch = {
+
+		def jsonData = []
+
+		if (params.term?.length() > 2) {
+			String username = params.term
+			String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
+
+			setIfMissing 'max', 10, 100
+
+			def results = lookupUserClass().executeQuery(
+					"SELECT DISTINCT u.$usernameFieldName " +
+					"FROM ${lookupUserClassName()} u " +
+					"WHERE LOWER(u.$usernameFieldName) LIKE :name " +
+					"ORDER BY u.$usernameFieldName",
+					[name: "${username.toLowerCase()}%"],
+					[max: params.max])
+
+			for (result in results) {
+				jsonData << [value: result]
+			}
+		}
+
+		render text: jsonData as JSON, contentType: 'text/plain'
+	}
+
+	protected void addRoles(user) {
+		String upperAuthorityFieldName = GrailsNameUtils.getClassName(
+			SpringSecurityUtils.securityConfig.authority.nameField, null)
+
+		for (String key in params.keySet()) {
+			if (key.contains('ROLE') && 'on' == params.get(key)) {
+				lookupUserRoleClass().create user, lookupRoleClass()."findBy$upperAuthorityFieldName"(key), true
+			}
+		}
+	}
+
+	protected Map buildUserModel(user) {
+
+		String authorityFieldName = SpringSecurityUtils.securityConfig.authority.nameField
+		String authoritiesPropertyName = SpringSecurityUtils.securityConfig.userLookup.authoritiesPropertyName
+
+		List roles = sortedRoles()
+		Set userRoleNames = user[authoritiesPropertyName].collect { it[authorityFieldName] }
+		def granted = [:]
+		def notGranted = [:]
+		for (role in roles) {
+			String authority = role[authorityFieldName]
+			if (userRoleNames.contains(authority)) {
+				granted[(role)] = userRoleNames.contains(authority)
+			}
+			else {
+				notGranted[(role)] = userRoleNames.contains(authority)
+			}
+		}
+
+		return [user: user, roleMap: granted + notGranted]
+	}
+
+	protected findById() {
+		def user = lookupUserClass().get(params.id)
+		if (!user) {
+			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'user.label', default: 'User'), params.id])}"
+			redirect action: search
+		}
+
+		user
+	}
+
+	protected List sortedRoles() {
+		lookupRoleClass().list().sort { it.authority }
+	}
 }

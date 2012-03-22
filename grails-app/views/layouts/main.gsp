@@ -1,4 +1,5 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<%@page import="org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils"%>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:fb="http://ogp.me/ns/fb#">
 <head>
 <title>Species Portal</title>
@@ -19,8 +20,14 @@
 <link rel="stylesheet" type="text/css" media="screen"
 	href="${resource(dir:'js/jquery/jquery.jqGrid-4.1.2/css',file:'ui.jqgrid.css', absolute:true)}" />
 
-<link rel="stylesheet" type="text/css"
-	href="${resource(dir:'css',file:'auth.css', absolute:true)}" />
+<!-- link rel="stylesheet" type="text/css"
+	href="${resource(dir:'css',file:'auth.css', absolute:true)}" /-->
+	<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'spring-security-ui.css',plugin:'spring-security-ui')}"/>
+	<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'jquery.jgrowl.css',plugin:'spring-security-ui')}"/>
+	<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'jquery.safari-checkbox.css',plugin:'spring-security-ui')}"/>
+	<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'auth.css',plugin:'spring-security-ui')}"/>
+
+	
 <link rel="stylesheet" type="text/css" media="all"
 	href="${resource(dir:'css',file:'reset.css', absolute:true)}" />
 <link rel="stylesheet" type="text/css" media="all"
@@ -35,7 +42,6 @@
 <link rel="stylesheet" type="text/css" media="all"
 	href="${resource(dir:'css',file:'jquery.rating.css', absolute:true)}" />
 
-
 <!-- script type="text/javascript"
 	src="${resource(dir:'plugins',file:'jquery-ui-1.8.15/jquery-ui/js/jquery-ui-1.8.15.custom.min.js', absolute:true)}"></script-->
 <g:javascript src="jquery/jquery.form.js"
@@ -44,6 +50,10 @@
 	base="${grailsApplication.config.grails.serverURL+'/js/'}"></g:javascript>
 <g:javascript src="readmore/readmore.js"
 	base="${grailsApplication.config.grails.serverURL+'/js/'}" />
+	
+<g:javascript src='jquery/jquery.jgrowl.js' plugin='spring-security-ui'/>
+<g:javascript src='jquery/jquery.checkbox.js' plugin='spring-security-ui'/>
+<g:javascript src='spring-security-ui.js' plugin='spring-security-ui'/>
 
 <g:javascript>
 jQuery(document).ready(function($) {
@@ -181,9 +191,8 @@ border-bottom:3px solid #003846;
 		<span id='loginLink'
 			style='position: relative; margin-right: 30px; float: right'>
 			<sec:ifLoggedIn>
-         	Logged in as <sec:username /> (<g:link controller='logout'>Logout</g:link>)
+         		<sUser:renderProfileLink/> (<g:link controller='logout'>Logout</g:link>)
       		</sec:ifLoggedIn> <sec:ifNotLoggedIn>
-				<!--a href='#' onclick='show_login_dialog();  return false'>Login</a-->
 				<g:link controller='login'>Login</g:link>
 			</sec:ifNotLoggedIn> </span>
 		<g:render template='/common/ajaxLogin' />
@@ -198,7 +207,9 @@ border-bottom:3px solid #003846;
 			<div id="menu" class="grid_12 ui-corner-all">
 				<div class="demo" style="float: right; margin-right: .3em;"
 					title="These are demo pages">These are demo pages</div><br/>
+				
 				<sNav:render group="dashboard" subitems="true" />
+				
 				<div style="float: right;">
 					<g:searchBox />
 				</div>
@@ -282,8 +293,7 @@ border-bottom:3px solid #003846;
 				$("a.ui-icon-close").click(function() {
 					$(this).parent().hide("slow");
 				})
-			    			
-    			
+				
 		}); 
 			<%if(!grailsApplication.config.checkin.drupal) {%>
 			function show_login_dialog() {
@@ -301,6 +311,39 @@ border-bottom:3px solid #003846;
 				$('#ajaxLoginForm').submit(); 
 			}
 			
+			window.fbAsyncInit = function() {
+		  FB.init({
+		    appId  : '${SpringSecurityUtils.securityConfig.facebook.appId}',
+		    channelUrl : "${grailsApplication.config.grails.serverURL}/channel.html",
+		    status : true,
+		    cookie : true,
+		    xfbml  : true,
+		    oauth  : true,
+		    logging : true
+		  });
+		  
+		FB.Event.subscribe('edge.create',
+			function(response) {
+				alert('You liked the URL: ' + response);
+		});
+		
+		FB.Event.subscribe('auth.login',
+				function(response) {
+					console.log(response);
+					if(response.status == 'connected') {
+						window.location = "${createLink(controller:'login', action:'authSuccess')}"
+					} else {
+						alert("Error in authenticating via Facebook");
+					}
+				}
+			);
+		
+		};
+		
+		
+	 
+		(function(d){var js, id = 'facebook-jssdk'; if (d.getElementById(id)) {return;}js = d.createElement('script'); js.id = id; js.async = true;js.src = "//connect.facebook.net/en_US/all.js";d.getElementsByTagName('head')[0].appendChild(js);}(document));
+		
 			if (typeof(console) == "undefined") { console = {}; } 
 			if (typeof(console.log) == "undefined") { console.log = function() { return 0; } }
 	</g:javascript>
