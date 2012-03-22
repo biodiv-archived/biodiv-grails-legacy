@@ -52,9 +52,9 @@ $(document).ready(function(){
 		<!-- g:paginateOnhabitat/-->
 		<g:each in="${species.Habitat.list()}" var="habitat" status="i">
 				<input type="radio" name="habitatFilter"
-					id="habitatFilter${i}" value="${habitat.name}"
+					id="habitatFilter${i}" value="${habitat.id}"
 					style="display: none" />
-				<label for="habitatFilter${i}" value="${habitat.name}"><img
+				<label for="habitatFilter${i}" value="${habitat.id}"><img
 					class="group_icon"
 					src="${resource(dir:'images/group_icons',file:'All.png', absolute:true)}"
 					title="${habitat.name}" /> </label>

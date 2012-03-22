@@ -7,6 +7,7 @@ import grails.plugins.springsecurity.Secured
 
 
 
+import species.Habitat
 import species.VisitCounter;
 import species.Contributor;
 import species.Resource;
@@ -58,7 +59,7 @@ class Observation implements Taggable{
 	float longitude;
 	boolean geoPrivacy = false;
 	String locationAccuracy;
-	String habitat;
+	Habitat habitat;
 	long visitCount = 0;
 	String maxVotedSpeciesName;
 

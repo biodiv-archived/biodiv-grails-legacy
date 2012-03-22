@@ -8,6 +8,7 @@ import org.grails.taggable.TagLink;
 import species.participation.RecommendationVote.ConfidenceType;
 import java.util.Date;
 import species.Resource;
+import species.Habitat;
 import species.Resource.ResourceType;
 import species.TaxonomyDefinition;
 import species.auth.SUser;
@@ -54,7 +55,7 @@ class ObservationService {
         observation.longitude = Float.parseFloat(params.longitude);
         observation.locationAccuracy = params.location_accuracy;
 		observation.geoPrivacy = false;
-		observation.habitat = params.habitat;
+		observation.habitat = Habitat.get(params.habitat_id);
 		
 		def resourcesXML = createResourcesXML(params);
 		def resources = saveResources(observation, resourcesXML);

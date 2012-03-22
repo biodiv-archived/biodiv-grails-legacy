@@ -1,6 +1,7 @@
 
 <%@ page import="species.participation.Observation"%>
 <%@ page import="species.groups.SpeciesGroup"%>
+<%@ page import="species.Habitat"%>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -48,7 +49,7 @@
 													of <span class="highlight">${SpeciesGroup.get(queryParams.groupId).name.toLowerCase()}</span> group
 												</g:if>
 												<g:if test="${queryParams.habitat}">
-													in <span class="highlight">${queryParams.habitat.toLowerCase()}</span> habitat
+													in <span class="highlight">${Habitat.get(queryParams.habitat).name.toLowerCase()}</span> habitat
 												</g:if>
 												<g:if test="${queryParams.tag}">
 													tagged <span class="highlight">${queryParams.tag}</span>
