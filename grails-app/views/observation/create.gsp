@@ -155,13 +155,13 @@
                                     <div id="selected_habitat" class="selected_value"><img src="${resource(dir:'images/group_icons',file:'All.png', absolute:true)}"/><span class="display_value">Select habitat</span></div>
                                         <div id="habitat_options" style="background-color:#fbfbfb;box-shadow:0 8px 6px -6px black; border-radius: 0 5px 5px 5px;display:none;">                                       <ul>
                                             	<g:each in="${species.Habitat.list()}" var="h">
-                                            		<li class="habitat_option"><img src="${resource(dir:'images/group_icons',file:'All.png', absolute:true)}"/><span class="display_value">${h.name}</span></li>
+                                            		<li class="habitat_option" value="${h.id}" ><img src="${resource(dir:'images/group_icons',file:'All.png', absolute:true)}"/><span class="display_value">${h.name}</span></li>
                                     			</g:each>
                                         	</ul>
                                         </div>
                                     </div>
                                 </div>	
-								<input id="habitat" type="hidden" name="habitat"></input>
+								<input id="habitat_id" type="hidden" name="habitat_id"></input>
                             </div>
 
                         <div class="row" style="margin-top:20px;height:auto;">
@@ -527,7 +527,7 @@
                 });
 		
         $(".habitat_option").click(function(){
-                $("#habitat").val($(this).text());
+                $("#habitat_id").val($(this).val());
                 $("#selected_habitat").html($(this).html());
                 $("#habitat_options").hide();
                 $("#selected_habitat").css({'background-color':'#e5e5e5', 'border-bottom-color':'#aeaeae'});

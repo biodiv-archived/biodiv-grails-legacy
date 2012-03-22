@@ -16,7 +16,8 @@ $(document).ready(function(){
 	$('#habitatFilter label[value$="${params.habitat}"]').each (function() {
 			$(this).attr('aria-pressed', 'true').addClass('ui-state-hover').addClass('ui-state-active');
 	});
-		
+	
+
 });
 </g:javascript>
 <div id="speciesGroupFilter" class="filterBar"  style="clear: both">
@@ -52,21 +53,13 @@ $(document).ready(function(){
 		<!-- g:paginateOnhabitat/-->
 		<g:each in="${species.Habitat.list()}" var="habitat" status="i">
 				<input type="radio" name="habitatFilter"
-					id="habitatFilter${i}" value="${habitat.name}"
+					id="habitatFilter${i}" value="${habitat.id}"
 					style="display: none" />
-				<label for="habitatFilter${i}" value="${habitat.name}"><img
+				<label for="habitatFilter${i}" value="${habitat.id}"><img
 					class="group_icon"
 					src="${resource(dir:'images/group_icons',file:'All.png', absolute:true)}"
 					title="${habitat.name}" /> </label>
 		</g:each>
 </div>
 
-<div style="float: right;">
-Sort by <select name="observationSort" id="observationSort"
-		class="value ui-corner-all">
-		<option value="createdOn" 
-			${params.sort?.equals('createdOn')?'selected':''  }>Latest</option>
-		<option value="visitCount"
-			${params.sort?.equals('visitCount')?'selected':'' }>Most Viewed</option>
-		</select>
-</div>
+

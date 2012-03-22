@@ -12,6 +12,7 @@ import species.sourcehandler.XMLConverter
 import species.utils.ImageUtils
 import species.utils.Utils;
 import species.groups.SpeciesGroup;
+import species.Habitat
 
 class ObservationController {
 
@@ -26,14 +27,17 @@ class ObservationController {
 	}
 
 	def list = {
-		params.max = Math.min(params.max ? params.int('max') : 10, 100)
+		params.max = Math.min(params.max ? params.int('max') : 9, 100)
 		params.sGroup = (params.sGroup)? params.sGroup : SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.ALL).id
-		params.habitat = (params.habitat)? params.habitat : grailsApplication.config.speciesPortal.group.ALL
+		params.habitat = (params.habitat)? params.habitat : Habitat.findByName(grailsApplication.config.speciesPortal.group.ALL).id
+		params.habitat = params.habitat.toLong()
 		//params.userName = springSecurityService.currentUser.username;
 		
 		def query = "select obv from Observation obv "
 		def queryParams = [:]
 		def filterQuery = ""
+
+                def activeFilters = [:]
 		
 		if(params.sGroup){
 			params.sGroup = params.sGroup.toLong()
@@ -44,6 +48,7 @@ class ObservationController {
 
 				filterQuery += " where obv.group.id = :groupId "
 				queryParams["groupId"] = groupId
+                                activeFilters["sGroup"] = groupId
 			}
 		}
 		
@@ -54,21 +59,25 @@ class ObservationController {
 			
 			queryParams["tag"] = params.tag
 			queryParams["tagType"] = 'observation'
+                        activeFilters["tag"] = params.tag
 		}
 		
 		
-		if(params.habitat && (params.habitat != grailsApplication.config.speciesPortal.group.ALL)){
-			(filterQuery == "")? (filterQuery += " where obv.habitat like :habitat ") : (filterQuery += " and obv.habitat like :habitat ")
+		if(params.habitat && (params.habitat != Habitat.findByName(grailsApplication.config.speciesPortal.group.ALL).id)){
+			(filterQuery == "")? (filterQuery += "  where ") : (filterQuery += "  and ")
+			filterQuery += " obv.habitat.id = :habitat " 
 			queryParams["habitat"] = params.habitat
+                        activeFilters["habitat"] = params.habitat
 		}
 		
 		if(params.userId){
 			(filterQuery == "")? (filterQuery += " where ") : (filterQuery += " and ")
 			filterQuery += " obv.author.id = :userId "
 			queryParams["userId"] = params.userId.toLong()
+                        activeFilters["userId"] = params.habitat
 		}
 		
-		if(params.speciesName){
+		if(params.speciesName && (params.speciesName != grailsApplication.config.speciesPortal.group.ALL)){
 			(filterQuery == "")? (filterQuery += " where ") : (filterQuery += " and ")
 			filterQuery += " obv.maxVotedSpeciesName like :speciesName "
 			queryParams["speciesName"] = params.speciesName
@@ -83,13 +92,9 @@ class ObservationController {
 		if(params.offset) {
 			queryParams["offset"] = params.offset.toInteger()
 		}
-		//log.error("===============query =======" + query)
-		//log.error("===============params =====" + queryParams)	
-		def observationInstanceList = Observation.executeQuery(query, queryParams)
-		//log.error("================= result == " +observationInstanceList  )
-		//log.error("================= size  == " +observationInstanceList.size()  )
 		
-		[observationInstanceList: observationInstanceList, observationInstanceTotal: count, queryParams: queryParams]
+		def observationInstanceList = Observation.executeQuery(query, queryParams)
+		[observationInstanceList: observationInstanceList, observationInstanceTotal: count, queryParams: queryParams, activeFilters:activeFilters]
 	}
 
 	@Secured(['ROLE_USER'])
