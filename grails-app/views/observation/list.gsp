@@ -43,7 +43,28 @@
 			<div class="list">
 				<div class="observations thumbwrap">
 					<div class="observation grid_11">
-											<div class="info-message">
+					
+					<div id="sortFilter" class="filterBar"  style="clear: both">
+						<input type="radio" name="sortFilter" id="sortFilter1" value="createdOn" style="display: none" />
+						<label for="sortFilter1" value="createdOn">Latest</label>
+		
+						<input type="radio" name="sortFilter" id="sortFilter2" value="lastUpdated" style="display: none" />
+						<label for="sortFilter2" value="lastUpdated">Last Updated</label>
+		
+						<input type="radio" name="sortFilter" id="sortFilter3" value="visitCount" style="display: none" />
+						<label for="sortFilter3" value="visitCount">Most Viewed</label>
+					</div>
+					<div id="speciesNameFilter" class="filterBar"  style="float:right">
+						<input type="radio" name="speciesNameFilter" id="speciesNameFilter1" value="All" style="display: none" />
+						<label for="speciesNameFilter1" value="All">All</label>
+		
+						<input type="radio" name="speciesNameFilter" id="speciesNameFilter2" value="Unknown" style="display: none" />
+						<label for="speciesNameFilter2" value="Unknown">Unidentified</label>
+					</div>
+					
+					
+					
+											<div class="info-message" style="clear: both" >
 												Showing <span class="highlight">${observationInstanceTotal} observation<g:if test="${observationInstanceTotal>1}">s</g:if></span>
 												<g:if test="${queryParams.groupId}">
 													of <span class="highlight">${SpeciesGroup.get(queryParams.groupId).name.toLowerCase()}</span> group
@@ -98,6 +119,15 @@
 	</div>
 	<g:javascript>	
 	$(document).ready(function(){
+		$( "#sortFilter" ).buttonset();
+		$('#sortFilter label[value$="${params.sort}"]').each (function() {
+			$(this).attr('aria-pressed', 'true').addClass('ui-state-hover').addClass('ui-state-active');
+		});
+		
+		$( "#speciesNameFilter" ).buttonset();
+		$('#speciesNameFilter label[value$="${params.speciesName}"]').each (function() {
+			$(this).attr('aria-pressed', 'true').addClass('ui-state-hover').addClass('ui-state-active');
+		});
 		
 		function getSelectedGroup() {
 			var grp = ''; 
@@ -122,30 +152,43 @@
 			hbt = hbt.replace(/\s*\,\s*$/,'');
 			return hbt;	
 		} 
-	
-		function getFilterParams(){
-			var params = {};
-			
-			var grp = getSelectedGroup();
-			if(grp) {
-				params['sGroup'] = grp;
-			}
-			
-			var habitat = getSelectedHabitat();
-			if(habitat) {
-				params['habitat'] = habitat;
-			}
-			
-			return params;		
-		}	
 		
+		function getSelectedSortBy() {
+			var sortBy = ''; 
+			$('#sortFilter label').each (function() {
+				if($(this).attr('aria-pressed') === 'true') {
+					sortBy += $(this).attr('value') + ',';
+				}
+			});
+			
+			sortBy = sortBy.replace(/\s*\,\s*$/,'');
+			return sortBy;	
+		} 
+		
+		function getSelectedSpeciesName() {
+			var sName = ''; 
+			$('#speciesNameFilter label').each (function() {
+				if($(this).attr('aria-pressed') === 'true') {
+					sName += $(this).attr('value') + ',';
+				}
+			});
+			
+			sName = sName.replace(/\s*\,\s*$/,'');
+			return sName;	
+		} 
+	
 		function getFilterParameters(url, limit, offset) {
 			
 			var params = url.param();
 			
-			if($('#observationSort').length > 0) {
-				params['sort'] = $('#observationSort option:selected').val();
-				console.log(params['sort']);
+			var sortBy = getSelectedSortBy();
+			if(sortBy) {
+				params['sort'] = sortBy;
+			}
+			
+			var sName = getSelectedSpeciesName();
+			if(sName) {
+				params['speciesName'] = sName;
 			}
 			
 			var grp = getSelectedGroup();
@@ -196,7 +239,12 @@
 			return false;
 		});
 		
-		$('#observationSort').change(function(){
+		$('#sortFilter input').change(function(){
+			updateGallery(undefined, ${queryParams.max}, 0);
+			return false;
+		});
+		
+		$('#speciesNameFilter input').change(function(){
 			updateGallery(undefined, ${queryParams.max}, 0);
 			return false;
 		});

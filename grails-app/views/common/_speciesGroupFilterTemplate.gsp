@@ -16,7 +16,8 @@ $(document).ready(function(){
 	$('#habitatFilter label[value$="${params.habitat}"]').each (function() {
 			$(this).attr('aria-pressed', 'true').addClass('ui-state-hover').addClass('ui-state-active');
 	});
-		
+	
+
 });
 </g:javascript>
 <div id="speciesGroupFilter" class="filterBar"  style="clear: both">
@@ -61,14 +62,4 @@ $(document).ready(function(){
 		</g:each>
 </div>
 
-<div style="float: right;">
-Sort by <select name="observationSort" id="observationSort"
-		class="value ui-corner-all">
-		<option value="createdOn" 
-			${params.sort?.equals('createdOn')?'selected':''  }>Latest</option>
-		<option value="lastUpdated"
-			${params.sort?.equals('lastUpdated')?'selected':'' }>Last Updated</option>
-		<option value="visitCount"
-			${params.sort?.equals('visitCount')?'selected':'' }>Most Viewed</option>
-		</select>
-</div>
+

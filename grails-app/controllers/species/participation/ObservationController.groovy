@@ -77,7 +77,7 @@ class ObservationController {
                         activeFilters["userId"] = params.habitat
 		}
 		
-		if(params.speciesName){
+		if(params.speciesName && (params.speciesName != grailsApplication.config.speciesPortal.group.ALL)){
 			(filterQuery == "")? (filterQuery += " where ") : (filterQuery += " and ")
 			filterQuery += " obv.maxVotedSpeciesName like :speciesName "
 			queryParams["speciesName"] = params.speciesName
