@@ -73,7 +73,8 @@ class SUser {
 		if(profilePic) {
 			return profilePic;
 		} 
-		return g.createLinkTo(file: "users/user_small.png", base:grailsApplication.config.speciesPortal.resources.serverURL)
+		return grailsApplication.config.speciesPortal.resources.serverURL+"/users/user_small.png"
+		
 	}
 	
 	@Override

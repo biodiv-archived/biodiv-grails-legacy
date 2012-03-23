@@ -1573,3 +1573,9 @@ ul.thumbwrap .license_options li:hover {
 	width:50px;
 	margin:5px;
 }
+
+.very_small_profile_pic {
+	hieght:25px;
+	width:25px;
+	margin:2px;
+}
