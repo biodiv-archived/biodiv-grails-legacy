@@ -73,7 +73,7 @@ class SUser {
 		if(profilePic) {
 			return profilePic;
 		} 
-		return grailsApplication.config.speciesPortal.resources.serverURL+"/users/user_small.png"
+		return grailsApplication.config.speciesPortal.resources.serverURL+"/users/user.png"
 		
 	}
 	
