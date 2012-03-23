@@ -1568,14 +1568,20 @@ ul.thumbwrap .license_options li:hover {
 	float:left;
 }
 
+.normal_profile_pic {
+	height:100px;
+	width:auto;
+	margin:5px;
+}
+
 .small_profile_pic {
 	height:50px;
-	width:50px;
+	width:auto;
 	margin:5px;
 }
 
 .very_small_profile_pic {
 	height:25px;
-	width:25px;
+	width:auto;
 	margin:2px;
 }

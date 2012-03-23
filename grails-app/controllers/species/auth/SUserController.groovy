@@ -2,6 +2,7 @@ package species.auth
 
 import grails.converters.JSON
 import grails.plugins.springsecurity.Secured;
+import grails.plugins.springsecurity.ui.AbstractS2UiController;
 import grails.plugins.springsecurity.ui.SpringSecurityUiService
 import grails.util.GrailsNameUtils
 
@@ -13,7 +14,7 @@ import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
 import org.springframework.dao.DataIntegrityViolationException
 
 
-class SUserController {
+class SUserController extends AbstractS2UiController {
 
 	def springSecurityService
 	
@@ -23,10 +24,10 @@ class SUserController {
         redirect(action: "list", params: params)
     }
 
-	@Secured(['ROLE_ADMIN'])
     def list = {
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
-        [SUserInstanceList: SUser.list(params), SUserInstanceTotal: SUser.count()]
+		def model = [results: SUser.list(params), totalCount: SUser.count()]
+		render view: 'search', model: model
     }
 
 	@Secured(['ROLE_ADMIN'])
@@ -128,12 +129,10 @@ class SUserController {
 		}
     }
 	
-	@Secured(['ROLE_ADMIN'])
 	def search = {
 		[enabled: 0, accountExpired: 0, accountLocked: 0, passwordExpired: 0]
 	}
 
-	@Secured(['ROLE_ADMIN'])
 	def userSearch = {
 
 		boolean useOffset = params.containsKey('offset')

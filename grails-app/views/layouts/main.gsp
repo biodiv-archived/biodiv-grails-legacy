@@ -4,8 +4,7 @@
 <head>
 <title>Species Portal</title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<!-- link rel="stylesheet" type="text/css" media="all"
-	href="${resource(dir:'plugins',file:'jquery-ui-1.8.15/jquery-ui/themes/ui-lightness/jquery-ui-1.8.15.custom.css', absolute:true)}" /-->
+
 <link rel="stylesheet" type="text/css" media="all"
 	href="${resource(dir:'css',file:'jquery-ui.css', absolute:true)}" />
 
@@ -26,7 +25,10 @@
 	<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'jquery.jgrowl.css',plugin:'spring-security-ui')}"/>
 	<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'jquery.safari-checkbox.css',plugin:'spring-security-ui')}"/>
 	<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'auth.css',plugin:'spring-security-ui')}"/>
-
+	<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'date_input.css',plugin:'spring-security-ui')}"/>
+   <link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'jquery.jdMenu.css',plugin:'spring-security-ui')}"/>
+   <link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'jquery.jdMenu.slate.css',plugin:'spring-security-ui')}"/>
+   <link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'table.css',plugin:'spring-security-ui')}"/>
 	
 <link rel="stylesheet" type="text/css" media="all"
 	href="${resource(dir:'css',file:'reset.css', absolute:true)}" />

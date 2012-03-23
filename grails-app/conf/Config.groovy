@@ -425,7 +425,8 @@ navigation.dashboard = [
 	 [controller:'observation', title:'Browse', order:1, action:'list'],
 	 [controller:'observation', title:'Add Observation', order:10, action:"create"],
 	 ]],
-	 [group:'search', order:50, controller:'search', title:'Advanced Search', action:'advSelect'],
+ 	[group:'users', order:50, controller:'SUser', title:'Users', action:'search'],
+	 [group:'search', order:60, controller:'search', title:'Advanced Search', action:'advSelect'],
 ]
 
 

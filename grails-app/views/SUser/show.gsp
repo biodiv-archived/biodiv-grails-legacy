@@ -37,7 +37,7 @@
 				<div class="figure"
 					style="float: left; max-height: 220px; max-width: 200px">
 					<g:link controller="SUser" action="show" id="${SUserInstance.id }">
-						<img class="profile_pic" src="${SUserInstance.icon()}" />
+						<img class="normal_profile_pic" src="${SUserInstance.icon()}" />
 					</g:link>
 					<div class="prop">
 						<span class="name">Member since </span> <span class="value">
