@@ -32,12 +32,17 @@
 					${flash.message}
 				</div>
 			</g:if>
-			
-			<obv:showGroupFilter
-				model="['observationInstance':observationInstance]" />
-			
-			<obv:showObservationsLocation
-					model="['observationInstanceList':observationInstanceList]" />
+	
+                        <div class="filters">
+                            <div class="grid_8" style="margin:0;">
+                                <obv:showGroupFilter
+                                        model="['observationInstance':observationInstance]" />
+                            </div>
+                            <div class="grid_8 observation_location">
+                                <div id="map_canvas" style="height: 300px;"></div>
+                                <div id="show_observations_in_bounds" class="button small" style="float:right;">View only these observations</div>
+                            </div>
+                        </div>
 				
 			<div style="clear:both"></div>
 			<div class="list">
@@ -103,13 +108,10 @@
 					
 					<div class="tags_section grid_4">
 						<obv:showAllTags/>
-						<div id="tagList" class="grid_4 sidebar_section" style="display:none;">
-							<obv:showTagsList model="['tags':tags]" />
-						</div>	
 						<obv:showGroupList/>
 					</div>
 				        
-					<div class="paginateButtons" style="visibility:hidden; clear: both">
+					<div class="paginateButtons" style="clear: both">
 						<g:paginate total="${observationInstanceTotal}" max="2" params="${activeFilters}"/>
 					</div>
 				</div>
@@ -176,6 +178,18 @@
 			sName = sName.replace(/\s*\,\s*$/,'');
 			return sName;	
 		} 
+
+                function getSelectedBounds() {
+                    var bounds = '';
+                    var swLat = map.getBounds().getSouthWest().lat();
+                    var swLng = map.getBounds().getSouthWest().lng();
+                    var neLat = map.getBounds().getNorthEast().lat();
+                    var neLng = map.getBounds().getNorthEast().lng();
+
+                    bounds = [swLat, swLng, neLat, neLng].join()
+                    
+                    return bounds;    
+                }
 	
 		function getFilterParameters(url, limit, offset) {
 			
@@ -200,6 +214,11 @@
 			if(habitat) {
 				params['habitat'] = habitat;
 			}
+
+                        var bounds = getSelectedBounds();
+                        if (bounds) {
+				params['bounds'] = bounds;
+                        }
 			
 			if(limit != undefined) {
 				params['max'] = limit.toString();
@@ -208,7 +227,7 @@
 			if(offset != undefined) {
 				params['offset'] = offset.toString();
 			}
-			
+
 			return params;
 		}	
 		
@@ -224,7 +243,10 @@
 			var params = getFilterParameters(url, limit, offset);
 			var recursiveDecoded = decodeURIComponent($.param(params));
 			window.location = href+'?'+recursiveDecoded;
-		
+			//var doc_url = href+'?'+recursiveDecoded;
+		        //$(".observations").load(doc_url+" .observations")
+                        //window.history.pushState(null, "", doc_url);
+
 			//var carousel = jQuery('#carousel_${carousel_id}').data('jcarousel');
 			//reloadCarousel(carousel, "speciesGroup", params['sGroupId']);
 		}
@@ -322,7 +344,65 @@
                     $.autopager('load');
                     return false;
                 });
+
+                $('#show_observations_in_bounds').click(function(){
+		    updateGallery(undefined, ${queryParams.max}, 0);
+		    return false;
+                });
 	});
 	</g:javascript>
+
+        <script type="text/javascript"
+                src="http://maps.google.com/maps/api/js?sensor=true"></script>
+        <g:javascript src="markerclusterer.js"
+                base="${grailsApplication.config.grails.serverURL+'/js/location/google/'}"></g:javascript>
+        <script>
+                var markers = [];
+                
+                $(document).ready(function() {
+                  var latlng = new google.maps.LatLng('22.77', '77.22');
+                  var options = {
+                    zoom: 4,
+                    center: latlng,
+                    mapTypeId: google.maps.MapTypeId.ROADMAP
+                  };
+                  map = new google.maps.Map(document.getElementById("map_canvas"), options);
+
+                  var bounds = "${activeFilters.bounds}";
+
+                  if (bounds) {
+                    var data = bounds.split(",");
+                    var bnd = new google.maps.LatLngBounds(new google.maps.LatLng(parseFloat(data[0]), parseFloat(data[1])), new google.maps.LatLng(parseFloat(data[2]), parseFloat(data[3]))); 
+                    map.fitBounds(bnd);
+                  }       
+
+                  <g:each in="${totalObservationInstanceList}" status="i"
+						var="observationInstance">
+		                var latlng = new google.maps.LatLng(
+		                		${observationInstance.latitude}, ${observationInstance.longitude});
+						var marker = new google.maps.Marker({
+							position: latlng,
+							map: map,
+							draggable: false
+						});
+	                    markers.push(marker);
+
+                            var infowindow = new google.maps.InfoWindow({
+                                content: 'An InfoWindow'
+                            });
+
+	                    google.maps.event.addListener(marker, 'click', function() {
+	                        map.setZoom(8);
+	                        map.setCenter(marker.getPosition());
+                                infowindow.open(map, marker);
+	                    });
+
+		    </g:each>	
+				  
+		    var markerCluster = new MarkerClusterer(map, markers);
+                
+                });
+        </script>
+
 </body>
 </html>

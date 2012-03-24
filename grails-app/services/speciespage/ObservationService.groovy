@@ -407,5 +407,94 @@ class ObservationService {
 		obvs.each{ tagSet.addAll(it.tags) }
 		return tagSet;
 	}
+
+        /**
+         * Filter observations by group, habitat, tag, user, species
+         * max: limit results to max: if max = -1 return all results
+         * offset: offset results: if offset = -1 its not passed to the 
+         * executing query
+         */
+        Map getFilteredObservations(params, max, offset){
+		params.sGroup = (params.sGroup)? params.sGroup : SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.ALL).id
+		params.habitat = (params.habitat)? params.habitat : Habitat.findByName(grailsApplication.config.speciesPortal.group.ALL).id
+		params.habitat = params.habitat.toLong()
+		//params.userName = springSecurityService.currentUser.username;
+		
+		def query = "select obv from Observation obv "
+		def queryParams = [:]
+		def filterQuery = ""
+                def activeFilters = [:]
+
+		if(params.sGroup){
+			params.sGroup = params.sGroup.toLong()
+			def groupId = getSpeciesGroupIds(params.sGroup)
+			if(!groupId){
+				log.debug("No groups for id " + params.sGroup)
+			}else{
+
+				filterQuery += " where obv.group.id = :groupId "
+				queryParams["groupId"] = groupId
+                                activeFilters["sGroup"] = groupId
+			}
+		}
+		
+		if(params.tag){
+			query = "select obv from Observation obv,  TagLink tagLink "
+			(filterQuery == "")? (filterQuery += "  where ") : (filterQuery += "  and ")
+			filterQuery +=  " obv.id = tagLink.tagRef and tagLink.type like :tagType and tagLink.tag.name like :tag "
+			
+			queryParams["tag"] = params.tag
+			queryParams["tagType"] = 'observation'
+                        activeFilters["tag"] = params.tag
+		}
+		
+		
+		if(params.habitat && (params.habitat != Habitat.findByName(grailsApplication.config.speciesPortal.group.ALL).id)){
+			(filterQuery == "")? (filterQuery += "  where ") : (filterQuery += "  and ")
+			filterQuery += " obv.habitat.id = :habitat " 
+			queryParams["habitat"] = params.habitat
+                        activeFilters["habitat"] = params.habitat
+		}
+		
+		if(params.userId){
+			(filterQuery == "")? (filterQuery += " where ") : (filterQuery += " and ")
+			filterQuery += " obv.author.id = :userId "
+			queryParams["userId"] = params.userId.toLong()
+                        activeFilters["userId"] = params.habitat
+		}
+		
+		if(params.speciesName && (params.speciesName != grailsApplication.config.speciesPortal.group.ALL)){
+			(filterQuery == "")? (filterQuery += " where ") : (filterQuery += " and ")
+			filterQuery += " obv.maxVotedSpeciesName like :speciesName "
+			queryParams["speciesName"] = params.speciesName
+		}
+                
+                if(params.bounds){
+                    def bounds = params.bounds.split(",")
+                    
+                    def swLat = bounds[0]   
+                    def swLon = bounds[1]    
+                    def neLat = bounds[2]    
+                    def neLon = bounds[3]    
+
+		    (filterQuery == "")? (filterQuery += " where ") : (filterQuery += " and ")
+		    filterQuery += " obv.latitude > " + swLat + " and  obv.latitude < " + neLat + " and obv.longitude > " + swLon + " and obv.longitude < " + neLon  
+		    activeFilters["bounds"] = params.bounds
+
+                }
+
+		def orderByClause = "order by obv." + (params.sort ? params.sort : "createdOn") +  " desc"
+
+		query += filterQuery + orderByClause
 	
+                if(max != -1)
+                    queryParams["max"] = max
+
+                if(offset != -1)        
+		    queryParams["offset"] = offset
+		
+		def observationInstanceList = Observation.executeQuery(query, queryParams)
+                
+                return [observationInstanceList:observationInstanceList, queryParams:queryParams, activeFilters:activeFilters]    
+        }
 }
