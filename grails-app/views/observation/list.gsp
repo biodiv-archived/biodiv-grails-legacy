@@ -111,7 +111,7 @@
 						<obv:showGroupList/>
 					</div>
 				        
-					<div class="paginateButtons" style="clear: both">
+					<div class="paginateButtons" style="visibility:hidden; clear: both">
 						<g:paginate total="${observationInstanceTotal}" max="2" params="${activeFilters}"/>
 					</div>
 				</div>
