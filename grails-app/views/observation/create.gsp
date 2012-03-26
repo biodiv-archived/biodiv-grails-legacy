@@ -1,10 +1,10 @@
-<%@page
-	import="org.springframework.web.context.request.RequestContextHolder"%>
+<%@page import="org.springframework.web.context.request.RequestContextHolder"%>
 <%@page import="species.License"%>
 <%@page import="species.License.LicenseType"%>
 <%@ page import="species.participation.Observation"%>
 <%@ page import="species.groups.SpeciesGroup"%>
-
+<%@ page import="species.Habitat"%>
+<%@ page import="org.grails.taggable.Tag"%>
 
 <html>
 <head>
@@ -92,23 +92,17 @@
                         <div class="row">
                             <label for="group"><g:message
                                             code="observation.group.label" default="Group" />
-                            </label> <!--select name="group_id" class="ui-widget-content ui-corner-all">
-                                    <g:each in="${species.groups.SpeciesGroup.list()}" var="g">
-                                            <g:if
-                                                    test="${!g.name.equals(grailsApplication.config.speciesPortal.group.ALL)}">
-                                                    <option value="${g.id}"
-                                                            ${(g.id == observationInstance?.group?.id)?'selected':''}>
-                                                            ${g.name}
-                                                    </option>
-                                            </g:if>
-                                    </g:each>
-                            </select-->
+                            </label> 
                             <div id="groups_div" class="bold_dropdown" style="z-index:3;">
-                            
+                            	<%
+									def defaultGroupId = observationInstance?.group?.id
+									def defaultGroupIconFileName = (defaultGroupId)? SpeciesGroup.read(defaultGroupId).icon()?.fileName?.trim() : SpeciesGroup.findByName('All').icon()?.fileName?.trim()
+									def defaultGroupValue = (defaultGroupId) ? SpeciesGroup.read(defaultGroupId).name : "Select group"
+								%>
 	                            <div id="selected_group" class="selected_value ${hasErrors(bean: observationInstance, field: 'group', 'errors')}">
 									<img
-										src="${createLinkTo(dir: 'images', file: SpeciesGroup.findByName('All').icon()?.fileName?.trim(), absolute:true)}" ></img>
-									<span class="display_value">Select group</span>
+										src="${createLinkTo(dir: 'images', file: defaultGroupIconFileName, absolute:true)}" ></img>
+								<span class="display_value">${defaultGroupValue}</span>
 								</div>
 	                            
 	                            <div id="group_options" style="background-color:#fbfbfb;box-shadow:0 8px 6px -6px black; border-radius: 0 5px 5px 5px;display:none;">
@@ -131,28 +125,16 @@
                         </div>
 
                         <div class="row">
-                                <label>Habitat</label>
+                          <label>Habitat</label>
                             <div id="habitat_list">
-                                <!--select class="ui-widget-content">
-                                        <option>None</option>
-                                        <option>Forest</option>
-                                        <option>Savanna</option>
-                                        <option>Shrubland</option>
-                                        <option>Grassland</option>
-                                        <option>Wetlands</option>
-                                        <option>Rocky Areas</option>
-                                        <option>Caves and Subterranean Habitats</option>
-                                        <option>Desert</option>
-                                        <option>Marine</option>
-                                        <option>Artificial - Terrestrial</option>
-                                        <option>Artificial - Aquatic</option>
-                                        <option>Introduced Vegetation</option>
-                                        <option>Other</option>
-                                        <option>Unknown</option>
-                                </select-->	
-                            
                                 <div id="habitat_div" class="bold_dropdown" style="z-index:2;">
-                                    <div id="selected_habitat" class="selected_value"><img src="${resource(dir:'images/group_icons',file:'All.png', absolute:true)}"/><span class="display_value">Select habitat</span></div>
+                                <%
+									def defaultHabitatId = observationInstance?.habitat?.id
+						  			//def defaultHabitatIconFileName = (defaultHabitatId)? Habitat.read(defaultHabitatId).icon()?.fileName?.trim() : Habitat.findByName('All').icon()?.fileName?.trim()
+									def defaultHabitatValue = (defaultHabitatId) ? Habitat.read(defaultHabitatId).name : "Select habitat"
+								%>
+                                    <div id="selected_habitat" class="selected_value"><img src="${resource(dir:'images/group_icons',file:'All.png', absolute:true)}"/>
+                                    <span class="display_value">${defaultHabitatValue}</span></div>
                                         <div id="habitat_options" style="background-color:#fbfbfb;box-shadow:0 8px 6px -6px black; border-radius: 0 5px 5px 5px;display:none;">                                       <ul>
                                             	<g:each in="${species.Habitat.list()}" var="h">
                                             		<li class="habitat_option" value="${h.id}" ><img src="${resource(dir:'images/group_icons',file:'All.png', absolute:true)}"/><span class="display_value">${h.name}</span></li>
@@ -181,7 +163,7 @@
                         <div class="row">
                             <label for="observedOn"><g:message
                                         code="observation.observedOn.label" default="Observed on" />
-                            </label> <input type="text" id="observedOn">
+                            </label> <input type="text" id="observedOn" value>
                         </div>
                         
                     </div>
@@ -267,14 +249,21 @@
 
 
                     <div class="row">
+                    <%
+						def defaultPlaceName = (observationInstance) ? observationInstance.placeName : ""
+					%>
                         <label>Location title</label> <input id="place_name" type="text"
-                                    name="place_name"></input>
+                                    name="place_name" value="${defaultPlaceName}" ></input>
                     </div>
                     <div class="row">
-                            <label>Accuracy</label> <input type="radio"
-                                    name="location_accuracy" value="Accurate">Accurate <input
-                                    type="radio" name="location_accuracy" value="Approximate"
-                                    checked>Approximate<br />
+                    <%
+						def defaultAccuracy = (observationInstance?.locationAccuracy) ? observationInstance.locationAccuracy : "Approximate"
+						def isAccurateChecked = (defaultAccuracy == "Accurate")? "checked" : ""
+						def isApproxChecked = (defaultAccuracy == "Approximate")? "checked" : ""
+					%>
+                            <label>Accuracy</label> 
+                            <input type="radio" name="location_accuracy" value="Accurate" ${isAccurateChecked} >Accurate 
+                            <input type="radio" name="location_accuracy" value="Approximate" ${isApproxChecked} >Approximate<br />
                     </div>
 
                     <div class="row" style="margin-bottom:20px;">
@@ -291,7 +280,7 @@
                     <div class="row">
                             <label>Latitude</label>
                             <div class="location_picker_value" id="latitude"></div>
-                            <input id="latitude_field" type="hidden" name="latitude"></input>
+                            <input id="latitude_field" type="hidden" name="latitude" ></input>
                     </div>
                     <div class="row">
                             <label>Longitude</label>
@@ -324,8 +313,9 @@
                     <label style="text-align:left;padding-left:10px;width:auto;">Tags</label><br/>
                     <div class="create_tags section-item">
                         <ul name="tags">
-                            <g:each in="${observationInstance.tags}">
-                                <li>${it}</li>
+                            <g:each in="${observationInstance?.tags}">
+                            	<li>${it}</li>  
+<%--                                <li class="tagit-choice" >'${it}' class="tagit-close">x</a> </li>--%>
                             </g:each>
                         </ul>
                     </div>
@@ -475,11 +465,16 @@
                         } 
      	});  
 
-        var currDate = new Date();
+
+		var currDate = new Date(${observationInstance?.observedOn?.getTime()});
         var prettyDate =(currDate.getMonth()+1) + '/' + currDate.getDate() + '/' +  currDate.getFullYear();
         $("#observedOn").val(prettyDate);
 
-     	$("ul[name='tags']").tagit({select:true, tagSource: "${g.createLink(action: 'tags')}"});
+		var defaultInitialTags = ['aa', 'bb']
+<%--		if(${observationInstance?.tags != null}){--%>
+<%--			defaultInitialTags = ${observationInstance.tags}--%>
+<%--		}--%>
+		$("ul[name='tags']").tagit({select:true, tagSource: "${g.createLink(action: 'tags')}"});
 
         $("#selected_group").click(function(){
             $("#group_options").show();
@@ -536,6 +531,10 @@
         $("#name").watermark("Recommend a species name");
         $("#place_name").watermark("Set a title for this location");
         $(".tagit-input").watermark("Add some tags");
+        
+        if(${observationInstance?.latitude && observationInstance?.longitude}){
+        	set_location(${observationInstance.latitude}, ${observationInstance.longitude});
+        }
 
 	});
 

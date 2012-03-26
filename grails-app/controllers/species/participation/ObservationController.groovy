@@ -155,13 +155,13 @@ class ObservationController {
 
 	@Secured(['ROLE_USER'])
 	def edit = {
-		def observationInstance = Observation.get(params.id)
+		def observationInstance = Observation.get(params.id.toLong())
 		if (!observationInstance) {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
 			redirect(action: "list")
 		}
 		else {
-			return [observationInstance: observationInstance]
+			render(view: "create", model: [observationInstance: observationInstance, 'springSecurityService':springSecurityService])
 		}
 	}
 
