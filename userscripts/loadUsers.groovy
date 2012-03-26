@@ -21,9 +21,11 @@ new File("/tmp/users.tsv").splitEachLine("\\t") {
 			email : fields[3],
 			dateCreated : new Date(Long.parseLong(fields[9])),
 			lastLoginDate : new Date(Long.parseLong(fields[11])),
-			profilePic:fields[15]
-			timezone:fields[13]);
-
+			profilePic:fields[15]);
+		
+		if(fields[13]) {			
+			user.timezone = fields[13]
+		}
 
 	SUser.withTransaction {
 		if(!user.save(flush: true) ){
