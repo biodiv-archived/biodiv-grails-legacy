@@ -22,7 +22,7 @@
                   var options = {
                     zoom: 4,
                     center: latlng,
-                    mapTypeId: google.maps.MapTypeId.HYBRID
+                    mapTypeId: google.maps.MapTypeId.ROADMAP
                   };
                   var map = new google.maps.Map(document.getElementById("map_canvas_${observationInstance.id}"), options);
                   var marker = new google.maps.Marker({

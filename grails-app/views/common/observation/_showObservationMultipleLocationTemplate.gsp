@@ -1,4 +1,5 @@
-<div class="grid_15 observation_location">
+
+<div class="observation_location">
 	<div>
 		<script type="text/javascript"
 			src="http://maps.google.com/maps/api/js?sensor=true"></script>
@@ -12,9 +13,9 @@
                   var options = {
                     zoom: 4,
                     center: latlng,
-                    mapTypeId: google.maps.MapTypeId.HYBRID
+                    mapTypeId: google.maps.MapTypeId.ROADMAP
                   };
-                  var map = new google.maps.Map(document.getElementById("map_canvas"), options);
+                  var big_map = new google.maps.Map(document.getElementById("big_map_canvas"), options);
 
                   <g:each in="${observationInstanceList}" status="i"
 						var="observationInstance">
@@ -22,23 +23,29 @@
 		                		${observationInstance.latitude}, ${observationInstance.longitude});
 						var marker = new google.maps.Marker({
 							position: latlng,
-							map: map,
+							map: big_map,
 							draggable: false
 						});
 	                    markers.push(marker);
 
+                            var infowindow = new google.maps.InfoWindow({
+                                content: 'An InfoWindow'
+                            });
+
 	                    google.maps.event.addListener(marker, 'click', function() {
-	                        map.setZoom(8);
-	                        map.setCenter(marker.getPosition());
+	                        big_map.setZoom(8);
+	                        big_map.setCenter(marker.getPosition());
+                                infowindow.open(big_map, marker);
 	                    });
-				  </g:each>	
+
+		    </g:each>	
 				  
-				  var markerCluster = new MarkerClusterer(map, markers);
+				  var markerCluster = new MarkerClusterer(big_map, markers);
                 
-                  map.setCenter(latlng);
+                  big_map.setCenter(latlng);
 
                 });
                 </script>
-		<div id="map_canvas" style="height: 170px;"></div>
+		<div id="big_map_canvas" style="height: 300px;"></div>
 	</div>
 </div>
