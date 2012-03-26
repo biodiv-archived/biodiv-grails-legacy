@@ -23,6 +23,7 @@ import org.springframework.social.support.ClientHttpRequestFactorySelector;
 
 import grails.plugins.springsecurity.Secured
 
+import species.auth.FacebookUser;
 import species.auth.Role;
 import species.auth.SUser;
 import species.auth.SUserRole;
@@ -69,14 +70,29 @@ class LoginController {
 	}
 
 	def authSuccess = {
-		def defaultSavedRequest = request.getSession()?.getAttribute(WebAttributes.SAVED_REQUEST)
-		if(defaultSavedRequest) {
-			(new DefaultRedirectStrategy()).sendRedirect(request, response, defaultSavedRequest.getRedirectUrl());
-			return
+		if(params.uid) {
+			def facebookUser = FacebookUser.findByUid(params.long("uid"));
+
+			if(facebookUser.isFirstLogin && !params.redirectToEdit) {
+				redirect (controller:'SUser', action:'edit', id:facebookUser.user.id, params:['isFirstLogin':true]);
+			} else {
+				if(facebookUser.isFirstLogin) {
+					FacebookUser.withTransaction {
+						facebookUser.isFirstLogin = false;
+						facebookUser.save();
+					}
+				}
+
+				def defaultSavedRequest = request.getSession()?.getAttribute(WebAttributes.SAVED_REQUEST)
+				if(defaultSavedRequest) {
+					(new DefaultRedirectStrategy()).sendRedirect(request, response, defaultSavedRequest.getRedirectUrl());
+					return
+				}
+			}
 		}
 		redirect uri:"/";
 	}
-	
+
 	/**
 	 * The redirect action for Ajax requests.
 	 */

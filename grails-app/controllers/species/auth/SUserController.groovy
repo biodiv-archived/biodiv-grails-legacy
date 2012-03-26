@@ -4,6 +4,7 @@ import grails.converters.JSON
 import grails.plugins.springsecurity.Secured;
 import grails.plugins.springsecurity.ui.AbstractS2UiController;
 import grails.plugins.springsecurity.ui.SpringSecurityUiService
+import grails.plugins.springsecurity.ui.UserController;
 import grails.util.GrailsNameUtils
 
 import java.util.List
@@ -14,31 +15,31 @@ import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
 import org.springframework.dao.DataIntegrityViolationException
 
 
-class SUserController extends AbstractS2UiController {
+class SUserController extends UserController {
 
 	def springSecurityService
-	
-    static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
-	
-    def index = {
-        redirect(action: "list", params: params)
-    }
 
-    def list = {
-        params.max = Math.min(params.max ? params.int('max') : 10, 100)
+	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
+
+	def index = {
+		redirect(action: "list", params: params)
+	}
+
+	def list = {
+		params.max = Math.min(params.max ? params.int('max') : 10, 100)
 		def model = [results: SUser.list(params), totalCount: SUser.count()]
 		render view: 'search', model: model
-    }
+	}
 
 	@Secured(['ROLE_ADMIN'])
-    def create = {
+	def create = {
 		def user = lookupUserClass().newInstance(params)
 		[user: user, authorityList: sortedRoles()]
-    }
+	}
 
 	@Secured(['ROLE_ADMIN'])
-    def save = {
-      def user = lookupUserClass().newInstance(params)
+	def save = {
+		def user = lookupUserClass().newInstance(params)
 		if (params.password) {
 			String salt = saltSource instanceof NullSaltSource ? null : params.username
 			user.password = SpringSecurityUiService.encodePassword(params.password, salt)
@@ -51,71 +52,85 @@ class SUserController extends AbstractS2UiController {
 		addRoles(user)
 		flash.message = "${message(code: 'default.created.message', args: [message(code: 'user.label', default: 'User'), user.id])}"
 		redirect action: edit, id: user.id
-    }
+	}
 
-    def show = {
+	def show = {
 		if(!params.id) {
 			params.id = springSecurityService.currentUser?.id;
 		}
-		
-        def SUserInstance = SUser.get(params.id)
-        if (!SUserInstance) {
-            flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'SUser.label', default: 'SUser'), params.id])}"
-            redirect(action: "list")
-        }
-        else {
-            [SUserInstance: SUserInstance]
-        }
-    }
+
+		def SUserInstance = SUser.get(params.id)
+		if (!SUserInstance) {
+			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'SUser.label', default: 'SUser'), params.id])}"
+			redirect(action: "list")
+		}
+		else {
+			[SUserInstance: SUserInstance]
+		}
+	}
 
 	@Secured(['ROLE_USER'])
-    def edit = {
-       String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
+	def edit = {
+		log.debug params;
+		String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
 
-		def user = params.username ? lookupUserClass().findWhere((usernameFieldName): params.username) : null
-		if (!user) user = findById()
-		if (!user) return
+		if(params.long('id') == springSecurityService.currentUser?.id) {
+			def user = params.username ? lookupUserClass().findWhere((usernameFieldName): params.username) : null
+			if (!user) user = findById()
+			if (!user) return
 
-		return buildUserModel(user)
-    }
+				return buildUserModel(user)
+		}
+		flash.message = "${message(code: 'edit.denied.message')}";
+		redirect (action:'show', id:params.id)
+	}
 
-	@Secured(['ROLE_ADMIN'])
-    def update = {
-        String passwordFieldName = SpringSecurityUtils.securityConfig.userLookup.passwordPropertyName
+	@Secured(['ROLE_USER'])
+	def update = {
+		log.debug params;
+		String passwordFieldName = SpringSecurityUtils.securityConfig.userLookup.passwordPropertyName
 
 		def user = findById()
+
 		if (!user) return
-		if (!versionCheck('user.label', 'User', user, [user: user])) {
-			return
+
+			if (!versionCheck('user.label', 'User', user, [user: user])) {
+				return
+			}
+
+		if(params.long('id') == springSecurityService.currentUser?.id) {
+
+			def oldPassword = user."$passwordFieldName"
+			user.properties = params
+			if (params.password && !params.password.equals(oldPassword)) {
+				String salt = saltSource instanceof NullSaltSource ? null : params.username
+				user."$passwordFieldName" = springSecurityUiService.encodePassword(params.password, salt)
+			}
+
+			if (!user.save(flush: true)) {
+				render view: 'edit', model: buildUserModel(user)
+				return
+			}
+
+			String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
+
+			lookupUserRoleClass().removeAll user
+			addRoles user
+			userCache.removeUserFromCache user[usernameFieldName]
+			flash.message = "${message(code: 'default.updated.message', args: [message(code: 'user.label', default: 'User'), user.id])}"
+			redirect action: edit, id: user.id
+		} else {
+			flash.message = "${message(code: 'update.denied.message')}";
+			redirect (action:'show', id:params.id)
 		}
-
-		def oldPassword = user."$passwordFieldName"
-		user.properties = params
-		if (params.password && !params.password.equals(oldPassword)) {
-			String salt = saltSource instanceof NullSaltSource ? null : params.username
-			user."$passwordFieldName" = springSecurityUiService.encodePassword(params.password, salt)
-		}
-
-		if (!user.save(flush: true)) {
-			render view: 'edit', model: buildUserModel(user)
-			return
-		}
-
-		String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
-
-		lookupUserRoleClass().removeAll user
-		addRoles user
-		userCache.removeUserFromCache user[usernameFieldName]
-		flash.message = "${message(code: 'default.updated.message', args: [message(code: 'user.label', default: 'User'), user.id])}"
-		redirect action: edit, id: user.id
-    }
+	}
 
 	@Secured(['ROLE_ADMIN'])
-    def delete = {
-        def user = findById()
+	def delete = {
+		def user = findById()
 		if (!user) return
 
-		String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
+			String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
 		try {
 			lookupUserRoleClass().removeAll user
 			user.delete flush: true
@@ -127,8 +142,8 @@ class SUserController extends AbstractS2UiController {
 			flash.error = "${message(code: 'default.not.deleted.message', args: [message(code: 'user.label', default: 'User'), params.id])}"
 			redirect action: edit, id: params.id
 		}
-    }
-	
+	}
+
 	def search = {
 		[enabled: 0, accountExpired: 0, accountLocked: 0, passwordExpired: 0]
 	}
@@ -158,9 +173,9 @@ class SUserController extends AbstractS2UiController {
 		String passwordExpiredPropertyName = userLookup.passwordExpiredPropertyName
 
 		for (name in [enabled: enabledPropertyName,
-					  accountExpired: accountExpiredPropertyName,
-					  accountLocked: accountLockedPropertyName,
-					  passwordExpired: passwordExpiredPropertyName]) {
+			accountExpired: accountExpiredPropertyName,
+			accountLocked: accountLockedPropertyName,
+			passwordExpired: passwordExpiredPropertyName]) {
 			Integer value = params.int(name.key)
 			if (value) {
 				hql.append " AND u.${name.value}=:${name.key}"
@@ -184,9 +199,16 @@ class SUserController extends AbstractS2UiController {
 		def model = [results: results, totalCount: totalCount, searched: true]
 
 		// add query params to model for paging
-		for (name in ['username', 'enabled', 'accountExpired', 'accountLocked',
-					  'passwordExpired', 'sort', 'order']) {
-			 model[name] = params[name]
+		for (name in [
+			'username',
+			'enabled',
+			'accountExpired',
+			'accountLocked',
+			'passwordExpired',
+			'sort',
+			'order'
+		]) {
+			model[name] = params[name]
 		}
 
 		render view: 'search', model: model
@@ -223,7 +245,7 @@ class SUserController extends AbstractS2UiController {
 
 	protected void addRoles(user) {
 		String upperAuthorityFieldName = GrailsNameUtils.getClassName(
-			SpringSecurityUtils.securityConfig.authority.nameField, null)
+				SpringSecurityUtils.securityConfig.authority.nameField, null)
 
 		for (String key in params.keySet()) {
 			if (key.contains('ROLE') && 'on' == params.get(key)) {

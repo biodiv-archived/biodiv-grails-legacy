@@ -115,7 +115,6 @@ td.openid-submit {
 							Sign in with:<br />
 							<div class="sign_in_external_bttn"
 								style="background-image: url('../images/external_providers.png'); background-position: 0 0; width: 100px; height: 33px; cursor: pointer; margin-left: 6px;">
-								<div id="fb-root"></div>
 								<div class="fb-login-button"
 									data-scope="email,user_about_me,user_location,user_activities,user_hometown,manage_notifications,user_website,publish_stream"
 									data-show-faces="false">Login with Facebook</div>
@@ -159,7 +158,7 @@ td.openid-submit {
 						<div id='formLogin' style='clear: both'>
 
 							<form action='${daoPostUrl}' method='POST' autocomplete='off'
-								name='siteLoginForm'>
+								name='loginForm'>
 								<table class="openid-loginbox-userpass">
 									<tr>
 										<td colspan=2>Or, sign in with your user account</td>
@@ -203,7 +202,7 @@ td.openid-submit {
 		</div>
 	</div>
 	<g:javascript>
-	(function() { document.forms['siteLoginForm'].elements['username'].focus(); })();
+	(function() { document.forms['loginForm'].elements['username'].focus(); })();
 		
 		function showOpenIdForm() {
 		        document.getElementById('openidLogin').style.display = '';

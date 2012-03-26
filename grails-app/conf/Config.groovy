@@ -84,12 +84,15 @@ log4j = {
 			'org.codehaus.groovy.grails.web.servlet',  //  controllers
 			'grails.plugin',
 			 'org.springframework.security.web'
+			 
 
 	warn   'org.mortbay.log'
 
 	debug	'species',
 			'speciespage',			
-			'grails.app'
+			'grails.app',
+			'org.springframework.security.openid',
+			'org.openid4java'
 
 }
 
@@ -554,7 +557,7 @@ grails.plugins.springsecurity.authority.className = 'species.auth.Role'
 //
 //grails.plugins.springsecurity.facebook.appId='308606395828381'
 //grails.plugins.springsecurity.facebook.secret='7ddb140cd81ff6b9be38853a0f43d6d3'
-//grails.plugins.springsecurity.facebook.bean.dao='facebookAuthDaoImpl'
+//grails.plugins.springsecurity.facebook.bean.dao='facebookAuthDao'
 
 //disabling as uid and name params sent for drupalauthcookiefilter needs to be parsed and
 //multipart requests stream cant be read twice.
@@ -596,7 +599,7 @@ grails.plugins.springsecurity.ui.register.postRegisterUrl  = null // use default
 grails.plugins.springsecurity.ui.register.defaultRoleNames = ['ROLE_USER']
 grails.plugins.springsecurity.ui.register.emailBody = '''Hi $user.username,<br/><br/>You (or someone pretending to be you) created an account with this email address.<br/><br/>If you made the request, please click <a href="$url">here</a> to finish the registration and activate your account.'''
 grails.plugins.springsecurity.ui.register.emailFrom = 'do.not.reply@westernghats.com'
-grails.plugins.springsecurity.ui.register.emailSubject = 'Activate your account with ${domain}'
+grails.plugins.springsecurity.ui.register.emailSubject = "Activate your account with ${speciesPortal.domain}"
 grails.plugins.springsecurity.ui.encodePassword = false
 
 grails.plugins.springsecurity.useSecurityEventListener = true

@@ -23,9 +23,17 @@
 	<div class="container_16 big_wrapper">
 		<div class=" grid_16">
 			<div class="body">
+				
 				<h1>
 					${fieldValue(bean: SUserInstance, field: "name")}
+					<sUser:ifOwns model="['user':SUserInstance]">
+					<span style="font-size: 60%;float:right;">
+						<g:link controller="SUser" action="edit" id="${SUserInstance.id }">Edit<span class="ui-icon-edit" /></g:link>
+					</span>
+				</sUser:ifOwns>
+					
 				</h1>
+
 				<g:if test="${flash.message}">
 					<div class="message">
 						${flash.message}

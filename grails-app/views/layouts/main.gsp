@@ -153,6 +153,12 @@ border-bottom:3px solid #003846;
 }
 
 </style>
+	<g:javascript>
+
+		
+		
+	</g:javascript>
+
 </head>
 <body>
 
@@ -191,11 +197,12 @@ border-bottom:3px solid #003846;
 		<span id='loginLink'
 			style='position: relative; margin-right: 30px; float: right'>
 			<sec:ifLoggedIn>
-         		<sUser:renderProfileLink/> (<g:link controller='logout'>Logout</g:link>)
+         		<sUser:renderProfileLink/> (<a id="logout" href="${createLink(controller:'logout')}">Logout</a>)
       		</sec:ifLoggedIn> <sec:ifNotLoggedIn>
 				<g:link controller='login'>Login</g:link>
 			</sec:ifNotLoggedIn> </span>
 		<!-- g:render template='/common/ajaxLogin' /-->
+			<div id="fb-root"></div>
 		<br />
 	</div>
 
@@ -221,7 +228,7 @@ border-bottom:3px solid #003846;
 	</div>
 
 	<g:javascript>
-		
+
 		$(document).ready(function(){
 	
 			$('.rating').each(function(){
@@ -294,24 +301,23 @@ border-bottom:3px solid #003846;
 					$(this).parent().hide("slow");
 				})
 				
-		}); 
-			<%if(!grailsApplication.config.checkin.drupal) {%>
-			function show_login_dialog() {
-				$('#ajaxLogin').show(); 
-			} 
-			<%} %>
-			
-			function cancelLogin() {
-				$('#ajaxLogin').hide(); 
-			}
+				$("#logout").click(function() {
+					FB.getLoginStatus(handleSessionResponse);
+					return false;
+				});
 
-			function authAjax() { 
-				$('#loginMessage').val('Sending request ...');
-				$('#loginMessage').show(); 
-				$('#ajaxLoginForm').submit(); 
-			}
-			
-			window.fbAsyncInit = function() {
+
+		function handleSessionResponse(response) {
+    		//if we dont have a session (which means the user has been logged out, redirect the user)
+    		if (!response.authResponse) {
+        		window.location = '${createLink(controller:'logout')}';
+        		return;
+    		}
+
+    		FB.logout(handleSessionResponse);
+		}				
+				
+		window.fbAsyncInit = function() {
 		  FB.init({
 		    appId  : '${SpringSecurityUtils.securityConfig.facebook.appId}',
 		    channelUrl : "${grailsApplication.config.grails.serverURL}/channel.html",
@@ -329,25 +335,38 @@ border-bottom:3px solid #003846;
 		
 		FB.Event.subscribe('auth.login',
 				function(response) {
-					console.log(response);
 					if(response.status == 'connected') {
-						window.location = "${createLink(controller:'login', action:'authSuccess')}"
+						window.location = "${createLink(controller:'login', action:'authSuccess')}"+"?uid="+response.authResponse.userID
 					} else {
 						alert("Error in authenticating via Facebook");
 					}
 				}
 			);
-		
 		};
-		
-		
-	 
+	  
 		(function(d){var js, id = 'facebook-jssdk'; if (d.getElementById(id)) {return;}js = d.createElement('script'); js.id = id; js.async = true;js.src = "//connect.facebook.net/en_US/all.js";d.getElementsByTagName('head')[0].appendChild(js);}(document));
-		
+
+				
+		}); 
+			<%if(!grailsApplication.config.checkin.drupal) {%>
+			function show_login_dialog() {
+				$('#ajaxLogin').show(); 
+			} 
+			<%} %>
+			
+			function cancelLogin() {
+				$('#ajaxLogin').hide(); 
+			}
+
+			function authAjax() { 
+				$('#loginMessage').val('Sending request ...');
+				$('#loginMessage').show(); 
+				$('#ajaxLoginForm').submit(); 
+			}
 			if (typeof(console) == "undefined") { console = {}; } 
 			if (typeof(console.log) == "undefined") { console.log = function() { return 0; } }
-	</g:javascript>
-	
+			
+</g:javascript>	
 	
 	
 </body>
