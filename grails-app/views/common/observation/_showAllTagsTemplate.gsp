@@ -40,6 +40,7 @@ View as
 <div id="tagCloud" class="grid_4 sidebar_section">
 	<obv:showTagsCloud/>
 </div>
-
-
+<div id="tagList" class="grid_4 sidebar_section" style="display:none;">
+	<obv:showTagsList/>
+</div>	
 

@@ -24,7 +24,7 @@ class Observation implements Taggable{
 	def grailsApplication;
 	
 	public enum OccurrenceStatus {
-		ABSENT ("Aabsent"),	//http://rs.gbif.org/terms/1.0/occurrenceStatus#absent
+		ABSENT ("Absent"),	//http://rs.gbif.org/terms/1.0/occurrenceStatus#absent
 		CASUAL ("Casual"),	// http://rs.gbif.org/terms/1.0/occurrenceStatus#casual
 		COMMON	("Common"), //http://rs.gbif.org/terms/1.0/occurrenceStatus#common
 		DOUBTFUL ("Doubtful"),	//http://rs.gbif.org/terms/1.0/occurrenceStatus#doubtful

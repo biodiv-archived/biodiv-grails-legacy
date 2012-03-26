@@ -1,3 +1,5 @@
+import species.auth.SUser;
+
 // locations to search for config files that get merged into the main config
 // config files can either be Java properties files or ConfigSlurper scripts
 
@@ -340,6 +342,10 @@ environments {
 		}		
 		google.analytics.enabled = false
 		
+		//wgp.panchgani.strandls.com
+		grails.plugins.springsecurity.facebook.appId='327308053982589'
+		grails.plugins.springsecurity.facebook.secret='f36074901fc24b904794692755796fd1'
+		
 	}
 	test {
 		grails.serverURL = "http://localhost:8080/${appName}"
@@ -372,6 +378,11 @@ environments {
 			grails.project.war.file = "/data/jetty-6.1.26/webapps/${appName}.war"
 		}
 		google.analytics.enabled = false
+		
+		//wgp.saturn.strandls.com
+		grails.plugins.springsecurity.facebook.appId='310694198984953'
+		grails.plugins.springsecurity.facebook.secret='eedf76e46272190fbd26e578ae764a60'
+		
 	}
 
 	pamba {
@@ -405,11 +416,6 @@ environments {
 }
 
 navigation.dashboard = [
-/*	[controller:'species', title:'Species Gallery', order:1, action:"list"],
-	[controller:'species', title:'Taxonomy Browser', order:10, action:'taxonBrowser'],
-	[controller:'search', title:'Advanced Search',order:20, action:'advSelect'],
-	[controller:'species', title:'Contribute', order:30, action:'contribute']
-*/
 	[group:'species', controller:'species', order:10, title:'Species', action:'list', subItems:[
 	 [controller:'species', title:'Thumbnail Gallery', order:1, action:"list"],
 	 [controller:'species', title:'Taxonomy Browser', order:10, action:'taxonBrowser'],
@@ -419,15 +425,10 @@ navigation.dashboard = [
 	 [controller:'observation', title:'Browse', order:1, action:'list'],
 	 [controller:'observation', title:'Add Observation', order:10, action:"create"],
 	 ]],
-	 [group:'search', order:50, controller:'search', title:'Advanced Search', action:'advSelect'],
-	 [group:'admin', order:60, controller:'admin', title:'Admin', action:'index']
-	 
+ 	[group:'users', order:50, controller:'SUser', title:'Users', action:'search'],
+	 [group:'search', order:60, controller:'search', title:'Advanced Search', action:'advSelect'],
 ]
 
-/*navigation.gallery = [
-	[controller:'species', title:'Images', order:1, action:"images"],
-	[controller:'species', title:'Images from Google', order:10, action:'imagesFromGoogle'],
-]*/
 
 ckeditor  = {
 	skipAllowedItemsCheck = false
@@ -568,14 +569,48 @@ grails.plugins.springsecurity.rememberMe.persistentToken.domainClassName = 'spec
 
 
 grails.plugins.springsecurity.facebook.domain.classname='species.auth.FacebookUser'
-//wgp.saturn.strandls.com
-grails.plugins.springsecurity.facebook.appId='310694198984953'
-grails.plugins.springsecurity.facebook.secret='eedf76e46272190fbd26e578ae764a60'
-
-//wgp.panchgani.strandls.com
-//grails.plugins.springsecurity.facebook.appId='327308053982589'
-//grails.plugins.springsecurity.facebook.secret='f36074901fc24b904794692755796fd1'
 
 grails.taggable.tag.autoImport=true
 grails.taggable.tagLink.autoImport=true
 
+grails {
+	mail {
+	  host = "smtp.gmail.com"
+	  port = 465
+	  username = "itsmesrav@gmail.com"
+	  password = "useless"
+	  props = ["mail.smtp.auth":"true",
+			   "mail.smtp.socketFactory.port":"465",
+			   "mail.smtp.socketFactory.class":"javax.net.ssl.SSLSocketFactory",
+			   "mail.smtp.socketFactory.fallback":"false"]
+	}
+ }
+grails.mail.default.from="team@westernghats.com"
+
+grails.plugins.springsecurity.password.algorithm = 'MD5'
+
+grails.plugins.springsecurity.ui.password.minLength=8
+grails.plugins.springsecurity.ui.password.maxLength=64
+grails.plugins.springsecurity.ui.password.validationRegex='^.*(?=.*\\d)(?=.*[a-zA-Z])(?=.*[!@#$%^&]).*$'
+grails.plugins.springsecurity.ui.register.postRegisterUrl  = null // use defaultTargetUrl if not set
+grails.plugins.springsecurity.ui.register.defaultRoleNames = ['ROLE_USER']
+grails.plugins.springsecurity.ui.register.emailBody = '''Hi $user.username,<br/><br/>You (or someone pretending to be you) created an account with this email address.<br/><br/>If you made the request, please click <a href="$url">here</a> to finish the registration and activate your account.'''
+grails.plugins.springsecurity.ui.register.emailFrom = 'do.not.reply@westernghats.com'
+grails.plugins.springsecurity.ui.register.emailSubject = 'Activate your account with ${domain}'
+grails.plugins.springsecurity.ui.encodePassword = false
+
+grails.plugins.springsecurity.useSecurityEventListener = true
+grails.plugins.springsecurity.onInteractiveAuthenticationSuccessEvent = { e, appCtx ->
+	Class<?> User = SUser.class
+	if (!User) {
+		log.error("Can't find domain: $domainClassName")
+		return null
+	}
+	def user = null
+	
+	User.withTransaction {
+		user = User.get(appCtx.springSecurityService.principal.id)
+		user.lastLoginDate = new Date()
+		user.save(failOnError: true)
+	}
+}

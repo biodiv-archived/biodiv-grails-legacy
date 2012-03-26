@@ -1,5 +1,3 @@
-<%@page import="org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils"%>
-
 <head>
 <meta name="layout" content="main">
 <title>Login</title>
@@ -108,7 +106,8 @@ td.openid-submit {
 							<tr>
 								<td align="left">Sign in</td>
 							</tr>
-						</table></td>
+						</table>
+					</td>
 				</tr>
 				<tr>
 					<td>
@@ -117,7 +116,8 @@ td.openid-submit {
 							<div class="sign_in_external_bttn"
 								style="background-image: url('../images/external_providers.png'); background-position: 0 0; width: 100px; height: 33px; cursor: pointer; margin-left: 6px;">
 								<div id="fb-root"></div>
-								<div class="fb-login-button" data-scope="email,user_about_me,user_location,user_activities,user_hometown,user_likes,user_photos,user_website"
+								<div class="fb-login-button"
+									data-scope="email,user_about_me,user_location,user_activities,user_hometown,manage_notifications,user_website,publish_stream"
 									data-show-faces="false">Login with Facebook</div>
 							</div>
 
@@ -136,7 +136,7 @@ td.openid-submit {
 								onclick="showOpenIdForm();"></div>
 						</div>
 
-						<div id='openidLogin' style="display: none; clear: both">
+						<!-- div id='openidLogin' style="display: none; clear: both">
 							<form action='${openIdPostUrl}' method='POST' autocomplete='off'
 								name='openIdLoginForm'>
 								<table class="openid-loginbox-userpass">
@@ -148,21 +148,13 @@ td.openid-submit {
 											name="${openidIdentifier}" class="openid-identifier" />
 										<td colspan='2' class="openid-submit" align="center"
 											style="padding: 3px;"><input type="submit"
-											value="Log in" />
-										</td>
+											value="Log in" /></td>
 										</td>
 									</tr>
-									<g:if test='${persistentRememberMe}'>
-										<!--tr>
-                                                    <td><label for='remember_me'>Remember me</label></td>
-                                                    <td>
-                                                            <input type='checkbox' name='${rememberMeParameter}' id='remember_me'/>
-                                                    </td>
-                                            </tr-->
-									</g:if>
+									
 								</table>
 							</form>
-						</div>
+						</div-->
 
 						<div id='formLogin' style='clear: both'>
 
@@ -173,65 +165,45 @@ td.openid-submit {
 										<td colspan=2>Or, sign in with your user account</td>
 									</tr>
 									<tr>
-										<td><span style="font-weight: bold;">Username</span>
-										</td>
+										<td><span style="font-weight: bold;">Username</span></td>
 										<td><input type="text" name='j_username' id='username' />
 										</td>
 									</tr>
 									<tr>
-										<td><span style="font-weight: bold;">Password</span>
-										</td>
+										<td><span style="font-weight: bold;">Password</span></td>
 										<td><input type="password" name='j_password'
-											id='password' />
-										</td>
+											id='password' /></td>
 									</tr>
+
 									<tr>
 										<td colspan='2' class="openid-submit" align="center"><input
-											type="submit" value="Log in" /> <input type='checkbox'
-											name='${rememberMeParameter}' id='remember_me' /><label
-											for='remember_me'>Remember me</label></td>
+											type="checkbox" class="checkbox"
+											name="${rememberMeParameter}" id="remember_me"
+											checked="checked" /> <label for='remember_me'><g:message
+													code='spring.security.ui.login.rememberme' />
+										</label> | <span class="forgot-link"> <g:link
+													controller='register' action='forgotPassword'>
+													<g:message code='spring.security.ui.login.forgotPassword' />
+												</g:link> </span></td>
 									</tr>
+									<tr>
+										<td colspan='2' class="openid-submit" align="center"><s2ui:linkButton
+												elementId='register' controller='register'
+												messageCode='spring.security.ui.login.register' /> <s2ui:submitButton
+												elementId='loginButton' form='loginForm'
+												messageCode='spring.security.ui.login.login' /></td>
+									</tr>
+
 								</table>
 							</form>
-						</div></td>
+						</div>
+					</td>
 				</tr>
 			</table>
 		</div>
 	</div>
 	<g:javascript>
-	window.fbAsyncInit = function() {
-		  FB.init({
-		    appId  : '${SpringSecurityUtils.securityConfig.facebook.appId}',
-		    channelUrl : "${grailsApplication.config.grails.serverURL}/channel.html",
-		    status : true,
-		    cookie : true,
-		    xfbml  : true,
-		    oauth  : true,
-		    logging : true
-		  });
-		  
-		FB.Event.subscribe('edge.create',
-			function(response) {
-				alert('You liked the URL: ' + response);
-		});
-		
-		FB.Event.subscribe('auth.login',
-				function(response) {
-					console.log(response);
-					if(response.status == 'connected') {
-						window.location = "${createLink(controller:'login', action:'authSuccess')}"
-					} else {
-						alert("Error in authenticating via Facebook");
-					}
-				}
-			);
-		
-		};
-		
-		
-	 
-		(function(d){var js, id = 'facebook-jssdk'; if (d.getElementById(id)) {return;}js = d.createElement('script'); js.id = id; js.async = true;js.src = "//connect.facebook.net/en_US/all.js";d.getElementsByTagName('head')[0].appendChild(js);}(document));
-		(function() { document.forms['siteLoginForm'].elements['username'].focus(); })();
+	(function() { document.forms['siteLoginForm'].elements['username'].focus(); })();
 		
 		function showOpenIdForm() {
 		        document.getElementById('openidLogin').style.display = '';

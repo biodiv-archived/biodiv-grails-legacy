@@ -1139,12 +1139,11 @@ td input.text:focus {
 
 .filterBar .ui-state-active {
 	opacity: 1;
-	border-bottom: 3px solid #aeaeae;
+	border-bottom: 3px solid #5b5b9d;
 	border-radius: 0;
 }
 
 .filterBar {
-	background-color: #F7F7F7;
 	border-radius: 5px 5px 5px 5px;
 	float: left;
 	margin: 5px 20px;
@@ -1565,5 +1564,40 @@ ul.thumbwrap .license_options li:hover {
 	float: left;
 }
 .username-value{
-	padding-left:25px;
+	float:left;
 }
+
+.normal_profile_pic {
+	height:100px;
+	width:auto;
+	margin:5px;
+}
+
+.small_profile_pic {
+	height:50px;
+	width:auto;
+	margin:5px;
+}
+
+.very_small_profile_pic {
+	height:25px;
+	width:auto;
+	margin:2px;
+}
+
+.filters {
+border: 1px solid #cecece;
+height: 332px;        
+background-color: #e1d3aa;
+box-shadow: 0 0 4px #e1d3aa, 0 3px 4px #e1d3aa;
+border-radius: 5px;
+}
+
+.filters .observation_location {
+margin:0;
+padding:0;
+float:right;
+border:0;
+border-left: 1px solid #cecece;       
+}
+

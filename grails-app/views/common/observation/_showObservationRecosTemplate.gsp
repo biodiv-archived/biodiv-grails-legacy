@@ -72,8 +72,8 @@
 			<div class="users">
 				<g:each in="${r.authors}" var="author">
 					<g:link controller="sUser" action="show" id="${author?.id}">
-						<img
-							src="${createLinkTo(file: author?.icon()?.fileName?.trim(), base:grailsApplication.config.speciesPortal.resources.serverURL)}"
+						<img class="very_small_profile_pic"
+							src="${author?.icon()}"
 							title="${author.username}" />
 					</g:link>
 				</g:each>
