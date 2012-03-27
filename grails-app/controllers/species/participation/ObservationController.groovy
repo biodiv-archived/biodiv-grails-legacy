@@ -13,6 +13,7 @@ import species.utils.ImageUtils
 import species.utils.Utils;
 import species.groups.SpeciesGroup;
 import species.Habitat
+import species.auth.SUser
 
 class ObservationController {
 
@@ -25,6 +26,23 @@ class ObservationController {
 	def index = {
 		redirect(action: "list", params: params)
 	}
+
+        def filteredList = {
+        	def max = Math.min(params.max ? params.int('max') : 3, 100)
+                
+		def offset = params.offset ? params.int('offset') : 0
+                 
+                def filteredObservation = observationService.getFilteredObservations(params, max, offset)
+                def observationInstanceList = filteredObservation.observationInstanceList
+                def queryParams = filteredObservation.queryParams 
+                def activeFilters = filteredObservation.activeFilters 
+
+		def totalObservationInstanceList = observationService.getFilteredObservations(params, -1, -1).observationInstanceList
+                def count = totalObservationInstanceList.size()
+
+		render (template:"/common/observation/showObservationListTemplate", model:[observationInstanceList:observationInstanceList, observationInstanceTotal:count, queryParams: queryParams, activeFilters:activeFilters]);
+
+        }
 
 	def list = {
 		def max = Math.min(params.max ? params.int('max') : 3, 100)
@@ -406,4 +424,10 @@ class ObservationController {
 		render Tag.findAllByNameIlike("${params.term}%")*.name as JSON
 	}
 	
+        def snippet = {
+		def observationInstance = Observation.get(params.id)
+        
+		render (template:"/common/observation/showObservationSnippetTabletTemplate", model:[observationInstance:observationInstance]);
+        }
+
 }
