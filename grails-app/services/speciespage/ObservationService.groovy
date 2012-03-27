@@ -1,6 +1,7 @@
 package speciespage
 
 import groovy.sql.Sql
+import groovy.text.SimpleTemplateEngine
 
 import org.grails.taggable.Tag;
 import org.grails.taggable.TagLink;
@@ -19,6 +20,8 @@ import species.participation.RecommendationVote;
 import species.participation.RecommendationVote.ConfidenceType;
 import species.sourcehandler.XMLConverter;
 
+import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
+
 class ObservationService {
 
 	static transactional = false
@@ -26,7 +29,7 @@ class ObservationService {
 	def recommendationService;
 	def grailsApplication;
 	def dataSource;
-
+	def mailService;
 	/**
 	 * 
 	 * @param params
@@ -501,4 +504,28 @@ class ObservationService {
 
 		return [observationInstanceList:observationInstanceList, queryParams:queryParams, activeFilters:activeFilters]
 	}
+	/**
+	 * 
+	 * @param user
+	 */
+	void sendAddRecommendationMail(user){
+		
+		def conf = SpringSecurityUtils.securityConfig
+		def body = conf.ui.addRecommendationVote.emailBody
+		if (body.contains('$')) {
+			body = evaluate(body, [user: user])
+		}
+		mailService.sendMail {
+			to user.email
+			from conf.ui.addRecommendationVote.emailFrom
+			subject conf.ui.addRecommendationVote.emailSubject
+			html body.toString()
+		}
+
+	}
+	
+	private String evaluate(s, binding) {
+		new SimpleTemplateEngine().createTemplate(s).make(binding)
+	}
+	
 }

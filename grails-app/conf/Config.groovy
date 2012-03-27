@@ -610,6 +610,10 @@ grails.plugins.springsecurity.ui.register.defaultRoleNames = ['ROLE_USER']
 grails.plugins.springsecurity.ui.register.emailBody = '''Hi $user.username,<br/><br/>You (or someone pretending to be you) created an account with this email address.<br/><br/>If you made the request, please click <a href="$url">here</a> to finish the registration and activate your account.'''
 grails.plugins.springsecurity.ui.register.emailFrom = 'do.not.reply@westernghats.com'
 grails.plugins.springsecurity.ui.register.emailSubject = "Activate your account with ${speciesPortal.domain}"
+
+grails.plugins.springsecurity.ui.addRecommendationVote.emailBody = '''Hi $user.username,<br/><br/>You (or someone pretending to be you) added recommendation vote.'''
+grails.plugins.springsecurity.ui.addRecommendationVote.emailFrom = 'do.not.reply@westernghats.com'
+grails.plugins.springsecurity.ui.addRecommendationVote.emailSubject = "Recommendation vote added from ${speciesPortal.domain}"
 grails.plugins.springsecurity.ui.encodePassword = false
 
 grails.plugins.springsecurity.useSecurityEventListener = true

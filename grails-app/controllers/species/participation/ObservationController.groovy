@@ -307,6 +307,10 @@ class ObservationController {
 					
 					//saving max voted species name for observation instance
 					observationInstance.calculateMaxVotedSpeciesName();
+					
+					//sending mail to user
+					observationService.sendAddRecommendationMail(params.author);
+					
 					redirect(action: "show", id: observationInstance.id);
 				}
 				else {
@@ -345,7 +349,11 @@ class ObservationController {
 					log.debug "Successfully added reco vote : "+recommendationVoteInstance
 					success = true;
 					
+					//sending mail to user
+					observationService.sendAddRecommendationMail(params.author);
+					
 					observationInstance.calculateMaxVotedSpeciesName();
+					
 					def result = ['votes':++params.int('currentVotes')];
 					render result as JSON;
 				}
@@ -377,7 +385,6 @@ class ObservationController {
 		if (observationInstance) {
 			try {
 				def results = observationInstance.getRecommendationVotes(params.max, params.offset);
-				log.debug "======="
 				log.debug results;
 				if(results?.recoVotes.size() > 0) {
 					def html =  g.render(template:"/common/observation/showObservationRecosTemplate", model:['observationInstance':observationInstance, 'result':results.recoVotes, 'totalVotes':results.totalVotes]);
