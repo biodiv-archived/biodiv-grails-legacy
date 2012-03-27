@@ -72,27 +72,27 @@ log4j = {
 	//}
 
 	error  	'org.codehaus.groovy.grails.web.pages', //  GSP
-			'org.codehaus.groovy.grails.web.sitemesh', //  layouts
-			'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
-			'org.codehaus.groovy.grails.web.mapping', // URL mapping
-			'org.codehaus.groovy.grails.commons', // core / classloading
-			'org.codehaus.groovy.grails.plugins', // plugins
-			'org.codehaus.groovy.grails.orm.hibernate', // hibernate integration	
-			'org.hibernate',
-			'net.sf.ehcache.hibernate',
-			'org.springframework.security',
-			'org.codehaus.groovy.grails.web.servlet',  //  controllers
-			'grails.plugin',
-			 'org.springframework.security.web'
-			 
+	'org.codehaus.groovy.grails.web.sitemesh', //  layouts
+	'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
+	'org.codehaus.groovy.grails.web.mapping', // URL mapping
+	'org.codehaus.groovy.grails.commons', // core / classloading
+	'org.codehaus.groovy.grails.plugins', // plugins
+	'org.codehaus.groovy.grails.orm.hibernate', // hibernate integration
+	'org.hibernate',
+	'net.sf.ehcache.hibernate',
+	'org.springframework.security',
+	'org.codehaus.groovy.grails.web.servlet',  //  controllers
+	'grails.plugin',
+	'org.springframework.security.web'
+
 
 	warn   'org.mortbay.log'
 
 	debug	'species',
-			'speciespage',			
-			'grails.app'//			,
-//			'org.springframework.security.openid',
-//			'org.openid4java'
+	'speciespage',
+	'grails.app'//			,
+	//			'org.springframework.security.openid',
+	//			'org.openid4java'
 
 }
 
@@ -118,11 +118,11 @@ fileuploader {
 cache.headers.enabled = true
 
 cache.headers.presets = [
-			authed_page: false, // No caching for logged in user
-			content: [shared:true, validFor: 3600], // 1hr on content
-			search_results: [validFor: 60, shared: true],
-			taxonomy_results: [validFor: 60, shared: true]
-		]
+	authed_page: false, // No caching for logged in user
+	content: [shared:true, validFor: 3600], // 1hr on content
+	search_results: [validFor: 60, shared: true],
+	taxonomy_results: [validFor: 60, shared: true]
+]
 
 /**
  * Loading configuration file.
@@ -339,16 +339,27 @@ jpegOptimProg = "/usr/bin/jpegoptim";
 environments {
 	development {
 		grails.serverURL = "http://localhost:8080/${appName}"
-		speciesPortal { 
+		speciesPortal {
 			search.serverURL = "http://localhost:8090/solr/species"
 			names.parser.serverURL = "127.0.0.1"
-		}		
+		}
 		google.analytics.enabled = false
-		
+
 		//wgp.panchgani.strandls.com
 		grails.plugins.springsecurity.facebook.appId='327308053982589'
 		grails.plugins.springsecurity.facebook.secret='f36074901fc24b904794692755796fd1'
-		
+		grails {
+			mail {
+				host = "smtp.gmail.com"
+				port = 465
+				username = "itsmesrav@gmail.com"
+				password = "useless"
+				props = ["mail.smtp.auth":"true",
+					"mail.smtp.socketFactory.port":"465",
+					"mail.smtp.socketFactory.class":"javax.net.ssl.SSLSocketFactory",
+					"mail.smtp.socketFactory.fallback":"false"]
+			}
+		}
 	}
 	test {
 		grails.serverURL = "http://localhost:8080/${appName}"
@@ -379,13 +390,19 @@ environments {
 			}
 			search.serverURL="http://saturn.strandls.com:8080/solr/species"
 			grails.project.war.file = "/data/jetty-6.1.26/webapps/${appName}.war"
+			grails {
+				mail {
+					 host = "127.0.0.1"
+					 port = 25
+				}
+			}
 		}
 		google.analytics.enabled = false
-		
+
 		//wgp.saturn.strandls.com
 		grails.plugins.springsecurity.facebook.appId='310694198984953'
 		grails.plugins.springsecurity.facebook.secret='eedf76e46272190fbd26e578ae764a60'
-		
+
 	}
 
 	pamba {
@@ -405,7 +422,12 @@ environments {
 				//serverURL = "http://localhost/${appName}/observations"
 			}
 			search.serverURL="http://thewesternghats.in:8080/solr/species"
-		
+			grails {
+				mail {
+					 host = "127.0.0.1"
+					 port = 25
+				}
+			}
 		}
 		google.analytics.webPropertyID = "UA-xxxxxx-x"
 		google.analytics.enabled = false
@@ -420,16 +442,16 @@ environments {
 
 navigation.dashboard = [
 	[group:'species', controller:'species', order:10, title:'Species', action:'list', subItems:[
-	 [controller:'species', title:'Thumbnail Gallery', order:1, action:"list"],
-	 [controller:'species', title:'Taxonomy Browser', order:10, action:'taxonBrowser'],
-	 [controller:'species', title:'Contribute', order:20, action:'contribute']
-	 ]],
-	 [group:'observation', order:40, controller:'observation', title:'Observations', action:'list', subItems:[
-	 [controller:'observation', title:'Browse', order:1, action:'list'],
-	 [controller:'observation', title:'Add Observation', order:10, action:"create"],
-	 ]],
- 	[group:'users', order:50, controller:'SUser', title:'Users', action:'search'],
-	 [group:'search', order:60, controller:'search', title:'Advanced Search', action:'advSelect'],
+			[controller:'species', title:'Thumbnail Gallery', order:1, action:"list"],
+			[controller:'species', title:'Taxonomy Browser', order:10, action:'taxonBrowser'],
+			[controller:'species', title:'Contribute', order:20, action:'contribute']
+		]],
+	[group:'observation', order:40, controller:'observation', title:'Observations', action:'list', subItems:[
+			[controller:'observation', title:'Browse', order:1, action:'list'],
+			[controller:'observation', title:'Add Observation', order:10, action:"create"],
+		]],
+	[group:'users', order:50, controller:'SUser', title:'Users', action:'search'],
+	[group:'search', order:60, controller:'search', title:'Advanced Search', action:'advSelect'],
 ]
 
 
@@ -576,25 +598,13 @@ grails.plugins.springsecurity.facebook.domain.classname='species.auth.FacebookUs
 grails.taggable.tag.autoImport=true
 grails.taggable.tagLink.autoImport=true
 
-grails {
-	mail {
-	  host = "smtp.gmail.com"
-	  port = 465
-	  username = "itsmesrav@gmail.com"
-	  password = "useless"
-	  props = ["mail.smtp.auth":"true",
-			   "mail.smtp.socketFactory.port":"465",
-			   "mail.smtp.socketFactory.class":"javax.net.ssl.SSLSocketFactory",
-			   "mail.smtp.socketFactory.fallback":"false"]
-	}
- }
 grails.mail.default.from="team@westernghats.com"
 
 grails.plugins.springsecurity.password.algorithm = 'MD5'
 
 grails.plugins.springsecurity.ui.password.minLength=8
 grails.plugins.springsecurity.ui.password.maxLength=64
-grails.plugins.springsecurity.ui.password.validationRegex='^.*(?=.*\\d)(?=.*[a-zA-Z])(?=.*[!@#$%^&]).*$'
+grails.plugins.springsecurity.ui.password.validationRegex='^.*$'
 grails.plugins.springsecurity.ui.register.postRegisterUrl  = null // use defaultTargetUrl if not set
 grails.plugins.springsecurity.ui.register.defaultRoleNames = ['ROLE_USER']
 grails.plugins.springsecurity.ui.register.emailBody = '''Hi $user.username,<br/><br/>You (or someone pretending to be you) created an account with this email address.<br/><br/>If you made the request, please click <a href="$url">here</a> to finish the registration and activate your account.'''
@@ -610,10 +620,12 @@ grails.plugins.springsecurity.onInteractiveAuthenticationSuccessEvent = { e, app
 		return null
 	}
 	def user = null
-	
+
 	User.withTransaction {
 		user = User.get(appCtx.springSecurityService.principal.id)
 		user.lastLoginDate = new Date()
 		user.save(failOnError: true)
 	}
 }
+
+grails.plugins.springsecurity.openid.registration.requiredAttributes = [email: 'http://axschema.org/contact/email', location: 'http://axschema.org/contact/country/home',firstname:'http://axschema.org/namePerson/first', lastname: 'http://axschema.org/namePerson/last', profilePic:'http://axschema.org/media/image/default']

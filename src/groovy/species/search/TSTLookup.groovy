@@ -7,6 +7,8 @@ import java.util.Map;
 
 import species.search.Lookup.LookupResult;
 import species.search.Lookup.LookupPriorityQueue;
+
+import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.lucene.util.PriorityQueue;
 
 class TSTLookup<E> extends Lookup<E> implements Serializable {
@@ -70,10 +72,11 @@ class TSTLookup<E> extends Lookup<E> implements Serializable {
 						//TODO:Hack to push records with exact prefix to the top
 						//clone not supported 
 						def record = new Record()
-						record.metaClass.properties.each{
-							if (it.name != 'metaClass' && it.name != 'class')
-							  it.setProperty(record, obj.metaClass.getProperty(obj, it.name))
-						 }
+						PropertyUtils.copyProperties(record, obj);
+//						record.metaClass.properties.each{
+//							if (it.name != 'metaClass' && it.name != 'class')
+//							  it.setProperty(record, obj.metaClass.getProperty(obj, it.name))
+//						 }
 						//println record
 						//println record.originalName+"  "+record.canonicalForm+"  "+record.wt
 						if(record.originalName.toLowerCase().startsWith(key)) {
