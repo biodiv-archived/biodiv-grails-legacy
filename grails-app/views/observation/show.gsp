@@ -55,7 +55,7 @@ width:90%;
 			<div class="grid_10">
 				
 				<div class="grid_10">
-				
+					<h3><obv:showSpeciesName model="['observationInstance':observationInstance]" /></h3>
 
 							<div id="gallery1">
 								<g:if test="${observationInstance.resource}">
