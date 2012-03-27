@@ -17,8 +17,6 @@
 	base="${grailsApplication.config.grails.serverURL+'/js/'}"></g:javascript>
 <g:javascript src="jquery.autopager-1.0.0.js"
 	base="${grailsApplication.config.grails.serverURL+'/js/jquery/'}"></g:javascript>
-<g:javascript src="jquery.infinitescroll.js"
-	base="${grailsApplication.config.grails.serverURL+'/js/jquery/'}"></g:javascript>
 </head>
 <body>
 	<div class="container_16">
@@ -37,10 +35,6 @@
                             <div class="grid_8" style="margin:0;">
                                 <obv:showGroupFilter
                                         model="['observationInstance':observationInstance]" />
-                            </div>
-                            <div class="grid_8 observation_location">
-                                <div id="map_canvas" style="height: 300px;"></div>
-                                <div id="show_observations_in_bounds" class="button small" style="float:right;">View only these observations</div>
                             </div>
                         </div>
 				
@@ -81,31 +75,15 @@
 													tagged <span class="highlight">${queryParams.tag}</span>
 												</g:if>
 											</div>
-                                           <div id="list_view_bttn" class="list_style_button active"></div> 
-                                           <div id="grid_view_bttn" class="grid_style_button"></div>
+                                           <div id="map_view_bttn" class="map_view_button"></div>
                                         </div>
-					<div class="observation grid_11">
-						<div class="mainContent">
-		                                    <div class="grid_view">
-								<g:each in="${observationInstanceList}" status="i"
-									var="observationInstance">
-									<obv:showSnippetTablet
-										model="['observationInstance':observationInstance]"></obv:showSnippetTablet>
-								</g:each>
-                                                    </div>       
-                                                    <div class="list_view" style="display:none;">
-                                                                                <g:each in="${observationInstanceList}" status="i"
-                                                                                        var="observationInstance">
-                                                                                        <obv:showSnippet
-                                                                                                model="['observationInstance':observationInstance]"></obv:showSnippet>
-                                                                                </g:each>
-                                                    </div>       
-                                            </div>
-                                            <g:if test="${observationInstanceTotal > queryParams.max}">
-                                            	<div class="button loadMore"><span class="progress" style="display:none;"><img src="${resource(dir:'images',file:'spinner.gif', absolute:true)}"/>Loading ... </span><span class="buttonTitle">Load more</span></div>
-                                            </g:if>
-					</div>
-					
+                                        
+					<div id="observations_list_map" class="observation grid_11" style="display:none;">
+                                            <obv:showObservationsLocation model="['observationInstanceList':totalObservationInstanceList]"></obv:showObservationsLocation>
+                                        </div>
+				        
+                                        <obv:showObservationsList/>
+
 					<div class="tags_section grid_4">
 						<obv:showAllTags/>
 						<obv:showGroupList/>
@@ -181,14 +159,16 @@
 
                 function getSelectedBounds() {
                     var bounds = '';
+                    /*
                     var swLat = map.getBounds().getSouthWest().lat();
                     var swLng = map.getBounds().getSouthWest().lng();
                     var neLat = map.getBounds().getNorthEast().lat();
                     var neLng = map.getBounds().getNorthEast().lng();
 
                     bounds = [swLat, swLng, neLat, neLng].join()
-                    
+                    */ 
                     return bounds;    
+
                 }
 	
 		function getFilterParameters(url, limit, offset) {
@@ -284,71 +264,23 @@
          	window.location.href = "${g.createLink(action: 'list')}/?tag=" + tg ;
          });
          
-         $('#list_view_bttn').click(function(){
-			$('.grid_view').hide();
-			$('.list_view').show();
-			$(this).addClass('active');
-			$('#grid_view_bttn').removeClass('active');
-			$.cookie("observation_listing", "list");
-		});
-		
-		$('#grid_view_bttn').click(function(){
-			$('.grid_view').show();
-			$('.list_view').hide();
-			$(this).addClass('active');
-			$('#list_view_bttn').removeClass('active');
-			$.cookie("observation_listing", "grid");
-		});
-		
-		if ($.cookie("observation_listing") == "list") {
-			$('.list_view').show();
-			$('.grid_view').hide();
-			$('#grid_view_bttn').removeClass('active');
-			$('#list_view_bttn').addClass('active');
-		}else{
-			$('.grid_view').show();
-			$('.list_view').hide();
-			$('#grid_view_bttn').addClass('active');
-			$('#list_view_bttn').removeClass('active');	
-		}
-
-		$.autopager({
-                 
-                    autoLoad: false,
-    		    // a selector that matches a element of next page link
-    		    link: 'div.paginateButtons a.nextLink',
-
-    		    // a selector that matches page contents
-    		    content: '.mainContent',
-    		
-    		    // a callback function to be triggered when loading start 
-		    start: function(current, next) {
-                        $(".loadMore .progress").show();
-                        $(".loadMore .buttonTitle").hide();
-		    },
-		
-		    // a function to be executed when next page was loaded. 
-		    // "this" points to the element of loaded content.
-		    load: function(current, next) {
-		    			$(".mainContent:last").hide().fadeIn(3000);
-                        if (next.url == undefined){
-                            $(".loadMore").hide();
-                        }else{
-                            $(".loadMore .progress").hide();
-                            $(".loadMore .buttonTitle").show();
-                        }
-		    }
-		});
 	
-                $('.loadMore').click(function() {
-                    $.autopager('load');
-                    return false;
-                });
+		$('#map_view_bttn').click(function(){
+			$('#observations_list_map').toggle(function(){
+                            
+                            if ($(this).is(':hidden')){
+                                $('div.observations > div.observations_list').show();
+                            } else {       
+                                $('div.observations > div.observations_list').hide();
+                            }
+                        });
+                        //$(this).addClass('active');
+			//$('#list_view_bttn').removeClass('active');
+			//$('#grid_view_bttn').removeClass('active');
+			//$.cookie("observation_listing", "map");
 
-                $('#show_observations_in_bounds').click(function(){
-		    updateGallery(undefined, ${queryParams.max}, 0);
-		    return false;
                 });
+                
 	});
 	</g:javascript>
 

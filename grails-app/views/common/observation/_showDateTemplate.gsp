@@ -27,7 +27,7 @@
 				timeString += " hour "
 			}
 		}
-		if(minutes > 0){
+		if(minutes >= 0){
 			timeString += minutes
 			if(minutes > 1){
 				timeString += " minutes "

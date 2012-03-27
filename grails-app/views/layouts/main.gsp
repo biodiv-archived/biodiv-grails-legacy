@@ -50,7 +50,9 @@
 	base="${grailsApplication.config.grails.serverURL+'/js/'}"></g:javascript>
 <g:javascript src="readmore/readmore.js"
 	base="${grailsApplication.config.grails.serverURL+'/js/'}" />
-	
+<g:javascript src="jquery.cookie.js"
+	base="${grailsApplication.config.grails.serverURL+'/js/jquery/'}"></g:javascript>
+
 <g:javascript src='jquery/jquery.jgrowl.js' plugin='spring-security-ui'/>
 <g:javascript src='jquery/jquery.checkbox.js' plugin='spring-security-ui'/>
 <g:javascript src='spring-security-ui.js' plugin='spring-security-ui'/>
@@ -302,10 +304,12 @@ border-bottom:3px solid #003846;
 				})
 				
 				$("#logout").click(function() {
+					<%if(grails.util.Environment.current.toString() != "DEVELOPMENT") {%>
 					FB.getLoginStatus(handleSessionResponse);
 					return false;
+					<%} %>
 				});
-
+			
 
 		function handleSessionResponse(response) {
     		//if we dont have a session (which means the user has been logged out, redirect the user)

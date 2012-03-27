@@ -62,6 +62,7 @@ class Observation implements Taggable{
 	Habitat habitat;
 	long visitCount = 0;
 	String maxVotedSpeciesName;
+	boolean isDeleted = false;
 
 	static hasMany = [resource:Resource, recommendationVote:RecommendationVote];
 

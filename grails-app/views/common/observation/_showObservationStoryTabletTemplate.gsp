@@ -27,14 +27,7 @@
 	<div class="prop tablet">
 		<span class="name tablet">Species Name</span>
 		<div class="value tablet">
-			<g:set var="sName" value="${observationInstance.maxVotedSpeciesName}" />
-			<g:if test="${sName == 'Unknown'}">
-				${sName}
-				<a href="#">Help identify</a>
-			</g:if>
-			<g:else>
-				${sName}
-			</g:else>
+			<obv:showSpeciesName model="['observationInstance':observationInstance]" />
 		</div>
 	</div>
 
@@ -47,7 +40,7 @@
 	</div>
 
 	<div class="prop tablet">
-		<span class="name tablet">Latitude/Longitude</span>
+		<span class="name tablet">Lat/Long</span>
 		<div class="value tablet">
 			<g:formatNumber number="${observationInstance.latitude}"
 				type="number" maxFractionDigits="2" />
@@ -71,7 +64,7 @@
 
 
 	<div class="prop tablet">
-		<span class="name tablet">Last Updated</span>
+		<span class="name tablet">Last Update</span>
 		<obv:showDate
 			model="['observationInstance':observationInstance, 'propertyName':'lastUpdated']" />
 	</div>
