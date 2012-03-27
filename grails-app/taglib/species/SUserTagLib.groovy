@@ -16,4 +16,13 @@ class SUserTagLib {
 		out << render(template:"/common/showUserTemplate", model:attrs.model);
 	}
 	
+	/**
+	* Renders the body if the authenticated user owns this page.
+	*/
+   def ifOwns = { attrs, body ->
+	   if (springSecurityService.isLoggedIn() && springSecurityService.currentUser?.id == attrs.model.user.id) {
+		   out << body()
+	   }
+   }
+	
 }

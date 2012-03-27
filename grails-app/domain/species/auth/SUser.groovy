@@ -6,9 +6,9 @@ import species.Resource.ResourceType;
 class SUser {
 
 	transient springSecurityService
-	
+
 	def grailsApplication;
-	
+
 	String username
 	String name;
 	String password
@@ -24,11 +24,12 @@ class SUser {
 	float timezone=0;//offset
 	String aboutMe;
 	String location;
-	
-    static hasMany = [openIds: OpenID]
+
+	static hasMany = [openIds: OpenID]
 
 	static constraints = {
-		username blank: false, unique: true
+		username blank: false
+		name blank: false
 		password blank: false
 		email email: true, blank: false, unique: true
 		profilePic nullable:true
@@ -37,7 +38,7 @@ class SUser {
 		aboutMe nullable:true
 		location nullable:true
 	}
-	
+
 	static mapping = {
 		/*
 		 * Just keep in mind that the UUIDHexGenerator is not generating globally unique identifiers, 
@@ -55,6 +56,18 @@ class SUser {
 		SUserRole.findAllBySUser(this).collect { it.role } as Set
 	}
 
+	def beforeValidate() {
+		if(this.email) {
+			if(!this.name) {
+				this.name = this.email.substring(0, this.email.indexOf('@'));
+			}
+
+			if(!this.username) {
+				this.username = this.email.substring(0, this.email.indexOf('@'));
+			}
+		}
+	}
+
 	def beforeInsert() {
 		encodePassword()
 	}
@@ -68,15 +81,15 @@ class SUser {
 	protected void encodePassword() {
 		password = springSecurityService.encodePassword(password)
 	}
-	
+
 	def icon() {
 		if(profilePic) {
 			return profilePic;
-		} 
+		}
 		return grailsApplication.config.speciesPortal.resources.serverURL+"/users/user.png"
-		
+
 	}
-	
+
 	@Override
 	String toString() {
 		return username;

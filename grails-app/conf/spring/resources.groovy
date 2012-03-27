@@ -8,50 +8,53 @@ import org.springframework.social.facebook.connect.FacebookConnectionFactory;
 
 import com.the6hours.grails.springsecurity.facebook.FacebookAuthCookieFilter;
 
+import species.auth.ConsumerManager;
 import species.auth.FacebookAuthCookieLogoutHandler;
+import species.auth.OpenIDAuthenticationFilter;
 
 import species.auth.drupal.DrupalAuthCookieFilter;
 import species.auth.drupal.DrupalAuthUtils;
+import speciespage.FacebookAuthService;
 
 // Place your Spring DSL code here
 beans = {
 	//userDetailsService(species.auth.drupal.DrupalUserDetailsService);
-	drupalAuthentiactionProvider(species.auth.drupal.DrupalAuthenticationProvider) {
-		//userDetailsService = ref("userDetailsService");
-		drupalAuthDao = ref('drupalAuthDao')
-	}
+//	drupalAuthentiactionProvider(species.auth.drupal.DrupalAuthenticationProvider) {
+//		//userDetailsService = ref("userDetailsService");
+//		drupalAuthDao = ref('drupalAuthDao')
+//	}
 
 	def conf = SpringSecurityUtils.securityConfig;
 	
-	authenticationSuccessHandler(AjaxAwareAuthenticationSuccessHandler) {
-		requestCache = ref('requestCache')
-		defaultTargetUrl = conf.successHandler.defaultTargetUrl // '/'
-		alwaysUseDefaultTargetUrl = conf.successHandler.alwaysUseDefault // false
-		targetUrlParameter = conf.successHandler.targetUrlParameter // 'spring-security-redirect'
-		ajaxSuccessUrl = conf.successHandler.ajaxSuccessUrl // '/login/ajaxSuccess'
-		useReferer = true // false
-		redirectStrategy = ref('redirectStrategy')
-	}
-
-	drupalAuthUtils(DrupalAuthUtils);
-	drupalAuthCookieFilter(DrupalAuthCookieFilter) {
-		authenticationManager = ref('authenticationManager')
-		drupalAuthUtils = ref('drupalAuthUtils')
-		sessionAuthenticationStrategy = ref('sessionAuthenticationStrategy')
-		authenticationSuccessHandler = ref('authenticationSuccessHandler')
-		authenticationFailureHandler = ref('authenticationFailureHandler')
-//		rememberMeServices = ref('rememberMeServices')
-//		authenticationDetailsSource = ref('authenticationDetailsSource')
-//		filterProcessesUrl = conf.apf.filterProcessesUrl // '/j_spring_security_check'
-//		usernameParameter = conf.apf.usernameParameter // j_username
-//		passwordParameter = conf.apf.passwordParameter // j_password
-		continueChainBeforeSuccessfulAuthentication = SpringSecurityUtils.securityConfig.apf.continueChainBeforeSuccessfulAuthentication // false
-		allowSessionCreation = SpringSecurityUtils.securityConfig.apf.allowSessionCreation // true
-//		postOnly = conf.apf.postOnly // true
-		logoutUrl =  SpringSecurityUtils.securityConfig.logout.filterProcessesUrl
-	}
-	
-	drupalAuthDao(species.auth.drupal.DrupalAuthDao)
+//	authenticationSuccessHandler(AjaxAwareAuthenticationSuccessHandler) {
+//		requestCache = ref('requestCache')
+//		defaultTargetUrl = conf.successHandler.defaultTargetUrl // '/'
+//		alwaysUseDefaultTargetUrl = conf.successHandler.alwaysUseDefault // false
+//		targetUrlParameter = conf.successHandler.targetUrlParameter // 'spring-security-redirect'
+//		ajaxSuccessUrl = conf.successHandler.ajaxSuccessUrl // '/login/ajaxSuccess'
+//		useReferer = true // false
+//		redirectStrategy = ref('redirectStrategy')
+//	}
+//
+//	drupalAuthUtils(DrupalAuthUtils);
+//	drupalAuthCookieFilter(DrupalAuthCookieFilter) {
+//		authenticationManager = ref('authenticationManager')
+//		drupalAuthUtils = ref('drupalAuthUtils')
+//		sessionAuthenticationStrategy = ref('sessionAuthenticationStrategy')
+//		authenticationSuccessHandler = ref('authenticationSuccessHandler')
+//		authenticationFailureHandler = ref('authenticationFailureHandler')
+////		rememberMeServices = ref('rememberMeServices')
+////		authenticationDetailsSource = ref('authenticationDetailsSource')
+////		filterProcessesUrl = conf.apf.filterProcessesUrl // '/j_spring_security_check'
+////		usernameParameter = conf.apf.usernameParameter // j_username
+////		passwordParameter = conf.apf.passwordParameter // j_password
+//		continueChainBeforeSuccessfulAuthentication = SpringSecurityUtils.securityConfig.apf.continueChainBeforeSuccessfulAuthentication // false
+//		allowSessionCreation = SpringSecurityUtils.securityConfig.apf.allowSessionCreation // true
+////		postOnly = conf.apf.postOnly // true
+//		logoutUrl =  SpringSecurityUtils.securityConfig.logout.filterProcessesUrl
+//	}
+//	
+//	drupalAuthDao(species.auth.drupal.DrupalAuthDao)
 	
 	userDetailsService(OpenIdUserDetailsService) {
 		grailsApplication = ref('grailsApplication')
@@ -84,6 +87,29 @@ beans = {
 		authenticationManager = ref('authenticationManager')
 		facebookAuthUtils = ref('facebookAuthUtils')
 		logoutUrl = 'j_spring_security_logout'
+	}
+
+	facebookAuthService(FacebookAuthService) {
+		grailsApplication = ref('grailsApplication')
+		userDomainClassName = conf.userLookup.userDomainClassName
+	}
+	
+	openIDAuthenticationFilter(OpenIDAuthenticationFilter) {
+		grailsApplication = ref('grailsApplication')
+		//claimedIdentityFieldName = conf.openid.claimedIdentityFieldName // openid_identifier
+		consumer = ref('openIDConsumer')
+		rememberMeServices = ref('rememberMeServices')
+		authenticationManager = ref('authenticationManager')
+		authenticationSuccessHandler = ref('authenticationSuccessHandler')
+		authenticationFailureHandler = ref('authenticationFailureHandler')
+		authenticationDetailsSource = ref('authenticationDetailsSource')
+		sessionAuthenticationStrategy = ref('sessionAuthenticationStrategy')
+		filterProcessesUrl = '/j_spring_openid_security_check' // not configurable
+	}
+
+	openIDConsumerManager(ConsumerManager) {
+		grailsApplication = ref('grailsApplication')
+		nonceVerifier = ref('openIDNonceVerifier')
 	}
 
 }

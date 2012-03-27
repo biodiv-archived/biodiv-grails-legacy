@@ -42,7 +42,7 @@ class BootStrap {
 	 * @return
 	 */
 	def initUsers() {
-		createOrUpdateUser('admin', 'admin', true);
+		createOrUpdateUser('admin@strandls.com', 'admin', true);
 //		createOrUpdateUser('sravanthi', 'sra123', true);
 //		createOrUpdateUser('janaki', 'janaki', false);
 //		createOrUpdateUser('prabha', 'prabha', false);
@@ -55,12 +55,12 @@ class BootStrap {
 	 * @param password
 	 * @param isAdmin
 	 */
-	private void createOrUpdateUser(username, password, boolean isAdmin) {
+	private void createOrUpdateUser(email, password, boolean isAdmin) {
 		def userRole = Role.findByAuthority('ROLE_USER') ?: new Role(authority: 'ROLE_USER').save(flush:true, failOnError: true)
 		def adminRole = Role.findByAuthority('ROLE_ADMIN') ?: new Role(authority: 'ROLE_ADMIN').save(flush:true, failOnError: true)
 
-		def user = SUser.findByUsername(username) ?: new SUser(
-				username: username,
+		def user = SUser.findByEmail(email) ?: new SUser(
+				email: email,
 				password: password,
 				enabled: true).save(failOnError: true)
 

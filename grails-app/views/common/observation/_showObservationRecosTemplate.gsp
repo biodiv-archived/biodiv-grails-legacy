@@ -49,10 +49,10 @@
 			<div class="reco">
 				<span class="name"> <g:if test="${r.canonicalForm}">
 						<g:link controller="species" action="show" id="${r.speciesId}">
-							${r.canonicalForm}
+							<i>${r.canonicalForm}</i>
 						</g:link>
 					</g:if> <g:else>
-						${r.name}
+						<i>${r.name}</i>
 					</g:else> </span>
 			</div>
 			<div class="iAgree">

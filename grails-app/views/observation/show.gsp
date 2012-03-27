@@ -55,7 +55,7 @@ width:90%;
 			<div class="grid_10">
 				
 				<div class="grid_10">
-				
+					<h3><obv:showSpeciesName model="['observationInstance':observationInstance]" /></h3>
 
 							<div id="gallery1">
 								<g:if test="${observationInstance.resource}">
@@ -94,6 +94,15 @@ width:90%;
 						data-href="${createLink(controller:'observation', action:'show', id:observationInstance.id, absolute:true)}"
 						data-num-posts="10"></div>
 				</div>
+				
+				<div>
+				<a href="${createLink(controller:'observation', action:'edit', id:observationInstance.id, absolute:true)}"> Edit Observation </a>
+				<a href="${createLink(controller:'observation', action:'flagDeleted', id:observationInstance.id, absolute:true)}"> Delete Observation </a>
+				</div>
+<%--				--%>
+<%--				<div class="buttons">--%>
+<%--                    <span class="button"><g:actionSubmit class="delete" action="flagDeleted" value="${message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" /></span>--%>
+<%--                </div>--%>
 			</div>
 
 

@@ -120,6 +120,10 @@ class ObservationTagLib {
 		out << render(template:"/common/observation/showDateTemplate",model:attrs.model);
 	}
 	
+	def showSpeciesName = {attrs, body->
+		out << render(template:"/common/observation/showSpeciesNameTemplate",model:attrs.model);
+        }
+        
         def showObservationsList = {attrs, body->
 		out << render(template:"/common/observation/showObservationListTemplate", model:attrs.model);
 	}

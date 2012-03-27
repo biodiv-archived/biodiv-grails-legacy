@@ -72,18 +72,8 @@ width:690px;
 <div
 	id="nameContainer" class="recommendation">
 	<input type="text" name="recoName" id="name"
-		value="${recommendationInstance?.name}"
+		value="${observationInstance?.maxVotedSpeciesName}"
 		class="value text ui-widget-content ui-corner-all ${hasErrors(bean: recommendationInstance, field: 'name', 'errors')} ${hasErrors(bean: recommendationVoteInstance, field: 'recommendation', 'errors')}" /> 
 	
-	<input
-		type="hidden" name="canName" id="canName" /> 
-		
-	<!-- select
-		name="confidence" class="value ui-corner-all">
-		<g:each in="${ConfidenceType.list()}" var="l">
-			<option value="${l}">
-				${l.value()}
-			</option>
-		</g:each>
-	</select-->
+	<input type="hidden" name="canName" id="canName" />
 </div>
