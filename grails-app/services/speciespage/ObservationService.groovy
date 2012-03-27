@@ -1,6 +1,6 @@
 package speciespage
 
-import groovy.sql.Sql 
+import groovy.sql.Sql
 
 import org.grails.taggable.Tag;
 import org.grails.taggable.TagLink;
@@ -26,7 +26,7 @@ class ObservationService {
 	def recommendationService;
 	def grailsApplication;
 	def dataSource;
-	
+
 	/**
 	 * 
 	 * @param params
@@ -35,8 +35,15 @@ class ObservationService {
 	Observation createObservation(params) {
 		log.info "Creating observations from params : "+params
 		Observation observation = new Observation();
-
-		
+		updateObservation(params, observation);
+		return observation;
+	}
+	/**
+	 * 
+	 * @param params
+	 * @param observation
+	 */
+	void updateObservation(params, observation){
 		if(params.author)  {
 			observation.author = params.author;
 		}
@@ -44,29 +51,27 @@ class ObservationService {
 		if(params.url) {
 			observation.url = params.url;
 		}
-		
 		observation.group = SpeciesGroup.get(params.group_id);
 		observation.notes = params.notes;
-		observation.observedOn = params.observedOn?:new Date();
-        observation.placeName = params.place_name;
+		observation.observedOn = params.observedOn? Date.parse("MM/dd/yyyy", params.observedOn):new Date();
+		observation.placeName = params.place_name;
 		observation.reverseGeocodedName = params.place_name;
 		observation.location = 'POINT(' + params.longitude + ' ' + params.latitude + ')'
-        observation.latitude = Float.parseFloat(params.latitude);
-        observation.longitude = Float.parseFloat(params.longitude);
-        observation.locationAccuracy = params.location_accuracy;
+		observation.latitude = Float.parseFloat(params.latitude);
+		observation.longitude = Float.parseFloat(params.longitude);
+		observation.locationAccuracy = params.location_accuracy;
 		observation.geoPrivacy = false;
 		observation.habitat = Habitat.get(params.habitat_id);
-		
+
 		def resourcesXML = createResourcesXML(params);
 		def resources = saveResources(observation, resourcesXML);
-		
+
 		resources.each { resource ->
 			observation.addToResource(resource);
 		}
-
-		return observation;
 	}
-
+	
+	
 	/**
 	 * 
 	 * @param params
@@ -98,7 +103,7 @@ class ObservationService {
 	RecommendationVote createRecommendationVote(params) {
 		def observation = params.observation?:Observation.get(params.obvId);
 		def reco;
-		if(params.recoId) 
+		if(params.recoId)
 			reco = Recommendation.get(params.long('recoId'));
 		else
 			reco = getRecommendation(params.recoName, params.canName);
@@ -107,16 +112,16 @@ class ObservationService {
 		log.debug params;
 		return new RecommendationVote(observation:observation, recommendation:reco, author:author, confidence:confidence);
 	}
-	
+
 	List getRelatedObservation(params){
 		def obvId = params.id.toLong()
 		def property = params.filterPropery
 		def propertyValue = Observation.read(obvId)[property]
-		def query = "from Observation as obv where obv." + property + " like :propertyValuee and obv.id != :parentObvId order by obv.createdOn desc"
-		def obvs = Observation.findAll(query, [propertyValue:propertyValue, parentObvId:params.id.toLong(), max:params.limit.toInteger(), offset:params.offset.toInteger()])
+		def query = "from Observation as obv where obv." + property + " like :propertyValuee and obv.id != :parentObvId and obv.isDeleted = :isDeleted order by obv.createdOn desc"
+		def obvs = Observation.findAll(query, [propertyValue:propertyValue, parentObvId:params.id.toLong(), max:params.limit.toInteger(), offset:params.offset.toInteger(), isDeleted:false])
 		return createUrlList(obvs)
 	}
-	
+
 	/**
 	 * 
 	 * @param params
@@ -136,32 +141,33 @@ class ObservationService {
 	 */
 	Map getRelatedObservationByUser(params){
 		//getting count
-		def queryParams = [:]
-		def countQuery = "select count(*) from Observation obv where obv.author.username like :userName "
+		def queryParams = [isDeleted:false]
+		def countQuery = "select count(*) from Observation obv where obv.author.username like :userName and obv.isDeleted = :isDeleted "
 		queryParams["userName"] = SUser.read(params.filterPropertyValue.toInteger()).username
+		queryParams["isDeleted"] = false;  
 		def count = Observation.executeQuery(countQuery, queryParams)
-		
-		
+
+
 		//getting observations
-		def query = "from Observation obv where obv.author.username like :userName "
+		def query = "from Observation obv where obv.author.username like :userName and obv.isDeleted = :isDeleted "
 		def orderByClause = "order by obv." + (params.sort ? params.sort : "createdOn") +  " desc"
 		query += orderByClause
-		
+
 		queryParams["max"] = params.limit.toInteger()
 		queryParams["offset"] = params.offset.toInteger()
-		
+
 		return ["observations":createUrlList(Observation.findAll(query, queryParams)), "count":count]
 	}
-//	
-//	List getRelatedObservationBySpeciesGroup(params){
-//		def obvId = params.id.toLong()
-//		def groupId = Observation.read(obvId).group.id
-//		log.debug(groupId)
-//		def query = "from Observation as obv where obv.group.id = :groupId and obv.id != :parentObvId order by obv.createdOn desc"
-//		def obvs = Observation.findAll(query, [groupId:groupId, parentObvId:params.id.toLong(), max:params.limit.toInteger(), offset:params.offset.toInteger()])
-//		return createUrlList(obvs)
-//	}
-	
+	//
+	//	List getRelatedObservationBySpeciesGroup(params){
+	//		def obvId = params.id.toLong()
+	//		def groupId = Observation.read(obvId).group.id
+	//		log.debug(groupId)
+	//		def query = "from Observation as obv where obv.group.id = :groupId and obv.id != :parentObvId order by obv.createdOn desc"
+	//		def obvs = Observation.findAll(query, [groupId:groupId, parentObvId:params.id.toLong(), max:params.limit.toInteger(), offset:params.offset.toInteger()])
+	//		return createUrlList(obvs)
+	//	}
+
 	/**
 	 * 
 	 * @param params
@@ -170,26 +176,26 @@ class ObservationService {
 	List getRelatedObservationBySpeciesGroup(params){
 		def groupId = params.filterPropertyValue.toLong()
 		log.debug(groupId)
-		
+
 		def query = ""
 		def obvs = null
-		//if filter group is all 
+		//if filter group is all
 		def groupIds = getSpeciesGroupIds(groupId)
 		if(!groupIds) {
-			query = "from Observation as obv order by obv.createdOn desc"
-			obvs = Observation.findAll(query, [max:params.limit.toInteger(), offset:params.offset.toInteger()])
+			query = "from Observation as obv where obv.isDeleted = :isDeleted order by obv.createdOn desc "
+			obvs = Observation.findAll(query, [max:params.limit.toInteger(), offset:params.offset.toInteger(), isDeleted:false])
 		}else if(groupIds instanceof List){
 			//if group is others
-			query = "from Observation as obv where obv.group is null or obv.group.id in (:groupIds) order by obv.createdOn desc"
-			obvs = Observation.findAll(query, [groupIds:groupIds, max:params.limit.toInteger(), offset:params.offset.toInteger()])
+			query = "from Observation as obv where obv.isDeleted = :isDeleted and obv.group is null or obv.group.id in (:groupIds) order by obv.createdOn desc"
+			obvs = Observation.findAll(query, [groupIds:groupIds, max:params.limit.toInteger(), offset:params.offset.toInteger(), isDeleted:false])
 		}else{
-			query = "from Observation as obv where obv.group.id = :groupId order by obv.createdOn desc"
-			obvs = Observation.findAll(query, [groupId:groupIds, max:params.limit.toInteger(), offset:params.offset.toInteger()])
+			query = "from Observation as obv where obv.isDeleted = :isDeleted and obv.group.id = :groupId order by obv.createdOn desc"
+			obvs = Observation.findAll(query, [groupId:groupIds, max:params.limit.toInteger(), offset:params.offset.toInteger(), isDeleted:false])
 		}
 		log.debug(" == obv size " + obvs.size())
 		return createUrlList(obvs)
 	}
-	
+
 	/**
 	 * 
 	 * @param groupId
@@ -202,16 +208,16 @@ class ObservationService {
 			return null
 		}
 		return groupId
-//		}else if(groupName == grailsApplication.config.speciesPortal.group.OTHERS){
-//			//if group is others
-//			def groupNameList = ['Animals', 'Arachnids', 'Archaea', 'Bacteria', 'Chromista', 'Viruses', 'Kingdom Protozoa', 'Mullusks', 'Others']
-//			def groupIds = SpeciesGroup.executeQuery("select distinct sg.id from SpeciesGroup sg where sg.name is null or sg.name in (:groupNameList)", [groupNameList:groupNameList])
-//			return groupIds
-//		}else{
-//			return groupId
-//		}
+		//		}else if(groupName == grailsApplication.config.speciesPortal.group.OTHERS){
+		//			//if group is others
+		//			def groupNameList = ['Animals', 'Arachnids', 'Archaea', 'Bacteria', 'Chromista', 'Viruses', 'Kingdom Protozoa', 'Mullusks', 'Others']
+		//			def groupIds = SpeciesGroup.executeQuery("select distinct sg.id from SpeciesGroup sg where sg.name is null or sg.name in (:groupNameList)", [groupNameList:groupNameList])
+		//			return groupIds
+		//		}else{
+		//			return groupId
+		//		}
 	}
-	
+
 
 	/**
 	 * 	
@@ -221,7 +227,7 @@ class ObservationService {
 	List<String> getSpeciesNames(obvId){
 		return Observation.read(obvId).getSpecies();
 	}
-	
+
 	/**
 	 * 
 	 * @param speciesName
@@ -235,15 +241,15 @@ class ObservationService {
 		//println "speciesName  ==== " + speciesName
 		//def recId = Recommendation.findByName(speciesName).id
 		def recIds = Recommendation.executeQuery("select rec.id from Recommendation as rec where rec.name in (:speciesNames)", [speciesNames:speciesNames]);
-		def countQuery = "select count(*) from RecommendationVote recVote where recVote.recommendation.id in (:recIds) and recVote.observation.id != :parentObv"
-		def countParams = [parentObv:params.id.toLong(), recIds:recIds]
+		def countQuery = "select count(*) from RecommendationVote recVote where recVote.recommendation.id in (:recIds) and recVote.observation.id != :parentObv and recVote.observation.isDeleted = :isDeleted"
+		def countParams = [parentObv:params.id.toLong(), recIds:recIds, isDeleted:false]
 		def count = RecommendationVote.executeQuery(countQuery, countParams)
-		def query = "select recVote.observation from RecommendationVote recVote where recVote.recommendation.id in (:recIds) and recVote.observation.id != :parentObv  order by recVote.votedOn desc "
-		def m = [parentObv:params.id.toLong(), recIds:recIds, max:params.limit.toInteger(), offset:params.offset.toInteger()]
+		def query = "select recVote.observation from RecommendationVote recVote where recVote.recommendation.id in (:recIds) and recVote.observation.id != :parentObv and recVote.observation.isDeleted = :isDeleted order by recVote.votedOn desc "
+		def m = [parentObv:params.id.toLong(), recIds:recIds, max:params.limit.toInteger(), offset:params.offset.toInteger(), isDeleted:false]
 		//return createUrlList(RecommendationVote.executeQuery(query, m).unique())
 		return ["observations":createUrlList(RecommendationVote.executeQuery(query, m)), "count":count]
 	}
-	
+
 	/**
 	 * 
 	 * @return
@@ -259,11 +265,11 @@ class ObservationService {
 		}
 		return urlList
 	}
-	
+
 	private static List createUrlList2(observations){
 		List urlList = []
 		for(param in observations){
-			def obv = param['observation'] 
+			def obv = param['observation']
 			def title = param['title']
 			def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 			def image = obv.mainImage()
@@ -273,11 +279,11 @@ class ObservationService {
 		}
 		return urlList
 	}
-	
+
 	private Recommendation getRecommendation(recoName, canName) {
 		def reco, taxonConcept;
 		if(canName) {
-			//findBy returns first...assuming taxon concepts wont hv same canonical name and different rank 
+			//findBy returns first...assuming taxon concepts wont hv same canonical name and different rank
 			taxonConcept = TaxonomyDefinition.findByCanonicalFormIlike(canName);
 			log.debug "Resolving recoName to canName : "+taxonConcept.canonicalForm
 			reco = Recommendation.findByNameIlike(taxonConcept.canonicalForm);
@@ -288,7 +294,7 @@ class ObservationService {
 				recommendationService.save(reco);
 			}
 		}
-		
+
 		else if(recoName) {
 			def c = Recommendation.createCriteria();
 			def result = c.list {
@@ -297,14 +303,14 @@ class ObservationService {
 			}
 			reco = result?result[0]:null;
 		}
-		
+
 		if(!reco) {
 			reco = new Recommendation(name:recoName, taxonConcept:taxonConcept);
 			if(!recommendationService.save(reco)) {
 				reco = null;
 			}
 		}
-		
+
 		return reco;
 	}
 
@@ -333,7 +339,7 @@ class ObservationService {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * 
 	 */
@@ -350,7 +356,7 @@ class ObservationService {
 			int index = -1;
 			if(key.startsWith('file_')) {
 				index = Integer.parseInt(key.substring(key.lastIndexOf('_')+1));
-				
+
 			}
 			if(index != -1) {
 				files.add(val);
@@ -373,57 +379,57 @@ class ObservationService {
 		}
 		return resources;
 	}
-	
+
 	List findAllTagsSortedByObservationCount(int max){
-	
+
 		def tag_ids = TagLink.executeQuery("select tag.id from TagLink group by tag_id order by count(tag_id) desc", [max:max]);
-		
+
 		def tags = []
-		
+
 		for (tag_id in tag_ids){
-			tags.add(Tag.get(tag_id).name);		
+			tags.add(Tag.get(tag_id).name);
 		}
 		return tags;
 	}
-	
+
 	Map getNearbyObservations(String observationId, int limit){
-		
+
 		def sql =  Sql.newInstance(dataSource);
-		
+
 		def resultSet = sql.rows("select g2.id,  ROUND(ST_Distance_Sphere(g1.st_geomfromtext, g2.st_geomfromtext)/1000) as distance from observation_locations as g1, observation_locations as g2 where g1.id = :observationId and g1.id <> g2.id order by ST_Distance(g1.st_geomfromtext, g2.st_geomfromtext) limit :max", [observationId: Integer.parseInt(observationId), max:limit])
-		
+
 		def nearbyObservations = []
-		
+
 		for (row in resultSet){
-			nearbyObservations.add(["observation":Observation.findById(row.getProperty("id")), "title":"Found "+row.getProperty("distance")+" km away"])	
+			nearbyObservations.add(["observation":Observation.findById(row.getProperty("id")), "title":"Found "+row.getProperty("distance")+" km away"])
 		}
-		
+
 		return ["observations":createUrlList2(nearbyObservations)]
 	}
-	
+
 	Set getAllTagsOfUser(userId){
-		List obvs = Observation.findAll("from Observation as obv where obv.author.id = :userId ", [userId :userId]);
+		List obvs = Observation.findAll("from Observation as obv where obv.author.id = :userId and obv.isDeleted = :isDeleted", [userId :userId, isDeleted:false]);
 		Set tagSet = new HashSet();
 		obvs.each{ tagSet.addAll(it.tags) }
 		return tagSet;
 	}
 
-        /**
-         * Filter observations by group, habitat, tag, user, species
-         * max: limit results to max: if max = -1 return all results
-         * offset: offset results: if offset = -1 its not passed to the 
-         * executing query
-         */
-        Map getFilteredObservations(params, max, offset){
+	/**
+	 * Filter observations by group, habitat, tag, user, species
+	 * max: limit results to max: if max = -1 return all results
+	 * offset: offset results: if offset = -1 its not passed to the 
+	 * executing query
+	 */
+	Map getFilteredObservations(params, max, offset){
 		params.sGroup = (params.sGroup)? params.sGroup : SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.ALL).id
 		params.habitat = (params.habitat)? params.habitat : Habitat.findByName(grailsApplication.config.speciesPortal.group.ALL).id
 		params.habitat = params.habitat.toLong()
 		//params.userName = springSecurityService.currentUser.username;
-		
-		def query = "select obv from Observation obv "
-		def queryParams = [:]
+
+		def query = "select obv from Observation obv where obv.isDeleted = :isDeleted "
+		def queryParams = [isDeleted : false]
 		def filterQuery = ""
-                def activeFilters = [:]
+		def activeFilters = [:]
 
 		if(params.sGroup){
 			params.sGroup = params.sGroup.toLong()
@@ -431,70 +437,68 @@ class ObservationService {
 			if(!groupId){
 				log.debug("No groups for id " + params.sGroup)
 			}else{
-
-				filterQuery += " where obv.group.id = :groupId "
+				filterQuery += " and obv.group.id = :groupId "
 				queryParams["groupId"] = groupId
-                                activeFilters["sGroup"] = groupId
+				activeFilters["sGroup"] = groupId
 			}
 		}
-		
+
 		if(params.tag){
-			query = "select obv from Observation obv,  TagLink tagLink "
-			(filterQuery == "")? (filterQuery += "  where ") : (filterQuery += "  and ")
-			filterQuery +=  " obv.id = tagLink.tagRef and tagLink.type like :tagType and tagLink.tag.name like :tag "
-			
+			query = "select obv from Observation obv,  TagLink tagLink where obv.isDeleted = :isDeleted "
+			//(filterQuery == "")? (filterQuery += "  where ") : (filterQuery += "  and ")
+			filterQuery +=  " and obv.id = tagLink.tagRef and tagLink.type like :tagType and tagLink.tag.name like :tag "
+
 			queryParams["tag"] = params.tag
 			queryParams["tagType"] = 'observation'
-                        activeFilters["tag"] = params.tag
+			activeFilters["tag"] = params.tag
 		}
-		
-		
+
+
 		if(params.habitat && (params.habitat != Habitat.findByName(grailsApplication.config.speciesPortal.group.ALL).id)){
-			(filterQuery == "")? (filterQuery += "  where ") : (filterQuery += "  and ")
-			filterQuery += " obv.habitat.id = :habitat " 
+			//(filterQuery == "")? (filterQuery += "  where ") : (filterQuery += "  and ")
+			filterQuery += " and obv.habitat.id = :habitat "
 			queryParams["habitat"] = params.habitat
-                        activeFilters["habitat"] = params.habitat
+			activeFilters["habitat"] = params.habitat
 		}
-		
+
 		if(params.userId){
-			(filterQuery == "")? (filterQuery += " where ") : (filterQuery += " and ")
-			filterQuery += " obv.author.id = :userId "
+			//(filterQuery == "")? (filterQuery += " where ") : (filterQuery += " and ")
+			filterQuery += " and obv.author.id = :userId "
 			queryParams["userId"] = params.userId.toLong()
-                        activeFilters["userId"] = params.habitat
+			activeFilters["userId"] = params.habitat
 		}
-		
+
 		if(params.speciesName && (params.speciesName != grailsApplication.config.speciesPortal.group.ALL)){
-			(filterQuery == "")? (filterQuery += " where ") : (filterQuery += " and ")
-			filterQuery += " obv.maxVotedSpeciesName like :speciesName "
+			//(filterQuery == "")? (filterQuery += " where ") : (filterQuery += " and ")
+			filterQuery += " and obv.maxVotedSpeciesName like :speciesName "
 			queryParams["speciesName"] = params.speciesName
 		}
-                
-                if(params.bounds){
-                    def bounds = params.bounds.split(",")
-                    
-                    def swLat = bounds[0]   
-                    def swLon = bounds[1]    
-                    def neLat = bounds[2]    
-                    def neLon = bounds[3]    
 
-		    (filterQuery == "")? (filterQuery += " where ") : (filterQuery += " and ")
-		    filterQuery += " obv.latitude > " + swLat + " and  obv.latitude < " + neLat + " and obv.longitude > " + swLon + " and obv.longitude < " + neLon  
-		    activeFilters["bounds"] = params.bounds
+		if(params.bounds){
+			def bounds = params.bounds.split(",")
 
-                }
+			def swLat = bounds[0]
+			def swLon = bounds[1]
+			def neLat = bounds[2]
+			def neLon = bounds[3]
 
-		def orderByClause = "order by obv." + (params.sort ? params.sort : "createdOn") +  " desc"
+			//(filterQuery == "")? (filterQuery += " where ") : (filterQuery += " and ")
+			filterQuery += " and obv.latitude > " + swLat + " and  obv.latitude < " + neLat + " and obv.longitude > " + swLon + " and obv.longitude < " + neLon
+			activeFilters["bounds"] = params.bounds
+		}
+
+		def orderByClause = " order by obv." + (params.sort ? params.sort : "createdOn") +  " desc"
 
 		query += filterQuery + orderByClause
-	
-                if(max != -1)
-                    queryParams["max"] = max
 
-                if(offset != -1)        
-		    queryParams["offset"] = offset
-		
+		if(max != -1)
+			queryParams["max"] = max
+
+		if(offset != -1)
+			queryParams["offset"] = offset
+
 		def observationInstanceList = Observation.executeQuery(query, queryParams)
-                
-                return [observationInstanceList:observationInstanceList, queryParams:queryParams, activeFilters:activeFilters]    
-        }
+
+		return [observationInstanceList:observationInstanceList, queryParams:queryParams, activeFilters:activeFilters]
+	}
 }

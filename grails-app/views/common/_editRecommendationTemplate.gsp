@@ -72,7 +72,7 @@ width:690px;
 <div
 	id="nameContainer" class="recommendation">
 	<input type="text" name="recoName" id="name"
-		value="${recommendationInstance?.name}"
+		value="${observationInstance?.maxVotedSpeciesName}"
 		class="value text ui-widget-content ui-corner-all ${hasErrors(bean: recommendationInstance, field: 'name', 'errors')} ${hasErrors(bean: recommendationVoteInstance, field: 'recommendation', 'errors')}" /> 
 	
 	<input type="hidden" name="canName" id="canName" />

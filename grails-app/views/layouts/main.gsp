@@ -302,10 +302,12 @@ border-bottom:3px solid #003846;
 				})
 				
 				$("#logout").click(function() {
+					<%if(grails.util.Environment.current.toString() != "DEVELOPMENT") {%>
 					FB.getLoginStatus(handleSessionResponse);
 					return false;
+					<%} %>
 				});
-
+			
 
 		function handleSessionResponse(response) {
     		//if we dont have a session (which means the user has been logged out, redirect the user)

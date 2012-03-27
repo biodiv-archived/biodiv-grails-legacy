@@ -12,7 +12,7 @@ import species.sourcehandler.XMLConverter
 import species.utils.ImageUtils
 import species.utils.Utils;
 import species.groups.SpeciesGroup;
-import species.Habitat
+import species.Habitat;
 
 class ObservationController {
 
@@ -31,13 +31,13 @@ class ObservationController {
                 
 		def offset = params.offset ? params.int('offset') : 0
                  
-                def filteredObservation = observationService.getFilteredObservations(params, max, offset)
-                def observationInstanceList = filteredObservation.observationInstanceList
-                def queryParams = filteredObservation.queryParams 
-                def activeFilters = filteredObservation.activeFilters 
+        def filteredObservation = observationService.getFilteredObservations(params, max, offset)
+        def observationInstanceList = filteredObservation.observationInstanceList
+        def queryParams = filteredObservation.queryParams 
+        def activeFilters = filteredObservation.activeFilters 
 
 		def totalObservationInstanceList = observationService.getFilteredObservations(params, -1, -1).observationInstanceList
-                def count = totalObservationInstanceList.size()
+        def count = totalObservationInstanceList.size()
 
 		[totalObservationInstanceList:totalObservationInstanceList, observationInstanceList: observationInstanceList, observationInstanceTotal: count, queryParams: queryParams, activeFilters:activeFilters]
 	}
@@ -53,7 +53,6 @@ class ObservationController {
 	def save = {
 		log.debug params;
 		if(request.method == 'POST') {
-			log.debug params;
 			//TODO:edit also calls here...handle that wrt other domain objects
 
 			params.author = springSecurityService.currentUser;
@@ -85,9 +84,43 @@ class ObservationController {
 			redirect(action: "create")
 		}
 	}
-
+	@Secured(['ROLE_USER'])
+	def update = {
+		log.debug params;
+		params.author = springSecurityService.currentUser;
+		def observationInstance = Observation.get(params.id.toLong())
+		if(observationInstance)	{
+			try {
+				observationService.updateObservation(params, observationInstance);
+	
+				if(!observationInstance.hasErrors() && observationInstance.save(flush:true)) {
+					flash.message = "${message(code: 'default.updated.message', args: [message(code: 'observation.label', default: 'Observation'), observationInstance.id])}"
+					log.debug "Successfully updated observation : "+observationInstance
+	
+					params.obvId = observationInstance.id
+					def tags = (params.tags != null) ? Arrays.asList(params.tags) : new ArrayList();
+					observationInstance.setTags(tags);
+					
+					redirect(action: "show", id: observationInstance.id)
+					//XXX do we need this now
+					//redirect(action: 'addRecommendationVote', params:params);
+				} else {
+					observationInstance.errors.allErrors.each { log.error it }
+					render(view: "create", model: [observationInstance: observationInstance])
+				}
+			} catch(e) {
+				e.printStackTrace();
+				flash.message = "${message(code: 'error')}";
+				render(view: "create", model: [observationInstance: observationInstance])
+			}
+		}else {
+			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
+			redirect(action: "list")
+		}
+	}
+	
 	def show = {
-		def observationInstance = Observation.get(params.id)
+		def observationInstance = Observation.findWhere(id:params.id.toLong(), isDeleted:false)
 		if (!observationInstance) {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
 			redirect(action: "list")
@@ -100,7 +133,7 @@ class ObservationController {
 
 	@Secured(['ROLE_USER'])
 	def edit = {
-		def observationInstance = Observation.get(params.id.toLong())
+		def observationInstance = Observation.findWhere(id:params.id.toLong(), isDeleted:false)
 		if (!observationInstance) {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
 			redirect(action: "list")
@@ -111,7 +144,7 @@ class ObservationController {
 	}
 
 	@Secured(['ROLE_USER'])
-	def update = {
+	def update1 = {
 		def observationInstance = Observation.get(params.id)
 		if (observationInstance) {
 			if (params.version) {
@@ -406,4 +439,26 @@ class ObservationController {
 		render Tag.findAllByNameIlike("${params.term}%")*.name as JSON
 	}
 	
+	@Secured(['ROLE_USER'])
+	def flagDeleted = {
+		log.debug params;
+		params.author = springSecurityService.currentUser;
+		def observationInstance = Observation.findWhere(id:params.id.toLong(), author: params.author)
+		if (observationInstance) {
+			try {
+				observationInstance.isDeleted = true;
+				observationInstance.save(flush: true)
+				flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
+				redirect(action: "list")
+			}
+			catch (org.springframework.dao.DataIntegrityViolationException e) {
+				flash.message = "${message(code: 'default.not.deleted.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
+				redirect(action: "show", id: params.id)
+			}
+		}
+		else {
+			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
+			redirect(action: "list")
+		}
+	}
 }
