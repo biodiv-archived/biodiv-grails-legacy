@@ -52,7 +52,7 @@ class NamesIndexerService {
 			}
 		}
 
-		synchronized(kk) {
+		synchronized(lookup) {
 			lookup = lookup1;
 		}
 

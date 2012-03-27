@@ -37,10 +37,18 @@ class Synonyms {
 	String name;
 	RelationShip relationship;
 	TaxonomyDefinition taxonConcept;
+	String canonicalForm;
+	String normalizedForm;
+	String italicisedForm;
+	String binomialForm;
 	
 	static constraints = {
-		name(blank : false, nullable:false, unique:['relationship', 'taxonConcept']);
+		name(blank : false);
+		canonicalForm(blank : false, nullable:false, unique:['relationship', 'taxonConcept']);
 		relationship(nullable:true);
+		normalizedForm nullable:true;
+		italicisedForm nullable:true;
+		binomialForm nullable:true;
     }
 	
 	static mapping = {

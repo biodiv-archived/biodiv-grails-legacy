@@ -63,13 +63,13 @@ class NamesLoaderService {
 
 				if(taxonConcept.name) {
 					def taxonObj = TaxonomyDefinition.get(taxonConcept.id)
-					recos.add(new Recommendation(name:taxonConcept.name, taxonConcept:taxonObj));
-					if(!taxonConcept.name.equals(taxonConcept.canonicalform))
-						recos.add(new Recommendation(name:taxonConcept.canonicalform, taxonConcept:taxonObj));
-					if(!taxonConcept.name.equals(taxonConcept.normalizedform))
-						recos.add(new Recommendation(name:taxonConcept.normalizedform, taxonConcept:taxonObj));
-					if(taxonConcept.binomialform && !taxonConcept.binomialform.equals(taxonConcept.canonicalform))
-						recos.add(new Recommendation(name:taxonConcept.binomialform, taxonConcept:taxonObj));
+					recos.add(new Recommendation(name:taxonConcept.canonicalform, taxonConcept:taxonObj));
+//					if(!taxonConcept.canonicalform.equals(taxonConcept.name))
+//						recos.add(new Recommendation(name:taxonConcept.canonicalform, taxonConcept:taxonObj));
+//					if(!taxonConcept.canonicalform.equals(taxonConcept.normalizedform))
+//						recos.add(new Recommendation(name:taxonConcept.normalizedform, taxonConcept:taxonObj));
+//					if(taxonConcept.binomialform && !taxonConcept.binomialform.equals(taxonConcept.canonicalform))
+//						recos.add(new Recommendation(name:taxonConcept.binomialform, taxonConcept:taxonObj));
 					// TODO giving species subspecies options to parent taxonEntries
 					noOfNames++;
 				}
@@ -94,11 +94,11 @@ class NamesLoaderService {
 		int offset = 0, noOfNames = 0, limit = BATCH_SIZE;
 		def conn = new Sql(sessionFactory.currentSession.connection())
 		while(true) {
-			def synonyms = conn.rows("select n.name as name, n.taxon_concept_id as taxonConcept from synonyms n left outer join recommendation r on n.name = r.name and n.taxon_concept_id = r.taxon_concept_id where r.name is null order by n.id limit "+limit+" offset "+offset)
+			def synonyms = conn.rows("select n.canonical_form as canonical_form, n.taxon_concept_id as taxonConcept from synonyms n left outer join recommendation r on n.canonical_form = r.name and n.taxon_concept_id = r.taxon_concept_id where r.name is null and n.canonical_form is not null order by n.id limit "+limit+" offset "+offset)
 			//def synonyms = Synonyms.findAll("from Synonyms as synonym left join Recommendation as recommendation with synonym.name = recommendation.name and synonym.taxonConcept = recommendation.taxonConcept where r.name is null)", [max:NAME_BATCH_TO_LOAD, offset:offset]);
 			
 			synonyms.each { synonym ->
-				recos.add(new Recommendation(name:synonym.name, taxonConcept:TaxonomyDefinition.get(synonym.taxonconcept)));
+				recos.add(new Recommendation(name:synonym.canonical_form, taxonConcept:TaxonomyDefinition.get(synonym.taxonconcept)));
 				noOfNames++
 			}
 	
