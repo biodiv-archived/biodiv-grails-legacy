@@ -563,6 +563,7 @@ jquery {
 grails.plugins.springsecurity.userLookup.userDomainClassName = 'species.auth.SUser'
 grails.plugins.springsecurity.userLookup.authorityJoinClassName = 'species.auth.SUserRole'
 grails.plugins.springsecurity.authority.className = 'species.auth.Role'
+grails.plugins.springsecurity.userLookup.usernamePropertyName = 'email'
 //grails.plugins.springsecurity.auth.loginFormUrl = "/login/authFromDrupal"
 
 //grails.plugins.springsecurity.auth.defaultRoleNames = ['ROLE_USER']
@@ -602,12 +603,12 @@ grails.mail.default.from="team@westernghats.com"
 
 grails.plugins.springsecurity.password.algorithm = 'MD5'
 
-grails.plugins.springsecurity.ui.password.minLength=8
+grails.plugins.springsecurity.ui.password.minLength=6
 grails.plugins.springsecurity.ui.password.maxLength=64
 grails.plugins.springsecurity.ui.password.validationRegex='^.*$'
 grails.plugins.springsecurity.ui.register.postRegisterUrl  = null // use defaultTargetUrl if not set
 grails.plugins.springsecurity.ui.register.defaultRoleNames = ['ROLE_USER']
-grails.plugins.springsecurity.ui.register.emailBody = '''Hi $user.username,<br/><br/>You (or someone pretending to be you) created an account with this email address.<br/><br/>If you made the request, please click <a href="$url">here</a> to finish the registration and activate your account.'''
+grails.plugins.springsecurity.ui.register.emailBody = '''Hi $username,<br/><br/>You (or someone pretending to be you) created an account with this email address.<br/><br/>If you made the request, please click <a href="$url">here</a> to finish the registration and activate your account.'''
 grails.plugins.springsecurity.ui.register.emailFrom = 'do.not.reply@westernghats.com'
 grails.plugins.springsecurity.ui.register.emailSubject = "Activate your account with ${speciesPortal.domain}"
 grails.plugins.springsecurity.ui.encodePassword = false

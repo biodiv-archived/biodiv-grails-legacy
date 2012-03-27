@@ -71,26 +71,29 @@ class LoginController {
 
 	def authSuccess = {
 		if(params.uid) {
-			def facebookUser = FacebookUser.findByUid(params.long("uid"));
-
-			if(facebookUser.isFirstLogin && !params.redirectToEdit) {
-				redirect (controller:'SUser', action:'edit', id:facebookUser.user.id, params:['isFirstLogin':true]);
-			} else {
-				if(facebookUser.isFirstLogin) {
-					FacebookUser.withTransaction {
-						facebookUser.isFirstLogin = false;
-						facebookUser.save();
-					}
-				}
+//			def facebookUser = FacebookUser.findByUid(params.long("uid"));
+//
+//			if(facebookUser.isFirstLogin) {				
+//				flash.chainedParams = [facebookUser:facebookUser, openId:facebookUser.link?:'dummyOpenId']
+//				chain (controller:'register');
+//			} else {
+//				if(facebookUser.isFirstLogin) {
+//					FacebookUser.withTransaction {
+//						facebookUser.isFirstLogin = false;
+//						facebookUser.save();
+//					}
+//				}
 
 				def defaultSavedRequest = request.getSession()?.getAttribute(WebAttributes.SAVED_REQUEST)
 				if(defaultSavedRequest) {
 					(new DefaultRedirectStrategy()).sendRedirect(request, response, defaultSavedRequest.getRedirectUrl());
 					return
+				} else {
+					redirect uri:"/";
+					return;
 				}
-			}
-		}
-		redirect uri:"/";
+//			}
+		} 
 	}
 
 	/**
