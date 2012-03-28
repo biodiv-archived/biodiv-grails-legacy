@@ -71,8 +71,18 @@ width:690px;
 
 <div
 	id="nameContainer" class="recommendation">
+	<%
+		def species_name = ""
+		//showing vote added by creator of the observation
+		if(params.action == 'edit' || params.action == 'update'){
+			species_name = observationInstance?.fetchOwnerRecoVote()?.recommendation?.name
+		}else{
+			//showing identified species name based on max vote
+			species_name = observationInstance?.maxVotedSpeciesName
+		}
+	%>
 	<input type="text" name="recoName" id="name"
-		value="${observationInstance?.maxVotedSpeciesName}"
+		value="${species_name}"
 		class="value text ui-widget-content ui-corner-all ${hasErrors(bean: recommendationInstance, field: 'name', 'errors')} ${hasErrors(bean: recommendationVoteInstance, field: 'recommendation', 'errors')}" /> 
 	
 	<input type="hidden" name="canName" id="canName" />

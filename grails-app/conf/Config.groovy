@@ -608,13 +608,20 @@ grails.plugins.springsecurity.ui.password.maxLength=64
 grails.plugins.springsecurity.ui.password.validationRegex='^.*$'
 grails.plugins.springsecurity.ui.register.postRegisterUrl  = null // use defaultTargetUrl if not set
 grails.plugins.springsecurity.ui.register.defaultRoleNames = ['ROLE_USER']
+
+grails.plugins.springsecurity.ui.notification.emailFrom = 'notification@thewesternghats.in'
+
 grails.plugins.springsecurity.ui.register.emailBody = '''Hi $username,<br/><br/>You (or someone pretending to be you) created an account with this email address.<br/><br/>If you made the request, please click <a href="$url">here</a> to finish the registration and activate your account.'''
 grails.plugins.springsecurity.ui.register.emailFrom = 'do.not.reply@westernghats.com'
 grails.plugins.springsecurity.ui.register.emailSubject = "Activate your account with ${speciesPortal.domain}"
 
-grails.plugins.springsecurity.ui.addRecommendationVote.emailBody = '''Hi $user.username,<br/><br/>You (or someone pretending to be you) added recommendation vote.'''
-grails.plugins.springsecurity.ui.addRecommendationVote.emailFrom = 'do.not.reply@westernghats.com'
-grails.plugins.springsecurity.ui.addRecommendationVote.emailSubject = "Recommendation vote added from ${speciesPortal.domain}"
+grails.plugins.springsecurity.ui.addObservation.emailSubject = 'Observation added'
+grails.plugins.springsecurity.ui.addObservation.emailBody = '''Hi $user.username,<br/><br/>You have uploaded an observation to the Western Ghats Portal/India Biodiversity Portal.<br/>Your observation is available at the following URL:<a href="$obvUrl">$obvUrl</a><br/><br/>You will be notified by mail on any social activity on the observation.<br/><br/>If you do not want to receive notifications please go to your user profile and switch it off.<br/>
+<br/>User Profile URL:<a href="$userProfileUrl">$userProfileUrl</a><br/><br/>Thank you for your contribution to the portal.<br/><br/>The portal team'''
+
+grails.plugins.springsecurity.ui.addRecommendationVote.emailBody = '''Hi $user.username,<br/><br/>Your observation has some social activity.<br/>$currentUser.username has $currentActivity on your Observation.<br/><br/>You can see the posting on your Observation URL:<a href="$obvUrl">$obvUrl</a><br/><br/>You will be notified by mail on any social activity on the observation.<br/><br/>If you do not want to receive notifications please go to your user profile and switch it off.<br/>
+<br/>User Profile URL:<a href="$userProfileUrl">$userProfileUrl</a><br/><br/>The portal team'''
+
 grails.plugins.springsecurity.ui.encodePassword = false
 
 grails.plugins.springsecurity.useSecurityEventListener = true
