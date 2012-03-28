@@ -27,7 +27,7 @@ class ObservationController {
 	}
 
         def filteredList = {
-        	def max = Math.min(params.max ? params.int('max') : 3, 100)
+        	def max = Math.min(params.max ? params.int('max') : 8, 100)
                 
 		def offset = params.offset ? params.int('offset') : 0
                  
@@ -44,7 +44,7 @@ class ObservationController {
         }
 
 	def list = {
-		def max = Math.min(params.max ? params.int('max') : 3, 100)
+		def max = Math.min(params.max ? params.int('max') : 8, 100)
                 
 		def offset = params.offset ? params.int('offset') : 0
                  
