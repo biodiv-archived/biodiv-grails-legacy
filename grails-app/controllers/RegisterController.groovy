@@ -1,37 +1,215 @@
 import org.codehaus.groovy.grails.plugins.springsecurity.NullSaltSource;
 import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
 import org.codehaus.groovy.grails.plugins.springsecurity.ui.RegistrationCode;
-
-
-
+import org.springframework.security.web.savedrequest.DefaultSavedRequest;
+import org.codehaus.groovy.grails.plugins.springsecurity.openid.OpenIdAuthenticationFailureHandler as OIAFH
 
 class RegisterController extends grails.plugins.springsecurity.ui.RegisterController {
-	
+
+	def SUserService;
+
 	def index = {
-		def copy = [:] + (flash.chainedParams ?: [:])
-		if(flash.chainedParams?.timezone) {
-			copy.timezone = params.float(copy.timezone)
+		if(flash.chainedParams?.command) {
+			['command': flash.chainedParams?.command]
+		} else {
+			log.debug("Registration : $flash.chainedParams");
+			def copy = [:] + (flash.chainedParams ?: [:])
+			if(flash.chainedParams?.timezone) {
+				copy.timezone = params.float(copy.timezone)
+			}
+			copy.remove 'controller'
+			copy.remove 'action'
+			['command': new RegisterCommand(copy)]
 		}
-		copy.remove 'controller'
-		copy.remove 'action'
-		[command: new RegisterCommand(copy)]
 	}
-	
 	
 	def register = { RegisterCommand command ->
 
+		def conf = SpringSecurityUtils.securityConfig
 		if (command.hasErrors()) {
 			render view: 'index', model: [command: command]
 			return
 		}
 
-		String salt = saltSource instanceof NullSaltSource ? null : command.username
-		def user = lookupUserClass().newInstance(email: command.email, username: command.username,
-				accountLocked: true, enabled: true)
+		def user = SUserService.create(command.properties);
+		
+		if(command.openId) {
+			user.accountLocked = false;
+			user.addToOpenIds(url: command.openId);
+			SUserService.save(user);
+			SUserService.assignRoles(user);
+		} else {
+			user.accountLocked = true;
+			SUserService.save(user);
+		}
+		
+		if (user == null || user.hasErrors()) {
+			flash.error = message(code: 'spring.security.ui.register.miscError')
+			flash.chainedParams = params
+			redirect action: 'index'
+			return
+		}
 
-		RegistrationCode registrationCode = springSecurityUiService.register(user, command.password, salt)
+		if(command.openId) {
+			flash.message = message(code: 'spring.security.ui.register.complete')
+			authenticateAndRedirect user.email
+			return	
+		} else {
+			registerAndEmail user.username, user.email			
+			render view: 'index', model: [emailSent: true]
+			return
+		}
+
+	}
+
+	def verifyRegistration = {
+
+		def conf = SpringSecurityUtils.securityConfig
+		String defaultTargetUrl = conf.successHandler.defaultTargetUrl
+		String usernamePropertyName = conf.userLookup.usernamePropertyName
+
+		String token = params.t
+
+		def registrationCode = token ? RegistrationCode.findByToken(token) : null
+		if (!registrationCode) {
+			flash.error = message(code: 'spring.security.ui.register.badCode')
+			redirect uri: defaultTargetUrl
+			return
+		}
+
+		println registrationCode
+		def user
+		RegistrationCode.withTransaction { status ->
+			user = lookupUserClass().findWhere((usernamePropertyName): registrationCode.username)
+
+			if (!user) {
+				return
+			}
+			user.accountLocked = false
+			user.save(flush:true)
+			SUserService.assignRoles(user);
+			registrationCode.delete()
+		}
+
+		if (!user) {
+			flash.error = message(code: 'spring.security.ui.register.badCode')
+			redirect uri: defaultTargetUrl
+			return
+		}
+
+		springSecurityService.reauthenticate user."$usernamePropertyName"
+
+		flash.message = message(code: 'spring.security.ui.register.complete')
+		redirect uri: conf.ui.register.postRegisterUrl ?: defaultTargetUrl
+	}
+
+	def forgotPassword = {
+
+		if (!request.post) {
+			// show the form
+			return
+		}
+
+		String usernamePropertyName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
+
+		String username = params.username
+		if (!username) {
+			flash.error = message(code: "spring.security.ui.forgotPassword.username.missing")
+			redirect action: 'forgotPassword'
+			return
+		}
+
+
+		def user = lookupUserClass().findWhere((usernamePropertyName): username)
+		if (!user) {
+			flash.error = message(code: 'spring.security.ui.forgotPassword.user.notFound')
+			redirect action: 'forgotPassword'
+			return
+		}
+
+		def registrationCode = new RegistrationCode(username: user."$usernamePropertyName")
+		registrationCode.save(flush: true)
+
+		String url = generateLink('resetPassword', [t: registrationCode.token])
+
+		def conf = SpringSecurityUtils.securityConfig
+		def body = conf.ui.forgotPassword.emailBody
+		if (body.contains('$')) {
+			body = evaluate(body, [user: user, url: url])
+		}
+		mailService.sendMail {
+			to user.email
+			from conf.ui.forgotPassword.emailFrom
+			subject conf.ui.forgotPassword.emailSubject
+			html body.toString()
+		}
+
+		[emailSent: true]
+	}
+
+	def resetPassword = { ResetPasswordCommand command ->
+		log.debug params
+		String token = params.t
+
+		def registrationCode = token ? RegistrationCode.findByToken(token) : null
+		if (!registrationCode) {
+			flash.error = message(code: 'spring.security.ui.resetPassword.badCode')
+			redirect uri: SpringSecurityUtils.securityConfig.successHandler.defaultTargetUrl
+			return
+		}
+
+		if (!request.post) {
+			return [token: token, command: new ResetPasswordCommand()]
+		}
+
+		String usernamePropertyName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
+		def command2 = new ResetPasswordCommand(username:registrationCode.username, password:command.password, password2:command.password2);
+		command2.validate()
+
+		if (command2.hasErrors()) {
+			return [token: token, command: command]
+		}
+
+		String salt = saltSource instanceof NullSaltSource ? null : registrationCode.username
+		RegistrationCode.withTransaction { status ->
+			def user = lookupUserClass().findWhere((usernamePropertyName): registrationCode.username)
+			user.password = springSecurityUiService.encodePassword(command.password, salt)
+			user.save()
+			registrationCode.delete()
+		}
+
+		springSecurityService.reauthenticate registrationCode.username
+
+		flash.message = message(code: 'spring.security.ui.resetPassword.success')
+
+		def conf = SpringSecurityUtils.securityConfig
+		String postResetUrl = conf.ui.register.postResetUrl ?: conf.successHandler.defaultTargetUrl
+		redirect uri: postResetUrl
+	}
+
+	protected String generateLink(String action, linkParams) {
+		createLink(base: "$request.scheme://$grailsApplication.config.speciesPortal.domain$request.contextPath",
+				controller: 'register', action: action,
+				params: linkParams)
+	}
+
+	static myPasswordValidator = { String password, command ->
+		String usernamePropertyName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
+		if (command."$usernamePropertyName" && command."$usernamePropertyName".equals(password)) {
+			return "command.password.error.email"
+		}
+
+		if (!checkPasswordMinLength(password, command) ||
+		!checkPasswordMaxLength(password, command) ||
+		!checkPasswordRegex(password, command)) {
+			return 'command.password.error.strength'
+		}
+	}
+
+	void registerAndEmail(String username, String email) {
+		RegistrationCode registrationCode = SUserService.register(email)
+
 		if (registrationCode == null || registrationCode.hasErrors()) {
-			// null means problem creating the user
 			flash.error = message(code: 'spring.security.ui.register.miscError')
 			flash.chainedParams = params
 			redirect action: 'index'
@@ -43,25 +221,43 @@ class RegisterController extends grails.plugins.springsecurity.ui.RegisterContro
 		def conf = SpringSecurityUtils.securityConfig
 		def body = conf.ui.register.emailBody
 		if (body.contains('$')) {
-			body = evaluate(body, [user: user, url: url])
+			body = evaluate(body, [username: username, url: url])
 		}
 		mailService.sendMail {
-			to command.email
+			to email
 			from conf.ui.register.emailFrom
 			subject conf.ui.register.emailSubject
 			html body.toString()
 		}
 
-		render view: 'index', model: [emailSent: true]
 	}
 	
-	protected String generateLink(String action, linkParams) {
-		createLink(base: "$request.scheme://$grailsApplication.config.speciesPortal.domain$request.contextPath",
-				controller: 'register', action: action,
-				params: linkParams)
+	
+	/**
+	 * Authenticate the user for real now that the account exists/is linked and redirect
+	 * to the originally-requested uri if there's a SavedRequest.
+	 *
+	 * @param username the user's login name
+	 */
+	private void authenticateAndRedirect(String username) {
+		session.removeAttribute OIAFH.LAST_OPENID_USERNAME
+		session.removeAttribute OIAFH.LAST_OPENID_ATTRIBUTES
+
+		springSecurityService.reauthenticate username
+
+		def config = SpringSecurityUtils.securityConfig
+
+		def savedRequest = session[DefaultSavedRequest.SPRING_SECURITY_SAVED_REQUEST_KEY]
+		if (savedRequest && !config.successHandler.alwaysUseDefault) {
+			redirect url: savedRequest.redirectUrl
+		}
+		else {
+			redirect uri: config.successHandler.defaultTargetUrl
+		}
 	}
 
 }
+
 
 class RegisterCommand {
 	String username
@@ -73,20 +269,46 @@ class RegisterCommand {
 	float timezone=0
 	String aboutMe;
 	String location;
+	String profilePic;
+	String openId;
 
 	def grailsApplication
 
 	static constraints = {
-		email blank: false, nullable: false, validator: { value, command ->
+		email email: true, blank: false, nullable: false, validator: { value, command ->
 			if (value) {
 				def User = command.grailsApplication.getDomainClass(
-					SpringSecurityUtils.securityConfig.userLookup.userDomainClassName).clazz
+						SpringSecurityUtils.securityConfig.userLookup.userDomainClassName).clazz
 				if (User.findByEmail(value)) {
 					return 'registerCommand.email.unique'
 				}
 			}
 		}
-		password blank: false, nullable: false, validator: RegisterController.passwordValidator
+		password blank: false, nullable: false, validator: RegisterController.myPasswordValidator
+		password2 validator: RegisterController.password2Validator
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "RegisterCommand [username=" + username + ", email=" + email
+		+ ", name=" + name + ", website=" + website + ", timezone="
+		+ timezone + ", aboutMe=" + aboutMe + ", location=" + location
+		+ ", profilePic=" + profilePic + "]";
+	}
+}
+
+
+class ResetPasswordCommand {
+	String username
+	String password
+	String password2
+
+	static constraints = {
+		username nullable: false, email: true
+		password blank: false, nullable: false, validator: grails.plugins.springsecurity.ui.RegisterController.passwordValidator
 		password2 validator: RegisterController.password2Validator
 	}
 }

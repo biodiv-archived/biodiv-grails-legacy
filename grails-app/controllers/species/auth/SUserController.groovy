@@ -59,7 +59,7 @@ class SUserController extends UserController {
 			params.id = springSecurityService.currentUser?.id;
 		}
 
-		def SUserInstance = SUser.get(params.id)
+		def SUserInstance = SUser.get(params.long("id"))
 		if (!SUserInstance) {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'SUser.label', default: 'SUser'), params.id])}"
 			redirect(action: "list")

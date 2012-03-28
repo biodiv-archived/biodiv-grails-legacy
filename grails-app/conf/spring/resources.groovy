@@ -11,6 +11,7 @@ import com.the6hours.grails.springsecurity.facebook.FacebookAuthCookieFilter;
 import species.auth.ConsumerManager;
 import species.auth.FacebookAuthCookieLogoutHandler;
 import species.auth.OpenIDAuthenticationFilter;
+import species.auth.OpenIdAuthenticationFailureHandler;
 
 import species.auth.drupal.DrupalAuthCookieFilter;
 import species.auth.drupal.DrupalAuthUtils;
@@ -94,6 +95,21 @@ beans = {
 		userDomainClassName = conf.userLookup.userDomainClassName
 	}
 	
+	openIDConsumerManager(ConsumerManager) {
+		grailsApplication = ref('grailsApplication')
+		nonceVerifier = ref('openIDNonceVerifier')
+	}
+	
+//	authenticationFailureHandler(OpenIdAuthenticationFailureHandler) {
+//		grailsApplication = ref('grailsApplication')
+//		userDomainClassName = conf.userLookup.userDomainClassName
+//		redirectStrategy = ref('redirectStrategy')
+//		defaultFailureUrl = conf.failureHandler.defaultFailureUrl //'/login/authfail?login_error=1'
+//		useForward = conf.failureHandler.useForward // false
+//		ajaxAuthenticationFailureUrl = conf.failureHandler.ajaxAuthFailUrl // '/login/authfail?ajax=true'
+//		exceptionMappings = conf.failureHandler.exceptionMappings // [:]
+//	}
+	
 	openIDAuthenticationFilter(OpenIDAuthenticationFilter) {
 		grailsApplication = ref('grailsApplication')
 		//claimedIdentityFieldName = conf.openid.claimedIdentityFieldName // openid_identifier
@@ -106,10 +122,4 @@ beans = {
 		sessionAuthenticationStrategy = ref('sessionAuthenticationStrategy')
 		filterProcessesUrl = '/j_spring_openid_security_check' // not configurable
 	}
-
-	openIDConsumerManager(ConsumerManager) {
-		grailsApplication = ref('grailsApplication')
-		nonceVerifier = ref('openIDNonceVerifier')
-	}
-
 }

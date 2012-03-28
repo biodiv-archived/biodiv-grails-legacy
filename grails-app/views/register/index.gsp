@@ -160,28 +160,41 @@ td.openid-submit {
 													labelCode='user.password2.label' bean="${command}"
 													size='25' labelCodeDefault='Password (again)*'
 													value="${command.password2}" />
-												<!-- 
-						<s2ui:textFieldRow name='name' labelCode='user.name.label'
-							bean="${command}" size='40' labelCodeDefault='Full Name'
-							value="${command.name}" />
+												 
+												<s2ui:textFieldRow name='name' labelCode='user.name.label'
+													bean="${command}" size='25' labelCodeDefault='Full Name'
+													value="${command.name}" />
+						
+												<s2ui:textFieldRow name='username' labelCode='user.username.label'
+													bean="${command}" size='25' labelCodeDefault='Username'
+													value="${command.username}" />
+						
+												<s2ui:textFieldRow name='website' bean="${command}"
+													value="${command.website}" size='25'
+													labelCode='user.website.label' labelCodeDefault='Website' />
+						
+												<s2ui:textFieldRow name='location' bean="${command}"
+													value="${command.location}" size='25'
+													labelCode='user.location.label' labelCodeDefault='Location' />
+						
+												<s2ui:textFieldRow name='timezone' bean="${command}"
+													value="${command.timezone}" size='25'
+													labelCode='user.timezone.label'
+													labelCodeDefault='Timezone Offset' />
+						 
+												<s2ui:textFieldRow name='aboutMe' bean="${command}"
+													value="${command.aboutMe}" size='25'
+													labelCode='user.aboutMe.label'
+													labelCodeDefault='About Me' />
+						 
+						 						<s2ui:textFieldRow name='profilePic' bean="${command}"
+													value="${command.profilePic}" size='25'
+													labelCode='user.profilePic.label'
+													labelCodeDefault='Profile Picture Link' />
 
-						<s2ui:textFieldRow name='username' labelCode='user.username.label'
-							bean="${command}" size='40' labelCodeDefault='Username'
-							value="${command.username}" />
-
-						<s2ui:textFieldRow name='website' bean="${command}"
-							value="${command.website}" size='40'
-							labelCode='user.website.label' labelCodeDefault='Website' />
-
-						<s2ui:textFieldRow name='location' bean="${command}"
-							value="${command.location}" size='40'
-							labelCode='user.location.label' labelCodeDefault='Location' />
-
-						<s2ui:textFieldRow name='timezone' bean="${command}"
-							value="${command.timezone}" size='40'
-							labelCode='user.timezone.label'
-							labelCodeDefault='Timezone Offset' />
- -->
+												<s2ui:textFieldRow name='openId' bean="${command}"
+													value="${command.openId}" size='25'
+													labelCode='user.openId.label' labelCodeDefault='OpenId' />
 
 											</tbody>
 										</table>
@@ -204,7 +217,7 @@ td.openid-submit {
 
 	<script>
 $(document).ready(function() {
-	$('#username').focus();
+	$('#email').focus();
 });
 </script>
 

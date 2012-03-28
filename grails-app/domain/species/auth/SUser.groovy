@@ -17,21 +17,22 @@ class SUser {
 	boolean accountLocked
 	boolean passwordExpired
 	String email
-	Date dateCreated
+	Date dateCreated = new Date();
 	Date lastLoginDate = new Date();
 	String profilePic
 	String website;
 	float timezone=0;//offset
 	String aboutMe;
 	String location;
-
+	boolean sendNotification = true;
+	
 	static hasMany = [openIds: OpenID]
 
 	static constraints = {
 		username blank: false
 		name blank: false
 		password blank: false
-		email email: true, blank: false, unique: true
+		email email: true, blank: false, unique: true, nullable:false
 		profilePic nullable:true
 		website nullable:true
 		timezone nullable:true

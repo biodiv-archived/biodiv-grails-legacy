@@ -58,6 +58,8 @@ class BootStrap {
 	private void createOrUpdateUser(email, password, boolean isAdmin) {
 		def userRole = Role.findByAuthority('ROLE_USER') ?: new Role(authority: 'ROLE_USER').save(flush:true, failOnError: true)
 		def adminRole = Role.findByAuthority('ROLE_ADMIN') ?: new Role(authority: 'ROLE_ADMIN').save(flush:true, failOnError: true)
+		def fbRole = Role.findByAuthority('ROLE_FACEBOOK') ?: new Role(authority: 'ROLE_FACEBOOK').save(flush:true, failOnError: true)
+		def drupalAdminRole = Role.findByAuthority('ROLE_DRUPAL_ADMIN') ?: new Role(authority: 'ROLE_DRUPAL_ADMIN').save(flush:true, failOnError: true)
 
 		def user = SUser.findByEmail(email) ?: new SUser(
 				email: email,

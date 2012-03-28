@@ -1,12 +1,11 @@
 import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
 import org.codehaus.groovy.grails.plugins.springsecurity.openid.OpenIdAuthenticationFailureHandler as OIAFH
-
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.AuthenticationException
 import org.springframework.security.web.savedrequest.DefaultSavedRequest
 
-import species.auth.SUser
 import species.auth.Role
+import species.auth.SUser
 import species.auth.SUserRole
 
 /**
@@ -43,10 +42,10 @@ class OpenIdController {
 		}
 
 		[openIdPostUrl: "${request.contextPath}$openIDAuthenticationFilter.filterProcessesUrl",
-		 daoPostUrl:    "${request.contextPath}${config.apf.filterProcessesUrl}",
-		 persistentRememberMe: config.rememberMe.persistent,
-		 rememberMeParameter: config.rememberMe.parameter,
-		 openidIdentifier: config.openid.claimedIdentityFieldName]
+					daoPostUrl:    "${request.contextPath}${config.apf.filterProcessesUrl}",
+					persistentRememberMe: config.rememberMe.persistent,
+					rememberMeParameter: config.rememberMe.parameter,
+					openidIdentifier: config.openid.claimedIdentityFieldName]
 	}
 
 	/**
@@ -58,30 +57,51 @@ class OpenIdController {
 	 * in the session rather than passing it between submits so the user has no opportunity
 	 * to change it.
 	 */
-	def createAccount = { OpenIdRegisterCommand command ->
+	def createAccount = {
 
 		String openId = session[OIAFH.LAST_OPENID_USERNAME]
+		List attributes = session[OIAFH.LAST_OPENID_ATTRIBUTES] ?: []
+
 		if (!openId) {
 			flash.error = 'Sorry, an OpenID was not found'
-			return [command: command]
+			return
 		}
 
-		if (!request.post) {
-			// show the form
-			command.clearErrors()
+		log.debug "Processing OpenId authentication in createAccount/merge"
+		
+		def emailAttribute = attributes.find { l ->
+			if(l.name == 'email') {
+				return l;
+			}
+		}
+
+		//TODO: if there are multiple email accounts available choose among them
+		String email = emailAttribute.values[0];
+
+		if (!email) {
+			flash.error = 'Sorry, an email id is necessary for an account'
+			return
+		}
+
+		def user;
+		if(email) {
+			user = SUser.findByEmail(email)
+		}
+		
+		if(user) {
+			log.info "Found existing user with same emailId $email"
+			log.info "Merging details with existing account $user"
+			registerAccountOpenId user, openId
+			authenticateAndRedirect user.username
+		} else {
+			log.info "Redirecting to register"
+			RegisterCommand command = new RegisterCommand();
 			copyFromAttributeExchange command
-			return [command: command, openId: openId]
+			command.openId = openId;
+			log.debug "register command : $command"
+			flash.chainedParams = [command: command]
+			chain ( controller:"register");
 		}
-
-		if (command.hasErrors()) {
-			return [command: command, openId: openId]
-		}
-
-		if (!createNewAccount(command.username, command.password, openId)) {
-			return [command: command, openId: openId]
-		}
-
-		authenticateAndRedirect command.username
 	}
 
 	/**
@@ -182,8 +202,12 @@ class OpenIdController {
 		daoAuthenticationProvider.authenticate(
 				new UsernamePasswordAuthenticationToken(username, password))
 
+		def user = SUser.findByUsername(username)
+		registerAccountOpenId(user, openId);
+	}
+
+	private void registerAccountOpenId(SUser user, String openId) {
 		SUser.withTransaction { status ->
-			def user = SUser.findByUsername(username)
 			user.addToOpenIds(url: openId)
 			if (!user.validate()) {
 				status.setRollbackOnly()
@@ -195,15 +219,27 @@ class OpenIdController {
 	 * For the initial form display, copy any registered AX values into the command.
 	 * @param command  the command
 	 */
-	private void copyFromAttributeExchange(OpenIdRegisterCommand command) {
+	private void copyFromAttributeExchange(RegisterCommand command) {
 		List attributes = session[OIAFH.LAST_OPENID_ATTRIBUTES] ?: []
+		String firstName, lastName="";
 		for (attribute in attributes) {
-			// TODO document
+			
 			String name = attribute.name
+			if(name == "firstname") {
+				firstName = attribute.values[0]	
+			} else if(name == "lastname") {
+				lastName = attribute.values[0]
+			}
+			
 			if (command.hasProperty(name)) {
 				command."$name" = attribute.values[0]
 			}
 		}
+		
+		if(firstName) {
+			command.name = firstName + " "+ lastName
+			command.name = command.name.trim();
+		} 
 	}
 }
 
@@ -227,9 +263,9 @@ class OpenIdRegisterCommand {
 			}
 
 			if (password && password.length() >= 8 && password.length() <= 64 &&
-					(!password.matches('^.*\\p{Alpha}.*$') ||
-					!password.matches('^.*\\p{Digit}.*$') ||
-					!password.matches('^.*[!@#$%^&].*$'))) {
+			(!password.matches('^.*\\p{Alpha}.*$') ||
+			!password.matches('^.*\\p{Digit}.*$') ||
+			!password.matches('^.*[!@#$%^&].*$'))) {
 				return 'openIdRegisterCommand.password.error.strength'
 			}
 		}

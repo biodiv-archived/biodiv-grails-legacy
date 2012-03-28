@@ -6,6 +6,7 @@ class Role {
 
 	static mapping = {
 		cache true
+		version:false;
 	}
 
 	static constraints = {

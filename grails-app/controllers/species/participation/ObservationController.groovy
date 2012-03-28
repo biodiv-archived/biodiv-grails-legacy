@@ -1,10 +1,12 @@
 package species.participation
 
 import org.grails.taggable.*
+import groovy.text.SimpleTemplateEngine
 import groovy.util.Node
 
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.springframework.web.multipart.MultipartHttpServletRequest
+import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
 
 import grails.converters.JSON;
 import grails.plugins.springsecurity.Secured
@@ -16,10 +18,16 @@ import species.Habitat
 
 class ObservationController {
 
+	private static final String OBSERVATION_ADDED = "observationAdded";
+	private static final String SPECIES_RECOMMENDED = "speciesRecommended";
+	private static final String SPECIES_AGREED_ON = "speciesAgreedOn";
+	
+	
 	def grailsApplication;
 	def observationService;
 	def springSecurityService;
-
+	def mailService;
+	
 	static allowedMethods = [update: "POST", delete: "POST"]
 
 	def index = {
@@ -86,7 +94,9 @@ class ObservationController {
 					def tags = (params.tags != null) ? Arrays.asList(params.tags) : new ArrayList();
 
 					observationInstance.setTags(tags);
-
+					
+					sendNotificationMail(OBSERVATION_ADDED, observationInstance, request);
+					
 					redirect(action: 'addRecommendationVote', params:params);
 				} else {
 					observationInstance.errors.allErrors.each { log.error it }
@@ -118,9 +128,8 @@ class ObservationController {
 					def tags = (params.tags != null) ? Arrays.asList(params.tags) : new ArrayList();
 					observationInstance.setTags(tags);
 					
-					redirect(action: "show", id: observationInstance.id)
-					//XXX do we need this now
-					//redirect(action: 'addRecommendationVote', params:params);
+					//redirect(action: "show", id: observationInstance.id)
+					redirect(action: 'addRecommendationVote', params:params);
 				} else {
 					observationInstance.errors.allErrors.each { log.error it }
 					render(view: "create", model: [observationInstance: observationInstance])
@@ -157,39 +166,6 @@ class ObservationController {
 		}
 		else {
 			render(view: "create", model: [observationInstance: observationInstance, 'springSecurityService':springSecurityService])
-		}
-	}
-
-	@Secured(['ROLE_USER'])
-	def update1 = {
-		def observationInstance = Observation.get(params.id)
-		if (observationInstance) {
-			if (params.version) {
-				def version = params.version.toLong()
-				if (observationInstance.version > version) {
-
-					observationInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [
-						message(code: 'observation.label', default: 'Observation')]
-					as Object[], "Another user has updated this Observation while you were editing")
-					render(view: "edit", model: [observationInstance: observationInstance])
-					return
-				}
-			}
-			observationInstance.properties = params
-			try {
-				if (!observationInstance.hasErrors() && observationInstance.save(flush: true)) {
-					flash.message = "${message(code: 'default.updated.message', args: [message(code: 'observation.label', default: 'Observation'), observationInstance.id])}"
-					redirect(action: "show", id: observationInstance.id)
-				}
-				else {
-					render(view: "edit", model: [observationInstance: observationInstance])
-				}}catch(e) {
-				render(view: "edit", model: [observationInstance: observationInstance])
-			}
-		}
-		else {
-			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
-			redirect(action: "list")
 		}
 	}
 
@@ -319,6 +295,12 @@ class ObservationController {
 			def observationInstance = Observation.get(params.obvId);
 			log.debug params;
 			try {
+				if(!recommendationVoteInstance){
+					//saving max voted species name for observation instance needed when observation created without species name
+					observationInstance.calculateMaxVotedSpeciesName();
+					redirect(action: "show", id: observationInstance.id);
+				}
+				
 				if (!recommendationVoteInstance.hasErrors() && recommendationVoteInstance.save(flush: true)) {
 					log.debug "Successfully added reco vote : "+recommendationVoteInstance
 					
@@ -326,7 +308,7 @@ class ObservationController {
 					observationInstance.calculateMaxVotedSpeciesName();
 					
 					//sending mail to user
-					observationService.sendAddRecommendationMail(params.author);
+					sendNotificationMail(SPECIES_RECOMMENDED, observationInstance, request);
 					
 					redirect(action: "show", id: observationInstance.id);
 				}
@@ -362,17 +344,24 @@ class ObservationController {
 			def observationInstance = Observation.get(params.obvId);
 			log.debug params;
 			try {
+				if(!recommendationVoteInstance){
+					def result = ['votes':params.int('currentVotes')];
+					render result as JSON;
+					return
+				}
+				
 				if (recommendationVoteInstance.save(flush: true)) {
 					log.debug "Successfully added reco vote : "+recommendationVoteInstance
 					success = true;
 					
-					//sending mail to user
-					observationService.sendAddRecommendationMail(params.author);
-					
 					observationInstance.calculateMaxVotedSpeciesName();
+					
+					//sending mail to user
+					sendNotificationMail(SPECIES_AGREED_ON, observationInstance, request);
 					
 					def result = ['votes':++params.int('currentVotes')];
 					render result as JSON;
+					
 				}
 				else {
 					recommendationVoteInstance.errors.allErrors.each { log.error it }
@@ -491,5 +480,74 @@ class ObservationController {
         
 		render (template:"/common/observation/showObservationSnippetTabletTemplate", model:[observationInstance:observationInstance]);
         }
+		
+	private sendNotificationMail(String notificationType, Observation obv, request){
+		//(commented / recommended a species name/ agreed on a species suggested)
+		
+		if(!obv.author.sendNotification){
+			log.debug "Not sending any notification mail for user " + obv.author.id
+			return
+		}
+		
+		def conf = SpringSecurityUtils.securityConfig
+		def obvUrl = generateLink("observation", "show", ["id": obv.id], request)
+		def userProfileUrl = generateLink("SUser", "show", ["id": obv.author.id], request)
+		
+		def templateMap = [user: obv.author, obvUrl:obvUrl, userProfileUrl:userProfileUrl]
+		
+		def mailSubject = ""
+		def body = ""
+		
+		if(notificationType == OBSERVATION_ADDED){
+			mailSubject = conf.ui.addObservation.emailSubject
+			body = conf.ui.addObservation.emailBody
+		}else if (notificationType == SPECIES_RECOMMENDED){
+			mailSubject = "Species name suggested"
+			body = conf.ui.addRecommendationVote.emailBody
+			templateMap["currentUser"] = springSecurityService.currentUser
+			templateMap["currentActivity"] = "recommended a species name"
+		}else{
+			mailSubject = "Species name suggested"
+			body = conf.ui.addRecommendationVote.emailBody
+			templateMap["currentUser"] = springSecurityService.currentUser
+			templateMap["currentActivity"] = "agreed on a species suggested"
+		}
+		if (body.contains('$')) {
+			body = evaluate(body, templateMap)
+		}
+		
+		mailService.sendMail {
+			to obv.author.email
+			from conf.ui.notification.emailFrom
+			subject mailSubject
+			html body.toString()
+		}
+	}
+//
+//	private sendAddObservationMail(Observation obv, request){
+//		def conf = SpringSecurityUtils.securityConfig
+//		def body = conf.ui.addObservation.emailBody
+//		def obvUrl = generateLink("observation", "show", ["id": obv.id], request)
+//		def userProfileUrl = generateLink("SUser", "show", ["id": obv.author.id], request)
+//				
+//		if (body.contains('$')) {
+//			body = evaluate(body, [user: obv.author, obvUrl:obvUrl, userProfileUrl:userProfileUrl])
+//		}
+//		mailService.sendMail {
+//			to obv.author.email
+//			from conf.ui.notification.emailFrom
+//			subject conf.ui.addObservation.emailSubject
+//			html body.toString()
+//		}
+//	}
 
+	private String generateLink( String controller, String action, linkParams, request) {
+		createLink(base: "$request.scheme://$grailsApplication.config.speciesPortal.domain$request.contextPath",
+				controller:controller, action: action,
+				params: linkParams)
+	}
+	
+	private String evaluate(s, binding) {
+		new SimpleTemplateEngine().createTemplate(s).make(binding)
+	}
 }

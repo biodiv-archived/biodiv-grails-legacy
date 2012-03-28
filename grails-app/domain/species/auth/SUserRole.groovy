@@ -1,11 +1,14 @@
 package species.auth
 
 import org.apache.commons.lang.builder.HashCodeBuilder
+import org.apache.commons.logging.LogFactory;
 
 class SUserRole implements Serializable {
 
 	SUser sUser
 	Role role
+	
+	private static final log = LogFactory.getLog(this);
 
 	boolean equals(other) {
 		if (!(other instanceof SUserRole)) {
@@ -29,7 +32,11 @@ class SUserRole implements Serializable {
 	}
 
 	static SUserRole create(SUser sUser, Role role, boolean flush = false) {
-		new SUserRole(sUser: sUser, role: role).save(flush: flush, insert: true)
+		//new SUserRole(sUser: sUser, role: role).save(flush: flush, insert: true)
+		def sUserRole = new SUserRole(sUser: sUser, role: role); 
+		if(!sUserRole.save(flush: flush)) {
+			log.error sUserRole.errors.allErrors.each { log.error it }
+		}
 	}
 
 	static boolean remove(SUser sUser, Role role, boolean flush = false) {

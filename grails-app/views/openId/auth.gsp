@@ -130,9 +130,21 @@ td.openid-submit {
 										style="background-image: url('../images/external_providers.png'); background-position: 0 -33px; width: 100px; height: 33px; cursor: pointer; background-color: #ffffff; border: 0;" />
 								</form>
 							</div>
-							<div class="sign_in_external_bttn"
+							
+							<div class="sign_in_external_bttn">
+								<form action='${openIdPostUrl}' method='POST' autocomplete='off'
+									name='openIdLoginForm'>
+									<input type="hidden" name="${openidIdentifier}"
+										class="yahoo openid-identifier"
+										value="http://me.yahoo.com/" /> <input
+										type="submit" value=""
+										style="background-image: url('../images/external_providers.png'); background-position: 0 -99px; width: 100px; height: 33px; cursor: pointer; background-color: #ffffff; border: 0;" />
+								</form>
+							</div>
+							
+							<!-- div class="sign_in_external_bttn"
 								style="background-image: url('../images/external_providers.png'); background-position: 0 -133px; width: 100px; height: 33px; cursor: pointer;"
-								onclick="showOpenIdForm();"></div>
+								onclick="showOpenIdForm();"></div-->
 						</div>
 
 						<!-- div id='openidLogin' style="display: none; clear: both">
@@ -157,19 +169,19 @@ td.openid-submit {
 
 						<div id='formLogin' style='clear: both'>
 
-							<form action='${daoPostUrl}' method='POST' autocomplete='off'
+							<form action='${daoPostUrl}' method='POST'
 								name='loginForm'>
 								<table class="openid-loginbox-userpass">
 									<tr>
 										<td colspan=2>Or, sign in with your user account</td>
 									</tr>
 									<tr>
-										<td><span style="font-weight: bold;">Username</span></td>
+										<td><label for="username" style="font-weight: bold;"><g:message code='spring.security.ui.login.username'/></label></td>
 										<td><input type="text" name='j_username' id='username' />
 										</td>
 									</tr>
 									<tr>
-										<td><span style="font-weight: bold;">Password</span></td>
+										<td><label for="password" style="font-weight: bold;"><g:message code='spring.security.ui.login.password'/></label></td>
 										<td><input type="password" name='j_password'
 											id='password' /></td>
 									</tr>
