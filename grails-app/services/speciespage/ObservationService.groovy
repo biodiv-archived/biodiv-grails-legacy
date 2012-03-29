@@ -337,12 +337,12 @@ class ObservationService {
 	}
 
 	List findAllTagsSortedByObservationCount(int max){
-		def tag_ids = TagLink.executeQuery("select tag.id from TagLink group by tag_id order by count(tag_id) desc", [max:max]);
+		def sql =  Sql.newInstance(dataSource);
+		String query = "select t.name as name from tag_links as tl, tags as t, observation obv where tl.tag_ref = obv.id and obv.is_deleted = false and t.id = tl.tag_id group by t.name order by count(t.name) desc limit " + max ;
 		def tags = []
-
-		for (tag_id in tag_ids){
-			tags.add(Tag.get(tag_id).name);
-		}
+		sql.rows(query).each{
+			tags.add(it.getProperty("name"));
+		};
 		return tags;
 	}
 
