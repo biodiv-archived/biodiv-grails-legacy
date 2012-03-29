@@ -18,12 +18,6 @@
 
 .iAgree {
 	float: right;
-	background-color: #F8F8F8;
-	background-image: -moz-linear-gradient(center top, #F8F8F8, #ECECEC);
-	border: 1px solid #C6C6C6;
-	border-radius: 2px 2px 2px 2px;
-	display: block;
-	padding: 3px;
 }
 
 .users {
@@ -55,7 +49,7 @@
 						<i>${r.name}</i>
 					</g:else> </span>
 			</div>
-			<div class="iAgree">
+			<div class="iAgree btn btn-primary btn-small">
 				<g:remoteLink action="addAgreeRecommendationVote"
 					method="GET"
 					controller="observation"
