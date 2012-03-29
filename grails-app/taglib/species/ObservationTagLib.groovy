@@ -82,8 +82,8 @@ class ObservationTagLib {
 	}
 	
 	def showTagsList = {attrs, body->
-			def tagsResult = observationService.findAllTagsSortedByObservationCount(50);
-			out << render(template:"/common/observation/showTagsListTemplate", model:tagsResult);
+			def tags = observationService.findAllTagsSortedByObservationCount(50);
+			out << render(template:"/common/observation/showTagsListTemplate", model:[tags:tags]);
 	}
 	
 	def showTagsCloud = {attrs, body->

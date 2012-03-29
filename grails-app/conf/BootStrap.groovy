@@ -26,7 +26,7 @@ class BootStrap {
 		initDefs();
 		initUsers();
 		//initGroups();
-		//initNames();
+		initNames();
 		initFilters();
 	}
 

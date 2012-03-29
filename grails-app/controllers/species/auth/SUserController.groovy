@@ -151,7 +151,7 @@ class SUserController extends UserController {
 	def userSearch = {
 
 		boolean useOffset = params.containsKey('offset')
-		setIfMissing 'max', 10, 100
+		setIfMissing 'max', 12, 100
 		setIfMissing 'offset', 0
 
 		def hql = new StringBuilder('FROM ').append(lookupUserClassName()).append(' u WHERE 1=1 ')

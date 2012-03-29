@@ -337,7 +337,7 @@ class ObservationService {
 	}
 
 
-	Map findAllTagsSortedByObservationCount(int max){
+	List findAllTagsSortedByObservationCount(int max){
 		def sql =  Sql.newInstance(dataSource);
 		String query = "select t.name as name from tag_links as tl, tags as t, observation obv where tl.tag_ref = obv.id and obv.is_deleted = false and t.id = tl.tag_id group by t.name order by count(t.name) desc limit " + max ;
 		def tags = []
