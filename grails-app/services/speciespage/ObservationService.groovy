@@ -56,7 +56,7 @@ class ObservationService {
 		observation.notes = params.notes;
 		observation.observedOn = params.observedOn? Date.parse("MM/dd/yyyy", params.observedOn):new Date();
 		observation.placeName = params.place_name;
-		observation.reverseGeocodedName = params.place_name;
+		observation.reverseGeocodedName = params.reverse_geocoded_name;
 		observation.location = 'POINT(' + params.longitude + ' ' + params.latitude + ')'
 		observation.latitude = Float.parseFloat(params.latitude);
 		observation.longitude = Float.parseFloat(params.longitude);
