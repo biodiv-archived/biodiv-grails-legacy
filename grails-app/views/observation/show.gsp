@@ -56,7 +56,9 @@ width:90%;
 			<div class="span8" style="margin:0;">
 				
 				<div class="grid_10">
-					<h3><obv:showSpeciesName model="['observationInstance':observationInstance]" /></h3>
+                                        <div class="page-header">
+					    <h1><obv:showSpeciesName model="['observationInstance':observationInstance]" /></h1>
+                                        </div>
 
 							<div id="gallery1">
 								<g:if test="${observationInstance.resource}">
@@ -86,11 +88,39 @@ width:90%;
 					
 				</div>
                                 
-                                <div class="span4" style="margin:0;">
+                                <div style="margin:0;">
 				    <obv:showStory model="['observationInstance':observationInstance]" />
                                 </div>
-                                <div class="span4">
-	                            <div class="grid_5 recommendations">
+  					
+				<div class="span8 comments" style="margin:0;">
+					<fb:like send="true" width="450" show_faces="true"></fb:like>
+					<div class="fb-comments grid_10"
+						data-href="${createLink(controller:'observation', action:'show', id:observationInstance.id, absolute:true)}"
+						data-num-posts="10"></div>
+				</div>
+				
+						</div>
+
+
+			<div class="span4">
+                                
+                            <div>
+				<a class="btn btn-large" href="${createLink(controller:'observation', action:'edit', id:observationInstance.id, absolute:true)}"> Edit Observation </a>
+				<a class="btn btn-danger btn-large" href="${createLink(controller:'observation', action:'flagDeleted', id:observationInstance.id, absolute:true)}"> Delete Observation </a>
+			    </div>
+<%--				--%>
+<%--				<div class="buttons">--%>
+<%--                    <span class="button"><g:actionSubmit class="delete" action="flagDeleted" value="${message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" /></span>--%>
+<%--                </div>--%>
+
+                                <div class="sidebar_section"> 
+				    <obv:showLocation
+					model="['observationInstance':observationInstance]" />
+                                </div>        
+
+				<!-- obv:showRating model="['observationInstance':observationInstance]" /-->
+				<!--  static species content -->
+                                <div class="grid_5 recommendations sidebar_section">
 					<div>
 						<div><!-- g:message code="recommendations.no.message"
 								,  args="[result.size()]" /-->
@@ -124,47 +154,22 @@ width:90%;
 						</div>
 					</div>
 				</div>
+                               
+                                <div class="sidebar_super_section">
+                                    <h3>Related observations</h3>
 
-
+                                    <div class="sidebar_section tile">
+                                        <div class="title">Nearby observations</div>	
+                                        <obv:showRelatedStory model="['observationInstance':observationInstance, 'observationId': observationInstance.id, 'controller':'observation', 'action':'getRelatedObservation', 'filterProperty': 'nearBy', 'id':'nearBy']" />
+                                    </div>
+                                    <div class="grid_5 sidebar_section tile" style="clear:both">
+                                    <div class="title">Other observations of the same species</div>	
+                                    <obv:showRelatedStory model="['observationInstance':observationInstance, 'observationId': observationInstance.id, 'controller':'observation', 'action':'getRelatedObservation', 'filterProperty': 'speciesName', 'id':'a']" />
+                                    </div>
                                 </div>
-  					
-				<div class="span8 comments" style="margin:0;">
-					<fb:like send="true" width="450" show_faces="true"></fb:like>
-					<div class="fb-comments grid_10"
-						data-href="${createLink(controller:'observation', action:'show', id:observationInstance.id, absolute:true)}"
-						data-num-posts="10"></div>
-				</div>
-				
-						</div>
-
-
-			<div class="span4">
-                                
-                            <div>
-				<a class="btn btn-large" href="${createLink(controller:'observation', action:'edit', id:observationInstance.id, absolute:true)}"> Edit Observation </a>
-				<a class="btn btn-danger btn-large" href="${createLink(controller:'observation', action:'flagDeleted', id:observationInstance.id, absolute:true)}"> Delete Observation </a>
-			    </div>
-<%--				--%>
-<%--				<div class="buttons">--%>
-<%--                    <span class="button"><g:actionSubmit class="delete" action="flagDeleted" value="${message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" /></span>--%>
-<%--                </div>--%>
-
-                                
-				<obv:showLocation
-					model="['observationInstance':observationInstance]" />
-
-				<!-- obv:showRating model="['observationInstance':observationInstance]" /-->
-				<!--  static species content -->
-				<div class="grid_5 sidebar_section" style="clear:both">
-				<h6>Nearby observations</h6>	
-				<obv:showRelatedStory model="['observationInstance':observationInstance, 'observationId': observationInstance.id, 'controller':'observation', 'action':'getRelatedObservation', 'filterProperty': 'nearBy', 'id':'nearBy']" />
-				</div>
-				<div class="grid_5 sidebar_section" style="clear:both">
-				<h6>Other observations of the same species</h6>	
-				<obv:showRelatedStory model="['observationInstance':observationInstance, 'observationId': observationInstance.id, 'controller':'observation', 'action':'getRelatedObservation', 'filterProperty': 'speciesName', 'id':'a']" />
-				</div>
 				<!-- obv:showTagsSummary model="['observationInstance':observationInstance]" /-->
 				<!-- obv:showObvStats  model="['observationInstance':observationInstance]"/-->
+
 			</div>
 
 
