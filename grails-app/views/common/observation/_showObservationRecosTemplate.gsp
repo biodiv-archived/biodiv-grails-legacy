@@ -71,7 +71,7 @@
 
 			<div class="users">
 				<g:each in="${r.authors}" var="author">
-					<g:link controller="sUser" action="show" id="${author?.id}">
+					<g:link controller="SUser" action="show" id="${author?.id}">
 						<img class="very_small_profile_pic"
 							src="${author?.icon()}"
 							title="${author.username}" />

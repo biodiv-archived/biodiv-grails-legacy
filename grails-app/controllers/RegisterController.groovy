@@ -4,13 +4,30 @@ import org.codehaus.groovy.grails.plugins.springsecurity.ui.RegistrationCode;
 import org.springframework.security.web.savedrequest.DefaultSavedRequest;
 import org.codehaus.groovy.grails.plugins.springsecurity.openid.OpenIdAuthenticationFailureHandler as OIAFH
 
+import com.the6hours.grails.springsecurity.facebook.FacebookAuthToken;
+
 class RegisterController extends grails.plugins.springsecurity.ui.RegisterController {
 
 	def SUserService;
-
+	def facebookAuthService;
+	def springSecurityService;
+	def openIDAuthenticationFilter;
+	
 	def index = {
+		if (springSecurityService.isLoggedIn()) {
+			redirect uri: SpringSecurityUtils.securityConfig.successHandler.defaultTargetUrl
+			return;
+		}
+		
+		def config = SpringSecurityUtils.securityConfig
 		if(flash.chainedParams?.command) {
-			['command': flash.chainedParams?.command]
+			['command': flash.chainedParams?.command, 
+				openIdPostUrl: "${request.contextPath}$openIDAuthenticationFilter.filterProcessesUrl",
+				daoPostUrl:    "${request.contextPath}${config.apf.filterProcessesUrl}",
+				persistentRememberMe: config.rememberMe.persistent,
+				rememberMeParameter: config.rememberMe.parameter,
+				openidIdentifier: config.openid.claimedIdentityFieldName
+				]
 		} else {
 			log.debug("Registration : $flash.chainedParams");
 			def copy = [:] + (flash.chainedParams ?: [:])
@@ -19,12 +36,22 @@ class RegisterController extends grails.plugins.springsecurity.ui.RegisterContro
 			}
 			copy.remove 'controller'
 			copy.remove 'action'
-			['command': new RegisterCommand(copy)]
+			['command': new RegisterCommand(copy), 
+				openIdPostUrl: "${request.contextPath}$openIDAuthenticationFilter.filterProcessesUrl",
+					daoPostUrl:    "${request.contextPath}${config.apf.filterProcessesUrl}",
+					persistentRememberMe: config.rememberMe.persistent,
+					rememberMeParameter: config.rememberMe.parameter,
+					openidIdentifier: config.openid.claimedIdentityFieldName]
 		}
 	}
 	
 	def register = { RegisterCommand command ->
 
+		if (springSecurityService.isLoggedIn()) {
+			redirect uri: SpringSecurityUtils.securityConfig.successHandler.defaultTargetUrl
+			return;
+		}
+		
 		def conf = SpringSecurityUtils.securityConfig
 		if (command.hasErrors()) {
 			render view: 'index', model: [command: command]
@@ -36,7 +63,14 @@ class RegisterController extends grails.plugins.springsecurity.ui.RegisterContro
 		if(command.openId) {
 			user.accountLocked = false;
 			user.addToOpenIds(url: command.openId);
+			user.password = "openIdPassword"
+			
 			SUserService.save(user);
+			
+			if(command.facebookToken) {
+				facebookAuthService.registerFacebookUser command.token, user
+			}
+			
 			SUserService.assignRoles(user);
 		} else {
 			user.accountLocked = true;
@@ -63,7 +97,11 @@ class RegisterController extends grails.plugins.springsecurity.ui.RegisterContro
 	}
 
 	def verifyRegistration = {
-
+		if (springSecurityService.isLoggedIn()) {
+			redirect uri: SpringSecurityUtils.securityConfig.successHandler.defaultTargetUrl
+			return;
+		}
+		
 		def conf = SpringSecurityUtils.securityConfig
 		String defaultTargetUrl = conf.successHandler.defaultTargetUrl
 		String usernamePropertyName = conf.userLookup.usernamePropertyName
@@ -77,7 +115,6 @@ class RegisterController extends grails.plugins.springsecurity.ui.RegisterContro
 			return
 		}
 
-		println registrationCode
 		def user
 		RegistrationCode.withTransaction { status ->
 			user = lookupUserClass().findWhere((usernamePropertyName): registrationCode.username)
@@ -104,7 +141,12 @@ class RegisterController extends grails.plugins.springsecurity.ui.RegisterContro
 	}
 
 	def forgotPassword = {
-
+		
+		if (springSecurityService.isLoggedIn()) {
+			redirect uri: SpringSecurityUtils.securityConfig.successHandler.defaultTargetUrl
+			return;
+		}
+		
 		if (!request.post) {
 			// show the form
 			return
@@ -206,7 +248,7 @@ class RegisterController extends grails.plugins.springsecurity.ui.RegisterContro
 		}
 	}
 
-	void registerAndEmail(String username, String email) {
+	protected void registerAndEmail(String username, String email) {
 		RegistrationCode registrationCode = SUserService.register(email)
 
 		if (registrationCode == null || registrationCode.hasErrors()) {
@@ -229,7 +271,7 @@ class RegisterController extends grails.plugins.springsecurity.ui.RegisterContro
 			subject conf.ui.register.emailSubject
 			html body.toString()
 		}
-
+		clearRegistrationInfoFromSession()
 	}
 	
 	
@@ -239,10 +281,9 @@ class RegisterController extends grails.plugins.springsecurity.ui.RegisterContro
 	 *
 	 * @param username the user's login name
 	 */
-	private void authenticateAndRedirect(String username) {
-		session.removeAttribute OIAFH.LAST_OPENID_USERNAME
-		session.removeAttribute OIAFH.LAST_OPENID_ATTRIBUTES
-
+	protected void authenticateAndRedirect(String username) {
+		clearRegistrationInfoFromSession()
+		
 		springSecurityService.reauthenticate username
 
 		def config = SpringSecurityUtils.securityConfig
@@ -256,6 +297,11 @@ class RegisterController extends grails.plugins.springsecurity.ui.RegisterContro
 		}
 	}
 
+	private void clearRegistrationInfoFromSession() {
+		session.removeAttribute OIAFH.LAST_OPENID_USERNAME
+		session.removeAttribute OIAFH.LAST_OPENID_ATTRIBUTES
+		session.removeAttribute "LAST_FACEBOOK_USER"
+	}
 }
 
 
@@ -271,6 +317,7 @@ class RegisterCommand {
 	String location;
 	String profilePic;
 	String openId;
+	FacebookAuthToken facebookToken;
 
 	def grailsApplication
 
@@ -293,10 +340,7 @@ class RegisterCommand {
 	 */
 	@Override
 	public String toString() {
-		return "RegisterCommand [username=" + username + ", email=" + email
-		+ ", name=" + name + ", website=" + website + ", timezone="
-		+ timezone + ", aboutMe=" + aboutMe + ", location=" + location
-		+ ", profilePic=" + profilePic + "]";
+		return this.properties.toString();
 	}
 }
 

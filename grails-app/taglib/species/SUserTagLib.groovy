@@ -24,5 +24,9 @@ class SUserTagLib {
 		   out << body()
 	   }
    }
+   
+   def externalAuthProviders = {attrs, body ->
+		out << render(template:"/common/auth/externalProvidersTemplate", model:attrs.model);
+	}
 	
 }

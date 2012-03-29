@@ -49,11 +49,14 @@
 					</g:link>
 					<div class="prop">
 						<span class="name">Member since </span> <span class="value">
-							${fieldValue(bean: SUserInstance, field: "dateCreated")} </span>
+						<g:formatDate format="yyyy-MM-dd" date="${fieldValue(bean: SUserInstance, field: "dateCreated")}" type="datetime" style="SHORT"/>
+						
+							 </span>
 					</div>
 					<div class="prop">
 						<span class="name">Last visited </span> <span class="value">
-							${fieldValue(bean: SUserInstance, field: "lastLoginDate")} </span>
+						<g:formatDate format="yyyy-MM-dd" date="${fieldValue(bean: SUserInstance, field: "lastLoginDate")}" type="datetime" style="SHORT"/>
+							 </span>
 					</div>
 				</div>
 
@@ -95,13 +98,9 @@
 
 
 			</div>
-
-			<div class="observation_links grid_15">
-				<a
-					href="${createLink(controller:'observation', action: 'list', params: [userId: fieldValue(bean: SUserInstance, field: "id")])}">All
-					observations</a>
-			</div>
-
+			
+			<br/>
+			
 			<div class="grid_15 userCreatedObservations" style="clear: both">
 				<obv:showRelatedStory
 					model="['controller':'observation', 'action':'getRelatedObservation', 'filterProperty': 'user', 'filterPropertyValue':SUserInstance.id, 'id':'a']" />

@@ -18,7 +18,7 @@
             </g:each>
         </div>       
     </div>
-    <g:if test="${observationInstanceTotal > queryParams.max}">
+    <g:if test="${observationInstanceTotal > queryParams?.max}">
         <div class="button loadMore"><span class="progress" style="display:none;">
             <img src="${resource(dir:'images',file:'spinner.gif', absolute:true)}"/>Loading ... </span>
             <span class="buttonTitle">Load more</span>

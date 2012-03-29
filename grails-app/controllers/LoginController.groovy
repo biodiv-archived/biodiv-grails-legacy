@@ -1,32 +1,17 @@
 import grails.converters.JSON
 
-import javax.servlet.http.Cookie;
+import javax.servlet.http.Cookie
 import javax.servlet.http.HttpServletResponse
 
 import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
-
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.authentication.AccountExpiredException
 import org.springframework.security.authentication.CredentialsExpiredException
 import org.springframework.security.authentication.DisabledException
 import org.springframework.security.authentication.LockedException
 import org.springframework.security.core.context.SecurityContextHolder as SCH
-import org.springframework.security.web.DefaultRedirectStrategy;
+import org.springframework.security.web.DefaultRedirectStrategy
 import org.springframework.security.web.WebAttributes
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
-import org.springframework.social.facebook.api.Facebook;
-import org.springframework.social.facebook.api.FacebookProfile;
-import org.springframework.social.facebook.api.ImageType;
-import org.springframework.social.facebook.api.impl.FacebookTemplate;
-import org.springframework.social.oauth2.Spring30OAuth2RequestFactory;
-import org.springframework.social.support.ClientHttpRequestFactorySelector;
-
-import grails.plugins.springsecurity.Secured
-
-import species.auth.FacebookUser;
-import species.auth.Role;
-import species.auth.SUser;
-import species.auth.SUserRole;
 
 class LoginController {
 
