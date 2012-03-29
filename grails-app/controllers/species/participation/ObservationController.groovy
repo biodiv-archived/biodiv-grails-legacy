@@ -296,9 +296,7 @@ class ObservationController {
 					//saving max voted species name for observation instance needed when observation created without species name
 					observationInstance.calculateMaxVotedSpeciesName();
 					redirect(action: "show", id: observationInstance.id);
-				}
-
-				if (!recommendationVoteInstance.hasErrors() && recommendationVoteInstance.save(flush: true)) {
+				}else if(!recommendationVoteInstance.hasErrors() && recommendationVoteInstance.save(flush: true)) {
 					log.debug "Successfully added reco vote : "+recommendationVoteInstance
 
 					//saving max voted species name for observation instance
@@ -344,10 +342,7 @@ class ObservationController {
 				if(!recommendationVoteInstance){
 					def result = ['votes':params.int('currentVotes')];
 					render result as JSON;
-					return
-				}
-
-				if (recommendationVoteInstance.save(flush: true)) {
+				}else if(recommendationVoteInstance.save(flush: true)) {
 					log.debug "Successfully added reco vote : "+recommendationVoteInstance
 					success = true;
 

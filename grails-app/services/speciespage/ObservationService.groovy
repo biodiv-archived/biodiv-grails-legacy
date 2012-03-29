@@ -242,7 +242,7 @@ class ObservationService {
 	 */
 	Map getRelatedObservationBySpeciesNames(List<String> speciesNames, long obvId, int limit, long offset){
 		if(!speciesNames) {
-			return [:];
+			return ["observations":[], "count":0];
 		}
 		def recIds = Recommendation.executeQuery("select rec.id from Recommendation as rec where rec.name in (:speciesNames)", [speciesNames:speciesNames]);
 		def countQuery = "select count(*) from RecommendationVote recVote where recVote.recommendation.id in (:recIds) and recVote.observation.id != :parentObv and recVote.observation.isDeleted = :isDeleted"
@@ -405,7 +405,7 @@ class ObservationService {
 
 		def sql =  Sql.newInstance(dataSource);
 
-		def resultSet = sql.rows("select g2.id,  ROUND(ST_Distance_Sphere(g1.st_geomfromtext, g2.st_geomfromtext)/1000) as distance from observation_locations as g1, observation_locations as g2 where g1.id = :observationId and g1.id <> g2.id order by ST_Distance(g1.st_geomfromtext, g2.st_geomfromtext) limit :max", [observationId: Integer.parseInt(observationId), max:limit])
+		def resultSet = sql.rows("select g2.id,  ROUND(ST_Distance_Sphere(g1.st_geomfromtext, g2.st_geomfromtext)/1000) as distance from observation_locations as g1, observation_locations as g2 where g2.is_deleted = false and g1.id = :observationId and g1.id <> g2.id order by ST_Distance(g1.st_geomfromtext, g2.st_geomfromtext) limit :max", [observationId: Integer.parseInt(observationId), max:limit])
 
 		def nearbyObservations = []
 
@@ -413,7 +413,7 @@ class ObservationService {
 			nearbyObservations.add(["observation":Observation.findById(row.getProperty("id")), "title":"Found "+row.getProperty("distance")+" km away"])
 		}
 
-		return ["observations":createUrlList2(nearbyObservations)]
+		return ["observations":nearbyObservations, "count":nearbyObservations.size()]
 	}
 
 	Set getAllTagsOfUser(userId){
