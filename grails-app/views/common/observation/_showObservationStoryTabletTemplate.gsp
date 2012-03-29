@@ -79,14 +79,11 @@
 	<sUser:showUserSnippet model="['userInstance':observationInstance.author]"/>
 
 
-
-	<br />
-
-	<div class="more_info"
+	<!--div class="more_info"
 		style="position: absolute; display: none; background-color: #fbfbfb; width: 200px; z-index: 2; box-shadow: 0 8px 6px -6px black;">
 		<obv:showTagsSummary
 			model="['observationInstance':observationInstance]" />
-	</div>
+	</div-->
 </div>
 
 
