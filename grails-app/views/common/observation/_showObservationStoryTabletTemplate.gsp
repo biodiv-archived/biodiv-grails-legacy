@@ -66,7 +66,7 @@
 	<div class="prop tablet">
 		<span class="name tablet">Last Update</span>
 		<obv:showDate
-			model="['observationInstance':observationInstance, 'propertyName':'lastUpdated']" />
+			model="['observationInstance':observationInstance, 'propertyName':'lastRevised']" />
 	</div>
 
 	<div class="prop tablet">
