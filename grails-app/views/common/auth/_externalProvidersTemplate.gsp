@@ -1,6 +1,6 @@
 
 <div class="external_providers">
-	${title} with:<br />
+	With:<br />
 	<div class="sign_in_external_bttn"
 		style="background-image: url('../images/external_providers.png'); background-position: 0 0; width: 100px; height: 33px; cursor: pointer; margin-left: 6px;">
 		<!-- div class="fb-login-button"

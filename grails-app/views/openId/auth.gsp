@@ -18,12 +18,12 @@
 			<table class='openid-loginbox-inner' cellpadding="0" cellspacing="0">
 				<tr>
 					<td class="openid-loginbox-title" align="left">
-						Sign in
+						<g:message code="springSecurity.login.title" default="Log in"/>
 					</td>
 				</tr>
 				<tr>
 					<td>
-						<sUser:externalAuthProviders model='["openidIdentifier":openidIdentifier, "title":"Log in"]'/>
+						<sUser:externalAuthProviders model='["openidIdentifier":openidIdentifier]'/>
 
 						<div id='formLogin' style='clear: both'>
 
