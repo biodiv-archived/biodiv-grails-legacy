@@ -158,7 +158,7 @@ class SUserController extends UserController {
 		def queryParams = [:]
 
 		def userLookup = SpringSecurityUtils.securityConfig.userLookup
-		String usernameFieldName = userLookup.usernamePropertyName
+		String usernameFieldName = 'username'
 
 		for (name in [username: usernameFieldName]) {
 			if (params[name.key]) {
@@ -223,7 +223,7 @@ class SUserController extends UserController {
 
 		if (params.term?.length() > 2) {
 			String username = params.term
-			String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
+			String usernameFieldName = 'username';//SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
 
 			setIfMissing 'max', 10, 100
 

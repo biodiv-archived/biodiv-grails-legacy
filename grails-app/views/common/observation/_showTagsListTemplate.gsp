@@ -9,4 +9,12 @@
 			</li>
 		</g:each>
 	</ul>
+	<g:javascript>
+	$(document).ready(function() {
+		 $("li.tagit-choice").click(function(){
+         	var tg = $(this).contents().first().text();
+         	window.location.href = "${g.createLink(controller:'observation', action: 'list')}/?tag=" + tg ;
+         });
+	})
+</g:javascript>
 </div>

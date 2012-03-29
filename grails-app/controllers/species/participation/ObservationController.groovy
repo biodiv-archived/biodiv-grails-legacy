@@ -458,7 +458,8 @@ class ObservationController {
 	 */
 
 	protected Map getRelatedObservations(params) {
-		def max = Math.min(params.max ? params.int('max') : 3, 100)
+		log.debug params;
+		def max = Math.min(params.limit ? params.int('limit') : 3, 100)
 
 		def offset = params.offset ? params.int('offset') : 0
 

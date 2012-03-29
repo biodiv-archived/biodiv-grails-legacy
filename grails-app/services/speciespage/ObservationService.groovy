@@ -389,7 +389,7 @@ class ObservationService {
 		return resources;
 	}
 
-	List findAllTagsSortedByObservationCount(int max){
+	Map findAllTagsSortedByObservationCount(int max){
 
 		def tag_ids = TagLink.executeQuery("select tag.id from TagLink group by tag_id order by count(tag_id) desc", [max:max]);
 
@@ -398,7 +398,13 @@ class ObservationService {
 		for (tag_id in tag_ids){
 			tags.add(Tag.get(tag_id).name);
 		}
-		return tags;
+		
+		return ['tags':tags];
+	}
+	
+	def getNoOfTags() {
+		def count = TagLink.executeQuery("select count(*) from TagLink group by tag_id");
+		return count.size()
 	}
 
 	Map getNearbyObservations(String observationId, int limit){
@@ -417,10 +423,12 @@ class ObservationService {
 	}
 
 	Set getAllTagsOfUser(userId){
+		Observation.withTransaction { status -> 
 		List obvs = Observation.findAll("from Observation as obv where obv.author.id = :userId and obv.isDeleted = :isDeleted", [userId :userId, isDeleted:false]);
 		Set tagSet = new HashSet();
 		obvs.each{ tagSet.addAll(it.tags) }
 		return tagSet;
+		}
 	}
 
 	/**

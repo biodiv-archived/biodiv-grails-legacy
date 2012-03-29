@@ -259,12 +259,6 @@
 		
 		$("ul[name='tags']").tagit({select:true,  tagSource: "${g.createLink(action: 'tags')}"});
          
-         $("li.tagit-choice").click(function(){
-         	var tg = $(this).contents().first().text();
-         	window.location.href = "${g.createLink(action: 'list')}/?tag=" + tg ;
-         });
-         
-	
 		$('#map_view_bttn').click(function(){
 			$('#observations_list_map').toggle(function(){
                             

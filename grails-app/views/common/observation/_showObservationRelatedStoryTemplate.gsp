@@ -83,6 +83,6 @@ $(document).ready(function() {
     </ul> 
 </div>
 <div id="relatedObservationMsg_${id}" style="display:none">
-	<g:link controller="observation" action="create">If you have any observations, please add them here</g:link>
+	<g:link controller="observation" action="create">Add an observation and contribute.</g:link>
 </div>
 

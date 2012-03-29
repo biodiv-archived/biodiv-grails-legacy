@@ -64,7 +64,7 @@
 		</div>
 	</div>
 
-	<sUser:showUserSnippet model="['userInstance':observationInstance.author]"/>
+	<sUser:showUserTemplate model="['userInstance':observationInstance.author]"/>
 
 	<obv:showTagsSummary
 		model="['observationInstance':observationInstance]" />

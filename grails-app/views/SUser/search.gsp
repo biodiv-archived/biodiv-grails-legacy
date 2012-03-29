@@ -4,11 +4,9 @@
 <meta name='layout' content='main' />
 <title><g:message code='spring.security.ui.user.search' />
 </title>
-<style>
-.prop {
-	clear: right;
-}
-</style>
+<g:javascript src="jquery.autopager-1.0.0.js"
+	base="${grailsApplication.config.grails.serverURL+'/js/jquery/'}"></g:javascript>
+
 </head>
 
 <body>
@@ -31,19 +29,13 @@ def queryParams = [username: username, enabled: enabled, accountExpired: account
 %>
 
 					<div class="list grid_16">
-						<g:each in="${results}" status="i" var="user">
-							<sUser:showUserSnippet model="['userInstance':user]" />
-						</g:each>
+						<sUser:showUserList model="['userInstanceList':results, 'userInstanceTotal':totalCount, 'queryParams':queryParams]" />
 					</div>
 
 					<br />
 
-					<div class="paginateButtons">
+					<div class="paginateButtons" style="visibility:hidden; clear: both">
 						<g:paginate total="${totalCount}" params="${queryParams}" />
-					</div>
-
-					<div style="text-align: center">
-						<s2ui:paginationSummary total="${totalCount}" />
 					</div>
 
 				</g:if>

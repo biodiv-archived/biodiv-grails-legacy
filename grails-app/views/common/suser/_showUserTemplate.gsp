@@ -4,8 +4,8 @@
 				src="${userInstance.icon()}" class="small_profile_pic"
 				title="${userInstance.username}" /> </a>
 		</div>
-		<div class="username-value">
-			<a href=/biodiv/SUser/show/${userInstance.id}> ${userInstance.username}
-			</a>
+		
+		<div class="all_content username-value" >
+			<sUser:showUserStoryTablet model="['userInstance':userInstance]"></sUser:showUserStoryTablet>
 		</div>
 </div>

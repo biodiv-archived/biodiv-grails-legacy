@@ -33,7 +33,7 @@
 		}
 	});
 </g:javascript>
-<h5><g:message code="default.tags.title" default="Tags" /></h5>
+<h5>${count} <g:message code="default.tags.title" default="Tags" /></h5>
 View as 
 <span id="as_list" class="button small">List</span> 
 <span id="as_cloud" class="button small active">Cloud</span>
