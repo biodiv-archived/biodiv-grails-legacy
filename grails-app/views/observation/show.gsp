@@ -96,8 +96,9 @@ width:90%;
 				</div>
 				
 				<div>
-				<a href="${createLink(controller:'observation', action:'edit', id:observationInstance.id, absolute:true)}"> Edit Observation </a>
-				<a href="${createLink(controller:'observation', action:'flagDeleted', id:observationInstance.id, absolute:true)}" onclick="return confirm('${message(code: 'default.observatoin.delete.confirm.message', default: 'This observation will be deleted. Are you sure ?')}');"> Delete Observation </a>
+				<sUser:ifOwns model="['user':observationInstance.author]">
+					<a href="${createLink(controller:'observation', action:'edit', id:observationInstance.id)}"> Edit Observation </a>
+				</sUser:ifOwns>
 				</div>
 <%--				--%>
 <%--				<div class="buttons">--%>

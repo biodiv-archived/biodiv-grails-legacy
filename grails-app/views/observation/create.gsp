@@ -328,6 +328,9 @@
                 </div>
             </div>    
 	        <span> <input class="button button-red" type="submit" name="${form_button_name}" value="${form_button_val}" /> </span>
+	        <g:if test="${observationInstance?.id}">
+	        	<a href="${createLink(controller:'observation', action:'flagDeleted', id:observationInstance.id)}" onclick="return confirm('${message(code: 'default.observatoin.delete.confirm.message', default: 'This observation will be deleted. Are you sure ?')}');"> Delete Observation </a>
+	        </g:if>
 	    </form>
 
         </div>

@@ -65,13 +65,13 @@
 					
 											<div class="info-message" style="clear: both" >
 												Showing <span class="highlight">${observationInstanceTotal} observation<g:if test="${observationInstanceTotal>1}">s</g:if></span>
-												<g:if test="${queryParams.groupId}">
+												<g:if test="${queryParams?.groupId}">
 													of <span class="highlight">${SpeciesGroup.get(queryParams.groupId).name.toLowerCase()}</span> group
 												</g:if>
-												<g:if test="${queryParams.habitat}">
+												<g:if test="${queryParams?.habitat}">
 													in <span class="highlight">${Habitat.get(queryParams.habitat).name.toLowerCase()}</span> habitat
 												</g:if>
-												<g:if test="${queryParams.tag}">
+												<g:if test="${queryParams?.tag}">
 													tagged <span class="highlight">${queryParams.tag}</span>
 												</g:if>
 											</div>

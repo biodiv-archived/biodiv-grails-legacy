@@ -66,11 +66,23 @@ $(document).ready(function() {
 }
 </style>
   <div id="carousel_${id}" class="jcarousel-skin-ie7"> 
+  	<div class="observation_links">
+  		<g:if test="${observationId}">
+		<a
+			href="${createLink(controller:controller, action:'listRelated', params: [id: observationId, filterProperty : filterProperty])}">All
+					observations</a>
+		</g:if><g:else>
+		<a
+			href="${createLink(controller:controller, action:'list', params: [(filterProperty) : filterPropertyValue])}">All
+					observations</a>
+		</g:else>
+					
+	</div>
     <ul> 
       <!-- The content will be dynamically loaded in here --> 
     </ul> 
 </div>
 <div id="relatedObservationMsg_${id}" style="display:none">
-	This is the first observation.
+	<g:link controller="observation" action="create">If you have any observations, please add them here</g:link>
 </div>
 
