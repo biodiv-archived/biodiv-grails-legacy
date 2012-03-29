@@ -1,26 +1,40 @@
 
-<div id="list_view_bttn" class="list_style_button active"></div> 
-<div id="grid_view_bttn" class="grid_style_button"></div>
-<div class="observations_list" class="observation grid_11">
+<div class="btn-group button-bar" data-toggle="buttons-radio" style="float:right;">
+    <button id="list_view_bttn" class="btn list_style_button active"><i class=" icon-th-list"></i></button> 
+    <button id="grid_view_bttn" class="btn grid_style_button"><i class="icon-th"></i></button>
+</div>    
+<div class="observations_list" class="observation grid_11" style="clear:both;">
     <div class="mainContent">
-        <div class="grid_view">
+        <ul class="grid_view thumbnails">
             <g:each in="${observationInstanceList}" status="i"
                     var="observationInstance">
-                    <obv:showSnippetTablet
-                            model="['observationInstance':observationInstance]"></obv:showSnippetTablet>
+                    
+                    <g:if test="${i%3 == 0}"> 
+                        <li class="thumbnail" style="clear:both;">
+                    </g:if>
+                    <g:else>
+                        <li class="thumbnail">
+                    </g:else>
+                        <obv:showSnippetTablet
+                                model="['observationInstance':observationInstance]"></obv:showSnippetTablet>
+                    </li>        
+
             </g:each>
-        </div> 
-        <div class="list_view" style="display:none;">
+        </ul> 
+        <ul class="list_view thumbnails" style="display:none;">
             <g:each in="${observationInstanceList}" status="i"
             var="observationInstance">
-            <obv:showSnippet
-            model="['observationInstance':observationInstance]"></obv:showSnippet>
+
+            <li class="thumbnail" style="clear:both;">
+                <obv:showSnippet
+                    model="['observationInstance':observationInstance]"></obv:showSnippet>
+            </li>        
             </g:each>
-        </div>       
+        </ul>       
     </div>
     <g:if test="${observationInstanceTotal > queryParams.max}">
-        <div class="button loadMore"><span class="progress" style="display:none;">
-            <img src="${resource(dir:'images',file:'spinner.gif', absolute:true)}"/>Loading ... </span>
+        <div class="btn loadMore">
+            <span class="progress" style="display:none;">Loading ... </span>
             <span class="buttonTitle">Load more</span>
         </div>
     </g:if>
@@ -31,15 +45,17 @@
                 		
                 $('#list_view_bttn').click(function(){
 			$('.grid_view').hide();
-			$('.list_view').show();
+			$('.list_view').fadeIn('slow');
 			$(this).addClass('active');
+                        //alert($(this).attr('class'));
 			$('#grid_view_bttn').removeClass('active');
 			$.cookie("observation_listing", "list");
 		});
 		
 		$('#grid_view_bttn').click(function(){
-			$('.grid_view').show();
+			$('.grid_view').fadeIn('slow');
 			$('.list_view').hide();
+                        //alert($(this).attr('class'));
 			$(this).addClass('active');
 			$('#list_view_bttn').removeClass('active');
 			$.cookie("observation_listing", "grid");
@@ -59,7 +75,7 @@
                     }
                 }
 
-                eatCookies();
+                //eatCookies();
 
                 $.autopager({
                  
