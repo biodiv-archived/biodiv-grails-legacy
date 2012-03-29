@@ -348,6 +348,7 @@
                     </div>
                 </div>
             </div>    
+            
             </div>    
             <div class="row">
                 <div class="span12 super-section">    
@@ -377,6 +378,10 @@
             <div class="span12">
                 <input class="btn btn-primary btn-large" type="submit" name="${form_button_name}" value="${form_button_val}" style="float:right;"/>
             </div>
+            <g:if test="${observationInstance?.id}">
+	        	<a href="${createLink(controller:'observation', action:'flagDeleted', id:observationInstance.id)}" onclick="return confirm('${message(code: 'default.observatoin.delete.confirm.message', default: 'This observation will be deleted. Are you sure ?')}');"> Delete Observation </a>
+	    </g:if>
+
                 </form>
 
                 </div>

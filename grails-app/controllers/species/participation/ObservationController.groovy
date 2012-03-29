@@ -10,6 +10,7 @@ import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
 
 import grails.converters.JSON;
 import grails.plugins.springsecurity.Secured
+import species.participation.RecommendationVote.ConfidenceType
 import species.sourcehandler.XMLConverter
 import species.utils.ImageUtils
 import species.utils.Utils;
@@ -21,48 +22,38 @@ class ObservationController {
 	private static final String OBSERVATION_ADDED = "observationAdded";
 	private static final String SPECIES_RECOMMENDED = "speciesRecommended";
 	private static final String SPECIES_AGREED_ON = "speciesAgreedOn";
-	
-	
+
+
 	def grailsApplication;
 	def observationService;
 	def springSecurityService;
 	def mailService;
-	
+
 	static allowedMethods = [update: "POST", delete: "POST"]
 
 	def index = {
 		redirect(action: "list", params: params)
 	}
 
-        def filteredList = {
-        	def max = Math.min(params.max ? params.int('max') : 8, 100)
-                
+	def filteredList = {
+		def result = getObservationList(params);
+		render (template:"/common/observation/showObservationListTemplate", model:result);
+	}
+
+	def list = { getObservationList(params); }
+
+	protected def getObservationList(params) {
+		def max = Math.min(params.max ? params.int('max') : 10, 100)
+
 		def offset = params.offset ? params.int('offset') : 0
-                 
-                def filteredObservation = observationService.getFilteredObservations(params, max, offset)
-                def observationInstanceList = filteredObservation.observationInstanceList
-                def queryParams = filteredObservation.queryParams 
-                def activeFilters = filteredObservation.activeFilters 
+
+		def filteredObservation = observationService.getFilteredObservations(params, max, offset)
+		def observationInstanceList = filteredObservation.observationInstanceList
+		def queryParams = filteredObservation.queryParams
+		def activeFilters = filteredObservation.activeFilters
 
 		def totalObservationInstanceList = observationService.getFilteredObservations(params, -1, -1).observationInstanceList
-                def count = totalObservationInstanceList.size()
-
-		render (template:"/common/observation/showObservationListTemplate", model:[observationInstanceList:observationInstanceList, observationInstanceTotal:count, queryParams: queryParams, activeFilters:activeFilters]);
-
-        }
-
-	def list = {
-		def max = Math.min(params.max ? params.int('max') : 8, 100)
-                
-		def offset = params.offset ? params.int('offset') : 0
-                 
-        def filteredObservation = observationService.getFilteredObservations(params, max, offset)
-        def observationInstanceList = filteredObservation.observationInstanceList
-        def queryParams = filteredObservation.queryParams 
-        def activeFilters = filteredObservation.activeFilters 
-
-		def totalObservationInstanceList = observationService.getFilteredObservations(params, -1, -1).observationInstanceList
-        def count = totalObservationInstanceList.size()
+		def count = totalObservationInstanceList.size()
 
 		[totalObservationInstanceList:totalObservationInstanceList, observationInstanceList: observationInstanceList, observationInstanceTotal: count, queryParams: queryParams, activeFilters:activeFilters]
 	}
@@ -94,9 +85,9 @@ class ObservationController {
 					def tags = (params.tags != null) ? Arrays.asList(params.tags) : new ArrayList();
 
 					observationInstance.setTags(tags);
-					
+
 					sendNotificationMail(OBSERVATION_ADDED, observationInstance, request);
-					
+
 					redirect(action: 'addRecommendationVote', params:params);
 				} else {
 					observationInstance.errors.allErrors.each { log.error it }
@@ -119,15 +110,15 @@ class ObservationController {
 		if(observationInstance)	{
 			try {
 				observationService.updateObservation(params, observationInstance);
-	
+
 				if(!observationInstance.hasErrors() && observationInstance.save(flush:true)) {
 					flash.message = "${message(code: 'default.updated.message', args: [message(code: 'observation.label', default: 'Observation'), observationInstance.id])}"
 					log.debug "Successfully updated observation : "+observationInstance
-	
+
 					params.obvId = observationInstance.id
 					def tags = (params.tags != null) ? Arrays.asList(params.tags) : new ArrayList();
 					observationInstance.setTags(tags);
-					
+
 					//redirect(action: "show", id: observationInstance.id)
 					redirect(action: 'addRecommendationVote', params:params);
 				} else {
@@ -144,7 +135,7 @@ class ObservationController {
 			redirect(action: "list")
 		}
 	}
-	
+
 	def show = {
 		def observationInstance = Observation.findWhere(id:params.id.toLong(), isDeleted:false)
 		if (!observationInstance) {
@@ -220,10 +211,17 @@ class ObservationController {
 					]
 
 					if (! okcontents.contains(f.contentType)) {
-						message = g.message(code: 'resource.file.invalid.extension.message', args: [okcontents, f.originalFilename])
+						message = g.message(code: 'resource.file.invalid.extension.message', args: [
+							okcontents,
+							f.originalFilename
+						])
 					}
 					else if(f.size > grailsApplication.config.speciesPortal.observations.MAX_IMAGE_SIZE) {
-						message = g.message(code: 'resource.file.invalid.extension.message', args: [grailsApplication.config.speciesPortal.observations.MAX_IMAGE_SIZE/1024, f.originalFilename,f.size/1024 ], default:'File size cannot exceed ${104857600/1024}KB');
+						message = g.message(code: 'resource.file.invalid.extension.message', args: [
+							grailsApplication.config.speciesPortal.observations.MAX_IMAGE_SIZE/1024,
+							f.originalFilename,
+							f.size/1024
+						], default:'File size cannot exceed ${104857600/1024}KB');
 					}
 					else if(f.empty) {
 						message = g.message(code: 'file.empty.message', default:'File cannot be empty');
@@ -291,7 +289,7 @@ class ObservationController {
 
 		if(params.obvId) {
 			//Saves recommendation if its not present
-			def recommendationVoteInstance = observationService.createRecommendationVote(params)
+			def recommendationVoteInstance = getRecommendationVote(params);
 			def observationInstance = Observation.get(params.obvId);
 			log.debug params;
 			try {
@@ -299,17 +297,15 @@ class ObservationController {
 					//saving max voted species name for observation instance needed when observation created without species name
 					observationInstance.calculateMaxVotedSpeciesName();
 					redirect(action: "show", id: observationInstance.id);
-				}
-				
-				if (!recommendationVoteInstance.hasErrors() && recommendationVoteInstance.save(flush: true)) {
+				}else if(!recommendationVoteInstance.hasErrors() && recommendationVoteInstance.save(flush: true)) {
 					log.debug "Successfully added reco vote : "+recommendationVoteInstance
-					
+
 					//saving max voted species name for observation instance
 					observationInstance.calculateMaxVotedSpeciesName();
-					
+
 					//sending mail to user
 					sendNotificationMail(SPECIES_RECOMMENDED, observationInstance, request);
-					
+
 					redirect(action: "show", id: observationInstance.id);
 				}
 				else {
@@ -340,28 +336,25 @@ class ObservationController {
 
 		if(params.obvId) {
 			//Saves recommendation if its not present
-			def recommendationVoteInstance = observationService.createRecommendationVote(params)
+			def recommendationVoteInstance = getRecommendationVote(params);
 			def observationInstance = Observation.get(params.obvId);
 			log.debug params;
 			try {
 				if(!recommendationVoteInstance){
 					def result = ['votes':params.int('currentVotes')];
 					render result as JSON;
-					return
-				}
-				
-				if (recommendationVoteInstance.save(flush: true)) {
+				}else if(recommendationVoteInstance.save(flush: true)) {
 					log.debug "Successfully added reco vote : "+recommendationVoteInstance
 					success = true;
-					
+
 					observationInstance.calculateMaxVotedSpeciesName();
-					
+
 					//sending mail to user
 					sendNotificationMail(SPECIES_AGREED_ON, observationInstance, request);
-					
+
 					def result = ['votes':++params.int('currentVotes')];
 					render result as JSON;
-					
+
 				}
 				else {
 					recommendationVoteInstance.errors.allErrors.each { log.error it }
@@ -386,7 +379,7 @@ class ObservationController {
 		log.debug params;
 		params.max = Math.min(params.max ? params.int('max') : 1, 10)
 		params.offset = params.offset ? params.long('offset'): 0
-		
+
 		def observationInstance = Observation.get(params.id)
 		if (observationInstance) {
 			try {
@@ -429,21 +422,56 @@ class ObservationController {
 		render (template:"/common/voteDetails", model:[votes:votes]);
 	}
 
+	/**
+	 * 
+	 */
+
+	def listRelated = {
+		log.debug params;
+		def relatedObv = getRelatedObservations(params);
+		
+		def model = [observationInstanceList: relatedObv.observations.observation, observationInstanceTotal: relatedObv.count, queryParams: [:], activeFilters:[:]]
+		render (view:'listRelated', model:model)
+	}
+	
+	/**
+	 * 
+	 */
 	def getRelatedObservation = {
 		log.debug params;
-		def relatedObv;
+		def relatedObv = getRelatedObservations(params);
+
+		if(relatedObv.observations) {
+			relatedObv.observations = observationService.createUrlList2(relatedObv.observations);
+		}
+		render relatedObv as JSON
+	}
+
+	/**
+	 * 
+	 * @param params
+	 * @return
+	 */
+
+	protected Map getRelatedObservations(params) {
+		log.debug params;
+		def max = Math.min(params.limit ? params.int('limit') : 3, 100)
+
+		def offset = params.offset ? params.int('offset') : 0
+
+		def relatedObv
 		if(params.filterProperty == "speciesName") {
-			relatedObv = observationService.getRelatedObservationBySpeciesName(params)
+			relatedObv = observationService.getRelatedObservationBySpeciesName(params.long('id'), max, offset)
 		} else if(params.filterProperty == "speciesGroup"){
-			relatedObv = observationService.getRelatedObservationBySpeciesGroup(params)
+			relatedObv = observationService.getRelatedObservationBySpeciesGroup(params.long('filterPropertyValue'),  max, offset)
 		}else if(params.filterProperty == "user"){
-			relatedObv = observationService.getRelatedObservationByUser(params)
+			relatedObv = observationService.getRelatedObservationByUser(params.long('filterPropertyValue'), max, offset, params.sort)
 		}else if(params.filterProperty == "nearBy"){
 			relatedObv = observationService.getNearbyObservations(params.id, 5)
 		}else{
-			relatedObv = observationService.getRelatedObservation(params)
+			relatedObv = observationService.getRelatedObservation(params.filterProperty, params.long('id'), max, offset)
 		}
-		render relatedObv as JSON
+		return relatedObv
 	}
 
 
@@ -451,7 +479,7 @@ class ObservationController {
 		log.debug params;
 		render Tag.findAllByNameIlike("${params.term}%")*.name as JSON
 	}
-	
+
 	@Secured(['ROLE_USER'])
 	def flagDeleted = {
 		log.debug params;
@@ -475,29 +503,29 @@ class ObservationController {
 		}
 	}
 
-        def snippet = {
+	def snippet = {
 		def observationInstance = Observation.get(params.id)
-        
+
 		render (template:"/common/observation/showObservationSnippetTabletTemplate", model:[observationInstance:observationInstance]);
-        }
-		
+	}
+
 	private sendNotificationMail(String notificationType, Observation obv, request){
 		//(commented / recommended a species name/ agreed on a species suggested)
-		
+
 		if(!obv.author.sendNotification){
 			log.debug "Not sending any notification mail for user " + obv.author.id
 			return
 		}
-		
+
 		def conf = SpringSecurityUtils.securityConfig
 		def obvUrl = generateLink("observation", "show", ["id": obv.id], request)
 		def userProfileUrl = generateLink("SUser", "show", ["id": obv.author.id], request)
-		
+
 		def templateMap = [user: obv.author, obvUrl:obvUrl, userProfileUrl:userProfileUrl]
-		
+
 		def mailSubject = ""
 		def body = ""
-		
+
 		if(notificationType == OBSERVATION_ADDED){
 			mailSubject = conf.ui.addObservation.emailSubject
 			body = conf.ui.addObservation.emailBody
@@ -515,7 +543,7 @@ class ObservationController {
 		if (body.contains('$')) {
 			body = evaluate(body, templateMap)
 		}
-		
+
 		mailService.sendMail {
 			to obv.author.email
 			from conf.ui.notification.emailFrom
@@ -523,31 +551,61 @@ class ObservationController {
 			html body.toString()
 		}
 	}
-//
-//	private sendAddObservationMail(Observation obv, request){
-//		def conf = SpringSecurityUtils.securityConfig
-//		def body = conf.ui.addObservation.emailBody
-//		def obvUrl = generateLink("observation", "show", ["id": obv.id], request)
-//		def userProfileUrl = generateLink("SUser", "show", ["id": obv.author.id], request)
-//				
-//		if (body.contains('$')) {
-//			body = evaluate(body, [user: obv.author, obvUrl:obvUrl, userProfileUrl:userProfileUrl])
-//		}
-//		mailService.sendMail {
-//			to obv.author.email
-//			from conf.ui.notification.emailFrom
-//			subject conf.ui.addObservation.emailSubject
-//			html body.toString()
-//		}
-//	}
 
 	private String generateLink( String controller, String action, linkParams, request) {
 		createLink(base: "$request.scheme://$grailsApplication.config.speciesPortal.domain$request.contextPath",
 				controller:controller, action: action,
 				params: linkParams)
 	}
-	
+
 	private String evaluate(s, binding) {
 		new SimpleTemplateEngine().createTemplate(s).make(binding)
 	}
+	
+	/**
+	*
+	* @param params
+	* @return
+	*/
+   private RecommendationVote getRecommendationVote(params) {
+	   def observation = params.observation?:Observation.get(params.obvId);
+	   def author = params.author;
+	   
+	   def reco;
+	   if(params.recoId)
+		   reco = Recommendation.get(params.long('recoId'));
+	   else
+		   reco = observationService.getRecommendation(params.recoName, params.canName);
+	   
+	   ConfidenceType confidence = observationService.getConfidenceType(params.confidence?:ConfidenceType.CERTAIN.name());
+	   
+	   RecommendationVote existingRecVote = RecommendationVote.findByAuthorAndObservation(author, observation);
+	   RecommendationVote newRecVote = new RecommendationVote(observation:observation, recommendation:reco, author:author, confidence:confidence);
+	   
+	   if(!reco){
+		   log.debug "Not a valid recommendation"
+		   return null
+	   }else{
+		   if(!existingRecVote){
+			   log.debug " Adding (first time) recommendation vote for user " + author.id +  " reco name " + reco.name
+			   flash.message = "${message(code: 'recommendations.added.message', args: [reco.name])}"
+			   return newRecVote
+		   }else{
+			   if(existingRecVote.recommendation.id == reco.id){
+				   log.debug " Same recommendation already made by user " + author.id +  " reco name " + reco.name + " leaving as it is"
+				   return null
+			   }else{
+			   	   log.debug " Overwrting old recommendation vote for user " + author.id +  " new reco name " + reco.name + " old reco name " + existingRecVote.recommendation.name
+				   flash.message = "${message(code: 'recommendations.overwrite.message', args: [existingRecVote.recommendation.name, reco.name])}"
+				   if(!existingRecVote.delete(flush: true)){
+					   existingRecVote.errors.allErrors.each { log.error it }
+				   }
+				   return newRecVote;
+			   }
+		   }
+	   }
+   }
+   private addMsgToFlash(msg){
+	   flash.message = msg
+   }   
 }

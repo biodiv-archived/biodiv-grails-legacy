@@ -105,8 +105,9 @@ width:90%;
 			<div class="span4">
                                 
                             <div>
-				<a class="btn btn-large" href="${createLink(controller:'observation', action:'edit', id:observationInstance.id, absolute:true)}"> Edit Observation </a>
-				<a class="btn btn-danger btn-large" href="${createLink(controller:'observation', action:'flagDeleted', id:observationInstance.id, absolute:true)}"> Delete Observation </a>
+                            	<sUser:ifOwns model="['user':observationInstance.author]">
+					<a href="${createLink(controller:'observation', action:'edit', id:observationInstance.id)}"> Edit Observation </a>
+				</sUser:ifOwns>
 			    </div>
 <%--				--%>
 <%--				<div class="buttons">--%>

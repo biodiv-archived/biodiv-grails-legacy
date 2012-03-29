@@ -1,3 +1,4 @@
+<%@page import="species.participation.Observation"%>
 <%@ page import="species.auth.SUser"%>
 <html>
 <head>
@@ -7,6 +8,11 @@
 	value="${message(code: 'SUser.label', default: 'SUser')}" />
 <title><g:message code="default.show.label" args="[entityName]" />
 </title>
+<link rel="stylesheet"
+	href="${resource(dir:'css',file:'tagit/tagit-custom.css', absolute:true)}"
+	type="text/css" media="all" />
+<g:javascript src="tagit.js"
+	base="${grailsApplication.config.grails.serverURL+'/js/'}"></g:javascript>
 <style>
 .userCreatedObservations .jcarousel-skin-ie7 .jcarousel-clip-horizontal
 	{
@@ -49,11 +55,13 @@
 					</g:link>
 					<div class="prop">
 						<span class="name">Member since </span> <span class="value">
-							${fieldValue(bean: SUserInstance, field: "dateCreated")} </span>
+							<g:formatDate format="yyyy-MM-dd" date="${SUserInstance.dateCreated}" type="datetime" style="MEDIUM"/>
+						</span>
 					</div>
 					<div class="prop">
 						<span class="name">Last visited </span> <span class="value">
-							${fieldValue(bean: SUserInstance, field: "lastLoginDate")} </span>
+							<g:formatDate format="yyyy-MM-dd" date="${SUserInstance.lastLoginDate}" type="datetime" style="MEDIUM"/>
+						</span>
 					</div>
 				</div>
 
@@ -68,13 +76,13 @@
 				</div>
 				<div class="prop">
 					<span class="name"><g:message code="resource.email.label"
-							default="Email" /> </span> <span class="value"> ${fieldValue(bean: SUserInstance, field: "email")}
+							default="Email" /> </span> <span class="value"> <a href="mailto:${fieldValue(bean: SUserInstance, field: 'email')}">${fieldValue(bean: SUserInstance, field: "email")}</a>
 					</span>
 				</div>
 
 				<div class="prop">
 					<span class="name"><g:message code="resource.website.label"
-							default="Website" /> </span> <span class="value"> ${fieldValue(bean: SUserInstance, field: "website")}
+							default="Website" /> </span> <span class="value"> <a href="${fieldValue(bean: SUserInstance, field: 'website')}">${fieldValue(bean: SUserInstance, field: 'website')}</a>
 					</span>
 				</div>
 				<div class="prop">
@@ -95,21 +103,18 @@
 
 
 			</div>
-
-			<div class="observation_links grid_15">
-				<a
-					href="${createLink(controller:'observation', action: 'list', params: [userId: fieldValue(bean: SUserInstance, field: "id")])}">All
-					observations</a>
-			</div>
-
+			
+			<br/><br/>
+			
 			<div class="grid_15 userCreatedObservations" style="clear: both">
+				<h5>${Observation.countByAuthor(SUserInstance)} Observations</h5>
 				<obv:showRelatedStory
 					model="['controller':'observation', 'action':'getRelatedObservation', 'filterProperty': 'user', 'filterPropertyValue':SUserInstance.id, 'id':'a']" />
 			</div>
 
-			<div class="tags_section grid_4">
-				<obv:showUserAddedTags />
-				<div id="tagList" class="grid_4 sidebar_section"
+			<div class="tags_section grid_15">
+				<obv:showUserAddedTags  model="['userId':SUserInstance.id]" />
+				<div id="tagList" class="grid_15 sidebar_section"
 					style="display: none;">
 					<obv:showAllTagsOfUser model="['userId':SUserInstance.id]" />
 				</div>
@@ -118,6 +123,6 @@
 
 
 	</div>
-
 </body>
+
 </html>

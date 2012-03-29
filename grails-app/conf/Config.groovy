@@ -89,10 +89,12 @@ log4j = {
 	warn   'org.mortbay.log'
 
 	debug	'species',
-	'speciespage',
-	'grails.app'//			,
+			'speciespage',
+			'grails.app'//			,
 	//			'org.springframework.security.openid',
 	//			'org.openid4java'
+	
+	info	'species.auth'
 
 }
 
@@ -635,6 +637,7 @@ grails.plugins.springsecurity.onInteractiveAuthenticationSuccessEvent = { e, app
 
 	User.withTransaction {
 		user = User.get(appCtx.springSecurityService.principal.id)
+		println "-------------------------saving last login date"
 		user.lastLoginDate = new Date()
 		user.save(failOnError: true)
 	}

@@ -1595,14 +1595,14 @@ ul.thumbwrap .license_options li:hover {
 }
 
 .small_profile_pic {
-	height:50px;
-	width:auto;
+	height:auto;
+	width:50px;
 	margin:5px;
 }
 
 .very_small_profile_pic {
-	height:25px;
-	width:auto;
+	height:auto;
+	width:25px;
 	margin:2px;
 }
 
@@ -1624,4 +1624,24 @@ border-left: 1px solid #cecece;
 
 #observations_list_map {
 margin-top: 5px;
+}
+
+.prop.tablet.summary {
+	width:30px;
+	height:auto;
+	float:left;
+	clear:none;
+	padding:2px;
+}
+
+.prop .name.observations_summary {
+	background: url('../images/binoculars-icon.png')  no-repeat ;	
+	height: 20px;
+    width: 20px;
+}
+
+.prop .name.tags_summary {
+	background: url('../images/tag.png')  no-repeat ;	
+	height: 20px;
+    width: 20px;
 }

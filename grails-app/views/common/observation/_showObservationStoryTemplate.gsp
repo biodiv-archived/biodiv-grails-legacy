@@ -54,7 +54,7 @@
 	<div class="prop">
 		<span class="name">Last Update</span>
 		<obv:showDate
-			model="['observationInstance':observationInstance, 'propertyName':'lastUpdated']" />
+			model="['observationInstance':observationInstance, 'propertyName':'lastRevised']" />
 	</div>
 
 	<div class="prop">
@@ -64,7 +64,7 @@
 		</div>
 	</div>
 
-	<sUser:showUserSnippet model="['userInstance':observationInstance.author]"/>
+	<sUser:showUserTemplate model="['userInstance':observationInstance.author]"/>
 
 	<obv:showTagsSummary
 		model="['observationInstance':observationInstance]" />

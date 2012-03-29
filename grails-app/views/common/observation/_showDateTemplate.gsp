@@ -5,12 +5,12 @@
 		if(propertyName == "createdOn")
 			serverDate =  observationInstance.createdOn
 		else
-			serverDate =  observationInstance.lastUpdated
+			serverDate =  observationInstance.lastRevised
 	 %>
 	<g:if test="${(new Date()).minus(serverDate)}">
 		<g:formatDate date="${serverDate}" type="datetime" style="LONG" timeStyle="SHORT"/>
 	</g:if>
-	<g:elseif test="${propertyName == 'lastUpdated' && (!(serverDate - observationInstance.createdOn))}">
+	<g:elseif test="${propertyName == 'lastRevised' && (!(serverDate - observationInstance.createdOn))}">
 		None	
 	</g:elseif>
 	<g:else>

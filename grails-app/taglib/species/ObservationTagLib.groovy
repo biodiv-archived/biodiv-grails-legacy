@@ -1,5 +1,7 @@
 package species
 
+import species.participation.Observation;
+
 class ObservationTagLib {
 	static namespace = "obv"
 	
@@ -22,7 +24,7 @@ class ObservationTagLib {
 		}
 	}
 
-        def showSnippetTablet = {attrs, body->
+    def showSnippetTablet = {attrs, body->
 		if(attrs.model.observationInstance) {
 			out << render(template:"/common/observation/showObservationSnippetTabletTemplate", model:attrs.model);
 		}
@@ -89,6 +91,7 @@ class ObservationTagLib {
 	}
 	
 	def showAllTags = {attrs, body->
+		attrs.model.count = observationService.getNoOfTags();
 		out << render(template:"/common/observation/showAllTagsTemplate", model:attrs.model);
 	}
 
@@ -99,7 +102,7 @@ class ObservationTagLib {
 	def showObservationsLocation = {attrs, body->
 		out << render(template:"/common/observation/showObservationMultipleLocationTemplate", model:attrs.model);
 	}
-	
+
 	////////////////////////////////////////////////////////////////////////////////////////////
 	///////////////////////////////  Tag List added by specific User ///////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////
@@ -108,7 +111,14 @@ class ObservationTagLib {
 		def tags = observationService.getAllTagsOfUser(attrs.model.userId.toLong());
 		out << render(template:"/common/observation/showTagsListTemplate", model:[tags:tags]);
 	}
+	
+	def showNoOfTagsOfUser = {attrs, body->
+		def tags = observationService.getAllTagsOfUser(attrs.model.userId.toLong());		
+		out << tags.size() 
+	}
+	
 	def showUserAddedTags = {attrs, body->
+		attrs.model.count = observationService.getAllTagsOfUser(attrs.model.userId.toLong())?.size();
 		out << render(template:"/common/observation/showAllTagsTemplate", model:attrs.model);
 	}
 	
