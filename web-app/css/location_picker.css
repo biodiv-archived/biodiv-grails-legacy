@@ -1,5 +1,5 @@
 #address {
-    width: 420px;
+    width: 90%;
     margin-bottom: 5px;
     margin-left: 10px;
     
@@ -8,6 +8,7 @@
 #map_canvas {
     height:300px;     
     clear:both; 
+    border: 2px solid #ffffff;      
 }
 
 #location_picker {

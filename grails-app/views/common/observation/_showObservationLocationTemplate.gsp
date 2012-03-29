@@ -3,16 +3,21 @@
 	<div>
 		<p class="prop">
 			<span class="name">Place name</span>
-		<div class="value">
+		<span class="value">
+                    <g:if test="${observationInstance.placeName != ''}">
 			${observationInstance.placeName}
-		</div>
+                    </g:if>    
+                    <g:else>
+			${observationInstance.reverseGeocodedName}
+                    </g:else>
+		</span>
 		</p>
 		<p class="prop">
 			<span class="name">Coordinates</span>
-		<div class="value">
+		<span class="value">
 			${observationInstance.latitude},
 			${observationInstance.longitude}
-		</div>
+		</span>
 		</p>
 		<script type="text/javascript"
 			src="http://maps.google.com/maps/api/js?sensor=true"></script>

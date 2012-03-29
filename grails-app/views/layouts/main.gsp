@@ -228,7 +228,7 @@ border-bottom:3px solid #003846;
 
 	<div id="species_main_wrapper">
 	
-		<div class="container_12">
+		<div class="container">
 			<div id="menu" class="grid_12 ui-corner-all">
 				<div class="demo" style="float: right; margin-right: .3em;"
 					title="These are demo pages">These are demo pages</div><br/>

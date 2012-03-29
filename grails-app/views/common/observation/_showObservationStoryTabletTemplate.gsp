@@ -58,15 +58,15 @@
 
 	<div class="prop tablet">
 		<span class="name tablet">Created on</span>
-		<obv:showDate
-			model="['observationInstance':observationInstance, 'propertyName':'createdOn']" />
+	<%--	<obv:showDate --%>
+	<%--		model="['observationInstance':observationInstance, 'propertyName':'createdOn']" />--%>
 	</div>
 
 
 	<div class="prop tablet">
 		<span class="name tablet">Last Update</span>
-		<obv:showDate
-			model="['observationInstance':observationInstance, 'propertyName':'lastRevised']" />
+	<%--	<obv:showDate --%>
+	<%--		model="['observationInstance':observationInstance, 'propertyName':'lastRevised']" />--%>
 	</div>
 
 	<div class="prop tablet">
@@ -76,7 +76,7 @@
 		</div>
 	</div>
 
-	<sUser:showUserTemplate model="['userInstance':observationInstance.author]"/>
+	<%--<sUser:showUserTemplate model="['userInstance':observationInstance.author]"/>--%>
 
 
 	<!--div class="more_info"

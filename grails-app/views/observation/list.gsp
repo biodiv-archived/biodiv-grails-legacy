@@ -13,6 +13,11 @@
 <link rel="stylesheet"
 	href="${resource(dir:'css',file:'tagit/tagit-custom.css', absolute:true)}"
 	type="text/css" media="all" />
+<script type="text/javascript"
+        src="http://maps.google.com/maps/api/js?sensor=true"></script>
+<g:javascript src="markerclusterer.js"
+        base="${grailsApplication.config.grails.serverURL+'/js/location/google/'}"></g:javascript>
+
 <g:javascript src="tagit.js"
 	base="${grailsApplication.config.grails.serverURL+'/js/'}"></g:javascript>
 <g:javascript src="jquery.autopager-1.0.0.js"
@@ -107,7 +112,7 @@
                     </div>
 
                     <div class="tags_section span3">
-                        <obv:showAllTags/>
+                        <%-- <obv:showAllTags/> --%>
                     </div>
 
                 </div> <!-- main_content end -->
@@ -266,13 +271,16 @@
         </g:javascript>
         <script>
             function showMapView() {
-                 $('#observations_list_map').fadeToggle(2000, function(){
+                 $('#observations_list_map').toggle(function(){
                     
                     if ($(this).is(':hidden')){
                         $('div.observations > div.observations_list').show();
                     } else {       
                         $('div.observations > div.observations_list').hide();
                     }
+
+                    google.maps.event.trigger(big_map, 'resize');
+                    big_map.setCenter(nagpur_latlng);
                 });
             }
 

@@ -1,9 +1,9 @@
 
-<div class="btn-group button-bar" data-toggle="buttons-radio" style="float:right;">
-    <button id="list_view_bttn" class="btn list_style_button active"><i class=" icon-th-list"></i></button> 
-    <button id="grid_view_bttn" class="btn grid_style_button"><i class="icon-th"></i></button>
-</div>    
 <div class="observations_list" class="observation grid_11" style="clear:both;">
+<div class="btn-group button-bar" data-toggle="buttons-radio" style="float:right;">
+    <button class="list_view_bttn btn list_style_button active"><i class="icon-align-justify"></i></button> 
+    <button class="grid_view_bttn btn grid_style_button"><i class="icon-th-large"></i></button>
+</div>    
     <div class="mainContent">
         <ul class="grid_view thumbnails">
             <g:each in="${observationInstanceList}" status="i"
@@ -43,21 +43,21 @@
     </div>
          <script>
                 		
-                $('#list_view_bttn').click(function(){
+                $('.list_view_bttn').click(function(){
 			$('.grid_view').hide();
-			$('.list_view').fadeIn('slow');
+			$('.list_view').show();
 			$(this).addClass('active');
                         //alert($(this).attr('class'));
-			$('#grid_view_bttn').removeClass('active');
+			$('.grid_view_bttn').removeClass('active');
 			$.cookie("observation_listing", "list");
 		});
 		
-		$('#grid_view_bttn').click(function(){
-			$('.grid_view').fadeIn('slow');
+		$('.grid_view_bttn').click(function(){
+			$('.grid_view').show();
 			$('.list_view').hide();
                         //alert($(this).attr('class'));
 			$(this).addClass('active');
-			$('#list_view_bttn').removeClass('active');
+			$('.list_view_bttn').removeClass('active');
 			$.cookie("observation_listing", "grid");
 		});
 	
@@ -65,17 +65,17 @@
                     if ($.cookie("observation_listing") == "list") {
                             $('.list_view').show();
                             $('.grid_view').hide();
-                            $('#grid_view_bttn').removeClass('active');
-                            $('#list_view_bttn').addClass('active');
+                            $('.grid_view_bttn').removeClass('active');
+                            $('.list_view_bttn').addClass('active');
                     }else{
                             $('.grid_view').show();
                             $('.list_view').hide();
-                            $('#grid_view_bttn').addClass('active');
-                            $('#list_view_bttn').removeClass('active');	
+                            $('.grid_view_bttn').addClass('active');
+                            $('.list_view_bttn').removeClass('active');	
                     }
                 }
 
-                //eatCookies();
+                eatCookies();
 
                 $.autopager({
                  

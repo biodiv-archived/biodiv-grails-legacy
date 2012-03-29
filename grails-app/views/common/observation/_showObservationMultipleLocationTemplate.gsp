@@ -1,30 +1,26 @@
 
 <div class="observation_location">
 	<div>
-		<script type="text/javascript"
-			src="http://maps.google.com/maps/api/js?sensor=true"></script>
-		<g:javascript src="markerclusterer.js"
-			base="${grailsApplication.config.grails.serverURL+'/js/location/google/'}"></g:javascript>
 		<script>
                 var markers = [];
+                var big_map;
+                var nagpur_latlng = new google.maps.LatLng('21.07', '79.27');
                 
                 $(document).ready(function() {
-                  var latlng = new google.maps.LatLng('21.07', '79.27');
                   var options = {
                     zoom: 4,
-                    center: latlng,
+                    center: nagpur_latlng,
                     mapTypeId: google.maps.MapTypeId.ROADMAP
                   };
-                  var big_map = new google.maps.Map(document.getElementById("big_map_canvas"), options);
+                  big_map = new google.maps.Map(document.getElementById("big_map_canvas"), options);
 
                     var infowindow = new google.maps.InfoWindow({
                         content: 'InfoWindow',
                         maxWidth: 400
                     });
-                  <g:each in="${observationInstanceList}" status="i"
-						var="observationInstance">
-		                var latlng = new google.maps.LatLng(
-		                		${observationInstance.latitude}, ${observationInstance.longitude});
+
+                  function addMarker(id, lat, lng) {
+                     var latlng = new google.maps.LatLng(lat, lng);
 						var marker = new google.maps.Marker({
 							position: latlng,
 							map: big_map,
@@ -34,10 +30,13 @@
 
 	                    google.maps.event.addListener(marker, 'click', function() {
                                 infowindow.setPosition(marker.getPosition());
-                                load_content(big_map, this, ${observationInstance.id}, infowindow); 
+                                load_content(big_map, this, id, infowindow); 
 	                    });
 
-                            
+                  }  
+                  <g:each in="${observationInstanceList}" status="i"
+						var="observationInstance">
+                        addMarker(${observationInstance.id}, ${observationInstance.latitude},  ${observationInstance.longitude}); 
 
 		    </g:each>	
 				  
@@ -47,7 +46,6 @@
                     });
 		  var markerCluster = new MarkerClusterer(big_map, markers, {gridSize: 30, maxZoom: 10});
                 
-                  big_map.setCenter(latlng);
                     
                   function load_content(map, marker, id, infowindow){
                       $.ajax({
@@ -70,10 +68,9 @@
                     return bounds;    
                 }
 
-
                 });
                 </script>
-		<div id="big_map_canvas" style="height: 500px;"></div>
+		<div id="big_map_canvas" style="height: 500px; width: 100%;"></div>
 	</div>
         <div id="map_results_list"></div>
         <script>
