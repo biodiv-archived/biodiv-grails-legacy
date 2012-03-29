@@ -1,9 +1,17 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!DOCTYPE html>
 <%@page import="org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils"%>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:fb="http://ogp.me/ns/fb#">
+<html lang="en" xmlns:fb="http://ogp.me/ns/fb#">
 <head>
 <title>Species Portal</title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+
+<g:if test="${params.controller == 'observation'}">
+<link rel="stylesheet" type="text/css" media="all"
+	href="${resource(dir:'bootstrap/css',file:'bootstrap.css', absolute:true)}" />
+</g:if>        
+<!--link rel="stylesheet" type="text/css" media="all"
+	href="${resource(dir:'bootstrap/css',file:'bootstrap-responsive.css', absolute:true)}" /-->
 
 <link rel="stylesheet" type="text/css" media="all"
 	href="${resource(dir:'css',file:'jquery-ui.css', absolute:true)}" />
@@ -14,6 +22,11 @@
 <!-- sNav:resources override="true" /-->
 
 <script src="${resource(dir:'plugins',file:'jquery-1.7/js/jquery/jquery-1.7.min.js', absolute:true)}" type="text/javascript" ></script>
+
+<g:if test="${params.controller == 'observation'}">
+<g:javascript src="bootstrap.js"
+	base="${grailsApplication.config.grails.serverURL+'/bootstrap/js/'}"></g:javascript>
+</g:if>
 <script src="${resource(dir:'plugins',file:'jquery-ui-1.8.15/jquery-ui/js/jquery-ui-1.8.15.custom.min.js', absolute:true)}" type="text/javascript" ></script>
 
 <link rel="stylesheet" type="text/css" media="screen"
@@ -34,15 +47,19 @@
 	href="${resource(dir:'css',file:'reset.css', absolute:true)}" />
 <link rel="stylesheet" type="text/css" media="all"
 	href="${resource(dir:'css',file:'text.css', absolute:true)}" />
+        
+<g:if test="${params.controller != 'observation'}">
 <link rel="stylesheet" type="text/css" media="all"
 	href="${resource(dir:'css',file:'960.css', absolute:true)}" />
-
 <link rel="stylesheet"
 	href="${resource(dir:'css',file:'main.css', absolute:true)}" />
+</g:if>        
 <link rel="stylesheet" type="text/css"
 	href="${resource(dir:'css',file:'navigation.css', absolute:true)}" />
 <link rel="stylesheet" type="text/css" media="all"
 	href="${resource(dir:'css',file:'jquery.rating.css', absolute:true)}" />
+<link rel="stylesheet" type="text/css" media="all"
+	href="${resource(dir:'css',file:'wgp.css', absolute:true)}" />
 
 <g:javascript src="jquery/jquery.form.js"
 	base="${grailsApplication.config.grails.serverURL+'/js/'}"></g:javascript>
@@ -163,7 +180,6 @@ border-bottom:3px solid #003846;
 
 </head>
 <body>
-
 	<!-- div id="spinner" class="spinner" style="display:none;">
 		<img src="${resource(dir:'images',file:'spinner.gif', absolute:true)}"
 			alt="${message(code:'spinner.alt',default:'Loading...')}" />
