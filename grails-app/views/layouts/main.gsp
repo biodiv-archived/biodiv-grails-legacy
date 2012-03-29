@@ -217,7 +217,7 @@ border-bottom:3px solid #003846;
 			<sec:ifLoggedIn>
          		<sUser:renderProfileLink/> (<a id="logout" href="${createLink(controller:'logout')}">Logout</a>)
       		</sec:ifLoggedIn> <sec:ifNotLoggedIn>
-				<g:link controller='login'>Login</g:link>
+				<g:link controller='login'>Login</g:link> | <g:link controller='register'>Register</g:link>
 			</sec:ifNotLoggedIn> </span>
 		<!-- g:render template='/common/ajaxLogin' /-->
 			<div id="fb-root"></div>
@@ -317,62 +317,63 @@ border-bottom:3px solid #003846;
 			
 				$("a.ui-icon-close").click(function() {
 					$(this).parent().hide("slow");
-				})
-				
-				$("#logout").click(function() {
-					<%if(grails.util.Environment.current.toString() != "DEVELOPMENT") {%>
-					FB.getLoginStatus(handleSessionResponse);
-					return false;
-					<%} %>
 				});
-			
-
-		function handleSessionResponse(response) {
-    		//if we dont have a session (which means the user has been logged out, redirect the user)
-    		if (!response.authResponse) {
-        		window.location = '${createLink(controller:'logout')}';
-        		return;
-    		}
-
-    		FB.logout(handleSessionResponse);
-		}				
 				
-		window.fbAsyncInit = function() {
-		  FB.init({
-		    appId  : '${SpringSecurityUtils.securityConfig.facebook.appId}',
-		    channelUrl : "${grailsApplication.config.grails.serverURL}/channel.html",
-		    status : true,
-		    cookie : true,
-		    xfbml  : true,
-		    oauth  : true,
-		    logging : true
-		  });
-		  
-		FB.Event.subscribe('edge.create',
-			function(response) {
-				alert('You liked the URL: ' + response);
-		});
-		
-		FB.Event.subscribe('auth.login',
-				function(response) {
-					if(response.status == 'connected') {
-						window.location = "${createLink(controller:'login', action:'authSuccess')}"+"?uid="+response.authResponse.userID
-					} else {
-						alert("Error in authenticating via Facebook");
-					}
-				}
-			);
-		};
-	  
-		(function(d){var js, id = 'facebook-jssdk'; if (d.getElementById(id)) {return;}js = d.createElement('script'); js.id = id; js.async = true;js.src = "//connect.facebook.net/en_US/all.js";d.getElementsByTagName('head')[0].appendChild(js);}(document));
 
+				(function(d){var js, id = 'facebook-jssdk'; if (d.getElementById(id)) {return;}js = d.createElement('script'); js.id = id; js.async = true;js.src = "//connect.facebook.net/en_US/all.js";d.getElementsByTagName('head')[0].appendChild(js);}(document));			
+	
+				// make sure facebook is initialized before calling the facebook JS api
+				window.fbEnsure = function(callback) {
+  					if (window.facebookInitialized) { callback(); return; }
+					  FB.init({
+						appId  : '${SpringSecurityUtils.securityConfig.facebook.appId}',
+					    channelUrl : "${grailsApplication.config.grails.serverURL}/channel.html",
+					    status : true,
+					    cookie : true,
+					    xfbml: true,
+					    oauth  : true,
+					    logging : true
+					  }); 
+					  
+					  window.facebookInitialized = true;
+					  callback();
+				};
+
+				/**
+				 * Just connect (for logged in users) to facebook and reassociate the user
+				 * (and possibly get the facebook profile picture if no avatar yet set).
+				 * Triggers two events on the '.fbJustConnect' element:
+				 * - "connected" will be triggered if the reassociation was successful
+				 * - "failed" will be triggered when for whatever reason the coupling was unsuccessful
+				 */
+				var fbConnect = function() {
+										
+					var scope = { scope: "" };
+					scope.scope = "email,user_about_me,user_location,user_activities,user_hometown,manage_notifications,user_website,publish_stream";
+					
+					fbEnsure(function() {
+						FB.login(function(response) {
+							if (response.status == 'connected') {
+								window.location = "${createLink(controller:'login', action:'authSuccess')}"+"?uid="+response.authResponse.userID
+							} else {
+								alert("Failed to connect to Facebook");
+							}
+						}, scope);
+					});
+				};
+				
+				$('.fbJustConnect').click(function() {
+					fbConnect();
+				});
 				
 		}); 
-			<%if(!grailsApplication.config.checkin.drupal) {%>
+
+
+
 			function show_login_dialog() {
 				$('#ajaxLogin').show(); 
 			} 
-			<%} %>
+
 			
 			function cancelLogin() {
 				$('#ajaxLogin').hide(); 

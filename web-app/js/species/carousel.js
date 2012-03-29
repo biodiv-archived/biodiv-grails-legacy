@@ -4,6 +4,7 @@ var itemLoadCallback = function(carousel, state) {
 		"offset" : carousel.first - 1,
 		"filterProperty": carousel.options.filterProperty,
 		"filterPropertyValue": carousel.options.filterPropertyValue
+		
 	}
 	if (state == 'prev')
 		return;
@@ -23,7 +24,12 @@ var itemAddCallback = function(carousel, first, last, data, state) {
 		}
 	}
 	if(state == 'init'){
-		carousel.size(data["count"]);
+		if(data["count"] == 0){
+			$(carousel.options.carouselDivId).hide();
+			$(carousel.options.carouselMsgDivId).show();
+		}else{
+			carousel.size(data["count"]);
+		}
 	}
 };
 

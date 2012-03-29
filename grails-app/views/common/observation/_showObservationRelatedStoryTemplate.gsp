@@ -13,7 +13,9 @@ $(document).ready(function() {
         itemLoadCallback : itemLoadCallback,
         url:"${createLink(controller:controller, action:action, id:observationId)}",
         filterProperty:"${filterProperty}",
-        filterPropertyValue:"${filterPropertyValue}"
+        filterPropertyValue:"${filterPropertyValue}",
+        carouselDivId:"#carousel_" + "${id}",
+        carouselMsgDivId:"#relatedObservationMsg_" + "${id}"
 	});
     
 });
@@ -68,3 +70,7 @@ $(document).ready(function() {
       <!-- The content will be dynamically loaded in here --> 
     </ul> 
 </div>
+<div id="relatedObservationMsg_${id}" style="display:none">
+	This is the first observation.
+</div>
+

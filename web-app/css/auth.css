@@ -1,3 +1,91 @@
+#loginButton, #createButton{
+	float:right;
+	margin:3px;
+}
+
+div.openid-loginbox {
+	width: 400px;
+	margin-left: auto;
+	margin-right: auto;
+	background: #F5F5F5;
+	border: 1px solid #E5E5E5;
+	padding: 15px;
+}
+
+.openid-loginbox-inner {
+	width: 100%;
+}
+
+td.openid-loginbox-title {
+	border-bottom: 1px #c0c0ff solid;
+	padding: 10px;
+	width: 100%;
+	font-size: 18px;
+}
+
+.openid-loginbox-useopenid {
+	font-weight: normal;
+	font-size: 14px;
+}
+
+td.openid-loginbox-inner .external_providers img {
+	border: 0;
+	vertical-align: middle;
+	padding-right: 3px;
+}
+
+table.openid-loginbox-userpass {
+ 	margin: 3px 3px 3px 8px;
+ 	margin-left: auto;
+ 	margin-right: auto; 
+	width:100%
+}
+
+table.openid-loginbox-userpass td {
+	height: 25px;
+	padding: 3px;
+}
+
+input.openid-identifier {
+	background: url(http://stat.livejournal.com/img/openid-inputicon.gif)
+		no-repeat;
+	background-color: #fff;
+	background-position: 0 50%;
+	padding-left: 18px;
+}
+
+input[type='text'],input[type='password'] {
+	font-size: 16px;
+	width: 250px;
+}
+
+input[type='submit'] {
+	font-size: 14px;
+}
+
+td.openid-submit {
+	padding: 3px;
+}
+
+.sign_in_external_bttn {
+	float: left;
+	margin: 3px;
+}
+
+#openidLogin {
+	border-top: 1px #c0c0ff solid;
+	margin-top: 50px;
+}
+
+#formLogin {
+	border-top: 1px #c0c0ff solid;
+	margin-top: 50px;
+}
+
+.fbJustConnect {
+	opacity: 0;
+}
+
 #ajaxLogin {
    margin: 15px 0px; padding: 0px;
    text-align: center;
