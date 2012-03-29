@@ -39,8 +39,9 @@ width:90%;
 </style>
 </head>
 <body>
-	<div class="container_16 big_wrapper">
-		<div class="observation  grid_16">
+	<div class="container outer-wrapper">
+            <div class="row">
+		<div class="observation  span12">
 			<!--h1>
 				<g:message code="default.show.label" args="[entityName]" />
 			</h1-->
@@ -52,7 +53,7 @@ width:90%;
 			</g:if>
 			<br />
 			
-			<div class="grid_10">
+			<div class="span8" style="margin:0;">
 				
 				<div class="grid_10">
 					<h3><obv:showSpeciesName model="['observationInstance':observationInstance]" /></h3>
@@ -84,34 +85,12 @@ width:90%;
 
 					
 				</div>
-
-				<!--  static species content -->
-				<obv:showStory model="['observationInstance':observationInstance]" />
-  					
-				<div class="grid_10 comments">
-					<fb:like send="true" width="450" show_faces="true"></fb:like>
-					<div class="fb-comments grid_10"
-						data-href="${createLink(controller:'observation', action:'show', id:observationInstance.id, absolute:true)}"
-						data-num-posts="10"></div>
-				</div>
-				
-				<div>
-				<a href="${createLink(controller:'observation', action:'edit', id:observationInstance.id, absolute:true)}"> Edit Observation </a>
-				<a href="${createLink(controller:'observation', action:'flagDeleted', id:observationInstance.id, absolute:true)}"> Delete Observation </a>
-				</div>
-<%--				--%>
-<%--				<div class="buttons">--%>
-<%--                    <span class="button"><g:actionSubmit class="delete" action="flagDeleted" value="${message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" /></span>--%>
-<%--                </div>--%>
-			</div>
-
-
-			<div class="grid_5">
-
-				<obv:showLocation
-					model="['observationInstance':observationInstance]" />
-
-				<div class="grid_5 recommendations">
+                                
+                                <div class="span4" style="margin:0;">
+				    <obv:showStory model="['observationInstance':observationInstance]" />
+                                </div>
+                                <div class="span4">
+	                            <div class="grid_5 recommendations">
 					<div>
 						<div><!-- g:message code="recommendations.no.message"
 								,  args="[result.size()]" /-->
@@ -119,7 +98,7 @@ width:90%;
 								
 							</ul>
 							<div id="seeMoreMessage" class="message"></div>
-							<div id="seeMore">more</div>
+							<div id="seeMore" class="btn btn-mini">more</div>
 						</div>
 						<div>
 							<g:hasErrors bean="${recommendationInstance}">
@@ -140,11 +119,39 @@ width:90%;
 									model="['recommendationInstance':recommendationInstance]" />
 								<input type="hidden" name='obvId' 
 									value="${observationInstance.id}" /> <input type="submit"
-									value="Add" />
+									value="Add" class="btn" style="position:relative; left: 10px;"/>
 							</form>
 						</div>
 					</div>
 				</div>
+
+
+                                </div>
+  					
+				<div class="span8 comments" style="margin:0;">
+					<fb:like send="true" width="450" show_faces="true"></fb:like>
+					<div class="fb-comments grid_10"
+						data-href="${createLink(controller:'observation', action:'show', id:observationInstance.id, absolute:true)}"
+						data-num-posts="10"></div>
+				</div>
+				
+						</div>
+
+
+			<div class="span4">
+                                
+                            <div>
+				<a class="btn btn-large" href="${createLink(controller:'observation', action:'edit', id:observationInstance.id, absolute:true)}"> Edit Observation </a>
+				<a class="btn btn-danger btn-large" href="${createLink(controller:'observation', action:'flagDeleted', id:observationInstance.id, absolute:true)}"> Delete Observation </a>
+			    </div>
+<%--				--%>
+<%--				<div class="buttons">--%>
+<%--                    <span class="button"><g:actionSubmit class="delete" action="flagDeleted" value="${message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" /></span>--%>
+<%--                </div>--%>
+
+                                
+				<obv:showLocation
+					model="['observationInstance':observationInstance]" />
 
 				<!-- obv:showRating model="['observationInstance':observationInstance]" /-->
 				<!--  static species content -->
@@ -162,6 +169,7 @@ width:90%;
 
 
 		</div>
+	    </div>
 	</div>
 	<g:javascript>
 	
