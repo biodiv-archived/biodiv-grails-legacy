@@ -6,7 +6,6 @@ import groovy.text.SimpleTemplateEngine
 import org.grails.taggable.Tag;
 import org.grails.taggable.TagLink;
 
-import species.participation.RecommendationVote.ConfidenceType;
 import java.util.Date;
 import species.Resource;
 import species.Habitat;
@@ -72,58 +71,6 @@ class ObservationService {
 		}
 	}
 	
-	
-	/**
-	 * 
-	 * @param params
-	 * @return
-	 */
-	RecommendationVote getRecommendationVote(params) {
-		def observation = params.observation?:Observation.get(params.obvId);
-		def author = params.author;
-		
-		def reco;
-		if(params.recoId)
-			reco = Recommendation.get(params.long('recoId'));
-		else
-			reco = getRecommendation(params.recoName, params.canName);
-		
-		ConfidenceType confidence = getConfidenceType(params.confidence?:ConfidenceType.CERTAIN.name());
-		
-		RecommendationVote existingRecVote = RecommendationVote.findByAuthorAndObservation(author, observation);
-		RecommendationVote newRecVote = new RecommendationVote(observation:observation, recommendation:reco, author:author, confidence:confidence);
-		
-		if(!reco){
-			log.debug "Not a valid recommendation"
-			return null
-		}else{
-			if(!existingRecVote){
-				log.debug " Adding (first time) recommendation vote for user " + author.id +  " reco name " + reco.name
-				return newRecVote
-			}else{
-				if(existingRecVote.recommendation.id == reco.id){
-					log.debug " Same recommendation already made by user " + author.id +  " reco name " + reco.name + " leaving as it is"
- 					return null
-				}else{
-					log.debug " Overwrting old recommendation vote for user " + author.id +  " new reco name " + reco.name + " old reco name " + existingRecVote.recommendation.name
-					if(!existingRecVote.delete(flush: true)){
-						existingRecVote.errors.allErrors.each { log.error it }
-					}
-					return newRecVote;
-				}
-			}
-		}
-	}
-
-	/**
-	 * 
-	 * @param params
-	 * @return
-	 */
-	RecommendationVote createRecommendationVote(params) {
-		return getRecommendationVote(params);
-	}
-
 	List getRelatedObservation(String property, long obvId, int limit, long offset){
 		def propertyValue = Observation.read(obvId)[property]
 		def query = "from Observation as obv where obv." + property + " like :propertyValuee and obv.id != :parentObvId and obv.isDeleted = :isDeleted order by obv.createdOn desc"
@@ -390,9 +337,7 @@ class ObservationService {
 	}
 
 	List findAllTagsSortedByObservationCount(int max){
-
 		def tag_ids = TagLink.executeQuery("select tag.id from TagLink group by tag_id order by count(tag_id) desc", [max:max]);
-
 		def tags = []
 
 		for (tag_id in tag_ids){
@@ -402,17 +347,13 @@ class ObservationService {
 	}
 
 	Map getNearbyObservations(String observationId, int limit){
-
 		def sql =  Sql.newInstance(dataSource);
-
 		def resultSet = sql.rows("select g2.id,  ROUND(ST_Distance_Sphere(g1.st_geomfromtext, g2.st_geomfromtext)/1000) as distance from observation_locations as g1, observation_locations as g2 where g2.is_deleted = false and g1.id = :observationId and g1.id <> g2.id order by ST_Distance(g1.st_geomfromtext, g2.st_geomfromtext) limit :max", [observationId: Integer.parseInt(observationId), max:limit])
 
 		def nearbyObservations = []
-
 		for (row in resultSet){
 			nearbyObservations.add(["observation":Observation.findById(row.getProperty("id")), "title":"Found "+row.getProperty("distance")+" km away"])
 		}
-
 		return ["observations":nearbyObservations, "count":nearbyObservations.size()]
 	}
 

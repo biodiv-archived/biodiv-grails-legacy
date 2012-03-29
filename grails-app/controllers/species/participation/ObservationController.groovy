@@ -10,6 +10,7 @@ import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
 
 import grails.converters.JSON;
 import grails.plugins.springsecurity.Secured
+import species.participation.RecommendationVote.ConfidenceType
 import species.sourcehandler.XMLConverter
 import species.utils.ImageUtils
 import species.utils.Utils;
@@ -288,7 +289,7 @@ class ObservationController {
 
 		if(params.obvId) {
 			//Saves recommendation if its not present
-			def recommendationVoteInstance = observationService.createRecommendationVote(params)
+			def recommendationVoteInstance = getRecommendationVote(params);
 			def observationInstance = Observation.get(params.obvId);
 			log.debug params;
 			try {
@@ -335,7 +336,7 @@ class ObservationController {
 
 		if(params.obvId) {
 			//Saves recommendation if its not present
-			def recommendationVoteInstance = observationService.createRecommendationVote(params)
+			def recommendationVoteInstance = getRecommendationVote(params);
 			def observationInstance = Observation.get(params.obvId);
 			log.debug params;
 			try {
@@ -559,4 +560,51 @@ class ObservationController {
 	private String evaluate(s, binding) {
 		new SimpleTemplateEngine().createTemplate(s).make(binding)
 	}
+	
+	/**
+	*
+	* @param params
+	* @return
+	*/
+   private RecommendationVote getRecommendationVote(params) {
+	   def observation = params.observation?:Observation.get(params.obvId);
+	   def author = params.author;
+	   
+	   def reco;
+	   if(params.recoId)
+		   reco = Recommendation.get(params.long('recoId'));
+	   else
+		   reco = observationService.getRecommendation(params.recoName, params.canName);
+	   
+	   ConfidenceType confidence = observationService.getConfidenceType(params.confidence?:ConfidenceType.CERTAIN.name());
+	   
+	   RecommendationVote existingRecVote = RecommendationVote.findByAuthorAndObservation(author, observation);
+	   RecommendationVote newRecVote = new RecommendationVote(observation:observation, recommendation:reco, author:author, confidence:confidence);
+	   
+	   if(!reco){
+		   log.debug "Not a valid recommendation"
+		   return null
+	   }else{
+		   if(!existingRecVote){
+			   log.debug " Adding (first time) recommendation vote for user " + author.id +  " reco name " + reco.name
+			   flash.message = "${message(code: 'recommendations.added.message', args: [reco.name])}"
+			   return newRecVote
+		   }else{
+			   if(existingRecVote.recommendation.id == reco.id){
+				   log.debug " Same recommendation already made by user " + author.id +  " reco name " + reco.name + " leaving as it is"
+				   return null
+			   }else{
+			   	   log.debug " Overwrting old recommendation vote for user " + author.id +  " new reco name " + reco.name + " old reco name " + existingRecVote.recommendation.name
+				   flash.message = "${message(code: 'recommendations.overwrite.message', args: [existingRecVote.recommendation.name, reco.name])}"
+				   if(!existingRecVote.delete(flush: true)){
+					   existingRecVote.errors.allErrors.each { log.error it }
+				   }
+				   return newRecVote;
+			   }
+		   }
+	   }
+   }
+   private addMsgToFlash(msg){
+	   flash.message = msg
+   }   
 }
