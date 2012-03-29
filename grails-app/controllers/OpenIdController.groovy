@@ -3,6 +3,12 @@ import org.codehaus.groovy.grails.plugins.springsecurity.openid.OpenIdAuthentica
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.AuthenticationException
 import org.springframework.security.web.savedrequest.DefaultSavedRequest
+import org.springframework.social.facebook.api.FacebookProfile;
+import org.springframework.social.facebook.api.impl.FacebookTemplate;
+import org.springframework.social.oauth2.Spring30OAuth2RequestFactory;
+import org.springframework.social.support.ClientHttpRequestFactorySelector;
+
+import com.the6hours.grails.springsecurity.facebook.FacebookAuthToken;
 
 import species.auth.Role
 import species.auth.SUser
@@ -23,6 +29,8 @@ class OpenIdController {
 	/** Dependency injection for the springSecurityService. */
 	def springSecurityService
 
+	def facebookAuthService
+	
 	static defaultAction = 'auth'
 
 	/**
@@ -92,7 +100,8 @@ class OpenIdController {
 			log.info "Found existing user with same emailId $email"
 			log.info "Merging details with existing account $user"
 			registerAccountOpenId user, openId
-			authenticateAndRedirect user.username
+			def usernamePropertyName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
+			authenticateAndRedirect user."$usernamePropertyName"
 		} else {
 			log.info "Redirecting to register"
 			RegisterCommand command = new RegisterCommand();
@@ -133,8 +142,58 @@ class OpenIdController {
 			flash.error = 'Sorry, no user was found with that username and password'
 			return [command: command, openId: openId]
 		}
+		
+		def usernamePropertyName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
+		authenticateAndRedirect user."$usernamePropertyName"
+		
+	}
+	
+	def createFacebookAccount = {
 
-		authenticateAndRedirect command.username
+		def token = session["LAST_FACEBOOK_USER"]
+
+		if (!token) {
+			flash.error = 'Sorry, problem fetching access token from facebook'
+			return
+		}
+
+		log.debug "Processing facebook registration in createAccount"
+		FacebookTemplate facebook = new FacebookTemplate(token.accessToken);
+		facebook.setRequestFactory(new Spring30OAuth2RequestFactory(ClientHttpRequestFactorySelector.getRequestFactory(), token.accessToken, facebook.getOAuth2Version()));
+		FacebookProfile fbProfile = facebook.userOperations().getUserProfile();
+
+		//TODO: if there are multiple email accounts available choose among them
+		String email = fbProfile.email;
+
+		if (!email) {
+			flash.error = 'Sorry, an email id is necessary for an account'
+			return
+		}
+
+		def user;
+		if(email) {
+			user = SUser.findByEmail(email)
+		}
+		
+		if(user) {
+			log.info "Found existing user with same emailId $email"
+			log.info "Merging details with existing account $user"
+			facebookAuthService.mergeFacebookUserDetails user, fbProfile
+			registerAccountOpenId user, fbProfile.link
+			facebookAuthService.registerFacebookUser token, user
+			
+			def usernamePropertyName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
+			authenticateAndRedirect user."$usernamePropertyName"
+		} else {
+			log.info "Redirecting to register"
+			RegisterCommand command = new RegisterCommand();
+			facebookAuthService.copyFromFacebookProfile command, fbProfile
+			command.openId = fbProfile.link
+			command.facebookToken = token;
+			log.debug "register command : $command"
+			flash.chainedParams = [command: command]
+			chain ( controller:"register");
+		}
 	}
 
 	/**
@@ -215,6 +274,8 @@ class OpenIdController {
 		}
 	}
 
+	
+
 	/**
 	 * For the initial form display, copy any registered AX values into the command.
 	 * @param command  the command
@@ -241,6 +302,7 @@ class OpenIdController {
 			command.name = command.name.trim();
 		} 
 	}
+	
 }
 
 class OpenIdRegisterCommand {

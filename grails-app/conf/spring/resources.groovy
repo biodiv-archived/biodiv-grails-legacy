@@ -6,10 +6,12 @@ import org.springframework.social.connect.support.ConnectionFactoryRegistry;
 import org.springframework.social.facebook.api.Facebook;
 import org.springframework.social.facebook.connect.FacebookConnectionFactory;
 
-import com.the6hours.grails.springsecurity.facebook.FacebookAuthCookieFilter;
+import com.the6hours.grails.springsecurity.facebook.DefaultFacebookAuthDao;
 
 import species.auth.ConsumerManager;
+import species.auth.FacebookAuthCookieFilter;
 import species.auth.FacebookAuthCookieLogoutHandler;
+import species.auth.FacebookAuthProvider;
 import species.auth.OpenIDAuthenticationFilter;
 import species.auth.OpenIdAuthenticationFailureHandler;
 
@@ -85,9 +87,12 @@ beans = {
 	SpringSecurityUtils.registerLogoutHandler('facebookAuthCookieLogout')
 	
 	facebookAuthCookieFilter(FacebookAuthCookieFilter) {
+		grailsApplication = ref('grailsApplication')
 		authenticationManager = ref('authenticationManager')
 		facebookAuthUtils = ref('facebookAuthUtils')
 		logoutUrl = 'j_spring_security_logout'
+		createAccountUrl = '/login/facebookCreateAccount'
+		registerUrl = '/register'
 	}
 
 	facebookAuthService(FacebookAuthService) {
@@ -95,6 +100,13 @@ beans = {
 		userDomainClassName = conf.userLookup.userDomainClassName
 	}
 	
+	
+
+	facebookAuthProvider(FacebookAuthProvider) {
+		facebookAuthDao = ref('facebookAuthDao')
+		facebookAuthUtils = ref('facebookAuthUtils')
+	}
+
 	openIDConsumerManager(ConsumerManager) {
 		grailsApplication = ref('grailsApplication')
 		nonceVerifier = ref('openIDNonceVerifier')

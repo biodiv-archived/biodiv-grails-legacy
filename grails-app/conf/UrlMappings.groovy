@@ -11,6 +11,11 @@ class UrlMappings {
                         action = 'createAccount'
                     }
 
+					"/login/facebookCreateAccount" {
+						controller = 'openId'
+						action = 'createFacebookAccount'
+					}
+					
 		//"/login/$action?"(controller: "login")
 		"/logout/$action?"(controller: "logout")
 		

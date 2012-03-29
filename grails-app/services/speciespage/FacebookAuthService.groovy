@@ -2,10 +2,15 @@ package speciespage
 
 
 import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
+import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.social.facebook.api.FacebookProfile
 import org.springframework.social.facebook.api.impl.FacebookTemplate
 import org.springframework.social.oauth2.Spring30OAuth2RequestFactory
 import org.springframework.social.support.ClientHttpRequestFactorySelector
+
+import species.auth.SUser
+
+import com.the6hours.grails.springsecurity.facebook.FacebookAuthToken
 
 class FacebookAuthService {
 
@@ -36,8 +41,9 @@ class FacebookAuthService {
 			}
 
 			if(!appUser) {
-				log.info "Creating a new user"
-				appUser = UserDomainClass.newInstance()
+				throw new UsernameNotFoundException("No user. Please register", fbProfile);
+				//log.info "Creating a new user"
+				//appUser = UserDomainClass.newInstance()
 			} else {
 				log.info "Merging details with existing account $appUser"
 			}
@@ -81,5 +87,77 @@ class FacebookAuthService {
 		}
 
 		return appUser;
+	}
+
+	/**
+	 * 
+	 * @param token
+	 * @param appUser
+	 * @param openId
+	 */
+	void registerFacebookUser(FacebookAuthToken token, SUser appUser) {
+
+		def conf =  grailsApplication.config.grails.plugins.springsecurity;
+		String domainClassName = conf.facebook.domain.classname;
+		String connectionPropertyName = conf.facebook.domain.connectionPropertyName
+		Class<?> UserClass = grailsApplication.getDomainClass(domainClassName)?.clazz
+
+		if (!UserClass) {
+			log.error("Can't find domain: $domainClassName")
+			return null
+		}
+
+		def user = grailsApplication.getDomainClass(domainClassName).newInstance()
+
+		user.uid = token.uid
+
+		if (user.properties.containsKey('accessToken')) {
+			user.accessToken = token.accessToken
+		}
+
+		user[connectionPropertyName] = appUser
+
+		UserClass.withTransaction {
+			user.save(flush: true, failOnError: true)
+		}
+	}
+
+	/**
+	 *
+	 * @param appUser
+	 * @param fbProfile
+	 */
+	void mergeFacebookUserDetails(SUser appUser, FacebookProfile fbProfile) {
+		copyFromFacebookProfile(appUser, fbProfile);
+	}
+
+	/**
+	 *
+	 */
+	void copyFromFacebookProfile(appUser, FacebookProfile fbProfile) {
+		def securityConf = SpringSecurityUtils.securityConfig
+		if(!appUser['username'] && fbProfile.username) {
+			appUser['username'] = fbProfile.username
+		}
+
+		if(!appUser['name'] && fbProfile.name) {
+			appUser['name'] = fbProfile.name
+		}
+
+		if(!appUser['email'] && fbProfile.email) {
+			appUser['email'] = fbProfile.email
+		}
+
+		if(!appUser['website'] && fbProfile.website) {
+			appUser['website'] = fbProfile.website
+		}
+
+		if(!appUser['profilePic'] && fbProfile.id) {
+			appUser['profilePic'] = "http://graph.facebook.com/$fbProfile.id/picture?type=large";
+		}
+
+		if(!appUser['timezone'] && fbProfile.timezone) {
+			appUser['timezone'] = fbProfile.timezone;
+		}
 	}
 }
