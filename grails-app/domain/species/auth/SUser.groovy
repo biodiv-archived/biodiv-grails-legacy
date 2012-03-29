@@ -24,7 +24,8 @@ class SUser {
 	float timezone=0;//offset
 	String aboutMe;
 	String location;
-
+	boolean sendNotification = true;
+	
 	static hasMany = [openIds: OpenID]
 
 	static constraints = {

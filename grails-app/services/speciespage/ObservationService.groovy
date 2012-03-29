@@ -20,8 +20,6 @@ import species.participation.RecommendationVote;
 import species.participation.RecommendationVote.ConfidenceType;
 import species.sourcehandler.XMLConverter;
 
-import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
-
 class ObservationService {
 
 	static transactional = false
@@ -29,7 +27,7 @@ class ObservationService {
 	def recommendationService;
 	def grailsApplication;
 	def dataSource;
-	def mailService;
+
 	/**
 	 * 
 	 * @param params
@@ -81,39 +79,49 @@ class ObservationService {
 	 * @return
 	 */
 	RecommendationVote getRecommendationVote(params) {
-		def observation = Observation.get(params.obvId);
-		def reco = getRecommendation(params.recoName, params.canName);
-		def author = params.author;
-		ConfidenceType confidence = getConfidenceType(params.confidence?:ConfidenceType.CERTAIN.name());
-		return getRecommendationVote(observation, reco, author, confidence);
-	}
-
-	/**
-	 * 
-	 * @param observation
-	 * @param reco
-	 * @param author
-	 * @param confidence
-	 * @return
-	 */
-	RecommendationVote getRecommendationVote(Observation observation, Recommendation reco, SUser author, ConfidenceType confidence) {
-		return  RecommendationVote.findByAuthorAndRecommendationAndObservation(author, reco, observation);
-	}
-
-	/**
-	 * 	
-	 */
-	RecommendationVote createRecommendationVote(params) {
 		def observation = params.observation?:Observation.get(params.obvId);
+		def author = params.author;
+		
 		def reco;
 		if(params.recoId)
 			reco = Recommendation.get(params.long('recoId'));
 		else
 			reco = getRecommendation(params.recoName, params.canName);
-		def author = params.author;
+		
 		ConfidenceType confidence = getConfidenceType(params.confidence?:ConfidenceType.CERTAIN.name());
-		log.debug params;
-		return new RecommendationVote(observation:observation, recommendation:reco, author:author, confidence:confidence);
+		
+		RecommendationVote existingRecVote = RecommendationVote.findByAuthorAndObservation(author, observation);
+		RecommendationVote newRecVote = new RecommendationVote(observation:observation, recommendation:reco, author:author, confidence:confidence);
+		
+		if(!reco){
+			log.debug "Not a valid recommendation"
+			return null
+		}else{
+			if(!existingRecVote){
+				log.debug " Adding (first time) recommendation vote for user " + author.id +  " reco name " + reco.name
+				return newRecVote
+			}else{
+				if(existingRecVote.recommendation.id == reco.id){
+					log.debug " Same recommendation already made by user " + author.id +  " reco name " + reco.name + " leaving as it is"
+ 					return null
+				}else{
+					log.debug " Overwrting old recommendation vote for user " + author.id +  " new reco name " + reco.name + " old reco name " + existingRecVote.recommendation.name
+					if(!existingRecVote.delete(flush: true)){
+						existingRecVote.errors.allErrors.each { log.error it }
+					}
+					return newRecVote;
+				}
+			}
+		}
+	}
+
+	/**
+	 * 
+	 * @param params
+	 * @return
+	 */
+	RecommendationVote createRecommendationVote(params) {
+		return getRecommendationVote(params);
 	}
 
 	List getRelatedObservation(params){
@@ -161,16 +169,7 @@ class ObservationService {
 
 		return ["observations":createUrlList(Observation.findAll(query, queryParams)), "count":count]
 	}
-	//
-	//	List getRelatedObservationBySpeciesGroup(params){
-	//		def obvId = params.id.toLong()
-	//		def groupId = Observation.read(obvId).group.id
-	//		log.debug(groupId)
-	//		def query = "from Observation as obv where obv.group.id = :groupId and obv.id != :parentObvId order by obv.createdOn desc"
-	//		def obvs = Observation.findAll(query, [groupId:groupId, parentObvId:params.id.toLong(), max:params.limit.toInteger(), offset:params.offset.toInteger()])
-	//		return createUrlList(obvs)
-	//	}
-
+	
 	/**
 	 * 
 	 * @param params
@@ -211,14 +210,6 @@ class ObservationService {
 			return null
 		}
 		return groupId
-		//		}else if(groupName == grailsApplication.config.speciesPortal.group.OTHERS){
-		//			//if group is others
-		//			def groupNameList = ['Animals', 'Arachnids', 'Archaea', 'Bacteria', 'Chromista', 'Viruses', 'Kingdom Protozoa', 'Mullusks', 'Others']
-		//			def groupIds = SpeciesGroup.executeQuery("select distinct sg.id from SpeciesGroup sg where sg.name is null or sg.name in (:groupNameList)", [groupNameList:groupNameList])
-		//			return groupIds
-		//		}else{
-		//			return groupId
-		//		}
 	}
 
 
@@ -241,15 +232,12 @@ class ObservationService {
 		if(!speciesNames) {
 			return [:];
 		}
-		//println "speciesName  ==== " + speciesName
-		//def recId = Recommendation.findByName(speciesName).id
 		def recIds = Recommendation.executeQuery("select rec.id from Recommendation as rec where rec.name in (:speciesNames)", [speciesNames:speciesNames]);
 		def countQuery = "select count(*) from RecommendationVote recVote where recVote.recommendation.id in (:recIds) and recVote.observation.id != :parentObv and recVote.observation.isDeleted = :isDeleted"
 		def countParams = [parentObv:params.id.toLong(), recIds:recIds, isDeleted:false]
 		def count = RecommendationVote.executeQuery(countQuery, countParams)
 		def query = "select recVote.observation from RecommendationVote recVote where recVote.recommendation.id in (:recIds) and recVote.observation.id != :parentObv and recVote.observation.isDeleted = :isDeleted order by recVote.votedOn desc "
 		def m = [parentObv:params.id.toLong(), recIds:recIds, max:params.limit.toInteger(), offset:params.offset.toInteger(), isDeleted:false]
-		//return createUrlList(RecommendationVote.executeQuery(query, m).unique())
 		return ["observations":createUrlList(RecommendationVote.executeQuery(query, m)), "count":count]
 	}
 
@@ -503,29 +491,6 @@ class ObservationService {
 		def observationInstanceList = Observation.executeQuery(query, queryParams)
 
 		return [observationInstanceList:observationInstanceList, queryParams:queryParams, activeFilters:activeFilters]
-	}
-	/**
-	 * 
-	 * @param user
-	 */
-	void sendAddRecommendationMail(user){
-		
-		def conf = SpringSecurityUtils.securityConfig
-		def body = conf.ui.addRecommendationVote.emailBody
-		if (body.contains('$')) {
-			body = evaluate(body, [user: user])
-		}
-		mailService.sendMail {
-			to user.email
-			from conf.ui.addRecommendationVote.emailFrom
-			subject conf.ui.addRecommendationVote.emailSubject
-			html body.toString()
-		}
-
-	}
-	
-	private String evaluate(s, binding) {
-		new SimpleTemplateEngine().createTemplate(s).make(binding)
 	}
 	
 }

@@ -97,11 +97,11 @@ width:90%;
 				
 				<div>
 				<a href="${createLink(controller:'observation', action:'edit', id:observationInstance.id, absolute:true)}"> Edit Observation </a>
-				<a href="${createLink(controller:'observation', action:'flagDeleted', id:observationInstance.id, absolute:true)}"> Delete Observation </a>
+				<a href="${createLink(controller:'observation', action:'flagDeleted', id:observationInstance.id, absolute:true)}" onclick="return confirm('${message(code: 'default.observatoin.delete.confirm.message', default: 'This observation will be deleted. Are you sure ?')}');"> Delete Observation </a>
 				</div>
 <%--				--%>
 <%--				<div class="buttons">--%>
-<%--                    <span class="button"><g:actionSubmit class="delete" action="flagDeleted" value="${message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" /></span>--%>
+<%--                    <span class="button"><g:actionSubmit class="delete" action="flagDeleted" value="${message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure you want to delete this observation ?')}');" /></span>--%>
 <%--                </div>--%>
 			</div>
 

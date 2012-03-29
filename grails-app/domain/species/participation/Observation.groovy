@@ -97,6 +97,14 @@ class Observation implements Taggable{
 			return null;			
 		}
 	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	RecommendationVote fetchOwnerRecoVote(){
+		return RecommendationVote.findByAuthorAndObservation(author, this);
+	}
 
 	/**
 	 * 
