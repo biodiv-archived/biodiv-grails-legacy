@@ -35,8 +35,8 @@
 </g:javascript>
 <h5><g:message code="default.tags.title" default="Tags" /></h5>
 View as 
-<span id="as_list" class="button small">List</span> 
-<span id="as_cloud" class="button small active">Cloud</span>
+<span id="as_list" class="btn btn-mini">List</span> 
+<span id="as_cloud" class="btn btn-mini active">Cloud</span>
 <div id="tagCloud" class="grid_4 sidebar_section">
 	<obv:showTagsCloud/>
 </div>
