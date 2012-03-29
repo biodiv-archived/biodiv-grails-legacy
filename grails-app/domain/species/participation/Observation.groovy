@@ -48,7 +48,7 @@ class Observation implements Taggable{
 	SUser author;
 	Date observedOn;
 	Date createdOn = new Date();
-	Date lastUpdated = createdOn;
+	Date lastRevised = createdOn;
 	String notes;
 	SpeciesGroup group;
 	int rating;
@@ -222,10 +222,6 @@ class Observation implements Taggable{
 		return result[0]["count"]
 	}
 	
-//	def daysAfterLastUpdate(){
-//		return (new Date()).minus(lastUpdated);
-//	}
-	
 	def incrementPageVisit(){
 		visitCount++;
 		
@@ -236,7 +232,7 @@ class Observation implements Taggable{
 	
 	def beforeUpdate(){
 		if(isDirty() && !isDirty('visitCount')){
-			lastUpdated = new Date();
+			lastRevised = new Date();
 		}
 	}
 	
