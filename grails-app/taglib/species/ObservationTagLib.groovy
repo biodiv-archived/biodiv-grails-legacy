@@ -91,8 +91,8 @@ class ObservationTagLib {
 	}
 	
 	def showAllTags = {attrs, body->
-		attrs.model.count = observationService.getNoOfTags();
-		out << render(template:"/common/observation/showAllTagsTemplate", model:attrs.model);
+		def count = observationService.getNoOfTags();
+		out << render(template:"/common/observation/showAllTagsTemplate", model:[count: count]);
 	}
 
 	def showGroupList = {attrs, body->

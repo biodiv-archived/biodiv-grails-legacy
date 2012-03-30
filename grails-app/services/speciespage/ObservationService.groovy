@@ -339,7 +339,10 @@ class ObservationService {
 
 	List findAllTagsSortedByObservationCount(int max){
 		def sql =  Sql.newInstance(dataSource);
-		String query = "select t.name as name from tag_links as tl, tags as t, observation obv where tl.tag_ref = obv.id and obv.is_deleted = false and t.id = tl.tag_id group by t.name order by count(t.name) desc limit " + max ;
+		//query with observation delete handle
+		//String query = "select t.name as name from tag_links as tl, tags as t, observation obv where tl.tag_ref = obv.id and obv.is_deleted = false and t.id = tl.tag_id group by t.name order by count(t.name) desc limit " + max ;
+		
+		String query = "select t.name as name from tag_links as tl, tags as t where t.id = tl.tag_id group by t.name order by count(t.name) desc limit " + max ;
 		def tags = []
 		sql.rows(query).each{
 			tags.add(it.getProperty("name"));
