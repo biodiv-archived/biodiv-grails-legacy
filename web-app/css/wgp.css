@@ -26,7 +26,7 @@ padding: 3px;
 
 .filterBar .ui-state-active {
 opacity: 1;
-border-bottom: 3px solid #5b5b9d;
+border-bottom: 2px solid #5b5b9d;
 border-radius: 0;
 }
 
@@ -37,10 +37,7 @@ float: left;
 
 .filterBar label {
 display: inline-block;    
-}
-
-#map_view_bttn {
-float: right;
+font-size: 0.9em;         
 }
 
 .list_view .snippet {
@@ -49,6 +46,8 @@ padding: 5px;
 
 .snippet.tablet {
 width: 200px;
+height: 300px;
+overflow: hidden;        
 }
 
 .snippet.tablet .span2{
@@ -56,7 +55,10 @@ margin: 0;
 }
 
 .snippet .figure {
-margin: 0;
+margin-bottom: 5px;        
+max-width: 200px
+margin-left: auto;
+margin-right: auto;
 }
 
 .grid_view li.thumbnail {
@@ -87,7 +89,6 @@ margin-top:10px;
 
 .prop.tablet {
 	font-size: 0.8em;
-	padding-left: 10px;
 }
 
 .prop .name {
@@ -313,6 +314,10 @@ list-style-type: none;
 color: #ffffff;
 }
 
+a.btn {
+color: #000000;
+}
+
 .btn a {
 text-decoration: none;
 }
@@ -403,4 +408,37 @@ padding:20px 10px;
 margin-bottom:10px;
 background-color:#9acc57;
 border-radius:5px 0 0 5px;
+}
+
+#big_map_canvas {
+border: 1px solid #ffffff;
+}
+
+.map_wrapper {
+padding: 10px;
+background-color: #9acc57;         
+border-radius: 5px;
+border-top-left-radius: 0;
+}
+
+#map_view_bttn {
+float: left;    
+padding: 10px 10px 0 10px;
+border-top-left-radius: 5px;
+border-top-right-radius: 5px;
+}
+
+.all_content {
+clear: both;
+width:200px;
+padding:0;
+margin:0;
+}
+
+.snippet.tablet .figure img {
+height: 120px;
+}
+
+.btn-group.open .dropdown-menu {
+border-radius: 0;
 }
