@@ -341,6 +341,7 @@ jpegOptimProg = "/usr/bin/jpegoptim";
 environments {
 	development {
 		grails.serverURL = "http://localhost:8080/${appName}"
+		grails.domainServerURL = "http://localhost:8080/${appName}"
 		speciesPortal {
 			search.serverURL = "http://localhost:8090/solr/species"
 			names.parser.serverURL = "127.0.0.1"
@@ -365,15 +366,18 @@ environments {
 	}
 	test {
 		grails.serverURL = "http://localhost:8080/${appName}"
+		grails.domainServerURL = "http://localhost:8080/${appName}"
 		google.analytics.enabled = false
 	}
 	production {
 		grails.serverURL = "http://localhost:8080/${appName}"
+		grails.domainServerURL = "http://localhost:8080/${appName}"
 		google.analytics.enabled = false
 	}
 
 	saturn {
 		grails.serverURL = "http://saturn.strandls.com:8080/${appName}"
+		grails.domainServerURL = "http://saturn.strandls.com:8080/${appName}"
 		speciesPortal {
 			app.rootDir = "/data/species"
 			data.rootDir = "${app.rootDir}/data"
@@ -409,6 +413,7 @@ environments {
 
 	pamba {
 		grails.serverURL = "http://thewesternghats.in:8080/${appName}"
+		grails.domainServerURL = "http://thewesternghats.in:8080/${appName}"
 		speciesPortal {
 			app.rootDir = "/data/species"
 			data.rootDir = "${app.rootDir}/data"

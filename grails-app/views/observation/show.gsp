@@ -92,7 +92,7 @@ width:90%;
 			    	<obv:showStory model="['observationInstance':observationInstance]" />
                 </div>
   					
-				<fb:comments colorscheme='light' href="${createLink(controller:'observation', action:'show', id:observationInstance.id, base:'http://'+grailsApplication.config.speciesPortal.domain)}"></fb:comments>
+				<fb:comments colorscheme='light' href="${createLink(controller:'observation', action:'show', id:observationInstance.id, base:grailsApplication.config.grails.domainServerURL)}"></fb:comments>
 				
 			</div>
 
