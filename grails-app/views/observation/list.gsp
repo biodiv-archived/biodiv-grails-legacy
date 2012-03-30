@@ -53,8 +53,8 @@
                                         <label for="sortFilter1" value="createdOn">Latest</label>
 
                                         <input type="radio" name="sortFilter" id="sortFilter2"
-                                                value="lastUpdated" style="display: none" />
-                                        <label for="sortFilter2" value="lastUpdated">Last Updated</label>
+                                                value="lastRevised" style="display: none" />
+                                        <label for="sortFilter2" value="lastRevised">Last Updated</label>
 
                                         <input type="radio" name="sortFilter" id="sortFilter3" 
                                                 value="visitCount" style="display: none" />
@@ -105,14 +105,14 @@
                             
                             <obv:showObservationsList/>
 
-                            <div class="paginateButtons" style="visibility:hidden; clear: both">
-                                <g:paginate total="${observationInstanceTotal}" max="2" params="${activeFilters}"/>
-                            </div>
+<%--                            <div class="paginateButtons" style="visibility:hidden; clear: both">--%>
+<%--                                <g:paginate total="${observationInstanceTotal}" max="2" params="${activeFilters}"/>--%>
+<%--                            </div>--%>
                         </div> 
                     </div>
 
                     <div class="tags_section span3">
-                         <obv:showAllTags/> 
+                         <obv:showAllTags model="['tagFilterByProperty':'All']"/> 
                     </div>
 
                 </div> <!-- main_content end -->
