@@ -88,18 +88,13 @@ width:90%;
 					
 				</div>
                                 
-                                <div style="margin:0;">
-				    <obv:showStory model="['observationInstance':observationInstance]" />
-                                </div>
+                <div style="margin:0;">
+			    	<obv:showStory model="['observationInstance':observationInstance]" />
+                </div>
   					
-				<div class="span8 comments" style="margin:0;">
-					<fb:like send="true" width="450" show_faces="true"></fb:like>
-					<div class="fb-comments grid_10"
-						data-href="${createLink(controller:'observation', action:'show', id:observationInstance.id, absolute:true)}"
-						data-num-posts="10"></div>
-				</div>
+				<fb:comments colorscheme='light' href="${createLink(controller:'observation', action:'show', id:observationInstance.id, base:'http://'+grailsApplication.config.speciesPortal.domain)}"></fb:comments>
 				
-						</div>
+			</div>
 
 
 			<div class="span4">
@@ -261,7 +256,6 @@ width:90%;
 			});
          });
          $("#seeMore").click();
-         
 	});
 </g:javascript>
 

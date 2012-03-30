@@ -320,7 +320,7 @@ border-bottom:3px solid #003846;
 				});
 				
 
-				(function(d){var js, id = 'facebook-jssdk'; if (d.getElementById(id)) {return;}js = d.createElement('script'); js.id = id; js.async = true;js.src = "//connect.facebook.net/en_US/all.js";d.getElementsByTagName('head')[0].appendChild(js);}(document));			
+							
 	
 				// make sure facebook is initialized before calling the facebook JS api
 				window.fbEnsure = function(callback) {
@@ -338,7 +338,7 @@ border-bottom:3px solid #003846;
 					  window.facebookInitialized = true;
 					  callback();
 				};
-
+				
 				/**
 				 * Just connect (for logged in users) to facebook and reassociate the user
 				 * (and possibly get the facebook profile picture if no avatar yet set).
@@ -368,8 +368,6 @@ border-bottom:3px solid #003846;
 				
 		}); 
 
-
-
 			function show_login_dialog() {
 				$('#ajaxLogin').show(); 
 			} 
@@ -388,7 +386,13 @@ border-bottom:3px solid #003846;
 			if (typeof(console.log) == "undefined") { console.log = function() { return 0; } }
 			
 </g:javascript>	
-	
+	<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1&appId=${SpringSecurityUtils.securityConfig.facebook.appId}";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
 	
 </body>
 </html>
