@@ -75,6 +75,21 @@
 			${observationInstance.getPageVisitCount()}
 		</div>
 	</div>
+	
+	<div class="prop tablet">
+		<span class="name tablet">Comments</span>
+		<div class="value tablet">
+			<fb:comments-count href="${createLink(controller:'observation', action:'show', id:observationInstance.id, base:'http://'+grailsApplication.config.speciesPortal.domain)}"></fb:comments-count>
+		</div>
+	</div>
+
+	<div class="prop tablet">
+		<span class="name tablet">Likes</span>
+		<div class="value tablet">
+			<fb:like layout="button_count" href="${createLink(controller:'observation', action:'show', id:observationInstance.id, base:'http://'+grailsApplication.config.speciesPortal.domain)}" send="true" width="450" show_faces="true"></fb:like>
+		</div>
+	</div>
+	
 
 	<sUser:showUserTemplate model="['userInstance':observationInstance.author]"/>
 
