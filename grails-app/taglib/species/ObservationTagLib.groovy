@@ -96,7 +96,7 @@ class ObservationTagLib {
 			tags =  observationService.findAllTagsSortedByObservationCount(50);
 			count = observationService.getNoOfTags();
 		} 
-		 
+		//log.debug "==== tags " + tags 
 		out << render(template:"/common/observation/showAllTagsTemplate", model:[count: count, tags:tags]);
 	}
 		

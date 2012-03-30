@@ -366,13 +366,15 @@ class ObservationService {
 		return ["observations":nearbyObservations, "count":nearbyObservations.size()]
 	}
 
-	Set getAllTagsOfUser(userId){
-		Observation.withTransaction { status ->
-			List obvs = Observation.findAll("from Observation as obv where obv.author.id = :userId and obv.isDeleted = :isDeleted", [userId :userId, isDeleted:false]);
-			Set tagSet = new HashSet();
-			obvs.each{ tagSet.addAll(it.tags) }
-			return tagSet;
-		}
+	List getAllTagsOfUser(userId){
+		def sql =  Sql.newInstance(dataSource);
+		String query = "select t.name as name from tag_links as tl, tags as t, observation as obv where obv.author_id = " + userId + " and tl.tag_ref = obv.id and t.id = tl.tag_id group by t.name order by count(t.name) desc";
+		
+		def tags = []
+		sql.rows(query).each{
+			tags.add(it.getProperty("name"));
+		};
+		return tags;
 	}
 
 	/**
