@@ -320,7 +320,7 @@ border-bottom:3px solid #003846;
 				});
 				
 
-				(function(d){var js, id = 'facebook-jssdk'; if (d.getElementById(id)) {return;}js = d.createElement('script'); js.id = id; js.async = true;js.src = "//connect.facebook.net/en_US/all.js";d.getElementsByTagName('head')[0].appendChild(js);}(document));			
+							
 	
 				// make sure facebook is initialized before calling the facebook JS api
 				window.fbEnsure = function(callback) {
@@ -338,7 +338,7 @@ border-bottom:3px solid #003846;
 					  window.facebookInitialized = true;
 					  callback();
 				};
-
+				
 				/**
 				 * Just connect (for logged in users) to facebook and reassociate the user
 				 * (and possibly get the facebook profile picture if no avatar yet set).
@@ -369,7 +369,18 @@ border-bottom:3px solid #003846;
 		}); 
 
 
-
+		(function(d) {
+			var js, id = 'facebook-jssdk'; 
+			if (d.getElementById(id)) { 
+				return;
+			}
+			js = d.createElement('script'); 
+			js.id = id; 
+			js.async = true;
+			js.src = "//connect.facebook.net/en_US/all.js";
+			d.getElementsByTagName('head')[0].appendChild(js);
+		}(document));
+		
 			function show_login_dialog() {
 				$('#ajaxLogin').show(); 
 			} 

@@ -30,6 +30,7 @@ class OpenIdController {
 	def springSecurityService
 
 	def facebookAuthService
+	def SUserService
 	
 	static defaultAction = 'auth'
 
@@ -99,7 +100,7 @@ class OpenIdController {
 		if(user) {
 			log.info "Found existing user with same emailId $email"
 			log.info "Merging details with existing account $user"
-			registerAccountOpenId user, openId
+			registerAccountOpenId user.email, openId
 			def usernamePropertyName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
 			authenticateAndRedirect user."$usernamePropertyName"
 		} else {
@@ -179,7 +180,7 @@ class OpenIdController {
 			log.info "Found existing user with same emailId $email"
 			log.info "Merging details with existing account $user"
 			facebookAuthService.mergeFacebookUserDetails user, fbProfile
-			registerAccountOpenId user, fbProfile.link
+			registerAccountOpenId user.email, fbProfile.link
 			facebookAuthService.registerFacebookUser token, user
 			
 			def usernamePropertyName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
@@ -189,7 +190,7 @@ class OpenIdController {
 			RegisterCommand command = new RegisterCommand();
 			facebookAuthService.copyFromFacebookProfile command, fbProfile
 			command.openId = fbProfile.link
-			command.facebookToken = token;
+			command.facebookUser = true;
 			log.debug "register command : $command"
 			flash.chainedParams = [command: command]
 			chain ( controller:"register");
@@ -205,7 +206,8 @@ class OpenIdController {
 	private void authenticateAndRedirect(String username) {
 		session.removeAttribute OIAFH.LAST_OPENID_USERNAME
 		session.removeAttribute OIAFH.LAST_OPENID_ATTRIBUTES
-
+		session.removeAttribute "LAST_FACEBOOK_USER"
+		
 		springSecurityService.reauthenticate username
 
 		def config = SpringSecurityUtils.securityConfig
@@ -262,16 +264,24 @@ class OpenIdController {
 				new UsernamePasswordAuthenticationToken(username, password))
 
 		def user = SUser.findByUsername(username)
-		registerAccountOpenId(user, openId);
+		registerAccountOpenId(user.email, openId);
 	}
 
-	private void registerAccountOpenId(SUser user, String openId) {
+	private void registerAccountOpenId(String email, String openId) {
 		SUser.withTransaction { status ->
+			def user = SUser.findByEmail(email);
 			user.addToOpenIds(url: openId)
-			if (!user.validate()) {
+			if (!user.save(flush:true, failOnError:true)) {
 				status.setRollbackOnly()
 			}
+			
+//			//user roles getting deleted...patch to add them again onmerge.
+//			def userRole = SUserRole.findBySUser(user);
+//			if(!userRole) {
+//				SUserService.assignRoles(user);
+//			}
 		}
+		
 	}
 
 	

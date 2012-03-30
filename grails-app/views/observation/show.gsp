@@ -95,7 +95,7 @@ width:90%;
 				<div class="span8 comments" style="margin:0;">
 					<fb:like send="true" width="450" show_faces="true"></fb:like>
 					<div class="fb-comments grid_10"
-						data-href="${createLink(controller:'observation', action:'show', id:observationInstance.id, absolute:true)}"
+						data-href="${createLink(controller:'observation', action:'show', id:observationInstance.id, base:'http://'+grailsApplication.config.speciesPortal.domain)}"
 						data-num-posts="10"></div>
 				</div>
 				
@@ -261,7 +261,6 @@ width:90%;
 			});
          });
          $("#seeMore").click();
-         
 	});
 </g:javascript>
 
