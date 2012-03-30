@@ -114,8 +114,8 @@ class SUserController extends UserController {
 
 			String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
 
-			lookupUserRoleClass().removeAll user
-			addRoles user
+			//lookupUserRoleClass().removeAll user
+			//addRoles user
 			userCache.removeUserFromCache user[usernameFieldName]
 			flash.message = "${message(code: 'default.updated.message', args: [message(code: 'user.label', default: 'User'), user.id])}"
 			redirect action: edit, id: user.id

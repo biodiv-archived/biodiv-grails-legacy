@@ -62,7 +62,7 @@
 											<s2ui:textFieldRow name='email' bean="${command}"
 												value="${command.email}" size='25'
 												labelCode='user.email.label' labelCodeDefault='E-mail*'
-												readonly="${(command.openId)?'readonly':''}" />
+												${(command.openId)?'readonly=':''} />
 
 											<g:if test="${!command.openId}">
 												<s2ui:passwordFieldRow name='password'
@@ -106,6 +106,11 @@
 													labelCode='user.password2.label' bean="${command}"
 													size='25' labelCodeDefault='Password (again)*'
 													value="dummyPassword" />
+													
+												<s2ui:textFieldRow name='facebookUser'
+													labelCode='user.facebookUser.label' bean="${facebookUser}"
+													size='25' labelCodeDefault='facebookUser'
+													value="${command.facebookUser}" />
 											</g:if>
 										<s2ui:textFieldRow name='username'
 											labelCode='user.username.label' bean="${command}" size='25'

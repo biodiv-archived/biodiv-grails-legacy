@@ -77,4 +77,12 @@ class SUserTagLib {
 			out << render(template:"/common/suser/showUserStoryTabletTemplate", model:attrs.model);
 		}
 	}
+	/**
+	 * 
+	 */
+	def showDate = {
+		if(attrs.model.userInstance) {
+			out << render(template:"/common/suser/showDateTemplate", model:attrs.model);
+		}
+	}
 }

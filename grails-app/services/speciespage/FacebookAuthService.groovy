@@ -96,7 +96,7 @@ class FacebookAuthService {
 	 * @param openId
 	 */
 	void registerFacebookUser(FacebookAuthToken token, SUser appUser) {
-
+		log.debug "Saving facebook user domain class"
 		def conf =  grailsApplication.config.grails.plugins.springsecurity;
 		String domainClassName = conf.facebook.domain.classname;
 		String connectionPropertyName = conf.facebook.domain.connectionPropertyName
@@ -117,9 +117,9 @@ class FacebookAuthService {
 
 		user[connectionPropertyName] = appUser
 
-		UserClass.withTransaction {
-			user.save(flush: true, failOnError: true)
-		}
+		user.save(flush: true, failOnError: true)
+
+		log.debug "Saving facebook user domain class done $user"
 	}
 
 	/**

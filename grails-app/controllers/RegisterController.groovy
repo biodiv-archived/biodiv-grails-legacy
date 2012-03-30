@@ -21,6 +21,7 @@ class RegisterController extends grails.plugins.springsecurity.ui.RegisterContro
 		
 		def config = SpringSecurityUtils.securityConfig
 		if(flash.chainedParams?.command) {
+			log.debug("Registration with openId command: $flash.chainedParams");
 			['command': flash.chainedParams?.command, 
 				openIdPostUrl: "${request.contextPath}$openIDAuthenticationFilter.filterProcessesUrl",
 				daoPostUrl:    "${request.contextPath}${config.apf.filterProcessesUrl}",
@@ -29,7 +30,7 @@ class RegisterController extends grails.plugins.springsecurity.ui.RegisterContro
 				openidIdentifier: config.openid.claimedIdentityFieldName
 				]
 		} else {
-			log.debug("Registration : $flash.chainedParams");
+			log.debug("Registration with params : $flash.chainedParams");
 			def copy = [:] + (flash.chainedParams ?: [:])
 			if(flash.chainedParams?.timezone) {
 				copy.timezone = params.float(copy.timezone)
@@ -61,18 +62,22 @@ class RegisterController extends grails.plugins.springsecurity.ui.RegisterContro
 		def user = SUserService.create(command.properties);
 		
 		if(command.openId) {
+			log.debug("Is an openId registration");
 			user.accountLocked = false;
 			user.addToOpenIds(url: command.openId);
 			user.password = "openIdPassword"
 			
 			SUserService.save(user);
 			
-			if(command.facebookToken) {
-				facebookAuthService.registerFacebookUser command.token, user
+			if(command.facebookUser) {
+				log.debug "registering facebook user"
+				def token = session["LAST_FACEBOOK_USER"]
+				facebookAuthService.registerFacebookUser token, user
 			}
 			
 			SUserService.assignRoles(user);
 		} else {
+			log.debug("Is an local account registration");
 			user.accountLocked = true;
 			SUserService.save(user);
 		}
@@ -317,7 +322,7 @@ class RegisterCommand {
 	String location;
 	String profilePic;
 	String openId;
-	FacebookAuthToken facebookToken;
+	boolean facebookUser;
 
 	def grailsApplication
 

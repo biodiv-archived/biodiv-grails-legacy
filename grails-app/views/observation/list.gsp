@@ -125,9 +125,9 @@
                             
                             <obv:showObservationsList/>
 
-                            <div class="paginateButtons" style="visibility:hidden; clear: both">
-                                <g:paginate total="${observationInstanceTotal}" max="2" params="${activeFilters}"/>
-                            </div>
+<%--                            <div class="paginateButtons" style="visibility:hidden; clear: both">--%>
+<%--                                <g:paginate total="${observationInstanceTotal}" max="2" params="${activeFilters}"/>--%>
+<%--                            </div>--%>
                         </div> 
                     </div>
 

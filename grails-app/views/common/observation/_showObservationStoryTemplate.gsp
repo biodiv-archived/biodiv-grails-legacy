@@ -64,6 +64,21 @@
 		</div>
 	</div>
 
+	<div class="prop">
+		<span class="name">Comments</span>
+		<div class="value">
+			<fb:comments-count href="${createLink(controller:'observation', action:'show', id:observationInstance.id, base:grailsApplication.config.grails.domainServerURL)}"></fb:comments-count>
+		</div>
+	</div>
+
+	<div class="prop">
+		<span class="name">Likes</span>
+		<div class="value">
+			<fb:like layout="button_count" href="${createLink(controller:'observation', action:'show', id:observationInstance.id, base:grailsApplication.config.grails.domainServerURL)}" send="true" width="450" show_faces="true"></fb:like>
+		</div>
+	</div>
+	
+					
 	<sUser:showUserTemplate model="['userInstance':observationInstance.author]"/>
 
 	<obv:showTagsSummary
