@@ -81,20 +81,35 @@ class ObservationTagLib {
 		}
 	}
 	
-	def showTagsList = {attrs, body->
-			def tags = observationService.findAllTagsSortedByObservationCount(50);
-			out << render(template:"/common/observation/showTagsListTemplate", model:[tags:tags]);
+	// this will call showTagsList and showTagsCloud
+	def showAllTags = {attrs, body->
+		def tagFilterBy = attrs.model.tagFilterByProperty
+		
+		def count
+		def tags
+		if(tagFilterBy == "User"){
+			def userId = attrs.model.tagFilterByPropertyValue.toLong();
+			tags = observationService.getAllTagsOfUser(userId)
+			count = tags.size()
+		}
+		else{
+			tags =  observationService.findAllTagsSortedByObservationCount(50);
+			count = observationService.getNoOfTags();
+		} 
+		 
+		out << render(template:"/common/observation/showAllTagsTemplate", model:[count: count, tags:tags]);
 	}
+		
+	def showTagsList = {attrs, body->
+		out << render(template:"/common/observation/showTagsListTemplate", model:[tags:attrs.model.tags]);
+	}
+	
 	
 	def showTagsCloud = {attrs, body->
 		out << render(template:"/common/observation/showTagsCloudTemplate", model:attrs.model);
 	}
 	
-	def showAllTags = {attrs, body->
-		def count = observationService.getNoOfTags();
-		out << render(template:"/common/observation/showAllTagsTemplate", model:[count: count]);
-	}
-
+	
 	def showGroupList = {attrs, body->
 		out << render(template:"/common/observation/showGroupListTemplate", model:attrs.model);
 	}
@@ -107,19 +122,9 @@ class ObservationTagLib {
 	///////////////////////////////  Tag List added by specific User ///////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////
 	
-	def showAllTagsOfUser = {attrs, body->
-		def tags = observationService.getAllTagsOfUser(attrs.model.userId.toLong());
-		out << render(template:"/common/observation/showTagsListTemplate", model:[tags:tags]);
-	}
-	
 	def showNoOfTagsOfUser = {attrs, body->
 		def tags = observationService.getAllTagsOfUser(attrs.model.userId.toLong());		
 		out << tags.size() 
-	}
-	
-	def showUserAddedTags = {attrs, body->
-		attrs.model.count = observationService.getAllTagsOfUser(attrs.model.userId.toLong())?.size();
-		out << render(template:"/common/observation/showAllTagsTemplate", model:attrs.model);
 	}
 	
 	////////////////////////////////////////////////////////////////////////////////////////////
@@ -134,7 +139,7 @@ class ObservationTagLib {
 		out << render(template:"/common/observation/showSpeciesNameTemplate",model:attrs.model);
         }
         
-        def showObservationsList = {attrs, body->
+    def showObservationsList = {attrs, body->
 		out << render(template:"/common/observation/showObservationListTemplate", model:attrs.model);
 	}
 	

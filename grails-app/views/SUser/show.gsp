@@ -113,11 +113,7 @@
 			</div>
 
 			<div class="tags_section grid_15">
-				<obv:showUserAddedTags  model="['userId':SUserInstance.id]" />
-				<div id="tagList" class="grid_15 sidebar_section"
-					style="display: none;">
-					<obv:showAllTagsOfUser model="['userId':SUserInstance.id]" />
-				</div>
+				<obv:showAllTags  model="['tagFilterByProperty':'User', 'tagFilterByPropertyValue':SUserInstance.id]" />
 			</div>
 		</div>
 

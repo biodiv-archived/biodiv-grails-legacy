@@ -112,7 +112,7 @@
                     </div>
 
                     <div class="tags_section span3">
-                         <obv:showAllTags/> 
+                         <obv:showAllTags model="['tagFilterByProperty':'All']"/> 
                     </div>
 
                 </div> <!-- main_content end -->
