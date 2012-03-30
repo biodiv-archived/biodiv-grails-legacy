@@ -53,8 +53,8 @@
                                         <label for="sortFilter1" value="createdOn">Latest</label>
 
                                         <input type="radio" name="sortFilter" id="sortFilter2"
-                                                value="lastUpdated" style="display: none" />
-                                        <label for="sortFilter2" value="lastUpdated">Last Updated</label>
+                                                value="lastRevised" style="display: none" />
+                                        <label for="sortFilter2" value="lastRevised">Last Updated</label>
 
                                         <input type="radio" name="sortFilter" id="sortFilter3" 
                                                 value="visitCount" style="display: none" />
