@@ -53,6 +53,23 @@
 					<g:link controller="SUser" action="show" id="${SUserInstance.id }">
 						<img class="normal_profile_pic" src="${SUserInstance.icon()}" />
 					</g:link>
+					
+<%--						<div class="prop">--%>
+<%--							<span class="name">Member since </span> <span class="value">--%>
+<%--							<sUser:showDate --%>
+<%--								model="['SUserInstance':SUserInstance, 'propertyName':'dateCreated']" />--%>
+<%--							</span>--%>
+<%--						</div>--%>
+<%----%>
+<%----%>
+<%--						<div class="prop">--%>
+<%--							<span class="name">Last visited </span> <span class="value">--%>
+<%--							<sUser:showDate --%>
+<%--								model="['SUserInstance':SUserInstance, 'propertyName':'lastLoginDate']" />--%>
+<%--							</span>--%>
+<%--						</div>--%>
+<%--					--%>
+					
 					<div class="prop">
 						<span class="name">Member since </span> <span class="value">
 							<g:formatDate format="yyyy-MM-dd" date="${SUserInstance.dateCreated}" type="datetime" style="MEDIUM"/>
@@ -90,11 +107,11 @@
 							default="Location" /> </span> <span class="value"> ${fieldValue(bean: SUserInstance, field: "location")}
 					</span>
 				</div>
-				<div class="prop">
-					<span class="name"><g:message code="resource.timezone.label"
-							default="Timezone Offset" /> </span> <span class="value"> ${fieldValue(bean: SUserInstance, field: "timezone")}
-					</span>
-				</div>
+<%--				<div class="prop">--%>
+<%--					<span class="name"><g:message code="resource.timezone.label"--%>
+<%--							default="Timezone Offset" /> </span> <span class="value"> ${fieldValue(bean: SUserInstance, field: "timezone")}--%>
+<%--					</span>--%>
+<%--				</div>--%>
 				<div class="prop">
 					<span class="name"><g:message code="resource.aboutMe.label"
 							default="About Me" /> </span> <span class="value"> ${fieldValue(bean: SUserInstance, field: "aboutMe")}
