@@ -12,6 +12,8 @@ class SUserService extends SpringSecurityUiService {
 
 	def grailsApplication
 
+	def springSecurityService
+	
 	/**
 	 * 
 	 */
@@ -94,5 +96,9 @@ class SUserService extends SpringSecurityUiService {
 				}
 			}
 		}
+	}
+	
+	def ifOwns(SUser user) {
+		return springSecurityService.isLoggedIn() && springSecurityService.currentUser?.id == user.id	
 	}
 }

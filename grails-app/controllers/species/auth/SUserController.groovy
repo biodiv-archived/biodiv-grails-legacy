@@ -106,7 +106,9 @@ class SUserController extends UserController {
 				String salt = saltSource instanceof NullSaltSource ? null : params.username
 				user."$passwordFieldName" = springSecurityUiService.encodePassword(params.password, salt)
 			}
-
+			
+			user.sendNotification = (params.sendNotification?.equals('on'))?true:false;
+				
 			if (!user.save(flush: true)) {
 				render view: 'edit', model: buildUserModel(user)
 				return
@@ -118,7 +120,7 @@ class SUserController extends UserController {
 			//addRoles user
 			userCache.removeUserFromCache user[usernameFieldName]
 			flash.message = "${message(code: 'default.updated.message', args: [message(code: 'user.label', default: 'User'), user.id])}"
-			redirect action: edit, id: user.id
+			redirect action: show, id: user.id
 		} else {
 			flash.message = "${message(code: 'update.denied.message')}";
 			redirect (action:'show', id:params.id)
@@ -277,7 +279,7 @@ class SUserController extends UserController {
 	}
 
 	protected findById() {
-		def user = lookupUserClass().get(params.id)
+		def user = lookupUserClass().get(params.long('id'))
 		if (!user) {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'user.label', default: 'User'), params.id])}"
 			redirect action: search

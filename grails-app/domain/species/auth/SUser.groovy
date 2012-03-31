@@ -25,6 +25,7 @@ class SUser {
 	String aboutMe;
 	String location;
 	boolean sendNotification = true;
+	boolean hideEmailId = true;
 	
 	static hasMany = [openIds: OpenID]
 

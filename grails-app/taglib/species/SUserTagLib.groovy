@@ -4,7 +4,8 @@ class SUserTagLib {
 	static namespace = "sUser"
 
 	def springSecurityService
-
+	def SUserService;
+	
 	/**
 	 * 
 	 */
@@ -20,7 +21,16 @@ class SUserTagLib {
 	 * Renders the body if the authenticated user owns this page.
 	 */
 	def ifOwns = { attrs, body ->
-		if (springSecurityService.isLoggedIn() && springSecurityService.currentUser?.id == attrs.model.user.id) {
+		if (SUserService.ifOwns(attrs.model.user)) {
+			out << body()
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	def ifOwnsOrIsPublic = { attrs, body ->
+		if (SUserService.ifOwns(attrs.model.user) || attrs.model.isPublic) {
 			out << body()
 		}
 	}
