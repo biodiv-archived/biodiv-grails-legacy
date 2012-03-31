@@ -47,37 +47,48 @@
                         <div class="observations thumbwrap">
                             <div class="observation grid_11">
                                 <div class="button-bar">
-                                    <div id="sortFilter" class="filterBar"  style="clear: both">
-                                        <input type="radio" name="sortFilter" id="sortFilter1" 
-                                                value="createdOn" style="display: none" />
-                                        <label for="sortFilter1" value="createdOn">Latest</label>
+                                    <div id="speciesNameFilter" class="filterBar"  style="clear:both;">
+                                            <input type="radio" name="speciesNameFilter" id="speciesNameFilter1"
+                                                    value="All" style="display: none" />
+                                            <label for="speciesNameFilter1" value="All">All</label>
 
-                                        <input type="radio" name="sortFilter" id="sortFilter2"
-                                                value="lastRevised" style="display: none" />
-                                        <label for="sortFilter2" value="lastRevised">Last Updated</label>
-
-                                        <input type="radio" name="sortFilter" id="sortFilter3" 
-                                                value="visitCount" style="display: none" />
-                                        <label for="sortFilter3" value="visitCount">Most Viewed</label>
+                                            <input type="radio" name="speciesNameFilter" id="speciesNameFilter2"
+                                                    value="Unknown" style="display: none" />
+                                            <label for="speciesNameFilter2" value="Unknown">Unidentified</label>
                                     </div>
-
-                                    <div id="map_view_bttn" class="btn-group">
-                                        <a class="btn btn-success btn-large dropdown-toggle" data-toggle="dropdown" href="#"
-                                                onclick="showMapView(); return false;">
-                                        Map view
+                                                
+                                    <div class="btn-group" style="float:right;">
+                                         <span style="float:left; padding: 5px;">sort by</span>
+                                         <a id="selected_sort" class="btn dropdown-toggle btn-small" data-toggle="dropdown" href="#">
+                                            <g:if test="${params.sort == 'visitCount'}">
+                                                Most viewed
+                                            </g:if>
+                                            <g:elseif test="${params.sort == 'lastRevised'}">
+                                                Last updated
+                                            </g:elseif>
+                                            <g:else>
+                                                Latest
+                                            </g:else>
+                                                        
                                         <span class="caret"></span>
-                                        </a>
+                                         </a>
+                                        <div id="sortFilter" class="filterBar dropdown-menu"  style="float:right;">
+                                            <input type="radio" name="sortFilter" id="sortFilter1" 
+                                                    value="createdOn" style="display: none" />
+                                            <label for="sortFilter1" value="createdOn" class="sort_filter_label">Latest</label><br/>
+
+                                            <input type="radio" name="sortFilter" id="sortFilter2"
+                                                    value="lastRevised" style="display: none" />
+                                            <label for="sortFilter2" value="lastRevised" class="sort_filter_label">Last Updated</label><br/>
+
+                                            <input type="radio" name="sortFilter" id="sortFilter3" 
+                                                    value="visitCount" style="display: none" />
+                                            <label for="sortFilter3" value="visitCount" class="sort_filter_label">Most Viewed</label><br/>
+                                        </div>
                                     </div>
 
-                                    <div id="speciesNameFilter" class="filterBar"  style="float:right">
-                                        <input type="radio" name="speciesNameFilter" id="speciesNameFilter1"
-                                                value="All" style="display: none" />
-                                        <label for="speciesNameFilter1" value="All">All</label>
-
-                                        <input type="radio" name="speciesNameFilter" id="speciesNameFilter2"
-                                                value="Unknown" style="display: none" />
-                                        <label for="speciesNameFilter2" value="Unknown">Unidentified</label>
-                                    </div>
+                                   
+                                    
                                 </div>
 
 
@@ -97,6 +108,15 @@
                                     </g:if>
                                 </div>
                             </div>
+                            
+                            <div id="map_view_bttn" class="btn-group">
+                                        <a class="btn btn-success btn-large dropdown-toggle" data-toggle="dropdown" href="#"
+                                                onclick="$(this).parent().css('background-color', '#9acc57'); showMapView(); return false;">
+                                        Map view
+                                        <span class="caret"></span>
+                                        </a>
+                                    </div>
+
 
                             <div id="observations_list_map" class="observation" style="clear:both;display:none;">
                                 <obv:showObservationsLocation model="['observationInstanceList':totalObservationInstanceList]">
@@ -124,6 +144,10 @@
             $( "#sortFilter" ).buttonset();
             $('#sortFilter label[value$="${params.sort}"]').each (function() {
                 $(this).attr('aria-pressed', 'true').addClass('ui-state-hover').addClass('ui-state-active');
+            });
+
+            $('.sort_filter_label').click(function(){
+                $('#selected_sort').html($(this).html());    
             });
 
             $( "#speciesNameFilter" ).buttonset();
@@ -271,10 +295,11 @@
         </g:javascript>
         <script>
             function showMapView() {
-                 $('#observations_list_map').toggle(function(){
+                 $('#observations_list_map').slideToggle(function(){
                     
                     if ($(this).is(':hidden')){
                         $('div.observations > div.observations_list').show();
+                        $('#map_view_bttn').css('background-color', 'transparent');
                     } else {       
                         $('div.observations > div.observations_list').hide();
                     }

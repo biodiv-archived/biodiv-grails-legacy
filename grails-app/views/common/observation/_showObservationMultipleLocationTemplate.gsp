@@ -70,7 +70,9 @@
 
                 });
                 </script>
-		<div id="big_map_canvas" style="height: 500px; width: 100%;"></div>
+                <div class="map_wrapper">
+		    <div id="big_map_canvas" style="height: 500px; width: 100%;"></div>
+                </div>
 	</div>
         <div id="map_results_list"></div>
         <script>
