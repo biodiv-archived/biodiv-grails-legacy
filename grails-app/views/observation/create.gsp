@@ -190,63 +190,56 @@
 
 
                 <div class="span11 section">
-                                      <div class="resources">
-                        <ul id="imagesList" class="thumbwrap"
+                    <div class="resources">
+                        <ul id="imagesList" class="thumbwrap thumbnails"
                                 style='list-style: none; margin-left: 0px;'>
                                 <g:set var="i" value="1" />
                                 <g:each in="${observationInstance?.resource}" var="r">
-                                        <li class="addedResource">
+                                        <li class="addedResource thumbnail">
                                                 <%def thumbnail = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.thumbnail.suffix)%>
-                                                <div class='figure'>
-                                                        <span> <img
+                                                <div class='figure' style="height: 200px; overflow: hidden;">
+                                                        <span> 
+                                                            <img
                                                                 style="width:100%; height:auto;" src='${createLinkTo(file: thumbnail, base:grailsApplication.config.speciesPortal.observations.serverURL)}'
-                                                                class='geotagged_image' exif='true' /> </span>
+                                                                class='geotagged_image' exif='true' /> 
+                                                        </span>
                                                 </div>
 
-
-                                                <div class='metadata prop'>
+                                                <div class='metadata prop' style="position:relative; left: 5px; top:-40px;">
                                                         <input name="file_${i}" type="hidden" value='${r.fileName}' />
-                                                         <!--label class="name grid_2">Title </label><input
-                                                                name="title_${i}" type="text" size='18'
-                                                                class='value ui-corner-all' value='${r.description}' /><br /-->
-                                                        <!--label class="name grid_2">License </label--> <!--select
-                                                                name="license_${i}" class="value ui-corner-all">
-                                                                <g:each in="${species.License.list()}" var="l">
-                                                                        <option value="${l.name.value()}"
-                                                                                ${(l == r.licenses.iterator().next())?'selected':''}>
-                                                                                ${l?.name.value()}
-                                                                        </option>
-                                                                </g:each>
-                                                        </select> <br /-->
-                                                          <div id="license_div" style="z-index:2;">
-                                                                    <div id="selected_license" class="selected_value"><img src="${resource(dir:'images/group_icons',file:'All.png', absolute:true)}"/><span class="display_value">Copyright</span></div>
-                                                                        <div id="license_options" style="background-color:#fbfbfb;box-shadow:0 8px 6px -6px black; border-radius: 0 5px 5px 5px;display:none;">                                       <ul>
-                                                                                <g:each in="${species.License.list()}" var="l">
-                                                                                        <li class="license_option"><img src="${resource(dir:'images/group_icons',file:'All.png', absolute:true)}"/><span class="display_value">${l?.name.value()}</span></li>
-                                                                                        </g:each>
-                                                                                </ul>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>	
-									<input id="license" type="hidden" name="license" ></input>
+                                                        <div id="license_div_${i}" class="licence_div btn-group" style="z-index:2;cursor:pointer;">
+
+                                                            <div id="selected_license_{i}" onclick="$(this).next().show();" class="btn dropdown-toggle" data-toggle="dropdown">
+                                                                <img src="${resource(dir:'images/license',file:'cc_by.png', absolute:true)}" title="Set a license for this image"/>
+                                                                <span class="caret"></span>
                                                             </div>
-
-
-                                                </div> <a href="#" class="resourceRemove">Remove</a></li>
-                                        <g:set var="i" value="${i+1}" />
-                                </g:each>
-                                <li id="add_file" class="addedResource" onclick="$('#attachFiles').select()[0].click();return false;">
-                                    <div class="progress">
-                                        <div id="translucent_box"></div >
-                                        <div id="progress_bar"></div >
-                                        <div id="progress_msg"></div >
-                                    </div>
-
-                                </li>
+                                                            <div id="license_options_{i}" class="license_options">
+                                                                <ul class="dropdown-menu">
+                                                                    <g:each in="${species.License.list()}" var="l">
+                                                                        <li class="license_option" onclick="$('#license_{{=i}}').val($(this).text());$('#selected_license_{{=i}}').html($(this).html());$('#license_options_{{=i}}').hide();">
+                                                                            <img src="${resource(dir:'images/license',file:'cc_by.png', absolute:true)}"/>
+                                                                        </li>
+                                                                    </g:each>
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                </div>	
+						<input id="license_${i}" type="hidden" name="license_${i}" ></input>
+                                                <div class="close_button" onclick="removeResource(event);$('#geotagged_images').trigger('update_map');"></div>
+                                                
+                                            </li>
+                                    <g:set var="i" value="${i+1}" />
+                                    </g:each>
+                                    <li id="add_file" class="addedResource" onclick="$('#attachFiles').select()[0].click();return false;">
+                                        <div class="progress">
+                                            <div id="translucent_box"></div >
+                                            <div id="progress_bar"></div >
+                                            <div id="progress_msg"></div >
+                                        </div>
+                                    </li>
                         </ul>
-
-                                   </div>
-                        </div>
+                    </div>
+                </div>
                                    
                 </div>
             </div>
@@ -377,10 +370,12 @@
             </div>
             <div class="span12">
                 <input class="btn btn-primary btn-large" type="submit" name="${form_button_name}" value="${form_button_val}" style="float:right;"/>
-            </div>
             <g:if test="${observationInstance?.id}">
-	        	<a href="${createLink(controller:'observation', action:'flagDeleted', id:observationInstance.id)}" onclick="return confirm('${message(code: 'default.observatoin.delete.confirm.message', default: 'This observation will be deleted. Are you sure ?')}');"> Delete Observation </a>
+	        	<div class="btn btn-danger" style="float:right;">
+                            <a href="${createLink(controller:'observation', action:'flagDeleted', id:observationInstance.id)}" onclick="return confirm('${message(code: 'default.observatoin.delete.confirm.message', default: 'This observation will be deleted. Are you sure ?')}');">Delete Observation </a>
+                        </div>     
 	    </g:if>
+            </div>
 
                 </form>
 
@@ -390,44 +385,34 @@
 
 		<!--====== Template ======-->
 		<script id="metadataTmpl" type="text/x-jquery-tmpl">
-	<li class="addedResource">
-		<div class='figure' style='overflow:hidden;'>
-			<span> 
-				<img style="width:100%; height: auto;" src='{{=thumbnail}}' class='geotagged_image' exif='true'/> 
-			</span>
-		</div>
+	<li class="addedResource thumbnail">
+	    <div class='figure' style='height: 200px; overflow:hidden;'>
+                <span> 
+                        <img style="width:100%; height: auto;" src='{{=thumbnail}}' class='geotagged_image' exif='true'/> 
+                </span>
+	    </div>
 				
-		<div class='metadata prop' style="position:relative; top:15px;">
-			<input name="file_{{=i}}" type="hidden" value='{{=file}}'/>
-			<!--label class="name grid_2">Title </label><input name="title_{{=i}}" type="text" size='18' class='value ui-corner-all' value='{{=title}}'/><br/-->
-			
-			<!--label class="name grid_2">License </label-->
-			<!--select name="license_{{=i}}" class="value ui-corner-all" >
-				<g:each in="${species.License.list()}" var="l">
-					<option value="${l.name.value()}" ${(l.name.value().equals(LicenseType.CC_BY.value()))?'selected':''}>${l?.name.value()}</option>
-				</g:each>							
-			</select><br/-->
-                            <div id="license_div_{{=i}}" class="licence_div btn-group" style="z-index:2;cursor:pointer;">
-                                    <div id="selected_license_{{=i}}" onclick="$(this).next().show();" class="btn dropdown-toggle" data-toggle="dropdown"><img src="${resource(dir:'images/license',file:'cc_by.png', absolute:true)}" title="Set a license for this image"/><span class="caret"></span></div>
-                                        <div id="license_options_{{=i}}" class="license_options">                                                                                    <ul class="dropdown-menu">
-                                            	<g:each in="${species.License.list()}" var="l">
-
-                                            		<li class="license_option" onclick="$('#license_{{=i}}').val($(this).text());$('#selected_license_{{=i}}').html($(this).html());$('#license_options_{{=i}}').hide();"><img src="${resource(dir:'images/license',file:l?.name.getIconFilename()+'.png', absolute:true)}"/><!--span class="display_value">${l?.name.value()}</span--></li>
-                                    			</g:each>
-                                        	</ul>
-                                        </div>
-                                    </div>
-                                </div>	
-								<input id="license_{{=i}}" type="hidden" name="license_{{=i}}"></input>
-                            </div>
-
-
-		</div>
-                <br/>
-		<div>
-                <!--a href="#" onclick="removeResource(event);$('#geotagged_images').trigger('update_map');">Remove</a-->
-                <div class="close_button" onclick="removeResource(event);$('#geotagged_images').trigger('update_map');"></div>
+	    <div class='metadata prop' style="position:relative; left: 5px; top:-40px;">
+	        <input name="file_{{=i}}" type="hidden" value='{{=file}}'/>
+                <div id="license_div_{{=i}}" class="licence_div btn-group" style="z-index:2;cursor:pointer;">
+                    <div id="selected_license_{{=i}}" onclick="$(this).next().show();" class="btn dropdown-toggle" data-toggle="dropdown">
+                        <img src="${resource(dir:'images/license',file:'cc_by.png', absolute:true)}" title="Set a license for this image"/>
+                        <span class="caret"></span>
+                    </div>
+                    <div id="license_options_{{=i}}" class="license_options">                                                                                                            <ul class="dropdown-menu">
+                            <g:each in="${species.License.list()}" var="l">
+                                <li class="license_option" onclick="$('#license_{{=i}}').val($(this).text());$('#selected_license_{{=i}}').html($(this).html());$('#license_options_{{=i}}').hide();">
+                                    <img src="${resource(dir:'images/license',file:l?.name.getIconFilename()+'.png', absolute:true)}"/>
+                                </li>
+                            </g:each>
+                        </ul>
+                    </div>
                 </div>
+            </div>	
+	    <input id="license_{{=i}}" type="hidden" name="license_{{=i}}"></input>
+            
+            <!--a href="#" onclick="removeResource(event);$('#geotagged_images').trigger('update_map');">Remove</a-->
+            <div class="close_button" onclick="removeResource(event);$('#geotagged_images').trigger('update_map');"></div>
 	</li>
 	
 </script>
@@ -600,7 +585,7 @@
 	});
 
 	function removeResource(event) {
-		$(event.target).parent().parent('.addedResource').remove();
+		$(event.target).parent('.addedResource').remove();
 	}
 	
 	$( "#observedOn" ).datepicker();
