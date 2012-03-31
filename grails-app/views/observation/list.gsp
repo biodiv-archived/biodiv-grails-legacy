@@ -291,16 +291,21 @@
                     window.location.href = "${g.createLink(action: 'list')}/?tag=" + tg ;
                 });
                 
-                $(".snippet.tablet").hover(function(){
-                    $(".figure", this).slideUp("fast");   
-                    $(".all_content", this).hide();   
-                    $('.observation_info_wrapper', this).slideDown("fast"); 
-                    },
-                    function(){
-                    $(".figure", this).slideDown("fast");   
-                    $(".all_content", this).fadeIn();   
-                    $('.observation_info_wrapper', this).slideUp("fast"); 
-                });
+                $(".snippet.tablet").live('hover', function(e){
+                    if(e.type == 'mouseenter'){    
+                        $(".figure", this).slideUp("fast");   
+                        $(".all_content", this).hide();   
+                        $('.observation_info_wrapper', this).slideDown("fast"); 
+                    }
+                
+                    if(e.type == 'mouseleave'){    
+                        $(".figure", this).slideDown("fast");   
+                        $(".all_content", this).show();   
+                        $('.observation_info_wrapper', this).slideUp("fast"); 
+                    }
+
+
+                   });
 
             });
         </g:javascript>
