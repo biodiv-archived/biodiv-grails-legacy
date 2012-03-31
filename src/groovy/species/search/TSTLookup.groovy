@@ -62,6 +62,7 @@ class TSTLookup<E> extends Lookup<E> implements Serializable {
 
 		int maxCnt = Math.min(num, list.size());
 		HashSet added = new HashSet();
+		List inQ = new ArrayList();
 		if (onlyMorePopular) {
 			LookupPriorityQueue queue = new LookupPriorityQueue(num);
 			for (TernaryTreeNode ttn : list) {
@@ -79,11 +80,17 @@ class TSTLookup<E> extends Lookup<E> implements Serializable {
 //						 }
 						//println record
 						//println record.originalName+"  "+record.canonicalForm+"  "+record.wt
-						if(record.originalName.toLowerCase().startsWith(key)) {
-							//println "incrementing wt by 3"
+						String name = record.originalName.toLowerCase();
+						boolean hasCanonicalName = inQ.contains(record.canonicalForm);
+						if(name.startsWith(key)) {
 							record.wt += 3;
+						} 
+						if(!hasCanonicalName) {
+							inQ.add(record.canonicalForm);
+							LookupResult r = new LookupResult(ttn.token, record);
+							LookupResult remRes = queue.insertWithOverflow(r);
+							inQ.remove(remRes);
 						}
-						queue.insertWithOverflow(new LookupResult(ttn.token, record));
 					}
 				}
 			}
