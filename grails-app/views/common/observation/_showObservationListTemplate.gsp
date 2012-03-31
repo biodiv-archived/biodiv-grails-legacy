@@ -9,11 +9,11 @@
             <g:each in="${observationInstanceList}" status="i"
                     var="observationInstance">
                     
-                    <g:if test="${i%3 == 0}"> 
+                    <g:if test="${i%4 == 0}"> 
                         <li class="thumbnail" style="clear:both;">
                     </g:if>
                     <g:else>
-                        <li class="thumbnail">
+                        <li class="thumbnail" style="margin:0;">
                     </g:else>
                         <obv:showSnippetTablet
                                 model="['observationInstance':observationInstance]"></obv:showSnippetTablet>

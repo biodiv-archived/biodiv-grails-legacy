@@ -290,6 +290,17 @@
                     var tg = $(this).contents().first().text();
                     window.location.href = "${g.createLink(action: 'list')}/?tag=" + tg ;
                 });
+                
+                $(".snippet.tablet").hover(function(){
+                    $(".figure", this).slideUp("fast");   
+                    $(".all_content", this).hide();   
+                    $('.observation_info_wrapper', this).slideDown("fast"); 
+                    },
+                    function(){
+                    $(".figure", this).slideDown("fast");   
+                    $(".all_content", this).fadeIn();   
+                    $('.observation_info_wrapper', this).slideUp("fast"); 
+                });
 
             });
         </g:javascript>

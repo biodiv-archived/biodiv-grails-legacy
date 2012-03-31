@@ -45,13 +45,19 @@ padding: 5px;
 }
 
 .snippet.tablet {
-width: 200px;
-height: 300px;
+width: 160px;
+height: 250px;
 overflow: hidden;        
+position: relative;          
 }
 
 .snippet.tablet .span2{
 margin: 0;
+}
+
+.snippet.tablet .observation_info_wrapper {
+position: absolute;
+bottom: 0;          
 }
 
 .snippet .figure {
@@ -79,7 +85,7 @@ margin-bottom: 10px;
 }
 
 .tags_section {
-margin-top:10px;
+margin-top:70px;
 }
 
 
@@ -322,6 +328,9 @@ color: #000000;
 text-decoration: none;
 }
 
+.btn-danger a {
+
+}
 li.reco_block {
 margin: 0;
 }
@@ -419,6 +428,7 @@ padding: 10px;
 background-color: #9acc57;         
 border-radius: 5px;
 border-top-left-radius: 0;
+margin-bottom: 10px;
 }
 
 #map_view_bttn {
@@ -430,7 +440,6 @@ border-top-right-radius: 5px;
 
 .all_content {
 clear: both;
-width:200px;
 padding:0;
 margin:0;
 }
@@ -441,4 +450,97 @@ height: 120px;
 
 .btn-group.open .dropdown-menu {
 border-radius: 0;
+}
+
+.observation_story.tablet .observation-icons, .observation_info .observation-icons{
+float: left;
+}
+
+.observation_story.tablet .user-icon, .observation_info .user-icon{
+float: right;
+}
+
+.observation_story.tablet .icons-bar {
+bottom: 0;    
+}
+
+.observation_info_wrapper {
+height: 100%;
+width: 100%;        
+font-size: 1em;       
+line-height: 1.5;
+}
+
+.tablet.highlighted {
+font-weight: bold;
+}
+
+.view-button {
+float: right;
+margin-right: 10px;       
+}
+
+.stats-box {
+position: absolute;
+bottom: 0;          
+font-size: 0.8em;        
+color: #5e5e5e;
+}
+
+.stats-box i {
+margin-right: 3px;
+}
+
+.stats-box span {
+margin-right: 5px;
+}
+
+.stats-box {
+opacity: 0.5;
+}
+
+#habitat_options {
+	cursor: default;
+}
+
+#habitat_options li:hover {
+	background-color: #c4cccf;
+}
+
+.habitat_option {
+	display: inline-block;
+	padding: 5px;
+	width: 160px;
+}
+
+#ui-datepicker-div {
+	width: auto;
+	z-index: 4 !important;
+}
+
+.normal_profile_pic {
+	height:100px;
+	width:auto;
+	margin:5px;
+}
+
+.small_profile_pic {
+	height:auto;
+	width:50px;
+	margin:5px;
+}
+
+.very_small_profile_pic {
+	height:auto;
+	width:25px;
+	margin:2px;
+}
+
+.observations_list {
+position:relative;
+top: -40px;         
+}
+
+.tags-tools {
+    padding-bottom: 10px;
 }

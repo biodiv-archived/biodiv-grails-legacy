@@ -30,4 +30,7 @@
 	<div class="all_content">
 		<obv:showStoryTablet model="['observationInstance':observationInstance]"></obv:showStoryTablet>
 	</div>
+	<div class="observation_info_wrapper" style="display:none;">
+		<obv:showObservationInfo model="['observationInstance':observationInstance]"></obv:showObservationInfo>
+	</div>
 </div>
