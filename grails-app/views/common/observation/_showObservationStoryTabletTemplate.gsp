@@ -23,10 +23,10 @@
             </div>
         </div>
 
-        <div class="stats-box">
-            <span><i class="icon-eye-open"></i>${observationInstance.getPageVisitCount()} views</span>
+        <div class="story-footer">
+            <div class="footer-item"><i class="icon-eye-open"></i>${observationInstance.getPageVisitCount()}</div>
                 
-            <span><i class="icon-comment"></i><fb:comments-count href="${createLink(controller:'observation', action:'show', id:observationInstance.id, base:grailsApplication.config.grails.domainServerURL)}"></fb:comments-count> comments</span>
+            <div class="footer-item"><i class="icon-comment"></i><fb:comments-count href="${createLink(controller:'observation', action:'show', id:observationInstance.id, base:grailsApplication.config.grails.domainServerURL)}"></fb:comments-count></div>
         </div>
 </div>
 
