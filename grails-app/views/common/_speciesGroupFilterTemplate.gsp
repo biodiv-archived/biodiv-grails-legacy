@@ -64,7 +64,7 @@ $(document).ready(function(){
 
 </div>
 <div id="habitatFilter" class="filterBar" style="clear: both">
-	<%def othersHabitat = species.Habitat.findByName('Other')%>
+	<%def othersHabitat = species.Habitat.findByName(grailsApplication.config.speciesPortal.group.OTHERS)%>
 	<g:each in="${species.Habitat.list()}" var="habitat" status="i">
 		<g:if test="${habitat != othersHabitat }">
 		<input type="radio" name="habitatFilter" id="habitatFilter${i}"
