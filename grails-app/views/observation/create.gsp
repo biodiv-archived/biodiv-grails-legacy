@@ -105,22 +105,20 @@
                                                                             def defaultGroupIconFileName = (defaultGroupId)? SpeciesGroup.read(defaultGroupId).icon()?.fileName?.trim() : SpeciesGroup.findByName('All').icon()?.fileName?.trim()
                                                                             def defaultGroupValue = (defaultGroupId) ? SpeciesGroup.read(defaultGroupId).name : "Select group"
                                                                     %>
-                                        <div id="selected_group" class="selected_value ${hasErrors(bean: observationInstance, field: 'group', 'errors')}">
-                                                                            <img
+                                        <div id="selected_group" class="btn dropdown-toggle selected_value ${hasErrors(bean: observationInstance, field: 'group', 'errors')}" data-toggle="dropdown">
+                                                                            <img class="float:left;"
                                                                                     src="${createLinkTo(dir: 'images', file: defaultGroupIconFileName, absolute:true)}" ></img>
-                                                                    <span class="display_value">${defaultGroupValue}</span>
+                                                                    <span class="display_value">${defaultGroupValue}</span><span class="caret"></span>
                                                                     </div>
                                         
-                                        <div id="group_options" style="background-color:#fbfbfb;box-shadow:0 8px 6px -6px black; border-radius: 0 5px 5px 5px;display:none;">
+                                        <div id="group_options" class="dropdown-menu">
                                                 <ul>
                                                     <g:each in="${species.groups.SpeciesGroup.list()}" var="g">
                                                         <g:if
                                                                 test="${!g.name.equals(grailsApplication.config.speciesPortal.group.ALL)}">
                                                                 <li class="group_option" style="display:inline-block;padding:5px;" value="${g.id}">
-                                                                            <div style="width:160px;">
                                                                             <img src="${createLinkTo(dir: 'images', file: g.icon()?.fileName?.trim(), absolute:true)}"/>
                                                                             <span class="display_value">${g.name}</span>
-                                                                    </div>
                                                                 </li>
                                                         </g:if>
                                                     </g:each>
@@ -143,9 +141,9 @@
                                                                             //def defaultHabitatIconFileName = (defaultHabitatId)? Habitat.read(defaultHabitatId).icon()?.fileName?.trim() : Habitat.findByName('All').icon()?.fileName?.trim()
                                                                             def defaultHabitatValue = (defaultHabitatId) ? Habitat.read(defaultHabitatId).name : "Select habitat"
                                                                     %>
-                                        <div id="selected_habitat" class="selected_value ${hasErrors(bean: observationInstance, field: 'habitat', 'errors')}"><img src="${resource(dir:'images/group_icons',file:'All.png', absolute:true)}"/>
-                                        <span class="display_value">${defaultHabitatValue}</span></div>
-                                            <div id="habitat_options" style="background-color:#fbfbfb;box-shadow:0 8px 6px -6px black; border-radius: 0 5px 5px 5px;display:none;">                                       <ul>
+                                        <div id="selected_habitat" class="btn dropdown-toggle selected_value ${hasErrors(bean: observationInstance, field: 'habitat', 'errors')}" data-toggle="dropdown"><img src="${resource(dir:'images/group_icons',file:'All.png', absolute:true)}"/>
+                                        <span class="display_value">${defaultHabitatValue}</span><span class="caret"></span></div>
+                                            <div id="habitat_options" class="dropdown-menu">                                       <ul>
                                                     <g:each in="${species.Habitat.list()}" var="h">
                                                             <li class="habitat_option" value="${h.id}" ><img src="${resource(dir:'images/group_icons',file:'All.png', absolute:true)}"/><span class="display_value">${h.name}</span></li>
                                                             </g:each>
@@ -369,7 +367,7 @@
                 </div>    
             </div>
             <div class="span12">
-                <input class="btn btn-primary btn-large" type="submit" name="${form_button_name}" value="${form_button_val}" style="float:right;"/>
+                <input class="btn btn-primary btn-large" type="submit" name="${form_button_name}" value="${form_button_val}" style="margin-top:20px;margin-bottom:40px; float:right;"/>
             <g:if test="${observationInstance?.id}">
 	        	<div class="btn btn-danger" style="float:right;">
                             <a href="${createLink(controller:'observation', action:'flagDeleted', id:observationInstance.id)}" onclick="return confirm('${message(code: 'default.observatoin.delete.confirm.message', default: 'This observation will be deleted. Are you sure ?')}');">Delete Observation </a>
@@ -543,7 +541,8 @@
 		
         $(".group_option").click(function(){
                 $("#group_id").val($(this).val());
-                $("#selected_group").html($(this).html());
+                var caret = "<span class='caret'></span>";
+                $("#selected_group").html($(this).html() + caret);
                 $("#group_options").hide();
                 $("#selected_group").css({'background-color':'#e5e5e5', 'border-bottom-color':'#aeaeae'});
         });
@@ -569,7 +568,8 @@
 		
         $(".habitat_option").click(function(){
                 $("#habitat_id").val($(this).val());
-                $("#selected_habitat").html($(this).html());
+                var caret = "<span class='caret'></span>";
+                $("#selected_habitat").html($(this).html() + caret);
                 $("#habitat_options").hide();
                 $("#selected_habitat").css({'background-color':'#e5e5e5', 'border-bottom-color':'#aeaeae'});
         });
