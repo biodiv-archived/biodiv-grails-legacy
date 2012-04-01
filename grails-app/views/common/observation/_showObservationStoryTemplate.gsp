@@ -4,7 +4,7 @@
 	<div class="observation-icons">
 		<img class="group_icon"
         	title="${observationInstance.group?.name}"  
-			style="background: url('${createLinkTo(file: observationInstance.group.icon(ImageType.SMALL)?.fileName?.trim(), absolute:true)}') no-repeat; background-position: 0 -100px; width: 50px; height: 50px; margin-left: 6px;"/>
+			style="background: url('${createLinkTo(dir:'images', file: observationInstance.group.icon(ImageType.SMALL)?.fileName?.trim(), absolute:true)}') no-repeat; background-position: 0 -100px; width: 50px; height: 50px; margin-left: 6px;"/>
 
 		<g:if test="${observationInstance.habitat}">
 			<img class="habitat_icon group_icon"

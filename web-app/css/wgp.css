@@ -14,10 +14,12 @@ padding: 10px;
 background: none;
 border: 0;
 /* opacity: 0.4; */
+display:inline-block; 
 }
 
 .filterBar .ui-button:hover {
 /* opacity: 0.9; */
+	
 }
 
 .filterBar .ui-button-text {

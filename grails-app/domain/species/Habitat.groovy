@@ -60,7 +60,7 @@ class Habitat {
 
 		boolean iconPresent = (new File(grailsApplication.config.speciesPortal.resources.rootDir+"/group_icons/habitat/${name}")).exists()
 		if(!iconPresent) {
-			name = Habitat.findByName(HabitatType.OTHERS).name?.trim()?.toLowerCase()?.replaceAll(/ /, '_')
+			name = Habitat.findByName(HabitatType.OTHERS.value()).name?.trim()?.toLowerCase()?.replaceAll(/ /, '_')
 			name = ImageUtils.getFileName(name, type, '.png');
 		}
 		return new Resource(fileName:"group_icons/habitat/${name}", type:ResourceType.ICON, title:"You can contribute!!!");

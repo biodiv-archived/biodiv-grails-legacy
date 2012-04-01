@@ -1,3 +1,4 @@
+<%@page import="species.Habitat.HabitatType"%>
 <%@page import="species.utils.ImageType"%>
 <%@ page import="species.groups.SpeciesGroup"%>
 <g:javascript src="jquery/jquery.url.js"
@@ -64,14 +65,14 @@ $(document).ready(function(){
 
 </div>
 <div id="habitatFilter" class="filterBar" style="clear: both">
-	<%def othersHabitat = species.Habitat.findByName(grailsApplication.config.speciesPortal.group.OTHERS)%>
+	<%def othersHabitat = species.Habitat.findByName(HabitatType.OTHERS.value())%>
 	<g:each in="${species.Habitat.list()}" var="habitat" status="i">
-		<g:if test="${habitat != othersHabitat }">
-		<input type="radio" name="habitatFilter" id="habitatFilter${i}"
-			value="${habitat.id}" style="display: none" />
-		<label for="habitatFilter${i}" value="${habitat.id}" title="${habitat.name}" class="group_icon"
-						style="background: url('${createLinkTo(dir: 'images', file: habitat.icon(ImageType.SMALL)?.fileName?.trim(), absolute:true)}') no-repeat; background-position: 0 0; width: 50px; height: 50px; margin-left: 6px;">				
-		</label>
+		<g:if test="${habitat.id != othersHabitat.id }">
+			<input type="radio" name="habitatFilter" id="habitatFilter${i}"
+				value="${habitat.id}" style="display: none" />
+			<label for="habitatFilter${i}" value="${habitat.id}" title="${habitat.name}" class="group_icon"
+							style="background: url('${createLinkTo(dir: 'images', file: habitat.icon(ImageType.SMALL)?.fileName?.trim(), absolute:true)}') no-repeat; background-position: 0 0; width: 50px; height: 50px; margin-left: 6px;">				
+			</label>
 		</g:if>
 	</g:each>
 	<input type="radio" name="habitatFilter" id="habitatFilter20"
