@@ -231,7 +231,8 @@ class ImageUtils {
 				break;
 		}
 		return name;
-	} 
+	}
+	
 }
 
 

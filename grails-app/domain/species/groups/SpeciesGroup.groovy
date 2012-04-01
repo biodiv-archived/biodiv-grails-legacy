@@ -32,7 +32,7 @@ class SpeciesGroup {
 		String name = this.name?.trim()?.toLowerCase()?.replaceAll(/ /, '_')
 		name = ImageUtils.getFileName(name, type, '.png');
 
-		boolean iconPresent = (new File(grailsApplication.config.speciesPortal.resources.rootDir+"/group_icons/speciesGroups/${name}")).exists()
+		boolean iconPresent = resExists(resource(dir:'images', file:"/group_icons/speciesGroups/${name}", absolute:true))
 		if(!iconPresent) {
 			name = SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.OTHERS).name?.trim()?.toLowerCase()?.replaceAll(/ /, '_')
 			name = ImageUtils.getFileName(name, type, '.png');
@@ -41,6 +41,11 @@ class SpeciesGroup {
 		return new Resource(fileName:"group_icons/speciesGroups/${name}", type:ResourceType.ICON, title:"You can contribute!!!");
 	}
 
+	def resExists(resPath) { 
+		def resFile = grailsApplication.parentContext.getResource(resPath)
+		resFile?.exists()
+	}
+	
 	/* (non-Javadoc)
 	 * @see java.lang.Object#hashCode()
 	 */
