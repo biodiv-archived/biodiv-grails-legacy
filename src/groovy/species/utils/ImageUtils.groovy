@@ -210,7 +210,7 @@ class ImageUtils {
 					//if filename already has an extention
 					name = name?.replaceFirst(/\.[a-zA-Z]{3,4}$/, ImageType.NORMAL.getSuffix()).replaceFirst('.'+config.speciesPortal.resources.images.defaultType, defaultFileType);
 				} else {
-					name = name?.plus(ImageType.NORMAL.getSuffix()).replaceFirst(/\.[a-zA-Z]{3,4}$/, defaultFileType);
+					name = name?.plus(ImageType.NORMAL.getSuffix()).replaceFirst('.'+config.speciesPortal.resources.images.defaultType, defaultFileType);
 				}
 				break;
 			case ImageType.SMALL :
@@ -218,15 +218,23 @@ class ImageUtils {
 					//if filename alreadyy has an extention
 					name = name?.replaceFirst(/\.[a-zA-Z]{3,4}$/, ImageType.SMALL.getSuffix()).replaceFirst('.'+config.speciesPortal.resources.images.defaultType, defaultFileType);
 				} else {
-					name = name?.plus(ImageType.SMALL.getSuffix()).replaceFirst(/\.[a-zA-Z]{3,4}$/, defaultFileType);
+					name = name?.plus(ImageType.SMALL.getSuffix()).replaceFirst('.'+config.speciesPortal.resources.images.defaultType, defaultFileType);
 				} 
+				break;
+			case ImageType.VERY_SMALL :
+				if(name =~ /\.[a-zA-Z]{3,4}$/) {
+					//if filename already has an extention
+					name = name?.replaceFirst(/\.[a-zA-Z]{3,4}$/, ImageType.VERY_SMALL.getSuffix()).replaceFirst('.'+config.speciesPortal.resources.images.defaultType, defaultFileType);
+				} else {
+					name = name?.plus(ImageType.VERY_SMALL.getSuffix()).replaceFirst('.'+config.speciesPortal.resources.images.defaultType, defaultFileType);
+				}
 				break;
 			case ImageType.LARGE :
 				if(name =~ /\.[a-zA-Z]{3,4}$/) {
 					//if filename already has an extention
 					name = name?.replaceFirst(/\.[a-zA-Z]{3,4}$/, ImageType.LARGE.getSuffix()).replaceFirst('.'+config.speciesPortal.resources.images.defaultType, defaultFileType);
 				} else {
-					name = name?.plus(ImageType.LARGE.getSuffix()).replaceFirst(/\.[a-zA-Z]{3,4}$/, defaultFileType);
+					name = name?.plus(ImageType.LARGE.getSuffix()).replaceFirst('.'+config.speciesPortal.resources.images.defaultType, defaultFileType);
 				}
 				break;
 		}
@@ -237,13 +245,14 @@ class ImageUtils {
 
 
 public enum ImageType {
-	NORMAL,SMALL,LARGE
+	NORMAL,SMALL,VERY_SMALL, LARGE
 	def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 	
 	public String getSuffix() {
 		switch(this) {
 			case NORMAL : return config.speciesPortal.resources.images.thumbnail.suffix
 			case SMALL : return config.speciesPortal.resources.images.galleryThumbnail.suffix
+			case VERY_SMALL : return '_32X32'+'.'+config.speciesPortal.resources.images.defaultType
 			case LARGE : return config.speciesPortal.resources.images.gallery.suffix 
 		}
 	}

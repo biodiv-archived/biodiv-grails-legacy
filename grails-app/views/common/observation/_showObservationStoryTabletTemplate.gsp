@@ -7,12 +7,12 @@
             <div class="observation-icons">
                     <img class="group_icon"
                             title="${observationInstance.group?.name}"  
-							style="background: url('${createLinkTo(dir: 'images', file: observationInstance.group.icon(ImageType.SMALL)?.fileName?.trim(), absolute:true)}') no-repeat; background-position: 0 -100px; width: 50px; height: 50px;;"/>
+							src="${createLinkTo(dir: 'images', file: observationInstance.group.icon(ImageType.VERY_SMALL)?.fileName?.trim(), absolute:true)}"/>
 
                     <g:if test="${observationInstance.habitat}">
                            <img class="habitat_icon group_icon"
                                     title="${observationInstance.habitat.name}" 
-                                    style="background: url('${createLinkTo(dir: 'images', file:observationInstance.habitat.icon(ImageType.SMALL)?.fileName?.trim(), absolute:true)}') no-repeat; background-position: 0 -100px; width: 50px; height: 50px;"/>
+                                    src='${createLinkTo(dir: 'images', file:observationInstance.habitat.icon(ImageType.VERY_SMALL)?.fileName?.trim(), absolute:true)}'/>
                     </g:if>
 
             </div>
