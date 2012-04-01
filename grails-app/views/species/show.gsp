@@ -1,4 +1,5 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<%@page import="species.utils.ImageType"%>
 <%@page import="species.TaxonomyDefinition.TaxonomyRank"%>
 <%@page import="species.Resource.ResourceType"%>
 <%@ page import="species.Species"%>
@@ -348,7 +349,7 @@ $(document).ready(function(){
 								<s:showSpeciesImages model="['speciesInstance':speciesInstance]"></s:showSpeciesImages>
 							</g:if>
 							<g:else>
-								<% def fileName = speciesInstance.fetchSpeciesGroupIcon()?.fileName?.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.thumbnail.suffix); %>
+								<% def fileName = speciesInstance.fetchSpeciesGroupIcon(ImageType.LARGE)?.fileName; %>
 								<img class="group_icon galleryImage" src="${createLinkTo(dir: 'images', file: fileName, absolute:true)}" 
 							  		title="Contribute!!!"/>
 							</g:else>							
@@ -399,8 +400,9 @@ $(document).ready(function(){
 							<s:showExternalLink model="['key':'wikipedia', 'taxonConcept':speciesInstance.taxonConcept]"/>
 							
 							
-							 <img class="group_icon species_group_icon" src="${createLinkTo(dir: 'images', file: speciesInstance.fetchSpeciesGroupIcon()?.fileName?.trim(), absolute:true)}" 
-							  title="${speciesInstance.fetchSpeciesGroup()?.name}"/>
+							 <img class="group_icon species_group_icon"  
+							  	title="${speciesInstance.fetchSpeciesGroup()?.name}"
+							 	 style="background: url('${createLinkTo(dir: 'images', file: speciesInstance.fetchSpeciesGroupIcon(ImageType.SMALL)?.fileName?.trim(), absolute:true)}') no-repeat; background-position: 0 -100px; width: 50px; height: 50px;"/>
 							  
 							  <g:if test="${speciesInstance.taxonConcept.threatenedStatus}">
 							  		<s:showThreatenedStatus model="['threatenedStatus':speciesInstance.taxonConcept.threatenedStatus]"/>

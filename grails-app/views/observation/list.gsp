@@ -94,8 +94,7 @@
 
 
                                 <div class="info-message" style="clear: both" >
-                                    Showing <span class="highlight">${observationInstanceTotal} observation
-                                            <g:if test="${observationInstanceTotal>1}">s</g:if></span>
+                                    Showing <span class="highlight">${observationInstanceTotal} observation<g:if test="${observationInstanceTotal>1}">s</g:if></span>
                                     <g:if test="${queryParams.groupId}">
                                             of <span class="highlight">${SpeciesGroup.get(queryParams.groupId).name.toLowerCase()}
                                             </span> group

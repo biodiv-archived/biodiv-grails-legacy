@@ -1,5 +1,6 @@
 
 
+<%@page import="species.utils.ImageType"%>
 <%@ page import="species.Species"%>
 <%@ page import="species.Language"%>
 <%@ page import="species.CommonNames"%>
@@ -69,13 +70,23 @@ $(document).ready(function(){
 									style="clear: both; float: left; max-height: 220px; max-width: 200px; padding: 10px;">
 									<g:link action="show" controller="species"
 										id="${speciesInstance.id}">
-										<g:set var="mainImage" value="${speciesInstance.mainImage()}" />
-										<%def thumbnailPath = mainImage?.fileName?.replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.thumbnail.suffix)%>
-										<span class="wrimg"> <span></span>
+										
+										<g:set var="mainImage" value="${speciesInstance.mainImage(ImageType.NORMAL)}" />
+										<%def thumbnailPath = mainImage?.fileName%>
+
+										<span class="wrimg"> <span></span> <g:if
+												test="${thumbnailPath }">
 												<img
 													src="${createLinkTo( base:grailsApplication.config.speciesPortal.resources.serverURL,
-											file: thumbnailPath)}" title="${speciesInstance.taxonConcept.name }" />
-											</span>
+											file: thumbnailPath)}"
+													title="${speciesInstance.taxonConcept.name }" />
+											</g:if>
+											<g:else>
+												<img class="group_icon" style="opacity:0.4;"
+													title="${speciesInstance.taxonConcept.name}"
+													src="${createLinkTo(dir:'images', file: speciesInstance.fetchSpeciesGroupIcon(ImageType.NORMAL)?.fileName, absolute:true)}"/>
+											</g:else> </span>
+
 									</g:link>
 								</div>
 								<div class="searchSnippet">
@@ -119,8 +130,9 @@ $(document).ready(function(){
 										</g:each>
 										
 										
-										<img class="group_icon species_group_icon" src="${createLinkTo(dir: 'images', file: speciesInstance.fetchSpeciesGroupIcon()?.fileName?.trim(), absolute:true)}" 
-										  title="${speciesInstance.fetchSpeciesGroup()?.name}"/>
+										<img class="group_icon species_group_icon" 
+										  	title="${speciesInstance.fetchSpeciesGroup()?.name}"
+										  	style="background: url('${createLinkTo(dir: 'images', file: speciesInstance.fetchSpeciesGroupIcon(ImageType.SMALL).fileName, absolute:true)}') no-repeat; background-position: 0 -100px; width: 50px; height: 50px;"/>
 										  
 										  <g:if test="${speciesInstance.taxonConcept.threatenedStatus}">
 										  		<s:showThreatenedStatus model="['threatenedStatus':speciesInstance.taxonConcept.threatenedStatus]"/>

@@ -4,20 +4,20 @@ body {
 }
 
 .filters {
-border: 1px solid #cecece;
+/* border: 1px solid #ffffff; */
 overflow: auto;
 padding: 10px;          
-background-color: #2b2b2b;         
+/* background-color: #ffffff;          */
 }
 
-.filterBar .ui-button {
+.filterBar .ui-button, .group_icon {
 background: none;
 border: 0;
-opacity: 0.4;
+/* opacity: 0.4; */
 }
 
 .filterBar .ui-button:hover {
-opacity: 0.9;
+/* opacity: 0.9; */
 }
 
 .filterBar .ui-button-text {

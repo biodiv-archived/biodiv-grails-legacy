@@ -49,7 +49,7 @@ $(document).ready(function(){
 				}  
 				return $( "<li class='grid_4' style='list-style:none;'></li>" )
 					.data( "item.autocomplete", item )
-					.append( "<img src='" + item.icon+"' class='ui-state-default icon' style='float:left' /><a>" + item.label + ((item.desc)?'<br>(' + item.desc + ')':'')+"</a>" )
+					.append( "<img style='float:left; background:url(" + item.icon+" no-repeat); background-position:0 -100px; width:50px; height:50px;opacity:0.4;' class='ui-state-default icon' style='float:left' /><a>" + item.label + ((item.desc)?'<br>(' + item.desc + ')':'')+"</a>" )
 					.appendTo( ul );
 			}
 		};;

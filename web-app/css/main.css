@@ -1125,11 +1125,11 @@ td input.text:focus {
 .filterBar .ui-button {
 	background: none;
 	border: 0;
-	opacity: 0.4;
+/* 	opacity: 0.4; */
 }
 
 .filterBar .ui-button:hover {
-	opacity: 0.9;
+/* 	opacity: 0.9; */
 }
 
 .filterBar .ui-button-text {
@@ -1137,7 +1137,7 @@ td input.text:focus {
 }
 
 .filterBar .ui-state-active {
-	opacity: 1;
+/* 	opacity: 1; */
 	border-bottom: 3px solid #5b5b9d;
 	border-radius: 0;
 }
@@ -1167,6 +1167,10 @@ ul.thumbwrap li.poor_species_content {
 
 ul.thumbwrap li.poor_species_content a {
 	color: #7e7e7e;
+}
+
+ul.thumbwrap li.poor_species_content a img {
+	opacity:0.4;
 }
 
 ul.thumbwrap li.poor_species_content div.poor_species_content {
