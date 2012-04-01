@@ -1,3 +1,4 @@
+<%@page import="species.utils.ImageType"%>
 <%@page import="org.springframework.web.context.request.RequestContextHolder"%>
 <%@page import="species.License"%>
 <%@page import="species.License.LicenseType"%>
@@ -102,12 +103,12 @@
                                 <div id="groups_div" class="bold_dropdown" style="z-index:3;">
                                     <%
                                                                             def defaultGroupId = observationInstance?.group?.id
-                                                                            def defaultGroupIconFileName = (defaultGroupId)? SpeciesGroup.read(defaultGroupId).icon()?.fileName?.trim() : SpeciesGroup.findByName('All').icon()?.fileName?.trim()
+                                                                            def defaultGroupIconFileName = (defaultGroupId)? SpeciesGroup.read(defaultGroupId).icon(ImageType.SMALL)?.fileName?.trim() : SpeciesGroup.findByName('All').icon(ImageType.SMALL)?.fileName?.trim()
                                                                             def defaultGroupValue = (defaultGroupId) ? SpeciesGroup.read(defaultGroupId).name : "Select group"
                                                                     %>
                                         <div id="selected_group" class="selected_value ${hasErrors(bean: observationInstance, field: 'group', 'errors')}">
-                                                                            <img
-                                                                                    src="${createLinkTo(dir: 'images', file: defaultGroupIconFileName, absolute:true)}" ></img>
+                                                                            <img class="group_icon" 
+                                                                                    style="background: url('${createLinkTo(dir: 'images', file: defaultGroupIconFileName, absolute:true)}') no-repeat; background-position: 0 -100px; width: 50px; height: 50px;"/>
                                                                     <span class="display_value">${defaultGroupValue}</span>
                                                                     </div>
                                         
@@ -118,7 +119,8 @@
                                                                 test="${!g.name.equals(grailsApplication.config.speciesPortal.group.ALL)}">
                                                                 <li class="group_option" style="display:inline-block;padding:5px;" value="${g.id}">
                                                                             <div style="width:160px;">
-                                                                            <img src="${createLinkTo(dir: 'images', file: g.icon()?.fileName?.trim(), absolute:true)}"/>
+                                                                            <img class="group_icon"
+                                                                            	style="background: url('${createLinkTo(dir: 'images', file: g.icon(ImageType.SMALL)?.fileName?.trim(), absolute:true)}') no-repeat; background-position: 0 -100px; width: 50px; height: 50px;"/>
                                                                             <span class="display_value">${g.name}</span>
                                                                     </div>
                                                                 </li>
@@ -140,14 +142,20 @@
                                     <div id="habitat_div" class="bold_dropdown" style="z-index:2;">
                                     <%
                                                                             def defaultHabitatId = observationInstance?.habitat?.id
-                                                                            //def defaultHabitatIconFileName = (defaultHabitatId)? Habitat.read(defaultHabitatId).icon()?.fileName?.trim() : Habitat.findByName('All').icon()?.fileName?.trim()
+                                                                            def defaultHabitatIconFileName = (defaultHabitatId)? Habitat.read(defaultHabitatId).icon(ImageType.SMALL)?.fileName?.trim() : Habitat.findByName('All').icon(ImageType.SMALL)?.fileName?.trim()
                                                                             def defaultHabitatValue = (defaultHabitatId) ? Habitat.read(defaultHabitatId).name : "Select habitat"
                                                                     %>
-                                        <div id="selected_habitat" class="selected_value ${hasErrors(bean: observationInstance, field: 'habitat', 'errors')}"><img src="${resource(dir:'images/group_icons',file:'All.png', absolute:true)}"/>
+                                        <div id="selected_habitat" class="selected_value ${hasErrors(bean: observationInstance, field: 'habitat', 'errors')}">
+                                        	<img class="group_icon"
+                                        		style="background: url('${createLinkTo(dir: 'images', file:defaultHabitatIconFileName, absolute:true)}') no-repeat; background-position: 0 -100px; width: 50px; height: 50px;"/>
+                                        	
                                         <span class="display_value">${defaultHabitatValue}</span></div>
                                             <div id="habitat_options" style="background-color:#fbfbfb;box-shadow:0 8px 6px -6px black; border-radius: 0 5px 5px 5px;display:none;">                                       <ul>
                                                     <g:each in="${species.Habitat.list()}" var="h">
-                                                            <li class="habitat_option" value="${h.id}" ><img src="${resource(dir:'images/group_icons',file:'All.png', absolute:true)}"/><span class="display_value">${h.name}</span></li>
+                                                            <li class="habitat_option" value="${h.id}" >
+                                                            	<img class="group_icon" 
+                                                            		style="background: url('${createLinkTo(dir: 'images', file:h.icon(ImageType.SMALL)?.fileName?.trim(), absolute:true)}') no-repeat; background-position: 0 -100px; width: 50px; height: 50px;"/>
+                                                            	<span class="display_value">${h.name}</span></li>
                                                             </g:each>
                                                     </ul>
                                             </div>
