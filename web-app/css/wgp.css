@@ -100,6 +100,11 @@ margin-top:70px;
 	font-size: 0.8em;
 }
 
+.prop {
+        margin-bottom: 5px;
+        margin-top: 5px;
+}
+
 .prop .name {
 	float: left;
 	text-align: left;
@@ -392,9 +397,13 @@ height: 100px;
 	opacity: 1;
 }
 
+#observations_list_map .observation_location {
+padding: 0;
+}
 
 .observation_location {
 background-color: #f7f7f7;         
+padding: 10px;
 }
 
 .observation_location .name{
@@ -582,6 +591,7 @@ border: 2px solid #9acc57;
 position:relative;
 top: -40px;         
 padding-right: 10px;     
+box-shadow: 8px 0 6px -6px #5e5e5e;
 }
 
 .tags-tools {

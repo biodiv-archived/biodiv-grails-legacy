@@ -182,7 +182,7 @@
 
                         <div class="row">
                             <div class="span4">
-                                <label for="observedOn"><g:message
+                                <label for="observedOn"><i class="icon-calendar"></i><g:message
                                             code="observation.observedOn.label" default="Observed on" />
                                 </label>
                             </div>
@@ -193,8 +193,8 @@
                         
                     </div>
 
-
                 <div class="span11 section">
+                <i class="icon-picture"></i>
                     <div class="resources">
                         <ul id="imagesList" class="thumbwrap thumbnails"
                                 style='list-style: none; margin-left: 0px;'>
@@ -273,7 +273,7 @@
                                                     def defaultPlaceName = (observationInstance) ? observationInstance.placeName : ""
                                             %>
                             <div class="span2">                
-                                <label>Location title</label>
+                                <label><i class="icon-map-marker"></i>Location title</label>
                             </div>
                             <div class="span4">                
                                 <input id="place_name" type="text"
@@ -354,7 +354,7 @@
                         <h3>Describe your observation!</h3>
                         <div class="span6">
                             <!--label for="notes"><g:message code="observation.notes.label" default="Notes" /></label-->
-                            <label style="float:left;text-align:left;padding-left:10px;width:auto;">Notes</label> (Max: 400 characters)<br/>
+                            <label style="float:left;text-align:left;padding-left:10px;width:auto;"><i class="icon-pencil"></i>Notes</label> (Max: 400 characters)<br/>
                             <div class="section-item" style="margin-right:10px;">
                             <g:textArea name="notes" value="${observationInstance?.notes}"
                                                             class="text ui-corner-all" />
@@ -362,7 +362,7 @@
                         </div>
 
                     <div class="span5" style="border-radius:5px; background-color:#c4cccf; margin:0;">
-                        <label style="float:left;text-align:left;padding:10px;width:auto;">Tags</label>
+                        <label style="float:left;text-align:left;padding:10px;width:auto;"><i class="icon-tags"></i>Tags</label>
 
                         <div class="create_tags section-item" style="clear:both;">
                             <ul name="tags">
