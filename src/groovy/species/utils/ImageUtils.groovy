@@ -194,4 +194,67 @@ class ImageUtils {
 
 		return ret;
 	}
+	
+	static String getFileName(String name, ImageType type, String defaultFileType) {
+		if(!name) return;
+	
+		if(!type) type = ImageType.NORMAL;
+		
+		def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+		
+		if(!defaultFileType) defaultFileType = '.'+config.speciesPortal.resources.images.defaultType;
+		
+		switch(type) {
+			case ImageType.NORMAL : 
+				if(name =~ /\.[a-zA-Z]{3,4}$/) {
+					//if filename already has an extention
+					name = name?.replaceFirst(/\.[a-zA-Z]{3,4}$/, ImageType.NORMAL.getSuffix()).replaceFirst('.'+config.speciesPortal.resources.images.defaultType, defaultFileType);
+				} else {
+					name = name?.plus(ImageType.NORMAL.getSuffix()).replaceFirst('.'+config.speciesPortal.resources.images.defaultType, defaultFileType);
+				}
+				break;
+			case ImageType.SMALL :
+				if(name =~ /\.[a-zA-Z]{3,4}$/) {
+					//if filename alreadyy has an extention
+					name = name?.replaceFirst(/\.[a-zA-Z]{3,4}$/, ImageType.SMALL.getSuffix()).replaceFirst('.'+config.speciesPortal.resources.images.defaultType, defaultFileType);
+				} else {
+					name = name?.plus(ImageType.SMALL.getSuffix()).replaceFirst('.'+config.speciesPortal.resources.images.defaultType, defaultFileType);
+				} 
+				break;
+			case ImageType.VERY_SMALL :
+				if(name =~ /\.[a-zA-Z]{3,4}$/) {
+					//if filename already has an extention
+					name = name?.replaceFirst(/\.[a-zA-Z]{3,4}$/, ImageType.VERY_SMALL.getSuffix()).replaceFirst('.'+config.speciesPortal.resources.images.defaultType, defaultFileType);
+				} else {
+					name = name?.plus(ImageType.VERY_SMALL.getSuffix()).replaceFirst('.'+config.speciesPortal.resources.images.defaultType, defaultFileType);
+				}
+				break;
+			case ImageType.LARGE :
+				if(name =~ /\.[a-zA-Z]{3,4}$/) {
+					//if filename already has an extention
+					name = name?.replaceFirst(/\.[a-zA-Z]{3,4}$/, ImageType.LARGE.getSuffix()).replaceFirst('.'+config.speciesPortal.resources.images.defaultType, defaultFileType);
+				} else {
+					name = name?.plus(ImageType.LARGE.getSuffix()).replaceFirst('.'+config.speciesPortal.resources.images.defaultType, defaultFileType);
+				}
+				break;
+		}
+		return name;
+	}
+	
 }
+
+
+public enum ImageType {
+	NORMAL,SMALL,VERY_SMALL, LARGE
+	def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+	
+	public String getSuffix() {
+		switch(this) {
+			case NORMAL : return config.speciesPortal.resources.images.thumbnail.suffix
+			case SMALL : return config.speciesPortal.resources.images.galleryThumbnail.suffix
+			case VERY_SMALL : return '_32X32'+'.'+config.speciesPortal.resources.images.defaultType
+			case LARGE : return config.speciesPortal.resources.images.gallery.suffix 
+		}
+	}
+}
+

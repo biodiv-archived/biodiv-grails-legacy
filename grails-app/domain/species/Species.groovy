@@ -8,6 +8,8 @@ import org.codehaus.groovy.grails.commons.ConfigurationHolder;
 import species.Resource;
 import species.Resource.ResourceType;
 import species.groups.SpeciesGroup;
+import species.utils.ImageType;
+import species.utils.ImageUtils;
 
 class Species {
 
@@ -45,7 +47,7 @@ class Species {
 		fields sort : 'field'
 	}
 
-	Resource mainImage() {  
+	Resource mainImage(ImageType type) {  
 		if(!reprImage) {
 			 
 			def images = this.getImages();
@@ -59,10 +61,12 @@ class Species {
 		}
 		
 		if(reprImage && (new File(grailsApplication.config.speciesPortal.resources.rootDir+reprImage.fileName.trim())).exists()) {
+			reprImage.fileName = ImageUtils.getFileName(reprImage.fileName, type, null);
 			return reprImage;			
-		} else {
-			fetchSpeciesGroupIcon();			
 		}
+//			 else {
+//			fetchSpeciesGroupIcon(type);			
+//		}
 	}
 
 	List<Resource> getImages() { 
@@ -113,9 +117,9 @@ class Species {
 	}
 	
 	//TODO:remove this function after getting icons for all groups
-	Resource fetchSpeciesGroupIcon() {
+	Resource fetchSpeciesGroupIcon(ImageType type) {
 		SpeciesGroup group = fetchSpeciesGroup();
-		return group.icon();
+		return group.icon(type);
 	}
 	
 	Map<Classification, List<TaxonomyDefinition>> fetchTaxonomyRegistry() {

@@ -7,6 +7,8 @@ import species.Classification;
 import species.Resource.ResourceType;
 import species.TaxonomyDefinition;
 import species.Resource;
+import species.utils.ImageType;
+import species.utils.ImageUtils;
 
 class SpeciesGroup {
 
@@ -26,13 +28,17 @@ class SpeciesGroup {
 		sort name:"asc"
 	}
 	
-	Resource icon() {
-		String name = this.name?.trim()?.replaceAll(/ /, '_')?.plus('.png');
-		boolean iconPresent = (new File(grailsApplication.config.speciesPortal.resources.rootDir+"/group_icons/${name?.trim()}")).exists()
+	Resource icon(ImageType type) {
+		String name = this.name?.trim()?.toLowerCase()?.replaceAll(/ /, '_')
+		name = ImageUtils.getFileName(name, type, '.png');
+
+		boolean iconPresent = (new File(grailsApplication.config.speciesPortal.resources.rootDir+"/group_icons/speciesGroups/${name}")).exists()
 		if(!iconPresent) {
-			name = SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.OTHERS).name?.trim()?.replaceAll(/ /, '_')?.plus('.png');
+			name = SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.OTHERS).name?.trim()?.toLowerCase()?.replaceAll(/ /, '_')
+			name = ImageUtils.getFileName(name, type, '.png');
 		}
-		return new Resource(fileName:"group_icons/${name}", type:ResourceType.ICON, title:"You can contribute!!!");
+		
+		return new Resource(fileName:"group_icons/speciesGroups/${name}", type:ResourceType.ICON, title:"You can contribute!!!");
 	}
 
 	/* (non-Javadoc)

@@ -1,6 +1,12 @@
 package species
 
+import species.Resource.ResourceType;
+import species.utils.ImageType;
+import species.utils.ImageUtils;
+
 class Habitat {
+	
+	def grailsApplication;
 	
 	public enum HabitatType {
 		ALL("All"),
@@ -45,5 +51,18 @@ class Habitat {
 	
 	static mapping = {
 		version false;
+		sort name:"asc"
+	}
+	
+	Resource icon(ImageType type) {
+		String name = this.name?.trim()?.toLowerCase()?.replaceAll(/ /, '_')
+		name = ImageUtils.getFileName(name, type, '.png');
+
+		boolean iconPresent = (new File(grailsApplication.config.speciesPortal.resources.rootDir+"/group_icons/habitat/${name}")).exists()
+		if(!iconPresent) {
+			name = Habitat.findByName(HabitatType.OTHERS.value()).name?.trim()?.toLowerCase()?.replaceAll(/ /, '_')
+			name = ImageUtils.getFileName(name, type, '.png');
+		}
+		return new Resource(fileName:"group_icons/habitat/${name}", type:ResourceType.ICON, title:"You can contribute!!!");
 	}
 }

@@ -1,3 +1,4 @@
+<%@page import="species.utils.ImageType"%>
 <%@page import="species.TaxonomyDefinition.TaxonomyRank"%>
 <%@ page import="species.Species"%>
 <%@ page import="species.groups.SpeciesGroup"%>
@@ -16,10 +17,21 @@
 
 $(document).ready(function(){
 
-	$( "#speciesGroupFilter" ).buttonset();
-	$('#speciesGroupFilter label[value$="${params.sGroup}"]').each (function() {
-			$(this).attr('aria-pressed', 'true').addClass('ui-state-hover').addClass('ui-state-active');
-	});
+	$("#speciesGroupFilter").buttonset();
+	$("#speciesGroupFilter label").each(function() {
+		$(this).hover(function() {
+			$(this).css('backgroundPosition', '0px -50px');
+		}, function() {
+			if($(this).attr('value') == '${params.sGroup}') {
+				$(this).css('backgroundPosition', '0px -100px');
+			} else {
+				$(this).css('backgroundPosition', '0px 0px');
+			}
+		});
+	})
+		
+
+	$('#speciesGroupFilter label[value$="${params.sGroup}"]').attr('aria-pressed', 'true').addClass('ui-state-hover').addClass('ui-state-active').css('backgroundPosition', '0px -100px');
 	
 	
 	function updateGallery(target, limit, offset) {
@@ -90,28 +102,25 @@ $(document).ready(function(){
 			<div id="speciesGroupFilter" class="filterBar" style="float: left;">
 				<center>
 					<!-- g:paginateOnSpeciesGroup/-->
-					<%def othersIds = "" %>
+					<%othersGroup = SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.OTHERS)%>
+
 					<g:each in="${SpeciesGroup.list() }" var="sGroup" status="i">
-						<g:if
-							test="${sGroup.name.equals('Mullusks') || sGroup.name.equals('Others')}">
-							<%othersIds += sGroup.id+',' %>
-						</g:if>
-						<g:else>
+						<g:if test="${sGroup != othersGroup }">
 							<input type="radio" name="specuesGroupFilter"
-								id="specuesGroupFilter${i}" value="${sGroup.id }" style="display:none" />
-							<label for="specuesGroupFilter${i}" value="${sGroup.id}"><img
-								class="group_icon"
-								src="${createLinkTo(dir: 'images', file: sGroup.icon()?.fileName?.trim(), absolute:true)}"
-								title="${sGroup.name}" /> </label>
-						</g:else>
+								id="speciesGroupFilter${i}" value="${sGroup.id }" />
+							<label for="speciesGroupFilter${i}" value="${sGroup.id}"
+								title="${sGroup.name}" class="group_icon"
+								style="background: url('${createLinkTo(dir: 'images', file: sGroup.icon(ImageType.SMALL)?.fileName, absolute:true)}') no-repeat; background-position: 0 0; width: 50px; height: 50px; margin-left: 6px;">
+							</label>
+						</g:if>
 					</g:each>
-					<%sGroup = SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.OTHERS)%>
+
 					<input type="radio" name="specuesGroupFilter"
-						id="specuesGroupFilter20" value="${othersIds}" /> <label
-						for="specuesGroupFilter20" value="${othersIds}"><img
-						class="group_icon"
-						src="${createLinkTo(dir: 'images', file: sGroup.icon()?.fileName?.trim(), absolute:true)}"
-						title="${sGroup.name}" /> </label>
+						id="specuesGroupFilter20" value="${othersGroup.id}" /> <label
+						for="speciesGroupFilter${i}" value="${othersGroup.id}"
+						title="${othersGroup.name}" class="group_icon"
+						style="background: url('${createLinkTo(dir: 'images', file: othersGroup.icon(ImageType.SMALL)?.fileName, absolute:true)}') no-repeat; background-position: 0 0; width: 50px; height: 50px; margin-left: 6px;">
+					</label>
 				</center>
 			</div>
 
@@ -153,15 +162,19 @@ $(document).ready(function(){
 				<g:else>
 					<li class="grid_5 poor_species_content">
 				</g:else>
-					    <g:link action="show" id="${speciesInstance.id}">
-						<g:set var="mainImage" value="${speciesInstance.mainImage()}" />
-						<%def thumbnailPath = mainImage?.fileName?.replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.galleryThumbnail.suffix)%>
-
+					<g:link action="show" id="${speciesInstance.id}">
+						<g:set var="mainImage" value="${speciesInstance.mainImage(ImageType.SMALL)}" />
+						<%def thumbnailPath = mainImage?.fileName%>
+						<g:if test="${thumbnailPath }">
 						<img class="icon" style="float: right;"
 							src="${createLinkTo( base:grailsApplication.config.speciesPortal.resources.serverURL,
 											file: thumbnailPath)}"
 							title=" ${speciesInstance.taxonConcept.name}" />
-
+						</g:if><g:else>
+							<img class="icon group_icon"
+								title="${speciesInstance.taxonConcept.name}" 
+								style="float: right; background: url('${createLinkTo(dir: 'images', file:speciesInstance.fetchSpeciesGroupIcon(ImageType.SMALL)?.fileName, absolute:true)}') no-repeat; background-position: 0 -100px; width: 50px; height: 50px;"></img>
+						</g:else>
 						<p class="caption">
 							${speciesInstance.taxonConcept.italicisedForm}
 						</p>

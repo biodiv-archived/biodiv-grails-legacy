@@ -162,6 +162,7 @@ class SUserController extends UserController {
 		def userLookup = SpringSecurityUtils.securityConfig.userLookup
 		String usernameFieldName = 'username'
 
+		params.sort ?: usernameFieldName;
 		for (name in [username: usernameFieldName]) {
 			if (params[name.key]) {
 				hql.append " AND LOWER(u.${name.value}) LIKE :${name.key}"

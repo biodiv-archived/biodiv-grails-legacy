@@ -1,16 +1,16 @@
 
+<%@page import="species.utils.ImageType"%>
 <div class="observation_info">
         
         <div class="icons-bar">
             <div class="observation-icons">
-                    <img class="species_group_icon"
-                            src="${createLinkTo(file: observationInstance.group.icon()?.fileName?.trim(), base:grailsApplication.config.speciesPortal.resources.serverURL)}"
-                            title="${observationInstance.group?.name}" />
-
+                    <img class="group_icon"
+                            title="${observationInstance.group?.name}"  
+							src='${createLinkTo(dir:'images', file: observationInstance.group.icon(ImageType.VERY_SMALL)?.fileName?.trim(), absolute:true)}'/>
                     <g:if test="${observationInstance.habitat}">
-                            <img class="habitat_icon species_group_icon"
-                                    src="${createLinkTo(dir: 'group_icons', file:'All.png', base:grailsApplication.config.speciesPortal.resources.serverURL)}"
-                                    title="${observationInstance.habitat}" />
+                            <img class="habitat_icon group_icon"
+                                    title="${observationInstance.habitat.name}" 
+                                    src='${createLinkTo(dir: 'images', file:observationInstance.habitat.icon(ImageType.VERY_SMALL)?.fileName?.trim(), absolute:true)}'/>
                     </g:if>
 
             </div>
