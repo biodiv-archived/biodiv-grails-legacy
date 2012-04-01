@@ -37,7 +37,7 @@ var itemAddCallback = function(carousel, first, last, data, state) {
  * Item html creation helper.
  */
 var getItemHTML = function(item){
-	var imageTag = '<img src="' + item.imageLink + '" title="' + item.imageTitle  +'" width="75" height="75" alt="" />';
+	var imageTag = '<img style="height:100%;" src="' + item.imageLink + '" title="' + item.imageTitle  +'" width="75" height="75" alt="" />';
 	return '<a href=/biodiv/observation/show/' + item.obvId + '>' + imageTag + '</a>';
 };
 

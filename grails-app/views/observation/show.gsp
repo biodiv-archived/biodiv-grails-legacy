@@ -52,14 +52,23 @@ width:90%;
 				</div>
 			</g:if>
 			<br />
+
+                        <div class="page-header" style="overflow: auto;">
+                            <div class="span8">
+                                <h1><obv:showSpeciesName model="['observationInstance':observationInstance]" /></h1>
+                            </div>
+                            <div class="span4" style="margin:0;">
+                                <sUser:ifOwns model="['user':observationInstance.author]">
+                                    <a class="btn" style="float: right;" href="${createLink(controller:'observation', action:'edit', id:observationInstance.id)}"> Edit Observation </a>
+                                </sUser:ifOwns>
+                            </div>
+
+                        </div>
 			
-			<div class="span8" style="margin:0;">
+			<div class="span8 right-shadow-box" style="margin:0;">
 				
 				<div class="grid_10">
-                                        <div class="page-header">
-					    <h1><obv:showSpeciesName model="['observationInstance':observationInstance]" /></h1>
-                                        </div>
-
+                                      
 							<div id="gallery1">
 								<g:if test="${observationInstance.resource}">
 									<g:each in="${observationInstance.resource}" var="r">
@@ -91,19 +100,16 @@ width:90%;
                 <div style="margin:0;">
 			    	<obv:showStory model="['observationInstance':observationInstance]" />
                 </div>
-  					
+  				
+                <div class="comments-box">
 				<fb:comments colorscheme='light' href="${createLink(controller:'observation', action:'show', id:observationInstance.id, base:grailsApplication.config.grails.domainServerURL)}"></fb:comments>
+                </div>
 				
 			</div>
 
 
 			<div class="span4">
                                 
-                            <div>
-                            	<sUser:ifOwns model="['user':observationInstance.author]">
-					<a href="${createLink(controller:'observation', action:'edit', id:observationInstance.id)}"> Edit Observation </a>
-				</sUser:ifOwns>
-			    </div>
 <%--				--%>
 <%--				<div class="buttons">--%>
 <%--                    <span class="button"><g:actionSubmit class="delete" action="flagDeleted" value="${message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" /></span>--%>

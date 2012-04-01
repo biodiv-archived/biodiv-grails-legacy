@@ -1,5 +1,5 @@
 
-<div class="observations_list" class="observation grid_11" style="clear:both;">
+<div class="observations_list" class="observation grid_11" style="box-shadow:8px 0 6px -6px; clear:both;">
 <div class="btn-group button-bar" data-toggle="buttons-radio" style="float:right;">
     <button class="list_view_bttn btn list_style_button active"><i class="icon-align-justify"></i></button> 
     <button class="grid_view_bttn btn grid_style_button"><i class="icon-th-large"></i></button>
@@ -9,7 +9,7 @@
             <g:each in="${observationInstanceList}" status="i"
                     var="observationInstance">
                     
-                    <g:if test="${i%4 == 0}"> 
+                    <g:if test="${i%3 == 0}"> 
                         <li class="thumbnail" style="clear:both;">
                     </g:if>
                     <g:else>

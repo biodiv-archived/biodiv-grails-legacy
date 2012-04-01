@@ -43,7 +43,7 @@ class ObservationController {
 	def list = { getObservationList(params); }
 
 	protected def getObservationList(params) {
-		def max = Math.min(params.max ? params.int('max') : 12, 100)
+		def max = Math.min(params.max ? params.int('max') : 9, 100)
 
 		def offset = params.offset ? params.int('offset') : 0
 

@@ -1,7 +1,7 @@
 <%@ page import="species.participation.Observation"%>
 <div class="view_tags">
 	<g:if test="${observationInstance.tags}">
-
+                <i class="icon-tags"></i> Tags
 		<ul class="tagit">
 			<g:each in="${observationInstance.tags}">
 				<li class="tagit-choice" style="padding:0 5px;">

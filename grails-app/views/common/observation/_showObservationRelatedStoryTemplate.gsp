@@ -66,23 +66,20 @@ $(document).ready(function() {
 }
 </style>
   <div id="carousel_${id}" class="jcarousel-skin-ie7"> 
-  	<div class="observation_links">
-  		<g:if test="${observationId}">
-		<a
-			href="${createLink(controller:controller, action:'listRelated', params: [id: observationId, filterProperty : filterProperty])}">All
-					observations</a>
-		</g:if><g:else>
-		<a
-			href="${createLink(controller:controller, action:'list', params: [(filterProperty) : filterPropertyValue])}">All
-					observations</a>
-		</g:else>
-					
-	</div>
     <ul> 
       <!-- The content will be dynamically loaded in here --> 
     </ul> 
+    <div class="observation_links">
+  		<g:if test="${observationId}">
+		    <a class="btn btn-mini" href="${createLink(controller:controller, action:'listRelated', params: [id: observationId, filterProperty : filterProperty])}">Show all</a>
+		</g:if>
+                <g:else>
+		    <a class="btn btn-mini" href="${createLink(controller:controller, action:'list', params: [(filterProperty) : filterPropertyValue])}">Show all</a>
+		</g:else>
+	</div>
+
 </div>
-<div id="relatedObservationMsg_${id}" style="display:none">
-	<g:link controller="observation" action="create">Add an observation and contribute.</g:link>
+<div id="relatedObservationMsg_${id}" style="padding-left:10px; display:none">
+	<g:link controller="observation" action="create"><div class="btn btn-warning">Add an observation</div></g:link>
 </div>
 
