@@ -172,8 +172,9 @@ $(document).ready(function(){
 							title=" ${speciesInstance.taxonConcept.name}" />
 						</g:if><g:else>
 							<img class="icon group_icon"
-								title="${speciesInstance.taxonConcept.name}" 
-								style="float: right; background: url('${createLinkTo(dir: 'images', file:speciesInstance.fetchSpeciesGroupIcon(ImageType.SMALL)?.fileName, absolute:true)}') no-repeat; background-position: 0 -100px; width: 50px; height: 50px;"></img>
+								title="${speciesInstance.taxonConcept.name}"
+								src= "${createLinkTo(dir: 'images', file:speciesInstance.fetchSpeciesGroupIcon(ImageType.VERY_SMALL)?.fileName, absolute:true)}" 
+								style="float: right;"></img>
 						</g:else>
 						<p class="caption">
 							${speciesInstance.taxonConcept.italicisedForm}

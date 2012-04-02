@@ -1,7 +1,4 @@
-
-<div id="list_view_bttn" class="list_style_button active"></div>
-<div id="grid_view_bttn" class="grid_style_button"></div>
-<div class="observations_list" class="observation grid_11">
+<div class="observation" style="clear:both;">
 	<div class="mainContent">
 		<div class="grid_view">
 			<g:each in="${userInstanceList}" status="i" var="userInstance">
@@ -27,7 +24,7 @@
 	</div>
 	<script>
                 		
-                $('#list_view_bttn').click(function(){
+        $('#list_view_bttn').click(function(){
 			$('.grid_view').hide();
 			$('.list_view').show();
 			$(this).addClass('active');

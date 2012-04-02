@@ -61,7 +61,14 @@
 		<obv:showDate
 		model="['observationInstance':observationInstance, 'propertyName':'lastRevised']" />
 	</div>
-
+	
+	<g:if test="${observationInstance.notes}">
+	<div class="prop">
+		<span class="name"><i class="icon-info-sign"></i>Description</span>
+		${observationInstance.notes.encodeAsHTML().replace('\n', '<br/>\n')}
+	</div>
+	</g:if>
+	
 	<sUser:showUserTemplate model="['userInstance':observationInstance.author]"/>
 
 	<obv:showTagsSummary

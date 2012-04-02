@@ -12,7 +12,7 @@
 .reco {
 	background-color: #ffffff;
 	padding: 3px;
-	width: 80%;
+	width: 75%;
 	float: left;
 }
 

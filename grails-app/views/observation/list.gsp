@@ -45,7 +45,7 @@
                 <div class="row"> <!-- main_content -->
                     <div class="list span9">
                         <div class="observations thumbwrap">
-                            <div class="observation grid_11">
+                            <div class="observation">
                                 <div class="button-bar">
                                     <div id="speciesNameFilter" class="filterBar"  style="clear:both;">
                                             <input type="radio" name="speciesNameFilter" id="speciesNameFilter1"
@@ -58,7 +58,7 @@
                                     </div>
                                                 
                                     <div class="btn-group" style="float:right;">
-                                         <span style="float:left; padding: 5px;">sort by</span>
+                                         <span style="float:left; padding: 5px;">Sort by</span>
                                          <a id="selected_sort" class="btn dropdown-toggle btn-small" data-toggle="dropdown" href="#">
                                             <g:if test="${params.sort == 'visitCount'}">
                                                 Most viewed
