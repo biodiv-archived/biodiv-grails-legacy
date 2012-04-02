@@ -197,7 +197,7 @@
                                 </div>
                                 <div id="help-identify" style="float:left; margin:10px;">
                                     <label class="checkbox">
-                                        <input type="checkbox"/> Help identify
+                                        <input type="checkbox" style="width:auto; height:auto;"/> Help identify
                                     </label>
                                 </div>
                             </div>
