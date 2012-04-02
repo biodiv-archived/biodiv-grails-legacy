@@ -11,33 +11,33 @@ $(document).ready(function(){
 	$("#speciesGroupFilter").buttonset();
 	$("#speciesGroupFilter label").each(function() {
 		$(this).hover(function() {
-			$(this).css('backgroundPosition', '0px -50px');
+			$(this).css('backgroundPosition', '0px -32px');
 		}, function() {
 			if($(this).attr('value') == '${params.sGroup}') {
-				$(this).css('backgroundPosition', '0px -100px');
+				$(this).css('backgroundPosition', '0px -64px');
 			} else {
 				$(this).css('backgroundPosition', '0px 0px');
 			}
 		});
 	})
 		
-	$('#speciesGroupFilter label[value$="${params.sGroup}"]').attr('aria-pressed', 'true').addClass('ui-state-hover').addClass('ui-state-active').css('backgroundPosition', '0px -100px');
+	$('#speciesGroupFilter label[value$="${params.sGroup}"]').attr('aria-pressed', 'true').addClass('ui-state-hover').addClass('ui-state-active').css('backgroundPosition', '0px -64px');
 	
 	
 	$("#habitatFilter").buttonset();
 	$("#habitatFilter label").each(function() {
 		$(this).hover(function() {
-			$(this).css('backgroundPosition', '0px -50px');
+			$(this).css('backgroundPosition', '0px -32px');
 		}, function() {
 			if($(this).attr('value') == '${params.habitat}') {
-				$(this).css('backgroundPosition', '0px -100px');
+				$(this).css('backgroundPosition', '0px -64px');
 			} else {
 				$(this).css('backgroundPosition', '0px 0px');
 			}
 		});
 	})
 	
-	$('#habitatFilter label[value$="${params.habitat}"]').attr('aria-pressed', 'true').addClass('ui-state-hover').addClass('ui-state-active').css('backgroundPosition', '0px -100px');
+	$('#habitatFilter label[value$="${params.habitat}"]').attr('aria-pressed', 'true').addClass('ui-state-hover').addClass('ui-state-active').css('backgroundPosition', '0px -64px');
 	
 	
 
@@ -51,7 +51,7 @@ $(document).ready(function(){
 			<input type="radio" name="specuesGroupFilter"
 				id="speciesGroupFilter${i}" value="${sGroup.id }" />
 			<label for="speciesGroupFilter${i}" value="${sGroup.id}" title="${sGroup.name}" class="group_icon"
-						style="background: url('${createLinkTo(dir: 'images', file: sGroup.icon(ImageType.SMALL)?.fileName?.trim(), absolute:true)}') no-repeat; background-position: 0 0; width: 50px; height: 50px; margin-left: 6px;">				
+						style="background: url('${createLinkTo(dir: 'images', file: sGroup.icon(ImageType.SMALL)?.fileName?.trim(), absolute:true)}') no-repeat; background-position: 0 0; width: 32px; height: 32px; margin-left: 6px;">				
 			</label>
 		</g:if>
 
@@ -60,7 +60,7 @@ $(document).ready(function(){
 	<input type="radio" name="specuesGroupFilter" id="specuesGroupFilter20"
 		value="${othersGroup.id}" />
 	<label for="speciesGroupFilter20" value="${othersGroup.id}" title="${othersGroup.name}" class="group_icon"
-						style="background: url('${createLinkTo(dir: 'images', file: othersGroup.icon(ImageType.SMALL)?.fileName?.trim(), absolute:true)}') no-repeat; background-position: 0 0; width: 50px; height: 50px; margin-left: 6px;">				
+						style="background: url('${createLinkTo(dir: 'images', file: othersGroup.icon(ImageType.SMALL)?.fileName?.trim(), absolute:true)}') no-repeat; background-position: 0 0; width: 32px; height: 32px; margin-left: 6px;">				
 	</label>
 
 </div>
@@ -71,14 +71,14 @@ $(document).ready(function(){
 			<input type="radio" name="habitatFilter" id="habitatFilter${i}"
 				value="${habitat.id}" style="display: none" />
 			<label for="habitatFilter${i}" value="${habitat.id}" title="${habitat.name}" class="group_icon"
-							style="background: url('${createLinkTo(dir: 'images', file: habitat.icon(ImageType.SMALL)?.fileName?.trim(), absolute:true)}') no-repeat; background-position: 0 0; width: 50px; height: 50px; margin-left: 6px;">				
+							style="background: url('${createLinkTo(dir: 'images', file: habitat.icon(ImageType.SMALL)?.fileName?.trim(), absolute:true)}') no-repeat; background-position: 0 0; width: 32px; height: 32px; margin-left: 6px;">				
 			</label>
 		</g:if>
 	</g:each>
 	<input type="radio" name="habitatFilter" id="habitatFilter20"
 			value="${othersHabitat.id}" style="display: none" />
 		<label for="habitatFilter20" value="${othersHabitat.id}" title="${othersHabitat.name}" class="group_icon"
-						style="background: url('${createLinkTo(dir: 'images', file: othersHabitat.icon(ImageType.SMALL)?.fileName?.trim(), absolute:true)}') no-repeat; background-position: 0 0; width: 50px; height: 50px; margin-left: 6px;">				
+						style="background: url('${createLinkTo(dir: 'images', file: othersHabitat.icon(ImageType.SMALL)?.fileName?.trim(), absolute:true)}') no-repeat; background-position: 0 0; width: 32px; height: 32px; margin-left: 6px;">				
 		</label>
 </div>
 
