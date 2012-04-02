@@ -59,11 +59,12 @@
                         </div>
                 </g:if>
 
-                <%--g:hasErrors bean="${observationInstance}">
-                	<div class="errors">
-                    	<g:renderErrors bean="${observationInstance}" as="list" />
-					</div>
-                </g:hasErrors--%>
+                <g:hasErrors bean="${observationInstance}">
+                        <span class="label label-important">
+                            <g:message code="fix.errors.before.proceeding" default="Fix errors" />
+                        </span>
+                    	<%--<g:renderErrors bean="${observationInstance}" as="list" />--%>
+                </g:hasErrors>
             </div>
 
             <form id="upload_resource" enctype="multipart/form-data"
@@ -195,7 +196,7 @@
                             </div>
                         </div>
 
-                        <div class="row">
+                        <div class="row control-group ${hasErrors(bean: observationInstance, field: 'observedOn', 'error')}">
                             <div class="span4">
                                 <label for="observedOn"><i class="icon-calendar"></i><g:message
                                             code="observation.observedOn.label" default="Observed on" />
@@ -203,6 +204,10 @@
                             </div>
                             <div class="span7">
                                 <input name="observedOn" type="date" id="observedOn" value="${observationInstance?.observedOn?.format('MM/dd/yyyy')}"/>
+                                <div class="help-inline">
+                                    <g:renderErrors bean="${observationInstance}" field="observedOn"/>
+                                </div>
+
                             </div>
                         </div>
                         

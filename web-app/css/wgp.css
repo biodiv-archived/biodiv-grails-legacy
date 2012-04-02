@@ -221,7 +221,7 @@ font-size: 1.1em;
 }
 
 .bold_section .row {
-height: 70px;
+height: 60px;
 }
 
 .section {
@@ -723,7 +723,7 @@ margin-right: 3px;
 list-style: none;
 }
 
-.control-group.error .selected_value,  .control-group.error #imagesList {
+.control-group.error .selected_value,  .control-group.error #imagesList, .control-group.error input{
 border:2px solid #B94A48 !important;
 } 
 

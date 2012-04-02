@@ -36,14 +36,6 @@ padding-top:3px;
 padding-bottom:3px;
 }
 
-.label {
-float: left;
-padding-right: 5px;
-text-align: right;
-font-weight: bold;
-width: 150px;
-}
-
 .location_picker_value {
 float: left;
 text-align: left;
