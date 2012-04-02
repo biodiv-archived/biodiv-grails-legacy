@@ -167,6 +167,12 @@ padding-left: 10px;
 padding-right: 10px;
 }
 
+div.errors {
+	border: 1px solid red;
+	color: #cc0000;
+	word-wrap: break-word;
+}
+
 .bold_dropdown img{
 width: 30px;
 height: 30px;       
@@ -215,7 +221,7 @@ font-size: 1.1em;
 }
 
 .bold_section .row {
-height: 50px;
+height: 70px;
 }
 
 .section {
@@ -658,7 +664,7 @@ margin-right: 3px;
 	float:right;
 }
 
-//SEARCH PAGE START
+/*SEARCH PAGE START*/
 .icon {
 	padding: 1px;
 	width: 50px;
@@ -710,4 +716,14 @@ margin-right: 3px;
 .searchSnippet .toolbarIconContent {
 	left: 0;
 }
-//SEARCH PAGE END
+
+/*SEARCH PAGE END*/
+
+.error .help-inline ul{
+list-style: none;
+}
+
+.control-group.error .selected_value,  .control-group.error #imagesList {
+border:2px solid #B94A48 !important;
+} 
+

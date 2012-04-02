@@ -59,11 +59,11 @@
                         </div>
                 </g:if>
 
-                <g:hasErrors bean="${observationInstance}">
+                <%--g:hasErrors bean="${observationInstance}">
                 	<div class="errors">
                     	<g:renderErrors bean="${observationInstance}" as="list" />
 					</div>
-                </g:hasErrors>
+                </g:hasErrors--%>
             </div>
 
             <form id="upload_resource" enctype="multipart/form-data"
@@ -93,7 +93,7 @@
             <div class="span12 super-section" style="clear:both;">    
                 <div class="span11 section bold_section" style="position:relative;overflow:visible;">
                     <h3>What did you observe?</h3>
-                        <div class="row">
+                        <div class="row control-group ${hasErrors(bean: observationInstance, field: 'group', 'error')}">
                             <div class="span4">
                                 <label for="group"><g:message
                                                 code="observation.group.label" default="Group" />
@@ -106,12 +106,21 @@
                                         def defaultGroupIconFileName = (defaultGroupId)? SpeciesGroup.read(defaultGroupId).icon(ImageType.VERY_SMALL)?.fileName?.trim() : SpeciesGroup.findByName('All').icon(ImageType.VERY_SMALL)?.fileName?.trim()
                                         def defaultGroupValue = (defaultGroupId) ? SpeciesGroup.read(defaultGroupId).name : "Select group"
                                         %>
-                                        <div id="selected_group" class="btn dropdown-toggle selected_value ${hasErrors(bean: observationInstance, field: 'group', 'errors')}" data-toggle="dropdown">
+                                        <div id="selected_group" class="btn dropdown-toggle selected_value " data-toggle="dropdown">
                                                                             <img class="group_icon" 
                                                                                     src="${createLinkTo(dir: 'images', file: defaultGroupIconFileName, absolute:true)}"/>
                                                                     <span class="display_value">${defaultGroupValue}</span><span class="caret"></span>
+                                                                   
+                                                                    
                                                                     </div>
                                         
+                                        <div class="help-inline">
+                                            <g:hasErrors bean="${observationInstance}" field="group">
+                                                <g:message code="observation.group.not_selected"/>
+                                            </g:hasErrors>
+                                        </div>
+                                        
+
                                         <div id="group_options" class="dropdown-menu">
                                                 <ul>
                                                     <g:each in="${species.groups.SpeciesGroup.list()}" var="g">
@@ -131,7 +140,7 @@
                             </div>
                         </div>
 
-                        <div class="row">
+                        <div class="row control-group ${hasErrors(bean: observationInstance, field: 'habitat', 'error')}">
                             <div class="span4">
                                 <label>Habitat</label>
                             </div>    
@@ -144,7 +153,7 @@
                                                                             def defaultHabitatIconFileName = (defaultHabitatId)? defaultHabitat.icon(ImageType.VERY_SMALL)?.fileName?.trim() : Habitat.findByName('All').icon(ImageType.VERY_SMALL)?.fileName?.trim()
                                                                             def defaultHabitatValue = (defaultHabitatId) ? defaultHabitat.name : "Select habitat"
                                                                     %>
-                                        <div id="selected_habitat" class="btn dropdown-toggle selected_value ${hasErrors(bean: observationInstance, field: 'habitat', 'errors')}" data-toggle="dropdown">
+                                        <div id="selected_habitat" class="btn dropdown-toggle selected_value" data-toggle="dropdown">
                                         	<img class="group_icon" src="${createLinkTo(dir: 'images', file:defaultHabitatIconFileName, absolute:true)}"/>
                                         	
                                         <span class="display_value">${defaultHabitatValue}</span><span class="caret"></span></div>
@@ -155,6 +164,12 @@
                                                             	<span class="display_value">${h.name}</span></li>
                                                             </g:each>
                                                     </ul>
+                                            </div>
+
+                                            <div class="help-inline">
+                                                <g:hasErrors bean="${observationInstance}" field="habitat">
+                                                    <g:message code="observation.habitat.not_selected"/>
+                                                </g:hasErrors>
                                             </div>
                                         </div>
                                     </div>	
@@ -195,7 +210,7 @@
 
                 <div class="span11 section">
                 <i class="icon-picture"></i><span>Upload photos of a single observation and species</span>
-                    <div class="resources">
+                    <div class="resources control-group ${hasErrors(bean: observationInstance, field: 'resource', 'error')}">
                         <ul id="imagesList" class="thumbwrap thumbnails"
                                 style='list-style: none; margin-left: 0px;'>
                                 <g:set var="i" value="1" />
@@ -245,6 +260,7 @@
                                         </div>
                                     </li>
                         </ul>
+                    <div class="help-inline"><g:renderErrors bean="${observationInstance}" as="list" field="resource"/></div>
                     </div>
                 </div>
                                    
