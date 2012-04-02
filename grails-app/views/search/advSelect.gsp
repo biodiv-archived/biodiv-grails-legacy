@@ -74,80 +74,100 @@ var cache = {},
 </head>
 <body>
 
-	<div class="container_12">
+	<div class="container outer-wrapper">
 
-		<div class="grid_11" id="advSearchForm">
+		<div id="advSearchForm">
 
-			<form method="get"
+			<div class="page-header" style="overflow: auto;">
+				<div class="span8">
+					<h1>Advanced Search</h1>
+				</div>
+			</div>
+			
+			
+			<form method="get" class="form-horizontal"
 				action="${createLink(controller:'search', action:'advSelect') }"
 				title="Advanced Search" id="advSearchBox" class="searchbox dialog">
-				<table>
-					<tbody>
-						<tr class="prop">
-							<td valign="top" class="name">Name</td>
-							<td valign="top" class="value"><input type="text" size="40"
-								name="name" id="advSearchTextField" class="text ui-widget-content ui-corner-all"
-								title="Search using species name" /></td>
-						</tr>
-						<tr class="prop">
-							<td valign="top" class="name">Taxon Hierarchy</td>
-							<td valign="top" class="value"><input type="text" size="40"
-								name="taxon" value=""
-								class="text ui-widget-content ui-corner-all"
-								title="Search using taxon hierarchy" /></td>
-						</tr>
-						<tr class="prop indent">
-							<td valign="top" class="name">Species Author</td>
-							<td valign="top" class="value"><input type="text" size="40"
-								name="author" class="text ui-widget-content ui-corner-all"
-								title="Search using species author and basionym author" />
-							</td>
-						</tr>
-						<tr class="prop indent">
-							<td valign="top" class="name">Year</td>
-							<td valign="top" class="value"><input type="text" size="40"
-								name="year" class="text ui-widget-content ui-corner-all"
-								title="Search using year of finding the species and basionym year" />
-							</td>
-						</tr>						
-						<tr class="prop">
-							<td valign="top" class="name">Content</td>
-							<td valign="top" class="value"><input type="text" size="40"
-								name="text" value=""
-								class="text ui-widget-content ui-corner-all"
-								title="Search all text content" /></td>
-						</tr>
-						<tr class="prop">
-							<td valign="top" class="name">Contributor</td>
-							<td valign="top" class="value"><input type="text" size="40"
-								name="contributor" value=""
-								class="text ui-widget-content ui-corner-all"
-								title="Field to search all contributors" /></td>
-						</tr>
-						<tr class="prop">
-							<td valign="top" class="name">Attributions</td>
-							<td valign="top" class="value"><input type="text" size="40"
-								name="attribution" value=""
-								class="text ui-widget-content ui-corner-all"
-								title="Field to search all attributions" /></td>
-						</tr>
-						<tr class="prop">
-							<td valign="top" class="name">References</td>
-							<td valign="top" class="value"><input type="text" size="40"
-								name="reference" value=""
-								class="text ui-widget-content ui-corner-all"
-								title="Field to search all references" /></td>
-						</tr>
-					</tbody>
-				</table>
 
+				<div class="control-group">
+					<label class="control-label" for="name">Name</label>
+					<div class="controls">
+						<input type="text" class="input-xlarge" name="name"
+							id="advSearchTextField" placeholder="Search using species name" />
+					</div>
+				</div>
+
+				<div class="control-group">
+					<label class="control-label" for="taxon">Taxon Hierarchy</label>
+					<div class="controls">
+					<input type="text" class="input-xlarge"
+								name="taxon" value=""
+								placeholder="Search using taxon hierarchy" />
+					</div>
+				</div>
+
+				<div class="control-group">
+					<label class="control-label" for="author">Species Author</label>
+					<div class="controls">
+					<input type="text"
+								name="author" class="input-xlarge"
+								placeholder="Search using species author or basionym author" />
+					
+					</div>
+				</div>
+
+				<div class="control-group">
+					<label class="control-label" for="year">Year</label>
+					<div class="controls">
+					<input type="text" class="input-xlarge"
+								name="year" 
+								placeholder="Search using year of finding the species and basionym year" />
+					</div>
+				</div>
+				
+				<div class="control-group">
+					<label class="control-label" for="text">Content</label>
+					<div class="controls">
+					<input type="text" class="input-xlarge"
+								name="text" value=""
+								placeholder="Search all text content" />
+					</div>
+				</div>
+
+				<div class="control-group">
+					<label class="control-label" for="contributor">Contributor</label>
+					<div class="controls">
+					<input type="text" class="input-xlarge"
+								name="contributor" value=""
+								placeholder="Field to search all contributors" />
+					</div>
+				</div>
+
+				<div class="control-group">
+					<label class="control-label" for="attribution">Attributions</label>
+					<div class="controls">
+					<input type="text" class="input-xlarge"
+								name="attribution" value=""
+								placeholder="Field to search all attributions" />
+					</div>
+				</div>
+
+				<div class="control-group">
+					<label class="control-label" for="reference">References</label>
+					<div class="controls">
+					<input type="text" class="input-xlarge"
+								name="reference" value=""
+								placeholder="Field to search all references" />
+					</div>
+				</div>
+
+				<div class="form-actions">
+					<button type="submit"  id="advSearch" class="btn btn-primary">Search</button>
+				</div>
 				<g:hiddenField name="start" value="0" />
 				<g:hiddenField name="rows" value="10" />
 				<g:hiddenField name="sort" value="score desc" />
 				<g:hiddenField name="fl" value="id, name" />
-
-				<div style="float: right"> <input id="advSearch" type="submit"
-					value="Search"> </div>
 
 			</form>
 		</div>

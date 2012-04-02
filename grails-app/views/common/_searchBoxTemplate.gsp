@@ -62,10 +62,12 @@ $(document).ready(function(){
 	<div id="mainSearchForm">
 	<form method="get"
 		action="${createLink(controller:'search', action:'select') }"
-		id="searchbox" class="searchbox">
-		<input type="text" name="query" id="searchTextField" value=""
-			size="26" class="text ui-widget-content ui-corner-all"
-			title="Enter your search key" />
+		id="searchbox" class="form-horizontal">
+		<div class="input-append">
+			<input type="text" name="query" id="searchTextField" value=""
+			size="26" class="span4"
+			placeholder="Enter your search key" /><input id="search"  class="btn btn-primary searchButton" type="submit"
+			value="Search"/></div>
 
 		<g:hiddenField name="start" value="0" />
 		<g:hiddenField name="rows" value="10" />
@@ -77,9 +79,6 @@ $(document).ready(function(){
 		<g:hiddenField name="hl.fl" value="message" />
 		<g:hiddenField name="hl.snippets" value="3" />
 		 -->
-		<span> <input id="search"  class="searchButton" type="submit"
-			value="">
-			<!-- a href="${createLink(controller:'search', action:'advSelect') }" class="search">Advanced Search</a--> </span>
-
+		
 	</form>
 	</div>

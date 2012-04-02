@@ -147,7 +147,8 @@ class SUserController extends UserController {
 	}
 
 	def search = {
-		[enabled: 0, accountExpired: 0, accountLocked: 0, passwordExpired: 0]
+		//[enabled: 0, accountExpired: 0, accountLocked: 0, passwordExpired: 0]
+		redirect action:userSearch
 	}
 
 	def userSearch = {

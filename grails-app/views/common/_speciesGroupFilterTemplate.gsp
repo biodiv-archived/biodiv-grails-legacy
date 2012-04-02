@@ -43,6 +43,8 @@ $(document).ready(function(){
 
 });
 </g:javascript>
+
+
 <div id="speciesGroupFilter" class="filterBar" style="clear: both;">
 	<!-- g:paginateOnSpeciesGroup/-->
 	<%def othersGroup = SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.OTHERS)%>

@@ -6,10 +6,11 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 
 
-<g:if test="${params.controller == 'observation'}">
+<g:if test="${params.controller != 'species'}">
 <link rel="stylesheet" type="text/css" media="all"
 	href="${resource(dir:'bootstrap/css',file:'bootstrap.css', absolute:true)}" />
 </g:if>        
+
 <!--link rel="stylesheet" type="text/css" media="all"
 	href="${resource(dir:'bootstrap/css',file:'bootstrap-responsive.css', absolute:true)}" /-->
 
@@ -23,7 +24,7 @@
 
 <script src="${resource(dir:'plugins',file:'jquery-1.7/js/jquery/jquery-1.7.min.js', absolute:true)}" type="text/javascript" ></script>
 
-<g:if test="${params.controller == 'observation'}">
+<g:if test="${params.controller  != 'species'}">
 <g:javascript src="bootstrap.js"
 	base="${grailsApplication.config.grails.serverURL+'/bootstrap/js/'}"></g:javascript>
 </g:if>
@@ -48,12 +49,14 @@
 <link rel="stylesheet" type="text/css" media="all"
 	href="${resource(dir:'css',file:'text.css', absolute:true)}" />
         
-<g:if test="${params.controller != 'observation'}">
+
 <link rel="stylesheet" type="text/css" media="all"
 	href="${resource(dir:'css',file:'960.css', absolute:true)}" />
+<g:if test="${params.controller == 'species'}">
 <link rel="stylesheet"
 	href="${resource(dir:'css',file:'main.css', absolute:true)}" />
-</g:if>        
+</g:if>    
+    
 <link rel="stylesheet" type="text/css"
 	href="${resource(dir:'css',file:'navigation.css', absolute:true)}" />
 <link rel="stylesheet" type="text/css" media="all"

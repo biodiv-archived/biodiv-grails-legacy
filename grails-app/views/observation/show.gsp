@@ -59,7 +59,7 @@ width:90%;
                             </div>
                             <div class="span4" style="margin:0;">
                                 <sUser:ifOwns model="['user':observationInstance.author]">
-                                    <a class="btn" style="float: right;" href="${createLink(controller:'observation', action:'edit', id:observationInstance.id)}"> Edit Observation </a>
+                                    <a class="btn btn-primary" style="float: right;" href="${createLink(controller:'observation', action:'edit', id:observationInstance.id)}"> Edit Observation </a>
                                 </sUser:ifOwns>
                             </div>
 
