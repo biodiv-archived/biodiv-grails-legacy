@@ -170,6 +170,7 @@ padding-right: 10px;
 .bold_dropdown img{
 width: 30px;
 height: 30px;       
+float: left;        
 }
 
 .bold_dropdown {
@@ -196,6 +197,11 @@ height: 30px;
     margin-left: 10px;
 }
 
+.bold_dropdown .display_value {
+padding: 7px;
+float: left;
+font-weight:normal;       
+}
 .bold_section {
 margin:0;
 }
@@ -204,10 +210,12 @@ margin:0;
 
 .bold_section input {
 width: 300px;    
+height: 32px;       
+font-size: 1.1em;        
 }
 
 .bold_section .row {
-height: 42px;
+height: 50px;
 }
 
 .section {
@@ -306,6 +314,19 @@ margin:20px;
     display: none;
     position: absolute;
     z-index: 7;
+}
+
+.license_options li{
+border-top: 1px solid #e3e3e3;
+padding: 3px;
+}
+
+.license_options li:hover{
+background-color: #9acc57;    
+}
+
+.license_options span {
+padding: 10px;
 }
 
 textarea#notes {
@@ -483,6 +504,7 @@ height: 120px;
 
 .btn-group.open .dropdown-menu {
 border-radius: 0;
+top: 20px;
 }
 
 .observation_story.tablet .observation-icons, .observation_info .observation-icons{
@@ -549,13 +571,26 @@ margin-right: 10px;
 margin-right: 3px;       
 }
 
+.bold_dropdown {
+font-size: 1.1em;
+}
+
+.bold_dropdown .dropdown-menu {
+width: 660px;
+}
+
 .bold_dropdown .dropdown-menu li {
 border: 2px solid #ffffff;
 cursor: default;
+width: 190px;        
 }
 
 .bold_dropdown .dropdown-menu li:hover {
 border: 2px solid #9acc57;
+}
+
+.bold_dropdown .caret {
+float: right;
 }
 
 .habitat_option {
@@ -599,7 +634,7 @@ box-shadow: 8px 0 6px -6px #5e5e5e;
 }
 
 .licence_div img {
-height: 20px;
+height: 15px;
 }
 
 .observation_links {
@@ -615,3 +650,6 @@ background-color: #dcdcdc;
 box-shadow: 8px 0 6px -6px #5e5e5e;
 }
 
+i {
+margin-right: 3px;
+}

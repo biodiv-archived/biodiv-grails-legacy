@@ -194,7 +194,7 @@
                     </div>
 
                 <div class="span11 section">
-                <i class="icon-picture"></i>
+                <i class="icon-picture"></i><span>Upload photos of a single observation and species</span>
                     <div class="resources">
                         <ul id="imagesList" class="thumbwrap thumbnails"
                                 style='list-style: none; margin-left: 0px;'>
@@ -214,14 +214,16 @@
                                                         <input name="file_${i}" type="hidden" value='${r.fileName}' />
                                                         <div id="license_div_${i}" class="licence_div btn-group" style="z-index:2;cursor:pointer;">
 
-                                                            <div id="selected_license_{i}" onclick="$(this).next().show();" class="btn dropdown-toggle" data-toggle="dropdown">
-                                                                <img src="${resource(dir:'images/license',file:'cc_by.png', absolute:true)}" title="Set a license for this image"/>
+                                                            <div id="selected_license_{i}" onclick="$(this).next().show();" class="btn dropdown-toggle btn-mini" data-toggle="dropdown">
+                                                                <div>
+                                                                    <img src="${resource(dir:'images/license',file:'cc_by.png', absolute:true)}" title="Set a license for this image"/>
+                                                                </div>
                                                                 <span class="caret"></span>
                                                             </div>
                                                             <div id="license_options_{i}" class="license_options">
                                                                 <ul class="dropdown-menu">
                                                                     <g:each in="${species.License.list()}" var="l">
-                                                                        <li class="license_option" onclick="$('#license_{{=i}}').val($(this).text());$('#selected_license_{{=i}}').html($(this).html());$('#license_options_{{=i}}').hide();">
+                                                                        <li class="license_option" onclick="$('#license_{{=i}}').val($(this).text());$('#selected_license_{{=i}}').children('div').html($(this).html());$('#license_options_{{=i}}').hide();">
                                                                             <img src="${resource(dir:'images/license',file:'cc_by.png', absolute:true)}"/>
                                                                         </li>
                                                                     </g:each>
@@ -400,13 +402,17 @@
 	    <div class='metadata prop' style="position:relative; left: 5px; top:-40px;">
 	        <input name="file_{{=i}}" type="hidden" value='{{=file}}'/>
                 <div id="license_div_{{=i}}" class="licence_div btn-group" style="z-index:2;cursor:pointer;">
-                    <div id="selected_license_{{=i}}" onclick="$(this).next().show();" class="btn dropdown-toggle" data-toggle="dropdown">
-                        <img src="${resource(dir:'images/license',file:'cc_by.png', absolute:true)}" title="Set a license for this image"/>
+                    <div id="selected_license_{{=i}}" onclick="$(this).next().show();" class="btn dropdown-toggle btn-mini" data-toggle="dropdown">
+                        <div>
+                            <img src="${resource(dir:'images/license',file:'cc_by.png', absolute:true)}" title="Set a license for this image"/>
+                        </div>
                         <span class="caret"></span>
                     </div>
-                    <div id="license_options_{{=i}}" class="license_options">                                                                                                            <ul class="dropdown-menu">
+                    <div id="license_options_{{=i}}" class="license_options">
+                        <ul class="dropdown-menu">
+                            <span>Choose a license</span>
                             <g:each in="${species.License.list()}" var="l">
-                                <li class="license_option" onclick="$('#license_{{=i}}').val($(this).text());$('#selected_license_{{=i}}').html($(this).html());$('#license_options_{{=i}}').hide();">
+                                <li class="license_option" onclick="$('#license_{{=i}}').val($(this).text());$('#selected_license_{{=i}}').children('div').html($(this).html());$('#license_options_{{=i}}').hide();">
                                     <img src="${resource(dir:'images/license',file:l?.name.getIconFilename()+'.png', absolute:true)}"/>
                                 </li>
                             </g:each>
@@ -581,7 +587,7 @@
                 $("#selected_habitat").css({'background-color':'#e5e5e5', 'border-bottom-color':'#aeaeae'});
         });
        
-        $("#name").watermark("Recommend a species name");
+        $("#name").watermark("Suggest a species name");
         $("#place_name").watermark("Set a title for this location");
         $(".tagit-input").watermark("Add some tags");
         
