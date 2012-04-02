@@ -60,7 +60,7 @@
                 </g:if>
 
                 <g:hasErrors bean="${observationInstance}">
-                        <span class="label label-important">
+                        <i class="icon-warning-sign"></i><span class="label label-important">
                             <g:message code="fix.errors.before.proceeding" default="Fix errors" />
                         </span>
                     	<%--<g:renderErrors bean="${observationInstance}" as="list" />--%>
@@ -191,8 +191,15 @@
                                                 <g:renderErrors bean="${observationInstance}" as="list" />
                                         </div>
                                 </g:hasErrors>
-
-                                <reco:create />
+                                
+                                <div style="float:left;">
+                                    <reco:create />
+                                </div>
+                                <div id="help-identify" style="float:left; margin:10px;">
+                                    <label class="checkbox">
+                                        <input type="checkbox"/> Help identify
+                                    </label>
+                                </div>
                             </div>
                         </div>
 
@@ -615,8 +622,17 @@
         if(${observationInstance?.latitude && observationInstance?.longitude}){
         	set_location(${observationInstance?.latitude}, ${observationInstance?.longitude});
         }
+       
+        $("#help-identify input").click(function(){
+                if ($(this).attr('checked') == 'checked'){
+                    $('#nameContainer input').attr('disabled', 'disabled');
+                }else{
+                    $('#nameContainer input').removeAttr('disabled');
+                }
+        });
 
 	});
+
 
 	function removeResource(event) {
 		$(event.target).parent('.addedResource').remove();
