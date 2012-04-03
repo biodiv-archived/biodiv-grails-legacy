@@ -309,7 +309,7 @@ $(document).ready(function(){
 
 	
 
-		<div class="container_16">
+		<div class="container_16 big_wrapper">
 			<g:if test="${flash.message}">
 				<div
 					class="ui-state-highlight ui-corner-all grid_16">

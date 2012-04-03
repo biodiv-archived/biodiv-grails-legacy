@@ -37,7 +37,7 @@ $(document).ready(function(){
 </g:javascript>
 </head>
 <body>
-	<div class="container_16">
+	<div class="container_16 big_wrapper">
 		<div class="grid_16" align="center">
 			<g:if test="${flash.message}">
 				<div class="message">

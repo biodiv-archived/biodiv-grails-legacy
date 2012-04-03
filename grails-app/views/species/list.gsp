@@ -88,7 +88,7 @@ $(document).ready(function(){
 </g:javascript>
 </head>
 <body>
-	<div class="container_16">
+	<div class="container_16 big_wrapper">
 
 		<div class="paginateButtons grid_16">
 			<center>

@@ -99,7 +99,7 @@
 
 
 
-		<div style="display: table; width:100%">
+		<div style="display: block; width:100%">
 			<div style="float: right; clear: both;">
 				<sUser:showUserTemplate
 					model="['userInstance':observationInstance.author]" />

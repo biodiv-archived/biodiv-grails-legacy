@@ -8,7 +8,7 @@
 
 </head>
 <body>
-	<div class="container_12">
+	<div class="container_12 big_wrapper">
 		<div class="grid_11" style="padding: 20px;">
 			<h3>Contribute to Species Pages</h3>
 			<p>We request you to contribute to the species pages and build

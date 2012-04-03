@@ -28,12 +28,12 @@ html * {
 }
 
 body {
-	color: #333;
+        background-color: #cccccc;
 	/* 	font: 13px/1.5 'Helvetica Neue', Arial, 'Liberation Sans', FreeSans, sans-serif; */
 	/*	font : 15px/1.5 Georgia, "Times New Roman", Times, serif;*/
 	width: 100%;
 	/*background-color: #f7f7f7;*/
-	background-image: url('../images/canvas.png');
+	/*background-image: url('../images/canvas.png');*/
 }
 
 .ui-widget {
@@ -244,7 +244,7 @@ th.desc a {
 
 /* PAGINATION */
 .paginateButtons {
-	background: #fff url(../images/skin/shadow.jpg) bottom repeat-x;
+	/*background: #fff url(../images/skin/shadow.jpg) bottom repeat-x;*/
 	color: #666;
 	font-size: 10px;
 	overflow: hidden;
@@ -828,8 +828,7 @@ html.busy,html.busy * {
 	margin-top: 10px;
 	margin-bottom: 20px;
 	opacity: 1.0;
-	background-color: #f9f9f9;
-	border-radius: 5px;
+	background-color: #e3e3e3;
 	padding-left: 10px;
 	padding-right: 10px;
 }
@@ -1156,13 +1155,21 @@ td input.text:focus {
 
 ul.thumbwrap li.rich_species_content {
 	opacity: 1;
-	background-color: #fafadf;
+	background-color: #fdfdfd;
+}
+
+ul.thumbwrap li.rich_species_content:hover {
+	background-color: #ffffff;
 }
 
 ul.thumbwrap li.poor_species_content {
 	opacity: 0.8;
 	background-color: #fafafa;
 	position: relative;
+}
+
+ul.thumbwrap li.poor_species_content:hover {
+	background-color: #ffffff;
 }
 
 ul.thumbwrap li.poor_species_content a {
