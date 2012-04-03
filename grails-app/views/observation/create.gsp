@@ -403,13 +403,13 @@
                     </div>
                 </div>    
             </div>
-            <div class="span12">
-                <input class="btn btn-primary btn-large" type="submit" name="${form_button_name}" value="${form_button_val}" style="margin-top:20px;margin-bottom:40px; float:right;"/>
-            <g:if test="${observationInstance?.id}">
-	        	<div class="btn btn-danger" style="float:right;">
-                            <a href="${createLink(controller:'observation', action:'flagDeleted', id:observationInstance.id)}" onclick="return confirm('${message(code: 'default.observatoin.delete.confirm.message', default: 'This observation will be deleted. Are you sure ?')}');">Delete Observation </a>
-                        </div>     
-	    </g:if>
+            <div class="span12" style="margin-top:20px;margin-bottom:40px; float:right;">
+                <input class="btn btn-primary btn-large" type="submit" name="${form_button_name}" value="${form_button_val}"/>
+            	<g:if test="${observationInstance?.id}">
+	        		<div class="btn btn-danger btn-large">
+                    	<a href="${createLink(controller:'observation', action:'flagDeleted', id:observationInstance.id)}" onclick="return confirm('${message(code: 'default.observatoin.delete.confirm.message', default: 'This observation will be deleted. Are you sure ?')}');">Delete Observation </a>
+                    </div>     
+	    		</g:if>
             </div>
 
                 </form>

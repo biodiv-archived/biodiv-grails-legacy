@@ -12,7 +12,7 @@
 		</g:if>
 	</div>
 
-	<div class="section">
+	<div >
 
 		<div class="prop">
 			<span class="name"><i class="icon-share-alt"></i>Species Name</span>
@@ -93,13 +93,13 @@
 
 	</div>
 
-	<div class="section">
+	<div >
 		<obv:showTagsSummary
 			model="['observationInstance':observationInstance]" />
 
 
 
-		<div style="display: table">
+		<div style="display: table; width:100%">
 			<div style="float: right; clear: both;">
 				<sUser:showUserTemplate
 					model="['userInstance':observationInstance.author]" />
