@@ -1,7 +1,6 @@
 
 body {
     background-color: #cccccc;
-    background-image: url('../images/canvas.png');
 }
 
 .filters {
@@ -163,7 +162,7 @@ background-color: transparent;
 
 .outer-wrapper {
 clear: both;
-/* background-color: #e3e3e3; */
+background-color: #e3e3e3;
 padding-left: 10px;
 padding-right: 10px;
 }
