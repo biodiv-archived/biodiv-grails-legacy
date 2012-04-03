@@ -27,12 +27,12 @@
 
 
 				<div class="filters">
-					<g:form action='userSearch' name='userSearchForm' class="well form-horizontal ">
+					<g:form action='userSearch' name='userSearchForm' id="userSearchForm" class="well form-horizontal ">
 						<label class="control-label" for="username"><g:message code='user.username.label' default='Username' />:</label>
 						<div class="controls">
 							<div class="input-append">
 							<g:textField class="span3" name='username' size='50' maxlength='255'
-							value='${username}' class="input-medium search-query"/><button id="search" class="btn btn-primary" type="button"><g:message code='spring.security.ui.search' default='Search'/></button>
+							value='${username}' class="input-medium search-query"/><button id="userSearch" class="btn btn-primary" type="button"><g:message code='spring.security.ui.search' default='Search'/></button>
 							</div>
 							<div class="btn-group" data-toggle="buttons-radio"
 								style="float: right;">
@@ -79,6 +79,11 @@ $(document).ready(function() {
 		cache: false,
 		source: "${createLink(action: 'ajaxUserSearch')}"
 	});
+	
+	$("#userSearch").click(function() {
+		$("#userSearchForm").submit();
+	})
+		
 });
 
 <s2ui:initCheckboxes/>

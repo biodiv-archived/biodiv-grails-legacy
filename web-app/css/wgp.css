@@ -132,7 +132,7 @@ margin-left: 100px;
 }
 
 .prop .value {
-	text-align: left;
+/* 	text-align: left; */
 }
 
 .list_view li.thumbnail {
@@ -614,17 +614,20 @@ float: right;
 .normal_profile_pic {
 	height:100px;
 	width:auto;
+	max-width:120px;
 	margin:5px;
 }
 
 .small_profile_pic {
 	height:auto;
+	max-height:60px;
 	width:50px;
 	margin:5px;
 }
 
 .very_small_profile_pic {
 	height:auto;
+	max-height:30px;
 	width:25px;
 	margin:2px;
 }

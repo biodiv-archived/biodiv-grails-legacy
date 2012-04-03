@@ -34,9 +34,8 @@
 				<h1>
 					${fieldValue(bean: SUserInstance, field: "name")}
 					<sUser:ifOwns model="['user':SUserInstance]">
-						<span style="font-size: 60%; float: right;"> <g:link
-								controller="SUser" action="edit" id="${SUserInstance.id }">Edit<span
-									class="ui-icon-edit" />
+						<span style="font-size: 60%; float: right;" class="btn btn-primary"> <g:link
+								controller="SUser" action="edit" id="${SUserInstance.id }">Edit
 							</g:link> </span>
 					</sUser:ifOwns>
 
@@ -51,7 +50,7 @@
 				</g:if>
 
 				<div class="super-section" style="clear: both;">
-					<div>
+					<div class="section span12">
 						<div class="figure span3"
 							style="float: left; max-height: 220px; max-width: 200px">
 							<g:link controller="SUser" action="show"
@@ -79,7 +78,7 @@
 								<span class="name"><i class="icon-time"></i>Member since </span> <div class="value">
 									<g:formatDate format="yyyy-MM-dd"
 										date="${SUserInstance.dateCreated}" type="datetime"
-										style="MEDIUM" /> </span>
+										style="MEDIUM" /> </div>
 							</div>
 							<div class="prop">
 								<span class="name"><i class="icon-time"></i>Last visited </span> <div class="value">
@@ -89,7 +88,6 @@
 							</div>
 						</div>
 
-					</div>
 					
 
 					<div class="span8 observation_story">
@@ -126,16 +124,14 @@
 						</div>
 
 					</div>
+				
 				</div>
-
-				<br />
 
 				<g:if test="${SUserInstance.aboutMe }">
 					<div class="section" style="clear: both;">
 						<h5>About Me</h5>
 						${SUserInstance.aboutMe.encodeAsHTML().replace('\n', '<br/>\n')}
 					</div>
-					<br />
 				</g:if>
 
 				<g:if test="${SUserInstance.openIds}">
@@ -160,7 +156,6 @@
 						</g:each>
 					</div>
 
-					<br />
 				</g:if>
 
 				<div class="section" style=" width:100%; clear: both;">
@@ -172,13 +167,13 @@
 						model="['controller':'observation', 'action':'getRelatedObservation', 'filterProperty': 'user', 'filterPropertyValue':SUserInstance.id, 'id':'a']" />
 				</div>
 
-				<br />
 
 				<div class="section" style="clear: both;">
 					<obv:showAllTags
 						model="['tagFilterByProperty':'User', 'tagFilterByPropertyValue':SUserInstance.id]" />
 				</div>
-
+			
+			</div>
 			</div>
 		</div>
 

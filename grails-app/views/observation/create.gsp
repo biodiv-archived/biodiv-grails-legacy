@@ -72,7 +72,7 @@
                     class="${hasErrors(bean: observationInstance, field: 'resource', 'errors')}">
 
                     <!-- TODO multiple attribute is HTML5. need to chk if this gracefully falls back to default in non compatible browsers -->
-                    <input type="file" id="attachFiles" name="resources" multiple="multiple" accept="image/*" />
+                    <input type="file" id="attachFiles" name="resources" accept="image/*" />
                     <span class="msg" style="float: right"></span>
             </form>
             
