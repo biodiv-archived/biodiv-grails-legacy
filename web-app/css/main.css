@@ -1656,3 +1656,9 @@ margin-top: 5px;
 	height: 20px;
     width: 20px;
 }
+
+#speciesGroupFilter {
+background-color: #F5F5F5;
+border-radius: 0 0 0 0;
+box-shadow: 0 4px 3px -3px #5E5E5E;
+}

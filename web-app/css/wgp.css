@@ -8,7 +8,8 @@ body {
 /* border: 1px solid #ffffff; */
 overflow: auto;
 padding: 10px;          
-/* background-color: #ffffff;          */
+background-color: #f7f7f7;
+box-shadow: 0 4px 3px -3px #5E5E5E;
 }
 
 .filterBar .ui-button, .group_icon {
@@ -773,4 +774,8 @@ td.errors input {
 
 td.errors textarea {
 	border: 1px solid red;
+}
+
+.tag-tools {
+padding-bottom: 10px;
 }
