@@ -102,6 +102,7 @@ class ObservationController {
 			redirect(action: "create")
 		}
 	}
+	
 	@Secured(['ROLE_USER'])
 	def update = {
 		log.debug params;

@@ -142,8 +142,7 @@
 					<div class="section" style="clear: both;">
 						<h5>
 							${SUserInstance.openIds?.size()}
-							External Provider Identification
-							<g:if test="${SUserInstance.openIds?.size()>1}">s</g:if>
+							External Provider Identification<g:if test="${SUserInstance.openIds?.size()>1}">s</g:if>
 						</h5>
 						<g:each in="${SUserInstance.openIds}" var="openId">
 							<g:if test="${openId.url.indexOf('facebook') != -1}">

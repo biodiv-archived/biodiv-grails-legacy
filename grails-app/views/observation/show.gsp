@@ -67,7 +67,7 @@ width:90%;
 			
 			<div class="span8 right-shadow-box" style="margin:0;">
 				
-				<div class="grid_10">
+				<div class="span7">
                                       
 							<div id="gallery1">
 								<g:if test="${observationInstance.resource}">
@@ -101,28 +101,22 @@ width:90%;
 			    	<obv:showStory model="['observationInstance':observationInstance]" />
                 </div>
   				
-                <div class="comments-box">
-				<fb:comments colorscheme='light' href="${createLink(controller:'observation', action:'show', id:observationInstance.id, base:grailsApplication.config.grails.domainServerURL)}"></fb:comments>
+                <div class="comments-box" style="clear:both;">
+					<fb:comments colorscheme='light' href="${createLink(controller:'observation', action:'show', id:observationInstance.id, base:grailsApplication.config.grails.domainServerURL)}"></fb:comments>
                 </div>
 				
 			</div>
 
 
 			<div class="span4">
-                                
-<%--				--%>
-<%--				<div class="buttons">--%>
-<%--                    <span class="button"><g:actionSubmit class="delete" action="flagDeleted" value="${message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" /></span>--%>
-<%--                </div>--%>
-
-                                <div class="sidebar_section"> 
+               <div class="sidebar_section"> 
 				    <obv:showLocation
 					model="['observationInstance':observationInstance]" />
                                 </div>        
 
 				<!-- obv:showRating model="['observationInstance':observationInstance]" /-->
 				<!--  static species content -->
-                                <div class="grid_5 recommendations sidebar_section">
+                                <div class="recommendations sidebar_section">
 					<div>
 						<div><!-- g:message code="recommendations.no.message"
 								,  args="[result.size()]" /-->
@@ -164,7 +158,7 @@ width:90%;
                                         <div class="title">Nearby observations</div>	
                                         <obv:showRelatedStory model="['observationInstance':observationInstance, 'observationId': observationInstance.id, 'controller':'observation', 'action':'getRelatedObservation', 'filterProperty': 'nearBy', 'id':'nearBy']" />
                                     </div>
-                                    <div class="grid_5 sidebar_section tile" style="clear:both">
+                                    <div class="sidebar_section tile" style="clear:both">
                                     <div class="title">Other observations of the same species</div>	
                                     <obv:showRelatedStory model="['observationInstance':observationInstance, 'observationId': observationInstance.id, 'controller':'observation', 'action':'getRelatedObservation', 'filterProperty': 'speciesName', 'id':'a']" />
                                     </div>
