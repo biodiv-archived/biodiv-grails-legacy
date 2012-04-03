@@ -8,6 +8,8 @@ body {
 overflow: auto;
 padding: 10px;          
 /* background-color: #ffffff;          */
+background-color: #f7f7f7;
+box-shadow: 0 4px 3px -3px #5e5e5e;
 }
 
 .filterBar .ui-button, .group_icon {

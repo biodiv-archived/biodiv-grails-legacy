@@ -1,4 +1,4 @@
-<div class="observations_list" style="clear: both;">
+<div class="users_list" style="clear: both;">
 	<div class="mainContent">
 		<ul class="grid_view thumbnails">
 
