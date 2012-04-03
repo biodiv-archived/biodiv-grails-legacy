@@ -728,3 +728,45 @@ list-style: none;
 border:2px solid #B94A48 !important;
 } 
 
+
+
+/* MESSAGES AND ERRORS */
+.message {
+	background: #f3f8fc url(../images/skin/information.png) 8px 50%
+		no-repeat;
+	border: 1px solid #b2d1ff;
+	color: #006dba;
+	padding: 5px 5px 5px 30px
+}
+
+.errors {
+	background: #fff3f3;
+	border: 1px solid red;
+	color: #cc0000;
+	margin: 10px 0 5px 0;
+	padding: 5px 0 5px 0;
+	word-wrap: break-word;
+}
+
+.errors ul {
+	list-style: none;
+	padding: 0;
+}
+
+.errors li {
+	background: url(../images/skin/exclamation.png) no-repeat 8px 0%;
+	line-height: 16px;
+	padding-left: 30px;
+}
+
+td.errors select {
+	border: 1px solid red;
+}
+
+td.errors input {
+	border: 1px solid red;
+}
+
+td.errors textarea {
+	border: 1px solid red;
+}
