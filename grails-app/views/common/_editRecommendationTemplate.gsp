@@ -78,11 +78,11 @@ width:690px;
 			species_name = observationInstance?.fetchOwnerRecoVote()?.recommendation?.name
 		}else{
 			//showing identified species name based on max vote
-			species_name = observationInstance?.maxVotedSpeciesName
+			//species_name = observationInstance?.maxVotedSpeciesName
 		}
 	%>
 	<input type="text" name="recoName" id="name"
-		value="${species_name}"
+		value="${species_name}" placeholder='Suggest a species name'
 		class="value text ui-widget-content ui-corner-all ${hasErrors(bean: recommendationInstance, field: 'name', 'errors')} ${hasErrors(bean: recommendationVoteInstance, field: 'recommendation', 'errors')}" /> 
 	
 	<input type="hidden" name="canName" id="canName" />

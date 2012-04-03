@@ -210,7 +210,7 @@
                                 </label>
                             </div>
                             <div class="span7">
-                                <input name="observedOn" type="date" id="observedOn" value="${observationInstance?.observedOn?.format('MM/dd/yyyy')}"/>
+                                <input name="observedOn" type="date" id="observedOn" value="${observationInstance?.observedOn?.format('MM/dd/yyyy')}" placeholder="Select date of observation"/>
                                 <div class="help-inline">
                                     <g:renderErrors bean="${observationInstance}" field="observedOn"/>
                                 </div>
@@ -403,13 +403,14 @@
                     </div>
                 </div>    
             </div>
-            <div class="span12" style="margin-top:20px;margin-bottom:40px; float:right;">
-                <input class="btn btn-primary btn-large" type="submit" name="${form_button_name}" value="${form_button_val}"/>
-            	<g:if test="${observationInstance?.id}">
-	        		<div class="btn btn-danger btn-large">
+            <div class="span12" style="margin-top:20px;margin-bottom:40px;">
+                <g:if test="${observationInstance?.id}">
+	        		<div class="btn btn-danger btn-large" style=" float:right; margin-right:5px;">
                     	<a href="${createLink(controller:'observation', action:'flagDeleted', id:observationInstance.id)}" onclick="return confirm('${message(code: 'default.observatoin.delete.confirm.message', default: 'This observation will be deleted. Are you sure ?')}');">Delete Observation </a>
                     </div>     
 	    		</g:if>
+                <input class="btn btn-primary btn-large" type="submit" name="${form_button_name}" value="${form_button_val}" style=" float:right;margin-right:5px;"/>
+            	
             </div>
 
                 </form>
