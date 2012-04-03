@@ -353,14 +353,8 @@ environments {
 		grails.plugins.springsecurity.facebook.secret='f36074901fc24b904794692755796fd1'
 		grails {
 			mail {
-				host = "smtp.gmail.com"
-				port = 465
-				username = "itsmesrav@gmail.com"
-				password = "useless"
-				props = ["mail.smtp.auth":"true",
-					"mail.smtp.socketFactory.port":"465",
-					"mail.smtp.socketFactory.class":"javax.net.ssl.SSLSocketFactory",
-					"mail.smtp.socketFactory.fallback":"false"]
+				 host = "127.0.0.1"
+				 port = 25
 			}
 		}
 	}

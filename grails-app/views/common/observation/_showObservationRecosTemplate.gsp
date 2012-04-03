@@ -1,6 +1,7 @@
 <!--link rel="stylesheet" type="text/css" media="all"
 	href="${resource(dir:'css',file:'pollBars.css', absolute:true)}" /-->
 
+<%@page import="species.utils.ImageType"%>
 <style>
 .reco_block {
 	background-color: #ffffff;
@@ -67,7 +68,7 @@
 				<g:each in="${r.authors}" var="author">
 					<g:link controller="SUser" action="show" id="${author?.id}">
 						<img class="very_small_profile_pic"
-							src="${author?.icon()}"
+							src="${author?.icon(ImageType.VERY_SMALL)}"
 							title="${author.username}" />
 					</g:link>
 				</g:each>

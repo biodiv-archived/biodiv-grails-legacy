@@ -2,6 +2,7 @@ package species.auth
 
 import species.Resource;
 import species.Resource.ResourceType;
+import species.utils.ImageType;
 
 class SUser {
 
@@ -85,11 +86,21 @@ class SUser {
 	}
 
 	def icon() {
+		return icon(ImageType.NORMAL);
+	}
+	
+	def icon(ImageType type) {
 		if(profilePic) {
 			return profilePic;
 		}
-		return grailsApplication.config.speciesPortal.resources.serverURL+"/users/user.png"
-
+		
+		def baseUrl = grailsApplication.config.speciesPortal.resources.serverURL;
+		switch(type) {
+			case ImageType.NORMAL : 
+			case ImageType.LARGE : return baseUrl+"/users/user_large.png"
+			case ImageType.SMALL : return baseUrl+"/users/user.png"
+			case ImageType.VERY_SMALL : return baseUrl+"/users/user_small.png"
+		}
 	}
 
 	@Override
