@@ -1,7 +1,6 @@
 
 body {
     background-color: #cccccc;
-    background-image: url('../images/canvas.png');
 }
 
 .filters {
@@ -9,6 +8,8 @@ body {
 overflow: auto;
 padding: 10px;          
 /* background-color: #ffffff;          */
+background-color: #f7f7f7;
+box-shadow: 0 4px 3px -3px #5e5e5e;
 }
 
 .filterBar .ui-button, .group_icon {
@@ -163,7 +164,7 @@ background-color: transparent;
 
 .outer-wrapper {
 clear: both;
-/* background-color: #e3e3e3; */
+background-color: #e3e3e3;
 padding-left: 10px;
 padding-right: 10px;
 }
