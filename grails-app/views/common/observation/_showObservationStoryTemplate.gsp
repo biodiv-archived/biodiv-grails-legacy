@@ -2,22 +2,22 @@
 <%@page import="species.utils.ImageType"%>
 <div class="observation_story">
 	<div class="observation-icons">
-		<img class="group_icon"
-        	title="${observationInstance.group?.name}"  
-			src="${createLinkTo(dir:'images', file: observationInstance.group.icon(ImageType.VERY_SMALL)?.fileName?.trim(), absolute:true)}"/>
+		<img class="group_icon" title="${observationInstance.group?.name}"
+			src="${createLinkTo(dir:'images', file: observationInstance.group.icon(ImageType.VERY_SMALL)?.fileName?.trim(), absolute:true)}" />
 
 		<g:if test="${observationInstance.habitat}">
 			<img class="habitat_icon group_icon"
-                title="${observationInstance.habitat.name}" 
-             	src="${createLinkTo(dir: 'images', file:observationInstance.habitat.icon(ImageType.VERY_SMALL)?.fileName?.trim(), absolute:true)}"/>
+				title="${observationInstance.habitat.name}"
+				src="${createLinkTo(dir: 'images', file:observationInstance.habitat.icon(ImageType.VERY_SMALL)?.fileName?.trim(), absolute:true)}" />
 		</g:if>
 	</div>
 
 	<div class="prop">
 		<span class="name"><i class="icon-share-alt"></i>Species Name</span>
 		<div class="value">
-			<obv:showSpeciesName model="['observationInstance':observationInstance]" />
-                        <i class="icon-ok"></i>
+			<obv:showSpeciesName
+				model="['observationInstance':observationInstance]" />
+			<i class="icon-ok"></i>
 		</div>
 	</div>
 
@@ -25,19 +25,19 @@
 	<div class="prop">
 		<span class="name"><i class="icon-map-marker"></i>Place</span>
 		<div class="value">
-                    <g:if test="${observationInstance.placeName == ''}">
-                        ${observationInstance.reverseGeocodedName}
-                    </g:if>
-                    <g:else>
-                        ${observationInstance.placeName}
-                    </g:else>
-                    <br/>
-                    Lat: <g:formatNumber number="${observationInstance.latitude}"
+			<g:if test="${observationInstance.placeName == ''}">
+				${observationInstance.reverseGeocodedName}
+			</g:if>
+			<g:else>
+				${observationInstance.placeName}
+			</g:else>
+			<br /> Lat:
+			<g:formatNumber number="${observationInstance.latitude}"
 				type="number" maxFractionDigits="2" />
-			,
-			Long: <g:formatNumber number="${observationInstance.longitude}"
+			, Long:
+			<g:formatNumber number="${observationInstance.longitude}"
 				type="number" maxFractionDigits="2" />
-                                
+
 
 		</div>
 	</div>
@@ -51,34 +51,50 @@
 
 	<div class="prop">
 		<span class="name"><i class="icon-time"></i>Submitted</span>
-	 <obv:showDate 
+		<obv:showDate
 			model="['observationInstance':observationInstance, 'propertyName':'createdOn']" />
-                        
+
 	</div>
 
 	<div class="prop">
 		<span class="name"><i class="icon-time"></i>Updated</span>
 		<obv:showDate
-		model="['observationInstance':observationInstance, 'propertyName':'lastRevised']" />
+			model="['observationInstance':observationInstance, 'propertyName':'lastRevised']" />
 	</div>
-	
+
 	<g:if test="${observationInstance.notes}">
-	<div class="prop">
-		<span class="name"><i class="icon-info-sign"></i>Description</span>
-		${observationInstance.notes.encodeAsHTML().replace('\n', '<br/>\n')}
-	</div>
+		<div class="prop">
+			<span class="name"><i class="icon-info-sign"></i>Description</span>
+			${observationInstance.notes.encodeAsHTML().replace('\n', '<br/>\n')}
+		</div>
 	</g:if>
-	
-	<sUser:showUserTemplate model="['userInstance':observationInstance.author]"/>
 
 	<obv:showTagsSummary
 		model="['observationInstance':observationInstance]" />
 
-        <div class="story-footer">
-            <div class="footer-item"><i class="icon-eye-open"></i>${observationInstance.getPageVisitCount()} views</div>
-                
-            <div class="footer-item"><i class="icon-comment"></i><fb:comments-count href="${createLink(controller:'observation', action:'show', id:observationInstance.id, base:grailsApplication.config.grails.domainServerURL)}"></fb:comments-count> comments</div>
-            <div class="footer-item" style="width:50px;"><fb:like layout="button_count" href="${createLink(controller:'observation', action:'show', id:observationInstance.id, base:grailsApplication.config.grails.domainServerURL)}" width="450" show_faces="true"></fb:like></div>
-        </div>
+	<div class="story-footer" style="position:static;">
+		<div class="footer-item">
+			<i class="icon-eye-open"></i>
+			${observationInstance.getPageVisitCount()}
+			views
+		</div>
+
+		<div class="footer-item">
+			<i class="icon-comment"></i>
+			<fb:comments-count
+				href="${createLink(controller:'observation', action:'show', id:observationInstance.id, base:grailsApplication.config.grails.domainServerURL)}"></fb:comments-count>
+			comments
+		</div>
+		<div class="footer-item" style="width: 50px;">
+			<fb:like layout="button_count"
+				href="${createLink(controller:'observation', action:'show', id:observationInstance.id, base:grailsApplication.config.grails.domainServerURL)}"
+				width="450" show_faces="true"></fb:like>
+		</div>
+	</div>
+
+	<div style="float: right;">
+		<sUser:showUserTemplate
+			model="['userInstance':observationInstance.author]" />
+	</div>
 
 </div>

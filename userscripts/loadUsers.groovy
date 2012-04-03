@@ -1,5 +1,6 @@
 import java.util.Date;
 import java.util.List;
+import java.lang.Float;
 
 import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
 
@@ -8,7 +9,7 @@ import species.auth.SUser;
 //SUser.executeUpdate("delete SUser s");
 def defaultRoleNames = ['ROLE_USER']
 
-new File("/tmp/users.tsv").splitEachLine("\\t") {
+new File("/home/sravanthi/git/biodiv/users.tsv").splitEachLine("\\t") {
 	def fields = it;
 	def user = new SUser (
 			username : fields[1],
@@ -24,7 +25,7 @@ new File("/tmp/users.tsv").splitEachLine("\\t") {
 			profilePic:fields[15]);
 		
 		if(fields[13]) {			
-			user.timezone = fields[13]
+			user.timezone = Float.parseFloat(fields[13])
 		}
 
 	SUser.withTransaction {

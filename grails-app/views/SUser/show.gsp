@@ -26,9 +26,10 @@
 </style>
 </head>
 <body>
-	<div class="container_16 big_wrapper">
-		<div class=" grid_16">
-			<div class="body">
+	<div class="container outer-wrapper">
+		<div class="row">
+			<div class="span12">
+				<div class="page-header">
 
 				<h1>
 					${fieldValue(bean: SUserInstance, field: "name")}
@@ -41,15 +42,17 @@
 
 				</h1>
 
+				</div>
+
 				<g:if test="${flash.message}">
 					<div class="message">
 						${flash.message}
 					</div>
 				</g:if>
 
-				<div class="span12 super-section" style="clear: both;">
-					<div class="grid_4" style="width: 200px; padding: 0;">
-						<div class="figure"
+				<div class="super-section" style="clear: both;">
+					<div>
+						<div class="figure span3"
 							style="float: left; max-height: 220px; max-width: 200px">
 							<g:link controller="SUser" action="show"
 								id="${SUserInstance.id }">
@@ -73,50 +76,53 @@
 							<%--					--%>
 
 							<div class="prop">
-								<span class="name">Member since </span> <span class="value">
+								<span class="name"><i class="icon-time"></i>Member since </span> <div class="value">
 									<g:formatDate format="yyyy-MM-dd"
 										date="${SUserInstance.dateCreated}" type="datetime"
 										style="MEDIUM" /> </span>
 							</div>
 							<div class="prop">
-								<span class="name">Last visited </span> <span class="value">
+								<span class="name"><i class="icon-time"></i>Last visited </span> <div class="value">
 									<g:formatDate format="yyyy-MM-dd"
 										date="${SUserInstance.lastLoginDate}" type="datetime"
-										style="MEDIUM" /> </span>
+										style="MEDIUM" /> </div>
 							</div>
 						</div>
 
 					</div>
+					
 
-					<div class="user_basic_info grid_11">
+					<div class="span8 observation_story">
 
 						<div class="prop">
-							<span class="name"><g:message code="suser.username.label"
-									default="Username" /> </span> <span class="value"> ${fieldValue(bean: SUserInstance, field: "username")}
-							</span>
+							<span class="name"><i class="icon-user"></i><g:message code="suser.username.label"
+									default="Username" /> </span> <div class="value"> ${fieldValue(bean: SUserInstance, field: "username")}
+							</div>
 						</div>
 
 						<sUser:ifOwnsOrIsPublic model="['user':SUserInstance, 'isPublic':!SUserInstance.hideEmailId]">
 							<div class="prop">
-								<span class="name"><g:message code="suser.email.label"
-										default="Email" /> </span> <span class="value"> <a
+								<span class="name"><i class="icon-envelope"></i><g:message code="suser.email.label"
+										default="Email" /> </span> <div class="value"> <a
 									href="mailto:${fieldValue(bean: SUserInstance, field: 'email')}">
-										${fieldValue(bean: SUserInstance, field: "email")} </a> </span>
+										${fieldValue(bean: SUserInstance, field: "email")} </a> </div>
 
 							</div>
 						</sUser:ifOwnsOrIsPublic>
 
 						<div class="prop">
-							<span class="name"><g:message code="suser.website.label"
-									default="Website" /> </span> <span class="value"> <a
+							<span class="name"><i class="icon-road"></i><g:message code="suser.website.label"
+									default="Website" /> </span> <div class="value"> 
+									<g:if test="${SUserInstance.website }"><a
 								target="blank"
 								href="${fieldValue(bean: SUserInstance, field: 'website')}">
-									${fieldValue(bean: SUserInstance, field: 'website')} </a> </span>
+									${fieldValue(bean: SUserInstance, field: 'website')} </a> </g:if></div>
+									
 						</div>
 						<div class="prop">
-							<span class="name"><g:message code="suser.location.label"
-									default="Location" /> </span> <span class="value"> ${fieldValue(bean: SUserInstance, field: "location")}
-							</span>
+							<span class="name"><i class="icon-map-marker"></i><g:message code="suser.location.label"
+									default="Location" /> </span> <div class="value"> ${fieldValue(bean: SUserInstance, field: "location")}
+							</div>
 						</div>
 
 					</div>
@@ -125,7 +131,7 @@
 				<br />
 
 				<g:if test="${SUserInstance.aboutMe }">
-					<div class="span12 super-section" style="clear: both;">
+					<div class="section" style="clear: both;">
 						<h5>About Me</h5>
 						${SUserInstance.aboutMe.encodeAsHTML().replace('\n', '<br/>\n')}
 					</div>
@@ -133,7 +139,7 @@
 				</g:if>
 
 				<g:if test="${SUserInstance.openIds}">
-					<div class="span12 super-section" style="clear: both;">
+					<div class="section" style="clear: both;">
 						<h5>
 							${SUserInstance.openIds?.size()}
 							External Provider Identification
@@ -158,7 +164,7 @@
 					<br />
 				</g:if>
 
-				<div class="span12 super-section" style="clear: both;">
+				<div class="section" style=" width:100%; clear: both;">
 					<h5>
 						${Observation.countByAuthor(SUserInstance)}
 						Observations
@@ -169,7 +175,7 @@
 
 				<br />
 
-				<div class="span12 super-section" style="clear: both;">
+				<div class="section" style="clear: both;">
 					<obv:showAllTags
 						model="['tagFilterByProperty':'User', 'tagFilterByPropertyValue':SUserInstance.id]" />
 				</div>

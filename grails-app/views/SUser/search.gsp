@@ -54,7 +54,7 @@
 				<g:if test='${searched}'>
 					<div class="row">
 						<!-- main_content -->
-						<div class="list">
+						<div class="list span12">
                         	<div class="observations thumbwrap">
 								<%
 def queryParams = [username: username, enabled: enabled, accountExpired: accountExpired, accountLocked: accountLocked, passwordExpired: passwordExpired]

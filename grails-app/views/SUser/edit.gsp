@@ -18,125 +18,140 @@
 </head>
 
 <body>
+	<div class="container outer-wrapper">
+		<div class="row">
+			<div class="span12">
+				<div class="page-header">
 
-	<div class="container_16 big_wrapper">
-		<div class=" grid_16">
-			<div class="body">
-				<h1>
-					${fieldValue(bean: user, field: "name")}
+					<h1>
+						${fieldValue(bean: user, field: "name")}
 
-					<span style="font-size: 60%; float: right;"> <g:link
-							controller="SUser" action="show" id="${user.id }">View my profile</g:link>
-					</span>
+						<span style="font-size: 60%; float: right;"> <g:link
+								controller="SUser" action="view" id="${user.id}">View my profile<span />
+							</g:link> </span>
 
-				</h1>
+
+					</h1>
+
+				</div>
+
 				<g:if test="${flash.message}">
 					<div class="message">
 						${flash.message}
 					</div>
 				</g:if>
 
-				<g:form action="update" name='userEditForm' class="button-style updateForm">
-					<g:hiddenField name="id" value="${user?.id}" />
-					<g:hiddenField name="version" value="${user?.version}" />
+				<div class="super-section" style="clear: both;">
+					<g:form class="form-horizontal" action="update" name='userEditForm'
+						class="button-style updateForm">
+						<g:hiddenField name="id" value="${user?.id}" />
+						<g:hiddenField name="version" value="${user?.version}" />
 
 
-					<div class="grid_4"
-						style="width: 200px; padding: 0;">
-						<div class="figure"
-							style="float: left; max-height: 220px; max-width: 200px">
-							<g:link controller="SUser" action="show" id="${user.id }">
-								<img class="normal_profile_pic" src="${user.icon()}" />
-							</g:link>
-							<div class="prop">
-								<span class="name">Member since </span> <span class="value">
-									${fieldValue(bean: user, field: "dateCreated")} </span>
+						<div class="span3" style="width: 200px; padding: 0;">
+							<div class="figure"
+								style="float: left; max-height: 220px; max-width: 200px">
+								<g:link controller="SUser" action="show" id="${user.id }">
+									<img class="normal_profile_pic" src="${user.icon()}" />
+								</g:link>
+								<div class="prop">
+									<span class="name">Member since </span> <span class="value">
+										${fieldValue(bean: user, field: "dateCreated")} </span>
+								</div>
+								<div class="prop">
+									<span class="name">Last visited </span> <span class="value">
+										${fieldValue(bean: user, field: "lastLoginDate")} </span>
+								</div>
 							</div>
-							<div class="prop">
-								<span class="name">Last visited </span> <span class="value">
-									${fieldValue(bean: user, field: "lastLoginDate")} </span>
+
+						</div>
+						<div class="span8 observation_story">
+							<table>
+								<tbody>
+									<s2ui:textFieldRow name='username'
+										labelCode='user.username.label' bean="${user}" size='40'
+										labelCodeDefault='Username' value="${user.username}" />
+
+									<s2ui:textFieldRow name='name' labelCode='user.name.label'
+										bean="${user}" size='40' labelCodeDefault='Full Name'
+										value="${user.name}" />
+
+									<s2ui:textFieldRow name='email' bean="${user}"
+										value="${user.email}" size='40' labelCode='user.email.label'
+										labelCodeDefault='E-mail*' readonly />
+
+									<s2ui:textFieldRow name='website' bean="${user}"
+										value="${user.website}" size='40'
+										labelCode='user.website.label' labelCodeDefault='Website' />
+
+									<s2ui:textFieldRow name='location' bean="${user}"
+										value="${user.location}" size='40'
+										labelCode='user.location.label' labelCodeDefault='Location' />
+
+
+								</tbody>
+							</table>
+						</div>
+
+						<div class="section" style="clear: both;">
+							<h5>About Me</h5>
+							<textarea cols='100' rows='3' style="width: 100%" name="aboutMe"
+								id="aboutMe">
+								${user.aboutMe }
+							</textarea>
+						</div>
+
+						<div class="section" style="clear: both;">
+							<h5>Settings</h5>
+							<div class="control-group">
+								<div class="controls">
+									<div>
+										<label class="checkbox"  style="float:left;clear:both;"> <g:checkBox
+												name="sendNotification" value="${user.sendNotification}" />
+											<g:message code='user.sendNotification.label'
+												default='Send me email notifications' /> </label>
+									</div>
+									<div>
+										<label class="checkbox"  style="float:left;clear:both;"> <g:checkBox
+												name="hideEmailId" value="${user.hideEmailId}" /> <g:message
+												code='user.hideEmailId.label'
+												default='Hide my email from others' /> </label>
+									</div>
+								</div>
 							</div>
 						</div>
 
-					</div>
-					<div class="user_basic_info grid_10">
-						<table>
-							<tbody>
-								<s2ui:textFieldRow name='username'
-									labelCode='user.username.label' bean="${user}" size='40'
-									labelCodeDefault='Username' value="${user.username}" />
+						
+						<div class="section form-action" style='clear:both;padding-top:10px; padding-bottom:10px'>
+							<s2ui:submitButton elementId='update' form='userEditForm'
+								messageCode='default.button.update.label' />
 
-								<s2ui:textFieldRow name='name' labelCode='user.name.label'
-									bean="${user}" size='40' labelCodeDefault='Full Name'
-									value="${user.name}" />
+							<g:if test='${user}'>
+								<!--s2ui:deleteButton /-->
+							</g:if>
 
-								<s2ui:textFieldRow name='email' bean="${user}"
-									value="${user.email}" size='40' labelCode='user.email.label'
-									labelCodeDefault='E-mail*' readonly />
-											
-								<s2ui:textFieldRow name='website' bean="${user}"
-									value="${user.website}" size='40'
-									labelCode='user.website.label' labelCodeDefault='Website' />
+							<g:if test='${canRunAs}'>
+								<a id="runAsButton"> ${message(code:'spring.security.ui.runas.submit')}
+								</a>
+							</g:if>
 
-								<s2ui:textFieldRow name='location' bean="${user}"
-									value="${user.location}" size='40'
-									labelCode='user.location.label' labelCodeDefault='Location' />
+						</div>
 
+					</g:form>
 
-							</tbody>
-						</table>
-					</div>
-					
-					<div class="span12 super-section" style="clear:both;">
-						<h5>About Me</h5>
-						<textarea cols='100' rows='3' style="width:100%" name="aboutMe" id="aboutMe">${user.aboutMe }</textarea>
-					</div>
+					<g:if test='${user}'>
+						<!-- s2ui:deleteButtonForm instanceId='${user.id}'/-->
+					</g:if>
 
-					<div class="span12 super-section" style="clear:both;">
-						<h5>Settings</h5>
-						<div>
-							<div>
-								<g:checkBox name="sendNotification" value="${user.sendNotification}" />
-								<label for="sendNotification"><g:message code='user.sendNotification.label' default='Send me email notifications'/></label>
-							</div>
-							<div>
-								<g:checkBox name="hideEmailId" value="${user.hideEmailId}" />
-								<label for="hideEmailId"><g:message code='user.hideEmailId.label' default='Hide my email if from others'/></label>
-							</div>
-							
-						</div>						
-					</div>
-
-					
-					<div style='float: left; margin-top: 10px;'>
-						<s2ui:submitButton elementId='update' form='userEditForm'
-							messageCode='default.button.update.label' />
-
-						<g:if test='${user}'>
-							<!--s2ui:deleteButton /-->
-						</g:if>
-
-						<g:if test='${canRunAs}'>
-							<a id="runAsButton"> ${message(code:'spring.security.ui.runas.submit')}
-							</a>
-						</g:if>
-
-					</div>
-
-				</g:form>
-
-				<g:if test='${user}'>
-					<!-- s2ui:deleteButtonForm instanceId='${user.id}'/-->
-				</g:if>
-
-				<g:if test='${canRunAs}'>
-					<form name='runAsForm'
-						action='${request.contextPath}/j_spring_security_switch_user'
-						method='POST'>
-						<g:hiddenField name='j_username' value="${user.username}" />
-						<input type='submit' class='s2ui_hidden_button' />
-					</form>
-				</g:if>
+					<g:if test='${canRunAs}'>
+						<form name='runAsForm'
+							action='${request.contextPath}/j_spring_security_switch_user'
+							method='POST'>
+							<g:hiddenField name='j_username' value="${user.username}" />
+							<input type='submit' class='s2ui_hidden_button' />
+						</form>
+					</g:if>
+				</div>
 			</div>
 		</div>
 	</div>

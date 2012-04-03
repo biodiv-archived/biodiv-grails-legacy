@@ -24,14 +24,14 @@
         <ul class="list_view thumbnails" style="display:none;">
             <g:each in="${observationInstanceList}" status="i"
             var="observationInstance">
-
-            <li class="thumbnail" style="clear:both;">
+	        <li class="thumbnail" style="clear:both;">
                 <obv:showSnippet
                     model="['observationInstance':observationInstance]"></obv:showSnippet>
             </li>        
             </g:each>
         </ul>       
     </div>
+    
     <g:if test="${observationInstanceTotal > queryParams.max}">
         <div class="btn loadMore">
             <span class="progress" style="display:none;">Loading ... </span>
@@ -103,6 +103,13 @@
                         }else{
                             $(".loadMore .progress").hide();
                             $(".loadMore .buttonTitle").show();
+                        }
+                        if($('.grid_view_bttn.active')[0]) {
+                      	  $('.grid_view').show();
+                      	  $('.list_view').hide();
+                        } else {
+                      	  $('.grid_view').hide();
+                      	  $('.list_view').show();
                         }
 		    }
 		});

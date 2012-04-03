@@ -152,7 +152,8 @@ class SUserController extends UserController {
 	}
 
 	def userSearch = {
-
+		log.debug params
+		
 		boolean useOffset = params.containsKey('offset')
 		setIfMissing 'max', 12, 100
 		setIfMissing 'offset', 0
@@ -163,7 +164,7 @@ class SUserController extends UserController {
 		def userLookup = SpringSecurityUtils.securityConfig.userLookup
 		String usernameFieldName = 'username'
 
-		params.sort ?: usernameFieldName;
+		params.sort = params.sort ?: usernameFieldName;
 		for (name in [username: usernameFieldName]) {
 			if (params[name.key]) {
 				hql.append " AND LOWER(u.${name.value}) LIKE :${name.key}"
@@ -222,7 +223,8 @@ class SUserController extends UserController {
 	 * Ajax call used by autocomplete textfield.
 	 */
 	def ajaxUserSearch = {
-
+		log.debug params
+		
 		def jsonData = []
 
 		if (params.term?.length() > 2) {

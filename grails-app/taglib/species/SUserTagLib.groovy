@@ -78,7 +78,16 @@ class SUserTagLib {
 			out << render(template:"/common/suser/showUserListTemplate", model:attrs.model);
 		}
 	}
-
+	
+	/**
+	 *
+	 */
+	def showUserStory = { attrs, body->
+		if(attrs.model.userInstance) {
+			out << render(template:"/common/suser/showUserStoryTemplate", model:attrs.model);
+		}
+	}
+	
 	/**
 	 * 
 	 */

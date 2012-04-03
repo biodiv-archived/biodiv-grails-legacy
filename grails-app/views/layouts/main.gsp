@@ -193,7 +193,7 @@ border-bottom:3px solid #003846;
 	</div>
         <div id="header">
             <!-- Logo -->
-              <div id="logo">
+              <div id="logo" class="span3">
                 <a href="/">
                   <img id="wg_logo" alt="western ghats" src="/sites/all/themes/wg/images/map-logo.gif">
                 </a>
@@ -210,22 +210,24 @@ border-bottom:3px solid #003846;
             <li onclick="location.href='/about/western-ghats'" title="About" id="about_nav_link">About</li>
             </ul>
             </div>
-
-        </div>
-
-
-	<div>
-		<span id='loginLink'
-			style='position: relative; margin-right: 30px; float: right'>
-			<sec:ifLoggedIn>
-         		<sUser:renderProfileLink/> (<a id="logout" href="${createLink(controller:'logout')}">Logout</a>)
+		<div>
+			<span id='loginLink'
+				style='position: relative; margin-right: 30px; float: right'>
+				<sec:ifLoggedIn>
+					<sUser:renderProfileLink /> (<a id="logout"
+						href="${createLink(controller:'logout')}">Logout</a>)
       		</sec:ifLoggedIn> <sec:ifNotLoggedIn>
-				<g:link controller='login'>Login</g:link> | <g:link controller='register'>Register</g:link>
-			</sec:ifNotLoggedIn> </span>
-		<!-- g:render template='/common/ajaxLogin' /-->
+					<g:link controller='login'>Login</g:link> | <g:link
+						controller='register'>Register</g:link>
+				</sec:ifNotLoggedIn> </span>
+			<!-- g:render template='/common/ajaxLogin' /-->
 			<div id="fb-root"></div>
-		<br />
+			<br />
+		</div>
 	</div>
+
+
+	
 
 
 
