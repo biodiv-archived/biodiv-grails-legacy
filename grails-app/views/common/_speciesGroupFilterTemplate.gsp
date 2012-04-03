@@ -4,6 +4,12 @@
 <g:javascript src="jquery/jquery.url.js"
 	base="${grailsApplication.config.grails.serverURL+'/js/'}" />
 
+<style>
+.popover.bottom {
+background-color: transparent;    
+border: 0;
+}
+</style>
 <g:javascript>
 
 $(document).ready(function(){
@@ -38,9 +44,8 @@ $(document).ready(function(){
 	})
 	
 	$('#habitatFilter label[value$="${params.habitat}"]').attr('aria-pressed', 'true').addClass('ui-state-hover').addClass('ui-state-active').css('backgroundPosition', '0px -64px');
-	
-	
-
+        
+        $('#habitatFilter label').popover({placement:'bottom'});
 });
 </g:javascript>
 
@@ -73,14 +78,19 @@ $(document).ready(function(){
 			<input type="radio" name="habitatFilter" id="habitatFilter${i}"
 				value="${habitat.id}" style="display: none" />
 			<label for="habitatFilter${i}" value="${habitat.id}" title="${habitat.name}" class="group_icon"
-							style="background: url('${createLinkTo(dir: 'images', file: habitat.icon(ImageType.SMALL)?.fileName?.trim(), absolute:true)}') no-repeat; background-position: 0 0; width: 32px; height: 32px; margin-left: 6px;">				
+							style="background: url('${createLinkTo(dir: 'images', file: habitat.icon(ImageType.SMALL)?.fileName?.trim(), absolute:true)}') no-repeat; background-position: 0 0; width: 32px; height: 32px; margin-left: 6px;" 
+                                                        data-content="${message(code: 'habitat.definition.' + habitat.name)}"
+                                                        rel="popover"
+                                                        data-original-title="A Title">				
 			</label>
 		</g:if>
 	</g:each>
 	<input type="radio" name="habitatFilter" id="habitatFilter20"
 			value="${othersHabitat.id}" style="display: none" />
 		<label for="habitatFilter20" value="${othersHabitat.id}" title="${othersHabitat.name}" class="group_icon"
-						style="background: url('${createLinkTo(dir: 'images', file: othersHabitat.icon(ImageType.SMALL)?.fileName?.trim(), absolute:true)}') no-repeat; background-position: 0 0; width: 32px; height: 32px; margin-left: 6px;">				
+						style="background: url('${createLinkTo(dir: 'images', file: othersHabitat.icon(ImageType.SMALL)?.fileName?.trim(), absolute:true)}') no-repeat; background-position: 0 0; width: 32px; height: 32px; margin-left: 6px;"
+                                                data-content="${message(code: 'habitat.definition.' + othersHabitat.name)}"
+                                                rel="popover">				
 		</label>
 </div>
 
