@@ -109,7 +109,7 @@ margin-top:70px;
 .prop .name {
 	float: left;
 	text-align: left;
-	color: #676767;
+	color: ##5E5E5E;
         font-size: 0.9em;       
 }
 
@@ -565,8 +565,8 @@ opacity: 0.5;
 position: absolute;
 bottom: 5px;          
 font-size: 0.8em;        
-color: #5e5e5e;
-opacity:0.5;       
+color: #b1b1b1;
+/* opacity:0.5;        */
 }
 
 .story-footer .footer-item {

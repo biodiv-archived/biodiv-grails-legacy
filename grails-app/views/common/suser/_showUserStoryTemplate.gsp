@@ -38,7 +38,7 @@
 	</div>
 	<div class="story-footer">
 		<div class="footer-item" title="No of Observations">
-			<i class="icon-camera"></i>
+			<i class="icon-screenshot"></i>
 			${Observation.countByAuthor(userInstance)}
 		</div>
 

@@ -33,7 +33,7 @@
 		}
 	});
 </g:javascript>
-<h5><g:message code="default.tags.title" default="Tags" /></h5>
+<h5><i class="icon-tags"></i><g:message code="default.tags.title" default="Tags" /></h5>
 <div class="tag-tools">
 View as 
 <span id="as_list" class="btn btn-mini">List</span> 

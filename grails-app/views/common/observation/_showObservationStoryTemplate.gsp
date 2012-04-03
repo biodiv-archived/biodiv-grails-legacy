@@ -86,7 +86,7 @@
 		</div>
 	
 	
-	<div class="story-footer">
+	<div class="story-footer" style="width:100%">
 			<div class="footer-item">
 				<i class="icon-eye-open"></i>
 				${observationInstance.getPageVisitCount()}
@@ -99,7 +99,7 @@
 					href="${createLink(controller:'observation', action:'show', id:observationInstance.id, base:grailsApplication.config.grails.domainServerURL)}"></fb:comments-count>
 				comments
 			</div>
-			<div class="footer-item" style="width: 50px;">
+			<div class="footer-item" style="width:100px">
 				<fb:like layout="button_count"
 					href="${createLink(controller:'observation', action:'show', id:observationInstance.id, base:grailsApplication.config.grails.domainServerURL)}"
 					width="450" show_faces="true"></fb:like>

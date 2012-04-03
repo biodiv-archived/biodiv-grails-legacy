@@ -129,7 +129,7 @@
 
 				<g:if test="${SUserInstance.aboutMe }">
 					<div class="section" style="clear: both;">
-						<h5>About Me</h5>
+						<h5><i class="icon-user"></i>About Me</h5>
 						${SUserInstance.aboutMe.encodeAsHTML().replace('\n', '<br/>\n')}
 					</div>
 				</g:if>
@@ -137,7 +137,7 @@
 				<g:if test="${SUserInstance.openIds}">
 					<div class="section" style="clear: both;">
 						<h5>
-							${SUserInstance.openIds?.size()}
+							<span class="name" style="color: #b1b1b1;"><i class="icon-gift"></i>${SUserInstance.openIds?.size()}</span>
 							External Provider Identification<g:if test="${SUserInstance.openIds?.size()>1}">s</g:if>
 						</h5>
 						<g:each in="${SUserInstance.openIds}" var="openId">
@@ -160,15 +160,16 @@
 
 				<div class="section" style=" width:100%; clear: both;">
 					<h5>
-						${Observation.countByAuthor(SUserInstance)}
-						Observations
+						<span class="name" style="color: #b1b1b1;">
+						<i class="icon-screenshot"></i>${Observation.countByAuthor(SUserInstance)}</i>
+						</span> 	Observations
 					</h5>
 					<obv:showRelatedStory
 						model="['controller':'observation', 'action':'getRelatedObservation', 'filterProperty': 'user', 'filterPropertyValue':SUserInstance.id, 'id':'a']" />
 				</div>
 
 
-				<div class="section" style="clear: both;">
+				<div class="section" style="clear: both;overflow:auto;">
 					<obv:showAllTags
 						model="['tagFilterByProperty':'User', 'tagFilterByPropertyValue':SUserInstance.id]" />
 				</div>
