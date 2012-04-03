@@ -27,7 +27,7 @@
 						${fieldValue(bean: user, field: "name")}
 
 						<span style="font-size: 60%; float: right;" class="btn btn-primary"> <g:link
-								controller="SUser" action="view" id="${user.id}">View my profile
+								controller="SUser" action="show" id="${user.id}">View my profile
 							</g:link> </span>
 
 

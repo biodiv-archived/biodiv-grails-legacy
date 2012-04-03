@@ -1,15 +1,14 @@
 
 body {
     background-color: #cccccc;
-    /*background-image: url('../images/canvas.png');*/
+    background-image: url('../images/canvas.png');
 }
 
 .filters {
 /* border: 1px solid #ffffff; */
 overflow: auto;
 padding: 10px;          
-background-color: #f7f7f7;
-box-shadow: 0 4px 3px -3px #5E5E5E;
+/* background-color: #ffffff;          */
 }
 
 .filterBar .ui-button, .group_icon {
@@ -164,7 +163,7 @@ background-color: transparent;
 
 .outer-wrapper {
 clear: both;
-background-color: #e3e3e3;
+/* background-color: #e3e3e3; */
 padding-left: 10px;
 padding-right: 10px;
 }
@@ -397,7 +396,6 @@ margin-top: 10px;
 padding: 10px;
 background-color: #f7f7f7;         
 position: relative;
-padding-bottom:100px;          
 }
 
 .observation_story.tablet {
@@ -774,8 +772,4 @@ td.errors input {
 
 td.errors textarea {
 	border: 1px solid red;
-}
-
-.tag-tools {
-padding-bottom: 10px;
 }

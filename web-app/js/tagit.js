@@ -175,7 +175,7 @@
             this.input.val("");
             value = value.replace(/,+$/, "");
             value = value.trim();
-            if (value == "" || this._exists(value))
+            if (typeof value !='string' || value == "" || this._exists(value))
                 return false;
 
             var tag = "";
@@ -232,9 +232,11 @@
 
         _initialTags: function() {
             if (this.options.initialTags.length != 0) {
-                for (var i in this.options.initialTags)
+            	for (var i=0; i<this.options.initialTags.length; i++) {
+//                for (var i in this.options.initialTags)
                     if (!this._exists(this.options.initialTags[i]))
                         this._addTag(this.options.initialTags[i]);
+            	}
             }
         }
         ,

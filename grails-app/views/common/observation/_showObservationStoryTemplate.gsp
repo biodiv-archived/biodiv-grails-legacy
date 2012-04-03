@@ -71,7 +71,22 @@
 			</div>
 		</g:if>
 
-		<div class="story-footer" style="position: static;">
+	</div>
+
+	
+		<obv:showTagsSummary
+			model="['observationInstance':observationInstance]" />
+
+		<div style="display: block; width:100%;overflow:auto;margin-bottom:10px">
+			<div style="float: right; clear: both;">
+				<sUser:showUserTemplate
+					model="['userInstance':observationInstance.author]" />
+			</div>
+
+		</div>
+	
+	
+	<div class="story-footer">
 			<div class="footer-item">
 				<i class="icon-eye-open"></i>
 				${observationInstance.getPageVisitCount()}
@@ -89,22 +104,5 @@
 					href="${createLink(controller:'observation', action:'show', id:observationInstance.id, base:grailsApplication.config.grails.domainServerURL)}"
 					width="450" show_faces="true"></fb:like>
 			</div>
-		</div>
-
-	</div>
-
-	<div >
-		<obv:showTagsSummary
-			model="['observationInstance':observationInstance]" />
-
-
-
-		<div style="display: block; width:100%">
-			<div style="float: right; clear: both;">
-				<sUser:showUserTemplate
-					model="['userInstance':observationInstance.author]" />
-			</div>
-
-		</div>
 	</div>
 </div>

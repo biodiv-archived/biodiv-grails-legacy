@@ -1,5 +1,6 @@
 <%@page import="species.utils.ImageType"%>
-<%@page import="org.springframework.web.context.request.RequestContextHolder"%>
+<%@page
+	import="org.springframework.web.context.request.RequestContextHolder"%>
 <%@page import="species.License"%>
 <%@page import="species.License.LicenseType"%>
 <%@ page import="species.participation.Observation"%>
@@ -16,8 +17,7 @@
 <g:set var="entityName"
 	value="${message(code: 'observation.label', default: 'Observation')}" />
 <title><g:message code="default.create.label"
-		args="[entityName]" />
-</title>
+		args="[entityName]" /></title>
 
 <link rel="stylesheet"
 	href="${resource(dir:'css',file:'location_picker.css', absolute:true)}"
@@ -45,51 +45,53 @@
 <body>
 	<div class="container outer-wrapper">
 
-            <div class="row">
-		<div class="span12">
-                    <div class="page-header">
-			<h1>
-				<!--g:message code="default.create.label" args="[entityName]" /-->
-				Add an observation
-			</h1>
-                    </div>
-			<g:if test="${flash.message}">
-				<div class="message">
-					${flash.message}
-                        </div>
-                </g:if>
+		<div class="row">
+			<div class="span12">
+				<div class="page-header">
+					<h1>
+						<!--g:message code="default.create.label" args="[entityName]" /-->
+						Add an observation
+					</h1>
+				</div>
+				<g:if test="${flash.message}">
+					<div class="message">
+						${flash.message}
+					</div>
+				</g:if>
 
-                <g:hasErrors bean="${observationInstance}">
-                        <i class="icon-warning-sign"></i><span class="label label-important">
-                            <g:message code="fix.errors.before.proceeding" default="Fix errors" />
-                        </span>
-                    	<%--<g:renderErrors bean="${observationInstance}" as="list" />--%>
-                </g:hasErrors>
-            </div>
+				<g:hasErrors bean="${observationInstance}">
+					<i class="icon-warning-sign"></i>
+					<span class="label label-important"> <g:message
+							code="fix.errors.before.proceeding" default="Fix errors" /> </span>
+					<%--<g:renderErrors bean="${observationInstance}" as="list" />--%>
+				</g:hasErrors>
+			</div>
 
-            <form id="upload_resource" enctype="multipart/form-data"
-                    style="visibility:hidden; position: relative; float: left; z-index: 2; left: 30px; top: 2300px;" title="Add a photo for this observation"
-                    class="${hasErrors(bean: observationInstance, field: 'resource', 'errors')}">
+			<form id="upload_resource" enctype="multipart/form-data"
+				style="visibility: hidden; position: relative; float: left; z-index: 2; left: 30px; top: 2300px;"
+				title="Add a photo for this observation"
+				class="${hasErrors(bean: observationInstance, field: 'resource', 'errors')}">
 
-                    <!-- TODO multiple attribute is HTML5. need to chk if this gracefully falls back to default in non compatible browsers -->
-                    <input type="file" id="attachFiles" name="resources" accept="image/*" />
-                    <span class="msg" style="float: right"></span>
-            </form>
-            
-            <%
+				<!-- TODO multiple attribute is HTML5. need to chk if this gracefully falls back to default in non compatible browsers -->
+				<input type="file" id="attachFiles" name="resources"
+					accept="image/*" /> <span class="msg" style="float: right"></span>
+			</form>
+
+			<%
 				def form_id = "addObservation"
 				def form_action = createLink(action:'save')
 				def form_button_name = "Add Observation"
 				def form_button_val = "Add Observation"
 				if(params.action == 'edit' || params.action == 'update'){
-					form_id = "updateObservation"
+					//form_id = "updateObservation"
 					form_action = createLink(action:'update', id:observationInstance.id)
 				 	form_button_name = "Update Observation"
 					form_button_val = "Update Observation"
 				}
 			
 			%>
-			 <form id="${form_id}" action="${form_action}" method="POST">
+			
+			<form id="${form_id}" action="${form_action}" method="POST">
 
             <div class="span12 super-section" style="clear:both;">    
                 <div class="span11 section bold_section" style="position:relative;overflow:visible;">
@@ -217,13 +219,11 @@
 
                             </div>
                         </div>
-                        
-                    </div>
 
-                <div class="span11 section">
-                <i class="icon-picture"></i><span>Upload photos of a single observation and species</span>
-                    <div class="resources control-group ${hasErrors(bean: observationInstance, field: 'resource', 'error')}">
-                        <ul id="imagesList" class="thumbwrap thumbnails"
+                	<div class="span11 section">
+                		<i class="icon-picture"></i><span>Upload photos of a single observation and species</span>
+                    	<div class="resources control-group ${hasErrors(bean: observationInstance, field: 'resource', 'error')}">
+                      	  <ul id="imagesList" class="thumbwrap thumbnails"
                                 style='list-style: none; margin-left: 0px;'>
                                 <g:set var="i" value="1" />
                                 <g:each in="${observationInstance?.resource}" var="r">
@@ -272,7 +272,7 @@
                                         </div>
                                     </li>
                         </ul>
-                    <div class="help-inline"><g:renderErrors bean="${observationInstance}" as="list" field="resource"/></div>
+                    	<div class="help-inline"><g:renderErrors bean="${observationInstance}" as="list" field="resource"/></div>
                     </div>
                 </div>
                                    
@@ -280,137 +280,143 @@
             </div>
 
             <div class="row">
-            <div class="span12 super-section">    
-                <div class="span11 section" style="clear:both">
-                    <h3>Where did you find this observation?</h3>
-                    
-                    <div class="span6">
-                         <div  class="map_search">   
-                         <input id="address" type="text" title="Find by place name" class="section-item"/>
-                         <div id="current_location" class="section-item" style="float:left">
-                            <a href="#" onclick="return false;">Use current location</a>
-                         </div>
-                         <div id="geotagged_images" class="section-item">
-                            <div class="title" style="display:none">Use location from geo-tagged image:</div>  	
-                            <div class="msg" style="display:none">Select image if you want to use location information embedded in it</div>  	
-                        </div>
-                        </div>
-
-
-
-                        <div class="row">
-                        <%
-                                                    def defaultPlaceName = (observationInstance) ? observationInstance.placeName : ""
-                                            %>
-                            <div class="span2">                
-                                <label><i class="icon-map-marker"></i>Location title</label>
-                            </div>
-                            <div class="span4">                
-                                <input id="place_name" type="text"
-                                        name="place_name" value="${defaultPlaceName}" ></input>
-                            </div>
-                                        
-                        </div>
-                        <div class="row">
-                        <%
-                                                    def defaultAccuracy = (observationInstance?.locationAccuracy) ? observationInstance.locationAccuracy : "Approximate"
-                                                    def isAccurateChecked = (defaultAccuracy == "Accurate")? "checked" : ""
-                                                    def isApproxChecked = (defaultAccuracy == "Approximate")? "checked" : ""
-                                            %>
-                            <div class="span2">                
-                                <label>Accuracy</label> 
-                            </div>
-                            <div class="span4">                
-                                <input type="radio" name="location_accuracy" value="Accurate" ${isAccurateChecked} >Accurate 
-                                <input type="radio" name="location_accuracy" value="Approximate" ${isApproxChecked} >Approximate<br />
-                            </div>
-                        </div>
-
-                        <div class="row" style="margin-bottom:20px;">
-                            <div class="span2">                
-                                <label>Hide precise location?</label>
-                            </div>
-                                
-                            <div class="span4">                
-                                <input type="checkbox"
-                                        name="geo_privacy" value="geo_privacy" />Hide
-                            </div>
-                        </div>
-                        <hr>
-                        <div class="row" style="margin-top:20px;">
-                            <div class="span2">                
-                                <label>Geocode name</label>
-                            </div>
-                            <div class="span4">                
-                                <div class="location_picker_value" id="reverse_geocoded_name"></div>
-                                <input id="reverse_geocoded_name_field" type="hidden"
-                                        name="reverse_geocoded_name" value="${observationInstance?.reverseGeocodedName}" > </input>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="span2">                
-                                <label>Latitude</label>
-                            </div>
-                            <div class="span4">                
-                                <div class="location_picker_value" id="latitude"></div>
-                                <input id="latitude_field" type="hidden" name="latitude" value="${observationInstance?.latitude}" ></input>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="span2">                
-                                <label>Longitude</label>
-                            </div>
-                            <div class="span4">                
-                                <div class="location_picker_value" id="longitude"></div>
-                                <input id="longitude_field" type="hidden" name="longitude" value="${observationInstance?.longitude}"></input>
-                            </div>
-                        </div>
-                  
-                </div>
-                <div class="span5 section map_section" style="padding:0; margin:0;">
-                   
-                    <div id="map_area">
-                        <div id="map_canvas"></div>
-                    </div>
-
-                    </div>
-                </div>
-            </div>    
-            
-            </div>    
-            <div class="row">
-                <div class="span12 super-section">    
-                    <div class="span11 section" style="clear:both">
-                        <h3>Describe your observation!</h3>
-                        <div class="span6">
-                            <!--label for="notes"><g:message code="observation.notes.label" default="Notes" /></label-->
-                            <label style="float:left;text-align:left;padding-left:10px;width:auto;"><i class="icon-pencil"></i>Notes</label> (Max: 400 characters)<br/>
-                            <div class="section-item" style="margin-right:10px;">
-                            <g:textArea name="notes" value="${observationInstance?.notes}"
-                                                            class="text ui-corner-all" />
-                            </div>
-                        </div>
-
-                    <div class="span5" style="border-radius:5px; background-color:#c4cccf; margin:0;">
-                        <label style="float:left;text-align:left;padding:10px;width:auto;"><i class="icon-tags"></i>Tags</label>
-
-                        <div class="create_tags section-item" style="clear:both;">
-                            <ul name="tags">
-                                <g:each in="${observationInstance?.tags}">
-                                </g:each>
-                            </ul>
-                        </div>
-                    </div>
-                </div>    
+	            <div class="span12 super-section">    
+	                <div class="span11 section" style="clear:both">
+	                    <h3>Where did you find this observation?</h3>
+	                    
+	                    <div class="span6">
+	                         <div  class="map_search">   
+	                         <input id="address" type="text" title="Find by place name" class="section-item"/>
+	                         <div id="current_location" class="section-item" style="float:left">
+	                            <a href="#" onclick="return false;">Use current location</a>
+	                         </div>
+	                         <div id="geotagged_images" class="section-item">
+	                            <div class="title" style="display:none">Use location from geo-tagged image:</div>  	
+	                            <div class="msg" style="display:none">Select image if you want to use location information embedded in it</div>  	
+	                        </div>
+	                        </div>
+	
+	
+	
+	                        <div class="row">
+	                        <%
+	                                                    def defaultPlaceName = (observationInstance) ? observationInstance.placeName : ""
+	                                            %>
+	                            <div class="span2">                
+	                                <label><i class="icon-map-marker"></i>Location title</label>
+	                            </div>
+	                            <div class="span4">                
+	                                <input id="place_name" type="text"
+	                                        name="place_name" value="${defaultPlaceName}" ></input>
+	                            </div>
+	                                        
+	                        </div>
+	                        <div class="row">
+	                        <%
+	                                                    def defaultAccuracy = (observationInstance?.locationAccuracy) ? observationInstance.locationAccuracy : "Approximate"
+	                                                    def isAccurateChecked = (defaultAccuracy == "Accurate")? "checked" : ""
+	                                                    def isApproxChecked = (defaultAccuracy == "Approximate")? "checked" : ""
+	                                            %>
+	                            <div class="span2">                
+	                                <label>Accuracy</label> 
+	                            </div>
+	                            <div class="span4">                
+	                                <input type="radio" name="location_accuracy" value="Accurate" ${isAccurateChecked} >Accurate 
+	                                <input type="radio" name="location_accuracy" value="Approximate" ${isApproxChecked} >Approximate<br />
+	                            </div>
+	                        </div>
+	
+	                        <div class="row" style="margin-bottom:20px;">
+	                            <div class="span2">                
+	                                <label>Hide precise location?</label>
+	                            </div>
+	                                
+	                            <div class="span4">                
+	                                <input type="checkbox"
+	                                        name="geo_privacy" value="geo_privacy" />Hide
+	                            </div>
+	                        </div>
+	                        <hr>
+	                        <div class="row" style="margin-top:20px;">
+	                            <div class="span2">                
+	                                <label>Geocode name</label>
+	                            </div>
+	                            <div class="span4">                
+	                                <div class="location_picker_value" id="reverse_geocoded_name"></div>
+	                                <input id="reverse_geocoded_name_field" type="hidden"
+	                                        name="reverse_geocoded_name" value="${observationInstance?.reverseGeocodedName}" > </input>
+	                            </div>
+	                        </div>
+	                        <div class="row">
+	                            <div class="span2">                
+	                                <label>Latitude</label>
+	                            </div>
+	                            <div class="span4">                
+	                                <div class="location_picker_value" id="latitude"></div>
+	                                <input id="latitude_field" type="hidden" name="latitude" value="${observationInstance?.latitude}" ></input>
+	                            </div>
+	                        </div>
+	                        <div class="row">
+	                            <div class="span2">                
+	                                <label>Longitude</label>
+	                            </div>
+	                            <div class="span4">                
+	                                <div class="location_picker_value" id="longitude"></div>
+	                                <input id="longitude_field" type="hidden" name="longitude" value="${observationInstance?.longitude}"></input>
+	                            </div>
+	                        </div>
+	                  
+	                </div>
+	                	<div class="span5 section map_section" style="padding:0; margin:0;">
+	                    	<div id="map_area">
+	                        	<div id="map_canvas"></div>
+	                    	</div>
+	                    </div>
+	                </div>
+	            </div>    
             </div>
-            <div class="span12" style="margin-top:20px;margin-bottom:40px;">
-                <g:if test="${observationInstance?.id}">
-	        		<div class="btn btn-danger btn-large" style=" float:right; margin-right:5px;">
-                    	<a href="${createLink(controller:'observation', action:'flagDeleted', id:observationInstance.id)}" onclick="return confirm('${message(code: 'default.observatoin.delete.confirm.message', default: 'This observation will be deleted. Are you sure ?')}');">Delete Observation </a>
-                    </div>     
-	    		</g:if>
-                <input class="btn btn-primary btn-large" type="submit" name="${form_button_name}" value="${form_button_val}" style=" float:right;margin-right:5px;"/>
-            	
+
+				<div class="row">
+					<div class="span12 super-section">
+						<div class="span11 section" style="clear: both">
+							<h3>Describe your observation!</h3>
+							<div class="span6">
+								<!--label for="notes"><g:message code="observation.notes.label" default="Notes" /></label-->
+								<label
+									style="float: left; text-align: left; padding-left: 10px; width: auto;"><i
+									class="icon-pencil"></i>Notes</label> (Max: 400 characters)<br />
+								<div class="section-item" style="margin-right: 10px;">
+									<g:textArea name="notes" value="${observationInstance?.notes}"
+										class="text ui-corner-all" />
+								</div>
+							</div>
+
+							<div class="span5"
+								style="border-radius: 5px; background-color: #c4cccf; margin: 0;">
+								<label
+									style="float: left; text-align: left; padding: 10px; width: auto;"><i
+									class="icon-tags"></i>Tags</label>
+
+								<div class="create_tags section-item" style="clear: both;">
+									<ul id="tags" name="tags">
+										<g:each in="${observationInstance.tags}" var="tag">
+											<li>${tag}</li>
+										</g:each>
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="span12" style="margin-top:20px;margin-bottom:40px;">
+	                <g:if test="${observationInstance?.id}">
+		        		<div class="btn btn-danger btn-large" style=" float:right; margin-right:5px;">
+	                    	<a href="${createLink(controller:'observation', action:'flagDeleted', id:observationInstance.id)}" onclick="return confirm('${message(code: 'default.observatoin.delete.confirm.message', default: 'This observation will be deleted. Are you sure ?')}');">Delete Observation </a>
+	            		</div>     
+		    		</g:if>
+                	<a id="addObservationSubmit" class="btn btn-primary btn-large" style=" float:right;margin-right:5px;">${form_button_val}</a>
+            	</div>
             </div>
 
                 </form>
@@ -552,15 +558,6 @@
         $("#observedOn").val(prettyDate);
         //alert(prettyDate);
 		*/
-		var defaultInitialTags = ["'zz'", "'tt'"]
-<%--		if(${observationInstance?.tags != null}){--%>
-<%--			defaultInitialTags = ${observationInstance.tags}--%>
-<%--		}--%>
-<%--		alert("test");--%>
-<%--		alert(defaultInitialTags);--%>
-		//$("ul[name='tags']").tagit({select:true, initialTags:defaultInitialTags, tagSource: "${g.createLink(action: 'tags')}"});
-		$("ul[name='tags']").tagit({select:true,  tagSource: "${g.createLink(action: 'tags')}"});
-		//$("ul[name='tags']").tagit();
 
         $("#selected_group").click(function(){
             $("#group_options").show();
@@ -618,7 +615,7 @@
        
         $("#name").watermark("Suggest a species name");
         $("#place_name").watermark("Set a title for this location");
-        $(".tagit-input").watermark("Add some tags");
+        
         
         if(${observationInstance?.latitude && observationInstance?.longitude}){
         	set_location(${observationInstance?.latitude}, ${observationInstance?.longitude});
@@ -631,11 +628,25 @@
                     $('#nameContainer input').removeAttr('disabled');
                 }
         });
+        
+ 		$(".tagit-input").watermark("Add some tags");
+        $("#tags").tagit({select:true,  tagSource: "${g.createLink(action: 'tags')}", triggerKeys:['enter', 'comma', 'tab'], maxLength:30});
 
+ 		 $("#addObservationSubmit").click(function(){
+        	var tags = $("ul[name='tags']").tagit("tags");
+        	$.each(tags, function(index){
+        		var input = $("<input>").attr("type", "hidden").attr("name", "tags."+index).val(this);
+        		console.log(input);
+				$('#addObservation').append($(input));	
+        	})
+        	$("#addObservation").submit();        	
+        	return false;
+        
+		});
 	});
 
 
-	function removeResource(event) {
+	function removeRessurce(event) {
 		$(event.target).parent('.addedResource').remove();
 	}
 	
