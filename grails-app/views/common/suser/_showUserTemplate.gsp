@@ -1,6 +1,6 @@
 <%@page import="species.utils.ImageType"%>
 <%@page import="species.participation.Observation"%>
-<div class="span3 prop tablet">
+<div class="prop tablet user_signature">
 		<div class="figure">
 		<a href=/biodiv/SUser/show/${userInstance.id}> <img
 			style="float: left;" src="${userInstance.icon(ImageType.SMALL)}"

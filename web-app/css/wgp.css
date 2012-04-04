@@ -127,6 +127,10 @@ width:100px;
 margin-left: 100px;    
 }
 
+.observation-icons {
+	float:right;
+}
+	
 #advSearchForm .prop .name {
 	float: right;
 	text-align: right;
@@ -524,7 +528,7 @@ float: right;
 }
 
 .observation_story.tablet .icons-bar {
-bottom: 0;    
+bottom: 0;
 }
 
 .observation_info_wrapper {
@@ -773,4 +777,12 @@ td.errors input {
 
 td.errors textarea {
 	border: 1px solid red;
+}
+
+.user_signature {
+	padding-left: 5px;
+	padding-top: 2px;
+	text-align: left;
+	width: 175px;
+	height: 50px;
 }

@@ -11,13 +11,13 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<div id="fb-root"></div>
 
 <meta name="layout" content="main" />
 <g:set var="entityName"
 	value="${message(code: 'observation.label', default: 'Observation')}" />
 <title><g:message code="default.create.label"
-		args="[entityName]" /></title>
+		args="[entityName]" />
+</title>
 
 <link rel="stylesheet"
 	href="${resource(dir:'css',file:'location_picker.css', absolute:true)}"
@@ -90,7 +90,7 @@
 				}
 			
 			%>
-			
+
 			<form id="${form_id}" action="${form_action}" method="POST">
 
             <div class="span12 super-section" style="clear:both;">    
@@ -180,13 +180,15 @@
                                 </div>
                             </div>
 
-                        <div class="row">
+                        <div class="row control-group">
                             <div class="span4">
-                                <label for="recommendationVote"><g:message
+                                <label for="recommendationVote">
+                                <g:message
                                                 code="observation.recommendationVote.label"
                                                 default="Species name" />
                                 </label>
                             </div>
+                            
                             <div class="span7">
                                 <g:hasErrors bean="${recommendationVoteInstance}">
                                         <div class="errors">
@@ -204,6 +206,7 @@
                                 </div>
                             </div>
                         </div>
+
 
                         <div class="row control-group ${hasErrors(bean: observationInstance, field: 'observedOn', 'error')}">
                             <div class="span4">
@@ -279,7 +282,7 @@
                 </div>
             </div>
 
-            <div class="row">
+            
 	            <div class="span12 super-section">    
 	                <div class="span11 section" style="clear:both">
 	                    <h3>Where did you find this observation?</h3>
@@ -311,6 +314,8 @@
 	                            </div>
 	                                        
 	                        </div>
+	                        
+	                        
 	                        <div class="row">
 	                        <%
 	                                                    def defaultAccuracy = (observationInstance?.locationAccuracy) ? observationInstance.locationAccuracy : "Approximate"
@@ -374,9 +379,7 @@
 	                    </div>
 	                </div>
 	            </div>    
-            </div>
-
-				<div class="row">
+      
 					<div class="span12 super-section">
 						<div class="span11 section" style="clear: both">
 							<h3>Describe your observation!</h3>
@@ -407,7 +410,7 @@
 							</div>
 						</div>
 					</div>
-				</div>
+				
 
 				<div class="span12" style="margin-top:20px;margin-bottom:40px;">
 	                <g:if test="${observationInstance?.id}">

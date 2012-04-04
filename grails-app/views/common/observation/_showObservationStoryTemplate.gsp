@@ -1,7 +1,6 @@
 
 <%@page import="species.utils.ImageType"%>
-<div class="observation_story">
-	<div class="observation-icons">
+<div class="observation-icons">
 		<img class="group_icon" title="${observationInstance.group?.name}"
 			src="${createLinkTo(dir:'images', file: observationInstance.group.icon(ImageType.VERY_SMALL)?.fileName?.trim(), absolute:true)}" />
 
@@ -10,7 +9,9 @@
 				title="${observationInstance.habitat.name}"
 				src="${createLinkTo(dir: 'images', file:observationInstance.habitat.icon(ImageType.VERY_SMALL)?.fileName?.trim(), absolute:true)}" />
 		</g:if>
-	</div>
+</div>
+<div class="observation_story">
+	
 
 	<div >
 
@@ -33,13 +34,13 @@
 				<g:else>
 					${observationInstance.placeName}
 				</g:else>
-				<br /> Lat:
+				<!-- <br /> Lat:
 				<g:formatNumber number="${observationInstance.latitude}"
 					type="number" maxFractionDigits="2" />
 				, Long:
 				<g:formatNumber number="${observationInstance.longitude}"
 					type="number" maxFractionDigits="2" />
-
+				-->
 
 			</div>
 		</div>
@@ -64,7 +65,7 @@
 				model="['observationInstance':observationInstance, 'propertyName':'lastRevised']" />
 		</div>
 
-		<g:if test="${observationInstance.notes}">
+		<g:if test="${observationInstance.notes && showDetails}">
 			<div class="prop">
 				<span class="name"><i class="icon-info-sign"></i>Description</span>
 				${observationInstance.notes.encodeAsHTML().replace('\n', '<br/>\n')}

@@ -98,7 +98,7 @@ width:90%;
 				</div>
                                 
                 <div style="margin:0;">
-			    	<obv:showStory model="['observationInstance':observationInstance]" />
+			    	<obv:showStory model="['observationInstance':observationInstance, 'showDetails':true]" />
                 </div>
   				
                 <div class="comments-box" style="clear:both;">
