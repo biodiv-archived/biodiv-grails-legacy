@@ -357,6 +357,9 @@ environments {
 				 port = 25
 			}
 		}
+
+                ibp.domain='ibp.localhost'
+                wgp.domain='wgp.localhost'    
 	}
 	test {
 		grails.serverURL = "http://localhost:8080/${appName}"
@@ -403,6 +406,9 @@ environments {
 		grails.plugins.springsecurity.facebook.appId='310694198984953'
 		grails.plugins.springsecurity.facebook.secret='eedf76e46272190fbd26e578ae764a60'
 
+                ibp.domain='ibp.saturn.strandls.com'
+                wgp.domain='wgp.saturn.strandls.com'    
+
 	}
 
 	pamba {
@@ -438,6 +444,9 @@ environments {
 			"_trackPageview",
 			"_trackPageLoadTime"
 		]
+
+                ibp.domain='thewesternghats.in'
+                wgp.domain='indiabiodiversity.org'    
 	}
 }
 
