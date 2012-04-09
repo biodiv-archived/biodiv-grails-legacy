@@ -129,6 +129,7 @@ margin-left: 100px;
 
 .observation-icons {
 	float:right;
+	margin-right:10px;
 }
 	
 #advSearchForm .prop .name {
@@ -397,10 +398,14 @@ margin-top: 10px;
     padding-right:10px;
 }
 
+.observation_story_wrapper {
+position:relative;
+}
+
 .observation_story {
 padding: 10px;
 background-color: #f7f7f7;         
-position: relative;
+
 }
 
 .observation_story.tablet {

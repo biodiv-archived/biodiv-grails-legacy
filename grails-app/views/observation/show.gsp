@@ -97,7 +97,7 @@ width:90%;
 					
 				</div>
                                 
-                <div style="margin:0;">
+                <div class="observation_story_wrapper" style="margin:0;">
 			    	<obv:showStory model="['observationInstance':observationInstance, 'showDetails':true]" />
                 </div>
   				
