@@ -354,7 +354,7 @@ textarea#notes {
 
 .recommendations {
     background-color: #9acc57;
-    border-radius: 7px 7px 7px 7px;
+/*     border-radius: 7px 7px 7px 7px; */
     margin-top: 10px;
     padding: 10px;
 }
@@ -398,14 +398,10 @@ margin-top: 10px;
     padding-right:10px;
 }
 
-.observation_story_wrapper {
-position:relative;
-}
-
 .observation_story {
 padding: 10px;
 background-color: #f7f7f7;         
-
+position:relative
 }
 
 .observation_story.tablet {
@@ -664,6 +660,7 @@ float: right;
 
 .comments-box {
 background-color: #dcdcdc;
+margin-top: 10px;
 }
 
 .right-shadow-box {

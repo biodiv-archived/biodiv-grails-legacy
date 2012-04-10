@@ -38,98 +38,83 @@
 
 <style>
 #nameContainer {
-width: 80%;
-float:left;
+	width: 80%;
+	float: left;
 }
+
 #name {
-width:90%;
+	width: 90%;
 }
 </style>
 </head>
 <body>
 	<div class="container outer-wrapper">
-            <div class="row">
-		<div class="observation  span12">
-			<!--h1>
+		<div class="row">
+			<div class="observation  span12">
+				<!--h1>
 				<g:message code="default.show.label" args="[entityName]" />
 			</h1-->
 
-			<g:if test="${flash.message}">
-				<div class="message">
-					${flash.message}
+				<g:if test="${flash.message}">
+					<div class="message">
+						${flash.message}
+					</div>
+				</g:if>
+				<br />
+
+				<div class="page-header" style="overflow: auto;">
+					<div class="span8">
+						<h1>
+							<obv:showSpeciesName
+								model="['observationInstance':observationInstance]" />
+						</h1>
+					</div>
+					<div class="span4" style="margin: 0;">
+						<sUser:ifOwns model="['user':observationInstance.author]">
+							<a class="btn btn-primary" style="float: right;"
+								href="${createLink(controller:'observation', action:'edit', id:observationInstance.id)}">
+								Edit Observation </a>
+						</sUser:ifOwns>
+					</div>
+
 				</div>
-			</g:if>
-			<br />
 
-                        <div class="page-header" style="overflow: auto;">
-                            <div class="span8">
-                                <h1><obv:showSpeciesName model="['observationInstance':observationInstance]" /></h1>
-                            </div>
-                            <div class="span4" style="margin:0;">
-                                <sUser:ifOwns model="['user':observationInstance.author]">
-                                    <a class="btn btn-primary" style="float: right;" href="${createLink(controller:'observation', action:'edit', id:observationInstance.id)}"> Edit Observation </a>
-                                </sUser:ifOwns>
-                            </div>
+				<div class="span8 right-shadow-box" style="margin: 0;">
 
-                        </div>
-			
-			<div class="span8 right-shadow-box" style="margin:0;">
-				
-				<div class="span7">
-                                      
-							<div id="gallery1">
-								<g:if test="${observationInstance.resource}">
-									<g:each in="${observationInstance.resource}" var="r">
 
-										<%def gallImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.gallery.suffix)%>
-										<%def gallThumbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.galleryThumbnail.suffix)%>
-										<a target="_blank"
-											rel="${createLinkTo(file: r.fileName.trim(), base:grailsApplication.config.speciesPortal.observations.serverURL)}"
-											href="${createLinkTo(file: gallImagePath, base:grailsApplication.config.speciesPortal.observations.serverURL)}">
-											<img class="galleryImage"
-											src="${createLinkTo(file: gallThumbImagePath, base:grailsApplication.config.speciesPortal.observations.serverURL)}"
-											title="${r?.description}" /> </a>
+					<div id="gallery1">
+						<g:if test="${observationInstance.resource}">
+							<g:each in="${observationInstance.resource}" var="r">
 
-										<g:imageAttribution model="['resource':r]" />
-									</g:each>
-								</g:if>
-								<g:else>
+								<%def gallImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.gallery.suffix)%>
+								<%def gallThumbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.galleryThumbnail.suffix)%>
+								<a target="_blank"
+									rel="${createLinkTo(file: r.fileName.trim(), base:grailsApplication.config.speciesPortal.observations.serverURL)}"
+									href="${createLinkTo(file: gallImagePath, base:grailsApplication.config.speciesPortal.observations.serverURL)}">
 									<img class="galleryImage"
-										src="${createLinkTo(file:"no-image.jpg", base:grailsApplication.config.speciesPortal.resources.serverURL)}"
-										title="You can contribute!!!" />
+									src="${createLinkTo(file: gallThumbImagePath, base:grailsApplication.config.speciesPortal.observations.serverURL)}"
+									title="${r?.description}" /> </a>
 
-								</g:else>
+								<g:imageAttribution model="['resource':r]" />
+							</g:each>
+						</g:if>
+						<g:else>
+							<img class="galleryImage"
+								src="${createLinkTo(file:"no-image.jpg", base:grailsApplication.config.speciesPortal.resources.serverURL)}"
+								title="You can contribute!!!" />
 
-							</div>
+						</g:else>
 
-					
-				</div>
-                                
-                <div class="observation_story_wrapper" style="margin:0;">
-			    	<obv:showStory model="['observationInstance':observationInstance, 'showDetails':true]" />
-                </div>
-  				
-                <div class="comments-box" style="clear:both;">
-					<fb:comments colorscheme='light' href="${createLink(controller:'observation', action:'show', id:observationInstance.id, base:grailsApplication.config.grails.domainServerURL)}"></fb:comments>
-                </div>
-				
-			</div>
+					</div>
 
 
-			<div class="span4">
-               <div class="sidebar_section"> 
-				    <obv:showLocation
-					model="['observationInstance':observationInstance]" />
-                                </div>        
 
-				<!-- obv:showRating model="['observationInstance':observationInstance]" /-->
-				<!--  static species content -->
-                                <div class="recommendations sidebar_section">
-					<div>
-						<div><!-- g:message code="recommendations.no.message"
-								,  args="[result.size()]" /-->
+					<obv:showStory
+						model="['observationInstance':observationInstance, 'showDetails':true]" />
+					<div class="recommendations sidebar_section">
+						<div>
 							<ul id="recoSummary" class="pollBars">
-								
+
 							</ul>
 							<div id="seeMoreMessage" class="message"></div>
 							<div id="seeMore" class="btn btn-mini">more</div>
@@ -148,37 +133,57 @@ width:90%;
 
 							<form id="addRecommendation"
 								action="${createLink(controller:'observation', action:'addRecommendationVote')}"
-								method="POST">
+								method="POST" class="form-horizontal">
+								<div  class="input-append">
 								<reco:create
 									model="['recommendationInstance':recommendationInstance]" />
-								<input type="hidden" name='obvId' 
+								<input type="hidden" name='obvId'
 									value="${observationInstance.id}" /> <input type="submit"
-									value="Add" class="btn" style="position:relative; left: 10px;"/>
+									value="Add" class="btn" style="position: relative; left: 10px;" />
+								</div>
 							</form>
 						</div>
 					</div>
-				</div>
-                               
-                                <div class="sidebar_super_section">
-                                    <h3>Related observations</h3>
 
-                                    <div class="sidebar_section tile">
-                                        <div class="title">Nearby observations</div>	
-                                        <obv:showRelatedStory model="['observationInstance':observationInstance, 'observationId': observationInstance.id, 'controller':'observation', 'action':'getRelatedObservation', 'filterProperty': 'nearBy', 'id':'nearBy']" />
-                                    </div>
-                                    <div class="sidebar_section tile" style="clear:both">
-                                    <div class="title">Other observations of the same species</div>	
-                                    <obv:showRelatedStory model="['observationInstance':observationInstance, 'observationId': observationInstance.id, 'controller':'observation', 'action':'getRelatedObservation', 'filterProperty': 'speciesName', 'id':'a']" />
-                                    </div>
-                                </div>
-				<!-- obv:showTagsSummary model="['observationInstance':observationInstance]" /-->
-				<!-- obv:showObvStats  model="['observationInstance':observationInstance]"/-->
+					<div class="comments-box sidebar_section" style="clear: both;">
+						<fb:comments href="${createLink(controller:'observation', action:'show', id:observationInstance.id, base:grailsApplication.config.grails.domainServerURL)}"
+							num_posts="10" width="620" colorscheme="light"></fb:comments>
+					</div>
+
+				</div>
+
+
+				<div class="span4">
+					<div class="sidebar_section">
+						<obv:showLocation
+							model="['observationInstance':observationInstance]" />
+					</div>
+
+					<!-- obv:showRating model="['observationInstance':observationInstance]" /-->
+					<!--  static species content -->
+
+					<div class="sidebar_section">
+						<h3>Related observations</h3>
+						<div class="sidebar_section tile" style="clear: both">
+							<div class="title">Other observations of the same species</div>
+							<obv:showRelatedStory
+								model="['observationInstance':observationInstance, 'observationId': observationInstance.id, 'controller':'observation', 'action':'getRelatedObservation', 'filterProperty': 'speciesName', 'id':'a']" />
+						</div>
+						<div class="sidebar_section tile">
+							<div class="title">Nearby observations</div>
+							<obv:showRelatedStory
+								model="['observationInstance':observationInstance, 'observationId': observationInstance.id, 'controller':'observation', 'action':'getRelatedObservation', 'filterProperty': 'nearBy', 'id':'nearBy']" />
+						</div>
+
+					</div>
+					<!-- obv:showTagsSummary model="['observationInstance':observationInstance]" /-->
+					<!-- obv:showObvStats  model="['observationInstance':observationInstance]"/-->
+
+				</div>
+
 
 			</div>
-
-
 		</div>
-	    </div>
 	</div>
 	<g:javascript>
 	
