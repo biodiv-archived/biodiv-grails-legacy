@@ -229,8 +229,8 @@ class ObservationService {
 			def title = param['title']
 			def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 			def image = obv.mainImage()
-			def imagePath = image.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, config.speciesPortal.resources.images.galleryThumbnail.suffix)
-			def imageLink = config.speciesPortal.observations.serverURL + "/" +  imagePath
+			def imagePath = image.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, config.speciesPortal.resources.images.thumbnail.suffix)
+			def imageLink = config.speciesPortal.observations.serverURL +  imagePath
 			urlList.add(["obvId":obv.id, "imageLink":imageLink, "imageTitle": title])
 		}
 		return urlList

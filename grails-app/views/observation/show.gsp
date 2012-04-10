@@ -1,4 +1,3 @@
-
 <%@ page import="species.participation.Observation"%>
 <%@ page import="species.participation.Recommendation"%>
 <%@ page import="species.participation.RecommendationVote"%>
@@ -6,15 +5,18 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="main" />
+
 <g:set var="entityName"
 	value="${message(code: 'observation.label', default: 'Observation')}" />
 <title><g:message code="default.show.label" args="[entityName]" />
 </title>
+
+
 <link rel="stylesheet" type="text/css" media="all"
 	href="${resource(dir:'js/galleria/1.2.6/themes/classic/',file:'galleria.classic.css', absolute:true)}" />
-<!--
-  jCarousel skin stylesheet
---> 
+<link rel="stylesheet" type="text/css" media="all"
+	href="${resource(dir:'js/jquery/jquery.jcarousel-0.2.8/themes/classic/',file:'skin.css', absolute:true)}" />
+
 <link rel="stylesheet"
 	href="${resource(dir:'css',file:'tagit/tagit-custom.css', absolute:true)}"
 	type="text/css" media="all" />
@@ -27,6 +29,12 @@
 
 <g:javascript src="tagit.js"
 	base="${grailsApplication.config.grails.serverURL+'/js/'}"></g:javascript>
+
+<g:javascript src="jquery/jquery.jcarousel-0.2.8/jquery.jcarousel.js"
+	base="${grailsApplication.config.grails.serverURL+'/js/'}" />
+
+<g:javascript src="species/carousel.js"
+	base="${grailsApplication.config.grails.serverURL+'/js/'}" />
 
 <style>
 #nameContainer {

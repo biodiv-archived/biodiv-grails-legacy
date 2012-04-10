@@ -11,8 +11,17 @@
 <link rel="stylesheet"
 	href="${resource(dir:'css',file:'tagit/tagit-custom.css', absolute:true)}"
 	type="text/css" media="all" />
+<link rel="stylesheet" type="text/css" media="all"
+	href="${resource(dir:'js/jquery/jquery.jcarousel-0.2.8/themes/classic/',file:'skin.css', absolute:true)}" />
+	
 <g:javascript src="tagit.js"
 	base="${grailsApplication.config.grails.serverURL+'/js/'}"></g:javascript>
+
+<g:javascript src="jquery/jquery.jcarousel-0.2.8/jquery.jcarousel.js"
+	base="${grailsApplication.config.grails.serverURL+'/js/'}" />
+
+<g:javascript src="species/carousel.js"
+	base="${grailsApplication.config.grails.serverURL+'/js/'}" />
 <style>
 .userCreatedObservations .jcarousel-skin-ie7 .jcarousel-clip-horizontal
 	{
