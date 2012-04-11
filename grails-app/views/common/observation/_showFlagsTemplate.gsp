@@ -1,5 +1,5 @@
 <div id="show-flags" class="btn-group" style="display:none">
-    <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+    <a data-toggle="dropdown" href="#">
     <i class="icon-flag"></i>
     Show Flags
     </a>

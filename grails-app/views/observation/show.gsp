@@ -112,7 +112,7 @@
 					<obv:showStory
 						model="['observationInstance':observationInstance, 'showDetails':true]" />
 					
-					<obv:addFlag model="['observationInstance':observationInstance]" />
+					
 					
 					<div class="recommendations sidebar_section">
 						<div>

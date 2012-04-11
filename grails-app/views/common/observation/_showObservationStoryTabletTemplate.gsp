@@ -29,7 +29,10 @@
                 
             <div class="footer-item"><i class="icon-comment"></i><fb:comments-count href="${createLink(controller:'observation', action:'show', id:observationInstance.id, base:grailsApplication.config.grails.domainServerURL)}"></fb:comments-count></div>
             
-            <div id="show-flag-count" class="footer-item" style="display:none"><i class="icon-flag"></i>${observationInstance.flagCount}</div>
+<%--            <div id="show-flag-count" class="footer-item" style="display:none"><i class="icon-flag"></i>${observationInstance.flagCount}</div>--%>
+			<div class="footer-item">
+				<obv:showFlags model="['observationInstance':observationInstance]" />
+			</div>
         </div>
 </div>
 

@@ -2,7 +2,7 @@
 
 <div>
     <div class="btn-group">
-    	<a id="flag-action" class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+    	<a id="flag-action" class="btn btn-mini" data-toggle="dropdown" href="#">
      		<i class="icon-flag"></i>
     		Flag
     	</a>
