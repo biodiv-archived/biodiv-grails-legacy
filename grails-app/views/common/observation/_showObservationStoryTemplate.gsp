@@ -67,7 +67,7 @@
 
 		<g:if test="${observationInstance.notes && showDetails}">
 			<div class="prop">
-				<span class="name"><i class="icon-info-sign"></i>Description</span>
+				<span class="name"><i class="icon-info-sign"></i>Notes</span>
 				${observationInstance.notes.encodeAsHTML().replace('\n', '<br/>\n')}
 			</div>
 		</g:if>

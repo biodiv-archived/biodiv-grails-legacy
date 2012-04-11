@@ -38,7 +38,6 @@
 
 <style>
 #nameContainer {
-	width: 80%;
 	float: left;
 }
 
@@ -137,7 +136,7 @@
 							<form id="addRecommendation"
 								action="${createLink(controller:'observation', action:'addRecommendationVote')}"
 								method="POST" class="form-horizontal">
-								<div  class="input-append">
+								<div  class="input-append" style="">
 								<reco:create
 									model="['recommendationInstance':recommendationInstance]" />
 								<input type="hidden" name='obvId'

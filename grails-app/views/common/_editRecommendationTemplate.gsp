@@ -8,7 +8,7 @@ $(document).ready(function() {
 	var cache = {},
 		lastXhr;
 	$("#name").catcomplete({
-			appendTo:"#nameContainer",
+			appendTo:"#nameSuggestions",
 		 	source:function( request, response ) {
 				var term = request.term;
 				if ( term in cache ) {
@@ -64,8 +64,9 @@ $(document).ready(function() {
 </g:javascript>
 
 <style>
-#nameContainer ul {
-width:690px;
+
+#nameSuggestions ul {
+	width:520px;
 }
 </style>
 
@@ -87,3 +88,4 @@ width:690px;
 	
 	<input type="hidden" name="canName" id="canName" />
 </div>
+<div id="nameSuggestions" class="span7"></div>
