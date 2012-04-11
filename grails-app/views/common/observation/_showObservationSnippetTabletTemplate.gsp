@@ -10,27 +10,28 @@
 			<g:if
 				test="${imagePath && (new File(grailsApplication.config.speciesPortal.observations.rootDir + imagePath)).exists()}">
 
-				<span class="wrimg"> <span></span> 
-                                <div class="thumbnail">
-                                    <img
-                                        src="${createLinkTo(base:grailsApplication.config.speciesPortal.observations.serverURL,	file: imagePath)}" />
-                                </div>                                                        
-				</span>
+				<span class="wrimg"> <span></span>
+					<div class="thumbnail">
+						<img
+							src="${createLinkTo(base:grailsApplication.config.speciesPortal.observations.serverURL,	file: imagePath)}" />
+					</div> </span>
 
 			</g:if>
 			<g:else>
-                                <div class="thumbnail">
-                                    <img class="galleryImage"
-                                            src="${createLinkTo( file:"no-image.jpg", base:grailsApplication.config.speciesPortal.resources.serverURL)}"
-                                            title="You can contribute!!!" />
-                                </div>                                                        
+				<div class="thumbnail">
+					<img class="galleryImage"
+						src="${createLinkTo( file:"no-image.jpg", base:grailsApplication.config.speciesPortal.resources.serverURL)}"
+						title="You can contribute!!!" />
+				</div>
 			</g:else>
 		</g:link>
 	</div>
 	<div class="all_content">
-		<obv:showStoryTablet model="['observationInstance':observationInstance]"></obv:showStoryTablet>
+		<obv:showStoryTablet
+			model="['observationInstance':observationInstance]"></obv:showStoryTablet>
 	</div>
-	<div class="observation_info_wrapper" style="display:none;">
-		<obv:showObservationInfo model="['observationInstance':observationInstance]"></obv:showObservationInfo>
+	<div class="observation_info_wrapper" style="display: none;">
+		<obv:showObservationInfo
+			model="['observationInstance':observationInstance]"></obv:showObservationInfo>
 	</div>
 </div>
