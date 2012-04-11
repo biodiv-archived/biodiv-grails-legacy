@@ -37,13 +37,22 @@ class Habitat {
 				  OTHERS]
 		}
 		
+		private static def orderMap =  [(ALL):1, (FOREST):2, (THICKET):3, (SAVANNA):4, (GRASSLAND):5,   \
+			(SWAMP):6, (AQUATIC):7, (DESERT):9, (ROCKY):8, (AGRICULTURE):10, (OTHERS):11]; 
+		
+		
 		public String toString() {
 			return this.value();
+		}
+		
+		public static int getOrdering(HabitatType ht){
+			return orderMap[ht];
 		}
 		
 	};
 	
 	String name;
+	int habitatOrder;
 	
     static constraints = {
 		name(blank:false, unique : true);
@@ -51,7 +60,7 @@ class Habitat {
 	
 	static mapping = {
 		version false;
-		sort name:"asc"
+		sort habitatOrder:"asc"
 	}
 	
 	Resource icon(ImageType type) {

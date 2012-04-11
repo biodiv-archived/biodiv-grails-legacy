@@ -111,6 +111,9 @@
 
 					<obv:showStory
 						model="['observationInstance':observationInstance, 'showDetails':true]" />
+					
+					
+					
 					<div class="recommendations sidebar_section">
 						<div>
 							<ul id="recoSummary" class="pollBars">

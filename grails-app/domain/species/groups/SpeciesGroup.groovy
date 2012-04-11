@@ -14,6 +14,8 @@ class SpeciesGroup {
 
 	String name;
 	SpeciesGroup parentGroup;
+	int groupOrder;
+	
 	def grailsApplication;
 	
 	static hasMany = [taxonConcept:TaxonomyDefinition, speciesGroupMapping:SpeciesGroupMapping]
@@ -25,7 +27,7 @@ class SpeciesGroup {
 	
 	static mapping = {
 		version  false;
-		sort name:"asc"
+		sort groupOrder:"asc"
 	}
 	
 	Resource icon(ImageType type) {

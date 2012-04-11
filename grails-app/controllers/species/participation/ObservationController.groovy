@@ -11,6 +11,7 @@ import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
 import grails.converters.JSON;
 import grails.plugins.springsecurity.Secured
 import species.participation.RecommendationVote.ConfidenceType
+import species.participation.ObservationFlag.FlagType
 import species.sourcehandler.XMLConverter
 import species.utils.ImageUtils
 import species.utils.Utils;
@@ -503,7 +504,33 @@ class ObservationController {
 			redirect(action: "list")
 		}
 	}
-
+	
+	@Secured(['ROLE_USER'])
+	def flagObservation = {
+		log.debug params;
+		params.author = springSecurityService.currentUser;
+		def obv = Observation.get(params.id.toLong())
+		FlagType flag = observationService.getObservationFlagType(params.obvFlag?:FlagType.OBV_INAPPROPRIATE.name());
+		def observationFlagInstance = ObservationFlag.findByObservationAndAuthor(obv, params.author)
+		if (!observationFlagInstance) {
+			try {
+				observationFlagInstance = new ObservationFlag(observation:obv, author: params.author, flag:flag, notes:params.notes)
+				observationFlagInstance.save(flush: true)
+				obv.flagCount++ 
+				obv.save(flush:true)
+				
+				flash.message = "${message(code: 'observation.flag.added', default: 'Observation flag added')}"
+			}
+			catch (org.springframework.dao.DataIntegrityViolationException e) {
+				flash.message = "${message(code: 'observation.flag.error', default: 'Observation flag error')}"
+			}
+		}
+		else {
+			flash.message  = "${message(code: 'observation.flag.duplicate', default:'Already flagged')}"
+		}
+		redirect(action: "show", id: params.id)
+	}
+	
 	def snippet = {
 		def observationInstance = Observation.get(params.id)
 

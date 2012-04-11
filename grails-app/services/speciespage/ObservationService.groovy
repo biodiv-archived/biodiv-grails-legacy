@@ -16,6 +16,7 @@ import species.groups.SpeciesGroup;
 import species.participation.Observation;
 import species.participation.Recommendation;
 import species.participation.RecommendationVote;
+import species.participation.ObservationFlag.FlagType
 import species.participation.RecommendationVote.ConfidenceType;
 import species.sourcehandler.XMLConverter;
 
@@ -295,6 +296,20 @@ class ObservationService {
 		}
 		return null;
 	}
+	/**
+	 * 
+	 * @param flagType
+	 * @return
+	 */
+	FlagType getObservationFlagType(String flagType){
+		if(!flagType) return null;
+		for(FlagType type : FlagType) {
+			if(type.name().equals(flagType)) {
+				return type;
+			}
+		}
+		return null;
+	}
 
 	/**
 	 * 
@@ -340,12 +355,12 @@ class ObservationService {
 	List findAllTagsSortedByObservationCount(int max){
 		def sql =  Sql.newInstance(dataSource);
 		//query with observation delete handle
-		//String query = "select t.name as name from tag_links as tl, tags as t, observation obv where tl.tag_ref = obv.id and obv.is_deleted = false and t.id = tl.tag_id group by t.name order by count(t.name) desc limit " + max ;
+		String query = "select t.name as name, count(t.name) as obv_count from tag_links as tl, tags as t, observation obv where tl.tag_ref = obv.id and obv.is_deleted = false and t.id = tl.tag_id group by t.name order by count(t.name) desc, t.name asc limit " + max ;
 		
-		String query = "select t.name as name from tag_links as tl, tags as t where t.id = tl.tag_id group by t.name order by count(t.name) desc limit " + max ;
+		//String query = "select t.name as name from tag_links as tl, tags as t where t.id = tl.tag_id group by t.name order by count(t.name) desc limit " + max ;
 		def tags = []
 		sql.rows(query).each{
-			tags.add(it.getProperty("name"));
+			tags.add(["name" : it.getProperty("name"), "count" : it.getProperty("obv_count")]);
 		};
 		return tags;
 	}
@@ -368,11 +383,11 @@ class ObservationService {
 
 	List getAllTagsOfUser(userId){
 		def sql =  Sql.newInstance(dataSource);
-		String query = "select t.name as name from tag_links as tl, tags as t, observation as obv where obv.author_id = " + userId + " and tl.tag_ref = obv.id and t.id = tl.tag_id group by t.name order by count(t.name) desc";
+		String query = "select t.name as name,  count(t.name) as obv_count from tag_links as tl, tags as t, observation as obv where obv.author_id = " + userId + " and tl.tag_ref = obv.id and t.id = tl.tag_id and obv.is_deleted = false group by t.name order by count(t.name) desc, t.name asc ";
 		
 		def tags = []
 		sql.rows(query).each{
-			tags.add(it.getProperty("name"));
+			tags.add(["name" : it.getProperty("name"), "count" : it.getProperty("obv_count")]);
 		};
 		return tags;
 	}
@@ -436,7 +451,11 @@ class ObservationService {
 			filterQuery += " and obv.maxVotedSpeciesName like :speciesName "
 			queryParams["speciesName"] = params.speciesName
 		}
-
+		
+		if(params.isFlagged){
+			//(filterQuery == "")? (filterQuery += " where ") : (filterQuery += " and ")
+			filterQuery += " and obv.flagCount > 0 "
+		}
 		if(params.bounds){
 			def bounds = params.bounds.split(",")
 
