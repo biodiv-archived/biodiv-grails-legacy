@@ -43,7 +43,7 @@
     </div>
          <script>
                 		
-                $('.list_view_bttn').click(function(){
+       $('.list_view_bttn').click(function(){
 			$('.grid_view').hide();
 			$('.list_view').show();
 			$(this).addClass('active');

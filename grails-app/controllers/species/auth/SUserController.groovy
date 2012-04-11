@@ -151,6 +151,9 @@ class SUserController extends UserController {
 		redirect action:userSearch
 	}
 
+	/**
+	 * 
+	 */
 	def userSearch = {
 		log.debug params
 		
@@ -159,15 +162,16 @@ class SUserController extends UserController {
 		setIfMissing 'offset', 0
 
 		def hql = new StringBuilder('FROM ').append(lookupUserClassName()).append(' u WHERE 1=1 ')
+		def cond = new StringBuilder("");
 		def queryParams = [:]
 
 		def userLookup = SpringSecurityUtils.securityConfig.userLookup
-		String usernameFieldName = 'username'
+		String usernameFieldName = 'name'
 
-		params.sort = params.sort ?: usernameFieldName;
+		params.sort = params.sort ?: "activity";
 		for (name in [username: usernameFieldName]) {
 			if (params[name.key]) {
-				hql.append " AND LOWER(u.${name.value}) LIKE :${name.key}"
+				cond.append " AND LOWER(u.${name.value}) LIKE :${name.key}"
 				queryParams[name.key] = params[name.key].toLowerCase() + '%'
 			}
 		}
@@ -183,24 +187,38 @@ class SUserController extends UserController {
 			passwordExpired: passwordExpiredPropertyName]) {
 			Integer value = params.int(name.key)
 			if (value) {
-				hql.append " AND u.${name.value}=:${name.key}"
+				cond.append " AND u.${name.value}=:${name.key}"
 				queryParams[name.key] = value == 1
 			}
 		}
 
+		hql.append cond;
 		int totalCount = lookupUserClass().executeQuery("SELECT COUNT(DISTINCT u) $hql", queryParams)[0]
 
 		Integer max = params.int('max')
 		Integer offset = params.int('offset')
 
 		String orderBy = ''
-		if (params.sort) {
+		if (params.sort == 'lastLoginDate') {
+			orderBy = " ORDER BY u.$params.sort ${params.order ?: 'DESC'},  u.$usernameFieldName ASC"
+		} else {
 			orderBy = " ORDER BY u.$params.sort ${params.order ?: 'ASC'}"
 		}
 
-		def results = lookupUserClass().executeQuery(
-				"SELECT DISTINCT u $hql $orderBy",
-				queryParams, [max: max, offset: offset])
+		
+		def results = []; 
+		if(params.sort == 'activity') {
+			String query = "select u.id, u.$usernameFieldName from Observation obv right outer join obv.author u WHERE 1=1 $cond group by u.id, u.$usernameFieldName order by count(obv.id)  desc, u.$usernameFieldName asc";
+			def uids =  lookupUserClass().executeQuery(query, queryParams, [max: max, offset: offset])
+			uids.each {
+				results.add(SUser.read(it[0]));
+			}
+		} else {
+			String query = "SELECT DISTINCT u $hql $orderBy";
+			results = lookupUserClass().executeQuery(query, queryParams, [max: max, offset: offset])
+		}
+		
+		
 		def model = [results: results, totalCount: totalCount, searched: true]
 
 		// add query params to model for paging
@@ -229,7 +247,7 @@ class SUserController extends UserController {
 
 		if (params.term?.length() > 2) {
 			String username = params.term
-			String usernameFieldName = 'username';//SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
+			String usernameFieldName = 'name';//SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
 
 			setIfMissing 'max', 10, 100
 

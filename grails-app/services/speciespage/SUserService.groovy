@@ -98,6 +98,11 @@ class SUserService extends SpringSecurityUiService {
 		}
 	}
 	
+	/**
+	 * 
+	 * @param user
+	 * @return
+	 */
 	def ifOwns(SUser user) {
 		return springSecurityService.isLoggedIn() && springSecurityService.currentUser?.id == user.id	
 	}

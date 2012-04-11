@@ -39,21 +39,25 @@
 	<script>
        $(document).ready(function() {
 	       $('.list_view_bttn').click(function(){
+		       console.log("list view btn click")
 				$('.grid_view').hide();
 				$('.list_view').show();
 				$(this).addClass('active');
 	            //alert($(this).attr('class'));
 				$('.grid_view_bttn').removeClass('active');
 				$.cookie("observation_listing", "list");
+				return false;
 			});
 			
 			$('.grid_view_bttn').click(function(){
+				console.log("grid view btn click")
 				$('.grid_view').show();
 				$('.list_view').hide();
 	                        //alert($(this).attr('class'));
 				$(this).addClass('active');
 				$('.list_view_bttn').removeClass('active');
 				$.cookie("observation_listing", "grid");
+				return false;
 			});
 	
               function eatCookies(){
@@ -116,15 +120,15 @@
 
               $(".snippet.tablet").live('hover', function(e){
                   if(e.type == 'mouseenter'){    
-                      $(".figure", this).slideUp("fast");   
-                      $(".some_content", this).slideUp("fast");   
-                      $('.observation_info_wrapper', this).slideDown("fast"); 
+                      $(".figure", this).slideUp("slow");   
+                      $(".some_content", this).slideUp("slow");   
+                      $('.observation_info_wrapper', this).slideDown("slow"); 
                   }
               
                   if(e.type == 'mouseleave'){    
-                      $(".figure", this).slideDown("fast");   
-                      $(".some_content", this).slideDown("fast");
-                      $('.observation_info_wrapper', this).slideUp("fast"); 
+                      $(".figure", this).slideDown("slow");   
+                      $(".some_content", this).slideDown("slow");
+                      $('.observation_info_wrapper', this).slideUp("slow"); 
                   }
 
 

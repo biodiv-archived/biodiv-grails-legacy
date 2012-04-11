@@ -5,7 +5,7 @@ body {
 
 .filters {
 /* border: 1px solid #ffffff; */
-overflow: auto;
+/* overflow: auto; */
 padding: 10px;          
 /* background-color: #ffffff;          */
 background-color: #f7f7f7;
@@ -36,7 +36,7 @@ border-radius: 0;
 
 .filterBar {
 border-radius: 5px 5px 5px 5px;
-float: left;
+/* float: left; */
 }
 
 .filterBar label {
@@ -789,3 +789,8 @@ td.errors textarea {
 	height: 50px;
 }
 
+.sort_filter_label {
+	padding : 0px 2px 0px 5px;
+	width : 95%;
+	text-align:left;
+}
