@@ -355,12 +355,12 @@ class ObservationService {
 	List findAllTagsSortedByObservationCount(int max){
 		def sql =  Sql.newInstance(dataSource);
 		//query with observation delete handle
-		//String query = "select t.name as name from tag_links as tl, tags as t, observation obv where tl.tag_ref = obv.id and obv.is_deleted = false and t.id = tl.tag_id group by t.name order by count(t.name) desc limit " + max ;
+		String query = "select t.name as name, count(t.name) as obv_count from tag_links as tl, tags as t, observation obv where tl.tag_ref = obv.id and obv.is_deleted = false and t.id = tl.tag_id group by t.name order by count(t.name) desc, t.name asc limit " + max ;
 		
-		String query = "select t.name as name from tag_links as tl, tags as t where t.id = tl.tag_id group by t.name order by count(t.name) desc limit " + max ;
+		//String query = "select t.name as name from tag_links as tl, tags as t where t.id = tl.tag_id group by t.name order by count(t.name) desc limit " + max ;
 		def tags = []
 		sql.rows(query).each{
-			tags.add(it.getProperty("name"));
+			tags.add(["name" : it.getProperty("name"), "count" : it.getProperty("obv_count")]);
 		};
 		return tags;
 	}
@@ -383,11 +383,11 @@ class ObservationService {
 
 	List getAllTagsOfUser(userId){
 		def sql =  Sql.newInstance(dataSource);
-		String query = "select t.name as name from tag_links as tl, tags as t, observation as obv where obv.author_id = " + userId + " and tl.tag_ref = obv.id and t.id = tl.tag_id group by t.name order by count(t.name) desc";
+		String query = "select t.name as name,  count(t.name) as obv_count from tag_links as tl, tags as t, observation as obv where obv.author_id = " + userId + " and tl.tag_ref = obv.id and t.id = tl.tag_id and obv.is_deleted = false group by t.name order by count(t.name) desc, t.name asc ";
 		
 		def tags = []
 		sql.rows(query).each{
-			tags.add(it.getProperty("name"));
+			tags.add(["name" : it.getProperty("name"), "count" : it.getProperty("obv_count")]);
 		};
 		return tags;
 	}
