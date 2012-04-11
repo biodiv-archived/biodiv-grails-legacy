@@ -28,7 +28,7 @@
                             </g:else>
                     </g:link>
             </div>
-            <div class="span5">
+            <div class="span5 observation_story_wrapper">
                     <obv:showStory model="['observationInstance':observationInstance]"></obv:showStory>
             </div>
 	</div>

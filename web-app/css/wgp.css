@@ -129,6 +129,7 @@ margin-left: 100px;
 
 .observation-icons {
 	float:right;
+	margin-right:10px;
 }
 	
 #advSearchForm .prop .name {
@@ -353,7 +354,7 @@ textarea#notes {
 
 .recommendations {
     background-color: #9acc57;
-    border-radius: 7px 7px 7px 7px;
+/*     border-radius: 7px 7px 7px 7px; */
     margin-top: 10px;
     padding: 10px;
 }
@@ -400,7 +401,7 @@ margin-top: 10px;
 .observation_story {
 padding: 10px;
 background-color: #f7f7f7;         
-position: relative;
+position:relative
 }
 
 .observation_story.tablet {
@@ -659,6 +660,7 @@ float: right;
 
 .comments-box {
 background-color: #dcdcdc;
+margin-top: 10px;
 }
 
 .right-shadow-box {
@@ -786,3 +788,4 @@ td.errors textarea {
 	width: 175px;
 	height: 50px;
 }
+
