@@ -61,6 +61,7 @@ width:90%;
                                 <sUser:ifOwns model="['user':observationInstance.author]">
                                     <a class="btn btn-primary" style="float: right;" href="${createLink(controller:'observation', action:'edit', id:observationInstance.id)}"> Edit Observation </a>
                                 </sUser:ifOwns>
+                               
                             </div>
 
                         </div>
@@ -100,11 +101,14 @@ width:90%;
                 <div style="margin:0;">
 			    	<obv:showStory model="['observationInstance':observationInstance, 'showDetails':true]" />
                 </div>
-  				
+  				                 
+                <div style="margin:0;">
+			    	<obv:addFlag model="['observationInstance':observationInstance]" />
+                </div>
+                
                 <div class="comments-box" style="clear:both;">
 					<fb:comments colorscheme='light' href="${createLink(controller:'observation', action:'show', id:observationInstance.id, base:grailsApplication.config.grails.domainServerURL)}"></fb:comments>
                 </div>
-				
 			</div>
 
 

@@ -93,7 +93,6 @@
 				${observationInstance.getPageVisitCount()}
 				views
 			</div>
-
 			<div class="footer-item">
 				<i class="icon-comment"></i>
 				<fb:comments-count
@@ -105,5 +104,9 @@
 					href="${createLink(controller:'observation', action:'show', id:observationInstance.id, base:grailsApplication.config.grails.domainServerURL)}"
 					width="450" show_faces="true"></fb:like>
 			</div>
+			<div class="footer-item"">
+				<obv:showFlags model="['observationInstance':observationInstance]" />
+            </div>
+                
 	</div>
 </div>

@@ -63,7 +63,8 @@ class Observation implements Taggable{
 	long visitCount = 0;
 	String maxVotedSpeciesName;
 	boolean isDeleted = false;
-
+	int flagCount = 0;
+	
 	static hasMany = [resource:Resource, recommendationVote:RecommendationVote];
 
 	static constraints = {
@@ -244,5 +245,8 @@ class Observation implements Taggable{
 		return Observation.executeQuery("select count(*) from Observation obv where obv.group.id = :groupId ", [groupId: groupId])[0]
 	}
 	
+	List fetchAllFlags(){
+		return ObservationFlag.findAllWhere(observation:this);
+	}
 	
 }

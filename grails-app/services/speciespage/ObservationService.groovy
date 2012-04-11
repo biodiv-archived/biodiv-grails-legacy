@@ -16,6 +16,7 @@ import species.groups.SpeciesGroup;
 import species.participation.Observation;
 import species.participation.Recommendation;
 import species.participation.RecommendationVote;
+import species.participation.ObservationFlag.FlagType
 import species.participation.RecommendationVote.ConfidenceType;
 import species.sourcehandler.XMLConverter;
 
@@ -295,6 +296,20 @@ class ObservationService {
 		}
 		return null;
 	}
+	/**
+	 * 
+	 * @param flagType
+	 * @return
+	 */
+	FlagType getObservationFlagType(String flagType){
+		if(!flagType) return null;
+		for(FlagType type : FlagType) {
+			if(type.name().equals(flagType)) {
+				return type;
+			}
+		}
+		return null;
+	}
 
 	/**
 	 * 
@@ -436,7 +451,11 @@ class ObservationService {
 			filterQuery += " and obv.maxVotedSpeciesName like :speciesName "
 			queryParams["speciesName"] = params.speciesName
 		}
-
+		
+		if(params.isFlagged){
+			//(filterQuery == "")? (filterQuery += " where ") : (filterQuery += " and ")
+			filterQuery += " and obv.flagCount > 0 "
+		}
 		if(params.bounds){
 			def bounds = params.bounds.split(",")
 
