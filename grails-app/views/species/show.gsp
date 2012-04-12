@@ -37,6 +37,8 @@
 
 <link rel="stylesheet" type="text/css" media="all"
 	href="${resource(dir:'js/galleria/1.2.6/themes/classic/',file:'galleria.classic.css', absolute:true)}" />
+<link rel="stylesheet" type="text/css" media="all"
+	href="${resource(dir:'css',file:'augmented-maps.css', absolute:true)}" />
 
 <g:set var="sparse" value="${Boolean.TRUE}" />
 <g:set var="entityName"
