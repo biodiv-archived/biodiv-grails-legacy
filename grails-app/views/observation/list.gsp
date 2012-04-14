@@ -28,7 +28,7 @@
         <div class="row">
             <div class="span12">
                 <div class="page-header">
-                    <h1><g:message code="default.list.label" args="[entityName]" /></h1>
+                    <h1><g:message code="default.observation.heading" args="[entityName]" /></h1>
                 </div>
                                 
                 <g:if test="${flash.message}">

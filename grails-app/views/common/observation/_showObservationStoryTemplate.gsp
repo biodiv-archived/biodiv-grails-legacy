@@ -20,7 +20,7 @@
 			<div class="value">
 				<obv:showSpeciesName
 					model="['observationInstance':observationInstance]" />
-				<i class="icon-ok"></i>
+<%--				<i class="icon-ok"></i>--%>
 			</div>
 		</div>
 

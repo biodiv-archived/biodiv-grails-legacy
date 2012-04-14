@@ -5,12 +5,18 @@
                 var markers = [];
                 var big_map;
                 var nagpur_latlng = new google.maps.LatLng('21.07', '79.27');
+                var swRestriction = new google.maps.LatLng('8', '69');
+                var neRestriction = new google.maps.LatLng('36', '98');
+
+                var allowedBounds = new google.maps.LatLngBounds(swRestriction, neRestriction);
                 
                 $(document).ready(function() {
                   var options = {
                     zoom: 4,
                     center: nagpur_latlng,
-                    mapTypeId: google.maps.MapTypeId.ROADMAP
+                    mapTypeId: google.maps.MapTypeId.ROADMAP,
+                    minZoom: 4,
+                    maxZoom: 15
                   };
                   big_map = new google.maps.Map(document.getElementById("big_map_canvas"), options);
 
@@ -66,6 +72,28 @@
 
                     bounds = [swLat, swLng, neLat, neLng].join()
                     return bounds;    
+                }
+
+
+                google.maps.event.addListener(big_map, 'dragend', function() { checkBounds(); });
+                
+                function checkBounds() {
+                     if (allowedBounds.contains(big_map.getCenter())) return;
+
+                     var c = big_map.getCenter(),
+                     x = c.lng(),
+                     y = c.lat(),
+                     maxX = allowedBounds.getNorthEast().lng(),
+                     maxY = allowedBounds.getNorthEast().lat(),
+                     minX = allowedBounds.getSouthWest().lng(),
+                     minY = allowedBounds.getSouthWest().lat();
+
+                     if (x < minX) x = minX;
+                     if (x > maxX) x = maxX;
+                     if (y < minY) y = minY;
+                     if (y > maxY) y = maxY;
+
+                     big_map.setCenter(new google.maps.LatLng(y, x));
                 }
 
                 });
