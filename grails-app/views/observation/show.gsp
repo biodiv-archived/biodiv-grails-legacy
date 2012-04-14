@@ -73,6 +73,11 @@
 							<a class="btn btn-primary" style="float: right;"
 								href="${createLink(controller:'observation', action:'edit', id:observationInstance.id)}">
 								Edit Observation </a>
+
+								<a class="btn btn-danger btn-primary" style="float: right; margin-right: 5px;"
+									href="${createLink(controller:'observation', action:'flagDeleted', id:observationInstance.id)}"
+									onclick="return confirm('${message(code: 'default.observatoin.delete.confirm.message', default: 'This observation will be deleted. Are you sure ?')}');">Delete
+									Observation </a>
 						</sUser:ifOwns>
 					</div>
 
@@ -113,7 +118,7 @@
 					
 					
 					
-					<div class="recommendations sidebar_section">
+					<div class="recommendations sidebar_section" style="overflow:visible;">
 						<div>
 							<ul id="recoSummary" class="pollBars">
 
@@ -121,7 +126,7 @@
 							<div id="seeMoreMessage" class="message"></div>
 							<div id="seeMore" class="btn btn-mini">more</div>
 						</div>
-						<div>
+						<div class="input-append">
 							<g:hasErrors bean="${recommendationInstance}">
 								<div class="errors">
 									<g:renderErrors bean="${recommendationInstance}" as="list" />
@@ -136,13 +141,13 @@
 							<form id="addRecommendation"
 								action="${createLink(controller:'observation', action:'addRecommendationVote')}"
 								method="POST" class="form-horizontal">
-								<div  class="input-append" style="">
+								
 								<reco:create
 									model="['recommendationInstance':recommendationInstance]" />
 								<input type="hidden" name='obvId'
 									value="${observationInstance.id}" /> <input type="submit"
-									value="Add" class="btn" style="position: relative; left: 10px;" />
-								</div>
+									value="Add" class="btn" style="position: relative;margin-right: 6px;top: -28px;float: right;" />
+								
 							</form>
 						</div>
 					</div>

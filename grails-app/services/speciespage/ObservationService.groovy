@@ -54,7 +54,7 @@ class ObservationService {
 		}
 		observation.group = SpeciesGroup.get(params.group_id);
 		observation.notes = params.notes;
-		observation.observedOn = params.observedOn? Date.parse("MM/dd/yyyy", params.observedOn):new Date();
+		observation.observedOn = params.observedOn? Date.parse("dd/MM/yyyy", params.observedOn):new Date();
 		observation.placeName = params.place_name;
 		observation.reverseGeocodedName = params.reverse_geocoded_name;
 		observation.location = 'POINT(' + params.longitude + ' ' + params.latitude + ')'

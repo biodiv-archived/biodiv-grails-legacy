@@ -6,7 +6,7 @@ $(document).ready(function(){
 	var cache = {},
 		lastXhr;
 	$("#searchTextField").catcomplete({
-	 	 appendTo: '#mainSearchForm',
+	 	 appendTo: '#nameSuggestionsMain',
 		 source:function( request, response ) {
 				var term = request.term;
 				if ( term in cache ) {
@@ -36,10 +36,13 @@ $(document).ready(function(){
 				//ui.item.icon ? $( "#name-icon" ).attr( "src",  ui.item.icon).show() : $( "#name-icon" ).hide();
 				$( "#searchbox" ).submit();
 				return false;
+			},open: function(event, ui) {
+				$("#nameSuggestionsMain ul").removeAttr('style').css({'display': 'block'}); 
 			}
 	}).data( "catcomplete" )._renderItem = function( ul, item ) {
+			ul.removeClass().addClass("dropdown-menu")
 			if(item.category == "General") {
-				return $( "<li class='grid_4'  style='list-style:none;'></li>" )
+				return $( "<li class='grid_4 span2 habitat_option'  style='list-style:none;'></li>" )
 					.data( "item.autocomplete", item )
 					.append( "<a>" + item.label + "</a>" )
 					.appendTo( ul );
@@ -47,9 +50,10 @@ $(document).ready(function(){
 				if(!item.icon) {
 					item.icon =  "${createLinkTo(file:"no-image.jpg", base:grailsApplication.config.speciesPortal.resources.serverURL)}"
 				}  
-				return $( "<li class='grid_4' style='list-style:none;'></li>" )
+				return $( "<li class='grid_4 span2 habitat_option' style='list-style:none;'></li>" )
 					.data( "item.autocomplete", item )
-					.append( "<img class='group_icon' style='float:left; background:url(" + item.icon+" no-repeat); background-position:0 -100px; width:50px; height:50px;opacity:0.4;' class='ui-state-default icon' style='float:left' /><a>" + item.label + ((item.desc)?'<br>(' + item.desc + ')':'')+"</a>" )
+					//.append( "<img class='group_icon' style='float:left; background:url(" + item.icon+" no-repeat); background-position:0 -100px; width:50px; height:50px;opacity:0.4;' class='ui-state-default icon'/><a>" + item.label + ((item.desc)?'<br>(' + item.desc + ')':'')+"</a>" )
+					.append( "<a title='"+item.label.replace(/<.*?>/g,"")+"'><img src='" + item.icon+"' class='group_icon' style='float:left; background:url(" + item.icon+" no-repeat); background-position:0 -100px; width:50px; height:50px;opacity:0.4;'/>" + item.label + ((item.desc)?'<br>(' + item.desc + ')':'')+"</a>" )
 					.appendTo( ul );
 			}
 		};;
@@ -59,7 +63,7 @@ $(document).ready(function(){
 	});
 });
 </g:javascript>
-	<div id="mainSearchForm">
+	<div id="mainSearchForm" style="position:relative">
 	<form method="get"
 		action="${createLink(controller:'search', action:'select') }"
 		id="searchbox" class="form-horizontal">
@@ -81,4 +85,5 @@ $(document).ready(function(){
 		 -->
 		
 	</form>
+	<div id="nameSuggestionsMain" style="display:block;"></div>
 	</div>

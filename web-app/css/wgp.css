@@ -372,9 +372,9 @@ list-style-type: none;
 color: #ffffff;
 }
 
-a.btn {
-color: #000000;
-}
+/* a.btn { */
+/* color: #000000; */
+/* } */
 
 .btn a {
 text-decoration: none;
@@ -515,10 +515,16 @@ margin:0;
 height: 120px;
 }
 
-.btn-group.open .dropdown-menu {
-border-radius: 0;
-top: 20px;
+.dropdown-menu a {
+	width: 100%;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
+
+/* .btn-group.open .dropdown-menu { */
+/* border-radius: 0; */
+/* top: 20px; */
+/* } */
 
 .observation_story.tablet .observation-icons, .observation_info .observation-icons{
 float: left;
@@ -620,20 +626,20 @@ float: right;
 .normal_profile_pic {
 	height:100px;
 	width:auto;
-	max-width:120px;
+	max-width:100px;
 	margin:5px;
 }
 
 .small_profile_pic {
-	height:50px;
-	max-width:60px;
+	height:32px;
+	max-width:32px;
 	width:auto;
 	margin:5px;
 }
 
 .very_small_profile_pic {
 	height:25px;
-	max-width:30px;
+	max-width:25px;
 	width:auto;
 	margin:2px;
 }
@@ -731,14 +737,12 @@ margin-right: 3px;
 /*SEARCH PAGE END*/
 
 .error .help-inline ul{
-list-style: none;
+	list-style: none;
 }
 
-.control-group.error .selected_value,  .control-group.error #imagesList, .control-group.error input{
-border:2px solid #B94A48 !important;
+.control-group.error button, .control-group.error .selected_value,  .control-group.error #imagesList, .control-group.error input{
+	border:1px solid #B94A48 !important;
 } 
-
-
 
 /* MESSAGES AND ERRORS */
 .message {
@@ -793,4 +797,8 @@ td.errors textarea {
 	padding : 0px 2px 0px 5px;
 	width : 95%;
 	text-align:left;
+}
+
+input, button, select, textarea {
+	font: 13px/1.5 'Helvetica Neue', Arial, 'Liberation Sans', FreeSans, sans-serif;
 }

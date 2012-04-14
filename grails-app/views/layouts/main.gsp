@@ -10,6 +10,12 @@
 <link rel="stylesheet" type="text/css" media="all"
 	href="${resource(dir:'bootstrap/css',file:'bootstrap.css', absolute:true)}" />
 </g:if>        
+<g:else>
+
+<link rel="stylesheet" type="text/css" media="all"
+	href="${resource(dir:'css',file:'forSpeciesPages.css', absolute:true)}" />
+
+</g:else>
 
 <!--link rel="stylesheet" type="text/css" media="all"
 	href="${resource(dir:'bootstrap/css',file:'bootstrap-responsive.css', absolute:true)}" /-->
