@@ -168,7 +168,7 @@
                                         %>
 
 									<button id="selected_group"
-										class="btn btn-large dropdown-toggle" data-toggle="dropdown"
+										class="btn btn-large btn-warning dropdown-toggle" data-toggle="dropdown"
 										data-target="#groups_div">
 										<img class="group_icon"
 											src="${createLinkTo(dir: 'images', file: defaultGroupIconFileName, absolute:true)}" />
@@ -221,7 +221,7 @@
                                                                             def defaultHabitatValue = (defaultHabitatId) ? defaultHabitat.name : "Select habitat"
                                                                     %>
                                         <button id="selected_habitat"
-										class="btn btn-large dropdown-toggle" data-toggle="dropdown"
+										class="btn btn-large btn-warning dropdown-toggle" data-toggle="dropdown"
 										data-target="#habitat_div">
 										<img class="group_icon"
 												src="${createLinkTo(dir: 'images', file:defaultHabitatIconFileName, absolute:true)}" />
@@ -527,7 +527,7 @@
             
             
 			<form id="upload_resource" enctype="multipart/form-data"
-				style="visibility: hidden; position: relative; float: left; z-index: 2; left: 30px; top: 2300px;"
+				style="visibility: hidden; position: relative; float: left; z-index: 2;"
 				title="Add a photo for this observation"
 				class="${hasErrors(bean: observationInstance, field: 'resource', 'errors')}">
 

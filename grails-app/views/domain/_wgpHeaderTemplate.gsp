@@ -1,7 +1,6 @@
 <style>
 #wgp-header {
-background-color: #f7f7f7;
-border-bottom: 1px solid #E5E5E5;
+background-color: #6ac9a2;
 box-shadow: 0 6px 6px -6px #5E5E5E;
 color: #5E5E5E;
 font-family: Verdana,Helvetica,Sans-Serif;

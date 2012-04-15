@@ -289,7 +289,8 @@
                     var tg = $(this).contents().first().text();
                     window.location.href = "${g.createLink(action: 'list')}/?tag=" + tg ;
                 });
-                
+               
+                /*
                 $(".snippet.tablet").live('hover', function(e){
                     if(e.type == 'mouseenter'){    
                         $(".figure", this).slideUp("fast");   
@@ -305,6 +306,7 @@
 
 
                    });
+                 */  
 
             });
         </g:javascript>
