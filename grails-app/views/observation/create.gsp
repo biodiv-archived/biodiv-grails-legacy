@@ -238,13 +238,14 @@
 										<ul id="habitat_options" class="dropdown-menu">
 
 											<g:each in="${species.Habitat.list()}" var="h">
-	
+											<g:if
+												test="${!h.name.equals(grailsApplication.config.speciesPortal.group.ALL)}">
 												<li class="span2 habitat_option" value="${h.id}"><a><img
 														class="group_icon"
 														src="${createLinkTo(dir: 'images', file:h.icon(ImageType.VERY_SMALL)?.fileName?.trim(), absolute:true)}" />
 														<span title="${h.name}"> ${h.name} </span> </a>
 												</li>
-
+											</g:if>
 											</g:each>
 										</ul>
 
