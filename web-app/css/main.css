@@ -1151,11 +1151,11 @@ td input.text:focus {
 }
 
 ul.thumbwrap li.rich_species_content {
-	background-color: #fefad5;
+	background-color: #ffffff;
 }
 
 ul.thumbwrap li.rich_species_content:hover {
-	background-color: #ffffff;
+	background-color: #fefad5;
 }
 
 ul.thumbwrap li.poor_species_content {

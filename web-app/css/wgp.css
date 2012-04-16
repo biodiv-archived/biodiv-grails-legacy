@@ -7,9 +7,13 @@ body {
 }
 
 .page-footer {
-height: 100px;
-width: 100%;
+height: 221px;
+width: 725px;
 background-image: url('../images/footer.png');       
+position: fixed;
+bottom: 0;
+right: 0;        
+z-index:-1000;       
 }
 
 .filters {
@@ -82,12 +86,12 @@ margin-right: auto;
 }
 
 .grid_view li.thumbnail {
-background-color: #fefad5;
+background-color: #ffffff;
 border: 1px solid #bee6d3;
 }
 
 .grid_view li.thumbnail:hover {
-background-color: #ffffff;
+background-color: #fefad5;
 }
 
 .observations {
@@ -159,12 +163,12 @@ margin-bottom: 0;
 border-radius: 0;
 border-bottom: 0;
 padding-left: 30px;
-background-color: #fefad5;
+background-color: #ffffff;    
 border: 1px solid #bee6d3;
 }
 
 .list_view li.thumbnail:hover {
-background-color: #ffffff;    
+background-color: #fefad5;
 }    
 
 .list_view li.thumbnail .observation_story {
@@ -257,7 +261,7 @@ margin:20px;
 }
 
 .super-section {
-	background-color: #fefad5;
+	background-color: rgba(106, 201, 162, 0.2);
 	border-radius: 5px;
 	margin-bottom: 10px;
         box-shadow: 0 8px 6px -6px #5e5e5e;
@@ -426,7 +430,7 @@ background-color: #fefad5;
 }
 
 #addObservation #imagesList {
-	background-color: #eeeeee;
+	background-color: #fefad5;
 	borderdisplay_value-bottom: 1px solid #9E9E9E;
 	border-top: 1px solid #9E9E9E;
 	box-shadow: 0 2px 11px -3px inset;
@@ -489,7 +493,7 @@ margin-right: 5px;
 }
 
 .map_section {
-background-color:#9acc57;
+background-color: #a6dfc8;
 border-radius:5px;
 }
 
@@ -498,7 +502,7 @@ position:relative;
 left:20px;
 padding:20px 10px;
 margin-bottom:10px;
-background-color:#9acc57;
+background-color: #a6dfc8;
 border-radius:5px 0 0 5px;
 }
 
@@ -537,6 +541,12 @@ height: 120px;
 	overflow: hidden;
 	text-overflow: ellipsis;
 }
+
+.dropdown-menu li a:hover {
+    color: #000000; 
+    background-color: #6ac9a2;
+}
+
 
 /* .btn-group.open .dropdown-menu { */
 /* border-radius: 0; */
@@ -820,6 +830,10 @@ td.errors textarea {
 input, button, select, textarea {
 	font: 13px/1.5 'Helvetica Neue', Arial, 'Liberation Sans', FreeSans, sans-serif;
 }
+
+.navigation li.navigation_active a:hover { 
+    background-color:#e5e5e5;
+} 
 
 .navigation li a {
     background-color: rgba(173, 219, 192, 0.7);

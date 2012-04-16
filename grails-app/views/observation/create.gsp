@@ -79,7 +79,7 @@
 
 .block {
 	border-radius: 5px;
-	background-color: #c4cccf; 
+	background-color: #a6dfc8; 
 	margin: 3px;
 }
 
@@ -88,6 +88,10 @@
 	text-align: left; 
 	padding: 10px; 
 	width: auto;
+}
+
+.block small{
+    color: #444444;
 }
 
 #help-identify {
@@ -168,7 +172,7 @@
                                         %>
 
 									<button id="selected_group"
-										class="btn btn-large btn-warning dropdown-toggle" data-toggle="dropdown"
+										class="btn btn-large dropdown-toggle" data-toggle="dropdown"
 										data-target="#groups_div">
 										<img class="group_icon"
 											src="${createLinkTo(dir: 'images', file: defaultGroupIconFileName, absolute:true)}" />
@@ -221,7 +225,7 @@
                                                                             def defaultHabitatValue = (defaultHabitatId) ? defaultHabitat.name : "Select habitat"
                                                                     %>
                                         <button id="selected_habitat"
-										class="btn btn-large btn-warning dropdown-toggle" data-toggle="dropdown"
+										class="btn btn-large dropdown-toggle" data-toggle="dropdown"
 										data-target="#habitat_div">
 										<img class="group_icon"
 												src="${createLinkTo(dir: 'images', file:defaultHabitatIconFileName, absolute:true)}" />

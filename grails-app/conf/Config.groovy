@@ -450,6 +450,18 @@ environments {
 	}
 }
 
+navigation.species_dashboard = [
+        [controller:'species', title:'Species gallery', order:1, action:"list"],
+        [controller:'species', title:'Taxonomy browser', order:10, action:'taxonBrowser'],
+	[controller:'search', title:'Advanced search', order:20, action:'advSelect'],
+        [controller:'species', title:'Contribute', order:30, action:'contribute']
+]
+
+navigation.observation_dashboard = [
+        [controller:'observation', title:'Browse observations', order:1, action:'list'],
+        [controller:'observation', title:'Add observation', order:10, action:"create"],
+]
+
 navigation.dashboard = [
 	[group:'species', controller:'species', order:10, title:'Species', action:'list', subItems:[
 			[controller:'species', title:'Thumbnail Gallery', order:1, action:"list"],
