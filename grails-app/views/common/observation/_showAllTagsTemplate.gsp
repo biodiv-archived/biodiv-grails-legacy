@@ -36,13 +36,13 @@
 <h5><i class="icon-tags"></i><g:message code="default.tags.title" default="Tags" /></h5>
 <div class="tag-tools">
 View as 
-<span id="as_list" class="btn btn-mini">List</span> 
-<span id="as_cloud" class="btn btn-mini active">Cloud</span>
+<span id="as_list" class="btn">List</span> 
+<span id="as_cloud" class="btn active">Cloud</span>
 </div>
-<div id="tagCloud" class="grid_4 sidebar_section">
+<div id="tagCloud" class="span4 tagsView">
 	<obv:showTagsCloud/>
 </div>
-<div id="tagList" class="grid_4 sidebar_section" style="display:none;">
+<div id="tagList" class="span4 tagsView" style="display:none;">
 	<obv:showTagsList model="['tags': tags]"/>
 </div>	
 
