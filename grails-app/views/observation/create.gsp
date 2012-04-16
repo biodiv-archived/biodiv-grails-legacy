@@ -328,24 +328,24 @@
 												<div id="license_div_${i}" class="licence_div btn-group"
 													style="z-index: 2; cursor: pointer;">
 
-													<div id="selected_license_{i}"
+													<div id="selected_license_${i}"
 														onclick="$(this).next().show();"
 														class="btn dropdown-toggle btn-mini"
 														data-toggle="dropdown">
 														<div>
 															<img
-																src="${resource(dir:'images/license',file:'cc_by.png', absolute:true)}"
+																src="${resource(dir:'images/license',file:r?.licenses?.asList().first()?.name?.getIconFilename()+'.png', absolute:true)}"
 																title="Set a license for this image" />
 														</div>
 														<span class="caret"></span>
 													</div>
-													<div id="license_options_{i}" class="license_options">
+													<div id="license_options_${i}" class="license_options">
 														<ul class="dropdown-menu">
 															<g:each in="${species.License.list()}" var="l">
 																<li class="license_option"
-																	onclick="$('#license_{{=i}}').val($(this).text());$('#selected_license_{{=i}}').children('div').html($(this).html());$('#license_options_{{=i}}').hide();">
+																	onclick="$('#license_${i}').val($(this).text());$('#selected_license_${i}').children('div').html($(this).html());$('#license_options_${i}').hide();">
 																	<img
-																	src="${resource(dir:'images/license',file:'cc_by.png', absolute:true)}" />
+																	src="${resource(dir:'images/license',file:l?.name?.getIconFilename()+'.png', absolute:true)}" /><span style="display:none;">${l?.name?.value}</span> 
 																</li>
 															</g:each>
 														</ul>
@@ -566,7 +566,8 @@
                             <span>Choose a license</span>
                             <g:each in="${species.License.list()}" var="l">
                                 <li class="license_option" onclick="$('#license_{{=i}}').val($(this).text());$('#selected_license_{{=i}}').children('div').html($(this).html());$('#license_options_{{=i}}').hide();">
-                                    <img src="${resource(dir:'images/license',file:l?.name.getIconFilename()+'.png', absolute:true)}"/>
+                                    <img src="${resource(dir:'images/license',file:l?.name.getIconFilename()+'.png', absolute:true)}"/><span style="display:none;">${l?.name?.value}</span>
+                                    
                                 </li>
                             </g:each>
                         </ul>
