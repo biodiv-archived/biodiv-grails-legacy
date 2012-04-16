@@ -51,10 +51,11 @@
 												id="speciesNameFilter2" value="Unknown"
 												style="display: none" /> <label for="speciesNameFilter2"
 												value="Unknown">Show Unidentified Only</label-->
+                                                                                                
 						<input type="text" id="speciesNameFilter"
 							value="${params.speciesName}" style="display: none" />
-						<button id="speciesNameFilterButton" class="btn"
-							data-toggle="button">Show Unidentified Only</button>
+						<button id="speciesNameAllButton" class="btn">All</button>
+						<button id="speciesNameFilterButton" class="btn">Unidentified</button>
 					</div>
 				</div>
 				<div class="tags_section span3" style="float: right;">
@@ -161,22 +162,29 @@
                 return false;   
             });
 
-			$('#speciesNameFilterButton').button();
+			$('#speciesNameFilter').button();
 			if(${params.speciesName == 'Unknown' }) {
 				$("#speciesNameFilterButton").addClass('active')
-			} 
+				$("#speciesNameAllButton").removeClass('active')
+			}else{ 
+				$("#speciesNameFilterButton").removeClass('active')
+				$("#speciesNameAllButton").addClass('active')
+                        }
 			
-			$("#speciesNameFilterButton").click(function() {
-				if($("#speciesNameFilterButton").hasClass('active')) {
-					$("#speciesNameFilter").val('All')
-					$("#speciesNameFilterButton").removeClass('active')
-				} else {
-					$("#speciesNameFilter").val('Unknown')
-					$("#speciesNameFilterButton").addClass('active')
-					
-				}
+			$("#speciesNameAllButton").click(function() {
+				$("#speciesNameFilter").val('All')
+				$("#speciesNameFilterButton").removeClass('active')
+				$("#speciesNameAllButton").addClass('active')
 				updateGallery(undefined, ${queryParams.max}, 0);
-                return false;
+                                return false;
+			});
+			$("#speciesNameFilterButton").click(function() {
+			    	$("#speciesNameFilter").val('Unknown')
+				$("#speciesNameFilterButton").addClass('active')
+			        $("#speciesNameAllButton").removeClass('active')
+					
+				updateGallery(undefined, ${queryParams.max}, 0);
+                                return false;
 			});
 			                
             function getSelectedGroup() {
