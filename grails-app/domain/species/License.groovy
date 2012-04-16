@@ -18,8 +18,8 @@ class License {
 		CC_BY_ND("CC BY-ND"),
 		CC_BY_NC("CC BY-NC"),		
 		CC_BY_NC_SA("CC BY-NC-SA"),
-		CC_BY_NC_ND("CC BY-NC-ND"),
-		COPYRIGHT("Copyright");
+		CC_BY_NC_ND("CC BY-NC-ND");
+		//COPYRIGHT("Copyright");
 
 		private String value;
 
@@ -39,8 +39,7 @@ class License {
 				CC_BY_ND,
 				CC_BY_NC,				
 				CC_BY_NC_SA,
-				CC_BY_NC_ND, 
-				COPYRIGHT ]
+				CC_BY_NC_ND ]
 		}
 
 		public String toString() {

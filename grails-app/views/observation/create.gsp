@@ -79,7 +79,7 @@
 
 .block {
 	border-radius: 5px;
-	background-color: #c4cccf; 
+	background-color: #a6dfc8; 
 	margin: 3px;
 }
 
@@ -88,6 +88,10 @@
 	text-align: left; 
 	padding: 10px; 
 	width: auto;
+}
+
+.block small{
+    color: #444444;
 }
 
 #help-identify {
@@ -526,7 +530,7 @@
             
             
 			<form id="upload_resource" enctype="multipart/form-data"
-				style="visibility: hidden; position: relative; float: left; z-index: 2; left: 30px; top: 2300px;"
+				style="visibility: hidden; position: relative; float: left; z-index: 2;"
 				title="Add a photo for this observation"
 				class="${hasErrors(bean: observationInstance, field: 'resource', 'errors')}">
 

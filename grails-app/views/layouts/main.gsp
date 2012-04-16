@@ -146,7 +146,7 @@ jQuery(document).ready(function($) {
     font-weight: bold;
     left: 300px;
     position: absolute;
-    top: 0;
+    top: 30px;
     z-index: 501;
 }
 #top_nav_bar ul {
@@ -161,33 +161,8 @@ jQuery(document).ready(function($) {
     display: inline;
     padding: 10px 10px 3px;
 }
-#top_nav_bar li#maps_nav_link:hover{
-background-color: #fafafa;
-border-bottom:3px solid #f0575a;
-}
-
-#top_nav_bar li#checklists_nav_link:hover{
-background-color: #fafafa;
-border-bottom:3px solid #7764a2;
-}
-
-#top_nav_bar li#collaborate_nav_link:hover{
-background-color: #fafafa;
-border-bottom:3px solid #145b9b;
-}
-
-#top_nav_bar li#species_nav_link:hover{
-background-color: #fafafa;
-border-bottom:3px solid #00a4be;
-}
-
-#top_nav_bar li#themes_nav_link:hover{
-background-color: #fafafa;
-border-bottom:3px solid #45a989;
-}
-
-#top_nav_bar li#about_nav_link:hover{
-background-color: #fafafa;
+#top_nav_bar li:hover{
+background-color: #e8f7f1;
 border-bottom:3px solid #003846;
 }
 
@@ -223,10 +198,13 @@ border-bottom:3px solid #003846;
 	
 		<div class="container_12 container">
 			<div id="menu" class="grid_12 ui-corner-all" style="margin-bottom:10px;">
-				<div class="demo" style="float: right; margin-right: .3em;"
-					title="These are demo pages">These are demo pages</div><br/>
 				
-				<sNav:render group="dashboard" subitems="true" />
+                                <g:if test="${params.controller == 'species' || params.controller == 'search'}">
+				    <sNav:render group="species_dashboard" subitems="false" />
+                                </g:if>    
+                                <g:if test="${params.controller == 'observation'}">
+				    <sNav:render group="observation_dashboard" subitems="false" />
+                                </g:if>    
 				
 				<div style="float: right;">
 					<g:searchBox />
@@ -236,6 +214,7 @@ border-bottom:3px solid #003846;
 			
 		</div>
 		<g:layoutBody />
+                <!--div class="page-footer"></div-->
 	</div>
 
 	<g:javascript>

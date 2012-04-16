@@ -7,6 +7,7 @@ $(document).ready(function() {
         filterPropertyValue:"${filterPropertyValue}",
         carouselDivId:"#carousel_" + "${id}",
         carouselMsgDivId:"#relatedObservationMsg_" + "${id}",
+        carouselAddObvDivId:"#relatedObservationAddButton_" + "${id}",
         itemFallbackDimension : 75
 	});
 	
@@ -34,7 +35,10 @@ $(document).ready(function() {
 	</div>
 
 </div>
-<div id="relatedObservationMsg_${id}" style="padding-left:10px; display:none">
+<div id="relatedObservationAddButton_${id}" style="padding-left:10px; display:none">
 	<g:link controller="observation" action="create"><div class="btn btn-warning">Add an observation</div></g:link>
 </div>
 
+<div id="relatedObservationMsg_${id}" style="padding-left:10px; display:none">
+	<span class="msg">This is the first observation</span>
+</div>

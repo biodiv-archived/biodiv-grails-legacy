@@ -258,7 +258,6 @@ th.desc a {
 	margin: 0 3px;
 	padding: 2px 6px;
 	text-shadow: 0 1px 2px #afafaf;
-	font-weight: bold;
 	font-size: 1.2em;
 }
 
@@ -824,11 +823,9 @@ html.busy,html.busy * {
 .big_wrapper {
 	padding-top: 20px;
 	padding-bottom: 20px;
-	border: 1px solid #cecece;
 	margin-top: 10px;
 	margin-bottom: 20px;
-	opacity: 1.0;
-	background-color: #e3e3e3;
+        background-color: rgba(106, 201, 162, 0.15);
 	padding-left: 10px;
 	padding-right: 10px;
 }
@@ -1154,12 +1151,11 @@ td input.text:focus {
 }
 
 ul.thumbwrap li.rich_species_content {
-	opacity: 1;
-	background-color: #fdfdfd;
+	background-color: #ffffff;
 }
 
 ul.thumbwrap li.rich_species_content:hover {
-	background-color: #ffffff;
+	background-color: #fefad5;
 }
 
 ul.thumbwrap li.poor_species_content {
@@ -1658,7 +1654,7 @@ margin-top: 5px;
 }
 
 #speciesGroupFilter {
-background-color: #F5F5F5;
+background-color: rgba(106, 201, 162, 0.2);
 border-radius: 0 0 0 0;
 box-shadow: 0 4px 3px -3px #5E5E5E;
 }
