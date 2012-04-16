@@ -359,7 +359,7 @@ environments {
 		}
 
                 ibp.domain='ibp.localhost'
-                wgp.domain='localhost'    
+                wgp.domain='wgp.localhost'    
 	}
 	test {
 		grails.serverURL = "http://localhost:8080/${appName}"
@@ -454,12 +454,14 @@ navigation.species_dashboard = [
         [controller:'species', title:'Species gallery', order:1, action:"list"],
         [controller:'species', title:'Taxonomy browser', order:10, action:'taxonBrowser'],
 	[controller:'search', title:'Advanced search', order:20, action:'advSelect'],
-        [controller:'species', title:'Contribute', order:30, action:'contribute']
+        [controller:'species', title:'Contribute', order:30, action:'contribute'],
+	[controller:'SUser', title:'Users', order:40, action:'search']
 ]
 
 navigation.observation_dashboard = [
         [controller:'observation', title:'Browse observations', order:1, action:'list'],
         [controller:'observation', title:'Add observation', order:10, action:"create"],
+	[controller:'SUser', title:'Users', order:20, action:'search']
 ]
 
 navigation.dashboard = [
