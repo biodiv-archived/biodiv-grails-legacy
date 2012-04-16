@@ -304,14 +304,24 @@
 			}, 
             
             success: function(responseXML, statusText, xhr, form) {
-            	$("#recoSummary").html($(responseXML).find("recoHtml").text());
-            	$("#seeMoreMessage").hide();
-		    	return false;
+            	showRecos(responseXML, null);
+            	return false;
             },
             error:function (xhr, ajaxOptions, thrownError){
-            	//alert(thrownError);
+            	alert(thrownError);
 			} 
      	});
+     	
+     	function showRecos(data, textStatus) {
+			jQuery('#recoSummary').html(jQuery(data).find('recoHtml').text());
+			var infoMsg = jQuery(data).find('recoVoteMsg').text();
+			if(infoMsg){
+				$("#seeMoreMessage").html(infoMsg).show().removeClass('error').addClass('message');
+			}else{
+				$("#seeMoreMessage").hide();
+			}
+		}
+	
         
 	});
 </g:javascript>

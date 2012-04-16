@@ -294,7 +294,10 @@ class ObservationController {
 
 		if(params.obvId) {
 			//Saves recommendation if its not present
-			def recommendationVoteInstance = getRecommendationVote(params);
+			def recVoteResult = getRecommendationVote(params)
+			def recommendationVoteInstance = recVoteResult?.recVote;
+			def recoVoteMsg = recVoteResult?.msg;
+			
 			def observationInstance = Observation.get(params.obvId);
 			log.debug params;
 			try {
@@ -302,7 +305,7 @@ class ObservationController {
 					//saving max voted species name for observation instance needed when observation created without species name
 					observationInstance.calculateMaxVotedSpeciesName();
 					if(!params["createNew"]){
-						redirect(action:getRecommendationVotes, id:params.obvId, params:[max:3, offset:0])
+						redirect(action:getRecommendationVotes, id:params.obvId, params:[max:3, offset:0, recoVoteMsg:recoVoteMsg])
 					}else{
 						redirect(action: "show", id: observationInstance.id);
 					}
@@ -317,7 +320,7 @@ class ObservationController {
 					//sending mail to user
 					sendNotificationMail(SPECIES_RECOMMENDED, observationInstance, request);
 					if(!params["createNew"]){
-						redirect(action:getRecommendationVotes, id:params.obvId, params:[max:3, offset:0])
+						redirect(action:getRecommendationVotes, id:params.obvId, params:[max:3, offset:0, recoVoteMsg:recoVoteMsg])
 					}else{
 						redirect(action: "show", id: observationInstance.id);
 					}
@@ -347,27 +350,28 @@ class ObservationController {
 		log.debug params;
 
 		params.author = springSecurityService.currentUser;
-		boolean success = false;
-
+		
 		if(params.obvId) {
 			//Saves recommendation if its not present
-			def recommendationVoteInstance = getRecommendationVote(params);
+			def recVoteResult = getRecommendationVote(params)
+			def recommendationVoteInstance = recVoteResult?.recVote;
+			def recoVoteMsg = recVoteResult?.msg;
+			
 			def observationInstance = Observation.get(params.obvId);
 			log.debug params;
 			try {
 				if(!recommendationVoteInstance){
 					def result = ['votes':params.int('currentVotes')];
-					redirect(action:getRecommendationVotes, id:params.obvId, params:[ max:3, offset:0])
+					redirect(action:getRecommendationVotes, id:params.obvId, params:[ max:3, offset:0, recoVoteMsg:recoVoteMsg])
 					return
 				}else if(recommendationVoteInstance.save(flush: true)) {
 					log.debug "Successfully added reco vote : "+recommendationVoteInstance
-					success = true;
-
+		
 					observationInstance.calculateMaxVotedSpeciesName();
 
 					//sending mail to user
 					sendNotificationMail(SPECIES_AGREED_ON, observationInstance, request);
-					redirect(action:getRecommendationVotes, id:params.obvId, params:[max:3, offset:0])
+					redirect(action:getRecommendationVotes, id:params.obvId, params:[max:3, offset:0, recoVoteMsg:recoVoteMsg])
 					return
 				}
 				else {
@@ -400,6 +404,7 @@ class ObservationController {
 						recos{
 							recoHtml(html)
 							uniqueVotes(results.uniqueVotes)
+							recoVoteMsg(params.recoVoteMsg)
 						}
 					}
 					return
@@ -608,7 +613,7 @@ class ObservationController {
 	* @param params
 	* @return
 	*/
-   private RecommendationVote getRecommendationVote(params) {
+   private Map getRecommendationVote(params) {
 	   def observation = params.observation?:Observation.get(params.obvId);
 	   def author = params.author;
 	   
@@ -629,24 +634,21 @@ class ObservationController {
 	   }else{
 		   if(!existingRecVote){
 			   log.debug " Adding (first time) recommendation vote for user " + author.id +  " reco name " + reco.name
-			   flash.message = "${message(code: 'recommendations.added.message', args: [reco.name])}"
-			   return newRecVote
+			   def msg = "${message(code: 'recommendations.added.message', args: [reco.name])}"
+			   return [recVote:newRecVote, msg:msg]
 		   }else{
 			   if(existingRecVote.recommendation.id == reco.id){
 				   log.debug " Same recommendation already made by user " + author.id +  " reco name " + reco.name + " leaving as it is"
 				   return null
 			   }else{
 			   	   log.debug " Overwrting old recommendation vote for user " + author.id +  " new reco name " + reco.name + " old reco name " + existingRecVote.recommendation.name
-				   flash.message = "${message(code: 'recommendations.overwrite.message', args: [existingRecVote.recommendation.name, reco.name])}"
+				   def msg = "${message(code: 'recommendations.overwrite.message', args: [existingRecVote.recommendation.name, reco.name])}"
 				   if(!existingRecVote.delete(flush: true)){
 					   existingRecVote.errors.allErrors.each { log.error it }
 				   }
-				   return newRecVote;
+				   return [recVote:newRecVote, msg:msg]
 			   }
 		   }
 	   }
-   }
-   private addMsgToFlash(msg){
-	   flash.message = msg
    }   
 }
