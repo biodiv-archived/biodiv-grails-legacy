@@ -830,3 +830,6 @@ input, button, select, textarea {
     color: #000000;
 }
 
+.msg {
+	font-style:italic;
+}

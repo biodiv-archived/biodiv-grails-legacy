@@ -26,7 +26,11 @@ var itemAddCallback = function(carousel, first, last, data, state) {
 	if(state == 'init') {
 		if(data["count"] == 0) {
 			$(carousel.options.carouselDivId).hide();
-			$(carousel.options.carouselMsgDivId).show();
+			if(carousel.options.filterProperty == 'user'){
+				$(carousel.options.carouselAddObvDivId).show();
+			}else{ 
+				$(carousel.options.carouselMsgDivId).show();
+			}
 		} else {
 			carousel.size(data["count"]);
 		}
