@@ -84,7 +84,12 @@
 
 	function showRecos(data, textStatus) {
 		jQuery('#recoSummary').html(jQuery(data).find('recoHtml').text());
-		$("#seeMoreMessage").hide();
+		var infoMsg = jQuery(data).find('recoVoteMsg').text();
+		if(infoMsg){
+			$("#seeMoreMessage").html(infoMsg).show().removeClass('error').addClass('message');
+		}else{
+			$("#seeMoreMessage").hide();
+		}
 	}
 	
 	function handleError(XMLHttpRequest,textStatus,errorThrown) {
