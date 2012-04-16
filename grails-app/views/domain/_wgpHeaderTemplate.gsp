@@ -1,6 +1,6 @@
 <style>
 #wgp-header {
-background-color: #6ac9a2;
+background-color: #f9f9f9;
 box-shadow: 0 6px 6px -6px #5E5E5E;
 color: #5E5E5E;
 font-family: Verdana,Helvetica,Sans-Serif;
@@ -21,10 +21,11 @@ z-index: 2000;
 
     <div id="top_nav_bar">
     <ul>
+    <li onclick="location.href='/biodiv/species/list'" title="Species" id="species_nav_link">Species</li>
+    <li onclick="location.href='/biodiv/observation/list'" title="Observations" id="species_nav_link">Observations</li>
     <li onclick="location.href='/map'" title="Maps" id="maps_nav_link">Maps</li>
     <li onclick="location.href='/browsechecklists'" title="Checklists" id="checklists_nav_link">Checklists</li>
     <li onclick="location.href='/collaborate-wg'" title="Collaborate" id="collaborate_nav_link">Collaborate</li>
-    <li onclick="location.href='/biodiv/species/list'" title="Species" id="species_nav_link">Species</li>
     <li onclick="location.href='/themepages/list'" title="Themes" id="themes_nav_link">Themes</li>
     <li onclick="location.href='/about/western-ghats'" title="About" id="about_nav_link">About</li>
     </ul>

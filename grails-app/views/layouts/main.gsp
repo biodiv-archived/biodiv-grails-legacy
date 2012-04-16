@@ -201,7 +201,12 @@ border-bottom:3px solid #003846;
 				<div class="demo" style="float: right; margin-right: .3em;"
 					title="These are demo pages">These are demo pages</div><br/>
 				
-				<sNav:render group="dashboard" subitems="true" />
+                                <g:if test="${params.controller == 'species' || params.controller == 'search'}">
+				    <sNav:render group="species_dashboard" subitems="false" />
+                                </g:if>    
+                                <g:if test="${params.controller == 'observation'}">
+				    <sNav:render group="observation_dashboard" subitems="false" />
+                                </g:if>    
 				
 				<div style="float: right;">
 					<g:searchBox />
@@ -211,7 +216,7 @@ border-bottom:3px solid #003846;
 			
 		</div>
 		<g:layoutBody />
-                <div class="page-footer"></div>
+                <!--div class="page-footer"></div-->
 	</div>
 
 	<g:javascript>
