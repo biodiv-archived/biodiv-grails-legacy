@@ -119,7 +119,7 @@
 
 							</ul>
 							<div id="seeMoreMessage" class="message"></div>
-							<div id="seeMore" class="btn btn-mini">more</div>
+							<div id="seeMore" class="btn btn-mini">see all</div>
 						</div>
 						<div>
 							<g:hasErrors bean="${recommendationInstance}">
@@ -134,8 +134,8 @@
 							</g:hasErrors>
 
 							<form id="addRecommendation"
-								action="${createLink(controller:'observation', action:'addRecommendationVote')}"
-								method="POST" class="form-horizontal">
+								
+								class="form-horizontal">
 								<div  class="input-append" style="">
 								<reco:create
 									model="['recommendationInstance':recommendationInstance]" />
@@ -246,16 +246,24 @@
          	window.location.href = "${g.createLink(action: 'list')}/?tag=" + tg 
          });
          
-         var max = 3, offset = 0;
-         $("#seeMore").click(function() {
-         	$.ajax({
-				url: "${createLink(controller:'observation', action:'getRecommendationVotes', id:observationInstance.id) }",
+         
+         function preLoadRecos(max){
+         	$("#seeMoreMessage").hide();
+         	$("#seeMore").hide();
+         	
+        	$.ajax({
+         		url: "${createLink(controller:'observation', action:'getRecommendationVotes', id:observationInstance.id) }",
 				method: "GET",
-				dataType: "json",
-				data: {max:max , offset:offset},	
+				dataType: "xml",
+				data: {max:max , offset:0},	
 				success: function(responseJSON) {
-					offset = offset += responseJSON.max;
-					$("#recoSummary").append(responseJSON.html);		
+					$("#recoSummary").html($(responseJSON).find("recoHtml").text());
+					
+					var uniqueVotes = parseInt($(responseJSON).find("uniqueVotes").text())
+					//alert(uniqueVotes);
+					if(uniqueVotes > 3){
+						$("#seeMore").show();
+					}	
 				}, statusCode: {
 	    			401: function() {
 	    				show_login_dialog();
@@ -269,8 +277,37 @@
 					}
 			   	}
 			});
-         });
-         $("#seeMore").click();
+         }
+         
+         var isSeeAllClicked = false;
+         $("#seeMore").click(function(){
+         	preLoadRecos(100);
+         	$("#seeMore").hide();
+		 });
+         
+         preLoadRecos(3);
+         
+         $('#addRecommendation').ajaxForm({ 
+         	url:"${createLink(controller:'observation', action:'addRecommendationVote')}",
+			dataType: 'xml',//could not parse json wih this form plugin 
+			clearForm: true,
+			resetForm: true,
+			type: 'POST',
+			 
+			beforeSubmit: function(formData, jqForm, options) {
+				return true;
+			}, 
+            
+            success: function(responseXML, statusText, xhr, form) {
+            	$("#recoSummary").html($(responseXML).find("recoHtml").text());
+            	$("#seeMoreMessage").hide();
+		    	return false;
+            },
+            error:function (xhr, ajaxOptions, thrownError){
+            	//alert(thrownError);
+			} 
+     	});
+        
 	});
 </g:javascript>
 

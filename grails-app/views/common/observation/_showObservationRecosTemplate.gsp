@@ -1,6 +1,3 @@
-<!--link rel="stylesheet" type="text/css" media="all"
-	href="${resource(dir:'css',file:'pollBars.css', absolute:true)}" /-->
-
 <%@page import="species.utils.ImageType"%>
 <style>
 .reco_block {
@@ -41,12 +38,8 @@
 						<g:remoteLink action="addAgreeRecommendationVote" method="GET"
 							controller="observation"
 							params="['obvId':observationInstance.id, 'recoId':r.recoId, 'currentVotes':r.noOfVotes]"
-							onSuccess="jQuery('#votes_${r.recoId}').html(data.votes);return false;"
-							onFailure="if(XMLHttpRequest.status == 401 || XMLHttpRequest.status == 200) {
-				    		show_login_dialog();
-				    	} else {	    
-				    		alert(errorThrown);
-				    	} return false;">Agree</g:remoteLink>
+							onSuccess="showRecos(data, textStatus);return false"
+							onFailure="handleError(XMLHttpRequest,textStatus,errorThrown);return false;">Agree</g:remoteLink>
 					</div>
 					<g:each in="${r.authors}" var="author">
 						<g:link controller="SUser" action="show" id="${author?.id}">
@@ -82,9 +75,27 @@
                                         $('#voteDetails_${r.recoId}').hide();
                                 });
                         });
+                       
                         </g:javascript>
 		</li>
 	</g:each>
+	
+<g:javascript>
+
+	function showRecos(data, textStatus) {
+		jQuery('#recoSummary').html(jQuery(data).find('recoHtml').text());
+		$("#seeMoreMessage").hide();
+	}
+	
+	function handleError(XMLHttpRequest,textStatus,errorThrown) {
+		if(XMLHttpRequest.status == 401 || XMLHttpRequest.status == 200) {
+			show_login_dialog();
+		} else {	    
+			alert(errorThrown);
+		}
+	}
+                        
+</g:javascript>	
 </g:if>
 <g:else>
 	<g:message code="recommendations.zero.message" />
