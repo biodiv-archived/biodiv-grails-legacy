@@ -359,7 +359,7 @@ environments {
 		}
 
                 ibp.domain='ibp.localhost'
-                wgp.domain='wgp.localhost'    
+                wgp.domain='localhost'    
 	}
 	test {
 		grails.serverURL = "http://localhost:8080/${appName}"

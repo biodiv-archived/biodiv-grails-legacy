@@ -9,6 +9,8 @@ import org.springframework.web.multipart.MultipartHttpServletRequest
 import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
 
 import grails.converters.JSON;
+import grails.converters.XML;
+
 import grails.plugins.springsecurity.Secured
 import species.participation.RecommendationVote.ConfidenceType
 import species.participation.ObservationFlag.FlagType
@@ -88,7 +90,7 @@ class ObservationController {
 					observationInstance.setTags(tags);
 
 					sendNotificationMail(OBSERVATION_ADDED, observationInstance, request);
-
+					params["createNew"] = true
 					redirect(action: 'addRecommendationVote', params:params);
 				} else {
 					observationInstance.errors.allErrors.each { log.error it }
@@ -122,6 +124,7 @@ class ObservationController {
 					observationInstance.setTags(tags);
 
 					//redirect(action: "show", id: observationInstance.id)
+					params["createNew"] = true
 					redirect(action: 'addRecommendationVote', params:params);
 				} else {
 					observationInstance.errors.allErrors.each { log.error it }
@@ -298,7 +301,13 @@ class ObservationController {
 				if(!recommendationVoteInstance){
 					//saving max voted species name for observation instance needed when observation created without species name
 					observationInstance.calculateMaxVotedSpeciesName();
-					redirect(action: "show", id: observationInstance.id);
+					if(!params["createNew"]){
+						redirect(action:getRecommendationVotes, id:params.obvId, params:[max:3, offset:0])
+					}else{
+						redirect(action: "show", id: observationInstance.id);
+					}
+					return
+					
 				}else if(!recommendationVoteInstance.hasErrors() && recommendationVoteInstance.save(flush: true)) {
 					log.debug "Successfully added reco vote : "+recommendationVoteInstance
 
@@ -307,8 +316,12 @@ class ObservationController {
 
 					//sending mail to user
 					sendNotificationMail(SPECIES_RECOMMENDED, observationInstance, request);
-
-					redirect(action: "show", id: observationInstance.id);
+					if(!params["createNew"]){
+						redirect(action:getRecommendationVotes, id:params.obvId, params:[max:3, offset:0])
+					}else{
+						redirect(action: "show", id: observationInstance.id);
+					}
+					return
 				}
 				else {
 					recommendationVoteInstance.errors.allErrors.each { log.error it }
@@ -344,7 +357,8 @@ class ObservationController {
 			try {
 				if(!recommendationVoteInstance){
 					def result = ['votes':params.int('currentVotes')];
-					render result as JSON;
+					redirect(action:getRecommendationVotes, id:params.obvId, params:[ max:3, offset:0])
+					return
 				}else if(recommendationVoteInstance.save(flush: true)) {
 					log.debug "Successfully added reco vote : "+recommendationVoteInstance
 					success = true;
@@ -353,24 +367,17 @@ class ObservationController {
 
 					//sending mail to user
 					sendNotificationMail(SPECIES_AGREED_ON, observationInstance, request);
-
-					def result = ['votes':++params.int('currentVotes')];
-					render result as JSON;
-
+					redirect(action:getRecommendationVotes, id:params.obvId, params:[max:3, offset:0])
+					return
 				}
 				else {
 					recommendationVoteInstance.errors.allErrors.each { log.error it }
-
 				}
 			} catch(e) {
 				e.printStackTrace();
 			}
 		} else {
 			flash.message  = "${message(code: 'observation.invalid', default:'Invalid observation')}"
-		}
-		if(!success) {
-			def result = ['votes':params.int('currentVotes')];
-			render result as JSON;
 		}
 	}
 
@@ -388,9 +395,14 @@ class ObservationController {
 				def results = observationInstance.getRecommendationVotes(params.max, params.offset);
 				log.debug results;
 				if(results?.recoVotes.size() > 0) {
-					def html =  g.render(template:"/common/observation/showObservationRecosTemplate", model:['observationInstance':observationInstance, 'result':results.recoVotes, 'totalVotes':results.totalVotes]);
-					def result = ['html':html, 'max':params.max]
-					render result as JSON;
+					def html =  g.render(template:"/common/observation/showObservationRecosTemplate", model:['observationInstance':observationInstance, 'result':results.recoVotes, 'totalVotes':results.totalVotes, 'uniqueVotes':results.uniqueVotes]);
+					render(contentType:"text/xml") {
+						recos{
+							recoHtml(html)
+							uniqueVotes(results.uniqueVotes)
+						}
+					}
+					return
 				} else {
 					response.setStatus(500);
 					def message = "";
@@ -400,6 +412,7 @@ class ObservationController {
 						message = [info:g.message(code: 'recommendations.zero.message', default:'No recommendations made. Please suggest')];
 					}
 					render message as JSON
+					return
 				}
 			} catch(e){
 				e.printStackTrace();
