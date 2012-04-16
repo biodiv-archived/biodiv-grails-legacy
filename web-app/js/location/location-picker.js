@@ -10,9 +10,14 @@ var map;
 var marker;
 var latitude;
 var longitude;
+
+var swRestriction = new google.maps.LatLng('8', '69');
+var neRestriction = new google.maps.LatLng('36', '98');
+var allowedBounds = new google.maps.LatLngBounds(swRestriction, neRestriction);
     
 function initialize(){
   var latlng = new google.maps.LatLng(21.07,79.27);
+
   var options = {
     zoom: 4,
     center: latlng,
@@ -27,8 +32,27 @@ function initialize(){
     map: map,
     draggable: true
   });
+    
+  google.maps.event.addListener(map, 'dragend', function() { checkBounds(); });
+        
+        function checkBounds() {
+             if (allowedBounds.contains(map.getCenter())) return;
 
-				
+             var c = map.getCenter(),
+             x = c.lng(),
+             y = c.lat(),
+             maxX = allowedBounds.getNorthEast().lng(),
+             maxY = allowedBounds.getNorthEast().lat(),
+             minX = allowedBounds.getSouthWest().lng(),
+             minY = allowedBounds.getSouthWest().lat();
+
+             if (x < minX) x = minX;
+             if (x > maxX) x = maxX;
+             if (y < minY) y = minY;
+             if (y > maxY) y = maxY;
+
+             map.setCenter(new google.maps.LatLng(y, x));
+    }
 }
 
 function set_location(lat, lng) {
@@ -164,9 +188,17 @@ $(document).ready(function() {
 
     });
   });
-	
+
+  var lastPosition = marker.getPosition();
   //add listener to marker for reverse geocoding
   google.maps.event.addListener(marker, 'drag', function() {
+    
+    if(!allowedBounds.contains(marker.getPosition())){
+        marker.setPosition(lastPosition);
+    }else {
+        lastPosition = marker.getPosition();
+    };
+
     geocoder.geocode({'latLng': marker.getPosition()}, function(results, status) {
       if (status == google.maps.GeocoderStatus.OK) {
         if (results[0]) {

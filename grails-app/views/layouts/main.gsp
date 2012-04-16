@@ -10,6 +10,12 @@
 <link rel="stylesheet" type="text/css" media="all"
 	href="${resource(dir:'bootstrap/css',file:'bootstrap.css', absolute:true)}" />
 </g:if>        
+<g:else>
+
+<link rel="stylesheet" type="text/css" media="all"
+	href="${resource(dir:'css',file:'forSpeciesPages.css', absolute:true)}" />
+
+</g:else>
 
 <!--link rel="stylesheet" type="text/css" media="all"
 	href="${resource(dir:'bootstrap/css',file:'bootstrap-responsive.css', absolute:true)}" /-->
@@ -140,7 +146,7 @@ jQuery(document).ready(function($) {
     font-weight: bold;
     left: 300px;
     position: absolute;
-    top: 0;
+    top: 30px;
     z-index: 501;
 }
 #top_nav_bar ul {
@@ -155,33 +161,8 @@ jQuery(document).ready(function($) {
     display: inline;
     padding: 10px 10px 3px;
 }
-#top_nav_bar li#maps_nav_link:hover{
-background-color: #fafafa;
-border-bottom:3px solid #f0575a;
-}
-
-#top_nav_bar li#checklists_nav_link:hover{
-background-color: #fafafa;
-border-bottom:3px solid #7764a2;
-}
-
-#top_nav_bar li#collaborate_nav_link:hover{
-background-color: #fafafa;
-border-bottom:3px solid #145b9b;
-}
-
-#top_nav_bar li#species_nav_link:hover{
-background-color: #fafafa;
-border-bottom:3px solid #00a4be;
-}
-
-#top_nav_bar li#themes_nav_link:hover{
-background-color: #fafafa;
-border-bottom:3px solid #45a989;
-}
-
-#top_nav_bar li#about_nav_link:hover{
-background-color: #fafafa;
+#top_nav_bar li:hover{
+background-color: #e8f7f1;
 border-bottom:3px solid #003846;
 }
 
@@ -230,6 +211,7 @@ border-bottom:3px solid #003846;
 			
 		</div>
 		<g:layoutBody />
+                <div class="page-footer"></div>
 	</div>
 
 	<g:javascript>

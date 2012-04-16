@@ -25,6 +25,7 @@ $(document).ready(function() {
 			},focus: function( event, ui ) {
 				$("#canName").val("");
 				$( "#name" ).val( ui.item.label.replace(/<.*?>/g,"") );
+				$("#nameSuggestions li a").css('border', 0);
 				return false;
 			},
 			select: function( event, ui ) {
@@ -33,45 +34,32 @@ $(document).ready(function() {
 				//$( "#name-description" ).html( ui.item.value ? ui.item.label.replace(/<.*?>/g,"")+" ("+ui.item.value+")" : "" );
 				//ui.item.icon ? $( "#name-icon" ).attr( "src",  ui.item.icon).show() : $( "#name-icon" ).hide();
 				return false;
+			},open: function(event, ui) {
+				$("#nameSuggestions ul").removeAttr('style').css({'display': 'block'}); 
 			}
 	}).data( "catcomplete" )._renderItem = function( ul, item ) {
+			ul.removeClass().addClass("dropdown-menu")
 			if(item.category == "General") {
-				return $( "<li class='grid_4'  style='display:inline-block;width:220px;clear:none;padding:5px;'></li>" )
+				return $( "<li class='span2 habitat_option'></li>" )
 					.data( "item.autocomplete", item )
-					.append( "<a style='height:50px;padding-left:60px;border:0;'>" + item.label + "</a>" )
+					.append( "<a>" + item.label + "</a>" )
 					.appendTo( ul );
 			} else {
 				if(!item.icon) {
 					item.icon =  "${resource(dir:'images',file:'no-image.jpg', absolute:true)}"
                                             //${createLinkTo(dir: 'images/', file:"no-image.jpg", base:grailsApplication.config.speciesPortal.resources.serverURL)}"
 				}  
-				return $( "<li class='grid_4' style='display:inline-block;width:220px;clear:none;padding:5px;'></li>" )
+				return $( "<li class='span2 habitat_option'></li>" )
 					.data( "item.autocomplete", item )
-					.append( "<img src='" + item.icon+"' class='ui-state-default' style='float:left' /><a style='height:50px;padding-left:60px;border:0;'>" + item.label + ((item.desc)?'<br>(' + item.desc + ')':'')+"</a>" )
+					.append( "<a title='"+item.label.replace(/<.*?>/g,"")+"'><img src='" + item.icon+"' class='group_icon' style='float:left; background:url(" + item.icon+" no-repeat); background-position:0 -100px; width:50px; height:50px;opacity:0.4;'/>" + item.label + ((item.desc)?'<br>(' + item.desc + ')':'')+"</a>" )
 					.appendTo( ul );
 			}
 		};
-		
-		//$("#name").ajaxStart(function(){
-		//	var offset = $(this).offset();  				
-   		//	$("#spinner").css({left:offset.left+$(this).width(), top:offset.top-6}).show();
-   		//	return false;
- 		//});	
-	
 });
-
-	
 </g:javascript>
 
-<style>
 
-#nameSuggestions ul {
-	width:520px;
-}
-</style>
-
-<div
-	id="nameContainer" class="recommendation">
+<div class="btn-group">
 	<%
 		def species_name = ""
 		//showing vote added by creator of the observation
@@ -82,10 +70,11 @@ $(document).ready(function() {
 			//species_name = observationInstance?.maxVotedSpeciesName
 		}
 	%>
-	<input type="text" name="recoName" id="name"
+	<input type="text" name="recoName" id="name"  
 		value="${species_name}" placeholder='Suggest a species name'
-		class="value text ui-widget-content ui-corner-all ${hasErrors(bean: recommendationInstance, field: 'name', 'errors')} ${hasErrors(bean: recommendationVoteInstance, field: 'recommendation', 'errors')}" /> 
+		class="input-xlarge ${hasErrors(bean: recommendationInstance, field: 'name', 'errors')} ${hasErrors(bean: recommendationVoteInstance, field: 'recommendation', 'errors')}" /> 
 	
 	<input type="hidden" name="canName" id="canName" />
+
+<div id="nameSuggestions" style="display:block;"></div>
 </div>
-<div id="nameSuggestions" class="span7"></div>

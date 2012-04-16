@@ -40,7 +40,71 @@
 <g:javascript src="tagit.js"
 	base="${grailsApplication.config.grails.serverURL+'/js/'}"></g:javascript>
 
+<style>
+.btn-group.open .dropdown-menu {
+	top: 43px;
+}
 
+.btn-large .caret {
+	margin-top: 13px;
+	position: absolute;
+	right: 10px;
+}
+
+.btn-group .btn-large.dropdown-toggle {
+	width: 300px;
+	height:44px;
+	text-align: left;
+	padding:5px;
+}
+
+.textbox input{
+	text-align: left;
+	width: 290px;
+	height:34px;
+	padding:5px;
+}
+
+.form-horizontal .control-label {
+	padding-top: 15px;
+}
+
+.form-horizontal .control-group {
+	margin-bottom: 5px;
+}
+
+.btn-large {
+	font-size: 13px;
+}
+
+.block {
+	border-radius: 5px;
+	background-color: #c4cccf; 
+	margin: 3px;
+}
+
+.block label {
+	float: left; 
+	text-align: left; 
+	padding: 10px; 
+	width: auto;
+}
+
+#help-identify {
+	height: 0;
+    left: 300px;
+    padding: 0;
+    position: relative;
+    top: -35px;
+}
+
+.left-indent {
+	margin-left:100px;
+}
+.control-group.error  .help-inline {
+	padding-top : 15px
+}
+</style>
 </head>
 <body>
 	<div class="container outer-wrapper">
@@ -50,7 +114,7 @@
 				<div class="page-header">
 					<h1>
 						<!--g:message code="default.create.label" args="[entityName]" /-->
-						Add an observation
+						Add an Observation
 					</h1>
 				</div>
 				<g:if test="${flash.message}">
@@ -67,15 +131,6 @@
 				</g:hasErrors>
 			</div>
 
-			<form id="upload_resource" enctype="multipart/form-data"
-				style="visibility: hidden; position: relative; float: left; z-index: 2; left: 30px; top: 2300px;"
-				title="Add a photo for this observation"
-				class="${hasErrors(bean: observationInstance, field: 'resource', 'errors')}">
-
-				<!-- TODO multiple attribute is HTML5. need to chk if this gracefully falls back to default in non compatible browsers -->
-				<input type="file" id="attachFiles" name="resources"
-					accept="image/*" /> <span class="msg" style="float: right"></span>
-			</form>
 
 			<%
 				def form_id = "addObservation"
@@ -91,281 +146,325 @@
 			
 			%>
 
-			<form id="${form_id}" action="${form_action}" method="POST">
+			<form id="${form_id}" action="${form_action}" method="POST"
+				class="form-horizontal">
 
-            <div class="span12 super-section" style="clear:both;">    
-                <div class="span11 section bold_section" style="position:relative;overflow:visible;">
-                    <h3>What did you observe?</h3>
-                        <div class="row control-group ${hasErrors(bean: observationInstance, field: 'group', 'error')}">
-                            <div class="span4">
-                                <label for="group"><g:message
-                                                code="observation.group.label" default="Group" />
-                                </label> 
-                             </div>   
-                             <div class="span7">
-                                <div id="groups_div" class="bold_dropdown" style="z-index:3;">
-                                    <%
+				<div class="span12 super-section" style="clear: both;">
+					<div class="span11 section"
+						style="position: relative; overflow: visible;">
+						<h3>What did you observe?</h3>
+						<div
+							class="row control-group left-indent ${hasErrors(bean: observationInstance, field: 'group', 'error')}">
+
+							<label for="group" class="control-label"><g:message
+									code="observation.group.label" default="Group" /> </label>
+
+							<div class="controls">
+								<div id="groups_div" class="btn-group" style="z-index: 3;">
+									<%
                                         def defaultGroupId = observationInstance?.group?.id
                                         def defaultGroupIconFileName = (defaultGroupId)? SpeciesGroup.read(defaultGroupId).icon(ImageType.VERY_SMALL)?.fileName?.trim() : SpeciesGroup.findByName('All').icon(ImageType.VERY_SMALL)?.fileName?.trim()
                                         def defaultGroupValue = (defaultGroupId) ? SpeciesGroup.read(defaultGroupId).name : "Select group"
                                         %>
-                                        <div id="selected_group" class="btn dropdown-toggle selected_value " data-toggle="dropdown">
-                                                                            <img class="group_icon" 
-                                                                                    src="${createLinkTo(dir: 'images', file: defaultGroupIconFileName, absolute:true)}"/>
-                                                                    <span class="display_value">${defaultGroupValue}</span><span class="caret"></span>
-                                                                   
-                                                                    
-                                                                    </div>
-                                        
-                                        <div class="help-inline">
-                                            <g:hasErrors bean="${observationInstance}" field="group">
-                                                <g:message code="observation.group.not_selected"/>
-                                            </g:hasErrors>
-                                        </div>
-                                        
 
-                                        <div id="group_options" class="dropdown-menu">
-                                                <ul>
-                                                    <g:each in="${species.groups.SpeciesGroup.list()}" var="g">
-                                                        <g:if
-                                                                test="${!g.name.equals(grailsApplication.config.speciesPortal.group.ALL)}">
-                                                                <li class="group_option" style="display:inline-block;padding:5px;" value="${g.id}">
-                                                                            <img class="group_icon"
-                                                                            	src="${createLinkTo(dir: 'images', file: g.icon(ImageType.VERY_SMALL)?.fileName?.trim(), absolute:true)}"/>
-                                                                            <span class="display_value">${g.name}</span>
-                                                                </li>
-                                                        </g:if>
-                                                    </g:each>
-                                                </ul>
-                                        </div>
-                                </div>
-                                <input id="group_id" type="hidden" name="group_id"  value="${observationInstance?.group?.id}"></input>
-                            </div>
-                        </div>
+									<button id="selected_group"
+										class="btn btn-large btn-warning dropdown-toggle" data-toggle="dropdown"
+										data-target="#groups_div">
+										<img class="group_icon"
+											src="${createLinkTo(dir: 'images', file: defaultGroupIconFileName, absolute:true)}" />
+										<span class="display_value"> ${defaultGroupValue}
+										</span> <span class="caret"></span>
+									</button>
 
-                        <div class="row control-group ${hasErrors(bean: observationInstance, field: 'habitat', 'error')}">
-                            <div class="span4">
-                                <label>Habitat</label>
-                            </div>    
-                            <div class="span7">
-                                <div id="habitat_list">
-                                    <div id="habitat_div" class="bold_dropdown" style="z-index:2;">
-                                    <%
+									<ul id="group_options" class="dropdown-menu">
+
+										<g:each in="${species.groups.SpeciesGroup.list()}" var="g">
+											<g:if
+												test="${!g.name.equals(grailsApplication.config.speciesPortal.group.ALL)}">
+												<li class="span2 group_option" value="${g.id}">
+													<a> <img
+														class="group_icon"
+														src="${createLinkTo(dir: 'images', file: g.icon(ImageType.VERY_SMALL)?.fileName?.trim(), absolute:true)}" />
+														<span title="${g.name}">
+															${g.name}
+													</span>
+												</a></li>
+											</g:if>
+										</g:each>
+									</ul>
+
+
+									<div class="help-inline">
+										<g:hasErrors bean="${observationInstance}" field="group">
+											<g:message code="observation.group.not_selected" />
+										</g:hasErrors>
+									</div>
+
+								</div>
+								<input id="group_id" type="hidden" name="group_id"
+									value="${observationInstance?.group?.id}"></input>
+							</div>
+						</div>
+
+						<div
+							class="row control-group left-indent ${hasErrors(bean: observationInstance, field: 'habitat', 'error')}">
+
+							<label class="control-label" for="habitat"><g:message
+									code="observation.habitat.label" default="Habitat" /> </label>
+
+							<div class="controls">
+									<div id="habitat_div" class="btn-group" style="z-index: 2;">
+										<%
                                                                             def defaultHabitatId = observationInstance?.habitat?.id
 																			def defaultHabitat = Habitat.read(defaultHabitatId);
                                                                             def defaultHabitatIconFileName = (defaultHabitatId)? defaultHabitat.icon(ImageType.VERY_SMALL)?.fileName?.trim() : Habitat.findByName('All').icon(ImageType.VERY_SMALL)?.fileName?.trim()
                                                                             def defaultHabitatValue = (defaultHabitatId) ? defaultHabitat.name : "Select habitat"
                                                                     %>
-                                        <div id="selected_habitat" class="btn dropdown-toggle selected_value" data-toggle="dropdown">
-                                        	<img class="group_icon" src="${createLinkTo(dir: 'images', file:defaultHabitatIconFileName, absolute:true)}"/>
-                                        	
-                                        <span class="display_value">${defaultHabitatValue}</span><span class="caret"></span></div>
-                                            <div id="habitat_options" class="dropdown-menu">                                       <ul>
-                                                    <g:each in="${species.Habitat.list()}" var="h">
-                                                            <li class="habitat_option" value="${h.id}" >
-                                                            	<img class="group_icon" src="${createLinkTo(dir: 'images', file:h.icon(ImageType.VERY_SMALL)?.fileName?.trim(), absolute:true)}"/>
-                                                            	<span class="display_value">${h.name}</span></li>
-                                                            </g:each>
-                                                    </ul>
-                                            </div>
+                                        <button id="selected_habitat"
+										class="btn btn-large btn-warning dropdown-toggle" data-toggle="dropdown"
+										data-target="#habitat_div">
+										<img class="group_icon"
+												src="${createLinkTo(dir: 'images', file:defaultHabitatIconFileName, absolute:true)}" />
 
-                                            <div class="help-inline">
-                                                <g:hasErrors bean="${observationInstance}" field="habitat">
-                                                    <g:message code="observation.habitat.not_selected"/>
-                                                </g:hasErrors>
-                                            </div>
-                                        </div>
-                                    </div>	
-                                                                    <input id="habitat_id" type="hidden" name="habitat_id"  value="${observationInstance?.habitat?.id}"></input>
-                                </div>
-                            </div>
+											<span>
+												${defaultHabitatValue}
+											</span><span class="caret"></span>
+									</button>
+										
+										<ul id="habitat_options" class="dropdown-menu">
 
-                        <div class="row control-group">
-                            <div class="span4">
-                                <label for="recommendationVote">
-                                <g:message
-                                                code="observation.recommendationVote.label"
-                                                default="Species name" />
-                                </label>
-                            </div>
-                            
-                            <div class="span7">
-                                <g:hasErrors bean="${recommendationVoteInstance}">
-                                        <div class="errors">
-                                                <g:renderErrors bean="${observationInstance}" as="list" />
-                                        </div>
-                                </g:hasErrors>
-                                
-                                <div style="float:left;">
-                                    <reco:create />
-                                </div>
-                                <div id="help-identify" style="float:left; margin:10px;">
-                                    <label class="checkbox">
-                                        <input type="checkbox" style="width:auto; height:auto;"/> Help identify
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-
-
-                        <div class="row control-group ${hasErrors(bean: observationInstance, field: 'observedOn', 'error')}">
-                            <div class="span4">
-                                <label for="observedOn"><i class="icon-calendar"></i><g:message
-                                            code="observation.observedOn.label" default="Observed on" />
-                                </label>
-                            </div>
-                            <div class="span7">
-                                <input name="observedOn" type="date" id="observedOn" value="${observationInstance?.observedOn?.format('MM/dd/yyyy')}" placeholder="Select date of observation"/>
-                                <div class="help-inline">
-                                    <g:renderErrors bean="${observationInstance}" field="observedOn"/>
-                                </div>
-
-                            </div>
-                        </div>
-
-                	<div class="span11 section">
-                		<i class="icon-picture"></i><span>Upload photos of a single observation and species</span>
-                    	<div class="resources control-group ${hasErrors(bean: observationInstance, field: 'resource', 'error')}">
-                      	  <ul id="imagesList" class="thumbwrap thumbnails"
-                                style='list-style: none; margin-left: 0px;'>
-                                <g:set var="i" value="1" />
-                                <g:each in="${observationInstance?.resource}" var="r">
-                                        <li class="addedResource thumbnail">
-                                                <%def thumbnail = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.thumbnail.suffix)%>
-                                                <div class='figure' style="height: 200px; overflow: hidden;">
-                                                        <span> 
-                                                            <img
-                                                                style="width:100%; height:auto;" src='${createLinkTo(file: thumbnail, base:grailsApplication.config.speciesPortal.observations.serverURL)}'
-                                                                class='geotagged_image' exif='true' /> 
-                                                        </span>
-                                                </div>
-
-                                                <div class='metadata prop' style="position:relative; left: 5px; top:-40px;">
-                                                        <input name="file_${i}" type="hidden" value='${r.fileName}' />
-                                                        <div id="license_div_${i}" class="licence_div btn-group" style="z-index:2;cursor:pointer;">
-
-                                                            <div id="selected_license_{i}" onclick="$(this).next().show();" class="btn dropdown-toggle btn-mini" data-toggle="dropdown">
-                                                                <div>
-                                                                    <img src="${resource(dir:'images/license',file:'cc_by.png', absolute:true)}" title="Set a license for this image"/>
-                                                                </div>
-                                                                <span class="caret"></span>
-                                                            </div>
-                                                            <div id="license_options_{i}" class="license_options">
-                                                                <ul class="dropdown-menu">
-                                                                    <g:each in="${species.License.list()}" var="l">
-                                                                        <li class="license_option" onclick="$('#license_{{=i}}').val($(this).text());$('#selected_license_{{=i}}').children('div').html($(this).html());$('#license_options_{{=i}}').hide();">
-                                                                            <img src="${resource(dir:'images/license',file:'cc_by.png', absolute:true)}"/>
-                                                                        </li>
-                                                                    </g:each>
-                                                                </ul>
-                                                            </div>
-                                                        </div>
-                                                </div>	
-						<input id="license_${i}" type="hidden" name="license_${i}" ></input>
-                                                <div class="close_button" onclick="removeResource(event);$('#geotagged_images').trigger('update_map');"></div>
-                                                
-                                            </li>
-                                    <g:set var="i" value="${i+1}" />
-                                    </g:each>
-                                    <li id="add_file" class="addedResource" onclick="$('#attachFiles').select()[0].click();return false;">
-                                        <div class="progress">
-                                            <div id="translucent_box"></div >
-                                            <div id="progress_bar"></div >
-                                            <div id="progress_msg"></div >
-                                        </div>
-                                    </li>
-                        </ul>
-                    	<div class="help-inline"><g:renderErrors bean="${observationInstance}" as="list" field="resource"/></div>
-                    </div>
-                </div>
-                                   
-                </div>
-            </div>
-
-            
-	            <div class="span12 super-section">    
-	                <div class="span11 section" style="clear:both">
-	                    <h3>Where did you find this observation?</h3>
-	                    
-	                    <div class="span6">
-	                         <div  class="map_search">   
-	                         <input id="address" type="text" title="Find by place name" class="section-item"/>
-	                         <div id="current_location" class="section-item" style="float:left">
-	                            <a href="#" onclick="return false;">Use current location</a>
-	                         </div>
-	                         <div id="geotagged_images" class="section-item">
-	                            <div class="title" style="display:none">Use location from geo-tagged image:</div>  	
-	                            <div class="msg" style="display:none">Select image if you want to use location information embedded in it</div>  	
-	                        </div>
-	                        </div>
+											<g:each in="${species.Habitat.list()}" var="h">
 	
-	
-	
-	                        <div class="row">
-	                        <%
-	                                                    def defaultPlaceName = (observationInstance) ? observationInstance.placeName : ""
-	                                            %>
-	                            <div class="span2">                
-	                                <label><i class="icon-map-marker"></i>Location title</label>
-	                            </div>
-	                            <div class="span4">                
-	                                <input id="place_name" type="text"
-	                                        name="place_name" value="${defaultPlaceName}" ></input>
-	                            </div>
-	                                        
-	                        </div>
-	                        
-	                        
-	                        <div class="row">
-	                        <%
-	                                                    def defaultAccuracy = (observationInstance?.locationAccuracy) ? observationInstance.locationAccuracy : "Approximate"
-	                                                    def isAccurateChecked = (defaultAccuracy == "Accurate")? "checked" : ""
-	                                                    def isApproxChecked = (defaultAccuracy == "Approximate")? "checked" : ""
-	                                            %>
-	                            <div class="span2">                
-	                                <label>Accuracy</label> 
-	                            </div>
-	                            <div class="span4">                
+												<li class="span2 habitat_option" value="${h.id}"><a><img
+														class="group_icon"
+														src="${createLinkTo(dir: 'images', file:h.icon(ImageType.VERY_SMALL)?.fileName?.trim(), absolute:true)}" />
+														<span title="${h.name}"> ${h.name} </span> </a>
+												</li>
+
+											</g:each>
+										</ul>
+
+
+										<div class="help-inline">
+											<g:hasErrors bean="${observationInstance}" field="habitat">
+												<g:message code="observation.habitat.not_selected" />
+											</g:hasErrors>
+										</div>
+									</div>
+								</div>
+								<input id="habitat_id" type="hidden" name="habitat_id"
+									value="${observationInstance?.habitat?.id}"></input>
+						</div>
+
+						<div class="row control-group left-indent">
+
+							<label for="recommendationVote" class="control-label"> <g:message
+									code="observation.recommendationVote.label"
+									default="Species name" /> </label>
+
+
+							<div class="controls">
+								<g:hasErrors bean="${recommendationVoteInstance}">
+									<div class="errors">
+										<g:renderErrors bean="${observationInstance}" as="list" />
+									</div>
+								</g:hasErrors>
+
+								<div class="textbox">
+									<reco:create />
+								</div>
+								<div id="help-identify" class="control-label">
+									<label class="checkbox"> <input type="checkbox"
+										style="width: auto; height: auto;" /> Help identify </label>
+								</div>
+							</div>
+						</div>
+
+
+						<div
+							class="row control-group left-indent ${hasErrors(bean: observationInstance, field: 'observedOn', 'error')}">
+
+							<label for="observedOn" class="control-label"><i
+								class="icon-calendar"></i>
+							<g:message code="observation.observedOn.label"
+									default="Observed on" /> </label>
+
+							<div class="controls textbox">
+								<input name="observedOn" type="date" id="observedOn"
+									value="${observationInstance?.observedOn?.format('dd/MM/yyyy')}"
+									placeholder="Select date of observation" />
+								<div class="help-inline">
+									<g:renderErrors bean="${observationInstance}"
+										field="observedOn" />
+								</div>
+
+							</div>
+						</div>
+
+						<div class="span11 section">
+							<i class="icon-picture"></i><span>Upload photos of a
+								single observation and species</span>
+							<div
+								class="resources control-group ${hasErrors(bean: observationInstance, field: 'resource', 'error')}">
+								<ul id="imagesList" class="thumbwrap thumbnails"
+									style='list-style: none; margin-left: 0px;'>
+									<g:set var="i" value="1" />
+									<g:each in="${observationInstance?.resource}" var="r">
+										<li class="addedResource thumbnail">
+											<%def thumbnail = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.thumbnail.suffix)%>
+											<div class='figure' style="height: 200px; overflow: hidden;">
+												<span> <img style="width: 100%; height: auto;"
+													src='${createLinkTo(file: thumbnail, base:grailsApplication.config.speciesPortal.observations.serverURL)}'
+													class='geotagged_image' exif='true' /> </span>
+											</div>
+
+											<div class='metadata prop'
+												style="position: relative; left: 5px; top: -40px;">
+												<input name="file_${i}" type="hidden" value='${r.fileName}' />
+												<div id="license_div_${i}" class="licence_div btn-group"
+													style="z-index: 2; cursor: pointer;">
+
+													<div id="selected_license_{i}"
+														onclick="$(this).next().show();"
+														class="btn dropdown-toggle btn-mini"
+														data-toggle="dropdown">
+														<div>
+															<img
+																src="${resource(dir:'images/license',file:'cc_by.png', absolute:true)}"
+																title="Set a license for this image" />
+														</div>
+														<span class="caret"></span>
+													</div>
+													<div id="license_options_{i}" class="license_options">
+														<ul class="dropdown-menu">
+															<g:each in="${species.License.list()}" var="l">
+																<li class="license_option"
+																	onclick="$('#license_{{=i}}').val($(this).text());$('#selected_license_{{=i}}').children('div').html($(this).html());$('#license_options_{{=i}}').hide();">
+																	<img
+																	src="${resource(dir:'images/license',file:'cc_by.png', absolute:true)}" />
+																</li>
+															</g:each>
+														</ul>
+													</div>
+												</div>
+											</div> <input id="license_${i}" type="hidden" name="license_${i}"></input>
+											<div class="close_button"
+												onclick="removeResource(event);$('#geotagged_images').trigger('update_map');"></div>
+
+										</li>
+										<g:set var="i" value="${i+1}" />
+									</g:each>
+									<li id="add_file" class="addedResource"
+										onclick="$('#attachFiles').select()[0].click();return false;">
+										<div class="progress">
+											<div id="translucent_box"></div>
+											<div id="progress_bar"></div>
+											<div id="progress_msg"></div>
+										</div></li>
+								</ul>
+								<div class="help-inline">
+									<g:renderErrors bean="${observationInstance}" as="list"
+										field="resource" />
+								</div>
+							</div>
+						</div>
+
+					</div>
+				</div>
+
+
+				<div class="span12 super-section" style="clear: both">
+					<div class="span11 section">
+						<h3>Where did you find this observation?</h3>
+
+						<div class="span6">
+							<div class="map_search">
+								<input id="address" type="text" title="Find by place name"
+									class="section-item" />
+								<div id="current_location" class="section-item"
+									style="float: left">
+									<a href="#" onclick="return false;">Use current location</a>
+								</div>
+								<div id="geotagged_images" class="section-item">
+									<div class="title" style="display: none">Use location
+										from geo-tagged image:</div>
+									<div class="msg" style="display: none">Select image if
+										you want to use location information embedded in it</div>
+								</div>
+							</div>
+
+
+
+							<div class="row control-group">
+								<%
+	                            	def defaultPlaceName = (observationInstance) ? observationInstance.placeName : ""
+	                            %>
+	                            <label for="place_name" class="control-label"> <i class="icon-map-marker"></i><g:message
+									code="observation.location.label"
+									default="Location title" /> </label>
+									
+								<div class="controls textbox">
+									<input id="place_name" type="text" name="place_name"
+										value="${defaultPlaceName}"></input>
+								</div>
+
+							</div>
+
+							<div class="row control-group">
+								<%
+	                              	def defaultAccuracy = (observationInstance?.locationAccuracy) ? observationInstance.locationAccuracy : "Approximate"
+	                                def isAccurateChecked = (defaultAccuracy == "Accurate")? "checked" : ""
+	                                def isApproxChecked = (defaultAccuracy == "Approximate")? "checked" : ""
+	                            %>
+	                             <label for="location_accuracy" class="control-label" style="padding:0px"><g:message
+									code="observation.accuracy.label"
+									default="Accuracy" /> </label>
+									
+	                            <div class="controls">                
 	                                <input type="radio" name="location_accuracy" value="Accurate" ${isAccurateChecked} >Accurate 
 	                                <input type="radio" name="location_accuracy" value="Approximate" ${isApproxChecked} >Approximate<br />
 	                            </div>
 	                        </div>
 	
-	                        <div class="row" style="margin-bottom:20px;">
-	                            <div class="span2">                
-	                                <label>Hide precise location?</label>
-	                            </div>
+	                        <div class="row control-group">
+	                        	<label for="location_accuracy" class="control-label" style="padding:0px"><g:message
+									code="observation.geoprivacy.label"
+									default="Hide precise location?" /> </label>
 	                                
-	                            <div class="span4">                
-	                                <input type="checkbox"
-	                                        name="geo_privacy" value="geo_privacy" />Hide
+	                            <div class="controls">  
+                						<input type="checkbox"
+	                                        name="geo_privacy" value="geo_privacy" />
+                						Hide
 	                            </div>
 	                        </div>
 	                        <hr>
-	                        <div class="row" style="margin-top:20px;">
-	                            <div class="span2">                
-	                                <label>Geocode name</label>
-	                            </div>
-	                            <div class="span4">                
+	                        <div class="row control-group">
+	                        	<label for="location_accuracy" class="control-label" style="padding:0px"><g:message
+									code="observation.geocode.label"
+									default="Geocode name" /> </label>
+								
+	                            <div class="controls">                
 	                                <div class="location_picker_value" id="reverse_geocoded_name"></div>
 	                                <input id="reverse_geocoded_name_field" type="hidden"
 	                                        name="reverse_geocoded_name" value="${observationInstance?.reverseGeocodedName}" > </input>
 	                            </div>
 	                        </div>
-	                        <div class="row">
-	                            <div class="span2">                
-	                                <label>Latitude</label>
-	                            </div>
-	                            <div class="span4">                
+	                        <div class="row control-group">
+	                        	<label for="location_accuracy" class="control-label" style="padding:0px"><g:message
+									code="observation.latitude.label"
+									default="Latitude" /> </label>
+	                            
+	                            <div class="controls">             
 	                                <div class="location_picker_value" id="latitude"></div>
 	                                <input id="latitude_field" type="hidden" name="latitude" value="${observationInstance?.latitude}" ></input>
 	                            </div>
 	                        </div>
-	                        <div class="row">
-	                            <div class="span2">                
-	                                <label>Longitude</label>
-	                            </div>
-	                            <div class="span4">                
+	                        <div class="row control-group">
+	                      	  <label for="location_accuracy" class="control-label" style="padding:0px"><g:message
+									code="observation.longitude.label"
+									default="Longitude" /> </label>
+	                            
+	                            <div class="controls">               
 	                                <div class="location_picker_value" id="longitude"></div>
 	                                <input id="longitude_field" type="hidden" name="longitude" value="${observationInstance?.longitude}"></input>
 	                            </div>
@@ -380,26 +479,23 @@
 	                </div>
 	            </div>    
       
-					<div class="span12 super-section">
-						<div class="span11 section" style="clear: both">
+					<div class="span12 super-section"  style="clear: both">
+						<div class="span11 section">
 							<h3>Describe your observation!</h3>
-							<div class="span6">
+							<div class="span6 block">
 								<!--label for="notes"><g:message code="observation.notes.label" default="Notes" /></label-->
-								<label
-									style="float: left; text-align: left; padding-left: 10px; width: auto;"><i
-									class="icon-pencil"></i>Notes</label> (Max: 400 characters)<br />
-								<div class="section-item" style="margin-right: 10px;">
-									<g:textArea name="notes" value="${observationInstance?.notes}"
+								<h5><label><i
+									class="icon-pencil"></i>Notes <small><g:message code="observation.notes.message" default="Description" /></small></label><br />
+								</h5><div class="section-item" style="margin-right: 10px;">
+									<g:textArea name="notes" rows="10" value="${observationInstance?.notes}"
 										class="text ui-corner-all" />
 								</div>
 							</div>
 
-							<div class="span5"
-								style="border-radius: 5px; background-color: #c4cccf; margin: 0;">
-								<label
-									style="float: left; text-align: left; padding: 10px; width: auto;"><i
-									class="icon-tags"></i>Tags</label>
-
+							<div class="span5 block">
+								<h5><label><i
+									class="icon-tags"></i>Tags <small><g:message code="observation.tags.message" default="" /></small></label>
+								</h5>
 								<div class="create_tags section-item" style="clear: both;">
 									<ul id="tags" name="tags">
 										<g:each in="${observationInstance.tags}" var="tag">
@@ -408,21 +504,37 @@
 									</ul>
 								</div>
 							</div>
-						</div>
+							
+							
 					</div>
-				
+					</div>
 
-				<div class="span12" style="margin-top:20px;margin-bottom:40px;">
-	                <g:if test="${observationInstance?.id}">
-		        		<div class="btn btn-danger btn-large" style=" float:right; margin-right:5px;">
-	                    	<a href="${createLink(controller:'observation', action:'flagDeleted', id:observationInstance.id)}" onclick="return confirm('${message(code: 'default.observatoin.delete.confirm.message', default: 'This observation will be deleted. Are you sure ?')}');">Delete Observation </a>
-	            		</div>     
-		    		</g:if>
-                	<a id="addObservationSubmit" class="btn btn-primary btn-large" style=" float:right;margin-right:5px;">${form_button_val}</a>
-            	</div>
-            </div>
+				<div class="span12" style="margin-top: 20px; margin-bottom: 40px;">
+					<g:if test="${observationInstance?.id}">
+						<div class="btn btn-danger btn-large"
+							style="float: right; margin-right: 5px;">
+							<a
+								href="${createLink(controller:'observation', action:'flagDeleted', id:observationInstance.id)}"
+								onclick="return confirm('${message(code: 'default.observatoin.delete.confirm.message', default: 'This observation will be deleted. Are you sure ?')}');">Delete
+								Observation </a>
+						</div>
+					</g:if>
+					<a id="addObservationSubmit" class="btn btn-primary btn-large"
+						style="float: right; margin-right: 5px;"> ${form_button_val} </a>
+				</div></div>
 
-                </form>
+            </form>
+            
+            
+			<form id="upload_resource" enctype="multipart/form-data"
+				style="visibility: hidden; position: relative; float: left; z-index: 2;"
+				title="Add a photo for this observation"
+				class="${hasErrors(bean: observationInstance, field: 'resource', 'errors')}">
+
+				<!-- TODO multiple attribute is HTML5. need to chk if this gracefully falls back to default in non compatible browsers -->
+				<input type="file" id="attachFiles" name="resources"
+					accept="image/*" /> <span class="msg" style="float: right"></span>
+			</form>
 
                 </div>
             </div>
@@ -468,18 +580,16 @@
 
 		<g:javascript>
 	
-        var mouse_inside_groups_div = false;        
-        var mouse_inside_habitat_div = false;        
         var add_file_button = '<li id="add_file" class="addedResource" style="display:none;" onclick="$(\'#attachFiles\').select()[0].click();return false;"><div class="progress"><div id="translucent_box"></div><div id="progress_bar"></div ><div id="progress_msg"></div ></div></li>';
 
 	
 	$(document).ready(function(){
-
+		$('.dropdown-toggle').dropdown();
+		
 		$('#attachFiles').change(function(e){
   			$('#upload_resource').submit().find("span.msg").html("Uploading... Please wait...");
 		});
        	
-        	
         function progressHandlingFunction(e){
             if(e.lengthComputable){
                 var position = e.position || e.loaded;
@@ -549,70 +659,22 @@
 					}
                         } 
      	});  
-		/*
-		//"aaaaa" 
-		//alert("${observationInstance?.observedOn?.getTime()}")
-		var currDate = new Date();
-		if(${observationInstance?.observedOn != null}){
-			currDate = new Date(${observationInstance?.observedOn?.getTime()})
-			console.log(currDate);
-		}
-        var prettyDate =(currDate.getMonth()+1) + '/' + currDate.getDate() + '/' +  currDate.getFullYear();
-        $("#observedOn").val(prettyDate);
-        //alert(prettyDate);
-		*/
-
-        $("#selected_group").click(function(){
-            $("#group_options").show();
-            $(this).css({'background-color':'#fbfbfb', 'border-bottom-color':'#fbfbfb'});
-        });
-
-        $("#group_options").hover(function(){
-                mouse_inside_groups_div = true;
-                }, function(){
-                mouse_inside_groups_div = false;
-                });
-
-
-        $("body").mouseup(function(){
-                if(!mouse_inside_groups_div){
-                    $("#group_options").hide();
-                    $("#selected_group").css({'background-color':'#e5e5e5', 'border-bottom-color':'#aeaeae'});
-                }
-                });
 		
         $(".group_option").click(function(){
                 $("#group_id").val($(this).val());
                 var caret = "<span class='caret'></span>";
                 $("#selected_group").html($(this).html() + caret);
-                $("#group_options").hide();
+                //$("#group_options").hide();
                 $("#selected_group").css({'background-color':'#e5e5e5', 'border-bottom-color':'#aeaeae'});
+                
         });
 
-        $("#selected_habitat").click(function(){
-            $("#habitat_options").show();
-            $(this).css({'background-color':'#fbfbfb', 'border-bottom-color':'#fbfbfb'});
-        });
-
-        $("#habitat_options").hover(function(){
-                mouse_inside_habitat_div = true;
-                }, function(){
-                mouse_inside_habitat_div = false;
-                });
-
-
-        $("body").mouseup(function(){
-                if(!mouse_inside_habitat_div){
-                    $("#habitat_options").hide();
-                    $("#selected_habitat").css({'background-color':'#e5e5e5', 'border-bottom-color':'#aeaeae'});
-                }
-                });
-		
+       
         $(".habitat_option").click(function(){
                 $("#habitat_id").val($(this).val());
                 var caret = "<span class='caret'></span>";
                 $("#selected_habitat").html($(this).html() + caret);
-                $("#habitat_options").hide();
+                //$("#habitat_options").hide();
                 $("#selected_habitat").css({'background-color':'#e5e5e5', 'border-bottom-color':'#aeaeae'});
         });
        
@@ -639,13 +701,14 @@
         	var tags = $("ul[name='tags']").tagit("tags");
         	$.each(tags, function(index){
         		var input = $("<input>").attr("type", "hidden").attr("name", "tags."+index).val(this);
-        		console.log(input);
 				$('#addObservation').append($(input));	
         	})
         	$("#addObservation").submit();        	
         	return false;
         
 		});
+		
+		$(".tagit-hiddenSelect").css('display','none');
 	});
 
 
@@ -653,7 +716,7 @@
 		$(event.target).parent('.addedResource').remove();
 	}
 	
-	$( "#observedOn" ).datepicker();
+	$( "#observedOn" ).datepicker({ dateFormat: 'dd/mm/yy' });
 	
 </g:javascript>
 </body>

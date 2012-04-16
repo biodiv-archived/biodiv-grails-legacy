@@ -72,7 +72,7 @@ class Observation implements Taggable{
 		maxVotedSpeciesName nullable:true
 		resource validator : { val, obj -> val && val.size() > 0 }
 		observedOn validator : {val -> val < new Date()}
-		notes (size:0..400)
+		
 	}
 
 	static mapping = {
