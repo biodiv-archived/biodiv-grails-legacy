@@ -453,7 +453,7 @@ padding: 0;
 }
 
 .observation_location {
-background-color: #f7f7f7;         
+/* background-color: #f7f7f7;          */
 padding: 10px;
 }
 
@@ -675,8 +675,8 @@ box-shadow: 8px 0 6px -6px #5e5e5e;
 position:relative;
 top: -40px;         
 padding-right: 10px;     
-box-shadow: 8px 0 6px -6px #5e5e5e;
-background-color: rgba(106, 201, 162, 0.1);
+/* box-shadow: 8px 0 6px -6px #5e5e5e; */
+/* background-color: rgba(106, 201, 162, 0.1); */
 }
 
 .tags-tools {

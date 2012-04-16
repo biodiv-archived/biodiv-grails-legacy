@@ -386,7 +386,7 @@
 								<input id="address" type="text" title="Find by place name"
 									class="section-item" />
 								<div id="current_location" class="section-item">
-									<a href="#" onclick="return false;">Use current location</a><span class="msg"> or</span>
+									<a href="#" onclick="return false;">Use current location</a>
 								</div>
 								<div id="geotagged_images" style="padding:5px;">
 									<div class="title" style="display: none">Use location

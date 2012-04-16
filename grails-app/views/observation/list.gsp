@@ -96,18 +96,8 @@
 										onclick="$(this).parent().css('background-color', '#9acc57'); showMapView(); return false;">
 										Map view <span class="caret"></span> </a>
 								</div>
-
-
-								<div id="observations_list_map" class="observation"
-									style="clear: both; display: none;">
-									<obv:showObservationsLocation
-										model="['observationInstanceList':totalObservationInstanceList]">
-									</obv:showObservationsLocation>
-								</div>
-
-
 								<div class="btn-group"
-									style="float: right; margin-right: 80px; z-index: 10">
+									style="float: right; margin-right: 90px; z-index: 10">
 									<button id="selected_sort"
 										class="btn dropdown-toggle" data-toggle="dropdown" href="#"><g:if
 											test="${params.sort == 'visitCount'}">
@@ -134,6 +124,16 @@
 									
 
 								</div>
+
+								<div id="observations_list_map" class="observation"
+									style="clear: both; display: none;">
+									<obv:showObservationsLocation
+										model="['observationInstanceList':totalObservationInstanceList]">
+									</obv:showObservationsLocation>
+								</div>
+
+
+								
 
 							</div>
 
