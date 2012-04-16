@@ -6,7 +6,8 @@
      		<i class="icon-flag"></i>
     		Flag
     	</a>
-    
+    	
+    	
 	    <div id="flag-options" style="display:none">
 	    	<form id="flag-form" action="${createLink(controller:'observation', action:'flagObservation', id:observationInstance.id)}">
 		    	<g:each in="${FlagType.list() }" var="flag" status="i">
@@ -19,9 +20,21 @@
 				</g:each>
 		    	
 		    	<input type="text" name="notes"></input><br/>
-		    	<input type="submit" value="Flag"></input>
+		    	<input class="btn" type="submit" value="Flag"></input>
 		    	<button type="button" id="flag-close" value="close">close</button>
 		  	</form>
+		  	<hr/>
+		  	<g:if test="${observationInstance.flagCount>0}">
+		  		<span style="font-weight:bold">Flagged</span>
+		  	</g:if>
+		  	<div>
+	    	<g:each in="${observationInstance.fetchAllFlags()}">
+				<li style="padding: 0 5px; clear: both;">
+					${it.author.username} : ${it.flag.value()}
+				</li>
+			</g:each>
+		</div>
+    	
 	    </div>
     </div>
 </div>
