@@ -69,8 +69,9 @@ $(document).ready(function(){
 		id="searchbox" class="form-horizontal">
 		<div class="input-append">
 			<input type="text" name="query" id="searchTextField" value=""
-			size="26" class="span4"
-			placeholder="Enter your search key" /><input id="search"  class="btn btn-primary searchButton" type="submit"
+			size="26"
+			placeholder="Enter your search key" />
+                        <input id="search"  class="btn btn-default" type="submit"
 			value="Search"/></div>
 
 		<g:hiddenField name="start" value="0" />
