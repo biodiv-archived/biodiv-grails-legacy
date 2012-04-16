@@ -139,8 +139,6 @@
 							</g:hasErrors>
 
 							<form id="addRecommendation"
-								
-								class="form-horizontal">
 								action="${createLink(controller:'observation', action:'addRecommendationVote')}"
 								method="POST" class="form-horizontal">
 								
