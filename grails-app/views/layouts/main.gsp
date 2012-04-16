@@ -30,11 +30,11 @@
 
 <script src="${resource(dir:'plugins',file:'jquery-1.7/js/jquery/jquery-1.7.min.js', absolute:true)}" type="text/javascript" ></script>
 
+<script src="${resource(dir:'plugins',file:'jquery-ui-1.8.15/jquery-ui/js/jquery-ui-1.8.15.custom.min.js', absolute:true)}" type="text/javascript" ></script>
 <g:if test="${params.controller  != 'species'}">
 <g:javascript src="bootstrap.js"
 	base="${grailsApplication.config.grails.serverURL+'/bootstrap/js/'}"></g:javascript>
 </g:if>
-<script src="${resource(dir:'plugins',file:'jquery-ui-1.8.15/jquery-ui/js/jquery-ui-1.8.15.custom.min.js', absolute:true)}" type="text/javascript" ></script>
 
 <link rel="stylesheet" type="text/css" media="screen"
 	href="${resource(dir:'js/jquery/jquery.jqGrid-4.1.2/css',file:'ui.jqgrid.css', absolute:true)}" />

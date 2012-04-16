@@ -287,12 +287,12 @@
 							<label for="observedOn" class="control-label"><i
 								class="icon-calendar"></i>
 							<g:message code="observation.observedOn.label"
-									default="Observed on" /> </label>
+									default="Observed on" /></label>
 
 							<div class="controls textbox">
 								<input name="observedOn" type="date" id="observedOn"
 									value="${observationInstance?.observedOn?.format('dd/MM/yyyy')}"
-									placeholder="Select date of observation" />
+									placeholder="Select date of observation (dd/MM/yyyy)" />
 								<div class="help-inline">
 									<g:renderErrors bean="${observationInstance}"
 										field="observedOn" />
@@ -381,11 +381,10 @@
 							<div class="map_search">
 								<input id="address" type="text" title="Find by place name"
 									class="section-item" />
-								<div id="current_location" class="section-item"
-									style="float: left">
-									<a href="#" onclick="return false;">Use current location</a>
+								<div id="current_location" class="section-item">
+									<a href="#" onclick="return false;">Use current location</a><span class="msg"> or</span>
 								</div>
-								<div id="geotagged_images" class="section-item">
+								<div id="geotagged_images" style="padding:5px;">
 									<div class="title" style="display: none">Use location
 										from geo-tagged image:</div>
 									<div class="msg" style="display: none">Select image if
@@ -429,12 +428,12 @@
 	                        <div class="row control-group">
 	                        	<label for="location_accuracy" class="control-label" style="padding:0px"><g:message
 									code="observation.geoprivacy.label"
-									default="Hide precise location?" /> </label>
+									default="Geoprivacy" /> </label>
 	                                
 	                            <div class="controls">  
                 						<input type="checkbox"
 	                                        name="geo_privacy" value="geo_privacy" />
-                						Hide
+                						Hide precise location
 	                            </div>
 	                        </div>
 	                        <hr>
@@ -641,6 +640,7 @@
 				var metadataEle = $(html)
 				metadataEle.each(function() {
 					$('.geotagged_image', this).load(function(){
+						
 						update_geotagged_images_list($(this));		
 					});
 				})

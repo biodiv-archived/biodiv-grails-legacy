@@ -80,22 +80,18 @@ background-color: #fbfbfb;
 background-color: #ffffff;
 }
 
-.observations {
-padding: 10px;
-}
-
 .button-bar {
 margin-top: 10px;    
 margin-bottom: 10px;
 }
 
 .tags_section {
-margin-top:70px;
+margin-top:20px;
 }
 
 
 .prop {
-	clear: both;
+ 	clear: both; 
 }
 
 .prop.tablet {
@@ -120,7 +116,7 @@ margin-top:70px;
 }
 
 .observation_story .prop .name {
-width:100px;
+	width:110px;
 }
 
 .observation_story .prop .value {
@@ -499,7 +495,7 @@ margin-bottom: 40px;
 
 #map_view_bttn {
 float: left;    
-padding: 10px 10px 0 10px;
+/* padding: 10px 10px 0 10px; */
 border-top-left-radius: 5px;
 border-top-right-radius: 5px;
 z-index: 10;
@@ -516,9 +512,13 @@ height: 120px;
 }
 
 .dropdown-menu a {
-	width: 100%;
+/* 	width: 100%; */
 	overflow: hidden;
 	text-overflow: ellipsis;
+}
+
+.dropdown-menu li > a:hover, .dropdown-menu .active > a, .dropdown-menu .active > a:hover {
+	background-color:#6AC9A2
 }
 
 /* .btn-group.open .dropdown-menu { */
@@ -644,11 +644,13 @@ float: right;
 	margin:2px;
 }
 
+.observations {
+padding: 10px;
+box-shadow: 8px 0 6px -6px #5e5e5e;
+}
 .observations_list {
 position:relative;
 top: -40px;         
-padding-right: 10px;     
-box-shadow: 8px 0 6px -6px #5e5e5e;
 }
 
 .tags-tools {
@@ -795,10 +797,28 @@ td.errors textarea {
 
 .sort_filter_label {
 	padding : 0px 2px 0px 5px;
-	width : 95%;
+/* 	width : 95%; */
 	text-align:left;
 }
 
 input, button, select, textarea {
 	font: 13px/1.5 'Helvetica Neue', Arial, 'Liberation Sans', FreeSans, sans-serif;
+}
+
+.highlight {
+	font-weight:bold;
+}
+
+.info-message {
+	padding-top:10px;
+	padding-bottom:10px;
+}
+
+.tagsView {
+	padding:0px;
+	margin-left:0px;
+}
+
+.group_option {
+	margin-left:0px;
 }

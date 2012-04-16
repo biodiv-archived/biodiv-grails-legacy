@@ -14,8 +14,8 @@ border: 0;
 
 $(document).ready(function(){
 
-	$("#speciesGroupFilter").buttonset();
-	$("#speciesGroupFilter label").each(function() {
+	$("#speciesGroupFilter").button();
+	$("#speciesGroupFilter button").each(function() {
 		$(this).hover(function() {
 			$(this).css('backgroundPosition', '0px -32px');
 		}, function() {
@@ -27,11 +27,11 @@ $(document).ready(function(){
 		});
 	})
 		
-	$('#speciesGroupFilter label[value$="${params.sGroup}"]').attr('aria-pressed', 'true').addClass('ui-state-hover').addClass('ui-state-active').css('backgroundPosition', '0px -64px');
+	$('#speciesGroupFilter button[value$="${params.sGroup}"]').addClass('active').css('backgroundPosition', '0px -64px');
 	
 	
-	$("#habitatFilter").buttonset();
-	$("#habitatFilter label").each(function() {
+	$("#habitatFilter").button();
+	$("#habitatFilter button").each(function() {
 		$(this).hover(function() {
 			$(this).css('backgroundPosition', '0px -32px');
 		}, function() {
@@ -43,55 +43,46 @@ $(document).ready(function(){
 		});
 	})
 	
-	$('#habitatFilter label[value$="${params.habitat}"]').attr('aria-pressed', 'true').addClass('ui-state-hover').addClass('ui-state-active').css('backgroundPosition', '0px -64px');
-        
-        $('#habitatFilter label').popover({placement:'bottom'});
+	$('#habitatFilter button[value$="${params.habitat}"]').addClass('active').css('backgroundPosition', '0px -64px');
+    $('#habitatFilter button').popover({placement:'bottom'});
 });
 </g:javascript>
-
-
-<div id="speciesGroupFilter" class="filterBar" style="clear: both;">
-	<!-- g:paginateOnSpeciesGroup/-->
+<div class="class="btn-group">
+<div id="speciesGroupFilter" 
+	data-toggle="buttons-radio">
 	<%def othersGroup = SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.OTHERS)%>
 	<g:each in="${SpeciesGroup.list() }" var="sGroup" status="i">
 		<g:if test="${sGroup != othersGroup }">
-			<input type="radio" name="specuesGroupFilter"
-				id="speciesGroupFilter${i}" value="${sGroup.id }" />
-			<label for="speciesGroupFilter${i}" value="${sGroup.id}" title="${sGroup.name}" class="group_icon"
-						style="background: url('${createLinkTo(dir: 'images', file: sGroup.icon(ImageType.SMALL)?.fileName?.trim(), absolute:true)}') no-repeat; background-position: 0 0; width: 32px; height: 32px; margin-left: 6px;">				
-			</label>
+			<button class="btn" value="${sGroup.id}"
+				title="${sGroup.name}"
+				style="background-image: url('${createLinkTo(dir: 'images', file: sGroup.icon(ImageType.SMALL)?.fileName?.trim(), absolute:true)}'); background-position: 0 0; width: 32px; height: 32px; "></button>
 		</g:if>
 
 	</g:each>
-
-	<input type="radio" name="specuesGroupFilter" id="specuesGroupFilter20"
-		value="${othersGroup.id}" />
-	<label for="speciesGroupFilter20" value="${othersGroup.id}" title="${othersGroup.name}" class="group_icon"
-						style="background: url('${createLinkTo(dir: 'images', file: othersGroup.icon(ImageType.SMALL)?.fileName?.trim(), absolute:true)}') no-repeat; background-position: 0 0; width: 32px; height: 32px; margin-left: 6px;">				
-	</label>
-
+	<button class="btn " value="${othersGroup.id}"
+		title="${othersGroup.name}" 
+		style="background-image: url('${createLinkTo(dir: 'images', file: othersGroup.icon(ImageType.SMALL)?.fileName?.trim(), absolute:true)}'); background-position: 0 0; width: 32px; height: 32px; "></button>
 </div>
-<div id="habitatFilter" class="filterBar" style="clear: both">
+
+
+
+<div id="habitatFilter" data-toggle="buttons-radio">
 	<%def othersHabitat = species.Habitat.findByName(HabitatType.OTHERS.value())%>
 	<g:each in="${species.Habitat.list()}" var="habitat" status="i">
 		<g:if test="${habitat.id != othersHabitat.id }">
-			<input type="radio" name="habitatFilter" id="habitatFilter${i}"
-				value="${habitat.id}" style="display: none" />
-			<label for="habitatFilter${i}" value="${habitat.id}" title="${habitat.name}" class="group_icon"
-							style="background: url('${createLinkTo(dir: 'images', file: habitat.icon(ImageType.SMALL)?.fileName?.trim(), absolute:true)}') no-repeat; background-position: 0 0; width: 32px; height: 32px; margin-left: 6px;" 
-                                                        data-content="${message(code: 'habitat.definition.' + habitat.name)}"
-                                                        rel="popover"
-                                                        data-original-title="A Title">				
-			</label>
+			<button class="btn " value="${habitat.id}"
+				title="${habitat.name}"
+				style="background-image: url('${createLinkTo(dir: 'images', file: habitat.icon(ImageType.SMALL)?.fileName?.trim(), absolute:true)}'); background-position: 0 0; width: 32px; height: 32px; "
+				data-content="${message(code: 'habitat.definition.' + habitat.name)}"
+				rel="popover" data-original-title="A Title"></button>
 		</g:if>
 	</g:each>
-	<input type="radio" name="habitatFilter" id="habitatFilter20"
-			value="${othersHabitat.id}" style="display: none" />
-		<label for="habitatFilter20" value="${othersHabitat.id}" title="${othersHabitat.name}" class="group_icon"
-						style="background: url('${createLinkTo(dir: 'images', file: othersHabitat.icon(ImageType.SMALL)?.fileName?.trim(), absolute:true)}') no-repeat; background-position: 0 0; width: 32px; height: 32px; margin-left: 6px;"
-                                                data-content="${message(code: 'habitat.definition.' + othersHabitat.name)}"
-                                                rel="popover">				
-		</label>
+	<button class="btn" value="${othersHabitat.id}"
+		title="${othersHabitat.name}" class="group_icon"
+		style="background-image: url('${createLinkTo(dir: 'images', file: othersHabitat.icon(ImageType.SMALL)?.fileName?.trim(), absolute:true)}'); background-position: 0 0; width: 32px; height: 32px; "
+		data-content="${message(code: 'habitat.definition.' + othersHabitat.name)}"
+		rel="popover"></button>
 </div>
 
 
+</div>
