@@ -3,11 +3,16 @@
 
 <div class="view_tags">
 	<ul class="tagit">
+		<g:if test="${tags}">
 		<g:each in="${tags}">
 			<li class="tagit-choice" style="padding:0 5px;clear:both;">
 				${it["name"]} <span class="tag_stats"> ${it["count"]}</span>
 			</li>
 		</g:each>
+		</g:if>
+		<g:else>
+			<span class="msg">No tags</span>
+		</g:else>
 	</ul>
 	<g:javascript>
 	$(document).ready(function() {

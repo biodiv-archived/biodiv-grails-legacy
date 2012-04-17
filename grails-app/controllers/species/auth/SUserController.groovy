@@ -99,7 +99,9 @@ class SUserController extends UserController {
 			}
 
 		if(params.long('id') == springSecurityService.currentUser?.id) {
-
+			//Cannot change email id with which user was registered
+			params.email = user.email;
+			
 			def oldPassword = user."$passwordFieldName"
 			user.properties = getTrimmedParams(params)
 			if (params.password && !params.password.equals(oldPassword)) {

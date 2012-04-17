@@ -26,12 +26,12 @@
 
 	<table>
 		<tr>
-			<td><label for="username"><g:message code='spring.security.ui.forgotPassword.username'/></label></td>
-			<td><g:textField name="username" size="25" /></td>
+			<td><label for="email"><g:message code='spring.security.ui.forgotPassword.username'/></label></td>
+			<td><g:textField name="email" size="25" /></td>
 		</tr>
 	</table>
 
-	<s2ui:submitButton elementId='reset' form='forgotPasswordForm' messageCode='spring.security.ui.forgotPassword.submit'/>
+	<s2ui:submitButton elementId='reset' form='forgotPasswordForm' messageCode='spring.security.ui.forgotPassword.submit' class="btn btn-primary" style="float:right;"/>
 
 	</g:else>
 

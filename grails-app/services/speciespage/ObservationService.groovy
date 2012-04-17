@@ -20,6 +20,7 @@ import species.participation.RecommendationVote;
 import species.participation.ObservationFlag.FlagType
 import species.participation.RecommendationVote.ConfidenceType;
 import species.sourcehandler.XMLConverter;
+import species.utils.Utils;
 
 class ObservationService {
 
@@ -243,6 +244,7 @@ class ObservationService {
 		if(canName) {
 			//findBy returns first...assuming taxon concepts wont hv same canonical name and different rank
 			canName = Utils.cleanName(canName);
+			log.debug "Resolving recoName to canName : "+taxonConcept.canonicalForm
 			reco = Recommendation.findByNameIlike(canName);
 			log.debug "Found taxonConcept : "+taxonConcept;
 			log.debug "Found reco : "+reco;

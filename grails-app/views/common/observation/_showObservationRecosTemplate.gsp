@@ -1,33 +1,4 @@
 <%@page import="species.utils.ImageType"%>
-<style>
-.reco_block {
-	background-color: #ffffff;
-	padding: 5px;
-	margin-bottom: 3px;
-	border-radius: 5px;
-	min-height:30px;
-}
-
-.reco {
-	background-color: #ffffff;
-	padding: 3px;
-	width: 75%;
-	float: left;
-}
-
-.iAgree {
-	float: right;
-}
-
-.users {
-	clear: both;
-	float:right;
-}
-
-.name {
-	font-weight: bold;
-}
-</style>
 
 <g:if test="${result.size() > 0 }">
 	<g:each in="${result}" var="r">
@@ -51,7 +22,7 @@
 				</div>
 				<span class="voteCount"><span id="votes_${r.recoId}">
 						${r.noOfVotes} </span> <g:if test="${r.noOfVotes <= 1}"> user thinks</g:if>
-					<g:else> users think</g:else> it is:</span><span class="name"> <g:if
+					<g:else> users think</g:else> it is:</span><span class="highlight"> <g:if
 						test="${r.canonicalForm}">
 						<g:link controller="species" action="show" id="${r.speciesId}">
 							<i>
@@ -63,7 +34,6 @@
 							${r.name}
 						</i>
 					</g:else> </span>
-				<!-- div style="width:${(r.noOfVotes/totalVotes)*100}%" class="pollbar"></div-->
 				
 			</div> <g:javascript>
                         $(document).ready(function(){
@@ -79,28 +49,6 @@
                         </g:javascript>
 		</li>
 	</g:each>
-	
-<g:javascript>
-
-	function showRecos(data, textStatus) {
-		jQuery('#recoSummary').html(jQuery(data).find('recoHtml').text());
-		var infoMsg = jQuery(data).find('recoVoteMsg').text();
-		if(infoMsg){
-			$("#seeMoreMessage").html(infoMsg).show().removeClass('error').addClass('message');
-		}else{
-			$("#seeMoreMessage").hide();
-		}
-	}
-	
-	function handleError(XMLHttpRequest,textStatus,errorThrown) {
-		if(XMLHttpRequest.status == 401 || XMLHttpRequest.status == 200) {
-			show_login_dialog();
-		} else {	    
-			alert(errorThrown);
-		}
-	}
-                        
-</g:javascript>	
 </g:if>
 <g:else>
 	<g:message code="recommendations.zero.message" />

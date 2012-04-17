@@ -11,7 +11,7 @@
 }
 
 .jcarousel-skin-ie7 .jcarousel-container-horizontal {
-    width: 245px;
+/*     width: 245px; */
     padding: 20px 40px;
 }
 
@@ -26,7 +26,7 @@
 }
 
 .jcarousel-skin-ie7 .jcarousel-clip-horizontal {
-    width:  245px;
+/*     width:  245px; */
     height: 77px;
 }
 
@@ -38,7 +38,7 @@
 .jcarousel-skin-ie7 .jcarousel-item {
     width: 75px;
     height: 75px;
-    border: 1px solid #fff;
+/*     border: 1px solid #fff; */
 }
 
 .jcarousel-skin-ie7 .jcarousel-item:hover,
