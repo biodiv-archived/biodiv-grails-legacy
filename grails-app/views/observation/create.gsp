@@ -294,9 +294,17 @@
 								<input name="observedOn" type="date" id="observedOn"
 									value="${observationInstance?.observedOn?.format('dd/MM/yyyy')}"
 									placeholder="Select date of observation (dd/MM/yyyy)" />
+								
 								<div class="help-inline">
-									<g:renderErrors bean="${observationInstance}"
-										field="observedOn" />
+									<g:hasErrors bean="${observationInstance}" field="observedOn">
+									<g:if test="${observationInstance.observedOn == null}">
+										<g:message code="observation.observedOn.validator.invalid_date" />
+									</g:if>
+									<g:else>
+										<g:message code="observation.observedOn.validator.future_date" />
+									</g:else>
+										
+									</g:hasErrors>
 								</div>
 
 							</div>
