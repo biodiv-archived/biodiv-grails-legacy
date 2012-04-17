@@ -9,6 +9,7 @@ import org.grails.taggable.TagLink;
 import java.util.Date;
 import species.Resource;
 import species.Habitat;
+import species.utils.Utils;
 import species.Resource.ResourceType;
 import species.TaxonomyDefinition;
 import species.auth.SUser;
@@ -236,27 +237,35 @@ class ObservationService {
 		}
 		return urlList
 	}
-
+	
 	private Recommendation getRecommendation(recoName, canName) {
 		def reco, taxonConcept;
 		if(canName) {
 			//findBy returns first...assuming taxon concepts wont hv same canonical name and different rank
-			taxonConcept = TaxonomyDefinition.findByCanonicalFormIlike(canName);
-			log.debug "Resolving recoName to canName : "+taxonConcept.canonicalForm
-			reco = Recommendation.findByNameIlike(taxonConcept.canonicalForm);
+			canName = Utils.cleanName(canName);
+			reco = Recommendation.findByNameIlike(canName);
 			log.debug "Found taxonConcept : "+taxonConcept;
 			log.debug "Found reco : "+reco;
 			if(!reco) {
-				reco = new Recommendation(name:taxonConcept.canonicalForm, taxonConcept:taxonConcept);
-				recommendationService.save(reco);
+				taxonConcept = TaxonomyDefinition.findByCanonicalFormIlike(canName);
+				if(taxonConcept) {
+					reco = new Recommendation(name:taxonConcept.canonicalForm, taxonConcept:taxonConcept);
+					if(!recommendationService.save(reco)) {
+						reco = null;
+					}
+					return reco;
+				} else {
+					log.error "Given taxonomy canonical name is invalid"
+				}
 			}
 		}
 
-		else if(recoName) {
+		if(recoName) {
+			recoName = Utils.cleanName(recoName);
 			def c = Recommendation.createCriteria();
 			def result = c.list {
 				ilike('name', recoName);
-				(taxonConcept) ? eq('taxonConcept', taxonConcept) : isNull('taxonConcept');
+				//(taxonConcept) ? eq('taxonConcept', taxonConcept) : isNull('taxonConcept');
 			}
 			reco = result?result[0]:null;
 		}
@@ -270,7 +279,7 @@ class ObservationService {
 
 		return reco;
 	}
-
+	
 	/**
 	 * 
 	 */
