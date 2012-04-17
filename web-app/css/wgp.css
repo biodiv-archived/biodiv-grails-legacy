@@ -878,3 +878,7 @@ input, button, select, textarea {
 .msg {
 	font-style:italic;
 }
+
+.icon-red {
+  background-image: url(../bootstrap/img/glyphicons-halflings-red.png);
+}
