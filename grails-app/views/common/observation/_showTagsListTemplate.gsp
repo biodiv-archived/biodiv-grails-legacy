@@ -4,9 +4,9 @@
 <div class="view_tags">
 	<ul class="tagit">
 		<g:if test="${tags}">
-		<g:each in="${tags}">
+		<g:each in="${tags.entrySet()}">
 			<li class="tagit-choice" style="padding:0 5px;clear:both;">
-				${it["name"]} <span class="tag_stats"> ${it["count"]}</span>
+				${it.getKey()} <span class="tag_stats"> ${it.getValue()}</span>
 			</li>
 		</g:each>
 		</g:if>

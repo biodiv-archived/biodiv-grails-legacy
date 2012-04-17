@@ -124,7 +124,7 @@ class ObservationTagLib {
 	
 	
 	def showTagsCloud = {attrs, body->
-		out << render(template:"/common/observation/showTagsCloudTemplate", model:attrs.model);
+		out << render(template:"/common/observation/showTagsCloudTemplate", model:[tags:attrs.model.tags]);
 	}
 	
 	
