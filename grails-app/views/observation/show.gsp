@@ -173,7 +173,7 @@
 					<!--  static species content -->
 
 					<div class="sidebar_section">
-						<h3>Related observations</h3>
+						<h5>Related observations</h5>
 						<div class="sidebar_section tile" style="clear: both">
 							<div class="title">Other observations of the same species</div>
 							<obv:showRelatedStory

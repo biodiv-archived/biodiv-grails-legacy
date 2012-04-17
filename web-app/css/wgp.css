@@ -370,9 +370,8 @@ textarea#notes {
 }
 
 .recommendations {
-    background-color: #9acc57;
+    background-color: #a6dfc8;
 /*     border-radius: 7px 7px 7px 7px; */
-    margin-top: 10px;
     padding: 10px;
 }
 
@@ -422,7 +421,7 @@ height: 100px;
 }
 
 .observation .observation_story {
-background-color: #fefad5;    
+background-color: #ffffff;    
 }
 
 #addObservation #imagesList {
@@ -455,6 +454,7 @@ padding: 0;
 .observation_location {
 background-color: #f7f7f7;         
 padding: 10px;
+box-shadow: 1px 1px 3px #5e5e5e inset;         
 }
 
 .observation_location .name{
@@ -463,10 +463,9 @@ margin-right: 5px;
 }
 
 .sidebar_section {
-        border-bottom: 1px solid #CCCCCC;
-        border-top: 1px solid #EEEEEE;
         overflow: hidden;
         padding-bottom: 10px;
+        margin-bottom: 20px;
 }
 
 .sidebar_section .title {
@@ -480,8 +479,6 @@ margin-right: 5px;
 
 .tile {
     background-color: #FFFFFF;
-    border-radius: 3px 3px 3px 3px;
-    box-shadow: 0 1px 1px #CCCCCC;
     color: #333333;
     display: block;
     margin-bottom: 12px;
@@ -508,7 +505,6 @@ border: 1px solid #ffffff;
 
 .map_wrapper {
 padding: 10px;
-background-color: #9acc57;         
 border-radius: 5px;
 border-top-left-radius: 0;
 margin-bottom: 40px;
@@ -517,9 +513,8 @@ margin-bottom: 40px;
 #map_view_bttn {
 float: left;    
 /* padding: 10px 10px 0 10px; */
-border-top-left-radius: 5px;
-border-top-right-radius: 5px;
 z-index: 10;
+margin-bottom:2px;
 }
 
 .all_content {
@@ -935,4 +930,10 @@ margin: 0;
 	height: 0px;
 	text-align: center;
 	line-height: 0px;
+}
+
+.tooltip {
+padding: 5px;    
+border: 0;         
+background-color: transparent;        
 }

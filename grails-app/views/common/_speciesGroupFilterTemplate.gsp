@@ -4,12 +4,6 @@
 <g:javascript src="jquery/jquery.url.js"
 	base="${grailsApplication.config.grails.serverURL+'/js/'}" />
 
-<style>
-.popover.bottom {
-background-color: transparent;    
-border: 0;
-}
-</style>
 <g:javascript>
 
 $(document).ready(function(){
@@ -28,6 +22,7 @@ $(document).ready(function(){
 	})
 		
 	$('#speciesGroupFilter button[value$="${params.sGroup}"]').addClass('active').css('backgroundPosition', '0px -64px');
+        $('#speciesGroupFilter button').tooltip({placement:'top'});
 	
 	
 	$("#habitatFilter").button();
@@ -44,7 +39,7 @@ $(document).ready(function(){
 	})
 	
 	$('#habitatFilter button[value$="${params.habitat}"]').addClass('active').css('backgroundPosition', '0px -64px');
-    $('#habitatFilter button').popover({placement:'bottom'});
+    $('#habitatFilter button').tooltip({placement:'bottom'});
 });
 </g:javascript>
 <div class="class="btn-group">
@@ -74,14 +69,14 @@ $(document).ready(function(){
 				title="${habitat.name}"
 				style="background-image: url('${createLinkTo(dir: 'images', file: habitat.icon(ImageType.SMALL)?.fileName?.trim(), absolute:true)}'); background-position: 0 0; width: 32px; height: 32px; "
 				data-content="${message(code: 'habitat.definition.' + habitat.name)}"
-				rel="popover" data-original-title="A Title"></button>
+				rel="tooltip" data-original-title="A Title"></button>
 		</g:if>
 	</g:each>
 	<button class="btn" value="${othersHabitat.id}"
 		title="${othersHabitat.name}" class="group_icon"
 		style="background-image: url('${createLinkTo(dir: 'images', file: othersHabitat.icon(ImageType.SMALL)?.fileName?.trim(), absolute:true)}'); background-position: 0 0; width: 32px; height: 32px; "
 		data-content="${message(code: 'habitat.definition.' + othersHabitat.name)}"
-		rel="popover"></button>
+		rel="tooltip"></button>
 </div>
 
 
