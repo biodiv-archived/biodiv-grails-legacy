@@ -101,7 +101,7 @@ class SUserController extends UserController {
 		if(params.long('id') == springSecurityService.currentUser?.id) {
 
 			def oldPassword = user."$passwordFieldName"
-			user.properties = params
+			user.properties = getTrimmedParams(params)
 			if (params.password && !params.password.equals(oldPassword)) {
 				String salt = saltSource instanceof NullSaltSource ? null : params.username
 				user."$passwordFieldName" = springSecurityUiService.encodePassword(params.password, salt)
@@ -312,5 +312,11 @@ class SUserController extends UserController {
 
 	protected List sortedRoles() {
 		lookupRoleClass().list().sort { it.authority }
+	}
+	
+	private Map getTrimmedParams(Map m){
+		def res = [:]
+		m.each {key, value -> res[key] = value.toString().trim()}
+		return res
 	}
 }
