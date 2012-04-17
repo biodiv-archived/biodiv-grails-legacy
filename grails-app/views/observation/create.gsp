@@ -69,10 +69,6 @@
 	padding-top: 15px;
 }
 
-.form-horizontal .control-group {
-	margin-bottom: 5px;
-}
-
 .btn-large {
 	font-size: 13px;
 }
@@ -113,7 +109,7 @@
 <body>
 	<div class="container outer-wrapper">
 
-		<div class="row">
+		<div class="observation_create row">
 			<div class="span12">
 				<div class="page-header">
 					<h1>
@@ -523,7 +519,7 @@
 								Observation </a>
 						</div>
 					</g:if>
-					<a id="addObservationSubmit" class="btn btn-primary btn-large"
+					<a id="addObservationSubmit" class="btn btn-primary"
 						style="float: right; margin-right: 5px;"> ${form_button_val} </a>
 				</div></div>
 

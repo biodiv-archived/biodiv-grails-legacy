@@ -185,3 +185,23 @@ function loadIFrame() {
 	uBioLink.remove();
 	$('iframe#uBioIframe').attr('src', url).height("500px").width("100%");
 }
+
+
+
+function showRecos(data, textStatus) {
+	jQuery('#recoSummary').html(jQuery(data).find('recoHtml').text());
+	var infoMsg = jQuery(data).find('recoVoteMsg').text();
+	if(infoMsg){
+		$("#seeMoreMessage").html(infoMsg).show().removeClass('error').addClass('message');
+	}else{
+		$("#seeMoreMessage").hide();
+	}
+}
+
+function handleError(XMLHttpRequest,textStatus,errorThrown) {
+	if(XMLHttpRequest.status == 401 || XMLHttpRequest.status == 200) {
+		show_login_dialog();
+	} else {	    
+		alert(errorThrown);
+	}
+}

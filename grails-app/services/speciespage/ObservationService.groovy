@@ -19,6 +19,7 @@ import species.participation.RecommendationVote;
 import species.participation.ObservationFlag.FlagType
 import species.participation.RecommendationVote.ConfidenceType;
 import species.sourcehandler.XMLConverter;
+import species.utils.Utils;
 
 class ObservationService {
 
@@ -241,22 +242,31 @@ class ObservationService {
 		def reco, taxonConcept;
 		if(canName) {
 			//findBy returns first...assuming taxon concepts wont hv same canonical name and different rank
-			taxonConcept = TaxonomyDefinition.findByCanonicalFormIlike(canName);
+			canName = Utils.cleanName(canName);
 			log.debug "Resolving recoName to canName : "+taxonConcept.canonicalForm
-			reco = Recommendation.findByNameIlike(taxonConcept.canonicalForm);
+			reco = Recommendation.findByNameIlike(canName);
 			log.debug "Found taxonConcept : "+taxonConcept;
 			log.debug "Found reco : "+reco;
 			if(!reco) {
-				reco = new Recommendation(name:taxonConcept.canonicalForm, taxonConcept:taxonConcept);
-				recommendationService.save(reco);
-			}
+				taxonConcept = TaxonomyDefinition.findByCanonicalFormIlike(canName);
+				if(taxonConcept) {
+					reco = new Recommendation(name:taxonConcept.canonicalForm, taxonConcept:taxonConcept);
+					if(!recommendationService.save(reco)) {
+						reco = null;
+					}
+					return reco;
+				} else {
+					log.error "Given taxonomy canonical name is invalid"
+				}
+			} 
 		}
 
-		else if(recoName) {
+		if(recoName) {
+			recoName = Utils.cleanName(recoName);
 			def c = Recommendation.createCriteria();
 			def result = c.list {
 				ilike('name', recoName);
-				(taxonConcept) ? eq('taxonConcept', taxonConcept) : isNull('taxonConcept');
+				//(taxonConcept) ? eq('taxonConcept', taxonConcept) : isNull('taxonConcept');
 			}
 			reco = result?result[0]:null;
 		}

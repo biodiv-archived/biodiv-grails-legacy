@@ -30,7 +30,7 @@ class SUserTagLib {
 	 * 
 	 */
 	def ifOwnsOrIsPublic = { attrs, body ->
-		if (SUserService.ifOwns(attrs.model.user) && attrs.model.isPublic) {
+		if (SUserService.ifOwns(attrs.model.user) || attrs.model.isPublic) {
 			out << body()
 		}
 	}

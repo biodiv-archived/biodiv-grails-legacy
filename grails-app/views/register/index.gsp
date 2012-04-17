@@ -88,7 +88,7 @@
 												By registering you agree to our <a href="/terms">Terms and Conditions</a> on the use of our site
 												</span> <s2ui:submitButton
 														elementId='createButton' form='registerForm'
-														messageCode='spring.security.ui.login.register' /></td>
+														messageCode='spring.security.ui.login.register' class="btn btn-primary"/></td>
 
 											</tr>
 										</tbody>

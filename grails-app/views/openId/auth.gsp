@@ -69,7 +69,7 @@
 														action='forgotPassword'>
 														<g:message code='spring.security.ui.login.forgotPassword' />
 													</g:link> </span> <s2ui:submitButton elementId='loginButton'
-													form='loginForm'
+													form='loginForm' class="btn btn-primary"
 													messageCode='spring.security.ui.login.login' />
 											</td>
 										</tr>

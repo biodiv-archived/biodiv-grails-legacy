@@ -22,7 +22,7 @@
 
 <g:javascript src="species/carousel.js"
 	base="${grailsApplication.config.grails.serverURL+'/js/'}" />
-
+	
 </head>
 <body>
 	<div class="container outer-wrapper">
@@ -34,7 +34,7 @@
 					${fieldValue(bean: SUserInstance, field: "name")}
 					<sUser:ifOwns model="['user':SUserInstance]">
 						<span style="font-size: 60%; float: right;" class="btn btn-primary"> <g:link
-								controller="SUser" action="edit" id="${SUserInstance.id }">Edit
+								controller="SUser" action="edit" id="${SUserInstance.id }">Edit Profile
 							</g:link> </span>
 					</sUser:ifOwns>
 
@@ -48,8 +48,8 @@
 					</div>
 				</g:if>
 
-				<div class="super-section" style="clear: both;">
-					<div class="section span12">
+				<div class="super-section">
+					<div class="row section" style="">
 						<div class="figure span3"
 							style="float: left; max-height: 220px; max-width: 200px">
 							<g:link controller="SUser" action="show"
@@ -126,15 +126,16 @@
 				
 				</div>
 
-				<g:if test="${SUserInstance.aboutMe }">
-					<div class="section span11" style="clear: both;">
+				
+				<g:if test="${SUserInstance.aboutMe}">
+					<div class="section">
 						<h5><i class="icon-user"></i>About Me</h5>
 						${SUserInstance.aboutMe.encodeAsHTML().replace('\n', '<br/>\n')}
 					</div>
 				</g:if>
 
 				<g:if test="${SUserInstance.openIds}">
-					<div class="section span11" style="clear: both;">
+					<div class="section" style="clear: both;">
 						<h5>
 							<span class="name" style="color: #b1b1b1;"><i class="icon-gift"></i>${SUserInstance.openIds?.size()}</span>
 							External Provider Identification<g:if test="${SUserInstance.openIds?.size()>1}">s</g:if>
@@ -157,7 +158,7 @@
 
 				</g:if>
 
-				<div class="section span11" style=" width:100%; clear: both;">
+				<div class="section" style="clear: both;">
 					<h5>
 						<span class="name" style="color: #b1b1b1;">
 						<i class="icon-screenshot"></i>${Observation.countByAuthor(SUserInstance)}</i>
@@ -168,7 +169,7 @@
 				</div>
 
 
-				<div class="section span11" style="clear: both;overflow:auto;">
+				<div class="section" style="clear: both;overflow:auto;">
 					<obv:showAllTags
 						model="['tagFilterByProperty':'User', 'tagFilterByPropertyValue':SUserInstance.id]" />
 				</div>

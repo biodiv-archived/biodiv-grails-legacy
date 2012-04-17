@@ -108,7 +108,8 @@ padding-bottom: 10px;
 }
 
 .prop {
- 	clear: both; 
+/*  	clear: both;  */
+	overflow: auto;
 }
 
 .prop.tablet {
@@ -120,11 +121,12 @@ padding-bottom: 10px;
         margin-top: 5px;
 }
 
-.prop .name {
+.prop .name, .prop .name .label {
 	float: left;
 	text-align: left;
 	color: ##5E5E5E;
-        font-size: 0.9em;       
+    font-size: 0.9em;
+	font-weight: bold;
 }
 
 .prop .name.tablet {
@@ -249,18 +251,16 @@ height: 60px;
 margin:20px;    
 }
 
-.section label {
-    float: right;
+.section label, .user .section label {
     font-weight: bold;
-    padding-right: 15px;
-    text-align: right;
 }
 
 .super-section {
 	background-color: rgba(106, 201, 162, 0.2);
 	border-radius: 5px;
 	margin-bottom: 10px;
-        box-shadow: 0 8px 6px -6px #5e5e5e;
+    box-shadow: 0 8px 6px -6px #5e5e5e;
+    padding:5px;
 }
 
 .resources .addedResource {
@@ -396,9 +396,6 @@ text-decoration: none;
 
 .btn-danger a {
 
-}
-li.reco_block {
-margin: 0;
 }
 
 #addRecommendation {
@@ -647,7 +644,8 @@ float: right;
 }
 
 .normal_profile_pic {
-	height:100px;
+	max-height:100px;
+	min-height:50px;
 	width:auto;
 	max-width:100px;
 	margin:5px;
@@ -877,8 +875,41 @@ input, button, select, textarea {
 
 .msg {
 	font-style:italic;
+	padding-left:10px;
 }
 
 .icon-red {
   background-image: url(../bootstrap/img/glyphicons-halflings-red.png);
+}
+
+li.reco_block {
+margin: 0;
+}
+
+.reco_block {
+	background-color: #ffffff;
+	padding: 5px;
+	margin-bottom: 3px;
+	border-radius: 5px;
+	min-height:30px;
+}
+
+.reco {
+	background-color: #ffffff;
+	padding: 3px;
+	width: 75%;
+	float: left;
+}
+
+.iAgree {
+	float: right;
+}
+
+.users {
+	clear: both;
+	float:right;
+}
+
+.form-horizontal .control-group {
+	margin-bottom: 5px;
 }

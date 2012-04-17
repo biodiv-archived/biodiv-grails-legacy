@@ -35,10 +35,11 @@ $(document).ready(function() {
 	</div>
 
 </div>
-<div id="relatedObservationAddButton_${id}" style="padding-left:10px; display:none">
-	<g:link controller="observation" action="create"><div class="btn btn-warning">Add an observation</div></g:link>
+<div id="relatedObservationAddButton_${id}" style="display:none">
+	<!--<g:link controller="observation" action="create"><div class="btn btn-warning">Add an observation</div></g:link>-->
+	<span class="msg">No observations</span>
 </div>
 
-<div id="relatedObservationMsg_${id}" style="padding-left:10px; display:none">
+<div id="relatedObservationMsg_${id}" style="display:none">
 	<span class="msg">This is the first observation</span>
 </div>
