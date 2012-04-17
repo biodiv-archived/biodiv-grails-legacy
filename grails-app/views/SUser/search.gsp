@@ -7,6 +7,22 @@
 	base="${grailsApplication.config.grails.serverURL+'/js/jquery/'}"></g:javascript>
 <g:set var="entityName"
 	value="${message(code: 'sUser.label', default: 'Users')}" />
+
+<style type="text/css">
+
+.snippet.tablet .figure img {
+	height:auto;
+}
+
+.figure .thumbnail {
+	height:120px;
+	margin: 0 auto;
+	text-align: center;
+	*font-size: 120px;
+	line-height: 120px;
+}
+</style>
+
 </head>
 
 <body>
@@ -93,10 +109,10 @@
 								<%
 def queryParams = [username: username, enabled: enabled, accountExpired: accountExpired, accountLocked: accountLocked, passwordExpired: passwordExpired]
 %>
-								<div class="observation">
+								
 									<sUser:showUserList
 										model="['userInstanceList':results, 'userInstanceTotal':totalCount, 'queryParams':queryParams]" />
-								</div>
+								
 							</div>
 						</div>
 					</div>

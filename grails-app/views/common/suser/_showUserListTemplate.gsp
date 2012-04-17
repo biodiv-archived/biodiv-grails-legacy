@@ -18,17 +18,18 @@
 		<ul class="list_view thumbnails" style="display: none;">
 			<g:each in="${userInstanceList}" status="i" var="userInstance">
 				<li class="thumbnail" style="clear: both;"><sUser:showUserSnippet
-						model="['userInstance':userInstance]"></sUser:showUserSnippet>
-				</li>
+						model="['userInstance':userInstance]"></sUser:showUserSnippet></li>
 			</g:each>
 		</ul>
 	</div>
 
 
 	<g:if test="${userInstanceTotal > queryParams.max}">
-		<div class="btn loadMore">
-			<span class="progress" style="display: none;">Loading ... </span> <span
-				class="buttonTitle">Load more</span>
+		<div class="centered">
+			<div class="btn loadMore">
+				<span class="progress" style="display: none;">Loading ... </span> <span
+					class="buttonTitle">Load more</span>
+			</div>
 		</div>
 	</g:if>
 	<div class="paginateButtons" style="visibility: hidden; clear: both">
@@ -37,103 +38,88 @@
 	</div>
 
 	<script>
-       $(document).ready(function() {
-	       $('.list_view_bttn').click(function(){
-		       console.log("list view btn click")
+		$(document).ready(function() {
+			$('.list_view_bttn').click(function() {
 				$('.grid_view').hide();
 				$('.list_view').show();
 				$(this).addClass('active');
-	            //alert($(this).attr('class'));
+				//alert($(this).attr('class'));
 				$('.grid_view_bttn').removeClass('active');
 				$.cookie("observation_listing", "list");
 				return false;
 			});
-			
-			$('.grid_view_bttn').click(function(){
+
+			$('.grid_view_bttn').click(function() {
 				console.log("grid view btn click")
 				$('.grid_view').show();
 				$('.list_view').hide();
-	                        //alert($(this).attr('class'));
+				//alert($(this).attr('class'));
 				$(this).addClass('active');
 				$('.list_view_bttn').removeClass('active');
 				$.cookie("observation_listing", "grid");
 				return false;
 			});
-	
-              function eatCookies(){
-                  if ($.cookie("observation_listing") == "list") {
-                          $('.list_view').show();
-                          $('.grid_view').hide();
-                          $('.grid_view_bttn').removeClass('active');
-                          $('.list_view_bttn').addClass('active');
-                  }else{
-                          $('.grid_view').show();
-                          $('.list_view').hide();
-                          $('.grid_view_bttn').addClass('active');
-                          $('.list_view_bttn').removeClass('active');	
-                  }
-              }
 
-              eatCookies();
+			function eatCookies() {
+				if ($.cookie("observation_listing") == "list") {
+					$('.list_view').show();
+					$('.grid_view').hide();
+					$('.grid_view_bttn').removeClass('active');
+					$('.list_view_bttn').addClass('active');
+				} else {
+					$('.grid_view').show();
+					$('.list_view').hide();
+					$('.grid_view_bttn').addClass('active');
+					$('.list_view_bttn').removeClass('active');
+				}
+			}
 
-        $.autopager({
-               
-            autoLoad: false,
-  			// a selector that matches a element of next page link
-  		    link: 'div.paginateButtons a.nextLink',
+			eatCookies();
 
-  		    // a selector that matches page contents
-  		    content: '.mainContent',
-                  
-            insertBefore: '.loadMore',
-  		
-  		    	// a callback function to be triggered when loading start 
-    		start: function(current, next) {
-                      $(".loadMore .progress").show();
-                      $(".loadMore .buttonTitle").hide();
-    		},
+			$.autopager({
 
-    		// a function to be executed when next page was loaded. 
-    		// "this" points to the element of loaded content.
-    		load: function(current, next) {
-    			$(".mainContent:last").hide().fadeIn(3000);
-                      if (next.url == undefined){
-                          $(".loadMore").hide();
-                      }else{
-                          $(".loadMore .progress").hide();
-                          $(".loadMore .buttonTitle").show();
-                      }
-                      if($('.grid_view_bttn.active')[0]) {
-                    	  $('.grid_view').show();
-                    	  $('.list_view').hide();
-                      } else {
-                    	  $('.grid_view').hide();
-                    	  $('.list_view').show();
-                      }
-    		}
+				autoLoad : false,
+				// a selector that matches a element of next page link
+				link : 'div.paginateButtons a.nextLink',
+
+				// a selector that matches page contents
+				content : '.mainContent',
+
+				appendTo: '.mainContent',
+				//insertBefore : '.loadMore',
+
+				// a callback function to be triggered when loading start 
+				start : function(current, next) {
+					$(".loadMore .progress").show();
+					$(".loadMore .buttonTitle").hide();
+				},
+
+				// a function to be executed when next page was loaded. 
+				// "this" points to the element of loaded content.
+				load : function(current, next) {
+					$(".mainContent:last").hide().fadeIn(3000);
+					if (next.url == undefined) {
+						$(".loadMore").hide();
+					} else {
+						$(".loadMore .progress").hide();
+						$(".loadMore .buttonTitle").show();
+					}
+					if ($('.grid_view_bttn.active')[0]) {
+						$('.grid_view').show();
+						$('.list_view').hide();
+					} else {
+						$('.grid_view').hide();
+						$('.list_view').show();
+					}
+				}
+			});
+
+			$('.loadMore').click(function() {
+				$.autopager('load');
+				return false;
+			});
+
 		});
-
-              $('.loadMore').click(function() {
-                  $.autopager('load');
-                  return false;
-              });
-
-              $(".snippet.tablet").live('hover', function(e){
-                  if(e.type == 'mouseenter'){    
-                      $(".figure", this).slideUp("slow");   
-                      $(".some_content", this).slideUp("slow");   
-                      $('.observation_info_wrapper', this).slideDown("slow"); 
-                  }
-              
-                  if(e.type == 'mouseleave'){    
-                      $(".figure", this).slideDown("slow");   
-                      $(".some_content", this).slideDown("slow");
-                      $('.observation_info_wrapper', this).slideUp("slow"); 
-                  }
-
-
-                 });
-        });
-        </script>
+	</script>
 </div>
 

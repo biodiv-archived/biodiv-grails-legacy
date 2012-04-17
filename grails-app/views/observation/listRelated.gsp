@@ -21,37 +21,41 @@
 <body>
 	<div class="container outer-wrapper">
 		<div class="row">
-                    <div class="span12">
-                        <div class="page-header">
-                            <h1>
-                                    <g:message code="default.list.label" args="[entityName]" />
-                            </h1>
-			</div>
-
-			<g:if test="${flash.message}">
-				<div class="message">
-					${flash.message}
+			<div class="span12">
+				<div class="page-header">
+					<h1>
+						<g:message code="default.list.label" args="[entityName]" />
+					</h1>
 				</div>
-			</g:if>
-				
-			<div style="clear:both"></div>
-                        <div class="row"> <!-- main_content -->
-			<div class="list span9">
-				<div class="observations thumbwrap">
-					<div class="observation">
 
-                                        <obv:showObservationsList/>
-				        
-					<div class="paginateButtons" style="visibility:hidden; clear: both">
-						<g:paginate total="${observationInstanceTotal}" max="2" params="${activeFilters}"/>
+				<g:if test="${flash.message}">
+					<div class="message">
+						${flash.message}
 					</div>
-				</div>
-			</div>
-			</div> <!-- main_content end -->
+				</g:if>
 
-                        </div>
-			
+				<div style="clear: both"></div>
+				<div class="row">
+					<!-- main_content -->
+					<div class="list span9">
+						<div class="observations thumbwrap">
+							<div>
+
+								<obv:showObservationsList />
+
+								<div class="paginateButtons"
+									style="visibility: hidden; clear: both">
+									<g:paginate total="${observationInstanceTotal}" max="2"
+										params="${activeFilters}" />
+								</div>
+							</div>
+						</div>
+					</div>
+					<!-- main_content end -->
+
+				</div>
+
+			</div>
 		</div>
-	</div>
 </body>
 </html>

@@ -33,11 +33,13 @@
     </div>
     
     <g:if test="${observationInstanceTotal > queryParams.max}">
-        <div class="btn loadMore">
-            <span class="progress" style="display:none;">Loading ... </span>
-            <span class="buttonTitle">Load more</span>
-        </div>
-    </g:if>
+		<div class="centered">
+			<div class="btn loadMore">
+				<span class="progress" style="display: none;">Loading ... </span> <span
+					class="buttonTitle">Load more</span>
+			</div>
+		</div>
+	</g:if>
     <div class="paginateButtons" style="visibility:hidden; clear: both">
         <g:paginate total="${observationInstanceTotal}" max="${queryParams.max}" params="${activeFilters}"/>
     </div>
@@ -86,8 +88,9 @@
     		    // a selector that matches page contents
     		    content: '.mainContent',
                     
-                    insertBefore: '.loadMore',
-    		
+                //insertBefore: '.loadMore',
+    			appendTo: '.mainContent',
+    			
     		    // a callback function to be triggered when loading start 
 		    start: function(current, next) {
                         $(".loadMore .progress").show();

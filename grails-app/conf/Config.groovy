@@ -358,8 +358,8 @@ environments {
 			}
 		}
 
-                ibp.domain='ibp.localhost'
-                wgp.domain='wgp.localhost'    
+                ibp.domain='ibp.localhost.strandls.com'
+                wgp.domain='wgp.localhost.strandls.com'    
 	}
 	test {
 		grails.serverURL = "http://localhost:8080/${appName}"
@@ -659,7 +659,6 @@ grails.plugins.springsecurity.onInteractiveAuthenticationSuccessEvent = { e, app
 
 	User.withTransaction {
 		user = User.get(appCtx.springSecurityService.principal.id)
-		println "-------------------------saving last login date"
 		user.lastLoginDate = new Date()
 		user.save(failOnError: true)
 	}

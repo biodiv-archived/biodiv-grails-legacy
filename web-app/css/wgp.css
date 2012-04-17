@@ -109,7 +109,7 @@ padding-bottom: 10px;
 
 .prop {
 /*  	clear: both;  */
-	overflow: auto;
+/* 	overflow: auto; */
 }
 
 .prop.tablet {
@@ -160,7 +160,6 @@ margin-left: 100px;
 margin-bottom: 0;
 border-radius: 0;
 border-bottom: 0;
-padding-left: 30px;
 background-color: #ffffff;    
 border: 1px solid #bee6d3;
 }
@@ -173,9 +172,13 @@ background-color: #fefad5;
 background-color: transparent;    
 }
 
+.list_view .figure .thumbnail {
+	padding: 0;	
+}
+
 .loadMore {
     width: 440px;
-    margin-left:100px;       
+/*     margin-left:100px;        */
     margin-top:50px;
 }
 
@@ -529,7 +532,7 @@ margin:0;
 height: 120px;
 }
 
-.dropdown-menu a {
+.consizedtext, .dropdown-menu a {
 /* 	width: 100%; */
 	overflow: hidden;
 	text-overflow: ellipsis;
@@ -651,11 +654,20 @@ float: right;
 	margin:5px;
 }
 
-.small_profile_pic {
+.user-icon {
 	height:32px;
+	width:32px;	
+	margin: 0 auto;
+	text-align: center;
+	*font-size: 32px;
+	line-height: 32px;
+}
+
+.small_profile_pic {
+	max-height:32px;
+	min-height:16px;
 	max-width:32px;
 	width:auto;
-	margin:5px;
 }
 
 .very_small_profile_pic {
@@ -912,4 +924,15 @@ margin: 0;
 
 .form-horizontal .control-group {
 	margin-bottom: 5px;
+}
+
+#habitatFilter {
+	margin-top:4px;
+}
+
+.centered {
+	width: 100%;
+	height: 0px;
+	text-align: center;
+	line-height: 0px;
 }

@@ -1,12 +1,12 @@
 <%@page import="species.utils.ImageType"%>
 <%@page import="species.participation.Observation"%>
 <div class="prop tablet user_signature">
-		<div class="figure">
+		<div class="figure user-icon" style="float:left;">
 		<a href=/biodiv/SUser/show/${userInstance.id}> <img
 			style="float: left;" src="${userInstance.icon(ImageType.SMALL)}"
 			class="small_profile_pic" title="${userInstance.name}" /></a>
 		</div>
-		<div class="story" style="margin-left:60px">
+		<div class="story" style="margin-left:35px">
 			<a href=/biodiv/SUser/show/${userInstance.id}> ${userInstance.name} </a>
 			<g:if test="${userInstance.location}">
 				<div>
