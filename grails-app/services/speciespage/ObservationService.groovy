@@ -9,6 +9,7 @@ import org.grails.taggable.TagLink;
 import java.util.Date;
 import species.Resource;
 import species.Habitat;
+import species.utils.Utils;
 import species.Resource.ResourceType;
 import species.TaxonomyDefinition;
 import species.auth.SUser;
@@ -237,7 +238,7 @@ class ObservationService {
 		}
 		return urlList
 	}
-
+	
 	private Recommendation getRecommendation(recoName, canName) {
 		def reco, taxonConcept;
 		if(canName) {
@@ -258,7 +259,7 @@ class ObservationService {
 				} else {
 					log.error "Given taxonomy canonical name is invalid"
 				}
-			} 
+			}
 		}
 
 		if(recoName) {
@@ -280,7 +281,7 @@ class ObservationService {
 
 		return reco;
 	}
-
+	
 	/**
 	 * 
 	 */
