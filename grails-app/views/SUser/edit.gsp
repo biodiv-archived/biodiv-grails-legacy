@@ -58,7 +58,7 @@
 							code="fix.errors.before.proceeding" default="Fix errors" /> </span>
 					<%--<g:renderErrors bean="${user}" as="list" />--%>
 				</g:hasErrors>
-				
+
 				<g:form class="form-horizontal" action="update" name='userEditForm'>
 					<g:hiddenField name="id" value="${user?.id}" />
 					<g:hiddenField name="version" value="${user?.version}" />
@@ -89,53 +89,83 @@
 							</div>
 							<div class="span8 observation_story">
 
-								<div class="control-group">
+								<div
+									class="control-group ${hasErrors(bean: user, field: 'username', 'error')}">
 									<label class="control-label" for="username"><i
 										class="icon-user"></i> <g:message code="suser.username.label"
 											default="Username" /> </label>
-									<div class="controls ${hasErrors(bean: user, field: 'username', 'error')}">
+									<div class="controls">
 										<input type="text" name="username" class="input-xlarge"
 											id="username" value="${user.username}">
+										<div class="help-inline">
+											<g:hasErrors bean="${user}" field="username">
+												<g:renderErrors bean="${user}" as="list" field="username" />
+											</g:hasErrors>
+										</div>
 									</div>
 								</div>
 
-								<div class="control-group">
+								<div
+									class="control-group ${hasErrors(bean: user, field: 'name', 'error')}">
 									<label class="control-label" for="name"><i
 										class="icon-user"></i> <g:message code="suser.name.label"
 											default="Full Name" /> </label>
-									<div class="controls ${hasErrors(bean: user, field: 'name', 'error')}">
+									<div class="controls">
 										<input type="text" name="name" class="input-xlarge" id="name"
 											value="${user.name}">
+										<div class="help-inline">
+											<g:hasErrors bean="${user}" field="name">
+												<g:renderErrors bean="${user}" as="list" field="name" />
+											</g:hasErrors>
+										</div>
 									</div>
 								</div>
 
-								<div class="control-group">
+								<div
+									class="control-group ${hasErrors(bean: user, field: 'email', 'error')}">
 									<label class="control-label" for="email"><i
 										class="icon-envelope"></i> <g:message code="suser.email.label"
 											default="Email *" /> </label>
-									<div class="controls ${hasErrors(bean: user, field: 'email', 'error')}">
+									<div class="controls">
 										<input type="text" name="email" class="input-xlarge disabled"
-											id="email" value="${user.email}" disabled>
+											id="email" value="${user.email}" disabled readonly>
+										<div class="help-inline">
+											<g:hasErrors bean="${user}" field="email">
+												<g:renderErrors bean="${user}" as="list" field="email" />
+											</g:hasErrors>
+										</div>
 									</div>
 								</div>
 
-								<div class="control-group">
+								<div
+									class="control-group ${hasErrors(bean: user, field: 'website', 'error')}">
 									<label class="control-label" for="website"><i
 										class="icon-road"></i> <g:message code="suser.website.label"
 											default="Website" /> </label>
-									<div class="controls ${hasErrors(bean: user, field: 'website', 'error')}">
+									<div class="controls">
 										<input type="text" name="website" class="input-xlarge"
 											id="website" value="${user.website}">
+										<div class="help-inline">
+											<g:hasErrors bean="${user}" field="website">
+												<g:renderErrors bean="${user}" as="list" field="website" />
+											</g:hasErrors>
+										</div>
 									</div>
 								</div>
 
-								<div class="control-group">
+								<div
+									class="control-group ${hasErrors(bean: user, field: 'location', 'error')}">
 									<label class="control-label" for="location"><i
 										class="icon-map-marker"></i> <g:message
 											code="suser.location.label" default="Location" /> </label>
-									<div class="controls ${hasErrors(bean: user, field: 'location', 'error')}">
+									<div class="controls">
 										<input type="text" name="location" class="input-xlarge"
-											id="location" value="${user.location}">
+											id="location" value="${user.location}" />
+										<div class="help-inline">
+											<g:hasErrors bean="${user}" field="location">
+												<g:renderErrors bean="${user}" as="list" field="location" />
+											</g:hasErrors>
+										</div>
 									</div>
 								</div>
 
@@ -143,7 +173,9 @@
 						</div>
 
 
-						<div class="section" style="clear: both;">
+						<div
+							class="section control-group  ${hasErrors(bean: user, field: 'aboutMe', 'error')}"
+							style="clear: both;">
 							<h5>
 								<i class="icon-user"></i>About Me
 							</h5>
@@ -151,31 +183,49 @@
 								id="aboutMe">
 								${user.aboutMe }
 							</textarea>
+							<div class="help-inline">
+								<g:hasErrors bean="${user}" field="aboutMe">
+									<g:renderErrors bean="${user}" as="list" field="aboutMe" />
+								</g:hasErrors>
+							</div>
 						</div>
 
 						<div class="section" style="clear: both;">
 							<h5>
 								<i class="icon-cog"></i>Settings
 							</h5>
-							<div class="control-group">
+							<div
+								class="control-group ${hasErrors(bean: user, field: 'sendNotification', 'error')}">
 								<div class="controls" style="margin-left: 0px;">
-									<div>
-										<label class="checkbox" style="clear: both;"> <g:checkBox
-												name="sendNotification" value="${user.sendNotification}" />
-											<g:message code='user.sendNotification.label'
-												default='Send me email notifications' /> </label>
+									<label class="checkbox" style="clear: both;"> <g:checkBox
+											name="sendNotification" value="${user.sendNotification}" />
+										<g:message code='user.sendNotification.label'
+											default='Send me email notifications' /> </label>
+									<div class="help-inline">
+										<g:hasErrors bean="${user}" field="sendNotification">
+											<g:renderErrors bean="${user}" as="list"
+												field="sendNotification" />
+										</g:hasErrors>
 									</div>
-									<div>
-										<label class="checkbox" style="clear: both;"> <g:checkBox
-												name="hideEmailId" value="${user.hideEmailId}" /> <g:message
-												code='user.hideEmailId.label'
-												default='Hide my email from others' /> </label>
+								</div>
+							</div>
+							<div
+								class="control-group ${hasErrors(bean: user, field: 'sendNotification', 'error')}">
+								<div class="controls" style="margin-left: 0px;">
+									<label class="checkbox" style="clear: both;"> <g:checkBox
+											name="hideEmailId" value="${user.hideEmailId}" /> <g:message
+											code='user.hideEmailId.label'
+											default='Hide my email from others' /> </label>
+									<div class="help-inline">
+										<g:hasErrors bean="${user}" field="hideEmailId">
+											<g:renderErrors bean="${user}" as="list" field="hideEmailId" />
+										</g:hasErrors>
 									</div>
 								</div>
 							</div>
 						</div>
 					</div>
-					
+
 					<div class="section form-action"
 						style='clear: both; margin-top: 20px; margin-bottom: 40px;'>
 						<s2ui:submitButton elementId='update' form='userEditForm'
