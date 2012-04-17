@@ -36,6 +36,9 @@
 <g:javascript src="species/carousel.js"
 	base="${grailsApplication.config.grails.serverURL+'/js/'}" />
 
+<g:javascript src="species/observations.js"
+	base="${grailsApplication.config.grails.serverURL+'/js/'}" />
+
 <style>
 #nameContainer {
 	float: left;
@@ -276,9 +279,11 @@
 	    		}, error: function(xhr, status, error) {
 	    			var msg = $.parseJSON(xhr.responseText);
 	    			if(msg.info) {
-						$("#seeMoreMessage").html(msg.info).show().removeClass('error').addClass('message');
+	    				showRecoUpdateStatus(msg.info, 'info');
+	    			}else if(msg.success){
+	    				showRecoUpdateStatus(msg.success, 'success');
 					} else {
-						$("#seeMoreMessage").html(msg.error ? msg.error : "Error").show().removeClass('message').addClass('error');
+						showRecoUpdateStatus(msg.error, 'error');
 					}
 			   	}
 			});
@@ -308,19 +313,14 @@
             	return false;
             },
             error:function (xhr, ajaxOptions, thrownError){
-            	alert(thrownError);
+            	handleError(xhr, ajaxOptions, thrownError, function() {
+            		console.log(xhr);
+            		showRecoUpdateStatus ()
+            	});
 			} 
      	});
      	
-     	function showRecos(data, textStatus) {
-			jQuery('#recoSummary').html(jQuery(data).find('recoHtml').text());
-			var infoMsg = jQuery(data).find('recoVoteMsg').text();
-			if(infoMsg){
-				$("#seeMoreMessage").html(infoMsg).show().removeClass('error').addClass('message');
-			}else{
-				$("#seeMoreMessage").hide();
-			}
-		}
+     
 	
         
 	});

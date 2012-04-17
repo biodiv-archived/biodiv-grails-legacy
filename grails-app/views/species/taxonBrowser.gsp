@@ -18,7 +18,7 @@
 	base="${grailsApplication.config.grails.serverURL+'/js/'}" />
 <g:javascript src="jquery/jquery.jqDock-1.8/jquery.jqDock.min.js"
 	base="${grailsApplication.config.grails.serverURL+'/js/'}" />
-<g:javascript src="species/main.js"
+<g:javascript src="species/species.js"
 	base="${grailsApplication.config.grails.serverURL+'/js/'}" />
 
 </head>

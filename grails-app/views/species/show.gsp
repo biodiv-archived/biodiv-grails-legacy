@@ -88,7 +88,7 @@ function getOccurrenceCount(data) {
 
 <script type="text/javascript"
 	src="/geoserver/ows?request=getOccurrenceCount&service=amdb&version=1.0.0&species_name=${speciesName}"></script>
-<g:javascript src="species/main.js"
+<g:javascript src="species/species.js"
 	base="${grailsApplication.config.grails.serverURL+'/js/'}" />
 
 

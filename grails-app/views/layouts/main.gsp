@@ -28,6 +28,9 @@
 	base="${grailsApplication.config.grails.serverURL+'/bootstrap/js/'}"></g:javascript>
 </g:if>
 
+<g:javascript src="species/main.js"
+	base="${grailsApplication.config.grails.serverURL+'/js/'}" />
+
 <link rel="stylesheet" type="text/css" media="screen"
 	href="${resource(dir:'js/jquery/jquery.jqGrid-4.1.2/css',file:'ui.jqgrid.css', absolute:true)}" />
 
