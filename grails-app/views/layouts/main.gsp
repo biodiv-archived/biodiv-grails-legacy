@@ -83,11 +83,15 @@ jQuery(document).ready(function($) {
         if (document.domain == "${grailsApplication.config.wgp.domain}"){
             $('#ibp_header').hide();
             $('#wgp_header').show();
+            $('#ibp_footer').hide();
+            $('#wgp_footer').show();
         }
 
         if (document.domain == "${grailsApplication.config.ibp.domain}"){
             $('#wgp_header').hide();
             $('#ibp_header').show();
+            $('#wgp_footer').hide();
+            $('#ibp_footer').show();
         }
 
 
@@ -209,7 +213,15 @@ border-bottom:3px solid #003846;
 			
 		</div>
 		<g:layoutBody />
-                <!--div class="page-footer"></div-->
+
+                <div id="wgp_footer" style="display:none;">
+                    <domain:showWGPFooter/>
+                </div>    
+
+                <div id="ibp_footer" style="display:none;">
+                    <domain:showIBPFooter/>
+                </div>    
+
 	</div>
 
 	<g:javascript>
