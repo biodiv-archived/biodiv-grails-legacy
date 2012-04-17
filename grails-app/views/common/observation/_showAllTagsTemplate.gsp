@@ -39,10 +39,10 @@ View as
 <span id="as_list" class="btn">List</span> 
 <span id="as_cloud" class="btn active">Cloud</span>
 </div>
-<div id="tagCloud" class="span4 tagsView">
+<div id="tagCloud" class="tagsView">
 	<obv:showTagsCloud/>
 </div>
-<div id="tagList" class="span4 tagsView" style="display:none;">
+<div id="tagList" class="tagsView" style="display:none;">
 	<obv:showTagsList model="['tags': tags]"/>
 </div>	
 

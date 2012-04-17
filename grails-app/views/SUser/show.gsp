@@ -22,17 +22,7 @@
 
 <g:javascript src="species/carousel.js"
 	base="${grailsApplication.config.grails.serverURL+'/js/'}" />
-<style>
-.userCreatedObservations .jcarousel-skin-ie7 .jcarousel-clip-horizontal
-	{
-	width: 100%;
-}
 
-.userCreatedObservations .jcarousel-skin-ie7 .jcarousel-container-horizontal
-	{
-	width: 100%;
-}
-</style>
 </head>
 <body>
 	<div class="container outer-wrapper">
@@ -85,13 +75,13 @@
 
 							<div class="prop">
 								<span class="name"><i class="icon-time"></i>Member since </span> <div class="value">
-									<g:formatDate format="yyyy-MM-dd"
+									<g:formatDate format="dd/MM/yyyy"
 										date="${SUserInstance.dateCreated}" type="datetime"
 										style="MEDIUM" /> </div>
 							</div>
 							<div class="prop">
 								<span class="name"><i class="icon-time"></i>Last visited </span> <div class="value">
-									<g:formatDate format="yyyy-MM-dd"
+									<g:formatDate format="dd/MM/yyyy"
 										date="${SUserInstance.lastLoginDate}" type="datetime"
 										style="MEDIUM" /> </div>
 							</div>
@@ -137,14 +127,14 @@
 				</div>
 
 				<g:if test="${SUserInstance.aboutMe }">
-					<div class="section" style="clear: both;">
+					<div class="section span11" style="clear: both;">
 						<h5><i class="icon-user"></i>About Me</h5>
 						${SUserInstance.aboutMe.encodeAsHTML().replace('\n', '<br/>\n')}
 					</div>
 				</g:if>
 
 				<g:if test="${SUserInstance.openIds}">
-					<div class="section" style="clear: both;">
+					<div class="section span11" style="clear: both;">
 						<h5>
 							<span class="name" style="color: #b1b1b1;"><i class="icon-gift"></i>${SUserInstance.openIds?.size()}</span>
 							External Provider Identification<g:if test="${SUserInstance.openIds?.size()>1}">s</g:if>
@@ -167,7 +157,7 @@
 
 				</g:if>
 
-				<div class="section" style=" width:100%; clear: both;">
+				<div class="section span11" style=" width:100%; clear: both;">
 					<h5>
 						<span class="name" style="color: #b1b1b1;">
 						<i class="icon-screenshot"></i>${Observation.countByAuthor(SUserInstance)}</i>
@@ -178,7 +168,7 @@
 				</div>
 
 
-				<div class="section" style="clear: both;overflow:auto;">
+				<div class="section span11" style="clear: both;overflow:auto;">
 					<obv:showAllTags
 						model="['tagFilterByProperty':'User', 'tagFilterByPropertyValue':SUserInstance.id]" />
 				</div>
