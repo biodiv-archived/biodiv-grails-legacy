@@ -106,17 +106,18 @@
         <script>
             function refreshList(bounds){
                 var url = "${g.createLink(controller: "observation", action: "filteredList")}" + location.search
-                if (bounds !== undefined)
+                if (bounds !== undefined){
                     var sep = (location.search == "") ? "?" : "&";
                     url = url + sep + "bounds=" + bounds
 
-                $.ajax({
-                    url:  url,
-                    dataType: "html",
-                    success: function(data) {
-                        $("#map_results_list").html(data);
-                    }
-                });    
+	                $.ajax({
+	                    url:  url,
+	                    dataType: "html",
+	                    success: function(data) {
+	                        $("#map_results_list").html(data);
+	                    }
+	                });
+                }    
             }
 
             $(function(){
