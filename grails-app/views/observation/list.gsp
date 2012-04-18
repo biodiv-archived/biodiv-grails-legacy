@@ -55,8 +55,8 @@
                                                                                                 
 						<input type="text" id="speciesNameFilter"
 							value="${params.speciesName}" style="display: none" />
-						<button id="speciesNameAllButton" class="btn">All</button>
-						<button id="speciesNameFilterButton" class="btn">Unidentified</button>
+						<button id="speciesNameAllButton" class="btn" rel="tooltip" data-original-title="Show all observations">All</button>
+						<button id="speciesNameFilterButton" class="btn" rel="tooltip" data-original-title="Show only unidentified observations">Unidentified</button>
 					</div>
 				</div>
 				<div class="tags_section span3" style="float: right;">
@@ -103,16 +103,16 @@
 										Map view <span class="caret"></span> </a>
 								</div>
 								<div class="btn-group"
-									style="float: right; margin-right: 90px; z-index: 10">
+									style="float: left; z-index: 10">
 									<button id="selected_sort"
-										class="btn dropdown-toggle" data-toggle="dropdown" href="#"><g:if
+										class="btn dropdown-toggle" data-toggle="dropdown" href="#" rel="tooltip" data-original-title="Sort by"><g:if
 											test="${params.sort == 'visitCount'}">
-                                               Sort by Most viewed
+                                               Most viewed
                                             </g:if> <g:elseif
 											test="${params.sort == 'lastRevised'}">
-                                                Sort by Last updated
+                                                Last updated
                                             </g:elseif> <g:else>
-                                                Sort by Latest
+                                                Latest
                                             </g:else> <span class="caret"></span>
 									</button>
 									
@@ -159,6 +159,8 @@
 	<!--container end-->
 	<g:javascript>	
         $(document).ready(function(){
+            $('#selected_sort').tooltip({placement:'right'});
+            $('button').tooltip();
             $('.dropdown-toggle').dropdown();
             
             $('.sort_filter_label').click(function(){

@@ -1,6 +1,6 @@
 
-<div class="observation_location">
-	<div>
+<div class="observation_location_wrapper">
+	<div class="observation_location">
 		<script>
                 var markers = [];
                 var big_map;
