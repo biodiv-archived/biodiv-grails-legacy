@@ -17,6 +17,11 @@
 	base="${grailsApplication.config.grails.serverURL+'/js/'}"></g:javascript>
 <g:javascript src="jquery.autopager-1.0.0.js"
 	base="${grailsApplication.config.grails.serverURL+'/js/jquery/'}"></g:javascript>
+	<style>
+	.observations_list {
+		top:0;
+	}
+	</style>
 </head>
 <body>
 	<div class="container outer-wrapper">
@@ -24,7 +29,12 @@
 			<div class="span12">
 				<div class="page-header">
 					<h1>
-						<g:message code="default.list.label" args="[entityName]" />
+						<g:if test="${filterProperty == 'nearBy'}">
+							Observations at near by locations :${parentObservation.location}
+						</g:if>
+						<g:elseif test="${filterProperty == 'speciesName'}">
+							Observations of species : ${parentObservation.maxVotedSpeciesName}
+						</g:elseif>
 					</h1>
 				</div>
 
@@ -34,28 +44,28 @@
 					</div>
 				</g:if>
 
-				<div style="clear: both"></div>
-				<div class="row">
-					<!-- main_content -->
-					<div class="list span9">
-						<div class="observations thumbwrap">
-							<div>
+				<div class="span12">
+					<div class="tags_section span3" style="float: right;">
+						<obv:showAllTags
+							model="['tagFilterByProperty':'Related', 'relatedObvParams':initialParams]" />
+					</div>
 
-								<obv:showObservationsList />
+					<div class="row">
+						<div class="list span9">
 
-								<div class="paginateButtons"
-									style="visibility: hidden; clear: both">
-									<g:paginate total="${observationInstanceTotal}" max="2"
-										params="${activeFilters}" />
+							<div class="observations thumbwrap">
+								<div>
+									<obv:showSnippet
+										model="['observationInstance':parentObservation]"></obv:showSnippet>
 								</div>
+								<div  style="clear: both;"></div>
+								<obv:showObservationsList />
 							</div>
 						</div>
 					</div>
-					<!-- main_content end -->
-
 				</div>
-
 			</div>
 		</div>
+	</div>
 </body>
 </html>

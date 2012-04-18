@@ -448,9 +448,9 @@ class ObservationController {
 
 	def listRelated = {
 		log.debug params;
-		def relatedObv = getRelatedObservations(params);
+		def relatedObv = observationService.getRelatedObservations(params);
 		
-		def model = [observationInstanceList: relatedObv.observations.observation, observationInstanceTotal: relatedObv.count, queryParams: [:], activeFilters:[:]]
+		def model = [observationInstanceList: relatedObv.observations.observation, observationInstanceTotal: relatedObv.count, queryParams: [:], activeFilters:[:], parentObservation:Observation.read(params.long('id')), filterProperty:params.filterProperty, initialParams:new HashMap(params)]
 		render (view:'listRelated', model:model)
 	}
 	
@@ -459,7 +459,7 @@ class ObservationController {
 	 */
 	def getRelatedObservation = {
 		log.debug params;
-		def relatedObv = getRelatedObservations(params);
+		def relatedObv = observationService.getRelatedObservations(params);
 
 		if(relatedObv.observations) {
 			relatedObv.observations = observationService.createUrlList2(relatedObv.observations);
@@ -467,32 +467,6 @@ class ObservationController {
 		render relatedObv as JSON
 	}
 
-	/**
-	 * 
-	 * @param params
-	 * @return
-	 */
-
-	protected Map getRelatedObservations(params) {
-		log.debug params;
-		def max = Math.min(params.limit ? params.int('limit') : 3, 100)
-
-		def offset = params.offset ? params.int('offset') : 0
-
-		def relatedObv
-		if(params.filterProperty == "speciesName") {
-			relatedObv = observationService.getRelatedObservationBySpeciesName(params.long('id'), max, offset)
-		} else if(params.filterProperty == "speciesGroup"){
-			relatedObv = observationService.getRelatedObservationBySpeciesGroup(params.long('filterPropertyValue'),  max, offset)
-		}else if(params.filterProperty == "user"){
-			relatedObv = observationService.getRelatedObservationByUser(params.long('filterPropertyValue'), max, offset, params.sort)
-		}else if(params.filterProperty == "nearBy"){
-			relatedObv = observationService.getNearbyObservations(params.id, 5)
-		}else{
-			relatedObv = observationService.getRelatedObservation(params.filterProperty, params.long('id'), max, offset)
-		}
-		return relatedObv
-	}
 
 
 	def tags = {

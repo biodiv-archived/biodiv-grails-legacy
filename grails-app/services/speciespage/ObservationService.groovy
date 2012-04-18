@@ -7,6 +7,8 @@ import org.grails.taggable.Tag;
 import org.grails.taggable.TagLink;
 
 import java.util.Date;
+import java.util.Map;
+
 import species.Resource;
 import species.Habitat;
 import species.utils.Utils;
@@ -73,7 +75,35 @@ class ObservationService {
 			observation.addToResource(resource);
 		}
 	}
+	
+	/**
+	*
+	* @param params
+	* @return
+	*/
+	Map getRelatedObservations(params) {
+	   log.debug params;
+	   def max = Math.min(params.limit ? params.limit.toInteger() : 3, 100)
 
+	   def offset = params.offset ? params.offset.toInteger() : 0
+
+	   def relatedObv
+	   if(params.filterProperty == "speciesName") {
+		   relatedObv = getRelatedObservationBySpeciesName(params.id.toLong(), max, offset)
+	   } else if(params.filterProperty == "speciesGroup"){
+		   relatedObv = getRelatedObservationBySpeciesGroup(params.filterPropertyValue.toLong(),  max, offset)
+	   }else if(params.filterProperty == "user"){
+		   relatedObv = getRelatedObservationByUser(params.filterPropertyValue.toLong(), max, offset, params.sort)
+	   }else if(params.filterProperty == "nearBy"){
+		   relatedObv = getNearbyObservations(params.id, 5)
+	   }else{
+		   relatedObv = getRelatedObservation(params.filterProperty, params.id.toLong(), max, offset)
+	   }
+	   return relatedObv
+   }
+
+	
+	
 	List getRelatedObservation(String property, long obvId, int limit, long offset){
 		def propertyValue = Observation.read(obvId)[property]
 		def query = "from Observation as obv where obv." + property + " like :propertyValuee and obv.id != :parentObvId and obv.isDeleted = :isDeleted order by obv.createdOn desc"
@@ -226,7 +256,6 @@ class ObservationService {
 
 	static List createUrlList2(observations){
 		List urlList = []
-		println observations
 		for(param in observations){
 			def obv = param['observation']
 			def title = param['title']
@@ -403,6 +432,23 @@ class ObservationService {
 		return tags;
 	}
 
+	Map getAllRelatedObvTags(params){
+		//XXX should handle in generic way
+		params.limit = 100
+		params.offset = 0
+		def obvIds = getRelatedObservations(params).observations.observation.collect{it.id}
+		obvIds.add(params.id.toLong())
+		
+		def sql =  Sql.newInstance(dataSource);
+		String query = "select t.name as name, count(t.name) as obv_count from tag_links as tl, tags as t, observation obv where tl.tag_ref in " + getIdList(obvIds)  + " and tl.tag_ref = obv.id and obv.is_deleted = false and t.id = tl.tag_id group by t.name order by count(t.name) desc, t.name asc ";
+		
+		LinkedHashMap tags = [:]
+		sql.rows(query).each{
+			tags[it.getProperty("name")] = it.getProperty("obv_count");
+		};
+		return tags;
+	}
+	
 	/**
 	 * Filter observations by group, habitat, tag, user, species
 	 * max: limit results to max: if max = -1 return all results
@@ -504,4 +550,7 @@ class ObservationService {
 		return null;
 	} 
 
+	private String getIdList(l){
+		return l.toString().replace("[", "(").replace("]", ")")
+	}
 }

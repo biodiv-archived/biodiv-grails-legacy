@@ -105,7 +105,12 @@ class ObservationTagLib {
 		
 		def count
 		def tags
-		if(tagFilterBy == "User"){
+		if(tagFilterBy == "Related"){
+			def relatedParams = attrs.model.relatedObvParams
+			tags = observationService.getAllRelatedObvTags(relatedParams)
+			count = tags.size()
+		}
+		else if(tagFilterBy == "User"){
 			def userId = attrs.model.tagFilterByPropertyValue.toLong();
 			tags = observationService.getAllTagsOfUser(userId)
 			count = tags.size()

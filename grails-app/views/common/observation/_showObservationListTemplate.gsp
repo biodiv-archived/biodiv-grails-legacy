@@ -5,7 +5,7 @@
     <button class="grid_view_bttn btn grid_style_button"><i class="icon-th-large"></i></button>
 </div>    
     <div class="mainContent">
-        <ul class="grid_view thumbnails">
+    	<ul class="grid_view thumbnails">
             <g:each in="${observationInstanceList}" status="i"
                     var="observationInstance">
                     
