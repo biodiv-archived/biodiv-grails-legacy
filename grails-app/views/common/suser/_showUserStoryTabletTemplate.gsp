@@ -30,7 +30,7 @@
 	<div class="story-footer">
 		<div class="footer-item" title="No of Observations">
 			<i class="icon-screenshot"></i>
-			${Observation.countByAuthor(userInstance)}
+			<obv:showNoOfObservationsOfUser model="['user':userInstance]"/>
 		</div>
 
 		<div class="footer-item" title="No of Tags">

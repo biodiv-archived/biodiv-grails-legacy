@@ -2,6 +2,8 @@
 $(document).ready(function() {
 	$('#carousel_${id}').jcarousel({
         itemLoadCallback : itemLoadCallback,
+        //buttonNextCallback:buttonNextCallback,
+        //itemVisibleInCallback:itemVisibleInCallback,
         url:"${createLink(controller:controller, action:action, id:observationId)}",
         filterProperty:"${filterProperty}",
         filterPropertyValue:"${filterPropertyValue}",

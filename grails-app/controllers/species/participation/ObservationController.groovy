@@ -400,11 +400,15 @@ class ObservationController {
 				log.debug results;
 				if(results?.recoVotes.size() > 0) {
 					def html =  g.render(template:"/common/observation/showObservationRecosTemplate", model:['observationInstance':observationInstance, 'result':results.recoVotes, 'totalVotes':results.totalVotes, 'uniqueVotes':results.uniqueVotes]);
+					def speciesNameHtml =  g.render(template:"/common/observation/showSpeciesNameTemplate", model:['observationInstance':observationInstance]);
+						
 					render(contentType:"text/xml") {
 						recos{
 							recoHtml(html)
 							uniqueVotes(results.uniqueVotes)
 							recoVoteMsg(params.recoVoteMsg)
+							speciesNameTemplate(speciesNameHtml)
+							speciesName(observationInstance.maxVotedSpeciesName)
 						}
 					}
 					return
@@ -448,9 +452,9 @@ class ObservationController {
 
 	def listRelated = {
 		log.debug params;
-		def relatedObv = observationService.getRelatedObservations(params);
+		def result = observationService.getRelatedObservations(params);
 		
-		def model = [observationInstanceList: relatedObv.observations.observation, observationInstanceTotal: relatedObv.count, queryParams: [:], activeFilters:[:], parentObservation:Observation.read(params.long('id')), filterProperty:params.filterProperty, initialParams:new HashMap(params)]
+		def model = [observationInstanceList: result.relatedObv.observations.observation, observationInstanceTotal: result.relatedObv.count, queryParams: [max:result.max], activeFilters:new HashMap(params), parentObservation:Observation.read(params.long('id')), filterProperty:params.filterProperty, initialParams:new HashMap(params)]
 		render (view:'listRelated', model:model)
 	}
 	
@@ -459,7 +463,7 @@ class ObservationController {
 	 */
 	def getRelatedObservation = {
 		log.debug params;
-		def relatedObv = observationService.getRelatedObservations(params);
+		def relatedObv = observationService.getRelatedObservations(params).relatedObv;
 
 		if(relatedObv.observations) {
 			relatedObv.observations = observationService.createUrlList2(relatedObv.observations);

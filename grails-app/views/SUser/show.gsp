@@ -161,7 +161,7 @@
 				<div class="section" style="clear: both;">
 					<h5>
 						<span class="name" style="color: #b1b1b1;">
-						<i class="icon-screenshot"></i>${Observation.countByAuthor(SUserInstance)}</i>
+						<i class="icon-screenshot"></i><obv:showNoOfObservationsOfUser model="['user':SUserInstance]"/></i>
 						</span> 	Observations
 					</h5>
 					<obv:showRelatedStory

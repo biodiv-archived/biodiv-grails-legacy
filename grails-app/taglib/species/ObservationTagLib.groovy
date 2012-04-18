@@ -165,5 +165,9 @@ class ObservationTagLib {
     def showObservationsList = {attrs, body->
 		out << render(template:"/common/observation/showObservationListTemplate", model:attrs.model);
 	}
-	
+
+	def showNoOfObservationsOfUser = {attrs, body->
+		def noOfObvs = observationService.getAllObservationsOfUser(attrs.model.user);
+		out << noOfObvs
+	}
 }

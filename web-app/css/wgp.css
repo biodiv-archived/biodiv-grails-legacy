@@ -382,6 +382,7 @@ background-color: #f5f5f5;
 
 ul#recoSummary {
 list-style-type: none;
+margin:0;
 }
 
 .btn-primary a, a.btn-primary, a.btn-danger, a.btn-warning, a.btn-success  {
