@@ -180,7 +180,7 @@
 								model="['observationInstance':observationInstance, 'observationId': observationInstance.id, 'controller':'observation', 'action':'getRelatedObservation', 'filterProperty': 'speciesName', 'id':'a']" />
 						</div>
 						<div class="sidebar_section tile">
-							<div class="title">Nearby observations</div>
+							<div class="title">Observations nearby</div>
 							<obv:showRelatedStory
 								model="['observationInstance':observationInstance, 'observationId': observationInstance.id, 'controller':'observation', 'action':'getRelatedObservation', 'filterProperty': 'nearBy', 'id':'nearBy']" />
 						</div>

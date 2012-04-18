@@ -122,7 +122,7 @@ class NamesIndexerService {
 		if(species?.mainImage()){
 			return species.mainImage().fileName;
 		}else{
-			return species?.fetchSpeciesGroupIcon(ImageType.SMALL)?.fileName;
+			return species?.fetchSpeciesGroupIcon(ImageType.VERY_SMALL)?.fileName;
 		}
 	}
 
