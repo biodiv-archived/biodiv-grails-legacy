@@ -37,7 +37,7 @@ class RegisterController extends grails.plugins.springsecurity.ui.RegisterContro
 			}
 			copy.remove 'controller'
 			copy.remove 'action'
-			['command': new RegisterCommand(copy), 
+			['command': new CustomRegisterCommand(copy), 
 				openIdPostUrl: "${request.contextPath}$openIDAuthenticationFilter.filterProcessesUrl",
 					daoPostUrl:    "${request.contextPath}${config.apf.filterProcessesUrl}",
 					persistentRememberMe: config.rememberMe.persistent,
@@ -46,7 +46,7 @@ class RegisterController extends grails.plugins.springsecurity.ui.RegisterContro
 		}
 	}
 	
-	def register = { RegisterCommand command ->
+	def register = { CustomRegisterCommand command ->
 
 		if (springSecurityService.isLoggedIn()) {
 			redirect uri: SpringSecurityUtils.securityConfig.successHandler.defaultTargetUrl
@@ -146,54 +146,46 @@ class RegisterController extends grails.plugins.springsecurity.ui.RegisterContro
 	}
 
 	def forgotPassword = {
-		
-		if (springSecurityService.isLoggedIn()) {
-			redirect uri: SpringSecurityUtils.securityConfig.successHandler.defaultTargetUrl
-			return;
-		}
-		
 		if (!request.post) {
 			// show the form
 			return
 		}
-
-		String usernamePropertyName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
-
+		
 		String username = params.username
 		if (!username) {
-			flash.error = message(code: "spring.security.ui.forgotPassword.username.missing")
+			flash.error = message(code: 'spring.security.ui.forgotPassword.username.missing')
 			redirect action: 'forgotPassword'
 			return
 		}
-
-
-		def user = lookupUserClass().findWhere((usernamePropertyName): username)
+		
+		String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
+		def user = lookupUserClass().findWhere((usernameFieldName): username)
 		if (!user) {
 			flash.error = message(code: 'spring.security.ui.forgotPassword.user.notFound')
 			redirect action: 'forgotPassword'
 			return
 		}
-
-		def registrationCode = new RegistrationCode(username: user."$usernamePropertyName")
+		
+		def registrationCode = new RegistrationCode(username: user."$usernameFieldName")
 		registrationCode.save(flush: true)
-
+		
 		String url = generateLink('resetPassword', [t: registrationCode.token])
-
 		def conf = SpringSecurityUtils.securityConfig
 		def body = conf.ui.forgotPassword.emailBody
 		if (body.contains('$')) {
-			body = evaluate(body, [user: user, url: url])
+			body = evaluate(body, [username: user.name.capitalize(), url: url])
 		}
+		
 		mailService.sendMail {
 			to user.email
 			from conf.ui.forgotPassword.emailFrom
 			subject conf.ui.forgotPassword.emailSubject
 			html body.toString()
 		}
-
+		
 		[emailSent: true]
 	}
-
+	
 	def resetPassword = { ResetPasswordCommand command ->
 		log.debug params
 		String token = params.t
@@ -268,7 +260,7 @@ class RegisterController extends grails.plugins.springsecurity.ui.RegisterContro
 		def conf = SpringSecurityUtils.securityConfig
 		def body = conf.ui.register.emailBody
 		if (body.contains('$')) {
-			body = evaluate(body, [username: username, url: url])
+			body = evaluate(body, [username: username.capitalize(), url: url])
 		}
 		mailService.sendMail {
 			to email
@@ -310,7 +302,7 @@ class RegisterController extends grails.plugins.springsecurity.ui.RegisterContro
 }
 
 
-class RegisterCommand {
+class CustomRegisterCommand {
 	String username
 	String email
 	String password
