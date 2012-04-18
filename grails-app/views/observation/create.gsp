@@ -275,8 +275,8 @@
 									<reco:create />
 								</div>
 								<div id="help-identify" class="control-label">
-									<label class="checkbox"> <input type="checkbox"
-										style="width: auto; height: auto;" /> Help identify </label>
+									<label class="checkbox" style="text-align:left;"> <input type="checkbox"
+										style="width: auto; height: auto;margin-left: -14px;" /> Help identify </label>
 								</div>
 							</div>
 						</div>
@@ -722,7 +722,7 @@
 	});
 
 
-	function removeRessurce(event) {
+	function removeResource(event) {
 		$(event.target).parent('.addedResource').remove();
 	}
 	

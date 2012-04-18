@@ -22,7 +22,11 @@
 
 <g:javascript src="species/carousel.js"
 	base="${grailsApplication.config.grails.serverURL+'/js/'}" />
-	
+<style>
+.prop .name {
+	clear:both;
+}
+	</style>
 </head>
 <body>
 	<div class="container outer-wrapper">

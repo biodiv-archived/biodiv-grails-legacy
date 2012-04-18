@@ -7,7 +7,7 @@
 
 
 <link rel="stylesheet" type="text/css" media="all"
-	href="${resource(dir:'bootstrap/css',file:'bootstrap.css', absolute:true)}" />
+	href="${resource(dir:'bootstrap/css',file:'bootstrap.min.css', absolute:true)}" />
 
 <!--link rel="stylesheet" type="text/css" media="all"
 	href="${resource(dir:'bootstrap/css',file:'bootstrap-responsive.css', absolute:true)}" /-->
@@ -24,7 +24,7 @@
 
 <script src="${resource(dir:'plugins',file:'jquery-ui-1.8.15/jquery-ui/js/jquery-ui-1.8.15.custom.min.js', absolute:true)}" type="text/javascript" ></script>
 <g:if test="${params.controller  != 'species'}">
-<g:javascript src="bootstrap.js"
+<g:javascript src="bootstrap.min.js"
 	base="${grailsApplication.config.grails.serverURL+'/bootstrap/js/'}"></g:javascript>
 </g:if>
 
