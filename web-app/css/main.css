@@ -1654,6 +1654,8 @@ border-radius: 0 0 0 0;
 box-shadow: 0 4px 3px -3px #5E5E5E;
 }
 
-#content, .speciesField {
-	background-color: rgba(106, 201, 162, 0.15);
-}
+/*
+.ui-widget-content, .ui-widget  {
+	background : rgba(106, 201, 162, 0.15) url(images/ui-bg_flat_75_ffffff_40x100.png) 50% 50% repeat-x;
+	//background-color: rgba(106, 201, 162, 0.15);
+}*/

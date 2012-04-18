@@ -375,6 +375,7 @@ environments {
 	saturn {
 		grails.serverURL = "http://saturn.strandls.com:8080/${appName}"
 		grails.domainServerURL = "http://saturn.strandls.com:8080/${appName}"
+		
 		speciesPortal {
 			app.rootDir = "/data/species"
 			data.rootDir = "${app.rootDir}/data"
@@ -414,6 +415,8 @@ environments {
 	pamba {
 		grails.serverURL = "http://thewesternghats.in:8080/${appName}"
 		grails.domainServerURL = "http://thewesternghats.in:8080/${appName}"
+		jpegOptimProg = '/usr/local/bin/jpegoptim'
+		
 		speciesPortal {
 			app.rootDir = "/data/species"
 			data.rootDir = "${app.rootDir}/data"
