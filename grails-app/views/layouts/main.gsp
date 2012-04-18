@@ -34,16 +34,10 @@
 <link rel="stylesheet" type="text/css" media="screen"
 	href="${resource(dir:'js/jquery/jquery.jqGrid-4.1.2/css',file:'ui.jqgrid.css', absolute:true)}" />
 
-<!-- link rel="stylesheet" type="text/css"
-	href="${resource(dir:'css',file:'auth.css', absolute:true)}" /-->
+<link rel="stylesheet" type="text/css"
+	href="${resource(dir:'css',file:'auth.css', absolute:true)}" />
 	<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'spring-security-ui.css',plugin:'spring-security-ui')}"/>
-	<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'jquery.jgrowl.css',plugin:'spring-security-ui')}"/>
 	<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'jquery.safari-checkbox.css',plugin:'spring-security-ui')}"/>
-	<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'auth.css',plugin:'spring-security-ui')}"/>
-	<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'date_input.css',plugin:'spring-security-ui')}"/>
-   <link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'jquery.jdMenu.css',plugin:'spring-security-ui')}"/>
-   <link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'jquery.jdMenu.slate.css',plugin:'spring-security-ui')}"/>
-   <link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'table.css',plugin:'spring-security-ui')}"/>
 	
 <!-- link rel="stylesheet" type="text/css" media="all"
 	href="${resource(dir:'css',file:'reset.css', absolute:true)}" /-->
@@ -74,24 +68,23 @@
 <g:javascript src="jquery.cookie.js"
 	base="${grailsApplication.config.grails.serverURL+'/js/jquery/'}"></g:javascript>
 
-<g:javascript src='jquery/jquery.jgrowl.js' plugin='spring-security-ui'/>
 <g:javascript src='jquery/jquery.checkbox.js' plugin='spring-security-ui'/>
 <g:javascript src='spring-security-ui.js' plugin='spring-security-ui'/>
 
 <g:javascript>
 jQuery(document).ready(function($) {
         if (document.domain == "${grailsApplication.config.wgp.domain}"){
-            $('#ibp_header').hide();
-            $('#wgp_header').show();
-            $('#ibp_footer').hide();
-            $('#wgp_footer').show();
+            $('#ibp-header').hide();
+            $('#wgp-header').show();
+            $('#ibp-footer').hide();
+            $('#wgp-footer').show();
         }
 
         if (document.domain == "${grailsApplication.config.ibp.domain}"){
-            $('#wgp_header').hide();
-            $('#ibp_header').show();
-            $('#wgp_footer').hide();
-            $('#ibp_footer').show();
+            $('#wgp-header').hide();
+            $('#ibp-header').show();
+            $('#wgp-footer').hide();
+            $('#ibp-footer').show();
         }
 
 
@@ -166,11 +159,7 @@ border-bottom:3px solid #003846;
 }
 
 </style>
-	<g:javascript>
-
-		
-		
-	</g:javascript>
+	
 
 </head>
 <body>
@@ -183,13 +172,8 @@ border-bottom:3px solid #003846;
 		<span>Loading ...</span>
 	</div>
        
-        <div id="wgp_header" style="display:none;">
             <domain:showWGPHeader/>
-        </div>    
-
-        <div id="ibp_header" style="display:none;">
             <domain:showIBPHeader/>
-        </div>    
 
 
 	
@@ -214,13 +198,9 @@ border-bottom:3px solid #003846;
 		</div>
 		<g:layoutBody />
 
-                <div id="wgp_footer" style="display:none;">
                     <domain:showWGPFooter/>
-                </div>    
 
-                <div id="ibp_footer" style="display:none;">
                     <domain:showIBPFooter/>
-                </div>    
 
 	</div>
 

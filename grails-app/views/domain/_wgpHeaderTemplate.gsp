@@ -10,7 +10,7 @@ z-index: 2000;
 }
 </style>
 
-<div id="wgp-header">
+<div id="wgp-header" style="display:none;">
     <!-- Logo -->
       <div id="logo" class="span3">
         <a href="/">

@@ -24,7 +24,7 @@ cursor: pointer;
 }
 </style>
 
-<div id="ibp-footer">
+<div id="ibp-footer" style="display:none;">
     <ul>
     <li onclick="location.href='/terms'" title="Terms">Terms</li>
     <li onclick="location.href='/license'" title="Licenses">Licenses</li>

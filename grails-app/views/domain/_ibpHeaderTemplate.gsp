@@ -50,7 +50,7 @@ right: 0;
 }
 </style>
 
-<div id="ibp-header">
+<div id="ibp-header" style="display:none;">
     <!-- Logo -->
       <div id="logo">
         <a href="/">

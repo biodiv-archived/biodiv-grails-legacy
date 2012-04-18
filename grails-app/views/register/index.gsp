@@ -51,7 +51,7 @@
 						</g:if>
 						<g:else>
 
-							<div class="control-group" style="clear: both;">Using:</div>
+							<div class="control-group" style="clear: both;float: left;line-height: 40px;">Using:</div>
 							<div class="control_group">
 								<sUser:externalAuthProviders
 									model='["openidIdentifier":openidIdentifier]' />

@@ -29,7 +29,7 @@
 						<legend>
 							<g:message code="springSecurity.login.title" default="Log in" />
 						</legend>
-						<div class="control-group"style="clear: both;">Using:</div>
+						<div class="control-group"style="clear: both;float: left;line-height: 40px;">Using:</div>
 						<div class="control_group">
 							<sUser:externalAuthProviders
 								model='["openidIdentifier":openidIdentifier]' />
