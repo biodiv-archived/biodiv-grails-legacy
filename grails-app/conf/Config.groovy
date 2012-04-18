@@ -449,8 +449,8 @@ environments {
 			"_trackPageLoadTime"
 		]
 
-                ibp.domain='thewesternghats.in'
-                wgp.domain='indiabiodiversity.org'    
+                ibp.domain='indiabiodiversity.org'
+                wgp.domain='thewesternghats.in'    
 	}
 }
 
