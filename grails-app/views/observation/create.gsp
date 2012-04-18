@@ -275,8 +275,8 @@
 									<reco:create />
 								</div>
 								<div id="help-identify" class="control-label">
-									<label class="checkbox"> <input type="checkbox"
-										style="width: auto; height: auto;" /> Help identify </label>
+									<label class="checkbox" style="text-align:left;"> <input type="checkbox"
+										style="width: auto; height: auto;margin-left: -14px;" /> Help identify </label>
 								</div>
 							</div>
 						</div>
@@ -519,7 +519,7 @@
 
 				<div class="span12" style="margin-top: 20px; margin-bottom: 40px;">
 					<g:if test="${observationInstance?.id}">
-						<div class="btn btn-danger btn-large"
+						<div class="btn btn-danger"
 							style="float: right; margin-right: 5px;">
 							<a
 								href="${createLink(controller:'observation', action:'flagDeleted', id:observationInstance.id)}"
@@ -722,7 +722,7 @@
 	});
 
 
-	function removeRessurce(event) {
+	function removeResource(event) {
 		$(event.target).parent('.addedResource').remove();
 	}
 	

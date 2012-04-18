@@ -1653,3 +1653,7 @@ background-color: rgba(106, 201, 162, 0.2);
 border-radius: 0 0 0 0;
 box-shadow: 0 4px 3px -3px #5E5E5E;
 }
+
+#content, .speciesField {
+	background-color: rgba(106, 201, 162, 0.15);
+}
