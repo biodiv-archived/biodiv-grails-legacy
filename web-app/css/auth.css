@@ -7,9 +7,10 @@ div.openid-loginbox {
 	width: 400px;
 	margin-left: auto;
 	margin-right: auto;
-	background: #F5F5F5;
+/* 	background: #F5F5F5; */
 	border: 1px solid #E5E5E5;
 	padding: 15px;
+	margin:10px auto;
 }
 
 .openid-loginbox-inner {
@@ -28,13 +29,15 @@ td.openid-loginbox-title {
 	font-size: 14px;
 }
 
-td.openid-loginbox-inner .external_providers img {
+
+.external_providers img {
 	border: 0;
 	vertical-align: middle;
 	padding-right: 3px;
 }
 
-table.openid-loginbox-userpass {
+.openid-loginbox-userpass {
+	border-top: 1px #eee solid;
  	margin: 3px 3px 3px 8px;
  	margin-left: auto;
  	margin-right: auto; 
@@ -54,18 +57,6 @@ input.openid-identifier {
 	padding-left: 18px;
 }
 
-input[type='text'],input[type='password'] {
-	font-size: 16px;
-	width: 250px;
-}
-
-input[type='submit'] {
-	font-size: 14px;
-}
-
-td.openid-submit {
-	padding: 3px;
-}
 
 .sign_in_external_bttn {
 	float: left;
@@ -73,11 +64,6 @@ td.openid-submit {
 }
 
 #openidLogin {
-	border-top: 1px #c0c0ff solid;
-	margin-top: 50px;
-}
-
-#formLogin {
 	border-top: 1px #c0c0ff solid;
 	margin-top: 50px;
 }
@@ -126,3 +112,20 @@ td.openid-submit {
 #ajaxLogin .inner .text_ {width:120px;}
 #ajaxLogin .inner .chk {height:12px;}
 .errorMessage { color: red; }
+
+.form-horizontal .control-label {
+	width:70px;
+	font-weight:bold;
+}
+
+.form-horizontal .controls {
+	margin-left: 90px;
+}
+
+form {
+	margin: 0 0;
+}
+
+legend + .control-group {
+	margin:0;
+}

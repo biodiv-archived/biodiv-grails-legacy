@@ -639,6 +639,18 @@ grails.plugins.springsecurity.ui.register.emailBody = '''Hi $username,<br/><br/>
 grails.plugins.springsecurity.ui.register.emailFrom = 'notification@thewesternghats.in'
 grails.plugins.springsecurity.ui.register.emailSubject = "Activate your account with ${speciesPortal.domain}"
 
+grails.plugins.springsecurity.ui.forgotPassword.emailBody = '''\
+Hi $username,<br/>
+<br/>
+You (or someone pretending to be you) requested that your password be reset.<br/>
+<br/>
+If you didn't make this request then ignore the email; no changes have been made.<br/>
+<br/>
+If you did make the request, then click <a href="$url">here</a> to reset your password.
+'''
+grails.plugins.springsecurity.ui.forgotPassword.emailFrom = 'notification@thewesternghats.in'
+grails.plugins.springsecurity.ui.forgotPassword.emailSubject = "Password Reset"
+
 grails.plugins.springsecurity.ui.addObservation.emailSubject = 'Observation added'
 grails.plugins.springsecurity.ui.addObservation.emailBody = '''Hi $user.username,<br/><br/>You have uploaded an observation to the Western Ghats Portal/India Biodiversity Portal.<br/>Your observation is available at the following URL:<a href="$obvUrl">$obvUrl</a><br/><br/>You will be notified by mail on any social activity on the observation.<br/><br/>If you do not want to receive notifications please go to your user profile and switch it off.<br/>
 <br/>User Profile URL:<a href="$userProfileUrl">$userProfileUrl</a><br/><br/>Thank you for your contribution to the portal.<br/><br/>The portal team'''

@@ -1,44 +1,87 @@
 <html>
 
 <head>
-<title><g:message code='spring.security.ui.resetPassword.title'/></title>
-<meta name='layout' content='main'/>
+<title><g:message code='spring.security.ui.resetPassword.title' />
+</title>
+<meta name='layout' content='main' />
+<link rel="stylesheet" type="text/css" media="all"
+	href="${resource(dir:'css',file:'auth.css', absolute:true)}" />
 </head>
 
 <body>
 
-<p/>
+	<div class="container outer-wrapper">
+		<div class="row">
 
-<s2ui:form width='475' height='250' elementId='resetPasswordFormContainer'
-           titleCode='spring.security.ui.resetPassword.header' center='true'>
+			<div class="openid-loginbox super-section">
+				<g:if test="${flash.error}">
+					<div class="alert alert-error">
+						${flash.error}
+					</div>
+				</g:if>
 
-	<g:form action='resetPassword' name='resetPasswordForm' autocomplete='off'>
-	<g:hiddenField name='t' value='${token}'/>
-	<div class="sign-in">
+				<g:if test="${flash.message}">
+					<div class="alert alert-success">
+						${flash.message}
+					</div>
+				</g:if>
+				<div style='clear: both'>
+					<fieldset>
+						<legend>
+							<g:message code="spring.security.ui.resetPassword.header"
+								default="Reset password" />
+						</legend>
+						<form action='resetPassword' name='resetPasswordForm'
+							autocomplete='off' method="POST" class="form-horizontal">
+							<g:hiddenField name='t' value='${token}' />
+							<div class="control-group"
+								style="clear: both; border-top: 1px solid #Eee; padding-top: 5px;">
+								<g:message code='spring.security.ui.resetPassword.description' />
+							</div>
+							<div
+								class="control-group ${hasErrors(bean: command, field: password, 'error')}">
+								<label class="control-label" for="password"><g:message
+										code='user.password.label' default='Password *' /> </label>
+								<div class="controls">
+									<input class="input-large" id="password" type="password"
+										value="${command.password}" name="password"
+										placeholder="Enter your password...">
 
-	<br/>
-	<h4><g:message code='spring.security.ui.resetPassword.description'/></h4>
+									<g:hasErrors bean="${command}" field="password">
+										<div class="help-inline">
+											<g:renderErrors bean="${command}" field="password" />
+										</div>
+									</g:hasErrors>
+								</div>
+							</div>
+							<div
+								class="control-group ${hasErrors(bean: command, field: password2, 'error')}">
+								<label class="control-label" for="password2"><g:message
+										code='user.password2.label' default='Password (again)*' /> </label>
+								<div class="controls">
+									<input class="input-large" id="password2" type="password"
+										value="${command.password2}" name="password2"
+										placeholder="Enter your password again...">
 
-	<table>
-		<s2ui:passwordFieldRow name='password' labelCode='resetPasswordCommand.password.label' bean="${command}"
-                             labelCodeDefault='Password' value="${command?.password}"/>
+									<g:hasErrors bean="${command}" field="password2">
+										<div class="help-inline">
+											<g:renderErrors bean="${command}" field="password2" />
+										</div>
+									</g:hasErrors>
 
-		<s2ui:passwordFieldRow name='password2' labelCode='resetPasswordCommand.password2.label' bean="${command}"
-                             labelCodeDefault='Password (again)' value="${command?.password2}"/>
-	</table>
+								</div>
+							</div>
+							<div class="control-group">
 
-	<s2ui:submitButton elementId='reset' form='resetPasswordForm' messageCode='spring.security.ui.resetPassword.submit' class="btn btn-primary" style="float:right;"/>
-
+								<s2ui:submitButton elementId='reset' form='resetPasswordForm'
+									messageCode='spring.security.ui.resetPassword.submit'
+									class="btn btn-primary" style="float:right;" />
+							</div>
+						</form>
+					</fieldset>
+				</div>
+			</div>
+		</div>
 	</div>
-	</g:form>
-
-</s2ui:form>
-
-<script>
-$(document).ready(function() {
-	$('#password').focus();
-});
-</script>
-
 </body>
 </html>

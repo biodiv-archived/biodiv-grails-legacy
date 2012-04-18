@@ -45,8 +45,8 @@
    <link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'jquery.jdMenu.slate.css',plugin:'spring-security-ui')}"/>
    <link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'table.css',plugin:'spring-security-ui')}"/>
 	
-<link rel="stylesheet" type="text/css" media="all"
-	href="${resource(dir:'css',file:'reset.css', absolute:true)}" />
+<!-- link rel="stylesheet" type="text/css" media="all"
+	href="${resource(dir:'css',file:'reset.css', absolute:true)}" /-->
 <link rel="stylesheet" type="text/css" media="all"
 	href="${resource(dir:'css',file:'text.css', absolute:true)}" />
         
