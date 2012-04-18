@@ -9,7 +9,7 @@ import species.auth.SUser;
 //SUser.executeUpdate("delete SUser s");
 def defaultRoleNames = ['ROLE_USER']
 
-new File("/home/sravanthi/git/biodiv/users.tsv").splitEachLine("\\t") {
+new File("/tmp/users.tsv").splitEachLine("\\t") {
 	def fields = it;
 	def user = new SUser (
 			username : fields[1],
