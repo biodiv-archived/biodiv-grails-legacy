@@ -105,7 +105,7 @@ class OpenIdController {
 			authenticateAndRedirect user."$usernamePropertyName"
 		} else {
 			log.info "Redirecting to register"
-			RegisterCommand command = new RegisterCommand();
+			CustomRegisterCommand command = new CustomRegisterCommand();
 			copyFromAttributeExchange command
 			command.openId = openId;
 			log.debug "register command : $command"
@@ -187,7 +187,7 @@ class OpenIdController {
 			authenticateAndRedirect user."$usernamePropertyName"
 		} else {
 			log.info "Redirecting to register"
-			RegisterCommand command = new RegisterCommand();
+			CustomRegisterCommand command = new CustomRegisterCommand();
 			facebookAuthService.copyFromFacebookProfile command, fbProfile
 			command.openId = fbProfile.link
 			command.facebookUser = true;
@@ -290,7 +290,7 @@ class OpenIdController {
 	 * For the initial form display, copy any registered AX values into the command.
 	 * @param command  the command
 	 */
-	private void copyFromAttributeExchange(RegisterCommand command) {
+	private void copyFromAttributeExchange(CustomRegisterCommand command) {
 		List attributes = session[OIAFH.LAST_OPENID_ATTRIBUTES] ?: []
 		String firstName, lastName="";
 		for (attribute in attributes) {
