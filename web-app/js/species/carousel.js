@@ -38,32 +38,49 @@ var itemAddCallback = function(carousel, first, last, data, state) {
 	
 	
 	$('.jcarousel-item a img').each(function() {
-        var maxWidth = 75; // Max width for the image
-        var maxHeight = 75;    // Max height for the image
-        var ratio = 0;  // Used for aspect ratio
+		var maxHeight=75;
+		var maxWidth=75;
         var width = $(this).width();    // Current image width
         var height = $(this).height();  // Current image height
-        // Check if the current width is larger than the max
-        if(width > maxWidth){
-            ratio = maxWidth / width;   // get ratio for scaling image
-            $(this).css("width", maxWidth); // Set new width
-            $(this).css("height", height * ratio);  // Scale height based on ratio
-            $(this).css("margin-top", (maxHeight - height * ratio)/2);
-            height = height * ratio;    // Reset height to match scaled image
-            width = width * ratio;    // Reset width to match scaled image
-        }
-
-        // Check if current height is larger than max
         if(height > maxHeight){
-            ratio = maxHeight / height; // get ratio for scaling image
-            $(this).css("height", maxHeight);   // Set new height
-            $(this).css("width", width * ratio);    // Scale width based on ratio
-            $(this).css("margin-left", (maxWidth - width * ratio)/2);
-            width = width * ratio;    // Reset width to match scaled image
+        	$(this).parent().parent().css('height', maxHeight);
         }
-    });
+        console.log(Math.abs(maxWidth-width));
+        $(this).css('position','absolute').css('left',(0-(Math.abs(maxWidth-width)/2)));
+       	$(this).parent().parent().css('width', maxWidth).css('overflow', 'hidden');
+       	
+       	
+		/*
+		 var maxWidth = 75; // Max width for the image
+	        var maxHeight = 75;    // Max height for the image
+	        var ratio = 0;  // Used for aspect ratio
+	        var width = $(this).width();    // Current image width
+	        var height = $(this).height();  // Current image height
+	        
 
-};
+	        // Check if current height is larger than max
+	        if(height > maxHeight){
+	            ratio = maxHeight / height; // get ratio for scaling image
+	            $(this).css("height", maxHeight);   // Set new height
+	            $(this).css("width", width * ratio);    // Scale width based on ratio
+	            width = width * ratio;    // Reset width to match scaled image
+	            height = maxHeight;
+	        }
+	        console.log(width+"  "+height);
+	        // Check if the current width is larger than the max
+	        if(width > maxWidth){
+	            ratio = maxWidth / width;   // get ratio for scaling image
+	            $(this).css("width", maxWidth); // Set new width
+	            $(this).css("height", maxHeight);  // Scale height based on ratio
+	            width = maxWidth;
+	            height = maxHeight    // Reset height to match scaled image
+	        }
+	        
+	        console.log(width+"  "+height);
+	        $(this).css("margin-left", (maxWidth - width)/2);
+	        $(this).css("margin-top", (maxHeight - height)/2);*/
+    });
+}
 
 /**
  * Item html creation helper.
@@ -78,3 +95,19 @@ var reloadCarousel = function(carousel, fitlerProperty, filterPropertyValue){
 	carousel.options.filterPropertyValue = filterPropertyValue;
 	carousel.reset();
 }
+
+/*
+var itemVisibleInCallback  = function(carousel, item, idx, state) {
+	console.log(item);
+	console.log(idx);
+	console.log(state);
+	carousel.buttons(true);
+   // if (carousel.first == 1) { $("#editos .jcarousel-prev").css("visibility", "hidden"); } else { $("#editos .jcarousel-prev").css("visibility", "visible"); }
+    //if (carousel.last == carousel.size()) { $("#editos .jcarousel-next").css("visibility", "hidden"); } else { $("#editos .jcarousel-next").css("visibility", "visible"); }
+}
+var buttonNextCallback  = function(carousel, ele, flag) {
+	console.log(carousel);
+	console.log(ele);
+	console.log(flag);
+
+}*/
