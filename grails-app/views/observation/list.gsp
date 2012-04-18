@@ -222,9 +222,7 @@
                 var sortBy = ''; 
                  $('.sort_filter_label').each (function() {
                         if($(this).hasClass('active')) {
-                        	console.log($(this));
-                        	console.log($(this).attr('value'));
-                                sortBy += $(this).attr('value') + ',';
+	                        sortBy += $(this).attr('value') + ',';
                         }
                 });
 

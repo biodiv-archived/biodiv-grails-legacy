@@ -2,20 +2,20 @@
 
 <head>
 <meta name='layout' content='main' />
-<title><g:message code='spring.security.ui.user.search' /></title>
+<title><g:message code='spring.security.ui.user.search' />
+</title>
 <g:javascript src="jquery.autopager-1.0.0.js"
 	base="${grailsApplication.config.grails.serverURL+'/js/jquery/'}"></g:javascript>
 <g:set var="entityName"
 	value="${message(code: 'sUser.label', default: 'Users')}" />
 
 <style type="text/css">
-
 .snippet.tablet .figure img {
-	height:auto;
+	height: auto;
 }
 
 .figure .thumbnail {
-	height:120px;
+	height: 120px;
 	margin: 0 auto;
 	text-align: center;
 	*font-size: 120px;
@@ -49,13 +49,15 @@
 								code='user.username.label' default='Username' />:</label>
 						<div class="controls">
 							<div class="input-append">
-								<g:textField id="username" class="span3" name='username' size='50'
-									maxlength='255' value='${username}'
+								<g:textField id="username" class="span3" name='username'
+									size='50' maxlength='255' value='${username}'
 									class="input-medium search-query" />
 								<button id="userSearch" class="btn btn-primary" type="button">
 									<g:message code='spring.security.ui.search' default='Search' />
 								</button>
 							</div>
+
+
 							<div class="btn-group" data-toggle="buttons-radio"
 								style="float: right;">
 								<button class="list_view_bttn btn list_style_button active">
@@ -65,32 +67,40 @@
 									<i class="icon-th-large"></i>
 								</button>
 
-								<span style="float: left; padding: 5px;">Sort by</span> <a
-									id="selected_sort" class="btn dropdown-toggle btn-small"
-									data-toggle="dropdown" href="#"> <g:if
-										test="${params.sort == 'lastLoginDate'}">
+								<div class="btn-group" style="float: left; z-index: 10">
+									<button id="selected_sort" class="btn dropdown-toggle"
+										data-toggle="dropdown" href="#" rel="tooltip"
+										data-original-title="Sort by">
+										<g:if test="${params.sort == 'lastLoginDate'}">
                                                 Last Login
-                                            </g:if> <g:elseif
-										test="${params.sort == 'name'}">
+                                            </g:if>
+										<g:elseif test="${params.sort == 'name'}">
                                                 Name
-                                            </g:elseif> <g:else>
+                                            </g:elseif>
+										<g:else>
                                                 Activity
-                                            </g:else> <span class="caret"></span>
-								</a>
-								<div id="sort" class="filterBar dropdown-menu"
-									style="float: right;">
-									<input type="radio" name="sort" id="sort1"
-										value="activity" style="display: none" /> <label
-										for="sort1" value="activity" class="sort_filter_label">Activity</label><br />
+                                            </g:else>
+										<span class="caret"></span>
+									</button>
+									<input id="userSearchSort" type="hidden" name="sort" value="${params.sort}"/>
 
-									<input type="radio" name="sort" id="sort2"
-										value="lastLoginDate" style="display: none" /> <label
-										for="sort2" value="lastLoginDate"
-										class="sort_filter_label">Recently Logged In</label><br /> <input
-										type="radio" name="sort" id="sort3"
-										value="name" style="display: none" /> <label
-										for="sort3" value="name" class="sort_filter_label">Name</label><br />
+									<ul id="sort" class="dropdown-menu" style="width: auto;">
+										<li class="group_option"><a class="sort_filter_label"
+											value="activity">Activity </a>
+										</li>
+										<li class="group_option"><a
+											class=" sort_filter_label ${params.sort == 'lastLoginDate'?'active':'' }"
+											value="lastLoginDate"> Last Login </a>
+										</li>
+										<li class="group_option"><a
+											class=" sort_filter_label  ${params.sort == 'name'?'active':'' }"
+											value="name"> Name </a>
+										</li>
+									</ul>
+
+
 								</div>
+
 							</div>
 						</div>
 
@@ -109,10 +119,10 @@
 								<%
 def queryParams = [username: username, enabled: enabled, accountExpired: accountExpired, accountLocked: accountLocked, passwordExpired: passwordExpired]
 %>
-								
-									<sUser:showUserList
-										model="['userInstanceList':results, 'userInstanceTotal':totalCount, 'queryParams':queryParams]" />
-								
+
+								<sUser:showUserList
+									model="['userInstanceList':results, 'userInstanceTotal':totalCount, 'queryParams':queryParams]" />
+
 							</div>
 						</div>
 					</div>
@@ -130,25 +140,36 @@ def queryParams = [username: username, enabled: enabled, accountExpired: account
 			source: "${createLink(action: 'ajaxUserSearch')}"
 		});
 
-        $( "#sort" ).buttonset();
-        $('#sort label[value$="${params.sort}"]').attr('aria-pressed', 'true').addClass('btn btn-primary');
-        $('#sort label').hover(function() {
-            $(this).addClass("btn");
-        }, function(){
-        	$(this).removeClass("btn");
-        });
+		$('.sort_filter_label').click(function() {
+			$('.sort_filter_label.active').removeClass('active');
+			$(this).addClass('active');
+			$('#selected_sort').html($(this).html());
+			$("#userSearch").click();
+			return false;
+		});
 
-        $("input[name='sort']").change(function(){
-            $('#selected_sort').html($(this).html());
-            $("#userSearch").click();
-        });
+		function getSelectedSortBy() {
+			var sortBy = '';
+			$('.sort_filter_label').each(function() {
+				if ($(this).hasClass('active')) {
+					sortBy += $(this).attr('value') + ',';
+				}
+			});
 
-		$("#userSearch").click(function() {
-			$("#userSearchForm").submit();
-		})
+			sortBy = sortBy.replace(/\s*\,\s*$/, '');
+			return sortBy;
+		}
+
+		$("#userSearch").click(
+				function() {
+					var sortParam = getSelectedSortBy();
+					if (sortParam) {
+						$("#userSearchSort").val(sortParam);
+					}
+					$("#userSearchForm").submit();
+				});
 
 	});
-
 	</script>
 
 </body>
