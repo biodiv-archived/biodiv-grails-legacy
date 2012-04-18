@@ -104,4 +104,9 @@ class SUserTagLib {
 			out << render(template:"/common/suser/showDateTemplate", model:attrs.model);
 		}
 	}
+
+        def userLoginBox = { attrs, body->
+			out << render(template:"/common/suser/userLoginBoxTemplate", model:attrs.model);
+	}
+
 }
