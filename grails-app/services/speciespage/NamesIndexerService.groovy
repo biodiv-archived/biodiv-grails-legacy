@@ -121,8 +121,9 @@ class NamesIndexerService {
 	private String getSpeciesIconPath(species){
 		if(species?.mainImage()){
 			return species.mainImage().fileName;
-		}else
-			return species?.fetchSpeciesGroupIcon(ImageType.SMALL);
+		}else{
+			return species?.fetchSpeciesGroupIcon(ImageType.SMALL)?.fileName;
+		}
 	}
 
 	/**
@@ -176,7 +177,7 @@ class NamesIndexerService {
 				String icon = record.icon;
 				if(icon) {
 					icon = grailsApplication.config.speciesPortal.resources.serverURL + "/" + icon;
-					icon = icon.replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.galleryThumbnail.suffix);
+					//icon = icon.replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.galleryThumbnail.suffix);
 				}
 				result.add([value:record.canonicalForm, label:highlightedName, desc:record.canonicalForm, icon:icon, speciesId:record.speciesId, "category":"Names"]);
 			}

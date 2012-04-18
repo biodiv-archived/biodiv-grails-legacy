@@ -48,11 +48,9 @@
 						<div class="list span9">
 
 							<div class="observations thumbwrap">
-								<div>
-									<obv:showSnippet
+								<obv:showSnippet
 										model="['observationInstance':parentObservation]"></obv:showSnippet>
-								</div>
-								<h5>
+								<h5 style="position:relative; top:40px; clear:both">
 									<g:if test="${filterProperty == 'nearBy'}">
 										Observations nearby
 									</g:if>
