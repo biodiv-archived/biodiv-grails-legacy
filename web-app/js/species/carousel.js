@@ -50,9 +50,14 @@ function resizeImage(item) {
     	item.css('height', maxHeight);
     } 
     
+    if(width == 0) {
+    	width = maxWidth;
+    }
+    
     if(width > maxWidth) {
     	ele.css('position','absolute').css('left',(0-(Math.abs(maxWidth-width)/2)));
     }
+    
     
    	item.css('width', Math.min(maxWidth, width)).css('overflow', 'hidden');
    	

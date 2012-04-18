@@ -2,6 +2,8 @@ package species
 
 import java.util.Date;
 import java.lang.Float;
+import species.NamesParser;
+import species.Synonyms;
 
 import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
 
@@ -181,5 +183,25 @@ class AdminController {
 			}
 		
 		}
+	}
+	
+	
+	def parseSynonyms = {
+		NamesParser namesParser = new NamesParser();
+		Synonyms.withTransaction {
+				Synonyms.list().eachWithIndex { syn, index ->
+						def parsedNames = namesParser.parse([syn.name]);
+						if(parsedNames[0]?.canonicalForm) {
+								syn.canonicalForm = parsedNames[0].canonicalForm;
+								syn.normalizedForm = parsedNames[0].normalizedForm;;
+								syn.italicisedForm = parsedNames[0].italicisedForm;;
+								syn.binomialForm = parsedNames[0].binomialForm;;
+								if(!syn.save(flush:true, insert:true)) {
+										syn.errors.each {println it}
+								}
+						}
+				};
+		}
+		namesLoaderService.syncNamesAndRecos(true);
 	}
 }

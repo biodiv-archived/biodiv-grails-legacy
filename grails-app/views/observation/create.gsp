@@ -519,7 +519,7 @@
 
 				<div class="span12" style="margin-top: 20px; margin-bottom: 40px;">
 					<g:if test="${observationInstance?.id}">
-						<div class="btn btn-danger btn-large"
+						<div class="btn btn-danger"
 							style="float: right; margin-right: 5px;">
 							<a
 								href="${createLink(controller:'observation', action:'flagDeleted', id:observationInstance.id)}"

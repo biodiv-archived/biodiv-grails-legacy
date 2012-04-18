@@ -417,7 +417,8 @@ environments {
 		speciesPortal {
 			app.rootDir = "/data/species"
 			data.rootDir = "${app.rootDir}/data"
-
+			names.parser.serverURL = "saturn.strandls.com"
+			
 			resources {
 				rootDir = "${app.rootDir}/images"
 				serverURL = "http://pamba.strandls.com/${appName}/images"
