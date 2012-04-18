@@ -269,6 +269,10 @@ class SUserController extends UserController {
 		render text: jsonData as JSON, contentType: 'text/plain'
 	}
 
+        def login = {
+            render  template:"/common/suser/userLoginBoxTemplate" 
+        }
+
 	protected void addRoles(user) {
 		String upperAuthorityFieldName = GrailsNameUtils.getClassName(
 				SpringSecurityUtils.securityConfig.authority.nameField, null)
