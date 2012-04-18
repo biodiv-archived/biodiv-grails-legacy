@@ -500,7 +500,7 @@ class ObservationService {
 			//(filterQuery == "")? (filterQuery += " where ") : (filterQuery += " and ")
 			filterQuery += " and obv.author.id = :user "
 			queryParams["user"] = params.user.toLong()
-			activeFilters["user"] = params.habitat
+			activeFilters["user"] = params.user.toLong()
 		}
 
 		if(params.speciesName && (params.speciesName != grailsApplication.config.speciesPortal.group.ALL)){
