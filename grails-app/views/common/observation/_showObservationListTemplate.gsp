@@ -88,8 +88,7 @@
     		    // a selector that matches page contents
     		    content: '.mainContent',
                     
-                //insertBefore: '.loadMore',
-    			appendTo: '.mainContent',
+                    insertAfter: '.mainContent',
     			
     		    // a callback function to be triggered when loading start 
 		    start: function(current, next) {
