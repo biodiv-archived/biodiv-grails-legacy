@@ -553,4 +553,9 @@ class ObservationService {
 	private String getIdList(l){
 		return l.toString().replace("[", "(").replace("]", ")")
 	}
+	
+	
+	long getAllObservationsOfUser(SUser user) {
+		return (long)Observation.countByAuthorAndIsDeleted(user, false);
+	}
 }

@@ -425,7 +425,7 @@ environments {
 			nameSearch.indexStore = "${app.rootDir}/data/names"
 			observations {
 				rootDir = "${app.rootDir}/observations"
-				serverURL = "http://pamba.strandls.com/${appName}/observations"
+				serverURL = "http://thewesternghats.in/${appName}/observations"
 				//serverURL = "http://localhost/${appName}/observations"
 			}
 			search.serverURL="http://thewesternghats.in:8080/solr/species"
