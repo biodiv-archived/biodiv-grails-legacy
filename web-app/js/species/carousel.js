@@ -99,7 +99,11 @@ var getItemHTML = function(item) {
 var reloadCarousel = function(carousel, fitlerProperty, filterPropertyValue){
 	carousel.options.filterProperty = fitlerProperty;
 	carousel.options.filterPropertyValue = filterPropertyValue;
+	var visibleOffset = carousel.last - carousel.first;
 	carousel.reset();
+	carousel.first = 1;
+	carousel.last = carousel.first + visibleOffset;
+	itemLoadCallback(carousel, 'init');
 }
 
 /*
