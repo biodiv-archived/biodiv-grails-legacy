@@ -6,7 +6,7 @@
 		<!-- div class="fb-login-button"
 			data-scope="email,user_about_me,user_location,user_activities,user_hometown,manage_notifications,user_website,publish_stream"
 			data-show-faces="true">Login with Facebook</div-->
-		<div class="fbJustConnect">Login with Facebook</div>
+		<div class="fbJustConnect"></div>
 	</div>
 
 	<div class="sign_in_external_bttn">
