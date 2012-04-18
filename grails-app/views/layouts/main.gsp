@@ -34,8 +34,8 @@
 <link rel="stylesheet" type="text/css" media="screen"
 	href="${resource(dir:'js/jquery/jquery.jqGrid-4.1.2/css',file:'ui.jqgrid.css', absolute:true)}" />
 
-<link rel="stylesheet" type="text/css"
-	href="${resource(dir:'css',file:'auth.css', absolute:true)}" />
+<!-- link rel="stylesheet" type="text/css"
+	href="${resource(dir:'css',file:'auth.css', absolute:true)}" /-->
 	<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'spring-security-ui.css',plugin:'spring-security-ui')}"/>
 	<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'jquery.safari-checkbox.css',plugin:'spring-security-ui')}"/>
 	
