@@ -31,7 +31,7 @@
 							<g:message code="spring.security.ui.resetPassword.header"
 								default="Reset password" />
 						</legend>
-						<form action='resetPassword' name='resetPasswordForm'
+						<form action='${createLink(controller:'register', action:'resetPassword')}' name='resetPasswordForm'
 							autocomplete='off' method="POST" class="form-horizontal">
 							<g:hiddenField name='t' value='${token}' />
 							<div class="control-group"

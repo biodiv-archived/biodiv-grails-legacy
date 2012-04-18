@@ -56,7 +56,7 @@
 								<sUser:externalAuthProviders
 									model='["openidIdentifier":openidIdentifier]' />
 							</div>
-							<form action='register' name='registerForm' method="POST"
+							<form action="${createLink(controller:'register', action:'register')}" name='registerForm' method="POST"
 								class="form-horizontal">
 								<div class="control-group"
 								style="clear: both; border-top: 1px solid #Eee; padding-top: 5px;">Or,
@@ -67,10 +67,10 @@
 											code='user.email.label' default='E-mail *' /> </label>
 									<div class="controls">
 										<input
-											class="input-large focused ${(command.openId)?'disabled':''} "
+											class="input-large focused ${(command.openId)?'readonly':''} "
 											id="email" type="text" value="${command.email}" name="email"
 											placeholder="Enter your email id..."
-											${(command.openId)?'disabled':''}>
+											${(command.openId)?'readonly':''}>
 
 										<g:hasErrors bean="${command}" field="email">
 											<div class="help-inline">

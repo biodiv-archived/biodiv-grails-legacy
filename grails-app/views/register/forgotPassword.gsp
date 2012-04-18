@@ -44,7 +44,7 @@ form {
 						</g:if>
 						<g:else>
 
-							<form action='forgotPassword' name="forgotPasswordForm" method="POST" 
+							<form action='${createLink(controller:'register', action:'forgotPassword')}' name="forgotPasswordForm" method="POST" 
 								class="form-horizontal">
 
 								<div class="control-group"
