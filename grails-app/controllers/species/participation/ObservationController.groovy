@@ -400,11 +400,15 @@ class ObservationController {
 				log.debug results;
 				if(results?.recoVotes.size() > 0) {
 					def html =  g.render(template:"/common/observation/showObservationRecosTemplate", model:['observationInstance':observationInstance, 'result':results.recoVotes, 'totalVotes':results.totalVotes, 'uniqueVotes':results.uniqueVotes]);
+					def speciesNameHtml =  g.render(template:"/common/observation/showSpeciesNameTemplate", model:['observationInstance':observationInstance]);
+						
 					render(contentType:"text/xml") {
 						recos{
 							recoHtml(html)
 							uniqueVotes(results.uniqueVotes)
 							recoVoteMsg(params.recoVoteMsg)
+							speciesNameTemplate(speciesNameHtml)
+							speciesName(observationInstance.maxVotedSpeciesName)
 						}
 					}
 					return

@@ -45,7 +45,7 @@
 }
 
 #name {
-	width: 90%;
+	width: 91%;
 }
 </style>
 </head>
@@ -149,7 +149,7 @@
 									model="['recommendationInstance':recommendationInstance]" />
 								<input type="hidden" name='obvId'
 									value="${observationInstance.id}" /> <input type="submit"
-									value="Add" class="btn" style="position: relative;margin-right: 6px;top: -28px;float: right;" />
+									value="Add" class="btn" style="position: relative;top: -28px;float: right;" />
 								
 							</form>
 						</div>

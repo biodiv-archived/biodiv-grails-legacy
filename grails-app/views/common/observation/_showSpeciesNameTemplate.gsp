@@ -1,3 +1,4 @@
+<div class="species_title">
 <g:set var="sName" value="${observationInstance.maxVotedSpeciesName}" />
 <g:if test="${sName == 'Unknown'}">
 	<i>${sName}</i>
@@ -6,3 +7,4 @@
 <g:else>
 	<i>${sName}</i>
 </g:else>
+</div>
