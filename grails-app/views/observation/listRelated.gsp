@@ -17,25 +17,19 @@
 	base="${grailsApplication.config.grails.serverURL+'/js/'}"></g:javascript>
 <g:javascript src="jquery.autopager-1.0.0.js"
 	base="${grailsApplication.config.grails.serverURL+'/js/jquery/'}"></g:javascript>
-	<style>
-	.observations_list {
-		top:0;
-	}
-	</style>
+<style>
+.observations_list {
+	top: 0;
+}
+</style>
 </head>
 <body>
 	<div class="container outer-wrapper">
 		<div class="row">
 			<div class="span12">
 				<div class="page-header">
-					<h1>
-						<g:if test="${filterProperty == 'nearBy'}">
-							Observations at near by locations :${parentObservation.location}
-						</g:if>
-						<g:elseif test="${filterProperty == 'speciesName'}">
-							Observations of species : ${parentObservation.maxVotedSpeciesName}
-						</g:elseif>
-					</h1>
+					<h1>Related Observations</h1>
+
 				</div>
 
 				<g:if test="${flash.message}">
@@ -58,7 +52,14 @@
 									<obv:showSnippet
 										model="['observationInstance':parentObservation]"></obv:showSnippet>
 								</div>
-								<div  style="clear: both;"></div>
+								<h5>
+									<g:if test="${filterProperty == 'nearBy'}">
+										Observations nearby
+									</g:if>
+									<g:elseif test="${filterProperty == 'speciesName'}">
+										Observations of same species
+									</g:elseif>
+								</h5>
 								<obv:showObservationsList />
 							</div>
 						</div>

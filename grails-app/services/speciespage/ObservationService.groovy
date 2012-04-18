@@ -83,7 +83,7 @@ class ObservationService {
 	*/
 	Map getRelatedObservations(params) {
 	   log.debug params;
-	   def max = Math.min(params.limit ? params.limit.toInteger() : 3, 100)
+	   def max = Math.min(params.limit ? params.limit.toInteger() : 9, 100)
 
 	   def offset = params.offset ? params.offset.toInteger() : 0
 
@@ -95,11 +95,11 @@ class ObservationService {
 	   }else if(params.filterProperty == "user"){
 		   relatedObv = getRelatedObservationByUser(params.filterPropertyValue.toLong(), max, offset, params.sort)
 	   }else if(params.filterProperty == "nearBy"){
-		   relatedObv = getNearbyObservations(params.id, 5)
+		   relatedObv = getNearbyObservations(params.id, max)
 	   }else{
 		   relatedObv = getRelatedObservation(params.filterProperty, params.id.toLong(), max, offset)
 	   }
-	   return relatedObv
+	   return [relatedObv:relatedObv, max:max]
    }
 
 	
@@ -436,7 +436,7 @@ class ObservationService {
 		//XXX should handle in generic way
 		params.limit = 100
 		params.offset = 0
-		def obvIds = getRelatedObservations(params).observations.observation.collect{it.id}
+		def obvIds = getRelatedObservations(params).relatedObv.observations.observation.collect{it.id}
 		obvIds.add(params.id.toLong())
 		
 		def sql =  Sql.newInstance(dataSource);
