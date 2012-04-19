@@ -412,15 +412,23 @@ environments {
 					 port = 25
 				}
 			}
+			wgp {
+				facebook {
+					appId= "310694198984953"
+					secret= "eedf76e46272190fbd26e578ae764a60"
+				}
+			}
+			ibp {
+				facebook {
+					appId= "310694198984953"
+					secret= "eedf76e46272190fbd26e578ae764a60"
+				}
+			}
 		}
 		google.analytics.enabled = false
 
-		//wgp.saturn.strandls.com
-		grails.plugins.springsecurity.facebook.appId='310694198984953'
-		grails.plugins.springsecurity.facebook.secret='eedf76e46272190fbd26e578ae764a60'
-
-                ibp.domain='ibp.saturn.strandls.com'
-                wgp.domain='wgp.saturn.strandls.com'    
+	    ibp.domain='ibp.saturn.strandls.com'
+        wgp.domain='wgp.saturn.strandls.com'    
 
 	}
 
@@ -450,6 +458,18 @@ environments {
 					 port = 25
 				}
 			}
+			wgp {
+				facebook {
+					appId= "327308053982589"
+					secret= "f36074901fc24b904794692755796fd1"
+				}
+			}
+			ibp {
+				facebook {
+					appId= "347177228674021"
+					secret= "82d91308b5437649bfe891a027205501"
+				}
+			}
 		}
 		google.analytics.webPropertyID = "UA-xxxxxx-x"
 		google.analytics.enabled = false
@@ -460,23 +480,23 @@ environments {
 			"_trackPageLoadTime"
 		]
 
-                ibp.domain='indiabiodiversity.org'
-                wgp.domain='thewesternghats.in'    
+        ibp.domain='indiabiodiversity.org'
+        wgp.domain='thewesternghats.in'    
 	}
 }
 
 navigation.species_dashboard = [
         [controller:'species', title:'Species gallery', order:1, action:"list"],
         [controller:'species', title:'Taxonomy browser', order:10, action:'taxonBrowser'],
-	[controller:'search', title:'Advanced search', order:20, action:'advSelect'],
+		[controller:'search', title:'Advanced search', order:20, action:'advSelect'],
         [controller:'species', title:'Contribute', order:30, action:'contribute'],
-	[controller:'SUser', title:'Users', order:40, action:'search']
+		[controller:'SUser', title:'Users', order:40, action:'search']
 ]
 
 navigation.observation_dashboard = [
         [controller:'observation', title:'Browse observations', order:1, action:'list'],
         [controller:'observation', title:'Add observation', order:10, action:"create"],
-	[controller:'SUser', title:'Users', order:20, action:'search']
+		[controller:'SUser', title:'Users', order:20, action:'search']
 ]
 
 navigation.dashboard = [
