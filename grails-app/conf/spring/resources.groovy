@@ -12,6 +12,7 @@ import species.auth.ConsumerManager;
 import species.auth.FacebookAuthCookieFilter;
 import species.auth.FacebookAuthCookieLogoutHandler;
 import species.auth.FacebookAuthProvider;
+import species.auth.FacebookAuthUtils;
 import species.auth.OpenIDAuthenticationFilter;
 import species.auth.OpenIdAuthenticationFailureHandler;
 
@@ -81,6 +82,11 @@ beans = {
 		solrServer = ref('solrServer');		
 	}
 	
+	
+	facebookAuthUtils(FacebookAuthUtils) {
+		grailsApplication = ref('grailsApplication')
+	}
+
 	facebookAuthCookieLogout(FacebookAuthCookieLogoutHandler) {
 		facebookAuthUtils = ref('facebookAuthUtils')
 	}

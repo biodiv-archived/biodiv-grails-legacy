@@ -18,7 +18,6 @@ import org.springframework.security.web.DefaultRedirectStrategy
 import org.springframework.web.filter.GenericFilterBean
 
 import com.the6hours.grails.springsecurity.facebook.FacebookAuthToken
-import com.the6hours.grails.springsecurity.facebook.FacebookAuthUtils
 
 /**
  * TODO
@@ -49,7 +48,7 @@ class FacebookAuthCookieFilter extends GenericFilterBean implements ApplicationE
             if (cookie != null) {
 				logger.debug("Found fb cookie");
                 try {
-                    FacebookAuthToken token = facebookAuthUtils.build(cookie.value)
+                    FacebookAuthToken token = facebookAuthUtils.build(request, cookie.value)
                     if (token != null) {
 						logger.debug("Got fbAuthToken $token");
                         Authentication authentication = authenticationManager.authenticate(token);

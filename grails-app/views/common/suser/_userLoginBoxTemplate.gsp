@@ -1,34 +1,46 @@
 <script>
 <sec:ifLoggedIn>
 $(function(){
-$('#login-box').mouseover(function(){
-    $('#login-box-options').show();      
+$('.login-box').mouseover(function(){
+    $('.login-box-options').show();      
     });
     
-$('#login-box').mouseout(function(){
-    $('#login-box-options').hide();      
+$('.login-box').mouseout(function(){
+    $('.login-box-options').hide();      
 });
 });
 </sec:ifLoggedIn>
 </script>
 <style>
-#login-box {
-float: right;    
+.login-box {
+font-weight: normal;
+height: 100px;
+margin: 0;
+position: absolute;
+right: 0;
+top: 0;
 width: 180px;
-margin: 0;       
-height: 100%;      
 }
 <sec:ifLoggedIn>
-#login-box:hover {
+.login-box:hover {
 background-color: #ffffff;    
 border-left: 1px solid #e5e5e5;
+box-shadow: 0 6px 8px -6px #5e5e5e;
+border-radius:0 0 5px 5px;        
 }
 </sec:ifLoggedIn>
-#login-box-options {
+.login-box-options {
 float:right;
 right: 0;
+padding:10px;       
 }
-#loginLink {
+
+.login-box img {
+width: 32px;
+height: 32px;       
+}
+
+.loginLink {
 margin: 0;
 position: relative;
 float: right;       
@@ -61,23 +73,28 @@ width: 175px;
 float: left;
 margin-right: 10px;
 }
+.prop {
+    margin-bottom: 5px;
+    margin-top: 5px;
+}
 </style>
+<div class="login-box">
 <div class="register">
 <sec:ifNotLoggedIn>
             <g:link controller='login'>Login</g:link> | <g:link
                 controller='register'>Register</g:link>
 </sec:ifNotLoggedIn>
 </div>
-<div id="login-box" class="btn-group">
-    <span id='loginLink' data-toggle="dropdown">
+
+    <span class='loginLink'>
             <sec:ifLoggedIn>
                     <sUser:renderProfileLink />
             </sec:ifLoggedIn> 
     </span>
-    <div id="fb-root"></div>
-    <div id="login-box-options" class="dropdown-menu" style="display:none;">
+    <div class="login-box-options" style="display:none;">
         <sec:ifLoggedIn>
-            <a id="logout" href="${createLink(controller:'logout')}">Logout</a>
+            <a id="logout" href="${createLink(controller:'logout')}"><button>Logout</button></a>
         </sec:ifLoggedIn> 
     </div>
 </div>
+<div id="fb-root"></div>

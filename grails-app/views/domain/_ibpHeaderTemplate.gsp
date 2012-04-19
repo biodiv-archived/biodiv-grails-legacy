@@ -1,7 +1,6 @@
 
 <style>
 #ibp-header {
-background-color: #ECE9B7;
 border-bottom: 1px solid #E5E5E5;
 box-shadow: 0 6px 6px -6px #5E5E5E;
 color: #5E5E5E;
@@ -9,6 +8,14 @@ font-family: Verdana,Helvetica,Sans-Serif;
 height: 80px;
 width: 100%;
 z-index: 2000;
+}
+.gradient-bg {
+   background-color: #ECE9B7;
+   background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#ECE9B7), to(#ebfefd));
+   background-image: -webkit-linear-gradient(left, #ECE9B7, #ebfefd);
+   background-image:    -moz-linear-gradient(left, #ECE9B7, #ebfefd);
+   background-image:     -ms-linear-gradient(left, #ECE9B7, #ebfefd);
+   background-image:      -o-linear-gradient(left, #ECE9B7, #ebfefd);
 }
 #userMenu {
 font-size: 8pt;
@@ -50,7 +57,7 @@ right: 0;
 }
 </style>
 
-<div id="ibp-header" style="display:none;">
+<div id="ibp-header" class="gradient-bg" style="display:none;">
     <!-- Logo -->
       <div id="logo">
         <a href="/">

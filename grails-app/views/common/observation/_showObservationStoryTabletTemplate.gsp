@@ -1,4 +1,5 @@
 
+<%@page import="species.utils.Utils"%>
 <%@page import="species.utils.ImageType"%>
 <div class="observation_story tablet">
         
@@ -27,7 +28,7 @@
         <div class="story-footer">
             <div class="footer-item"><i class="icon-eye-open"></i>${observationInstance.getPageVisitCount()}</div>
                 
-            <div class="footer-item"><i class="icon-comment"></i><fb:comments-count href="${createLink(controller:'observation', action:'show', id:observationInstance.id, base:grailsApplication.config.grails.domainServerURL)}"></fb:comments-count></div>
+            <div class="footer-item"><i class="icon-comment"></i><fb:comments-count href="${createLink(controller:'observation', action:'show', id:observationInstance.id, base:Utils.getDomain(request))}"></fb:comments-count></div>
             
             <g:if test="${observationInstance.flagCount>0}">
 				<div id="show-flag-count" class="footer-item"><i class="icon-flag"></i>${observationInstance.flagCount}</div>

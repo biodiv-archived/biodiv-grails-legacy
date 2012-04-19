@@ -9,9 +9,6 @@ import org.apache.log4j.Logger
 
 import species.utils.Utils;
 
-import com.the6hours.grails.springsecurity.facebook.FacebookAuthUtils;
-
-
 class FacebookAuthCookieLogoutHandler implements LogoutHandler {
 
 	private static final Logger logger = Logger.getLogger(this)

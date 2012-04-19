@@ -88,14 +88,18 @@ log4j = {
 
 	warn   'org.mortbay.log'
 
+	info	'species.auth'
+	
 	debug	'species',
 			'speciespage',
 			'grails.app',
 			//'org.springframework.security.web',
 			'org.springframework.security.openid',
-			'org.openid4java'
+			'org.openid4java',
+			'species.auth',
+			'com.the6hours.grails.springsecurity.facebook'
 	
-	info	'species.auth'
+	
 
 }
 
@@ -342,16 +346,26 @@ jpegOptimProg = "/usr/bin/jpegoptim";
 environments {
 	development {
 		grails.serverURL = "http://localhost:8080/${appName}"
-		grails.domainServerURL = "http://localhost:8080/${appName}"
 		speciesPortal {
 			search.serverURL = "http://localhost:8090/solr/species"
 			names.parser.serverURL = "127.0.0.1"
+			//wgp.panchgani.strandls.com
+			wgp {
+				facebook {
+					appId= "327308053982589"
+					secret= "f36074901fc24b904794692755796fd1"
+				}
+			}
+			ibp {
+				facebook {
+					appId= "347177228674021"
+					secret= "82d91308b5437649bfe891a027205501"
+				}
+			}
 		}
 		google.analytics.enabled = false
 
-		//wgp.panchgani.strandls.com
-		grails.plugins.springsecurity.facebook.appId='327308053982589'
-		grails.plugins.springsecurity.facebook.secret='f36074901fc24b904794692755796fd1'
+		
 		grails {
 			mail {
 				 host = "127.0.0.1"
@@ -359,23 +373,20 @@ environments {
 			}
 		}
 
-                ibp.domain='ibp.localhost.strandls.com'
-                wgp.domain='wgp.localhost.strandls.com'    
+                ibp.domain='indiabiodiversity.localhost.org'
+                wgp.domain='thewesternghats.localhost.in'    
 	}
 	test {
 		grails.serverURL = "http://localhost:8080/${appName}"
-		grails.domainServerURL = "http://localhost:8080/${appName}"
 		google.analytics.enabled = false
 	}
 	production {
 		grails.serverURL = "http://localhost:8080/${appName}"
-		grails.domainServerURL = "http://localhost:8080/${appName}"
 		google.analytics.enabled = false
 	}
 
 	saturn {
 		grails.serverURL = "http://saturn.strandls.com:8080/${appName}"
-		grails.domainServerURL = "http://saturn.strandls.com:8080/${appName}"
 		
 		speciesPortal {
 			app.rootDir = "/data/species"
@@ -401,21 +412,28 @@ environments {
 					 port = 25
 				}
 			}
+			wgp {
+				facebook {
+					appId= "310694198984953"
+					secret= "eedf76e46272190fbd26e578ae764a60"
+				}
+			}
+			ibp {
+				facebook {
+					appId= "310694198984953"
+					secret= "eedf76e46272190fbd26e578ae764a60"
+				}
+			}
 		}
 		google.analytics.enabled = false
 
-		//wgp.saturn.strandls.com
-		grails.plugins.springsecurity.facebook.appId='310694198984953'
-		grails.plugins.springsecurity.facebook.secret='eedf76e46272190fbd26e578ae764a60'
-
-                ibp.domain='ibp.saturn.strandls.com'
-                wgp.domain='wgp.saturn.strandls.com'    
+	    ibp.domain='ibp.saturn.strandls.com'
+        wgp.domain='wgp.saturn.strandls.com'    
 
 	}
 
 	pamba {
 		grails.serverURL = "http://thewesternghats.in:8080/${appName}"
-		grails.domainServerURL = "http://thewesternghats.in:8080/${appName}"
 		jpegOptimProg = '/usr/local/bin/jpegoptim'
 		
 		speciesPortal {
@@ -440,6 +458,18 @@ environments {
 					 port = 25
 				}
 			}
+			wgp {
+				facebook {
+					appId= "327308053982589"
+					secret= "f36074901fc24b904794692755796fd1"
+				}
+			}
+			ibp {
+				facebook {
+					appId= "347177228674021"
+					secret= "82d91308b5437649bfe891a027205501"
+				}
+			}
 		}
 		google.analytics.webPropertyID = "UA-xxxxxx-x"
 		google.analytics.enabled = false
@@ -450,23 +480,23 @@ environments {
 			"_trackPageLoadTime"
 		]
 
-                ibp.domain='indiabiodiversity.org'
-                wgp.domain='thewesternghats.in'    
+        ibp.domain='indiabiodiversity.org'
+        wgp.domain='thewesternghats.in'    
 	}
 }
 
 navigation.species_dashboard = [
         [controller:'species', title:'Species gallery', order:1, action:"list"],
         [controller:'species', title:'Taxonomy browser', order:10, action:'taxonBrowser'],
-	[controller:'search', title:'Advanced search', order:20, action:'advSelect'],
+		[controller:'search', title:'Advanced search', order:20, action:'advSelect'],
         [controller:'species', title:'Contribute', order:30, action:'contribute'],
-	[controller:'SUser', title:'Users', order:40, action:'search']
+		[controller:'SUser', title:'Users', order:40, action:'search']
 ]
 
 navigation.observation_dashboard = [
         [controller:'observation', title:'Browse observations', order:1, action:'list'],
         [controller:'observation', title:'Add observation', order:10, action:"create"],
-	[controller:'SUser', title:'Users', order:20, action:'search']
+		[controller:'SUser', title:'Users', order:20, action:'search']
 ]
 
 navigation.dashboard = [

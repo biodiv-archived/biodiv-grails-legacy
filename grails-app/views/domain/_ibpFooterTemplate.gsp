@@ -10,7 +10,14 @@ z-index: 2000;
 position: relative;
 border-top: 1px solid #e5e5e5;          
 }
-
+.gradient-bg-reverse {
+   background-color: #ECE9B7;
+   background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#ebfefd), to(#ECE9B7));
+   background-image: -webkit-linear-gradient(left, #ebfefd, #ECE9B7);
+   background-image:    -moz-linear-gradient(left, #ebfefd, #ECE9B7);
+   background-image:     -ms-linear-gradient(left, #ebfefd, #ECE9B7);
+   background-image:      -o-linear-gradient(left, #ebfefd, #ECE9B7);
+}
 #ibp-footer ul {
 list-style: none;
 position: absolute;
@@ -24,7 +31,7 @@ cursor: pointer;
 }
 </style>
 
-<div id="ibp-footer" style="display:none;">
+<div id="ibp-footer" class="gradient-bg-reverse" style="display:none;">
     <ul>
     <li onclick="location.href='/terms'" title="Terms">Terms</li>
     <li onclick="location.href='/license'" title="Licenses">Licenses</li>
