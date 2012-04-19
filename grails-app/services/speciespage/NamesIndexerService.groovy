@@ -19,7 +19,7 @@ import species.search.Record
 import species.search.TSTLookup
 import species.search.Lookup.LookupResult
 import species.utils.ImageType;
-
+import species.utils.ImageUtils;
 
 class NamesIndexerService {
 
@@ -120,7 +120,7 @@ class NamesIndexerService {
 	
 	private String getSpeciesIconPath(species){
 		if(species?.mainImage()){
-			return species.mainImage().fileName;
+			return ImageUtils.getFileName(species.mainImage().fileName, ImageType.SMALL, null);
 		}else{
 			return species?.fetchSpeciesGroupIcon(ImageType.VERY_SMALL)?.fileName;
 		}
