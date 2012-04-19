@@ -81,7 +81,7 @@
 	<%-- <obv:showTagsSummary model="['observationInstance':observationInstance]" /> --%>
 
 	<div class="value tablet">
-		<%--  <fb:like layout="button_count" href="${createLink(controller:'observation', action:'show', id:observationInstance.id, base:grailsApplication.config.grails.domainServerURL)}" send="true" width="450" show_faces="true"></fb:like> --%>
+		<%--  <fb:like layout="button_count" href="${createLink(controller:'observation', action:'show', id:observationInstance.id, base:Utils.getDomain(request))}" send="true" width="450" show_faces="true"></fb:like> --%>
 	</div>
 
 

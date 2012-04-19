@@ -70,6 +70,7 @@ class LoginController {
 //				}
 
 				def defaultSavedRequest = request.getSession()?.getAttribute(WebAttributes.SAVED_REQUEST)
+				log.debug "Redirecting to DefaultSavedRequest : $defaultSavedRequest";
 				if(defaultSavedRequest) {
 					(new DefaultRedirectStrategy()).sendRedirect(request, response, defaultSavedRequest.getRedirectUrl());
 					return

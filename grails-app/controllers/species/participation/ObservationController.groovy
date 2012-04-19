@@ -629,5 +629,12 @@ class ObservationController {
 			   }
 		   }
 	   }
-   }   
+   }
+   
+   /**
+    * Count   
+    */
+   def count = {
+	  render Observation.count(); 
+   }
 }

@@ -12,7 +12,6 @@ import org.apache.log4j.Logger
 
 import com.the6hours.grails.springsecurity.facebook.FacebookAuthDao;
 import com.the6hours.grails.springsecurity.facebook.FacebookAuthToken;
-import com.the6hours.grails.springsecurity.facebook.FacebookAuthUtils;
 
 public class FacebookAuthProvider implements AuthenticationProvider {
 
@@ -32,7 +31,10 @@ public class FacebookAuthProvider implements AuthenticationProvider {
 			//log.debug "New person $token.uid"
 			if (createNew) {
 				log.info "Create new facebook user with uid $token.uid"
-				token.accessToken = facebookAuthUtils.getAccessToken(token.code)
+				log.info "Setting domain specific applicationId and secret"
+				String applicationId = facebookAuthUtils.getFacebookAppIdForDomain(token.domain); 
+				String secret = facebookAuthUtils.getFacebookAppSecretForDomain(token.domain)
+				token.accessToken = facebookAuthUtils.getAccessToken(applicationId, secret, token.code)
 				if(token.accessToken) {
 					throw new UsernameNotFoundException("No user. Please register", token);
 					//	user = facebookAuthDao.create(token)
@@ -52,6 +54,7 @@ public class FacebookAuthProvider implements AuthenticationProvider {
 		} else {
 			token.authenticated = false
 		}
+		log.debug "returning fb token : $token"
 		return token
 	}
 

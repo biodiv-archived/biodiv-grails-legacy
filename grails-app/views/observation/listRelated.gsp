@@ -38,7 +38,7 @@
 					</div>
 				</g:if>
 
-				<div class="span12">
+				<div>
 					<div class="tags_section span3" style="float: right;">
 						<obv:showAllTags
 							model="['tagFilterByProperty':'Related', 'relatedObvParams':initialParams]" />

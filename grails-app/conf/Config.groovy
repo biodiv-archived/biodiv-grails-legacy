@@ -88,14 +88,18 @@ log4j = {
 
 	warn   'org.mortbay.log'
 
+	info	'species.auth'
+	
 	debug	'species',
 			'speciespage',
 			'grails.app',
 			//'org.springframework.security.web',
 			'org.springframework.security.openid',
-			'org.openid4java'
+			'org.openid4java',
+			'species.auth',
+			'com.the6hours.grails.springsecurity.facebook'
 	
-	info	'species.auth'
+	
 
 }
 
@@ -342,16 +346,26 @@ jpegOptimProg = "/usr/bin/jpegoptim";
 environments {
 	development {
 		grails.serverURL = "http://localhost:8080/${appName}"
-		grails.domainServerURL = "http://localhost:8080/${appName}"
 		speciesPortal {
 			search.serverURL = "http://localhost:8090/solr/species"
 			names.parser.serverURL = "127.0.0.1"
+			//wgp.panchgani.strandls.com
+			wgp {
+				facebook {
+					appId= "327308053982589"
+					secret= "f36074901fc24b904794692755796fd1"
+				}
+			}
+			ibp {
+				facebook {
+					appId= "347177228674021"
+					secret= "82d91308b5437649bfe891a027205501"
+				}
+			}
 		}
 		google.analytics.enabled = false
 
-		//wgp.panchgani.strandls.com
-		grails.plugins.springsecurity.facebook.appId='327308053982589'
-		grails.plugins.springsecurity.facebook.secret='f36074901fc24b904794692755796fd1'
+		
 		grails {
 			mail {
 				 host = "127.0.0.1"
@@ -359,23 +373,20 @@ environments {
 			}
 		}
 
-                ibp.domain='ibp.localhost.strandls.com'
-                wgp.domain='wgp.localhost.strandls.com'    
+                ibp.domain='indiabiodiversity.localhost.org'
+                wgp.domain='thewesternghats.localhost.in'    
 	}
 	test {
 		grails.serverURL = "http://localhost:8080/${appName}"
-		grails.domainServerURL = "http://localhost:8080/${appName}"
 		google.analytics.enabled = false
 	}
 	production {
 		grails.serverURL = "http://localhost:8080/${appName}"
-		grails.domainServerURL = "http://localhost:8080/${appName}"
 		google.analytics.enabled = false
 	}
 
 	saturn {
 		grails.serverURL = "http://saturn.strandls.com:8080/${appName}"
-		grails.domainServerURL = "http://saturn.strandls.com:8080/${appName}"
 		
 		speciesPortal {
 			app.rootDir = "/data/species"
@@ -415,7 +426,6 @@ environments {
 
 	pamba {
 		grails.serverURL = "http://thewesternghats.in:8080/${appName}"
-		grails.domainServerURL = "http://thewesternghats.in:8080/${appName}"
 		jpegOptimProg = '/usr/local/bin/jpegoptim'
 		
 		speciesPortal {

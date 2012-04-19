@@ -1,4 +1,5 @@
 
+<%@page import="species.utils.Utils"%>
 <%@page import="species.utils.ImageType"%>
 
 <div class="observation_story">
@@ -97,7 +98,7 @@
 			<div class="footer-item">
 				<i class="icon-comment"></i>
 				<fb:comments-count
-					href="${createLink(controller:'observation', action:'show', id:observationInstance.id, base:grailsApplication.config.grails.domainServerURL)}"></fb:comments-count>
+					href="${createLink(controller:'observation', action:'show', id:observationInstance.id, base:Utils.getDomain(request))}"></fb:comments-count>
 				
 			</div>
 			
@@ -118,7 +119,7 @@
             
 			<div class="footer-item" style="width:100px">
 				<fb:like layout="button_count"
-					href="${createLink(controller:'observation', action:'show', id:observationInstance.id, base:grailsApplication.config.grails.domainServerURL)}"
+					href="${createLink(controller:'observation', action:'show', id:observationInstance.id, base:Utils.getDomain(request))}"
 					width="450" show_faces="true"></fb:like>
 			</div>
 			

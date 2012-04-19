@@ -285,15 +285,25 @@ border-bottom:3px solid #003846;
 				// make sure facebook is initialized before calling the facebook JS api
 				window.fbEnsure = function(callback) {
   					if (window.facebookInitialized) { callback(); return; }
-					  FB.init({
-						appId  : '${SpringSecurityUtils.securityConfig.facebook.appId}',
+  						var domainAppId;
+  						if (document.domain == "${grailsApplication.config.wgp.domain}"){
+  							domainAppId = '${grailsApplication.config.speciesPortal.wgp.facebook.appId}'
+  						} else {
+  							domainAppId = '${grailsApplication.config.speciesPortal.ibp.facebook.appId}'
+  						}
+  						
+  						var options = {
+						appId  : domainAppId,
 					    channelUrl : "${grailsApplication.config.grails.serverURL}/channel.html",
 					    status : true,
 					    cookie : true,
 					    xfbml: true,
 					    oauth  : true,
 					    logging : true
-					  }); 
+					  };
+					  
+					  console.log(options); 
+					  FB.init(options); 
 					  
 					  window.facebookInitialized = true;
 					  callback();
@@ -313,7 +323,9 @@ border-bottom:3px solid #003846;
 					
 					fbEnsure(function() {
 						FB.login(function(response) {
+							console.log(response);
 							if (response.status == 'connected') {
+								console.log('redirecting to authsuccess')
 								window.location = "${createLink(controller:'login', action:'authSuccess')}"+"?uid="+response.authResponse.userID
 							} else {
 								alert("Failed to connect to Facebook");

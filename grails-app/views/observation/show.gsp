@@ -1,3 +1,4 @@
+<%@page import="species.utils.Utils"%>
 <%@ page import="species.participation.Observation"%>
 <%@ page import="species.participation.Recommendation"%>
 <%@ page import="species.participation.RecommendationVote"%>
@@ -156,7 +157,7 @@
 					</div>
 
 					<div class="comments-box sidebar_section" style="clear: both;">
-						<fb:comments href="${createLink(controller:'observation', action:'show', id:observationInstance.id, base:grailsApplication.config.grails.domainServerURL)}"
+						<fb:comments href="${createLink(controller:'observation', action:'show', id:observationInstance.id, base:Utils.getDomain(request))}"
 							num_posts="10" width="620" colorscheme="light"></fb:comments>
 					</div>
 

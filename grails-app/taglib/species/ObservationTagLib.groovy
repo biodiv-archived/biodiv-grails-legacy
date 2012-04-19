@@ -170,4 +170,6 @@ class ObservationTagLib {
 		def noOfObvs = observationService.getAllObservationsOfUser(attrs.model.user);
 		out << noOfObvs
 	}
+	
 }
+
