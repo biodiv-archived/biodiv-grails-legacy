@@ -546,7 +546,7 @@ class ObservationController {
 		def obvUrl = generateLink("observation", "show", ["id": obv.id], request)
 		def userProfileUrl = generateLink("SUser", "show", ["id": obv.author.id], request)
 
-		def templateMap = [user: obv.author, obvUrl:obvUrl, userProfileUrl:userProfileUrl]
+		def templateMap = [username: obv.author.name.capitalize(), obvUrl:obvUrl, userProfileUrl:userProfileUrl]
 
 		def mailSubject = ""
 		def body = ""
@@ -578,7 +578,7 @@ class ObservationController {
 	}
 
 	private String generateLink( String controller, String action, linkParams, request) {
-		createLink(base: "$request.scheme://$grailsApplication.config.speciesPortal.domain$request.contextPath",
+		createLink(base: Utils.getDomainServerUrl(request),
 				controller:controller, action: action,
 				params: linkParams)
 	}

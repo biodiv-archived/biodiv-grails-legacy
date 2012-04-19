@@ -17,7 +17,9 @@ import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 class Utils {
 
 	private static final log = LogFactory.getLog(this);
-
+	
+	def grailsApplication;
+	
 	static boolean copy(File src, File dst) throws IOException {
 		try {
 			InputStream inS = new FileInputStream(src);
@@ -112,4 +114,10 @@ class Utils {
 		header.replace("http://", "");
 		return header;
 	}
+
+	static String getDomainServerUrl(HttpServletRequest request) {
+		def domain = getDomain(request);
+		return "$request.scheme://$domain$request.contextPath";
+	}
 }
+

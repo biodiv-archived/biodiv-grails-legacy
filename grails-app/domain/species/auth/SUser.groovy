@@ -18,7 +18,7 @@ class SUser {
 	boolean accountLocked
 	boolean passwordExpired
 	String email
-	Date dateCreated;
+	Date dateCreated = new Date();
 	Date lastLoginDate = new Date();
 	String profilePic
 	String website;

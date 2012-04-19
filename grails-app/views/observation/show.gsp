@@ -157,7 +157,7 @@
 					</div>
 
 					<div class="comments-box sidebar_section" style="clear: both;">
-						<fb:comments href="${createLink(controller:'observation', action:'show', id:observationInstance.id, base:Utils.getDomain(request))}"
+						<fb:comments href="${createLink(controller:'observation', action:'show', id:observationInstance.id, base:Utils.getDomainServerUrl(request))}"
 							num_posts="10" width="620" colorscheme="light"></fb:comments>
 					</div>
 

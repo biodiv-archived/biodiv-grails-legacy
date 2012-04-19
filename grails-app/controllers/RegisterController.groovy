@@ -4,6 +4,8 @@ import org.codehaus.groovy.grails.plugins.springsecurity.ui.RegistrationCode;
 import org.springframework.security.web.savedrequest.DefaultSavedRequest;
 import org.codehaus.groovy.grails.plugins.springsecurity.openid.OpenIdAuthenticationFailureHandler as OIAFH
 
+import species.utils.Utils;
+
 import com.the6hours.grails.springsecurity.facebook.FacebookAuthToken;
 
 class RegisterController extends grails.plugins.springsecurity.ui.RegisterController {
@@ -94,7 +96,7 @@ class RegisterController extends grails.plugins.springsecurity.ui.RegisterContro
 			authenticateAndRedirect user.email
 			return	
 		} else {
-			registerAndEmail user.username, user.email			
+			registerAndEmail user.username, user.email, request			
 			render view: 'index', model: [emailSent: true]
 			return
 		}
@@ -169,7 +171,7 @@ class RegisterController extends grails.plugins.springsecurity.ui.RegisterContro
 		def registrationCode = new RegistrationCode(username: user."$usernameFieldName")
 		registrationCode.save(flush: true)
 		
-		String url = generateLink('resetPassword', [t: registrationCode.token])
+		String url = generateLink('resetPassword', [t: registrationCode.token], request)
 		def conf = SpringSecurityUtils.securityConfig
 		def body = conf.ui.forgotPassword.emailBody
 		if (body.contains('$')) {
@@ -226,8 +228,8 @@ class RegisterController extends grails.plugins.springsecurity.ui.RegisterContro
 		redirect uri: postResetUrl
 	}
 
-	protected String generateLink(String action, linkParams) {
-		createLink(base: "$request.scheme://$grailsApplication.config.speciesPortal.domain$request.contextPath",
+	protected String generateLink(String action, linkParams, request) {
+		createLink(base: Utils.getDomainServerUrl(request),
 				controller: 'register', action: action,
 				params: linkParams)
 	}
@@ -245,7 +247,7 @@ class RegisterController extends grails.plugins.springsecurity.ui.RegisterContro
 		}
 	}
 
-	protected void registerAndEmail(String username, String email) {
+	protected void registerAndEmail(String username, String email, request) {
 		RegistrationCode registrationCode = SUserService.register(email)
 
 		if (registrationCode == null || registrationCode.hasErrors()) {
@@ -255,7 +257,7 @@ class RegisterController extends grails.plugins.springsecurity.ui.RegisterContro
 			return
 		}
 
-		String url = generateLink('verifyRegistration', [t: registrationCode.token])
+		String url = generateLink('verifyRegistration', [t: registrationCode.token], request)
 
 		def conf = SpringSecurityUtils.securityConfig
 		def body = conf.ui.register.emailBody
