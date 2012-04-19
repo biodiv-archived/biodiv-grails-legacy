@@ -1,6 +1,5 @@
-
-
 <%@page import="species.utils.ImageType"%>
+<%@page import="species.utils.ImageUtils"%>
 <%@ page import="species.Species"%>
 <%@ page import="species.Language"%>
 <%@ page import="species.CommonNames"%>
@@ -69,8 +68,8 @@ $(document).ready(function(){
 									id="${speciesInstance.id}">
 
 									<g:set var="mainImage"
-										value="${speciesInstance.mainImage(ImageType.NORMAL)}" />
-									<%def thumbnailPath = mainImage?.fileName%>
+										value="${speciesInstance.mainImage()}" />
+									<%def thumbnailPath = ImageUtils.getFileName(mainImage?.fileName, ImageType.NORMAL, null)%>
 
 									<span class="wrimg"> <span></span> <g:if
 											test="${thumbnailPath }">

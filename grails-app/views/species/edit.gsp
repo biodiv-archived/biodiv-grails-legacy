@@ -1,4 +1,6 @@
 <%@ page import="species.Species"%>
+<%@page import="species.utils.ImageType"%>
+<%@page import="species.utils.ImageUtils"%>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html" />
@@ -83,7 +85,7 @@ $(document).ready(function(){
 								<td><g:link action="show" id="${speciesInstance.id}">
 
 										<g:set var="mainImage" value="${speciesInstance.mainImage()}" />
-										<%def thumbnailPath = mainImage?.fileName?.replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.galleryThumbnail.suffix)%>
+										<%def thumbnailPath = ImageUtils.getFileName(mainImage?.fileName, ImageType.SMALL, null)%>
 
 										<img class="icon" style="float: right;"
 											src="${createLinkTo( base:grailsApplication.config.speciesPortal.resources.serverURL,
