@@ -223,7 +223,7 @@ class ObservationController {
 						])
 					}
 					else if(f.size > grailsApplication.config.speciesPortal.observations.MAX_IMAGE_SIZE) {
-						message = g.message(code: 'resource.file.invalid.extension.message', args: [
+						message = g.message(code: 'resource.file.invalid.max.message', args: [
 							grailsApplication.config.speciesPortal.observations.MAX_IMAGE_SIZE/1024,
 							f.originalFilename,
 							f.size/1024
