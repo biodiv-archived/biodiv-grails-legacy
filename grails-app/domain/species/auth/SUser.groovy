@@ -53,6 +53,7 @@ class SUser {
 		id generator:"species.utils.PrefillableUUIDHexGenerator"
 		password column: '`password`'
 		aboutMe type:"text";
+		autoTimestamp false;
 	}
 
 	Set<Role> getAuthorities() {
