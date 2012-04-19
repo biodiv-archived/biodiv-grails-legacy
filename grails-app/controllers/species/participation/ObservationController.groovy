@@ -278,7 +278,7 @@ class ObservationController {
 		} catch(e) {
 			e.printStackTrace();
 			response.setStatus(500)
-			def message = [error:g.message(code: 'error', default:'Error while processing the request.')]
+			def message = [error:g.message(code: 'file.upload.fail', default:'Error while processing the request.')]
 			render message as JSON
 		}
 	}
@@ -618,7 +618,8 @@ class ObservationController {
 		   }else{
 			   if(existingRecVote.recommendation.id == reco.id){
 				   log.debug " Same recommendation already made by user " + author.id +  " reco name " + reco.name + " leaving as it is"
-				   return null
+				   def msg = "${message(code: 'reco.vote.duplicate.message', args: [reco.name])}"
+				   return [recVote:null, msg:msg]
 			   }else{
 			   	   log.debug " Overwrting old recommendation vote for user " + author.id +  " new reco name " + reco.name + " old reco name " + existingRecVote.recommendation.name
 				   def msg = "${message(code: 'recommendations.overwrite.message', args: [existingRecVote.recommendation.name, reco.name])}"
