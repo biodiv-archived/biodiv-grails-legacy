@@ -371,7 +371,7 @@
 											<div id="progress_msg"></div>
 										</div></li>
 								</ul>
-								<div class="help-inline">
+								<div id="image-resources-msg" class="help-inline">
 									<g:renderErrors bean="${observationInstance}" as="list"
 										field="resource" />
 								</div>
@@ -621,13 +621,13 @@
 			beforeSubmit: function(formData, jqForm, options) {
 				return true;
 			}, 
-                        xhr: function() {  // custom xhr
-                            myXhr = $.ajaxSettings.xhr();
-                            if(myXhr.upload){ // check if upload property exists
-                                myXhr.upload.addEventListener('progress', progressHandlingFunction, false); // for handling the progress of the upload
-                            }
-                            return myXhr;
-                        },
+                     xhr: function() {  // custom xhr
+                         myXhr = $.ajaxSettings.xhr();
+                         if(myXhr.upload){ // check if upload property exists
+                             myXhr.upload.addEventListener('progress', progressHandlingFunction, false); // for handling the progress of the upload
+                         }
+                         return myXhr;
+                     },
 
 			success: function(responseXML, statusText, xhr, form) {
 				$(form).find("span.msg").html("");
@@ -657,17 +657,24 @@
 				$( "#imagesList" ).append (metadataEle);
                 $( "#imagesList" ).append (add_file_button);
                 $( "#add_file" ).fadeIn(3000);
+                $("#image-resources-msg").parent(".resources").removeClass("error");
+                $("#image-resources-msg").html("");
 
 			}, error:function (xhr, ajaxOptions, thrownError){
-					$('#upload_resource').find("span.msg").html("");
-					var messageNode = $(".message .resources") 
-					var response = $.parseJSON(xhr.responseText);					
+					//xhr.upload.removeEventListener( 'progress', progressHandlingFunction, false); 
+					var response = $.parseJSON(xhr.responseText);
+					if(response.error){
+						$("#image-resources-msg").parent(".resources").addClass("error");
+						$("#image-resources-msg").html(response.error);
+					}
+					
+					var messageNode = $(".message .resources");
 					if(messageNode.length == 0 ) {
 						$("#upload_resource").prepend('<div class="message">'+(response?response.error:"Error")+'</div>');
 					} else {
 						messageNode.append(response?response.error:"Error");
 					}
-                        } 
+           } 
      	});  
 		
         $(".group_option").click(function(){
