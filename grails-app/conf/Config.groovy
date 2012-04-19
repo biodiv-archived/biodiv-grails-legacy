@@ -466,8 +466,8 @@ environments {
 			}
 			ibp {
 				facebook {
-					appId= "347177228674021"
-					secret= "82d91308b5437649bfe891a027205501"
+					appId= "320284831369968"
+					secret= "900d0811194fe28503006b31792690ae"
 				}
 			}
 		}
@@ -687,10 +687,10 @@ grails.plugins.springsecurity.ui.forgotPassword.emailFrom = 'notification@thewes
 grails.plugins.springsecurity.ui.forgotPassword.emailSubject = "Password Reset"
 
 grails.plugins.springsecurity.ui.addObservation.emailSubject = 'Observation added'
-grails.plugins.springsecurity.ui.addObservation.emailBody = '''Hi $user.username,<br/><br/>You have uploaded an observation to the Western Ghats Portal/India Biodiversity Portal.<br/>Your observation is available at the following URL:<a href="$obvUrl">$obvUrl</a><br/><br/>You will be notified by mail on any social activity on the observation.<br/><br/>If you do not want to receive notifications please go to your user profile and switch it off.<br/>
+grails.plugins.springsecurity.ui.addObservation.emailBody = '''Hi $username,<br/><br/>You have uploaded an observation to the Western Ghats Portal/India Biodiversity Portal.<br/>Your observation is available at the following URL:<a href="$obvUrl">$obvUrl</a><br/><br/>You will be notified by mail on any social activity on the observation.<br/><br/>If you do not want to receive notifications please go to your user profile and switch it off.<br/>
 <br/>User Profile URL:<a href="$userProfileUrl">$userProfileUrl</a><br/><br/>Thank you for your contribution to the portal.<br/><br/>The portal team'''
 
-grails.plugins.springsecurity.ui.addRecommendationVote.emailBody = '''Hi $user.username,<br/><br/>Your observation has some social activity.<br/>$currentUser.username has $currentActivity on your Observation.<br/><br/>You can see the posting on your Observation URL:<a href="$obvUrl">$obvUrl</a><br/><br/>You will be notified by mail on any social activity on the observation.<br/><br/>If you do not want to receive notifications please go to your user profile and switch it off.<br/>
+grails.plugins.springsecurity.ui.addRecommendationVote.emailBody = '''Hi $username,<br/><br/>Your observation has some social activity.<br/>$currentUser.username has $currentActivity on your Observation.<br/><br/>You can see the posting on your Observation URL:<a href="$obvUrl">$obvUrl</a><br/><br/>You will be notified by mail on any social activity on the observation.<br/><br/>If you do not want to receive notifications please go to your user profile and switch it off.<br/>
 <br/>User Profile URL:<a href="$userProfileUrl">$userProfileUrl</a><br/><br/>The portal team'''
 
 grails.plugins.springsecurity.ui.encodePassword = false
