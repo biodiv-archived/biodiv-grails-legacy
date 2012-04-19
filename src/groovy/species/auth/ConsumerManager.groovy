@@ -17,7 +17,9 @@ class ConsumerManager extends org.openid4java.consumer.ConsumerManager {
 	* @return                  True if the two URLs match, false otherwise.
 	*/
    public boolean verifyReturnTo(String receivingUrl, AuthSuccess response) {
-	   receivingUrl = receivingUrl.replace("localhost:8080", grailsApplication.config.speciesPortal.domain);
+	   receivingUrl = receivingUrl.replace(":8080", '');
+	   println receivingUrl
+	   println response.getReturnTo()
 	   return super.verifyReturnTo(receivingUrl, response);
    }
 }

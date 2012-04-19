@@ -16,7 +16,7 @@ class OpenIDAuthenticationFilter extends
 			*/
 		   protected String buildReturnToUrl(HttpServletRequest request) {
 			   String return_to = super.buildReturnToUrl(request)
-			   return_to = return_to.replace("localhost:8080", grailsApplication.config.speciesPortal.domain);
+			   return_to = return_to.replace(":8080", '');
 			   return return_to;
 		   }
 }
