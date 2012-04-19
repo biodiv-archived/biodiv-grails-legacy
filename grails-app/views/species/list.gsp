@@ -1,4 +1,5 @@
 <%@page import="species.utils.ImageType"%>
+<%@page import="species.utils.ImageUtils"%>
 <%@page import="species.TaxonomyDefinition.TaxonomyRank"%>
 <%@ page import="species.Species"%>
 <%@ page import="species.groups.SpeciesGroup"%>
@@ -163,8 +164,8 @@ $(document).ready(function(){
 					<li class="grid_5 poor_species_content">
 				</g:else>
 					<g:link action="show" id="${speciesInstance.id}">
-						<g:set var="mainImage" value="${speciesInstance.mainImage(ImageType.SMALL)}" />
-						<%def thumbnailPath = mainImage?.fileName%>
+						<g:set var="mainImage" value="${speciesInstance.mainImage()}" />
+						<%def thumbnailPath = ImageUtils.getFileName(mainImage?.fileName, ImageType.SMALL, null)%>
 						<g:if test="${thumbnailPath }">
 						<img class="icon" style="float: right;"
 							src="${createLinkTo( base:grailsApplication.config.speciesPortal.resources.serverURL,

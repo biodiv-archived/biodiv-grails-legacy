@@ -47,13 +47,12 @@ class Species {
 		fields sort : 'field'
 	}
 
-	Resource mainImage(ImageType type) {  
+	Resource mainImage() {  
 		if(!reprImage) {
-			 
 			def images = this.getImages();
 			this.reprImage = images ? images[0]:null;
 			if(reprImage) {
-				log.debug "Saving representative image for species";
+				log.debug " Saving representative image for species ===  $reprImage.fileName" ;
 				if(!this.save(flush:true)) {
 					this.errors.each { log.error it }
 				}
@@ -61,12 +60,10 @@ class Species {
 		}
 		
 		if(reprImage && (new File(grailsApplication.config.speciesPortal.resources.rootDir+reprImage.fileName.trim())).exists()) {
-			reprImage.fileName = ImageUtils.getFileName(reprImage.fileName, type, null);
-			return reprImage;			
+			return reprImage;
+		} else {
+			return null;
 		}
-//			 else {
-//			fetchSpeciesGroupIcon(type);			
-//		}
 	}
 
 	List<Resource> getImages() { 
@@ -142,4 +139,5 @@ class Species {
 		
 		return classifications;
 	}
+
 }
