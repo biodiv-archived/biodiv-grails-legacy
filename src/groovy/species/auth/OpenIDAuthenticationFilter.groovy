@@ -5,8 +5,6 @@ import javax.servlet.http.HttpServletRequest;
 class OpenIDAuthenticationFilter extends
 		org.springframework.security.openid.OpenIDAuthenticationFilter {
 
-			def grailsApplication;
-			
 			/**
 			* Builds the <tt>return_to</tt> URL that will be sent to the OpenID service provider.
 			* By default returns the URL of the current request.

@@ -4,8 +4,6 @@ import org.openid4java.message.AuthSuccess;
 
 class ConsumerManager extends org.openid4java.consumer.ConsumerManager {
 
-	def grailsApplication
-	
 	/**
 	* Verifies that the URL where the Consumer (Relying Party) received the
 	* authentication response matches the value of the "openid.return_to"
@@ -18,8 +16,6 @@ class ConsumerManager extends org.openid4java.consumer.ConsumerManager {
 	*/
    public boolean verifyReturnTo(String receivingUrl, AuthSuccess response) {
 	   receivingUrl = receivingUrl.replace(":8080", '');
-	   println receivingUrl
-	   println response.getReturnTo()
 	   return super.verifyReturnTo(receivingUrl, response);
    }
 }

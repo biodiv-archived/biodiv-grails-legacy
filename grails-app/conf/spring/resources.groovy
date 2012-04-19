@@ -108,7 +108,6 @@ beans = {
 	}
 
 	openIDConsumerManager(ConsumerManager) {
-		grailsApplication = ref('grailsApplication')
 		nonceVerifier = ref('openIDNonceVerifier')
 	}
 	
@@ -123,7 +122,6 @@ beans = {
 //	}
 	
 	openIDAuthenticationFilter(OpenIDAuthenticationFilter) {
-		grailsApplication = ref('grailsApplication')
 		//claimedIdentityFieldName = conf.openid.claimedIdentityFieldName // openid_identifier
 		consumer = ref('openIDConsumer')
 		rememberMeServices = ref('rememberMeServices')
