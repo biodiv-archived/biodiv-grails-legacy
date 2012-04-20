@@ -40,7 +40,7 @@ $(document).ready(function() {
 	}).data( "catcomplete" )._renderItem = function( ul, item ) {
 			ul.removeClass().addClass("dropdown-menu")
 			if(item.category == "General") {
-				return $( "<li class='span2 habitat_option'></li>" )
+				return $( "<li class='span3'></li>" )
 					.data( "item.autocomplete", item )
 					.append( "<a>" + item.label + "</a>" )
 					.appendTo( ul );
@@ -49,7 +49,7 @@ $(document).ready(function() {
 					item.icon =  "${resource(dir:'images',file:'no-image.jpg', absolute:true)}"
                                             //${createLinkTo(dir: 'images/', file:"no-image.jpg", base:grailsApplication.config.speciesPortal.resources.serverURL)}"
 				}  
-				return $( "<li class='span2 habitat_option'></li>" )
+				return $( "<li class='span3'></li>" )
 					.data( "item.autocomplete", item )
 					.append( "<a title='"+item.label.replace(/<.*?>/g,"")+"'><img src='" + item.icon+"' class='group_icon' style='float:left; background:url(" + item.icon+" no-repeat); background-position:0 -100px; width:50px; height:50px;opacity:0.4;'/>" + item.label + ((item.desc)?'<br>(' + item.desc + ')':'')+"</a>" )
 					.appendTo( ul );

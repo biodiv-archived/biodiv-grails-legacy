@@ -206,6 +206,13 @@ border-bottom:3px solid #003846;
 
 	<g:javascript>
 
+		var domainAppId;
+  				if (document.domain == "${grailsApplication.config.wgp.domain}"){
+  					domainAppId = '${grailsApplication.config.speciesPortal.wgp.facebook.appId}'
+  				} else if(document.domain == "${grailsApplication.config.ibp.domain}") {
+  					domainAppId = '${grailsApplication.config.speciesPortal.ibp.facebook.appId}'
+  				}
+  				
 		$(document).ready(function(){
                        
                      
@@ -279,34 +286,28 @@ border-bottom:3px solid #003846;
 					$(this).parent().hide("slow");
 				});
 				
-
-							
-	
 				// make sure facebook is initialized before calling the facebook JS api
 				window.fbEnsure = function(callback) {
   					if (window.facebookInitialized) { callback(); return; }
-  						var domainAppId;
-  						if (document.domain == "${grailsApplication.config.wgp.domain}"){
-  							domainAppId = '${grailsApplication.config.speciesPortal.wgp.facebook.appId}'
-  						} else {
-  							domainAppId = '${grailsApplication.config.speciesPortal.ibp.facebook.appId}'
-  						}
-  						
+  					
+  					if(!window.FB) {
+  						//alert("Facebook script all.js could not be loaded for some reason. Either its not available or is blocked.")
+  					} else {
   						var options = {
-						appId  : domainAppId,
-					    channelUrl : "${grailsApplication.config.grails.serverURL}/channel.html",
-					    status : true,
-					    cookie : true,
-					    xfbml: true,
-					    oauth  : true,
-					    logging : true
-					  };
+							appId  : domainAppId,
+						    channelUrl : "${grailsApplication.config.grails.serverURL}/channel.html",
+						    status : true,
+						    cookie : true,
+						    xfbml: true,
+						    oauth  : true,
+						    logging : true
+						  };
 					  
-					  console.log(options); 
 					  FB.init(options); 
 					  
 					  window.facebookInitialized = true;
 					  callback();
+					  }
 				};
 				
 				/**
@@ -323,9 +324,7 @@ border-bottom:3px solid #003846;
 					
 					fbEnsure(function() {
 						FB.login(function(response) {
-							console.log(response);
 							if (response.status == 'connected') {
-								console.log('redirecting to authsuccess')
 								window.location = "${createLink(controller:'login', action:'authSuccess')}"+"?uid="+response.authResponse.userID
 							} else {
 								alert("Failed to connect to Facebook");
@@ -362,7 +361,7 @@ border-bottom:3px solid #003846;
   var js, fjs = d.getElementsByTagName(s)[0];
   if (d.getElementById(id)) return;
   js = d.createElement(s); js.id = id;
-  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1&appId=${SpringSecurityUtils.securityConfig.facebook.appId}";
+  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1&appId="+domainAppId;
   fjs.parentNode.insertBefore(js, fjs);
 }(document, 'script', 'facebook-jssdk'));</script>
 	
