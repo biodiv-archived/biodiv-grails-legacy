@@ -103,6 +103,12 @@ log4j = {
 
 }
 
+grails.gorm.default.mapping = {
+	cache true
+	id generator:'increment'
+	'user-type'( type:org.hibernate.type.YesNoType, class:Boolean )
+}
+
 grails.views.javascript.library="jquery"
 
 grails.project.dependency.resolution = {
