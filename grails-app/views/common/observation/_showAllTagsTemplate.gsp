@@ -18,16 +18,16 @@
 			$.cookie("tags_view", "cloud");
 		});
 		
-		if ($.cookie("tags_view") == "cloud") {
-			$('#tagCloud').show();
-			$('#tagList').hide();
-			$('#as_cloud').addClass('active');
-			$('#as_list').removeClass('active');
-		}else{
-			$('#tagList').show();
+		if ($.cookie("tags_view") == "list") {
 			$('#tagCloud').hide();
+			$('#tagList').show();
 			$('#as_cloud').removeClass('active');
 			$('#as_list').addClass('active');
+		}else{
+			$('#tagList').hide();
+			$('#tagCloud').show();
+			$('#as_cloud').addClass('active');
+			$('#as_list').removeClass('active');
 		
 		}
 	});
