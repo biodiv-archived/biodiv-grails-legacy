@@ -41,7 +41,7 @@
 		</div>
 	</g:if>
     <div class="paginateButtons" style="visibility:hidden; clear: both">
-        <g:paginate total="${observationInstanceTotal}" max="${queryParams.max}" params="${activeFilters}"/>
+        <g:paginate total="${observationInstanceTotal}" max="${queryParams.max}" action="${activeFilters.action}"  params="${activeFilters}"/>
     </div>
          <script>
                 		

@@ -1,7 +1,7 @@
 <g:javascript type="text/javascript"> 
 $(document).ready(function() {
 	$('#carousel_${id}').jcarousel({
-        itemLoadCallback : itemLoadCallback,
+		itemLoadCallback : itemLoadCallback,
         //buttonNextCallback:buttonNextCallback,
         //itemVisibleInCallback:itemVisibleInCallback,
         url:"${createLink(controller:controller, action:action, id:observationId)}",
@@ -29,7 +29,7 @@ $(document).ready(function() {
     </ul> 
     <div class="observation_links">
   		<g:if test="${observationId}">
-		    <a class="btn btn-mini" href="${createLink(controller:controller, action:'listRelated', params: [id: observationId, filterProperty : filterProperty])}">Show all</a>
+		    <a class="btn btn-mini" href="${createLink(controller:controller, action:'listRelated', params: [id: observationId, filterProperty : filterProperty, offset:0, limit:9])}">Show all</a>
 		</g:if>
                 <g:else>
 		    <a class="btn btn-mini" href="${createLink(controller:controller, action:'list', params: [(filterProperty) : filterPropertyValue])}">Show all</a>

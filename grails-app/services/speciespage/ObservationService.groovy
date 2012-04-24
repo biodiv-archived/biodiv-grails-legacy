@@ -95,7 +95,7 @@ class ObservationService {
 	   }else if(params.filterProperty == "user"){
 		   relatedObv = getRelatedObservationByUser(params.filterPropertyValue.toLong(), max, offset, params.sort)
 	   }else if(params.filterProperty == "nearBy"){
-		   relatedObv = getNearbyObservations(params.id, max)
+		   relatedObv = getNearbyObservations(params.id, max, offset)
 	   }else{
 		   relatedObv = getRelatedObservation(params.filterProperty, params.id.toLong(), max, offset)
 	   }
@@ -410,15 +410,18 @@ class ObservationService {
 		return count.size()
 	}
 
-	Map getNearbyObservations(String observationId, int limit){
+	Map getNearbyObservations(String observationId, int limit, int offset){
+		int maxRadius = 1000;
 		def sql =  Sql.newInstance(dataSource);
-		def resultSet = sql.rows("select g2.id,  ROUND(ST_Distance_Sphere(g1.st_geomfromtext, g2.st_geomfromtext)/1000) as distance from observation_locations as g1, observation_locations as g2 where g2.is_deleted = false and g1.id = :observationId and g1.id <> g2.id order by ST_Distance(g1.st_geomfromtext, g2.st_geomfromtext) limit :max", [observationId: Integer.parseInt(observationId), max:limit])
+		def rows = sql.rows("select count(*) as count from observation_locations as g1, observation_locations as g2 where ROUND(ST_Distance_Sphere(g1.st_geomfromtext, g2.st_geomfromtext)/1000) < :maxRadius and g2.is_deleted = false and g1.id = :observationId and g1.id <> g2.id", [observationId: Long.parseLong(observationId), maxRadius:maxRadius]);
+		def totalResultCount = rows[0].getProperty("count"); 
+		def resultSet = sql.rows("select g2.id,  ROUND(ST_Distance_Sphere(g1.st_geomfromtext, g2.st_geomfromtext)/1000) as distance from observation_locations as g1, observation_locations as g2 where  ROUND(ST_Distance_Sphere(g1.st_geomfromtext, g2.st_geomfromtext)/1000) < :maxRadius and g2.is_deleted = false and g1.id = :observationId and g1.id <> g2.id order by ST_Distance(g1.st_geomfromtext, g2.st_geomfromtext) limit :max offset :offset", [observationId: Long.parseLong(observationId), maxRadius:maxRadius, max:limit, offset:offset])
 
 		def nearbyObservations = []
 		for (row in resultSet){
 			nearbyObservations.add(["observation":Observation.findById(row.getProperty("id")), "title":"Found "+row.getProperty("distance")+" km away"])
 		}
-		return ["observations":nearbyObservations, "count":nearbyObservations.size()]
+		return ["observations":nearbyObservations, "count":totalResultCount]
 	}
 
 	Map getAllTagsOfUser(userId){

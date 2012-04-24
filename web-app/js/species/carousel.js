@@ -1,14 +1,21 @@
 var itemLoadCallback = function(carousel, state) {
 	var params = {
-		"limit" : carousel.last - carousel.first + 1,
-		"offset" : carousel.first - 1,
+		"limit" : carousel.last - carousel.first,
+		"offset" :carousel.first,
 		"filterProperty": carousel.options.filterProperty,
 		"filterPropertyValue": carousel.options.filterPropertyValue
-		
 	}
-	if (state == 'prev')
+	
+	if (state == 'prev'){
 		return;
-
+	}
+	
+	params.offset = carousel.first -1;
+		
+	if(carousel.last == carousel.options.size){
+		params.limit = carousel.last;
+	}
+		
 	var jqxhr = $.get(carousel.options.url, params, function(data) {
 		itemAddCallback(carousel, carousel.first, carousel.last, data, state);
 	});
@@ -18,7 +25,7 @@ var itemLoadCallback = function(carousel, state) {
 var itemAddCallback = function(carousel, first, last, data, state) {
 	var items = data["observations"];
 	for (i = 0; i < items.length; i++) {
-		var actualIndex = first + i
+		var actualIndex = first + i;
 		if (!carousel.has(actualIndex)) {
 			var item = carousel.add(actualIndex, getItemHTML(items[i]));
 			resizeImage(item);
