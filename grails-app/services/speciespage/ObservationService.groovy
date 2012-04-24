@@ -411,10 +411,12 @@ class ObservationService {
 	}
 
 	Map getNearbyObservations(String observationId, int limit, int offset){
-		int maxRadius = 1000;
+		int maxRadius = 200;
+		int maxObvs = 50;
 		def sql =  Sql.newInstance(dataSource);
 		def rows = sql.rows("select count(*) as count from observation_locations as g1, observation_locations as g2 where ROUND(ST_Distance_Sphere(g1.st_geomfromtext, g2.st_geomfromtext)/1000) < :maxRadius and g2.is_deleted = false and g1.id = :observationId and g1.id <> g2.id", [observationId: Long.parseLong(observationId), maxRadius:maxRadius]);
-		def totalResultCount = rows[0].getProperty("count"); 
+		def totalResultCount = Math.min(rows[0].getProperty("count"), maxObvs);
+		limit = Math.min(limit, maxObvs - offset); 
 		def resultSet = sql.rows("select g2.id,  ROUND(ST_Distance_Sphere(g1.st_geomfromtext, g2.st_geomfromtext)/1000) as distance from observation_locations as g1, observation_locations as g2 where  ROUND(ST_Distance_Sphere(g1.st_geomfromtext, g2.st_geomfromtext)/1000) < :maxRadius and g2.is_deleted = false and g1.id = :observationId and g1.id <> g2.id order by ST_Distance(g1.st_geomfromtext, g2.st_geomfromtext) limit :max offset :offset", [observationId: Long.parseLong(observationId), maxRadius:maxRadius, max:limit, offset:offset])
 
 		def nearbyObservations = []
