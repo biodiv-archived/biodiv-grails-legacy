@@ -43,16 +43,16 @@ the explicit tags above and edit those, not the taglib code.
 --%>
 
 <link rel="stylesheet" type="text/css" media="all"
-	href="${resource(dir:'css',file:'reset.css', absolute:true)}" />
+	href="${resource(dir:'css',file:'reset.css')}" />
 <link rel="stylesheet" type="text/css" media="all"
-	href="${resource(dir:'css',file:'text.css', absolute:true)}" />
+	href="${resource(dir:'css',file:'text.css')}" />
 <link rel="stylesheet" type="text/css" media="all"
-	href="${resource(dir:'css',file:'960.css', absolute:true)}" />
+	href="${resource(dir:'css',file:'960.css')}" />
 
 <link rel="stylesheet"
-	href="${resource(dir:'css',file:'main.css', absolute:true)}" />
+	href="${resource(dir:'css',file:'main.css')}" />
 <link rel="stylesheet" type="text/css"
-	href="${resource(dir:'css',file:'navigation.css', absolute:true)}" />
+	href="${resource(dir:'css',file:'navigation.css')}" />
 
 <%-- tab icons --%>
 <style>

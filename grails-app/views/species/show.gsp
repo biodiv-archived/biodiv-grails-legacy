@@ -36,9 +36,9 @@
 </style><![endif]--> 
 
 <link rel="stylesheet" type="text/css" media="all"
-	href="${resource(dir:'js/galleria/1.2.6/themes/classic/',file:'galleria.classic.css', absolute:true)}" />
+	href="${resource(dir:'js/galleria/1.2.6/themes/classic/',file:'galleria.classic.css')}" />
 <link rel="stylesheet" type="text/css" media="all"
-	href="${resource(dir:'css',file:'augmented-maps.css', absolute:true)}" />
+	href="${resource(dir:'css',file:'augmented-maps.css')}" />
 
 <g:set var="sparse" value="${Boolean.TRUE}" />
 <g:set var="entityName"
@@ -48,10 +48,8 @@
 
 <g:set var="conceptCounter" value="${1}" />
 
-<g:javascript src="jquery/jquery.jqGrid-4.1.2/js/i18n/grid.locale-en.js"
-	base="${grailsApplication.config.grails.serverURL+'/js/'}" />
-<g:javascript src="jquery/jquery.jqGrid-4.1.2/js/jquery.jqGrid.src.js"
-	base="${grailsApplication.config.grails.serverURL+'/js/'}" />
+<g:javascript src="jquery/jquery.jqGrid-4.1.2/js/i18n/grid.locale-en.js"/>
+<g:javascript src="jquery/jquery.jqGrid-4.1.2/js/jquery.jqGrid.src.js"/>
 
 <script
 	src="https://www.google.com/jsapi?key=ABQIAAAAk7I0Cw42MpifyYznFgPLhhRmb189gvdF0PvFEJbEHF8DoiJl8hRsYqpBTt5r5L9DCsFHIsqlwnMKHA"
@@ -63,18 +61,14 @@
 	src="/sites/all/themes/wg/scripts/OpenLayers-2.10/OpenLayers.js"></script>
 <script type="text/javascript" src="/sites/all/themes/wg/scripts/am.js"></script>
 
-<g:javascript src="galleria/1.2.6/galleria-1.2.6.min.js"
-	base="${grailsApplication.config.grails.serverURL+'/js/'}" />
-<g:javascript src="galleria/1.2.6/plugins/flickr/galleria.flickr.min.js"
-	base="${grailsApplication.config.grails.serverURL+'/js/'}"></g:javascript>
+<g:javascript src="galleria/1.2.6/galleria-1.2.6.min.js"/>
+<g:javascript src="galleria/1.2.6/plugins/flickr/galleria.flickr.min.js"></g:javascript>
 
-<g:javascript src="jquery.collapser/jquery.collapser.min.js"
-	base="${grailsApplication.config.grails.serverURL+'/js/'}" />
-<g:javascript src="floating-1.7.js"
-	base="${grailsApplication.config.grails.serverURL+'/js/'}" />
+<g:javascript src="jquery.collapser/jquery.collapser.min.js"/>
+<g:javascript src="floating-1.7.js"/>
 <!-- 
 <ckeditor:resources />
-<script type="text/javascript" src="${resource(dir:'plugins',file:'ckeditor-3.6.0.0/js/ckeditor/_source/adapters/jquery.js', absolute:true)}"></script>
+<script type="text/javascript" src="${resource(dir:'plugins',file:'ckeditor-3.6.0.0/js/ckeditor/_source/adapters/jquery.js')}"></script>
 <g:javascript src="ckEditorConfig.js" />
 -->
 <g:javascript>
@@ -88,13 +82,12 @@ function getOccurrenceCount(data) {
 
 <script type="text/javascript"
 	src="/geoserver/ows?request=getOccurrenceCount&service=amdb&version=1.0.0&species_name=${speciesName}"></script>
-<g:javascript src="species/species.js"
-	base="${grailsApplication.config.grails.serverURL+'/js/'}" />
+<g:javascript src="species/species.js" />
 
 
 <g:javascript>
 google.load("search", "1");
-Galleria.loadTheme('${resource(dir:'js/galleria/1.2.6/themes/classic/',file:'galleria.classic.min.js', absolute:true)}');
+Galleria.loadTheme('${resource(dir:'js/galleria/1.2.6/themes/classic/',file:'galleria.classic.min.js')}');
 
 $(document).ready(function(){
 	var tabs = $("#resourceTabs").tabs();

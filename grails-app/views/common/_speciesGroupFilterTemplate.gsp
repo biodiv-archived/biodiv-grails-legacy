@@ -1,8 +1,7 @@
 <%@page import="species.Habitat.HabitatType"%>
 <%@page import="species.utils.ImageType"%>
 <%@ page import="species.groups.SpeciesGroup"%>
-<g:javascript src="jquery/jquery.url.js"
-	base="${grailsApplication.config.grails.serverURL+'/js/'}" />
+<g:javascript src="jquery/jquery.url.js"/>
 
 <g:javascript>
 

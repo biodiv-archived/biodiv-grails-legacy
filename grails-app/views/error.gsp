@@ -1,8 +1,7 @@
 <html>
   <head>
 	  <title>Error</title>
-	<g:javascript src="species/util.js"
-	base="${grailsApplication.config.grails.serverURL+'/js/'}" />
+	<g:javascript src="species/util.js"/>
 	<meta name="layout" content="main" />
   </head>
 

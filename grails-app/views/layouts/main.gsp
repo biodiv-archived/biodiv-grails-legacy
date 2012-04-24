@@ -7,66 +7,56 @@
 
 
 <link rel="stylesheet" type="text/css" media="all"
-	href="${resource(dir:'bootstrap/css',file:'bootstrap.min.css', absolute:true)}" />
-
-<!--link rel="stylesheet" type="text/css" media="all"
-	href="${resource(dir:'bootstrap/css',file:'bootstrap-responsive.css', absolute:true)}" /-->
-
+	href="${resource(dir:'bootstrap/css',file:'bootstrap.min.css')}" />
 <link rel="stylesheet" type="text/css" media="all"
-	href="${resource(dir:'css',file:'jquery-ui.css', absolute:true)}" />
+	href="${resource(dir:'css',file:'jquery-ui.css')}" />
 
 <!-- r:require module="jquery-ui" /-->
 
 <!-- r:layoutResources /-->
 <!-- sNav:resources override="true" /-->
 
-<script src="${resource(dir:'plugins',file:'jquery-1.7/js/jquery/jquery-1.7.min.js', absolute:true)}" type="text/javascript" ></script>
+<script src="${resource(dir:'plugins',file:'jquery-1.7/js/jquery/jquery-1.7.min.js')}" type="text/javascript" ></script>
+<script src="${resource(dir:'plugins',file:'jquery-ui-1.8.15/jquery-ui/js/jquery-ui-1.8.15.custom.min.js')}" type="text/javascript" ></script>
 
-<script src="${resource(dir:'plugins',file:'jquery-ui-1.8.15/jquery-ui/js/jquery-ui-1.8.15.custom.min.js', absolute:true)}" type="text/javascript" ></script>
 <g:if test="${params.controller  != 'species'}">
-<g:javascript src="bootstrap.min.js"
-	base="${grailsApplication.config.grails.serverURL+'/bootstrap/js/'}"></g:javascript>
+	<g:javascript src="../bootstrap/js/bootstrap.min.js" contextPath=""></g:javascript>
 </g:if>
 
-<g:javascript src="species/main.js"
-	base="${grailsApplication.config.grails.serverURL+'/js/'}" />
+<g:javascript src="species/main.js"/>
 
 <link rel="stylesheet" type="text/css" media="screen"
-	href="${resource(dir:'js/jquery/jquery.jqGrid-4.1.2/css',file:'ui.jqgrid.css', absolute:true)}" />
+	href="${resource(dir:'js/jquery/jquery.jqGrid-4.1.2/css',file:'ui.jqgrid.css')}" />
 
-<!-- link rel="stylesheet" type="text/css"
-	href="${resource(dir:'css',file:'auth.css', absolute:true)}" /-->
+<link rel="stylesheet" type="text/css"
+	href="${resource(dir:'css',file:'auth.css')}" />
 	<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'spring-security-ui.css',plugin:'spring-security-ui')}"/>
 	<link rel="stylesheet" media="screen" href="${resource(dir:'css',file:'jquery.safari-checkbox.css',plugin:'spring-security-ui')}"/>
 	
 <!-- link rel="stylesheet" type="text/css" media="all"
-	href="${resource(dir:'css',file:'reset.css', absolute:true)}" /-->
+	href="${resource(dir:'css',file:'reset.css')}" /-->
 <link rel="stylesheet" type="text/css" media="all"
-	href="${resource(dir:'css',file:'text.css', absolute:true)}" />
+	href="${resource(dir:'css',file:'text.css')}" />
         
 
 <link rel="stylesheet" type="text/css" media="all"
-	href="${resource(dir:'css',file:'960.css', absolute:true)}" />
+	href="${resource(dir:'css',file:'960.css')}" />
 <g:if test="${params.controller == 'species'}">
 <link rel="stylesheet"
-	href="${resource(dir:'css',file:'main.css', absolute:true)}" />
+	href="${resource(dir:'css',file:'main.css')}" />
 </g:if>    
     
 <link rel="stylesheet" type="text/css"
-	href="${resource(dir:'css',file:'navigation.css', absolute:true)}" />
+	href="${resource(dir:'css',file:'navigation.css')}" />
 <link rel="stylesheet" type="text/css" media="all"
-	href="${resource(dir:'css',file:'jquery.rating.css', absolute:true)}" />
+	href="${resource(dir:'css',file:'jquery.rating.css')}" />
 <link rel="stylesheet" type="text/css" media="all"
-	href="${resource(dir:'css',file:'wgp.css', absolute:true)}" />
+	href="${resource(dir:'css',file:'wgp.css')}" />
 
-<g:javascript src="jquery/jquery.form.js"
-	base="${grailsApplication.config.grails.serverURL+'/js/'}"></g:javascript>
-<g:javascript src="jquery/jquery.rating.js"
-	base="${grailsApplication.config.grails.serverURL+'/js/'}"></g:javascript>
-<g:javascript src="readmore/readmore.js"
-	base="${grailsApplication.config.grails.serverURL+'/js/'}" />
-<g:javascript src="jquery.cookie.js"
-	base="${grailsApplication.config.grails.serverURL+'/js/jquery/'}"></g:javascript>
+<g:javascript src="jquery/jquery.form.js"></g:javascript>
+<g:javascript src="jquery/jquery.rating.js"></g:javascript>
+<g:javascript src="readmore/readmore.js"/>
+<g:javascript src="jquery/jquery.cookie.js"></g:javascript>
 
 <g:javascript src='jquery/jquery.checkbox.js' plugin='spring-security-ui'/>
 <g:javascript src='spring-security-ui.js' plugin='spring-security-ui'/>
@@ -175,7 +165,7 @@ border-bottom:3px solid #003846;
             <domain:showWGPHeader/>
             <domain:showIBPHeader/>
 
-
+	<!-- g:render template='/common/ajaxLogin'/-->
 	
 	<div id="species_main_wrapper">
 	
@@ -277,7 +267,7 @@ border-bottom:3px solid #003846;
 				$(".ui-icon-edit").click(function() {
 					var ele =$(this).siblings("div.toolbarIconContent").find("textArea.fieldEditor");
 					if(ele) { 
-						ele.ckeditor(function(){}, {customConfig:"${resource(dir:'js',file:'ckEditorConfig.js', absolute:true)}"});
+						ele.ckeditor(function(){}, {customConfig:"${resource(dir:'js',file:'ckEditorConfig.js')}"});
 						CKEDITOR.replace( ele.attr('id') );
 					}
 				});
@@ -295,7 +285,7 @@ border-bottom:3px solid #003846;
   					} else {
   						var options = {
 							appId  : domainAppId,
-						    channelUrl : "${grailsApplication.config.grails.serverURL}/channel.html",
+						    channelUrl : "Utils.getDomainServerUrl(request)/channel.html",
 						    status : true,
 						    cookie : true,
 						    xfbml: true,
@@ -340,12 +330,12 @@ border-bottom:3px solid #003846;
 		}); 
 
 			function show_login_dialog() {
-				$('#ajaxLogin').show(); 
+				$('#ajaxLogin').slideDown('slow').scrollTop(); 
 			} 
 
 			
 			function cancelLogin() {
-				$('#ajaxLogin').hide(); 
+				$('#ajaxLogin').slideUp('slow').hide(); 
 			}
 
 			function authAjax() { 
@@ -353,6 +343,7 @@ border-bottom:3px solid #003846;
 				$('#loginMessage').show(); 
 				$('#ajaxLoginForm').submit(); 
 			}
+			
 			if (typeof(console) == "undefined") { console = {}; } 
 			if (typeof(console.log) == "undefined") { console.log = function() { return 0; } }
 			

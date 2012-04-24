@@ -20,25 +20,20 @@
 </title>
 
 <link rel="stylesheet"
-	href="${resource(dir:'css',file:'location_picker.css', absolute:true)}"
+	href="${resource(dir:'css',file:'location_picker.css')}"
 	type="text/css" media="all" />
 <link rel="stylesheet"
-	href="${resource(dir:'css',file:'tagit/tagit-custom.css', absolute:true)}"
+	href="${resource(dir:'css',file:'tagit/tagit-custom.css')}"
 	type="text/css" media="all" />
 
 <script src="http://maps.google.com/maps/api/js?sensor=true"></script>
-<g:javascript src="jquery/jquery.exif.js"
-	base="${grailsApplication.config.grails.serverURL+'/js/'}"></g:javascript>
-<g:javascript src="jquery/jquery.watermark.min.js"
-	base="${grailsApplication.config.grails.serverURL+'/js/'}"></g:javascript>
-<g:javascript src="location/location-picker.js"
-	base="${grailsApplication.config.grails.serverURL+'/js/'}"></g:javascript>
+<g:javascript src="jquery/jquery.exif.js"></g:javascript>
+<g:javascript src="jquery/jquery.watermark.min.js"></g:javascript>
+<g:javascript src="location/location-picker.js"></g:javascript>
 
-<g:javascript src="jsrender.js"
-	base="${grailsApplication.config.grails.serverURL+'/js/'}"></g:javascript>
+<g:javascript src="jsrender.js"></g:javascript>
 
-<g:javascript src="tagit.js"
-	base="${grailsApplication.config.grails.serverURL+'/js/'}"></g:javascript>
+<g:javascript src="tagit.js"></g:javascript>
 
 <style>
 .btn-group.open .dropdown-menu {

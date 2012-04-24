@@ -10,16 +10,12 @@
 <title>Taxonomy Browser</title>
 
 <link rel="stylesheet" type="text/css" media="screen"
-	href="${resource(dir:'js/jquery/jquery.jqGrid-4.1.2/css',file:'ui.jqgrid.css', absolute:true)}" />
+	href="${resource(dir:'js/jquery/jquery.jqGrid-4.1.2/css',file:'ui.jqgrid.css')}" />
 
-<g:javascript src="jquery/jquery.jqGrid-4.1.2/js/i18n/grid.locale-en.js"
-	base="${grailsApplication.config.grails.serverURL+'/js/'}" />
-<g:javascript src="jquery/jquery.jqGrid-4.1.2/js/jquery.jqGrid.src.js"
-	base="${grailsApplication.config.grails.serverURL+'/js/'}" />
-<g:javascript src="jquery/jquery.jqDock-1.8/jquery.jqDock.min.js"
-	base="${grailsApplication.config.grails.serverURL+'/js/'}" />
-<g:javascript src="species/species.js"
-	base="${grailsApplication.config.grails.serverURL+'/js/'}" />
+<g:javascript src="jquery/jquery.jqGrid-4.1.2/js/i18n/grid.locale-en.js"/>
+<g:javascript src="jquery/jquery.jqGrid-4.1.2/js/jquery.jqGrid.src.js"/>
+<g:javascript src="jquery/jquery.jqDock-1.8/jquery.jqDock.min.js"/>
+<g:javascript src="species/species.js"/>
 
 </head>
 <body>

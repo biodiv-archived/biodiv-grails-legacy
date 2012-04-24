@@ -2,7 +2,7 @@
 <meta name="layout" content="main">
 <title>Login</title>
 <link rel="stylesheet" type="text/css" media="all"
-	href="${resource(dir:'css',file:'auth.css', absolute:true)}" />
+	href="${resource(dir:'css',file:'auth.css')}" />
 </head>
 
 <body>
@@ -80,24 +80,9 @@
 		</div>
 	</div>
 	<g:javascript>
-	(function() { document.forms['loginForm'].elements['username'].focus(); })();
-		
-		function showOpenIdForm() {
-		        document.getElementById('openidLogin').style.display = '';
-		}
-		
-		var openid = true;
-		
-		function toggleForms() {
-			if (openid) {
-				document.getElementById('openidLogin').style.display = 'none';
-				document.getElementById('formLogin').style.display = '';
-			}
-			else {
-				document.getElementById('openidLogin').style.display = '';
-				document.getElementById('formLogin').style.display = 'none';
-			}
-			openid = !openid;
-		}
+		/*$(document).ready(function() {
+			$("#mainSearchForm").hide();
+			show_login_dialog();
+		});*/
 	</g:javascript>
 </body>

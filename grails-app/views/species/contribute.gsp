@@ -3,8 +3,7 @@
 
 <meta name="layout" content="main" />
 <title>Contribute</title>
-<g:javascript src="species/util.js"
-	base="${grailsApplication.config.grails.serverURL+'/js/'}" />
+<g:javascript src="species/util.js"/>
 
 </head>
 <body>

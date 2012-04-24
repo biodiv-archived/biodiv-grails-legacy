@@ -11,12 +11,10 @@
 <title><g:message code="default.list.label" args="[entityName]" />
 </title>
 <link rel="stylesheet"
-	href="${resource(dir:'css',file:'tagit/tagit-custom.css', absolute:true)}"
+	href="${resource(dir:'css',file:'tagit/tagit-custom.css')}"
 	type="text/css" media="all" />
-<g:javascript src="tagit.js"
-	base="${grailsApplication.config.grails.serverURL+'/js/'}"></g:javascript>
-<g:javascript src="jquery.autopager-1.0.0.js"
-	base="${grailsApplication.config.grails.serverURL+'/js/jquery/'}"></g:javascript>
+<g:javascript src="tagit.js"></g:javascript>
+<g:javascript src="jquery/jquery.autopager-1.0.0.js"></g:javascript>
 <style>
 .observations_list {
 	top: 0;

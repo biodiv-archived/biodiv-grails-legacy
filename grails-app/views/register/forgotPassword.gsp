@@ -5,7 +5,7 @@
 </title>
 <meta name='layout' content='main' />
 <link rel="stylesheet" type="text/css" media="all"
-	href="${resource(dir:'css',file:'auth.css', absolute:true)}" />
+	href="${resource(dir:'css',file:'auth.css')}" />
 </head>
 <style>
 form {

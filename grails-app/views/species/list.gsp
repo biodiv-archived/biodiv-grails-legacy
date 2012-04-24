@@ -8,8 +8,7 @@
 <meta http-equiv="Content-Type" content="text/html" />
 <meta name="layout" content="main" />
 
-<g:javascript src="jquery/jquery.url.js"
-	base="${grailsApplication.config.grails.serverURL+'/js/'}" />
+<g:javascript src="jquery/jquery.url.js"/>
 
 <g:set var="entityName"
 	value="${message(code: 'species.label', default: 'Species')}" />

@@ -4,8 +4,7 @@
 <meta name='layout' content='main' />
 <title><g:message code='spring.security.ui.user.search' />
 </title>
-<g:javascript src="jquery.autopager-1.0.0.js"
-	base="${grailsApplication.config.grails.serverURL+'/js/jquery/'}"></g:javascript>
+<g:javascript src="jquery.autopager-1.0.0.js"></g:javascript>
 <g:set var="entityName"
 	value="${message(code: 'sUser.label', default: 'Users')}" />
 

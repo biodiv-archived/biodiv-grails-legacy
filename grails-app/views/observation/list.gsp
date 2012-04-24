@@ -12,17 +12,14 @@
 <title><g:message code="default.list.label" args="[entityName]" />
 </title>
 <link rel="stylesheet"
-	href="${resource(dir:'css',file:'tagit/tagit-custom.css', absolute:true)}"
+	href="${resource(dir:'css',file:'tagit/tagit-custom.css')}"
 	type="text/css" media="all" />
 <script type="text/javascript"
 	src="http://maps.google.com/maps/api/js?sensor=true"></script>
-<g:javascript src="markerclusterer.js"
-	base="${grailsApplication.config.grails.serverURL+'/js/location/google/'}"></g:javascript>
+<g:javascript src="location/google/markerclusterer.js"></g:javascript>
 
-<g:javascript src="tagit.js"
-	base="${grailsApplication.config.grails.serverURL+'/js/'}"></g:javascript>
-<g:javascript src="jquery.autopager-1.0.0.js"
-	base="${grailsApplication.config.grails.serverURL+'/js/jquery/'}"></g:javascript>
+<g:javascript src="tagit.js"></g:javascript>
+<g:javascript src="jquery/jquery.autopager-1.0.0.js"></g:javascript>
 </head>
 <body>
 	<div class="container outer-wrapper">

@@ -14,31 +14,25 @@
 
 
 <link rel="stylesheet" type="text/css" media="all"
-	href="${resource(dir:'js/galleria/1.2.6/themes/classic/',file:'galleria.classic.css', absolute:true)}" />
+	href="${resource(dir:'js/galleria/1.2.6/themes/classic/',file:'galleria.classic.css')}" />
 <link rel="stylesheet" type="text/css" media="all"
-	href="${resource(dir:'js/jquery/jquery.jcarousel-0.2.8/themes/classic/',file:'skin.css', absolute:true)}" />
+	href="${resource(dir:'js/jquery/jquery.jcarousel-0.2.8/themes/classic/',file:'skin.css')}" />
 
 <link rel="stylesheet"
-	href="${resource(dir:'css',file:'tagit/tagit-custom.css', absolute:true)}"
+	href="${resource(dir:'css',file:'tagit/tagit-custom.css')}"
 	type="text/css" media="all" />
 
-<g:javascript src="jsrender.js"
-	base="${grailsApplication.config.grails.serverURL+'/js/'}"></g:javascript>
+<g:javascript src="jsrender.js"></g:javascript>
 
-<g:javascript src="galleria/1.2.6/galleria-1.2.6.min.js"
-	base="${grailsApplication.config.grails.serverURL+'/js/'}" />
+<g:javascript src="galleria/1.2.6/galleria-1.2.6.min.js"/>
 
-<g:javascript src="tagit.js"
-	base="${grailsApplication.config.grails.serverURL+'/js/'}"></g:javascript>
+<g:javascript src="tagit.js"></g:javascript>
 
-<g:javascript src="jquery/jquery.jcarousel-0.2.8/jquery.jcarousel.js"
-	base="${grailsApplication.config.grails.serverURL+'/js/'}" />
+<g:javascript src="jquery/jquery.jcarousel-0.2.8/jquery.jcarousel.js"/>
 
-<g:javascript src="species/carousel.js"
-	base="${grailsApplication.config.grails.serverURL+'/js/'}" />
+<g:javascript src="species/carousel.js"/>
 
-<g:javascript src="species/observations.js"
-	base="${grailsApplication.config.grails.serverURL+'/js/'}" />
+<g:javascript src="species/observations.js"/>
 
 <style>
 #nameContainer {
@@ -198,7 +192,7 @@
 	</div>
 	<g:javascript>
 	
-	Galleria.loadTheme('${resource(dir:'js/galleria/1.2.6/themes/classic/',file:'galleria.classic.min.js', absolute:true)}');
+	Galleria.loadTheme('${resource(dir:'js/galleria/1.2.6/themes/classic/',file:'galleria.classic.min.js')}');
 	
 	$(document).ready(function(){
 		

@@ -1,5 +1,4 @@
-<g:javascript src="jquery.cookie.js"
-	base="${grailsApplication.config.grails.serverURL+'/js/jquery/'}"></g:javascript>
+<g:javascript src="jquery/jquery.cookie.js"></g:javascript>
 <g:javascript>
 	
 	$(document).ready(function(){

@@ -5,15 +5,15 @@
 <title><g:message code='spring.security.ui.register.title' /></title>
 
 <link rel="stylesheet" type="text/css" media="all"
-	href="${resource(dir:'css',file:'auth.css', absolute:true)}" />
+	href="${resource(dir:'css',file:'auth.css')}" />
 
 <style>
 
-.form-horizontal .control-label {
+.openid-loginbox .form-horizontal .control-label {
 	width: 120px;
 }
 
-.form-horizontal .controls {
+.openid-loginbox .form-horizontal .controls {
 	margin-left: 140px;
 }
 </style>
