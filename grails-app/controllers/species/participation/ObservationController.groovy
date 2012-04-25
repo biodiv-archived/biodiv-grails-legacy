@@ -12,6 +12,8 @@ import grails.converters.JSON;
 import grails.converters.XML;
 
 import grails.plugins.springsecurity.Secured
+import grails.util.Environment;
+import grails.util.GrailsUtil;
 import species.participation.RecommendationVote.ConfidenceType
 import species.participation.ObservationFlag.FlagType
 import species.sourcehandler.XMLConverter
@@ -569,11 +571,21 @@ class ObservationController {
 			body = evaluate(body, templateMap)
 		}
 
-		mailService.sendMail {
-			to obv.author.email
-			from conf.ui.notification.emailFrom
-			subject mailSubject
-			html body.toString()
+		if ( Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
+			mailService.sendMail {
+				to obv.author.email
+				bcc "prabha.prabhakar@gmail.com"
+				from conf.ui.notification.emailFrom
+				subject mailSubject
+				html body.toString()
+			}
+		} else {
+			mailService.sendMail {
+				to obv.author.email
+				from conf.ui.notification.emailFrom
+				subject mailSubject
+				html body.toString()
+			}
 		}
 	}
 

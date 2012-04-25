@@ -1,11 +1,38 @@
+<%@page import="species.utils.ImageType"%>
 <%@page import="species.utils.Utils"%>
 <%@ page import="species.participation.Observation"%>
 <%@ page import="species.participation.Recommendation"%>
 <%@ page import="species.participation.RecommendationVote"%>
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta property="og:type" content="article" />
+<meta property="og:title" content="${observationInstance.maxVotedSpeciesName?'Confirm name '+observationInstance.maxVotedSpeciesName:'Help Identify'}"/>
+<meta property="og:url" content="${createLink(controller:'observation', action:'show', id:observationInstance.id, base:Utils.getDomainServerUrl(request))}" />
+<%
+def r = observationInstance.mainImage();
+def gallImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.thumbnail.suffix)
+%>
+<meta property="og:image" content="${createLinkTo(file: gallImagePath, base:grailsApplication.config.speciesPortal.observations.serverURL)}" />
+<meta property="og:site_name" content="${Utils.getDomainName(request)}" />
+<%
+		String domain = Utils.getDomain(request);
+		String fbAppId;
+		if(domain.equals(grailsApplication.config.wgp.domain)) {
+			fbAppId = grailsApplication.config.speciesPortal.wgp.facebook.appId;
+		} else if(domain.equals(grailsApplication.config.ibp.domain)) {
+			fbAppId =  grailsApplication.config.speciesPortal.ibp.facebook.appId;
+		}
+%>
+
+<meta property="fb:app_id" content="${fbAppId }" />
+<meta property="fb:admins" content="581308415,100000607869577" />
+<meta property="og:description"
+          content="${observationInstance.notes.encodeAsHTML()}"/>
+<meta property="og:latitude" content="${observationInstance.latitude}"/>
+<meta property="og:longitude" content="${observationInstance.longitude }"/>
+
 <meta name="layout" content="main" />
+<link rel="image_src" href="${createLinkTo(file: gallImagePath, base:grailsApplication.config.speciesPortal.observations.serverURL)}" />
 
 <g:set var="entityName"
 	value="${message(code: 'observation.label', default: 'Observation')}" />
@@ -256,7 +283,7 @@
          	
         	$.ajax({
          		url: "${createLink(controller:'observation', action:'getRecommendationVotes', id:observationInstance.id) }",
-				method: "GET",
+				method: "POST",
 				dataType: "xml",
 				data: {max:max , offset:0},	
 				success: function(responseJSON) {
@@ -297,7 +324,7 @@
 			dataType: 'xml',//could not parse json wih this form plugin 
 			clearForm: true,
 			resetForm: true,
-			type: 'POST',
+			type: 'GET',
 			 
 			beforeSubmit: function(formData, jqForm, options) {
 				return true;

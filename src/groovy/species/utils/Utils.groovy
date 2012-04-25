@@ -119,5 +119,15 @@ class Utils {
 		def domain = getDomain(request);
 		return "$request.scheme://$domain$request.contextPath";
 	}
+	
+	static String getDomainName(HttpServletRequest request) {
+		def domain = getDomain(request);
+		if(domain.startsWith("thewesternghats.in")) {
+			return "The Westernghats Portal"
+		} else {
+			return "India Biodiversity Portal"
+		}
+		return "";
+	}
 }
 

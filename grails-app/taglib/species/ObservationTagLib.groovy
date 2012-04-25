@@ -116,7 +116,7 @@ class ObservationTagLib {
 			count = tags.size()
 		}
 		else{
-			tags =  observationService.findAllTagsSortedByObservationCount(50);
+			tags =  observationService.findAllTagsSortedByObservationCount(30);
 			count = observationService.getNoOfTags();
 		} 
 		//log.debug "==== tags " + tags 
