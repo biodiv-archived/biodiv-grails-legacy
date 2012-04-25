@@ -5,8 +5,8 @@
 <%@ page import="species.participation.RecommendationVote"%>
 <html>
 <head>
-<meta property="og:type" content="article" />
-<meta property="og:title" content="${observationInstance.maxVotedSpeciesName?'Confirm name '+observationInstance.maxVotedSpeciesName:'Help Identify'}"/>
+<meta property="og:type" content="website" />
+<meta property="og:title" content="${(!observationInstance.maxVotedSpeciesName?.equalsIgnoreCase('Unknown'))?'Confirm name '+observationInstance.maxVotedSpeciesName:'Help Identify'}"/>
 <meta property="og:url" content="${createLink(controller:'observation', action:'show', id:observationInstance.id, base:Utils.getDomainServerUrl(request))}" />
 <%
 def r = observationInstance.mainImage();
