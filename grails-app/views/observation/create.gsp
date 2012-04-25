@@ -645,7 +645,6 @@
 				var metadataEle = $(html)
 				metadataEle.each(function() {
 					$('.geotagged_image', this).load(function(){
-						
 						update_geotagged_images_list($(this));		
 					});
 				})
