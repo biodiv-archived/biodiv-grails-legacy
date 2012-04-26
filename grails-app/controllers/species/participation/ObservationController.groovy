@@ -221,6 +221,7 @@ class ObservationController {
 					def okcontents = [
 						'image/png',
 						'image/jpeg',
+						'image/pjpeg',
 						'image/gif',
 						'image/jpg'
 					]
