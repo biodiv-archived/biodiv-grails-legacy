@@ -1,38 +1,42 @@
 
-<div class="observations_list" class="observation" style="clear:both;">
-<div class="btn-group button-bar" data-toggle="buttons-radio" style="float:right;">
-    <button class="list_view_bttn btn list_style_button active"><i class="icon-align-justify"></i></button> 
-    <button class="grid_view_bttn btn grid_style_button"><i class="icon-th-large"></i></button>
-</div>    
-    <div class="mainContent">
-    	<ul class="grid_view thumbnails">
-            <g:each in="${observationInstanceList}" status="i"
-                    var="observationInstance">
-                    
-                    <g:if test="${i%3 == 0}"> 
-                        <li class="thumbnail" style="clear:both;">
-                    </g:if>
-                    <g:else>
-                        <li class="thumbnail" style="margin:0;">
-                    </g:else>
-                        <obv:showSnippetTablet
-                                model="['observationInstance':observationInstance]"></obv:showSnippetTablet>
-                    </li>        
+<div class="observations_list observation" style="clear: both;">
+	<div class="btn-group button-bar" data-toggle="buttons-radio"
+		style="float: right;">
+		<button class="list_view_bttn btn list_style_button active">
+			<i class="icon-align-justify"></i>
+		</button>
+		<button class="grid_view_bttn btn grid_style_button">
+			<i class="icon-th-large"></i>
+		</button>
+	</div>
+	<div class="mainContent">
+		<ul class="grid_view thumbnails">
+			<g:each in="${observationInstanceList}" status="i"
+				var="observationInstance">
 
-            </g:each>
-        </ul> 
-        <ul class="list_view thumbnails" style="display:none;">
-            <g:each in="${observationInstanceList}" status="i"
-            var="observationInstance">
-	        <li class="thumbnail" style="clear:both;">
-                <obv:showSnippet
-                    model="['observationInstance':observationInstance]"></obv:showSnippet>
-            </li>        
-            </g:each>
-        </ul>       
-    </div>
-    
-    <g:if test="${observationInstanceTotal > queryParams.max}">
+				<g:if test="${i%3 == 0}">
+					<li class="thumbnail" style="clear: both;">
+				</g:if>
+				<g:else>
+					<li class="thumbnail" style="margin: 0;">
+				</g:else>
+				<obv:showSnippetTablet
+					model="['observationInstance':observationInstance]"></obv:showSnippetTablet>
+				</li>
+
+			</g:each>
+		</ul>
+		<ul class="list_view thumbnails" style="display: none;">
+			<g:each in="${observationInstanceList}" status="i"
+				var="observationInstance">
+				<li class="thumbnail" style="clear: both;"><obv:showSnippet
+						model="['observationInstance':observationInstance]"></obv:showSnippet>
+				</li>
+			</g:each>
+		</ul>
+	</div>
+
+	<g:if test="${observationInstanceTotal > queryParams.max}">
 		<div class="centered">
 			<div class="btn loadMore">
 				<span class="progress" style="display: none;">Loading ... </span> <span
@@ -40,10 +44,12 @@
 			</div>
 		</div>
 	</g:if>
-    <div class="paginateButtons" style="visibility:hidden; clear: both">
-        <g:paginate total="${observationInstanceTotal}" max="${queryParams.max}" action="${activeFilters.action}"  params="${activeFilters}"/>
-    </div>
-         <script>
+	<div class="paginateButtons" style="visibility: hidden; clear: both">
+		<g:paginate total="${observationInstanceTotal}"
+			max="${queryParams.max}" action="${activeFilters.action}"
+			params="${activeFilters}" />
+	</div>
+	<script>
                 		
        $('.list_view_bttn').click(function(){
 			$('.grid_view').hide();
