@@ -140,6 +140,10 @@ class ObservationTagLib {
 	def showObservationsLocation = {attrs, body->
 		out << render(template:"/common/observation/showObservationMultipleLocationTemplate", model:attrs.model);
 	}
+	
+	def showObservationFilterMessage = {attrs, body->
+		out << render(template:"/common/observation/showObservationFilterMsgTemplate", model:attrs.model);
+	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////
 	///////////////////////////////  Tag List added by specific User ///////////////////////////

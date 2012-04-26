@@ -512,6 +512,7 @@ class ObservationService {
 			//(filterQuery == "")? (filterQuery += " where ") : (filterQuery += " and ")
 			filterQuery += " and obv.maxVotedSpeciesName like :speciesName "
 			queryParams["speciesName"] = params.speciesName
+			activeFilters["speciesName"] = params.speciesName
 		}
 		
 		if(params.isFlagged){
