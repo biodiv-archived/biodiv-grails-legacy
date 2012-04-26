@@ -68,7 +68,8 @@
 <g:javascript src='jquery/jquery.checkbox.js'
 	plugin='spring-security-ui' />
 <g:javascript src='spring-security-ui.js' plugin='spring-security-ui' />
-<ckeditor:resources minified="false" />
+<ckeditor:resources/>
+
 <g:javascript>
 jQuery(document).ready(function($) {
         if (document.domain == "${grailsApplication.config.wgp.domain}"){

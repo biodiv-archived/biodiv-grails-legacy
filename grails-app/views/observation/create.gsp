@@ -492,7 +492,12 @@
 								</h5><div class="section-item" style="margin-right: 10px;">
 									<!-- g:textArea name="notes" rows="10" value=""
 										class="text ui-corner-all" /-->
-									<ckeditor:editor name="notes" height="200px" toolbar="Basic">
+									<ckeditor:config var="toolbar_editorToolbar">
+									[
+    									[ 'Bold', 'Italic' ]
+									]
+									</ckeditor:config>
+									<ckeditor:editor name="notes" height="200px" toolbar="editorToolbar">
 										${observationInstance?.notes}
 									</ckeditor:editor>
 								</div>
