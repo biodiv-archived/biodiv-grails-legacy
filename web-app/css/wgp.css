@@ -943,3 +943,10 @@ padding: 5px;
 border: 0;         
 background-color: transparent;        
 }
+
+#upload_resource {
+margin-left: 45px;
+position: absolute;
+top: 525px;
+z-index: 2;
+}

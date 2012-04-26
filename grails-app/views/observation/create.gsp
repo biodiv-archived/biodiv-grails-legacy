@@ -305,7 +305,7 @@
 							</div>
 						</div>
 
-						<div class="span11 section">
+						<div class="span11 section" style="margin-top:50px;">
 							<i class="icon-picture"></i><span>Upload photos of a
 								single observation and species</span>
 							<div
@@ -527,16 +527,16 @@
 				</div></div>
 
             </form>
-            
+           
             
 			<form id="upload_resource" enctype="multipart/form-data"
-				style="visibility: hidden; position: relative; float: left; z-index: 2;"
 				title="Add a photo for this observation"
+                                method="post"
 				class="${hasErrors(bean: observationInstance, field: 'resource', 'errors')}">
 
 				<!-- TODO multiple attribute is HTML5. need to chk if this gracefully falls back to default in non compatible browsers -->
 				<input type="file" id="attachFiles" name="resources"
-					accept="image/*" /> <span class="msg" style="float: right"></span>
+					accept="image/*" multiple/> <span class="msg" style="float: right"></span>
 			</form>
 
                 </div>
@@ -589,6 +589,15 @@
 	
 	$(document).ready(function(){
 		$('.dropdown-toggle').dropdown();
+
+                //hack: for fixing ie image upload
+                if (navigator.appName.indexOf('Microsoft') != -1) {
+                    $('#upload_resource').css({'visibility':'visible'});
+                    $('#add_file').hide();
+                } else {
+                    $('#upload_resource').css({'visibility':'hidden'});
+                    $('#add_file').show();
+                }
 		
 		$('#attachFiles').change(function(e){
   			$('#upload_resource').submit().find("span.msg").html("Uploading... Please wait...");
@@ -649,13 +658,17 @@
 					});
 				})
 				$( "#imagesList" ).append (metadataEle);
-                $( "#imagesList" ).append (add_file_button);
+
+                if (navigator.appName.indexOf('Microsoft') == -1) {
+                    $( "#imagesList" ).append (add_file_button);
+                }
                 $( "#add_file" ).fadeIn(3000);
                 $("#image-resources-msg").parent(".resources").removeClass("error");
                 $("#image-resources-msg").html("");
 
 			}, error:function (xhr, ajaxOptions, thrownError){
 					//xhr.upload.removeEventListener( 'progress', progressHandlingFunction, false); 
+                                        alert(JSON.stringify(xhr));
 					var response = $.parseJSON(xhr.responseText);
 					if(response.error){
 						$("#image-resources-msg").parent(".resources").addClass("error");
