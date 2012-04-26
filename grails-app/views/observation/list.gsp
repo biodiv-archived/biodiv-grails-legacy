@@ -49,11 +49,13 @@
 												id="speciesNameFilter2" value="Unknown"
 												style="display: none" /> <label for="speciesNameFilter2"
 												value="Unknown">Show Unidentified Only</label-->
-                                                                                                
+
 						<input type="text" id="speciesNameFilter"
 							value="${params.speciesName}" style="display: none" />
-						<button id="speciesNameAllButton" class="btn" rel="tooltip" data-original-title="Show all observations">All</button>
-						<button id="speciesNameFilterButton" class="btn" rel="tooltip" data-original-title="Show only unidentified observations">Unidentified</button>
+						<button id="speciesNameAllButton" class="btn" rel="tooltip"
+							data-original-title="Show all observations">All</button>
+						<button id="speciesNameFilterButton" class="btn" rel="tooltip"
+							data-original-title="Show only unidentified observations">Unidentified</button>
 					</div>
 				</div>
 				<div class="tags_section span3" style="float: right;">
@@ -67,7 +69,8 @@
 						<div class="observations thumbwrap">
 							<div class="observation">
 								<div>
-									<obv:showObservationFilterMessage model="['observationInstanceTotal':observationInstanceTotal, 'queryParams':queryParams]"/>
+									<obv:showObservationFilterMessage
+										model="['observationInstanceTotal':observationInstanceTotal, 'queryParams':queryParams]" />
 								</div>
 								<div style="clear: both;"></div>
 
@@ -75,34 +78,34 @@
 									<a class="btn btn-success dropdown-toggle"
 										data-toggle="dropdown" href="#"
 										onclick="$(this).parent().css('background-color', '#9acc57'); showMapView(); return false;">
-										Map view <span class="caret"></span> </a>
+										Map view <span class="caret"></span>
+									</a>
 								</div>
-								<div class="btn-group"
-									style="float: left; z-index: 10">
-									<button id="selected_sort"
-										class="btn dropdown-toggle" data-toggle="dropdown" href="#" rel="tooltip" data-original-title="Sort by"><g:if
-											test="${params.sort == 'visitCount'}">
+								<div class="btn-group" style="float: left; z-index: 10">
+									<button id="selected_sort" class="btn dropdown-toggle"
+										data-toggle="dropdown" href="#" rel="tooltip"
+										data-original-title="Sort by">
+										<g:if test="${params.sort == 'visitCount'}">
                                                Most viewed
-                                            </g:if> <g:elseif
-											test="${params.sort == 'lastRevised'}">
+                                            </g:if>
+										<g:elseif test="${params.sort == 'lastRevised'}">
                                                 Last updated
-                                            </g:elseif> <g:else>
+                                            </g:elseif>
+										<g:else>
                                                 Latest
-                                            </g:else> <span class="caret"></span>
+                                            </g:else>
+										<span class="caret"></span>
 									</button>
-									
-									<ul id="sortFilter" class="dropdown-menu" style="width:auto;">
-										<li class="group_option">
-													<a class=" sort_filter_label" value="createdOn"> Latest
-												</a></li>
-												<li class="group_option">
-													<a class=" sort_filter_label" value="lastRevised"> Last Updated
-												</a></li>
-												<li class="group_option">
-													<a class=" sort_filter_label" value="visitCount"> Most Viewed
-												</a></li>
+
+									<ul id="sortFilter" class="dropdown-menu" style="width: auto;">
+										<li class="group_option"><a class=" sort_filter_label"
+											value="createdOn"> Latest </a></li>
+										<li class="group_option"><a class=" sort_filter_label"
+											value="lastRevised"> Last Updated </a></li>
+										<li class="group_option"><a class=" sort_filter_label"
+											value="visitCount"> Most Viewed </a></li>
 									</ul>
-									
+
 
 								</div>
 
@@ -112,10 +115,6 @@
 										model="['observationInstanceList':totalObservationInstanceList]">
 									</obv:showObservationsLocation>
 								</div>
-
-
-								
-
 							</div>
 
 							<obv:showObservationsList />
@@ -306,9 +305,14 @@
                    	$.ajax({
   						url: doc_url,
   						dataType: 'json',
+  						
+  						beforeSend : function(){
+  							$('.observations_list').css({"opacity": 0.5});
+  						},
+  						
   						success: function(data){
-  							$('.observations_list').html(data.obvListHtml);
-							$('#info-message').html(data.obvFilterMsgHtml);
+  							$('.observations_list').replaceWith(data.obvListHtml);
+  							$('#info-message').replaceWith(data.obvFilterMsgHtml);
 						},
 						statusCode: {
 	    					401: function() {
