@@ -1,4 +1,4 @@
-#loginButton,#createButton {
+#createButton {
 	float: right;
 	margin: 3px;
 }
@@ -46,11 +46,6 @@ td.openid-loginbox-title {
 table.openid-loginbox-userpass td {
 	height: 25px;
 	padding: 3px;
-}
-
-#openidLogin {
-	border-top: 1px #c0c0ff solid;
-	margin-top: 50px;
 }
 
 .openid-loginbox .form-horizontal .control-label {

@@ -27,7 +27,7 @@ def gallImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApp
 <meta property="fb:app_id" content="${fbAppId }" />
 <meta property="fb:admins" content="581308415,100000607869577" />
 <meta property="og:description"
-          content="${observationInstance.notes.encodeAsHTML()}"/>
+          content="${observationInstance.notes}"/>
 <meta property="og:latitude" content="${observationInstance.latitude}"/>
 <meta property="og:longitude" content="${observationInstance.longitude }"/>
 
@@ -163,9 +163,9 @@ def gallImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApp
 								</div>
 							</g:hasErrors>
 
-							<form id="addRecommendation"
+							<form id="addRecommendation" name="addRecommendation"
 								action="${createLink(controller:'observation', action:'addRecommendationVote')}"
-								method="POST" class="form-horizontal">
+								method="GET" class="form-horizontal">
 								
 								<reco:create
 									model="['recommendationInstance':recommendationInstance]" />
@@ -284,29 +284,25 @@ def gallImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApp
         	$.ajax({
          		url: "${createLink(controller:'observation', action:'getRecommendationVotes', id:observationInstance.id) }",
 				method: "POST",
-				dataType: "xml",
+				dataType: "json",
 				data: {max:max , offset:0},	
-				success: function(responseJSON) {
-					$("#recoSummary").html($(responseJSON).find("recoHtml").text());
-					
-					var uniqueVotes = parseInt($(responseJSON).find("uniqueVotes").text())
-					//alert(uniqueVotes);
+				success: function(data) {
+					$("#recoSummary").html(data.recoHtml);
+					var uniqueVotes = parseInt(data.uniqueVotes);
 					if(uniqueVotes > 3){
 						$("#seeMore").show();
 					}	
-				}, statusCode: {
-	    			401: function() {
-	    				show_login_dialog();
-	    			}	    				    			
-	    		}, error: function(xhr, status, error) {
-	    			var msg = $.parseJSON(xhr.responseText);
-	    			if(msg.info) {
-	    				showRecoUpdateStatus(msg.info, 'info');
-	    			}else if(msg.success){
-	    				showRecoUpdateStatus(msg.success, 'success');
-					} else {
-						showRecoUpdateStatus(msg.error, 'error');
-					}
+				}, error: function(xhr, status, error) {
+	    			handleError(xhr, ajaxOptions, thrownError, undefined, function() {
+		    			var msg = $.parseJSON(xhr.responseText);
+		    			if(msg.info) {
+		    				showRecoUpdateStatus(msg.info, 'info');
+		    			}else if(msg.success){
+		    				showRecoUpdateStatus(msg.success, 'success');
+						} else {
+							showRecoUpdateStatus(msg.error, 'error');
+						}
+					});
 			   	}
 			});
          }
@@ -319,31 +315,28 @@ def gallImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApp
          
          preLoadRecos(3);
          
-         $('#addRecommendation').ajaxForm({ 
-         	url:"${createLink(controller:'observation', action:'addRecommendationVote')}",
-			dataType: 'xml',//could not parse json wih this form plugin 
-			clearForm: true,
-			resetForm: true,
-			type: 'GET',
-			 
-			beforeSubmit: function(formData, jqForm, options) {
-				return true;
-			}, 
-            
-            success: function(responseXML, statusText, xhr, form) {
-            	showRecos(responseXML, null);
-            	return false;
-            },
-            error:function (xhr, ajaxOptions, thrownError){
-            	handleError(xhr, ajaxOptions, thrownError, function() {
-            		console.log(xhr);
-            		showRecoUpdateStatus ()
-            	});
-			} 
+     	$('#addRecommendation').bind('submit', function(event) {
+     		$(this).ajaxSubmit({ 
+	         	url:"${createLink(controller:'observation', action:'addRecommendationVote')}",
+				dataType: 'json', 
+				clearForm: true,
+				resetForm: true,
+				type: 'GET',
+				beforeSubmit: function(formData, jqForm, options) {
+					return true;
+				}, 
+	            success: function(data, statusText, xhr, form) {
+	            	showRecos(data, null);
+	            	return false;
+	            },
+	            error:function (xhr, ajaxOptions, thrownError){
+	            	//successHandler is used when ajax login succedes
+	            	var successHandler = this.success, errorHandler = showRecoUpdateStatus;
+	            	handleError(xhr, ajaxOptions, thrownError, successHandler, errorHandler);
+				} 
+	     	});
+	     	event.preventDefault();
      	});
-     	
-     
-	
         
 	});
 </g:javascript>

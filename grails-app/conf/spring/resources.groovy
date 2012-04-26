@@ -30,7 +30,7 @@ beans = {
 
 	def conf = SpringSecurityUtils.securityConfig;
 	
-//	authenticationSuccessHandler(AjaxAwareAuthenticationSuccessHandler) {
+//	authenticationSuccessHandler(species.auth.AjaxAwareAuthenticationSuccessHandler) {
 //		requestCache = ref('requestCache')
 //		defaultTargetUrl = conf.successHandler.defaultTargetUrl // '/'
 //		alwaysUseDefaultTargetUrl = conf.successHandler.alwaysUseDefault // false

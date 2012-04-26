@@ -1,9 +1,9 @@
 function showRecos(data, textStatus) {
-	jQuery('#recoSummary').html(jQuery(data).find('recoHtml').text());
-	var speciesName =  jQuery(data).find('speciesName').text();
-	jQuery('.species_title').html(jQuery(data).find('speciesNameTemplate').text());
+	$('#recoSummary').html(data.recoHtml);
+	var speciesName =  data.speciesName;
+	$('.species_title').html(data.speciesNameTemplate);
 	reloadCarousel($('#carousel_a').data('jcarousel'), 'speciesName', speciesName);
-	var infoMsg = jQuery(data).find('recoVoteMsg').text();
+	var infoMsg = data.recoVoteMsg;
 	showRecoUpdateStatus(infoMsg, 'success');
 }
 

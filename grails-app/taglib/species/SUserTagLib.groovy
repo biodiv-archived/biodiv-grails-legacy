@@ -38,13 +38,6 @@ class SUserTagLib {
 	/**
 	 * 
 	 */
-	def externalAuthProviders = {attrs, body ->
-		out << render(template:"/common/auth/externalProvidersTemplate", model:attrs.model);
-	}
-
-	/**
-	 * 
-	 */
 	def showUserTemplate = { attrs ->
 		if(attrs.model.userInstance) {
 			out << render(template:"/common/suser/showUserTemplate", model:attrs.model);

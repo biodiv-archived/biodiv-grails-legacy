@@ -53,7 +53,7 @@
 
 							<div class="control-group" style="clear: both;float: left;line-height: 40px;">Using:</div>
 							<div class="control_group">
-								<sUser:externalAuthProviders
+								<auth:externalAuthProviders
 									model='["openidIdentifier":openidIdentifier]' />
 							</div>
 							<form action="${createLink(controller:'register', action:'register')}" name='registerForm' method="POST"

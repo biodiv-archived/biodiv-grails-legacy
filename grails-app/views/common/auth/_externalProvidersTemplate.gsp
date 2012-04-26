@@ -5,6 +5,10 @@
 		<div class="fbJustConnect">Login with Facebook</div>
 	</div>
 
+	<!-- div class="sign_in_external_bttn external_bttn googleButton">
+		<div class="googleConnect">Login with Google</div>
+	</div-->
+	
 	<div  class="sign_in_external_bttn">
 		<form action='${openIdPostUrl}' method='POST' autocomplete='off'
 			name='google_openIdLoginForm'>

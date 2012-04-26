@@ -292,7 +292,7 @@ class ObservationController {
 	@Secured(['ROLE_USER'])
 	def addRecommendationVote = {
 		log.debug params;
-
+		
 		params.author = springSecurityService.currentUser;
 
 		if(params.obvId) {
@@ -395,7 +395,7 @@ class ObservationController {
 		log.debug params;
 		params.max = Math.min(params.max ? params.int('max') : 1, 10)
 		params.offset = params.offset ? params.long('offset'): 0
-
+		
 		def observationInstance = Observation.get(params.id)
 		if (observationInstance) {
 			try {
@@ -404,16 +404,15 @@ class ObservationController {
 				if(results?.recoVotes.size() > 0) {
 					def html =  g.render(template:"/common/observation/showObservationRecosTemplate", model:['observationInstance':observationInstance, 'result':results.recoVotes, 'totalVotes':results.totalVotes, 'uniqueVotes':results.uniqueVotes]);
 					def speciesNameHtml =  g.render(template:"/common/observation/showSpeciesNameTemplate", model:['observationInstance':observationInstance]);
+					def result = [
+							success : 'true',
+							recoHtml:html,
+							uniqueVotes:results.uniqueVotes,
+							recoVoteMsg:params.recoVoteMsg,
+							speciesNameTemplate:speciesNameHtml,
+							speciesName:observationInstance.maxVotedSpeciesName]
 						
-					render(contentType:"text/xml") {
-						recos{
-							recoHtml(html)
-							uniqueVotes(results.uniqueVotes)
-							recoVoteMsg(params.recoVoteMsg)
-							speciesNameTemplate(speciesNameHtml)
-							speciesName(observationInstance.maxVotedSpeciesName)
-						}
-					}
+					render result as JSON
 					return
 				} else {
 					response.setStatus(500);

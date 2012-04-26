@@ -1,16 +1,4 @@
-<style>
-#wgp-header {
-background-color: #f9f9f9;
-box-shadow: 0 6px 6px -6px #5E5E5E;
-color: #5E5E5E;
-font-family: Verdana,Helvetica,Sans-Serif;
-height: 80px;
-width: 100%;
-z-index: 2000;
-}
-</style>
-
-<div id="wgp-header" style="display:none;">
+<div id="wgp-header" class="header" style="display:none;">
     <!-- Logo -->
       <div id="logo" class="span3">
         <a href="/">
@@ -30,8 +18,8 @@ z-index: 2000;
     <li onclick="location.href='/about/western-ghats'" title="About" id="about_nav_link">About</li>
     </ul>
     </div>
-
-        <sUser:userLoginBox/>
+		<div class="header_userInfo">
+        	<sUser:userLoginBox/>
+        </div>
 
 </div>
-

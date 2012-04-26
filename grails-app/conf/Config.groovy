@@ -93,7 +93,7 @@ log4j = {
 	debug	'species',
 			'speciespage',
 			'grails.app',
-			//'org.springframework.security.web',
+			'org.springframework.security.web',
 			'org.springframework.security.openid',
 			'org.openid4java',
 			'species.auth',
@@ -434,7 +434,10 @@ environments {
 		google.analytics.enabled = false
 
 	    ibp.domain='ibp.saturn.strandls.com'
-        wgp.domain='wgp.saturn.strandls.com'    
+        wgp.domain='wgp.saturn.strandls.com' 
+		
+		grails.plugins.springsecurity.successHandler.defaultTargetUrl = "/list/../../"
+		grails.plugins.springsecurity.logout.afterLogoutUrl = '/list/../../'
 
 	}
 
@@ -477,17 +480,13 @@ environments {
 				}
 			}
 		}
-		google.analytics.webPropertyID = "UA-xxxxxx-x"
-		google.analytics.enabled = false
-		google.analytics.customTrackingCode = [
-			[_setDetectFlash: false],
-			[_setCampaignCookieTimeout: 31536000000],
-			"_trackPageview",
-			"_trackPageLoadTime"
-		]
-
+		
         ibp.domain='indiabiodiversity.org'
-        wgp.domain='thewesternghats.in'    
+        wgp.domain='thewesternghats.in'   
+		
+		grails.plugins.springsecurity.successHandler.defaultTargetUrl = "/list/../../"
+		grails.plugins.springsecurity.logout.afterLogoutUrl = '/list/../../'
+		
 	}
 }
 
@@ -520,64 +519,64 @@ navigation.dashboard = [
 ]
 
 
-ckeditor  = {
-	skipAllowedItemsCheck = false
-	defaultFileBrowser = "ofm"
-	upload {
-		basedir = "/images/resources/"
-		overwrite = false
-		link {
-			browser = true
-			upload = false
-			allowed = []
-			denied = [
-				'html',
-				'htm',
-				'php',
-				'php2',
-				'php3',
-				'php4',
-				'php5',
-				'phtml',
-				'pwml',
-				'inc',
-				'asp',
-				'aspx',
-				'ascx',
-				'jsp',
-				'cfm',
-				'cfc',
-				'pl',
-				'bat',
-				'exe',
-				'com',
-				'dll',
-				'vbs',
-				'js',
-				'reg',
-				'cgi',
-				'htaccess',
-				'asis',
-				'sh',
-				'shtml',
-				'shtm',
-				'phtm'
-			]
-		}
-		image {
-			browser = true
-			upload = true
-			allowed = ['jpg', 'gif', 'jpeg', 'png']
-			denied = []
-		}
-		flash {
-			browser = false
-			upload = false
-			allowed = ['swf']
-			denied = []
-		}
-	}
-}
+//ckeditor  = {
+//	skipAllowedItemsCheck = false
+//	defaultFileBrowser = "ofm"
+//	upload {
+//		basedir = "/images/resources/"
+//		overwrite = false
+//		link {
+//			browser = true
+//			upload = false
+//			allowed = []
+//			denied = [
+//				'html',
+//				'htm',
+//				'php',
+//				'php2',
+//				'php3',
+//				'php4',
+//				'php5',
+//				'phtml',
+//				'pwml',
+//				'inc',
+//				'asp',
+//				'aspx',
+//				'ascx',
+//				'jsp',
+//				'cfm',
+//				'cfc',
+//				'pl',
+//				'bat',
+//				'exe',
+//				'com',
+//				'dll',
+//				'vbs',
+//				'js',
+//				'reg',
+//				'cgi',
+//				'htaccess',
+//				'asis',
+//				'sh',
+//				'shtml',
+//				'shtm',
+//				'phtm'
+//			]
+//		}
+//		image {
+//			browser = true
+//			upload = true
+//			allowed = ['jpg', 'gif', 'jpeg', 'png']
+//			denied = []
+//		}
+//		flash {
+//			browser = false
+//			upload = false
+//			allowed = ['swf']
+//			denied = []
+//		}
+//	}
+//}
 
 
 jquery {
@@ -664,7 +663,7 @@ grails.plugins.springsecurity.facebook.domain.classname='species.auth.FacebookUs
 grails.taggable.tag.autoImport=true
 grails.taggable.tagLink.autoImport=true
 
-grails.mail.default.from="team@thewesternghats.in"
+grails.mail.default.from="notification@thewesternghats.in"
 
 grails.plugins.springsecurity.password.algorithm = 'MD5'
 

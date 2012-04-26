@@ -1,12 +1,30 @@
-
-function handleError(xhr, textStatus, errorThrown, callback) {
-	if(xhr.status == 401 || xhr.status == 200) {
-		show_login_dialog();
-	} else {
-		if(callback) 
-			callback();
-		else 
-			alert(errorThrown);
+if (typeof (console) == "undefined") {
+	console = {};
+}
+if (typeof (console.log) == "undefined") {
+	console.log = function() {
+		return 0;
 	}
 }
 
+
+function show_login_dialog(successHandler, errorHandler) {
+	ajaxLoginSuccessCallbackFunction = successHandler;
+	ajaxLoginErrorCallbackFunction = errorHandler;
+	$('#ajaxLogin').modal('show');
+}
+
+function cancelLogin() {
+	$('#ajaxLogin').modal('hide');
+}
+
+function handleError(xhr, textStatus, errorThrown, successHandler, errorHandler) {
+	if (xhr.status == 401) {
+		show_login_dialog(successHandler, errorHandler);
+	} else {
+		if (errorHandler)
+			errorHandler();
+		else
+			alert(errorThrown);
+	}
+}

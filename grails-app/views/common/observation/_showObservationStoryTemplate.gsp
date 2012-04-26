@@ -69,7 +69,7 @@
 		<g:if test="${observationInstance.notes && showDetails}">
 			<div class="prop">
 				<span class="name"><i class="icon-info-sign"></i>Notes</span>
-				${observationInstance.notes.encodeAsHTML().replace('\n', '<br/>\n')}
+					${observationInstance.notes}
 			</div>
 		</g:if>
 
@@ -117,11 +117,13 @@
 				</g:if>
             </g:else>
             
+            <g:if test="${showDetails}">
 			<div class="footer-item" style="width:100px">
 				<fb:like layout="button_count"
 					href="${createLink(controller:'observation', action:'show', id:observationInstance.id, base:Utils.getDomainServerUrl(request))}"
 					width="450" show_faces="true"></fb:like>
 			</div>
+			</g:if>
 			
                 
 	</div>

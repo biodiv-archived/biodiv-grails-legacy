@@ -490,8 +490,11 @@
 								<h5><label><i
 									class="icon-pencil"></i>Notes <small><g:message code="observation.notes.message" default="Description" /></small></label><br />
 								</h5><div class="section-item" style="margin-right: 10px;">
-									<g:textArea name="notes" rows="10" value="${observationInstance?.notes}"
-										class="text ui-corner-all" />
+									<!-- g:textArea name="notes" rows="10" value=""
+										class="text ui-corner-all" /-->
+									<ckeditor:editor name="notes" height="200px" toolbar="Basic">
+										${observationInstance?.notes}
+									</ckeditor:editor>
 								</div>
 							</div>
 
