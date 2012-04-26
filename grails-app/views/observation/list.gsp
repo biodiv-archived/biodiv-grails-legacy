@@ -67,29 +67,7 @@
 						<div class="observations thumbwrap">
 							<div class="observation">
 								<div>
-									<!-- main_content -->
-									<div class="info-message">
-										<span class="name" style="color: #b1b1b1;"> <i
-											class="icon-screenshot"></i> ${observationInstanceTotal} </span>
-										Observation<g:if test="${observationInstanceTotal>1}">s</g:if>
-										<g:if test="${queryParams.groupId}">
-	                                            of <span class="highlight">
-												<g:link controller="observation" action="list" params="[sGroup: queryParams.groupId]">${SpeciesGroup.get(queryParams.groupId).name}</g:link> </span> group
-	                                    </g:if>
-										<g:if test="${queryParams.habitat}">
-	                                            in <span class="highlight"><g:link controller="observation" action="list" params="[habitat: queryParams.habitat]">
-												${Habitat.get(queryParams.habitat).name}</g:link> </span> habitat
-	                                    </g:if>
-										<g:if test="${queryParams.tag}">
-	                                            tagged <span
-												class="highlight"> <g:link controller="observation" action="list" params="[tag: queryParams.tag]">${queryParams.tag}</g:link> </span>
-										</g:if>
-										<g:if test="${queryParams.user}">
-	                                            by user <span
-												class="highlight"> <g:link controller="SUser" action="show" id="${queryParams.user}"> ${SUser.read(queryParams.user).name.encodeAsHTML()}</g:link> </span>
-										</g:if>
-									</div>
-
+									<obv:showObservationFilterMessage model="['observationInstanceTotal':observationInstanceTotal, 'queryParams':queryParams]"/>
 								</div>
 								<div style="clear: both;"></div>
 
@@ -140,9 +118,7 @@
 
 							</div>
 
-
 							<obv:showObservationsList />
-
 						</div>
 					</div>
 
@@ -156,41 +132,84 @@
 	<!--container end-->
 	<g:javascript>	
         $(document).ready(function(){
-            $('#selected_sort').tooltip({placement:'right'});
+        	$('#selected_sort').tooltip({placement:'right'});
             $('button').tooltip();
             $('.dropdown-toggle').dropdown();
-            
-            $('.sort_filter_label').click(function(){
-                $(this).addClass('active'); 
-                updateGallery(undefined, ${queryParams.max}, 0);
-                return false;   
-            });
-
-			$('#speciesNameFilter').button();
-			if(${params.speciesName == 'Unknown' }) {
+            	
+            $('#speciesNameFilter').button();
+            if(${params.speciesName == 'Unknown' }){
 				$("#speciesNameFilterButton").addClass('active')
 				$("#speciesNameAllButton").removeClass('active')
-			}else{ 
+			}else{
 				$("#speciesNameFilterButton").removeClass('active')
 				$("#speciesNameAllButton").addClass('active')
-                        }
-			
-			$("#speciesNameAllButton").click(function() {
+            }
+        	
+        	function stringTrim(s){
+           		return s.replace(/^\s*/, "").replace(/\s*$/, "");
+            }
+           
+           $("#speciesNameAllButton").click(function() {
+           		if($("#speciesNameAllButton").hasClass('active')){
+           			return false;
+           		}
 				$("#speciesNameFilter").val('All')
 				$("#speciesNameFilterButton").removeClass('active')
 				$("#speciesNameAllButton").addClass('active')
+				
 				updateGallery(undefined, ${queryParams.max}, 0);
-                                return false;
+                return false;
 			});
+			
 			$("#speciesNameFilterButton").click(function() {
-			    	$("#speciesNameFilter").val('Unknown')
+				if($("#speciesNameFilterButton").hasClass('active')){
+           			return false;
+           		}
+			    $("#speciesNameFilter").val('Unknown')
 				$("#speciesNameFilterButton").addClass('active')
-			        $("#speciesNameAllButton").removeClass('active')
+			    $("#speciesNameAllButton").removeClass('active')
 					
 				updateGallery(undefined, ${queryParams.max}, 0);
-                                return false;
+                return false;
 			});
 			                
+        	$('#speciesGroupFilter button').click(function(){
+        		if($(this).hasClass('active')){
+        			return false;
+        		}
+        		$('#speciesGroupFilter button.active').removeClass('active').css('backgroundPosition', '0px 0px');
+            	$(this).addClass('active').css('backgroundPosition', '0px -64px');
+            	updateGallery(undefined, ${queryParams.max}, 0);
+            	return false;
+         	});
+                
+         	$('#habitatFilter button').click(function(){
+         		if($(this).hasClass('active')){
+        			return false;
+        		}
+         		$('#habitatFilter button.active').removeClass('active').css('backgroundPosition', '0px 0px');
+            	$(this).addClass('active').css('backgroundPosition', '0px -64px');
+            	updateGallery(undefined, ${queryParams.max}, 0);
+            	return false;
+         	});
+                
+           $('.sort_filter_label').click(function(){
+           		var caret = '<span class="caret"></span>'
+           		if(stringTrim(($(this).html())) == stringTrim($("#selected_sort").html().replace(caret, ''))){
+           			$("#sortFilter").hide()
+                	return false;
+        		}
+        		$(this).addClass('active');
+                $("#selected_sort").html($(this).html() + caret);
+                $("#sortFilter").hide()
+                updateGallery(undefined, ${queryParams.max}, 0);
+                return false;   
+           });
+
+			$("#selected_sort").click(function(){
+				$("#sortFilter").show();
+			});
+			
             function getSelectedGroup() {
                 var grp = ''; 
                 $('#speciesGroupFilter button').each (function() {
@@ -210,7 +229,6 @@
                                 hbt += $(this).attr('value') + ',';
                         }
                 });
-
                 hbt = hbt.replace(/\s*\,\s*$/,'');
                 return hbt;	
             } 
@@ -271,7 +289,6 @@
                     return params;
                 }	
                 
-                
                 function updateGallery(target, limit, offset) {
                     if(target === undefined) {
                             target = window.location.pathname + window.location.search;
@@ -281,30 +298,29 @@
                     var url = a.url();
                     var href = url.attr('path');
                     var params = getFilterParameters(url, limit, offset);
+                    params["isGalleryUpdate"] = true;
                     var recursiveDecoded = decodeURIComponent($.param(params));
-                    window.location = href+'?'+recursiveDecoded;
-                    //var doc_url = href+'?'+recursiveDecoded;
-                    //$(".observations").load(doc_url+" .observations")
-                    //window.history.pushState(null, "", doc_url);
-
-                    //var carousel = jQuery('#carousel_${carousel_id}').data('jcarousel');
-                    //reloadCarousel(carousel, "speciesGroup", params['sGroupId']);
+                    
+                    var doc_url = href+'?'+recursiveDecoded;
+                    
+                   	$.ajax({
+  						url: doc_url,
+  						dataType: 'json',
+  						success: function(data){
+  							$('.observations_list').html(data.obvListHtml);
+							$('#info-message').html(data.obvFilterMsgHtml);
+						},
+						statusCode: {
+	    					401: function() {
+	    						show_login_dialog();
+	    					}	    				    			
+	    				},
+	    				error: function(xhr, status, error) {
+	    					var msg = $.parseJSON(xhr.responseText);
+	    					$('.message').html(msg);
+						}
+					});
                 }
-                
-                $('#speciesGroupFilter button').click(function(){
-                	$('#speciesGroupFilter button.active').removeClass('active');
-                	$(this).addClass('active');
-                    updateGallery(undefined, ${queryParams.max}, 0);
-                    return false;
-                });
-                
-                $('#habitatFilter button').click(function(){
-                	$('#habitatFilter button.active').removeClass('active');
-                	$(this).addClass('active');
-                    updateGallery(undefined, ${queryParams.max}, 0);
-                    return false;
-                });
-                
                 
                 $('#speciesNameFilter input').change(function(){
                     updateGallery(undefined, ${queryParams.max}, 0);

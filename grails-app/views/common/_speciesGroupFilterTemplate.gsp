@@ -6,22 +6,20 @@
 <g:javascript>
 
 $(document).ready(function(){
-
 	$("#speciesGroupFilter").button();
 	$("#speciesGroupFilter button").each(function() {
 		$(this).hover(function() {
 			$(this).css('backgroundPosition', '0px -32px');
 		}, function() {
-			if($(this).attr('value') == '${params.sGroup}') {
-				$(this).css('backgroundPosition', '0px -64px');
-			} else {
+			if(!$(this).hasClass('active')) {
 				$(this).css('backgroundPosition', '0px 0px');
+			}else{
+				$(this).css('backgroundPosition', '0px -64px');
 			}
 		});
 	})
-		
 	$('#speciesGroupFilter button[value$="${params.sGroup}"]').addClass('active').css('backgroundPosition', '0px -64px');
-        $('#speciesGroupFilter button').tooltip({placement:'top'});
+    $('#speciesGroupFilter button').tooltip({placement:'top'});
 	
 	
 	$("#habitatFilter").button();
@@ -29,17 +27,19 @@ $(document).ready(function(){
 		$(this).hover(function() {
 			$(this).css('backgroundPosition', '0px -32px');
 		}, function() {
-			if($(this).attr('value') == '${params.habitat}') {
-				$(this).css('backgroundPosition', '0px -64px');
-			} else {
+			if(!$(this).hasClass('active')) {
 				$(this).css('backgroundPosition', '0px 0px');
+			}else{
+				$(this).css('backgroundPosition', '0px -64px');
 			}
 		});
 	})
 	
 	$('#habitatFilter button[value$="${params.habitat}"]').addClass('active').css('backgroundPosition', '0px -64px');
-    $('#habitatFilter button').tooltip({placement:'bottom'});
+	$('#habitatFilter button').tooltip({placement:'bottom'});
+		
 });
+
 </g:javascript>
 <div class="class="btn-group">
 <div id="speciesGroupFilter" 

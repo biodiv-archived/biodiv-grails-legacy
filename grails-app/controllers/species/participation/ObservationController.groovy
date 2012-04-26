@@ -45,14 +45,13 @@ class ObservationController {
 		render (template:"/common/observation/showObservationListTemplate", model:result);
 	}
 
-	def list = { getObservationList(params); }
+	def list = { 
+		getObservationList(params);
+	}
 
 	protected def getObservationList(params) {
-		log.debug(params);
 		def max = Math.min(params.max ? params.int('max') : 9, 100)
-
 		def offset = params.offset ? params.int('offset') : 0
-
 		def filteredObservation = observationService.getFilteredObservations(params, max, offset)
 		def observationInstanceList = filteredObservation.observationInstanceList
 		def queryParams = filteredObservation.queryParams
@@ -60,8 +59,16 @@ class ObservationController {
 
 		def totalObservationInstanceList = observationService.getFilteredObservations(params, -1, -1).observationInstanceList
 		def count = totalObservationInstanceList.size()
-
-		[totalObservationInstanceList:totalObservationInstanceList, observationInstanceList: observationInstanceList, observationInstanceTotal: count, queryParams: queryParams, activeFilters:activeFilters]
+		if(!params.isGalleryUpdate){
+			[totalObservationInstanceList:totalObservationInstanceList, observationInstanceList: observationInstanceList, observationInstanceTotal: count, queryParams: queryParams, activeFilters:activeFilters]
+		}else{
+			def model = [totalObservationInstanceList:totalObservationInstanceList, observationInstanceList: observationInstanceList, observationInstanceTotal: count, queryParams: queryParams, activeFilters:activeFilters]
+			def obvListHtml =  g.render(template:"/common/observation/showObservationListTemplate", model:model);
+			def obvFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
+		
+			def result = [obvListHtml:obvListHtml,obvFilterMsgHtml:obvFilterMsgHtml]
+			render result as JSON
+		}
 	}
 
 	@Secured(['ROLE_USER'])
