@@ -50,7 +50,7 @@
                         var bounds = getSelectedBounds();
                         refreshList(bounds);
                     });
-		  var markerCluster = new MarkerClusterer(big_map, markers, {gridSize: 30, maxZoom: 10});
+		  var markerCluster = new MarkerClusterer(big_map, markers, {gridSize: 30});
                 
                     
                   function load_content(map, marker, id, infowindow){
