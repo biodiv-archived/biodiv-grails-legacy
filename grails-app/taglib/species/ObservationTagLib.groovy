@@ -116,8 +116,8 @@ class ObservationTagLib {
 			count = tags.size()
 		}
 		else{
-			tags =  observationService.findAllTagsSortedByObservationCount(30);
-			count = observationService.getNoOfTags();
+			tags =  observationService.getFilteredTags(attrs.model.params);
+			count = tags.size();
 		} 
 		//log.debug "==== tags " + tags 
 		out << render(template:"/common/observation/showAllTagsTemplate", model:[count: count, tags:tags]);

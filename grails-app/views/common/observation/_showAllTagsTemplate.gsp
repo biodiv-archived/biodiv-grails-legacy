@@ -32,16 +32,19 @@
 		}
 	});
 </g:javascript>
-<h5><i class="icon-tags"></i><g:message code="default.tags.title" default="Tags" /></h5>
-<div class="tag-tools">
-View as 
-<span id="as_list" class="btn">List</span> 
-<span id="as_cloud" class="btn active">Cloud</span>
+<div id="tags_section">
+	<h5>
+		<i class="icon-tags"></i>
+		<g:message code="default.tags.title" default="Tags" />
+	</h5>
+	<div class="tag-tools">
+		View as <span id="as_list" class="btn">List</span> <span id="as_cloud"
+			class="btn active">Cloud</span>
+	</div>
+	<div id="tagCloud" class="tagsView">
+		<obv:showTagsCloud model="['tags': tags]" />
+	</div>
+	<div id="tagList" class="tagsView" style="display: none;">
+		<obv:showTagsList model="['tags': tags]" />
+	</div>
 </div>
-<div id="tagCloud" class="tagsView">
-	<obv:showTagsCloud model="['tags': tags]"/>
-</div>
-<div id="tagList" class="tagsView" style="display:none;">
-	<obv:showTagsList model="['tags': tags]"/>
-</div>	
-
