@@ -50,7 +50,6 @@
 			});
 
 			$('.grid_view_bttn').click(function() {
-				console.log("grid view btn click")
 				$('.grid_view').show();
 				$('.list_view').hide();
 				//alert($(this).attr('class'));

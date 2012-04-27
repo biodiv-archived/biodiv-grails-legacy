@@ -127,7 +127,7 @@ var reloadLoginInfo = function() {
 				success : function(data) {
 					$('.header:visible .header_userInfo').html(data);
 				}, error: function (xhr, ajaxOptions, thrownError){
-					console.log("Error while getting login information : "+xhr.responseText);
+					alert("Error while getting login information : "+xhr.responseText);
 				}
 			});
 		}
@@ -375,7 +375,6 @@ var ajaxLoginSuccessHandler = function(json, statusText, xhr, $form) {
 
 	<script type="text/javascript">
 		function closeHandler() {
-			console.log("close")
 		};
 
 		function setAttribute(node, name, value) {

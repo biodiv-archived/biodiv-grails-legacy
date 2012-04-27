@@ -681,19 +681,23 @@ display: table !important;
 
 			}, error:function (xhr, ajaxOptions, thrownError){
 					//xhr.upload.removeEventListener( 'progress', progressHandlingFunction, false); 
-                                        alert(JSON.stringify(xhr));
-					var response = $.parseJSON(xhr.responseText);
-					if(response.error){
-						$("#image-resources-msg").parent(".resources").addClass("error");
-						$("#image-resources-msg").html(response.error);
-					}
 					
-					var messageNode = $(".message .resources");
-					if(messageNode.length == 0 ) {
-						$("#upload_resource").prepend('<div class="message">'+(response?response.error:"Error")+'</div>');
-					} else {
-						messageNode.append(response?response.error:"Error");
-					}
+					//successHandler is used when ajax login succedes
+	            	var successHandler = this.success, errorHandler;
+	            	handleError(xhr, ajaxOptions, thrownError, successHandler, function() {
+						var response = $.parseJSON(xhr.responseText);
+						if(response.error){
+							$("#image-resources-msg").parent(".resources").addClass("error");
+							$("#image-resources-msg").html(response.error);
+						}
+						
+						var messageNode = $(".message .resources");
+						if(messageNode.length == 0 ) {
+							$("#upload_resource").prepend('<div class="message">'+(response?response.error:"Error")+'</div>');
+						} else {
+							messageNode.append(response?response.error:"Error");
+						}
+					});
            } 
      	});  
 		

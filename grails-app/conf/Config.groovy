@@ -92,12 +92,12 @@ log4j = {
 	
 	debug	'species',
 			'speciespage',
-			'grails.app',
-			'org.springframework.security.web',
-			'org.springframework.security.openid',
-			'org.openid4java',
-			'species.auth',
-			'com.the6hours.grails.springsecurity.facebook'
+			'grails.app'
+			//'org.springframework.security.web',
+			//'org.springframework.security.openid',
+			//'org.openid4java',
+			//'species.auth',
+			//'com.the6hours.grails.springsecurity.facebook'
 	
 	
 
