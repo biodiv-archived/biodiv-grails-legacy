@@ -65,8 +65,11 @@ class ObservationController {
 			def model = [totalObservationInstanceList:totalObservationInstanceList, observationInstanceList: observationInstanceList, observationInstanceTotal: count, queryParams: queryParams, activeFilters:activeFilters]
 			def obvListHtml =  g.render(template:"/common/observation/showObservationListTemplate", model:model);
 			def obvFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
-		
-			def result = [obvListHtml:obvListHtml,obvFilterMsgHtml:obvFilterMsgHtml]
+			
+			def filteredTags = observationService.getTagsFromObservation(totalObservationInstanceList.collect{it.id})
+			def tagsHtml = g.render(template:"/common/observation/showAllTagsTemplate", model:[count: count, tags:filteredTags]);
+			
+			def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml, tagsHtml:tagsHtml]
 			render result as JSON
 		}
 	}

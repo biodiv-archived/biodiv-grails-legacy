@@ -59,7 +59,7 @@
 					</div>
 				</div>
 				<div class="tags_section span3" style="float: right;">
-					<obv:showAllTags model="['tagFilterByProperty':'All']" />
+					<obv:showAllTags model="['tagFilterByProperty':'All' , 'params':params]" />
 				</div>
 
 				<div class="row">
@@ -195,12 +195,13 @@
            $('.sort_filter_label').click(function(){
            		var caret = '<span class="caret"></span>'
            		if(stringTrim(($(this).html())) == stringTrim($("#selected_sort").html().replace(caret, ''))){
-           			$("#sortFilter").hide()
+           			$("#sortFilter").hide();
                 	return false;
         		}
+        		$('.sort_filter_label.active').removeClass('active');
         		$(this).addClass('active');
                 $("#selected_sort").html($(this).html() + caret);
-                $("#sortFilter").hide()
+                $("#sortFilter").hide();
                 updateGallery(undefined, ${queryParams.max}, 0);
                 return false;   
            });
@@ -308,11 +309,13 @@
   						
   						beforeSend : function(){
   							$('.observations_list').css({"opacity": 0.5});
+  							$('#tags_section').css({"opacity": 0.5});
   						},
   						
   						success: function(data){
   							$('.observations_list').replaceWith(data.obvListHtml);
   							$('#info-message').replaceWith(data.obvFilterMsgHtml);
+  							$('#tags_section').replaceWith(data.tagsHtml);
 						},
 						statusCode: {
 	    					401: function() {
@@ -339,12 +342,13 @@
                 
                 $("ul[name='tags']").tagit({select:true,  tagSource: "${g.createLink(action: 'tags')}"});
          
+          		/*
                 $("li.tagit-choice").click(function(){
                     var tg = $(this).contents().first().text();
                     window.location.href = "${g.createLink(action: 'list')}/?tag=" + tg ;
                 });
                
-                /*
+               
                 $(".snippet.tablet").live('hover', function(e){
                     if(e.type == 'mouseenter'){    
                         $(".figure", this).slideUp("fast");   

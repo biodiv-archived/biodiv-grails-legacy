@@ -27,29 +27,29 @@
                                     of <span class="highlight"> <g:link
 				controller="observation" action="list"
 				params="[sGroup: queryParams.groupId]">
-				${SpeciesGroup.get(queryParams.groupId).name} [<a
-					onclick="setDefaultGroup()">X</a>]</g:link>
+				${SpeciesGroup.get(queryParams.groupId).name} <a
+				href="#" onclick="setDefaultGroup(); return false;">[X]</a></g:link>
 		</span> group
                             </g:if>
 	<g:if test="${queryParams.habitat}">
                                     in <span class="highlight"><g:link
 				controller="observation" action="list"
 				params="[habitat: queryParams.habitat]">
-				${Habitat.get(queryParams.habitat).name} [<a
-					onclick="setDefaultHabitat()">X</a>]</g:link> </span> habitat
+				${Habitat.get(queryParams.habitat).name} <a
+				href="#" onclick="setDefaultHabitat(); return false;">[X]</a></g:link> </span> habitat
                             </g:if>
 	<g:if test="${queryParams.tag}">
                                     tagged <span class="highlight">
 			<g:link controller="observation" action="list"
 				params="[tag: queryParams.tag]">
-				${queryParams.tag} [<a onclick="removeTag()">X</a>]</g:link>
+				${queryParams.tag} <a href="#" onclick="removeTag(); return false;">[X]</a></g:link>
 		</span>
 	</g:if>
 	<g:if test="${queryParams.user}">
                                     by user <span class="highlight">
 			<g:link controller="SUser" action="show" id="${queryParams.user}">
-				${SUser.read(queryParams.user).name.encodeAsHTML()}  [<a
-					onclick="removeUser()">X</a>]</g:link>
+				${SUser.read(queryParams.user).name.encodeAsHTML()} <a
+				href="#" onclick="removeUser(); return false;">[X]</a></g:link>
 		</span>
 	</g:if>
 </div>

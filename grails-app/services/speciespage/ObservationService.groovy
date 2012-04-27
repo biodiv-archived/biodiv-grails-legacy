@@ -443,15 +443,27 @@ class ObservationService {
 		params.offset = 0
 		def obvIds = getRelatedObservations(params).relatedObv.observations.observation.collect{it.id}
 		obvIds.add(params.id.toLong())
+		return getTagsFromObservation(obvIds)
+	}
+	
+	protected Map getTagsFromObservation(obvIds){
+		int tagsLimit = 30;
+		LinkedHashMap tags = [:]
+		if(!obvIds){
+			return tags
+		}
 		
 		def sql =  Sql.newInstance(dataSource);
-		String query = "select t.name as name, count(t.name) as obv_count from tag_links as tl, tags as t, observation obv where tl.tag_ref in " + getIdList(obvIds)  + " and tl.tag_ref = obv.id and obv.is_deleted = false and t.id = tl.tag_id group by t.name order by count(t.name) desc, t.name asc ";
+		String query = "select t.name as name, count(t.name) as obv_count from tag_links as tl, tags as t, observation obv where tl.tag_ref in " + getIdList(obvIds)  + " and tl.tag_ref = obv.id and obv.is_deleted = false and t.id = tl.tag_id group by t.name order by count(t.name) desc, t.name asc limit " + tagsLimit;
 		
-		LinkedHashMap tags = [:]
 		sql.rows(query).each{
 			tags[it.getProperty("name")] = it.getProperty("obv_count");
 		};
 		return tags;
+	}
+	
+	Map getFilteredTags(params){
+		return getTagsFromObservation(getFilteredObservations(params, -1, -1).observationInstanceList.collect{it.id});
 	}
 	
 	/**
