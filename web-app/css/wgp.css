@@ -1016,3 +1016,34 @@ position: absolute;
 top: 525px;
 z-index: 2;
 }
+
+span.cke_skin_kama {
+border: 0 !important;
+}
+
+.cke_skin_kama .cke_wrapper {
+background: none !important;
+}
+
+.cke_skin_kama .cke_toolgroup {
+background: none !important;
+}
+
+.cke_skin_kama .cke_button a.cke_on {
+background-color: #f7f7f7 !important;
+}
+
+.cke_skin_kama .cke_button a, .cke_skin_kama .cke_button a.cke_off {
+border-radius: 0 !important;
+}
+
+.cke_show_borders p {
+margin-top: 0 !important;
+margin-bottom: 0 !important;
+}
+
+#cke_notes {
+width: 100%;
+min-width: 100%;
+max-width: 100%;
+}
