@@ -69,7 +69,7 @@
 		<g:if test="${observationInstance.notes && showDetails}">
 			<div class="prop">
 				<span class="name"><i class="icon-info-sign"></i>Notes</span>
-                                <div class="value">
+                                <div class="notes_view">
 					${observationInstance.notes}
                                 </div>        
 			</div>

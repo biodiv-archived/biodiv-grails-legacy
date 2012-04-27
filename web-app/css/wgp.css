@@ -1051,3 +1051,9 @@ max-width: 100%;
 .galleria-container {
 background-color: #000000 !important;
 }
+
+.notes_view {
+clear: both;
+background-color: #fdfdfd;       
+padding: 10px;
+}
