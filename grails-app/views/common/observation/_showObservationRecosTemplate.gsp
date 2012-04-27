@@ -10,7 +10,7 @@
 							controller="observation"
 							params="['obvId':observationInstance.id, 'recoId':r.recoId, 'currentVotes':r.noOfVotes]"
 							onSuccess="showRecos(data, textStatus);return false"
-							onFailure="handleError(XMLHttpRequest,textStatus,undefined,errorThrown);return false;">Agree</g:remoteLink>
+							onFailure="handleError(XMLHttpRequest,textStatus,errorThrown,this.success,showRecoUpdateStatus);return false;">Agree</g:remoteLink>
 					</div>
 					<g:each in="${r.authors}" var="author">
 						<g:link controller="SUser" action="show" id="${author?.id}">

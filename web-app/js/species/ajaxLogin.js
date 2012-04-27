@@ -2,6 +2,7 @@
  * 
  */
 
+
 (function($) {
 
 	var ajaxLoginFormHandler = function(event) {
@@ -17,28 +18,7 @@
 												'alter alert-info').show();
 								return true;
 							},
-							success : function(json, statusText, xhr, $form) {
-								if (json.success) {
-									$('#ajaxLogin').modal('hide');
-									$('#loginMessage').html('').removeClass()
-											.hide();
-									reloadLoginInfo();
-									if (ajaxLoginSuccessCallbackFunction) {
-										ajaxLoginSuccessCallbackFunction(json,
-												statusText, xhr);
-										ajaxLoginSuccessCallbackFunction = undefined;
-									}
-								} else if (json.error) {
-									$('#loginMessage').html(json.error)
-											.removeClass().addClass(
-													'alter alert-error')
-											.show();
-								} else {
-									$('#loginMessage').html(json).removeClass()
-											.addClass('alter alert-info')
-											.show();
-								}
-							},
+							success : ajaxLoginSuccessHandler,
 							error : function(xhr, ajaxOptions, thrownError) {
 								handleError(
 										xhr,
@@ -66,9 +46,11 @@
 
 	$('#ajaxLogin form').bind('submit', ajaxLoginFormHandler);
 	/*
-	 * $('.googleConnect').click(function() { googleOpener.popup(450,500);
-	 * return true; });
-	 */
+	$('.googleConnect').click(function() { 
+		googleOpener.popup(450,500);
+		return true; 
+	});
+	*/
 	$('#ajaxLogin').modal({
 		"show" : false,
 		"backdrop" : "static"
