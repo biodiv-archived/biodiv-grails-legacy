@@ -20,7 +20,9 @@ function cancelLogin() {
 
 function handleError(xhr, textStatus, errorThrown, successHandler, errorHandler) {
 	if (xhr.status == 401) {
-		show_login_dialog(successHandler, errorHandler);
+		//show_login_dialog(successHandler, errorHandler);
+		console.log(xhr);
+		window.location.href = "/biodiv/login?spring-security-redirect="+window.location.href;
 	} else {
 		if (errorHandler)
 			errorHandler();

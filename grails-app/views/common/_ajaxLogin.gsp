@@ -12,7 +12,7 @@
 					'daoPostUrl':daoPostUrl,
 					'persistentRememberMe': persistentRememberMe,
 					'rememberMeParameter': rememberMeParameter,
-					'openidIdentifier': openidIdentifier]"/>
+					'openidIdentifier': openidIdentifier, 'ajax':true]"/>
 		</div>
 	</div>
 </div>

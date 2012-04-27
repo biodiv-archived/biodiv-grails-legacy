@@ -135,29 +135,29 @@
 					</div>
 				</g:if>
 
-				<g:if test="${SUserInstance.openIds}">
-					<div class="section" style="clear: both;">
-						<h5>
-							<span class="name" style="color: #b1b1b1;"><i class="icon-gift"></i>${SUserInstance.openIds?.size()}</span>
-							External Provider Identification<g:if test="${SUserInstance.openIds?.size()>1}">s</g:if>
-						</h5>
-						<g:each in="${SUserInstance.openIds}" var="openId">
-							<g:if test="${openId.url.indexOf('facebook') != -1}">
-								<a href="${openId.url}" target="blank">Facebook</a>
-							</g:if>
-							<g:elseif test="${openId.url.indexOf('google') != -1 }">
-								<a href="${openId.url}" target="blank">Google</a>
-							</g:elseif>
-							<g:elseif test="${openId.url.indexOf('yahoo')  != -1}">
-								<a href="${openId.url}" target="blank">Yahoo</a>
-							</g:elseif>
-							<g:else>
-								<a href="${openId.url}" target="blank">openId.url</a>
-							</g:else>
-						</g:each>
-					</div>
-
-				</g:if>
+<%--				<g:if test="${SUserInstance.openIds}">--%>
+<%--					<div class="section" style="clear: both;">--%>
+<%--						<h5>--%>
+<%--							<span class="name" style="color: #b1b1b1;"><i class="icon-gift"></i>${SUserInstance.openIds?.size()}</span>--%>
+<%--							External Provider Identification<g:if test="${SUserInstance.openIds?.size()>1}">s</g:if>--%>
+<%--						</h5>--%>
+<%--						<g:each in="${SUserInstance.openIds}" var="openId">--%>
+<%--							<g:if test="${openId.url.indexOf('facebook') != -1}">--%>
+<%--								<a href="${openId.url}" target="blank">Facebook</a>--%>
+<%--							</g:if>--%>
+<%--							<g:elseif test="${openId.url.indexOf('google') != -1 }">--%>
+<%--								<a href="${openId.url}" target="blank">Google</a>--%>
+<%--							</g:elseif>--%>
+<%--							<g:elseif test="${openId.url.indexOf('yahoo')  != -1}">--%>
+<%--								<a href="${openId.url}" target="blank">Yahoo</a>--%>
+<%--							</g:elseif>--%>
+<%--							<g:else>--%>
+<%--								<a href="${openId.url}" target="blank">openId.url</a>--%>
+<%--							</g:else>--%>
+<%--						</g:each>--%>
+<%--					</div>--%>
+<%----%>
+<%--				</g:if>--%>
 
 				<div class="section" style="clear: both;">
 					<h5>

@@ -11,7 +11,10 @@ import org.springframework.security.authentication.LockedException
 import org.springframework.security.core.context.SecurityContextHolder as SCH
 import org.springframework.security.web.DefaultRedirectStrategy
 import org.springframework.security.web.WebAttributes
+import org.springframework.security.web.authentication.AbstractAuthenticationTargetUrlRequestHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
+import org.springframework.security.web.savedrequest.SavedRequest;
+import org.springframework.util.StringUtils;
 
 class LoginController {
 
@@ -56,30 +59,23 @@ class LoginController {
 
 	def authSuccess = {
 		if(params.uid) {
-//			def facebookUser = FacebookUser.findByUid(params.long("uid"));
-//
-//			if(facebookUser.isFirstLogin) {				
-//				flash.chainedParams = [facebookUser:facebookUser, openId:facebookUser.link?:'dummyOpenId']
-//				chain (controller:'register');
-//			} else {
-//				if(facebookUser.isFirstLogin) {
-//					FacebookUser.withTransaction {
-//						facebookUser.isFirstLogin = false;
-//						facebookUser.save();
-//					}
-//				}
+			def target = request.getParameter(AbstractAuthenticationTargetUrlRequestHandler.DEFAULT_TARGET_PARAMETER);
+			if (StringUtils.hasText(target)) {
+				log.debug "Redirecting to target : $target";
+				(new DefaultRedirectStrategy()).sendRedirect(request, response, target);
+				return;
+			}
 
-				def defaultSavedRequest = request.getSession()?.getAttribute(WebAttributes.SAVED_REQUEST)
-				log.debug "Redirecting to DefaultSavedRequest : $defaultSavedRequest";
-				if(defaultSavedRequest) {
-					(new DefaultRedirectStrategy()).sendRedirect(request, response, defaultSavedRequest.getRedirectUrl());
-					return
-				} else {
-					redirect uri:"/";
-					return;
-				}
-//			}
-		} 
+			def defaultSavedRequest = request.getSession()?.getAttribute(WebAttributes.SAVED_REQUEST)
+			log.debug "Redirecting to DefaultSavedRequest : $defaultSavedRequest";
+			if(defaultSavedRequest) {
+				(new DefaultRedirectStrategy()).sendRedirect(request, response, defaultSavedRequest.getRedirectUrl());
+				return
+			} else {
+				redirect uri:"/";
+				return;
+			}
+		}
 	}
 
 	/**

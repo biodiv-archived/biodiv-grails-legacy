@@ -7,7 +7,7 @@
 			style="clear: both; float: left; line-height: 40px;">Using:</div>
 		<div class="control_group">
 			<auth:externalAuthProviders
-				model='["openidIdentifier":openidIdentifier, "openIdPostUrl":openIdPostUrl]' />
+				model='["openidIdentifier":openidIdentifier, "openIdPostUrl":openIdPostUrl, "ajax":ajax]' />
 		</div>
 		<form action='${daoPostUrl}' method='POST' class="form-horizontal"
 			name='loginForm'>
@@ -30,7 +30,12 @@
 						placeholder="Enter your password...">
 				</div>
 			</div>
-
+			
+			<g:if test="${params['spring-security-redirect']}">
+				<input type="hidden" name="spring-security-redirect"
+					value="${params['spring-security-redirect']}" />
+			</g:if>
+			
 			<div class="control-group">
 				<label class="control-label" for="optionsCheckbox"></label>
 				<div class="controls">

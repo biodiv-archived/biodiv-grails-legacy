@@ -99,6 +99,11 @@
 .control-group.error  .help-inline {
 	padding-top : 15px
 }
+
+.cke_skin_kama .cke_editor {
+display: table !important;
+}
+
 </style>
 </head>
 <body>

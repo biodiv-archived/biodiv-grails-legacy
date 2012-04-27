@@ -1,4 +1,4 @@
-<div id="ibp-header" class="gradient-bg" style="display:none;">
+<div id="ibp-header" class="header gradient-bg" style="display:none;">
     <!-- Logo -->
       <div id="logo">
         <a href="/">

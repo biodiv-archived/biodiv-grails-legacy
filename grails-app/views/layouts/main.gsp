@@ -110,14 +110,50 @@ jQuery(document).ready(function($) {
 					}
 				});
 });
+
+var domainAppId;
+		if (document.domain == "${grailsApplication.config.wgp.domain}"){
+			domainAppId = '${grailsApplication.config.speciesPortal.wgp.facebook.appId}'
+		} else if(document.domain == "${grailsApplication.config.ibp.domain}") {
+			domainAppId = '${grailsApplication.config.speciesPortal.ibp.facebook.appId}'
+		}
+		// Callback to execute whenever ajax login is successful.
+		// Todo some thing meaningful with the response data
+		var ajaxLoginSuccessCallbackFunction, ajaxLoginErrorCallbackFunction;
+		
 var reloadLoginInfo = function() {
 			$.ajax({
 				url : "${createLink(controller:'SUser', action:'login')}",
 				success : function(data) {
 					$('.header:visible .header_userInfo').html(data);
+				}, error: function (xhr, ajaxOptions, thrownError){
+					console.log("Error while getting login information : "+xhr.responseText);
 				}
 			});
 		}
+		
+var ajaxLoginSuccessHandler = function(json, statusText, xhr, $form) {
+	if (json.success) {
+		$('#ajaxLogin').modal('hide');
+		$('#loginMessage').html('').removeClass()
+				.hide();
+		reloadLoginInfo();
+		if (ajaxLoginSuccessCallbackFunction) {
+			ajaxLoginSuccessCallbackFunction(json,
+					statusText, xhr);
+			ajaxLoginSuccessCallbackFunction = undefined;
+		}
+	} else if (json.error) {
+		$('#loginMessage').html(json.error)
+				.removeClass().addClass(
+						'alter alert-error')
+				.show();
+	} else {
+		$('#loginMessage').html(json).removeClass()
+				.addClass('alter alert-info')
+				.show();
+	}
+}
 </g:javascript>
 
 <g:layoutHead />
@@ -235,16 +271,6 @@ var reloadLoginInfo = function() {
 
 	<g:javascript>
 
-		var domainAppId;
-		if (document.domain == "${grailsApplication.config.wgp.domain}"){
-			domainAppId = '${grailsApplication.config.speciesPortal.wgp.facebook.appId}'
-		} else if(document.domain == "${grailsApplication.config.ibp.domain}") {
-			domainAppId = '${grailsApplication.config.speciesPortal.ibp.facebook.appId}'
-		}
-		// Callback to execute whenever ajax login is successful.
-		// Todo some thing meaningful with the response data
-		var ajaxLoginSuccessCallbackFunction, ajaxLoginErrorCallbackFunction;
-		
 		$(document).ready(function(){
 			
 			$(".ui-icon-control").click(function() {
@@ -274,7 +300,7 @@ var reloadLoginInfo = function() {
 			// make sure facebook is initialized before calling the facebook JS api
 			window.fbEnsure = function(callback) {
  					if (window.facebookInitialized) { callback(); return; }
- 					
+ 						
  					if(!window.FB) {
  						//alert("Facebook script all.js could not be loaded for some reason. Either its not available or is blocked.")
  					} else {
@@ -302,24 +328,31 @@ var reloadLoginInfo = function() {
 			 * - "connected" will be triggered if the reassociation was successful
 			 * - "failed" will be triggered when for whatever reason the coupling was unsuccessful
 			 */
-			var fbConnect = function() {
-									
+			$('.fbJustConnect').click(function() {
 				var scope = { scope: "" };
 				scope.scope = "email,user_about_me,user_location,user_activities,user_hometown,manage_notifications,user_website,publish_stream";
 				
 				fbEnsure(function() {
 					FB.login(function(response) {
 						if (response.status == 'connected') {
-							window.location = "${createLink(controller:'login', action:'authSuccess')}"+"?uid="+response.authResponse.userID
+							/*if($('.fbJustConnect').hasClass('ajaxForm')) {
+								$.ajax({
+								  url: "${createLink(controller:'login', action:'authSuccess')}",
+								  method:"GET",
+								  data:{'uid':response.authResponse.userID, ${params['spring-security-redirect']?'"spring-security-redirect":"'+params['spring-security-redirect']+'"':''}},
+								  success: function(data, statusText, xhr) {
+								    ajaxLoginSuccessHandler(data, statusText, xhr);
+								  }
+								});
+							} else */{
+								var redirectTarget = ${params['spring-security-redirect']?'"&spring-security-redirect='+params['spring-security-redirect']+'"':'""'};
+								window.location = "${createLink(controller:'login', action:'authSuccess')}"+"?uid="+response.authResponse.userID+redirectTarget
+							}
 						} else {
 							alert("Failed to connect to Facebook");
 						}
 					}, scope);
 				});
-			};
-			
-			$('.fbJustConnect').click(function() {
-				fbConnect();
 			});
 			 
 		}); 
@@ -332,8 +365,7 @@ var reloadLoginInfo = function() {
 				return;
 			js = d.createElement(s);
 			js.id = id;
-			js.src = "//connect.facebook.net/en_US/all.js#xfbml=1&appId="
-					+ domainAppId;
+			js.src = "//connect.facebook.net/en_US/all.js#xfbml=1&appId="+ domainAppId;
 			fjs.parentNode.insertBefore(js, fjs);
 		}(document, 'script', 'facebook-jssdk'));
 	</script>
