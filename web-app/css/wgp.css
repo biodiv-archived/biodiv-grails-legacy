@@ -1047,3 +1047,7 @@ width: 100%;
 min-width: 100%;
 max-width: 100%;
 }
+
+.galleria-container {
+background-color: #000000 !important;
+}

@@ -41,7 +41,7 @@ def gallImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApp
 
 
 <link rel="stylesheet" type="text/css" media="all"
-	href="${resource(dir:'js/galleria/1.2.6/themes/classic/',file:'galleria.classic.css')}" />
+	href="${resource(dir:'js/galleria/1.2.4/themes/classic/',file:'galleria.classic.css')}" />
 <link rel="stylesheet" type="text/css" media="all"
 	href="${resource(dir:'js/jquery/jquery.jcarousel-0.2.8/themes/classic/',file:'skin.css')}" />
 
@@ -51,7 +51,7 @@ def gallImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApp
 
 <g:javascript src="jsrender.js"></g:javascript>
 
-<g:javascript src="galleria/1.2.6/galleria-1.2.6.min.js"/>
+<g:javascript src="galleria/1.2.4/galleria-1.2.4.min.js"/>
 
 <g:javascript src="tagit.js"></g:javascript>
 
@@ -219,7 +219,7 @@ def gallImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApp
 	</div>
 	<g:javascript>
 	
-	Galleria.loadTheme('${resource(dir:'js/galleria/1.2.6/themes/classic/',file:'galleria.classic.min.js')}');
+	Galleria.loadTheme('${resource(dir:'js/galleria/1.2.4/themes/classic/',file:'galleria.classic.min.js')}');
 	
 	$(document).ready(function(){
 		
