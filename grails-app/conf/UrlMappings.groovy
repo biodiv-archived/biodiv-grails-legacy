@@ -26,7 +26,7 @@ class UrlMappings {
 		}
 		
 
-		"/"(view:"/index")
+		"/"(controller:"observation", action:"list")
 		"500"(view:'/error')
 		
 		"/static/$path"(controller:"species", action:"staticContent")
