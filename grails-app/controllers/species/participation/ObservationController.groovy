@@ -104,7 +104,7 @@ class ObservationController {
 
 					sendNotificationMail(OBSERVATION_ADDED, observationInstance, request);
 					params["createNew"] = true
-					redirect(action: 'addRecommendationVote', params:params);
+					chain(action: 'addRecommendationVote', model:['chainedParams':params]);
 				} else {
 					observationInstance.errors.allErrors.each { log.error it }
 					render(view: "create", model: [observationInstance: observationInstance])
@@ -138,7 +138,7 @@ class ObservationController {
 
 					//redirect(action: "show", id: observationInstance.id)
 					params["createNew"] = true
-					redirect(action: 'addRecommendationVote', params:params);
+					chain(action: 'addRecommendationVote', model:['chainedParams':params]);
 				} else {
 					observationInstance.errors.allErrors.each { log.error it }
 					render(view: "create", model: [observationInstance: observationInstance])
@@ -302,10 +302,17 @@ class ObservationController {
 	 */
 	@Secured(['ROLE_USER'])
 	def addRecommendationVote = {
+		
+		if(chainModel?.chainedParams) {
+			//need to change... dont pass on params
+			chainModel.chainedParams.each {
+				params[it.key] = it.value;
+			}
+			params.action = 'addRecommendationVote'
+		}
+		params.author = springSecurityService.currentUser;
 		log.debug params;
 		
-		params.author = springSecurityService.currentUser;
-
 		if(params.obvId) {
 			//Saves recommendation if its not present
 			def recVoteResult = getRecommendationVote(params)

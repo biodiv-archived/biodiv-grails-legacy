@@ -293,7 +293,7 @@ def gallImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApp
 						$("#seeMore").show();
 					}	
 				}, error: function(xhr, status, error) {
-	    			handleError(xhr, ajaxOptions, thrownError, undefined, function() {
+	    			handleError(xhr, status, error, undefined, function() {
 		    			var msg = $.parseJSON(xhr.responseText);
 		    			if(msg.info) {
 		    				showRecoUpdateStatus(msg.info, 'info');
