@@ -264,10 +264,16 @@ class RegisterController extends grails.plugins.springsecurity.ui.RegisterContro
 		if (body.contains('$')) {
 			body = evaluate(body, [username: username.capitalize(), url: url])
 		}
+		def sub = conf.ui.register.emailSubject
+		println sub
+		if (sub.contains('$')) {
+			sub = evaluate(sub, [domain: Utils.getDomainName(request)])
+		}
+		println sub;
 		mailService.sendMail {
 			to email
 			from conf.ui.register.emailFrom
-			subject conf.ui.register.emailSubject
+			subject sub.toString()
 			html body.toString()
 		}
 		clearRegistrationInfoFromSession()

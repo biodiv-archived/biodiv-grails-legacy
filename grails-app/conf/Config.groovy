@@ -92,11 +92,11 @@ log4j = {
 	
 	debug	'species',
 			'speciespage',
-			'grails.app'
+			'grails.app',
 			//'org.springframework.security.web',
 			//'org.springframework.security.openid',
 			//'org.openid4java',
-			//'species.auth',
+			'species.auth'
 			//'com.the6hours.grails.springsecurity.facebook'
 	
 	
@@ -677,7 +677,7 @@ grails.plugins.springsecurity.ui.notification.emailFrom = 'notification@theweste
 
 grails.plugins.springsecurity.ui.register.emailBody = '''Hi $username,<br/><br/>You (or someone pretending to be you) created an account with this email address.<br/><br/>If you made the request, please click <a href="$url">here</a> to finish the registration and activate your account.'''
 grails.plugins.springsecurity.ui.register.emailFrom = 'notification@thewesternghats.in'
-grails.plugins.springsecurity.ui.register.emailSubject = "Activate your account with ${speciesPortal.domain}"
+grails.plugins.springsecurity.ui.register.emailSubject = 'Activate your account with $domain'
 
 grails.plugins.springsecurity.ui.forgotPassword.emailBody = '''\
 Hi $username,<br/>
