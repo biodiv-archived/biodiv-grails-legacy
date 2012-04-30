@@ -697,7 +697,8 @@ grails.plugins.springsecurity.ui.addObservation.emailBody = '''Hi $username,<br/
 
 grails.plugins.springsecurity.ui.addRecommendationVote.emailBody = '''Hi $username,<br/><br/>Your observation has some social activity.<br/>$currentUser.username has $currentActivity on your Observation.<br/><br/>You can see the posting on your Observation URL:<a href="$obvUrl">$obvUrl</a><br/><br/>You will be notified by mail on any social activity on the observation.<br/><br/>If you do not want to receive notifications please go to your user profile and switch it off.<br/>
 <br/>User Profile URL:<a href="$userProfileUrl">$userProfileUrl</a><br/><br/>The portal team'''
-
+grails.plugins.springsecurity.ui.observationFlagged.emailBody ='''Hi $username,<br/><br/>Your observation has some social activity.<br/>$currentUser.username has flagged your Observation.<br/><br/>You can see the posting on your Observation URL:<a href="$obvUrl">$obvUrl</a><br/><br/>You will be notified by mail on any social activity on the observation.<br/><br/>If you do not want to receive notifications please go to your user profile and switch it off.<br/>
+<br/>User Profile URL:<a href="$userProfileUrl">$userProfileUrl</a><br/><br/>The portal team'''
 grails.plugins.springsecurity.ui.encodePassword = false
 
 grails.plugins.springsecurity.useSecurityEventListener = true
