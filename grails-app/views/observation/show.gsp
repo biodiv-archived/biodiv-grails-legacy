@@ -22,12 +22,13 @@ def gallImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApp
 		} else if(domain.equals(grailsApplication.config.ibp.domain)) {
 			fbAppId =  grailsApplication.config.speciesPortal.ibp.facebook.appId;
 		}
+		String location = observationInstance.placeName?:observationInstance.reverseGeocodedName 
 %>
 
 <meta property="fb:app_id" content="${fbAppId }" />
 <meta property="fb:admins" content="581308415,100000607869577" />
 <meta property="og:description"
-          content="${observationInstance.notes}"/>
+          content='${observationInstance.notes?:"Observed at $location"}'/>
 <meta property="og:latitude" content="${observationInstance.latitude}"/>
 <meta property="og:longitude" content="${observationInstance.longitude }"/>
 
@@ -179,7 +180,7 @@ def gallImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApp
 
 					<div class="comments-box sidebar_section" style="clear: both;">
 						<fb:comments href="${createLink(controller:'observation', action:'show', id:observationInstance.id, base:Utils.getDomainServerUrl(request))}"
-							num_posts="10" width="620" colorscheme="light"></fb:comments>
+							num_posts="10" width="620" colorscheme="light"  notify="true"></fb:comments>
 					</div>
 
 				</div>

@@ -27,6 +27,8 @@ class ObservationController {
 	private static final String OBSERVATION_ADDED = "observationAdded";
 	private static final String SPECIES_RECOMMENDED = "speciesRecommended";
 	private static final String SPECIES_AGREED_ON = "speciesAgreedOn";
+	private static final String SPECIES_NEW_COMMENT = "speciesNewComment";
+	private static final String SPECIES_REMOVE_COMMENT = "speciesRemoveComment";
 
 
 	def grailsApplication;
@@ -565,7 +567,7 @@ class ObservationController {
 		def obvUrl = generateLink("observation", "show", ["id": obv.id], request)
 		def userProfileUrl = generateLink("SUser", "show", ["id": obv.author.id], request)
 
-		def templateMap = [username: obv.author.name.capitalize(), obvUrl:obvUrl, userProfileUrl:userProfileUrl]
+		def templateMap = [username: obv.author.name.capitalize(), obvUrl:obvUrl, userProfileUrl:userProfileUrl, domain:Utils.getDomainName(request)]
 
 		def mailSubject = ""
 		def body = ""
@@ -578,11 +580,12 @@ class ObservationController {
 			body = conf.ui.addRecommendationVote.emailBody
 			templateMap["currentUser"] = springSecurityService.currentUser
 			templateMap["currentActivity"] = "recommended a species name"
+		}else if (notificationType == SPECIES_NEW_COMMENT){
+			mailSubject = conf.ui.newComment.emailSubject
+			body = conf.ui.newComment.emailBody
 		}else{
 			mailSubject = "Species name suggested"
 			body = conf.ui.addRecommendationVote.emailBody
-			templateMap["currentUser"] = springSecurityService.currentUser
-			templateMap["currentActivity"] = "agreed on a species suggested"
 		}
 		if (body.contains('$')) {
 			body = evaluate(body, templateMap)
@@ -667,4 +670,34 @@ class ObservationController {
    def count = {
 	  render Observation.count(); 
    }
+   
+   /**
+    * 
+    */
+   def newComment = {
+	   log.debug params;
+	   if(!params.obvId) return;
+	   
+	   def observationInstance = Observation.read(params.obvId);
+	   if(observationInstance) {
+		   sendNotificationMail(SPECIES_NEW_COMMENT, observationInstance, request);
+	   } else {
+	   	return (['error':"Coudn't find the specified observation with id $params.obvId"] as JSON);
+	   }
+   }
+   
+   /**
+   *
+   */
+  def removeComment = {
+	  log.debug params;
+	  if(!params.obvId) return;
+	  
+	  def observationInstance = Observation.read(params.obvId);
+	  if(observationInstance) {
+		  sendNotificationMail(SPECIES_REMOVE_COMMENT, observationInstance, request);
+	  } else {
+		  return (['error':"Coudn't find the specified observation with id $params.obvId"] as JSON);
+	  }
+  }
 }

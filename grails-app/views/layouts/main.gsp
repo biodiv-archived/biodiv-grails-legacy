@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<%@page import="species.utils.Utils"%>
 <%@page
 	import="org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils"%>
 <html lang="en" xmlns:fb="http://ogp.me/ns/fb#"
@@ -69,6 +70,17 @@
 	plugin='spring-security-ui' />
 <g:javascript src='spring-security-ui.js' plugin='spring-security-ui' />
 <ckeditor:resources/>
+<g:set var="fbAppId"
+	value="" />
+<%
+String domain = Utils.getDomain(request);
+if(domain.equals(grailsApplication.config.wgp.domain)) {
+	fbAppId = grailsApplication.config.speciesPortal.wgp.facebook.appId;
+} else if(domain.equals(grailsApplication.config.ibp.domain)) {
+	fbAppId =  grailsApplication.config.speciesPortal.ibp.facebook.appId;
+}
+
+%>
 
 <g:javascript>
 jQuery(document).ready(function($) {
@@ -111,26 +123,20 @@ jQuery(document).ready(function($) {
 				});
 });
 
-var domainAppId;
-		if (document.domain == "${grailsApplication.config.wgp.domain}"){
-			domainAppId = '${grailsApplication.config.speciesPortal.wgp.facebook.appId}'
-		} else if(document.domain == "${grailsApplication.config.ibp.domain}") {
-			domainAppId = '${grailsApplication.config.speciesPortal.ibp.facebook.appId}'
-		}
-		// Callback to execute whenever ajax login is successful.
-		// Todo some thing meaningful with the response data
-		var ajaxLoginSuccessCallbackFunction, ajaxLoginErrorCallbackFunction;
-		
+// Callback to execute whenever ajax login is successful.
+// Todo some thing meaningful with the response data
+var ajaxLoginSuccessCallbackFunction, ajaxLoginErrorCallbackFunction;
+
 var reloadLoginInfo = function() {
-			$.ajax({
-				url : "${createLink(controller:'SUser', action:'login')}",
-				success : function(data) {
-					$('.header:visible .header_userInfo').html(data);
-				}, error: function (xhr, ajaxOptions, thrownError){
-					alert("Error while getting login information : "+xhr.responseText);
-				}
-			});
+	$.ajax({
+		url : "${createLink(controller:'SUser', action:'login')}",
+		success : function(data) {
+			$('.header:visible .header_userInfo').html(data);
+		}, error: function (xhr, ajaxOptions, thrownError){
+			alert("Error while getting login information : "+xhr.responseText);
 		}
+	});
+}
 		
 var ajaxLoginSuccessHandler = function(json, statusText, xhr, $form) {
 	if (json.success) {
@@ -230,7 +236,6 @@ var ajaxLoginSuccessHandler = function(json, statusText, xhr, $form) {
 
 </head>
 <body>
-
 	<div id="loading" class="loading" style="display: none;">
 		<span>Loading ...</span>
 	</div>
@@ -305,8 +310,8 @@ var ajaxLoginSuccessHandler = function(json, statusText, xhr, $form) {
  						//alert("Facebook script all.js could not be loaded for some reason. Either its not available or is blocked.")
  					} else {
  						var options = {
-						appId  : domainAppId,
-					    channelUrl : "Utils.getDomainServerUrl(request)/channel.html",
+						appId  : "${fbAppId}",
+					    channelUrl : "${Utils.getDomainServerUrl(request)}/channel.html",
 					    status : true,
 					    cookie : true,
 					    xfbml: true,
@@ -352,6 +357,35 @@ var ajaxLoginSuccessHandler = function(json, statusText, xhr, $form) {
 							alert("Failed to connect to Facebook");
 						}
 					}, scope);
+					
+					FB.Event.subscribe('comment.create', function(response) {
+			  			console.log(response);
+			  			 FB.api('comments', {'ids': response.href}, function(res) {
+					        var data = res[response.href].data;
+					        console.log(data);
+					        console.log(data.pop().from.name);
+					    });
+			  			$.ajax({
+			  				url: "${createLink(action:'newComment')}",
+			  				method:"POST",
+			  				data:{'obvId':${observationInstance.id}, 'href':response.href, 'commentId':response.commentID},
+							error: function (xhr, status, thrownError){
+								console.log("Error while callback to new comment"+xhr.responseText)
+							}
+						});
+					});
+					
+					FB.Event.subscribe('comment.remove', function(response) {
+			  			console.log(response);
+			  			$.ajax({
+			  				url: "${createLink(action:'removeComment')}",
+			  				method:"POST",
+			  				data:{'obvId':${observationInstance.id}, 'href':response.href, 'commentId':response.commentID},
+							error: function (xhr, status, thrownError){
+								console.log("Error while callback to remove comment"+xhr.responseText)
+							}
+						});
+					});
 				});
 			});
 			 
@@ -365,7 +399,7 @@ var ajaxLoginSuccessHandler = function(json, statusText, xhr, $form) {
 				return;
 			js = d.createElement(s);
 			js.id = id;
-			js.src = "//connect.facebook.net/en_US/all.js#xfbml=1&appId="+ domainAppId;
+			js.src = "//connect.facebook.net/en_US/all.js#xfbml=1&appId=${fbAppId}";
 			fjs.parentNode.insertBefore(js, fjs);
 		}(document, 'script', 'facebook-jssdk'));
 	</script>

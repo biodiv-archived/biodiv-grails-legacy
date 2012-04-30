@@ -355,7 +355,6 @@ environments {
 		speciesPortal {
 			search.serverURL = "http://localhost:8090/solr/species"
 			names.parser.serverURL = "127.0.0.1"
-			//wgp.panchgani.strandls.com
 			wgp {
 				facebook {
 					appId= "327308053982589"
@@ -692,11 +691,57 @@ grails.plugins.springsecurity.ui.forgotPassword.emailFrom = 'notification@thewes
 grails.plugins.springsecurity.ui.forgotPassword.emailSubject = "Password Reset"
 
 grails.plugins.springsecurity.ui.addObservation.emailSubject = 'Observation added'
-grails.plugins.springsecurity.ui.addObservation.emailBody = '''Hi $username,<br/><br/>You have uploaded an observation to the Western Ghats Portal/India Biodiversity Portal.<br/>Your observation is available at the following URL:<a href="$obvUrl">$obvUrl</a><br/><br/>You will be notified by mail on any social activity on the observation.<br/><br/>If you do not want to receive notifications please go to your user profile and switch it off.<br/>
-<br/>User Profile URL:<a href="$userProfileUrl">$userProfileUrl</a><br/><br/>Thank you for your contribution to the portal.<br/><br/>The portal team'''
+grails.plugins.springsecurity.ui.addObservation.emailBody = '''
+Hi $username,<br/>
+<br/>
+You have uploaded an observation to <b>$domain</b> and it is available <a href="$obvUrl">here</a><br/>
+<br/>
+You will be notified by mail on any social activity on the observation.<br/>
+If you do not want to receive notifications please go to your <a href="$userProfileUrl">user profile<a> and switch it off.<br/>
+<br/>
+Thank you for your contribution to the portal.<br/>
+<br/>
+-The portal team'''
 
-grails.plugins.springsecurity.ui.addRecommendationVote.emailBody = '''Hi $username,<br/><br/>Your observation has some social activity.<br/>$currentUser.username has $currentActivity on your Observation.<br/><br/>You can see the posting on your Observation URL:<a href="$obvUrl">$obvUrl</a><br/><br/>You will be notified by mail on any social activity on the observation.<br/><br/>If you do not want to receive notifications please go to your user profile and switch it off.<br/>
-<br/>User Profile URL:<a href="$userProfileUrl">$userProfileUrl</a><br/><br/>The portal team'''
+grails.plugins.springsecurity.ui.addRecommendationVote.emailBody = '''
+Hi $username,<br/>
+<br/>
+Your observation has some social activity on <b>$domain</b>.<br/>
+$currentUser.username has $currentActivity on your Observation.<br/>
+<br/>
+You can see the posting on your observation <a href="$obvUrl">here</a><br/>
+<br/>
+You will be notified by mail on any social activity on the observation.<br/>
+<br/>
+If you do not want to receive notifications please go to your <a href="$userProfileUrl">user profile</a> and switch it off.<br/>
+<br/>
+-The portal team'''
+
+grails.plugins.springsecurity.ui.newComment.emailSubject = 'New comment on your observation'
+grails.plugins.springsecurity.ui.newComment.emailBody = '''
+Hi $username,<br/>
+<br/>
+A new comment got added to your observation on <b>$domain</b> which is available <a href="$obvUrl">here</a><br/>
+<br/>
+You will be notified by mail on any social activity on the observation.<br/>
+If you do not want to receive notifications please go to your <a href="$userProfileUrl">user profile</a> and switch it off.<br/>
+<br/>
+Thank you for your contribution to the portal.<br/>
+<br/>
+-The portal team'''
+
+grails.plugins.springsecurity.ui.removeComment.emailSubject = 'Removed a comment from your observation'
+grails.plugins.springsecurity.ui.removeComment.emailBody = '''
+Hi $username,<br/>
+<br/>
+A comment got removed from your observation on <b>$domain</b> which is available <a href="$obvUrl">here</a><br/>
+<br/>
+You will be notified by mail on any social activity on the observation.<br/>
+If you do not want to receive notifications please go to your <a href="$userProfileUrl">user profile</a> and switch it off.<br/>
+<br/>
+Thank you for your contribution to the portal.<br/>
+<br/>
+-The portal team'''
 
 grails.plugins.springsecurity.ui.encodePassword = false
 
