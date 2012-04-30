@@ -706,7 +706,7 @@ Thank you for your contribution to the portal.<br/>
 grails.plugins.springsecurity.ui.addRecommendationVote.emailBody = '''
 Hi $username,<br/>
 <br/>
-Your observation has some social activity on <b>$domain</b>.<br/>
+Your <a href="$obvUrl">observation</a> has some social activity on <b>$domain</b>.<br/>
 $currentUser.username has $currentActivity on your Observation.<br/>
 <br/>
 You can see the posting on your observation <a href="$obvUrl">here</a><br/>
@@ -740,6 +740,19 @@ You will be notified by mail on any social activity on the observation.<br/>
 If you do not want to receive notifications please go to your <a href="$userProfileUrl">user profile</a> and switch it off.<br/>
 <br/>
 Thank you for your contribution to the portal.<br/>
+<br/>
+-The portal team'''
+
+grails.plugins.springsecurity.ui.observationFlagged.emailBody ='''
+Hi $username,<br/>
+<br/>
+Your <a href="$obvUrl">observation</a> has some social activity.<br/>
+$currentUser.username has flagged your Observation.<br/>
+<br/>
+You can see the posting on your observation <a href="$obvUrl">here</a><br/>
+<br/>
+You will be notified by mail on any social activity on the observation.<br/>
+If you do not want to receive notifications please go to your <a href="$userProfileUrl">user profile</a> and switch it off.<br/>
 <br/>
 -The portal team'''
 

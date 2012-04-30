@@ -29,7 +29,7 @@ class ObservationController {
 	private static final String SPECIES_AGREED_ON = "speciesAgreedOn";
 	private static final String SPECIES_NEW_COMMENT = "speciesNewComment";
 	private static final String SPECIES_REMOVE_COMMENT = "speciesRemoveComment";
-
+	private static final String OBSERVATION_FLAGGED = "observationFlagged";
 
 	def grailsApplication;
 	def observationService;
@@ -340,9 +340,9 @@ class ObservationController {
 					//saving max voted species name for observation instance
 					observationInstance.calculateMaxVotedSpeciesName();
 
-					//sending mail to user
-					sendNotificationMail(SPECIES_RECOMMENDED, observationInstance, request);
 					if(!params["createNew"]){
+						//sending mail to user
+						sendNotificationMail(SPECIES_RECOMMENDED, observationInstance, request);
 						redirect(action:getRecommendationVotes, id:params.obvId, params:[max:3, offset:0, recoVoteMsg:recoVoteMsg])
 					}else{
 						redirect(action: "show", id: observationInstance.id);
@@ -536,7 +536,7 @@ class ObservationController {
 				observationFlagInstance.save(flush: true)
 				obv.flagCount++ 
 				obv.save(flush:true)
-				
+				sendNotificationMail(OBSERVATION_FLAGGED, obv, request)
 				flash.message = "${message(code: 'observation.flag.added', default: 'Observation flag added')}"
 			}
 			catch (org.springframework.dao.DataIntegrityViolationException e) {
@@ -572,21 +572,45 @@ class ObservationController {
 		def mailSubject = ""
 		def body = ""
 
-		if(notificationType == OBSERVATION_ADDED){
-			mailSubject = conf.ui.addObservation.emailSubject
-			body = conf.ui.addObservation.emailBody
-		}else if (notificationType == SPECIES_RECOMMENDED){
-			mailSubject = "Species name suggested"
-			body = conf.ui.addRecommendationVote.emailBody
-			templateMap["currentUser"] = springSecurityService.currentUser
-			templateMap["currentActivity"] = "recommended a species name"
-		}else if (notificationType == SPECIES_NEW_COMMENT){
-			mailSubject = conf.ui.newComment.emailSubject
-			body = conf.ui.newComment.emailBody
-		}else{
-			mailSubject = "Species name suggested"
-			body = conf.ui.addRecommendationVote.emailBody
+		switch ( notificationType ) {
+			case OBSERVATION_ADDED:
+				mailSubject = conf.ui.addObservation.emailSubject
+				body = conf.ui.addObservation.emailBody
+				break
+			
+			case OBSERVATION_FLAGGED :
+				mailSubject = "Observation flagged"
+				body = conf.ui.observationFlagged.emailBody
+				templateMap["currentUser"] = springSecurityService.currentUser
+				break
+				
+			case SPECIES_RECOMMENDED :
+				mailSubject = "Species name suggested"
+				body = conf.ui.addRecommendationVote.emailBody
+				templateMap["currentUser"] = springSecurityService.currentUser
+				templateMap["currentActivity"] = "recommended a species name"
+				break
+				
+			case SPECIES_AGREED_ON:
+				mailSubject = "Species name suggested"
+				body = conf.ui.addRecommendationVote.emailBody
+				templateMap["currentUser"] = springSecurityService.currentUser
+				templateMap["currentActivity"] = "agreed on a species suggested"
+				break
+			
+			case SPECIES_NEW_COMMENT:
+				mailSubject = conf.ui.newComment.emailSubject
+				body = conf.ui.newComment.emailBody
+				break;
+			case SPECIES_REMOVE_COMMENT:
+				mailSubject = conf.ui.removeComment.emailSubject
+				body = conf.ui.removeComment.emailBody
+				break;
+				
+			default:
+				log.debug "invalid notification type"
 		}
+		
 		if (body.contains('$')) {
 			body = evaluate(body, templateMap)
 		}
