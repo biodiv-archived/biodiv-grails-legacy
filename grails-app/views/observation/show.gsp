@@ -338,8 +338,42 @@ def gallImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApp
 	     	});
 	     	event.preventDefault();
      	});
+     	
+     	
+     	window.fbEnsure(function() {
+			FB.Event.subscribe('comment.create', function(response) {
+	  			console.log(response);
+	  			 FB.api('comments', {'ids': response.href}, function(res) {
+			        var data = res[response.href].data;
+			        console.log(data);
+			        console.log(data.pop().from.name);
+			    });
+	  			$.ajax({
+	  				url: "${createLink(action:'newComment')}",
+	  				method:"POST",
+	  				data:{'obvId':${observationInstance.id}, 'href':response.href, 'commentId':response.commentID},
+					error: function (xhr, status, thrownError){
+						console.log("Error while callback to new comment"+xhr.responseText)
+					}
+				});
+			});
+			
+			FB.Event.subscribe('comment.remove', function(response) {
+	  			console.log(response);
+	  			$.ajax({
+	  				url: "${createLink(action:'removeComment')}",
+	  				method:"POST",
+	  				data:{'obvId':${observationInstance.id}, 'href':response.href, 'commentId':response.commentID},
+					error: function (xhr, status, thrownError){
+						console.log("Error while callback to remove comment"+xhr.responseText)
+					}
+				});
+			});
+		});
         
 	});
+	
+	
 </g:javascript>
 
 </body>

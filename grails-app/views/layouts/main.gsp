@@ -121,6 +121,60 @@ jQuery(document).ready(function($) {
 						});
 					}
 				});
+				
+	//////////////////////// FB RELATED CALLS ///////////////////////
+	
+	// make sure facebook is initialized before calling the facebook JS api
+	window.fbEnsure = function(callback) {
+				if (window.facebookInitialized) { callback(); return; }
+					
+				if(!window.FB) {
+					//alert("Facebook script all.js could not be loaded for some reason. Either its not available or is blocked.")
+				} else {
+					var options = {
+				appId  : "${fbAppId}",
+			    channelUrl : "${Utils.getDomainServerUrl(request)}/channel.html",
+			    status : true,
+			    cookie : true,
+			    xfbml: true,
+			    oauth  : true,
+			    logging : true
+			  };
+		  
+			  FB.init(options); 
+			  console.log("Initialized FB sdk");
+			  window.facebookInitialized = true;
+			  callback();
+		  }
+	};
+	
+	$('.fbJustConnect').click(function() {
+		var scope = { scope: "" };
+		scope.scope = "email,user_about_me,user_location,user_activities,user_hometown,manage_notifications,user_website,publish_stream";
+		
+		fbEnsure(function() {
+			FB.login(function(response) {
+				if (response.status == 'connected') {
+					/*if($('.fbJustConnect').hasClass('ajaxForm')) {
+						$.ajax({
+						  url: "${createLink(controller:'login', action:'authSuccess')}",
+						  method:"GET",
+						  data:{'uid':response.authResponse.userID, ${params['spring-security-redirect']?'"spring-security-redirect":"'+params['spring-security-redirect']+'"':''}},
+						  success: function(data, statusText, xhr) {
+						    ajaxLoginSuccessHandler(data, statusText, xhr);
+						  }
+						});
+					} else */{
+						var redirectTarget = ${params['spring-security-redirect']?'"&spring-security-redirect='+params['spring-security-redirect']+'"':'""'};
+						window.location = "${createLink(controller:'login', action:'authSuccess')}"+"?uid="+response.authResponse.userID+redirectTarget
+					}
+				} else {
+					alert("Failed to connect to Facebook");
+				}
+			}, scope);
+		});
+	});
+	//////////////////////// FB RELATED CALLS END HERE ///////////////////////
 });
 
 // Callback to execute whenever ajax login is successful.
@@ -302,92 +356,7 @@ var ajaxLoginSuccessHandler = function(json, statusText, xhr, $form) {
 				$(this).parent().hide("slow");
 			});
 			
-			// make sure facebook is initialized before calling the facebook JS api
-			window.fbEnsure = function(callback) {
- 					if (window.facebookInitialized) { callback(); return; }
- 						
- 					if(!window.FB) {
- 						//alert("Facebook script all.js could not be loaded for some reason. Either its not available or is blocked.")
- 					} else {
- 						var options = {
-						appId  : "${fbAppId}",
-					    channelUrl : "${Utils.getDomainServerUrl(request)}/channel.html",
-					    status : true,
-					    cookie : true,
-					    xfbml: true,
-					    oauth  : true,
-					    logging : true
-					  };
-				  
-				  FB.init(options); 
-				  
-				  window.facebookInitialized = true;
-				  callback();
-				  }
-			};
 			
-			/**
-			 * Just connect (for logged in users) to facebook and reassociate the user
-			 * (and possibly get the facebook profile picture if no avatar yet set).
-			 * Triggers two events on the '.fbJustConnect' element:
-			 * - "connected" will be triggered if the reassociation was successful
-			 * - "failed" will be triggered when for whatever reason the coupling was unsuccessful
-			 */
-			$('.fbJustConnect').click(function() {
-				var scope = { scope: "" };
-				scope.scope = "email,user_about_me,user_location,user_activities,user_hometown,manage_notifications,user_website,publish_stream";
-				
-				fbEnsure(function() {
-					FB.login(function(response) {
-						if (response.status == 'connected') {
-							/*if($('.fbJustConnect').hasClass('ajaxForm')) {
-								$.ajax({
-								  url: "${createLink(controller:'login', action:'authSuccess')}",
-								  method:"GET",
-								  data:{'uid':response.authResponse.userID, ${params['spring-security-redirect']?'"spring-security-redirect":"'+params['spring-security-redirect']+'"':''}},
-								  success: function(data, statusText, xhr) {
-								    ajaxLoginSuccessHandler(data, statusText, xhr);
-								  }
-								});
-							} else */{
-								var redirectTarget = ${params['spring-security-redirect']?'"&spring-security-redirect='+params['spring-security-redirect']+'"':'""'};
-								window.location = "${createLink(controller:'login', action:'authSuccess')}"+"?uid="+response.authResponse.userID+redirectTarget
-							}
-						} else {
-							alert("Failed to connect to Facebook");
-						}
-					}, scope);
-					
-					FB.Event.subscribe('comment.create', function(response) {
-			  			console.log(response);
-			  			 FB.api('comments', {'ids': response.href}, function(res) {
-					        var data = res[response.href].data;
-					        console.log(data);
-					        console.log(data.pop().from.name);
-					    });
-			  			$.ajax({
-			  				url: "${createLink(action:'newComment')}",
-			  				method:"POST",
-			  				data:{'obvId':${observationInstance.id}, 'href':response.href, 'commentId':response.commentID},
-							error: function (xhr, status, thrownError){
-								console.log("Error while callback to new comment"+xhr.responseText)
-							}
-						});
-					});
-					
-					FB.Event.subscribe('comment.remove', function(response) {
-			  			console.log(response);
-			  			$.ajax({
-			  				url: "${createLink(action:'removeComment')}",
-			  				method:"POST",
-			  				data:{'obvId':${observationInstance.id}, 'href':response.href, 'commentId':response.commentID},
-							error: function (xhr, status, thrownError){
-								console.log("Error while callback to remove comment"+xhr.responseText)
-							}
-						});
-					});
-				});
-			});
 			 
 		}); 
 			
