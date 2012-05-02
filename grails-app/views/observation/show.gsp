@@ -61,6 +61,7 @@ def gallImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApp
 
 <g:javascript src="species/observations.js"/>
 
+
 <style>
 #nameContainer {
 	float: left;
@@ -269,13 +270,12 @@ def gallImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApp
         	$('#voteDetails').hide();
         });
                         
-         $("ul[name='tags']").tagit({select:true,  tagSource: "${g.createLink(action: 'tags')}"});
-         
-         $("li.tagit-choice").click(function(){
-         	var tg = $(this).contents().first().text();
-         	window.location.href = "${g.createLink(action: 'list')}/?tag=" + tg 
-         });
-         
+        $("ul[name='tags']").tagit({select:true,  tagSource: "${g.createLink(action: 'tags')}"});
+     	 
+     	$("li.tagit-choice").click(function(){
+	    	var tg = $(this).contents().first().text();
+	        window.location.href = "${g.createLink(controller:'observation', action: 'list')}?tag=" + tg ;
+	     });
          
          function preLoadRecos(max){
          	$("#seeMoreMessage").hide();

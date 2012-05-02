@@ -79,7 +79,7 @@
 
 	
 		<obv:showTagsSummary
-			model="['observationInstance':observationInstance]" />
+			model="['observationInstance':observationInstance, 'isAjaxLoad':false]" />
 
 		<div style="display: block; width:100%;overflow:auto;margin-bottom:10px">
 			<div style="float: right; clear: both;">

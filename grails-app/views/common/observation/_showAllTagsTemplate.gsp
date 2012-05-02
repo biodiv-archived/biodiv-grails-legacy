@@ -42,9 +42,9 @@
 			class="btn active">Cloud</span>
 	</div>
 	<div id="tagCloud" class="tagsView">
-		<obv:showTagsCloud model="['tags': tags]" />
+		<obv:showTagsCloud model="['tags': tags, 'isAjaxLoad':isAjaxLoad]" />
 	</div>
 	<div id="tagList" class="tagsView" style="display: none;">
-		<obv:showTagsList model="['tags': tags]" />
+		<obv:showTagsList model="['tags': tags, 'isAjaxLoad':isAjaxLoad]" />
 	</div>
 </div>
