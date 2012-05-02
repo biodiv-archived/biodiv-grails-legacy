@@ -93,7 +93,7 @@ margin-right: 10px;
     </span>
     <div class="login-box-options" style="display:none;">
         <sec:ifLoggedIn>
-            <a id="logout" href="${createLink(controller:'logout')}"><button>Logout</button></a>
+            <a id="logout" href="${createLink(controller:'logout')}">Logout</a>
         </sec:ifLoggedIn> 
     </div>
 </div>

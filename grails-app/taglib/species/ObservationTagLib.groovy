@@ -87,11 +87,11 @@ class ObservationTagLib {
 		}
 	}
 	
-	def showTags = {attrs, body->
-		if(attrs.model.observationInstance) {
-			out << render(template:"/common/observation/showObservationTagsTemplate", model:attrs.model);
-		}
-	}
+//	def showTags = {attrs, body->
+//		if(attrs.model.observationInstance) {
+//			out << render(template:"/common/observation/showObservationTagsTemplate", model:attrs.model);
+//		}
+//	}
 
 	def showObvStats = {attrs, body->
 		if(attrs.model.observationInstance) {
@@ -120,16 +120,16 @@ class ObservationTagLib {
 			count = tags.size();
 		} 
 		//log.debug "==== tags " + tags 
-		out << render(template:"/common/observation/showAllTagsTemplate", model:[count: count, tags:tags]);
+		out << render(template:"/common/observation/showAllTagsTemplate", model:[count: count, tags:tags, isAjaxLoad:attrs.model.isAjaxLoad]);
 	}
 		
 	def showTagsList = {attrs, body->
-		out << render(template:"/common/observation/showTagsListTemplate", model:[tags:attrs.model.tags]);
+		out << render(template:"/common/observation/showTagsListTemplate", model:[tags:attrs.model.tags, isAjaxLoad:attrs.model.isAjaxLoad]);
 	}
 	
 	
 	def showTagsCloud = {attrs, body->
-		out << render(template:"/common/observation/showTagsCloudTemplate", model:[tags:attrs.model.tags]);
+		out << render(template:"/common/observation/showTagsCloudTemplate", model:[tags:attrs.model.tags, isAjaxLoad:attrs.model.isAjaxLoad]);
 	}
 	
 	

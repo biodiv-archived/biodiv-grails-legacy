@@ -14,12 +14,14 @@
 	<g:else>
 		<span class="msg" style="padding-left: 50px;">No tags</span>
 	</g:else>
-	<g:javascript>
+<g:javascript>
 	$(document).ready(function() {
-		 $("li.tagit-choice").click(function(){
-         	var tg = $(this).contents().first().text();
-         	window.location.href = "${g.createLink(controller:'observation', action: 'list')}/?tag=" + tg ;
-         });
+		if((${isAjaxLoad} === undefined) || (!${isAjaxLoad})){
+			 $("li.tagit-choice").click(function(){
+			 	var tg = $(this).contents().first().text();
+	         	window.location.href = "${g.createLink(controller:'observation', action: 'list')}?tag=" + tg ;
+	         });
+         }
 	})
 </g:javascript>
 </div>

@@ -11,12 +11,6 @@
 		var defId = "#habitat_" + "${Habitat.findByName(grailsApplication.config.speciesPortal.group.ALL).id}"
 		$(defId).click();
 	}
-	function removeTag(){
-		window.location.href = "${g.createLink(action: 'list')}";
-	}
-	function removeUser(){
-		window.location.href = "${g.createLink(action: 'list')}";
-	}
 </g:javascript>
 
 <div class="info-message" id="info-message">
@@ -42,14 +36,14 @@
                                     tagged <span class="highlight">
 			<g:link controller="observation" action="list"
 				params="[tag: queryParams.tag]">
-				${queryParams.tag} <a href="#" onclick="removeTag(); return false;">[X]</a></g:link>
+				${queryParams.tag} <a id="removeTagFilter" href="#" >[X]</a></g:link>
 		</span>
 	</g:if>
 	<g:if test="${queryParams.user}">
                                     by user <span class="highlight">
 			<g:link controller="SUser" action="show" id="${queryParams.user}">
 				${SUser.read(queryParams.user).name.encodeAsHTML()} <a
-				href="#" onclick="removeUser(); return false;">[X]</a></g:link>
+				id="removeUserFilter" href="#">[X]</a></g:link>
 		</span>
 	</g:if>
 </div>

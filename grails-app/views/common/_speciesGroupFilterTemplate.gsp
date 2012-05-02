@@ -19,7 +19,7 @@ $(document).ready(function(){
 			}
 		});
 	})
-	$('#speciesGroupFilter button[value$="${SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.ALL).id}"]').addClass('active').css('backgroundPosition', '0px -64px');
+	$('#speciesGroupFilter button[value$="${params.sGroup}"]').addClass('active').css('backgroundPosition', '0px -64px');
     $('#speciesGroupFilter button').tooltip({placement:'top'});
 	
 	
@@ -36,7 +36,7 @@ $(document).ready(function(){
 		});
 	})
 	
-	$('#habitatFilter button[value$="${Habitat.findByName(grailsApplication.config.speciesPortal.group.ALL).id}"]').addClass('active').css('backgroundPosition', '0px -64px');
+	$('#habitatFilter button[value$="${params.habitat}"]').addClass('active').css('backgroundPosition', '0px -64px');
 	$('#habitatFilter button').tooltip({placement:'bottom'});
 		
 });

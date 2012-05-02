@@ -172,7 +172,7 @@
 
 				<div class="section" style="clear: both;overflow:auto;">
 					<obv:showAllTags
-						model="['tagFilterByProperty':'User', 'tagFilterByPropertyValue':SUserInstance.id]" />
+						model="['tagFilterByProperty':'User', 'tagFilterByPropertyValue':SUserInstance.id, 'isAjaxLoad':false]" />
 				</div>
 			
 			</div>
@@ -181,6 +181,15 @@
 
 
 	</div>
+<g:javascript>
+	$(document).ready(function() {
+		$('#tc_tagcloud a').click(function(){
+			var tg = $(this).contents().first().text();
+			window.location.href = "${g.createLink(controller:'observation', action: 'list')}?tag=" + tg ;
+	    	return false;
+	 	});
+	});
+</g:javascript>	
 </body>
 
 </html>

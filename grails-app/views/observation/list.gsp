@@ -20,6 +20,8 @@
 
 <g:javascript src="tagit.js"></g:javascript>
 <g:javascript src="jquery/jquery.autopager-1.0.0.js"></g:javascript>
+<g:javascript src="jquery/jquery-history-1.7.1/scripts/bundled/html4+html5/jquery.history.js"/>
+
 </head>
 <body>
 	<div class="container outer-wrapper">
@@ -59,7 +61,7 @@
 					</div>
 				</div>
 				<div class="tags_section span3" style="float: right;">
-					<obv:showAllTags model="['tagFilterByProperty':'All' , 'params':params]" />
+					<obv:showAllTags model="['tagFilterByProperty':'All' , 'params':params, 'isAjaxLoad':true]" />
 				</div>
 
 				<div class="row">
@@ -253,11 +255,21 @@
                 	return sName;
                 }	
             } 
-
-            function getFilterParameters(url, limit, offset) {
-                            
+				
+			function getSelectedTag() {
+				var tag = ''; 
+				tag = $("li.tagit-choice.active").contents().first().text();
+				if(!tag){
+					tag = $("#tc_tagcloud a.active").contents().first().text();	
+				}
+				if(tag) {
+                	tag = stringTrim(tag.replace(/\s*\,\s*$/,''));
+                	return tag;
+                }	
+            } 
+            
+	        function getFilterParameters(url, limit, offset, removeUser) {
                     var params = url.param();
-
                     var sortBy = getSelectedSortBy();
                     if(sortBy) {
                             params['sort'] = sortBy;
@@ -285,11 +297,81 @@
                     if(offset != undefined) {
                         params['offset'] = offset.toString();
                     }
-
-                    return params;
+					
+					var tag = getSelectedTag();
+					if(tag){
+						params['tag'] = tag;
+					}else{
+						//removing old tag from url
+						if(params['tag'] != undefined){
+							delete params['tag'];
+						}
+					}
+					
+					if(removeUser){
+						if(params['user'] != undefined){
+							delete params['user'];
+						}
+					}
+					
+					return params;
                 }	
                 
-                function updateGallery(target, limit, offset) {
+<%--                History.Adapter.bind(window,'statechange',function(){ // Note: We are using statechange instead of popstate--%>
+<%--        			var State = History.getState(); // Note: We are using History.getState() instead of event.state--%>
+<%--        			History.log(State.data, State.title, State.url);--%>
+<%--        			alert(JSON.stringify(State));--%>
+<%--        			alert("data " + JSON.stringify(State.data) + "  title "  + State.title + "  url " + State.url);--%>
+<%--        			//window.location.href = State.url;--%>
+<%--    			});--%>
+                
+<%--                window.onpopstate = function(event) {  --%>
+<%--                	alert(event);--%>
+<%--  					alert("location: " + document.location + ", state: " + JSON.stringify(event.state));--%>
+<%--  					if(event.state !== undefined){--%>
+<%--  						window.location = document.location;--%>
+<%--  					} --%>
+<%--				};--%>
+<%--                $(window).bind('statechange',function(){--%>
+<%--                	alert("state changed " );--%>
+<%--                });--%>
+<%--                --%>
+				function setActiveTag(activeTag){
+					if(activeTag != undefined){
+ 							$('li.tagit-choice').each (function() {
+ 								if(stringTrim($(this).contents().first().text()) == stringTrim(activeTag)) {
+                       				$(this).addClass('active');
+                       			}
+                       			else{
+                       				if($(this).hasClass('active')){
+                       					$(this).removeClass('active');
+                       				}
+                       			}
+                       		});
+                       		
+                       		$('#tc_tagcloud a').each(function() {
+ 								if(stringTrim($(this).contents().first().text()) == stringTrim(activeTag)) {
+                       				$(this).addClass('active');
+                       			}else{
+                       				if($(this).hasClass('active')){
+                       					$(this).removeClass('active');
+                       				}
+                       			}
+               				});
+               				
+				 		}
+				}
+				
+                function updateListPage(activeTag) {
+  					return function (data) {
+  						$('.observations_list').replaceWith(data.obvListHtml);
+						$('#info-message').replaceWith(data.obvFilterMsgHtml);
+  						$('#tags_section').replaceWith(data.tagsHtml);
+  						setActiveTag(activeTag);
+					}
+				}
+                
+                function updateGallery(target, limit, offset, removeUser) {
                     if(target === undefined) {
                             target = window.location.pathname + window.location.search;
                     }
@@ -297,12 +379,16 @@
                     var a = $('<a href="'+target+'"></a>');
                     var url = a.url();
                     var href = url.attr('path');
-                    var params = getFilterParameters(url, limit, offset);
+                    var params = getFilterParameters(url, limit, offset, removeUser);
+                    //alert(" tag in params " + params['tag'] );
                     params["isGalleryUpdate"] = true;
                     var recursiveDecoded = decodeURIComponent($.param(params));
                     
                     var doc_url = href+'?'+recursiveDecoded;
-                    
+                    var History = window.History;
+                    delete params["isGalleryUpdate"];
+                    History.pushState({state:1}, "Species Portal", '?'+decodeURIComponent($.param(params))); 
+                    //alert("doc_url " + doc_url);
                    	$.ajax({
   						url: doc_url,
   						dataType: 'json',
@@ -312,11 +398,7 @@
   							$('#tags_section').css({"opacity": 0.5});
   						},
   						
-  						success: function(data){
-  							$('.observations_list').replaceWith(data.obvListHtml);
-  							$('#info-message').replaceWith(data.obvFilterMsgHtml);
-  							$('#tags_section').replaceWith(data.tagsHtml);
-						},
+  						success: updateListPage(params["tag"]),
 						statusCode: {
 	    					401: function() {
 	    						show_login_dialog();
@@ -342,13 +424,40 @@
                 
                 $("ul[name='tags']").tagit({select:true,  tagSource: "${g.createLink(action: 'tags')}"});
          
-          		/*
-                $("li.tagit-choice").click(function(){
-                    var tg = $(this).contents().first().text();
-                    window.location.href = "${g.createLink(action: 'list')}/?tag=" + tg ;
+          		
+                $("li.tagit-choice").live('click', function(){
+               		setActiveTag($(this).contents().first().text());
+                	updateGallery(undefined, undefined, 0);
+                	return false;
                 });
                
+               $('#tc_tagcloud a').live('click', function(){
+               		setActiveTag($(this).contents().first().text());
+		 			updateGallery(undefined, undefined, 0);
+					return false;
+			   });
                
+                $("#removeTagFilter").live('click', function(){
+                	var oldActiveTag = $("li.tagit-choice.active");
+		 			if(oldActiveTag){
+		 				oldActiveTag.removeClass('active');
+		 			}
+		 			var oldActiveTag = $("#tc_tagcloud a.active");
+		 			if(oldActiveTag){
+		 				oldActiveTag.removeClass('active');
+		 			}
+		 			updateGallery(undefined, undefined, 0);
+                	return false;
+                });
+                
+                $("#removeUserFilter").live('click', function(){
+                	updateGallery(undefined, undefined, 0, true);
+                	return false;
+                });
+               
+               var tmpTarget =  window.location.pathname + window.location.search;
+               setActiveTag($('<a href="'+ tmpTarget +'"></a>').url().param()["tag"]);
+               /*
                 $(".snippet.tablet").live('hover', function(e){
                     if(e.type == 'mouseenter'){    
                         $(".figure", this).slideUp("fast");   
