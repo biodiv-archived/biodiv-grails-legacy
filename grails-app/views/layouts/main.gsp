@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<%@page import="species.utils.Utils"%>
 <%@page
 	import="org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils"%>
 <html lang="en" xmlns:fb="http://ogp.me/ns/fb#"
@@ -69,6 +70,17 @@
 	plugin='spring-security-ui' />
 <g:javascript src='spring-security-ui.js' plugin='spring-security-ui' />
 <ckeditor:resources/>
+<g:set var="fbAppId"
+	value="" />
+<%
+String domain = Utils.getDomain(request);
+if(domain.equals(grailsApplication.config.wgp.domain)) {
+	fbAppId = grailsApplication.config.speciesPortal.wgp.facebook.appId;
+} else if(domain.equals(grailsApplication.config.ibp.domain)) {
+	fbAppId =  grailsApplication.config.speciesPortal.ibp.facebook.appId;
+}
+
+%>
 
 <g:javascript>
 jQuery(document).ready(function($) {
@@ -109,28 +121,76 @@ jQuery(document).ready(function($) {
 						});
 					}
 				});
+				
+	//////////////////////// FB RELATED CALLS ///////////////////////
+	
+	// make sure facebook is initialized before calling the facebook JS api
+	window.fbEnsure = function(callback) {
+				if (window.facebookInitialized) { callback(); return; }
+					
+				if(!window.FB) {
+					//alert("Facebook script all.js could not be loaded for some reason. Either its not available or is blocked.")
+				} else {
+					var options = {
+				appId  : "${fbAppId}",
+			    channelUrl : "${Utils.getDomainServerUrl(request)}/channel.html",
+			    status : true,
+			    cookie : true,
+			    xfbml: true,
+			    oauth  : true,
+			    logging : true
+			  };
+		  
+			  FB.init(options); 
+			  console.log("Initialized FB sdk");
+			  window.facebookInitialized = true;
+			  callback();
+		  }
+	};
+	
+	$('.fbJustConnect').click(function() {
+		var scope = { scope: "" };
+		scope.scope = "email,user_about_me,user_location,user_activities,user_hometown,manage_notifications,user_website,publish_stream";
+		
+		fbEnsure(function() {
+			FB.login(function(response) {
+				if (response.status == 'connected') {
+					/*if($('.fbJustConnect').hasClass('ajaxForm')) {
+						$.ajax({
+						  url: "${createLink(controller:'login', action:'authSuccess')}",
+						  method:"GET",
+						  data:{'uid':response.authResponse.userID, ${params['spring-security-redirect']?'"spring-security-redirect":"'+params['spring-security-redirect']+'"':''}},
+						  success: function(data, statusText, xhr) {
+						    ajaxLoginSuccessHandler(data, statusText, xhr);
+						  }
+						});
+					} else */{
+						var redirectTarget = ${params['spring-security-redirect']?'"&spring-security-redirect='+params['spring-security-redirect']+'"':'""'};
+						window.location = "${createLink(controller:'login', action:'authSuccess')}"+"?uid="+response.authResponse.userID+redirectTarget
+					}
+				} else {
+					alert("Failed to connect to Facebook");
+				}
+			}, scope);
+		});
+	});
+	//////////////////////// FB RELATED CALLS END HERE ///////////////////////
 });
 
-var domainAppId;
-		if (document.domain == "${grailsApplication.config.wgp.domain}"){
-			domainAppId = '${grailsApplication.config.speciesPortal.wgp.facebook.appId}'
-		} else if(document.domain == "${grailsApplication.config.ibp.domain}") {
-			domainAppId = '${grailsApplication.config.speciesPortal.ibp.facebook.appId}'
-		}
-		// Callback to execute whenever ajax login is successful.
-		// Todo some thing meaningful with the response data
-		var ajaxLoginSuccessCallbackFunction, ajaxLoginErrorCallbackFunction;
-		
+// Callback to execute whenever ajax login is successful.
+// Todo some thing meaningful with the response data
+var ajaxLoginSuccessCallbackFunction, ajaxLoginErrorCallbackFunction;
+
 var reloadLoginInfo = function() {
-			$.ajax({
-				url : "${createLink(controller:'SUser', action:'login')}",
-				success : function(data) {
-					$('.header:visible .header_userInfo').html(data);
-				}, error: function (xhr, ajaxOptions, thrownError){
-					alert("Error while getting login information : "+xhr.responseText);
-				}
-			});
+	$.ajax({
+		url : "${createLink(controller:'SUser', action:'login')}",
+		success : function(data) {
+			$('.header:visible .header_userInfo').html(data);
+		}, error: function (xhr, ajaxOptions, thrownError){
+			alert("Error while getting login information : "+xhr.responseText);
 		}
+	});
+}
 		
 var ajaxLoginSuccessHandler = function(json, statusText, xhr, $form) {
 	if (json.success) {
@@ -230,7 +290,6 @@ var ajaxLoginSuccessHandler = function(json, statusText, xhr, $form) {
 
 </head>
 <body>
-
 	<div id="loading" class="loading" style="display: none;">
 		<span>Loading ...</span>
 	</div>
@@ -297,63 +356,7 @@ var ajaxLoginSuccessHandler = function(json, statusText, xhr, $form) {
 				$(this).parent().hide("slow");
 			});
 			
-			// make sure facebook is initialized before calling the facebook JS api
-			window.fbEnsure = function(callback) {
- 					if (window.facebookInitialized) { callback(); return; }
- 						
- 					if(!window.FB) {
- 						//alert("Facebook script all.js could not be loaded for some reason. Either its not available or is blocked.")
- 					} else {
- 						var options = {
-						appId  : domainAppId,
-					    channelUrl : "Utils.getDomainServerUrl(request)/channel.html",
-					    status : true,
-					    cookie : true,
-					    xfbml: true,
-					    oauth  : true,
-					    logging : true
-					  };
-				  
-				  FB.init(options); 
-				  
-				  window.facebookInitialized = true;
-				  callback();
-				  }
-			};
 			
-			/**
-			 * Just connect (for logged in users) to facebook and reassociate the user
-			 * (and possibly get the facebook profile picture if no avatar yet set).
-			 * Triggers two events on the '.fbJustConnect' element:
-			 * - "connected" will be triggered if the reassociation was successful
-			 * - "failed" will be triggered when for whatever reason the coupling was unsuccessful
-			 */
-			$('.fbJustConnect').click(function() {
-				var scope = { scope: "" };
-				scope.scope = "email,user_about_me,user_location,user_activities,user_hometown,manage_notifications,user_website,publish_stream";
-				
-				fbEnsure(function() {
-					FB.login(function(response) {
-						if (response.status == 'connected') {
-							/*if($('.fbJustConnect').hasClass('ajaxForm')) {
-								$.ajax({
-								  url: "${createLink(controller:'login', action:'authSuccess')}",
-								  method:"GET",
-								  data:{'uid':response.authResponse.userID, ${params['spring-security-redirect']?'"spring-security-redirect":"'+params['spring-security-redirect']+'"':''}},
-								  success: function(data, statusText, xhr) {
-								    ajaxLoginSuccessHandler(data, statusText, xhr);
-								  }
-								});
-							} else */{
-								var redirectTarget = ${params['spring-security-redirect']?'"&spring-security-redirect='+params['spring-security-redirect']+'"':'""'};
-								window.location = "${createLink(controller:'login', action:'authSuccess')}"+"?uid="+response.authResponse.userID+redirectTarget
-							}
-						} else {
-							alert("Failed to connect to Facebook");
-						}
-					}, scope);
-				});
-			});
 			 
 		}); 
 			
@@ -365,7 +368,7 @@ var ajaxLoginSuccessHandler = function(json, statusText, xhr, $form) {
 				return;
 			js = d.createElement(s);
 			js.id = id;
-			js.src = "//connect.facebook.net/en_US/all.js#xfbml=1&appId="+ domainAppId;
+			js.src = "//connect.facebook.net/en_US/all.js#xfbml=1&appId=${fbAppId}";
 			fjs.parentNode.insertBefore(js, fjs);
 		}(document, 'script', 'facebook-jssdk'));
 	</script>

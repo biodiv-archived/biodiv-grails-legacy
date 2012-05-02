@@ -22,12 +22,13 @@ def gallImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApp
 		} else if(domain.equals(grailsApplication.config.ibp.domain)) {
 			fbAppId =  grailsApplication.config.speciesPortal.ibp.facebook.appId;
 		}
+		String location = observationInstance.placeName?:observationInstance.reverseGeocodedName 
 %>
 
 <meta property="fb:app_id" content="${fbAppId }" />
 <meta property="fb:admins" content="581308415,100000607869577" />
 <meta property="og:description"
-          content="${observationInstance.notes}"/>
+          content='${observationInstance.notes?:"Observed at $location"}'/>
 <meta property="og:latitude" content="${observationInstance.latitude}"/>
 <meta property="og:longitude" content="${observationInstance.longitude }"/>
 
@@ -180,7 +181,7 @@ def gallImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApp
 
 					<div class="comments-box sidebar_section" style="clear: both;">
 						<fb:comments href="${createLink(controller:'observation', action:'show', id:observationInstance.id, base:Utils.getDomainServerUrl(request))}"
-							num_posts="10" width="620" colorscheme="light"></fb:comments>
+							num_posts="10" width="620" colorscheme="light"  notify="true"></fb:comments>
 					</div>
 
 				</div>
@@ -337,8 +338,42 @@ def gallImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApp
 	     	});
 	     	event.preventDefault();
      	});
+     	
+     	
+     	window.fbEnsure(function() {
+			FB.Event.subscribe('comment.create', function(response) {
+	  			console.log(response);
+	  			 FB.api('comments', {'ids': response.href}, function(res) {
+			        var data = res[response.href].data;
+			        console.log(data);
+			        console.log(data.pop().from.name);
+			    });
+	  			$.ajax({
+	  				url: "${createLink(action:'newComment')}",
+	  				method:"POST",
+	  				data:{'obvId':${observationInstance.id}, 'href':response.href, 'commentId':response.commentID},
+					error: function (xhr, status, thrownError){
+						console.log("Error while callback to new comment"+xhr.responseText)
+					}
+				});
+			});
+			
+			FB.Event.subscribe('comment.remove', function(response) {
+	  			console.log(response);
+	  			$.ajax({
+	  				url: "${createLink(action:'removeComment')}",
+	  				method:"POST",
+	  				data:{'obvId':${observationInstance.id}, 'href':response.href, 'commentId':response.commentID},
+					error: function (xhr, status, thrownError){
+						console.log("Error while callback to remove comment"+xhr.responseText)
+					}
+				});
+			});
+		});
         
 	});
+	
+	
 </g:javascript>
 
 </body>
