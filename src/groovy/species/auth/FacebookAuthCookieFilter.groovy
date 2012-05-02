@@ -45,7 +45,8 @@ class FacebookAuthCookieFilter extends GenericFilterBean implements ApplicationE
             logger.debug("Applying facebook auth filter")
             assert facebookAuthUtils != null
             Cookie cookie = facebookAuthUtils.getAuthCookie(request)
-            if (cookie != null) {
+			Cookie fbLoginCookie = facebookAuthUtils.getFBLoginCookie(request);
+            if (cookie != null && fbLoginCookie != null) {
 				logger.debug("Found fb cookie");
                 try {
                     FacebookAuthToken token = facebookAuthUtils.build(request, cookie.value)

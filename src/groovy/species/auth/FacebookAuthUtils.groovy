@@ -64,6 +64,17 @@ class FacebookAuthUtils {
 		}
 	}
 
+	public getFBLoginCookie(HttpServletRequest request) {
+		String applicationId = getFacebookAppIdForDomain(request);
+		String cookieName = "fb_login"
+		log.debug "looking for cookie named $cookieName";
+		return request.cookies.find {
+			Cookie it ->
+			log.debug("Cookie $it.name, expected $cookieName")
+			return it.name == cookieName
+		}
+	}
+	
 	String getAccessToken(String applicationId, String secret, String code) {
 		try {
 			String authUrl = "https://graph.facebook.com/oauth/access_token?client_id=$applicationId&redirect_uri=&client_secret=$secret&code=$code"

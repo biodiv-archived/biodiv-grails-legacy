@@ -263,6 +263,7 @@ var ajaxLoginSuccessHandler = function(json, statusText, xhr, $form) {
 				window.fbEnsure(function() {
 					FB.login(function(response) {
 						if (response.status == 'connected') {
+							$.cookie("fb_login", "true", { path: '/', domain:".${Utils.getDomain(request)}"});
 							/*if($('.fbJustConnect').hasClass('ajaxForm')) {
 								$.ajax({
 								  url: "${createLink(controller:'login', action:'authSuccess')}",
@@ -286,11 +287,12 @@ var ajaxLoginSuccessHandler = function(json, statusText, xhr, $form) {
 		}); 
 			
 </g:javascript>
-	<script>
+	<g:javascript>
 	//////////////////////// FB RELATED CALLS ///////////////////////
 	
 	window.fbInitCalls = Array();
-	window.fbAsyncInit = function() {		
+	window.fbAsyncInit = function() {	
+		console.log('FB init called');	
 		if (!window.facebookInitialized) { 
           	FB.init({
 	            appId  : "${fbAppId}",
@@ -333,7 +335,7 @@ var ajaxLoginSuccessHandler = function(json, statusText, xhr, $form) {
 		fjs.parentNode.insertBefore(js, fjs);
 	}(document, 'script', 'facebook-jssdk'));
 	////////////////////////FB RELATED CALLS END HERE ///////////////////////
-	</script>
+	</g:javascript>
 
 
 	<g:javascript src="species/popuplib.js"></g:javascript>

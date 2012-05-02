@@ -19,13 +19,21 @@ class FacebookAuthCookieLogoutHandler implements LogoutHandler {
 	HttpServletResponse httpServletResponse,
 	Authentication authentication) {
 
+		logger.info("Cleanup Facebook cookies")
 		Cookie cookie = facebookAuthUtils.getAuthCookie(httpServletRequest)
 		if (cookie != null) {
-			logger.info("Cleanup Facebook cookies")
 			cookie.maxAge = 0
 			cookie.path = '/'
 			cookie.domain = "."+Utils.getDomain(httpServletRequest);
 			httpServletResponse.addCookie(cookie)
+		}
+		
+		Cookie cookie2 = facebookAuthUtils.getFBLoginCookie(httpServletRequest)
+		if (cookie2 != null) {
+			cookie2.maxAge = 0
+			cookie2.path = '/'
+			cookie2.domain = "."+Utils.getDomain(httpServletRequest);
+			httpServletResponse.addCookie(cookie2)
 		}
 	}
 

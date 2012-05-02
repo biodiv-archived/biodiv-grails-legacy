@@ -352,6 +352,7 @@ def gallImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApp
 	  			$.ajax({
 	  				url: "${createLink(action:'newComment')}",
 	  				method:"POST",
+	  				dataType:'json',
 	  				data:{'obvId':${observationInstance.id}, 'href':response.href, 'commentId':response.commentID},
 					error: function (xhr, status, thrownError){
 						console.log("Error while callback to new comment"+xhr.responseText)
