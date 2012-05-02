@@ -342,12 +342,13 @@ def gallImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApp
      	
      	window.fbEnsure(function() {
 			FB.Event.subscribe('comment.create', function(response) {
-	  			console.log(response);
-	  			 FB.api('comments', {'ids': response.href}, function(res) {
-			        var data = res[response.href].data;
+				//console.log(response);
+	  			/*FB.api('comments', {'ids': response.href}, function(res) {
+	  			 	console.log(res);
+			        var data = res[response.href].comments.data;
 			        console.log(data);
 			        console.log(data.pop().from.name);
-			    });
+			    });*/
 	  			$.ajax({
 	  				url: "${createLink(action:'newComment')}",
 	  				method:"POST",
@@ -359,7 +360,7 @@ def gallImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApp
 			});
 			
 			FB.Event.subscribe('comment.remove', function(response) {
-	  			console.log(response);
+	  			//console.log(response);
 	  			$.ajax({
 	  				url: "${createLink(action:'removeComment')}",
 	  				method:"POST",
@@ -370,9 +371,7 @@ def gallImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApp
 				});
 			});
 		});
-        
 	});
-	
 	
 </g:javascript>
 

@@ -97,4 +97,3 @@ margin-right: 10px;
         </sec:ifLoggedIn> 
     </div>
 </div>
-<div id="fb-root"></div>

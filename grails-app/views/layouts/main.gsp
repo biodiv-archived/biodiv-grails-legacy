@@ -70,8 +70,7 @@
 	plugin='spring-security-ui' />
 <g:javascript src='spring-security-ui.js' plugin='spring-security-ui' />
 <ckeditor:resources/>
-<g:set var="fbAppId"
-	value="" />
+<g:set var="fbAppId" value="" />
 <%
 String domain = Utils.getDomain(request);
 if(domain.equals(grailsApplication.config.wgp.domain)) {
@@ -84,19 +83,19 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 
 <g:javascript>
 jQuery(document).ready(function($) {
-        if (document.domain == "${grailsApplication.config.wgp.domain}"){
-            $('#ibp-header').hide();
-            $('#wgp-header').show();
-            $('#ibp-footer').hide();
-            $('#wgp-footer').show();
-        }
+    if (document.domain == "${grailsApplication.config.wgp.domain}"){
+        $('#ibp-header').hide();
+        $('#wgp-header').show();
+        $('#ibp-footer').hide();
+        $('#wgp-footer').show();
+    }
 
-        if (document.domain == "${grailsApplication.config.ibp.domain}"){
-            $('#wgp-header').hide();
-            $('#ibp-header').show();
-            $('#wgp-footer').hide();
-            $('#ibp-footer').show();
-        }
+    if (document.domain == "${grailsApplication.config.ibp.domain}"){
+        $('#wgp-header').hide();
+        $('#ibp-header').show();
+        $('#wgp-footer').hide();
+        $('#ibp-footer').show();
+    }
 
 
 	$("#menu .navigation li").hover(
@@ -108,73 +107,19 @@ jQuery(document).ready(function($) {
   		}
 	);
 	$.widget( "custom.catcomplete", $.ui.autocomplete, {
-					_renderMenu: function( ul, items ) {
-						var self = this,
-							currentCategory = "";
-						$.each( items, function( index, item ) {
-							if ( item.category != currentCategory ) {
-								ul.append( "<li class='ui-autocomplete-category'>" +
-		item.category + "</li>" );
-								currentCategory = item.category;
-							}
-							self._renderItem( ul, item );
-						});
-					}
-				});
-				
-	//////////////////////// FB RELATED CALLS ///////////////////////
-	
-	// make sure facebook is initialized before calling the facebook JS api
-	window.fbEnsure = function(callback) {
-				if (window.facebookInitialized) { callback(); return; }
-					
-				if(!window.FB) {
-					//alert("Facebook script all.js could not be loaded for some reason. Either its not available or is blocked.")
-				} else {
-					var options = {
-				appId  : "${fbAppId}",
-			    channelUrl : "${Utils.getDomainServerUrl(request)}/channel.html",
-			    status : true,
-			    cookie : true,
-			    xfbml: true,
-			    oauth  : true,
-			    logging : true
-			  };
-		  
-			  FB.init(options); 
-			  console.log("Initialized FB sdk");
-			  window.facebookInitialized = true;
-			  callback();
-		  }
-	};
-	
-	$('.fbJustConnect').click(function() {
-		var scope = { scope: "" };
-		scope.scope = "email,user_about_me,user_location,user_activities,user_hometown,manage_notifications,user_website,publish_stream";
-		
-		fbEnsure(function() {
-			FB.login(function(response) {
-				if (response.status == 'connected') {
-					/*if($('.fbJustConnect').hasClass('ajaxForm')) {
-						$.ajax({
-						  url: "${createLink(controller:'login', action:'authSuccess')}",
-						  method:"GET",
-						  data:{'uid':response.authResponse.userID, ${params['spring-security-redirect']?'"spring-security-redirect":"'+params['spring-security-redirect']+'"':''}},
-						  success: function(data, statusText, xhr) {
-						    ajaxLoginSuccessHandler(data, statusText, xhr);
-						  }
-						});
-					} else */{
-						var redirectTarget = ${params['spring-security-redirect']?'"&spring-security-redirect='+params['spring-security-redirect']+'"':'""'};
-						window.location = "${createLink(controller:'login', action:'authSuccess')}"+"?uid="+response.authResponse.userID+redirectTarget
-					}
-				} else {
-					alert("Failed to connect to Facebook");
+		_renderMenu: function( ul, items ) {
+			var self = this,
+				currentCategory = "";
+			$.each( items, function( index, item ) {
+				if ( item.category != currentCategory ) {
+					ul.append( "<li class='ui-autocomplete-category'>" +item.category + "</li>" );
+					currentCategory = item.category;
 				}
-			}, scope);
-		});
+				self._renderItem( ul, item );
+			});
+		}
 	});
-	//////////////////////// FB RELATED CALLS END HERE ///////////////////////
+	
 });
 
 // Callback to execute whenever ajax login is successful.
@@ -217,56 +162,9 @@ var ajaxLoginSuccessHandler = function(json, statusText, xhr, $form) {
 </g:javascript>
 
 <g:layoutHead />
-<ga:trackPageview />
+<!-- ga:trackPageview /-->
 
 <!-- script src="http://cdn.wibiya.com/Toolbars/dir_1100/Toolbar_1100354/Loader_1100354.js" type="text/javascript"></script><noscript><a href="http://www.wibiya.com/">Web Toolbar by Wibiya</a></noscript-->
-
-<style>
-#header {
-	background-color: #F7F7F7;
-	height: 80px;
-	width: 100%;
-	z-index: 2000;
-	font-family: Verdana, Helvetica, Sans-Serif;
-	color: #5E5E5E;
-	box-shadow: 0 6px 6px -6px #5E5E5E;
-	border-bottom: 1px solid #E5E5E5;
-}
-
-#wg_logo {
-	border: 0 none;
-	height: 80px;
-	width: auto;
-}
-
-#top_nav_bar {
-	font-size: 1em;
-	font-weight: bold;
-	left: 300px;
-	position: absolute;
-	top: 30px;
-	z-index: 501;
-}
-
-#top_nav_bar ul {
-	list-style: none outside none;
-	margin-top: 14px;
-	margin-bottom: 14px;
-	font-size: 1.1em;
-	padding-left: 40px;
-}
-
-#top_nav_bar li {
-	cursor: pointer;
-	display: inline;
-	padding: 10px 10px 3px;
-}
-
-#top_nav_bar li:hover {
-	background-color: #e8f7f1;
-	border-bottom: 3px solid #003846;
-}
-</style>
 
 <script type="text/javascript">
 
@@ -293,12 +191,13 @@ var ajaxLoginSuccessHandler = function(json, statusText, xhr, $form) {
 	<div id="loading" class="loading" style="display: none;">
 		<span>Loading ...</span>
 	</div>
-
+	
 	<domain:showWGPHeader />
 	<domain:showIBPHeader />
-
+	
 	<auth:ajaxLogin />
-
+	<div id="fb-root"></div>
+	
 	<div id="species_main_wrapper">
 
 		<div class="container_12 container">
@@ -357,20 +256,83 @@ var ajaxLoginSuccessHandler = function(json, statusText, xhr, $form) {
 			});
 			
 			
+			$('.fbJustConnect').click(function() {
+				var scope = { scope: "" };
+				scope.scope = "email,user_about_me,user_location,user_activities,user_hometown,manage_notifications,user_website,publish_stream";
+				
+				window.fbEnsure(function() {
+					FB.login(function(response) {
+						if (response.status == 'connected') {
+							/*if($('.fbJustConnect').hasClass('ajaxForm')) {
+								$.ajax({
+								  url: "${createLink(controller:'login', action:'authSuccess')}",
+								  method:"GET",
+								  data:{'uid':response.authResponse.userID, ${params['spring-security-redirect']?'"spring-security-redirect":"'+params['spring-security-redirect']+'"':''}},
+								  success: function(data, statusText, xhr) {
+								    ajaxLoginSuccessHandler(data, statusText, xhr);
+								  }
+								});
+							} else */{
+								var redirectTarget = ${params['spring-security-redirect']?'"&spring-security-redirect='+params['spring-security-redirect']+'"':'""'};
+								window.location = "${createLink(controller:'login', action:'authSuccess')}"+"?uid="+response.authResponse.userID+redirectTarget
+							}
+						} else {
+							alert("Failed to connect to Facebook");
+						}
+					}, scope);
+				});
+			});
 			 
 		}); 
 			
 </g:javascript>
 	<script>
-		(function(d, s, id) {
-			var js, fjs = d.getElementsByTagName(s)[0];
-			if (d.getElementById(id))
-				return;
-			js = d.createElement(s);
-			js.id = id;
-			js.src = "//connect.facebook.net/en_US/all.js#xfbml=1&appId=${fbAppId}";
-			fjs.parentNode.insertBefore(js, fjs);
-		}(document, 'script', 'facebook-jssdk'));
+	//////////////////////// FB RELATED CALLS ///////////////////////
+	
+	window.fbInitCalls = Array();
+	window.fbAsyncInit = function() {		
+		if (!window.facebookInitialized) { 
+          	FB.init({
+	            appId  : "${fbAppId}",
+			    channelUrl : "${Utils.getDomainServerUrl(request)}/channel.html",
+			    status : true,
+			    cookie : true,
+			    xfbml: true,
+			    oauth  : true,
+			    logging : true
+	        });
+        	window.facebookInitialized = true;
+		}
+        $.each(window.fbInitCalls, function(index, fn) {
+            fn();
+        });
+        window.fbInitCalls = [];
+    };
+        
+	// make sure facebook is initialized before calling the facebook JS api
+	window.fbEnsure = function(callback) {
+		if (window.facebookInitialized) { callback(); return; }
+			
+		if(!window.FB) {
+			//alert("Facebook script all.js could not be loaded for some reason. Either its not available or is blocked.")
+			window.fbInitCalls.push(callback);
+		} else {
+			window.fbAsyncInit();
+		  	callback();
+	  	}
+	};
+	
+	(function(d, s, id) {
+		var js, fjs = d.getElementsByTagName(s)[0];
+		if (d.getElementById(id))
+			return;
+		js = d.createElement(s);
+		js.id = id;
+		js.src = "//connect.facebook.net/en_US/all.js#xfbml=1&appId=${fbAppId}";
+
+		fjs.parentNode.insertBefore(js, fjs);
+	}(document, 'script', 'facebook-jssdk'));
+	////////////////////////FB RELATED CALLS END HERE ///////////////////////
 	</script>
 
 

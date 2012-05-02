@@ -700,9 +700,11 @@ class ObservationController {
     */
    def newComment = {
 	   log.debug params;
-	   if(!params.obvId) return;
-	   
-	   def observationInstance = Observation.read(params.obvId);
+	   if(!params.obvId) {
+		   log.error  "No Observation selected"
+		   return (['error':"Coudn't find the specified observation with id $params.obvId"] as JSON);
+	   }
+	   def observationInstance = Observation.read(params.long('obvId'));
 	   if(observationInstance) {
 		   sendNotificationMail(SPECIES_NEW_COMMENT, observationInstance, request);
 	   } else {
@@ -715,9 +717,12 @@ class ObservationController {
    */
   def removeComment = {
 	  log.debug params;
-	  if(!params.obvId) return;
+	    if(!params.obvId) {
+		   log.error "No Observation selected"
+		   return (['error':"Coudn't find the specified observation with id $params.obvId"] as JSON);
+	   }
 	  
-	  def observationInstance = Observation.read(params.obvId);
+	  def observationInstance = Observation.read(params.long('obvId'));
 	  if(observationInstance) {
 		  sendNotificationMail(SPECIES_REMOVE_COMMENT, observationInstance, request);
 	  } else {
