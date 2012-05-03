@@ -8,11 +8,12 @@
 <meta property="og:type" content="article" />
 <meta property="og:title" content="${(!observationInstance.maxVotedSpeciesName?.equalsIgnoreCase('Unknown'))?observationInstance.maxVotedSpeciesName:'Help Identify'}"/>
 <meta property="og:url" content="${createLink(controller:'observation', action:'show', id:observationInstance.id, base:Utils.getDomainServerUrl(request))}" />
+<g:set var="fbImagePath" value="" />
 <%
 def r = observationInstance.mainImage();
-def gallImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.thumbnail.suffix)
+fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.thumbnail.suffix)
 %>
-<meta property="og:image" content="${createLinkTo(file: gallImagePath, base:grailsApplication.config.speciesPortal.observations.serverURL)}" />
+<meta property="og:image" content="${createLinkTo(file: fbImagePath, base:grailsApplication.config.speciesPortal.observations.serverURL)}" />
 <meta property="og:site_name" content="${Utils.getDomainName(request)}" />
 <g:set var="description" value="" />
 <%
@@ -376,13 +377,13 @@ def gallImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApp
 				});
 			});
 			
-			if('${params.postToFB}' == 'on') {
+			if('${params.postToFB}' === 'on') {
 				FB.ui(
 				  {
 				    method: 'feed',
 				    name: "${(!observationInstance.maxVotedSpeciesName?.equalsIgnoreCase('Unknown'))?observationInstance.maxVotedSpeciesName:'Help Identify'}",
 				    link: "${createLink(controller:'observation', action:'show', id:observationInstance.id, base:Utils.getDomainServerUrl(request))}",
-				    picture: "${createLinkTo(file: gallImagePath, base:grailsApplication.config.speciesPortal.observations.serverURL)}",
+				    picture: "${createLinkTo(file: fbImagePath, base:grailsApplication.config.speciesPortal.observations.serverURL)}",
 				    caption: "${Utils.getDomainName(request)}",
 				    description: "${description.replaceAll("\\n", " ")}"
 				  },
