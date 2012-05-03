@@ -196,9 +196,9 @@ class ObservationService {
 	 * @return
 	 */
 	Object getSpeciesGroupIds(groupId){
-		def groupName = SpeciesGroup.read(groupId).name
+		def groupName = SpeciesGroup.read(groupId)?.name
 		//if filter group is all
-		if(groupName == grailsApplication.config.speciesPortal.group.ALL){
+		if(!groupName || (groupName == grailsApplication.config.speciesPortal.group.ALL)){
 			return null
 		}
 		return groupId

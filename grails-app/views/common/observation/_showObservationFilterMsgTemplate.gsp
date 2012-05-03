@@ -17,7 +17,7 @@
 	<span class="name" style="color: #b1b1b1;"> <i
 		class="icon-screenshot"></i> ${observationInstanceTotal}
 	</span> Observation<g:if test="${observationInstanceTotal>1}">s</g:if>
-	<g:if test="${queryParams.groupId}">
+	<g:if test="${queryParams.groupId && SpeciesGroup.get(queryParams.groupId)}">
                                     of <span class="highlight"> <g:link
 				controller="observation" action="list"
 				params="[sGroup: queryParams.groupId]">
@@ -25,7 +25,7 @@
 				href="#" onclick="setDefaultGroup(); return false;">[X]</a></g:link>
 		</span> group
                             </g:if>
-	<g:if test="${queryParams.habitat}">
+	<g:if test="${queryParams.habitat && Habitat.get(queryParams.habitat)}">
                                     in <span class="highlight"><g:link
 				controller="observation" action="list"
 				params="[habitat: queryParams.habitat]">
@@ -39,7 +39,7 @@
 				${queryParams.tag} <a id="removeTagFilter" href="#" >[X]</a></g:link>
 		</span>
 	</g:if>
-	<g:if test="${queryParams.user}">
+	<g:if test="${queryParams.user && SUser.read(queryParams.user)}">
                                     by user <span class="highlight">
 			<g:link controller="SUser" action="show" id="${queryParams.user}">
 				${SUser.read(queryParams.user).name.encodeAsHTML()} <a

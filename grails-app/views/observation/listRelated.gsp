@@ -39,7 +39,7 @@
 				<div>
 					<div class="tags_section span3" style="float: right;">
 						<obv:showAllTags
-							model="['tagFilterByProperty':'Related', 'relatedObvParams':initialParams]" />
+							model="['tagFilterByProperty':'Related', 'relatedObvParams':initialParams, 'isAjaxLoad':false]" />
 					</div>
 
 					<div class="row">
@@ -64,5 +64,14 @@
 			</div>
 		</div>
 	</div>
+<g:javascript>
+	$(document).ready(function() {
+		$('#tc_tagcloud a').click(function(){
+			var tg = $(this).contents().first().text();
+			window.location.href = "${g.createLink(controller:'observation', action: 'list')}?tag=" + tg ;
+	    	return false;
+	 	});
+	});
+</g:javascript>	
 </body>
 </html>
