@@ -1,5 +1,7 @@
 package species
 
+import species.auth.FacebookAuthToken;
+
 class SUserTagLib {
 	static namespace = "sUser"
 
@@ -101,5 +103,10 @@ class SUserTagLib {
         def userLoginBox = { attrs, body->
 			out << render(template:"/common/suser/userLoginBoxTemplate", model:attrs.model);
 	}
-
+	
+	def isFBUser = { attrs, body->
+		if(springSecurityService.getAuthentication() instanceof FacebookAuthToken) {
+			out<< body();
+		}
+	}
 }

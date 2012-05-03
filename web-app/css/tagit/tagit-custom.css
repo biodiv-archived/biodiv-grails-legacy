@@ -48,6 +48,7 @@ ul.tagit {
     padding: 3px;
     border: 1px solid #cccccc;
     background: #fff;
+    margin : 0px;
 }
 
 ul.tagit li {

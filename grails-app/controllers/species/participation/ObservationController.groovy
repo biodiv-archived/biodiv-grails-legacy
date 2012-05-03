@@ -332,7 +332,7 @@ class ObservationController {
 					if(!params["createNew"]){
 						redirect(action:getRecommendationVotes, id:params.obvId, params:[max:3, offset:0, recoVoteMsg:recoVoteMsg])
 					}else{
-						redirect(action: "show", id: observationInstance.id);
+						redirect(action: "show", id: observationInstance.id, params:[postToFB:(params.postToFB?:false)]);
 					}
 					return
 					
@@ -347,17 +347,17 @@ class ObservationController {
 						sendNotificationMail(SPECIES_RECOMMENDED, observationInstance, request);
 						redirect(action:getRecommendationVotes, id:params.obvId, params:[max:3, offset:0, recoVoteMsg:recoVoteMsg])
 					}else{
-						redirect(action: "show", id: observationInstance.id);
+						redirect(action: "show", id: observationInstance.id, params:[postToFB:(params.postToFB?:false)]);
 					}
 					return
 				}
 				else {
 					recommendationVoteInstance.errors.allErrors.each { log.error it }
-					render (view: "show", model: [observationInstance:observationInstance, recommendationVoteInstance: recommendationVoteInstance])
+					render (view: "show", model: [observationInstance:observationInstance, recommendationVoteInstance: recommendationVoteInstance], params:[postToFB:(params.postToFB?:false)])
 				}
 			} catch(e) {
 				e.printStackTrace()
-				render(view: "show", model: [observationInstance:observationInstance, recommendationVoteInstance: recommendationVoteInstance])
+				render(view: "show", model: [observationInstance:observationInstance, recommendationVoteInstance: recommendationVoteInstance], params:[postToFB:(params.postToFB?:false)])
 			}
 		} else {
 			flash.message  = "${message(code: 'observation.invalid', default:'Invalid observation')}"

@@ -378,8 +378,8 @@ environments {
 			}
 		}
 
-                ibp.domain='indiabiodiversity.localhost.org'
-                wgp.domain='thewesternghats.localhost.in'    
+        ibp.domain='indiabiodiversity.localhost.org'
+        wgp.domain='thewesternghats.localhost.in'
 	}
 	test {
 		grails.serverURL = "http://localhost:8080/${appName}"
@@ -697,7 +697,7 @@ Hi $username,<br/>
 You have uploaded an observation to <b>$domain</b> and it is available <a href="$obvUrl">here</a><br/>
 <br/>
 You will be notified by mail on any social activity on the observation.<br/>
-If you do not want to receive notifications please go to your <a href="$userProfileUrl">user profile<a> and switch it off.<br/>
+If you do not want to receive notifications please go to your <a href="$userProfileUrl">user profile</a> and switch it off.<br/>
 <br/>
 Thank you for your contribution to the portal.<br/>
 <br/>

@@ -521,7 +521,15 @@ display: table !important;
 								</div>
 							</div>
 							
-							
+							<sUser:isFBUser>
+								<div class="span5 block control-group">
+									<div class="create_tags" >
+										<label class="checkbox" > <g:checkBox style="margin-left:0px;"
+												name="postToFB" />
+											Post to Facebook</label>
+									</div>
+								</div>
+							</sUser:isFBUser>
 					</div>
 					</div>
 
