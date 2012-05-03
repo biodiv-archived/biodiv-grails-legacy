@@ -48,7 +48,20 @@ class ObservationController {
 	}
 
 	def list = { 
-		getObservationList(params);
+		def model = getObservationList(params);
+		if(!params.isGalleryUpdate){
+			render (view:"list", model:model)
+		}else{
+			//def model = [totalObservationInstanceList:totalObservationInstanceList, observationInstanceList: observationInstanceList, observationInstanceTotal: count, queryParams: queryParams, activeFilters:activeFilters]
+			def obvListHtml =  g.render(template:"/common/observation/showObservationListTemplate", model:model);
+			def obvFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
+			
+			def filteredTags = observationService.getTagsFromObservation(model.totalObservationInstanceList.collect{it.id})
+			def tagsHtml = g.render(template:"/common/observation/showAllTagsTemplate", model:[count: count, tags:filteredTags, isAjaxLoad:true]);
+			
+			def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml, tagsHtml:tagsHtml]
+			render result as JSON
+		}
 	}
 
 	protected def getObservationList(params) {
@@ -61,19 +74,8 @@ class ObservationController {
 
 		def totalObservationInstanceList = observationService.getFilteredObservations(params, -1, -1).observationInstanceList
 		def count = totalObservationInstanceList.size()
-		if(!params.isGalleryUpdate){
-			[totalObservationInstanceList:totalObservationInstanceList, observationInstanceList: observationInstanceList, observationInstanceTotal: count, queryParams: queryParams, activeFilters:activeFilters]
-		}else{
-			def model = [totalObservationInstanceList:totalObservationInstanceList, observationInstanceList: observationInstanceList, observationInstanceTotal: count, queryParams: queryParams, activeFilters:activeFilters]
-			def obvListHtml =  g.render(template:"/common/observation/showObservationListTemplate", model:model);
-			def obvFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
-			
-			def filteredTags = observationService.getTagsFromObservation(totalObservationInstanceList.collect{it.id})
-			def tagsHtml = g.render(template:"/common/observation/showAllTagsTemplate", model:[count: count, tags:filteredTags, isAjaxLoad:true]);
-			
-			def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml, tagsHtml:tagsHtml]
-			render result as JSON
-		}
+		return [totalObservationInstanceList:totalObservationInstanceList, observationInstanceList: observationInstanceList, observationInstanceTotal: count, queryParams: queryParams, activeFilters:activeFilters]
+		
 	}
 
 	@Secured(['ROLE_USER'])
