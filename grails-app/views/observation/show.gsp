@@ -14,6 +14,7 @@ def gallImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApp
 %>
 <meta property="og:image" content="${createLinkTo(file: gallImagePath, base:grailsApplication.config.speciesPortal.observations.serverURL)}" />
 <meta property="og:site_name" content="${Utils.getDomainName(request)}" />
+<g:set var="description" value="" />
 <%
 		String domain = Utils.getDomain(request);
 		String fbAppId;
@@ -22,13 +23,16 @@ def gallImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApp
 		} else if(domain.equals(grailsApplication.config.ibp.domain)) {
 			fbAppId =  grailsApplication.config.speciesPortal.ibp.facebook.appId;
 		}
-		String location = observationInstance.placeName?:observationInstance.reverseGeocodedName 
+		
+		//description = observationInstance.notes.trim() ;
+		String location = "Observed at '" + (observationInstance.placeName.trim()?:observationInstance.reverseGeocodedName) +"'"
+		description += "- "+ location +" by "+observationInstance.author.name.capitalize()+" in species group "+observationInstance.group.name + " and habitat "+ observationInstance.habitat.name;
 %>
 
 <meta property="fb:app_id" content="${fbAppId }" />
 <meta property="fb:admins" content="581308415,100000607869577" />
 <meta property="og:description"
-          content='${observationInstance.notes?:"Observed at $location"}'/>
+          content='${description}'/>
 <meta property="og:latitude" content="${observationInstance.latitude}"/>
 <meta property="og:longitude" content="${observationInstance.longitude }"/>
 
@@ -371,6 +375,26 @@ def gallImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApp
 					}
 				});
 			});
+			
+			if('${params.postToFB}' == 'on') {
+				FB.ui(
+				  {
+				    method: 'feed',
+				    name: "${(!observationInstance.maxVotedSpeciesName?.equalsIgnoreCase('Unknown'))?observationInstance.maxVotedSpeciesName:'Help Identify'}",
+				    link: "${createLink(controller:'observation', action:'show', id:observationInstance.id, base:Utils.getDomainServerUrl(request))}",
+				    picture: "${createLinkTo(file: gallImagePath, base:grailsApplication.config.speciesPortal.observations.serverURL)}",
+				    caption: "${Utils.getDomainName(request)}",
+				    description: "${description.replaceAll("\\n", " ")}"
+				  },
+				  function(response) {
+				    if (response && response.post_id) {
+				      //alert('Post was published.');
+				    } else {
+				      //alert('Could not published to the FB wall.');
+				    }
+				  }
+				);
+			}
 		});
 	});
 	

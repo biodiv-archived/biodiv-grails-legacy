@@ -32,14 +32,14 @@ class FacebookAuthUtils {
 			throw new BadCredentialsException("Unknown hashing algoright: $json.algorithm")
 		}
 
-		log.debug("Payload: $jsonData")
+		//log.debug("Payload: $jsonData")
 		
 		String secret = getFacebookAppSecretForDomain(Utils.getDomain(request));
 		
 		if (!verifySign(signedRequestParts[0], signedRequestParts[1], secret)) {
 			throw new BadCredentialsException("Invalid signature")
 		} else {
-			log.debug "Signature is ok"
+			//log.debug "Signature is ok"
 		}
 
 		String code = json.code?.toString()
@@ -59,7 +59,7 @@ class FacebookAuthUtils {
 		log.debug "looking for cookie named $cookieName";
 		return request.cookies.find {
 			Cookie it ->
-			log.debug("Cookie $it.name, expected $cookieName")
+			//log.debug("Cookie $it.name, expected $cookieName")
 			return it.name == cookieName
 		}
 	}
@@ -70,7 +70,7 @@ class FacebookAuthUtils {
 		log.debug "looking for cookie named $cookieName";
 		return request.cookies.find {
 			Cookie it ->
-			log.debug("Cookie $it.name, expected $cookieName")
+			//log.debug("Cookie $it.name, expected $cookieName")
 			return it.name == cookieName
 		}
 	}
@@ -113,7 +113,7 @@ class FacebookAuthUtils {
 
 	String getFacebookAppIdForDomain(String domain) {
 		if(!domain) return;
-		log.debug "Looking facebook appId for domain $domain"
+		//log.debug "Looking facebook appId for domain $domain"
 
 		if(domain.equals(grailsApplication.config.wgp.domain)) {
 			return grailsApplication.config.speciesPortal.wgp.facebook.appId;
@@ -126,7 +126,7 @@ class FacebookAuthUtils {
 	String getFacebookAppSecretForDomain(String domain) {
 		if(!domain) return;
 
-		log.debug "Looking facebook secret for domain $domain"
+		//log.debug "Looking facebook secret for domain $domain"
 		
 		if(domain.equals(grailsApplication.config.wgp.domain)) {
 			return grailsApplication.config.speciesPortal.wgp.facebook.secret

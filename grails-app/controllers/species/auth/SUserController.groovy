@@ -174,7 +174,7 @@ class SUserController extends UserController {
 		for (name in [username: usernameFieldName]) {
 			if (params[name.key]) {
 				cond.append " AND LOWER(u.${name.value}) LIKE :${name.key}"
-				queryParams[name.key] = params[name.key].toLowerCase() + '%'
+				queryParams[name.key] = '%' + params[name.key].toLowerCase() + '%'
 			}
 		}
 

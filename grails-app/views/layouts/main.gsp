@@ -5,7 +5,8 @@
 <html lang="en" xmlns:fb="http://ogp.me/ns/fb#"
 	xmlns:og="og: http://ogp.me/ns#">
 <head>
-<title>Species Portal</title>
+<title>${Utils.getDomainName(request)}</title>
+
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 
 
@@ -80,8 +81,14 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 }
 
 %>
-
+<g:if test="${domain.equals(grailsApplication.config.ibp.domain) }">
+	<link rel="shortcut icon" href="/sites/default/files/ibp_favicon_2.png" type="image/x-icon" />
+</g:if>
+<g:else>
+	<link rel="shortcut icon" href="/sites/all/themes/wg/images/favicon.png" type="image/x-icon" />
+</g:else>
 <g:javascript>
+
 jQuery(document).ready(function($) {
     if (document.domain == "${grailsApplication.config.wgp.domain}"){
         $('#ibp-header').hide();
