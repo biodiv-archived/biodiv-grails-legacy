@@ -42,7 +42,7 @@
                   }  
                   <g:each in="${observationInstanceList}" status="i"
 						var="observationInstance">
-                        addMarker(${observationInstance.id}, ${observationInstance.latitude},  ${observationInstance.longitude}); 
+                        addMarker(${observationInstance[0]}, ${observationInstance[1]},  ${observationInstance[2]}); 
 
 		    </g:each>	
 				  

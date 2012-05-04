@@ -463,7 +463,7 @@ class ObservationService {
 	}
 	
 	Map getFilteredTags(params){
-		return getTagsFromObservation(getFilteredObservations(params, -1, -1).observationInstanceList.collect{it.id});
+		return getTagsFromObservation(getFilteredObservations(params, -1, -1, true).observationInstanceList.collect{it[0]});
 	}
 	
 	/**
@@ -472,13 +472,14 @@ class ObservationService {
 	 * offset: offset results: if offset = -1 its not passed to the 
 	 * executing query
 	 */
-	Map getFilteredObservations(params, max, offset){
+	Map getFilteredObservations(params, max, offset, isMapView){
 		params.sGroup = (params.sGroup)? params.sGroup : SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.ALL).id
 		params.habitat = (params.habitat)? params.habitat : Habitat.findByName(grailsApplication.config.speciesPortal.group.ALL).id
 		params.habitat = params.habitat.toLong()
 		//params.userName = springSecurityService.currentUser.username;
 
 		def query = "select obv from Observation obv where obv.isDeleted = :isDeleted "
+		def mapViewQuery = "select obv.id, obv.latitude, obv.longitude from Observation obv where obv.isDeleted = :isDeleted "
 		def queryParams = [isDeleted : false]
 		def filterQuery = ""
 		def activeFilters = [:]
@@ -497,7 +498,7 @@ class ObservationService {
 
 		if(params.tag){
 			query = "select obv from Observation obv,  TagLink tagLink where obv.isDeleted = :isDeleted "
-			//(filterQuery == "")? (filterQuery += "  where ") : (filterQuery += "  and ")
+			mapViewQuery = "select obv.id, obv.latitude, obv.longitude from Observation obv, TagLink tagLink where obv.isDeleted = :isDeleted " 
 			filterQuery +=  " and obv.id = tagLink.tagRef and tagLink.type like :tagType and tagLink.tag.name like :tag "
 
 			queryParams["tag"] = params.tag
@@ -507,28 +508,24 @@ class ObservationService {
 
 
 		if(params.habitat && (params.habitat != Habitat.findByName(grailsApplication.config.speciesPortal.group.ALL).id)){
-			//(filterQuery == "")? (filterQuery += "  where ") : (filterQuery += "  and ")
 			filterQuery += " and obv.habitat.id = :habitat "
 			queryParams["habitat"] = params.habitat
 			activeFilters["habitat"] = params.habitat
 		}
 
 		if(params.user){
-			//(filterQuery == "")? (filterQuery += " where ") : (filterQuery += " and ")
 			filterQuery += " and obv.author.id = :user "
 			queryParams["user"] = params.user.toLong()
 			activeFilters["user"] = params.user.toLong()
 		}
 
 		if(params.speciesName && (params.speciesName != grailsApplication.config.speciesPortal.group.ALL)){
-			//(filterQuery == "")? (filterQuery += " where ") : (filterQuery += " and ")
 			filterQuery += " and obv.maxVotedSpeciesName like :speciesName "
 			queryParams["speciesName"] = params.speciesName
 			activeFilters["speciesName"] = params.speciesName
 		}
 		
 		if(params.isFlagged){
-			//(filterQuery == "")? (filterQuery += " where ") : (filterQuery += " and ")
 			filterQuery += " and obv.flagCount > 0 "
 		}
 		if(params.bounds){
@@ -539,23 +536,22 @@ class ObservationService {
 			def neLat = bounds[2]
 			def neLon = bounds[3]
 
-			//(filterQuery == "")? (filterQuery += " where ") : (filterQuery += " and ")
 			filterQuery += " and obv.latitude > " + swLat + " and  obv.latitude < " + neLat + " and obv.longitude > " + swLon + " and obv.longitude < " + neLon
 			activeFilters["bounds"] = params.bounds
 		}
 
 		def orderByClause = " order by obv." + (params.sort ? params.sort : "createdOn") +  " desc"
-
-		query += filterQuery + orderByClause
-
-		if(max != -1)
+		
+		if(isMapView){
+			query = mapViewQuery + filterQuery + orderByClause
+		}else{
+			query += filterQuery + orderByClause
 			queryParams["max"] = max
-
-		if(offset != -1)
 			queryParams["offset"] = offset
-
+		}
+		
+		
 		def observationInstanceList = Observation.executeQuery(query, queryParams)
-
 		return [observationInstanceList:observationInstanceList, queryParams:queryParams, activeFilters:activeFilters]
 	}
 	

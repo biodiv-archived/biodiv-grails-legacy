@@ -55,7 +55,7 @@ class ObservationController {
 			def obvListHtml =  g.render(template:"/common/observation/showObservationListTemplate", model:model);
 			def obvFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
 			
-			def filteredTags = observationService.getTagsFromObservation(model.totalObservationInstanceList.collect{it.id})
+			def filteredTags = observationService.getTagsFromObservation(model.totalObservationInstanceList.collect{it[0]})
 			def tagsHtml = g.render(template:"/common/observation/showAllTagsTemplate", model:[count: count, tags:filteredTags, isAjaxLoad:true]);
 			def mapViewHtml = g.render(template:"/common/observation/showObservationMultipleLocationTemplate", model:[observationInstanceList:model.totalObservationInstanceList]);
 			
@@ -67,12 +67,12 @@ class ObservationController {
 	protected def getObservationList(params) {
 		def max = Math.min(params.max ? params.int('max') : 9, 100)
 		def offset = params.offset ? params.int('offset') : 0
-		def filteredObservation = observationService.getFilteredObservations(params, max, offset)
+		def filteredObservation = observationService.getFilteredObservations(params, max, offset, false)
 		def observationInstanceList = filteredObservation.observationInstanceList
 		def queryParams = filteredObservation.queryParams
 		def activeFilters = filteredObservation.activeFilters
 
-		def totalObservationInstanceList = observationService.getFilteredObservations(params, -1, -1).observationInstanceList
+		def totalObservationInstanceList = observationService.getFilteredObservations(params, -1, -1, true).observationInstanceList
 		def count = totalObservationInstanceList.size()
 		return [totalObservationInstanceList:totalObservationInstanceList, observationInstanceList: observationInstanceList, observationInstanceTotal: count, queryParams: queryParams, activeFilters:activeFilters]
 		
@@ -737,4 +737,5 @@ class ObservationController {
 		  render (['error':"Coudn't find the specified observation with id $params.obvId"] as JSON);
 	  }
   }
+  
 }
