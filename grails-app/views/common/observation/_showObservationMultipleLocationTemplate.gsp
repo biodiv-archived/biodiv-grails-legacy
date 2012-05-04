@@ -98,19 +98,18 @@
 
                 });
                 </script>
-                <div class="map_wrapper">
-		    <div id="big_map_canvas" style="height: 500px; width: 100%;"></div>
-                </div>
+		<div class="map_wrapper">
+			<div id="big_map_canvas" style="height: 500px; width: 100%;"></div>
+		</div>
 	</div>
-        <div id="map_results_list"></div>
-        <script>
+	<div id="map_results_list"></div>
+	<script>
             function refreshList(bounds){
                 var url = "${g.createLink(controller: "observation", action: "filteredList")}" + location.search
                 if (bounds !== undefined){
                     var sep = (location.search == "") ? "?" : "&";
                     url = url + sep + "bounds=" + bounds
-
-	                $.ajax({
+			        $.ajax({
 	                    url:  url,
 	                    dataType: "html",
 	                    success: function(data) {
