@@ -20,7 +20,8 @@
 
 <g:javascript src="tagit.js"></g:javascript>
 <g:javascript src="jquery/jquery.autopager-1.0.0.js"></g:javascript>
-<g:javascript src="jquery/jquery-history-1.7.1/scripts/bundled/html4+html5/jquery.history.js"/>
+<g:javascript
+	src="jquery/jquery-history-1.7.1/scripts/bundled/html4+html5/jquery.history.js" />
 
 </head>
 <body>
@@ -61,7 +62,8 @@
 					</div>
 				</div>
 				<div class="tags_section span3" style="float: right;">
-					<obv:showAllTags model="['tagFilterByProperty':'All' , 'params':params, 'isAjaxLoad':true]" />
+					<obv:showAllTags
+						model="['tagFilterByProperty':'All' , 'params':params, 'isAjaxLoad':true]" />
 				</div>
 
 				<div class="row">
@@ -146,9 +148,7 @@
 				$("#speciesNameAllButton").addClass('active')
             }
         	
-        	function stringTrim(s){
-           		return s.replace(/^\s*/, "").replace(/\s*$/, "");
-            }
+   
            
            $("#speciesNameAllButton").click(function() {
            		if($("#speciesNameAllButton").hasClass('active')){
@@ -212,6 +212,59 @@
 				$("#sortFilter").show();
 			});
 			
+
+                $('#speciesNameFilter input').change(function(){
+                    updateGallery(undefined, ${queryParams.max}, 0);
+                    return false;
+                });
+        
+                
+                $(".paginateButtons a").click(function() {
+                    updateGallery($(this).attr('href'));
+                    return false;
+                });
+                
+                $("ul[name='tags']").tagit({select:true,  tagSource: "${g.createLink(action: 'tags')}"});
+         
+          		
+                $("li.tagit-choice").live('click', function(){
+               		setActiveTag($(this).contents().first().text());
+                	updateGallery(undefined, undefined, 0);
+                	return false;
+                });
+               
+               $('#tc_tagcloud a').live('click', function(){
+               		setActiveTag($(this).contents().first().text());
+		 			updateGallery(undefined, undefined, 0);
+					return false;
+			   });
+               
+                $("#removeTagFilter").live('click', function(){
+                	var oldActiveTag = $("li.tagit-choice.active");
+		 			if(oldActiveTag){
+		 				oldActiveTag.removeClass('active');
+		 			}
+		 			var oldActiveTag = $("#tc_tagcloud a.active");
+		 			if(oldActiveTag){
+		 				oldActiveTag.removeClass('active');
+		 			}
+		 			updateGallery(undefined, undefined, 0);
+                	return false;
+                });
+                
+                $("#removeUserFilter").live('click', function(){
+                	updateGallery(undefined, undefined, 0, true);
+                	return false;
+                });
+               
+               var tmpTarget =  window.location.pathname + window.location.search;
+               setActiveTag($('<a href="'+ tmpTarget +'"></a>').url().param()["tag"]);
+              
+            });
+            
+            function stringTrim(s){
+           		return s.replace(/^\s*/, "").replace(/\s*$/, "");
+            }
             function getSelectedGroup() {
                 var grp = ''; 
                 $('#speciesGroupFilter button').each (function() {
@@ -316,26 +369,26 @@
 					
 					return params;
                 }	
-                
-<%--                History.Adapter.bind(window,'statechange',function(){ // Note: We are using statechange instead of popstate--%>
+<%--                --%>
+		<%--                History.Adapter.bind(window,'statechange',function(){ // Note: We are using statechange instead of popstate--%>
 <%--        			var State = History.getState(); // Note: We are using History.getState() instead of event.state--%>
 <%--        			History.log(State.data, State.title, State.url);--%>
 <%--        			alert(JSON.stringify(State));--%>
 <%--        			alert("data " + JSON.stringify(State.data) + "  title "  + State.title + "  url " + State.url);--%>
 <%--        			//window.location.href = State.url;--%>
 <%--    			});--%>
-                
-<%--                window.onpopstate = function(event) {  --%>
+
+		<%--                window.onpopstate = function(event) {  --%>
 <%--                	alert(event);--%>
 <%--  					alert("location: " + document.location + ", state: " + JSON.stringify(event.state));--%>
 <%--  					if(event.state !== undefined){--%>
 <%--  						window.location = document.location;--%>
 <%--  					} --%>
 <%--				};--%>
-<%--                $(window).bind('statechange',function(){--%>
+		<%--                $(window).bind('statechange',function(){--%>
 <%--                	alert("state changed " );--%>
 <%--                });--%>
-<%--                --%>
+		<%--                --%>
 				function setActiveTag(activeTag){
 					if(activeTag != undefined){
  							$('li.tagit-choice').each (function() {
@@ -367,6 +420,7 @@
   						$('.observations_list').replaceWith(data.obvListHtml);
 						$('#info-message').replaceWith(data.obvFilterMsgHtml);
   						$('#tags_section').replaceWith(data.tagsHtml);
+  						$('.observation_location_wrapper').replaceWith(data.mapViewHtml);
   						setActiveTag(activeTag);
 					}
 				}
@@ -410,88 +464,26 @@
 						}
 					});
                 }
-                
-                $('#speciesNameFilter input').change(function(){
-                    updateGallery(undefined, ${queryParams.max}, 0);
-                    return false;
-                });
-        
-                
-                $(".paginateButtons a").click(function() {
-                    updateGallery($(this).attr('href'));
-                    return false;
-                });
-                
-                $("ul[name='tags']").tagit({select:true,  tagSource: "${g.createLink(action: 'tags')}"});
-         
-          		
-                $("li.tagit-choice").live('click', function(){
-               		setActiveTag($(this).contents().first().text());
-                	updateGallery(undefined, undefined, 0);
-                	return false;
-                });
-               
-               $('#tc_tagcloud a').live('click', function(){
-               		setActiveTag($(this).contents().first().text());
-		 			updateGallery(undefined, undefined, 0);
-					return false;
-			   });
-               
-                $("#removeTagFilter").live('click', function(){
-                	var oldActiveTag = $("li.tagit-choice.active");
-		 			if(oldActiveTag){
-		 				oldActiveTag.removeClass('active');
-		 			}
-		 			var oldActiveTag = $("#tc_tagcloud a.active");
-		 			if(oldActiveTag){
-		 				oldActiveTag.removeClass('active');
-		 			}
-		 			updateGallery(undefined, undefined, 0);
-                	return false;
-                });
-                
-                $("#removeUserFilter").live('click', function(){
-                	updateGallery(undefined, undefined, 0, true);
-                	return false;
-                });
-               
-               var tmpTarget =  window.location.pathname + window.location.search;
-               setActiveTag($('<a href="'+ tmpTarget +'"></a>').url().param()["tag"]);
-               /*
-                $(".snippet.tablet").live('hover', function(e){
-                    if(e.type == 'mouseenter'){    
-                        $(".figure", this).slideUp("fast");   
-                        $(".all_content", this).hide();   
-                        $('.observation_info_wrapper', this).slideDown("fast"); 
-                    }
-                
-                    if(e.type == 'mouseleave'){    
-                        $(".figure", this).slideDown("fast");   
-                        $(".all_content", this).show();   
-                        $('.observation_info_wrapper', this).slideUp("fast"); 
-                    }
-
-
-                   });
-                 */  
-
-            });
-        </g:javascript>
-	<script>
 		function showMapView() {
 			$('#observations_list_map').slideToggle(function() {
 
 				if ($(this).is(':hidden')) {
 					$('div.observations > div.observations_list').show();
 					$('#map_view_bttn').css('background-color', 'transparent');
+					$('#map_results_list > div.observations_list').remove();
+					updateGallery(undefined, undefined, 0);
+					//alert(" hiding map view");
+					
 				} else {
 					$('div.observations > div.observations_list').hide();
+					$('div.observations > div.observations_list').html('');
+					//alert("showing map view");
 				}
 
 				google.maps.event.trigger(big_map, 'resize');
 				big_map.setCenter(nagpur_latlng);
 			});
 		}
-	</script>
+        </g:javascript>
 </body>
 </html>
