@@ -52,6 +52,13 @@
 		<%--				${observationInstance.getRecommendationCount()}--%>
 		<%--			</div>--%>
 		<%--		</div>--%>
+		
+		<div class="prop">
+			<span class="name"><i class="icon-time"></i>Observed on</span>
+			<obv:showDate
+				model="['observationInstance':observationInstance, 'propertyName':'observedOn']" />
+
+		</div>
 
 		<div class="prop">
 			<span class="name"><i class="icon-time"></i>Submitted</span>
