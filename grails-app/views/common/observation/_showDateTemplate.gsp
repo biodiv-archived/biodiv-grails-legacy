@@ -4,6 +4,8 @@
 		def serverDate
 		if(propertyName == "createdOn")
 			serverDate =  observationInstance.createdOn
+		else if(propertyName == "observedOn")
+			serverDate =  observationInstance.observedOn
 		else
 			serverDate =  observationInstance.lastRevised
 	 %>
