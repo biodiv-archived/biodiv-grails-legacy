@@ -761,8 +761,9 @@ grails.plugins.springsecurity.ui.encodePassword = false
 grails.plugins.springsecurity.useSecurityEventListener = true
 grails.plugins.springsecurity.onInteractiveAuthenticationSuccessEvent = { e, appCtx ->
 	Class<?> User = SUser.class
+	println "updating lastlogin date"
 	if (!User) {
-		log.error("Can't find domain: $domainClassName")
+		println "Can't find domain: $domainClassName"
 		return null
 	}
 	def user = null

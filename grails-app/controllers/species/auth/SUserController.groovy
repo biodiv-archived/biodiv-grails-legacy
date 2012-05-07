@@ -14,6 +14,8 @@ import org.codehaus.groovy.grails.plugins.springsecurity.NullSaltSource
 import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
 import org.springframework.dao.DataIntegrityViolationException
 
+import species.utils.Utils;
+
 
 class SUserController extends UserController {
 
@@ -174,7 +176,7 @@ class SUserController extends UserController {
 		for (name in [username: usernameFieldName]) {
 			if (params[name.key]) {
 				cond.append " AND LOWER(u.${name.value}) LIKE :${name.key}"
-				queryParams[name.key] = '%' + params[name.key].toLowerCase() + '%'
+				queryParams[name.key] = params[name.key].toLowerCase() + '%'
 			}
 		}
 
@@ -220,8 +222,13 @@ class SUserController extends UserController {
 			results = lookupUserClass().executeQuery(query, queryParams, [max: max, offset: offset])
 		}
 		
-		
-		def model = [results: results, totalCount: totalCount, searched: true]
+		def sorted = results;
+//		//sorts only current page results
+//		if(results && params['username']) {
+//			println params['username'].toLowerCase();
+//			sorted = results.sort( sorter.rcurry(params['username'].toLowerCase()))
+//		}
+		def model = [results: sorted, totalCount: totalCount, searched: true]
 
 		// add query params to model for paging
 		for (name in [
@@ -239,6 +246,21 @@ class SUserController extends UserController {
 		render view: 'search', model: model
 	}
 
+	// Define a closure that will do the sorting
+	def sorter = { SUser a, SUser b, String prefix ->
+	  // Get the index into order for a and b
+	  // if not found, set to being Integer.MAX_VALUE
+	  def (aidx,bidx) = [a,b].collect {
+		  it.name.toLowerCase().startsWith(prefix); 
+		  }.collect {
+	    it ? 1 : Integer.MAX_VALUE
+	  }
+	  
+	  // Compare the two indexes.
+	  // If they are the same, compare alphabetically
+	  aidx <=> bidx ?: a.name <=> b.name
+	}
+	
 	/**
 	 * Ajax call used by autocomplete textfield.
 	 */

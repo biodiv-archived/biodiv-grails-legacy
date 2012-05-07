@@ -11,6 +11,7 @@ import org.springframework.context.ApplicationEventPublisher
 import org.springframework.context.ApplicationEventPublisherAware
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.BadCredentialsException
+import org.springframework.security.authentication.event.InteractiveAuthenticationSuccessEvent;
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.UsernameNotFoundException
@@ -27,7 +28,8 @@ import com.the6hours.grails.springsecurity.facebook.FacebookAuthToken
  */
 class FacebookAuthCookieFilter extends GenericFilterBean implements ApplicationEventPublisherAware {
 
-    ApplicationEventPublisher applicationEventPublisher
+	
+    protected ApplicationEventPublisher eventPublisher
     FacebookAuthUtils facebookAuthUtils
     AuthenticationManager authenticationManager
     String logoutUrl = '/j_spring_security_logout'
@@ -55,7 +57,12 @@ class FacebookAuthCookieFilter extends GenericFilterBean implements ApplicationE
                         Authentication authentication = authenticationManager.authenticate(token);
                         // Store to SecurityContextHolder
                         SecurityContextHolder.context.authentication = authentication;
-
+						
+						// Fire event
+						if (this.eventPublisher != null) {
+							eventPublisher.publishEvent(new InteractiveAuthenticationSuccessEvent(authentication, this.getClass()));
+						}
+						
                         if (logger.isDebugEnabled()) {
                             logger.debug("SecurityContextHolder populated with FacebookAuthToken: '"
                                 + SecurityContextHolder.context.authentication + "'");
@@ -90,4 +97,7 @@ class FacebookAuthCookieFilter extends GenericFilterBean implements ApplicationE
         chain.doFilter(request, response)
     }
 
+	public void setApplicationEventPublisher(ApplicationEventPublisher eventPublisher) {
+		this.eventPublisher = eventPublisher;
+	}
 }
