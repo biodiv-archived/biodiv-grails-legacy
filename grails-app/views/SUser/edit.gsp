@@ -266,8 +266,6 @@
 		$(document).ready(function() {
 			$('#username').focus();
 
-			<s2ui:initCheckboxes/>
-
 			$("#runAsButton").button();
 			$('#runAsButton').bind('click', function() {
 				document.forms.runAsForm.submit();

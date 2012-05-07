@@ -36,7 +36,7 @@ class SUser {
 		password blank: false
 		email email: true, blank: false, unique: true, nullable:false
 		profilePic nullable:true
-		website nullable:true, url:true
+		website nullable:true
 		timezone nullable:true
 		aboutMe nullable:true
 		location nullable:true

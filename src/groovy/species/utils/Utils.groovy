@@ -129,5 +129,14 @@ class Utils {
 		}
 		return "";
 	}
+	
+	static boolean isURL(String str) {
+		try {
+			URL url = new URL(str);
+		  } catch (MalformedURLException e) {
+			return false;
+		  }
+		  return true;
+	}
 }
 

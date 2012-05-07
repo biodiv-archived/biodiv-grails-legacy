@@ -299,7 +299,7 @@ var ajaxLoginSuccessHandler = function(json, statusText, xhr, $form) {
 	
 	window.fbInitCalls = Array();
 	window.fbAsyncInit = function() {	
-		console.log('FB init called');	
+		
 		if (!window.facebookInitialized) { 
           	FB.init({
 	            appId  : "${fbAppId}",

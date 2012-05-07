@@ -1,5 +1,6 @@
 <%@page import="species.participation.Observation"%>
 <%@ page import="species.auth.SUser"%>
+<%@ page import="species.utils.Utils"%>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -111,10 +112,12 @@
 						<div class="prop">
 							<span class="name"><i class="icon-road"></i><g:message code="suser.website.label"
 									default="Website" /> </span> <div class="value"> 
-									<g:if test="${SUserInstance.website }"><a
+									<g:if test="${Utils.isURL(SUserInstance.website) }">
+									<a
 								target="blank"
 								href="${fieldValue(bean: SUserInstance, field: 'website')}">
-									${fieldValue(bean: SUserInstance, field: 'website')} </a> </g:if></div>
+									${fieldValue(bean: SUserInstance, field: 'website')} </a>
+									</g:if><g:else>${fieldValue(bean: SUserInstance, field: 'website')}</g:else></div>
 									
 						</div>
 						<div class="prop">

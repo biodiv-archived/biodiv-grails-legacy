@@ -275,11 +275,7 @@ class OpenIdController {
 				status.setRollbackOnly()
 			}
 			
-//			//user roles getting deleted...patch to add them again onmerge.
-//			def userRole = SUserRole.findBySUser(user);
-//			if(!userRole) {
-//				SUserService.assignRoles(user);
-//			}
+			SUserService.assignRoles(user);
 		}
 		
 	}

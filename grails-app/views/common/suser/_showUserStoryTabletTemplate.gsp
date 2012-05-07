@@ -1,4 +1,5 @@
 <%@page import="species.participation.Observation"%>
+<%@page import="species.utils.Utils"%>
 <div class="observation_story tablet">
 	<h5>
 		<a href=/biodiv/SUser/show/${userInstance.id}> ${userInstance.name}
@@ -19,9 +20,13 @@
 		<g:if test="${userInstance.website}">
 			<div>
 				<i class="icon-road"></i>
-				<a target="blank"
-					href="${fieldValue(bean: userInstance, field: 'website')}"> ${fieldValue(bean: userInstance, field: 'website')}
-				</a>
+				<g:if test="${Utils.isURL(userInstance.website) }">
+					<a target="blank"
+						href="${fieldValue(bean: userInstance, field: 'website')}"> ${fieldValue(bean: userInstance, field: 'website')}
+					</a>
+				</g:if><g:else>
+					${fieldValue(bean: userInstance, field: 'website')}
+				</g:else>
 			</div>
 		</g:if>
 
