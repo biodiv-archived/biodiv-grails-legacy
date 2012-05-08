@@ -112,10 +112,6 @@
 			</div>
 			
 			<g:if test="${showDetails}">
-<%--				<div class="footer-item"">--%>
-<%--					<obv:showFlags model="['observationInstance':observationInstance]" />--%>
-<%--	            </div>--%>
-<%--	            --%>
 	            <div class="footer-item"">
 	            	<obv:addFlag model="['observationInstance':observationInstance]" />
 	            </div>

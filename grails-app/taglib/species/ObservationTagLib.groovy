@@ -43,12 +43,6 @@ class ObservationTagLib {
 		}
 	}
 	
-	def showFlags= {attrs, body->
-		if(attrs.model.observationInstance) {
-			out << render(template:"/common/observation/showFlagsTemplate", model:attrs.model);
-		}
-	}
-	
 	def showStoryTablet = {attrs, body->
 		if(attrs.model.observationInstance) {
 			out << render(template:"/common/observation/showObservationStoryTabletTemplate", model:attrs.model);

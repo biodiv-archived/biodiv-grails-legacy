@@ -26,7 +26,7 @@ class ObservationFlag {
     
 	static constraints = {
 		author(unique:['observation'])
-		notes nullable:true
+		notes nullable:true, blank: true
 		flag nullable:false
 		notes (size:0..400)
     }

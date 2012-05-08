@@ -37,7 +37,7 @@
 		  	<div>
 	    	<g:each in="${observationInstance.fetchAllFlags()}">
 				<li style="padding: 0 5px; clear: both;">
-					${it.author.username} : ${it.flag.value()}
+					${it.author.username} : ${it.flag.value()} : ${it.notes}
 				</li>
 			</g:each>
 		</div>
