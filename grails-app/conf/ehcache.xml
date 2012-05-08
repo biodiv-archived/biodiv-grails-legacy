@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="ehcache.xsd" >
+<diskStore path="java.io.tmpdir"/>
+<cacheManagerEventListenerFactory class="" properties=""/>
+<defaultCache
+       eternal="false"
+       timeToLiveSeconds="120"
+       overflowToDisk="false"
+       diskPersistent="false"
+       />
+<cache name="org.hibernate.cache.UpdateTimestampsCache"
+      timeToIdleSeconds="300"
+       />
+<cache name="org.hibernate.cache.StandardQueryCache"
+      timeToIdleSeconds="300"
+      overflowToDisk="false"
+      diskPersistent="false"
+       />
+
+</ehcache>
