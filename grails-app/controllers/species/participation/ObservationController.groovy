@@ -620,7 +620,7 @@ class ObservationController {
 		if ( Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
 			mailService.sendMail {
 				to obv.author.email
-				bcc "prabha.prabhakar@gmail.com"
+				bcc "prabha.prabhakar@gmail.com, sravanthi@strandls.com"
 				from conf.ui.notification.emailFrom
 				subject mailSubject
 				html body.toString()

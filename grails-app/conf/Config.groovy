@@ -655,7 +655,9 @@ checkin.drupal = false;
 grails.plugins.springsecurity.openid.domainClass = 'species.auth.OpenID'
 grails.plugins.springsecurity.rememberMe.persistent = true
 grails.plugins.springsecurity.rememberMe.persistentToken.domainClassName = 'species.auth.PersistentLogin'
-
+grails.plugins.springsecurity.roleHierarchy = '''
+	ROLE_ADMIN > ROLE_USER
+'''
 
 grails.plugins.springsecurity.facebook.domain.classname='species.auth.FacebookUser'
  
@@ -761,7 +763,7 @@ grails.plugins.springsecurity.ui.encodePassword = false
 grails.plugins.springsecurity.useSecurityEventListener = true
 grails.plugins.springsecurity.onInteractiveAuthenticationSuccessEvent = { e, appCtx ->
 	Class<?> User = SUser.class
-	println "updating lastlogin date"
+	println "updating lastlogin date : "+appCtx.springSecurityService.principal.id
 	if (!User) {
 		println "Can't find domain: $domainClassName"
 		return null
@@ -771,7 +773,7 @@ grails.plugins.springsecurity.onInteractiveAuthenticationSuccessEvent = { e, app
 	User.withTransaction {
 		user = User.get(appCtx.springSecurityService.principal.id)
 		user.lastLoginDate = new Date()
-		user.save(failOnError: true)
+		user.save()
 	}
 }
 

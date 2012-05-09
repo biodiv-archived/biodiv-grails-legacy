@@ -109,22 +109,44 @@
 							</div>
 						</sUser:ifOwnsOrIsPublic>
 
+						<g:if test="${SUserInstance.location}">
+							<div class="prop">
+								<span class="name"><i class="icon-map-marker"></i><g:message code="suser.location.label"
+										default="Location" /> </span> <div class="value"> ${fieldValue(bean: SUserInstance, field: "location")}
+								</div>
+							</div>
+						</g:if>
+						
 						<div class="prop">
 							<span class="name"><i class="icon-road"></i><g:message code="suser.website.label"
-									default="Website" /> </span> <div class="value"> 
+									default="Website" /> </span> 
+								<div class="value"> 
 									<g:if test="${Utils.isURL(SUserInstance.website) }">
-									<a
-								target="blank"
-								href="${fieldValue(bean: SUserInstance, field: 'website')}">
-									${fieldValue(bean: SUserInstance, field: 'website')} </a>
-									</g:if><g:else>${fieldValue(bean: SUserInstance, field: 'website')}</g:else></div>
+										<a
+									target="blank"
+									href="${fieldValue(bean: SUserInstance, field: 'website')}">
+										${fieldValue(bean: SUserInstance, field: 'website')} </a>
+									</g:if>
+									<g:else>
+										${fieldValue(bean: SUserInstance, field: 'website')}
+									</g:else>							
+									<% def openId = SUserInstance.openIds.find { it.url.indexOf('facebook') != -1 }
+									def facebookUrl = openId?.url %>
+									<g:if test="${facebookUrl}">
+										 <div class="facebookButton" style="background-repeat:no-repeat; margin:0px;height:33px;"> 
+													<a class="fbJustConnect"
+												target="_blank" 
+												href="${facebookUrl}">Facebook Profile</a>
+										</div>
+									</g:if>
+									
+								</div>
+								
+								
 									
 						</div>
-						<div class="prop">
-							<span class="name"><i class="icon-map-marker"></i><g:message code="suser.location.label"
-									default="Location" /> </span> <div class="value"> ${fieldValue(bean: SUserInstance, field: "location")}
-							</div>
-						</div>
+						
+						
 
 					</div>
 				
