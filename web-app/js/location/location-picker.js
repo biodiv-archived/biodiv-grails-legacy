@@ -109,11 +109,11 @@ function update_geotagged_images_list() {
 }
 
 function update_geotagged_images_list(image) {
-    	$(image).exifLoad(function() {
+		$(image).exifLoad(function() {
     		var latlng = get_latlng_from_image(image); 
             if (latlng) {            	
             	var func = "set_location(" + latlng.lat+"," +latlng.lng+ "); $(this).addClass('active_location_picker_button')";
-                var html = '<div class="location_picker_button" style="display:inline-block; width:40px;" onclick="' + func + '"><div style="width:40px; height:40px;float:left;"><img style="width:100%; height:100%;" src="' + $(image).attr('src') + '"/></div><div style="float:left; padding:2px;font-size:"></div></div>';
+                var html = '<div id=' + $(image).attr("id") +' class="location_picker_button" style="display:inline-block; width:40px;" onclick="' + func + '"><div style="width:40px; height:40px;float:left;"><img style="width:100%; height:100%;" src="' + $(image).attr('src') + '"/></div><div style="float:left; padding:2px;font-size:"></div></div>';
                 $("#geotagged_images>.title").show();
                 $("#geotagged_images>.msg").show();
                 $("#geotagged_images").append(html);
@@ -300,6 +300,11 @@ $(document).ready(function() {
     */
     
     $('#geotagged_images').on('update_map', function() {
-    	$(this).children(":first").trigger("click");
+    	if($(this).children(".location_picker_button").length >0){
+    		$(this).children(":last").trigger("click");
+    	}else{
+    		$("#geotagged_images>.title").hide();
+            $("#geotagged_images>.msg").hide();
+    	}
     });
 });

@@ -358,7 +358,7 @@ display: table !important;
 												</div>
 											</div> <input id="license_${i}" type="hidden" name="license_${i}"></input>
 											<div class="close_button"
-												onclick="removeResource(event);$('#geotagged_images').trigger('update_map');"></div>
+												onclick="removeResource(event, ${i});$('#geotagged_images').trigger('update_map');"></div>
 
 										</li>
 										<g:set var="i" value="${i+1}" />
@@ -569,7 +569,7 @@ display: table !important;
 	<li class="addedResource thumbnail">
 	    <div class='figure' style='height: 200px; overflow:hidden;'>
                 <span> 
-                        <img style="width:100%; height: auto;" src='{{=thumbnail}}' class='geotagged_image' exif='true'/> 
+                        <img id='image_{{=i}}' style="width:100%; height: auto;" src='{{=thumbnail}}' class='geotagged_image' exif='true'/> 
                 </span>
 	    </div>
 				
@@ -598,7 +598,7 @@ display: table !important;
 	    <input id="license_{{=i}}" type="hidden" name="license_{{=i}}"></input>
             
             <!--a href="#" onclick="removeResource(event);$('#geotagged_images').trigger('update_map');">Remove</a-->
-            <div class="close_button" onclick="removeResource(event);$('#geotagged_images').trigger('update_map');"></div>
+            <div class="close_button" onclick="removeResource(event, {{=i}});$('#geotagged_images').trigger('update_map');"></div>
 	</li>
 	
 </script>
@@ -761,8 +761,9 @@ display: table !important;
 	});
 
 
-	function removeResource(event) {
+	function removeResource(event, imageId) {
 		$(event.target).parent('.addedResource').remove();
+		$("#image_"+imageId).remove();
 	}
 	
 	$( "#observedOn" ).datepicker({ dateFormat: 'dd/mm/yy' });
