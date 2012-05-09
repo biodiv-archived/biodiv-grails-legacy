@@ -551,6 +551,31 @@ class ObservationController {
 		redirect(action: "show", id: params.id)
 	}
 	
+	@Secured(['ROLE_USER'])
+	def deleteObvFlag = {
+		log.debug params;
+		params.author = springSecurityService.currentUser;
+		def obvFlag = ObservationFlag.get(params.id.toLong());
+		def obv = obvFlag.observation;
+		if (obv) {
+			try {
+				obvFlag.delete(flush: true);
+				obv.flagCount--;
+				obv.save(flush:true)
+				//sendNotificationMail(OBSERVATION_FLAGGED, obv, request)
+				flash.message = "${message(code: 'observation.flag.deleted', default: 'Observation flag deleted')}"
+			}
+			catch (Exception e) {
+				flash.message = "${message(code: 'observation.flag.error.onDelete', default: 'Observation flag error on delete')}"
+			}
+		}
+		else {
+			flash.message  = "${message(code: 'observation.flag.duplicate', default:'Flag alredy deleted or does not exist')}"
+			
+		}
+		render obv.flagCount;
+	}
+	
 	def snippet = {
 		def observationInstance = Observation.get(params.id)
 
