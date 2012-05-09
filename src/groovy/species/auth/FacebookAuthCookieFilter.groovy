@@ -50,6 +50,7 @@ class FacebookAuthCookieFilter extends GenericFilterBean implements ApplicationE
 			Cookie fbLoginCookie = facebookAuthUtils.getFBLoginCookie(request);
             if (cookie != null && fbLoginCookie != null) {
 				logger.debug("Found fb cookie");
+				
                 try {
                     FacebookAuthToken token = facebookAuthUtils.build(request, cookie.value)
                     if (token != null) {
@@ -58,8 +59,8 @@ class FacebookAuthCookieFilter extends GenericFilterBean implements ApplicationE
                         // Store to SecurityContextHolder
                         SecurityContextHolder.context.authentication = authentication;
 						
-						// Fire event
-						if (this.eventPublisher != null) {
+						// Fire event only if its the authSuccess url
+						if (this.eventPublisher != null && url == '/login/authSuccess') {
 							eventPublisher.publishEvent(new InteractiveAuthenticationSuccessEvent(authentication, this.getClass()));
 						}
 						

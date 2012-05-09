@@ -100,7 +100,7 @@ class SUserTagLib {
 		}
 	}
 
-        def userLoginBox = { attrs, body->
+    def userLoginBox = { attrs, body->
 			out << render(template:"/common/suser/userLoginBoxTemplate", model:attrs.model);
 	}
 	
