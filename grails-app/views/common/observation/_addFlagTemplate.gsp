@@ -37,7 +37,7 @@
 		  	<div>
 	    	<g:each in="${observationInstance.fetchAllFlags()}">
 				<li style="padding: 0 5px; clear: both;">
-					${it.author.username} : ${it.flag.value()} : ${it.notes}
+					${it.author.username} : ${it.flag.value()} ${it.notes ? ": " + it.notes : ""}
 				</li>
 			</g:each>
 		</div>
@@ -74,7 +74,7 @@ $('#flag-close').click(function(){
     left: 0;
     list-style: none outside none;
     margin: 0;
-    min-width: 160px;
+    min-width: 400px;
     padding: 10px;
     position: absolute;
     top: 100%;

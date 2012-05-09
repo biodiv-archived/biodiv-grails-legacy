@@ -45,20 +45,21 @@
 						model="['observationInstance':observationInstance]" />
 					<div id="speciesNameFilter" class="btn-group"
 						style="float: right; margin-right: 5px; z-index: 10; position: absolute; margin-top: -65px; right: 0;">
-						<!-- input type="radio" name="speciesNameFilter"
-												id="speciesNameFilter1" value="All" style="display: none" />
-											<label for="speciesNameFilter1" value="All">All</label> <input
-												type="radio" name="speciesNameFilter"
-												id="speciesNameFilter2" value="Unknown"
-												style="display: none" /> <label for="speciesNameFilter2"
-												value="Unknown">Show Unidentified Only</label-->
-
 						<input type="text" id="speciesNameFilter"
 							value="${params.speciesName}" style="display: none" />
 						<button id="speciesNameAllButton" class="btn" rel="tooltip"
 							data-original-title="Show all observations">All</button>
 						<button id="speciesNameFilterButton" class="btn" rel="tooltip"
 							data-original-title="Show only unidentified observations">Unidentified</button>
+					</div>
+					<div id="observationFlagFilter" class="btn-group"
+						style="float: right; margin-right: 5px; z-index: 10; position: absolute; margin-top: -30px; right: 0;">
+							<input type="text" id="observationFlagFilter"
+							value="${params.isFlagged}" style="display: none" />
+						<button id="observationWithNoFlagFilterButton" class="btn" rel="tooltip"
+							data-original-title="Show all observations">All</button>
+						<button id="observationFlaggedButton" class="btn" rel="tooltip"
+							data-original-title="Show only flagged observations">Flagged</button>
 					</div>
 				</div>
 				<div class="tags_section span3" style="float: right;">
@@ -141,16 +142,47 @@
             	
             $('#speciesNameFilter').button();
             if(${params.speciesName == 'Unknown' }){
-				$("#speciesNameFilterButton").addClass('active')
-				$("#speciesNameAllButton").removeClass('active')
+				$("#speciesNameFilterButton").addClass('active');
+				$("#speciesNameAllButton").removeClass('active');
 			}else{
-				$("#speciesNameFilterButton").removeClass('active')
-				$("#speciesNameAllButton").addClass('active')
+				$("#speciesNameFilterButton").removeClass('active');
+				$("#speciesNameAllButton").addClass('active');
             }
-        	
+        	$('#observationFlagFilter').button();
+            if(${params.isFlagged == 'true' }){
+				$("#observationFlaggedButton").addClass('active');
+				$("#observationWithNoFlagFilterButton").removeClass('active')
+			}else{
+				$("#observationFlaggedButton").removeClass('active');
+				$("#observationWithNoFlagFilterButton").addClass('active')
+			}
    
            
-           $("#speciesNameAllButton").click(function() {
+           $("#observationFlaggedButton").click(function() {
+           		if($("#observationFlaggedButton").hasClass('active')){
+           			return false;
+           		}
+				$("#observationFlagFilter").val('true')
+				$("#observationWithNoFlagFilterButton").removeClass('active')
+				$("#observationFlaggedButton").addClass('active')
+				
+				updateGallery(undefined, ${queryParams.max}, 0);
+                return false;
+			});
+			
+			$("#observationWithNoFlagFilterButton").click(function() {
+           		if($("#observationWithNoFlagFilterButton").hasClass('active')){
+           			return false;
+           		}
+				$("#observationFlagFilter").val('false')
+				$("#observationFlaggedButton").removeClass('active')
+				$("#observationWithNoFlagFilterButton").addClass('active')
+				
+				updateGallery(undefined, ${queryParams.max}, 0);
+                return false;
+			});
+			
+			$("#speciesNameAllButton").click(function() {
            		if($("#speciesNameAllButton").hasClass('active')){
            			return false;
            		}
@@ -212,12 +244,12 @@
 				$("#sortFilter").show();
 			});
 			
-
-                $('#speciesNameFilter input').change(function(){
-                    updateGallery(undefined, ${queryParams.max}, 0);
-                    return false;
-                });
-        
+<%--                $('#speciesNameFilter input').change(function(){--%>
+<%--                	alert(" should not called");--%>
+<%--                    updateGallery(undefined, ${queryParams.max}, 0);--%>
+<%--                    return false;--%>
+<%--                });--%>
+<%--        --%>
                 
                 $(".paginateButtons a").click(function() {
                     updateGallery($(this).attr('href'));
@@ -299,6 +331,15 @@
                 sortBy = sortBy.replace(/\s*\,\s*$/,'');
                 return sortBy;	
             } 
+            
+            function getSelectedFlag() {
+                var flag = ''; 
+				flag = $("#observationFlagFilter").attr('value');
+				if(flag) {
+                	flag = flag.replace(/\s*\,\s*$/,'');
+                	return flag;
+                }	
+            } 
                 
             function getSelectedSpeciesName() {
                 var sName = ''; 
@@ -332,7 +373,11 @@
                     if(sName) {
                             params['speciesName'] = sName;
                     }
-
+					
+					var flag = getSelectedFlag();
+                    if(flag) {
+                            params['isFlagged'] = flag;
+                    }
                     var grp = getSelectedGroup();
                     if(grp) {
                             params['sGroup'] = grp;

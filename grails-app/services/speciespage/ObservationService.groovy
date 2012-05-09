@@ -525,7 +525,7 @@ class ObservationService {
 			activeFilters["speciesName"] = params.speciesName
 		}
 		
-		if(params.isFlagged){
+		if(params.isFlagged && params.isFlagged.toBoolean()){
 			filterQuery += " and obv.flagCount > 0 "
 		}
 		if(params.bounds){
