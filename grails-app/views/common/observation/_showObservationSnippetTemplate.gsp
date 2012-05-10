@@ -2,7 +2,7 @@
 <div class="snippet span8">
 	<div class="row">
 		<g:set var="mainImage" value="${observationInstance.mainImage()}" />
-		<div class="figure span3"
+		<div class="figure span3" title='<g:if test="${obvTitle != null}">${obvTitle}</g:if>'
 			style="float: left;max-height: 220px; max-width: 200px">
 
 			<%def imagePath = mainImage?mainImage.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.thumbnail.suffix): null%>

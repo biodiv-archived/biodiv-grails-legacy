@@ -1,7 +1,7 @@
 
 <div class="snippet tablet">
 	<g:set var="mainImage" value="${observationInstance.mainImage()}" />
-	<div class="figure">
+	<div class="figure" title='<g:if test="${obvTitle != null}">${obvTitle}</g:if>'>
 
 		<%def imagePath = mainImage?mainImage.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.thumbnail.suffix): null%>
 

@@ -478,7 +478,7 @@ class ObservationController {
 		log.debug params;
 		def result = observationService.getRelatedObservations(params);
 		
-		def model = [observationInstanceList: result.relatedObv.observations.observation, observationInstanceTotal: result.relatedObv.count, queryParams: [max:result.max], activeFilters:new HashMap(params), parentObservation:Observation.read(params.long('id')), filterProperty:params.filterProperty, initialParams:new HashMap(params)]
+		def model = [observationInstanceList: result.relatedObv.observations.observation, obvTitleList:result.relatedObv.observations.title, observationInstanceTotal: result.relatedObv.count, queryParams: [max:result.max], activeFilters:new HashMap(params), parentObservation:Observation.read(params.long('id')), filterProperty:params.filterProperty, initialParams:new HashMap(params)]
 		render (view:'listRelated', model:model)
 	}
 	
