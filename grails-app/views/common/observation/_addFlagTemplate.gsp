@@ -40,15 +40,18 @@
 					<span id="flagHeadings" style="font-weight: bold">Who flagged and why:</span>
 				</g:if>
 				<div>
-					<g:each in="${observationInstance.fetchAllFlags()}">
+					<g:each var="flagInstance" in="${observationInstance.fetchAllFlags()}">
 						<li style="padding: 0 5px; clear: both;">
-<%--							<sUser:ifOwns model="['user':observationInstance.author]">--%>
-								<a href="#" onclick="removeFlag(${it.id}, $(this).parent()); return false;">[X]</a>
-<%--							</sUser:ifOwns>--%>
-							<span class="flagInstanceClass"> ${it.author.username} : ${it.flag.value()} ${it.notes ? ": " + it.notes : ""}</span>
+							<span class="flagInstanceClass"> ${flagInstance.author.username} : ${flagInstance.flag.value()} ${flagInstance.notes ? ": " + flagInstance.notes : ""}</span>
+							<sUser:ifOwns model="['user':flagInstance.author]">
+								<a href="#" onclick="removeFlag(${flagInstance.id}, ${flagInstance.observation.id}, $(this).parent()); return false;"><span class="deleteFlagIcon" data-original-title="Remove this flag" ><i class="icon-trash icon-red"></i></span></a>
+							</sUser:ifOwns>
+							
 						</li>
 					</g:each>
 				</div>
+			</div>
+			<div id="flagMessage">
 			</div>
 
 		</div>
@@ -56,6 +59,10 @@
 </div>
 
 <script>
+$(document).ready(function(){
+	$(".deleteFlagIcon").tooltip({"placement":"right"});
+});
+
 $('#flag-action').click(function(){
 	$('#flag-options').show();
 });
@@ -67,16 +74,19 @@ $('#flag-close').click(function(){
 	$('#flag-options').hide();
 });
 
-function removeFlag(flagId, flagComponent){ 
+function removeFlag(flagId, obvId, flagComponent){ 
 	$.ajax({
-		url: "${createLink(controller:'observation', action:'deleteObvFlag')}/" + flagId,
+		url: "${createLink(controller:'observation', action:'deleteObvFlag')}",
+		data:{"id":flagId, "obvId":obvId},
 		
 		success: function(data){
 			if(parseInt(data) == 0){
 				$("#flagHeadings").hide();
 				$("#flag-action>i").removeClass("icon-red");
 			}
+			$(".deleteFlagIcon").tooltip('hide');
 			flagComponent.remove();
+			$("#flagMessage").html('');
 		},
 		
 		statusCode: {
@@ -86,7 +96,7 @@ function removeFlag(flagId, flagComponent){
 		},
 		error: function(xhr, status, error) {
 			var msg = $.parseJSON(xhr.responseText);
-			//alert(msg);
+			$("#flagMessage").html(msg["error"]).show().removeClass().addClass('alert alert-error');
 		}
 	});
 }

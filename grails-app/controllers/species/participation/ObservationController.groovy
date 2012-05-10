@@ -554,26 +554,27 @@ class ObservationController {
 	@Secured(['ROLE_USER'])
 	def deleteObvFlag = {
 		log.debug params;
-		params.author = springSecurityService.currentUser;
 		def obvFlag = ObservationFlag.get(params.id.toLong());
-		def obv = obvFlag.observation;
-		if (obv) {
-			try {
-				obvFlag.delete(flush: true);
-				obv.flagCount--;
-				obv.save(flush:true)
-				//sendNotificationMail(OBSERVATION_FLAGGED, obv, request)
-				flash.message = "${message(code: 'observation.flag.deleted', default: 'Observation flag deleted')}"
-			}
-			catch (Exception e) {
-				flash.message = "${message(code: 'observation.flag.error.onDelete', default: 'Observation flag error on delete')}"
-			}
+		def obv = Observation.get(params.obvId.toLong());
+		
+		if(!obvFlag){
+			//response.setStatus(500);
+			//def message = [info: g.message(code: 'observation.flag.alreadytDeleted', default:'Flag already deleted')];
+			render obv.flagCount;
+			return
 		}
-		else {
-			flash.message  = "${message(code: 'observation.flag.duplicate', default:'Flag alredy deleted or does not exist')}"
-			
+		try {
+			obvFlag.delete(flush: true);
+			obv.flagCount--;
+			obv.save(flush:true)
+			render obv.flagCount;
+			return;
+		}catch (Exception e) {
+			e.printStackTrace();
+			response.setStatus(500);
+			def message = [error: g.message(code: 'observation.flag.error.onDelete', default:'Error on deleting observation flag')];
+			render message as JSON
 		}
-		render obv.flagCount;
 	}
 	
 	def snippet = {
