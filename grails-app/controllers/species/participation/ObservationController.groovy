@@ -542,7 +542,7 @@ class ObservationController {
 				flash.message = "${message(code: 'observation.flag.added', default: 'Observation flag added')}"
 			}
 			catch (org.springframework.dao.DataIntegrityViolationException e) {
-				flash.message = "${message(code: 'observation.flag.error', default: 'Observation flag error')}"
+				flash.message = "${message(code: 'observation.flag.error', default: 'Error during addition of flag')}"
 			}
 		}
 		else {
@@ -584,12 +584,10 @@ class ObservationController {
 	}
 
 	private sendNotificationMail(String notificationType, Observation obv, request){
-		//(commented / recommended a species name/ agreed on a species suggested)
-
-		if(!obv.author.sendNotification){
-			log.debug "Not sending any notification mail for user " + obv.author.id
-			return
-		}
+//		if(!obv.author.sendNotification){
+//			log.debug "Not sending any notification mail for user " + obv.author.id
+//			return
+//		}
 
 		def conf = SpringSecurityUtils.securityConfig
 		def obvUrl = generateLink("observation", "show", ["id": obv.id], request)
@@ -644,19 +642,31 @@ class ObservationController {
 		}
 
 		if ( Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
-			mailService.sendMail {
-				to obv.author.email
-				bcc "prabha.prabhakar@gmail.com, sravanthi@strandls.com"
-				from conf.ui.notification.emailFrom
-				subject mailSubject
-				html body.toString()
+			if(obv.author.sendNotification){
+				mailService.sendMail {
+					to obv.author.email
+					bcc "prabha.prabhakar@gmail.com, sravanthi@strandls.com"
+					from conf.ui.notification.emailFrom
+					subject mailSubject
+					html body.toString()
+				}
+			}else{
+				//sending mail only to website manager 
+				mailService.sendMail {
+					bcc "prabha.prabhakar@gmail.com, sravanthi@strandls.com"
+					from conf.ui.notification.emailFrom
+					subject mailSubject
+					html body.toString()
+				}
 			}
 		} else {
-			mailService.sendMail {
-				to obv.author.email
-				from conf.ui.notification.emailFrom
-				subject mailSubject
-				html body.toString()
+			if(obv.author.sendNotification){
+				mailService.sendMail {
+					to obv.author.email
+					from conf.ui.notification.emailFrom
+					subject mailSubject
+					html body.toString()
+				}
 			}
 		}
 	}
