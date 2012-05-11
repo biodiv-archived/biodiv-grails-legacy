@@ -81,8 +81,10 @@ class ObservationController {
 	@Secured(['ROLE_USER'])
 	def create = {
 		def observationInstance = new Observation()
-		observationInstance.properties = params
-		return [observationInstance: observationInstance, 'springSecurityService':springSecurityService]
+		observationInstance.properties = params;
+		def author = springSecurityService.currentUser;
+		def lastCreatedObv = Observation.find("from Observation as obv where obv.author=:author order by obv.createdOn desc ",[author:author]);
+		return [observationInstance: observationInstance,lastCreatedObv:lastCreatedObv, 'springSecurityService':springSecurityService]
 	}
 
 	@Secured(['ROLE_USER'])
@@ -111,12 +113,12 @@ class ObservationController {
 					chain(action: 'addRecommendationVote', model:['chainedParams':params]);
 				} else {
 					observationInstance.errors.allErrors.each { log.error it }
-					render(view: "create", model: [observationInstance: observationInstance])
+					render(view: "create", model: [observationInstance: observationInstance, lastCreatedObv:null])
 				}
 			} catch(e) {
 				e.printStackTrace();
 				flash.message = "${message(code: 'error')}";
-				render(view: "create", model: [observationInstance: observationInstance])
+				render(view: "create", model: [observationInstance: observationInstance, lastCreatedObv:null])
 			}
 		} else {
 			redirect(action: "create")
@@ -773,5 +775,4 @@ class ObservationController {
 		  render (['error':"Coudn't find the specified observation with id $params.obvId"] as JSON);
 	  }
   }
-  
 }
