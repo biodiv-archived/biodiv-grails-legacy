@@ -112,6 +112,7 @@ class Utils {
 			header = httpServletRequest.getHeader("Host");
 		}
 		header.replace("http://", "");
+		header.replace(":8080", "");
 		return header;
 	}
 
