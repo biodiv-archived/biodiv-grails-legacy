@@ -19,6 +19,7 @@ class Habitat {
 		DESERT("Desert"),
 		ROCKY_OUTCROPS("Rocky Outcrops"),
 		AGRICULTURE("Agriculture"),
+		URBAN("Urban"),
 		OTHERS("Others"),
 		
 		private String value;
@@ -33,12 +34,12 @@ class Habitat {
 		
 		static def toList() {
 			return [ALL, FOREST, THICKET, SAVANNA, GRASSLAND,   \
-				 SWAMP, AQUATIC, DESERT, ROCKY_OUTCROPS, AGRICULTURE,  \
+				 SWAMP, AQUATIC, DESERT, ROCKY_OUTCROPS, AGRICULTURE, URBAN, \
 				  OTHERS]
 		}
 		
 		private static def orderMap =  [(ALL):1, (FOREST):2, (THICKET):3, (SAVANNA):4, (GRASSLAND):5,   \
-			(SWAMP):6, (AQUATIC):7, (DESERT):9, (ROCKY_OUTCROPS):8, (AGRICULTURE):10, (OTHERS):11]; 
+			(SWAMP):6, (AQUATIC):7, (DESERT):9, (ROCKY_OUTCROPS):8, (AGRICULTURE):10, (URBAN):11, (OTHERS):12]; 
 		
 		
 		public String toString() {

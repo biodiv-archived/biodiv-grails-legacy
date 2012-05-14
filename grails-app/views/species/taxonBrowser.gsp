@@ -19,7 +19,24 @@
 
 </head>
 <body>
-	<div class="container_12">
+	<div class="container_12 big_wrapper outer_wrapper">
+		<div class="page-header clearfix">
+			<div class="span8">
+				<h1>
+					<g:message code="default.taxonBrowser.heading" default="Taxonomy Browser" />
+				</h1>
+			</div>
+			<div style="float: right;">
+				<g:searchBox />
+			</div>
+		</div>
+
+		<g:if test="${flash.message}">
+			<div class="message">
+				${flash.message}
+			</div>
+		</g:if>
+
 
 		<div class="grid_12">
 			<t:showTaxonBrowser model="['expandAll':false]"/>

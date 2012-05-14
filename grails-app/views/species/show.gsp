@@ -301,10 +301,19 @@ $(document).ready(function(){
 </head>
 
 <body>
+<div class="container_16 big_wrapper outer_wrapper">
+				<div class="page-header clearfix">
+					<div class="grid_11">
+						<h1>
+					${speciesInstance.taxonConcept.italicisedForm }
+						</h1>
+										<h4><%=CommonNames.findByTaxonConceptAndLanguage(speciesInstance.taxonConcept, Language.findByThreeLetterCode('eng'))?.name%></h4>
+					</div>
+					<div style="float:right;">
+						<g:searchBox />
+					</div>
+				</div>
 
-	
-
-		<div class="container_16 big_wrapper">
 			<g:if test="${flash.message}">
 				<div
 					class="ui-state-highlight ui-corner-all grid_16">
@@ -321,14 +330,6 @@ $(document).ready(function(){
 					
 				</div>
 			</g:if>
-			<div class="grid_16">
-
-				<h2 style="padding: 5px; color: black; text-shadow: 1px 1px 2px #c6c6c6;">
-					${speciesInstance.taxonConcept.italicisedForm }
-				</h2>
-
-				<h4><%=CommonNames.findByTaxonConceptAndLanguage(speciesInstance.taxonConcept, Language.findByThreeLetterCode('eng'))?.name%></h4>
-			</div>
 
 			<!-- media gallery -->
 			<div class="grid_10">

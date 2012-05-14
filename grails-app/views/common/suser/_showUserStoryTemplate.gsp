@@ -52,6 +52,11 @@
 			<i class="icon-tags"></i>
 			<obv:showNoOfTagsOfUser model="['userId':userInstance.id]" />
 		</div>
+		
+		<div class="footer-item" title="No of Identifications">
+					<i class="icon-check"></i>
+					<obv:showNoOfRecommendationsOfUser model="['user':userInstance]" />
+		</div>
 	</div>
 
 </div>

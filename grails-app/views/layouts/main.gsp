@@ -51,7 +51,7 @@
 
 <link rel="stylesheet" type="text/css" media="all"
 	href="${resource(dir:'css',file:'960.css')}" />
-<g:if test="${params.controller == 'species'}">
+<g:if test="${params.controller == 'species' || params.controller == 'search'}">
 	<link rel="stylesheet" href="${resource(dir:'css',file:'main.css')}" />
 </g:if>
 
@@ -218,10 +218,6 @@ var ajaxLoginSuccessHandler = function(json, statusText, xhr, $form) {
 				<g:if test="${params.controller == 'observation'}">
 					<sNav:render group="observation_dashboard" subitems="false" />
 				</g:if>
-
-				<div style="float: right;">
-					<g:searchBox />
-				</div>
 
 			</div>
 

@@ -24,37 +24,45 @@ $(document).ready(function(){
 </g:javascript>
 </head>
 <body>
-	<div class="container outer-wrapper">
-
-		<div class="searchResults">
-			<g:if test="${flash.message}">
-				<div class="message">
-					${flash.message}
-				</div>
-			</g:if>
-
-
-
-
-			<g:set var="start"
-				value="${Integer.parseInt(responseHeader.params.start) }" />
-			<g:set var="rows"
-				value="${Integer.parseInt(responseHeader.params.rows) }" />
-
-			<div class="page-header" style="overflow: auto;">
-				<div class="span8">
-					<h1>Search Results</h1>
-				</div>
-				<div style="float: right; color: #999; text-decoration: underline;">
-					Showing
-					${start+1}-${Math.min(start+rows, total)}
-					of
-					${total}
-					results
-
-				</div>
+	<div class="container big_wrapper outer_wrapper">
+		<div class="page-header clearfix">
+			<div class="span11">
+				<h1>
+					<g:message code="default.search.heading" default="Search Results" />
+				</h1>
 			</div>
+			<div style="float: right;">
+				<g:searchBox />
+			</div>
+		</div>
 
+		<g:if test="${flash.message}">
+			<div class="message">
+				${flash.message}
+			</div>
+		</g:if>
+		
+		<g:if test="${total>0 }">
+			<div class="span12 clearfix" style="float: right;clear:both;">
+				<g:set var="start"
+					value="${Integer.parseInt(responseHeader?.params?.start?:'0') }" />
+				<g:set var="rows"
+					value="${Integer.parseInt(responseHeader?.params?.rows?:'0') }" />
+	
+					<div style="float: right; color: #999; text-decoration: underline;">
+						Showing
+						${start+1}-${Math.min(start+rows, total)}
+						of
+						${total}
+						results
+	
+					</div>
+			</div>
+		</g:if>
+
+		<div class="searchResults" style="clear:both;">
+
+		
 			<g:if test="${speciesInstanceList}">
 				<ul class="thumbwrap">
 					<g:each in="${speciesInstanceList}" status="i"

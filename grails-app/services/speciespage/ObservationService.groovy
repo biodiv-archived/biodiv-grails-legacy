@@ -572,4 +572,9 @@ class ObservationService {
 	long getAllObservationsOfUser(SUser user) {
 		return (long)Observation.countByAuthorAndIsDeleted(user, false);
 	}
+	
+	long getAllRecommendationsOfUser(SUser user) {
+		def result = RecommendationVote.executeQuery("select count(recoVote) from RecommendationVote recoVote where recoVote.author.id = :userId and recoVote.observation.isDeleted = :isDeleted", [userId:user.id, isDeleted:false]);
+		return (long)result[0];
+	}
 }

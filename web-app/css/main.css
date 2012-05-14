@@ -1,8 +1,3 @@
-html * {
-	margin: 0;
-	/*padding: 0; SELECT NOT DISPLAYED CORRECTLY IN FIREFOX */
-}
-
 /* GENERAL */
 .spinner {
 	padding: 5px;
@@ -695,7 +690,7 @@ img {
 }
 
 .searchResults .thumbwrap {
-	float: left;
+/* 	float: left; */
 }
 
 .facets { /*border-right:1px solid #999999;*/
@@ -1075,13 +1070,6 @@ td input.text:focus {
 
 .dialog table .prop td {
 	border: 0;
-}
-
-#advSearchForm {
-	background-color: #FCFCFC;
-	border-radius: 5px 5px 5px 5px;
-	padding: 10px;
-	border: 1px solid #E5E5E5;
 }
 
 .ui-icon-control {

@@ -88,7 +88,24 @@ $(document).ready(function(){
 </g:javascript>
 </head>
 <body>
-	<div class="container_16 big_wrapper">
+		<div class="container_16 big_wrapper outer_wrapper">
+				<div class="page-header clearfix">
+					<div class="grid_11">
+						<h1>
+							<g:message code="default.species.heading" default="Species" />
+						</h1>
+					</div>
+					<div style="float:right;">
+						<g:searchBox />
+					</div>
+				</div>
+
+				<g:if test="${flash.message}">
+					<div class="message">
+						${flash.message}
+					</div>
+				</g:if>
+
 
 		<div class="paginateButtons grid_16">
 			<center>
