@@ -405,7 +405,8 @@ display: table !important;
 
 							<div class="row control-group">
 								<%
-	                            	def defaultPlaceName = (observationInstance) ? observationInstance.placeName : ""
+									def obvInfoFeeder = lastCreatedObv ? lastCreatedObv : observationInstance
+	                            	def defaultPlaceName = (obvInfoFeeder) ? obvInfoFeeder.placeName : ""
 	                            %>
 	                            <label for="place_name" class="control-label"> <i class="icon-map-marker"></i><g:message
 									code="observation.location.label"
@@ -420,7 +421,7 @@ display: table !important;
 
 							<div class="row control-group">
 								<%
-	                              	def defaultAccuracy = (observationInstance?.locationAccuracy) ? observationInstance.locationAccuracy : "Approximate"
+	                              	def defaultAccuracy = (obvInfoFeeder?.locationAccuracy) ? obvInfoFeeder.locationAccuracy : "Approximate"
 	                                def isAccurateChecked = (defaultAccuracy == "Accurate")? "checked" : ""
 	                                def isApproxChecked = (defaultAccuracy == "Approximate")? "checked" : ""
 	                            %>
@@ -450,31 +451,28 @@ display: table !important;
 	                        	<label for="location_accuracy" class="control-label" style="padding:0px"><g:message
 									code="observation.geocode.label"
 									default="Geocode name" /> </label>
-								
-	                            <div class="controls">                
+								<div class="controls">                
 	                                <div class="location_picker_value" id="reverse_geocoded_name"></div>
 	                                <input id="reverse_geocoded_name_field" type="hidden"
-	                                        name="reverse_geocoded_name" value="${observationInstance?.reverseGeocodedName}" > </input>
+	                                        name="reverse_geocoded_name" > </input>
 	                            </div>
 	                        </div>
 	                        <div class="row control-group">
 	                        	<label for="location_accuracy" class="control-label" style="padding:0px"><g:message
 									code="observation.latitude.label"
 									default="Latitude" /> </label>
-	                            
 	                            <div class="controls">             
 	                                <div class="location_picker_value" id="latitude"></div>
-	                                <input id="latitude_field" type="hidden" name="latitude" value="${observationInstance?.latitude}" ></input>
+	                                <input id="latitude_field" type="hidden" name="latitude"></input>
 	                            </div>
 	                        </div>
 	                        <div class="row control-group">
 	                      	  <label for="location_accuracy" class="control-label" style="padding:0px"><g:message
 									code="observation.longitude.label"
 									default="Longitude" /> </label>
-	                            
 	                            <div class="controls">               
 	                                <div class="location_picker_value" id="longitude"></div>
-	                                <input id="longitude_field" type="hidden" name="longitude" value="${observationInstance?.longitude}"></input>
+	                                <input id="longitude_field" type="hidden" name="longitude"></input>
 	                            </div>
 	                        </div>
 	                  
@@ -729,10 +727,9 @@ display: table !important;
        
         $("#name").watermark("Suggest a species name");
         $("#place_name").watermark("Set a title for this location");
-        
-        
-        if(${observationInstance?.latitude && observationInstance?.longitude}){
-        	set_location(${observationInstance?.latitude}, ${observationInstance?.longitude});
+       
+        if(${obvInfoFeeder?.latitude && obvInfoFeeder?.longitude}){
+        	set_location(${obvInfoFeeder?.latitude}, ${obvInfoFeeder?.longitude});
         }
        
         $("#help-identify input").click(function(){
