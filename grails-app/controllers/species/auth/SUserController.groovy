@@ -23,6 +23,10 @@ class SUserController extends UserController {
 
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
+        def isLoggedIn = {
+            render springSecurityService.isLoggedIn()
+        }
+
 	def index = {
 		redirect(action: "list", params: params)
 	}
