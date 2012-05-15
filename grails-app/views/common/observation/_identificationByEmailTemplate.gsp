@@ -2,7 +2,7 @@
 	<div class="btn-group">
 		<a id="identification-email" class="btn btn-mini"
 			data-toggle="dropdown" href="#"><i class="icon-envelope"></i>Email</a>
-		<form id="email-form" style="display: none"
+		<form id="email-form" name="email-form" style="display: none"
 			action="${createLink(controller:'observation', action:'sendIdentificationMail', id:observationInstance.id)}"
 			method="post">
 			To : <input id="userAndEmailList"
@@ -21,6 +21,7 @@
 						Please identify species name for observation ${observationInstance.id}
 					</ckeditor:editor>
 				</div>
+<%--			<input type="text" name="mailBody" id="mailBody" />--%>
 			<input type="hidden" name="userIds" id="userIds" />
 			<input type="hidden" name="emailIds" id="emailIds" /> 
 			<input class="btn btn-mini" type="submit" value="send"> </input>
@@ -35,6 +36,8 @@
 	$(function() {	
 		$('#identification-email').click(function(){
 			$('#email-form').show();
+			$('#userIds').val('');
+			$('#emailIds').val('');
 		});
 		$('#email-form').submit(function(){
 			$('#email-form').hide();
@@ -44,8 +47,6 @@
 			$('#email-form').hide();
 		});
 		
-	var userIds = [];
-	var emailIds = [];
 	function isEmail(email) {
 		var regex = /^([a-zA-Z0-9_\.\-\+])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
 		return regex.test(email);
@@ -67,8 +68,12 @@
 				//storing email after validation
 				var lastEntry = extractLast(this.value);
 				if(isEmail(lastEntry)){
-					emailIds.push(extractLast(this.value));
-					$("#emailIds").val(emailIds.join(","));
+					var oldValue = $("#emailIds").val();
+					if(oldValue === ""){
+						$("#emailIds").val(lastEntry);
+					}else{
+						$("#emailIds").val(oldValue + "," + lastEntry);
+					}
 				}
 				//event.preventDefault();
 			}
@@ -102,12 +107,36 @@
 
 				//adding user ids from suggestion	
 				var userId = ui.item.userId 
-				userIds.push(userId);
-				$("#userIds").val(userIds.join(","));
-
+				var oldValue = $("#userIds").val();
+				if(oldValue === ""){
+					$("#userIds").val(userId);
+				}else{
+					$("#userIds").val(oldValue + "," + userId);
+				}
 				return false;
 			}	
 		});
+
+	$('#email-form').bind('submit', function(event) {
+ 		$(this).ajaxSubmit({ 
+         	url:"${createLink(controller:'observation', action:'sendIdentificationMail', id:observationInstance.id)}",
+			dataType: 'json', 
+			type: 'POST',
+			success: function(data, statusText, xhr, form) {
+				showRecoUpdateStatus('Email sent to respective person', 'success');
+            	return false;
+            },
+            error:function (xhr, ajaxOptions, thrownError){
+            	//successHandler is used when ajax login succedes
+            	//var successHandler = this.success, errorHandler = showRecoUpdateStatus;
+            	//handleError(xhr, ajaxOptions, thrownError, successHandler, errorHandler);
+            	showRecoUpdateStatus('Error while sending email', 'error');
+            	return false;
+			} 
+     	});
+     	event.preventDefault();
+ 	});
+ 	
 	});
 </script>
 <style>

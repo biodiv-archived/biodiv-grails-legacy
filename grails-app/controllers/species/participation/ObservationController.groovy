@@ -800,6 +800,6 @@ class ObservationController {
 			//		  html body.toString()
 			//	  }
 		}
-		redirect(action: "show", id: params.id)
+		render (['success:true'] as JSON);
 	}
 }
