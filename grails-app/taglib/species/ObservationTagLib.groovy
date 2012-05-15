@@ -174,5 +174,10 @@ class ObservationTagLib {
 		def noOfObvs = observationService.getAllRecommendationsOfUser(attrs.model.user);
 		out << noOfObvs
 	}
+	
+	def identificationByEmail = {attrs, body->
+		out << render(template:"/common/observation/identificationByEmailTemplate",model:attrs.model);
+	}
+	
 }
 

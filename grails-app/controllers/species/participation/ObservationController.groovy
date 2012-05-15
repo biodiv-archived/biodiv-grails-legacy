@@ -20,7 +20,8 @@ import species.sourcehandler.XMLConverter
 import species.utils.ImageUtils
 import species.utils.Utils;
 import species.groups.SpeciesGroup;
-import species.Habitat
+import species.Habitat;
+import species.auth.SUser;
 
 class ObservationController {
 
@@ -775,4 +776,30 @@ class ObservationController {
 		  render (['error':"Coudn't find the specified observation with id $params.obvId"] as JSON);
 	  }
   }
+  
+  @Secured(['ROLE_USER'])
+	def sendIdentificationMail = {
+		log.debug params;
+		def currentUserMailId = springSecurityService.currentUser?.email;
+		def userEmailList = [];
+		params.userIds?.split(",").each{ userEmailList << SUser.get(it.toLong()).email }
+		params.emailIds?.split(",").each{userEmailList << it.trim()}
+
+		if(userEmailList.isEmpty()){
+			log.debug "No valid email specified for identification."
+		}else{
+			String toMailList = userEmailList.join(", ");
+			String mailSubject = params.mailSubject ? params.mailSubject : "Please identify species name"
+			String body = params.mailBody ? params.mailBody : "Please identify species name"
+			log.debug "mail list $toMailList"
+			//	  mailService.sendMail {
+			//		  to toMailList
+			//		  bcc "tel2sandeep@gmail.com"
+			//		  from currentUserMailId
+			//		  subject mailSubject
+			//		  html body.toString()
+			//	  }
+		}
+		redirect(action: "show", id: params.id)
+	}
 }

@@ -276,11 +276,11 @@ class SUserController extends UserController {
 		if (params.term?.length() > 2) {
 			String username = params.term
 			String usernameFieldName = 'name';//SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
-
+			String userId = 'id';
 			setIfMissing 'max', 10, 100
 
 			def results = lookupUserClass().executeQuery(
-					"SELECT DISTINCT u.$usernameFieldName " +
+					"SELECT DISTINCT u.$usernameFieldName, u.$userId " +
 					"FROM ${lookupUserClassName()} u " +
 					"WHERE LOWER(u.$usernameFieldName) LIKE :name " +
 					"ORDER BY u.$usernameFieldName",
@@ -288,7 +288,7 @@ class SUserController extends UserController {
 					[max: params.max])
 
 			for (result in results) {
-				jsonData << [value: result]
+				jsonData << [value: result[0], userId:result[1] ]
 			}
 		}
 
