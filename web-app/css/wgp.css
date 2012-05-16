@@ -1155,3 +1155,11 @@ right: 20px;
 display: inline;
 cursor: pointer;         
 }
+.keyname {
+	float: left;
+    font-size: 0.9em;
+    font-weight: bold;
+    margin-right: 10px;
+    text-align: right;
+    width: 10%;
+}

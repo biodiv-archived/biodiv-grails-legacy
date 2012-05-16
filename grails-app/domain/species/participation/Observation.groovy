@@ -249,4 +249,11 @@ class Observation implements Taggable{
 		return ObservationFlag.findAllWhere(observation:this);
 	}
 	
+	def updateObservationTimeStamp(){
+		lastRevised = new Date();
+		if(!save(flush:true)){
+			this.errors.allErrors.each { log.error it }
+		}
+	}
+	
 }

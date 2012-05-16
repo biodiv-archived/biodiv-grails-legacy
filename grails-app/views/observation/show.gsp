@@ -16,8 +16,8 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 <meta property="og:image" content="${createLinkTo(file: fbImagePath, base:grailsApplication.config.speciesPortal.observations.serverURL)}" />
 <meta property="og:site_name" content="${Utils.getDomainName(request)}" />
 <g:set var="description" value="" />
+<g:set var="domain" value="${Utils.getDomain(request)}" />
 <%
-		String domain = Utils.getDomain(request);
 		String fbAppId;
 		if(domain.equals(grailsApplication.config.wgp.domain)) {
 			fbAppId = grailsApplication.config.speciesPortal.wgp.facebook.appId;
@@ -181,9 +181,13 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 									value="Add" class="btn" style="position: relative;top: -28px;float: right;" />
 								
 							</form>
+						
 						</div>
+						
 					</div>
-
+			    	
+			    	<obv:identificationByEmail model="['observationInstance':observationInstance, 'domain':Utils.getDomainName(request)]" />
+	            	
 					<div class="comments-box sidebar_section" style="clear: both;">
 						<fb:comments href="${createLink(controller:'observation', action:'show', id:observationInstance.id, base:Utils.getDomainServerUrl(request))}"
 							num_posts="10" width="620" colorscheme="light"  notify="true"></fb:comments>

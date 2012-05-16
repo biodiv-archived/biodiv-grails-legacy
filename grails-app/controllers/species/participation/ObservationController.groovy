@@ -648,7 +648,7 @@ class ObservationController {
 			if(obv.author.sendNotification){
 				mailService.sendMail {
 					to obv.author.email
-					bcc "prabha.prabhakar@gmail.com, sravanthi@strandls.com"
+					bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com"
 					from conf.ui.notification.emailFrom
 					subject mailSubject
 					html body.toString()
@@ -656,7 +656,7 @@ class ObservationController {
 			}else{
 				//sending mail only to website manager 
 				mailService.sendMail {
-					bcc "prabha.prabhakar@gmail.com, sravanthi@strandls.com"
+					bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com"
 					from conf.ui.notification.emailFrom
 					subject mailSubject
 					html body.toString()
@@ -748,6 +748,7 @@ class ObservationController {
 	   }
 	   def observationInstance = Observation.read(params.long('obvId'));
 	   if(observationInstance) {
+		   observationInstance.updateObservationTimeStamp();
 		   sendNotificationMail(SPECIES_NEW_COMMENT, observationInstance, request);
 		   render (['success:true'] as JSON);
 	   } else {
@@ -769,6 +770,7 @@ class ObservationController {
 	  
 	  def observationInstance = Observation.read(params.long('obvId'));
 	  if(observationInstance) {
+		  observationInstance.updateObservationTimeStamp();
 		  sendNotificationMail(SPECIES_REMOVE_COMMENT, observationInstance, request);
 		  render (['success:true'] as JSON);
 	  } else {
@@ -781,25 +783,30 @@ class ObservationController {
 	def sendIdentificationMail = {
 		log.debug params;
 		def currentUserMailId = springSecurityService.currentUser?.email;
-		def userEmailList = [];
-		params.userIds?.split(",").each{ userEmailList << SUser.get(it.toLong()).email }
-		params.emailIds?.split(",").each{userEmailList << it.trim()}
+		Set userEmailList = new HashSet();
+		if(params.userIds && params.userIds != ""){
+			 params.userIds.split(",").each{ userEmailList << '"' + SUser.get(it.toLong()).email.trim() + '"' }
+		}
+		if(params.emailIds && params.emailIds != ""){
+			params.emailIds.split(",").each{'"' + userEmailList << it.trim() + '"'}
+		}
 
 		if(userEmailList.isEmpty()){
 			log.debug "No valid email specified for identification."
-		}else{
-			String toMailList = userEmailList.join(", ");
-			String mailSubject = params.mailSubject ? params.mailSubject : "Please identify species name"
-			String body = params.mailBody ? params.mailBody : "Please identify species name"
-			log.debug "mail list $toMailList"
-			//	  mailService.sendMail {
-			//		  to toMailList
-			//		  bcc "tel2sandeep@gmail.com"
-			//		  from currentUserMailId
-			//		  subject mailSubject
-			//		  html body.toString()
-			//	  }
+		}else if (Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
+			def mailSubject = params.mailSubject //? params.mailSubject : "Please identify species name"
+			def body = params.mailBody //? params.mailBody : "Please identify species name"
+			log.debug "mail list $userEmailList"
+				  mailService.sendMail {
+					  to userEmailList.toArray()
+					  bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com"
+					  from currentUserMailId
+					  subject mailSubject
+					  html body.toString()
+				  }
+			log.debug " mail sent for identification "
 		}
 		render (['success:true'] as JSON);
 	}
+	
 }
