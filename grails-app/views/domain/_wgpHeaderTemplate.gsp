@@ -7,13 +7,13 @@
       </div>
     <!-- Logo ends -->
 
-    <div id="top_nav_bar">
+    <div id="top_nav_bar" class="span7">
     <ul>
     <li onclick="location.href='/biodiv/species/list'" title="Species" id="species_nav_link">Species</li>
     <li onclick="location.href='/biodiv/observation/list'" title="Observations" id="species_nav_link">Observations</li>
     <li onclick="location.href='/map'" title="Maps" id="maps_nav_link">Maps</li>
     <li onclick="location.href='/browsechecklists'" title="Checklists" id="checklists_nav_link">Checklists</li>
-    <li onclick="location.href='/collaborate-wg'" title="Collaborate" id="collaborate_nav_link">Collaborate</li>
+    <!--li onclick="location.href='/collaborate-wg'" title="Collaborate" id="collaborate_nav_link">Collaborate</li-->
     <li onclick="location.href='/themepages/list'" title="Themes" id="themes_nav_link">Themes</li>
     <li onclick="location.href='/about/western-ghats'" title="About" id="about_nav_link">About</li>
     </ul>
