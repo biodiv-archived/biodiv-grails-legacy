@@ -37,7 +37,7 @@ class SpeciesService {
 	def namesLoaderService;
 	def sessionFactory;
 	def externalLinksService;
-	def searchService;
+	def speciesSearchService;
 
 	static int BATCH_SIZE = 10;
 	int noOfFields = Field.count();
@@ -167,7 +167,7 @@ class SpeciesService {
 		//log.debug "Publishing to search index"
 
 		try {
-			searchService.publishSearchIndex(species);
+			speciesSearchService.publishSearchIndex(species);
 		} catch(e) {
 			e.printStackTrace()
 		}

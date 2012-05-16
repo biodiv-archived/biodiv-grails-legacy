@@ -22,12 +22,6 @@ import speciespage.FacebookAuthService;
 
 // Place your Spring DSL code here
 beans = {
-	//userDetailsService(species.auth.drupal.DrupalUserDetailsService);
-//	drupalAuthentiactionProvider(species.auth.drupal.DrupalAuthenticationProvider) {
-//		//userDetailsService = ref("userDetailsService");
-//		drupalAuthDao = ref('drupalAuthDao')
-//	}
-
 	def conf = SpringSecurityUtils.securityConfig;
 	
 //	authenticationSuccessHandler(species.auth.AjaxAwareAuthenticationSuccessHandler) {
@@ -39,34 +33,14 @@ beans = {
 //		useReferer = true // false
 //		redirectStrategy = ref('redirectStrategy')
 //	}
-//
-//	drupalAuthUtils(DrupalAuthUtils);
-//	drupalAuthCookieFilter(DrupalAuthCookieFilter) {
-//		authenticationManager = ref('authenticationManager')
-//		drupalAuthUtils = ref('drupalAuthUtils')
-//		sessionAuthenticationStrategy = ref('sessionAuthenticationStrategy')
-//		authenticationSuccessHandler = ref('authenticationSuccessHandler')
-//		authenticationFailureHandler = ref('authenticationFailureHandler')
-////		rememberMeServices = ref('rememberMeServices')
-////		authenticationDetailsSource = ref('authenticationDetailsSource')
-////		filterProcessesUrl = conf.apf.filterProcessesUrl // '/j_spring_security_check'
-////		usernameParameter = conf.apf.usernameParameter // j_username
-////		passwordParameter = conf.apf.passwordParameter // j_password
-//		continueChainBeforeSuccessfulAuthentication = SpringSecurityUtils.securityConfig.apf.continueChainBeforeSuccessfulAuthentication // false
-//		allowSessionCreation = SpringSecurityUtils.securityConfig.apf.allowSessionCreation // true
-////		postOnly = conf.apf.postOnly // true
-//		logoutUrl =  SpringSecurityUtils.securityConfig.logout.filterProcessesUrl
-//	}
-//	
-//	drupalAuthDao(species.auth.drupal.DrupalAuthDao)
-	
+
 	userDetailsService(OpenIdUserDetailsService) {
 		grailsApplication = ref('grailsApplication')
 	}
 
 	def configRoot = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 	def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.search
-	solrServer(org.apache.solr.client.solrj.impl.StreamingUpdateSolrServer,config.serverURL, config.queueSize, config.threadCount ) { 
+	speciesSolrServer(org.apache.solr.client.solrj.impl.StreamingUpdateSolrServer,config.serverURL+"/species", config.queueSize, config.threadCount ) { 
 		setSoTimeout(config.soTimeout);
 		setConnectionTimeout(config.connectionTimeout);
 		setDefaultMaxConnectionsPerHost(config.defaultMaxConnectionsPerHost);
@@ -75,13 +49,29 @@ beans = {
 		setAllowCompression(config.allowCompression);
 		setMaxRetries(config.maxRetries);
 		//setParser(new XMLResponseParser()); // binary parser is used by default
-		log.debug "Initialized search server to "+config.serverURL
+		log.debug "Initialized search server to "+config.serverURL+"/species"
 	}
 
-	searchService(speciespage.SearchService) { 
-		solrServer = ref('solrServer');		
+	speciesSearchService(speciespage.search.SpeciesSearchService) { 
+		solrServer = ref('speciesSolrServer');		
 	}
-	
+
+	observationsSolrServer(org.apache.solr.client.solrj.impl.StreamingUpdateSolrServer,config.serverURL+"/observations", config.queueSize, config.threadCount ) {
+		setSoTimeout(config.soTimeout);
+		setConnectionTimeout(config.connectionTimeout);
+		setDefaultMaxConnectionsPerHost(config.defaultMaxConnectionsPerHost);
+		setMaxTotalConnections(config.maxTotalConnections);
+		setFollowRedirects(config.followRedirects);
+		setAllowCompression(config.allowCompression);
+		setMaxRetries(config.maxRetries);
+		//setParser(new XMLResponseParser()); // binary parser is used by default
+		log.debug "Initialized search server to "+config.serverURL+"/observations"
+	}
+
+	observationsSearchService(speciespage.search.ObservationsSearchService) {
+		solrServer = ref('observationsSolrServer');
+	}
+
 	
 	facebookAuthUtils(FacebookAuthUtils) {
 		grailsApplication = ref('grailsApplication')

@@ -17,7 +17,8 @@ class AdminController {
 	def setupService;
 	def speciesService;
 	def taxonService;
-	def searchService;
+	def speciesSearchService;
+	def observationsSearchService;
 	def namesLoaderService;
 	def namesIndexerService;
 	def groupHandlerService;
@@ -81,10 +82,21 @@ class AdminController {
 		redirect(action: "index")
 	}
 
-	def reloadSearchIndex = {
+	def reloadSpeciesSearchIndex = {
 		try {
-			searchService.publishSearchIndex();
-			flash.message = "Successfully created search index"
+			speciesSearchService.publishSearchIndex();
+			flash.message = "Successfully created species search index"
+		} catch(e) {
+			e.printStackTrace();
+			flash.message = e.getMessage()
+		}
+		redirect(action: "index")
+	}
+
+	def reloadObservationSearchIndex = {
+		try {
+			observationsSearchService.publishSearchIndex();
+			flash.message = "Successfully created observations search index"
 		} catch(e) {
 			e.printStackTrace();
 			flash.message = e.getMessage()

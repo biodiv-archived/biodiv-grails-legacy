@@ -16,7 +16,7 @@ import species.utils.Utils;
 class SearchController {
 
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
-	def searchService;
+	def speciesSearchService;
 	def namesIndexerService;
 	/**
 	 * Default action : select
@@ -55,7 +55,7 @@ class SearchController {
 
 			log.debug "Along with faceting params : "+paramsList;
 			try {
-				def queryResponse = searchService.search(paramsList);
+				def queryResponse = speciesSearchService.search(paramsList);
 				List<Species> speciesInstanceList = new ArrayList<Species>();
 				Iterator iter = queryResponse.getResults().listIterator();
 				while(iter.hasNext()) {
@@ -108,7 +108,7 @@ class SearchController {
 		def namesLookupResults = namesIndexerService.suggest(params)
 		result.addAll(namesLookupResults);
 
-		def queryResponse = searchService.terms(params);
+		def queryResponse = speciesSearchService.terms(params);
 		NamedList tags = (NamedList) ((NamedList)queryResponse.getResponse().terms)[params.field];
 
 		for (Iterator iterator = tags.iterator(); iterator.hasNext();) {
@@ -131,7 +131,7 @@ class SearchController {
 			result.addAll(namesLookupResults);
 		} else {
 
-			def queryResponse = searchService.terms(params);
+			def queryResponse = speciesSearchService.terms(params);
 			NamedList tags = (NamedList) ((NamedList)queryResponse.getResponse().terms)[params.field];
 
 			for (Iterator iterator = tags.iterator(); iterator.hasNext();) {

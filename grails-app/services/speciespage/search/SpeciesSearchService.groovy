@@ -1,4 +1,4 @@
-package speciespage
+package speciespage.search
 
 import static groovyx.net.http.ContentType.JSON
 
@@ -19,7 +19,7 @@ import species.Species
 import species.Synonyms
 import species.TaxonomyDefinition
 
-class SearchService {
+class SpeciesSearchService {
 
 	static transactional = false
 

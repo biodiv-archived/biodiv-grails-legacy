@@ -36,7 +36,8 @@ class ObservationController {
 	def observationService;
 	def springSecurityService;
 	def mailService;
-
+	def observationSearchService;
+	
 	static allowedMethods = [update: "POST", delete: "POST"]
 
 	def index = {
@@ -191,6 +192,7 @@ class ObservationController {
 		if (observationInstance) {
 			try {
 				observationInstance.delete(flush: true)
+				observationSearchService.delete(observationInstance.id);
 				flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
 				redirect(action: "list")
 			}
@@ -332,6 +334,8 @@ class ObservationController {
 				if(!recommendationVoteInstance){
 					//saving max voted species name for observation instance needed when observation created without species name
 					observationInstance.calculateMaxVotedSpeciesName();
+					observationSearchService.publishSearchIndex(observationInstance);
+					
 					if(!params["createNew"]){
 						redirect(action:getRecommendationVotes, id:params.obvId, params:[max:3, offset:0, recoVoteMsg:recoVoteMsg])
 					}else{
@@ -344,7 +348,8 @@ class ObservationController {
 
 					//saving max voted species name for observation instance
 					observationInstance.calculateMaxVotedSpeciesName();
-
+					observationSearchService.publishSearchIndex(observationInstance);
+					
 					if(!params["createNew"]){
 						//sending mail to user
 						sendNotificationMail(SPECIES_RECOMMENDED, observationInstance, request);
@@ -355,6 +360,7 @@ class ObservationController {
 					return
 				}
 				else {
+					observationSearchService.publishSearchIndex(observationInstance);
 					recommendationVoteInstance.errors.allErrors.each { log.error it }
 					render (view: "show", model: [observationInstance:observationInstance, recommendationVoteInstance: recommendationVoteInstance], params:[postToFB:(params.postToFB?:false)])
 				}
@@ -396,7 +402,8 @@ class ObservationController {
 					log.debug "Successfully added reco vote : "+recommendationVoteInstance
 		
 					observationInstance.calculateMaxVotedSpeciesName();
-
+					observationSearchService.publishSearchIndex(observationInstance);
+					
 					//sending mail to user
 					sendNotificationMail(SPECIES_AGREED_ON, observationInstance, request);
 					redirect(action:getRecommendationVotes, id:params.obvId, params:[max:3, offset:0, recoVoteMsg:recoVoteMsg])
@@ -648,7 +655,7 @@ class ObservationController {
 			if(obv.author.sendNotification){
 				mailService.sendMail {
 					to obv.author.email
-					bcc "prabha.prabhakar@gmail.com, sravanthi@strandls.com"
+					bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com"
 					from conf.ui.notification.emailFrom
 					subject mailSubject
 					html body.toString()
@@ -656,7 +663,7 @@ class ObservationController {
 			}else{
 				//sending mail only to website manager 
 				mailService.sendMail {
-					bcc "prabha.prabhakar@gmail.com, sravanthi@strandls.com"
+					bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com"
 					from conf.ui.notification.emailFrom
 					subject mailSubject
 					html body.toString()
@@ -769,7 +776,7 @@ class ObservationController {
 	  
 	  def observationInstance = Observation.read(params.long('obvId'));
 	  if(observationInstance) {
-		  sendNotificationMail(SPECIES_REMOVE_COMMENT, observationInstance, request);
+		  		  sendNotificationMail(SPECIES_REMOVE_COMMENT, observationInstance, request);
 		  render (['success:true'] as JSON);
 	  } else {
 	      response.setStatus(500)

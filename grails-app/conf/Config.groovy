@@ -214,7 +214,7 @@ speciesPortal {
 	names.parser.serverURL = "saturn.strandls.com"
 	names.parser.port = 4334
 	search {
-		serverURL = "http://localhost:8090/solr/species"
+		serverURL = "http://localhost:8090/solr"
 		queueSize = 1000
 		threadCount = 3
 		soTimeout = 10000;
@@ -320,6 +320,15 @@ speciesPortal {
 		SYNONYM = "synonym"
 		SYNONYM_CANONICAL = "synonym_canonical"
 		SCIENTIFIC_NAME = "scientific_name"
+		OBSERVED_ON = "observed_on"
+		UPLOADED_ON = "uploaded_on"
+		UPDATED_ON = "updateD_on"
+		SGROUP = "sgroup"
+		HABITAT = "habitat"
+		LATITUDE = "latitude"
+		LONGITUDE = "longitude"
+		MAX_VOTED_SPECIES_NAME = "max_voted_species_name"
+		TAG = "Tag"
 	}
 
 	nameSearchFields {
@@ -353,7 +362,7 @@ environments {
 	development {
 		grails.serverURL = "http://localhost:8080/${appName}"
 		speciesPortal {
-			search.serverURL = "http://localhost:8090/solr/species"
+			search.serverURL = "http://localhost:8090/solr"
 			names.parser.serverURL = "127.0.0.1"
 			wgp {
 				facebook {
@@ -409,7 +418,7 @@ environments {
 				serverURL = "http://wgp.saturn.strandls.com/${appName}/observations"
 				//serverURL = "http://localhost/${appName}/observations"
 			}
-			search.serverURL="http://saturn.strandls.com:8080/solr/species"
+			search.serverURL="http://saturn.strandls.com:8080/solr"
 			grails.project.war.file = "/data/jetty-6.1.26/webapps/${appName}.war"
 			grails {
 				mail {
@@ -459,7 +468,7 @@ environments {
 				serverURL = "http://thewesternghats.in/${appName}/observations"
 				//serverURL = "http://localhost/${appName}/observations"
 			}
-			search.serverURL="http://thewesternghats.in:8080/solr/species"
+			search.serverURL="http://thewesternghats.in:8080/solr"
 			grails {
 				mail {
 					 host = "127.0.0.1"
