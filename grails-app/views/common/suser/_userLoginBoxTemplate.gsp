@@ -14,25 +14,23 @@ $('.login-box').mouseout(function(){
 <style>
 .login-box {
 font-weight: normal;
-height: 100px;
+height: 80px;
 margin: 0;
-position: absolute;
-right: 0;
 top: 0;
 width: 180px;
+float: right;       
 }
 <sec:ifLoggedIn>
 .login-box:hover {
 background-color: #ffffff;    
-border-left: 1px solid #e5e5e5;
 box-shadow: 0 6px 8px -6px #5e5e5e;
-border-radius:0 0 5px 5px;        
 }
 </sec:ifLoggedIn>
 .login-box-options {
 float:right;
 right: 0;
-padding:10px;       
+padding-right:10px;       
+padding-bottom:10px;       
 }
 
 .login-box img {
