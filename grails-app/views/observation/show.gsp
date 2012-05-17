@@ -186,7 +186,7 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 						
 					</div>
 			    	
-			    	<obv:identificationByEmail model="['observationInstance':observationInstance, 'domain':Utils.getDomainName(request)]" />
+			    	<obv:identificationByEmail model="['observationInstance':observationInstance, 'requestObject':request]" />
 	            	
 					<div class="comments-box sidebar_section" style="clear: both;">
 						<fb:comments href="${createLink(controller:'observation', action:'show', id:observationInstance.id, base:Utils.getDomainServerUrl(request))}"
