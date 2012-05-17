@@ -93,11 +93,11 @@
 										<g:if test="${params.sort == 'visitCount'}">
                                                Most viewed
                                             </g:if>
-										<g:elseif test="${params.sort == 'lastRevised'}">
-                                                Last updated
+										<g:elseif test="${params.sort == 'createdOn'}">
+                                                Latest
                                             </g:elseif>
 										<g:else>
-                                                Latest
+                                                Last updated
                                             </g:else>
 										<span class="caret"></span>
 									</button>
@@ -295,7 +295,7 @@
             });
             
             function stringTrim(s){
-           		return s.replace(/^\s*/, "").replace(/\s*$/, "");
+           		return $.trim(s);
             }
             function getSelectedGroup() {
                 var grp = ''; 

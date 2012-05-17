@@ -1,15 +1,14 @@
 <div>
 	<div class="btn-group">
-		<a id="identification-email" class="btn btn-mini"
-			data-toggle="dropdown" href="#"><i class="icon-envelope"></i>Email</a>
-		<form id="email-form" name="email-form" style="display: none"
+		<a id="identification-email" class="btn"
+			data-toggle="dropdown" href="#"><i class="icon-envelope"></i>Ask</a>
+		<form id="email-form" name="email-form" style="display: none; background-color: #F2F2F2;"
 			action="${createLink(controller:'observation', action:'sendIdentificationMail', id:observationInstance.id)}"
 			method="post">
-			To : <input id="userAndEmailList"
-				placeholder='Type user name or email id'
-				class="input-xlarge ui-autocomplete-input" type="text" /><br />
-			Subject : <input type="text" name="mailSubject"
-				value="Please identify species name"></input><br />
+			<span class="keyname">To</span><input id="userAndEmailList"
+				placeholder='Type user name or email id' style="width:70%" type="text" /><br />
+			<span class="keyname">Subject</span><input type="text" style="width:70%" name="mailSubject"
+				value="${mailSubject}"></input><br />
 			<h5><label><i class="icon-pencil"></i> Message </label></h5>
 				<div class="section-item" style="margin-right: 10px;">
 					<ckeditor:config var="toolbar_editorToolbar">
@@ -17,14 +16,13 @@
     									[ 'Bold', 'Italic' ]
 									]
 					</ckeditor:config>
-					<ckeditor:editor name="mailBody" height="200px" toolbar="editorToolbar">
-						Please identify species name for observation ${observationInstance.id}
+					<ckeditor:editor name="mailBody" height="90px" toolbar="editorToolbar">
+						${mailBody}
 					</ckeditor:editor>
 				</div>
-<%--			<input type="text" name="mailBody" id="mailBody" />--%>
 			<input type="hidden" name="userIds" id="userIds" />
 			<input type="hidden" name="emailIds" id="emailIds" /> 
-			<input class="btn btn-mini" type="submit" value="send"> </input>
+			<input class="btn btn-mini" type="submit" value="send" style="float:right"> </input>
 			<div id="email-form-close" value="close">
 				<i class="icon-remove"></i>
 			</div>
@@ -34,14 +32,13 @@
 
 <script>
 	$(function() {	
+		$("#observationUrlLink").attr("href", document.location.href);
+		
 		$('#identification-email').click(function(){
-			$('#email-form').show();
 			$('#userIds').val('');
 			$('#emailIds').val('');
-		});
-		$('#email-form').submit(function(){
-			$('#email-form').hide();
-			
+			$('#userAndEmailList').val('')
+			$('#email-form').show();
 		});
 		$('#email-form-close').click(function(){
 			$('#email-form').hide();
@@ -58,6 +55,24 @@
 		return split( term ).pop();
 	}
 
+	function removeErrorClass(){
+		if($("#userAndEmailList" ).hasClass('alert alert-error')){
+			$("#userAndEmailList" ).removeClass(('alert alert-error'));
+		}
+	}
+
+	function validateAndAddEmail(lastEntry){
+		if(isEmail(lastEntry)){
+			var oldValue = $("#emailIds").val();
+			if(oldValue === ""){
+				$("#emailIds").val(lastEntry);
+			}else{
+				$("#emailIds").val(oldValue + "," + lastEntry);
+			}
+			removeErrorClass();
+		}
+	}
+
 	$("#userAndEmailList" )
 		// don't navigate away from the field on tab when selecting an item
 		.bind( "keydown", function( event ) {
@@ -66,16 +81,7 @@
 				event.preventDefault();
 			}else if( event.keyCode === $.ui.keyCode.COMMA){
 				//storing email after validation
-				var lastEntry = extractLast(this.value);
-				if(isEmail(lastEntry)){
-					var oldValue = $("#emailIds").val();
-					if(oldValue === ""){
-						$("#emailIds").val(lastEntry);
-					}else{
-						$("#emailIds").val(oldValue + "," + lastEntry);
-					}
-				}
-				//event.preventDefault();
+				validateAndAddEmail(extractLast(this.value));
 			}
 		})
 		.autocomplete({
@@ -113,15 +119,26 @@
 				}else{
 					$("#userIds").val(oldValue + "," + userId);
 				}
+				removeErrorClass();
 				return false;
-			}	
+			}
 		});
 
 	$('#email-form').bind('submit', function(event) {
+		//adding last entry if not ended with comma
+		validateAndAddEmail($.trim(extractLast($("#userAndEmailList" ).val())));
+		
+		if(($('#userIds').val() == '') && ($('#emailIds').val() == '')){
+			$("#userAndEmailList" ).addClass('alert alert-error');
+			event.preventDefault();
+			return false; 
+		}
+		
  		$(this).ajaxSubmit({ 
          	url:"${createLink(controller:'observation', action:'sendIdentificationMail', id:observationInstance.id)}",
 			dataType: 'json', 
 			type: 'POST',
+			resetForm: true,
 			success: function(data, statusText, xhr, form) {
 				showRecoUpdateStatus('Email sent to respective person', 'success');
             	return false;
@@ -134,6 +151,9 @@
             	return false;
 			} 
      	});
+ 		$('#userIds').val('');
+		$('#emailIds').val('');
+		$('#email-form').hide();
      	event.preventDefault();
  	});
  	

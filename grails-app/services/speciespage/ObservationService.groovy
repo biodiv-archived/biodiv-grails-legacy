@@ -23,6 +23,7 @@ import species.participation.ObservationFlag.FlagType
 import species.participation.RecommendationVote.ConfidenceType;
 import species.sourcehandler.XMLConverter;
 import species.utils.Utils;
+import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
 
 class ObservationService {
 
@@ -540,7 +541,7 @@ class ObservationService {
 			activeFilters["bounds"] = params.bounds
 		}
 
-		def orderByClause = " order by obv." + (params.sort ? params.sort : "createdOn") +  " desc"
+		def orderByClause = " order by obv." + (params.sort ? params.sort : "lastRevised") +  " desc"
 		
 		if(isMapView){
 			query = mapViewQuery + filterQuery + orderByClause
@@ -577,4 +578,29 @@ class ObservationService {
 		def result = RecommendationVote.executeQuery("select count(recoVote) from RecommendationVote recoVote where recoVote.author.id = :userId and recoVote.observation.isDeleted = :isDeleted", [userId:user.id, isDeleted:false]);
 		return (long)result[0];
 	}
+	
+	
+	
+	Map getIdentificationEmailInfo(m){
+		def obv = m.observationInstance;
+		def domain = m.domain;
+		
+		def g = new org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib()
+		def obvUrl =  g.createLink(controller: 'observation', action: 'show', absolute: 'true', params:["id": obv.id])
+		def templateMap = [obvUrl:obvUrl, domain:domain]
+		
+		def conf = SpringSecurityUtils.securityConfig
+		def mailSubject = conf.ui.askIdentification.emailSubject
+		def body = conf.ui.askIdentification.emailBody
+		if (body.contains('$')) {
+			body = evaluate(body, templateMap)
+		}
+		return [mailSubject:mailSubject, mailBody:body, observationInstance:obv]
+	}
+	
+	private String evaluate(s, binding) {
+		new SimpleTemplateEngine().createTemplate(s).make(binding)
+	}
+	
+	
 }

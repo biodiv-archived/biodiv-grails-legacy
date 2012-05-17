@@ -758,6 +758,16 @@ If you do not want to receive notifications please go to your <a href="$userProf
 <br/>
 -The portal team'''
 
+grails.plugins.springsecurity.ui.askIdentification.emailSubject = 'Please identify the species name'
+grails.plugins.springsecurity.ui.askIdentification.emailBody = '''
+Hi,<br/>
+<br/>
+Please identify the species name for <a href="$obvUrl">observation</a> on <b>$domain</b><br/>
+<br/>
+Thank you for your contribution to the portal.<br/>
+<br/>
+-The portal team'''
+
 grails.plugins.springsecurity.ui.encodePassword = false
 
 grails.plugins.springsecurity.useSecurityEventListener = true
