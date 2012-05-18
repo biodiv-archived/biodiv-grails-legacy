@@ -14,6 +14,7 @@ import org.codehaus.groovy.grails.plugins.springsecurity.NullSaltSource
 import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
 import org.springframework.dao.DataIntegrityViolationException
 
+import species.BlockedMails;
 import species.utils.Utils;
 
 
@@ -109,6 +110,10 @@ class SUserController extends UserController {
 			params.email = user.email;
 			
 			def oldPassword = user."$passwordFieldName"
+			
+			def allowIdenMail = (params.allowIdentifactionMail?.equals('on'))?true:false;
+			updateBlockMailList(allowIdenMail, user);
+			
 			user.properties = getTrimmedParams(params)
 			if (params.password && !params.password.equals(oldPassword)) {
 				String salt = saltSource instanceof NullSaltSource ? null : params.username
@@ -116,11 +121,14 @@ class SUserController extends UserController {
 			}
 			
 			user.sendNotification = (params.sendNotification?.equals('on'))?true:false;
-				
+			
+			
 			if (!user.save(flush: true)) {
 				render view: 'edit', model: buildUserModel(user)
 				return
 			}
+			
+			//if(params.allowIdentifactionMail?.equals('on'));
 
 			String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
 
@@ -350,5 +358,21 @@ class SUserController extends UserController {
 		def res = [:]
 		m.each {key, value -> res[key] = value.toString().trim()}
 		return res
+	}
+	
+	private updateBlockMailList(allowIdenMail, user){
+		if(user.allowIdentifactionMail != allowIdenMail){
+			if(allowIdenMail){
+				BlockedMails bm = BlockedMails.findByEmail(user.email.trim());
+				if(bm && !bm.delete(flush:true)){
+					this.errors.allErrors.each { log.error it }
+				}
+			}else{
+				BlockedMails bm = new BlockedMails(email:user.email.trim());
+				if(!bm.save(flush:true)){
+					this.errors.allErrors.each { log.error it }
+				}
+			}
+		}
 	}
 }

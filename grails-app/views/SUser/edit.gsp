@@ -210,7 +210,22 @@
 								</div>
 							</div>
 							<div
-								class="control-group ${hasErrors(bean: user, field: 'sendNotification', 'error')}">
+								class="control-group ${hasErrors(bean: user, field: 'allowIdentifactionMail', 'error')}">
+								<div class="controls" style="margin-left: 0px;">
+									<label class="checkbox" style="clear: both;"> <g:checkBox
+											name="allowIdentifactionMail" value="${user.allowIdentifactionMail}" />
+										<g:message code='user.allowIdentifactionMail.label'
+											default='Allow identification email' /> </label>
+									<div class="help-inline">
+										<g:hasErrors bean="${user}" field="sendNotification">
+											<g:renderErrors bean="${user}" as="list"
+												field="sendNotification" />
+										</g:hasErrors>
+									</div>
+								</div>
+							</div>
+							<div
+								class="control-group ${hasErrors(bean: user, field: 'hideEmailId', 'error')}">
 								<div class="controls" style="margin-left: 0px;">
 									<label class="checkbox" style="clear: both;"> <g:checkBox
 											name="hideEmailId" value="${user.hideEmailId}" /> <g:message

@@ -121,7 +121,11 @@
 					<div id="show-flag-count" class="footer-item"><i class="icon-flag"></i>${observationInstance.flagCount}</div>
 				</g:if>
             </g:else>
-            
+            <g:if test="${showDetails}">
+	            <div class="footer-item"">
+	            	<obv:identificationByEmail model="['observationInstance':observationInstance, 'requestObject':request]" />
+	            </div>
+            </g:if>
             <g:if test="${showDetails}">
 			<div class="footer-item" style="width:100px">
 				<fb:like layout="button_count"

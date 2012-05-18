@@ -1,13 +1,13 @@
 <div>
 	<div class="btn-group">
-		<a id="identification-email" class="btn"
-			data-toggle="dropdown" href="#"><i class="icon-envelope"></i>Ask</a>
+		<a id="identification-email" class="btn btn-mini"
+			data-toggle="dropdown" href="#"><i class="icon-envelope"></i>Share</a>
 		<form id="email-form" name="email-form" style="display: none; background-color: #F2F2F2;"
-			action="${createLink(controller:'observation', action:'sendIdentificationMail', id:observationInstance.id)}"
+			action="${createLink(controller:'observation', action:'sendIdentificationMail')}"
 			method="post">
 			<span class="keyname">To</span><input id="userAndEmailList"
-				placeholder='Type user name or email id' style="width:70%" type="text" /><br />
-			<span class="keyname">Subject</span><input type="text" style="width:70%" name="mailSubject"
+				placeholder='Type user name or email id' style="float:left" type="text" /><br />
+			<span class="keyname" style="clear:both">Subject</span><input type="text" style="width:70%" name="mailSubject"
 				value="${mailSubject}"></input><br />
 			<h5><label><i class="icon-pencil"></i> Message </label></h5>
 				<div class="section-item" style="margin-right: 10px;">
@@ -20,9 +20,8 @@
 						${mailBody}
 					</ckeditor:editor>
 				</div>
-			<input type="hidden" name="userIds" id="userIds" />
-			<input type="hidden" name="emailIds" id="emailIds" /> 
-			<input class="btn btn-mini" type="submit" value="send" style="float:right"> </input>
+			<input type="hidden" name="userIdsAndEmailIds" id="userIdsAndEmailIds" />
+			<input class="btn btn-mini btn-primary" type="submit" value="send" style="float:right"> </input>
 			<div id="email-form-close" value="close">
 				<i class="icon-remove"></i>
 			</div>
@@ -31,28 +30,34 @@
 </div>
 
 <script>
-	$(function() {	
-		$("#observationUrlLink").attr("href", document.location.href);
+var validEmailAndIdList = []
+
+function removeChoice(ele){
+	console.log($(ele).attr("id"));
+	var removedIndex = validEmailAndIdList.indexOf("" + $(ele).attr("id"));
+	//alert("before remove " + validEmailAndIdList + " index " + removedIndex + "  item " + $(ele).attr("id"));
+	validEmailAndIdList.splice(removedIndex, 1);
+	//alert("vvv == " + validEmailAndIdList);
+	$(ele).parent().remove();
+}
+
+$(function() {
+	//validEmailAndIdList = []
+	//alert(validEmailAndIdList);
+	$("#observationUrlLink").attr("href", document.location.href);
 		
-		$('#identification-email').click(function(){
-			$('#userIds').val('');
-			$('#emailIds').val('');
+	$('#identification-email').click(function(){
+			$('#userIdsAndEmailIds').val('');
 			$('#userAndEmailList').val('')
 			$('#email-form').show();
-		});
-		$('#email-form-close').click(function(){
+	});
+	$('#email-form-close').click(function(){
 			$('#email-form').hide();
-		});
+	});
 		
 	function isEmail(email) {
 		var regex = /^([a-zA-Z0-9_\.\-\+])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
 		return regex.test(email);
-	}
-	function split( val ) {
-		return val.split( /,\s*/ );
-	}
-	function extractLast( term ) {
-		return split( term ).pop();
 	}
 
 	function removeErrorClass(){
@@ -61,16 +66,26 @@
 		}
 	}
 
+	function addLiChoice(itemValue, id){
+		$('<li class="userAndEmailList-choice">' + itemValue + '<span id="'+ id + '" class="userAndEmailList-close" onClick="removeChoice(this);return false;"> x</span></li>').insertBefore("#userAndEmailList");
+	}
+	
 	function validateAndAddEmail(lastEntry){
 		if(isEmail(lastEntry)){
-			var oldValue = $("#emailIds").val();
-			if(oldValue === ""){
-				$("#emailIds").val(lastEntry);
-			}else{
-				$("#emailIds").val(oldValue + "," + lastEntry);
-			}
+			addLiChoice(lastEntry, lastEntry);
+			validEmailAndIdList.push(""+lastEntry);
+			alert("after push email " +  validEmailAndIdList);
 			removeErrorClass();
 		}
+		$("#userAndEmailList").val("");
+	}
+
+	function addUserId(ui){
+		var userId = ui.item.userId;
+		addLiChoice(ui.item.value, userId);
+		validEmailAndIdList.push(""+userId);
+		removeErrorClass();
+		$("#userAndEmailList").val("");
 	}
 
 	$("#userAndEmailList" )
@@ -81,61 +96,47 @@
 				event.preventDefault();
 			}else if( event.keyCode === $.ui.keyCode.COMMA){
 				//storing email after validation
-				validateAndAddEmail(extractLast(this.value));
+				validateAndAddEmail($.trim(this.value));
+				event.preventDefault();
 			}
 		})
 		.autocomplete({
 			source: function( request, response ) {
 				$.getJSON( "${createLink(controller:'SUser', action: 'ajaxUserSearch')}", {
-					term: extractLast( request.term )
+					term: request.term
 				}, response );
 			},
 			search: function() {
 				// custom minLength
-				var term = extractLast( this.value );
+				var term = this.value;
 				if ( term.length < 2 ) {
 					return false;
 				}
 			},
 			focus: function() {
-				// prevent value inserted on focus
 				return false;
 			},
 			select: function( event, ui ) {
-				var terms = split( this.value );
-				// remove the current input
-				terms.pop();
-				// add the selected item
-				terms.push( ui.item.value );
-				// add placeholder to get the comma-and-space at the end
-				terms.push( "" );
-				this.value = terms.join( ", " );
-
-				//adding user ids from suggestion	
-				var userId = ui.item.userId 
-				var oldValue = $("#userIds").val();
-				if(oldValue === ""){
-					$("#userIds").val(userId);
-				}else{
-					$("#userIds").val(oldValue + "," + userId);
-				}
-				removeErrorClass();
+				//adding user ids from suggestion
+				addUserId(ui);	
 				return false;
 			}
 		});
 
 	$('#email-form').bind('submit', function(event) {
 		//adding last entry if not ended with comma
-		validateAndAddEmail($.trim(extractLast($("#userAndEmailList" ).val())));
+		validateAndAddEmail($.trim($("#userAndEmailList" ).val()));
 		
-		if(($('#userIds').val() == '') && ($('#emailIds').val() == '')){
+		if(validEmailAndIdList.length == 0){
 			$("#userAndEmailList" ).addClass('alert alert-error');
 			event.preventDefault();
 			return false; 
+		}else{
+			$('#userIdsAndEmailIds').val(validEmailAndIdList.join(","));
 		}
 		
  		$(this).ajaxSubmit({ 
-         	url:"${createLink(controller:'observation', action:'sendIdentificationMail', id:observationInstance.id)}",
+         	url:"${createLink(controller:'observation', action:'sendIdentificationMail')}",
 			dataType: 'json', 
 			type: 'POST',
 			resetForm: true,
@@ -151,13 +152,12 @@
             	return false;
 			} 
      	});
- 		$('#userIds').val('');
-		$('#emailIds').val('');
+ 		$('#userIdsAndEmailIds').val('');
 		$('#email-form').hide();
      	event.preventDefault();
  	});
  	
-	});
+});
 </script>
 <style>
 #email-form {
