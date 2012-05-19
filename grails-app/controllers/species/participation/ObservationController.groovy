@@ -128,8 +128,9 @@ class ObservationController {
 	@Secured(['ROLE_USER'])
 	def update = {
 		log.debug params;
-		params.author = springSecurityService.currentUser;
+		
 		def observationInstance = Observation.get(params.id.toLong())
+		//params.author = springSecurityService.currentUser;
 		if(observationInstance)	{
 			try {
 				observationService.updateObservation(params, observationInstance);
@@ -516,13 +517,9 @@ class ObservationController {
 		if (observationInstance) {
 			try {
 				observationInstance.isDeleted = true;
-<<<<<<< HEAD
 				observationInstance.save(flush: true)
-				observationsSearchService.delete(observationInstance);
-=======
-				observationInstance.save(flush: true);
 				sendNotificationMail(OBSERVATION_DELETED, observationInstance, request);
->>>>>>> 7b813ccd33c64e8ab491790695ef641a826b61c7
+				observationsSearchService.delete(observationInstance);
 				flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
 				redirect(action: "list")
 			}
@@ -598,14 +595,6 @@ class ObservationController {
 	}
 
 	private sendNotificationMail(String notificationType, Observation obv, request){
-<<<<<<< HEAD
-		//		if(!obv.author.sendNotification){
-		//			log.debug "Not sending any notification mail for user " + obv.author.id
-		//			return
-		//		}
-
-=======
->>>>>>> 7b813ccd33c64e8ab491790695ef641a826b61c7
 		def conf = SpringSecurityUtils.securityConfig
 		def obvUrl = generateLink("observation", "show", ["id": obv.id], request)
 		def userProfileUrl = generateLink("SUser", "show", ["id": obv.author.id], request)
@@ -626,9 +615,6 @@ class ObservationController {
 				body = conf.ui.observationFlagged.emailBody
 				templateMap["currentUser"] = springSecurityService.currentUser
 				break
-<<<<<<< HEAD
-
-=======
 			
 			case OBSERVATION_DELETED :
 				mailSubject = conf.ui.observationDeleted.emailSubject
@@ -636,7 +622,6 @@ class ObservationController {
 				templateMap["currentUser"] = springSecurityService.currentUser
 				break
 			
->>>>>>> 7b813ccd33c64e8ab491790695ef641a826b61c7
 			case SPECIES_RECOMMENDED :
 				mailSubject = "Species name suggested"
 				body = conf.ui.addRecommendationVote.emailBody
