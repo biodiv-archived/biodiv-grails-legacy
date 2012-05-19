@@ -16,7 +16,7 @@
 	</g:else>
 <g:javascript>
 	$(document).ready(function() {
-		if((${isAjaxLoad} === undefined) || (!${isAjaxLoad})){
+		if((${isAjaxLoad?:'false'} == 'false') || (!${isAjaxLoad?1:0})){
 			 $("li.tagit-choice").click(function(){
 			 	var tg = $(this).contents().first().text();
 	         	window.location.href = "${g.createLink(controller:'observation', action: 'list')}?tag=" + tg ;

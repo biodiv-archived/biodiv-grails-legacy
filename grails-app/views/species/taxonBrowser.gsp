@@ -27,7 +27,7 @@
 				</h1>
 			</div>
 			<div style="float: right;">
-				<g:searchBox />
+				<search:searchBox />
 			</div>
 		</div>
 

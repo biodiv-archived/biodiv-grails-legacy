@@ -238,7 +238,7 @@ jQuery(document).ready(function($) {
 				<br />
 				<sNav:render group="dashboard" subitems="true" />
 				<div style="float: right;">
-					<g:searchBox />
+					<search:searchBox />
 				</div>
 
 			</div>

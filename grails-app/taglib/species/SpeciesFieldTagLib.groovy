@@ -48,7 +48,4 @@ class SpeciesFieldTagLib {
 		out << render(template:"/common/imageAttributionTemplate", model:attrs.model);
 	}
 	
-	def searchBox = {attrs, body ->
-		out << render(template:"/common/searchBoxTemplate", model:attrs.model);
-	}
 }

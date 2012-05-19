@@ -93,24 +93,30 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 				</g:if>
 				<br />
 
-				<div class="page-header" style="overflow: auto;">
+				<div class="page-header clearfix">
 					<div class="span8">
 						<h1>
 							<obv:showSpeciesName
 								model="['observationInstance':observationInstance]" />
 						</h1>
 					</div>
-					<div class="span4" style="margin: 0;">
+					<div style="float:right;">
+						<div class="clearfix">
 						<sUser:ifOwns model="['user':observationInstance.author]">
-							<a class="btn btn-primary" style="float: right;"
+							
+							<a class="btn btn-primary pull-right"
 								href="${createLink(controller:'observation', action:'edit', id:observationInstance.id)}">
 								Edit Observation </a>
 
-								<a class="btn btn-danger btn-primary" style="float: right; margin-right: 5px;"
+								<a class="btn btn-danger btn-primary pull-right" style="margin-right: 5px;margin-bottom:10px;"
 									href="${createLink(controller:'observation', action:'flagDeleted', id:observationInstance.id)}"
 									onclick="return confirm('${message(code: 'default.observatoin.delete.confirm.message', default: 'This observation will be deleted. Are you sure ?')}');">Delete
 									Observation </a>
+									
 						</sUser:ifOwns>
+						</div>
+						<search:searchBox />
+						
 					</div>
 
 				</div>
@@ -195,6 +201,7 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 
 
 				<div class="span4">
+					
 					<div class="sidebar_section">
 						<obv:showLocation
 							model="['observationInstance':observationInstance]" />

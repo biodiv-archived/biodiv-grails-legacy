@@ -14,7 +14,7 @@ $(document).ready(function(){
 					return;
 				}
 
-				lastXhr = $.getJSON( "${createLink(action: 'nameTerms', controller:'search')}", request, function( data, status, xhr ) {
+				lastXhr = $.getJSON( "${createLink(action: 'nameTerms')}", request, function( data, status, xhr ) {
 					cache[ term ] = data;
 					if ( xhr === lastXhr ) {
 						response( data );
@@ -34,14 +34,14 @@ $(document).ready(function(){
 				$( "#canName" ).val( ui.item.value );
 				//$( "#name-description" ).html( ui.item.value ? ui.item.label.replace(/<.*?>/g,"")+" ("+ui.item.value+")" : "" );
 				//ui.item.icon ? $( "#name-icon" ).attr( "src",  ui.item.icon).show() : $( "#name-icon" ).hide();
-				$( "#searchbox" ).submit();
+				$( "#search" ).click();
 				return false;
 			},open: function(event, ui) {
 				$("#nameSuggestionsMain ul").removeAttr('style').css({'display': 'block'}); 
 			}
 	}).data( "catcomplete" )._renderItem = function( ul, item ) {
 			ul.removeClass().addClass("dropdown-menu")
-			if(item.category == "General") {
+			if(item.category != "Names") {
 				return $( "<li class='span3'  style='list-style:none;'></li>" )
 					.data( "item.autocomplete", item )
 					.append( "<a>" + item.label + "</a>" )
@@ -57,15 +57,14 @@ $(document).ready(function(){
 					.appendTo( ul );
 			}
 		};;
-	
-	$( "#search" ).click(function() {
-			$( "#searchbox" ).submit();
-	});
+});
+$( "#search" ).click(function() {
+	$( "#searchbox" ).submit();
 });
 </g:javascript>
 	<div id="mainSearchForm" style="position:relative">
 	<form method="get"
-		action="${createLink(controller:'search', action:'select') }"
+		action="${createLink(action:'search') }"
 		id="searchbox" class="form-horizontal">
 		<div class="input-append">
 			<input type="text" name="query" id="searchTextField" value=""
@@ -77,7 +76,7 @@ $(document).ready(function(){
 		<g:hiddenField name="start" value="0" />
 		<g:hiddenField name="rows" value="10" />
 		<g:hiddenField name="sort" value="score desc" />
-		<g:hiddenField name="fl" value="id, name" />
+		<g:hiddenField name="fl" value="id,name" />
 
 		<!-- 
 		<g:hiddenField name="hl" value="true" />
