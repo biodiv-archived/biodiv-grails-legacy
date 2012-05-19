@@ -64,11 +64,13 @@ class Observation implements Taggable{
 	String maxVotedSpeciesName;
 	boolean isDeleted = false;
 	int flagCount = 0;
+	String searchText;
 	
 	static hasMany = [resource:Resource, recommendationVote:RecommendationVote];
 
 	static constraints = {
 		notes nullable:true
+		searchText nullable:true;
 		maxVotedSpeciesName nullable:true
 		resource validator : { val, obj -> val && val.size() > 0 }
 		observedOn validator : {val -> val < new Date()}
@@ -78,6 +80,7 @@ class Observation implements Taggable{
 	static mapping = {
 		version : false;
 		notes type:'text'
+		searchText type:'text'
 		autoTimestamp false
 	}
 
@@ -247,6 +250,13 @@ class Observation implements Taggable{
 	
 	List fetchAllFlags(){
 		return ObservationFlag.findAllWhere(observation:this);
+	}
+	
+	def updateObservationTimeStamp(){
+		lastRevised = new Date();
+		if(!save(flush:true)){
+			this.errors.allErrors.each { log.error it }
+		}
 	}
 	
 }

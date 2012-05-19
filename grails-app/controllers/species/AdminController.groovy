@@ -93,7 +93,7 @@ class AdminController {
 		redirect(action: "index")
 	}
 
-	def reloadObservationSearchIndex = {
+	def reloadObservationsSearchIndex = {
 		try {
 			observationsSearchService.publishSearchIndex();
 			flash.message = "Successfully created observations search index"

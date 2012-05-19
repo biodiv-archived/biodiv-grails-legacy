@@ -14,9 +14,18 @@
 </g:javascript>
 
 <div class="info-message" id="info-message">
-	<span class="name" style="color: #b1b1b1;"> <i
-		class="icon-screenshot"></i> ${observationInstanceTotal}
-	</span> Observation<g:if test="${observationInstanceTotal>1}">s</g:if>
+	<g:if test="${observationInstanceTotal == 0}">
+	<div class="alert alert-info"> No
+					observations found. Please relax the search query or filter criteria.</div>
+	</g:if>
+	
+	<i
+		class="icon-screenshot"></i> Showing <span class="name" style="color: #b1b1b1;"> ${observationInstanceTotal}
+	</span> Observation<g:if test="${observationInstanceTotal!=1}">s</g:if>
+	
+	
+	
+	
 	<g:if test="${queryParams.groupId && SpeciesGroup.get(queryParams.groupId)}">
                                     of <span class="highlight"> <g:link
 				controller="observation" action="list"
@@ -44,6 +53,13 @@
 			<g:link controller="SUser" action="show" id="${queryParams.user}">
 				${SUser.read(queryParams.user).name.encodeAsHTML()} <a
 				id="removeUserFilter" href="#">[X]</a></g:link>
+		</span>
+	</g:if>
+	<g:if test="${queryParams.query}">
+                                    for query <span class="highlight">
+			<g:link controller="observation" action="select" params="[query: queryParams.query]">
+				${queryParams.query.encodeAsHTML()} <a
+				id="removeQueryFilter" href="#">[X]</a></g:link>
 		</span>
 	</g:if>
 </div>

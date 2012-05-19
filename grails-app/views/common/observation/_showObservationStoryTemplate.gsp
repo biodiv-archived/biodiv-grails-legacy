@@ -123,12 +123,6 @@
             </g:else>
             
             <g:if test="${showDetails}">
-	            <div class="footer-item"">
-	            	<obv:identificationByEmail model="['observationInstance':observationInstance]" />
-	            </div>
-            </g:if>
-			
-            <g:if test="${showDetails}">
 			<div class="footer-item" style="width:100px">
 				<fb:like layout="button_count"
 					href="${createLink(controller:'observation', action:'show', id:observationInstance.id, base:Utils.getDomainServerUrl(request))}"

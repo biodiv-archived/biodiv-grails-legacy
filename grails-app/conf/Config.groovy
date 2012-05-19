@@ -320,15 +320,16 @@ speciesPortal {
 		SYNONYM = "synonym"
 		SYNONYM_CANONICAL = "synonym_canonical"
 		SCIENTIFIC_NAME = "scientific_name"
-		OBSERVED_ON = "observed_on"
-		UPLOADED_ON = "uploaded_on"
-		UPDATED_ON = "updateD_on"
+		OBSERVED_ON = "observedon"
+		UPLOADED_ON = "createdon"
+		UPDATED_ON = "lastrevised"
 		SGROUP = "sgroup"
 		HABITAT = "habitat"
 		LATITUDE = "latitude"
 		LONGITUDE = "longitude"
-		MAX_VOTED_SPECIES_NAME = "max_voted_species_name"
-		TAG = "Tag"
+		MAX_VOTED_SPECIES_NAME = "maxvotedspeciesname"
+		TAG = "tag"
+		ISFLAGGED = "isflagged"
 	}
 
 	nameSearchFields {
@@ -501,8 +502,7 @@ environments {
 navigation.species_dashboard = [
         [controller:'species', title:'Species gallery', order:1, action:"list"],
         [controller:'species', title:'Taxonomy browser', order:10, action:'taxonBrowser'],
-		[controller:'search', title:'Advanced search', order:20, action:'advSelect'],
-        [controller:'species', title:'Contribute', order:30, action:'contribute'],
+		[controller:'species', title:'Contribute', order:30, action:'contribute'],
 		[controller:'SUser', title:'Users', order:40, action:'search']
 ]
 
@@ -764,6 +764,16 @@ You can see the posting on your observation <a href="$obvUrl">here</a><br/>
 <br/>
 You will be notified by mail on any social activity on the observation.<br/>
 If you do not want to receive notifications please go to your <a href="$userProfileUrl">user profile</a> and switch it off.<br/>
+<br/>
+-The portal team'''
+
+grails.plugins.springsecurity.ui.askIdentification.emailSubject = 'Please identify the species name'
+grails.plugins.springsecurity.ui.askIdentification.emailBody = '''
+Hi,<br/>
+<br/>
+Please identify the species name for <a href="$obvUrl">observation</a> on <b>$domain</b><br/>
+<br/>
+Thank you for your contribution to the portal.<br/>
 <br/>
 -The portal team'''
 

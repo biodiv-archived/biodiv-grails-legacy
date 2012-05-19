@@ -12,6 +12,7 @@
 	<div class="mainContentList">
 		<div class="mainContent">
 			<ul class="grid_view thumbnails">
+			
 				<g:each in="${observationInstanceList}" status="i"
 					var="observationInstance">
 
@@ -37,7 +38,8 @@
 			</ul>
 		</div>
 	</div>
-	<g:if test="${observationInstanceTotal > queryParams.max}">
+	
+	<g:if test="${observationInstanceTotal > (queryParams.max?:0)}">
 		<div class="centered">
 			<div class="btn loadMore">
 				<span class="progress" style="display: none;">Loading ... </span> <span
@@ -47,7 +49,7 @@
 	</g:if>
 	<div class="paginateButtons" style="visibility: hidden; clear: both">
 		<g:paginate total="${observationInstanceTotal}"
-			max="${queryParams.max}" action="${activeFilters.action}"
+			max="${queryParams.max}" action="${params.action}"
 			params="${activeFilters}" />
 	</div>
 	<script>

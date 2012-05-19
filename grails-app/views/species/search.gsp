@@ -32,7 +32,7 @@ $(document).ready(function(){
 				</h1>
 			</div>
 			<div style="float: right;">
-				<g:searchBox />
+				<search:searchBox />
 			</div>
 		</div>
 
@@ -166,7 +166,7 @@ $(document).ready(function(){
 			</g:if>
 			<g:else>
 				<div style="float: center; color: #999; text-decoration: underline;">No
-					search results found. Please refine/relax the search query.</div>
+					search results found. Please relax the search query.</div>
 			</g:else>
 		</div>
 

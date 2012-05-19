@@ -40,7 +40,7 @@ var cache = {},
 					return;
 				}
 
-				lastXhr = $.getJSON( "${createLink(action: 'nameTerms', controller:'search')}", request, function( data, status, xhr ) {
+				lastXhr = $.getJSON( "${createLink(action: 'nameTerms')}", request, function( data, status, xhr ) {
 					cache[ term ] = data;
 					if ( xhr === lastXhr ) {
 						response( data );
@@ -86,7 +86,7 @@ var cache = {},
 				</h1>
 			</div>
 			<div style="float:right;">
-				<g:searchBox />
+				<search:searchBox />
 			</div>
 		</div>
 
@@ -98,7 +98,7 @@ var cache = {},
 		
 		<div class="row"  id="advSearchBox">
 			<form id="advSearchForm" method="get" class="form-horizontal span12 super-section"
-					action="${createLink(controller:'search', action:'advSelect') }"
+					action="${createLink(action:'advSelect') }"
 					title="Advanced Search" class="searchbox dialog">
 				<div  class="section" style="clear:both;">
 					<div class="control-group">

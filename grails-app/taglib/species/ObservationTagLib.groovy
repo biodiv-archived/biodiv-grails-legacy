@@ -95,24 +95,27 @@ class ObservationTagLib {
 	
 	// this will call showTagsList and showTagsCloud
 	def showAllTags = {attrs, body->
-		def tagFilterBy = attrs.model.tagFilterByProperty
-		
-		def count
-		def tags
-		if(tagFilterBy == "Related"){
-			def relatedParams = attrs.model.relatedObvParams
-			tags = observationService.getAllRelatedObvTags(relatedParams)
-			count = tags.size()
+		def count = attrs.model.count;
+		def tags = attrs.model.tags
+		if(tags == null) {
+			def tagFilterBy = attrs.model.tagFilterByProperty
+			
+			
+			if(tagFilterBy == "Related"){
+				def relatedParams = attrs.model.relatedObvParams
+				tags = observationService.getAllRelatedObvTags(relatedParams)
+				count = tags.size()
+			}
+			else if(tagFilterBy == "User"){
+				def userId = attrs.model.tagFilterByPropertyValue.toLong();
+				tags = observationService.getAllTagsOfUser(userId)
+				count = tags.size()
+			}
+			else {
+				tags =  observationService.getFilteredTags(attrs.model.params);
+				count = tags.size();
+			} 
 		}
-		else if(tagFilterBy == "User"){
-			def userId = attrs.model.tagFilterByPropertyValue.toLong();
-			tags = observationService.getAllTagsOfUser(userId)
-			count = tags.size()
-		}
-		else{
-			tags =  observationService.getFilteredTags(attrs.model.params);
-			count = tags.size();
-		} 
 		//log.debug "==== tags " + tags 
 		out << render(template:"/common/observation/showAllTagsTemplate", model:[count: count, tags:tags, isAjaxLoad:attrs.model.isAjaxLoad]);
 	}
@@ -165,6 +168,10 @@ class ObservationTagLib {
 		out << render(template:"/common/observation/showObservationListTemplate", model:attrs.model);
 	}
 
+	def showObservationsListWrapper = {attrs, body->
+		out << render(template:"/common/observation/showObservationListWrapperTemplate", model:attrs.model);
+	}
+	
 	def showNoOfObservationsOfUser = {attrs, body->
 		def noOfObvs = observationService.getAllObservationsOfUser(attrs.model.user);
 		out << noOfObvs
@@ -176,7 +183,8 @@ class ObservationTagLib {
 	}
 	
 	def identificationByEmail = {attrs, body->
-		out << render(template:"/common/observation/identificationByEmailTemplate",model:attrs.model);
+		def emailInfoModel = observationService.getIdentificationEmailInfo(attrs.model);
+		out << render(template:"/common/observation/identificationByEmailTemplate",model:emailInfoModel);
 	}
 	
 }

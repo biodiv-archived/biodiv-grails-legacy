@@ -16,8 +16,8 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 <meta property="og:image" content="${createLinkTo(file: fbImagePath, base:grailsApplication.config.speciesPortal.observations.serverURL)}" />
 <meta property="og:site_name" content="${Utils.getDomainName(request)}" />
 <g:set var="description" value="" />
+<g:set var="domain" value="${Utils.getDomain(request)}" />
 <%
-		String domain = Utils.getDomain(request);
 		String fbAppId;
 		if(domain.equals(grailsApplication.config.wgp.domain)) {
 			fbAppId = grailsApplication.config.speciesPortal.wgp.facebook.appId;
@@ -93,24 +93,28 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 				</g:if>
 				<br />
 
-				<div class="page-header" style="overflow: auto;">
+				<div class="page-header clearfix">
 					<div class="span8">
 						<h1>
 							<obv:showSpeciesName
 								model="['observationInstance':observationInstance]" />
 						</h1>
 					</div>
-					<div class="span4" style="margin: 0;">
+					<div style="float:right;">
 						<sUser:ifOwns model="['user':observationInstance.author]">
+							
 							<a class="btn btn-primary" style="float: right;"
 								href="${createLink(controller:'observation', action:'edit', id:observationInstance.id)}">
 								Edit Observation </a>
 
-								<a class="btn btn-danger btn-primary" style="float: right; margin-right: 5px;"
+								<a class="btn btn-danger btn-primary" style="float: right; margin-right: 5px;margin-bottom:10px;"
 									href="${createLink(controller:'observation', action:'flagDeleted', id:observationInstance.id)}"
 									onclick="return confirm('${message(code: 'default.observatoin.delete.confirm.message', default: 'This observation will be deleted. Are you sure ?')}');">Delete
 									Observation </a>
+									
 						</sUser:ifOwns>
+						<search:searchBox />
+						
 					</div>
 
 				</div>
@@ -181,9 +185,13 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 									value="Add" class="btn" style="position: relative;top: -28px;float: right;" />
 								
 							</form>
+						
 						</div>
+						
 					</div>
-
+			    	
+			    	<obv:identificationByEmail model="['observationInstance':observationInstance, 'domain':Utils.getDomainName(request)]" />
+	            	
 					<div class="comments-box sidebar_section" style="clear: both;">
 						<fb:comments href="${createLink(controller:'observation', action:'show', id:observationInstance.id, base:Utils.getDomainServerUrl(request))}"
 							num_posts="10" width="620" colorscheme="light"  notify="true"></fb:comments>
@@ -193,6 +201,7 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 
 
 				<div class="span4">
+					
 					<div class="sidebar_section">
 						<obv:showLocation
 							model="['observationInstance':observationInstance]" />

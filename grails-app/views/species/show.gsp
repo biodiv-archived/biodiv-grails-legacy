@@ -310,7 +310,7 @@ $(document).ready(function(){
 										<h4><%=CommonNames.findByTaxonConceptAndLanguage(speciesInstance.taxonConcept, Language.findByThreeLetterCode('eng'))?.name%></h4>
 					</div>
 					<div style="float:right;">
-						<g:searchBox />
+						<search:searchBox />
 					</div>
 				</div>
 

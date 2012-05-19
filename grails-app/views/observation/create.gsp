@@ -111,11 +111,16 @@ display: table !important;
 
 		<div class="observation_create row">
 			<div class="span12">
-				<div class="page-header">
-					<h1>
-						<!--g:message code="default.create.label" args="[entityName]" /-->
-						Add an Observation
-					</h1>
+				<div class="page-header clearfix">
+					<div class="span8">
+						<h1>
+							<!--g:message code="default.create.label" args="[entityName]" /-->
+							Add an Observation
+						</h1>
+					</div>
+					<div style="float: right;">
+						<search:searchBox />
+					</div>
 				</div>
 				<g:if test="${flash.message}">
 					<div class="message">

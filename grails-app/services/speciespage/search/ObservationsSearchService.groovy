@@ -49,21 +49,25 @@ class ObservationsSearchService {
 		def observations;
 		def startTime = System.currentTimeMillis()
 		while(true) {
-			observations = Observations.list(max:limit, offset:offset);
+			observations = Observation.list(max:limit, offset:offset);
 			if(!observations) break;
-			publishSearchIndex(observations);
+			publishSearchIndex(observations, true);
 			observations.clear();
 			offset += limit;
 		}
+		
 		log.info "Time taken to publish observations search index is ${System.currentTimeMillis()-startTime}(msec)";
 	}
 
+	def publishSearchIndex(Observation obv, boolean commit) {
+		return publishSearchIndex([obv], commit);
+	}
 	/**
 	 * 
 	 * @param species
 	 * @return
 	 */
-	def publishSearchIndex(List<Observation> obvs) {
+	def publishSearchIndex(List<Observation> obvs, boolean commit) {
 		if(!obvs) return;
 		log.info "Initializing publishing to observations search index : "+obvs.size();
 
@@ -77,28 +81,31 @@ class ObservationsSearchService {
 		obvs.each { obv ->
 			log.debug "Reading Observation : "+obv.id;
 			if(!obv.isDeleted) {
-			SolrInputDocument doc = new SolrInputDocument();
-			doc.addField(searchFieldsConfig.ID, obv.id.toString());
-			addNameToDoc(obv, doc);
-
-			doc.addField(searchFieldsConfig.CONTRIBUTOR, obv.author.name);
-			doc.addField(searchFieldsConfig.OBSERVED_ON, obv.observedOn);
-			doc.addField(searchFieldsConfig.UPLOADED_ON, obv.createdOn);
-			doc.addField(searchFieldsConfig.UPDATED_ON, obv.updatedOn);
-			if(obv.notes)
-				doc.addField(searchFieldsConfig.MESSAGE, obv.notes);
-			doc.addField(searchFieldsConfig.SGROUP, obv.group.id);
-			doc.addField(searchFieldsConfig.HABITAT, obv.habitat.id);
-			doc.addField(searchFieldsConfig.LOCATION, obv.placeName);
-			doc.addField(searchFieldsConfig.LOCATION, obv.reverseGeocodedName);
-			//doc.addField(searchFieldsConfig.point, obv.latitude+","+obv.longitude);
-			//boolean geoPrivacy = false;
-			//String locationAccuracy;
-			obv.tags.each { tag ->
-				doc.addField(searchFieldsConfig.TAG, tag);
-			}
+				SolrInputDocument doc = new SolrInputDocument();
+				doc.addField(searchFieldsConfig.ID, obv.id.toString());
+				addNameToDoc(obv, doc);
+	
+				doc.addField(searchFieldsConfig.CONTRIBUTOR, obv.author.name);
+				doc.addField(searchFieldsConfig.OBSERVED_ON, obv.observedOn);
+				doc.addField(searchFieldsConfig.UPLOADED_ON, obv.createdOn);
+				doc.addField(searchFieldsConfig.UPDATED_ON, obv.lastRevised);
+				if(obv.notes) {
+					doc.addField(searchFieldsConfig.MESSAGE, obv.notes);
+				}
 				
-			docs.add(doc);
+				doc.addField(searchFieldsConfig.SGROUP, obv.group.id);			
+				doc.addField(searchFieldsConfig.HABITAT, obv.habitat.id);
+				doc.addField(searchFieldsConfig.LOCATION, obv.placeName);
+				doc.addField(searchFieldsConfig.LOCATION, obv.reverseGeocodedName);
+				doc.addField(searchFieldsConfig.ISFLAGGED, (obv.flagCount > 0));
+				//doc.addField(searchFieldsConfig.point, obv.latitude+","+obv.longitude);
+				//boolean geoPrivacy = false;
+				//String locationAccuracy;
+				obv.tags.each { tag ->
+					doc.addField(searchFieldsConfig.TAG, tag);
+				}
+					
+				docs.add(doc);
 			}
 		}
 
@@ -106,10 +113,12 @@ class ObservationsSearchService {
 
 		try {
 			solrServer.add(docs);
-			//commit ...server is configured to do an autocommit after 10000 docs or 1hr
-			solrServer.blockUntilFinished();
-			solrServer.commit();
-			log.info "Finished committing to observations solr core"
+			if(commit) {
+				//commit ...server is configured to do an autocommit after 10000 docs or 1hr
+				solrServer.blockUntilFinished();
+				solrServer.commit();
+				log.info "Finished committing to observations solr core"
+			}
 		} catch(SolrServerException e) {
 			e.printStackTrace();
 		} catch(IOException e) {
@@ -146,7 +155,7 @@ class ObservationsSearchService {
 	}
 
 	/**
-	*
+	* delete requires an immediate commit
 	* @return
 	*/
    def delete(long id) {
