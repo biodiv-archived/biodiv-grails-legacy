@@ -98,7 +98,7 @@ class ObservationsSearchService {
 				doc.addField(searchFieldsConfig.LOCATION, obv.placeName);
 				doc.addField(searchFieldsConfig.LOCATION, obv.reverseGeocodedName);
 				doc.addField(searchFieldsConfig.ISFLAGGED, (obv.flagCount > 0));
-				//doc.addField(searchFieldsConfig.point, obv.latitude+","+obv.longitude);
+				doc.addField(searchFieldsConfig.LATLONG, obv.latitude+","+obv.longitude);
 				//boolean geoPrivacy = false;
 				//String locationAccuracy;
 				obv.tags.each { tag ->

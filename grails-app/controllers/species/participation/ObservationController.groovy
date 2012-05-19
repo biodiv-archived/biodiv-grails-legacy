@@ -46,7 +46,13 @@ class ObservationController {
 	}
 
 	def filteredList = {
-		def result = getObservationList(params);
+		def result;
+		//TODO: Dirty hack to feed results through solr if the request is from search 
+		if(params.action == 'search') {
+			result = getObservationsFromSearch(params)
+		} else {
+			result = getObservationList(params);
+		}
 		render (template:"/common/observation/showObservationListTemplate", model:result);
 	}
 
@@ -845,17 +851,7 @@ class ObservationController {
 		def searchFieldsConfig = grailsApplication.config.speciesPortal.searchFields
 
 
-		def max = Math.min(params.max ? params.int('max') : 9, 100)
-		def offset = params.offset ? params.long('offset') : 0
-
-		def model;
-		
-		try {
-			model = observationService.getFilteredObservationsFromSearch(params, max, offset, false);
-		} catch(SolrException e) {
-			e.printStackTrace();
-			//model = [params:params, observationInstanceTotal:0, observationInstanceList:[],  queryParams:[max:0], tags:[]];
-		}
+		def model = getObservationsFromSearch(params);
 		
 		if(!params.isGalleryUpdate?.toBoolean()){
 			params.remove('isGalleryUpdate');
@@ -874,6 +870,26 @@ class ObservationController {
 		}
 	}
 
+	/**
+	 * 
+	 * @param params
+	 * @return
+	 */
+	private def getObservationsFromSearch(params) {
+		def max = Math.min(params.max ? params.int('max') : 9, 100)
+		def offset = params.offset ? params.long('offset') : 0
+
+		def model;
+		
+		try {
+			model = observationService.getFilteredObservationsFromSearch(params, max, offset, false);
+		} catch(SolrException e) {
+			e.printStackTrace();
+			//model = [params:params, observationInstanceTotal:0, observationInstanceList:[],  queryParams:[max:0], tags:[]];
+		}
+		return model;
+	}
+	
 	/**
 	 *
 	 */

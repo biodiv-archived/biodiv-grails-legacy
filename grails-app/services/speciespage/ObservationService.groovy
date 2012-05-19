@@ -700,13 +700,13 @@ class ObservationService {
 		}
 
 		if(params.bounds){
-			/*def bounds = params.bounds.split(",")
+			def bounds = params.bounds.split(",")
 			 def swLat = bounds[0]
 			 def swLon = bounds[1]
 			 def neLat = bounds[2]
 			 def neLon = bounds[3]
-			 filterQuery += " and obv.latitude > " + swLat + " and  obv.latitude < " + neLat + " and obv.longitude > " + swLon + " and obv.longitude < " + neLon
-			 activeFilters["bounds"] = params.bounds*/
+			 paramsList.add('fq', searchFieldsConfig.LATLONG+":["+swLat+","+swLon+" TO "+neLat+","+neLon+"]");
+			 activeFilters["bounds"] = params.bounds
 		}
 		
 		paramsList.add('facet.field', searchFieldsConfig.TAG);

@@ -33,7 +33,9 @@ grails.project.dependency.resolution = {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
 
         // runtime 'mysql:mysql-connector-java:5.1.13'
-	   compile 'org.apache.solr:solr-solrj:3.2.0'
+	   compile ('org.apache.solr:solr-solrj:3.6.0') {
+	   		excludes 'slf4j-api', 'jcl-over-slf4j'
+	   }
 	   compile 'org.apache.lucene:lucene-analyzers:3.4.0'
 	   compile 'org.apache.lucene:lucene-spellchecker:3.4.0'
 	   compile group:'org.apache.poi', name:'poi', version:'3.7'

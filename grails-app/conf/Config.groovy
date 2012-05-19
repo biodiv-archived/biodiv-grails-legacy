@@ -330,6 +330,7 @@ speciesPortal {
 		MAX_VOTED_SPECIES_NAME = "maxvotedspeciesname"
 		TAG = "tag"
 		ISFLAGGED = "isflagged"
+		LATLONG = "latlong"
 	}
 
 	nameSearchFields {
