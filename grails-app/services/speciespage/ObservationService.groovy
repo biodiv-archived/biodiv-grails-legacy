@@ -645,8 +645,8 @@ class ObservationService {
 		//options
 		paramsList.add('start', offset);
 		paramsList.add('rows', max);
-		
-		String sort = params['sort']?params['sort'].toLowerCase():"score"; 
+		params['sort'] = params['sort']?:"score"
+		String sort = params['sort'].toLowerCase(); 
 		if(sort.indexOf(' desc') == -1) {
 			sort += " desc";
 			
@@ -746,7 +746,6 @@ class ObservationService {
 			noOfResults = queryResponse.getResults().getNumFound()
 		}
 		
-		//def tags = tagFacet.collectEntries([:]) {index-> [it.getName(),it.getCount()] }
 		[responseHeader:responseHeader, observationInstanceList:instanceList, observationInstanceTotal:noOfResults, queryParams:queryParams, activeFilters:activeFilters, tags:tags]
 	}
 }

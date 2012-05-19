@@ -19,9 +19,8 @@
 					observations found. Please relax the search query or filter criteria.</div>
 	</g:if>
 	
-	<i
-		class="icon-screenshot"></i> Showing <span class="name" style="color: #b1b1b1;"> ${observationInstanceTotal}
-	</span> observation<g:if test="${observationInstanceTotal!=1}">s</g:if>
+	<span class="name" style="color: #b1b1b1;"><i class="icon-screenshot"></i> ${observationInstanceTotal}
+	</span> Observation<g:if test="${observationInstanceTotal!=1}">s</g:if>
 	
 	
 	

@@ -18,7 +18,6 @@
 			model="['tagFilterByProperty':'All' , 'params':params, 'isAjaxLoad':true]" />
 	</g:else>
 </div>
-
 <div class="row">
 	<!-- main_content -->
 	<div class="list span9">
@@ -41,8 +40,9 @@
 					<button id="selected_sort" class="btn dropdown-toggle"
 						data-toggle="dropdown" href="#" rel="tooltip"
 						data-original-title="Sort by">
+						
 						<g:if test="${params.sort == 'visitCount'}">
-                                               Most viewed
+                                               Most Viewed
                                             </g:if>
 						<g:elseif test="${params.sort == 'createdOn'}">
                                                 Latest
@@ -51,7 +51,7 @@
                                                 Relevancy
                                             </g:elseif>
 						<g:else>
-                                                Last updated
+                                                Last Updated
                                             </g:else>
 						<span class="caret"></span>
 					</button>
