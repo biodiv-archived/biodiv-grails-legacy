@@ -777,6 +777,16 @@ Thank you for your contribution to the portal.<br/>
 <br/>
 -The portal team'''
 
+grails.plugins.springsecurity.ui.observationDeleted.emailSubject = 'Observation deleted'
+grails.plugins.springsecurity.ui.observationDeleted.emailBody = '''
+Hi $username,<br/>
+<br/>
+Your <a href="$obvUrl">observation</a> has been deleted on <b>$domain</b>.<br/>
+<br/>
+If you do not want to receive notifications please go to your <a href="$userProfileUrl">user profile</a> and switch it off.<br/>
+<br/>
+-The portal team'''
+
 grails.plugins.springsecurity.ui.encodePassword = false
 
 grails.plugins.springsecurity.useSecurityEventListener = true

@@ -28,8 +28,9 @@ class ObservationController {
 	private static final String SPECIES_NEW_COMMENT = "speciesNewComment";
 	private static final String SPECIES_REMOVE_COMMENT = "speciesRemoveComment";
 	private static final String OBSERVATION_FLAGGED = "observationFlagged";
-
 	private static final boolean COMMIT = true;
+	private static final String OBSERVATION_DELETED = "observationDeleted";
+
 	def grailsApplication;
 	def observationService;
 	def springSecurityService;
@@ -515,8 +516,13 @@ class ObservationController {
 		if (observationInstance) {
 			try {
 				observationInstance.isDeleted = true;
+<<<<<<< HEAD
 				observationInstance.save(flush: true)
 				observationsSearchService.delete(observationInstance);
+=======
+				observationInstance.save(flush: true);
+				sendNotificationMail(OBSERVATION_DELETED, observationInstance, request);
+>>>>>>> 7b813ccd33c64e8ab491790695ef641a826b61c7
 				flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
 				redirect(action: "list")
 			}
@@ -592,11 +598,14 @@ class ObservationController {
 	}
 
 	private sendNotificationMail(String notificationType, Observation obv, request){
+<<<<<<< HEAD
 		//		if(!obv.author.sendNotification){
 		//			log.debug "Not sending any notification mail for user " + obv.author.id
 		//			return
 		//		}
 
+=======
+>>>>>>> 7b813ccd33c64e8ab491790695ef641a826b61c7
 		def conf = SpringSecurityUtils.securityConfig
 		def obvUrl = generateLink("observation", "show", ["id": obv.id], request)
 		def userProfileUrl = generateLink("SUser", "show", ["id": obv.author.id], request)
@@ -617,7 +626,17 @@ class ObservationController {
 				body = conf.ui.observationFlagged.emailBody
 				templateMap["currentUser"] = springSecurityService.currentUser
 				break
+<<<<<<< HEAD
 
+=======
+			
+			case OBSERVATION_DELETED :
+				mailSubject = conf.ui.observationDeleted.emailSubject
+				body = conf.ui.observationDeleted.emailBody
+				templateMap["currentUser"] = springSecurityService.currentUser
+				break
+			
+>>>>>>> 7b813ccd33c64e8ab491790695ef641a826b61c7
 			case SPECIES_RECOMMENDED :
 				mailSubject = "Species name suggested"
 				body = conf.ui.addRecommendationVote.emailBody
@@ -802,8 +821,8 @@ class ObservationController {
 		if(userEmailList.isEmpty()){
 			log.debug "No valid email specified for identification."
 		}else if (Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
-			def mailSubject = params.mailSubject //? params.mailSubject : "Please identify species name"
-			def body = params.mailBody //? params.mailBody : "Please identify species name"
+			def mailSubject = params.mailSubject
+			def body = params.mailBody
 			log.debug "mail list $userEmailList"
 			mailService.sendMail {
 				to userEmailList.toArray()

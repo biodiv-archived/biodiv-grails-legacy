@@ -571,12 +571,11 @@ class ObservationService {
 
 	Map getIdentificationEmailInfo(m){
 		def obv = m.observationInstance;
-		def domain = m.domain;
-
+		def requestObj = m.requestObject;
 		def g = new org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib()
-		def obvUrl =  g.createLink(controller: 'observation', action: 'show', absolute: 'true', params:["id": obv.id])
-		def templateMap = [obvUrl:obvUrl, domain:domain]
-
+		def obvUrl =  g.createLink(controller: 'observation', action: 'show', base:Utils.getDomainServerUrl(requestObj), params:["id": obv.id])
+		def templateMap = [obvUrl:obvUrl, domain:Utils.getDomainName(requestObj)]
+		
 		def conf = SpringSecurityUtils.securityConfig
 		def mailSubject = conf.ui.askIdentification.emailSubject
 		def body = conf.ui.askIdentification.emailBody
@@ -716,5 +715,4 @@ class ObservationService {
 		//def tags = tagFacet.collectEntries([:]) {index-> [it.getName(),it.getCount()] }
 		[responseHeader:responseHeader, observationInstanceList:instanceList, observationInstanceTotal:noOfResults, queryParams:queryParams, activeFilters:activeFilters, tags:tags]
 	}
-
 }
