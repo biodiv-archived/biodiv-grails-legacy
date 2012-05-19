@@ -695,101 +695,7 @@ class ObservationController {
 		new SimpleTemplateEngine().createTemplate(s).make(binding)
 	}
 
-	/**
-	*
-	* @param params
-	* @return
-	*/
-   private Map getRecommendationVote(params) {
-	   def observation = params.observation?:Observation.get(params.obvId);
-	   def author = params.author;
-	   
-	   def reco;
-	   if(params.recoId)
-		   reco = Recommendation.get(params.long('recoId'));
-	   else
-		   reco = observationService.getRecommendation(params.recoName, params.canName);
-	   
-	   ConfidenceType confidence = observationService.getConfidenceType(params.confidence?:ConfidenceType.CERTAIN.name());
-	   
-	   RecommendationVote existingRecVote = RecommendationVote.findByAuthorAndObservation(author, observation);
-	   RecommendationVote newRecVote = new RecommendationVote(observation:observation, recommendation:reco, author:author, confidence:confidence);
-	   
-	   if(!reco){
-		   log.debug "Not a valid recommendation"
-		   return null
-	   }else{
-		   if(!existingRecVote){
-			   log.debug " Adding (first time) recommendation vote for user " + author.id +  " reco name " + reco.name
-			   def msg = "${message(code: 'recommendations.added.message', args: [reco.name])}"
-			   return [recVote:newRecVote, msg:msg]
-		   }else{
-			   if(existingRecVote.recommendation.id == reco.id){
-				   log.debug " Same recommendation already made by user " + author.id +  " reco name " + reco.name + " leaving as it is"
-				   def msg = "${message(code: 'reco.vote.duplicate.message', args: [reco.name])}"
-				   return [recVote:null, msg:msg]
-			   }else{
-			   	   log.debug " Overwrting old recommendation vote for user " + author.id +  " new reco name " + reco.name + " old reco name " + existingRecVote.recommendation.name
-				   def msg = "${message(code: 'recommendations.overwrite.message', args: [existingRecVote.recommendation.name, reco.name])}"
-				   if(!existingRecVote.delete(flush: true)){
-					   existingRecVote.errors.allErrors.each { log.error it }
-				   }
-				   return [recVote:newRecVote, msg:msg]
-			   }
-		   }
-	   }
-   }
-   
-   /**
-    * Count   
-    */
-   def count = {
-	  render Observation.count(); 
-   }
-   
-   /**
-    * 
-    */
-   def newComment = {
-	   log.debug params;
-	   if(!params.obvId) {
-		   log.error  "No Observation selected"
-		   response.setStatus(500)
-		   render (['error':"Coudn't find the specified observation with id $params.obvId"] as JSON);
-	   }
-	   def observationInstance = Observation.read(params.long('obvId'));
-	   if(observationInstance) {
-		   observationInstance.updateObservationTimeStamp();
-		   sendNotificationMail(SPECIES_NEW_COMMENT, observationInstance, request);
-		   render (['success:true'] as JSON);
-	   } else {
-	   	    response.setStatus(500)
-	   		render (['error':"Coudn't find the specified observation with id $params.obvId"] as JSON);
-	   }
-   }
-   
-   /**
-   *
-   */
-  def removeComment = {
-	  log.debug params;
-	    if(!params.obvId) {
-		   log.error "No Observation selected"
-		   response.setStatus(500)
-		   render (['error':"Coudn't find the specified observation with id $params.obvId"] as JSON);
-	   }
-	  
-	  def observationInstance = Observation.read(params.long('obvId'));
-	  if(observationInstance) {
-		  observationInstance.updateObservationTimeStamp();
-		  sendNotificationMail(SPECIES_REMOVE_COMMENT, observationInstance, request);
-		  render (['success:true'] as JSON);
-	  } else {
-	      response.setStatus(500)
-		  render (['error':"Coudn't find the specified observation with id $params.obvId"] as JSON);
-	  }
-  }
-  
+	
   def unsubscribeToIdentificationMail = {
 	  log.debug "$params"
 	  if(params.userId){
@@ -806,13 +712,8 @@ class ObservationController {
 	  render "Successfully unsubscribed from identification emails"
   }
   
-  @Secured(['ROLE_USER'])
-	def sendIdentificationMail = {
-		log.debug params;
-		def currentUserMailId = springSecurityService.currentUser?.email;
-		Map emailList = getUnBlockedMailList(params.userIdsAndEmailIds, request);
-		if(emailList.isEmpty()){
-	 *
+
+	 /*
 	 * @param params
 	 * @return
 	 */
@@ -908,22 +809,13 @@ class ObservationController {
 			render (['error':"Coudn't find the specified observation with id $params.obvId"] as JSON);
 		}
 	}
-
 	@Secured(['ROLE_USER'])
 	def sendIdentificationMail = {
 		log.debug params;
 		def currentUserMailId = springSecurityService.currentUser?.email;
-		Set userEmailList = new HashSet();
-		if(params.userIds && params.userIds != ""){
-			params.userIds.split(",").each{ userEmailList << '"' + SUser.get(it.toLong()).email.trim() + '"' }
-		}
-		if(params.emailIds && params.emailIds != ""){
-			params.emailIds.split(",").each{'"' + userEmailList << it.trim() + '"'}
-		}
-
-		if(userEmailList.isEmpty()){
->>>>>>> 003b8aea1cb00379052babf4b68440cdc270c60a
-			log.debug "No valid email specified for identification."
+		Map emailList = getUnBlockedMailList(params.userIdsAndEmailIds, request);
+		if(emailList.isEmpty()){
+				log.debug "No valid email specified for identification."
 		}else if (Environment.getCurrent().getName().equalsIgnoreCase("pamba") || Environment.getCurrent().getName().equalsIgnoreCase("saturn")) {
 			def mailSubject = params.mailSubject
 			for(entry in emailList.entrySet()){
@@ -935,20 +827,11 @@ class ObservationController {
 					  subject mailSubject
 					  html body.toString()
 				  }
-			def body = params.mailBody
-			log.debug "mail list $userEmailList"
-			mailService.sendMail {
-				to userEmailList.toArray()
-				bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com"
-				from currentUserMailId
-				subject mailSubject
-				html body.toString()
+				log.debug " mail sent for identification "
 			}
-			log.debug " mail sent for identification "
 		}
 		render (['success:true']as JSON);
 	}
-
 
 	///////////////////////////////////////////////////////////////////////////////
 	////////////////////////////// SEARCH /////////////////////////////////////////
