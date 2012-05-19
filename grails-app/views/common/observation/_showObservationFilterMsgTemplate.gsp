@@ -46,4 +46,5 @@
 				id="removeUserFilter" href="#">[X]</a></g:link>
 		</span>
 	</g:if>
+	<obv:identificationByEmail model="['source':'observationList', 'requestObject':request]" />
 </div>

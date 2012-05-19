@@ -21,6 +21,7 @@ import species.utils.ImageUtils
 import species.utils.Utils;
 import species.groups.SpeciesGroup;
 import species.Habitat;
+import species.BlockedMails;
 import species.auth.SUser;
 
 class ObservationController {
@@ -782,34 +783,70 @@ class ObservationController {
 	  }
   }
   
+  def unsubscribeToIdentificationMail = {
+	  log.debug "$params"
+	  if(params.userId){
+		  def user = SUser.get(params.userId.toLong())
+		  user.allowIdentifactionMail = false;
+		  if(!user.save(flush:true)){
+			  this.errors.allErrors.each { log.error it }
+		  }
+	  }
+	  BlockedMails bm = new BlockedMails(email:params.email);
+	  if(!bm.save(flush:true)){
+		  this.errors.allErrors.each { log.error it }
+	  }
+	  render "Successfully unsubscribed from identification emails"
+  }
+  
   @Secured(['ROLE_USER'])
 	def sendIdentificationMail = {
 		log.debug params;
 		def currentUserMailId = springSecurityService.currentUser?.email;
-		Set userEmailList = new HashSet();
-		if(params.userIds && params.userIds != ""){
-			 params.userIds.split(",").each{ userEmailList << '"' + SUser.get(it.toLong()).email.trim() + '"' }
-		}
-		if(params.emailIds && params.emailIds != ""){
-			params.emailIds.split(",").each{'"' + userEmailList << it.trim() + '"'}
-		}
-
-		if(userEmailList.isEmpty()){
+		Map emailList = getUnBlockedMailList(params.userIdsAndEmailIds, request);
+		if(emailList.isEmpty()){
 			log.debug "No valid email specified for identification."
-		}else if (Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
+		}else if (Environment.getCurrent().getName().equalsIgnoreCase("pamba") || Environment.getCurrent().getName().equalsIgnoreCase("saturn")) {
 			def mailSubject = params.mailSubject
-			def body = params.mailBody
-			log.debug "mail list $userEmailList"
-				  mailService.sendMail {
-					  to userEmailList.toArray()
+			for(entry in emailList.entrySet()){
+				def body = observationService.getIdentificationEmailInfo(params, entry.getValue()).mailBody
+				mailService.sendMail {
+					  to entry.getKey()
 					  bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com"
 					  from currentUserMailId
 					  subject mailSubject
 					  html body.toString()
 				  }
+			}
 			log.debug " mail sent for identification "
 		}
 		render (['success:true'] as JSON);
 	}
+	
+	private Map getUnBlockedMailList(String userIdsAndEmailIds, request){
+		Map result = new HashMap();
+		userIdsAndEmailIds.split(",").each{
+			String candidateEmail = it.trim();
+			//checking for email signature
+			if(candidateEmail.contains("@")){
+				if(BlockedMails.findByEmail(candidateEmail)){
+					log.debug "Email $candidateEmail is unsubscribed for identification mail."
+				}else{
+					result[candidateEmail] = generateLink("observation", "unsubscribeToIdentificationMail", [email:candidateEmail], request) ;
+				}
+			}else{
+				//its user id
+				SUser user = SUser.get(candidateEmail.toLong());
+				candidateEmail = user.email.trim();
+				if(user.allowIdentifactionMail){
+					result[candidateEmail] = generateLink("observation", "unsubscribeToIdentificationMail", [email:candidateEmail, userId:user.id], request) ;
+				}else{
+					log.debug "User $user.id has unsubscribed for identification mail."
+				}
+			}
+		}
+		return result;
+	}
+	
 	
 }

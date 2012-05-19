@@ -759,12 +759,15 @@ If you do not want to receive notifications please go to your <a href="$userProf
 -The portal team'''
 
 grails.plugins.springsecurity.ui.askIdentification.emailSubject = 'Please identify the species name'
+grails.plugins.springsecurity.ui.askIdentification.staticMessage = '''
+The user $currentUser has shared this $activitySource with you.'''
 grails.plugins.springsecurity.ui.askIdentification.emailBody = '''
-Hi,<br/>
+The user $currentUser has shared this  <a href="$activitySourceUrl">$activitySource</a> with you.
 <br/>
-Please identify the species name for <a href="$obvUrl">observation</a> on <b>$domain</b><br/>
+$userMessage
 <br/>
-Thank you for your contribution to the portal.<br/>
+If you do not want to receive such mails please click <a href="$unsubscribeUrl">here</a>.
+<br/>
 <br/>
 -The portal team'''
 

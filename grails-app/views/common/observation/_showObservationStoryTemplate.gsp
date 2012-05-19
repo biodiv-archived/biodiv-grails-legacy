@@ -123,7 +123,7 @@
             </g:else>
             <g:if test="${showDetails}">
 	            <div class="footer-item"">
-	            	<obv:identificationByEmail model="['observationInstance':observationInstance, 'requestObject':request]" />
+	            	<obv:identificationByEmail model="['source':'observationShow', 'requestObject':request]" />
 	            </div>
             </g:if>
             <g:if test="${showDetails}">

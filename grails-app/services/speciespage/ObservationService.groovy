@@ -32,7 +32,7 @@ class ObservationService {
 	def recommendationService;
 	def grailsApplication;
 	def dataSource;
-
+	def springSecurityService;
 	/**
 	 * 
 	 * @param params
@@ -581,20 +581,48 @@ class ObservationService {
 	
 	
 	
-	Map getIdentificationEmailInfo(m){
-		def obv = m.observationInstance;
-		def requestObj = m.requestObject;
-		def g = new org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib()
-		def obvUrl =  g.createLink(controller: 'observation', action: 'show', base:Utils.getDomainServerUrl(requestObj), params:["id": obv.id])
-		def templateMap = [obvUrl:obvUrl, domain:Utils.getDomainName(requestObj)]
+	Map getIdentificationEmailInfo(m, unsubscribeUrl){
+		def source = m.source;
+		//def requestObj = m.requestObject;
 		
+		def mailSubject = ""
+		def activitySource = ""
+
+		switch (source) {
+			case "observationShow":
+				mailSubject = "Share Observation"
+				activitySource = "observation"
+				break
+			
+			case  "observationList" :
+				mailSubject = "Share Observation List"
+				activitySource = "observation list"
+				break
+			
+			case "userProfileShow":
+				mailSubject = "Share User Profile"
+				activitySource = "user profile"
+				break
+			
+			default:
+				log.debug "invalid source type"
+		}
+		
+		def templateMap = [currentUser:springSecurityService.currentUser, activitySource:activitySource]
 		def conf = SpringSecurityUtils.securityConfig
-		def mailSubject = conf.ui.askIdentification.emailSubject
+		def staticMessage = conf.ui.askIdentification.staticMessage
+		if (staticMessage.contains('$')) {
+			staticMessage = evaluate(staticMessage, templateMap)
+		}
+		
+		templateMap["activitySourceUrl"] = m.sourcePageUrl? m.sourcePageUrl : ""
+		templateMap["unsubscribeUrl"] = unsubscribeUrl ? unsubscribeUrl : ""
+		templateMap["userMessage"] = m.userMessage? m.userMessage : ""
 		def body = conf.ui.askIdentification.emailBody
 		if (body.contains('$')) {
 			body = evaluate(body, templateMap)
 		}
-		return [mailSubject:mailSubject, mailBody:body, observationInstance:obv]
+		return [mailSubject:mailSubject, mailBody:body, staticMessage:staticMessage, source:source]
 	}
 	
 	private String evaluate(s, binding) {

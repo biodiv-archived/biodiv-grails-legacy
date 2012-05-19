@@ -39,7 +39,6 @@
 								controller="SUser" action="edit" id="${SUserInstance.id }">Edit Profile
 							</g:link> </span>
 					</sUser:ifOwns>
-
 				</h1>
 
 				</div>
@@ -49,7 +48,7 @@
 						${flash.message}
 					</div>
 				</g:if>
-
+				<obv:identificationByEmail model="['source':'userProfileShow', 'requestObject':request]" />
 				<div class="super-section">
 					<div class="row section" style="">
 						<div class="figure span3"
@@ -147,7 +146,6 @@
 						</div>
 						
 						
-
 					</div>
 				
 				</div>

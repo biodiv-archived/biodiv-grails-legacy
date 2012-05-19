@@ -365,7 +365,7 @@ class SUserController extends UserController {
 			if(allowIdenMail){
 				BlockedMails bm = BlockedMails.findByEmail(user.email.trim());
 				if(bm && !bm.delete(flush:true)){
-					this.errors.allErrors.each { log.error it }
+					this.errors?.allErrors.each { log.error it }
 				}
 			}else{
 				BlockedMails bm = new BlockedMails(email:user.email.trim());

@@ -176,7 +176,7 @@ class ObservationTagLib {
 	}
 	
 	def identificationByEmail = {attrs, body->
-		def emailInfoModel = observationService.getIdentificationEmailInfo(attrs.model);
+		def emailInfoModel = observationService.getIdentificationEmailInfo(attrs.model, "");
 		out << render(template:"/common/observation/identificationByEmailTemplate",model:emailInfoModel);
 	}
 	

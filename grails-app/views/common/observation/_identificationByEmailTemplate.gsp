@@ -10,14 +10,14 @@
 			<span class="keyname" style="clear:both">Subject</span><input type="text" style="width:70%" name="mailSubject"
 				value="${mailSubject}"></input><br />
 			<h5><label><i class="icon-pencil"></i> Message </label></h5>
+			<h5><label>${staticMessage}</label></h5>
 				<div class="section-item" style="margin-right: 10px;">
 					<ckeditor:config var="toolbar_editorToolbar">
 									[
     									[ 'Bold', 'Italic' ]
 									]
 					</ckeditor:config>
-					<ckeditor:editor name="mailBody" height="90px" toolbar="editorToolbar">
-						${mailBody}
+					<ckeditor:editor name="userMessage" height="90px" toolbar="editorToolbar">
 					</ckeditor:editor>
 				</div>
 			<input type="hidden" name="userIdsAndEmailIds" id="userIdsAndEmailIds" />
@@ -33,19 +33,13 @@
 var validEmailAndIdList = []
 
 function removeChoice(ele){
-	console.log($(ele).attr("id"));
 	var removedIndex = validEmailAndIdList.indexOf("" + $(ele).attr("id"));
-	//alert("before remove " + validEmailAndIdList + " index " + removedIndex + "  item " + $(ele).attr("id"));
 	validEmailAndIdList.splice(removedIndex, 1);
-	//alert("vvv == " + validEmailAndIdList);
 	$(ele).parent().remove();
 }
 
 $(function() {
 	//validEmailAndIdList = []
-	//alert(validEmailAndIdList);
-	$("#observationUrlLink").attr("href", document.location.href);
-		
 	$('#identification-email').click(function(){
 			$('#userIdsAndEmailIds').val('');
 			$('#userAndEmailList').val('')
@@ -134,21 +128,22 @@ $(function() {
 		}else{
 			$('#userIdsAndEmailIds').val(validEmailAndIdList.join(","));
 		}
-		
- 		$(this).ajaxSubmit({ 
+
+		$(this).ajaxSubmit({ 
          	url:"${createLink(controller:'observation', action:'sendIdentificationMail')}",
 			dataType: 'json', 
 			type: 'POST',
+			data:{sourcePageUrl : window.location.href, source:"${source}"},
 			resetForm: true,
 			success: function(data, statusText, xhr, form) {
-				showRecoUpdateStatus('Email sent to respective person', 'success');
+				//showRecoUpdateStatus('Email sent to respective person', 'success');
             	return false;
             },
             error:function (xhr, ajaxOptions, thrownError){
             	//successHandler is used when ajax login succedes
             	//var successHandler = this.success, errorHandler = showRecoUpdateStatus;
             	//handleError(xhr, ajaxOptions, thrownError, successHandler, errorHandler);
-            	showRecoUpdateStatus('Error while sending email', 'error');
+            	//showRecoUpdateStatus('Error while sending email', 'error');
             	return false;
 			} 
      	});
