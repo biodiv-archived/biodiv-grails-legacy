@@ -20,7 +20,7 @@
 	</g:if>
 	
 	<i
-		class="icon-screenshot"></i> Showing <span class="name" style="color: #b1b1b1;"> ${observationInstanceTotal}
+		class="icon-screenshot"></i> showing <span class="name" style="color: #b1b1b1;"> ${observationInstanceTotal}
 	</span> Observation<g:if test="${observationInstanceTotal!=1}">s</g:if>
 	
 	
@@ -55,7 +55,6 @@
 				id="removeUserFilter" href="#">[X]</a></g:link>
 		</span>
 	</g:if>
-	<obv:identificationByEmail model="['source':'observationList', 'requestObject':request]" />
 	<g:if test="${queryParams.query}">
                                     for query <span class="highlight">
 			<g:link controller="observation" action="select" params="[query: queryParams.query]">

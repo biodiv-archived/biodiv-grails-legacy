@@ -48,7 +48,7 @@
 						${flash.message}
 					</div>
 				</g:if>
-				<obv:identificationByEmail model="['source':'userProfileShow', 'requestObject':request]" />
+<%--				<obv:identificationByEmail model="['source':'userProfileShow', 'requestObject':request]" />--%>
 				<div class="super-section">
 					<div class="row section" style="">
 						<div class="figure span3"
