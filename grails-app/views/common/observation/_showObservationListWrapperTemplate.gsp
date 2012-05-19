@@ -30,9 +30,7 @@
 						model="['observationInstanceTotal':observationInstanceTotal, 'queryParams':queryParams]" />
 				</div>
 				<div style="clear: both;"></div>
-				
 				<!-- needs to be fixed -->
-				<g:if test="${params.action != 'search'}">
 				<div id="map_view_bttn" class="btn-group">
 					<a class="btn btn-success dropdown-toggle" data-toggle="dropdown"
 						href="#"
@@ -49,15 +47,14 @@
 						<g:elseif test="${params.sort == 'createdOn'}">
                                                 Latest
                                             </g:elseif>
-						<g:elseif test="${params.sort == 'score desc'}">
-                                                Revevancy
+						<g:elseif test="${params.sort == 'score'}">
+                                                Relevancy
                                             </g:elseif>
 						<g:else>
                                                 Last updated
                                             </g:else>
 						<span class="caret"></span>
 					</button>
-
 					<ul id="sortFilter" class="dropdown-menu" style="width: auto;">
 						<li class="group_option"><a class=" sort_filter_label"
 							value="createdOn"> Latest </a>
@@ -67,7 +64,7 @@
 						</li>
 						<g:if test="${params.action == 'search'}">
 							<li class="group_option"><a class=" sort_filter_label"
-								value="score desc"> Relevancy </a>
+								value="score"> Relevancy </a>
 							</li>
 						</g:if>
 						<g:else>
@@ -79,7 +76,6 @@
 
 
 				</div>
-				</g:if>
 				
 				<div id="observations_list_map" class="observation"
 					style="clear: both; display: none;">

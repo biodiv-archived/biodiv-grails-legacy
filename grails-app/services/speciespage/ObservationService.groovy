@@ -645,7 +645,14 @@ class ObservationService {
 		//options
 		paramsList.add('start', offset);
 		paramsList.add('rows', max);
-		paramsList.add('sort', params['sort']?:"score desc");
+		
+		String sort = params['sort']?params['sort'].toLowerCase():"score"; 
+		if(sort.indexOf(' desc') == -1) {
+			sort += " desc";
+			
+		}
+		paramsList.add('sort', sort);
+		
 		paramsList.add('fl', params['fl']?:"id");
 		
 		//Facets

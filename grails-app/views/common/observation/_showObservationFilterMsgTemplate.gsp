@@ -20,8 +20,8 @@
 	</g:if>
 	
 	<i
-		class="icon-screenshot"></i> showing <span class="name" style="color: #b1b1b1;"> ${observationInstanceTotal}
-	</span> Observation<g:if test="${observationInstanceTotal!=1}">s</g:if>
+		class="icon-screenshot"></i> Showing <span class="name" style="color: #b1b1b1;"> ${observationInstanceTotal}
+	</span> observation<g:if test="${observationInstanceTotal!=1}">s</g:if>
 	
 	
 	
