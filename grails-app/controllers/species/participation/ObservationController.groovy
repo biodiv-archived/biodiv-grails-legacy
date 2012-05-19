@@ -130,7 +130,7 @@ class ObservationController {
 		log.debug params;
 		
 		def observationInstance = Observation.get(params.id.toLong())
-		//params.author = springSecurityService.currentUser;
+		params.author = observationInstance.author;
 		if(observationInstance)	{
 			try {
 				observationService.updateObservation(params, observationInstance);

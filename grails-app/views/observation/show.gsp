@@ -101,18 +101,20 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 						</h1>
 					</div>
 					<div style="float:right;">
+						<div class="clearfix">
 						<sUser:ifOwns model="['user':observationInstance.author]">
 							
-							<a class="btn btn-primary" style="float: right;"
+							<a class="btn btn-primary pull-right"
 								href="${createLink(controller:'observation', action:'edit', id:observationInstance.id)}">
 								Edit Observation </a>
 
-								<a class="btn btn-danger btn-primary" style="float: right; margin-right: 5px;margin-bottom:10px;"
+								<a class="btn btn-danger btn-primary pull-right" style="margin-right: 5px;margin-bottom:10px;"
 									href="${createLink(controller:'observation', action:'flagDeleted', id:observationInstance.id)}"
 									onclick="return confirm('${message(code: 'default.observatoin.delete.confirm.message', default: 'This observation will be deleted. Are you sure ?')}');">Delete
 									Observation </a>
 									
 						</sUser:ifOwns>
+						</div>
 						<search:searchBox />
 						
 					</div>

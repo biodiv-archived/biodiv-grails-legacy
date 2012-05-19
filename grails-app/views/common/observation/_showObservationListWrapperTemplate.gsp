@@ -30,7 +30,9 @@
 						model="['observationInstanceTotal':observationInstanceTotal, 'queryParams':queryParams]" />
 				</div>
 				<div style="clear: both;"></div>
-
+				
+				<!-- needs to be fixed -->
+				<g:if test="${params.action != 'search'}">
 				<div id="map_view_bttn" class="btn-group">
 					<a class="btn btn-success dropdown-toggle" data-toggle="dropdown"
 						href="#"
@@ -77,7 +79,8 @@
 
 
 				</div>
-
+				</g:if>
+				
 				<div id="observations_list_map" class="observation"
 					style="clear: both; display: none;">
 					<obv:showObservationsLocation
