@@ -570,7 +570,7 @@ class ObservationService {
 	
 	Map getIdentificationEmailInfo(m, unsubscribeUrl){
 		def source = m.source;
-		//def requestObj = m.requestObject;
+		def requestObj = m.requestObject;
 		
 		def mailSubject = ""
 		def activitySource = ""
@@ -594,8 +594,8 @@ class ObservationService {
 			default:
 				log.debug "invalid source type"
 		}
-
-		def templateMap = [currentUser:springSecurityService.currentUser, activitySource:activitySource]
+		def currentUser = springSecurityService.currentUser?springSecurityService.currentUser:""
+		def templateMap = [currentUser:currentUser, activitySource:activitySource, domain:Utils.getDomainName(requestObj)]
 		def conf = SpringSecurityUtils.securityConfig
 		def staticMessage = conf.ui.askIdentification.staticMessage
 		if (staticMessage.contains('$')) {

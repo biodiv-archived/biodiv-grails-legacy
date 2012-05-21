@@ -715,7 +715,7 @@ class ObservationController {
 	  if(!bm.save(flush:true)){
 		  this.errors.allErrors.each { log.error it }
 	  }
-	  render "Successfully unsubscribed from identification emails"
+	  render "${message(code: 'user.unsubscribe.identificationMail', args: [params.email])}"
   }
   
 
@@ -838,7 +838,32 @@ class ObservationController {
 		}
 		render (['success:true']as JSON);
 	}
-
+	
+	private Map getUnBlockedMailList(String userIdsAndEmailIds, request){
+		Map result = new HashMap();
+		userIdsAndEmailIds.split(",").each{
+			String candidateEmail = it.trim();
+			//checking for email signature
+			if(candidateEmail.contains("@")){
+				if(BlockedMails.findByEmail(candidateEmail)){
+					log.debug "Email $candidateEmail is unsubscribed for identification mail."
+				}else{
+					result[candidateEmail] = generateLink("observation", "unsubscribeToIdentificationMail", [email:candidateEmail], request) ;
+				}
+			}else{
+				//its user id
+				SUser user = SUser.get(candidateEmail.toLong());
+				candidateEmail = user.email.trim();
+				if(user.allowIdentifactionMail){
+					result[candidateEmail] = generateLink("observation", "unsubscribeToIdentificationMail", [email:candidateEmail, userId:user.id], request) ;
+				}else{
+					log.debug "User $user.id has unsubscribed for identification mail."
+				}
+			}
+		}
+		return result;
+	}
+	
 	///////////////////////////////////////////////////////////////////////////////
 	////////////////////////////// SEARCH /////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////
@@ -915,33 +940,9 @@ class ObservationController {
 		render (view:'advSearch', params:newParams);
 	}
 	
-	private Map getUnBlockedMailList(String userIdsAndEmailIds, request){
-		Map result = new HashMap();
-		userIdsAndEmailIds.split(",").each{
-			String candidateEmail = it.trim();
-			//checking for email signature
-			if(candidateEmail.contains("@")){
-				if(BlockedMails.findByEmail(candidateEmail)){
-					log.debug "Email $candidateEmail is unsubscribed for identification mail."
-				}else{
-					result[candidateEmail] = generateLink("observation", "unsubscribeToIdentificationMail", [email:candidateEmail], request) ;
-				}
-			}else{
-				//its user id
-				SUser user = SUser.get(candidateEmail.toLong());
-				candidateEmail = user.email.trim();
-				if(user.allowIdentifactionMail){
-					result[candidateEmail] = generateLink("observation", "unsubscribeToIdentificationMail", [email:candidateEmail, userId:user.id], request) ;
-				}else{
-					log.debug "User $user.id has unsubscribed for identification mail."
-				}
-			}
-		}
-		return result;
-	}
-	
-	
-
+	/**
+	 * 
+	 */
 	def nameTerms = {
 		log.debug params;
 		params.field = params.field?:"autocomplete";

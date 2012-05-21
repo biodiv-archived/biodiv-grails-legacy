@@ -21,7 +21,7 @@
 					</ckeditor:editor>
 				</div>
 			<input type="hidden" name="userIdsAndEmailIds" id="userIdsAndEmailIds" />
-			<input class="btn btn-mini btn-primary" type="submit" value="send" style="float:right"> </input>
+			<input class="btn btn-mini btn-primary" type="submit" value="SEND" style="float:right"> </input>
 			<div id="email-form-close" value="close">
 				<i class="icon-remove"></i>
 			</div>
@@ -68,7 +68,6 @@ $(function() {
 		if(isEmail(lastEntry)){
 			addLiChoice(lastEntry, lastEntry);
 			validEmailAndIdList.push(""+lastEntry);
-			alert("after push email " +  validEmailAndIdList);
 			removeErrorClass();
 		}
 		$("#userAndEmailList").val("");
