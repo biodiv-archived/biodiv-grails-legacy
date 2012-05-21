@@ -1,6 +1,6 @@
 <div>
 	<div class="btn-group">
-		<a id="identification-email" class="btn btn-mini"
+		<a id="identification-email" class="${(source == 'observationShow')?'btn btn-mini' : 'btn'}" 
 			data-toggle="dropdown" href="#"><i class="icon-envelope"></i>Share</a>
 		<form id="email-form" name="email-form" style="display: none; background-color: #F2F2F2;"
 			action="${createLink(controller:'observation', action:'sendIdentificationMail')}"
@@ -140,8 +140,8 @@ $(function() {
             },
             error:function (xhr, ajaxOptions, thrownError){
             	//successHandler is used when ajax login succedes
-            	//var successHandler = this.success, errorHandler = showRecoUpdateStatus;
-            	//handleError(xhr, ajaxOptions, thrownError, successHandler, errorHandler);
+            	var successHandler = this.success;//, errorHandler = showRecoUpdateStatus;
+            	handleError(xhr, ajaxOptions, thrownError, successHandler, function() { return false;});
             	//showRecoUpdateStatus('Error while sending email', 'error');
             	return false;
 			} 

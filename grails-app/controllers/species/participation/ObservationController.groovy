@@ -825,7 +825,7 @@ class ObservationController {
 		}else if (Environment.getCurrent().getName().equalsIgnoreCase("pamba") || Environment.getCurrent().getName().equalsIgnoreCase("saturn")) {
 			def mailSubject = params.mailSubject
 			for(entry in emailList.entrySet()){
-				def body = observationService.getIdentificationEmailInfo(params, entry.getValue()).mailBody
+				def body = observationService.getIdentificationEmailInfo(params, request, entry.getValue()).mailBody
 				mailService.sendMail {
 					  to entry.getKey()
 					  bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com"
