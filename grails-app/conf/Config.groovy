@@ -770,9 +770,9 @@ If you do not want to receive notifications please go to your <a href="$userProf
 
 grails.plugins.springsecurity.ui.askIdentification.emailSubject = 'Please identify the species name'
 grails.plugins.springsecurity.ui.askIdentification.staticMessage = '''
-The user $currentUser has shared this $activitySource with you.'''
+The user $currentUser has shared this $activitySource from $domain with you.'''
 grails.plugins.springsecurity.ui.askIdentification.emailBody = '''
-The user $currentUser has shared this  <a href="$activitySourceUrl">$activitySource</a> with you.
+The user $currentUser has shared this  <a href="$activitySourceUrl">$activitySource</a> from $domain with you.
 <br/>
 $userMessage
 <br/>
