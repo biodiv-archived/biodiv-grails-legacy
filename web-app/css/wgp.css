@@ -1108,11 +1108,10 @@ padding: 10px;
 }
 
 #wgp-footer {
-background: url(../images/species.png) no-repeat scroll 0 100%, url(../images/footer-big.jpg);    
-background-color: #f9f9f9;
+background-image: url(../images/footer-big.jpg);    
 color: #5E5E5E;
 font-family: Verdana,Helvetica,Sans-Serif;
-height: 274px;
+height: 160px;
 width: 100%;
 position: relative;
 border-top: 1px solid #e5e5e5;          
