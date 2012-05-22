@@ -1,17 +1,29 @@
 <div>
-	<div class="btn-group">
-		<a id="identification-email" class="${(source == 'observationShow')?'btn btn-mini' : 'btn'}" 
+	<div class="btn-group" style="z-index:10; float: left; margin-left: 5px;">
+		<a id="identification-email" class="${(source == 'observationShow')?'btn btn-mini' : 'btn'} dropdown-toggle" 
 			data-toggle="dropdown" href="#"><i class="icon-envelope"></i>Share</a>
 		<form id="email-form" name="email-form" style="display: none; background-color: #F2F2F2;"
 			action="${createLink(controller:'observation', action:'sendIdentificationMail')}"
 			method="post">
-			<span class="keyname">To</span><input id="userAndEmailList"
-				placeholder='Type user name or email id' style="float:left" type="text" /><br />
-			<span class="keyname" style="clear:both">Subject</span><input type="text" style="width:70%" name="mailSubject"
-				value="${mailSubject}"></input><br />
-			<h5><label><i class="icon-pencil"></i> Message </label></h5>
+                        <div class="form-row">
+                            <span class="keyname">To</span>
+                            <ul class="userOrEmail-list">
+                            <li id="userOrEmail-new">
+                            <input id="userAndEmailList"
+                                    placeholder='Type user name or email id' style="float:left" type="text" />
+                            </li>
+                            </ul>
+                        </div>
+                        <div class="form-row">
+                            <span class="keyname" style="clear:both">Subject</span><input type="text" style="width:97%" name="mailSubject"
+                                    value="${mailSubject}"></input>
+                        </div>        
+
+                        <div class="form-row">
+			<i class="icon-pencil"></i><span class="keyname" style="clear:both"> Message</span>
 			<h5><label>${staticMessage}</label></h5>
-				<div class="section-item" style="margin-right: 10px;">
+				<div class="section-item">
+                                        <div id="cke_message">
 					<ckeditor:config var="toolbar_editorToolbar">
 									[
     									[ 'Bold', 'Italic' ]
@@ -19,9 +31,11 @@
 					</ckeditor:config>
 					<ckeditor:editor name="userMessage" height="90px" toolbar="editorToolbar">
 					</ckeditor:editor>
+                                        </div>
 				</div>
+                        </div>        
 			<input type="hidden" name="userIdsAndEmailIds" id="userIdsAndEmailIds" />
-			<input class="btn btn-mini btn-primary" type="submit" value="SEND" style="float:right"> </input>
+			<input class="btn btn-mini btn-primary" type="submit" value="SEND" style="margin:10px; float:right"> </input>
 			<div id="email-form-close" value="close">
 				<i class="icon-remove"></i>
 			</div>
@@ -61,7 +75,7 @@ $(function() {
 	}
 
 	function addLiChoice(itemValue, id){
-		$('<li class="userAndEmailList-choice">' + itemValue + '<span id="'+ id + '" class="userAndEmailList-close" onClick="removeChoice(this);return false;"> x</span></li>').insertBefore("#userAndEmailList");
+		$('<li class="userOrEmail-choice">' + itemValue + '<span id="'+ id + '" class="userOrEmail-close" onClick="removeChoice(this);return false;"> x</span></li>').insertBefore("#userOrEmail-new");
 	}
 	
 	function validateAndAddEmail(lastEntry){
@@ -182,5 +196,78 @@ $(function() {
 	top: 0;
 	right: 0;
 }
+
+input#userAndEmailList {
+-moz-box-sizing: border-box;
+border: medium none !important;
+margin: 0 !important;
+outline: medium none;
+padding: 0 !important;
+width: inherit !important;
+}
+
+.userOrEmail-list {
+background: none repeat scroll 0 0 #FFFFFF;
+border: 1px solid #CCCCCC;
+cursor: text;
+margin: 0;
+overflow: auto;
+padding: 3px;
+list-style: none;       
+clear: both;       
+}
+
+li.userOrEmail-choice {
+background-color: #DEE7F8;
+border: 1px solid #CAD8F3;
+padding: 2px 13px 3px 4px;
+border-radius: 5px 5px 5px 5px;
+display: block;
+float: left;
+margin: 2px 5px 2px 0;
+position: relative;
+}
+
+li.userOrEmail-choice:hover {
+background-color: #bbcef1;
+}
+
+span.userOrEmail-close {
+cursor:pointer;
+}
+
+li#userOrEmail-new {
+padding: 2px 4px 1px 0;
+margin-left: 0;         
+border-radius: 5px 5px 5px 5px;
+display: block;
+float: left;
+margin: 2px 5px 2px 0;
+position: relative;
+}
+
+.form-row {
+margin: 10px;
+}
+
+.keyname {
+float: left;
+font-size: 0.9em;
+font-weight: bold;
+margin-right: 10px;
+text-align: right;
+}
+
+#cke_userMessage {
+padding: 0;
+width: 100%;         
+}
+
+#cke_message {
+width: 100%;
+min-width: 100%;
+max-width: 100%;
+}
+
 </style>
 	
