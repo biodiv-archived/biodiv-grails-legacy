@@ -37,8 +37,7 @@ class SUserController extends UserController {
 
 	def list = {
 		params.max = Math.min(params.max ? params.int('max') : 10, 100)
-		def model = [results: SUser.list(params), totalCount: SUser.count()]
-		render view: 'search', model: model
+		render view: 'list', model: [results: SUser.list(params), totalCount: SUser.count(), searched:"true"]
 	}
 
 	@Secured(['ROLE_ADMIN'])
@@ -170,6 +169,25 @@ class SUserController extends UserController {
 		
 		log.debug params
 		
+		def model = getUsersList(params);
+		
+		// add query params to model for paging
+		for (name in [
+			'username',
+			'enabled',
+			'accountExpired',
+			'accountLocked',
+			'passwordExpired',
+			'sort',
+			'order'
+		]) {
+			model[name] = params[name]
+		}
+		
+		render view: 'search', model: model
+	}
+
+	private def getUsersList(params) {
 		boolean useOffset = params.containsKey('offset')
 		setIfMissing 'max', 12, 100
 		setIfMissing 'offset', 0
@@ -236,7 +254,7 @@ class SUserController extends UserController {
 		}
 
 		
-		def results = []; 
+		def results = [];
 		if(params.sort == 'activity') {
 			String query = "select u.id, u.$usernameFieldName from Observation obv right outer join obv.author u WHERE 1=1 $cond group by u.id, u.$usernameFieldName order by count(obv.id)  desc, u.$usernameFieldName asc";
 			def uids =  lookupUserClass().executeQuery(query, queryParams, [max: max, offset: offset])
@@ -254,24 +272,10 @@ class SUserController extends UserController {
 //			println params['username'].toLowerCase();
 //			sorted = results.sort( sorter.rcurry(params['username'].toLowerCase()))
 //		}
-		def model = [results: sorted, totalCount: totalCount, searched: true]
+		return [results: sorted, totalCount: totalCount, searched: true]
 
-		// add query params to model for paging
-		for (name in [
-			'username',
-			'enabled',
-			'accountExpired',
-			'accountLocked',
-			'passwordExpired',
-			'sort',
-			'order'
-		]) {
-			model[name] = params[name]
-		}
-		println params.query;
-		render view: 'search', model: model
 	}
-
+	
 	// Define a closure that will do the sorting
 	def sorter = { SUser a, SUser b, String prefix ->
 	  // Get the index into order for a and b
@@ -312,7 +316,6 @@ class SUserController extends UserController {
 		render (view:'advSearch', params:newParams);
 	}
 	
-	
 	/**
 	 * Ajax call used by autocomplete textfield.
 	 */
@@ -346,7 +349,6 @@ class SUserController extends UserController {
 		render jsonData as JSON
 	}
 	
-	
 	/**
 	 *
 	 */
@@ -358,7 +360,6 @@ class SUserController extends UserController {
 		render result as JSON;
 	}
 
-	
 	private Map getUnBlockedMailList(String userIdsAndEmailIds, request){
 		Map result = new HashMap();
 		userIdsAndEmailIds.split(",").each{
@@ -384,11 +385,9 @@ class SUserController extends UserController {
 		return result;
 	}
 	
-	
-
-        def login = {
-            render  template:"/common/suser/userLoginBoxTemplate" 
-        }
+    def login = {
+		render template:"/common/suser/userLoginBoxTemplate" 
+    }
 
 	protected void addRoles(user) {
 		String upperAuthorityFieldName = GrailsNameUtils.getClassName(
@@ -436,6 +435,7 @@ class SUserController extends UserController {
 	protected List sortedRoles() {
 		lookupRoleClass().list().sort { it.authority }
 	}
+	
 	
 	private Map getTrimmedParams(Map m){
 		def res = [:]

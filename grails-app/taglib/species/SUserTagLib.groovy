@@ -75,6 +75,13 @@ class SUserTagLib {
 	}
 	
 	/**
+	*
+	*/
+   def showUserListWrapper = { attrs, body->
+	   out << render(template:"/common/suser/showUserListWrapperTemplate", model:attrs.model);
+   }
+	
+	/**
 	 *
 	 */
 	def showUserStory = { attrs, body->

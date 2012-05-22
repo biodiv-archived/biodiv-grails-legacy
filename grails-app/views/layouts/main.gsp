@@ -303,7 +303,7 @@ var ajaxLoginSuccessHandler = function(json, statusText, xhr, $form) {
 			 
 		}); 
 			
-</g:javascript>
+	</g:javascript>
 	<g:javascript>
 	//////////////////////// FB RELATED CALLS ///////////////////////
 	
