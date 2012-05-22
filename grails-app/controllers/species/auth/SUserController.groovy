@@ -355,7 +355,23 @@ class SUserController extends UserController {
 		def namesLookupResults = namesIndexerService.suggest(params)
 		jsonData.addAll(namesLookupResults);
  
+		jsonData.addAll(getUserSuggestions(params));
+		render jsonData as JSON
+	}
+	
+	/**
+	 *
+	 */
+	def terms = {
+		log.debug params;
+		setIfMissing 'max', 5, 10
+		render getUserSuggestions(params) as JSON;
+	}
+
+	private getUserSuggestions(params){
+		def jsonData = []
 		String username = params.term
+		
 		String usernameFieldName = 'name';//SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
 		String userId = 'id';
 
@@ -369,23 +385,12 @@ class SUserController extends UserController {
 				[max: params.max])
 
 		for (result in results) {
-			jsonData << [value: result[0], label:result[0] ,  "category":"Users"]
-			}
-
-		render jsonData as JSON
-	}
-	
-	/**
-	 *
-	 */
-	def terms = {
-		log.debug params;
-		params.field = params.field?:"autocomplete";
-		List result = new ArrayList();
+			jsonData << [value: result[0], label:result[0] , userId:result[1] , "category":"Users"]
+		}
 		
-		render result as JSON;
-	}
-
+		return jsonData;
+	} 
+	
 	private Map getUnBlockedMailList(String userIdsAndEmailIds, request){
 		Map result = new HashMap();
 		userIdsAndEmailIds.split(",").each{

@@ -109,7 +109,7 @@ $(function() {
 		})
 		.autocomplete({
 			source: function( request, response ) {
-				$.getJSON( "${createLink(controller:'SUser', action: 'ajaxUserSearch')}", {
+				$.getJSON( "${createLink(controller:'SUser', action: 'terms')}", {
 					term: request.term
 				}, response );
 			},
