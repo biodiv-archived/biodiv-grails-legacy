@@ -1159,32 +1159,6 @@ right: 20px;
 display: inline;
 cursor: pointer;         
 }
-.keyname {
-	float: left;
-    font-size: 0.9em;
-    font-weight: bold;
-    margin-right: 10px;
-    text-align: right;
-    width: 10%;
-}
-li.userAndEmailList-choice{
-	background-color: #DEE7F8;
-    border: 1px solid #CAD8F3;
-    padding: 2px 13px 3px 4px;
-    border-radius: 5px 5px 5px 5px;
-    display: block;
-    float: left;
-    margin: 2px 5px 2px 0;
-    position: relative;
-}
-
-li.userAndEmailList-choice:hover{ 
-	background-color: #bbcef1;
-}
-
-span.userAndEmailList-close {
-	cursor:pointer;
-}
 
 .nav-tabs {
 border-bottom: 0px solid #FFF;
