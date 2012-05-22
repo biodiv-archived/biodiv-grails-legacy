@@ -446,6 +446,7 @@ class SpeciesController {
 	   params.field = params.field?:"autocomplete";
 	   List result = new ArrayList();
 
+	   params.max = params.max ?: 5;
 	   def namesLookupResults = namesIndexerService.suggest(params)
 	   result.addAll(namesLookupResults);
 

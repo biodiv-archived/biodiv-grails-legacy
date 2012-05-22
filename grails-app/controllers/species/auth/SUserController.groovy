@@ -231,9 +231,10 @@ class SUserController extends UserController {
 			}
 		}
 
-		String q = hql + " " + cond + " " + userNameQuery;
+		String q = hql.toString() + cond.toString() + userNameQuery;
 		int totalCount = lookupUserClass().executeQuery("SELECT COUNT(DISTINCT u) $q", queryParams)[0]
 		if(totalCount) {
+			cond.append userNameQuery
 			hql = q;
 		} else {
 			queryParams.remove('username')
@@ -245,7 +246,7 @@ class SUserController extends UserController {
 			hql.append cond
 			totalCount = lookupUserClass().executeQuery("SELECT COUNT(DISTINCT u) $hql", queryParams)[0]
 		}
-println hql
+
 		Integer max = params.int('max')
 		Integer offset = params.int('offset')
 
@@ -346,30 +347,30 @@ println hql
 	 */
 	def nameTerms = {
 		log.debug params
+
+		setIfMissing 'max', 5, 10
 		
 		def jsonData = []
 
 		def namesLookupResults = namesIndexerService.suggest(params)
 		jsonData.addAll(namesLookupResults);
  
-		if (params.term?.length() > 2) {
-			String username = params.term
-			String usernameFieldName = 'name';//SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
-			String userId = 'id';
-			setIfMissing 'max', 10, 100
+		String username = params.term
+		String usernameFieldName = 'name';//SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
+		String userId = 'id';
 
-			def results = lookupUserClass().executeQuery(
-					"SELECT DISTINCT u.$usernameFieldName, u.$userId " +
-					"FROM ${lookupUserClassName()} u " +
-					"WHERE LOWER(u.$usernameFieldName) LIKE :name " +
-					"ORDER BY u.$usernameFieldName",
-					[name: "${username.toLowerCase()}%"],
-					[max: params.max])
 
-			for (result in results) {
-				jsonData << [value: result[0], label:result[0] ,  "category":"Users"]
+		def results = lookupUserClass().executeQuery(
+				"SELECT DISTINCT u.$usernameFieldName, u.$userId " +
+				"FROM ${lookupUserClassName()} u " +
+				"WHERE LOWER(u.$usernameFieldName) LIKE :name " +
+				"ORDER BY u.$usernameFieldName",
+				[name: "${username.toLowerCase()}%"],
+				[max: params.max])
+
+		for (result in results) {
+			jsonData << [value: result[0], label:result[0] ,  "category":"Users"]
 			}
-		}
 
 		render jsonData as JSON
 	}

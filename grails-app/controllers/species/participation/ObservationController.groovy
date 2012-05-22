@@ -949,6 +949,7 @@ class ObservationController {
 		params.field = params.field?:"autocomplete";
 		List result = new ArrayList();
 
+		params.max = Math.min(params.max ? params.int('max') : 5, 10)
 		def namesLookupResults = namesIndexerService.suggest(params)
 		result.addAll(namesLookupResults);
  
