@@ -461,7 +461,7 @@ class ObservationService {
 	 * offset: offset results: if offset = -1 its not passed to the 
 	 * executing query
 	 */
-	Map getFilteredObservations(params, max, offset, isMapView){
+	Map getFilteredObservations(params, max, offset, isMapView) {
 		params.sGroup = (params.sGroup)? params.sGroup : SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.ALL).id
 		params.habitat = (params.habitat)? params.habitat : Habitat.findByName(grailsApplication.config.speciesPortal.group.ALL).id
 		params.habitat = params.habitat.toLong()
@@ -531,16 +531,16 @@ class ObservationService {
 
 		def orderByClause = " order by obv." + (params.sort ? params.sort : "lastRevised") +  " desc"
 
-		if(isMapView){
+		if(isMapView) {
 			query = mapViewQuery + filterQuery + orderByClause
-		}else{
+		} else {
 			query += filterQuery + orderByClause
 			queryParams["max"] = max
 			queryParams["offset"] = offset
 		}
 
-
 		def observationInstanceList = Observation.executeQuery(query, queryParams)
+		
 		return [observationInstanceList:observationInstanceList, queryParams:queryParams, activeFilters:activeFilters]
 	}
 
@@ -656,12 +656,10 @@ class ObservationService {
 		//params.userName = springSecurityService.currentUser.username;
 		
 		queryParams["query"] = params.query
+		activeFilters["query"] = params.query
 		params.query = params.query ?: "*:*";
 			
 		paramsList.add('q', Utils.cleanSearchQuery(params.query));
-		
-		
-		
 		//options
 		paramsList.add('start', offset);
 		paramsList.add('rows', max);
@@ -703,7 +701,6 @@ class ObservationService {
 			queryParams["habitat"] = params.habitat
 			activeFilters["habitat"] = params.habitat
 		}
-		
 		if(params.tag) {
 			paramsList.add('fq', searchFieldsConfig.TAG+":"+params.tag);
 			queryParams["tag"] = params.tag
@@ -720,7 +717,6 @@ class ObservationService {
 			queryParams["speciesName"] = params.speciesName
 			activeFilters["speciesName"] = params.speciesName
 		}
-
 		if(params.isFlagged && params.isFlagged.toBoolean()){
 			paramsList.add('fq', searchFieldsConfig.ISFLAGGED+":"+params.isFlagged.toBoolean());
 		}
@@ -734,15 +730,11 @@ class ObservationService {
 			 paramsList.add('fq', searchFieldsConfig.LATLONG+":["+swLat+","+swLon+" TO "+neLat+","+neLon+"]");
 			 activeFilters["bounds"] = params.bounds
 		}
-		
-		
-
 		log.debug "Along with faceting params : "+paramsList;
 		
-		
-		if(isMapView){
+		if(isMapView) {
 			//query = mapViewQuery + filterQuery + orderByClause
-		}else{
+		} else {
 			//query += filterQuery + orderByClause
 			queryParams["max"] = max
 			queryParams["offset"] = offset
@@ -771,10 +763,9 @@ class ObservationService {
 			responseHeader = queryResponse?.responseHeader;
 			noOfResults = queryResponse.getResults().getNumFound()
 		}
-		
 		if(responseHeader?.params?.q == "*:*") {
 			responseHeader.params.remove('q');
 		}
-		[responseHeader:responseHeader, observationInstanceList:instanceList, observationInstanceTotal:noOfResults, queryParams:queryParams, activeFilters:activeFilters, tags:facetResults]
+		return [responseHeader:responseHeader, observationInstanceList:instanceList, observationInstanceTotal:noOfResults, queryParams:queryParams, activeFilters:activeFilters, tags:facetResults]
 	}
 }
