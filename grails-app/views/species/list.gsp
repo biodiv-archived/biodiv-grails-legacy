@@ -90,14 +90,9 @@ $(document).ready(function(){
 <body>
 		<div class="container_16 big_wrapper outer_wrapper">
 				<div class="page-header clearfix">
-					<div class="grid_11">
 						<h1>
 							<g:message code="default.species.heading" default="Species" />
 						</h1>
-					</div>
-					<div style="float:right;">
-						<search:searchBox />
-					</div>
 				</div>
 
 				<g:if test="${flash.message}">

@@ -200,25 +200,16 @@ class SUserController extends UserController {
 		String usernameFieldName = 'name'
 
 		params.sort = params.sort && params.sort != 'score desc' ? params.sort : "activity";
+		String userNameQuery = "";
 		if (params['query']) {
-			def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields
-			
+			def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields			
 			if(params['query'].startsWith(searchFieldsConfig.CANONICAL_NAME)) {
-				def newParams = [:];
-				newParams["facet.field"] = searchFieldsConfig.CONTRIBUTOR+"_exact";
-				newParams["facet.limit"] = params.max;
-				newParams["facet.offset"] = params.offset;
-				newParams["query"] = params.query;
-				def obvSearchModel = observationService.getObservationsFromSearch(newParams);
-				def contributorNames = obvSearchModel.tags
-				
-				def usernames = (contributorNames.collect {"'"+it.getKey()+"'"}).toString();
-				usernames = usernames.replaceFirst('\\[', '(');
-				usernames = usernames[0..-2]+")";
-				cond.append " AND LOWER(u.${usernameFieldName}) IN ${usernames}"
+				def usernamesList = searchObservations(params);
+				String usernames = getUsernamesSearchCondition(usernamesList);
+				userNameQuery = " AND LOWER(u.${usernameFieldName}) IN ${usernames}"
 				//queryParams['username'] = usernames
 			} else {
-				cond.append " AND LOWER(u.${usernameFieldName}) LIKE :username"
+				userNameQuery = " AND LOWER(u.${usernameFieldName}) LIKE :username"
 				queryParams['username'] = params['query'].toLowerCase() + '%'
 			}
 		}
@@ -240,8 +231,21 @@ class SUserController extends UserController {
 			}
 		}
 
-		hql.append cond;
-		int totalCount = lookupUserClass().executeQuery("SELECT COUNT(DISTINCT u) $hql", queryParams)[0]
+		String q = hql.toString() + cond.toString() + userNameQuery;
+		int totalCount = lookupUserClass().executeQuery("SELECT COUNT(DISTINCT u) $q", queryParams)[0]
+		if(totalCount) {
+			cond.append userNameQuery
+			hql = q;
+		} else {
+			queryParams.remove('username')
+			//Searching observations core when no user is found.
+			def usernamesList = searchObservations(params);
+			String usernames = getUsernamesSearchCondition(usernamesList);
+			cond.append " AND LOWER(u.${usernameFieldName}) IN ${usernames}"
+			//queryParams['username'] = usernames
+			hql.append cond
+			totalCount = lookupUserClass().executeQuery("SELECT COUNT(DISTINCT u) $hql", queryParams)[0]
+		}
 
 		Integer max = params.int('max')
 		Integer offset = params.int('offset')
@@ -291,6 +295,28 @@ class SUserController extends UserController {
 	  aidx <=> bidx ?: a.name <=> b.name
 	}
 	
+	private def searchObservations(params) {
+		def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields
+		def newParams = [:];
+		newParams["facet.field"] = searchFieldsConfig.CONTRIBUTOR+"_exact";
+		newParams["facet.limit"] = params.max;
+		newParams["facet.offset"] = params.offset;
+		newParams["query"] = params.query;
+		def obvSearchModel = observationService.getObservationsFromSearch(newParams);
+		def contributorNames = obvSearchModel.tags
+		
+		return (contributorNames.collect {"'"+it.getKey()+"'"});
+	}
+	
+	private String getUsernamesSearchCondition(List usernamesList) {
+		String usernames = usernamesList.toString().replaceFirst('\\[', '(');
+		usernames = usernames[0..-2]+")";
+		if(!usernamesList) {
+			usernames = "('')"
+		}
+		
+		return usernames;
+	}
 	/**
 	 *
 	 */
@@ -321,30 +347,30 @@ class SUserController extends UserController {
 	 */
 	def nameTerms = {
 		log.debug params
+
+		setIfMissing 'max', 5, 10
 		
 		def jsonData = []
 
 		def namesLookupResults = namesIndexerService.suggest(params)
 		jsonData.addAll(namesLookupResults);
  
-		if (params.term?.length() > 2) {
-			String username = params.term
-			String usernameFieldName = 'name';//SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
-			String userId = 'id';
-			setIfMissing 'max', 10, 100
+		String username = params.term
+		String usernameFieldName = 'name';//SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
+		String userId = 'id';
 
-			def results = lookupUserClass().executeQuery(
-					"SELECT DISTINCT u.$usernameFieldName, u.$userId " +
-					"FROM ${lookupUserClassName()} u " +
-					"WHERE LOWER(u.$usernameFieldName) LIKE :name " +
-					"ORDER BY u.$usernameFieldName",
-					[name: "${username.toLowerCase()}%"],
-					[max: params.max])
 
-			for (result in results) {
-				jsonData << [value: result[0], label:result[0] ,  "category":"Users"]
+		def results = lookupUserClass().executeQuery(
+				"SELECT DISTINCT u.$usernameFieldName, u.$userId " +
+				"FROM ${lookupUserClassName()} u " +
+				"WHERE LOWER(u.$usernameFieldName) LIKE :name " +
+				"ORDER BY u.$usernameFieldName",
+				[name: "${username.toLowerCase()}%"],
+				[max: params.max])
+
+		for (result in results) {
+			jsonData << [value: result[0], label:result[0] ,  "category":"Users"]
 			}
-		}
 
 		render jsonData as JSON
 	}

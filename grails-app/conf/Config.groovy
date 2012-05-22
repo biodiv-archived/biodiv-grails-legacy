@@ -501,16 +501,21 @@ environments {
 }
 
 navigation.species_dashboard = [
-        [controller:'species', title:'Species gallery', order:1, action:"list"],
-        [controller:'species', title:'Taxonomy browser', order:10, action:'taxonBrowser'],
+        [controller:'species', title:'Species Gallery', order:1, action:"list"],
+        [controller:'species', title:'Taxonomy Browser', order:10, action:'taxonBrowser'],
 		[controller:'species', title:'Contribute', order:30, action:'contribute'],
-		[controller:'SUser', title:'Users', order:40, action:'search']
+		[controller:'SUser', title:'Users', order:40, action:'list']
 ]
 
 navigation.observation_dashboard = [
-        [controller:'observation', title:'Browse observations', order:1, action:'list'],
-        [controller:'observation', title:'Add observation', order:10, action:"create"],
-		[controller:'SUser', title:'Users', order:20, action:'search']
+        [controller:'observation', title:'Browse Observations', order:1, action:'list'],
+        [controller:'observation', title:'Add Observation', order:10, action:"create"],
+		[controller:'SUser', title:'Users', order:20, action:'list']
+]
+
+navigation.users_dashboard = [
+	[controller:'species', title:'Species Gallery', order:1, action:"list"],
+	[controller:'observation', title:'Browse Observations', order:1, action:'list'],	
 ]
 
 navigation.dashboard = [
@@ -523,7 +528,7 @@ navigation.dashboard = [
 			[controller:'observation', title:'Browse', order:1, action:'list'],
 			[controller:'observation', title:'Add Observation', order:10, action:"create"],
 		]],
-	[group:'users', order:50, controller:'SUser', title:'Users', action:'search'],
+	[group:'users', order:50, controller:'SUser', title:'Users', action:'list'],
 	[group:'search', order:60, controller:'search', title:'Advanced Search', action:'advSelect'],
 ]
 
