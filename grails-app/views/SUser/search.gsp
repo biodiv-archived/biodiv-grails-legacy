@@ -77,6 +77,11 @@
 			return false;
 		});
 
+		$("#removeQueryFilter").live('click', function(){
+           	$( "#searchTextField" ).val('');
+          	$("#search").click();
+           	return false;
+        });
 	});
 	
 	$( "#search" ).unbind('click');

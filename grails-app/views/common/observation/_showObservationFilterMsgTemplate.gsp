@@ -56,7 +56,7 @@
 	</g:if>
 	<g:if test="${queryParams.query}">
                                     for query <span class="highlight">
-			<g:link controller="observation" action="select" params="[query: queryParams.query]">
+			<g:link controller="observation" action="search" params="[query: queryParams.query]">
 				${queryParams.query.encodeAsHTML()} <a
 				id="removeQueryFilter" href="#">[X]</a></g:link>
 		</span>

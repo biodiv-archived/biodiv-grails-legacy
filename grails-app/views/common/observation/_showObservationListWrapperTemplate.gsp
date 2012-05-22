@@ -9,10 +9,6 @@
 </div>
 
 <div class="tags_section span3" style="float: right;">
-	<div style="clear:both;">
-		<obv:identificationByEmail model="['source':'observationList', 'requestObject':request]" />
-		<br />
-	</div>
 	<g:if test="${params.action == 'search' }">
 		<obv:showAllTags
 			model="['tags':tags , 'count':tags?tags.size():0, 'isAjaxLoad':true]" />
@@ -80,7 +76,8 @@
 
 
 				</div>
-				
+			
+		                <obv:identificationByEmail model="['source':'observationList', 'requestObject':request]" />
 				<div id="observations_list_map" class="observation"
 					style="clear: both; display: none;">
 					<obv:showObservationsLocation

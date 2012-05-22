@@ -384,7 +384,7 @@ class SpeciesController {
 		   params['facet.mincount'] = "1";
 		   NamedList paramsList = new NamedList();
 		   paramsList.addAll(params);
-		   paramsList.add('facet.field', searchFieldsConfig.NAME_EXACT);
+		   /*paramsList.add('facet.field', searchFieldsConfig.NAME_EXACT);
 		   paramsList.add('facet.field', searchFieldsConfig.CANONICAL_NAME_EXACT);
 		   paramsList.add('facet.field', searchFieldsConfig.COMMON_NAME_EXACT);
 		   paramsList.add('facet.field', searchFieldsConfig.UNINOMIAL_EXACT)
@@ -392,7 +392,8 @@ class SpeciesController {
 		   paramsList.add('facet.field', searchFieldsConfig.SPECIES)
 		   paramsList.add('facet.field', searchFieldsConfig.AUTHOR)
 		   paramsList.add('facet.field', searchFieldsConfig.YEAR)
-
+		   */
+		   
 		   log.debug "Along with faceting params : "+paramsList;
 		   try {
 			   def queryResponse = speciesSearchService.search(paramsList);
@@ -445,6 +446,7 @@ class SpeciesController {
 	   params.field = params.field?:"autocomplete";
 	   List result = new ArrayList();
 
+	   params.max = params.max ?: 5;
 	   def namesLookupResults = namesIndexerService.suggest(params)
 	   result.addAll(namesLookupResults);
 
