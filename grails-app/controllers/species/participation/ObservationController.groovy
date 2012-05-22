@@ -50,7 +50,7 @@ class ObservationController {
 		def result;
 		//TODO: Dirty hack to feed results through solr if the request is from search 
 		if(params.action == 'search') {
-			result = getObservationsFromSearch(params)
+			result = observationService.getObservationsFromSearch(params)
 		} else {
 			result = getObservationList(params);
 		}
@@ -844,21 +844,19 @@ class ObservationController {
 		Map result = new HashMap();
 		userIdsAndEmailIds.split(",").each{
 			String candidateEmail = it.trim();
-			//checking for email signature
-			if(candidateEmail.contains("@")){
-				if(BlockedMails.findByEmail(candidateEmail)){
-					log.debug "Email $candidateEmail is unsubscribed for identification mail."
-				}else{
-					result[candidateEmail] = generateLink("observation", "unsubscribeToIdentificationMail", [email:candidateEmail], request) ;
-				}
-			}else{
-				//its user id
+			if(candidateEmail.isNumber()){
 				SUser user = SUser.get(candidateEmail.toLong());
 				candidateEmail = user.email.trim();
 				if(user.allowIdentifactionMail){
 					result[candidateEmail] = generateLink("observation", "unsubscribeToIdentificationMail", [email:candidateEmail, userId:user.id], request) ;
 				}else{
 					log.debug "User $user.id has unsubscribed for identification mail."
+				}
+			}else{
+				if(BlockedMails.findByEmail(candidateEmail)){
+					log.debug "Email $candidateEmail is unsubscribed for identification mail."
+				}else{
+					result[candidateEmail] = generateLink("observation", "unsubscribeToIdentificationMail", [email:candidateEmail], request) ;
 				}
 			}
 		}
@@ -877,8 +875,8 @@ class ObservationController {
 		def searchFieldsConfig = grailsApplication.config.speciesPortal.searchFields
 
 
-		def model = getObservationsFromSearch(params);
-		
+		def model = observationService.getObservationsFromSearch(params);
+		println "--------------"+model
 		if(!params.isGalleryUpdate?.toBoolean()){
 			params.remove('isGalleryUpdate');
 			render (view:"search", model:model)
@@ -895,27 +893,8 @@ class ObservationController {
 			render result as JSON
 		}
 	}
-
-	/**
-	 * 
-	 * @param params
-	 * @return
-	 */
-	private def getObservationsFromSearch(params) {
-		def max = Math.min(params.max ? params.int('max') : 9, 100)
-		def offset = params.offset ? params.long('offset') : 0
-
-		def model;
-		
-		try {
-			model = observationService.getFilteredObservationsFromSearch(params, max, offset, false);
-		} catch(SolrException e) {
-			e.printStackTrace();
-			//model = [params:params, observationInstanceTotal:0, observationInstanceList:[],  queryParams:[max:0], tags:[]];
-		}
-		return model;
-	}
 	
+
 	/**
 	 *
 	 */
@@ -944,6 +923,7 @@ class ObservationController {
 	/**
 	 * 
 	 */
+
 	def nameTerms = {
 		log.debug params;
 		params.field = params.field?:"autocomplete";
