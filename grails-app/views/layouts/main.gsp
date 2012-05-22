@@ -218,9 +218,12 @@ var ajaxLoginSuccessHandler = function(json, statusText, xhr, $form) {
 				<g:if test="${params.controller == 'observation'}">
 					<sNav:render group="observation_dashboard" subitems="false" />
 				</g:if>
-					<div style="float: right;">
-						<search:searchBox />
-					</div>
+				<g:if test="${params.controller == 'SUser'}">
+					<sNav:render group="users_dashboard" subitems="false" />
+				</g:if>
+				<div style="float: right;">
+					<search:searchBox />
+				</div>
 
 			</div>
 
