@@ -9,14 +9,9 @@
 <body>
 	<div class="container_16 big_wrapper outer_wrapper">
 				<div class="page-header clearfix">
-					<div class="grid_11">
 						<h1>
 							<g:message code="default.species.contribute.heading" default="Contribute to Species Pages" />
 						</h1>
-					</div>
-					<div style="float:right;">
-						<search:searchBox />
-					</div>
 				</div>
 
 				<g:if test="${flash.message}">

@@ -40,21 +40,26 @@
 					</div>
 				</g:if>
 
-
-				<div class="filters">
-					<g:form action='userSearch' name='userSearchForm' method="GET"
-						id="userSearchForm" class="well form-horizontal ">
-						<label class="control-label" for="username"><g:message
-								code='user.username.label' default='Username' />:</label>
+				<ul id="searchResultsTabs" class="nav nav-tabs">
+				  <li><a href="${createLink(controller:'species', action:'search')}" data-toggle="tab">Species</a></li>
+				  <li><a href="${createLink(controller:'observation', action:'search')}" data-toggle="tab">Observations</a></li>
+				  <li><a href="${createLink(controller:'SUser', action:'search')}" data-toggle="tab">Users</a></li>
+				</ul>
+				
+				<div class="searchResults">
+					
+					
+						<!-- label class="control-label" for="username"><g:message
+								code='user.username.label' default='Username' />:</label-->
 						<div class="controls">
-							<div class="input-append">
+							<!-- div class="input-append">
 								<g:textField id="username" class="span3" name='username'
 									size='50' maxlength='255' value='${username}'
 									class="input-medium search-query" />
 								<button id="userSearch" class="btn btn-primary" type="button">
 									<g:message code='spring.security.ui.search' default='Search' />
 								</button>
-							</div>
+							</div-->
 
 
 							<div class="btn-group" data-toggle="buttons-radio"
@@ -103,9 +108,8 @@
 							</div>
 						</div>
 
-					</g:form>
 
-				</div>
+				
 
 
 				<div style="clear: both"></div>
@@ -126,50 +130,48 @@ def queryParams = [username: username, enabled: enabled, accountExpired: account
 						</div>
 					</div>
 				</g:if>
-
+			</div>
 			</div>
 		</div>
 	</div>
 
-	<script>
+	<g:javascript>
 	$(document).ready(function() {
-		$("#username").focus().autocomplete({
+		/*$("#username").focus().autocomplete({
 			minLength: 3,
 			cache: false,
 			source: "${createLink(action: 'ajaxUserSearch')}"
-		});
+		});*/
 
 		$('.sort_filter_label').click(function() {
 			$('.sort_filter_label.active').removeClass('active');
 			$(this).addClass('active');
 			$('#selected_sort').html($(this).html());
-			$("#userSearch").click();
+			$("#search").click();
 			return false;
 		});
 
-		function getSelectedSortBy() {
-			var sortBy = '';
-			$('.sort_filter_label').each(function() {
-				if ($(this).hasClass('active')) {
-					sortBy += $(this).attr('value') + ',';
-				}
-			});
-
-			sortBy = sortBy.replace(/\s*\,\s*$/, '');
-			return sortBy;
-		}
-
-		$("#userSearch").click(
-				function() {
-					var sortParam = getSelectedSortBy();
-					if (sortParam) {
-						$("#userSearchSort").val(sortParam);
-					}
-					$("#userSearchForm").submit();
-				});
-
 	});
-	</script>
+	
+	$( "#search" ).unbind('click');
+	
+	$( "#search" ).click(function() {
+		var sortBy = '';
+		$('.sort_filter_label').each(function() {
+			if ($(this).hasClass('active')) {
+				sortBy += $(this).attr('value') + ',';
+			}
+		});
+
+		sortBy = sortBy.replace(/\s*\,\s*$/, '');
+		
+		var sortParam = sortBy;
+		if (sortParam) {
+			$("#searchBoxSort").val(sortParam);
+		}
+		$("#searchBox").submit();
+	});
+	</g:javascript>
 
 </body>
 </html>

@@ -28,7 +28,7 @@
 	type="text/javascript"></script>
 
 <g:if test="${params.controller  != 'species'}">
-	<g:javascript src="../bootstrap/js/bootstrap.min.js" contextPath=""></g:javascript>
+	<g:javascript src="../bootstrap/js/bootstrap.js" contextPath=""></g:javascript>
 </g:if>
 
 <g:javascript src="species/main.js" />
@@ -218,6 +218,9 @@ var ajaxLoginSuccessHandler = function(json, statusText, xhr, $form) {
 				<g:if test="${params.controller == 'observation'}">
 					<sNav:render group="observation_dashboard" subitems="false" />
 				</g:if>
+					<div style="float: right;">
+						<search:searchBox />
+					</div>
 
 			</div>
 
@@ -286,6 +289,17 @@ var ajaxLoginSuccessHandler = function(json, statusText, xhr, $form) {
 					}, scope);
 				});
 			});
+			
+			var t = "${createLink(controller:params.controller, action:params.action) }";
+			//t = t.replace(/\//g, "\\\\/");
+			//console.log(t);
+			$("#searchResultsTabs a[href='"+t+"']").parent().addClass("active");
+			
+			$('#searchResultsTabs a').click(function (e) {
+			console.log($("#searchTextField").val());
+				$( "#searchbox" ).attr('action', $(this).attr('href')).submit();
+				e.preventDefault();
+			})
 			 
 		}); 
 			

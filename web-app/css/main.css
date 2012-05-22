@@ -100,41 +100,11 @@ input:focus,select:focus,textarea:focus {
 	width: 100%;
 }
 
-/* NAVIGATION MENU */
-.nav { /*color: #666;
-	border: 1px solid #ccc;
-	border-style: solid none solid none;
-	margin-top: 5px;
-	padding: 7px 5px;
-	margin-left: 10px;*/
-	background: #fff url(../images/skin/shadow.jpg) repeat-x center;
-	padding: 3px;
-	margin-top: 10px;
-	border-bottom: 5px solid #A9DA92;
-	border-top: 5px solid #EB8F00;
-}
 
 .menuButton {
 	font-size: 15px;
 	font-weight: bold;
 	color: blue;
-}
-
-.nav .active {
-	/*background: url('../images/arrow-down.png') center bottom no-repeat;*/
-	background-color: #fff;
-}
-
-.nav .current {
-	padding-top: 0px;
-	padding-bottom: 0px;
-	background-color: #fff;
-}
-
-.nav .current a {
-	background: transparent url('../images/arrow-down.png') no-repeat center bottom;
-	text-decoration: underline;
-	background-position: 50% -80%;
 }
 
 .menuButton a {

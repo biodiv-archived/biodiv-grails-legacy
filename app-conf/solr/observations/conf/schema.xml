@@ -211,7 +211,11 @@
 		<field name="id" type="string" indexed="true" stored="true"
 			required="true" multiValued="false" />
 			
-		<field name="contributor" type="taxonText" indexed="true" required="true" multiValued="true" />
+		<field name="author" type="taxonText" indexed="true" required="true"/>
+		<field name="contributor" type="taxonText" indexed="true" multiValued="true" />
+		<field name="contributor_exact" type="textExact" indexed="true" multiValued="true" />
+		<copyField source="contributor" dest="contributor_exact" />
+		
 		<field name="location" type="text" indexed="true" required="true" multiValued="true"/>
 		<field name="observedon" type="tdate" indexed="true" required="true"/>
 		<field name="createdon" type="tdate" indexed="true" required="true"/>

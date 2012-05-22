@@ -26,14 +26,9 @@ $(document).ready(function(){
 <body>
 	<div class="container big_wrapper outer_wrapper">
 		<div class="page-header clearfix">
-			<div class="span11">
 				<h1>
 					<g:message code="default.search.heading" default="Search Results" />
 				</h1>
-			</div>
-			<div style="float: right;">
-				<search:searchBox />
-			</div>
 		</div>
 
 		<g:if test="${flash.message}">
@@ -41,7 +36,12 @@ $(document).ready(function(){
 				${flash.message}
 			</div>
 		</g:if>
-		
+						
+<ul id="searchResultsTabs" class="nav nav-tabs">
+  <li><a href="${createLink(controller:'species', action:'search')}" data-toggle="tab">Species</a></li>
+  <li><a href="${createLink(controller:'observation', action:'search')}" data-toggle="tab">Observations</a></li>
+  <li><a href="${createLink(controller:'SUser', action:'search')}" data-toggle="tab">Users</a></li>
+</ul>
 		<g:if test="${total>0 }">
 			<div class="span12 clearfix" style="float: right;clear:both;">
 				<g:set var="start"
@@ -60,7 +60,7 @@ $(document).ready(function(){
 			</div>
 		</g:if>
 
-		<div class="searchResults" style="clear:both;">
+		<div class="searchResults clearfix">
 
 		
 			<g:if test="${speciesInstanceList}">
@@ -165,7 +165,7 @@ $(document).ready(function(){
 
 			</g:if>
 			<g:else>
-				<div style="float: center; color: #999; text-decoration: underline;">No
+				<div class="alert alert-info">No
 					search results found. Please relax the search query.</div>
 			</g:else>
 		</div>

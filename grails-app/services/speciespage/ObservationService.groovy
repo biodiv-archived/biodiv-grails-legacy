@@ -617,6 +617,26 @@ class ObservationService {
 	}
 
 	/**
+	*
+	* @param params
+	* @return
+	*/
+   def getObservationsFromSearch(params) {
+	   def max = Math.min(params.max ? params.int('max') : 9, 100)
+	   def offset = params.offset ? params.long('offset') : 0
+
+	   def model;
+	   
+	   try {
+		   model = getFilteredObservationsFromSearch(params, max, offset, false);
+	   } catch(SolrException e) {
+		   e.printStackTrace();
+		   //model = [params:params, observationInstanceTotal:0, observationInstanceList:[],  queryParams:[max:0], tags:[]];
+	   }
+	   return model;
+   }
+   
+	/**
 	 * Filter observations by group, habitat, tag, user, species
 	 * max: limit results to max: if max = -1 return all results
 	 * offset: offset results: if offset = -1 its not passed to the
@@ -636,10 +656,11 @@ class ObservationService {
 		
 		//params.userName = springSecurityService.currentUser.username;
 		
+		queryParams["query"] = params.query
 		params.query = params.query ?: "*:*";
 			
 		paramsList.add('q', Utils.cleanSearchQuery(params.query));
-		queryParams["query"] = params.query
+		
 		
 		
 		//options
@@ -656,9 +677,15 @@ class ObservationService {
 		paramsList.add('fl', params['fl']?:"id");
 		
 		//Facets
+		params["facet.field"] = params["facet.field"] ?: searchFieldsConfig.TAG;
+		paramsList.add('facet.field', params["facet.field"]);
 		paramsList.add('facet', "true");
-		paramsList.add('facet.limit', "-1");
+		params["facet.limit"] = params["facet.limit"] ?: 50;
+		paramsList.add('facet.limit', params["facet.limit"]);
+		params["facet.offset"] = params["facet.offset"] ?: 0;
+		paramsList.add('facet.offset', params["facet.offset"]);
 		paramsList.add('facet.mincount', "1");
+		
 		//Filters
 		if(params.sGroup){
 			params.sGroup = params.sGroup.toLong()
@@ -709,7 +736,7 @@ class ObservationService {
 			 activeFilters["bounds"] = params.bounds
 		}
 		
-		paramsList.add('facet.field', searchFieldsConfig.TAG);
+		
 
 		log.debug "Along with faceting params : "+paramsList;
 		
@@ -723,9 +750,9 @@ class ObservationService {
 		}
 		
 		List<Observation> instanceList = new ArrayList<Observation>();
-		def tags = [:], responseHeader
+		def facetResults = [:], responseHeader
 		long noOfResults = 0;
-		if(queryParams["query"]) {
+		if(paramsList.get('q')) {
 			def queryResponse = observationsSearchService.search(paramsList);
 			
 			Iterator iter = queryResponse.getResults().listIterator();
@@ -736,16 +763,19 @@ class ObservationService {
 					instanceList.add(instance);
 			}
 			
-			List tagFacet = queryResponse.getFacetField(searchFieldsConfig.TAG).getValues()
+			List facets = queryResponse.getFacetField(params["facet.field"]).getValues()
 			
-			tagFacet.each {
-				tags.put(it.getName(),it.getCount());
+			facets.each {
+				facetResults.put(it.getName(),it.getCount());
 			}
 			
 			responseHeader = queryResponse?.responseHeader;
 			noOfResults = queryResponse.getResults().getNumFound()
 		}
 		
-		[responseHeader:responseHeader, observationInstanceList:instanceList, observationInstanceTotal:noOfResults, queryParams:queryParams, activeFilters:activeFilters, tags:tags]
+		if(responseHeader?.params?.q == "*:*") {
+			responseHeader.params.remove('q');
+		}
+		[responseHeader:responseHeader, observationInstanceList:instanceList, observationInstanceTotal:noOfResults, queryParams:queryParams, activeFilters:activeFilters, tags:facetResults]
 	}
 }

@@ -101,7 +101,6 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 						</h1>
 					</div>
 					<div style="float:right;">
-						<div class="clearfix">
 						<sUser:ifOwns model="['user':observationInstance.author]">
 							
 							<a class="btn btn-primary pull-right"
@@ -114,9 +113,6 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 									Observation </a>
 									
 						</sUser:ifOwns>
-						</div>
-						<search:searchBox />
-						
 					</div>
 
 				</div>

@@ -85,6 +85,7 @@ class ObservationsSearchService {
 				doc.addField(searchFieldsConfig.ID, obv.id.toString());
 				addNameToDoc(obv, doc);
 	
+				doc.addField(searchFieldsConfig.AUTHOR, obv.author.name);
 				doc.addField(searchFieldsConfig.CONTRIBUTOR, obv.author.name);
 				doc.addField(searchFieldsConfig.OBSERVED_ON, obv.observedOn);
 				doc.addField(searchFieldsConfig.UPLOADED_ON, obv.createdOn);
@@ -138,6 +139,7 @@ class ObservationsSearchService {
 		def distRecoVotes = obv.recommendationVote.unique { it.recommendation };  
 		distRecoVotes.each { vote ->
 			doc.addField(searchFieldsConfig.NAME, vote.recommendation.name);
+			doc.addField(searchFieldsConfig.CONTRIBUTOR, vote.author.name);
 			if(vote.recommendation.taxonConcept)
 				doc.addField(searchFieldsConfig.CANONICAL_NAME, vote.recommendation.taxonConcept.canonicalForm);
 		}

@@ -1185,3 +1185,24 @@ li.userAndEmailList-choice:hover{
 span.userAndEmailList-close {
 	cursor:pointer;
 }
+
+.nav-tabs {
+border-bottom: 0px solid #FFF;
+background-color: whiteSmoke;
+}
+
+.nav-tabs > .active > a, .nav-tabs > .active > a:hover {
+	border: 1px solid #FFF;
+} 
+
+#searchResultsTabs.nav-tabs {
+	margin:0px -3px ;
+}
+
+.searchResults {
+	border: 3px solid #FFF;
+	margin : -3px;
+}
+.ui-autocomplete-category {
+	font-weight:bold;
+}

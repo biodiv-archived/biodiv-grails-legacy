@@ -38,6 +38,7 @@ class ObservationController {
 	def springSecurityService;
 	def mailService;
 	def observationsSearchService;
+	def namesIndexerService;
 
 	static allowedMethods = [update: "POST", delete: "POST"]
 
@@ -947,12 +948,15 @@ class ObservationController {
 		params.field = params.field?:"autocomplete";
 		List result = new ArrayList();
 
+		def namesLookupResults = namesIndexerService.suggest(params)
+		result.addAll(namesLookupResults);
+ 
 		def queryResponse = observationsSearchService.terms(params);
 		NamedList tags = (NamedList) ((NamedList)queryResponse.getResponse().terms)[params.field];
 
 		for (Iterator iterator = tags.iterator(); iterator.hasNext();) {
 			Map.Entry tag = (Map.Entry) iterator.next();
-			result.add([value:tag.getKey().toString(), label:tag.getKey().toString(),  "category":""]);
+			result.add([value:tag.getKey().toString(), label:tag.getKey().toString(),  "category":"Observations"]);
 		}
 
 		render result as JSON;

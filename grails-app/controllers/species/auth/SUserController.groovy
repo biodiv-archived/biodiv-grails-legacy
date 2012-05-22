@@ -10,6 +10,7 @@ import grails.util.GrailsNameUtils
 import java.util.List
 import java.util.Map
 
+import org.apache.solr.common.util.NamedList;
 import org.codehaus.groovy.grails.plugins.springsecurity.NullSaltSource
 import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
 import org.springframework.dao.DataIntegrityViolationException
@@ -21,7 +22,9 @@ import species.utils.Utils;
 class SUserController extends UserController {
 
 	def springSecurityService
-
+	def namesIndexerService;
+	def observationService;
+	
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
         def isLoggedIn = {
@@ -164,19 +167,13 @@ class SUserController extends UserController {
 
 	def search = {
 		//[enabled: 0, accountExpired: 0, accountLocked: 0, passwordExpired: 0]
-		redirect action:userSearch
-	}
-
-	/**
-	 * 
-	 */
-	def userSearch = {
+		
 		log.debug params
 		
 		boolean useOffset = params.containsKey('offset')
 		setIfMissing 'max', 12, 100
 		setIfMissing 'offset', 0
-
+		
 		def hql = new StringBuilder('FROM ').append(lookupUserClassName()).append(' u WHERE 1=1 ')
 		def cond = new StringBuilder("");
 		def queryParams = [:]
@@ -184,13 +181,30 @@ class SUserController extends UserController {
 		def userLookup = SpringSecurityUtils.securityConfig.userLookup
 		String usernameFieldName = 'name'
 
-		params.sort = params.sort ?: "activity";
-		for (name in [username: usernameFieldName]) {
-			if (params[name.key]) {
-				cond.append " AND LOWER(u.${name.value}) LIKE :${name.key}"
-				queryParams[name.key] = params[name.key].toLowerCase() + '%'
+		params.sort = params.sort && params.sort != 'score desc' ? params.sort : "activity";
+		if (params['query']) {
+			def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields
+			
+			if(params['query'].startsWith(searchFieldsConfig.CANONICAL_NAME)) {
+				def newParams = [:];
+				newParams["facet.field"] = searchFieldsConfig.CONTRIBUTOR+"_exact";
+				newParams["facet.limit"] = params.max;
+				newParams["facet.offset"] = params.offset;
+				newParams["query"] = params.query;
+				def obvSearchModel = observationService.getObservationsFromSearch(newParams);
+				def contributorNames = obvSearchModel.tags
+				
+				def usernames = (contributorNames.collect {"'"+it.getKey()+"'"}).toString();
+				usernames = usernames.replaceFirst('\\[', '(');
+				usernames = usernames[0..-2]+")";
+				cond.append " AND LOWER(u.${usernameFieldName}) IN ${usernames}"
+				//queryParams['username'] = usernames
+			} else {
+				cond.append " AND LOWER(u.${usernameFieldName}) LIKE :username"
+				queryParams['username'] = params['query'].toLowerCase() + '%'
 			}
 		}
+		
 
 		String enabledPropertyName = userLookup.enabledPropertyName
 		String accountExpiredPropertyName = userLookup.accountExpiredPropertyName
@@ -233,7 +247,7 @@ class SUserController extends UserController {
 			String query = "SELECT DISTINCT u $hql $orderBy";
 			results = lookupUserClass().executeQuery(query, queryParams, [max: max, offset: offset])
 		}
-		
+
 		def sorted = results;
 //		//sorts only current page results
 //		if(results && params['username']) {
@@ -254,7 +268,7 @@ class SUserController extends UserController {
 		]) {
 			model[name] = params[name]
 		}
-
+		println params.query;
 		render view: 'search', model: model
 	}
 
@@ -274,13 +288,42 @@ class SUserController extends UserController {
 	}
 	
 	/**
+	 *
+	 */
+	def advSearch = {
+		log.debug params;
+		String query  = "";
+		def newParams = [:]
+		for(field in params) {
+			if(!(field.key ==~ /action|controller|sort|fl|start|rows/) && field.value ) {
+				if(field.key.equalsIgnoreCase('name')) {
+					newParams[field.key] = field.value;
+					query = query + " " +field.value;
+				} else {
+					newParams[field.key] = field.value;
+					query = query + " " + field.key + ': "'+field.value+'"';
+				}
+			}
+		}
+		if(query) {
+			newParams['query'] = query;
+			redirect (action:"search", params:newParams);
+		}
+		render (view:'advSearch', params:newParams);
+	}
+	
+	
+	/**
 	 * Ajax call used by autocomplete textfield.
 	 */
-	def ajaxUserSearch = {
+	def nameTerms = {
 		log.debug params
 		
 		def jsonData = []
 
+		def namesLookupResults = namesIndexerService.suggest(params)
+		jsonData.addAll(namesLookupResults);
+ 
 		if (params.term?.length() > 2) {
 			String username = params.term
 			String usernameFieldName = 'name';//SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
@@ -296,12 +339,52 @@ class SUserController extends UserController {
 					[max: params.max])
 
 			for (result in results) {
-				jsonData << [value: result[0], userId:result[1] ]
+				jsonData << [value: result[0], label:result[0] ,  "category":"Users"]
 			}
 		}
 
-		render text: jsonData as JSON, contentType: 'text/plain'
+		render jsonData as JSON
 	}
+	
+	
+	/**
+	 *
+	 */
+	def terms = {
+		log.debug params;
+		params.field = params.field?:"autocomplete";
+		List result = new ArrayList();
+		
+		render result as JSON;
+	}
+
+	
+	private Map getUnBlockedMailList(String userIdsAndEmailIds, request){
+		Map result = new HashMap();
+		userIdsAndEmailIds.split(",").each{
+			String candidateEmail = it.trim();
+			//checking for email signature
+			if(candidateEmail.contains("@")){
+				if(BlockedMails.findByEmail(candidateEmail)){
+					log.debug "Email $candidateEmail is unsubscribed for identification mail."
+				}else{
+					result[candidateEmail] = generateLink("observation", "unsubscribeToIdentificationMail", [email:candidateEmail], request) ;
+				}
+			}else{
+				//its user id
+				SUser user = SUser.get(candidateEmail.toLong());
+				candidateEmail = user.email.trim();
+				if(user.allowIdentifactionMail){
+					result[candidateEmail] = generateLink("observation", "unsubscribeToIdentificationMail", [email:candidateEmail, userId:user.id], request) ;
+				}else{
+					log.debug "User $user.id has unsubscribed for identification mail."
+				}
+			}
+		}
+		return result;
+	}
+	
+	
 
         def login = {
             render  template:"/common/suser/userLoginBoxTemplate" 

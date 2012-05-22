@@ -24,14 +24,9 @@
 		<div class="row">
 			<div class="span12">
 				<div class="page-header clearfix">
-					<div class="span8">
 						<h1>
 							<g:message code="default.observation.heading" args="[entityName]" />
 						</h1>
-					</div>
-					<div style="float: right;">
-						<search:searchBox />
-					</div>
 				</div>
 
 				<g:if test="${flash.message}">

@@ -1,7 +1,12 @@
 <g:javascript>
 
 $(document).ready(function(){
-	$("#searchTextField").val('${responseHeader?.params?.q}')
+
+	if('${responseHeader?.params?.q}'){
+		$("#searchTextField").val('${responseHeader?.params?.q}')
+	} else {
+		$("#searchTextField").val('${params.query}');
+	}
 	
 	var cache = {},
 		lastXhr;
@@ -75,7 +80,7 @@ $( "#search" ).click(function() {
 
 		<g:hiddenField name="start" value="0" />
 		<g:hiddenField name="rows" value="10" />
-		<g:hiddenField name="sort" value="score desc" />
+		<g:hiddenField id="searchBoxSort"  name="sort" value="score desc" />
 		<g:hiddenField name="fl" value="id,name" />
 
 		<!-- 
