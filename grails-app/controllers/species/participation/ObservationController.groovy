@@ -528,7 +528,7 @@ class ObservationController {
 				observationInstance.isDeleted = true;
 				observationInstance.save(flush: true)
 				sendNotificationMail(OBSERVATION_DELETED, observationInstance, request);
-				observationsSearchService.delete(observationInstance);
+				observationsSearchService.delete(observationInstance.id);
 				flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
 				redirect(action: "list")
 			}
