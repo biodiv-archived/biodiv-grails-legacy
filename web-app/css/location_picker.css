@@ -91,6 +91,7 @@ padding: 10px;
 }
 
 .active_location_picker_button {
+background-color: #fe847b;    
 }
 
 #geotagged_images .title {

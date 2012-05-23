@@ -213,6 +213,8 @@ $(document).ready(function() {
       }
     });
 
+    $(".location_picker_button").removeClass("active_location_picker_button");
+
     $('#location_info').html('You have selected this location');
   });
   
