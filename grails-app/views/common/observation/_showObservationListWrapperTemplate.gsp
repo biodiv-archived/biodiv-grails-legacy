@@ -30,12 +30,14 @@
 				</div>
 				<div style="clear: both;"></div>
 				<!-- needs to be fixed -->
+				<g:if test="${params.action != 'search'}">
 				<div id="map_view_bttn" class="btn-group">
 					<a class="btn btn-success dropdown-toggle" data-toggle="dropdown"
 						href="#"
 						onclick="$(this).parent().css('background-color', '#9acc57'); showMapView(); return false;">
 						Map view <span class="caret"></span> </a>
 				</div>
+				</g:if>
 				<div class="btn-group" style="float: left; z-index: 10">
 					<button id="selected_sort" class="btn dropdown-toggle"
 						data-toggle="dropdown" href="#" rel="tooltip"

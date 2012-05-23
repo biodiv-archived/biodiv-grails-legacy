@@ -233,10 +233,10 @@ class SUserController extends UserController {
 
 		String q = hql.toString() + cond.toString() + userNameQuery;
 		int totalCount = lookupUserClass().executeQuery("SELECT COUNT(DISTINCT u) $q", queryParams)[0]
-		if(totalCount) {
+		//if(totalCount) {
 			cond.append userNameQuery
 			hql = q;
-		} else {
+		/*} else {
 			queryParams.remove('username')
 			//Searching observations core when no user is found.
 			def usernamesList = searchObservations(params);
@@ -245,7 +245,7 @@ class SUserController extends UserController {
 			//queryParams['username'] = usernames
 			hql.append cond
 			totalCount = lookupUserClass().executeQuery("SELECT COUNT(DISTINCT u) $hql", queryParams)[0]
-		}
+		}*/
 
 		Integer max = params.int('max')
 		Integer offset = params.int('offset')
