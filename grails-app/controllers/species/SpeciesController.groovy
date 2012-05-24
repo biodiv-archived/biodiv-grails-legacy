@@ -377,7 +377,7 @@ class SpeciesController {
 		   params.remove('query');
 		   params['start'] = params['start']?:"0";
 		   params['rows'] = params['rows']?:"10";
-		   params['sort'] = params['sort']?:"score";
+		   params['sort'] = params['sort']+" desc"?:"score";
 		   params['fl'] = params['fl']?:"id, name";
 		   params['facet'] = "true";
 		   params['facet.limit'] = "-1";

@@ -876,7 +876,7 @@ class ObservationController {
 
 
 		def model = observationService.getObservationsFromSearch(params);
-		println "--------------"+model
+		
 		if(!params.isGalleryUpdate?.toBoolean()){
 			params.remove('isGalleryUpdate');
 			render (view:"search", model:model)

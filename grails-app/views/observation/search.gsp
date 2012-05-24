@@ -24,9 +24,7 @@
 		<div class="row">
 			<div class="span12">
 				<div class="page-header clearfix">
-						<h1>
-							<g:message code="default.observation.heading" args="[entityName]" />
-						</h1>
+						<search:searchResultsHeading/>
 				</div>
 
 				<g:if test="${flash.message}">
@@ -35,11 +33,6 @@
 					</div>
 				</g:if>
 				
-				<ul id="searchResultsTabs" class="nav nav-tabs">
-				  <li><a href="${createLink(controller:'species', action:'search')}" >Species</a></li>
-				  <li><a href="${createLink(controller:'observation', action:'search')}" >Observations</a></li>
-				  <li><a href="${createLink(controller:'SUser', action:'search')}" >Users</a></li>
-				</ul>
 				<div class="searchResults">
 					<obv:showObservationsListWrapper/>
 				</div>

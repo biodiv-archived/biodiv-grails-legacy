@@ -199,7 +199,7 @@ class SUserController extends UserController {
 		def userLookup = SpringSecurityUtils.securityConfig.userLookup
 		String usernameFieldName = 'name'
 
-		params.sort = params.sort && params.sort != 'score desc' ? params.sort : "activity";
+		params.sort = params.sort && params.sort != 'score' ? params.sort : "activity";
 		String userNameQuery = "";
 		if (params['query']) {
 			def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields			

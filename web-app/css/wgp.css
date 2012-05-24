@@ -1173,8 +1173,8 @@ background-color: whiteSmoke;
 }
 
 .searchResults {
-	border: 3px solid #FFF;
-	margin : -3px;
+/* 	border: 3px solid #FFF; */
+/* 	margin : -3px; */
 }
 .ui-autocomplete-category {
 	font-weight:bold;

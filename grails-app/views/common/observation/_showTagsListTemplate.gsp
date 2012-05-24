@@ -1,6 +1,5 @@
 <%@ page import="org.grails.taggable.Tag"%>
 <%@ page import="species.participation.Observation"%>
-
 <div class="view_tags">
 	<g:if test="${tags}">
 		<ul class="tagit">

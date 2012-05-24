@@ -80,7 +80,7 @@ $( "#search" ).click(function() {
 
 		<g:hiddenField name="start" value="0" />
 		<g:hiddenField name="rows" value="10" />
-		<g:hiddenField id="searchBoxSort"  name="sort" value="score desc" />
+		<g:hiddenField id="searchBoxSort"  name="sort" value="score" />
 		<g:hiddenField name="fl" value="id,name" />
 
 		<!-- 

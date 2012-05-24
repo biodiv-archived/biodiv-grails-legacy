@@ -7,7 +7,6 @@
 	<obv:showGroupFilter
 		model="['observationInstance':observationInstance]" />
 </div>
-
 <div class="tags_section span3" style="float: right;">
 	<g:if test="${params.action == 'search' }">
 		<obv:showAllTags
@@ -31,18 +30,18 @@
 				<div style="clear: both;"></div>
 				<!-- needs to be fixed -->
 				<g:if test="${params.action != 'search'}">
-				<div id="map_view_bttn" class="btn-group">
-					<a class="btn btn-success dropdown-toggle" data-toggle="dropdown"
-						href="#"
-						onclick="$(this).parent().css('background-color', '#9acc57'); showMapView(); return false;">
-						Map view <span class="caret"></span> </a>
-				</div>
+					<div id="map_view_bttn" class="btn-group">
+						<a class="btn btn-success dropdown-toggle" data-toggle="dropdown"
+							href="#"
+							onclick="$(this).parent().css('background-color', '#9acc57'); showMapView(); return false;">
+							Map view <span class="caret"></span> </a>
+					</div>
 				</g:if>
 				<div class="btn-group" style="float: left; z-index: 10">
 					<button id="selected_sort" class="btn dropdown-toggle"
 						data-toggle="dropdown" href="#" rel="tooltip"
 						data-original-title="Sort by">
-						
+
 						<g:if test="${params.sort == 'visitCount'}">
                                                Most Viewed
                                             </g:if>
@@ -59,27 +58,24 @@
 					</button>
 					<ul id="sortFilter" class="dropdown-menu" style="width: auto;">
 						<li class="group_option"><a class=" sort_filter_label"
-							value="createdOn"> Latest </a>
-						</li>
+							value="createdOn"> Latest </a></li>
 						<li class="group_option"><a class=" sort_filter_label"
-							value="lastRevised"> Last Updated </a>
-						</li>
+							value="lastRevised"> Last Updated </a></li>
 						<g:if test="${params.action == 'search'}">
 							<li class="group_option"><a class=" sort_filter_label"
-								value="score"> Relevancy </a>
-							</li>
+								value="score"> Relevancy </a></li>
 						</g:if>
 						<g:else>
 							<li class="group_option"><a class=" sort_filter_label"
-								value="visitCount"> Most Viewed </a>
-							</li>
+								value="visitCount"> Most Viewed </a></li>
 						</g:else>
 					</ul>
 
 
 				</div>
-			
-		                <obv:identificationByEmail model="['source':'observationList', 'requestObject':request]" />
+
+				<obv:identificationByEmail
+					model="['source':'observationList', 'requestObject':request]" />
 				<div id="observations_list_map" class="observation"
 					style="clear: both; display: none;">
 					<obv:showObservationsLocation
@@ -97,7 +93,7 @@
 
 
 <!--container end-->
-	<g:javascript>	
+<g:javascript>	
         $(document).ready(function(){
         	$('#selected_sort').tooltip({placement:'right'});
             $('button').tooltip();
@@ -212,7 +208,7 @@
 <%--                    updateGallery(undefined, ${queryParams.max}, 0);--%>
 <%--                    return false;--%>
 <%--                });--%>
-<%--        --%>
+	<%--        --%>
                 
                 $(".paginateButtons a").click(function() {
                     updateGallery($(this).attr('href'));
@@ -394,7 +390,7 @@
 					return params;
                 }	
 <%--                --%>
-		<%--                History.Adapter.bind(window,'statechange',function(){ // Note: We are using statechange instead of popstate--%>
+	<%--                History.Adapter.bind(window,'statechange',function(){ // Note: We are using statechange instead of popstate--%>
 <%--        			var State = History.getState(); // Note: We are using History.getState() instead of event.state--%>
 <%--        			History.log(State.data, State.title, State.url);--%>
 <%--        			alert(JSON.stringify(State));--%>
@@ -402,17 +398,17 @@
 <%--        			//window.location.href = State.url;--%>
 <%--    			});--%>
 
-		<%--                window.onpopstate = function(event) {  --%>
+	<%--                window.onpopstate = function(event) {  --%>
 <%--                	alert(event);--%>
 <%--  					alert("location: " + document.location + ", state: " + JSON.stringify(event.state));--%>
 <%--  					if(event.state !== undefined){--%>
 <%--  						window.location = document.location;--%>
 <%--  					} --%>
 <%--				};--%>
-		<%--                $(window).bind('statechange',function(){--%>
+	<%--                $(window).bind('statechange',function(){--%>
 <%--                	alert("state changed " );--%>
 <%--                });--%>
-		<%--                --%>
+	<%--                --%>
 				function setActiveTag(activeTag){
 					if(activeTag != undefined){
  							$('li.tagit-choice').each (function() {

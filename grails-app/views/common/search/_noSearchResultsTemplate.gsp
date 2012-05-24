@@ -1,0 +1,1 @@
+<div class="alert alert-info">No results were found. Please relax the search key or filter criteria.</div>

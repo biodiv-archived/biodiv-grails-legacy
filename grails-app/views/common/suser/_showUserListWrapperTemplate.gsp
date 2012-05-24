@@ -58,20 +58,20 @@ def queryParams = [username: username, enabled: enabled, accountExpired: account
 					</div>
 					<div>
 						<g:if test="${totalCount == 0}">
-							<div class="alert alert-info">No users were found. Please
-								relax the search query or filter criteria.</div>
+							<search:noSearchResults />
 						</g:if>
-
+						<g:else>
 						<span class="name" style="color: #b1b1b1;"><i
 							class="icon-user"></i> ${totalCount} </span> User<g:if test="${totalCount!=1}">s</g:if> 
 						
 						<g:if test="${params.query}">
-                                    for query <span class="highlight">
+                                    for search key <span class="highlight">
 							<g:link controller="sUser" action="search" params="[query: params.query]">
 								${params.query.encodeAsHTML()} <a
 								id="removeQueryFilter" href="#">[X]</a></g:link>
 							</span>
 						</g:if>
+						</g:else>
 					</div>
 
 				</div>

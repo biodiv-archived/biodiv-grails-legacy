@@ -657,7 +657,7 @@ class ObservationService {
 		
 		queryParams["query"] = params.query
 		activeFilters["query"] = params.query
-		params.query = params.query ?: "*:*";
+		params.query = params.query ?: "";
 			
 		paramsList.add('q', Utils.cleanSearchQuery(params.query));
 		//options
@@ -763,9 +763,9 @@ class ObservationService {
 			responseHeader = queryResponse?.responseHeader;
 			noOfResults = queryResponse.getResults().getNumFound()
 		}
-		if(responseHeader?.params?.q == "*:*") {
+		/*if(responseHeader?.params?.q == "*:*") {
 			responseHeader.params.remove('q');
-		}
+		}*/
 		return [responseHeader:responseHeader, observationInstanceList:instanceList, observationInstanceTotal:noOfResults, queryParams:queryParams, activeFilters:activeFilters, tags:facetResults]
 	}
 }
