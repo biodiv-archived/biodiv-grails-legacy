@@ -601,9 +601,9 @@ class ObservationService {
 			staticMessage = evaluate(staticMessage, templateMap)
 		}
 		
-		templateMap["activitySourceUrl"] = m.sourcePageUrl? m.sourcePageUrl : ""
-		templateMap["unsubscribeUrl"] = unsubscribeUrl ? unsubscribeUrl : ""
-		templateMap["userMessage"] = m.userMessage? m.userMessage : ""
+		templateMap["activitySourceUrl"] = m.sourcePageUrl?: ""
+		templateMap["unsubscribeUrl"] = unsubscribeUrl ?: ""
+		templateMap["userMessage"] = m.userMessage?: ""
 		def body = conf.ui.askIdentification.emailBody
 		if (body.contains('$')) {
 			body = evaluate(body, templateMap)

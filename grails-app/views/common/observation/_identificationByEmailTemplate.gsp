@@ -2,9 +2,7 @@
 	<div class="btn-group" style="z-index:10; float: left; margin-left: 5px;">
 		<a id="identification-email" class="${(source == 'observationShow')?'btn btn-mini' : 'btn'} dropdown-toggle" 
 			data-toggle="dropdown" href="#"><i class="icon-envelope"></i>Share</a>
-		<form id="email-form" name="email-form" style="display: none; background-color: #F2F2F2;"
-			action="${createLink(controller:'observation', action:'sendIdentificationMail')}"
-			method="post">
+		<form id="email-form" name="email-form" style="display: none; background-color: #F2F2F2;">
                         <div class="form-row">
                             <span class="keyname">To</span>
                             <ul class="userOrEmail-list">
@@ -55,9 +53,22 @@ function removeChoice(ele){
 $(function() {
 	//validEmailAndIdList = []
 	$('#identification-email').click(function(){
-			$('#userIdsAndEmailIds').val('');
-			$('#userAndEmailList').val('')
-			$('#email-form').show();
+			$.ajax({ 
+	         	url:"${createLink(controller:'SUser', action:'isLoggedIn')}",
+				success: function(data, statusText, xhr, form) {
+					if(data === "true"){
+						$('#userIdsAndEmailIds').val('');
+						$('#userAndEmailList').val('')
+						$('#email-form').show();
+						return false;
+					}else{
+						window.location.href = "/biodiv/login?spring-security-redirect="+window.location.href;
+					}
+	            },
+	            error:function (xhr, ajaxOptions, thrownError){
+	            	return false;
+				} 
+	     	});
 	});
 	$('#email-form-close').click(function(){
 			$('#email-form').hide();
@@ -101,7 +112,7 @@ $(function() {
 			if ( event.keyCode === $.ui.keyCode.TAB &&
 					$( this ).data( "autocomplete" ).menu.active ) {
 				event.preventDefault();
-			}else if( event.keyCode === $.ui.keyCode.COMMA){
+			}else if( event.keyCode === $.ui.keyCode.COMMA || event.keyCode === $.ui.keyCode.ENTER){
 				//storing email after validation
 				validateAndAddEmail($.trim(this.value));
 				event.preventDefault();
@@ -130,10 +141,15 @@ $(function() {
 			}
 		});
 
+	function UpdateCKEditors() {
+	    for (var i in CKEDITOR.instances) {
+	        CKEDITOR.instances[i].updateElement();
+	    }    
+	}
+	
 	$('#email-form').bind('submit', function(event) {
 		//adding last entry if not ended with comma
 		validateAndAddEmail($.trim($("#userAndEmailList" ).val()));
-		
 		if(validEmailAndIdList.length == 0){
 			$("#userAndEmailList" ).addClass('alert alert-error');
 			event.preventDefault();
@@ -141,7 +157,8 @@ $(function() {
 		}else{
 			$('#userIdsAndEmailIds').val(validEmailAndIdList.join(","));
 		}
-
+		UpdateCKEditors();
+		
 		$(this).ajaxSubmit({ 
          	url:"${createLink(controller:'observation', action:'sendIdentificationMail')}",
 			dataType: 'json', 

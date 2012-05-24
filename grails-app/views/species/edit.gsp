@@ -7,11 +7,11 @@
 <meta name="layout" content="main" />
 <title>Species Edit</title>
 <link rel="stylesheet" type="text/css" media="all"
-	href="${resource(dir:'js/galleria/1.2.6/themes/classic/',file:'galleria.classic.css')}" />
-<g:javascript src="galleria/1.2.6/galleria-1.2.6.min.js"/>
+	href="${resource(dir:'js/galleria/1.2.7/themes/classic/',file:'galleria.classic.css')}" />
+<g:javascript src="galleria/1.2.7/galleria-1.2.7.min.js"/>
 
 <g:javascript>
-Galleria.loadTheme('${resource(dir:'js/galleria/1.2.6/themes/classic/',file:'galleria.classic.min.js')}');
+Galleria.loadTheme('${resource(dir:'js/galleria/1.2.7/themes/classic/',file:'galleria.classic.min.js')}');
 $(document).ready(function(){
 	$(".caption").click(function() {
 		$.ajax({

@@ -36,7 +36,7 @@
 </style><![endif]--> 
 
 <link rel="stylesheet" type="text/css" media="all"
-	href="${resource(dir:'js/galleria/1.2.4/themes/classic/',file:'galleria.classic.css')}" />
+	href="${resource(dir:'js/galleria/1.2.7/themes/classic/',file:'galleria.classic.css')}" />
 <link rel="stylesheet" type="text/css" media="all"
 	href="${resource(dir:'css',file:'augmented-maps.css')}" />
 
@@ -61,8 +61,8 @@
 	src="/sites/all/themes/wg/scripts/OpenLayers-2.10/OpenLayers.js"></script>
 <script type="text/javascript" src="/sites/all/themes/wg/scripts/am.js"></script>
 
-<g:javascript src="galleria/1.2.4/galleria-1.2.4.min.js"/>
-<g:javascript src="galleria/1.2.4/plugins/flickr/galleria.flickr.min.js"></g:javascript>
+<g:javascript src="galleria/1.2.7/galleria-1.2.7.min.js"/>
+<g:javascript src="galleria/1.2.7/plugins/flickr/galleria.flickr.min.js"></g:javascript>
 
 <g:javascript src="jquery.collapser/jquery.collapser.min.js"/>
 <g:javascript src="floating-1.7.js"/>
@@ -87,7 +87,7 @@ function getOccurrenceCount(data) {
 
 <g:javascript>
 google.load("search", "1");
-Galleria.loadTheme('${resource(dir:'js/galleria/1.2.4/themes/classic/',file:'galleria.classic.min.js')}');
+Galleria.loadTheme('${resource(dir:'js/galleria/1.2.7/themes/classic/',file:'galleria.classic.min.js')}');
 
 $(document).ready(function(){
 	var tabs = $("#resourceTabs").tabs();
