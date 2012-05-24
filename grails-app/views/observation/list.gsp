@@ -12,6 +12,7 @@
 <script type="text/javascript"
 	src="http://maps.google.com/maps/api/js?sensor=true"></script>
 <g:javascript src="location/google/markerclusterer.js"></g:javascript>
+<g:javascript src="jquery/jquery.url.js" />
 
 <g:javascript src="tagit.js"></g:javascript>
 <g:javascript src="jquery/jquery.autopager-1.0.0.js"></g:javascript>
