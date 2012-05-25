@@ -187,5 +187,8 @@ class ObservationTagLib {
 		out << render(template:"/common/observation/identificationByEmailTemplate",model:emailInfoModel);
 	}
 	
+	def showRecoComment = {	attrs, body->
+		out << render(template:"/common/observation/showRecoCommentTemplate",model:attrs.model);
+	}
 }
 

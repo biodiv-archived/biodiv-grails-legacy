@@ -215,6 +215,15 @@ class Observation implements Taggable{
 			map.put("votedOn", recos.collect{it.votedOn})
 			
 			map.put("noOfVotes", recoVote[1]);
+			
+			def recoComments = []
+			recos.each{
+				String comment = it.comment;
+				if(comment){
+					recoComments << [comment:comment, author:it.author, votedOn:it.votedOn]
+				}
+			}
+			map.put("recoComments", recoComments);
 			result.add(map);
 		}
 		return ['recoVotes':result, 'totalVotes':this.recommendationVote.size(), 'uniqueVotes':getRecommendationCount()];

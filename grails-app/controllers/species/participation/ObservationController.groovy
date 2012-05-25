@@ -727,6 +727,7 @@ class ObservationController {
 	private Map getRecommendationVote(params) {
 		def observation = params.observation?:Observation.get(params.obvId);
 		def author = params.author;
+		def recoComment = (params.recoComment?.trim().length() > 0)? params.recoComment.trim():null;
 
 		def reco;
 		if(params.recoId)
@@ -737,7 +738,7 @@ class ObservationController {
 		ConfidenceType confidence = observationService.getConfidenceType(params.confidence?:ConfidenceType.CERTAIN.name());
 
 		RecommendationVote existingRecVote = RecommendationVote.findByAuthorAndObservation(author, observation);
-		RecommendationVote newRecVote = new RecommendationVote(observation:observation, recommendation:reco, author:author, confidence:confidence);
+		RecommendationVote newRecVote = new RecommendationVote(observation:observation, recommendation:reco, author:author, confidence:confidence, comment:recoComment);
 
 		if(!reco){
 			log.debug "Not a valid recommendation"

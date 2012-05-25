@@ -160,7 +160,7 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 							<div id="seeMoreMessage" class="message"></div>
 							<div id="seeMore" class="btn btn-mini">see all</div>
 						</div>
-						<div class="input-append">
+						<div class="input-append"  style="position: relative;">
 							<g:hasErrors bean="${recommendationInstance}">
 								<div class="errors">
 									<g:renderErrors bean="${recommendationInstance}" as="list" />
@@ -180,7 +180,7 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 									model="['recommendationInstance':recommendationInstance]" />
 								<input type="hidden" name='obvId'
 									value="${observationInstance.id}" /> <input type="submit"
-									value="Add" class="btn" style="position: relative;top: -28px;float: right;" />
+									value="Add" class="btn" style="position:absolute; top:0; right:0;" />
 								
 							</form>
 						
@@ -302,7 +302,8 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 					var uniqueVotes = parseInt(data.uniqueVotes);
 					if(uniqueVotes > 3){
 						$("#seeMore").show();
-					}	
+					}
+					
 				}, error: function(xhr, status, error) {
 	    			handleError(xhr, status, error, undefined, function() {
 		    			var msg = $.parseJSON(xhr.responseText);
@@ -338,6 +339,7 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 				}, 
 	            success: function(data, statusText, xhr, form) {
 	            	showRecos(data, null);
+	            	cancelRecoComment();
 	            	return false;
 	            },
 	            error:function (xhr, ajaxOptions, thrownError){

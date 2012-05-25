@@ -34,6 +34,7 @@
 							${r.name}
 						</i>
 					</g:else> </span>
+					<obv:showRecoComment model="['recoComments':r.recoComments, 'recoId': r.recoId]" />
 				
 			</div> <g:javascript>
                         $(document).ready(function(){
