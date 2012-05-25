@@ -373,17 +373,18 @@ class SpeciesController {
 	   def searchFieldsConfig = grailsApplication.config.speciesPortal.searchFields
 
 	   if(params.query) {
+		   NamedList paramsList = new NamedList();
 		   params.q = Utils.cleanSearchQuery(params.query);
 		   params.remove('query');
-		   params['start'] = params['start']?:"0";
-		   params['rows'] = params['rows']?:"10";
-		   params['sort'] = params['sort']+" desc"?:"score";
-		   params['fl'] = params['fl']?:"id, name";
-		   params['facet'] = "true";
-		   params['facet.limit'] = "-1";
-		   params['facet.mincount'] = "1";
-		   NamedList paramsList = new NamedList();
-		   paramsList.addAll(params);
+		   paramsList.add('start', params['start']?:"0");
+		   paramsList.add('rows', params['rows']?:"10");
+		   paramsList.add('sort', params['sort']+" desc"?:"score");
+		   paramsList.add('fl', params['fl']?:"id, name");
+		   paramsList.add('facet', "true");
+		   paramsList.add('facet.limit', "-1");
+		   paramsList.add('facet.mincount', "1");
+		   
+		   
 		   /*paramsList.add('facet.field', searchFieldsConfig.NAME_EXACT);
 		   paramsList.add('facet.field', searchFieldsConfig.CANONICAL_NAME_EXACT);
 		   paramsList.add('facet.field', searchFieldsConfig.COMMON_NAME_EXACT);
@@ -440,6 +441,7 @@ class SpeciesController {
 	   }
 	   render (view:'advSearch', params:newParams);
    }
+   
 
    def nameTerms = {
 	   log.debug params;
