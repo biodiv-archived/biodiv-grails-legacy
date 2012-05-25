@@ -28,9 +28,7 @@
 		<div class="row">
 			<div class="span12">
 				<div class="page-header">
-					<h1>
-						<g:message code="default.search.heading" default="Search Results" />
-					</h1>
+					<search:searchResultsHeading/>
 				</div>
 
 				<g:if test="${flash.message}">
@@ -38,21 +36,6 @@
 						${flash.message}
 					</div>
 				</g:if>
-
-				<ul id="searchResultsTabs" class="nav nav-tabs">
-					<li><a
-						href="${createLink(controller:'species', action:'search')}"
-						data-toggle="tab">Species</a>
-					</li>
-					<li><a
-						href="${createLink(controller:'observation', action:'search')}"
-						data-toggle="tab">Observations</a>
-					</li>
-					<li><a
-						href="${createLink(controller:'SUser', action:'search')}"
-						data-toggle="tab">Users</a>
-					</li>
-				</ul>
 
 				<div class="searchResults">
 					<sUser:showUserListWrapper/>

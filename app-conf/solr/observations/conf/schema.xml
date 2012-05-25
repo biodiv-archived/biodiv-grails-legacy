@@ -211,7 +211,7 @@
 		<field name="id" type="string" indexed="true" stored="true"
 			required="true" multiValued="false" />
 			
-		<field name="author" type="taxonText" indexed="true" required="true"/>
+		<field name="author" type="taxonText" indexed="true" required="true" stored="true"/>
 		<field name="contributor" type="taxonText" indexed="true" multiValued="true" />
 		<field name="contributor_exact" type="textExact" indexed="true" multiValued="true" />
 		<copyField source="contributor" dest="contributor_exact" />
@@ -235,7 +235,8 @@
 		
 		<field name="tag" type="string" indexed="true" multiValued="true" />
 		
-		<field name="text" type="text" indexed="true" stored="false" required="true" multiValued="true" />
+		<!-- using stored=true for highlighting...needs to change -->
+		<field name="text" type="text" indexed="true" stored="true" required="true" multiValued="true"  termVectors="true" termPositions="true" termOffsets="true"/>
 		<copyField source="contributor" dest="text" />
 		<copyField source="location" dest="text" />
 		<copyField source="name" dest="text" />
@@ -244,7 +245,8 @@
 		<copyField source="sgroup" dest="text" />
 		<copyField source="habitat" dest="text" />
 
-		<field name="autocomplete" type="textSpell" indexed="true" stored="true" multiValued="true" />
+		
+		<field name="autocomplete" type="textSpell" indexed="true" stored="true" multiValued="true"/>
 		<copyField source="*_exact" dest="autocomplete" />
 		<copyField source="contributor" dest="autocomplete" />
 		<copyField source="location" dest="autocomplete" />

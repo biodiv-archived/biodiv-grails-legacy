@@ -36,8 +36,26 @@ class SUserController extends UserController {
 	}
 
 	def list = {
-		params.max = Math.min(params.max ? params.int('max') : 10, 100)
-		render view: 'list', model: [results: SUser.list(params), totalCount: SUser.count(), searched:"true"]
+		params.max = Math.min(params.max ? params.int('max') : 12, 100)
+		//params.sort = params.sort && params.sort != 'score' ? params.sort : "activity";
+		params.query='%';
+		def model = getUsersList(params);
+		
+		// add query params to model for paging
+			for (name in [
+			'username',
+			'enabled',
+			'accountExpired',
+			'accountLocked',
+			'passwordExpired',
+			'sort',
+			'order'
+		]) {
+			model[name] = params[name]
+		}
+		params.remove('query');
+		render view: 'list', model: model
+		//render view: 'list', model: [results: SUser.list(params), totalCount: SUser.count(), searched:"true"]
 	}
 
 	@Secured(['ROLE_ADMIN'])
@@ -199,7 +217,7 @@ class SUserController extends UserController {
 		def userLookup = SpringSecurityUtils.securityConfig.userLookup
 		String usernameFieldName = 'name'
 
-		params.sort = params.sort && params.sort != 'score desc' ? params.sort : "activity";
+		params.sort = params.sort && params.sort != 'score' ? params.sort : "activity";
 		String userNameQuery = "";
 		if (params['query']) {
 			def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields			
