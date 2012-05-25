@@ -374,7 +374,7 @@ class SpeciesController {
 
 	   if(params.query) {
 		   NamedList paramsList = new NamedList();
-		   params.q = Utils.cleanSearchQuery(params.query);
+		   paramsList.add('q', Utils.cleanSearchQuery(params.query));
 		   params.remove('query');
 		   paramsList.add('start', params['start']?:"0");
 		   paramsList.add('rows', params['rows']?:"10");
