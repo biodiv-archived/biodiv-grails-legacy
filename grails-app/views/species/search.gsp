@@ -187,7 +187,7 @@ $( "#search" ).unbind('click');
 										</g:each>
 									</ul>
 									<div class="paginateButtons" style="clear: both;">
-										<g:paginateOnSearchResult total="${total}" action="select"
+										<g:paginateOnSearchResult total="${total}" action="search"
 											params="[query:responseHeader.params.q, fl:responseHeader.params.fl]" />
 									</div>
 								</g:if>
