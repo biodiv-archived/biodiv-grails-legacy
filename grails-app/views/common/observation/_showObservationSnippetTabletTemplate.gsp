@@ -7,24 +7,19 @@
 
 		<div class="wrimg">
 			<div class="thumbnail">
-				<g:if
-					test="${imagePath && (new File(grailsApplication.config.speciesPortal.observations.rootDir + imagePath)).exists()}">
-					<g:link action="show" controller="observation"
-						id="${observationInstance.id}">
+				<g:link action="show" controller="observation"
+						id="${observationInstance.id}" params="['pos':pos]">
+					<g:if
+						test="${imagePath && (new File(grailsApplication.config.speciesPortal.observations.rootDir + imagePath)).exists()}">
 						<img
 							src="${createLinkTo(base:grailsApplication.config.speciesPortal.observations.serverURL,	file: imagePath)}" />
-					</g:link>
-
-
-				</g:if>
-				<g:else>
-					<g:link action="show" controller="observation"
-						id="${observationInstance.id}">
+					</g:if>
+					<g:else>
 						<img
 							src="${createLinkTo( file:"no-image.jpg", base:grailsApplication.config.speciesPortal.resources.serverURL)}"
 							title="You can contribute!!!" />
-					</g:link>
-				</g:else>
+					</g:else>
+				</g:link>
 			</div>
 		</div>
 	</div>

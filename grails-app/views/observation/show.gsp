@@ -94,12 +94,11 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 				<br />
 
 				<div class="page-header clearfix">
-					<div class="span8">
-						<h1>
+					<div style="width:100%;">
+						<h1 class="span8">
 							<obv:showSpeciesName
 								model="['observationInstance':observationInstance]" />
 						</h1>
-					</div>
 					<div style="float:right;">
 						<sUser:ifOwns model="['user':observationInstance.author]">
 							
@@ -114,9 +113,18 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 									
 						</sUser:ifOwns>
 					</div>
-
+					</div>
+					<div style="clear:both;"></div>
+					<g:if test="${params.pos}">
+						<div style="width:100%;">
+							<g:link class="pull-left btn ${prevObservationId?'active':'disabled'}" action="show" controller="observation"
+								id="${prevObservationId}" params="['pos':params.int('pos')-1]">Prev Observation</g:link>
+							<g:link class="pull-right  btn ${nextObservationId?'active':'disabled'}"  action="show" controller="observation"
+								id="${nextObservationId}" params="['pos':params.int('pos')+1]">Next Observation</g:link>
+						</div>
+					</g:if>
 				</div>
-
+				
 				<div class="span8 right-shadow-box" style="margin: 0;">
 
 

@@ -48,7 +48,7 @@ class ObservationController {
 
 	def filteredList = {
 		def result;
-		//TODO: Dirty hack to feed results through solr if the request is from search 
+		//TODO: Dirty hack to feed results through solr if the request is from search
 		if(params.action == 'search') {
 			result = observationService.getObservationsFromSearch(params)
 		} else {
@@ -84,6 +84,13 @@ class ObservationController {
 
 		def totalObservationInstanceList = observationService.getFilteredObservations(params, -1, -1, true).observationInstanceList
 		def count = totalObservationInstanceList.size()
+		
+		//storing this filtered obvs ids list in session for next and prev links
+		//http://grepcode.com/file/repo1.maven.org/maven2/org.codehaus.groovy/groovy-all/1.8.2/org/codehaus/groovy/runtime/DefaultGroovyMethods.java
+		//returns an arraylist and invalidates prev listing result
+		println session.getId();
+		session["obv_ids_list"] = totalObservationInstanceList.collect {it[0]};
+		log.debug "Storing all observations ids list in session ${session['obv_ids_list']}";
 		return [totalObservationInstanceList:totalObservationInstanceList, observationInstanceList: observationInstanceList, observationInstanceTotal: count, queryParams: queryParams, activeFilters:activeFilters]
 	}
 
@@ -137,7 +144,7 @@ class ObservationController {
 	@Secured(['ROLE_USER'])
 	def update = {
 		log.debug params;
-		
+
 		def observationInstance = Observation.get(params.id.toLong())
 		params.author = observationInstance.author;
 		if(observationInstance)	{
@@ -171,14 +178,30 @@ class ObservationController {
 	}
 
 	def show = {
-		def observationInstance = Observation.findWhere(id:params.id.toLong(), isDeleted:false)
-		if (!observationInstance) {
-			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
-			redirect(action: "list")
-		}
-		else {
-			observationInstance.incrementPageVisit();
-			[observationInstance: observationInstance]
+		if(params.id) {
+			def observationInstance = Observation.findWhere(id:params.id.toLong(), isDeleted:false)
+			if (!observationInstance) {
+				flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
+				redirect(action: "list")
+			}
+			else {
+				observationInstance.incrementPageVisit();
+				if(params.pos) {
+					println session.getId();
+					if(!session["obv_ids_list"]) {
+						log.debug "Fetching observations list as its not present in session "
+						def result = getObservationList(params);
+					}
+					int pos = params.int('pos');
+					log.debug "Current ids list in session ${session['obv_ids_list']} and position ${pos}";
+					def nextObservationId = (pos+1 < session["obv_ids_list"].size()) ? session["obv_ids_list"][pos+1] : null;
+					def prevObservationId = pos > 0 ? session["obv_ids_list"][pos-1] : null;
+					println "returning prev and next ids ${prevObservationId} ${nextObservationId}" 
+					[observationInstance: observationInstance, prevObservationId:prevObservationId, nextObservationId:nextObservationId]
+				} else {
+					[observationInstance: observationInstance]
+				}
+			}
 		}
 	}
 
@@ -624,13 +647,13 @@ class ObservationController {
 				body = conf.ui.observationFlagged.emailBody
 				templateMap["currentUser"] = springSecurityService.currentUser
 				break
-			
+
 			case OBSERVATION_DELETED :
 				mailSubject = conf.ui.observationDeleted.emailSubject
 				body = conf.ui.observationDeleted.emailBody
 				templateMap["currentUser"] = springSecurityService.currentUser
 				break
-			
+
 			case SPECIES_RECOMMENDED :
 				mailSubject = "Species name suggested"
 				body = conf.ui.addRecommendationVote.emailBody
@@ -702,25 +725,25 @@ class ObservationController {
 		new SimpleTemplateEngine().createTemplate(s).make(binding)
 	}
 
-	
-  def unsubscribeToIdentificationMail = {
-	  log.debug "$params"
-	  if(params.userId){
-		  def user = SUser.get(params.userId.toLong())
-		  user.allowIdentifactionMail = false;
-		  if(!user.save(flush:true)){
-			  this.errors.allErrors.each { log.error it }
-		  }
-	  }
-	  BlockedMails bm = new BlockedMails(email:params.email);
-	  if(!bm.save(flush:true)){
-		  this.errors.allErrors.each { log.error it }
-	  }
-	  render "${message(code: 'user.unsubscribe.identificationMail', args: [params.email])}"
-  }
-  
 
-	 /*
+	def unsubscribeToIdentificationMail = {
+		log.debug "$params"
+		if(params.userId){
+			def user = SUser.get(params.userId.toLong())
+			user.allowIdentifactionMail = false;
+			if(!user.save(flush:true)){
+				this.errors.allErrors.each { log.error it }
+			}
+		}
+		BlockedMails bm = new BlockedMails(email:params.email);
+		if(!bm.save(flush:true)){
+			this.errors.allErrors.each { log.error it }
+		}
+		render "${message(code: 'user.unsubscribe.identificationMail', args: [params.email])}"
+	}
+
+
+	/*
 	 * @param params
 	 * @return
 	 */
@@ -822,24 +845,24 @@ class ObservationController {
 		def currentUserMailId = springSecurityService.currentUser?.email;
 		Map emailList = getUnBlockedMailList(params.userIdsAndEmailIds, request);
 		if(emailList.isEmpty()){
-				log.debug "No valid email specified for identification."
+			log.debug "No valid email specified for identification."
 		}else if (Environment.getCurrent().getName().equalsIgnoreCase("pamba") || Environment.getCurrent().getName().equalsIgnoreCase("saturn")) {
 			def mailSubject = params.mailSubject
 			for(entry in emailList.entrySet()){
 				def body = observationService.getIdentificationEmailInfo(params, request, entry.getValue()).mailBody
 				mailService.sendMail {
-					  to entry.getKey()
-					  bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com"
-					  from currentUserMailId
-					  subject mailSubject
-					  html body.toString()
-				  }
+					to entry.getKey()
+					bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com"
+					from currentUserMailId
+					subject mailSubject
+					html body.toString()
+				}
 				log.debug " mail sent for identification "
 			}
 		}
 		render (['success:true']as JSON);
 	}
-	
+
 	private Map getUnBlockedMailList(String userIdsAndEmailIds, request){
 		Map result = new HashMap();
 		userIdsAndEmailIds.split(",").each{
@@ -862,7 +885,7 @@ class ObservationController {
 		}
 		return result;
 	}
-	
+
 	///////////////////////////////////////////////////////////////////////////////
 	////////////////////////////// SEARCH /////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////
@@ -876,7 +899,7 @@ class ObservationController {
 
 
 		def model = observationService.getObservationsFromSearch(params);
-		
+
 		if(!params.isGalleryUpdate?.toBoolean()){
 			params.remove('isGalleryUpdate');
 			render (view:"search", model:model)
@@ -893,7 +916,7 @@ class ObservationController {
 			render result as JSON
 		}
 	}
-	
+
 
 	/**
 	 *
@@ -919,7 +942,7 @@ class ObservationController {
 		}
 		render (view:'advSearch', params:newParams);
 	}
-	
+
 	/**
 	 * 
 	 */
@@ -932,7 +955,7 @@ class ObservationController {
 		params.max = Math.min(params.max ? params.int('max') : 5, 10)
 		def namesLookupResults = namesIndexerService.suggest(params)
 		result.addAll(namesLookupResults);
- 
+
 		def queryResponse = observationsSearchService.terms(params);
 		NamedList tags = (NamedList) ((NamedList)queryResponse.getResponse().terms)[params.field];
 
