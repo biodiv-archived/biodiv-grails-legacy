@@ -1,4 +1,5 @@
-<%@ page import="species.participation.RecommendationVote.ConfidenceType" %>
+<%@ page
+	import="species.participation.RecommendationVote.ConfidenceType"%>
 <!-- TODO change this r:script which is used by resources framework for script not to be repeated multiple times -->
 <g:javascript>
 
@@ -70,11 +71,67 @@ $(document).ready(function() {
 			//species_name = observationInstance?.maxVotedSpeciesName
 		}
 	%>
-	<input type="text" name="recoName" id="name"  
-		value="${species_name}" placeholder='Suggest a species name'
-		class="input-xlarge ${hasErrors(bean: recommendationInstance, field: 'name', 'errors')} ${hasErrors(bean: recommendationVoteInstance, field: 'recommendation', 'errors')}" /> 
-	
+	<input type="text" name="recoName" id="name" value="${species_name}"
+		placeholder='Suggest a species name'
+		class="input-xlarge ${hasErrors(bean: recommendationInstance, field: 'name', 'errors')} ${hasErrors(bean: recommendationVoteInstance, field: 'recommendation', 'errors')}" />
+
 	<input type="hidden" name="canName" id="canName" />
 
-<div id="nameSuggestions" style="display:block;"></div>
+	<div id="nameSuggestions" style="display: block;"></div>
+	<div>
+		<a id="reco-action" data-toggle="dropdown" href="#">Comment</a>
+
+		<div id="reco-options" style="display: none">
+			<input type="text" name="recoComment" id="recoComment"
+				placeholder="Write comment" style="width: 80%"></input><br /> <input
+				class="btn btn-mini" style="top:5px;" type="button" value="cancel"
+				onclick="cancelRecoComment();return false;"></input>
+		</div>
+	</div>
 </div>
+<script>
+	$(document).ready(function() {
+		$('#recoComment').val('');
+
+		$('#reco-action').click(function() {
+			$('#reco-options').show();
+			$('#reco-action').hide();
+		});
+	});
+
+	function cancelRecoComment(){
+		$('#recoComment').val('');
+		$('#reco-options').hide();
+		$('#reco-action').show();
+	}
+	
+</script>
+<style>
+#reco-options {
+	background-clip: padding-box;
+	background-color: #FFFFFF;
+	border-color: rgba(0, 0, 0, 0.2);
+	border-radius: 0 0 5px 5px;
+	border-style: solid;
+	border-width: 1px;
+	box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+	display: none;
+	float: left;
+	left: 0;
+	list-style: none outside none;
+	margin: 0;
+	min-width: 400px;
+	max-width: 400px;
+	width : 400px;
+	padding: 10px;
+	top: 100%;
+	z-index: 1000;
+	color: #000000;
+}
+
+#reco-close {
+	position: absolute;
+	top: 0;
+	right: 0;
+}
+</style>

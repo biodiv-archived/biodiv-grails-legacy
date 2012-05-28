@@ -30,6 +30,7 @@ class RecommendationVote {
 	ConfidenceType confidence;
 	Date votedOn = new Date();
 	float userWeight;
+	String comment;
 	
 	static belongsTo = [observation:Observation];
 	
@@ -37,10 +38,12 @@ class RecommendationVote {
 		author(unique:['observation']);
 		votedOn validator : {val -> val < new Date()};
 		confidence(nullable:true);
+		comment nullable:true, blank: true;
+		comment (size:0..400);
 	}
 	
 	static mapping = {
-		
+		comment type:'text';
 	}
 
 }
