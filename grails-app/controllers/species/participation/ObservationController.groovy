@@ -197,7 +197,7 @@ class ObservationController {
 				if(params.pos) {
 					int pos = params.int('pos');
 					def prevNext = getPrevNextObservations(pos);
-					[observationInstance: observationInstance, prevObservationId:prevNext.prevObservationId, nextObservationId:prevNext.nextObservationId]
+					[observationInstance: observationInstance, prevObservationId:prevNext.prevObservationId, nextObservationId:prevNext.nextObservationId, lastListParams:prevNext.lastListParams]
 				} else {
 					[observationInstance: observationInstance]
 				}
@@ -230,7 +230,9 @@ class ObservationController {
 			nextObservationId = (pos+1 < session["obv_ids_list"].size()) ? session["obv_ids_list"][pos+1] : null;
 		}
 		def prevObservationId = pos > 0 ? session["obv_ids_list"][pos-1] : null;
-		return ['prevObservationId':prevObservationId, 'nextObservationId':nextObservationId];
+		
+		lastListParams.isGalleryUpdate = false;
+		return ['prevObservationId':prevObservationId, 'nextObservationId':nextObservationId, 'lastListParams':lastListParams];
 	}
 	
 	private void runLastListQuery(Map params) {
