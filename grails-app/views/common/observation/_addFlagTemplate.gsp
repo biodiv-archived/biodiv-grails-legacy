@@ -1,5 +1,6 @@
 <%@ page import="species.participation.ObservationFlag.FlagType"%>
 <%@ page import="species.participation.Observation"%>
+<%@page import="species.utils.ImageType"%>
 <div>
 	<div class="btn-group">
 		<a id="flag-action" class="btn btn-mini" data-toggle="dropdown"
@@ -42,7 +43,11 @@
 				<div>
 					<g:each var="flagInstance" in="${observationInstance.fetchAllFlags()}">
 						<li style="padding: 0 5px; clear: both;">
-							<span class="flagInstanceClass"> ${flagInstance.author.username} : ${flagInstance.flag.value()} ${flagInstance.notes ? ": " + flagInstance.notes : ""}</span>
+							<span class="flagInstanceClass">
+							<g:link controller="SUser" action="show" id="${flagInstance.author?.id}">
+							<img class="very_small_profile_pic"
+								src="${flagInstance.author?.icon(ImageType.VERY_SMALL)}"
+								title="${flagInstance.author.name}"/></g:link> : ${flagInstance.flag.value()} ${flagInstance.notes ? ": " + flagInstance.notes : ""}</span>
 							<sUser:ifOwns model="['user':flagInstance.author]">
 								<a href="#" onclick="removeFlag(${flagInstance.id}, ${flagInstance.observation.id}, $(this).parent()); return false;"><span class="deleteFlagIcon" data-original-title="Remove this flag" ><i class="icon-trash icon-red"></i></span></a>
 							</sUser:ifOwns>

@@ -111,7 +111,7 @@ class ObservationService {
 
 	List getRelatedObservation(String property, long obvId, int limit, long offset){
 		def propertyValue = Observation.read(obvId)[property]
-		def query = "from Observation as obv where obv." + property + " like :propertyValuee and obv.id != :parentObvId and obv.isDeleted = :isDeleted order by obv.createdOn desc"
+		def query = "from Observation as obv where obv." + property + " = :propertyValue and obv.id != :parentObvId and obv.isDeleted = :isDeleted order by obv.createdOn desc"
 		def obvs = Observation.findAll(query, [propertyValue:propertyValue, parentObvId:obvId, max:limit, offset:offset, isDeleted:false])
 		def result = [];
 		obvs.each {
@@ -488,7 +488,7 @@ class ObservationService {
 		if(params.tag){
 			query = "select obv from Observation obv,  TagLink tagLink where obv.isDeleted = :isDeleted "
 			mapViewQuery = "select obv.id, obv.latitude, obv.longitude from Observation obv, TagLink tagLink where obv.isDeleted = :isDeleted "
-			filterQuery +=  " and obv.id = tagLink.tagRef and tagLink.type like :tagType and tagLink.tag.name like :tag "
+			filterQuery +=  " and obv.id = tagLink.tagRef and tagLink.type = :tagType and tagLink.tag.name = :tag "
 
 			queryParams["tag"] = params.tag
 			queryParams["tagType"] = 'observation'
@@ -509,7 +509,7 @@ class ObservationService {
 		}
 
 		if(params.speciesName && (params.speciesName != grailsApplication.config.speciesPortal.group.ALL)){
-			filterQuery += " and obv.maxVotedSpeciesName like :speciesName "
+			filterQuery += " and obv.maxVotedSpeciesName = :speciesName "
 			queryParams["speciesName"] = params.speciesName
 			activeFilters["speciesName"] = params.speciesName
 		}
