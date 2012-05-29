@@ -81,18 +81,25 @@ class ObservationController {
 		def observationInstanceList = filteredObservation.observationInstanceList
 		def queryParams = filteredObservation.queryParams
 		def activeFilters = filteredObservation.activeFilters
-
+		activeFilters.put("append", true);//needed for adding new page obv ids into existing session["obv_ids_list"]
+		
 		def totalObservationInstanceList = observationService.getFilteredObservations(params, -1, -1, true).observationInstanceList
 		def count = totalObservationInstanceList.size()
 		
 		//storing this filtered obvs ids list in session for next and prev links
 		//http://grepcode.com/file/repo1.maven.org/maven2/org.codehaus.groovy/groovy-all/1.8.2/org/codehaus/groovy/runtime/DefaultGroovyMethods.java
 		//returns an arraylist and invalidates prev listing result
-		println session.getId();
-		session["obv_ids_list"] = totalObservationInstanceList.collect {it[0]};
-		log.debug "Storing all observations ids list in session ${session['obv_ids_list']}";
+		if(params.append) {
+			session["obv_ids_list"].addAll(observationInstanceList.collect {it.id});
+		} else {
+			session["obv_ids_list_params"] = params.clone();
+			session["obv_ids_list"] = observationInstanceList.collect {it.id};
+		}
+		
+		log.debug "Storing all observations ids list in session ${session['obv_ids_list']} for params ${params}";
 		return [totalObservationInstanceList:totalObservationInstanceList, observationInstanceList: observationInstanceList, observationInstanceTotal: count, queryParams: queryParams, activeFilters:activeFilters]
 	}
+	
 
 	@Secured(['ROLE_USER'])
 	def create = {
@@ -102,6 +109,7 @@ class ObservationController {
 		def lastCreatedObv = Observation.find("from Observation as obv where obv.author=:author order by obv.createdOn desc ",[author:author]);
 		return [observationInstance: observationInstance,lastCreatedObv:lastCreatedObv, 'springSecurityService':springSecurityService]
 	}
+	
 
 	@Secured(['ROLE_USER'])
 	def save = {
@@ -187,17 +195,9 @@ class ObservationController {
 			else {
 				observationInstance.incrementPageVisit();
 				if(params.pos) {
-					println session.getId();
-					if(!session["obv_ids_list"]) {
-						log.debug "Fetching observations list as its not present in session "
-						def result = getObservationList(params);
-					}
 					int pos = params.int('pos');
-					log.debug "Current ids list in session ${session['obv_ids_list']} and position ${pos}";
-					def nextObservationId = (pos+1 < session["obv_ids_list"].size()) ? session["obv_ids_list"][pos+1] : null;
-					def prevObservationId = pos > 0 ? session["obv_ids_list"][pos-1] : null;
-					println "returning prev and next ids ${prevObservationId} ${nextObservationId}" 
-					[observationInstance: observationInstance, prevObservationId:prevObservationId, nextObservationId:nextObservationId]
+					def prevNext = getPrevNextObservations(pos);
+					[observationInstance: observationInstance, prevObservationId:prevNext.prevObservationId, nextObservationId:prevNext.nextObservationId]
 				} else {
 					[observationInstance: observationInstance]
 				}
@@ -205,6 +205,43 @@ class ObservationController {
 		}
 	}
 
+	/**
+	 * 
+	 * @param pos
+	 * @return
+	 */
+	private def getPrevNextObservations(int pos) {
+		def lastListParams = session["obv_ids_list_params"].clone();
+		if(!session["obv_ids_list"]) {
+			log.debug "Fetching observations list as its not present in session "
+			runLastListQuery(lastListParams);
+			
+		}
+		
+		log.debug "Current ids list in session ${session['obv_ids_list']} and position ${pos}";
+		def nextObservationId = (pos+1 < session["obv_ids_list"].size()) ? session["obv_ids_list"][pos+1] : null;
+		if(nextObservationId == null) {			
+			lastListParams.put("append", true);
+			def max = Math.min(lastListParams.max ? lastListParams.int('max') : 9, 100)
+			def offset = lastListParams.offset ? lastListParams.int('offset') : 0
+			lastListParams.offset = offset + max;
+			log.debug "Fetching new page of observations using params ${lastListParams}";
+			runLastListQuery(lastListParams);
+			nextObservationId = (pos+1 < session["obv_ids_list"].size()) ? session["obv_ids_list"][pos+1] : null;
+		}
+		def prevObservationId = pos > 0 ? session["obv_ids_list"][pos-1] : null;
+		return ['prevObservationId':prevObservationId, 'nextObservationId':nextObservationId];
+	}
+	
+	private void runLastListQuery(Map params) {
+		log.debug params;
+		if(params.action == 'search') {
+			observationService.getObservationsFromSearch(params);
+		} else {
+			getObservationList(params);
+		}
+	}
+	
 	@Secured(['ROLE_USER'])
 	def edit = {
 		def observationInstance = Observation.findWhere(id:params.id.toLong(), isDeleted:false)
@@ -898,9 +935,17 @@ class ObservationController {
 		log.debug params;
 		def searchFieldsConfig = grailsApplication.config.speciesPortal.searchFields
 
-
 		def model = observationService.getObservationsFromSearch(params);
-
+		
+		if(params.append) {
+			session["obv_ids_list"].addAll(model.totalObservationIdList);
+		} else {
+			session["obv_ids_list_params"] = params.clone();
+			session["obv_ids_list"] = model.totalObservationIdList;
+		}
+		model.remove('totalObservationIdList');
+		log.debug "Storing all observations ids list in session ${session['obv_ids_list']}";
+		
 		if(!params.isGalleryUpdate?.toBoolean()){
 			params.remove('isGalleryUpdate');
 			render (view:"search", model:model)

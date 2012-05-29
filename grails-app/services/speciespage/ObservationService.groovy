@@ -741,6 +741,7 @@ class ObservationService {
 		}
 		
 		List<Observation> instanceList = new ArrayList<Observation>();
+		def totalObservationIdList = [];
 		def facetResults = [:], responseHeader
 		long noOfResults = 0;
 		if(paramsList.get('q')) {
@@ -750,8 +751,10 @@ class ObservationService {
 			while(iter.hasNext()) {
 				def doc = iter.next();
 				def instance = Observation.read(Long.parseLong(doc.getFieldValue("id")+""));
-				if(instance)
+				if(instance) {
+					totalObservationIdList.add(Long.parseLong(doc.getFieldValue("id")+""));
 					instanceList.add(instance);
+				}
 			}
 			
 			List facets = queryResponse.getFacetField(params["facet.field"]).getValues()
@@ -766,6 +769,8 @@ class ObservationService {
 		/*if(responseHeader?.params?.q == "*:*") {
 			responseHeader.params.remove('q');
 		}*/
-		return [responseHeader:responseHeader, observationInstanceList:instanceList, observationInstanceTotal:noOfResults, queryParams:queryParams, activeFilters:activeFilters, tags:facetResults]
+		
+		
+		return [responseHeader:responseHeader, observationInstanceList:instanceList, observationInstanceTotal:noOfResults, queryParams:queryParams, activeFilters:activeFilters, tags:facetResults, totalObservationIdList:totalObservationIdList]
 	}
 }
