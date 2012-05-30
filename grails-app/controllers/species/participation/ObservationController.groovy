@@ -59,7 +59,7 @@ class ObservationController {
 
 	def list = {
 		def model = getObservationList(params);
-		if(!params.isGalleryUpdate){
+		if(!params.isGalleryUpdate?.toBoolean()){
 			render (view:"list", model:model)
 		}else{
 			def obvListHtml =  g.render(template:"/common/observation/showObservationListTemplate", model:model);
@@ -508,7 +508,7 @@ class ObservationController {
 	 */
 	def getRecommendationVotes = {
 		log.debug params;
-		params.max = Math.min(params.max ? params.int('max') : 1, 10)
+		params.max = params.max ? params.int('max') : 1
 		params.offset = params.offset ? params.long('offset'): 0
 
 		def observationInstance = Observation.get(params.id)

@@ -234,7 +234,7 @@
 	 	
       
          $("#seeMore").click(function(){
-         	preLoadRecos(100, true);
+         	preLoadRecos(-1, true);
 		 });
          
          preLoadRecos(3, false);

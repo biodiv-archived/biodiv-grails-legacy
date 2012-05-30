@@ -301,7 +301,7 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
        
          
          $("#seeMore").click(function(){
-         	preLoadRecos(100, hide);
+         	preLoadRecos(-1, hide);
 		 });
          
          preLoadRecos(3, false);

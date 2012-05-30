@@ -568,8 +568,13 @@ class ObservationService {
 	}
 	
 	List getRecommendationsOfUser(SUser user, int max, long offset) {
-		def recommendationVotesList = RecommendationVote.executeQuery("select recoVote from RecommendationVote recoVote where recoVote.author.id = :userId and recoVote.observation.isDeleted = :isDeleted order by recoVote.votedOn desc", [userId:user.id, isDeleted:false], [max:max, offset:offset]);
-		return recommendationVotesList;
+		if(max == -1) {
+			def recommendationVotesList = RecommendationVote.executeQuery("select recoVote from RecommendationVote recoVote where recoVote.author.id = :userId and recoVote.observation.isDeleted = :isDeleted order by recoVote.votedOn desc", [userId:user.id, isDeleted:false]);
+			return recommendationVotesList;
+		} else {
+			def recommendationVotesList = RecommendationVote.executeQuery("select recoVote from RecommendationVote recoVote where recoVote.author.id = :userId and recoVote.observation.isDeleted = :isDeleted order by recoVote.votedOn desc", [userId:user.id, isDeleted:false], [max:max, offset:offset]);
+			return recommendationVotesList;
+		}
 	}
 	
 	Map getIdentificationEmailInfo(m, requestObj, unsubscribeUrl){

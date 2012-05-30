@@ -513,7 +513,7 @@ class SUserController extends UserController {
 	*/
    def getRecommendationVotes = {
 	   log.debug params;
-	   params.max = Math.min(params.max ? params.int('max') : 1, 10)
+	   params.max = params.max ? params.int('max') : 1
 	   params.offset = params.offset ? params.long('offset'): 0
 
 	   def userInstance = SUser.get(params.id)
