@@ -197,7 +197,11 @@ class ObservationController {
 				if(params.pos) {
 					int pos = params.int('pos');
 					def prevNext = getPrevNextObservations(pos);
-					[observationInstance: observationInstance, prevObservationId:prevNext.prevObservationId, nextObservationId:prevNext.nextObservationId, lastListParams:prevNext.lastListParams]
+					if(prevNext) {
+						[observationInstance: observationInstance, prevObservationId:prevNext.prevObservationId, nextObservationId:prevNext.nextObservationId, lastListParams:prevNext.lastListParams]
+					} else {
+						[observationInstance: observationInstance]
+					}
 				} else {
 					[observationInstance: observationInstance]
 				}
@@ -211,11 +215,11 @@ class ObservationController {
 	 * @return
 	 */
 	private def getPrevNextObservations(int pos) {
-		def lastListParams = session["obv_ids_list_params"].clone();
+		def lastListParams = session["obv_ids_list_params"]?.clone();
+		if(lastListParams) {
 		if(!session["obv_ids_list"]) {
 			log.debug "Fetching observations list as its not present in session "
 			runLastListQuery(lastListParams);
-			
 		}
 		
 		log.debug "Current ids list in session ${session['obv_ids_list']} and position ${pos}";
@@ -233,6 +237,7 @@ class ObservationController {
 		
 		lastListParams.isGalleryUpdate = false;
 		return ['prevObservationId':prevObservationId, 'nextObservationId':nextObservationId, 'lastListParams':lastListParams];
+		}
 	}
 	
 	private void runLastListQuery(Map params) {
@@ -466,7 +471,11 @@ class ObservationController {
 			try {
 				if(!recommendationVoteInstance){
 					def result = ['votes':params.int('currentVotes')];
-					redirect(action:getRecommendationVotes, id:params.obvId, params:[ max:3, offset:0, recoVoteMsg:recoVoteMsg])
+					def r = [
+						success : 'true',
+						recoVoteMsg:recoVoteMsg]
+					render r as JSON
+					//redirect(action:getRecommendationVotes, id:params.obvId, params:[ max:3, offset:0, recoVoteMsg:recoVoteMsg])
 					return
 				}else if(recommendationVoteInstance.save(flush: true)) {
 					log.debug "Successfully added reco vote : "+recommendationVoteInstance
@@ -476,7 +485,11 @@ class ObservationController {
 
 					//sending mail to user
 					sendNotificationMail(SPECIES_AGREED_ON, observationInstance, request);
-					redirect(action:getRecommendationVotes, id:params.obvId, params:[max:3, offset:0, recoVoteMsg:recoVoteMsg])
+					def r = [
+						success : 'true',
+						recoVoteMsg:recoVoteMsg]
+					render r as JSON
+					//redirect(action:getRecommendationVotes, id:params.obvId, params:[max:3, offset:0, recoVoteMsg:recoVoteMsg])
 					return
 				}
 				else {
@@ -789,7 +802,7 @@ class ObservationController {
 	private Map getRecommendationVote(params) {
 		def observation = params.observation?:Observation.get(params.obvId);
 		def author = params.author;
-		def recoComment = (params.recoComment?.trim().length() > 0)? params.recoComment.trim():null;
+		def recoComment = (params.recoComment?.trim()?.length() > 0)? params.recoComment.trim():null;
 
 		def reco;
 		if(params.recoId)

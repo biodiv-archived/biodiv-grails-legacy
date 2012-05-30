@@ -507,4 +507,66 @@ class SUserController extends UserController {
 			}
 		}
 	}
+	
+	/**
+	*
+	*/
+   def getRecommendationVotes = {
+	   log.debug params;
+	   params.max = Math.min(params.max ? params.int('max') : 1, 10)
+	   params.offset = params.offset ? params.long('offset'): 0
+
+	   def userInstance = SUser.get(params.id)
+	   if (userInstance) {
+		   try {
+			   def recommendationVoteList = observationService.getRecommendationsOfUser(userInstance, params.max, params.offset);
+			  
+			   if(recommendationVoteList.size() > 0) {
+				   def result = [];
+				   recommendationVoteList.each { recoVote ->
+					   def map = recoVote.recommendation.getRecommendationDetails(recoVote.observation);
+					   //map.put("noOfVotes", 1);
+					   def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+					   def image = recoVote.observation.mainImage()
+					   def imagePath = image.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, config.speciesPortal.resources.images.thumbnail.suffix)
+					   def imageLink = config.speciesPortal.observations.serverURL +  imagePath
+					   map.put('observationImage', imageLink);
+					   map.put("obvId", recoVote.observation.id);
+					   result.add(map);
+				   }
+				   def noOfVotes = observationService.getAllRecommendationsOfUser(userInstance);
+				   def model = ['result':result, 'totalVotes':noOfVotes, 'uniqueVotes':noOfVotes];
+				   def html = g.render(template:"/common/observation/showObservationRecosTemplate", model:model);
+				   def r = [
+							   success : 'true',
+							   uniqueVotes:model.uniqueVotes,
+							   recoHtml:html,
+							   recoVoteMsg:params.recoVoteMsg]
+				   render r as JSON
+				   return
+			   } else {
+				   response.setStatus(500);
+				   def message = "";
+				   if(params.offset > 0) {
+					   message = [info: g.message(code: 'recommendations.nomore.message', default:'No more recommendations made. Please suggest')];
+				   } else {
+					   message = [info:g.message(code: 'recommendations.zero.message', default:'No recommendations made. Please suggest')];
+				   }
+				   render message as JSON
+				   return
+			   }
+		   } catch(e){
+			   e.printStackTrace();
+			   response.setStatus(500);
+			   def message = ['error' : g.message(code: 'error', default:'Error while processing the request.')];
+			   render message as JSON
+		   }
+	   }
+	   else {
+		   response.setStatus(500)
+		   def message = ['error':g.message(code: 'error', default:'Error while processing the request.')]
+		   render message as JSON
+	   }
+   }
+
 }

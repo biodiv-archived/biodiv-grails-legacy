@@ -516,6 +516,7 @@ navigation.observation_dashboard = [
 navigation.users_dashboard = [
 	[controller:'species', title:'Species Gallery', order:1, action:"list"],
 	[controller:'observation', title:'Browse Observations', order:1, action:'list'],	
+	[controller:'SUser', title:'Users', order:20, action:'list']
 ]
 
 navigation.dashboard = [

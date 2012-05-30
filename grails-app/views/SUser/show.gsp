@@ -20,6 +20,9 @@
 <g:javascript src="jquery/jquery.jcarousel-0.2.8/jquery.jcarousel.js"/>
 
 <g:javascript src="species/carousel.js"/>
+
+<g:javascript src="species/observations.js"/>
+
 <style>
 .prop .name {
 	clear:both;
@@ -192,6 +195,22 @@
 						model="['controller':'observation', 'action':'getRelatedObservation', 'filterProperty': 'user', 'filterPropertyValue':SUserInstance.id, 'id':'a']" />
 				</div>
 
+				<div class="section" style="clear: both;">
+					<h5>
+						<span class="name" style="color: #b1b1b1;">
+						<i class="icon-check"></i><obv:showNoOfRecommendationsOfUser model="['user':SUserInstance]"/></i>
+						</span> 	Identifications
+					</h5>
+					<div>
+						<ul id="recoSummary" class="pollBars">
+							
+						</ul>
+						<div id="seeMoreMessage" class="message"></div>
+						<div id="seeMore" class="btn btn-mini observation_links">Show all</div>
+					</div>
+					
+					
+				</div>
 
 				<div class="section" style="clear: both;overflow:auto;">
 					<obv:showAllTags
@@ -206,12 +225,53 @@
 	</div>
 <g:javascript>
 	$(document).ready(function() {
+		$("#seeMoreMessage").hide();
 		$('#tc_tagcloud a').click(function(){
 			var tg = $(this).contents().first().text();
 			window.location.href = "${g.createLink(controller:'observation', action: 'list')}?tag=" + tg ;
 	    	return false;
 	 	});
+	 	
+      
+         $("#seeMore").click(function(){
+         	preLoadRecos(100, true);
+		 });
+         
+         preLoadRecos(3, false);
 	});
+	   function preLoadRecos(max, seeAllClicked){
+         	$("#seeMoreMessage").hide();
+         	
+         	
+        	$.ajax({
+         		url: "${createLink(action:'getRecommendationVotes', id:SUserInstance.id) }",
+				method: "POST",
+				dataType: "json",
+				data: {max:max , offset:0},	
+				success: function(data) {
+					$("#recoSummary").html(data.recoHtml);
+					var uniqueVotes = parseInt(data.uniqueVotes);
+					if(uniqueVotes > 3 && !seeAllClicked){
+						$("#seeMore").show();
+					} else {
+						$("#seeMore").hide();
+					}
+				}, error: function(xhr, status, error) {
+	    			handleError(xhr, status, error, undefined, function() {
+		    			var msg = $.parseJSON(xhr.responseText);
+		    			if(msg.info) {
+		    				showRecoUpdateStatus(msg.info, 'info');
+		    			}else if(msg.success){
+		    				showRecoUpdateStatus(msg.success, 'success');
+						} else {
+							showRecoUpdateStatus(msg.error, 'error');
+						}
+					});
+			   	}
+			});
+         }
+	
+         
 </g:javascript>	
 </body>
 

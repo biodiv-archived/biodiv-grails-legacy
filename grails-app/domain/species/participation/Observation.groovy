@@ -197,37 +197,15 @@ class Observation implements Taggable{
 		def result = [];
 		recoVoteCount.each { recoVote ->
             def reco = Recommendation.read(recoVote[0]);
-			def map = [:];
-			map.put("recoId", reco.id);
-			if(reco?.taxonConcept) {
-				map.put("speciesId", reco?.taxonConcept?.findSpeciesId());
-				map.put("canonicalForm", reco?.taxonConcept?.canonicalForm)
-			} else {
-				map.put("name", reco?.name)
-			}
-			def recos = RecommendationVote.withCriteria {
-				eq('recommendation', reco)
-				eq('observation', this)
-				min('votedOn')				
-			}
-			
-			map.put("authors", recos.collect{it.author})
-			map.put("votedOn", recos.collect{it.votedOn})
-			
+			def map = reco.getRecommendationDetails(this);
 			map.put("noOfVotes", recoVote[1]);
-			
-			def recoComments = []
-			recos.each{
-				String comment = it.comment;
-				if(comment){
-					recoComments << [comment:comment, author:it.author, votedOn:it.votedOn]
-				}
-			}
-			map.put("recoComments", recoComments);
+			map.put("obvId", this.id);
 			result.add(map);
 		}
 		return ['recoVotes':result, 'totalVotes':this.recommendationVote.size(), 'uniqueVotes':getRecommendationCount()];
 	}
+	
+	
 	
 	def getRecommendationCount(){
 		Sql sql =  Sql.newInstance(dataSource);

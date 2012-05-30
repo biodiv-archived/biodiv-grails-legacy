@@ -25,14 +25,5 @@
             </div>
         </div>
 
-        <div class="story-footer">
-            <div class="footer-item"><i class="icon-eye-open"></i>${observationInstance.getPageVisitCount()}</div>
-                
-            <div class="footer-item"><i class="icon-comment"></i><fb:comments-count href="${createLink(controller:'observation', action:'show', id:observationInstance.id, base:Utils.getDomainServerUrl(request))}"></fb:comments-count></div>
-            
-            <g:if test="${observationInstance.flagCount>0}">
-				<div id="show-flag-count" class="footer-item"><i class="icon-flag"></i>${observationInstance.flagCount}</div>
-			</g:if>
-			
-        </div>
+       <obv:showFooter model="['observationInstance':observationInstance, 'showDetails':showDetails]"/>
 </div>

@@ -1,6 +1,8 @@
 package species
 
 import species.participation.Observation;
+import species.participation.Recommendation;
+import species.participation.RecommendationVote;
 
 class ObservationTagLib {
 	static namespace = "obv"
@@ -190,5 +192,10 @@ class ObservationTagLib {
 	def showRecoComment = {	attrs, body->
 		out << render(template:"/common/observation/showRecoCommentTemplate",model:attrs.model);
 	}
+	
+	def showFooter = {attrs, body->
+		out << render(template:"/common/observation/showObservationStoryFooterTemplate", model:attrs.model);
+	}
+	
 }
 

@@ -115,11 +115,11 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 					</div>
 					</div>
 					<div style="clear:both;"></div>
-					<g:if test="${params.pos}">
+					<g:if test="${params.pos && lastListParams}">
 						<div style="width:100%;">
-							<g:link class="pull-left btn ${prevObservationId?'active':'disabled'}" action="show" controller="observation"
+							<g:link class="pull-left btn ${prevObservationId?:'disabled'}" action="show" controller="observation"
 								id="${prevObservationId}" params="['pos':params.int('pos')-1]">Prev Observation</g:link>
-							<g:link class="pull-right  btn ${nextObservationId?'active':'disabled'}"  action="show" controller="observation"
+							<g:link class="pull-right  btn ${nextObservationId?:'disabled'}"  action="show" controller="observation"
 								id="${nextObservationId}" params="['pos':params.int('pos')+1]">Next Observation</g:link>
 							<g:link class="btn" action="${lastListParams.action}" controller="observation" params="${lastListParams}" style="text-align: center;display: block;width: 125px;margin: 0 auto;">List Observations</g:link>
 							
@@ -168,7 +168,7 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 
 							</ul>
 							<div id="seeMoreMessage" class="message"></div>
-							<div id="seeMore" class="btn btn-mini">see all</div>
+							<div id="seeMore" class="btn btn-mini">Show all</div>
 						</div>
 						<div class="input-append">
 							<g:hasErrors bean="${recommendationInstance}">
@@ -298,43 +298,13 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 	        window.location.href = "${g.createLink(controller:'observation', action: 'list')}?tag=" + tg ;
 	     });
          
-         function preLoadRecos(max){
-         	$("#seeMoreMessage").hide();
-         	$("#seeMore").hide();
-         	
-        	$.ajax({
-         		url: "${createLink(controller:'observation', action:'getRecommendationVotes', id:observationInstance.id) }",
-				method: "POST",
-				dataType: "json",
-				data: {max:max , offset:0},	
-				success: function(data) {
-					$("#recoSummary").html(data.recoHtml);
-					var uniqueVotes = parseInt(data.uniqueVotes);
-					if(uniqueVotes > 3){
-						$("#seeMore").show();
-					}	
-				}, error: function(xhr, status, error) {
-	    			handleError(xhr, status, error, undefined, function() {
-		    			var msg = $.parseJSON(xhr.responseText);
-		    			if(msg.info) {
-		    				showRecoUpdateStatus(msg.info, 'info');
-		    			}else if(msg.success){
-		    				showRecoUpdateStatus(msg.success, 'success');
-						} else {
-							showRecoUpdateStatus(msg.error, 'error');
-						}
-					});
-			   	}
-			});
-         }
+       
          
-         var isSeeAllClicked = false;
          $("#seeMore").click(function(){
-         	preLoadRecos(100);
-         	$("#seeMore").hide();
+         	preLoadRecos(100, hide);
 		 });
          
-         preLoadRecos(3);
+         preLoadRecos(3, false);
          
      	$('#addRecommendation').bind('submit', function(event) {
      		$(this).ajaxSubmit({ 
@@ -413,7 +383,37 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 			}
 		});
 	});
-	
+	  function preLoadRecos(max, seeAllClicked){
+         	$("#seeMoreMessage").hide();
+         	$("#seeMore").hide();
+         	
+        	$.ajax({
+         		url: "${createLink(controller:'observation', action:'getRecommendationVotes', id:observationInstance.id) }",
+				method: "POST",
+				dataType: "json",
+				data: {max:max , offset:0},	
+				success: function(data) {
+					$("#recoSummary").html(data.recoHtml);
+					var uniqueVotes = parseInt(data.uniqueVotes);
+					if(uniqueVotes > 3 && !seeAllClicked){
+						$("#seeMore").show();
+					} else {
+						$("#seeMore").hide();
+					}
+				}, error: function(xhr, status, error) {
+	    			handleError(xhr, status, error, undefined, function() {
+		    			var msg = $.parseJSON(xhr.responseText);
+		    			if(msg.info) {
+		    				showRecoUpdateStatus(msg.info, 'info');
+		    			}else if(msg.success){
+		    				showRecoUpdateStatus(msg.success, 'success');
+						} else {
+							showRecoUpdateStatus(msg.error, 'error');
+						}
+					});
+			   	}
+			});
+         }
 </g:javascript>
 
 </body>
