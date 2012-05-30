@@ -789,7 +789,7 @@ class ObservationController {
 	private Map getRecommendationVote(params) {
 		def observation = params.observation?:Observation.get(params.obvId);
 		def author = params.author;
-		def recoComment = (params.recoComment?.trim().length() > 0)? params.recoComment.trim():null;
+		def recoComment = (params.recoComment?.trim()?.length() > 0)? params.recoComment.trim():null;
 
 		def reco;
 		if(params.recoId)
