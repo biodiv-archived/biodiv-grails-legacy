@@ -534,8 +534,8 @@ class SUserController extends UserController {
 					   map.put("obvId", recoVote.observation.id);
 					   result.add(map);
 				   }
-				   def noOfVotes = observationService.getAllRecommendationsOfUser(userInstance);
-				   def model = ['result':result, 'totalVotes':noOfVotes, 'uniqueVotes':noOfVotes];
+				   //def noOfVotes = observationService.getAllRecommendationsOfUser(userInstance);
+				   def model = ['result':result, 'totalVotes':result.size(), 'uniqueVotes':result.size()];
 				   def html = g.render(template:"/common/observation/showObservationRecosTemplate", model:model);
 				   def r = [
 							   success : 'true',
@@ -548,9 +548,9 @@ class SUserController extends UserController {
 				   response.setStatus(500);
 				   def message = "";
 				   if(params.offset > 0) {
-					   message = [info: g.message(code: 'recommendations.nomore.message', default:'No more recommendations made. Please suggest')];
+					   message = [info: g.message(code: 'recommendations.nomore.message', default:'No more recommendations made.')];
 				   } else {
-					   message = [info:g.message(code: 'recommendations.zero.message', default:'No recommendations made. Please suggest')];
+					   message = [info:g.message(code: 'recommendations.zero.message', default:'No recommendations made.')];
 				   }
 				   render message as JSON
 				   return

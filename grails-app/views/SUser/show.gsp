@@ -232,29 +232,30 @@
 	    	return false;
 	 	});
 	 	
-      
-         $("#seeMore").click(function(){
-         	preLoadRecos(-1, true);
+      	var offset = 0;
+      	var max =  3;
+         $("#seeMore").click(function() {         	
+         	preLoadRecos(max, max+offset, true);
+         	offset = max + offset;
 		 });
          
-         preLoadRecos(3, false);
+         preLoadRecos(max, offset, false);
 	});
-	   function preLoadRecos(max, seeAllClicked){
-         	$("#seeMoreMessage").hide();
-         	
+	   function preLoadRecos(max, offset, seeAllClicked){
+         	$("#seeMoreMessage").hide();        	
          	
         	$.ajax({
          		url: "${createLink(action:'getRecommendationVotes', id:SUserInstance.id) }",
 				method: "POST",
 				dataType: "json",
-				data: {max:max , offset:0},	
+				data: {max:max , offset:offset},	
 				success: function(data) {
-					$("#recoSummary").html(data.recoHtml);
+					$("#recoSummary").append(data.recoHtml);
 					var uniqueVotes = parseInt(data.uniqueVotes);
-					if(uniqueVotes > 3 && !seeAllClicked){
-						$("#seeMore").show();
-					} else {
+					if(uniqueVotes < 3){
 						$("#seeMore").hide();
+					} else {
+						$("#seeMore").show();
 					}
 				}, error: function(xhr, status, error) {
 	    			handleError(xhr, status, error, undefined, function() {
