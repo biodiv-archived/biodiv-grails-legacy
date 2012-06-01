@@ -12,6 +12,7 @@
 
 	</div>
 
+	<g:if test="${showDetails}">
 	<div class="footer-item">
 		<i class="icon-comment"></i>
 		<fb:comments-count
@@ -19,7 +20,7 @@
 
 	</div>
 
-	<g:if test="${showDetails}">
+	
 		<div class="footer-item"">
 			<obv:addFlag model="['observationInstance':observationInstance]" />
 		</div>
