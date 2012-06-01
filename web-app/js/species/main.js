@@ -29,3 +29,12 @@ function handleError(xhr, textStatus, errorThrown, successHandler, errorHandler)
 			alert(errorThrown);
 	}
 }
+
+function adjustHeight() {
+	$(".ellipsis").ellipsis();
+	$('.snippet .observation_story_image').each(function() {
+		$(this).css({
+	    	'height': $(this).next().height()
+	    });
+	});
+}

@@ -60,7 +60,7 @@ font-size: 0.9em;
 
 .list_view .snippet {
 padding: 5px;
-width: 630px;         
+/* width: 630px;          */
 }
 
 .snippet.tablet {

@@ -77,13 +77,13 @@
 				$('.grid_view').hide();
 				$('.grid_view_bttn').removeClass('active');
 				$('.list_view_bttn').addClass('active');
-				adjustHeight();
 			} else {
 				$('.grid_view').show();
 				$('.list_view').hide();
 				$('.grid_view_bttn').addClass('active');
 				$('.list_view_bttn').removeClass('active');
 			}
+			adjustHeight();
 		}
 
 		eatCookies();
@@ -132,15 +132,6 @@
 			return false;
 		});
 
-		function adjustHeight() {
-			$(".ellipsis").ellipsis();
-			$('.snippet .observation_story_image').each(function() {
-				$(this).css({
-			    	'height': $(this).next().height()
-			    });
-			});
-		}
-		adjustHeight();
 	</script>
 
 </div>

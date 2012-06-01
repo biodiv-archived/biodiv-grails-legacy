@@ -46,6 +46,7 @@
 				//alert($(this).attr('class'));
 				$('.grid_view_bttn').removeClass('active');
 				$.cookie("observation_listing", "list");
+				adjustHeight();
 				return false;
 			});
 
@@ -65,6 +66,7 @@
 					$('.grid_view').hide();
 					$('.grid_view_bttn').removeClass('active');
 					$('.list_view_bttn').addClass('active');
+					adjustHeight();
 				} else {
 					$('.grid_view').show();
 					$('.list_view').hide();
@@ -110,6 +112,7 @@
 						$('.grid_view').hide();
 						$('.list_view').show();
 					}
+					adjustHeight();
 				}
 			});
 
@@ -117,7 +120,6 @@
 				$.autopager('load');
 				return false;
 			});
-
 		});
 	</script>
 </div>

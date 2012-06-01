@@ -17,7 +17,6 @@
 				<g:else>
 					<img class="galleryImage"
 						src="${createLinkTo( file:"no-image.jpg", base:grailsApplication.config.speciesPortal.resources.serverURL)}"
-						style="max-height: 220px; max-width: 200px"
 						title="You can contribute!!!" />
 				</g:else>
 			</g:link>
