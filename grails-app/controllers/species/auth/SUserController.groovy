@@ -548,9 +548,9 @@ class SUserController extends UserController {
 				   response.setStatus(500);
 				   def message = "";
 				   if(params.offset > 0) {
-					   message = [info: g.message(code: 'recommendations.nomore.message', default:'No more recommendations made.')];
+					   message = [info: g.message(code: 'user.recommendations.nomore.message', default:'No more recommendations made.')];
 				   } else {
-					   message = [info:g.message(code: 'recommendations.zero.message', default:'No recommendations made.')];
+					   message = [info:g.message(code: 'user.recommendations.zero.message', default:'No recommendations made.')];
 				   }
 				   render message as JSON
 				   return
