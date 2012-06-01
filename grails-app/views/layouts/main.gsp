@@ -350,7 +350,7 @@ var ajaxLoginSuccessHandler = function(json, statusText, xhr, $form) {
 			return;
 		js = d.createElement(s);
 		js.id = id;
-		js.src = "//connect.facebook.net/en_US/all.js#xfbml=1&appId=${fbAppId}";
+		js.src = "//connect.facebook.net/en_US/all.js";//#xfbml=1&appId=${fbAppId}
 
 		fjs.parentNode.insertBefore(js, fjs);
 	}(document, 'script', 'facebook-jssdk'));
