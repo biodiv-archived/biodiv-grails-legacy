@@ -78,16 +78,16 @@ $(document).ready(function() {
 	<input type="hidden" name="canName" id="canName" />
 
 	<div id="nameSuggestions" style="display: block;"></div>
-	<div>
-		<a id="reco-action" data-toggle="dropdown" href="#">Comment</a>
-
-		<div id="reco-options" style="display: none">
-			<input type="text" name="recoComment" id="recoComment"
-				placeholder="Write comment" style="width: 80%"></input><br /> <input
-				class="btn btn-mini" style="top:5px;" type="button" value="cancel"
-				onclick="cancelRecoComment();return false;"></input>
-		</div>
-	</div>
+<%--	<div>--%>
+<%--		<a id="reco-action" data-toggle="dropdown" href="#">Comment</a>--%>
+<%----%>
+<%--		<div id="reco-options" style="display: none">--%>
+<%--			<input type="text" name="recoComment" id="recoComment"--%>
+<%--				placeholder="Write comment" style="width: 80%"></input><br /> <input--%>
+<%--				class="btn btn-mini" style="top:5px;" type="button" value="cancel"--%>
+<%--				onclick="cancelRecoComment();return false;"></input>--%>
+<%--		</div>--%>
+<%--	</div>--%>
 </div>
 <script>
 	$(document).ready(function() {
