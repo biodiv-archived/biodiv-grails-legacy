@@ -7,7 +7,7 @@
 			title='<g:if test="${obvTitle != null}">${obvTitle}</g:if>'>
 
 			<g:link action="show" controller="observation"
-				id="${observationInstance.id}">
+				id="${observationInstance.id}"  params="['pos':pos]">
 				<g:if
 					test="${imagePath && (new File(grailsApplication.config.speciesPortal.observations.rootDir + imagePath)).exists()}">
 					<img
