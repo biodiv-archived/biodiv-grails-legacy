@@ -65,7 +65,7 @@ width: 630px;
 
 .snippet.tablet {
 width: 213px;
-height: 250px;
+height: 280px; 
 overflow: hidden;        
 position: relative;          
 }
@@ -81,14 +81,21 @@ bottom: 0;
 
 .snippet .figure {
 margin-bottom: 5px;        
-max-width: 200px
+max-width: 200px;
 margin-left: auto;
 margin-right: auto;
+display: table;
 }
 
+.snippet .figure a {
+	display: table-cell;
+	vertical-align: middle;
+	max-height: 220px; 
+	max-width: 200px
+}
 .grid_view li.thumbnail {
 background-color: #ffffff;
-border: 1px solid #bee6d3;
+border: 0px solid #bee6d3;
 }
 
 .grid_view li.thumbnail:hover {
@@ -527,7 +534,8 @@ margin:0;
 }
 
 .snippet.tablet .figure img {
-height: 120px;
+ max-height: 150px;
+ max-width : 200px 
 }
 
 .consizedtext, .dropdown-menu a {
@@ -535,6 +543,15 @@ height: 120px;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
+}
+
+.ellipsis {
+        white-space: nowrap;
+        overflow: hidden;
+}
+
+.ellipsis.multiline {
+        white-space: normal;
 }
 
 .dropdown-menu li > a:hover, .dropdown-menu .active > a, .dropdown-menu .active > a:hover {
@@ -1208,4 +1225,12 @@ background-color: whiteSmoke;
 	position: absolute;
 	top: 0;
 	right: 0;
+}
+
+.thumbnail {
+	border: 0px;
+}
+
+.observation_story.tablet .species_title {
+	height:38px;
 }
