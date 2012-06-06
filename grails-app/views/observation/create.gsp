@@ -104,6 +104,11 @@
 display: table !important;
 }
 
+input.dms_field {
+width: 19%;
+display: none;       
+}
+
 </style>
 </head>
 <body>
@@ -383,25 +388,11 @@ display: table !important;
 
 
 				<div class="span12 super-section" style="clear: both">
-					<div class="span11 section">
+					<div class="section">
 						<h3>Where did you find this observation?</h3>
 
 						<div class="span6">
-							<div class="map_search">
-								<input id="address" type="text" title="Find by place name"
-									class="section-item" />
-								<div id="current_location" class="section-item">
-									<a href="#" onclick="return false;">Use current location</a>
-								</div>
-								<div id="geotagged_images" style="padding:5px;">
-									<div class="title" style="display: none">Use location
-										from geo-tagged image:</div>
-									<div class="msg" style="display: none">Select image if
-										you want to use location information embedded in it</div>
-								</div>
-							</div>
-
-
+						
 
 							<div class="row control-group">
 								<%
@@ -457,27 +448,57 @@ display: table !important;
 	                                        name="reverse_geocoded_name" > </input>
 	                            </div>
 	                        </div>
+                                <div><input id="use_dms" type="checkbox" name="use_dms" value="use_dms" />
+                                    Use deg-min-sec format for lat/long
+	                        </div>
+
 	                        <div class="row control-group">
-	                        	<label for="location_accuracy" class="control-label" style="padding:0px"><g:message
+	                        	<label for="location_accuracy" class="control-label"><g:message
 									code="observation.latitude.label"
 									default="Latitude" /> </label>
-	                            <div class="controls">             
-	                                <div class="location_picker_value" id="latitude"></div>
-	                                <input id="latitude_field" type="hidden" name="latitude"></input>
+	                            <div class="controls textbox">             
+	                                <!--div class="location_picker_value" id="latitude"></div>
+	                                <input id="latitude_field" type="hidden" name="latitude"></input-->
+	                                <input class="degree_field" id="latitude_field" type="text" name="latitude"></input>
+	                                <input class="dms_field" id="latitude_deg_field" type="text" name="latitude_deg" placeholder="deg"></input>
+	                                <input class="dms_field" id="latitude_min_field" type="text" name="latitude_min" placeholder="min"></input>
+	                                <input class="dms_field" id="latitude_sec_field" type="text" name="latitude_sec" placeholder="sec"></input>
+	                                <input class="dms_field" id="latitude_direction_field" type="text" name="latitude_direction" placeholder="direction"></input>
 	                            </div>
 	                        </div>
 	                        <div class="row control-group">
-	                      	  <label for="location_accuracy" class="control-label" style="padding:0px"><g:message
+	                      	  <label for="location_accuracy" class="control-label"><g:message
 									code="observation.longitude.label"
 									default="Longitude" /> </label>
-	                            <div class="controls">               
-	                                <div class="location_picker_value" id="longitude"></div>
-	                                <input id="longitude_field" type="hidden" name="longitude"></input>
+	                            <div class="controls textbox">               
+	                                <!--div class="location_picker_value" id="longitude"></div>
+	                                <input id="longitude_field" type="hidden" name="longitude"></input-->
+	                                <input class="degree_field" id="longitude_field" type="text" name="longitude"></input>
+	                                <input class="dms_field" id="longitude_deg_field" type="text" name="longitude_deg" placeholder="deg"></input>
+	                                <input class="dms_field" id="longitude_min_field" type="text" name="longitude_min" placeholder="min"></input>
+	                                <input class="dms_field" id="longitude_sec_field" type="text" name="longitude_sec" placeholder="sec"></input>
+	                                <input class="dms_field" id="longitude_direction_field" type="text" name="longitude_direction" placeholder="direction"></input>
 	                            </div>
 	                        </div>
 	                  
 	                </div>
-	                	<div class="span5 section map_section" style="padding:0; margin:0;">
+	                	<div class="sidebar-section section map_section" style="padding:0; margin:0;">
+                                    <div class="map_search">
+                                            <div id="geotagged_images" style="padding:10px;">
+                                                    <div class="title" style="display: none">Use location
+                                                            from geo-tagged image:</div>
+                                                    <div class="msg" style="display: none">Select image if
+                                                            you want to use location information embedded in it</div>
+                                            </div>
+
+                                            <div id="current_location" class="section-item">
+                                                    <div class="location_picker_button"><a href="#" onclick="return false;">Use current location</a></div>
+                                            </div>
+                                            <input id="address" type="text" title="Find by place name"
+                                                    class="section-item" />
+                                                                               </div>
+
+
 	                    	<div id="map_area">
 	                        	<div id="map_canvas"></div>
 	                    	</div>
@@ -486,7 +507,7 @@ display: table !important;
 	            </div>    
       
 					<div class="span12 super-section"  style="clear: both">
-						<div class="span11 section">
+						<div class="section">
 							<h3>Describe your observation!</h3>
 							<div class="span6 block">
 								<!--label for="notes"><g:message code="observation.notes.label" default="Notes" /></label-->
@@ -506,7 +527,7 @@ display: table !important;
 								</div>
 							</div>
 
-							<div class="span5 block">
+							<div class="sidebar-section block">
 								<h5><label><i
 									class="icon-tags"></i>Tags <small><g:message code="observation.tags.message" default="" /></small></label>
 								</h5>
@@ -755,6 +776,16 @@ display: table !important;
 		});
 		
 		$(".tagit-hiddenSelect").css('display','none');
+
+                $('#use_dms').click(function(){
+                if ($('#use_dms').is(':checked')) {
+                    $('.dms_field').fadeIn();
+                    $('.degree_field').hide();
+                } else {
+                    $('.dms_field').hide();
+                    $('.degree_field').fadeIn();
+                }
+                });
 	});
 
 

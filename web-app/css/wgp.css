@@ -502,9 +502,6 @@ border-radius:5px;
 
 .map_search {
 position:relative;    
-left:20px;
-padding:20px 10px;
-margin-bottom:10px;
 background-color: #a6dfc8;
 border-radius:5px 0 0 5px;
 }
@@ -1198,6 +1195,11 @@ background-color: whiteSmoke;
 	font-weight:bold;
 }
 
+.sidebar-section {
+width: 420px;
+float: right;       
+}
+
 .reco-comment-table {
 	background-clip: padding-box;
 	background-color: #FFFFFF;
@@ -1234,3 +1236,4 @@ background-color: whiteSmoke;
 .observation_story.tablet .species_title {
 	height:38px;
 }
+
