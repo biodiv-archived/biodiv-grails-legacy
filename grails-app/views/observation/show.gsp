@@ -116,7 +116,7 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 					</div>
 					<div style="clear:both;"></div>
 					<g:if test="${params.pos && lastListParams}">
-						<div style="width:100%;">
+						<div class="nav" style="width:100%;">
 							<g:link class="pull-left btn ${prevObservationId?:'disabled'}" action="show" controller="observation"
 								id="${prevObservationId}" params="['pos':params.int('pos')-1]">Prev Observation</g:link>
 							<g:link class="pull-right  btn ${nextObservationId?:'disabled'}"  action="show" controller="observation"
@@ -382,6 +382,10 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 				);
 			}
 		});
+		
+		$(".nav a.disabled").click(function() {
+			return false;
+		})
 	});
 	  function preLoadRecos(max, seeAllClicked){
          	$("#seeMoreMessage").hide();
