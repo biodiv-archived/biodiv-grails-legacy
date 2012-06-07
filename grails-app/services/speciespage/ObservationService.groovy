@@ -434,6 +434,23 @@ class ObservationService {
 		obvIds.add(params.id.toLong())
 		return getTagsFromObservation(obvIds)
 	}
+	
+	Map getRelatedTagsFromObservation(obv){
+		int tagsLimit = 30;
+		def tagNames = obv.tags
+		LinkedHashMap tags = [:]
+		if(tagNames.isEmpty()){
+			return tags
+		}
+		
+		def sql =  Sql.newInstance(dataSource);
+		String query = "select t.name as name, count(t.name) as obv_count from tag_links as tl, tags as t, observation obv where t.name in ('" +  tagNames.join("', '") + "') and tl.tag_ref = obv.id and obv.is_deleted = false and t.id = tl.tag_id group by t.name order by count(t.name) desc, t.name asc limit " + tagsLimit;
+
+		sql.rows(query).each{
+			tags[it.getProperty("name")] = it.getProperty("obv_count");
+		};
+		return tags;
+	}
 
 	protected Map getTagsFromObservation(obvIds){
 		int tagsLimit = 30;
