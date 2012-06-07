@@ -58,8 +58,8 @@ function initialize(){
 function set_location(lat, lng) {
 	
 		$(".location_picker_button").removeClass("active_location_picker_button");
-        $("#latitude").html(lat.toFixed(2));
-        $("#longitude").html(lng.toFixed(2));
+        //$(#latitude").html(lat.toFixed(2));
+        //$("#longitude").html(lng.toFixed(2));
         var location = new google.maps.LatLng(lat, lng);
         marker.setPosition(location);
         map.setCenter(location);
@@ -69,22 +69,65 @@ function set_location(lat, lng) {
                 if (results[0]) {
                     //$('#place_name').val(results[0].formatted_address);
                     $('#reverse_geocoded_name').html(results[0].formatted_address);
-                    $('#latitude').html(marker.getPosition().lat().toFixed(2));
-                    $('#longitude').html(marker.getPosition().lng().toFixed(2));
+                    //$('#latitude').html(marker.getPosition().lat().toFixed(2));
+                    //$('#longitude').html(marker.getPosition().lng().toFixed(2));
                     $('#reverse_geocoded_name_field').val(results[0].formatted_address);
                     $('#latitude_field').val(marker.getPosition().lat());
                     $('#longitude_field').val(marker.getPosition().lng());
+                    var dms_lat = convert_DD_to_DMS(marker.getPosition().lat(), 'lat');
+                    var dms_lng = convert_DD_to_DMS(marker.getPosition().lng(), 'lng');
+                    $('#latitude_deg_field').val(dms_lat['deg']);
+                    $('#latitude_min_field').val(dms_lat['min']);
+                    $('#latitude_sec_field').val(dms_lat['sec']);
+                    $('#latitude_direction_field').val(dms_lat['dir']);
+                    $('#longitude_deg_field').val(dms_lng['deg']);
+                    $('#longitude_min_field').val(dms_lng['min']);
+                    $('#longitude_sec_field').val(dms_lng['sec']);
+                    $('#longitude_direction_field').val(dms_lng['dir']);
                 }
             }
         });
 
 }
 
-function convert_DMS_to_DD(days, minutes, seconds, direction) {
-    var dd = days + minutes/60 + seconds/(60*60);
+function get_integer_part(n) {
+    if (n < 0) {
+        return Math.ceil(n);
+    }
+    
+    return Math.floor(n);
+}
+
+function convert_DD_to_DMS(decimal_degree, type) {
+    var dms = {};
+    var deg = get_integer_part(decimal_degree);
+    var decimal_min = (decimal_degree % 1) * 60;
+    var min = get_integer_part(decimal_min);
+    var sec = (decimal_min % 1) * 60;
+    
+    dms['deg'] = deg;
+    dms['min'] = min;
+    dms['sec'] = sec;
+
+    if (type === 'lat' && deg < 0) {
+       dms['dir'] = 'S'; 
+    } else if (type === 'lat') {
+       dms['dir'] = 'N';
+    } else if (type === 'lng' && deg < 0) {
+       dms['dir'] = 'W'; 
+    } else if (type === 'lng'){
+       dms['dir'] = 'E'; 
+    }
+
+    return dms;
+}
+
+function convert_DMS_to_DD(deg, minutes, seconds, direction) {
+    var dd = parseInt(deg) + minutes/60 + seconds/(60*60);
 
     if (direction == "S" || direction == "W") {
         dd = dd * -1;
+
     } // Don't do anything for N or E
     return dd;
 }
@@ -112,8 +155,9 @@ function update_geotagged_images_list(image) {
 		$(image).exifLoad(function() {
     		var latlng = get_latlng_from_image(image); 
             if (latlng) {            	
+                var latlng_display = "Lat: " + latlng.lat.toFixed(2) + ", Lon: " + latlng.lng.toFixed(2)
             	var func = "set_location(" + latlng.lat+"," +latlng.lng+ "); $(this).addClass('active_location_picker_button')";
-                var html = '<div id=' + $(image).attr("id") +' class="location_picker_button" style="display:inline-block; width:40px;" onclick="' + func + '"><div style="width:40px; height:40px;float:left;"><img style="width:100%; height:100%;" src="' + $(image).attr('src') + '"/></div><div style="float:left; padding:2px;font-size:"></div></div>';
+                var html = '<div id=' + $(image).attr("id") +' class="location_picker_button" style="display:inline-block;" onclick="' + func + '"><div style="width:40px; height:40px;float:left;"><img style="width:100%; height:100%;" src="' + $(image).attr('src') + '"/></div><div style="float:left; padding:10px;">' + latlng_display + '</div></div>';
                 $("#geotagged_images>.title").show();
                 $("#geotagged_images>.msg").show();
                 $("#geotagged_images").append(html);
@@ -204,11 +248,24 @@ $(document).ready(function() {
         if (results[0]) {
           //$('#place_name').val(results[0].formatted_address);
           $('#reverse_geocoded_name').html(results[0].formatted_address);
-          $('#latitude').html(marker.getPosition().lat().toFixed(2));
-          $('#longitude').html(marker.getPosition().lng().toFixed(2));
+          //$('#latitude').html(marker.getPosition().lat().toFixed(2));
+          //$('#longitude').html(marker.getPosition().lng().toFixed(2));
           $('#reverse_geocoded_name_field').val(results[0].formatted_address);
           $('#latitude_field').val(marker.getPosition().lat());
           $('#longitude_field').val(marker.getPosition().lng());
+
+            var dms_lat = convert_DD_to_DMS(marker.getPosition().lat(), 'lat');
+            var dms_lng = convert_DD_to_DMS(marker.getPosition().lng(), 'lng');
+            $('#latitude_deg_field').val(dms_lat['deg']);
+            $('#latitude_min_field').val(dms_lat['min']);
+            $('#latitude_sec_field').val(dms_lat['sec']);
+            $('#latitude_direction_field').val(dms_lat['dir']);
+            $('#longitude_deg_field').val(dms_lng['deg']);
+            $('#longitude_min_field').val(dms_lng['min']);
+            $('#longitude_sec_field').val(dms_lng['sec']);
+            $('#longitude_direction_field').val(dms_lng['dir']);
+    
+          
         }
       }
     });
@@ -308,5 +365,47 @@ $(document).ready(function() {
     		$("#geotagged_images>.title").hide();
             $("#geotagged_images>.msg").hide();
     	}
+    });
+
+    $('#latitude_field').change(function(){
+        set_location($(this).val(), $('#longitude_field').val());        
+    });
+
+    $('#longitude_field').change(function(){
+        set_location($('#latitude_field').val(), $(this).val());
+    });
+
+    function set_dms_latitude() {
+            var lat = convert_DMS_to_DD($('#latitude_deg_field').val(), $('#latitude_min_field').val(), $('#latitude_sec_field').val(), $('#latitude_direction_field').val());
+            set_location(lat,  $('#longitude_field').val());
+    }
+    function set_dms_longitude() {
+            var lng = convert_DMS_to_DD($('#longitude_deg_field').val(), $('#longitude_min_field').val(), $('#longitude_sec_field').val(), $('#longitude_direction_field').val());
+            set_location($('#latitude_field').val(), lng);
+    }
+
+    $('#latitude_deg_field').change(function(){
+            set_dms_latitude();
+    });
+    $('#latitude_min_field').change(function(){
+            set_dms_latitude();
+    });
+    $('#latitude_sec_field').change(function(){
+            set_dms_latitude();
+    });
+    $('#latitude_direction_field').change(function(){
+            set_dms_latitude();
+    });
+    $('#longitude_deg_field').change(function(){
+            set_dms_longitude();
+    });
+    $('#longitude_min_field').change(function(){
+            set_dms_longitude();
+    });
+    $('#longitude_sec_field').change(function(){
+            set_dms_longitude();
+    });
+    $('#longitude_direction_field').change(function(){
+            set_dms_longitude();
     });
 });
