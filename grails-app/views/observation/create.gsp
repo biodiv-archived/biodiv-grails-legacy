@@ -279,7 +279,7 @@ display: none;
 								<div id="nameContainer" class="textbox">
 									<reco:create />
 								</div>
-                                                                <g:if test="${observationInstance?.maxVotedSpeciesName == 'Unknown'}">
+                                                                <g:if test="${observationInstance?.maxVotedSpeciesName == 'Unknown' || observationInstance?.maxVotedSpeciesName == null}">
 								<div id="help-identify" class="control-label">
 									<label class="checkbox" style="text-align:left;"> <input type="checkbox" name="help_identify"
 										style="width: auto; height: auto;margin-left: -14px;" /> Help identify </label>
