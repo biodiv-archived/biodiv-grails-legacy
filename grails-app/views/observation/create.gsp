@@ -276,13 +276,15 @@ display: none;
 									</div>
 								</g:hasErrors>
 
-								<div class="textbox">
+								<div id="nameContainer" class="textbox">
 									<reco:create />
 								</div>
+                                                                <g:if test="${observationInstance?.maxVotedSpeciesName == 'Unknown'}">
 								<div id="help-identify" class="control-label">
-									<label class="checkbox" style="text-align:left;"> <input type="checkbox"
+									<label class="checkbox" style="text-align:left;"> <input type="checkbox" name="help_identify"
 										style="width: auto; height: auto;margin-left: -14px;" /> Help identify </label>
 								</div>
+                                                                </g:if>
 							</div>
 						</div>
 
@@ -754,7 +756,8 @@ display: none;
         }
        
         $("#help-identify input").click(function(){
-                if ($(this).attr('checked') == 'checked'){
+                if ($(this).is(':checked')){
+                    $('#nameContainer input').val('');
                     $('#nameContainer input').attr('disabled', 'disabled');
                 }else{
                     $('#nameContainer input').removeAttr('disabled');
