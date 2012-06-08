@@ -64,6 +64,19 @@ function set_location(lat, lng) {
         marker.setPosition(location);
         map.setCenter(location);
 
+        $('#latitude_field').val(marker.getPosition().lat());
+        $('#longitude_field').val(marker.getPosition().lng());
+        var dms_lat = convert_DD_to_DMS(marker.getPosition().lat(), 'lat');
+        var dms_lng = convert_DD_to_DMS(marker.getPosition().lng(), 'lng');
+        $('#latitude_deg_field').val(dms_lat['deg']);
+        $('#latitude_min_field').val(dms_lat['min']);
+        $('#latitude_sec_field').val(dms_lat['sec']);
+        $('#latitude_direction_field').val(dms_lat['dir']);
+        $('#longitude_deg_field').val(dms_lng['deg']);
+        $('#longitude_min_field').val(dms_lng['min']);
+        $('#longitude_sec_field').val(dms_lng['sec']);
+        $('#longitude_direction_field').val(dms_lng['dir']);
+
         geocoder.geocode({'latLng': marker.getPosition()}, function(results, status) {
             if (status == google.maps.GeocoderStatus.OK) {
                 if (results[0]) {
@@ -72,18 +85,6 @@ function set_location(lat, lng) {
                     //$('#latitude').html(marker.getPosition().lat().toFixed(2));
                     //$('#longitude').html(marker.getPosition().lng().toFixed(2));
                     $('#reverse_geocoded_name_field').val(results[0].formatted_address);
-                    $('#latitude_field').val(marker.getPosition().lat());
-                    $('#longitude_field').val(marker.getPosition().lng());
-                    var dms_lat = convert_DD_to_DMS(marker.getPosition().lat(), 'lat');
-                    var dms_lng = convert_DD_to_DMS(marker.getPosition().lng(), 'lng');
-                    $('#latitude_deg_field').val(dms_lat['deg']);
-                    $('#latitude_min_field').val(dms_lat['min']);
-                    $('#latitude_sec_field').val(dms_lat['sec']);
-                    $('#latitude_direction_field').val(dms_lat['dir']);
-                    $('#longitude_deg_field').val(dms_lng['deg']);
-                    $('#longitude_min_field').val(dms_lng['min']);
-                    $('#longitude_sec_field').val(dms_lng['sec']);
-                    $('#longitude_direction_field').val(dms_lng['dir']);
                 }
             }
         });
@@ -242,6 +243,20 @@ $(document).ready(function() {
     }else {
         lastPosition = marker.getPosition();
     };
+    
+    $('#latitude_field').val(marker.getPosition().lat());
+    $('#longitude_field').val(marker.getPosition().lng());
+
+    var dms_lat = convert_DD_to_DMS(marker.getPosition().lat(), 'lat');
+    var dms_lng = convert_DD_to_DMS(marker.getPosition().lng(), 'lng');
+    $('#latitude_deg_field').val(dms_lat['deg']);
+    $('#latitude_min_field').val(dms_lat['min']);
+    $('#latitude_sec_field').val(dms_lat['sec']);
+    $('#latitude_direction_field').val(dms_lat['dir']);
+    $('#longitude_deg_field').val(dms_lng['deg']);
+    $('#longitude_min_field').val(dms_lng['min']);
+    $('#longitude_sec_field').val(dms_lng['sec']);
+    $('#longitude_direction_field').val(dms_lng['dir']);
 
     geocoder.geocode({'latLng': marker.getPosition()}, function(results, status) {
       if (status == google.maps.GeocoderStatus.OK) {
@@ -251,20 +266,7 @@ $(document).ready(function() {
           //$('#latitude').html(marker.getPosition().lat().toFixed(2));
           //$('#longitude').html(marker.getPosition().lng().toFixed(2));
           $('#reverse_geocoded_name_field').val(results[0].formatted_address);
-          $('#latitude_field').val(marker.getPosition().lat());
-          $('#longitude_field').val(marker.getPosition().lng());
-
-            var dms_lat = convert_DD_to_DMS(marker.getPosition().lat(), 'lat');
-            var dms_lng = convert_DD_to_DMS(marker.getPosition().lng(), 'lng');
-            $('#latitude_deg_field').val(dms_lat['deg']);
-            $('#latitude_min_field').val(dms_lat['min']);
-            $('#latitude_sec_field').val(dms_lat['sec']);
-            $('#latitude_direction_field').val(dms_lat['dir']);
-            $('#longitude_deg_field').val(dms_lng['deg']);
-            $('#longitude_min_field').val(dms_lng['min']);
-            $('#longitude_sec_field').val(dms_lng['sec']);
-            $('#longitude_direction_field').val(dms_lng['dir']);
-    
+              
           
         }
       }
