@@ -121,9 +121,9 @@ class NamesLoaderService {
 		int offset = 0, noOfNames = 0, limit=BATCH_SIZE;
 		def conn = new Sql(sessionFactory.currentSession.connection())
 		while(true) {
-			def commonNames = conn.rows("select n.name as name, n.taxon_concept_id as taxonConcept from common_names n left outer join recommendation r on n.name = r.name and n.taxon_concept_id = r.taxon_concept_id where r.name is null group by n.name, n.taxon_concept_id, n.id order by n.id limit "+limit+" offset "+offset)
+			def commonNames = conn.rows("select n.name as name, n.taxon_concept_id as taxonConcept, n.language_id as language from common_names n left outer join recommendation r on n.name = r.name and n.taxon_concept_id = r.taxon_concept_id where r.name is null group by n.name, n.taxon_concept_id, n.language_id, n.id order by n.id limit "+limit+" offset "+offset)
 			commonNames.each { cName ->
-				recos.add(new Recommendation(name:cName.name, taxonConcept:TaxonomyDefinition.get(cName.taxonconcept)));
+				recos.add(new Recommendation(name:cName.name, isScientificName:false, languageId:cName.language, taxonConcept:TaxonomyDefinition.get(cName.taxonconcept)));
 				noOfNames++
 			}
 			recommendationService.save(recos);

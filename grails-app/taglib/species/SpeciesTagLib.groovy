@@ -86,4 +86,9 @@ class SpeciesTagLib {
 				break;
 		}
 	}
+	
+	def chooseLanguage = { attrs, body->
+		out << render(template:"/common/chooseLanguageTemplate", model:attrs.model);
+	}
+	
 }

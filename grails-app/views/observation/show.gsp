@@ -72,10 +72,6 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 #nameContainer {
 	float: left;
 }
-
-#name {
-	width: 91%;
-}
 </style>
 </head>
 <body>
@@ -318,6 +314,7 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 				}, 
 	            success: function(data, statusText, xhr, form) {
 	            	showRecos(data, null);
+	            	$('#canName').val('');
 	            	return false;
 	            },
 	            error:function (xhr, ajaxOptions, thrownError){

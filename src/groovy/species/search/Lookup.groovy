@@ -61,7 +61,7 @@ abstract class Lookup <E>{
 
 	abstract boolean add(String key, Object value);
 		
-	abstract List<LookupResult> lookup(String key, boolean onlyMorePopular, int num);
+	abstract List<LookupResult> lookup(String key, boolean onlyMorePopular, int num, String nameFilter);
 	
 	abstract List<Object> get(String key);
 	

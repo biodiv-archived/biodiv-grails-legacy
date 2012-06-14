@@ -10,6 +10,7 @@ import java.util.Map;
 
 import species.Resource;
 import species.Habitat;
+import species.Language;
 import species.utils.Utils;
 import species.TaxonomyDefinition;
 import species.auth.SUser;
@@ -37,6 +38,7 @@ class ObservationService {
 	def grailsApplication;
 	def dataSource;
 	def springSecurityService;
+	def curationService;
 	/**
 	 * 
 	 * @param params
@@ -257,49 +259,76 @@ class ObservationService {
 		return urlList
 	}
 
-	private Recommendation getRecommendation(recoName, canName) {
+	private Map getRecommendation(params){
+		def recoName = params.recoName;
+		def canName = params.canName;
+		def commonName = params.commonName;
+		def languageId = Language.getLanguage(params.languageName).id;
+		def obv = params.observation?:Observation.get(params.obvId);
+		
+		Recommendation scientificNameReco = getRecoForScientificName(recoName, canName);
+		Recommendation commonNameReco = findReco(commonName, false, languageId, null);
+		
+		curationService.add(scientificNameReco, commonNameReco, obv);
+		
+		//giving priority to scientific name if its available. same will be used in determining species call
+		return [mainReco : (scientificNameReco ?:commonNameReco), commonNameReco:commonNameReco];
+	}
+		
+	private Recommendation getRecoForScientificName(recoName, canonicalName){
 		def reco, taxonConcept;
-		if(canName) {
+		
+		//first searching by canonical name. this name is present if user select from auto suggest
+		if(canonicalName){
 			//findBy returns first...assuming taxon concepts wont hv same canonical name and different rank
-			canName = Utils.cleanName(canName);
-			reco = Recommendation.findByNameIlike(canName);
+			canonicalName = Utils.cleanName(canonicalName);
+			reco = Recommendation.findByNameIlikeAndIsScientificName(canonicalName, true);
 			log.debug "Found taxonConcept : "+taxonConcept;
 			log.debug "Found reco : "+reco;
 			if(!reco) {
-				taxonConcept = TaxonomyDefinition.findByCanonicalFormIlike(canName);
+				taxonConcept = TaxonomyDefinition.findByCanonicalFormIlike(canonicalName);
 				if(taxonConcept) {
 					log.debug "Resolving recoName to canName : "+taxonConcept.canonicalForm
 					reco = new Recommendation(name:taxonConcept.canonicalForm, taxonConcept:taxonConcept);
 					if(!recommendationService.save(reco)) {
 						reco = null;
 					}
-					return reco;
 				} else {
 					log.error "Given taxonomy canonical name is invalid"
 				}
 			}
+			return reco;
 		}
-
+		
+		//searching on whatever user typed in scientific name text box
 		if(recoName) {
-			recoName = Utils.cleanName(recoName);
+			return findReco(recoName, true, null, taxonConcept);
+		}
+		
+		return null;
+	}
+	
+	private  Recommendation findReco(name, isScientificName, languageId, taxonConceptForNewReco){
+		if(name){
+			name = Utils.cleanName(name);
 			def c = Recommendation.createCriteria();
 			def result = c.list {
-				ilike('name', recoName);
-				//(taxonConcept) ? eq('taxonConcept', taxonConcept) : isNull('taxonConcept');
+				ilike('name', name);
+				eq('isScientificName', isScientificName);
+			    (languageId) ? eq('languageId', languageId) : isNull('languageId');
 			}
-			reco = result?result[0]:null;
-		}
-
-		if(!reco) {
-			reco = new Recommendation(name:recoName, taxonConcept:taxonConcept);
-			if(!recommendationService.save(reco)) {
-				reco = null;
+			def reco = result?result[0]:null;
+			if(!reco) {
+				reco = new Recommendation(name:name, taxonConcept:taxonConceptForNewReco, isScientificName:isScientificName, languageId:languageId);
+				if(!recommendationService.save(reco)) {
+					reco = null;
+				}
 			}
+			return reco;
 		}
-
-		return reco;
+		return null;
 	}
-
+	
 	/**
 	 * 
 	 */

@@ -39,7 +39,7 @@ class ObservationController {
 	def mailService;
 	def observationsSearchService;
 	def namesIndexerService;
-
+	
 	static allowedMethods = [update: "POST", delete: "POST"]
 
 	def index = {
@@ -804,16 +804,18 @@ class ObservationController {
 		def author = params.author;
 		def recoComment = (params.recoComment?.trim()?.length() > 0)? params.recoComment.trim():null;
 
-		def reco;
+		def reco, commonNameReco;
 		if(params.recoId)
 			reco = Recommendation.get(params.long('recoId'));
-		else
-			reco = observationService.getRecommendation(params.recoName, params.canName);
-
+		else{
+			def recoResultMap = observationService.getRecommendation(params);
+			reco = recoResultMap.mainReco;
+			commonNameReco =  recoResultMap.commonNameReco;
+		}
 		ConfidenceType confidence = observationService.getConfidenceType(params.confidence?:ConfidenceType.CERTAIN.name());
 
 		RecommendationVote existingRecVote = RecommendationVote.findByAuthorAndObservation(author, observation);
-		RecommendationVote newRecVote = new RecommendationVote(observation:observation, recommendation:reco, author:author, confidence:confidence, comment:recoComment);
+		RecommendationVote newRecVote = new RecommendationVote(observation:observation, recommendation:reco, commonNameReco:commonNameReco, author:author, confidence:confidence, comment:recoComment);
 
 		if(!reco){
 			log.debug "Not a valid recommendation"
@@ -1050,4 +1052,7 @@ class ObservationController {
 	////////////////////////////// SEARCH END /////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////
 
+	def getFilteredLanguage = {
+		render species.Language.filteredList() 
+	}
 }

@@ -1,5 +1,6 @@
 package species.participation
 
+import species.Language;
 import species.TaxonomyDefinition;
 import species.auth.Role;
 import species.utils.Utils;
@@ -9,10 +10,16 @@ class Recommendation {
 	String name;
 	TaxonomyDefinition taxonConcept;
 	Date lastModified = new Date();
-
+	
+	//To distinguish between scientific and common name
+	boolean isScientificName = true;
+	//if its common name then can have language
+	Long languageId = null;
+	
 	static constraints = {
-		name(blank:false, unique:['taxonConcept']);
+		name(blank:false, unique:['taxonConcept', 'languageId']);
 		taxonConcept nullable:true;
+		languageId(nullable:true);
 	}
 
 	static mapping = { 

@@ -36,6 +36,8 @@ class SetupService {
 		uploadClassifications(grailsApplication.config.speciesPortal.data.rootDir+"/templates/Classifications.xlsx", 0, 0);
 		uploadLicences();
 		uploadHabitats();
+		
+		//updateLanguageRegion(grailsApplication.config.speciesPortal.data.rootDir+"/templates/Language_iso639-2_withRegion.csv");
 
 		def allGroup = new SpeciesGroup(name:"All");
 		allGroup.save(flush:true, failOnError:true);
@@ -47,6 +49,20 @@ class SetupService {
 		//taxonService.loadTaxon();
 	}
 
+	void updateLanguageRegion(languagesFile){
+		log.info "Updating languages"
+		new File(languagesFile).splitEachLine("\\t") {
+			def fields = it;
+			def region = fields[0].replaceAll("\"","").trim()
+			if(region){
+				def lang = Language.findByThreeLetterCode(fields[1].replaceAll("\"",""))
+				lang.region = region
+				if(!lang.save(flush:true))
+				lang.errors.each { log.error it; }
+			}
+		}
+	}
+	
 	void uploadHabitats(){
 		log.info " uploading habitats"
 		HabitatType.toList().each { hbType ->
