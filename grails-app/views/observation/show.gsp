@@ -91,10 +91,10 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 
 				<div class="page-header clearfix">
 					<div style="width:100%;">
-						<h1 class="span8">
+						<div class="span8">
 							<obv:showSpeciesName
-								model="['observationInstance':observationInstance]" />
-						</h1>
+								model="['observationInstance':observationInstance, 'isTitle':true]" />
+						</div>
 					<div style="float:right;">
 						<sUser:ifOwns model="['user':observationInstance.author]">
 							

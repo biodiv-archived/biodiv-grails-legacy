@@ -8,6 +8,7 @@ import grails.plugins.springsecurity.Secured
 
 
 import species.Habitat
+import species.Language;
 import species.VisitCounter;
 import species.Contributor;
 import species.Resource;
@@ -110,67 +111,77 @@ class Observation implements Taggable{
 		return RecommendationVote.findByAuthorAndObservation(author, this);
 	}
 
-	/**
-	 * 
-	 * @return
-	 */
-	List<String> getSpecies() {
-		def speciesList = [];
-		this.recommendationVote.each{speciesList << it.recommendation.name}
-		return getMaxRepeatedElementsFromList(speciesList)
+	Long findMaxRepeatedRecoId(){
+		//getting list of max repeated recoIds
+		def sql =  Sql.newInstance(dataSource);
+		def query = "select recoVote.recommendation_id as recoid, count(*) as votecount from recommendation_vote as recoVote where recoVote.observation_id = :obvId group by recoId order by votecount desc;"
+		def res = sql.rows(query, [obvId:id])
+		
+		if(!res || res.isEmpty()){
+			return null
+		}
+		def recoIds = []
+		
+		int maxCount = res[0]["votecount"]
+		res.each{ reco ->
+			if(reco["votecount"] == maxCount){
+				recoIds << reco["recoid"]
+			}
+		}
+		
+		if(recoIds.size() == 1){
+			return recoIds[0]
+		}
+		
+		//getting latest recoVote
+		query = "from RecommendationVote as recoVote where recoVote.observation = :observation and recoVote.recommendation.id in (:recoIds) order by recoVote.votedOn desc "
+		return RecommendationVote.find(query, [observation:this, recoIds:recoIds]).recommendation.id
 	}
-
+	
 	void calculateMaxVotedSpeciesName(){
-		List speciesList = getSpecies(); 
-		if(speciesList.isEmpty()){
+		Long recoId = findMaxRepeatedRecoId(); 
+		if(!recoId){
 			maxVotedSpeciesName = "Unknown";
-		}else if(speciesList.size() == 1){
-			maxVotedSpeciesName = speciesList[0];
 		}else{
-			String query = "from RecommendationVote as recoVote where recoVote.recommendation.name in (:speciesList) order by recoVote.votedOn desc "
-			maxVotedSpeciesName = RecommendationVote.find(query, [speciesList:speciesList]).recommendation.name
+			maxVotedSpeciesName = Recommendation.get(recoId).name
 		}
 		
 		if(!save(flush:true)){
 			errors.allErrors.each { log.error it }
 		}
+		
 	}
 	
-	/**
-	 * 
-	 * @param list
-	 * @return
-	 */
-	private List getMaxRepeatedElementsFromList(list){
-		list.sort()
-		def max = 1
-		def currentElement = list[0]
-		def maxElement = []
-		def currentCounter = 0
-		for(spe in list) {
-			if(spe == currentElement) {
-				currentCounter++
-			} else {
-				if(currentCounter > max) {
-					maxElement.clear();
-					maxElement.add(currentElement)
-				} else if (currentCounter == max) {
-					maxElement.add(currentElement)
-				}
-				currentElement = spe
-				currentCounter = 1
-			}
+	String fetchSuggestedCommonNames(){
+		Long recoId = findMaxRepeatedRecoId();
+		if(!recoId){
+			return "";
+		}else{
+			return fetchSuggestedCommonNames(recoId);
 		}
-
-		if(currentCounter > max) {
-			maxElement.clear();
-			maxElement.add(currentElement)
-		} else if (currentCounter == max) {
-			maxElement.add(currentElement)
-		}
-
-		return maxElement
 	}
+	
+	
+	private String fetchSuggestedCommonNames(recoId){
+		def englistId = Language.getLanguage(null)
+		Set engCommonNameList = []
+		Set otherCNList = []
+		this.recommendationVote.each{ rv ->
+			if(rv.recommendation.id == recoId){
+				def cnReco = rv.commonNameReco
+				if(cnReco){
+					if(cnReco.languageId == englistId){
+						engCommonNameList << cnReco.name
+					}else{
+						otherCNList << cnReco.name
+					}
+				}
+			}
+			
+		}
+		return engCommonNameList.join(", ") +  otherCNList.join(", ")
+	}
+	
 
 	/**
 	 * 
@@ -205,6 +216,8 @@ class Observation implements Taggable{
 			def map = reco.getRecommendationDetails(this);
 			map.put("noOfVotes", recoVote[1]);
 			map.put("obvId", this.id);
+			String cNames = fetchSuggestedCommonNames(reco.id)
+			map.put("commonNames", (cNames == "")?:"(" + cNames + ")");
 			result.add(map);
 		}
 		return ['recoVotes':result, 'totalVotes':this.recommendationVote.size(), 'uniqueVotes':getRecommendationCount()];

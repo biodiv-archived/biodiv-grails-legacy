@@ -128,10 +128,10 @@ class ObservationService {
 	 * @return
 	 */
 	Map getRelatedObservationBySpeciesName(long obvId, int limit, long offset){
-		List<String> speciesNames = getSpeciesNames(obvId)
-		log.debug speciesNames
-		log.debug speciesNames.getClass();
-		return getRelatedObservationBySpeciesNames(speciesNames, obvId, limit, offset)
+		String speciesName = getSpeciesNames(obvId)
+		//log.debug speciesName
+		//log.debug speciesName.getClass();
+		return getRelatedObservationBySpeciesNames(speciesName, obvId, limit, offset)
 	}
 	/**
 	 * 
@@ -217,8 +217,8 @@ class ObservationService {
 	 * @param obvId
 	 * @return
 	 */
-	List<String> getSpeciesNames(obvId){
-		return Observation.read(obvId).getSpecies();
+	String getSpeciesNames(obvId){
+		return Observation.read(obvId).maxVotedSpeciesName;
 	}
 
 	/**
@@ -227,11 +227,11 @@ class ObservationService {
 	 * @param params
 	 * @return
 	 */
-	Map getRelatedObservationBySpeciesNames(List<String> speciesNames, long obvId, int limit, long offset){
-		if(!speciesNames) {
+	Map getRelatedObservationBySpeciesNames(String speciesName, long obvId, int limit, long offset){
+		if(speciesName == "Unknown") {
 			return ["observations":[], "count":0];
 		}
-		def recIds = Recommendation.executeQuery("select rec.id from Recommendation as rec where rec.name in (:speciesNames)", [speciesNames:speciesNames]);
+		def recIds = Recommendation.executeQuery("select rec.id from Recommendation as rec where rec.name = :speciesName", [speciesName:speciesName]);
 		def countQuery = "select count(*) from RecommendationVote recVote where recVote.recommendation.id in (:recIds) and recVote.observation.id != :parentObv and recVote.observation.isDeleted = :isDeleted"
 		def countParams = [parentObv:obvId, recIds:recIds, isDeleted:false]
 		def count = RecommendationVote.executeQuery(countQuery, countParams)
@@ -269,7 +269,7 @@ class ObservationService {
 		Recommendation scientificNameReco = getRecoForScientificName(recoName, canName);
 		Recommendation commonNameReco = findReco(commonName, false, languageId, null);
 		
-		curationService.add(scientificNameReco, commonNameReco, obv);
+		curationService.add(scientificNameReco, commonNameReco, obv, springSecurityService.currentUser);
 		
 		//giving priority to scientific name if its available. same will be used in determining species call
 		return [mainReco : (scientificNameReco ?:commonNameReco), commonNameReco:commonNameReco];

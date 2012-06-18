@@ -10,7 +10,7 @@ class CurationService {
 
 	def springSecurityService
 
-	def add(Recommendation recoForSciName,  Recommendation recoForCommonName, Observation obv){
+	def add(Recommendation recoForSciName,  Recommendation recoForCommonName, Observation obv, author){
 		UnCuratedScientificNames unSciName;
 		UnCuratedCommonNames unCn;
 
@@ -44,7 +44,7 @@ class CurationService {
 			}
 		}
 
-		addUnCuratedRecommendationVote(unSciName, unCn, obv);
+		addUnCuratedRecommendationVote(unSciName, unCn, obv, author);
 	}
 
 	private boolean isAuthenticRecos(Recommendation recoForSciName, Recommendation recoForCommonName){
@@ -53,8 +53,8 @@ class CurationService {
 	}
 
 
-	private addUnCuratedRecommendationVote(sn, cn, obv){
-		def author = springSecurityService.currentUser;
+	private addUnCuratedRecommendationVote(sn, cn, obv, author){
+		author = author?:springSecurityService.currentUser;
 		UnCuratedVotes uv = UnCuratedVotes.findWhere(author:author, sciName:sn, commonName:cn, obv:obv)
 		if(!uv){
 			uv = new UnCuratedVotes(author:author, sciName:sn, commonName:cn, obv:obv);

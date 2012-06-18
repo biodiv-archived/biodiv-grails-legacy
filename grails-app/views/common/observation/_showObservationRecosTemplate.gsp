@@ -30,14 +30,14 @@
 
 				<span class="voteCount"><span id="votes_${r.recoId}">
 						${r.noOfVotes} </span> <g:if test="${r.noOfVotes <= 1}"> user thinks</g:if>
-					<g:else> users think</g:else> it is:</span><span class="highlight">
+					<g:else> users think</g:else> it is:</span><span class="highlight ellipsis multiline">
 					<g:if test="${r.canonicalForm}">
 						<g:link controller="species" action="show" id="${r.speciesId}">
 							<i> ${r.canonicalForm} </i>
 						</g:link>
 					</g:if> <g:else>
 						<i> ${r.name} </i>
-					</g:else> </span>
+					</g:else>${r.commonNames} </span>
 				<obv:showRecoComment
 					model="['recoComments':r.recoComments, 'recoId': r.recoId]" />
 
