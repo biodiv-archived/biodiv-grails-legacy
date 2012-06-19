@@ -34,7 +34,7 @@ $(document).ready(function() {
 				$("#mappedRecoNameForcanName").val(ui.item.label.replace(/<.*?>/g,""));
 				return false;
 			},open: function(event, ui) {
-				$("#nameSuggestions ul").removeAttr('style').css({'display': 'block'}); 
+				$("#nameSuggestions ul").removeAttr('style').css({'display': 'block','width':'300px'}); 
 			}
 	}).data( "catcomplete" )._renderItem = function( ul, item ) {
 			ul.removeClass().addClass("dropdown-menu")
@@ -79,11 +79,12 @@ $(document).ready(function() {
 				$( "#canName" ).val( ui.item.value );
 				$( "#name" ).val( ui.item.value );
 				if(ui.item.languageName !== null){
-					$("#languageName").val(ui.item.languageName);
+					$("#languageComboBox").val(ui.item.languageName).attr("selected",true);
+					$("#languageComboBox").data('combobox').refresh();
 				}
 				return false;
 			},open: function(event, ui) {
-				$("#commonNameSuggestions ul").removeAttr('style').css({'display': 'block'}); 
+				$("#commonNameSuggestions ul").removeAttr('style').css({'display': 'block','width':'300px'}); 
 			}
 	}).data( "catcomplete" )._renderItem = function( ul, item ) {
 			ul.removeClass().addClass("dropdown-menu")
@@ -95,28 +96,42 @@ $(document).ready(function() {
 			} else {
 				if(!item.icon) {
 					item.icon =  "${resource(dir:'images',file:'no-image.jpg', absolute:true)}"
-                                            //${createLinkTo(dir: 'images/', file:"no-image.jpg", base:grailsApplication.config.speciesPortal.resources.serverURL)}"
-				}  
-				return $( "<li class='span3'></li>" )
-					.data( "item.autocomplete", item )
-					.append( "<a title='"+item.label.replace(/<.*?>/g,"")+"'><img src='" + item.icon+"' class='group_icon' style='float:left; background:url(" + item.icon+" no-repeat); background-position:0 -100px; width:50px; height:50px;opacity:0.4;'/>" + item.label + ((item.desc)?'<br>(' + item.desc + ')':'')+ ((item.languageName)? '<br>(' + item.languageName + ')':'') + "</a>" )
-					.appendTo( ul );
-			}
-		};
-		
-		$("#name").keypress(function() {
-			//console.log("=== saved val " + $("#mappedRecoNameForcanName").val() + "  newVal  " + $("#name").val()); 
-			if($("#mappedRecoNameForcanName").val() !== $("#name").val()){
-				$( "#canName" ).val('');
-			}
-		});
-		
-});
+                                            //${createLinkTo(dir: 'images/', file:"no-image.jpg", base:grailsApplication.config.speciesPortal.resources.serverURL)}
+								}
+								return $("<li class='span3'></li>")
+										.data("item.autocomplete", item)
+										.append("<a title='"+ item.label.replace(/<.*?>/g, "")+ "'><img src='"+ item.icon+ "' class='group_icon' style='float:left; background:url("+ item.icon+ " no-repeat); background-position:0 -100px; width:50px; height:50px;opacity:0.4;'/>"+ item.label+ ((item.desc) ? '<br>('+ item.desc+ ')': '')+ ((item.languageName) ? '<br>('+ item.languageName+ ')': '') + "</a>")
+										.appendTo(ul);
+							}
+						};
+
+						$("#name")
+								.keypress(
+										function() {
+											//console.log("=== saved val " + $("#mappedRecoNameForcanName").val() + "  newVal  " + $("#name").val()); 
+											if ($("#mappedRecoNameForcanName")
+													.val() !== $("#name").val()) {
+												$("#canName").val('');
+											}
+										});
+
+					});
 </script>
 
+<g:hasErrors bean="${recommendationVoteInstance}">
+	<div class="alert alert-error">
+		<g:renderErrors bean="${observationInstance}" as="list" />
+	</div>
+</g:hasErrors>
 
-<div class="btn-group">
-	<%
+<div class="row control-group ">
+	<label for="recommendationVote" class="control-label"> <g:message
+			code="observation.recommendationVote.label" default="Species name" />
+	</label>
+	<div class="controls">
+		<div class="textbox nameContainer">
+
+			<%
 		def species_name = ""
 		//showing vote added by creator of the observation
 		if(params.action == 'edit' || params.action == 'update'){
@@ -126,38 +141,67 @@ $(document).ready(function() {
 			//species_name = observationInstance?.maxVotedSpeciesName
 		}
 	%>
-	<div style="float:left; padding: 5px; background-color: #E5E5E5;width:55%">
-	<input type="text" name="commonName" id="commonName" value="${species_name}"
-		placeholder='Suggest a common name' style="width:63%"
-		class="input-xlarge ${hasErrors(bean: recommendationInstance, field: 'name', 'errors')} ${hasErrors(bean: recommendationVoteInstance, field: 'recommendation', 'errors')}" />
-	<input type="hidden" id="mappedRecoNameForcanName"/>
-	
-	<s:chooseLanguage/>
-	<div id="commonNameSuggestions" style="display: block;"></div>
-	</div>
-	
-	<div style="float:left; padding: 5px;background-color: #3BCD91; width:34%">
-	<input type="text" name="recoName" id="name" value="${species_name}"
-		placeholder='Suggest a scientific name' style="width:95%"
-		class="input-xlarge ${hasErrors(bean: recommendationInstance, field: 'name', 'errors')} ${hasErrors(bean: recommendationVoteInstance, field: 'recommendation', 'errors')}" />
-	<input type="hidden" name="canName" id="canName" />
-	
-	</div>
-	<div id="nameSuggestions" style="display: block;"></div>
-	<input type="text" name="recoComment" id="recoComment"
-		placeholder="Write comment" style="width:91%"></input><br />
+			<input type="text" name="recoName" id="name" value="${species_name}"
+				placeholder='Suggest a scientific name'
+				class="input-xlarge ${hasErrors(bean: recommendationInstance, field: 'name', 'errors')} ${hasErrors(bean: recommendationVoteInstance, field: 'recommendation', 'errors')}" />
+			<input type="hidden" name="canName" id="canName" />
+			<div id="nameSuggestions" style="display: block;"></div>
 
-<%--	<div>--%>
-<%--		<a id="reco-action" data-toggle="dropdown" href="#">Comment</a>--%>
-<%----%>
-<%--		<div id="reco-options" style="display: none">--%>
-<%--			<input type="text" name="recoComment" id="recoComment"--%>
-<%--				placeholder="Write comment" style="width: 80%"></input><br /> <input--%>
-<%--				class="btn btn-mini" style="top:5px;" type="button" value="cancel"--%>
-<%--				onclick="cancelRecoComment();return false;"></input>--%>
-<%--		</div>--%>
-<%--	</div>--%>
+		</div>
+	</div>
 </div>
+
+
+
+<div class="row control-group ">
+	<label for="recommendationVote" class="control-label"> <g:message
+			code="observation.recommendationVote.label" default="Common name" />
+	</label>
+	<div class="controls">
+		<div class="nameContainer textbox" style="position:relative;">
+			
+			<input type="text" name="commonName" id="commonName"
+				value="${species_name}" placeholder='Suggest a common name'
+				class="input-xlarge ${hasErrors(bean: recommendationInstance, field: 'name', 'errors')} ${hasErrors(bean: recommendationVoteInstance, field: 'recommendation', 'errors')}" />
+			<input type="hidden" id="mappedRecoNameForcanName" />
+			
+			<div style="width:90px;">
+			<s:chooseLanguage />
+			</div>
+			<div id="commonNameSuggestions" style="display: block;"></div>
+
+		</div>
+	</div>
+</div>
+
+
+<div class="row control-group ">
+	<label for="recommendationVote" class="control-label"> <g:message
+			code="observation.recommendationVote.label" default="Comment" />
+	</label>
+	<div class="controls">
+		<div class="nameContainer textbox">
+
+			<input type="text" name="recoComment" id="recoComment"
+				class="input-xlarge ${hasErrors(bean: recommendationInstance, field: 'name', 'errors')} ${hasErrors(bean: recommendationVoteInstance, field: 'recommendation', 'errors')}"
+				placeholder="Write comment"></input>
+
+		</div>
+	</div>
+</div>
+
+
+<g:if
+	test="${observationInstance?.maxVotedSpeciesName == 'Unknown' || observationInstance?.maxVotedSpeciesName == null}">
+	<div id="help-identify" class="control-label">
+		<label class="checkbox" style="text-align: left;"> <input
+			type="checkbox" name="help_identify"
+			style="width: auto; height: auto; margin-left: -14px;" /> Help
+			identify
+		</label>
+	</div>
+</g:if>
+
 <script>
 	$(document).ready(function() {
 		$('#recoComment').val('');
@@ -168,12 +212,11 @@ $(document).ready(function() {
 		});
 	});
 
-	function cancelRecoComment(){
+	function cancelRecoComment() {
 		$('#recoComment').val('');
 		$('#reco-options').hide();
 		$('#reco-action').show();
 	}
-	
 </script>
 <style>
 #reco-options {
@@ -191,7 +234,7 @@ $(document).ready(function() {
 	margin: 0;
 	min-width: 400px;
 	max-width: 400px;
-	width : 400px;
+	width: 400px;
 	padding: 10px;
 	top: 100%;
 	z-index: 1000;
@@ -203,4 +246,16 @@ $(document).ready(function() {
 	top: 0;
 	right: 0;
 }
+
+.nameContainer {
+	position:relative;
+}
+
+#nameSuggestions {
+	width:290px;
+}
+#commonName {
+	width:200px;
+}
+
 </style>

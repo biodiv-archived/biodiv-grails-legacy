@@ -158,166 +158,9 @@ display: none;
 					<div class="span11 section"
 						style="position: relative; overflow: visible;">
 						<h3>What did you observe?</h3>
-						<div
-							class="row control-group left-indent ${hasErrors(bean: observationInstance, field: 'group', 'error')}">
-
-							<label for="group" class="control-label"><g:message
-									code="observation.group.label" default="Group" /> </label>
-
-							<div class="controls">
-								<div id="groups_div" class="btn-group" style="z-index: 3;">
-									<%
-                                        def defaultGroupId = observationInstance?.group?.id
-                                        def defaultGroupIconFileName = (defaultGroupId)? SpeciesGroup.read(defaultGroupId).icon(ImageType.VERY_SMALL)?.fileName?.trim() : SpeciesGroup.findByName('All').icon(ImageType.VERY_SMALL)?.fileName?.trim()
-                                        def defaultGroupValue = (defaultGroupId) ? SpeciesGroup.read(defaultGroupId).name : "Select group"
-                                        %>
-
-									<button id="selected_group"
-										class="btn btn-large dropdown-toggle" data-toggle="dropdown"
-										data-target="#groups_div">
-										<img class="group_icon"
-											src="${createLinkTo(dir: 'images', file: defaultGroupIconFileName, absolute:true)}" />
-										<span class="display_value"> ${defaultGroupValue}
-										</span> <span class="caret"></span>
-									</button>
-
-									<ul id="group_options" class="dropdown-menu">
-
-										<g:each in="${species.groups.SpeciesGroup.list()}" var="g">
-											<g:if
-												test="${!g.name.equals(grailsApplication.config.speciesPortal.group.ALL)}">
-												<li class="span2 group_option" value="${g.id}">
-													<a> <img
-														class="group_icon"
-														src="${createLinkTo(dir: 'images', file: g.icon(ImageType.VERY_SMALL)?.fileName?.trim(), absolute:true)}" />
-														<span title="${g.name}">
-															${g.name}
-													</span>
-												</a></li>
-											</g:if>
-										</g:each>
-									</ul>
 
 
-									<div class="help-inline">
-										<g:hasErrors bean="${observationInstance}" field="group">
-											<g:message code="observation.group.not_selected" />
-										</g:hasErrors>
-									</div>
-
-								</div>
-								<input id="group_id" type="hidden" name="group_id"
-									value="${observationInstance?.group?.id}"></input>
-							</div>
-						</div>
-
-						<div
-							class="row control-group left-indent ${hasErrors(bean: observationInstance, field: 'habitat', 'error')}">
-
-							<label class="control-label" for="habitat"><g:message
-									code="observation.habitat.label" default="Habitat" /> </label>
-
-							<div class="controls">
-									<div id="habitat_div" class="btn-group" style="z-index: 2;">
-										<%
-                                                                            def defaultHabitatId = observationInstance?.habitat?.id
-																			def defaultHabitat = Habitat.read(defaultHabitatId);
-                                                                            def defaultHabitatIconFileName = (defaultHabitatId)? defaultHabitat.icon(ImageType.VERY_SMALL)?.fileName?.trim() : Habitat.findByName('All').icon(ImageType.VERY_SMALL)?.fileName?.trim()
-                                                                            def defaultHabitatValue = (defaultHabitatId) ? defaultHabitat.name : "Select habitat"
-                                                                    %>
-                                        <button id="selected_habitat"
-										class="btn btn-large dropdown-toggle" data-toggle="dropdown"
-										data-target="#habitat_div">
-										<img class="group_icon"
-												src="${createLinkTo(dir: 'images', file:defaultHabitatIconFileName, absolute:true)}" />
-
-											<span>
-												${defaultHabitatValue}
-											</span><span class="caret"></span>
-									</button>
-										
-										<ul id="habitat_options" class="dropdown-menu">
-
-											<g:each in="${species.Habitat.list()}" var="h">
-											<g:if
-												test="${!h.name.equals(grailsApplication.config.speciesPortal.group.ALL)}">
-												<li class="span2 habitat_option" value="${h.id}"><a><img
-														class="group_icon"
-														src="${createLinkTo(dir: 'images', file:h.icon(ImageType.VERY_SMALL)?.fileName?.trim(), absolute:true)}" />
-														<span title="${h.name}"> ${h.name} </span> </a>
-												</li>
-											</g:if>
-											</g:each>
-										</ul>
-
-
-										<div class="help-inline">
-											<g:hasErrors bean="${observationInstance}" field="habitat">
-												<g:message code="observation.habitat.not_selected" />
-											</g:hasErrors>
-										</div>
-									</div>
-								</div>
-								<input id="habitat_id" type="hidden" name="habitat_id"
-									value="${observationInstance?.habitat?.id}"></input>
-						</div>
-
-						<div class="row control-group left-indent">
-
-							<label for="recommendationVote" class="control-label"> <g:message
-									code="observation.recommendationVote.label"
-									default="Species name" /> </label>
-
-
-							<div class="controls">
-								<g:hasErrors bean="${recommendationVoteInstance}">
-									<div class="errors">
-										<g:renderErrors bean="${observationInstance}" as="list" />
-									</div>
-								</g:hasErrors>
-
-								<div id="nameContainer" class="textbox">
-									<reco:create />
-								</div>
-                                                                <g:if test="${observationInstance?.maxVotedSpeciesName == 'Unknown' || observationInstance?.maxVotedSpeciesName == null}">
-								<div id="help-identify" class="control-label">
-									<label class="checkbox" style="text-align:left;"> <input type="checkbox" name="help_identify"
-										style="width: auto; height: auto;margin-left: -14px;" /> Help identify </label>
-								</div>
-                                                                </g:if>
-							</div>
-						</div>
-
-
-						<div
-							class="row control-group left-indent ${hasErrors(bean: observationInstance, field: 'observedOn', 'error')}">
-
-							<label for="observedOn" class="control-label"><i
-								class="icon-calendar"></i>
-							<g:message code="observation.observedOn.label"
-									default="Observed on" /></label>
-
-							<div class="controls textbox">
-								<input name="observedOn" type="date" id="observedOn"
-									value="${observationInstance?.observedOn?.format('dd/MM/yyyy')}"
-									placeholder="Select date of observation (dd/MM/yyyy)" />
-								
-								<div class="help-inline">
-									<g:hasErrors bean="${observationInstance}" field="observedOn">
-									<g:if test="${observationInstance.observedOn == null}">
-										<g:message code="observation.observedOn.validator.invalid_date" />
-									</g:if>
-									<g:else>
-										<g:message code="observation.observedOn.validator.future_date" />
-									</g:else>
-										
-									</g:hasErrors>
-								</div>
-
-							</div>
-						</div>
-
-						<div class="span11 section" style="margin-top:50px;">
+						<div class="span11 section">
 							<i class="icon-picture"></i><span>Upload photos of a
 								single observation and species</span>
 							<div
@@ -384,6 +227,144 @@ display: none;
 								</div>
 							</div>
 						</div>
+						<div class="span6">
+						<div class="row control-group ${hasErrors(bean: observationInstance, field: 'group', 'error')}">
+
+							<label for="group" class="control-label"><g:message
+									code="observation.group.label" default="Group" /> </label>
+
+							<div class="controls">
+								<div id="groups_div" class="btn-group" style="z-index: 3;">
+									<%
+                                        def defaultGroupId = observationInstance?.group?.id
+                                        def defaultGroupIconFileName = (defaultGroupId)? SpeciesGroup.read(defaultGroupId).icon(ImageType.VERY_SMALL)?.fileName?.trim() : SpeciesGroup.findByName('All').icon(ImageType.VERY_SMALL)?.fileName?.trim()
+                                        def defaultGroupValue = (defaultGroupId) ? SpeciesGroup.read(defaultGroupId).name : "Select group"
+                                        %>
+
+									<button id="selected_group"
+										class="btn btn-large dropdown-toggle" data-toggle="dropdown"
+										data-target="#groups_div">
+										<img class="group_icon"
+											src="${createLinkTo(dir: 'images', file: defaultGroupIconFileName, absolute:true)}" />
+										<span class="display_value"> ${defaultGroupValue}
+										</span> <span class="caret"></span>
+									</button>
+
+									<ul id="group_options" class="dropdown-menu">
+
+										<g:each in="${species.groups.SpeciesGroup.list()}" var="g">
+											<g:if
+												test="${!g.name.equals(grailsApplication.config.speciesPortal.group.ALL)}">
+												<li class="span2 group_option" value="${g.id}">
+													<a> <img
+														class="group_icon"
+														src="${createLinkTo(dir: 'images', file: g.icon(ImageType.VERY_SMALL)?.fileName?.trim(), absolute:true)}" />
+														<span title="${g.name}">
+															${g.name}
+													</span>
+												</a></li>
+											</g:if>
+										</g:each>
+									</ul>
+
+
+									<div class="help-inline">
+										<g:hasErrors bean="${observationInstance}" field="group">
+											<g:message code="observation.group.not_selected" />
+										</g:hasErrors>
+									</div>
+
+								</div>
+								<input id="group_id" type="hidden" name="group_id"
+									value="${observationInstance?.group?.id}"></input>
+							</div>
+						</div>
+
+						<div
+							class="row control-group ${hasErrors(bean: observationInstance, field: 'habitat', 'error')}">
+
+							<label class="control-label" for="habitat"><g:message
+									code="observation.habitat.label" default="Habitat" /> </label>
+
+							<div class="controls">
+									<div id="habitat_div" class="btn-group" style="z-index: 2;">
+										<%
+                                                                            def defaultHabitatId = observationInstance?.habitat?.id
+																			def defaultHabitat = Habitat.read(defaultHabitatId);
+                                                                            def defaultHabitatIconFileName = (defaultHabitatId)? defaultHabitat.icon(ImageType.VERY_SMALL)?.fileName?.trim() : Habitat.findByName('All').icon(ImageType.VERY_SMALL)?.fileName?.trim()
+                                                                            def defaultHabitatValue = (defaultHabitatId) ? defaultHabitat.name : "Select habitat"
+                                                                    %>
+                                        <button id="selected_habitat"
+										class="btn btn-large dropdown-toggle" data-toggle="dropdown"
+										data-target="#habitat_div">
+										<img class="group_icon"
+												src="${createLinkTo(dir: 'images', file:defaultHabitatIconFileName, absolute:true)}" />
+
+											<span>
+												${defaultHabitatValue}
+											</span><span class="caret"></span>
+									</button>
+										
+										<ul id="habitat_options" class="dropdown-menu">
+
+											<g:each in="${species.Habitat.list()}" var="h">
+											<g:if
+												test="${!h.name.equals(grailsApplication.config.speciesPortal.group.ALL)}">
+												<li class="span2 habitat_option" value="${h.id}"><a><img
+														class="group_icon"
+														src="${createLinkTo(dir: 'images', file:h.icon(ImageType.VERY_SMALL)?.fileName?.trim(), absolute:true)}" />
+														<span title="${h.name}"> ${h.name} </span> </a>
+												</li>
+											</g:if>
+											</g:each>
+										</ul>
+
+
+										<div class="help-inline">
+											<g:hasErrors bean="${observationInstance}" field="habitat">
+												<g:message code="observation.habitat.not_selected" />
+											</g:hasErrors>
+										</div>
+									</div>
+								</div>
+								<input id="habitat_id" type="hidden" name="habitat_id"
+									value="${observationInstance?.habitat?.id}"></input>
+						</div>
+						
+						<div
+							class="row control-group ${hasErrors(bean: observationInstance, field: 'observedOn', 'error')}">
+
+							<label for="observedOn" class="control-label"><i
+								class="icon-calendar"></i>
+							<g:message code="observation.observedOn.label"
+									default="Observed on" /></label>
+
+							<div class="controls textbox">
+								<input name="observedOn" type="date" id="observedOn"
+									value="${observationInstance?.observedOn?.format('dd/MM/yyyy')}"
+									placeholder="Select date of observation (dd/MM/yyyy)" />
+								
+								<div class="help-inline">
+									<g:hasErrors bean="${observationInstance}" field="observedOn">
+									<g:if test="${observationInstance.observedOn == null}">
+										<g:message code="observation.observedOn.validator.invalid_date" />
+									</g:if>
+									<g:else>
+										<g:message code="observation.observedOn.validator.future_date" />
+									</g:else>
+										
+									</g:hasErrors>
+								</div>
+
+							</div>
+						</div>
+						</div>
+						<div class="span6" style="margin-left: -40px; width: 420px;">
+							<reco:create />
+						</div>
+
+						</div>
+
 
 					</div>
 				</div>
@@ -757,10 +738,10 @@ display: none;
        
         $("#help-identify input").click(function(){
                 if ($(this).is(':checked')){
-                    $('#nameContainer input').val('');
-                    $('#nameContainer input').attr('disabled', 'disabled');
+                    $('.nameContainer input').val('');
+                    $('.nameContainer input').attr('disabled', 'disabled');
                 }else{
-                    $('#nameContainer input').removeAttr('disabled');
+                    $('.nameContainer input').removeAttr('disabled');
                 }
         });
         

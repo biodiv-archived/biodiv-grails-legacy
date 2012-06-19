@@ -1237,3 +1237,9 @@ float: right;
 	height:38px;
 }
 
+h1, .main_heading .species_title .sci_name{
+	font-size:25px;
+}
+.main_heading .species_title .common_name{
+	font-size:12px;
+}
