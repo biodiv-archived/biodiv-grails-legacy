@@ -49,7 +49,9 @@ class XMLConverter extends SourceConverter {
 
 	public enum SaveAction {
 		MERGE("merge"),
-		OVERWRITE("overwrite");
+		OVERWRITE("overwrite"),
+		IGNORE("ignore");
+		
 		private String value;
 
 		SaveAction(String value) {
@@ -75,7 +77,7 @@ class XMLConverter extends SourceConverter {
 
 	public Species convertSpecies(Node species) {
 		//TODO default action to be merge
-		convertSpecies(species, SaveAction.OVERWRITE);
+		convertSpecies(species, SaveAction.IGNORE);
 	}
 
 	public Species convertSpecies(Node species, SaveAction defaultSaveAction) {
@@ -132,7 +134,7 @@ class XMLConverter extends SourceConverter {
 							//mergeSpecies(existingSpecies, s);
 							s = existingSpecies;
 						} else {
-							log.info "Ignoring species as a duplicate is already present and no action is specified : "+existingSpecies.id;
+							log.warn "Ignoring species as a duplicate is already present : "+existingSpecies.id;
 							return;
 						}
 					}
@@ -887,24 +889,37 @@ class XMLConverter extends SourceConverter {
 			RelationShip rel = getRelationship(n.relationship?.text());
 			if(rel) {
 				def cleanName = Utils.cleanName(n.text()?.trim());
-				def criteria = Synonyms.createCriteria();
-				Synonyms sfield = criteria.get {
-					ilike("name", cleanName);
-					eq("relationship", rel);
-					eq("taxonConcept", taxonConcept);
-				}
-
-				if(!sfield) {
-					log.debug "Saving synonym : "+cleanName;
-					sfield = new Synonyms();
-					sfield.name = cleanName;
-					sfield.relationship = rel;
-					sfield.taxonConcept = taxonConcept;
-					if(!sfield.save(flush:true)) {
-						sfield.errors.each { log.error it }
+				def parsedNames = namesParser.parse([cleanName]);
+				
+				if(parsedNames[0]?.canonicalForm) {
+					//TODO: IMP equality of given name with the one in db should include synonyms of taxonconcepts
+					//i.e., parsedName.canonicalForm == taxonomyDefinition.canonicalForm or Synonym.canonicalForm
+					def criteria = Synonyms.createCriteria();
+					Synonyms sfield = criteria.get {
+						ilike("canonicalForm", parsedNames[0].canonicalForm);
+						eq("relationship", rel);
+						eq("taxonConcept", taxonConcept);
 					}
+					if(!sfield) {
+						log.debug "Saving synonym : "+cleanName;
+						sfield = new Synonyms();
+						sfield.name = cleanName;
+						sfield.relationship = rel;
+						sfield.taxonConcept = taxonConcept;
+						
+						sfield.canonicalForm = parsedNames[0].canonicalForm;
+						sfield.normalizedForm = parsedNames[0].normalizedForm;;
+						sfield.italicisedForm = parsedNames[0].italicisedForm;;
+						sfield.binomialForm = parsedNames[0].binomialForm;;
+						
+						if(!sfield.save(flush:true)) {
+							sfield.errors.each { log.error it }
+						}
+					}
+					synonyms.add(sfield);
+				} else {
+					log.error "Ignoring synonym taxon entry as the name is not parsed : "+cleanName
 				}
-				synonyms.add(sfield);
 			} else {
 				log.warn "NOT A SUPPORTED RELATIONSHIP: "+n.relationship?.text();
 			}

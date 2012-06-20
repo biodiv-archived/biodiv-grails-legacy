@@ -13,15 +13,17 @@ import species.utils.ImageUtils;
 
 class Species {
 
-	String title;  
+	String title;   
 	String guid;
 	TaxonomyDefinition taxonConcept;
 	Resource reprImage;
 	Float percentOfInfo; 
 	Date updatedOn;
 	Date createdOn = new Date();
+	Date dateCreated;
+	Date lastUpdated;
 	
-	def grailsApplication; 
+	def grailsApplication;
 	
 	private static final log = LogFactory.getLog(this);
 	
