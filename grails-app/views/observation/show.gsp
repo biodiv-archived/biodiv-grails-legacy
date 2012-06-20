@@ -78,6 +78,14 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 	width: 290px;
 	padding:5px;
 }
+
+.btn .combobox-clear {
+    margin-top: 3px;
+}
+.btn .caret {
+    margin-top: 3px;
+}
+
 </style>
 </head>
 <body>

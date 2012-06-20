@@ -105,10 +105,15 @@ display: table !important;
 }
 
 input.dms_field {
-width: 19%;
-display: none;       
+	width: 19%;
+	display: none;       
 }
-
+.btn .combobox-clear {
+    margin-top: 12px;
+}
+.btn .caret {
+    margin-top: 18px;
+}
 </style>
 </head>
 <body>
@@ -370,7 +375,7 @@ display: none;
 				</div>
 
 
-				<div class="span12 super-section" style="clear: both">
+				<div class="span12 super-section" style="clear: both; margin-left: 0px;">
 					<div class="section">
 						<h3>Where did you find this observation?</h3>
 
@@ -489,7 +494,7 @@ display: none;
 	                </div>
 	            </div>    
       
-					<div class="span12 super-section"  style="clear: both">
+					<div class="span12 super-section"  style="clear: both; margin-left: 0px;">
 						<div class="section">
 							<h3>Describe your observation!</h3>
 							<div class="span6 block">
@@ -535,7 +540,7 @@ display: none;
 					</div>
 					</div>
 
-				<div class="span12" style="margin-top: 20px; margin-bottom: 40px;">
+				<div class="span12" style="margin-top: 20px; margin-bottom: 40px;margin-left: 0px;">
 					<g:if test="${observationInstance?.id}">
 						<div class="btn btn-danger"
 							style="float: right; margin-right: 5px;">

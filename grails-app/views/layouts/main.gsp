@@ -14,6 +14,9 @@
 	href="${resource(dir:'bootstrap/css',file:'bootstrap.min.css')}" />
 <link rel="stylesheet" type="text/css" media="all"
 	href="${resource(dir:'css',file:'jquery-ui.css')}" />
+<link rel="stylesheet"
+	href="${resource(dir:'css',file:'bootstrap-combobox.css')}"
+	type="text/css" media="all" />
 
 <!-- r:require module="jquery-ui" /-->
 

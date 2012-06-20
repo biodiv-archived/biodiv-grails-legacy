@@ -1,7 +1,5 @@
 <%@ page import="species.Language"%>
-<link rel="stylesheet"
-	href="${resource(dir:'css',file:'bootstrap-combobox.css')}"
-	type="text/css" media="all" />
+
 <style>
 .combobox-container {
 	position: absolute;
@@ -16,6 +14,7 @@
 .combobox-container .add-on {
 	position: absolute;
 	right: -26px;
+	height: 20px;
 }
 
 #addObservation .combobox-container .add-on {
