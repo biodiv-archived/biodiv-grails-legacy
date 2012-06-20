@@ -66,6 +66,7 @@ class Observation implements Taggable{
 	boolean isDeleted = false;
 	int flagCount = 0;
 	String searchText;
+	Recommendation maxVotedReco;
 	
 	static hasMany = [resource:Resource, recommendationVote:RecommendationVote];
 
@@ -73,6 +74,7 @@ class Observation implements Taggable{
 		notes nullable:true
 		searchText nullable:true;
 		maxVotedSpeciesName nullable:true
+		maxVotedReco nullable:true
 		resource validator : { val, obj -> val && val.size() > 0 }
 		observedOn validator : {val -> val < new Date()}
 		
@@ -111,7 +113,7 @@ class Observation implements Taggable{
 		return RecommendationVote.findByAuthorAndObservation(author, this);
 	}
 
-	Long findMaxRepeatedRecoId(){
+	private Recommendation findMaxRepeatedReco(){
 		//getting list of max repeated recoIds
 		def sql =  Sql.newInstance(dataSource);
 		def query = "select recoVote.recommendation_id as recoid, count(*) as votecount from recommendation_vote as recoVote where recoVote.observation_id = :obvId group by recoId order by votecount desc;"
@@ -130,20 +132,20 @@ class Observation implements Taggable{
 		}
 		
 		if(recoIds.size() == 1){
-			return recoIds[0]
+			return Recommendation.read(recoIds[0])
 		}
 		
 		//getting latest recoVote
 		query = "from RecommendationVote as recoVote where recoVote.observation = :observation and recoVote.recommendation.id in (:recoIds) order by recoVote.votedOn desc "
-		return RecommendationVote.find(query, [observation:this, recoIds:recoIds]).recommendation.id
+		return RecommendationVote.find(query, [observation:this, recoIds:recoIds]).recommendation
 	}
 	
 	void calculateMaxVotedSpeciesName(){
-		Long recoId = findMaxRepeatedRecoId(); 
-		if(!recoId){
+		maxVotedReco = findMaxRepeatedReco(); 
+		if(!maxVotedReco){
 			maxVotedSpeciesName = "Unknown";
 		}else{
-			maxVotedSpeciesName = Recommendation.get(recoId).name
+			maxVotedSpeciesName = maxVotedReco.name
 		}
 		
 		if(!save(flush:true)){
@@ -153,16 +155,15 @@ class Observation implements Taggable{
 	}
 	
 	String fetchSuggestedCommonNames(){
-		Long recoId = findMaxRepeatedRecoId();
-		if(!recoId){
+		if(!maxVotedReco){
 			return "";
 		}else{
-			return fetchSuggestedCommonNames(recoId);
+			return fetchSuggestedCommonNames(maxVotedReco.id, false);
 		}
 	}
 	
 	
-	private String fetchSuggestedCommonNames(recoId){
+	private String fetchSuggestedCommonNames(recoId, boolean addLanguage){
 		def englistId = Language.getLanguage(null)
 		Set engCommonNameList = []
 		Set otherCNList = []
@@ -170,10 +171,11 @@ class Observation implements Taggable{
 			if(rv.recommendation.id == recoId){
 				def cnReco = rv.commonNameReco
 				if(cnReco){
+					String langSuffix = (addLanguage)? (":" + Language.read((cnReco.languageId)?:englistId).name) : ""
 					if(cnReco.languageId == englistId){
-						engCommonNameList << cnReco.name
+						engCommonNameList << (cnReco.name + langSuffix)
 					}else{
-						otherCNList << cnReco.name
+						otherCNList << (cnReco.name + langSuffix)
 					}
 				}
 			}
@@ -216,8 +218,8 @@ class Observation implements Taggable{
 			def map = reco.getRecommendationDetails(this);
 			map.put("noOfVotes", recoVote[1]);
 			map.put("obvId", this.id);
-			String cNames = fetchSuggestedCommonNames(reco.id)
-			map.put("commonNames", (cNames == "")?:"(" + cNames + ")");
+			String cNames = fetchSuggestedCommonNames(reco.id, true)
+			map.put("commonNames", (cNames == "")?"":"(" + cNames + ")");
 			result.add(map);
 		}
 		return ['recoVotes':result, 'totalVotes':this.recommendationVote.size(), 'uniqueVotes':getRecommendationCount()];
@@ -262,6 +264,10 @@ class Observation implements Taggable{
 		if(!save(flush:true)){
 			this.errors.allErrors.each { log.error it }
 		}
+	}
+	
+	String fetchSpeciesCall(){
+		return maxVotedReco ? maxVotedReco.name : "Unknown"
 	}
 	
 }

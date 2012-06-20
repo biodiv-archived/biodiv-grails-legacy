@@ -125,7 +125,7 @@ def updateNonStandardReco(languagesFile){
 		
 	}
 	
-	storedObvId.each{
+	Observation.findAllByIsDeleted(false).each{
 		def observationInstance = Observation.get(it)
 		//update species call
 		observationInstance.calculateMaxVotedSpeciesName();
@@ -133,7 +133,6 @@ def updateNonStandardReco(languagesFile){
 		//update solr
 		//ss.publishSearchIndex(observationInstance, true);	
 	}
-	
 }
 
 def findReco(name, isSciName){

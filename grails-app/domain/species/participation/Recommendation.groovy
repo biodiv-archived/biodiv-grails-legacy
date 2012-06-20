@@ -38,6 +38,7 @@ class Recommendation {
    def getRecommendationDetails(Observation obv) {
 	   def map = [:]
 	   map.put("recoId", this.id);
+	   map.put("isScientificName", isScientificName);
 	   
 	   if(this?.taxonConcept) {
 		   map.put("speciesId", this?.taxonConcept?.findSpeciesId());

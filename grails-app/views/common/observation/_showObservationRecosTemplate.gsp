@@ -35,8 +35,12 @@
 						<g:link controller="species" action="show" id="${r.speciesId}">
 							<i> ${r.canonicalForm} </i>
 						</g:link>
-					</g:if> <g:else>
-						<i> ${r.name} </i>
+					</g:if>
+					<g:elseif test="${r.isScientificName}">
+						<i>${r.name}</i>
+					</g:elseif>
+					<g:else>
+						${r.name}
 					</g:else>${r.commonNames} </span>
 				<obv:showRecoComment
 					model="['recoComments':r.recoComments, 'recoId': r.recoId]" />

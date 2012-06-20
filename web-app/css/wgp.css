@@ -260,7 +260,9 @@ height: 60px;
 }
 
 .section {
-margin:20px;    
+	margin:20px;
+	position: relative; 
+	overflow: visible;    
 }
 
 .section label, .user .section label {
@@ -704,6 +706,11 @@ padding-right: 10px;
 
 .tags-tools {
     padding-bottom: 10px;
+}
+
+.licence_div {
+	z-index:4;
+	cursor:pointer;
 }
 
 .licence_div img {
@@ -1196,7 +1203,8 @@ background-color: whiteSmoke;
 }
 
 .sidebar-section {
-width: 420px;
+width: 450px;
+margin:0px 0px 20px -10px;
 float: right;       
 }
 
@@ -1241,5 +1249,5 @@ h1, .main_heading .species_title .sci_name{
 	font-size:25px;
 }
 .main_heading .species_title .common_name{
-	font-size:12px;
+	font-size:19px;
 }
