@@ -87,7 +87,7 @@
 
 #help-identify {
 	height: 0;
-    left: 300px;
+    left: 139px;
     padding: 0;
     position: relative;
     top: -35px;
@@ -365,6 +365,14 @@ input.dms_field {
 						</div>
 						</div>
 						<div class="span6" style="margin-left: -40px; width: 420px;">
+						<g:if
+							test="${observationInstance?.maxVotedSpeciesName == 'Unknown' || observationInstance?.maxVotedSpeciesName == null}">
+							<div id="help-identify" class="control-label">
+								<label class="checkbox" style="text-align: left;"> <input
+									type="checkbox" name="help_identify" /> Help identify </label>
+							</div>
+						</g:if>
+						
 							<reco:create />
 						</div>
 
@@ -372,10 +380,10 @@ input.dms_field {
 
 
 					</div>
-				</div>
+				
 
 
-				<div class="span12 super-section" style="clear: both; margin-left: 0px;">
+				<div class="span12 super-section" style="clear: both;">
 					<div class="section">
 						<h3>Where did you find this observation?</h3>
 
@@ -494,7 +502,7 @@ input.dms_field {
 	                </div>
 	            </div>    
       
-					<div class="span12 super-section"  style="clear: both; margin-left: 0px;">
+				<div class="span12 super-section"  style="clear: both;">
 						<div class="section">
 							<h3>Describe your observation!</h3>
 							<div class="span6 block">
@@ -540,7 +548,7 @@ input.dms_field {
 					</div>
 					</div>
 
-				<div class="span12" style="margin-top: 20px; margin-bottom: 40px;margin-left: 0px;">
+				<div class="span12" style="margin-top: 20px; margin-bottom: 40px;">
 					<g:if test="${observationInstance?.id}">
 						<div class="btn btn-danger"
 							style="float: right; margin-right: 5px;">
@@ -552,7 +560,9 @@ input.dms_field {
 					</g:if>
 					<a id="addObservationSubmit" class="btn btn-primary"
 						style="float: right; margin-right: 5px;"> ${form_button_val} </a>
-				</div></div>
+				</div>
+				
+				
 
             </form>
            

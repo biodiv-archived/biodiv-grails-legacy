@@ -191,16 +191,6 @@ $(document).ready(function() {
 </div>
 
 
-<g:if
-	test="${observationInstance?.maxVotedSpeciesName == 'Unknown' || observationInstance?.maxVotedSpeciesName == null}">
-	<div id="help-identify" class="control-label">
-		<label class="checkbox" style="text-align: left;"> <input
-			type="checkbox" name="help_identify"
-			style="width: auto; height: auto; margin-left: -14px;" /> Help
-			identify
-		</label>
-	</div>
-</g:if>
 
 <script>
 	$(document).ready(function() {
