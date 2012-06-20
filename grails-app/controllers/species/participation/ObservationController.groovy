@@ -829,6 +829,13 @@ class ObservationController {
 				if(existingRecVote.recommendation.id == reco.id){
 					log.debug " Same recommendation already made by user " + author.id +  " reco name " + reco.name + " leaving as it is"
 					def msg = "${message(code: 'reco.vote.duplicate.message', args: [reco.name])}"
+					if(existingRecVote.commonNameReco != commonNameReco){
+						log.debug "Updating recoVote as ommon name changed"
+						existingRecVote.commonNameReco = commonNameReco;
+						if(!existingRecVote.save(flush:true)){
+							existingRecVote.errors.allErrors.each { log.error it }
+						}
+					}
 					return [recVote:null, msg:msg]
 				}else{
 					log.debug " Overwriting old recommendation vote for user " + author.id +  " new reco name " + reco.name + " old reco name " + existingRecVote.recommendation.name

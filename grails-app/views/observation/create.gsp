@@ -71,7 +71,7 @@
 .block {
 	border-radius: 5px;
 	background-color: #a6dfc8; 
-	margin: 3px;
+	margin: 0px;
 }
 
 .block label {
@@ -90,7 +90,7 @@
     left: 139px;
     padding: 0;
     position: relative;
-    top: -35px;
+    top: -25px;
 }
 
 .left-indent {
@@ -160,12 +160,11 @@ input.dms_field {
 				class="form-horizontal">
 
 				<div class="span12 super-section" style="clear: both;">
-					<div class="span11 section"
-						style="position: relative; overflow: visible;">
+					<div class="section">
 						<h3>What did you observe?</h3>
 
 
-						<div class="span11 section">
+						<div>
 							<i class="icon-picture"></i><span>Upload photos of a
 								single observation and species</span>
 							<div
@@ -232,7 +231,7 @@ input.dms_field {
 								</div>
 							</div>
 						</div>
-						<div class="span6">
+						<div class="span6" style="margin:0px";>
 						<div class="row control-group ${hasErrors(bean: observationInstance, field: 'group', 'error')}">
 
 							<label for="group" class="control-label"><g:message
@@ -364,7 +363,7 @@ input.dms_field {
 							</div>
 						</div>
 						</div>
-						<div class="span6" style="margin-left: -40px; width: 420px;">
+						<div class="span6 sidebar-section map_section" style="margin-top:-5px;">
 						<g:if
 							test="${observationInstance?.maxVotedSpeciesName == 'Unknown' || observationInstance?.maxVotedSpeciesName == null}">
 							<div id="help-identify" class="control-label">
@@ -372,7 +371,6 @@ input.dms_field {
 									type="checkbox" name="help_identify" /> Help identify </label>
 							</div>
 						</g:if>
-						
 							<reco:create />
 						</div>
 
@@ -387,7 +385,7 @@ input.dms_field {
 					<div class="section">
 						<h3>Where did you find this observation?</h3>
 
-						<div class="span6">
+						<div class="span6" style="margin:0px";>
 						
 
 							<div class="row control-group">
@@ -478,7 +476,7 @@ input.dms_field {
 	                        </div>
 	                  
 	                </div>
-	                	<div class="sidebar-section section map_section" style="padding:0; margin:0;">
+	                	<div class=" span6 sidebar-section section map_section" style="padding:0;">
                                     <div class="map_search">
                                             <div id="geotagged_images" style="padding:10px;">
                                                     <div class="title" style="display: none">Use location
@@ -523,7 +521,7 @@ input.dms_field {
 								</div>
 							</div>
 
-							<div class="sidebar-section block">
+							<div class="span6 block sidebar-section" style="margin:0px 0px 20px -10px;">
 								<h5><label><i
 									class="icon-tags"></i>Tags <small><g:message code="observation.tags.message" default="" /></small></label>
 								</h5>
@@ -537,7 +535,7 @@ input.dms_field {
 							</div>
 							
 							<sUser:isFBUser>
-								<div class="span5 block control-group">
+								<div class="span6 sidebar-section block" style="margin-left:-10px;">
 									<div class="create_tags" >
 										<label class="checkbox" > <g:checkBox style="margin-left:0px;"
 												name="postToFB" />
@@ -592,7 +590,7 @@ input.dms_field {
 				
 	    <div class='metadata prop' style="position:relative; left: 5px; top:-40px;">
 	        <input name="file_{{=i}}" type="hidden" value='{{=file}}'/>
-                <div id="license_div_{{=i}}" class="licence_div btn-group" style="z-index:2;cursor:pointer;">
+                <div id="license_div_{{=i}}" class="licence_div btn-group">
                     <div id="selected_license_{{=i}}" onclick="$(this).next().show();" class="btn dropdown-toggle btn-mini" data-toggle="dropdown">
                         <div>
                             <img src="${resource(dir:'images/license',file:'cc_by.png', absolute:true)}" title="Set a license for this image"/>

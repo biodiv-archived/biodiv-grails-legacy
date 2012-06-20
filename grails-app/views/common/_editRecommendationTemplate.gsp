@@ -124,9 +124,9 @@ $(document).ready(function() {
 	</div>
 </g:hasErrors>
 
-<div class="row control-group ">
+<div class="row control-group " style="margin-top:5px;">
 	<label for="recommendationVote" class="control-label"> <g:message
-			code="observation.recommendationVote.label" default="Species name" />
+			code="observation.recommendationVote.label" default="Scientific name" />
 	</label>
 	<div class="controls">
 		<div class="textbox nameContainer">

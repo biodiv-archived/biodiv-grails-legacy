@@ -11,5 +11,5 @@ import species.Language
 
 def s = ctx.getBean("setupService");
 println "=============== started == "
-s.updateLanguageRegion(grailsApplication.config.speciesPortal.data.rootDir+"/templates/Language_iso639-2_withRegion.csv");
+s.updateLanguageRegion("/home/sandeept/dbmig/pambaMig/Language_iso639-2_withRegion.csv");
 println "=================== done =="
