@@ -59,6 +59,7 @@ def updateStandardReco(){
 }
 
 def updateNonStandardReco(languagesFile){
+	
 	def cs = ctx.getBean("curationService");
 	def ss = ctx.getBean("observationsSearchService");
 	
@@ -93,13 +94,17 @@ def updateNonStandardReco(languagesFile){
 		
 		def oldName = fields[2]?.replaceAll("\"","")?.trim()
 		
-		def sciName = fields[4]?.replaceAll("\"","")?.trim()
+		def sciName = fields[5]?.replaceAll("\"","")?.trim()
 		sciName = (sciName && sciName != "") ?  Utils.cleanName(sciName) : null
 		
 		def commonName = fields[3]?.replaceAll("\"","")?.trim()
 		commonName = (commonName && commonName != "") ? Utils.cleanName(commonName) : null
 
-		def comment = fields[5]?.replaceAll("\"","")?.trim()
+		def langName = fields[4]?.replaceAll("\"","")?.trim()
+		langName = (langName && langName != "") ?  langName : null
+		
+		
+		def comment = fields[6]?.replaceAll("\"","")?.trim()
 		comment = (comment && comment != "") ? comment : null
 		
 		
@@ -113,11 +118,11 @@ def updateNonStandardReco(languagesFile){
 		Recommendation sciReco, commonNameReco
 		
 		if(commonName){
-			commonNameReco = findReco(commonName, false)
+			commonNameReco = findReco(commonName, false, langName)
 		}
 		
 		if(sciName){
-			sciReco = findReco(sciName, true)
+			sciReco = findReco(sciName, true, null)
 			updateRecoVoteReferances(sciReco, commonNameReco, oldReco, cs, comment);
 		}else{
 			updateRecoVoteReferances(commonNameReco, commonNameReco, oldReco, cs, comment);
@@ -125,20 +130,23 @@ def updateNonStandardReco(languagesFile){
 		
 	}
 	
-	Observation.findAllByIsDeleted(false).each{
-		def observationInstance = Observation.get(it)
+	def obvList = Observation.findAllByIsDeleted(false)
+	println "============ obvList  $obvList"
+	obvList.each{
+		def observationInstance = it
 		//update species call
 		observationInstance.calculateMaxVotedSpeciesName();
 		
-		//update solr
-		//ss.publishSearchIndex(observationInstance, true);	
+			
 	}
+	//update solr
+	//ss.publishSearchIndex(obvList, true);
 }
 
-def findReco(name, isSciName){
+def findReco(name, isSciName, langName){
 	def reco = Recommendation.findByNameIlikeAndIsScientificName(name, isSciName);
 	if(!reco){
-		def langId = (isSciName) ? null : Language.getLanguage(null).id
+		def langId = (isSciName) ? null : Language.getLanguage(langName).id
 		reco = new Recommendation(name:name, isScientificName:isSciName, languageId:langId)
 		if(!reco.save(flush:true)){
 			reco.errors.each { println it; }
@@ -153,7 +161,7 @@ def updateRecoVoteReferances(Recommendation sciReco, Recommendation commonNameRe
 	rVotes.each{ rVote ->
 		rVote.recommendation = sciReco
 		rVote.commonNameReco = commonNameReco
-		rVote.comment = comment
+		//rVote.comment = comment
 		if(!rVote.save(flush:true)){
 			rVote.errors.each { println it; }
 		}
@@ -163,8 +171,8 @@ def updateRecoVoteReferances(Recommendation sciReco, Recommendation commonNameRe
 }
 
 def migrate(){
-	//updateStandardReco()
-	updateNonStandardReco("/home/sandeept/dbmig/3.txt")
+	updateStandardReco()
+	//updateNonStandardReco("/home/sandeept/dbmig/pambaMig/Recommendation_pamba_obvId.csv")
 }
 
 migrate()
