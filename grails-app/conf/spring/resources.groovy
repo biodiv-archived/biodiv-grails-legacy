@@ -24,15 +24,15 @@ import speciespage.FacebookAuthService;
 beans = {
 	def conf = SpringSecurityUtils.securityConfig;
 	
-//	authenticationSuccessHandler(species.auth.AjaxAwareAuthenticationSuccessHandler) {
-//		requestCache = ref('requestCache')
-//		defaultTargetUrl = conf.successHandler.defaultTargetUrl // '/'
-//		alwaysUseDefaultTargetUrl = conf.successHandler.alwaysUseDefault // false
-//		targetUrlParameter = conf.successHandler.targetUrlParameter // 'spring-security-redirect'
-//		ajaxSuccessUrl = conf.successHandler.ajaxSuccessUrl // '/login/ajaxSuccess'
-//		useReferer = true // false
-//		redirectStrategy = ref('redirectStrategy')
-//	}
+	authenticationSuccessHandler(species.auth.AjaxAwareAuthenticationSuccessHandler) {
+		requestCache = ref('requestCache')
+		defaultTargetUrl = conf.successHandler.defaultTargetUrl // '/'
+		alwaysUseDefaultTargetUrl = conf.successHandler.alwaysUseDefault // false
+		targetUrlParameter = conf.successHandler.targetUrlParameter // 'spring-security-redirect'
+		ajaxSuccessUrl = conf.successHandler.ajaxSuccessUrl // '/login/ajaxSuccess'
+		useReferer = true // false
+		redirectStrategy = ref('redirectStrategy')
+	}
 
 	userDetailsService(OpenIdUserDetailsService) {
 		grailsApplication = ref('grailsApplication')
