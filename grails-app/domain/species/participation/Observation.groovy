@@ -164,26 +164,60 @@ class Observation implements Taggable{
 	
 	
 	private String fetchSuggestedCommonNames(recoId, boolean addLanguage){
-		def englistId = Language.getLanguage(null)
-		Set engCommonNameList = []
-		Set otherCNList = []
+		def englistId = Language.getLanguage(null).id
+		Map langToCommonName = new HashMap()
 		this.recommendationVote.each{ rv ->
 			if(rv.recommendation.id == recoId){
 				def cnReco = rv.commonNameReco
 				if(cnReco){
-					String langSuffix = (addLanguage)? (":" + Language.read((cnReco.languageId)?:englistId).name) : ""
-					if(cnReco.languageId == englistId){
-						engCommonNameList << (cnReco.name + langSuffix)
-					}else{
-						otherCNList << (cnReco.name + langSuffix)
+					def cnLangId = (cnReco.languageId != null)?(cnReco.languageId):englistId
+					def nameList = langToCommonName.get(cnLangId)
+					if(!nameList){
+						nameList = new HashSet()
+						langToCommonName[cnLangId] = nameList
 					}
+					nameList.add(cnReco.name)	
 				}
 			}
-			
 		}
-		return engCommonNameList.join(", ") +  otherCNList.join(", ")
+		
+		return getFormattedCommonNames(langToCommonName, addLanguage)
 	}
 	
+	private String getFormattedCommonNames(Map langToCommonName, boolean addLanguage){
+		if(langToCommonName.isEmpty()){
+			return ""
+		}
+		
+		def englishId = Language.getLanguage(null).id
+		def englishNames = langToCommonName.remove(englishId)
+		
+		def cnList = []
+		
+		langToCommonName.keySet().each{ key ->
+			def lanSuffix = langToCommonName.get(key).join(", ")
+			if(addLanguage){
+				lanSuffix = Language.read(key).name + " : " + lanSuffix
+			}
+			cnList << lanSuffix
+		}
+		
+		//adding english names in front if its availabel
+		def engNamesString = null
+		if(englishNames){
+			engNamesString = englishNames.join(", ")
+			if(addLanguage){
+				engNamesString = Language.read(englishId).name + " : " + engNamesString				
+			}
+		}
+		
+		if(engNamesString){
+			cnList.add(0, engNamesString);
+		}
+		
+		return cnList.join("; ")
+		
+	}
 
 	/**
 	 * 

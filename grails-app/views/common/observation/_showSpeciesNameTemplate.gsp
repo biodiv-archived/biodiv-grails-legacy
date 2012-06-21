@@ -14,13 +14,13 @@
 				<i>
 					${sName}
 				</i>
+			<div class="common_name">
+				${observationInstance.fetchSuggestedCommonNames()}
+			</div>
 			</g:if>
 			<g:else>
 				${sName}
 			</g:else>
-		</div>
-		<div class="common_name">
-			${observationInstance.fetchSuggestedCommonNames()}
 		</div>
 	</g:else>
 </div>
