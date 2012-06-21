@@ -1062,4 +1062,18 @@ class ObservationController {
 	def getFilteredLanguage = {
 		render species.Language.filteredList() 
 	}
+	
+	///////////////////////////////////////////////////////////////////////////////
+	////////////////////////////// json API ////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////
+	
+	@Secured(['ROLE_USER'])
+	def getObv = {
+		render Observation.read(params.id.toLong()) as JSON
+	} 
+	
+	@Secured(['ROLE_USER'])
+	def getList = {
+		render getObservationList(params) as JSON
+	}
 }
