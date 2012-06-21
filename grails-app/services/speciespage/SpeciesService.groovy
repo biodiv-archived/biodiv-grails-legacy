@@ -65,18 +65,20 @@ class SpeciesService {
 //		String mappingFile = grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/keystone/keystone_mapping_v1.xlsx";
 //		noOfInsertions += uploadKeyStoneData("jdbc:mysql://localhost:3306/ezpz", "sravanthi", "sra123", mappingFile, 0, 0);
 
-		grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/speciespageszip/mango/mango";
-		noOfInsertions += uploadSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/speciespageszip/mango/mango/MangoMangifera_indica_prabha_v4 (copy).xlsx", 0, 0, 1, 4);
+//		grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/speciespageszip/mango/mango";
+//		noOfInsertions += uploadSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/speciespageszip/mango/mango/MangoMangifera_indica_prabha_v4 (copy).xlsx", 0, 0, 1, 4);
+//
+//		grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/speciespageszip/grey_falcolin";
+//		noOfInsertions += uploadSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/speciespageszip/grey_falcolin/GreyFrancolin_v4.xlsx", 0, 0, 1, 4);
+//
+//		grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/Rufous Woodpecker/images";
+//		noOfInsertions += uploadNewSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/Rufous Woodpecker/RufousWoodepecker_v4_1.xlsm");
+//
+//		grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/Eurasian Curlew/png ec";
+//		noOfInsertions += uploadNewSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/Eurasian Curlew/EurasianCurlew_v4_2.xlsm");
 
-		grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/speciespageszip/grey_falcolin";
-		noOfInsertions += uploadSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/speciespageszip/grey_falcolin/GreyFrancolin_v4.xlsx", 0, 0, 1, 4);
-
-		grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/Rufous Woodpecker/images";
-		noOfInsertions += uploadNewSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/Rufous Woodpecker/RufousWoodepecker_v4_1.xlsm");
-
-		grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/Eurasian Curlew/png ec";
-		noOfInsertions += uploadNewSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/Eurasian Curlew/EurasianCurlew_v4_2.xlsm");
-
+		noOfInsertions += uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/zoooutreach/uploadready/primates.xlsx", grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/zoooutreach/uploadready/primates_mappingfile.xls", 0, 0, 0, 0);
+		
 		return noOfInsertions;
 	}
 
@@ -147,18 +149,23 @@ class SpeciesService {
 	int saveSpecies(List species) {
 		log.info "Saving species : "+species.size()
 		int noOfInsertions = 0;
+		def addedSpecies = [];
 		def startTime = System.currentTimeMillis()
 		List <Species> batch =[]
 		species.each {
 			batch.add(it);
 			if(batch.size() > BATCH_SIZE){
-				noOfInsertions += saveSpeciesBatch(batch);
+				def newlyAddedSpecies = saveSpeciesBatch(batch);
+				noOfInsertions += newlyAddedSpecies.size();
+				addedSpecies.addAll(newlyAddedSpecies);
 				batch.clear();
 				return
 			}
 		}
 		if(batch.size() > 0) {
-			noOfInsertions += saveSpeciesBatch(batch);
+			def newlyAddedSpecies = saveSpeciesBatch(batch);
+			noOfInsertions += newlyAddedSpecies.size();
+			addedSpecies.addAll(newlyAddedSpecies);
 			batch.clear();
 		}
 
@@ -167,14 +174,14 @@ class SpeciesService {
 		//log.debug "Publishing to search index"
 
 		try {
-			speciesSearchService.publishSearchIndex(species);
+			speciesSearchService.publishSearchIndex(addedSpecies);
 		} catch(e) {
 			e.printStackTrace()
 		}
 
 		cleanUpGorm();
 
-		//postProcessSpecies(species);
+		postProcessSpecies(addedSpecies);
 
 		return noOfInsertions;
 	}
@@ -184,23 +191,31 @@ class SpeciesService {
 	 * @param batch
 	 * @return
 	 */
-	private int saveSpeciesBatch(List<Species> batch) {
+	private List saveSpeciesBatch(List<Species> batch) {
 		int noOfInsertions = 0;
+		List<Species> addedSpecies = [];
 		Species.withTransaction {
 			for(Species s in batch) {
-				//externalLinksService.updateExternalLinks(s.taxonConcept);
+				try {
+					externalLinksService.updateExternalLinks(s.taxonConcept);
+				} catch(e) {
+					e.printStackTrace()
+				}
+				
 				s.percentOfInfo = calculatePercentOfInfo(s);
+				
 				if(!s.save()) {
 					s.errors.allErrors.each { log.error it }
 				} else {
 					noOfInsertions++;
+					addedSpecies.add(s);
 				}
 			}
 		}
 		log.debug "Saved batch with insertions : "+noOfInsertions
 		//TODO : probably required to clear hibernate cache
 		//Reference : http://naleid.com/blog/2009/10/01/batch-import-performance-with-grails-and-mysql/
-		return noOfInsertions;
+		return addedSpecies;
 	}
 
 	/**
@@ -216,7 +231,6 @@ class SpeciesService {
 		s.title = s.taxonConcept.italicisedForm;
 		s.guid = converter.constructGUID(s);
 
-
 		return s;
 	}
 
@@ -227,13 +241,13 @@ class SpeciesService {
 	def postProcessSpecies(List<Species> species) {
 		//TODO: got to move this to the end of taxon creation
 		try{
-			groupHandlerService.updateGroups(species);
+			//groupHandlerService.updateGroups(species);
 		} catch(e) {
 			e.printStackTrace()
 		}
 
 		try{
-			namesLoaderService.syncNamesAndRecos(false);
+			//namesLoaderService.syncNamesAndRecos(false);
 		} catch(e) {
 			e.printStackTrace()
 		}

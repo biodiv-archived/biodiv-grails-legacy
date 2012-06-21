@@ -50,6 +50,7 @@ class RegisterController extends grails.plugins.springsecurity.ui.RegisterContro
 	
 	def register = { CustomRegisterCommand command ->
 
+		log.debug "Registering user $command"
 		if (springSecurityService.isLoggedIn()) {
 			redirect uri: SpringSecurityUtils.securityConfig.successHandler.defaultTargetUrl
 			return;
@@ -138,7 +139,7 @@ class RegisterController extends grails.plugins.springsecurity.ui.RegisterContro
 		if (!user) {
 			flash.error = message(code: 'spring.security.ui.register.badCode')
 			redirect uri: defaultTargetUrl
-			return
+			return	
 		}
 
 		springSecurityService.reauthenticate user."$usernamePropertyName"

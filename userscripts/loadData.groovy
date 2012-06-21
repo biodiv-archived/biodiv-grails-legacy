@@ -3,8 +3,8 @@ import org.codehaus.groovy.grails.commons.ApplicationHolder;
 import speciespage.SpeciesService;
 import speciespage.SetupService;
 
-def s = ctx.getBean("setupService");
-s.uploadHabitats();
+//def s = ctx.getBean("setupService");
+//s.uploadHabitats();
 def speciesService = ctx.getBean("speciesService");
 
 //grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/speciespageszip/mango/mango";
@@ -34,3 +34,6 @@ def speciesService = ctx.getBean("speciesService");
 //grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/keystone";
 //String mappingFile = grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/keystone/keystone_mapping_v1.xlsx";
 //speciesService.uploadKeyStoneData("jdbc:mysql://localhost:3306/ezpz", "sravanthi", "sra123", mappingFile, 0, 0);
+
+//speciesService.uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/zoooutreach/uploadready/primates.xlsx", grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/zoooutreach/uploadready/primates_mappingfile.xls", 0, 0, 0, 0);
+speciesService.uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/zoooutreach/uploadready/smallmammals.xls", grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/zoooutreach/uploadready/smallmammals_mappingfile.xls", 0, 0, 0, 0);

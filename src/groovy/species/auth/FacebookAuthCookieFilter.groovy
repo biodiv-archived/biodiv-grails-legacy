@@ -88,10 +88,17 @@ class FacebookAuthCookieFilter extends GenericFilterBean implements ApplicationE
                     logger.info("Invalid cookie, skip. Message was: $e.message")
                 }
             } else {
-                logger.debug("No auth cookie")
+				if(!cookie) {
+					logger.warn("No auth cookie");
+				}
+				if(!fbLoginCookie) {
+					logger.warn("No fb_login cookie");
+				}
+				logger.debug("Found following cookies");
+				request.cookies.each { logger.debug it.name+":"+it.value }
             }
         } else {
-            logger.debug("SecurityContextHolder not populated with FacebookAuthToken token, as it already contained: $SecurityContextHolder.context.authentication");
+            logger.debug("SecurityContextHolder not populated with FacebookAuthToken token , as it already contained: $SecurityContextHolder.context.authentication");
         }
 
         //when not authenticated, don't have auth cookie or bad credentials
