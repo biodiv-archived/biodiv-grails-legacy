@@ -1076,4 +1076,63 @@ class ObservationController {
 	def getList = {
 		render getObservationList(params) as JSON
 	}
+	
+	@Secured(['ROLE_USER'])
+	def getHabitatList = {
+		def res = new HashMap()
+			Habitat.list().each {
+			res[it.id] = it.name
+		
+		}
+		render res as JSON
+	}
+	
+	@Secured(['ROLE_USER'])
+	def getGroupList = {
+		def res = new HashMap()
+		SpeciesGroup.list().each {
+			res[it.id] = it.name
+		
+		}
+		render res as JSON
+	}
+	
+	@Secured(['ROLE_USER'])
+	def getThumbObvImage = {
+		def mainImage = Observation.read(params.id.toLong()).mainImage()
+		def imagePath = mainImage?mainImage.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.thumbnail.suffix): null
+		render imagePath 
+	}
+	
+	@Secured(['ROLE_USER'])
+	def getFullObvImage = {
+		def mainImage = Observation.read(params.id.toLong()).mainImage()
+		def gallImagePath = mainImage?mainImage.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.gallery.suffix):null
+		render gallImagePath
+	}
+	
+	
+	@Secured(['ROLE_USER'])
+	def getUserImage = {
+		render SUser.read(params.id.toLong()).icon() 
+		
+	}
+	
+	@Secured(['ROLE_USER'])
+	def getUserInfo = {
+		def res = new HashMap()
+		def u = SUser.read(params.id.toLong())
+		res["id"] = u.id
+		res["aboutMe"] = u.aboutMe
+		res["dateCreated"] =  u.dateCreated
+		res["email"] = u.email
+		res["lastLoginDate"] = u.lastLoginDate
+		res["location"] = u.location 
+		res["name"] = u.name
+		res["username"] = u.username
+		res["website"] = u.website
+		render res as JSON
+	}
+	
+	
 }
