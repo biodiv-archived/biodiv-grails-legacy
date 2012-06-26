@@ -1,5 +1,4 @@
 <%@ page import="org.grails.taggable.Tag"%>
-<%@ page import="species.participation.Observation"%>
 <div class="view_tags">
 	<g:if test="${tags}">
 		<ul class="tagit">
@@ -18,7 +17,7 @@
 		if((${isAjaxLoad?:'false'} == 'false') || (!${isAjaxLoad?1:0})){
 			 $("li.tagit-choice").click(function(){
 			 	var tg = $(this).contents().first().text();
-	         	window.location.href = "${g.createLink(controller:'observation', action: 'list')}?tag=" + tg ;
+	         	window.location.href = "${g.createLink(action: 'list')}?tag=" + tg ;
 	         });
          }
 	})

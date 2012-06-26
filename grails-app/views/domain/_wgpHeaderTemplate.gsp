@@ -1,13 +1,13 @@
 <div id="wgp-header" class="header" style="display:none;">
     <!-- Logo -->
-      <div id="logo" class="span3">
+      <div class="span3">
         <a href="/">
-          <img id="wg_logo" alt="western ghats" src="/sites/all/themes/wg/images/map-logo.gif">
+          <img class="logo" alt="western ghats" src="/sites/all/themes/wg/images/map-logo.gif">
         </a>
       </div>
     <!-- Logo ends -->
 
-    <div id="top_nav_bar" class="span7">
+    <div class="span7 top_nav_bar">
     <ul>
     <li onclick="location.href='/biodiv/species/list'" title="Species" id="species_nav_link">Species</li>
     <li onclick="location.href='/biodiv/observation/list'" title="Observations" id="species_nav_link">Observations</li>

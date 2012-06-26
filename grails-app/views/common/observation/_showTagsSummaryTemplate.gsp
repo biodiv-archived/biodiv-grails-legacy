@@ -1,4 +1,3 @@
-<%@ page import="species.participation.Observation"%>
 <div class="view_tags">
 	<g:if test="${tags}">
                 <i class="icon-tags"></i> Tags

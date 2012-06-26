@@ -444,7 +444,7 @@ class ObservationService {
 		}
 		
 		def sql =  Sql.newInstance(dataSource);
-		String query = "select t.name as name, count(t.name) as obv_count from tag_links as tl, tags as t, observation obv where t.name in ('" +  tagNames.join("', '") + "') and tl.tag_ref = obv.id and obv.is_deleted = false and t.id = tl.tag_id group by t.name order by count(t.name) desc, t.name asc limit " + tagsLimit;
+		String query = "select t.name as name, count(t.name) as obv_count from tag_links as tl, tags as t, observation obv where t.name in ('" +  tagNames.join("', '") + "') and tl.tag_ref = obv.id and tl.type = '"+Observation.getClass().getName().toLowerCase()+"' and obv.is_deleted = false and t.id = tl.tag_id group by t.name order by count(t.name) desc, t.name asc limit " + tagsLimit;
 
 		sql.rows(query).each{
 			tags[it.getProperty("name")] = it.getProperty("obv_count");
@@ -460,7 +460,7 @@ class ObservationService {
 		}
 
 		def sql =  Sql.newInstance(dataSource);
-		String query = "select t.name as name, count(t.name) as obv_count from tag_links as tl, tags as t, observation obv where tl.tag_ref in " + getIdList(obvIds)  + " and tl.tag_ref = obv.id and obv.is_deleted = false and t.id = tl.tag_id group by t.name order by count(t.name) desc, t.name asc limit " + tagsLimit;
+		String query = "select t.name as name, count(t.name) as obv_count from tag_links as tl, tags as t, observation obv where tl.tag_ref in " + getIdList(obvIds)  + " and tl.tag_ref = obv.id and tl.type = '"+Observation.getClass().getName().toLowerCase()+"' and obv.is_deleted = false and t.id = tl.tag_id group by t.name order by count(t.name) desc, t.name asc limit " + tagsLimit;
 
 		sql.rows(query).each{
 			tags[it.getProperty("name")] = it.getProperty("obv_count");
@@ -508,7 +508,7 @@ class ObservationService {
 			filterQuery +=  " and obv.id = tagLink.tagRef and tagLink.type = :tagType and tagLink.tag.name = :tag "
 
 			queryParams["tag"] = params.tag
-			queryParams["tagType"] = 'observation'
+			queryParams["tagType"] = Observation.getClass().getName().getLowerCase();
 			activeFilters["tag"] = params.tag
 		}
 
@@ -552,8 +552,10 @@ class ObservationService {
 			query = mapViewQuery + filterQuery + orderByClause
 		} else {
 			query += filterQuery + orderByClause
-			queryParams["max"] = max
-			queryParams["offset"] = offset
+			if(max != -1)
+				queryParams["max"] = max
+			if(offset != -1)
+				queryParams["offset"] = offset
 		}
 
 		def observationInstanceList = Observation.executeQuery(query, queryParams)
@@ -615,7 +617,12 @@ class ObservationService {
 				mailSubject = "Share User Profile"
 				activitySource = "user profile"
 				break
-			
+				
+			case "userGroupList":
+				mailSubject = "Share Groups List"
+				activitySource = "userGroup List"
+				break
+				
 			default:
 				log.debug "invalid source type"
 		}

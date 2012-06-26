@@ -2,6 +2,7 @@ package species.auth
 
 import species.Resource;
 import species.Resource.ResourceType;
+import species.groups.UserGroup;
 import species.utils.ImageType;
 
 class SUser {
@@ -29,7 +30,8 @@ class SUser {
 	boolean hideEmailId = true;
 	boolean allowIdentifactionMail = true;
 	
-	static hasMany = [openIds: OpenID]
+	static hasMany = [openIds: OpenID, groups:UserGroup]
+	static belongsTo = [UserGroup]
 
 	static constraints = {
 		username blank: false

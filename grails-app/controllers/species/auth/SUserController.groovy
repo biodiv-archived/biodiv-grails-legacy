@@ -42,7 +42,7 @@ class SUserController extends UserController {
 		def model = getUsersList(params);
 		
 		// add query params to model for paging
-			for (name in [
+		for (name in [
 			'username',
 			'enabled',
 			'accountExpired',
@@ -106,7 +106,7 @@ class SUserController extends UserController {
 			if (!user) user = findById()
 			if (!user) return
 
-				return buildUserModel(user)
+			return buildUserModel(user)
 		}
 		flash.message = "${message(code: 'edit.denied.message')}";
 		redirect (action:'show', id:params.id)

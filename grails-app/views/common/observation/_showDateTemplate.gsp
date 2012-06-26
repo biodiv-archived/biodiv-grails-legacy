@@ -6,9 +6,12 @@
 			serverDate =  observationInstance.createdOn
 		else if(propertyName == "observedOn")
 			serverDate =  observationInstance.observedOn
-		else
+		else if(propertyName == "lastRevised")
 			serverDate =  observationInstance.lastRevised
+		else if(propertyName == "foundedOn")
+			serverDate =  userGroupInstance.foundedOn
 	 %>
+	 <g:if test="${serverDate}">
 	<g:if test="${(new Date()).minus(serverDate)}">
 		<g:formatDate date="${serverDate}" type="datetime" style="LONG" timeStyle="SHORT"/>
 	</g:if>
@@ -41,5 +44,6 @@
 	%>
 		${timeString}
 	</g:else>
+	</g:if>
 </div>
 

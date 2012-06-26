@@ -7,6 +7,7 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
@@ -14,12 +15,14 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
+import species.auth.SUser;
+
 class Utils {
 
 	private static final log = LogFactory.getLog(this);
-	
+
 	def grailsApplication;
-	
+
 	static boolean copy(File src, File dst) throws IOException {
 		try {
 			InputStream inS = new FileInputStream(src);
@@ -72,25 +75,25 @@ class Utils {
 			if (ServletFileUpload.isMultipartContent(request)) {
 				//TODO
 				/*
-				FileItemFactory factory = new DiskFileItemFactory();
-				ServletFileUpload upload = new ServletFileUpload(factory);
-				Iterator items = upload.parseRequest(request).iterator();
-				while (items.hasNext()) {
-					FileItem thisItem = (FileItem) items.next();
-					if (thisItem.isFormField()) {
-						params[thisItem.getFieldName()] = thisItem.getString();
-					}
-				}*/
-//				println request.multiFileMap;
-//				CommonsMultipartResolver res = new CommonsMultipartResolver();
-//				request = res.resolveMultipart(request);
-//				request.getParameterMap().each { fieldName, files ->
-//					if (files.size() == 1) {
-//						params.put(fieldName, files.first())
-//					} else {
-//						params.put(fieldName, files)
-//					}
-//				}
+				 FileItemFactory factory = new DiskFileItemFactory();
+				 ServletFileUpload upload = new ServletFileUpload(factory);
+				 Iterator items = upload.parseRequest(request).iterator();
+				 while (items.hasNext()) {
+				 FileItem thisItem = (FileItem) items.next();
+				 if (thisItem.isFormField()) {
+				 params[thisItem.getFieldName()] = thisItem.getString();
+				 }
+				 }*/
+				//				println request.multiFileMap;
+				//				CommonsMultipartResolver res = new CommonsMultipartResolver();
+				//				request = res.resolveMultipart(request);
+				//				request.getParameterMap().each { fieldName, files ->
+				//					if (files.size() == 1) {
+				//						params.put(fieldName, files.first())
+				//					} else {
+				//						params.put(fieldName, files)
+				//					}
+				//				}
 			} else {
 				request.getParameterNames().each {
 					params[it] = request.getParameter(it)
@@ -100,7 +103,7 @@ class Utils {
 			e.printStackTrace();
 		}
 	}
-	
+
 	static String getDomain(HttpServletRequest httpServletRequest) {
 		// maybe we are behind a proxy
 		String header = httpServletRequest.getHeader("X-Forwarded-Host");
@@ -120,7 +123,7 @@ class Utils {
 		def domain = getDomain(request);
 		return "$request.scheme://$domain$request.contextPath";
 	}
-	
+
 	static String getDomainName(HttpServletRequest request) {
 		def domain = getDomain(request);
 		if(domain.startsWith("thewesternghats.in")) {
@@ -130,14 +133,53 @@ class Utils {
 		}
 		return "";
 	}
-	
+
 	static boolean isURL(String str) {
 		try {
 			URL url = new URL(str);
-		  } catch (MalformedURLException e) {
+		} catch (MalformedURLException e) {
 			return false;
-		  }
-		  return true;
+		}
+		return true;
+	}
+
+
+	static Map getUnBlockedMailList(String userIdsAndEmailIds, request) {
+		Map result = new HashMap();
+		userIdsAndEmailIds.split(",").each{
+			String candidateEmail = it.trim();
+			if(candidateEmail.isNumber()){
+				SUser user = SUser.get(candidateEmail.toLong());
+				candidateEmail = user.email.trim();
+				if(user.allowIdentifactionMail){
+					result[candidateEmail] = generateLink("observation", "unsubscribeToIdentificationMail", [email:candidateEmail, userId:user.id], request) ;
+				}else{
+					log.debug "User $user.id has unsubscribed for identification mail."
+				}
+			}else{
+				if(BlockedMails.findByEmail(candidateEmail)){
+					log.debug "Email $candidateEmail is unsubscribed for identification mail."
+				}else{
+					result[candidateEmail] = generateLink("observation", "unsubscribeToIdentificationMail", [email:candidateEmail], request) ;
+				}
+			}
+		}
+		return result;
+	}
+
+	static List getUsersList(String userIdsAndEmailIds) {
+		List result = [];
+		userIdsAndEmailIds.trim().split(",").each{
+			String candidateEmail = it.trim();
+			if(candidateEmail) {
+				if(candidateEmail.isNumber()){
+					result.add(SUser.get(candidateEmail.toLong()));
+				} else{
+					result.add(SUser.findByEmail(candidateEmail.toLong()));
+				}
+			}
+		}
+		return result;
 	}
 }
 

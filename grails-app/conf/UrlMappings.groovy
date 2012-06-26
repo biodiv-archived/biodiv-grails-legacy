@@ -28,7 +28,12 @@ class UrlMappings {
 
 		"/"(controller:"observation", action:"list")
 		"500"(view:'/error')
-		
+		"403"(view:'/error')
+/*		"403"(controller: "errors", action: "error403")
+		"500"(controller: "errors", action: "error500")
+		"500"(controller: "errors", action: "error403", exception: AccessDeniedException)
+		"500"(controller: "errors", action: "error403", exception: NotFoundException)
+*/		
 		"/static/$path"(controller:"species", action:"staticContent")
 		
 	}

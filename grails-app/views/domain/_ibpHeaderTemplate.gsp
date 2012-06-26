@@ -1,8 +1,8 @@
 <div id="ibp-header" class="header gradient-bg" style="display:none;">
     <!-- Logo -->
-      <div id="logo" class="span3">
+      <div class="span3">
         <a href="/">
-          <img id="ibp_logo" alt="western ghats" src="/sites/all/themes/ibp/images/map-logo.gif">
+          <img class="logo" alt="western ghats" src="/sites/all/themes/ibp/images/map-logo.gif">
         </a>
       </div>
     <!-- Logo ends -->

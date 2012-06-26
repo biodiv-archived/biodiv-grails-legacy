@@ -509,7 +509,7 @@ display: none;
 	            </div>    
       
 					<div class="span12 super-section"  style="clear: both">
-						<div class="section">
+						<div class="section" style="position: relative; overflow: visible;">
 							<h3>Describe your observation!</h3>
 							<div class="span6 block">
 								<!--label for="notes"><g:message code="observation.notes.label" default="Notes" /></label-->
@@ -551,6 +551,7 @@ display: none;
 									</div>
 								</div>
 							</sUser:isFBUser>
+							
 					</div>
 					</div>
 
@@ -780,7 +781,7 @@ display: none;
 		
 		$(".tagit-hiddenSelect").css('display','none');
 
-                $('#use_dms').click(function(){
+        $('#use_dms').click(function(){
                 if ($('#use_dms').is(':checked')) {
                     $('.dms_field').fadeIn();
                     $('.degree_field').hide();
@@ -788,7 +789,7 @@ display: none;
                     $('.dms_field').hide();
                     $('.degree_field').fadeIn();
                 }
-                });
+        });
 	});
 
 

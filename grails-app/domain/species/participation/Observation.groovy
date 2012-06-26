@@ -13,6 +13,7 @@ import species.Contributor;
 import species.Resource;
 import species.auth.SUser;
 import species.groups.SpeciesGroup;
+import species.groups.UserGroup;
 
 class Observation implements Taggable{
 
@@ -66,7 +67,8 @@ class Observation implements Taggable{
 	int flagCount = 0;
 	String searchText;
 	
-	static hasMany = [resource:Resource, recommendationVote:RecommendationVote];
+	static hasMany = [resource:Resource, recommendationVote:RecommendationVote, userGroups:UserGroup];
+	static belongsTo = [UserGroup];
 
 	static constraints = {
 		notes nullable:true
@@ -248,6 +250,15 @@ class Observation implements Taggable{
 		lastRevised = new Date();
 		if(!save(flush:true)){
 			this.errors.allErrors.each { log.error it }
+		}
+	}
+	
+	def setUserGroups (List userGroups) {
+		userGroups.each {
+			def userGroup = UserGroup.read(Long.parseLong(it+""));
+			if(userGroup) {
+				this.addToUserGroups(userGroup)
+			}
 		}
 	}
 	

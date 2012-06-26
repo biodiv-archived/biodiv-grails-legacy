@@ -210,7 +210,11 @@ speciesPortal {
 		//serverURL = "http://localhost/${appName}/observations"
 		MAX_IMAGE_SIZE = 104857600
 	}
-
+	userGroups {
+		rootDir = "${app.rootDir}/userGroups"
+		serverURL = "http://localhost/${appName}/userGroups"
+		//serverURL = "http://localhost/${appName}/userGroups"
+	}
 	names.parser.serverURL = "saturn.strandls.com"
 	names.parser.port = 4334
 	search {
@@ -420,6 +424,11 @@ environments {
 				serverURL = "http://wgp.saturn.strandls.com/${appName}/observations"
 				//serverURL = "http://localhost/${appName}/observations"
 			}
+			userGroups {
+				rootDir = "${app.rootDir}/userGroups"
+				serverURL = "http://wgp.saturn.strandls.com/${appName}/userGroups"
+				//serverURL = "http://localhost/${appName}/observations"
+			}
 			search.serverURL="http://saturn.strandls.com:8080/solr"
 			grails.project.war.file = "/data/jetty-6.1.26/webapps/${appName}.war"
 			grails {
@@ -468,7 +477,10 @@ environments {
 			observations {
 				rootDir = "${app.rootDir}/observations"
 				serverURL = "http://thewesternghats.in/${appName}/observations"
-				//serverURL = "http://localhost/${appName}/observations"
+			}
+			userGroups {
+				rootDir = "${app.rootDir}/userGroups"
+				serverURL = "http://thewesternghats.in/${appName}/userGroups"
 			}
 			search.serverURL="http://thewesternghats.in:8080/solr"
 			grails {
@@ -516,7 +528,13 @@ navigation.observation_dashboard = [
 navigation.users_dashboard = [
 	[controller:'species', title:'Species Gallery', order:1, action:"list"],
 	[controller:'observation', title:'Browse Observations', order:1, action:'list'],	
+	[controller:'userGroup', title:'Groups', order:20, action:'list'],
 	[controller:'SUser', title:'Users', order:20, action:'list']
+]
+
+navigation.user_group_dashboard = [
+	[controller:'userGroup', title:'Browse Groups', order:1, action:'list'],
+    [controller:'userGroup', title:'Create New Group', order:10, action:"create"],
 ]
 
 navigation.dashboard = [
@@ -797,6 +815,26 @@ If you do not want to receive notifications please go to your <a href="$userProf
 <br/>
 -The portal team'''
 
+grails.plugins.springsecurity.ui.userGroup.inviteMember.emailSubject = 'Request to join the group'
+grails.plugins.springsecurity.ui.userGroup.inviteMember.emailBody = '''
+Hi $username,<br/>
+<br/>
+$user has invited you to be member of the group <a href="$groupUrl">$group</a> on <b>$domain</b>.<br/>
+<br/>
+If you do not want to receive notifications please go to your <a href="$userProfileUrl">user profile</a> and switch it off.<br/>
+<br/>
+-The portal team'''
+
+grails.plugins.springsecurity.ui.userGroup.inviteFounder.emailSubject = 'Request to be founder of the group'
+grails.plugins.springsecurity.ui.userGroup.inviteFounder.emailBody = '''
+Hi $username,<br/>
+<br/>
+$user has invited you to be founder of the group <a href="$groupUrl">$group</a> on <b>$domain</b>.<br/>
+<br/>
+If you do not want to receive notifications please go to your <a href="$userProfileUrl">user profile</a> and switch it off.<br/>
+<br/>
+-The portal team'''
+
 grails.plugins.springsecurity.ui.encodePassword = false
 
 grails.plugins.springsecurity.useSecurityEventListener = true
@@ -817,3 +855,11 @@ grails.plugins.springsecurity.onInteractiveAuthenticationSuccessEvent = { e, app
 }
 
 grails.plugins.springsecurity.openid.registration.requiredAttributes = [email: 'http://axschema.org/contact/email', location: 'http://axschema.org/contact/country/home',firstname:'http://axschema.org/namePerson/first', lastname: 'http://axschema.org/namePerson/last', profilePic:'http://axschema.org/media/image/default']
+
+//TODO:Need to change
+grails.plugins.springsecurity.useRunAs = true
+grails.plugins.springsecurity.runAs.key = 'run-asKey'
+
+grails.plugins.springsecurity.acl.authority.modifyAuditingDetails = 'ROLE_ADMIN'//'ROLE_ACL_MODIFY_AUDITING'
+grails.plugins.springsecurity.acl.authority.changeOwnership =       'ROLE_RUN_AS_ACL_USERGROUP_FOUNDER'
+grails.plugins.springsecurity.acl.authority.changeAclDetails =      'ROLE_ADMIN'//'ROLE_ACL_CHANGE_DETAILS'

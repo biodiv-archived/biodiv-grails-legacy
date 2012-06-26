@@ -116,4 +116,8 @@ class SUserTagLib {
 			out<< body();
 		}
 	}
+	
+	def selectUsers = { attrs, body->
+		out << render(template:"/common/suser/selectUsersTemplate", model:attrs.model);
+	}
 }

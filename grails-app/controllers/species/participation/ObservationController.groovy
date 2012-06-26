@@ -23,6 +23,7 @@ import org.apache.solr.common.SolrException;
 import org.apache.solr.common.util.NamedList
 
 class ObservationController {
+	
 
 	private static final String OBSERVATION_ADDED = "observationAdded";
 	private static final String SPECIES_RECOMMENDED = "speciesRecommended";
@@ -40,7 +41,7 @@ class ObservationController {
 	def observationsSearchService;
 	def namesIndexerService;
 
-	static allowedMethods = [update: "POST", delete: "POST"]
+	static allowedMethods = [save:"POST", update: "POST", delete: "POST"]
 
 	def index = {
 		redirect(action: "list", params: params)
@@ -61,7 +62,7 @@ class ObservationController {
 		def model = getObservationList(params);
 		if(!params.isGalleryUpdate?.toBoolean()){
 			render (view:"list", model:model)
-		}else{
+		} else{
 			def obvListHtml =  g.render(template:"/common/observation/showObservationListTemplate", model:model);
 			def obvFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
 
@@ -129,9 +130,11 @@ class ObservationController {
 					params.obvId = observationInstance.id
 
 					def tags = (params.tags != null) ? Arrays.asList(params.tags) : new ArrayList();
-
 					observationInstance.setTags(tags);
 
+					def userGroups = (params.userGroups != null) ? Arrays.asList(params.userGroups) : new ArrayList();
+					observationInstance.setUserGroups(userGroups);
+										
 					sendNotificationMail(OBSERVATION_ADDED, observationInstance, request);
 					params["createNew"] = true
 					chain(action: 'addRecommendationVote', model:['chainedParams':params]);
@@ -166,6 +169,9 @@ class ObservationController {
 					params.obvId = observationInstance.id
 					def tags = (params.tags != null) ? Arrays.asList(params.tags) : new ArrayList();
 					observationInstance.setTags(tags);
+
+					def userGroups = (params.userGroups != null) ? Arrays.asList(params.userGroups) : new ArrayList();
+					observationInstance.setUserGroups(userGroups);
 
 					//redirect(action: "show", id: observationInstance.id)
 					params["createNew"] = true
@@ -892,11 +898,12 @@ class ObservationController {
 			render (['error':"Coudn't find the specified observation with id $params.obvId"] as JSON);
 		}
 	}
+	
 	@Secured(['ROLE_USER'])
 	def sendIdentificationMail = {
 		log.debug params;
 		def currentUserMailId = springSecurityService.currentUser?.email;
-		Map emailList = getUnBlockedMailList(params.userIdsAndEmailIds, request);
+		Map emailList = Utils.getUnBlockedMailList(params.userIdsAndEmailIds, request);
 		if(emailList.isEmpty()){
 			log.debug "No valid email specified for identification."
 		}else if (Environment.getCurrent().getName().equalsIgnoreCase("pamba") || Environment.getCurrent().getName().equalsIgnoreCase("saturn")) {
@@ -916,28 +923,7 @@ class ObservationController {
 		render (['success:true']as JSON);
 	}
 
-	private Map getUnBlockedMailList(String userIdsAndEmailIds, request){
-		Map result = new HashMap();
-		userIdsAndEmailIds.split(",").each{
-			String candidateEmail = it.trim();
-			if(candidateEmail.isNumber()){
-				SUser user = SUser.get(candidateEmail.toLong());
-				candidateEmail = user.email.trim();
-				if(user.allowIdentifactionMail){
-					result[candidateEmail] = generateLink("observation", "unsubscribeToIdentificationMail", [email:candidateEmail, userId:user.id], request) ;
-				}else{
-					log.debug "User $user.id has unsubscribed for identification mail."
-				}
-			}else{
-				if(BlockedMails.findByEmail(candidateEmail)){
-					log.debug "Email $candidateEmail is unsubscribed for identification mail."
-				}else{
-					result[candidateEmail] = generateLink("observation", "unsubscribeToIdentificationMail", [email:candidateEmail], request) ;
-				}
-			}
-		}
-		return result;
-	}
+	
 
 	///////////////////////////////////////////////////////////////////////////////
 	////////////////////////////// SEARCH /////////////////////////////////////////

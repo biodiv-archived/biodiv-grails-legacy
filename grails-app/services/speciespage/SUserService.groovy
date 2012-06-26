@@ -89,7 +89,7 @@ class SUserService extends SpringSecurityUiService {
 				String findByField = securityConf.authority.nameField[0].toUpperCase() + securityConf.authority.nameField.substring(1)
 				def auth = Authority."findBy${findByField}"(roleName)
 				if (auth) {
-					log.debug "Assigning role $auth"
+					log.debug "Assigning role $auth to user $user"
 					PersonRole.create(user, auth)
 				} else {
 					log.error("Can't find authority for name '$roleName'")
