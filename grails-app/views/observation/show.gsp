@@ -73,9 +73,19 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 	float: left;
 }
 
-#name {
-	width: 91%;
+.textbox input{
+	text-align: left;
+	width: 290px;
+	padding:5px;
 }
+
+.btn .combobox-clear {
+    margin-top: 3px;
+}
+.btn .caret {
+    margin-top: 3px;
+}
+
 </style>
 </head>
 <body>
@@ -95,10 +105,10 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 
 				<div class="page-header clearfix">
 					<div style="width:100%;">
-						<h1 class="span8">
+						<div class="span8 main_heading">
 							<obv:showSpeciesName
 								model="['observationInstance':observationInstance]" />
-						</h1>
+						</div>
 					<div style="float:right;">
 						<sUser:ifOwns model="['user':observationInstance.author]">
 							
@@ -185,13 +195,13 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 							<form id="addRecommendation" name="addRecommendation"
 								action="${createLink(controller:'observation', action:'addRecommendationVote')}"
 								method="GET" class="form-horizontal">
-								
+								<div class="reco-input">
 								<reco:create
 									model="['recommendationInstance':recommendationInstance]" />
 								<input type="hidden" name='obvId'
 									value="${observationInstance.id}" /> <input type="submit"
 									value="Add" class="btn" style="position: relative;top: -28px;float: right;" />
-								
+								</div>
 							</form>
 						
 						</div>
@@ -318,6 +328,7 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 				}, 
 	            success: function(data, statusText, xhr, form) {
 	            	showRecos(data, null);
+	            	$('#canName').val('');
 	            	return false;
 	            },
 	            error:function (xhr, ajaxOptions, thrownError){

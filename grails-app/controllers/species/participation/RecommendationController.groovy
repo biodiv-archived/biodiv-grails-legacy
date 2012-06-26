@@ -119,9 +119,7 @@ class RecommendationController {
         }
     }
 	
-	
 	def suggest = {
 		render namesIndexerService.suggest(params) as JSON;
 	}
-	
 }

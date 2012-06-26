@@ -15,6 +15,9 @@ class Record implements Comparable<Record>, Serializable {
 	String icon;
 	int wt = 0;
 	String canonicalForm;
+	boolean isScientificName;
+	//if record represent common name then languageId is useful
+	Long languageId;
 	
 	int compareTo(Record r) {
 		if(this.equals(r)) return 0;

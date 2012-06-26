@@ -16,10 +16,12 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 import species.auth.SUser;
+import species.NamesParser;
 
 class Utils {
 
 	private static final log = LogFactory.getLog(this);
+	private static final NamesParser namesParser = new NamesParser();
 
 	def grailsApplication;
 
@@ -68,6 +70,10 @@ class Utils {
 		name = cleanName(name);
 		name = name.replaceAll("[^\\x20-\\x7e]", "");	//removing all non ascii characters
 		return name;
+	}
+	
+	static String getCanonicalForm(String name){
+		return namesParser.parse([name])?.get(0)?.canonicalForm
 	}
 
 	static void populateHttpServletRequestParams(ServletRequest request, Map params) {

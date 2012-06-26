@@ -86,6 +86,7 @@ class XMLConverter extends SourceConverter {
 
 		try {
 			log.info "Creating/Updating species"
+			log.debug species;
 			s = new Species();
 
 			removeInvalidNode(species);
@@ -116,7 +117,7 @@ class XMLConverter extends SourceConverter {
 
 					//either overwrite or merge if an existing species exists
 					if(existingSpecies) {
-						if(defaultSaveAction == SaveAction.OVERWRITE){
+						if(defaultSaveAction == SaveAction.OVERWRITE || existingSpecies.percentOfInfo == 0){
 							log.info "Deleting old version of species : "+existingSpecies.id;
 							try {
 								s.id = existingSpecies.id;
