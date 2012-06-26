@@ -1,8 +1,7 @@
 <%@ page
 	import="species.participation.RecommendationVote.ConfidenceType"%>
 <!-- TODO change this r:script which is used by resources framework for script not to be repeated multiple times -->
-<g:javascript>
-
+<script>
 $(document).ready(function() {
 
 	//TODO : global variables ... may be problematic
@@ -16,7 +15,7 @@ $(document).ready(function() {
 					response( cache[ term ] );
 					return;
 				}
-
+				request.nameFilter = "scientificNames";
 				lastXhr = $.getJSON( "${createLink(controller:'recommendation', action: 'suggest')}", request, function( data, status, xhr ) {
 					cache[ term ] = data;
 					if ( xhr === lastXhr ) {
@@ -32,11 +31,10 @@ $(document).ready(function() {
 			select: function( event, ui ) {
 				$( "#name" ).val( ui.item.label.replace(/<.*?>/g,"") );
 				$( "#canName" ).val( ui.item.value );
-				//$( "#name-description" ).html( ui.item.value ? ui.item.label.replace(/<.*?>/g,"")+" ("+ui.item.value+")" : "" );
-				//ui.item.icon ? $( "#name-icon" ).attr( "src",  ui.item.icon).show() : $( "#name-icon" ).hide();
+				$("#mappedRecoNameForcanName").val(ui.item.label.replace(/<.*?>/g,""));
 				return false;
 			},open: function(event, ui) {
-				$("#nameSuggestions ul").removeAttr('style').css({'display': 'block'}); 
+				$("#nameSuggestions ul").removeAttr('style').css({'display': 'block','width':'300px'}); 
 			}
 	}).data( "catcomplete" )._renderItem = function( ul, item ) {
 			ul.removeClass().addClass("dropdown-menu")
@@ -56,12 +54,84 @@ $(document).ready(function() {
 					.appendTo( ul );
 			}
 		};
-});
-</g:javascript>
+		
+		$("#commonName").catcomplete({
+			appendTo:"#commonNameSuggestions",
+		 	source:function( request, response ) {
+				var term = request.term;
+				if ( term in cache ) {
+					response( cache[ term ] );
+					return;
+				}
+				request.nameFilter = "commonNames";
+				lastXhr = $.getJSON( "${createLink(controller:'recommendation', action: 'suggest')}", request, function( data, status, xhr ) {
+					cache[ term ] = data;
+					if ( xhr === lastXhr ) {
+						response( data );
+					}
+				});
+			},focus: function( event, ui ) {
+				$( "#commonName" ).val( ui.item.label.replace(/<.*?>/g,"") );
+				$("#commonNameSuggestions li a").css('border', 0);
+				return false;
+			},select: function( event, ui ) {
+				$( "#commonName" ).val( ui.item.label.replace(/<.*?>/g,"") );
+				$( "#canName" ).val( ui.item.value );
+				$( "#name" ).val( ui.item.value );
+				if(ui.item.languageName !== null){
+					$("#languageComboBox").val(ui.item.languageName).attr("selected",true);
+					$("#languageComboBox").data('combobox').refresh();
+				}
+				return false;
+			},open: function(event, ui) {
+				$("#commonNameSuggestions ul").removeAttr('style').css({'display': 'block','width':'300px'}); 
+			}
+	}).data( "catcomplete" )._renderItem = function( ul, item ) {
+			ul.removeClass().addClass("dropdown-menu")
+			if(item.category == "General") {
+				return $( "<li class='span3'></li>" )
+					.data( "item.autocomplete", item )
+					.append( "<a>" + item.label + "</a>" )
+					.appendTo( ul );
+			} else {
+				if(!item.icon) {
+					item.icon =  "${resource(dir:'images',file:'no-image.jpg', absolute:true)}"
+                                            //${createLinkTo(dir: 'images/', file:"no-image.jpg", base:grailsApplication.config.speciesPortal.resources.serverURL)}
+								}
+								return $("<li class='span3'></li>")
+										.data("item.autocomplete", item)
+										.append("<a title='"+ item.label.replace(/<.*?>/g, "")+ "'><img src='"+ item.icon+ "' class='group_icon' style='float:left; background:url("+ item.icon+ " no-repeat); background-position:0 -100px; width:50px; height:50px;opacity:0.4;'/>"+ item.label+ ((item.desc) ? '<br>('+ item.desc+ ')': '')+ ((item.languageName) ? '<br>('+ item.languageName+ ')': '') + "</a>")
+										.appendTo(ul);
+							}
+						};
 
+						$("#name")
+								.keypress(
+										function() {
+											//console.log("=== saved val " + $("#mappedRecoNameForcanName").val() + "  newVal  " + $("#name").val()); 
+											if ($("#mappedRecoNameForcanName")
+													.val() !== $("#name").val()) {
+												$("#canName").val('');
+											}
+										});
 
-<div class="btn-group">
-	<%
+					});
+</script>
+
+<g:hasErrors bean="${recommendationVoteInstance}">
+	<div class="alert alert-error">
+		<g:renderErrors bean="${observationInstance}" as="list" />
+	</div>
+</g:hasErrors>
+
+<div class="row control-group " style="margin-top:5px;">
+	<label for="recommendationVote" class="control-label"> <g:message
+			code="observation.recommendationVote.label" default="Scientific name" />
+	</label>
+	<div class="controls">
+		<div class="textbox nameContainer">
+
+			<%
 		def species_name = ""
 		//showing vote added by creator of the observation
 		if(params.action == 'edit' || params.action == 'update'){
@@ -71,24 +141,57 @@ $(document).ready(function() {
 			//species_name = observationInstance?.maxVotedSpeciesName
 		}
 	%>
-	<input type="text" name="recoName" id="name" value="${species_name}"
-		placeholder='Suggest a species name'
-		class="input-xlarge ${hasErrors(bean: recommendationInstance, field: 'name', 'errors')} ${hasErrors(bean: recommendationVoteInstance, field: 'recommendation', 'errors')}" />
+			<input type="text" name="recoName" id="name" value="${species_name}"
+				placeholder='Suggest a scientific name'
+				class="input-xlarge ${hasErrors(bean: recommendationInstance, field: 'name', 'errors')} ${hasErrors(bean: recommendationVoteInstance, field: 'recommendation', 'errors')}" />
+			<input type="hidden" name="canName" id="canName" />
+			<div id="nameSuggestions" style="display: block;"></div>
 
-	<input type="hidden" name="canName" id="canName" />
-
-	<div id="nameSuggestions" style="display: block;"></div>
-<%--	<div>--%>
-<%--		<a id="reco-action" data-toggle="dropdown" href="#">Comment</a>--%>
-<%----%>
-<%--		<div id="reco-options" style="display: none">--%>
-<%--			<input type="text" name="recoComment" id="recoComment"--%>
-<%--				placeholder="Write comment" style="width: 80%"></input><br /> <input--%>
-<%--				class="btn btn-mini" style="top:5px;" type="button" value="cancel"--%>
-<%--				onclick="cancelRecoComment();return false;"></input>--%>
-<%--		</div>--%>
-<%--	</div>--%>
+		</div>
+	</div>
 </div>
+
+
+
+<div class="row control-group ">
+	<label for="recommendationVote" class="control-label"> <g:message
+			code="observation.recommendationVote.label" default="Common name" />
+	</label>
+	<div class="controls">
+		<div class="nameContainer textbox" style="position:relative;">
+			
+			<input type="text" name="commonName" id="commonName"
+				value="${species_name}" placeholder='Suggest a common name'
+				class="input-xlarge ${hasErrors(bean: recommendationInstance, field: 'name', 'errors')} ${hasErrors(bean: recommendationVoteInstance, field: 'recommendation', 'errors')}" />
+			<input type="hidden" id="mappedRecoNameForcanName" />
+			
+			<div style="width:90px;">
+			<s:chooseLanguage />
+			</div>
+			<div id="commonNameSuggestions" style="display: block;"></div>
+
+		</div>
+	</div>
+</div>
+
+
+<div class="row control-group ">
+	<label for="recommendationVote" class="control-label"> <g:message
+			code="observation.recommendationVote.label" default="Comment" />
+	</label>
+	<div class="controls">
+		<div class="nameContainer textbox">
+
+			<input type="text" name="recoComment" id="recoComment"
+				class="input-xlarge ${hasErrors(bean: recommendationInstance, field: 'name', 'errors')} ${hasErrors(bean: recommendationVoteInstance, field: 'recommendation', 'errors')}"
+				placeholder="Write comment"></input>
+
+		</div>
+	</div>
+</div>
+
+
+
 <script>
 	$(document).ready(function() {
 		$('#recoComment').val('');
@@ -99,12 +202,11 @@ $(document).ready(function() {
 		});
 	});
 
-	function cancelRecoComment(){
+	function cancelRecoComment() {
 		$('#recoComment').val('');
 		$('#reco-options').hide();
 		$('#reco-action').show();
 	}
-	
 </script>
 <style>
 #reco-options {
@@ -122,7 +224,7 @@ $(document).ready(function() {
 	margin: 0;
 	min-width: 400px;
 	max-width: 400px;
-	width : 400px;
+	width: 400px;
 	padding: 10px;
 	top: 100%;
 	z-index: 1000;
@@ -134,4 +236,16 @@ $(document).ready(function() {
 	top: 0;
 	right: 0;
 }
+
+.nameContainer {
+	position:relative;
+}
+
+#nameSuggestions {
+	width:290px;
+}
+#commonName {
+	width:200px;
+}
+
 </style>

@@ -31,6 +31,7 @@ class RecommendationVote {
 	Date votedOn = new Date();
 	float userWeight;
 	String comment;
+	Recommendation commonNameReco;
 	
 	static belongsTo = [observation:Observation];
 	
@@ -38,6 +39,7 @@ class RecommendationVote {
 		author(unique:['observation']);
 		votedOn validator : {val -> val < new Date()};
 		confidence(nullable:true);
+		commonNameReco nullable:true, blank: true;
 		comment nullable:true, blank: true;
 		comment (size:0..400);
 	}

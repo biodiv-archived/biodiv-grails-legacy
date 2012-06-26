@@ -27,9 +27,9 @@
                 $(document).ready(function() {
                   var latlng = new google.maps.LatLng(${observationInstance.latitude}, ${observationInstance.longitude});
                   var options = {
-                    zoom: 4,
+                    zoom: 13,
                     center: latlng,
-                    mapTypeId: google.maps.MapTypeId.ROADMAP
+                    mapTypeId: google.maps.MapTypeId.HYBRID
                   };
                   var map = new google.maps.Map(document.getElementById("map_canvas_${observationInstance.id}"), options);
                   var marker = new google.maps.Marker({

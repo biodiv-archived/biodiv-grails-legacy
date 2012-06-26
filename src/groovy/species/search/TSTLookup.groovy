@@ -50,7 +50,7 @@ class TSTLookup<E> extends Lookup<E> implements Serializable {
 	 * @param num
 	 * @return
 	 */
-	List<LookupResult> lookup(String key, boolean onlyMorePopular, int num) {
+	List<LookupResult> lookup(String key, boolean onlyMorePopular, int num, String nameFilter) {
 		List<TernaryTreeNode> list = autocomplete.prefixCompletion(root, key, 0);
 		key = key.toLowerCase();
 		//println "-----------------"
@@ -68,6 +68,13 @@ class TSTLookup<E> extends Lookup<E> implements Serializable {
 			for (TernaryTreeNode ttn : list) {
 				for (obj in ttn.val) {
 					//println obj.originalName+"   "+obj.canonicalForm+"  "+obj.wt
+					
+					if(nameFilter.equalsIgnoreCase("scientificNames") && !obj.isScientificName){
+						continue;
+					}
+					if(nameFilter.equalsIgnoreCase("commonNames") && obj.isScientificName){
+						continue;
+					}
 					if(!added.contains(obj)) {
 						added.add(obj);
 						//TODO:Hack to push records with exact prefix to the top

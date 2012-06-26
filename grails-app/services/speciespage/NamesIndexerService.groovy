@@ -12,6 +12,7 @@ import org.apache.lucene.analysis.tokenattributes.OffsetAttribute
 import org.apache.lucene.util.Version
 
 import species.Species
+import species.Language
 import species.TaxonomyDefinition
 import species.participation.Recommendation
 import species.search.Lookup
@@ -107,7 +108,7 @@ class NamesIndexerService {
 			String term = charTermAttribute.toString()?.replaceAll("\u00A0|\u2007|\u202F", " ");
 			log.debug "Adding name term : "+term
 			synchronized(lookup) {
-				success |= lookup.add(term, new Record(originalName:reco.name, canonicalForm:reco.taxonConcept?.canonicalForm, icon:icon, wt:wt, speciesId:species?.id));
+				success |= lookup.add(term, new Record(originalName:reco.name, canonicalForm:reco.taxonConcept?.canonicalForm, isScientificName:reco.isScientificName, languageId:reco.languageId, icon:icon, wt:wt, speciesId:species?.id));
 			}
 		}
 		return success;
@@ -142,51 +143,57 @@ class NamesIndexerService {
 		return false;
 	}
 
+	
+	def getFormattedResult(lookupResults, inputTerm){
+		def result = new ArrayList();
+		lookupResults.each { lookupResult ->
+			def term = lookupResult.key;
+			def record = lookupResult.value;
+			//			String name = term.replaceFirst(/(?i)${params.term}/, "<b>"+params.term+"</b>");
+			//			String highlightedName = record.originalName.replaceFirst(/(?i)${term}/, name);
+			int index = record.originalName.toLowerCase().indexOf(inputTerm.toLowerCase());
+
+			//TODO:StringBuilder
+			String name = new String();
+			for(int i=0; i<record.originalName.size(); i++) {
+				if(i == index) {
+					name += "<b>"
+				}
+				name += record.originalName.charAt(i);
+				if(i == index+inputTerm.length()-1) {
+					name += "</b>"
+				}
+			}
+
+			String highlightedName = name.toString();
+			String icon = record.icon;
+			if(icon) {
+				icon = grailsApplication.config.speciesPortal.resources.serverURL + "/" + icon;
+				//icon = icon.replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.galleryThumbnail.suffix);
+			}
+			def languageName = Language.read(record.languageId)?.name 
+			result.add([value:record.canonicalForm, label:highlightedName, desc:record.canonicalForm, icon:icon, speciesId:record.speciesId, languageName:languageName, "category":"Names"]);
+		}
+		return result;
+	}
+	
 	/**
 	 *
 	 * @param query
 	 * @return
 	 */
-	def suggest(params) {
+	def suggest(params){
 		log.info "Suggest name using params : "+params
 		def result = new ArrayList();
 		if(params.term) {
 			int max = params.max ?: 10;
-			List<LookupResult> lookupResults = lookup.lookup(params.term.toLowerCase(), true, max);
-
-			lookupResults.each { lookupResult ->
-				def term = lookupResult.key;
-				def record = lookupResult.value;
-
-				//			String name = term.replaceFirst(/(?i)${params.term}/, "<b>"+params.term+"</b>");
-				//			String highlightedName = record.originalName.replaceFirst(/(?i)${term}/, name);
-				int index = record.originalName.toLowerCase().indexOf(params.term.toLowerCase());
-
-				//TODO:StringBuilder
-				String name = new String();
-				for(int i=0; i<record.originalName.size(); i++) {
-					if(i == index) {
-						name += "<b>"
-					}
-					name += record.originalName.charAt(i);
-					if(i == index+params.term.length()-1) {
-						name += "</b>"
-					}
-				}
-
-				String highlightedName = name.toString();
-				String icon = record.icon;
-				if(icon) {
-					icon = grailsApplication.config.speciesPortal.resources.serverURL + "/" + icon;
-					//icon = icon.replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.galleryThumbnail.suffix);
-				}
-				result.add([value:record.canonicalForm, label:highlightedName, desc:record.canonicalForm, icon:icon, speciesId:record.speciesId, "category":"Names"]);
-			}
+			List<LookupResult> lookupResults = lookup.lookup(params.term.toLowerCase(), true, max, params.nameFilter);
+			result = getFormattedResult(lookupResults,  params.term)
 		}
 		log.debug "suggestion : "+result;
 		return result;
 	}
-
+	
 	public static final String FILENAME = "tstLookup.dat";
 
 	/**
