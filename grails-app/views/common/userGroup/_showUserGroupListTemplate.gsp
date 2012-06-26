@@ -1,0 +1,141 @@
+
+<div class="observations_list observation" style="clear: both;">
+	<div class="btn-group button-bar" data-toggle="buttons-radio"
+		style="float: right;">
+		<button class="list_view_bttn btn list_style_button active">
+			<i class="icon-align-justify"></i>
+		</button>
+		<button class="grid_view_bttn btn grid_style_button">
+			<i class="icon-th-large"></i>
+		</button>
+	</div>
+	<div class="mainContentList">
+		<div class="mainContent">
+			<%
+				def userGroupPos = (queryParams?.offset != null) ? queryParams.offset : params?.offset
+			%>
+			<ul class="grid_view thumbnails">
+			
+				<g:each in="${userGroupInstanceList}" status="i"
+					var="userGroupInstance">
+
+					<g:if test="${i%3 == 0}">
+						<li class="thumbnail" style="clear: both;">
+					</g:if>
+					<g:else>
+						<li class="thumbnail" style="margin: 0;">
+					</g:else>
+					<uGroup:showSnippetTablet
+						model="['userGroupInstance':userGroupInstance, 'userGroupTitle':userGroupTitleList?.get(i), 'pos': userGroupPos+i]"></uGroup:showSnippetTablet>
+					</li>
+
+				</g:each>
+			</ul>
+			<ul class="list_view thumbnails" style="display: none;">
+				<g:each in="${userGroupInstanceList}" status="i"
+					var="userGroupInstance">
+					<li class="thumbnail" style="clear: both;"><uGroup:showSnippet
+							model="['userGroupInstance':userGroupInstance, 'userGroupTitle':userGroupTitleList?.get(i), 'pos':userGroupPos+i]"></uGroup:showSnippet>
+					</li>
+				</g:each>
+			</ul>
+		</div>
+	</div>
+	
+	<g:if test="${userGroupInstanceTotal > (queryParams?.max?:0)}">
+		<div class="centered">
+			<div class="btn loadMore">
+				<span class="progress" style="display: none;">Loading ... </span> <span
+					class="buttonTitle">Load more</span>
+			</div>
+		</div>
+	</g:if>
+	
+	<div class="paginateButtons" style="visibility: hidden; clear: both">
+		<g:paginate total="${userGroupInstanceTotal}"
+			max="${queryParams?.max}" action="${params.action}"
+			params="${activeFilters}" />
+	</div>
+	<script>
+		$('.list_view_bttn').click(function() {
+			$('.grid_view').hide();
+			$('.list_view').show();
+			$(this).addClass('active');
+			$('.grid_view_bttn').removeClass('active');
+			$.cookie("observation_listing", "list");
+			adjustHeight();
+		});
+
+		$('.grid_view_bttn').click(function() {
+			$('.grid_view').show();
+			$('.list_view').hide();
+			$(this).addClass('active');
+			$('.list_view_bttn').removeClass('active');
+			$.cookie("observation_listing", "grid");
+		});
+
+		function eatCookies() {
+			if ($.cookie("observation_listing") == "list") {
+				$('.list_view').show();
+				$('.grid_view').hide();
+				$('.grid_view_bttn').removeClass('active');
+				$('.list_view_bttn').addClass('active');
+			} else {
+				$('.grid_view').show();
+				$('.list_view').hide();
+				$('.grid_view_bttn').addClass('active');
+				$('.list_view_bttn').removeClass('active');
+			}
+			adjustHeight();
+		}
+
+		eatCookies();
+
+		$.autopager({
+
+			autoLoad : false,
+			// a selector that matches a element of next page link
+			link : 'div.paginateButtons a.nextLink',
+
+			// a selector that matches page contents
+			content : '.mainContent',
+
+			appendTo : '.mainContentList',
+
+			// a callback function to be triggered when loading start 
+			start : function(current, next) {
+
+				$(".loadMore .progress").show();
+				$(".loadMore .buttonTitle").hide();
+			},
+
+			// a function to be executed when next page was loaded. 
+			// "this" points to the element of loaded content.
+			load : function(current, next) {
+				$(".mainContent:last").hide().fadeIn(3000);
+				if (next.url == undefined) {
+					$(".loadMore").hide();
+				} else {
+					$(".loadMore .progress").hide();
+					$(".loadMore .buttonTitle").show();
+				}
+				if ($('.grid_view_bttn.active')[0]) {
+					$('.grid_view').show();
+					$('.list_view').hide();
+				} else {
+					$('.grid_view').hide();
+					$('.list_view').show();
+				}
+				adjustHeight();
+			}
+		});
+
+		$('.loadMore').click(function() {
+			$.autopager('load');
+			return false;
+		});
+
+	</script>
+
+</div>
+
