@@ -24,7 +24,7 @@
                         content: 'InfoWindow',
                         maxWidth: 400
                     });
-
+									
                   function addMarker(id, lat, lng) {
                      var latlng = new google.maps.LatLng(lat, lng);
 						var marker = new google.maps.Marker({
@@ -39,6 +39,28 @@
                                 load_content(big_map, this, id, infowindow); 
 	                    });
 
+                  }
+
+                  function getRandomNumber(){
+					return ((Math.random() -.5) / 200);
+                  }
+
+                  function jitterCloseMarker(big_map){
+                	var zoomLevel = big_map.getZoom();
+              		if(zoomLevel >= 13){
+                  		var markerKeys = [];
+                  		var mapBounds = big_map.getBounds()
+                  		for (var i = 0; i < markers.length; i++) {
+                      		var pos = markers[i].getPosition();
+                      		if(mapBounds.contains(pos)){
+									if($.inArray(pos.toString(), markerKeys) != -1){
+										markers[i].setPosition(new google.maps.LatLng(pos.lat() + getRandomNumber(), pos.lng() + getRandomNumber()));
+									}else{
+										markerKeys.push(pos.toString());
+									}
+                              }
+                  			}
+                      }
                   }  
                   <g:each in="${observationInstanceList}" status="i"
 						var="observationInstance">
@@ -50,7 +72,13 @@
                         var bounds = getSelectedBounds();
                         refreshList(bounds);
                     });
-		  var markerCluster = new MarkerClusterer(big_map, markers, {gridSize: 30});
+
+                    google.maps.event.addListener(big_map, 'zoom_changed', function() {
+                    	jitterCloseMarker(big_map);
+                    	
+                    });
+                    
+		  var markerCluster = new MarkerClusterer(big_map, markers, {gridSize: 30, maxZoom:13});
                 
                     
                   function load_content(map, marker, id, infowindow){
