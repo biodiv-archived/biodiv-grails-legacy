@@ -25,19 +25,44 @@
 }
 </style>
 <g:javascript src="bootstrap-combobox.js"></g:javascript>
-<g:javascript src="bootstrap-typeahead.min.js"></g:javascript>
+<%--<g:javascript src="bootstrap-typeahead.js"></g:javascript>--%>
 
 <script>
 $(document).ready(function() {
-	var langDropdown = $('#languageComboBox').combobox();
+	function doCustomization(langCombo){
+		var inputTextEle = langCombo.data('combobox').$element
+		inputTextEle.unbind('blur');
+	    inputTextEle.attr('name', 'languageName');
+	    inputTextEle.attr('autocomplete', 'off');
+		inputTextEle.on('blur', $.proxy(myBlur, langCombo.data('combobox')));
+	}
+
+	function myBlur(e){
+		var oldVal = this.$element.val();
+		this.blur(e);
+		this.$element.val(oldVal);
+	}
+
+	$('#languageComboBox').combobox();
+	var langCombo = $("#languageComboBox");
+	doCustomization(langCombo);
 	var defaultLang = "${Language.getLanguage(null).name}";
-	$("#languageComboBox").val(defaultLang).attr("selected",true);
-	$("#languageComboBox").data('combobox').refresh();
-	
+	langCombo.val(defaultLang).attr("selected",true);
+	langCombo.data('combobox').refresh();
 });
+
+function updateCommonNameLanguage(){
+	var langCombo = $("#languageComboBox");
+	var inputVal = $.trim(langCombo.data('combobox').$element.val());
+	if(inputVal.toLowerCase() !== langCombo.val().toLowerCase()){
+		langCombo.append($('<option></option>').val(inputVal).html(inputVal));
+		langCombo.data('combobox').refresh();
+	}
+}
+
 </script>
 
-<select id="languageComboBox" class="combobox" style="display:none;" name="languageName">
+<select id="languageComboBox" class="combobox" style="display:none;" >
 <option></option>
 	<g:each in="${Language.filteredList()}">
 		<option value="${it}"> ${it}</option>
