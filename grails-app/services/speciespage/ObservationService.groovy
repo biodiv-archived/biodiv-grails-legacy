@@ -472,10 +472,10 @@ class ObservationService {
 			return tags
 		}
 		
-		def sql =  Sql.newInstance(dataSource);
-		String query = "select t.name as name, count(t.name) as obv_count from tag_links as tl, tags as t, observation obv where t.name in ('" +  tagNames.join("', '") + "') and tl.tag_ref = obv.id and obv.is_deleted = false and t.id = tl.tag_id group by t.name order by count(t.name) desc, t.name asc limit " + tagsLimit;
-
-		sql.rows(query).each{
+		Sql sql =  Sql.newInstance(dataSource);
+		String query = "select t.name as name, count(t.name) as obv_count from tag_links as tl, tags as t, observation obv where t.name in " +  getSqlInCluase(tagNames) + " and tl.tag_ref = obv.id and obv.is_deleted = false and t.id = tl.tag_id group by t.name order by count(t.name) desc, t.name asc limit " + tagsLimit;
+		
+		sql.rows(query, tagNames).each{
 			tags[it.getProperty("name")] = it.getProperty("obv_count");
 		};
 		return tags;
@@ -489,9 +489,9 @@ class ObservationService {
 		}
 
 		def sql =  Sql.newInstance(dataSource);
-		String query = "select t.name as name, count(t.name) as obv_count from tag_links as tl, tags as t, observation obv where tl.tag_ref in " + getIdList(obvIds)  + " and tl.tag_ref = obv.id and obv.is_deleted = false and t.id = tl.tag_id group by t.name order by count(t.name) desc, t.name asc limit " + tagsLimit;
+		String query = "select t.name as name, count(t.name) as obv_count from tag_links as tl, tags as t, observation obv where tl.tag_ref in " + getSqlInCluase(obvIds)  + " and tl.tag_ref = obv.id and obv.is_deleted = false and t.id = tl.tag_id group by t.name order by count(t.name) desc, t.name asc limit " + tagsLimit;
 
-		sql.rows(query).each{
+		sql.rows(query, obvIds).each{
 			tags[it.getProperty("name")] = it.getProperty("obv_count");
 		};
 		return tags;
@@ -499,6 +499,10 @@ class ObservationService {
 
 	Map getFilteredTags(params){
 		return getTagsFromObservation(getFilteredObservations(params, -1, -1, true).observationInstanceList.collect{it[0]});
+	}
+	
+	private String getSqlInCluase(list){
+		return "(" + list.collect {'?'}.join(", ") + ")"
 	}
 
 	/**
@@ -598,12 +602,7 @@ class ObservationService {
 		}
 		return null;
 	}
-
-	private String getIdList(l){
-		return l.toString().replace("[", "(").replace("]", ")")
-	}
-
-
+	
 	long getAllObservationsOfUser(SUser user) {
 		return (long)Observation.countByAuthorAndIsDeleted(user, false);
 	}

@@ -25,7 +25,7 @@
 }
 </style>
 <g:javascript src="bootstrap-combobox.js"></g:javascript>
-<%--<g:javascript src="bootstrap-typeahead.js"></g:javascript>--%>
+<g:javascript src="bootstrap-typeahead.js"></g:javascript>
 
 <script>
 $(document).ready(function() {
