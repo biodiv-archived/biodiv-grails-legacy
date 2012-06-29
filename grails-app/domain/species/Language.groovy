@@ -31,7 +31,7 @@ class Language {
 		if(!languageName || languageName.trim() == ""){
 			lang = Language.findByNameIlike(DEFAULT_LANGUAGE);
 		}else{ 
-			lang = Language.findByNameIlike(languageName);
+			lang = Language.findByNameIlike(languageName.trim());
 			if(!lang){
 				//inserting new language
 				lang = new Language(name:languageName.trim(), threeLetterCode:getThreeLetterCode(languageName), isDirty:true);

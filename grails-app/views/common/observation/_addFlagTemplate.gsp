@@ -100,6 +100,7 @@ function removeFlag(flagId, obvId, flagComponent){
 			}	    				    			
 		},
 		error: function(xhr, status, error) {
+			$(".deleteFlagIcon").tooltip('hide');
 			var msg = $.parseJSON(xhr.responseText);
 			$("#flagMessage").html(msg["error"]).show().removeClass().addClass('alert alert-error');
 		}

@@ -689,6 +689,24 @@ class ObservationController {
 			render message as JSON
 		}
 	}
+	
+	@Secured(['ROLE_USER'])
+	def deleteRecoVoteComment = {
+		log.debug params;
+		def recoVote = RecommendationVote.get(params.id.toLong());
+		recoVote.comment = null;
+		try {
+			recoVote.save(flush:true)
+			def msg =  [success:g.message(code: 'observation.recoVoteComment.success.onDelete', default:'Comment deleted successfully')]
+			render msg as JSON
+			return;
+		}catch (Exception e) {
+			e.printStackTrace();
+			response.setStatus(500);
+			def message = [error: g.message(code: 'observation.recoVoteComment.error.onDelete', default:'Error on deleting recommendation vote comment')];
+			render message as JSON
+		}
+	}
 
 	def snippet = {
 		def observationInstance = Observation.get(params.id)
