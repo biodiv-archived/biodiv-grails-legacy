@@ -77,7 +77,7 @@ class ObservationService {
 
 		def resourcesXML = createResourcesXML(params);
 		def resources = saveResources(observation, resourcesXML);
-		observation.resource.clear();
+		observation.resource?.clear();
 		resources.each { resource ->
 			observation.addToResource(resource);
 		}
