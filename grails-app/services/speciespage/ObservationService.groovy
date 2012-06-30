@@ -275,29 +275,12 @@ class ObservationService {
 		return [mainReco : (scientificNameReco ?:commonNameReco), commonNameReco:commonNameReco];
 	}
 		
-	private Recommendation getRecoForScientificName(recoName, canonicalName){
+	private Recommendation getRecoForScientificName(String recoName, String canonicalName){
 		def reco, taxonConcept;
 		
 		//first searching by canonical name. this name is present if user select from auto suggest
-		if(canonicalName){
-			//findBy returns first...assuming taxon concepts wont hv same canonical name and different rank
-			canonicalName = Utils.cleanName(canonicalName);
-			reco = Recommendation.findByNameIlikeAndIsScientificName(canonicalName, true);
-			log.debug "Found taxonConcept : "+taxonConcept;
-			log.debug "Found reco : "+reco;
-			if(!reco) {
-				taxonConcept = TaxonomyDefinition.findByCanonicalFormIlike(canonicalName);
-				if(taxonConcept) {
-					log.debug "Resolving recoName to canName : "+taxonConcept.canonicalForm
-					reco = new Recommendation(name:taxonConcept.canonicalForm, taxonConcept:taxonConcept);
-					if(!recommendationService.save(reco)) {
-						reco = null;
-					}
-				} else {
-					log.error "Given taxonomy canonical name is invalid"
-				}
-			}
-			return reco;
+		if(canonicalName && (canonicalName.trim() != "")){
+			return findReco(canonicalName, true, null, taxonConcept);
 		}
 		
 		//searching on whatever user typed in scientific name text box
