@@ -5,20 +5,19 @@
 $(document).ready(function() {
 
 	//TODO : global variables ... may be problematic
-	var cache = {},
-		lastXhr;
+	var cacheSN = {}, cacheCN = {}, lastXhrSN, lastXhrCN;
 	$("#name").catcomplete({
 			appendTo:"#nameSuggestions",
 		 	source:function( request, response ) {
 				var term = request.term;
-				if ( term in cache ) {
-					response( cache[ term ] );
+				if ( term in cacheSN ) {
+					response( cacheSN[ term ] );
 					return;
 				}
 				request.nameFilter = "scientificNames";
-				lastXhr = $.getJSON( "${createLink(controller:'recommendation', action: 'suggest')}", request, function( data, status, xhr ) {
-					cache[ term ] = data;
-					if ( xhr === lastXhr ) {
+				lastXhrSN = $.getJSON( "${createLink(controller:'recommendation', action: 'suggest')}", request, function( data, status, xhr ) {
+					cacheSN[ term ] = data;
+					if ( xhr === lastXhrSN ) {
 						response( data );
 					}
 				});
@@ -59,14 +58,14 @@ $(document).ready(function() {
 			appendTo:"#commonNameSuggestions",
 		 	source:function( request, response ) {
 				var term = request.term;
-				if ( term in cache ) {
-					response( cache[ term ] );
+				if ( term in cacheCN ) {
+					response( cacheCN[ term ] );
 					return;
 				}
 				request.nameFilter = "commonNames";
-				lastXhr = $.getJSON( "${createLink(controller:'recommendation', action: 'suggest')}", request, function( data, status, xhr ) {
-					cache[ term ] = data;
-					if ( xhr === lastXhr ) {
+				lastXhrCN = $.getJSON( "${createLink(controller:'recommendation', action: 'suggest')}", request, function( data, status, xhr ) {
+					cacheCN[ term ] = data;
+					if ( xhr === lastXhrCN ) {
 						response( data );
 					}
 				});

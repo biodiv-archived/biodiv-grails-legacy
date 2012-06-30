@@ -32,6 +32,7 @@ class NamesLoaderService {
 		noOfNames += syncRecosFromTaxonConcepts(3, 3, cleanAndUpdate);
 		noOfNames += syncSynonyms();
 		noOfNames += syncCommonNames();
+		
 		log.info "No of names synched : "+noOfNames
 		return noOfNames;
 	}
@@ -48,6 +49,7 @@ class NamesLoaderService {
 			//TODO:Handle cascading delete recommendations
 			recommendationService.deleteAll();
 		}
+		updateTaxOnConceptForReco();
 		
 		int limit = BATCH_SIZE, offset = 0, noOfNames = 0;
 		def recos = new ArrayList<Recommendation>();
@@ -83,7 +85,48 @@ class NamesLoaderService {
 		conn.executeUpdate("DROP TABLE IF EXISTS " + tmpTableName);	
 		return noOfNames;
 	}
-
+	
+	int updateTaxOnConceptForReco(){
+		String taxOnDefQuery = "select r.id as recoid, t.id as taxonid from recommendation as r, taxonomy_definition as t where r.name = t.canonical_form and r.taxon_concept_id is null and r.is_scientific_name = true"
+		String synonymQuery = "select r.id as recoid, t.id as taxonid from recommendation as r, taxonomy_definition as t where r.name = t.canonical_form and r.taxon_concept_id is null and r.is_scientific_name = true"
+		String commnonNameQuery = "select r.id as recoid,  t.id as taxonid from recommendation as r, taxonomy_definition as t, common_names as c where r.name = c.name and r.language_id = c.language_id and c.taxon_concept_id = t.id and r.taxon_concept_id is null and c.taxon_concept_id is not null and r.is_scientific_name = false"
+		
+		def queryList = [taxOnDefQuery, synonymQuery, commnonNameQuery]
+		int limit = BATCH_SIZE, noOfNames = 0
+		
+		queryList.each{ query ->
+			int offset = 0
+			def recos = new ArrayList<Recommendation>();
+			def conn = new Sql(sessionFactory.currentSession.connection())
+			def tmpTableName = "tmp_table_update_taxonconcept"
+			try {
+				conn.executeUpdate("CREATE TABLE " + tmpTableName +  " as " + query);
+				while(true) {
+					def recommendationList = conn.rows("select recoid, taxonid from " + tmpTableName + " order by recoid limit " + limit + " offset " + offset);
+					recommendationList.each { r ->
+						Recommendation rec = Recommendation.get(r.recoid);
+						rec.taxonConcept = TaxonomyDefinition.read(r.taxonid);
+						recos.add(rec);
+						noOfNames++;
+					}
+					recommendationService.save(recos);
+					recos.clear();
+					offset = offset + limit;
+					
+					if(!recommendationList) break; //no more results;
+				}
+			}catch (Exception e) {
+				// TODO: handle exception
+				e.printStackTrace();
+			}finally{
+				conn.executeUpdate("DROP TABLE IF EXISTS " + tmpTableName);
+			}	
+		}
+		log.info "Total updated recommencation is $noOfNames"
+		return noOfNames
+	}
+	
+		
 	/**
 	 * 
 	 * @return
@@ -145,5 +188,6 @@ class NamesLoaderService {
 		log.info "Imported common names into recommendations : "+noOfNames
 		return noOfNames
 	}
+	
 
 }

@@ -32,11 +32,13 @@ class TSTLookup<E> extends Lookup<E> implements Serializable {
 	 */
 	boolean add(String key, Object value) {
 		if(key) {
+			/*
 			if(valueKeys.containsKey(value.originalName)) {
 				value = valueKeys.get(value.originalName);
 			} else {
 				valueKeys.put(value.originalName, value)
 			}
+			*/
 			root = autocomplete.insert(root, key.trim(), value, 0);
 			return true;
 		} else
@@ -139,7 +141,7 @@ class TSTLookup<E> extends Lookup<E> implements Serializable {
 	/**
 	 * Get record by original name
 	 */
-	Object getByName(String originalName) {
-		return valueKeys.get(originalName);
-	}
+//	Object getByName(String originalName) {
+//		return valueKeys.get(originalName);
+//	}
 }
