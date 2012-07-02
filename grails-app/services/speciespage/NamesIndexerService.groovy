@@ -55,8 +55,10 @@ class NamesIndexerService {
 					noOfRecosAdded++;
 				}
 			}
+			
 			offset = offset + limit;
 			log.info "=========== total added recos == $noOfRecosAdded"
+			if(!recos) break; //no more results;
 		}
 		
 		synchronized(lookup) {
