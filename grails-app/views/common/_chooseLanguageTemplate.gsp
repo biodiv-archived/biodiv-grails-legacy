@@ -26,7 +26,16 @@
 </style>
 <g:javascript src="bootstrap-combobox.js"></g:javascript>
 <g:javascript src="bootstrap-typeahead.js"></g:javascript>
-
+<%
+	def species_sn_lang = null
+	//showing vote added by creator of the observation
+	if(params.action == 'edit' || params.action == 'update'){
+		def tmp_cn_reco = observationInstance?.fetchOwnerRecoVote()?.commonNameReco
+		if(tmp_cn_reco){
+			species_sn_lang = Language.read(tmp_cn_reco.languageId).name
+		}
+	}
+%>
 <script>
 $(document).ready(function() {
 	function doCustomization(langCombo){
@@ -46,7 +55,10 @@ $(document).ready(function() {
 	$('#languageComboBox').combobox();
 	var langCombo = $("#languageComboBox");
 	doCustomization(langCombo);
-	var defaultLang = "${Language.getLanguage(null).name}";
+	var defaultLang = "${species_sn_lang}";
+	if(defaultLang === ""){
+		defaultLang = "${Language.getLanguage(null).name}";
+	}
 	langCombo.val(defaultLang).attr("selected",true);
 	langCombo.data('combobox').refresh();
 });
@@ -61,6 +73,7 @@ function updateCommonNameLanguage(){
 }
 
 </script>
+
 
 <select id="languageComboBox" class="combobox" style="display:none;" >
 <option></option>

@@ -46,14 +46,19 @@ class NamesIndexerService {
 
 		//TODO fetch in batches
 		def startTime = System.currentTimeMillis()
-		def recos = Recommendation.list();
-		int noOfRecosAdded = 0;
-		recos.each { reco ->
-			if(add(reco, analyzer, lookup1)) {
-				noOfRecosAdded++;
+		
+		int limit = 100, offset = 0, noOfRecosAdded = 0;
+		while(true){
+			def recos = Recommendation.listOrderById(max:limit, offset:offset, order: "asc")
+			recos.each { reco ->
+				if(add(reco, analyzer, lookup1)) {
+					noOfRecosAdded++;
+				}
 			}
+			offset = offset + limit;
+			log.info "=========== total added recos == $noOfRecosAdded"
 		}
-
+		
 		synchronized(lookup) {
 			lookup = lookup1;
 		}
@@ -90,13 +95,13 @@ class NamesIndexerService {
 			return;
 		}
 
-		log.debug "Adding recommendation : "+reco.name + " with taxonConcept : "+reco.taxonConcept;
+		//log.debug "Adding recommendation : "+reco.name + " with taxonConcept : "+reco.taxonConcept;
 
 		boolean success = false;
 
 		def species = getSpecies(reco.taxonConcept);
 		def icon = getSpeciesIconPath(species);
-		log.debug "Generating ngrams"
+		//log.debug "Generating ngrams"
 		def tokenStream = analyzer.tokenStream("name", new StringReader(reco.name));
 		OffsetAttribute offsetAttribute = tokenStream.getAttribute(OffsetAttribute.class);
 		CharTermAttribute charTermAttribute = tokenStream.getAttribute(CharTermAttribute.class);
@@ -106,7 +111,7 @@ class NamesIndexerService {
 			int startOffset = offsetAttribute.startOffset();
 			int endOffset = offsetAttribute.endOffset();
 			String term = charTermAttribute.toString()?.replaceAll("\u00A0|\u2007|\u202F", " ");
-			log.debug "Adding name term : "+term
+			//log.debug "Adding name term : "+term
 			synchronized(lookup) {
 				success |= lookup.add(term, new Record(originalName:reco.name, canonicalForm:reco.taxonConcept?.canonicalForm, isScientificName:reco.isScientificName, languageId:reco.languageId, icon:icon, wt:wt, speciesId:species?.id));
 			}
