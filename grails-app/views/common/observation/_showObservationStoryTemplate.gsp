@@ -56,7 +56,7 @@
 		<div class="prop">
 			<span class="name"><i class="icon-time"></i>Observed on</span>
 			<obv:showDate
-				model="['observationInstance':observationInstance, 'propertyName':'observedOn']" />
+				model="['observationInstance':observationInstance, 'propertyName':'observedOn', 'dateFormat':'dateOnly']" />
 
 		</div>
 
