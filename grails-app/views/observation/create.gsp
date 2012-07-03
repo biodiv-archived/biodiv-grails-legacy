@@ -171,7 +171,7 @@ input.dms_field {
 								class="resources control-group ${hasErrors(bean: observationInstance, field: 'resource', 'error')}">
 								<ul id="imagesList" class="thumbwrap thumbnails"
 									style='list-style: none; margin-left: 0px;'>
-									<g:set var="i" value="1" />
+									<g:set var="i" value="${1}" />
 									<g:each in="${observationInstance?.resource}" var="r">
 										<li class="addedResource thumbnail">
 											<%def thumbnail = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.thumbnail.suffix)%>
@@ -674,7 +674,12 @@ input.dms_field {
 				var rootDir = '${grailsApplication.config.speciesPortal.observations.serverURL}'
 				var obvDir = $(responseXML).find('dir').text();
 				var images = []
-				var i = $(".metadata").length;
+				var metadata = $(".metadata");
+				var i = 0;
+				if(metadata.length > 0) {
+					var file_id = $(metadata.get(-1)).children("input").first().attr("name");
+					i = parseInt(file_id.substring(file_id.indexOf("_")+1));
+				}
 				$(responseXML).find('resources').find('image').each(function() {
 					var fileName = $(this).attr('fileName');
 					var size = $(this).attr('size');
