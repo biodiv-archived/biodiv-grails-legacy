@@ -304,6 +304,7 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 				resetForm: true,
 				type: 'GET',
 				beforeSubmit: function(formData, jqForm, options) {
+					updateCommonNameLanguage();
 					return true;
 				}, 
 	            success: function(data, statusText, xhr, form) {

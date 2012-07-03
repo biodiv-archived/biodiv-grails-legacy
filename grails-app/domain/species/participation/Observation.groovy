@@ -197,7 +197,7 @@ class Observation implements Taggable{
 		langToCommonName.keySet().each{ key ->
 			def lanSuffix = langToCommonName.get(key).join(", ")
 			if(addLanguage){
-				lanSuffix = Language.read(key).name + " : " + lanSuffix
+				lanSuffix = Language.read(key).name + ": " + lanSuffix
 			}
 			cnList << lanSuffix
 		}
@@ -207,7 +207,7 @@ class Observation implements Taggable{
 		if(englishNames){
 			engNamesString = englishNames.join(", ")
 			if(addLanguage){
-				engNamesString = Language.read(englishId).name + " : " + engNamesString				
+				engNamesString = Language.read(englishId).name + ": " + engNamesString				
 			}
 		}
 		

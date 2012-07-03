@@ -1,24 +1,23 @@
-<%@ page
-	import="species.participation.RecommendationVote.ConfidenceType"%>
+<%@ page import="species.participation.RecommendationVote.ConfidenceType"%>
+<%@ page import="species.Language"%>
 <!-- TODO change this r:script which is used by resources framework for script not to be repeated multiple times -->
 <r:script>
 $(document).ready(function() {
 
 	//TODO : global variables ... may be problematic
-	var cache = {},
-		lastXhr;
+	var cacheSN = {}, cacheCN = {}, lastXhrSN, lastXhrCN;
 	$("#name").catcomplete({
 			appendTo:"#nameSuggestions",
 		 	source:function( request, response ) {
 				var term = request.term;
-				if ( term in cache ) {
-					response( cache[ term ] );
+				if ( term in cacheSN ) {
+					response( cacheSN[ term ] );
 					return;
 				}
 				request.nameFilter = "scientificNames";
-				lastXhr = $.getJSON( "${createLink(controller:'recommendation', action: 'suggest')}", request, function( data, status, xhr ) {
-					cache[ term ] = data;
-					if ( xhr === lastXhr ) {
+				lastXhrSN = $.getJSON( "${createLink(controller:'recommendation', action: 'suggest')}", request, function( data, status, xhr ) {
+					cacheSN[ term ] = data;
+					if ( xhr === lastXhrSN ) {
 						response( data );
 					}
 				});
@@ -59,14 +58,14 @@ $(document).ready(function() {
 			appendTo:"#commonNameSuggestions",
 		 	source:function( request, response ) {
 				var term = request.term;
-				if ( term in cache ) {
-					response( cache[ term ] );
+				if ( term in cacheCN ) {
+					response( cacheCN[ term ] );
 					return;
 				}
 				request.nameFilter = "commonNames";
-				lastXhr = $.getJSON( "${createLink(controller:'recommendation', action: 'suggest')}", request, function( data, status, xhr ) {
-					cache[ term ] = data;
-					if ( xhr === lastXhr ) {
+				lastXhrCN = $.getJSON( "${createLink(controller:'recommendation', action: 'suggest')}", request, function( data, status, xhr ) {
+					cacheCN[ term ] = data;
+					if ( xhr === lastXhrCN ) {
 						response( data );
 					}
 				});
@@ -131,17 +130,27 @@ $(document).ready(function() {
 	<div class="controls">
 		<div class="textbox nameContainer">
 
-			<%
-		def species_name = ""
+	<%
+		def species_sn_name = ""
+		def species_cn_name = ""
+		def species_call_comment = null
+		
 		//showing vote added by creator of the observation
 		if(params.action == 'edit' || params.action == 'update'){
-			species_name = observationInstance?.fetchOwnerRecoVote()?.recommendation?.name
-		}else{
-			//showing identified species name based on max vote
-			//species_name = observationInstance?.maxVotedSpeciesName
+			def tmp_reco_vote = observationInstance?.fetchOwnerRecoVote()
+			def tmp_cn_reco	= tmp_reco_vote?.commonNameReco
+			
+			species_call_comment =  tmp_reco_vote?.comment
+			species_cn_name = (tmp_cn_reco)? tmp_cn_reco.name : ""
+			
+			if(tmp_reco_vote && tmp_reco_vote.recommendation.isScientificName){
+				species_sn_name = tmp_reco_vote.recommendation.name
+			}
 		}
 	%>
-			<input type="text" name="recoName" id="name" value="${species_name}"
+	<g:set var="species_sn_lang"
+	value="${species_sn_lang}" />
+			<input type="text" name="recoName" id="name" value="${species_sn_name}"
 				placeholder='Suggest a scientific name'
 				class="input-xlarge ${hasErrors(bean: recommendationInstance, field: 'name', 'errors')} ${hasErrors(bean: recommendationVoteInstance, field: 'recommendation', 'errors')}" />
 			<input type="hidden" name="canName" id="canName" />
@@ -161,7 +170,7 @@ $(document).ready(function() {
 		<div class="nameContainer textbox" style="position:relative;">
 			
 			<input type="text" name="commonName" id="commonName"
-				value="${species_name}" placeholder='Suggest a common name'
+				value="${species_cn_name}" placeholder='Suggest a common name'
 				class="input-xlarge ${hasErrors(bean: recommendationInstance, field: 'name', 'errors')} ${hasErrors(bean: recommendationVoteInstance, field: 'recommendation', 'errors')}" />
 			<input type="hidden" id="mappedRecoNameForcanName" />
 			
@@ -182,7 +191,7 @@ $(document).ready(function() {
 	<div class="controls">
 		<div class="nameContainer textbox">
 
-			<input type="text" name="recoComment" id="recoComment"
+			<input type="text" name="recoComment" id="recoComment" value="${species_call_comment}"
 				class="input-xlarge ${hasErrors(bean: recommendationInstance, field: 'name', 'errors')} ${hasErrors(bean: recommendationVoteInstance, field: 'recommendation', 'errors')}"
 				placeholder="Write comment"></input>
 
@@ -194,8 +203,7 @@ $(document).ready(function() {
 
 <r:script>
 	$(document).ready(function() {
-		$('#recoComment').val('');
-
+		//$('#recoComment').val('');
 		$('#reco-action').click(function() {
 			$('#reco-options').show();
 			$('#reco-action').hide();

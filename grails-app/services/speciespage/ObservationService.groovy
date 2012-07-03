@@ -77,7 +77,7 @@ class ObservationService {
 
 		def resourcesXML = createResourcesXML(params);
 		def resources = saveResources(observation, resourcesXML);
-
+		observation.resource?.clear();
 		resources.each { resource ->
 			observation.addToResource(resource);
 		}
@@ -275,29 +275,12 @@ class ObservationService {
 		return [mainReco : (scientificNameReco ?:commonNameReco), commonNameReco:commonNameReco];
 	}
 		
-	private Recommendation getRecoForScientificName(recoName, canonicalName){
+	private Recommendation getRecoForScientificName(String recoName, String canonicalName){
 		def reco, taxonConcept;
 		
 		//first searching by canonical name. this name is present if user select from auto suggest
-		if(canonicalName){
-			//findBy returns first...assuming taxon concepts wont hv same canonical name and different rank
-			canonicalName = Utils.cleanName(canonicalName);
-			reco = Recommendation.findByNameIlikeAndIsScientificName(canonicalName, true);
-			log.debug "Found taxonConcept : "+taxonConcept;
-			log.debug "Found reco : "+reco;
-			if(!reco) {
-				taxonConcept = TaxonomyDefinition.findByCanonicalFormIlike(canonicalName);
-				if(taxonConcept) {
-					log.debug "Resolving recoName to canName : "+taxonConcept.canonicalForm
-					reco = new Recommendation(name:taxonConcept.canonicalForm, taxonConcept:taxonConcept);
-					if(!recommendationService.save(reco)) {
-						reco = null;
-					}
-				} else {
-					log.error "Given taxonomy canonical name is invalid"
-				}
-			}
-			return reco;
+		if(canonicalName && (canonicalName.trim() != "")){
+			return findReco(canonicalName, true, null, taxonConcept);
 		}
 		
 		//searching on whatever user typed in scientific name text box
@@ -472,10 +455,10 @@ class ObservationService {
 			return tags
 		}
 		
-		def sql =  Sql.newInstance(dataSource);
-		String query = "select t.name as name, count(t.name) as obv_count from tag_links as tl, tags as t, observation obv where t.name in ('" +  tagNames.join("', '") + "') and tl.tag_ref = obv.id and obv.is_deleted = false and t.id = tl.tag_id group by t.name order by count(t.name) desc, t.name asc limit " + tagsLimit;
-
-		sql.rows(query).each{
+		Sql sql =  Sql.newInstance(dataSource);
+		String query = "select t.name as name, count(t.name) as obv_count from tag_links as tl, tags as t, observation obv where t.name in " +  getSqlInCluase(tagNames) + " and tl.tag_ref = obv.id and obv.is_deleted = false and t.id = tl.tag_id group by t.name order by count(t.name) desc, t.name asc limit " + tagsLimit;
+		
+		sql.rows(query, tagNames).each{
 			tags[it.getProperty("name")] = it.getProperty("obv_count");
 		};
 		return tags;
@@ -489,9 +472,9 @@ class ObservationService {
 		}
 
 		def sql =  Sql.newInstance(dataSource);
-		String query = "select t.name as name, count(t.name) as obv_count from tag_links as tl, tags as t, observation obv where tl.tag_ref in " + getIdList(obvIds)  + " and tl.tag_ref = obv.id and obv.is_deleted = false and t.id = tl.tag_id group by t.name order by count(t.name) desc, t.name asc limit " + tagsLimit;
+		String query = "select t.name as name, count(t.name) as obv_count from tag_links as tl, tags as t, observation obv where tl.tag_ref in " + getSqlInCluase(obvIds)  + " and tl.tag_ref = obv.id and obv.is_deleted = false and t.id = tl.tag_id group by t.name order by count(t.name) desc, t.name asc limit " + tagsLimit;
 
-		sql.rows(query).each{
+		sql.rows(query, obvIds).each{
 			tags[it.getProperty("name")] = it.getProperty("obv_count");
 		};
 		return tags;
@@ -499,6 +482,10 @@ class ObservationService {
 
 	Map getFilteredTags(params){
 		return getTagsFromObservation(getFilteredObservations(params, -1, -1, true).observationInstanceList.collect{it[0]});
+	}
+	
+	private String getSqlInCluase(list){
+		return "(" + list.collect {'?'}.join(", ") + ")"
 	}
 
 	/**
@@ -598,12 +585,7 @@ class ObservationService {
 		}
 		return null;
 	}
-
-	private String getIdList(l){
-		return l.toString().replace("[", "(").replace("]", ")")
-	}
-
-
+	
 	long getAllObservationsOfUser(SUser user) {
 		return (long)Observation.countByAuthorAndIsDeleted(user, false);
 	}

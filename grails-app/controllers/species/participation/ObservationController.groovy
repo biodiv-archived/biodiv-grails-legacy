@@ -137,12 +137,22 @@ class ObservationController {
 					chain(action: 'addRecommendationVote', model:['chainedParams':params]);
 				} else {
 					observationInstance.errors.allErrors.each { log.error it }
-					render(view: "create", model: [observationInstance: observationInstance, lastCreatedObv:null])
+					if(params["isMobileApp"]?.toBoolean()){
+						render (['error:true']as JSON);
+						return
+					}else{
+						render(view: "create", model: [observationInstance: observationInstance, lastCreatedObv:null])
+					}
 				}
 			} catch(e) {
 				e.printStackTrace();
-				flash.message = "${message(code: 'error')}";
-				render(view: "create", model: [observationInstance: observationInstance, lastCreatedObv:null])
+				if(params["isMobileApp"]?.toBoolean()){
+					render (['error:true']as JSON);
+					return
+				}else{
+					flash.message = "${message(code: 'error')}";
+					render(view: "create", model: [observationInstance: observationInstance, lastCreatedObv:null])
+				}
 			}
 		} else {
 			redirect(action: "create")
@@ -413,6 +423,8 @@ class ObservationController {
 
 					if(!params["createNew"]){
 						redirect(action:getRecommendationVotes, id:params.obvId, params:[max:3, offset:0, recoVoteMsg:recoVoteMsg])
+					}else if(params["isMobileApp"]?.toBoolean()){
+						render (['success:true, obvId:$observationInstance.id']as JSON);
 					}else{
 						redirect(action: "show", id: observationInstance.id, params:[postToFB:(params.postToFB?:false)]);
 					}
@@ -429,6 +441,8 @@ class ObservationController {
 						//sending mail to user
 						sendNotificationMail(SPECIES_RECOMMENDED, observationInstance, request);
 						redirect(action:getRecommendationVotes, id:params.obvId, params:[max:3, offset:0, recoVoteMsg:recoVoteMsg])
+					}else if(params["isMobileApp"]?.toBoolean()){
+						render (['success:true, obvId:$observationInstance.id'] as JSON);
 					}else{
 						redirect(action: "show", id: observationInstance.id, params:[postToFB:(params.postToFB?:false)]);
 					}
@@ -441,7 +455,11 @@ class ObservationController {
 				}
 			} catch(e) {
 				e.printStackTrace()
-				render(view: "show", model: [observationInstance:observationInstance, recommendationVoteInstance: recommendationVoteInstance], params:[postToFB:(params.postToFB?:false)])
+				if(params["isMobileApp"]?.toBoolean()){
+					render (['success:true, obvId:$observationInstance.id'] as JSON);
+				}else{
+					render(view: "show", model: [observationInstance:observationInstance, recommendationVoteInstance: recommendationVoteInstance], params:[postToFB:(params.postToFB?:false)])
+				}
 			}
 		} else {
 			flash.message  = "${message(code: 'observation.invalid', default:'Invalid observation')}"
@@ -668,6 +686,24 @@ class ObservationController {
 			e.printStackTrace();
 			response.setStatus(500);
 			def message = [error: g.message(code: 'observation.flag.error.onDelete', default:'Error on deleting observation flag')];
+			render message as JSON
+		}
+	}
+	
+	@Secured(['ROLE_USER'])
+	def deleteRecoVoteComment = {
+		log.debug params;
+		def recoVote = RecommendationVote.get(params.id.toLong());
+		recoVote.comment = null;
+		try {
+			recoVote.save(flush:true)
+			def msg =  [success:g.message(code: 'observation.recoVoteComment.success.onDelete', default:'Comment deleted successfully')]
+			render msg as JSON
+			return;
+		}catch (Exception e) {
+			e.printStackTrace();
+			response.setStatus(500);
+			def message = [error: g.message(code: 'observation.recoVoteComment.error.onDelete', default:'Error on deleting recommendation vote comment')];
 			render message as JSON
 		}
 	}
@@ -1069,16 +1105,19 @@ class ObservationController {
 	
 	@Secured(['ROLE_USER'])
 	def getObv = {
+		log.debug params;
 		render Observation.read(params.id.toLong()) as JSON
 	} 
 	
 	@Secured(['ROLE_USER'])
 	def getList = {
+		log.debug params;
 		render getObservationList(params) as JSON
 	}
 	
 	@Secured(['ROLE_USER'])
 	def getHabitatList = {
+		log.debug params;
 		def res = new HashMap()
 			Habitat.list().each {
 			res[it.id] = it.name
@@ -1088,6 +1127,7 @@ class ObservationController {
 	
 	@Secured(['ROLE_USER'])
 	def getGroupList = {
+		log.debug params;
 		def res = new HashMap()
 		SpeciesGroup.list().each {
 			res[it.id] = it.name
@@ -1098,27 +1138,33 @@ class ObservationController {
 	
 	@Secured(['ROLE_USER'])
 	def getThumbObvImage = {
+		log.debug params;
+		def baseUrl = grailsApplication.config.speciesPortal.observations.serverURL
 		def mainImage = Observation.read(params.id.toLong()).mainImage()
 		def imagePath = mainImage?mainImage.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.thumbnail.suffix): null
-		render imagePath 
+		render baseUrl + imagePath 
 	}
 	
 	@Secured(['ROLE_USER'])
 	def getFullObvImage = {
+		log.debug params;
+		def baseUrl = grailsApplication.config.speciesPortal.observations.serverURL
 		def mainImage = Observation.read(params.id.toLong()).mainImage()
 		def gallImagePath = mainImage?mainImage.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.gallery.suffix):null
-		render gallImagePath
+		render baseUrl + gallImagePath
 	}
 	
 	
 	@Secured(['ROLE_USER'])
 	def getUserImage = {
+		log.debug params;
 		render SUser.read(params.id.toLong()).icon() 
 		
 	}
 	
 	@Secured(['ROLE_USER'])
 	def getUserInfo = {
+		log.debug params;
 		def res = new HashMap()
 		def u = SUser.read(params.id.toLong())
 		res["id"] = u.id
