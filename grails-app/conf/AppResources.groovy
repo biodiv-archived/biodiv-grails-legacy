@@ -1,13 +1,12 @@
-//debug = false
 //adhoc.patterns.excludes = ["*.css"]
 //mappers.hashandcache.excludes = ["**/*.css"]
 //
 modules = {
 	core {
-		dependsOn 'jquery'
+		dependsOn 'jquery, jquery-ui'
+		defaultBundle false
 		
 		resource url:'/bootstrap/css/bootstrap.min.css'
-		resource url:'/css/jquery-ui.css'
 		resource url:'/css/bootstrap-combobox.css'
 		resource url:'/js/jquery/jquery.jqGrid-4.1.2/css/ui.jqgrid.css'
 		resource url:'/css/auth.css'
@@ -19,7 +18,6 @@ modules = {
 		resource url:'/css/wgp.css'
 		
 		
-		resource url:'/plugins/jquery-ui-1.8.15/jquery-ui/js/jquery-ui-1.8.15.custom.min.js'
 		resource url:'/bootstrap/js/bootstrap.min.js'
 		resource url:'/js/species/main.js'
 		resource url:'/js/readmore/readmore.js'

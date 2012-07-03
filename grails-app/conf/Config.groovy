@@ -83,7 +83,8 @@ log4j = {
 	'org.springframework.security',
 	'org.codehaus.groovy.grails.web.servlet',  //  controllers
 	'grails.plugin',
-	'org.springframework.security.web'
+	'org.springframework.security.web',
+	'grails.app.tagLib.org.grails.plugin.resource'
 
 
 	warn   'org.mortbay.log'
@@ -784,3 +785,5 @@ grails.plugins.springsecurity.onInteractiveAuthenticationSuccessEvent = { e, app
 }
 
 grails.plugins.springsecurity.openid.registration.requiredAttributes = [email: 'http://axschema.org/contact/email', location: 'http://axschema.org/contact/country/home',firstname:'http://axschema.org/namePerson/first', lastname: 'http://axschema.org/namePerson/last', profilePic:'http://axschema.org/media/image/default']
+
+//grails.resources.debug=true
