@@ -71,10 +71,10 @@ class TSTLookup<E> extends Lookup<E> implements Serializable {
 				for (obj in ttn.val) {
 					//println obj.originalName+"   "+obj.canonicalForm+"  "+obj.wt
 					
-					if(nameFilter.equalsIgnoreCase("scientificNames") && !obj.isScientificName){
+					if(nameFilter && nameFilter.equalsIgnoreCase("scientificNames") && !obj.isScientificName){
 						continue;
 					}
-					if(nameFilter.equalsIgnoreCase("commonNames") && obj.isScientificName){
+					if(nameFilter && nameFilter.equalsIgnoreCase("commonNames") && obj.isScientificName){
 						continue;
 					}
 					if(!added.contains(obj)) {
