@@ -6,15 +6,12 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="main" />
+<r:require modules="observations_list"/>
 <g:set var="entityName"
 	value="${message(code: 'observation.label', default: 'Related Observations')}" />
 <title><g:message code="default.list.label" args="[entityName]" />
 </title>
-<link rel="stylesheet"
-	href="${resource(dir:'css',file:'tagit/tagit-custom.css')}"
-	type="text/css" media="all" />
-<g:javascript src="tagit.js"></g:javascript>
-<g:javascript src="jquery/jquery.autopager-1.0.0.js"></g:javascript>
+
 <style>
 .observations_list {
 	top: 0;
@@ -63,7 +60,7 @@
 			</div>
 		</div>
 	</div>
-<g:javascript>
+<r:script>
 	$(document).ready(function() {
 		$('#tc_tagcloud a').click(function(){
 			var tg = $(this).contents().first().text();
@@ -71,6 +68,6 @@
 	    	return false;
 	 	});
 	});
-</g:javascript>	
+</r:script>	
 </body>
 </html>

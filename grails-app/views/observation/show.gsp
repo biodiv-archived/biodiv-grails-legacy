@@ -38,34 +38,14 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 <meta property="og:longitude" content="${observationInstance.longitude }"/>
 
 <meta name="layout" content="main" />
+<script src="http://maps.google.com/maps/api/js?sensor=true"></script>
+<r:require modules="observations_show"/>
 <link rel="image_src" href="${createLinkTo(file: gallImagePath, base:grailsApplication.config.speciesPortal.observations.serverURL)}" />
 
 <g:set var="entityName"
 	value="${message(code: 'observation.label', default: 'Observation')}" />
 <title><g:message code="default.show.label" args="[entityName]" />
 </title>
-
-
-<link rel="stylesheet" type="text/css" media="all"
-	href="${resource(dir:'js/galleria/1.2.7/themes/classic/',file:'galleria.classic.css')}" />
-<link rel="stylesheet" type="text/css" media="all"
-	href="${resource(dir:'js/jquery/jquery.jcarousel-0.2.8/themes/classic/',file:'skin.css')}" />
-
-<link rel="stylesheet"
-	href="${resource(dir:'css',file:'tagit/tagit-custom.css')}"
-	type="text/css" media="all" />
-
-<g:javascript src="jsrender.js"></g:javascript>
-
-<g:javascript src="galleria/1.2.7/galleria-1.2.7.min.js"/>
-
-<g:javascript src="tagit.js"></g:javascript>
-
-<g:javascript src="jquery/jquery.jcarousel-0.2.8/jquery.jcarousel.js"/>
-
-<g:javascript src="species/carousel.js"/>
-
-<g:javascript src="species/observations.js"/>
 
 
 <style>
@@ -249,7 +229,7 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 			</div>
 		</div>
 	</div>
-	<g:javascript>
+	<r:script>
 	
 	Galleria.loadTheme('${resource(dir:'js/galleria/1.2.7/themes/classic/',file:'galleria.classic.min.js')}');
 	
@@ -429,7 +409,7 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 			   	}
 			});
          }
-</g:javascript>
+</r:script>
 
 </body>
 </html>

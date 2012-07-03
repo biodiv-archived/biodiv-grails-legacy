@@ -63,7 +63,7 @@
 	</div>
 </div>
 
-<script>
+<r:script>
 $(document).ready(function(){
 	$(".deleteFlagIcon").tooltip({"placement":"right"});
 });
@@ -106,7 +106,7 @@ function removeFlag(flagId, obvId, flagComponent){
 	});
 }
 
-</script>
+</r:script>
 
 <style>
 #flag-options {

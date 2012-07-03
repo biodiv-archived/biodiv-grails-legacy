@@ -21,9 +21,9 @@
 		</div>
 	</div>
 
-	<script type="text/javascript"
-		src="http://maps.google.com/maps/api/js?sensor=true"></script>
-	<script>
+	<!-- script type="text/javascript"
+		src="http://maps.google.com/maps/api/js?sensor=true"></script-->
+	<r:script>
                 $(document).ready(function() {
                   var latlng = new google.maps.LatLng(${observationInstance.latitude}, ${observationInstance.longitude});
                   var options = {
@@ -41,6 +41,6 @@
                   map.setCenter(latlng);
 
                 });
-        </script>
+        </r:script>
 
 </div>

@@ -11,6 +11,8 @@
 
 <head>
 <meta name='layout' content='main' />
+<r:require modules="observations_show"/>
+
 <g:set var="entityName"
 	value="${message(code: 'user.label', default: 'User')}" />
 <title><g:message code="default.edit.label" args="[entityName]" />
@@ -277,7 +279,7 @@
 
 	</div>
 
-	<script>
+	<r:script>
 		$(document).ready(function() {
 			$('#username').focus();
 
@@ -287,7 +289,7 @@
 			});
 
 		});
-	</script>
+	</r:script>
 
 </body>
 </html>

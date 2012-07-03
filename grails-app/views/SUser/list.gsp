@@ -3,11 +3,7 @@
 <head>
 <meta name='layout' content='main' />
 <title><g:message code='spring.security.ui.user.search' /></title>
-<g:javascript src="jquery/jquery.autopager-1.0.0.js"></g:javascript>
-<g:javascript src="jquery/jquery.url.js" />
-<g:javascript
-	src="jquery/jquery-history-1.7.1/scripts/bundled/html4+html5/jquery.history.js" />
-
+<r:require modules="susers_list"/>
 <g:set var="entityName"
 	value="${message(code: 'sUser.label', default: 'Users')}" />
 
@@ -48,7 +44,7 @@
 		</div>
 </div>
 	
-<g:javascript>
+<r:script>
 	$(document).ready(function() {
 		
 
@@ -111,7 +107,7 @@
 	});
 	
 	
-</g:javascript>
+</r:script>
 	
 </body>
 </html>

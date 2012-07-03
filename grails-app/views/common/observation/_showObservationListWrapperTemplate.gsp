@@ -93,7 +93,7 @@
 
 
 <!--container end-->
-<g:javascript>	
+<r:script>	
         $(document).ready(function(){
         	$('#selected_sort').tooltip({placement:'right'});
             $('button').tooltip();
@@ -516,4 +516,4 @@
 				big_map.setCenter(nagpur_latlng);
 			});
 		}
-</g:javascript>
+</r:script>

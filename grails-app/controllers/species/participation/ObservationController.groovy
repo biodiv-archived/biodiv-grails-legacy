@@ -1082,7 +1082,6 @@ class ObservationController {
 		def res = new HashMap()
 			Habitat.list().each {
 			res[it.id] = it.name
-		
 		}
 		render res as JSON
 	}

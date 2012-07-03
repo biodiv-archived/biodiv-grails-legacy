@@ -4,9 +4,7 @@
 <meta name='layout' content='main' />
 <title><g:message code='spring.security.ui.register.title' /></title>
 
-<link rel="stylesheet" type="text/css" media="all"
-	href="${resource(dir:'css',file:'auth.css')}" />
-
+<r:require modules="auth"/>
 <style>
 
 .openid-loginbox .form-horizontal .control-label {

@@ -1,5 +1,4 @@
-<g:javascript src="jquery/jquery.cookie.js"></g:javascript>
-<g:javascript>
+<r:script>
 	
 	$(document).ready(function(){
 		$('#as_list').click(function(){
@@ -31,7 +30,7 @@
 		
 		}
 	});
-</g:javascript>
+</r:script>
 <div id="tags_section">
 	<h5>
 		<i class="icon-tags"></i>

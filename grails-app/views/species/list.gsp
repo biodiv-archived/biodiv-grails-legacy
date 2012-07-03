@@ -7,13 +7,13 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html" />
 <meta name="layout" content="main" />
+<r:require modules="species"/>
 
-<g:javascript src="jquery/jquery.url.js"/>
 
 <g:set var="entityName"
 	value="${message(code: 'species.label', default: 'Species')}" />
 <title>Species List</title>
-<g:javascript>
+<r:script>
 
 $(document).ready(function(){
 
@@ -85,7 +85,7 @@ $(document).ready(function(){
 	}
 	);
 });
-</g:javascript>
+</r:script>
 </head>
 <body>
 		<div class="container_16 big_wrapper outer_wrapper">

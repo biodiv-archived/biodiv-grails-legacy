@@ -1,7 +1,7 @@
 
 <div class="observation_location_wrapper">
 	<div class="observation_location">
-		<script>
+		<r:script>
                 var markers = [];
                 var big_map;
                 var nagpur_latlng = new google.maps.LatLng('21.07', '79.27');
@@ -97,13 +97,13 @@
                 }
 
                 });
-                </script>
+                </r:script>
 		<div class="map_wrapper">
 			<div id="big_map_canvas" style="height: 500px; width: 100%;"></div>
 		</div>
 	</div>
 	<div id="map_results_list"></div>
-	<script>
+	<r:script>
             function refreshList(bounds){
                 var url = "${g.createLink(controller: "observation", action: "filteredList")}" + location.search
                 if (bounds !== undefined){
@@ -122,5 +122,5 @@
             $(function(){
                 refreshList();
             });
-        </script>
+        </r:script>
 </div>

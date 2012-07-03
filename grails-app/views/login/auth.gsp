@@ -7,8 +7,6 @@
 
 <body>
 
-<p/>
-
 <div class="login s2ui_center ui-corner-all" style='text-align:center;'>
 	<div class="login-inner">
 	<form action='${postUrl}' method='POST' id="loginForm" name="loginForm" autocomplete='off'>
@@ -47,14 +45,14 @@
 	</div>
 </div>
 
-<script>
+<r:script>
 $(document).ready(function() {
 	$('#username').focus();
 });
 
 <s2ui:initCheckboxes/>
 
-</script>
+</r:script>
 
 </body>
 </html>

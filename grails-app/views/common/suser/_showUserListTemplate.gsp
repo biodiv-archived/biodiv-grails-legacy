@@ -38,7 +38,7 @@
 			params="${params}" />
 	</div>
 
-	<script>
+	<r:script>
 		$(document).ready(function() {
 			$('.list_view_bttn').click(function() {
 				$('.grid_view').hide();
@@ -122,6 +122,6 @@
 				return false;
 			});
 		});
-	</script>
+	</r:script>
 </div>
 

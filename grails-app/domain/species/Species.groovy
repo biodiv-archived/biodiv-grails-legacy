@@ -23,7 +23,7 @@ class Species {
 	Date dateCreated;
 	Date lastUpdated;
 	
-	def grailsApplication;
+	def grailsApplication; 
 	
 	private static final log = LogFactory.getLog(this);
 	

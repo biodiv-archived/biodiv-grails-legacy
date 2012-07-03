@@ -24,10 +24,8 @@
 	vertical-align: middle;
 }
 </style>
-<g:javascript src="bootstrap-combobox.js"></g:javascript>
-<g:javascript src="bootstrap-typeahead.min.js"></g:javascript>
 
-<script>
+<r:script>
 $(document).ready(function() {
 	var langDropdown = $('#languageComboBox').combobox();
 	var defaultLang = "${Language.getLanguage(null).name}";
@@ -35,7 +33,7 @@ $(document).ready(function() {
 	$("#languageComboBox").data('combobox').refresh();
 	
 });
-</script>
+</r:script>
 
 <select id="languageComboBox" class="combobox" style="display:none;" name="languageName">
 <option></option>

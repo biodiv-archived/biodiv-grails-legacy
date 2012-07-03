@@ -2,9 +2,8 @@
 <%@page import="species.utils.ImageType"%>
 <%@ page import="species.groups.SpeciesGroup"%>
 <%@ page import="species.Habitat"%>
-<g:javascript src="jquery/jquery.url.js" />
 
-<g:javascript>
+<r:script>
 
 $(document).ready(function(){
 	$("#speciesGroupFilter").button();
@@ -41,7 +40,7 @@ $(document).ready(function(){
 		
 });
 
-</g:javascript>
+</r:script>
 <div class="class="btn-group">
 	<div id="speciesGroupFilter" data-toggle="buttons-radio">
 		<%def othersGroup = SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.OTHERS)%>

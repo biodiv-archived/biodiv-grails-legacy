@@ -3,7 +3,7 @@
 <head>
 <meta name='layout' content='main' />
 <title><g:message code='spring.security.ui.user.search' /></title>
-<g:javascript src="jquery/jquery.autopager-1.0.0.js"></g:javascript>
+<r:require modules="susers_list"/>
 <g:set var="entityName"
 	value="${message(code: 'searchlabel', default: 'Search Results')}" />
 
@@ -44,7 +44,7 @@
 			</div>
 		</div>
 
-		<g:javascript>
+		<r:script>
 	$(document).ready(function() {
 		/*$("#username").focus().autocomplete({
 			minLength: 3,
@@ -85,6 +85,6 @@
 		}
 		$("#searchBox").submit();
 	});
-	</g:javascript>
+	</r:script>
 </body>
 </html>

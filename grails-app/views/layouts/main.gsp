@@ -9,71 +9,8 @@
 
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 
-
-<link rel="stylesheet" type="text/css" media="all"
-	href="${resource(dir:'bootstrap/css',file:'bootstrap.min.css')}" />
-<link rel="stylesheet" type="text/css" media="all"
-	href="${resource(dir:'css',file:'jquery-ui.css')}" />
-<link rel="stylesheet"
-	href="${resource(dir:'css',file:'bootstrap-combobox.css')}"
-	type="text/css" media="all" />
-
-<!-- r:require module="jquery-ui" /-->
-
-<!-- r:layoutResources /-->
-<!-- sNav:resources override="true" /-->
-
-<script
-	src="${resource(dir:'plugins',file:'jquery-1.7/js/jquery/jquery-1.7.min.js')}"
-	type="text/javascript"></script>
-<script
-	src="${resource(dir:'plugins',file:'jquery-ui-1.8.15/jquery-ui/js/jquery-ui-1.8.15.custom.min.js')}"
-	type="text/javascript"></script>
-
-<g:if test="${params.controller  != 'species'}">
-	<g:javascript src="../bootstrap/js/bootstrap.js" contextPath=""></g:javascript>
-</g:if>
-
-<g:javascript src="species/main.js" />
-
-<link rel="stylesheet" type="text/css" media="screen"
-	href="${resource(dir:'js/jquery/jquery.jqGrid-4.1.2/css',file:'ui.jqgrid.css')}" />
-
-<link rel="stylesheet" type="text/css"
-	href="${resource(dir:'css',file:'auth.css')}" />
-<link rel="stylesheet" media="screen"
-	href="${resource(dir:'css',file:'spring-security-ui.css',plugin:'spring-security-ui')}" />
-<link rel="stylesheet" media="screen"
-	href="${resource(dir:'css',file:'jquery.safari-checkbox.css',plugin:'spring-security-ui')}" />
-
-<!-- link rel="stylesheet" type="text/css" media="all"
-	href="${resource(dir:'css',file:'reset.css')}" /-->
-<link rel="stylesheet" type="text/css" media="all"
-	href="${resource(dir:'css',file:'text.css')}" />
-
-
-<link rel="stylesheet" type="text/css" media="all"
-	href="${resource(dir:'css',file:'960.css')}" />
-<g:if test="${params.controller == 'species' || params.controller == 'search'}">
-	<link rel="stylesheet" href="${resource(dir:'css',file:'main.css')}" />
-</g:if>
-
-<link rel="stylesheet" type="text/css"
-	href="${resource(dir:'css',file:'navigation.css')}" />
-<link rel="stylesheet" type="text/css" media="all"
-	href="${resource(dir:'css',file:'jquery.rating.css')}" />
-<link rel="stylesheet" type="text/css" media="all"
-	href="${resource(dir:'css',file:'wgp.css')}" />
-
-<g:javascript src="jquery/jquery.form.js"></g:javascript>
-<g:javascript src="jquery/jquery.rating.js"></g:javascript>
-<g:javascript src="readmore/readmore.js" />
-<g:javascript src="jquery/jquery.cookie.js"></g:javascript>
-
-<g:javascript src='jquery/jquery.checkbox.js'
-	plugin='spring-security-ui' />
-<g:javascript src='spring-security-ui.js' plugin='spring-security-ui' />
-<g:javascript src="jquery/jquery.ellipses.js"></g:javascript>
+<r:layoutResources/>
+<g:javascript src="ga.js"></g:javascript>
 <ckeditor:resources/>
 <g:set var="fbAppId" value="" />
 <%
@@ -92,110 +29,15 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 	<link rel="shortcut icon" href="/sites/all/themes/wg/images/favicon.png" type="image/x-icon" />
 </g:else>
 <g:javascript>
-
-jQuery(document).ready(function($) {
-    if (document.domain == "${grailsApplication.config.wgp.domain}"){
-        $('#ibp-header').hide();
-        $('#wgp-header').show();
-        $('#ibp-footer').hide();
-        $('#wgp-footer').show();
-    }
-
-    if (document.domain == "${grailsApplication.config.ibp.domain}"){
-        $('#wgp-header').hide();
-        $('#ibp-header').show();
-        $('#wgp-footer').hide();
-        $('#ibp-footer').show();
-    }
-
-
-	$("#menu .navigation li").hover(
-  		function () {
-    		$(".subnavigation", this).show();
-  		}, 
-  		function () {
-    		$(".subnavigation", this).hide();
-  		}
-	);
-	$.widget( "custom.catcomplete", $.ui.autocomplete, {
-		_renderMenu: function( ul, items ) {
-			var self = this,
-				currentCategory = "";
-			$.each( items, function( index, item ) {
-				if ( item.category != currentCategory ) {
-					ul.append( "<li class='ui-autocomplete-category'>" +item.category + "</li>" );
-					currentCategory = item.category;
-				}
-				self._renderItem( ul, item );
-			});
-		}
-	});
-	
-});
-
-// Callback to execute whenever ajax login is successful.
-// Todo some thing meaningful with the response data
-var ajaxLoginSuccessCallbackFunction, ajaxLoginErrorCallbackFunction;
-
-var reloadLoginInfo = function() {
-	$.ajax({
-		url : "${createLink(controller:'SUser', action:'login')}",
-		success : function(data) {
-			$('.header:visible .header_userInfo').html(data);
-		}, error: function (xhr, ajaxOptions, thrownError){
-			alert("Error while getting login information : "+xhr.responseText);
-		}
-	});
-}
-		
-var ajaxLoginSuccessHandler = function(json, statusText, xhr, $form) {
-	if (json.success) {
-		$('#ajaxLogin').modal('hide');
-		$('#loginMessage').html('').removeClass()
-				.hide();
-		reloadLoginInfo();
-		if (ajaxLoginSuccessCallbackFunction) {
-			ajaxLoginSuccessCallbackFunction(json,
-					statusText, xhr);
-			ajaxLoginSuccessCallbackFunction = undefined;
-		}
-	} else if (json.error) {
-		$('#loginMessage').html(json.error)
-				.removeClass().addClass(
-						'alter alert-error')
-				.show();
-	} else {
-		$('#loginMessage').html(json).removeClass()
-				.addClass('alter alert-info')
-				.show();
-	}
-}
+    window.appContext = '${request.contextPath}';
+    window.appIBPDomain = '${grailsApplication.config.ibp.domain}'
+    window.appWGPDomain = '${grailsApplication.config.wgp.domain}'
 </g:javascript>
 
 <g:layoutHead />
-<!-- ga:trackPageview /-->
 
 <!-- script src="http://cdn.wibiya.com/Toolbars/dir_1100/Toolbar_1100354/Loader_1100354.js" type="text/javascript"></script><noscript><a href="http://www.wibiya.com/">Web Toolbar by Wibiya</a></noscript-->
 
-<script type="text/javascript">
-
-  var _gaq = _gaq || [];
-
-    if (document.domain == "${grailsApplication.config.ibp.domain}"){
-        _gaq.push(['_setAccount', 'UA-3185202-1']);
-    } else {
-        _gaq.push(['_setAccount', 'UA-23009417-1']);
-    }
-
-  _gaq.push(['_trackPageview']);
-
-  (function() {
-    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-  })();
-
-</script>
 
 </head>
 <body>
@@ -225,9 +67,13 @@ var ajaxLoginSuccessHandler = function(json, statusText, xhr, $form) {
 				<g:if test="${params.controller == 'SUser'}">
 					<sNav:render group="users_dashboard" subitems="false" />
 				</g:if>
+				
+				<g:if
+					test="${params.controller == 'species' || params.controller == 'observation' || params.controller == 'SUser'}">
 				<div style="float: right;">
 					<search:searchBox />
 				</div>
+				</g:if>
 
 			</div>
 
@@ -239,8 +85,9 @@ var ajaxLoginSuccessHandler = function(json, statusText, xhr, $form) {
 		<domain:showIBPFooter />
 
 	</div>
-
-	<g:javascript>
+	
+	
+	<r:script>
 
 		$(document).ready(function(){
 			
@@ -309,9 +156,7 @@ var ajaxLoginSuccessHandler = function(json, statusText, xhr, $form) {
 			})
 			 
 		}); 
-			
-	</g:javascript>
-	<g:javascript>
+	
 	//////////////////////// FB RELATED CALLS ///////////////////////
 	
 	window.fbInitCalls = Array();
@@ -359,12 +204,7 @@ var ajaxLoginSuccessHandler = function(json, statusText, xhr, $form) {
 		fjs.parentNode.insertBefore(js, fjs);
 	}(document, 'script', 'facebook-jssdk'));
 	////////////////////////FB RELATED CALLS END HERE ///////////////////////
-	</g:javascript>
-
-
-	<g:javascript src="species/popuplib.js"></g:javascript>
-
-	<script type="text/javascript">
+		
 		function closeHandler() {
 		};
 
@@ -397,8 +237,27 @@ var ajaxLoginSuccessHandler = function(json, statusText, xhr, $form) {
 			'shouldEncodeUrls' : true,
 			'extensions' : extensions
 		});
-	</script>
-
-
+	</r:script>
+	<r:script>
+	
+	  var _gaq = _gaq || [];
+	
+	    if (document.domain == "${grailsApplication.config.ibp.domain}"){
+	        _gaq.push(['_setAccount', 'UA-3185202-1']);
+	    } else {
+	        _gaq.push(['_setAccount', 'UA-23009417-1']);
+	    }
+	
+	  _gaq.push(['_trackPageview']);
+	
+	  (function() {
+	    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+	    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+	    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+	  })();
+	
+	</r:script>
+		
+	<r:layoutResources/>
 </body>
 </html>

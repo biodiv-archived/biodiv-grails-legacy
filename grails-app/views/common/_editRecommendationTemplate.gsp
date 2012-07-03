@@ -1,7 +1,7 @@
 <%@ page
 	import="species.participation.RecommendationVote.ConfidenceType"%>
 <!-- TODO change this r:script which is used by resources framework for script not to be repeated multiple times -->
-<script>
+<r:script>
 $(document).ready(function() {
 
 	//TODO : global variables ... may be problematic
@@ -116,7 +116,7 @@ $(document).ready(function() {
 										});
 
 					});
-</script>
+</r:script>
 
 <g:hasErrors bean="${recommendationVoteInstance}">
 	<div class="alert alert-error">
@@ -192,7 +192,7 @@ $(document).ready(function() {
 
 
 
-<script>
+<r:script>
 	$(document).ready(function() {
 		$('#recoComment').val('');
 
@@ -207,7 +207,7 @@ $(document).ready(function() {
 		$('#reco-options').hide();
 		$('#reco-action').show();
 	}
-</script>
+</r:script>
 <style>
 #reco-options {
 	background-clip: padding-box;

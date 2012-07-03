@@ -56,7 +56,7 @@
 			max="${queryParams.max}" action="${params.action}"
 			params="${activeFilters}" />
 	</div>
-	<script>
+	<r:script>
 		$('.list_view_bttn').click(function() {
 			$('.grid_view').hide();
 			$('.list_view').show();
@@ -135,7 +135,7 @@
 			return false;
 		});
 
-	</script>
+	</r:script>
 
 </div>
 

@@ -41,7 +41,7 @@
 	</div>
 </div>
 
-<script>
+<r:script>
 var validEmailAndIdList = []
 
 function removeChoice(ele){
@@ -183,7 +183,7 @@ $(function() {
  	});
  	
 });
-</script>
+</r:script>
 <style>
 #email-form {
 	background-clip: padding-box;

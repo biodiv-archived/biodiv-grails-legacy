@@ -28,7 +28,7 @@
 	</div>
 </g:if>
 
-<script>
+<r:script>
 	$(document).ready(function() {
 		$('#reco_comment_' + ${recoId} + ' .reco-comment-action').click(function() {
 			$('#reco_comment_' + ${recoId} +' .reco-comment-table').show();
@@ -37,4 +37,4 @@
 			$('#reco_comment_' + ${recoId} + ' .reco-comment-table').hide();
 		});
 	});
-</script>
+</r:script>

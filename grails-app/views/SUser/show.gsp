@@ -5,23 +5,11 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="main" />
+<r:require modules="observations_show"/>
 <g:set var="entityName"
 	value="${message(code: 'SUser.label', default: 'SUser')}" />
 <title><g:message code="default.show.label" args="[entityName]" />
 </title>
-<link rel="stylesheet"
-	href="${resource(dir:'css',file:'tagit/tagit-custom.css')}"
-	type="text/css" media="all" />
-<link rel="stylesheet" type="text/css" media="all"
-	href="${resource(dir:'js/jquery/jquery.jcarousel-0.2.8/themes/classic/',file:'skin.css')}" />
-	
-<g:javascript src="tagit.js"></g:javascript>
-
-<g:javascript src="jquery/jquery.jcarousel-0.2.8/jquery.jcarousel.js"/>
-
-<g:javascript src="species/carousel.js"/>
-
-<g:javascript src="species/observations.js"/>
 
 <style>
 .prop .name {

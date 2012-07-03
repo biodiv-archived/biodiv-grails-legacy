@@ -7,10 +7,10 @@
 <head>
 
 <meta name="layout" content="main" />
-
+<r:require modules="species"/>
 <title>Search Species</title>
 
-<g:javascript>
+<r:script>
 
 $(document).ready(function(){
 	//$(".readmore").readmore({
@@ -32,7 +32,7 @@ $( "#search" ).unbind('click');
 	});
 
 
-</g:javascript>
+</r:script>
 </head>
 <body>
 	<div class="container big_wrapper outer_wrapper">
