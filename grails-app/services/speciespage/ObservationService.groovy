@@ -128,10 +128,10 @@ class ObservationService {
 	 * @return
 	 */
 	Map getRelatedObservationBySpeciesName(long obvId, int limit, long offset){
-		String speciesName = getSpeciesNames(obvId)
+		//String speciesName = getSpeciesNames(obvId)
 		//log.debug speciesName
 		//log.debug speciesName.getClass();
-		return getRelatedObservationBySpeciesNames(speciesName, obvId, limit, offset)
+		return getRelatedObservationBySpeciesNames(obvId, limit, offset)
 	}
 	/**
 	 * 
@@ -227,22 +227,27 @@ class ObservationService {
 	 * @param params
 	 * @return
 	 */
-	Map getRelatedObservationBySpeciesNames(String speciesName, long obvId, int limit, long offset){
-		if(speciesName == "Unknown") {
+	Map getRelatedObservationBySpeciesNames(long obvId, int limit, long offset){
+		Observation parentObv = Observation.read(obvId);
+		if(!parentObv.maxVotedReco) {
 			return ["observations":[], "count":0];
 		}
-		def recIds = Recommendation.executeQuery("select rec.id from Recommendation as rec where rec.name = :speciesName", [speciesName:speciesName]);
-		def countQuery = "select count(*) from RecommendationVote recVote where recVote.recommendation.id in (:recIds) and recVote.observation.id != :parentObv and recVote.observation.isDeleted = :isDeleted"
-		def countParams = [parentObv:obvId, recIds:recIds, isDeleted:false]
-		def count = RecommendationVote.executeQuery(countQuery, countParams)
-		def query = "select recVote.observation as observation from RecommendationVote recVote where recVote.recommendation.id in (:recIds) and recVote.observation.id != :parentObv and recVote.observation.isDeleted = :isDeleted order by recVote.votedOn desc "
-		def m = [parentObv:obvId, recIds:recIds, max:limit, offset:offset, isDeleted:false]
-		def observations = RecommendationVote.executeQuery(query, m);
+		def count = Observation.countByMaxVotedRecoAndIsDeleted(parentObv.maxVotedReco, false) - 1;
+		def c = Observation.createCriteria();
+		def observations = c.list (max: limit, offset: offset) {
+			and {
+				eq("maxVotedReco", parentObv.maxVotedReco)
+				eq("isDeleted", false)
+				ne("id", obvId)
+			}
+			order("lastRevised", "desc")
+		}
+		
 		def result = [];
 		observations.each {
 			result.add(['observation':it, 'title':it.maxVotedSpeciesName]);
 		}
-		return ["observations":result, "count":count[0]]
+		return ["observations":result, "count":count]
 	}
 
 	static List createUrlList2(observations){
