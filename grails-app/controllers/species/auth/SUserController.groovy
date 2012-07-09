@@ -24,6 +24,7 @@ class SUserController extends UserController {
 	def springSecurityService
 	def namesIndexerService;
 	def observationService;
+	def SUserService;
 	
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
@@ -92,16 +93,16 @@ class SUserController extends UserController {
 			redirect(action: "list")
 		}
 		else {
-			[SUserInstance: SUserInstance]
+			return buildUserModel(SUserInstance)
 		}
 	}
 
-	@Secured(['ROLE_USER'])
+	@Secured(['ROLE_USER', 'ROLE_ADMIN'])
 	def edit = {
 		log.debug params;
 		String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
 
-		if(params.long('id') == springSecurityService.currentUser?.id) {
+		if(SUserService.ifOwns(params.long('id'))) {
 			def user = params.username ? lookupUserClass().findWhere((usernameFieldName): params.username) : null
 			if (!user) user = findById()
 			if (!user) return
@@ -112,7 +113,7 @@ class SUserController extends UserController {
 		redirect (action:'show', id:params.id)
 	}
 
-	@Secured(['ROLE_USER'])
+	@Secured(['ROLE_USER', 'ROLE_ADMIN'])
 	def update = {
 		log.debug params;
 		String passwordFieldName = SpringSecurityUtils.securityConfig.userLookup.passwordPropertyName
@@ -125,7 +126,7 @@ class SUserController extends UserController {
 				return
 			}
 
-		if(params.long('id') == springSecurityService.currentUser?.id) {
+		if(SUserService.ifOwns(params.long('id'))) {
 			//Cannot change email id with which user was registered
 			params.email = user.email;
 			
@@ -152,8 +153,8 @@ class SUserController extends UserController {
 
 			String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
 
-			//lookupUserRoleClass().removeAll user
-			//addRoles user
+			lookupUserRoleClass().removeAll user
+			addRoles user
 			userCache.removeUserFromCache user[usernameFieldName]
 			flash.message = "${message(code: 'default.updated.message', args: [message(code: 'user.label', default: 'User'), user.id])}"
 			redirect action: show, id: user.id
@@ -502,7 +503,7 @@ class SUserController extends UserController {
 			}else{
 				BlockedMails bm = new BlockedMails(email:user.email.trim());
 				if(!bm.save(flush:true)){
-					this.errors.allErrors.each { log.error it }
+					bm.errors.allErrors.each { log.error it }
 				}
 			}
 		}

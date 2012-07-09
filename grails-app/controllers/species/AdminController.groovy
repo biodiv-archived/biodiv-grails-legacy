@@ -216,4 +216,10 @@ class AdminController {
 		}
 		namesLoaderService.syncNamesAndRecos(true);
 	}
+	
+	def user = {
+		String actionId = params.id ?: "list"
+		log.debug actionId
+		render (template:"/admin/user/$actionId");
+	}
 }

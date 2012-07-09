@@ -15,7 +15,7 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 %>
 <meta property="og:image" content="${createLinkTo(file: fbImagePath, base:grailsApplication.config.speciesPortal.observations.serverURL)}" />
 <meta property="og:site_name" content="${Utils.getDomainName(request)}" />
-<g:set var="description" value="" />
+
 <g:set var="domain" value="${Utils.getDomain(request)}" />
 <%
 		String fbAppId;
@@ -27,8 +27,9 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 		
 		//description = observationInstance.notes.trim() ;
 		String location = "Observed at '" + (observationInstance.placeName.trim()?:observationInstance.reverseGeocodedName) +"'"
-		description += "- "+ location +" by "+observationInstance.author.name.capitalize()+" in species group "+observationInstance.group.name + " and habitat "+ observationInstance.habitat.name;
+		String desc = "- "+ location +" by "+observationInstance.author.name.capitalize()+" in species group "+observationInstance.group.name + " and habitat "+ observationInstance.habitat.name;
 %>
+<g:set var="description" value="${desc }" />
 
 <meta property="fb:app_id" content="${fbAppId }" />
 <meta property="fb:admins" content="581308415,100000607869577" />

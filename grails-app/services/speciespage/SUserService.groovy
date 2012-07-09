@@ -106,4 +106,12 @@ class SUserService extends SpringSecurityUiService {
 	def ifOwns(SUser user) {
 		return springSecurityService.isLoggedIn() && (springSecurityService.currentUser?.id == user.id || SpringSecurityUtils.ifAllGranted('ROLE_ADMIN'))	
 	}
+	
+	def ifOwns(long id) {
+		return springSecurityService.isLoggedIn() && (springSecurityService.currentUser?.id == id || SpringSecurityUtils.ifAllGranted('ROLE_ADMIN'))
+	}
+	
+	def isAdmin(long id) {
+		return SpringSecurityUtils.ifAllGranted('ROLE_ADMIN')
+	}
 }

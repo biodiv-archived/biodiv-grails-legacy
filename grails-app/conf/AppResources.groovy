@@ -130,4 +130,8 @@ modules = {
 		resource url:'/css/main.css'
 	}
 	
+	admin {
+		dependsOn	'core'
+	}
+	
 }

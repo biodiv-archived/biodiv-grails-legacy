@@ -7,7 +7,7 @@ class SUserTagLib {
 
 	def springSecurityService
 	def SUserService;
-	
+
 	/**
 	 * 
 	 */
@@ -27,7 +27,7 @@ class SUserTagLib {
 			out << body()
 		}
 	}
-	
+
 	/**
 	 * 
 	 */
@@ -73,14 +73,14 @@ class SUserTagLib {
 			out << render(template:"/common/suser/showUserListTemplate", model:attrs.model);
 		}
 	}
-	
+
 	/**
-	*
-	*/
-   def showUserListWrapper = { attrs, body->
-	   out << render(template:"/common/suser/showUserListWrapperTemplate", model:attrs.model);
-   }
-	
+	 *
+	 */
+	def showUserListWrapper = { attrs, body->
+		out << render(template:"/common/suser/showUserListWrapperTemplate", model:attrs.model);
+	}
+
 	/**
 	 *
 	 */
@@ -89,7 +89,7 @@ class SUserTagLib {
 			out << render(template:"/common/suser/showUserStoryTemplate", model:attrs.model);
 		}
 	}
-	
+
 	/**
 	 * 
 	 */
@@ -107,13 +107,22 @@ class SUserTagLib {
 		}
 	}
 
-    def userLoginBox = { attrs, body->
-			out << render(template:"/common/suser/userLoginBoxTemplate", model:attrs.model);
+	def userLoginBox = { attrs, body->
+		out << render(template:"/common/suser/userLoginBoxTemplate", model:attrs.model);
 	}
-	
+
 	def isFBUser = { attrs, body->
 		if(springSecurityService.getAuthentication() instanceof FacebookAuthToken) {
 			out<< body();
+		}
+	}
+
+	/**
+	 * Renders the body if the authenticated user owns this page.
+	 */
+	def isAdmin = { attrs, body ->
+		if (SUserService.isAdmin(attrs.model.user?.id)) {
+			out << body()
 		}
 	}
 }

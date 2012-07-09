@@ -10,7 +10,6 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 
 <r:layoutResources/>
-<g:javascript src="ga.js"></g:javascript>
 <ckeditor:resources/>
 <g:set var="fbAppId" value="" />
 <%
@@ -144,7 +143,7 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 				});
 			});
 			
-			var t = "${createLink(controller:params.controller, action:params.action) }";
+			var t = "${createLink(controller:params.controller?:'search', action:params.action?:'') }";
 			//t = t.replace(/\//g, "\\\\/");
 			//console.log(t);
 			$("#searchResultsTabs a[href='"+t+"']").parent().addClass("active");
