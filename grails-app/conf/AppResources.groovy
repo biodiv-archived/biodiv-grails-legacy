@@ -4,7 +4,7 @@
 modules = {
 	core {
 		dependsOn 'jquery, jquery-ui'
-		defaultBundle false
+		//defaultBundle false
 		
 		resource url:'/bootstrap/css/bootstrap.min.css'
 		resource url:'/css/bootstrap-combobox.css'
