@@ -232,7 +232,7 @@ input.dms_field {
                                         def defaultGroup = observationInstance?.group
                                         //def defaultGroupIconFileName = (defaultGroupId)? SpeciesGroup.read(defaultGroupId).icon(ImageType.VERY_SMALL)?.fileName?.trim() : SpeciesGroup.findByName('All').icon(ImageType.VERY_SMALL)?.fileName?.trim()
                                         def defaultGroupValue = (defaultGroup) ? defaultGroup.name : "Select group"
-										def defaultIcon = (defaultGroup) ? defaultGroup.name.toLowerCase()+'_gall_th' : "all_gall_th"
+										def defaultIcon = (defaultGroup) ? defaultGroup.iconClass() : "all_gall_th"
                                         %>
 
 									<button id="selected_group"
@@ -249,7 +249,7 @@ input.dms_field {
 												test="${!g.name.equals(grailsApplication.config.speciesPortal.group.ALL)}">
 												<li class="span2 group_option" value="${g.id}" title="${g.name}">
 													<a>
-														<i class="group_icon pull-left species_groups_sprites active ${g.name.toLowerCase()+'_gall_th'}"></i>
+														<i class="group_icon pull-left species_groups_sprites active ${g.iconClass()}"></i>
 															${g.name}
 												</a></li>
 											</g:if>
@@ -281,7 +281,7 @@ input.dms_field {
                                             def defaultHabitat = observationInstance?.habitat;
                                             //def defaultHabitatIconFileName = (defaultHabitatId)? defaultHabitat.icon(ImageType.VERY_SMALL)?.fileName?.trim() : Habitat.findByName('All').icon(ImageType.VERY_SMALL)?.fileName?.trim()
                                             def defaultHabitatValue = (defaultHabitat) ? defaultHabitat.name : "Select habitat"
-											def defaultHabitatIcon = (defaultHabitat) ? defaultHabitat.name.toLowerCase()+'_gall_th' : "all_gall_th"
+											def defaultHabitatIcon = (defaultHabitat) ? defaultHabitat.iconClass() : "all_gall_th"
                                         %>
                                         <button id="selected_habitat"
 										class="btn btn-large dropdown-toggle" data-toggle="dropdown"
@@ -297,7 +297,7 @@ input.dms_field {
 												test="${!h.name.equals(grailsApplication.config.speciesPortal.group.ALL)}">
 												<li class="span2 habitat_option" value="${h.id}" title="${h.name}"><a>
 												
-												<i class="group_icon pull-left habitats_sprites active ${h.name.toLowerCase()+'_gall_th'}"></i>
+												<i class="group_icon pull-left habitats_sprites active ${h.iconClass()}"></i>
 												${h.name}</a>
 												</li>
 											</g:if>

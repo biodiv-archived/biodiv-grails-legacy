@@ -392,6 +392,10 @@ environments {
 
         ibp.domain='indiabiodiversity.localhost.org'
         wgp.domain='thewesternghats.localhost.in'
+		//grails.resources.debug=true
+		grails.resources.mappers.hashandcache.excludes = ['**']
+		//grails.resources.flatten = false
+		grails.resources.mappers.yuijsminify.disable=true
 	}
 	test {
 		grails.serverURL = "http://localhost:8080/${appName}"
@@ -785,8 +789,6 @@ grails.plugins.springsecurity.onInteractiveAuthenticationSuccessEvent = { e, app
 }
 
 grails.plugins.springsecurity.openid.registration.requiredAttributes = [email: 'http://axschema.org/contact/email', location: 'http://axschema.org/contact/country/home',firstname:'http://axschema.org/namePerson/first', lastname: 'http://axschema.org/namePerson/last', profilePic:'http://axschema.org/media/image/default']
-
-//grails.resources.debug=true
 
 grails.plugins.springsecurity.controllerAnnotations.staticRules = [
 	'/role/**': ['ROLE_ADMIN'],

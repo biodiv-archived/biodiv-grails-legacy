@@ -6,10 +6,10 @@
         <h5><obv:showSpeciesName model="['observationInstance':observationInstance]" /></h5>
         <div class="icons-bar">
             <div class="observation-icons">
-                    <span class="group_icon species_groups_sprites active ${observationInstance.group.name.toLowerCase()+'_gall_th'}" title="${observationInstance.group?.name}"></span>
+                    <span class="group_icon species_groups_sprites active ${observationInstance.group.iconClass()}" title="${observationInstance.group?.name}"></span>
 
                     <g:if test="${observationInstance.habitat}">
-                           <span class="habitat_icon group_icon habitats_sprites active ${observationInstance.habitat.name.toLowerCase()+'_gall_th'}"
+                           <span class="habitat_icon group_icon habitats_sprites active ${observationInstance.habitat.iconClass()}"
                                     title="${observationInstance.habitat.name}" ></span>
                                     
                     </g:if>

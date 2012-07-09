@@ -78,4 +78,7 @@ class SpeciesGroup {
 		return true;
 	}	
 	
+	String iconClass() {
+		return this.name?.trim()?.toLowerCase()?.replaceAll(/ /, '_')+'_gall_th';
+	}
 }

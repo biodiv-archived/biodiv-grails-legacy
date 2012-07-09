@@ -23,13 +23,13 @@ $(document).ready(function(){
 		<%def othersGroup = SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.OTHERS)%>
 		<g:each in="${SpeciesGroup.list() }" var="sGroup" status="i">
 			<g:if test="${sGroup != othersGroup }">
-				<button class="btn species_groups_sprites ${sGroup.name.toLowerCase()+'_gall_th'}" id="${"group_" + sGroup.id}"
+				<button class="btn species_groups_sprites ${sGroup.iconClass()}" id="${"group_" + sGroup.id}"
 					value="${sGroup.id}" title="${sGroup.name}" 
 					></button>
 			</g:if>
 
 		</g:each>
-		<button class="btn species_groups_sprites ${ othersGroup.name.toLowerCase()+'_gall_th'}" id="${"group_" + othersGroup.id}"
+		<button class="btn species_groups_sprites ${ othersGroup.iconClass()}" id="${"group_" + othersGroup.id}"
 			value="${othersGroup.id}" title="${othersGroup.name}"
 			></button>
 	</div>
@@ -40,13 +40,13 @@ $(document).ready(function(){
 		<%def othersHabitat = species.Habitat.findByName(HabitatType.OTHERS.value())%>
 		<g:each in="${species.Habitat.list()}" var="habitat" status="i">
 			<g:if test="${habitat.id != othersHabitat.id }">
-				<button class="btn habitats_sprites ${habitat.name.toLowerCase()+'_gall_th'}" id="${"habitat_" + habitat.id}"
+				<button class="btn habitats_sprites ${habitat.iconClass()}" id="${"habitat_" + habitat.id}"
 					value="${habitat.id}" title="${habitat.name}"
 					data-content="${message(code: 'habitat.definition.' + habitat.name)}"
 					rel="tooltip" data-original-title="A Title"></button>
 			</g:if>
 		</g:each>
-		<button class="btn habitats_sprites ${othersHabitat.name.toLowerCase()+'_gall_th'}" id="${"habitat_" + othersHabitat.id}"
+		<button class="btn habitats_sprites ${othersHabitat.iconClass()}" id="${"habitat_" + othersHabitat.id}"
 			value="${othersHabitat.id}" title="${othersHabitat.name}"
 			data-content="${message(code: 'habitat.definition.' + othersHabitat.name)}"
 			rel="tooltip"></button>

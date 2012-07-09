@@ -2,9 +2,18 @@
 //mappers.hashandcache.excludes = ["**/*.css"]
 //
 modules = {
+	overrides {
+		jquery {
+			defaultBundle 'core'
+		}
+		'jquery-ui' {
+			defaultBundle 'core'
+		}
+	}
+	
 	core {
 		dependsOn 'jquery, jquery-ui'
-		defaultBundle 'ui'
+		defaultBundle 'core'
 		
 		resource url:'/bootstrap/css/bootstrap.min.css'
 		resource url:'/css/bootstrap-combobox.css'
@@ -67,7 +76,7 @@ modules = {
 	
 	observations {
 		dependsOn 'core, tagit'
-		defaultBundle 'ui'
+		defaultBundle 'core'
 		
 		resource url:'/css/speciesGroups.css'
 		resource url:'/css/habitats.css'
