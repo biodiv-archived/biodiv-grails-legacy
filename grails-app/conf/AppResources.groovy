@@ -4,7 +4,7 @@
 modules = {
 	core {
 		dependsOn 'jquery, jquery-ui'
-		//defaultBundle false
+		defaultBundle 'ui'
 		
 		resource url:'/bootstrap/css/bootstrap.min.css'
 		resource url:'/css/bootstrap-combobox.css'
@@ -20,6 +20,7 @@ modules = {
 		
 		resource url:'/bootstrap/js/bootstrap.min.js'
 		resource url:'/js/species/main.js'
+		resource url:'/js/species/util.js'
 		resource url:'/js/readmore/readmore.js'
 		resource url:'/js/jquery/jquery.form.js'
 		resource url:'/js/jquery/jquery.rating.js'
@@ -66,8 +67,10 @@ modules = {
 	
 	observations {
 		dependsOn 'core, tagit'
+		defaultBundle 'ui'
 		
-		
+		resource url:'/css/speciesGroups.css'
+		resource url:'/css/habitats.css'
 		resource url:'/js/jquery/jquery.watermark.min.js'
 		resource url:'/js/jsrender.js'		
 		resource url:'/js/bootstrap-typeahead.js'

@@ -1,0 +1,50 @@
+.habitats_sprites, .habitats_sprites.active { background-image: url(../images/group_icons/habitat/all_small_sprite.png); background-color: transparent; background-repeat: no-repeat; }
+
+.habitats_sprites.all_gall_th { width: 32px; height: 32px; background-position: -33px -483px; }
+.habitats_sprites.all_gall_th:hover { background-position: -33px -515px; }
+.habitats_sprites.all_gall_th.active, .habitats_sprites.all_gall_th:active { background-position: -33px -547px; }
+
+.habitats_sprites.others_gall_th { width: 32px; height: 32px; background-position: -33px -388px; }
+.habitats_sprites.others_gall_th:hover { background-position: -33px -420px; }
+.habitats_sprites.others_gall_th.active, .habitats_sprites.others_gall_th:active { background-position: -33px -452px; }
+
+.agriculture_gall_th { width: 32px; height: 32px; background-position: -33px -97px; }
+.agriculture_gall_th:hover { background-position: -33px -129px; }
+.agriculture_gall_th.active, .agriculture_gall_th:active { background-position: -33px -131px; }
+
+.aquatic_gall_th { width: 32px; height: 32px; background-position: 0 0; }
+.aquatic_gall_th:hover { background-position: 0 -32px; }
+.aquatic_gall_th.active, .aquatic_gall_th:active  { background-position: 0 -64px; }
+
+.desert_gall_th { width: 32px; height: 32px; background-position: 0 -97px; }
+.desert_gall_th:hover { background-position: 0 -129px; }
+.desert_gall_th.active, .desert_gall_th:active { background-position: 0 -131px; }
+
+.forest_gall_th { width: 32px; height: 32px; background-position: 0 -289px; }
+.forest_gall_th:hover { background-position: 0 -321px; }
+.forest_gall_th.active, .forest_gall_th:active { background-position: 0 -353px; }
+
+.grassland_gall_th { width: 32px; height: 32px; background-position: 0 -483px; }
+.grassland_gall_th:hover { background-position: 0 -515px; }
+.grassland_gall_th.active, .grassland_gall_th:active { background-position: 0 -547px; }
+
+
+.rocky_outcrops_gall_th { width: 32px; height: 32px; background-position: -33px -194px; }
+.rocky_outcrops_gall_th:hover { background-position: -33px -226px; }
+.rocky_outcrops_gall_th.active, .rocky_outcrops_gall_th:active  { background-position: -33px -258px; }
+
+.savanna_gall_th { width: 32px; height: 32px; background-position: -33px -291px; }
+.savanna_gall_th:hover { background-position: -33px -323px; }
+.savanna_gall_th.active, .savanna_gall_th:active { background-position: -33px -355px; }
+
+.swamp_gall_th { width: 32px; height: 32px; background-position: 0 -386px; }
+.swamp_gall_th:hover { background-position: 0 -418px; }
+.swamp_gall_th.active, .swamp_gall_th:active  { background-position: 0 -450px; }
+
+.thicket_gall_th { width: 32px; height: 32px; background-position: -33px 0; }
+.thicket_gall_th:hover { background-position: -33px -32px; }
+.thicket_gall_th.active, .thicket_gall_th:active  {background-position: -33px -64px; }
+
+.urban_gall_th { width: 32px; height: 32px; background-position: 0 -194px; }
+.urban_gall_th:hover { background-position: 0 -226px; }
+.urban_gall_th.active, .urban_gall_th:active  { background-position: 0 -258px; }

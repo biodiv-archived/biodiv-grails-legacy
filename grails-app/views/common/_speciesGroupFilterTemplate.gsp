@@ -7,35 +7,12 @@
 
 $(document).ready(function(){
 	$("#speciesGroupFilter").button();
-	$("#speciesGroupFilter button").each(function() {
-		$(this).hover(function() {
-			$(this).css('backgroundPosition', '0px -32px');
-		}, function() {
-			if(!$(this).hasClass('active')) {
-				$(this).css('backgroundPosition', '0px 0px');
-			}else{
-				$(this).css('backgroundPosition', '0px -64px');
-			}
-		});
-	})
-	$('#speciesGroupFilter button[value$="${params.sGroup}"]').addClass('active').css('backgroundPosition', '0px -64px');
+	$('#speciesGroupFilter button[value$="${params.sGroup}"]').addClass('active');
     $('#speciesGroupFilter button').tooltip({placement:'top'});
 	
 	
 	$("#habitatFilter").button();
-	$("#habitatFilter button").each(function() {
-		$(this).hover(function() {
-			$(this).css('backgroundPosition', '0px -32px');
-		}, function() {
-			if(!$(this).hasClass('active')) {
-				$(this).css('backgroundPosition', '0px 0px');
-			}else{
-				$(this).css('backgroundPosition', '0px -64px');
-			}
-		});
-	})
-	
-	$('#habitatFilter button[value$="${params.habitat}"]').addClass('active').css('backgroundPosition', '0px -64px');
+	$('#habitatFilter button[value$="${params.habitat}"]').addClass('active');
 	$('#habitatFilter button').tooltip({placement:'bottom'});
 		
 });
@@ -46,15 +23,15 @@ $(document).ready(function(){
 		<%def othersGroup = SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.OTHERS)%>
 		<g:each in="${SpeciesGroup.list() }" var="sGroup" status="i">
 			<g:if test="${sGroup != othersGroup }">
-				<button class="btn" id="${"group_" + sGroup.id}"
-					value="${sGroup.id}" title="${sGroup.name}"
-					style="background-image: url('${createLinkTo(dir: 'images', file: sGroup.icon(ImageType.SMALL)?.fileName?.trim(), absolute:true)}'); background-position: 0 0; width: 32px; height: 32px; "></button>
+				<button class="btn species_groups_sprites ${sGroup.name.toLowerCase()+'_gall_th'}" id="${"group_" + sGroup.id}"
+					value="${sGroup.id}" title="${sGroup.name}" 
+					></button>
 			</g:if>
 
 		</g:each>
-		<button class="btn " id="${"group_" + othersGroup.id}"
+		<button class="btn species_groups_sprites ${ othersGroup.name.toLowerCase()+'_gall_th'}" id="${"group_" + othersGroup.id}"
 			value="${othersGroup.id}" title="${othersGroup.name}"
-			style="background-image: url('${createLinkTo(dir: 'images', file: othersGroup.icon(ImageType.SMALL)?.fileName?.trim(), absolute:true)}'); background-position: 0 0; width: 32px; height: 32px; "></button>
+			></button>
 	</div>
 
 
@@ -63,17 +40,14 @@ $(document).ready(function(){
 		<%def othersHabitat = species.Habitat.findByName(HabitatType.OTHERS.value())%>
 		<g:each in="${species.Habitat.list()}" var="habitat" status="i">
 			<g:if test="${habitat.id != othersHabitat.id }">
-				<button class="btn " id="${"habitat_" + habitat.id}"
+				<button class="btn habitats_sprites ${habitat.name.toLowerCase()+'_gall_th'}" id="${"habitat_" + habitat.id}"
 					value="${habitat.id}" title="${habitat.name}"
-					style="background-image: url('${createLinkTo(dir: 'images', file: habitat.icon(ImageType.SMALL)?.fileName?.trim(), absolute:true)}'); background-position: 0 0; width: 32px; height: 32px; "
 					data-content="${message(code: 'habitat.definition.' + habitat.name)}"
 					rel="tooltip" data-original-title="A Title"></button>
 			</g:if>
 		</g:each>
-		<button class="btn" id="${"habitat_" + othersHabitat.id}"
+		<button class="btn habitats_sprites ${othersHabitat.name.toLowerCase()+'_gall_th'}" id="${"habitat_" + othersHabitat.id}"
 			value="${othersHabitat.id}" title="${othersHabitat.name}"
-			class="group_icon"
-			style="background-image: url('${createLinkTo(dir: 'images', file: othersHabitat.icon(ImageType.SMALL)?.fileName?.trim(), absolute:true)}'); background-position: 0 0; width: 32px; height: 32px; "
 			data-content="${message(code: 'habitat.definition.' + othersHabitat.name)}"
 			rel="tooltip"></button>
 	</div>

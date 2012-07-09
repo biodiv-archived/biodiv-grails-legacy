@@ -4,13 +4,11 @@
 
 <div class="observation_story">
 	<div class="observation-icons">
-		<img class="group_icon" title="${observationInstance.group?.name}"
-			src="${createLinkTo(dir:'images', file: observationInstance.group.icon(ImageType.VERY_SMALL)?.fileName?.trim(), absolute:true)}" />
+		 <span class="group_icon species_groups_sprites active ${observationInstance.group.name.toLowerCase()+'_gall_th'}" title="${observationInstance.group?.name}"></span>
 
 		<g:if test="${observationInstance.habitat}">
-			<img class="habitat_icon group_icon"
-				title="${observationInstance.habitat.name}"
-				src="${createLinkTo(dir: 'images', file:observationInstance.habitat.icon(ImageType.VERY_SMALL)?.fileName?.trim(), absolute:true)}" />
+			<span class="habitat_icon group_icon habitats_sprites active ${observationInstance.habitat.name.toLowerCase()+'_gall_th'}"
+                                    title="${observationInstance.habitat.name}" ></span>
 		</g:if>
 	</div>
 

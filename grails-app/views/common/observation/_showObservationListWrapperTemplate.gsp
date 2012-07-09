@@ -169,8 +169,8 @@
         		if($(this).hasClass('active')){
         			return false;
         		}
-        		$('#speciesGroupFilter button.active').removeClass('active').css('backgroundPosition', '0px 0px');
-            	$(this).addClass('active').css('backgroundPosition', '0px -64px');
+        		$('#speciesGroupFilter button.active').removeClass('active');
+            	$(this).addClass('active');
             	updateGallery(undefined, ${queryParams.max}, 0);
             	return false;
          	});
@@ -179,8 +179,8 @@
          		if($(this).hasClass('active')){
         			return false;
         		}
-         		$('#habitatFilter button.active').removeClass('active').css('backgroundPosition', '0px 0px');
-            	$(this).addClass('active').css('backgroundPosition', '0px -64px');
+         		$('#habitatFilter button.active').removeClass('active');
+            	$(this).addClass('active');
             	updateGallery(undefined, ${queryParams.max}, 0);
             	return false;
          	});

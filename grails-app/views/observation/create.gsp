@@ -26,8 +26,13 @@
 	top: 43px;
 }
 
+.group_option a {
+	text-align: left;
+	line-height:33px;
+}
+
 .btn-large .caret {
-	margin-top: 13px;
+	margin-top: 15px;
 	position: absolute;
 	right: 10px;
 }
@@ -36,6 +41,7 @@
 	width: 300px;
 	height:44px;
 	text-align: left;
+	line-height:33px;
 	padding:5px;
 }
 
@@ -96,9 +102,6 @@ input.dms_field {
 }
 .btn .combobox-clear {
     margin-top: 12px;
-}
-.btn .caret {
-    margin-top: 18px;
 }
 </style>
 </head>
@@ -226,18 +229,17 @@ input.dms_field {
 							<div class="controls">
 								<div id="groups_div" class="btn-group" style="z-index: 3;">
 									<%
-                                        def defaultGroupId = observationInstance?.group?.id
-                                        def defaultGroupIconFileName = (defaultGroupId)? SpeciesGroup.read(defaultGroupId).icon(ImageType.VERY_SMALL)?.fileName?.trim() : SpeciesGroup.findByName('All').icon(ImageType.VERY_SMALL)?.fileName?.trim()
-                                        def defaultGroupValue = (defaultGroupId) ? SpeciesGroup.read(defaultGroupId).name : "Select group"
+                                        def defaultGroup = observationInstance?.group
+                                        //def defaultGroupIconFileName = (defaultGroupId)? SpeciesGroup.read(defaultGroupId).icon(ImageType.VERY_SMALL)?.fileName?.trim() : SpeciesGroup.findByName('All').icon(ImageType.VERY_SMALL)?.fileName?.trim()
+                                        def defaultGroupValue = (defaultGroup) ? defaultGroup.name : "Select group"
+										def defaultIcon = (defaultGroup) ? defaultGroup.name.toLowerCase()+'_gall_th' : "all_gall_th"
                                         %>
 
 									<button id="selected_group"
 										class="btn btn-large dropdown-toggle" data-toggle="dropdown"
 										data-target="#groups_div">
-										<img class="group_icon"
-											src="${createLinkTo(dir: 'images', file: defaultGroupIconFileName, absolute:true)}" />
-										<span class="display_value"> ${defaultGroupValue}
-										</span> <span class="caret"></span>
+										<i class="display_value group_icon pull-left species_groups_sprites active ${defaultIcon}"></i> ${defaultGroupValue}
+										<span class="caret"></span>
 									</button>
 
 									<ul id="group_options" class="dropdown-menu">
@@ -245,13 +247,10 @@ input.dms_field {
 										<g:each in="${species.groups.SpeciesGroup.list()}" var="g">
 											<g:if
 												test="${!g.name.equals(grailsApplication.config.speciesPortal.group.ALL)}">
-												<li class="span2 group_option" value="${g.id}">
-													<a> <img
-														class="group_icon"
-														src="${createLinkTo(dir: 'images', file: g.icon(ImageType.VERY_SMALL)?.fileName?.trim(), absolute:true)}" />
-														<span title="${g.name}">
+												<li class="span2 group_option" value="${g.id}" title="${g.name}">
+													<a>
+														<i class="group_icon pull-left species_groups_sprites active ${g.name.toLowerCase()+'_gall_th'}"></i>
 															${g.name}
-													</span>
 												</a></li>
 											</g:if>
 										</g:each>
@@ -279,20 +278,16 @@ input.dms_field {
 							<div class="controls">
 									<div id="habitat_div" class="btn-group" style="z-index: 2;">
 										<%
-                                                                            def defaultHabitatId = observationInstance?.habitat?.id
-																			def defaultHabitat = Habitat.read(defaultHabitatId);
-                                                                            def defaultHabitatIconFileName = (defaultHabitatId)? defaultHabitat.icon(ImageType.VERY_SMALL)?.fileName?.trim() : Habitat.findByName('All').icon(ImageType.VERY_SMALL)?.fileName?.trim()
-                                                                            def defaultHabitatValue = (defaultHabitatId) ? defaultHabitat.name : "Select habitat"
-                                                                    %>
+                                            def defaultHabitat = observationInstance?.habitat;
+                                            //def defaultHabitatIconFileName = (defaultHabitatId)? defaultHabitat.icon(ImageType.VERY_SMALL)?.fileName?.trim() : Habitat.findByName('All').icon(ImageType.VERY_SMALL)?.fileName?.trim()
+                                            def defaultHabitatValue = (defaultHabitat) ? defaultHabitat.name : "Select habitat"
+											def defaultHabitatIcon = (defaultHabitat) ? defaultHabitat.name.toLowerCase()+'_gall_th' : "all_gall_th"
+                                        %>
                                         <button id="selected_habitat"
 										class="btn btn-large dropdown-toggle" data-toggle="dropdown"
 										data-target="#habitat_div">
-										<img class="group_icon"
-												src="${createLinkTo(dir: 'images', file:defaultHabitatIconFileName, absolute:true)}" />
-
-											<span>
-												${defaultHabitatValue}
-											</span><span class="caret"></span>
+											<i class="display_value group_icon pull-left habitats_sprites active ${defaultHabitatIcon}"></i> ${defaultHabitatValue}
+											<span class="caret"></span>
 									</button>
 										
 										<ul id="habitat_options" class="dropdown-menu">
@@ -300,10 +295,10 @@ input.dms_field {
 											<g:each in="${species.Habitat.list()}" var="h">
 											<g:if
 												test="${!h.name.equals(grailsApplication.config.speciesPortal.group.ALL)}">
-												<li class="span2 habitat_option" value="${h.id}"><a><img
-														class="group_icon"
-														src="${createLinkTo(dir: 'images', file:h.icon(ImageType.VERY_SMALL)?.fileName?.trim(), absolute:true)}" />
-														<span title="${h.name}"> ${h.name} </span> </a>
+												<li class="span2 habitat_option" value="${h.id}" title="${h.name}"><a>
+												
+												<i class="group_icon pull-left habitats_sprites active ${h.name.toLowerCase()+'_gall_th'}"></i>
+												${h.name}</a>
 												</li>
 											</g:if>
 											</g:each>
