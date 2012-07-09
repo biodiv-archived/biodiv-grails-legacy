@@ -103,8 +103,7 @@
 				<div>
 
 					<ul class="jd_menu jd_menu_slate">
-						<li><a class="accessible"><g:message
-									code="spring.security.ui.menu.data" /> </a>
+						<li><a class="accessible">Data </a>
 							<ul>
 								<li><a href="${createLink(action:'loadData')}">Load
 										sample data</a></li>

@@ -153,8 +153,12 @@ class SUserController extends UserController {
 
 			String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
 
-			lookupUserRoleClass().removeAll user
-			addRoles user
+			//only admin interface has roles information while editing user profile
+			if(SUserService.isAdmin(user.id)) {
+				lookupUserRoleClass().removeAll user
+				addRoles user
+			}
+			
 			userCache.removeUserFromCache user[usernameFieldName]
 			flash.message = "${message(code: 'default.updated.message', args: [message(code: 'user.label', default: 'User'), user.id])}"
 			redirect action: show, id: user.id

@@ -787,3 +787,17 @@ grails.plugins.springsecurity.onInteractiveAuthenticationSuccessEvent = { e, app
 grails.plugins.springsecurity.openid.registration.requiredAttributes = [email: 'http://axschema.org/contact/email', location: 'http://axschema.org/contact/country/home',firstname:'http://axschema.org/namePerson/first', lastname: 'http://axschema.org/namePerson/last', profilePic:'http://axschema.org/media/image/default']
 
 //grails.resources.debug=true
+
+grails.plugins.springsecurity.controllerAnnotations.staticRules = [
+	'/role/**': ['ROLE_ADMIN'],
+	'/persistentLogin/**': ['ROLE_ADMIN'],
+	'/abstractS2Ui/**': ['ROLE_ADMIN'],
+	'/aclClass/**': ['ROLE_ADMIN'],
+	'/aclEntry/**': ['ROLE_ADMIN'],
+	'/aclObjectIdentity/**': ['ROLE_ADMIN'],
+	'/aclSid/**': ['ROLE_ADMIN'],
+	'/registrationCode/**': ['ROLE_ADMIN'],
+	'/requestmap/**': ['ROLE_ADMIN'],
+	'/securityInfo/**': ['ROLE_ADMIN'],
+	'/securityInfo/**': ['ROLE_ADMIN']
+ ]
