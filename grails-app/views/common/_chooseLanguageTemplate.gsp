@@ -29,7 +29,7 @@
 	//showing vote added by creator of the observation
 	if(params.action == 'edit' || params.action == 'update'){
 		def tmp_cn_reco = observationInstance?.fetchOwnerRecoVote()?.commonNameReco
-		if(tmp_cn_reco){
+		if(tmp_cn_reco && (tmp_cn_reco.languageId != null)){
 			species_sn_lang = Language.read(tmp_cn_reco.languageId).name
 		}
 	}
