@@ -131,11 +131,11 @@
 						<li><a class="accessible"><g:message
 									code="spring.security.ui.menu.users" /> </a>
 							<ul>
-								<li><g:link action='user' id='search'>
+								<li><g:link controller='SUser' action='search'>
 										<g:message code="spring.security.ui.search" />
 									</g:link>
 								</li>
-								<li><g:link action='user' id='create'>
+								<li><g:link controller='SUser' action='create'>
 										<g:message code="spring.security.ui.create" />
 									</g:link>
 								</li>

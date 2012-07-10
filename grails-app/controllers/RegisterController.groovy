@@ -3,6 +3,7 @@ import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
 import org.codehaus.groovy.grails.plugins.springsecurity.ui.RegistrationCode;
 import org.springframework.security.web.savedrequest.DefaultSavedRequest;
 import org.codehaus.groovy.grails.plugins.springsecurity.openid.OpenIdAuthenticationFailureHandler as OIAFH
+import org.springframework.web.context.request.RequestContextHolder as RCH
 
 import species.utils.Utils;
 
@@ -14,6 +15,7 @@ class RegisterController extends grails.plugins.springsecurity.ui.RegisterContro
 	def facebookAuthService;
 	def springSecurityService;
 	def openIDAuthenticationFilter;
+	def recaptchaService;
 	
 	def index = {
 		if (springSecurityService.isLoggedIn()) {
@@ -92,6 +94,8 @@ class RegisterController extends grails.plugins.springsecurity.ui.RegisterContro
 			return
 		}
 
+		recaptchaService.cleanUp(session)
+		
 		if(command.openId) {
 			flash.message = message(code: 'spring.security.ui.register.complete')
 			authenticateAndRedirect user.email
@@ -324,9 +328,12 @@ class CustomRegisterCommand {
 	String profilePic;
 	String openId;
 	boolean facebookUser;
-
+	String recaptcha_response_field;
+	String recaptcha_challenge_field;
+	
 	def grailsApplication
-
+	def recaptchaService;
+		
 	static constraints = {
 		email email: true, blank: false, nullable: false, validator: { value, command ->
 			if (value) {
@@ -339,6 +346,13 @@ class CustomRegisterCommand {
 		}
 		password blank: false, nullable: false, validator: RegisterController.myPasswordValidator
 		password2 validator: RegisterController.password2Validator
+		recaptcha_response_field blank:false, nullable:false, validator: { value, command ->
+			def session = RCH.requestAttributes.session
+			def request = RCH.requestAttributes.request
+			if(!command.recaptchaService.verifyAnswer(session, request.getRemoteAddr(), command)) {
+				return 'reCaptcha.invalid.message'
+			}
+		}
 	}
 
 	/* (non-Javadoc)
