@@ -34,7 +34,7 @@
 						${flash.message}
 					</div>
 				</g:if>
-
+				
 				<div id='formLogin' style='clear: both'>
 					<fieldset>
 						<legend>
@@ -60,7 +60,7 @@
 								style="clear: both; border-top: 1px solid #Eee; padding-top: 5px;">Or,
 								register here:</div>
 								<div
-									class="control-group ${hasErrors(bean: command, field: email, 'error')}">
+									class="control-group ${hasErrors(bean: command, field: 'email', 'error')}">
 									<label class="control-label" for="email"><g:message
 											code='user.email.label' default='E-mail *' /> </label>
 									<div class="controls">
@@ -81,7 +81,7 @@
 
 								<g:if test="${!command.openId}">
 									<div
-										class="control-group ${hasErrors(bean: command, field: password, 'error')}">
+										class="control-group ${hasErrors(bean: command, field: 'password', 'error')}">
 										<label class="control-label" for="password"><g:message
 												code='user.password.label' default='Password *' /> </label>
 										<div class="controls">
@@ -97,7 +97,7 @@
 										</div>
 									</div>
 									<div
-										class="control-group ${hasErrors(bean: command, field: password2, 'error')}">
+										class="control-group ${hasErrors(bean: command, field: 'password2', 'error')}">
 										<label class="control-label" for="password2"><g:message
 												code='user.password2.label' default='Password (again)*' />
 										</label>
@@ -117,9 +117,8 @@
 
 								</g:if>
 
-
 								<div
-									class="control-group ${hasErrors(bean: command, field: name, 'error')}">
+									class="control-group ${hasErrors(bean: command, field: 'name', 'error')}">
 									<label class="control-label" for="name"><g:message
 											code='user.name.label' default='Name' /> </label>
 									<div class="controls">
@@ -137,7 +136,7 @@
 								</div>
 
 								<div
-									class="control-group ${hasErrors(bean: command, field: location, 'error')}">
+									class="control-group ${hasErrors(bean: command, field: 'location', 'error')}">
 									<label class="control-label" for="location"><g:message
 											code='user.location.label' default='Location' /> </label>
 									<div class="controls">
@@ -153,6 +152,20 @@
 
 									</div>
 								</div>
+								
+								<recaptcha:ifEnabled>
+									<div
+										class="control-group ${hasErrors(bean: command, field: 'recaptcha_response_field', 'error')}">
+    								<recaptcha:recaptcha theme="clean"/>
+    								<recaptcha:ifFailed>
+    									<g:hasErrors bean="${command}" field="recaptcha_response_field">
+											<div class="help-inline">
+												<g:renderErrors bean="${command}" field="recaptcha_response_field" />
+											</div>
+										</g:hasErrors>
+    								</recaptcha:ifFailed>
+    								</div>
+								</recaptcha:ifEnabled>
 
 								<div class="control-group">
 									<span class="policy-text"> By registering you agree to
