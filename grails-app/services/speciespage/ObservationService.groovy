@@ -554,7 +554,9 @@ class ObservationService {
 
 		if(params.isFlagged && params.isFlagged.toBoolean()){
 			filterQuery += " and obv.flagCount > 0 "
+			activeFilters["isFlagged"] = params.isFlagged.toBoolean()
 		}
+		
 		if(params.bounds){
 			def bounds = params.bounds.split(",")
 
@@ -761,6 +763,7 @@ class ObservationService {
 		}
 		if(params.isFlagged && params.isFlagged.toBoolean()){
 			paramsList.add('fq', searchFieldsConfig.ISFLAGGED+":"+params.isFlagged.toBoolean());
+			activeFilters["isFlagged"] = params.isFlagged.toBoolean()
 		}
 
 		if(params.bounds){
