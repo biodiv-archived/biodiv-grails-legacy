@@ -14,6 +14,10 @@
 .openid-loginbox .form-horizontal .controls {
 	margin-left: 140px;
 }
+
+.openid-loginbox .form-horizontal .controls input {
+	width: 290px;
+}
 </style>
 </head>
 

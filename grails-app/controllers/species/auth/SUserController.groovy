@@ -16,6 +16,7 @@ import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
 import org.springframework.dao.DataIntegrityViolationException
 
 import species.BlockedMails;
+import species.participation.curation.UnCuratedVotes;
 import species.utils.Utils;
 
 
@@ -175,13 +176,26 @@ class SUserController extends UserController {
 
 			String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
 		try {
-			lookupUserRoleClass().removeAll user
-			user.delete flush: true
+			lookupUserClass().withTransaction { status ->
+				user.observations.each { obv -> 
+					UnCuratedVotes.findAllByObv(obv).each { vote ->
+						println "deleting $vote"
+						vote.delete();
+					}
+				}
+				
+				lookupUserRoleClass().removeAll user
+				
+				SUserService.sendNotificationMail(SUserService.USER_DELETED, user, request, "");
+				user.delete flush: true
+
+			}
 			userCache.removeUserFromCache user[usernameFieldName]
 			flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'user.label', default: 'User'), params.id])}"
 			redirect action: search
 		}
 		catch (DataIntegrityViolationException e) {
+			e.printStackTrace();
 			flash.error = "${message(code: 'default.not.deleted.message', args: [message(code: 'user.label', default: 'User'), params.id])}"
 			redirect action: edit, id: params.id
 		}

@@ -668,6 +668,30 @@ grails.plugins.springsecurity.ui.register.emailBody = '''Hi $username,<br/><br/>
 grails.plugins.springsecurity.ui.register.emailFrom = 'notification@thewesternghats.in'
 grails.plugins.springsecurity.ui.register.emailSubject = 'Activate your account with $domain'
 
+grails.plugins.springsecurity.ui.newuser.emailBody = '''\
+Hi $username,<br/>
+<br/>
+Thank you for registering with us at <b>$domain</b>.<br/>
+<br/> 
+We look forward for your contribution to the portal. The portal is a public participatory portal that thrives by participation from users like you. Will also appreciate any feedback you may have to offer.<br/>
+<br/>
+You will be notified by mail on any social activity on the observation.<br/>
+<br/>
+If you do not want to receive notifications please go to your <a href="$userProfileUrl">user profile</a> and switch it off.<br/>
+<br/>
+-The portal team'''
+grails.plugins.springsecurity.ui.newuser.emailFrom = 'notification@thewesternghats.in'
+grails.plugins.springsecurity.ui.newuser.emailSubject = 'Welcome to $domain'
+
+grails.plugins.springsecurity.ui.userdeleted.emailBody = '''\
+Hi Admin,<br/>
+<br/>
+A user with email address $email is being deleted from <b>$domain</b>.<br/>
+<br/>
+-The portal team'''
+grails.plugins.springsecurity.ui.userdeleted.emailFrom = 'notification@thewesternghats.in'
+grails.plugins.springsecurity.ui.userdeleted.emailSubject = 'User is being deleted on $domain'
+
 grails.plugins.springsecurity.ui.forgotPassword.emailBody = '''\
 Hi $username,<br/>
 <br/>

@@ -2,6 +2,10 @@ package species.auth
 
 import species.Resource;
 import species.Resource.ResourceType;
+import species.participation.Observation;
+import species.participation.ObservationFlag;
+import species.participation.RecommendationVote;
+import species.participation.curation.UnCuratedVotes;
 import species.utils.ImageType;
 
 class SUser {
@@ -29,8 +33,9 @@ class SUser {
 	boolean hideEmailId = true;
 	boolean allowIdentifactionMail = true;
 	
-	static hasMany = [openIds: OpenID]
-
+	static hasMany = [openIds: OpenID, flags:ObservationFlag, unCuratedVotes:UnCuratedVotes, observations:Observation, recoVotes:RecommendationVote]
+	//static hasOne = [facebookUser:FacebookUser]
+	
 	static constraints = {
 		username blank: false
 		name blank: false
@@ -41,6 +46,7 @@ class SUser {
 		timezone nullable:true
 		aboutMe nullable:true
 		location nullable:true
+		
 	}
 
 	static mapping = {

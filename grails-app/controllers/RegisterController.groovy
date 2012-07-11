@@ -1,3 +1,5 @@
+import grails.util.Environment;
+
 import org.codehaus.groovy.grails.plugins.springsecurity.NullSaltSource;
 import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
 import org.codehaus.groovy.grails.plugins.springsecurity.ui.RegistrationCode;
@@ -5,12 +7,15 @@ import org.springframework.security.web.savedrequest.DefaultSavedRequest;
 import org.codehaus.groovy.grails.plugins.springsecurity.openid.OpenIdAuthenticationFailureHandler as OIAFH
 import org.springframework.web.context.request.RequestContextHolder as RCH
 
+import species.auth.SUser;
+import species.participation.Observation;
 import species.utils.Utils;
 
 import com.the6hours.grails.springsecurity.facebook.FacebookAuthToken;
 
 class RegisterController extends grails.plugins.springsecurity.ui.RegisterController {
-
+	
+	
 	def SUserService;
 	def facebookAuthService;
 	def springSecurityService;
@@ -96,6 +101,9 @@ class RegisterController extends grails.plugins.springsecurity.ui.RegisterContro
 
 		recaptchaService.cleanUp(session)
 		
+		def userProfileUrl = generateLink("SUser", "show", ["id": user.id], request)
+		SUserService.sendNotificationMail(SUserService.NEW_USER, user, request, userProfileUrl);
+		
 		if(command.openId) {
 			flash.message = message(code: 'spring.security.ui.register.complete')
 			authenticateAndRedirect user.email
@@ -176,7 +184,7 @@ class RegisterController extends grails.plugins.springsecurity.ui.RegisterContro
 		def registrationCode = new RegistrationCode(username: user."$usernameFieldName")
 		registrationCode.save(flush: true)
 		
-		String url = generateLink('resetPassword', [t: registrationCode.token], request)
+		String url = generateLink('register', 'resetPassword', [t: registrationCode.token], request)
 		def conf = SpringSecurityUtils.securityConfig
 		def body = conf.ui.forgotPassword.emailBody
 		if (body.contains('$')) {
@@ -233,9 +241,9 @@ class RegisterController extends grails.plugins.springsecurity.ui.RegisterContro
 		redirect uri: postResetUrl
 	}
 
-	protected String generateLink(String action, linkParams, request) {
+	protected String generateLink(String controller, String action, linkParams, request) {
 		createLink(base: Utils.getDomainServerUrl(request),
-				controller: 'register', action: action,
+				controller: controller, action: action,
 				params: linkParams)
 	}
 
@@ -262,7 +270,7 @@ class RegisterController extends grails.plugins.springsecurity.ui.RegisterContro
 			return
 		}
 
-		String url = generateLink('verifyRegistration', [t: registrationCode.token], request)
+		String url = generateLink('register', 'verifyRegistration', [t: registrationCode.token], request)
 
 		def conf = SpringSecurityUtils.securityConfig
 		def body = conf.ui.register.emailBody
@@ -312,6 +320,7 @@ class RegisterController extends grails.plugins.springsecurity.ui.RegisterContro
 		session.removeAttribute OIAFH.LAST_OPENID_ATTRIBUTES
 		session.removeAttribute "LAST_FACEBOOK_USER"
 	}
+	
 }
 
 

@@ -1,18 +1,24 @@
 package speciespage
 
 import grails.plugins.springsecurity.ui.SpringSecurityUiService;
+import groovy.text.SimpleTemplateEngine;
 
 import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
 import org.codehaus.groovy.grails.plugins.springsecurity.ui.RegistrationCode;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import species.auth.SUser;
+import species.utils.Utils;
 
 class SUserService extends SpringSecurityUiService {
 
 	def grailsApplication
 
 	def springSecurityService
+	def mailService
+	
+	public static final String NEW_USER = "newUser";
+	public static final String USER_DELETED = "deleteUser";
 	
 	/**
 	 * 
@@ -114,4 +120,53 @@ class SUserService extends SpringSecurityUiService {
 	def isAdmin(long id) {
 		return SpringSecurityUtils.ifAllGranted('ROLE_ADMIN')
 	}
+
+	public void sendNotificationMail(String notificationType, SUser user, request, String userProfileUrl){
+		def conf = SpringSecurityUtils.securityConfig
+		
+		//def userProfileUrl = generateLink("SUser", "show", ["id": user.id], request)
+
+		def templateMap = [username: user.name.capitalize(), email:user.email, userProfileUrl:userProfileUrl, domain:Utils.getDomainName(request)]
+
+		def mailSubject = ""
+		def body = ""
+
+		switch ( notificationType ) {
+			case NEW_USER:
+				mailSubject = conf.ui.newuser.emailSubject
+				body = conf.ui.newuser.emailBody
+				break
+			case USER_DELETED:
+				mailSubject = conf.ui.userdeleted.emailSubject
+				body = conf.ui.userdeleted.emailBody
+				break
+			default:
+				log.debug "invalid notification type"
+		}
+
+		if (body.contains('$')) {
+			body = evaluate(body, templateMap)
+		}
+		
+		if (mailSubject.contains('$')) {
+			mailSubject = evaluate(mailSubject, [domain: Utils.getDomainName(request)])
+		}
+
+		if ( Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
+			mailService.sendMail {
+				to user.email
+				bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com"
+				from conf.ui.notification.emailFrom
+				subject mailSubject
+				html body.toString()
+			}
+		}
+			log.debug "Sent mail for notificationType ${notificationType} to ${user.email}"
+	}
+	
+	protected String evaluate(s, binding) {
+		new SimpleTemplateEngine().createTemplate(s).make(binding)
+	}
+	
+	
 }

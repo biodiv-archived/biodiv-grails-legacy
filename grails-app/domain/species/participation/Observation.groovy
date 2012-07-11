@@ -46,7 +46,6 @@ class Observation implements Taggable{
 		}
 	}
 
-	SUser author;
 	Date observedOn;
 	Date createdOn = new Date();
 	Date lastRevised = createdOn;
@@ -68,8 +67,9 @@ class Observation implements Taggable{
 	String searchText;
 	Recommendation maxVotedReco;
 	
-	static hasMany = [resource:Resource, recommendationVote:RecommendationVote];
-
+	static hasMany = [resource:Resource, recommendationVote:RecommendationVote, obvFlags:ObservationFlag];
+	static belongsTo = [author:SUser]
+	
 	static constraints = {
 		notes nullable:true
 		searchText nullable:true;
