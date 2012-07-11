@@ -20,3 +20,31 @@ function showRecoUpdateStatus(msg, type) {
 		$("#seeMoreMessage").hide();
 	}
 }
+
+function removeRecoComment(recoVoteId, commentDivId, url, commentComp){
+	$.ajax({
+		url: url,
+		data:{"id":recoVoteId},
+		
+		success: function(data){
+			if($(commentDivId + ' li').length > 1){
+				commentComp.remove();
+			}else{
+				$(commentDivId).remove(); 
+			}
+			//$(".deleteCommentIcon").tooltip('hide');
+			showRecoUpdateStatus(data.success, 'success');
+		},
+		
+		statusCode: {
+			401: function() {
+				show_login_dialog();
+			}	    				    			
+		},
+		error: function(xhr, status, error) {
+			//$(".deleteCommentIcon").tooltip('hide');
+			var msg = $.parseJSON(xhr.responseText);
+			showRecoUpdateStatus(msg.error, 'error');
+		}
+	});
+}
