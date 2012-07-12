@@ -14,4 +14,8 @@ class FacebookUser {
 		uid unique: true
 	 
 	}
+	
+	static void removeAll(SUser sUser) {
+		executeUpdate 'DELETE FROM FacebookUser WHERE user=:sUser', [sUser: sUser]
+	}
 }

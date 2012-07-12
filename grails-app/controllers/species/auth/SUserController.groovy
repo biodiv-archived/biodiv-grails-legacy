@@ -176,6 +176,7 @@ class SUserController extends UserController {
 
 			String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
 		try {
+			List obvToUpdate = [];
 			lookupUserClass().withTransaction { status ->
 				user.observations.each { obv -> 
 					UnCuratedVotes.findAllByObv(obv).each { vote ->
@@ -184,11 +185,23 @@ class SUserController extends UserController {
 					}
 				}
 				
+				user.recoVotes.each { vote ->
+					if(vote.observation.author.id != user.id) {
+						obvToUpdate.add(vote.observation);
+					}
+				}
+				
+				FacebookUser.removeAll user;
 				lookupUserRoleClass().removeAll user
 				
 				SUserService.sendNotificationMail(SUserService.USER_DELETED, user, request, "");
-				user.delete flush: true
+				user.delete();
 
+			}
+			//updating maxVotedSpeciesName
+			obvToUpdate.each { obv ->
+				println "Updating speciesname for ${obv}"
+				obv.calculateMaxVotedSpeciesName();
 			}
 			userCache.removeUserFromCache user[usernameFieldName]
 			flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'user.label', default: 'User'), params.id])}"
