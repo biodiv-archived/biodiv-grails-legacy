@@ -271,8 +271,8 @@ class ObservationService {
 		def languageId = Language.getLanguage(params.languageName).id;
 		def obv = params.observation?:Observation.get(params.obvId);
 		
-		Recommendation scientificNameReco = getRecoForScientificName(recoName, canName);
 		Recommendation commonNameReco = findReco(commonName, false, languageId, null);
+		Recommendation scientificNameReco = getRecoForScientificName(recoName, canName, commonNameReco);
 		
 		curationService.add(scientificNameReco, commonNameReco, obv, springSecurityService.currentUser);
 		
@@ -280,7 +280,7 @@ class ObservationService {
 		return [mainReco : (scientificNameReco ?:commonNameReco), commonNameReco:commonNameReco];
 	}
 		
-	private Recommendation getRecoForScientificName(String recoName, String canonicalName){
+	private Recommendation getRecoForScientificName(String recoName, String canonicalName, Recommendation commonNameReco){
 		def reco, taxonConcept;
 		
 		//first searching by canonical name. this name is present if user select from auto suggest
@@ -291,6 +291,12 @@ class ObservationService {
 		//searching on whatever user typed in scientific name text box
 		if(recoName) {
 			return findReco(recoName, true, null, taxonConcept);
+		}
+		
+		//it may possible certain common name may point to species id in that case getting the SN for it
+		if(commonNameReco && commonNameReco.taxonConcept){
+			TaxonomyDefinition taxOnConcept = commonNameReco.taxonConcept
+			return findReco(taxOnConcept.canonicalForm, true, null, taxOnConcept)
 		}
 		
 		return null;
