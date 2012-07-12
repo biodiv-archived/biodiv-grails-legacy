@@ -6,11 +6,7 @@
 			<div>
 				<div class="users">
 					<div class="iAgree btn btn-primary btn-small">
-						<g:remoteLink action="addAgreeRecommendationVote" method="GET"
-							controller="observation"
-							params="['obvId':r.obvId, 'recoId':r.recoId, 'currentVotes':r.noOfVotes]"
-							onSuccess="preLoadRecos(3,false);return false"
-							onFailure="handleError(XMLHttpRequest,textStatus,errorThrown,this.success,showRecoUpdateStatus);return false;">Agree</g:remoteLink>
+						<a href="#" onclick="addAgreeRecoVote(${r.obvId}, ${r.recoId}, ${r.noOfVotes}, $(this).closest('li'), '${createLink(controller:'observation', action:'addAgreeRecommendationVote')}'); return false;">Agree</a>
 					</div>
 					<g:each in="${r.authors}" var="author">
 						<g:link controller="SUser" action="show" id="${author?.id}">
@@ -55,8 +51,8 @@
                                         $('#voteDetails_${r.recoId}').hide();
                                 });
                         });
-                       
-                        </r:script></li>
+                        
+   </r:script></li>
 	</g:each>
 </g:if>
 <g:else>

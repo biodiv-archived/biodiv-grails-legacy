@@ -16,6 +16,9 @@ import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
 import org.springframework.dao.DataIntegrityViolationException
 
 import species.BlockedMails;
+import species.participation.RecommendationVote;
+import species.participation.Observation;
+
 import species.participation.curation.UnCuratedVotes;
 import species.utils.Utils;
 
@@ -547,52 +550,17 @@ class SUserController extends UserController {
 	   log.debug params;
 	   params.max = params.max ? params.int('max') : 1
 	   params.offset = params.offset ? params.long('offset'): 0
-
+	   
 	   def userInstance = SUser.get(params.id)
 	   if (userInstance) {
-		   try {
-			   def recommendationVoteList = observationService.getRecommendationsOfUser(userInstance, params.max, params.offset);
-			  
-			   if(recommendationVoteList.size() > 0) {
-				   def result = [];
-				   recommendationVoteList.each { recoVote ->
-					   def map = recoVote.recommendation.getRecommendationDetails(recoVote.observation);
-					   //map.put("noOfVotes", 1);
-					   def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
-					   def image = recoVote.observation.mainImage()
-					   def imagePath = image.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, config.speciesPortal.resources.images.thumbnail.suffix)
-					   def imageLink = config.speciesPortal.observations.serverURL +  imagePath
-					   map.put('observationImage', imageLink);
-					   map.put("obvId", recoVote.observation.id);
-					   result.add(map);
-				   }
-				   //def noOfVotes = observationService.getAllRecommendationsOfUser(userInstance);
-				   def model = ['result':result, 'totalVotes':result.size(), 'uniqueVotes':result.size()];
-				   def html = g.render(template:"/common/observation/showObservationRecosTemplate", model:model);
-				   def r = [
-							   success : 'true',
-							   uniqueVotes:model.uniqueVotes,
-							   recoHtml:html,
-							   recoVoteMsg:params.recoVoteMsg]
-				   render r as JSON
-				   return
-			   } else {
-				   response.setStatus(500);
-				   def message = "";
-				   if(params.offset > 0) {
-					   message = [info: g.message(code: 'user.recommendations.nomore.message', default:'No more recommendations made.')];
-				   } else {
-					   message = [info:g.message(code: 'user.recommendations.zero.message', default:'No recommendations made.')];
-				   }
-				   render message as JSON
-				   return
-			   }
-		   } catch(e){
-			   e.printStackTrace();
-			   response.setStatus(500);
-			   def message = ['error' : g.message(code: 'error', default:'Error while processing the request.')];
-			   render message as JSON
+		   def recommendationVoteList 
+		   if(params.obvId){
+			   	recommendationVoteList = RecommendationVote.findAllByAuthorAndObservation(springSecurityService.currentUser, Observation.read(params.long('obvId')));
+		   }else{
+		   		recommendationVoteList = observationService.getRecommendationsOfUser(userInstance, params.max, params.offset);
 		   }
+		   processResult(recommendationVoteList, params)
+		   return
 	   }
 	   else {
 		   response.setStatus(500)
@@ -601,4 +569,49 @@ class SUserController extends UserController {
 	   }
    }
 
+	private processResult(List recommendationVoteList, Map params) {
+		try {
+			if(recommendationVoteList.size() > 0) {
+				def result = [];
+				recommendationVoteList.each { recoVote ->
+					def map = recoVote.recommendation.getRecommendationDetails(recoVote.observation);
+					map.put("noOfVotes", 1);
+					def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+					def image = recoVote.observation.mainImage()
+					def imagePath = image.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, config.speciesPortal.resources.images.thumbnail.suffix)
+					def imageLink = config.speciesPortal.observations.serverURL +  imagePath
+					map.put('observationImage', imageLink);
+					map.put("obvId", recoVote.observation.id);
+					result.add(map);
+				}
+				//def noOfVotes = observationService.getAllRecommendationsOfUser(userInstance);
+				def model = ['result':result, 'totalVotes':result.size(), 'uniqueVotes':result.size()];
+				def html = g.render(template:"/common/observation/showObservationRecosTemplate", model:model);
+				def r = [
+							success : 'true',
+							uniqueVotes:model.uniqueVotes,
+							recoHtml:html,
+							recoVoteMsg:params.recoVoteMsg]
+				render r as JSON
+				return
+			} else {
+				response.setStatus(500);
+				def message = "";
+				if(params.offset > 0) {
+					message = [info: g.message(code: 'user.recommendations.nomore.message', default:'No more recommendations made.')];
+				} else {
+					message = [info:g.message(code: 'user.recommendations.zero.message', default:'No recommendations made.')];
+				}
+				render message as JSON
+				return
+			}
+		} catch(e){
+			e.printStackTrace();
+			response.setStatus(500);
+			def message = ['error' : g.message(code: 'error', default:'Error while processing the request.')];
+			render message as JSON
+		}
+	}
+
 }
+

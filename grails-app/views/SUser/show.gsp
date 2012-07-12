@@ -211,7 +211,8 @@
 	
 	
 <r:script>
-	$(document).ready(function() {
+	var userRecoffset = 0;
+    $(document).ready(function() {
 		$("#seeMoreMessage").hide();
 		$('#tc_tagcloud a').click(function(){
 			var tg = $(this).contents().first().text();
@@ -219,31 +220,35 @@
 	    	return false;
 	 	});
 	 	
-      	var offset = 0;
       	var max =  3;
-         $("#seeMore").click(function() {         	
-         	preLoadRecos(max, max+offset, true);
-         	offset = max + offset;
+         $("#seeMore").click(function() {   
+         	preLoadRecos(max, true);
+         	userRecoffset = max + userRecoffset;
 		 });
          
-         preLoadRecos(max, offset, false);
+         preLoadRecos(max, true);
+         userRecoffset = max + userRecoffset;
 	});
-	   function preLoadRecos(max, offset, seeAllClicked){
+	   function preLoadRecos(max, seeAllClicked, obvId, liComponent){
          	$("#seeMoreMessage").hide();        	
-         	
-        	$.ajax({
+         	$.ajax({
          		url: "${createLink(action:'getRecommendationVotes', id:user.id) }",
 				method: "POST",
 				dataType: "json",
-				data: {max:max , offset:offset},	
+				data: {max:max , offset:userRecoffset, obvId:obvId},	
 				success: function(data) {
-					$("#recoSummary").append(data.recoHtml);
-					var uniqueVotes = parseInt(data.uniqueVotes);
-					if(uniqueVotes < 3){
-						$("#seeMore").hide();
-					} else {
-						$("#seeMore").show();
+					if(seeAllClicked){
+						$("#recoSummary").append(data.recoHtml);
+						var uniqueVotes = parseInt(data.uniqueVotes);
+						if(uniqueVotes < 3){
+							$("#seeMore").hide();
+						} else {
+							$("#seeMore").show();
+						}
+					}else{
+						$(liComponent).replaceWith(data.recoHtml)
 					}
+					
 				}, error: function(xhr, status, error) {
 	    			handleError(xhr, status, error, undefined, function() {
 		    			var msg = $.parseJSON(xhr.responseText);

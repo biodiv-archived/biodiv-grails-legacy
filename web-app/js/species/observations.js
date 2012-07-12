@@ -48,3 +48,27 @@ function removeRecoComment(recoVoteId, commentDivId, url, commentComp){
 		}
 	});
 }
+
+function addAgreeRecoVote(obvId, recoId, currentVotes, liComponent, url){
+	$.ajax({
+		url: url,
+		data:{'obvId':obvId, 'recoId':recoId, 'currentVotes':currentVotes},
+		
+		success: function(data){
+			preLoadRecos(3, false, obvId, liComponent);
+			return false;
+		},
+		
+		statusCode: {
+			401: function() {
+				show_login_dialog();
+			}	    				    			
+		},
+		error: function(xhr, status, error) {
+			handleError(xhr, status, error, this.success,showRecoUpdateStatus);
+			return false;
+		}
+	});
+}
+
+
