@@ -63,8 +63,13 @@ $(document).ready(function() {
 
 function updateCommonNameLanguage(){
 	var langCombo = $("#languageComboBox");
+	var langComboVal = langCombo.val();
+	if(langComboVal != null){
+		langComboVal = langComboVal.toLowerCase()
+	}
+	
 	var inputVal = $.trim(langCombo.data('combobox').$element.val());
-	if(inputVal.toLowerCase() !== langCombo.val().toLowerCase()){
+	if(inputVal.toLowerCase() !== langComboVal){
 		langCombo.append($('<option></option>').val(inputVal).html(inputVal));
 		langCombo.data('combobox').refresh();
 	}
