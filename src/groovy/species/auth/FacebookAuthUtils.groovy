@@ -9,6 +9,11 @@ import javax.crypto.Mac
 import org.apache.commons.codec.binary.Base64
 import org.springframework.security.authentication.BadCredentialsException
 import grails.converters.JSON
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.Cookie;
+
+import species.utils.Utils;
 
 class FacebookAuthUtils {
 
@@ -33,9 +38,9 @@ class FacebookAuthUtils {
 		}
 
 		//log.debug("Payload: $jsonData")
-		
+
 		String secret = getFacebookAppSecretForDomain(Utils.getDomain(request));
-		
+
 		if (!verifySign(signedRequestParts[0], signedRequestParts[1], secret)) {
 			throw new BadCredentialsException("Invalid signature")
 		} else {
@@ -45,10 +50,10 @@ class FacebookAuthUtils {
 		String code = json.code?.toString()
 
 		FacebookAuthToken token = new FacebookAuthToken(
-			uid: Long.parseLong(json.user_id.toString()),
-			code: code,
-			domain:Utils.getDomain(request)
-		);
+				uid: Long.parseLong(json.user_id.toString()),
+				code: code,
+				domain:Utils.getDomain(request)
+				);
 		token.authenticated = true
 		return token
 	}
@@ -57,8 +62,7 @@ class FacebookAuthUtils {
 		String applicationId = getFacebookAppIdForDomain(request);
 		String cookieName = "fbsr_" + applicationId
 		log.debug "looking for cookie named $cookieName";
-		return request.cookies.find {
-			Cookie it ->
+		return request.cookies.find { Cookie it ->
 			//log.debug("Cookie $it.name, expected $cookieName")
 			return it.name == cookieName
 		}
@@ -68,13 +72,12 @@ class FacebookAuthUtils {
 		String applicationId = getFacebookAppIdForDomain(request);
 		String cookieName = "fb_login"
 		log.debug "looking for cookie named $cookieName";
-		return request.cookies.find {
-			Cookie it ->
+		return request.cookies.find { Cookie it ->
 			//log.debug("Cookie $it.name, expected $cookieName")
 			return it.name == cookieName
 		}
 	}
-	
+
 	String getAccessToken(String applicationId, String secret, String code) {
 		try {
 			String authUrl = "https://graph.facebook.com/oauth/access_token?client_id=$applicationId&redirect_uri=&client_secret=$secret&code=$code"
@@ -127,7 +130,7 @@ class FacebookAuthUtils {
 		if(!domain) return;
 
 		//log.debug "Looking facebook secret for domain $domain"
-		
+
 		if(domain.equals(grailsApplication.config.wgp.domain)) {
 			return grailsApplication.config.speciesPortal.wgp.facebook.secret
 		} else if(domain.equals(grailsApplication.config.ibp.domain)) {
@@ -135,5 +138,25 @@ class FacebookAuthUtils {
 		}
 		return null;
 	}
+
+	void logout(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+		log.info("Cleanup Facebook cookies")
+		Cookie cookie = this.getAuthCookie(httpServletRequest)
+		if (cookie != null) {
+			cookie.maxAge = 0
+			cookie.path = '/'
+			cookie.domain = "."+Utils.getDomain(httpServletRequest);
+			httpServletResponse.addCookie(cookie)
+		}
+
+		Cookie cookie2 = this.getFBLoginCookie(httpServletRequest)
+		if (cookie2 != null) {
+			cookie2.maxAge = 0
+			cookie2.path = '/'
+			cookie2.domain = "."+Utils.getDomain(httpServletRequest);
+			httpServletResponse.addCookie(cookie2)
+		}
+	}
+
 }
 

@@ -75,4 +75,8 @@ class Habitat {
 		}
 		return new Resource(fileName:"group_icons/habitat/${name}", type:ResourceType.ICON, title:"You can contribute!!!");
 	}
+	
+	String iconClass() {
+		return this.name?.trim()?.toLowerCase()?.replaceAll(/ /, '_')+'_gall_th';
+	}
 }

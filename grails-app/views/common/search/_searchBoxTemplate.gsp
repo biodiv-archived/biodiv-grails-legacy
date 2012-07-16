@@ -1,4 +1,4 @@
-<g:javascript>
+<r:script>
 
 $(document).ready(function(){
 
@@ -66,7 +66,7 @@ $(document).ready(function(){
 $( "#search" ).click(function() {
 	$( "#searchbox" ).submit();
 });
-</g:javascript>
+</r:script>
 	<div id="mainSearchForm" style="position:relative">
 	<form method="get"
 		action="${createLink(action:'search') }"

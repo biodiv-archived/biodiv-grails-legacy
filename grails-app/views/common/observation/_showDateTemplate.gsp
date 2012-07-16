@@ -13,7 +13,12 @@
 	 %>
 	 <g:if test="${serverDate}">
 	<g:if test="${(new Date()).minus(serverDate)}">
-		<g:formatDate date="${serverDate}" type="datetime" style="LONG" timeStyle="SHORT"/>
+		<g:if test="${dateFormat == 'dateOnly'}">
+			<g:formatDate date="${serverDate}" type="date" style="LONG" timeStyle="SHORT"/>
+		</g:if>
+		<g:else>
+			<g:formatDate date="${serverDate}" type="datetime" style="LONG" timeStyle="SHORT"/>
+		</g:else>
 	</g:if>
 	<g:elseif test="${propertyName == 'lastRevised' && (!(serverDate - observationInstance.createdOn))}">
 		None	

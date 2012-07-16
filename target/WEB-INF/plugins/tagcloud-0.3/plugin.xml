@@ -1,0 +1,25 @@
+<plugin name='tagcloud' version='0.3' grailsVersion='1.2.0 &gt; *'>
+  <author>Marek Podsiadły</author>
+  <authorEmail>marekpodsiadly@gmail.com</authorEmail>
+  <title>Tagcloud</title>
+  <description>\
+Tagcloud plugin provides tagliblary to simple create tag cloud in views.
+It is based on jquery.tagcloud.js [http://github.com/addywaddy/jquery.tagcloud.js/]
+</description>
+  <documentation>http://grails.org/plugin/tagcloud</documentation>
+  <resources>
+    <resource>BuildConfig</resource>
+    <resource>DataSource</resource>
+    <resource>UrlMappings</resource>
+    <resource>org.grails.tagcloud.DemoController</resource>
+    <resource>org.grails.tagcloud.TagCloudTagLib</resource>
+    <resource>org.grails.tagcloud.TagCloudUtil</resource>
+  </resources>
+  <dependencies>
+    <plugin name='jquery' version='1.3.2.4 &gt; *' />
+    <resolvers>
+      <resolver type='grailsPlugins' name='grailsPlugins' />
+    </resolvers>
+  </dependencies>
+  <behavior />
+</plugin>

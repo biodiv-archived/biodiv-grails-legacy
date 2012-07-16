@@ -59,7 +59,7 @@ class Recommendation {
 	   recos.each {
 		   String comment = it.comment;
 		   if(comment){
-			   recoComments << [comment:comment, author:it.author, votedOn:it.votedOn]
+			   recoComments << [recoVoteId:it.id, comment:comment, author:it.author, votedOn:it.votedOn]
 		   }
 	   }
 	   map.put("recoComments", recoComments);

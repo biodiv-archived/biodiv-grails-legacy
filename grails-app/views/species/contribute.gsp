@@ -2,6 +2,7 @@
 <head>
 
 <meta name="layout" content="main" />
+<r:require modules="species"/>
 <title>Contribute</title>
 <g:javascript src="species/util.js"/>
 

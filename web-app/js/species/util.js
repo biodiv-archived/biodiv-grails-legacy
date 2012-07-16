@@ -19,3 +19,18 @@ $(function() {
 	});
 	
 });
+
+function getBackgroundPos(obj) {
+	var pos = obj.css("background-position");
+	if (pos == 'undefined' || pos == null) {
+		pos = [obj.css("background-position-x"),obj.css("background-position-y")];//i hate IE!!
+	} else {
+		pos = pos.split(" ");
+	}
+	return {
+		x: parseFloat(pos[0]),
+		xUnit: pos[0].replace(/[0-9-.]/g, ""),
+		y: parseFloat(pos[1]),
+		yUnit: pos[1].replace(/[0-9-.]/g, "")
+	};
+}

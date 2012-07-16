@@ -1,0 +1,89 @@
+
+/* common *********************/
+form legend {
+  padding: 0 2px;
+  font-weight: bold;
+}
+form label  {
+  line-height: 1.8;
+  vertical-align: top;
+  float: left;
+  text-align:right;
+  width:30%;
+  margin-right:0.5em;
+}
+form li {
+  list-style: none;
+  margin: 0px 0;
+  padding: 2;
+}
+
+form em {
+  font-weight: bold;
+  font-style: normal;
+  color: #f00;
+}
+form ol {
+  margin: 0;
+  padding: 0;
+}
+
+
+
+/* form fieldset *********************/
+form fieldset {
+  margin-bottom: 2px;
+  border-style: solid none none;
+  border-color: #BBB;
+  border-width: thin;
+}
+form fieldset:first-child {
+  border: none;
+}
+
+/* form fieldset fieldset*********************/
+form fieldset fieldset {
+  border: none;
+  margin-top: 0;
+  padding-top: 0;
+  padding-left: 2;
+}
+
+form fieldset fieldset legend {
+  padding: 0 0 5px;
+  font-weight: normal;
+}
+form fieldset fieldset label {
+  float: none;
+  text-align:right;
+  width:30%;
+  margin-right:0.5em;
+}
+form fieldset fieldset li {
+  padding: 0 2px 3px;
+}
+
+/* form fieldset fieldset*********************/
+
+form fieldset fieldset fieldset {
+  margin: 0 0 0 19px; 
+  padding: 0;
+}
+form fieldset fieldset fieldset label {
+  padding: 0;
+}
+
+.ui-slider {
+  vertical-align: top;
+  width: 200px; /* Width of labels */
+
+  float: left;
+  margin-right:0.4em;
+  margin-top:0.5em;
+  margin-bottom:0.6em;
+}
+
+#autoUpdate-selection {
+	float: right;
+	padding-top: 5px;
+}

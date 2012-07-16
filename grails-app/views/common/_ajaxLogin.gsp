@@ -16,4 +16,3 @@
 		</div>
 	</div>
 </div>
-<g:javascript src="species/ajaxLogin.js"></g:javascript>

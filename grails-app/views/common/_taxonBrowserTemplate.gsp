@@ -2,7 +2,7 @@
 <%@ page import="species.Species"%>
 <%@ page import="species.Classification"%>
 
-<g:javascript>
+<r:script>
 $(document).ready(function() {
 	
 	
@@ -99,7 +99,7 @@ var heirarchyLevelFormatter = function(el, cellVal, opts) {
 	}
 	return el;	   
 }			
-</g:javascript>
+</r:script>
 
 
 <div class="taxonomyBrowser" style="position: relative;">

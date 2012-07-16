@@ -1,7 +1,7 @@
 
 <div class="observation_location_wrapper">
 	<div class="observation_location">
-		<script>
+		<g:javascript>
                 var markers = [];
                 var big_map;
                 var nagpur_latlng = new google.maps.LatLng('21.07', '79.27');
@@ -24,7 +24,7 @@
                         content: 'InfoWindow',
                         maxWidth: 400
                     });
-
+									
                   function addMarker(id, lat, lng) {
                      var latlng = new google.maps.LatLng(lat, lng);
 						var marker = new google.maps.Marker({
@@ -39,6 +39,28 @@
                                 load_content(big_map, this, id, infowindow); 
 	                    });
 
+                  }
+
+                  function getRandomNumber(){
+					return ((Math.random() -.5) / 200);
+                  }
+
+                  function jitterCloseMarker(big_map){
+                	var zoomLevel = big_map.getZoom();
+              		if(zoomLevel >= 13){
+                  		var markerKeys = [];
+                  		var mapBounds = big_map.getBounds()
+                  		for (var i = 0; i < markers.length; i++) {
+                      		var pos = markers[i].getPosition();
+                      		if(mapBounds.contains(pos)){
+									if($.inArray(pos.toString(), markerKeys) != -1){
+										markers[i].setPosition(new google.maps.LatLng(pos.lat() + getRandomNumber(), pos.lng() + getRandomNumber()));
+									}else{
+										markerKeys.push(pos.toString());
+									}
+                              }
+                  			}
+                      }
                   }  
                   <g:each in="${observationInstanceList}" status="i"
 						var="observationInstance">
@@ -50,7 +72,13 @@
                         var bounds = getSelectedBounds();
                         refreshList(bounds);
                     });
-		  var markerCluster = new MarkerClusterer(big_map, markers, {gridSize: 30});
+
+                    google.maps.event.addListener(big_map, 'zoom_changed', function() {
+                    	jitterCloseMarker(big_map);
+                    	
+                    });
+                    
+		  var markerCluster = new MarkerClusterer(big_map, markers, {gridSize: 30, maxZoom:13});
                 
                     
                   function load_content(map, marker, id, infowindow){
@@ -97,13 +125,13 @@
                 }
 
                 });
-                </script>
+                </g:javascript>
 		<div class="map_wrapper">
 			<div id="big_map_canvas" style="height: 500px; width: 100%;"></div>
 		</div>
 	</div>
 	<div id="map_results_list"></div>
-	<script>
+	<g:javascript>
             function refreshList(bounds){
                 var url = "${g.createLink(controller: "observation", action: "filteredList")}" + location.search
                 if (bounds !== undefined){
@@ -122,5 +150,5 @@
             $(function(){
                 refreshList();
             });
-        </script>
+        </g:javascript>
 </div>

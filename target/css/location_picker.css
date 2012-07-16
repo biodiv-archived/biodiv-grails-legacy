@@ -1,0 +1,114 @@
+#address {
+    width: 420px;
+    margin-bottom: 5px;
+    margin-left: 10px;
+    
+}    
+
+#map_canvas {
+    height:300px;     
+    clear:both; 
+}
+
+#location_picker {
+clear:both;    
+width: auto;      
+background: #f5f5f1;       
+box-radius: 7px;
+position: relative;
+padding: 10px;
+width: 260px;         
+}
+
+#selection_box {
+border: 1px solid #e5e5e5;
+padding:10px;      
+margin:10px;        
+background: #fcfcfc;       
+float:left;
+min-height: 300px;
+}
+
+.row {
+clear: both;
+padding-top:3px;
+padding-bottom:3px;
+}
+
+.label {
+float: left;
+padding-right: 5px;
+text-align: right;
+font-weight: bold;
+width: 150px;
+}
+
+.location_picker_value {
+float: left;
+text-align: left;
+height: 20px;
+overflow: hidden;
+width: 265px;          
+}
+
+#side_bar {
+float:left;
+padding:5px;      
+}
+
+#map_area {
+padding:10px;
+}
+
+.location_picker_button {
+margin-bottom: 2px;    
+border: 1px solid #e5e5e5;
+padding: 2px;        
+cursor: pointer;
+font-weight: bold;        
+color: #424242;            
+background: #f5f5f0;    
+height:40px;
+}
+
+.location_picker_button:hover {
+background: #c8e6ed;    
+}
+
+
+.thumbnail {
+float:left;
+width: 80px;
+height: 80px;       
+}
+
+#result_box {
+clear: both;
+border: 0px solid #e5e5e5;       
+padding: 10px;
+margin: 10px;         
+}
+
+#selected_place_name {
+width: 500px;
+}
+
+.button_no_icon {
+padding: 10px;
+}
+
+.active_location_picker_button {
+}
+
+#geotagged_images .title {
+font-weight: bold;	
+}
+
+#geotagged_images .msg {
+font-size: 0.9em;
+font-style: italic;
+}
+
+#current_location.location_picker_button {
+width: 150px;	
+}

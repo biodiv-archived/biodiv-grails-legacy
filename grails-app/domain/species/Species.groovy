@@ -13,7 +13,7 @@ import species.utils.ImageUtils;
 
 class Species {
 
-	String title;   
+	String title;    
 	String guid;
 	TaxonomyDefinition taxonConcept;
 	Resource reprImage;
@@ -23,7 +23,7 @@ class Species {
 	Date dateCreated;
 	Date lastUpdated;
 	
-	def grailsApplication;
+	def grailsApplication; 
 	
 	private static final log = LogFactory.getLog(this);
 	

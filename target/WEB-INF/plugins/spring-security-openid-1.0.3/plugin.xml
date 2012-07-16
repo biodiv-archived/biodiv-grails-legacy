@@ -1,0 +1,21 @@
+<plugin name='spring-security-openid' version='1.0.3' grailsVersion='1.2.3 &gt; *'>
+  <author>Burt Beckwith</author>
+  <authorEmail>beckwithb@vmware.com</authorEmail>
+  <title>OpenID authentication support for the Spring Security plugin.</title>
+  <description>OpenID authentication support for the Spring Security plugin.</description>
+  <documentation>http://grails.org/plugin/spring-security-openid</documentation>
+  <resources>
+    <resource>BuildConfig</resource>
+    <resource>Config</resource>
+    <resource>DataSource</resource>
+    <resource>DefaultOpenIdSecurityConfig</resource>
+    <resource>test.TestOpenID</resource>
+    <resource>test.TestRole</resource>
+    <resource>test.TestUser</resource>
+    <resource>test.TestUserRole</resource>
+  </resources>
+  <dependencies>
+    <plugin name='springSecurityCore' version='1.1.1 &gt; *' />
+  </dependencies>
+  <behavior />
+</plugin>

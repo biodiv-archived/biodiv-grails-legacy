@@ -34,8 +34,9 @@ padding-bottom:10px;
 }
 
 .login-box img {
-width: 32px;
-height: 32px;       
+max-height: 32px;
+min-height: 16px;
+max-width: 32px;       
 }
 
 .loginLink {

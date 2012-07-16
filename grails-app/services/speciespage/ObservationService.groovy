@@ -77,7 +77,7 @@ class ObservationService {
 
 		def resourcesXML = createResourcesXML(params);
 		def resources = saveResources(observation, resourcesXML);
-
+		observation.resource?.clear();
 		resources.each { resource ->
 			observation.addToResource(resource);
 		}
@@ -128,10 +128,10 @@ class ObservationService {
 	 * @return
 	 */
 	Map getRelatedObservationBySpeciesName(long obvId, int limit, long offset){
-		String speciesName = getSpeciesNames(obvId)
+		//String speciesName = getSpeciesNames(obvId)
 		//log.debug speciesName
 		//log.debug speciesName.getClass();
-		return getRelatedObservationBySpeciesNames(speciesName, obvId, limit, offset)
+		return getRelatedObservationBySpeciesNames(obvId, limit, offset)
 	}
 	/**
 	 * 
@@ -227,22 +227,27 @@ class ObservationService {
 	 * @param params
 	 * @return
 	 */
-	Map getRelatedObservationBySpeciesNames(String speciesName, long obvId, int limit, long offset){
-		if(speciesName == "Unknown") {
+	Map getRelatedObservationBySpeciesNames(long obvId, int limit, long offset){
+		Observation parentObv = Observation.read(obvId);
+		if(!parentObv.maxVotedReco) {
 			return ["observations":[], "count":0];
 		}
-		def recIds = Recommendation.executeQuery("select rec.id from Recommendation as rec where rec.name = :speciesName", [speciesName:speciesName]);
-		def countQuery = "select count(*) from RecommendationVote recVote where recVote.recommendation.id in (:recIds) and recVote.observation.id != :parentObv and recVote.observation.isDeleted = :isDeleted"
-		def countParams = [parentObv:obvId, recIds:recIds, isDeleted:false]
-		def count = RecommendationVote.executeQuery(countQuery, countParams)
-		def query = "select recVote.observation as observation from RecommendationVote recVote where recVote.recommendation.id in (:recIds) and recVote.observation.id != :parentObv and recVote.observation.isDeleted = :isDeleted order by recVote.votedOn desc "
-		def m = [parentObv:obvId, recIds:recIds, max:limit, offset:offset, isDeleted:false]
-		def observations = RecommendationVote.executeQuery(query, m);
+		def count = Observation.countByMaxVotedRecoAndIsDeleted(parentObv.maxVotedReco, false) - 1;
+		def c = Observation.createCriteria();
+		def observations = c.list (max: limit, offset: offset) {
+			and {
+				eq("maxVotedReco", parentObv.maxVotedReco)
+				eq("isDeleted", false)
+				ne("id", obvId)
+			}
+			order("lastRevised", "desc")
+		}
+		
 		def result = [];
 		observations.each {
 			result.add(['observation':it, 'title':it.maxVotedSpeciesName]);
 		}
-		return ["observations":result, "count":count[0]]
+		return ["observations":result, "count":count]
 	}
 
 	static List createUrlList2(observations){
@@ -266,8 +271,8 @@ class ObservationService {
 		def languageId = Language.getLanguage(params.languageName).id;
 		def obv = params.observation?:Observation.get(params.obvId);
 		
-		Recommendation scientificNameReco = getRecoForScientificName(recoName, canName);
 		Recommendation commonNameReco = findReco(commonName, false, languageId, null);
+		Recommendation scientificNameReco = getRecoForScientificName(recoName, canName, commonNameReco);
 		
 		curationService.add(scientificNameReco, commonNameReco, obv, springSecurityService.currentUser);
 		
@@ -275,34 +280,23 @@ class ObservationService {
 		return [mainReco : (scientificNameReco ?:commonNameReco), commonNameReco:commonNameReco];
 	}
 		
-	private Recommendation getRecoForScientificName(recoName, canonicalName){
+	private Recommendation getRecoForScientificName(String recoName, String canonicalName, Recommendation commonNameReco){
 		def reco, taxonConcept;
 		
 		//first searching by canonical name. this name is present if user select from auto suggest
-		if(canonicalName){
-			//findBy returns first...assuming taxon concepts wont hv same canonical name and different rank
-			canonicalName = Utils.cleanName(canonicalName);
-			reco = Recommendation.findByNameIlikeAndIsScientificName(canonicalName, true);
-			log.debug "Found taxonConcept : "+taxonConcept;
-			log.debug "Found reco : "+reco;
-			if(!reco) {
-				taxonConcept = TaxonomyDefinition.findByCanonicalFormIlike(canonicalName);
-				if(taxonConcept) {
-					log.debug "Resolving recoName to canName : "+taxonConcept.canonicalForm
-					reco = new Recommendation(name:taxonConcept.canonicalForm, taxonConcept:taxonConcept);
-					if(!recommendationService.save(reco)) {
-						reco = null;
-					}
-				} else {
-					log.error "Given taxonomy canonical name is invalid"
-				}
-			}
-			return reco;
+		if(canonicalName && (canonicalName.trim() != "")){
+			return findReco(canonicalName, true, null, taxonConcept);
 		}
 		
 		//searching on whatever user typed in scientific name text box
 		if(recoName) {
 			return findReco(recoName, true, null, taxonConcept);
+		}
+		
+		//it may possible certain common name may point to species id in that case getting the SN for it
+		if(commonNameReco && commonNameReco.taxonConcept){
+			TaxonomyDefinition taxOnConcept = commonNameReco.taxonConcept
+			return findReco(taxOnConcept.canonicalForm, true, null, taxOnConcept)
 		}
 		
 		return null;
@@ -472,10 +466,10 @@ class ObservationService {
 			return tags
 		}
 		
-		def sql =  Sql.newInstance(dataSource);
-		String query = "select t.name as name, count(t.name) as obv_count from tag_links as tl, tags as t, observation obv where t.name in ('" +  tagNames.join("', '") + "') and tl.tag_ref = obv.id and tl.type = '"+Observation.getClass().getName().toLowerCase()+"' and obv.is_deleted = false and t.id = tl.tag_id group by t.name order by count(t.name) desc, t.name asc limit " + tagsLimit;
-
-		sql.rows(query).each{
+		Sql sql =  Sql.newInstance(dataSource);
+		String query = "select t.name as name, count(t.name) as obv_count from tag_links as tl, tags as t, observation obv where t.name in " +  getSqlInCluase(tagNames) + " and tl.tag_ref = obv.id and tl.type = '"+Observation.getClass().getName().toLowerCase()+"' and obv.is_deleted = false and t.id = tl.tag_id group by t.name order by count(t.name) desc, t.name asc limit " + tagsLimit;
+		
+		sql.rows(query, tagNames).each{
 			tags[it.getProperty("name")] = it.getProperty("obv_count");
 		};
 		return tags;
@@ -489,9 +483,9 @@ class ObservationService {
 		}
 
 		def sql =  Sql.newInstance(dataSource);
-		String query = "select t.name as name, count(t.name) as obv_count from tag_links as tl, tags as t, observation obv where tl.tag_ref in " + getIdList(obvIds)  + " and tl.tag_ref = obv.id and tl.type = '"+Observation.getClass().getName().toLowerCase()+"' and obv.is_deleted = false and t.id = tl.tag_id group by t.name order by count(t.name) desc, t.name asc limit " + tagsLimit;
+		String query = "select t.name as name, count(t.name) as obv_count from tag_links as tl, tags as t, observation obv where tl.tag_ref in " + getSqlInCluase(obvIds)  + " and tl.tag_ref = obv.id and tl.type = '"+Observation.getClass().getName().toLowerCase()+"' and obv.is_deleted = false and t.id = tl.tag_id group by t.name order by count(t.name) desc, t.name asc limit " + tagsLimit;
 
-		sql.rows(query).each{
+		sql.rows(query, obvIds).each{
 			tags[it.getProperty("name")] = it.getProperty("obv_count");
 		};
 		return tags;
@@ -499,6 +493,10 @@ class ObservationService {
 
 	Map getFilteredTags(params){
 		return getTagsFromObservation(getFilteredObservations(params, -1, -1, true).observationInstanceList.collect{it[0]});
+	}
+	
+	private String getSqlInCluase(list){
+		return "(" + list.collect {'?'}.join(", ") + ")"
 	}
 
 	/**
@@ -562,7 +560,9 @@ class ObservationService {
 
 		if(params.isFlagged && params.isFlagged.toBoolean()){
 			filterQuery += " and obv.flagCount > 0 "
+			activeFilters["isFlagged"] = params.isFlagged.toBoolean()
 		}
+		
 		if(params.bounds){
 			def bounds = params.bounds.split(",")
 
@@ -600,12 +600,7 @@ class ObservationService {
 		}
 		return null;
 	}
-
-	private String getIdList(l){
-		return l.toString().replace("[", "(").replace("]", ")")
-	}
-
-
+	
 	long getAllObservationsOfUser(SUser user) {
 		return (long)Observation.countByAuthorAndIsDeleted(user, false);
 	}
@@ -781,6 +776,7 @@ class ObservationService {
 		}
 		if(params.isFlagged && params.isFlagged.toBoolean()){
 			paramsList.add('fq', searchFieldsConfig.ISFLAGGED+":"+params.isFlagged.toBoolean());
+			activeFilters["isFlagged"] = params.isFlagged.toBoolean()
 		}
 
 		if(params.bounds){

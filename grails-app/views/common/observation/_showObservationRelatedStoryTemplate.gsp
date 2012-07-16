@@ -1,4 +1,4 @@
-<g:javascript type="text/javascript"> 
+<r:script> 
 $(document).ready(function() {
 	$('#carousel_${id}').jcarousel({
 		itemLoadCallback : itemLoadCallback,
@@ -22,7 +22,7 @@ $(document).ready(function() {
 	);
 	
 });
-</g:javascript> 
+</r:script> 
   <div id="carousel_${id}" class="jcarousel-skin-ie7"> 
     <ul> 
       <!-- The content will be dynamically loaded in here --> 

@@ -74,13 +74,13 @@
     width: 32px;
     height: 32px;
     cursor: pointer;
-    background: transparent url(next-horizontal.gif) no-repeat 0 0;
+    background: transparent url(next-horizontal.png) no-repeat 0 0;
 }
 
 .jcarousel-skin-ie7 .jcarousel-direction-rtl .jcarousel-next-horizontal {
     left: 5px;
     right: auto;
-    background-image: url(prev-horizontal.gif);
+    background-image: url(prev-horizontal.png);
 }
 
 .jcarousel-skin-ie7 .jcarousel-next-horizontal:hover,
@@ -107,13 +107,13 @@
     width: 32px;
     height: 32px;
     cursor: pointer;
-    background: transparent url(prev-horizontal.gif) no-repeat 0 0;
+    background: transparent url(prev-horizontal.png) no-repeat 0 0;
 }
 
 .jcarousel-skin-ie7 .jcarousel-direction-rtl .jcarousel-prev-horizontal {
     left: auto;
     right: 5px;
-    background-image: url(next-horizontal.gif);
+    background-image: url(next-horizontal.png);
 }
 
 .jcarousel-skin-ie7 .jcarousel-prev-horizontal:hover,
@@ -143,7 +143,7 @@
     width: 32px;
     height: 32px;
     cursor: pointer;
-    background: transparent url(next-vertical.gif) no-repeat 0 0;
+    background: transparent url(next-vertical.png) no-repeat 0 0;
 }
 
 .jcarousel-skin-ie7 .jcarousel-next-vertical:hover,
@@ -170,7 +170,7 @@
     width: 32px;
     height: 32px;
     cursor: pointer;
-    background: transparent url(prev-vertical.gif) no-repeat 0 0;
+    background: transparent url(prev-vertical.png) no-repeat 0 0;
 }
 
 .jcarousel-skin-ie7 .jcarousel-prev-vertical:hover,

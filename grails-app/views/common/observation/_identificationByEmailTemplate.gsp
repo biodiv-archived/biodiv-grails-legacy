@@ -37,8 +37,8 @@
 	</div>
 </div>
 
-<g:javascript src="species/users.js"></g:javascript>
-<script>
+
+<g:javascript>
 
 $(function() {
 	var autofillUsersComp = $("#userAndEmailList_${autofillUsersId}").autofillUsers({
@@ -110,6 +110,5 @@ $(function() {
  	});
  	
 });
-</script>
 
-	
+</g:javascript>

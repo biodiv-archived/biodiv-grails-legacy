@@ -1,6 +1,5 @@
 <%@page import="species.utils.ImageType"%>
-<%@page
-	import="org.springframework.web.context.request.RequestContextHolder"%>
+<%@page	import="org.springframework.web.context.request.RequestContextHolder"%>
 <%@page import="species.License"%>
 <%@page import="species.License.LicenseType"%>
 <%@ page import="species.participation.Observation"%>
@@ -13,35 +12,27 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 
 <meta name="layout" content="main" />
+<script src="http://maps.google.com/maps/api/js?sensor=true"></script>
+<r:require modules="observations_create"/>
+
 <g:set var="entityName"
 	value="${message(code: 'observation.label', default: 'Observation')}" />
 <title><g:message code="default.create.label"
 		args="[entityName]" />
 </title>
 
-<link rel="stylesheet"
-	href="${resource(dir:'css',file:'location_picker.css')}"
-	type="text/css" media="all" />
-<link rel="stylesheet"
-	href="${resource(dir:'css',file:'tagit/tagit-custom.css')}"
-	type="text/css" media="all" />
-
-<script src="http://maps.google.com/maps/api/js?sensor=true"></script>
-<g:javascript src="jquery/jquery.exif.js"></g:javascript>
-<g:javascript src="jquery/jquery.watermark.min.js"></g:javascript>
-<g:javascript src="location/location-picker.js"></g:javascript>
-
-<g:javascript src="jsrender.js"></g:javascript>
-
-<g:javascript src="tagit.js"></g:javascript>
-
 <style>
 .btn-group.open .dropdown-menu {
 	top: 43px;
 }
 
+.group_option a {
+	text-align: left;
+	line-height:33px;
+}
+
 .btn-large .caret {
-	margin-top: 13px;
+	margin-top: 15px;
 	position: absolute;
 	right: 10px;
 }
@@ -50,6 +41,7 @@
 	width: 300px;
 	height:44px;
 	text-align: left;
+	line-height:33px;
 	padding:5px;
 }
 
@@ -111,9 +103,6 @@ input.dms_field {
 .btn .combobox-clear {
     margin-top: 12px;
 }
-.btn .caret {
-    margin-top: 18px;
-}
 </style>
 </head>
 <body>
@@ -171,7 +160,7 @@ input.dms_field {
 								class="resources control-group ${hasErrors(bean: observationInstance, field: 'resource', 'error')}">
 								<ul id="imagesList" class="thumbwrap thumbnails"
 									style='list-style: none; margin-left: 0px;'>
-									<g:set var="i" value="1" />
+									<g:set var="i" value="${1}" />
 									<g:each in="${observationInstance?.resource}" var="r">
 										<li class="addedResource thumbnail">
 											<%def thumbnail = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.thumbnail.suffix)%>
@@ -240,18 +229,17 @@ input.dms_field {
 							<div class="controls">
 								<div id="groups_div" class="btn-group" style="z-index: 3;">
 									<%
-                                        def defaultGroupId = observationInstance?.group?.id
-                                        def defaultGroupIconFileName = (defaultGroupId)? SpeciesGroup.read(defaultGroupId).icon(ImageType.VERY_SMALL)?.fileName?.trim() : SpeciesGroup.findByName('All').icon(ImageType.VERY_SMALL)?.fileName?.trim()
-                                        def defaultGroupValue = (defaultGroupId) ? SpeciesGroup.read(defaultGroupId).name : "Select group"
+                                        def defaultGroup = observationInstance?.group
+                                        //def defaultGroupIconFileName = (defaultGroupId)? SpeciesGroup.read(defaultGroupId).icon(ImageType.VERY_SMALL)?.fileName?.trim() : SpeciesGroup.findByName('All').icon(ImageType.VERY_SMALL)?.fileName?.trim()
+                                        def defaultGroupValue = (defaultGroup) ? defaultGroup.name : "Select group"
+										def defaultIcon = (defaultGroup) ? defaultGroup.iconClass() : "all_gall_th"
                                         %>
 
 									<button id="selected_group"
 										class="btn btn-large dropdown-toggle" data-toggle="dropdown"
 										data-target="#groups_div">
-										<img class="group_icon"
-											src="${createLinkTo(dir: 'images', file: defaultGroupIconFileName, absolute:true)}" />
-										<span class="display_value"> ${defaultGroupValue}
-										</span> <span class="caret"></span>
+										<i class="display_value group_icon pull-left species_groups_sprites active ${defaultIcon}"></i> ${defaultGroupValue}
+										<span class="caret"></span>
 									</button>
 
 									<ul id="group_options" class="dropdown-menu">
@@ -259,13 +247,10 @@ input.dms_field {
 										<g:each in="${species.groups.SpeciesGroup.list()}" var="g">
 											<g:if
 												test="${!g.name.equals(grailsApplication.config.speciesPortal.group.ALL)}">
-												<li class="span2 group_option" value="${g.id}">
-													<a> <img
-														class="group_icon"
-														src="${createLinkTo(dir: 'images', file: g.icon(ImageType.VERY_SMALL)?.fileName?.trim(), absolute:true)}" />
-														<span title="${g.name}">
+												<li class="span2 group_option" value="${g.id}" title="${g.name}">
+													<a>
+														<i class="group_icon pull-left species_groups_sprites active ${g.iconClass()}"></i>
 															${g.name}
-													</span>
 												</a></li>
 											</g:if>
 										</g:each>
@@ -293,20 +278,16 @@ input.dms_field {
 							<div class="controls">
 									<div id="habitat_div" class="btn-group" style="z-index: 2;">
 										<%
-                                                                            def defaultHabitatId = observationInstance?.habitat?.id
-																			def defaultHabitat = Habitat.read(defaultHabitatId);
-                                                                            def defaultHabitatIconFileName = (defaultHabitatId)? defaultHabitat.icon(ImageType.VERY_SMALL)?.fileName?.trim() : Habitat.findByName('All').icon(ImageType.VERY_SMALL)?.fileName?.trim()
-                                                                            def defaultHabitatValue = (defaultHabitatId) ? defaultHabitat.name : "Select habitat"
-                                                                    %>
+                                            def defaultHabitat = observationInstance?.habitat;
+                                            //def defaultHabitatIconFileName = (defaultHabitatId)? defaultHabitat.icon(ImageType.VERY_SMALL)?.fileName?.trim() : Habitat.findByName('All').icon(ImageType.VERY_SMALL)?.fileName?.trim()
+                                            def defaultHabitatValue = (defaultHabitat) ? defaultHabitat.name : "Select habitat"
+											def defaultHabitatIcon = (defaultHabitat) ? defaultHabitat.iconClass() : "all_gall_th"
+                                        %>
                                         <button id="selected_habitat"
 										class="btn btn-large dropdown-toggle" data-toggle="dropdown"
 										data-target="#habitat_div">
-										<img class="group_icon"
-												src="${createLinkTo(dir: 'images', file:defaultHabitatIconFileName, absolute:true)}" />
-
-											<span>
-												${defaultHabitatValue}
-											</span><span class="caret"></span>
+											<i class="display_value group_icon pull-left habitats_sprites active ${defaultHabitatIcon}"></i> ${defaultHabitatValue}
+											<span class="caret"></span>
 									</button>
 										
 										<ul id="habitat_options" class="dropdown-menu">
@@ -314,10 +295,10 @@ input.dms_field {
 											<g:each in="${species.Habitat.list()}" var="h">
 											<g:if
 												test="${!h.name.equals(grailsApplication.config.speciesPortal.group.ALL)}">
-												<li class="span2 habitat_option" value="${h.id}"><a><img
-														class="group_icon"
-														src="${createLinkTo(dir: 'images', file:h.icon(ImageType.VERY_SMALL)?.fileName?.trim(), absolute:true)}" />
-														<span title="${h.name}"> ${h.name} </span> </a>
+												<li class="span2 habitat_option" value="${h.id}" title="${h.name}"><a>
+												
+												<i class="group_icon pull-left habitats_sprites active ${h.iconClass()}"></i>
+												${h.name}</a>
 												</li>
 											</g:if>
 											</g:each>
@@ -611,15 +592,15 @@ input.dms_field {
                     </div>
                 </div>
             </div>	
-	    <input id="license_{{=i}}" type="hidden" name="license_{{=i}}"></input>
+	    	<input id="license_{{=i}}" type="hidden" name="license_{{=i}}"></input>
             
-            <!--a href="#" onclick="removeResource(event);$('#geotagged_images').trigger('update_map');">Remove</a-->
-            <div class="close_button" onclick="removeResource(event, {{=i}});$('#geotagged_images').trigger('update_map');"></div>
+        	<!--a href="#" onclick="removeResource(event);$('#geotagged_images').trigger('update_map');">Remove</a-->
+        	<div class="close_button" onclick="removeResource(event, {{=i}});$('#geotagged_images').trigger('update_map');"></div>
 	</li>
 	
 </script>
 
-		<g:javascript>
+		<r:script>
 	
         var add_file_button = '<li id="add_file" class="addedResource" style="display:none;" onclick="$(\'#attachFiles\').select()[0].click();return false;"><div class="progress"><div id="translucent_box"></div><div id="progress_bar"></div ><div id="progress_msg"></div ></div></li>';
 
@@ -662,20 +643,24 @@ input.dms_field {
 			beforeSubmit: function(formData, jqForm, options) {
 				return true;
 			}, 
-                     xhr: function() {  // custom xhr
-                         myXhr = $.ajaxSettings.xhr();
-                         if(myXhr.upload){ // check if upload property exists
-                             myXhr.upload.addEventListener('progress', progressHandlingFunction, false); // for handling the progress of the upload
-                         }
-                         return myXhr;
-                     },
-
+            xhr: function() {  // custom xhr
+                myXhr = $.ajaxSettings.xhr();
+                if(myXhr.upload){ // check if upload property exists
+                    myXhr.upload.addEventListener('progress', progressHandlingFunction, false); // for handling the progress of the upload
+                }
+                return myXhr;
+            },
 			success: function(responseXML, statusText, xhr, form) {
 				$(form).find("span.msg").html("");
 				var rootDir = '${grailsApplication.config.speciesPortal.observations.serverURL}'
 				var obvDir = $(responseXML).find('dir').text();
 				var images = []
-				var i = $(".metadata").length;
+				var metadata = $(".metadata");
+				var i = 0;
+				if(metadata.length > 0) {
+					var file_id = $(metadata.get(-1)).children("input").first().attr("name");
+					i = parseInt(file_id.substring(file_id.indexOf("_")+1));
+				}
 				$(responseXML).find('resources').find('image').each(function() {
 					var fileName = $(this).attr('fileName');
 					var size = $(this).attr('size');
@@ -794,7 +779,7 @@ input.dms_field {
 	
 	$( "#observedOn" ).datepicker({ dateFormat: 'dd/mm/yy' });
 	
-</g:javascript>
+</r:script>
 </body>
 </html>
 

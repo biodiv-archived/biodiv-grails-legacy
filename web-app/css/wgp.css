@@ -767,7 +767,7 @@ margin-right: 3px;
 }
 
 .toolbar a.close {
-	background: url(../images/skin/close.png) no-repeat;
+	background: url(../images/close.png) no-repeat;
 	cursor: pointer;
 	float: right;
 }

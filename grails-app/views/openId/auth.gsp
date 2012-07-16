@@ -1,5 +1,6 @@
 <head>
-<meta name="layout" content="main">
+<meta name="layout" content="main" />
+<r:require modules="auth"/>
 <title>Login</title>
 <link rel="stylesheet" type="text/css" media="all"
 	href="${resource(dir:'css',file:'auth.css')}" />

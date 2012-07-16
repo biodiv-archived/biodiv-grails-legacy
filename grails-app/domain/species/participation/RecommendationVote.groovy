@@ -25,7 +25,6 @@ class RecommendationVote {
 		}
 	}
 	
-	SUser author;
 	Recommendation recommendation;
 	ConfidenceType confidence;
 	Date votedOn = new Date();
@@ -33,7 +32,7 @@ class RecommendationVote {
 	String comment;
 	Recommendation commonNameReco;
 	
-	static belongsTo = [observation:Observation];
+	static belongsTo = [observation:Observation, author:SUser];
 	
 	static constraints = {
 		author(unique:['observation']);

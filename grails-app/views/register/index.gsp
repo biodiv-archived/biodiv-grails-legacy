@@ -4,9 +4,7 @@
 <meta name='layout' content='main' />
 <title><g:message code='spring.security.ui.register.title' /></title>
 
-<link rel="stylesheet" type="text/css" media="all"
-	href="${resource(dir:'css',file:'auth.css')}" />
-
+<r:require modules="auth"/>
 <style>
 
 .openid-loginbox .form-horizontal .control-label {
@@ -15,6 +13,10 @@
 
 .openid-loginbox .form-horizontal .controls {
 	margin-left: 140px;
+}
+
+.openid-loginbox .form-horizontal .controls input {
+	width: 290px;
 }
 </style>
 </head>
@@ -36,7 +38,7 @@
 						${flash.message}
 					</div>
 				</g:if>
-
+				
 				<div id='formLogin' style='clear: both'>
 					<fieldset>
 						<legend>
@@ -62,7 +64,7 @@
 								style="clear: both; border-top: 1px solid #Eee; padding-top: 5px;">Or,
 								register here:</div>
 								<div
-									class="control-group ${hasErrors(bean: command, field: email, 'error')}">
+									class="control-group ${hasErrors(bean: command, field: 'email', 'error')}">
 									<label class="control-label" for="email"><g:message
 											code='user.email.label' default='E-mail *' /> </label>
 									<div class="controls">
@@ -83,7 +85,7 @@
 
 								<g:if test="${!command.openId}">
 									<div
-										class="control-group ${hasErrors(bean: command, field: password, 'error')}">
+										class="control-group ${hasErrors(bean: command, field: 'password', 'error')}">
 										<label class="control-label" for="password"><g:message
 												code='user.password.label' default='Password *' /> </label>
 										<div class="controls">
@@ -99,7 +101,7 @@
 										</div>
 									</div>
 									<div
-										class="control-group ${hasErrors(bean: command, field: password2, 'error')}">
+										class="control-group ${hasErrors(bean: command, field: 'password2', 'error')}">
 										<label class="control-label" for="password2"><g:message
 												code='user.password2.label' default='Password (again)*' />
 										</label>
@@ -119,9 +121,8 @@
 
 								</g:if>
 
-
 								<div
-									class="control-group ${hasErrors(bean: command, field: name, 'error')}">
+									class="control-group ${hasErrors(bean: command, field: 'name', 'error')}">
 									<label class="control-label" for="name"><g:message
 											code='user.name.label' default='Name' /> </label>
 									<div class="controls">
@@ -139,7 +140,7 @@
 								</div>
 
 								<div
-									class="control-group ${hasErrors(bean: command, field: location, 'error')}">
+									class="control-group ${hasErrors(bean: command, field: 'location', 'error')}">
 									<label class="control-label" for="location"><g:message
 											code='user.location.label' default='Location' /> </label>
 									<div class="controls">
@@ -155,7 +156,27 @@
 
 									</div>
 								</div>
+								
+								<div
+									class="control-group ${hasErrors(bean: command, field: 'captcha_response', 'error')}">
+									<label class="control-label" for="captcha_response"><g:message
+											code='user.location.label' default='Enter words as shown in' /> </label>
+									
+									<div class="controls">
+										<jcaptcha:jpeg name="imageCaptcha" height="100px" width="100px" />
+										<input class="input-large" id="captcha_response" type="text"
+											value="" name="captcha_response"
+											placeholder="Enter words as shown in box...">
 
+										<g:hasErrors bean="${command}" field="captcha_response">
+											<div class="help-inline">
+												<g:renderErrors bean="${command}" field="captcha_response" />
+											</div>
+										</g:hasErrors>
+
+									</div>
+								</div>
+									    								
 								<div class="control-group">
 									<span class="policy-text"> By registering you agree to
 										our <a href="/terms">Terms and Conditions</a> on the use of

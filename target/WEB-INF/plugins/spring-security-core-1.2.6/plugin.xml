@@ -1,0 +1,20 @@
+<plugin name='spring-security-core' version='1.2.6' grailsVersion='1.2.2 &gt; *'>
+  <author>Burt Beckwith</author>
+  <authorEmail>beckwithb@vmware.com</authorEmail>
+  <title>Spring Security Core Plugin</title>
+  <description>Spring Security Core plugin</description>
+  <documentation>http://grails.org/plugin/spring-security-core</documentation>
+  <type>SpringSecurityCoreGrailsPlugin</type>
+  <resources>
+    <resource>DefaultSecurityConfig</resource>
+    <resource>test.TestPersistentLogin</resource>
+    <resource>test.TestRequestmap</resource>
+    <resource>test.TestRole</resource>
+    <resource>test.TestUser</resource>
+    <resource>test.TestUserRole</resource>
+    <resource>grails.plugins.springsecurity.SpringSecurityService</resource>
+    <resource>grails.plugins.springsecurity.SecurityTagLib</resource>
+  </resources>
+  <dependencies />
+  <behavior />
+</plugin>

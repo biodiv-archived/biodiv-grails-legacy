@@ -1,0 +1,25 @@
+#Mon Jun 18 07:59:37 IST 2012
+com.springsource.sts.grails.core.com.springsource.sts.grails.runonserver.RunOnServerProperties.INCREMENTAL=false
+com.springsource.sts.grails.core.source.attachment-grails-bootstrap-1.3.7.jar=/home/sravanthi/Softwares/grails-1.3.7/src/java
+com.springsource.sts.grails.core.source.attachment-grails-core-1.3.7.jar=/home/sravanthi/Softwares/grails-1.3.7/src/java
+com.springsource.sts.grails.core.source.attachment-grails-crud-1.3.7.jar=/home/sravanthi/Softwares/grails-1.3.7/src/java
+com.springsource.sts.grails.core.source.attachment-grails-docs-1.3.7.jar=/home/sravanthi/Softwares/grails-1.3.7/src/java
+com.springsource.sts.grails.core.source.attachment-grails-gorm-1.3.7.jar=/home/sravanthi/Softwares/grails-1.3.7/src/java
+com.springsource.sts.grails.core.source.attachment-grails-resources-1.3.7.jar=/home/sravanthi/Softwares/grails-1.3.7/src/java
+com.springsource.sts.grails.core.source.attachment-grails-scripts-1.3.7.jar=/home/sravanthi/Softwares/grails-1.3.7/scripts
+com.springsource.sts.grails.core.source.attachment-grails-spring-1.3.7.jar=/home/sravanthi/Softwares/grails-1.3.7/src/java
+com.springsource.sts.grails.core.source.attachment-grails-test-1.3.7.jar=/home/sravanthi/Softwares/grails-1.3.7/src/java
+com.springsource.sts.grails.core.source.attachment-grails-tomcat-plugin-1.0.jar=/home/sravanthi/Softwares/grails-1.3.7/src/java
+com.springsource.sts.grails.core.source.attachment-grails-web-1.3.7.jar=/home/sravanthi/Softwares/grails-1.3.7/src/java
+com.springsource.sts.grails.core.source.attachment-org.springframework.context-3.0.5.RELEASE.jar=/home/sravanthi/git/spring-framework/spring-context/src
+com.springsource.sts.grails.core.source.attachment-org.springframework.security.acls-3.0.4.RELEASE.jar=/home/sravanthi/git/spring-security/acl
+com.springsource.sts.grails.core.source.attachment-org.springframework.web-3.0.5.RELEASE.jar=/home/sravanthi/git/spring-framework/spring-web/src/main/java
+com.springsource.sts.grails.core.source.attachment-spring-security-core-3.0.7.RELEASE.jar=/home/sravanthi/git/spring-security/core/src
+com.springsource.sts.grails.core.source.attachment-spring-security-openid-3.0.5.RELEASE.jar=/home/sravanthi/git/spring-security/openid/src
+com.springsource.sts.grails.core.source.attachment-spring-security-web-3.0.7.RELEASE.jar=/home/sravanthi/git/spring-security/web/src
+com.springsource.sts.grails.core.source.attachment-spring-social-core-1.0.1.RELEASE.jar=/home/sravanthi/git/spring-social/spring-social-core/src/main/java
+com.springsource.sts.grails.core.source.attachment-spring-social-facebook-1.0.0.RELEASE.jar=/home/sravanthi/git/spring-social-facebook/spring-social-facebook/src
+com.springsource.sts.grails.core.source.attachment-spring-social-facebook-1.0.1.RELEASE.jar=/home/sravanthi/git/spring-social-facebook/spring-social-facebook/src/main/java
+com.springsource.sts.grails.core.source.attachment-spring-web-3.1.0.RELEASE.jar=/home/sravanthi/git/spring-framework/spring-web/src/main/java
+com.springsource.sts.grails.core.use.default.install=false
+eclipse.preferences.version=1

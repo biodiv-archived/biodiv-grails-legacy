@@ -36,9 +36,10 @@ class ObservationFlag {
 		notes type:'text';
 	}
 
-	SUser author;
-	Observation observation;
+	
 	Date createdOn = new Date();
 	String notes;
 	FlagType flag;
+	
+	static belongsTo = [author:SUser, observation:Observation]
 }

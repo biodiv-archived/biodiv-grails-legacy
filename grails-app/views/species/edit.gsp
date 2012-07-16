@@ -6,11 +6,9 @@
 <meta http-equiv="Content-Type" content="text/html" />
 <meta name="layout" content="main" />
 <title>Species Edit</title>
-<link rel="stylesheet" type="text/css" media="all"
-	href="${resource(dir:'js/galleria/1.2.7/themes/classic/',file:'galleria.classic.css')}" />
-<g:javascript src="galleria/1.2.7/galleria-1.2.7.min.js"/>
+<r:require modules="species"/>
 
-<g:javascript>
+<r:script>
 Galleria.loadTheme('${resource(dir:'js/galleria/1.2.7/themes/classic/',file:'galleria.classic.min.js')}');
 $(document).ready(function(){
 	$(".caption").click(function() {
@@ -35,7 +33,7 @@ $(document).ready(function(){
 	});
 	
 });
-</g:javascript>
+</r:script>
 </head>
 <body>
 	<div class="container_16 big_wrapper">

@@ -4,8 +4,7 @@
 <title><g:message code='spring.security.ui.resetPassword.title' />
 </title>
 <meta name='layout' content='main' />
-<link rel="stylesheet" type="text/css" media="all"
-	href="${resource(dir:'css',file:'auth.css')}" />
+<r:require modules="auth"/>
 </head>
 
 <body>
@@ -39,7 +38,7 @@
 								<g:message code='spring.security.ui.resetPassword.description' />
 							</div>
 							<div
-								class="control-group ${hasErrors(bean: command, field: password, 'error')}">
+								class="control-group ${hasErrors(bean: command, field: 'password', 'error')}">
 								<label class="control-label" for="password"><g:message
 										code='user.password.label' default='Password *' /> </label>
 								<div class="controls">
@@ -55,7 +54,7 @@
 								</div>
 							</div>
 							<div
-								class="control-group ${hasErrors(bean: command, field: password2, 'error')}">
+								class="control-group ${hasErrors(bean: command, field: 'password2', 'error')}">
 								<label class="control-label" for="password2"><g:message
 										code='user.password2.label' default='Password (again)*' /> </label>
 								<div class="controls">

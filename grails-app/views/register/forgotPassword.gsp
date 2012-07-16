@@ -4,8 +4,7 @@
 <title><g:message code='spring.security.ui.forgotPassword.title' />
 </title>
 <meta name='layout' content='main' />
-<link rel="stylesheet" type="text/css" media="all"
-	href="${resource(dir:'css',file:'auth.css')}" />
+<r:require modules="auth"/>
 </head>
 <style>
 form {

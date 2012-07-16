@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="main" />
-
+<r:require modules="species"/>
 <title>Advance Search</title>
 
 <style>
@@ -11,7 +11,7 @@
 	width:420px;
 }
 </style>
-<g:javascript>
+<r:script>
 
 $(document).ready(function(){
 	
@@ -75,7 +75,7 @@ var cache = {},
 			}
 		};	
 });
-</g:javascript>
+</r:script>
 </head>
 <body>
 	<div class="container_16 big_wrapper outer_wrapper">

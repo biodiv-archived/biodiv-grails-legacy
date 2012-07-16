@@ -11,6 +11,8 @@
 
 <head>
 <meta name='layout' content='main' />
+<r:require modules="observations_show" />
+
 <g:set var="entityName"
 	value="${message(code: 'user.label', default: 'User')}" />
 <title><g:message code="default.edit.label" args="[entityName]" />
@@ -213,8 +215,9 @@
 								class="control-group ${hasErrors(bean: user, field: 'allowIdentifactionMail', 'error')}">
 								<div class="controls" style="margin-left: 0px;">
 									<label class="checkbox" style="clear: both;"> <g:checkBox
-											name="allowIdentifactionMail" value="${user.allowIdentifactionMail}" />
-										<g:message code='user.allowIdentifactionMail.label'
+											name="allowIdentifactionMail"
+											value="${user.allowIdentifactionMail}" /> <g:message
+											code='user.allowIdentifactionMail.label'
 											default='Allow identification email' /> </label>
 									<div class="help-inline">
 										<g:hasErrors bean="${user}" field="sendNotification">
@@ -239,30 +242,97 @@
 								</div>
 							</div>
 						</div>
-					</div>
 
-					<div class="section form-action"
-						style='clear: both; margin-top: 20px; margin-bottom: 40px;'>
-						<s2ui:submitButton elementId='update' form='userEditForm'
-							messageCode='default.button.update.label' class="btn btn-primary"
-							style="float: right; margin-right: 5px;" />
 
-						<g:if test='${user}'>
-							<!--s2ui:deleteButton /-->
-						</g:if>
 
-						<g:if test='${canRunAs}'>
-							<a id="runAsButton"> ${message(code:'spring.security.ui.runas.submit')}
-							</a>
-						</g:if>
 
-					</div>
+						<div class="section" style="clear: both; overflow: auto;">
+							<obv:showAllTags
+								model="['tagFilterByProperty':'User', 'tagFilterByPropertyValue':user.id, 'isAjaxLoad':false]" />
+						</div>
 
+						<sUser:isAdmin model="['user':user]">
+							<div class="section" style="clear: both;">
+								<h5>
+									<i class="icon-cog"></i>
+									<g:message code="default.edit.label" args="[entityName]" />
+								</h5>
+								<%
+	def tabData = []
+	tabData << [name: 'userinfo', icon: 'icon_user', messageCode: 'spring.security.ui.user.info']
+	tabData << [name: 'roles',    icon: 'icon_role', messageCode: 'spring.security.ui.user.roles']
+	%>
+
+								<s2ui:tabs elementId='tabs' height='375' data="${tabData}">
+
+									<s2ui:tab name='userinfo' height='275'>
+										<table>
+											<tbody>
+
+												<s2ui:checkboxRow name='enabled'
+													labelCode='user.enabled.label' bean="${user}"
+													labelCodeDefault='Enabled' value="${user?.enabled}" />
+
+												<s2ui:checkboxRow name='accountExpired'
+													labelCode='user.accountExpired.label' bean="${user}"
+													labelCodeDefault='Account Expired'
+													value="${user?.accountExpired}" />
+
+												<s2ui:checkboxRow name='accountLocked'
+													labelCode='user.accountLocked.label' bean="${user}"
+													labelCodeDefault='Account Locked'
+													value="${user?.accountLocked}" />
+
+												<s2ui:checkboxRow name='passwordExpired'
+													labelCode='user.passwordExpired.label' bean="${user}"
+													labelCodeDefault='Password Expired'
+													value="${user?.passwordExpired}" />
+											</tbody>
+										</table>
+									</s2ui:tab>
+
+									<s2ui:tab name='roles' height='275'>
+										<g:each var="entry" in="${roleMap}">
+											<div>
+												<g:checkBox name="${entry.key.authority}"
+													value="${entry.value}" />
+												<g:link controller='role' action='edit' id='${entry.key.id}'>
+													${entry.key.authority.encodeAsHTML()}
+												</g:link>
+											</div>
+										</g:each>
+									</s2ui:tab>
+								</s2ui:tabs>
+							</div>
+						</sUser:isAdmin>
+						</div>
+						
+						<div class="section form-action"
+							style='clear: both; margin-top: 20px; margin-bottom: 40px;'>
+							<s2ui:submitButton elementId='update' form='userEditForm'
+								messageCode='default.button.update.label'
+								class="btn btn-primary" style="float: right; margin-right: 5px;" />
+
+							<sUser:isAdmin model="['user':user]">
+								<g:if test='${user}'>
+									<a class="btn btn-danger" id="deleteButton"> ${message(code:'default.button.delete.label')}
+									</a>
+								</g:if>
+							</sUser:isAdmin>
+
+							<g:if test='${canRunAs}'>
+								<a id="runAsButton"> ${message(code:'spring.security.ui.runas.submit')}
+								</a>
+							</g:if>
+
+						</div>
 				</g:form>
 
-				<g:if test='${user}'>
-					<!-- s2ui:deleteButtonForm instanceId='${user.id}'/-->
-				</g:if>
+				<sUser:isAdmin model="['user':user]">
+					<g:if test='${user}'>
+						<s2ui:deleteButtonForm instanceId='${user.id}' />
+					</g:if>
+				</sUser:isAdmin>
 
 				<g:if test='${canRunAs}'>
 					<form name='runAsForm'
@@ -274,10 +344,11 @@
 				</g:if>
 			</div>
 		</div>
-
 	</div>
 
-	<script>
+
+
+	<r:script>
 		$(document).ready(function() {
 			$('#username').focus();
 
@@ -287,7 +358,7 @@
 			});
 
 		});
-	</script>
+	</r:script>
 
 </body>
 </html>

@@ -6,7 +6,7 @@ import species.auth.SUser;
 import species.participation.Observation
 
 class UnCuratedVotes {
-	SUser author;
+	
 	Date votedOn = new Date();
 	Observation obv;
 	UnCuratedScientificNames sciName;
@@ -26,6 +26,7 @@ class UnCuratedVotes {
 	}
 
 	static mapping = { version false; }
+	static belongsTo = [author:SUser]
 
 	//duplicate check will be done on 'author', 'sciName', 'commonName'
 

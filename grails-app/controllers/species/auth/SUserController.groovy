@@ -16,6 +16,10 @@ import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
 import org.springframework.dao.DataIntegrityViolationException
 
 import species.BlockedMails;
+import species.participation.RecommendationVote;
+import species.participation.Observation;
+
+import species.participation.curation.UnCuratedVotes;
 import species.utils.Utils;
 
 
@@ -24,6 +28,7 @@ class SUserController extends UserController {
 	def springSecurityService
 	def namesIndexerService;
 	def observationService;
+	def SUserService;
 	
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
@@ -92,16 +97,16 @@ class SUserController extends UserController {
 			redirect(action: "list")
 		}
 		else {
-			[SUserInstance: SUserInstance]
+			return buildUserModel(SUserInstance)
 		}
 	}
 
-	@Secured(['ROLE_USER'])
+	@Secured(['ROLE_USER', 'ROLE_ADMIN'])
 	def edit = {
 		log.debug params;
 		String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
 
-		if(params.long('id') == springSecurityService.currentUser?.id) {
+		if(SUserService.ifOwns(params.long('id'))) {
 			def user = params.username ? lookupUserClass().findWhere((usernameFieldName): params.username) : null
 			if (!user) user = findById()
 			if (!user) return
@@ -112,7 +117,7 @@ class SUserController extends UserController {
 		redirect (action:'show', id:params.id)
 	}
 
-	@Secured(['ROLE_USER'])
+	@Secured(['ROLE_USER', 'ROLE_ADMIN'])
 	def update = {
 		log.debug params;
 		String passwordFieldName = SpringSecurityUtils.securityConfig.userLookup.passwordPropertyName
@@ -125,7 +130,7 @@ class SUserController extends UserController {
 				return
 			}
 
-		if(params.long('id') == springSecurityService.currentUser?.id) {
+		if(SUserService.ifOwns(params.long('id'))) {
 			//Cannot change email id with which user was registered
 			params.email = user.email;
 			
@@ -152,8 +157,12 @@ class SUserController extends UserController {
 
 			String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
 
-			//lookupUserRoleClass().removeAll user
-			//addRoles user
+			//only admin interface has roles information while editing user profile
+			if(SUserService.isAdmin(user.id)) {
+				lookupUserRoleClass().removeAll user
+				addRoles user
+			}
+			
 			userCache.removeUserFromCache user[usernameFieldName]
 			flash.message = "${message(code: 'default.updated.message', args: [message(code: 'user.label', default: 'User'), user.id])}"
 			redirect action: show, id: user.id
@@ -170,13 +179,39 @@ class SUserController extends UserController {
 
 			String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
 		try {
-			lookupUserRoleClass().removeAll user
-			user.delete flush: true
+			List obvToUpdate = [];
+			lookupUserClass().withTransaction { status ->
+				user.observations.each { obv -> 
+					UnCuratedVotes.findAllByObv(obv).each { vote ->
+						println "deleting $vote"
+						vote.delete();
+					}
+				}
+				
+				user.recoVotes.each { vote ->
+					if(vote.observation.author.id != user.id) {
+						obvToUpdate.add(vote.observation);
+					}
+				}
+				
+				FacebookUser.removeAll user;
+				lookupUserRoleClass().removeAll user
+				
+				SUserService.sendNotificationMail(SUserService.USER_DELETED, user, request, "");
+				user.delete();
+
+			}
+			//updating maxVotedSpeciesName
+			obvToUpdate.each { obv ->
+				println "Updating speciesname for ${obv}"
+				obv.calculateMaxVotedSpeciesName();
+			}
 			userCache.removeUserFromCache user[usernameFieldName]
 			flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'user.label', default: 'User'), params.id])}"
 			redirect action: search
 		}
 		catch (DataIntegrityViolationException e) {
+			e.printStackTrace();
 			flash.error = "${message(code: 'default.not.deleted.message', args: [message(code: 'user.label', default: 'User'), params.id])}"
 			redirect action: edit, id: params.id
 		}
@@ -502,7 +537,7 @@ class SUserController extends UserController {
 			}else{
 				BlockedMails bm = new BlockedMails(email:user.email.trim());
 				if(!bm.save(flush:true)){
-					this.errors.allErrors.each { log.error it }
+					bm.errors.allErrors.each { log.error it }
 				}
 			}
 		}
@@ -515,52 +550,17 @@ class SUserController extends UserController {
 	   log.debug params;
 	   params.max = params.max ? params.int('max') : 1
 	   params.offset = params.offset ? params.long('offset'): 0
-
+	   
 	   def userInstance = SUser.get(params.id)
 	   if (userInstance) {
-		   try {
-			   def recommendationVoteList = observationService.getRecommendationsOfUser(userInstance, params.max, params.offset);
-			  
-			   if(recommendationVoteList.size() > 0) {
-				   def result = [];
-				   recommendationVoteList.each { recoVote ->
-					   def map = recoVote.recommendation.getRecommendationDetails(recoVote.observation);
-					   //map.put("noOfVotes", 1);
-					   def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
-					   def image = recoVote.observation.mainImage()
-					   def imagePath = image.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, config.speciesPortal.resources.images.thumbnail.suffix)
-					   def imageLink = config.speciesPortal.observations.serverURL +  imagePath
-					   map.put('observationImage', imageLink);
-					   map.put("obvId", recoVote.observation.id);
-					   result.add(map);
-				   }
-				   //def noOfVotes = observationService.getAllRecommendationsOfUser(userInstance);
-				   def model = ['result':result, 'totalVotes':result.size(), 'uniqueVotes':result.size()];
-				   def html = g.render(template:"/common/observation/showObservationRecosTemplate", model:model);
-				   def r = [
-							   success : 'true',
-							   uniqueVotes:model.uniqueVotes,
-							   recoHtml:html,
-							   recoVoteMsg:params.recoVoteMsg]
-				   render r as JSON
-				   return
-			   } else {
-				   response.setStatus(500);
-				   def message = "";
-				   if(params.offset > 0) {
-					   message = [info: g.message(code: 'user.recommendations.nomore.message', default:'No more recommendations made.')];
-				   } else {
-					   message = [info:g.message(code: 'user.recommendations.zero.message', default:'No recommendations made.')];
-				   }
-				   render message as JSON
-				   return
-			   }
-		   } catch(e){
-			   e.printStackTrace();
-			   response.setStatus(500);
-			   def message = ['error' : g.message(code: 'error', default:'Error while processing the request.')];
-			   render message as JSON
+		   def recommendationVoteList 
+		   if(params.obvId){
+			   	recommendationVoteList = RecommendationVote.findAllByAuthorAndObservation(springSecurityService.currentUser, Observation.read(params.long('obvId')));
+		   }else{
+		   		recommendationVoteList = observationService.getRecommendationsOfUser(userInstance, params.max, params.offset);
 		   }
+		   processResult(recommendationVoteList, params)
+		   return
 	   }
 	   else {
 		   response.setStatus(500)
@@ -569,4 +569,49 @@ class SUserController extends UserController {
 	   }
    }
 
+	private processResult(List recommendationVoteList, Map params) {
+		try {
+			if(recommendationVoteList.size() > 0) {
+				def result = [];
+				recommendationVoteList.each { recoVote ->
+					def map = recoVote.recommendation.getRecommendationDetails(recoVote.observation);
+					map.put("noOfVotes", 1);
+					def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+					def image = recoVote.observation.mainImage()
+					def imagePath = image.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, config.speciesPortal.resources.images.thumbnail.suffix)
+					def imageLink = config.speciesPortal.observations.serverURL +  imagePath
+					map.put('observationImage', imageLink);
+					map.put("obvId", recoVote.observation.id);
+					result.add(map);
+				}
+				//def noOfVotes = observationService.getAllRecommendationsOfUser(userInstance);
+				def model = ['result':result, 'totalVotes':result.size(), 'uniqueVotes':result.size()];
+				def html = g.render(template:"/common/observation/showObservationRecosTemplate", model:model);
+				def r = [
+							success : 'true',
+							uniqueVotes:model.uniqueVotes,
+							recoHtml:html,
+							recoVoteMsg:params.recoVoteMsg]
+				render r as JSON
+				return
+			} else {
+				response.setStatus(500);
+				def message = "";
+				if(params.offset > 0) {
+					message = [info: g.message(code: 'user.recommendations.nomore.message', default:'No more recommendations made.')];
+				} else {
+					message = [info:g.message(code: 'user.recommendations.zero.message', default:'No recommendations made.')];
+				}
+				render message as JSON
+				return
+			}
+		} catch(e){
+			e.printStackTrace();
+			response.setStatus(500);
+			def message = ['error' : g.message(code: 'error', default:'Error while processing the request.')];
+			render message as JSON
+		}
+	}
+
 }
+

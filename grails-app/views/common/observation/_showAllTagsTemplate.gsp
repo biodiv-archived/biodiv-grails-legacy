@@ -1,4 +1,3 @@
-<g:javascript src="jquery/jquery.cookie.js"></g:javascript>
 <g:javascript>
 	
 	$(document).ready(function(){

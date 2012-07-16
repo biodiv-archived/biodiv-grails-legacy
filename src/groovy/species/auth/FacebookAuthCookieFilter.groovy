@@ -1,5 +1,8 @@
 package species.auth
 
+import java.io.IOException;
+
+import javax.servlet.ServletException;
 import javax.servlet.ServletRequest
 import javax.servlet.ServletResponse
 import javax.servlet.http.Cookie
@@ -13,9 +16,15 @@ import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.authentication.event.InteractiveAuthenticationSuccessEvent;
 import org.springframework.security.core.Authentication
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.security.web.DefaultRedirectStrategy
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
+import org.springframework.util.Assert;
 import org.springframework.web.filter.GenericFilterBean
 
 import com.the6hours.grails.springsecurity.facebook.FacebookAuthToken
@@ -28,54 +37,57 @@ import com.the6hours.grails.springsecurity.facebook.FacebookAuthToken
  */
 class FacebookAuthCookieFilter extends GenericFilterBean implements ApplicationEventPublisherAware {
 
-	
-    protected ApplicationEventPublisher eventPublisher
-    FacebookAuthUtils facebookAuthUtils
-    AuthenticationManager authenticationManager
-    String logoutUrl = '/j_spring_security_logout'
+
+	protected ApplicationEventPublisher eventPublisher
+	FacebookAuthUtils facebookAuthUtils
+	AuthenticationManager authenticationManager
+	String logoutUrl = '/j_spring_security_logout'
 	String registerUrl;
 	String createAccountUrl;
-	
+
+	private AuthenticationSuccessHandler successHandler = new SavedRequestAwareAuthenticationSuccessHandler();
+	private AuthenticationFailureHandler failureHandler = new SimpleUrlAuthenticationFailureHandler();
+
 	def grailsApplication
 
-    void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, javax.servlet.FilterChain chain) {
-        HttpServletRequest request = servletRequest
-        HttpServletResponse response = servletResponse
-        String url = request.requestURI.substring(request.contextPath.length())
-        logger.debug("Processing url: $url")
-        if (url != logoutUrl && SecurityContextHolder.context.authentication == null) {
-            logger.debug("Applying facebook auth filter")
-            assert facebookAuthUtils != null
-            Cookie cookie = facebookAuthUtils.getAuthCookie(request)
+	void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, javax.servlet.FilterChain chain) {
+		HttpServletRequest request = servletRequest
+		HttpServletResponse response = servletResponse
+		String url = request.requestURI.substring(request.contextPath.length())
+		logger.debug("Processing url: $url")
+		if (url != logoutUrl && SecurityContextHolder.context.authentication == null) {
+			logger.debug("Applying facebook auth filter")
+			assert facebookAuthUtils != null
+			Cookie cookie = facebookAuthUtils.getAuthCookie(request)
 			Cookie fbLoginCookie = facebookAuthUtils.getFBLoginCookie(request);
-            if (cookie != null && fbLoginCookie != null) {
+			if (cookie != null && fbLoginCookie != null) {
 				logger.debug("Found fb cookie");
-				
-                try {
-                    FacebookAuthToken token = facebookAuthUtils.build(request, cookie.value)
-                    if (token != null) {
+
+				try {
+					FacebookAuthToken token = facebookAuthUtils.build(request, cookie.value)
+					if (token != null) {
 						logger.debug("Got fbAuthToken $token");
-                        Authentication authentication = authenticationManager.authenticate(token);
-                        // Store to SecurityContextHolder
-                        SecurityContextHolder.context.authentication = authentication;
-						
+						Authentication authentication = authenticationManager.authenticate(token);
+						// Store to SecurityContextHolder
+						SecurityContextHolder.context.authentication = authentication;
+
 						// Fire event only if its the authSuccess url
 						if (this.eventPublisher != null && url == '/login/authSuccess') {
 							eventPublisher.publishEvent(new InteractiveAuthenticationSuccessEvent(authentication, this.getClass()));
 						}
-						
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("SecurityContextHolder populated with FacebookAuthToken: '"
-                                + SecurityContextHolder.context.authentication + "'");
-                        }
-                        try {
-                            chain.doFilter(request, response);
-                        } finally {
-                            SecurityContextHolder.context.authentication = null;
-                        }
-                        return
-                    }
-                } catch(UsernameNotFoundException e) {
+
+						if (logger.isDebugEnabled()) {
+							logger.debug("SecurityContextHolder populated with FacebookAuthToken: '"
+									+ SecurityContextHolder.context.authentication + "'");
+						}
+						try {
+							chain.doFilter(request, response);
+						} finally {
+							SecurityContextHolder.context.authentication = null;
+						}
+						return
+					}
+				} catch(UsernameNotFoundException e) {
 					def referer = request.getHeader("referer");
 					if(url == '/login/authSuccess') {
 						logger.error e.getMessage();
@@ -84,10 +96,12 @@ class FacebookAuthCookieFilter extends GenericFilterBean implements ApplicationE
 						(new DefaultRedirectStrategy()).sendRedirect(request, response, createAccountUrl);
 						return;
 					}
-                } catch (BadCredentialsException e) {
-                    logger.info("Invalid cookie, skip. Message was: $e.message")
-                }
-            } else {
+				} catch (BadCredentialsException e) {
+					logger.info("Invalid cookie, skip. Message was: $e.message")
+				} catch(AuthenticationException e) {
+					unsuccessfulAuthentication(request, response, e);
+				}
+			} else {
 				if(!cookie) {
 					logger.warn("No auth cookie");
 				}
@@ -96,16 +110,45 @@ class FacebookAuthCookieFilter extends GenericFilterBean implements ApplicationE
 				}
 				logger.debug("Found following cookies");
 				request.cookies.each { logger.debug it.name+":"+it.value }
-            }
-        } else {
-            logger.debug("SecurityContextHolder not populated with FacebookAuthToken token , as it already contained: $SecurityContextHolder.context.authentication");
-        }
+			}
+		} else {
+			logger.debug("SecurityContextHolder not populated with FacebookAuthToken token , as it already contained: $SecurityContextHolder.context.authentication");
+		}
 
-        //when not authenticated, don't have auth cookie or bad credentials
-        chain.doFilter(request, response)
-    }
+		//when not authenticated, don't have auth cookie or bad credentials
+		chain.doFilter(request, response)
+	}
 
 	public void setApplicationEventPublisher(ApplicationEventPublisher eventPublisher) {
 		this.eventPublisher = eventPublisher;
+	}
+
+	/**
+	 * Default behaviour for unsuccessful authentication.
+	 * <ol>
+	 * <li>Clears the {@link SecurityContextHolder}</li>
+	 * <li>Stores the exception in the session (if it exists or <tt>allowSesssionCreation</tt> is set to <tt>true</tt>)</li>
+	 * <li>Informs the configured <tt>RememberMeServices</tt> of the failed login</li>
+	 * <li>Delegates additional behaviour to the {@link AuthenticationFailureHandler}.</li>
+	 * </ol>
+	 */
+	protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,
+	AuthenticationException failed) throws IOException, ServletException {
+		SecurityContextHolder.clearContext();
+		
+		if (logger.isDebugEnabled()) {
+			logger.debug("Authentication request failed: " + failed.toString());
+			logger.debug("Updated SecurityContextHolder to contain null Authentication");
+			logger.debug("Delegating to authentication failure handler" + failureHandler);
+		}
+		
+		facebookAuthUtils.logout(request, response);
+		//rememberMeServices.loginFail(request, response);
+		failureHandler.onAuthenticationFailure(request, response, failed);
+	}
+	
+	public void setAuthenticationFailureHandler(AuthenticationFailureHandler failureHandler) {
+		Assert.notNull(failureHandler, "failureHandler cannot be null");
+		this.failureHandler = failureHandler;
 	}
 }

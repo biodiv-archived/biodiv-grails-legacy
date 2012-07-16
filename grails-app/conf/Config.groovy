@@ -1,4 +1,18 @@
 import species.auth.SUser;
+import java.awt.Font
+import java.awt.Color
+import com.octo.captcha.service.multitype.GenericManageableCaptchaService
+import com.octo.captcha.engine.GenericCaptchaEngine
+import com.octo.captcha.image.gimpy.GimpyFactory
+import com.octo.captcha.component.word.wordgenerator.RandomWordGenerator
+import com.octo.captcha.component.image.wordtoimage.ComposedWordToImage
+import com.octo.captcha.component.image.fontgenerator.RandomFontGenerator
+import com.octo.captcha.component.image.backgroundgenerator.GradientBackgroundGenerator
+import com.octo.captcha.component.image.color.SingleColorGenerator
+import com.octo.captcha.component.image.textpaster.NonLinearTextPaster
+
+import com.octo.captcha.service.sound.DefaultManageableSoundCaptchaService
+
 
 // locations to search for config files that get merged into the main config
 // config files can either be Java properties files or ConfigSlurper scripts
@@ -83,7 +97,8 @@ log4j = {
 	'org.springframework.security',
 	'org.codehaus.groovy.grails.web.servlet',  //  controllers
 	'grails.plugin',
-	'org.springframework.security.web'
+	'org.springframework.security.web',
+	'grails.app.tagLib.org.grails.plugin.resource'
 
 
 	warn   'org.mortbay.log'
@@ -395,6 +410,10 @@ environments {
 
         ibp.domain='indiabiodiversity.localhost.org'
         wgp.domain='thewesternghats.localhost.in'
+		//grails.resources.debug=true
+		grails.resources.mappers.hashandcache.excludes = ['**']
+		//grails.resources.flatten = false
+		grails.resources.mappers.yuijsminify.disable=true
 	}
 	test {
 		grails.serverURL = "http://localhost:8080/${appName}"
@@ -621,39 +640,6 @@ jquery {
 	minExtentsion = 'min'
 }
 
-//grails.resources.debug = false
-//grails.resources.adhoc.patterns.excludes = ["*.css"]
-//grails.resources.mappers.hashandcache.excludes = ["**/*.css"]
-//
-//grails.resources.modules = {
-//	core { dependsOn 'jquery-ui' }
-//	// Define reference to custom jQuery UI theme
-//	overrides {
-//		'jquery-theme' {
-//			resource id: 'theme', url: 'css/custom-theme/jquery-ui-.custom.css'
-//		}
-//	}
-//
-//	//	'jquery' {
-//	//		resource url:"js/jquery/jquery-1.7.min.js", nominify:true, disposition:'head'
-//	//	}
-//	//	'jquery-ui' {
-//	//		dependsOn 'jquery'
-//	//		resource url:[dir:"js/jquery-ui", file:'jquery-ui-1.8-min.js'], nominify:true
-//	//		resource url:[dir:"js/jquery-ui", file:'jquery-ui-1.8-min.css'],
-//	//				nominify:true, attrs:[media:'screen,projection']
-//	//	}
-//	//	'blueprint' {
-//	//		resource url:[dir:'css/blueprint',file:'screen.css'], attrs:[media:'screen,projection']
-//	//		resource url:[dir:'css/blueprint',file:'print.css'], attrs:[media:'print']
-//	//		resource url:[dir:'css/blueprint',file:'ie.css'], attrs:[media:'screen,projection'],
-//	//			  wrapper: { s -> "<!--[if lt IE 8]>$s<![endif]-->" }
-//	//	}
-//	//	'app' {
-//	//		resource 'css/main.css'
-//	//		resource 'js/application.js'
-//	//	}
-//}
 
 
 // Added by the Spring Security Core plugin:
@@ -713,6 +699,30 @@ grails.plugins.springsecurity.ui.notification.emailFrom = 'notification@theweste
 grails.plugins.springsecurity.ui.register.emailBody = '''Hi $username,<br/><br/>You (or someone pretending to be you) created an account with this email address.<br/><br/>If you made the request, please click <a href="$url">here</a> to finish the registration and activate your account.'''
 grails.plugins.springsecurity.ui.register.emailFrom = 'notification@thewesternghats.in'
 grails.plugins.springsecurity.ui.register.emailSubject = 'Activate your account with $domain'
+
+grails.plugins.springsecurity.ui.newuser.emailBody = '''\
+Hi $username,<br/>
+<br/>
+Thank you for registering with us at <b>$domain</b>.<br/>
+<br/> 
+We look forward for your contribution to the portal. The portal is a public participatory portal that thrives by participation from users like you. Will also appreciate any feedback you may have to offer.<br/>
+<br/>
+You will be notified by mail on any social activity on the observation.<br/>
+<br/>
+If you do not want to receive notifications please go to your <a href="$userProfileUrl">user profile</a> and switch it off.<br/>
+<br/>
+-The portal team'''
+grails.plugins.springsecurity.ui.newuser.emailFrom = 'notification@thewesternghats.in'
+grails.plugins.springsecurity.ui.newuser.emailSubject = 'Welcome to $domain'
+
+grails.plugins.springsecurity.ui.userdeleted.emailBody = '''\
+Hi Admin,<br/>
+<br/>
+A user with email address $email is being deleted from <b>$domain</b>.<br/>
+<br/>
+-The portal team'''
+grails.plugins.springsecurity.ui.userdeleted.emailFrom = 'notification@thewesternghats.in'
+grails.plugins.springsecurity.ui.userdeleted.emailSubject = 'User is being deleted on $domain'
 
 grails.plugins.springsecurity.ui.forgotPassword.emailBody = '''\
 Hi $username,<br/>
@@ -856,6 +866,7 @@ grails.plugins.springsecurity.onInteractiveAuthenticationSuccessEvent = { e, app
 
 grails.plugins.springsecurity.openid.registration.requiredAttributes = [email: 'http://axschema.org/contact/email', location: 'http://axschema.org/contact/country/home',firstname:'http://axschema.org/namePerson/first', lastname: 'http://axschema.org/namePerson/last', profilePic:'http://axschema.org/media/image/default']
 
+
 //TODO:Need to change
 grails.plugins.springsecurity.useRunAs = true
 grails.plugins.springsecurity.runAs.key = 'run-asKey'
@@ -863,3 +874,54 @@ grails.plugins.springsecurity.runAs.key = 'run-asKey'
 grails.plugins.springsecurity.acl.authority.modifyAuditingDetails = 'ROLE_ADMIN'//'ROLE_ACL_MODIFY_AUDITING'
 grails.plugins.springsecurity.acl.authority.changeOwnership =       'ROLE_RUN_AS_ACL_USERGROUP_FOUNDER'
 grails.plugins.springsecurity.acl.authority.changeAclDetails =      'ROLE_ADMIN'//'ROLE_ACL_CHANGE_DETAILS'
+
+grails.plugins.springsecurity.controllerAnnotations.staticRules = [
+	'/role/**': ['ROLE_ADMIN'],
+	'/persistentLogin/**': ['ROLE_ADMIN'],
+	'/abstractS2Ui/**': ['ROLE_ADMIN'],
+	'/aclClass/**': ['ROLE_ADMIN'],
+	'/aclEntry/**': ['ROLE_ADMIN'],
+	'/aclObjectIdentity/**': ['ROLE_ADMIN'],
+	'/aclSid/**': ['ROLE_ADMIN'],
+	'/registrationCode/**': ['ROLE_ADMIN'],
+	'/requestmap/**': ['ROLE_ADMIN'],
+	'/securityInfo/**': ['ROLE_ADMIN'],
+	'/securityInfo/**': ['ROLE_ADMIN']
+ ]
+
+
+
+jcaptchas {
+	imageCaptcha = new GenericManageableCaptchaService(
+		new GenericCaptchaEngine(
+			new GimpyFactory(
+				new RandomWordGenerator(
+					"abcdefghijklmnopqrstuvwxyz1234567890"
+				),
+				new ComposedWordToImage(
+					new RandomFontGenerator(
+						20, // min font size
+						30, // max font size
+						[new Font("Arial", 0, 10)] as Font[]
+					),
+					new GradientBackgroundGenerator(
+						140, // width
+						35, // height
+						new SingleColorGenerator(new Color(0, 60, 0)),
+						new SingleColorGenerator(new Color(20, 20, 20))
+					),
+					new NonLinearTextPaster(
+						6, // minimal length of text
+						6, // maximal length of text
+						new Color(0, 255, 0)
+					)
+				)
+			)
+		),
+		180, // minGuarantedStorageDelayInSeconds
+		180000 // maxCaptchaStoreSize
+	)
+
+	/*soundCaptcha = new DefaultManageableSoundCaptchaService()*/
+}
+

@@ -63,7 +63,7 @@
 	</div>
 </div>
 
-<script>
+<r:script>
 $(document).ready(function(){
 	$(".deleteFlagIcon").tooltip({"placement":"right"});
 });
@@ -100,13 +100,14 @@ function removeFlag(flagId, obvId, flagComponent){
 			}	    				    			
 		},
 		error: function(xhr, status, error) {
+			$(".deleteFlagIcon").tooltip('hide');
 			var msg = $.parseJSON(xhr.responseText);
 			$("#flagMessage").html(msg["error"]).show().removeClass().addClass('alert alert-error');
 		}
 	});
 }
 
-</script>
+</r:script>
 
 <style>
 #flag-options {

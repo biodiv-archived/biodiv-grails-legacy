@@ -15,7 +15,7 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 %>
 <meta property="og:image" content="${createLinkTo(file: fbImagePath, base:grailsApplication.config.speciesPortal.observations.serverURL)}" />
 <meta property="og:site_name" content="${Utils.getDomainName(request)}" />
-<g:set var="description" value="" />
+
 <g:set var="domain" value="${Utils.getDomain(request)}" />
 <%
 		String fbAppId;
@@ -27,8 +27,9 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 		
 		//description = observationInstance.notes.trim() ;
 		String location = "Observed at '" + (observationInstance.placeName.trim()?:observationInstance.reverseGeocodedName) +"'"
-		description += "- "+ location +" by "+observationInstance.author.name.capitalize()+" in species group "+observationInstance.group.name + " and habitat "+ observationInstance.habitat.name;
+		String desc = "- "+ location +" by "+observationInstance.author.name.capitalize()+" in species group "+observationInstance.group.name + " and habitat "+ observationInstance.habitat.name;
 %>
+<g:set var="description" value="${desc }" />
 
 <meta property="fb:app_id" content="${fbAppId }" />
 <meta property="fb:admins" content="581308415,100000607869577" />
@@ -38,34 +39,14 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 <meta property="og:longitude" content="${observationInstance.longitude }"/>
 
 <meta name="layout" content="main" />
+<script src="http://maps.google.com/maps/api/js?sensor=true"></script>
+<r:require modules="observations_show"/>
 <link rel="image_src" href="${createLinkTo(file: gallImagePath, base:grailsApplication.config.speciesPortal.observations.serverURL)}" />
 
 <g:set var="entityName"
 	value="${message(code: 'observation.label', default: 'Observation')}" />
 <title><g:message code="default.show.label" args="[entityName]" />
 </title>
-
-
-<link rel="stylesheet" type="text/css" media="all"
-	href="${resource(dir:'js/galleria/1.2.7/themes/classic/',file:'galleria.classic.css')}" />
-<link rel="stylesheet" type="text/css" media="all"
-	href="${resource(dir:'js/jquery/jquery.jcarousel-0.2.8/themes/classic/',file:'skin.css')}" />
-
-<link rel="stylesheet"
-	href="${resource(dir:'css',file:'tagit/tagit-custom.css')}"
-	type="text/css" media="all" />
-
-<g:javascript src="jsrender.js"></g:javascript>
-
-<g:javascript src="galleria/1.2.7/galleria-1.2.7.min.js"/>
-
-<g:javascript src="tagit.js"></g:javascript>
-
-<g:javascript src="jquery/jquery.jcarousel-0.2.8/jquery.jcarousel.js"/>
-
-<g:javascript src="species/carousel.js"/>
-
-<g:javascript src="species/observations.js"/>
 
 
 <style>
@@ -249,7 +230,7 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 			</div>
 		</div>
 	</div>
-	<g:javascript>
+	<r:script>
 	
 	Galleria.loadTheme('${resource(dir:'js/galleria/1.2.7/themes/classic/',file:'galleria.classic.min.js')}');
 	
@@ -324,6 +305,7 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 				resetForm: true,
 				type: 'GET',
 				beforeSubmit: function(formData, jqForm, options) {
+					updateCommonNameLanguage();
 					return true;
 				}, 
 	            success: function(data, statusText, xhr, form) {
@@ -429,7 +411,7 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 			   	}
 			});
          }
-</g:javascript>
+</r:script>
 
 </body>
 </html>
