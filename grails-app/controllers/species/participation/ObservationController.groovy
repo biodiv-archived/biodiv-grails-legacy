@@ -1004,6 +1004,7 @@ class ObservationController {
 			session["obv_ids_list"] = model.totalObservationIdList;
 		}
 		model.remove('totalObservationIdList');
+		model['isSearch'] = true;
 		log.debug "Storing all observations ids list in session ${session['obv_ids_list']}";
 		
 		if(!params.isGalleryUpdate?.toBoolean()){

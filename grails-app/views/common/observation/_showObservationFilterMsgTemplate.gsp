@@ -2,7 +2,7 @@
 <%@ page import="species.participation.Observation"%>
 <%@ page import="species.groups.SpeciesGroup"%>
 <%@ page import="species.Habitat"%>
-<r:script>
+<g:javascript>
 	function setDefaultGroup(){
 		var defId = "#group_" + "${SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.ALL).id}"
 		$(defId).click();
@@ -11,7 +11,7 @@
 		var defId = "#habitat_" + "${Habitat.findByName(grailsApplication.config.speciesPortal.group.ALL).id}"
 		$(defId).click();
 	}
-</r:script>
+</g:javascript>
 
 <div class="info-message" id="info-message">
 	<g:if test="${observationInstanceTotal == 0}">

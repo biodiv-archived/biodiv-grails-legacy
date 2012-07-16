@@ -1,4 +1,4 @@
-<r:script>
+<g:javascript>
 	
 	$(document).ready(function(){
 		$('#as_list').click(function(){
@@ -30,7 +30,7 @@
 		
 		}
 	});
-</r:script>
+</g:javascript>
 <div id="tags_section">
 	<h5>
 		<i class="icon-tags"></i>

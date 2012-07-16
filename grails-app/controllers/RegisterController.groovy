@@ -20,7 +20,8 @@ class RegisterController extends grails.plugins.springsecurity.ui.RegisterContro
 	def facebookAuthService;
 	def springSecurityService;
 	def openIDAuthenticationFilter;
-	def recaptchaService;
+	def jcaptchaService;
+	//def recaptchaService;	
 	
 	def index = {
 		if (springSecurityService.isLoggedIn()) {
@@ -99,7 +100,7 @@ class RegisterController extends grails.plugins.springsecurity.ui.RegisterContro
 			return
 		}
 
-		recaptchaService.cleanUp(session)
+		//recaptchaService.cleanUp(session)
 		
 		def userProfileUrl = generateLink("SUser", "show", ["id": user.id], request)
 		SUserService.sendNotificationMail(SUserService.NEW_USER, user, request, userProfileUrl);
@@ -337,11 +338,14 @@ class CustomRegisterCommand {
 	String profilePic;
 	String openId;
 	boolean facebookUser;
-	String recaptcha_response_field;
-	String recaptcha_challenge_field;
+	//String recaptcha_response_field;
+	//String recaptcha_challenge_field;
+	String captcha_response;
 	
 	def grailsApplication
-	def recaptchaService;
+	def jcaptchaService;
+	//def recaptchaService;
+	
 		
 	static constraints = {
 		email email: true, blank: false, nullable: false, validator: { value, command ->
@@ -355,10 +359,11 @@ class CustomRegisterCommand {
 		}
 		password blank: false, nullable: false, validator: RegisterController.myPasswordValidator
 		password2 validator: RegisterController.password2Validator
-		recaptcha_response_field blank:false, nullable:false, validator: { value, command ->
+		captcha_response blank:false, nullable:false, validator: { value, command ->
 			def session = RCH.requestAttributes.session
 			def request = RCH.requestAttributes.request
-			if(!command.recaptchaService.verifyAnswer(session, request.getRemoteAddr(), command)) {
+			if (!command.jcaptchaService.validateResponse("imageCaptcha", session.id, command.captcha_response)) {
+				//if(!command.recaptchaService.verifyAnswer(session, request.getRemoteAddr(), command)) {
 				return 'reCaptcha.invalid.message'
 			}
 		}
