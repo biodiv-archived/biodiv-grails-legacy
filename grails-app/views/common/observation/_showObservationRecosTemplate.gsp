@@ -41,7 +41,7 @@
 				<obv:showRecoComment
 					model="['recoComments':r.recoComments, 'recoId': r.recoId]" />
 
-			</div> <r:script>
+			</div> <g:javascript>
                         $(document).ready(function(){
                                 $('#voteCountLink_${r.recoId}').click(function() {
                                         $('#voteDetails_${r.recoId}').show();
@@ -52,7 +52,7 @@
                                 });
                         });
                         
-   </r:script></li>
+   </g:javascript></li>
 	</g:each>
 </g:if>
 <g:else>

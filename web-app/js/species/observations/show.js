@@ -32,7 +32,7 @@ function removeRecoComment(recoVoteId, commentDivId, url, commentComp){
 			}else{
 				$(commentDivId).remove(); 
 			}
-			//$(".deleteCommentIcon").tooltip('hide');
+			// $(".deleteCommentIcon").tooltip('hide');
 			showRecoUpdateStatus(data.success, 'success');
 		},
 		
@@ -42,7 +42,7 @@ function removeRecoComment(recoVoteId, commentDivId, url, commentComp){
 			}	    				    			
 		},
 		error: function(xhr, status, error) {
-			//$(".deleteCommentIcon").tooltip('hide');
+			// $(".deleteCommentIcon").tooltip('hide');
 			var msg = $.parseJSON(xhr.responseText);
 			showRecoUpdateStatus(msg.error, 'error');
 		}
@@ -70,5 +70,3 @@ function addAgreeRecoVote(obvId, recoId, currentVotes, liComponent, url){
 		}
 	});
 }
-
-

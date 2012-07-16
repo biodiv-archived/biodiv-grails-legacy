@@ -157,20 +157,26 @@
 									</div>
 								</div>
 								
-								<recaptcha:ifEnabled>
-									<div
-										class="control-group ${hasErrors(bean: command, field: 'recaptcha_response_field', 'error')}">
-    								<recaptcha:recaptcha theme="clean"/>
-    								<recaptcha:ifFailed>
-    									<g:hasErrors bean="${command}" field="recaptcha_response_field">
+								<div
+									class="control-group ${hasErrors(bean: command, field: 'captcha_response', 'error')}">
+									<label class="control-label" for="captcha_response"><g:message
+											code='user.location.label' default='Enter words as shown in' /> </label>
+									
+									<div class="controls">
+										<jcaptcha:jpeg name="imageCaptcha" height="100px" width="100px" />
+										<input class="input-large" id="captcha_response" type="text"
+											value="" name="captcha_response"
+											placeholder="Enter words as shown in box...">
+
+										<g:hasErrors bean="${command}" field="captcha_response">
 											<div class="help-inline">
-												<g:renderErrors bean="${command}" field="recaptcha_response_field" />
+												<g:renderErrors bean="${command}" field="captcha_response" />
 											</div>
 										</g:hasErrors>
-    								</recaptcha:ifFailed>
-    								</div>
-								</recaptcha:ifEnabled>
 
+									</div>
+								</div>
+									    								
 								<div class="control-group">
 									<span class="policy-text"> By registering you agree to
 										our <a href="/terms">Terms and Conditions</a> on the use of

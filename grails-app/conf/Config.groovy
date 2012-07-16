@@ -1,4 +1,18 @@
 import species.auth.SUser;
+import java.awt.Font
+import java.awt.Color
+import com.octo.captcha.service.multitype.GenericManageableCaptchaService
+import com.octo.captcha.engine.GenericCaptchaEngine
+import com.octo.captcha.image.gimpy.GimpyFactory
+import com.octo.captcha.component.word.wordgenerator.RandomWordGenerator
+import com.octo.captcha.component.image.wordtoimage.ComposedWordToImage
+import com.octo.captcha.component.image.fontgenerator.RandomFontGenerator
+import com.octo.captcha.component.image.backgroundgenerator.GradientBackgroundGenerator
+import com.octo.captcha.component.image.color.SingleColorGenerator
+import com.octo.captcha.component.image.textpaster.NonLinearTextPaster
+
+import com.octo.captcha.service.sound.DefaultManageableSoundCaptchaService
+
 
 // locations to search for config files that get merged into the main config
 // config files can either be Java properties files or ConfigSlurper scripts
@@ -827,3 +841,39 @@ grails.plugins.springsecurity.controllerAnnotations.staticRules = [
 	'/securityInfo/**': ['ROLE_ADMIN'],
 	'/securityInfo/**': ['ROLE_ADMIN']
  ]
+
+
+
+jcaptchas {
+	imageCaptcha = new GenericManageableCaptchaService(
+		new GenericCaptchaEngine(
+			new GimpyFactory(
+				new RandomWordGenerator(
+					"abcdefghijklmnopqrstuvwxyz1234567890"
+				),
+				new ComposedWordToImage(
+					new RandomFontGenerator(
+						20, // min font size
+						30, // max font size
+						[new Font("Arial", 0, 10)] as Font[]
+					),
+					new GradientBackgroundGenerator(
+						140, // width
+						35, // height
+						new SingleColorGenerator(new Color(0, 60, 0)),
+						new SingleColorGenerator(new Color(20, 20, 20))
+					),
+					new NonLinearTextPaster(
+						6, // minimal length of text
+						6, // maximal length of text
+						new Color(0, 255, 0)
+					)
+				)
+			)
+		),
+		180, // minGuarantedStorageDelayInSeconds
+		180000 // maxCaptchaStoreSize
+	)
+
+	/*soundCaptcha = new DefaultManageableSoundCaptchaService()*/
+}

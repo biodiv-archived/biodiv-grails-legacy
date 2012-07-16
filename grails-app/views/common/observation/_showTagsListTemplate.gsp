@@ -13,7 +13,7 @@
 	<g:else>
 		<span class="msg" style="padding-left: 50px;">No tags</span>
 	</g:else>
-<r:script>
+<g:javascript>
 	$(document).ready(function() {
 		if((${isAjaxLoad?:'false'} == 'false') || (!${isAjaxLoad?1:0})){
 			 $("li.tagit-choice").click(function(){
@@ -22,5 +22,5 @@
 	         });
          }
 	})
-</r:script>
+</g:javascript>
 </div>
