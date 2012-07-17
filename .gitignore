@@ -1,3 +1,9 @@
 plugins/core/
 web-app/WEB-INF
 target/stacktrace.log
+target
+target-eclipse/
+app-conf/solr/species/data/
+app-conf/solr/observations/data/
+.settings/
+species/
