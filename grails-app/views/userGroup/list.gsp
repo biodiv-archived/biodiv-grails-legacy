@@ -7,12 +7,7 @@
 	value="${message(code: 'userGroup.label', default: 'UserGroup')}" />
 <title><g:message code="default.list.label" args="[entityName]" />
 </title>
-<link rel="stylesheet"
-	href="${resource(dir:'css',file:'tagit/tagit-custom.css')}"
-	type="text/css" media="all" />
-
-<g:javascript src="tagit.js"></g:javascript>
-<g:javascript src="jquery/jquery.autopager-1.0.0.js"></g:javascript>
+<r:require modules="userGroups_list"/>
 </head>
 <body>
 	<div class="container outer-wrapper">
@@ -35,13 +30,13 @@
 			</div>
 		</div>
 	</div>
-	<g:javascript>
+	<r:script>
 		$( "#search" ).unbind('click');
 		$( "#search" ).click(function() {          
 			var target = "${createLink(action:'search')}" + window.location.search;
 			//updateGallery(target, ${queryParams.max}, 0, undefined, false);
         	return false;
 		});
-	</g:javascript>
+	</r:script>
 </body>
 </html>

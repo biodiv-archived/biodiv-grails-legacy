@@ -40,6 +40,7 @@ class Observation implements Taggable{
 		}
 	}
 
+	SUser author;
 	Date observedOn;
 	Date createdOn = new Date();
 	Date lastRevised = createdOn;

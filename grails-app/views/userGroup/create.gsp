@@ -9,11 +9,7 @@
 <title>
 	${entityName}
 </title>
-<g:javascript src="tagit.js"></g:javascript>
-<g:javascript src="jquery/jquery.watermark.min.js"></g:javascript>
-<link rel="stylesheet"
-	href="${resource(dir:'css',file:'tagit/tagit-custom.css')}"
-	type="text/css" media="all" />
+<r:require modules="userGroups_create"/>
 <style>
 .btn-group.open .dropdown-menu {
 	top: 43px;
@@ -90,7 +86,7 @@ display: none;
 
 </style>
 
-<g:javascript src="species/users.js"></g:javascript>
+
 </head>
 <body>
 	<div class="container outer-wrapper">
@@ -287,7 +283,7 @@ display: none;
 			</div>
 		</div>
 	
-<g:javascript>
+<r:script>
 $(document).ready(function() {
 
 	var founders_autofillUsersComp = $("#userAndEmailList_${founders_autofillUsersId}").autofillUsers({
@@ -315,7 +311,7 @@ $(document).ready(function() {
 	$("#tags").tagit({select:true,  tagSource: "${g.createLink(action: 'tags')}", triggerKeys:['enter', 'comma', 'tab'], maxLength:30});
 	$(".tagit-hiddenSelect").css('display','none');
 });
-</g:javascript>
+</r:script>
 
 </body>
 

@@ -155,18 +155,6 @@ modules = {
 
 	admin { dependsOn	'core' }
 
-	userGroups {
-		dependsOn 'core, tagit'
-		defaultBundle 'core'
-
-		resource url:'/css/speciesGroups.css'
-		resource url:'/css/habitats.css'
-		resource url:'/js/jquery/jquery.watermark.min.js'
-		resource url:'/js/jsrender.js'
-		resource url:'/js/bootstrap-typeahead.js'
-		resource url:'/js/bootstrap-combobox.js'
-	}
-
 	userGroups_show {
 		dependsOn 'observations, gallery, carousel'
 
@@ -176,10 +164,8 @@ modules = {
 
 	userGroups_create {
 		dependsOn 'observations'
-
-		resource url:'/css/location_picker.css'
-		resource url:'/js/location/location-picker.js'
-		resource url:'/js/jquery/jquery.exif.js'
+		
+		resource url:'/js/species/users.js'
 	}
 
 	userGroups_list {

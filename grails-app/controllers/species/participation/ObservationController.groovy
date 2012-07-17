@@ -31,7 +31,7 @@ class ObservationController {
 	private static final String SPECIES_NEW_COMMENT = "speciesNewComment";
 	private static final String SPECIES_REMOVE_COMMENT = "speciesRemoveComment";
 	private static final String OBSERVATION_FLAGGED = "observationFlagged";
-	private static final boolean COMMIT = true;
+	public static final boolean COMMIT = true;
 	private static final String OBSERVATION_DELETED = "observationDeleted";
 
 	def grailsApplication;

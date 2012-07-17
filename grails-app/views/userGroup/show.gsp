@@ -43,6 +43,7 @@
 	value="${userGroupInstance.name}" />
 <title><g:message code="default.show.label" args="[userGroupInstance.name]" />
 </title>
+<r:require modules="userGroups_show"/>
 </head>
 <body>
 	<div class="container outer-wrapper">
@@ -130,10 +131,10 @@
 			</div>
 		</div>
 	</div>
-	<g:javascript>
+	<r:script>
 		$(document).ready(function(){
 
 		});
-	</g:javascript>	
+	</r:script>	
 </body>
 </html>

@@ -9,8 +9,9 @@
 
     <div class="span7 top_nav_bar">
     <ul>
-    <li onclick="location.href='/biodiv/species/list'" title="Species" id="species_nav_link">Species</li>
-    <li onclick="location.href='/biodiv/observation/list'" title="Observations" id="species_nav_link">Observations</li>
+    <li onclick="location.href='${createLink("controller":"species")}'" title="Species" id="species_nav_link">Species</li>
+    <li onclick="location.href='${createLink("controller":"observation")}'" title="Observations" id="species_nav_link">Observations</li>
+    <li onclick="location.href='${createLink("controller":"userGroup")}'" title="Groups" id="species_nav_link">Groups</li>
     <li onclick="location.href='/map'" title="Maps" id="maps_nav_link">Maps</li>
     <li onclick="location.href='/browsechecklists'" title="Checklists" id="checklists_nav_link">Checklists</li>
     <!--li onclick="location.href='/collaborate-wg'" title="Collaborate" id="collaborate_nav_link">Collaborate</li-->

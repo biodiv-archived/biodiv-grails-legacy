@@ -925,3 +925,5 @@ jcaptchas {
 	/*soundCaptcha = new DefaultManageableSoundCaptchaService()*/
 }
 
+NamesIndexerService.FILENAME = "${appName}_tstLookup.dat";
+ObservationController.COMMIT = false;
