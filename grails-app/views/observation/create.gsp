@@ -103,6 +103,7 @@ input.dms_field {
 .btn .combobox-clear {
     margin-top: 12px;
 }
+
 </style>
 </head>
 <body>
@@ -325,7 +326,7 @@ input.dms_field {
 									default="Observed on" /></label>
 
 							<div class="controls textbox">
-								<input name="observedOn" type="date" id="observedOn"
+								<input name="observedOn" type="text" id="observedOn"
 									value="${observationInstance?.observedOn?.format('dd/MM/yyyy')}"
 									placeholder="Select date of observation (dd/MM/yyyy)" />
 								
@@ -776,7 +777,11 @@ input.dms_field {
 		$("#image_"+imageId).remove();
 	}
 	
-	$( "#observedOn" ).datepicker({ dateFormat: 'dd/mm/yy' });
+	$( "#observedOn" ).datepicker({ 
+			changeMonth: true,
+			changeYear: true,
+			dateFormat: 'dd/mm/yy' 
+	});
 	
 </r:script>
 </body>
