@@ -17,6 +17,21 @@
 	top: 0;
 }
 </style>
+<g:javascript>
+	$(document).ready(function() {
+
+		window.params = {
+		<%
+			params.each { key, value ->
+				println '"'+key+'":"'+value+'",'
+			}
+		%>
+			"tagsLink":"${g.createLink(action: 'tags')}",
+			"queryParamsMax":"${params.queryParams?.max}"
+		}
+	});
+</g:javascript>
+
 </head>
 <body>
 	<div class="container outer-wrapper">
@@ -62,6 +77,7 @@
 	</div>
 <r:script>
 	$(document).ready(function() {
+
 		$('#tc_tagcloud a').click(function(){
 			var tg = $(this).contents().first().text();
 			window.location.href = "${g.createLink(controller:'observation', action: 'list')}?tag=" + tg ;

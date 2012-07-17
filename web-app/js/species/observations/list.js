@@ -15,6 +15,7 @@ $(document).ready(function(){
 		$("#speciesNameFilterButton").removeClass('active');
 		$("#speciesNameAllButton").addClass('active');
     }
+    
 	$('#observationFlagFilter').button();
     if(window.params.isFlagged == 'true' ){
 		$("#observationFlaggedButton").addClass('active');

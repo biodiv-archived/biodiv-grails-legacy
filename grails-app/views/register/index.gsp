@@ -159,11 +159,10 @@
 								
 								<div
 									class="control-group ${hasErrors(bean: command, field: 'captcha_response', 'error')}">
-									<label class="control-label" for="captcha_response"><g:message
-											code='user.location.label' default='Enter words as shown in' /> </label>
+									<label class="control-label" for="captcha_response"><jcaptcha:jpeg name="imageCaptcha" height="100px" width="100px" /></label>
 									
 									<div class="controls">
-										<jcaptcha:jpeg name="imageCaptcha" height="100px" width="100px" />
+										
 										<input class="input-large" id="captcha_response" type="text"
 											value="" name="captcha_response"
 											placeholder="Enter words as shown in box...">
