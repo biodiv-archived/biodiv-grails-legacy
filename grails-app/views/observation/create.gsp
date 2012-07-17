@@ -191,7 +191,7 @@ input.dms_field {
 														<ul class="dropdown-menu">
 															<g:each in="${species.License.list()}" var="l">
 																<li class="license_option"
-																	onclick="$('#license_${i}').val($(this).text());$('#selected_license_${i}').children('div').html($(this).html());$('#license_options_${i}').hide();">
+																	onclick="$('#license_${i}').val($.trim($(this).text()));$('#selected_license_${i}').children('div').html($(this).html());$('#license_options_${i}').hide();">
 																	<img
 																	src="${resource(dir:'images/license',file:l?.name?.getIconFilename()+'.png', absolute:true)}" /><span style="display:none;">${l?.name?.value}</span> 
 																</li>
@@ -582,7 +582,7 @@ input.dms_field {
                         <ul class="dropdown-menu">
                             <span>Choose a license</span>
                             <g:each in="${species.License.list()}" var="l">
-                                <li class="license_option" onclick="$('#license_{{=i}}').val($(this).text());$('#selected_license_{{=i}}').children('div').html($(this).html());$('#license_options_{{=i}}').hide();">
+                                <li class="license_option" onclick="$('#license_{{=i}}').val($.trim($(this).text()));$('#selected_license_{{=i}}').children('div').html($(this).html());$('#license_options_{{=i}}').hide();">
                                     <img src="${resource(dir:'images/license',file:l?.name.getIconFilename()+'.png', absolute:true)}"/><span style="display:none;">${l?.name?.value}</span>
                                     
                                 </li>
