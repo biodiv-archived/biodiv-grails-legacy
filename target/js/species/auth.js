@@ -1,4 +1,0 @@
-/**
- * 
- */
-// center the form
