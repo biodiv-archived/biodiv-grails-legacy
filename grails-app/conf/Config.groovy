@@ -907,13 +907,13 @@ jcaptchas {
 					new GradientBackgroundGenerator(
 						140, // width
 						35, // height
-						new SingleColorGenerator(new Color(0, 60, 0)),
-						new SingleColorGenerator(new Color(20, 20, 20))
+						new SingleColorGenerator(new Color(229, 229, 229)),
+						new SingleColorGenerator(new Color(229, 229, 229))
 					),
 					new NonLinearTextPaster(
 						6, // minimal length of text
 						6, // maximal length of text
-						new Color(0, 255, 0)
+						new Color(0, 0, 0)
 					)
 				)
 			)

@@ -438,7 +438,7 @@ class ObservationController {
 
 				}else if(!recommendationVoteInstance.hasErrors() && recommendationVoteInstance.save(flush: true)) {
 					log.debug "Successfully added reco vote : "+recommendationVoteInstance
-
+					observationInstance.lastRevised = new Date();
 					//saving max voted species name for observation instance
 					observationInstance.calculateMaxVotedSpeciesName();
 					observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
@@ -503,7 +503,7 @@ class ObservationController {
 					return
 				}else if(recommendationVoteInstance.save(flush: true)) {
 					log.debug "Successfully added reco vote : "+recommendationVoteInstance
-
+					observationInstance.lastRevised = new Date();
 					observationInstance.calculateMaxVotedSpeciesName();
 					observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
 

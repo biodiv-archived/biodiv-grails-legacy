@@ -361,9 +361,11 @@ class XMLConverter extends SourceConverter {
 				log.warn "NOT A SUPPORTED LICENSE TYPE: "+licenseType;
 			}
 		}
+		
 		if(!licenses) {
 			licenses.add(getLicenseByType(LicenseType.CC_BY, createNew));
 		}
+		
 		return licenses;
 	}
 
@@ -546,6 +548,12 @@ class XMLConverter extends SourceConverter {
 				for(Contributor con : getAttributions(imageNode, true)) {
 					res.addToAttributors(con);
 				}
+				for(License l : getLicenses(imageNode, true)) {
+					res.addToLicenses(l);
+				}
+			} else {
+				res.description = imageNode.caption?.text();
+				res.licenses?.clear()
 				for(License l : getLicenses(imageNode, true)) {
 					res.addToLicenses(l);
 				}
