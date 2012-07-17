@@ -63,7 +63,7 @@ class Observation implements Taggable{
 
 
 	static hasMany = [resource:Resource, recommendationVote:RecommendationVote, obvFlags:ObservationFlag, userGroups:UserGroup];
-	static belongsTo = [author:SUser]
+	static belongsTo = [SUser, UserGroup]
 
 	static constraints = {
 		notes nullable:true

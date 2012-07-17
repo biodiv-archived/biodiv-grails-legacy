@@ -36,6 +36,7 @@ class SUser {
 	
 
 	static hasMany = [openIds: OpenID, flags:ObservationFlag, unCuratedVotes:UnCuratedVotes, observations:Observation, recoVotes:RecommendationVote, groups:UserGroup]
+	static belongsTo = [UserGroup]
 	//static hasOne = [facebookUser:FacebookUser]
 	
 	static constraints = {
