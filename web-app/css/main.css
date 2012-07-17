@@ -791,6 +791,10 @@ html.busy,html.busy * {
 	margin-top: 10px;
 	margin-bottom: 20px;
         background-color: rgba(106, 201, 162, 0.15);
+	background: transparent\9;
+		-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#266AC9A2,endColorstr=#266AC9A2)"; /* IE8 */
+		    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#266AC9A2,endColorstr=#266AC9A2);   /* IE6 & 7 */
+		      zoom: 1;
 	padding-left: 10px;
 	padding-right: 10px;
 }
@@ -1608,6 +1612,10 @@ margin-top: 5px;
 
 #speciesGroupFilter {
 background-color: rgba(106, 201, 162, 0.2);
+background: transparent\9;
+-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#336AC9A2,endColorstr=#336AC9A2)"; /* IE8 */
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#336AC9A2,endColorstr=#336AC9A2);   /* IE6 & 7 */
+      zoom: 1;
 border-radius: 0 0 0 0;
 box-shadow: 0 4px 3px -3px #5E5E5E;
 }

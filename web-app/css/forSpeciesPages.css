@@ -65,6 +65,10 @@
   color: #ffffff;
   background: #ccc;
   background: rgba(0, 0, 0, 0.3);
+background: transparent\9;
+-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#4C000000,endColorstr=#4C000000)"; /* IE8 */
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#4C000000,endColorstr=#4C000000);   /* IE6 & 7 */
+      zoom: 1;
 }
 .dropdown.open .dropdown-menu {
   display: block;
