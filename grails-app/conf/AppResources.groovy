@@ -54,7 +54,6 @@ modules = {
 
 	auth {
 		dependsOn 'core'
-		resource url:'/css/auth.css'
 	}
 
 	gallery {
