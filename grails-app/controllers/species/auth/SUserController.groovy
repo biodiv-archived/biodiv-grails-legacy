@@ -313,7 +313,7 @@ class SUserController extends UserController {
 		
 		def results = [];
 		if(params.sort == 'activity') {
-			String query = "select u.id, u.$usernameFieldName from Observation obv right outer join obv.author u WHERE 1=1 $cond group by u.id, u.$usernameFieldName order by count(obv.id)  desc, u.$usernameFieldName asc";
+			String query = "select u.id, u.$usernameFieldName from Observation obv right outer join obv.author u WHERE 1=1 $cond and obv.isDeleted = false group by u.id, u.$usernameFieldName order by count(obv.id)  desc, u.$usernameFieldName asc";
 			def uids =  lookupUserClass().executeQuery(query, queryParams, [max: max, offset: offset])
 			uids.each {
 				results.add(SUser.read(it[0]));
