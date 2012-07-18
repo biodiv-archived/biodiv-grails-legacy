@@ -103,7 +103,9 @@ input.dms_field {
 .btn .combobox-clear {
     margin-top: 12px;
 }
-
+#ui-datepicker-div {
+	width: 16%;
+}
 </style>
 </head>
 <body>
