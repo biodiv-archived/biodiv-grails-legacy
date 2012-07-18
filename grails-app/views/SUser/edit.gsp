@@ -146,7 +146,7 @@
 											default="Website" /> </label>
 									<div class="controls">
 										<input type="text" name="website" class="input-xlarge"
-											id="website" value="${user.website}">
+											id="website" value="${user.website ?: 'http://'}">
 										<div class="help-inline">
 											<g:hasErrors bean="${user}" field="website">
 												<g:renderErrors bean="${user}" as="list" field="website" />

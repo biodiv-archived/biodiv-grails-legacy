@@ -115,4 +115,12 @@ class SUser {
 	String toString() {
 		return username;
 	}
+	
+	def getWebsiteLink(){
+		if(website && website.indexOf("://") == -1){
+			return "http://" + website
+		}else{
+			return website;
+		}
+	}
 }

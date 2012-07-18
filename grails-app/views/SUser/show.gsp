@@ -112,9 +112,7 @@
 									default="Website" /> </span> 
 								<div class="value"> 
 									<g:if test="${Utils.isURL(user.website) }">
-										<a
-									target="blank"
-									href="${fieldValue(bean: user, field: 'website')}">
+										<a target="_blank" href="${user.getWebsiteLink()}">
 										${fieldValue(bean: user, field: 'website')} </a>
 									</g:if>
 									<g:else>
