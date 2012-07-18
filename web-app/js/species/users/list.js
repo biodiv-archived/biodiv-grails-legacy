@@ -48,6 +48,7 @@ $(document).ready(function() {
 			// "this" points to the element of loaded content.
 			load : function(current, next) {
 				$(".mainContent:last").hide().fadeIn(3000);
+				$("div.paginateButtons a.nextLink").attr('href', next.url);
 				if (next.url == undefined) {
 					$(".loadMore").hide();
 				} else {

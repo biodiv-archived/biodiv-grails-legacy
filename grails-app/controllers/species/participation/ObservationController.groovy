@@ -58,10 +58,17 @@ class ObservationController {
 	}
 
 	def list = {
+		log.debug params
+		
 		def model = getObservationList(params);
-		if(!params.isGalleryUpdate?.toBoolean()){
+		if(params.loadMore?.toBoolean()){
+			println model;
+			render(template:"/common/observation/showObservationListTemplate", model:model);
+			return;
+		} else if(!params.isGalleryUpdate?.toBoolean()){
 			render (view:"list", model:model)
-		}else{
+			return;
+		} else{
 			def obvListHtml =  g.render(template:"/common/observation/showObservationListTemplate", model:model);
 			def obvFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
 
@@ -71,6 +78,7 @@ class ObservationController {
 
 			def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml, tagsHtml:tagsHtml, mapViewHtml:mapViewHtml]
 			render result as JSON
+			return;
 		}
 	}
 
