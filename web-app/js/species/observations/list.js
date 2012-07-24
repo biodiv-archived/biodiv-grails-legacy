@@ -219,7 +219,7 @@ $(document).ready(function(){
 			    var params = url.param();
 			    delete params["append"]
 			    delete params["loadMore"]
-			    params['max'] = parseInt(params['offset'])+1;
+			    params['max'] = parseInt(params['offset'])+parseInt(params['max']);
 			    params['offset'] = 0
 			    var History = window.History;
 			    History.pushState({state:1}, "Species Portal", '?'+decodeURIComponent($.param(params))); 
