@@ -7,76 +7,39 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html" />
 <meta name="layout" content="main" />
-<r:require modules="species"/>
+<r:require modules="species_list"/>
 
 
 <g:set var="entityName"
 	value="${message(code: 'species.label', default: 'Species')}" />
 <title>Species List</title>
+<g:javascript>
+$(document).ready(function(){
+	window.params = {
+	<%
+		params.each { key, value ->
+			println '"'+key+'":"'+value+'",'
+		}
+	%>
+		"tagsLink":"${g.createLink(action: 'tags')}",
+		"queryParamsMax":"${params.max}",
+		"isGalleryUpdate":false,
+		"offset":0
+	}
+});
+</g:javascript>
 <r:script>
 
 $(document).ready(function(){
 
-	$("#speciesGroupFilter").buttonset();
-	$("#speciesGroupFilter label").each(function() {
-		$(this).hover(function() {
-			$(this).css('backgroundPosition', '0px -32px');
-		}, function() {
-			if($(this).attr('value') == '${params.sGroup}') {
-				$(this).css('backgroundPosition', '0px -64px');
-			} else {
-				$(this).css('backgroundPosition', '0px 0px');
-			}
-		});
-	})
-		
-
-	$('#speciesGroupFilter label[value$="${params.sGroup}"]').attr('aria-pressed', 'true').addClass('ui-state-hover').addClass('ui-state-active').css('backgroundPosition', '0px -64px');
 	
-	
-	function updateGallery(target, limit, offset) {
-		var a = $('<a href="'+target+'"></a>');
-		var url = a.url();
-		var href = url.attr('path');
-		var params = url.param();
-		params['sort'] = $('#speciesGallerySort option:selected').val()
-		//params['order'] = $('#speciesGalleryOrder option:selected').val()
-		var grp = ''; 
-		$('#speciesGroupFilter label').each (function() {
-			if($(this).attr('aria-pressed') === 'true') {
-				grp += $(this).attr('value') + ',';
-			}
-		});
-		
-		grp = grp.replace(/\s*\,\s*$/,'');
-		if(grp) {
-			params['sGroup'] = grp;//$('#speciesGalleryFilter option:selected').val().toString();
-		}
-		
-		if(limit != undefined) {
-			params['max'] = limit.toString();
-		}
-		if(offset != undefined) {
-			params['offset'] = offset.toString();
-		}
-		var recursiveDecoded = decodeURIComponent($.param(params));
-		window.location = href+'?'+recursiveDecoded;
-	}
-	
-	$(".paginateButtons a").click(function() {
-		updateGallery($(this).attr('href'));
-		return false;
-	});
 	
 	$('#speciesGallerySort').change(function(){
-		updateGallery(window.location.pathname + window.location.search, ${params.limit?:51}, 0);
+		updateGallery(window.location.pathname + window.location.search, ${params.limit?:51}, 0, undefined, false);
 		return false;
 	});
 	
-	$('#speciesGroupFilter input').change(function(){
-		updateGallery(window.location.pathname + window.location.search, ${params.limit?:51}, 0);
-		return false;
-	});
+	
 	
 	$('li.poor_species_content').hover(function(){
 		$(this).children('.poor_species_content').slideDown(200);
@@ -102,60 +65,37 @@ $(document).ready(function(){
 				</g:if>
 
 
-		<div class="paginateButtons grid_16">
-			<center>
-				<g:paginateOnAlphabet total="${speciesInstanceTotal}" />
-			</center>
-		</div>
-		<br />
-		<br />
 
 		<div class="gallerytoolbar grid_16" >
-			<div id="speciesGroupFilter" class="filterBar" style="float: left;">
-				<center>
-					<!-- g:paginateOnSpeciesGroup/-->
-					<%othersGroup = SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.OTHERS)%>
+			<div class="filters" style="position: relative;overflow:visible;">
+				<div class="paginateButtons">
+					<center>
+						<g:paginateOnAlphabet total="${speciesInstanceTotal}" />
+					</center>
+				</div>
+				<div class="btn-group" style="float: right; z-index: 10">
+					<button id="selected_sort" class="btn dropdown-toggle"
+						data-toggle="dropdown" href="#" rel="tooltip"
+						data-original-title="Sort by">
 
-					<g:each in="${SpeciesGroup.list() }" var="sGroup" status="i">
-						<g:if test="${sGroup != othersGroup }">
-							<input type="radio" name="specuesGroupFilter"
-								id="speciesGroupFilter${i}" value="${sGroup.id }" />
-							<label for="speciesGroupFilter${i}" value="${sGroup.id}"
-								title="${sGroup.name}" class="group_icon"
-								style="background: url('${createLinkTo(dir: 'images', file: sGroup.icon(ImageType.SMALL)?.fileName, absolute:true)}') no-repeat; background-position: 0 0; width: 32px; height: 32px; margin-left: 6px;">
-							</label>
-						</g:if>
-					</g:each>
-
-					<input type="radio" name="specuesGroupFilter"
-						id="specuesGroupFilter20" value="${othersGroup.id}" /> <label
-						for="speciesGroupFilter${i}" value="${othersGroup.id}"
-						title="${othersGroup.name}" class="group_icon"
-						style="background: url('${createLinkTo(dir: 'images', file: othersGroup.icon(ImageType.SMALL)?.fileName, absolute:true)}') no-repeat; background-position: 0 0; width: 32px; height: 32px; margin-left: 6px;">
-					</label>
-				</center>
-			</div>
-
-			<div style="float: right;">
-				Sort by <select name="speciesGallerySort" id="speciesGallerySort"
-					class="value ui-corner-all">
-					<option value="title"
-						${params.sort?.equals('title')?'selected':'' }>Title</option>
-					<option value="percentOfInfo"
-						${params.sort?.equals('percentOfInfo')?'selected':''  }>Richness</option>
-					<!-- option value="createdOn" ${params.sort?.equals('createdOn')?'selected':''  }>Recently Added</option>
-				<option value="updatedOn" ${params.sort?.equals('updatedOn')?'selected':''  }>Recently Updated</option-->
-				</select>
-				<!-- Filter by group <select name="speciesGalleryFilter"
-				id="speciesGalleryFilter" multiple="multiple"
-				class="value ui-corner-all">
-				<g:each in="${SpeciesGroup.list()}" var="sGroup">
-					<option value="${sGroup.id}"
-						${params.sGroup.equals(sGroup)?'selected':''  }>
-						${sGroup.name}
-					</option>
-				</g:each>
-			</select> -->
+						<g:if test="${params.sort == 'title'}">
+                                               Sort by Title
+                                            </g:if>
+						<g:else>
+                                               Sort by Richness
+                                            </g:else>
+						<span class="caret"></span>
+					</button>
+					<ul id="sortFilter" class="dropdown-menu">
+						<li class="group_option"><a class=" sort_filter_label"
+							value="title"> Sort by Title </a></li>
+						<li class="group_option"><a class=" sort_filter_label"
+							value="percentOfInfo">Sort by Richness </a></li>
+					</ul>
+				</div>
+			
+				<obv:showGroupFilter />
+				
 			</div>
 		</div>
 		

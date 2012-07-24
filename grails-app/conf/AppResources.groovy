@@ -120,7 +120,7 @@ modules = {
 	}
 
 	species {
-		dependsOn 'core, list_utils'
+		dependsOn 'core, list_utils, tagit'
 
 		resource url:'/css/960.css'
 		resource url:'/css/main.css'
@@ -142,6 +142,11 @@ modules = {
 		resource url:'/js/jquery.collapser/jquery.collapser.min.js'
 		resource url:'/js/jquery/jquery.jqDock-1.8/jquery.jqDock.min.js'
 		resource url:'/js/floating-1.7.js'
+	}
+	
+	species_list {
+		dependsOn 'species, list_utils'
+		resource url:'/js/species/observations/list.js'
 	}
 
 	search {
