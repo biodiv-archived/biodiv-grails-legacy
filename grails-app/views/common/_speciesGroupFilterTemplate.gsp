@@ -18,7 +18,7 @@ $(document).ready(function(){
 });
 
 </r:script>
-<div class="class="btn-group">
+
 	<div id="speciesGroupFilter" data-toggle="buttons-radio">
 		<%def othersGroup = SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.OTHERS)%>
 		<g:each in="${SpeciesGroup.list() }" var="sGroup" status="i">
@@ -35,7 +35,7 @@ $(document).ready(function(){
 	</div>
 
 
-
+	<g:if test="${params.controller != 'species'}">
 	<div id="habitatFilter" data-toggle="buttons-radio">
 		<%def othersHabitat = species.Habitat.findByName(HabitatType.OTHERS.value())%>
 		<g:each in="${species.Habitat.list()}" var="habitat" status="i">
@@ -51,9 +51,10 @@ $(document).ready(function(){
 			data-content="${message(code: 'habitat.definition.' + othersHabitat.name)}"
 			rel="tooltip"></button>
 	</div>
+	</g:if>
 
 
-</div>
+<g:if test="${params.controller != 'species'}">
 <div id="speciesNameFilter" class="btn-group"
 	style="float: right; margin-right: 5px; z-index: 10; position: absolute; margin-top: -65px; right: 0;">
 	<input type="text" id="speciesNameFilter" value="${params.speciesName}"
@@ -72,3 +73,4 @@ $(document).ready(function(){
 	<button id="observationFlaggedButton" class="btn" rel="tooltip"
 		data-original-title="Show only flagged observations">Flagged</button>
 </div>
+</g:if>

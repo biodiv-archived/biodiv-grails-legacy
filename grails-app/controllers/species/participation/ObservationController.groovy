@@ -62,7 +62,6 @@ class ObservationController {
 		
 		def model = getObservationList(params);
 		if(params.loadMore?.toBoolean()){
-			println model;
 			render(template:"/common/observation/showObservationListTemplate", model:model);
 			return;
 		} else if(!params.isGalleryUpdate?.toBoolean()){
@@ -97,7 +96,7 @@ class ObservationController {
 		//storing this filtered obvs ids list in session for next and prev links
 		//http://grepcode.com/file/repo1.maven.org/maven2/org.codehaus.groovy/groovy-all/1.8.2/org/codehaus/groovy/runtime/DefaultGroovyMethods.java
 		//returns an arraylist and invalidates prev listing result
-		if(params.append) {
+		if(params.append?.toBoolean()) {
 			session["obv_ids_list"].addAll(observationInstanceList.collect {it.id});
 		} else {
 			session["obv_ids_list_params"] = params.clone();
@@ -246,14 +245,16 @@ class ObservationController {
 			lastListParams.put("append", true);
 			def max = Math.min(lastListParams.max ? lastListParams.int('max') : 9, 100)
 			def offset = lastListParams.offset ? lastListParams.int('offset') : 0
-			lastListParams.offset = offset + max;
+			lastListParams.offset = offset + session["obv_ids_list"].size();
 			log.debug "Fetching new page of observations using params ${lastListParams}";
 			runLastListQuery(lastListParams);
+			lastListParams.offset = offset;
 			nextObservationId = (pos+1 < session["obv_ids_list"].size()) ? session["obv_ids_list"][pos+1] : null;
 		}
 		def prevObservationId = pos > 0 ? session["obv_ids_list"][pos-1] : null;
 		
 		lastListParams.isGalleryUpdate = false;
+		lastListParams.put("append", false);
 		return ['prevObservationId':prevObservationId, 'nextObservationId':nextObservationId, 'lastListParams':lastListParams];
 		}
 	}

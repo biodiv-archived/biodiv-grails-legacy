@@ -34,7 +34,7 @@ $(document).ready(function(){
 		$("#observationWithNoFlagFilterButton").removeClass('active')
 		$("#observationFlaggedButton").addClass('active')
 		
-		updateGallery(undefined, window.params.queryParamsMax, 0);
+		updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
         return false;
 	});
 	
@@ -46,7 +46,7 @@ $(document).ready(function(){
 		$("#observationFlaggedButton").removeClass('active')
 		$("#observationWithNoFlagFilterButton").addClass('active')
 		
-		updateGallery(undefined, window.params.queryParamsMax, 0);
+		updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
         return false;
 	});
 	
@@ -58,7 +58,7 @@ $(document).ready(function(){
 		$("#speciesNameFilterButton").removeClass('active')
 		$("#speciesNameAllButton").addClass('active')
 		
-		updateGallery(undefined, window.params.queryParamsMax, 0);
+		updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
         return false;
 	});
 	
@@ -70,7 +70,7 @@ $(document).ready(function(){
 		$("#speciesNameFilterButton").addClass('active')
 	    $("#speciesNameAllButton").removeClass('active')
 			
-		updateGallery(undefined, window.params.queryParamsMax, 0);
+		updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
         return false;
 	});
 	                
@@ -80,7 +80,7 @@ $(document).ready(function(){
 		}
 		$('#speciesGroupFilter button.active').removeClass('active');
     	$(this).addClass('active');
-    	updateGallery(undefined, window.params.queryParamsMax, 0);
+    	updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
     	return false;
  	});
         
@@ -90,7 +90,7 @@ $(document).ready(function(){
 		}
  		$('#habitatFilter button.active').removeClass('active');
     	$(this).addClass('active');
-    	updateGallery(undefined, window.params.queryParamsMax, 0);
+    	updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
     	return false;
  	});
         
@@ -104,7 +104,7 @@ $(document).ready(function(){
 		$(this).addClass('active');
         $("#selected_sort").html($(this).html() + caret);
         $("#sortFilter").hide();
-        updateGallery(undefined, window.params.queryParamsMax, 0);
+        updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
         return false;   
    });
 
@@ -114,20 +114,20 @@ $(document).ready(function(){
 	
         
     $(".paginateButtons a").click(function() {
-        updateGallery($(this).attr('href'));
+        updateGallery($(this).attr('href'), window.params.queryParamsMax, undefined, undefined, window.params.isGalleryUpdate);
         return false;
     });
     
     $("ul[name='tags']").tagit({select:true,  tagSource: window.params.tagsLink});
 	$("li.tagit-choice").live('click', function(){
    		setActiveTag($(this).contents().first().text());
-    	updateGallery(undefined, undefined, 0);
+    	updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
     	return false;
     });
    
    $('#tc_tagcloud a').live('click', function(){
    		setActiveTag($(this).contents().first().text());
-		updateGallery(undefined, undefined, 0);
+		updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
 		return false;
    });
    
@@ -140,18 +140,18 @@ $(document).ready(function(){
 		if(oldActiveTag){
 			oldActiveTag.removeClass('active');
 		}
-		updateGallery(undefined, undefined, 0);
+		updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
     	return false;
     });
  
     $("#removeUserFilter").live('click', function(){
-    	updateGallery(undefined, undefined, 0, true);
+    	updateGallery(undefined, window.params.queryParamsMax, window.params.offset, true, window.params.isGalleryUpdate);
     	return false;
     });
     
     $("#removeQueryFilter").live('click', function(){
     	$( "#searchTextField" ).val('');
-    	updateGallery(undefined, undefined, 0);
+    	updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
     	return false;
     });
    
@@ -336,7 +336,7 @@ function getFilterParameters(url, limit, offset, removeUser) {
 
     if(limit != undefined) {
         params['max'] = limit.toString();
-    }
+    } 
 
     if(offset != undefined) {
         params['offset'] = offset.toString();
@@ -463,7 +463,7 @@ function showMapView() {
 			$('div.observations > div.observations_list').show();
 			$('#map_view_bttn').css('background-color', 'transparent');
 			$('#map_results_list > div.observations_list').remove();
-			updateGallery(undefined, undefined, 0);
+			updateGallery(undefined, undefined, 0, undefined, window.params.isGalleryUpdate);
 			// alert(" hiding map view");
 			
 		} else {
