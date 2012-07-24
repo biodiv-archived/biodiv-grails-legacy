@@ -84,6 +84,8 @@ class ObservationController {
 	protected def getObservationList(params) {
 		def max = Math.min(params.max ? params.int('max') : 9, 100)
 		def offset = params.offset ? params.int('offset') : 0
+		println max;
+		println offset;
 		def filteredObservation = observationService.getFilteredObservations(params, max, offset, false)
 		def observationInstanceList = filteredObservation.observationInstanceList
 		def queryParams = filteredObservation.queryParams
@@ -255,6 +257,8 @@ class ObservationController {
 		
 		lastListParams.isGalleryUpdate = false;
 		lastListParams.put("append", false);
+		lastListParams['max'] = session["obv_ids_list"].size() - 1;
+		lastListParams['offset'] = 0;		
 		return ['prevObservationId':prevObservationId, 'nextObservationId':nextObservationId, 'lastListParams':lastListParams];
 		}
 	}
