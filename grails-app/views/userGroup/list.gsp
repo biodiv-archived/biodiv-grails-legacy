@@ -30,6 +30,19 @@
 			</div>
 		</div>
 	</div>
+	<g:javascript>
+		$(document).ready(function(){
+			window.params = {
+			<%
+				params.each { key, value ->
+					println '"'+key+'":"'+value+'",'
+				}
+			%>
+				"tagsLink":"${g.createLink(action: 'tags')}",
+				"queryParamsMax":"${params.queryParams?.max}"
+			}
+		});
+	</g:javascript>
 	<r:script>
 		$( "#search" ).unbind('click');
 		$( "#search" ).click(function() {          
@@ -38,5 +51,6 @@
         	return false;
 		});
 	</r:script>
+
 </body>
 </html>

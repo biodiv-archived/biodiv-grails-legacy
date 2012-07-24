@@ -7,6 +7,7 @@ import species.auth.Role
 import species.auth.SUser
 import species.auth.SUserRole
 import species.groups.SpeciesGroup;
+import species.groups.UserGroupMemberRole.UserGroupMemberRoleType;
 
 class BootStrap {
 
@@ -74,6 +75,10 @@ class BootStrap {
 			if (!user.authorities.contains(adminRole)) {
 				SUserRole.create user, adminRole
 			}
+		}
+		
+		UserGroupMemberRoleType.each { it ->
+			Role.findByAuthority(it.value()) ?: new Role(authority: it.value()).save(flush:true, failOnError: true)
 		}
 	}
 

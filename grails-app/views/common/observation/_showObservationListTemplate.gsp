@@ -9,8 +9,10 @@
 			<i class="icon-th-large"></i>
 		</button>
 	</div>
+	
 	<div class="mainContentList">
 		<div class="mainContent">
+		
 			<%
 				def observationPos = (queryParams?.offset != null) ? queryParams.offset : params?.offset
 			%>
@@ -31,6 +33,7 @@
 
 				</g:each>
 			</ul>
+			
 			<ul class="list_view thumbnails" style="display: none;">
 				<g:each in="${observationInstanceList}" status="i"
 					var="observationInstance">
@@ -39,6 +42,7 @@
 					</li>
 				</g:each>
 			</ul>
+			
 		</div>
 	</div>
 	
@@ -51,10 +55,10 @@
 		</div>
 	</g:if>
 	
+	<%activeFilters?.loadMore = true %>
 	<div class="paginateButtons" style="visibility: hidden; clear: both">
-		<g:paginate total="${observationInstanceTotal}"
-			max="${queryParams.max}" action="${params.action}"
-			params="${activeFilters}" />
+		<g:paginate total="${observationInstanceTotal}" action="${params.action}"
+			max="${queryParams.max}" params="${activeFilters}" />
 	</div>
 	
 

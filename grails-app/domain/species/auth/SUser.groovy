@@ -1,8 +1,13 @@
 package species.auth
 
+import java.util.List;
+
+import org.springframework.security.acls.domain.BasePermission;
+
 import species.Resource;
 import species.Resource.ResourceType;
 import species.groups.UserGroup;
+import species.groups.UserGroupMemberRole;
 import species.participation.Observation;
 import species.participation.ObservationFlag;
 import species.participation.RecommendationVote;
@@ -12,7 +17,7 @@ import species.utils.ImageType;
 class SUser {
 
 	transient springSecurityService
-
+	def aclUtilService
 	def grailsApplication;
 
 	String username
@@ -114,6 +119,24 @@ class SUser {
 		}
 	}
 
+	Set<UserGroup> getUserGroups() {
+		HashSet<UserGroup> userGroups = [];
+		def uGroups = UserGroupMemberRole.findAllBySUser(this).collect{it.userGroup}
+		println uGroups
+		uGroups.each { 
+			if(aclUtilService.hasPermission(springSecurityService.getAuthentication(), it, BasePermission.WRITE)) {
+				userGroups.add(it)
+			}
+		}
+		println "----"
+		println userGroups;
+		return userGroups;
+	}
+	
+	boolean isUserGroupMember(UserGroup userGroup) {
+		return UserGroupMemberRole.countBySUserAndUserGroup(this, userGroup) ?: 0
+	}
+	
 	@Override
 	String toString() {
 		return username;

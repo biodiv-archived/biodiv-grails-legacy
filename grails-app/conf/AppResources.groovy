@@ -48,13 +48,13 @@ modules = {
 		resource url:'/js/species/popuplib.js'
 		resource url:'/js/species/ajaxLogin.js'
 		resource url:'/js/species/ajaxLogin.js'
+		resource url:'/js/species/users.js'
 		resource url:[dir:'js',file:'jquery/jquery.checkbox.js',plugin:'spring-security-ui']
-		resource url:[dir:'js',file:'spring-security-ui.js', plugin:'spring-security-ui']
+		resource url:[dir:'js',file:'spring-security-ui.js', plugin:'spring-security-ui']		
 	}
 
 	auth {
 		dependsOn 'core'
-		resource url:'/css/auth.css'
 	}
 
 	gallery {
@@ -77,7 +77,6 @@ modules = {
 		resource url:'/js/jquery/jquery-history-1.7.1/scripts/bundled/html4+html5/jquery.history.js'
 		resource url:'/js/jquery/jquery.url.js'
 		resource url:'/js/jquery/jquery.autopager-1.0.0.js'
-		resource url:'/js/species/users.js'
 	}
 
 	location_utils { resource url:'/js/location/google/markerclusterer.js'		 }
@@ -163,9 +162,7 @@ modules = {
 	}
 
 	userGroups_create {
-		dependsOn 'observations'
-		
-		resource url:'/js/species/users.js'
+		dependsOn 'observations'		
 	}
 
 	userGroups_list {

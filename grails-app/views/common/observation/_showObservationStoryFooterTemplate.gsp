@@ -37,7 +37,7 @@
 	<g:if test="${showDetails}">
 		<div class="footer-item"">
 			<obv:identificationByEmail
-				model="['source':'observationShow', 'requestObject':request]" />
+				model="['source':'observationShow', 'requestObject':request, 'cssClass':'btn btn-mini']" />
 		</div>
 	</g:if>
 	<g:if test="${showDetails}">

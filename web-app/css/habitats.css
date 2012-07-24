@@ -10,7 +10,7 @@
 
 .agriculture_gall_th { width: 32px; height: 32px; background-position: -33px -97px; }
 .agriculture_gall_th:hover { background-position: -33px -129px; }
-.agriculture_gall_th.active, .agriculture_gall_th:active { background-position: -33px -131px; }
+.agriculture_gall_th.active, .agriculture_gall_th:active { background-position: -33px -161px; }
 
 .aquatic_gall_th { width: 32px; height: 32px; background-position: 0 0; }
 .aquatic_gall_th:hover { background-position: 0 -32px; }
@@ -18,7 +18,7 @@
 
 .desert_gall_th { width: 32px; height: 32px; background-position: 0 -97px; }
 .desert_gall_th:hover { background-position: 0 -129px; }
-.desert_gall_th.active, .desert_gall_th:active { background-position: 0 -131px; }
+.desert_gall_th.active, .desert_gall_th:active { background-position: 0 -161px; }
 
 .forest_gall_th { width: 32px; height: 32px; background-position: 0 -289px; }
 .forest_gall_th:hover { background-position: 0 -321px; }

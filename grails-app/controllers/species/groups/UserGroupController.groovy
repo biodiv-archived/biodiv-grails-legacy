@@ -3,6 +3,8 @@ package species.groups
 import java.util.Map;
 
 import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.acls.domain.BasePermission;
 
 import species.auth.SUser;
 import species.utils.Utils;
@@ -14,7 +16,8 @@ class UserGroupController {
 	def springSecurityService;
 	def userGroupService;
 	def mailService;
-
+	def aclUtilService;
+	
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
 	def index = {
@@ -89,8 +92,8 @@ class UserGroupController {
 	def save = {
 		log.debug params;
 		List founders = Utils.getUsersList(params.founderUserIds);
-		List members = Utils.getUsersList(params.memberUserIds);
-		def userGroupInstance = userGroupService.create(params.name, params.webaddress, params.description, founders, members);
+		//List members = Utils.getUsersList(params.memberUserIds);
+		def userGroupInstance = userGroupService.create(params.name, params.webaddress, params.description, founders);
 		if (userGroupInstance.hasErrors()) {
 			userGroupInstance.errors.allErrors.each { log.error it }
 			render(view: "create", model: [userGroupInstance: userGroupInstance])
@@ -204,9 +207,11 @@ class UserGroupController {
 		if (!userGroupInstance) {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'userGroup.label', default: 'UserGroup'), params.id])}"
 			redirect(action: "list")
-		}
-		else {
-			return [userGroupInstance: userGroupInstance]
+		} else if(aclUtilService.hasPermission(springSecurityService.getAuthentication(), userGroupInstance, BasePermission.ADMINISTRATION)) {
+			render(view: "create", model: [userGroupInstance: userGroupInstance, 'springSecurityService':springSecurityService])
+		} else {
+			flash.message = "${message(code: 'default.not.permitted.message', args: [params.action, message(code: 'userGroup.label', default: 'UserGroup'), userGroupInstance.name])}"
+			redirect(action: "list")
 		}
 	}
 
@@ -226,12 +231,16 @@ class UserGroupController {
 					return
 				}
 			}
+			
 			userGroupService.update(userGroupInstance, params)
 			if (userGroupInstance.hasErrors()) {
 				userGroupInstance.errors.allErrors.each { log.error it }
 				render(view: "edit", model: [userGroupInstance: userGroupInstance])
 			}
 			else {
+				def tags = (params.tags != null) ? Arrays.asList(params.tags) : new ArrayList();
+				userGroupInstance.setTags(tags);
+				log.debug "Successfully updated usergroup : "+userGroupInstance
 				flash.message = "${message(code: 'default.updated.message', args: [message(code: 'userGroup.label', default: 'UserGroup'), userGroupInstance.id])}"
 				redirect(action: "show", id: userGroupInstance.id)
 			}
@@ -283,7 +292,68 @@ class UserGroupController {
 		userGroup
 	}
 
+	def members = {
+		def userGroupInstance = findInstance()
+		if (!userGroupInstance) return
+
+		params.max = Math.min(params.max ? params.int('max') : 9, 100)
+		params.offset = params.offset ? params.int('offset') : 0
+
+		def allMembers = userGroupInstance.getAllMembers(params.max, params.offset);
+		['userGroupInstance':userGroupInstance, 'members':allMembers, 'totalCount':userGroupInstance.getMembersCount()]
+ 	}
+	
+	def observations = {
+		def userGroupInstance = findInstance()
+		if (!userGroupInstance) return
+
+		params.max = Math.min(params.max ? params.int('max') : 9, 100)
+		params.offset = params.offset ? params.int('offset') : 0
+
+		['userGroupInstance':userGroupInstance, 'observations':userGroupInstance.observations, 'totalCount':userGroupInstance.observations.size()]
+	}
+	
+	@Secured(['ROLE_USER', 'ROLE_ADMIN'])
+	def settings = {
+		def userGroupInstance = findInstance()
+		if (!userGroupInstance) return
+		
+		if(aclUtilService.hasPermission(springSecurityService.getAuthentication(), userGroupInstance, BasePermission.ADMINISTRATION)) {
+			return ['userGroupInstance':userGroupInstance]
+		}
+		return;
+	}
+	
+	@Secured(['ROLE_USER'])
+	def joinUs = {
+		def userGroupInstance = findInstance()
+		if (!userGroupInstance) return;
+		
+		def user = springSecurityService.currentUser;
+		if(user) {
+			userGroupInstance.addMember(user);
+			render (['msg':'Congratulations. You are now part of us!!!']as JSON);
+		}
+		render (['msg':'We are extremely sorry as we are not able to process your request now. Please try again.']as JSON);
+	}
+	
+	@Secured(['ROLE_USER'])
+	def leaveUs = {
+		def userGroupInstance = findInstance()
+		if (!userGroupInstance) return;
+		
+		def user = springSecurityService.currentUser;
+		if(user) {
+			userGroupInstance.deleteMember(user);
+			render (['msg':'successful'] as JSON);
+			return
+		}
+		render (['msg':'Your presence is important to us. If you still want to leave this group please try again.']as JSON);
+	}
+	
+
 }
+
 class UserGroupCommand {
 	String name
 	String webaddress

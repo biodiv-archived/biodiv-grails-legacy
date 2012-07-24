@@ -33,7 +33,7 @@
 
 
 <!--container end-->
-<g:javascript>	
+<r:script>	
         $(document).ready( function() {
         					
 			function getSelectedTag() {
@@ -175,4 +175,4 @@
                 		return false;
 				});
 				
-</g:javascript>
+</r:script>

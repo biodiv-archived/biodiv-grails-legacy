@@ -1,5 +1,12 @@
 package species
 
+import org.springframework.security.acls.domain.GrantedAuthoritySid;
+import org.springframework.security.acls.domain.PrincipalSid;
+import org.springframework.security.acls.model.Sid;
+import org.springframework.security.core.Authentication;
+
+import species.groups.UserGroupMemberRole;
+
 class UserGroupTagLib {
 	static namespace = "uGroup";
 	
@@ -171,4 +178,45 @@ class UserGroupTagLib {
 		out << render(template:"/common/userGroup/headerTemplate", model:attrs.model);
 	}
 
+	def showSidebar = {attrs, body->
+		out << render(template:"/common/userGroup/sidebarTemplate", model:attrs.model);
+	}
+	
+	def getCurrentUserUserGroups = {attrs, body ->
+		def user = springSecurityService.getCurrentUser();
+		out << render(template:"/common/userGroup/showCurrentUserUserGroupsTemplate", model:[userGroups:user.getUserGroups()]);
+	}
+	
+	def isUserGroupMember = { attrs, body->
+		def user = springSecurityService.getCurrentUser();
+		//TODO:optimize count
+		if(user.getUserGroups().size() > 0) {
+			out<< body();
+		}
+	}
+	
+	def isNotAMember = { attrs, body->
+		def user = springSecurityService.getCurrentUser();
+		def userGroupInstance = attrs.model?.userGroupInstance;
+		if(!user || !userGroupInstance || !user.isUserGroupMember(userGroupInstance)) {
+			out<< body();
+		}
+	}
+	
+	def isAMember = { attrs, body->
+		def user = springSecurityService.getCurrentUser();
+		def userGroupInstance = attrs.model?.userGroupInstance;
+		if(user && userGroupInstance && user.isUserGroupMember(userGroupInstance)) {
+			out<< body();
+		}
+	}
+	
+	def aclUtilService
+	def gormUserDetailsService
+	def perm = { attrs, body ->
+		println aclUtilService.hasPermission(gormUserDetailsService.loadUserByUsername(attrs.model.user.email, true), attrs.model.userGroupInstance, attrs.model.permission)
+		//println aclUtilService.readAcl(attrs.model.userGroupInstance);
+		println "====="
+	}
+	
 }

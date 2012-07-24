@@ -57,12 +57,20 @@ Just change the color-values to apply your own color-scheme.
     border: 1px solid rgba(0, 0, 0, 0.1);
     color: #444444;
     background-color: rgba(0, 0, 0, 0.1);
+    background: transparent\9;
+-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#19000000,endColorstr=#19000000)"; /* IE8 */
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#19000000,endColorstr=#19000000);   /* IE6 & 7 */
+      zoom: 1;
     border-radius: 5px;
     text-shadow: 1px 1px 1px #aaaaaa;
     font-weight: bold;
 }
 .navigation li a:hover {
     background-color: rgba(128, 128, 128, 0.1);
+    background: transparent\9;
+    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#19808080,endColorstr=#19808080)"; /* IE8 */
+        filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#19808080,endColorstr=#19808080);   /* IE6 & 7 */
+          zoom: 1;
     border: 1px solid rgba(0, 0, 0, 0.1);
     color: #111111;
     /* background-color: #999; */

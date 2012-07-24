@@ -18,7 +18,7 @@
 
 .birds_gall_th { width: 32px; height: 32px; background-position: 0 -97px; }
 .birds_gall_th:hover { background-position: 0 -129px; }
-.birds_gall_th.active, .birds_gall_th:active { background-position: 0 -131px; }
+.birds_gall_th.active, .birds_gall_th:active { background-position: 0 -161px; }
 
 .fish_gall_th { width: 32px; height: 32px; background-position: 0 -961px; }
 .fish_gall_th:hover { background-position: 0 -993px; }

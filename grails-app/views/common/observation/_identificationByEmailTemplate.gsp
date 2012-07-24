@@ -1,8 +1,15 @@
 <g:set var="autofillUsersId" value="id1"/>
-<div>
+
 	<div class="btn-group" style="z-index:10; float: left; margin-left: 5px;">
-		<a id="identification-email" class="${(source == 'observationShow')?'btn btn-mini' : 'btn'} dropdown-toggle" 
-			data-toggle="dropdown" href="#"><i class="icon-envelope"></i>Share</a>
+		<a id="identification-email" class="${cssClass?:'btn'} dropdown-toggle" 
+			data-toggle="dropdown" href="#"><i class="icon-envelope"></i>
+			<g:if test="${activity}">
+				${activity}
+			</g:if>	
+			<g:else>
+			Share
+			</g:else>
+		</a>
 		<form id="email-form" name="email-form" style="display: none; background-color: #F2F2F2;">
                         <div class="form-row">
                             <span class="keyname">To</span>
@@ -35,7 +42,7 @@
 			</div>
 		</form>
 	</div>
-</div>
+
 
 
 <g:javascript>

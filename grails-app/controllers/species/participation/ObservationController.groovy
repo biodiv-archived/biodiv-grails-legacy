@@ -16,6 +16,7 @@ import species.participation.ObservationFlag.FlagType
 import species.utils.ImageUtils
 import species.utils.Utils;
 import species.groups.SpeciesGroup;
+import species.groups.UserGroup;
 import species.Habitat;
 import species.BlockedMails;
 import species.auth.SUser;
@@ -40,7 +41,8 @@ class ObservationController {
 	def mailService;
 	def observationsSearchService;
 	def namesIndexerService;
-
+	def userGroupService;
+	
 	static allowedMethods = [save:"POST", update: "POST", delete: "POST"]
 
 	def index = {
@@ -59,9 +61,15 @@ class ObservationController {
 	}
 
 	def list = {
+		log.debug params
+		
 		def model = getObservationList(params);
-		if(!params.isGalleryUpdate?.toBoolean()){
+		if(params.loadMore?.toBoolean()){
+			render(template:"/common/observation/showObservationListTemplate", model:model);
+			return;
+		} else if(!params.isGalleryUpdate?.toBoolean()){
 			render (view:"list", model:model)
+			return;
 		} else{
 			def obvListHtml =  g.render(template:"/common/observation/showObservationListTemplate", model:model);
 			def obvFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
@@ -72,6 +80,7 @@ class ObservationController {
 
 			def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml, tagsHtml:tagsHtml, mapViewHtml:mapViewHtml]
 			render result as JSON
+			return;
 		}
 	}
 
@@ -133,7 +142,7 @@ class ObservationController {
 					observationInstance.setTags(tags);
 
 					def userGroups = (params.userGroups != null) ? Arrays.asList(params.userGroups) : new ArrayList();
-					observationInstance.setUserGroups(userGroups);
+					setUserGroups(observationInstance, userGroups);
 										
 					sendNotificationMail(OBSERVATION_ADDED, observationInstance, request);
 					params["createNew"] = true
@@ -162,6 +171,11 @@ class ObservationController {
 		}
 	}
 
+	private void setUserGroups(Observation observationInstance, List userGroupIds) {
+		if(!observationInstance) return
+		userGroupService.postObservationtoUserGroups(observationInstance, userGroupIds);		
+	}
+	
 	@Secured(['ROLE_USER'])
 	def update = {
 		log.debug params;

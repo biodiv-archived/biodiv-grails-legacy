@@ -644,9 +644,12 @@ class ObservationService {
 				
 			case "userGroupList":
 				mailSubject = "Share Groups List"
-				activitySource = "userGroup List"
+				activitySource = "user groups list"
 				break
-				
+			case "userGroupInvite":
+				mailSubject = "Invitation to join group"
+				activitySource = "user group"
+				break
 			default:
 				log.debug "invalid source type"
 		}

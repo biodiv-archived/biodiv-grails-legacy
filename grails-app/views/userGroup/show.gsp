@@ -54,77 +54,27 @@
 				<div class="page-header clearfix">
 					<div style="width: 100%;">
 						<uGroup:showHeader model=['userGroupInstance':userGroupInstance] />
-						
-						<div style="float: right;">
-							<sec:permitted className='species.groups.UserGroup' id='${userGroupInstance.id}' permission='${org.springframework.security.acls.domain.BasePermission.ADMINISTRATION}'>
-
-								<a class="btn btn-primary pull-right"
-									href="${createLink(action:'edit', id:userGroupInstance.id)}">
-									Edit Group </a>
-
-								<a class="btn btn-danger btn-primary pull-right"
-									style="margin-right: 5px; margin-bottom: 10px;"
-									href="${createLink(action:'flagDeleted', id:userGroupInstance.id)}"
-									onclick="return confirm('${message(code: 'default.observatoin.delete.confirm.message', default: 'This group will be deleted. Are you sure ?')}');">Delete
-									Group </a>
-							</sec:permitted>
-						</div>
 					</div>
 				</div>
 				
 				<g:if test="${flash.message }">
-					<div class="span12 message alert">
+					<div class="message alert">
 						${flash.message}
 					</div>
 				</g:if>
 				
 				<div>
-				<div class="span4 sidebar left-sidebar">
-					
-					<div class="super-section">
-						<div class="section">
-							<h5><i class="icon-user"></i>Founders</h5>
-							<g:each in="${[]}" var="sUser">
-								<g:link controller="SUser" action="show" id="${sUser.id}">${sUser.name}</g:link>
-							</g:each>
-						</div>
-				
-						<div class="section">
-							<h5><i class="icon-user"></i>Members</h5>
-							<g:each in="${userGroupInstance.members}" var="sUser">
-								<g:link controller="SUser" action="show" id="${sUser.id}">${sUser.name}</g:link>,
-							</g:each>
-						</div>
-					</div>
-					
-					<div class="super-section">
-						<div class="section">
-							<uGroup:showAllTags model="['tagFilterByProperty':'All' , 'params':params, 'isAjaxLoad':true]" />
-						</div>	
-					</div>
-					
-					<div class="super-section">
-						<div class="section">
-							<div class="prop">
-								<span class="name"><i class="icon-time"></i>Founded</span>
-								<obv:showDate
-									model="['userGroupInstance':userGroupInstance, 'propertyName':'foundedOn']" /> </div>
-						</div>
-					</div>
-										
-					<div class="super-section">
-						<div class="section">
-							<g:link action="aboutUs">More about us here</g:link> or<br/>
-							<g:link action="contactUs">Contact us here</g:link>
-						</div>
-					</div>
-					
-				</div>
-				
-				<div class="super-section span8" style="width:580px">
+					<uGroup:showSidebar/>
+				<div class="super-section userGroup-section">
 					<div class="description notes_view">
 						${userGroupInstance.description}
-					</div>					
+					</div>
+				</div>
+				
+				<div class="super-section userGroup-section">
+					<div class="section">
+							<h5>Activity Stream</h5>
+					</div>						
 				</div>
 				</div>
 				

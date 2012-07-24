@@ -296,15 +296,6 @@ class Observation implements Taggable{
 		}
 	}
 
-	def setUserGroups (List userGroups) {
-		userGroups.each {
-			def userGroup = UserGroup.read(Long.parseLong(it+""));
-			if(userGroup) {
-				this.addToUserGroups(userGroup)
-			}
-		}
-	}
-
 	String fetchSpeciesCall(){
 		return maxVotedReco ? maxVotedReco.name : "Unknown"
 	}

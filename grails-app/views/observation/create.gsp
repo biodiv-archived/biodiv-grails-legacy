@@ -103,6 +103,9 @@ input.dms_field {
 .btn .combobox-clear {
     margin-top: 12px;
 }
+#ui-datepicker-div {
+	width: 16%;
+}
 </style>
 </head>
 <body>
@@ -325,7 +328,7 @@ input.dms_field {
 									default="Observed on" /></label>
 
 							<div class="controls textbox">
-								<input name="observedOn" type="date" id="observedOn"
+								<input name="observedOn" type="text" id="observedOn"
 									value="${observationInstance?.observedOn?.format('dd/MM/yyyy')}"
 									placeholder="Select date of observation (dd/MM/yyyy)" />
 								
@@ -432,7 +435,7 @@ input.dms_field {
 									code="observation.latitude.label"
 									default="Latitude" /> </label>
 	                            <div class="controls textbox">             
-	                                <!--div class="location_picker_value" id="latitude"></div>
+	                                <!-- div class="location_picker_value" id="latitude"></div>
 	                                <input id="latitude_field" type="hidden" name="latitude"></input-->
 	                                <input class="degree_field" id="latitude_field" type="text" name="latitude"></input>
 	                                <input class="dms_field" id="latitude_deg_field" type="text" name="latitude_deg" placeholder="deg"></input>
@@ -482,7 +485,7 @@ input.dms_field {
 	            </div>    
       
 					<div class="span12 super-section"  style="clear: both">
-						<div class="section" style="position: relative; overflow: visible;">
+						<div class="section" style="position: relative; overflow: visible;"
 							<h3>Describe your observation!</h3>
 							<div class="span6 block">
 								<!--label for="notes"><g:message code="observation.notes.label" default="Notes" /></label-->
@@ -515,6 +518,19 @@ input.dms_field {
 								</div>
 							</div>
 							
+							<uGroup:isUserGroupMember>
+								<div class="span6 block sidebar-section" style="margin:0px 0px 20px -10px;">
+									<h5><label><i
+										class="icon-tags"></i>Post to Groups </label>
+									</h5>
+									<div>
+										<ul id="userGroups" name="userGroups" style="list-style:none;">
+											<uGroup:getCurrentUserUserGroups/>
+										</ul>
+									</div>
+								</div>
+							</uGroup:isUserGroupMember>
+								
 							<sUser:isFBUser>
 								<div class="span6 sidebar-section block" style="margin-left:-10px;">
 									<div class="create_tags" >
@@ -524,6 +540,8 @@ input.dms_field {
 									</div>
 								</div>
 							</sUser:isFBUser>
+							
+							
 							
 					</div>
 					</div>
@@ -777,7 +795,11 @@ input.dms_field {
 		$("#image_"+imageId).remove();
 	}
 	
-	$( "#observedOn" ).datepicker({ dateFormat: 'dd/mm/yy' });
+	$( "#observedOn" ).datepicker({ 
+			changeMonth: true,
+			changeYear: true,
+			dateFormat: 'dd/mm/yy' 
+	});
 	
 </r:script>
 </body>

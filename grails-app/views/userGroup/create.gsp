@@ -60,14 +60,6 @@
     color: #444444;
 }
 
-#help-identify {
-	height: 0;
-    left: 300px;
-    padding: 0;
-    position: relative;
-    top: -35px;
-}
-
 .left-indent {
 	margin-left:100px;
 }
@@ -187,7 +179,7 @@ display: none;
 								</div>
 							</div>
 							
-							<div
+							<!-- div
 								class="row control-group left-indent ${hasErrors(bean: userGroupInstance, field: 'members', 'error')}">
 								<label for="members" class="control-label"><g:message
 										code="userGroup.members.label" default="Invite Members" /> </label>
@@ -197,7 +189,7 @@ display: none;
 										<input type="hidden" name="memberUserIds" id="memberUserIds" />
 									</div>
 								</div>
-							</div>
+							</div-->
 						</div>
 					</div>
 					
@@ -214,12 +206,12 @@ display: none;
 						<div class="section"
 							style="position: relative; overflow: visible;">
 							<h3>Additional Information</h3>
-							<div class="span6 block">
+							<div class="span6 block ${hasErrors(bean: userGroupInstance, field: 'description', 'error')}">
 								<!--label for="notes"><g:message code="observation.notes.label" default="Notes" /></label-->
 								<h5><label><i
 									class="icon-pencil"></i>Description </label><br />
 								</h5>
-								<div class="section-item" style="margin-right: 10px;">
+								<div class="section-item" >
 										<!-- g:textArea name="description" rows="10" value=""
 										class="text ui-corner-all" /-->
 										<ckeditor:config var="toolbar_editorToolbar">
@@ -290,13 +282,21 @@ $(document).ready(function() {
 		usersUrl : '${createLink(controller:'SUser', action: 'terms')}'
 	});
 	
-	var members_autofillUsersComp = $("#userAndEmailList_${members_autofillUsersId}").autofillUsers({
-		usersUrl : '${createLink(controller:'SUser', action: 'terms')}'
-	});
+	<g:each in="${userGroupInstance?.getFounders()}" var="user">
+		founders_autofillUsersComp[0].addUserId({'item':{'userId':'${user.id}', 'value':'${user.name}'}});
+	</g:each>
 	
+<%--	var members_autofillUsersComp = $("#userAndEmailList_${members_autofillUsersId}").autofillUsers({--%>
+<%--		usersUrl : '${createLink(controller:'SUser', action: 'terms')}'--%>
+<%--	});--%>
+<%--	--%>
+<%--	<g:each in="${userGroupInstance?.getMembers()}" var="user">--%>
+<%--		members_autofillUsersComp[0].addUserId('item':{{'userId':'${user.id}', 'value':'${user.name}'}});--%>
+<%--	</g:each>--%>
+<%--	--%>
 	 $("#createGroupSubmit").click(function(){
 		$('#founderUserIds').val(founders_autofillUsersComp[0].getEmailAndIdsList().join(","));
-		$('#memberUserIds').val(members_autofillUsersComp[0].getEmailAndIdsList().join(","));
+		//$('#memberUserIds').val(members_autofillUsersComp[0].getEmailAndIdsList().join(","));
 		var tags = $("ul[name='tags']").tagit("tags");
         	$.each(tags, function(index){
         		var input = $("<input>").attr("type", "hidden").attr("name", "tags."+index).val(this);
