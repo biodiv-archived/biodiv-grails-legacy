@@ -316,13 +316,13 @@ class ObservationController {
 				Utils.populateHttpServletRequestParams(request, rs);
 				def resourcesInfo = [];
 				def rootDir = grailsApplication.config.speciesPortal.observations.rootDir
-				File obvDir;
+				File obvDir 
 				def message;
 
 				if(!params.resources) {
 					message = g.message(code: 'no.file.attached', default:'No file is attached')
 				}
-
+				
 				params.resources.each { f ->
 					log.debug "Saving observation file ${f.originalFilename}"
 
@@ -362,11 +362,12 @@ class ObservationController {
 								obvDir = new File(obvDir, UUID.randomUUID().toString());
 								obvDir.mkdir();
 							} else {
-								obvDir = new File(params.obvDir);
+								obvDir = new File(rootDir, params.obvDir);
+								obvDir.mkdir();
 							}
 						}
 
-						File file = new File(obvDir, Utils.cleanFileName(f.originalFilename));
+						File file = observationService.getUniqueFile(obvDir, Utils.cleanFileName(f.originalFilename));
 						f.transferTo( file );
 						ImageUtils.createScaledImages(file, obvDir);
 						resourcesInfo.add([fileName:file.name, size:f.size]);
@@ -1192,6 +1193,5 @@ class ObservationController {
 		res["website"] = u.website
 		render res as JSON
 	}
-	
-	
+		
 }

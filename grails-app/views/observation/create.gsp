@@ -547,9 +547,11 @@ input.dms_field {
 				
 
             </form>
-           
-            
-			<form id="upload_resource" enctype="multipart/form-data"
+           <%
+				def obvTmpFileName = observationInstance?.resource?.iterator()?.next()?.fileName
+				def obvDir = obvTmpFileName ?  obvTmpFileName.substring(0, obvTmpFileName.lastIndexOf("/")) : ""
+	       %>
+            <form id="upload_resource" enctype="multipart/form-data"
 				title="Add a photo for this observation"
                                 method="post"
 				class="${hasErrors(bean: observationInstance, field: 'resource', 'errors')}">
@@ -557,6 +559,7 @@ input.dms_field {
 				<!-- TODO multiple attribute is HTML5. need to chk if this gracefully falls back to default in non compatible browsers -->
 				<input type="file" id="attachFiles" name="resources"
 					accept="image/*" multiple/> <span class="msg" style="float: right"></span>
+				<input type="hidden" name='obvDir' value="${obvDir}" />
 			</form>
 
                 </div>
@@ -656,6 +659,10 @@ input.dms_field {
 				$(form).find("span.msg").html("");
 				var rootDir = '${grailsApplication.config.speciesPortal.observations.serverURL}'
 				var obvDir = $(responseXML).find('dir').text();
+				var obvDirInput = $('#upload_resource input[name="obvDir"]');
+				if(!obvDirInput.val()){
+					$(obvDirInput).val(obvDir);
+				}
 				var images = []
 				var metadata = $(".metadata");
 				var i = 0;
