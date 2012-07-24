@@ -576,7 +576,7 @@ class ObservationService {
 			activeFilters["bounds"] = params.bounds
 		}
 
-		def orderByClause = " order by obv." + (params.sort ? params.sort : "lastRevised") +  " desc"
+		def orderByClause = " order by obv." + (params.sort ? params.sort : "lastRevised") +  " desc, obv.id asc"
 
 		if(isMapView) {
 			query = mapViewQuery + filterQuery + orderByClause
