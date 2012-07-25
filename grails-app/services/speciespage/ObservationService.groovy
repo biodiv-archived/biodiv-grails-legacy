@@ -582,7 +582,9 @@ class ObservationService {
 			query = mapViewQuery + filterQuery + orderByClause
 		} else {
 			query += filterQuery + orderByClause
+			activeFilters["max"] = max
 			queryParams["max"] = max
+			activeFilters["offset"] = offset
 			queryParams["offset"] = offset
 		}
 

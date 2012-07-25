@@ -58,7 +58,7 @@
 	<%activeFilters['loadMore'] = true;%>
 	<div class="paginateButtons" style="visibility: hidden; clear: both">
 		<g:paginate total="${observationInstanceTotal}" action="${params.action}"
-			 params="${activeFilters}" />
+		max="${queryParams.max}" params="${activeFilters}" />
 	</div>
 	
 
