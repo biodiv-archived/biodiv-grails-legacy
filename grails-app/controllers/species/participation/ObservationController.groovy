@@ -99,7 +99,7 @@ class ObservationController {
 		//storing this filtered obvs ids list in session for next and prev links
 		//http://grepcode.com/file/repo1.maven.org/maven2/org.codehaus.groovy/groovy-all/1.8.2/org/codehaus/groovy/runtime/DefaultGroovyMethods.java
 		//returns an arraylist and invalidates prev listing result
-		if(params.append) {
+		if(params.append?.toBoolean()) {
 			session["obv_ids_list"].addAll(observationInstanceList.collect {it.id});
 		} else {
 			session["obv_ids_list_params"] = params.clone();
@@ -251,6 +251,8 @@ class ObservationController {
 			log.debug "Fetching observations list as its not present in session "
 			runLastListQuery(lastListParams);
 		}
+
+		long noOfObvs = session["obv_ids_list"].size();
 		
 		log.debug "Current ids list in session ${session['obv_ids_list']} and position ${pos}";
 		def nextObservationId = (pos+1 < session["obv_ids_list"].size()) ? session["obv_ids_list"][pos+1] : null;
@@ -258,14 +260,18 @@ class ObservationController {
 			lastListParams.put("append", true);
 			def max = Math.min(lastListParams.max ? lastListParams.int('max') : 9, 100)
 			def offset = lastListParams.offset ? lastListParams.int('offset') : 0
-			lastListParams.offset = offset + max;
+			lastListParams.offset = offset + session["obv_ids_list"].size();
 			log.debug "Fetching new page of observations using params ${lastListParams}";
 			runLastListQuery(lastListParams);
+			lastListParams.offset = offset;
 			nextObservationId = (pos+1 < session["obv_ids_list"].size()) ? session["obv_ids_list"][pos+1] : null;
 		}
 		def prevObservationId = pos > 0 ? session["obv_ids_list"][pos-1] : null;
 		
-		lastListParams.isGalleryUpdate = false;
+		lastListParams.remove('isGalleryUpdate');
+		lastListParams.remove("append");
+		lastListParams['max'] = noOfObvs;
+		lastListParams['offset'] = 0;
 		return ['prevObservationId':prevObservationId, 'nextObservationId':nextObservationId, 'lastListParams':lastListParams];
 		}
 	}
@@ -323,13 +329,13 @@ class ObservationController {
 				Utils.populateHttpServletRequestParams(request, rs);
 				def resourcesInfo = [];
 				def rootDir = grailsApplication.config.speciesPortal.observations.rootDir
-				File obvDir;
+				File obvDir 
 				def message;
 
 				if(!params.resources) {
 					message = g.message(code: 'no.file.attached', default:'No file is attached')
 				}
-
+				
 				params.resources.each { f ->
 					log.debug "Saving observation file ${f.originalFilename}"
 
@@ -369,11 +375,12 @@ class ObservationController {
 								obvDir = new File(obvDir, UUID.randomUUID().toString());
 								obvDir.mkdir();
 							} else {
-								obvDir = new File(params.obvDir);
+								obvDir = new File(rootDir, params.obvDir);
+								obvDir.mkdir();
 							}
 						}
 
-						File file = new File(obvDir, Utils.cleanFileName(f.originalFilename));
+						File file = observationService.getUniqueFile(obvDir, Utils.cleanFileName(f.originalFilename));
 						f.transferTo( file );
 						ImageUtils.createScaledImages(file, obvDir);
 						resourcesInfo.add([fileName:file.name, size:f.size]);
@@ -1179,6 +1186,5 @@ class ObservationController {
 		res["website"] = u.website
 		render res as JSON
 	}
-	
-	
+		
 }

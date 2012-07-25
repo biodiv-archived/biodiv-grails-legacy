@@ -404,6 +404,7 @@ class ObservationService {
 	}
 
 
+
 	Map findAllTagsSortedByObservationCount(int max){
 		def sql =  Sql.newInstance(dataSource);
 		//query with observation delete handle
@@ -575,7 +576,7 @@ class ObservationService {
 			activeFilters["bounds"] = params.bounds
 		}
 
-		def orderByClause = " order by obv." + (params.sort ? params.sort : "lastRevised") +  " desc"
+		def orderByClause = " order by obv." + (params.sort ? params.sort : "lastRevised") +  " desc, obv.id asc"
 
 		if(isMapView) {
 			query = mapViewQuery + filterQuery + orderByClause
@@ -833,5 +834,27 @@ class ObservationService {
 		
 		
 		return [responseHeader:responseHeader, observationInstanceList:instanceList, observationInstanceTotal:noOfResults, queryParams:queryParams, activeFilters:activeFilters, tags:facetResults, totalObservationIdList:totalObservationIdList]
+	}
+	
+	File getUniqueFile(File root, String fileName){
+		File imageFile = new File(root, fileName);
+		
+		if(!imageFile.exists()) {
+			return imageFile
+		}
+		
+		int i = 0;
+		int duplicateFileLimit = 20
+		while(++i < duplicateFileLimit){
+			def newFileName = "" + i + "_" + fileName
+			File newImageFile = new File(root, newFileName);
+			
+			if(!newImageFile.exists()){
+				return newImageFile
+			}
+			
+		}
+		log.error "Too many duplicate files $fileName"
+		return imageFile
 	}
 }

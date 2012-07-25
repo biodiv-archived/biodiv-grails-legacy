@@ -13,7 +13,7 @@ import species.utils.ImageUtils;
 
 class Species {
 
-	String title;    
+	String title;
 	String guid;
 	TaxonomyDefinition taxonConcept;
 	Resource reprImage;

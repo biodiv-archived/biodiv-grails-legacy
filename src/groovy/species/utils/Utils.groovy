@@ -5,6 +5,7 @@ import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
@@ -12,6 +13,7 @@ import java.util.Map;
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.logging.LogFactory;
+import org.codehaus.groovy.grails.validation.routines.UrlValidator
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
@@ -141,12 +143,9 @@ class Utils {
 	}
 
 	static boolean isURL(String str) {
-		try {
-			URL url = new URL(str);
-		} catch (MalformedURLException e) {
-			return false;
-		}
-		return true;
+		String defaultUrlPrefix = "http://"; 
+		UrlValidator urlValidator = new UrlValidator();
+		return urlValidator.isValid(str) || urlValidator.isValid(defaultUrlPrefix + str);
 	}
 
 

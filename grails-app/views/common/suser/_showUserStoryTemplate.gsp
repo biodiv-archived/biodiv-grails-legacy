@@ -21,8 +21,8 @@
 			<div>
 				<i class="icon-road"></i> 
 				<g:if test="${Utils.isURL(userInstance.website) }">
-					<a target="blank"
-					href="${fieldValue(bean: userInstance, field: 'website')}"> ${fieldValue(bean: userInstance, field: 'website')}
+					<a target="_blank"
+					href="${userInstance.getWebsiteLink()}"> ${fieldValue(bean: userInstance, field: 'website')}
 				</a>
 				</g:if>
 				<g:else>${fieldValue(bean: userInstance, field: 'website')}
