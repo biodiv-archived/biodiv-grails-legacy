@@ -234,13 +234,36 @@ $(document).ready(function(){
 	eatCookies();
 });
 
+if (typeof String.prototype.startsWith != 'function') {
+	  // see below for better implementation!
+	  String.prototype.startsWith = function (str){
+	    return this.indexOf(str) == 0;
+	  };
+	}
+
 function eatCookies() {
+	
+	var hashString = window.location.hash.substring(1)
 	if ($.cookie("observation_listing") == "list") {
+		if(!hashString.startsWith('l')) {
+			if(hashString.startsWith('g')) {
+				window.location.hash = "l"+hashString.substring(1);
+			} else if(hashString){
+				window.location.hash = "l"+hashString;
+			}
+		}
 		$('.list_view').show();
 		$('.grid_view').hide();
 		$('.grid_view_bttn').removeClass('active');
 		$('.list_view_bttn').addClass('active');
 	} else {
+		if(!hashString.startsWith('g')) {
+			if(hashString.startsWith('l')) {
+				window.location.hash = "g"+hashString.substring(1);
+			} else if(hashString){
+				window.location.hash = "g"+hashString;
+			}
+		}
 		$('.grid_view').show();
 		$('.list_view').hide();
 		$('.grid_view_bttn').addClass('active');

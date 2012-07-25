@@ -112,7 +112,7 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 								id="${prevObservationId}" params="['pos':params.int('pos')-1]">Prev Observation</g:link>
 							<g:link class="pull-right  btn ${nextObservationId?:'disabled'}"  action="show" controller="observation"
 								id="${nextObservationId}" params="['pos':params.int('pos')+1]">Next Observation</g:link>
-							<g:link class="btn" action="${lastListParams.action}" controller="observation" params="${lastListParams}" style="text-align: center;display: block;width: 125px;margin: 0 auto;">List Observations</g:link>
+							<g:link class="btn" action="${lastListParams.action}" controller="observation" fragment="${params.pos}" params="${lastListParams}" style="text-align: center;display: block;width: 125px;margin: 0 auto;">List Observations</g:link>
 							
 						</div>
 					</g:if>

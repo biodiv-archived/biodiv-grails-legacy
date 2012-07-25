@@ -238,6 +238,8 @@ class ObservationController {
 			log.debug "Fetching observations list as its not present in session "
 			runLastListQuery(lastListParams);
 		}
+
+		long noOfObvs = session["obv_ids_list"].size();
 		
 		log.debug "Current ids list in session ${session['obv_ids_list']} and position ${pos}";
 		def nextObservationId = (pos+1 < session["obv_ids_list"].size()) ? session["obv_ids_list"][pos+1] : null;
@@ -255,8 +257,8 @@ class ObservationController {
 		
 		lastListParams.remove('isGalleryUpdate');
 		lastListParams.remove("append");
-		lastListParams['max'] = session["obv_ids_list"].size();
-		lastListParams['offset'] = 0;		
+		lastListParams['max'] = noOfObvs;
+		lastListParams['offset'] = 0;
 		return ['prevObservationId':prevObservationId, 'nextObservationId':nextObservationId, 'lastListParams':lastListParams];
 		}
 	}

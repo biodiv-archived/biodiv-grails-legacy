@@ -11,7 +11,7 @@
 	</div>
 	
 	<div class="mainContentList">
-		<div class="mainContent">
+		<div class="mainContent" name="p${params?.offset}">
 		
 			<%
 				def observationPos = (queryParams?.offset != null) ? queryParams.offset : params?.offset
@@ -55,10 +55,10 @@
 		</div>
 	</g:if>
 	
-	<%activeFilters['loadMore'] = true %>
+	<%activeFilters['loadMore'] = true;%>
 	<div class="paginateButtons" style="visibility: hidden; clear: both">
 		<g:paginate total="${observationInstanceTotal}" action="${params.action}"
-			max="${queryParams.max}" params="${activeFilters}" />
+			 params="${activeFilters}" />
 	</div>
 	
 
