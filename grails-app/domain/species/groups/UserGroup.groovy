@@ -18,6 +18,8 @@ class UserGroup implements Taggable {
 
 	String name;
 	String description;
+	String aboutUs;
+	String contactEmail;
 	String webaddress;
 	Date foundedOn = new Date();
 	boolean isDeleted = false;
@@ -35,11 +37,13 @@ class UserGroup implements Taggable {
 		name nullable: false, blank:false, unique:true
 		webaddress nullable: false, blank:false, unique:true
 		description nullable: false, blank:false
+		contactEmail nullable:false, blank:false, email:true
 	}
 
 	static mapping = {
 		version  false;
 		description type:'text';
+		aboutUs type:'text';
 	}
 
 	Resource icon(ImageType type) {

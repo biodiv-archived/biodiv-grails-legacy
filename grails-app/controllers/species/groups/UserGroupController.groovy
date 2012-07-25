@@ -351,6 +351,12 @@ class UserGroupController {
 		render (['msg':'Your presence is important to us. If you still want to leave this group please try again.']as JSON);
 	}
 	
+	def aboutUs = {
+		def userGroupInstance = findInstance()
+		if (!userGroupInstance) return;
+		
+		return ['userGroupInstance':userGroupInstance]
+	}
 
 }
 

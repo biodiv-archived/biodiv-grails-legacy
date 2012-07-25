@@ -231,6 +231,24 @@ display: none;
 								</div>
 								
 							</div>
+							<div class="span6 block ${hasErrors(bean: userGroupInstance, field: 'aboutUs', 'error')}">
+								<!--label for="notes"><g:message code="observation.notes.label" default="Notes" /></label-->
+								<h5><label><i
+									class="icon-pencil"></i>AboutUs </label><br />
+								</h5>
+								<div class="section-item" >
+										<ckeditor:editor name="aboutUs" height="200px"
+											toolbar="editorToolbar">
+											${userGroupInstance?.aboutUs}
+										</ckeditor:editor>
+										<div class="help-inline">
+											<g:hasErrors bean="${userGroupInstance}" field="aboutUs">
+												<g:message code="userGroup.aboutUs.invalid" />
+											</g:hasErrors>
+										</div>
+								</div>
+								
+							</div>
 							<div class="sidebar-section block">
 								<h5><label><i
 									class="icon-tags"></i>Tags <small><g:message code="observation.tags.message" default="" /></small></label>
@@ -242,6 +260,27 @@ display: none;
 										</g:each>
 									</ul>
 								</div>
+							</div>
+							<div class="sidebar-section block">
+								<h5><label><i
+									class="icon-envelop"></i>Contact Us at <small><g:message code="observation.contactUs.message" default="Please provide a single email address" /></small></label>
+								</h5>
+								<div
+								class="control-group ${hasErrors(bean: userGroupInstance, field: 'contactEmail', 'error')}">
+								<label class="control-label" for="contactEmail"><g:message
+										code='user.password.label' default='Contact at Email' /> </label>
+								<div class="controls">
+									<input class="input-large" id="contactEmail"
+										value="${userGroupInstance?.contactEmail}" name="contactEmail"
+										placeholder="Enter a single email address where you can be contacted...">
+
+									<g:hasErrors bean="${userGroupInstance}" field="contactEmail">
+										<div class="help-inline">
+											<g:renderErrors bean="${userGroupInstance}" field="contactEmail" />
+										</div>
+									</g:hasErrors>
+								</div>
+							</div>
 							</div>
 						</div>
 					</div>

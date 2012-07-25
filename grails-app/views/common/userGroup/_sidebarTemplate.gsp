@@ -46,7 +46,7 @@
 		<div class="section">
 			<g:link action="aboutUs">More about us here</g:link>
 			or<br />
-			<g:link action="contactUs">Contact us here</g:link>
+			<g:link action="aboutUs" fragment="contactEmail">Contact us here</g:link>
 		</div>
 	</div>
 
