@@ -1,0 +1,120 @@
+package species.participation
+
+class CommentService {
+
+	static transactional = false
+	def grailsApplication
+	
+	def addComment(params){
+		Comment c = new Comment(author:params.author, body:params.commentBody.trim(), commentHolderId:params.commentHolderId, \
+						commentHolderType:params.commentHolderType, rootHolderId:params.rootHolderId, rootHolderType:params.rootHolderType);
+
+		if(!c.save(flush:true)){
+			c.errors.allErrors.each { log.error it }
+			return null
+		}else{
+			try {
+				getDomainObject(params.commentHolderType, params.commentHolderId).onAddComment(c)
+			}catch (MissingMethodException e) {}
+			return c
+		}
+	}
+
+	def removeComment(params){
+		Comment comment = Comment.get(params.commentId.toLong());
+		try{
+			comment.delete(flush:true, failOnError:true)
+			return true
+		}catch(e) {
+			e.printStackTrace()
+		}
+		return false
+	}
+
+
+	def getComments(params){
+		setDefaultRange(params)
+		return Comment.fetchComments(getDomainObject(params.commentHolderType, params.commentHolderId), getDomainObject(params.rootHolderType, params.rootHolderId), params.max, params.refTime, params.timeLine)
+	}
+
+	def getSuperComments(params){
+		setDefaultRange(params)
+		return Comment.fetchSuperComments(getDomainObject(params.rootHolderType, params.rootHolderId), params.max, params.refTime, params.timeLine)
+	}
+	
+	def likeComment(params){
+		Comment comment = Comment.get(params.commentId.toLong());
+		comment.addToLikes(params.author)
+		if(!comment.save(flush:true)){
+			comment.errors.allErrors.each { log.error it }
+			return false
+		}else{
+			return true
+		}
+	}
+	
+	private getDomainObject(className, id){
+		id = id.toLong()
+		//return Class.forName(className).read(id)
+		return grailsApplication.getArtefact("Domain",className)?.getClazz()?.read(id)
+	}
+
+	private setDefaultRange(params){
+		params.max = params.max ? params.max.toInteger() : 3
+		params.offset = params.offset ? params.offset.toLong() : 0
+	}
+
+
+	//
+	//	private static final String OBSERVATION = "species.participation.Observation"
+	//	private static final String COMMENT = "species.participation.Comment"
+	//
+	//
+	//
+	//
+	//
+	//	def getCommentHolder(params){
+	//		def id = params.commentOwnerId.toLong();
+	//		String commentOwnerType = params.commentOwnerType
+	//
+	//		switch (commentOwnerType) {
+	//		case OBSERVATION:
+	//			return Observation.get(id);
+	//		case COMMENT:
+	//			return Comment.get(id);
+	//		default:
+	//			log.error "Invalid commentOwnerType ==  $commentOwnerType";
+	//		}
+	//		return null;
+	//	}
+	//
+	//	def addDummyReplyComment(Comment c){
+	//		def newC =  new Comment(author:c.author, body:" dummy comment");
+	//		c.addToComments(newC);
+	//		if(!c.save(flush:true)){
+	//			c.errors.allErrors.each{log.error it}
+	//		}
+	//
+	//		def newC1 =  new Comment(author:c.author, body:" dummy to dummy comment");
+	//		newC.addToComments(newC1);
+	//		if(!newC.save(flush:true)){
+	//			newC.errors.allErrors.each{log.error it}
+	//		}
+	//
+	//
+	//	}
+	//
+	//	def getParentDivId(c){
+	//		println "============== c in taglib " + c.class.getCanonicalName()
+	//		switch (c.class.getCanonicalName()) {
+	//			case OBSERVATION:
+	//				return "observation_comment_" + c.id;
+	//			case COMMENT:
+	//				return "comment_" + c.id;
+	//			default:
+	//				log.error "Invalid commentType";
+	//			}
+	//			return null;
+	//	}
+
+}
