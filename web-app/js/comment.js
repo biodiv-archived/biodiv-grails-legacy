@@ -24,7 +24,7 @@ function postComment(postComp, url) {
 	var textComp = $(postComp).children('textarea[name="commentBody"]');
 	if($.trim(textComp.val()) === ""){
 		$(textComp).addClass('comment-textEmpty');
-		$(textComp).next().show();
+		$(textComp).next('span').show();
 		return false;
 	}
 	
@@ -53,7 +53,7 @@ function postComment(postComp, url) {
  	});
 	
 	$(textComp).removeClass('comment-textEmpty');
-	$(textComp).next().hide();
+	$(textComp).next('span').hide();
 	return false;
 }
 
@@ -68,6 +68,8 @@ function loadOlderComment(targetComp, commentType, commentHolderId, commentHolde
 			$(targetComp).children('input[name="olderTimeRef"]').val(data.olderTimeRef);
 			if(data.remainingCommentCount == 0){
 				$(targetComp).children('a').hide();	
+			}else{
+				$(targetComp).children('a').text("Show " + data.remainingCommentCount + " older comments >>");
 			}
 		}, error: function(xhr, status, error) {
 			alert(xhr.responseText);
