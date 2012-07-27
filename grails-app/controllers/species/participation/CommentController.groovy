@@ -33,12 +33,14 @@ class CommentController {
 
 	def getComments = {
 		log.debug params;
-		def comments = getComments(params)
+		def comments = commentService.getComments(params);
 		def showCommentListHtml = g.render(template:"/common/comment/showCommentListTemplate", model:[comments:comments]);
 		def olderTimeRef = (comments) ? (comments.last().lastUpdated.time.toString()) : null
-		def result = [showCommentListHtml:showCommentListHtml, olderTimeRef:olderTimeRef]
+		def remainingCommentCount = (comments) ? getRemainingCommentCount(comments.last().lastUpdated.time.toString(), params) : 0
+		def result = [showCommentListHtml:showCommentListHtml, olderTimeRef:olderTimeRef, remainingCommentCount:remainingCommentCount]
 		render result as JSON
 	}
+	
 
 	@Secured(['ROLE_USER'])
 	def likeComment = {
@@ -53,20 +55,15 @@ class CommentController {
 		render "To do edit"
 	}
 	
-	private List getComments(params){
-		def comments;
-		if(params.commentType && (params.commentType == "context")){
-			comments = commentService.getComments(params)
-		}else{
-			comments = commentService.getSuperComments(params)
-		}
-		return comments
-	}
-	
 	private getAllNewerComments(params){
 		params.max = 100
 		params.timeLine = "newer"
 		params.refTime = params.refTime ?: new Date().previous().time.toString()
-		return getComments(params)
+		return commentService.getComments(params)
+	}
+	
+	private getRemainingCommentCount(String refTime, params){
+		params.refTime = refTime
+		return commentService.getCount(params)
 	}
 }

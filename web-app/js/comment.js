@@ -21,6 +21,13 @@ function deleteComment(commentId, commentComp, url){
 }
 
 function postComment(postComp, url) {
+	var textComp = $(postComp).children('textarea[name="commentBody"]');
+	if($.trim(textComp.val()) === ""){
+		$(textComp).addClass('comment-textEmpty');
+		$(textComp).next().show();
+		return false;
+	}
+	
 	var targetComp = $(postComp).closest('.comment');
 	var refTime = $(targetComp).children('input[name="newerTimeRef"]').val();
 	$(postComp).ajaxSubmit({ 
@@ -39,10 +46,14 @@ function postComment(postComp, url) {
         	return false;
         },
         error:function (xhr, ajaxOptions, thrownError){
-        	var msg = $.parseJSON(xhr.responseText);
-       		alert("error " + msg);
+        	//successHandler is used when ajax login succedes
+        	var successHandler = this.success, errorHandler = undefined;
+        	handleError(xhr, ajaxOptions, thrownError, successHandler, errorHandler);
 		} 
  	});
+	
+	$(textComp).removeClass('comment-textEmpty');
+	$(textComp).next().hide();
 	return false;
 }
 
@@ -55,6 +66,9 @@ function loadOlderComment(targetComp, commentType, commentHolderId, commentHolde
 		success: function(data) {
 			$(targetComp).children('ul').append(data.showCommentListHtml);
 			$(targetComp).children('input[name="olderTimeRef"]').val(data.olderTimeRef);
+			if(data.remainingCommentCount == 0){
+				$(targetComp).children('a').hide();	
+			}
 		}, error: function(xhr, status, error) {
 			alert(xhr.responseText);
 	   	}

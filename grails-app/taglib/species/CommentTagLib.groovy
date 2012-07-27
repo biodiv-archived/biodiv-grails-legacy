@@ -34,10 +34,10 @@ class CommentTagLib {
 		model.commentType = model.commentType ?: "context"
 		if(model.commentType == "context"){
 			model.comments = Comment.fetchComments(model.commentHolder, model.rootHolder, 3, new Date().time.toString(), null)
-			model.totalCount = Comment.fetchCount(model.commentHolder, model.rootHolder)
+			model.totalCount = Comment.fetchCount(model.commentHolder, model.rootHolder, null, null)
 		}else{
-			model.comments =  Comment.fetchSuperComments(model.commentHolder, 3, new Date().time.toString(), null)
-			model.totalCount = Comment.fetchSuperCount(model.rootHolder)
+			model.comments =  Comment.fetchSuperComments(model.rootHolder, 3, new Date().time.toString(), null)
+			model.totalCount = Comment.fetchSuperCount(model.rootHolder, null, null)
 		}
 		model.newerTimeRef = (model.comments) ? (model.comments.first().lastUpdated.time.toString()) : null
 		model.olderTimeRef = (model.comments) ? (model.comments.last().lastUpdated.time.toString()) : null

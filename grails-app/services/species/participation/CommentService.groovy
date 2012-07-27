@@ -34,14 +34,23 @@ class CommentService {
 
 	def getComments(params){
 		setDefaultRange(params)
-		return Comment.fetchComments(getDomainObject(params.commentHolderType, params.commentHolderId), getDomainObject(params.rootHolderType, params.rootHolderId), params.max, params.refTime, params.timeLine)
-	}
-
-	def getSuperComments(params){
-		setDefaultRange(params)
-		return Comment.fetchSuperComments(getDomainObject(params.rootHolderType, params.rootHolderId), params.max, params.refTime, params.timeLine)
+		def rootHolder = getDomainObject(params.rootHolderType, params.rootHolderId)
+		def commentHolder = null
+		if(params.commentType && (params.commentType == "context")){
+			commentHolder = getDomainObject(params.commentHolderType, params.commentHolderId)
+		}
+		return Comment.fetchComments(commentHolder, rootHolder, params.max, params.refTime, params.timeLine)
 	}
 	
+	def getCount(params){
+		def rootHolder = getDomainObject(params.rootHolderType, params.rootHolderId)
+		def commentHolder = null
+		if(params.commentType && (params.commentType == "context")){
+			commentHolder = getDomainObject(params.commentHolderType, params.commentHolderId)
+		}
+		return Comment.fetchCount(commentHolder, rootHolder, params.refTime, params.timeLine)
+	}
+
 	def likeComment(params){
 		Comment comment = Comment.get(params.commentId.toLong());
 		comment.addToLikes(params.author)

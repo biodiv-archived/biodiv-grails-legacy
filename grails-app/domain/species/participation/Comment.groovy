@@ -37,7 +37,9 @@ class Comment{
 		body type:'text';
 	}
 
-	static int fetchCount(commentHolder, rootHolder){
+	static int fetchCount(commentHolder, rootHolder, refTime, timeLine){
+		timeLine = (timeLine)?:"older"
+		refTime = getDate(refTime)
 		if(commentHolder || rootHolder){
 			return Comment.withCriteria(){
 				projections {
@@ -52,6 +54,9 @@ class Comment{
 						eq('rootHolderId', rootHolder.id)
 						eq('rootHolderType', getType(rootHolder))
 					}
+					if(refTime){
+						(timeLine == "older") ? lt('lastUpdated', refTime) : gt('lastUpdated', refTime)
+					}
 				}
 			}[0]
 		}else{
@@ -59,10 +64,10 @@ class Comment{
 		}
 	}
 
-	static int fetchSuperCount(rootHolder){
-		return fetchCount(null, rootHolder)
+	static int fetchSuperCount(rootHolder, refTime, timeLine){
+		return fetchCount(null, rootHolder, refTime, timeLine)
 	}
-
+	
 
 	static fetchComments(commentHolder, rootHolder, max, refTime, timeLine){
 		timeLine = (timeLine)?:"older"
