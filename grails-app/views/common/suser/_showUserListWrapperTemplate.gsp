@@ -1,4 +1,4 @@
-
+	
 <!-- label class="control-label" for="username"><g:message
 								code='user.username.label' default='Username' />:</label-->
 
@@ -7,7 +7,7 @@
 <g:if test='${searched}'>
 	<div class="row">
 		<!-- main_content -->
-		<div class="list">
+		<div class="list ${(params.controller != 'userGroup')?'span12':'span6'}">
 			<div class="observations thumbwrap">
 				<%
 def queryParams = [username: username, enabled: enabled, accountExpired: accountExpired, accountLocked: accountLocked, passwordExpired: passwordExpired]
