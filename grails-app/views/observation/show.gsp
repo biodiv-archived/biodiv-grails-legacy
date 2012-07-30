@@ -189,9 +189,10 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 						
 					</div>
 			    	
-					<div class="comments-box sidebar_section" style="clear: both;">
-						<fb:comments href="${createLink(controller:'observation', action:'show', id:observationInstance.id, base:Utils.getDomainServerUrl(request))}"
-							num_posts="10" width="620" colorscheme="light"  notify="true"></fb:comments>
+					<div style="clear: both;">
+				    <comment:showAllComments model="['commentHolder':observationInstance, commentType:'super']" />
+<%--						<fb:comments href="${createLink(controller:'observation', action:'show', id:observationInstance.id, base:Utils.getDomainServerUrl(request))}"--%>
+<%--							num_posts="10" width="620" colorscheme="light"  notify="true"></fb:comments>--%>
 					</div>
 
 				</div>

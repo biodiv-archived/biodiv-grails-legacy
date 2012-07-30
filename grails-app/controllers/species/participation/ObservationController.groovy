@@ -910,8 +910,10 @@ class ObservationController {
 				}else{
 					log.debug " Overwriting old recommendation vote for user " + author.id +  " new reco name " + reco.name + " old reco name " + existingRecVote.recommendation.name
 					def msg = "${message(code: 'recommendations.overwrite.message', args: [existingRecVote.recommendation.name, reco.name])}"
-					if(!existingRecVote.delete(flush: true)){
-						existingRecVote.errors.allErrors.each { log.error it }
+					try{
+						existingRecVote.delete(flush: true,, failOnError:true)
+					}catch (Exception e) {
+						e.printStackTrace();
 					}
 					return [recVote:newRecVote, msg:msg]
 				}
@@ -1211,5 +1213,4 @@ class ObservationController {
 		res["website"] = u.website
 		render res as JSON
 	}
-
 }
