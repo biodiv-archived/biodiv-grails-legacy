@@ -7,25 +7,28 @@
 	<obv:showGroupFilter
 		model="['observationInstance':observationInstance]" />
 </div>
-<div class="tags_section span3" style="float: right;">
-	<g:if test="${params.action == 'search' }">
-		<obv:showAllTags
-			model="['tags':tags , 'count':tags?tags.size():0, 'isAjaxLoad':true]" />
-	</g:if>
-	<g:else>
-		<obv:showAllTags
-			model="['tagFilterByProperty':'All' , 'params':params, 'isAjaxLoad':true]" />
-	</g:else>
-</div>
+
+<g:if test="${showTags != false}">
+	<div class="tags_section span3" style="float: right;">
+		<g:if test="${params.action == 'search' }">
+			<obv:showAllTags
+				model="['tags':tags , 'count':tags?tags.size():0, 'isAjaxLoad':true]" />
+		</g:if>
+		<g:else>
+			<obv:showAllTags
+				model="['tagFilterByProperty':'All' , 'params':params, 'isAjaxLoad':true]" />
+		</g:else>
+	</div>
+</g:if>
 <div class="row">
 	<!-- main_content -->
-	<div class="list span9">
+	<div class="list ${(showTags != false)?'span9':''}">
 
 		<div class="observations thumbwrap">
 			<div class="observation">
 				<div>
 					<obv:showObservationFilterMessage
-						model="['observationInstanceTotal':observationInstanceTotal, 'queryParams':queryParams]" />
+						model="['observationInstanceList':observationInstanceList, 'observationInstanceTotal':observationInstanceTotal, 'queryParams':queryParams]" />
 				</div>
 				<div style="clear: both;"></div>
 				<!-- needs to be fixed -->
@@ -37,7 +40,7 @@
 							Map view <span class="caret"></span> </a>
 					</div>
 				</g:if>
-				<div class="btn-group" style="float: left; z-index: 10">
+				<div class="btn-group pull-left" style="z-index: 10">
 					<button id="selected_sort" class="btn dropdown-toggle"
 						data-toggle="dropdown" href="#" rel="tooltip"
 						data-original-title="Sort by">
@@ -83,8 +86,7 @@
 					</obv:showObservationsLocation>
 				</div>
 			</div>
-
-			<obv:showObservationsList />
+			<obv:showObservationsList  model="['totalObservationInstanceList':totalObservationInstanceList, 'observationInstanceList':observationInstanceList, 'observationInstanceTotal':observationInstanceTotal, 'queryParams':queryParams, 'activeFilters':activeFilters]"  />
 		</div>
 	</div>
 
@@ -99,12 +101,12 @@ $(document).ready(function() {
 		}
 	%>
 		"tagsLink":"${g.createLink(action: 'tags')}",
-		"queryParamsMax":"${params.queryParams?.max}"
+		"queryParamsMax":"${queryParams?.max}"
 	}
 });
 
 $( "#search" ).click(function() {                		
-	updateGallery(undefined, ${queryParams.max}, 0);
+	updateGallery(undefined, ${queryParams?.max}, 0);
 	return false;
 });
 </g:javascript>

@@ -8,6 +8,7 @@
 <meta name="layout" content="main" />
 <link rel="image_src"
 	href="${createLinkTo(file: gallImagePath, base:grailsApplication.config.speciesPortal.observations.serverURL)}" />
+<script src="http://maps.google.com/maps/api/js?sensor=true"></script>
 <r:require modules="userGroups_show, observations_list"/>
 <g:set var="entityName"
 	value="${userGroupInstance.name}" />
@@ -39,8 +40,16 @@
 					
 					<div class="super-section userGroup-section">
 						<div class="section">
+							<div class="page-header clearfix">
 								<h5>Observations</h5>
-								<obv:showObservationsList model="['observationInstanceList':observations, 'observationInstanceTotal':totalCount, 'queryParams':params]" />
+								<div class="btn-group pull-right" style="z-index:10;">
+									<uGroup:isAMember model="['userGroupInstance':userGroupInstance]">
+										<g:link controller="observation" action="create" params="['userGroup':userGroupInstance.id]" class="btn btn-large btn-info"><i
+											class="icon-plus"></i>Add an Observation</g:link>
+									</uGroup:isAMember>
+								</div>  
+							</div>
+							<obv:showObservationsListWrapper model="['totalObservationInstanceList':totalObservationInstanceList, 'observationInstanceList':observationInstanceList, 'observationInstanceTotal':observationInstanceTotal, 'queryParams':queryParams, 'activeFilters':activeFilters]" />
 						</div>						
 					</div>
 				</div>
@@ -48,19 +57,7 @@
 			</div>
 		</div>
 	</div>
-	<g:javascript>
-		$(document).ready(function(){
-			window.params = {
-			<%
-				params.each { key, value ->
-					println '"'+key+'":"'+value+'",'
-				}
-			%>
-				"tagsLink":"${g.createLink(action: 'tags')}",
-				"queryParamsMax":"${params.queryParams?.max}"
-			}
-		});
-	</g:javascript>
+	
 	<r:script>
 	</r:script>	
 </body>

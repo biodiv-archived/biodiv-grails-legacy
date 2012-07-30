@@ -6,7 +6,7 @@
 <html>
 <head>
 <meta property="og:type" content="article" />
-<meta property="og:title" content="${(!observationInstance.maxVotedSpeciesName?.equalsIgnoreCase('Unknown'))?observationInstance.maxVotedSpeciesName:'Help Identify'}"/>
+<meta property="og:title" content="${observationInstance.title()}"/>
 <meta property="og:url" content="${createLink(controller:'observation', action:'show', id:observationInstance.id, base:Utils.getDomainServerUrl(request))}" />
 <g:set var="fbImagePath" value="" />
 <%
@@ -221,6 +221,16 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 						</div>
 
 					</div>
+					
+					<div class="sidebar_section">
+						<h5>Groups</h5>
+						<div class="sidebar_section tile" style="clear: both">
+							<div class="title">This observation belongs to following groups</div>
+							<obv:showRelatedStory
+								model="['observationInstance':observationInstance, 'observationId': observationInstance.id, 'controller':'userGroup', 'action':'getRelatedUserGroups', 'id':'relatedGroups']" />
+						</div>
+					</div>
+					
 					<!-- obv:showTagsSummary model="['observationInstance':observationInstance]" /-->
 					<!-- obv:showObvStats  model="['observationInstance':observationInstance]"/-->
 

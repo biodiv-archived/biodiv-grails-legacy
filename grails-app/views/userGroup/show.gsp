@@ -39,52 +39,93 @@
 <link rel="image_src"
 	href="${createLinkTo(file: gallImagePath, base:grailsApplication.config.speciesPortal.observations.serverURL)}" />
 
-<g:set var="entityName"
-	value="${userGroupInstance.name}" />
-<title><g:message code="default.show.label" args="[userGroupInstance.name]" />
+<g:set var="entityName" value="${userGroupInstance.name}" />
+<title><g:message code="default.show.label"
+		args="[userGroupInstance.name]" />
 </title>
-<r:require modules="userGroups_show"/>
+<script src="http://maps.google.com/maps/api/js?sensor=true"></script>
+<r:require modules="userGroups_show,userGroups_list" />
 </head>
 <body>
 	<div class="container outer-wrapper">
 		<div class="row">
 			<div class="observation span12">
-				
+
 
 				<div class="page-header clearfix">
 					<div style="width: 100%;">
-						<uGroup:showHeader model=['userGroupInstance':userGroupInstance] />
+						<uGroup:showHeader model=[ 'userGroupInstance':userGroupInstance] />
 					</div>
 				</div>
-				
+
 				<g:if test="${flash.message }">
 					<div class="message alert">
 						${flash.message}
 					</div>
 				</g:if>
-				
+
 				<div>
-					<uGroup:showSidebar/>
+					<uGroup:showSidebar />
 					<div class="super-section userGroup-section">
 						<div class="description notes_view">
 							${userGroupInstance.description}
 						</div>
 					</div>
-					
+
 					<div class="super-section userGroup-section">
 						<div class="section">
-								<h5>Activity Stream</h5>
-						</div>						
+							<h5>Featured Observations</h5>
+							<obv:showRelatedStory
+								model="['observationId': userGroupInstance.id, 'controller':'userGroup', 'action':'getFeaturedObservations', 'id':'featuredObservations', 'filterProperty':'featuredObservations', 'resultController':'observation']" />
+						</div>
+					</div>
+
+					<div class="super-section userGroup-section">
+						<div class="section">
+							<h5>Active Members</h5>
+							<obv:showRelatedStory
+								model="['observationId': userGroupInstance.id, 'controller':'userGroup', 'action':'getFeaturedMembers', 'id':'featuredMembers', 'filterProperty':'featuredMembers', 'resultController':'SUser']" />
+						</div>
+					</div>
+
+					<div class="super-section userGroup-section">
+						<div class="section">
+							<h5>Activity Stream</h5>
+							<div id="map_view_bttn" class="btn-group">
+								<a class="btn btn-success dropdown-toggle"
+									data-toggle="dropdown" href="#"
+									onclick="$(this).parent().css('background-color', '#9acc57'); showMapView(); return false;">
+									Map view <span class="caret"></span> </a>
+							</div>
+							<div id="observations_list_map" class="observation"
+								style="clear: both; display: none;">
+								<uGroup:showActivityOnMap model="['userGroupInstance':userGroupInstance]"/>
+							</div>
+						</div>
 					</div>
 				</div>
-				
+
 			</div>
 		</div>
 	</div>
+	<g:javascript>
+		$(document).ready(function() {
+			window.params = {
+			<%
+				params.each { key, value ->
+					println '"'+key+'":"'+value+'",'
+				}
+			%>
+				"tagsLink":"${g.createLink(action: 'tags')}",
+				"queryParamsMax":"${queryParams?.max}"
+			}
+		});
+		
+	</g:javascript>
 	<r:script>
 		$(document).ready(function(){
-
+			showMapView();
 		});
-	</r:script>	
+	</r:script>
 </body>
 </html>

@@ -5,6 +5,7 @@ import org.springframework.security.acls.domain.PrincipalSid;
 import org.springframework.security.acls.model.Sid;
 import org.springframework.security.core.Authentication;
 
+import species.groups.UserGroup;
 import species.groups.UserGroupMemberRole;
 
 class UserGroupTagLib {
@@ -184,7 +185,21 @@ class UserGroupTagLib {
 	
 	def getCurrentUserUserGroups = {attrs, body ->
 		def user = springSecurityService.getCurrentUser();
-		out << render(template:"/common/userGroup/showCurrentUserUserGroupsTemplate", model:[userGroups:user.getUserGroups()]);
+		def userGroups = user.getUserGroups();
+		def result = [:]
+		if(attrs.model?.observationInstance && attrs.model.observationInstance.userGroups) {
+			//check if the obv already belongs to userGroup and disable the control for it not to submit again
+			def obvInUserGroups = attrs.model.observationInstance.userGroups.intersect(userGroups)
+			userGroups.removeAll(obvInUserGroups);
+			obvInUserGroups.each {
+				result[it] = true;
+			}
+		}
+		
+		userGroups.each {
+			result[it] = false;
+		}
+		out << render(template:"/common/userGroup/showCurrentUserUserGroupsTemplate", model:[userGroups:result]);
 	}
 	
 	def isUserGroupMember = { attrs, body->
@@ -218,5 +233,12 @@ class UserGroupTagLib {
 		//println aclUtilService.readAcl(attrs.model.userGroupInstance);
 		println "====="
 	}
-	
+
+	def showActivityOnMap = {attrs, body ->
+		def userGroupInstance = attrs.model?.userGroupInstance;
+		def result = userGroupService.getUserGroupObservations(userGroupInstance, [:], -1, -1, true)
+		def model = ['observationInstanceList':result?.observationInstanceList]
+		println model;
+		out<<render(template:"/common/observation/showObservationMultipleLocationTemplate", model:model);
+	}	
 }

@@ -25,12 +25,25 @@
 				</g:if>
 				
 				<div class="searchResults">
-					<obv:showObservationsListWrapper/>
+					<obv:showObservationsListWrapper />
 				</div>
 
 
 			</div>
 		</div>
 	</div>
+	<g:javascript>
+		$(document).ready(function() {
+			window.params = {
+			<%
+				params.each { key, value ->
+					println '"'+key+'":"'+value+'",'
+				}
+			%>
+				"tagsLink":"${g.createLink(action: 'tags')}",
+				"queryParamsMax":"${queryParams?.max}"
+			}
+		});
+	</g:javascript>
 </body>
 </html>

@@ -148,30 +148,6 @@ class Utils {
 		return urlValidator.isValid(str) || urlValidator.isValid(defaultUrlPrefix + str);
 	}
 
-
-	static Map getUnBlockedMailList(String userIdsAndEmailIds, request) {
-		Map result = new HashMap();
-		userIdsAndEmailIds.split(",").each{
-			String candidateEmail = it.trim();
-			if(candidateEmail.isNumber()){
-				SUser user = SUser.get(candidateEmail.toLong());
-				candidateEmail = user.email.trim();
-				if(user.allowIdentifactionMail){
-					result[candidateEmail] = generateLink("observation", "unsubscribeToIdentificationMail", [email:candidateEmail, userId:user.id], request) ;
-				}else{
-					log.debug "User $user.id has unsubscribed for identification mail."
-				}
-			}else{
-				if(BlockedMails.findByEmail(candidateEmail)){
-					log.debug "Email $candidateEmail is unsubscribed for identification mail."
-				}else{
-					result[candidateEmail] = generateLink("observation", "unsubscribeToIdentificationMail", [email:candidateEmail], request) ;
-				}
-			}
-		}
-		return result;
-	}
-
 	static List getUsersList(String userIdsAndEmailIds) {
 		List result = [];
 		userIdsAndEmailIds.trim().split(",").each{

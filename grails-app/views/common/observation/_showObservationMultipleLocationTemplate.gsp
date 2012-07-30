@@ -1,4 +1,3 @@
-
 <div class="observation_location_wrapper">
 	<div class="observation_location">
 		<g:javascript>
@@ -83,7 +82,7 @@
                     
                   function load_content(map, marker, id, infowindow){
                       $.ajax({
-                        url: '/biodiv/observation/snippet/' + id ,
+                        url: "${createLink(controller:'observation', action:'snippet') }"+"/"+id,
                         success: function(data){
                           infowindow.setContent("<div id='info-content'>" + data + "</div>");
                           infowindow.open(map, marker);
@@ -133,7 +132,11 @@
 	<div id="map_results_list"></div>
 	<g:javascript>
             function refreshList(bounds){
-                var url = "${g.createLink(controller: "observation", action: "filteredList")}" + location.search
+            	<g:if test="{params.id}">
+                var url = "${g.createLink( action: "filteredMapBasedObservationsList", id:params.id)}" + location.search
+                </g:if><g:else>
+                var url = "${g.createLink( action: "filteredMapBasedObservationsList")}" + location.search
+                </g:else>
                 if (bounds !== undefined){
                     var sep = (location.search == "") ? "?" : "&";
                     url = url + sep + "bounds=" + bounds

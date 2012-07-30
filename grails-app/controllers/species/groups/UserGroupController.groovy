@@ -2,11 +2,15 @@ package species.groups
 
 import java.util.Map;
 
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.acls.domain.BasePermission;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import species.auth.SUser;
+import species.participation.Observation;
+import species.utils.ImageUtils;
 import species.utils.Utils;
 import grails.converters.JSON;
 import grails.plugins.springsecurity.Secured;
@@ -17,6 +21,7 @@ class UserGroupController {
 	def userGroupService;
 	def mailService;
 	def aclUtilService;
+	def observationService;
 	
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
@@ -80,20 +85,35 @@ class UserGroupController {
 		return [totalUserGroupInstanceList:totalUserGroupInstanceList, userGroupInstanceList: userGroupInstanceList, userGroupInstanceTotal: count, queryParams: queryParams, activeFilters:activeFilters]
 	}
 
+	def listRelated = {
+		log.debug params
+		
+		switch(params.filterProperty) {
+			case 'featuredObservations':
+				redirect(action:'observations', id:params.id);
+				break;
+			case 'featuredMembers':
+				redirect(action:'members', id:params.id);
+				break;
+			default:
+				flash:message "Invalid command"
+				redirect(action:show, id:params.id)
+		}	
+		return
+	}
+	
 	@Secured(['ROLE_USER'])
 	def create = {
 		log.debug params
 		def userGroupInstance = new UserGroup()
 		userGroupInstance.properties = params
-		return [userGroupInstance: userGroupInstance]
+		return [userGroupInstance: userGroupInstance, currentUser:springSecurityService.currentUser]
 	}
 
 	@Secured(['ROLE_USER'])
 	def save = {
 		log.debug params;
-		List founders = Utils.getUsersList(params.founderUserIds);
-		//List members = Utils.getUsersList(params.memberUserIds);
-		def userGroupInstance = userGroupService.create(params.name, params.webaddress, params.description, founders);
+		def userGroupInstance = userGroupService.create(params);
 		if (userGroupInstance.hasErrors()) {
 			userGroupInstance.errors.allErrors.each { log.error it }
 			render(view: "create", model: [userGroupInstance: userGroupInstance])
@@ -235,7 +255,7 @@ class UserGroupController {
 			userGroupService.update(userGroupInstance, params)
 			if (userGroupInstance.hasErrors()) {
 				userGroupInstance.errors.allErrors.each { log.error it }
-				render(view: "edit", model: [userGroupInstance: userGroupInstance])
+				render(view: "create", model: [userGroupInstance: userGroupInstance])
 			}
 			else {
 				def tags = (params.tags != null) ? Arrays.asList(params.tags) : new ArrayList();
@@ -284,6 +304,8 @@ class UserGroupController {
 	}
 
 	private UserGroup findInstance() {
+		if(!params.id) return;
+		
 		def userGroup = userGroupService.get(params.long('id'))
 		if (!userGroup) {
 			flash.message = "UserGroup not found with id $params.id"
@@ -300,8 +322,30 @@ class UserGroupController {
 		params.offset = params.offset ? params.int('offset') : 0
 
 		def allMembers = userGroupInstance.getAllMembers(params.max, params.offset);
-		['userGroupInstance':userGroupInstance, 'members':allMembers, 'totalCount':userGroupInstance.getMembersCount()]
+		['userGroupInstance':userGroupInstance, 'members':allMembers, 'foundersTotalCount':userGroupInstance.getFoundersCount(), 'membersTotalCount':userGroupInstance.getAllMembersCount(), 'expertsTotalCount':0]
  	}
+	
+	def founders = {
+		def userGroupInstance = findInstance()
+		if (!userGroupInstance) return
+
+		params.max = Math.min(params.max ? params.int('max') : 9, 100)
+		params.offset = params.offset ? params.int('offset') : 0
+
+		def founders = userGroupInstance.getFounders(params.max, params.offset);
+		render(view:"members", model:['userGroupInstance':userGroupInstance, 'founders':founders, 'foundersTotalCount':userGroupInstance.getFoundersCount(), 'membersTotalCount':userGroupInstance.getAllMembersCount(), 'expertsTotalCount':0]);
+	}
+
+	def experts = {
+		def userGroupInstance = findInstance()
+		if (!userGroupInstance) return
+
+		params.max = Math.min(params.max ? params.int('max') : 9, 100)
+		params.offset = params.offset ? params.int('offset') : 0
+
+		def experts = [];//userGroupInstance.getExperts(params.max, params.offset);
+		render(view:"members", model:['userGroupInstance':userGroupInstance, 'founders':founders, 'foundersTotalCount':userGroupInstance.getFoundersCount(), 'membersTotalCount':userGroupInstance.getAllMembersCount(), 'expertsTotalCount':0]);
+	}
 	
 	def observations = {
 		def userGroupInstance = findInstance()
@@ -309,8 +353,50 @@ class UserGroupController {
 
 		params.max = Math.min(params.max ? params.int('max') : 9, 100)
 		params.offset = params.offset ? params.int('offset') : 0
+		
+		def model = userGroupService.getUserGroupObservations(userGroupInstance, params, params.max, params.offset);
+		def model2 = userGroupService.getUserGroupObservations(userGroupInstance, params, -1, -1, true);
+		def observationInstanceTotal = model2.observationInstanceList.size();
+		model['observationInstanceTotal'] = observationInstanceTotal
+		model['totalObservationInstanceList'] = model2.observationInstanceList;
+		println observationInstanceTotal;
+println model2.observationInstanceList;
+		if(params.loadMore?.toBoolean()){
+			render(template:"/common/observation/showObservationListTemplate", model:model);
+			return;
+		} else if(!params.isGalleryUpdate?.toBoolean()){
+			render(view:"observations", model:model);
+			return;
+		} else {
+			def obvListHtml =  g.render(template:"/common/observation/showObservationListTemplate", model:model);
+			def obvFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
+			def tagsHtml = "";
+			if(model.showTags) {
+				def filteredTags = observationService.getTagsFromObservation(model.totalObservationInstanceList.collect{it[0]})
+				tagsHtml = g.render(template:"/common/observation/showAllTagsTemplate", model:[count: count, tags:filteredTags, isAjaxLoad:true]);
+			}
+			def mapViewHtml = g.render(template:"/common/observation/showObservationMultipleLocationTemplate", model:[observationInstanceList:model2.observationInstanceList]);
 
-		['userGroupInstance':userGroupInstance, 'observations':userGroupInstance.observations, 'totalCount':userGroupInstance.observations.size()]
+			def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml, tagsHtml:tagsHtml, mapViewHtml:mapViewHtml]
+			render result as JSON
+			return;
+		}
+	
+	}
+	
+	def filteredMapBasedObservationsList = {
+		def userGroupInstance = findInstance()
+		if (!userGroupInstance) return
+
+		params.max = Math.min(params.max ? params.int('max') : 9, 100)
+		params.offset = params.offset ? params.int('offset') : 0
+		
+		def model = userGroupService.getUserGroupObservations(userGroupInstance, params, params.max, params.offset);
+		def model2 = userGroupService.getUserGroupObservations(userGroupInstance, params, -1, -1, true);
+		def totalCount = model2.observationInstanceList.size();
+		model['observationInstanceTotal'] = totalCount
+
+		render (template:"/common/observation/showObservationListTemplate", model:model);
 	}
 	
 	@Secured(['ROLE_USER', 'ROLE_ADMIN'])
@@ -357,7 +443,170 @@ class UserGroupController {
 		
 		return ['userGroupInstance':userGroupInstance]
 	}
+	
+	def getRelatedUserGroups = {
+		log.debug params;
+		def max = Math.min(params.limit ? params.limit.toInteger() : 9, 100)
+		def offset = params.offset ? params.offset.toInteger() : 0
 
+		def userGroups = userGroupService.getObservationUserGroups(params.long('id'), max, offset);
+
+		def result = [];
+		userGroups.each {
+			result.add(['observation':it, 'title':it.name]);
+		}
+
+		def r = ["observations":result, "count":userGroups.size()]
+		if(r.observations) {
+			r.observations = observationService.createUrlList2(r.observations, '');
+		}
+		render r as JSON
+	}
+
+	@Secured(['ROLE_USER'])
+	def upload_resource = {
+		log.debug params;
+
+		try {
+			if(ServletFileUpload.isMultipartContent(request)) {
+				MultipartHttpServletRequest multiRequest = (MultipartHttpServletRequest) request;
+				def rs = [:]
+				Utils.populateHttpServletRequestParams(request, rs);
+				def resourcesInfo = [];
+				def rootDir = grailsApplication.config.speciesPortal.userGroups.rootDir
+				File userGroupDir;
+				def message;
+
+				if(!params.resources) {
+					message = g.message(code: 'no.file.attached', default:'No file is attached')
+				}
+				
+				params.resources.each { f ->
+					log.debug "Saving userGroup logo file ${f.originalFilename}"
+
+					// List of OK mime-types
+					//TODO Move to config
+					def okcontents = [
+						'image/png',
+						'image/jpeg',
+						'image/pjpeg',
+						'image/gif',
+						'image/jpg'
+					]
+
+					if (! okcontents.contains(f.contentType)) {
+						message = g.message(code: 'resource.file.invalid.extension.message', args: [
+							okcontents,
+							f.originalFilename
+						])
+					}
+					else if(f.size > grailsApplication.config.speciesPortal.userGroups.logo.MAX_IMAGE_SIZE) {
+						message = g.message(code: 'resource.file.invalid.max.message', args: [
+							grailsApplication.config.speciesPortal.userGroups.logo.MAX_IMAGE_SIZE/1024,
+							f.originalFilename,
+							f.size/1024
+						], default:"File size cannot exceed ${grailsApplication.config.speciesPortal.userGroups.logo.MAX_IMAGE_SIZE/1024}KB");
+					}
+					else if(f.empty) {
+						message = g.message(code: 'file.empty.message', default:'File cannot be empty');
+					}
+					else {
+						if(!userGroupDir) {
+							if(!params.dir) {
+								userGroupDir = new File(rootDir);
+								if(!userGroupDir.exists()) {
+									userGroupDir.mkdir();
+								}
+								userGroupDir = new File(userGroupDir, UUID.randomUUID().toString()+File.separator+"resources");
+								userGroupDir.mkdirs();
+							} else {
+								userGroupDir = new File(rootDir, params.dir);
+								userGroupDir.mkdir();
+							}
+						}
+
+						File file = observationService.getUniqueFile(userGroupDir, Utils.cleanFileName(f.originalFilename));
+						f.transferTo( file );
+						ImageUtils.createScaledImages(file, userGroupDir);
+						resourcesInfo.add([fileName:file.name, size:f.size]);
+					}
+				}
+				log.debug resourcesInfo
+				// render some XML markup to the response
+				if(userGroupDir && resourcesInfo) {
+					render(contentType:"text/xml") {
+						userGroup {
+							dir(userGroupDir.absolutePath.replace(rootDir, ""))
+							resources {
+								for(r in resourcesInfo) {
+									image('fileName':r.fileName, 'size':r.size){}
+								}
+							}
+						}
+					}
+				} else {
+					response.setStatus(500)
+					message = [error:message]
+					render message as JSON
+				}
+			} else {
+				response.setStatus(500)
+				def message = [error:g.message(code: 'no.file.attached', default:'No file is attached')]
+				render message as JSON
+			}
+		} catch(e) {
+			e.printStackTrace();
+			response.setStatus(500)
+			def message = [error:g.message(code: 'file.upload.fail', default:'Error while processing the request.')]
+			render message as JSON
+		}
+	}
+	
+	def getFeaturedObservations = {
+		def userGroupInstance = findInstance()
+		if (!userGroupInstance) return;
+
+		log.debug params;
+		def max = Math.min(params.limit ? params.limit.toInteger() : 9, 100)
+		def offset = params.offset ? params.offset.toInteger() : 0
+		params.sort = "visitCount"; 
+		def model = userGroupService.getUserGroupObservations(userGroupInstance, params, max, offset);
+
+		def result = [];
+		model.observationInstanceList.each {
+			result.add(['observation':it, 'title':it.maxVotedSpeciesName]);
+		}
+
+		def r = ["observations":result, "count":model.observationInstanceTotal]
+		if(r.observations) {
+			r.observations = observationService.createUrlList2(r.observations);
+		}
+		render r as JSON
+	}
+
+	def getFeaturedMembers = {
+		def userGroupInstance = findInstance()
+		if (!userGroupInstance) return;
+
+		log.debug params;
+		def max = Math.min(params.limit ? params.limit.toInteger() : 9, 100)
+		def offset = params.offset ? params.offset.toInteger() : 0
+		
+		params.sort = "activity";
+		//TODO:sort on activity
+		def members = UserGroupMemberRole.findAllByUserGroup(userGroupInstance, [max:max, offset:offset]).collect { it.sUser};
+
+		def result = [];
+		members.each {
+			result.add(['observation':it, 'title':it.name]);
+		}
+
+		def r = ["observations":result, "count":userGroupInstance.getAllMembersCount()]
+		if(r.observations) {
+			r.observations = observationService.createUrlList2(r.observations, "");
+		}
+		render r as JSON
+	}
 }
 
 class UserGroupCommand {

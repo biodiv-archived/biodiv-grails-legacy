@@ -24,7 +24,7 @@
 				
 			</div>
 
-			<uGroup:showUserGroupsList />
+			<uGroup:showUserGroupsList/>
 		</div>
 	</div>
 

@@ -1,5 +1,8 @@
 package species.participation
 
+import java.util.List;
+import java.util.Map;
+
 import org.grails.taggable.*
 import groovy.text.SimpleTemplateEngine
 
@@ -49,7 +52,7 @@ class ObservationController {
 		redirect(action: "list", params: params)
 	}
 
-	def filteredList = {
+	def filteredMapBasedObservationsList = {
 		def result;
 		//TODO: Dirty hack to feed results through solr if the request is from search
 		if(params.action == 'search') {
@@ -141,7 +144,7 @@ class ObservationController {
 					def tags = (params.tags != null) ? Arrays.asList(params.tags) : new ArrayList();
 					observationInstance.setTags(tags);
 
-					def userGroups = (params.userGroups != null) ? Arrays.asList(params.userGroups) : new ArrayList();
+					def userGroups = (params.userGroup != null) ? params.userGroup.collect{k,v->v} : new ArrayList();
 					setUserGroups(observationInstance, userGroups);
 										
 					sendNotificationMail(OBSERVATION_ADDED, observationInstance, request);
@@ -173,7 +176,12 @@ class ObservationController {
 
 	private void setUserGroups(Observation observationInstance, List userGroupIds) {
 		if(!observationInstance) return
-		userGroupService.postObservationtoUserGroups(observationInstance, userGroupIds);		
+		
+		def obvInUserGroups = observationInstance.userGroups.collect { it.id + ""}
+		userGroupService.postObservationtoUserGroups(observationInstance, userGroupIds);
+		userGroupIds.removeAll(obvInUserGroups);
+		userGroupService.removeObservationFromUserGroups(observationInstance, userGroupIds);
+				
 	}
 	
 	@Secured(['ROLE_USER'])
@@ -194,8 +202,8 @@ class ObservationController {
 					def tags = (params.tags != null) ? Arrays.asList(params.tags) : new ArrayList();
 					observationInstance.setTags(tags);
 
-					def userGroups = (params.userGroups != null) ? Arrays.asList(params.userGroups) : new ArrayList();
-					observationInstance.setUserGroups(userGroups);
+					def userGroups = (params.userGroup != null) ? params.userGroup.collect{k,v->v} : new ArrayList();
+					setUserGroups(observationInstance, userGroups);
 
 					//redirect(action: "show", id: observationInstance.id)
 					params["createNew"] = true
@@ -213,6 +221,7 @@ class ObservationController {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
 			redirect(action: "list")
 		}
+		render(view: "create", model: [observationInstance: observationInstance])
 	}
 
 	def show = {
@@ -840,7 +849,6 @@ class ObservationController {
 		new SimpleTemplateEngine().createTemplate(s).make(binding)
 	}
 
-
 	def unsubscribeToIdentificationMail = {
 		log.debug "$params"
 		if(params.userId){
@@ -856,7 +864,6 @@ class ObservationController {
 		}
 		render "${message(code: 'user.unsubscribe.identificationMail', args: [params.email])}"
 	}
-
 
 	/*
 	 * @param params
@@ -969,7 +976,7 @@ class ObservationController {
 	def sendIdentificationMail = {
 		log.debug params;
 		def currentUserMailId = springSecurityService.currentUser?.email;
-		Map emailList = Utils.getUnBlockedMailList(params.userIdsAndEmailIds, request);
+		Map emailList = getUnBlockedMailList(params.userIdsAndEmailIds, request);
 		if(emailList.isEmpty()){
 			log.debug "No valid email specified for identification."
 		}else if (Environment.getCurrent().getName().equalsIgnoreCase("pamba") || Environment.getCurrent().getName().equalsIgnoreCase("saturn")) {
@@ -989,7 +996,28 @@ class ObservationController {
 		render (['success:true']as JSON);
 	}
 
-	
+	private Map getUnBlockedMailList(String userIdsAndEmailIds, request) {
+		Map result = new HashMap();
+		userIdsAndEmailIds.split(",").each{
+			String candidateEmail = it.trim();
+			if(candidateEmail.isNumber()){
+				SUser user = SUser.get(candidateEmail.toLong());
+				candidateEmail = user.email.trim();
+				if(user.allowIdentifactionMail){
+					result[candidateEmail] = generateLink("observation", "unsubscribeToIdentificationMail", [email:candidateEmail, userId:user.id], request) ;
+				}else{
+					log.debug "User $user.id has unsubscribed for identification mail."
+				}
+			}else{
+				if(BlockedMails.findByEmail(candidateEmail)){
+					log.debug "Email $candidateEmail is unsubscribed for identification mail."
+				}else{
+					result[candidateEmail] = generateLink("observation", "unsubscribeToIdentificationMail", [email:candidateEmail], request) ;
+				}
+			}
+		}
+		return result;
+	}
 
 	///////////////////////////////////////////////////////////////////////////////
 	////////////////////////////// SEARCH /////////////////////////////////////////
@@ -1031,7 +1059,6 @@ class ObservationController {
 		}
 	}
 
-
 	/**
 	 *
 	 */
@@ -1060,7 +1087,6 @@ class ObservationController {
 	/**
 	 * 
 	 */
-
 	def nameTerms = {
 		log.debug params;
 		params.field = params.field?:"autocomplete";
@@ -1162,7 +1188,6 @@ class ObservationController {
 		render baseUrl + gallImagePath
 	}
 	
-	
 	@Secured(['ROLE_USER'])
 	def getUserImage = {
 		log.debug params;
@@ -1186,5 +1211,5 @@ class ObservationController {
 		res["website"] = u.website
 		render res as JSON
 	}
-		
+
 }

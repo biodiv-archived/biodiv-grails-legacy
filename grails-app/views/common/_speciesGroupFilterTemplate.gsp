@@ -7,12 +7,12 @@
 
 $(document).ready(function(){
 	$("#speciesGroupFilter").button();
-	$('#speciesGroupFilter button[value$="${params.sGroup}"]').addClass('active');
+	$('#speciesGroupFilter button[value="${params.sGroup}"]').addClass('active');
     $('#speciesGroupFilter button').tooltip({placement:'top'});
 	
 	
 	$("#habitatFilter").button();
-	$('#habitatFilter button[value$="${params.habitat}"]').addClass('active');
+	$('#habitatFilter button[value="${params.habitat}"]').addClass('active');
 	$('#habitatFilter button').tooltip({placement:'bottom'});
 		
 });

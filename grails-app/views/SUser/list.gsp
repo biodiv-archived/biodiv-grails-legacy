@@ -12,6 +12,10 @@
 	height: auto;
 }
 
+.thumbnails > li {
+	margin: 0px;
+}
+
 .figure .thumbnail {
 	height: 120px;
 	margin: 0 auto;

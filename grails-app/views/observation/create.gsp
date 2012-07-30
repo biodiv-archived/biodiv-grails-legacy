@@ -485,7 +485,7 @@ input.dms_field {
 	            </div>    
       
 					<div class="span12 super-section"  style="clear: both">
-						<div class="section" style="position: relative; overflow: visible;"
+						<div class="section" style="position: relative; overflow: visible;">
 							<h3>Describe your observation!</h3>
 							<div class="span6 block">
 								<!--label for="notes"><g:message code="observation.notes.label" default="Notes" /></label-->
@@ -525,7 +525,7 @@ input.dms_field {
 									</h5>
 									<div>
 										<ul id="userGroups" name="userGroups" style="list-style:none;">
-											<uGroup:getCurrentUserUserGroups/>
+											<uGroup:getCurrentUserUserGroups model="['observationInstance':observationInstance]"/>
 										</ul>
 									</div>
 								</div>

@@ -1278,3 +1278,104 @@ h1, .main_heading .species_title .sci_name{
 	width:600px;
 	float:right;	
 }
+
+.userOrEmail-list {
+	background: none repeat scroll 0 0 #FFFFFF;
+	border: 1px solid #CCCCCC;
+	cursor: text;
+	margin: 0;
+	overflow: auto;
+	padding: 3px;
+	list-style: none;
+	clear: both;
+}
+
+li.userOrEmail-choice {
+	background-color: #DEE7F8;
+	border: 1px solid #CAD8F3;
+	padding: 2px 13px 3px 4px;
+	border-radius: 5px 5px 5px 5px;
+	display: block;
+	float: left;
+	margin: 2px 5px 2px 0;
+	position: relative;
+}
+
+li.userOrEmail-choice:hover {
+	background-color: #bbcef1;
+}
+
+input#userAndEmailList {
+	-moz-box-sizing: border-box;
+	border: medium none !important;
+	margin: 0 !important;
+	outline: medium none;
+	padding: 0 !important;
+	width: inherit !important;
+}
+
+span.userOrEmail-close {
+	cursor: pointer;
+}
+
+li#userOrEmail-new {
+	padding: 2px 4px 1px 0;
+	margin-left: 0;
+	border-radius: 5px 5px 5px 5px;
+	display: block;
+	float: left;
+	margin: 2px 5px 2px 0;
+	position: relative;
+}
+
+#email-form {
+	background-clip: padding-box;
+	background-color: #FFFFFF;
+	border-color: rgba(0, 0, 0, 0.2);
+	border-radius: 0 0 5px 5px;
+	border-style: solid;
+	border-width: 1px;
+	box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+	display: none;
+	float: left;
+	left: 0;
+	list-style: none outside none;
+	margin: 0;
+	min-width: 400px;
+	max-width: 400px;
+	width : 400px;
+	padding: 10px;
+	position: absolute;
+	top: 100%;
+	z-index: 1000;
+	color: #000000;
+}
+
+#email-form-close {
+	position: absolute;
+	top: 0;
+	right: 0;
+}
+
+.form-row {
+margin: 10px;
+}
+
+.keyname {
+float: left;
+font-size: 0.9em;
+font-weight: bold;
+margin-right: 10px;
+text-align: right;
+}
+
+#cke_userMessage {
+padding: 0;
+width: 100%;         
+}
+
+#cke_message {
+width: 100%;
+min-width: 100%;
+max-width: 100%;
+}

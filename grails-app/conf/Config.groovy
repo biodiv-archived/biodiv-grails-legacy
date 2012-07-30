@@ -229,6 +229,9 @@ speciesPortal {
 		rootDir = "${app.rootDir}/userGroups"
 		serverURL = "http://localhost/${appName}/userGroups"
 		//serverURL = "http://localhost/${appName}/userGroups"
+		logo {
+			MAX_IMAGE_SIZE = 51200
+		}
 	}
 	names.parser.serverURL = "saturn.strandls.com"
 	names.parser.port = 4334

@@ -5,7 +5,8 @@
 			<div class="span3">
 				<a href="${createLink(action:"show", id:userGroupInstance.id)}">
 					<img class="logo" alt="${userGroupInstance.name}"
-					src="/sites/all/themes/wg/images/map-logo.gif"> </a>
+					src="${createLink(url: userGroupInstance.mainImage()?.fileName)}">
+				</a>
 			</div>
 			<!-- Logo ends -->
 			<!-- h1 class="span8">
@@ -14,15 +15,15 @@
 			<ul class="nav">
 				<li><a href="${createLink(action:'show', id:params.id)}">Home</a>
 				</li>
-				<li><a href="${createLink(action:'members', id:params.id)}">Members</a>
-				</li>
 				<li><a
 					href="${createLink(action:'observations', id:params.id)}">Observations</a>
 				</li>
-				<li><a href="${createLink(action:'species', id:params.id)}">Species</a>
+				<li><a href="${createLink(action:'members', id:params.id)}">Members</a>
 				</li>
-				<li><a href="${createLink(action:'pages')}">Pages</a>
+
+				<!-- li><a href="${createLink(action:'species', id:params.id)}">Species</a>
 				</li>
+				<li><a href="${createLink(action:'pages')}">Pages</a></li-->
 				<li><a href="${createLink(action:'aboutUs', id:params.id)}">About
 						Us</a></li>
 				<sec:permitted className='species.groups.UserGroup'
@@ -35,40 +36,43 @@
 			</ul>
 		</div>
 	</div>
-	
-	
-	<div class="observation-icons">
-		
-		<uGroup:isNotAMember model="['userGroupInstance':userGroupInstance]">
-			<a class="btn btn-large btn-success" id="joinUs"> <i class="icon-plus"></i> Join Us</a>
-		</uGroup:isNotAMember>
-		
-		<uGroup:isAMember model="['userGroupInstance':userGroupInstance]">
-			<a class="btn btn-large btn-info" id="leaveUs"><i class="icon-minus"></i>Leave this group</a>
-		</uGroup:isAMember>
-		
-		<obv:identificationByEmail
-					model="['source':'userGroupInvite', 'requestObject':request, 'activity':'Invite Friends', 'cssClass':'btn btn-large btn-success']" />
-					
-		
-	</div>
-	
-	
-	<div style="float: right; margin-right: 3px;">
-		<sec:permitted className='species.groups.UserGroup'
-			id='${userGroupInstance.id}'
-			permission='${org.springframework.security.acls.domain.BasePermission.ADMINISTRATION}'>
 
-			<a class="btn btn-primary "
-				href="${createLink(action:'edit', id:userGroupInstance.id)}">
-				Edit Group </a>
 
-			<a class="btn btn-danger btn-primary "
-				href="${createLink(action:'flagDeleted', id:userGroupInstance.id)}"
-				onclick="return confirm('${message(code: 'default.observation.delete.confirm.message', default: 'This group will be deleted. Are you sure ?')}');">Delete
-				Group </a>
-		</sec:permitted>
+	<div style="position: relative; overflow: visible;">
+
+		<div class="observation-icons pull-right">
+
+			<obv:identificationByEmail
+				model="['source':'userGroupInvite', 'requestObject':request, 'activity':'Invite Friends', 'cssClass':'btn btn-large btn-success dropdown-toggle']" />
+
+			<span class="pull-right"> <uGroup:isNotAMember
+					model="['userGroupInstance':userGroupInstance]">
+					<a class="btn btn-large btn-success" id="joinUs"> <i
+						class="icon-plus"></i> Join Us</a>
+				</uGroup:isNotAMember> <uGroup:isAMember model="['userGroupInstance':userGroupInstance]">
+					<a class="btn btn-large btn-primary" id="leaveUs"><i
+						class="icon-minus"></i>Leave this group</a>
+				</uGroup:isAMember> </span>
+
+
+			<sec:permitted className='species.groups.UserGroup'
+				id='${userGroupInstance.id}'
+				permission='${org.springframework.security.acls.domain.BasePermission.ADMINISTRATION}'>
+
+				<a class="btn btn-large btn-primary "
+					href="${createLink(action:'edit', id:userGroupInstance.id)}">
+					Edit Group </a>
+
+				<a class="btn btn-large btn-danger"
+					href="${createLink(action:'flagDeleted', id:userGroupInstance.id)}"
+					onclick="return confirm('${message(code: 'default.observation.delete.confirm.message', default: 'This group will be deleted. Are you sure ?')}');">Delete
+					Group </a>
+			</sec:permitted>
+		</div>
 	</div>
+
+
+
 
 </div>
 

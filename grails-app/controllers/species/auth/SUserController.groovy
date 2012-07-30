@@ -32,9 +32,9 @@ class SUserController extends UserController {
 	
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
-        def isLoggedIn = {
-            render springSecurityService.isLoggedIn()
-        }
+    def isLoggedIn = {
+        render springSecurityService.isLoggedIn()
+    }
 
 	def index = {
 		redirect(action: "list", params: params)
@@ -45,7 +45,7 @@ class SUserController extends UserController {
 		//params.sort = params.sort && params.sort != 'score' ? params.sort : "activity";
 		params.query='%';
 		def model = getUsersList(params);
-		
+		println model;
 		// add query params to model for paging
 		for (name in [
 			'username',
@@ -313,7 +313,9 @@ class SUserController extends UserController {
 		
 		def results = [];
 		if(params.sort == 'activity') {
-			String query = "select u.id, u.$usernameFieldName from Observation obv right outer join obv.author u WHERE 1=1 $cond and obv.isDeleted = false group by u.id, u.$usernameFieldName order by count(obv.id)  desc, u.$usernameFieldName asc";
+			String query = "select u.id, u.$usernameFieldName from Observation obv right outer join obv.author u WHERE 1=1 $cond and (obv.isDeleted = false or obv.isDeleted is null) group by u.id, u.$usernameFieldName order by count(obv.id)  desc, u.$usernameFieldName asc";
+			println query;
+			println queryParams;
 			def uids =  lookupUserClass().executeQuery(query, queryParams, [max: max, offset: offset])
 			uids.each {
 				results.add(SUser.read(it[0]));
@@ -329,6 +331,8 @@ class SUserController extends UserController {
 //			println params['username'].toLowerCase();
 //			sorted = results.sort( sorter.rcurry(params['username'].toLowerCase()))
 //		}
+		
+
 		return [results: sorted, totalCount: totalCount, searched: true]
 
 	}

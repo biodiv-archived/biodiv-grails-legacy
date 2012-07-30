@@ -7,7 +7,7 @@
 <g:if test='${searched}'>
 	<div class="row">
 		<!-- main_content -->
-		<div class="list span12">
+		<div class="list">
 			<div class="observations thumbwrap">
 				<%
 def queryParams = [username: username, enabled: enabled, accountExpired: accountExpired, accountLocked: accountLocked, passwordExpired: passwordExpired]
@@ -51,8 +51,6 @@ def queryParams = [username: username, enabled: enabled, accountExpired: account
 									class=" sort_filter_label  ${params.sort == 'name'?'active':'' }"
 									value="name"> Name </a></li>
 							</ul>
-
-
 						</div>
 
 					</div>

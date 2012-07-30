@@ -1,5 +1,6 @@
 package speciespage
 
+import grails.util.GrailsNameUtils;
 import groovy.sql.Sql
 import groovy.text.SimpleTemplateEngine
 
@@ -91,7 +92,6 @@ class ObservationService {
 	Map getRelatedObservations(params) {
 		log.debug params;
 		def max = Math.min(params.limit ? params.limit.toInteger() : 9, 100)
-
 		def offset = params.offset ? params.offset.toInteger() : 0
 
 		def relatedObv
@@ -251,14 +251,22 @@ class ObservationService {
 	}
 
 	static List createUrlList2(observations){
+		def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+		String iconBasePath = config.speciesPortal.observations.serverURL
+		def urlList = createUrlList2(observations, iconBasePath)
+		urlList.each {
+			it.imageLink = it.imageLink.replaceFirst(/\.[a-zA-Z]{3,4}$/, config.speciesPortal.resources.images.thumbnail.suffix)
+		}
+		return urlList
+	}
+	static List createUrlList2(observations, String iconBasePath){
 		List urlList = []
 		for(param in observations){
 			def obv = param['observation']
 			def title = param['title']
 			def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 			def image = obv.mainImage()
-			def imagePath = image.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, config.speciesPortal.resources.images.thumbnail.suffix)
-			def imageLink = config.speciesPortal.observations.serverURL +  imagePath
+			def imageLink = iconBasePath +  image.fileName.trim()
 			urlList.add(["obvId":obv.id, "imageLink":imageLink, "imageTitle": title])
 		}
 		return urlList
@@ -461,14 +469,16 @@ class ObservationService {
 	
 	Map getRelatedTagsFromObservation(obv){
 		int tagsLimit = 30;
+		//println "HACK to load obv at ObvService: ${obv.author}";
 		def tagNames = obv.tags
+		
 		LinkedHashMap tags = [:]
 		if(tagNames.isEmpty()){
 			return tags
 		}
 		
 		Sql sql =  Sql.newInstance(dataSource);
-		String query = "select t.name as name, count(t.name) as obv_count from tag_links as tl, tags as t, observation obv where t.name in " +  getSqlInCluase(tagNames) + " and tl.tag_ref = obv.id and tl.type = '"+Observation.getClass().getName().toLowerCase()+"' and obv.is_deleted = false and t.id = tl.tag_id group by t.name order by count(t.name) desc, t.name asc limit " + tagsLimit;
+		String query = "select t.name as name, count(t.name) as obv_count from tag_links as tl, tags as t, observation obv where t.name in " +  getSqlInCluase(tagNames) + " and tl.tag_ref = obv.id and tl.type = '"+GrailsNameUtils.getPropertyName(obv.class).toLowerCase()+"' and obv.is_deleted = false and t.id = tl.tag_id group by t.name order by count(t.name) desc, t.name asc limit " + tagsLimit;
 		
 		sql.rows(query, tagNames).each{
 			tags[it.getProperty("name")] = it.getProperty("obv_count");
@@ -484,7 +494,7 @@ class ObservationService {
 		}
 
 		def sql =  Sql.newInstance(dataSource);
-		String query = "select t.name as name, count(t.name) as obv_count from tag_links as tl, tags as t, observation obv where tl.tag_ref in " + getSqlInCluase(obvIds)  + " and tl.tag_ref = obv.id and tl.type = '"+Observation.getClass().getName().toLowerCase()+"' and obv.is_deleted = false and t.id = tl.tag_id group by t.name order by count(t.name) desc, t.name asc limit " + tagsLimit;
+		String query = "select t.name as name, count(t.name) as obv_count from tag_links as tl, tags as t, observation obv where tl.tag_ref in " + getSqlInCluase(obvIds)  + " and tl.tag_ref = obv.id and tl.type = '"+GrailsNameUtils.getPropertyName(Observation.class).toLowerCase()+"' and obv.is_deleted = false and t.id = tl.tag_id group by t.name order by count(t.name) desc, t.name asc limit " + tagsLimit;
 
 		sql.rows(query, obvIds).each{
 			tags[it.getProperty("name")] = it.getProperty("obv_count");
@@ -507,15 +517,35 @@ class ObservationService {
 	 * executing query
 	 */
 	Map getFilteredObservations(params, max, offset, isMapView) {
+
+		def queryParts = getFilteredObservationsFilterQuery(params) 
+		String query = queryParts.query;
+		
+		if(isMapView) {
+			query = queryParts.mapViewQuery + queryParts.filterQuery + queryParts.orderByClause
+		} else {
+			query += queryParts.filterQuery + queryParts.orderByClause
+			if(max != -1)
+				queryParts.queryParams["max"] = max
+			if(offset != -1)
+				queryParts.queryParams["offset"] = offset
+		}
+
+		def observationInstanceList = Observation.executeQuery(query, queryParts.queryParams)
+		
+		return [observationInstanceList:observationInstanceList, queryParams:queryParts.queryParams, activeFilters:queryParts.activeFilters]
+	}
+
+	def getFilteredObservationsFilterQuery(params) {
 		params.sGroup = (params.sGroup)? params.sGroup : SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.ALL).id
 		params.habitat = (params.habitat)? params.habitat : Habitat.findByName(grailsApplication.config.speciesPortal.group.ALL).id
 		params.habitat = params.habitat.toLong()
 		//params.userName = springSecurityService.currentUser.username;
 
-		def query = "select obv from Observation obv where obv.isDeleted = :isDeleted "
-		def mapViewQuery = "select obv.id, obv.latitude, obv.longitude from Observation obv where obv.isDeleted = :isDeleted "
+		def query = "select obv from Observation obv "
+		def mapViewQuery = "select obv.id, obv.latitude, obv.longitude from Observation obv "
 		def queryParams = [isDeleted : false]
-		def filterQuery = ""
+		def filterQuery = " where obv.isDeleted = :isDeleted "
 		def activeFilters = [:]
 
 		if(params.sGroup){
@@ -531,8 +561,8 @@ class ObservationService {
 		}
 
 		if(params.tag){
-			query = "select obv from Observation obv,  TagLink tagLink where obv.isDeleted = :isDeleted "
-			mapViewQuery = "select obv.id, obv.latitude, obv.longitude from Observation obv, TagLink tagLink where obv.isDeleted = :isDeleted "
+			query = "select obv from Observation obv,  TagLink tagLink "
+			mapViewQuery = "select obv.id, obv.latitude, obv.longitude from Observation obv, TagLink tagLink "
 			filterQuery +=  " and obv.id = tagLink.tagRef and tagLink.type = :tagType and tagLink.tag.name = :tag "
 
 			queryParams["tag"] = params.tag
@@ -575,24 +605,12 @@ class ObservationService {
 			filterQuery += " and obv.latitude > " + swLat + " and  obv.latitude < " + neLat + " and obv.longitude > " + swLon + " and obv.longitude < " + neLon
 			activeFilters["bounds"] = params.bounds
 		}
-
+		
 		def orderByClause = " order by obv." + (params.sort ? params.sort : "lastRevised") +  " desc, obv.id asc"
 
-		if(isMapView) {
-			query = mapViewQuery + filterQuery + orderByClause
-		} else {
-			query += filterQuery + orderByClause
-			if(max != -1)
-				queryParams["max"] = max
-			if(offset != -1)
-				queryParams["offset"] = offset
-		}
-
-		def observationInstanceList = Observation.executeQuery(query, queryParams)
-		
-		return [observationInstanceList:observationInstanceList, queryParams:queryParams, activeFilters:activeFilters]
+		return [query:query, mapViewQuery:mapViewQuery, filterQuery:filterQuery, orderByClause:orderByClause, queryParams:queryParams, activeFilters:activeFilters]
 	}
-
+	
 	private Date parseDate(date){
 		try {
 			return date? Date.parse("dd/MM/yyyy", date):new Date();

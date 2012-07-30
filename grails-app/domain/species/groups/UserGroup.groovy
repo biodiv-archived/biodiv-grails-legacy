@@ -24,7 +24,8 @@ class UserGroup implements Taggable {
 	Date foundedOn = new Date();
 	boolean isDeleted = false;
 	long visitCount = 0;
-
+	String icon;
+	
 	def grailsApplication;
 	def aclUtilService
 	def gormUserDetailsService;
@@ -38,25 +39,22 @@ class UserGroup implements Taggable {
 		webaddress nullable: false, blank:false, unique:true
 		description nullable: false, blank:false
 		contactEmail nullable:false, blank:false, email:true
+		icon nullable:false
 	}
 
 	static mapping = {
 		version  false;
 		description type:'text';
 		aboutUs type:'text';
+		sort name:"asc"
 	}
 
 	Resource icon(ImageType type) {
-		String name = this.name?.trim()?.toLowerCase()?.replaceAll(/ /, '_')
-		name = ImageUtils.getFileName(name, type, '.png');
-
-		boolean iconPresent = (new File(grailsApplication.config.speciesPortal.resources.rootDir+"/group_icons/groups/${name}")).exists()
+		boolean iconPresent = (new File(grailsApplication.config.speciesPortal.userGroups.rootDir+this.icon)).exists()
 		if(!iconPresent) {
-			name = SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.OTHERS).name?.trim()?.toLowerCase()?.replaceAll(/ /, '_')
-			name = ImageUtils.getFileName(name, type, '.png');
+			return new Resource(fileName:grailsApplication.config.speciesPortal.resources.serverURL+"/no-image.jpg", type:ResourceType.ICON, title:"");
 		}
-
-		return new Resource(fileName:"group_icons/groups/${name}", type:ResourceType.ICON, title:"You can contribute!!!");
+		return new Resource(fileName:grailsApplication.config.speciesPortal.userGroups.serverURL+this.icon, type:ResourceType.ICON, title:"You can contribute!!!");
 	}
 
 	Resource mainImage() {
@@ -75,9 +73,9 @@ class UserGroup implements Taggable {
 		return visitCount;
 	}
 
-	def getFounders() {
+	def getFounders(int max, long offset) {
 		def founderRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_FOUNDER.value())
-		return UserGroupMemberRole.findAllByUserGroupAndRole(this, founderRole).collect { it.sUser};
+		return UserGroupMemberRole.findAllByUserGroupAndRole(this, founderRole, [max:max, offset:offset]).collect { it.sUser};
 	}
 
 	void setFounders(List<SUser> founders) {
@@ -107,9 +105,9 @@ class UserGroup implements Taggable {
 		}
 	}
 
-	def getMembers() {
+	def getMembers(int max, long offset) {
 		def role = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value())
-		return UserGroupMemberRole.findAllByUserGroupAndRole(this, role).collect { it.sUser};
+		return UserGroupMemberRole.findAllByUserGroupAndRole(this, role, [max:max, offset:offset]).collect { it.sUser};
 	}
 
 	void setMembers(List<SUser> members) {
@@ -137,14 +135,24 @@ class UserGroup implements Taggable {
 		}
 	}
 	
-	def getAllMembers(int max, int offset) {
+	def getAllMembers(int max, long offset) {
 		return UserGroupMemberRole.findAllByUserGroup(this, [max:max, offset:offset]).collect { it.sUser};
 	}
 
 	def getMembersCount() {
-		return UserGroupMemberRole.countByUserGroup(this);
+		def memberRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value())
+		return UserGroupMemberRole.countByUserGroupAndRole(this, memberRole);
 	}
 
+	def getFoundersCount() {
+		def founderRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_FOUNDER.value())
+		return UserGroupMemberRole.countByUserGroupAndRole(this, founderRole);
+	}
+	
+	def getAllMembersCount() {
+		return UserGroupMemberRole.countByUserGroup(this);
+	}
+	
 	//TODO:remove
 	boolean hasPermission(SUser user, Permission permission) {
 		return aclUtilService.hasPermission(gormUserDetailsService.loadUserByUsername(user.email, true), this, permission)

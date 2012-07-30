@@ -13,6 +13,8 @@ import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.transaction.annotation.Transactional
 
+import species.Resource;
+import species.Resource.ResourceType;
 import species.auth.Role;
 import species.auth.SUser;
 import species.groups.SpeciesGroup;
@@ -20,6 +22,7 @@ import species.groups.UserGroup;
 import species.groups.UserGroupMemberRole;
 import species.groups.UserGroupMemberRole.UserGroupMemberRoleType;
 import species.participation.Observation;
+import species.utils.ImageUtils;
 import species.utils.Utils;
 
 class UserGroupService {
@@ -31,7 +34,9 @@ class UserGroupService {
 	def aclUtilService
 	def springSecurityService
 	def dataSource;
-
+	def observationService;
+	def grailsApplication;
+	
 	void addPermission(UserGroup userGroup, SUser user, int permission) {
 		addPermission userGroup, user, aclPermissionFactory.buildFromMask(permission)
 	}
@@ -44,9 +49,14 @@ class UserGroupService {
 
 	@Transactional
 	@PreAuthorize("hasRole('ROLE_USER')")
-	UserGroup create(String name, String webaddress, String description, List founders) {
-		UserGroup userGroup = new UserGroup(name: name, webaddress: webaddress, description:description);
-
+	UserGroup create(params) {
+		UserGroup userGroup = new UserGroup();
+		userGroup.properties = params;
+		userGroup.name = userGroup.name?.capitalize();
+		List founders = Utils.getUsersList(params.founderUserIds);
+		//List members = Utils.getUsersList(params.memberUserIds);
+		userGroup.icon = getUserGroupIcon(params.icon);
+		
 		if(userGroup.save()) {
 			userGroup.setFounders(founders);
 			//userGroup.setMembers(members);
@@ -73,14 +83,39 @@ class UserGroupService {
 	@PreAuthorize("hasPermission(#userGroup, write) or hasPermission(#userGroup, admin)")
 	void update(UserGroup userGroup, params) {
 		userGroup.properties = params
+		userGroup.name = userGroup.name?.capitalize();
 		List founders = Utils.getUsersList(params.founderUserIds);
 		//List members = Utils.getUsersList(params.memberUserIds);
-
+		userGroup.icon = getUserGroupIcon(params.icon);
 		userGroup.setFounders(founders);
 		//userGroup.setMembers(members);
 
 	}
 
+	private String getUserGroupIcon(String icon) {
+		if(!icon) return;
+		
+		def resource = null;
+		def rootDir = grailsApplication.config.speciesPortal.userGroups.rootDir
+		
+		File iconFile = new File(rootDir , Utils.cleanFileName(icon));
+		if(!iconFile.exists()) {
+			log.error "COULD NOT locate icon file ${iconFile.getAbsolutePath()}";
+		}
+		
+		resource = iconFile.absolutePath.replace(rootDir, "");
+		
+//		def res = Resource.findByFileNameAndType(path, ResourceType.ICON);
+//			
+//		if(!res) {
+//			resource = new Resource(fileName:path, type:ResourceType.ICON);
+//			if(!resource.save()) {
+//				resource.errors.each { log.error it }
+//			}
+//		} 
+		return resource;
+	}
+	
 	@Transactional
 	@PreAuthorize("hasPermission(#userGroup, delete) or hasPermission(#userGroup, admin)")
 	void delete(UserGroup userGroup) {
@@ -231,8 +266,8 @@ class UserGroupService {
 		//		   filterQuery += " and obv.latitude > " + swLat + " and  obv.latitude < " + neLat + " and obv.longitude > " + swLon + " and obv.longitude < " + neLon
 		//		   activeFilters["bounds"] = params.bounds
 		//	   }
-
-		def orderByClause = " order by uGroup." + (params.sort ? params.sort : "foundedOn") +  " desc"
+		def sortOption = "foundedOn";//(params.sort ? params.sort : "foundedOn");
+		def orderByClause = " order by uGroup." + sortOption +  " desc"
 		//
 		//	   if(isMapView) {
 		//		   query = mapViewQuery + filterQuery + orderByClause
@@ -263,11 +298,39 @@ class UserGroupService {
 		return l.toString().replace("[", "(").replace("]", ")")
 	}
 
-	void postObservationToUserGroup(Observation observation, List userGroupIds) {
+	/////////////// OBSERVATIONS RELATED /////////////////
+	void postObservationtoUserGroups(Observation observation, List userGroupIds) {
+		log.debug "Posting ${observation} to userGroups ${userGroupIds}"
 		userGroupIds.each {
-			def userGroup = UserGroup.read(Long.parseLong(it+""));
-			if(userGroup) {
-				postObservationToUserGroup(observation, userGroup)
+			if(it) {
+				def userGroup = UserGroup.read(Long.parseLong(it));
+				if(userGroup) {
+					postObservationToUserGroup(observation, userGroup)
+				}
+			}
+		}
+	}
+	
+	@Transactional
+	@PreAuthorize("hasPermission(#userGroup, write)")
+	void postObservationToUserGroup(Observation observation, UserGroup userGroup) {
+		userGroup.addToObservations(observation);
+		if(!userGroup.save()) {
+			log.error "Could not add ${observation} to ${usergroup}"
+			log.error  userGroup.errors.allErrors.each { log.error it }
+		} else {
+			log.debug "Added ${observation} to userGroup ${userGroup}"
+		}
+	}
+	
+	void removeObservationFromUserGroups(Observation observation, List userGroupIds) {
+		log.debug "Removing ${observation} from userGroups ${userGroupIds}"
+		userGroupIds.each {
+			if(it) {
+				def userGroup = UserGroup.read(Long.parseLong(it));
+				if(userGroup) {
+					removeObservationFromUserGroup(observation, userGroup)
+				}
 			}
 		}
 	}
@@ -275,10 +338,62 @@ class UserGroupService {
 
 	@Transactional
 	@PreAuthorize("hasPermission(#userGroup, write)")
-	void postObservationToUserGroup(Observation observation, UserGroup userGroup) {
-		userGroup.addToObservations(observation);
+	void removeObservationFromUserGroup(Observation observation, UserGroup userGroup) {
+		userGroup.observations.remove(observation);
+		if(!userGroup.save()) {
+			log.error "Could not remove ${observation} from ${usergroup}"
+			log.error  userGroup.errors.allErrors.each { log.error it }
+		} else {
+			log.debug "Removed ${observation} from userGroup ${userGroup}"
+		}
+	}
+	
+	def getObservationUserGroups(long observationId, int max, long offset) {
+		return Observation.get(observationId).userGroups;
 	}
 
+	def getUserGroupObservations(UserGroup userGroupInstance, params, int max, long offset, boolean isMapView=false) {
+		
+		if(!userGroupInstance) return;
+		
+		def queryParts = observationService.getFilteredObservationsFilterQuery(params);
+		queryParts.queryParams['userGroup'] = userGroupInstance
+		queryParts.queryParams['isDeleted'] = false;
+		
+		String query = queryParts.query;
+		String userGroupQuery = " join obv.userGroups userGroup "
+		queryParts.filterQuery += " and userGroup=:userGroup " 
+		if(isMapView) {
+			query = queryParts.mapViewQuery + userGroupQuery + queryParts.filterQuery + queryParts.orderByClause
+		} else {
+			query += userGroupQuery + queryParts.filterQuery + queryParts.orderByClause
+			if(max != -1)
+				queryParts.queryParams["max"] = max
+			if(offset != -1)
+				queryParts.queryParams["offset"] = offset
+		}
+			
+//		String countQuery = "select count(*) from Observation observation " +
+//			"join observation.userGroups userGroup " +
+//			"where userGroup=:userGroup and observation.isDeleted=:obvIsDeleted	";
+//		
+//		def countParams = queryParts.queryParams.clone();
+//		countParams.remove("max");
+//		println countParams;
+//		println queryParts.mapViewQuery
+//		def totalObservationInstanceList = Observation.executeQuery(queryParts.mapViewQuery, countParams)
+//		def count = totalObservationInstanceList.size()
+
+//		String query = "select observation from Observation observation " +
+//			"join observation.userGroups userGroup " +
+//			"where userGroup=:userGroup and observation.isDeleted=:obvIsDeleted	";
+		log.debug query;
+		
+		def result=['userGroupInstance':userGroupInstance, 'observationInstanceList': Observation.executeQuery(query, queryParts.queryParams), 'queryParams':queryParts.queryParams, 'activeFilters':queryParts.activeFilters, 'showTags':false];
+		
+		return result;
+	}
+	
 	////////////////////MEMBERS RELATED/////////////////////////
 	/**
 	*
@@ -344,4 +459,5 @@ class UserGroupService {
 			   log.error "Prev rle is invalid ${role}"
 	   }
    }
+   
 }

@@ -8,17 +8,8 @@
 
 			<g:link action="show" 
 				id="${userGroupInstance.id}"  params="['pos':pos]">
-				<g:if
-					test="${imagePath && (new File(grailsApplication.config.speciesPortal.userGroups.rootDir + imagePath)).exists()}">
-					<img
-						src="${createLinkTo(base:grailsApplication.config.speciesPortal.userGroups.serverURL,	file: imagePath)}"
-						/>
-				</g:if>
-				<g:else>
-					<img class="galleryImage"
-						src="${createLinkTo( file:"no-image.jpg", base:grailsApplication.config.speciesPortal.resources.serverURL)}"
-						title="You can contribute!!!" />
-				</g:else>
+				<img class="logo" alt="${userGroupInstance.name}"
+					src="${createLink(url: userGroupInstance.mainImage()?.fileName)}">
 			</g:link>
 
 		</div>

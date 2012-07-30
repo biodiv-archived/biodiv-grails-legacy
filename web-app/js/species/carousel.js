@@ -105,7 +105,7 @@ function resizeImage(item) {
  */
 var getItemHTML = function(item) {
 	var imageTag = '<img style="height:100%;" src="' + item.imageLink + '" title="' + item.imageTitle  +'" alt="" />';
-	return '<a href=/biodiv/observation/show/' + item.obvId + '>' + imageTag + '</a>';
+	return '<a href='+window.contextUrl +'/'+ item.obvId + '>' + imageTag + '</a>';
 };
 
 var reloadCarousel = function(carousel, fitlerProperty, filterPropertyValue){

@@ -101,6 +101,10 @@ class SUser {
 		password = springSecurityService.encodePassword(password)
 	}
 
+	Resource mainImage() {
+		return new Resource(fileName:icon());
+	}
+	
 	def icon() {
 		return icon(ImageType.NORMAL);
 	}
@@ -122,14 +126,11 @@ class SUser {
 	Set<UserGroup> getUserGroups() {
 		HashSet<UserGroup> userGroups = [];
 		def uGroups = UserGroupMemberRole.findAllBySUser(this).collect{it.userGroup}
-		println uGroups
 		uGroups.each { 
 			if(aclUtilService.hasPermission(springSecurityService.getAuthentication(), it, BasePermission.WRITE)) {
 				userGroups.add(it)
 			}
 		}
-		println "----"
-		println userGroups;
 		return userGroups;
 	}
 	

@@ -299,5 +299,12 @@ class Observation implements Taggable{
 	String fetchSpeciesCall(){
 		return maxVotedReco ? maxVotedReco.name : "Unknown"
 	}
-
+	
+	String title() {
+		String title = this.maxVotedSpeciesName; 
+		if(!title || title.equalsIgnoreCase('Unknown')) {
+			title = 'Help Identify'
+		}
+		return title;
+	}
 }

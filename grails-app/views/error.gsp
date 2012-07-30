@@ -6,7 +6,7 @@
 </head>
 
 <body>
-	<div class="container_12 outer-wrapper">
+	<div class="container_12 container outer-wrapper">
 		<div class="row">
 			<div class="observation  span12 ui-state-error">
 				<p class="message">

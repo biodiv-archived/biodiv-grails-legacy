@@ -6,22 +6,24 @@
 			<h5>
 				<i class="icon-user"></i>Founders
 			</h5>
-			<g:each in="${userGroupInstance.getFounders()}" var="sUser">
+			<g:each in="${userGroupInstance.getFounders(5,0)}" var="sUser">
 				<g:link controller="SUser" action="show" id="${sUser.id}">
-					${sUser.name}
+					${sUser.name},
 				</g:link>
 			</g:each>
+			...
 		</div>
 
 		<div class="section">
 			<h5>
 				<i class="icon-user"></i>Members
 			</h5>
-			<g:each in="${userGroupInstance.getMembers()}" var="sUser">
+			<g:each in="${userGroupInstance.getMembers(5,0)}" var="sUser">
 				<g:link controller="SUser" action="show" id="${sUser.id}">
-					${sUser.name}
-				</g:link>,
-							</g:each>
+					${sUser.name},
+				</g:link>
+			</g:each>
+			...
 		</div>
 	</div>
 
@@ -44,9 +46,9 @@
 
 	<div class="super-section">
 		<div class="section">
-			<g:link action="aboutUs">More about us here</g:link>
+			<g:link action="aboutUs" id="${userGroupInstance.id}">More about us here</g:link>
 			or<br />
-			<g:link action="aboutUs" fragment="contactEmail">Contact us here</g:link>
+			<g:link action="aboutUs" id="${userGroupInstance.id}" fragment="contactEmail">Contact us here</g:link>
 		</div>
 	</div>
 

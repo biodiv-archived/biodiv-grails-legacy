@@ -8,7 +8,7 @@
 						<li class="thumbnail" style="clear: both;">
 					</g:if>
 					<g:else>
-						<li class="thumbnail" style="margin: 0;">
+						<li class="thumbnail">
 					</g:else>
 					<sUser:showUserSnippetTablet model="['userInstance':userInstance]"></sUser:showUserSnippetTablet>
 					</li>

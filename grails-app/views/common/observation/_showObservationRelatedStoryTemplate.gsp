@@ -10,7 +10,8 @@ $(document).ready(function() {
         carouselDivId:"#carousel_" + "${id}",
         carouselMsgDivId:"#relatedObservationMsg_" + "${id}",
         carouselAddObvDivId:"#relatedObservationAddButton_" + "${id}",
-        itemFallbackDimension : 75
+        itemFallbackDimension : 75,
+        contextUrl:"${createLink(controller:resultController?:controller, action:'show')}"
 	});
 	
 	$('#carousel_${id} img').hover( function () {
@@ -23,6 +24,7 @@ $(document).ready(function() {
 	
 });
 </r:script> 
+
   <div id="carousel_${id}" class="jcarousel-skin-ie7"> 
     <ul> 
       <!-- The content will be dynamically loaded in here --> 
@@ -31,7 +33,7 @@ $(document).ready(function() {
   		<g:if test="${observationId}">
 		    <a class="btn btn-mini" href="${createLink(controller:controller, action:'listRelated', params: [id: observationId, filterProperty : filterProperty, offset:0, limit:9])}">Show all</a>
 		</g:if>
-                <g:else>
+        <g:else>
 		    <a class="btn btn-mini" href="${createLink(controller:controller, action:'list', params: [(filterProperty) : filterPropertyValue])}">Show all</a>
 		</g:else>
 	</div>

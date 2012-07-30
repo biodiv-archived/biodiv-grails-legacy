@@ -1,47 +1,47 @@
 <g:set var="autofillUsersId" value="id1"/>
 
-	<div class="btn-group" style="z-index:10; float: left; margin-left: 5px;">
-		<a id="identification-email" class="${cssClass?:'btn'} dropdown-toggle" 
-			data-toggle="dropdown" href="#"><i class="icon-envelope"></i>
-			<g:if test="${activity}">
-				${activity}
-			</g:if>	
-			<g:else>
-			Share
-			</g:else>
-		</a>
-		<form id="email-form" name="email-form" style="display: none; background-color: #F2F2F2;">
-                        <div class="form-row">
-                            <span class="keyname">To</span>
-                            <sUser:selectUsers model="['id':autofillUsersId]"/>
-                        </div>
-                        <div class="form-row">
-                            <span class="keyname" style="clear:both">Subject</span><input type="text" style="width:97%" name="mailSubject"
-                                    value="${mailSubject}"></input>
-                        </div>        
+<div class="btn-group" style="z-index:100; float: left; margin-left: 5px;margin-right:5px;">
+	<a id="identification-email" class="${cssClass?:'btn'} dropdown-toggle" 
+		data-toggle="dropdown" href="#"><i class="icon-envelope"></i>
+		<g:if test="${activity}">
+			${activity}
+		</g:if>	
+		<g:else>
+		Share
+		</g:else>
+	</a>
+	<form id="email-form" name="email-form" style="display: none; background-color: #F2F2F2;">
+                       <div class="form-row">
+                           <span class="keyname">To</span>
+                           <sUser:selectUsers model="['id':autofillUsersId]"/>
+                       </div>
+                       <div class="form-row">
+                           <span class="keyname" style="clear:both">Subject</span><input type="text" style="width:97%" name="mailSubject"
+                                   value="${mailSubject}"></input>
+                       </div>        
 
-                        <div class="form-row">
-			<i class="icon-pencil"></i><span class="keyname" style="clear:both"> Message</span>
-			<h5><label>${staticMessage}</label></h5>
-				<div class="section-item">
-                                        <div id="cke_message">
-					<ckeditor:config var="toolbar_editorToolbar">
-									[
-    									[ 'Bold', 'Italic' ]
-									]
-					</ckeditor:config>
-					<ckeditor:editor name="userMessage" height="90px" toolbar="editorToolbar">
-					</ckeditor:editor>
-                                        </div>
-				</div>
-                        </div>        
-			<input type="hidden" name="userIdsAndEmailIds" id="userIdsAndEmailIds" />
-			<input class="btn btn-mini btn-primary" type="submit" value="SEND" style="margin:10px; float:right"> </input>
-			<div id="email-form-close" value="close">
-				<i class="icon-remove"></i>
+                       <div class="form-row">
+		<i class="icon-pencil"></i><span class="keyname" style="clear:both"> Message</span>
+		<h5><label>${staticMessage}</label></h5>
+			<div class="section-item">
+                                       <div id="cke_message">
+				<ckeditor:config var="toolbar_editorToolbar">
+								[
+   									[ 'Bold', 'Italic' ]
+								]
+				</ckeditor:config>
+				<ckeditor:editor name="userMessage" height="90px" toolbar="editorToolbar">
+				</ckeditor:editor>
+                                       </div>
 			</div>
-		</form>
-	</div>
+                       </div>        
+		<input type="hidden" name="userIdsAndEmailIds" id="userIdsAndEmailIds" />
+		<input class="btn btn-mini btn-primary" type="submit" value="SEND" style="margin:10px; float:right"> </input>
+		<div id="email-form-close" value="close">
+			<i class="icon-remove"></i>
+		</div>
+	</form>
+</div>
 
 
 
@@ -62,7 +62,7 @@ $(function() {
 						$('#email-form').show();
 						return false;
 					}else{
-						window.location.href = "/biodiv/login?spring-security-redirect="+window.location.href;
+						window.location.href = "${createLink(controller:'login')}?spring-security-redirect="+window.location.href;
 					}
 	            },
 	            error:function (xhr, ajaxOptions, thrownError){
