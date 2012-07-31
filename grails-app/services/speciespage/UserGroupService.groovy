@@ -356,7 +356,7 @@ class UserGroupService {
 		String countQuery = "select count(*) from UserGroup userGroup " +
 					"join userGroup.observations observation " +
 					"where observation=:observation and observation.isDeleted=:obvIsDeleted	and userGroup.isDeleted=:userGroupIsDeleted";
-		def count = UserGroup.executeQuery(countQuery, [obvIsDeleted:false, userGroupIsDeleted:false])
+		def count = UserGroup.executeQuery(countQuery, [observation:observationInstance, obvIsDeleted:false, userGroupIsDeleted:false])
 		return count[0]
 	}
 
