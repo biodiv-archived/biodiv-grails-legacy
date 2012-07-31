@@ -25,7 +25,7 @@ class UserGroup implements Taggable {
 	boolean isDeleted = false;
 	long visitCount = 0;
 	String icon;
-	
+
 	def grailsApplication;
 	def aclUtilService
 	def gormUserDetailsService;
@@ -47,6 +47,54 @@ class UserGroup implements Taggable {
 		description type:'text';
 		aboutUs type:'text';
 		sort name:"asc"
+	}
+
+	
+
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result
+				+ ((webaddress == null) ? 0 : webaddress.hashCode());
+		result = prime * result
+				+ ((id == null) ? 0 : id.hashCode());
+				
+		return result;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof UserGroup))
+			return false;
+			
+		UserGroup other = (UserGroup) obj;
+		if (name == null) {
+			if (other.name != null)
+				return false;
+		} else if (!name.equals(other.name))
+			return false;
+		if (webaddress == null) {
+			if (other.webaddress != null)
+				return false;
+		} else if (!webaddress.equals(other.webaddress))
+			return false;
+			
+		if(other.id != id) return false;
+		
+		return true;
 	}
 
 	Resource icon(ImageType type) {
@@ -86,7 +134,7 @@ class UserGroup implements Taggable {
 		groupFounders.removeAll(commons);
 		founders.removeAll(commons);
 
-		
+
 		log.debug "Adding new founders ${founders}"
 		log.debug "Romoving as founders ${groupFounders}"
 		if(founders) {
@@ -126,7 +174,7 @@ class UserGroup implements Taggable {
 			true;
 		}
 	}
-	
+
 	boolean deleteMember(SUser member) {
 		if(member) {
 			def memberRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value())
@@ -134,7 +182,7 @@ class UserGroup implements Taggable {
 			true;
 		}
 	}
-	
+
 	def getAllMembers(int max, long offset) {
 		return UserGroupMemberRole.findAllByUserGroup(this, [max:max, offset:offset]).collect { it.sUser};
 	}
@@ -148,11 +196,11 @@ class UserGroup implements Taggable {
 		def founderRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_FOUNDER.value())
 		return UserGroupMemberRole.countByUserGroupAndRole(this, founderRole);
 	}
-	
+
 	def getAllMembersCount() {
 		return UserGroupMemberRole.countByUserGroup(this);
 	}
-	
+
 	//TODO:remove
 	boolean hasPermission(SUser user, Permission permission) {
 		return aclUtilService.hasPermission(gormUserDetailsService.loadUserByUsername(user.email, true), this, permission)

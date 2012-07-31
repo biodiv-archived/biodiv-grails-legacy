@@ -524,7 +524,7 @@ input.dms_field {
 										class="icon-tags"></i>Post to Groups </label>
 									</h5>
 									<div>
-										<ul id="userGroups" name="userGroups" style="list-style:none;">
+										<ul id="userGroups" name="userGroups" style="list-style:none;clear:both;">
 											<uGroup:getCurrentUserUserGroups model="['observationInstance':observationInstance]"/>
 										</ul>
 									</div>

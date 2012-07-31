@@ -189,7 +189,10 @@ class UserGroupTagLib {
 		def result = [:]
 		if(attrs.model?.observationInstance && attrs.model.observationInstance.userGroups) {
 			//check if the obv already belongs to userGroup and disable the control for it not to submit again
+		println attrs.model.observationInstance.userGroups
+		println userGroups
 			def obvInUserGroups = attrs.model.observationInstance.userGroups.intersect(userGroups)
+			println obvInUserGroups
 			userGroups.removeAll(obvInUserGroups);
 			obvInUserGroups.each {
 				result[it] = true;
