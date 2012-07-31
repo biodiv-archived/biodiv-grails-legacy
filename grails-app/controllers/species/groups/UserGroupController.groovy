@@ -258,7 +258,7 @@ class UserGroupController {
 				render(view: "create", model: [userGroupInstance: userGroupInstance])
 			}
 			else {
-				def tags = (params.tags != null) ? Arrays.asList(params.tags) : new ArrayList();
+				def tags = (params.tags != null) ? params.tags.values() as List : new ArrayList();
 				userGroupInstance.setTags(tags);
 				log.debug "Successfully updated usergroup : "+userGroupInstance
 				flash.message = "${message(code: 'default.updated.message', args: [message(code: 'userGroup.label', default: 'UserGroup'), userGroupInstance.id])}"

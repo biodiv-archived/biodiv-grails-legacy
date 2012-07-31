@@ -54,7 +54,7 @@ class UserGroup implements Taggable {
 		if(!iconPresent) {
 			return new Resource(fileName:grailsApplication.config.speciesPortal.resources.serverURL+"/no-image.jpg", type:ResourceType.ICON, title:"");
 		}
-		return new Resource(fileName:grailsApplication.config.speciesPortal.userGroups.serverURL+this.icon, type:ResourceType.ICON, title:"You can contribute!!!");
+		return new Resource(fileName:grailsApplication.config.speciesPortal.userGroups.serverURL+this.icon, type:ResourceType.ICON, title:this.name);
 	}
 
 	Resource mainImage() {

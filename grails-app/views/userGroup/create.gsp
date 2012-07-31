@@ -179,10 +179,10 @@ input.dms_field {
 										<div
 											class="resources control-group ${hasErrors(bean: userGroupInstance, field: 'icon', 'error')}">
 
-											<%def thumbnail = userGroupInstance.icon().fileName%>
+											<%def thumbnail = userGroupInstance.icon%>
 											<div class='span3' style="height:80px; width:auto;margin-left: 0px;">
 												<img id="thumbnail"
-													src='${createLink(url: thumbnail)}' class='logo'/>
+													src='${createLink(url: userGroupInstance.mainImage().fileName)}' class='logo'/>
 												<a id="change_picture" onclick="$('#attachFile').select()[0].click();return false;"> Change Picture</a>
 											</div>
 											<input id="icon" name="icon" type="hidden" value='${thumbnail}' />
@@ -292,11 +292,9 @@ input.dms_field {
 								</label>
 							</h5>
 							<div class="create_tags section-item" style="clear: both;">
-								<ul id="tags" name="tags">
+								<ul id="tags">
 									<g:each in="${userGroupInstance.tags}" var="tag">
-										<li>
-											${tag}
-										</li>
+										<li>${tag}</li>
 									</g:each>
 								</ul>
 							</div>
@@ -466,9 +464,9 @@ $(document).ready(function() {
 	 $("#createGroupSubmit").click(function(){
 		$('#founderUserIds').val(founders_autofillUsersComp[0].getEmailAndIdsList().join(","));
 		//$('#memberUserIds').val(members_autofillUsersComp[0].getEmailAndIdsList().join(","));
-		var tags = $("ul[name='tags']").tagit("tags");
+		var tags = $("#tags").tagit("tags");
         	$.each(tags, function(index){
-        		var input = $("<input>").attr("type", "hidden").attr("name", "tags."+index).val(this);
+        		var input = $("<input>").attr("type", "hidden").attr("name", "tags."+index).val(this.label);
 				$('#${form_id}').append($(input));	
         	})
         $("#${form_id}").submit();        	
