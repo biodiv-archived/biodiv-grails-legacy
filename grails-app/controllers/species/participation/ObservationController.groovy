@@ -178,9 +178,12 @@ class ObservationController {
 		if(!observationInstance) return
 		
 		def obvInUserGroups = observationInstance.userGroups.collect { it.id + ""}
+		def toRemainInUserGroups =  obvInUserGroups.intersect(userGroupIds);
+		
+		userGroupIds.removeAll(toRemainInUserGroups)
 		userGroupService.postObservationtoUserGroups(observationInstance, userGroupIds);
-		userGroupIds.removeAll(obvInUserGroups);
-		userGroupService.removeObservationFromUserGroups(observationInstance, userGroupIds);
+		obvInUserGroups.removeAll(toRemainInUserGroups)
+		userGroupService.removeObservationFromUserGroups(observationInstance, obvInUserGroups);
 				
 	}
 	
