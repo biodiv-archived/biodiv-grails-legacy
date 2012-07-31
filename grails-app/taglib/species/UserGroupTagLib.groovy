@@ -238,7 +238,11 @@ class UserGroupTagLib {
 		def userGroupInstance = attrs.model?.userGroupInstance;
 		def result = userGroupService.getUserGroupObservations(userGroupInstance, [:], -1, -1, true)
 		def model = ['observationInstanceList':result?.observationInstanceList]
-		println model;
 		out<<render(template:"/common/observation/showObservationMultipleLocationTemplate", model:model);
-	}	
+	}
+	
+	def showNoOfUserGroupsOfUser = {attrs, body->
+		def noOfGroups = userGroupService.getNoOfUserUserGroups(attrs.model.user);
+		out << noOfGroups
+	}
 }

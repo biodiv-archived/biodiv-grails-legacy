@@ -27,7 +27,7 @@ var itemAddCallback = function(carousel, first, last, data, state) {
 	for (i = 0; i < items.length; i++) {
 		var actualIndex = first + i;
 		if (!carousel.has(actualIndex)) {
-			var item = carousel.add(actualIndex, getItemHTML(items[i]));
+			var item = carousel.add(actualIndex, getItemHTML(carousel.options.contextUrl, items[i]));
 			resizeImage(item);
 		}
 	}
@@ -103,9 +103,9 @@ function resizeImage(item) {
 /**
  * Item html creation helper.
  */
-var getItemHTML = function(item) {
+var getItemHTML = function(contextUrl, item) {
 	var imageTag = '<img style="height:100%;" src="' + item.imageLink + '" title="' + item.imageTitle  +'" alt="" />';
-	return '<a href='+window.contextUrl +'/'+ item.obvId + '>' + imageTag + '</a>';
+	return '<a href='+contextUrl +'/'+ item.obvId + '>' + imageTag + '</a>';
 };
 
 var reloadCarousel = function(carousel, fitlerProperty, filterPropertyValue){

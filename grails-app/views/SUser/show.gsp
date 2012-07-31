@@ -174,13 +174,23 @@
 				<div class="section" style="clear: both;">
 					<h5>
 						<span class="name" style="color: #b1b1b1;">
+						<i class="icon-screenshot"></i><uGroup:showNoOfUserGroupsOfUser model="['user':user]"/></i>
+						</span> 	Groups
+					</h5>
+					<obv:showRelatedStory
+								model="['observationId': user.id, 'controller':'userGroup', 'action':'getUserUserGroups', 'id':'userUserGroups', 'filterProperty':'userUserGroups', 'resultController':'userGroup']" />
+				</div>
+
+				<div class="section" style="clear: both;">
+					<h5>
+						<span class="name" style="color: #b1b1b1;">
 						<i class="icon-screenshot"></i><obv:showNoOfObservationsOfUser model="['user':user]"/></i>
 						</span> 	Observations
 					</h5>
 					<obv:showRelatedStory
 						model="['controller':'observation', 'action':'getRelatedObservation', 'filterProperty': 'user', 'filterPropertyValue':user.id, 'id':'a']" />
 				</div>
-
+				
 				<div class="section" style="clear: both;">
 					<h5>
 						<span class="name" style="color: #b1b1b1;">

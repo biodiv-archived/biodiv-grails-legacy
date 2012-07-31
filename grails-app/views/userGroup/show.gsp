@@ -44,7 +44,12 @@
 		args="[userGroupInstance.name]" />
 </title>
 <script src="http://maps.google.com/maps/api/js?sensor=true"></script>
-<r:require modules="userGroups_show,userGroups_list" />
+<r:require modules="userGroups_show,userGroups_list,comment" />
+<style>
+.comment-textbox {
+	width:100%;
+}
+</style>
 </head>
 <body>
 	<div class="container outer-wrapper">
@@ -101,6 +106,10 @@
 								style="clear: both; display: none;">
 								<uGroup:showActivityOnMap model="['userGroupInstance':userGroupInstance]"/>
 							</div>
+							
+							<div style="clear: both;">
+				    			<comment:showAllComments model="['commentHolder':userGroupInstance, commentType:'super']" />
+							</div>
 						</div>
 					</div>
 				</div>
@@ -113,7 +122,7 @@
 			window.params = {
 			<%
 				params.each { key, value ->
-					println '"'+key+'":"'+value+'",'
+					println '"'+key+'":"'+value.trim()+'",'
 				}
 			%>
 				"tagsLink":"${g.createLink(action: 'tags')}",
@@ -124,7 +133,7 @@
 	</g:javascript>
 	<r:script>
 		$(document).ready(function(){
-			showMapView();
+			//showMapView();
 		});
 	</r:script>
 </body>

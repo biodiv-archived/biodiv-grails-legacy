@@ -11,7 +11,7 @@
 					${sUser.name},
 				</g:link>
 			</g:each>
-			...
+			<g:link controller="userGroup" action="founders" id="${userGroupInstance.id}">...</g:link>
 		</div>
 
 		<div class="section">
@@ -23,7 +23,7 @@
 					${sUser.name},
 				</g:link>
 			</g:each>
-			...
+			<g:link controller="userGroup" action="members" id="${userGroupInstance.id}">...</g:link>
 		</div>
 	</div>
 

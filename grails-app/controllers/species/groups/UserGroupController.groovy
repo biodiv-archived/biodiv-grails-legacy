@@ -449,14 +449,22 @@ println model2.observationInstanceList;
 		def max = Math.min(params.limit ? params.limit.toInteger() : 9, 100)
 		def offset = params.offset ? params.offset.toInteger() : 0
 
-		def userGroups = userGroupService.getObservationUserGroups(params.long('id'), max, offset);
+		if(!params.id) return;
+		
+		def observationInstance = Observation.get(params.long('id'))
+		if (!observationInstance) {
+			flash.message = "Observation not found with id $params.id"
+			return;
+		}
+		
+		def userGroups = userGroupService.getObservationUserGroups(observationInstance, max, offset);
 
 		def result = [];
 		userGroups.each {
 			result.add(['observation':it, 'title':it.name]);
 		}
 
-		def r = ["observations":result, "count":userGroups.size()]
+		def r = ["observations":result, "count":userGroupService.getNoOfObservationUserGroups(observationInstance)]
 		if(r.observations) {
 			r.observations = observationService.createUrlList2(r.observations, '');
 		}
@@ -604,6 +612,33 @@ println model2.observationInstanceList;
 		def r = ["observations":result, "count":userGroupInstance.getAllMembersCount()]
 		if(r.observations) {
 			r.observations = observationService.createUrlList2(r.observations, "");
+		}
+		render r as JSON
+	}
+
+	def getUserUserGroups = {
+		log.debug params;
+		def max = Math.min(params.limit ? params.limit.toInteger() : 9, 100)
+		def offset = params.offset ? params.offset.toInteger() : 0
+
+		if(!params.id) return;
+		
+		def userInstance = SUser.get(params.long('id'))
+		if (!userInstance) {
+			flash.message = "SUser not found with id $params.id"
+			return;
+		}
+		
+		def userGroups = userGroupService.getUserUserGroups(userInstance, max, offset);
+
+		def result = [];
+		userGroups.each {
+			result.add(['observation':it, 'title':it.name]);
+		}
+
+		def r = ["observations":result, "count":userGroupService.getNoOfUserUserGroups(userInstance)]
+		if(r.observations) {
+			r.observations = observationService.createUrlList2(r.observations, '');
 		}
 		render r as JSON
 	}

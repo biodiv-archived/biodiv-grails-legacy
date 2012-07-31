@@ -1,6 +1,6 @@
 <div>
 	<form class="form-horizontal" onSubmit='return postComment(this, "${createLink(controller:'comment', action:'addComment')}")'>
-		<textarea name="commentBody" class="comment-textbox" placeholder="Write comment" ></textarea>
+		<textarea name="commentBody" class="comment-textbox" placeholder="Post your views here ..." ></textarea>
 		<span  style="color:#B84A48; display:none;">Please write comment</span>
 		<input type="hidden" name='commentHolderId' value="${commentHolder.id}" />
 		<input type="hidden" name='commentHolderType' value="${commentHolder.class.getCanonicalName()}" />

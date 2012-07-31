@@ -6,8 +6,7 @@
 
 <g:if test='${searched}'>
 	<div class="row">
-		<!-- main_content -->
-		<div class="list ${(params.controller != 'userGroup')?'span12':'span6'}">
+		<div class="list ${(params.controller != 'userGroup')?'span12':'span7'}">
 			<div class="observations thumbwrap">
 				<%
 def queryParams = [username: username, enabled: enabled, accountExpired: accountExpired, accountLocked: accountLocked, passwordExpired: passwordExpired]

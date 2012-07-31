@@ -36,7 +36,7 @@ class UserGroupService {
 	def dataSource;
 	def observationService;
 	def grailsApplication;
-	
+
 	void addPermission(UserGroup userGroup, SUser user, int permission) {
 		addPermission userGroup, user, aclPermissionFactory.buildFromMask(permission)
 	}
@@ -56,7 +56,7 @@ class UserGroupService {
 		List founders = Utils.getUsersList(params.founderUserIds);
 		//List members = Utils.getUsersList(params.memberUserIds);
 		userGroup.icon = getUserGroupIcon(params.icon);
-		
+
 		if(userGroup.save()) {
 			userGroup.setFounders(founders);
 			//userGroup.setMembers(members);
@@ -94,28 +94,28 @@ class UserGroupService {
 
 	private String getUserGroupIcon(String icon) {
 		if(!icon) return;
-		
+
 		def resource = null;
 		def rootDir = grailsApplication.config.speciesPortal.userGroups.rootDir
-		
+
 		File iconFile = new File(rootDir , Utils.cleanFileName(icon));
 		if(!iconFile.exists()) {
 			log.error "COULD NOT locate icon file ${iconFile.getAbsolutePath()}";
 		}
-		
+
 		resource = iconFile.absolutePath.replace(rootDir, "");
-		
-//		def res = Resource.findByFileNameAndType(path, ResourceType.ICON);
-//			
-//		if(!res) {
-//			resource = new Resource(fileName:path, type:ResourceType.ICON);
-//			if(!resource.save()) {
-//				resource.errors.each { log.error it }
-//			}
-//		} 
+
+		//		def res = Resource.findByFileNameAndType(path, ResourceType.ICON);
+		//
+		//		if(!res) {
+		//			resource = new Resource(fileName:path, type:ResourceType.ICON);
+		//			if(!resource.save()) {
+		//				resource.errors.each { log.error it }
+		//			}
+		//		}
 		return resource;
 	}
-	
+
 	@Transactional
 	@PreAuthorize("hasPermission(#userGroup, delete) or hasPermission(#userGroup, admin)")
 	void delete(UserGroup userGroup) {
@@ -310,7 +310,7 @@ class UserGroupService {
 			}
 		}
 	}
-	
+
 	@Transactional
 	@PreAuthorize("hasPermission(#userGroup, write)")
 	void postObservationToUserGroup(Observation observation, UserGroup userGroup) {
@@ -322,7 +322,7 @@ class UserGroupService {
 			log.debug "Added ${observation} to userGroup ${userGroup}"
 		}
 	}
-	
+
 	void removeObservationFromUserGroups(Observation observation, List userGroupIds) {
 		log.debug "Removing ${observation} from userGroups ${userGroupIds}"
 		userGroupIds.each {
@@ -334,7 +334,7 @@ class UserGroupService {
 			}
 		}
 	}
-	
+
 
 	@Transactional
 	@PreAuthorize("hasPermission(#userGroup, write)")
@@ -347,22 +347,30 @@ class UserGroupService {
 			log.debug "Removed ${observation} from userGroup ${userGroup}"
 		}
 	}
+
+	def getObservationUserGroups(Observation observationInstance, int max, long offset) {
+		return observationInstance.userGroups;
+	}
 	
-	def getObservationUserGroups(long observationId, int max, long offset) {
-		return Observation.get(observationId).userGroups;
+	long getNoOfObservationUserGroups(Observation observationInstance) {
+		String countQuery = "select count(*) from UserGroup userGroup " +
+					"join userGroup.observations observation " +
+					"where observation=:observation and observation.isDeleted=:obvIsDeleted	and userGroup.isDeleted=:userGroupIsDeleted";
+		def count = UserGroup.executeQuery(countQuery, [obvIsDeleted:false, userGroupIsDeleted:false])
+		return count[0]
 	}
 
 	def getUserGroupObservations(UserGroup userGroupInstance, params, int max, long offset, boolean isMapView=false) {
-		
+
 		if(!userGroupInstance) return;
-		
+
 		def queryParts = observationService.getFilteredObservationsFilterQuery(params);
 		queryParts.queryParams['userGroup'] = userGroupInstance
 		queryParts.queryParams['isDeleted'] = false;
-		
+
 		String query = queryParts.query;
 		String userGroupQuery = " join obv.userGroups userGroup "
-		queryParts.filterQuery += " and userGroup=:userGroup " 
+		queryParts.filterQuery += " and userGroup=:userGroup "
 		if(isMapView) {
 			query = queryParts.mapViewQuery + userGroupQuery + queryParts.filterQuery + queryParts.orderByClause
 		} else {
@@ -372,92 +380,102 @@ class UserGroupService {
 			if(offset != -1)
 				queryParts.queryParams["offset"] = offset
 		}
-			
-//		String countQuery = "select count(*) from Observation observation " +
-//			"join observation.userGroups userGroup " +
-//			"where userGroup=:userGroup and observation.isDeleted=:obvIsDeleted	";
-//		
-//		def countParams = queryParts.queryParams.clone();
-//		countParams.remove("max");
-//		println countParams;
-//		println queryParts.mapViewQuery
-//		def totalObservationInstanceList = Observation.executeQuery(queryParts.mapViewQuery, countParams)
-//		def count = totalObservationInstanceList.size()
 
-//		String query = "select observation from Observation observation " +
-//			"join observation.userGroups userGroup " +
-//			"where userGroup=:userGroup and observation.isDeleted=:obvIsDeleted	";
+		//		String countQuery = "select count(*) from Observation observation " +
+		//			"join observation.userGroups userGroup " +
+		//			"where userGroup=:userGroup and observation.isDeleted=:obvIsDeleted	";
+		//
+		//		def countParams = queryParts.queryParams.clone();
+		//		countParams.remove("max");
+		//		println countParams;
+		//		println queryParts.mapViewQuery
+		//		def totalObservationInstanceList = Observation.executeQuery(queryParts.mapViewQuery, countParams)
+		//		def count = totalObservationInstanceList.size()
+
+		//		String query = "select observation from Observation observation " +
+		//			"join observation.userGroups userGroup " +
+		//			"where userGroup=:userGroup and observation.isDeleted=:obvIsDeleted	";
 		log.debug query;
-		
+
 		def result=['userGroupInstance':userGroupInstance, 'observationInstanceList': Observation.executeQuery(query, queryParts.queryParams), 'queryParams':queryParts.queryParams, 'activeFilters':queryParts.activeFilters, 'showTags':false];
-		
+
 		return result;
 	}
-	
+
 	////////////////////MEMBERS RELATED/////////////////////////
 	/**
-	*
-	* @param userGroup
-	* @param user
-	* @param Role
-	* @param role
-	* @param permission
-	*/
+	 *
+	 * @param userGroup
+	 * @param user
+	 * @param Role
+	 * @param role
+	 * @param permission
+	 */
 	@Transactional
-   void addMember(UserGroup userGroup, SUser user, Role role, Permission... permissions) {
-	   def userMemberRole = UserGroupMemberRole.findBySUserAndUserGroup(user, userGroup);
-	   if(!userMemberRole) {
-		   userMemberRole = UserGroupMemberRole.create(userGroup, user, role);
-	   }
+	void addMember(UserGroup userGroup, SUser user, Role role, Permission... permissions) {
+		def userMemberRole = UserGroupMemberRole.findBySUserAndUserGroup(user, userGroup);
+		if(!userMemberRole) {
+			userMemberRole = UserGroupMemberRole.create(userGroup, user, role);
+		}
 
-	   if(userMemberRole.role.id != role.id) {
-		   def prevRole = userMemberRole.role;
-		   userMemberRole.role = role
-		   if(!userMemberRole.save()) {
-			   log.error userMemberRole.errors.allErrors.each { log.error it }
-		   } else {
-			   deletePermissionsAsPerRole(userGroup, user, prevRole);
-		   }
-	   }
+		if(userMemberRole.role.id != role.id) {
+			def prevRole = userMemberRole.role;
+			userMemberRole.role = role
+			if(!userMemberRole.save()) {
+				log.error userMemberRole.errors.allErrors.each { log.error it }
+			} else {
+				deletePermissionsAsPerRole(userGroup, user, prevRole);
+			}
+		}
 
-	   permissions.each { permission ->
-		   addPermission userGroup, user, permission
-	   }
+		permissions.each { permission ->
+			addPermission userGroup, user, permission
+		}
 
-	   //TODO:send invitation requesting for confirmation
-	   //sendFounderInvitation(user);
-   }
+		//TODO:send invitation requesting for confirmation
+		//sendFounderInvitation(user);
+	}
 
-   void addMember(UserGroup userGroup, SUser user, Role role, List<Permission> permissions) {
-	   addMember userGroup, user, role, permissions as Permission[]
-   }
+	void addMember(UserGroup userGroup, SUser user, Role role, List<Permission> permissions) {
+		addMember userGroup, user, role, permissions as Permission[]
+	}
 
-   @Transactional
-   void deleteMember(UserGroup userGroup, SUser user, Role role) {
-	   UserGroupMemberRole.remove(userGroup, user, role);
-	   deletePermissionsAsPerRole(userGroup, user, role);
-	   
-	   ///////////////////IMPORTANT//////////////////////////
-	   //TODO:delete obvs posted by him in this group
-	   /////////////////////////////////////////////////////
-   }
-   
-   
-   //TODO:need to make this better by providing a mapping between this role and associated permissions
-   private deletePermissionsAsPerRole(UserGroup userGroup, SUser user, Role role) {
-	   def founderRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_FOUNDER.value())
-	   def memberRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value())
-	   switch(role.id) {
-		   case founderRole.id :
-			   deletePermission userGroup, user, BasePermission.ADMINISTRATION
-			   deletePermission userGroup, user, BasePermission.WRITE
-			   break;
-		   case memberRole.id :
-			   deletePermission userGroup, user, BasePermission.WRITE
-			   break;
-		   default :
-			   log.error "Prev rle is invalid ${role}"
-	   }
-   }
-   
+	@Transactional
+	void deleteMember(UserGroup userGroup, SUser user, Role role) {
+		UserGroupMemberRole.remove(userGroup, user, role);
+		deletePermissionsAsPerRole(userGroup, user, role);
+
+		///////////////////IMPORTANT//////////////////////////
+		//TODO:delete obvs posted by him in this group
+		/////////////////////////////////////////////////////
+	}
+
+
+	//TODO:need to make this better by providing a mapping between this role and associated permissions
+	private deletePermissionsAsPerRole(UserGroup userGroup, SUser user, Role role) {
+		def founderRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_FOUNDER.value())
+		def memberRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value())
+		switch(role.id) {
+			case founderRole.id :
+				deletePermission userGroup, user, BasePermission.ADMINISTRATION
+				deletePermission userGroup, user, BasePermission.WRITE
+				break;
+			case memberRole.id :
+				deletePermission userGroup, user, BasePermission.WRITE
+				break;
+			default :
+				log.error "Prev rle is invalid ${role}"
+		}
+	}
+
+	////////////////////USERS RELATED/////////////////////////
+
+	int getNoOfUserUserGroups(SUser user) {
+		return UserGroupMemberRole.countBySUser(user);
+	}
+	
+	def getUserUserGroups(SUser user, int max, long offset) {
+		return UserGroupMemberRole.findAllBySUser(user,[max:max, offset:offset]).collect { it.userGroup};
+	}
+	
 }
