@@ -1,6 +1,7 @@
 <%@page import="species.auth.SUser"%>
 <%@ page import="species.groups.UserGroup"%>
 <div class="filters" style="position: relative;">
+	<obv:showGroupFilter />
 </div>
 <div class="tags_section span3" style="float: right;">
 	<g:if test="${params.action == 'search' }">
@@ -18,7 +19,43 @@
 
 		<div class="observations thumbwrap">
 			<div class="observation">
+				<div>
+					<obv:showObservationFilterMessage
+						model="['observationInstanceList':userGroupInstanceList, 'instanceTotal':instanceTotal, 'queryParams':queryParams, 'resultType':'user group']" />
+				</div>
+				<div class="btn-group pull-left" style="z-index: 10">
+					<button id="selected_sort" class="btn dropdown-toggle"
+						data-toggle="dropdown" href="#" rel="tooltip"
+						data-original-title="Sort by">
 
+						
+						<g:if test="${params.sort == 'foundedOn'}">
+                                                Latest
+                                            </g:if>
+						<g:elseif test="${params.sort == 'score'}">
+                                                Relevancy
+                                            </g:elseif>
+						<g:else>
+                                                Most Viewed
+                                            </g:else>
+						<span class="caret"></span>
+					</button>
+					<ul id="sortFilter" class="dropdown-menu" style="width: auto;">
+						<li class="group_option"><a class=" sort_filter_label"
+							value="foundedOn"> Latest </a></li>
+						
+						<g:if test="${isSearch}">
+							<li class="group_option"><a class=" sort_filter_label"
+								value="score"> Relevancy </a></li>
+						</g:if>
+						<g:else>
+							<li class="group_option"><a class=" sort_filter_label"
+								value="visitCount"> Most Viewed </a></li>
+						</g:else>
+					</ul>
+
+
+				</div>
 				<obv:identificationByEmail
 					model="['source':'userGroupList', 'requestObject':request]" />
 				
@@ -33,146 +70,46 @@
 
 
 <!--container end-->
-<r:script>	
-        $(document).ready( function() {
-        					
-			function getSelectedTag() {
-				var tag = ''; 
-				tag = $("li.tagit-choice.active").contents().first().text();
-				if(!tag){
-					tag = $("#tc_tagcloud a.active").contents().first().text();	
-				}
-				if(tag) {
-                	tag = stringTrim(tag.replace(/\s*\,\s*$/,''));
-                	return tag;
-                }	
-            } 
-            
-	        function getFilterParameters(url, limit, offset, removeUser) {
-                    var params = url.param();
-            
-                    if(limit != undefined) {
-                        params['max'] = limit.toString();
-                    }
+<g:javascript>
+$(document).ready(function() {
+	window.params = {
+	<%
+		params.each { key, value ->
+			println '"'+key+'":"'+value+'",'
+		}
+	%>
+		"tagsLink":"${g.createLink(action: 'tags')}",
+		"queryParamsMax":"${queryParams?.max}"
+	}
+});
 
-                    if(offset != undefined) {
-                        params['offset'] = offset.toString();
-                    }
-					
-					var tag = getSelectedTag();
-					if(tag){
-						params['tag'] = tag;
-					}else{
-						//removing old tag from url
-						if(params['tag'] != undefined){
-							delete params['tag'];
-						}
-					}
-					
-					var query = $( "#searchTextField" ).val();
-					if(query){
-						params['query'] = query;
-					}else{
-						//removing old tag from url
-						if(params['query'] != undefined){
-							delete params['query'];
-						}
-					}
-					
-					if(removeUser){
-						if(params['user'] != undefined){
-							delete params['user'];
-						}
-					}
-					
-					return params;
-                }	
+$( "#search" ).click(function() {                		
+	updateGallery(undefined, ${queryParams?.max}, 0);
+	return false;
+});
+</g:javascript>
+<r:script>
 
-				function setActiveTag(activeTag){
-					if(activeTag != undefined){
- 							$('li.tagit-choice').each (function() {
- 								if(stringTrim($(this).contents().first().text()) == stringTrim(activeTag)) {
-                       				$(this).addClass('active');
-                       			}
-                       			else{
-                       				if($(this).hasClass('active')){
-                       					$(this).removeClass('active');
-                       				}
-                       			}
-                       		});
-                       		
-                       		$('#tc_tagcloud a').each(function() {
- 								if(stringTrim($(this).contents().first().text()) == stringTrim(activeTag)) {
-                       				$(this).addClass('active');
-                       			}else{
-                       				if($(this).hasClass('active')){
-                       					$(this).removeClass('active');
-                       				}
-                       			}
-               				});
-               				
-				 		}
-				}
-				
-                function updateListPage(activeTag) {
-  					return function (data) {
-  						$('.observations_list').replaceWith(data.obvListHtml);
-						$('#info-message').replaceWith(data.obvFilterMsgHtml);
-  						$('#tags_section').replaceWith(data.tagsHtml);
-  						$('.observation_location_wrapper').replaceWith(data.mapViewHtml);
-  						setActiveTag(activeTag);
-					}
-				}
-                
-                function updateGallery(target, limit, offset, removeUser, isGalleryUpdate) {
-                    if(target === undefined) {
-                            target = window.location.pathname + window.location.search;
-                    }
-                    
-                    var a = $('<a href="'+target+'"></a>');
-                    var url = a.url();
-                    var href = url.attr('path');
-                    var params = getFilterParameters(url, limit, offset, removeUser);
-                    //alert(" tag in params " + params['tag'] );
-                    isGalleryUpdate = (isGalleryUpdate == undefined)?true:isGalleryUpdate
-                    if(isGalleryUpdate)
-                    	params["isGalleryUpdate"] = isGalleryUpdate;
-                    var recursiveDecoded = decodeURIComponent($.param(params));
-                    
-                    var doc_url = href+'?'+recursiveDecoded;
-                    var History = window.History;
-                    delete params["isGalleryUpdate"]
-                    History.pushState({state:1}, "Species Portal", '?'+decodeURIComponent($.param(params))); 
-                    //alert("doc_url " + doc_url);
-                    if(isGalleryUpdate) {
-	                   	$.ajax({
-	  						url: doc_url,
-	  						dataType: 'json',
-	  						
-	  						beforeSend : function(){
-	  							$('.observations_list').css({"opacity": 0.5});
-	  							$('#tags_section').css({"opacity": 0.5});
-	  						},
-	  						
-	  						success: updateListPage(params["tag"]),
-							statusCode: {
-		    					401: function() {
-		    						show_login_dialog();
-		    					}	    				    			
-		    				},
-		    				error: function(xhr, status, error) {
-		    					var msg = $.parseJSON(xhr.responseText);
-		    					$('.message').html(msg);
-							}
-						});
-					} else {
-						window.location = doc_url;
-					}
-                }
-           
-                $( "#search" ).click(function() {                		
-						updateGallery(undefined, ${queryParams.max}, 0);
-                		return false;
-				});
-				
+function getSelectedGroup() {
+    var grp = ''; 
+    $('#speciesGroupFilter button').each (function() {
+            if($(this).hasClass('active')) {
+                    grp += $(this).attr('data-original-title') + ',';
+            }
+    });
+
+    grp = grp.replace(/\s*\,\s*$/,'');
+    return grp;	
+} 
+    
+function getSelectedHabitat() {
+    var hbt = ''; 
+    $('#habitatFilter button').each (function() {
+            if($(this).hasClass('active')) {
+                    hbt += $(this).attr('data-original-title') + ',';
+            }
+    });
+    hbt = hbt.replace(/\s*\,\s*$/,'');
+    return hbt;	
+} 
 </r:script>

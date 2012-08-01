@@ -122,7 +122,7 @@
 			window.params = {
 			<%
 				params.each { key, value ->
-					println '"'+key+'":"'+value.trim()+'",'
+					println '"'+key+'":"'+value?.trim()+'",'
 				}
 			%>
 				"tagsLink":"${g.createLink(action: 'tags')}",

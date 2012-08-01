@@ -13,6 +13,7 @@ import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.transaction.annotation.Transactional
 
+import species.Habitat;
 import species.Resource;
 import species.Resource.ResourceType;
 import species.auth.Role;
@@ -56,6 +57,8 @@ class UserGroupService {
 		List founders = Utils.getUsersList(params.founderUserIds);
 		//List members = Utils.getUsersList(params.memberUserIds);
 		userGroup.icon = getUserGroupIcon(params.icon);
+		addInterestedSpeciesGroups(userGroup, params.speciesGroup)
+		addInterestedHabitats(userGroup, params.habitats)
 
 		if(userGroup.save()) {
 			userGroup.setFounders(founders);
@@ -87,6 +90,9 @@ class UserGroupService {
 		List founders = Utils.getUsersList(params.founderUserIds);
 		//List members = Utils.getUsersList(params.memberUserIds);
 		userGroup.icon = getUserGroupIcon(params.icon);
+		addInterestedSpeciesGroups(userGroup, params.speciesGroup)
+		addInterestedHabitats(userGroup, params.habitats)
+		
 		userGroup.setFounders(founders);
 		//userGroup.setMembers(members);
 
@@ -114,6 +120,22 @@ class UserGroupService {
 		//			}
 		//		}
 		return resource;
+	}
+	
+	private void addInterestedSpeciesGroups(userGroupInstance, speciesGroups) {
+		log.debug "Adding species group interests ${speciesGroups}"
+		userGroupInstance.speciesGroups?.removeAll()
+		speciesGroups.each {key, value ->
+			userGroupInstance.addToSpeciesGroups(value.capitalize());
+		}
+	}
+	
+	private void addInterestedHabitats(userGroupInstance, habitats) {
+		log.debug "Adding habitat interests ${habitats}"
+		userGroupInstance.habitats?.removeAll()
+		habitats.each { key, value ->
+			userGroupInstance.addToHabitats(value.capitalize());
+		}
 	}
 
 	@Transactional
@@ -168,16 +190,18 @@ class UserGroupService {
 		return tags;
 	}
 
-	protected Map getTagsFromUserGroup(uGroupIds){
+	protected Map getTagsFromUserGroup(uGroups){
 		int tagsLimit = 30;
 		LinkedHashMap tags = [:]
-		if(!uGroupIds){
+		if(!uGroups){
 			return tags
 		}
 
 		def sql =  Sql.newInstance(dataSource);
-		String query = "select t.name as name, count(t.name) as ug_count from tag_links as tl, tags as t, user_group ug where tl.tag_ref in " + getIdList(uGroupIds)  + " and tl.tag_ref = ug.id  and tl.type = 'userGroup' and ug.is_deleted = false and t.id = tl.tag_id group by t.name order by count(t.name) desc, t.name asc limit " + tagsLimit;
+		println uGroups
+		String query = "select t.name as name, count(t.name) as ug_count from tag_links as tl, tags as t, user_group ug where tl.tag_ref in " + getIdList(uGroups)  + " and tl.tag_ref = ug.id  and tl.type = 'userGroup' and ug.is_deleted = false and t.id = tl.tag_id group by t.name order by count(t.name) desc, t.name asc limit " + tagsLimit;
 
+		log.debug query;
 		sql.rows(query).each{
 			tags[it.getProperty("name")] = it.getProperty("ug_count");
 		};
@@ -199,31 +223,21 @@ class UserGroupService {
 	 * executing query
 	 */
 	Map getFilteredUserGroups(params, max, offset, isMapView) {
-		//params.sGroup = (params.sGroup)? params.sGroup : SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.ALL).id
-		//params.habitat = (params.habitat)? params.habitat : Habitat.findByName(grailsApplication.config.speciesPortal.group.ALL).id
+		//params.sGroup = (params.sGroup)? params.sGroup : SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.ALL).name
+		//params.habitat = (params.habitat)? params.habitat : Habitat.findByName(grailsApplication.config.speciesPortal.group.ALL).name
 		//params.habitat = params.habitat.toLong()
 		//params.userName = springSecurityService.currentUser.username;
+		params.observation = (params.observation)? params.long('observation'):null
+		params.user = (params.user)? params.long('user'):null
 
-		def query = "select uGroup from UserGroup uGroup where uGroup.isDeleted = :isDeleted "
+		def query = "select uGroup from UserGroup uGroup "
 		//def mapViewQuery = "select obv.id, obv.latitude, obv.longitude from Observation obv where obv.isDeleted = :isDeleted "
 		def queryParams = [isDeleted : false]
-		def filterQuery = ""
+		def filterQuery = " where uGroup.isDeleted = :isDeleted "
 		def activeFilters = [:]
 
-		//	   if(params.sGroup){
-		//		   params.sGroup = params.sGroup.toLong()
-		//		   def groupId = getSpeciesGroupIds(params.sGroup)
-		//		   if(!groupId){
-		//			   log.debug("No groups for id " + params.sGroup)
-		//		   }else{
-		//			   filterQuery += " and obv.group.id = :groupId "
-		//			   queryParams["groupId"] = groupId
-		//			   activeFilters["sGroup"] = groupId
-		//		   }
-		//	   }
-
 		if(params.tag){
-			query = "select uGroup from UserGroup uGroup,  TagLink tagLink where uGroup.isDeleted = :isDeleted "
+			query = "select uGroup from UserGroup uGroup,  TagLink tagLink  "
 			//mapViewQuery = "select obv.id, obv.latitude, obv.longitude from Observation obv, TagLink tagLink where obv.isDeleted = :isDeleted "
 			filterQuery +=  " and uGroup.id = tagLink.tagRef and tagLink.type = :tagType and tagLink.tag.name = :tag "
 
@@ -232,52 +246,54 @@ class UserGroupService {
 			activeFilters["tag"] = params.tag
 		}
 
+		if(params.user){
+			params.user = params.user.toLong()
+			query += "  ,UserGroupMemberRole userGroupMemberRole "
+			filterQuery += " and userGroupMemberRole.userGroup.id=uGroup.id and userGroupMemberRole.sUser.id=:user ";
+			queryParams["user"] = params.user
+			activeFilters["user"] = params.user
+		}
+		
+		if(params.observation){
+			params.observation = params.observation.toLong()
+			query += " join uGroup.observations observation "
+			filterQuery += " and observation.id=:observation and observation.isDeleted=:obvIsDeleted ";
+			queryParams["observation"] = params.observation
+			queryParams["obvIsDeleted"] = false
+			activeFilters["observation"] = params.observation
+		}
 
-		//	   if(params.habitat && (params.habitat != Habitat.findByName(grailsApplication.config.speciesPortal.group.ALL).id)){
-		//		   filterQuery += " and obv.habitat.id = :habitat "
-		//		   queryParams["habitat"] = params.habitat
-		//		   activeFilters["habitat"] = params.habitat
-		//	   }
-		//
-		//	   if(params.user){
-		//		   filterQuery += " and obv.author.id = :user "
-		//		   queryParams["user"] = params.user.toLong()
-		//		   activeFilters["user"] = params.user.toLong()
-		//	   }
-		//
-		//	   if(params.speciesName && (params.speciesName != grailsApplication.config.speciesPortal.group.ALL)){
-		//		   filterQuery += " and obv.maxVotedSpeciesName = :speciesName "
-		//		   queryParams["speciesName"] = params.speciesName
-		//		   activeFilters["speciesName"] = params.speciesName
-		//	   }
-		//
-		//	   if(params.isFlagged && params.isFlagged.toBoolean()){
-		//		   filterQuery += " and obv.flagCount > 0 "
-		//	   }
-		//
-		//	   if(params.bounds){
-		//		   def bounds = params.bounds.split(",")
-		//
-		//		   def swLat = bounds[0]
-		//		   def swLon = bounds[1]
-		//		   def neLat = bounds[2]
-		//		   def neLon = bounds[3]
-		//
-		//		   filterQuery += " and obv.latitude > " + swLat + " and  obv.latitude < " + neLat + " and obv.longitude > " + swLon + " and obv.longitude < " + neLon
-		//		   activeFilters["bounds"] = params.bounds
-		//	   }
-		def sortOption = "foundedOn";//(params.sort ? params.sort : "foundedOn");
-		def orderByClause = " order by uGroup." + sortOption +  " desc"
-		//
-		//	   if(isMapView) {
-		//		   query = mapViewQuery + filterQuery + orderByClause
-		//	   } else {
+		if(params.sGroup){
+			//params.sGroup = params.sGroup.toLong()
+			//def groupId = observationService.getSpeciesGroupIds(params.sGroup)
+			if(!params.sGroup){
+				log.debug("No groups for id " + params.sGroup)
+			}else{
+				query += " join uGroup.speciesGroups speciesGroup "
+				filterQuery += " and lower(speciesGroup) = :groupId"
+				queryParams["groupId"] = params.sGroup.toLowerCase()
+				activeFilters["sGroup"] = params.sGroup
+			}
+		}
+
+		if(params.habitat){// && (params.habitat != Habitat.findByName(grailsApplication.config.speciesPortal.group.ALL).id)){
+			//params.sGroup = params.sGroup.toLong()
+			//def groupId = observationService.getSpeciesGroupIds(params.sGroup)
+			
+				query += " join uGroup.habitats habitat "
+				filterQuery += " and lower(habitat) = :habitat"
+				queryParams["habitat"] = params.habitat.toLowerCase()
+				activeFilters["habitat"] = params.habitat
+		}
+
+		def sortOption = (params.sort ? params.sort : "visitCount");
+		def orderByClause = " order by uGroup." + sortOption +  " desc, uGroup.id asc"
+		
 		query += filterQuery + orderByClause
 		if(max != -1)
 			queryParams["max"] = max
 		if(offset != -1)
 			queryParams["offset"] = offset
-		//	   }
 
 		log.debug "Getting filtered usergroups $query $queryParams";
 		def userGroupInstanceList = UserGroup.executeQuery(query, queryParams)
@@ -294,7 +310,7 @@ class UserGroupService {
 		return null;
 	}
 
-	private String getIdList(l){
+	private String getIdList(l){		
 		return l.toString().replace("[", "(").replace("]", ")")
 	}
 
@@ -335,7 +351,6 @@ class UserGroupService {
 		}
 	}
 
-
 	@Transactional
 	@PreAuthorize("hasPermission(#userGroup, write)")
 	void removeObservationFromUserGroup(Observation observation, UserGroup userGroup) {
@@ -351,11 +366,11 @@ class UserGroupService {
 	def getObservationUserGroups(Observation observationInstance, int max, long offset) {
 		return observationInstance.userGroups;
 	}
-	
+
 	long getNoOfObservationUserGroups(Observation observationInstance) {
 		String countQuery = "select count(*) from UserGroup userGroup " +
-					"join userGroup.observations observation " +
-					"where observation=:observation and observation.isDeleted=:obvIsDeleted	and userGroup.isDeleted=:userGroupIsDeleted";
+				"join userGroup.observations observation " +
+				"where observation=:observation and observation.isDeleted=:obvIsDeleted	and userGroup.isDeleted=:userGroupIsDeleted";
 		def count = UserGroup.executeQuery(countQuery, [observation:observationInstance, obvIsDeleted:false, userGroupIsDeleted:false])
 		return count[0]
 	}
@@ -473,9 +488,9 @@ class UserGroupService {
 	int getNoOfUserUserGroups(SUser user) {
 		return UserGroupMemberRole.countBySUser(user);
 	}
-	
+
 	def getUserUserGroups(SUser user, int max, long offset) {
 		return UserGroupMemberRole.findAllBySUser(user,[max:max, offset:offset]).collect { it.userGroup};
 	}
-	
+
 }

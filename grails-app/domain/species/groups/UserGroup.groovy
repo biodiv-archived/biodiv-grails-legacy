@@ -32,7 +32,7 @@ class UserGroup implements Taggable {
 	def springSecurityService;
 	def userGroupService;
 
-	static hasMany = [sGroups:SpeciesGroup, habitats:Habitat, observations:Observation]
+	static hasMany = [speciesGroups:String, habitats:String, observations:Observation]
 
 	static constraints = {
 		name nullable: false, blank:false, unique:true

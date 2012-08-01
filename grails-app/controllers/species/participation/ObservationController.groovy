@@ -110,7 +110,7 @@ class ObservationController {
 		}
 		
 		log.debug "Storing all observations ids list in session ${session['obv_ids_list']} for params ${params}";
-		return [totalObservationInstanceList:totalObservationInstanceList, observationInstanceList: observationInstanceList, observationInstanceTotal: count, queryParams: queryParams, activeFilters:activeFilters]
+		return [totalObservationInstanceList:totalObservationInstanceList, observationInstanceList: observationInstanceList, instanceTotal: count, queryParams: queryParams, activeFilters:activeFilters]
 	}
 	
 

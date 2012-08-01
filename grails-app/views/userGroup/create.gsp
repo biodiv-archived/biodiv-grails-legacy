@@ -1,5 +1,6 @@
 <%@page import="species.utils.Utils"%>
 <%@ page import="species.groups.UserGroup"%>
+<%@ page import="species.Habitat"%>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -329,10 +330,41 @@ input.dms_field {
 				</div>
 
 				<div class="span12 super-section" style="clear: both;">
-					<div class="span11 section"
+					<div class="section"
 						style="position: relative; overflow: visible;">
 						<h3>Interested In</h3>
-
+						<div class="span6 block" style="width: 442px;clear:both;">
+							<h5>
+								<label>Species Groups<small><g:message
+											code="observation.speciesGroups.message" default="" />
+								</small>
+								</label>
+							</h5>
+							<div class="create_tags section-item" style="clear: both;">
+								<ul id="speciesGroups">
+									<g:each in="${userGroupInstance.speciesGroups}" var="speciesGroup">
+										<li>${speciesGroup}</li>
+									</g:each>
+								</ul>
+							</div>
+						</div>
+						
+						<div class="sidebar-section block" style="width: 442px;">
+							<h5>
+								<label>Habitats<small><g:message
+											code="observation.habitats.message" default="" />
+								</small>
+								</label>
+							</h5>
+							<div class="create_tags section-item" style="clear: both;">
+								<ul id="habitats">
+									<g:each in="${userGroupInstance.habitats}" var="habitat">
+										<li>${habitat}</li>
+									</g:each>
+								</ul>
+							</div>
+						</div>
+						
 					</div>
 				</div>
 
@@ -465,17 +497,48 @@ $(document).ready(function() {
 		$('#founderUserIds').val(founders_autofillUsersComp[0].getEmailAndIdsList().join(","));
 		//$('#memberUserIds').val(members_autofillUsersComp[0].getEmailAndIdsList().join(","));
 		var tags = $("#tags").tagit("tags");
-        	$.each(tags, function(index){
-        		var input = $("<input>").attr("type", "hidden").attr("name", "tags."+index).val(this.label);
-				$('#${form_id}').append($(input));	
-        	})
+       	$.each(tags, function(index){
+       		var input = $("<input>").attr("type", "hidden").attr("name", "tags."+index).val(this.label);
+			$('#${form_id}').append($(input));	
+       	})
+        
+        var speciesGroups = $("#speciesGroups").tagit("tags");
+       	$.each(speciesGroups, function(index){
+       		var input = $("<input>").attr("type", "hidden").attr("name", "speciesGroup."+index).val(this.label);
+			$('#${form_id}').append($(input));	
+       	})
+        
+        var habitats = $("#habitats").tagit("tags");
+       	$.each(habitats, function(index){
+       		var input = $("<input>").attr("type", "hidden").attr("name", "habitat."+index).val(this.label);
+			$('#${form_id}').append($(input));	
+       	})
+       	
         $("#${form_id}").submit();        	
         return false;
         
 	});
 	
-	$(".tagit-input").watermark("Add some tags");
+	
+	
+	$("#tags .tagit-input").watermark("Add some tags");	
 	$("#tags").tagit({select:true,  tagSource: "${g.createLink(action: 'tags')}", triggerKeys:['enter', 'comma', 'tab'], maxLength:30});
+	
+	$("#speciesGroups .tagit-input").watermark("Add species groups that are of interest");
+	$("#speciesGroups").tagit({select:true,  tagSource: "${g.createLink(controller:'speciesGroup', action: 'tags')}", triggerKeys:['enter', 'comma', 'tab'], maxLength:30});
+	
+	<%
+		String habitatList = "[";
+		Habitat.list().each {
+			habitatList += "'"+it.name+"',"
+		}
+		habitatList = habitatList[0..-2];
+		habitatList += "]";
+		
+	%>
+	$("#habitats .tagit-input").watermark("Add some habitats that are of interest");
+	$("#habitats").tagit({select:true,  availableTags:${habitatList}, triggerKeys:['enter', 'comma', 'tab'], maxLength:30});
+	
 	$(".tagit-hiddenSelect").css('display','none');
 });
 </r:script>

@@ -228,7 +228,7 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 						<div class="sidebar_section tile" style="clear: both">
 							<div class="title">This observation belongs to following groups</div>
 							<obv:showRelatedStory
-								model="['observationInstance':observationInstance, 'observationId': observationInstance.id, 'controller':'userGroup', 'action':'getRelatedUserGroups', 'id':'relatedGroups']" />
+								model="['observationInstance':observationInstance, 'observationId': observationInstance.id, 'controller':'userGroup', 'action':'getRelatedUserGroups', 'filterProperty': 'obvRelatedUserGroups', 'id':'relatedGroups']" />
 						</div>
 					</div>
 					

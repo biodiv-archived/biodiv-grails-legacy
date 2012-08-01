@@ -149,6 +149,11 @@ $(document).ready(function(){
     	return false;
     });
     
+    $("#removeObvFilter").live('click', function(){
+    	updateGallery(undefined, window.params.queryParamsMax, window.params.offset, false, window.params.isGalleryUpdate, true);
+    	return false;
+    });
+    
     $("#removeQueryFilter").live('click', function(){
     	$( "#searchTextField" ).val('');
     	updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
@@ -341,7 +346,7 @@ function getSelectedTag() {
     }	
 } 
 
-function getFilterParameters(url, limit, offset, removeUser) {
+function getFilterParameters(url, limit, offset, removeUser, removeObv) {
     var params = url.param();
     var sortBy = getSelectedSortBy();
     if(sortBy) {
@@ -401,6 +406,11 @@ function getFilterParameters(url, limit, offset, removeUser) {
 		}
 	}
 	
+	if(removeObv){
+		if(params['observation'] != undefined){
+			delete params['observation'];
+		}
+	}
 	return params;
 }	
 
@@ -441,7 +451,7 @@ function updateListPage(activeTag) {
 	}
 }
 
-function updateGallery(target, limit, offset, removeUser, isGalleryUpdate) {
+function updateGallery(target, limit, offset, removeUser, isGalleryUpdate, removeObv) {
     if(target === undefined) {
             target = window.location.pathname + window.location.search;
     }
@@ -449,7 +459,7 @@ function updateGallery(target, limit, offset, removeUser, isGalleryUpdate) {
     var a = $('<a href="'+target+'"></a>');
     var url = a.url();
     var href = url.attr('path');
-    var params = getFilterParameters(url, limit, offset, removeUser);
+    var params = getFilterParameters(url, limit, offset, removeUser, removeObv);
     // alert(" tag in params " + params['tag'] );
     isGalleryUpdate = (isGalleryUpdate == undefined)?true:isGalleryUpdate
     if(isGalleryUpdate)

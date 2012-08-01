@@ -25,7 +25,7 @@
 					</div>
 				</g:if>
 
-				<uGroup:showUserGroupsListWrapper />
+				<uGroup:showUserGroupsListWrapper  model="['totalUserGroupInstanceList':totalUserGroupInstanceList, 'userGroupInstanceList':UserGroupInstanceList, 'userGroupInstanceTotal':userGroupInstanceTotal, 'queryParams':queryParams, 'activeFilters':activeFilters]" />
 
 			</div>
 		</div>

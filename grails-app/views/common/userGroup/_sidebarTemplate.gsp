@@ -1,3 +1,5 @@
+<%@ page import="species.groups.SpeciesGroup"%>
+<%@ page import="species.Habitat"%>
 
 <div class="span4 sidebar left-sidebar">
 
@@ -27,6 +29,34 @@
 		</div>
 	</div>
 
+	<div class="super-section">
+		<h3>
+				Interested In
+		</h3>
+		<div class="section">
+			<h5>
+				<i class="icon-snapshot"></i>Species Groups
+			</h5>
+			<g:each in="${userGroupInstance.speciesGroups}" var="speciesGroup">
+				<g:link controller="userGroup" action="list" params="['sGroup':speciesGroup]">
+					${speciesGroup},
+				</g:link>
+			</g:each>
+		</div>
+
+		<div class="section">
+			<h5>
+				<i class="icon-snapshot"></i>Habitat
+			</h5>
+			<g:each in="${userGroupInstance.habitats}" var="habitat">
+				<g:link controller="userGroup" action="list" params="['habitat':habitat]">
+					${habitat},
+				</g:link>
+			</g:each>
+			
+		</div>
+	</div>
+	
 	<div class="super-section">
 		<div class="section">
 			<uGroup:showAllTags

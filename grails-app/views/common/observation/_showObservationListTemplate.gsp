@@ -46,7 +46,7 @@
 		</div>
 	</div>
 	
-	<g:if test="${observationInstanceTotal > (queryParams.max?:0)}">
+	<g:if test="${instanceTotal > (queryParams.max?:0)}">
 		<div class="centered">
 			<div class="btn loadMore">
 				<span class="progress" style="display: none;">Loading ... </span> <span
@@ -58,7 +58,7 @@
 
 	<%activeFilters?.loadMore = true %>
 	<div class="paginateButtons" style="visibility: hidden; clear: both">
-		<g:paginate total="${observationInstanceTotal}" action="${params.action}"
+		<g:paginate total="${instanceTotal}" action="${params.action}"
 			 max="${queryParams.max}" params="${activeFilters}" />
 	</div>
 	

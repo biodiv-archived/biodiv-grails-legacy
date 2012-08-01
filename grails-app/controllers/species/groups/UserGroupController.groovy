@@ -35,13 +35,13 @@ class UserGroupController {
 			render (view:"list", model:model)
 		} else{
 			def userGroupListHtml =  g.render(template:"/common/userGroup/showUserGroupListTemplate", model:model);
-			def userGroupFilterMsgHtml = g.render(template:"/common/userGroup/showUserGroupFilterMsgTemplate", model:model);
+			def userGroupFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
 
-			def filteredTags = userGroupService.getTagsFromUserGroup(model.totalUserGroupInstanceList.collect{it[0]})
-			def tagsHtml = g.render(template:"/common/userGroup/showAllTagsTemplate", model:[count: count, tags:filteredTags, isAjaxLoad:true]);
-			def mapViewHtml = g.render(template:"/common/userGroup/showUserGroupMultipleLocationTemplate", model:[userGroupInstanceList:model.totalUserGroupInstanceList]);
+			def filteredTags = userGroupService.getTagsFromUserGroup(model.totalUserGroupInstanceList.collect{it.id})
+			def tagsHtml = g.render(template:"/common/observation/showAllTagsTemplate", model:[tags:filteredTags, isAjaxLoad:true]);
+			def mapViewHtml = g.render(template:"/common/observation/showObservationMultipleLocationTemplate", model:[userGroupInstanceList:model.totalUserGroupInstanceList]);
 
-			def result = [userGroupListHtml:userGroupListHtml, userGroupFilterMsgHtml:userGroupFilterMsgHtml, tagsHtml:tagsHtml, mapViewHtml:mapViewHtml]
+			def result = [obvListHtml:userGroupListHtml, obvFilterMsgHtml:userGroupFilterMsgHtml, tagsHtml:tagsHtml, mapViewHtml:mapViewHtml]
 			render result as JSON
 		}
 	}
@@ -82,7 +82,7 @@ class UserGroupController {
 		}
 
 		log.debug "Storing all userGroup ids list in session ${session['uGroup_ids_list']} for params ${params}";
-		return [totalUserGroupInstanceList:totalUserGroupInstanceList, userGroupInstanceList: userGroupInstanceList, userGroupInstanceTotal: count, queryParams: queryParams, activeFilters:activeFilters]
+		return [totalUserGroupInstanceList:totalUserGroupInstanceList, userGroupInstanceList: userGroupInstanceList, instanceTotal: count, queryParams: queryParams, activeFilters:activeFilters]
 	}
 
 	def listRelated = {
@@ -95,9 +95,15 @@ class UserGroupController {
 			case 'featuredMembers':
 				redirect(action:'members', id:params.id);
 				break;
+			case 'obvRelatedUserGroups':
+				redirect(action:'list', params:[observation:params.id]);
+				break;
+			case 'userUserGroups':
+				redirect(action:'list', params:[user:params.id]);
+				break;
 			default:
 				flash:message "Invalid command"
-				redirect(action:show, id:params.id)
+				redirect(action:list, id:params.id)
 		}	
 		return
 	}
@@ -359,8 +365,7 @@ class UserGroupController {
 		def observationInstanceTotal = model2.observationInstanceList.size();
 		model['observationInstanceTotal'] = observationInstanceTotal
 		model['totalObservationInstanceList'] = model2.observationInstanceList;
-		println observationInstanceTotal;
-println model2.observationInstanceList;
+
 		if(params.loadMore?.toBoolean()){
 			render(template:"/common/observation/showObservationListTemplate", model:model);
 			return;

@@ -14,35 +14,57 @@
 </g:javascript>
 
 <div class="info-message" id="info-message">
-	<g:if test="${observationInstanceTotal == 0}">
+	<g:if test="${instanceTotal == 0}">
 		<search:noSearchResults />
 	</g:if>
 	<g:else>
 		<span class="name" style="color: #b1b1b1;"><i
-			class="icon-screenshot"></i> ${observationInstanceTotal} </span> observation<g:if
-			test="${observationInstanceTotal!=1}">s</g:if>
+			class="icon-screenshot"></i> ${instanceTotal} </span>
+		${resultType?:'observation' }<g:if test="${instanceTotal!=1}">s</g:if>
 
 
 
 
-		<g:if
-			test="${queryParams.groupId && SpeciesGroup.get(queryParams.groupId)}">
+		<g:if test="${queryParams.groupId instanceof Long }">
+			<g:if
+				test="${queryParams.groupId && SpeciesGroup.get(queryParams.groupId)}">
                                     of <span class="highlight"> <g:link
-					controller="observation" action="list"
+						controller="observation" action="list"
+						params="[sGroup: queryParams.groupId]">
+						${SpeciesGroup.get(queryParams.groupId).name}
+						<a href="#" onclick="setDefaultGroup(); return false;">[X]</a>
+					</g:link> </span> group
+                            </g:if>
+		</g:if>
+		<g:elseif test="${queryParams.groupId }">
+                           		of <span class="highlight"><g:link
+					controller="userGroup" action="list"
 					params="[sGroup: queryParams.groupId]">
-					${SpeciesGroup.get(queryParams.groupId).name}
+					${queryParams.groupId }
 					<a href="#" onclick="setDefaultGroup(); return false;">[X]</a>
-				</g:link> </span> group
-                            </g:if>
-		<g:if
-			test="${queryParams.habitat && Habitat.get(queryParams.habitat)}">
+				</g:link>
+			</span> species group
+                           </g:elseif>
+
+		<g:if test="${queryParams.habitat instanceof Long }">
+			<g:if
+				test="${queryParams.habitat && Habitat.get(queryParams.habitat)}">
                                     in <span class="highlight"><g:link
-					controller="observation" action="list"
-					params="[habitat: queryParams.habitat]">
-					${Habitat.get(queryParams.habitat).name}
-					<a href="#" onclick="setDefaultHabitat(); return false;">[X]</a>
-				</g:link> </span> habitat
+						controller="observation" action="list"
+						params="[habitat: queryParams.habitat]">
+						${Habitat.get(queryParams.habitat).name}
+						<a href="#" onclick="setDefaultHabitat(); return false;">[X]</a>
+					</g:link> </span> habitat
                             </g:if>
+		</g:if>
+		<g:elseif test="${queryParams.habitat }">
+                           		in <span class="highlight"><g:link
+					controller="userGroup" action="list"
+					params="[habitat: queryParams.habitat]">
+					${queryParams.habitat }
+					<a href="#" onclick="setDefaultHabitat(); return false;">[X]</a>
+				</g:link> </span>habitat
+                           </g:elseif>
 		<g:if test="${queryParams.tag}">
                                     tagged <span class="highlight">
 				<g:link controller="observation" action="list"
@@ -58,6 +80,14 @@
 					<a id="removeUserFilter" href="#">[X]</a>
 				</g:link> </span>
 		</g:if>
+		<g:if test="${queryParams.observation}">
+                                    for  <span class="highlight">
+				<g:link controller="observation" action="show"
+					id="${queryParams.observation}">
+					observation
+					<a id="removeObvFilter" href="#">[X]</a>
+				</g:link> </span>
+		</g:if>
 		<g:if test="${queryParams.query}">
                                     for search key <span
 				class="highlight"> <g:link controller="observation"
@@ -66,5 +96,6 @@
 					<a id="removeQueryFilter" href="#">[X]</a>
 				</g:link> </span>
 		</g:if>
+
 	</g:else>
 </div>
