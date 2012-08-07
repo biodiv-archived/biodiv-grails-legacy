@@ -363,7 +363,7 @@ class UserGroupController {
 		def model = userGroupService.getUserGroupObservations(userGroupInstance, params, params.max, params.offset);
 		def model2 = userGroupService.getUserGroupObservations(userGroupInstance, params, -1, -1, true);
 		def observationInstanceTotal = model2.observationInstanceList.size();
-		model['observationInstanceTotal'] = observationInstanceTotal
+		model['instanceTotal'] = observationInstanceTotal
 		model['totalObservationInstanceList'] = model2.observationInstanceList;
 
 		if(params.loadMore?.toBoolean()){

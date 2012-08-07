@@ -91,7 +91,7 @@ public class FacebookAuthProvider implements AuthenticationProvider {
 		String accountLockedPropertyName = 'accountLocked'
 		String passwordExpiredPropertyName = 'passwordExpired'
 
-		String username = fbUser.uid.toString()
+		String username = user."$usernamePropertyName";//fbUser.uid.toString()
 		String password = secret
 		boolean enabled = enabledPropertyName ? user."$enabledPropertyName" : true
 		boolean accountExpired = accountExpiredPropertyName ? user."$accountExpiredPropertyName" : false

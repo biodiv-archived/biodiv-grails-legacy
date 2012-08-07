@@ -121,9 +121,12 @@ class UserGroupTagLib {
 				def userId = attrs.model.tagFilterByPropertyValue.toLong();
 				tags = userGroupService.getAllTagsOfUser(userId)
 				count = tags.size()
-			}
-			else {
-				tags =  userGroupService.getFilteredTags(attrs.model.params);
+			} else if(tagFilterBy == "UserGroup") {
+				def userGroupInstance = attrs.model.tagFilterByPropertyValue
+				tags = userGroupService.getRelatedTagsFromUserGroup(userGroupInstance)
+				count = tags.size()
+			} else {
+				tags = userGroupService.getFilteredTags(attrs.model.params);
 				count = tags.size();
 			}
 		}

@@ -21,9 +21,10 @@
 				<li><a href="${createLink(action:'members', id:params.id)}">Members</a>
 				</li>
 
-				<!-- li><a href="${createLink(action:'species', id:params.id)}">Species</a>
+				<li><a href="${createLink(action:'species', id:params.id)}">Species</a>
 				</li>
-				<li><a href="${createLink(action:'pages')}">Pages</a></li-->
+				<li><a href="${createLink(action:'maps', id:params.id)}">Maps</a></li>
+				<li><a href="${createLink(action:'pages', id:params.id)}">Pages</a></li>				
 				<li><a href="${createLink(action:'aboutUs', id:params.id)}">About
 						Us</a></li>
 				<sec:permitted className='species.groups.UserGroup'

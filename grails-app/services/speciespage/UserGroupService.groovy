@@ -210,7 +210,6 @@ class UserGroupService {
 
 	Map getFilteredTags(params){
 		def userGroupInstanceList = getFilteredUserGroups(params, -1, -1, true).userGroupInstanceList
-		println userGroupInstanceList;
 		return getTagsFromUserGroup(userGroupInstanceList.collect{it.id});
 	}
 

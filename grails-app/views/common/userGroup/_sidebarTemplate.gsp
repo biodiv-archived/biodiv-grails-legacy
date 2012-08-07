@@ -60,7 +60,7 @@
 	<div class="super-section">
 		<div class="section">
 			<uGroup:showAllTags
-				model="['tagFilterByProperty':'All' , 'params':params, 'isAjaxLoad':true]" />
+				model="['tagFilterByProperty':'UserGroup' , 'tagFilterByPropertyValue':userGroupInstance, 'isAjaxLoad':true]" />
 		</div>
 	</div>
 

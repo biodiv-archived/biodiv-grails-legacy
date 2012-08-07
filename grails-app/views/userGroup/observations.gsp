@@ -49,7 +49,7 @@
 									</uGroup:isAMember>
 								</div>  
 							</div>
-							<obv:showObservationsListWrapper model="['totalObservationInstanceList':totalObservationInstanceList, 'observationInstanceList':observationInstanceList, 'observationInstanceTotal':observationInstanceTotal, 'queryParams':queryParams, 'activeFilters':activeFilters]" />
+							<obv:showObservationsListWrapper model="['totalObservationInstanceList':totalObservationInstanceList, 'observationInstanceList':observationInstanceList, 'instanceTotal':instanceTotal, 'queryParams':queryParams, 'activeFilters':activeFilters]" />
 						</div>						
 					</div>
 				</div>
