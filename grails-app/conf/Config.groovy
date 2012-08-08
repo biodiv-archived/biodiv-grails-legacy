@@ -386,12 +386,14 @@ environments {
 					appId= "327308053982589"
 					secret= "f36074901fc24b904794692755796fd1"
 				}
+				supportEmail = "team(at)thewesternghats(dot)in"
 			}
 			ibp {
 				facebook {
 					appId= "347177228674021"
 					secret= "82d91308b5437649bfe891a027205501"
 				}
+				supportEmail = "support(at)indiabiodiversity(dot)org"
 			}
 		}
 		google.analytics.enabled = false
@@ -452,12 +454,14 @@ environments {
 					appId= "310694198984953"
 					secret= "eedf76e46272190fbd26e578ae764a60"
 				}
+				supportEmail = "team(at)thewesternghats(dot)in"
 			}
 			ibp {
 				facebook {
 					appId= "310694198984953"
 					secret= "eedf76e46272190fbd26e578ae764a60"
 				}
+				supportEmail = "support(at)indiabiodiversity(dot)org"
 			}
 		}
 		google.analytics.enabled = false
@@ -501,12 +505,14 @@ environments {
 					appId= "327308053982589"
 					secret= "f36074901fc24b904794692755796fd1"
 				}
+				supportEmail = "team(at)thewesternghats(dot)in"
 			}
 			ibp {
 				facebook {
 					appId= "320284831369968"
 					secret= "900d0811194fe28503006b31792690ae"
 				}
+				supportEmail = "support(at)indiabiodiversity(dot)org"
 			}
 		}
 		
