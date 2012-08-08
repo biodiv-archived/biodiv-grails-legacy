@@ -19,7 +19,7 @@ class UserGroup implements Taggable {
 	String name;
 	String description;
 	String aboutUs;
-	String contactEmail;
+	//String contactEmail;
 	String webaddress;
 	Date foundedOn = new Date();
 	boolean isDeleted = false;
@@ -32,13 +32,13 @@ class UserGroup implements Taggable {
 	def springSecurityService;
 	def userGroupService;
 
-	static hasMany = [speciesGroups:String, habitats:String, observations:Observation]
+	static hasMany = [speciesGroups:SpeciesGroup, habitats:Habitat, observations:Observation]
 
 	static constraints = {
 		name nullable: false, blank:false, unique:true
 		webaddress nullable: false, blank:false, unique:true
 		description nullable: false, blank:false
-		contactEmail nullable:false, blank:false, email:true
+		//contactEmail nullable:false, blank:false, email:true
 		icon nullable:false
 	}
 

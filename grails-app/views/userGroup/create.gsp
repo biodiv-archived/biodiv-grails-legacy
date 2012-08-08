@@ -208,9 +208,8 @@ input.dms_field {
 							<label for="founders" class="control-label"><g:message
 									code="userGroup.founders.label" default="Group Founders" /> </label>
 							<div class="controls  textbox">
-								
-									<sUser:selectUsers model="['id':founders_autofillUsersId]" />
-									<input type="hidden" name="founderUserIds" id="founderUserIds" />
+								<sUser:selectUsers model="['id':founders_autofillUsersId]" />
+								<input type="hidden" name="founderUserIds" id="founderUserIds" />
 								
 							</div>
 						</div>
@@ -233,24 +232,22 @@ input.dms_field {
 					<div class="section" style="position: relative; overflow: visible;">
 						<h3>Additional Information</h3>
 						<div
-							class="span6 block ${hasErrors(bean: userGroupInstance, field: 'description', 'error')}"
-							style="width: 442px;">
+							class="row control-group left-indent ${hasErrors(bean: userGroupInstance, field: 'description', 'error')}"
+							>
 							<!--label for="notes"><g:message code="observation.notes.label" default="Notes" /></label-->
-							<h5>
-								<label><i class="icon-pencil"></i>Description <small><g:message
+							
+								<label for="description" class="control-label">Description <small><g:message
 											code="userGroup.description.message" default="" />
 								</small>
-								</label><br />
-							</h5>
-							<div class="section-item">
-								<!-- g:textArea name="description" rows="10" value=""
-										class="text ui-corner-all" /-->
+								</label>
+							<div class="controls  textbox">
+								
 								<ckeditor:config var="toolbar_editorToolbar">
 										[
 	    									[ 'Bold', 'Italic' ]
 										]
 										</ckeditor:config>
-								<ckeditor:editor name="description" height="200px"
+								<ckeditor:editor name="description" height="100px"
 									toolbar="editorToolbar">
 									${userGroupInstance?.description}
 								</ckeditor:editor>
@@ -263,16 +260,16 @@ input.dms_field {
 
 						</div>
 						<div
-							class="sidebar-section block ${hasErrors(bean: userGroupInstance, field: 'aboutUs', 'error')}"
-							style="width: 442px;">
+							class="row control-group left-indent ${hasErrors(bean: userGroupInstance, field: 'aboutUs', 'error')}"
+							>
 							<!--label for="notes"><g:message code="observation.notes.label" default="Notes" /></label-->
-							<h5>
-								<label><i class="icon-pencil"></i>AboutUs <small><g:message
+							
+								<label for="aboutUs" class="control-label">AboutUs <small><g:message
 											code="userGroup.aboutUs.message" default="" />
 								</small>
-								</label><br />
-							</h5>
-							<div class="section-item">
+								</label>
+							
+							<div class="controls  textbox">
 								<ckeditor:editor name="aboutUs" height="200px"
 									toolbar="editorToolbar">
 									${userGroupInstance?.aboutUs}
@@ -285,47 +282,7 @@ input.dms_field {
 							</div>
 
 						</div>
-						<div class="span6 block" style="width: 442px;clear:both;">
-							<h5>
-								<label><i class="icon-tags"></i>Tags <small><g:message
-											code="observation.tags.message" default="" />
-								</small>
-								</label>
-							</h5>
-							<div class="create_tags section-item" style="clear: both;">
-								<ul id="tags">
-									<g:each in="${userGroupInstance.tags}" var="tag">
-										<li>${tag}</li>
-									</g:each>
-								</ul>
-							</div>
-						</div>
-						<div class="sidebar-section block" style="width: 442px;">
-							<h5>
-								<label><i class="icon-envelope"></i>Contact us at <small><g:message
-											code="userGroup.contactUs.message" default="" />
-								</small>
-								</label>
-							</h5>
-							<div
-								class="control-group ${hasErrors(bean: userGroupInstance, field: 'contactEmail', 'error')}">
-								<!-- label class="control-label" for="contactEmail"><g:message
-										code='user.password.label' default='Contact at Email' /> </label-->
-								<div class="create_tags section-item" style="clear: both;">
-									<input class="input-large" id="contactEmail" style="width: 95%"
-										value="${userGroupInstance?.contactEmail?:currentUser.email}"
-										name="contactEmail"
-										placeholder="Enter a single email address where you can be contacted...">
-
-									<g:hasErrors bean="${userGroupInstance}" field="contactEmail">
-										<div class="help-inline">
-											<g:renderErrors bean="${userGroupInstance}"
-												field="contactEmail" />
-										</div>
-									</g:hasErrors>
-								</div>
-							</div>
-						</div>
+						
 					</div>
 				</div>
 
@@ -333,33 +290,31 @@ input.dms_field {
 					<div class="section"
 						style="position: relative; overflow: visible;">
 						<h3>Interested In</h3>
-						<div class="span6 block" style="width: 442px;clear:both;">
-							<h5>
-								<label>Species Groups<small><g:message
+						
+						<div class="row control-group left-indent">
+							
+								<label class="control-label">Species Groups & Habitats<small><g:message
 											code="observation.speciesGroups.message" default="" />
-								</small>
+									</small>
 								</label>
-							</h5>
-							<div class="create_tags section-item" style="clear: both;">
-								<ul id="speciesGroups">
-									<g:each in="${userGroupInstance.speciesGroups}" var="speciesGroup">
-										<li>${speciesGroup}</li>
-									</g:each>
-								</ul>
+							
+							<div class="filters controls  textbox" style="position: relative;">
+								<obv:showGroupFilter
+									model="['observationInstance':observationInstance]" />
 							</div>
 						</div>
 						
 						<div class="sidebar-section block" style="width: 442px;">
-							<h5>
-								<label>Habitats<small><g:message
-											code="observation.habitats.message" default="" />
+							
+								<label class="control-label"><i class="icon-tags"></i>Tags <small><g:message
+											code="observation.tags.message" default="" />
 								</small>
 								</label>
-							</h5>
-							<div class="create_tags section-item" style="clear: both;">
-								<ul id="habitats">
-									<g:each in="${userGroupInstance.habitats}" var="habitat">
-										<li>${habitat}</li>
+							
+							<div class="create_tags controls  textbox" >
+								<ul id="tags">
+									<g:each in="${userGroupInstance.tags}" var="tag">
+										<li>${tag}</li>
 									</g:each>
 								</ul>
 							</div>
@@ -493,6 +448,27 @@ $(document).ready(function() {
 		<%--		members_autofillUsersComp[0].addUserId('item':{{'userId':'${user.id}', 'value':'${user.name}'}});--%>
 		<%--	</g:each>--%>
 		<%--	--%>
+		
+	function getSelectedGroup() {
+	    var grp = []; 
+	    $('#speciesGroupFilter button').each (function() {
+	            if($(this).hasClass('active')) {
+	                    grp.push($(this).attr('value'));
+	            }
+	    });
+	    return grp;	
+	} 
+	    
+	function getSelectedHabitat() {
+	    var hbt = []; 
+	    $('#habitatFilter button').each (function() {
+	            if($(this).hasClass('active')) {
+	                    hbt.push($(this).attr('value'));
+	            }
+	    });
+	    return hbt;	
+	}
+	 
 	 $("#createGroupSubmit").click(function(){
 		$('#founderUserIds').val(founders_autofillUsersComp[0].getEmailAndIdsList().join(","));
 		//$('#memberUserIds').val(members_autofillUsersComp[0].getEmailAndIdsList().join(","));
@@ -502,44 +478,49 @@ $(document).ready(function() {
 			$('#${form_id}').append($(input));	
        	})
         
-        var speciesGroups = $("#speciesGroups").tagit("tags");
+        var speciesGroups = getSelectedGroup();
+        var habitats = getSelectedHabitat();
+        console.log(speciesGroups);
+        console.log(habitats);
+        
        	$.each(speciesGroups, function(index){
-       		var input = $("<input>").attr("type", "hidden").attr("name", "speciesGroup."+index).val(this.label);
+       		var input = $("<input>").attr("type", "hidden").attr("name", "speciesGroup."+index).val(this);
 			$('#${form_id}').append($(input));	
        	})
         
-        var habitats = $("#habitats").tagit("tags");
        	$.each(habitats, function(index){
-       		var input = $("<input>").attr("type", "hidden").attr("name", "habitat."+index).val(this.label);
+       		var input = $("<input>").attr("type", "hidden").attr("name", "habitat."+index).val(this);
 			$('#${form_id}').append($(input));	
        	})
        	
-        $("#${form_id}").submit();        	
+        $("#${form_id}").submit();
         return false;
         
 	});
 	
-	
-	
 	$("#tags .tagit-input").watermark("Add some tags");	
 	$("#tags").tagit({select:true,  tagSource: "${g.createLink(action: 'tags')}", triggerKeys:['enter', 'comma', 'tab'], maxLength:30});
-	
-	$("#speciesGroups .tagit-input").watermark("Add species groups that are of interest");
-	$("#speciesGroups").tagit({select:true,  tagSource: "${g.createLink(controller:'speciesGroup', action: 'tags')}", triggerKeys:['enter', 'comma', 'tab'], maxLength:30});
-	
-	<%
-		String habitatList = "[";
-		Habitat.list().each {
-			habitatList += "'"+it.name+"',"
-		}
-		habitatList = habitatList[0..-2];
-		habitatList += "]";
-		
-	%>
-	$("#habitats .tagit-input").watermark("Add some habitats that are of interest");
-	$("#habitats").tagit({select:true,  availableTags:${habitatList}, triggerKeys:['enter', 'comma', 'tab'], maxLength:30});
-	
 	$(".tagit-hiddenSelect").css('display','none');
+	
+	$('#speciesGroupFilter button').attr('data-toggle', 'buttons-checkbox').click(function(){
+    	$(this).addClass('active');
+    	return false;
+ 	});
+        
+ 	$('#habitatFilter button').attr('data-toggle', 'buttons-checkbox').click(function(){
+    	$(this).addClass('active');
+    	return false;
+ 	});
+ 	
+ 	<%
+ 		userGroupInstance.speciesGroups.each {
+			out << "jQuery('#group_${it.id}').addClass('active');";
+		}
+		userGroupInstance.habitats.each {
+			out << "jQuery('#habitat_${it.id}').addClass('active');";
+		}
+	%>
+ 	
 });
 </r:script>
 

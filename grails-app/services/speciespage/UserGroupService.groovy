@@ -91,7 +91,7 @@ class UserGroupService {
 		//List members = Utils.getUsersList(params.memberUserIds);
 		userGroup.icon = getUserGroupIcon(params.icon);
 		addInterestedSpeciesGroups(userGroup, params.speciesGroup)
-		addInterestedHabitats(userGroup, params.habitats)
+		addInterestedHabitats(userGroup, params.habitat)
 		
 		userGroup.setFounders(founders);
 		//userGroup.setMembers(members);
@@ -126,7 +126,7 @@ class UserGroupService {
 		log.debug "Adding species group interests ${speciesGroups}"
 		userGroupInstance.speciesGroups?.removeAll()
 		speciesGroups.each {key, value ->
-			userGroupInstance.addToSpeciesGroups(value.capitalize());
+			userGroupInstance.addToSpeciesGroups(SpeciesGroup.read(value.toLong()));
 		}
 	}
 	
@@ -134,7 +134,7 @@ class UserGroupService {
 		log.debug "Adding habitat interests ${habitats}"
 		userGroupInstance.habitats?.removeAll()
 		habitats.each { key, value ->
-			userGroupInstance.addToHabitats(value.capitalize());
+			userGroupInstance.addToHabitats(Habitat.read(value.toLong()));
 		}
 	}
 
@@ -198,7 +198,6 @@ class UserGroupService {
 		}
 
 		def sql =  Sql.newInstance(dataSource);
-		println uGroups
 		String query = "select t.name as name, count(t.name) as ug_count from tag_links as tl, tags as t, user_group ug where tl.tag_ref in " + getIdList(uGroups)  + " and tl.tag_ref = ug.id  and tl.type = 'userGroup' and ug.is_deleted = false and t.id = tl.tag_id group by t.name order by count(t.name) desc, t.name asc limit " + tagsLimit;
 
 		log.debug query;
