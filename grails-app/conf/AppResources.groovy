@@ -162,5 +162,6 @@ modules = {
 		resource url:'/css/comment.css'
 		
 		resource url:'/js/comment.js'
+		resource url:'/js/jquery/jquery.linkify-1.0.js'
 	}
 }

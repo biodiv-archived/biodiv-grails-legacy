@@ -1,5 +1,5 @@
 <g:each var="commentInstance" in="${comments}">
-	<li><comment:showComment
+	<li class="${commentInstance.id}"><comment:showComment
 			model="['commentInstance':commentInstance]" />
 	</li>
 </g:each>
