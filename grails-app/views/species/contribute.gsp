@@ -1,3 +1,4 @@
+<%@page import="species.utils.Utils"%>
 <html>
 <head>
 
@@ -20,6 +21,15 @@
 						${flash.message}
 					</div>
 				</g:if>
+<%
+String supportEmail = "";
+String domain = Utils.getDomain(request);
+if(domain.equals(grailsApplication.config.wgp.domain)) {
+	supportEmail = grailsApplication.config.speciesPortal.wgp.supportEmail;
+} else if(domain.equals(grailsApplication.config.ibp.domain)) {
+	supportEmail =  grailsApplication.config.speciesPortal.ibp.supportEmail;
+}
+%>
 		<div class="row ">
 			<div class="span12 super-section" style="clear:both;">
 				<div class="section">
@@ -36,7 +46,7 @@
 						href="${createLinkTo(dir: '/../static/templates/spreadsheet/', file:'speciesTemplateSimple_v2.xlsx' , base:grailsApplication.config.speciesPortal.resources.serverURL)}">here</a>,
 						fill in multiple species descriptions in the spreadsheet, have a
 						directory of images, zip the directory and send it to us <span
-						class="mailme">team(at)thewesternghats(dot)in</span>
+						class="mailme">${supportEmail}</span>
 					</li>
 	
 					<li><b>One species page in one spreadsheet</b> : If you have
@@ -47,13 +57,13 @@
 						The expanded spreadsheet will allow you to fill in all the species
 						pages fields available on the portal with appropriate attribution
 						and license. Mail the completed species page to us <span
-						class="mailme">team(at)thewesternghats(dot)in</span>
+						class="mailme">${supportEmail}</span>
 					</li>
 	
 					<li><b>On-line creating of species pages</b> : We are still
 						working on the facility of creating species pages on-line on the
 						portal. Please let us know your interest and we will inform you
-						once the feature is available. Please email <span class="mailme">team(at)thewesternghats(dot)in</span>
+						once the feature is available. Please email <span class="mailme">${supportEmail}</span>
 					</li>
 				</ol>
 				
@@ -69,7 +79,7 @@
 					</li>
 				</ol>
 				<br /> If you have any question please provide feedback and email us
-				at <span class="mailme">team(at)thewesternghats(dot)in</span>
+				at <span class="mailme">${supportEmail}</span>
 				</div>
 	
 			</div>
