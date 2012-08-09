@@ -126,7 +126,7 @@ class UserGroupController {
 		}
 		else {
 
-			def tags = (params.tags != null) ? Arrays.asList(params.tags) : new ArrayList();
+			def tags = (params.tags != null) ? params.tags.values() as List : new ArrayList();
 			userGroupInstance.setTags(tags);
 
 			log.debug "Successfully created usergroup : "+userGroupInstance

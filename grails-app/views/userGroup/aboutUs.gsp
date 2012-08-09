@@ -42,13 +42,7 @@
 					
 					<div class="super-section userGroup-section">
 						<div class="description notes_view" name="contactEmail">
-							Interested In
-						</div>
-					</div>
-					
-					<div class="super-section userGroup-section">
-						<div class="description notes_view" name="contactEmail">
-							Contact us at <span class="mailme">${userGroupInstance.contactEmail}</span>
+							Contact us by filling in the following feedback form.
 						</div>
 					</div>
 				</div>
