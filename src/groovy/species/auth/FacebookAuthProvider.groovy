@@ -14,6 +14,7 @@ import org.apache.log4j.Logger
 import org.codehaus.groovy.grails.plugins.springsecurity.DefaultPostAuthenticationChecks;
 import org.codehaus.groovy.grails.plugins.springsecurity.DefaultPreAuthenticationChecks;
 import org.codehaus.groovy.grails.plugins.springsecurity.GrailsUser;
+import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
 
 import com.the6hours.grails.springsecurity.facebook.FacebookAuthDao;
 import com.the6hours.grails.springsecurity.facebook.FacebookAuthToken;
@@ -56,7 +57,7 @@ public class FacebookAuthProvider implements AuthenticationProvider {
 			UserDetails userDetails = createUserDetails(user, token.code)
 
 			token.details = userDetails
-			token.principal = facebookAuthDao.getPrincipal(user)
+			token.principal = userDetails//facebookAuthDao.getPrincipal(user)
 			token.authorities = userDetails.getAuthorities()
 
 			try {
@@ -84,13 +85,14 @@ public class FacebookAuthProvider implements AuthenticationProvider {
 		
 		def user = fbUser.user;
 		
-		String usernamePropertyName = 'username'
-		String passwordPropertyName = 'password'
-		String enabledPropertyName = 'enabled'
-		String accountExpiredPropertyName = 'accountExpired'
-		String accountLockedPropertyName = 'accountLocked'
-		String passwordExpiredPropertyName = 'passwordExpired'
-
+		def conf = SpringSecurityUtils.securityConfig
+		String usernamePropertyName = conf.userLookup.usernamePropertyName
+		String passwordPropertyName = conf.userLookup.passwordPropertyName
+		String enabledPropertyName = conf.userLookup.enabledPropertyName
+		String accountExpiredPropertyName = conf.userLookup.accountExpiredPropertyName
+		String accountLockedPropertyName = conf.userLookup.accountLockedPropertyName
+		String passwordExpiredPropertyName = conf.userLookup.passwordExpiredPropertyName
+		
 		String username = user."$usernamePropertyName";//fbUser.uid.toString()
 		String password = secret
 		boolean enabled = enabledPropertyName ? user."$enabledPropertyName" : true

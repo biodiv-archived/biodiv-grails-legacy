@@ -160,4 +160,5 @@ class FacebookAuthService {
 			appUser['timezone'] = fbProfile.timezone;
 		}
 	}
+	
 }

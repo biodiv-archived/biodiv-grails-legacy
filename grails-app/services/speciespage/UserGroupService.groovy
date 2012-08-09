@@ -221,9 +221,9 @@ class UserGroupService {
 	 * executing query
 	 */
 	Map getFilteredUserGroups(params, max, offset, isMapView) {
-		//params.sGroup = (params.sGroup)? params.sGroup : SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.ALL).name
-		//params.habitat = (params.habitat)? params.habitat : Habitat.findByName(grailsApplication.config.speciesPortal.group.ALL).name
-		//params.habitat = params.habitat.toLong()
+		params.sGroup = (params.sGroup)? params.sGroup : SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.ALL).id
+		params.habitat = (params.habitat)? params.habitat : Habitat.findByName(grailsApplication.config.speciesPortal.group.ALL).id
+		params.habitat = params.habitat.toLong()
 		//params.userName = springSecurityService.currentUser.username;
 		params.observation = (params.observation)? params.long('observation'):null
 		params.user = (params.user)? params.long('user'):null
@@ -262,26 +262,23 @@ class UserGroupService {
 		}
 
 		if(params.sGroup){
-			//params.sGroup = params.sGroup.toLong()
-			//def groupId = observationService.getSpeciesGroupIds(params.sGroup)
-			if(!params.sGroup){
+			params.sGroup = params.sGroup.toLong()
+			def groupId = observationService.getSpeciesGroupIds(params.sGroup)
+			if(!groupId){
 				log.debug("No groups for id " + params.sGroup)
 			}else{
 				query += " join uGroup.speciesGroups speciesGroup "
-				filterQuery += " and lower(speciesGroup) = :groupId"
-				queryParams["groupId"] = params.sGroup.toLowerCase()
-				activeFilters["sGroup"] = params.sGroup
+				filterQuery += " and speciesGroup.id = :groupId"
+				queryParams["groupId"] = groupId
+				activeFilters["sGroup"] = groupId
 			}
 		}
 
-		if(params.habitat){// && (params.habitat != Habitat.findByName(grailsApplication.config.speciesPortal.group.ALL).id)){
-			//params.sGroup = params.sGroup.toLong()
-			//def groupId = observationService.getSpeciesGroupIds(params.sGroup)
-			
-				query += " join uGroup.habitats habitat "
-				filterQuery += " and lower(habitat) = :habitat"
-				queryParams["habitat"] = params.habitat.toLowerCase()
-				activeFilters["habitat"] = params.habitat
+		if(params.habitat && (params.habitat != Habitat.findByName(grailsApplication.config.speciesPortal.group.ALL).id)){
+			query += " join uGroup.habitats habitat "
+			filterQuery += " and habitat.id = :habitat "
+			queryParams["habitat"] = params.habitat
+			activeFilters["habitat"] = params.habitat
 		}
 
 		def sortOption = (params.sort ? params.sort : "visitCount");

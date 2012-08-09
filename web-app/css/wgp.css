@@ -277,6 +277,10 @@ height: 60px;
     font-weight: bold;
 }
 
+.section label .small, .user .section label .small{
+    font-weight: normal;
+}
+
 .super-section {
 	background-color: rgba(106, 201, 162,0.2);
 	background: transparent\9;

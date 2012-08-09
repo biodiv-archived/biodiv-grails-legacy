@@ -88,28 +88,3 @@ $( "#search" ).click(function() {
 	return false;
 });
 </g:javascript>
-<r:script>
-
-function getSelectedGroup() {
-    var grp = ''; 
-    $('#speciesGroupFilter button').each (function() {
-            if($(this).hasClass('active')) {
-                    grp += $(this).attr('data-original-title') + ',';
-            }
-    });
-
-    grp = grp.replace(/\s*\,\s*$/,'');
-    return grp;	
-} 
-    
-function getSelectedHabitat() {
-    var hbt = ''; 
-    $('#habitatFilter button').each (function() {
-            if($(this).hasClass('active')) {
-                    hbt += $(this).attr('data-original-title') + ',';
-            }
-    });
-    hbt = hbt.replace(/\s*\,\s*$/,'');
-    return hbt;	
-} 
-</r:script>

@@ -293,9 +293,7 @@ input.dms_field {
 						
 						<div class="row control-group left-indent">
 							
-								<label class="control-label">Species Groups & Habitats<small><g:message
-											code="observation.speciesGroups.message" default="" />
-									</small>
+								<label class="control-label">Species Groups & Habitats
 								</label>
 							
 							<div class="filters controls  textbox" style="position: relative;">
@@ -304,9 +302,9 @@ input.dms_field {
 							</div>
 						</div>
 						
-						<div class="sidebar-section block" style="width: 442px;">
+						<div class="row control-group left-indent">
 							
-								<label class="control-label"><i class="icon-tags"></i>Tags <small><g:message
+								<label class="control-label">Tags <small><g:message
 											code="observation.tags.message" default="" />
 								</small>
 								</label>
@@ -323,13 +321,13 @@ input.dms_field {
 					</div>
 				</div>
 
-				<div class="span12 super-section" style="clear: both;">
+				<!-- div class="span12 super-section" style="clear: both;">
 					<div class="span11 section"
 						style="position: relative; overflow: visible;">
 						<h3>Pick a Theme</h3>
 
 					</div>
-				</div>
+				</div-->
 
 				<div class="span12" style="margin-top: 20px; margin-bottom: 40px;">
 					<g:if test="${userGroupInstance?.id}">
