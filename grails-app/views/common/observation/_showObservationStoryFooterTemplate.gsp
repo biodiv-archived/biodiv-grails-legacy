@@ -15,9 +15,7 @@
 	<g:if test="${showDetails}">
 	<div class="footer-item">
 		<i class="icon-comment"></i>
-		<fb:comments-count
-			href="${createLink(controller:'observation', action:'show', id:observationInstance.id, base:Utils.getDomainServerUrl(request))}"></fb:comments-count>
-
+		${observationInstance.fetchCommentCount()}
 	</div>
 
 	

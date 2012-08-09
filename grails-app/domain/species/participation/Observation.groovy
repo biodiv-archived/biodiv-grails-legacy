@@ -11,13 +11,10 @@ import species.groups.UserGroup;
 
 class Observation implements Taggable{
 
-	/**
-	 * 
-	 */
 	def dataSource
-
 	def grailsApplication;
-
+	def commentService;
+	
 	public enum OccurrenceStatus {
 		ABSENT ("Absent"),	//http://rs.gbif.org/terms/1.0/occurrenceStatus#absent
 		CASUAL ("Casual"),	// http://rs.gbif.org/terms/1.0/occurrenceStatus#casual
@@ -307,4 +304,9 @@ class Observation implements Taggable{
 		}
 		return title;
 	}
+
+	def fetchCommentCount(){
+		return commentService.getCount(null, this, null, null)
+	}
+	
 }

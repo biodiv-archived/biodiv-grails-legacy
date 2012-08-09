@@ -12,7 +12,7 @@
 			<div class="yj-attributes">
 				<g:formatDate date="${commentInstance.lastUpdated}" type="datetime" style="LONG" timeStyle="SHORT"/>
 				<sUser:ifOwns model="['user':commentInstance.author]">
-					<a href="#" onclick="deleteComment(${commentInstance.id}, $(this).closest('li'), '${createLink(controller:'comment', action:'removeComment')}'); return false;">
+					<a href="#" onclick="deleteComment(${commentInstance.id}, '${createLink(controller:'comment', action:'removeComment')}'); return false;">
 					<span class="deleteFlagIcon"><i class="icon-trash icon-red"></i></span></a>
 				</sUser:ifOwns>
 		</div>

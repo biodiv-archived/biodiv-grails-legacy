@@ -64,3 +64,13 @@
 	border-color: #B94A48;
 	border-width: 1px;
 }
+.post-comment {
+	overflow: visible;
+    position: relative;
+}
+
+.comment-post-btn {
+	position: absolute;
+    right: 0;
+    z-index: 10;
+}

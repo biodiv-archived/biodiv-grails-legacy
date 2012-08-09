@@ -12,10 +12,12 @@ class CommentController {
 	def addComment = {
 		log.debug params;
 		params.author = springSecurityService.currentUser;
-		def c = commentService.addComment(params);
+		if(params.commentBody.trim().length() > 0){
+			commentService.addComment(params);
+		}
 		def comments = getAllNewerComments(params);
 		def showCommentListHtml = g.render(template:"/common/comment/showCommentListTemplate", model:[comments:comments]);
-		def result = [showCommentListHtml:showCommentListHtml, newerTimeRef:comments.first().lastUpdated.time.toString()]
+		def result = [showCommentListHtml:showCommentListHtml, newerTimeRef:comments.first().lastUpdated.time.toString(), newlyAddedCommentCount:comments.size()]
 		render result as JSON
 	}
 
@@ -39,6 +41,10 @@ class CommentController {
 		def remainingCommentCount = (comments) ? getRemainingCommentCount(comments.last().lastUpdated.time.toString(), params) : 0
 		def result = [showCommentListHtml:showCommentListHtml, olderTimeRef:olderTimeRef, remainingCommentCount:remainingCommentCount]
 		render result as JSON
+	}
+	
+	def getCommentByType = {
+		commentService.getCommentByType(params)
 	}
 	
 

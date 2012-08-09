@@ -39,7 +39,11 @@ class CommentService {
 		if(params.commentType && (params.commentType == "context")){
 			commentHolder = getDomainObject(params.commentHolderType, params.commentHolderId)
 		}
-		return Comment.fetchComments(commentHolder, rootHolder, params.max, params.refTime, params.timeLine)
+		return getComments(commentHolder, rootHolder, params.max, params.refTime, params.timeLine)
+	}
+	
+	def getComments(commentHolder, rootHolder, max, refTime, timeLine){
+		return Comment.fetchComments(commentHolder, rootHolder, max, refTime, timeLine)
 	}
 	
 	def getCount(params){
@@ -48,7 +52,15 @@ class CommentService {
 		if(params.commentType && (params.commentType == "context")){
 			commentHolder = getDomainObject(params.commentHolderType, params.commentHolderId)
 		}
-		return Comment.fetchCount(commentHolder, rootHolder, params.refTime, params.timeLine)
+		return getCount(commentHolder, rootHolder, params.refTime, params.timeLine)
+	}
+	
+	def getCount(commentHolder, rootHolder, refTime, timeLine){
+		return Comment.fetchCount(commentHolder, rootHolder, refTime, timeLine)
+	}
+	
+	def getCountByUser(author){
+		return Comment.countByAuthor(author)
 	}
 
 	def likeComment(params){
@@ -60,6 +72,10 @@ class CommentService {
 		}else{
 			return true
 		}
+	}
+	
+	def getCommentByType(params){
+		return Comment.findAllByRootHolderType(Observation.getClass().getCanonicalName(),[sort: "lastUpdated", order: "desc"])
 	}
 	
 	private getDomainObject(className, id){
