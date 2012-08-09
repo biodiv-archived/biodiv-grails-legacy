@@ -13,6 +13,7 @@ class SUser {
 	transient springSecurityService
 
 	def grailsApplication;
+	def commentService;
 
 	String username
 	String name;
@@ -123,4 +124,9 @@ class SUser {
 			return website;
 		}
 	}
+	
+	def fetchCommentCount(){
+		return commentService.getCountByUser(this)
+	}
+	
 }

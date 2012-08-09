@@ -1,7 +1,5 @@
 package species
 
-import species.participation.Comment;
-
 class CommentTagLib {
 	static namespace = "comment"
 	
@@ -25,6 +23,14 @@ class CommentTagLib {
 	}
 	
 	def showCommentPopup = {attrs, body->
+		def model = attrs.model
+		model.rootHolder = model.rootHolder?:model.commentHolder
+		model.commentType = model.commentType ?: "context"
+		if(model.commentType == "context"){
+			model.totalCount = commentService.getCount(model.commentHolder, model.rootHolder, null, null)
+		}else{
+			model.totalCount = commentService.getCount(null, model.rootHolder, null, null)
+		}
 		out << render(template:"/common/comment/showCommentPopupTemplate", model:attrs.model);
 	}
 	
@@ -33,14 +39,33 @@ class CommentTagLib {
 		model.rootHolder = model.rootHolder?:model.commentHolder
 		model.commentType = model.commentType ?: "context"
 		if(model.commentType == "context"){
-			model.comments = Comment.fetchComments(model.commentHolder, model.rootHolder, 3, new Date().time.toString(), null)
-			model.totalCount = Comment.fetchCount(model.commentHolder, model.rootHolder, null, null)
+			model.comments = commentService.getComments(model.commentHolder, model.rootHolder, 3, new Date().time.toString(), null)
+			model.totalCount = commentService.getCount(model.commentHolder, model.rootHolder, null, null)
 		}else{
-			model.comments =  Comment.fetchSuperComments(model.rootHolder, 3, new Date().time.toString(), null)
-			model.totalCount = Comment.fetchSuperCount(model.rootHolder, null, null)
+			model.comments =  commentService.getComments(null, model.rootHolder, 3, new Date().time.toString(), null)
+			model.totalCount = commentService.getCount(null, model.rootHolder, null, null)
 		}
 		model.newerTimeRef = (model.comments) ? (model.comments.first().lastUpdated.time.toString()) : null
 		model.olderTimeRef = (model.comments) ? (model.comments.last().lastUpdated.time.toString()) : null
 		out << render(template:"/common/comment/showAllCommentsTemplate", model:model);
+	}
+	
+	
+	///////////////////////////////// FEEDS ////////////////////////////
+	
+	def showAllFeeds = {attrs, body->
+		def model = attrs.model
+		model.feeds = commentService.getCommentByType(null)
+		out << render(template:"/common/feeds/showAllFeedsTemplate", model:model);
+	}
+	
+	def showFeed = {attrs, body->
+		out << render(template:"/common/feeds/showFeedTemplate", model:attrs.model);
+	}
+	
+	def showFeedContext = {attrs, body->
+		def model = attrs.model
+		model.observationInstance = Observation.read(model.feedInstance.rootHolderId)
+		out << render(template:"/common/feeds/showFeedContextTemplate", model:attrs.model);
 	}
 }

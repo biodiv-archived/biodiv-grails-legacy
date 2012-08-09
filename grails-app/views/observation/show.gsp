@@ -189,12 +189,12 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 						
 					</div>
 			    	
-					<div style="clear: both;">
+					<div class="union-comment" style="clear: both;">
 				    <comment:showAllComments model="['commentHolder':observationInstance, commentType:'super']" />
 <%--						<fb:comments href="${createLink(controller:'observation', action:'show', id:observationInstance.id, base:Utils.getDomainServerUrl(request))}"--%>
 <%--							num_posts="10" width="620" colorscheme="light"  notify="true"></fb:comments>--%>
 					</div>
-
+					
 				</div>
 
 
@@ -236,7 +236,7 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 	Galleria.loadTheme('${resource(dir:'js/galleria/1.2.7/themes/classic/',file:'galleria.classic.min.js')}');
 	
 	$(document).ready(function(){
-		
+		$('.comment .yj-message-body').linkify();
 		$("#seeMoreMessage").hide();
 		
 		$(".readmore").readmore({

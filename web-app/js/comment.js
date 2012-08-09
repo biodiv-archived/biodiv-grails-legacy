@@ -1,11 +1,12 @@
 
-function deleteComment(commentId, commentComp, url){
+function deleteComment(commentId, url){
 	$.ajax({
 		url: url,
 		data:{"commentId":commentId},
 		
 		success: function(data){
-			$(commentComp).remove();
+			$('.comment .' + commentId).remove();
+			
 		},
 		
 		statusCode: {
@@ -28,6 +29,25 @@ function postComment(postComp, url) {
 		return false;
 	}
 	
+	postAsAjax(postComp, url, true);
+	
+	$(textComp).removeClass('comment-textEmpty');
+	$(textComp).next('span').hide();
+	return false;
+}
+
+function updateUnionComment(postComp, url){
+	var unionPostComp = $('.union-comment .post-comment').children('form');
+	if(unionPostComp){
+		var postCommentProp = $(postComp).children('input[name="commentHolderId"]').val() + $(postComp).children('input[name="commentHolderType"]').val();
+		var unionPostCommentProp = $(unionPostComp).children('input[name="commentHolderId"]').val() + $(unionPostComp).children('input[name="commentHolderType"]').val();
+		if(postCommentProp !== unionPostCommentProp ){	
+			postAsAjax(unionPostComp, url, false);
+		}
+	}
+}
+
+function postAsAjax(postComp, url, update){
 	var targetComp = $(postComp).closest('.comment');
 	var refTime = $(targetComp).children('input[name="newerTimeRef"]').val();
 	$(postComp).ajaxSubmit({ 
@@ -41,8 +61,14 @@ function postComment(postComp, url) {
 			return true;
 		}, 
         success: function(data, statusText, xhr, form) {
-        	$(targetComp).children('ul').prepend(data.showCommentListHtml);
+        	var htmlData = $(data.showCommentListHtml);
+			htmlData.find('.yj-message-body').linkify();
+        	$(targetComp).children('ul').prepend(htmlData);
         	$(targetComp).children('input[name="newerTimeRef"]').val(data.newerTimeRef);
+        	updateCountOnPopup(postComp, data.newlyAddedCommentCount);
+        	if(update){
+        		updateUnionComment(postComp, url);
+        	}
         	return false;
         },
         error:function (xhr, ajaxOptions, thrownError){
@@ -51,10 +77,19 @@ function postComment(postComp, url) {
         	handleError(xhr, ajaxOptions, thrownError, successHandler, errorHandler);
 		} 
  	});
-	
-	$(textComp).removeClass('comment-textEmpty');
-	$(textComp).next('span').hide();
-	return false;
+}
+
+function updateCountOnPopup(postComp, newlyAddedCount){
+	var popupButton = $(postComp).closest('.comment-popup').children('a');
+	if(popupButton.attr("class")){
+		var count = popupButton.text();
+		if(count !== ""){
+			count = parseInt(count) + newlyAddedCount;
+		}else{
+			count = newlyAddedCount;
+		}
+		popupButton.html('<i class="icon-comment"></i>' + count);
+	}
 }
 
 function loadOlderComment(targetComp, commentType, commentHolderId, commentHolderType, rootHolderId, rootHolderType, url){
@@ -64,7 +99,9 @@ function loadOlderComment(targetComp, commentType, commentHolderId, commentHolde
 		dataType: "json",
 		data: {commentType:commentType, commentHolderId:commentHolderId , commentHolderType:commentHolderType, rootHolderId:rootHolderId, rootHolderType:rootHolderType, refTime:refTime},	
 		success: function(data) {
-			$(targetComp).children('ul').append(data.showCommentListHtml);
+			var htmlData = $(data.showCommentListHtml);
+			htmlData.find('.yj-message-body').linkify();
+			$(targetComp).children('ul').append(htmlData);
 			$(targetComp).children('input[name="olderTimeRef"]').val(data.olderTimeRef);
 			if(data.remainingCommentCount == 0){
 				$(targetComp).children('a').hide();	
