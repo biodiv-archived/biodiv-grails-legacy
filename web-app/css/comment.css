@@ -10,7 +10,7 @@
 .comment-textbox {
 	width: 98%;
     height: 100%;
-    resize: none;
+    resize: vertical;
  }
  
 .yj-thread-replies-container{
@@ -71,6 +71,6 @@
 
 .comment-post-btn {
 	position: absolute;
-    right: 0;
+    right: 8px;
     z-index: 10;
 }
