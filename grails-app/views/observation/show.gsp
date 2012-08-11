@@ -181,7 +181,7 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 									model="['recommendationInstance':recommendationInstance]" />
 								<input type="hidden" name='obvId'
 									value="${observationInstance.id}" /> <input type="submit"
-									value="Add" class="btn" style="position: relative;top: -28px;float: right;" />
+									value="Add" class="btn" style="position: relative;top: -28px;float: right;border-radius:4px;" />
 								</div>
 							</form>
 						
@@ -189,11 +189,10 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 						
 					</div>
 			    	
-					<div class="comments-box sidebar_section" style="clear: both;">
-						<fb:comments href="${createLink(controller:'observation', action:'show', id:observationInstance.id, base:Utils.getDomainServerUrl(request))}"
-							num_posts="10" width="620" colorscheme="light"  notify="true"></fb:comments>
+					<div class="union-comment" style="clear: both;">
+				    	<comment:showAllComments model="['commentHolder':observationInstance, commentType:'super']" />
 					</div>
-
+					
 				</div>
 
 
@@ -235,7 +234,7 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 	Galleria.loadTheme('${resource(dir:'js/galleria/1.2.7/themes/classic/',file:'galleria.classic.min.js')}');
 	
 	$(document).ready(function(){
-		
+		dcorateCommentBody($('.comment .yj-message-body'));
 		$("#seeMoreMessage").hide();
 		
 		$(".readmore").readmore({

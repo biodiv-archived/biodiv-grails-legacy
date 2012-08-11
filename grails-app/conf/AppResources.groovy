@@ -93,7 +93,7 @@ modules = {
 	}
 
 	observations_show {
-		dependsOn 'observations, gallery, carousel'
+		dependsOn 'observations, gallery, carousel, comment'
 
 		resource url:'/js/jsrender.js'
 		resource url:'/js/species/observations/show.js'
@@ -157,5 +157,11 @@ modules = {
 	}
 
 	admin { dependsOn	'core' }
-
+	
+	comment{
+		resource url:'/css/comment.css'
+		
+		resource url:'/js/comment.js'
+		resource url:'/js/jquery/jquery.linkify-1.0.js'
+	}
 }

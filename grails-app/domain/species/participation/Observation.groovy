@@ -23,6 +23,7 @@ class Observation implements Taggable{
 	def dataSource
 	
 	def grailsApplication;
+	def commentService;
 	
 	public enum OccurrenceStatus {
 		ABSENT ("Absent"),	//http://rs.gbif.org/terms/1.0/occurrenceStatus#absent
@@ -302,6 +303,10 @@ class Observation implements Taggable{
 	
 	String fetchSpeciesCall(){
 		return maxVotedReco ? maxVotedReco.name : "Unknown"
+	}
+	
+	def fetchCommentCount(){
+		return commentService.getCount(null, this, null, null)
 	}
 	
 }

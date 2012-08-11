@@ -1,4 +1,5 @@
 <%@page import="species.utils.ImageType"%>
+<%@page import="species.participation.Recommendation"%>
 
 <g:if test="${result.size() > 0 }">
 	<g:each in="${result}" var="r">
@@ -38,8 +39,9 @@
 					<g:else>
 						${r.name}
 					</g:else>${r.commonNames} </span>
-				<obv:showRecoComment
-					model="['recoComments':r.recoComments, 'recoId': r.recoId]" />
+				<comment:showCommentPopup model="['commentHolder':Recommendation.read(r.recoId), 'rootHolder':observationInstance]" />
+<%--				<obv:showRecoComment--%>
+<%--					model="['recoComments':r.recoComments, 'recoId': r.recoId]" />--%>
 
 			</div> <g:javascript>
                         $(document).ready(function(){

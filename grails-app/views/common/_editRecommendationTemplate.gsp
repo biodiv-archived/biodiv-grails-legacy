@@ -193,8 +193,7 @@ $(document).ready(function() {
 
 			<input type="text" name="recoComment" id="recoComment" value="${species_call_comment}"
 				class="input-xlarge ${hasErrors(bean: recommendationInstance, field: 'name', 'errors')} ${hasErrors(bean: recommendationVoteInstance, field: 'recommendation', 'errors')}"
-				placeholder="Write comment (max 400 letters)"></input>
-
+				placeholder="Write comment"></input>
 		</div>
 	</div>
 </div>
