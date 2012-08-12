@@ -8,14 +8,20 @@ class CommentService {
 	def addComment(params){
 		Comment c = new Comment(author:params.author, body:params.commentBody.trim(), commentHolderId:params.commentHolderId, \
 						commentHolderType:params.commentHolderType, rootHolderId:params.rootHolderId, rootHolderType:params.rootHolderType);
-
+					
+		if(params.dateCreated) {
+			c.dateCreated = params.dateCreated
+		}
+		
 		if(!c.save(flush:true)){
 			c.errors.allErrors.each { log.error it }
 			return null
 		}else{
 			try {
 				getDomainObject(params.commentHolderType, params.commentHolderId).onAddComment(c)
-			}catch (MissingMethodException e) {}
+			}catch (MissingMethodException e) {
+				e.printStackTrace();
+			}
 			return c
 		}
 	}
