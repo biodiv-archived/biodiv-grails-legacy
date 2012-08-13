@@ -14,7 +14,7 @@
 		<comment:showCommentContext
 			model="['commentInstance' : commentInstance]" />
 		<div class="yj-message-body">
-			${commentInstance.body}
+			<pre>${commentInstance.body}</pre>
 		</div>
 		<div class="yj-attributes">
 			<g:formatDate date="${commentInstance.lastUpdated}" type="datetime"
