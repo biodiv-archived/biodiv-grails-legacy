@@ -48,6 +48,7 @@
     line-height:15px;
     font-family: 'helvetica';
     font-size: 12px;
+    word-break: normal;
 }
 
 .yj-avatar {
