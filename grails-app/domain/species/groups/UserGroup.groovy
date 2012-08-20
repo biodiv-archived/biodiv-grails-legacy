@@ -25,7 +25,10 @@ class UserGroup implements Taggable {
 	boolean isDeleted = false;
 	long visitCount = 0;
 	String icon;
-
+	boolean allowObvCrossPosting=true;
+	boolean allowNonMembersToComment=true;
+	boolean allowUsersToJoin=true;
+	
 	def grailsApplication;
 	def aclUtilService
 	def gormUserDetailsService;
@@ -40,6 +43,9 @@ class UserGroup implements Taggable {
 		description nullable: false, blank:false
 		//contactEmail nullable:false, blank:false, email:true
 		icon nullable:false
+		allowObvCrossPosting nullable:false
+		allowNonMembersToComment nullable:false
+		allowUsersToJoin nullable:false
 	}
 
 	static mapping = {

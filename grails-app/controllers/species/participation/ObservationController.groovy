@@ -144,8 +144,12 @@ class ObservationController {
 					def tags = (params.tags != null) ? Arrays.asList(params.tags) : new ArrayList();
 					observationInstance.setTags(tags);
 
-					def userGroups = (params.userGroup != null) ? params.userGroup.collect{k,v->v} : new ArrayList();
-					setUserGroups(observationInstance, userGroups);
+					if(params.groupsWithSharingNotAllowed) {
+						setUserGroups(observationInstance, [params.groupsWithSharingNotAllowed]);
+					} else {
+						def userGroups = (params.userGroup != null) ? params.userGroup.collect{k,v->v} : new ArrayList();
+						setUserGroups(observationInstance, userGroups);
+					}
 										
 					sendNotificationMail(OBSERVATION_ADDED, observationInstance, request);
 					params["createNew"] = true
@@ -205,9 +209,12 @@ class ObservationController {
 					def tags = (params.tags != null) ? Arrays.asList(params.tags) : new ArrayList();
 					observationInstance.setTags(tags);
 
-					def userGroups = (params.userGroup != null) ? params.userGroup.collect{k,v->v} : new ArrayList();
-					setUserGroups(observationInstance, userGroups);
-
+					if(params.groupsWithSharingNotAllowed) {
+						setUserGroups(observationInstance, [params.groupsWithSharingNotAllowed]);
+					} else {
+						def userGroups = (params.userGroup != null) ? params.userGroup.collect{k,v->v} : new ArrayList();
+						setUserGroups(observationInstance, userGroups);
+					}
 					//redirect(action: "show", id: observationInstance.id)
 					params["createNew"] = true
 					chain(action: 'addRecommendationVote', model:['chainedParams':params]);

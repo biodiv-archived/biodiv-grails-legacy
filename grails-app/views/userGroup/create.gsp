@@ -321,13 +321,33 @@ input.dms_field {
 					</div>
 				</div>
 
-				<!-- div class="span12 super-section" style="clear: both;">
+				<div class="span12 super-section" style="clear: both;">
 					<div class="span11 section"
 						style="position: relative; overflow: visible;">
-						<h3>Pick a Theme</h3>
-
+						<h3>Permissions</h3>
+						<div class="row control-group left-indent">
+							
+								<label class="checkbox" style="text-align: left;"> 
+								 <g:checkBox style="margin-left:0px;"
+												name="allowUsersToJoin" checked="${userGroupInstance.allowUsersToJoin}"/>
+								 <g:message code="userGroup.permissions.members.joining" default="Is invitation required to join? (If yes, registered users will be able to request for invitation from group's home page)" /> </label>
+						</div>
+						<div class="row control-group left-indent">
+							
+								<label class="checkbox" style="text-align: left;"> 
+								 <g:checkBox style="margin-left:0px;"
+												name="allowObvCrossPosting" checked="${userGroupInstance.allowObvCrossPosting}"/>
+								 <g:message code="userGroup.permissions.observations.crossposting" default="Allow Observations Cross Posting" /> </label>
+						</div>
+						<div class="row control-group left-indent">
+							
+								<label class="checkbox" style="text-align: left;"> 
+								 <g:checkBox style="margin-left:0px;"
+												name="allowNonMembersToComment" checked="${userGroupInstance.allowNonMembersToComment}"/>
+								 <g:message code="userGroup.permissions.comments.bynonmembers" default="Allow non members to comment???" /> </label>
+						</div>
 					</div>
-				</div-->
+				</div>
 
 				<div class="span12" style="margin-top: 20px; margin-bottom: 40px;">
 					<g:if test="${userGroupInstance?.id}">

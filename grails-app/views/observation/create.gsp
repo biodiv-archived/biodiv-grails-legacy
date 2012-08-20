@@ -518,18 +518,7 @@ input.dms_field {
 								</div>
 							</div>
 							
-							<uGroup:isUserGroupMember>
-								<div class="span6 block sidebar-section" style="margin:0px 0px 20px -10px;">
-									<h5><label><i
-										class="icon-tags"></i>Post to Groups </label>
-									</h5>
-									<div>
-										<ul id="userGroups" name="userGroups" style="list-style:none;clear:both;">
-											<uGroup:getCurrentUserUserGroups model="['observationInstance':observationInstance]"/>
-										</ul>
-									</div>
-								</div>
-							</uGroup:isUserGroupMember>
+							
 								
 							<sUser:isFBUser>
 								<div class="span6 sidebar-section block" style="margin-left:-10px;">
@@ -546,6 +535,19 @@ input.dms_field {
 					</div>
 					</div>
 
+				<uGroup:isUserGroupMember>
+					<div class="span12 super-section"  style="clear: both">
+						<div class="section" style="position: relative; overflow: visible;">
+							<h3>Post to User Groups</h3>
+							<div>
+								<ul id="userGroups" name="userGroups" style="list-style:none;clear:both;">
+									<uGroup:getCurrentUserUserGroups model="['observationInstance':observationInstance]"/>
+								</ul>
+							</div>
+						</div>
+					</div>
+				</uGroup:isUserGroupMember>
+				
 				<div class="span12" style="margin-top: 20px; margin-bottom: 40px;">
 					<g:if test="${observationInstance?.id}">
 						<div class="btn btn-danger"
@@ -621,22 +623,22 @@ input.dms_field {
 	
 </script>
 
-		<r:script>
+	<r:script>
 	
-        var add_file_button = '<li id="add_file" class="addedResource" style="display:none;" onclick="$(\'#attachFiles\').select()[0].click();return false;"><div class="progress"><div id="translucent_box"></div><div id="progress_bar"></div ><div id="progress_msg"></div ></div></li>';
+    var add_file_button = '<li id="add_file" class="addedResource" style="display:none;" onclick="$(\'#attachFiles\').select()[0].click();return false;"><div class="progress"><div id="translucent_box"></div><div id="progress_bar"></div ><div id="progress_msg"></div ></div></li>';
 
 	
 	$(document).ready(function(){
 		$('.dropdown-toggle').dropdown();
 
-                //hack: for fixing ie image upload
-                if (navigator.appName.indexOf('Microsoft') != -1) {
-                    $('#upload_resource').css({'visibility':'visible'});
-                    $('#add_file').hide();
-                } else {
-                    $('#upload_resource').css({'visibility':'hidden'});
-                    $('#add_file').show();
-                }
+        //hack: for fixing ie image upload
+        if (navigator.appName.indexOf('Microsoft') != -1) {
+            $('#upload_resource').css({'visibility':'visible'});
+            $('#add_file').hide();
+        } else {
+            $('#upload_resource').css({'visibility':'hidden'});
+            $('#add_file').show();
+        }
 		
 		$('#attachFiles').change(function(e){
   			$('#upload_resource').submit().find("span.msg").html("Uploading... Please wait...");
@@ -771,6 +773,7 @@ input.dms_field {
         
  		$(".tagit-input").watermark("Add some tags");
         $("#tags").tagit({select:true,  tagSource: "${g.createLink(action: 'tags')}", triggerKeys:['enter', 'comma', 'tab'], maxLength:30});
+		$(".tagit-hiddenSelect").css('display','none');
 
  		 $("#addObservationSubmit").click(function(){
         	var tags = $("ul[name='tags']").tagit("tags");
@@ -778,14 +781,38 @@ input.dms_field {
         		var input = $("<input>").attr("type", "hidden").attr("name", "tags."+index).val(this);
 				$('#addObservation').append($(input));	
         	})
+        	
+        	//chck usergroups compatibility
+	       	var groupsWithSharingNotAllowed = $("#groupsWithSharingNotAllowed input[name='groupsWithSharingNotAllowed']:checked").val()
+	       	var groupsWithSharingAllowed = $("input[name^='userGroup']:checked:enabled",'#groupsWithSharingAllowed');
+	       	
+	       	if(groupsWithSharingNotAllowed) {
+	       		if(groupsWithSharingAllowed.length != 0) {
+	       			var msg = "Sorry, usergroup "+$("#groupsWithSharingNotAllowed input[name='groupsWithSharingNotAllowed']:checked").parent().text()+" doesn't allow its observations to be shared. Please choose only this group or any other groups which allow sharing";
+	       			$("#userGroupSelectionModal .modal-body").html(msg);
+	       			$("#userGroupSelectionModal").modal().show();
+	       			return false;
+	       		}
+	       	}
+	       	
         	$("#addObservation").submit();        	
         	return false;
         
 		});
 		
-		$(".tagit-hiddenSelect").css('display','none');
+		$('input:radio[name=groupsWithSharingNotAllowed]').click(function() {
+		    var previousValue = $(this).attr('previousValue');
+    
+    		if(previousValue == 'true'){
+        		$(this).attr('checked', false)
+    		}
+    
+    		$(this).attr('previousValue', $(this).attr('checked'));
+		});
+		
 
-        $('#use_dms').click(function(){
+      
+		$('#use_dms').click(function(){
                 if ($('#use_dms').is(':checked')) {
                     $('.dms_field').fadeIn();
                     $('.degree_field').hide();

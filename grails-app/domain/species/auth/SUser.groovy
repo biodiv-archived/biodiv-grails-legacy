@@ -39,12 +39,12 @@ class SUser {
 	boolean sendNotification = true;
 	boolean hideEmailId = true;
 	boolean allowIdentifactionMail = true;
-	
+
 
 	static hasMany = [openIds: OpenID, flags:ObservationFlag, unCuratedVotes:UnCuratedVotes, observations:Observation, recoVotes:RecommendationVote, groups:UserGroup]
 	static belongsTo = [UserGroup]
 	//static hasOne = [facebookUser:FacebookUser]
-	
+
 	static constraints = {
 		username blank: false
 		name blank: false
@@ -55,7 +55,7 @@ class SUser {
 		timezone nullable:true
 		aboutMe nullable:true
 		location nullable:true
-		
+
 	}
 
 	static mapping = {
@@ -105,45 +105,52 @@ class SUser {
 	Resource mainImage() {
 		return new Resource(fileName:icon());
 	}
-	
+
 	def icon() {
 		return icon(ImageType.NORMAL);
 	}
-	
+
 	def icon(ImageType type) {
 		if(profilePic) {
 			return profilePic;
 		}
-		
+
 		def baseUrl = grailsApplication.config.speciesPortal.resources.serverURL;
 		switch(type) {
-			case ImageType.NORMAL : 
-			case ImageType.LARGE : return baseUrl+"/users/user_large.png"
+			case ImageType.NORMAL :
+				case ImageType.LARGE : return baseUrl+"/users/user_large.png"
 			case ImageType.SMALL : return baseUrl+"/users/user.png"
 			case ImageType.VERY_SMALL : return baseUrl+"/users/user_small.png"
 		}
 	}
 
 	Set<UserGroup> getUserGroups() {
-		HashSet<UserGroup> userGroups = [];
+		def orderedByName = [
+					compare:{ a,b ->
+						a.name<=>b.name }
+				] as Comparator
+
+		def userGroups = new TreeSet(orderedByName)
+
 		def uGroups = UserGroupMemberRole.findAllBySUser(this).collect{it.userGroup}
-		uGroups.each { 
+		uGroups.each {
 			if(aclUtilService.hasPermission(springSecurityService.getAuthentication(), it, BasePermission.WRITE)) {
 				userGroups.add(it)
 			}
 		}
+		//userGroups.asList().sort(true, { a, b -> a.name <=> b.name } as Comparator)
 		return userGroups;
 	}
-	
+
 	boolean isUserGroupMember(UserGroup userGroup) {
 		return UserGroupMemberRole.countBySUserAndUserGroup(this, userGroup) ?: 0
 	}
-	
+
 	@Override
 	String toString() {
 		return username;
 	}
-	
+
 	def getWebsiteLink(){
 		if(website && website.indexOf("://") == -1){
 			return "http://" + website
@@ -151,9 +158,9 @@ class SUser {
 			return website;
 		}
 	}
-	
+
 	def fetchCommentCount(){
 		return commentService.getCountByUser(this)
 	}
-	
+
 }
