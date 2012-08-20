@@ -64,7 +64,7 @@ class CommentController {
 	private getAllNewerComments(params){
 		params.max = 100
 		params.timeLine = "newer"
-		params.refTime = params.refTime ?: new Date().previous().time.toString()
+		params.refTime = params.newerTimeRef ?: new Date().previous().time.toString()
 		return commentService.getComments(params)
 	}
 	

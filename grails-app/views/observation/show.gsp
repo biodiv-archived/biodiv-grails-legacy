@@ -183,7 +183,7 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 									<g:if test="${customsecurity.hasPermissionAsPerGroups([object:observationInstance,
 										permission:org.springframework.security.acls.domain.BasePermission.WRITE]).toBoolean()}">
 										 <input type="submit"
-											value="Add" class="btn btn-primary btn-small pull-right" style="position: relative;top: -30px;" />
+											value="Add" class="btn btn-primary btn-small pull-right" style="position: relative;top: -30px; border-radius:4px" />
 									</g:if><g:else>
 										<a href="#"
 											title="Protected to group members. Need to join any of the user groups this observation belongs to inorder to add a species call" class="btn btn-primary btn-small disabled pull-right" style="position: relative;top: -30px;">Join Groups</a>
@@ -196,7 +196,7 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 					</div>
 			    	
 					<div class="union-comment" style="clear: both;">
-					
+				
 					<customsecurity:isPermittedAsPerGroups object='${observationInstance}'
 							permission='${org.springframework.security.acls.domain.BasePermission.WRITE}'
 							property='allowNonMembersToComment'>
@@ -206,6 +206,9 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 				    <comment:showAllComments model="['commentHolder':observationInstance, commentType:'super']" />
 <%--						<fb:comments href="${createLink(controller:'observation', action:'show', id:observationInstance.id, base:Utils.getDomainServerUrl(request))}"--%>
 <%--							num_posts="10" width="620" colorscheme="light"  notify="true"></fb:comments>--%>
+
+				    	<comment:showAllComments model="['commentHolder':observationInstance, commentType:'super']" />
+
 					</div>
 					
 				</div>
@@ -259,7 +262,7 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 	Galleria.loadTheme('${resource(dir:'js/galleria/1.2.7/themes/classic/',file:'galleria.classic.min.js')}');
 	
 	$(document).ready(function(){
-		$('.comment .yj-message-body').linkify();
+		dcorateCommentBody($('.comment .yj-message-body'));
 		$("#seeMoreMessage").hide();
 		
 		$(".readmore").readmore({

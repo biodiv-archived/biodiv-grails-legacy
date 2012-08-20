@@ -4,10 +4,19 @@ class CommentService {
 
 	static transactional = false
 	def grailsApplication
-	
+
 	def addComment(params){
 		Comment c = new Comment(author:params.author, body:params.commentBody.trim(), commentHolderId:params.commentHolderId, \
 						commentHolderType:params.commentHolderType, rootHolderId:params.rootHolderId, rootHolderType:params.rootHolderType);
+
+		if(params.dateCreated) {
+			c.dateCreated = params.dateCreated
+			c.lastUpdated = new Date();
+		}
+		if(params.lastUpdated) {
+			c.lastUpdated = params.lastUpdated;
+		}
+
 
 		if(!c.save(flush:true)){
 			c.errors.allErrors.each { log.error it }
@@ -15,7 +24,9 @@ class CommentService {
 		}else{
 			try {
 				getDomainObject(params.commentHolderType, params.commentHolderId).onAddComment(c)
-			}catch (MissingMethodException e) {}
+			}catch (MissingMethodException e) {
+				e.printStackTrace();
+			}
 			return c
 		}
 	}
@@ -41,11 +52,11 @@ class CommentService {
 		}
 		return getComments(commentHolder, rootHolder, params.max, params.refTime, params.timeLine)
 	}
-	
+
 	def getComments(commentHolder, rootHolder, max, refTime, timeLine){
 		return Comment.fetchComments(commentHolder, rootHolder, max, refTime, timeLine)
 	}
-	
+
 	def getCount(params){
 		def rootHolder = getDomainObject(params.rootHolderType, params.rootHolderId)
 		def commentHolder = null
@@ -54,11 +65,11 @@ class CommentService {
 		}
 		return getCount(commentHolder, rootHolder, params.refTime, params.timeLine)
 	}
-	
+
 	def getCount(commentHolder, rootHolder, refTime, timeLine){
 		return Comment.fetchCount(commentHolder, rootHolder, refTime, timeLine)
 	}
-	
+
 	def getCountByUser(author){
 		return Comment.countByAuthor(author)
 	}
@@ -73,11 +84,11 @@ class CommentService {
 			return true
 		}
 	}
-	
+
 	def getCommentByType(params){
 		return Comment.findAllByRootHolderType(Observation.getClass().getCanonicalName(),[sort: "lastUpdated", order: "desc"])
 	}
-	
+
 	private getDomainObject(className, id){
 		id = id.toLong()
 		//return Class.forName(className).read(id)

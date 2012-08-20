@@ -49,7 +49,7 @@
 								src="${flagInstance.author?.icon(ImageType.VERY_SMALL)}"
 								title="${flagInstance.author.name}"/></g:link> : ${flagInstance.flag.value()} ${flagInstance.notes ? ": " + flagInstance.notes : ""}</span>
 							<sUser:ifOwns model="['user':flagInstance.author]">
-								<a href="#" onclick="removeFlag(${flagInstance.id}, ${flagInstance.observation.id}, $(this).parent()); return false;"><span class="deleteFlagIcon" data-original-title="Remove this flag" ><i class="icon-trash icon-red"></i></span></a>
+								<a href="#" onclick="removeFlag(${flagInstance.id}, ${flagInstance.observation.id}, $(this).parent()); return false;"><span class="deleteFlagIcon" data-original-title="Remove this flag" ><i class="icon-trash"></i></span></a>
 							</sUser:ifOwns>
 							
 						</li>

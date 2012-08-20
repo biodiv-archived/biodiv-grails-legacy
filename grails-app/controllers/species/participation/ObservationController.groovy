@@ -458,7 +458,7 @@ class ObservationController {
 			def recVoteResult = getRecommendationVote(params)
 			def recommendationVoteInstance = recVoteResult?.recVote;
 			def recoVoteMsg = recVoteResult?.msg;
-
+			
 			def observationInstance = Observation.get(params.obvId);
 			log.debug params;
 			try {
@@ -478,6 +478,7 @@ class ObservationController {
 
 				}else if(!recommendationVoteInstance.hasErrors() && recommendationVoteInstance.save(flush: true)) {
 					log.debug "Successfully added reco vote : "+recommendationVoteInstance
+					observationService.addRecoComment(recommendationVoteInstance.recommendation, observationInstance, params.recoComment);
 					observationInstance.lastRevised = new Date();
 					//saving max voted species name for observation instance
 					observationInstance.calculateMaxVotedSpeciesName();
@@ -882,8 +883,7 @@ class ObservationController {
 	private Map getRecommendationVote(params) {
 		def observation = params.observation?:Observation.get(params.obvId);
 		def author = params.author;
-		def recoComment = (params.recoComment?.trim()?.length() > 0)? params.recoComment.trim():null;
-
+		
 		def reco, commonNameReco;
 		if(params.recoId)
 			reco = Recommendation.get(params.long('recoId'));
@@ -895,7 +895,7 @@ class ObservationController {
 		ConfidenceType confidence = observationService.getConfidenceType(params.confidence?:ConfidenceType.CERTAIN.name());
 
 		RecommendationVote existingRecVote = RecommendationVote.findByAuthorAndObservation(author, observation);
-		RecommendationVote newRecVote = new RecommendationVote(observation:observation, recommendation:reco, commonNameReco:commonNameReco, author:author, confidence:confidence, comment:recoComment);
+		RecommendationVote newRecVote = new RecommendationVote(observation:observation, recommendation:reco, commonNameReco:commonNameReco, author:author, confidence:confidence);
 
 		if(!reco){
 			log.debug "Not a valid recommendation"
@@ -910,11 +910,12 @@ class ObservationController {
 					log.debug " Same recommendation already made by user " + author.id +  " reco name " + reco.name + " leaving as it is"
 					def msg = "${message(code: 'reco.vote.duplicate.message', args: [reco.name])}"
 					if(existingRecVote.commonNameReco != commonNameReco){
-						log.debug "Updating recoVote as ommon name changed"
+						log.debug "Updating recoVote as common name changed"
 						existingRecVote.commonNameReco = commonNameReco;
 						if(!existingRecVote.save(flush:true)){
 							existingRecVote.errors.allErrors.each { log.error it }
 						}
+						observationService.addRecoComment(existingRecVote.recommendation, observation, params.recoComment);
 					}
 					return [recVote:null, msg:msg]
 				}else{

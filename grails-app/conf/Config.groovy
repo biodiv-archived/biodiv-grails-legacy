@@ -937,3 +937,4 @@ jcaptchas {
 
 NamesIndexerService.FILENAME = "${appName}_tstLookup.dat";
 ObservationController.COMMIT = false;
+

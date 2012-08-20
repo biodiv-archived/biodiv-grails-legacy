@@ -309,4 +309,7 @@ class Observation implements Taggable{
 		return commentService.getCount(null, this, null, null)
 	}
 	
+	def onAddComment(comment){
+		updateObservationTimeStamp();
+	}
 }
