@@ -695,6 +695,7 @@ grails.taggable.tag.autoImport=true
 grails.taggable.tagLink.autoImport=true
 
 grails.mail.default.from="notification@thewesternghats.in"
+emailConfirmation.from="notification@thewesternghats.in"
 
 grails.plugins.springsecurity.password.algorithm = 'MD5'
 

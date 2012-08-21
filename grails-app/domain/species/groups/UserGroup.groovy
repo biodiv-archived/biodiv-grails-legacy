@@ -176,7 +176,10 @@ class UserGroup implements Taggable {
 	boolean addMember(SUser member) {
 		if(member) {
 			def memberRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value())
-			userGroupService.addMember(this, member, memberRole, BasePermission.WRITE);
+			if(!UserGroupMemberRole.find("from UserGroupMemberRole uMR where uMR.sUser=:sUser and uMR.userGroup=:userGroup and uMR.role=:role",[sUser:member, userGroup:this, role:memberRole])) {
+				log.debug "${member} is already a member of group ${this}"
+				userGroupService.addMember(this, member, memberRole, BasePermission.WRITE);
+			}
 			true;
 		}
 	}

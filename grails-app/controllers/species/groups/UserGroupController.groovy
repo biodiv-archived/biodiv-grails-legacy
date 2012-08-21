@@ -4,12 +4,15 @@ import java.util.Map;
 
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
+import org.codehaus.groovy.grails.plugins.springsecurity.ui.RegistrationCode;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import species.auth.SUser;
+import species.groups.UserGroupMemberRole.UserGroupMemberRoleType;
 import species.participation.Observation;
+import species.participation.UserToken;
 import species.utils.ImageUtils;
 import species.utils.Utils;
 import grails.converters.JSON;
@@ -22,6 +25,7 @@ class UserGroupController {
 	def mailService;
 	def aclUtilService;
 	def observationService;
+	def emailConfirmationService;
 	
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
@@ -426,6 +430,54 @@ class UserGroupController {
 			render (['msg':'Congratulations. You are now part of us!!!']as JSON);
 		}
 		render (['msg':'We are extremely sorry as we are not able to process your request now. Please try again.']as JSON);
+	}
+	
+	@Secured(['ROLE_USER'])
+	def requestMembership = {
+		def user = springSecurityService.currentUser;
+		if(user) {
+			def userGroupInstance = findInstance()
+			if (!userGroupInstance) return;
+			
+			String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
+			def founders = userGroupInstance.getFounders(userGroupInstance.getFoundersCount(), 0);
+			founders.each { founder ->
+				def userToken = new UserToken(username: user."$usernameFieldName", controller:'userGroup', action:'confirmMembershipRequest', params:['userGroupInstanceId':userGroupInstance.id.toString(), 'userId':user.id.toString(), 'role':UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value()]);
+				userToken.save(flush: true)
+				emailConfirmationService.sendConfirmation(founder.email,
+					"Please confirm users membership",  [founder:founder, user: user, userGroupInstance:userGroupInstance,domain:Utils.getDomainName(request), view:'/emailtemplates/requestMembership'], userToken.token);
+			}
+		}
+		return;
+	}
+	
+	private String generateLink( String controller, String action, linkParams, request) {
+		createLink(base: Utils.getDomainServerUrl(request),
+				controller:controller, action: action,
+				params: linkParams)
+	}
+	
+	@Secured(['ROLE_USER'])
+	def confirmMembershipRequest = {
+		log.debug params;
+		if(params.userId) {
+			def user = SUser.read(params.userId.toLong())
+			def userGroupInstance = UserGroup.read(params.userGroupInstanceId.toLong());
+			if(user && userGroupInstance) {
+				switch(params.role) {
+					case UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value():
+						if(userGroupInstance.addMember(user)) {
+							flash.message="Successfully added ${user} to this group"
+						}						
+						break;
+					default: log.error "No proper role type is specified."
+				}
+			}
+			UserToken.get(params.tokenId.toLong())?.delete();
+			redirect (action:"show", id:userGroupInstance.id);
+			return;
+		}
+		redirect (action:"list");		
 	}
 	
 	@Secured(['ROLE_USER'])

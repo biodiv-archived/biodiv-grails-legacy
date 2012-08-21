@@ -51,8 +51,16 @@
 
 			<span class="pull-right"> <uGroup:isNotAMember
 					model="['userGroupInstance':userGroupInstance]">
-					<a class="btn btn-large btn-success" id="joinUs"> <i
-						class="icon-plus"></i> Join Us</a>
+					
+					<g:if test="${userGroupInstance.allowUsersToJoin}">
+						<a class="btn btn-large btn-success" id="joinUs"> <i
+							class="icon-plus"></i> Join Us</a></g:if>
+					<g:else>
+						<a class="btn btn-large btn-success" id="requestMembership"> <i
+							class="icon-plus"></i> Request Membership</a>
+					</g:else>
+						
+						
 				</uGroup:isNotAMember> <uGroup:isAMember model="['userGroupInstance':userGroupInstance]">
 					<a class="btn btn-large btn-primary" id="leaveUs"><i
 						class="icon-minus"></i>Leave this group</a>
@@ -89,6 +97,23 @@ $(document).ready(function(){
             dataType: "json",
             success: function(data) {
             	$("#joinUs").html("Joined").removeClass("btn-success").addClass("btn-disabled");
+            	$(".message").removeClass('alert-error').addClass('alert-success').html(data.msg);
+            }, error: function(xhr, status, error) {
+				handleError(xhr, status, error, undefined, function() {
+                	var msg = $.parseJSON(xhr.responseText);
+                    $(".message").html(msg.msg).removeClass('alert-success').addClass('alert-error');
+				});
+            }
+		});
+	})
+	
+	$("#requestMembership").click(function() {
+		$.ajax({
+        	url: "${createLink(action:'requestMembership',id:userGroupInstance.id) }",
+            method: "POST",
+            dataType: "json",
+            success: function(data) {
+            	$("#joinUs").html("Sent request to founders").removeClass("btn-success").addClass("btn-disabled");
             	$(".message").removeClass('alert-error').addClass('alert-success').html(data.msg);
             }, error: function(xhr, status, error) {
 				handleError(xhr, status, error, undefined, function() {

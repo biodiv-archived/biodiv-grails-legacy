@@ -8,6 +8,7 @@ import species.auth.SUser
 import species.auth.SUserRole
 import species.groups.SpeciesGroup;
 import species.groups.UserGroupMemberRole.UserGroupMemberRoleType;
+import species.participation.UserToken;
 
 class BootStrap {
 
@@ -18,7 +19,8 @@ class BootStrap {
 	def namesIndexerService
 	def navigationService
 	def springSecurityService
-
+	def emailConfirmationService
+	
 	/**
 	 * 
 	 */
@@ -29,6 +31,7 @@ class BootStrap {
 		//initGroups();
 		initNames();
 		initFilters();
+		initEmailConfirmationService();
 	}
 
 	def initDefs() {
@@ -117,6 +120,25 @@ class BootStrap {
 			SpringSecurityUtils.clientRegisterFilter('drupalAuthCookieFilter', SecurityFilterPosition.CAS_FILTER.order + 1);
 		}
 	}
+
+	def initEmailConfirmationService() {
+		emailConfirmationService.onConfirmation = { email, uid ->
+			log.info("User with id $uid has confirmed their email address $email")
+			def userToken = UserToken.findByToken(uid);
+			if(userToken) {
+				userToken.params.tokenId=userToken.id.toString();
+				return [controller:userToken.controller, action:userToken.action, params:userToken.params]
+			} else {
+				//TODO
+			}
+		  }
+		  emailConfirmationService.onInvalid = { uid ->
+			log.warn("User with id $uid failed to confirm email address after 30 days")
+		  }
+		  emailConfirmationService.onTimeout = { email, uid ->
+			 log.warn("User with id $uid failed to confirm email address after 30 days")
+		  }
+	}
 	
 	/**
 	 * 
@@ -125,4 +147,5 @@ class BootStrap {
 		def indexStoreDir = grailsApplication.config.speciesPortal.nameSearch.indexStore;
 		//namesIndexerService.store(indexStoreDir);
 	}
+	
 }
