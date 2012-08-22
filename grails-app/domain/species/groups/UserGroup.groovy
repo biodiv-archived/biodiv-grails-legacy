@@ -216,6 +216,27 @@ class UserGroup implements Taggable {
 		return UserGroupMemberRole.countByUserGroup(this);
 	}
 
+	boolean isFounder(SUser user) {
+		def role = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_FOUNDER.value());
+		if(UserGroupMemberRole.find("from UserGroupMemberRole umr where umr.userGroup=:userGroup and umr.sUser=:sUser and umr.role=:role", [sUser:user, userGroup:this, role:role])) 
+			return true;
+		return false
+	} 
+	
+	boolean isExpert(SUser user) {
+		def role = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_EXPERT.value());
+		if(UserGroupMemberRole.find("from UserGroupMemberRole umr where umr.userGroup=:userGroup and umr.sUser=:sUser and umr.role=:role", [sUser:user, userGroup:this, role:role]))
+			return true;
+		return false
+	}
+	
+	boolean isMember(SUser user) {
+		def role = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value());
+		if(UserGroupMemberRole.find("from UserGroupMemberRole umr where umr.userGroup=:userGroup and umr.sUser=:sUser and umr.role=:role", [sUser:user, userGroup:this, role:role]))
+			return true;
+		return false
+	}
+	
 	//TODO:remove
 	boolean hasPermission(SUser user, Permission permission) {
 		return aclUtilService.hasPermission(gormUserDetailsService.loadUserByUsername(user.email, true), this, permission)

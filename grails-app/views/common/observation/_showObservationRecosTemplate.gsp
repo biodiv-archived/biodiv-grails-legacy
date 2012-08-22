@@ -7,12 +7,12 @@
 			<div>
 				<div class="users">
 					<div class="iAgree ">
-						<g:if test="${customsecurity.hasPermissionAsPerGroups([object:observationInstance,
+						<g:if test="${customsecurity.hasPermissionToMakeSpeciesCall([object:observationInstance,
 										permission:org.springframework.security.acls.domain.BasePermission.WRITE]).toBoolean()}">
 							<a href="#" class="btn btn-primary btn-small" onclick="addAgreeRecoVote(${r.obvId}, ${r.recoId}, ${r.noOfVotes}, $(this).closest('li'), '${createLink(controller:'observation', action:'addAgreeRecommendationVote')}'); return false;">Agree</a>
 						</g:if><g:else>
 							<a href="#"
-								title="Protected to group members. Need to join any of the user groups this observation belongs to inorder to add a species call" class="btn btn-primary btn-small disabled">Join Groups</a>
+								title="Protected to group members/experts. Need to join any of the user groups this observation belongs to inorder to add a species call" class="btn btn-primary btn-small disabled">Join Groups / Be an expert</a>
 						</g:else>
 					</div>
 					<g:each in="${r.authors}" var="author">

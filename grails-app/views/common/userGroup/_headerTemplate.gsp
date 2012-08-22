@@ -177,24 +177,17 @@ $(document).ready(function(){
 	
 	$("#invite").click(function(){
 		$('#memberUserIds').val(members_autofillUsersComp[0].getEmailAndIdsList().join(","));
-		$('#inviteMembersForm').ajaxSubmit();	
-	});
-	
-	$('#inviteMembersForm').ajaxForm({ 
+		$('#inviteMembersForm').ajaxSubmit({ 
 			url:'${createLink(action:'inviteMembers',id:userGroupInstance.id)}',
 			dataType: 'json', 
 			clearForm: true,
 			resetForm: true,
 			type: 'POST',
 			
-			beforeSubmit: function(formData, jqForm, options) {
-				console.log(members_autofillUsersComp[0].getEmailAndIdsList().join(","));
-				console.log(formData);
-					
-				return true;
-			},
 			success: function(responseXML, statusText, xhr, form) {
-				$('#inviteMembersForm').hide();
+				//$('#inviteMembersForm').hide();
+				console.log("success")
+				$('#inviteMembersDialog').modal('hide');
 			}, error:function (xhr, ajaxOptions, thrownError){
 					//successHandler is used when ajax login succedes
 	            	var successHandler = this.success, errorHandler;
@@ -203,16 +196,17 @@ $(document).ready(function(){
 						
 					});
            } 
-     	}); 
+     	});	
+	});
      	
-     	$('#inviteMembersDialog').modal({
-				"show" : false,
-				"backdrop" : "static"
-		});
-			
-     	$("#inviteMembers").click(function(){
-			$('#inviteMembersDialog').modal('show');
-		});
+   	$('#inviteMembersDialog').modal({
+		"show" : false,
+		"backdrop" : "static"
+	});
+		
+    $("#inviteMembers").click(function(){
+		$('#inviteMembersDialog').modal('show');
+	});
 		
 });
 </r:script>

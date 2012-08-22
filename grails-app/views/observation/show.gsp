@@ -180,13 +180,13 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 									<input type="hidden" name='obvId'
 											value="${observationInstance.id}" />
 									
-									<g:if test="${customsecurity.hasPermissionAsPerGroups([object:observationInstance,
-										permission:org.springframework.security.acls.domain.BasePermission.WRITE, property:'allowMembersToMakeSpeciesCall']).toBoolean()}">
+									<g:if test="${customsecurity.hasPermissionToMakeSpeciesCall([object:observationInstance,
+										permission:org.springframework.security.acls.domain.BasePermission.WRITE]).toBoolean()}">
 										 <input type="submit"
 											value="Add" class="btn btn-primary btn-small pull-right" style="position: relative;top: -30px; border-radius:4px" />
 									</g:if><g:else>
 										<a href="#"
-											title="Protected to group members. Need to join any of the user groups this observation belongs to inorder to add a species call" class="btn btn-primary btn-small disabled pull-right" style="position: relative;top: -30px;">Join Groups</a>
+											title="Protected to group members/experts. Need to join any of the user groups this observation belongs to inorder to add a species call" class="btn btn-primary btn-small disabled pull-right" style="position: relative;top: -30px;">Join Groups / Be an expert</a>
 									</g:else>
 								</div>
 							</form>

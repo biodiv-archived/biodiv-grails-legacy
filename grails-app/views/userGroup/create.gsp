@@ -330,7 +330,7 @@ input.dms_field {
 								<label class="checkbox" style="text-align: left;"> 
 								 <g:checkBox style="margin-left:0px;"
 												name="allowUsersToJoin" checked="${userGroupInstance.allowUsersToJoin}"/>
-								 <g:message code="userGroup.permissions.members.joining" default="Is invitation required to join? (If yes, registered users will be able to request for invitation from group's home page)" /> </label>
+								 <g:message code="userGroup.permissions.members.joining" default="Can users join with out invitation? (If no, registered users will be able to request for invitation from group's home page)" /> </label>
 						</div>
 						<div class="row control-group left-indent">
 							

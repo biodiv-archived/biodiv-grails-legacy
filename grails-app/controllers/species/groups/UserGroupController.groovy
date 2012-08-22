@@ -23,6 +23,7 @@ class UserGroupController {
 
 	def springSecurityService;
 	def userGroupService;
+	
 	def mailService;
 	def aclUtilService;
 	def observationService;
@@ -514,6 +515,7 @@ class UserGroupController {
 			redirect (action:"show", id:userGroupInstance.id);
 			return;
 		}
+		flash.message="There seems to be some problem. You are not the user to whom this confirmation request is sent as per our records."
 		redirect (action:"list");		
 	}
 	
