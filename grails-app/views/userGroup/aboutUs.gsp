@@ -36,7 +36,7 @@
 					<uGroup:showSidebar/>
 					<div class="super-section userGroup-section">
 						<div class="description notes_view">
-							${userGroupInstance.aboutUs}
+							${userGroupInstance.description}
 						</div>
 					</div>
 					

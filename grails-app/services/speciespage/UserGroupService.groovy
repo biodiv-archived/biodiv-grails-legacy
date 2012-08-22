@@ -57,6 +57,7 @@ class UserGroupService {
 		UserGroup userGroup = new UserGroup();
 		userGroup.properties = params;
 		userGroup.name = userGroup.name?.capitalize();
+		userGroup.webaddress = URLEncoder.encode(userGroup.name.replaceAll(" ", "_"), "UTF-8");
 		List founders = Utils.getUsersList(params.founderUserIds);
 		//List members = Utils.getUsersList(params.memberUserIds);
 		userGroup.icon = getUserGroupIcon(params.icon);
@@ -91,6 +92,7 @@ class UserGroupService {
 	void update(UserGroup userGroup, params) {
 		userGroup.properties = params
 		userGroup.name = userGroup.name?.capitalize();
+		userGroup.webaddress = URLEncoder.encode(userGroup.name.replaceAll(" ", "_"), "UTF-8");
 		List founders = Utils.getUsersList(params.founderUserIds);
 		//List members = Utils.getUsersList(params.memberUserIds);
 		userGroup.icon = getUserGroupIcon(params.icon);

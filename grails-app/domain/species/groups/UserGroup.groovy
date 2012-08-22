@@ -18,7 +18,7 @@ class UserGroup implements Taggable {
 
 	String name;
 	String description;
-	String aboutUs;
+	//String aboutUs;
 	//String contactEmail;
 	String webaddress;
 	Date foundedOn = new Date();
@@ -52,7 +52,7 @@ class UserGroup implements Taggable {
 	static mapping = {
 		version  false;
 		description type:'text';
-		aboutUs type:'text';
+		//aboutUs type:'text';
 		sort name:"asc"
 	}
 

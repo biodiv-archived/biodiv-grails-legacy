@@ -147,7 +147,38 @@ input.dms_field {
 								</div>
 							</div>
 						</div>
+						
+												
 						<div
+							class="row control-group left-indent ${hasErrors(bean: userGroupInstance, field: 'description', 'error')}"
+							>
+							<!--label for="notes"><g:message code="observation.notes.label" default="Notes" /></label-->
+							
+								<label for="description" class="control-label">Description <small><g:message
+											code="userGroup.description.message" default="" />
+								</small>
+								</label>
+							<div class="controls  textbox">
+								
+								<ckeditor:config var="toolbar_editorToolbar">
+										[
+	    									[ 'Bold', 'Italic' ]
+										]
+										</ckeditor:config>
+								<ckeditor:editor name="description" height="100px"
+									toolbar="editorToolbar">
+									${userGroupInstance?.description}
+								</ckeditor:editor>
+								<div class="help-inline">
+									<g:hasErrors bean="${userGroupInstance}" field="description">
+										<g:message code="userGroup.description.invalid" />
+									</g:hasErrors>
+								</div>
+							</div>
+
+						</div>
+						
+						<!-- div
 							class="row control-group left-indent ${hasErrors(bean: userGroupInstance, field: 'webaddress', 'error')}">
 							<label for="webaddress" class="control-label"><g:message
 									code="userGroup.webaddress.label" default="Web Address" /> </label>
@@ -165,7 +196,7 @@ input.dms_field {
 									</div>
 								</div>
 							</div>
-						</div>
+						</div-->
 
 						<div
 							class="row control-group left-indent ${hasErrors(bean: userGroupInstance, field: 'webaddress', 'error')}">
@@ -196,6 +227,7 @@ input.dms_field {
 								</div>
 							</div>
 						</div>
+
 					</div>
 				</div>
 
@@ -228,63 +260,13 @@ input.dms_field {
 					</div>
 				</div>
 
-				<div class="span12 super-section" style="clear: both;">
+				<!-- div class="span12 super-section" style="clear: both;">
 					<div class="section" style="position: relative; overflow: visible;">
 						<h3>Additional Information</h3>
-						<div
-							class="row control-group left-indent ${hasErrors(bean: userGroupInstance, field: 'description', 'error')}"
-							>
-							<!--label for="notes"><g:message code="observation.notes.label" default="Notes" /></label-->
-							
-								<label for="description" class="control-label">Description <small><g:message
-											code="userGroup.description.message" default="" />
-								</small>
-								</label>
-							<div class="controls  textbox">
-								
-								<ckeditor:config var="toolbar_editorToolbar">
-										[
-	    									[ 'Bold', 'Italic' ]
-										]
-										</ckeditor:config>
-								<ckeditor:editor name="description" height="100px"
-									toolbar="editorToolbar">
-									${userGroupInstance?.description}
-								</ckeditor:editor>
-								<div class="help-inline">
-									<g:hasErrors bean="${userGroupInstance}" field="description">
-										<g:message code="userGroup.description.invalid" />
-									</g:hasErrors>
-								</div>
-							</div>
-
-						</div>
-						<div
-							class="row control-group left-indent ${hasErrors(bean: userGroupInstance, field: 'aboutUs', 'error')}"
-							>
-							<!--label for="notes"><g:message code="observation.notes.label" default="Notes" /></label-->
-							
-								<label for="aboutUs" class="control-label">AboutUs <small><g:message
-											code="userGroup.aboutUs.message" default="" />
-								</small>
-								</label>
-							
-							<div class="controls  textbox">
-								<ckeditor:editor name="aboutUs" height="200px"
-									toolbar="editorToolbar">
-									${userGroupInstance?.aboutUs}
-								</ckeditor:editor>
-								<div class="help-inline">
-									<g:hasErrors bean="${userGroupInstance}" field="aboutUs">
-										<g:message code="userGroup.aboutUs.invalid" />
-									</g:hasErrors>
-								</div>
-							</div>
-
-						</div>
+						
 						
 					</div>
-				</div>
+				</div-->
 
 				<div class="span12 super-section" style="clear: both;">
 					<div class="section"
@@ -296,7 +278,7 @@ input.dms_field {
 								<label class="control-label">Species Groups & Habitats
 								</label>
 							
-							<div class="filters controls  textbox" style="position: relative;">
+							<div class="filters controls textbox" style="position: relative;">
 								<obv:showGroupFilter
 									model="['observationInstance':observationInstance]" />
 							</div>
@@ -526,12 +508,21 @@ $(document).ready(function() {
 	$(".tagit-hiddenSelect").css('display','none');
 	
 	$('#speciesGroupFilter button').attr('data-toggle', 'buttons-checkbox').click(function(){
-    	$(this).addClass('active');
+    	if($(this).hasClass('active')) {
+    		$(this).removeClass('active');
+    	} else {
+    		$(this).addClass('active');
+    	}
     	return false;
  	});
+	
         
  	$('#habitatFilter button').attr('data-toggle', 'buttons-checkbox').click(function(){
-    	$(this).addClass('active');
+    	if($(this).hasClass('active')) {
+    		$(this).removeClass('active');
+    	} else {
+    		$(this).addClass('active');
+    	}
     	return false;
  	});
  	
