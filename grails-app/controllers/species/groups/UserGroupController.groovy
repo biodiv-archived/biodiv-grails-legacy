@@ -457,7 +457,7 @@ class UserGroupController {
 				def userToken = new UserToken(username: member."$usernameFieldName", controller:'userGroup', action:'confirmMembershipRequest', params:['userGroupInstanceId':userGroupInstance.id.toString(), 'userId':member.id.toString(), 'role':UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value()]);
 				userToken.save(flush: true)
 				emailConfirmationService.sendConfirmation(member.email,
-						"Invitation to join as member in group",  [member:member, from:springSecurityService.currentUser, userGroupInstance:userGroupInstance,domain:domain, view:'/emailtemplates/memberInvitation'], userToken.token);
+						"Invitation to join as member in group",  [member:member, fromUser:springSecurityService.currentUser, userGroupInstance:userGroupInstance,domain:domain, view:'/emailtemplates/memberInvitation'], userToken.token);
 			}
 		}
 		

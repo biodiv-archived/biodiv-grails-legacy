@@ -531,7 +531,7 @@ class UserGroupService {
 				def userToken = new UserToken(username: founder."$usernameFieldName", controller:'userGroup', action:'confirmMembershipRequest', params:['userGroupInstanceId':userGroupInstance.id.toString(), 'userId':founder.id.toString(), 'role':UserGroupMemberRoleType.ROLE_USERGROUP_FOUNDER.value()]);
 				userToken.save(flush: true)
 				emailConfirmationService.sendConfirmation(founder.email,
-						"Invitation to join as founder for group",  [founder:founder, from:springSecurityService.currentUser, userGroupInstance:userGroupInstance,domain:domain, view:'/emailtemplates/founderInvitation'], userToken.token);
+						"Invitation to join as founder for group",  [founder:founder, fromUser:springSecurityService.currentUser, userGroupInstance:userGroupInstance,domain:domain, view:'/emailtemplates/founderInvitation'], userToken.token);
 			}
 		}
 	}
