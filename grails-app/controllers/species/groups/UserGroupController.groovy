@@ -9,6 +9,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
+import species.auth.Role;
 import species.auth.SUser;
 import species.groups.UserGroupMemberRole.UserGroupMemberRoleType;
 import species.participation.Observation;
@@ -123,6 +124,7 @@ class UserGroupController {
 	@Secured(['ROLE_USER'])
 	def save = {
 		log.debug params;
+		params.domain = Utils.getDomainName(request)
 		def userGroupInstance = userGroupService.create(params);
 		if (userGroupInstance.hasErrors()) {
 			userGroupInstance.errors.allErrors.each { log.error it }
@@ -261,7 +263,7 @@ class UserGroupController {
 					return
 				}
 			}
-			
+			params.domain = Utils.getDomainName(request)
 			userGroupService.update(userGroupInstance, params)
 			if (userGroupInstance.hasErrors()) {
 				userGroupInstance.errors.allErrors.each { log.error it }
@@ -433,6 +435,36 @@ class UserGroupController {
 	}
 	
 	@Secured(['ROLE_USER'])
+	def inviteMembers = {
+		List members = Utils.getUsersList(params.memberUserIds);
+		log.debug members;
+		
+		if(members) {
+			def userGroupInstance = findInstance()
+			if (!userGroupInstance) return {render (['success':false] as JSON)};
+	
+			def memberRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value())
+			def groupMembers = UserGroupMemberRole.findAllByUserGroupAndRole(userGroupInstance, memberRole).collect {it.sUser};
+			def commons = members.intersect(groupMembers);
+			members.removeAll(commons);
+			
+			log.debug "Sending invitation to ${members}"
+	
+			String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
+			String domain = Utils.getDomainName(request)
+			members.each { member ->
+				def userToken = new UserToken(username: member."$usernameFieldName", controller:'userGroup', action:'confirmMembershipRequest', params:['userGroupInstanceId':userGroupInstance.id.toString(), 'userId':member.id.toString(), 'role':UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value()]);
+				userToken.save(flush: true)
+				emailConfirmationService.sendConfirmation(member.email,
+						"Invitation to join as member in group",  [member:member, from:springSecurityService.currentUser, userGroupInstance:userGroupInstance,domain:domain, view:'/emailtemplates/memberInvitation'], userToken.token);
+			}
+		}
+		
+		render (['success':true] as JSON)
+
+	}
+	
+	@Secured(['ROLE_USER'])
 	def requestMembership = {
 		def user = springSecurityService.currentUser;
 		if(user) {
@@ -460,15 +492,20 @@ class UserGroupController {
 	@Secured(['ROLE_USER'])
 	def confirmMembershipRequest = {
 		log.debug params;
-		if(params.userId) {
+		if(params.userId && params.userId.toLong() == springSecurityService.currentUser.id) {
 			def user = SUser.read(params.userId.toLong())
 			def userGroupInstance = UserGroup.read(params.userGroupInstanceId.toLong());
 			if(user && userGroupInstance) {
 				switch(params.role) {
 					case UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value():
 						if(userGroupInstance.addMember(user)) {
-							flash.message="Successfully added ${user} to this group"
+							flash.message="Successfully added ${user} to this group as member"
 						}						
+						break;
+					case UserGroupMemberRoleType.ROLE_USERGROUP_FOUNDER.value():
+						if(userGroupInstance.addFounder(user)) {
+							flash.message="Successfully added ${user} to this group as founder"
+						}
 						break;
 					default: log.error "No proper role type is specified."
 				}

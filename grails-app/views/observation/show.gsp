@@ -179,9 +179,9 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 									model="['recommendationInstance':recommendationInstance]" />
 									<input type="hidden" name='obvId'
 											value="${observationInstance.id}" />
-											
+									
 									<g:if test="${customsecurity.hasPermissionAsPerGroups([object:observationInstance,
-										permission:org.springframework.security.acls.domain.BasePermission.WRITE]).toBoolean()}">
+										permission:org.springframework.security.acls.domain.BasePermission.WRITE, property:'allowMembersToMakeSpeciesCall']).toBoolean()}">
 										 <input type="submit"
 											value="Add" class="btn btn-primary btn-small pull-right" style="position: relative;top: -30px; border-radius:4px" />
 									</g:if><g:else>

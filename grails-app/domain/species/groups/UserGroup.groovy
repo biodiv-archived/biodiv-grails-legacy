@@ -28,6 +28,7 @@ class UserGroup implements Taggable {
 	boolean allowObvCrossPosting=true;
 	boolean allowNonMembersToComment=true;
 	boolean allowUsersToJoin=true;
+	boolean allowMembersToMakeSpeciesCall=true;
 	
 	def grailsApplication;
 	def aclUtilService
@@ -142,13 +143,13 @@ class UserGroup implements Taggable {
 
 
 		log.debug "Adding new founders ${founders}"
-		log.debug "Romoving as founders ${groupFounders}"
+		log.debug "Removing as founders ${groupFounders}"
 		if(founders) {
 			founders.each { founder ->
 				userGroupService.addMember(this,founder, founderRole, [
-					BasePermission.ADMINISTRATION,
-					BasePermission.WRITE
-				]);
+			BasePermission.ADMINISTRATION,
+			BasePermission.WRITE
+		]);
 			}
 		}
 
@@ -159,6 +160,14 @@ class UserGroup implements Taggable {
 		}
 	}
 
+	void addFounder(SUser founder) {
+		def founderRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_FOUNDER.value())
+		userGroupService.addMember(this,founder, founderRole, [
+			BasePermission.ADMINISTRATION,
+			BasePermission.WRITE
+		]);
+	}
+	
 	def getMembers(int max, long offset) {
 		def role = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value())
 		return UserGroupMemberRole.findAllByUserGroupAndRole(this, role, [max:max, offset:offset]).collect { it.sUser};
@@ -176,10 +185,7 @@ class UserGroup implements Taggable {
 	boolean addMember(SUser member) {
 		if(member) {
 			def memberRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value())
-			if(!UserGroupMemberRole.find("from UserGroupMemberRole uMR where uMR.sUser=:sUser and uMR.userGroup=:userGroup and uMR.role=:role",[sUser:member, userGroup:this, role:memberRole])) {
-				log.debug "${member} is already a member of group ${this}"
-				userGroupService.addMember(this, member, memberRole, BasePermission.WRITE);
-			}
+			userGroupService.addMember(this, member, memberRole, BasePermission.WRITE);
 			true;
 		}
 	}

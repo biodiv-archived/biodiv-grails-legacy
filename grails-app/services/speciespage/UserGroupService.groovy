@@ -7,6 +7,7 @@ import java.util.Map;
 import grails.plugins.springsecurity.Secured;
 import groovy.sql.Sql;
 
+import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
 import org.springframework.security.access.prepost.PostFilter
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.acls.domain.BasePermission;
@@ -23,6 +24,7 @@ import species.groups.UserGroup;
 import species.groups.UserGroupMemberRole;
 import species.groups.UserGroupMemberRole.UserGroupMemberRoleType;
 import species.participation.Observation;
+import species.participation.UserToken;
 import species.utils.ImageUtils;
 import species.utils.Utils;
 
@@ -37,6 +39,7 @@ class UserGroupService {
 	def dataSource;
 	def observationService;
 	def grailsApplication;
+	def emailConfirmationService;
 
 	void addPermission(UserGroup userGroup, SUser user, int permission) {
 		addPermission userGroup, user, aclPermissionFactory.buildFromMask(permission)
@@ -61,7 +64,8 @@ class UserGroupService {
 		addInterestedHabitats(userGroup, params.habitats)
 
 		if(userGroup.save()) {
-			userGroup.setFounders(founders);
+			setUserGroupFounders(userGroup, founders, params.domain);
+			//userGroup.setFounders(founders);
 			//userGroup.setMembers(members);
 		}
 		return userGroup
@@ -92,11 +96,13 @@ class UserGroupService {
 		userGroup.icon = getUserGroupIcon(params.icon);
 		addInterestedSpeciesGroups(userGroup, params.speciesGroup)
 		addInterestedHabitats(userGroup, params.habitat)
-		
-		userGroup.setFounders(founders);
+
+		setUserGroupFounders(userGroup, founders, params.domain);
+		//userGroup.setFounders(founders);
 		//userGroup.setMembers(members);
 
 	}
+
 
 	private String getUserGroupIcon(String icon) {
 		if(!icon) return;
@@ -121,7 +127,7 @@ class UserGroupService {
 		//		}
 		return resource;
 	}
-	
+
 	private void addInterestedSpeciesGroups(userGroupInstance, speciesGroups) {
 		log.debug "Adding species group interests ${speciesGroups}"
 		userGroupInstance.speciesGroups?.removeAll()
@@ -129,7 +135,7 @@ class UserGroupService {
 			userGroupInstance.addToSpeciesGroups(SpeciesGroup.read(value.toLong()));
 		}
 	}
-	
+
 	private void addInterestedHabitats(userGroupInstance, habitats) {
 		log.debug "Adding habitat interests ${habitats}"
 		userGroupInstance.habitats?.removeAll()
@@ -251,7 +257,7 @@ class UserGroupService {
 			queryParams["user"] = params.user
 			activeFilters["user"] = params.user
 		}
-		
+
 		if(params.observation){
 			params.observation = params.observation.toLong()
 			query += " join uGroup.observations observation "
@@ -283,7 +289,7 @@ class UserGroupService {
 
 		def sortOption = (params.sort ? params.sort : "visitCount");
 		def orderByClause = " order by uGroup." + sortOption +  " desc, uGroup.id asc"
-		
+
 		query += filterQuery + orderByClause
 		if(max != -1)
 			queryParams["max"] = max
@@ -305,7 +311,7 @@ class UserGroupService {
 		return null;
 	}
 
-	private String getIdList(l){		
+	private String getIdList(l){
 		return l.toString().replace("[", "(").replace("]", ")")
 	}
 
@@ -426,9 +432,12 @@ class UserGroupService {
 		def userMemberRole = UserGroupMemberRole.findBySUserAndUserGroup(user, userGroup);
 		if(!userMemberRole) {
 			userMemberRole = UserGroupMemberRole.create(userGroup, user, role);
+		} else {
+			log.debug "${user} is already a member of ${userGroup}"
 		}
 
 		if(userMemberRole.role.id != role.id) {
+			log.debug "Assigning a new role ${role}"
 			def prevRole = userMemberRole.role;
 			userMemberRole.role = role
 			if(!userMemberRole.save()) {
@@ -488,4 +497,40 @@ class UserGroupService {
 		return UserGroupMemberRole.findAllBySUser(user,[max:max, offset:offset]).collect { it.userGroup};
 	}
 
+	//////////////////User & MAIL RELATED////////////////////
+
+	def setUserGroupFounders(userGroupInstance, founders, domain) {
+		founders.add(springSecurityService.currentUser);
+		def founderRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_FOUNDER.value())
+		def groupFounders = UserGroupMemberRole.findAllByUserGroupAndRole(userGroupInstance, founderRole).collect {it.sUser};
+		def commons = founders.intersect(groupFounders);
+		groupFounders.removeAll(commons);
+		founders.removeAll(commons);
+
+		sendFounderInvitation(userGroupInstance, founders, domain);
+
+		if(groupFounders) {
+			groupFounders.each { founder ->
+				deleteMember (userGroupInstance, founder, founderRole);
+			}
+		}
+	}
+
+	void sendFounderInvitation(userGroupInstance, founders, domain) {
+
+		log.debug "Sending invitation to ${founders}"
+
+		String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
+
+		founders.each { founder ->
+			if(founder.id == springSecurityService.currentUser.id) {
+				userGroupInstance.addFounder(founder);
+			} else {
+				def userToken = new UserToken(username: founder."$usernameFieldName", controller:'userGroup', action:'confirmMembershipRequest', params:['userGroupInstanceId':userGroupInstance.id.toString(), 'userId':founder.id.toString(), 'role':UserGroupMemberRoleType.ROLE_USERGROUP_FOUNDER.value()]);
+				userToken.save(flush: true)
+				emailConfirmationService.sendConfirmation(founder.email,
+						"Invitation to join as founder for group",  [founder:founder, from:springSecurityService.currentUser, userGroupInstance:userGroupInstance,domain:domain, view:'/emailtemplates/founderInvitation'], userToken.token);
+			}
+		}
+	}
 }

@@ -46,25 +46,55 @@
 
 		<div class="observation-icons pull-right">
 
-			<obv:identificationByEmail
-				model="['source':'userGroupInvite', 'requestObject':request, 'activity':'Invite Friends', 'cssClass':'btn btn-large btn-success dropdown-toggle']" />
+			<!-- obv:identificationByEmail
+				model="['source':'userGroupInvite', 'requestObject':request, 'activity':'Invite Friends', 'cssClass':'btn btn-large btn-success dropdown-toggle']" /-->
 
-			<span class="pull-right"> <uGroup:isNotAMember
-					model="['userGroupInstance':userGroupInstance]">
-					
-					<g:if test="${userGroupInstance.allowUsersToJoin}">
-						<a class="btn btn-large btn-success" id="joinUs"> <i
-							class="icon-plus"></i> Join Us</a></g:if>
-					<g:else>
-						<a class="btn btn-large btn-success" id="requestMembership"> <i
-							class="icon-plus"></i> Request Membership</a>
-					</g:else>
-						
-						
-				</uGroup:isNotAMember> <uGroup:isAMember model="['userGroupInstance':userGroupInstance]">
-					<a class="btn btn-large btn-primary" id="leaveUs"><i
-						class="icon-minus"></i>Leave this group</a>
-				</uGroup:isAMember> </span>
+
+			<a id="inviteMembers" class="btn btn-large btn-primary" href="#"><i
+				class="icon-envelope"></i> <g:message code="userGroup.members.label"
+					default="Invite Members" /> </a>
+
+			<div class="modal hide" id="inviteMembersDialog">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal">×</button>
+					<h3>Invite friends as members</h3>
+				</div>
+				<div class="modal-body">
+					<p>Send an invitation to invite your friends to join and
+						contribute in this interesting group…</p>
+					<div>
+						<form id="inviteMembersForm" method="post"
+							style="background-color: #F2F2F2;">
+							<sUser:selectUsers model="['id':members_autofillUsersId]" />
+							<input type="hidden" name="memberUserIds" id="memberUserIds" />
+						</form>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<a href="#" class="btn" data-dismiss="modal">Close</a> <a href="#"
+						id="invite" class="btn btn-primary">Invite</a>
+				</div>
+			</div>
+
+
+
+			<uGroup:isNotAMember model="['userGroupInstance':userGroupInstance]">
+
+				<g:if test="${userGroupInstance.allowUsersToJoin}">
+					<a class="btn btn-large btn-success" id="joinUs"> <i
+						class="icon-plus"></i> Join Us</a>
+				</g:if>
+				<g:else>
+					<a class="btn btn-large btn-success" id="requestMembership"> <i
+						class="icon-plus"></i> Request Membership</a>
+				</g:else>
+
+
+			</uGroup:isNotAMember>
+			<uGroup:isAMember model="['userGroupInstance':userGroupInstance]">
+				<a class="btn btn-large btn-primary" id="leaveUs"><i
+					class="icon-minus"></i>Leave this group</a>
+			</uGroup:isAMember>
 
 
 			<sec:permitted className='species.groups.UserGroup'
@@ -140,5 +170,49 @@ $(document).ready(function(){
             }
 		});
 	})
+	
+	var members_autofillUsersComp = $("#userAndEmailList_${members_autofillUsersId}").autofillUsers({
+		usersUrl : '${createLink(controller:'SUser', action: 'terms')}'
+	});
+	
+	$("#invite").click(function(){
+		$('#memberUserIds').val(members_autofillUsersComp[0].getEmailAndIdsList().join(","));
+		$('#inviteMembersForm').ajaxSubmit();	
+	});
+	
+	$('#inviteMembersForm').ajaxForm({ 
+			url:'${createLink(action:'inviteMembers',id:userGroupInstance.id)}',
+			dataType: 'json', 
+			clearForm: true,
+			resetForm: true,
+			type: 'POST',
+			
+			beforeSubmit: function(formData, jqForm, options) {
+				console.log(members_autofillUsersComp[0].getEmailAndIdsList().join(","));
+				console.log(formData);
+					
+				return true;
+			},
+			success: function(responseXML, statusText, xhr, form) {
+				$('#inviteMembersForm').hide();
+			}, error:function (xhr, ajaxOptions, thrownError){
+					//successHandler is used when ajax login succedes
+	            	var successHandler = this.success, errorHandler;
+	            	handleError(xhr, ajaxOptions, thrownError, successHandler, function() {
+						var response = $.parseJSON(xhr.responseText);
+						
+					});
+           } 
+     	}); 
+     	
+     	$('#inviteMembersDialog').modal({
+				"show" : false,
+				"backdrop" : "static"
+		});
+			
+     	$("#inviteMembers").click(function(){
+			$('#inviteMembersDialog').modal('show');
+		});
+		
 });
 </r:script>

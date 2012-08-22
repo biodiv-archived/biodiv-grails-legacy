@@ -206,7 +206,7 @@ input.dms_field {
 						<div
 							class="row control-group left-indent ${hasErrors(bean: userGroupInstance, field: 'founders', 'error')}">
 							<label for="founders" class="control-label"><g:message
-									code="userGroup.founders.label" default="Group Founders" /> </label>
+									code="userGroup.founders.label" default="Invite Founders" /> </label>
 							<div class="controls  textbox">
 								<sUser:selectUsers model="['id':founders_autofillUsersId]" />
 								<input type="hidden" name="founderUserIds" id="founderUserIds" />
@@ -215,16 +215,16 @@ input.dms_field {
 						</div>
 
 						<!-- div
-								class="row control-group left-indent ${hasErrors(bean: userGroupInstance, field: 'members', 'error')}">
-								<label for="members" class="control-label"><g:message
-										code="userGroup.members.label" default="Invite Members" /> </label>
-								<div class="controls  textbox">
-									<div class="create_tags section-item">
-										<sUser:selectUsers model="['id':members_autofillUsersId]"/>
-										<input type="hidden" name="memberUserIds" id="memberUserIds" />
-									</div>
+							class="row control-group left-indent ${hasErrors(bean: userGroupInstance, field: 'members', 'error')}">
+							<label for="members" class="control-label"><g:message
+									code="userGroup.members.label" default="Invite Members" /> </label>
+							<div class="controls  textbox">
+								<div class="create_tags section-item">
+									<sUser:selectUsers model="['id':members_autofillUsersId]"/>
+									<input type="hidden" name="memberUserIds" id="memberUserIds" />
 								</div>
-							</div-->
+							</div>
+						</div-->
 					</div>
 				</div>
 
@@ -338,6 +338,13 @@ input.dms_field {
 								 <g:checkBox style="margin-left:0px;"
 												name="allowObvCrossPosting" checked="${userGroupInstance.allowObvCrossPosting}"/>
 								 <g:message code="userGroup.permissions.observations.crossposting" default="Allow Observations Cross Posting" /> </label>
+						</div>
+						<div class="row control-group left-indent">
+							
+								<label class="checkbox" style="text-align: left;"> 
+								 <g:checkBox style="margin-left:0px;"
+												name="allowMembersToMakeSpeciesCall" checked="${userGroupInstance.allowMembersToMakeSpeciesCall}"/>
+								 <g:message code="userGroup.permissions.observations.allowMembersToMakeSpeciesCall" default="Allow members to make species calls and agree upon existing species calls" /> </label>
 						</div>
 						<div class="row control-group left-indent">
 							
@@ -498,8 +505,6 @@ $(document).ready(function() {
         
         var speciesGroups = getSelectedGroup();
         var habitats = getSelectedHabitat();
-        console.log(speciesGroups);
-        console.log(habitats);
         
        	$.each(speciesGroups, function(index){
        		var input = $("<input>").attr("type", "hidden").attr("name", "speciesGroup."+index).val(this);
