@@ -4,5 +4,4 @@ target/stacktrace.log
 target/
 target-eclipse/
 app-conf/solr/*/data/
-species
 .settings/
