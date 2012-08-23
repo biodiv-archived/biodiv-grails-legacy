@@ -185,8 +185,6 @@ $(document).ready(function(){
 			type: 'POST',
 			
 			success: function(responseXML, statusText, xhr, form) {
-				//$('#inviteMembersForm').hide();
-				console.log("success")
 				$('#inviteMembersDialog').modal('hide');
 			}, error:function (xhr, ajaxOptions, thrownError){
 					//successHandler is used when ajax login succedes
@@ -204,8 +202,22 @@ $(document).ready(function(){
 		"backdrop" : "static"
 	});
 		
-    $("#inviteMembers").click(function(){
-		$('#inviteMembersDialog').modal('show');
+	$('#inviteMembers').click(function(){
+			$.ajax({ 
+	         	url:"${createLink(controller:'SUser', action:'isLoggedIn')}",
+				success: function(data, statusText, xhr, form) {
+					if(data === "true"){
+						$('#memberUserIds').val('');
+						$('#inviteMembersDialog').modal('show');
+						return false;
+					}else{
+						window.location.href = "${createLink(controller:'login')}?spring-security-redirect="+window.location.href;
+					}
+	            },
+	            error:function (xhr, ajaxOptions, thrownError){
+	            	return false;
+				} 
+	     	});
 	});
 		
 });
