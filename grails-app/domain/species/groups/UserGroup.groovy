@@ -147,9 +147,9 @@ class UserGroup implements Taggable {
 		if(founders) {
 			founders.each { founder ->
 				userGroupService.addMember(this,founder, founderRole, [
-			BasePermission.ADMINISTRATION,
-			BasePermission.WRITE
-		]);
+					BasePermission.ADMINISTRATION,
+					BasePermission.WRITE
+				]);
 			}
 		}
 
