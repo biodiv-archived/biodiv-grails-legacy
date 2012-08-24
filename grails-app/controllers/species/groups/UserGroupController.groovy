@@ -490,7 +490,7 @@ class UserGroupController {
 				params: linkParams)
 	}
 	
-	@Secured(['ROLE_USER'])
+	@Secured(['ROLE_USER', 'RUN_AS_ADMIN'])
 	def confirmMembershipRequest = {
 		log.debug params;
 		if(params.userId && params.userId.toLong() == springSecurityService.currentUser.id) {

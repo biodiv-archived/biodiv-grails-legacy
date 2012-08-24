@@ -47,7 +47,6 @@ class UserGroupService {
 	}
 
 	//@PreAuthorize("hasPermission(#userGroup, admin) or hasRole('ROLE_RUN_AS_ACL_USERGROUP_FOUNDER')")
-	@Secured(['ROLE_USER', 'RUN_AS_ADMIN'])
 	@Transactional
 	void addPermission(UserGroup userGroup, SUser user, Permission permission) {
 		aclUtilService.addPermission userGroup, user.email, permission

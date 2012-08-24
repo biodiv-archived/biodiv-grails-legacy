@@ -112,7 +112,8 @@ log4j = {
 			//'org.springframework.security.openid',
 			//'org.openid4java',
 			'species.auth',
-			"org.springframework.security.acls"
+			"org.springframework.security.acls",
+			"org.springframework.security.access"
 			//'com.the6hours.grails.springsecurity.facebook'
 	
 	
@@ -427,7 +428,40 @@ environments {
 	}
 	production {
 		grails.serverURL = "http://localhost:8080/${appName}"
+		speciesPortal {
+			search.serverURL = "http://localhost:8090/solr"
+			names.parser.serverURL = "127.0.0.1"
+			wgp {
+				facebook {
+					appId= "327308053982589"
+					secret= "f36074901fc24b904794692755796fd1"
+				}
+				supportEmail = "team(at)thewesternghats(dot)in"
+			}
+			ibp {
+				facebook {
+					appId= "347177228674021"
+					secret= "82d91308b5437649bfe891a027205501"
+				}
+				supportEmail = "support(at)indiabiodiversity(dot)org"
+			}
+		}
 		google.analytics.enabled = false
+
+		
+		grails {
+			mail {
+				 host = "127.0.0.1"
+				 port = 25
+			}
+		}
+
+        ibp.domain='indiabiodiversity.localhost.org'
+        wgp.domain='thewesternghats.localhost.in'
+		//grails.resources.debug=true
+		grails.resources.mappers.hashandcache.excludes = ['**']
+		//grails.resources.flatten = false
+		grails.resources.mappers.yuijsminify.disable=true
 	}
 
 	saturn {
@@ -883,7 +917,7 @@ grails.plugins.springsecurity.useRunAs = true
 grails.plugins.springsecurity.runAs.key = 'run-asKey'
 
 grails.plugins.springsecurity.acl.authority.modifyAuditingDetails = 'ROLE_ADMIN'//'ROLE_ACL_MODIFY_AUDITING'
-grails.plugins.springsecurity.acl.authority.changeOwnership =       'ROLE_RUN_AS_ACL_USERGROUP_FOUNDER'
+grails.plugins.springsecurity.acl.authority.changeOwnership =       'ROLE_ADMIN'
 grails.plugins.springsecurity.acl.authority.changeAclDetails =      'ROLE_ADMIN'//'ROLE_ACL_CHANGE_DETAILS'
 
 grails.plugins.springsecurity.controllerAnnotations.staticRules = [
