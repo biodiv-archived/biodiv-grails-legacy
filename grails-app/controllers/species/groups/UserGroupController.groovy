@@ -23,12 +23,12 @@ class UserGroupController {
 
 	def springSecurityService;
 	def userGroupService;
-	
+
 	def mailService;
 	def aclUtilService;
 	def observationService;
 	def emailConfirmationService;
-	
+
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
 	def index = {
@@ -93,7 +93,7 @@ class UserGroupController {
 
 	def listRelated = {
 		log.debug params
-		
+
 		switch(params.filterProperty) {
 			case 'featuredObservations':
 				redirect(action:'observations', id:params.id);
@@ -110,10 +110,10 @@ class UserGroupController {
 			default:
 				flash:message "Invalid command"
 				redirect(action:list, id:params.id)
-		}	
+		}
 		return
 	}
-	
+
 	@Secured(['ROLE_USER'])
 	def create = {
 		log.debug params
@@ -233,7 +233,7 @@ class UserGroupController {
 			getUserGroupList(params);
 		}
 	}
-	
+
 	@Secured(['ROLE_USER'])
 	def edit = {
 		def userGroupInstance = findInstance()
@@ -273,6 +273,11 @@ class UserGroupController {
 			else {
 				def tags = (params.tags != null) ? params.tags.values() as List : new ArrayList();
 				userGroupInstance.setTags(tags);
+
+				userGroupService.setUserGroupFounders(userGroup, founders, params.domain);
+				//userGroup.setFounders(founders);
+				//userGroup.setMembers(members);
+
 				log.debug "Successfully updated usergroup : "+userGroupInstance
 				flash.message = "${message(code: 'default.updated.message', args: [message(code: 'userGroup.label', default: 'UserGroup'), userGroupInstance.id])}"
 				redirect(action: "show", id: userGroupInstance.id)
@@ -318,7 +323,7 @@ class UserGroupController {
 
 	private UserGroup findInstance() {
 		if(!params.id) return;
-		
+
 		def userGroup = userGroupService.get(params.long('id'))
 		if (!userGroup) {
 			flash.message = "UserGroup not found with id $params.id"
@@ -331,18 +336,18 @@ class UserGroupController {
 		def userGroupInstance = findInstance()
 		if (!userGroupInstance) return
 
-		params.max = Math.min(params.max ? params.int('max') : 9, 100)
+			params.max = Math.min(params.max ? params.int('max') : 9, 100)
 		params.offset = params.offset ? params.int('offset') : 0
 
 		def allMembers = userGroupInstance.getAllMembers(params.max, params.offset);
 		['userGroupInstance':userGroupInstance, 'members':allMembers, 'foundersTotalCount':userGroupInstance.getFoundersCount(), 'membersTotalCount':userGroupInstance.getAllMembersCount(), 'expertsTotalCount':0]
- 	}
-	
+	}
+
 	def founders = {
 		def userGroupInstance = findInstance()
 		if (!userGroupInstance) return
 
-		params.max = Math.min(params.max ? params.int('max') : 9, 100)
+			params.max = Math.min(params.max ? params.int('max') : 9, 100)
 		params.offset = params.offset ? params.int('offset') : 0
 
 		def founders = userGroupInstance.getFounders(params.max, params.offset);
@@ -353,20 +358,20 @@ class UserGroupController {
 		def userGroupInstance = findInstance()
 		if (!userGroupInstance) return
 
-		params.max = Math.min(params.max ? params.int('max') : 9, 100)
+			params.max = Math.min(params.max ? params.int('max') : 9, 100)
 		params.offset = params.offset ? params.int('offset') : 0
 
 		def experts = [];//userGroupInstance.getExperts(params.max, params.offset);
 		render(view:"members", model:['userGroupInstance':userGroupInstance, 'founders':founders, 'foundersTotalCount':userGroupInstance.getFoundersCount(), 'membersTotalCount':userGroupInstance.getAllMembersCount(), 'expertsTotalCount':0]);
 	}
-	
+
 	def observations = {
 		def userGroupInstance = findInstance()
 		if (!userGroupInstance) return
 
-		params.max = Math.min(params.max ? params.int('max') : 9, 100)
+			params.max = Math.min(params.max ? params.int('max') : 9, 100)
 		params.offset = params.offset ? params.int('offset') : 0
-		
+
 		def model = userGroupService.getUserGroupObservations(userGroupInstance, params, params.max, params.offset);
 		def model2 = userGroupService.getUserGroupObservations(userGroupInstance, params, -1, -1, true);
 		def observationInstanceTotal = model2.observationInstanceList.size();
@@ -393,16 +398,16 @@ class UserGroupController {
 			render result as JSON
 			return;
 		}
-	
+
 	}
-	
+
 	def filteredMapBasedObservationsList = {
 		def userGroupInstance = findInstance()
 		if (!userGroupInstance) return
 
-		params.max = Math.min(params.max ? params.int('max') : 9, 100)
+			params.max = Math.min(params.max ? params.int('max') : 9, 100)
 		params.offset = params.offset ? params.int('offset') : 0
-		
+
 		def model = userGroupService.getUserGroupObservations(userGroupInstance, params, params.max, params.offset);
 		def model2 = userGroupService.getUserGroupObservations(userGroupInstance, params, -1, -1, true);
 		def totalCount = model2.observationInstanceList.size();
@@ -410,23 +415,23 @@ class UserGroupController {
 
 		render (template:"/common/observation/showObservationListTemplate", model:model);
 	}
-	
+
 	@Secured(['ROLE_USER', 'ROLE_ADMIN'])
 	def settings = {
 		def userGroupInstance = findInstance()
 		if (!userGroupInstance) return
-		
-		if(aclUtilService.hasPermission(springSecurityService.getAuthentication(), userGroupInstance, BasePermission.ADMINISTRATION)) {
-			return ['userGroupInstance':userGroupInstance]
-		}
+
+			if(aclUtilService.hasPermission(springSecurityService.getAuthentication(), userGroupInstance, BasePermission.ADMINISTRATION)) {
+				return ['userGroupInstance':userGroupInstance]
+			}
 		return;
 	}
-	
+
 	@Secured(['ROLE_USER'])
 	def joinUs = {
 		def userGroupInstance = findInstance()
 		if (!userGroupInstance) return;
-		
+
 		def user = springSecurityService.currentUser;
 		if(user) {
 			userGroupInstance.addMember(user);
@@ -434,23 +439,23 @@ class UserGroupController {
 		}
 		render (['msg':'We are extremely sorry as we are not able to process your request now. Please try again.']as JSON);
 	}
-	
+
 	@Secured(['ROLE_USER'])
 	def inviteMembers = {
 		List members = Utils.getUsersList(params.memberUserIds);
 		log.debug members;
-		
+
 		if(members) {
 			def userGroupInstance = findInstance()
 			if (!userGroupInstance) return {render (['success':false] as JSON)};
-	
+
 			def memberRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value())
 			def groupMembers = UserGroupMemberRole.findAllByUserGroupAndRole(userGroupInstance, memberRole).collect {it.sUser};
 			def commons = members.intersect(groupMembers);
 			members.removeAll(commons);
-			
+
 			log.debug "Sending invitation to ${members}"
-	
+
 			String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
 			String domain = Utils.getDomainName(request)
 			members.each { member ->
@@ -460,37 +465,37 @@ class UserGroupController {
 						"Invitation to join as member in group",  [member:member, fromUser:springSecurityService.currentUser, userGroupInstance:userGroupInstance,domain:domain, view:'/emailtemplates/memberInvitation'], userToken.token);
 			}
 		}
-		
+
 		render (['success':true] as JSON)
 
 	}
-	
+
 	@Secured(['ROLE_USER'])
 	def requestMembership = {
 		def user = springSecurityService.currentUser;
 		if(user) {
 			def userGroupInstance = findInstance()
 			if (!userGroupInstance) return;
-			
+
 			String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
 			def founders = userGroupInstance.getFounders(userGroupInstance.getFoundersCount(), 0);
 			founders.each { founder ->
 				def userToken = new UserToken(username: user."$usernameFieldName", controller:'userGroup', action:'confirmMembershipRequest', params:['userGroupInstanceId':userGroupInstance.id.toString(), 'userId':user.id.toString(), 'role':UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value()]);
 				userToken.save(flush: true)
 				emailConfirmationService.sendConfirmation(founder.email,
-					"Please confirm users membership",  [founder:founder, user: user, userGroupInstance:userGroupInstance,domain:Utils.getDomainName(request), view:'/emailtemplates/requestMembership'], userToken.token);
+						"Please confirm users membership",  [founder:founder, user: user, userGroupInstance:userGroupInstance,domain:Utils.getDomainName(request), view:'/emailtemplates/requestMembership'], userToken.token);
 			}
 		}
 		return;
 	}
-	
+
 	private String generateLink( String controller, String action, linkParams, request) {
 		createLink(base: Utils.getDomainServerUrl(request),
 				controller:controller, action: action,
 				params: linkParams)
 	}
-	
-	@Secured(['ROLE_USER', 'RUN_AS_ADMIN'])
+
+	@Secured(['ROLE_USER'])
 	def confirmMembershipRequest = {
 		log.debug params;
 		if(params.userId && params.userId.toLong() == springSecurityService.currentUser.id) {
@@ -501,7 +506,7 @@ class UserGroupController {
 					case UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value():
 						if(userGroupInstance.addMember(user)) {
 							flash.message="Successfully added ${user} to this group as member"
-						}						
+						}
 						break;
 					case UserGroupMemberRoleType.ROLE_USERGROUP_FOUNDER.value():
 						if(userGroupInstance.addFounder(user)) {
@@ -516,43 +521,44 @@ class UserGroupController {
 			return;
 		}
 		flash.message="There seems to be some problem. You are not the user to whom this confirmation request is sent as per our records."
-		redirect (action:"list");		
+		redirect (action:"list");
 	}
-	
+
 	@Secured(['ROLE_USER'])
 	def leaveUs = {
 		def userGroupInstance = findInstance()
 		if (!userGroupInstance) return;
-		
+
 		def user = springSecurityService.currentUser;
 		if(user) {
+			//TODO:chk if h is the last founder left
 			userGroupInstance.deleteMember(user);
 			render (['msg':'successful'] as JSON);
 			return
 		}
 		render (['msg':'Your presence is important to us. If you still want to leave this group please try again.']as JSON);
 	}
-	
+
 	def aboutUs = {
 		def userGroupInstance = findInstance()
 		if (!userGroupInstance) return;
-		
+
 		return ['userGroupInstance':userGroupInstance]
 	}
-	
+
 	def getRelatedUserGroups = {
 		log.debug params;
 		def max = Math.min(params.limit ? params.limit.toInteger() : 9, 100)
 		def offset = params.offset ? params.offset.toInteger() : 0
 
 		if(!params.id) return;
-		
+
 		def observationInstance = Observation.get(params.long('id'))
 		if (!observationInstance) {
 			flash.message = "Observation not found with id $params.id"
 			return;
 		}
-		
+
 		def userGroups = userGroupService.getObservationUserGroups(observationInstance, max, offset);
 
 		def result = [];
@@ -584,7 +590,7 @@ class UserGroupController {
 				if(!params.resources) {
 					message = g.message(code: 'no.file.attached', default:'No file is attached')
 				}
-				
+
 				params.resources.each { f ->
 					log.debug "Saving userGroup logo file ${f.originalFilename}"
 
@@ -665,7 +671,7 @@ class UserGroupController {
 			render message as JSON
 		}
 	}
-	
+
 	def getFeaturedObservations = {
 		def userGroupInstance = findInstance()
 		if (!userGroupInstance) return;
@@ -673,7 +679,7 @@ class UserGroupController {
 		log.debug params;
 		def max = Math.min(params.limit ? params.limit.toInteger() : 9, 100)
 		def offset = params.offset ? params.offset.toInteger() : 0
-		params.sort = "visitCount"; 
+		params.sort = "visitCount";
 		def model = userGroupService.getUserGroupObservations(userGroupInstance, params, max, offset);
 
 		def result = [];
@@ -695,7 +701,7 @@ class UserGroupController {
 		log.debug params;
 		def max = Math.min(params.limit ? params.limit.toInteger() : 9, 100)
 		def offset = params.offset ? params.offset.toInteger() : 0
-		
+
 		params.sort = "activity";
 		//TODO:sort on activity
 		def members = UserGroupMemberRole.findAllByUserGroup(userGroupInstance, [max:max, offset:offset]).collect { it.sUser};
@@ -718,13 +724,13 @@ class UserGroupController {
 		def offset = params.offset ? params.offset.toInteger() : 0
 
 		if(!params.id) return;
-		
+
 		def userInstance = SUser.get(params.long('id'))
 		if (!userInstance) {
 			flash.message = "SUser not found with id $params.id"
 			return;
 		}
-		
+
 		def userGroups = userGroupService.getUserUserGroups(userInstance, max, offset);
 
 		def result = [];

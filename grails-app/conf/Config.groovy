@@ -918,7 +918,7 @@ grails.plugins.springsecurity.runAs.key = 'run-asKey'
 
 grails.plugins.springsecurity.acl.authority.modifyAuditingDetails = 'ROLE_ADMIN'//'ROLE_ACL_MODIFY_AUDITING'
 grails.plugins.springsecurity.acl.authority.changeOwnership =       'ROLE_ADMIN'
-grails.plugins.springsecurity.acl.authority.changeAclDetails =      'ROLE_ADMIN'//'ROLE_ACL_CHANGE_DETAILS'
+grails.plugins.springsecurity.acl.authority.changeAclDetails =      'ROLE_RUN_AS_ADMIN'//'ROLE_ACL_CHANGE_DETAILS'
 
 grails.plugins.springsecurity.controllerAnnotations.staticRules = [
 	'/role/**': ['ROLE_ADMIN'],

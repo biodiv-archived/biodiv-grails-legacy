@@ -48,6 +48,7 @@ class UserGroupService {
 
 	//@PreAuthorize("hasPermission(#userGroup, admin) or hasRole('ROLE_RUN_AS_ACL_USERGROUP_FOUNDER')")
 	@Transactional
+	@PreAuthorize("hasRole('RUN_AS_ADMIN')")
 	void addPermission(UserGroup userGroup, SUser user, Permission permission) {
 		aclUtilService.addPermission userGroup, user.email, permission
 	}
@@ -100,10 +101,7 @@ class UserGroupService {
 		addInterestedSpeciesGroups(userGroup, params.speciesGroup)
 		addInterestedHabitats(userGroup, params.habitat)
 
-		setUserGroupFounders(userGroup, founders, params.domain);
-		//userGroup.setFounders(founders);
-		//userGroup.setMembers(members);
-
+		
 	}
 
 
