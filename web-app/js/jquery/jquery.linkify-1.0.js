@@ -73,8 +73,8 @@
       httpOrMailtoUrl = /(^|["'(\s]|&lt;)((?:(?:https?|ftp):\/\/|mailto:).+?)((?:[:?]|\.+)?(?:\s|$)|&gt;|[)"',])/g,
       linkifier = function ( html ) {
           return html
-                      .replace( noProtocolUrl, '$1<a href="<``>://$2">$2</a>$3' )  // NOTE: we escape `"http` as `"<``>` to make sure `httpOrMailtoUrl` below doesn't find it as a false-positive
-                      .replace( httpOrMailtoUrl, '$1<a href="$2">$2</a>$3' )
+                      .replace( noProtocolUrl, '$1<a  href="<``>://$2">$2</a>$3' )  // NOTE: we escape `"http` as `"<``>` to make sure `httpOrMailtoUrl` below doesn't find it as a false-positive
+                      .replace( httpOrMailtoUrl, '$1<a  target="_blank" href="$2">$2</a>$3' )
                       .replace( /"<``>/g, '"http' );  // reinsert `"http`
         },
 

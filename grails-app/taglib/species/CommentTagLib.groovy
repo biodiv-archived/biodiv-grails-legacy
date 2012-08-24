@@ -50,7 +50,6 @@ class CommentTagLib {
 		out << render(template:"/common/comment/showAllCommentsTemplate", model:model);
 	}
 	
-	
 	///////////////////////////////// FEEDS ////////////////////////////
 	
 	def showAllFeeds = {attrs, body->

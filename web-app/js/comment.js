@@ -49,11 +49,9 @@ function updateUnionComment(postComp, url){
 
 function postAsAjax(postComp, url, update){
 	var targetComp = $(postComp).closest('.comment');
-	var refTime = $(targetComp).children('input[name="newerTimeRef"]').val();
 	$(postComp).ajaxSubmit({ 
      	url:url,
 		dataType: 'json', 
-		data : {refTime:refTime},
 		clearForm: true,
 		resetForm: true,
 		type: 'POST',
@@ -62,9 +60,9 @@ function postAsAjax(postComp, url, update){
 		}, 
         success: function(data, statusText, xhr, form) {
         	var htmlData = $(data.showCommentListHtml);
-			htmlData.find('.yj-message-body').linkify();
+        	dcorateCommentBody(htmlData.find('.yj-message-body'));
         	$(targetComp).children('ul').prepend(htmlData);
-        	$(targetComp).children('input[name="newerTimeRef"]').val(data.newerTimeRef);
+        	$(postComp).children('input[name="newerTimeRef"]').val(data.newerTimeRef);
         	updateCountOnPopup(postComp, data.newlyAddedCommentCount);
         	if(update){
         		updateUnionComment(postComp, url);
@@ -82,13 +80,8 @@ function postAsAjax(postComp, url, update){
 function updateCountOnPopup(postComp, newlyAddedCount){
 	var popupButton = $(postComp).closest('.comment-popup').children('a');
 	if(popupButton.attr("class")){
-		var count = popupButton.text();
-		if(count !== ""){
-			count = parseInt(count) + newlyAddedCount;
-		}else{
-			count = newlyAddedCount;
-		}
-		popupButton.html('<i class="icon-comment"></i>' + count);
+		var newCount = parseInt(popupButton.text()) + newlyAddedCount;
+		popupButton.html('<i class="icon-comment"></i>' + newCount);
 	}
 }
 
@@ -100,7 +93,7 @@ function loadOlderComment(targetComp, commentType, commentHolderId, commentHolde
 		data: {commentType:commentType, commentHolderId:commentHolderId , commentHolderType:commentHolderType, rootHolderId:rootHolderId, rootHolderType:rootHolderType, refTime:refTime},	
 		success: function(data) {
 			var htmlData = $(data.showCommentListHtml);
-			htmlData.find('.yj-message-body').linkify();
+			dcorateCommentBody(htmlData.find('.yj-message-body'));
 			$(targetComp).children('ul').append(htmlData);
 			$(targetComp).children('input[name="olderTimeRef"]').val(data.olderTimeRef);
 			if(data.remainingCommentCount == 0){
@@ -112,6 +105,14 @@ function loadOlderComment(targetComp, commentType, commentHolderId, commentHolde
 			alert(xhr.responseText);
 	   	}
 	});
+}
+
+
+function dcorateCommentBody(comp){
+	//var text = $(comp).text().replace(/\n\r?/g, '<br />');
+	//$(comp).html(text);
+	$(comp).linkify();
+	
 }
 
  

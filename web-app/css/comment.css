@@ -10,7 +10,7 @@
 .comment-textbox {
 	width: 98%;
     height: 100%;
-    resize: none;
+    resize: vertical;
  }
  
 .yj-thread-replies-container{
@@ -40,6 +40,17 @@
     word-wrap: break-word;
 }
 
+.yj-message-body pre{
+	background: none repeat scroll 0 0 transparent;
+    border: 0 none;
+    margin: 0;
+    padding: 0;
+    line-height:15px;
+    font-family: 'helvetica';
+    font-size: 12px;
+    word-break: normal;
+}
+
 .yj-avatar {
     height: 33px;
     width: 32px;
@@ -67,10 +78,11 @@
 .post-comment {
 	overflow: visible;
     position: relative;
+    margin-bottom : 40px;
 }
 
 .comment-post-btn {
 	position: absolute;
-    right: 0;
-    z-index: 10;
+    right: 8px;
+    margin-top : 5px;
 }

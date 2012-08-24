@@ -39,6 +39,8 @@ class ObservationService {
 	def dataSource;
 	def springSecurityService;
 	def curationService;
+	def commentService;
+	
 	/**
 	 * 
 	 * @param params
@@ -848,5 +850,14 @@ class ObservationService {
 		}
 		log.error "Too many duplicate files $fileName"
 		return imageFile
+	}
+	
+	def addRecoComment(commentHolder, rootHolder, recoComment){
+		recoComment = (recoComment?.trim()?.length() > 0)? recoComment.trim():null;
+		if(recoComment){
+			def m = [author:springSecurityService.currentUser, commentBody:recoComment, commentHolderId:commentHolder.id, \
+						commentHolderType:commentHolder.class.getCanonicalName(), rootHolderId:rootHolder.id, rootHolderType:rootHolder.class.getCanonicalName()]
+			commentService.addComment(m);
+		}
 	}
 }
