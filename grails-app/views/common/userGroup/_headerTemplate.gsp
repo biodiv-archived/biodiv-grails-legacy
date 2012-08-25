@@ -49,11 +49,15 @@
 			<!-- obv:identificationByEmail
 				model="['source':'userGroupInvite', 'requestObject':request, 'activity':'Invite Friends', 'cssClass':'btn btn-large btn-success dropdown-toggle']" /-->
 
+			<sec:permitted className='species.groups.UserGroup'
+				id='${userGroupInstance.id}'
+				permission='${org.springframework.security.acls.domain.BasePermission.WRITE}'>
 
-			<a id="inviteMembers" class="btn btn-large btn-primary" href="#"><i
-				class="icon-envelope"></i> <g:message code="userGroup.members.label"
-					default="Invite Members" /> </a>
-
+				<a id="inviteMembers" class="btn btn-large btn-primary" href="#"><i
+					class="icon-envelope"></i> <g:message code="userGroup.members.label"
+						default="Invite Members" /> </a>
+			</sec:permitted>
+			
 			<div class="modal hide" id="inviteMembersDialog">
 				<div class="modal-header">
 					<button type="button" class="close" data-dismiss="modal">×</button>
@@ -63,6 +67,9 @@
 					<p>Send an invitation to invite your friends to join and
 						contribute in this interesting group…</p>
 					<div>
+						<div id="invite_memberMsg">
+							
+						</div>
 						<form id="inviteMembersForm" method="post"
 							style="background-color: #F2F2F2;">
 							<sUser:selectUsers model="['id':members_autofillUsersId]" />
@@ -96,24 +103,12 @@
 					class="icon-minus"></i>Leave this group</a>
 			</uGroup:isAMember>
 
-
-			<sec:permitted className='species.groups.UserGroup'
-				id='${userGroupInstance.id}'
-				permission='${org.springframework.security.acls.domain.BasePermission.ADMINISTRATION}'>
-
-				<a class="btn btn-large btn-primary "
-					href="${createLink(action:'edit', id:userGroupInstance.id)}">
-					Edit Group </a>
-
-				<a class="btn btn-large btn-danger"
-					href="${createLink(action:'flagDeleted', id:userGroupInstance.id)}"
-					onclick="return confirm('${message(code: 'default.observation.delete.confirm.message', default: 'This group will be deleted. Are you sure ?')}');">Delete
-					Group </a>
-			</sec:permitted>
 		</div>
 	</div>
 
-
+	<div class="msg ${(flash.message)?'alert':'' }" style="clear:both;">
+		${flash.message}
+	</div>
 
 
 </div>
@@ -126,12 +121,17 @@ $(document).ready(function(){
             method: "POST",
             dataType: "json",
             success: function(data) {
-            	$("#joinUs").html("Joined").removeClass("btn-success").addClass("btn-disabled");
-            	$(".message").removeClass('alert-error').addClass('alert-success').html(data.msg);
+            	if(data.success) {
+            		$("#joinUs").html("Joined").removeClass("btn-success").addClass("disabled");
+            		$(".msg").removeClass('alert-error').addClass('alert-success').html(data.msg);
+            	} else {
+            		$("#requestMembership").html("Error sending request").removeClass("btn-success").addClass("disabled");
+            		$(".msg").removeClass('alert alert-success').addClass('alert alert-error').html(data.msg);
+            	}
             }, error: function(xhr, status, error) {
 				handleError(xhr, status, error, undefined, function() {
                 	var msg = $.parseJSON(xhr.responseText);
-                    $(".message").html(msg.msg).removeClass('alert-success').addClass('alert-error');
+                    $(".msg").html(msg.msg).removeClass('alert-success').addClass('alert-error');
 				});
             }
 		});
@@ -143,12 +143,17 @@ $(document).ready(function(){
             method: "POST",
             dataType: "json",
             success: function(data) {
-            	$("#joinUs").html("Sent request to founders").removeClass("btn-success").addClass("btn-disabled");
-            	$(".message").removeClass('alert-error').addClass('alert-success').html(data.msg);
+            	if(data.success) {
+            		$("#requestMembership").html("Sent Request").removeClass("btn-success").addClass("disabled");
+            		$(".msg").removeClass('alert alert-error').addClass('alert alert-success').html(data.msg);
+            	} else {
+            		$("#requestMembership").html("Error sending request").removeClass("btn-success").addClass("disabled");
+            		$(".msg").removeClass('alert alert-success').addClass('alert alert-error').html(data.msg);
+            	}
             }, error: function(xhr, status, error) {
 				handleError(xhr, status, error, undefined, function() {
                 	var msg = $.parseJSON(xhr.responseText);
-                    $(".message").html(msg.msg).removeClass('alert-success').addClass('alert-error');
+                    $(".msg").html(msg.msg).removeClass('alert alert-success').addClass('alert alert-error');
 				});
             }
 		});
@@ -160,12 +165,17 @@ $(document).ready(function(){
             method: "POST",
             dataType: "json",
             success: function(data) {
-            	$("#leaveUs").html("Thank You").removeClass("btn-info").addClass("btn-disabled");
-            	$(".message").removeClass('alert-error').addClass('alert-success').html(data.msg);
+            	if(data.success) {
+            		$("#leaveUs").html("Thank You").removeClass("btn-info").addClass("disabled");
+            		$(".msg").removeClass('alert alert-error').addClass('alert alert-success').html(data.msg);
+            	} else {
+            		$("#requestMembership").html("Couldn't Leave").removeClass("btn-success").addClass("disabled");
+            		$(".msg").removeClass('alert alert-success').addClass('alert alert-error').html(data.msg);
+            	}
             }, error: function(xhr, status, error) {
 				handleError(xhr, status, error, undefined, function() {
                 	var msg = $.parseJSON(xhr.responseText);
-                    $(".message").html(msg.msg).removeClass('alert-success').addClass('alert-error');
+                    $(".msg").html(msg.msg).removeClass('alert-success').addClass('alert-error');
 				});
             }
 		});
@@ -184,8 +194,13 @@ $(document).ready(function(){
 			resetForm: true,
 			type: 'POST',
 			
-			success: function(responseXML, statusText, xhr, form) {
-				$('#inviteMembersDialog').modal('hide');
+			success: function(data, statusText, xhr, form) {
+				if(data.success) {
+					$('#inviteMembersDialog').modal('hide');
+					$(".msg").removeClass('alert alert-error').addClass('alert alert-success').html(data.msg);
+				} else {
+					$("#invite_memberMsg").removeClass('alert alert-error').addClass('alert alert-success').html(data.msg);
+				}				
 			}, error:function (xhr, ajaxOptions, thrownError){
 					//successHandler is used when ajax login succedes
 	            	var successHandler = this.success, errorHandler;

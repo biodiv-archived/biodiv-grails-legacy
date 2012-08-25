@@ -10,8 +10,7 @@
 <meta name="layout" content="main" />
 <g:set var="entityName" value="${userGroupInstance.name}" />
 <title><g:message code="default.show.label"
-		args="[userGroupInstance.name]" />
-</title>
+		args="[userGroupInstance.name]" /></title>
 <r:require modules="userGroups_show" />
 </head>
 <body>
@@ -26,47 +25,36 @@
 					</div>
 				</div>
 
-				<g:if test="${flash.message }">
-					<div class="span12 message alert">
-						${flash.message}
-					</div>
-				</g:if>
-
 				<div class="super-section">
 					<ul class="nav nav-tabs" data-tabs="tabs">
+						<li class="active"><a href="#general">General</a></li>
 						<li class="active"><a href="#userPermissions">User
-								Permissions</a>
+								Permissions</a></li>
+						<li><a href="#">...</a>
 						</li>
-						<li><a href="#">...</a></li>
-						<li><a href="#">...</a></li>
+						<li><a href="#">...</a>
+						</li>
 					</ul>
 
 					<div id="my-tab-content" class="tab-content">
-						<div class="tab-pane active" id="userPermissions">
+						<div class="tab-pane active" id="general">
+							<sec:permitted className='species.groups.UserGroup'
+								id='${userGroupInstance.id}'
+								permission='${org.springframework.security.acls.domain.BasePermission.ADMINISTRATION}'>
 
-							<ul>
-								<g:each var="entry" in="${userGroupInstance.getAllMembers(9,0)}"
-									var="user">
-									<li><g:link controller="SUser" action="show"
-											id="${user.id}">
-											${user.name}
-										</g:link>
-										<span>
-										
-											<% def hasWritePerm = userGroupInstance.hasPermission(user, BasePermission.WRITE);
-											//def hasAdminPerm = userGroupInstance.hasPermission(user, BasePermission.ADMINISTRATION) %>
+								<a class="btn btn-large btn-primary "
+									href="${createLink(action:'edit', id:userGroupInstance.id)}">
+									Edit Group </a>
 
-											<label class="checkbox"> <g:checkBox
-													name="${BasePermission.WRITE}" value="${hasWritePerm}" /> Write </label> 
-							
-											<label
-												class="checkbox"> <g:checkBox
-													name="${BasePermission.ADMINISTRATION}" value="${hasAdminPerm}" />
-												Administration </label>
+								<a class="btn btn-large btn-danger"
+									href="${createLink(action:'flagDeleted', id:userGroupInstance.id)}"
+									onclick="return confirm('${message(code: 'default.observation.delete.confirm.message', default: 'This group will be deleted. Are you sure ?')}');">Delete
+									Group </a>
+							</sec:permitted>
+						</div>
 
-										</span></li>
-								</g:each>
-							</ul>
+						<div class="tab-pane" id="userPermissions">
+
 						</div>
 					</div>
 				</div>

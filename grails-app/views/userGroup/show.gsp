@@ -63,33 +63,12 @@
 					</div>
 				</div>
 
-				<g:if test="${flash.message }">
-					<div class="message alert">
-						${flash.message}
-					</div>
-				</g:if>
-
+				
 				<div>
 					<uGroup:showSidebar />
 					<div class="super-section userGroup-section">
 						<div class="description notes_view">
 							${userGroupInstance.description}
-						</div>
-					</div>
-
-					<div class="super-section userGroup-section">
-						<div class="section">
-							<h5>Featured Observations</h5>
-							<obv:showRelatedStory
-								model="['observationId': userGroupInstance.id, 'controller':'userGroup', 'action':'getFeaturedObservations', 'id':'featuredObservations', 'filterProperty':'featuredObservations', 'resultController':'observation']" />
-						</div>
-					</div>
-
-					<div class="super-section userGroup-section">
-						<div class="section">
-							<h5>Active Members</h5>
-							<obv:showRelatedStory
-								model="['observationId': userGroupInstance.id, 'controller':'userGroup', 'action':'getFeaturedMembers', 'id':'featuredMembers', 'filterProperty':'featuredMembers', 'resultController':'SUser']" />
 						</div>
 					</div>
 

@@ -41,14 +41,14 @@ class UserGroupService {
 	def grailsApplication;
 	def emailConfirmationService;
 
-	
+
 	void addPermission(UserGroup userGroup, SUser user, int permission) {
 		addPermission userGroup, user, aclPermissionFactory.buildFromMask(permission)
 	}
 
 	//@PreAuthorize("hasPermission(#userGroup, admin) or hasRole('ROLE_RUN_AS_ACL_USERGROUP_FOUNDER')")
 	@Transactional
-	@PreAuthorize("hasRole('RUN_AS_ADMIN')")
+	//@PreAuthorize("hasRole('RUN_AS_ADMIN')")
 	void addPermission(UserGroup userGroup, SUser user, Permission permission) {
 		aclUtilService.addPermission userGroup, user.email, permission
 	}
@@ -95,13 +95,13 @@ class UserGroupService {
 		userGroup.properties = params
 		userGroup.name = userGroup.name?.capitalize();
 		userGroup.webaddress = URLEncoder.encode(userGroup.name.replaceAll(" ", "_"), "UTF-8");
-		List founders = Utils.getUsersList(params.founderUserIds);
+		
 		//List members = Utils.getUsersList(params.memberUserIds);
 		userGroup.icon = getUserGroupIcon(params.icon);
 		addInterestedSpeciesGroups(userGroup, params.speciesGroup)
 		addInterestedHabitats(userGroup, params.habitat)
 
-		
+
 	}
 
 
@@ -433,27 +433,25 @@ class UserGroupService {
 		def userMemberRole = UserGroupMemberRole.findBySUserAndUserGroup(user, userGroup);
 		if(!userMemberRole) {
 			userMemberRole = UserGroupMemberRole.create(userGroup, user, role);
+			permissions.each { permission ->
+				addPermission userGroup, user, permission
+			}
 		} else {
 			log.debug "${user} is already a member of ${userGroup}"
-		}
-
-		if(userMemberRole.role.id != role.id) {
-			log.debug "Assigning a new role ${role}"
-			def prevRole = userMemberRole.role;
-			userMemberRole.role = role
-			if(!userMemberRole.save()) {
-				log.error userMemberRole.errors.allErrors.each { log.error it }
-			} else {
-				deletePermissionsAsPerRole(userGroup, user, prevRole);
+			if(userMemberRole.role.id != role.id) {
+				log.debug "Assigning a new role ${role}"
+				def prevRole = userMemberRole.role;
+				userMemberRole.role = role
+				if(!userMemberRole.save()) {
+					log.error userMemberRole.errors.allErrors.each { log.error it }
+				} else {
+					deletePermissionsAsPerRole(userGroup, user, prevRole);
+					permissions.each { permission ->
+						addPermission userGroup, user, permission
+					}
+				}
 			}
 		}
-
-		permissions.each { permission ->
-			addPermission userGroup, user, permission
-		}
-
-		//TODO:send invitation requesting for confirmation
-		//sendFounderInvitation(user);
 	}
 
 	void addMember(UserGroup userGroup, SUser user, Role role, List<Permission> permissions) {
@@ -461,9 +459,11 @@ class UserGroupService {
 	}
 
 	@Transactional
-	void deleteMember(UserGroup userGroup, SUser user, Role role) {
-		UserGroupMemberRole.remove(userGroup, user, role);
-		deletePermissionsAsPerRole(userGroup, user, role);
+	boolean deleteMember(UserGroup userGroup, SUser user, Role role) {
+		if(UserGroupMemberRole.remove(userGroup, user, role)) {
+			return deletePermissionsAsPerRole(userGroup, user, role);
+		}
+		return false;
 
 		///////////////////IMPORTANT//////////////////////////
 		//TODO:delete obvs posted by him in this group
@@ -484,8 +484,10 @@ class UserGroupService {
 				deletePermission userGroup, user, BasePermission.WRITE
 				break;
 			default :
-				log.error "Prev rle is invalid ${role}"
+				log.error "Prev role is invalid ${role}"
+				return false;
 		}
+		return true;
 	}
 
 	////////////////////USERS RELATED/////////////////////////
@@ -500,6 +502,7 @@ class UserGroupService {
 
 	//////////////////User & MAIL RELATED////////////////////
 
+	@PreAuthorize("hasPermission(#userGroupInstance, write) or hasPermission(#userGroup, admin)")
 	def setUserGroupFounders(userGroupInstance, founders, domain) {
 		founders.add(springSecurityService.currentUser);
 		def founderRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_FOUNDER.value())
@@ -517,6 +520,7 @@ class UserGroupService {
 		}
 	}
 
+	@PreAuthorize("hasPermission(#userGroupInstance, write) or hasPermission(#userGroup, admin)")
 	void sendFounderInvitation(userGroupInstance, founders, domain) {
 
 		log.debug "Sending invitation to ${founders}"
@@ -532,6 +536,25 @@ class UserGroupService {
 				emailConfirmationService.sendConfirmation(founder.email,
 						"Invitation to join as founder for group",  [founder:founder, fromUser:springSecurityService.currentUser, userGroupInstance:userGroupInstance,domain:domain, view:'/emailtemplates/founderInvitation'], userToken.token);
 			}
+		}
+	}
+	
+	@PreAuthorize("hasPermission(#userGroupInstance, write)")
+	void sendMemberInvitation(userGroupInstance, members, domain) {
+		//find if the invited members are already part of the group and ignore sending invitation to them
+		//def memberRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value())
+		def groupMembers = UserGroupMemberRole.findAllByUserGroup(userGroupInstance).collect {it.sUser};
+		def commons = members.intersect(groupMembers);
+		members.removeAll(commons);
+	
+		log.debug "Sending invitation to ${members}"
+	
+		String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
+		members.each { member ->
+			def userToken = new UserToken(username: member."$usernameFieldName", controller:'userGroup', action:'confirmMembershipRequest', params:['userGroupInstanceId':userGroupInstance.id.toString(), 'userId':member.id.toString(), 'role':UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value()]);
+			userToken.save(flush: true)
+			emailConfirmationService.sendConfirmation(member.email,
+					"Invitation to join as member in group",  [member:member, fromUser:springSecurityService.currentUser, userGroupInstance:userGroupInstance,domain:domain, view:'/emailtemplates/memberInvitation'], userToken.token);
 		}
 	}
 }

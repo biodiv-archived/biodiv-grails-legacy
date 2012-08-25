@@ -274,7 +274,8 @@ class UserGroupController {
 				def tags = (params.tags != null) ? params.tags.values() as List : new ArrayList();
 				userGroupInstance.setTags(tags);
 
-				userGroupService.setUserGroupFounders(userGroup, founders, params.domain);
+				List founders = Utils.getUsersList(params.founderUserIds);
+				userGroupService.setUserGroupFounders(userGroupInstance, founders, params.domain);
 				//userGroup.setFounders(founders);
 				//userGroup.setMembers(members);
 
@@ -430,14 +431,18 @@ class UserGroupController {
 	@Secured(['ROLE_USER'])
 	def joinUs = {
 		def userGroupInstance = findInstance()
-		if (!userGroupInstance) return;
+		if (!userGroupInstance) {
+				render (['success':false, 'msg':'No userGroup selected.'] as JSON);
+				 return;
+			}
 
 		def user = springSecurityService.currentUser;
 		if(user) {
 			userGroupInstance.addMember(user);
-			render (['msg':'Congratulations. You are now part of us!!!']as JSON);
+			render ([success:true, 'msg':'Congratulations. You are now part of us!!!']as JSON);
+			return;
 		}
-		render (['msg':'We are extremely sorry as we are not able to process your request now. Please try again.']as JSON);
+		render ([success:false, 'msg':'We are extremely sorry as we are not able to process your request now. Please try again.']as JSON);
 	}
 
 	@Secured(['ROLE_USER'])
@@ -447,27 +452,21 @@ class UserGroupController {
 
 		if(members) {
 			def userGroupInstance = findInstance()
-			if (!userGroupInstance) return {render (['success':false] as JSON)};
-
-			def memberRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value())
-			def groupMembers = UserGroupMemberRole.findAllByUserGroupAndRole(userGroupInstance, memberRole).collect {it.sUser};
-			def commons = members.intersect(groupMembers);
-			members.removeAll(commons);
-
-			log.debug "Sending invitation to ${members}"
-
-			String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
-			String domain = Utils.getDomainName(request)
-			members.each { member ->
-				def userToken = new UserToken(username: member."$usernameFieldName", controller:'userGroup', action:'confirmMembershipRequest', params:['userGroupInstanceId':userGroupInstance.id.toString(), 'userId':member.id.toString(), 'role':UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value()]);
-				userToken.save(flush: true)
-				emailConfirmationService.sendConfirmation(member.email,
-						"Invitation to join as member in group",  [member:member, fromUser:springSecurityService.currentUser, userGroupInstance:userGroupInstance,domain:domain, view:'/emailtemplates/memberInvitation'], userToken.token);
+			if (!userGroupInstance) {
+				render (['success':false, 'msg':'No userGroup selected.'] as JSON);
+				 return;
 			}
+				
+			int membersCount = members.size();
+			userGroupService.sendMemberInvitation(userGroupInstance, members, Utils.getDomainName(request));
+			String msg = "Successfully sent invitation messsages to ${members.size()} member(s)"
+			if(membersCount > members.size()) {
+				msg += " as other "+membersCount-members.size()+" member(s) were already found to be members of this group." 
+			}
+			render (['success':true, 'msg':msg] as JSON)
+			return
 		}
-
-		render (['success':true] as JSON)
-
+		render (['success':false, 'msg':'Please provide details of people you want to invite to join this group.'] as JSON)		
 	}
 
 	@Secured(['ROLE_USER'])
@@ -475,18 +474,26 @@ class UserGroupController {
 		def user = springSecurityService.currentUser;
 		if(user) {
 			def userGroupInstance = findInstance()
-			if (!userGroupInstance) return;
-
+			if (!userGroupInstance) {
+				render (['success':false, 'msg':'No userGroup selected.'] as JSON);
+				 return;
+			}
+			
 			String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
 			def founders = userGroupInstance.getFounders(userGroupInstance.getFoundersCount(), 0);
+			
 			founders.each { founder ->
+				log.debug "Sending email to  founder ${founder}"
 				def userToken = new UserToken(username: user."$usernameFieldName", controller:'userGroup', action:'confirmMembershipRequest', params:['userGroupInstanceId':userGroupInstance.id.toString(), 'userId':user.id.toString(), 'role':UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value()]);
 				userToken.save(flush: true)
 				emailConfirmationService.sendConfirmation(founder.email,
 						"Please confirm users membership",  [founder:founder, user: user, userGroupInstance:userGroupInstance,domain:Utils.getDomainName(request), view:'/emailtemplates/requestMembership'], userToken.token);
 			}
+			render (['success':true, 'msg':'Sent request to all founders for confirmation.'] as JSON);
+			return;
 		}
-		return;
+		render (['success':false, 'msg':'Please login to request membership.'] as JSON);
+		
 	}
 
 	private String generateLink( String controller, String action, linkParams, request) {
@@ -495,13 +502,13 @@ class UserGroupController {
 				params: linkParams)
 	}
 
-	@Secured(['ROLE_USER'])
+	@Secured(['ROLE_USER', 'RUN_AS_ADMIN'])
 	def confirmMembershipRequest = {
 		log.debug params;
-		if(params.userId && params.userId.toLong() == springSecurityService.currentUser.id) {
+		if(params.userId && params.userGroupInstanceId) {
 			def user = SUser.read(params.userId.toLong())
 			def userGroupInstance = UserGroup.read(params.userGroupInstanceId.toLong());
-			if(user && userGroupInstance) {
+			if(user && userGroupInstance && (params.userId.toLong() == springSecurityService.currentUser.id || aclUtilService.hasPermission(springSecurityService.authentication, userGroupInstance, BasePermission.ADMINISTRATION))) {
 				switch(params.role) {
 					case UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value():
 						if(userGroupInstance.addMember(user)) {
@@ -524,19 +531,20 @@ class UserGroupController {
 		redirect (action:"list");
 	}
 
-	@Secured(['ROLE_USER'])
+	@Secured(['ROLE_USER', 'RUN_AS_ADMIN'])
 	def leaveUs = {
 		def userGroupInstance = findInstance()
-		if (!userGroupInstance) return;
+		if (!userGroupInstance) {
+				render (['success':false, 'msg':'No userGroup selected.'] as JSON);
+				 return;
+		}
 
 		def user = springSecurityService.currentUser;
-		if(user) {
-			//TODO:chk if h is the last founder left
-			userGroupInstance.deleteMember(user);
-			render (['msg':'successful'] as JSON);
-			return
+		if(user && userGroupInstance.deleteMember(user)) {
+			render (['msg':'Thank you for being with us', 'success':true] as JSON);
+			return;
 		}
-		render (['msg':'Your presence is important to us. If you still want to leave this group please try again.']as JSON);
+		render (['msg':'Your presence is important to us. If you still want to leave this group please try again.','success':false]as JSON);
 	}
 
 	def aboutUs = {

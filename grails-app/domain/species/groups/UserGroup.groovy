@@ -29,7 +29,7 @@ class UserGroup implements Taggable {
 	boolean allowNonMembersToComment=true;
 	boolean allowUsersToJoin=true;
 	boolean allowMembersToMakeSpeciesCall=true;
-	
+
 	def grailsApplication;
 	def aclUtilService
 	def gormUserDetailsService;
@@ -56,7 +56,7 @@ class UserGroup implements Taggable {
 		sort name:"asc"
 	}
 
-	
+
 
 
 	/* (non-Javadoc)
@@ -68,10 +68,10 @@ class UserGroup implements Taggable {
 		int result = 1;
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		result = prime * result
-				+ ((webaddress == null) ? 0 : webaddress.hashCode());
+		+ ((webaddress == null) ? 0 : webaddress.hashCode());
 		result = prime * result
-				+ ((id == null) ? 0 : id.hashCode());
-				
+		+ ((id == null) ? 0 : id.hashCode());
+
 		return result;
 	}
 
@@ -86,7 +86,7 @@ class UserGroup implements Taggable {
 			return false;
 		if (!(obj instanceof UserGroup))
 			return false;
-			
+
 		UserGroup other = (UserGroup) obj;
 		if (name == null) {
 			if (other.name != null)
@@ -98,9 +98,9 @@ class UserGroup implements Taggable {
 				return false;
 		} else if (!webaddress.equals(other.webaddress))
 			return false;
-			
+
 		if(other.id != id) return false;
-		
+
 		return true;
 	}
 
@@ -167,7 +167,7 @@ class UserGroup implements Taggable {
 			BasePermission.WRITE
 		]);
 	}
-	
+
 	def getMembers(int max, long offset) {
 		def role = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value())
 		return UserGroupMemberRole.findAllByUserGroupAndRole(this, role, [max:max, offset:offset]).collect { it.sUser};
@@ -192,10 +192,17 @@ class UserGroup implements Taggable {
 
 	boolean deleteMember(SUser member) {
 		if(member) {
-			def memberRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value())
-			userGroupService.deleteMember(this, member, memberRole);
-			true;
+			def role = getRole(member);
+			if(role.authority == UserGroupMemberRoleType.ROLE_USERGROUP_FOUNDER.value() && getFoundersCount() <= 1) {
+				return false;
+			} else {
+				return userGroupService.deleteMember(this, member, role);
+			}
 		}
+	}
+
+	Role getRole(SUser member) {
+		return UserGroupMemberRole.findByUserGroupAndSUser(this, member)?.role;
 	}
 
 	def getAllMembers(int max, long offset) {
@@ -218,25 +225,25 @@ class UserGroup implements Taggable {
 
 	boolean isFounder(SUser user) {
 		def role = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_FOUNDER.value());
-		if(UserGroupMemberRole.find("from UserGroupMemberRole umr where umr.userGroup=:userGroup and umr.sUser=:sUser and umr.role=:role", [sUser:user, userGroup:this, role:role])) 
+		if(UserGroupMemberRole.find("from UserGroupMemberRole umr where umr.userGroup=:userGroup and umr.sUser=:sUser and umr.role=:role", [sUser:user, userGroup:this, role:role]))
 			return true;
 		return false
-	} 
-	
+	}
+
 	boolean isExpert(SUser user) {
 		def role = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_EXPERT.value());
 		if(UserGroupMemberRole.find("from UserGroupMemberRole umr where umr.userGroup=:userGroup and umr.sUser=:sUser and umr.role=:role", [sUser:user, userGroup:this, role:role]))
 			return true;
 		return false
 	}
-	
+
 	boolean isMember(SUser user) {
 		def role = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value());
 		if(UserGroupMemberRole.find("from UserGroupMemberRole umr where umr.userGroup=:userGroup and umr.sUser=:sUser and umr.role=:role", [sUser:user, userGroup:this, role:role]))
 			return true;
 		return false
 	}
-	
+
 	//TODO:remove
 	boolean hasPermission(SUser user, Permission permission) {
 		return aclUtilService.hasPermission(gormUserDetailsService.loadUserByUsername(user.email, true), this, permission)
