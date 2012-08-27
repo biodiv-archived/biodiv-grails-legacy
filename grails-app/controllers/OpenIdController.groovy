@@ -33,6 +33,10 @@ class OpenIdController {
 	def SUserService
 	
 	static defaultAction = 'auth'
+	
+	def checkauth = {
+		log.debug "inside check auth " + params
+	}
 
 	/**
 	 * Shows the login page. The user has the choice between using an OpenID and a username

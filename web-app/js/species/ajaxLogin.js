@@ -45,12 +45,17 @@
 	}
 
 	$('#ajaxLogin form').bind('submit', ajaxLoginFormHandler);
-	/*
+	
 	$('.googleConnect').click(function() { 
 		googleOpener.popup(450,500);
 		return true; 
 	});
-	*/
+	
+	$('.yahooConnect').click(function() { 
+		yahooOpener.popup(450,500);
+		return true; 
+	});
+	
 	$('#ajaxLogin').modal({
 		"show" : false,
 		"backdrop" : "static"

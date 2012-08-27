@@ -2,7 +2,7 @@
 	<div class="btn-group" style="z-index:10; float: left; margin-left: 5px;">
 		<a id="identification-email" class="${(source == 'observationShow')?'btn btn-mini' : 'btn'} dropdown-toggle" 
 			data-toggle="dropdown" href="#"><i class="icon-envelope"></i>Share</a>
-		<form id="email-form" name="email-form" style="display: none; background-color: #F2F2F2;">
+		<form id="email-form" name="email-form" class="popup-form" style="display: none; background-color: #F2F2F2;">
                         <div class="form-row">
                             <span class="keyname">To</span>
                             <ul class="userOrEmail-list">
@@ -34,7 +34,7 @@
                         </div>        
 			<input type="hidden" name="userIdsAndEmailIds" id="userIdsAndEmailIds" />
 			<input class="btn btn-mini btn-primary" type="submit" value="SEND" style="margin:10px; float:right"> </input>
-			<div id="email-form-close" value="close">
+			<div id="email-form-close"  class="popup-form-close" value="close">
 				<i class="icon-remove"></i>
 			</div>
 		</form>
@@ -185,34 +185,6 @@ $(function() {
 });
 </g:javascript>
 <style>
-#email-form {
-	background-clip: padding-box;
-	background-color: #FFFFFF;
-	border-color: rgba(0, 0, 0, 0.2);
-	border-radius: 0 0 5px 5px;
-	border-style: solid;
-	border-width: 1px;
-	box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-	display: none;
-	float: left;
-	left: 0;
-	list-style: none outside none;
-	margin: 0;
-	min-width: 400px;
-	max-width: 400px;
-	width : 400px;
-	padding: 10px;
-	position: absolute;
-	top: 100%;
-	z-index: 1000;
-	color: #000000;
-}
-
-#email-form-close {
-	position: absolute;
-	top: 0;
-	right: 0;
-}
 
 input#userAndEmailList {
 -moz-box-sizing: border-box;

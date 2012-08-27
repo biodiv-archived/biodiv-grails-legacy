@@ -12,7 +12,7 @@
 		</a>
 
 
-		<div id="flag-options" style="display: none">
+		<div id="flag-options" class="popup-form" style="display: none">
 			<h5>Why?</h5>
 			<form id="flag-form"
 				action="${createLink(controller:'observation', action:'flagObservation', id:observationInstance.id)}">
@@ -31,7 +31,7 @@
 
 				<input type="text" name="notes" placeholder="Any other reason"></input><br />
 				<input class="btn btn-danger" type="submit" value="Flag"></input>
-				<div id="flag-close" value="close">
+				<div id="flag-close" class="popup-form-close" value="close">
 					<i class="icon-remove"></i>
 				</div>
 			</form>
@@ -110,34 +110,6 @@ function removeFlag(flagId, obvId, flagComponent){
 </r:script>
 
 <style>
-#flag-options {
-	background-clip: padding-box;
-	background-color: #FFFFFF;
-	border-color: rgba(0, 0, 0, 0.2);
-	border-radius: 0 0 5px 5px;
-	border-style: solid;
-	border-width: 1px;
-	box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-	display: none;
-	float: left;
-	left: 0;
-	list-style: none outside none;
-	margin: 0;
-	min-width: 400px;
-	max-width: 400px;
-	width : 400px;
-	padding: 10px;
-	position: absolute;
-	top: 100%;
-	z-index: 1000;
-	color: #000000;
-}
-
-#flag-close {
-	position: absolute;
-	top: 0;
-	right: 0;
-}
 
 #flagged {
 	clear: both;

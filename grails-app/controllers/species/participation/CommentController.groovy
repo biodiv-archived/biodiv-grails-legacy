@@ -12,13 +12,19 @@ class CommentController {
 	def addComment = {
 		log.debug params;
 		params.author = springSecurityService.currentUser;
-		if(params.commentBody.trim().length() > 0){
-			commentService.addComment(params);
+		
+		if(params.commentBody){
+			if(params.commentBody.trim().length() > 0){
+				commentService.addComment(params);
+			}
+			def comments = getAllNewerComments(params);
+			def showCommentListHtml = g.render(template:"/common/comment/showCommentListTemplate", model:[comments:comments]);
+			def result = [success : 'true', proceed:'true', showCommentListHtml:showCommentListHtml, newerTimeRef:comments.first().lastUpdated.time.toString(), newlyAddedCommentCount:comments.size()]
+			render result as JSON
+		}else{
+			def result = [success : 'true']
+			render result as JSON
 		}
-		def comments = getAllNewerComments(params);
-		def showCommentListHtml = g.render(template:"/common/comment/showCommentListTemplate", model:[comments:comments]);
-		def result = [showCommentListHtml:showCommentListHtml, newerTimeRef:comments.first().lastUpdated.time.toString(), newlyAddedCommentCount:comments.size()]
-		render result as JSON
 	}
 
 	@Secured(['ROLE_USER'])

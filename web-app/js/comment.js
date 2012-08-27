@@ -52,20 +52,23 @@ function postAsAjax(postComp, url, update){
 	$(postComp).ajaxSubmit({ 
      	url:url,
 		dataType: 'json', 
-		clearForm: true,
-		resetForm: true,
+//		clearForm: true,
+//		resetForm: true,
 		type: 'POST',
 		beforeSubmit: function(formData, jqForm, options) {
 			return true;
 		}, 
         success: function(data, statusText, xhr, form) {
-        	var htmlData = $(data.showCommentListHtml);
-        	dcorateCommentBody(htmlData.find('.yj-message-body'));
-        	$(targetComp).children('ul').prepend(htmlData);
-        	$(postComp).children('input[name="newerTimeRef"]').val(data.newerTimeRef);
-        	updateCountOnPopup(postComp, data.newlyAddedCommentCount);
-        	if(update){
-        		updateUnionComment(postComp, url);
+        	if(data.proceed){
+        		var htmlData = $(data.showCommentListHtml);
+        		dcorateCommentBody(htmlData.find('.yj-message-body'));
+        		$(targetComp).children('ul').prepend(htmlData);
+        		$(postComp).children('input[name="newerTimeRef"]').val(data.newerTimeRef);
+        		updateCountOnPopup(postComp, data.newlyAddedCommentCount);
+        		if(update){
+        			updateUnionComment(postComp, url);
+        		}
+        		$(postComp).children('textarea[name=commentBody]').val("");
         	}
         	return false;
         },
