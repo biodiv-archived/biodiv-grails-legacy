@@ -6,5 +6,6 @@ class Newsletter {
     String newsitem
 
     static constraints = {
+        newsitem size: 1..5000
     }
 }
