@@ -412,6 +412,17 @@ environments {
 		grails.resources.mappers.hashandcache.excludes = ['**']
 		//grails.resources.flatten = false
 		grails.resources.mappers.yuijsminify.disable=true
+
+                ckeditor {
+                    upload {
+                    basedir = "/newsletters/"
+                    image.browser = true
+                    image.upload = true    
+                    image.allowed = ['jpg', 'gif', 'jpeg', 'png']
+                    image.denied = []
+                }
+		}
+
 	}
 	test {
 		grails.serverURL = "http://localhost:8080/${appName}"
@@ -472,6 +483,17 @@ environments {
 		grails.plugins.springsecurity.successHandler.defaultTargetUrl = "/list/../../"
 		grails.plugins.springsecurity.logout.afterLogoutUrl = '/list/../../'
 
+                ckeditor {
+                    upload {
+                    baseurl = "/newsletters"
+                    basedir = "/data/species/newsletters/"
+                    image.browser = true
+                    image.upload = true    
+                    image.allowed = ['jpg', 'gif', 'jpeg', 'png']
+                    image.denied = []
+                }
+
+		}
 	}
 
 	pamba {
@@ -521,6 +543,17 @@ environments {
 		
 		grails.plugins.springsecurity.successHandler.defaultTargetUrl = "/list/../../"
 		grails.plugins.springsecurity.logout.afterLogoutUrl = '/list/../../'
+
+                ckeditor {
+                    upload {
+                    baseurl = "/newsletters"
+                    basedir = "/data/species/newsletters/"
+                    image.browser = true
+                    image.upload = true    
+                    image.allowed = ['jpg', 'gif', 'jpeg', 'png']
+                    image.denied = []
+                }
+		}
 		
 	}
 }
