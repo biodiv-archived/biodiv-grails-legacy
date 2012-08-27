@@ -1,5 +1,7 @@
 package utils
 
+import grails.plugins.springsecurity.Secured;
+
 class NewsletterController {
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
@@ -13,12 +15,14 @@ class NewsletterController {
         [newsletterInstanceList: Newsletter.list(params), newsletterInstanceTotal: Newsletter.count()]
     }
 
+    @Secured(['ROLE_ADMIN'])
     def create = {
         def newsletterInstance = new Newsletter()
         newsletterInstance.properties = params
         return [newsletterInstance: newsletterInstance]
     }
-
+    
+    @Secured(['ROLE_ADMIN'])
     def save = {
     
         println ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
@@ -45,6 +49,7 @@ class NewsletterController {
         }
     }
 
+    @Secured(['ROLE_ADMIN'])
     def edit = {
         def newsletterInstance = Newsletter.get(params.id)
         if (!newsletterInstance) {
@@ -56,6 +61,7 @@ class NewsletterController {
         }
     }
 
+    @Secured(['ROLE_ADMIN'])
     def update = {
         def newsletterInstance = Newsletter.get(params.id)
         if (newsletterInstance) {
@@ -83,6 +89,7 @@ class NewsletterController {
         }
     }
 
+    @Secured(['ROLE_ADMIN'])
     def delete = {
         def newsletterInstance = Newsletter.get(params.id)
         if (newsletterInstance) {

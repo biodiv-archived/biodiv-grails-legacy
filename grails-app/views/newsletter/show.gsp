@@ -8,7 +8,7 @@
         <title><g:message code="default.show.label" args="[entityName]" /></title>
         <style>
         .newsletter_wrapper {
-        width: 650px;
+        width: 800px;
         padding: 30px;
         margin-left: auto;
         margin-right: auto;
@@ -49,6 +49,7 @@
                     </tbody>
                 </table>
             </div>
+            <sec:ifLoggedIn>
             <div class="buttons">
                 <g:form>
                     <g:hiddenField name="id" value="${newsletterInstance?.id}" />
@@ -56,6 +57,7 @@
                     <span class="button"><g:actionSubmit class="delete" action="delete" value="${message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" /></span>
                 </g:form>
             </div>
+            </sec:ifLoggedIn>
         </div>
         </div>
     </body>

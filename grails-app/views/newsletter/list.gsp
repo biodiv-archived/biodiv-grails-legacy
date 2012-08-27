@@ -4,25 +4,32 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="main" />
+        <link rel="stylesheet" type="text/css" media="all"
+	href="${resource(dir:'bootstrap/css',file:'bootstrap.css', absolute:true)}" />
+
         <g:set var="entityName" value="${message(code: 'newsletter.label', default: 'Newsletter')}" />
         <title><g:message code="default.list.label" args="[entityName]" /></title>
+        <style>
+        .body {
+            padding: 10px;        
+        }
+
+        .body td {
+            padding: 5px;
+        }
+        </style>
     </head>
     <body>
-        <div class="nav">
-            <span class="menuButton"><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></span>
-            <span class="menuButton"><g:link class="create" action="create"><g:message code="default.new.label" args="[entityName]" /></g:link></span>
-        </div>
         <div class="body">
-            <h1><g:message code="default.list.label" args="[entityName]" /></h1>
+            <div style="float: right;"><g:link action="create"><h3>Create newsletter</h3></g:link></div>
+            <h1>Newsletters Archive</h1>
             <g:if test="${flash.message}">
             <div class="message">${flash.message}</div>
             </g:if>
             <div class="list">
-                <table>
+                <table class="table table-striped">
                     <thead>
                         <tr>
-                        
-                            <g:sortableColumn property="id" title="${message(code: 'newsletter.id.label', default: 'Id')}" />
                         
                             <g:sortableColumn property="date" title="${message(code: 'newsletter.date.label', default: 'Date')}" />
                         
@@ -34,11 +41,9 @@
                     <g:each in="${newsletterInstanceList}" status="i" var="newsletterInstance">
                         <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
                         
-                            <td><g:link action="show" id="${newsletterInstance.id}">${fieldValue(bean: newsletterInstance, field: "id")}</g:link></td>
+                            <td><g:formatDate date="${newsletterInstance.date}" type="date" style="MEDIUM"/></td>
                         
-                            <td><g:formatDate date="${newsletterInstance.date}" /></td>
-                        
-                            <td>${fieldValue(bean: newsletterInstance, field: "title")}</td>
+                            <td><g:link action="show" id="${newsletterInstance.id}">${fieldValue(bean: newsletterInstance, field: "title")}</g:link></td>
                         
                         </tr>
                     </g:each>

@@ -5,9 +5,18 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="main" />
+        <link rel="stylesheet" type="text/css" media="all"
+	href="${resource(dir:'bootstrap/css',file:'bootstrap.css', absolute:true)}" />
+
         <script src="${resource(dir:'plugins',file:'jquery-1.7/js/jquery/jquery-1.7.min.js', absolute:true)}" type="text/javascript" ></script>
+
         <g:set var="entityName" value="${message(code: 'newsletter.label', default: 'Newsletter')}" />
         <title><g:message code="default.create.label" args="[entityName]" /></title>
+        <style>
+            .body {
+                padding: 10px;
+            }
+        </style>
     </head>
     <body>
         <div class="body">
@@ -39,7 +48,7 @@
 
                               <tr id="main_editor" class="prop">
                                 <td valign="top" class="name">
-                                    <ckeditor:editor name="newsitem" height="300px" width="100%">
+                                    <ckeditor:editor name="newsitem" height="300px" width="800px">
                                     ${newsletterInstance?.newsitem}
                                     </ckeditor:editor>
                                 </td>

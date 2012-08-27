@@ -485,7 +485,7 @@ environments {
 
                 ckeditor {
                     upload {
-                    baseurl = "http://wgp.saturn.strandls.com/${appName}/newsletters"
+                    baseurl = "/newsletters"
                     basedir = "/data/species/newsletters/"
                     image.browser = true
                     image.upload = true    
@@ -546,7 +546,7 @@ environments {
 
                 ckeditor {
                     upload {
-                    baseurl = "http://thewesternghats.in/${appName}/newsletters"
+                    baseurl = "/newsletters"
                     basedir = "/data/species/newsletters/"
                     image.browser = true
                     image.upload = true    
