@@ -421,6 +421,7 @@ environments {
                     image.allowed = ['jpg', 'gif', 'jpeg', 'png']
                     image.denied = []
                 }
+		}
 
 	}
 	test {
@@ -492,7 +493,7 @@ environments {
                     image.denied = []
                 }
 
-
+		}
 	}
 
 	pamba {
@@ -552,7 +553,7 @@ environments {
                     image.allowed = ['jpg', 'gif', 'jpeg', 'png']
                     image.denied = []
                 }
-
+		}
 		
 	}
 }
