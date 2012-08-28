@@ -442,13 +442,15 @@ class UserGroupService {
 				log.debug "Assigning a new role ${role}"
 				def prevRole = userMemberRole.role;
 				userMemberRole.role = role
-				if(!userMemberRole.save()) {
-					log.error userMemberRole.errors.allErrors.each { log.error it }
-				} else {
+				println userMemberRole.role;
+				if(userMemberRole.save()) {
 					deletePermissionsAsPerRole(userGroup, user, prevRole);
 					permissions.each { permission ->
 						addPermission userGroup, user, permission
 					}
+					log.debug "Updated permissions as per new role"
+				} else {
+					log.error userMemberRole.errors.allErrors.each { log.error it }
 				}
 			}
 		}

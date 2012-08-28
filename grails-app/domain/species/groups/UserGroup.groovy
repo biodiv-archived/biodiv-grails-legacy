@@ -43,7 +43,7 @@ class UserGroup implements Taggable {
 		webaddress nullable: false, blank:false, unique:true
 		description nullable: false, blank:false
 		//contactEmail nullable:false, blank:false, email:true
-		icon nullable:false
+		//icon nullable:false
 		allowObvCrossPosting nullable:false
 		allowNonMembersToComment nullable:false
 		allowUsersToJoin nullable:false

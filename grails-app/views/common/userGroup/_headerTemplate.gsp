@@ -101,15 +101,35 @@
 			<uGroup:isAMember model="['userGroupInstance':userGroupInstance]">
 				<a class="btn btn-large btn-primary" id="leaveUs"><i
 					class="icon-minus"></i>Leave this group</a>
+				<div class="modal hide" id="leaveUsModalDialog">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">×</button>
+						<h3>Do you want to leave this group???</h3>
+					</div>
+					<div class="modal-body">
+						<p>
+						We would like to know your feedback and any ideas on making this group a more interesting and happening place.
+						We are thankful for your wonderful contribution to this group and would like to hear from you soon.</p>
+					</div>
+					<div class="modal-footer">
+						<a href="#" class="btn" data-dismiss="modal">Close</a> <a href="#"
+							id="leave" class="btn btn-primary">Leave</a>
+					</div>
+				</div>
 			</uGroup:isAMember>
 
 		</div>
 	</div>
 
-	<div class="msg ${(flash.message)?'alert':'' }" style="clear:both;">
+	<g:if test="${flash.error}">
+		<div class="alertMsg alert alert-error" style="clear:both;">
+			${flash.error}
+		</div>
+	</g:if>
+	
+	<div class="alertMsg ${(flash.message)?'alert':'' }" style="clear:both;">
 		${flash.message}
 	</div>
-
 
 </div>
 
@@ -123,15 +143,15 @@ $(document).ready(function(){
             success: function(data) {
             	if(data.success) {
             		$("#joinUs").html("Joined").removeClass("btn-success").addClass("disabled");
-            		$(".msg").removeClass('alert-error').addClass('alert-success').html(data.msg);
+            		$(".alertMsg").removeClass('alert-error').addClass('alert-success').html(data.msg);
             	} else {
             		$("#requestMembership").html("Error sending request").removeClass("btn-success").addClass("disabled");
-            		$(".msg").removeClass('alert alert-success').addClass('alert alert-error').html(data.msg);
+            		$(".alertMsg").removeClass('alert alert-success').addClass('alert alert-error').html(data.msg);
             	}
             }, error: function(xhr, status, error) {
 				handleError(xhr, status, error, undefined, function() {
                 	var msg = $.parseJSON(xhr.responseText);
-                    $(".msg").html(msg.msg).removeClass('alert-success').addClass('alert-error');
+                    $(".alertMsg").html(msg.msg).removeClass('alert-success').addClass('alert-error');
 				});
             }
 		});
@@ -145,21 +165,25 @@ $(document).ready(function(){
             success: function(data) {
             	if(data.success) {
             		$("#requestMembership").html("Sent Request").removeClass("btn-success").addClass("disabled");
-            		$(".msg").removeClass('alert alert-error').addClass('alert alert-success').html(data.msg);
+            		$(".alertMsg").removeClass('alert alert-error').addClass('alert alert-success').html(data.msg);
             	} else {
             		$("#requestMembership").html("Error sending request").removeClass("btn-success").addClass("disabled");
-            		$(".msg").removeClass('alert alert-success').addClass('alert alert-error').html(data.msg);
+            		$(".alertMsg").removeClass('alert alert-success').addClass('alert alert-error').html(data.msg);
             	}
             }, error: function(xhr, status, error) {
 				handleError(xhr, status, error, undefined, function() {
                 	var msg = $.parseJSON(xhr.responseText);
-                    $(".msg").html(msg.msg).removeClass('alert alert-success').addClass('alert alert-error');
+                    $(".alertMsg").html(msg.msg).removeClass('alert alert-success').addClass('alert alert-error');
 				});
             }
 		});
 	})
 	
 	$("#leaveUs").click(function() {
+		$('#leaveUsModalDialog').modal('show');
+	});
+	
+	$("#leave").click(function() {
 		$.ajax({
         	url: "${createLink(action:'leaveUs',id:userGroupInstance.id) }",
             method: "POST",
@@ -167,15 +191,15 @@ $(document).ready(function(){
             success: function(data) {
             	if(data.success) {
             		$("#leaveUs").html("Thank You").removeClass("btn-info").addClass("disabled");
-            		$(".msg").removeClass('alert alert-error').addClass('alert alert-success').html(data.msg);
+            		$(".alertMsg").removeClass('alert alert-error').addClass('alert alert-success').html(data.msg);
             	} else {
             		$("#requestMembership").html("Couldn't Leave").removeClass("btn-success").addClass("disabled");
-            		$(".msg").removeClass('alert alert-success').addClass('alert alert-error').html(data.msg);
+            		$(".alertMsg").removeClass('alert alert-success').addClass('alert alert-error').html(data.msg);
             	}
             }, error: function(xhr, status, error) {
 				handleError(xhr, status, error, undefined, function() {
                 	var msg = $.parseJSON(xhr.responseText);
-                    $(".msg").html(msg.msg).removeClass('alert-success').addClass('alert-error');
+                    $(".alertMsg").html(msg.msg).removeClass('alert-success').addClass('alert-error');
 				});
             }
 		});
@@ -197,7 +221,7 @@ $(document).ready(function(){
 			success: function(data, statusText, xhr, form) {
 				if(data.success) {
 					$('#inviteMembersDialog').modal('hide');
-					$(".msg").removeClass('alert alert-error').addClass('alert alert-success').html(data.msg);
+					$(".alertMsg").removeClass('alert alert-error').addClass('alert alert-success').html(data.msg);
 				} else {
 					$("#invite_memberMsg").removeClass('alert alert-error').addClass('alert alert-success').html(data.msg);
 				}				
@@ -213,6 +237,10 @@ $(document).ready(function(){
 	});
      	
    	$('#inviteMembersDialog').modal({
+		"show" : false,
+		"backdrop" : "static"
+	});
+	$('#leaveUsModalDialog').modal({
 		"show" : false,
 		"backdrop" : "static"
 	});

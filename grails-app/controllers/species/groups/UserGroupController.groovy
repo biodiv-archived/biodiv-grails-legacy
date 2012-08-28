@@ -428,18 +428,18 @@ class UserGroupController {
 		return;
 	}
 
-	@Secured(['ROLE_USER'])
+	@Secured(['ROLE_USER', 'RUN_AS_ADMIN'])
 	def joinUs = {
 		def userGroupInstance = findInstance()
 		if (!userGroupInstance) {
-				render (['success':false, 'msg':'No userGroup selected.'] as JSON);
+				render (['success':false, 'msg':'No userGroup is selected.'] as JSON);
 				 return;
 			}
 
 		def user = springSecurityService.currentUser;
 		if(user) {
 			userGroupInstance.addMember(user);
-			render ([success:true, 'msg':'Congratulations. You are now part of us!!!']as JSON);
+			render ([success:true, 'msg':'Congratulations. You are now part of us!!! We look forward for your contribution.']as JSON);
 			return;
 		}
 		render ([success:false, 'msg':'We are extremely sorry as we are not able to process your request now. Please try again.']as JSON);
@@ -459,7 +459,7 @@ class UserGroupController {
 				
 			int membersCount = members.size();
 			userGroupService.sendMemberInvitation(userGroupInstance, members, Utils.getDomainName(request));
-			String msg = "Successfully sent invitation messsages to ${members.size()} member(s)"
+			String msg = "Successfully sent invitation messsage to ${members.size()} member(s)"
 			if(membersCount > members.size()) {
 				msg += " as other "+membersCount-members.size()+" member(s) were already found to be members of this group." 
 			}
@@ -522,12 +522,19 @@ class UserGroupController {
 						break;
 					default: log.error "No proper role type is specified."
 				}
+			} else {
+				if(user && userGroupInstance) {
+					flash.error="Couldn't add user to the group as the currently logged in user doesnt have required permissions."
+				} else {
+					flash.error="Couldn't add user to the group because of missing information."
+				}
 			}
+			
 			UserToken.get(params.tokenId.toLong())?.delete();
 			redirect (action:"show", id:userGroupInstance.id);
 			return;
 		}
-		flash.message="There seems to be some problem. You are not the user to whom this confirmation request is sent as per our records."
+		flash.error="There seems to be some problem. You are not the user to whom this confirmation request is sent as per our records."
 		redirect (action:"list");
 	}
 
