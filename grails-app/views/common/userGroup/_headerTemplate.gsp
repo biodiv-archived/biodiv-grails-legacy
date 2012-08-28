@@ -108,7 +108,7 @@
 					</div>
 					<div class="modal-body">
 						<p>
-						We would like to know your feedback and any ideas on making this group a more interesting and happening place.
+						We would like to know your feedback and any ideas on making this group a more interesting and a happening place.
 						We are thankful for your wonderful contribution to this group and would like to hear from you soon.</p>
 					</div>
 					<div class="modal-footer">
@@ -136,6 +136,7 @@
 <r:script>
 $(document).ready(function(){
 	$("#joinUs").click(function() {
+		if($("#joinUs").hasClass('disabled')) return false;
 		$.ajax({
         	url: "${createLink(action:'joinUs',id:userGroupInstance.id) }",
             method: "POST",
@@ -144,6 +145,7 @@ $(document).ready(function(){
             	if(data.success) {
             		$("#joinUs").html("Joined").removeClass("btn-success").addClass("disabled");
             		$(".alertMsg").removeClass('alert-error').addClass('alert-success').html(data.msg);
+            		reloadMembers();
             	} else {
             		$("#requestMembership").html("Error sending request").removeClass("btn-success").addClass("disabled");
             		$(".alertMsg").removeClass('alert alert-success').addClass('alert alert-error').html(data.msg);
@@ -158,6 +160,7 @@ $(document).ready(function(){
 	})
 	
 	$("#requestMembership").click(function() {
+		if($("#requestMembership").hasClass('disabled')) return false;
 		$.ajax({
         	url: "${createLink(action:'requestMembership',id:userGroupInstance.id) }",
             method: "POST",
@@ -180,10 +183,12 @@ $(document).ready(function(){
 	})
 	
 	$("#leaveUs").click(function() {
+		if($("#leaveUs").hasClass('disabled')) return false;
 		$('#leaveUsModalDialog').modal('show');
 	});
 	
 	$("#leave").click(function() {
+		if($("#leave").hasClass('disabled')) return false;
 		$.ajax({
         	url: "${createLink(action:'leaveUs',id:userGroupInstance.id) }",
             method: "POST",
@@ -192,10 +197,12 @@ $(document).ready(function(){
             	if(data.success) {
             		$("#leaveUs").html("Thank You").removeClass("btn-info").addClass("disabled");
             		$(".alertMsg").removeClass('alert alert-error').addClass('alert alert-success').html(data.msg);
+            		reloadMembers();
             	} else {
-            		$("#requestMembership").html("Couldn't Leave").removeClass("btn-success").addClass("disabled");
+            		$("#leaveUs").html("Couldn't Leave").removeClass("btn-success").addClass("disabled");
             		$(".alertMsg").removeClass('alert alert-success').addClass('alert alert-error').html(data.msg);
             	}
+            	$('#leaveUsModalDialog').modal('hide');
             }, error: function(xhr, status, error) {
 				handleError(xhr, status, error, undefined, function() {
                 	var msg = $.parseJSON(xhr.responseText);

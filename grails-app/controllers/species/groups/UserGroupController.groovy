@@ -337,21 +337,47 @@ class UserGroupController {
 		def userGroupInstance = findInstance()
 		if (!userGroupInstance) return
 
-			params.max = Math.min(params.max ? params.int('max') : 9, 100)
+		params.max = Math.min(params.max ? params.int('max') : 9, 100)
 		params.offset = params.offset ? params.int('offset') : 0
 
-		def allMembers = userGroupInstance.getAllMembers(params.max, params.offset);
+		def allMembers;
+		if(params.onlyMembers) {
+			allMembers = userGroupInstance.getMembers(params.max, params.offset);
+		} else {
+			allMembers = userGroupInstance.getAllMembers(params.max, params.offset);
+		}
+		if(params.isAjaxLoad) {
+			render(contentType:"text/json") {
+				result {
+					for(m in allMembers) { 
+						member('id':m.id, 'name':m.name, 'icon':m.icon())
+					}	
+				}
+			}
+			return;	
+		}
 		['userGroupInstance':userGroupInstance, 'members':allMembers, 'foundersTotalCount':userGroupInstance.getFoundersCount(), 'membersTotalCount':userGroupInstance.getAllMembersCount(), 'expertsTotalCount':0]
 	}
 
+	
 	def founders = {
 		def userGroupInstance = findInstance()
 		if (!userGroupInstance) return
 
-			params.max = Math.min(params.max ? params.int('max') : 9, 100)
+		params.max = Math.min(params.max ? params.int('max') : 9, 100)
 		params.offset = params.offset ? params.int('offset') : 0
 
 		def founders = userGroupInstance.getFounders(params.max, params.offset);
+		if(params.isAjaxLoad) {
+			render(contentType:"text/json") {
+				result {
+					for(m in founders) { 
+						founder('id':m.id, 'name':m.name, 'icon':m.icon())
+					}	
+				}
+			}
+			return;	
+		}
 		render(view:"members", model:['userGroupInstance':userGroupInstance, 'founders':founders, 'foundersTotalCount':userGroupInstance.getFoundersCount(), 'membersTotalCount':userGroupInstance.getAllMembersCount(), 'expertsTotalCount':0]);
 	}
 
@@ -551,7 +577,7 @@ class UserGroupController {
 			render (['msg':'Thank you for being with us', 'success':true] as JSON);
 			return;
 		}
-		render (['msg':'Your presence is important to us. If you still want to leave this group please try again.','success':false]as JSON);
+		render (['msg':'Your presence is important to us. Cannot let you leave at present.','success':false]as JSON);
 	}
 
 	def aboutUs = {

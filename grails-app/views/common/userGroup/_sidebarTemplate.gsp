@@ -9,27 +9,19 @@
 			<h5>
 				<i class="icon-user"></i>Founders
 			</h5>
-			<g:each in="${userGroupInstance.getFounders(5,0)}" var="userInstance">
-				<g:link controller="SUser" action="show" id="${userInstance.id}">
-					<img
-						style="float: left;" src="${userInstance.icon(ImageType.SMALL)}"
-					class="small_profile_pic" title="${userInstance.name}" />	
-				</g:link>
-			</g:each>
-			<g:link controller="userGroup" action="founders" id="${userGroupInstance.id}">...</g:link>
+			<div id="founders_sidebar">
+			
+			</div>
+			<g:link controller="userGroup" action="founders" id="${userGroupInstance.id}">...</g:link>			
 		</div>
 
 		<div class="section">
 			<h5>
 				<i class="icon-user"></i>Members
 			</h5>
-			<g:each in="${userGroupInstance.getMembers(5,0)}" var="userInstance">
-				<g:link controller="SUser" action="show" id="${userInstance.id}">
-					<img
-						style="float: left;" src="${userInstance.icon(ImageType.SMALL)}"
-						class="small_profile_pic" title="${userInstance.name}" />
-				</g:link>
-			</g:each>
+			<div id="members_sidebar">
+			
+			</div>
 			<g:link controller="userGroup" action="members" id="${userGroupInstance.id}">...</g:link>
 		</div>
 	</div>
@@ -94,3 +86,55 @@
 	</div>
 
 </div>
+
+<r:script>
+function reloadMembers() {
+	$.ajax({
+       	url: "${createLink(action:'members',id:userGroupInstance.id) }",
+           method: "GET",
+           dataType: "json",
+           data:{'isAjaxLoad':true,'onlyMembers':true},
+           success: function(data) {
+           	var html = "";
+           	$.each(data.result, function(i, item) {
+           		html += "<a href='"+"${createLink(controller:'SUser', action:'show')}/"+item.id+"'>"+
+							"<img src='"+item.icon+"' class='pull-left small_profile_pic' title='"+item.name+"'>"+	
+						"</a>";
+           	});
+           	$("#members_sidebar").html(html);
+           }, error: function(xhr, status, error) {
+			handleError(xhr, status, error, undefined, function() {
+               	var msg = $.parseJSON(xhr.responseText);
+                   $(".alertMsg").html(msg.msg).removeClass('alert-success').addClass('alert-error');
+			});
+           }
+	});
+}
+function reloadFounders() {
+	$.ajax({
+       	url: "${createLink(action:'founders',id:userGroupInstance.id) }",
+           method: "GET",
+           dataType: "json",
+           data:{'isAjaxLoad':true},
+           success: function(data) {
+           	var html = "";
+           	$.each(data.result, function(i, item) {
+           		html += "<a href='"+"${createLink(controller:'SUser', action:'show')}/"+item.id+"'>"+
+							"<img src='"+item.icon+"' class='pull-left small_profile_pic' title='"+item.name+"'>"+	
+						"</a>";
+           	});
+           	$("#founders_sidebar").html(html);
+           }, error: function(xhr, status, error) {
+			handleError(xhr, status, error, undefined, function() {
+               	var msg = $.parseJSON(xhr.responseText);
+                   $(".alertMsg").html(msg.msg).removeClass('alert-success').addClass('alert-error');
+			});
+           }
+	});
+}
+$(document).ready(function(){
+	reloadFounders();
+	reloadMembers();	
+});
+
+</r:script>
