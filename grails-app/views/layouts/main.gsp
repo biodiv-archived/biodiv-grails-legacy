@@ -125,6 +125,7 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 						if (response.status == 'connected') {
 							$.cookie("fb_login", "true", { path: '/', domain:".${Utils.getDomain(request)}"});
 							if($(clickedObject).hasClass('ajaxForm')) {
+								$('#loginMessage').html("Logging in ...").removeClass().addClass('alter alert-info').show();
 								$.ajax({
 								  url: "${createLink(controller:'login', action:'authSuccess')}",
 								  method:"GET",

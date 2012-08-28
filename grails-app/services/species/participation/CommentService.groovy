@@ -25,7 +25,7 @@ class CommentService {
 			try {
 				getDomainObject(params.commentHolderType, params.commentHolderId).onAddComment(c)
 			}catch (MissingMethodException e) {
-				e.printStackTrace();
+				//e.printStackTrace();
 			}
 			return c
 		}

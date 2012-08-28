@@ -13,18 +13,18 @@ class CommentController {
 		log.debug params;
 		params.author = springSecurityService.currentUser;
 		
-		if(params.commentBody){
-			if(params.commentBody.trim().length() > 0){
-				commentService.addComment(params);
-			}
-			def comments = getAllNewerComments(params);
-			def showCommentListHtml = g.render(template:"/common/comment/showCommentListTemplate", model:[comments:comments]);
-			def result = [success : 'true', proceed:'true', showCommentListHtml:showCommentListHtml, newerTimeRef:comments.first().lastUpdated.time.toString(), newlyAddedCommentCount:comments.size()]
-			render result as JSON
+		
+		def result = [:]
+		//XXX on ajax pop up login post request is not sending all params 
+		// in such cases checking params and handling gracefully 
+		if(params.commentBody && params.commentBody.trim().length() > 0){
+			commentService.addComment(params);
+			result = getResultForResponse(params);
+			result["clearForm"] = true;
 		}else{
-			def result = [success : 'true']
-			render result as JSON
+			result["success"] = true;
 		}
+		render result as JSON;
 	}
 
 	@Secured(['ROLE_USER'])
@@ -37,6 +37,11 @@ class CommentController {
 			log.error "Error in deleting comment " +  params.commentId
 			render (['success:false']as JSON);
 		}
+	}
+	
+	def getAllNewerComments = {
+		log.debug params;
+		render getResultForResponse(params) as JSON;
 	}
 
 	def getComments = {
@@ -65,6 +70,16 @@ class CommentController {
 	def editComment = {
 		log.debug params;
 		render "To do edit"
+	}
+	
+	private getResultForResponse(params){
+		def result = ["success":true];
+		def comments = getAllNewerComments(params);
+		if(!comments.isEmpty()){
+			def showCommentListHtml = g.render(template:"/common/comment/showCommentListTemplate", model:[comments:comments]);
+			result.putAll([showCommentListHtml:showCommentListHtml, newerTimeRef:comments.first().lastUpdated.time.toString(), newlyAddedCommentCount:comments.size()]);
+		}	
+		return result
 	}
 	
 	private getAllNewerComments(params){
