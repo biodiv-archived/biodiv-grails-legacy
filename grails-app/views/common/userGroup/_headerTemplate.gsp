@@ -46,9 +46,6 @@
 
 		<div class="observation-icons pull-right">
 
-			<!-- obv:identificationByEmail
-				model="['source':'userGroupInvite', 'requestObject':request, 'activity':'Invite Friends', 'cssClass':'btn btn-large btn-success dropdown-toggle']" /-->
-
 			<sec:permitted className='species.groups.UserGroup'
 				id='${userGroupInstance.id}'
 				permission='${org.springframework.security.acls.domain.BasePermission.WRITE}'>

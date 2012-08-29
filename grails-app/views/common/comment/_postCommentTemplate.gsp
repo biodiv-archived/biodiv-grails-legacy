@@ -1,8 +1,8 @@
 <%@page import="species.participation.Recommendation"%>
 <%@page import="species.participation.Observation"%>
 <div class="post-comment">
-	<form class="form-horizontal" onSubmit='return postComment(this, "${createLink(controller:'comment', action:'addComment')}")'>
 
+	<form class="form-horizontal" onSubmit='return postComment(this, "${createLink(controller:'comment', action:'addComment')}")'>
 		<%
 			def commentPlaceHolder = "Write comment"
 			if(commentHolder.class.getName() == Observation.class.getName())

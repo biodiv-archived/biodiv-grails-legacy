@@ -78,7 +78,7 @@ input+.external_bttn, .external_bttn {
 
 .fbJustConnect {
 	opacity: 0;
-        filter: alpha(opacity = 0);         
+    filter: alpha(opacity = 0);         
 }
 
 .facebookButton {
@@ -87,12 +87,21 @@ input+.external_bttn, .external_bttn {
 	background-position: 0 0;
 }
 
-input+.googleButton {
+.googleButton {
 	background-image: url('../images/external_providers.png');
 	background-position: 0 -33px;
 }
 
-input+.yahooButton {
+.googleConnect {
+	opacity: 0;
+}
+
+.yahooButton {
 	background-image: url('../images/external_providers.png');
 	background-position: 0 -99px;
 }
+
+.yahooConnect {
+	opacity: 0;
+}
+

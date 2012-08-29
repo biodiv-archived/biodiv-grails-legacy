@@ -73,7 +73,7 @@ class Utils {
 		name = name.replaceAll("[^\\x20-\\x7e]", "");	//removing all non ascii characters
 		return name;
 	}
-	
+
 	static String getCanonicalForm(String name){
 		return namesParser.parse([name])?.get(0)?.canonicalForm
 	}
@@ -122,15 +122,15 @@ class Utils {
 		if(header == null) {
 			header = httpServletRequest.getHeader("Host");
 		}
-		
+
 		if(header.startsWith("http://")) {
 			header = header.replace("http://", "");
 		}
-		
+
 		if(header.startsWith("www.")) {
 			header = header.replace("www.", "");
 		}
-		
+
 		header = header.replace(":8080", "");
 		return header;
 	}
@@ -151,7 +151,7 @@ class Utils {
 	}
 
 	static boolean isURL(String str) {
-		String defaultUrlPrefix = "http://"; 
+		String defaultUrlPrefix = "http://";
 		UrlValidator urlValidator = new UrlValidator();
 		return urlValidator.isValid(str) || urlValidator.isValid(defaultUrlPrefix + str);
 	}

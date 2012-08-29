@@ -21,7 +21,7 @@ function deleteComment(commentId, url){
 	});
 }
 
-function postComment(postComp, url) {
+function postComment(postComp, url, newCommentUrl) {
 	var textComp = $(postComp).children('textarea[name="commentBody"]');
 	if($.trim(textComp.val()) === ""){
 		$(textComp).addClass('comment-textEmpty');
@@ -29,7 +29,7 @@ function postComment(postComp, url) {
 		return false;
 	}
 	
-	postAsAjax(postComp, url, true);
+	postAsAjax(postComp, url, newCommentUrl, true);
 	
 	$(textComp).removeClass('comment-textEmpty');
 	$(textComp).next('span').hide();
@@ -41,33 +41,38 @@ function updateUnionComment(postComp, url){
 	if(unionPostComp){
 		var postCommentProp = $(postComp).children('input[name="commentHolderId"]').val() + $(postComp).children('input[name="commentHolderType"]').val();
 		var unionPostCommentProp = $(unionPostComp).children('input[name="commentHolderId"]').val() + $(unionPostComp).children('input[name="commentHolderType"]').val();
-		if(postCommentProp !== unionPostCommentProp ){	
-			postAsAjax(unionPostComp, url, false);
+		if(postCommentProp !== unionPostCommentProp ){
+			postAsAjax(unionPostComp, url, url, false);
 		}
 	}
 }
 
-function postAsAjax(postComp, url, update){
+function postAsAjax(postComp, url, newCommentUrl, update){
 	var targetComp = $(postComp).closest('.comment');
 	$(postComp).ajaxSubmit({ 
      	url:url,
 		dataType: 'json', 
-		clearForm: true,
-		resetForm: true,
+//		clearForm: true,
+//		resetForm: true,
 		type: 'POST',
 		beforeSubmit: function(formData, jqForm, options) {
 			return true;
 		}, 
         success: function(data, statusText, xhr, form) {
-        	var htmlData = $(data.showCommentListHtml);
-        	dcorateCommentBody(htmlData.find('.yj-message-body'));
-        	$(targetComp).children('ul').prepend(htmlData);
-        	$(postComp).children('input[name="newerTimeRef"]').val(data.newerTimeRef);
-        	updateCountOnPopup(postComp, data.newlyAddedCommentCount);
-        	if(update){
-        		updateUnionComment(postComp, url);
+        	if(data.showCommentListHtml){
+    			var htmlData = $(data.showCommentListHtml);
+    			dcorateCommentBody(htmlData.find('.yj-message-body'));
+    			$(targetComp).children('ul').prepend(htmlData);
+    			$(postComp).children('input[name="newerTimeRef"]').val(data.newerTimeRef);
+    			updateCountOnPopup(postComp, data.newlyAddedCommentCount);
+    			if(update){
+    				updateUnionComment(postComp, newCommentUrl);
+    			}
+    			if(data.clearForm){
+    				$(postComp).children('textarea[name=commentBody]').val("");
+    			}
         	}
-        	return false;
+    		return false;
         },
         error:function (xhr, ajaxOptions, thrownError){
         	//successHandler is used when ajax login succedes

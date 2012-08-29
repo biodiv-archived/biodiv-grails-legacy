@@ -338,6 +338,7 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 	            success: function(data, statusText, xhr, form) {
 	            	showRecos(data, null);
 	            	$('#canName').val('');
+	            	updateUnionComment(null, "${createLink(controller:'comment', action:'getAllNewerComments')}");
 	            	return false;
 	            },
 	            error:function (xhr, ajaxOptions, thrownError){

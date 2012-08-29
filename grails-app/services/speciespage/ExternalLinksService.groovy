@@ -26,7 +26,8 @@ class ExternalLinksService {
 		int noOfFailures = 0;
 		
 		while(true) {
-			def taxonConcepts = TaxonomyDefinition.findAll("from TaxonomyDefinition as taxonomyDefinition where taxonomyDefinition.rank = :speciesTaxonRank order by taxonomyDefinition.id",[speciesTaxonRank:TaxonomyRank.SPECIES.ordinal()],[max:limit, offset:offset]);
+
+			def taxonConcepts = TaxonomyDefinition.findAll("from TaxonomyDefinition as taxonomyDefinition where taxonomyDefinition.rank = :speciesTaxonRank  order by taxonomyDefinition.id",[speciesTaxonRank:TaxonomyRank.SPECIES.ordinal()],[max:limit, offset:offset]);
 			
 			if(!taxonConcepts) break;
 			

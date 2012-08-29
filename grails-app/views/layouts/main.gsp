@@ -123,6 +123,7 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 			
 			
 			$('.fbJustConnect').click(function() {
+				var clickedObject = this;
 				var scope = { scope: "" };
 				scope.scope = "email,user_about_me,user_location,user_activities,user_hometown,manage_notifications,user_website,publish_stream";
 				
@@ -130,16 +131,17 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 					FB.login(function(response) {
 						if (response.status == 'connected') {
 							$.cookie("fb_login", "true", { path: '/', domain:".${Utils.getDomain(request)}"});
-							/*if($('.fbJustConnect').hasClass('ajaxForm')) {
+							if($(clickedObject).hasClass('ajaxForm')) {
+								$('#loginMessage').html("Logging in ...").removeClass().addClass('alter alert-info').show();
 								$.ajax({
 								  url: "${createLink(controller:'login', action:'authSuccess')}",
 								  method:"GET",
 								  data:{'uid':response.authResponse.userID, ${params['spring-security-redirect']?'"spring-security-redirect":"'+params['spring-security-redirect']+'"':''}},
 								  success: function(data, statusText, xhr) {
-								    ajaxLoginSuccessHandler(data, statusText, xhr);
+								  	ajaxLoginSuccessHandler(data, statusText, xhr);
 								  }
 								});
-							} else */{
+							} else{
 								var redirectTarget = ${params['spring-security-redirect']?'"&spring-security-redirect='+params['spring-security-redirect']+'"':'""'};
 								window.location = "${createLink(controller:'login', action:'authSuccess')}"+"?uid="+response.authResponse.userID+redirectTarget
 							}
@@ -156,7 +158,6 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 			$("#searchResultsTabs a[href='"+t+"']").parent().addClass("active");
 			
 			$('#searchResultsTabs a').click(function (e) {
-			console.log($("#searchTextField").val());
 				$( "#searchbox" ).attr('action', $(this).attr('href')).submit();
 				e.preventDefault();
 			})
@@ -210,8 +211,24 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 		fjs.parentNode.insertBefore(js, fjs);
 	}(document, 'script', 'facebook-jssdk'));
 	////////////////////////FB RELATED CALLS END HERE ///////////////////////
+	
+	
 		
 		function closeHandler() {
+			$('#loginMessage').html("Logging in ...").removeClass().addClass('alter alert-info').show();
+			var authParams = window.mynewparams;
+<%--			authParams["openid.return_to"] = 'http://indiabiodiversity.localhost.org/biodiv/j_spring_openid_security_check' --%>
+			 $.ajax({
+              url:  "${Utils.getDomainServerUrl(request)}/j_spring_openid_security_check" ,
+              method: "POST",
+			  data: authParams,	
+              success: function(data, statusText, xhr) {
+              	ajaxLoginSuccessHandler(data, statusText, xhr);
+              },
+              error: function(xhr, ajaxOptions, thrownError) {
+              	$('#loginMessage').html(xhr.responseText).removeClass().addClass('alter alert-error').show();
+              }
+          });
 		};
 
 		function setAttribute(node, name, value) {
@@ -236,13 +253,23 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 			'openid.ui.icon' : 'true'
 		};
 		var googleOpener = popupManager.createPopupOpener({
-			'realm' : 'http://thewesternghats.localhost.in',
+			'realm' : "${Utils.getDomainServerUrl(request)}",
 			'opEndpoint' : 'https://www.google.com/accounts/o8/ud',
-			'returnToUrl' : 'http://thewesternghats.localhost.in/biodiv',
+			'returnToUrl' :	"${createLink(controller:'openId', action:'checkauth', base:Utils.getDomainServerUrl(request))}",
 			'onCloseHandler' : closeHandler,
 			'shouldEncodeUrls' : true,
 			'extensions' : extensions
 		});
+		
+		var yahooOpener = popupManager.createPopupOpener({
+			'realm' : "${Utils.getDomainServerUrl(request)}",
+			'opEndpoint' : 'https://open.login.yahooapis.com/openid/op/auth',
+			'returnToUrl' :	"${createLink(controller:'openId', action:'checkauth', base:Utils.getDomainServerUrl(request))}",
+			'onCloseHandler' : closeHandler,
+			'shouldEncodeUrls' : true,
+			'extensions' : extensions
+		});
+		
 	</r:script>
 	<r:script>
 	
