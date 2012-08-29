@@ -23,7 +23,7 @@ class Utils {
 	private static final log = LogFactory.getLog(this);
 	private static final NamesParser namesParser = new NamesParser();
 	def grailsApplication;
-	
+
 	static boolean copy(File src, File dst) throws IOException {
 		try {
 			InputStream inS = new FileInputStream(src);
@@ -70,7 +70,7 @@ class Utils {
 		name = name.replaceAll("[^\\x20-\\x7e]", "");	//removing all non ascii characters
 		return name;
 	}
-	
+
 	static String getCanonicalForm(String name){
 		return namesParser.parse([name])?.get(0)?.canonicalForm
 	}
@@ -80,25 +80,25 @@ class Utils {
 			if (ServletFileUpload.isMultipartContent(request)) {
 				//TODO
 				/*
-				FileItemFactory factory = new DiskFileItemFactory();
-				ServletFileUpload upload = new ServletFileUpload(factory);
-				Iterator items = upload.parseRequest(request).iterator();
-				while (items.hasNext()) {
-					FileItem thisItem = (FileItem) items.next();
-					if (thisItem.isFormField()) {
-						params[thisItem.getFieldName()] = thisItem.getString();
-					}
-				}*/
-//				println request.multiFileMap;
-//				CommonsMultipartResolver res = new CommonsMultipartResolver();
-//				request = res.resolveMultipart(request);
-//				request.getParameterMap().each { fieldName, files ->
-//					if (files.size() == 1) {
-//						params.put(fieldName, files.first())
-//					} else {
-//						params.put(fieldName, files)
-//					}
-//				}
+				 FileItemFactory factory = new DiskFileItemFactory();
+				 ServletFileUpload upload = new ServletFileUpload(factory);
+				 Iterator items = upload.parseRequest(request).iterator();
+				 while (items.hasNext()) {
+				 FileItem thisItem = (FileItem) items.next();
+				 if (thisItem.isFormField()) {
+				 params[thisItem.getFieldName()] = thisItem.getString();
+				 }
+				 }*/
+				//				println request.multiFileMap;
+				//				CommonsMultipartResolver res = new CommonsMultipartResolver();
+				//				request = res.resolveMultipart(request);
+				//				request.getParameterMap().each { fieldName, files ->
+				//					if (files.size() == 1) {
+				//						params.put(fieldName, files.first())
+				//					} else {
+				//						params.put(fieldName, files)
+				//					}
+				//				}
 			} else {
 				request.getParameterNames().each {
 					params[it] = request.getParameter(it)
@@ -108,7 +108,7 @@ class Utils {
 			e.printStackTrace();
 		}
 	}
-	
+
 	static String getDomain(HttpServletRequest httpServletRequest) {
 		// maybe we are behind a proxy
 		String header = httpServletRequest.getHeader("X-Forwarded-Host");
@@ -119,8 +119,17 @@ class Utils {
 		if(header == null) {
 			header = httpServletRequest.getHeader("Host");
 		}
-		header.replace("http://", "");
-		header.replace(":8080", "");
+
+		if(header.startsWith("http://")) {
+			header = header.replace("http://", "");
+		}
+
+		if(header.startsWith("www.")) {
+			header = header.replace("www.", "");
+		}
+
+		header = header.replace(":8080", "");
+
 		return header;
 	}
 
@@ -128,7 +137,7 @@ class Utils {
 		def domain = getDomain(request);
 		return "$request.scheme://$domain$request.contextPath";
 	}
-	
+
 	static String getDomainName(HttpServletRequest request) {
 		def domain = getDomain(request);
 		if(domain.startsWith("thewesternghats.in")) {
@@ -138,12 +147,12 @@ class Utils {
 		}
 		return "";
 	}
-	
+
 	static boolean isURL(String str) {
-		String defaultUrlPrefix = "http://"; 
+		String defaultUrlPrefix = "http://";
 		UrlValidator urlValidator = new UrlValidator();
 		return urlValidator.isValid(str) || urlValidator.isValid(defaultUrlPrefix + str);
 	}
-	
+
 }
 
