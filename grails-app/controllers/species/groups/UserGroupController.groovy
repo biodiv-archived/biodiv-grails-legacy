@@ -9,6 +9,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
+import com.grailsrocks.emailconfirmation.PendingEmailConfirmation;
+
 import species.auth.Role;
 import species.auth.SUser;
 import species.groups.UserGroupMemberRole.UserGroupMemberRoleType;
@@ -353,7 +355,7 @@ class UserGroupController {
 						member('id':m.id, 'name':m.name, 'icon':m.icon())
 					}	
 				}
-			}
+			} 
 			return;	
 		}
 		['userGroupInstance':userGroupInstance, 'members':allMembers, 'foundersTotalCount':userGroupInstance.getFoundersCount(), 'membersTotalCount':userGroupInstance.getAllMembersCount(), 'expertsTotalCount':0]
@@ -368,14 +370,15 @@ class UserGroupController {
 		params.offset = params.offset ? params.int('offset') : 0
 
 		def founders = userGroupInstance.getFounders(params.max, params.offset);
+		
 		if(params.isAjaxLoad) {
-			render(contentType:"text/json") {
-				result {
-					for(m in founders) { 
-						founder('id':m.id, 'name':m.name, 'icon':m.icon())
-					}	
-				}
+			println founders;
+			def foundersJSON = []
+			for(m in founders) {
+				foundersJSON << ['id':m.id, 'name':m.name, 'icon':m.icon()]
 			}
+			println foundersJSON;
+			render ([result:foundersJSON] as JSON);
 			return;	
 		}
 		render(view:"members", model:['userGroupInstance':userGroupInstance, 'founders':founders, 'foundersTotalCount':userGroupInstance.getFoundersCount(), 'membersTotalCount':userGroupInstance.getAllMembersCount(), 'expertsTotalCount':0]);
@@ -385,11 +388,11 @@ class UserGroupController {
 		def userGroupInstance = findInstance()
 		if (!userGroupInstance) return
 
-			params.max = Math.min(params.max ? params.int('max') : 9, 100)
+		params.max = Math.min(params.max ? params.int('max') : 9, 100)
 		params.offset = params.offset ? params.int('offset') : 0
 
 		def experts = [];//userGroupInstance.getExperts(params.max, params.offset);
-		render(view:"members", model:['userGroupInstance':userGroupInstance, 'founders':founders, 'foundersTotalCount':userGroupInstance.getFoundersCount(), 'membersTotalCount':userGroupInstance.getAllMembersCount(), 'expertsTotalCount':0]);
+		render(view:"members", model:['userGroupInstance':userGroupInstance, 'experts':experts, 'foundersTotalCount':userGroupInstance.getFoundersCount(), 'membersTotalCount':userGroupInstance.getAllMembersCount(), 'expertsTotalCount':0]);
 	}
 
 	def observations = {
@@ -534,7 +537,7 @@ class UserGroupController {
 		if(params.userId && params.userGroupInstanceId) {
 			def user = SUser.read(params.userId.toLong())
 			def userGroupInstance = UserGroup.read(params.userGroupInstanceId.toLong());
-			if(user && userGroupInstance && (params.userId.toLong() == springSecurityService.currentUser.id || aclUtilService.hasPermission(springSecurityService.authentication, userGroupInstance, BasePermission.ADMINISTRATION))) {
+			if(user && userGroupInstance && (params.userId.toLong() == springSecurityService.currentUser.id || userGroupInstance.isFounder())) {
 				switch(params.role) {
 					case UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value():
 						if(userGroupInstance.addMember(user)) {
@@ -548,15 +551,19 @@ class UserGroupController {
 						break;
 					default: log.error "No proper role type is specified."
 				}
+				def conf = PendingEmailConfirmation.findByConfirmationToken(params.confirmationToken);
+				if(conf) {
+					log.debug "Deleting confirmation code and usertoken params"; 
+					conf.delete();
+					UserToken.get(params.tokenId.toLong())?.delete();
+				}
 			} else {
 				if(user && userGroupInstance) {
-					flash.error="Couldn't add user to the group as the currently logged in user doesnt have required permissions."
+					flash.error="Couldn't add user to the group as the currently logged in user doesn't have required permissions."
 				} else {
 					flash.error="Couldn't add user to the group because of missing information."
 				}
 			}
-			
-			UserToken.get(params.tokenId.toLong())?.delete();
 			redirect (action:"show", id:userGroupInstance.id);
 			return;
 		}

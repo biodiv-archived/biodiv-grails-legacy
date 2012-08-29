@@ -122,8 +122,16 @@ class Utils {
 		if(header == null) {
 			header = httpServletRequest.getHeader("Host");
 		}
-		header.replace("http://", "");
-		header.replace(":8080", "");
+		
+		if(header.startsWith("http://")) {
+			header = header.replace("http://", "");
+		}
+		
+		if(header.startsWith("www.")) {
+			header = header.replace("www.", "");
+		}
+		
+		header = header.replace(":8080", "");
 		return header;
 	}
 

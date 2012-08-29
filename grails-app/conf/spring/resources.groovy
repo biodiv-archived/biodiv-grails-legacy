@@ -22,6 +22,7 @@ import species.auth.OpenIdAuthenticationFailureHandler;
 
 import species.auth.drupal.DrupalAuthCookieFilter;
 import species.auth.drupal.DrupalAuthUtils;
+import species.participation.EmailConfirmationService;
 import speciespage.FacebookAuthService;
 
 // Place your Spring DSL code here
@@ -153,4 +154,6 @@ beans = {
 		sessionAuthenticationStrategy = ref('sessionAuthenticationStrategy')
 		filterProcessesUrl = '/j_spring_openid_security_check' // not configurable
 	}
+	
+	emailConfirmationService(EmailConfirmationService)
 }

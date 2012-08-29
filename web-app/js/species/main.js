@@ -41,14 +41,16 @@ function adjustHeight() {
 
 
 jQuery(document).ready(function($) {
-	if (document.domain == appWGPDomain){
+	var domain = document.domain.replace('http://','').replace('www.','').replace(':8080','');
+	
+	if (domain == appWGPDomain){
         $('#ibp-header').hide();
         $('#wgp-header').show();
         $('#ibp-footer').hide();
         $('#wgp-footer').show();
     }
 
-    if (document.domain == appIBPDomain){
+    if (domain == appIBPDomain){
         $('#wgp-header').hide();
         $('#ibp-header').show();
         $('#wgp-footer').hide();

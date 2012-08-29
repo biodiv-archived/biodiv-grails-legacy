@@ -122,11 +122,12 @@ class BootStrap {
 	}
 
 	def initEmailConfirmationService() {
-		emailConfirmationService.onConfirmation = { email, uid ->
+		emailConfirmationService.onConfirmation = { email, uid, confirmationToken ->
 			log.info("User with id $uid has confirmed their email address $email")
 			def userToken = UserToken.findByToken(uid);
 			if(userToken) {
-				userToken.params.tokenId=userToken.id.toString();
+				userToken.params.tokenId = userToken.id.toString();
+				userToken.params.confirmationToken = confirmationToken;
 				return [controller:userToken.controller, action:userToken.action, params:userToken.params]
 			} else {
 				//TODO

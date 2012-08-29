@@ -224,6 +224,7 @@ class UserGroup implements Taggable {
 	}
 
 	boolean isFounder(SUser user) {
+		if(!user) user = springSecurityService.currentUser;
 		def role = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_FOUNDER.value());
 		if(UserGroupMemberRole.find("from UserGroupMemberRole umr where umr.userGroup=:userGroup and umr.sUser=:sUser and umr.role=:role", [sUser:user, userGroup:this, role:role]))
 			return true;
@@ -231,6 +232,7 @@ class UserGroup implements Taggable {
 	}
 
 	boolean isExpert(SUser user) {
+		if(!user) user = springSecurityService.currentUser;
 		def role = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_EXPERT.value());
 		if(UserGroupMemberRole.find("from UserGroupMemberRole umr where umr.userGroup=:userGroup and umr.sUser=:sUser and umr.role=:role", [sUser:user, userGroup:this, role:role]))
 			return true;
@@ -238,6 +240,7 @@ class UserGroup implements Taggable {
 	}
 
 	boolean isMember(SUser user) {
+		if(!user) user = springSecurityService.currentUser;
 		def role = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value());
 		if(UserGroupMemberRole.find("from UserGroupMemberRole umr where umr.userGroup=:userGroup and umr.sUser=:sUser and umr.role=:role", [sUser:user, userGroup:this, role:role]))
 			return true;
