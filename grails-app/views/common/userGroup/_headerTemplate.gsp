@@ -45,7 +45,17 @@
 	<div style="position: relative; overflow: visible;">
 
 		<div class="observation-icons pull-right">
+			<sec:permitted className='species.groups.UserGroup'
+								id='${userGroupInstance.id}'
+								permission='${org.springframework.security.acls.domain.BasePermission.ADMINISTRATION}'>
 
+								<a class="btn btn-large btn-primary "
+									href="${createLink(action:'edit', id:userGroupInstance.id)}">
+									<i
+					class="icon-edit"></i>Edit Group </a>
+								
+			</sec:permitted>
+							
 			<sec:permitted className='species.groups.UserGroup'
 				id='${userGroupInstance.id}'
 				permission='${org.springframework.security.acls.domain.BasePermission.WRITE}'>

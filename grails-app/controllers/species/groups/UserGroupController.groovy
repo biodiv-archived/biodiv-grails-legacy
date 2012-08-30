@@ -134,43 +134,9 @@ class UserGroupController {
 			render(view: "create", model: [userGroupInstance: userGroupInstance])
 		}
 		else {
-
-			def tags = (params.tags != null) ? params.tags.values() as List : new ArrayList();
-			userGroupInstance.setTags(tags);
-
 			log.debug "Successfully created usergroup : "+userGroupInstance
 			flash.message = "${message(code: 'default.created.message', args: [message(code: 'userGroup.label', default: 'UserGroup'), userGroupInstance.id])}"
 			redirect(action: "show", id: userGroupInstance.id)
-		}
-	}
-
-	private void setFounderInvitation(SUser user, UserGroup userGroup) {
-		def conf = SpringSecurityUtils.securityConfig
-		def body = conf.ui.userGroup.inviteFounder.emailBody
-		if (body.contains('$')) {
-			body = evaluate(body, [username: user.name.capitalize(), groupUrl: userGroup.webaddress])
-		}
-
-		mailService.sendMail {
-			to user.email
-			from conf.ui.userGroup.inviteFounder.emailFrom
-			subject conf.ui.userGroup.inviteFounder.emailSubject
-			html body.toString()
-		}
-	}
-
-	private void setMemberInvitation(SUser user) {
-		def conf = SpringSecurityUtils.securityConfig
-		def body = conf.ui.userGroup.inviteMember.emailBody
-		if (body.contains('$')) {
-			body = evaluate(body, [username: user.name.capitalize(), groupUrl: userGroup.webaddress])
-		}
-
-		mailService.sendMail {
-			to user.email
-			from conf.ui.userGroup.inviteMember.emailFrom
-			subject conf.ui.userGroup.inviteMember.emailSubject
-			html body.toString()
 		}
 	}
 
@@ -253,6 +219,7 @@ class UserGroupController {
 	@Secured(['ROLE_USER'])
 	def update = {
 		log.debug params;
+		
 		def userGroupInstance = findInstance()
 		if (userGroupInstance) {
 			if (params.version) {
@@ -273,16 +240,11 @@ class UserGroupController {
 				render(view: "create", model: [userGroupInstance: userGroupInstance])
 			}
 			else {
-				def tags = (params.tags != null) ? params.tags.values() as List : new ArrayList();
-				userGroupInstance.setTags(tags);
-
-				List founders = Utils.getUsersList(params.founderUserIds);
-				userGroupService.setUserGroupFounders(userGroupInstance, founders, params.domain);
-				//userGroup.setFounders(founders);
-				//userGroup.setMembers(members);
-
 				log.debug "Successfully updated usergroup : "+userGroupInstance
-				flash.message = "${message(code: 'default.updated.message', args: [message(code: 'userGroup.label', default: 'UserGroup'), userGroupInstance.id])}"
+				flash.message = "${message(code: 'default.updated.message', args: [message(code: 'userGroup.label', default: 'UserGroup'), userGroupInstance.name])}"
+				if(params.founders) {
+					flash.message += ". Sent email invitation to ${params.founders} to join as founders"
+				}
 				redirect(action: "show", id: userGroupInstance.id)
 			}
 		}
@@ -313,17 +275,6 @@ class UserGroupController {
 		}
 	}
 
-	def grant = {
-		def userGroupInstance = findInstance()
-		if (!userGroupInstance) return
-			if (!request.post) {
-				return [userGroupInstance: userGroupInstance]
-			}
-		userGroupService.addPermission userGroupInstance, params.recipient, params.int('permission')
-		flash.message = "Permission $params.permission granted on userGroupInstance $userGroupInstance.id to $params.recipient";
-		redirect action: show, id: id
-	}
-
 	private UserGroup findInstance() {
 		if(!params.id) return;
 
@@ -339,7 +290,7 @@ class UserGroupController {
 		def userGroupInstance = findInstance()
 		if (!userGroupInstance) return
 
-		params.max = Math.min(params.max ? params.int('max') : 9, 100)
+			params.max = Math.min(params.max ? params.int('max') : 9, 100)
 		params.offset = params.offset ? params.int('offset') : 0
 
 		def allMembers;
@@ -349,37 +300,32 @@ class UserGroupController {
 			allMembers = userGroupInstance.getAllMembers(params.max, params.offset);
 		}
 		if(params.isAjaxLoad) {
-			render(contentType:"text/json") {
-				result {
-					for(m in allMembers) { 
-						member('id':m.id, 'name':m.name, 'icon':m.icon())
-					}	
-				}
-			} 
-			return;	
+			def membersJSON = []
+			for(m in allMembers) {
+				membersJSON << ['id':m.id, 'name':m.name, 'icon':m.icon()]
+			}
+			render ([result:membersJSON] as JSON);
+			return;
 		}
 		['userGroupInstance':userGroupInstance, 'members':allMembers, 'foundersTotalCount':userGroupInstance.getFoundersCount(), 'membersTotalCount':userGroupInstance.getAllMembersCount(), 'expertsTotalCount':0]
 	}
 
-	
 	def founders = {
 		def userGroupInstance = findInstance()
 		if (!userGroupInstance) return
 
-		params.max = Math.min(params.max ? params.int('max') : 9, 100)
+			params.max = Math.min(params.max ? params.int('max') : 9, 100)
 		params.offset = params.offset ? params.int('offset') : 0
 
 		def founders = userGroupInstance.getFounders(params.max, params.offset);
-		
+
 		if(params.isAjaxLoad) {
-			println founders;
 			def foundersJSON = []
 			for(m in founders) {
 				foundersJSON << ['id':m.id, 'name':m.name, 'icon':m.icon()]
 			}
-			println foundersJSON;
 			render ([result:foundersJSON] as JSON);
-			return;	
+			return;
 		}
 		render(view:"members", model:['userGroupInstance':userGroupInstance, 'founders':founders, 'foundersTotalCount':userGroupInstance.getFoundersCount(), 'membersTotalCount':userGroupInstance.getAllMembersCount(), 'expertsTotalCount':0]);
 	}
@@ -388,7 +334,7 @@ class UserGroupController {
 		def userGroupInstance = findInstance()
 		if (!userGroupInstance) return
 
-		params.max = Math.min(params.max ? params.int('max') : 9, 100)
+			params.max = Math.min(params.max ? params.int('max') : 9, 100)
 		params.offset = params.offset ? params.int('offset') : 0
 
 		def experts = [];//userGroupInstance.getExperts(params.max, params.offset);
@@ -461,9 +407,9 @@ class UserGroupController {
 	def joinUs = {
 		def userGroupInstance = findInstance()
 		if (!userGroupInstance) {
-				render (['success':false, 'msg':'No userGroup is selected.'] as JSON);
-				 return;
-			}
+			render (['success':false, 'msg':'No userGroup is selected.'] as JSON);
+			return;
+		}
 
 		def user = springSecurityService.currentUser;
 		if(user) {
@@ -483,19 +429,21 @@ class UserGroupController {
 			def userGroupInstance = findInstance()
 			if (!userGroupInstance) {
 				render (['success':false, 'msg':'No userGroup selected.'] as JSON);
-				 return;
+				return;
 			}
-				
+
 			int membersCount = members.size();
 			userGroupService.sendMemberInvitation(userGroupInstance, members, Utils.getDomainName(request));
 			String msg = "Successfully sent invitation messsage to ${members.size()} member(s)"
 			if(membersCount > members.size()) {
-				msg += " as other "+membersCount-members.size()+" member(s) were already found to be members of this group." 
+				int alreadyMembersCount = membersCount-members.size();
+
+				msg += " as other "+alreadyMembersCount+" member(s) were already found to be members of this group."
 			}
 			render (['success':true, 'msg':msg] as JSON)
 			return
 		}
-		render (['success':false, 'msg':'Please provide details of people you want to invite to join this group.'] as JSON)		
+		render (['success':false, 'msg':'Please provide details of people you want to invite to join this group.'] as JSON)
 	}
 
 	@Secured(['ROLE_USER'])
@@ -505,12 +453,12 @@ class UserGroupController {
 			def userGroupInstance = findInstance()
 			if (!userGroupInstance) {
 				render (['success':false, 'msg':'No userGroup selected.'] as JSON);
-				 return;
+				return;
 			}
-			
+
 			String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
 			def founders = userGroupInstance.getFounders(userGroupInstance.getFoundersCount(), 0);
-			
+
 			founders.each { founder ->
 				log.debug "Sending email to  founder ${founder}"
 				def userToken = new UserToken(username: user."$usernameFieldName", controller:'userGroup', action:'confirmMembershipRequest', params:['userGroupInstanceId':userGroupInstance.id.toString(), 'userId':user.id.toString(), 'role':UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value()]);
@@ -522,7 +470,7 @@ class UserGroupController {
 			return;
 		}
 		render (['success':false, 'msg':'Please login to request membership.'] as JSON);
-		
+
 	}
 
 	private String generateLink( String controller, String action, linkParams, request) {
@@ -553,7 +501,7 @@ class UserGroupController {
 				}
 				def conf = PendingEmailConfirmation.findByConfirmationToken(params.confirmationToken);
 				if(conf) {
-					log.debug "Deleting confirmation code and usertoken params"; 
+					log.debug "Deleting confirmation code and usertoken params";
 					conf.delete();
 					UserToken.get(params.tokenId.toLong())?.delete();
 				}
@@ -575,8 +523,8 @@ class UserGroupController {
 	def leaveUs = {
 		def userGroupInstance = findInstance()
 		if (!userGroupInstance) {
-				render (['success':false, 'msg':'No userGroup selected.'] as JSON);
-				 return;
+			render (['success':false, 'msg':'No userGroup selected.'] as JSON);
+			return;
 		}
 
 		def user = springSecurityService.currentUser;

@@ -42,14 +42,11 @@ class UserGroupService {
 	def emailConfirmationService;
 
 
-	void addPermission(UserGroup userGroup, SUser user, int permission) {
+	private void addPermission(UserGroup userGroup, SUser user, int permission) {
 		addPermission userGroup, user, aclPermissionFactory.buildFromMask(permission)
 	}
 
-	//@PreAuthorize("hasPermission(#userGroup, admin) or hasRole('ROLE_RUN_AS_ACL_USERGROUP_FOUNDER')")
-	@Transactional
-	//@PreAuthorize("hasRole('RUN_AS_ADMIN')")
-	void addPermission(UserGroup userGroup, SUser user, Permission permission) {
+	private void addPermission(UserGroup userGroup, SUser user, Permission permission) {
 		aclUtilService.addPermission userGroup, user.email, permission
 	}
 
@@ -57,23 +54,31 @@ class UserGroupService {
 	@PreAuthorize("hasRole('ROLE_USER')")
 	UserGroup create(params) {
 		UserGroup userGroup = new UserGroup();
+		update(userGroup, params);
+		return userGroup
+	}
+	
+	@Transactional
+	@PreAuthorize("hasPermission(#userGroup, write) or hasPermission(#userGroup, admin)")
+	void update(UserGroup userGroup, params) {
 		userGroup.properties = params;
 		userGroup.name = userGroup.name?.capitalize();
 		userGroup.webaddress = URLEncoder.encode(userGroup.name.replaceAll(" ", "_"), "UTF-8");
-		List founders = Utils.getUsersList(params.founderUserIds);
-		//List members = Utils.getUsersList(params.memberUserIds);
+		
 		userGroup.icon = getUserGroupIcon(params.icon);
 		addInterestedSpeciesGroups(userGroup, params.speciesGroup)
 		addInterestedHabitats(userGroup, params.habitats)
 
-		if(userGroup.save()) {
+		if(!userGroup.hasErrors() && userGroup.save()) {
+			def tags = (params.tags != null) ? params.tags.values() as List : new ArrayList();
+			userGroup.setTags(tags);
+			
+			List founders = Utils.getUsersList(params.founderUserIds);
 			setUserGroupFounders(userGroup, founders, params.domain);
-			//userGroup.setFounders(founders);
-			//userGroup.setMembers(members);
+			params.founders = founders;
 		}
-		return userGroup
 	}
-
+	
 	//@PreAuthorize("hasPermission(#id, 'species.groups.UserGroup', read) or hasPermission(#id, 'species.groups.UserGroup', admin)")
 	UserGroup get(long id) {
 		UserGroup.get id
@@ -88,22 +93,6 @@ class UserGroupService {
 	int count() {
 		UserGroup.count()
 	}
-
-	@Transactional
-	@PreAuthorize("hasPermission(#userGroup, write) or hasPermission(#userGroup, admin)")
-	void update(UserGroup userGroup, params) {
-		userGroup.properties = params
-		userGroup.name = userGroup.name?.capitalize();
-		userGroup.webaddress = URLEncoder.encode(userGroup.name.replaceAll(" ", "_"), "UTF-8");
-		
-		//List members = Utils.getUsersList(params.memberUserIds);
-		userGroup.icon = getUserGroupIcon(params.icon);
-		addInterestedSpeciesGroups(userGroup, params.speciesGroup)
-		addInterestedHabitats(userGroup, params.habitat)
-
-
-	}
-
 
 	private String getUserGroupIcon(String icon) {
 		if(!icon) return;
@@ -153,17 +142,9 @@ class UserGroupService {
 		aclUtilService.deleteAcl userGroup
 	}
 
-	@Transactional
 	@PreAuthorize("hasPermission(#userGroup, admin)")
-	void deletePermission(UserGroup userGroup, SUser user, Permission permission) {
-		def acl = aclUtilService.readAcl(userGroup)
-		// Remove all permissions associated with this particular recipient (string equality to KISS)
-		acl.entries.eachWithIndex { entry, i ->
-			if (entry.sid.equals(user) && entry.permission.equals(permission)) {
-				acl.deleteAce i
-			}
-		}
-		aclService.updateAcl acl
+	private void deletePermission(UserGroup userGroup, SUser user, Permission permission) {
+		aclUtilService.deletePermission(userGroup, user.email, permission);
 	}
 
 	def getUserGroups(SUser userInstance) {
@@ -430,6 +411,7 @@ class UserGroupService {
 	 */
 	@Transactional
 	void addMember(UserGroup userGroup, SUser user, Role role, Permission... permissions) {
+		log.debug "Adding member ${user} with role ${role} to group ${userGroup}"
 		def userMemberRole = UserGroupMemberRole.findBySUserAndUserGroup(user, userGroup);
 		if(!userMemberRole) {
 			userMemberRole = UserGroupMemberRole.create(userGroup, user, role);
@@ -441,16 +423,16 @@ class UserGroupService {
 			if(userMemberRole.role.id != role.id) {
 				log.debug "Assigning a new role ${role}"
 				def prevRole = userMemberRole.role;
-				userMemberRole.role = role
-				println userMemberRole.role;
-				if(userMemberRole.save()) {
+				
+				
+				if(UserGroupMemberRole.setRole(userGroup, user, role) > 0) {
 					deletePermissionsAsPerRole(userGroup, user, prevRole);
 					permissions.each { permission ->
 						addPermission userGroup, user, permission
 					}
 					log.debug "Updated permissions as per new role"
 				} else {
-					log.error userMemberRole.errors.allErrors.each { log.error it }
+					log.error "error while updating role for ${userMemberRole}"
 				}
 			}
 		}
@@ -462,6 +444,7 @@ class UserGroupService {
 
 	@Transactional
 	boolean deleteMember(UserGroup userGroup, SUser user, Role role) {
+		log.debug "Deleting member ${user} with role ${role} from group ${userGroup}"
 		if(UserGroupMemberRole.remove(userGroup, user, role)) {
 			return deletePermissionsAsPerRole(userGroup, user, role);
 		}
@@ -475,20 +458,26 @@ class UserGroupService {
 
 	//TODO:need to make this better by providing a mapping between this role and associated permissions
 	private deletePermissionsAsPerRole(UserGroup userGroup, SUser user, Role role) {
+		log.debug "Deleting permissions for member ${user} who had role ${role} in group ${userGroup}"
 		def founderRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_FOUNDER.value())
 		def memberRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value())
+		println role.id;
 		switch(role.id) {
 			case founderRole.id :
+				log.debug "Deleting admin permission for member ${user} who had role ${role} in group ${userGroup}"
 				deletePermission userGroup, user, BasePermission.ADMINISTRATION
+				log.debug "Deleting write permission for member ${user} who had role ${role} in group ${userGroup}"
 				deletePermission userGroup, user, BasePermission.WRITE
 				break;
 			case memberRole.id :
+				log.debug "Deleting write permission for member ${user} who had role ${role} in group ${userGroup}"
 				deletePermission userGroup, user, BasePermission.WRITE
 				break;
 			default :
 				log.error "Prev role is invalid ${role}"
 				return false;
 		}
+		println true;
 		return true;
 	}
 
@@ -517,7 +506,10 @@ class UserGroupService {
 
 		if(groupFounders) {
 			groupFounders.each { founder ->
-				deleteMember (userGroupInstance, founder, founderRole);
+				//deletes as founder
+				userGroupInstance.deleteMember (founder);
+				//adds as member
+				userGroupInstance.addMember(founder);
 			}
 		}
 	}

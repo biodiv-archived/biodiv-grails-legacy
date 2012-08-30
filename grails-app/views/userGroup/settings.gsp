@@ -38,19 +38,7 @@
 
 					<div id="my-tab-content" class="tab-content">
 						<div class="tab-pane active" id="general">
-							<sec:permitted className='species.groups.UserGroup'
-								id='${userGroupInstance.id}'
-								permission='${org.springframework.security.acls.domain.BasePermission.ADMINISTRATION}'>
-
-								<a class="btn btn-large btn-primary "
-									href="${createLink(action:'edit', id:userGroupInstance.id)}">
-									Edit Group </a>
-
-								<a class="btn btn-large btn-danger"
-									href="${createLink(action:'flagDeleted', id:userGroupInstance.id)}"
-									onclick="return confirm('${message(code: 'default.observation.delete.confirm.message', default: 'This group will be deleted. Are you sure ?')}');">Delete
-									Group </a>
-							</sec:permitted>
+				
 						</div>
 
 						<div class="tab-pane" id="userPermissions">

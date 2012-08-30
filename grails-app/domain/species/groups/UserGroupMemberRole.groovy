@@ -82,7 +82,7 @@ class UserGroupMemberRole implements Serializable {
 		true
 	}
 
-	static void removeAll(UserGroup userGroup, SUser sUser) {
+	static def removeAll(UserGroup userGroup, SUser sUser) {
 		executeUpdate 'DELETE FROM UserGroupMemberRole WHERE userGroup=:userGroup and sUser=:sUser', [userGroup:userGroup, sUser: sUser]
 	}
 
@@ -90,6 +90,10 @@ class UserGroupMemberRole implements Serializable {
 		executeUpdate 'DELETE FROM UserGroupMemberRole WHERE role=:role', [role: role]
 	}
 
+	static int setRole(UserGroup userGroup, SUser sUser, Role role) {
+		return executeUpdate('UPDATE UserGroupMemberRole SET role=:role WHERE sUser=:sUser and userGroup=:userGroup', [userGroup:userGroup, sUser:sUser, role: role]);
+	}
+	
 	static mapping = {
 		id composite: ['role', 'sUser', 'userGroup']
 		version false
