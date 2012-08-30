@@ -155,5 +155,7 @@ beans = {
 		filterProcessesUrl = '/j_spring_openid_security_check' // not configurable
 	}
 	
-	emailConfirmationService(EmailConfirmationService)
+	emailConfirmationService(EmailConfirmationService) {
+		mailService = ref('mailService')
+	}
 }

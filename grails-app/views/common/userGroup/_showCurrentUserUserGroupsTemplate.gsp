@@ -17,9 +17,9 @@ def otherUsergroups =  userGroups[true] %>
 				checked = checked || params.userGroup.containsValue(String.valueOf(userGroup.key.id))
 			}
 		}
-	 %> <label class="radio"><input type="radio" style="margin-left: 0px;" name="groupsWithSharingNotAllowed"
-					value="${userGroup.key.id}" ${checked?'checked':''} />  ${userGroup.key.name}
-					<!-- img class="logo" src="${userGroup.key.icon().fileName}" title="${userGroup.key.name}" alt="${userGroup.key.name}"-->
+	 %> <label class="radio"><input type="radio" style="margin-left: 0px;" name="groupsWithSharingNotAllowed" style="display:none;"
+					value="${userGroup.key.id}" ${checked?'checked':''} />  
+					<img class="logo" src="${userGroup.key.icon().fileName}" title="${userGroup.key.name}" alt="${userGroup.key.name}">
 			</label>
 		</g:each>
 	</div>
@@ -40,8 +40,8 @@ or with any of these groups
 				checked = checked || params.userGroup.containsValue(String.valueOf(userGroup.key.id))
 			}
 		}
-	 %> <label class="checkbox"><input type="checkbox" style="margin-left: 0px;" name="userGroup.${i}"
-				value="${userGroup.key.id}" ${checked?'checked':''} />  ${userGroup.key.name}
+	 %> <label class="checkbox"><input type="checkbox" style="margin-left: 0px;" name="userGroup.${i}" style="display:none;"
+				value="${userGroup.key.id}" ${checked?'checked':''} />  <img class="logo" src="${userGroup.key.icon().fileName}" title="${userGroup.key.name}" alt="${userGroup.key.name}">
 		</label>
 	</g:each>
 </div>

@@ -414,14 +414,17 @@ class UserGroupController {
 		def user = springSecurityService.currentUser;
 		if(user) {
 			if(userGroupInstance.isMember(user)) {
+				flash.message = 'Already a member.';
 				render ([success:true, 'statusComplete':false, 'msg':'Already a member.']as JSON);
 			} else {
 				if(userGroupInstance.addMember(user)) {
+					flash.message = 'Congratulations. You are now part of us!!! We look forward for your contribution.';
 					render ([success:true, 'statusComplete':true, 'msg':'Congratulations. You are now part of us!!! We look forward for your contribution.']as JSON);
 					return;
 				}
 			}
 		}
+		flash.error = 'We are extremely sorry as we are not able to process your request now. Please try again.';
 		render ([success:true, 'statusComplete':false, 'msg':'We are extremely sorry as we are not able to process your request now. Please try again.']as JSON);
 	}
 
@@ -528,15 +531,18 @@ class UserGroupController {
 	def leaveUs = {
 		def userGroupInstance = findInstance()
 		if (!userGroupInstance) {
+			flash.error = 'No userGroup selected.'
 			render (['success':true, 'statusComplete':false, 'msg':'No userGroup selected.'] as JSON);
 			return;
 		}
 
 		def user = springSecurityService.currentUser;
 		if(user && userGroupInstance.deleteMember(user)) {
-			render (['msg':'Thank you for being with us', 'success':true, 'statusComplete':true] as JSON);
+			flash.message = 'Thank you for being with us.'
+			render (['msg':'Thank you for being with us.', 'success':true, 'statusComplete':true] as JSON);
 			return;
 		}
+		flash.error = 'Your presence is important to us. Cannot let you leave at present.'
 		render (['msg':'Your presence is important to us. Cannot let you leave at present.','success':true, 'statusComplete':false]as JSON);
 	}
 
