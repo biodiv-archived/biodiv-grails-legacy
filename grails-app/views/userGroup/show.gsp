@@ -87,14 +87,19 @@
 							</div>
 							
 							<div style="clear: both;">
-								
-								<sec:permitted object='${userGroupInstance}'
-										permission='${org.springframework.security.acls.domain.BasePermission.WRITE}'>
-									<comment:postComment model="['commentHolder':userGroupInstance, 'rootHolder':userGroupInstance, commentType:'super']" />
-								</sec:permitted>
-															
 							
-				    			<comment:showAllComments model="['commentHolder':userGroupInstance, commentType:'super']" />
+							<%
+								def canPostComment = customsecurity.hasPermissionAsPerGroups([object:userGroupInstance, permission:org.springframework.security.acls.domain.BasePermission.WRITE]).toBoolean()
+							%>
+							<comment:showAllComments model="['commentHolder':observationInstance, commentType:'super', 'canPostComment':canPostComment]" />
+<%--								--%>
+<%--								<sec:permitted object='${userGroupInstance}'--%>
+<%--										permission='${org.springframework.security.acls.domain.BasePermission.WRITE}'>--%>
+<%--									<comment:postComment model="['commentHolder':userGroupInstance, 'rootHolder':userGroupInstance, commentType:'super']" />--%>
+<%--								</sec:permitted>--%>
+<%--															--%>
+<%--							--%>
+<%--				    			<comment:showAllComments model="['commentHolder':userGroupInstance, commentType:'super']" />--%>
 							</div>
 						</div>
 					</div>

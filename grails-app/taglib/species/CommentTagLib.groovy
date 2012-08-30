@@ -38,6 +38,7 @@ class CommentTagLib {
 		def model = attrs.model
 		model.rootHolder = model.rootHolder?:model.commentHolder
 		model.commentType = model.commentType ?: "context"
+		model.canPostComment = (model.canPostComment != null)? model.canPostComment : true
 		if(model.commentType == "context"){
 			model.comments = commentService.getComments(model.commentHolder, model.rootHolder, 3, new Date().time.toString(), null)
 			model.totalCount = commentService.getCount(model.commentHolder, model.rootHolder, null, null)
