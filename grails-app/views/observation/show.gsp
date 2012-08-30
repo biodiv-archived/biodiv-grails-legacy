@@ -240,19 +240,19 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 					</div>
 					
 					<g:if test="${observationInstance.userGroups}">
-					<div class="sidebar_section">
-						<h5>Observation is in groups</h5>
-						<div class="sidebar_section" style="clear: both">
-							<!-- div class="title">This observation belongs to following groups</div-->
-							<ul class="thumbnails">
-							<g:each in="${observationInstance.userGroups}" var="userGroup">
-								<li class="thumbnail"><g:link controller="userGroup" action="show" id="${userGroup.id}"><img class="logo" src="${userGroup.icon().fileName}" title="${userGroup.name}" alt="${userGroup.name}"></g:link></li>
-							</g:each>
-							</ul>
-							<!-- obv:showRelatedStory
-								model="['observationInstance':observationInstance, 'observationId': observationInstance.id, 'controller':'userGroup', 'action':'getRelatedUserGroups', 'filterProperty': 'obvRelatedUserGroups', 'id':'relatedGroups']" /-->
+						<div class="sidebar_section">
+							<h5>Observation is in groups</h5>
+							<div class="sidebar_section" style="clear: both">
+								<!-- div class="title">This observation belongs to following groups</div-->
+								<ul class="thumbnails">
+									<g:each in="${observationInstance.userGroups}" var="userGroup">
+										<li class="thumbnail"><g:link controller="userGroup" action="show" id="${userGroup.id}"><img class="logo" src="${userGroup.icon().fileName}" title="${userGroup.name}" alt="${userGroup.name}"></g:link></li>
+									</g:each>
+								</ul>
+								<!-- obv:showRelatedStory
+									model="['observationInstance':observationInstance, 'observationId': observationInstance.id, 'controller':'userGroup', 'action':'getRelatedUserGroups', 'filterProperty': 'obvRelatedUserGroups', 'id':'relatedGroups']" /-->
+							</div>
 						</div>
-					</div>
 					</g:if>
 					
 					<!-- obv:showTagsSummary model="['observationInstance':observationInstance]" /-->

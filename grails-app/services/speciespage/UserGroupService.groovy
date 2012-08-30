@@ -57,14 +57,14 @@ class UserGroupService {
 		update(userGroup, params);
 		return userGroup
 	}
-	
+
 	@Transactional
 	@PreAuthorize("hasPermission(#userGroup, write) or hasPermission(#userGroup, admin)")
 	void update(UserGroup userGroup, params) {
 		userGroup.properties = params;
 		userGroup.name = userGroup.name?.capitalize();
 		userGroup.webaddress = URLEncoder.encode(userGroup.name.replaceAll(" ", "_"), "UTF-8");
-		
+
 		userGroup.icon = getUserGroupIcon(params.icon);
 		addInterestedSpeciesGroups(userGroup, params.speciesGroup)
 		addInterestedHabitats(userGroup, params.habitats)
@@ -72,13 +72,13 @@ class UserGroupService {
 		if(!userGroup.hasErrors() && userGroup.save()) {
 			def tags = (params.tags != null) ? params.tags.values() as List : new ArrayList();
 			userGroup.setTags(tags);
-			
+
 			List founders = Utils.getUsersList(params.founderUserIds);
 			setUserGroupFounders(userGroup, founders, params.founderMsg, params.domain);
 			params.founders = founders;
 		}
 	}
-	
+
 	//@PreAuthorize("hasPermission(#id, 'species.groups.UserGroup', read) or hasPermission(#id, 'species.groups.UserGroup', admin)")
 	UserGroup get(long id) {
 		UserGroup.get id
@@ -410,7 +410,7 @@ class UserGroupService {
 	 * @param permission
 	 */
 	@Transactional
-	void addMember(UserGroup userGroup, SUser user, Role role, Permission... permissions) {
+	boolean addMember(UserGroup userGroup, SUser user, Role role, Permission... permissions) {
 		log.debug "Adding member ${user} with role ${role} to group ${userGroup}"
 		def userMemberRole = UserGroupMemberRole.findBySUserAndUserGroup(user, userGroup);
 		if(!userMemberRole) {
@@ -418,24 +418,25 @@ class UserGroupService {
 			permissions.each { permission ->
 				addPermission userGroup, user, permission
 			}
+			return true;
 		} else {
 			log.debug "${user} is already a member of ${userGroup}"
 			if(userMemberRole.role.id != role.id) {
 				log.debug "Assigning a new role ${role}"
 				def prevRole = userMemberRole.role;
-				
-				
 				if(UserGroupMemberRole.setRole(userGroup, user, role) > 0) {
 					deletePermissionsAsPerRole(userGroup, user, prevRole);
 					permissions.each { permission ->
 						addPermission userGroup, user, permission
 					}
 					log.debug "Updated permissions as per new role"
+					return true;
 				} else {
 					log.error "error while updating role for ${userMemberRole}"
 				}
 			}
 		}
+		return false;
 	}
 
 	void addMember(UserGroup userGroup, SUser user, Role role, List<Permission> permissions) {
@@ -461,7 +462,6 @@ class UserGroupService {
 		log.debug "Deleting permissions for member ${user} who had role ${role} in group ${userGroup}"
 		def founderRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_FOUNDER.value())
 		def memberRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value())
-		println role.id;
 		switch(role.id) {
 			case founderRole.id :
 				log.debug "Deleting admin permission for member ${user} who had role ${role} in group ${userGroup}"
@@ -477,7 +477,6 @@ class UserGroupService {
 				log.error "Prev role is invalid ${role}"
 				return false;
 		}
-		println true;
 		return true;
 	}
 
@@ -488,7 +487,9 @@ class UserGroupService {
 	}
 
 	def getUserUserGroups(SUser user, int max, long offset) {
-		return UserGroupMemberRole.findAllBySUser(user,[max:max, offset:offset]).collect { it.userGroup};
+		if(max==-1 && offset==-1)
+			return  UserGroupMemberRole.findAllBySUser(user).groupBy{ it.role };
+		return UserGroupMemberRole.findAllBySUser(user,[max:max, offset:offset]).groupBy{ it.role };
 	}
 
 	//////////////////User & MAIL RELATED////////////////////
@@ -532,7 +533,7 @@ class UserGroupService {
 			}
 		}
 	}
-	
+
 	@PreAuthorize("hasPermission(#userGroupInstance, write)")
 	void sendMemberInvitation(userGroupInstance, members, domain) {
 		//find if the invited members are already part of the group and ignore sending invitation to them
@@ -540,9 +541,9 @@ class UserGroupService {
 		def groupMembers = UserGroupMemberRole.findAllByUserGroup(userGroupInstance).collect {it.sUser};
 		def commons = members.intersect(groupMembers);
 		members.removeAll(commons);
-	
+
 		log.debug "Sending invitation to ${members}"
-	
+
 		String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
 		members.each { member ->
 			def userToken = new UserToken(username: member."$usernameFieldName", controller:'userGroup', action:'confirmMembershipRequest', params:['userGroupInstanceId':userGroupInstance.id.toString(), 'userId':member.id.toString(), 'role':UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value()]);

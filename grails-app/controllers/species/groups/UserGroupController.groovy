@@ -407,17 +407,22 @@ class UserGroupController {
 	def joinUs = {
 		def userGroupInstance = findInstance()
 		if (!userGroupInstance) {
-			render (['success':false, 'msg':'No userGroup is selected.'] as JSON);
+			render (['success':true,'statusComplete':false, 'msg':'No userGroup is selected.'] as JSON);
 			return;
 		}
 
 		def user = springSecurityService.currentUser;
 		if(user) {
-			userGroupInstance.addMember(user);
-			render ([success:true, 'msg':'Congratulations. You are now part of us!!! We look forward for your contribution.']as JSON);
-			return;
+			if(userGroupInstance.isMember(user)) {
+				render ([success:true, 'statusComplete':false, 'msg':'Already a member.']as JSON);
+			} else {
+				if(userGroupInstance.addMember(user)) {
+					render ([success:true, 'statusComplete':true, 'msg':'Congratulations. You are now part of us!!! We look forward for your contribution.']as JSON);
+					return;
+				}
+			}
 		}
-		render ([success:false, 'msg':'We are extremely sorry as we are not able to process your request now. Please try again.']as JSON);
+		render ([success:true, 'statusComplete':false, 'msg':'We are extremely sorry as we are not able to process your request now. Please try again.']as JSON);
 	}
 
 	@Secured(['ROLE_USER'])
@@ -428,7 +433,7 @@ class UserGroupController {
 		if(members) {
 			def userGroupInstance = findInstance()
 			if (!userGroupInstance) {
-				render (['success':false, 'msg':'No userGroup selected.'] as JSON);
+				render (['success':true, 'statusComplete':false, 'msg':'No userGroup selected.'] as JSON);
 				return;
 			}
 
@@ -440,10 +445,10 @@ class UserGroupController {
 
 				msg += " as other "+alreadyMembersCount+" member(s) were already found to be members of this group."
 			}
-			render (['success':true, 'msg':msg] as JSON)
+			render (['success':true, 'statusComplete':true, 'msg':msg] as JSON)
 			return
 		}
-		render (['success':false, 'msg':'Please provide details of people you want to invite to join this group.'] as JSON)
+		render (['success':true, 'statusComplete':false, 'msg':'Please provide details of people you want to invite to join this group.'] as JSON)
 	}
 
 	@Secured(['ROLE_USER'])
@@ -452,7 +457,7 @@ class UserGroupController {
 		if(user) {
 			def userGroupInstance = findInstance()
 			if (!userGroupInstance) {
-				render (['success':false, 'msg':'No userGroup selected.'] as JSON);
+				render (['success':true, 'statusComplete':false, 'msg':'No userGroup selected.'] as JSON);
 				return;
 			}
 
@@ -466,10 +471,10 @@ class UserGroupController {
 				emailConfirmationService.sendConfirmation(founder.email,
 						"Please confirm users membership",  [founder:founder, user: user, userGroupInstance:userGroupInstance,domain:Utils.getDomainName(request), view:'/emailtemplates/requestMembership'], userToken.token);
 			}
-			render (['success':true, 'msg':'Sent request to all founders for confirmation.'] as JSON);
+			render (['success':true, 'statusComplete':true, 'msg':'Sent request to all founders for confirmation.'] as JSON);
 			return;
 		}
-		render (['success':false, 'msg':'Please login to request membership.'] as JSON);
+		render (['success':true,'statusComplete':false, 'msg':'Please login to request membership.'] as JSON);
 
 	}
 
@@ -523,16 +528,16 @@ class UserGroupController {
 	def leaveUs = {
 		def userGroupInstance = findInstance()
 		if (!userGroupInstance) {
-			render (['success':false, 'msg':'No userGroup selected.'] as JSON);
+			render (['success':true, 'statusComplete':false, 'msg':'No userGroup selected.'] as JSON);
 			return;
 		}
 
 		def user = springSecurityService.currentUser;
 		if(user && userGroupInstance.deleteMember(user)) {
-			render (['msg':'Thank you for being with us', 'success':true] as JSON);
+			render (['msg':'Thank you for being with us', 'success':true, 'statusComplete':true] as JSON);
 			return;
 		}
-		render (['msg':'Your presence is important to us. Cannot let you leave at present.','success':false]as JSON);
+		render (['msg':'Your presence is important to us. Cannot let you leave at present.','success':true, 'statusComplete':false]as JSON);
 	}
 
 	def aboutUs = {
@@ -739,6 +744,12 @@ class UserGroupController {
 			r.observations = observationService.createUrlList2(r.observations, '');
 		}
 		render r as JSON
+	}
+	
+	def actionsHeader = {
+		def userGroupInstance = findInstance()
+		if (!userGroupInstance) return;
+		render (template:"/common/userGroup/actionsHeaderTemplate", model:['userGroupInstance':userGroupInstance]);
 	}
 }
 
