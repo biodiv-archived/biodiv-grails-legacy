@@ -82,6 +82,10 @@ class UserGroupMemberRole implements Serializable {
 		true
 	}
 
+	static def removeAll(UserGroup userGroup) {
+		executeUpdate 'DELETE FROM UserGroupMemberRole WHERE userGroup=:userGroup', [userGroup:userGroup]
+	}
+	
 	static def removeAll(UserGroup userGroup, SUser sUser) {
 		executeUpdate 'DELETE FROM UserGroupMemberRole WHERE userGroup=:userGroup and sUser=:sUser', [userGroup:userGroup, sUser: sUser]
 	}

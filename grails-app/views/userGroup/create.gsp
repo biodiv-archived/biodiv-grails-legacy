@@ -343,7 +343,7 @@ max-width: 100%;
 						<div class="btn btn-danger"
 							style="float: right; margin-right: 5px;">
 							<a
-								href="${createLink(action:'deleted', id:userGroupInstance.id)}"
+								href="${createLink(action:'delete', id:userGroupInstance.id)}"
 								onclick="return confirm('${message(code: 'default.userGroup.delete.confirm.message', default: 'This group and its content will be deleted. Are you sure ?')}');">Delete
 								Group </a>
 						</div>

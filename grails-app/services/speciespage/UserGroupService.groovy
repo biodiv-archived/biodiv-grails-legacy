@@ -137,9 +137,11 @@ class UserGroupService {
 	@Transactional
 	@PreAuthorize("hasPermission(#userGroup, delete) or hasPermission(#userGroup, admin)")
 	void delete(UserGroup userGroup) {
+		aclUtilService.deleteAcl userGroup
+		UserGroupMemberRole.removeAll(userGroup)
 		userGroup.delete()
 		// Delete the ACL information as well
-		aclUtilService.deleteAcl userGroup
+		
 	}
 
 	@PreAuthorize("hasPermission(#userGroup, admin)")

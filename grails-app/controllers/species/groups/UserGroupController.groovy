@@ -31,7 +31,7 @@ class UserGroupController {
 	def observationService;
 	def emailConfirmationService;
 
-	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
+	static allowedMethods = [save: "POST", update: "POST",]
 
 	def index = {
 		redirect(action: "list", params: params)
@@ -263,16 +263,18 @@ class UserGroupController {
 				userGroupService.delete(userGroupInstance)
 				flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'userGroup.label', default: 'UserGroup'), params.id])}"
 				redirect(action: "list")
+				return
 			}
 			catch (org.springframework.dao.DataIntegrityViolationException e) {
 				flash.message = "${message(code: 'default.not.deleted.message', args: [message(code: 'userGroup.label', default: 'UserGroup'), params.id])}"
 				redirect(action: "show", id: params.id)
+				return;
 			}
 		}
-		else {
-			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'userGroup.label', default: 'UserGroup'), params.id])}"
-			redirect(action: "list")
-		}
+		
+		flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'userGroup.label', default: 'UserGroup'), params.id])}"
+		redirect(action: "list")
+		
 	}
 
 	private UserGroup findInstance() {
