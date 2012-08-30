@@ -74,7 +74,7 @@ class UserGroupService {
 			userGroup.setTags(tags);
 			
 			List founders = Utils.getUsersList(params.founderUserIds);
-			setUserGroupFounders(userGroup, founders, params.domain);
+			setUserGroupFounders(userGroup, founders, params.founderMsg, params.domain);
 			params.founders = founders;
 		}
 	}
@@ -494,7 +494,7 @@ class UserGroupService {
 	//////////////////User & MAIL RELATED////////////////////
 
 	@PreAuthorize("hasPermission(#userGroupInstance, write) or hasPermission(#userGroup, admin)")
-	def setUserGroupFounders(userGroupInstance, founders, domain) {
+	def setUserGroupFounders(userGroupInstance, founders, foundersMsg, domain) {
 		founders.add(springSecurityService.currentUser);
 		def founderRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_FOUNDER.value())
 		def groupFounders = UserGroupMemberRole.findAllByUserGroupAndRole(userGroupInstance, founderRole).collect {it.sUser};
@@ -502,7 +502,7 @@ class UserGroupService {
 		groupFounders.removeAll(commons);
 		founders.removeAll(commons);
 
-		sendFounderInvitation(userGroupInstance, founders, domain);
+		sendFounderInvitation(userGroupInstance, founders, foundersMsg, domain);
 
 		if(groupFounders) {
 			groupFounders.each { founder ->
@@ -515,7 +515,7 @@ class UserGroupService {
 	}
 
 	@PreAuthorize("hasPermission(#userGroupInstance, write) or hasPermission(#userGroup, admin)")
-	void sendFounderInvitation(userGroupInstance, founders, domain) {
+	void sendFounderInvitation(userGroupInstance, founders, foundersMsg, domain) {
 
 		log.debug "Sending invitation to ${founders}"
 
@@ -528,7 +528,7 @@ class UserGroupService {
 				def userToken = new UserToken(username: founder."$usernameFieldName", controller:'userGroup', action:'confirmMembershipRequest', params:['userGroupInstanceId':userGroupInstance.id.toString(), 'userId':founder.id.toString(), 'role':UserGroupMemberRoleType.ROLE_USERGROUP_FOUNDER.value()]);
 				userToken.save(flush: true)
 				emailConfirmationService.sendConfirmation(founder.email,
-						"Invitation to join as founder for group",  [founder:founder, fromUser:springSecurityService.currentUser, userGroupInstance:userGroupInstance,domain:domain, view:'/emailtemplates/founderInvitation'], userToken.token);
+						"Invitation to join as founder for group",  [founder:founder, fromUser:springSecurityService.currentUser, foundersMsg:foundersMsg, userGroupInstance:userGroupInstance,domain:domain, view:'/emailtemplates/founderInvitation'], userToken.token);
 			}
 		}
 	}

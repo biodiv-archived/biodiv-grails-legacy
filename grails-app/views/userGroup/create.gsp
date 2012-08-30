@@ -65,10 +65,6 @@
 	margin-left: 100px;
 }
 
-.control-group.error  .help-inline {
-	padding-top: 15px
-}
-
 .cke_skin_kama .cke_editor {
 	display: table !important;
 }
@@ -80,7 +76,11 @@ input.dms_field {
 
 .userOrEmail-list {
 	clear:none;
-	width: 300px;
+}
+#cke_description {
+width: 100%;
+min-width: 100%;
+max-width: 100%;
 }
 </style>
 
@@ -127,7 +127,7 @@ input.dms_field {
 			<form id="${form_id}" action="${form_action}" method="POST"
 				class="form-horizontal">
 				<div class="span12 super-section" style="clear: both;">
-					<div class="span11 section"
+					<div class="section"
 						style="position: relative; overflow: visible;">
 						<h3>What will this group be called?</h3>
 						<div
@@ -154,10 +154,7 @@ input.dms_field {
 							>
 							<!--label for="notes"><g:message code="observation.notes.label" default="Notes" /></label-->
 							
-								<label for="description" class="control-label">Description <small><g:message
-											code="userGroup.description.message" default="" />
-								</small>
-								</label>
+								<label for="description" class="control-label">Description</label>
 							<div class="controls  textbox">
 								
 								<ckeditor:config var="toolbar_editorToolbar">
@@ -165,7 +162,7 @@ input.dms_field {
 	    									[ 'Bold', 'Italic' ]
 										]
 										</ckeditor:config>
-								<ckeditor:editor name="description" height="100px"
+								<ckeditor:editor name="description" height="200px"
 									toolbar="editorToolbar">
 									${userGroupInstance?.description}
 								</ckeditor:editor>
@@ -199,31 +196,33 @@ input.dms_field {
 						</div-->
 
 						<div
-							class="row control-group left-indent ${hasErrors(bean: userGroupInstance, field: 'webaddress', 'error')}">
+							class="row control-group left-indent ${hasErrors(bean: userGroupInstance, field: 'icon', 'error')}">
 							<label for="icon" class="control-label"><g:message
 									code="userGroup.icon.label" default="Icon" /> </label>
 							<div class="controls">
 								<div id="groups_div" class="btn-group" style="z-index: 3;">
-
-
-									<div>
-										<i class="icon-picture"></i><span>Upload group icon preferably of dimensions 150px X 50px and size < 50KB</span>
 										<div
 											class="resources control-group ${hasErrors(bean: userGroupInstance, field: 'icon', 'error')}">
 
 											<%def thumbnail = userGroupInstance.icon%>
-											<div class='span3' style="height:80px; width:auto;margin-left: 0px;">
-												<img id="thumbnail"
-													src='${createLink(url: userGroupInstance.mainImage().fileName)}' class='logo'/>
-												<a id="change_picture" onclick="$('#attachFile').select()[0].click();return false;"> Change Picture</a>
+											<div class='pull-left' style="height:80px; width:auto;margin-left: 0px;">
+												<a id="change_picture" onclick="$('#attachFile').select()[0].click();return false;" style="postiion:relative;">
+													<img id="thumbnail"
+													src='${createLink(url: userGroupInstance.mainImage().fileName)}' class='logo '/>
+													<i class="icon-picture"></i><span>Upload group icon preferably of dimensions 150px X 50px and size < 50KB</span>
+												</a>
+												
 											</div>
 											<input id="icon" name="icon" type="hidden" value='${thumbnail}' />
-											<div id="image-resources-msg" class="help-inline">
-												<g:renderErrors bean="${userGroupInstance}" as="list"
-													field="icon" />
+											
+											<div class="help-inline">
+												<g:hasErrors bean="${userGroupInstance}" field="icon">
+													<g:message code="userGroup.icon.invalid" />
+												</g:hasErrors>
 											</div>
+											
 										</div>
-									</div>
+									
 								</div>
 							</div>
 						</div>
@@ -232,7 +231,7 @@ input.dms_field {
 				</div>
 
 				<div class="span12 super-section" style="clear: both;">
-					<div class="span11 section"
+					<div class="section"
 						style="position: relative; overflow: visible;">
 						<h3>Driven By</h3>
 						<div
@@ -242,6 +241,7 @@ input.dms_field {
 							<div class="controls  textbox">
 								<sUser:selectUsers model="['id':founders_autofillUsersId]" />
 								<input type="hidden" name="founderUserIds" id="founderUserIds" />
+								<textarea name="founderMsg" rows="3" style="max-width:100%;min-width:100%;" placeholder="Place your message here" >You are invited to be a founder for the group. Please click on the link to accept being a founder for this group</textarea>
 								
 							</div>
 						</div>
@@ -304,7 +304,7 @@ input.dms_field {
 				</div>
 
 				<div class="span12 super-section" style="clear: both;">
-					<div class="span11 section"
+					<div class="section"
 						style="position: relative; overflow: visible;">
 						<h3>Permissions</h3>
 						<div class="row control-group left-indent">
@@ -312,28 +312,28 @@ input.dms_field {
 								<label class="checkbox" style="text-align: left;"> 
 								 <g:checkBox style="margin-left:0px;"
 												name="allowUsersToJoin" checked="${userGroupInstance.allowUsersToJoin}"/>
-								 <g:message code="userGroup.permissions.members.joining" default="Can users join with out invitation? (If no, registered users will be able to request for invitation from group's home page)" /> </label>
+								 <g:message code="userGroup.permissions.members.joining" default="Can users join the Group without invitation?" /> </label>
 						</div>
 						<div class="row control-group left-indent">
 							
 								<label class="checkbox" style="text-align: left;"> 
 								 <g:checkBox style="margin-left:0px;"
 												name="allowObvCrossPosting" checked="${userGroupInstance.allowObvCrossPosting}"/>
-								 <g:message code="userGroup.permissions.observations.crossposting" default="Allow Observations Cross Posting" /> </label>
+								 <g:message code="userGroup.permissions.observations.crossposting" default="Can members cross post Observations to other Groups as well?" /> </label>
 						</div>
 						<div class="row control-group left-indent">
 							
 								<label class="checkbox" style="text-align: left;"> 
 								 <g:checkBox style="margin-left:0px;"
 												name="allowMembersToMakeSpeciesCall" checked="${userGroupInstance.allowMembersToMakeSpeciesCall}"/>
-								 <g:message code="userGroup.permissions.observations.allowMembersToMakeSpeciesCall" default="Allow members to make species calls and agree upon existing species calls" /> </label>
+								 <g:message code="userGroup.permissions.observations.allowMembersToMakeSpeciesCall" default="Can members make species call on Observations?" /> </label>
 						</div>
 						<div class="row control-group left-indent">
 							
 								<label class="checkbox" style="text-align: left;"> 
 								 <g:checkBox style="margin-left:0px;"
 												name="allowNonMembersToComment" checked="${userGroupInstance.allowNonMembersToComment}"/>
-								 <g:message code="userGroup.permissions.comments.bynonmembers" default="Allow non members to comment???" /> </label>
+								 <g:message code="userGroup.permissions.comments.bynonmembers" default="Can non-members comment on Observations of the Group? " /> </label>
 						</div>
 					</div>
 				</div>
