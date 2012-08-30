@@ -91,7 +91,7 @@
 							<%
 								def canPostComment = customsecurity.hasPermissionAsPerGroups([object:userGroupInstance, permission:org.springframework.security.acls.domain.BasePermission.WRITE]).toBoolean()
 							%>
-							<comment:showAllComments model="['commentHolder':observationInstance, commentType:'super', 'canPostComment':canPostComment]" />
+							<comment:showAllComments model="['commentHolder':userGroupInstance, commentType:'super', 'canPostComment':canPostComment]" />
 <%--								--%>
 <%--								<sec:permitted object='${userGroupInstance}'--%>
 <%--										permission='${org.springframework.security.acls.domain.BasePermission.WRITE}'>--%>
