@@ -67,7 +67,7 @@ class UserGroupService {
 
 		userGroup.icon = getUserGroupIcon(params.icon);
 		addInterestedSpeciesGroups(userGroup, params.speciesGroup)
-		addInterestedHabitats(userGroup, params.habitats)
+		addInterestedHabitats(userGroup, params.habitat)
 
 		if(!userGroup.hasErrors() && userGroup.save()) {
 			def tags = (params.tags != null) ? params.tags.values() as List : new ArrayList();

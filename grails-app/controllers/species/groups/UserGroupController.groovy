@@ -464,6 +464,11 @@ class UserGroupController {
 				return;
 			}
 
+			if(userGroupInstance.isMember(user)) {
+				render (['success':true, 'statusComplete':false, 'msg':'Already a member.'] as JSON);
+				return;
+			}
+			
 			String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
 			def founders = userGroupInstance.getFounders(userGroupInstance.getFoundersCount(), 0);
 
