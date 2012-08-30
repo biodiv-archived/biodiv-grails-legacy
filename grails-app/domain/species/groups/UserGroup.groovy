@@ -185,7 +185,7 @@ class UserGroup implements Taggable {
 	boolean addMember(SUser member) {
 		if(member) {
 			def memberRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value())
-			return userGroupService.addMember(this, member, memberRole, BasePermission.WRITE, false);
+			return userGroupService.addMember(this, member, memberRole, BasePermission.WRITE);
 		}
 		return false;
 	}
