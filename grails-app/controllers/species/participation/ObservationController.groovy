@@ -212,8 +212,11 @@ class ObservationController {
 					if(params.groupsWithSharingNotAllowed) {
 						setUserGroups(observationInstance, [params.groupsWithSharingNotAllowed]);
 					} else {
-						def userGroups = (params.userGroup != null) ? params.userGroup.collect{k,v->v} : new ArrayList();
-						setUserGroups(observationInstance, userGroups);
+						if(params.userGroupsList) {
+							def userGroups = (params.userGroupsList != null) ? params.userGroupsList.split(',').collect{k->k} : new ArrayList();
+							println userGroups
+							setUserGroups(observationInstance, userGroups);
+						}						
 					}
 					//redirect(action: "show", id: observationInstance.id)
 					params["createNew"] = true

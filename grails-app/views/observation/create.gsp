@@ -782,24 +782,20 @@ input.dms_field {
 				$('#addObservation').append($(input));	
         	})
         	
-        	//chck usergroups compatibility
-	       	var groupsWithSharingNotAllowed = $("#groupsWithSharingNotAllowed input[name='groupsWithSharingNotAllowed']:checked").val()
-	       	var groupsWithSharingAllowed = $("input[name^='userGroup']:checked:enabled",'#groupsWithSharingAllowed');
-	       	
-	       	if(groupsWithSharingNotAllowed) {
-	       		if(groupsWithSharingAllowed.length != 0) {
-	       			var msg = "Sorry, usergroup "+$("#groupsWithSharingNotAllowed input[name='groupsWithSharingNotAllowed']:checked").parent().text()+" doesn't allow its observations to be shared. Please choose only this group or any other groups which allow sharing";
-	       			$("#userGroupSelectionModal .modal-body").html(msg);
-	       			$("#userGroupSelectionModal").modal().show();
-	       			return false;
-	       		}
-	       	}
-	       	
+        	console.log(getSelectedUserGroups());
+			$("#userGroupsList").val(getSelectedUserGroups());	       	
         	$("#addObservation").submit();        	
         	return false;
         
 		});
 		
+		function getSelectedUserGroups() {
+		    var userGroups = []; 
+		    $('.userGroups button[class~="active"]').each (function() {
+	            userGroups.push($(this).attr('value'));
+		    });
+		    return userGroups;	
+		}
 		$('input:radio[name=groupsWithSharingNotAllowed]').click(function() {
 		    var previousValue = $(this).attr('previousValue');
     
