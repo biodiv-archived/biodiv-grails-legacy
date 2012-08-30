@@ -152,7 +152,8 @@ $(document).ready(function(){
             	if(data.success) {
             		$("#joinUs").html("Joined").removeClass("btn-success").addClass("disabled");
             		$(".alertMsg").removeClass('alert-error').addClass('alert-success').html(data.msg);
-            		reloadMembers();
+            		//reloadMembers();
+            		document.location.reload(true)
             	} else {
             		$("#requestMembership").html("Error sending request").removeClass("btn-success").addClass("disabled");
             		$(".alertMsg").removeClass('alert alert-success').addClass('alert alert-error').html(data.msg);
@@ -204,7 +205,8 @@ $(document).ready(function(){
             	if(data.success) {
             		$("#leaveUs").html("Thank You").removeClass("btn-info").addClass("disabled");
             		$(".alertMsg").removeClass('alert alert-error').addClass('alert alert-success').html(data.msg);
-            		reloadMembers();
+            		//reloadMembers();
+            		document.location.reload(true)
             	} else {
             		$("#leaveUs").html("Couldn't Leave").removeClass("btn-success").addClass("disabled");
             		$(".alertMsg").removeClass('alert alert-success').addClass('alert alert-error').html(data.msg);
