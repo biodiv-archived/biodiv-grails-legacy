@@ -22,6 +22,10 @@ class CustomSecurityAclTagLib extends SecurityAclTagLib {
 		}
 	}
 
+	def hasPermissionForAction = {attrs ->
+		out << hasPermission(attrs, 'permitted');
+	}
+	
 	def hasPermissionAsPerGroups = {attrs ->
 		out << hasPermissionAsPerGroup(attrs, 'permitted');
 	}

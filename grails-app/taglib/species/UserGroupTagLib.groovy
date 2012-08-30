@@ -5,8 +5,10 @@ import org.springframework.security.acls.domain.PrincipalSid;
 import org.springframework.security.acls.model.Sid;
 import org.springframework.security.core.Authentication;
 
+import species.auth.Role;
 import species.groups.UserGroup;
 import species.groups.UserGroupMemberRole;
+import species.groups.UserGroupMemberRole.UserGroupMemberRoleType;
 
 class UserGroupTagLib {
 	static namespace = "uGroup";
@@ -249,4 +251,32 @@ class UserGroupTagLib {
 		def noOfGroups = userGroupService.getNoOfUserUserGroups(attrs.model.user);
 		out << noOfGroups
 	}
+	
+	def showUserUserGroups  = {attrs, body->
+		def userInstance = attrs.model?.userInstance;
+		def result = userGroupService.getUserUserGroups(userInstance, -1, -1);
+		
+		def founderRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_FOUNDER.value())
+		def memberRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value())
+		
+		result.each {
+			switch(it.key.id) {
+				case founderRole.id :
+					out << render(template:"/common/userGroup/showUserGroupsTemplate", model:['title':'Founded', 'userGroupInstanceList':it.value.collect{it.userGroup}]);
+					break;
+				case memberRole.id :
+					out << render(template:"/common/userGroup/showUserGroupsTemplate", model:['title':'Member of', 'userGroupInstanceList':it.value.collect{it.userGroup}]);
+					break;
+				default :
+					log.error it
+			}
+		}
+		
+		
+	}
+	
+	def showActionsHeaderTemplate = {attrs, body ->
+		out<<render(template:"/common/userGroup/actionsHeaderTemplate", model:attrs.model);
+	}
+	
 }

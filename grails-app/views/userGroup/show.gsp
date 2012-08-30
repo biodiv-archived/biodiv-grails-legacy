@@ -75,7 +75,7 @@
 					<div class="super-section userGroup-section">
 						<div class="section">
 							<h5>Activity Stream</h5>
-							<div id="map_view_bttn" class="btn-group">
+							<!-- div id="map_view_bttn" class="btn-group">
 								<a class="btn btn-success dropdown-toggle"
 									data-toggle="dropdown" href="#"
 									onclick="$(this).parent().css('background-color', '#9acc57'); showMapView(); return false;">
@@ -84,12 +84,12 @@
 							<div id="observations_list_map" class="observation"
 								style="clear: both; display: none;">
 								<uGroup:showActivityOnMap model="['userGroupInstance':userGroupInstance]"/>
-							</div>
+							</div-->
 							
 							<div style="clear: both;">
 							
 							<%
-								def canPostComment = customsecurity.hasPermissionAsPerGroups([object:userGroupInstance, permission:org.springframework.security.acls.domain.BasePermission.WRITE]).toBoolean()
+								def canPostComment = customsecurity.hasPermissionForAction([object:userGroupInstance, permission:org.springframework.security.acls.domain.BasePermission.WRITE]).toBoolean()
 							%>
 							<comment:showAllComments model="['commentHolder':userGroupInstance, commentType:'super', 'canPostComment':canPostComment]" />
 <%--								--%>

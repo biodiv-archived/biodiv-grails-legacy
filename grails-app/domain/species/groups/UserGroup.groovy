@@ -185,9 +185,9 @@ class UserGroup implements Taggable {
 	boolean addMember(SUser member) {
 		if(member) {
 			def memberRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value())
-			userGroupService.addMember(this, member, memberRole, BasePermission.WRITE);
-			true;
+			return userGroupService.addMember(this, member, memberRole, BasePermission.WRITE);
 		}
+		return false;
 	}
 
 	boolean deleteMember(SUser member) {
@@ -241,9 +241,11 @@ class UserGroup implements Taggable {
 
 	boolean isMember(SUser user) {
 		if(!user) user = springSecurityService.currentUser;
-		def role = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value());
-		if(UserGroupMemberRole.find("from UserGroupMemberRole umr where umr.userGroup=:userGroup and umr.sUser=:sUser and umr.role=:role", [sUser:user, userGroup:this, role:role]))
-			return true;
+		def role = getRole(user);
+		if(role) return true;
+//		def role = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value());
+//		if(UserGroupMemberRole.find("from UserGroupMemberRole umr where umr.userGroup=:userGroup and umr.sUser=:sUser and umr.role=:role", [sUser:user, userGroup:this, role:role]))
+//			return true;
 		return false
 	}
 
