@@ -8,7 +8,7 @@ def otherUsergroups =  userGroups[true] %>
 		Share with either of these groups
 		<g:each in="${exclusiveUsergroups}" var="userGroup" status="i">
 
-			<li><%
+			<li class="thumbnail"><%
 		boolean checked = userGroup.value;
 		if(params.userGroup) {
 			if(params.userGroup instanceof String) {
@@ -19,6 +19,7 @@ def otherUsergroups =  userGroups[true] %>
 		}
 	 %> <label class="radio"><input type="radio" style="margin-left: 0px;" name="groupsWithSharingNotAllowed"
 					value="${userGroup.key.id}" ${checked?'checked':''} />  ${userGroup.key.name}
+					<!-- img class="logo" src="${userGroup.key.icon().fileName}" title="${userGroup.key.name}" alt="${userGroup.key.name}"-->
 			</label>
 		</g:each>
 	</div>

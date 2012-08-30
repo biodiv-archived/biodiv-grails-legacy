@@ -299,7 +299,7 @@ class UserGroupController {
 		} else {
 			allMembers = userGroupInstance.getAllMembers(params.max, params.offset);
 		}
-		if(params.isAjaxLoad) {
+		if(params.isAjaxLoad?.toBoolean()) {
 			def membersJSON = []
 			for(m in allMembers) {
 				membersJSON << ['id':m.id, 'name':m.name, 'icon':m.icon()]
@@ -319,7 +319,7 @@ class UserGroupController {
 
 		def founders = userGroupInstance.getFounders(params.max, params.offset);
 
-		if(params.isAjaxLoad) {
+		if(params.isAjaxLoad?.toBoolean()) {
 			def foundersJSON = []
 			for(m in founders) {
 				foundersJSON << ['id':m.id, 'name':m.name, 'icon':m.icon()]
