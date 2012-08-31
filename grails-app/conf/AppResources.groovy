@@ -163,6 +163,7 @@ modules = {
 
 		resource url:'/js/jsrender.js'
 		resource url:'/js/species/observations/show.js'
+		resource url:'/js/species/userGroups/main.js'
 	}
 
 	userGroups_create {
@@ -173,7 +174,7 @@ modules = {
 		dependsOn 'observations, location_utils, list_utils'
 		 
 		resource url:'/js/species/observations/list.js'
-		
+		resource url:'/js/species/userGroups/main.js'		
 	}
 
 	comment{

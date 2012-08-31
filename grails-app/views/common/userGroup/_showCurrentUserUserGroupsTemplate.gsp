@@ -10,7 +10,7 @@ def otherUsergroups =  userGroups[true] %>
 		<ul class="thumbnails" style="clear:both;">
 			<g:each in="${exclusiveUsergroups}" var="userGroup" status="i">
 
-				<li class="thumbnail">
+				<li>
 					<%
 		boolean checked = userGroup.value;
 		if(params.userGroup) {

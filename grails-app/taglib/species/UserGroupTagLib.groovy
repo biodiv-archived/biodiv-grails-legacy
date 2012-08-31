@@ -278,5 +278,17 @@ class UserGroupTagLib {
 	def showActionsHeaderTemplate = {attrs, body ->
 		out<<render(template:"/common/userGroup/actionsHeaderTemplate", model:attrs.model);
 	}
+
+	def joinLeaveGroupTemplate = {attrs, body ->
+		out<<render(template:"/common/userGroup/joinLeaveGroupTemplate", model:attrs.model);
+	}
 	
+	def interestedSpeciesGroups = {attrs, body ->
+		out<<render(template:"/common/userGroup/interestedSpeciesGroupsTemplate", model:attrs.model);
+	}
+	
+	def interestedHabitats = {attrs, body ->
+		out<<render(template:"/common/userGroup/interestedHabitatsTemplate", model:attrs.model);
+	}
+
 }

@@ -56,8 +56,7 @@
 
 
 				</div>
-				<obv:identificationByEmail
-					model="['source':'userGroupList', 'requestObject':request]" />
+				
 				
 			</div>
 

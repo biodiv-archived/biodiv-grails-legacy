@@ -1,0 +1,19 @@
+<uGroup:isNotAMember model="['userGroupInstance':userGroupInstance]">
+
+	<g:if test="${userGroupInstance.allowUsersToJoin}">
+		<a class="btn btn-large btn-success joinUs"
+			data-group-id="${userGroupInstance.id }"> <i class="icon-plus"></i>
+			Join Us</a>
+	</g:if>
+	<g:else>
+		<a class="btn btn-large btn-success requestMembership"
+			data-group-id="${userGroupInstance.id }"> <i class="icon-plus"></i>
+			Request Membership</a>
+	</g:else>
+
+
+</uGroup:isNotAMember>
+<uGroup:isAMember model="['userGroupInstance':userGroupInstance]">
+	<a class="btn btn-large btn-primary leaveUs" data-group-id="${userGroupInstance.id }"><i
+		class="icon-minus"></i>Leave</a>
+</uGroup:isAMember>

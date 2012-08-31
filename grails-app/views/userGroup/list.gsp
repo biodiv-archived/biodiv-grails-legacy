@@ -19,11 +19,9 @@
 					</h1>
 				</div>
 
-				<g:if test="${flash.message}">
-					<div class="message alert alert-info">
-						${flash.message}
-					</div>
-				</g:if>
+				<div class="alertMsg ${(flash.message)?'alert':'' }" style="clear:both;">
+					${flash.message}
+				</div>
 
 				<uGroup:showUserGroupsListWrapper  model="['totalUserGroupInstanceList':totalUserGroupInstanceList, 'userGroupInstanceList':UserGroupInstanceList, 'userGroupInstanceTotal':userGroupInstanceTotal, 'queryParams':queryParams, 'activeFilters':activeFilters]" />
 

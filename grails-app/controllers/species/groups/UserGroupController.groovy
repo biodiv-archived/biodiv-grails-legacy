@@ -420,8 +420,8 @@ class UserGroupController {
 				render ([success:true, 'statusComplete':false, 'msg':'Already a member.']as JSON);
 			} else {
 				if(userGroupInstance.addMember(user)) {
-					flash.message = 'Congratulations. You are now part of us!!! We look forward for your contribution.';
-					render ([success:true, 'statusComplete':true, 'msg':'Congratulations. You are now part of us!!! We look forward for your contribution.']as JSON);
+					flash.message = "You have joined ${userGroupInstance} group. We look forward for your contribution.";
+					render ([success:true, 'statusComplete':true, 'msg':"You have joined ${userGroupInstance} group. We look forward for your contribution."]as JSON);
 					return;
 				}
 			}

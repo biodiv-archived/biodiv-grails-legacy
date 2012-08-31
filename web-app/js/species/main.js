@@ -26,7 +26,7 @@ function handleError(xhr, textStatus, errorThrown, successHandler, errorHandler)
 		if (errorHandler)
 			errorHandler();
 		else
-			alert(errorThrown);
+			console.log(errorThrown);
 	}
 }
 

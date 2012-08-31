@@ -47,40 +47,22 @@
 				</div>
 			</div>
 
-
-
-			<uGroup:isNotAMember model="['userGroupInstance':userGroupInstance]">
-
-				<g:if test="${userGroupInstance.allowUsersToJoin}">
-					<a class="btn btn-large btn-success" id="joinUs"> <i
-						class="icon-plus"></i> Join Us</a>
-				</g:if>
-				<g:else>
-					<a class="btn btn-large btn-success" id="requestMembership"> <i
-						class="icon-plus"></i> Request Membership</a>
-				</g:else>
-
-
-			</uGroup:isNotAMember>
-			<uGroup:isAMember model="['userGroupInstance':userGroupInstance]">
-				<a class="btn btn-large btn-primary" id="leaveUs"><i
-					class="icon-minus"></i>Leave this group</a>
-				<div class="modal hide" id="leaveUsModalDialog">
-					<div class="modal-header">
-						<button type="button" class="close" data-dismiss="modal">×</button>
-						<h3>Do you want to leave this group???</h3>
-					</div>
-					<div class="modal-body">
-						<p>
-						We would like to know your feedback and any ideas on making this group a more interesting and a happening place.
-						We are thankful for your wonderful contribution to this group and would like to hear from you soon.</p>
-					</div>
-					<div class="modal-footer">
-						<a href="#" class="btn" data-dismiss="modal">Close</a> <a href="#"
-							id="leave" class="btn btn-primary">Leave</a>
-					</div>
+			<uGroup:joinLeaveGroupTemplate/>
+			<div class="modal hide" id="leaveUsModalDialog">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal">×</button>
+					<h3>Do you want to leave this group???</h3>
 				</div>
-			</uGroup:isAMember>
-
+				<div class="modal-body">
+					<p>We would like to know your feedback and any ideas on making
+						this group a more interesting and a happening place. We are thankful
+						for your wonderful contribution to this group and would like to hear
+						from you soon.</p>
+				</div>
+				<div class="modal-footer">
+					<a href="#" class="btn" data-dismiss="modal">Close</a> <a href="#"
+						id="leave" class="btn btn-primary" data-group-id="${userGroupInstance.id}">Leave</a>
+				</div>
+			</div>
 		</div>
 	</div>
