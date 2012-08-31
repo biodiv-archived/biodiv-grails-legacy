@@ -21,7 +21,7 @@ def otherUsergroups =  userGroups[true] %>
 			}
 		}
 	 %> <label class="radio">
-						<button type="button" class="btn ${checked?'active':''} single-post" value="${userGroup.key.id}">
+						<button type="button" class="btn ${checked?'active btn-success':''} single-post" value="${userGroup.key.id}">
 							<img class="logo" src="${userGroup.key.icon().fileName}"
 								title="${userGroup.key.name}" alt="${userGroup.key.name}" />
 						</button> </label>
@@ -50,7 +50,7 @@ or with any of these groups
 			}
 		}
 	 %> <label class="checkbox">
-					<button type="button" class="btn ${checked?'active':''} multi-post"  value="${userGroup.key.id}">
+					<button type="button" class="btn ${checked?'active btn-success':''} multi-post"  value="${userGroup.key.id}">
 						<img class="logo" src="${userGroup.key.icon().fileName}"
 							title="${userGroup.key.name}" alt="${userGroup.key.name}" />
 					</button> </label>
@@ -66,23 +66,23 @@ $(document).ready (function(){
 
 	$(".userGroups button").click(function(e){
 		if($(this).hasClass('active')) {
+			$(this).removeClass('btn-success');
 			if($(this).hasClass("single-post")) {
-				$("#groupsWithSharingAllowed button").removeClass('disabled')
+				$("#groupsWithSharingNotAllowed button.single-post").removeClass('disabled')
+				$("#groupsWithSharingAllowed button.multi-post").removeClass('disabled')
 			} else {
 				if($("#groupsWithSharingAllowed button.active").length == 0) {
-					$("#groupsWithSharingAllowed button").removeClass('disabled')
+					$("#groupsWithSharingAllowed button.multi-post").removeClass('disabled')
 				}
 			}
-			
 		} else {
 			if($(this).hasClass("single-post")) {
-				$("#groupsWithSharingAllowed button").addClass('disabled')
-				$("#groupsWithSharingAllowed input").prop('checked', false)
-				$("#groupsWithSharingNotAllowed button").addClass('disabled');
-				$(this).removeClass('disabled');
+				$("#groupsWithSharingAllowed button.multi-post").addClass('disabled').removeClass('active btn-success')
+				$("#groupsWithSharingNotAllowed button.single-post").addClass('disabled').removeClass('active btn-success');
+				$(this).removeClass('disabled').addClass('btn-success');
 			} else {
-				$("#groupsWithSharingNotAllowed button").addClass('disabled')
-				$("#groupsWithSharingNotAllowed input").prop('checked', false)
+				$("#groupsWithSharingNotAllowed button.single-post").addClass('disabled').removeClass('active btn-success')
+				$(this).removeClass('disabled').addClass('btn-success');
 			}
 		}
 		e.preventDefault();

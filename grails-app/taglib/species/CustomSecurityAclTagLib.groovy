@@ -14,6 +14,8 @@ class CustomSecurityAclTagLib extends SecurityAclTagLib {
 
 	static namespace = "customsecurity"
 
+	def grailsApplication;
+	
 	private ObjectIdentityGenerator objectIdentityGenerator = new ObjectIdentityRetrievalStrategyImpl();
 
 	def isPermittedAsPerGroups = { attrs, body ->
@@ -49,9 +51,7 @@ class CustomSecurityAclTagLib extends SecurityAclTagLib {
 			if (!id || !className) {
 				throwTagError "Tag [$tagName] requires either an object or a class name and id"
 			}
-			println "TODOOOOOOOOOOOOOOOOOOOO"
-			//TODO
-			//object = objectIdentityGenerator.createObjectIdentity(id, className);
+			object = grailsApplication.getClassForName(className).read(id.toLong());
 		}
 
 		if(object) {
@@ -111,9 +111,7 @@ class CustomSecurityAclTagLib extends SecurityAclTagLib {
 			if (!id || !className) {
 				throwTagError "Tag [$tagName] requires either an object or a class name and id"
 			}
-			println "TODOOOOOOOOOOOOOOOOOOOO"
-			//TODO
-			//object = objectIdentityGenerator.createObjectIdentity(id, className);
+			object = grailsApplication.getClassForName(className).read(id.toLong());
 		}
 
 		if(object) {

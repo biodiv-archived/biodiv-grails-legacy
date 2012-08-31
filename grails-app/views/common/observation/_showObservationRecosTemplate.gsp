@@ -1,3 +1,4 @@
+<%@page import="species.participation.Observation"%>
 <%@page import="species.utils.ImageType"%>
 <%@page import="species.participation.Recommendation"%>
 
@@ -7,7 +8,7 @@
 			<div>
 				<div class="users">
 					<div class="iAgree ">
-						<g:if test="${customsecurity.hasPermissionToMakeSpeciesCall([object:observationInstance,
+						<g:if test="${customsecurity.hasPermissionToMakeSpeciesCall([id:r.obvId, className:species.participation.Observation.class.getCanonicalName(),
 										permission:org.springframework.security.acls.domain.BasePermission.WRITE]).toBoolean()}">
 							<a href="#" class="btn btn-primary btn-small" onclick="addAgreeRecoVote(${r.obvId}, ${r.recoId}, ${r.noOfVotes}, $(this).closest('li'), '${createLink(controller:'observation', action:'addAgreeRecommendationVote')}'); return false;">Agree</a>
 						</g:if><g:else>
