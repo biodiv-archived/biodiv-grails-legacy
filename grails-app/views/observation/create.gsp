@@ -549,6 +549,16 @@ input.dms_field {
 				</uGroup:isUserGroupMember>
 				
 				<div class="span12" style="margin-top: 20px; margin-bottom: 40px;">
+					
+					<g:if test="${observationInstance?.id}">
+						<a href="${createLink(action:'show', id:observationInstance.id)}" class="btn"
+							style="float: right; margin-right: 5px;"> Cancel </a>
+					</g:if>
+					<g:else>
+					<a href="${createLink(action:'list')}" class="btn"
+							style="float: right; margin-right: 5px;"> Cancel </a>
+					</g:else>
+					
 					<g:if test="${observationInstance?.id}">
 						<div class="btn btn-danger"
 							style="float: right; margin-right: 5px;">
@@ -558,8 +568,10 @@ input.dms_field {
 								Observation </a>
 						</div>
 					</g:if>
+					
 					<a id="addObservationSubmit" class="btn btn-primary"
 						style="float: right; margin-right: 5px;"> ${form_button_val} </a>
+					
 				</div>
 				
 				
@@ -782,7 +794,7 @@ input.dms_field {
 				$('#addObservation').append($(input));	
         	})
         	
-        	console.log(getSelectedUserGroups());
+        	
 			$("#userGroupsList").val(getSelectedUserGroups());	       	
         	$("#addObservation").submit();        	
         	return false;

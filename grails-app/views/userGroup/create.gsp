@@ -137,11 +137,13 @@ max-width: 100%;
 									code="userGroup.name.label" default="Group Name" /> </label>
 							<div class="controls textbox">
 								<div id="groups_div" class="btn-group" style="z-index: 3;">
-									<g:textField name="name" value="${userGroupInstance?.name}" />
+									<g:textField name="name" value="${userGroupInstance?.name}" placeholder="Enter a group name..."/>
 
 									<div class="help-inline">
 										<g:hasErrors bean="${userGroupInstance}" field="name">
-											<g:message code="userGroup.name.invalid" />
+											<g:eachError bean="${userGroupInstance}" field="name">
+    											<li><g:message error="${it}" /></li>
+											</g:eachError>
 										</g:hasErrors>
 									</div>
 								</div>
@@ -157,18 +159,19 @@ max-width: 100%;
 								<label for="description" class="control-label">Description</label>
 							<div class="controls  textbox">
 								
-								<ckeditor:config var="toolbar_editorToolbar">
-										[
-	    									[ 'Bold', 'Italic' ]
-										]
-										</ckeditor:config>
-								<ckeditor:editor name="description" height="200px"
-									toolbar="editorToolbar">
-									${userGroupInstance?.description}
-								</ckeditor:editor>
+								<textarea id="description" name="description" placeholder="Write a small description about your activities in this Group. This will appear on the Group's home page...">${userGroupInstance?.description}</textarea>
+								
+								<script type='text/javascript'>
+CKEDITOR.plugins.addExternal( 'confighelper', '${request.contextPath}/js/ckeditor/plugins/confighelper/' );
+
+var config = { extraPlugins: 'confighelper', toolbar:'EditorToolbar', toolbar_EditorToolbar:[[ 'Bold', 'Italic' ]]};
+CKEDITOR.replace('description', config);
+</script>
 								<div class="help-inline">
 									<g:hasErrors bean="${userGroupInstance}" field="description">
-										<g:message code="userGroup.description.invalid" />
+										<g:eachError bean="${userGroupInstance}" field="description">
+    											<li><g:message error="${it}" /></li>
+										</g:eachError>
 									</g:hasErrors>
 								</div>
 							</div>
@@ -188,7 +191,9 @@ max-width: 100%;
 
 									<div class="help-inline">
 										<g:hasErrors bean="${userGroupInstance}" field="webaddress">
-											<g:message code="userGroup.webaddress.invalid" />
+											<g:eachError bean="${userGroupInstance}" field="webaddress">
+    											<li><g:message error="${it}" /></li>
+											</g:eachError>
 										</g:hasErrors>
 									</div>
 								</div>
@@ -217,7 +222,9 @@ max-width: 100%;
 											
 											<div class="help-inline">
 												<g:hasErrors bean="${userGroupInstance}" field="icon">
-													<g:message code="userGroup.icon.invalid" />
+													<g:eachError bean="${userGroupInstance}" field="icon">
+    													<li><g:message error="${it}" /></li>
+													</g:eachError>
 												</g:hasErrors>
 											</div>
 											
@@ -339,6 +346,16 @@ max-width: 100%;
 				</div>
 
 				<div class="span12" style="margin-top: 20px; margin-bottom: 40px;">
+				
+					<g:if test="${userGroupInstance?.id}">
+						<a href="${createLink(action:'show', id:userGroupInstance.id)}" class="btn"
+							style="float: right; margin-right: 5px;"> Cancel </a>
+					</g:if>
+					<g:else>
+					<a href="${createLink(action:'list')}" class="btn"
+							style="float: right; margin-right: 5px;"> Cancel </a>
+					</g:else>
+					
 					<g:if test="${userGroupInstance?.id}">
 						<div class="btn btn-danger"
 							style="float: right; margin-right: 5px;">
