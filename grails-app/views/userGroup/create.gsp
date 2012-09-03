@@ -129,7 +129,7 @@ max-width: 100%;
 				<div class="span12 super-section" style="clear: both;">
 					<div class="section"
 						style="position: relative; overflow: visible;">
-						<h3>What will this group be called?</h3>
+						<h3>Groups</h3>
 						<div
 							class="row control-group left-indent ${hasErrors(bean: userGroupInstance, field: 'name', 'error')}">
 
@@ -162,11 +162,11 @@ max-width: 100%;
 								<textarea id="description" name="description" placeholder="Write a small description about your activities in this Group. This will appear on the Group's home page...">${userGroupInstance?.description}</textarea>
 								
 								<script type='text/javascript'>
-CKEDITOR.plugins.addExternal( 'confighelper', '${request.contextPath}/js/ckeditor/plugins/confighelper/' );
-
-var config = { extraPlugins: 'confighelper', toolbar:'EditorToolbar', toolbar_EditorToolbar:[[ 'Bold', 'Italic' ]]};
-CKEDITOR.replace('description', config);
-</script>
+									CKEDITOR.plugins.addExternal( 'confighelper', '${request.contextPath}/js/ckeditor/plugins/confighelper/' );
+									
+									var config = { extraPlugins: 'confighelper', toolbar:'EditorToolbar', toolbar_EditorToolbar:[[ 'Bold', 'Italic' ]]};
+									CKEDITOR.replace('description', config);
+								</script>
 								<div class="help-inline">
 									<g:hasErrors bean="${userGroupInstance}" field="description">
 										<g:eachError bean="${userGroupInstance}" field="description">
@@ -240,7 +240,7 @@ CKEDITOR.replace('description', config);
 				<div class="span12 super-section" style="clear: both;">
 					<div class="section"
 						style="position: relative; overflow: visible;">
-						<h3>Driven By</h3>
+						<h3>Founders</h3>
 						<div
 							class="row control-group left-indent ${hasErrors(bean: userGroupInstance, field: 'founders', 'error')}">
 							<label for="founders" class="control-label"><g:message
@@ -278,7 +278,7 @@ CKEDITOR.replace('description', config);
 				<div class="span12 super-section" style="clear: both;">
 					<div class="section"
 						style="position: relative; overflow: visible;">
-						<h3>Interested In</h3>
+						<h3>Interests</h3>
 						
 						<div class="row control-group left-indent">
 							
