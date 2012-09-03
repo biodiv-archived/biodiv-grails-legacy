@@ -525,13 +525,24 @@ class UserGroupService {
 		String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
 
 		founders.each { founder ->
-			if(founder.id == springSecurityService.currentUser.id) {
+			if(founder instanceof SUser && founder?.id == springSecurityService.currentUser.id) {
 				userGroupInstance.addFounder(founder);
 			} else {
-				def userToken = new UserToken(username: founder."$usernameFieldName", controller:'userGroup', action:'confirmMembershipRequest', params:['userGroupInstanceId':userGroupInstance.id.toString(), 'userId':founder.id.toString(), 'role':UserGroupMemberRoleType.ROLE_USERGROUP_FOUNDER.value()]);
+				String founderEmail, name, userId;
+				if(founder instanceof String) {
+					founderEmail = founder
+					name = founder.substring(0, founder.indexOf("@"));
+					userId = 'register'
+				} else {
+					founderEmail = founder.email;
+					name = founder."$usernameFieldName".capitalize()
+					userId = founder.id.toString()
+				}
+				
+				def userToken = new UserToken(username: name, controller:'userGroup', action:'confirmMembershipRequest', params:['userGroupInstanceId':userGroupInstance.id.toString(), 'userId':userId, 'role':UserGroupMemberRoleType.ROLE_USERGROUP_FOUNDER.value()]);
 				userToken.save(flush: true)
-				emailConfirmationService.sendConfirmation(founder.email,
-						"Invitation to join as founder for group",  [founder:founder, fromUser:springSecurityService.currentUser, foundersMsg:foundersMsg, userGroupInstance:userGroupInstance,domain:domain, view:'/emailtemplates/founderInvitation'], userToken.token);
+				emailConfirmationService.sendConfirmation(founderEmail,
+						"Invitation to join as founder for group",  [name:name, fromUser:springSecurityService.currentUser, foundersMsg:foundersMsg, userGroupInstance:userGroupInstance,domain:domain, view:'/emailtemplates/founderInvitation'], userToken.token);
 			}
 		}
 	}
@@ -548,10 +559,20 @@ class UserGroupService {
 
 		String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
 		members.each { member ->
-			def userToken = new UserToken(username: member."$usernameFieldName", controller:'userGroup', action:'confirmMembershipRequest', params:['userGroupInstanceId':userGroupInstance.id.toString(), 'userId':member.id.toString(), 'role':UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value()]);
+			String memberEmail, name, userId;
+			if(member instanceof String) {
+				memberEmail = member
+				name = member.substring(0, member.indexOf("@"));
+				userId = 'register'
+			} else {
+				memberEmail = member.email;
+				name = member."$usernameFieldName".capitalize()
+				userId = member.id.toString()
+			}
+			def userToken = new UserToken(username: name, controller:'userGroup', action:'confirmMembershipRequest', params:['userGroupInstanceId':userGroupInstance.id.toString(), 'userId':userId, 'role':UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value()]);
 			userToken.save(flush: true)
-			emailConfirmationService.sendConfirmation(member.email,
-					"Invitation to join as member in group",  [member:member, fromUser:springSecurityService.currentUser, userGroupInstance:userGroupInstance,domain:domain, view:'/emailtemplates/memberInvitation'], userToken.token);
+			emailConfirmationService.sendConfirmation(memberEmail,
+					"Invitation to join as member in group",  [name:name, fromUser:springSecurityService.currentUser, userGroupInstance:userGroupInstance,domain:domain, view:'/emailtemplates/memberInvitation'], userToken.token);
 		}
 	}
 }

@@ -13,6 +13,7 @@ import java.util.Map;
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.logging.LogFactory;
+import org.apache.commons.validator.EmailValidator;
 import org.codehaus.groovy.grails.validation.routines.UrlValidator
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
@@ -158,18 +159,28 @@ class Utils {
 
 	static List getUsersList(String userIdsAndEmailIds) {
 		List result = [];
+		def emailValidator = EmailValidator.getInstance()
 		userIdsAndEmailIds.trim().split(",").each{
 			String candidateEmail = it.trim();
 			if(candidateEmail) {
 				if(candidateEmail.isNumber()){
 					result.add(SUser.get(candidateEmail.toLong()));
-				} else{
-					result.add(SUser.findByEmail(candidateEmail.toLong()));
+				} else {
+					if(emailValidator.isValid(candidateEmail)) {
+						if(SUser.findByEmail(candidateEmail)){
+							log.debug "Found a user with the email address ${candidateEmail}"
+							result.add(SUser.findByEmail(candidateEmail));
+						} else {
+							result.add(candidateEmail);
+						}
+					} else {
+						log.error "Not a valid email address ${candidateEmail}"
+					}
 				}
 			}
 		}
 		return result;
 	}
-	
+
 }
 

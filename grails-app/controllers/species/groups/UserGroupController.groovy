@@ -497,10 +497,16 @@ class UserGroupController {
 	@Secured(['ROLE_USER', 'RUN_AS_ADMIN'])
 	def confirmMembershipRequest = {
 		log.debug params;
+		
 		if(params.userId && params.userGroupInstanceId) {
-			def user = SUser.read(params.userId.toLong())
+			def user;
+			if(params.userId == 'register') {
+				user = springSecurityService.currentUser
+			} else {
+				user = SUser.read(params.userId.toLong())
+			}
 			def userGroupInstance = UserGroup.read(params.userGroupInstanceId.toLong());
-			if(user && userGroupInstance && (params.userId.toLong() == springSecurityService.currentUser.id || userGroupInstance.isFounder())) {
+			if(user && userGroupInstance && (user.id.toLong() == springSecurityService.currentUser.id || userGroupInstance.isFounder())) {
 				switch(params.role) {
 					case UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value():
 						if(userGroupInstance.addMember(user)) {
