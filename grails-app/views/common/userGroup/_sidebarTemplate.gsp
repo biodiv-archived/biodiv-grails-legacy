@@ -48,6 +48,12 @@
 	
 	<div class="super-section">
 		<div class="section">
+                    <uGroup:showLocation model="['userGroupInstance':userGroupInstance]"/>
+		</div>
+	</div>
+
+	<div class="super-section">
+		<div class="section">
 			<uGroup:showAllTags
 				model="['tagFilterByProperty':'UserGroup' , 'tagFilterByPropertyValue':userGroupInstance, 'isAjaxLoad':true]" />
 		</div>

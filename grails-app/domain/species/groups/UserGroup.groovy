@@ -29,6 +29,10 @@ class UserGroup implements Taggable {
 	boolean allowNonMembersToComment=true;
 	boolean allowUsersToJoin=true;
 	boolean allowMembersToMakeSpeciesCall=true;
+        float sw_latitude;
+        float sw_longitude;
+        float ne_latitude;
+        float ne_longitude;
 
 	def grailsApplication;
 	def aclUtilService
@@ -47,6 +51,11 @@ class UserGroup implements Taggable {
 		allowObvCrossPosting nullable:false
 		allowNonMembersToComment nullable:false
 		allowUsersToJoin nullable:false
+                
+                sw_latitude nullable:false
+                sw_longitude nullable:false
+                ne_latitude nullable:false
+                ne_longitude nullable:false
 	}
 
 	static mapping = {

@@ -10,6 +10,7 @@
 <title>
 	${entityName}
 </title>
+<script src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>
 <r:require modules="userGroups_create" />
 <style>
 .btn-group.open .dropdown-menu {
@@ -226,9 +227,16 @@ max-width: 100%;
 								</div>
 							</div>
 						</div>
-
 					</div>
 				</div>
+
+				<div class="span12 super-section" style="clear: both;">
+					<div class="section"
+						style="position: relative; overflow: visible;">
+						<h3>Location</h3>
+                                                <uGroup:locationSelector/>
+                                        </div>
+                                </div>
 
 				<div class="span12 super-section" style="clear: both;">
 					<div class="section"
