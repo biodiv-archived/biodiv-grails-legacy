@@ -153,6 +153,14 @@ class UserGroupTagLib {
 	def showUserGroupFilterMessage = {attrs, body->
 		out << render(template:"/common/userGroup/showUserGroupFilterMsgTemplate", model:attrs.model);
 	}
+        
+        def showLocation = {attrs, body->
+		if(attrs.model.userGroupInstance) {
+			out << render(template:"/common/userGroup/showUserGroupLocationTemplate", model:attrs.model);
+		}
+	}
+
+
 
 	////////////////////////////////////////////////////////////////////////////////////////////
 	///////////////////////////////  Tag List added by specific User ///////////////////////////
@@ -291,4 +299,7 @@ class UserGroupTagLib {
 		out<<render(template:"/common/userGroup/interestedHabitatsTemplate", model:attrs.model);
 	}
 
+        def locationSelector = {attrs, body ->
+		out<<render(template:"/common/userGroup/locationSelectorTemplate", model:attrs.model);
+        }
 }

@@ -2,54 +2,48 @@
 <%@ page import="species.groups.SpeciesGroup"%>
 <%@ page import="species.Habitat"%>
 
-<div class="sidebar left-sidebar" style="margin:0px;width:250px; float:left;">
+<div class="sidebar left-sidebar"
+	style="margin: 0px; width: 250px; float: left;">
 
 	<div class="super-section">
 		<h3>Home</h3>
 		<div class="section">
-				<i class="icon-home"></i>
-				Activity 	
-			
+			<i class="icon-home"></i> Activity
+
 		</div>
 		<div class="section">
-				<i class="icon-envelope"></i>
-				Notifications			
+			<i class="icon-envelope"></i> Notifications
 		</div>
 		<div class="section">
-				<i class="icon-user"></i>
-				<a href="<sUser:renderProfileHyperLink/>">Profile</a>
-			
+			<i class="icon-user"></i> <a href="<sUser:renderProfileHyperLink/>">Profile</a>
+
 		</div>
 		<div class="section">
-				<i class="icon-cog"></i>
-				Settings			
-		</div>		
+			<i class="icon-cog"></i> Settings
+		</div>
 
 	</div>
-	
+
 	<div class="super-section">
 		<h3>Groups</h3>
 		<div class="section">
-			
-				<i class="icon-snapshot"></i>
-				<g:link controller="userGroup" action="list" params="['user':2]">My Groups</g:link>
-			
+			<i class="icon-snapshot"></i>
+			<g:link controller="userGroup" action="list" params="['user':2]">My Groups</g:link>
+
 		</div>
+
 		<div class="section">
-			
-				<i class="icon-snapshot"></i>
-				<g:link controller="userGroup" action="list">Browse Groups</g:link>
-			
+			<i class="icon-snapshot"></i>
+			<g:link controller="userGroup" action="list">Browse Groups</g:link>
 		</div>
+		
 		<div class="section">
-				<i class="icon-snapshot"></i>
-				India Biodiversity Group
+			<i class="icon-snapshot"></i> India Biodiversity Group
 		</div>
+		
 		<div class="section">
-			
-				<i class="icon-plus-sign"></i>
-				<g:link controller="userGroup" action="create">Create a Group</g:link>
-			
+			<i class="icon-plus-sign"></i>
+			<g:link controller="userGroup" action="create">Create a Group</g:link>
 		</div>
 
 	</div>
@@ -97,6 +91,12 @@
 
 		<div class="super-section">
 			<div class="section">
+				<uGroup:showLocation model="['userGroupInstance':userGroupInstance]" />
+			</div>
+		</div>
+
+		<div class="super-section">
+			<div class="section">
 				<uGroup:showAllTags
 					model="['tagFilterByProperty':'UserGroup' , 'tagFilterByPropertyValue':userGroupInstance, 'isAjaxLoad':true]" />
 			</div>
@@ -135,9 +135,9 @@
 					;
 			           	$.each(data.result, function(i, item) {
 			           		html +="<a
-							href='"+"${createLink(controller:'SUser', action:'show')}/"+item.id+"'>"
-							+ "<img src='"+item.icon+"' class='pull-left small_profile_pic'
-							title='"+item.name+"'>"+ "</a>";
+				href='"+"${createLink(controller:'SUser', action:'show')}/"+item.id+"'>"
+				+ "<img src='"+item.icon+"' class='pull-left small_profile_pic'
+				title='"+item.name+"'>"+ "</a>";
 			           	});
 			           	$("#members_sidebar").html(html);
 			           }, error: function(xhr, status, error) {
@@ -158,9 +158,9 @@
 			           	var html = "";
 			           	$.each(data.result, function(i, item) {
 			           		html += "<a
-							href='"+"${createLink(controller:'SUser', action:'show')}/"+item.id+"'>"+
-							"<img src='"+item.icon+"' class='pull-left small_profile_pic'
-							title='"+item.name+"'>"+ "</a>";
+				href='"+"${createLink(controller:'SUser', action:'show')}/"+item.id+"'>"+
+				"<img src='"+item.icon+"' class='pull-left small_profile_pic'
+				title='"+item.name+"'>"+ "</a>";
 			           	});
 			           	$("#founders_sidebar").html(html);
 			           }, error: function(xhr, status, error) {
@@ -179,3 +179,58 @@
 	</g:if>
 </div>
 
+<<<<<<< HEAD =======
+<r:script>
+function reloadMembers() {
+	$.ajax({
+       	url: "${createLink(action:'members',id:userGroupInstance.id) }",
+           method: "GET",
+           dataType: "json",
+           data:{'isAjaxLoad':true,'onlyMembers':true},
+           success: function(data) {
+           	var html = "";
+           	$.each(data.result, function(i, item) {
+           		html += "<a
+		href='"+"${createLink(controller:'SUser', action:'show')}/"+item.id+"'>"+
+		"<img src='"+item.icon+"' class='pull-left small_profile_pic'
+		title='"+item.name+"'>"+ "</a>";
+           	});
+           	$("#members_sidebar").html(html);
+           }, error: function(xhr, status, error) {
+			handleError(xhr, status, error, undefined, function() {
+               	var msg = $.parseJSON(xhr.responseText);
+                   $(".alertMsg").html(msg.msg).removeClass('alert-success').addClass('alert-error');
+			});
+           }
+	});
+}
+function reloadFounders() {
+	$.ajax({
+       	url: "${createLink(action:'founders',id:userGroupInstance.id) }",
+           method: "GET",
+           dataType: "json",
+           data:{'isAjaxLoad':true},
+           success: function(data) {
+           	var html = "";
+           	$.each(data.result, function(i, item) {
+           		html += "<a
+		href='"+"${createLink(controller:'SUser', action:'show')}/"+item.id+"'>"+
+		"<img src='"+item.icon+"' class='pull-left small_profile_pic'
+		title='"+item.name+"'>"+ "</a>";
+           	});
+           	$("#founders_sidebar").html(html);
+           }, error: function(xhr, status, error) {
+			handleError(xhr, status, error, undefined, function() {
+               	var msg = $.parseJSON(xhr.responseText);
+                   $(".alertMsg").html(msg.msg).removeClass('alert-success').addClass('alert-error');
+			});
+           }
+	});
+}
+$(document).ready(function(){
+	reloadFounders();
+	reloadMembers();	
+});
+
+</r:script>
+>>>>>>> branch 'biodiv_usergroups' of git@github.com:strandls/biodiv.git
