@@ -36,6 +36,13 @@ class UrlMappings {
 		"500"(controller: "errors", action: "error403", exception: NotFoundException)
 */		
 		"/static/$path"(controller:"species", action:"staticContent")
+		
+		"/userGroup/$id/pages"(controller:"userGroup", action:"pages")
+		
+		name userGroupPageShow: "/userGroup/$id/page/$newsletterId" {
+			controller = 'userGroup'
+			action = 'page'
+		}
 
 	}
 }

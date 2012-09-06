@@ -200,7 +200,7 @@ background-color: transparent;
 }
 
 .outer-wrapper {
-clear: both;
+/* clear: both; */
 background-color: rgba(106, 201, 162,0.15);
 background: transparent\9;
 -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#266AC9A2,endColorstr=#266AC9A2)"; /* IE8 */
@@ -1282,8 +1282,8 @@ h1, .main_heading .species_title .sci_name{
 
 
 .userGroup-section {
-	width:600px;
-	float:right;	
+/* 	width:600px; */
+/* 	float:right;	 */
 }
 
 .userOrEmail-list {
@@ -1414,3 +1414,4 @@ max-width: 100%;
 	top: 0;
 	right: 0;
 }
+

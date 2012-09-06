@@ -13,6 +13,7 @@ import species.groups.UserGroupMemberRole.UserGroupMemberRoleType;
 import species.participation.Observation;
 import species.utils.ImageType;
 import species.utils.ImageUtils;
+import utils.Newsletter;
 
 class UserGroup implements Taggable {
 
@@ -36,7 +37,7 @@ class UserGroup implements Taggable {
 	def springSecurityService;
 	def userGroupService;
 
-	static hasMany = [speciesGroups:SpeciesGroup, habitats:Habitat, observations:Observation]
+	static hasMany = [speciesGroups:SpeciesGroup, habitats:Habitat, observations:Observation, newsletters:Newsletter]
 
 	static constraints = {
 		name nullable: false, blank:false, unique:true

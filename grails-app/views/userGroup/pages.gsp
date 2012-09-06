@@ -1,20 +1,18 @@
+
+<%@page import="org.springframework.security.acls.domain.BasePermission"%>
+
 <%@page import="org.springframework.security.acls.domain.BasePermission"%>
 <%@page import="species.utils.ImageType"%>
 <%@page import="species.utils.Utils"%>
 <%@ page import="species.groups.UserGroup"%>
 <html>
 <head>
-
 <meta name="layout" content="main" />
-<link rel="image_src"
-	href="${createLinkTo(file: gallImagePath, base:grailsApplication.config.speciesPortal.observations.serverURL)}" />
-<script src="http://maps.google.com/maps/api/js?sensor=true"></script>
-<r:require modules="userGroups_show, observations_list" />
 <g:set var="entityName" value="${userGroupInstance.name}" />
 <title><g:message code="default.show.label"
 		args="[userGroupInstance.name]" />
 </title>
-
+<r:require modules="userGroups_show" />
 </head>
 <body>
 	<div class="container outer-wrapper">
@@ -28,32 +26,38 @@
 						<uGroup:showHeader model=[ 'userGroupInstance':userGroupInstance] />
 					</div>
 				</div>
-
-
 				<div class="super-section userGroup-section">
 					<div class="section">
 						<div class="page-header clearfix">
-							<h5>Observations</h5>
+							<h5>Pages</h5>
 							<div class="btn-group pull-right" style="z-index: 10;">
-								<uGroup:isAMember
-									model="['userGroupInstance':userGroupInstance]">
-									<g:link controller="observation" action="create"
-										params="['userGroup':userGroupInstance.id]"
+								<sec:permitted className='species.groups.UserGroup'
+									id='${userGroupInstance.id}'
+									permission='${org.springframework.security.acls.domain.BasePermission.ADMINISTRATION}'>
+
+									<g:link action="pageCreate" id="${userGroupInstance.id}"
 										class="btn btn-large btn-info">
-										<i class="icon-plus"></i>Add an Observation</g:link>
-								</uGroup:isAMember>
+										<i class="icon-plus"></i>Add a Newsletter</g:link>
+								</sec:permitted>
 							</div>
 						</div>
-						<obv:showObservationsListWrapper
-							model="['totalObservationInstanceList':totalObservationInstanceList, 'observationInstanceList':observationInstanceList, 'instanceTotal':instanceTotal, 'queryParams':queryParams, 'activeFilters':activeFilters]" />
+						<g:each in="${userGroupInstance.newsletters}" var="newsletter">
+							<g:include controller="newsletter" action="show"
+								id="${newsletter.id }" />
+						</g:each>
 					</div>
+
+
+
 				</div>
 
 			</div>
 		</div>
 	</div>
-
 	<r:script>
+		$(document).ready(function(){
+
+		});
 	</r:script>
 </body>
 </html>

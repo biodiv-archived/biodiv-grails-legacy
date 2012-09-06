@@ -18,6 +18,12 @@ class SUserTagLib {
 		}
 	}
 
+	def renderProfileHyperLink = { attrs ->
+		def currentUser = springSecurityService.getCurrentUser()
+		if(currentUser) {
+			out << createLink(controller:"user", action:"show", id:springSecurityService.currentUser.id);
+		}
+	}
 
 	/**
 	 * Renders the body if the authenticated user owns this page.

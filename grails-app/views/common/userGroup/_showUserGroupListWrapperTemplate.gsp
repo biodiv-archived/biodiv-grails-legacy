@@ -3,19 +3,10 @@
 <div class="filters" style="position: relative;">
 	<obv:showGroupFilter />
 </div>
-<div class="tags_section span3" style="float: right;">
-	<g:if test="${params.action == 'search' }">
-		<obv:showAllTags
-			model="['tags':tags , 'count':tags?tags.size():0, 'isAjaxLoad':true]" />
-	</g:if>
-	<g:else>
-		<uGroup:showAllTags
-			model="['tagFilterByProperty':'All' , 'params':params, 'isAjaxLoad':true]" />
-	</g:else>
-</div>
-<div class="row">
+
+<div>
 	<!-- main_content -->
-	<div class="list span9">
+	<div class="list">
 
 		<div class="observations thumbwrap">
 			<div class="observation">

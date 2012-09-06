@@ -7,24 +7,24 @@
 	value="${message(code: 'userGroup.label', default: 'UserGroup')}" />
 <title><g:message code="default.list.label" args="[entityName]" />
 </title>
-<r:require modules="userGroups_list"/>
+<r:require modules="userGroups_list" />
 </head>
 <body>
 	<div class="container outer-wrapper">
 		<div class="row">
 			<div class="span12">
+
 				<div class="page-header clearfix">
-					<h1>
-						Groups
-					</h1>
+					<h1>Groups</h1>
 				</div>
 
-				<div class="alertMsg ${(flash.message)?'alert':'' }" style="clear:both;">
+				<div class="alertMsg ${(flash.message)?'alert':'' }"
+					style="clear: both;">
 					${flash.message}
 				</div>
 
-				<uGroup:showUserGroupsListWrapper  model="['totalUserGroupInstanceList':totalUserGroupInstanceList, 'userGroupInstanceList':UserGroupInstanceList, 'userGroupInstanceTotal':userGroupInstanceTotal, 'queryParams':queryParams, 'activeFilters':activeFilters]" />
-
+				<uGroup:showUserGroupsListWrapper
+					model="['totalUserGroupInstanceList':totalUserGroupInstanceList, 'userGroupInstanceList':UserGroupInstanceList, 'userGroupInstanceTotal':userGroupInstanceTotal, 'queryParams':queryParams, 'activeFilters':activeFilters]" />
 			</div>
 		</div>
 	</div>

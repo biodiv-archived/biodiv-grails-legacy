@@ -51,7 +51,7 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 	<div id="fb-root"></div>
 	
 	<div id="species_main_wrapper">
-
+		
 		<div class="container_12 container">
 			<div id="menu" class="grid_12 ui-corner-all"
 				style="margin-bottom: 10px;">
@@ -67,10 +67,7 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 					<sNav:render group="users_dashboard" subitems="false" />
 				</g:if>
 
-				<g:if
-					test="${params.controller == 'userGroup'}">
-					<sNav:render group="user_group_dashboard" subitems="false" />
-				</g:if>
+			
 
 				
 				<g:if
@@ -80,10 +77,14 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 					<search:searchBox />
 				</div>
 				</g:if>
+				
+				
 
 			</div>
 
 		</div>
+		
+		<uGroup:showSidebar />
 		<g:layoutBody />
 
 		<domain:showWGPFooter />

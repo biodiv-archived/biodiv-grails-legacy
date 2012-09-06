@@ -20,26 +20,23 @@
 			<div class="observation span12">
 
 
+
 				<div class="page-header clearfix">
 					<div style="width: 100%;">
 						<uGroup:showHeader model=[ 'userGroupInstance':userGroupInstance] />
 					</div>
 				</div>
 
-
-
 				<div class="super-section userGroup-section">
-					<div class="description notes_view">
-						${userGroupInstance.description}
-					</div>
+
+					<g:include controller="newsletter" action="create"
+						id="${newsletterId }"
+						params="['userGroupId':userGroupInstance.id]" />
+					<g:link action="pages" id="${userGroupInstance.id}">< Back to Newsletters</g:link>
 				</div>
 
-				<div class="super-section userGroup-section">
-					<div class="description notes_view" name="contactEmail">
-						Contact us by filling in the following feedback form.</div>
-				</div>
+
 			</div>
-
 		</div>
 	</div>
 	<r:script>

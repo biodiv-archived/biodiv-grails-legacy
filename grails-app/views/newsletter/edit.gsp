@@ -44,8 +44,9 @@
                                     </ckeditor:editor>
                                 </td>
                             </tr>
-                        
-                                                  
+                              <g:if test="${newsletterInstance.userGroup}">
+                            	<input type="hidden" name="userGroupId" value="${newsletterInstance.userGroup.id}"/>
+                            </g:if>                      
                         </tbody>
                     </table>
                 </div>

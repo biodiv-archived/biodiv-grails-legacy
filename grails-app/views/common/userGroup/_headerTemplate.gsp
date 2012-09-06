@@ -1,18 +1,26 @@
 <div class="header">
+	
 	<div class="top_nav_bar navbar">
 		<div class="container">
 			<!-- Logo -->
-			<div class="span3">
+			<div class="logo" style="float:left; margin-left:0px;">
 				<a href="${createLink(action:"show", id:userGroupInstance.id)}">
 					<img class="logo" alt="${userGroupInstance.name}"
 					src="${createLink(url: userGroupInstance.mainImage()?.fileName)}">
 				</a>
 			</div>
+			<div style="margin-left:10px;">
+					<h1>${userGroupInstance.name}</h1>
+					<span class="ellipsis multiline">
+						${userGroupInstance.description}
+					</span>
+				</div>
+			
 			<!-- Logo ends -->
 			<!-- h1 class="span8">
 							${userGroupInstance.name}
 			</h1-->
-			<ul class="nav">
+			<ul class="nav" style="clear:both;">
 				<li><a href="${createLink(action:'show', id:params.id)}">Home</a>
 				</li>
 				<li><a
@@ -21,10 +29,10 @@
 				<li><a href="${createLink(action:'members', id:params.id)}">Members</a>
 				</li>
 
-				<li><a href="${createLink(action:'species', id:params.id)}">Species</a>
+				<!-- li><a href="${createLink(action:'species', id:params.id)}">Species</a>
 				</li>
 				<li><a href="${createLink(action:'maps', id:params.id)}">Maps</a>
-				</li>
+				</li-->
 				<li><a href="${createLink(action:'pages', id:params.id)}">Pages</a>
 				</li>
 				<li><a href="${createLink(action:'aboutUs', id:params.id)}">About

@@ -8,7 +8,6 @@
         <title><g:message code="default.show.label" args="[entityName]" /></title>
         <style>
         .newsletter_wrapper {
-        width: 800px;
         padding: 30px;
         margin-left: auto;
         margin-right: auto;
@@ -53,6 +52,7 @@
             <div class="buttons">
                 <g:form>
                     <g:hiddenField name="id" value="${newsletterInstance?.id}" />
+                    <g:hiddenField name="userGroupId" value="${newsletterInstance?.userGroup?.id}" />
                     <span class="button"><g:actionSubmit class="edit" action="edit" value="${message(code: 'default.button.edit.label', default: 'Edit')}" /></span>
                     <span class="button"><g:actionSubmit class="delete" action="delete" value="${message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" /></span>
                 </g:form>

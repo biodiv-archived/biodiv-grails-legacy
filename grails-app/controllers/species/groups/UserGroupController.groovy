@@ -770,6 +770,26 @@ class UserGroupController {
 		if (!userGroupInstance) return;
 		render (template:"/common/userGroup/actionsHeaderTemplate", model:['userGroupInstance':userGroupInstance]);
 	}
+
+	def pages = {
+		def userGroupInstance = findInstance()
+		if (!userGroupInstance) return;
+		render (view:"pages", model:['userGroupInstance':userGroupInstance])
+	}
+	
+	def page = {
+		log.debug params;
+		def userGroupInstance = findInstance()
+		if (!userGroupInstance) return;
+		render (view:'page', model:['userGroupInstance':userGroupInstance, 'newsletterId':params.newsletterId])
+	}
+	
+	def pageCreate = {
+		log.debug params;
+		def userGroupInstance = findInstance()
+		if (!userGroupInstance) return;
+		render (view:'pageCreate', model:['userGroupInstance':userGroupInstance])
+	}
 }
 
 class UserGroupCommand {

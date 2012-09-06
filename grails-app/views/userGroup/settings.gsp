@@ -37,16 +37,11 @@
 					</ul>
 
 					<div id="my-tab-content" class="tab-content">
-						<div class="tab-pane active" id="general">
-				
-						</div>
+						<div class="tab-pane active" id="general"></div>
 
-						<div class="tab-pane" id="userPermissions">
-
-						</div>
+						<div class="tab-pane" id="userPermissions"></div>
 					</div>
 				</div>
-
 			</div>
 		</div>
 	</div>

@@ -41,13 +41,12 @@
 
 <g:set var="entityName" value="${userGroupInstance.name}" />
 <title><g:message code="default.show.label"
-		args="[userGroupInstance.name]" />
-</title>
+		args="[userGroupInstance.name]" /></title>
 <script src="http://maps.google.com/maps/api/js?sensor=true"></script>
 <r:require modules="userGroups_show,userGroups_list,comment" />
 <style>
 .comment-textbox {
-	width:100%;
+	width: 100%;
 }
 </style>
 </head>
@@ -63,9 +62,9 @@
 					</div>
 				</div>
 
-				
+
 				<div>
-					<uGroup:showSidebar />
+
 					<div class="super-section userGroup-section">
 						<div class="description notes_view">
 							${userGroupInstance.description}
@@ -85,26 +84,26 @@
 								style="clear: both; display: none;">
 								<uGroup:showActivityOnMap model="['userGroupInstance':userGroupInstance]"/>
 							</div-->
-							
+
 							<div style="clear: both;">
-							
-							<%
+
+								<%
 								def canPostComment = customsecurity.hasPermissionForAction([object:userGroupInstance, permission:org.springframework.security.acls.domain.BasePermission.WRITE]).toBoolean()
 							%>
-							<comment:showAllComments model="['commentHolder':userGroupInstance, commentType:'super', 'canPostComment':canPostComment]" />
-<%--								--%>
-<%--								<sec:permitted object='${userGroupInstance}'--%>
-<%--										permission='${org.springframework.security.acls.domain.BasePermission.WRITE}'>--%>
-<%--									<comment:postComment model="['commentHolder':userGroupInstance, 'rootHolder':userGroupInstance, commentType:'super']" />--%>
-<%--								</sec:permitted>--%>
-<%--															--%>
-<%--							--%>
-<%--				    			<comment:showAllComments model="['commentHolder':userGroupInstance, commentType:'super']" />--%>
+								<comment:showAllComments
+									model="['commentHolder':userGroupInstance, commentType:'super', 'canPostComment':canPostComment]" />
+								<%--								--%>
+								<%--								<sec:permitted object='${userGroupInstance}'--%>
+								<%--										permission='${org.springframework.security.acls.domain.BasePermission.WRITE}'>--%>
+								<%--									<comment:postComment model="['commentHolder':userGroupInstance, 'rootHolder':userGroupInstance, commentType:'super']" />--%>
+								<%--								</sec:permitted>--%>
+								<%--															--%>
+								<%--							--%>
+								<%--				    			<comment:showAllComments model="['commentHolder':userGroupInstance, commentType:'super']" />--%>
 							</div>
 						</div>
 					</div>
 				</div>
-
 			</div>
 		</div>
 	</div>
