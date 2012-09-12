@@ -17,9 +17,7 @@
 			<pre>${commentInstance.body}</pre>
 		</div>
 		<div class="yj-attributes">
-			<time class="timeago" datetime="${commentInstance.getDate()}"></time>
-<%--			<g:formatDate date="${commentInstance.lastUpdated}" type="datetime"--%>
-<%--				style="LONG" timeStyle="SHORT" />--%>
+			<time class="timeago" datetime="${commentInstance.lastUpdated.getTime()}"></time>
 			<sUser:ifOwns model="['user':commentInstance.author]">
 				<a href="#"
 					onclick="deleteComment(${commentInstance.id}, '${createLink(controller:'comment', action:'removeComment')}'); return false;">

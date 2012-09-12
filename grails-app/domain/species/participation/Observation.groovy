@@ -318,7 +318,4 @@ class Observation implements Taggable{
 		activityFeedService.deleteFeed(this)
 	}
 	
-	def getDate(){
-		activityFeedService.getDateInISO(createdOn);
-	}
 }

@@ -124,10 +124,6 @@ class Comment{
 		activityFeedService.deleteFeed(this);
 	}
 	
-	def getDate(){
-		return activityFeedService.getDateInISO(lastUpdated);
-	}
-	
 	//	int compareTo(obj) {
 	//		lastUpdated.compareTo(obj.lastUpdated);
 	//	}

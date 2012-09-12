@@ -25,6 +25,10 @@ class ActivityFeedController {
 		}
 	}
 	
+	def getServerTime = {
+		render ("" + new Date().getTime()) as JSON
+	}
+	
 	def index = {
 		redirect(action:list)
 	}

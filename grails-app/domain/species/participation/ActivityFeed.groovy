@@ -170,8 +170,4 @@ class ActivityFeed {
 			}
 		}
 	}
-	
-	def getDate(){
-		return ActivityFeedService.getDateInISO(lastUpdated);
-	}
 }

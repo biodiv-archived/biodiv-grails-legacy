@@ -43,10 +43,6 @@ function dcorateCommentBody(comp){
 	
 }
 
-function updateRelativeTime(){
-	$('.timeago').timeago('refresh');
-}
-
 //to show relative date
 //function updateRelativeTime(currentTime){
 //	//toRelativeTime('.activityfeed .timestamp', currentTime);

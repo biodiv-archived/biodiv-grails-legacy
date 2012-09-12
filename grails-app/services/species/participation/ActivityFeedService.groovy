@@ -86,7 +86,7 @@ class ActivityFeedService {
 		ActivityFeed.deleteFeed(obj);
 	}
 	
-	static getDateInISO(date){
-		return DATE_FORMAT.format(date)
-	}
+//	static getDateInISO(date){
+//		return date.getTime()//DATE_FORMAT.format(date)
+//	}
 }

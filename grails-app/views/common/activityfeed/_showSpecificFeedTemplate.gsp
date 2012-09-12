@@ -10,9 +10,5 @@
 	</div>
 	<b> ${feedInstance.author.name} :<span class="yj-context"> ${feedInstance.activityType}</span></b>
 	<feed:showActivity model="['feedInstance' : feedInstance, 'feedPermission':feedPermission]" />
-<%--	<div class="yj-attributes timestamp" style="clear:both;">--%>
-<%--		<input type="hidden" name='creationTime' value="${feedInstance.lastUpdated.getTime()}"/>--%>
-<%--		<span></span>--%>
-<%--	</div>--%>
-	 <time class="timeago" datetime="${feedInstance.getDate()}"></time>
+	 <time class="timeago" datetime="${feedInstance.lastUpdated.getTime()}"></time>
 </div>

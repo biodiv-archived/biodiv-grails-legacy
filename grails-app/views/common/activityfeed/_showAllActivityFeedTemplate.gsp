@@ -20,6 +20,6 @@
 </div>
 <r:script>
 	$(document).ready(function(){
-		setUpFeed();
+		setUpFeed("${createLink(controller:'activityFeed', action:'getServerTime')}");
 	});
 </r:script>

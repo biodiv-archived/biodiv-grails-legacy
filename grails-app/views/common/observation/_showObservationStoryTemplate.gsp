@@ -60,7 +60,7 @@
 
 		<div class="prop">
 			<span class="name"><i class="icon-time"></i>Submitted</span>
-			<time class="timeago" datetime="${observationInstance.getDate()}"></time>
+			<time class="timeago" datetime="${observationInstance.createdOn.getTime()}"></time>
 <%--			<obv:showDate--%>
 <%--				model="['observationInstance':observationInstance, 'propertyName':'createdOn']" />--%>
 

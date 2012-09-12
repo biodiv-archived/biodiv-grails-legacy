@@ -1,4 +1,5 @@
 var oldFeedProcessing = false;
+var serverTimeDiff = null;
 
 function loadOlderFeedsInAjax(targetComp, url, feedType){
 	$.ajax({
@@ -122,9 +123,28 @@ function setUpFeedForTarget(targetComp){
 	}
 }
 
-function setUpFeed(){
-	$('body').timeago();
+function setUpFeed(timeUrl){
+	initRelativeTime(timeUrl);
 	setUpFeedForTarget(getTargetComp());
+}
+
+function initRelativeTime(url){
+	if(!serverTimeDiff){
+		$.ajax({
+	 		url: url,
+			dataType: "json",
+			success: function(data) {
+				serverTimeDiff = parseInt(data) - new Date().getTime();
+				$('body').timeago({serverTimeDiff:serverTimeDiff});
+			}, error: function(xhr, status, error) {
+				alert(xhr.responseText);
+		   	}
+		});	
+	}
+}
+
+function updateRelativeTime(){
+	$('.timeago').timeago({serverTimeDiff:serverTimeDiff});
 }
 
 function pollForFeeds(targetComp, url, feedType){

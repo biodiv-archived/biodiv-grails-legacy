@@ -90,16 +90,16 @@
     TimeAgo.prototype.parse = function(iso8601) {
       var timeStr;
       timeStr = $.trim(iso8601);
-      timeStr = timeStr.replace(/\.\d\d\d+/, "");
-      timeStr = timeStr.replace(/-/, "/").replace(/-/, "/");
-      timeStr = timeStr.replace(/T/, " ").replace(/Z/, " UTC");
-      timeStr = timeStr.replace(/([\+\-]\d\d)\:?(\d\d)/, " $1$2");
-      return new Date(timeStr);
+//      timeStr = timeStr.replace(/\.\d\d\d+/, "");
+//      timeStr = timeStr.replace(/-/, "/").replace(/-/, "/");
+//      timeStr = timeStr.replace(/T/, " ").replace(/Z/, " UTC");
+//      timeStr = timeStr.replace(/([\+\-]\d\d)\:?(\d\d)/, " $1$2");
+      return new Date(parseInt(timeStr));
     };
 
     TimeAgo.prototype.getTimeDistanceInMinutes = function(absolutTime) {
       var timeDistance;
-      timeDistance = new Date().getTime() - absolutTime.getTime();
+      timeDistance = new Date().getTime() - absolutTime.getTime() + this.options.serverTimeDiff;
       return Math.round((Math.abs(timeDistance) / 1000) / 60);
     };
 

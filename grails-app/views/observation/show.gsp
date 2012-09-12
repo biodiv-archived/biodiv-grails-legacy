@@ -268,9 +268,8 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 	Galleria.loadTheme('${resource(dir:'js/galleria/1.2.7/themes/classic/',file:'galleria.classic.min.js')}');
 	
 	$(document).ready(function(){
-		$('body').timeago();
-		$('.timeago').timeago('refresh');
-		
+<%--		initRelativeTime("${createLink(controller:'activityFeed', action:'getServerTime')}");--%>
+
 		dcorateCommentBody($('.comment .yj-message-body'));
 		$("#seeMoreMessage").hide();
 		
