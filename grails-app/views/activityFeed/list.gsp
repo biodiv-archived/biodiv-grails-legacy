@@ -3,7 +3,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="main" />
 <g:set var="entityName"
-	value="${message(code: 'feeds.label', default: 'Feeds')}" />
+	value="${message(code: 'feeds.label', default: 'Actions')}" />
 <title><g:message code="default.list.label" args="[entityName]" />
 </title>
 <%--<script src="http://maps.google.com/maps/api/js?sensor=true"></script>--%>

@@ -10,5 +10,5 @@
 	</div>
 	<b> ${feedInstance.author.name} :<span class="yj-context"> ${feedInstance.activityType}</span></b>
 	<feed:showActivity model="['feedInstance' : feedInstance, 'feedPermission':feedPermission]" />
-	 <time class="timeago" datetime="${feedInstance.lastUpdated.getTime()}"></time>
+	<time class="timeago" datetime="${feedInstance.lastUpdated.getTime()}"></time>
 </div>

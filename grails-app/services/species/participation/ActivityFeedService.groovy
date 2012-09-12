@@ -6,6 +6,8 @@ class ActivityFeedService {
 	
 	static final String COMMENT_ADDED = "Comment added" 
 	static final String OBSERVATION_CREATED = "Observation created"
+	static final String OBSERVATION_UPDATED = "Observation updated"
+	
 	static final String OBSERVATION_FLAGGED = "Observation flagged"
 	static final String SPECIES_RECOMMENDED = "Species recommended"
 	static final String SPECIES_AGREED_ON = "Species agreed on"

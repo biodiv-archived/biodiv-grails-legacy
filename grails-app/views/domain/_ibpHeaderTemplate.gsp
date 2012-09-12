@@ -10,6 +10,7 @@
     <div id="mainMenu" class="span10">
         <ul class="links primary-links">
             <!--li class="menu-449 first"><a href="/" title="">Home</a></li-->
+            <li class="menu-450"><a href="${createLink("controller":"activityFeed")}" title="Activity">Activity</a></li>
             <li class="menu-450"><a href="${createLink("controller":"species")}" title="Species">Species</a></li>
             <li class="menu-450"><a href="${createLink("controller":"observation")}" title="Observations">Observations</a></li>
             <li class="menu-450"><a href="${createLink("controller":"userGroup")}" title="Groups">Groups</a></li>

@@ -83,6 +83,9 @@ class ActivityFeedTagLib {
 			case activityFeedService.OBSERVATION_FLAGGED:
 				text = activityDomainObj.flag.value() + ( activityDomainObj.notes ? " \n" + activityDomainObj.notes : "")
 				break
+			case activityFeedService.OBSERVATION_UPDATED:
+				text = "User updated the observation details"
+				break
 			default:
 				text = activityType
 				break

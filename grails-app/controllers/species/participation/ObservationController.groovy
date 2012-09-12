@@ -213,7 +213,8 @@ class ObservationController {
 					params.obvId = observationInstance.id
 					def tags = (params.tags != null) ? Arrays.asList(params.tags) : new ArrayList();
 					observationInstance.setTags(tags);
-
+					activityFeedService.addActivityFeed(observationInstance, null, observationInstance.author, activityFeedService.OBSERVATION_UPDATED);
+					
 					if(params.groupsWithSharingNotAllowed) {
 						setUserGroups(observationInstance, [params.groupsWithSharingNotAllowed]);
 					} else {

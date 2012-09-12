@@ -50,4 +50,9 @@
 	clear:both;
 }
 
-
+.activityfeed .timeago{
+    color: #666666;
+    display: inline;
+    line-height: 16px;
+    margin-bottom: 0;
+}
