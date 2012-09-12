@@ -51,12 +51,12 @@
 		<%--			</div>--%>
 		<%--		</div>--%>
 
-		<div class="prop">
-			<span class="name"><i class="icon-time"></i>Observed on</span>
-			<obv:showDate
-				model="['observationInstance':observationInstance, 'propertyName':'observedOn', 'dateFormat':'dateOnly']" />
-
-		</div>
+<%--		<div class="prop">--%>
+<%--			<span class="name"><i class="icon-time"></i>Observed on</span>--%>
+<%--			<obv:showDate--%>
+<%--				model="['observationInstance':observationInstance, 'propertyName':'observedOn', 'dateFormat':'dateOnly']" />--%>
+<%----%>
+<%--		</div>--%>
 
 		<div class="prop">
 			<span class="name"><i class="icon-time"></i>Submitted</span>
@@ -65,11 +65,11 @@
 
 		</div>
 
-		<div class="prop">
-			<span class="name"><i class="icon-time"></i>Updated</span>
-			<obv:showDate
-				model="['observationInstance':observationInstance, 'propertyName':'lastRevised']" />
-		</div>
+<%--		<div class="prop">--%>
+<%--			<span class="name"><i class="icon-time"></i>Updated</span>--%>
+<%--			<obv:showDate--%>
+<%--				model="['observationInstance':observationInstance, 'propertyName':'lastRevised']" />--%>
+<%--		</div>--%>
 
 		<g:if test="${observationInstance.notes && showDetails}">
 			<div class="prop">
@@ -83,8 +83,8 @@
 	</div>
 
 
-	<obv:showTagsSummary
-		model="['observationInstance':observationInstance, 'isAjaxLoad':false]" />
+<%--	<obv:showTagsSummary--%>
+<%--		model="['observationInstance':observationInstance, 'isAjaxLoad':false]" />--%>
 
 	<div
 		style="display: block; width: 100%; overflow: auto; margin-bottom: 10px">

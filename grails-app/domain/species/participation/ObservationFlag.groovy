@@ -4,6 +4,7 @@ import species.auth.SUser
 
 class ObservationFlag {
 	
+	def activityFeedService
 	
 	public enum FlagType {
 		OBV_INAPPROPRIATE("Inappropriate observation"),
@@ -42,4 +43,8 @@ class ObservationFlag {
 	FlagType flag;
 	
 	static belongsTo = [author:SUser, observation:Observation]
+	
+	def afterDelete(){
+		activityFeedService.deleteFeed(this)
+	}
 }

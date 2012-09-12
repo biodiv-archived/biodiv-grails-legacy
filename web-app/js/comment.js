@@ -6,7 +6,6 @@ function deleteComment(commentId, url){
 		
 		success: function(data){
 			$('.comment .' + commentId).remove();
-			
 		},
 		
 		statusCode: {
@@ -66,7 +65,8 @@ function postAsAjax(postComp, url, newCommentUrl, update){
     			$(postComp).children('input[name="newerTimeRef"]').val(data.newerTimeRef);
     			updateCountOnPopup(postComp, data.newlyAddedCommentCount);
     			if(update){
-    				updateUnionComment(postComp, newCommentUrl);
+    				updateFeeds();
+        			updateUnionComment(postComp, newCommentUrl);
     			}
     			if(data.clearForm){
     				$(postComp).children('textarea[name=commentBody]').val("");
@@ -110,14 +110,6 @@ function loadOlderComment(targetComp, commentType, commentHolderId, commentHolde
 			alert(xhr.responseText);
 	   	}
 	});
-}
-
-
-function dcorateCommentBody(comp){
-	//var text = $(comp).text().replace(/\n\r?/g, '<br />');
-	//$(comp).html(text);
-	$(comp).linkify();
-	
 }
 
  

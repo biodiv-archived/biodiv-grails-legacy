@@ -24,6 +24,7 @@ class Observation implements Taggable{
 	
 	def grailsApplication;
 	def commentService;
+	def activityFeedService
 	
 	public enum OccurrenceStatus {
 		ABSENT ("Absent"),	//http://rs.gbif.org/terms/1.0/occurrenceStatus#absent
@@ -311,5 +312,9 @@ class Observation implements Taggable{
 	
 	def onAddComment(comment){
 		updateObservationTimeStamp();
+	}
+	
+	def afterDelete(){
+		activityFeedService.deleteFeed(this)
 	}
 }

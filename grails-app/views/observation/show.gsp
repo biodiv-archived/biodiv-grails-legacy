@@ -3,6 +3,7 @@
 <%@ page import="species.participation.Observation"%>
 <%@ page import="species.participation.Recommendation"%>
 <%@ page import="species.participation.RecommendationVote"%>
+
 <html>
 <head>
 <meta property="og:type" content="article" />
@@ -188,11 +189,12 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 						</div>
 						
 					</div>
-			    	
-					<div class="union-comment" style="clear: both;">
-				    	<comment:showAllComments model="['commentHolder':observationInstance, commentType:'super']" />
+			    	<div class="union-comment" style="clear: both;">
+				    	<comment:showAllComments model="['commentHolder':observationInstance, commentType:'super', 'showCommentList':false]" />
 					</div>
-					
+					<feed:showAllActivityFeeds model="['rootHolder':observationInstance, feedType:'Specific', refreshType:'manual', 'feedPermission':'editable']" />
+<%--					<time class="timeago" datetime="2012-09-11T07:51:50Z">ggg about 8 hours ago</time>--%>
+<%--					<time class="timeago" datetime="2012-09-11T13:04+0000">ccc</time>--%>
 				</div>
 
 
@@ -234,6 +236,9 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 	Galleria.loadTheme('${resource(dir:'js/galleria/1.2.7/themes/classic/',file:'galleria.classic.min.js')}');
 	
 	$(document).ready(function(){
+		$('body').timeago();
+		$('.timeago').timeago('refresh');
+		
 		dcorateCommentBody($('.comment .yj-message-body'));
 		$("#seeMoreMessage").hide();
 		
@@ -311,6 +316,7 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 	            	showRecos(data, null);
 	            	$('#canName').val('');
 	            	updateUnionComment(null, "${createLink(controller:'comment', action:'getAllNewerComments')}");
+	            	updateFeeds();
 	            	return false;
 	            },
 	            error:function (xhr, ajaxOptions, thrownError){

@@ -17,8 +17,9 @@
 			<pre>${commentInstance.body}</pre>
 		</div>
 		<div class="yj-attributes">
-			<g:formatDate date="${commentInstance.lastUpdated}" type="datetime"
-				style="LONG" timeStyle="SHORT" />
+			<time class="timeago" datetime="${commentInstance.getDate()}"></time>
+<%--			<g:formatDate date="${commentInstance.lastUpdated}" type="datetime"--%>
+<%--				style="LONG" timeStyle="SHORT" />--%>
 			<sUser:ifOwns model="['user':commentInstance.author]">
 				<a href="#"
 					onclick="deleteComment(${commentInstance.id}, '${createLink(controller:'comment', action:'removeComment')}'); return false;">
@@ -26,10 +27,5 @@
 				</a>
 			</sUser:ifOwns>
 		</div>
-		<%----%>
-		<%--<g:if test="${commentInstance.comments}">--%>
-		<%--	<comment:showAllComments model="['commentHolder':commentInstance]" />--%>
-		<%--</g:if>--%>
-		<%--<hr>--%>
 	</div>
 </div>
