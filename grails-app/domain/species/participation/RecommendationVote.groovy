@@ -7,6 +7,8 @@ import species.auth.SUser;
 
 class RecommendationVote {
 	
+	def activityFeedService
+	
 	public enum ConfidenceType {
 		CERTAIN("I am certain"),
 		UNSURE("I am unsure"),
@@ -45,6 +47,10 @@ class RecommendationVote {
 	
 	static mapping = {
 		comment type:'text';
+	}
+	
+	def afterDelete(){
+		activityFeedService.deleteFeed(this)
 	}
 
 }

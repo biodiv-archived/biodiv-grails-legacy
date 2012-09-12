@@ -45,6 +45,7 @@ class ObservationController {
 	def observationsSearchService;
 	def namesIndexerService;
 	def userGroupService;
+	def activityFeedService;
 	
 	static allowedMethods = [save:"POST", update: "POST", delete: "POST"]
 
@@ -154,6 +155,7 @@ class ObservationController {
 						}	
 					}
 										
+					activityFeedService.addActivityFeed(observationInstance, null, observationInstance.author, activityFeedService.OBSERVATION_CREATED);
 					sendNotificationMail(OBSERVATION_ADDED, observationInstance, request);
 					params["createNew"] = true
 					chain(action: 'addRecommendationVote', model:['chainedParams':params]);
@@ -488,8 +490,9 @@ class ObservationController {
 					observationInstance.lastRevised = new Date();
 					//saving max voted species name for observation instance
 					observationInstance.calculateMaxVotedSpeciesName();
+					activityFeedService.addActivityFeed(observationInstance, recommendationVoteInstance, recommendationVoteInstance.author, activityFeedService.SPECIES_RECOMMENDED);
 					observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
-
+					
 					if(!params["createNew"]){
 						//sending mail to user
 						sendNotificationMail(SPECIES_RECOMMENDED, observationInstance, request);
@@ -552,8 +555,9 @@ class ObservationController {
 					log.debug "Successfully added reco vote : "+recommendationVoteInstance
 					observationInstance.lastRevised = new Date();
 					observationInstance.calculateMaxVotedSpeciesName();
+					activityFeedService.addActivityFeed(observationInstance, recommendationVoteInstance, recommendationVoteInstance.author, activityFeedService.SPECIES_AGREED_ON);
 					observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
-
+					
 					//sending mail to user
 					sendNotificationMail(SPECIES_AGREED_ON, observationInstance, request);
 					def r = [
@@ -674,6 +678,7 @@ class ObservationController {
 				observationInstance.isDeleted = true;
 				observationInstance.save(flush: true)
 				sendNotificationMail(OBSERVATION_DELETED, observationInstance, request);
+				activityFeedService.deleteFeed(observationInstance);
 				observationsSearchService.delete(observationInstance.id);
 				flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
 				redirect(action: "list")
@@ -702,7 +707,10 @@ class ObservationController {
 				observationFlagInstance.save(flush: true)
 				obv.flagCount++
 				obv.save(flush:true)
+				activityFeedService.addActivityFeed(obv, observationFlagInstance, observationFlagInstance.author, activityFeedService.OBSERVATION_FLAGGED);
+				
 				observationsSearchService.publishSearchIndex(obv, COMMIT);
+				
 				sendNotificationMail(OBSERVATION_FLAGGED, obv, request)
 				flash.message = "${message(code: 'observation.flag.added', default: 'Observation flag added')}"
 			}

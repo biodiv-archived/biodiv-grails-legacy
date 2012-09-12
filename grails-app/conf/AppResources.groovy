@@ -1,3 +1,4 @@
+
 //adhoc.patterns.excludes = ["*.css"]
 //mappers.hashandcache.excludes = ["**/*.css"]
 //
@@ -48,6 +49,9 @@ modules = {
 		resource url:'/js/species/popuplib.js'
 		resource url:'/js/species/ajaxLogin.js'
 		resource url:'/js/species/users.js'
+		resource url:'/js/jquery/jquery.linkify-1.0.js'
+		resource url:'/js/timeago.js'
+		//resource url:'/js/species/ajaxLogin.js'
 		resource url:[dir:'js',file:'jquery/jquery.checkbox.js',plugin:'spring-security-ui']
 		resource url:[dir:'js',file:'spring-security-ui.js', plugin:'spring-security-ui']		
 	}
@@ -93,7 +97,7 @@ modules = {
 	}
 
 	observations_show {
-		dependsOn 'observations, gallery, carousel, comment'
+		dependsOn 'observations, gallery, carousel, comment, activityfeed'
 
 		resource url:'/js/jsrender.js'
 		resource url:'/js/species/observations/show.js'
@@ -181,6 +185,15 @@ modules = {
 		resource url:'/css/comment.css'
 		
 		resource url:'/js/comment.js'
-		resource url:'/js/jquery/jquery.linkify-1.0.js'
 	}
+	
+	activityfeed {
+		dependsOn 'core'
+		
+		resource url:'/css/comment.css'
+		resource url:'/css/activityfeed.css'
+		
+		resource url:'/js/activityfeed.js'
+	}
+	
 }

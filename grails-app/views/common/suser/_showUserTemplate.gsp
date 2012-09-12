@@ -8,12 +8,12 @@
 		</div>
 		<div class="story" style="margin-left:35px">
 			<a href="${request.contextPath}/SUser/show/${userInstance.id}"> ${userInstance.name} </a>
-			<g:if test="${userInstance.location}">
-				<div>
-					<i class="icon-map-marker"></i>
-					${userInstance.location}
-				</div>
-			</g:if>
+<%--			<g:if test="${userInstance.location}">--%>
+<%--				<div>--%>
+<%--					<i class="icon-map-marker"></i>--%>
+<%--					${userInstance.location}--%>
+<%--				</div>--%>
+<%--			</g:if>--%>
 
 			<div class="story-footer" style="position:static;">
 				<div class="footer-item" title="No of Observations">
@@ -21,10 +21,10 @@
 					<obv:showNoOfObservationsOfUser model="['user':userInstance]"/>
 				</div>
 
-				<div class="footer-item" title="No of Tags">
-					<i class="icon-tags"></i>
-					<obv:showNoOfTagsOfUser model="['userId':userInstance.id]" />
-				</div>
+<%--				<div class="footer-item" title="No of Tags">--%>
+<%--					<i class="icon-tags"></i>--%>
+<%--					<obv:showNoOfTagsOfUser model="['userId':userInstance.id]" />--%>
+<%--				</div>--%>
 				
 				<div class="footer-item" title="No of Identifications">
 					<i class="icon-check"></i>

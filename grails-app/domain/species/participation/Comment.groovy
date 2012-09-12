@@ -8,6 +8,8 @@ import species.Resource
 
 class Comment{
 
+	def activityFeedService
+	
 	//comment basic info
 	String body;
 	Date dateCreated;
@@ -27,7 +29,7 @@ class Comment{
 	static hasMany = [likes:SUser, attachments:Resource];
 	static belongsTo = [author:SUser];
 
-	static constraints() {
+	static constraints = {
 		body blank:false;
 		//parentComment nullable:false;
 	}
@@ -39,7 +41,7 @@ class Comment{
 
 	static int fetchCount(commentHolder, rootHolder, refTime, timeLine){
 		timeLine = (timeLine)?:"older"
-		refTime = getDate(refTime)
+		refTime = getValidDate(refTime)
 		if(commentHolder || rootHolder){
 			return Comment.withCriteria(){
 				projections {
@@ -71,7 +73,7 @@ class Comment{
 
 	static fetchComments(commentHolder, rootHolder, max, refTime, timeLine){
 		timeLine = (timeLine)?:"older"
-		refTime = getDate(refTime)
+		refTime = getValidDate(refTime)
 		if(!refTime){
 			return Collections.EMPTY_LIST
 		}
@@ -101,7 +103,7 @@ class Comment{
 	}
 
 
-	private static getDate(String timeIn){
+	private static getValidDate(String timeIn){
 		if(!timeIn){
 			return null
 		}
@@ -112,6 +114,18 @@ class Comment{
 			e.printStackTrace()
 		}
 		return null
+	}
+	
+	def afterInsert(){
+		activityFeedService.addActivityFeed(activityFeedService.getDomainObject(rootHolderType, rootHolderId), this, author, activityFeedService.COMMENT_ADDED)
+	}
+	
+	def afterDelete(){
+		activityFeedService.deleteFeed(this);
+	}
+	
+	def getDate(){
+		return activityFeedService.getDateInISO(lastUpdated);
 	}
 	
 	//	int compareTo(obj) {
