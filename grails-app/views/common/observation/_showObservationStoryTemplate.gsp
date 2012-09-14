@@ -15,7 +15,7 @@
 	<div>
 
 		<div class="prop">
-			<span class="name"><i class="icon-share-alt"></i>Species Name</span>
+			<span class="name"><i class="icon-share-alt"></i></span>
 			<div class="value">
 				<obv:showSpeciesName
 					model="['observationInstance':observationInstance]" />
@@ -25,7 +25,7 @@
 
 
 		<div class="prop">
-			<span class="name"><i class="icon-map-marker"></i>Place</span>
+			<span class="name"><i class="icon-map-marker"></i></span>
 			<div class="value">
 				<g:if test="${observationInstance.placeName == ''}">
 					${observationInstance.reverseGeocodedName}
@@ -59,7 +59,7 @@
 <%--		</div>--%>
 
 		<div class="prop">
-			<span class="name"><i class="icon-time"></i>Submitted</span>
+			<span class="name"><i class="icon-time"></i></span>
 			<time class="timeago" datetime="${observationInstance.createdOn.getTime()}"></time>
 <%--			<obv:showDate--%>
 <%--				model="['observationInstance':observationInstance, 'propertyName':'createdOn']" />--%>

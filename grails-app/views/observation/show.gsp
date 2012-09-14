@@ -201,15 +201,6 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 					%>
 					<comment:showAllComments model="['commentHolder':observationInstance, commentType:'super', 'canPostComment':canPostComment, 'showCommentList':false]" />
 					</div>
-<%--					<customsecurity:isPermittedAsPerGroups object='${observationInstance}'--%>
-<%--							permission='${org.springframework.security.acls.domain.BasePermission.WRITE}'--%>
-<%--							property='allowNonMembersToComment'>--%>
-<%--						<comment:postComment model="['commentHolder':observationInstance, 'rootHolder':observationInstance, commentType:'super']" />--%>
-<%--					</customsecurity:isPermittedAsPerGroups>--%>
-<%--	--%>
-<%--				    <comment:showAllComments model="['commentHolder':observationInstance, commentType:'super']" />--%>
-<%--						<fb:comments href="${createLink(controller:'observation', action:'show', id:observationInstance.id, base:Utils.getDomainServerUrl(request))}"--%>
-<%--							num_posts="10" width="620" colorscheme="light"  notify="true"></fb:comments>--%>
 					<feed:showAllActivityFeeds model="['rootHolder':observationInstance, feedType:'Specific', refreshType:'manual', 'feedPermission':'editable']" />
 				</div>
 

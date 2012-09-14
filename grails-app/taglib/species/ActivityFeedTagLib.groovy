@@ -86,6 +86,28 @@ class ActivityFeedTagLib {
 			case activityFeedService.OBSERVATION_UPDATED:
 				text = "User updated the observation details"
 				break
+			
+			case activityFeedService.USERGROUP_CREATED:
+				text = activityType
+				break
+			case activityFeedService.USERGROUP_UPDATED:
+				text = activityType
+				break
+			case activityFeedService.OBSERVATION_POSTED_ON_GROUP:
+				text = getObservationHyperLink(activityDomainObj) + " posted"
+				break
+			case activityFeedService.OBSERVATION_REMOVED_FROM_GROUP:
+				text = getObservationHyperLink(activityDomainObj) + " removed"
+				break
+			case activityFeedService.MEMBER_JOINED:
+				text = getUserHyperLink(activityDomainObj) + " joined the group"
+				break
+			case activityFeedService.MEMBER_ROLE_UPDATED:
+				text = getUserHyperLink(activityDomainObj) + "'s role updated"
+				break
+			case activityFeedService.MEMBER_LEFT:
+				text = getUserHyperLink(activityDomainObj) + " left the group"
+				break
 			default:
 				text = activityType
 				break
@@ -108,4 +130,13 @@ class ActivityFeedTagLib {
 		}
  		return "" + sb
 	}
+	
+	private getObservationHyperLink(obv){
+		return "" + (g.link(controller:"observation", action:"show", id:obv.id){"<i>Observation</i>"})
+	}
+	
+	private getUserHyperLink(user){
+		return "" + (g.link(controller:"sUser", action:"show", id:user.id){"<i>$user.username</i>"})
+	}
+	
 }

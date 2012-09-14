@@ -30,6 +30,7 @@ class UserGroupController {
 	def aclUtilService;
 	def observationService;
 	def emailConfirmationService;
+	def activityFeedService;
 
 	static allowedMethods = [save: "POST", update: "POST",]
 
@@ -135,6 +136,7 @@ class UserGroupController {
 		}
 		else {
 			log.debug "Successfully created usergroup : "+userGroupInstance
+			activityFeedService.addActivityFeed(userGroupInstance, null, springSecurityService.currentUser, activityFeedService.USERGROUP_CREATED);
 			flash.message = "${message(code: 'default.created.message', args: [message(code: 'userGroup.label', default: 'UserGroup'), userGroupInstance.id])}"
 			redirect(action: "show", id: userGroupInstance.id)
 		}
@@ -241,6 +243,7 @@ class UserGroupController {
 			}
 			else {
 				log.debug "Successfully updated usergroup : "+userGroupInstance
+				activityFeedService.addActivityFeed(userGroupInstance, null, springSecurityService.currentUser, activityFeedService.USERGROUP_UPDATED);
 				flash.message = "${message(code: 'default.updated.message', args: [message(code: 'userGroup.label', default: 'UserGroup'), userGroupInstance.name])}"
 				if(params.founders) {
 					flash.message += ". Sent email invitation to ${params.founders} to join as founders"
@@ -261,6 +264,7 @@ class UserGroupController {
 		if (userGroupInstance) {
 			try {
 				userGroupService.delete(userGroupInstance)
+				activityFeedService.deleteFeed(userGroupInstance);
 				flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'userGroup.label', default: 'UserGroup'), params.id])}"
 				redirect(action: "list")
 				return
@@ -551,6 +555,7 @@ class UserGroupController {
 
 		def user = springSecurityService.currentUser;
 		if(user && userGroupInstance.deleteMember(user)) {
+			activityFeedService.addActivityFeed(userGroupInstance, user, user, activityFeedService.MEMBER_LEFT);
 			flash.message = 'Thank you for being with us.'
 			render (['msg':'Thank you for being with us.', 'success':true, 'statusComplete':true] as JSON);
 			return;

@@ -163,7 +163,7 @@ modules = {
 	admin { dependsOn	'core' }
 
 	userGroups_show {
-		dependsOn 'observations, gallery, carousel'
+		dependsOn 'observations, gallery, carousel, activityfeed'
 
 		resource url:'/js/jsrender.js'
 		resource url:'/js/species/observations/show.js'

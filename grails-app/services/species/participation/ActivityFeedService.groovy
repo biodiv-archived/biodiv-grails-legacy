@@ -5,12 +5,22 @@ import java.text.SimpleDateFormat
 class ActivityFeedService {
 	
 	static final String COMMENT_ADDED = "Comment added" 
+	
+	//observation related
 	static final String OBSERVATION_CREATED = "Observation created"
 	static final String OBSERVATION_UPDATED = "Observation updated"
-	
 	static final String OBSERVATION_FLAGGED = "Observation flagged"
 	static final String SPECIES_RECOMMENDED = "Species recommended"
 	static final String SPECIES_AGREED_ON = "Species agreed on"
+	
+	//group related
+	static final String USERGROUP_CREATED = "User group created"
+	static final String USERGROUP_UPDATED = "User group updated"
+	static final String OBSERVATION_POSTED_ON_GROUP = "Observation posted on group"
+	static final String OBSERVATION_REMOVED_FROM_GROUP = "Observation removed from group"
+	static final String MEMBER_JOINED = "New member joined"
+	static final String MEMBER_ROLE_UPDATED = "Member role updated"
+	static final String MEMBER_LEFT = "Member left"
 	
 	static final String OLDER = "older"
 	static final String NEWER = "newer"
