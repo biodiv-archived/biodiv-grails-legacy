@@ -80,21 +80,13 @@
 							</div-->
 
 							<div style="clear: both;">
-
-								<%
+							<%
 								def canPostComment = customsecurity.hasPermissionForAction([object:userGroupInstance, permission:org.springframework.security.acls.domain.BasePermission.WRITE]).toBoolean()
 							%>
 								<comment:showAllComments
-									model="['commentHolder':userGroupInstance, commentType:'super', 'canPostComment':canPostComment]" />
-								<%--								--%>
-								<%--								<sec:permitted object='${userGroupInstance}'--%>
-								<%--										permission='${org.springframework.security.acls.domain.BasePermission.WRITE}'>--%>
-								<%--									<comment:postComment model="['commentHolder':userGroupInstance, 'rootHolder':userGroupInstance, commentType:'super']" />--%>
-								<%--								</sec:permitted>--%>
-								<%--															--%>
-								<%--							--%>
-								<%--				    			<comment:showAllComments model="['commentHolder':userGroupInstance, commentType:'super']" />--%>
+									model="['commentHolder':userGroupInstance, commentType:'super', 'canPostComment':canPostComment, 'showCommentList':false]" />
 							</div>
+							<feed:showAllActivityFeeds model="['rootHolder':userGroupInstance, feedType:'Specific', refreshType:'manual', 'feedPermission':'editable']" />
 						</div>
 					</div>
 				</div>

@@ -3,10 +3,11 @@
 <%@ page import="species.participation.Observation"%>
 <%@ page import="species.participation.Recommendation"%>
 <%@ page import="species.participation.RecommendationVote"%>
+
 <html>
 <head>
 <meta property="og:type" content="article" />
-<meta property="og:title" content="${observationInstance.title()}"/>
+<meta property="og:title" content="${(!observationInstance.maxVotedSpeciesName?.equalsIgnoreCase('Unknown'))?observationInstance.maxVotedSpeciesName:'Help Identify'}"/>
 <meta property="og:url" content="${createLink(controller:'observation', action:'show', id:observationInstance.id, base:Utils.getDomainServerUrl(request))}" />
 <g:set var="fbImagePath" value="" />
 <%
@@ -194,26 +195,14 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 						</div>
 						
 					</div>
-			    	
 					<div class="union-comment" style="clear: both;">
 					<%
 						def canPostComment = customsecurity.hasPermissionAsPerGroups([object:observationInstance, permission:org.springframework.security.acls.domain.BasePermission.WRITE]).toBoolean()
 					%>
-					<comment:showAllComments model="['commentHolder':observationInstance, commentType:'super', 'canPostComment':canPostComment]" />
-					
-<%--					<customsecurity:isPermittedAsPerGroups object='${observationInstance}'--%>
-<%--							permission='${org.springframework.security.acls.domain.BasePermission.WRITE}'--%>
-<%--							property='allowNonMembersToComment'>--%>
-<%--						<comment:postComment model="['commentHolder':observationInstance, 'rootHolder':observationInstance, commentType:'super']" />--%>
-<%--					</customsecurity:isPermittedAsPerGroups>--%>
-<%--	--%>
-<%--				    <comment:showAllComments model="['commentHolder':observationInstance, commentType:'super']" />--%>
-<%--						<fb:comments href="${createLink(controller:'observation', action:'show', id:observationInstance.id, base:Utils.getDomainServerUrl(request))}"--%>
-<%--							num_posts="10" width="620" colorscheme="light"  notify="true"></fb:comments>--%>
+					<comment:showAllComments model="['commentHolder':observationInstance, commentType:'super', 'canPostComment':canPostComment, 'showCommentList':false]" />
 					</div>
-					
+					<feed:showAllActivityFeeds model="['rootHolder':observationInstance, feedType:'Specific', refreshType:'manual', 'feedPermission':'editable']" />
 				</div>
-
 
 				<div class="span4">
 					
@@ -270,6 +259,8 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 	Galleria.loadTheme('${resource(dir:'js/galleria/1.2.7/themes/classic/',file:'galleria.classic.min.js')}');
 	
 	$(document).ready(function(){
+<%--		initRelativeTime("${createLink(controller:'activityFeed', action:'getServerTime')}");--%>
+
 		dcorateCommentBody($('.comment .yj-message-body'));
 		$("#seeMoreMessage").hide();
 		
@@ -347,6 +338,7 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 	            	showRecos(data, null);
 	            	$('#canName').val('');
 	            	updateUnionComment(null, "${createLink(controller:'comment', action:'getAllNewerComments')}");
+	            	updateFeeds();
 	            	return false;
 	            },
 	            error:function (xhr, ajaxOptions, thrownError){

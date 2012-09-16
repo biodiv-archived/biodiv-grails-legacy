@@ -42,6 +42,7 @@ class UserGroupService {
 	def grailsApplication;
 	def emailConfirmationService;
 	def sessionFactory
+	def activityFeedService;
 
 
 	private void addPermission(UserGroup userGroup, SUser user, int permission) {
@@ -351,6 +352,7 @@ class UserGroupService {
 			log.error "Could not add ${observation} to ${usergroup}"
 			log.error  userGroup.errors.allErrors.each { log.error it }
 		} else {
+			activityFeedService.addActivityFeed(userGroup, observation, observation.author, activityFeedService.OBSERVATION_POSTED_ON_GROUP);
 			log.debug "Added ${observation} to userGroup ${userGroup}"
 		}
 	}
@@ -375,6 +377,7 @@ class UserGroupService {
 			log.error "Could not remove ${observation} from ${usergroup}"
 			log.error  userGroup.errors.allErrors.each { log.error it }
 		} else {
+			activityFeedService.addActivityFeed(userGroup, observation, observation.author, activityFeedService.OBSERVATION_REMOVED_FROM_GROUP);
 			log.debug "Removed ${observation} from userGroup ${userGroup}"
 		}
 	}
@@ -451,6 +454,7 @@ class UserGroupService {
 			permissions.each { permission ->
 				addPermission userGroup, user, permission
 			}
+			activityFeedService.addActivityFeed(userGroup, user, user, activityFeedService.MEMBER_JOINED);
 			return true;
 		} else {
 			log.debug "${user} is already a member of ${userGroup}"
@@ -463,6 +467,7 @@ class UserGroupService {
 						addPermission userGroup, user, permission
 					}
 					log.debug "Updated permissions as per new role"
+					activityFeedService.addActivityFeed(userGroup, user, user, activityFeedService.MEMBER_ROLE_UPDATED);
 					return true;
 				} else {
 					log.error "error while updating role for ${userMemberRole}"

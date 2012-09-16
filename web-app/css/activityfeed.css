@@ -1,0 +1,58 @@
+.activityfeed li {
+	margin-left: -9px;
+	list-style: none none;
+}
+
+.activityfeed a {
+    color: #16509E;
+    text-decoration: none;
+}
+
+.activityfeedAll {
+	width:700px;
+	background-color:#ffffff;
+}
+
+.activityfeedGeneric {
+	width:700px;
+	background-color:#ffffff;
+}
+
+.activityfeedSpecific {
+	clear:both;
+	background-color: rgba(106, 201, 162, 0.15);
+}
+
+.activityfeedSpecific .activityFeed-container {
+	background-color: #e5e5e5;
+}
+
+.activityFeedContext {
+	clear:both;
+	margin-top:5px;
+}
+
+.feedParentContext {
+	background-color:#ffffff;
+}
+
+.activityFeed-container{
+    border-bottom: 1px solid #DDDDDD;
+    margin: 0 0 2px;
+    min-height: 20px;
+    padding: 7px;
+}
+
+
+
+.activityfeed .feedActivityHolderContext{
+	background-color: #EBEBEB;
+	clear:both;
+}
+
+.activityfeed .timeago{
+    color: #666666;
+    display: inline;
+    line-height: 16px;
+    margin-bottom: 0;
+}

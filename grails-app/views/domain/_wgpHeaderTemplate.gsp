@@ -9,6 +9,7 @@
 
     <div class="span7 top_nav_bar">
     <ul>
+    <li onclick="location.href='${createLink("controller":"activityFeed")}'" title="Activity" id="activity_nav_link">Activity</li>
     <li onclick="location.href='${createLink("controller":"species")}'" title="Species" id="species_nav_link">Species</li>
     <li onclick="location.href='${createLink("controller":"observation")}'" title="Observations" id="species_nav_link">Observations</li>
     <li onclick="location.href='${createLink("controller":"userGroup")}'" title="Groups" id="species_nav_link">Groups</li>
