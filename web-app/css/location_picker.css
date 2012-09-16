@@ -29,7 +29,7 @@ min-height: 300px;
 }
 
 .row {
-clear: both;
+/* clear: both; */
 padding-top:3px;
 padding-bottom:3px;
 }

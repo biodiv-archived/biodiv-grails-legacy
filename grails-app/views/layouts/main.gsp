@@ -50,40 +50,8 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 	<auth:ajaxLogin />
 	<div id="fb-root"></div>
 	
-	<div id="species_main_wrapper">
-		
-		<div class="container_12 container">
-			<div id="menu" class="grid_12 ui-corner-all"
-				style="margin-bottom: 10px;">
+	<div id="species_main_wrapper" style="clear:both;">
 
-				<g:if
-					test="${params.controller == 'species' || params.controller == 'search'}">
-					<sNav:render group="species_dashboard" subitems="false" />
-				</g:if>
-				<g:if test="${params.controller == 'observation'}">
-					<sNav:render group="observation_dashboard" subitems="false" />
-				</g:if>
-				<g:if test="${params.controller == 'SUser'}">
-					<sNav:render group="users_dashboard" subitems="false" />
-				</g:if>
-
-			
-
-				
-				<g:if
-					test="${params.controller == 'species' || params.controller == 'observation' || params.controller == 'SUser'}">
-
-				<div style="float: right;">
-					<search:searchBox />
-				</div>
-				</g:if>
-				
-				
-
-			</div>
-
-		</div>
-		
 		<uGroup:showSidebar />
 		<g:layoutBody />
 
@@ -162,6 +130,8 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 				$( "#searchbox" ).attr('action', $(this).attr('href')).submit();
 				e.preventDefault();
 			})
+			
+			$(".ellipsis").trunk8();
 			 
 		}); 
 	

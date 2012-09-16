@@ -67,16 +67,16 @@ $( "#search" ).click(function() {
 	$( "#searchbox" ).submit();
 });
 </r:script>
-	<div id="mainSearchForm" style="position:relative">
+<div id="mainSearchForm" class="dropdown pull-left">
 	<form method="get"
 		action="${createLink(action:'search') }"
-		id="searchbox" class="form-horizontal">
+		id="searchbox" class="navbar-search"  style="margin-top:0px;">
 		<div class="input-append">
 			<input type="text" name="query" id="searchTextField" value=""
-			size="26"
-			placeholder="Enter your search key" />
-                        <input id="search"  class="btn btn-default" type="submit"
-			value="Search"/></div>
+				class="search-query span3"
+				placeholder="Search" />
+            <input id="search"  class="btn btn-default" type="submit"
+				value="Search" style="display:none;"/></div>
 
 		<g:hiddenField name="start" value="0" />
 		<g:hiddenField name="rows" value="10" />
@@ -91,4 +91,4 @@ $( "#search" ).click(function() {
 		
 	</form>
 	<div id="nameSuggestionsMain" style="display:block;"></div>
-	</div>
+</div>

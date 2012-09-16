@@ -1,4 +1,4 @@
-<div style='clear: both'>
+<div>
 	<fieldset>
 		<legend>
 			<g:message code="springSecurity.login.title" default="Log in" />

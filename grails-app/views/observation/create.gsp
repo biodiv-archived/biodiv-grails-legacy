@@ -151,7 +151,7 @@ input.dms_field {
 			<form id="${form_id}" action="${form_action}" method="POST"
 				class="form-horizontal">
 
-				<div class="span12 super-section" style="clear: both;">
+				<div class="span12 super-section">
 					<div class="section">
 						<h3>What did you observe?</h3>
 

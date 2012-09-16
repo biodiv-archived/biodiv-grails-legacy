@@ -30,7 +30,8 @@ class UserGroupController {
 	def aclUtilService;
 	def observationService;
 	def emailConfirmationService;
-
+	def namesIndexerService;
+	
 	static allowedMethods = [save: "POST", update: "POST",]
 
 	def index = {
@@ -790,6 +791,80 @@ class UserGroupController {
 		if (!userGroupInstance) return;
 		render (view:'pageCreate', model:['userGroupInstance':userGroupInstance])
 	}
+	
+	///////////////////////////////////////////////////////////////////////////////
+	////////////////////////////// SEARCH /////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////
+
+	/**
+	 *
+	 */
+	def search = {
+		log.debug params;
+		
+		def model = getUserGroupList(params);
+		if(!params.isGalleryUpdate?.toBoolean()){
+			render (view:"list", model:model)
+		} else{
+			def userGroupListHtml =  g.render(template:"/common/userGroup/showUserGroupListTemplate", model:model);
+			def userGroupFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
+
+			def filteredTags = userGroupService.getTagsFromUserGroup(model.totalUserGroupInstanceList.collect{it.id})
+			def tagsHtml = g.render(template:"/common/observation/showAllTagsTemplate", model:[tags:filteredTags, isAjaxLoad:true]);
+			def mapViewHtml = g.render(template:"/common/observation/showObservationMultipleLocationTemplate", model:[userGroupInstanceList:model.totalUserGroupInstanceList]);
+
+			def result = [obvListHtml:userGroupListHtml, obvFilterMsgHtml:userGroupFilterMsgHtml, tagsHtml:tagsHtml, mapViewHtml:mapViewHtml]
+			render result as JSON
+		}
+	}
+	/**
+	* Ajax call used by autocomplete textfield.
+	*/
+   def nameTerms = {
+	   log.debug params
+
+	   params.max = Math.min(params.max ? params.int('max') : 5, 10);
+	   
+	   def jsonData = []
+
+	   def namesLookupResults = namesIndexerService.suggest(params)
+	   jsonData.addAll(namesLookupResults);
+
+	   jsonData.addAll(getUserGroupSuggestions(params));
+	   render jsonData as JSON
+   }
+   
+   /**
+	*
+	*/
+   def terms = {
+	   log.debug params;
+	   params.max = Math.min(params.max ? params.int('max') : 5, 10);
+	   render getUserGroupSuggestions(params) as JSON;
+   }
+
+   private getUserGroupSuggestions(params){
+	   def jsonData = []
+	   String name = params.term
+	   
+	   String usernameFieldName = 'name';//SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
+	   String userId = 'id';
+
+
+	   def results = UserGroup.executeQuery(
+			   "SELECT DISTINCT u.$usernameFieldName, u.$userId " +
+			   "FROM UserGroup u " +
+			   "WHERE LOWER(u.$usernameFieldName) LIKE :name " +
+			   "ORDER BY u.$usernameFieldName",
+			   [name: "${name.toLowerCase()}%"],
+			   [max: params.max])
+
+	   for (result in results) {
+		   jsonData << [value: result[0], label:result[0] , userId:result[1] , "category":"User Groups"]
+	   }
+	   
+	   return jsonData;
+   }
 }
 
 class UserGroupCommand {

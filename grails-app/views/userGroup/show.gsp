@@ -66,12 +66,6 @@
 				<div>
 
 					<div class="super-section userGroup-section">
-						<div class="description notes_view">
-							${userGroupInstance.description}
-						</div>
-					</div>
-
-					<div class="super-section userGroup-section">
 						<div class="section">
 							<h5>Activity Stream</h5>
 							<!-- div id="map_view_bttn" class="btn-group">

@@ -24,7 +24,7 @@
 						${flash.message}
 					</div>
 				</g:if>
-				<div style='clear: both'>
+				<div>
 					<fieldset>
 						<legend>
 							<g:message code="spring.security.ui.resetPassword.header"

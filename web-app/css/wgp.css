@@ -1012,20 +1012,22 @@ line-height: 14px;
 top: 0;
 right: 0;     
 }
-#mainMenu {
-    margin-left: 10px;
+#mainMenu,  #myGroups {
+/*     margin-left: 10px; */
     margin-top: 0;
-    clear: both;
+/*     clear: both; */
     font-size: 12pt;
     margin-left: 10px;
     font-weight: bold;
-    position:absolute;
-    top: 0px;        
-    left: 200px;     
+/*     position:absolute; */
+/*     top: 0px;         */
+/*     left: 200px;      */
     padding: 5px;     
-    min-width: 540px;         
+    min-width: 540px;
+    width:960px;  
+    overflow:visible;       
 }
-#mainMenu ul.links li a:link, #mainMenu ul li a:visited, #mainMenu ul li a:hover, #mainMenu ul li a:active {
+#mainMenu ul.links li a:link, #mainMenu ul li a:visited, #mainMenu ul li a:hover, #mainMenu ul li a:active, #myGroups a:link, #myGroups  a:visited, #myGroups a:hover, #myGroups a:active {
     background-color: #726033;
     border-radius: 5px 5px 5px 5px;
     color: #ECE9B7;
@@ -1415,3 +1417,15 @@ max-width: 100%;
 	right: 0;
 }
 
+.sidebar {
+	margin: 0px;
+	width: 250px;
+}
+
+.left-sidebar {
+	float: left;
+}
+
+.right-sidebar {
+	float: right;
+}

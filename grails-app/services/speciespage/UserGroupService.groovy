@@ -7,6 +7,7 @@ import java.util.Map;
 import grails.plugins.springsecurity.Secured;
 import groovy.sql.Sql;
 
+import org.apache.solr.common.SolrException;
 import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
 import org.springframework.security.access.prepost.PostFilter
 import org.springframework.security.access.prepost.PreAuthorize
@@ -40,6 +41,7 @@ class UserGroupService {
 	def observationService;
 	def grailsApplication;
 	def emailConfirmationService;
+	def sessionFactory
 
 
 	private void addPermission(UserGroup userGroup, SUser user, int permission) {
@@ -69,10 +71,10 @@ class UserGroupService {
 		addInterestedSpeciesGroups(userGroup, params.speciesGroup)
 		addInterestedHabitats(userGroup, params.habitat)
 
-                userGroup.sw_latitude = Float.parseFloat(params.sw_latitude);
-                userGroup.sw_longitude = Float.parseFloat(params.sw_longitude);
-                userGroup.ne_latitude = Float.parseFloat(params.ne_latitude);
-                userGroup.ne_longitude = Float.parseFloat(params.ne_longitude);
+		userGroup.sw_latitude = Float.parseFloat(params.sw_latitude);
+		userGroup.sw_longitude = Float.parseFloat(params.sw_longitude);
+		userGroup.ne_latitude = Float.parseFloat(params.ne_latitude);
+		userGroup.ne_longitude = Float.parseFloat(params.ne_longitude);
 
 		if(!userGroup.hasErrors() && userGroup.save()) {
 			def tags = (params.tags != null) ? params.tags.values() as List : new ArrayList();
@@ -146,7 +148,7 @@ class UserGroupService {
 		UserGroupMemberRole.removeAll(userGroup)
 		userGroup.delete()
 		// Delete the ACL information as well
-		
+
 	}
 
 	@PreAuthorize("hasPermission(#userGroup, admin)")
@@ -154,8 +156,26 @@ class UserGroupService {
 		aclUtilService.deletePermission(userGroup, user.email, permission);
 	}
 
+	@Transactional
 	def getUserGroups(SUser userInstance) {
-		return userInstance.groups;
+		return userInstance.getUserGroups();
+	}
+
+	@Transactional
+	def getSuggestedUserGroups(SUser userInstance) {
+
+		def conn = new Sql(sessionFactory.currentSession.connection())
+
+		def userGroups = [];
+
+		conn.eachRow("""select distinct s.user_group_id, max(s.count) as maxCount from ((select distinct u1.user_group_id, u2.count from  user_group_observations u1, (select observation_id, count(*) from user_group_observations group by observation_id) u2 where u1.observation_id=u2.observation_id) union (select distinct u1.user_group_species_groups_id, u2.count from  user_group_species_group u1, (select species_group_id, count(*) from user_group_species_group group by species_group_id) u2 where u1.species_group_id=u2.species_group_id) union (select distinct u1.user_group_habitats_id, u2.count from  user_group_habitat u1, (select habitat_id, count(*) from user_group_habitat group by habitat_id) u2 where u1.habitat_id=u2.habitat_id)) s where s.user_group_id not in (select distinct user_group_id from user_group_member_role where s_user_id=${userInstance.id}) group by s.user_group_id order by maxCount desc;""",
+				{ row ->
+					userGroups << UserGroup.read(row.user_group_id)
+
+				}
+				)
+		return userGroups;
+
 	}
 
 	/////////////// TAGS RELATED START /////////////////
@@ -239,6 +259,12 @@ class UserGroupService {
 			activeFilters["tag"] = params.tag
 		}
 
+		if(params.query) {
+			filterQuery += " and lower(uGroup.name) LIKE :name ";
+			queryParams["name"] = params.query.toLowerCase()+"%"
+			activeFilters["name"] = params.query
+		}
+		
 		if(params.user){
 			params.user = params.user.toLong()
 			query += "  ,UserGroupMemberRole userGroupMemberRole "
@@ -276,7 +302,7 @@ class UserGroupService {
 			activeFilters["habitat"] = params.habitat
 		}
 
-		def sortOption = (params.sort ? params.sort : "visitCount");
+		def sortOption = (params.sort ? ((params.sort=='score')?'name':params.sort) : "visitCount");
 		def orderByClause = " order by uGroup." + sortOption +  " desc, uGroup.id asc"
 
 		query += filterQuery + orderByClause
@@ -543,7 +569,7 @@ class UserGroupService {
 					name = founder."$usernameFieldName".capitalize()
 					userId = founder.id.toString()
 				}
-				
+
 				def userToken = new UserToken(username: name, controller:'userGroup', action:'confirmMembershipRequest', params:['userGroupInstanceId':userGroupInstance.id.toString(), 'userId':userId, 'role':UserGroupMemberRoleType.ROLE_USERGROUP_FOUNDER.value()]);
 				userToken.save(flush: true)
 				emailConfirmationService.sendConfirmation(founderEmail,
@@ -580,4 +606,27 @@ class UserGroupService {
 					"Invitation to join as member in group",  [name:name, fromUser:springSecurityService.currentUser, userGroupInstance:userGroupInstance,domain:domain, view:'/emailtemplates/memberInvitation'], userToken.token);
 		}
 	}
+	
+	////////////////////////////// SEaRCH ///////////////////////////
+	
+	/**
+	*
+	* @param params
+	* @return
+	*/
+   def getUserGroupsFromSearch(params) {
+	   def max = Math.min(params.max ? params.int('max') : 9, 100)
+	   def offset = params.offset ? params.long('offset') : 0
+
+	   def model;
+	   
+	   try {
+		   model = getFilteredUserGroups(params, max, offset, false);
+	   } catch(SolrException e) {
+		   e.printStackTrace();
+		   //model = [params:params, observationInstanceTotal:0, observationInstanceList:[],  queryParams:[max:0], tags:[]];
+	   }
+	   return model;
+   }
+   
 }

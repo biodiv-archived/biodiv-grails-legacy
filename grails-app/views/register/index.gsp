@@ -39,7 +39,7 @@
 					</div>
 				</g:if>
 				
-				<div id='formLogin' style='clear: both'>
+				<div id='formLogin'>
 					<fieldset>
 						<legend>
 							<g:message code="spring.security.ui.register.description"

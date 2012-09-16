@@ -127,7 +127,7 @@ max-width: 100%;
 			<g:set var="members_autofillUsersId" value="id2" />
 			<form id="${form_id}" action="${form_action}" method="POST"
 				class="form-horizontal">
-				<div class="span12 super-section" style="clear: both;">
+				<div class="span12 super-section">
 					<div class="section"
 						style="position: relative; overflow: visible;">
 						<h3>Groups</h3>
