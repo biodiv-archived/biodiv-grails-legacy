@@ -37,7 +37,7 @@
 						href="${createLink(controller:"userGroup", "action":"species",  id:userGroupInstance.id)}"
 						title="Species">Species</a> <g:if
 							test="${params.action == 'species'}">
-							<div class="submenu gradient-bg dropdown-menu"
+							<div class="submenu dropdown-menu"
 								style="width: 390px">
 								<ul class="navigation"
 									id="navigation_userGroup_species_dashboard">
@@ -59,7 +59,7 @@
 						href="${createLink(controller:"userGroup", "action":"observations",  id:userGroupInstance.id)}"
 						title="Observations">Observations</a> <g:if
 							test="${params.action == 'observations'}">
-							<div class="submenu gradient-bg dropdown-menu"
+							<div class="submenu dropdown-menu"
 								style="width: 290px">
 								<ul class="navigation"
 									id="navigation_userGroup_observation_dashboard">
@@ -90,7 +90,7 @@
 						<ul class="nav">
 							<li class="dropdown"><a href="#" class="dropdown-toggle"
 								data-toggle="dropdown"> More <b class="caret"></b> </a>
-								<div class="submenu gradient-bg dropdown-menu"
+								<div class="submenu dropdown-menu"
 									style="width: 500px; left: -400px;">
 									<ul class="navigation">
 										<li><a
@@ -118,7 +118,7 @@
 						href="${createLink("controller":"species")}" title="Species">Species</a>
 						<g:if
 							test="${params.controller == 'species' || params.controller == 'search'}">
-							<div class="submenu gradient-bg dropdown-menu"
+							<div class="submenu dropdown-menu"
 								style="width: 390px">
 								<sNav:render group="species_dashboard" subitems="false" />
 							</div>
@@ -128,7 +128,7 @@
 						href="${createLink("controller":"observation")}"
 						title="Observations">Observations</a> <g:if
 							test="${params.controller == 'observation'}">
-							<div class="submenu gradient-bg dropdown-menu"
+							<div class="submenu dropdown-menu"
 								style="width: 290px;">
 								<sNav:render group="observation_dashboard" subitems="false" />
 							</div>
@@ -140,7 +140,7 @@
 						<ul class="nav">
 							<li class="dropdown"><a href="#" class="dropdown-toggle"
 								data-toggle="dropdown"> More <b class="caret"></b> </a>
-								<div class="submenu gradient-bg dropdown-menu"
+								<div class="submenu dropdown-menu"
 									style="width: 500px; left: -400px;">
 									<ul class="navigation">
 										<li><a href="${createLink(controller:'user', action:'list')}"
@@ -214,8 +214,9 @@ $(document).ready(function(){
 
 <style>
 .submenu {
-	padding: 0; <%--
+	padding: 0; 
+	border: 0;
 	background-color: transparent;
-	--%>
+	box-shadow: none;
 }
 </style>
