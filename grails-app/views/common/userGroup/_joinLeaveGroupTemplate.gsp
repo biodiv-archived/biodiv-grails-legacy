@@ -8,7 +8,7 @@
 	<g:else>
 		<a class="btn btn-large btn-success requestMembership"
 			data-group-id="${userGroupInstance.id }"> <i class="icon-plus"></i>
-			Request Membership</a>
+			Join Us</a>
 	</g:else>
 
 

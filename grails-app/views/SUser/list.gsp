@@ -19,6 +19,10 @@
 	*font-size: 120px;
 	line-height: 120px;
 }
+
+.thumbnails > li {
+	margin: 0 0 18px 10px;
+}
 </style>
 
 </head>

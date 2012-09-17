@@ -31,14 +31,14 @@ Just change the color-values to apply your own color-scheme.
 .navigation {
     list-style-type: none;
     clear: both;
-    margin: 1em 0;
+    margin: 5px 0;
     font-size: 13px;
     /*overflow: hidden;*/ /* Clearing floats */
 }
 
 .navigation li {
     float: left;
-    margin-left:4px;
+    margin-left:5px;
     /* border: 1px solid #888; */
     /* border-left-color: #bbb; */
 }
@@ -62,7 +62,7 @@ Just change the color-values to apply your own color-scheme.
     filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#19000000,endColorstr=#19000000);   /* IE6 & 7 */
       zoom: 1;
     border-radius: 5px;
-    text-shadow: 1px 1px 1px #aaaaaa;
+/*     text-shadow: 1px 1px 1px #aaaaaa; */
     font-weight: bold;
 }
 .navigation li a:hover {

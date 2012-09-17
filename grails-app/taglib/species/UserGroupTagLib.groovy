@@ -222,7 +222,7 @@ class UserGroupTagLib {
 		def subList= []
 		int i=0;
 		userGroups.each {
-			if(i++<3) {
+			if(i++<5) {
 				subList.push(it)
 				return;
 			}
@@ -237,7 +237,7 @@ class UserGroupTagLib {
 		def subList= []
 		int i=0;
 		userGroups.each {
-			if(i++<3) {
+			if(i++<5) {
 				subList.push(it)
 				return;
 			}

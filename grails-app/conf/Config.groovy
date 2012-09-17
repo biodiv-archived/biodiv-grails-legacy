@@ -612,13 +612,11 @@ navigation.species_dashboard = [
         [controller:'species', title:'Species Gallery', order:1, action:"list"],
         [controller:'species', title:'Taxonomy Browser', order:10, action:'taxonBrowser'],
 		[controller:'species', title:'Contribute', order:30, action:'contribute'],
-		[controller:'SUser', title:'Users', order:40, action:'list']
 ]
 
 navigation.observation_dashboard = [
         [controller:'observation', title:'Browse Observations', order:1, action:'list'],
         [controller:'observation', title:'Add Observation', order:10, action:"create"],
-		[controller:'SUser', title:'Users', order:20, action:'list']
 ]
 
 navigation.users_dashboard = [
@@ -631,6 +629,17 @@ navigation.users_dashboard = [
 navigation.user_group_dashboard = [
 	[controller:'userGroup', title:'Browse Groups', order:1, action:'list'],
     [controller:'userGroup', title:'Create New Group', order:10, action:"create"],
+]
+
+navigation.userGroup_species_dashboard = [
+	[controller:'species', title:'Species Gallery', order:1, action:"list"],
+	[controller:'species', title:'Taxonomy Browser', order:10, action:'taxonBrowser'],
+	[controller:'species', title:'Contribute', order:30, action:'contribute'],
+]
+
+navigation.userGroup_observation_dashboard = [
+	[controller:'userGroup', action:'observations', title:'Browse Observations', order:1, action:'list'],
+	[controller:'observation', title:'Add Observation', order:10, action:"create"],
 ]
 
 navigation.dashboard = [
