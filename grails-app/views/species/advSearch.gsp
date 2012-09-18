@@ -79,19 +79,8 @@ var cache = {},
 </head>
 <body>
 	<div class="container_16 big_wrapper outer_wrapper">
-		<div class="page-header clearfix">
-				<h1>
-					<g:message code="default.advSearch.heading" default="Advanced Search" />
-				</h1>
-			
-		</div>
-
-		<g:if test="${flash.message}">
-			<div class="message">
-				${flash.message}
-			</div>
-		</g:if>
-		
+		<s:showSubmenuTemplate model="['entityName':'Advanced Search']"/>
+				
 		<div class="row"  id="advSearchBox">
 			<form id="advSearchForm" method="get" class="form-horizontal span12 super-section"
 					action="${createLink(action:'advSelect') }"

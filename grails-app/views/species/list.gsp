@@ -52,20 +52,7 @@ $(document).ready(function(){
 </head>
 <body>
 		<div class="container_16 big_wrapper outer_wrapper">
-				<div class="page-header clearfix">
-						<h1>
-							<g:message code="default.species.heading" default="Species" />
-						</h1>
-				</div>
-
-				<g:if test="${flash.message}">
-					<div class="message">
-						${flash.message}
-					</div>
-				</g:if>
-
-
-
+		<s:showSubmenuTemplate model="['entityName':'Species']"/>
 		<div class="gallerytoolbar grid_16" >
 			<div class="filters" style="position: relative;overflow:visible;">
 				<div class="paginateButtons">

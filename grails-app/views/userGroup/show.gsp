@@ -55,16 +55,7 @@
 		<div class="row">
 			<div class="observation span12">
 
-
-				<div class="page-header clearfix">
-					<div style="width: 100%;">
-						<uGroup:showHeader model=[ 'userGroupInstance':userGroupInstance] />
-					</div>
-				</div>
-
-
-				<div>
-
+					<uGroup:showSubmenuTemplate/>
 					<div class="super-section userGroup-section">
 						<div class="section">
 							<h5>Activity Stream</h5>
@@ -79,7 +70,7 @@
 								<uGroup:showActivityOnMap model="['userGroupInstance':userGroupInstance]"/>
 							</div-->
 
-							<div style="clear: both;">
+							<div>
 							<%
 								def canPostComment = customsecurity.hasPermissionForAction([object:userGroupInstance, permission:org.springframework.security.acls.domain.BasePermission.WRITE]).toBoolean()
 							%>
@@ -89,7 +80,6 @@
 							<feed:showAllActivityFeeds model="['rootHolder':userGroupInstance, feedType:'Specific', refreshType:'manual', 'feedPermission':'editable']" />
 						</div>
 					</div>
-				</div>
 			</div>
 		</div>
 	</div>

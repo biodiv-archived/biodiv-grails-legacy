@@ -14,15 +14,10 @@
 	<div class="container outer-wrapper">
 		<div class="row">
 			<div class="span12">
+				<obv:showSubmenuTemplate/>
 				<div class="page-header clearfix">
 						<search:searchResultsHeading/>
 				</div>
-
-				<g:if test="${flash.message}">
-					<div class="message">
-						${flash.message}
-					</div>
-				</g:if>
 				
 				<div class="searchResults">
 					<obv:showObservationsListWrapper />

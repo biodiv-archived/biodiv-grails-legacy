@@ -13,14 +13,9 @@
 	<div class="container outer-wrapper">
 		<div class="row">
 			<div class="span12">
-
-				<div class="page-header clearfix">
+				<uGroup:showSubmenuTemplate/>
+				<div class="page-header">
 					<h1>Groups</h1>
-				</div>
-
-				<div class="alertMsg ${(flash.message)?'alert':'' }"
-					style="clear: both;">
-					${flash.message}
 				</div>
 
 				<uGroup:showUserGroupsListWrapper

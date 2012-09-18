@@ -10,17 +10,8 @@
 </head>
 <body>
 	<div class="container_16 big_wrapper outer_wrapper">
-				<div class="page-header clearfix">
-						<h1>
-							<g:message code="default.species.contribute.heading" default="Contribute to Species Pages" />
-						</h1>
-				</div>
-
-				<g:if test="${flash.message}">
-					<div class="message">
-						${flash.message}
-					</div>
-				</g:if>
+		<s:showSubmenuTemplate model="['entityName':'Contribute to Species Pages']"/>
+				
 <%
 String supportEmail = "";
 String domain = Utils.getDomain(request);

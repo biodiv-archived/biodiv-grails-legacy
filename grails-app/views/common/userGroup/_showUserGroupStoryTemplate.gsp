@@ -9,5 +9,5 @@
 <td>
 	${userGroupInstance.getAllMembersCount()}
 </td>
-<td><uGroup:joinLeaveGroupTemplate
-		model="['userGroupInstance':userGroupInstance]" /></td>
+<td><div class="pull-right"><uGroup:joinLeaveGroupTemplate
+		model="['userGroupInstance':userGroupInstance]" /></div></td>

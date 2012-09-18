@@ -51,7 +51,8 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 	<div id="fb-root"></div>
 	
 	<div id="species_main_wrapper" style="clear:both;">
-
+		<domain:showHeader/>
+		
 		<uGroup:showSidebar />
 		<g:layoutBody />
 

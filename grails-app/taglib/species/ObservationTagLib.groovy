@@ -201,5 +201,8 @@ class ObservationTagLib {
 		out << render(template:"/common/observation/showObservationStoryFooterTemplate", model:attrs.model);
 	}
 	
+	def showSubmenuTemplate = {attrs, body->
+		out << render(template:"/observation/observationSubmenuTemplate", model:attrs.model);
+	} 	
 }
 

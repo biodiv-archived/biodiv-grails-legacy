@@ -72,10 +72,14 @@ class UserGroupService {
 		addInterestedSpeciesGroups(userGroup, params.speciesGroup)
 		addInterestedHabitats(userGroup, params.habitat)
 
-		userGroup.sw_latitude = Float.parseFloat(params.sw_latitude);
-		userGroup.sw_longitude = Float.parseFloat(params.sw_longitude);
-		userGroup.ne_latitude = Float.parseFloat(params.ne_latitude);
-		userGroup.ne_longitude = Float.parseFloat(params.ne_longitude);
+		if(params.sw_latitude)
+			userGroup.sw_latitude = Float.parseFloat(params.sw_latitude)
+		if(params.sw_longitude)
+			userGroup.sw_longitude = Float.parseFloat(params.sw_longitude)
+		if(params.ne_latitude)
+			userGroup.ne_latitude = Float.parseFloat(params.ne_latitude)
+		if(params.ne_longitude)
+			userGroup.ne_longitude = Float.parseFloat(params.ne_longitude)
 
 		if(!userGroup.hasErrors() && userGroup.save()) {
 			def tags = (params.tags != null) ? params.tags.values() as List : new ArrayList();

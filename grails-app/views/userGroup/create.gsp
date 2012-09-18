@@ -92,16 +92,13 @@ max-width: 100%;
 
 		<div class="observation_create row">
 			<div class="span12">
-				<div class="page-header clearfix">
+				<uGroup:showSubmenuTemplate/>
+				<div class="page-header">
 					<h1>
 						${entityName}
 					</h1>
 				</div>
-				<g:if test="${flash.message}">
-					<div class="message">
-						${flash.message}
-					</div>
-				</g:if>
+				
 
 				<g:hasErrors bean="${userGroupInstance}">
 					<i class="icon-warning-sign"></i>

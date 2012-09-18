@@ -869,6 +869,20 @@ class UserGroupController {
 	   
 	   return jsonData;
    }
+   
+   def allGroups= {
+	   log.debug params;
+		def userGroupInstance = findInstance()
+		if (!userGroupInstance) return;
+		render (view:'allGroups', model:['userGroupInstance':userGroupInstance])
+   }
+   
+   def myGroups= {
+	   log.debug params;
+		def userGroupInstance = findInstance()
+		if (!userGroupInstance) return;
+		render (view:'myGroups', model:['userGroupInstance':userGroupInstance])
+   }
 }
 
 class UserGroupCommand {

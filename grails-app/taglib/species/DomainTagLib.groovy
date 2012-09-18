@@ -18,5 +18,9 @@ class DomainTagLib {
 	def showIBPFooter = { attrs ->
 		out << render(template:"/domain/ibpFooterTemplate");
 	}
+	
+	def showHeader = { attrs ->
+		out << render(template:"/domain/headerTemplate");
+	}
 
 }

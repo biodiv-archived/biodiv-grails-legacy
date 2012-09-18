@@ -77,13 +77,8 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 				<!--h1>
 				<g:message code="default.show.label" args="[entityName]" />
 			</h1-->
-
-				<g:if test="${flash.message}">
-					<div class="message">
-						${flash.message}
-					</div>
-				</g:if>
-				<br />
+			
+				<obv:showSubmenuTemplate/>
 
 				<div class="page-header clearfix">
 					<div style="width:100%;">

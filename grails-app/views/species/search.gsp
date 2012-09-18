@@ -36,6 +36,7 @@ $( "#search" ).unbind('click');
 </head>
 <body>
 	<div class="container big_wrapper outer_wrapper">
+		<s:showSubmenuTemplate/>
 		<div class="page-header clearfix">
 			<search:searchResultsHeading/>
 		</div>

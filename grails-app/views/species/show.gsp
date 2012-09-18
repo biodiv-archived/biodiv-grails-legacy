@@ -287,6 +287,7 @@ $(document).ready(function(){
 
 <body>
 <div class="container_16 big_wrapper outer_wrapper">
+			<s:showSubmenuTemplate/>
 				<div class="page-header clearfix">
 						<h1>
 					${speciesInstance.taxonConcept.italicisedForm }
@@ -294,14 +295,6 @@ $(document).ready(function(){
 										<h4><%=CommonNames.findByTaxonConceptAndLanguage(speciesInstance.taxonConcept, Language.findByThreeLetterCode('eng'))?.name%></h4>
 				</div>
 
-			<g:if test="${flash.message}">
-				<div
-					class="ui-state-highlight ui-corner-all grid_16">
-					<span class="ui-icon-info" style="float: left; margin-right: .3em;"></span>
-					${flash.message}
-					
-				</div>
-			</g:if>
 			<g:if test="${!speciesInstance.percentOfInfo}">
 				<div
 					class="poor_species_content ui-state-highlight ui-corner-all grid_16">

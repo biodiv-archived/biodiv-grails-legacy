@@ -37,16 +37,8 @@
 	<div class="container outer-wrapper">
 		<div class="row">
 			<div class="span12">
-				<div class="page-header clearfix">
-						<h1>Related Observations</h1>
-				</div>
-
-				<g:if test="${flash.message}">
-					<div class="message">
-						${flash.message}
-					</div>
-				</g:if>
-
+				<obv:showSubmenuTemplate model="['entityName':'Related Observations']"/>
+			
 				<div>
 					<div class="tags_section span3" style="float: right;">
 						<obv:showAllTags

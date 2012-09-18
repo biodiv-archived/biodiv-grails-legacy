@@ -90,5 +90,8 @@ class SpeciesTagLib {
 	def chooseLanguage = { attrs, body->
 		out << render(template:"/common/chooseLanguageTemplate", model:attrs.model);
 	}
-	
+
+	def showSubmenuTemplate = {attrs, body->
+		out << render(template:"/species/speciesSubmenuTemplate", model:attrs.model);
+	}
 }

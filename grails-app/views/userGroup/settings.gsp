@@ -17,14 +17,7 @@
 	<div class="container outer-wrapper">
 		<div class="row">
 			<div class="observation span12">
-
-
-				<div class="page-header clearfix">
-					<div style="width: 100%;">
-						<uGroup:showHeader model=[ 'userGroupInstance':userGroupInstance] />
-					</div>
-				</div>
-
+				<uGroup:showSubmenuTemplate/>
 				<div class="super-section">
 					<ul class="nav nav-tabs" data-tabs="tabs">
 						<li class="active"><a href="#general">General</a></li>

@@ -113,26 +113,8 @@ input.dms_field {
 
 		<div class="observation_create row">
 			<div class="span12">
-				<div class="page-header clearfix">
-						<h1>
-							<!--g:message code="default.create.label" args="[entityName]" /-->
-							Add an Observation
-						</h1>
-				</div>
-				<g:if test="${flash.message}">
-					<div class="message">
-						${flash.message}
-					</div>
-				</g:if>
-
-				<g:hasErrors bean="${observationInstance}">
-					<i class="icon-warning-sign"></i>
-					<span class="label label-important"> <g:message
-							code="fix.errors.before.proceeding" default="Fix errors" /> </span>
-					<%--<g:renderErrors bean="${observationInstance}" as="list" />--%>
-				</g:hasErrors>
+				<obv:showSubmenuTemplate model="['entityName':'Add an Observation']"/>
 			</div>
-
 
 			<%
 				def form_id = "addObservation"

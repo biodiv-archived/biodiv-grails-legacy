@@ -3,27 +3,21 @@
 	<div class="top_nav_bar navbar">
 		<div class="container">
 			<div style="margin-left:10px;">
+					<div class="span3 logo" >
+						<uGroup:showUserGroupSignature  model="[ 'userGroup':userGroupInstance]" />
+					</div>
 					<h1>${userGroupInstance.name}</h1>
-					<!-- span class="ellipsis multiline">
+					<span class="ellipsis multiline">
 						${userGroupInstance.description}
-					</span-->
+					</span>
 				</div>
 		</div>
 	</div>
 
 
+	
 	<div id="actionsHeader" style="position: relative; overflow: visible;">
 		<uGroup:showActionsHeaderTemplate model="['userGroupInstance':userGroupInstance]"/>
-	</div>
-
-	<g:if test="${flash.error}">
-		<div class="alertMsg alert alert-error" style="clear:both;">
-			${flash.error}
-		</div>
-	</g:if>
-	
-	<div class="alertMsg ${(flash.message)?'alert':'' }" style="clear:both;">
-		${flash.message}
 	</div>
 
 </div>

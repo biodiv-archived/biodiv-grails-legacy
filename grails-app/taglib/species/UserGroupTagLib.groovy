@@ -336,4 +336,8 @@ class UserGroupTagLib {
 	def showUserGroupSignature = {attrs, body ->
 		out<<render(template:"/common/userGroup/showUserGroupSignatureTemplate", model:attrs.model);
 	}
+	
+	def showSubmenuTemplate = {attrs, body->
+		out << render(template:"/userGroup/userGroupSubmenuTemplate", model:attrs.model);
+	}
 }

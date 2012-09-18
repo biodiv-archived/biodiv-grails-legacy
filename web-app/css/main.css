@@ -788,7 +788,7 @@ html.busy,html.busy * {
 .big_wrapper {
 /* 	padding-top: 20px; */
 	padding-bottom: 20px;
-	margin-top: 10px;
+/* 	margin-top: 10px; */
 	margin-bottom: 20px;
         background-color: rgba(106, 201, 162, 0.15);
 	background: transparent\9;

@@ -18,17 +18,10 @@
 	<div class="container outer-wrapper">
 		<div class="row">
 			<div class="observation span12">
-
-
-
-				<div class="page-header clearfix">
-					<div style="width: 100%;">
-						<uGroup:showHeader model=[ 'userGroupInstance':userGroupInstance] />
-					</div>
-				</div>
+				<uGroup:showSubmenuTemplate/>
 				<div class="super-section userGroup-section">
 					<div class="section">
-						<div class="page-header clearfix">
+						<div class="page-header">
 							<h5>Pages</h5>
 							<div class="btn-group pull-right" style="z-index: 10;">
 								<sec:permitted className='species.groups.UserGroup'
