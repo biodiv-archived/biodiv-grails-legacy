@@ -14,10 +14,9 @@
 
 				</ul>
 
-				<search:searchBox />
+				
 				<ul class="nav pull-right">
-					<li><a
-						href="${createLink(controller:'activityFeed') }">Activity</a>
+					<li><search:searchBox />
 					</li>
 					<li class="divider-vertical"></li>
 					<li><sUser:userLoginBox /></li>
