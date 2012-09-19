@@ -158,7 +158,7 @@ class ActivityFeed {
 				if(!params.author){
 					return false
 				}
-				def groups = params.author.groups
+				def groups = params.author.getUserGroups()
 				params.showUserFeed = true
 				params.typeToIdFilterMap = getGroupAndObsevations(groups)
 				break
