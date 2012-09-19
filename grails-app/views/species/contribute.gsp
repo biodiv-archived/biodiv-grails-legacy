@@ -22,7 +22,7 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 }
 %>
 		<div class="row ">
-			<div class="span12 super-section" style="clear:both;">
+			<div class="span12 super-section">
 				<div class="section">
 				<p>We request you to contribute to the species pages and build
 					rich and reliable information on the biodiversity of India.</p>

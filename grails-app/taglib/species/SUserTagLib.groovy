@@ -25,6 +25,13 @@ class SUserTagLib {
 		}
 	}
 
+	def renderCurrentUserId = { attrs ->
+		def currentUser = springSecurityService.getCurrentUser()
+		if(currentUser) {
+			out << currentUser.id
+		}
+	}
+	
 	/**
 	 * Renders the body if the authenticated user owns this page.
 	 */

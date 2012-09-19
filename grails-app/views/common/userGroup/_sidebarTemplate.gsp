@@ -2,6 +2,49 @@
 <%@ page import="species.groups.SpeciesGroup"%>
 <%@ page import="species.Habitat"%>
 
+
+<div class="span3">
+	<sec:ifLoggedIn>
+		<div class="super-section">
+
+			<ul class="nav">
+				<li class="nav-header">Home</li>
+				<li><a
+					href="${createLink(controller:'userGroup', action:'activityFeed', params:['user':sUser.renderCurrentUserId()])}"><i
+						class="icon-home"></i>My Feed</a>
+				</li>
+
+				<li><a
+					href="${createLink(controller:'user', action:'show', params:['user':sUser.renderCurrentUserId()])}"><i
+						class="icon-user"></i>My Profile</a>
+				</li>
+				<li><a
+					href="${createLink(controller:'userGroup', action:'list', params:['user':sUser.renderCurrentUserId()])}"><i
+						class="icon-user"></i>My Groups</a>
+				</li>
+				<li><a
+					href="${createLink(controller:'observation', action:'list', params:['user':sUser.renderCurrentUserId()])}"><i
+						class="icon-screenshot"></i>My Observations</a>
+				</li>
+
+			</ul>
+		</div>
+	</sec:ifLoggedIn>
+	<div class="super-section">
+		<ul class="nav">
+			<li class="${(params.action=='create')?'active':'' }"><a
+				href="${createLink(action:'create')}"><i class="icon-plus"></i>Add
+					Observation</a>
+			</li>
+		</ul>
+	</div>
+	<div class="super-section">
+		<uGroup:showSuggestedUserGroups />
+	</div>
+
+</div>
+
+
 <g:if test="${false }">
 	<div class="super-section">
 		<div class="section">

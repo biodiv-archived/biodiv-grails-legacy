@@ -121,7 +121,7 @@
 									<% def openId = user.openIds.find { it.url.indexOf('facebook') != -1 }
 									def facebookUrl = openId?.url %>
 									<g:if test="${facebookUrl}">
-										 <div class="facebookButton" style="background-repeat:no-repeat; margin:0px;height:33px;"> 
+										 <div class="facebookButton" style="background-repeat:no-repeat; margin:0px 70px;height:33px;"> 
 													<a class="fbJustConnect"
 												target="_blank" 
 												href="${facebookUrl}">Facebook Profile</a>

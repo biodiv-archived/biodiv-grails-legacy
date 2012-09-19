@@ -1,5 +1,5 @@
 <ul class="nav">
-	<li class="nav-header">Other groups that might interest you</li>
+	<li class="nav-header">Other groups of interest</li>
 	<li style="clear: both;" />
 	<g:each in="${userGroups}" var="userGroup">
 		<li><uGroup:showUserGroupSignature

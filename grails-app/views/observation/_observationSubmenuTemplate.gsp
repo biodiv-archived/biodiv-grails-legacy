@@ -1,15 +1,4 @@
 
-<div class="tabbable tabs-left"
-	style="margin-left: -167px; float: left;">
-	<ul class="nav nav-tabs" style="margin-right: 0px">
-		<li class="${(params.action=='list')?'active':'' }"><a
-			href="${createLink(action:'list')}">Browse Observations</a></li>
-		<li class="${(params.action=='create')?'active':'' }"><a
-			href="${createLink(action:'create')}">Add Observation</a>
-		</li>
-	</ul>
-</div>
-
 <g:if test="${entityName}">
 	<div class="page-header">
 		<h1>

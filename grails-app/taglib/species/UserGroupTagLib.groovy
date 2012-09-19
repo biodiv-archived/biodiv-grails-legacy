@@ -231,7 +231,7 @@ class UserGroupTagLib {
 		out << render(template:"/common/userGroup/showCurrentUserUserGroupsSidebarTemplate", model:['userGroups':subList]);
 	}
 
-	def getSuggestedUserGroups = {attrs, body ->
+	def showSuggestedUserGroups = {attrs, body ->
 		def user = springSecurityService.getCurrentUser();
 		Set userGroups = userGroupService.getSuggestedUserGroups(user);
 		def subList= []

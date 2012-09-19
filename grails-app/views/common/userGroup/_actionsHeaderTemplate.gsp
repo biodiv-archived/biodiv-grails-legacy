@@ -10,7 +10,7 @@
 									href="${createLink(action:'edit', id:userGroupInstance.id)}">
 									<i
 					class="icon-edit"></i>Edit Group </a>
-								<a class="btn btn-large btn-primary" href="${createLink(action:'settings', id:params.id)}"><i class="icon-cog"></i>Settings</a>
+								<!-- a class="btn btn-large btn-primary" href="${createLink(action:'settings', id:params.id)}"><i class="icon-cog"></i>Settings</a-->
 			</sec:permitted>
 							
 			<sec:permitted className='species.groups.UserGroup'
@@ -47,7 +47,7 @@
 				</div>
 			</div>
 
-			<uGroup:joinLeaveGroupTemplate/>
+			<uGroup:joinLeaveGroupTemplate model="['showLeave':false]"/>
 			<div class="modal hide" id="leaveUsModalDialog">
 				<div class="modal-header">
 					<button type="button" class="close" data-dismiss="modal">×</button>

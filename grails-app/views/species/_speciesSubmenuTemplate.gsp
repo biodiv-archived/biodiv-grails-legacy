@@ -1,18 +1,4 @@
 
-<div class="tabbable tabs-left"
-	style="margin-left: -163px; float: left;">
-	<ul class="nav nav-tabs" style="margin-right: 0px">
-		<li class="${(params.action=='list')?'active':'' }"><a
-			href="${createLink(action:'list')}">Browse Species</a></li>
-		<li class="${(params.action=='taxonBrowser')?'active':'' }"><a
-			href="${createLink(action:'taxonBrowser')}">Taxonomy Browser</a>
-		</li>
-		<li class="${(params.action=='contribute')?'active':'' }"><a
-			href="${createLink(action:'contribute')}">Contribute</a>
-		</li>
-	</ul>
-</div>
-
 <g:if test="${entityName}">
 	<div class="page-header">
 		<h1>

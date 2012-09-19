@@ -10,10 +10,11 @@
 			data-group-id="${userGroupInstance.id }"> <i class="icon-plus"></i>
 			Join Us</a>
 	</g:else>
-
-
 </uGroup:isNotAMember>
-<uGroup:isAMember model="['userGroupInstance':userGroupInstance]">
-	<a class="btn btn-large btn-primary leaveUs" data-group-id="${userGroupInstance.id }"><i
-		class="icon-minus"></i>Leave</a>
-</uGroup:isAMember>
+
+<g:if test="${showLeave}">
+	<uGroup:isAMember model="['userGroupInstance':userGroupInstance]">
+		<a class="btn btn-large btn-primary leaveUs"
+			data-group-id="${userGroupInstance.id }"><i class="icon-minus"></i>Leave</a>
+	</uGroup:isAMember>
+</g:if>
