@@ -24,7 +24,7 @@
 						${flash.message}
 					</div>
 				</g:if>
-				<feed:showAllActivityFeeds model="[feedType:'All']" />
+				<feed:showFeedWithFilter model="[feedType:feedType, feedCategory:'All']" />
 			</div>
 		</div>
 	</div>

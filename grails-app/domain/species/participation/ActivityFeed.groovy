@@ -4,6 +4,7 @@ import org.hibernate.Hibernate;
 import org.hibernate.criterion.DetachedCriteria
 
 import species.auth.SUser
+import species.groups.UserGroup;
 import species.participation.ActivityFeedService
 
 class ActivityFeed {
@@ -64,8 +65,32 @@ class ActivityFeed {
 						eq('rootHolderType', params.rootHolderType)
 						eq('rootHolderId', params.rootHolderId.toLong())
 						break
+					case [ActivityFeedService.GROUP_SPECIFIC, ActivityFeedService.MY_FEEDS]:
+						or{
+							params.typeToIdFilterMap.each{key, value ->
+								println "==== key $key === val $value"
+								if(!value.isEmpty()){ 
+									and{
+										eq('rootHolderType', key)
+										'in'('rootHolderId', value)
+									}
+								}
+							}
+							if(params.showUserFeed){
+								and{
+									eq('author', params.author)
+									eq('rootHolderType', Observation.class.getCanonicalName())
+								}
+							}
+						}
 					default:
 						break
+				}
+				if(params.feedCategory && params.feedCategory.trim() != ActivityFeedService.ALL){
+					eq('rootHolderType', params.feedCategory)
+				}
+				if(params.feedClass){
+					eq('activityHolderType', params.feedClass)
 				}
 				(params.timeLine == ActivityFeedService.OLDER) ? lt('lastUpdated', refTime) : gt('lastUpdated', refTime)
 			}
@@ -93,7 +118,7 @@ class ActivityFeed {
 					case ActivityFeedService.GENERIC:
 						eq('rootHolderType', params.rootHolderType)
 						break
-					case ActivityFeedService.SPECIFIC:
+					case [ActivityFeedService.SPECIFIC, ActivityFeedService.GROUP_SPECIFIC]:
 						eq('rootHolderType', params.rootHolderType)
 						eq('rootHolderId', params.rootHolderId.toLong())
 						break
@@ -108,16 +133,36 @@ class ActivityFeed {
 	private static validateParams(params){
 		params.feedType = params.feedType ?: ActivityFeedService.ALL
 		switch (params.feedType) {
+			//to handle complete list (ie groups, obvs, species)
 			case ActivityFeedService.GENERIC:
 				if(!params.rootHolderType || params.rootHolderType.trim() == ""){
 					return false
 				}
 				break
+			//to search for only specific object	
 			case ActivityFeedService.SPECIFIC:
 				if(!params.rootHolderType || params.rootHolderType.trim() == "" || !params.rootHolderId || params.rootHolderId.trim() == ""){
 					return false
 				}
 				break
+			
+			case ActivityFeedService.GROUP_SPECIFIC:
+				if(!params.rootHolderType || params.rootHolderType.trim() != UserGroup.class.getCanonicalName()){ 
+					return false
+				}
+				def groups = [UserGroup.read(params.rootHolderId.toLong())]
+				params.typeToIdFilterMap = getGroupAndObsevations(groups)
+				break
+			
+			case ActivityFeedService.MY_FEEDS:
+				if(!params.author){
+					return false
+				}
+				def groups = params.author.groups
+				params.showUserFeed = true
+				params.typeToIdFilterMap = getGroupAndObsevations(groups)
+				break
+				
 			default:
 				break
 		}
@@ -128,6 +173,21 @@ class ActivityFeed {
 		params.max = params.max ?: ((params.timeLine == ActivityFeedService.OLDER) ? ((params.feedType == ActivityFeedService.SPECIFIC) ? 2 : 5)  :null)
 		
 		return true
+	}
+	
+	private static getGroupAndObsevations(groups){
+		def m = [:]
+		m[Observation.class.getCanonicalName()] = getObvIds(groups)
+		m[UserGroup.class.getCanonicalName()] = groups.collect{ it.id}
+		return m
+	}
+	
+	private static getObvIds(groups){
+		def obvIds = []
+		groups.each{ it ->
+			obvIds.addAll(it.observations.collect{it.id})
+		}
+		return obvIds
 	}
 	
 	private static getDate(String timeIn){

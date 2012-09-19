@@ -53,8 +53,12 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 	<div id="species_main_wrapper" style="clear:both;">
 		<domain:showHeader/>
 		
-		<uGroup:showSidebar />
-		<g:layoutBody />
+		<div class="container outer-wrapper">
+			<div class="row">
+				<uGroup:showSidebar />
+				<g:layoutBody />
+			</div>
+		</div>
 
 		<domain:showWGPFooter />
 

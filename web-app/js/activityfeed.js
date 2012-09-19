@@ -1,7 +1,10 @@
 var oldFeedProcessing = false;
 var serverTimeDiff = null;
 
-function loadOlderFeedsInAjax(targetComp, url, feedType){
+function loadOlderFeedsInAjax(targetComp){
+	var url = $(targetComp).children('input[name="feedUrl"]').val();
+	var feedType = $(targetComp).children('input[name="feedType"]').val();
+	
 	$.ajax({
  		url: url,
 		dataType: "json",
@@ -28,13 +31,16 @@ function loadOlderFeedsInAjax(targetComp, url, feedType){
 	});
 }
 
-function loadNewerFeedsInAjax(targetComp, url, feedType){
+function loadNewerFeedsInAjax(targetComp){
+	var url = $(targetComp).children('input[name="feedUrl"]').val();
+	var feedType = $(targetComp).children('input[name="feedType"]').val();
+	
 	$.ajax({ 
      	url:url,
 		dataType: 'json', 
 		data: getFeedParams("newer", targetComp),	
 		success: function(data, statusText, xhr, form) {
-        	if(data.showFeedListHtml){
+			if(data.showFeedListHtml){
         		var refreshType = $(targetComp).children('input[name="refreshType"]').val();
         		if(refreshType == "auto"){
         			$(targetComp).hide().fadeIn(3000);
@@ -49,6 +55,7 @@ function loadNewerFeedsInAjax(targetComp, url, feedType){
         	return false;
         },
         error:function (xhr, ajaxOptions, thrownError){
+        	//alert("error ====");
         	//successHandler is used when ajax login succedes
         	var successHandler = this.success, errorHandler = undefined;
         	handleError(xhr, ajaxOptions, thrownError, successHandler, errorHandler);
@@ -65,10 +72,14 @@ function removeDuplicateFeed(parentList, newList, feedType, feedTimeType){
 		$(newList).each(function(index) {
 			var liClass = $(this).attr("class");
 			if(liClass){
-				var selector = 'li[class="' + liClass +  '"]'
-				var dupEle = $(parentList).children(selector);
-				if(dupEle.attr("class") == undefined){
+				if(feedType === "GroupSpecific" && liClass.match("^species.groups.UserGroup")){
 					newListStr = newListStr + '<li class="'+ liClass +'">' + $(this).html() + '</li>';
+				}else{
+					var selector = 'li[class="' + liClass +  '"]'
+					var dupEle = $(parentList).children(selector);
+					if(dupEle.attr("class") == undefined){
+						newListStr = newListStr + '<li class="'+ liClass +'">' + $(this).html() + '</li>';
+					}	
 				}
 			}
 		});
@@ -78,8 +89,10 @@ function removeDuplicateFeed(parentList, newList, feedType, feedTimeType){
 	$(newList).each(function(index) {
 		var liClass = $(this).attr("class");
 		if(liClass){
-			var selector = 'li[class="' + liClass +  '"]'
-			$(parentList).children(selector).remove();
+			if(!(feedType === "GroupSpecific" && liClass.match("^species.groups.UserGroup"))){
+				var selector = 'li[class="' + liClass +  '"]'
+				$(parentList).children(selector).remove();
+			}
 		}
 		
 	});
@@ -95,6 +108,8 @@ function getFeedParams(timeLine, targetComp){
 	feedParams["activityHolderId"] = $(targetComp).children('input[name="activityHolderId"]').val();
 	feedParams["activityHolderType"] = $(targetComp).children('input[name="activityHolderType"]').val();
 	feedParams["feedType"] = $(targetComp).children('input[name="feedType"]').val();
+	feedParams["feedCategory"] = $(targetComp).children('input[name="feedCategory"]').val();
+	feedParams["feedClass"] = $(targetComp).children('input[name="feedClass"]').val();
 	feedParams["feedPermission"] = $(targetComp).children('input[name="feedPermission"]').val();
 	
 	feedParams["refreshType"] = $(targetComp).children('input[name="refreshType"]').val();
@@ -112,14 +127,14 @@ function setUpFeedForTarget(targetComp){
 		return; 
 	}
 	
-	var feedType = $(targetComp).children('input[name="feedType"]').val();
+	//var feedType = $(targetComp).children('input[name="feedType"]').val();
 	var refreshType = $(targetComp).children('input[name="refreshType"]').val();
-	var url = $(targetComp).children('input[name="feedUrl"]').val();
+	//var url = $(targetComp).children('input[name="feedUrl"]').val();
 	
 	if(refreshType === "auto"){
-		pollForFeeds(targetComp, url, feedType); //to get newer feeds
-		autoLoadOnScroll(targetComp, url, feedType); // to get older feeds on scroll bottom
-		loadOlderFeedsInAjax(targetComp, url, feedType); // to load some feeds to start with
+		pollForFeeds(targetComp); //to get newer feeds
+		autoLoadOnScroll(targetComp); // to get older feeds on scroll bottom
+		loadOlderFeedsInAjax(targetComp); // to load some feeds to start with
 	}
 }
 
@@ -147,22 +162,22 @@ function updateRelativeTime(){
 	$('.timeago').timeago({serverTimeDiff:serverTimeDiff});
 }
 
-function pollForFeeds(targetComp, url, feedType){
+function pollForFeeds(targetComp){
 	window.setInterval(function(){
 		if($(window).scrollTop() < 250 ){
-			loadNewerFeedsInAjax(targetComp, url, feedType);
+			loadNewerFeedsInAjax(targetComp);
 		}
 	}, 15000);
 } 
 
-function autoLoadOnScroll(targetComp, url, feedType){
+function autoLoadOnScroll(targetComp){
 	$(window).scroll(function() {
 		if(oldFeedProcessing){
 			return false;
 		}
 		if($(window).scrollTop() + $(window).height() > $(document).height() - 100) {
 			oldFeedProcessing = true;
-			loadOlderFeedsInAjax(targetComp, url, feedType);
+			loadOlderFeedsInAjax(targetComp);
 		}
 	});	
 }
@@ -181,7 +196,17 @@ function getTargetComp(){
 	if(targetComp.length > 0){
 		return targetComp;
 	}
-	
+
+	targetComp = $('.activityfeedMyFeeds');
+	if(targetComp.length > 0){
+		return targetComp;
+	}
+
+	targetComp = $('.activityfeedGroupSpecific');
+	if(targetComp.length > 0){
+		return targetComp;
+	}
+		
 	targetComp = $('.activityfeedSpecific');
 	if(targetComp.length == 1){
 		return targetComp;
@@ -192,12 +217,35 @@ function getTargetComp(){
 function updateFeeds(){
 	var targetComp = getTargetComp();
 	if(targetComp){
-		var feedType = $(targetComp).children('input[name="feedType"]').val();
-		var url = $(targetComp).children('input[name="feedUrl"]').val();
 		var refreshType = $(targetComp).children('input[name="refreshType"]').val();
 		if(refreshType == "manual"){
-			loadNewerFeedsInAjax(targetComp, url, feedType);	
+			loadNewerFeedsInAjax(targetComp);	
 		}
 	}
 }
+
+function updateFeedComponent(targetComp, feedCategory){
+	 $(targetComp).children('input[name="feedCategory"]').val(feedCategory);
+	 $(targetComp).children('input[name="newerTimeRef"]').val("");
+	 $(targetComp).children('input[name="olderTimeRef"]').val("");
+	 $(targetComp).children('ul').empty();
+	 loadOlderFeedsInAjax(targetComp);
+}
+
+$('.feed_filter_label').click(function(){
+	var caret = '<span class="caret"></span>'
+	if($.trim(($(this).html())) == $.trim($("#feedFilterButton").html().replace(caret, ''))){
+		$("#feedFilter").hide();
+		return false;
+	}
+	$('.feed_filter_label.active').removeClass('active');
+	$(this).addClass('active');
+    $("#feedFilterButton").html($(this).html() + caret);
+    $("#feedFilter").hide();
+    var feedCategory =  $(this).attr("value");
+    var targetComp =  $(this).closest(".feedFilterDiv").next(".activityfeed");
+    updateFeedComponent(targetComp, feedCategory);
+    return false;   
+});
+
 

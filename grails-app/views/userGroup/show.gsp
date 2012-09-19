@@ -77,7 +77,8 @@
 								<comment:showAllComments
 									model="['commentHolder':userGroupInstance, commentType:'super', 'canPostComment':canPostComment, 'showCommentList':false]" />
 							</div>
-							<feed:showAllActivityFeeds model="['rootHolder':userGroupInstance, feedType:'Specific', refreshType:'manual', 'feedPermission':'editable']" />
+							<feed:showFeedWithFilter model="['rootHolder':userGroupInstance, feedType:'GroupSpecific', refreshType:'manual', feedPermission:'editable', feedCategory:'All']" />
+<%--							<feed:showAllActivityFeeds model="['rootHolder':userGroupInstance, feedType:'GroupSpecific', refreshType:'manual', 'feedPermission':'editable']" />--%>
 						</div>
 					</div>
 			</div>

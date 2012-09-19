@@ -5,6 +5,8 @@
 	</ul>
 	<input type="hidden" name='olderTimeRef' value="${olderTimeRef}"/>
 	<input type="hidden" name='feedType' value="${feedType}"/>
+	<input type="hidden" name='feedCategory' value="${feedCategory}"/>
+	<input type="hidden" name='feedClass' value="${feedClass}"/>
 	<input type="hidden" name='feedPermission' value="${feedPermission}"/>
 	<input type="hidden" name='refreshType' value="${refreshType}"/>
 	<input type="hidden" name='rootHolderId' value="${rootHolder?.id}"/>
@@ -14,9 +16,8 @@
 	<input type="hidden" name='feedUrl' value="${createLink(controller:'activityFeed', action: 'getFeeds')}"/>
 	
 	<g:if test="${refreshType == 'manual' && remainingFeedCount > 0}" >
-		<a class="yj-thread-replies-container yj-show-older-replies" href="#" title="show feeds" onclick='loadOlderFeedsInAjax($(this).closest(".activityfeed${feedType}"), "${createLink(controller:'activityFeed', action: 'getFeeds')}", "${feedType}");return false;'>Show ${remainingFeedCount} older feeds >></a>
+		<a class="yj-thread-replies-container yj-show-older-replies" href="#" title="show feeds" onclick='loadOlderFeedsInAjax($(this).closest(".activityfeed${feedType}"));return false;'>Show ${remainingFeedCount} older feeds >></a>
 	</g:if>
-	
 </div>
 <r:script>
 	$(document).ready(function(){
