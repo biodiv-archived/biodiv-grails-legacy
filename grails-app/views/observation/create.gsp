@@ -109,9 +109,7 @@ input.dms_field {
 </style>
 </head>
 <body>
-	<div class="container outer-wrapper">
-
-		<div class="observation_create row">
+		<div class="observation_create">
 			<div class="span12">
 				<obv:showSubmenuTemplate model="['entityName':'Add an Observation']"/>
 			</div>
@@ -576,8 +574,7 @@ input.dms_field {
 
                 </div>
             </div>
-        </div>
-
+       
 		<!--====== Template ======-->
 		<script id="metadataTmpl" type="text/x-jquery-tmpl">
 	<li class="addedResource thumbnail">

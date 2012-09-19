@@ -33,23 +33,27 @@
 					<!--li class="menu-449 first"><a href="/" title="">Home</a></li-->
 					<li class="${(params.action == 'index')?' active':''}"><a
 						href="${createLink(controller:"userGroup", "action":"index",  id:userGroupInstance.id)}"
-						title="Activity">Activity</a></li>
+						title="Activity">Activity</a>
+					</li>
 					<li class="${(params.action == 'aboutUs')?' active':''}"><a
 						href="${createLink(controller:"userGroup", "action":"aboutUs",  id:userGroupInstance.id)}"
-						title="About Us">About Us</a></li>
+						title="About Us">About Us</a>
+					</li>
 
 					<li class="divider-vertical"></li>
 
 					<li class="${(params.controller == 'species')?' active':''}"><a
 						href="${createLink(controller:"species", "action":"list")}"
-						title="Species">Species</a></li>
+						title="Species">Species</a>
+					</li>
 					<li class="${(params.action == 'observations')?' active':''}"><a
 						href="${createLink(controller:"userGroup", "action":"observations",  id:userGroupInstance.id)}"
-						title="Observations">Observations</a></li>
-
-					<li><a href="/maps" title="Maps">Maps</a>
+						title="Observations">Observations</a>
 					</li>
-					<li><a href="/checklists" title="Checklists">Checklists</a></li>
+
+					<li><a href="/maps" title="Maps">Maps</a></li>
+					<li><a href="/checklists" title="Checklists">Checklists</a>
+					</li>
 					<li>
 						<ul class="nav">
 							<li class="dropdown"><a href="#" class="dropdown-toggle"
@@ -59,20 +63,17 @@
 
 										<li><a
 											href="${createLink(controller:"userGroup", "action":"pages",  id:userGroupInstance.id)}"
-											title="Pages">Pages</a></li>
-										<li><a href="/calendar" title="Events">Events</a>
+											title="Pages">Pages</a>
 										</li>
-										<li><a href="/biodiversity_news" title="News">News</a>
-										</li>
+										<li><a href="/calendar" title="Events">Events</a></li>
+										<li><a href="/biodiversity_news" title="News">News</a></li>
 										<li><a href="/collaborate-wg" title="Collaborate">Collaborate</a>
 										</li>
 										<li><a href="/themepages/list" title="Themes">Themes</a>
 										</li>
 									</ul>
-								</div>
-							</li>
-						</ul>
-					</li>
+								</div></li>
+						</ul></li>
 					<li class="divider-vertical"></li>
 
 
@@ -80,7 +81,8 @@
 					<li
 						class="${(params.controller == 'user' || params.controller == 'SUser')?' active':''}"><a
 						href="${createLink(controller:"userGroup", "action":"members",  id:userGroupInstance.id)}"
-						title="Members">Members</a></li>
+						title="Members">Members</a>
+					</li>
 
 
 
@@ -90,8 +92,7 @@
 						href="${createLink("controller":"activityFeed")}" title="Activity">Activity</a>
 					</li>
 
-					<li><a href="/about" title="About Us">About Us </a>
-					</li>
+					<li><a href="/about" title="About Us">About Us </a></li>
 
 					<li class="divider-vertical"></li>
 
@@ -101,11 +102,10 @@
 					</li>
 					<li class="${(params.controller == 'observation')?'active':''}"><a
 						href="${createLink("controller":"observation")}"
-						title="Observations">Observations</a>
+						title="Observations">Observations</a></li>
+					<li><a href="/maps" title="Maps">Maps</a></li>
+					<li><a href="/checklists" title="Checklists">Checklists</a>
 					</li>
-					<li><a href="/maps" title="Maps">Maps</a>
-					</li>
-					<li><a href="/checklists" title="Checklists">Checklists</a></li>
 
 					<li>
 						<ul class="nav">
@@ -113,27 +113,22 @@
 								data-toggle="dropdown"> More <b class="caret"></b> </a>
 								<div class="dropdown-menu">
 									<ul class="nav">
-										<li><a href="/calendar" title="Events">Events</a>
-										</li>
-										<li><a href="/biodiversity_news" title="News">News</a>
-										</li>
+										<li><a href="/calendar" title="Events">Events</a></li>
+										<li><a href="/biodiversity_news" title="News">News</a></li>
 										<li><a href="/collaborate-wg" title="Collaborate">Collaborate</a>
 										</li>
 										<li><a href="/themepages/list" title="Themes">Themes</a>
 										</li>
 
 									</ul>
-								</div>
-							</li>
-						</ul>
-					</li>
+								</div></li>
+						</ul></li>
 
 					<li class="divider-vertical"></li>
 					<li
 						class="${(params.controller == 'user' || params.controller == 'SUser')?' active':''}"><a
 						href="${createLink(controller:'user', action:'list')}"
-						title="Members">Members</a>
-					</li>
+						title="Members">Members</a></li>
 
 				</g:else>
 			</ul>

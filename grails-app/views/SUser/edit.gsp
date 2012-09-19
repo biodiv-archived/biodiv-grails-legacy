@@ -30,8 +30,7 @@
 </head>
 
 <body>
-	<div class="container outer-wrapper">
-		<div class="row">
+	
 			<div class=" user span12">
 				<div class="page-header">
 
@@ -343,8 +342,7 @@
 					</form>
 				</g:if>
 			</div>
-		</div>
-	</div>
+	
 
 
 

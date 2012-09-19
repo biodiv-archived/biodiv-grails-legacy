@@ -28,27 +28,25 @@
 </head>
 
 <body>
-	<div class="container outer-wrapper">
-		<div class="row">
-			<div class="span12">
-				<div class="page-header">
-					<h1>
-						<g:message code="default.list.label" args="[entityName]" />
-					</h1>
-				</div>
 
-				<g:if test="${flash.message}">
-					<div class="message">
-						${flash.message}
-					</div>
-				</g:if>
-
-				<sUser:showUserListWrapper model="['results':results, 'totalCount':totalCount]"/>
-			</div>
+	<div class="span12">
+		<div class="page-header">
+			<h1>
+				<g:message code="default.list.label" args="[entityName]" />
+			</h1>
 		</div>
-</div>
-	
-<r:script>
+
+		<g:if test="${flash.message}">
+			<div class="message">
+				${flash.message}
+			</div>
+		</g:if>
+
+		<sUser:showUserListWrapper
+			model="['results':results, 'totalCount':totalCount]" />
+	</div>
+
+	<r:script>
 	$(document).ready(function() {
 		
 

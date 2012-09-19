@@ -10,25 +10,22 @@
 <meta name="layout" content="main" />
 <g:set var="entityName" value="${userGroupInstance.name}" />
 <title><g:message code="default.show.label"
-		args="[userGroupInstance.name]" />
-</title>
+		args="[userGroupInstance.name]" /></title>
 <r:require modules="userGroups_show" />
 </head>
 <body>
-	<div class="container outer-wrapper">
-		<div class="row">
-			<div class="observation span12">
-				<uGroup:showSubmenuTemplate/>
-				<div class="super-section userGroup-section">
-					<g:include controller="newsletter" action="show"
-						id="${newsletterId }" />
-					<g:link action="pages" id="${userGroupInstance.id}">< Back to Newsletters</g:link>
-				</div>
 
-
-			</div>
+	<div class="observation span12">
+		<uGroup:showSubmenuTemplate />
+		<div class="userGroup-section">
+			<g:include controller="newsletter" action="show"
+				id="${newsletterId }" />
+			<g:link action="pages" id="${userGroupInstance.id}">< Back to Newsletters</g:link>
 		</div>
+
+
 	</div>
+
 	<r:script>
 		$(document).ready(function(){
 

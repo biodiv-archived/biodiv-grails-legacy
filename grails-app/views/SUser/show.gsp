@@ -18,8 +18,7 @@
 	</style>
 </head>
 <body>
-	<div class="container outer-wrapper">
-		<div class="row">
+
 			<div class="span12">
 				<div class="page-header">
 
@@ -211,11 +210,7 @@
 							
 			</div>
 			</div>
-		</div>
-
-
-	</div>
-	
+		
 	
 	
 <r:script>

@@ -278,7 +278,11 @@ $(document).ready(function(){
 });
 
 </r:script>
-
+<style>
+	 .container_16 {
+	 	width:940px;
+	 }
+</style>
 <title>
 	${speciesName}
 </title>
@@ -288,7 +292,7 @@ $(document).ready(function(){
 <body>
 <div class="container_16 big_wrapper outer_wrapper">
 			<s:showSubmenuTemplate/>
-				<div class="page-header clearfix">
+				<div class="page-header">
 						<h1>
 					${speciesInstance.taxonConcept.italicisedForm }
 						</h1>
@@ -383,7 +387,7 @@ $(document).ready(function(){
 			</div>
 
 			<!--  static species content -->
-			<div class="grid_6 classifications">
+			<div class="grid_6 classifications" style="width:330px;margin-left:0px;">
 				<t:showTaxonBrowser model="['speciesInstance':speciesInstance, 'expandSpecies':true, 'expandAll':false, 'speciesId':speciesInstance.taxonConcept?.id, expandAllIcon:false]"/>
 				<br />					
 

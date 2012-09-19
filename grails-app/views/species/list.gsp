@@ -31,15 +31,11 @@ $(document).ready(function(){
 <r:script>
 
 $(document).ready(function(){
-
-	
 	
 	$('#speciesGallerySort').change(function(){
 		updateGallery(window.location.pathname + window.location.search, ${params.limit?:51}, 0, undefined, false);
 		return false;
 	});
-	
-	
 	
 	$('li.poor_species_content').hover(function(){
 		$(this).children('.poor_species_content').slideDown(200);
@@ -49,118 +45,143 @@ $(document).ready(function(){
 	);
 });
 </r:script>
+<style type="text/css">
+.snippet.tablet {
+	width: 300px;
+	height: 65px;
+}
+
+.snippet.tablet .figure img {
+	height: auto;
+}
+
+.figure .thumbnail {
+	height: 120px;
+	margin: 0 auto;
+	text-align: center;
+	*font-size: 120px;
+	line-height: 120px;
+}
+
+.thumbnails > li {
+	margin: 0 0 18px 10px;
+}
+</style>
 </head>
 <body>
-	<div class="container_16 big_wrapper outer_wrapper">
+	<div class="span12" style="margin-left:10px;">
 		<s:showSubmenuTemplate model="['entityName':'Species']" />
 		<div class="tabbable">
-		<ul class="nav nav-tabs pull-right" style="margin-right: 0px">
-				<li class="active"><a
-					href="#list"  data-toggle="tab">Gallery</a></li>
-				<li><a
-					href="#contribute"  data-toggle="tab">Contribute</a></li>
-		</ul>
-		
-		<div class="tab-content">
-		<div id="list" class="tab-pane active">
-			<div class="gallerytoolbar grid_16">
-				<div class="filters" style="position: relative; overflow: visible;">
-					<div class="paginateButtons">
+			<ul class="nav nav-tabs pull-right" style="margin-bottom: 0px">
+				<li class="active"><a href="#list" data-toggle="tab">Gallery</a>
+				</li>
+				<li><a href="#contribute" data-toggle="tab">Contribute</a>
+				</li>
+			</ul>
+
+			<div class="tab-content">
+				<div id="list" class="tab-pane active">
+					<div class="gallerytoolbar">
+						<div class="filters"
+							style="position: relative; overflow: visible;">
+							<div class="paginateButtons">
+								<center>
+									<g:paginateOnAlphabet total="${speciesInstanceTotal}" />
+								</center>
+							</div>
+							<div class="btn-group" style="float: right; z-index: 10">
+								<button id="selected_sort" class="btn dropdown-toggle"
+									data-toggle="dropdown" href="#" rel="tooltip"
+									data-original-title="Sort by">
+
+									<g:if test="${params.sort == 'title'}">
+                                               Sort by Title
+                                            </g:if>
+									<g:else>
+                                               Sort by Richness
+                                            </g:else>
+									<span class="caret"></span>
+								</button>
+								<ul id="sortFilter" class="dropdown-menu">
+									<li class="group_option"><a class=" sort_filter_label"
+										value="title"> Sort by Title </a></li>
+									<li class="group_option"><a class=" sort_filter_label"
+										value="percentOfInfo">Sort by Richness </a></li>
+								</ul>
+							</div>
+
+							<obv:showGroupFilter />
+
+						</div>
+					</div>
+
+
+					<div align="center" class="observations thumbwrap">
+						
+						<ul class="grid_view thumbnails" style="list-style: none; text-align: left">
+							<g:each in="${speciesInstanceList}" status="i"
+								var="speciesInstance">
+
+
+
+								<g:if test="${i%3 == 0}">
+									<li
+										class="thumbnail ${speciesInstance.percentOfInfo > 0?'rich_species_content':'poor_species_content'}"
+										style="clear: both;">
+								</g:if>
+								<g:else>
+									<li
+										class="thumbnail ${speciesInstance.percentOfInfo > 0?'rich_species_content':'poor_species_content'}"
+										style="margin: 0;">
+								</g:else>
+								<g:set var="mainImage" value="${speciesInstance.mainImage()}" />
+								<%def thumbnailPath = ImageUtils.getFileName(mainImage?.fileName, ImageType.SMALL, null)%>
+								<div class="snippet tablet">
+										<g:link action="show" id="${speciesInstance.id}">
+
+											<g:if test="${thumbnailPath }">
+												<img class="icon pull-right"
+													src="${createLinkTo( base:grailsApplication.config.speciesPortal.resources.serverURL,
+											file: thumbnailPath)}"
+													title=" ${speciesInstance.taxonConcept.name}" />
+											</g:if>
+											<g:else>
+												<img class="icon pull-right" title="${speciesInstance.taxonConcept.name}"
+													src="${createLinkTo(dir: 'images', file:speciesInstance.fetchSpeciesGroupIcon(ImageType.VERY_SMALL)?.fileName, absolute:true)}"
+													style="float: right;"></img>
+											</g:else>
+											<p class="caption">${speciesInstance.taxonConcept.italicisedForm}</p>
+										</g:link>
+									
+										
+										<div class="poor_species_content" style="display: none;">No
+											information yet</div>
+									
+								</div>
+								</li>
+							</g:each>
+						</ul>
+					</div>
+					<br />
+
+					<div class="paginateButtons span11">
+						<center>
+							<g:paginate total="${speciesInstanceTotal}"
+								params="['startsWith':params.startsWith]" max="50" maxsteps="10" />
+						</center>
+					</div>
+					<br />
+
+					<div class="paginateButtons span11">
 						<center>
 							<g:paginateOnAlphabet total="${speciesInstanceTotal}" />
 						</center>
 					</div>
-					<div class="btn-group" style="float: right; z-index: 10">
-						<button id="selected_sort" class="btn dropdown-toggle"
-							data-toggle="dropdown" href="#" rel="tooltip"
-							data-original-title="Sort by">
-
-							<g:if test="${params.sort == 'title'}">
-                                               Sort by Title
-                                            </g:if>
-							<g:else>
-                                               Sort by Richness
-                                            </g:else>
-							<span class="caret"></span>
-						</button>
-						<ul id="sortFilter" class="dropdown-menu">
-							<li class="group_option"><a class=" sort_filter_label"
-								value="title"> Sort by Title </a>
-							</li>
-							<li class="group_option"><a class=" sort_filter_label"
-								value="percentOfInfo">Sort by Richness </a>
-							</li>
-						</ul>
-					</div>
-
-					<obv:showGroupFilter />
-
+				</div>
+				<div id="contribute" class="tab-pane">
+					<g:include controller="species" action="contribute" />
 				</div>
 			</div>
-
-			<br />
-			<br />
-			<br />
-
-			<div class="grid_16" align="center">
-				<g:set var="columnSize"
-					value="${Math.ceil(speciesInstanceList.size()/3)}" />
-				<g:each in="${speciesInstanceList}" status="i" var="speciesInstance">
-
-					<ul class="speciesList thumbwrap grid_5"
-						style="list-style: none; text-align: left">
-						<g:if test="${speciesInstance.percentOfInfo > 0}">
-							<li class="grid_5 rich_species_content">
-						</g:if>
-						<g:else>
-							<li class="grid_5 poor_species_content">
-						</g:else>
-						<g:link action="show" id="${speciesInstance.id}">
-							<g:set var="mainImage" value="${speciesInstance.mainImage()}" />
-							<%def thumbnailPath = ImageUtils.getFileName(mainImage?.fileName, ImageType.SMALL, null)%>
-							<g:if test="${thumbnailPath }">
-								<img class="icon" style="float: right;"
-									src="${createLinkTo( base:grailsApplication.config.speciesPortal.resources.serverURL,
-											file: thumbnailPath)}"
-									title=" ${speciesInstance.taxonConcept.name}" />
-							</g:if>
-							<g:else>
-								<img class="icon group_icon"
-									title="${speciesInstance.taxonConcept.name}"
-									src="${createLinkTo(dir: 'images', file:speciesInstance.fetchSpeciesGroupIcon(ImageType.VERY_SMALL)?.fileName, absolute:true)}"
-									style="float: right;"></img>
-							</g:else>
-							<p class="caption">
-								${speciesInstance.taxonConcept.italicisedForm}
-							</p>
-						</g:link>
-						<div class="poor_species_content" style="display: none;">No
-							information yet</div>
-						</li>
-					</ul>
-				</g:each>
-				</ul>
-			</div>
-			<br />
-
-			<div class="paginateButtons  grid_16">
-				<center>
-					<g:paginate total="${speciesInstanceTotal}"
-						params="['startsWith':params.startsWith]" max="50" maxsteps="10" />
-				</center>
-			</div>
-			<br />
-
-			<div class="paginateButtons grid_16">
-				<center>
-					<g:paginateOnAlphabet total="${speciesInstanceTotal}" />
-				</center>
-			</div>
-		</div>
-		<div id="contribute" class="tab-pane">
-			<g:include controller="species" action="contribute" />
-		</div>
-		</div>
 		</div>
 	</div>
 

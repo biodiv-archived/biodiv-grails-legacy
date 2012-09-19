@@ -71,8 +71,7 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 </style>
 </head>
 <body>
-	<div class="container outer-wrapper">
-		<div class="row">
+	
 			<div class="observation  span12">
 				<!--h1>
 				<g:message code="default.show.label" args="[entityName]" />
@@ -247,8 +246,7 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 
 
 			</div>
-		</div>
-	</div>
+	
 	<r:script>
 	
 	Galleria.loadTheme('${resource(dir:'js/galleria/1.2.7/themes/classic/',file:'galleria.classic.min.js')}');

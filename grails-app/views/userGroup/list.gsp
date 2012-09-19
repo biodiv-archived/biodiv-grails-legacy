@@ -10,19 +10,16 @@
 <r:require modules="userGroups_list" />
 </head>
 <body>
-	<div class="container outer-wrapper">
-		<div class="row">
-			<div class="span12">
-				<uGroup:showSubmenuTemplate/>
-				<div class="page-header">
-					<h1>Groups</h1>
-				</div>
-
-				<uGroup:showUserGroupsListWrapper
-					model="['totalUserGroupInstanceList':totalUserGroupInstanceList, 'userGroupInstanceList':UserGroupInstanceList, 'userGroupInstanceTotal':userGroupInstanceTotal, 'queryParams':queryParams, 'activeFilters':activeFilters]" />
-			</div>
+	<div class="span12">
+		<uGroup:showSubmenuTemplate />
+		<div class="page-header">
+			<h1>Groups</h1>
 		</div>
+
+		<uGroup:showUserGroupsListWrapper
+			model="['totalUserGroupInstanceList':totalUserGroupInstanceList, 'userGroupInstanceList':UserGroupInstanceList, 'userGroupInstanceTotal':userGroupInstanceTotal, 'queryParams':queryParams, 'activeFilters':activeFilters]" />
 	</div>
+
 	<g:javascript>
 		$(document).ready(function(){
 			window.params = {

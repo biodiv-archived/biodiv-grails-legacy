@@ -2,8 +2,7 @@
 <%@ page import="species.groups.SpeciesGroup"%>
 <%@ page import="species.Habitat"%>
 
-
-<div class="span3">
+<div class="span3 sidebar">
 	<sec:ifLoggedIn>
 		<div class="super-section">
 
@@ -43,7 +42,6 @@
 	</div>
 
 </div>
-
 
 <g:if test="${false }">
 	<div class="super-section">

@@ -10,14 +10,12 @@
 <r:require modules="observations_list" />
 </head>
 <body>
-	<div class="container outer-wrapper">
-		<div class="row">
-			<div class="span12">
-				<obv:showSubmenuTemplate model="['entityName':entityName]"/>
-				<obv:showObservationsListWrapper />
-			</div>
-		</div>
+
+	<div class="span12">
+		<obv:showSubmenuTemplate model="['entityName':entityName]" />
+		<obv:showObservationsListWrapper />
 	</div>
+
 	<g:javascript>
 		$(document).ready(function() {
 			window.params = {

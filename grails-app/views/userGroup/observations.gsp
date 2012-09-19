@@ -12,37 +12,33 @@
 <r:require modules="userGroups_show, observations_list" />
 <g:set var="entityName" value="${userGroupInstance.name}" />
 <title><g:message code="default.show.label"
-		args="[userGroupInstance.name]" />
-</title>
+		args="[userGroupInstance.name]" /></title>
 
 </head>
 <body>
-	<div class="container outer-wrapper">
-		<div class="row">
-			<div class="observation span12">
-				<uGroup:showSubmenuTemplate/>
-				<div class="super-section userGroup-section">
-					<div class="section">
-						<div class="page-header clearfix">
-							<h5>Observations</h5>
-							<div class="btn-group pull-right" style="z-index: 10;">
-								<uGroup:isAMember
-									model="['userGroupInstance':userGroupInstance]">
-									<g:link controller="observation" action="create"
-										params="['userGroup':userGroupInstance.id]"
-										class="btn btn-large btn-info">
-										<i class="icon-plus"></i>Add an Observation</g:link>
-								</uGroup:isAMember>
-							</div>
-						</div>
-						<obv:showObservationsListWrapper
-							model="['totalObservationInstanceList':totalObservationInstanceList, 'observationInstanceList':observationInstanceList, 'instanceTotal':instanceTotal, 'queryParams':queryParams, 'activeFilters':activeFilters]" />
+
+	<div class="observation span12">
+		<uGroup:showSubmenuTemplate />
+		<div class="userGroup-section">
+			<div class="section">
+				<div class="page-header clearfix">
+					<h5>Observations</h5>
+					<div class="btn-group pull-right" style="z-index: 10;">
+						<uGroup:isAMember model="['userGroupInstance':userGroupInstance]">
+							<g:link controller="observation" action="create"
+								params="['userGroup':userGroupInstance.id]"
+								class="btn btn-large btn-info">
+								<i class="icon-plus"></i>Add an Observation</g:link>
+						</uGroup:isAMember>
 					</div>
 				</div>
-
+				<obv:showObservationsListWrapper
+					model="['totalObservationInstanceList':totalObservationInstanceList, 'observationInstanceList':observationInstanceList, 'instanceTotal':instanceTotal, 'queryParams':queryParams, 'activeFilters':activeFilters]" />
 			</div>
 		</div>
+
 	</div>
+
 
 	<r:script>
 	</r:script>

@@ -88,9 +88,8 @@ max-width: 100%;
 
 </head>
 <body>
-	<div class="container outer-wrapper">
 
-		<div class="observation_create row">
+		<div class="observation_create">
 			<div class="span12">
 				<uGroup:showSubmenuTemplate/>
 				<div class="page-header">
@@ -389,7 +388,7 @@ max-width: 100%;
 			</form>
 			
 		</div>
-	</div>
+	
 
 	<r:script>
 $(document).ready(function() {

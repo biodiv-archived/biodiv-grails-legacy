@@ -24,27 +24,25 @@
 </head>
 
 <body>
-	<div class="container outer-wrapper">
-		<div class="row">
-			<div class="span12">
-				<div class="page-header">
-					<search:searchResultsHeading/>
-				</div>
 
-				<g:if test="${flash.message}">
-					<div class="message">
-						${flash.message}
-					</div>
-				</g:if>
-
-				<div class="searchResults">
-					<sUser:showUserListWrapper/>
-				</div>
-				</div>
-			</div>
+	<div class="span12">
+		<div class="page-header">
+			<search:searchResultsHeading />
 		</div>
 
-		<r:script>
+		<g:if test="${flash.message}">
+			<div class="message">
+				${flash.message}
+			</div>
+		</g:if>
+
+		<div class="searchResults">
+			<sUser:showUserListWrapper />
+		</div>
+	</div>
+
+
+	<r:script>
 	$(document).ready(function() {
 		/*$("#username").focus().autocomplete({
 			minLength: 3,

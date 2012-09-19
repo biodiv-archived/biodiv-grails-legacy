@@ -22,11 +22,10 @@
 </style>
 </head>
 <body>
-	<div class="container outer-wrapper">
-		<div class="row">
+	
 			<div class="observation span12">
 				<uGroup:showSubmenuTemplate/>
-				<div class="super-section userGroup-section">
+				<div class=" userGroup-section">
 					<div class="section tabbable">
 						<h5>Members</h5>
 
@@ -72,9 +71,6 @@
 					</div>
 				</div>
 			</div>
-
-		</div>
-	</div>
 	<r:script>
 		$(document).ready(function(){
 			

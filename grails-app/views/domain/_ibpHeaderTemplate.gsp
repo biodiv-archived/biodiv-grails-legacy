@@ -18,7 +18,6 @@
 				<ul class="nav pull-right">
 					<li><search:searchBox />
 					</li>
-					<li class="divider-vertical"></li>
 					<li><sUser:userLoginBox /></li>
 
 				</ul>

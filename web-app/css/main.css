@@ -1102,10 +1102,10 @@ td input.text:focus {
 	padding: 5px 20px;
 }
 
-.gallerytoolbar div {
-	margin: 5px 20px;
-	padding: 5px 20px;
-}
+/* .gallerytoolbar div { */
+/* 	margin: 5px 20px; */
+/* 	padding: 5px 20px; */
+/* } */
 
 ul.thumbwrap li.rich_species_content {
 	background-color: #ffffff;
@@ -1610,15 +1610,15 @@ margin-top: 5px;
     width: 20px;
 }
 
-#speciesGroupFilter {
-background-color: rgba(106, 201, 162, 0.2);
-background: transparent\9;
--ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#336AC9A2,endColorstr=#336AC9A2)"; /* IE8 */
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#336AC9A2,endColorstr=#336AC9A2);   /* IE6 & 7 */
-      zoom: 1;
-border-radius: 0 0 0 0;
-box-shadow: 0 4px 3px -3px #5E5E5E;
-}
+/* #speciesGroupFilter { */
+/* background-color: rgba(106, 201, 162, 0.2); */
+/* background: transparent\9; */
+/* -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#336AC9A2,endColorstr=#336AC9A2)"; IE8 */
+/*     filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#336AC9A2,endColorstr=#336AC9A2);   IE6 & 7 */
+/*       zoom: 1; */
+/* border-radius: 0 0 0 0; */
+/* box-shadow: 0 4px 3px -3px #5E5E5E; */
+/* } */
 
 /*
 .ui-widget-content, .ui-widget  {

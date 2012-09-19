@@ -208,6 +208,7 @@ background: transparent\9;
       zoom: 1;
 padding-left: 10px;
 padding-right: 10px;
+width: 1200px;
 }
 
 div.errors {
@@ -1419,8 +1420,8 @@ max-width: 100%;
 }
 
 .sidebar {
-	margin: 0px;
-	width: 250px;
+	margin-top: 20px;
+/* 	width: 250px; */
 }
 
 .left-sidebar {
