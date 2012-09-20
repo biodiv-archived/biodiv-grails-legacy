@@ -3,11 +3,11 @@
 	<li style="clear: both;" />
 	<g:each in="${userGroups}" var="userGroup">
 		<li><uGroup:showUserGroupSignature
-				model="['userGroup':userGroup]" /></li>
+				model="['userGroup':userGroup]" />
+		</li>
 	</g:each>
-
+	<li class="pull-right"><g:link controller="userGroup"
+			action="list" style="display:inline;">More ...</g:link></li>
 </ul>
-<div class="pull-right nav-header" style="clear: both;">
-	<g:link controller="userGroup" action="list" style="display:inline;">More ...</g:link>
-</div>
+
 

@@ -4,47 +4,49 @@
 <%@ page import="species.participation.ActivityFeedService"%>
 
 <div class="span3 sidebar">
-	
-		<div class="super-section">
 
-			<ul class="nav">
-				<li class="nav-header">Home</li>
-				<sec:ifLoggedIn>
+	<div class="super-section">
+
+		<ul class="nav">
+			<li class="nav-header">Home</li>
+			<sec:ifLoggedIn>
 				<li><a
 					href="${createLink(controller:'activityFeed', params:['user':sUser.renderCurrentUserId(), 'feedType':ActivityFeedService.MY_FEEDS])}"><i
-						class="icon-home"></i>My Feed</a>
-				</li>
+						class="icon-home"></i>My Feed</a></li>
 
 				<li><a
 					href="${createLink(controller:'user', action:'show', params:['user':sUser.renderCurrentUserId()])}"><i
-						class="icon-user"></i>My Profile</a>
-				</li>
+						class="icon-user"></i>My Profile</a></li>
+
+				<li><a class="pull-left" style="margin-right:5px"
+					href="${createLink(controller:'observation', action:'list', params:['user':sUser.renderCurrentUserId()])}"><i
+						class="icon-screenshot"></i>My Observations</a><a
+					href="${createLink(action:'create')}"><i class="icon-plus"></i>
+				</a></li>
+
 				<li><a
 					href="${createLink(controller:'userGroup', action:'list', params:['user':sUser.renderCurrentUserId()])}"><i
 						class="icon-user"></i>My Groups</a>
+					<uGroup:getCurrentUserUserGroupsSidebar />
 				</li>
-				<li><a
-					href="${createLink(controller:'observation', action:'list', params:['user':sUser.renderCurrentUserId()])}"><i
-						class="icon-screenshot"></i>My Observations</a>
-				</li>
-				</sec:ifLoggedIn>
-				<sec:ifNotLoggedIn>
+			</sec:ifLoggedIn>
+
+
+			<sec:ifNotLoggedIn>
 				<li><a
 					href="${createLink(controller:'activityFeed', params:['user':sUser.renderCurrentUserId(), 'feedType':ActivityFeedService.ALL])}"><i
-						class="icon-home"></i>Activity</a>
-				</li>
-				<li class="${(params.action=='create')?'active':'' }">
-					<g:link controller='login' class="btn btn-primary span1">Login</g:link>
-				</li>
-				</sec:ifNotLoggedIn>
-				
-				<li class="${(params.action=='create')?'active':'' }" style="clear:both;"><a
-					href="${createLink(action:'create')}"><i class="icon-plus"></i>Add
-					Observation</a>
-				</li>
-			</ul>
-		</div>
-	
+						class="icon-home"></i>Activity</a></li>
+				<li class="${(params.action=='create')?'active':'' }"><g:link
+						controller='login' class="btn btn-primary span1">Login</g:link></li>
+				<li class="${(params.action=='create')?'active':'' }"
+					style="clear: both;"><a href="${createLink(action:'create')}"><i
+						class="icon-plus"></i>Add Observation</a></li>
+			</sec:ifNotLoggedIn>
+
+
+		</ul>
+	</div>
+
 	<div class="super-section">
 		<uGroup:showSuggestedUserGroups />
 	</div>
