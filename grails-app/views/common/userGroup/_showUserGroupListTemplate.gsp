@@ -27,7 +27,7 @@
 						var="userGroupInstance">
 						<tr class="mainContent">
 							<uGroup:showSnippet
-								model="['userGroupInstance':userGroupInstance, 'userGroupTitle':userGroupTitleList?.get(i), 'pos':userGroupPos+i]"></uGroup:showSnippet>
+								model="['userGroupInstance':userGroupInstance, 'userGroupTitle':userGroupTitleList?.get(i), 'pos':userGroupPos+i, 'showLeave':true]"></uGroup:showSnippet>
 						</tr>
 					</g:each>
 				</tbody>
