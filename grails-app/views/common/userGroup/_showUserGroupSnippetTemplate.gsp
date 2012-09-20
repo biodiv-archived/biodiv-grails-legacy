@@ -5,10 +5,10 @@
 <td
 	title='<g:if test="${userGroupTitle != null}">${userGroupTitle}</g:if>'>
 
-	<g:link action="show" id="${userGroupInstance.id}" params="['pos':pos]">
+	<g:link controller="userGroup" action="show" id="${userGroupInstance.id}" params="['pos':pos]">
 		<img class="logo" alt="${userGroupInstance.name}"
 			src="${createLink(url: userGroupInstance.mainImage()?.fileName)}">
 	</g:link></td>
 
-<uGroup:showStory model="['userGroupInstance':userGroupInstance]"></uGroup:showStory>
+<uGroup:showStory model="['userGroupInstance':userGroupInstance, 'showLeave':(showLeave != null)?showLeave:false]"></uGroup:showStory>
 
