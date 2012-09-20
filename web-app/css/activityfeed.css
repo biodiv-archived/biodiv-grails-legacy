@@ -1,3 +1,7 @@
+.activityfeed {
+	clear:both;
+}
+
 .activityfeed li {
 	margin-left: -9px;
 	list-style: none none;
@@ -8,22 +12,17 @@
     text-decoration: none;
 }
 
-.activityfeedAll {
+.activityfeedAll, .activityfeedGeneric, .activityfeedMyFeeds{
 	width:700px;
 	background-color:#ffffff;
 }
 
-.activityfeedGeneric {
-	width:700px;
-	background-color:#ffffff;
-}
-
-.activityfeedSpecific {
+.activityfeedSpecific, .activityfeedGroupSpecific{
 	clear:both;
 	background-color: rgba(106, 201, 162, 0.15);
 }
 
-.activityfeedSpecific .activityFeed-container {
+.activityfeedSpecific .activityFeed-container, .activityfeedGroupSpecific .activityFeed-container {
 	background-color: #e5e5e5;
 }
 
@@ -32,6 +31,9 @@
 	margin-top:5px;
 }
 
+.activityfeedGroupSpecific .activityFeedContext {
+	background-color:#ffffff;
+}
 .feedParentContext {
 	background-color:#ffffff;
 }

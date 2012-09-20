@@ -33,6 +33,11 @@ class ActivityFeedService {
 	
 	static final String GENERIC = "Generic"
 	static final String SPECIFIC = "Specific"
+	static final String SELECTED = "Selected"
+	static final String GROUP_SPECIFIC = "GroupSpecific"
+	static final String MY_FEEDS = "MyFeeds"
+	
+	
 	static final String ALL = "All"
 	static final String OTHER = "other"
 	
@@ -82,6 +87,25 @@ class ActivityFeedService {
 			return feeds
 		}
 		
+		// aggregating only observation object
+		if(params.feedType == GROUP_SPECIFIC){
+			Set feedSet = new HashSet()
+			def retList = []
+			feeds.each { it ->
+				if(it.rootHolderType != Observation.class.getCanonicalName()){
+					retList.add(it)
+				}else{
+					def feedKey = it.rootHolderType + it.rootHolderId;
+					if(!feedSet.contains(feedKey)){
+						retList.add(it)
+						feedSet.add(feedKey)
+					}
+				}
+			}
+			return retList
+		}
+		
+		//aggregating all the object
 		Set feedSet = new HashSet()
 		def retList = []
 		feeds.each { it ->

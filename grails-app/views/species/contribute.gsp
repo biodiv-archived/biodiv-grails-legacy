@@ -9,7 +9,7 @@
 
 </head>
 <body>
-	<div class="container_16 big_wrapper outer_wrapper">
+	<div class="span12 outer_wrapper">
 		<s:showSubmenuTemplate model="['entityName':'Contribute to Species Pages']"/>
 				
 <%
@@ -21,8 +21,8 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 	supportEmail =  grailsApplication.config.speciesPortal.ibp.supportEmail;
 }
 %>
-		<div class="row ">
-			<div class="span12 super-section">
+		<div class="">
+			<div class="super-section">
 				<div class="section">
 				<p>We request you to contribute to the species pages and build
 					rich and reliable information on the biodiversity of India.</p>

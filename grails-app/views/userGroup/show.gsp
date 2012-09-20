@@ -74,11 +74,11 @@
 					<%
 								def canPostComment = customsecurity.hasPermissionForAction([object:userGroupInstance, permission:org.springframework.security.acls.domain.BasePermission.WRITE]).toBoolean()
 							%>
-					<comment:showAllComments
-						model="['commentHolder':userGroupInstance, commentType:'super', 'canPostComment':canPostComment, 'showCommentList':false]" />
-				</div>
-				<feed:showAllActivityFeeds
-					model="['rootHolder':userGroupInstance, feedType:'Specific', refreshType:'manual', 'feedPermission':'editable']" />
+								<comment:showAllComments
+									model="['commentHolder':userGroupInstance, commentType:'super', 'canPostComment':canPostComment, 'showCommentList':false]" />
+							</div>
+							<feed:showFeedWithFilter model="['rootHolder':userGroupInstance, feedType:'GroupSpecific', refreshType:'manual', feedPermission:'editable', feedCategory:'All']" />
+<%--							<feed:showAllActivityFeeds model="['rootHolder':userGroupInstance, feedType:'GroupSpecific', refreshType:'manual', 'feedPermission':'editable']" />--%>
 			</div>
 		</div>
 	</div>
@@ -102,5 +102,6 @@
 			//showMapView();
 		});
 	</r:script>
+
 </body>
 </html>

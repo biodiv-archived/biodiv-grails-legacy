@@ -1052,9 +1052,10 @@ background-color: #f9f9f9;
 box-shadow: 0 6px 6px -6px #5E5E5E;
 color: #5E5E5E;
 font-family: Verdana,Helvetica,Sans-Serif;
-height: 80px;
+/* height: 80px; */
 width: 100%;
 z-index: 2000;
+min-width: 1220px;
 }
 #upload_resource {
 margin-left: 45px;

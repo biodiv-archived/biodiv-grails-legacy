@@ -1,6 +1,7 @@
 <%@page import="species.utils.ImageType"%>
 <%@ page import="species.groups.SpeciesGroup"%>
 <%@ page import="species.Habitat"%>
+<%@ page import="species.participation.ActivityFeedService"%>
 
 <div class="span3 sidebar">
 	<sec:ifLoggedIn>
@@ -9,7 +10,7 @@
 			<ul class="nav">
 				<li class="nav-header">Home</li>
 				<li><a
-					href="${createLink(controller:'userGroup', action:'activityFeed', params:['user':sUser.renderCurrentUserId()])}"><i
+					href="${createLink(controller:'activityFeed', params:['user':sUser.renderCurrentUserId(), 'feedType':ActivityFeedService.MY_FEEDS])}"><i
 						class="icon-home"></i>My Feed</a>
 				</li>
 

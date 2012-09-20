@@ -56,11 +56,11 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 		<div class="container outer-wrapper">
 			
 				<uGroup:showSidebar />
-				<div class="row">
+				<div class="">
 				<div style="padding:10px 0px">
 					<g:layoutBody />
 				</div>
-			</div>
+				</div>
 		</div>
 
 		<domain:showWGPFooter />

@@ -5,9 +5,11 @@ import grails.converters.JSON
 class ActivityFeedController {
 
 	def activityFeedService;
+	def springSecurityService;
 	
 	def getFeeds = {
 		log.debug params;
+		params.author = springSecurityService.currentUser;
 		
 		def feeds = activityFeedService.getActivityFeeds(params);
 		if(!feeds.isEmpty()){
@@ -30,8 +32,11 @@ class ActivityFeedController {
 	}
 	
 	def index = {
-		redirect(action:list)
+		redirect(action:list, params:['feedType':params.feedType, 'feedCategory':params.feedCategory])
 	}
 	
-	def list = {}
+	def list = {
+		log.debug params
+		['feedType':params.feedType, 'feedCategory':params.feedCategory]
+	}
 }

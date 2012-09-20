@@ -7,12 +7,14 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html" />
 <meta name="layout" content="main" />
-<r:require modules="species_list" />
 
+
+<r:require modules="species_list" />
 
 <g:set var="entityName"
 	value="${message(code: 'species.label', default: 'Species')}" />
 <title>Species List</title>
+
 <g:javascript>
 $(document).ready(function(){
 	window.params = {
@@ -45,11 +47,8 @@ $(document).ready(function(){
 	);
 });
 </r:script>
-<style type="text/css">
-.snippet.tablet {
-	width: 300px;
-	height: 65px;
-}
+<style>
+
 
 .snippet.tablet .figure img {
 	height: auto;
@@ -67,6 +66,7 @@ $(document).ready(function(){
 	margin: 0 0 18px 10px;
 }
 </style>
+
 </head>
 <body>
 	<div class="span12" style="margin-left:10px;">
@@ -103,9 +103,9 @@ $(document).ready(function(){
 									<span class="caret"></span>
 								</button>
 								<ul id="sortFilter" class="dropdown-menu">
-									<li class="group_option"><a class=" sort_filter_label"
+									<li class="group_option"><a class="sort_filter_label"
 										value="title"> Sort by Title </a></li>
-									<li class="group_option"><a class=" sort_filter_label"
+									<li class="group_option"><a class="sort_filter_label"
 										value="percentOfInfo">Sort by Richness </a></li>
 								</ul>
 							</div>
@@ -136,7 +136,7 @@ $(document).ready(function(){
 								</g:else>
 								<g:set var="mainImage" value="${speciesInstance.mainImage()}" />
 								<%def thumbnailPath = ImageUtils.getFileName(mainImage?.fileName, ImageType.SMALL, null)%>
-								<div class="snippet tablet">
+								<div class="snippet tablet" style="width: 299px;height: 65px;">
 										<g:link action="show" id="${speciesInstance.id}">
 
 											<g:if test="${thumbnailPath }">
@@ -184,6 +184,5 @@ $(document).ready(function(){
 			</div>
 		</div>
 	</div>
-
 </body>
 </html>

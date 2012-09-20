@@ -290,6 +290,7 @@ $(document).ready(function(){
 </head>
 
 <body>
+<div class="span12" STYLE="MARGIN-LEFT:5PX;">
 <div class="container_16 big_wrapper outer_wrapper">
 			<s:showSubmenuTemplate/>
 				<div class="page-header">
@@ -537,7 +538,7 @@ $(document).ready(function(){
 
 	</div>
 		
-		
+</div>		
 			
 	
 

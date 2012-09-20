@@ -702,8 +702,8 @@ img {
 
 .sidebar { /*position: relative;
 	width: 300px;*/
-	float: right;
-	margin: 10px;
+/* 	float: right; */
+/* 	margin: 10px; */
 }
 
 .recommendations {

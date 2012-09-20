@@ -29,6 +29,17 @@ class ActivityFeedTagLib {
 		out << render(template:"/common/activityfeed/showSpecificFeedTemplate", model:attrs.model);
 	}
 	
+	def showFeedWithFilter = {attrs, body->
+		def model = attrs.model
+		model.feedType = model.feedType ?: activityFeedService.ALL
+		model.feedCategory = model.feedCategory ?: activityFeedService.ALL
+		out << render(template:"/common/activityfeed/showFeedWithFilterTemplate", model:attrs.model);
+	}
+	
+	def showFeedFilter = {attrs, body->
+		out << render(template:"/common/activityfeed/showFeedFilterTemplate", model:attrs.model);
+	}
+	
 	def showAllActivityFeeds = {attrs, body->
 		def model = attrs.model
 		
@@ -94,10 +105,10 @@ class ActivityFeedTagLib {
 				text = activityType
 				break
 			case activityFeedService.OBSERVATION_POSTED_ON_GROUP:
-				text = getObservationHyperLink(activityDomainObj) + " posted"
+				text = "Posted on " + getUserGroupHyperLink(activityDomainObj)
 				break
 			case activityFeedService.OBSERVATION_REMOVED_FROM_GROUP:
-				text = getObservationHyperLink(activityDomainObj) + " removed"
+				text = "Removed from " + getUserGroupHyperLink(activityDomainObj) 
 				break
 			case activityFeedService.MEMBER_JOINED:
 				text = getUserHyperLink(activityDomainObj) + " joined the group"
@@ -137,6 +148,10 @@ class ActivityFeedTagLib {
 	
 	private getUserHyperLink(user){
 		return "" + (g.link(controller:"sUser", action:"show", id:user.id){"<i>$user.username</i>"})
+	}
+	
+	private getUserGroupHyperLink(uGroup){
+		return "" + (g.link(controller:"userGroup", action:"show", id:uGroup.id){"<i>$uGroup.name</i>"})
 	}
 	
 }
