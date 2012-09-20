@@ -7,9 +7,10 @@
         <meta name="layout" content="main" />
         <g:set var="entityName" value="${message(code: 'newsletter.label', default: 'Newsletter')}" />
         <title><g:message code="default.edit.label" args="[entityName]" /></title>
+        <r:require modules="core"/>
     </head>
     <body>
-        <div class="body">
+        <div class="span12">
             <h1><g:message code="default.edit.label" args="[entityName]" /></h1>
             <g:if test="${flash.message}">
             <div class="message">${flash.message}</div>

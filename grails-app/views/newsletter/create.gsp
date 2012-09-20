@@ -15,9 +15,10 @@
 	padding: 10px;
 }
 </style>
+<r:require modules="core"/>
 </head>
 <body>
-	<div class="body">
+	<div class="span12">
 		<h1>
 			<g:message code="default.create.label" args="[entityName]" />
 		</h1>

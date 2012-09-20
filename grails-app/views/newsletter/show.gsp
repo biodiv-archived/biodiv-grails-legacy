@@ -27,10 +27,11 @@
             font-style: italic;
         }
         </style>
+        <r:require modules="core"/>
     </head>
     <body>
-        <div class="newsletter_wrapper">
-        <div class="body">
+        <div class="span12">
+        <div>
             <h1>${fieldValue(bean: newsletterInstance, field: "title")}</h1>
             <div class="dialog">
                 <table>

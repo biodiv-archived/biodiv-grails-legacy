@@ -18,9 +18,10 @@
             padding: 5px;
         }
         </style>
+        <r:require modules="core"/>
     </head>
     <body>
-        <div class="body">
+        <div class="span12">
             <div style="float: right;"><g:link action="create"><h3>Create newsletter</h3></g:link></div>
             <h1>Newsletters Archive</h1>
             <g:if test="${flash.message}">

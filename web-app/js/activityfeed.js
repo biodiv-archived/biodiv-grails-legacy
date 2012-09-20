@@ -167,7 +167,7 @@ function pollForFeeds(targetComp){
 		if($(window).scrollTop() < 250 ){
 			loadNewerFeedsInAjax(targetComp);
 		}
-	}, 15000);
+	}, 2000);
 } 
 
 function autoLoadOnScroll(targetComp){
