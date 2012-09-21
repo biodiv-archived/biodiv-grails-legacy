@@ -25,7 +25,7 @@
 	</g:else>
 
 	<div class="navbar navbar-static-top btn"
-		style="width: 100%; margin-left: -10px; margin-bottom: 0px">
+		style="width: 100%; margin-left: -10px; margin-bottom: 0px;height:auto;">
 
 		<div class="navbar-inner">
 			<ul class="nav" style="width: 100%;">

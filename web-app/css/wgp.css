@@ -995,6 +995,7 @@ width: 100%;
 z-index: 2000;
 /* margin-top:50px; */
 min-width: 1220px;
+hight:auto;
 }
 .gradient-bg {
    background-color: #ECE9B7;
