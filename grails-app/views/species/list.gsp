@@ -15,58 +15,6 @@
 	value="${message(code: 'species.label', default: 'Species')}" />
 <title>Species List</title>
 
-<g:javascript>
-$(document).ready(function(){
-	window.params = {
-	<%
-		params.each { key, value ->
-			println '"'+key+'":"'+value+'",'
-		}
-	%>
-		"tagsLink":"${g.createLink(action: 'tags')}",
-		"queryParamsMax":"${params.max}",
-		"isGalleryUpdate":false,
-		"offset":0
-	}
-});
-</g:javascript>
-<r:script>
-
-$(document).ready(function(){
-	
-	$('#speciesGallerySort').change(function(){
-		updateGallery(window.location.pathname + window.location.search, ${params.limit?:51}, 0, undefined, false);
-		return false;
-	});
-	
-	$('li.poor_species_content').hover(function(){
-		$(this).children('.poor_species_content').slideDown(200);
-	}, function(){
-		$(this).children('.poor_species_content').slideUp(200);
-	}
-	);
-});
-</r:script>
-<style>
-
-
-.snippet.tablet .figure img {
-	height: auto;
-}
-
-.figure .thumbnail {
-	height: 120px;
-	margin: 0 auto;
-	text-align: center;
-	*font-size: 120px;
-	line-height: 120px;
-}
-
-.thumbnails > li {
-	margin: 0 0 18px 10px;
-}
-</style>
-
 </head>
 <body>
 	<div class="span12" style="margin-left:10px;">
@@ -184,5 +132,58 @@ $(document).ready(function(){
 			</div>
 		</div>
 	</div>
+	
+<g:javascript>
+$(document).ready(function(){
+	window.params = {
+	<%
+		params.each { key, value ->
+			println '"'+key+'":"'+value+'",'
+		}
+	%>
+		"tagsLink":"${g.createLink(action: 'tags')}",
+		"queryParamsMax":"${params.max}",
+		"isGalleryUpdate":false,
+		"offset":0
+	}
+});
+</g:javascript>
+<r:script>
+
+$(document).ready(function(){
+	
+	$('#speciesGallerySort').change(function(){
+		updateGallery(window.location.pathname + window.location.search, ${params.limit?:51}, 0, undefined, false);
+		return false;
+	});
+	
+	$('li.poor_species_content').hover(function(){
+		$(this).children('.poor_species_content').slideDown(200);
+	}, function(){
+		$(this).children('.poor_species_content').slideUp(200);
+	}
+	);
+});
+</r:script>
+<style>
+
+
+.snippet.tablet .figure img {
+	height: auto;
+}
+
+.figure .thumbnail {
+	height: 120px;
+	margin: 0 auto;
+	text-align: center;
+	*font-size: 120px;
+	line-height: 120px;
+}
+
+.thumbnails > li {
+	margin: 0 0 18px 10px;
+}
+</style>
+	
 </body>
 </html>

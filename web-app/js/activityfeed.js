@@ -1,3 +1,4 @@
+var newFeedProcessing = false;
 var oldFeedProcessing = false;
 var serverTimeDiff = null;
 
@@ -18,9 +19,10 @@ function loadOlderFeedsInAjax(targetComp){
 				$(targetComp).children('input[name="olderTimeRef"]').val(data.olderTimeRef);
 				updateRelativeTime(data.currentTime);
 				if(data.remainingFeedCount && data.remainingFeedCount > 0){
-					$(targetComp).children('a').text("Show " + data.remainingFeedCount + " older feeds >>");
+					$(targetComp).children('.activiyfeedoldermsg').text("Show " + data.remainingFeedCount + " older feeds >>");
 				}else{
-					$(targetComp).children('a').hide();
+					//alert("=== befor hiding last");
+					$(targetComp).children('.activiyfeedoldermsg').hide();
 				}
 			}
 			oldFeedProcessing = false;
@@ -31,19 +33,28 @@ function loadOlderFeedsInAjax(targetComp){
 	});
 }
 
-function loadNewerFeedsInAjax(targetComp){
+function loadNewerFeedsInAjax(targetComp, checkFeed){
 	var url = $(targetComp).children('input[name="feedUrl"]').val();
 	var feedType = $(targetComp).children('input[name="feedType"]').val();
+	var paramData =  getFeedParams("newer", targetComp);
+	paramData["checkFeed"] = checkFeed;
 	
 	$.ajax({ 
      	url:url,
 		dataType: 'json', 
-		data: getFeedParams("newer", targetComp),	
+		data: paramData,	
 		success: function(data, statusText, xhr, form) {
-			if(data.showFeedListHtml){
-        		var refreshType = $(targetComp).children('input[name="refreshType"]').val();
+			if(checkFeed){
+				if(data.feedAvailable){
+					newFeedProcessing = true;
+					$(targetComp).children('.activiyfeednewermsg').show();
+				}
+			}
+			else if(data.showFeedListHtml){
+				var refreshType = $(targetComp).children('input[name="refreshType"]').val();
         		if(refreshType == "auto"){
         			$(targetComp).hide().fadeIn(3000);
+        			$(targetComp).children('.activiyfeednewermsg').hide();
         		}
     			var htmlData = $(data.showFeedListHtml);
     			dcorateCommentBody(htmlData.find('.yj-message-body'));
@@ -51,12 +62,15 @@ function loadNewerFeedsInAjax(targetComp){
     			$(targetComp).children('ul').prepend(htmlData);
     			$(targetComp).children('input[name="newerTimeRef"]').val(data.newerTimeRef);
     			updateRelativeTime(data.currentTime);
+    			newFeedProcessing = false;
         	}
+			
         	return false;
         },
         error:function (xhr, ajaxOptions, thrownError){
         	//alert("error ====");
         	//successHandler is used when ajax login succedes
+        	newFeedProcessing = false;
         	var successHandler = this.success, errorHandler = undefined;
         	handleError(xhr, ajaxOptions, thrownError, successHandler, errorHandler);
 		} 
@@ -162,13 +176,24 @@ function updateRelativeTime(){
 	$('.timeago').timeago({serverTimeDiff:serverTimeDiff});
 }
 
+//on user click fetch
 function pollForFeeds(targetComp){
 	window.setInterval(function(){
-		if($(window).scrollTop() < 250 ){
-			loadNewerFeedsInAjax(targetComp);
+		if(!newFeedProcessing){
+			//newFeedProcessing = true;
+			loadNewerFeedsInAjax(targetComp, true);
 		}
-	}, 2000);
+	}, 5000);
 } 
+
+// on automatic fetch
+//function pollForFeeds(targetComp){
+//	window.setInterval(function(){
+//		if($(window).scrollTop() < 250 ){
+//			loadNewerFeedsInAjax(targetComp, false);
+//		}
+//	}, 2000);
+//} 
 
 function autoLoadOnScroll(targetComp){
 	$(window).scroll(function() {
@@ -219,7 +244,7 @@ function updateFeeds(){
 	if(targetComp){
 		var refreshType = $(targetComp).children('input[name="refreshType"]').val();
 		if(refreshType == "manual"){
-			loadNewerFeedsInAjax(targetComp);	
+			loadNewerFeedsInAjax(targetComp, false);	
 		}
 	}
 }

@@ -83,7 +83,7 @@ class ActivityFeedService {
 	
 	//XXX needs to handle this on query level
 	private aggregateFeeds(List feeds, params){
-		if(params.feedType == SPECIFIC){
+		if(params.feedType == SPECIFIC || params.checkFeed){
 			return feeds
 		}
 		

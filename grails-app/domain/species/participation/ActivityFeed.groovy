@@ -132,6 +132,7 @@ class ActivityFeed {
 
 	private static validateParams(params){
 		params.feedType = params.feedType ?: ActivityFeedService.ALL
+		params.checkFeed = (params.checkFeed != null)? params.checkFeed.toBoolean() : false
 		switch (params.feedType) {
 			//to handle complete list (ie groups, obvs, species)
 			case ActivityFeedService.GENERIC:
