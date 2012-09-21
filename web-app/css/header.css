@@ -1,0 +1,17 @@
+#ibp-header {
+border-bottom: 1px solid #E5E5E5;
+box-shadow: 0 6px 6px -6px #5e5e5e;
+color: #5E5E5E;
+font-family: Verdana,Helvetica,Sans-Serif;
+width: 100%;
+z-index: 2000;
+min-width: 1220px;
+}
+.gradient-bg {
+background-color: #ECE9B7;
+background-image: -webkit-gradient(linear,0% 0,0% 100%,from(#ece9b7),to(#ebfefd));
+background-image: -webkit-linear-gradient(left,#ece9b7,#ebfefd);
+background-image: -moz-linear-gradient(left,#ece9b7,#ebfefd);
+background-image: -ms-linear-gradient(left,#ece9b7,#ebfefd);
+background-image: -o-linear-gradient(left,#ece9b7,#ebfefd);
+}

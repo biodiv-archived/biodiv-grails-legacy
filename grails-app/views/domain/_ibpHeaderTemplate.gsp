@@ -1,5 +1,5 @@
 <div id="ibp-header" class="header gradient-bg navbar navbar-static-top"
-	style="display: none; margin-bottom: 0px; padding-bottom: 5px">
+	style="margin-bottom: 0px; padding-bottom: 5px">
 	<div class="navbar-inner"
 		style="padding-left: 0px; background-color: transparent; background-image: none; box-shadow: none">
 		<div class="container">
@@ -26,3 +26,4 @@
 
 	</div>
 </div>
+<domain:showHeader/>

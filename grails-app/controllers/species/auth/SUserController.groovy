@@ -476,6 +476,10 @@ class SUserController extends UserController {
     def login = {
 		render template:"/common/suser/userLoginBoxTemplate" 
     }
+	
+	def header = {
+		render template:"/domain/ibpHeaderTemplate"
+	}
 
 	protected void addRoles(user) {
 		String upperAuthorityFieldName = GrailsNameUtils.getClassName(

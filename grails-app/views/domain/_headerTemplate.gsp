@@ -46,12 +46,10 @@
 					<li class="${(params.action == 'aboutUs')?' active':''}"><a
 						href="${createLink(controller:"userGroup", "action":"aboutUs",  id:userGroupInstance.id)}"
 						title="About Us">About Us</a></li>
-					<li>
-						<ul class="nav">
-							<li class="dropdown"><a href="#" class="dropdown-toggle"
+					<li class="dropdown">
+						<a href="#" class="dropdown-toggle"
 								data-toggle="dropdown"> More <b class="caret"></b> </a>
-								<div class="dropdown-menu">
-									<ul class="nav">
+								<ul class="dropdown-menu">
 
 										<li><a
 											href="${createLink(controller:"userGroup", "action":"pages",  id:userGroupInstance.id)}"
@@ -64,10 +62,8 @@
 										</li>
 										<li><a href="/themepages/list" title="Themes">Themes</a>
 										</li>
-									</ul>
-								</div>
-							</li>
-						</ul>
+								</ul>
+						
 					</li>
 					<li style="float: right;">
 						<ul class="nav">

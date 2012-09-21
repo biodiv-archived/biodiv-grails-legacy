@@ -44,14 +44,14 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 		<span>Loading ...</span>
 	</div>
 	
-	<domain:showWGPHeader />
-	<domain:showIBPHeader />
+	
+	
 	
 	<auth:ajaxLogin />
 	<div id="fb-root"></div>
 	
 	<div id="species_main_wrapper" style="clear:both;">
-		<domain:showHeader/>
+		<domain:showIBPHeader />
 
 		<div class="container outer-wrapper">
 			
@@ -63,7 +63,7 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 				</div>
 		</div>
 
-		<domain:showWGPFooter />
+		
 		<domain:showIBPFooter />
 
 	</div>
