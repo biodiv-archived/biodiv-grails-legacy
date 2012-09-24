@@ -70,10 +70,10 @@
 
 							<li class="${(params.controller == 'species')?' active':''}"><a
 								href="${createLink(controller:"species", "action":"list")}"
-								title="Species">Species</a></li>
-							<li><a href="/maps" title="Maps">Maps</a>
+								title="Species">All Species</a></li>
+							<li><a href="/maps" title="Maps">All Maps</a>
 							</li>
-							<li><a href="/checklists" title="Checklists">Checklists</a>
+							<li><a href="/checklists" title="Checklists">All Checklists</a>
 							</li>
 						</ul></li>
 				</g:if>
@@ -119,11 +119,11 @@
 					<li style="float: right;">
 						<ul class="nav">
 							<li class=" ${(params.controller == 'species')?'active':''}"><a
-								href="${createLink("controller":"species")}" title="Species">Species</a>
+								href="${createLink("controller":"species")}" title="Species">All Species</a>
 							</li>
-							<li><a href="/maps" title="Maps">Maps</a>
+							<li><a href="/maps" title="Maps">All Maps</a>
 							</li>
-							<li><a href="/checklists" title="Checklists">Checklists</a>
+							<li><a href="/checklists" title="Checklists">All Checklists</a>
 							</li>
 						</ul></li>
 
