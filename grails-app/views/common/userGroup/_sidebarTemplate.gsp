@@ -6,9 +6,9 @@
 <div class="span3 sidebar">
 
 	<div class="super-section">
-
-		<ul class="nav">
-			<li class="nav-header">Home</li>
+		<h5 class="nav-header">Home</h5>
+		<ul class="nav block-tagadelic">
+			
 			<sec:ifLoggedIn>
 				<li><a
 					href="${createLink(controller:'activityFeed', params:['user':sUser.renderCurrentUserId(), 'feedType':ActivityFeedService.MY_FEEDS])}"><i

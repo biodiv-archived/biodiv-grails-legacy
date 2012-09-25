@@ -51,16 +51,16 @@
 								data-toggle="dropdown"> More <b class="caret"></b> </a>
 								<ul class="dropdown-menu">
 
-										<li><a
+										<li class="${(params.action == 'pages')?' active':''}"><a
 											href="${createLink(controller:"userGroup", "action":"pages",  id:userGroupInstance.id)}"
 											title="Pages">Pages</a></li>
-										<li><a href="/calendar" title="Events">Events</a>
+										<li class="${(request.forwardURI.contains('/calendar'))?' active':''}"><a href="/calendar" title="Events">Events</a>
 										</li>
-										<li><a href="/biodiversity_news" title="News">News</a>
+										<li class="${(request.forwardURI.contains('/biodiversity_news'))?' active':''}"><a href="/biodiversity_news" title="News">News</a>
 										</li>
-										<li><a href="/collaborate-wg" title="Collaborate">Collaborate</a>
+										<li class="${(request.forwardURI.contains('/collaborate-wg'))?' active':''}"><a href="/collaborate-wg" title="Collaborate">Collaborate</a>
 										</li>
-										<li><a href="/themepages/list" title="Themes">Themes</a>
+										<li class="${(request.forwardURI.contains('/themepages/list'))?' active':''}"><a href="/themepages/list" title="Themes">Themes</a>
 										</li>
 								</ul>
 						
@@ -71,9 +71,9 @@
 							<li class="${(params.controller == 'species')?' active':''}"><a
 								href="${createLink(controller:"species", "action":"list")}"
 								title="Species">All Species</a></li>
-							<li><a href="/maps" title="Maps">All Maps</a>
+							<li class="${(request.forwardURI.contains('/map'))?' active':''}"><a href="/map" title="Maps">All Maps</a>
 							</li>
-							<li><a href="/checklists" title="Checklists">All Checklists</a>
+							<li class="${(request.forwardURI.contains('/checklists'))?' active':''}"><a href="/checklists" title="Checklists">All Checklists</a>
 							</li>
 						</ul></li>
 				</g:if>
@@ -94,7 +94,7 @@
 						href="${createLink(controller:'user', action:'list')}"
 						title="Members">Members</a>
 					</li>
-					<li><a href="/about" title="About Us">About Us </a>
+					<li class="${(request.forwardURI.contains('/about'))?' active':''}"><a href="/about" title="About Us">About Us </a>
 					</li>
 					<li>
 						<ul class="nav">
@@ -102,13 +102,13 @@
 								data-toggle="dropdown"> More <b class="caret"></b> </a>
 								<div class="dropdown-menu">
 									<ul class="nav">
-										<li><a href="/calendar" title="Events">Events</a>
+										<li class="${(request.forwardURI.contains('/calendar'))?' active':''}"><a href="/calendar" title="Events">Events</a>
 										</li>
-										<li><a href="/biodiversity_news" title="News">News</a>
+										<li class="${(request.forwardURI.contains('/biodiversity_news'))?' active':''}"><a href="/biodiversity_news" title="News">News</a>
 										</li>
-										<li><a href="/collaborate-wg" title="Collaborate">Collaborate</a>
+										<li class="${(request.forwardURI.contains('/collaborate-wg'))?' active':''}"><a href="/collaborate-wg" title="Collaborate">Collaborate</a>
 										</li>
-										<li><a href="/themepages/list" title="Themes">Themes</a>
+										<li class="${(request.forwardURI.contains('/themepages/list'))?' active':''}"><a href="/themepages/list" title="Themes">Themes</a>
 										</li>
 
 									</ul>
@@ -121,9 +121,9 @@
 							<li class=" ${(params.controller == 'species')?'active':''}"><a
 								href="${createLink("controller":"species")}" title="Species">All Species</a>
 							</li>
-							<li><a href="/maps" title="Maps">All Maps</a>
+							<li class="${(request.forwardURI.contains('/map'))?' active':''}"><a href="/map" title="Maps">All Maps</a>
 							</li>
-							<li><a href="/checklists" title="Checklists">All Checklists</a>
+							<li class="${(request.forwardURI.contains('/checklists'))?' active':''}"><a href="/checklists" title="Checklists">All Checklists</a>
 							</li>
 						</ul></li>
 

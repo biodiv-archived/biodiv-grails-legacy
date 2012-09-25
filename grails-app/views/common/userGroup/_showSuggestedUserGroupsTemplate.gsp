@@ -1,6 +1,5 @@
-<ul class="nav">
-	<li class="nav-header">Other groups of interest</li>
-	<li style="clear: both;" />
+<h5 class="nav-header">Groups of Interest</h5>
+<ul class="nav  block-tagadelic">	
 	<g:each in="${userGroups}" var="userGroup">
 		<li><uGroup:showUserGroupSignature
 				model="['userGroup':userGroup]" />
