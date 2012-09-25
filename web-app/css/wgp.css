@@ -1021,6 +1021,7 @@ ul,ol {
 	/* margin-top:50px; */
 	min-width: 1220px;
 	height: auto;
+	margin-top:0
 }
 
 .gradient-bg {
