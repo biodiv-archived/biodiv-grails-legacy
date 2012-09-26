@@ -38,14 +38,15 @@
 	background-color:#ffffff;
 }
 
+.feedSubParentContext, .feedSubParentContext .yj-message-body pre {
+	background-color:#99ff88;
+}
 .activityFeed-container{
     border-bottom: 1px solid #DDDDDD;
     margin: 0 0 2px;
     min-height: 20px;
     padding: 7px;
 }
-
-
 
 .activityfeed .feedActivityHolderContext{
 	background-color: #EBEBEB;
@@ -60,6 +61,6 @@
 }
 
 .activityfeed .activiyfeednewermsg{
-	background-color: #99FF00;
+	background-color: #E7F0FE;
 }
 

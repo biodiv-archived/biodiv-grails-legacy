@@ -22,6 +22,17 @@ class CommentTagLib {
 		out << render(template:"/common/comment/showCommentContextTemplate", model:attrs.model);
 	}
 	
+	def showCommentWithReply = {attrs, body->
+		def model = attrs.model
+//		def showAlways = (model.showAlways != null)?model.showAlways:false
+//		 
+//		if(showAlways || model.feedInstance.showComment()){
+			model.commentInstance = commentService.getDomainObject( model.feedInstance.activityHolderType, model.feedInstance.activityHolderId)
+			out << render(template:"/common/comment/showCommentWithReplyTemplate", model:attrs.model);
+//		}
+	}
+	
+	
 	def showCommentPopup = {attrs, body->
 		def model = attrs.model
 		model.rootHolder = model.rootHolder?:model.commentHolder

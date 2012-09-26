@@ -23,7 +23,12 @@ class ActivityFeed {
 	//activity holder (i.e recoVote, image)
 	Long activityHolderId; 
 	String activityHolderType;
-
+	
+	//subroot : this is to support aggregation on commnet(ie. thread) on group or obv
+	//it will be null for all except the commnet activity where is will store main comment thread
+	Long subRootHolderId;
+	String subRootHolderType;
+	
 	static belongsTo = [author:SUser];
 
 	static constraints = {
@@ -34,6 +39,8 @@ class ActivityFeed {
 		activityDescrption nullable:true;
 		activityHolderId nullable:true;
 		activityHolderType nullable:true;
+		subRootHolderId nullable:true;
+		subRootHolderType nullable:true;
 	}
 
 	static mapping = {
@@ -57,34 +64,39 @@ class ActivityFeed {
 		
 		return ActivityFeed.withCriteria(){
 			and{
-				switch (feedType) {
-					case ActivityFeedService.GENERIC:
-						eq('rootHolderType', params.rootHolderType)
-						break
-					case ActivityFeedService.SPECIFIC:
-						eq('rootHolderType', params.rootHolderType)
-						eq('rootHolderId', params.rootHolderId.toLong())
-						break
-					case [ActivityFeedService.GROUP_SPECIFIC, ActivityFeedService.MY_FEEDS]:
-						or{
-							params.typeToIdFilterMap.each{key, value ->
-								println "==== key $key === val $value"
-								if(!value.isEmpty()){ 
+				if(params.isCommentThread){
+					eq('subRootHolderType', params.subRootHolderType)
+					eq('subRootHolderId', params.subRootHolderId)
+				}else{
+					switch (feedType) {
+						case ActivityFeedService.GENERIC:
+							eq('rootHolderType', params.rootHolderType)
+							break
+						case ActivityFeedService.SPECIFIC:
+							eq('rootHolderType', params.rootHolderType)
+							eq('rootHolderId', params.rootHolderId.toLong())
+							break
+						case [ActivityFeedService.GROUP_SPECIFIC, ActivityFeedService.MY_FEEDS]:
+							or{
+								params.typeToIdFilterMap.each{key, value ->
+									println "==== key $key === val $value"
+									if(!value.isEmpty()){ 
+										and{
+											eq('rootHolderType', key)
+											'in'('rootHolderId', value)
+										}
+									}
+								}
+								if(params.showUserFeed){
 									and{
-										eq('rootHolderType', key)
-										'in'('rootHolderId', value)
+										eq('author', params.author)
+										eq('rootHolderType', Observation.class.getCanonicalName())
 									}
 								}
 							}
-							if(params.showUserFeed){
-								and{
-									eq('author', params.author)
-									eq('rootHolderType', Observation.class.getCanonicalName())
-								}
-							}
-						}
-					default:
-						break
+						default:
+							break
+					}
 				}
 				if(params.feedCategory && params.feedCategory.trim() != ActivityFeedService.ALL){
 					eq('rootHolderType', params.feedCategory)
@@ -114,16 +126,24 @@ class ActivityFeed {
 				count('id')
 			}
 			and{
-				switch (feedType) {
-					case ActivityFeedService.GENERIC:
-						eq('rootHolderType', params.rootHolderType)
-						break
-					case [ActivityFeedService.SPECIFIC, ActivityFeedService.GROUP_SPECIFIC]:
-						eq('rootHolderType', params.rootHolderType)
-						eq('rootHolderId', params.rootHolderId.toLong())
-						break
-					default:
-						break
+				if(params.isCommentThread != null && params.isCommentThread.toBoolean()){
+					eq('subRootHolderType', params.subRootHolderType)
+					eq('subRootHolderId', params.subRootHolderId)
+					//removing main thread comment
+//					ne('activityHolderType', params.subRootHolderType)
+//					ne('activityHolderId', params.subRootHolderId)
+				}else{
+					switch (feedType) {
+						case ActivityFeedService.GENERIC:
+							eq('rootHolderType', params.rootHolderType)
+							break
+						case [ActivityFeedService.SPECIFIC, ActivityFeedService.GROUP_SPECIFIC]:
+							eq('rootHolderType', params.rootHolderType)
+							eq('rootHolderId', params.rootHolderId.toLong())
+							break
+						default:
+							break
+					}
 				}
 				(params.timeLine == ActivityFeedService.OLDER) ? lt('lastUpdated', refTime) : gt('lastUpdated', refTime)
 			}
@@ -133,6 +153,12 @@ class ActivityFeed {
 	private static validateParams(params){
 		params.feedType = params.feedType ?: ActivityFeedService.ALL
 		params.checkFeed = (params.checkFeed != null)? params.checkFeed.toBoolean() : false
+		params.isCommentThread = (params.isCommentThread != null)? params.isCommentThread.toBoolean() : false
+		
+		if(params.isCommentThread){
+			params.subRootHolderId = params.subRootHolderId.toLong()
+		}
+		
 		switch (params.feedType) {
 			//to handle complete list (ie groups, obvs, species)
 			case ActivityFeedService.GENERIC:
@@ -176,6 +202,18 @@ class ActivityFeed {
 		return true
 	}
 	
+	def isMainThreadComment(){
+		return (activityHolderId == subRootHolderId && activityHolderType == subRootHolderType)
+	}
+	
+	def fetchMainCommentFeed(){
+		return ActivityFeed.findByActivityHolderTypeAndActivityHolderId(subRootHolderType, subRootHolderId)
+	}
+	
+	def showComment(){
+		return (rootHolderType == Observation.class.getCanonicalName() || !isMainThreadComment())
+	}
+	
 	private static getGroupAndObsevations(groups){
 		def m = [:]
 		m[Observation.class.getCanonicalName()] = getObvIds(groups)
@@ -217,6 +255,10 @@ class ActivityFeed {
 					and{
 						eq('activityHolderType', type)
 						eq('activityHolderId', id)
+					}
+					and{
+						eq('subRootHolderType', type)
+						eq('subRootHolderId', id)
 					}
 				}
 			}

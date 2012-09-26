@@ -6,8 +6,10 @@ class CommentService {
 	def grailsApplication
 
 	def addComment(params){
+		validateParams(params);
 		Comment c = new Comment(author:params.author, body:params.commentBody.trim(), commentHolderId:params.commentHolderId, \
-						commentHolderType:params.commentHolderType, rootHolderId:params.rootHolderId, rootHolderType:params.rootHolderType);
+						commentHolderType:params.commentHolderType, rootHolderId:params.rootHolderId, rootHolderType:params.rootHolderType, \
+						parentId:params.parentId, mainParentId:params.mainParentId);
 
 		if(params.dateCreated) {
 			c.dateCreated = params.dateCreated
@@ -34,7 +36,7 @@ class CommentService {
 	def removeComment(params){
 		Comment comment = Comment.get(params.commentId.toLong());
 		try{
-			comment.delete(flush:true, failOnError:true)
+			comment.deleteComment();
 			return true
 		}catch(e) {
 			e.printStackTrace()
@@ -89,12 +91,25 @@ class CommentService {
 		return Comment.findAllByRootHolderType(Observation.getClass().getCanonicalName(),[sort: "lastUpdated", order: "desc"])
 	}
 
-	private getDomainObject(className, id){
+	def getDomainObject(className, id){
+		if(!className || className.trim() == ""){
+			return null
+		}
 		id = id.toLong()
-		//return Class.forName(className).read(id)
 		return grailsApplication.getArtefact("Domain",className)?.getClazz()?.read(id)
 	}
 
+	private validateParams(params){
+		if(params.parentId){
+			Comment parentComment = Comment.read(params.parentId.toLong());
+			params.mainParentId = parentComment.mainParentId ?: parentComment.id
+			params.commentHolderId = parentComment.commentHolderId
+			params.commentHolderType = parentComment.commentHolderType
+			params.rootHolderId = parentComment.rootHolderId
+			params.rootHolderType = parentComment.rootHolderType
+		} 
+	}
+	
 	private setDefaultRange(params){
 		params.max = params.max ? params.max.toInteger() : 3
 		params.offset = params.offset ? params.offset.toLong() : 0
