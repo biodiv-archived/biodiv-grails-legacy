@@ -10,8 +10,7 @@
 <r:require modules="activityfeed"/>
 </head>
 <body>
-	<div class="container outer-wrapper">
-		<div class="row">
+	
 			<div class="span12">
 				<div class="page-header clearfix">
 						<h1>
@@ -26,8 +25,7 @@
 				</g:if>
 				<feed:showFeedWithFilter model="[feedType:feedType, feedCategory:'All']" />
 			</div>
-		</div>
-	</div>
+		
 	<r:script>
 	</r:script>
 </body>
