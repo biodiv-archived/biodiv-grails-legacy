@@ -1211,7 +1211,7 @@ span.cke_skin_kama {
 	width: 100%;
 	/* z-index: 2000; */
 	position: relative;
-	margin-top: 50px;
+/* 	margin-top: 50px; */
 	border-top: 1px solid #e5e5e5;
 }
 
@@ -1464,7 +1464,7 @@ li#userOrEmail-new {
 	padding: 10px 15px 10px 15px;
 	position: relative;
 	left: -50px;
-	top: 50px;
+/* 	top: 50px; */
 	background-color: #8D9B87;
 	box-shadow: 1px 1px 5px #aaaaaa;
 	/* height: 340px; */
