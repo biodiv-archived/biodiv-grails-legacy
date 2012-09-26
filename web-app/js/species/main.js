@@ -77,19 +77,19 @@ var ajaxLoginSuccessHandler = function(json, statusText, xhr, $form) {
 
 jQuery(document).ready(function($) {
 	var domain = document.domain.replace('http://','').replace('www.','').replace(':8080','');
-	if (domain == appWGPDomain){
-        $('#ibp-header').hide();
-        $('#wgp-header').show();
-        $('#ibp-footer').hide();
-        $('#wgp-footer').show();
-    }
-
-    if (domain == appIBPDomain){
-        $('#wgp-header').hide();
-        $('#ibp-header').show();
-        $('#wgp-footer').hide();
-        $('#ibp-footer').show();
-    }
+//	if (domain == appWGPDomain){
+//        $('#ibp-header').hide();
+//        $('#wgp-header').show();
+//        $('#ibp-footer').hide();
+//        $('#wgp-footer').show();
+//    }
+//
+//    if (domain == appIBPDomain){
+//        $('#wgp-header').hide();
+//        $('#ibp-header').show();
+//        $('#wgp-footer').hide();
+//        $('#ibp-footer').show();
+//    }
 
 	$("#menu .navigation li").hover(
   		function () {
