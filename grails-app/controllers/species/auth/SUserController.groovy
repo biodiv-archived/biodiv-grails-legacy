@@ -480,6 +480,9 @@ class SUserController extends UserController {
 	def header = {
 		render template:"/domain/ibpHeaderTemplate"
 	}
+	def sidebar = {
+		render template:"/common/userGroup/sidebarTemplate"
+	}
 
 	protected void addRoles(user) {
 		String upperAuthorityFieldName = GrailsNameUtils.getClassName(

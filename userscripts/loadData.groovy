@@ -7,20 +7,20 @@ import speciespage.SetupService;
 //s.uploadHabitats();
 def speciesService = ctx.getBean("speciesService");
 
-//grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/ibp/1.0/mango";
-//speciesService.uploadSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/ibp/1.0/mango/MangoMangifera_indica_prabha.xlsx", 0, 0, 1, 4);
-//
-//grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/ibp/1.0/grey_falcolin";
-//speciesService.uploadSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/ibp/1.0/grey_falcolin/GreyFrancolin.xlsx", 0, 0, 1, 4);
-//
-//grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/ibp/1.0/Rufous Woodpecker/images";
-//speciesService.uploadNewSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/ibp/1.0/Rufous Woodpecker/RufousWoodepecker.xlsm");	
-//
-//grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/ibp/1.0/Eurasian Curlew/png ec";
-//speciesService.uploadNewSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/ibp/1.0/Eurasian Curlew/EurasianCurlew.xlsm");
+grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/ibp/1.0/mango";
+speciesService.uploadSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/ibp/1.0/mango/MangoMangifera_indica_prabha.xlsx", 0, 0, 1, 4);
 
-grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/atree/1.0/Dung_beetle/images";
-speciesService.uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/atree/1.0/Dung_beetle/Dung_beetle_Species_pages_IBP.xlsx", grailsApplication.config.speciesPortal.data.rootDir+"/mappings/dungbeetles_mapping.xlsx", 0, 0, 0, 0);
+grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/ibp/1.0/grey_falcolin";
+speciesService.uploadSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/ibp/1.0/grey_falcolin/GreyFrancolin.xlsx", 0, 0, 1, 4);
+
+grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/ibp/1.0/Rufous Woodpecker/images";
+speciesService.uploadNewSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/ibp/1.0/Rufous Woodpecker/RufousWoodepecker.xlsm");	
+
+grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/ibp/1.0/Eurasian Curlew/png ec";
+speciesService.uploadNewSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/ibp/1.0/Eurasian Curlew/EurasianCurlew.xlsm");
+
+//grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/atree/1.0/Dung_beetle/images";
+//speciesService.uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/atree/1.0/Dung_beetle/Dung_beetle_Species_pages_IBP.xlsx", grailsApplication.config.speciesPortal.data.rootDir+"/mappings/dungbeetles_mapping.xlsx", 0, 0, 0, 0);
 
 //grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/ifp/1.0/images";
 //speciesService.uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/ifp/1.0/Trees_descriptives.xlsx", grailsApplication.config.speciesPortal.data.rootDir+"/mappings/ifp_tree_mapping_v2.xlsx", 0, 0, 0, 2);
