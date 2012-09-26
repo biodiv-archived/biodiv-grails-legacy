@@ -1,7 +1,7 @@
 <div class="container outer-wrapper">
 	<g:if test="${userGroupInstance  && userGroupInstance.id }">
-		<div class="page-header clearfix"
-			style="margin:5px 0px; padding:18px 0px;background-image:url(${resource(dir:'images', file:'species_canvas.png')})">
+		<div class="page-header gradient-bg clearfix"
+			style="margin:5px 0px; padding:18px 0px;">
 			<div style="width: 100%;">
 				<uGroup:showHeader model=[ 'userGroupInstance':userGroupInstance] />
 			</div>
@@ -75,6 +75,10 @@
 							</li>
 							<li class="${(request.forwardURI.contains('/checklists'))?' active':''}"><a href="/checklists" title="Checklists">All Checklists</a>
 							</li>
+								<li class="${(params.controller == 'userGroup')?' active':''}"><a
+								href="${createLink(controller:"userGroup", "action":"list")}"
+								title="Species">All Groups</a></li>
+							
 						</ul></li>
 				</g:if>
 				<g:else>
@@ -125,6 +129,10 @@
 							</li>
 							<li class="${(request.forwardURI.contains('/checklists'))?' active':''}"><a href="/checklists" title="Checklists">All Checklists</a>
 							</li>
+							</li>
+								<li class="${(params.controller == 'userGroup')?' active':''}"><a
+								href="${createLink(controller:"userGroup", "action":"list")}"
+								title="Species">All Groups</a></li>
 						</ul></li>
 
 				</g:else>

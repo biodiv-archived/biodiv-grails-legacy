@@ -790,7 +790,7 @@ html.busy,html.busy * {
 	padding-bottom: 20px;
 /* 	margin-top: 10px; */
 	margin-bottom: 20px;
-        background-color: rgba(106, 201, 162, 0.15);
+        background-color: #ffffff;/*rgba(106, 201, 162, 0.15);*/
 	background: transparent\9;
 		-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#266AC9A2,endColorstr=#266AC9A2)"; /* IE8 */
 		    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#266AC9A2,endColorstr=#266AC9A2);   /* IE6 & 7 */
