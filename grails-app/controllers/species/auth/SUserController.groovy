@@ -481,6 +481,10 @@ class SUserController extends UserController {
 		render template:"/domain/ibpHeaderTemplate"
 	}
 
+	def footer = {
+		render template:"/domain/ibpFooterTemplate"
+	}
+	
 	protected void addRoles(user) {
 		String upperAuthorityFieldName = GrailsNameUtils.getClassName(
 				SpringSecurityUtils.securityConfig.authority.nameField, null)
