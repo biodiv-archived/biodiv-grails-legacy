@@ -58,7 +58,7 @@
 										</li>
 										<li class="${(request.forwardURI.contains('/biodiversity_news'))?' active':''}"><a href="/biodiversity_news" title="News">News</a>
 										</li>
-										<li class="${(request.forwardURI.contains('/collaborate-wg'))?' active':''}"><a href="/collaborate-wg" title="Collaborate">Collaborate</a>
+										<li class="${(request.forwardURI.contains('/cepf_grantee_database'))?' active':''}"><a href="/cepf_grantee_database" title="Western Ghats CEPF Projects">Western Ghats CEPF Projects</a>
 										</li>
 										<li class="${(request.forwardURI.contains('/themepages/list'))?' active':''}"><a href="/themepages/list" title="Themes">Themes</a>
 										</li>
@@ -106,7 +106,7 @@
 										</li>
 										<li class="${(request.forwardURI.contains('/biodiversity_news'))?' active':''}"><a href="/biodiversity_news" title="News">News</a>
 										</li>
-										<li class="${(request.forwardURI.contains('/collaborate-wg'))?' active':''}"><a href="/collaborate-wg" title="Collaborate">Collaborate</a>
+										<li class="${(request.forwardURI.contains('/cepf_grantee_database'))?' active':''}"><a href="/cepf_grantee_database" title="Western Ghats CEPF Projects">Western Ghats CEPF Projects</a>
 										</li>
 										<li class="${(request.forwardURI.contains('/themepages/list'))?' active':''}"><a href="/themepages/list" title="Themes">Themes</a>
 										</li>
