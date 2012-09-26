@@ -16,8 +16,6 @@
 
 				
 				<ul class="nav pull-right">
-					<li><search:searchBox />
-					</li>
 					<li><sUser:userLoginBox /></li>
 
 				</ul>
