@@ -18,6 +18,7 @@
 		<input type="hidden" name='rootHolderType' value="${rootHolder.class.getCanonicalName()}" />
 		<input type="hidden" name='commentType' value="${commentType}" />
 		<input type="hidden" name='newerTimeRef' value="${newerTimeRef}"/>
+		<input type="hidden" name='commentPostUrl' value="${createLink(controller:'comment', action:'addComment')}"/>
 		<input type="submit" value="Post" class="btn comment-post-btn " style="float:right;"/>
 	</form>
 </div>

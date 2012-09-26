@@ -23,15 +23,18 @@ class Comment{
 	Long rootHolderId;
 	String rootHolderType;
 
-	//comment parent (to handle reply)
-	//Comment parentComment;
-
+	//to store immediate parent comment 
+	Long parentId;
+	//to store main comment thread
+	Long mainParentId;
+	
 	static hasMany = [likes:SUser, attachments:Resource];
 	static belongsTo = [author:SUser];
 
 	static constraints = {
 		body blank:false;
-		//parentComment nullable:false;
+		parentId nullable:true;
+		mainParentId nullable:true;
 	}
 
 	static mapping = {
@@ -116,15 +119,78 @@ class Comment{
 		return null
 	}
 	
+	def isMainThread(){
+		return mainParentId == null;
+	}
+	
+	
+	def deleteComment(){
+		this.delete(flush:true, failOnError:true)
+		if(isMainThread()){
+			deleteAllChild()
+		}else{
+			setParentToNull()
+		}
+	}
+	
 	def afterInsert(){
 		activityFeedService.addActivityFeed(activityFeedService.getDomainObject(rootHolderType, rootHolderId), this, author, activityFeedService.COMMENT_ADDED)
 	}
 	
 	def afterDelete(){
 		activityFeedService.deleteFeed(this);
+	
 	}
 	
-	//	int compareTo(obj) {
-	//		lastUpdated.compareTo(obj.lastUpdated);
-	//	}
+	def deleteAllChild(){
+		def commentList = Comment.findAllByMainParentId(this.id)
+		commentList.each{ Comment c ->
+			try{
+				//Comment.withNewSession {
+					c.delete(flush:true, failOnError:true)
+					println "================== deleting commetn with id $c.id" 
+				//} 
+			}catch(Exception e){
+				e.printStackTrace()
+			}
+		}
+	}
+	
+	def setParentToNull(){
+		def commentList = Comment.findAllByParentId(this.id)
+		commentList.each{ Comment c ->
+			try{
+				//Comment.withNewSession {
+					c.parentId = null
+					c.save(flush:true)
+				//}
+			}catch(Exception e){
+				e.printStackTrace()
+			}
+		}
+	}
+	
+	def fetchParent(){
+		return Comment.read(parentId)
+	}
+	
+	def fetchMainThread(){
+		return Comment.read(mainParentId)
+	}
+	
+	def fetchParentText(){
+		def parentComment = fetchParent()
+		if(parentComment){
+			return parentComment.body
+		}
+		return "Parent comment has been deleted"
+	}
+	
+	def fetchParentCommentAuthor(){
+		def parentComment = fetchParent()
+		if(parentComment){
+			return parentComment.author
+		}
+		return null
+	}
 }

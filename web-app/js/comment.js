@@ -112,5 +112,23 @@ function loadOlderComment(targetComp, commentType, commentHolderId, commentHolde
 	});
 }
 
+function replyOnComment(comp, parentId, url){
+	var params = {};
+	params["commentBody"] = $(comp).siblings(".comment-textbox").val();
+	params["parentId"] = parentId;
+	
+	$.ajax({
+ 		url: url,
+		dataType: "json",
+		data: params,
+		success: function(data) {
+			if(data.success){
+				updateFeeds();
+			}
+		}, error: function(xhr, status, error) {
+			alert(xhr.responseText);
+	   	}
+	});
+}
  
 

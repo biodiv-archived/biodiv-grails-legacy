@@ -1,4 +1,5 @@
 <%@page import="species.participation.Observation"%>
+<%@page import="species.participation.Comment"%>
 <%@page import="species.groups.UserGroup"%>
 
 <%@page import="species.participation.ActivityFeedService"%>
@@ -14,6 +15,14 @@
 			${feedInstance.rootHolderType}
 		</g:else>
 	</div>
-	
-	<feed:showAllActivityFeeds model="['rootHolder':feedParentInstance, 'feedType':ActivityFeedService.SPECIFIC, 'refreshType':ActivityFeedService.MANUAL]" />
+	<%
+		def isCommentThread = (feedInstance.subRootHolderType == Comment.class.getCanonicalName() && feedInstance.rootHolderType != Observation.class.getCanonicalName()) 
+	%>
+	<g:if test="${isCommentThread}">
+		<div class="feedSubParentContext ${feedInstance.fetchMainCommentFeed().subRootHolderType + feedInstance.fetchMainCommentFeed().subRootHolderId}">
+		Comment thread
+<%--			<comment:showCommentWithReply model="['feedInstance' : feedInstance.fetchMainCommentFeed(), 'feedPermission':feedPermission, 'showAlways':true]" />	--%>
+		</div>
+	</g:if>
+	<feed:showAllActivityFeeds model="['rootHolder':feedParentInstance, 'isCommentThread':isCommentThread, 'subRootHolderType':feedInstance.subRootHolderType, 'subRootHolderId':feedInstance.subRootHolderId, 'feedType':ActivityFeedService.SPECIFIC, 'refreshType':ActivityFeedService.MANUAL, 'feedPermission':feedPermission]" />
 </div>
