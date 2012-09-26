@@ -8,8 +8,8 @@
 		</div>
 	</g:if>
 	<g:else>
-		<div class="page-header clearfix"
-			style="margin:5px 0px; padding:18px 0px;background-image:url(${resource(dir:'images', file:'species_canvas.png')})">
+		<div class="page-header gradient-bg clearfix"
+			style="margin:5px 0px; padding:18px 0px;">
 			<div style="width: 100%;">
 
 				<div class="span3 logo">
