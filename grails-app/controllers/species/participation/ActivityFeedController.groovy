@@ -8,7 +8,7 @@ class ActivityFeedController {
 	def springSecurityService;
 	
 	def getFeeds = {
-		log.debug params;
+		log.debug "=========================== " + params;
 		params.author = springSecurityService.currentUser;
 		
 		def feeds = activityFeedService.getActivityFeeds(params);
@@ -18,16 +18,17 @@ class ActivityFeedController {
 				render m as JSON;
 			}
 			else{
-			def showFeedListHtml = g.render(template:"/common/activityfeed/showActivityFeedListTemplate", model:[feeds:feeds, feedType:params.feedType, feedPermission:params.feedPermission]);
-			def olderTimeRef = feeds.last().lastUpdated.time.toString()
-			def newerTimeRef = feeds.first().lastUpdated.time.toString()
-			def result = [showFeedListHtml:showFeedListHtml, olderTimeRef:olderTimeRef, newerTimeRef:newerTimeRef, currentTime:new Date().getTime()]
-			if(params.refreshType == activityFeedService.MANUAL){
-				params.refTime = feeds.last().lastUpdated.time.toString()
-				result["remainingFeedCount"] = activityFeedService.getCount(params);
-			}
-			render result as JSON
-			}
+				println "========================= list size of feed " + feeds.size() + "   sss $feeds"
+				def showFeedListHtml = g.render(template:"/common/activityfeed/showActivityFeedListTemplate", model:[feeds:feeds, feedType:params.feedType, feedPermission:params.feedPermission]);
+				def olderTimeRef = feeds.last().lastUpdated.time.toString()
+				def newerTimeRef = feeds.first().lastUpdated.time.toString()
+				def result = [showFeedListHtml:showFeedListHtml, olderTimeRef:olderTimeRef, newerTimeRef:newerTimeRef, currentTime:new Date().getTime()]
+				if(params.refreshType == activityFeedService.MANUAL){
+					params.refTime = feeds.last().lastUpdated.time.toString()
+					result["remainingFeedCount"] = activityFeedService.getCount(params);
+				}
+				render result as JSON
+				}
 		}else{
 			render [:] as JSON
 		}

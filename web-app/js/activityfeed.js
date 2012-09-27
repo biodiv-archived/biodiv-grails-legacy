@@ -5,7 +5,6 @@ var serverTimeDiff = null;
 function loadOlderFeedsInAjax(targetComp){
 	var url = $(targetComp).children('input[name="feedUrl"]').val();
 	var feedType = $(targetComp).children('input[name="feedType"]').val();
-	
 	$.ajax({
  		url: url,
 		dataType: "json",
@@ -14,7 +13,7 @@ function loadOlderFeedsInAjax(targetComp){
 			if(data.showFeedListHtml){
 				var htmlData = $(data.showFeedListHtml);
 				dcorateCommentBody(htmlData.find('.yj-message-body'));
-				htmlData = removeDuplicateFeed($(targetComp).children('ul'), htmlData, feedType, "older");
+				htmlData = removeDuplicateFeed($(targetComp).children('ul'), htmlData, feedType, "older", targetComp);
     			$(targetComp).children('ul').append(htmlData);
 				$(targetComp).children('input[name="olderTimeRef"]').val(data.olderTimeRef);
 				updateRelativeTime(data.currentTime);
@@ -58,7 +57,7 @@ function loadNewerFeedsInAjax(targetComp, checkFeed){
         		}
     			var htmlData = $(data.showFeedListHtml);
     			dcorateCommentBody(htmlData.find('.yj-message-body'));
-    			htmlData = removeDuplicateFeed($(targetComp).children('ul'), htmlData, feedType, "newer");
+    			htmlData = removeDuplicateFeed($(targetComp).children('ul'), htmlData, feedType, "newer", targetComp);
     			$(targetComp).children('ul').prepend(htmlData);
     			$(targetComp).children('input[name="newerTimeRef"]').val(data.newerTimeRef);
     			updateRelativeTime(data.currentTime);
@@ -77,8 +76,23 @@ function loadNewerFeedsInAjax(targetComp, checkFeed){
  	});
 }
 
-function removeDuplicateFeed(parentList, newList, feedType, feedTimeType){
+function removeDuplicateFeed(parentList, newList, feedType, feedTimeType, targetComp){
+	//alert(feedType + "  " + feedTimeType);
 	if(feedType === "Specific"){
+		/*
+		var isCommentThread = ($(targetComp).children('input[name="isCommentThread"]').val() == "true");
+		alert("is comment " + isCommentThread);
+		if(!isCommentThread || feedTimeType == "newer"){
+			return newList
+		}
+		//removing the last component as it may be repeating
+		var lastCompClass = $(newList).last().attr("class")
+		alert("==== last comp class " + lastCompClass);
+		if($(targetComp).siblings(".feedSubParentContext").hasClass(lastCompClass)){
+			alert("hiding");
+			$(newList).last().hide();
+		}
+		*/
 		return newList
 	}
 	if(feedTimeType == "older"){
@@ -125,6 +139,11 @@ function getFeedParams(timeLine, targetComp){
 	feedParams["feedCategory"] = $(targetComp).children('input[name="feedCategory"]').val();
 	feedParams["feedClass"] = $(targetComp).children('input[name="feedClass"]').val();
 	feedParams["feedPermission"] = $(targetComp).children('input[name="feedPermission"]').val();
+	
+	feedParams["isCommentThread"] = $(targetComp).children('input[name="isCommentThread"]').val();
+	feedParams["subRootHolderId"] = $(targetComp).children('input[name="subRootHolderId"]').val();
+	feedParams["subRootHolderType"] = $(targetComp).children('input[name="subRootHolderType"]').val();
+	
 	
 	feedParams["refreshType"] = $(targetComp).children('input[name="refreshType"]').val();
 	feedParams["timeLine"] = timeLine;

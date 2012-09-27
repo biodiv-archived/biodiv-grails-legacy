@@ -2,6 +2,8 @@ package species.participation
 
 import java.text.SimpleDateFormat
 
+import species.groups.UserGroup;
+
 class ActivityFeedService {
 	
 	static final String COMMENT_ADDED = "Comment added" 
@@ -58,10 +60,19 @@ class ActivityFeedService {
 	}
 	
 	def addActivityFeed(rootHolder, activityHolder, author, activityType){
+		//to support discussion on comment thread
+		def subRootHolderType = rootHolder?.class?.getCanonicalName()
+		def subRootHolderId = rootHolder?.id
+		if(activityHolder?.class?.getCanonicalName() == Comment.class.getCanonicalName()){
+			subRootHolderType = activityHolder.class.getCanonicalName()
+			subRootHolderId = (activityHolder.isMainThread())? activityHolder.id : activityHolder.fetchMainThread().id
+		}
+			
 		ActivityFeed af = new ActivityFeed(author:author, activityHolderId:activityHolder?.id, \
 						activityHolderType:activityHolder?.class?.getCanonicalName(), \
 						rootHolderId:rootHolder?.id, rootHolderType:rootHolder?.class?.getCanonicalName(), \
-						activityType:activityType);
+						activityType:activityType, subRootHolderType:subRootHolderType, subRootHolderId:subRootHolderId);
+					
 		ActivityFeed.withNewSession {
 			if(!af.save(flush:true)){
 				af.errors.allErrors.each { log.error it }
@@ -87,34 +98,39 @@ class ActivityFeedService {
 			return feeds
 		}
 		
-		// aggregating only observation object
-		if(params.feedType == GROUP_SPECIFIC){
-			Set feedSet = new HashSet()
-			def retList = []
-			feeds.each { it ->
-				if(it.rootHolderType != Observation.class.getCanonicalName()){
-					retList.add(it)
-				}else{
-					def feedKey = it.rootHolderType + it.rootHolderId;
-					if(!feedSet.contains(feedKey)){
-						retList.add(it)
-						feedSet.add(feedKey)
-					}
-				}
-			}
-			return retList
-		}
-		
-		//aggregating all the object
-		Set feedSet = new HashSet()
+		// aggregating object based on feed type
+		Set obvFeedSet = new HashSet()
+		Set commentFeedSet = new HashSet()
+		Set otherFeedSet = new HashSet()
 		def retList = []
 		feeds.each { it ->
-			def feedKey = it.rootHolderType + it.rootHolderId;
-			if(!feedSet.contains(feedKey)){
+			if(it.rootHolderType == Observation.class.getCanonicalName()){
+				//aggregating observation object
+				def feedKey = it.rootHolderType + it.rootHolderId;
+				if(!obvFeedSet.contains(feedKey)){
+					retList.add(it)
+					obvFeedSet.add(feedKey)
+				}
+			}else if(it.rootHolderType == UserGroup.class.getCanonicalName() && it.subRootHolderType == Comment.class.getCanonicalName()){
+				//aggregating comment
+				def feedKey = it.subRootHolderType + it.subRootHolderId;
+				if(!commentFeedSet.contains(feedKey)){
+					retList.add(it)
+					commentFeedSet.add(feedKey)
+				}
+			}else if(params.feedType == GROUP_SPECIFIC){
+				//adding object as it is if group specific object	
 				retList.add(it)
-				feedSet.add(feedKey)
+			}else{
+				//aggregating other object as well if its not specific to group(ie. myfeeds )
+				def feedKey = it.rootHolderType + it.rootHolderId;
+				if(!otherFeedSet.contains(feedKey)){
+					retList.add(it)
+					otherFeedSet.add(feedKey)
+				}
 			}
 		}
+		println "============== retlist " + retList
 		return retList
 	}
 	

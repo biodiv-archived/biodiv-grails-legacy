@@ -9,9 +9,5 @@
 		</g:link>
 	</div>
 	<feed:showActivityFeedContext
-		model="['feedInstance' : feedInstance, 'feedType':feedType]" />
-<%--	<div class="yj-attributes timestamp" style="clear:both;">--%>
-<%--		<input type="hidden" name='creationTime' value="${feedInstance.lastUpdated.getTime()}"/>--%>
-<%--		<span></span>--%>
-<%--	</div>--%>
+		model="['feedInstance' : feedInstance, 'feedType':feedType, 'feedPermission':feedPermission]" />
 </div>
