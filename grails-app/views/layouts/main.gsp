@@ -54,9 +54,10 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 		<domain:showIBPHeader />
 
 		<div class="container outer-wrapper">
-			
-				<uGroup:showSidebar />
-				<div class="">
+				<g:if test="${params.controller != 'openId' && params.controller != 'login' &&  params.controller != 'register'}">
+					<uGroup:showSidebar />
+				</g:if>
+				<div>
 				<div style="padding:10px 0px">
 					<g:layoutBody />
 				</div>

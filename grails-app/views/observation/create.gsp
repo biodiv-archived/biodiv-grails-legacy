@@ -112,7 +112,7 @@ input.dms_field {
 		<div class="observation_create">
 			<div class="span12">
 				<obv:showSubmenuTemplate model="['entityName':'Add an Observation']"/>
-			</div>
+			
 
 			<%
 				def form_id = "addObservation"
@@ -574,7 +574,7 @@ input.dms_field {
 
                 </div>
             </div>
-       
+       </div>
 		<!--====== Template ======-->
 		<script id="metadataTmpl" type="text/x-jquery-tmpl">
 	<li class="addedResource thumbnail">

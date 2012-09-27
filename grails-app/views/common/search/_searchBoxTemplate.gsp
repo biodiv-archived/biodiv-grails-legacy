@@ -67,7 +67,7 @@ $( "#search" ).click(function() {
 	$( "#searchbox" ).submit();
 });
 </r:script>
-<div id="mainSearchForm" class="dropdown pull-left">
+<div id="mainSearchForm" class="dropdown pull-left" style="margin:8px;">
 	<form method="get"
 		action="${createLink(action:'search') }"
 		id="searchbox" class="navbar-search"  style="margin-top:0px;">

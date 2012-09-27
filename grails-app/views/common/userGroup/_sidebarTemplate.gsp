@@ -36,11 +36,10 @@
 				<li><a
 					href="${createLink(controller:'activityFeed', params:['user':sUser.renderCurrentUserId(), 'feedType':ActivityFeedService.ALL])}"><i
 						class="icon-home"></i>Activity</a></li>
-				<li class="${(params.action=='create')?'active':'' }"><g:link
-						controller='login' class="btn btn-primary span1">Login</g:link></li>
 				<li class="${(params.action=='create')?'active':'' }"
-					style="clear: both;"><a href="${createLink(action:'create')}"><i
-						class="icon-plus"></i>Add Observation</a></li>
+					style="clear: both;"><a href="${createLink(action:'create')}"  style="display:inline;"><i
+						class="icon-plus"></i>Add Observation <g:link
+						controller='login' class="btn" style="margin-left:5px; display:inline;">Login</g:link></a></li>
 			</sec:ifNotLoggedIn>
 
 
