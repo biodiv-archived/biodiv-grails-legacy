@@ -18,7 +18,7 @@
 					</div>
 					<g:each in="${r.authors}" var="author">
 						<g:link controller="SUser" action="show" id="${author?.id}">
-							<img class="very_small_profile_pic"
+							<img class="small_profile_pic"
 								src="${author?.icon(ImageType.VERY_SMALL)}"
 								title="${author.name}" />
 						</g:link>

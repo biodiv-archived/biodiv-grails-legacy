@@ -18,6 +18,9 @@
 <body>
 	<div class="observation span12">
 		<uGroup:showSubmenuTemplate />
+		<div class="page-header">
+			<h1>About Us</h1>
+		</div>
 		<div class="super-section userGroup-section">
 			<div class="description notes_view">
 				${userGroupInstance.description}
@@ -86,10 +89,10 @@
 			</div>
 		</div>
 
-		<div class="super-section userGroup-section">
+		<!-- div class="super-section userGroup-section">
 			<div class="description notes_view" name="contactEmail">
 				Contact us by filling in the following feedback form.</div>
-		</div>
+		</div-->
 	</div>
 
 
