@@ -79,7 +79,6 @@ class ActivityFeed {
 						case [ActivityFeedService.GROUP_SPECIFIC, ActivityFeedService.MY_FEEDS]:
 							or{
 								params.typeToIdFilterMap.each{key, value ->
-									println "==== key $key === val $value"
 									if(!value.isEmpty()){ 
 										and{
 											eq('rootHolderType', key)
@@ -129,9 +128,6 @@ class ActivityFeed {
 				if(params.isCommentThread != null && params.isCommentThread.toBoolean()){
 					eq('subRootHolderType', params.subRootHolderType)
 					eq('subRootHolderId', params.subRootHolderId)
-					//removing main thread comment
-//					ne('activityHolderType', params.subRootHolderType)
-//					ne('activityHolderId', params.subRootHolderId)
 				}else{
 					switch (feedType) {
 						case ActivityFeedService.GENERIC:

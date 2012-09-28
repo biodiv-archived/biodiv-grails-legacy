@@ -5,6 +5,8 @@ var serverTimeDiff = null;
 function loadOlderFeedsInAjax(targetComp){
 	var url = $(targetComp).children('input[name="feedUrl"]').val();
 	var feedType = $(targetComp).children('input[name="feedType"]').val();
+	var feedOrder = $(targetComp).children('input[name="feedOrder"]').val();
+	
 	$.ajax({
  		url: url,
 		dataType: "json",
@@ -14,13 +16,16 @@ function loadOlderFeedsInAjax(targetComp){
 				var htmlData = $(data.showFeedListHtml);
 				dcorateCommentBody(htmlData.find('.yj-message-body'));
 				htmlData = removeDuplicateFeed($(targetComp).children('ul'), htmlData, feedType, "older", targetComp);
-    			$(targetComp).children('ul').append(htmlData);
-				$(targetComp).children('input[name="olderTimeRef"]').val(data.olderTimeRef);
+				if(feedOrder === "latestFirst"){
+					$(targetComp).children('ul').append(htmlData);
+				}else{
+					$(targetComp).children('ul').prepend(htmlData);
+				}
+    			$(targetComp).children('input[name="olderTimeRef"]').val(data.olderTimeRef);
 				updateRelativeTime(data.currentTime);
 				if(data.remainingFeedCount && data.remainingFeedCount > 0){
 					$(targetComp).children('.activiyfeedoldermsg').text("Show " + data.remainingFeedCount + " older feeds >>");
 				}else{
-					//alert("=== befor hiding last");
 					$(targetComp).children('.activiyfeedoldermsg').hide();
 				}
 			}
@@ -36,6 +41,8 @@ function loadNewerFeedsInAjax(targetComp, checkFeed){
 	var url = $(targetComp).children('input[name="feedUrl"]').val();
 	var feedType = $(targetComp).children('input[name="feedType"]').val();
 	var paramData =  getFeedParams("newer", targetComp);
+	var feedOrder = $(targetComp).children('input[name="feedOrder"]').val();
+	
 	paramData["checkFeed"] = checkFeed;
 	
 	$.ajax({ 
@@ -58,7 +65,11 @@ function loadNewerFeedsInAjax(targetComp, checkFeed){
     			var htmlData = $(data.showFeedListHtml);
     			dcorateCommentBody(htmlData.find('.yj-message-body'));
     			htmlData = removeDuplicateFeed($(targetComp).children('ul'), htmlData, feedType, "newer", targetComp);
-    			$(targetComp).children('ul').prepend(htmlData);
+    			if(feedOrder === "latestFirst"){
+    				$(targetComp).children('ul').prepend(htmlData);
+				}else{
+					$(targetComp).children('ul').append(htmlData);
+				}
     			$(targetComp).children('input[name="newerTimeRef"]').val(data.newerTimeRef);
     			updateRelativeTime(data.currentTime);
     			newFeedProcessing = false;
@@ -67,7 +78,6 @@ function loadNewerFeedsInAjax(targetComp, checkFeed){
         	return false;
         },
         error:function (xhr, ajaxOptions, thrownError){
-        	//alert("error ====");
         	//successHandler is used when ajax login succedes
         	newFeedProcessing = false;
         	var successHandler = this.success, errorHandler = undefined;
@@ -139,11 +149,11 @@ function getFeedParams(timeLine, targetComp){
 	feedParams["feedCategory"] = $(targetComp).children('input[name="feedCategory"]').val();
 	feedParams["feedClass"] = $(targetComp).children('input[name="feedClass"]').val();
 	feedParams["feedPermission"] = $(targetComp).children('input[name="feedPermission"]').val();
+	feedParams["feedOrder"] = $(targetComp).children('input[name="feedOrder"]').val();
 	
 	feedParams["isCommentThread"] = $(targetComp).children('input[name="isCommentThread"]').val();
 	feedParams["subRootHolderId"] = $(targetComp).children('input[name="subRootHolderId"]').val();
 	feedParams["subRootHolderType"] = $(targetComp).children('input[name="subRootHolderType"]').val();
-	
 	
 	feedParams["refreshType"] = $(targetComp).children('input[name="refreshType"]').val();
 	feedParams["timeLine"] = timeLine;
@@ -160,9 +170,7 @@ function setUpFeedForTarget(targetComp){
 		return; 
 	}
 	
-	//var feedType = $(targetComp).children('input[name="feedType"]').val();
 	var refreshType = $(targetComp).children('input[name="refreshType"]').val();
-	//var url = $(targetComp).children('input[name="feedUrl"]').val();
 	
 	if(refreshType === "auto"){
 		pollForFeeds(targetComp); //to get newer feeds
@@ -199,7 +207,6 @@ function updateRelativeTime(){
 function pollForFeeds(targetComp){
 	window.setInterval(function(){
 		if(!newFeedProcessing){
-			//newFeedProcessing = true;
 			loadNewerFeedsInAjax(targetComp, true);
 		}
 	}, 5000);

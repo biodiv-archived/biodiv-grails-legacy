@@ -3,11 +3,11 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="main" />
 <g:set var="entityName"
-	value="${message(code: 'feeds.label', default: 'Actions')}" />
+	value="${message(code: 'feeds.label', default: 'Activity')}" />
 <title><g:message code="default.list.label" args="[entityName]" />
 </title>
 <%--<script src="http://maps.google.com/maps/api/js?sensor=true"></script>--%>
-<r:require modules="activityfeed"/>
+<r:require modules="activityfeed,comment"/>
 </head>
 <body>
 	
@@ -23,7 +23,7 @@
 						${flash.message}
 					</div>
 				</g:if>
-				<feed:showFeedWithFilter model="[feedType:feedType, feedCategory:'All']" />
+				<feed:showFeedWithFilter model="[feedType:feedType, feedCategory:'All','feedOrder':'latestFirst']" />
 			</div>
 		
 	<r:script>

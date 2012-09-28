@@ -45,7 +45,7 @@ class ActivityFeedTagLib {
 		
 		def refTime = new Date().time.toString()
 		model.newerTimeRef = model.olderTimeRef = refTime
-		
+		model.feedOrder = model.feedOrder?:activityFeedService.OLDEST_FIRST
 		model.feedPermission = model.feedPermission?:activityFeedService.READ_ONLY
 		model.refreshType = model.refreshType ?:activityFeedService.AUTO
 		if(model.refreshType == activityFeedService.MANUAL){
@@ -63,8 +63,8 @@ class ActivityFeedTagLib {
 		newParams["rootHolderId"] = "" + model.rootHolder?.id
 		model.feeds = activityFeedService.getActivityFeeds(newParams);
 		if(model.feeds){
-			model.olderTimeRef = model.feeds.last().lastUpdated.time.toString()
-			model.newerTimeRef = model.feeds.first().lastUpdated.time.toString()
+			model.newerTimeRef = (model.feedOrder == activityFeedService.LATEST_FIRST) ? model.feeds.first().lastUpdated.time.toString() :  model.feeds.last().lastUpdated.time.toString()
+			model.olderTimeRef = (model.feedOrder == activityFeedService.LATEST_FIRST) ? model.feeds.last().lastUpdated.time.toString() :  model.feeds.first().lastUpdated.time.toString() 
 		}else{
 			def refTime = new Date().time.toString()
 			model.newerTimeRef = model.olderTimeRef = refTime
@@ -147,7 +147,7 @@ class ActivityFeedTagLib {
 	}
 	
 	private getUserHyperLink(user){
-		return "" + (g.link(controller:"sUser", action:"show", id:user.id){"<i>$user.username</i>"})
+		return "" + (g.link(controller:"sUser", action:"show", id:user.id){"<i>$user.name</i>"})
 	}
 	
 	private getUserGroupHyperLink(uGroup){
