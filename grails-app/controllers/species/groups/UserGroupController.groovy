@@ -709,7 +709,7 @@ class UserGroupController {
 
 		def result = [];
 		model.observationInstanceList.each {
-			result.add(['observation':it, 'title':it.maxVotedSpeciesName]);
+			result.add(['observation':it, 'title':it.fetchSpeciesCall()]);
 		}
 
 		def r = ["observations":result, "count":model.observationInstanceTotal]

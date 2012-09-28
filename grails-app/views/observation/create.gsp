@@ -329,7 +329,7 @@ input.dms_field {
 						</div>
 						<div class="span6 sidebar-section map_section" style="margin-top:-5px;">
 						<g:if
-							test="${observationInstance?.maxVotedSpeciesName == 'Unknown' || observationInstance?.maxVotedSpeciesName == null}">
+							test="${observationInstance?.fetchSpeciesCall() == 'Unknown'}">
 							<div id="help-identify" class="control-label">
 								<label class="checkbox" style="text-align: left;"> <input
 									type="checkbox" name="help_identify" /> Help identify </label>

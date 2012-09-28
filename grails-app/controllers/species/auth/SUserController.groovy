@@ -201,7 +201,7 @@ class SUserController extends UserController {
 				user.delete();
 
 			}
-			//updating maxVotedSpeciesName
+			//updating SpeciesName
 			obvToUpdate.each { obv ->
 				println "Updating speciesname for ${obv}"
 				obv.calculateMaxVotedSpeciesName();
