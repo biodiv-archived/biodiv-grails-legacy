@@ -1015,7 +1015,7 @@ ul,ol {
 #ibp-header {
 	border-bottom: 1px solid #E5E5E5;
 	box-shadow: 0 6px 6px -6px #5E5E5E;
-	/* 	color: #5E5E5E; */
+	color: #5E5E5E;
 	/* 	font-family: Verdana, Helvetica, Sans-Serif; */
 	/* height: 80px; */
 	width: 100%;
@@ -1027,16 +1027,16 @@ ul,ol {
 }
 
 .gradient-bg {
-	background: url('../images/header.png') white no-repeat;
-	background-size: 100%;
+/* 	background: url('../images/header.png') white no-repeat; */
+/* 	background-size: 100%; */
 	border: solid 1px #EEE;
-	/* 	background-color: #ECE9B7; */
-	/* 	background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#ECE9B7), */
-	/* 		to(#ebfefd) ); */
-	/* 	background-image: -webkit-linear-gradient(left, #ECE9B7, #ebfefd); */
-	/* 	background-image: -moz-linear-gradient(left, #ECE9B7, #ebfefd); */
-	/* 	background-image: -ms-linear-gradient(left, #ECE9B7, #ebfefd); */
-	/* 	background-image: -o-linear-gradient(left, #ECE9B7, #ebfefd); */
+		background-color: #ECE9B7;
+		background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#ECE9B7),
+			to(#ebfefd) );
+		background-image: -webkit-linear-gradient(left, #ECE9B7, #ebfefd);
+		background-image: -moz-linear-gradient(left, #ECE9B7, #ebfefd);
+		background-image: -ms-linear-gradient(left, #ECE9B7, #ebfefd);
+		background-image: -o-linear-gradient(left, #ECE9B7, #ebfefd);
 }
 
 #userMenu {
@@ -1205,7 +1205,7 @@ span.cke_skin_kama {
 }
 
 #ibp-footer {
-	background-image: url(../images/footer-big.jpg);
+/* 	background-image: url(../images/footer-big.jpg); */
 	/* 	background-size: 100%; */
 	background-color: #ffffff;
 	color: #5E5E5E;

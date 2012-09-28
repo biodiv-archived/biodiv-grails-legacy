@@ -45,7 +45,7 @@
 						<li style="padding: 0 5px; clear: both;">
 							<span class="flagInstanceClass">
 							<g:link controller="SUser" action="show" id="${flagInstance.author?.id}">
-							<img class="very_small_profile_pic"
+							<img class="small_profile_pic"
 								src="${flagInstance.author?.icon(ImageType.VERY_SMALL)}"
 								title="${flagInstance.author.name}"/></g:link> : ${flagInstance.flag.value()} ${flagInstance.notes ? ": " + flagInstance.notes : ""}</span>
 							<sUser:ifOwns model="['user':flagInstance.author]">

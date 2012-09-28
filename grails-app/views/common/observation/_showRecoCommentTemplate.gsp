@@ -15,7 +15,7 @@
 						<li style="padding: 0 5px; clear: both;"><span
 							class="flagInstanceClass ellipsis multiline">
 							<g:link controller="SUser" action="show" id="${recoVoteInstance.author?.id}">
-							<img class="very_small_profile_pic"
+							<img class="small_profile_pic"
 								src="${recoVoteInstance.author?.icon(ImageType.VERY_SMALL)}"
 								title="${recoVoteInstance.author.name}"/>
 							</g:link> on <g:formatDate date="${recoVoteInstance.votedOn}" type="datetime" style="LONG" timeStyle="SHORT"/> : ${recoVoteInstance.comment} 
