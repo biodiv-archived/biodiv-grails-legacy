@@ -139,8 +139,10 @@ class UserGroup implements Taggable {
 	}
 
 	def getFounders(int max, long offset) {
-		def founderRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_FOUNDER.value())
-		return UserGroupMemberRole.findAllByUserGroupAndRole(this, founderRole, [max:max, offset:offset]).collect { it.sUser};
+		UserGroupMemberRole.withTransaction {
+			def founderRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_FOUNDER.value())
+			return UserGroupMemberRole.findAllByUserGroupAndRole(this, founderRole, [max:max, offset:offset]).collect { it.sUser};
+		}
 	}
 
 	void setFounders(List<SUser> founders) {
