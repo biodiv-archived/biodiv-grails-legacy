@@ -4,7 +4,11 @@
 		<div class="container">
 			<div style="margin-left:10px;">
 					<div class="span3 logo" >
-						<uGroup:showUserGroupSignature  model="[ 'userGroup':userGroupInstance]" />
+						<g:link controller="userGroup" action="show" id="${userGroupInstance.id}">
+							<img class="logo"
+								src="${userGroupInstance.mainImage()?.fileName}" title="${userGroupInstance.name}"
+								alt="${userGroupInstance.name}" />
+						</g:link>
 					</div>
 					<h1>${userGroupInstance.name}</h1>
 					<span class="ellipsis multiline">

@@ -1218,6 +1218,7 @@ span.cke_skin_kama {
 	border-top: 1px solid #e5e5e5;
 	background-position: bottom center;
 	background-repeat: repeat-x;
+	margin-top:20px;
 }
 
 .gradient-bg-reverse {
@@ -1500,6 +1501,7 @@ li#userOrEmail-new {
 	width: 960px;
 	margin-left: auto;
 	margin-right: auto;
+	padding:10px;
 }
 
 .links_box_column {

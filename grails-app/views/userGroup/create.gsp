@@ -105,7 +105,7 @@ max-width: 100%;
 							code="fix.errors.before.proceeding" default="Fix errors" /> </span>
 					<%--<g:renderErrors bean="${userGroupInstance}" as="list" />--%>
 				</g:hasErrors>
-			</div>
+			
 			<%
 				def form_id = "createGroup"
 				def form_action = createLink(action:'save')
@@ -123,7 +123,7 @@ max-width: 100%;
 			<g:set var="members_autofillUsersId" value="id2" />
 			<form id="${form_id}" action="${form_action}" method="POST"
 				class="form-horizontal">
-				<div class="span12 super-section">
+				<div class="super-section">
 					<div class="section"
 						style="position: relative; overflow: visible;">
 						<h3>Groups</h3>
@@ -233,7 +233,7 @@ max-width: 100%;
 					</div>
 				</div>
 
-				<div class="span12 super-section" style="clear: both;">
+				<div class="super-section" style="clear: both;">
 					<div class="section"
 						style="position: relative; overflow: visible;">
 						<h3>Founders</h3>
@@ -263,7 +263,7 @@ max-width: 100%;
 					</div>
 				</div>
 
-				<!-- div class="span12 super-section" style="clear: both;">
+				<!-- div class="super-section" style="clear: both;">
 					<div class="section" style="position: relative; overflow: visible;">
 						<h3>Additional Information</h3>
 						
@@ -271,7 +271,7 @@ max-width: 100%;
 					</div>
 				</div-->
 
-                                <div class="span12 super-section" style="clear: both;">
+                                <div class="super-section" style="clear: both;">
 					<div class="section"
 						style="position: relative; overflow: visible;">
 						<h3>Location</h3>
@@ -279,7 +279,7 @@ max-width: 100%;
                                         </div>
                                 </div>
 
-				<div class="span12 super-section" style="clear: both;">
+				<div class="super-section" style="clear: both;">
 					<div class="section"
 						style="position: relative; overflow: visible;">
 						<h3>Interests</h3>
@@ -314,7 +314,7 @@ max-width: 100%;
 					</div>
 				</div>
 
-				<div class="span12 super-section" style="clear: both;">
+				<div class="super-section" style="clear: both;">
 					<div class="section"
 						style="position: relative; overflow: visible;">
 						<h3>Permissions</h3>
@@ -349,7 +349,7 @@ max-width: 100%;
 					</div>
 				</div>
 
-				<div class="span12" style="margin-top: 20px; margin-bottom: 40px;">
+				<div class="" style="margin-top: 20px; margin-bottom: 40px;">
 				
 					<g:if test="${userGroupInstance?.id}">
 						<a href="${createLink(action:'show', id:userGroupInstance.id)}" class="btn"
@@ -369,11 +369,12 @@ max-width: 100%;
 								Group </a>
 						</div>
 					</g:if>
-					<span class="policy-text"> By submitting this form for
-						creating a new group you agree to our <a href="/terms">Terms
-							and Conditions</a> on the use of our site </span> <a id="createGroupSubmit"
+					 <a id="createGroupSubmit"
 						class="btn btn-primary" style="float: right; margin-right: 5px;">
 						${form_button_val} </a>
+					<span class="policy-text"> By submitting this form for
+						creating a new group you agree to our <a href="/terms">Terms
+							and Conditions</a> on the use of our site </span>
 				</div>
 
 
@@ -389,7 +390,7 @@ max-width: 100%;
 			
 		</div>
 	
-
+</div>
 	<r:script>
 $(document).ready(function() {
 
