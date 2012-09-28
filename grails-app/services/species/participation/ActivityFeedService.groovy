@@ -14,12 +14,12 @@ class ActivityFeedService {
 	static final String OBSERVATION_FLAGGED = "Observation flagged"
 	static final String SPECIES_RECOMMENDED = "Species recommended"
 	static final String SPECIES_AGREED_ON = "Species agreed on"
+	static final String OBSERVATION_POSTED_ON_GROUP = "Observation posted on group"
+	static final String OBSERVATION_REMOVED_FROM_GROUP = "Observation removed from group"
 	
 	//group related
 	static final String USERGROUP_CREATED = "User group created"
 	static final String USERGROUP_UPDATED = "User group updated"
-	static final String OBSERVATION_POSTED_ON_GROUP = "Observation posted on group"
-	static final String OBSERVATION_REMOVED_FROM_GROUP = "Observation removed from group"
 	static final String MEMBER_JOINED = "New member joined"
 	static final String MEMBER_ROLE_UPDATED = "Member role updated"
 	static final String MEMBER_LEFT = "Member left"
@@ -32,6 +32,9 @@ class ActivityFeedService {
 	
 	static final String AUTO = "auto"
 	static final String MANUAL= "manual"
+	
+	static final String LATEST_FIRST = "latestFirst"
+	static final String OLDEST_FIRST = "oldestFirst"
 	
 	static final String GENERIC = "Generic"
 	static final String SPECIFIC = "Specific"
@@ -51,7 +54,11 @@ class ActivityFeedService {
 	def grailsApplication
 	
 	def getActivityFeeds(params){
+		log.debug params;
 		def feeds = ActivityFeed.fetchFeeds(params)
+		if(params.feedOrder == OLDEST_FIRST){
+			feeds = feeds.reverse()
+		}
 		return aggregateFeeds(feeds, params)
 	}
 	
@@ -92,7 +99,6 @@ class ActivityFeedService {
 		return grailsApplication.getArtefact("Domain",className)?.getClazz()?.read(id)
 	}
 	
-	//XXX needs to handle this on query level
 	private aggregateFeeds(List feeds, params){
 		if(params.feedType == SPECIFIC || params.checkFeed){
 			return feeds
@@ -130,7 +136,6 @@ class ActivityFeedService {
 				}
 			}
 		}
-		println "============== retlist " + retList
 		return retList
 	}
 	

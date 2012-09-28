@@ -1,7 +1,7 @@
 <%@page import="species.participation.Observation"%>
 <%@page import="species.groups.UserGroup"%>
 <div class="feedFilterDiv">
-	<div class="btn-group pull-left" style="z-index: 10; clear:both">
+	<div class="btn-group pull-right" style="z-index: 10; clear:both">
 		<button id="feedFilterButton" class="btn dropdown-toggle" data-toggle="dropdown" href="#" rel="tooltip"
 			data-original-title="Filter by" onclick="$('#feedFilter').show(); return false;"> All <span class="caret"></span>
 		</button>

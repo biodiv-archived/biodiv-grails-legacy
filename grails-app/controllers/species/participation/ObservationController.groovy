@@ -601,7 +601,7 @@ class ObservationController {
 								uniqueVotes:results.uniqueVotes,
 								recoVoteMsg:params.recoVoteMsg,
 								speciesNameTemplate:speciesNameHtml,
-								speciesName:observationInstance.maxVotedSpeciesName]
+								speciesName:observationInstance.fetchSpeciesCall()]
 
 					render result as JSON
 					return

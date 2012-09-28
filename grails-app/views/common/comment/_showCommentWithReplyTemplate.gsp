@@ -23,21 +23,20 @@
 	<g:if test="${feedPermission != 'readOnly' && commentInstance}">
 		<sUser:ifOwns model="['user':commentInstance.author]">
 			<div class="reco-comment-close" value="close" title="delete comment"
-				onclick="deleteComment(${commentInstance.id}, '${createLink(controller:'comment', action:'removeComment')}'); removeActivity(this);return false;">
+				onclick="deleteCommentActivity(this, ${commentInstance.id}, '${createLink(controller:'comment', action:'removeComment')}'); return false;">
 				<i class="icon-remove"></i>
 			</div>
 		</sUser:ifOwns>
-		<div class="comment-reply">
-			<a data-toggle="dropdown" href="#" title="reply on comment" onclick='$(this).siblings(".commnet-reply-popup").show();return false'>Reply</a>
-			<div class="commnet-reply-popup popup-form" style="display: none">
-				<div class="popup-form-close" value="close" onclick='$(this).parent().hide(); return false;'>
-					<i class="icon-remove"></i>
-				</div>
-				<textarea name="commentBody" class="comment-textbox" placeholder="Reply on comment"></textarea>
-				<a href="#" class="btn btn-mini pull-right" title="post comment" onclick='replyOnComment($(this), ${commentInstance.id}, "${createLink(controller:'comment', action:'addComment')}"); $(this).parent().hide();return false;'>Post</a>	
-			</div>
-		</div>
 	</g:if>
-
+	<div class="comment-reply">
+		<a data-toggle="dropdown" href="#" title="reply on comment" onclick='$(this).siblings(".commnet-reply-popup").show();return false'>Reply</a>
+		<div class="commnet-reply-popup popup-form" style="display: none">
+			<div class="popup-form-close" value="close" onclick='$(this).parent().hide(); return false;'>
+				<i class="icon-remove"></i>
+			</div>
+			<textarea name="commentBody" class="comment-textbox" placeholder="Reply on comment"></textarea>
+			<a href="#" class="btn btn-mini pull-right" title="post comment" onclick='replyOnComment($(this), ${commentInstance.id}, "${createLink(controller:'comment', action:'addComment')}"); $(this).parent().hide();return false;'>Post</a>	
+		</div>
+	</div>
 	<time class="timeago" datetime="${feedInstance.lastUpdated.getTime()}"></time>
 </div>

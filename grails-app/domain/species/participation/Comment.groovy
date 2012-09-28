@@ -148,7 +148,6 @@ class Comment{
 			try{
 				//Comment.withNewSession {
 					c.delete(flush:true, failOnError:true)
-					println "================== deleting commetn with id $c.id" 
 				//} 
 			}catch(Exception e){
 				e.printStackTrace()

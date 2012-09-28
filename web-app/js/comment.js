@@ -1,3 +1,9 @@
+function deleteCommentActivity(targetComp, commentId, url){
+	if(confirm('This comment will be deleted. Are you sure ?')){
+		deleteComment(commentId, url);
+		removeActivity(targetComp);
+	}
+}
 
 function deleteComment(commentId, url){
 	$.ajax({
@@ -6,6 +12,7 @@ function deleteComment(commentId, url){
 		
 		success: function(data){
 			$('.comment .' + commentId).remove();
+			return true;
 		},
 		
 		statusCode: {
@@ -16,6 +23,7 @@ function deleteComment(commentId, url){
 		error: function(xhr, status, error) {
 			var msg = $.parseJSON(xhr.responseText);
 			alert(msg);
+			return false;
 		}
 	});
 }

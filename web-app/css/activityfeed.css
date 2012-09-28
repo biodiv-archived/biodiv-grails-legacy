@@ -13,7 +13,6 @@
 }
 
 .activityfeedAll, .activityfeedGeneric, .activityfeedMyFeeds{
-/* 	width:700px; */
 	background-color:#ffffff;
 }
 
@@ -22,7 +21,7 @@
 	background-color: rgba(106, 201, 162, 0.15);
 }
 
-.activityfeedSpecific .activityFeed-container, .activityfeedGroupSpecific .activityFeed-container {
+.activityfeedSpecific .activityFeed-container, .activityfeedGroupSpecific .activityFeed-container, .activityfeedAll .activityFeed-container {
 	background-color: #e5e5e5;
 }
 
@@ -31,7 +30,7 @@
 	margin-top:5px;
 }
 
-.activityfeedGroupSpecific .activityFeedContext {
+.activityfeedGroupSpecific .activityFeedContext, .activityfeedAll .activityFeedContext{
 	background-color:#ffffff;
 }
 .feedParentContext {
@@ -39,13 +38,16 @@
 }
 
 .feedSubParentContext, .feedSubParentContext .yj-message-body pre {
-	background-color:#99ff88;
+/* 	background-color:#99ff88; */
+	background-color:#E7F0FE;
+
 }
 .activityFeed-container{
     border-bottom: 1px solid #DDDDDD;
     margin: 0 0 2px;
     min-height: 20px;
     padding: 7px;
+/*     background-color:#e5e5e5; */
 }
 
 .activityfeed .feedActivityHolderContext{
@@ -63,4 +65,9 @@
 .activityfeed .activiyfeednewermsg{
 	background-color: #E7F0FE;
 }
-
+.userGroup-section .comment-textbox{
+	width:99%;	
+}
+.userGroup-section .comment-post-btn {
+	position:inherit;	
+}
