@@ -8,10 +8,15 @@ import species.participation.ActivityFeed
 
 import speciespage.UserGroupService
 import species.auth.SUser
+import species.groups.UserGroup
 
-def feedService = ctx.getbean("activityFeedService");
-def userGroupService = ctx.getbean("userGroupService");
-def wgpGroup = null
+/*
+def feedService = ctx.getBean("activityFeedService");
+def userGroupService = ctx.getBean("userGroupService");
+
+def wgpGroup = UserGroup.read(1)
+def wgpUserDate = new Date(112, 7, 8)
+*/
 
 def migrate(){
 	migrateCommentAsFeeds()
@@ -21,6 +26,7 @@ def migrate(){
 
 
 def migrateCommentAsFeeds(){
+	def feedService = ctx.getBean("activityFeedService");
 	Comment.list().each { Comment c ->
 		def rootHolder = feedService.getDomainObject(c.rootHolderType, c.rootHolderId)
 		def af = feedService.addActivityFeed(rootHolder, c,  c.author, feedService.COMMENT_ADDED)
@@ -34,7 +40,11 @@ def migrateCommentAsFeeds(){
 }
 
 def migrateUserToWGPGroup(){
-	SUser.list().each{ user ->
+	def wgpUserDate = new Date(112, 7, 8)
+	def wgpGroup = UserGroup.read(1)
+	def feedService = ctx.getBean("activityFeedService");
+
+	SUser.findAllByDateCreatedGreaterThanEquals(wgpUserDate).each{ user ->
 		wgpGroup.addMember(user)
 		println "== done user addition " + user
 	}
@@ -47,22 +57,29 @@ def migrateUserToWGPGroup(){
 }
 
 def migreateObvToTWGPGroup(){
+	def wgpGroup = UserGroup.read(1)
+	def userGroupService = ctx.getBean("userGroupService");
+	def feedService = ctx.getBean("activityFeedService");
+	
 	def obvs = getAllWgpObvs()
 	obvs.each{ obv ->
 		userGroupService.postObservationToUserGroup(obv, wgpGroup)
 		println "done post of obv " + obv
 	}
 	
-	
 	ActivityFeed.findAllByActivityType(feedService.OBSERVATION_POSTED_ON_GROUP).each{ af ->
 		def obv = feedService.getDomainObject(af.rootHolderType, af.rootHolderId)
-		updateTime(af, obv)
+		af.dateCreated = obv.createdOn 
+		af.lastUpdated = obv.createdOn
+		if(!af.save(flush:true)){
+			af.errors.allErrors.each { println  it }
+		}
 		println "== done updating user time addition " + obv
 	}
 }
 
 def getAllWgpObvs(){
-	def dataSource =  ctx.getbean("dataSource");
+	def dataSource =  ctx.getBean("dataSource");
 	println "======== data osurce  $dataSource"
 	def sql =  Sql.newInstance(dataSource);
 	String query = "select obv.id from observation_locations as obv, wg_bounds as wg where ST_Contains(wg.geom, obv.st_geomfromtext);"
@@ -76,15 +93,14 @@ def getAllWgpObvs(){
 }
 
 def updateTime(af, c){
-	af.dateCreated = c.dateCreated
-	af.lastUpdated = c.lastUpdated
+	af.dateCreated = c.dateCreated 
+	af.lastUpdated = c.dateCreated
 	if(!af.save(flush:true)){
 		af.errors.allErrors.each { println  it }
 	}
 }
 
-getAllWgpObvs()
-//migrate()
+migrate()
 
 /*
 //please run following command on database
