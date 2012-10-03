@@ -6,9 +6,7 @@
 
 <body>
 
-	<div class="container outer-wrapper">
-		<div class="row">
-
+	
 			<div class="openid-loginbox super-section">
 
 				<g:if test="${flash.error}">
@@ -24,6 +22,5 @@
 				</g:if>
 				<auth:loginForm/>
 			</div>
-		</div>
-	</div>
+	
 </body>

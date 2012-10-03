@@ -197,7 +197,7 @@ body { /*     background-color: #ffffff; */
 	padding: 10px;
 }
 
-.outer-wrapper { /* clear: both; */
+.outer-wrapper, .navbar .container { /* clear: both; */
 	background-color: rgba(106, 201, 162, 0.15);
 	background: transparent\9;
 	-ms-filter:
@@ -1214,7 +1214,7 @@ span.cke_skin_kama {
 	border-top: 1px solid #e5e5e5;
 	background-position: bottom center;
 	background-repeat: repeat-x;
-	margin-top:20px;
+/* 	padding:10px 0px; */
 }
 
 .gradient-bg-reverse {
@@ -1511,6 +1511,7 @@ li#userOrEmail-new {
 	margin-left: 10px;
 	margin-right: 10px;
 	font-size: 0.9em;
+	padding: 10px 0px;
 }
 
 .links_box_column ul {

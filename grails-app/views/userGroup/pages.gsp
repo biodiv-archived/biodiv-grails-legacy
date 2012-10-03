@@ -31,7 +31,7 @@
 					</sec:permitted>
 				</div>
 			
-			<div class="list" style="margin: 30px 0px;">
+			<div class="list">
 				<table class="table table-striped">
 					<thead>
 						<tr>
