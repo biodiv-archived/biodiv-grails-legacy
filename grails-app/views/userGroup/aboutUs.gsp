@@ -25,12 +25,21 @@
 			<div class="description notes_view">
 				${userGroupInstance.description}
 			</div>
+			<div class="section">
+				<div class="prop">
+					<span class="name"><i class="icon-time"></i>Founded</span>
+					<obv:showDate
+						model="['userGroupInstance':userGroupInstance, 'propertyName':'foundedOn']" />
+				</div>
+			</div>
 		</div>
 		
+		
 		<div class="super-section">
+			<h3>Driven by</h3>
 			<div class="section">
 				<h5>
-					<i class="icon-user"></i>Founders
+					Founders
 				</h5>
 				<div id="founders_sidebar"></div>
 				<g:link controller="userGroup" action="founders"
@@ -39,7 +48,7 @@
 
 			<div class="section">
 				<h5>
-					<i class="icon-user"></i>Members
+					Members
 				</h5>
 				<div id="members_sidebar"></div>
 				<g:link controller="userGroup" action="members"
@@ -48,10 +57,10 @@
 		</div>
 
 		<div class="super-section">
-			<h3>Interested In</h3>
+			<h3>Interests</h3>
 			<div class="section">
 				<h5>
-					<i class="icon-snapshot"></i>Species Groups
+					Species Groups
 				</h5>
 				<uGroup:interestedSpeciesGroups
 					model="['userGroupInstance':userGroupInstance]" />
@@ -59,34 +68,21 @@
 
 			<div class="section">
 				<h5>
-					<i class="icon-snapshot"></i>Habitat
+					Habitat
 				</h5>
 				<uGroup:interestedHabitats
 					model="['userGroupInstance':userGroupInstance]" />
 
 			</div>
-		</div>
-
-		<div class="super-section">
 			<div class="section">
+				<h5>
+					Location
+				</h5>
 				<uGroup:showLocation model="['userGroupInstance':userGroupInstance]" />
 			</div>
-		</div>
-
-		<div class="super-section">
 			<div class="section">
 				<uGroup:showAllTags
 					model="['tagFilterByProperty':'UserGroup' , 'tagFilterByPropertyValue':userGroupInstance, 'isAjaxLoad':true]" />
-			</div>
-		</div>
-
-		<div class="super-section">
-			<div class="section">
-				<div class="prop">
-					<span class="name"><i class="icon-time"></i>Founded</span>
-					<obv:showDate
-						model="['userGroupInstance':userGroupInstance, 'propertyName':'foundedOn']" />
-				</div>
 			</div>
 		</div>
 

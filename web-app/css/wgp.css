@@ -153,8 +153,8 @@ body { /*     background-color: #ffffff; */
 	width: 100px;
 }
 
-.observation_story .prop .value {
-	margin-left: 25px;
+.prop .value {
+	margin-left: 110px;
 }
 
 .observation-icons {
@@ -165,10 +165,6 @@ body { /*     background-color: #ffffff; */
 #advSearchForm .prop .name {
 	float: right;
 	text-align: right;
-}
-
-.prop .value { /* 	text-align: left; */
-	
 }
 
 .list_view li.thumbnail {
@@ -1458,7 +1454,6 @@ li#userOrEmail-new {
 }
 
 .sidebar {
-/* 	margin-top: 20px; */
 	/* 	width: 250px; */
 }
 
@@ -1479,6 +1474,7 @@ li#userOrEmail-new {
 
 .left-sidebar {
 	float: left;
+	margin-top: 20px;
 }
 
 .right-sidebar {
