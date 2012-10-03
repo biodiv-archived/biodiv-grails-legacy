@@ -12,8 +12,7 @@
 
 <g:set var="entityName" value="${userGroupInstance.name}" />
 <title><g:message code="default.show.label"
-		args="[userGroupInstance.name]" />
-</title>
+		args="[userGroupInstance.name]" /></title>
 <r:require modules="userGroups_show, list_utils" />
 <style>
 .thumbnail {
@@ -22,55 +21,52 @@
 </style>
 </head>
 <body>
-	
-			<div class="observation span12">
-				<uGroup:showSubmenuTemplate/>
-				<div class=" userGroup-section">
-					<div class="section tabbable">
-						<h5>Members</h5>
 
-						<ul class="nav nav-tabs">
-							<li
-								class="${(!params.action || params.action == 'members')?'active':'' }"><a
-								href="${createLink(action:'members', id:params.id)}"> All
-									Members (${membersTotalCount})</a>
-							</li>
+	<div class="observation span12">
+		<uGroup:showSubmenuTemplate model="['entityName':'Members']"/>
+		<uGroup:rightSidebar  model="['userGroupInstance':userGroupInstance]"/>
+		<div class=" userGroup-section center_panel">
+			<div class="section tabbable">
+				<ul class="nav nav-tabs">
+					<li
+						class="${(!params.action || params.action == 'members')?'active':'' }"><a
+						href="${createLink(action:'members', id:params.id)}"> All
+							Members (${membersTotalCount})</a></li>
 
-							<li class="${(params.action == 'founders')?'active':'' }"><a
-								href="${createLink(action:'founders', id:params.id)}">
-									Founders (${foundersTotalCount})</a>
-							</li>
-							<li class="${(params.action == 'experts')?'active':'' }"><a
-								href="${createLink(action:'experts', id:params.id)}">
-									Experts (${expertsTotalCount})</a>
-							</li>
-						</ul>
+					<li class="${(params.action == 'founders')?'active':'' }"><a
+						href="${createLink(action:'founders', id:params.id)}">
+							Founders (${foundersTotalCount})</a></li>
+					<li class="${(params.action == 'experts')?'active':'' }"><a
+						href="${createLink(action:'experts', id:params.id)}"> Experts
+							(${expertsTotalCount})</a></li>
+				</ul>
 
 
 
-						<g:if test="${params.action == 'founders' }">
-							<div class="tab-pane" id="founders">
-								<sUser:showUserListWrapper
-									model="['results':founders, 'totalCount':foundersTotalCount, 'queryParams':queryParams, 'searched':true]" />
-							</div>
-						</g:if>
-
-						<g:elseif test="${params.action == 'experts' }">
-							<div class="tab-pane" id="experts">
-								<sUser:showUserListWrapper
-									model="['results':experts, 'totalCount':expertsTotalCount, 'queryParams':queryParams, 'searched':true]" />
-							</div>
-						</g:elseif>
-						<g:else>
-							<div class="tab-pane" id="members">
-								<sUser:showUserListWrapper
-									model="['results':members, 'totalCount':membersTotalCount, 'queryParams':queryParams, 'searched':true]" />
-							</div>
-						</g:else>
-
+				<g:if test="${params.action == 'founders' }">
+					<div class="tab-pane" id="founders">
+						<sUser:showUserListWrapper
+							model="['results':founders, 'totalCount':foundersTotalCount, 'queryParams':queryParams, 'searched':true]" />
 					</div>
-				</div>
+				</g:if>
+
+				<g:elseif test="${params.action == 'experts' }">
+					<div class="tab-pane" id="experts">
+						<sUser:showUserListWrapper
+							model="['results':experts, 'totalCount':expertsTotalCount, 'queryParams':queryParams, 'searched':true]" />
+					</div>
+				</g:elseif>
+				<g:else>
+					<div class="tab-pane" id="members">
+						<sUser:showUserListWrapper
+							model="['results':members, 'totalCount':membersTotalCount, 'queryParams':queryParams, 'searched':true]" />
+					</div>
+				</g:else>
+
 			</div>
+		</div>
+
+	</div>
 	<r:script>
 		$(document).ready(function(){
 			

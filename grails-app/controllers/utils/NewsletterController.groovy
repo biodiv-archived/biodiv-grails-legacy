@@ -35,7 +35,7 @@ class NewsletterController {
 				redirect url: createLink(mapping:'userGroupPageShow', params:['id':newsletterInstance.userGroup.id, 'newsletterId':newsletterInstance.id])
 			}
 			else {
-				render(view: "create", model: [newsletterInstance: newsletterInstance])
+				render(view: "create", model: [userGroupInstance:userGroupInstance, newsletterInstance: newsletterInstance])
 			}
 		} else {
 			if (newsletterInstance.save(flush: true)) {
@@ -56,7 +56,12 @@ class NewsletterController {
 			redirect(action: "list")
 		}
 		else {
-			[newsletterInstance: newsletterInstance]
+			if(newsletterInstance.userGroup) {
+				[userGroupInstance:newsletterInstance.userGroup, newsletterInstance: newsletterInstance]	
+			}
+			else {
+				[newsletterInstance: newsletterInstance]
+			}
 		}
 	}
 
@@ -94,10 +99,10 @@ class NewsletterController {
 				userGroupInstance.addToNewsletters(newsletterInstance);
 				if (userGroupInstance.save(flush: true)) {
 					flash.message = "${message(code: 'default.updated.message', args: [message(code: 'newsletter.label', default: 'Newsletter'), newsletterInstance.id])}"
-					redirect url: createLink(mapping:'userGroupPageShow', params:['id':newsletterInstance.userGroup.id, 'newsletterId':newsletterInstance.id])
+					redirect url: createLink(mapping:'userGroupPageShow', params:['id':newsletterInstance.userGroup.id, 'newsletterId':newsletterInstance.id, userGroupInstance:userGroupInstance])
 				}
 				else {
-					render(view: "edit", model: [newsletterInstance: newsletterInstance])
+					render(view: "edit", model: [userGroupInstance:userGroupInstance, newsletterInstance: newsletterInstance])
 				}
 			} else {
 				if (!newsletterInstance.hasErrors() && newsletterInstance.save(flush: true)) {

@@ -8,20 +8,21 @@
 <g:set var="entityName"
 	value="${message(code: 'newsletter.label', default: 'Newsletter')}" />
 <title><g:message code="default.create.label"
-		args="[entityName]" />
-</title>
+		args="[entityName]" /></title>
 <style>
 .body {
 	padding: 10px;
 }
 </style>
-<r:require modules="core"/>
+<r:require modules="core" />
 </head>
 <body>
 	<div class="span12">
+		<div class="page-header">
 		<h1>
 			<g:message code="default.create.label" args="[entityName]" />
 		</h1>
+		</div>
 		<g:if test="${flash.message}">
 			<div class="message">
 				${flash.message}
@@ -37,8 +38,7 @@
 				<div
 					class="control-group ${hasErrors(bean: newsletterInstance, field: 'title', 'errors')}">
 					<label for="title"><g:message code="newsletter.title.label"
-							default="Title" />
-					</label>
+							default="Title" /> </label>
 					<div class="controls">
 						<g:textField name="title" value="${newsletterInstance?.title}" />
 
@@ -52,8 +52,7 @@
 				<div
 					class="control-group ${hasErrors(bean: newsletterInstance, field: 'date', 'errors')}">
 					<label for="date"><g:message code="newsletter.date.label"
-							default="Date" />
-					</label>
+							default="Date" /> </label>
 					<div class="controls">
 						<g:datePicker name="date" precision="day"
 							value="${newsletterInstance?.date}" />
@@ -81,7 +80,15 @@
 					</div>
 				</div>
 
+				<div class="row control-group left-indent">
 
+					<label class="checkbox" style="text-align: left;"> <g:checkBox
+							style="margin-left:0px;" name="sticky"
+							checked="${newsletterInstance.sticky}" /> <g:message
+							code="newsletter.sticky"
+							default="Check this option to make this page available in sidebar?" />
+					</label>
+				</div>
 
 
 				<g:if test="${params.userGroupId}">

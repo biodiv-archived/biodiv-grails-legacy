@@ -12,11 +12,10 @@
 <body>
 
 			<div class="span12">
-				<uGroup:showSubmenuTemplate/>
-				<div class="page-header">
-					<h1>All Groups</h1>
-				</div>
+				<uGroup:showSubmenuTemplate  model="['entityName':'All Groups']"/>
 
+				<uGroup:rightSidebar model="['userGroupInstance':userGroupInstance]"/>
+				<div class="center_panel">
 				<div class="alertMsg ${(flash.message)?'alert':'' }"
 					style="clear: both;">
 					${flash.message}
@@ -26,6 +25,7 @@
 					style="clear: both; overflow: auto; background-image: none;">
 					<button type="button" class="close" data-dismiss="alert">×</button>
 					<uGroup:getSuggestedUserGroups />
+				</div>
 				</div>
 			</div>
 

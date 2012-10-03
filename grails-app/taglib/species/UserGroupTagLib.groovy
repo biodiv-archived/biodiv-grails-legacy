@@ -340,4 +340,11 @@ class UserGroupTagLib {
 	def showSubmenuTemplate = {attrs, body->
 		out << render(template:"/userGroup/userGroupSubmenuTemplate", model:attrs.model);
 	}
+	
+	def rightSidebar = {attrs, body->
+		def userGroupInstance = attrs.model?.userGroupInstance;
+		println userGroupInstance;
+		def result = userGroupService.getUserGroupsStickyPages(userGroupInstance, -1, -1);
+		out << render(template:"/userGroup/rightSidebar", model:['pages':result]);
+	}
 }

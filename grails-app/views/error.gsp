@@ -18,7 +18,7 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 }
 %>
 
-			<div class="observation  span12 ui-state-error">
+			<div class="observation  span12">
 				<p class="message">
 					Oops!!! There seems to be some problem. <br /> Please mail us the
 					following message as bug report here <span class="mailme">${supportEmail }</span><br />

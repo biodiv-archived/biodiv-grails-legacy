@@ -11,13 +11,13 @@
 </head>
 <body>
 	<div class="span12">
-		<uGroup:showSubmenuTemplate />
-		<div class="page-header">
-			<h1>Groups</h1>
-		</div>
-
+		<uGroup:showSubmenuTemplate   model="['entityName':'Groups']"/>
+		
+		
+		<div class="">
 		<uGroup:showUserGroupsListWrapper
 			model="['totalUserGroupInstanceList':totalUserGroupInstanceList, 'userGroupInstanceList':UserGroupInstanceList, 'userGroupInstanceTotal':userGroupInstanceTotal, 'queryParams':queryParams, 'activeFilters':activeFilters]" />
+		</div>
 	</div>
 
 	<g:javascript>
