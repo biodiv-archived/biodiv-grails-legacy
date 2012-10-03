@@ -1,6 +1,6 @@
 <%@page import="species.participation.Observation"%>
 <%@page import="species.utils.Utils"%>
-<div class="observation_story">
+<div class="observation_story" style="display:inline-block">
 	<h5>
 		<a href=/biodiv/SUser/show/${userInstance.id}> ${userInstance.name}
 		</a>
@@ -43,20 +43,20 @@
 
 	</div>
 	<div class="story-footer">
-		<div class="footer-item" title="No of Observations">
+		<span class="footer-item" title="No of Observations">
 			<i class="icon-screenshot"></i>
 				<obv:showNoOfObservationsOfUser model="['user':userInstance]"/>
-		</div>
+		</span>
 
-		<div class="footer-item" title="No of Tags">
+		<span class="footer-item" title="No of Tags">
 			<i class="icon-tags"></i>
 			<obv:showNoOfTagsOfUser model="['userId':userInstance.id]" />
-		</div>
+		</span>
 		
-		<div class="footer-item" title="No of Identifications">
+		<span class="footer-item" title="No of Identifications">
 					<i class="icon-check"></i>
 					<obv:showNoOfRecommendationsOfUser model="['user':userInstance]" />
-		</div>
+		</span>
 	</div>
 
 </div>

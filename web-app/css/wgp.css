@@ -100,9 +100,14 @@ body { /*     background-color: #ffffff; */
 	max-width: 200px
 }
 
+.grid_view.thumbnails {
+	margin-left:0px;
+}
+
 .grid_view li.thumbnail {
 	background-color: #ffffff;
 	border: 0px solid #bee6d3;
+	margin:0px;
 }
 
 .grid_view li.thumbnail:hover {
@@ -149,6 +154,10 @@ body { /*     background-color: #ffffff; */
 	padding-right: 3px;
 }
 
+.observation_story .prop {
+	clear:none;
+}
+	
 .observation_story .prop .name {
 	width: 100px;
 }
@@ -167,12 +176,17 @@ body { /*     background-color: #ffffff; */
 	text-align: right;
 }
 
+.list_view.thumbnails {
+	margin-left:0px;
+}
+
 .list_view li.thumbnail {
-	margin-bottom: 0;
+	margin: 0;
 	border-radius: 0;
 	border-bottom: 0;
 	background-color: #ffffff;
 	border: 1px solid #bee6d3;
+	width:100%;
 }
 
 .list_view li.thumbnail:hover {
@@ -1486,7 +1500,7 @@ li#userOrEmail-new {
 }
 
 .center_panel {
-	width: 680px;
+	width: 700px;
 	float: left;
 }
 

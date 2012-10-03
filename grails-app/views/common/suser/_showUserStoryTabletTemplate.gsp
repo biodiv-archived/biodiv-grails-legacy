@@ -33,20 +33,20 @@
 	</div>
 
 	<div class="story-footer">
-		<div class="footer-item" title="No of Observations">
+		<span class="footer-item" title="No of Observations">
 			<i class="icon-screenshot"></i>
 			<obv:showNoOfObservationsOfUser model="['user':userInstance]"/>
-		</div>
+		</span>
 
-		<div class="footer-item" title="No of Tags">
+		<span class="footer-item" title="No of Tags">
 			<i class="icon-tags"></i>
 			<obv:showNoOfTagsOfUser model="['userId':userInstance.id]" />
-		</div>
+		</span>
 		
-		<div class="footer-item" title="No of Identifications">
+		<span class="footer-item" title="No of Identifications">
 					<i class="icon-check"></i>
 					<obv:showNoOfRecommendationsOfUser model="['user':userInstance]" />
-		</div>
+		</span>
 	</div>
 </div>
 

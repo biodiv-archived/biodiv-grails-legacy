@@ -22,7 +22,7 @@
 </g:if>
 <div class="">
 	<!-- main_content -->
-	<div class="list ${(showTags != false)?'span9':''}">
+	<div class="list span9" style="margin-left:0px;">
 
 		<div class="observations thumbwrap">
 			<div class="observation">

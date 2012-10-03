@@ -13,7 +13,7 @@
 <g:set var="entityName" value="${userGroupInstance.name}" />
 <title><g:message code="default.show.label"
 		args="[userGroupInstance.name]" /></title>
-<r:require modules="userGroups_show, list_utils" />
+<r:require modules="userGroups_show, susers_list" />
 <style>
 .thumbnail {
 	margin: 0 25px;
@@ -25,8 +25,8 @@
 	<div class="observation span12">
 		<uGroup:showSubmenuTemplate model="['entityName':'Members']"/>
 		<uGroup:rightSidebar  model="['userGroupInstance':userGroupInstance]"/>
-		<div class=" userGroup-section center_panel">
-			<div class="section tabbable">
+		<div class="userGroup-section center_panel">
+			<div class="tabbable">
 				<ul class="nav nav-tabs">
 					<li
 						class="${(!params.action || params.action == 'members')?'active':'' }"><a
@@ -36,9 +36,7 @@
 					<li class="${(params.action == 'founders')?'active':'' }"><a
 						href="${createLink(action:'founders', id:params.id)}">
 							Founders (${foundersTotalCount})</a></li>
-					<li class="${(params.action == 'experts')?'active':'' }"><a
-						href="${createLink(action:'experts', id:params.id)}"> Experts
-							(${expertsTotalCount})</a></li>
+					
 				</ul>
 
 
