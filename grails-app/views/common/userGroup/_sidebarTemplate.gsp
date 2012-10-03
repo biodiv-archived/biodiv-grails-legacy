@@ -3,7 +3,7 @@
 <%@ page import="species.Habitat"%>
 <%@ page import="species.participation.ActivityFeedService"%>
 
-<div class="span3 sidebar">
+<div class="sidebar left-sidebar">
 
 	<div class="super-section">
 		<h5 class="nav-header">Home</h5>

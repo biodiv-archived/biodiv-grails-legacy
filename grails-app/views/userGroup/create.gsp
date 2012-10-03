@@ -91,13 +91,8 @@ max-width: 100%;
 
 		<div class="observation_create">
 			<div class="span12">
-				<uGroup:showSubmenuTemplate/>
-				<div class="page-header">
-					<h1>
-						${entityName}
-					</h1>
-				</div>
-				
+				<uGroup:showSubmenuTemplate  model="['entityName':entityName]"/>
+						
 
 				<g:hasErrors bean="${userGroupInstance}">
 					<i class="icon-warning-sign"></i>

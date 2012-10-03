@@ -12,11 +12,8 @@
 <body>
 	
 			<div class="span12">
-				<uGroup:showSubmenuTemplate/>
-				<div class="page-header ">
-					<h1>My Groups</h1>
-				</div>
-
+				<uGroup:showSubmenuTemplate model="['entityName':'My Groups']"/>
+				
 				<div class="alertMsg ${(flash.message)?'alert':'' }"
 					style="clear: both;">
 					${flash.message}

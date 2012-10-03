@@ -1,29 +1,21 @@
 
 <%@page import="species.utils.ImageType"%>
-<div class="prop tablet user_signature">
-	<div class="figure user-icon" style="float: left;">
-
-		<g:link controller="userGroup" action="show" id="${userGroup.id}">
-			<img class="logo small_profile_pic"
-				src="${userGroup.mainImage()?.fileName}" title="${userGroup.name}"
-				alt="${userGroup.name}" />
-		</g:link>
-
-	</div>
-	<div class="story" style="margin-left: 35px">
-		<g:link controller="userGroup" action="show" id="${userGroup.id}">
+<div style="margin: 5px 0px;position:relative;">
+	<g:link controller="userGroup" action="show" id="${userGroup.id}"
+		style="display:inline-block;width:85%">
+		<img class="logo small_profile_pic" style="vertical-align: middle;"
+			src="${userGroup.mainImage()?.fileName}" title="${userGroup.name}"
+			alt="${userGroup.name}" />
+		<span class="ellipsis" style="margin: 0px 5px;">
 			${userGroup.name}
-		</g:link>
+		</span>
+	</g:link>
+	<g:link controller="userGroup" action="members" id="${userGroup.id}"
+		title="No ofMembers"
+		style="padding:5px;position:absolute;right:0px;display:inline-block;">
+		<i class="icon-user"></i>
+		${userGroup.getAllMembersCount()}
+	</g:link>
 
-		<div class="story-footer" style="position: static;">
-			<div class="footer-item" title="Founders">
-				<g:link controller="userGroup" action="members" id="${userGroup.id}"
-					title="No ofMembers"
-					style="padding:5px;float:left;display:inline-block;">
-					<i class="icon-user"></i>
-					${userGroup.getAllMembersCount()}
-				</g:link>
-			</div>
-		</div>
-	</div>
+
 </div>

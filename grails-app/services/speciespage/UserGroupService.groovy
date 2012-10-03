@@ -28,6 +28,7 @@ import species.participation.Observation;
 import species.participation.UserToken;
 import species.utils.ImageUtils;
 import species.utils.Utils;
+import utils.Newsletter;
 
 class UserGroupService {
 
@@ -643,5 +644,20 @@ class UserGroupService {
 	   }
 	   return model;
    }
-   
+
+   def getUserGroupsStickyPages(UserGroup userGroup, int max, long offset) {
+
+	   if(userGroup) {
+		   def queryParams = ['userGroup':userGroup]
+		   if(max != -1) {
+			   queryParams['max'] = max;
+		   }
+		   if(offset != -1) {
+			   queryParams['offset'] = offset;
+		   }
+		   queryParams['sticky'] = true;
+		   return Newsletter.executeQuery('from Newsletter newsletter where newsletter.sticky=:sticky and newsletter.userGroup=:userGroup',
+			   	queryParams);
+	   }
+   }   
 }

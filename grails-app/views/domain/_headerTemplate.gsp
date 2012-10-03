@@ -31,8 +31,8 @@
 			<ul class="nav" style="width: 100%;">
 				<g:if test="${userGroupInstance && userGroupInstance.id}">
 					<!--li class="menu-449 first"><a href="/" title="">Home</a></li-->
-					<li class="${(params.action == 'index')?' active':''}"><a
-						href="${createLink(controller:"userGroup", "action":"index",  id:userGroupInstance.id)}"
+					<li class="${(params.action == 'show')?' active':''}"><a
+						href="${createLink(controller:"userGroup", "action":"show",  id:userGroupInstance.id)}"
 						title="Activity">Activity</a>
 					</li>
 					<li class="${(params.action == 'observations')?' active':''}"><a

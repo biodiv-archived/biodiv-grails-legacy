@@ -20,7 +20,7 @@
 		</g:else>
 	</div>
 </g:if>
-<div class="row">
+<div class="">
 	<!-- main_content -->
 	<div class="list ${(showTags != false)?'span9':''}">
 

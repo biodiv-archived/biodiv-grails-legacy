@@ -17,15 +17,16 @@
 </head>
 <body>
 	<div class="observation span12">
-		<uGroup:showSubmenuTemplate />
-		<div class="page-header">
-			<h1>About Us</h1>
-		</div>
+		<uGroup:showSubmenuTemplate  model="['entityName':'About Us']"/>
+		
+		<uGroup:rightSidebar model="['userGroupInstance':userGroupInstance]"/>
+		<div class="center_panel">
 		<div class="super-section userGroup-section">
 			<div class="description notes_view">
 				${userGroupInstance.description}
 			</div>
 		</div>
+		
 		<div class="super-section">
 			<div class="section">
 				<h5>
@@ -93,6 +94,7 @@
 			<div class="description notes_view" name="contactEmail">
 				Contact us by filling in the following feedback form.</div>
 		</div-->
+		</div>
 	</div>
 
 

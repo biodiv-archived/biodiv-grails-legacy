@@ -55,10 +55,9 @@
 
 	<div class="observation span12">
 
-		<uGroup:showSubmenuTemplate />
-		<div class="userGroup-section">
-			<div class="section">
-				<h5>Activity Stream</h5>
+		<uGroup:showSubmenuTemplate model="['entityName':'Activity Stream']"/>
+		<uGroup:rightSidebar model="['userGroupInstance':userGroupInstance]"/>
+		<div class="userGroup-section center_panel">
 				<!-- div id="map_view_bttn" class="btn-group">
 								<a class="btn btn-success dropdown-toggle"
 									data-toggle="dropdown" href="#"
@@ -77,11 +76,10 @@
 								<comment:showAllComments
 									model="['commentHolder':userGroupInstance, commentType:'super', 'canPostComment':canPostComment, 'showCommentList':false]" />
 							</div>
-							<hr>
 							<feed:showFeedWithFilter model="['rootHolder':userGroupInstance, feedType:'GroupSpecific', refreshType:'manual', feedPermission:'editable', feedCategory:'All','feedOrder':'latestFirst']" />
 <%--							<feed:showAllActivityFeeds model="['rootHolder':userGroupInstance, feedType:'GroupSpecific', refreshType:'manual', 'feedPermission':'editable']" />--%>
 			</div>
-		</div>
+		
 	</div>
 
 	<g:javascript>

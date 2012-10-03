@@ -6,6 +6,7 @@ class Newsletter {
     String title
     Date date    
     String newsitem
+	boolean sticky = false;
 
 	static belongsTo = [userGroup: UserGroup]
     static constraints = {
