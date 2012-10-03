@@ -579,11 +579,15 @@ ul#recoSummary {
 	white-space: normal;
 }
 
-.dropdown-menu li>a:hover,.dropdown-menu .active>a,.dropdown-menu .active>a:hover
-	{
-	color: #000000;
-	background-color: #6ac9a2;
+.dropdown-menu li {
+	margin-left:0px;
 }
+
+/* .dropdown-menu li>a:hover,.dropdown-menu .active>a,.dropdown-menu .active>a:hover */
+/* 	{ */
+/* 	color: #000000; */
+/* 	background-color: #6ac9a2; */
+/* } */
 
 /* .btn-group.open .dropdown-menu { */
 /* border-radius: 0; */
@@ -1461,7 +1465,7 @@ li#userOrEmail-new {
 /* 	margin: 10px; */
 	border: 1px solid #E5E5E5;
 	border-radius: 7px;
-	padding: 10px 15px 10px 15px;
+	padding: 10px 0px 0px 0px;
 	position: relative;
 /* 	left: -50px; */
 	/* 	top: 50px; */
@@ -1489,10 +1493,10 @@ li#userOrEmail-new {
 .block-tagadelic {
 	background-color: #D4EDC9;
 	padding: 10px;
-	margin: 5px;
+	margin: 0px;
 	position: relative;
 	/* 	top: 40px; */
-	left: 10px;
+/* 	left: 10px; */
 	/* width: 230px; */
 	border-radius: 7px;
 	position: relative;

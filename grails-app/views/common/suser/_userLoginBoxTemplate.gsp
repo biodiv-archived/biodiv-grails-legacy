@@ -97,11 +97,9 @@
 			<a href="#" class="dropdown-toggle pull-right" data-toggle="dropdown" style="float:right;">
 				<b class="caret" style="border-top-color: black;border-bottom-color: black;"></b>
 			</a>	
-			<div class="dropdown-menu">
-				<ul>
+				<ul class="dropdown-menu">
 					<li><a id="logout" href="${createLink(controller:'logout')}">Logout</a></li>
 				</ul>
-			</div>
 			<div class="login-box"><sUser:renderProfileLink /></div>
 		</li>
 	</sec:ifLoggedIn>

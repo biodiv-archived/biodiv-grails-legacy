@@ -37,9 +37,7 @@ var members_autofillUsersComp = $("#userAndEmailList_${members_autofillUsersId}"
 $(document).ready(function(){
 	$(".ellipsis").trunk8({
 		lines:2,
-		fill: '&hellip;&nbsp;<a
-		href="${createLink(action:'aboutUs', id:userGroupInstance.id) }">read
-		more</a>&nbsp;'
+		fill: '&hellip;&nbsp;<a	href="${createLink(action:'aboutUs', id:userGroupInstance.id) }">read more</a>&nbsp;'
 	})
 })
 

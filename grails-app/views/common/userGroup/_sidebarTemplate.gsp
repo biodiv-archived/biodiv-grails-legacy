@@ -25,8 +25,8 @@
 				</a></li>
 
 				<li><a
-					href="${createLink(controller:'userGroup', action:'list', params:['user':sUser.renderCurrentUserId()])}"><i
-						class="icon-user"></i>My Groups</a>
+					href="${createLink(controller:'userGroup', action:'list', params:['user':sUser.renderCurrentUserId()])}" title="Groups is in Beta. We would like you to provide valuable feedback, suggestions and interest in using the groups functionality."><i
+						class="icon-user"></i>My Groups<sup>Beta</sup></a>
 					<uGroup:getCurrentUserUserGroupsSidebar />
 				</li>
 			</sec:ifLoggedIn>
@@ -37,7 +37,7 @@
 					href="${createLink(controller:'activityFeed', params:['user':sUser.renderCurrentUserId(), 'feedType':ActivityFeedService.ALL])}"><i
 						class="icon-home"></i>Activity</a></li>
 				<li class="${(params.action=='create')?'active':'' }"
-					style="clear: both;"><a href="${createLink(action:'create')}"  style="display:inline;"><i
+					style="clear: both;"><a href="${createLink( controller:'observation', action:'create')}"  style="display:inline;"><i
 						class="icon-plus"></i>Add Observation <g:link
 						controller='login' class="btn" style="margin-left:5px; display:inline;">Login</g:link></a></li>
 			</sec:ifNotLoggedIn>

@@ -1,4 +1,4 @@
-<div class="container outer-wrapper">
+<div class="container" style="width:100%">
 	<div style="padding: 10px 0px;">
 	<g:if test="${userGroupInstance  && userGroupInstance.id }">
 		<uGroup:showHeader model=[ 'userGroupInstance':userGroupInstance] />
@@ -12,13 +12,12 @@
 	</g:else>
 </div>
 </div>
-<div class="navbar navbar-static-top btn"
-	style="width: 100%; padding: 0px; margin-bottom: 0px; height: auto; background-color: transparent; background-image: none; box-shadow: none;">
+<div class="navbar navbar-static-top" style="margin-bottom:0px;">
 
 	<div class="navbar-inner"
 		style="background-color: transparent; background-image: none;">
-		<div class="container outer-wrapper">
-			<ul class="nav" style="width: 100%; margin-left: 0px">
+		<div class="container outer-wrapper" style="background-color:transparent;padding:0px">
+			<ul class="nav btn" style="width: 100%; margin: 0px;padding:4px 0px;">
 				<g:if test="${userGroupInstance && userGroupInstance.id}">
 					<!--li class="menu-449 first"><a href="/" title="">Home</a></li-->
 					<li class="${(params.action == 'show')?' active':''}"><a
@@ -31,7 +30,7 @@
 					</li>
 
 					<li
-						class="${(params.controller == 'user' || params.controller == 'SUser')?' active':''}"><a
+						class="${((params.controller == 'user' || params.controller == 'SUser')&& params.action != 'header')?' active':''}"><a
 						href="${createLink(controller:"userGroup", "action":"members",  id:userGroupInstance.id)}"
 						title="Members">Members</a>
 					</li>
@@ -78,7 +77,7 @@
 							<li
 								class="${(params.controller == 'userGroup' && params.action== 'list')?' active':''}"><a
 								href="${createLink(controller:"userGroup", "action":"list")}"
-								title="Species">All Groups</a>
+								title="Groups is in Beta. We would like you to provide valuable feedback, suggestions and interest in using the groups functionality.">All Groups<sup >Beta</sup></a>
 							</li>
 
 						</ul>
@@ -96,7 +95,7 @@
 						title="Observations">Observations</a></li>
 
 					<li
-						class="${(params.controller == 'user' || params.controller == 'SUser')?' active':''}"><a
+						class="${((params.controller == 'user' || params.controller == 'SUser') && params.action != 'header')?' active':''}"><a
 						href="${createLink(controller:'user', action:'list')}"
 						title="Members">Members</a></li>
 					<li class="${(request.forwardURI.contains('/about'))?' active':''}"><a
@@ -136,7 +135,7 @@
 							<li
 								class="${(params.controller == 'userGroup'  && params.action== 'list')?' active':''}"><a
 								href="${createLink(controller:"userGroup", "action":"list")}"
-								title="Species">All Groups</a>
+								title="Groups is in Beta. We would like you to provide valuable feedback, suggestions and interest in using the groups functionality.">All Groups<sup>Beta</sup></a>
 							</li>
 						</ul>
 					</li>
