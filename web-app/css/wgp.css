@@ -153,8 +153,8 @@ body { /*     background-color: #ffffff; */
 	width: 100px;
 }
 
-.observation_story .prop .value {
-	margin-left: 25px;
+.prop .value {
+	margin-left: 110px;
 }
 
 .observation-icons {
@@ -165,10 +165,6 @@ body { /*     background-color: #ffffff; */
 #advSearchForm .prop .name {
 	float: right;
 	text-align: right;
-}
-
-.prop .value { /* 	text-align: left; */
-	
 }
 
 .list_view li.thumbnail {
@@ -201,7 +197,7 @@ body { /*     background-color: #ffffff; */
 	padding: 10px;
 }
 
-.outer-wrapper { /* clear: both; */
+.outer-wrapper, .navbar .container { /* clear: both; */
 	background-color: rgba(106, 201, 162, 0.15);
 	background: transparent\9;
 	-ms-filter:
@@ -1218,7 +1214,7 @@ span.cke_skin_kama {
 	border-top: 1px solid #e5e5e5;
 	background-position: bottom center;
 	background-repeat: repeat-x;
-	margin-top:20px;
+/* 	padding:10px 0px; */
 }
 
 .gradient-bg-reverse {
@@ -1458,7 +1454,6 @@ li#userOrEmail-new {
 }
 
 .sidebar {
-/* 	margin-top: 20px; */
 	/* 	width: 250px; */
 }
 
@@ -1479,6 +1474,7 @@ li#userOrEmail-new {
 
 .left-sidebar {
 	float: left;
+	margin-top: 20px;
 }
 
 .right-sidebar {
@@ -1515,6 +1511,7 @@ li#userOrEmail-new {
 	margin-left: 10px;
 	margin-right: 10px;
 	font-size: 0.9em;
+	padding: 10px 0px;
 }
 
 .links_box_column ul {

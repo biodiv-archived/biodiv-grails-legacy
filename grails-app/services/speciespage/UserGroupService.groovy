@@ -656,7 +656,8 @@ class UserGroupService {
 			   queryParams['offset'] = offset;
 		   }
 		   queryParams['sticky'] = true;
-		   return Newsletter.executeQuery('from Newsletter newsletter where newsletter.sticky=:sticky and newsletter.userGroup=:userGroup',
+		   
+		   return Newsletter.executeQuery('from Newsletter newsletter where newsletter.sticky=:sticky and newsletter.userGroup=:userGroup order by newsletter.date asc',
 			   	queryParams);
 	   }
    }   

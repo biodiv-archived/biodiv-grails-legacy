@@ -1,34 +1,24 @@
 <div class="container outer-wrapper">
+	<div style="padding: 10px 0px;">
 	<g:if test="${userGroupInstance  && userGroupInstance.id }">
-		<div class="page-header gradient-bg clearfix"
-			style="margin: 5px 0px; padding: 18px 0px;">
-			<div style="width: 100%;">
-				<uGroup:showHeader model=[ 'userGroupInstance':userGroupInstance] />
-			</div>
-		</div>
+		<uGroup:showHeader model=[ 'userGroupInstance':userGroupInstance] />
 	</g:if>
 	<g:else>
-		<div class="page-header gradient-bg clearfix"
-			style="margin: 5px 0px; padding: 18px 0px;">
-			<div style="width: 100%;">
-
-				<div class="span3 logo">
-					<a href="/"> <img class="logo"
-						src="/sites/all/themes/ibp/images/map-logo.gif"
-						title="India Biodiversity Portal" alt="India Biodiversity Portal">
-					</a>
-				</div>
-				<h1>India Biodiversity Portal</h1>
-
-			</div>
-		</div>
+		<a href="/" class="span3 logo" style="margin-left: 0px;"> <img
+			class="logo" src="/sites/all/themes/ibp/images/map-logo.gif"
+			title="India Biodiversity Portal" alt="India Biodiversity Portal">
+		</a>
+		<h1>India Biodiversity Portal</h1>
 	</g:else>
+</div>
+</div>
+<div class="navbar navbar-static-top btn"
+	style="width: 100%; padding: 0px; margin-bottom: 0px; height: auto; background-color: transparent; background-image: none; box-shadow: none;">
 
-	<div class="navbar navbar-static-top btn"
-		style="width: 100%; margin-left: -10px; margin-bottom: 0px; height: auto;">
-
-		<div class="navbar-inner">
-			<ul class="nav" style="width: 100%;">
+	<div class="navbar-inner"
+		style="background-color: transparent; background-image: none;">
+		<div class="container outer-wrapper">
+			<ul class="nav" style="width: 100%; margin-left: 0px">
 				<g:if test="${userGroupInstance && userGroupInstance.id}">
 					<!--li class="menu-449 first"><a href="/" title="">Home</a></li-->
 					<li class="${(params.action == 'show')?' active':''}"><a
@@ -52,7 +42,7 @@
 					</li>
 					<li class="dropdown"><a href="#" class="dropdown-toggle"
 						data-toggle="dropdown"> More <b class="caret"></b> </a>
-						<ul class="dropdown-menu" style="text-align:left;">
+						<ul class="dropdown-menu" style="text-align: left;">
 
 							<li class="${(params.action == 'pages')?' active':''}"><a
 								href="${createLink(controller:"userGroup", "action":"pages",  id:userGroupInstance.id)}"
@@ -85,7 +75,8 @@
 							<li
 								class="${(request.forwardURI.contains('/checklists'))?' active':''}"><a
 								href="/checklists" title="Checklists">All Checklists</a></li>
-							<li class="${(params.controller == 'userGroup')?' active':''}"><a
+							<li
+								class="${(params.controller == 'userGroup' && params.action== 'list')?' active':''}"><a
 								href="${createLink(controller:"userGroup", "action":"list")}"
 								title="Species">All Groups</a>
 							</li>
@@ -113,7 +104,7 @@
 					<li class="dropdown"><a href="#" class="dropdown-toggle"
 						data-toggle="dropdown"> More <b class="caret"></b> </a>
 
-						<ul class="dropdown-menu"  style="text-align:left;color:#000">
+						<ul class="dropdown-menu" style="text-align: left; color: #000">
 							<li
 								class="${(request.forwardURI.contains('/calendar'))?' active':''}"><a
 								href="/calendar" title="Events">Events</a></li>
@@ -142,7 +133,8 @@
 								class="${(request.forwardURI.contains('/checklists'))?' active':''}"><a
 								href="/checklists" title="Checklists">All Checklists</a></li>
 
-							<li class="${(params.controller == 'userGroup')?' active':''}"><a
+							<li
+								class="${(params.controller == 'userGroup'  && params.action== 'list')?' active':''}"><a
 								href="${createLink(controller:"userGroup", "action":"list")}"
 								title="Species">All Groups</a>
 							</li>
@@ -151,10 +143,10 @@
 
 				</g:else>
 			</ul>
-
 		</div>
 	</div>
 </div>
+
 
 <r:script>
 $(document).ready(function(){
