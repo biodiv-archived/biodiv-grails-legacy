@@ -1,6 +1,5 @@
 
-<div class="snippet span11">
-	<div class="row">
+<div class="snippet">
 		<g:set var="mainImage" value="${userInstance.icon()}" />
 		<div class="figure span3 observation_story_image" style="display: table;" >
 			<g:link action="show" controller="SUser" id="${userInstance.id}">
@@ -9,8 +8,5 @@
 			</g:link>
 		</div>
 
-		<div class="span8">
-			<sUser:showUserStory model="['userInstance':userInstance]"></sUser:showUserStory>
-		</div>
-	</div>
+		<sUser:showUserStory model="['userInstance':userInstance]"></sUser:showUserStory>
 </div>

@@ -839,7 +839,7 @@ class ObservationController {
 			if(obv.author.sendNotification){
 				mailService.sendMail {
 					to obv.author.email
-					bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com"
+					bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com", "thomas.vee@gmail.com"
 					from conf.ui.notification.emailFrom
 					subject mailSubject
 					html body.toString()
@@ -847,7 +847,7 @@ class ObservationController {
 			}else{
 				//sending mail only to website manager
 				mailService.sendMail {
-					bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com"
+					bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com", "thomas.vee@gmail.com"
 					from conf.ui.notification.emailFrom
 					subject mailSubject
 					html body.toString()
@@ -1013,7 +1013,7 @@ class ObservationController {
 				def body = observationService.getIdentificationEmailInfo(params, request, entry.getValue()).mailBody
 				mailService.sendMail {
 					to entry.getKey()
-					bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com"
+					bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com", "thomas.vee@gmail.com"
 					from currentUserMailId
 					subject mailSubject
 					html body.toString()

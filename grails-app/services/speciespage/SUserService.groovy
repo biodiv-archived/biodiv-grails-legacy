@@ -156,7 +156,7 @@ class SUserService extends SpringSecurityUiService {
 		if ( Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
 			mailService.sendMail {
 				to user.email
-				bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com"
+				bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com","thomas.vee@gmail.com"
 				from conf.ui.notification.emailFrom
 				subject mailSubject
 				html body.toString()

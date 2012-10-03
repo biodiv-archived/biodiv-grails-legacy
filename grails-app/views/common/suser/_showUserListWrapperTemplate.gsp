@@ -5,8 +5,8 @@
 <div style="clear: both"></div>
 
 <g:if test='${searched}'>
-	<div class="row">
-		<div class="list ${(params.controller != 'userGroup')?'span12':'span7'}">
+	<div class="">
+		<div class="list">
 			<div class="observations thumbwrap">
 				<%
 def queryParams = [username: username, enabled: enabled, accountExpired: accountExpired, accountLocked: accountLocked, passwordExpired: passwordExpired]
@@ -80,4 +80,68 @@ def queryParams = [username: username, enabled: enabled, accountExpired: account
 		</div>
 	</div>
 </g:if>
-</div>
+<r:script>
+	$(document).ready(function() {
+		
+
+		$('.sort_filter_label').click(function() {
+			$('.sort_filter_label.active').removeClass('active');
+			$(this).addClass('active');
+			$('#selected_sort').html($(this).html());
+			//$("#search").click();
+			updateGallery(undefined, ${params.max}, 0);
+			return false;
+		});
+
+		$("#removeQueryFilter").live('click', function(){
+           	$( "#searchTextField" ).val('');
+          	//$("#search").click();
+           	return false;
+        });
+        
+        function getSelectedSortBy() {
+	        var sortBy = '';
+			$('.sort_filter_label').each(function() {
+				if ($(this).hasClass('active')) {
+					sortBy += $(this).attr('value') + ',';
+				}
+			});
+	
+			sortBy = sortBy.replace(/\s*\,\s*$/, '');
+	        return sortBy
+        }
+        
+        function getFilterParameters(url, limit, offset, removeUser) {
+             var params = url.param();
+             var sortBy = getSelectedSortBy();
+             if(sortBy) {
+                     params['sort'] = sortBy;
+             }
+             return params;
+        }
+        
+        function updateGallery(target, limit, offset) {
+             if(target === undefined) {
+                     target = window.location.pathname + window.location.search;
+             }
+             
+             var a = $('<a href="'+target+'"></a>');
+             var url = a.url();
+             var href = url.attr('path');
+             var params = getFilterParameters(url, limit, offset);
+             //alert(" tag in params " + params['tag'] );
+             
+             var recursiveDecoded = decodeURIComponent($.param(params));
+             
+             var doc_url = href+'?'+recursiveDecoded;
+             var History = window.History;
+             
+             History.pushState({state:1}, "Species Portal", '?'+decodeURIComponent($.param(params))); 
+             //alert("doc_url " + doc_url);
+             window.location = doc_url;
+        }
+	});
+	
+	
+</r:script>
+	

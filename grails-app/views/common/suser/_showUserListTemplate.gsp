@@ -4,11 +4,11 @@
 			<ul class="grid_view thumbnails">
 	
 				<g:each in="${userInstanceList}" status="i" var="userInstance">
-					<g:if test="${i%4 == 0}">
+					<g:if test="${i% ((params.controller != 'userGroup')?4:3) == 0}">
 						<li class="thumbnail" style="clear: both;">
 					</g:if>
 					<g:else>
-						<li class="thumbnail">
+						<li class="thumbnail" style="margin:0px;">
 					</g:else>
 					<sUser:showUserSnippetTablet model="['userInstance':userInstance]"></sUser:showUserSnippetTablet>
 					</li>
