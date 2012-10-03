@@ -1,7 +1,7 @@
 <%@page import="species.participation.Recommendation"%>
 <%@page import="species.participation.Observation"%>
 
-<span class="yj-context">on  
+<span class="yj-context">Comment on  
 	<g:if test="${commentInstance.commentHolderType ==  Recommendation.class.getName()}" >
 	<%
 		def tmpReco = Recommendation.read(commentInstance.commentHolderId.toLong());
