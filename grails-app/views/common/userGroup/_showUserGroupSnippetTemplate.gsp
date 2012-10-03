@@ -10,5 +10,5 @@
 			src="${createLink(url: userGroupInstance.mainImage()?.fileName)}">
 	</g:link></td>
 
-<uGroup:showStory model="['userGroupInstance':userGroupInstance, 'showLeave':(showLeave != null)?showLeave:false]"></uGroup:showStory>
+<uGroup:showStory model="['userGroupInstance':userGroupInstance, 'showLeave':(showLeave != null)?showLeave:false, 'showJoin':(showJoin != null)?showJoin:true]"></uGroup:showStory>
 

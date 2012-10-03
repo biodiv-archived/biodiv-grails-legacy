@@ -1,7 +1,6 @@
 <%@page import="species.participation.Observation"%>
 <%@page import="species.participation.Comment"%>
 <%@page import="species.groups.UserGroup"%>
-
 <%@page import="species.participation.ActivityFeedService"%>
 <div class="activityFeedContext" >
 	<div class="feedParentContext">
@@ -9,7 +8,13 @@
 			<obv:showSnippet model="['observationInstance':feedParentInstance]"></obv:showSnippet>
 		</g:if>
 		<g:elseif test="${feedInstance.rootHolderType ==  UserGroup.class.getCanonicalName()}" >
-			<uGroup:showSnippet model="['userGroupInstance':feedParentInstance]"></uGroup:showSnippet>
+			<table class="table">
+				<tbody>
+					<tr>
+						<uGroup:showSnippet model="['userGroupInstance':feedParentInstance, 'showJoin':false]"></uGroup:showSnippet>
+					</tr>
+				</tbody>
+			</table>
 		</g:elseif>
 		<g:else>
 			${feedInstance.rootHolderType}

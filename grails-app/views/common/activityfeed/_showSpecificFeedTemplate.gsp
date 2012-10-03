@@ -13,8 +13,9 @@
 					title="${feedInstance.author.name}" />
 			</g:link>
 		</div>
-		<b> ${feedInstance.author.name} :<span class="yj-context"> ${feedInstance.activityType}</span></b>
 		<feed:showActivity model="['feedInstance' : feedInstance, 'feedPermission':feedPermission]" />
-		<time class="timeago" datetime="${feedInstance.lastUpdated.getTime()}"></time>
+		<div>
+			<time class="timeago" datetime="${feedInstance.lastUpdated.getTime()}"></time>
+		</div>
 	</div>
 </g:else>
