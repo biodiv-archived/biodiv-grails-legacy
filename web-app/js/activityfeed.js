@@ -1,6 +1,5 @@
 var newFeedProcessing = false;
 var oldFeedProcessing = false;
-var serverTimeDiff = null;
 
 function loadOlderFeedsInAjax(targetComp){
 	var url = $(targetComp).children('input[name="feedUrl"]').val();
@@ -182,25 +181,6 @@ function setUpFeedForTarget(targetComp){
 function setUpFeed(timeUrl){
 	initRelativeTime(timeUrl);
 	setUpFeedForTarget(getTargetComp());
-}
-
-function initRelativeTime(url){
-	if(!serverTimeDiff){
-		$.ajax({
-	 		url: url,
-			dataType: "json",
-			success: function(data) {
-				serverTimeDiff = parseInt(data) - new Date().getTime();
-				$('body').timeago({serverTimeDiff:serverTimeDiff});
-			}, error: function(xhr, status, error) {
-				alert(xhr.responseText);
-		   	}
-		});	
-	}
-}
-
-function updateRelativeTime(){
-	$('.timeago').timeago({serverTimeDiff:serverTimeDiff});
 }
 
 //on user click fetch

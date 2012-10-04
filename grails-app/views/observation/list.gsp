@@ -27,6 +27,7 @@
 				"tagsLink":"${g.createLink(action: 'tags')}",
 				"queryParamsMax":"${queryParams?.max}"
 			}
+			initRelativeTime("${createLink(controller:'activityFeed', action:'getServerTime')}");
 		});
 	</g:javascript>
 	<r:script>
