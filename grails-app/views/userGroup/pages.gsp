@@ -8,9 +8,9 @@
 <html>
 <head>
 <meta name="layout" content="main" />
-<g:set var="entityName" value="${userGroupInstance.name}" />
+<g:set var="entityName" value="${(userGroupInstance)?userGroupInstance.name:Utils.getDomainName(request)}" />
 <title><g:message code="default.show.label"
-		args="[userGroupInstance.name]" /></title>
+		args="[(userGroupInstance)?userGroupInstance.name:Utils.getDomainName(request)]" /></title>
 <r:require modules="userGroups_show" />
 </head>
 <body>
@@ -21,6 +21,7 @@
 		<div class="userGroup-section center_panel">
 			
 				<div class="btn-group pull-right" style="z-index: 10;margin-bottom:10px;">
+				<g:if test="${userGroupInstance}">
 					<sec:permitted className='species.groups.UserGroup'
 						id='${userGroupInstance.id}'
 						permission='${org.springframework.security.acls.domain.BasePermission.ADMINISTRATION}'>
@@ -29,7 +30,14 @@
 							class="btn btn-large btn-info">
 							<i class="icon-plus"></i>Add a Newsletter</g:link>
 					</sec:permitted>
-				</div>
+				</g:if>
+				<g:else>
+					<sUser:isAdmin>
+						<g:link action="pageCreate" class="btn btn-large btn-info">
+							<i class="icon-plus"></i>Add a Newsletter</g:link>
+					</sUser:isAdmin>
+				</g:else>
+			</div>
 			
 			<div class="list">
 				<table class="table table-striped">
@@ -46,13 +54,22 @@
 						</tr>
 					</thead>
 					<tbody>
-						<g:each in="${userGroupInstance.newsletters}"
+					
+						<g:each in="${newsletters}"
 							var="newsletterInstance" status="i">
 							<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 
-								<td><a
+								<td>
+								<g:if test="${userGroupInstance}">
+								<a
 									href="${createLink(mapping:'userGroupPageShow', params:['id':userGroupInstance.id, 'newsletterId':newsletterInstance.id]) }">
 										${fieldValue(bean: newsletterInstance, field: "title")} </a>
+								</g:if>
+								<g:else>
+								<a
+									href="${createLink(controller:'userGroup', action:'page', params:['newsletterId':newsletterInstance.id]) }">
+										${fieldValue(bean: newsletterInstance, field: "title")} </a>
+								</g:else>
 								</td>
 								<td><g:formatDate date="${newsletterInstance.date}"
 										type="date" style="MEDIUM" />

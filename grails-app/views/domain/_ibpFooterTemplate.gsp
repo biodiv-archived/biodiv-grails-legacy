@@ -24,7 +24,7 @@
 		</div>
 		<div class="links_box_column">
 			<ul>
-				<li class="nav-header bold"><a href='/about'>About</a></li>
+				<li class="nav-header bold"><a href='/about'>The Portal</a></li>
 				<li><a href='/biodiversity_in_india'>Biodiversity in India</a>
 				</li>
 				<li><a href='/about/whats-new'>What's new?</a></li>
@@ -38,6 +38,7 @@
 				<li class="nav-header bold"><a href='/people'>People</a></li>
 				<li><a href='/people/partners'>Partners</a></li>
 				<li><a href='/people/donors'>Donors</a></li>
+				<li><a href='/people/fraternity'>Fraternity</a></li>
 				<li><a href='/people/team'>Team</a></li>
 			</ul>
 		</div>

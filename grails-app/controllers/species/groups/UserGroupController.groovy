@@ -777,15 +777,17 @@ class UserGroupController {
 	}
 
 	def pages = {
+		log.debug params
 		def userGroupInstance = findInstance()
-		if (!userGroupInstance) return;
-		render (view:"pages", model:['userGroupInstance':userGroupInstance])
+		//if (!userGroupInstance) return;
+		def newsletters = userGroupService.getNewsLetters(userGroupInstance, params.max, params.offset, params.sort, params.order);
+		render (view:"pages", model:['userGroupInstance':userGroupInstance, 'newsletters':newsletters])
 	}
 	
 	def page = {
 		log.debug params;
 		def userGroupInstance = findInstance()
-		if (!userGroupInstance) return;
+		//if (!userGroupInstance) return;
 		render (view:'page', model:['userGroupInstance':userGroupInstance, 'newsletterId':params.newsletterId])
 	}
 	

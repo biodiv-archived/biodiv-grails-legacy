@@ -10,7 +10,7 @@ class Newsletter {
 
 	static belongsTo = [userGroup: UserGroup]
     static constraints = {
-        newsitem size: 1..5000
+        newsitem type:'text'
 		userGroup nullable:true;
     }
 	
