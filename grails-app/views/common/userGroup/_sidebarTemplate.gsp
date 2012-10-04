@@ -48,6 +48,8 @@
 
 	<div class="super-section">
 		<uGroup:showSuggestedUserGroups />
+		<small>Groups is in Beta. We would like you to provide valuable feedback, suggestions and interest in using the groups functionality.
+		</small>
 	</div>
 
 </div>

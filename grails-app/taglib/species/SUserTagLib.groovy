@@ -138,7 +138,9 @@ class SUserTagLib {
 	 * Renders the body if the authenticated user owns this page.
 	 */
 	def isAdmin = { attrs, body ->
-		if (SUserService.isAdmin(attrs.model.user?.id)) {
+		def user = attrs.model ? attrs.model.user : null;
+		user = user?:springSecurityService.getCurrentUser()
+		if (SUserService.isAdmin(user?.id)) {
 			out << body()
 		}
 	}

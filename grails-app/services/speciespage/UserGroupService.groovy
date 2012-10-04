@@ -276,7 +276,7 @@ class UserGroupService {
 			queryParams["name"] = params.query.toLowerCase()+"%"
 			activeFilters["name"] = params.query
 		}
-		
+
 		if(params.user){
 			params.user = params.user.toLong()
 			query += "  ,UserGroupMemberRole userGroupMemberRole "
@@ -622,43 +622,80 @@ class UserGroupService {
 					"Invitation to join as member in group",  [name:name, fromUser:springSecurityService.currentUser, userGroupInstance:userGroupInstance,domain:domain, view:'/emailtemplates/memberInvitation'], userToken.token);
 		}
 	}
-	
+
 	////////////////////////////// SEaRCH ///////////////////////////
-	
+
 	/**
-	*
-	* @param params
-	* @return
-	*/
-   def getUserGroupsFromSearch(params) {
-	   def max = Math.min(params.max ? params.int('max') : 9, 100)
-	   def offset = params.offset ? params.long('offset') : 0
+	 *
+	 * @param params
+	 * @return
+	 */
+	def getUserGroupsFromSearch(params) {
+		def max = Math.min(params.max ? params.int('max') : 9, 100)
+		def offset = params.offset ? params.long('offset') : 0
 
-	   def model;
-	   
-	   try {
-		   model = getFilteredUserGroups(params, max, offset, false);
-	   } catch(SolrException e) {
-		   e.printStackTrace();
-		   //model = [params:params, observationInstanceTotal:0, observationInstanceList:[],  queryParams:[max:0], tags:[]];
-	   }
-	   return model;
-   }
+		def model;
 
-   def getUserGroupsStickyPages(UserGroup userGroup, int max, long offset) {
+		try {
+			model = getFilteredUserGroups(params, max, offset, false);
+		} catch(SolrException e) {
+			e.printStackTrace();
+			//model = [params:params, observationInstanceTotal:0, observationInstanceList:[],  queryParams:[max:0], tags:[]];
+		}
+		return model;
+	}
 
-	   if(userGroup) {
-		   def queryParams = ['userGroup':userGroup]
-		   if(max != -1) {
-			   queryParams['max'] = max;
-		   }
-		   if(offset != -1) {
-			   queryParams['offset'] = offset;
-		   }
-		   queryParams['sticky'] = true;
-		   
-		   return Newsletter.executeQuery('from Newsletter newsletter where newsletter.sticky=:sticky and newsletter.userGroup=:userGroup order by newsletter.date asc',
-			   	queryParams);
-	   }
-   }   
+	def getNewsLetters(UserGroup userGroupInstance,  max,  offset, String sort, String order) {
+		String query = "from Newsletter newsletter ";
+		def queryParams = [:]
+		if(userGroupInstance) {
+			queryParams['userGroupInstance'] = userGroupInstance;
+			query += " where newsletter.userGroup=:userGroupInstance "
+		} else {
+			query += " where newsletter.userGroup is null"
+		}
+		if(max && max != -1) {
+			queryParams['max'] = max;
+		}
+		if(max && offset != -1) {
+			queryParams['offset'] = offset;
+		}
+		if(sort) {
+			sort = sort?:"date"
+			query += " order by newsletter."+sort
+		}
+		if(order) {
+			order = order?:"desc"
+			query += " "+order
+		}
+		log.debug query
+		return Newsletter.executeQuery(query, queryParams);
+		
+	}
+
+
+	def getUserGroupsStickyPages(UserGroup userGroup, int max, long offset) {
+
+
+		def queryParams = [:]
+		if(userGroup) {
+			queryParams['userGroup'] = userGroup;
+		}
+		if(max != -1) {
+			queryParams['max'] = max;
+		}
+		if(offset != -1) {
+			queryParams['offset'] = offset;
+		}
+		queryParams['sticky'] = true;
+
+		if(userGroup) {
+			return Newsletter.executeQuery('from Newsletter newsletter where newsletter.sticky=:sticky and newsletter.userGroup=:userGroup order by newsletter.date asc',
+			queryParams);
+		} else {
+			return Newsletter.executeQuery('from Newsletter newsletter where newsletter.sticky=:sticky and newsletter.userGroup is null order by newsletter.date asc',
+			queryParams);
+		}
+
+	}
 }

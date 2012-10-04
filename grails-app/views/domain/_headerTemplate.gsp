@@ -104,7 +104,7 @@
 
 						<ul class="dropdown-menu" style="text-align: left; color: #000">
 							<li class="${(params.action == 'pages')?' active':''}"><a
-								href="${createLink(controller:"userGroup", "action":"pages",  id:userGroupInstance.id)}"
+								href="${createLink(controller:"userGroup", "action":"pages")}"
 								title="Pages">Pages</a>
 							</li>
 							<li

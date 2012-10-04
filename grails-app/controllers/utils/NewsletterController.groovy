@@ -40,7 +40,7 @@ class NewsletterController {
 		} else {
 			if (newsletterInstance.save(flush: true)) {
 				flash.message = "${message(code: 'default.created.message', args: [message(code: 'newsletter.label', default: 'Newsletter'), newsletterInstance.id])}"
-				redirect(action: "show", id: newsletterInstance.id)
+				redirect(controller:"userGroup", action: "page", params:['newsletterId':newsletterInstance.id])
 			}
 
 			else {
