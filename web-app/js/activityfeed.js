@@ -286,17 +286,15 @@ function updateFeedComponent(targetComp, feedCategory){
 $('.feed_filter_label').click(function(){
 	var caret = '<span class="caret"></span>'
 	if($.trim(($(this).html())) == $.trim($("#feedFilterButton").html().replace(caret, ''))){
-		$("#feedFilter").hide();
-		return false;
+		return true;
 	}
 	$('.feed_filter_label.active').removeClass('active');
 	$(this).addClass('active');
     $("#feedFilterButton").html($(this).html() + caret);
-    $("#feedFilter").hide();
     var feedCategory =  $(this).attr("value");
     var targetComp =  $(this).closest(".feedFilterDiv").next(".activityfeed");
     updateFeedComponent(targetComp, feedCategory);
-    return false;   
+    return true;   
 });
 
 

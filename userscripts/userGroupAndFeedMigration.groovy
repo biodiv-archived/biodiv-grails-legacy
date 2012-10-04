@@ -40,7 +40,7 @@ def migrateCommentAsFeeds(){
 }
 
 def migrateUserToWGPGroup(){
-	def wgpUserDate = new Date(112, 7, 8)
+	def wgpUserDate = new Date(111, 7, 8)
 	def wgpGroup = UserGroup.read(1)
 	def feedService = ctx.getBean("activityFeedService");
 
