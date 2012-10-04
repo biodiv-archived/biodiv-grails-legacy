@@ -1,4 +1,4 @@
-<div id="ibp-header" class="header gradient-bg">
+<div id="ibp-header" class="gradient-bg">
 	<div class=" gradient-bg navbar navbar-static-top"
 		style="margin-bottom: 0px;">
 		<div class="navbar-inner"

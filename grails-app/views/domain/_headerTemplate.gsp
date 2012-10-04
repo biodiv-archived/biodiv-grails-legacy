@@ -13,7 +13,6 @@
 </div>
 </div>
 <div class="navbar navbar-static-top" style="margin-bottom:0px;">
-
 	<div class="navbar-inner"
 		style="background-color: transparent; background-image: none;">
 		<div class="container outer-wrapper" style="background-color:transparent;padding:0px">
@@ -48,18 +47,18 @@
 								title="Pages">Pages</a>
 							</li>
 							<li
-								class="${(request.forwardURI.contains('/calendar'))?' active':''}"><a
+								class="${(request.getHeader('referer')?.contains('/calendar'))?' active':''}"><a
 								href="/calendar" title="Events">Events</a></li>
 							<li
-								class="${(request.forwardURI.contains('/biodiversity_news'))?' active':''}"><a
+								class="${(request.getHeader('referer')?.contains('/biodiversity_news'))?' active':''}"><a
 								href="/biodiversity_news" title="News">News</a></li>
 							<li
-								class="${(request.forwardURI.contains('/cepf_grantee_database'))?' active':''}"><a
+								class="${(request.getHeader('referer')?.contains('/cepf_grantee_database'))?' active':''}"><a
 								href="/cepf_grantee_database"
 								title="Western Ghats CEPF Projects">Western Ghats CEPF
 									Projects</a></li>
 							<li
-								class="${(request.forwardURI.contains('/themepages/list'))?' active':''}"><a
+								class="${(request.getHeader('referer')?.contains('/themepages/list'))?' active':''}"><a
 								href="/themepages/list" title="Themes">Themes</a></li>
 						</ul></li>
 					<li style="float: right;">
@@ -69,11 +68,11 @@
 								href="${createLink(controller:"species", "action":"list")}"
 								title="Species">All Species</a>
 							</li>
-							<li class="${(request.forwardURI.contains('/map'))?' active':''}"><a
+							<li class="${(request.getHeader('referer')?.contains('/map'))?' active':''}"><a
 								href="/map" title="Maps">All Maps</a></li>
 							<li
-								class="${(request.forwardURI.contains('/checklists'))?' active':''}"><a
-								href="/checklists" title="Checklists">All Checklists</a></li>
+								class="${(request.getHeader('referer')?.contains('/browsechecklists'))?' active':''}"><a
+								href="/browsechecklists" title="Checklists">All Checklists</a></li>
 							<li
 								class="${(params.controller == 'userGroup' && params.action== 'list')?' active':''}"><a
 								href="${createLink(controller:"userGroup", "action":"list")}"
@@ -98,25 +97,29 @@
 						class="${((params.controller == 'user' || params.controller == 'SUser') && params.action != 'header')?' active':''}"><a
 						href="${createLink(controller:'user', action:'list')}"
 						title="Members">Members</a></li>
-					<li class="${(request.forwardURI.contains('/about'))?' active':''}"><a
+					<li class="${(request.getHeader('referer')?.contains('/about'))?' active':''}"><a
 						href="/about" title="About Us">About Us </a></li>
 					<li class="dropdown"><a href="#" class="dropdown-toggle"
 						data-toggle="dropdown"> More <b class="caret"></b> </a>
 
 						<ul class="dropdown-menu" style="text-align: left; color: #000">
+							<li class="${(params.action == 'pages')?' active':''}"><a
+								href="${createLink(controller:"userGroup", "action":"pages",  id:userGroupInstance.id)}"
+								title="Pages">Pages</a>
+							</li>
 							<li
-								class="${(request.forwardURI.contains('/calendar'))?' active':''}"><a
+								class="${(request.getHeader('referer')?.contains('/calendar'))?' active':''}"><a
 								href="/calendar" title="Events">Events</a></li>
 							<li
-								class="${(request.forwardURI.contains('/biodiversity_news'))?' active':''}"><a
+								class="${(request.getHeader('referer')?.contains('/biodiversity_news'))?' active':''}"><a
 								href="/biodiversity_news" title="News">News</a></li>
 							<li
-								class="${(request.forwardURI.contains('/cepf_grantee_database'))?' active':''}"><a
+								class="${(request.getHeader('referer')?.contains('/cepf_grantee_database'))?' active':''}"><a
 								href="/cepf_grantee_database"
 								title="Western Ghats CEPF Projects">Western Ghats CEPF
 									Projects</a></li>
 							<li
-								class="${(request.forwardURI.contains('/themepages/list'))?' active':''}"><a
+								class="${(request.getHeader('referer')?.contains('/themepages/list'))?' active':''}"><a
 								href="/themepages/list" title="Themes">Themes</a></li>
 
 						</ul>
@@ -126,11 +129,11 @@
 							<li class=" ${(params.controller == 'species')?'active':''}"><a
 								href="${createLink("controller":"species")}" title="Species">All
 									Species</a></li>
-							<li class="${(request.forwardURI.contains('/map'))?' active':''}"><a
+							<li class="${(request.getHeader('referer')?.contains('/map'))?' active':''}"><a
 								href="/map" title="Maps">All Maps</a></li>
 							<li
-								class="${(request.forwardURI.contains('/checklists'))?' active':''}"><a
-								href="/checklists" title="Checklists">All Checklists</a></li>
+								class="${(request.getHeader('referer')?.contains('/browsechecklists'))?' active':''}"><a
+								href="/browsechecklists" title="Checklists">All Checklists</a></li>
 
 							<li
 								class="${(params.controller == 'userGroup'  && params.action== 'list')?' active':''}"><a
