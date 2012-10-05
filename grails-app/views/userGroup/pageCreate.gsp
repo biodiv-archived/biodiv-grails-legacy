@@ -21,7 +21,7 @@
 		<div class="userGroup-section">
 
 			<g:include controller="newsletter" action="create"
-				id="${newsletterId }" params="['userGroupId':userGroupInstance?.id]" />
+				id="${newsletterId }" params="['userGroup':userGroupInstance?.webaddress]" />
 			<div class="btn-group pull-right" style="z-index: 10;">
 
 				<g:if test="${userGroupInstance}">

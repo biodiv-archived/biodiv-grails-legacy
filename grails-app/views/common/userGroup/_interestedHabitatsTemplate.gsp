@@ -1,5 +1,5 @@
 <g:each in="${userGroupInstance.habitats}" var="habitat">
-	<g:link controller="userGroup" action="list"
+	<g:link mapping="userGroupGeneric" action="list"
 		params="['habitat':habitat.id]">
 		<button class="btn habitats_sprites ${habitat.iconClass()} active"
 			id="${"habitat_" + habitat.id}" value="${habitat.id}"

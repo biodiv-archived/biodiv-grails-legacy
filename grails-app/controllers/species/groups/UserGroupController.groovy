@@ -35,7 +35,7 @@ class UserGroupController {
 	static allowedMethods = [save: "POST", update: "POST",]
 
 	def index = {
-		redirect(action: "list", params: params)
+		redirect  url: createLink(mapping: 'userGroupGeneric', action: "list", params: params)
 	}
 
 	def list = {
@@ -99,20 +99,20 @@ class UserGroupController {
 
 		switch(params.filterProperty) {
 			case 'featuredObservations':
-				redirect(action:'observations', id:params.id);
+				redirect  url: createLink(mapping: 'userGroup', action:'observations', params:['webaddress':params.webaddress]);
 				break;
 			case 'featuredMembers':
-				redirect(action:'members', id:params.id);
+				redirect  url: createLink(mapping: 'userGroup', action:'members',params:['webaddress':params.webaddress]);
 				break;
 			case 'obvRelatedUserGroups':
-				redirect(action:'list', params:[observation:params.id]);
+				redirect  url: createLink(mapping: 'userGroupGeneric', action:'list', params:[observation:params.id]);
 				break;
 			case 'userUserGroups':
-				redirect(action:'list', params:[user:params.id]);
+				redirect  url: createLink(mapping: 'userGroupGeneric', action:'list', params:[user:params.id]);
 				break;
 			default:
 				flash:message "Invalid command"
-				redirect(action:list, id:params.id)
+				redirect  url: createLink(mapping: 'userGroupGeneric', action:'list')
 		}
 		return
 	}
@@ -137,18 +137,14 @@ class UserGroupController {
 		else {
 			log.debug "Successfully created usergroup : "+userGroupInstance
 			activityFeedService.addActivityFeed(userGroupInstance, null, springSecurityService.currentUser, activityFeedService.USERGROUP_CREATED);
-			flash.message = "${message(code: 'default.created.message', args: [message(code: 'userGroup.label', default: 'UserGroup'), userGroupInstance.id])}"
-			redirect(action: "show", id: userGroupInstance.id)
+			flash.message = "${message(code: 'default.created.message', args: [message(code: 'userGroup.label', default: 'UserGroup'), userGroupInstance.webaddress])}"
+			redirect  url: createLink(mapping: 'userGroup', action: "show", params:['webaddress': userGroupInstance.webaddress])
 		}
 	}
 
 	def show = {
 		def userGroupInstance = findInstance();
-		if (!userGroupInstance) {
-			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'userGroup.label', default: 'UserGroup'), params.id])}"
-			redirect(action: "list")
-		}
-		else {
+		if (userGroupInstance) {
 			userGroupInstance.incrementPageVisit();
 			if(params.pos) {
 				int pos = params.int('pos');
@@ -208,13 +204,13 @@ class UserGroupController {
 	def edit = {
 		def userGroupInstance = findInstance()
 		if (!userGroupInstance) {
-			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'userGroup.label', default: 'UserGroup'), params.id])}"
-			redirect(action: "list")
+			//flash.message = "${message(code: 'userGroup.default.not.found.message', args: [params.webaddress])}"
+			//redirect(action: "list")
 		} else if(aclUtilService.hasPermission(springSecurityService.getAuthentication(), userGroupInstance, BasePermission.ADMINISTRATION)) {
 			render(view: "create", model: [userGroupInstance: userGroupInstance, 'springSecurityService':springSecurityService])
 		} else {
 			flash.message = "${message(code: 'default.not.permitted.message', args: [params.action, message(code: 'userGroup.label', default: 'UserGroup'), userGroupInstance.name])}"
-			redirect(action: "list")
+			redirect  url: createLink(mapping: 'userGroupGeneric', action: "list")
 		}
 	}
 
@@ -248,13 +244,10 @@ class UserGroupController {
 				if(params.founders) {
 					flash.message += ". Sent email invitation to ${params.founders} to join as founders"
 				}
-				redirect(action: "show", id: userGroupInstance.id)
+				redirect  url: createLink(mapping: 'userGroup', action: "show", params:['webaddress':userGroupInstance.webaddress])
 			}
 		}
-		else {
-			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'userGroup.label', default: 'UserGroup'), params.id])}"
-			redirect(action: "list")
-		}
+	
 	}
 
 	@Secured(['ROLE_USER'])
@@ -265,29 +258,31 @@ class UserGroupController {
 			try {
 				userGroupService.delete(userGroupInstance)
 				activityFeedService.deleteFeed(userGroupInstance);
-				flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'userGroup.label', default: 'UserGroup'), params.id])}"
-				redirect(action: "list")
+				flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'userGroup.label', default: 'UserGroup'), params.webaddress])}"
+				redirect url: createLink(mapping: 'userGroupGeneric',action: "list")
 				return
 			}
 			catch (org.springframework.dao.DataIntegrityViolationException e) {
-				flash.message = "${message(code: 'default.not.deleted.message', args: [message(code: 'userGroup.label', default: 'UserGroup'), params.id])}"
-				redirect(action: "show", id: params.id)
+				flash.message = "${message(code: 'default.not.deleted.message', args: [message(code: 'userGroup.label', default: 'UserGroup'), params.webaddress])}"
+				redirect url: createLink(mapping: 'userGroup',action: "show", params:['webaddress': params.webaddress])
 				return;
 			}
 		}
-		
-		flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'userGroup.label', default: 'UserGroup'), params.id])}"
-		redirect(action: "list")
-		
 	}
 
-	private UserGroup findInstance() {
-		if(!params.id) return;
-
-		def userGroup = userGroupService.get(params.long('id'))
-		if (!userGroup) {
-			flash.message = "UserGroup not found with id $params.id"
-			redirect action: list
+	private UserGroup findInstance(boolean redirectToList=true) {
+		def userGroup
+		
+		if(params.id) {
+			userGroup = userGroupService.get(params.long('id'))
+		} 
+		if(params.webaddress) {
+			userGroup = userGroupService.get(params['webaddress'])
+		}
+		
+		if (!userGroup && redirectToList) {
+			flash.message = "${message(code: 'userGroup.default.not.found.message', args: [params.webaddress])}"
+			redirect url: createLink(mapping: 'userGroupGeneric', action:'list')
 		}
 		userGroup
 	}
@@ -296,7 +291,7 @@ class UserGroupController {
 		def userGroupInstance = findInstance()
 		if (!userGroupInstance) return
 
-			params.max = Math.min(params.max ? params.int('max') : 9, 100)
+		params.max = Math.min(params.max ? params.int('max') : 9, 100)
 		params.offset = params.offset ? params.int('offset') : 0
 
 		def allMembers;
@@ -320,7 +315,7 @@ class UserGroupController {
 		def userGroupInstance = findInstance()
 		if (!userGroupInstance) return
 
-			params.max = Math.min(params.max ? params.int('max') : 9, 100)
+		params.max = Math.min(params.max ? params.int('max') : 9, 100)
 		params.offset = params.offset ? params.int('offset') : 0
 
 		def founders = userGroupInstance.getFounders(params.max, params.offset);
@@ -480,7 +475,7 @@ class UserGroupController {
 
 			founders.each { founder ->
 				log.debug "Sending email to  founder ${founder}"
-				def userToken = new UserToken(username: user."$usernameFieldName", controller:'userGroup', action:'confirmMembershipRequest', params:['userGroupInstanceId':userGroupInstance.id.toString(), 'userId':user.id.toString(), 'role':UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value()]);
+				def userToken = new UserToken(username: user."$usernameFieldName", controller:'userGroupGeneric', action:'confirmMembershipRequest', params:['userGroupInstanceId':userGroupInstance.id.toString(), 'userId':user.id.toString(), 'role':UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value()]);
 				userToken.save(flush: true)
 				emailConfirmationService.sendConfirmation(founder.email,
 						"Please confirm users membership",  [founder:founder, user: user, userGroupInstance:userGroupInstance,domain:Utils.getDomainName(request), view:'/emailtemplates/requestMembership'], userToken.token);
@@ -537,11 +532,11 @@ class UserGroupController {
 					flash.error="Couldn't add user to the group because of missing information."
 				}
 			}
-			redirect (action:"show", id:userGroupInstance.id);
+			redirect url: createLink(mapping: 'userGroup', action:"show", params:['webaddress':userGroupInstance.webaddress]);
 			return;
 		}
 		flash.error="There seems to be some problem. You are not the user to whom this confirmation request is sent as per our records."
-		redirect (action:"list");
+		redirect url: createLink(mapping: 'userGroupGeneric', action:"list");
 	}
 
 	@Secured(['ROLE_USER', 'RUN_AS_ADMIN'])
@@ -778,7 +773,7 @@ class UserGroupController {
 
 	def pages = {
 		log.debug params
-		def userGroupInstance = findInstance()
+		def userGroupInstance = findInstance(false)
 		//if (!userGroupInstance) return;
 		def newsletters = userGroupService.getNewsLetters(userGroupInstance, params.max, params.offset, params.sort, params.order);
 		render (view:"pages", model:['userGroupInstance':userGroupInstance, 'newsletters':newsletters])
@@ -786,15 +781,15 @@ class UserGroupController {
 	
 	def page = {
 		log.debug params;
-		def userGroupInstance = findInstance()
+		def userGroupInstance = findInstance(false)
 		//if (!userGroupInstance) return;
 		render (view:'page', model:['userGroupInstance':userGroupInstance, 'newsletterId':params.newsletterId])
 	}
 	
 	def pageCreate = {
 		log.debug params;
-		def userGroupInstance = findInstance()
-		if (!userGroupInstance) return;
+		def userGroupInstance = findInstance(false)
+		//if (!userGroupInstance) return;
 		render (view:'pageCreate', model:['userGroupInstance':userGroupInstance])
 	}
 	

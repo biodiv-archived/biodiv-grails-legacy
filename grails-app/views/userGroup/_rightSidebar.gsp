@@ -7,7 +7,7 @@
 
 				<li><g:if test="${userGroupInstance}">
 						<a
-							href="${createLink(mapping:'userGroupPageShow', params:['id':userGroupInstance.id, 'newsletterId':newsletterInstance.id]) }">
+							href="${createLink(mapping:'userGroupPageShow', params:['webaddress':userGroupInstance.webaddress, 'newsletterId':newsletterInstance.id]) }">
 							${fieldValue(bean: newsletterInstance, field: "title")} </a>
 					</g:if>
 					<g:else>
@@ -17,10 +17,9 @@
 					</g:else></li>
 			</g:each>
 			<li><g:if test="${userGroupInstance}">
-					<g:link controller="userGroup" action="pages"
-						id="${userGroupInstance.id}">Pages</g:link>
+					<g:link mapping="userGroup" action="pages" params=['webaddress':userGroupInstance.webaddress]>Pages</g:link>
 				</g:if> <g:else>
-					<g:link controller="userGroup" action="pages">Pages</g:link>
+					<g:link mapping="pages">Pages</g:link>
 				</g:else>
 			</li>
 		</ul>

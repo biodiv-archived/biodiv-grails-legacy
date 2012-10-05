@@ -37,12 +37,29 @@ class UrlMappings {
 */		
 		"/static/$path"(controller:"species", action:"staticContent")
 		
-		"/userGroup/$id/pages"(controller:"userGroup", action:"pages")
-		
-		name userGroupPageShow: "/userGroup/$id/page/$newsletterId" {
+		name userGroupPageShow: "/userGroup/$webaddress/page/$newsletterId" {
 			controller = 'userGroup'
 			action = 'page'
 		}
-
+		
+		
+		name userGroupGeneric: "/group/$action" {
+			controller = 'userGroup'
+		}
+		
+		name pages:"/pages" {
+			controller = 'userGroup'
+			action = 'pages'
+		}
+		
+		name page:"/page/$newsletterId" {
+			controller = 'userGroup'
+			action = 'page'
+		}
+		
+		name userGroup: "/group/$webaddress?/$action?" {
+			controller = 'userGroup'
+		}
+		
 	}
 }

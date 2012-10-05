@@ -10,7 +10,7 @@
 		<div class="footer-item">
 			<i class="icon-comment"></i>
 			<fb:comments-count
-				href="${createLink(controller:'userGroup', action:'show', id:userGroupInstance.id, base:Utils.getDomainServerUrl(request))}"></fb:comments-count>
+				href="${createLink(mapping:'userGroup', action:'show', params:"['webaddress':userGroupInstance.webaddress]", base:Utils.getDomainServerUrl(request))}"></fb:comments-count>
 	
 		</div>
 	</g:if>
@@ -26,7 +26,7 @@
 	<g:if test="${showDetails}">
 		<div class="footer-item" style="width: 100px">
 			<fb:like layout="button_count"
-				href="${createLink(controller:'userGroup', action:'show', id:userGroupInstance.id, base:Utils.getDomainServerUrl(request))}"
+				href="${createLink(mapping:'userGroup', action:'show', params:"['webaddress':userGroupInstance.webaddress]", base:Utils.getDomainServerUrl(request))}"
 				width="450" show_faces="true"></fb:like>
 		</div>
 	</g:if>

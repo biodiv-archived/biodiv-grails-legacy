@@ -91,9 +91,9 @@
 				</div>
 
 
-				<g:if test="${params.userGroupId}">
-					<input type="hidden" name="userGroupId"
-						value="${params.userGroupId}" />
+				<g:if test="${params.userGroup}">
+					<input type="hidden" name="userGroup"
+						value="${params.userGroup}" />
 				</g:if>
 
 			</div>
