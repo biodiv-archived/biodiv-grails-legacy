@@ -3,10 +3,10 @@
 <%@ page import="species.Habitat"%>
 <%@ page import="species.participation.ActivityFeedService"%>
 
-<div class="sidebar left-sidebar">
+<div class="sidebar left-sidebar span3">
 
-	<div class="super-section">
-		<h5 class="nav-header">Home</h5>
+	<div class="sidebar_section">
+		<!--h5 class="nav-header">Home</h5-->
 		<ul class="nav block-tagadelic">
 			
 			<sec:ifLoggedIn>
@@ -46,7 +46,7 @@
 		</ul>
 	</div>
 
-	<div class="super-section">
+	<div class="sidebar_section">
 		<uGroup:showSuggestedUserGroups />
 		<small>Groups is in Beta. We would like you to provide valuable feedback, suggestions and interest in using the groups functionality.
 		</small>

@@ -1,4 +1,4 @@
-<div class="species_title ellipsis multiline">
+<div class="species_title multiline">
 	<g:set var="sName" value="${observationInstance.fetchSpeciesCall()}" />
 	<g:if test="${sName == 'Unknown'}">
 		<div class="sci_name">
@@ -11,15 +11,15 @@
 	<g:else>
 		<div class="sci_name">
 			<g:if test="${observationInstance.maxVotedReco.isScientificName}">
-				<i>
+			  	<i>
 					${sName}
 				</i>
-			<div class="common_name">
-				${observationInstance.fetchSuggestedCommonNames()}
-			</div>
+				<div class="common_name">
+					${observationInstance.fetchSuggestedCommonNames()}
+				</div>
 			</g:if>
 			<g:else>
-				${sName}
+			    ${sName}
 			</g:else>
 		</div>
 	</g:else>

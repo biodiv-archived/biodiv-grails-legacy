@@ -1,6 +1,7 @@
 /**
  * 
  */
+var serverTimeDiff = null;
 
 $(function() {
 	var spt = $('span.mailme');
@@ -42,6 +43,27 @@ function dcorateCommentBody(comp){
 	$(comp).linkify();
 	
 }
+
+
+function initRelativeTime(url){
+	if(!serverTimeDiff){
+		$.ajax({
+	 		url: url,
+			dataType: "json",
+			success: function(data) {
+				serverTimeDiff = parseInt(data) - new Date().getTime();
+				$('body').timeago({serverTimeDiff:serverTimeDiff});
+			}, error: function(xhr, status, error) {
+				alert(xhr.responseText);
+		   	}
+		});	
+	}
+}
+
+function updateRelativeTime(){
+	$('.timeago').timeago({serverTimeDiff:serverTimeDiff});
+}
+
 
 //to show relative date
 //function updateRelativeTime(currentTime){

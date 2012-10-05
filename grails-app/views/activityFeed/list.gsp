@@ -11,7 +11,7 @@
 </head>
 <body>
 	
-			<div class="span12">
+			<div class="span9">
 				<div class="page-header clearfix">
 						<h1>
 							<g:message code="default.observation.heading" args="[entityName]" />

@@ -175,6 +175,10 @@ class UserGroupTagLib {
 		out << render(template:"/common/userGroup/showUserGroupListTemplate", model:attrs.model);
 	}
 
+	def showUserGroupsListInModal = {attrs, body->
+		out << render(template:"/common/userGroup/showUserGroupListInModalTemplate", model:attrs.model);
+	}
+	
 	def showUserGroupsListWrapper = {attrs, body->
 		out << render(template:"/common/userGroup/showUserGroupListWrapperTemplate", model:attrs.model);
 	}

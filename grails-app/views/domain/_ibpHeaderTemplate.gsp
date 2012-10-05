@@ -1,8 +1,7 @@
 <div id="ibp-header" class="gradient-bg">
 	<div class=" gradient-bg navbar navbar-static-top"
 		style="margin-bottom: 0px;">
-		<div class="navbar-inner"
-			style="background-color: transparent; background-image: none; box-shadow: none;padding-left:0px;padding-right:0px">
+		<div class="navbar-inner">
 			<div class="container" style="width:100%">
 				<a class="btn btn-navbar" data-toggle="collapse"
 					data-target=".nav-collapse"> <span class="icon-bar"></span> <span

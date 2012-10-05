@@ -1,4 +1,3 @@
-
 <%@page import="species.utils.Utils"%>
 <%@page import="species.utils.ImageType"%>
 
@@ -15,7 +14,12 @@
 	<div>
 
 		<div class="prop">
-			<i class="pull-left icon-share-alt"></i>
+			<g:if test="${showDetails}">
+				<span class="name"><i class="icon-share-alt"></i>Species Name</span>
+			</g:if>
+			<g:else>
+				<i class="pull-left icon-share-alt"></i>
+			</g:else>
 			<div class="value">
 				<obv:showSpeciesName
 					model="['observationInstance':observationInstance]" />
@@ -25,9 +29,13 @@
 
 
 		<div class="prop">
-			<i class="pull-left icon-map-marker"></i>
-			<div class="value">
-				
+			<g:if test="${showDetails}">
+				<span class="name"><i class="icon-map-marker"></i>Place</span>
+			</g:if>
+			<g:else>
+				<i class="pull-left icon-map-marker"></i>
+			</g:else>
+			<div class="value ellipsis">
 				<g:if test="${observationInstance.placeName == ''}">
 					${observationInstance.reverseGeocodedName}
 				</g:if>
@@ -41,10 +49,8 @@
 				<g:formatNumber number="${observationInstance.longitude}"
 					type="number" maxFractionDigits="2" />
 				-->
-
 			</div>
 		</div>
-
 		<%--		<div class="prop">--%>
 		<%--			<span class="name">Recommendations</span>--%>
 		<%--			<div class="value">--%>
@@ -52,54 +58,83 @@
 		<%--			</div>--%>
 		<%--		</div>--%>
 
-<%--		<div class="prop">--%>
-<%--			<span class="name"><i class="icon-time"></i>Observed on</span>--%>
-<%--			<obv:showDate--%>
-<%--				model="['observationInstance':observationInstance, 'propertyName':'observedOn', 'dateFormat':'dateOnly']" />--%>
-<%----%>
-<%--		</div>--%>
-
 		<div class="prop">
-			<i class="pull-left  icon-time"></i>
+			<g:if test="${showDetails}">
+				<span class="name"><i class="icon-time"></i>Observed on</span>
+			</g:if>
+			<g:else>
+				<i class="pull-left icon-time"></i>
+			</g:else>
 			<div class="value">
-				<time class="timeago" datetime="${observationInstance.createdOn.getTime()}"></time>
+				<time class="timeago" datetime="${observationInstance.observedOn.getTime()}"></time>
 			</div>
-<%--			<obv:showDate--%>
-<%--				model="['observationInstance':observationInstance, 'propertyName':'createdOn']" />--%>
-
 		</div>
-
-<%--		<div class="prop">--%>
-<%--			<span class="name"><i class="icon-time"></i>Updated</span>--%>
-<%--			<obv:showDate--%>
-<%--				model="['observationInstance':observationInstance, 'propertyName':'lastRevised']" />--%>
-<%--		</div>--%>
-
-		<g:if test="${observationInstance.notes && showDetails}">
+		
+		<g:if test="${showDetails}">
 			<div class="prop">
-				<span class="name"><i class="icon-info-sign"></i>Notes</span>
-				<div class="notes_view">
-					${observationInstance.notes}
+				<g:if test="${showDetails}">
+					<span class="name"><i class="icon-time"></i>Submitted</span>
+				</g:if>
+				<g:else>
+					<i class="pull-left icon-time"></i>
+				</g:else>
+				<div class="value">
+					<time class="timeago" datetime="${observationInstance.createdOn.getTime()}"></time>
+				</div>
+			</div>
+			
+			<div class="prop">
+				<g:if test="${showDetails}">
+					<span class="name"><i class="icon-time"></i>Updated</span>
+				</g:if>
+				<g:else>
+					<i class="pull-left icon-time"></i>
+				</g:else>
+				<div class="value">
+					<time class="timeago" datetime="${observationInstance.lastRevised?.getTime()}"></time>
+				</div>
+			</div>
+			<g:if test="${observationInstance.notes}">
+				<div class="prop">
+					<span class="name"><i class="icon-info-sign"></i>Notes</span>
+					<div class="notes_view">
+						${observationInstance.notes}
+					</div>
+				</div>
+			</g:if>
+		</g:if>
+	</div>
+	
+	<g:if test="${showDetails}">
+		<obv:showTagsSummary
+			model="['observationInstance':observationInstance, 'isAjaxLoad':false]" />
+	</g:if>
+	
+	<g:if test="${!showDetails}">
+		<div class="prop">
+			<i class="pull-left icon-eye-open"></i>
+			<div class="value">
+				${observationInstance.getPageVisitCount()}
+			</div>
+		</div>
+		
+		<g:if test="${observationInstance.flagCount>0}">
+			<div id="show-flag-count" class="prop">
+				<i class="pull-left icon-flag"></i>
+				<div class="value">	
+					${observationInstance.flagCount}
 				</div>
 			</div>
 		</g:if>
-
-	</div>
-
-
-<%--	<obv:showTagsSummary--%>
-<%--		model="['observationInstance':observationInstance, 'isAjaxLoad':false]" />--%>
-
+	</g:if>
+	
 	<div
-		style="display: block; width: 100%; overflow: auto; margin-bottom: 10px">
+		style="display: block; width: 100%; overflow: auto; margin-bottom: 10px;">
 		<div style="float: right; clear: both;">
 			<sUser:showUserTemplate
 				model="['userInstance':observationInstance.author]" />
 		</div>
 
 	</div>
-
-
 	<obv:showFooter model="['observationInstance':observationInstance, 'showDetails':showDetails]"/>
-	
 </div>
