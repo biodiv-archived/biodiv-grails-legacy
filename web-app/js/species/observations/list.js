@@ -222,6 +222,7 @@ $(document).ready(function(){
 			    var History = window.History;
 			    History.pushState({state:1}, "Species Portal", '?'+decodeURIComponent($.param(params))); 
 				eatCookies();
+				updateRelativeTime();
 			}
 		});
 

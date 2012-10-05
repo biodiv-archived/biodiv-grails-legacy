@@ -9,7 +9,7 @@
 	<div>
 		<div>
 			<%
-				def userGroupPos = (queryParams?.offset != null) ? queryParams.offset : params?.offset
+				def userGroupPos = (queryParams?.offset != null) ? queryParams.offset : (params?.offset != null) ? params.offset : 0
 			%>
 			
 			<table class="table table-hover span8" style="margin-left: 0px;">

@@ -179,9 +179,12 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 										permission:org.springframework.security.acls.domain.BasePermission.WRITE]).toBoolean()}">
 										 <input type="submit"
 											value="Add" class="btn btn-primary btn-small pull-right" style="position: relative;top: -30px; border-radius:4px" />
-									</g:if><g:else>
-										<a href="#"
-											title="Protected to group members/experts. Need to join any of the user groups this observation belongs to inorder to add a species call" class="btn btn-primary btn-small disabled pull-right" style="position: relative;top: -30px;">Join Groups / Be an expert</a>
+									</g:if>
+									<g:else>
+										<a href="#" onclick="$('#selectedGroupList').modal('show'); return false;"
+											title="Protected to group members/experts. Need to join any of the user groups this observation belongs to inorder to add a species call" class="btn btn-primary btn-small pull-right" style="position: relative;top: -30px;">Join Groups / Be an expert</a>
+											<uGroup:showUserGroupsListInModal
+												model="['userGroupInstanceList':observationInstance.userGroups]" />
 									</g:else>
 								</div>
 							</form>
@@ -319,6 +322,7 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
          preLoadRecos(3, false);
          
      	$('#addRecommendation').bind('submit', function(event) {
+     		alert("clicked ");
      		$(this).ajaxSubmit({ 
 	         	url:"${createLink(controller:'observation', action:'addRecommendationVote')}",
 				dataType: 'json', 

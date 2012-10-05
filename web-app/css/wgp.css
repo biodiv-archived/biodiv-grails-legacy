@@ -211,19 +211,14 @@ body { /*     background-color: #ffffff; */
 	padding: 10px;
 }
 
-.outer-wrapper, .navbar .container { /* clear: both; */
-	background-color: rgba(106, 201, 162, 0.15);
-	background: transparent\9;
-	-ms-filter:
-		"progid:DXImageTransform.Microsoft.gradient(startColorstr=#266AC9A2,endColorstr=#266AC9A2)";
-	/* IE8 */
-	filter: progid :       DXImageTransform.Microsoft.gradient (     
-		 startColorstr =   
-		   #266AC9A2, endColorstr =       #266AC9A2 ); /* IE6 & 7 */
-	zoom: 1;
-	padding-left: 10px;
-	padding-right: 10px;
-	width: 1200px;
+.navbar .container { /* clear: both; */
+}
+
+.outer-wrapper {
+    background-color: rgba(106, 201, 162, 0.15);
+    padding-left: 10px;
+    padding-right: 10px;
+    width: 1200px;
 }
 
 div.errors {
@@ -1317,6 +1312,8 @@ span.cke_skin_kama {
 	border: 0 none;
 	height: 80px;
 	width: auto;
+        margin-left: 16px;
+        margin-right: 16px;
 }
 /*USER GROUP END*/
 h1,.main_heading .species_title .sci_name {
@@ -1545,11 +1542,19 @@ li#userOrEmail-new {
 	color: #999;
 }
 
+#ibp-header .navbar .nav>li>a {
+	color: #a5a5a5;
+}
+
+#ibp-header .navbar .nav>li>a:hover {
+	color: #fefefe;
+}
+
 #ibp-header .brand {
-	font-size: 30px;
-	font-weight: 300;
-	color: #333;
-	text-shadow: 3px 3px 3px white;
+	font-size: 14px;
+	font-weight: bold;
+	color: #e5e5e5;
+        margin-top:5px;
 }
 
 .navbar .nav .dropdown-toggle .caret, .navbar .nav .open.dropdown .caret {
@@ -1562,4 +1567,8 @@ li#userOrEmail-new {
 
 .sidebar .block-tagadelic li div {
 	background-color:transparent;
+}
+
+#searchTextField {
+border-radius:0;
 }
