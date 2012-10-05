@@ -94,15 +94,14 @@
 					<time class="timeago" datetime="${observationInstance.lastRevised?.getTime()}"></time>
 				</div>
 			</div>
-		</g:if>
-		
-		<g:if test="${observationInstance.notes && showDetails}">
-			<div class="prop">
-				<span class="name"><i class="icon-info-sign"></i>Notes</span>
-				<div class="notes_view">
-					${observationInstance.notes}
+			<g:if test="${observationInstance.notes}">
+				<div class="prop">
+					<span class="name"><i class="icon-info-sign"></i>Notes</span>
+					<div class="notes_view">
+						${observationInstance.notes}
+					</div>
 				</div>
-			</div>
+			</g:if>
 		</g:if>
 	</div>
 	
@@ -111,8 +110,26 @@
 			model="['observationInstance':observationInstance, 'isAjaxLoad':false]" />
 	</g:if>
 	
+	<g:if test="${!showDetails}">
+		<div class="prop">
+			<i class="pull-left icon-eye-open"></i>
+			<div class="value">
+				${observationInstance.getPageVisitCount()}
+			</div>
+		</div>
+		
+		<g:if test="${observationInstance.flagCount>0}">
+			<div id="show-flag-count" class="prop">
+				<i class="pull-left icon-flag"></i>
+				<div class="value">	
+					${observationInstance.flagCount}
+				</div>
+			</div>
+		</g:if>
+	</g:if>
+	
 	<div
-		style="display: block; width: 100%; overflow: auto; margin-bottom: 10px">
+		style="display: block; width: 100%; overflow: auto; margin-bottom: 10px;">
 		<div style="float: right; clear: both;">
 			<sUser:showUserTemplate
 				model="['userInstance':observationInstance.author]" />
