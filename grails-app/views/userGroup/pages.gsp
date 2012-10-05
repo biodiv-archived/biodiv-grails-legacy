@@ -26,14 +26,14 @@
 						id='${userGroupInstance.id}'
 						permission='${org.springframework.security.acls.domain.BasePermission.ADMINISTRATION}'>
 
-						<g:link action="pageCreate" id="${userGroupInstance.id}"
+						<g:link mapping="userGroup" action="pageCreate" params="['webaddress':userGroupInstance.webaddress]"
 							class="btn btn-large btn-info">
 							<i class="icon-plus"></i>Add a Newsletter</g:link>
 					</sec:permitted>
 				</g:if>
 				<g:else>
 					<sUser:isAdmin>
-						<g:link action="pageCreate" class="btn btn-large btn-info">
+						<g:link mapping="userGroupGeneric" action="pageCreate" class="btn btn-large btn-info">
 							<i class="icon-plus"></i>Add a Newsletter</g:link>
 					</sUser:isAdmin>
 				</g:else>
@@ -62,12 +62,12 @@
 								<td>
 								<g:if test="${userGroupInstance}">
 								<a
-									href="${createLink(mapping:'userGroupPageShow', params:['id':userGroupInstance.id, 'newsletterId':newsletterInstance.id]) }">
+									href="${createLink(mapping:'userGroupPageShow', params:['webaddress':userGroupInstance.webaddress, 'newsletterId':newsletterInstance.id]) }">
 										${fieldValue(bean: newsletterInstance, field: "title")} </a>
 								</g:if>
 								<g:else>
 								<a
-									href="${createLink(controller:'userGroup', action:'page', params:['newsletterId':newsletterInstance.id]) }">
+									href="${createLink(mapping:'page', params:['newsletterId':newsletterInstance.id]) }">
 										${fieldValue(bean: newsletterInstance, field: "title")} </a>
 								</g:else>
 								</td>

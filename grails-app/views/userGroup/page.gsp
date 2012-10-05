@@ -28,14 +28,14 @@
 							id='${userGroupInstance.id}'
 							permission='${org.springframework.security.acls.domain.BasePermission.ADMINISTRATION}'>
 
-							<g:link action="pageCreate" id="${userGroupInstance.id}"
+							<g:link mapping="userGroup" action="pageCreate" params="['webaddress':userGroupInstance.webaddress]"
 								class="btn btn-large btn-info">
 								<i class="icon-plus"></i>Add a Newsletter</g:link>
 						</sec:permitted>
 					</g:if>
 					<g:else>
 						<sUser:isAdmin>
-							<g:link action="pageCreate" class="btn btn-large btn-info">
+							<g:link mapping="userGroupGeneric" action="pageCreate" class="btn btn-large btn-info">
 								<i class="icon-plus"></i>Add a Newsletter</g:link>
 						</sUser:isAdmin>
 					</g:else>
@@ -47,11 +47,11 @@
 			<div class="btn-group pull-right" style="z-index: 10;">
 
 				<g:if test="${userGroupInstance}">
-					<g:link action="pages" id="${userGroupInstance.id}"
+					<g:link mapping="userGroup" action="pages" params="['webaddress':userGroupInstance.webaddress]"
 						class="btn btn-large btn-info">< Back to Newsletters</g:link>
 				</g:if>
 				<g:else>
-					<g:link action="pages" class="btn btn-large btn-info">< Back to Newsletters</g:link>
+					<g:link mapping="userGroupGeneric" action="pages" class="btn btn-large btn-info">< Back to Newsletters</g:link>
 				</g:else>
 
 

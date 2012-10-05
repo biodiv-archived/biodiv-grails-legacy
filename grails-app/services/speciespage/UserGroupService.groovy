@@ -67,7 +67,7 @@ class UserGroupService {
 	void update(UserGroup userGroup, params) {
 		userGroup.properties = params;
 		userGroup.name = userGroup.name?.capitalize();
-		userGroup.webaddress = URLEncoder.encode(userGroup.name.replaceAll(" ", "_"), "UTF-8");
+		userGroup.webaddress = URLEncoder.encode(userGroup.name.toLowerCase().replaceAll(" ", "_"), "UTF-8");
 
 		userGroup.icon = getUserGroupIcon(params.icon);
 		addInterestedSpeciesGroups(userGroup, params.speciesGroup)
@@ -95,6 +95,10 @@ class UserGroupService {
 	//@PreAuthorize("hasPermission(#id, 'species.groups.UserGroup', read) or hasPermission(#id, 'species.groups.UserGroup', admin)")
 	UserGroup get(long id) {
 		UserGroup.get id
+	}
+
+	UserGroup get(String webaddress) {
+		UserGroup.findByWebaddress(webaddress);
 	}
 
 	@PreAuthorize("hasRole('ROLE_USER')")
@@ -645,6 +649,7 @@ class UserGroupService {
 		return model;
 	}
 
+
 	def getNewsLetters(UserGroup userGroupInstance,  max,  offset, String sort, String order) {
 		String query = "from Newsletter newsletter ";
 		def queryParams = [:]
@@ -657,7 +662,7 @@ class UserGroupService {
 		if(max && max != -1) {
 			queryParams['max'] = max;
 		}
-		if(max && offset != -1) {
+		if(offset && offset != -1) {
 			queryParams['offset'] = offset;
 		}
 		if(sort) {
@@ -668,9 +673,9 @@ class UserGroupService {
 			order = order?:"desc"
 			query += " "+order
 		}
-		log.debug query
+		log.debug query + " " + queryParams
 		return Newsletter.executeQuery(query, queryParams);
-		
+
 	}
 
 

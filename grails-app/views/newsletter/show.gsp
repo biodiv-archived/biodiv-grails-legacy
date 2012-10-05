@@ -67,8 +67,8 @@
 			<div class="buttons">
 				<g:form>
 					<g:hiddenField name="id" value="${newsletterInstance?.id}" />
-					<g:hiddenField name="userGroupId"
-						value="${newsletterInstance?.userGroup?.id}" />
+					<g:hiddenField name="userGroup"
+						value="${newsletterInstance?.userGroup?.webaddress}" />
 					<span class="button"><g:actionSubmit class="edit"
 							action="edit"
 							value="${message(code: 'default.button.edit.label', default: 'Edit')}" />

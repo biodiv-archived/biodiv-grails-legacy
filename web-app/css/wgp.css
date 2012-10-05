@@ -1528,7 +1528,7 @@ li#userOrEmail-new {
 	color: #5e5e5e;
 }
 
-.links_box_column li.bold a {
+.links_box_column li.bold{
 	font-weight: bold;
 	text-shadow: 1px 1px 3px #999999;
 }

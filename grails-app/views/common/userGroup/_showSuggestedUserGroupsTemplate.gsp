@@ -7,7 +7,7 @@
 				model="['userGroup':userGroup]" />
 		</li>
 	</g:each>
-	<li class="pull-right"><g:link controller="userGroup"
+	<li class="pull-right"><g:link mapping="userGroupGeneric"
 			action="list" style="display:inline;">More ...</g:link></li>
 </ul>
 </div>

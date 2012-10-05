@@ -38,7 +38,7 @@
 		</g:if>
 		<g:elseif test="${queryParams.groupId }">
                            		of <span class="highlight"><g:link
-					controller="userGroup" action="list"
+					mapping="userGroupGeneric" action="list"
 					params="[sGroup: queryParams.groupId]">
 					${queryParams.groupId }
 					<a href="#" onclick="setDefaultGroup(); return false;">[X]</a>
@@ -59,7 +59,7 @@
 		</g:if>
 		<g:elseif test="${queryParams.habitat }">
                            		in <span class="highlight"><g:link
-					controller="userGroup" action="list"
+					mapping="userGroupGeneric" action="list"
 					params="[habitat: queryParams.habitat]">
 					${queryParams.habitat }
 					<a href="#" onclick="setDefaultHabitat(); return false;">[X]</a>

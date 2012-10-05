@@ -9,6 +9,7 @@ import species.auth.SUserRole
 import species.groups.SpeciesGroup;
 import species.groups.UserGroupMemberRole.UserGroupMemberRoleType;
 import species.participation.UserToken;
+import org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib
 
 class BootStrap {
 
@@ -128,7 +129,11 @@ class BootStrap {
 			if(userToken) {
 				userToken.params.tokenId = userToken.id.toString();
 				userToken.params.confirmationToken = confirmationToken;
-				return [controller:userToken.controller, action:userToken.action, params:userToken.params]
+				println userToken.params
+				println userToken.controller
+				println userToken.action
+				println new ApplicationTagLib().createLink(mapping: 'userGroupGeneric', action:'confirmMembershipRequest', params:userToken.params)
+				return [url: new ApplicationTagLib().createLink(mapping: 'userGroupGeneric', action:userToken.action, params:userToken.params)]
 			} else {
 				//TODO
 			}

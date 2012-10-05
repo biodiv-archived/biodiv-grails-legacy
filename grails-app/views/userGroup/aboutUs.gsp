@@ -42,8 +42,8 @@
 					Founders
 				</h5>
 				<div id="founders_sidebar"></div>
-				<g:link controller="userGroup" action="founders"
-					id="${userGroupInstance.id}">...</g:link>
+				<g:link mapping="userGroup" action="founders"
+					params="['webaddress':userGroupInstance.webaddress]">...</g:link>
 			</div>
 
 			<div class="section">
@@ -51,8 +51,8 @@
 					Members
 				</h5>
 				<div id="members_sidebar"></div>
-				<g:link controller="userGroup" action="members"
-					id="${userGroupInstance.id}">...</g:link>
+				<g:link mapping="userGroup" action="members"
+					params="['webaddress':userGroupInstance.webaddress]">...</g:link>
 			</div>
 		</div>
 
@@ -96,7 +96,7 @@
 
 <r:script>
 			function reloadMembers(url) {
-				var membersUrl = (url)?url:"${createLink(action:'members',id:userGroupInstance.id) }"  
+				var membersUrl = (url)?url:"${createLink(mapping:'userGroup', action:'members', params:['webaddress':userGroupInstance.webaddress]) }"  
 				$.ajax({
 			       	url: membersUrl,
 			           method: "GET",
@@ -120,7 +120,7 @@
 				});
 			}
 			function reloadFounders(url) {
-				var foundersUrl = (url)?url:"${createLink(action:'founders',id:userGroupInstance?.id) }"  
+				var foundersUrl = (url)?url:"${createLink(mapping:'userGroup', action:'founders',params:['webaddress':userGroupInstance.webaddress]) }"  
 				$.ajax({
 			       		url: foundersUrl,
 			           method: "GET",

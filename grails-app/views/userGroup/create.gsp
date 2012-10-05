@@ -103,16 +103,15 @@ max-width: 100%;
 			
 			<%
 				def form_id = "createGroup"
-				def form_action = createLink(action:'save')
+				def form_action = createLink(mapping:'userGroupGeneric', action:'save')
 				def form_button_name = "Create Group"
 				def form_button_val = "Create Group"
 				if(params.action == 'edit' || params.action == 'update'){
 					//form_id = "updateGroup"
-					form_action = createLink(action:'update', id:userGroupInstance.id)
+					form_action = createLink(mapping:'userGroup', action:'update', params:['webaddress':userGroupInstance.webaddress])
 				 	form_button_name = "Update Group"
 					form_button_val = "Update Group"
 				}
-			
 				%>
 			<g:set var="founders_autofillUsersId" value="id1" />
 			<g:set var="members_autofillUsersId" value="id2" />
@@ -347,11 +346,11 @@ max-width: 100%;
 				<div class="" style="margin-top: 20px; margin-bottom: 40px;">
 				
 					<g:if test="${userGroupInstance?.id}">
-						<a href="${createLink(action:'show', id:userGroupInstance.id)}" class="btn"
+						<a href="${createLink(mapping:'userGroup', action:'show', params:['webaddress':userGroupInstance.webaddress])}" class="btn"
 							style="float: right; margin-right: 5px;"> Cancel </a>
 					</g:if>
 					<g:else>
-					<a href="${createLink(action:'list')}" class="btn"
+					<a href="${createLink(mapping:'userGroupgeneric', action:'list')}" class="btn"
 							style="float: right; margin-right: 5px;"> Cancel </a>
 					</g:else>
 					
@@ -359,7 +358,7 @@ max-width: 100%;
 						<div class="btn btn-danger"
 							style="float: right; margin-right: 5px;">
 							<a
-								href="${createLink(action:'delete', id:userGroupInstance.id)}"
+								href="${createLink(mapping:'userGroup', action:'delete', params:['webaddress':userGroupInstance.webaddress])}"
 								onclick="return confirm('${message(code: 'default.userGroup.delete.confirm.message', default: 'This group and its content will be deleted. Are you sure ?')}');">Delete
 								Group </a>
 						</div>
@@ -403,7 +402,7 @@ $(document).ready(function() {
 		});
 
      	$('#upload_resource').ajaxForm({ 
-			url:'${createLink(action:'upload_resource')}',
+			url:'${createLink(mapping:'userGroupGeneric', action:'upload_resource')}',
 			dataType: 'xml',//could not parse json wih this form plugin 
 			clearForm: true,
 			resetForm: true,
@@ -521,7 +520,7 @@ $(document).ready(function() {
 	});
 	
 	$("#tags .tagit-input").watermark("Add some tags");	
-	$("#tags").tagit({select:true,  tagSource: "${g.createLink(action: 'tags')}", triggerKeys:['enter', 'comma', 'tab'], maxLength:30});
+	$("#tags").tagit({select:true,  tagSource: "${g.createLink(mapping:'userGroupGeneric', action: 'tags')}", triggerKeys:['enter', 'comma', 'tab'], maxLength:30});
 	$(".tagit-hiddenSelect").css('display','none');
 	
 	$('#speciesGroupFilter button').attr('data-toggle', 'buttons-checkbox').click(function(){

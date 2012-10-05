@@ -15,7 +15,7 @@
 	<div class="span12">
 		<div class="page-header">
 			<h1>
-				<g:message code="default.edit.label" args="[entityName]" />
+				Edit
 			</h1>
 		</div>
 		<g:if test="${flash.message}">
@@ -67,8 +67,8 @@
 							</td>
 						</tr>
 						<g:if test="${newsletterInstance.userGroup}">
-							<input type="hidden" name="userGroupId"
-								value="${newsletterInstance.userGroup.id}" />
+							<input type="hidden" name="userGroup"
+								value="${newsletterInstance.userGroup.webaddress}" />
 						</g:if>
 					</tbody>
 				</table>

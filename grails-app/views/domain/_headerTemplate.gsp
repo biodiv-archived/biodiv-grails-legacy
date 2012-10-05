@@ -20,22 +20,22 @@
 				<g:if test="${userGroupInstance && userGroupInstance.id}">
 					<!--li class="menu-449 first"><a href="/" title="">Home</a></li-->
 					<li class="${(params.action == 'show')?' active':''}"><a
-						href="${createLink(controller:"userGroup", "action":"show",  id:userGroupInstance.id)}"
+						href="${createLink(mapping:"userGroup", params:['webaddress':userGroupInstance.webaddress])}"
 						title="Activity">Activity</a>
 					</li>
 					<li class="${(params.action == 'observations')?' active':''}"><a
-						href="${createLink(controller:"userGroup", "action":"observations",  id:userGroupInstance.id)}"
+						href="${createLink(mapping:"userGroup", "action":"observations", params:['webaddress':userGroupInstance.webaddress])}"
 						title="Observations">Observations</a>
 					</li>
 
 					<li
 						class="${((params.controller == 'user' || params.controller == 'SUser')&& params.action != 'header')?' active':''}"><a
-						href="${createLink(controller:"userGroup", "action":"members",  id:userGroupInstance.id)}"
+						href="${createLink(mapping:"userGroup", "action":"members", params:['webaddress':userGroupInstance.webaddress])}"
 						title="Members">Members</a>
 					</li>
 
 					<li class="${(params.action == 'aboutUs')?' active':''}"><a
-						href="${createLink(controller:"userGroup", "action":"aboutUs",  id:userGroupInstance.id)}"
+						href="${createLink(mapping:"userGroup", "action":"aboutUs", params:['webaddress':userGroupInstance.webaddress])}"
 						title="About Us">About Us</a>
 					</li>
 					<li class="dropdown"><a href="#" class="dropdown-toggle"
@@ -43,7 +43,7 @@
 						<ul class="dropdown-menu" style="text-align: left;">
 
 							<li class="${(params.action == 'pages')?' active':''}"><a
-								href="${createLink(controller:"userGroup", "action":"pages",  id:userGroupInstance.id)}"
+								href="${createLink(mapping:"userGroup", "action":"pages", params:['webaddress':userGroupInstance.webaddress])}"
 								title="Pages">Pages</a>
 							</li>
 							<li
@@ -75,7 +75,7 @@
 								href="/browsechecklists" title="Checklists">All Checklists</a></li>
 							<li
 								class="${(params.controller == 'userGroup' && params.action== 'list')?' active':''}"><a
-								href="${createLink(controller:"userGroup", "action":"list")}"
+								href="${createLink(mapping:"userGroupGeneric", "action":"list")}"
 								title="Groups is in Beta. We would like you to provide valuable feedback, suggestions and interest in using the groups functionality.">All Groups<sup >Beta</sup></a>
 							</li>
 
@@ -104,7 +104,7 @@
 
 						<ul class="dropdown-menu" style="text-align: left; color: #000">
 							<li class="${(params.action == 'pages')?' active':''}"><a
-								href="${createLink(controller:"userGroup", "action":"pages")}"
+								href="${createLink(mapping:"pages", "action":"pages")}"
 								title="Pages">Pages</a>
 							</li>
 							<li
@@ -137,7 +137,7 @@
 
 							<li
 								class="${(params.controller == 'userGroup'  && params.action== 'list')?' active':''}"><a
-								href="${createLink(controller:"userGroup", "action":"list")}"
+								href="${createLink(mapping:"userGroupGeneric", "action":"list")}"
 								title="Groups is in Beta. We would like you to provide valuable feedback, suggestions and interest in using the groups functionality.">All Groups<sup>Beta</sup></a>
 							</li>
 						</ul>

@@ -233,7 +233,9 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 								<!-- div class="title">This observation belongs to following groups</div-->
 								<ul class="thumbnails">
 									<g:each in="${observationInstance.userGroups}" var="userGroup">
-										<li class="thumbnail"><g:link controller="userGroup" action="show" id="${userGroup.id}"><img class="logo" src="${userGroup.icon().fileName}" title="${userGroup.name}" alt="${userGroup.name}"></g:link></li>
+										<li class="thumbnail">
+											<uGroup:showUserGroupSignature  model="[ 'userGroup':userGroup]" />
+										</li>
 									</g:each>
 								</ul>
 								<!-- obv:showRelatedStory

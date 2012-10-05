@@ -13,8 +13,8 @@
 	</div>
 
 	<div class="btn btn-primary view-button">
-		<g:link action="show"
-			id="${userGroupInstance.id}">View</g:link>
+		<g:link mapping="userGroup" action="show"
+			params="['webaddress':userGroupInstance.webaddress]">View</g:link>
 	</div>
 
 
