@@ -127,14 +127,14 @@
 			</div>
 		</g:if>
 	</g:if>
-	
-	<div
-		style="display: block; width: 100%; overflow: auto; margin-bottom: 10px;">
-		<div style="float: right; clear: both;">
-			<sUser:showUserTemplate
-				model="['userInstance':observationInstance.author]" />
+	<g:if test="${showDetails}">
+		<div
+			style="display: block; width: 100%; overflow: auto; margin-bottom: 10px;">
+			<div style="float: right; clear: both;">
+				<sUser:showUserTemplate
+					model="['userInstance':observationInstance.author]" />
+			</div>
 		</div>
-
-	</div>
+	</g:if>
 	<obv:showFooter model="['observationInstance':observationInstance, 'showDetails':showDetails]"/>
 </div>
