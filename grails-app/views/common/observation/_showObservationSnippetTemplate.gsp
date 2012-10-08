@@ -2,7 +2,7 @@
 <%def imagePath = mainImage?mainImage.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.thumbnail.suffix): null%>
 
 <div class="snippet span8">
-	<div class="row">
+	<div class="row" style="position:relative;">
 		<div class="figure span3 observation_story_image" style="display: table;" 
 			title='<g:if test="${obvTitle != null}">${obvTitle}</g:if>'>
 
@@ -25,5 +25,11 @@
 		<div class="span5 observation_story_wrapper">
 			<obv:showStory model="['observationInstance':observationInstance]"></obv:showStory>
 		</div>
-	</div>
+		
+		<div style="position:absolute; right:5px; bottom:-3px;">
+				<sUser:showUserTemplate
+					model="['userInstance':observationInstance.author]" />
+		</div>
+</div>
+				
 </div>

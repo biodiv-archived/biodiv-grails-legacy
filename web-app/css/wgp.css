@@ -162,8 +162,12 @@ body { /*     background-color: #ffffff; */
 	width: 100px;
 }
 
-.prop .value {
-/* 	margin-left: 110px; */
+.observation .prop .value {
+ 	margin-left: 110px; 
+}
+
+.prop .value, .observations_list .prop .value {
+ 	margin-left: 22px; 
 }
 
 .observation-icons {
