@@ -42,7 +42,7 @@
 			</div>
 		</div>
 
-		<uGroup:joinLeaveGroupTemplate model="['showLeave':false]" />
+		<uGroup:joinLeaveGroupTemplate model="['showLeave':false, 'showJoin':true]" />
 		<div class="modal hide" id="leaveUsModalDialog">
 			<div class="modal-header">
 				<button type="button" class="close" data-dismiss="modal">×</button>
