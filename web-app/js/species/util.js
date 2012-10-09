@@ -54,7 +54,7 @@ function initRelativeTime(url){
 				serverTimeDiff = parseInt(data) - new Date().getTime();
 				$('body').timeago({serverTimeDiff:serverTimeDiff});
 			}, error: function(xhr, status, error) {
-				alert(xhr.responseText);
+				//alert(xhr.responseText);
 		   	}
 		});	
 	}
