@@ -106,6 +106,10 @@ input.dms_field {
 #ui-datepicker-div {
 	width: 16%;
 }
+
+.observation_create .super-section {
+	margin-left:0px;
+}
 </style>
 </head>
 <body>
