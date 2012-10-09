@@ -338,6 +338,8 @@ class UserGroupTagLib {
 	}
 
 	def showUserGroupSignature = {attrs, body ->
+		def model = attrs.model
+		model.showDetails = (model.showDetails != null)? model.showDetails : false
 		out<<render(template:"/common/userGroup/showUserGroupSignatureTemplate", model:attrs.model);
 	}
 	
