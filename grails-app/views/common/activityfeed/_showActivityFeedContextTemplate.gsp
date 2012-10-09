@@ -8,7 +8,7 @@
 			<obv:showSnippet model="['observationInstance':feedParentInstance]"></obv:showSnippet>
 		</g:if>
 		<g:elseif test="${feedInstance.rootHolderType ==  UserGroup.class.getCanonicalName()}" >
-			<uGroup:showUserGroupSignature model="['userGroup':feedParentInstance]"></uGroup:showUserGroupSignature>
+			<uGroup:showUserGroupSignature model="['userGroup':feedParentInstance, 'showDetails':true]"></uGroup:showUserGroupSignature>
 		</g:elseif>
 		<g:else>
 			${feedInstance.rootHolderType}

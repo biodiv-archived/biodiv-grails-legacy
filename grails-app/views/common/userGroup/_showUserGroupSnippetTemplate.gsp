@@ -6,7 +6,7 @@
 	title='<g:if test="${userGroupTitle != null}">${userGroupTitle}</g:if>'>
 
 	<uGroup:showUserGroupSignature
-		model="[ 'userGroup':userGroupInstance, 'pos':pos]" />
+		model="[ 'userGroup':userGroupInstance, 'pos':pos, 'showDetails':true]" />
 </td>
 
 <uGroup:showStory
