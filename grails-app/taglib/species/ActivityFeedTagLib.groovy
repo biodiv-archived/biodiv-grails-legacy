@@ -83,7 +83,7 @@ class ActivityFeedTagLib {
 		def text = null
 		def activityTitle = null
 		
-		println "=============================$model.feedInstance"
+		println "==============$model.feedInstance === $model.feedInstance.activityType"
 		switch (activityType) {
 			case activityFeedService.COMMENT_ADDED:
 				activityTitle = activityFeedService.COMMENT_ADDED

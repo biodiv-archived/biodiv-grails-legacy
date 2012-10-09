@@ -322,7 +322,6 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
          preLoadRecos(3, false);
          
      	$('#addRecommendation').bind('submit', function(event) {
-     		alert("clicked ");
      		$(this).ajaxSubmit({ 
 	         	url:"${createLink(controller:'observation', action:'addRecommendationVote')}",
 				dataType: 'json', 
