@@ -1,4 +1,4 @@
-<div class="container" style="width:100%; height: 120px;">
+<div class="container" style="width:100%; height: 100px;">
 	<div style="padding: 10px 0px;">
 	<g:if test="${userGroupInstance  && userGroupInstance.id }">
 		<uGroup:showHeader model=[ 'userGroupInstance':userGroupInstance] />
@@ -12,9 +12,9 @@
 	</g:else>
 </div>
 </div>
-<div class="navbar navbar-static-top" style="margin-bottom:0px;position: relative; top: -10px;">
+<div class="navbar navbar-static-top" style="margin-bottom:0px;position: relative; ">
 	<div class="navbar-inner"
-		style="box-shadow: none; background-color: transparent; background-image: none;">
+		style="padding:0px;box-shadow: none; background-color: transparent; background-image: none;">
 		<div class="container outer-wrapper" style="background-color:transparent;padding:0px">
 			<ul class="nav btn" style="width: 100%; margin: 0px;padding:4px 0px;">
 				<g:if test="${userGroupInstance && userGroupInstance.id}">

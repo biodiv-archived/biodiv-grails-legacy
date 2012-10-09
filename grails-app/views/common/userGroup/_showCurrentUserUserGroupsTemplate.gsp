@@ -22,8 +22,7 @@ def otherUsergroups =  userGroups[true] %>
 		}
 	 %> <label class="radio">
 						<button type="button" class="btn ${checked?'active btn-success':''} single-post" value="${userGroup.key.id}">
-							<img class="logo" src="${userGroup.key.icon().fileName}"
-								title="${userGroup.key.name}" alt="${userGroup.key.name}" />
+							<uGroup:showUserGroupSignature  model="[ 'userGroup':userGroup.key]" />
 						</button> </label>
 			</g:each>
 		</ul>

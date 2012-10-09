@@ -35,7 +35,7 @@ class UserGroupController {
 	static allowedMethods = [save: "POST", update: "POST",]
 
 	def index = {
-		redirect  url: createLink(mapping: 'userGroupGeneric', action: "list", params: params)
+		redirect  url: createLink(mapping: 'userGroup', action: "show", params: params)
 	}
 
 	def list = {
