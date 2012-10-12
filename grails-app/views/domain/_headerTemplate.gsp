@@ -19,8 +19,8 @@
 			<ul class="nav btn" style="width: 100%; margin: 0px;padding:4px 0px;">
 				<g:if test="${userGroupInstance && userGroupInstance.id}">
 					<!--li class="menu-449 first"><a href="/" title="">Home</a></li-->
-					<li class="${(params.action == 'show')?' active':''}"><a
-						href="${createLink(mapping:"userGroup", params:['webaddress':userGroupInstance.webaddress])}"
+					<li class="${(params.action == 'activity')?' active':''}"><a
+						href="${createLink(mapping:"userGroup", "action":"activity", params:['webaddress':userGroupInstance.webaddress])}"
 						title="Activity">Activity</a>
 					</li>
 					<li class="${(params.action == 'observations')?' active':''}"><a

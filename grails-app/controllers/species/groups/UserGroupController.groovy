@@ -38,6 +38,14 @@ class UserGroupController {
 		redirect  url: createLink(mapping: 'userGroup', action: "show", params: params)
 	}
 
+	def activity = {
+		log.debug params
+		def userGroupInstance = findInstance();
+		if (userGroupInstance) {
+			[userGroupInstance: userGroupInstance]
+		}
+	}
+	
 	def list = {
 		def model = getUserGroupList(params);
 		if(!params.isGalleryUpdate?.toBoolean()){
