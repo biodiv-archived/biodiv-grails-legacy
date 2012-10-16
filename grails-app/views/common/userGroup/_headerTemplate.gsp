@@ -1,6 +1,3 @@
-
-
-
 		<g:link mapping="userGroup" action="show" class="span3 logo" style="margin-left:0px;"
 			params="['webaddress':userGroupInstance.webaddress]">
 			<img class="logo" src="${userGroupInstance.mainImage()?.fileName}"

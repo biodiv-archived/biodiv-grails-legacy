@@ -43,10 +43,9 @@
 					<div class="row section" style="">
 						<div class="figure span3"
 							style="float: left; max-height: 220px; max-width: 200px">
-							<g:link controller="SUser" action="show"
-								id="${user.id }">
+							<a href="${uGroup.createLink([action:"show", controller:"SUser", id:user.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':userGroupWebaddress])}">
 								<img class="normal_profile_pic" src="${user.icon()}" />
-							</g:link>
+							</a>
 
 							<%--						<div class="prop">--%>
 							<%--							<span class="name">Member since </span> <span class="value">--%>
@@ -177,7 +176,7 @@
 						</span> 	Observations
 					</h5>
 					<obv:showRelatedStory
-						model="['controller':'observation', 'action':'getRelatedObservation', 'filterProperty': 'user', 'filterPropertyValue':user.id, 'id':'a']" />
+						model="['controller':'observation', 'action':'getRelatedObservation', 'filterProperty': 'user', 'filterPropertyValue':user.id, 'id':'a', 'userGroup':userGroupInstance, 'userGroupWebaddress':userGroupWebaddress]" />
 				</div>
 				
 				<div class="section" style="clear: both;">
@@ -238,7 +237,7 @@
          		url: "${createLink(action:'getRecommendationVotes', id:user.id) }",
 				method: "POST",
 				dataType: "json",
-				data: {max:max , offset:userRecoffset, obvId:obvId},	
+				data: {max:max , offset:userRecoffset, obvId:obvId, 'userGroupWebaddress':"${userGroupWebaddress}"},	
 				success: function(data) {
 					if(seeAllClicked){
 						$("#recoSummary").append(data.recoHtml);

@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<%@page import="species.groups.UserGroup"%>
 <%@page import="species.utils.Utils"%>
 <%@page
 	import="org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils"%>
@@ -36,7 +37,9 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 <g:layoutHead />
 
 <!-- script src="http://cdn.wibiya.com/Toolbars/dir_1100/Toolbar_1100354/Loader_1100354.js" type="text/javascript"></script><noscript><a href="http://www.wibiya.com/">Web Toolbar by Wibiya</a></noscript-->
-
+<g:if test="${userGroupInstance && userGroupInstance.theme}">
+	<link rel="stylesheet" type="text/css" href="${resource(dir:'group-themes', file:userGroupInstance.theme + '.css')}"/>
+</g:if>
 
 </head>
 <body>
@@ -44,19 +47,21 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 		<span>Loading ...</span>
 	</div>
 	
-	
-	
-	
 	<auth:ajaxLogin />
 	<div id="fb-root"></div>
+	<%
+		def userGroupInstance;
+		if(params.userGroup) {
+			userGroupInstance = UserGroup.get(params.long('userGroup'));
+		} else if(params.webaddress) {
+			userGroupInstance = UserGroup.findByWebaddress(params.webaddress);
+		}
+	%>
 	
 	<div id="species_main_wrapper" style="clear:both;">
-		<domain:showIBPHeader />
+		<domain:showIBPHeader model="['userGroupInstance':userGroupInstance]"/>
 
 		<div class="container outer-wrapper">
-				<g:if test="${params.controller != 'openId' && params.controller != 'login' &&  params.controller != 'register'}">
-					<uGroup:showSidebar />
-				</g:if>
 				<div>
 				<div style="padding:10px 0px">
 					<g:layoutBody />

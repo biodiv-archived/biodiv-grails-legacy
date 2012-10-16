@@ -1,41 +1,62 @@
-<div class="container" style="width:100%; height: 100px;">
+<div class="container group-theme" style="width:100%; height: 100px;">
 	<div style="padding: 10px 0px;">
-	<g:if test="${userGroupInstance  && userGroupInstance.id }">
-		<uGroup:showHeader model=[ 'userGroupInstance':userGroupInstance] />
-	</g:if>
-	<g:else>
-		<a href="/" class="span3 logo" style="margin-left: 0px;"> <img
-			class="logo" src="/sites/all/themes/ibp/images/map-logo.gif"
-			title="India Biodiversity Portal" alt="India Biodiversity Portal">
-		</a>
-		<h1>India Biodiversity Portal</h1>
-	</g:else>
+		<g:if test="${userGroupInstance  && userGroupInstance.id }">
+			<uGroup:showHeader model="[ 'userGroupInstance':userGroupInstance]" />
+		</g:if>
+		<g:else>
+			<a href="/" class="span3 logo" style="margin-left: 0px;"> <img
+				class="logo" src="/sites/all/themes/ibp/images/map-logo.gif"
+				title="India Biodiversity Portal" alt="India Biodiversity Portal">
+			</a>
+			<h1>India Biodiversity Portal</h1>
+		</g:else>
+	</div>
 </div>
-</div>
-<div class="navbar navbar-static-top" style="margin-bottom:0px;position: relative; ">
+<div class="navbar navbar-static-top"
+	style="margin-bottom: 0px; position: relative;">
 	<div class="navbar-inner"
-		style="padding:0px;box-shadow: none; background-color: transparent; background-image: none;">
-		<div class="container outer-wrapper" style="background-color:transparent;padding:0px">
-			<ul class="nav btn" style="width: 100%; margin: 0px;padding:4px 0px;">
+		style="padding: 0px; box-shadow: none; background-color: transparent; background-image: none;">
+		<div class="container outer-wrapper"
+			style="background-color: transparent; padding: 0px">
+			<ul class="nav btn"
+				style="width: 100%; margin: 0px; padding: 4px 0px;">
 				<g:if test="${userGroupInstance && userGroupInstance.id}">
+
 					<!--li class="menu-449 first"><a href="/" title="">Home</a></li-->
-					<li class="${(params.action == 'show')?' active':''}"><a
-						href="${createLink(mapping:"userGroup", params:['webaddress':userGroupInstance.webaddress])}"
+
+					<li
+						class="${(params.controller == 'userGroup' && params.action == 'activity')?' active':''}"><a
+						href="${createLink(mapping:"userGroup", "action":"activity", params:['webaddress':userGroupInstance.webaddress])}"
 						title="Activity">Activity</a>
 					</li>
-					<li class="${(params.action == 'observations')?' active':''}"><a
-						href="${createLink(mapping:"userGroup", "action":"observations", params:['webaddress':userGroupInstance.webaddress])}"
+
+
+					<li
+						class="${(params.controller == 'userGroup' && params.action == 'species')?' active':''}"><a
+						href="${createLink(mapping:"userGroup", "action":"species", params:['webaddress':userGroupInstance.webaddress])}"
+						title="Species">Species</a>
+					</li>
+					<li
+						class="${(request.getHeader('referer')?.contains('/map'))?' active':''}"><a
+						href="/map" title="Maps">Maps</a></li>
+					<li
+						class="${(request.getHeader('referer')?.contains('/browsechecklists'))?' active':''}"><a
+						href="/browsechecklists" title="Checklists">Checklists</a></li>
+
+
+					<li class="${(params.action == 'observation')?' active':''}"><a
+						href="${createLink(mapping:"userGroup", "action":"observation", params:['webaddress':userGroupInstance.webaddress])}"
 						title="Observations">Observations</a>
 					</li>
 
 					<li
 						class="${((params.controller == 'user' || params.controller == 'SUser')&& params.action != 'header')?' active':''}"><a
-						href="${createLink(mapping:"userGroup", "action":"members", params:['webaddress':userGroupInstance.webaddress])}"
+						href="${createLink(mapping:"userGroup", "action":"user", params:['webaddress':userGroupInstance.webaddress])}"
 						title="Members">Members</a>
 					</li>
 
 					<li class="${(params.action == 'aboutUs')?' active':''}"><a
-						href="${createLink(mapping:"userGroup", "action":"aboutUs", params:['webaddress':userGroupInstance.webaddress])}"
+						href="${createLink(mapping:"userGroup", "action":"about", params:['webaddress':userGroupInstance.webaddress])}"
 						title="About Us">About Us</a>
 					</li>
 					<li class="dropdown"><a href="#" class="dropdown-toggle"
@@ -61,26 +82,8 @@
 								class="${(request.getHeader('referer')?.contains('/themepages/list'))?' active':''}"><a
 								href="/themepages/list" title="Themes">Themes</a></li>
 						</ul></li>
-					<li style="float: right;">
-						<ul class="nav">
 
-							<li class="${(params.controller == 'species')?' active':''}"><a
-								href="${createLink(controller:"species", "action":"list")}"
-								title="Species">All Species</a>
-							</li>
-							<li class="${(request.getHeader('referer')?.contains('/map'))?' active':''}"><a
-								href="/map" title="Maps">All Maps</a></li>
-							<li
-								class="${(request.getHeader('referer')?.contains('/browsechecklists'))?' active':''}"><a
-								href="/browsechecklists" title="Checklists">All Checklists</a></li>
-							<li
-								class="${(params.controller == 'userGroup' && params.action== 'list')?' active':''}"><a
-								href="${createLink(mapping:"userGroupGeneric", "action":"list")}"
-								title="Groups is in Beta. We would like you to provide valuable feedback, suggestions and interest in using the groups functionality.">All Groups<sup >Beta</sup></a>
-							</li>
 
-						</ul>
-					</li>
 				</g:if>
 				<g:else>
 					<li class=" ${(params.controller == 'activityFeed')?'active':''}"><a
@@ -88,6 +91,15 @@
 					</li>
 
 					<!--li class="menu-449 first"><a href="/" title="">Home</a></li-->
+					<li class=" ${(params.controller == 'species')?'active':''}"><a
+						href="${createLink("controller":"species")}" title="Species">
+							Species</a></li>
+					<li
+						class="${(request.getHeader('referer')?.contains('/map'))?' active':''}"><a
+						href="/map" title="Maps">Maps</a></li>
+					<li
+						class="${(request.getHeader('referer')?.contains('/browsechecklists'))?' active':''}"><a
+						href="/browsechecklists" title="Checklists">Checklists</a></li>
 
 					<li class="${(params.controller == 'observation')?'active':''}"><a
 						href="${createLink("controller":"observation")}"
@@ -97,7 +109,8 @@
 						class="${((params.controller == 'user' || params.controller == 'SUser') && params.action != 'header')?' active':''}"><a
 						href="${createLink(controller:'user', action:'list')}"
 						title="Members">Members</a></li>
-					<li class="${(request.getHeader('referer')?.contains('/about'))?' active':''}"><a
+					<li
+						class="${(request.getHeader('referer')?.contains('/about'))?' active':''}"><a
 						href="/about" title="About Us">About Us </a></li>
 					<li class="dropdown"><a href="#" class="dropdown-toggle"
 						data-toggle="dropdown"> More <b class="caret"></b> </a>
@@ -124,24 +137,7 @@
 
 						</ul>
 					</li>
-					<li style="float: right;">
-						<ul class="nav">
-							<li class=" ${(params.controller == 'species')?'active':''}"><a
-								href="${createLink("controller":"species")}" title="Species">All
-									Species</a></li>
-							<li class="${(request.getHeader('referer')?.contains('/map'))?' active':''}"><a
-								href="/map" title="Maps">All Maps</a></li>
-							<li
-								class="${(request.getHeader('referer')?.contains('/browsechecklists'))?' active':''}"><a
-								href="/browsechecklists" title="Checklists">All Checklists</a></li>
 
-							<li
-								class="${(params.controller == 'userGroup'  && params.action== 'list')?' active':''}"><a
-								href="${createLink(mapping:"userGroupGeneric", "action":"list")}"
-								title="Groups is in Beta. We would like you to provide valuable feedback, suggestions and interest in using the groups functionality.">All Groups<sup>Beta</sup></a>
-							</li>
-						</ul>
-					</li>
 
 				</g:else>
 			</ul>

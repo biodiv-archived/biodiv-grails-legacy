@@ -1,5 +1,7 @@
 package species
 
+import species.groups.UserGroup;
+
 class DomainTagLib {
 	static namespace = "domain"
 
@@ -12,7 +14,7 @@ class DomainTagLib {
 	}
 
 	def showIBPHeader = { attrs ->
-		out << render(template:"/domain/ibpHeaderTemplate");
+		out << render(template:"/domain/ibpHeaderTemplate", model:attrs.model);
 	}
 
 	def showIBPFooter = { attrs ->
@@ -20,7 +22,7 @@ class DomainTagLib {
 	}
 	
 	def showHeader = { attrs ->
-		out << render(template:"/domain/headerTemplate");
+		out << render(template:"/domain/headerTemplate", model:attrs.model);
 	}
 
 }

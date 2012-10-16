@@ -4,8 +4,16 @@
 
 	<div class="figure" style="height:150px;"
 		title='<g:if test="${obvTitle != null}">${obvTitle}</g:if>'>
-		<g:link action="show" controller="observation"
-			id="${observationInstance.id}" params="['pos':pos]" name="g${pos}">
+		<g:if test="${userGroup}">
+			<g:set var="url" value="${createLink(mapping:'userGroupModule', controller:'observation', action:'show', id:observationInstance.id, params:['pos':pos, 'webaddress':userGroup.webaddress]) }"/>
+		</g:if>
+		<g:elseif test="${userGroupWebaddress }">
+			<g:set var="url" value="${createLink(mapping:'userGroupModule', controller:'observation', action:'show', id:observationInstance.id, params:['webaddress':userGroupWebaddress]) }"/>
+		</g:elseif>
+		<g:else>
+			<g:set var="url" value="${createLink( controller:'observation', action:'show', id:observationInstance.id, params:['pos':pos]) }"/>
+		</g:else>
+		<g:link url="${url}" name="g${pos}">
 			<g:if
 				test="${imagePath && (new File(grailsApplication.config.speciesPortal.observations.rootDir + imagePath)).exists()}">
 				<img
@@ -20,6 +28,6 @@
 	</div>
 	<div class="all_content">
 		<obv:showStoryTablet
-			model="['observationInstance':observationInstance]"></obv:showStoryTablet>
+			model="['observationInstance':observationInstance, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress]"></obv:showStoryTablet>
 	</div>
 </div>

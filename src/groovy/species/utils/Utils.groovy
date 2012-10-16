@@ -140,6 +140,11 @@ class Utils {
 		def domain = getDomain(request);
 		return "$request.scheme://$domain$request.contextPath";
 	}
+	
+	static String getIBPServerUrl() {
+		def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config;
+		return "http://$config.ibp.domain/$config.appName";
+	}
 
 	static String getDomainName(HttpServletRequest request) {
 		def domain = getDomain(request);

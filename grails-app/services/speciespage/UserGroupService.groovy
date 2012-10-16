@@ -451,6 +451,7 @@ class UserGroupService {
 		return result;
 	}
 
+	
 	////////////////////MEMBERS RELATED/////////////////////////
 	/**
 	 *
@@ -702,5 +703,9 @@ class UserGroupService {
 			queryParams);
 		}
 
+	}
+	
+	def getGroupThemes(){
+		return ["blue", "green", "black"]
 	}
 }

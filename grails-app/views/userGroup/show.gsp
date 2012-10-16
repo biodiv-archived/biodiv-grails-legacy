@@ -24,7 +24,7 @@
 				String fbAppId;
 				if(domain.equals(grailsApplication.config.wgp.domain)) {
 					fbAppId = grailsApplication.config.speciesPortal.wgp.facebook.appId;
-				} else if(domain.equals(grailsApplication.config.ibp.domain)) {
+				} else { //if(domain.equals(grailsApplication.config.ibp.domain)) {
 					fbAppId =  grailsApplication.config.speciesPortal.ibp.facebook.appId;
 				}
 				
@@ -52,35 +52,37 @@
 </style>
 </head>
 <body>
-
-	<div class="observation span12">
-
-		<uGroup:showSubmenuTemplate model="['entityName':'Activity Stream']"/>
-		<uGroup:rightSidebar model="['userGroupInstance':userGroupInstance]"/>
-		<div class="userGroup-section center_panel">
-				<!-- div id="map_view_bttn" class="btn-group">
-								<a class="btn btn-success dropdown-toggle"
-									data-toggle="dropdown" href="#"
-									onclick="$(this).parent().css('background-color', '#9acc57'); showMapView(); return false;">
-									Map view <span class="caret"></span> </a>
-							</div>
-							<div id="observations_list_map" class="observation"
-								style="clear: both; display: none;">
-								<uGroup:showActivityOnMap model="['userGroupInstance':userGroupInstance]"/>
-							</div-->
-
-				<div>
-					<%
-								def canPostComment = customsecurity.hasPermissionForAction([object:userGroupInstance, permission:org.springframework.security.acls.domain.BasePermission.WRITE]).toBoolean()
-							%>
-								<comment:showAllComments
-									model="['commentHolder':userGroupInstance, commentType:'super', 'canPostComment':canPostComment, 'showCommentList':false]" />
-							</div>
-							<feed:showFeedWithFilter model="['rootHolder':userGroupInstance, feedType:'GroupSpecific', refreshType:'manual', feedPermission:'editable', feedCategory:'All','feedOrder':'latestFirst']" />
-<%--							<feed:showAllActivityFeeds model="['rootHolder':userGroupInstance, feedType:'GroupSpecific', refreshType:'manual', 'feedPermission':'editable']" />--%>
-			</div>
-		
-	</div>
+	<g:if test="${userGroupInstance.homePage && userGroupInstance.homePage.endsWith('activity')}">
+		<g:include controller="userGroup" action="activity" id="${userGroupInstance.id}"/>
+	</g:if>
+	<g:else>
+		<g:include controller="userGroup" action="about" id="${userGroupInstance.id}"/>
+	</g:else>
+<%--	<g:include controller="userGroup" action="page" id="${userGroupInstance.id}"/>--%>
+<%--	<g:include controller="userGroup" action="activity" id="${userGroupInstance.id}"/>--%>
+<%--		<uGroup:showSubmenuTemplate model="['entityName':'Activity Stream']"/>--%>
+<%--		<uGroup:rightSidebar model="['userGroupInstance':userGroupInstance]"/>--%>
+<%--		<div class="userGroup-section center_panel">--%>
+<%--				<!-- div id="map_view_bttn" class="btn-group">--%>
+<%--								<a class="btn btn-success dropdown-toggle"--%>
+<%--									data-toggle="dropdown" href="#"--%>
+<%--									onclick="$(this).parent().css('background-color', '#9acc57'); showMapView(); return false;">--%>
+<%--									Map view <span class="caret"></span> </a>--%>
+<%--							</div>--%>
+<%--							<div id="observations_list_map" class="observation"--%>
+<%--								style="clear: both; display: none;">--%>
+<%--								<uGroup:showActivityOnMap model="['userGroupInstance':userGroupInstance]"/>--%>
+<%--							</div-->--%>
+<%----%>
+<%--			<div>--%>
+<%--				<%--%>
+<%--					def canPostComment = customsecurity.hasPermissionForAction([object:userGroupInstance, permission:org.springframework.security.acls.domain.BasePermission.WRITE]).toBoolean()--%>
+<%--				%>--%>
+<%--				<comment:showAllComments--%>
+<%--					model="['commentHolder':userGroupInstance, commentType:'super', 'canPostComment':canPostComment, 'showCommentList':false]" />--%>
+<%--			</div>--%>
+<%--			<feed:showFeedWithFilter model="['rootHolder':userGroupInstance, feedType:'GroupSpecific', refreshType:'manual', feedPermission:'editable', feedCategory:'All','feedOrder':'latestFirst']" />--%>
+<%--		</div>--%>
 
 	<g:javascript>
 		$(document).ready(function() {

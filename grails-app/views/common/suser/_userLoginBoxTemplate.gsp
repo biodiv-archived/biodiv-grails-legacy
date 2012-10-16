@@ -1,3 +1,4 @@
+<%@page import="species.utils.Utils"%>
 <script>
 	<sec:ifLoggedIn>
 	$(function() {
@@ -86,19 +87,19 @@
 </style>
 <ul class="nav">
 	<sec:ifNotLoggedIn>
-		<li><g:link controller='login'>Login</g:link>
+		<li><g:link controller='login' absolute='true'>Login</g:link>
 		</li>
 		
-		<li><g:link controller='register'>Register</g:link>
+		<li><g:link controller='register' absolute='true'>Register</g:link>
 		</li>
 	</sec:ifNotLoggedIn>
 	<sec:ifLoggedIn>
 		<li class="dropdown">
-			<a href="#" class="dropdown-toggle pull-right" data-toggle="dropdown" style="float:right;">
+			<a href="#" class="dropdown-toggle" data-toggle="dropdown" style="float:right;">
 				<b class="caret" style="border-top-color: black;border-bottom-color: black;"></b>
 			</a>	
 				<ul class="dropdown-menu">
-					<li><a id="logout" href="${createLink(controller:'logout')}">Logout</a></li>
+					<li><a id="logout" href="${createLink(controller:'logout', absolute:true)}">Logout</a></li>
 				</ul>
 			<div class="login-box"><sUser:renderProfileLink /></div>
 		</li>

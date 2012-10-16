@@ -97,7 +97,9 @@ class SUserController extends UserController {
 			redirect(action: "list")
 		}
 		else {
-			return buildUserModel(SUserInstance)
+			def result = buildUserModel(SUserInstance)
+			result.put('userGroupWebaddress', params.webaddress)
+			return result
 		}
 	}
 
@@ -600,7 +602,7 @@ class SUserController extends UserController {
 					result.add(map);
 				}
 				//def noOfVotes = observationService.getAllRecommendationsOfUser(userInstance);
-				def model = ['result':result, 'totalVotes':result.size(), 'uniqueVotes':result.size()];
+				def model = ['result':result, 'totalVotes':result.size(), 'uniqueVotes':result.size(), 'userGroupWebaddress':params.userGroupWebaddress];
 				def html = g.render(template:"/common/observation/showObservationRecosTemplate", model:model);
 				def r = [
 							success : 'true',

@@ -20,6 +20,7 @@ import species.utils.ImageUtils
 import species.utils.Utils;
 import species.groups.SpeciesGroup;
 import species.groups.UserGroup;
+import species.groups.UserGroupController;
 import species.Habitat;
 import species.BlockedMails;
 import species.auth.SUser;
@@ -244,6 +245,7 @@ class ObservationController {
 	}
 
 	def show = {
+		log.debug params;
 		if(params.id) {
 			def observationInstance = Observation.findWhere(id:params.id.toLong(), isDeleted:false)
 			if (!observationInstance) {
@@ -254,14 +256,14 @@ class ObservationController {
 				observationInstance.incrementPageVisit();
 				if(params.pos) {
 					int pos = params.int('pos');
-					def prevNext = getPrevNextObservations(pos);
+					def prevNext = getPrevNextObservations(pos, params.webaddress);
 					if(prevNext) {
-						[observationInstance: observationInstance, prevObservationId:prevNext.prevObservationId, nextObservationId:prevNext.nextObservationId, lastListParams:prevNext.lastListParams]
+						[observationInstance: observationInstance, 'userGroupWebaddress':params.webaddress, prevObservationId:prevNext.prevObservationId, nextObservationId:prevNext.nextObservationId, lastListParams:prevNext.lastListParams]
 					} else {
-						[observationInstance: observationInstance]
+						[observationInstance: observationInstance, 'userGroupWebaddress':params.webaddress]
 					}
 				} else {
-					[observationInstance: observationInstance]
+					[observationInstance: observationInstance, 'userGroupWebaddress':params.webaddress]
 				}
 			}
 		}
@@ -272,41 +274,54 @@ class ObservationController {
 	 * @param pos
 	 * @return
 	 */
-	private def getPrevNextObservations(int pos) {
-		def lastListParams = session["obv_ids_list_params"]?.clone();
+	private def getPrevNextObservations(int pos, String userGroupWebaddress) {
+		
+		String listKey = "obv_ids_list";
+		String listParamsKey = "obv_ids_list_params"
+		if(userGroupWebaddress) {
+			listKey = userGroupWebaddress + listKey;
+			listParamsKey = userGroupWebaddress + listParamsKey;
+		}
+		def lastListParams = session[listParamsKey]?.clone();
+		println session;
+		println listKey
+		println listParamsKey
 		if(lastListParams) {
-		if(!session["obv_ids_list"]) {
-			log.debug "Fetching observations list as its not present in session "
-			runLastListQuery(lastListParams);
-		}
-
-		long noOfObvs = session["obv_ids_list"].size();
-		
-		log.debug "Current ids list in session ${session['obv_ids_list']} and position ${pos}";
-		def nextObservationId = (pos+1 < session["obv_ids_list"].size()) ? session["obv_ids_list"][pos+1] : null;
-		if(nextObservationId == null) {			
-			lastListParams.put("append", true);
-			def max = Math.min(lastListParams.max ? lastListParams.int('max') : 9, 100)
-			def offset = lastListParams.offset ? lastListParams.int('offset') : 0
-			lastListParams.offset = offset + session["obv_ids_list"].size();
-			log.debug "Fetching new page of observations using params ${lastListParams}";
-			runLastListQuery(lastListParams);
-			lastListParams.offset = offset;
-			nextObservationId = (pos+1 < session["obv_ids_list"].size()) ? session["obv_ids_list"][pos+1] : null;
-		}
-		def prevObservationId = pos > 0 ? session["obv_ids_list"][pos-1] : null;
-		
-		lastListParams.remove('isGalleryUpdate');
-		lastListParams.remove("append");
-		lastListParams['max'] = noOfObvs;
-		lastListParams['offset'] = 0;
-		return ['prevObservationId':prevObservationId, 'nextObservationId':nextObservationId, 'lastListParams':lastListParams];
+			if(!session[listKey]) {
+				log.debug "Fetching observations list as its not present in session "
+				runLastListQuery(lastListParams);
+			}
+	
+			long noOfObvs = session[listKey].size();
+			
+			log.debug "Current ids list in session ${session[listKey]} and position ${pos}";
+			def nextObservationId = (pos+1 < session[listKey].size()) ? session[listKey][pos+1] : null;
+			if(nextObservationId == null) {			
+				lastListParams.put("append", true);
+				def max = Math.min(lastListParams.max ? lastListParams.int('max') : 9, 100)
+				def offset = lastListParams.offset ? lastListParams.int('offset') : 0
+				lastListParams.offset = offset + session[listKey].size();
+				log.debug "Fetching new page of observations using params ${lastListParams}";
+				runLastListQuery(lastListParams);
+				lastListParams.offset = offset;
+				nextObservationId = (pos+1 < session[listKey].size()) ? session[listKey][pos+1] : null;
+			}
+			def prevObservationId = pos > 0 ? session[listKey][pos-1] : null;
+			
+			lastListParams.remove('isGalleryUpdate');
+			lastListParams.remove("append");
+			lastListParams['max'] = noOfObvs;
+			lastListParams['offset'] = 0;
+			return ['prevObservationId':prevObservationId, 'nextObservationId':nextObservationId, 'lastListParams':lastListParams];
 		}
 	}
 	
 	private void runLastListQuery(Map params) {
 		log.debug params;
-		if(params.action == 'search') {
+		if(params.webaddress) {
+			def userGroupController = new UserGroupController();
+			userGroupController.getUserGroupObservationsList(params)
+		} else if(params.action == 'search') {
 			observationService.getObservationsFromSearch(params);
 		} else {
 			getObservationList(params);
@@ -593,7 +608,7 @@ class ObservationController {
 				def results = observationInstance.getRecommendationVotes(params.max, params.offset);
 				log.debug results;
 				if(results?.recoVotes.size() > 0) {
-					def html =  g.render(template:"/common/observation/showObservationRecosTemplate", model:['observationInstance':observationInstance, 'result':results.recoVotes, 'totalVotes':results.totalVotes, 'uniqueVotes':results.uniqueVotes]);
+					def html =  g.render(template:"/common/observation/showObservationRecosTemplate", model:['observationInstance':observationInstance, 'result':results.recoVotes, 'totalVotes':results.totalVotes, 'uniqueVotes':results.uniqueVotes, 'userGroupWebaddress':params.userGroupWebaddress]);
 					def speciesNameHtml =  g.render(template:"/common/observation/showSpeciesNameTemplate", model:['observationInstance':observationInstance]);
 					def result = [
 								success : 'true',
@@ -773,7 +788,7 @@ class ObservationController {
 	def snippet = {
 		def observationInstance = Observation.get(params.id)
 
-		render (template:"/common/observation/showObservationSnippetTabletTemplate", model:[observationInstance:observationInstance]);
+		render (template:"/common/observation/showObservationSnippetTabletTemplate", model:[observationInstance:observationInstance, 'userGroupWebaddress':params.webaddress]);
 	}
 
 	private sendNotificationMail(String notificationType, Observation obv, request){
