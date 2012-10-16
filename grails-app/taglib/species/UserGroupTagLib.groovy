@@ -193,6 +193,7 @@ class UserGroupTagLib {
 	}
 
 	def showHeader = {attrs, body->
+		println attrs.model
 		out << render(template:"/common/userGroup/headerTemplate", model:attrs.model);
 	}
 
@@ -357,5 +358,61 @@ class UserGroupTagLib {
 		out << render(template:"/common/userGroup/showGeneralSettingsTemplate", model:attrs.model);
 	}
 	
+	def createLink = { attrs, body ->
+		out << userGroupBasedLink(attrs);
+	}
 	
+	def link = { attrs, body ->
+		out << userGroupBasedLink(attrs);
+	}
+	
+	private String userGroupBasedLink(attrs) {
+		println attrs
+		String url = "";
+		if(attrs.userGroup) {
+			attrs.webaddress = attrs.userGroup.webaddress
+			String base = attrs.base
+			attrs.remove('base');
+			String controller = attrs.controller;
+			attrs.remove('controller')
+			String action = attrs.action;
+			attrs.remove('userGroup');
+			attrs.remove('userGroupWebaddress');
+			if(base) {
+				url = g.createLink(mapping:'userGroupModule',  'controller':controller, 'action':action, 'base':base, params:attrs);
+			} else {
+				url = g.createLink(mapping:'userGroupModule',  'controller':controller, 'action':action, params:attrs);
+			}
+		} else if(attrs.userGroupWebaddress) {
+			attrs.webaddress = attrs.userGroupWebaddress
+			String base = attrs.base
+			attrs.remove('base');
+			String controller = attrs.controller;
+			attrs.remove('controller')
+			String action = attrs.action;
+			attrs.remove('action');
+			attrs.remove('userGroup');
+			attrs.remove('userGroupWebaddress');
+			if(base) {
+				url = g.createLink(mapping:'userGroupModule',  'controller':controller, 'action':action, 'base':base, params:attrs)
+			} else {
+				url = g.createLink(mapping:'userGroupModule', 'controller':controller, 'action':action, params:attrs)
+			}
+		} else {
+			String base = attrs.base
+			attrs.remove('base');
+			String controller = attrs.controller;
+			attrs.remove('controller')
+			String action = attrs.action;
+			attrs.remove('action');
+			attrs.remove('userGroup');
+			attrs.remove('userGroupWebaddress');
+			if(base) {
+				url = g.createLink('base':base, 'controller':controller, 'action':action, params:attrs)
+			} else {
+				url = g.createLink('controller':controller, 'action':action, params:attrs)
+			}
+		}
+		return url;
+	}
 }

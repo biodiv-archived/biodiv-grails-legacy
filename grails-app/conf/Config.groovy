@@ -386,7 +386,7 @@ jpegOptimProg = "/usr/bin/jpegoptim";
 
 environments {
 	development {
-		grails.serverURL = "http://localhost:8080/${appName}"
+		grails.serverURL = "http://indiabiodiversity.localhost.org/${appName}"
 		speciesPortal {
 			search.serverURL = "http://localhost:8090/solr"
 			names.parser.serverURL = "127.0.0.1"
@@ -434,11 +434,11 @@ environments {
 
 	}
 	test {
-		grails.serverURL = "http://localhost:8080/${appName}"
+		grails.serverURL = "http://indiabiodiversity.localhost.org/${appName}"
 		google.analytics.enabled = false
 	}
 	production {
-		grails.serverURL = "http://localhost:8080/${appName}"
+		grails.serverURL = "http://indiabiodiversity.localhost.org/${appName}"
 		speciesPortal {
 			search.serverURL = "http://localhost:8090/solr"
 			names.parser.serverURL = "127.0.0.1"
@@ -544,7 +544,7 @@ environments {
 	}
 
 	pamba {
-		grails.serverURL = "http://thewesternghats.in:8080/${appName}"
+		grails.serverURL = "http://indiabiodiversity.org/${appName}"
 		jpegOptimProg = '/usr/local/bin/jpegoptim'
 		
 		speciesPortal {

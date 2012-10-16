@@ -24,7 +24,7 @@
 				String fbAppId;
 				if(domain.equals(grailsApplication.config.wgp.domain)) {
 					fbAppId = grailsApplication.config.speciesPortal.wgp.facebook.appId;
-				} else if(domain.equals(grailsApplication.config.ibp.domain)) {
+				} else { //if(domain.equals(grailsApplication.config.ibp.domain)) {
 					fbAppId =  grailsApplication.config.speciesPortal.ibp.facebook.appId;
 				}
 				
@@ -56,7 +56,7 @@
 		<g:include controller="userGroup" action="activity" id="${userGroupInstance.id}"/>
 	</g:if>
 	<g:else>
-		<g:include controller="userGroup" action="aboutUs" id="${userGroupInstance.id}"/>
+		<g:include controller="userGroup" action="about" id="${userGroupInstance.id}"/>
 	</g:else>
 <%--	<g:include controller="userGroup" action="page" id="${userGroupInstance.id}"/>--%>
 <%--	<g:include controller="userGroup" action="activity" id="${userGroupInstance.id}"/>--%>

@@ -1,3 +1,4 @@
+<%@page import="species.utils.Utils"%>
 <div id="ibp-header" class="gradient-bg">
 	<div class=" gradient-bg navbar navbar-static-top"
 		style="margin-bottom: 0px;">
@@ -16,8 +17,16 @@
 
 
 					<ul class="nav pull-right">
-						<li><search:searchBox /></li>
-						<li><sUser:userLoginBox />
+						<li>
+								<search:searchBox />
+						</li>
+						<g:if test="${params.controller != 'openId' && params.controller != 'login' &&  params.controller != 'register'}">
+						<li>
+							<uGroup:showSidebar />
+						</li>
+						</g:if>
+						<li>
+							<sUser:userLoginBox />
 						</li>
 
 					</ul>
@@ -26,5 +35,5 @@
 
 		</div>
 	</div>
-	<domain:showHeader />
+	<domain:showHeader model="['userGroupInstance':userGroupInstance]"/>
 </div>

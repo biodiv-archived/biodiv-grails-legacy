@@ -82,11 +82,11 @@
 				<div id="observations_list_map" class="observation"
 					style="clear: both; display: none;">
 					<obv:showObservationsLocation
-						model="['observationInstanceList':totalObservationInstanceList]">
+						model="['observationInstanceList':totalObservationInstanceList, 'userGroup':userGroup]">
 					</obv:showObservationsLocation>
 				</div>
 			</div>
-			<obv:showObservationsList  model="['totalObservationInstanceList':totalObservationInstanceList, 'observationInstanceList':observationInstanceList, 'instanceTotal':instanceTotal, 'queryParams':queryParams, 'activeFilters':activeFilters]"  />
+			<obv:showObservationsList  model="['totalObservationInstanceList':totalObservationInstanceList, 'observationInstanceList':observationInstanceList, 'instanceTotal':instanceTotal, 'queryParams':queryParams, 'activeFilters':activeFilters, 'userGroup':userGroup]"  />
 		</div>
 	</div>
 

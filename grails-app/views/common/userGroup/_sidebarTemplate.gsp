@@ -3,11 +3,14 @@
 <%@ page import="species.Habitat"%>
 <%@ page import="species.participation.ActivityFeedService"%>
 
-<div class="sidebar left-sidebar span3">
+<ul class="nav sidebar left-sidebar span3">
 
-	<div class="sidebar_section">
+	<li class="dropdown">
+		<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+				My Home<b class="caret" style="border-top-color: black;border-bottom-color: black;"></b>
+		</a>	
 		<!--h5 class="nav-header">Home</h5-->
-		<ul class="nav block-tagadelic">
+		<ul class="dropdown-menu">
 			
 			<sec:ifLoggedIn>
 				<li><a
@@ -44,12 +47,13 @@
 
 
 		</ul>
-	</div>
+	</li>
 
-	<div class="sidebar_section">
+	<li class="dropdown">
+		<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+				Groups<b class="caret" style="border-top-color: black;border-bottom-color: black;"></b>
+		</a>	
 		<uGroup:showSuggestedUserGroups />
-		<small>Groups is in Beta. We would like you to provide valuable feedback, suggestions and interest in using the groups functionality.
-		</small>
-	</div>
+	<li>
 
-</div>
+</ul>

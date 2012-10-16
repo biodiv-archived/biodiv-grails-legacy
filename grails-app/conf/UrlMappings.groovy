@@ -27,7 +27,7 @@ class UrlMappings {
 			} }
 
 
-		"/"(controller:"observation", action:"list")
+		"/"(controller:"userGroup", action:"list")
 		"500"(view:'/error')
 		"403"(view:'/error')
 /*		"403"(controller: "errors", action: "error403")
@@ -59,6 +59,14 @@ class UrlMappings {
 		
 		name userGroup: "/group/$webaddress?/$action?" {
 			controller = 'userGroup'
+		}
+		
+		"/group/$webaddress/observation/list" {
+			controller='userGroup'
+			action='observation'
+		}
+
+		name userGroupModule:"/group/$webaddress?/$controller/$action/$id?" {
 		}
 		
 	}

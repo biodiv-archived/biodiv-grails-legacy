@@ -34,7 +34,7 @@
 							style="position: relative; overflow: visible;">
 							<div class="paginateButtons">
 								<center>
-									<g:paginateOnAlphabet total="${speciesInstanceTotal}" />
+									<p:paginateOnAlphabet controller="species" action="list" total="${speciesInstanceTotal}"  userGroup="${userGroup }" userGroupWebaddress="${userGroupWebaddress}"/>
 								</center>
 							</div>
 							<div class="btn-group" style="float: right; z-index: 10">
@@ -85,7 +85,8 @@
 								<g:set var="mainImage" value="${speciesInstance.mainImage()}" />
 								<%def thumbnailPath = ImageUtils.getFileName(mainImage?.fileName, ImageType.SMALL, null)%>
 								<div class="snippet tablet" style="width: 299px;height: 65px;">
-										<g:link action="show" id="${speciesInstance.id}">
+									<a href="${uGroup.createLink([controller:'species', action:'show', id:speciesInstance.id, userGroup:userGroup, userGroupWebaddress:userGroupWebaddress])}">
+										
 
 											<g:if test="${thumbnailPath }">
 												<img class="icon pull-right"
@@ -99,7 +100,7 @@
 													style="float: right;"></img>
 											</g:else>
 											<p class="caption">${speciesInstance.taxonConcept.italicisedForm}</p>
-										</g:link>
+										</a>
 									
 										
 										<div class="poor_species_content" style="display: none;">No
@@ -114,15 +115,15 @@
 
 					<div class="paginateButtons span11">
 						<center>
-							<g:paginate total="${speciesInstanceTotal}"
-								params="['startsWith':params.startsWith]" max="50" maxsteps="10" />
+							<p:paginate controller="species" action="list" total="${speciesInstanceTotal}"   userGroup="${userGroup}" userGroupWebaddress="${userGroupWebaddress}"
+								params="['startsWith':params.startsWith]" max="${params.max }" offset="${params.offset}" maxsteps="10" />
 						</center>
 					</div>
 					<br />
 
 					<div class="paginateButtons span11">
 						<center>
-							<g:paginateOnAlphabet total="${speciesInstanceTotal}" />
+							<p:paginateOnAlphabet controller="species" action="list" total="${speciesInstanceTotal}"  userGroup="${userGroup }" userGroupWebaddress="${userGroupWebaddress}"/>
 						</center>
 					</div>
 				</div>

@@ -22,7 +22,7 @@
 			</g:else>
 			<div class="value">
 				<obv:showSpeciesName
-					model="['observationInstance':observationInstance]" />
+					model="['observationInstance':observationInstance, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress]" />
 				<%--				<i class="icon-ok"></i>--%>
 			</div>
 		</div>

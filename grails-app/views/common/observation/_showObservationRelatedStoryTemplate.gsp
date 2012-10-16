@@ -11,7 +11,7 @@ $(document).ready(function() {
         carouselMsgDivId:"#relatedObservationMsg_" + "${id}",
         carouselAddObvDivId:"#relatedObservationAddButton_" + "${id}",
         itemFallbackDimension : 75,
-        contextUrl:"${createLink(controller:resultController?:controller, action:'show')}"
+        contextUrl:"${uGroup.createLink([controller:resultController?:controller, action:'show', 'userGroup':userGroupInstance, 'userGroupWebaddress':userGroupWebaddress])}"
 	});
 	
 	$('#carousel_${id} img').hover( function () {
@@ -31,10 +31,10 @@ $(document).ready(function() {
     </ul> 
     <div class="observation_links">
   		<g:if test="${observationId}">
-		    <a class="btn btn-mini" href="${createLink(controller:controller, action:'listRelated', params: [id: observationId, filterProperty : filterProperty, offset:0, limit:9])}">Show all</a>
+		    <a class="btn btn-mini" href="${uGroup.createLink([controller:controller, action:'listRelated', id: observationId, filterProperty : filterProperty, offset:0, limit:9, 'userGroup':userGroupInstance, 'userGroupWebaddress':userGroupWebaddress])}">Show all</a>
 		</g:if>
         <g:else>
-		    <a class="btn btn-mini" href="${createLink(controller:controller, action:'list', params: [(filterProperty) : filterPropertyValue])}">Show all</a>
+		    <a class="btn btn-mini" href="${uGroup.createLink([controller:controller, action:'list', (filterProperty) : filterPropertyValue, 'userGroup':userGroupInstance, 'userGroupWebaddress':userGroupWebaddress])}">Show all</a>
 		</g:else>
 	</div>
 

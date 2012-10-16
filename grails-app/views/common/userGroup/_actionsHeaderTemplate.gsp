@@ -23,9 +23,7 @@
 			<a id="inviteMembers" class="btn btn-large btn-primary" href="#"><i
 				class="icon-envelope"></i> <g:message code="userGroup.members.label"
 					default="Invite Members" /> </a>
-		</sec:permitted>
-
-		<div class="modal hide" id="inviteMembersDialog">
+			<div class="modal hide" id="inviteMembersDialog">
 			<div class="modal-header">
 				<button type="button" class="close" data-dismiss="modal">×</button>
 				<h3>Invite friends as members</h3>
@@ -47,23 +45,26 @@
 					id="invite" class="btn btn-primary">Invite</a>
 			</div>
 		</div>
+		</sec:permitted>
 
-		<uGroup:joinLeaveGroupTemplate model="['showLeave':false, 'showJoin':true]" />
-		<div class="modal hide" id="leaveUsModalDialog">
-			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal">×</button>
-				<h3>Do you want to leave this group???</h3>
-			</div>
-			<div class="modal-body">
-				<p>We would like to know your feedback and any ideas on making
-					this group a more interesting and a happening place. We are
-					thankful for your wonderful contribution to this group and would
-					like to hear from you soon.</p>
-			</div>
-			<div class="modal-footer">
-				<a href="#" class="btn" data-dismiss="modal">Close</a> <a href="#"
-					id="leave" class="btn btn-primary"
-					data-group-id="${userGroupInstance.id}">Leave</a>
-			</div>
+		
+
+		<uGroup:joinLeaveGroupTemplate model="['showLeave':false, 'showJoin':true, 'userGroupInstance':userGroupInstance]" />
+	<div class="modal hide" id="leaveUsModalDialog">
+		<div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal">×</button>
+			<h3>Do you want to leave this group???</h3>
+		</div>
+		<div class="modal-body">
+			<p>We would like to know your feedback and any ideas on making
+				this group a more interesting and a happening place. We are thankful
+				for your wonderful contribution to this group and would like to hear
+				from you soon.</p>
+		</div>
+		<div class="modal-footer">
+			<a href="#" class="btn" data-dismiss="modal">Close</a> <a href="#"
+				id="leave" class="btn btn-primary"
+				data-group-id="${userGroupInstance.id}">Leave</a>
 		</div>
 	</div>
+</div>

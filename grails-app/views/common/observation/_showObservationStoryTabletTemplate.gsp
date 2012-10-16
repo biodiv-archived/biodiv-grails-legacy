@@ -3,7 +3,7 @@
 <%@page import="species.utils.ImageType"%>
 <div class="observation_story tablet">
         
-        <h5><obv:showSpeciesName model="['observationInstance':observationInstance]" /></h5>
+        <h5><obv:showSpeciesName model="['observationInstance':observationInstance, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress]" /></h5>
         <div class="icons-bar">
             <div class="observation-icons">
                     <span class="group_icon species_groups_sprites active ${observationInstance.group.iconClass()}" title="${observationInstance.group?.name}"></span>
@@ -17,9 +17,19 @@
             </div>
 
             <div class="user-icon">
-                    <a href=/biodiv/SUser/show/${observationInstance.author.id}> <img
+            		<g:if test="${userGroup }">
+            			<g:set var="userUrl" value="${createLink(mapping:'userGroupModule', controller:'SUser', action:'show', id:observationInstance.author.id, params:['webaddress':userGroup.webaddress])}"/>
+            		</g:if>
+            		<g:elseif test="${userGroupWebaddress }">
+						<g:set var="url" value="${createLink(mapping:'userGroupModule', controller:'SUser', action:'show', id:observationInstance.author.id, params:['webaddress':userGroupWebaddress]) }"/>
+					</g:elseif>
+            		<g:else>
+            			<g:set var="userUrl" value="${createLink(controller:'SUser', action:'show', id:observationInstance.author.id)}"/>
+            		</g:else>
+                    <a href="${userUrl}"> <img
                             src="${observationInstance.author.icon()}" class="small_profile_pic"
                             title="${observationInstance.author.name}" /> </a>
+                    
             </div>
         </div>
 

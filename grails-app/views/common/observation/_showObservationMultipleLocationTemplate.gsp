@@ -1,5 +1,11 @@
 <div class="observation_location_wrapper">
 	<div class="observation_location">
+		<g:if test="${userGroup}">
+				<g:set var="snippetUrl" value="${createLink(mapping:'userGroupModule', controller:'observation', action:'snippet', params:['webaddress':userGroup.webaddress]) }"/>
+			</g:if>
+			<g:else>
+				<g:set var="snippetUrl" value="${createLink( controller:'observation', action:'snippet') }"/>
+			</g:else>
 		<g:javascript>
                 var markers = [];
                 var big_map;
@@ -82,7 +88,7 @@
                     
                   function load_content(map, marker, id, infowindow){
                       $.ajax({
-                        url: "${createLink(controller:'observation', action:'snippet') }"+"/"+id,
+                        url: "${snippetUrl }"+"/"+id,
                         success: function(data){
                           infowindow.setContent("<div id='info-content'>" + data + "</div>");
                           infowindow.open(map, marker);

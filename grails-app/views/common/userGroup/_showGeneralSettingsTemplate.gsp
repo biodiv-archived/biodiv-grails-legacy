@@ -11,7 +11,7 @@
 				</button>
 				<ul class="dropdown-menu" style="width: auto;">
 					<li class="group_option"><a class=" home_page_label"
-						value="${createLink(mapping:'userGroup', action:'aboutUs', params:['webaddress':userGroupInstance.webaddress])}"> ${createLink(mapping:'userGroup', action:'aboutUs', params:['webaddress':userGroupInstance.webaddress])} </a></li>
+						value="${createLink(mapping:'userGroup', action:'about', params:['webaddress':userGroupInstance.webaddress])}"> ${createLink(mapping:'userGroup', action:'about', params:['webaddress':userGroupInstance.webaddress])} </a></li>
 					<li class="group_option"><a class=" home_page_label"
 						value="${createLink(mapping:'userGroup', action:'activity', params:['webaddress':userGroupInstance.webaddress])}"> ${createLink(mapping:'userGroup', action:'activity', params:['webaddress':userGroupInstance.webaddress])} </a></li>
 					<li class="divider"></li>

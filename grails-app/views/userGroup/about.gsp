@@ -51,7 +51,7 @@
 					Members
 				</h5>
 				<div id="members_sidebar"></div>
-				<g:link mapping="userGroup" action="members"
+				<g:link mapping="userGroup" action="user"
 					params="['webaddress':userGroupInstance.webaddress]">...</g:link>
 			</div>
 		</div>

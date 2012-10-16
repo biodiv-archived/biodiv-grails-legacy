@@ -2,7 +2,7 @@
 <%@page import="species.utils.Utils"%>
 <div class="observation_story tablet">
 	<h5>
-		<a href=/biodiv/SUser/show/${userInstance.id}> ${userInstance.name}
+		<a href="${uGroup.createLink([action:"show", controller:"SUser", id:userInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':userGroupWebaddress])}"> ${userInstance.name}
 		</a>
 	</h5>
 	<div class="icons-bar">
