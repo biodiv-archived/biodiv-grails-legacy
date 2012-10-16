@@ -363,7 +363,6 @@ class UserGroupTagLib {
 	}
 	
 	private String userGroupBasedLink(attrs) {
-		println '----'
 		println attrs
 		String url = "";
 		if(attrs.userGroup) {
@@ -410,7 +409,6 @@ class UserGroupTagLib {
 				url = g.createLink('controller':controller, 'action':action, params:attrs)
 			}
 		}
-		println url;
 		return url;
 	}
 }
