@@ -35,6 +35,7 @@ class UserGroupController {
 	static allowedMethods = [save: "POST", update: "POST",]
 
 	def index = {
+		log.debug params
 		redirect  url: createLink(mapping: 'userGroup', action: "show", params: params)
 	}
 
@@ -99,10 +100,10 @@ class UserGroupController {
 
 		switch(params.filterProperty) {
 			case 'featuredObservations':
-				redirect  url: createLink(mapping: 'userGroup', action:'observations', params:['webaddress':params.webaddress]);
+				redirect  url: createLink(mapping: 'userGroup', action:'observation', params:['webaddress':params.webaddress]);
 				break;
 			case 'featuredMembers':
-				redirect  url: createLink(mapping: 'userGroup', action:'members',params:['webaddress':params.webaddress]);
+				redirect  url: createLink(mapping: 'userGroup', action:'user',params:['webaddress':params.webaddress]);
 				break;
 			case 'obvRelatedUserGroups':
 				redirect  url: createLink(mapping: 'userGroupGeneric', action:'list', params:[observation:params.id]);
@@ -287,7 +288,7 @@ class UserGroupController {
 		userGroup
 	}
 
-	def members = {
+	def user = {
 		def userGroupInstance = findInstance()
 		if (!userGroupInstance) return
 
@@ -328,7 +329,7 @@ class UserGroupController {
 			render ([result:foundersJSON] as JSON);
 			return;
 		}
-		render(view:"members", model:['userGroupInstance':userGroupInstance, 'founders':founders, 'foundersTotalCount':userGroupInstance.getFoundersCount(), 'membersTotalCount':userGroupInstance.getAllMembersCount(), 'expertsTotalCount':0]);
+		render(view:"user", model:['userGroupInstance':userGroupInstance, 'founders':founders, 'foundersTotalCount':userGroupInstance.getFoundersCount(), 'membersTotalCount':userGroupInstance.getAllMembersCount(), 'expertsTotalCount':0]);
 	}
 
 	def experts = {
@@ -339,27 +340,19 @@ class UserGroupController {
 		params.offset = params.offset ? params.int('offset') : 0
 
 		def experts = [];//userGroupInstance.getExperts(params.max, params.offset);
-		render(view:"members", model:['userGroupInstance':userGroupInstance, 'experts':experts, 'foundersTotalCount':userGroupInstance.getFoundersCount(), 'membersTotalCount':userGroupInstance.getAllMembersCount(), 'expertsTotalCount':0]);
+		render(view:"user", model:['userGroupInstance':userGroupInstance, 'experts':experts, 'foundersTotalCount':userGroupInstance.getFoundersCount(), 'membersTotalCount':userGroupInstance.getAllMembersCount(), 'expertsTotalCount':0]);
 	}
 
-	def observations = {
-		def userGroupInstance = findInstance()
-		if (!userGroupInstance) return
-
-			params.max = Math.min(params.max ? params.int('max') : 9, 100)
-		params.offset = params.offset ? params.int('offset') : 0
-
-		def model = userGroupService.getUserGroupObservations(userGroupInstance, params, params.max, params.offset);
-		def model2 = userGroupService.getUserGroupObservations(userGroupInstance, params, -1, -1, true);
-		def observationInstanceTotal = model2.observationInstanceList.size();
-		model['instanceTotal'] = observationInstanceTotal
-		model['totalObservationInstanceList'] = model2.observationInstanceList;
-
+	def observation = {
+		log.debug params;
+		def r = getUserGroupObservationsList(params);
+		def model = r.model
+		def model2 = r.model2; 
 		if(params.loadMore?.toBoolean()){
 			render(template:"/common/observation/showObservationListTemplate", model:model);
 			return;
 		} else if(!params.isGalleryUpdate?.toBoolean()){
-			render(view:"observations", model:model);
+			render(view:"observation", model:model);
 			return;
 		} else {
 			def obvListHtml =  g.render(template:"/common/observation/showObservationListTemplate", model:model);
@@ -367,9 +360,9 @@ class UserGroupController {
 			def tagsHtml = "";
 			if(model.showTags) {
 				def filteredTags = observationService.getTagsFromObservation(model.totalObservationInstanceList.collect{it[0]})
-				tagsHtml = g.render(template:"/common/observation/showAllTagsTemplate", model:[count: count, tags:filteredTags, isAjaxLoad:true]);
+				tagsHtml = g.render(template:"/common/observation/showAllTagsTemplate", model:[count: count, tags:filteredTags, isAjaxLoad:true, 'userGroup':userGroupInstance]);
 			}
-			def mapViewHtml = g.render(template:"/common/observation/showObservationMultipleLocationTemplate", model:[observationInstanceList:model2.observationInstanceList]);
+			def mapViewHtml = g.render(template:"/common/observation/showObservationMultipleLocationTemplate", model:[observationInstanceList:model2.observationInstanceList, 'userGroup':userGroupInstance]);
 
 			def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml, tagsHtml:tagsHtml, mapViewHtml:mapViewHtml]
 			render result as JSON
@@ -377,16 +370,37 @@ class UserGroupController {
 		}
 
 	}
-
-	def filteredMapBasedObservationsList = {
+	
+	def getUserGroupObservationsList(params) {
 		def userGroupInstance = findInstance()
 		if (!userGroupInstance) return
 
-			params.max = Math.min(params.max ? params.int('max') : 9, 100)
+		params.max = Math.min(params.max ? params.int('max') : 9, 100)
 		params.offset = params.offset ? params.int('offset') : 0
-
+		
 		def model = userGroupService.getUserGroupObservations(userGroupInstance, params, params.max, params.offset);
 		def model2 = userGroupService.getUserGroupObservations(userGroupInstance, params, -1, -1, true);
+		def observationInstanceTotal = model2.observationInstanceList.size();
+		model['instanceTotal'] = observationInstanceTotal
+		model['totalObservationInstanceList'] = model2.observationInstanceList;
+		model['userGroup'] = userGroupInstance;
+		model2['userGroup'] = userGroupInstance;
+		
+		if(params.append?.toBoolean()) {
+			session[userGroupInstance.webaddress+"obv_ids_list"].addAll(model.observationInstanceList.collect {it.id});
+		} else {
+			session[userGroupInstance.webaddress+"obv_ids_list_params"] = params.clone();
+			session[userGroupInstance.webaddress+"obv_ids_list"] = model.observationInstanceList.collect {it.id};
+		}
+		
+		log.debug "Storing all observations ids list in session ${session[userGroupInstance.webaddress+'obv_ids_list']} for params ${params}";
+		return [model:model, model2:model2];
+	}
+	
+	def filteredMapBasedObservationsList = {
+		def r = getUserGroupObservationsList(params);
+		def model = r.model
+		def model2 = r.model2; 
 		def totalCount = model2.observationInstanceList.size();
 		model['observationInstanceTotal'] = totalCount
 
@@ -559,7 +573,7 @@ class UserGroupController {
 		render (['msg':'Your presence is important to us. Cannot let you leave at present.','success':true, 'statusComplete':false]as JSON);
 	}
 
-	def aboutUs = {
+	def about = {
 		def userGroupInstance = findInstance()
 		if (!userGroupInstance) return;
 
@@ -880,6 +894,7 @@ class UserGroupController {
 		if (!userGroupInstance) return;
 		render (view:'myGroups', model:['userGroupInstance':userGroupInstance])
    }
+
 }
 
 class UserGroupCommand {

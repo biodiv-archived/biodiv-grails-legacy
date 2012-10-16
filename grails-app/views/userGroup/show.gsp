@@ -24,7 +24,7 @@
 				String fbAppId;
 				if(domain.equals(grailsApplication.config.wgp.domain)) {
 					fbAppId = grailsApplication.config.speciesPortal.wgp.facebook.appId;
-				} else if(domain.equals(grailsApplication.config.ibp.domain)) {
+				} else { //if(domain.equals(grailsApplication.config.ibp.domain)) {
 					fbAppId =  grailsApplication.config.speciesPortal.ibp.facebook.appId;
 				}
 				

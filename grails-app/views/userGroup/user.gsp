@@ -29,12 +29,12 @@
 			<div class="tabbable">
 				<ul class="nav nav-tabs">
 					<li
-						class="${(!params.action || params.action == 'members')?'active':'' }"><a
-						href="${createLink(action:'members', id:params.id)}"> All
+						class="${(!params.action || params.action == 'user')?'active':'' }"><a
+						href="${createLink(mapping:'userGroup', action:'user', params:['webaddress':userGroupInstance.webaddress])}"> All
 							Members (${membersTotalCount})</a></li>
 
 					<li class="${(params.action == 'founders')?'active':'' }"><a
-						href="${createLink(action:'founders', id:params.id)}">
+						href="${createLink(mapping:'userGroup', action:'founders', params:['webaddress':userGroupInstance.webaddress])}">
 							Founders (${foundersTotalCount})</a></li>
 					
 				</ul>
@@ -44,20 +44,20 @@
 				<g:if test="${params.action == 'founders' }">
 					<div class="tab-pane" id="founders">
 						<sUser:showUserListWrapper
-							model="['results':founders, 'totalCount':foundersTotalCount, 'queryParams':queryParams, 'searched':true]" />
+							model="['results':founders, 'totalCount':foundersTotalCount, 'queryParams':queryParams, 'searched':true, 'userGroupInstance':userGroupInstance]" />
 					</div>
 				</g:if>
 
 				<g:elseif test="${params.action == 'experts' }">
 					<div class="tab-pane" id="experts">
 						<sUser:showUserListWrapper
-							model="['results':experts, 'totalCount':expertsTotalCount, 'queryParams':queryParams, 'searched':true]" />
+							model="['results':experts, 'totalCount':expertsTotalCount, 'queryParams':queryParams, 'searched':true, 'userGroupInstance':userGroupInstance]" />
 					</div>
 				</g:elseif>
 				<g:else>
 					<div class="tab-pane" id="members">
 						<sUser:showUserListWrapper
-							model="['results':members, 'totalCount':membersTotalCount, 'queryParams':queryParams, 'searched':true]" />
+							model="['results':members, 'totalCount':membersTotalCount, 'queryParams':queryParams, 'searched':true, 'userGroupInstance':userGroupInstance]" />
 					</div>
 				</g:else>
 

@@ -568,7 +568,7 @@ class ObservationService {
 			filterQuery +=  " and obv.id = tagLink.tagRef and tagLink.type = :tagType and tagLink.tag.name = :tag "
 
 			queryParams["tag"] = params.tag
-			queryParams["tagType"] = Observation.getClass().getName().getLowerCase();
+			queryParams["tagType"] = GrailsNameUtils.getPropertyName(Observation.class);
 			activeFilters["tag"] = params.tag
 		}
 
@@ -609,7 +609,9 @@ class ObservationService {
 		}
 		
 		def orderByClause = " order by obv." + (params.sort ? params.sort : "lastRevised") +  " desc, obv.id asc"
-
+		println "----"
+println query
+println queryParams
 		return [query:query, mapViewQuery:mapViewQuery, filterQuery:filterQuery, orderByClause:orderByClause, queryParams:queryParams, activeFilters:activeFilters]
 
 	}

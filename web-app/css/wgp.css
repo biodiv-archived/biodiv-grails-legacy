@@ -222,7 +222,7 @@ body { /*     background-color: #ffffff; */
     background-color: rgba(106, 201, 162, 0.15);
     padding-left: 10px;
     padding-right: 10px;
-    width: 1200px;
+/*     width: 1200px; */
 }
 
 div.errors {

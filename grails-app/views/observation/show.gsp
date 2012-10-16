@@ -8,7 +8,7 @@
 <head>
 <meta property="og:type" content="article" />
 <meta property="og:title" content="${(!observationInstance.fetchSpeciesCall()?.equalsIgnoreCase('Unknown'))?observationInstance.fetchSpeciesCall():'Help Identify'}"/>
-<meta property="og:url" content="${createLink(controller:'observation', action:'show', id:observationInstance.id, base:Utils.getDomainServerUrl(request))}" />
+<meta property="og:url" content="${uGroup.createLink(controller:'observation', action:'show', id:observationInstance.id, base:Utils.getDomainServerUrl(request), 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress)}" />
 <g:set var="fbImagePath" value="" />
 <%
 def r = observationInstance.mainImage();
@@ -76,9 +76,7 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 				<!--h1>
 				<g:message code="default.show.label" args="[entityName]" />
 			</h1-->
-			
 				<obv:showSubmenuTemplate/>
-
 				<div class="page-header clearfix">
 					<div style="width:100%;">
 						<div class="span8 main_heading">
@@ -103,12 +101,25 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 					<div style="clear:both;"></div>
 					<g:if test="${params.pos && lastListParams}">
 						<div class="nav" style="width:100%;">
-							<g:link class="pull-left btn ${prevObservationId?:'disabled'}" action="show" controller="observation"
-								id="${prevObservationId}" params="['pos':params.int('pos')-1]">Prev Observation</g:link>
-							<g:link class="pull-right  btn ${nextObservationId?:'disabled'}"  action="show" controller="observation"
-								id="${nextObservationId}" params="['pos':params.int('pos')+1]">Next Observation</g:link>
-							<g:link class="btn" action="${lastListParams.action}" controller="observation" fragment="${params.pos}" params="${lastListParams}" style="text-align: center;display: block;width: 125px;margin: 0 auto;">List Observations</g:link>
-							
+							<g:if test="${test}">
+								<a class="pull-left btn ${prevObservationId?:'disabled'}" href="${uGroup.createLink([action:"show", controller:"observation", id:prevObservationId, 'pos':params.int('pos')-1, 'userGroupWebaddress':(userGroup?userGroup.webaddress:userGroupWebaddress)])}">Prev Observation</a>
+								<a class="pull-right  btn ${nextObservationId?:'disabled'}"  href="${uGroup.createLink([action:"show", controller:"observation",
+									id:nextObservationId, 'pos':params.int('pos')+1, 'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress])}">Next Observation</a>
+								<%lastListParams.put('userGroupWebaddress', userGroup?userGroup.webaddress:userGroupWebaddress);
+									lastListParams.put('fragment', params.pos);
+								 %>
+								<a class="btn" href="${uGroup.createLink(lastListParams)}" style="text-align: center;display: block;width: 125px;margin: 0 auto;">List Observations</a>
+							</g:if>
+							<g:else>
+								<a class="pull-left btn ${prevObservationId?:'disabled'}" href="${uGroup.createLink([action:"show", controller:"observation",
+									id:prevObservationId, 'pos':params.int('pos')-1, 'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress])}">Prev Observation</a>
+								<a class="pull-right  btn ${nextObservationId?:'disabled'}"  href="${uGroup.createLink([action:"show", controller:"observation",
+									id:nextObservationId, 'pos':params.int('pos')+1, 'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress])}">Next Observation</a>
+								<%lastListParams.put('userGroupWebaddress', userGroup?userGroup.webaddress:userGroupWebaddress);
+								lastListParams.put('fragment', params.pos);	 
+								%>
+								<a class="btn" href="${uGroup.createLink(lastListParams)}" style="text-align: center;display: block;width: 125px;margin: 0 auto;">List Observations</a>
+							</g:else>
 						</div>
 					</g:if>
 				</div>
@@ -144,7 +155,7 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 
 
 					<obv:showStory
-						model="['observationInstance':observationInstance, 'showDetails':true]" />
+						model="['observationInstance':observationInstance, 'showDetails':true, 'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress]" />
 					
 					<div class="recommendations sidebar_section" style="overflow:visible;">
 						<div>
@@ -216,12 +227,12 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 						<div class="sidebar_section tile" style="clear: both">
 							<div class="title">Other observations of the same species</div>
 							<obv:showRelatedStory
-								model="['observationInstance':observationInstance, 'observationId': observationInstance.id, 'controller':'observation', 'action':'getRelatedObservation', 'filterProperty': 'speciesName', 'id':'a']" />
+								model="['observationInstance':observationInstance, 'observationId': observationInstance.id, 'controller':'observation', 'action':'getRelatedObservation', 'filterProperty': 'speciesName', 'id':'a','userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress]" />
 						</div>
 						<div class="sidebar_section tile">
 							<div class="title">Observations nearby</div>
 							<obv:showRelatedStory
-								model="['observationInstance':observationInstance, 'observationId': observationInstance.id, 'controller':'observation', 'action':'getRelatedObservation', 'filterProperty': 'nearBy', 'id':'nearBy']" />
+								model="['observationInstance':observationInstance, 'observationId': observationInstance.id, 'controller':'observation', 'action':'getRelatedObservation', 'filterProperty': 'nearBy', 'id':'nearBy', 'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress]" />
 						</div>
 
 					</div>
@@ -386,7 +397,7 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 				  {
 				    method: 'feed',
 				    name: "${(!observationInstance.fetchSpeciesCall()?.equalsIgnoreCase('Unknown'))?observationInstance.fetchSpeciesCall():'Help Identify'}",
-				    link: "${createLink(controller:'observation', action:'show', id:observationInstance.id, base:Utils.getDomainServerUrl(request))}",
+				    link: "${uGroup.createLink(controller:'observation', action:'show', id:observationInstance.id, base:Utils.getDomainServerUrl(request), 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress)}",
 				    picture: "${createLinkTo(file: fbImagePath, base:grailsApplication.config.speciesPortal.observations.serverURL)}",
 				    caption: "${Utils.getDomainName(request)}",
 				    description: "${description.replaceAll("\\n", " ")}"
@@ -414,7 +425,7 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
          		url: "${createLink(controller:'observation', action:'getRecommendationVotes', id:observationInstance.id) }",
 				method: "POST",
 				dataType: "json",
-				data: {max:max , offset:0},	
+				data: {max:max , offset:0, 'userGroupWebaddress':"${userGroup?userGroup.webaddress:userGroupWebaddress}"},	
 				success: function(data) {
 					$("#recoSummary").html(data.recoHtml);
 					var uniqueVotes = parseInt(data.uniqueVotes);

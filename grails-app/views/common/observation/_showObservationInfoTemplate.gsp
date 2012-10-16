@@ -23,7 +23,7 @@
 	<div style="clear: both;"></div>
 	<h5>
 		<obv:showSpeciesName
-			model="['observationInstance':observationInstance]" />
+			model="['observationInstance':observationInstance, 'userGroup':userGroup]" />
 	</h5>
 
 	<!--div class="prop tablet">

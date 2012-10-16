@@ -451,6 +451,7 @@ class UserGroupService {
 		return result;
 	}
 
+	
 	////////////////////MEMBERS RELATED/////////////////////////
 	/**
 	 *
@@ -703,4 +704,5 @@ class UserGroupService {
 		}
 
 	}
+	
 }

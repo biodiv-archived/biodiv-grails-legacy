@@ -34,6 +34,7 @@ class UserGroup implements Taggable {
     float sw_longitude;
     float ne_latitude;
     float ne_longitude;
+	String domainName;
 
 	def grailsApplication;
 	def aclUtilService
@@ -57,6 +58,7 @@ class UserGroup implements Taggable {
         sw_longitude nullable:false
         ne_latitude nullable:false
         ne_longitude nullable:false
+		domainName nullable:true
 	}
 
 	static mapping = {

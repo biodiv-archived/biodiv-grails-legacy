@@ -74,7 +74,7 @@ def queryParams = [username: username, enabled: enabled, accountExpired: account
 				</div>
 
 				<sUser:showUserList
-					model="['userInstanceList':results, 'userInstanceTotal':totalCount, 'queryParams':queryParams]" />
+					model="['userInstanceList':results, 'userInstanceTotal':totalCount, 'queryParams':queryParams, 'userGroupInstance':userGroupInstance]" />
 
 			</div>
 		</div>

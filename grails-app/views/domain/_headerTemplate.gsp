@@ -1,7 +1,7 @@
 <div class="container" style="width:100%; height: 100px;">
 	<div style="padding: 10px 0px;">
 	<g:if test="${userGroupInstance  && userGroupInstance.id }">
-		<uGroup:showHeader model=[ 'userGroupInstance':userGroupInstance] />
+		<uGroup:showHeader model="[ 'userGroupInstance':userGroupInstance]" />
 	</g:if>
 	<g:else>
 		<a href="/" class="span3 logo" style="margin-left: 0px;"> <img
@@ -18,24 +18,25 @@
 		<div class="container outer-wrapper" style="background-color:transparent;padding:0px">
 			<ul class="nav btn" style="width: 100%; margin: 0px;padding:4px 0px;">
 				<g:if test="${userGroupInstance && userGroupInstance.id}">
+					
 					<!--li class="menu-449 first"><a href="/" title="">Home</a></li-->
-					<li class="${(params.action == 'show')?' active':''}"><a
-						href="${createLink(mapping:"userGroup", params:['webaddress':userGroupInstance.webaddress])}"
+					<li class="${(params.controller == 'userGroup' && params.action == 'show')?' active':''}"><a
+						href="${createLink(mapping:"userGroup", action:'show', params:['webaddress':userGroupInstance.webaddress])}"
 						title="Activity">Activity</a>
 					</li>
-					<li class="${(params.action == 'observations')?' active':''}"><a
-						href="${createLink(mapping:"userGroup", "action":"observations", params:['webaddress':userGroupInstance.webaddress])}"
+					<li class="${(params.action == 'observation')?' active':''}"><a
+						href="${createLink(mapping:"userGroup", "action":"observation", params:['webaddress':userGroupInstance.webaddress])}"
 						title="Observations">Observations</a>
 					</li>
 
 					<li
 						class="${((params.controller == 'user' || params.controller == 'SUser')&& params.action != 'header')?' active':''}"><a
-						href="${createLink(mapping:"userGroup", "action":"members", params:['webaddress':userGroupInstance.webaddress])}"
+						href="${createLink(mapping:"userGroup", "action":"user", params:['webaddress':userGroupInstance.webaddress])}"
 						title="Members">Members</a>
 					</li>
 
 					<li class="${(params.action == 'aboutUs')?' active':''}"><a
-						href="${createLink(mapping:"userGroup", "action":"aboutUs", params:['webaddress':userGroupInstance.webaddress])}"
+						href="${createLink(mapping:"userGroup", "action":"about", params:['webaddress':userGroupInstance.webaddress])}"
 						title="About Us">About Us</a>
 					</li>
 					<li class="dropdown"><a href="#" class="dropdown-toggle"

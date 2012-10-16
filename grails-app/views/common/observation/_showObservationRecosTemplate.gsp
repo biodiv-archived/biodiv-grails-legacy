@@ -26,10 +26,11 @@
 				</div>
 
 				<g:if test="${r.observationImage}">
-					<g:link controller="observation" action="show" id="${r.obvId}">
+					<a href="${uGroup.createLink([action:"show", controller:"observation", id:r.obvId, 'userGroup':userGroupInstance, 'userGroupWebaddress':userGroupWebaddress])}">
+					
 						<img style="width: 75px; height: 75px;"
 							src="${r.observationImage}">
-					</g:link>
+					</a>
 				</g:if>
 
 				<span class="voteCount"><span id="votes_${r.recoId}">

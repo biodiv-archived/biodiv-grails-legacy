@@ -28,7 +28,7 @@
 						<li class="thumbnail" style="margin: 0;">
 					</g:else>
 					<obv:showSnippetTablet
-						model="['observationInstance':observationInstance, 'obvTitle':obvTitleList?.get(i), 'pos': observationPos+i]"></obv:showSnippetTablet>
+						model="['observationInstance':observationInstance, 'obvTitle':obvTitleList?.get(i), 'pos': observationPos+i, 'userGroup':userGroup]"></obv:showSnippetTablet>
 					</li>
 
 				</g:each>
@@ -38,7 +38,7 @@
 				<g:each in="${observationInstanceList}" status="i"
 					var="observationInstance">
 					<li class="thumbnail" style="clear: both;"><obv:showSnippet
-							model="['observationInstance':observationInstance, 'obvTitle':obvTitleList?.get(i), 'pos':observationPos+i]"></obv:showSnippet>
+							model="['observationInstance':observationInstance, 'obvTitle':obvTitleList?.get(i), 'pos':observationPos+i, 'userGroup':userGroup]"></obv:showSnippet>
 					</li>
 				</g:each>
 			</ul>
