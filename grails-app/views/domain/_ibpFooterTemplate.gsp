@@ -1,6 +1,6 @@
 
 <div id="ibp-footer" class="gradient-bg-reverse navbar">
-	<div class="container outer-wrapper">
+	<div class="container outer-wrapper" style="width:940px">
 		<div class="links_box_column">
 			<ul>
 				<li

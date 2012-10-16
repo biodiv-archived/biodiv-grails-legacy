@@ -78,11 +78,11 @@ class SpeciesController {
 				def rs = Species.executeQuery(countQuery,[sGroup:groupIds]);
 				count = rs[0];
 			}
-			return [speciesInstanceList: speciesInstanceList, speciesInstanceTotal: count]
+			return [speciesInstanceList: speciesInstanceList, speciesInstanceTotal: count, 'userGroupWebaddress':params.webaddress]
 		} else {
 			//Not being used for now
 			params.max = Math.min(params.max ? params.int('max') : 51, 100)
-			return [speciesInstanceList: Species.list(params), speciesInstanceTotal: Species.count()]
+			return [speciesInstanceList: Species.list(params), speciesInstanceTotal: Species.count(),  'userGroupWebaddress':params.webaddress]
 		}
 	}
 
