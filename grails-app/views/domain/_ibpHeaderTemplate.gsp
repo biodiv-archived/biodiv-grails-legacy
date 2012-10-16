@@ -7,7 +7,7 @@
 				<a class="btn btn-navbar" data-toggle="collapse"
 					data-target=".nav-collapse"> <span class="icon-bar"></span> <span
 					class="icon-bar"></span> <span class="icon-bar"></span> </a> <a
-					class="brand" href="${createLink('absolute':true) }"> <!-- img class="logo" alt="India Biodiversity Portal"
+					class="brand" href="/"> <!-- img class="logo" alt="India Biodiversity Portal"
 						src="/sites/all/themes/ibp/images/map-logo.gif"--> India
 					Biodiversity Portal</a>
 				<div class="nav-collapse">

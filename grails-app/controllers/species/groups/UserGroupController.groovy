@@ -39,6 +39,14 @@ class UserGroupController {
 		redirect  url: createLink(mapping: 'userGroup', action: "show", params: params)
 	}
 
+	def activity = {
+		log.debug params
+		def userGroupInstance = findInstance();
+		if (userGroupInstance) {
+			[userGroupInstance: userGroupInstance]
+		}
+	}
+	
 	def list = {
 		def model = getUserGroupList(params);
 		if(!params.isGalleryUpdate?.toBoolean()){
@@ -289,6 +297,7 @@ class UserGroupController {
 	}
 
 	def user = {
+		log.debug params
 		def userGroupInstance = findInstance()
 		if (!userGroupInstance) return
 
@@ -297,9 +306,9 @@ class UserGroupController {
 
 		def allMembers;
 		if(params.onlyMembers) {
-			allMembers = userGroupInstance.getMembers(params.max, params.offset);
+			allMembers = userGroupInstance.getMembers(params.max, params.offset, params.sort);
 		} else {
-			allMembers = userGroupInstance.getAllMembers(params.max, params.offset);
+			allMembers = userGroupInstance.getAllMembers(params.max, params.offset, params.sort);
 		}
 		if(params.isAjaxLoad?.toBoolean()) {
 			def membersJSON = []
@@ -895,6 +904,12 @@ class UserGroupController {
 		render (view:'myGroups', model:['userGroupInstance':userGroupInstance])
    }
 
+   def species = {
+	   log.debug params;
+	   def userGroupInstance = findInstance()
+	   if (!userGroupInstance) return;
+	   render (view:'species', model:['userGroupInstance':userGroupInstance])
+   }
 }
 
 class UserGroupCommand {

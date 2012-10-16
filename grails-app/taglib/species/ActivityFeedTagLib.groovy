@@ -113,16 +113,16 @@ class ActivityFeedTagLib {
 				activityTitle = activityFeedService.OBSERVATION_POSTED_ON_GROUP + " " + getUserGroupHyperLink(activityDomainObj)
 				break
 			case activityFeedService.OBSERVATION_REMOVED_FROM_GROUP:
-				text = activityFeedService.OBSERVATION_REMOVED_FROM_GROUP + " " + getUserGroupHyperLink(activityDomainObj) 
+				activityTitle = activityFeedService.OBSERVATION_REMOVED_FROM_GROUP + " " + getUserGroupHyperLink(activityDomainObj) 
 				break
 			case activityFeedService.MEMBER_JOINED:
-				text = "Joined group " +  getUserGroupHyperLink(activityRootObj)
+				activityTitle = "Joined group " +  getUserGroupHyperLink(activityRootObj)
 				break
 			case activityFeedService.MEMBER_ROLE_UPDATED:
-				text = getUserHyperLink(activityDomainObj) + "'s role updated"
+				activityTitle = getUserHyperLink(activityDomainObj) + "'s role updated"
 				break
 			case activityFeedService.MEMBER_LEFT:
-				text = "Left group " + getUserGroupHyperLink(activityRootObj)
+				activityTitle = "Left group " + getUserGroupHyperLink(activityRootObj)
 				break
 			default:
 				activityTitle = activityType

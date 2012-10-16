@@ -1,8 +1,9 @@
 package species.groups
-
 import org.grails.taggable.Taggable;
 import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.security.acls.model.Permission;
+
+import groovy.sql.Sql;
 
 import species.Habitat;
 import species.Resource;
@@ -16,7 +17,9 @@ import species.utils.ImageUtils;
 import utils.Newsletter;
 
 class UserGroup implements Taggable {
-
+	
+	def dataSource;
+	
 	String name;
 	String description;
 	//String aboutUs;
@@ -182,10 +185,11 @@ class UserGroup implements Taggable {
 		]);
 	}
 
-	def getMembers(int max, long offset) {
+	def getMembers(int max, long offset, String sortBy) {
 		def role = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value())
-		return UserGroupMemberRole.findAllByUserGroupAndRole(this, role, [max:max, offset:offset]).collect { it.sUser};
+		return getUserList(max, offset, sortBy, role.id)
 	}
+	
 
 	void setMembers(List<SUser> members) {
 		if(members) {
@@ -219,8 +223,8 @@ class UserGroup implements Taggable {
 		return UserGroupMemberRole.findByUserGroupAndSUser(this, member)?.role;
 	}
 
-	def getAllMembers(int max, long offset) {
-		return UserGroupMemberRole.findAllByUserGroup(this, [max:max, offset:offset]).collect { it.sUser};
+	def getAllMembers(int max, long offset, String sortBy) {
+		return getUserList(max, offset, sortBy, null)
 	}
 
 	def getMembersCount() {
@@ -268,4 +272,29 @@ class UserGroup implements Taggable {
 		return aclUtilService.hasPermission(gormUserDetailsService.loadUserByUsername(user.email, true), this, permission)
 	}
 
+	private getUserList(int max, long offset, String sortBy, roleId){
+		if(!sortBy || sortBy.trim().equalsIgnoreCase("Activity")){
+			def res = []
+			def groupId = this.id
+			def groupClass = "'" + this.class.getCanonicalName() + "'"
+			
+			String query = "select umg.s_user_id as user, count(*) as activitycount from user_group_member_role as umg, activity_feed as af where umg.s_user_id = af.author_id and umg.user_group_id = $groupId and af.root_holder_id = $groupId and af.root_holder_type = $groupClass"
+			query += (roleId) ? " and umg.role_id $roleId" : ""
+			query += " group by umg.s_user_id  order by activitycount desc limit $max offset $offset"
+			
+			def sql =  Sql.newInstance(dataSource);
+			sql.rows(query).each{
+				res.add(SUser.read(it.getProperty("user")));
+			};
+			return res;
+		}
+		
+		String sortOrder = sortBy.trim().equalsIgnoreCase("name") ? "asc" : "desc"
+		String query = "from UserGroupMemberRole as umr where umr.userGroup = :userGroup"
+		query += (roleId) ? " and umg.role.id $roleId" : ""
+		query += " order by umr.sUser.$sortBy $sortOrder"
+		return UserGroupMemberRole.findAll(query, [userGroup:this, max:max, offset:offset]).collect{it.sUser}
+	}
+
+	
 }

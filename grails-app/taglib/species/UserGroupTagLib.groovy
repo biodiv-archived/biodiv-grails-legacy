@@ -339,6 +339,8 @@ class UserGroupTagLib {
 	}
 
 	def showUserGroupSignature = {attrs, body ->
+		def model = attrs.model
+		model.showDetails = (model.showDetails != null)? model.showDetails : false
 		out<<render(template:"/common/userGroup/showUserGroupSignatureTemplate", model:attrs.model);
 	}
 	
@@ -361,6 +363,7 @@ class UserGroupTagLib {
 	}
 	
 	private String userGroupBasedLink(attrs) {
+		println '----'
 		println attrs
 		String url = "";
 		if(attrs.userGroup) {
@@ -387,8 +390,6 @@ class UserGroupTagLib {
 			attrs.remove('action');
 			attrs.remove('userGroup');
 			attrs.remove('userGroupWebaddress');
-			println attrs
-			println "----"
 			if(base) {
 				url = g.createLink(mapping:'userGroupModule',  'controller':controller, 'action':action, 'base':base, params:attrs)
 			} else {
