@@ -21,6 +21,7 @@
 		<div class="userGroup-section">
 			<ul class="nav nav-tabs" data-tabs="tabs">
 				<li class="active"><a href="#general">General</a>
+					<uGroup:showGeneralSettings model="['userGroupInstance':userGroupInstance]"/>
 				</li>
 				<li class="active"><a href="#userPermissions">User
 						Permissions</a>

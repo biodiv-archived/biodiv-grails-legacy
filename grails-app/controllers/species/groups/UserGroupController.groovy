@@ -404,10 +404,17 @@ class UserGroupController {
 
 	@Secured(['ROLE_USER', 'ROLE_ADMIN'])
 	def settings = {
+		log.debug params
 		def userGroupInstance = findInstance()
 		if (!userGroupInstance) return
 
 			if(aclUtilService.hasPermission(springSecurityService.getAuthentication(), userGroupInstance, BasePermission.ADMINISTRATION)) {
+				userGroupInstance.homePage = params.homePage ?: userGroupInstance.homePage 
+				userGroupInstance.theme = params.theme ?: userGroupInstance.theme
+				
+				if(!userGroupInstance.save(flush:true)){
+					userGroupInstance.errors.allErrors.each { log.error it }
+				}
 				return ['userGroupInstance':userGroupInstance]
 			}
 		return;
@@ -889,6 +896,7 @@ class UserGroupController {
 		if (!userGroupInstance) return;
 		render (view:'myGroups', model:['userGroupInstance':userGroupInstance])
    }
+   
 }
 
 class UserGroupCommand {

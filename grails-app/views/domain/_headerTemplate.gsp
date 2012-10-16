@@ -1,4 +1,4 @@
-<div class="container" style="width:100%; height: 100px;">
+<div class="container group-theme" style="width:100%; height: 100px;">
 	<div style="padding: 10px 0px;">
 	<g:if test="${userGroupInstance  && userGroupInstance.id }">
 		<uGroup:showHeader model=[ 'userGroupInstance':userGroupInstance] />

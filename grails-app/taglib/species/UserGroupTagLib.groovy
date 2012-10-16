@@ -352,4 +352,10 @@ class UserGroupTagLib {
 		def result = userGroupService.getUserGroupsStickyPages(userGroupInstance, -1, -1);
 		out << render(template:"/userGroup/rightSidebar", model:['pages':result, 'userGroupInstance':userGroupInstance]);
 	}
+	
+	def showGeneralSettings = {attrs, body->
+		out << render(template:"/common/userGroup/showGeneralSettingsTemplate", model:attrs.model);
+	}
+	
+	
 }
