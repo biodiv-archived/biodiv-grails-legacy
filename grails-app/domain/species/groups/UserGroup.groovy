@@ -37,6 +37,8 @@ class UserGroup implements Taggable {
     float sw_longitude;
     float ne_latitude;
     float ne_longitude;
+	String homePage;
+	String theme;
 	String domainName;
 
 	def grailsApplication;
@@ -61,6 +63,8 @@ class UserGroup implements Taggable {
         sw_longitude nullable:false
         ne_latitude nullable:false
         ne_longitude nullable:false
+		homePage nullable:true
+		theme nullable:true
 		domainName nullable:true
 	}
 
@@ -296,5 +300,11 @@ class UserGroup implements Taggable {
 		return UserGroupMemberRole.findAll(query, [userGroup:this, max:max, offset:offset]).collect{it.sUser}
 	}
 
+	def getPages(){
+		return userGroupService.getNewsLetters(this, null, null, null, null);
+	}
 	
+	def getThemes(){
+		return userGroupService.getGroupThemes()
+	}
 }

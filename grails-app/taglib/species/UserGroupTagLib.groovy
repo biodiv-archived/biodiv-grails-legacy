@@ -354,6 +354,10 @@ class UserGroupTagLib {
 		out << render(template:"/userGroup/rightSidebar", model:['pages':result, 'userGroupInstance':userGroupInstance]);
 	}
 	
+	def showGeneralSettings = {attrs, body->
+		out << render(template:"/common/userGroup/showGeneralSettingsTemplate", model:attrs.model);
+	}
+	
 	def createLink = { attrs, body ->
 		out << userGroupBasedLink(attrs);
 	}

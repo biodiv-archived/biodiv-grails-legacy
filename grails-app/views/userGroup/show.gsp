@@ -52,8 +52,14 @@
 </style>
 </head>
 <body>
+	<g:if test="${userGroupInstance.homePage && userGroupInstance.homePage.endsWith('activity')}">
+		<g:include controller="userGroup" action="activity" id="${userGroupInstance.id}"/>
+	</g:if>
+	<g:else>
+		<g:include controller="userGroup" action="about" id="${userGroupInstance.id}"/>
+	</g:else>
 <%--	<g:include controller="userGroup" action="page" id="${userGroupInstance.id}"/>--%>
-	<g:include controller="userGroup" action="activity" id="${userGroupInstance.id}"/>
+<%--	<g:include controller="userGroup" action="activity" id="${userGroupInstance.id}"/>--%>
 <%--		<uGroup:showSubmenuTemplate model="['entityName':'Activity Stream']"/>--%>
 <%--		<uGroup:rightSidebar model="['userGroupInstance':userGroupInstance]"/>--%>
 <%--		<div class="userGroup-section center_panel">--%>

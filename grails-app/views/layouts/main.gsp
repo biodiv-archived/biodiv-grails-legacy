@@ -37,7 +37,9 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 <g:layoutHead />
 
 <!-- script src="http://cdn.wibiya.com/Toolbars/dir_1100/Toolbar_1100354/Loader_1100354.js" type="text/javascript"></script><noscript><a href="http://www.wibiya.com/">Web Toolbar by Wibiya</a></noscript-->
-
+<g:if test="${userGroupInstance && userGroupInstance.theme}">
+	<link rel="stylesheet" type="text/css" href="${resource(dir:'group-themes', file:userGroupInstance.theme + '.css')}"/>
+</g:if>
 
 </head>
 <body>

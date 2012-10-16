@@ -13,6 +13,12 @@
 		<sec:permitted className='species.groups.UserGroup'
 			id='${userGroupInstance.id}'
 			permission='${org.springframework.security.acls.domain.BasePermission.WRITE}'>
+			<a class="btn btn-large btn-primary" href="${createLink(mapping:'userGroup', action:'settings', params:['webaddress':userGroupInstance.webaddress])}"><i class="icon-cog"></i>Settings</a>
+		</sec:permitted>
+
+		<sec:permitted className='species.groups.UserGroup'
+			id='${userGroupInstance.id}'
+			permission='${org.springframework.security.acls.domain.BasePermission.WRITE}'>
 
 			<a id="inviteMembers" class="btn btn-large btn-primary" href="#"><i
 				class="icon-envelope"></i> <g:message code="userGroup.members.label"
