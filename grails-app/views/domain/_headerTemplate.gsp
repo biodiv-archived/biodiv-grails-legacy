@@ -1,5 +1,35 @@
 <div class="container group-theme" style="width:100%; height: 100px;">
 	<div style="padding: 10px 0px;">
+		<div class="navbar navbar-static-top pull-right" style="margin-bottom: 0px;">
+		<div class="navbar-inner"
+			style="box-shadow: none; background-color: transparent; background-image: none;">
+			<div class="container" style="width: 100%">
+				<a class="btn btn-navbar" data-toggle="collapse"
+					data-target=".nav-collapse"> <span class="icon-bar"></span> </a>
+				<div class="nav-collapse">
+					<ul class="nav">
+
+					</ul>
+
+
+					<ul class="nav pull-right">
+						<li><search:searchBox /></li>
+						<li><a class="" href="/"> India Biodiversity Portal</a>
+						</li>
+						<g:if
+							test="${params.controller != 'openId' && params.controller != 'login' &&  params.controller != 'register'}">
+							<li><uGroup:showSidebar />
+							</li>
+						</g:if>
+						<li><sUser:userLoginBox />
+						</li>
+
+					</ul>
+				</div>
+			</div>
+
+		</div>
+	</div>
 		<g:if test="${userGroupInstance  && userGroupInstance.id }">
 			<uGroup:showHeader model="[ 'userGroupInstance':userGroupInstance]" />
 		</g:if>
@@ -10,31 +40,31 @@
 			</a>
 			<h1>India Biodiversity Portal</h1>
 		</g:else>
+		
 	</div>
 </div>
 <div class="navbar navbar-static-top"
-	style="margin-bottom: 0px; position: relative;">
+	style="margin-bottom: 0px; position: relative; width: 100%; background-color: #A5A5A5">
 	<div class="navbar-inner"
 		style="padding: 0px; box-shadow: none; background-color: transparent; background-image: none;">
 		<div class="container outer-wrapper"
-			style="background-color: transparent; padding: 0px">
-			<ul class="nav btn"
-				style="width: 100%; margin: 0px; padding: 4px 0px;">
-				<g:if test="${userGroupInstance && userGroupInstance.id}">
+			style="background-color: transparent; padding: 0px; width: 940px">
 
-					<!--li class="menu-449 first"><a href="/" title="">Home</a></li-->
+			<g:if test="${userGroupInstance && userGroupInstance.id}">
 
-					<li
-						class="${(params.controller == 'userGroup' && params.action == 'activity')?' active':''}"><a
-						href="${createLink(mapping:"userGroup", "action":"activity", params:['webaddress':userGroupInstance.webaddress])}"
-						title="Activity">Activity</a>
-					</li>
+				<ul class="nav pull-left">
 
+				</ul>
+				<ul class="nav pull-left">
 
 					<li
 						class="${(params.controller == 'userGroup' && params.action == 'species')?' active':''}"><a
 						href="${createLink(mapping:"userGroup", "action":"species", params:['webaddress':userGroupInstance.webaddress])}"
 						title="Species">Species</a>
+					</li>
+					<li class="${(params.action == 'observation')?' active':''}"><a
+						href="${createLink(mapping:"userGroup", "action":"observation", params:['webaddress':userGroupInstance.webaddress])}"
+						title="Observations">Observations</a>
 					</li>
 					<li
 						class="${(request.getHeader('referer')?.contains('/map'))?' active':''}"><a
@@ -44,11 +74,16 @@
 						href="/browsechecklists" title="Checklists">Checklists</a></li>
 
 
-					<li class="${(params.action == 'observation')?' active':''}"><a
-						href="${createLink(mapping:"userGroup", "action":"observation", params:['webaddress':userGroupInstance.webaddress])}"
-						title="Observations">Observations</a>
-					</li>
 
+				</ul>
+				<ul class="nav pull-right">
+					<!--li class="menu-449 first"><a href="/" title="">Home</a></li-->
+
+					<li
+						class="${(params.controller == 'userGroup' && params.action == 'activity')?' active':''}"><a
+						href="${createLink(mapping:"userGroup", "action":"activity", params:['webaddress':userGroupInstance.webaddress])}"
+						title="Activity">Activity</a>
+					</li>
 					<li
 						class="${((params.controller == 'user' || params.controller == 'SUser')&& params.action != 'header')?' active':''}"><a
 						href="${createLink(mapping:"userGroup", "action":"user", params:['webaddress':userGroupInstance.webaddress])}"
@@ -82,18 +117,20 @@
 								class="${(request.getHeader('referer')?.contains('/themepages/list'))?' active':''}"><a
 								href="/themepages/list" title="Themes">Themes</a></li>
 						</ul></li>
+				</ul>
 
+			</g:if>
+			<g:else>
+				<ul class="nav pull-left">
 
-				</g:if>
-				<g:else>
-					<li class=" ${(params.controller == 'activityFeed')?'active':''}"><a
-						href="${createLink("controller":"activityFeed")}" title="Activity">Activity</a>
-					</li>
-
-					<!--li class="menu-449 first"><a href="/" title="">Home</a></li-->
+				</ul>
+				<ul class="nav">
 					<li class=" ${(params.controller == 'species')?'active':''}"><a
 						href="${createLink("controller":"species")}" title="Species">
 							Species</a></li>
+					<li class="${(params.controller == 'observation')?'active':''}"><a
+						href="${createLink("controller":"observation")}"
+						title="Observations">Observations</a></li>
 					<li
 						class="${(request.getHeader('referer')?.contains('/map'))?' active':''}"><a
 						href="/map" title="Maps">Maps</a></li>
@@ -101,10 +138,15 @@
 						class="${(request.getHeader('referer')?.contains('/browsechecklists'))?' active':''}"><a
 						href="/browsechecklists" title="Checklists">Checklists</a></li>
 
-					<li class="${(params.controller == 'observation')?'active':''}"><a
-						href="${createLink("controller":"observation")}"
-						title="Observations">Observations</a></li>
 
+				</ul>
+
+				<ul class="nav pull-right">
+					<li class=" ${(params.controller == 'activityFeed')?'active':''}"><a
+						href="${createLink("controller":"activityFeed")}" title="Activity">Activity</a>
+					</li>
+
+					<!--li class="menu-449 first"><a href="/" title="">Home</a></li-->
 					<li
 						class="${((params.controller == 'user' || params.controller == 'SUser') && params.action != 'header')?' active':''}"><a
 						href="${createLink(controller:'user', action:'list')}"
@@ -137,10 +179,10 @@
 
 						</ul>
 					</li>
+				</ul>
 
+			</g:else>
 
-				</g:else>
-			</ul>
 		</div>
 	</div>
 </div>
