@@ -87,7 +87,7 @@
 </style>
 <ul class="nav">
 	<sec:ifNotLoggedIn>
-		<li><g:link controller='login' absolute='true'>Login</g:link>
+		<li><a href="${createLink(controller:'login', absolute:'true') }">Login</a>
 		</li>
 		
 		<li><g:link controller='register' absolute='true'>Register</g:link>

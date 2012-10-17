@@ -5,16 +5,7 @@
 	<div class="row" style="position:relative;">
 		<div class="figure span3 observation_story_image" style="display: table;" 
 			title='<g:if test="${obvTitle != null}">${obvTitle}</g:if>'>
-			<g:if test="${userGroup}">
-				<g:set var="url" value="${createLink(mapping:'userGroupModule', controller:'observation', action:'show', id:observationInstance.id, params:['pos':pos, 'webaddress':userGroup.webaddress]) }"/>
-			</g:if>
-			<g:elseif test="${userGroupWebaddress }">
-				<g:set var="url" value="${createLink(mapping:'userGroupModule', controller:'observation', action:'show', id:observationInstance.id, params:['webaddress':userGroupWebaddress]) }"/>
-			</g:elseif>
-			<g:else>
-				<g:set var="url" value="${createLink( controller:'observation', action:'show', id:observationInstance.id, params:['pos':pos]) }"/>
-			</g:else>
-			<g:link url="${url }" name="l${pos}">
+			<g:link url="${uGroup.createLink(controller:'observation', action:'show', id:observationInstance.id, 'pos':pos, 'userGroupWebaddress':userGroup?.webaddress) }" name="l${pos}">
 				<g:if
 					test="${imagePath && (new File(grailsApplication.config.speciesPortal.observations.rootDir + imagePath)).exists()}">
 					<img

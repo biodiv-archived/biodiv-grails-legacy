@@ -1,11 +1,6 @@
 <div class="observation_location_wrapper">
 	<div class="observation_location">
-		<g:if test="${userGroup}">
-				<g:set var="snippetUrl" value="${createLink(mapping:'userGroupModule', controller:'observation', action:'snippet', params:['webaddress':userGroup.webaddress]) }"/>
-			</g:if>
-			<g:else>
-				<g:set var="snippetUrl" value="${createLink( controller:'observation', action:'snippet') }"/>
-			</g:else>
+		<g:set var="snippetUrl" value="${uGroup.createLink(controller:'observation', action:'snippet', 'userGroupWebaddress':userGroup?.webaddress) }"/>
 		<g:javascript>
                 var markers = [];
                 var big_map;
@@ -139,9 +134,9 @@
 	<g:javascript>
             function refreshList(bounds){
             	<g:if test="{params.id}">
-                var url = "${g.createLink( action: "filteredMapBasedObservationsList", id:params.id)}" + location.search
+                var url = "${uGroup.createLink( controller:'observation', action: "filteredMapBasedObservationsList",'userGroupWebaddress':userGroup?.webaddress, id:params.id)}" + location.search
                 </g:if><g:else>
-                var url = "${g.createLink( action: "filteredMapBasedObservationsList")}" + location.search
+                var url = "${uGroup.createLink( controller:'observation', action: "filteredMapBasedObservationsList", 'userGroupWebaddress':userGroup?.webaddress)}" + location.search
                 </g:else>
                 if (bounds !== undefined){
                     var sep = (location.search == "") ? "?" : "&";

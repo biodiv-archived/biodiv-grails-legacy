@@ -6,6 +6,6 @@
 				model="['userGroup':userGroup]" />
 		</li>
 	</g:each>
-	<li class="pull-right"><g:link mapping="userGroupGeneric" action="list" params="['user':sUser.renderCurrentUserId()]"
+	<li style="float:right;"><g:link mapping="userGroupGeneric" action="list" absolute='true' params="['user':sUser.renderCurrentUserId()]"
 		style="display:inline;">More ...</g:link></li>
 </ul>

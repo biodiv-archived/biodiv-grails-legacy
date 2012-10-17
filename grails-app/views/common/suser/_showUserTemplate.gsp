@@ -3,24 +3,12 @@
 <%@page import="species.participation.Observation"%>
 <div class="prop tablet user_signature">
 		<div class="figure user-icon" style="float:left;">
-		<g:if test="${userGroup }">
-		<a href="${createLink(mapping:'userGroupModule', 'controller':'SUser', action:'show', id:userInstance.id, params:['webaddress':userGroup.webaddress])}"> <img
-			style="float: left;" src="${userInstance.icon(ImageType.SMALL)}"
-			class="small_profile_pic" title="${userInstance.name}" /></a>
-		</g:if>
-		<g:else>
-		<a href="${createLink( 'controller':'SUser', action:'show', id:userInstance.id)}"> <img
-			style="float: left;" src="${userInstance.icon(ImageType.SMALL)}"
-			class="small_profile_pic" title="${userInstance.name}" /></a>
-		</g:else>
+			<a href="${uGroup.createLink( 'controller':'SUser', action:'show', id:userInstance.id, userGroup:userGroup, 'userGroupWebaddress':userGroupWebaddress)}"> <img
+				style="float: left;" src="${userInstance.icon(ImageType.SMALL)}"
+				class="small_profile_pic" title="${userInstance.name}" /></a>
 		</div>
 		<div class="story" style="margin-left:35px">
-		<g:if test="${userGroup }">
-			<a href="${createLink(mapping:'userGroupModule', 'controller':'SUser', action:'show', id:userInstance.id, params:['webaddress':userGroup.webaddress])}"> ${userInstance.name} </a>
-		</g:if>
-		<g:else>
-			<a href="${createLink('controller':'SUser', action:'show', id:userInstance.id)}"> ${userInstance.name} </a>
-		</g:else>
+			<a href="${uGroup.createLink('controller':'SUser', action:'show', id:userInstance.id,  userGroup:userGroup, 'userGroupWebaddress':userGroupWebaddress)}"> ${userInstance.name} </a>
 			
 <%--			<g:if test="${userInstance.location}">--%>
 <%--				<div>--%>

@@ -27,7 +27,7 @@ class UrlMappings {
 			} }
 
 
-		"/"(controller:"userGroup", action:"list")
+		
 		"500"(view:'/error')
 		"403"(view:'/error')
 /*		"403"(controller: "errors", action: "error403")
@@ -37,27 +37,32 @@ class UrlMappings {
 */		
 		"/static/$path"(controller:"species", action:"staticContent")
 		
-		name userGroupPageShow: "/userGroup/$webaddress/page/$newsletterId" {
+//		name pages:"/pages" {
+//			controller = 'userGroup'
+//			action = 'pages'
+//		}
+//		
+//		name page:"/page/$newsletterId" {
+//			controller = 'userGroup'
+//			action = 'page'
+//		}
+		
+		name userGroupPageShow: "/group/$webaddress/page/$newsletterId" {
 			controller = 'userGroup'
 			action = 'page'
 		}
 		
+		name onlyUserGroup:"/group/$webaddress" {
+			controller='userGroup'
+			action='index'
+		}
 		
+		//to match /group/list
 		name userGroupGeneric: "/group/$action" {
 			controller = 'userGroup'
 		}
-		
-		name pages:"/pages" {
-			controller = 'userGroup'
-			action = 'pages'
-		}
-		
-		name page:"/page/$newsletterId" {
-			controller = 'userGroup'
-			action = 'page'
-		}
-		
-		name userGroup: "/group/$webaddress?/$action?" {
+
+		name userGroup: "/group/$webaddress/$action" {
 			controller = 'userGroup'
 		}
 		
@@ -66,8 +71,7 @@ class UrlMappings {
 			action='observation'
 		}
 
-		name userGroupModule:"/group/$webaddress?/$controller/$action/$id?" {
+		name userGroupModule:"/group/$webaddress/$controller/$action/$id?" {
 		}
-		
 	}
 }

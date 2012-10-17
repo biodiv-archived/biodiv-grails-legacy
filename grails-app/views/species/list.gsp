@@ -17,7 +17,7 @@
 
 </head>
 <body>
-	<div class="span12" style="margin-left:10px;">
+	<div class="span12">
 		<s:showSubmenuTemplate model="['entityName':'Species']" />
 		<div class="tabbable">
 			<ul class="nav nav-tabs pull-right" style="margin-bottom: 0px">

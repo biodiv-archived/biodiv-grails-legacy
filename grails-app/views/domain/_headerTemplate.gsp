@@ -1,4 +1,4 @@
-<div class="container group-theme" style="width:100%; height: 100px;">
+<div class="container group-theme" style="width:100%;">
 	<div style="padding: 10px 0px;">
 		<div class="navbar navbar-static-top pull-right" style="margin-bottom: 0px;">
 		<div class="navbar-inner"
@@ -14,8 +14,11 @@
 
 					<ul class="nav pull-right">
 						<li><search:searchBox /></li>
-						<li><a class="" href="/"> India Biodiversity Portal</a>
+						<g:if test="${userGroupInstance  && userGroupInstance.id }">
+						<li>
+								<a class="" href="${createLink(url:grailsApplication.config.grails.serverURL+"/..") }"> India Biodiversity Portal</a>
 						</li>
+						</g:if>
 						<g:if
 							test="${params.controller != 'openId' && params.controller != 'login' &&  params.controller != 'register'}">
 							<li><uGroup:showSidebar />
@@ -34,7 +37,7 @@
 			<uGroup:showHeader model="[ 'userGroupInstance':userGroupInstance]" />
 		</g:if>
 		<g:else>
-			<a href="/" class="span3 logo" style="margin-left: 0px;"> <img
+			<a href="${createLink(url:grailsApplication.config.grails.serverURL+"/..") }" class="span3 logo" style="margin-left: 0px;"> <img
 				class="logo" src="/sites/all/themes/ibp/images/map-logo.gif"
 				title="India Biodiversity Portal" alt="India Biodiversity Portal">
 			</a>
@@ -59,11 +62,11 @@
 
 					<li
 						class="${(params.controller == 'userGroup' && params.action == 'species')?' active':''}"><a
-						href="${createLink(mapping:"userGroup", "action":"species", params:['webaddress':userGroupInstance.webaddress])}"
+						href="${uGroup.createLink('mapping':'userGroup', 'action':'species', 'userGroup':userGroupInstance)}"
 						title="Species">Species</a>
 					</li>
 					<li class="${(params.action == 'observation')?' active':''}"><a
-						href="${createLink(mapping:"userGroup", "action":"observation", params:['webaddress':userGroupInstance.webaddress])}"
+						href="${uGroup.createLink('mapping':'userGroup', 'action':'observation', 'userGroup':userGroupInstance)}"
 						title="Observations">Observations</a>
 					</li>
 					<li
@@ -81,17 +84,17 @@
 
 					<li
 						class="${(params.controller == 'userGroup' && params.action == 'activity')?' active':''}"><a
-						href="${createLink(mapping:"userGroup", "action":"activity", params:['webaddress':userGroupInstance.webaddress])}"
+						href="${uGroup.createLink(mapping:"userGroup", 'action':"activity", 'userGroupWebaddress':userGroupInstance.webaddress)}"
 						title="Activity">Activity</a>
 					</li>
 					<li
 						class="${((params.controller == 'user' || params.controller == 'SUser')&& params.action != 'header')?' active':''}"><a
-						href="${createLink(mapping:"userGroup", "action":"user", params:['webaddress':userGroupInstance.webaddress])}"
+						href="${uGroup.createLink(mapping:"userGroup", 'action':"user", 'userGroupWebaddress':userGroupInstance.webaddress)}"
 						title="Members">Members</a>
 					</li>
 
 					<li class="${(params.action == 'aboutUs')?' active':''}"><a
-						href="${createLink(mapping:"userGroup", "action":"about", params:['webaddress':userGroupInstance.webaddress])}"
+						href="${uGroup.createLink(mapping:"userGroup", 'action':"about", 'userGroupWebaddress':userGroupInstance.webaddress)}"
 						title="About Us">About Us</a>
 					</li>
 					<li class="dropdown"><a href="#" class="dropdown-toggle"
@@ -99,7 +102,7 @@
 						<ul class="dropdown-menu" style="text-align: left;">
 
 							<li class="${(params.action == 'pages')?' active':''}"><a
-								href="${createLink(mapping:"userGroup", "action":"pages", params:['webaddress':userGroupInstance.webaddress])}"
+								href="${uGroup.createLink(mapping:"userGroup", 'action':"pages", 'userGroupWebaddress':userGroupInstance.webaddress)}"
 								title="Pages">Pages</a>
 							</li>
 							<li
@@ -159,7 +162,7 @@
 
 						<ul class="dropdown-menu" style="text-align: left; color: #000">
 							<li class="${(params.action == 'pages')?' active':''}"><a
-								href="${createLink(mapping:"pages", "action":"pages")}"
+								href="${createLink(mapping:"pages", 'action':"pages")}"
 								title="Pages">Pages</a>
 							</li>
 							<li

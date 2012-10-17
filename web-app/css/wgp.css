@@ -166,7 +166,7 @@ body { /*     background-color: #ffffff; */
  	margin-left: 110px; 
 }
 
-.prop .value, .observations_list .prop .value {
+.prop .value, .observations_list .prop .value, .activityfeed .prop .value{
  	margin-left: 22px; 
 }
 
@@ -1517,7 +1517,7 @@ li#userOrEmail-new {
 }
 
 .links_box_column {
-	width: 170px;
+	width: 15%;
 	float: left;
 	margin-left: 10px;
 	margin-right: 10px;

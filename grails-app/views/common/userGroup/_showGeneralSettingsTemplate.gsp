@@ -17,7 +17,7 @@
 					<li class="divider"></li>
 					<g:each var="newsletterInstance" in="${userGroupInstance.getPages()}">
 						<li class="group_option"><a class=" home_page_label"
-							value="${createLink(mapping:'userGroupPageShow', params:['webaddress':userGroupInstance.webaddress, 'newsletterId':newsletterInstance.id]) }"> ${newsletterInstance.title + " "}</a></li>
+							value="${createLink(controller:'newsletter', action:'show', id:newsletterInstance.id)}"> ${newsletterInstance.title + " "}</a></li>
 					</g:each>
 				</ul>
 			</div>

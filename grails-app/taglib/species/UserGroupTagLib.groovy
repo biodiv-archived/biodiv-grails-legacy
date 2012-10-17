@@ -7,8 +7,10 @@ import org.springframework.security.core.Authentication;
 
 import species.auth.Role;
 import species.groups.UserGroup;
+import species.groups.UserGroupController;
 import species.groups.UserGroupMemberRole;
 import species.groups.UserGroupMemberRole.UserGroupMemberRoleType;
+import species.utils.Utils;
 
 class UserGroupTagLib {
 	static namespace = "uGroup";
@@ -193,7 +195,6 @@ class UserGroupTagLib {
 	}
 
 	def showHeader = {attrs, body->
-		println attrs.model
 		out << render(template:"/common/userGroup/headerTemplate", model:attrs.model);
 	}
 
@@ -367,44 +368,50 @@ class UserGroupTagLib {
 	}
 	
 	private String userGroupBasedLink(attrs) {
+		println '-------------'
 		println attrs
 		String url = "";
 		if(attrs.userGroup) {
+			
 			attrs.webaddress = attrs.userGroup.webaddress
-			String base = attrs.base
-			attrs.remove('base');
-			String controller = attrs.controller;
-			attrs.remove('controller')
-			String action = attrs.action;
-			attrs.remove('userGroup');
+			String base = attrs.remove('base')
+			String controller = attrs.remove('controller')
+			String action = attrs.remove('action');			
+			String mappingName = attrs.remove('mapping')?:'userGroupModule';
+			def userGroup = attrs.remove('userGroup');
 			attrs.remove('userGroupWebaddress');
+			
 			if(base) {
-				url = g.createLink(mapping:'userGroupModule',  'controller':controller, 'action':action, 'base':base, params:attrs);
+				url = g.createLink(mapping:mappingName,  'controller':controller, 'action':action, 'base':base, params:attrs);
 			} else {
-				url = g.createLink(mapping:'userGroupModule',  'controller':controller, 'action':action, params:attrs);
+				url = g.createLink(mapping:mappingName,  'controller':controller, 'action':action, params:attrs);
+				if((userGroup?.domainName) && (userGroup.domainName == "http://"+Utils.getDomain(request))) {
+					url = url.replace( g.createLink(mapping:'onlyUserGroup', params:['webaddress':attrs.webaddress]), "");
+				} 
 			}
 		} else if(attrs.userGroupWebaddress) {
 			attrs.webaddress = attrs.userGroupWebaddress
-			String base = attrs.base
-			attrs.remove('base');
-			String controller = attrs.controller;
-			attrs.remove('controller')
-			String action = attrs.action;
-			attrs.remove('action');
-			attrs.remove('userGroup');
-			attrs.remove('userGroupWebaddress');
+			String base = attrs.remove('base')
+			String controller = attrs.remove('controller')
+			String action = attrs.remove('action');			
+			String mappingName = attrs.remove('mapping')?:'userGroupModule';
+			def userGroup = attrs.remove('userGroup');
+			String userGroupWebaddress = attrs.remove('userGroupWebaddress');
+			
 			if(base) {
-				url = g.createLink(mapping:'userGroupModule',  'controller':controller, 'action':action, 'base':base, params:attrs)
+				url = g.createLink(mapping:mappingName,  'controller':controller, 'action':action, 'base':base, params:attrs)
 			} else {
-				url = g.createLink(mapping:'userGroupModule', 'controller':controller, 'action':action, params:attrs)
+				url = g.createLink(mapping:mappingName, 'controller':controller, 'action':action, params:attrs)
+				def userGroupController = new UserGroupController();
+				userGroup = userGroupController.findInstance(null, userGroupWebaddress);
+				if((userGroup?.domainName) && (userGroup.domainName == "http://"+Utils.getDomain(request))) {
+					url = url.replace( g.createLink(mapping:'onlyUserGroup', params:['webaddress':attrs.webaddress]), "");
+				}
 			}
 		} else {
-			String base = attrs.base
-			attrs.remove('base');
-			String controller = attrs.controller;
-			attrs.remove('controller')
-			String action = attrs.action;
-			attrs.remove('action');
+			String base = attrs.remove('base')
+			String controller = attrs.remove('controller')
+			String action = attrs.remove('action');			
 			attrs.remove('userGroup');
 			attrs.remove('userGroupWebaddress');
 			if(base) {
@@ -413,6 +420,7 @@ class UserGroupTagLib {
 				url = g.createLink('controller':controller, 'action':action, params:attrs)
 			}
 		}
+		println url;
 		return url;
 	}
 }

@@ -36,7 +36,7 @@
 <r:require modules="core" />
 </head>
 <body>
-	<div class="">
+	<div class="bodymarker">
 		<div class="page-header">
 			
 					<h1>

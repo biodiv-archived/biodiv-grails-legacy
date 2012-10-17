@@ -602,7 +602,7 @@ class SUserController extends UserController {
 					result.add(map);
 				}
 				//def noOfVotes = observationService.getAllRecommendationsOfUser(userInstance);
-				def model = ['result':result, 'totalVotes':result.size(), 'uniqueVotes':result.size(), 'userGroupWebaddress':params.userGroupWebaddress];
+				def model = ['result':result, 'totalVotes':result.size(), 'uniqueVotes':result.size(), 'userGroupWebaddress':params.webaddress];
 				def html = g.render(template:"/common/observation/showObservationRecosTemplate", model:model);
 				def r = [
 							success : 'true',
