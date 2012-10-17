@@ -5,7 +5,10 @@
 <div class="activityFeedContext" >
 	<div class="feedParentContext">
 		<g:if test="${feedInstance.rootHolderType ==  Observation.class.getCanonicalName()}" >
-			<obv:showSnippet model="['observationInstance':feedParentInstance]"></obv:showSnippet>
+			<%
+				def tmpUserGroup = (feedHomeObject && feedHomeObject.class.getCanonicalName() == UserGroup.class.getCanonicalName()) ? feedHomeObject : null
+			%>
+			<obv:showSnippet model="['observationInstance':feedParentInstance, userGroup:tmpUserGroup, userGroupWebaddress:tmpUserGroup?.webaddress]"></obv:showSnippet>
 		</g:if>
 		<g:elseif test="${feedInstance.rootHolderType ==  UserGroup.class.getCanonicalName()}" >
 			<uGroup:showUserGroupSignature model="['userGroup':feedParentInstance, 'showDetails':true]"></uGroup:showUserGroupSignature>

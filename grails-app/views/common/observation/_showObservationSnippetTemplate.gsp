@@ -5,8 +5,7 @@
 	<div class="row" style="position:relative;">
 		<div class="figure span3 observation_story_image" style="display: table;" 
 			title='<g:if test="${obvTitle != null}">${obvTitle}</g:if>'>
-		
-			<g:link url="${uGroup.createLink(controller:'observation', action:'show', id:observationInstance.id, 'pos':pos, 'userGroupWebaddress':userGroup.webaddress) }" name="l${pos}">
+			<g:link url="${uGroup.createLink(controller:'observation', action:'show', id:observationInstance.id, 'pos':pos, 'userGroupWebaddress':userGroup?.webaddress) }" name="l${pos}">
 				<g:if
 					test="${imagePath && (new File(grailsApplication.config.speciesPortal.observations.rootDir + imagePath)).exists()}">
 					<img
