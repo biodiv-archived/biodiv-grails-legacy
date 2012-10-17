@@ -41,7 +41,7 @@ class UserGroupController {
 
 	def activity = {
 		log.debug params
-		def userGroupInstance = findInstance();
+		def userGroupInstance = findInstance(params.id, params.webaddress);
 		if (userGroupInstance) {
 			[userGroupInstance: userGroupInstance]
 		}
@@ -152,7 +152,7 @@ class UserGroupController {
 	}
 
 	def show = {
-		def userGroupInstance = findInstance();
+		def userGroupInstance = findInstance(params.id, params.webaddress);
 		if (userGroupInstance) {
 			userGroupInstance.incrementPageVisit();
 			if(params.pos) {
@@ -211,7 +211,7 @@ class UserGroupController {
 
 	@Secured(['ROLE_USER'])
 	def edit = {
-		def userGroupInstance = findInstance()
+		def userGroupInstance = findInstance(params.id, params.webaddress)
 		if (!userGroupInstance) {
 			//flash.message = "${message(code: 'userGroup.default.not.found.message', args: [params.webaddress])}"
 			//redirect(action: "list")
@@ -227,7 +227,7 @@ class UserGroupController {
 	def update = {
 		log.debug params;
 		
-		def userGroupInstance = findInstance()
+		def userGroupInstance = findInstance(params.id, params.webaddress)
 		if (userGroupInstance) {
 			if (params.version) {
 				def version = params.version.toLong()
@@ -262,7 +262,7 @@ class UserGroupController {
 	@Secured(['ROLE_USER'])
 	def delete = {
 		log.debug params;
-		def userGroupInstance = findInstance()
+		def userGroupInstance = findInstance(params.id, params.webaddress)
 		if (userGroupInstance) {
 			try {
 				userGroupService.delete(userGroupInstance)
@@ -279,13 +279,13 @@ class UserGroupController {
 		}
 	}
 
-	private UserGroup findInstance(boolean redirectToList=true) {
+	private UserGroup findInstance(id=null, webaddress='', boolean redirectToList=true) {
 		def userGroup
 		
-		if(params.id) {
+		if(id) {
 			userGroup = userGroupService.get(params.long('id'))
 		} 
-		if(params.webaddress) {
+		if(webaddress) {
 			userGroup = userGroupService.get(params['webaddress'])
 		}
 		
@@ -298,7 +298,7 @@ class UserGroupController {
 
 	def user = {
 		log.debug params
-		def userGroupInstance = findInstance()
+		def userGroupInstance = findInstance(params.id, params.webaddress)
 		if (!userGroupInstance) return
 
 		params.max = Math.min(params.max ? params.int('max') : 9, 100)
@@ -322,7 +322,7 @@ class UserGroupController {
 	}
 
 	def founders = {
-		def userGroupInstance = findInstance()
+		def userGroupInstance = findInstance(params.id, params.webaddress)
 		if (!userGroupInstance) return
 
 		params.max = Math.min(params.max ? params.int('max') : 9, 100)
@@ -342,7 +342,7 @@ class UserGroupController {
 	}
 
 	def experts = {
-		def userGroupInstance = findInstance()
+		def userGroupInstance = findInstance(params.id, params.webaddress)
 		if (!userGroupInstance) return
 
 			params.max = Math.min(params.max ? params.int('max') : 9, 100)
@@ -369,9 +369,9 @@ class UserGroupController {
 			def tagsHtml = "";
 			if(model.showTags) {
 				def filteredTags = observationService.getTagsFromObservation(model.totalObservationInstanceList.collect{it[0]})
-				tagsHtml = g.render(template:"/common/observation/showAllTagsTemplate", model:[count: count, tags:filteredTags, isAjaxLoad:true, 'userGroup':userGroupInstance]);
+				tagsHtml = g.render(template:"/common/observation/showAllTagsTemplate", model:[count: count, tags:filteredTags, isAjaxLoad:true, 'userGroup':model.userGroup]);
 			}
-			def mapViewHtml = g.render(template:"/common/observation/showObservationMultipleLocationTemplate", model:[observationInstanceList:model2.observationInstanceList, 'userGroup':userGroupInstance]);
+			def mapViewHtml = g.render(template:"/common/observation/showObservationMultipleLocationTemplate", model:[observationInstanceList:model2.observationInstanceList, 'userGroup':model2.userGroup]);
 
 			def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml, tagsHtml:tagsHtml, mapViewHtml:mapViewHtml]
 			render result as JSON
@@ -381,7 +381,7 @@ class UserGroupController {
 	}
 	
 	def getUserGroupObservationsList(params) {
-		def userGroupInstance = findInstance()
+		def userGroupInstance = findInstance(params.id, params.webaddress)
 		if (!userGroupInstance) return
 
 		params.max = Math.min(params.max ? params.int('max') : 9, 100)
@@ -419,7 +419,7 @@ class UserGroupController {
 	@Secured(['ROLE_USER', 'ROLE_ADMIN'])
 	def settings = {
 		log.debug params
-		def userGroupInstance = findInstance()
+		def userGroupInstance = findInstance(params.id, params.webaddress)
 		if (!userGroupInstance) return
 
 			if(aclUtilService.hasPermission(springSecurityService.getAuthentication(), userGroupInstance, BasePermission.ADMINISTRATION)) {
@@ -436,7 +436,7 @@ class UserGroupController {
 
 	@Secured(['ROLE_USER', 'RUN_AS_ADMIN'])
 	def joinUs = {
-		def userGroupInstance = findInstance()
+		def userGroupInstance = findInstance(params.id, params.webaddress)
 		if (!userGroupInstance) {
 			render (['success':true,'statusComplete':false, 'msg':'No userGroup is selected.'] as JSON);
 			return;
@@ -465,7 +465,7 @@ class UserGroupController {
 		log.debug members;
 
 		if(members) {
-			def userGroupInstance = findInstance()
+			def userGroupInstance = findInstance(params.id, params.webaddress)
 			if (!userGroupInstance) {
 				render (['success':true, 'statusComplete':false, 'msg':'No userGroup selected.'] as JSON);
 				return;
@@ -487,9 +487,10 @@ class UserGroupController {
 
 	@Secured(['ROLE_USER'])
 	def requestMembership = {
+		log.debug params;
 		def user = springSecurityService.currentUser;
 		if(user) {
-			def userGroupInstance = findInstance()
+			def userGroupInstance = findInstance(params.id, params.webaddress)
 			if (!userGroupInstance) {
 				render (['success':true, 'statusComplete':false, 'msg':'No userGroup selected.'] as JSON);
 				return;
@@ -571,7 +572,7 @@ class UserGroupController {
 
 	@Secured(['ROLE_USER', 'RUN_AS_ADMIN'])
 	def leaveUs = {
-		def userGroupInstance = findInstance()
+		def userGroupInstance = findInstance(params.id, params.webaddress)
 		if (!userGroupInstance) {
 			flash.error = 'No userGroup selected.'
 			render (['success':true, 'statusComplete':false, 'msg':'No userGroup selected.'] as JSON);
@@ -590,7 +591,7 @@ class UserGroupController {
 	}
 
 	def about = {
-		def userGroupInstance = findInstance()
+		def userGroupInstance = findInstance(params.id, params.webaddress)
 		if (!userGroupInstance) return;
 
 		return ['userGroupInstance':userGroupInstance]
@@ -723,7 +724,7 @@ class UserGroupController {
 	}
 
 	def getFeaturedObservations = {
-		def userGroupInstance = findInstance()
+		def userGroupInstance = findInstance(params.id, params.webaddress)
 		if (!userGroupInstance) return;
 
 		log.debug params;
@@ -745,7 +746,7 @@ class UserGroupController {
 	}
 
 	def getFeaturedMembers = {
-		def userGroupInstance = findInstance()
+		def userGroupInstance = findInstance(params.id, params.webaddress)
 		if (!userGroupInstance) return;
 
 		log.debug params;
@@ -796,14 +797,14 @@ class UserGroupController {
 	}
 	
 	def actionsHeader = {
-		def userGroupInstance = findInstance()
+		def userGroupInstance = findInstance(params.id, params.webaddress)
 		if (!userGroupInstance) return;
 		render (template:"/common/userGroup/actionsHeaderTemplate", model:['userGroupInstance':userGroupInstance]);
 	}
 
 	def pages = {
 		log.debug params
-		def userGroupInstance = findInstance(false)
+		def userGroupInstance = findInstance(null, params.webaddress, false)
 		//if (!userGroupInstance) return;
 		def newsletters = userGroupService.getNewsLetters(userGroupInstance, params.max, params.offset, params.sort, params.order);
 		render (view:"pages", model:['userGroupInstance':userGroupInstance, 'newsletters':newsletters])
@@ -811,14 +812,14 @@ class UserGroupController {
 	
 	def page = {
 		log.debug params;
-		def userGroupInstance = findInstance(false)
+		def userGroupInstance = findInstance(null, params.webaddress, false)
 		//if (!userGroupInstance) return;
-		render (view:'page', model:['userGroupInstance':userGroupInstance, 'newsletterId':params.newsletterId])
+		render (view:'page', model:['userGroupInstance':userGroupInstance, 'newsletterId':params.id])
 	}
 	
 	def pageCreate = {
 		log.debug params;
-		def userGroupInstance = findInstance(false)
+		def userGroupInstance = findInstance(null, params.webaddress, false)
 		//if (!userGroupInstance) return;
 		render (view:'pageCreate', model:['userGroupInstance':userGroupInstance])
 	}
@@ -899,21 +900,21 @@ class UserGroupController {
    
    def allGroups= {
 	   log.debug params;
-		def userGroupInstance = findInstance()
+		def userGroupInstance = findInstance(params.id, params.webaddress)
 		if (!userGroupInstance) return;
 		render (view:'allGroups', model:['userGroupInstance':userGroupInstance])
    }
    
    def myGroups= {
 	   log.debug params;
-		def userGroupInstance = findInstance()
+		def userGroupInstance = findInstance(params.id, params.webaddress)
 		if (!userGroupInstance) return;
 		render (view:'myGroups', model:['userGroupInstance':userGroupInstance])
    }
 
    def species = {
 	   log.debug params;
-	   def userGroupInstance = findInstance()
+	   def userGroupInstance = findInstance(params.id, params.webaddress)
 	   if (!userGroupInstance) return;
 	   render (view:'species', model:['userGroupInstance':userGroupInstance])
    }

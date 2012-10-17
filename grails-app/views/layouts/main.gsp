@@ -63,7 +63,7 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 
 		<div class="container outer-wrapper">
 				<div>
-				<div style="padding:10px 0px">
+				<div style="padding:10px 0px;margin-left:-20px">
 					<g:layoutBody />
 				</div>
 				</div>

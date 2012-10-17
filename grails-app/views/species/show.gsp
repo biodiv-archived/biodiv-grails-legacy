@@ -290,8 +290,8 @@ $(document).ready(function(){
 </head>
 
 <body>
-<div class="span12" STYLE="MARGIN-LEFT:5PX;">
-<div class="container_16 big_wrapper outer_wrapper">
+<div class="span12">
+<div class="container_16 outer_wrapper">
 			<s:showSubmenuTemplate/>
 				<div class="page-header">
 						<h1>
@@ -302,7 +302,7 @@ $(document).ready(function(){
 
 			<g:if test="${!speciesInstance.percentOfInfo}">
 				<div
-					class="poor_species_content ui-state-highlight ui-corner-all grid_16">
+					class="poor_species_content ui-state-highlight ui-corner-all span12">
 					<span class="ui-icon-info" style="float: left; margin-right: .3em;"></span>
 					No information yet.
 					

@@ -1,6 +1,6 @@
 <%@page import="species.utils.ImageType"%>
-<div style="margin: 5px 0px;position:relative;">
-	<g:link mapping="userGroup" action="show" params="['webaddress':userGroup.webaddress, 'pos':pos]"
+<div class="span4" style="margin: 5px 0px;position:relative;">
+	<g:link mapping="userGroup" action="show" absolute='true' params="['webaddress':userGroup.webaddress, 'pos':pos]"
 		style="display:inline-block;width:85%">
 		<img class="logo ${showDetails ? 'profile_pic' : 'small_profile_pic'}" style="vertical-align: middle;"
 			src="${userGroup.mainImage()?.fileName}" title="${userGroup.name}"
@@ -15,7 +15,7 @@
 <%--		</g:if>--%>
 	</g:link>
 	<g:if test="${!showDetails}">
-		<g:link mapping="userGroup" action="members" params="['webaddress':userGroup.webaddress]"
+		<g:link mapping="userGroup" action="members" absolute='true', params="['webaddress':userGroup.webaddress]"
 			title="No ofMembers"
 			style="padding:5px;position:absolute;right:0px;display:inline-block;">
 			<i class="icon-user"></i>

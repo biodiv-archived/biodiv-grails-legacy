@@ -26,15 +26,15 @@
 						id='${userGroupInstance.id}'
 						permission='${org.springframework.security.acls.domain.BasePermission.ADMINISTRATION}'>
 
-						<g:link mapping="userGroup" action="pageCreate" params="['webaddress':userGroupInstance.webaddress]"
+						<a href="${uGroup.createLink(mapping:"userGroup", action:"pageCreate", 'userGroupWebaddress':userGroupInstance.webaddress)}"
 							class="btn btn-large btn-info">
-							<i class="icon-plus"></i>Add a Newsletter</g:link>
+							<i class="icon-plus"></i>Add a Newsletter</a>
 					</sec:permitted>
 				</g:if>
 				<g:else>
 					<sUser:isAdmin>
-						<g:link mapping="userGroupGeneric" action="pageCreate" class="btn btn-large btn-info">
-							<i class="icon-plus"></i>Add a Newsletter</g:link>
+						<a href="${uGroup.createLink(mapping:"userGroupGeneric", action:"pageCreate") }" class="btn btn-large btn-info">
+							<i class="icon-plus"></i>Add a Newsletter</a>
 					</sUser:isAdmin>
 				</g:else>
 			</div>
@@ -62,12 +62,12 @@
 								<td>
 								<g:if test="${userGroupInstance}">
 								<a
-									href="${createLink(mapping:'userGroupPageShow', params:['webaddress':userGroupInstance.webaddress, 'newsletterId':newsletterInstance.id]) }">
+									href="${uGroup.createLink('mapping':'userGroup', 'action':'page', 'id':newsletterInstance.id, 'userGroup':userGroupInstance) }">
 										${fieldValue(bean: newsletterInstance, field: "title")} </a>
 								</g:if>
 								<g:else>
 								<a
-									href="${createLink(mapping:'page', params:['newsletterId':newsletterInstance.id]) }">
+									href="${uGroup.createLink(controller:'userGroup', action:'page', id:newsletterInstance.id) }">
 										${fieldValue(bean: newsletterInstance, field: "title")} </a>
 								</g:else>
 								</td>

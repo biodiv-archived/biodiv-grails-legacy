@@ -17,16 +17,7 @@
             </div>
 
             <div class="user-icon">
-            		<g:if test="${userGroup }">
-            			<g:set var="userUrl" value="${createLink(mapping:'userGroupModule', controller:'SUser', action:'show', id:observationInstance.author.id, params:['webaddress':userGroup.webaddress])}"/>
-            		</g:if>
-            		<g:elseif test="${userGroupWebaddress }">
-						<g:set var="url" value="${createLink(mapping:'userGroupModule', controller:'SUser', action:'show', id:observationInstance.author.id, params:['webaddress':userGroupWebaddress]) }"/>
-					</g:elseif>
-            		<g:else>
-            			<g:set var="userUrl" value="${createLink(controller:'SUser', action:'show', id:observationInstance.author.id)}"/>
-            		</g:else>
-                    <a href="${userUrl}"> <img
+                    <a href="${uGroup.createLink(controller:'SUser', action:'show', id:observationInstance.author.id, 'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress)}"> <img
                             src="${observationInstance.author.icon()}" class="small_profile_pic"
                             title="${observationInstance.author.name}" /> </a>
                     

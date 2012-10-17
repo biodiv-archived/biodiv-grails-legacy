@@ -18,7 +18,6 @@
 	</style>
 </head>
 <body>
-
 			<div class="span12">
 				<div class="page-header">
 
@@ -43,7 +42,7 @@
 					<div class="row section" style="">
 						<div class="figure span3"
 							style="float: left; max-height: 220px; max-width: 200px">
-							<a href="${uGroup.createLink([action:"show", controller:"SUser", id:user.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':userGroupWebaddress])}">
+							<a href="${uGroup.createLink(action:"show", controller:"SUser", id:user.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
 								<img class="normal_profile_pic" src="${user.icon()}" />
 							</a>
 
@@ -176,7 +175,7 @@
 						</span> 	Observations
 					</h5>
 					<obv:showRelatedStory
-						model="['controller':'observation', 'action':'getRelatedObservation', 'filterProperty': 'user', 'filterPropertyValue':user.id, 'id':'a', 'userGroup':userGroupInstance, 'userGroupWebaddress':userGroupWebaddress]" />
+						model="['controller':'observation', 'action':'getRelatedObservation', 'filterProperty': 'user', 'filterPropertyValue':user.id, 'id':'a', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress]" />
 				</div>
 				
 				<div class="section" style="clear: both;">
@@ -218,7 +217,7 @@
 		$("#seeMoreMessage").hide();
 		$('#tc_tagcloud a').click(function(){
 			var tg = $(this).contents().first().text();
-			window.location.href = "${g.createLink(controller:'observation', action: 'list')}?tag=" + tg ;
+			window.location.href = "${uGroup.createLink(controller:'observation', action: 'list', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}?tag=" + tg ;
 	    	return false;
 	 	});
 	 	
@@ -234,10 +233,10 @@
 	   function preLoadRecos(max, seeAllClicked, obvId, liComponent){
          	$("#seeMoreMessage").hide();        	
          	$.ajax({
-         		url: "${createLink(action:'getRecommendationVotes', id:user.id) }",
+         		url: "${uGroup.createLink(controller:params.controller, action:'getRecommendationVotes', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress, id:user.id) }",
 				method: "POST",
 				dataType: "json",
-				data: {max:max , offset:userRecoffset, obvId:obvId, 'userGroupWebaddress':"${userGroupWebaddress}"},	
+				data: {max:max , offset:userRecoffset, obvId:obvId},	
 				success: function(data) {
 					if(seeAllClicked){
 						$("#recoSummary").append(data.recoHtml);
