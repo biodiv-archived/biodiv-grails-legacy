@@ -12,7 +12,7 @@
 	<input type="hidden" name='feedPermission' value="${feedPermission}"/>
 	<input type="hidden" name='refreshType' value="${refreshType}"/>
 	<input type="hidden" name='rootHolderId' value="${rootHolder?.id}"/>
-	<input type="hidden" name='rootHolderType' value="${rootHolder?.class.getCanonicalName()}"/>
+	<input type="hidden" name='rootHolderType' value="${rootHolder?.class?.getCanonicalName()}"/>
 	<input type="hidden" name='activityHolderId' value="${activityHolder?.id}"/>
 	<input type="hidden" name='activityHolderType' value="${activityHolder?.class?.getCanonicalName()}"/>
 	<input type="hidden" name='feedUrl' value="${createLink(controller:'activityFeed', action: 'getFeeds')}"/>
@@ -22,7 +22,7 @@
 	<input type="hidden" name='subRootHolderId' value="${subRootHolderId}"/>
 	<input type="hidden" name='subRootHolderType' value="${subRootHolderType}"/>
 	<input type="hidden" name='feedHomeObjectId' value="${rootHolder?.id}"/>
-	<input type="hidden" name='feedHomeObjectType' value="${rootHolder?.class.getCanonicalName()}"/>
+	<input type="hidden" name='feedHomeObjectType' value="${rootHolder?.class?.getCanonicalName()}"/>
 	
 	<g:if test="${feedOrder == 'oldestFirst'}">	
 		<g:if test="${refreshType == 'manual' && remainingFeedCount > 0}" >

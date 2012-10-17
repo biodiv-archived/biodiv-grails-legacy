@@ -85,7 +85,13 @@
 									default="Username" /> </span> <div class="value"> ${fieldValue(bean: user, field: "username")}
 							</div>
 						</div>
-
+						
+						<div class="prop">
+							<span class="name"><i class="icon-user"></i><g:message code="suser.name.label"
+									default="Full Name" /> </span> <div class="value"> ${fieldValue(bean: user, field: "name")}
+							</div>
+						</div>
+						
 						<sUser:ifOwnsOrIsPublic model="['user':user, 'isPublic':!user.hideEmailId]">
 							<div class="prop">
 								<span class="name"><i class="icon-envelope"></i><g:message code="suser.email.label"
