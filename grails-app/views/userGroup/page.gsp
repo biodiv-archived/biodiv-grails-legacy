@@ -17,7 +17,7 @@
 </head>
 <body>
 
-	<div class="observation span12">
+	<div class="observation span12 bodymarker">
 		<uGroup:showSubmenuTemplate model="['entityName':'Pages']" />
 		<uGroup:rightSidebar model="['userGroupInstance':userGroupInstance]" />
 		<div class="center_panel">

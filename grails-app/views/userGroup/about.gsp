@@ -16,9 +16,8 @@
 <r:require modules="userGroups_show" />
 </head>
 <body>
-	<div class="observation span12">
+	<div class="observation span12 bodymarker">
 		<uGroup:showSubmenuTemplate  model="['entityName':'About Us']"/>
-		
 		<uGroup:rightSidebar model="['userGroupInstance':userGroupInstance]"/>
 		<div class="center_panel">
 		<div class="super-section userGroup-section">

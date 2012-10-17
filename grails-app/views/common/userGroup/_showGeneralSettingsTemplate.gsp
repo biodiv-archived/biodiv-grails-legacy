@@ -5,7 +5,7 @@
 		<span class="name">Home Page</span>
 		<g:hiddenField name="homePage"/>
 		<div class="value">
-			<div class="btn-group pull-right" style="z-index: 10;">
+			<div class="btn-group pull-right">
 				<button id="homePageSelector" class="btn dropdown-toggle" data-toggle="dropdown" href="#" rel="tooltip"
 					data-original-title="Home page">${userGroupInstance.homePage ?: 'Select home page '}<span class="caret"></span>
 				</button>
@@ -28,7 +28,7 @@
 		<span class="name">Theme</span>
 		<g:hiddenField name="theme"/>
 		<div class="value">
-			<div class="btn-group pull-right" style="z-index: 10;">
+			<div class="btn-group pull-right">
 				<button id="themeSelector" class="btn dropdown-toggle" data-toggle="dropdown" href="#" rel="tooltip"
 					data-original-title="Theme">${userGroupInstance.theme ?: 'Select theme '}<span class="caret"></span>
 				</button>

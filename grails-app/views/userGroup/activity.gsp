@@ -18,7 +18,7 @@
 </style>
 </head>
 <body>
-	<div class="observation span12">
+	<div class="observation span12 bodymarker">
 		<uGroup:showSubmenuTemplate model="['entityName':'Activity Stream']"/>
 		<uGroup:rightSidebar model="['userGroupInstance':userGroupInstance]"/>
 		<div class="userGroup-section center_panel">
