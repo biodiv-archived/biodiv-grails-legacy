@@ -66,27 +66,42 @@
 
 					<div class="super-section" style="clear: both;">
 						<div class="row section">
-							<div class="figure span3"
-								style="float: left; max-height: 220px; max-width: 200px">
-								<g:link controller="SUser" action="show" id="${user.id }">
-									<img class="normal_profile_pic" src="${user.icon()}" />
-								</g:link>
-								<div class="prop">
-									<span class="name"><i class="icon-time"></i>Member since
-									</span>
-									<div class="value">
-										<g:formatDate format="dd/MM/yyyy" date="${user.dateCreated}"
-											type="datetime" style="MEDIUM" />
-									</div>
+								<div class="figure span3" style="float: left; max-height: 220px; max-width: 200px">
+								
+								<%def thumbnail = user.icon%>
+								<div class='pull-left' style="height:80px; width:auto;margin-left: 0px;">
+									<a onclick="$('#attachFile').select()[0].click();return false;" style="postiion:relative;">
+										<img id="thumbnail"
+										src='${createLink(url: user.mainImage().fileName)}' class='logo '/>
+										<div style="clear:both;">
+											<i class="icon-picture"></i>
+											<span>Upload picture of size < 1MB</span>
+										</div>
+									</a>
 								</div>
-								<div class="prop">
-									<span class="name"><i class="icon-time"></i>Last visited
-									</span>
-									<div class="value">
-										<g:formatDate format="dd/MM/yyyy" date="${user.lastLoginDate}"
-											type="datetime" style="MEDIUM" />
-									</div>
-								</div>
+								<input id="icon" name="icon" type="hidden" value='${thumbnail}' />
+								
+								
+<%--								<g:link controller="SUser" action="show" id="${user.id }">--%>
+<%--									<img class="normal_profile_pic" src="${user.icon()}" />--%>
+<%--								</g:link>--%>
+<%--								--%>
+<%--								<div class="prop">--%>
+<%--									<span class="name"><i class="icon-time"></i>Member since--%>
+<%--									</span>--%>
+<%--									<div class="value">--%>
+<%--										<g:formatDate format="dd/MM/yyyy" date="${user.dateCreated}"--%>
+<%--											type="datetime" style="MEDIUM" />--%>
+<%--									</div>--%>
+<%--								</div>--%>
+<%--								<div class="prop">--%>
+<%--									<span class="name"><i class="icon-time"></i>Last visited--%>
+<%--									</span>--%>
+<%--									<div class="value">--%>
+<%--										<g:formatDate format="dd/MM/yyyy" date="${user.lastLoginDate}"--%>
+<%--											type="datetime" style="MEDIUM" />--%>
+<%--									</div>--%>
+<%--								</div>--%>
 							</div>
 							<div class="span8 observation_story">
 
@@ -190,7 +205,25 @@
 								</g:hasErrors>
 							</div>
 						</div>
-
+						
+						<div class="section"
+								style="position: relative; overflow: visible;">
+								<h5>
+									<i class="icon-screenshot"></i>Interests
+								</h5>
+								
+								<div class="row control-group left-indent">
+									
+										<label class="control-label">Species Groups & Habitats
+										</label>
+									
+									<div class="filters controls textbox" style="position: relative;">
+										<obv:showGroupFilter
+											model="['observationInstance':observationInstance]" />
+									</div>
+								</div>						
+						</div>
+						
 						<div class="section" style="clear: both;">
 							<h5>
 								<i class="icon-cog"></i>Settings
@@ -308,9 +341,13 @@
 						
 						<div class="section form-action"
 							style='clear: both; margin-top: 20px; margin-bottom: 40px;'>
-							<s2ui:submitButton elementId='update' form='userEditForm'
-								messageCode='default.button.update.label'
-								class="btn btn-primary" style="float: right; margin-right: 5px;" />
+							 <a id="userEditFormSubmit"
+								class="btn btn-primary" style="float: right; margin-right: 5px;">
+								update
+							 </a>
+<%--							<s2ui:submitButton elementId='update' form='userEditForm'--%>
+<%--								messageCode='default.button.update.label'--%>
+<%--								class="btn btn-primary" style="float: right; margin-right: 5px;" />--%>
 
 							<sUser:isAdmin model="['user':user]">
 								<g:if test='${user}'>
@@ -326,7 +363,7 @@
 
 						</div>
 				</g:form>
-
+				
 				<sUser:isAdmin model="['user':user]">
 					<g:if test='${user}'>
 						<s2ui:deleteButtonForm instanceId='${user.id}' />
@@ -341,6 +378,16 @@
 						<input type='submit' class='s2ui_hidden_button' />
 					</form>
 				</g:if>
+				
+				
+				<form id="upload_resource" enctype="multipart/form-data"
+					title="Add a logo for this group" method="post"
+					class="${hasErrors(bean: user, field: 'profilePic', 'errors')}">
+					<input type="file" id="attachFile" name="resources" accept="image/*"/> 
+					<span class="msg" style="float: right"></span> 
+					<input type="hidden" name='dir' value="${userGroupDir}" />
+				</form>
+	
 			</div>
 	
 
@@ -354,7 +401,137 @@
 			$('#runAsButton').bind('click', function() {
 				document.forms.runAsForm.submit();
 			});
+			
+			
+			$("#userEditFormSubmit").click(function(){
+				var speciesGroups = getSelectedGroup();
+		        var habitats = getSelectedHabitat();
+		        
+		       	$.each(speciesGroups, function(index){
+		       		var input = $("<input>").attr("type", "hidden").attr("name", "speciesGroup."+index).val(this);
+					$('#userEditForm').append($(input));	
+		       	})
+		        
+		       	$.each(habitats, function(index){
+		       		var input = $("<input>").attr("type", "hidden").attr("name", "habitat."+index).val(this);
+					$('#userEditForm').append($(input));	
+		       	})
+		       	
+		        $("#userEditForm").submit();
+		        return false;
+			});
+			
+			
+			
+			function getSelectedGroup() {
+			    var grp = []; 
+			    $('#speciesGroupFilter button').each (function() {
+			            if($(this).hasClass('active')) {
+			                    grp.push($(this).attr('value'));
+			            }
+			    });
+			    return grp;	
+			} 
+			    
+			function getSelectedHabitat() {
+			    var hbt = []; 
+			    $('#habitatFilter button').each (function() {
+			            if($(this).hasClass('active')) {
+			                    hbt.push($(this).attr('value'));
+			            }
+			    });
+			    return hbt;	
+			}
+			
+			$('#speciesGroupFilter button').attr('data-toggle', 'buttons-checkbox').click(function(){
+		    	if($(this).hasClass('active')) {
+		    		$(this).removeClass('active');
+		    	} else {
+		    		$(this).addClass('active');
+		    	}
+		    	return false;
+		 	});
+			
+		        
+		 	$('#habitatFilter button').attr('data-toggle', 'buttons-checkbox').click(function(){
+		    	if($(this).hasClass('active')) {
+		    		$(this).removeClass('active');
+		    	} else {
+		    		$(this).addClass('active');
+		    	}
+		    	return false;
+		 	});
+						
+			<%
+				user.speciesGroups.each {
+					out << "jQuery('#group_${it.id}').addClass('active');";
+				}
+				user.habitats.each {
+					out << "jQuery('#habitat_${it.id}').addClass('active');";
+				}
+			%>
+			
+		//hack: for fixing ie image upload
+        if (navigator.appName.indexOf('Microsoft') != -1) {
+            $('#upload_resource').css({'visibility':'visible'});
+        } else {
+            $('#upload_resource').css({'visibility':'hidden'});
+        }
+		
+		$('#attachFile').change(function(e){
+  			$('#upload_resource').submit().find("span.msg").html("Uploading... Please wait...");
+		});
 
+     	$('#upload_resource').ajaxForm({ 
+			url:'${createLink(controller:'SUser', action:'upload_resource')}',
+			dataType: 'xml',//could not parse json wih this form plugin 
+			clearForm: true,
+			resetForm: true,
+			type: 'POST',
+			 
+			beforeSubmit: function(formData, jqForm, options) {
+				return true;
+			}, 
+            xhr: function() {  // custom xhr
+                myXhr = $.ajaxSettings.xhr();
+                return myXhr;
+            },
+			success: function(responseXML, statusText, xhr, form) {
+				$(form).find("span.msg").html("");
+				var rootDir = '${grailsApplication.config.speciesPortal.users.serverURL}'
+				var dir = $(responseXML).find('dir').text();
+				var dirInput = $('#upload_resource input[name="dir"]');
+				if(!dirInput.val()){
+					$(dirInput).val(dir);
+				}
+				
+				$(responseXML).find('resources').find('image').each(function() {
+					var file = dir + "/" + $(this).attr('fileName');
+					var thumbnail = rootDir + file.replace(/\.[a-zA-Z]{3,4}$/, "${grailsApplication.config.speciesPortal.resources.images.thumbnail.suffix}");
+					$("#icon").val(file);
+					$("#thumbnail").attr("src", thumbnail);
+				});
+				$("#image-resources-msg").parent(".resources").removeClass("error");
+                $("#image-resources-msg").html("");
+			}, error:function (xhr, ajaxOptions, thrownError){
+					//successHandler is used when ajax login succedes
+	            	var successHandler = this.success, errorHandler;
+	            	handleError(xhr, ajaxOptions, thrownError, successHandler, function() {
+						var response = $.parseJSON(xhr.responseText);
+						if(response.error){
+							$("#image-resources-msg").parent(".resources").addClass("error");
+							$("#image-resources-msg").html(response.error);
+						}
+						
+						var messageNode = $(".message .resources");
+						if(messageNode.length == 0 ) {
+							$("#upload_resource").prepend('<div class="message">'+(response?response.error:"Error")+'</div>');
+						} else {
+							messageNode.append(response?response.error:"Error");
+						}
+					});
+           		} 
+     		});
 		});
 	</r:script>
 

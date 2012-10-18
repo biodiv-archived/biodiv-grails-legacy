@@ -144,4 +144,13 @@ class SUserTagLib {
 			out << body()
 		}
 	}
+	
+	def interestedSpeciesGroups = {attrs, body ->
+		out<<render(template:"/common/suser/interestedSpeciesGroupsTemplate", model:attrs.model);
+	}
+
+	def interestedHabitats = {attrs, body ->
+		out<<render(template:"/common/suser/interestedHabitatsTemplate", model:attrs.model);
+	}
+
 }

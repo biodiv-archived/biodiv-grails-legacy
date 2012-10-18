@@ -10,10 +10,12 @@ import grails.util.GrailsNameUtils
 import java.util.List
 import java.util.Map
 
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.solr.common.util.NamedList;
 import org.codehaus.groovy.grails.plugins.springsecurity.NullSaltSource
 import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
 import org.springframework.dao.DataIntegrityViolationException
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import species.BlockedMails;
 import species.participation.RecommendationVote;
@@ -21,7 +23,9 @@ import species.participation.Observation;
 
 import species.participation.curation.UnCuratedVotes;
 import species.utils.Utils;
-
+import species.utils.ImageUtils;
+import species.Habitat;
+import species.groups.SpeciesGroup;
 
 class SUserController extends UserController {
 
@@ -149,6 +153,9 @@ class SUserController extends UserController {
 			
 			user.sendNotification = (params.sendNotification?.equals('on'))?true:false;
 			
+			user.icon = getUserIcon(params.icon);
+			addInterestedSpeciesGroups(user, params.speciesGroup)
+			addInterestedHabitats(user, params.habitat)
 			
 			if (!user.save(flush: true)) {
 				render view: 'edit', model: buildUserModel(user)
@@ -173,7 +180,7 @@ class SUserController extends UserController {
 			redirect (action:'show', id:params.id)
 		}
 	}
-
+	
 	@Secured(['ROLE_ADMIN'])
 	def delete = {
 		def user = findById()
@@ -582,8 +589,122 @@ class SUserController extends UserController {
 		   render message as JSON
 	   }
    }
+   
+   @Secured(['ROLE_USER'])
+   def upload_resource = {
+	   log.debug params;
 
-	private processResult(List recommendationVoteList, Map params) {
+	   try {
+		   if(ServletFileUpload.isMultipartContent(request)) {
+			   MultipartHttpServletRequest multiRequest = (MultipartHttpServletRequest) request;
+			   def rs = [:]
+			   Utils.populateHttpServletRequestParams(request, rs);
+			   def resourcesInfo = [];
+			   def rootDir = grailsApplication.config.speciesPortal.users.rootDir
+			   File usersDir;
+			   def message;
+
+			   if(!params.resources) {
+				   message = g.message(code: 'no.file.attached', default:'No file is attached')
+			   }
+
+			   params.resources.each { f ->
+				   log.debug "Saving userGroup logo file ${f.originalFilename}"
+
+				   // List of OK mime-types
+				   //TODO Move to config
+				   def okcontents = [
+					   'image/png',
+					   'image/jpeg',
+					   'image/pjpeg',
+					   'image/gif',
+					   'image/jpg'
+				   ]
+
+				   if (! okcontents.contains(f.contentType)) {
+					   message = g.message(code: 'resource.file.invalid.extension.message', args: [
+						   okcontents,
+						   f.originalFilename
+					   ])
+				   }
+				   else if(f.size > grailsApplication.config.speciesPortal.users.logo.MAX_IMAGE_SIZE) {
+					   message = g.message(code: 'resource.file.invalid.max.message', args: [
+						   grailsApplication.config.speciesPortal.users.logo.MAX_IMAGE_SIZE/1024,
+						   f.originalFilename,
+						   f.size/1024
+					   ], default:"File size cannot exceed ${grailsApplication.config.speciesPortal.users.logo.MAX_IMAGE_SIZE/1024}KB");
+				   }
+				   else if(f.empty) {
+					   message = g.message(code: 'file.empty.message', default:'File cannot be empty');
+				   }
+				   else {
+					   if(!usersDir) {
+						   if(!params.dir) {
+							   usersDir = new File(rootDir);
+							   if(!usersDir.exists()) {
+								   usersDir.mkdir();
+							   }
+							   usersDir = new File(usersDir, UUID.randomUUID().toString()+File.separator+"resources");
+							   usersDir.mkdirs();
+						   } else {
+							   usersDir = new File(rootDir, params.dir);
+							   usersDir.mkdir();
+						   }
+					   }
+
+					   File file = observationService.getUniqueFile(usersDir, Utils.cleanFileName(f.originalFilename));
+					   f.transferTo( file );
+					   ImageUtils.createScaledImages(file, usersDir);
+					   resourcesInfo.add([fileName:file.name, size:f.size]);
+				   }
+			   }
+			   log.debug resourcesInfo
+			   // render some XML markup to the response
+			   if(usersDir && resourcesInfo) {
+				   render(contentType:"text/xml") {
+					   userGroup {
+						   dir(usersDir.absolutePath.replace(rootDir, ""))
+						   resources {
+							   for(r in resourcesInfo) {
+								   image('fileName':r.fileName, 'size':r.size){}
+							   }
+						   }
+					   }
+				   }
+			   } else {
+				   response.setStatus(500)
+				   message = [error:message]
+				   render message as JSON
+			   }
+		   } else {
+			   response.setStatus(500)
+			   def message = [error:g.message(code: 'no.file.attached', default:'No file is attached')]
+			   render message as JSON
+		   }
+	   } catch(e) {
+		   e.printStackTrace();
+		   response.setStatus(500)
+		   def message = [error:g.message(code: 'file.upload.fail', default:'Error while processing the request.')]
+		   render message as JSON
+	   }
+   }
+   
+   private String getUserIcon(String icon) {
+	   if(!icon) return;
+
+	   def resource = null;
+	   def rootDir = grailsApplication.config.speciesPortal.users.rootDir
+
+	   File iconFile = new File(rootDir , Utils.cleanFileName(icon));
+	   if(!iconFile.exists()) {
+		   log.error "COULD NOT locate icon file ${iconFile.getAbsolutePath()}";
+	   }
+
+	   resource = iconFile.absolutePath.replace(rootDir, "");
+	   return resource;
+   }
+   
+   private processResult(List recommendationVoteList, Map params) {
 		try {
 			if(recommendationVoteList.size() > 0) {
 				def result = [];
@@ -626,6 +747,24 @@ class SUserController extends UserController {
 			render message as JSON
 		}
 	}
+	
+	private void addInterestedSpeciesGroups(userInstance, speciesGroups) {
+		log.debug "Adding species group interests ${speciesGroups}"
+		userInstance.speciesGroups = []
+		
+		speciesGroups.each {key, value ->
+			userInstance.addToSpeciesGroups(SpeciesGroup.read(value.toLong()));
+		}
+	}
+
+	private void addInterestedHabitats(userInstance, habitats) {
+		log.debug "Adding habitat interests ${habitats}"
+		userInstance.habitats = []
+		habitats.each { key, value ->
+			userInstance.addToHabitats(Habitat.read(value.toLong()));
+		}
+	}
+
 
 }
 
