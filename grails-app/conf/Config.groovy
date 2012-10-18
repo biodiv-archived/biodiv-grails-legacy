@@ -235,6 +235,16 @@ speciesPortal {
 			MAX_IMAGE_SIZE = 51200
 		}
 	}
+
+	users {
+		rootDir = "${app.rootDir}/users"
+		serverURL = "http://localhost/${appName}/users"
+		logo {
+			MAX_IMAGE_SIZE = 104857600
+		}
+	}
+
+		
 	names.parser.serverURL = "saturn.strandls.com"
 	names.parser.port = 4334
 	search {

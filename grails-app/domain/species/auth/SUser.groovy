@@ -13,6 +13,8 @@ import species.participation.ObservationFlag;
 import species.participation.RecommendationVote;
 import species.participation.curation.UnCuratedVotes;
 import species.utils.ImageType;
+import species.Habitat;
+import species.groups.SpeciesGroup;
 
 class SUser {
 
@@ -32,6 +34,8 @@ class SUser {
 	Date dateCreated = new Date();
 	Date lastLoginDate = new Date();
 	String profilePic
+	String icon
+	
 	String website;
 	float timezone=0;//offset
 	String aboutMe;
@@ -41,7 +45,7 @@ class SUser {
 	boolean allowIdentifactionMail = true;
 
 
-	static hasMany = [openIds: OpenID, flags:ObservationFlag, unCuratedVotes:UnCuratedVotes, observations:Observation, recoVotes:RecommendationVote, groups:UserGroup]
+	static hasMany = [openIds: OpenID, flags:ObservationFlag, unCuratedVotes:UnCuratedVotes, observations:Observation, recoVotes:RecommendationVote, groups:UserGroup, speciesGroups:SpeciesGroup, habitats:Habitat]
 	static belongsTo = [UserGroup]
 	//static hasOne = [facebookUser:FacebookUser]
 
@@ -51,6 +55,7 @@ class SUser {
 		password blank: false
 		email email: true, blank: false, unique: true, nullable:false
 		profilePic nullable:true
+		icon nullable:true
 		website nullable:true
 		timezone nullable:true
 		aboutMe nullable:true
@@ -111,6 +116,12 @@ class SUser {
 	}
 
 	def icon(ImageType type) {
+		boolean iconPresent = (new File(grailsApplication.config.speciesPortal.users.rootDir.toString()+this.icon)).exists()
+		if(iconPresent) {
+			return grailsApplication.config.speciesPortal.users.serverURL+this.icon //, type:ResourceType.ICON, title:this.name);
+		}
+		
+		
 		if(profilePic) {
 			return profilePic;
 		}
