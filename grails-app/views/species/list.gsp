@@ -74,17 +74,17 @@
 
 								<g:if test="${i%3 == 0}">
 									<li
-										class="thumbnail ${speciesInstance.percentOfInfo > 0?'rich_species_content':'poor_species_content'}"
-										style="clear: both;">
+										class=" pull-left thumbnail ${speciesInstance.percentOfInfo > 0?'rich_species_content':'poor_species_content'}"
+										style="clear: both;margin:5px">
 								</g:if>
 								<g:else>
 									<li
-										class="thumbnail ${speciesInstance.percentOfInfo > 0?'rich_species_content':'poor_species_content'}"
-										style="margin: 0;">
+										class="pull-left thumbnail ${speciesInstance.percentOfInfo > 0?'rich_species_content':'poor_species_content'}"
+										style="margin:5px">
 								</g:else>
 								<g:set var="mainImage" value="${speciesInstance.mainImage()}" />
 								<%def thumbnailPath = ImageUtils.getFileName(mainImage?.fileName, ImageType.SMALL, null)%>
-								<div class="snippet tablet" style="width: 299px;height: 65px;">
+								<div class="snippet tablet" style="width: 290px;height: auto;">
 									<a href="${uGroup.createLink([controller:'species', action:'show', id:speciesInstance.id, userGroup:userGroup, userGroupWebaddress:userGroupWebaddress])}">
 										
 

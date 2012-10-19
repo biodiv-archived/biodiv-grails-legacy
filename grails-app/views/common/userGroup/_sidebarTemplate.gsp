@@ -7,7 +7,7 @@
 
 	<li class="dropdown">
 		<a href="#" class="dropdown-toggle" data-toggle="dropdown">
-				My Home<b class="caret" style="border-top-color: black;border-bottom-color: black;"></b>
+				Home<b class="caret" style="border-top-color: black;border-bottom-color: black;"></b>
 		</a>	
 		<!--h5 class="nav-header">Home</h5-->
 		<ul class="dropdown-menu">
