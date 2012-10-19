@@ -24,9 +24,9 @@
 				<h1>
 					${fieldValue(bean: user, field: "name")}
 					<sUser:ifOwns model="['user':user]">
-						<span style="font-size: 60%; float: right;" class="btn btn-primary"> <g:link
-								controller="SUser" action="edit" id="${user.id }">Edit Profile
-							</g:link> </span>
+						<span style="font-size: 60%; float: right;" class="btn btn-primary">
+						<a href="${uGroup.createLink(action:'edit', controller:'SUser', id:user.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">Edit Profile
+						</a> </span>
 					</sUser:ifOwns>
 				</h1>
 
