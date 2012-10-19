@@ -509,6 +509,10 @@ environments {
 				serverURL = "http://wgp.saturn.strandls.com/${appName}/userGroups"
 				//serverURL = "http://localhost/${appName}/observations"
 			}
+			users {
+				rootDir = "${app.rootDir}/users"
+				serverURL = "http://wgp.saturn.strandls.com/${appName}/users"
+			}
 			search.serverURL="http://saturn.strandls.com:8080/solr"
 			grails.project.war.file = "/data/jetty-6.1.26/webapps/${appName}.war"
 			grails {
@@ -574,6 +578,10 @@ environments {
 			userGroups {
 				rootDir = "${app.rootDir}/userGroups"
 				serverURL = "http://thewesternghats.in/${appName}/userGroups"
+			}
+			users {
+				rootDir = "${app.rootDir}/users"
+				serverURL = "http://thewesternghats.in/${appName}/users"
 			}
 			search.serverURL="http://thewesternghats.in:8080/solr"
 			grails {

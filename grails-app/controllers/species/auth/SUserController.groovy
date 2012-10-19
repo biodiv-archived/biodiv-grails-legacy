@@ -120,7 +120,8 @@ class SUserController extends UserController {
 			return buildUserModel(user)
 		}
 		flash.message = "${message(code: 'edit.denied.message')}";
-		redirect (action:'show', id:params.id)
+		redirect (url:uGroup.createLink(action:'show', controller:"SUser", id:params.id, 'userGroupWebaddress':params.webaddress))
+		//redirect (action:'show', id:params.id)
 	}
 
 	@Secured(['ROLE_USER', 'ROLE_ADMIN'])
@@ -174,10 +175,12 @@ class SUserController extends UserController {
 			
 			userCache.removeUserFromCache user[usernameFieldName]
 			flash.message = "${message(code: 'default.updated.message', args: [message(code: 'user.label', default: 'User'), user.id])}"
-			redirect action: show, id: user.id
+			redirect (url:uGroup.createLink(action:'show', controller:"SUser", id:user.id, 'userGroupWebaddress':params.webaddress))
+			//redirect action: show, id: user.id
 		} else {
 			flash.message = "${message(code: 'update.denied.message')}";
-			redirect (action:'show', id:params.id)
+			redirect (url:uGroup.createLink(action:'show', controller:"SUser", id:params.id, 'userGroupWebaddress':params.webaddress))
+			//redirect (action:'show', id:params.id)
 		}
 	}
 	
@@ -222,7 +225,8 @@ class SUserController extends UserController {
 		catch (DataIntegrityViolationException e) {
 			e.printStackTrace();
 			flash.error = "${message(code: 'default.not.deleted.message', args: [message(code: 'user.label', default: 'User'), params.id])}"
-			redirect action: edit, id: params.id
+			redirect (url:uGroup.createLink(action:'edit', controller:"SUser", id:params.id, 'userGroupWebaddress':params.webaddress))
+			//redirect action: edit, id: params.id
 		}
 	}
 

@@ -38,11 +38,9 @@
 						${fieldValue(bean: user, field: "name")}
 
 						<span style="font-size: 60%; float: right;"
-							class="btn btn-primary"> <g:link controller="SUser"
-								action="show" id="${user.id}">View my profile
-							</g:link> </span>
-
-
+							class="btn btn-primary">
+							<a href="${uGroup.createLink(action:'show', controller:"SUser", id:user.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">View my profile
+							</a> </span>
 					</h1>
 
 				</div>
@@ -60,7 +58,7 @@
 					<%--<g:renderErrors bean="${user}" as="list" />--%>
 				</g:hasErrors>
 
-				<g:form class="form-horizontal" action="update" name='userEditForm'>
+				<form class="form-horizontal" action="${uGroup.createLink(action:'update', controller:'SUser', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}" id='userEditForm' method="POST">
 					<g:hiddenField name="id" value="${user?.id}" />
 					<g:hiddenField name="version" value="${user?.version}" />
 
@@ -343,7 +341,7 @@
 							style='clear: both; margin-top: 20px; margin-bottom: 40px;'>
 							 <a id="userEditFormSubmit"
 								class="btn btn-primary" style="float: right; margin-right: 5px;">
-								update
+								Update
 							 </a>
 <%--							<s2ui:submitButton elementId='update' form='userEditForm'--%>
 <%--								messageCode='default.button.update.label'--%>
@@ -362,7 +360,7 @@
 							</g:if>
 
 						</div>
-				</g:form>
+				</form>
 				
 				<sUser:isAdmin model="['user':user]">
 					<g:if test='${user}'>
