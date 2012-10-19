@@ -55,8 +55,7 @@ $(document).ready(function(){
 	</div>
 </g:if>
 
-
-<g:if test="${params.controller != 'species'  && params.controller != 'userGroup'}">
+<g:if test="${params.controller != 'species'  && params.controller != 'userGroup' && params.controller != 'SUser' }">
 	<div id="speciesNameFilter" class="btn-group"
 		style="float: right; margin-right: 5px; z-index: 10; position: absolute; margin-top: -65px; right: 0;">
 		<input type="text" id="speciesNameFilter"

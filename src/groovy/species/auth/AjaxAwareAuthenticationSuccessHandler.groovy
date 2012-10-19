@@ -36,6 +36,7 @@ org.codehaus.groovy.grails.plugins.springsecurity.AjaxAwareAuthenticationSuccess
 		cookie.domain = "."+Utils.getDomain(request);
 		response.addCookie(cookie)
 
+		
 		super.onAuthenticationSuccess(request, response, authentication);
 	}
 
@@ -45,4 +46,5 @@ org.codehaus.groovy.grails.plugins.springsecurity.AjaxAwareAuthenticationSuccess
 			return it.name == cookieName
 		}
 	}
+
 }

@@ -154,6 +154,10 @@ function getFeedParams(timeLine, targetComp){
 	feedParams["subRootHolderId"] = $(targetComp).children('input[name="subRootHolderId"]').val();
 	feedParams["subRootHolderType"] = $(targetComp).children('input[name="subRootHolderType"]').val();
 	
+	feedParams["feedHomeObjectId"] = $(targetComp).children('input[name="feedHomeObjectId"]').val();
+	feedParams["feedHomeObjectType"] = $(targetComp).children('input[name="feedHomeObjectType"]').val();
+	feedParams["webaddress"] = $(targetComp).children('input[name="webaddress"]').val();
+	
 	feedParams["refreshType"] = $(targetComp).children('input[name="refreshType"]').val();
 	feedParams["timeLine"] = timeLine;
 	if(timeLine === "newer"){

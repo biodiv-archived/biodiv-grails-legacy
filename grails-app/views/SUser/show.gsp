@@ -85,7 +85,13 @@
 									default="Username" /> </span> <div class="value"> ${fieldValue(bean: user, field: "username")}
 							</div>
 						</div>
-
+						
+						<div class="prop">
+							<span class="name"><i class="icon-user"></i><g:message code="suser.name.label"
+									default="Full Name" /> </span> <div class="value"> ${fieldValue(bean: user, field: "name")}
+							</div>
+						</div>
+						
 						<sUser:ifOwnsOrIsPublic model="['user':user, 'isPublic':!user.hideEmailId]">
 							<div class="prop">
 								<span class="name"><i class="icon-envelope"></i><g:message code="suser.email.label"
@@ -167,11 +173,32 @@
 <%--					</div>--%>
 <%----%>
 <%--				</g:if>--%>
-
+<%--			<div class="super-section">--%>
+<%--				<h3>Interests</h3>--%>
 				<div class="section" style="clear: both;">
 					<h5>
 						<span class="name" style="color: #b1b1b1;">
-						<i class="icon-screenshot"></i><obv:showNoOfObservationsOfUser model="['user':user]"/></i>
+						<i class="icon-screenshot"></i></span>
+						Species Groups
+					</h5>
+					<sUser:interestedSpeciesGroups
+						model="['userInstance':user]" />
+				</div>
+	
+				<div class="section" style="clear: both;" >
+					<h5>
+						<span class="name" style="color: #b1b1b1;">
+						<i class="icon-screenshot"></i></span>
+						Habitat
+					</h5>
+					<sUser:interestedHabitats
+						model="['userInstance':user]" />
+				</div>
+			
+				<div class="section" style="clear: both;">
+					<h5>
+						<span class="name" style="color: #b1b1b1;">
+						<i class="icon-screenshot"></i><obv:showNoOfObservationsOfUser model="['user':user]"/>
 						</span> 	Observations
 					</h5>
 					<obv:showRelatedStory
@@ -181,7 +208,7 @@
 				<div class="section" style="clear: both;">
 					<h5>
 						<span class="name" style="color: #b1b1b1;">
-						<i class="icon-check"></i><obv:showNoOfRecommendationsOfUser model="['user':user]"/></i>
+						<i class="icon-check"></i><obv:showNoOfRecommendationsOfUser model="['user':user]"/>
 						</span> 	Identifications
 					</h5>
 					<div>
@@ -198,13 +225,13 @@
 				<div class="section" style="clear: both;">
 					<h5>
 						<span class="name" style="color: #b1b1b1;">
-						<i class="icon-screenshot"></i><uGroup:showNoOfUserGroupsOfUser model="['user':user]"/></i>
+						<i class="icon-screenshot"></i><uGroup:showNoOfUserGroupsOfUser model="['user':user]"/>
 						</span> Groups
 					</h5>
 						<uGroup:showUserUserGroups model="['userInstance':user]"></uGroup:showUserUserGroups>
 						
 				</div>
-
+<%--			</div>--%>
 							
 			</div>
 			</div>

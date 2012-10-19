@@ -119,7 +119,7 @@ class ActivityFeedTagLib {
 				activityTitle = "Joined group " +  getUserGroupHyperLink(activityRootObj)
 				break
 			case activityFeedService.MEMBER_ROLE_UPDATED:
-				activityTitle = getUserHyperLink(activityDomainObj) + "'s role updated"
+				activityTitle = getUserHyperLink(activityDomainObj, model.feedInstance.fetchUserGroup()) + "'s role updated"
 				break
 			case activityFeedService.MEMBER_LEFT:
 				activityTitle = "Left group " + getUserGroupHyperLink(activityRootObj)
@@ -149,16 +149,16 @@ class ActivityFeedTagLib {
  		return "" + sb
 	}
 	
-	private getObservationHyperLink(obv){
-		return "" + (g.link(controller:"observation", action:"show", id:obv.id){"<i>Observation</i>"})
+//	private getObservationHyperLink(obv){
+//		return "" + (g.link(controller:"observation", action:"show", id:obv.id){"<i>Observation</i>"})
+//	}
+	
+	private getUserHyperLink(user, userGroup){
+		return '<a href="' + uGroup.createLink(controller:'SUser', action:'show', id:user.id, userGroup:userGroup, 'userGroupWebaddress':userGroup?.webaddress)  + '">' + "<i>$user.name</i>" + "</a>"
 	}
 	
-	private getUserHyperLink(user){
-		return "" + (g.link(controller:"sUser", action:"show", id:user.id){"<i>$user.name</i>"})
-	}
-	
-	private getUserGroupHyperLink(uGroup){
-		return "" + (g.link(controller:"userGroup", action:"show", id:uGroup.id){"<i>$uGroup.name</i>"})
+	private getUserGroupHyperLink(userGroupInstance){
+		return '<a href="' + uGroup.createLink(mapping:'userGroup',  action:'show', 'userGroup':userGroupInstance) + '">' + "<i>$userGroupInstance.name</i>" + "</a>"
 	}
 	
 }

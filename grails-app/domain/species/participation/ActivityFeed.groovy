@@ -8,6 +8,8 @@ import species.groups.UserGroup;
 import species.participation.ActivityFeedService
 
 class ActivityFeed {
+	def activityFeedService;
+	
 	//activity basic info
 	Date dateCreated;
 	Date lastUpdated;
@@ -208,6 +210,13 @@ class ActivityFeed {
 	
 	def showComment(){
 		return (rootHolderType == Observation.class.getCanonicalName() || !isMainThreadComment())
+	}
+	
+	def fetchUserGroup(){
+		if(rootHolderType == UserGroup.class.getCanonicalName()){
+			return activityFeedService.getDomainObject( rootHolderType, rootHolderId)
+		}
+		return null
 	}
 	
 	private static getGroupAndObsevations(groups){
