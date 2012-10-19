@@ -36,14 +36,14 @@
 <r:require modules="core" />
 </head>
 <body>
-	<div class="bodymarker">
+	<div>
 		<div class="page-header">
 			
 					<h1>
 						${fieldValue(bean: newsletterInstance, field: "title")}
 					</h1>
 		</div>
-		<div class="description notes_view">
+		<div class="description notes_view bodymarker">
 			<table>
 				<tbody>
 
@@ -52,7 +52,7 @@
 								date="${newsletterInstance?.date}" />
 						</td>
 					</tr>
-
+					
 					<tr class="prop">
 						<td valign="top" class="value">
 							${newsletterInstance?.newsitem}
