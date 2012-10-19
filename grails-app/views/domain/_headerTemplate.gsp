@@ -32,7 +32,7 @@
 						href="${uGroup.createLink('mapping':'userGroup', 'action':'species', 'userGroup':userGroupInstance)}"
 						title="Species">Species</a>
 					</li>
-					<li class="${(params.action == 'observation')?' active':''}"><a
+					<li class="${(params.controller == 'userGroup' && params.action == 'observation')?' active':''}"><a
 						href="${uGroup.createLink('mapping':'userGroup', 'action':'observation', 'userGroup':userGroupInstance)}"
 						title="Observations">Observations</a>
 					</li>
@@ -55,12 +55,12 @@
 						title="Activity">Activity</a>
 					</li>
 					<li
-						class="${((params.controller == 'user' || params.controller == 'SUser')&& params.action != 'header')?' active':''}"><a
+						class="${(params.controller == 'userGroup' && params.action == 'user')?' active':''}"><a
 						href="${uGroup.createLink(mapping:"userGroup", 'action':"user", 'userGroupWebaddress':userGroupInstance.webaddress)}"
 						title="Members">Members</a>
 					</li>
 
-					<li class="${(params.action == 'aboutUs')?' active':''}"><a
+					<li class="${(params.controller == 'userGroup' && params.action == 'about')?' active':''}"><a
 						href="${uGroup.createLink(mapping:"userGroup", 'action':"about", 'userGroupWebaddress':userGroupInstance.webaddress)}"
 						title="About Us">About Us</a>
 					</li>
@@ -68,7 +68,7 @@
 						data-toggle="dropdown"> More <b class="caret"></b> </a>
 						<ul class="dropdown-menu" style="text-align: left;">
 
-							<li class="${(params.action == 'pages')?' active':''}"><a
+							<li class="${(params.controller == 'userGroup' && params.action == 'pages')?' active':''}"><a
 								href="${uGroup.createLink(mapping:"userGroup", 'action':"pages", 'userGroupWebaddress':userGroupInstance.webaddress)}"
 								title="Pages">Pages</a>
 							</li>
@@ -138,14 +138,6 @@
 							<li
 								class="${(request.getHeader('referer')?.contains('/biodiversity_news'))?' active':''}"><a
 								href="/biodiversity_news" title="News">News</a></li>
-							<li
-								class="${(request.getHeader('referer')?.contains('/cepf_grantee_database'))?' active':''}"><a
-								href="/cepf_grantee_database"
-								title="Western Ghats CEPF Projects">Western Ghats CEPF
-									Projects</a></li>
-							<li
-								class="${(request.getHeader('referer')?.contains('/themepages/list'))?' active':''}"><a
-								href="/themepages/list" title="Themes">Themes</a></li>
 
 						</ul>
 					</li>

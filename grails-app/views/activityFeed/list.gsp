@@ -11,7 +11,7 @@
 </head>
 <body>
 	
-			<div class="span9">
+			<div class="span12">
 				<div class="page-header clearfix">
 						<h1>
 							<g:message code="default.observation.heading" args="[entityName]" />
@@ -23,7 +23,10 @@
 						${flash.message}
 					</div>
 				</g:if>
-				<feed:showFeedWithFilter model="[feedType:feedType, feedCategory:'All','feedOrder':'latestFirst']" />
+				<uGroup:rightSidebar model="['userGroupInstance':userGroupInstance]"/>
+				<div class="userGroup-section center_panel">
+					<feed:showFeedWithFilter model="[feedType:feedType, feedCategory:'All','feedOrder':'latestFirst']" />
+				</div>
 			</div>
 		
 	<r:script>

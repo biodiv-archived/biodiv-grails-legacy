@@ -41,7 +41,7 @@
 				${flash.message}
 			</div>
 		</g:if>
-
+		<uGroup:rightSidebar model="['userGroupInstance':userGroupInstance]"/>
 		<sUser:showUserListWrapper
 			model="['results':results, 'totalCount':totalCount]" />
 	</div>

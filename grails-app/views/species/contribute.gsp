@@ -9,7 +9,7 @@
 
 </head>
 <body>
-	<div class="span12 outer_wrapper">
+	<div>
 		<s:showSubmenuTemplate model="['entityName':'Contribute to Species Pages']"/>
 				
 <%

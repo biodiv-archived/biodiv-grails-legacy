@@ -2,10 +2,8 @@
 <!-- label class="control-label" for="username"><g:message
 								code='user.username.label' default='Username' />:</label-->
 
-<div style="clear: both"></div>
-
 <g:if test='${searched}'>
-	<div class="">
+	<div class=" center_panel">
 		<div class="list">
 			<div class="observations thumbwrap">
 				<%

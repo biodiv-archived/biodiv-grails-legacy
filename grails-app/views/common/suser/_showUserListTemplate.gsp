@@ -1,10 +1,10 @@
-<div class="users_list" style="clear: both;">
+<div class="users_list">
 	<div class="mainContentList">
 		<div class="mainContent">
 			<ul class="grid_view thumbnails">
 	
 				<g:each in="${userInstanceList}" status="i" var="userInstance">
-					<g:if test="${i% ((params.controller != 'userGroup')?4:3) == 0}">
+					<g:if test="${i% ((params.controller != 'userGroup')?3:3) == 0}">
 						<li class="thumbnail" style="clear: both;">
 					</g:if>
 					<g:else>
