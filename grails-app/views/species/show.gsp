@@ -390,7 +390,7 @@ $(document).ready(function(){
 			<!--  static species content -->
 			<div class="grid_6 classifications" style="width:330px;margin-left:0px;">
 				<t:showTaxonBrowser model="['speciesInstance':speciesInstance, 'expandSpecies':true, 'expandAll':false, 'speciesId':speciesInstance.taxonConcept?.id, expandAllIcon:false]"/>
-				<br />					
+				<br />
 
 				<div class="readmore" style="float:left;">
 					${speciesInstance.findSummary() }

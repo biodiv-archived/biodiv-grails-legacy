@@ -1,38 +1,5 @@
 <div class="container group-theme" style="width:100%;">
 	<div style="padding: 10px 0px;">
-		<div class="navbar navbar-static-top pull-right" style="margin-bottom: 0px;">
-		<div class="navbar-inner"
-			style="box-shadow: none; background-color: transparent; background-image: none;">
-			<div class="container" style="width: 100%">
-				<a class="btn btn-navbar" data-toggle="collapse"
-					data-target=".nav-collapse"> <span class="icon-bar"></span> </a>
-				<div class="nav-collapse">
-					<ul class="nav">
-
-					</ul>
-
-
-					<ul class="nav pull-right">
-						<li><search:searchBox /></li>
-						<g:if test="${userGroupInstance  && userGroupInstance.id }">
-						<li>
-								<a class="" href="${createLink(url:grailsApplication.config.grails.serverURL+"/..") }"> India Biodiversity Portal</a>
-						</li>
-						</g:if>
-						<g:if
-							test="${params.controller != 'openId' && params.controller != 'login' &&  params.controller != 'register'}">
-							<li><uGroup:showSidebar />
-							</li>
-						</g:if>
-						<li><sUser:userLoginBox />
-						</li>
-
-					</ul>
-				</div>
-			</div>
-
-		</div>
-	</div>
 		<g:if test="${userGroupInstance  && userGroupInstance.id }">
 			<uGroup:showHeader model="[ 'userGroupInstance':userGroupInstance]" />
 		</g:if>
@@ -46,8 +13,8 @@
 		
 	</div>
 </div>
-<div class="navbar navbar-static-top"
-	style="margin-bottom: 0px; position: relative; width: 100%; background-color: #A5A5A5">
+<div class="navbar navbar-static-top btn"
+	style="margin-bottom: 0px; position: relative; width: 100%;">
 	<div class="navbar-inner"
 		style="padding: 0px; box-shadow: none; background-color: transparent; background-image: none;">
 		<div class="container outer-wrapper"

@@ -55,7 +55,7 @@ class OpenIdController {
 		}
 
 		[openIdPostUrl: "${request.contextPath}$openIDAuthenticationFilter.filterProcessesUrl",
-					daoPostUrl:    "${request.contextPath}${config.apf.filterProcessesUrl}",
+					daoPostUrl:"${request.contextPath}${config.apf.filterProcessesUrl}",
 					persistentRememberMe: config.rememberMe.persistent,
 					rememberMeParameter: config.rememberMe.parameter,
 					openidIdentifier: config.openid.claimedIdentityFieldName]

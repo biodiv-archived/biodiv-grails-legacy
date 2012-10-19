@@ -87,7 +87,7 @@
 </style>
 <ul class="nav">
 	<sec:ifNotLoggedIn>
-		<li><a href="${createLink(controller:'login', absolute:'true') }">Login</a>
+		<li><a href="${uGroup.createLink(controller:'login', 'userGroup':userGroup) }">Login</a>
 		</li>
 		
 		<li><g:link controller='register' absolute='true'>Register</g:link>
