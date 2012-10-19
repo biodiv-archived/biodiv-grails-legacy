@@ -84,7 +84,7 @@
 								</g:else>
 								<g:set var="mainImage" value="${speciesInstance.mainImage()}" />
 								<%def thumbnailPath = ImageUtils.getFileName(mainImage?.fileName, ImageType.SMALL, null)%>
-								<div class="snippet tablet" style="width: 290px;height: auto;">
+								<div class="snippet tablet" style="width: 285px;height: auto;">
 									<a href="${uGroup.createLink([controller:'species', action:'show', id:speciesInstance.id, userGroup:userGroup, userGroupWebaddress:userGroupWebaddress])}">
 										
 
