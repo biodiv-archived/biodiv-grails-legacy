@@ -14,11 +14,11 @@
 	</div>
 </div>
 <div class="navbar navbar-static-top btn"
-	style="margin-bottom: 0px; position: relative; width: 100%;">
+	style="margin-bottom: 0px; position: relative; width: 100%;padding: 0px; ">
 	<div class="navbar-inner"
-		style="padding: 0px; box-shadow: none; background-color: transparent; background-image: none;">
+		style="box-shadow: none; background-color: transparent; background-image: none;">
 		<div class="container outer-wrapper"
-			style="background-color: transparent; padding: 0px; width: 940px">
+			style="background-color: transparent; padding-bottom: 0px; width: 940px">
 
 			<g:if test="${userGroupInstance && userGroupInstance.id}">
 

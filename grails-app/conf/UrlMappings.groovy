@@ -19,7 +19,7 @@ class UrlMappings {
 
 		"/user/$action?/$id?" { controller = 'SUser' }
 
-
+		"/" {view="index"}
 		//"/login/$action?"(controller: "login")
 		"/logout/$action?"(controller: "logout")
 
