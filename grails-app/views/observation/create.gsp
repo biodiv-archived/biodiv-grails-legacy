@@ -120,12 +120,12 @@ input.dms_field {
 
 			<%
 				def form_id = "addObservation"
-				def form_action = createLink(action:'save')
+				def form_action = uGroup.createLink(action:'save', controller:'observation', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)
 				def form_button_name = "Add Observation"
 				def form_button_val = "Add Observation"
 				if(params.action == 'edit' || params.action == 'update'){
 					//form_id = "updateObservation"
-					form_action = createLink(action:'update', id:observationInstance.id)
+					form_action = uGroup.createLink(action:'update', controller:'observation', id:observationInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)
 				 	form_button_name = "Update Observation"
 					form_button_val = "Update Observation"
 				}

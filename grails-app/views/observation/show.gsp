@@ -87,7 +87,7 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 						<sUser:ifOwns model="['user':observationInstance.author]">
 							
 							<a class="btn btn-primary pull-right"
-								href="${createLink(controller:'observation', action:'edit', id:observationInstance.id)}">
+								href="${uGroup.createLink(controller:'observation', action:'edit', id:observationInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
 								Edit Observation </a>
 
 								<a class="btn btn-danger btn-primary pull-right" style="margin-right: 5px;margin-bottom:10px;"

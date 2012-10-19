@@ -180,7 +180,8 @@ class ObservationController {
 				}
 			}
 		} else {
-			redirect(action: "create")
+			redirect (url:uGroup.createLink(action:'create', controller:"observation", 'userGroupWebaddress':params.webaddress))
+			//redirect(action: "create")
 		}
 	}
 
@@ -239,7 +240,8 @@ class ObservationController {
 			}
 		}else {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
-			redirect(action: "list")
+			redirect (url:uGroup.createLink(action:'list', controller:"observation", 'userGroupWebaddress':params.webaddress))
+			//redirect(action: "list")
 		}
 		render(view: "create", model: [observationInstance: observationInstance])
 	}
@@ -250,7 +252,8 @@ class ObservationController {
 			def observationInstance = Observation.findWhere(id:params.id.toLong(), isDeleted:false)
 			if (!observationInstance) {
 				flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
-				redirect(action: "list")
+				redirect (url:uGroup.createLink(action:'list', controller:"observation", 'userGroupWebaddress':params.webaddress))
+				//redirect(action: "list")
 			}
 			else {
 				observationInstance.incrementPageVisit();
@@ -333,7 +336,8 @@ class ObservationController {
 		def observationInstance = Observation.findWhere(id:params.id.toLong(), isDeleted:false)
 		if (!observationInstance) {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
-			redirect(action: "list")
+			redirect (url:uGroup.createLink(action:'list', controller:"observation", 'userGroupWebaddress':params.webaddress))
+			//redirect(action: "list")
 		}
 		else {
 			render(view: "create", model: [observationInstance: observationInstance, 'springSecurityService':springSecurityService])
@@ -348,16 +352,19 @@ class ObservationController {
 				observationInstance.delete(flush: true)
 				observationsSearchService.delete(observationInstance.id);
 				flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
-				redirect(action: "list")
+				redirect (url:uGroup.createLink(action:'list', controller:"observation", 'userGroupWebaddress':params.webaddress))
+				//redirect(action: "list")
 			}
 			catch (org.springframework.dao.DataIntegrityViolationException e) {
 				flash.message = "${message(code: 'default.not.deleted.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
-				redirect(action: "show", id: params.id)
+				redirect (url:uGroup.createLink(action:'show', controller:"observation", id:params.id, 'userGroupWebaddress':params.webaddress))
+				//redirect(action: "show", id: params.id)
 			}
 		}
 		else {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
-			redirect(action: "list")
+			redirect (url:uGroup.createLink(action:'list', controller:"observation", 'userGroupWebaddress':params.webaddress))
+			//redirect(action: "list")
 		}
 	}
 
@@ -496,7 +503,8 @@ class ObservationController {
 					}else if(params["isMobileApp"]?.toBoolean()){
 						render (['success:true, obvId:$observationInstance.id']as JSON);
 					}else{
-						redirect(action: "show", id: observationInstance.id, params:[postToFB:(params.postToFB?:false)]);
+						redirect (url:uGroup.createLink(action:'show', controller:"observation", id:observationInstance.id, 'userGroupWebaddress':params.webaddress, postToFB:(params.postToFB?:false)))
+						//redirect(action: "show", id: observationInstance.id, params:[postToFB:(params.postToFB?:false)]);
 					}
 					return
 
@@ -516,7 +524,8 @@ class ObservationController {
 					}else if(params["isMobileApp"]?.toBoolean()){
 						render (['success:true, obvId:$observationInstance.id'] as JSON);
 					}else{
-						redirect(action: "show", id: observationInstance.id, params:[postToFB:(params.postToFB?:false)]);
+						redirect (url:uGroup.createLink(action:'show', controller:"observation", id:observationInstance.id, 'userGroupWebaddress':params.webaddress, postToFB:(params.postToFB?:false)))
+						//redirect(action: "show", id: observationInstance.id, params:[postToFB:(params.postToFB?:false)]);
 					}
 					return
 				}
@@ -536,7 +545,8 @@ class ObservationController {
 		} else {
 			flash.message  = "${message(code: 'observation.invalid', default:'Invalid observation')}"
 			log.error flash.message;
-			redirect(action: "list")
+			redirect (url:uGroup.createLink(action:'list', controller:"observation", 'userGroupWebaddress':params.webaddress))
+			//redirect(action: "list")
 		}
 	}
 
@@ -697,16 +707,19 @@ class ObservationController {
 				activityFeedService.deleteFeed(observationInstance);
 				observationsSearchService.delete(observationInstance.id);
 				flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
-				redirect(action: "list")
+				redirect (url:uGroup.createLink(action:'list', controller:"observation", 'userGroupWebaddress':params.webaddress))
+				//redirect(action: "list")
 			}
 			catch (org.springframework.dao.DataIntegrityViolationException e) {
 				flash.message = "${message(code: 'default.not.deleted.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
-				redirect(action: "show", id: params.id)
+				redirect (url:uGroup.createLink(action:'show', controller:"observation",  id: params.id, 'userGroupWebaddress':params.webaddress))
+				//redirect(action: "show", id: params.id)
 			}
 		}
 		else {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
-			redirect(action: "list")
+			redirect (url:uGroup.createLink(action:'list', controller:"observation", 'userGroupWebaddress':params.webaddress))
+			//redirect(action: "list")
 		}
 	}
 
@@ -737,7 +750,8 @@ class ObservationController {
 		else {
 			flash.message  = "${message(code: 'observation.flag.duplicate', default:'Already flagged')}"
 		}
-		redirect(action: "show", id: params.id)
+		redirect (url:uGroup.createLink(action:'show', controller:"observation", id: params.id, 'userGroupWebaddress':params.webaddress))
+		//redirect(action: "show", id: params.id)
 	}
 
 	@Secured(['ROLE_USER'])
