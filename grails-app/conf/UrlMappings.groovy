@@ -71,7 +71,11 @@ class UrlMappings {
 			action='observation'
 		}
 
+		"/group/$webaddress/login/$action/$id?" {
+			controller = "openId"
+		}
 		name userGroupModule:"/group/$webaddress/$controller/$action/$id?" {
+		
 		}
 	}
 }
