@@ -55,8 +55,10 @@
 		</div>
 	</g:if>
 	
-
-	<%activeFilters?.loadMore = true %>
+	<%
+		activeFilters?.loadMore = true
+		activeFilters?.webaddress = userGroup?.webaddress
+	%>
 	<div class="paginateButtons" style="visibility: hidden; clear: both">
 		<g:paginate total="${instanceTotal?:0}" action="${params.action}"
 			 max="${queryParams.max}" params="${activeFilters}" />
