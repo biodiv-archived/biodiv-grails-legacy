@@ -706,6 +706,6 @@ class UserGroupService {
 	}
 	
 	def getGroupThemes(){
-		return ["blue", "green", "black"]
+		return ["default", "blue", "green", "black"]
 	}
 }
