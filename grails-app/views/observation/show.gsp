@@ -425,7 +425,7 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
          		url: "${createLink(controller:'observation', action:'getRecommendationVotes', id:observationInstance.id) }",
 				method: "POST",
 				dataType: "json",
-				data: {max:max , offset:0, 'userGroupWebaddress':"${userGroup?userGroup.webaddress:userGroupWebaddress}"},	
+				data: {max:max , offset:0, 'webaddress':"${userGroup?userGroup.webaddress:userGroupWebaddress}"},	
 				success: function(data) {
 					$("#recoSummary").html(data.recoHtml);
 					var uniqueVotes = parseInt(data.uniqueVotes);
