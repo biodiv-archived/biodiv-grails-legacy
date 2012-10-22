@@ -495,7 +495,7 @@ class ObservationController {
 			try {
 				if(!recommendationVoteInstance){
 					//saving max voted species name for observation instance needed when observation created without species name
-					observationInstance.calculateMaxVotedSpeciesName();
+					//observationInstance.calculateMaxVotedSpeciesName();
 					observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
 
 					if(!params["createNew"]){

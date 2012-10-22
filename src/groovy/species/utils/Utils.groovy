@@ -143,7 +143,7 @@ class Utils {
 	
 	static String getIBPServerUrl() {
 		def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config;
-		return "http://$config.ibp.domain/$config.appName";
+		return "http://$config.ibp.domain";
 	}
 
 	static String getDomainName(HttpServletRequest request) {
