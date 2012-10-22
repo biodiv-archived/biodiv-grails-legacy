@@ -62,7 +62,6 @@ class Observation implements Taggable{
 	String locationAccuracy;
 	Habitat habitat;
 	long visitCount = 0;
-	String maxVotedSpeciesName;
 	boolean isDeleted = false;
 	int flagCount = 0;
 	String searchText;
@@ -74,7 +73,6 @@ class Observation implements Taggable{
 	static constraints = {
 		notes nullable:true
 		searchText nullable:true;
-		maxVotedSpeciesName nullable:true
 		maxVotedReco nullable:true
 		resource validator : { val, obj -> val && val.size() > 0 }
 		observedOn validator : {val -> val < new Date()}
@@ -143,16 +141,9 @@ class Observation implements Taggable{
 	
 	void calculateMaxVotedSpeciesName(){
 		maxVotedReco = findMaxRepeatedReco(); 
-		if(!maxVotedReco){
-			maxVotedSpeciesName = "Unknown";
-		}else{
-			maxVotedSpeciesName = maxVotedReco.name
-		}
-		
 		if(!save(flush:true)){
 			errors.allErrors.each { log.error it }
 		}
-		
 	}
 	
 	String fetchSuggestedCommonNames(){

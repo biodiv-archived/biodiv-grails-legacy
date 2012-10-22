@@ -119,7 +119,7 @@ class ObservationService {
 		def obvs = Observation.findAll(query, [propertyValue:propertyValue, parentObvId:obvId, max:limit, offset:offset, isDeleted:false])
 		def result = [];
 		obvs.each {
-			result.add(['observation':it, 'title':it.maxVotedSpeciesName]);
+			result.add(['observation':it, 'title':it.fetchSpeciesCall()]);
 		}
 		return result
 	}
@@ -160,7 +160,7 @@ class ObservationService {
 		def observations = Observation.findAll(query, queryParams);
 		def result = [];
 		observations.each {
-			result.add(['observation':it, 'title':it.maxVotedSpeciesName]);
+			result.add(['observation':it, 'title':it.fetchSpeciesCall()]);
 		}
 
 		return ["observations":result, "count":count[0]]
@@ -193,7 +193,7 @@ class ObservationService {
 
 		def result = [];
 		obvs.each {
-			result.add(['observation':it, 'title':it.maxVotedSpeciesName]);
+			result.add(['observation':it, 'title':it.fetchSpeciesCall()]);
 		}
 
 		return result
@@ -220,7 +220,7 @@ class ObservationService {
 	 * @return
 	 */
 	String getSpeciesNames(obvId){
-		return Observation.read(obvId).maxVotedSpeciesName;
+		return Observation.read(obvId).fetchSpeciesCall();
 	}
 
 	/**
@@ -247,7 +247,7 @@ class ObservationService {
 		
 		def result = [];
 		observations.each {
-			result.add(['observation':it, 'title':it.maxVotedSpeciesName]);
+			result.add(['observation':it, 'title':it.fetchSpeciesCall()]);
 		}
 		return ["observations":result, "count":count]
 	}
@@ -556,7 +556,7 @@ class ObservationService {
 		}
 
 		if(params.speciesName && (params.speciesName != grailsApplication.config.speciesPortal.group.ALL)){
-			filterQuery += " and obv.maxVotedSpeciesName = :speciesName "
+			filterQuery += " and obv.maxVotedReco is null "
 			queryParams["speciesName"] = params.speciesName
 			activeFilters["speciesName"] = params.speciesName
 		}
