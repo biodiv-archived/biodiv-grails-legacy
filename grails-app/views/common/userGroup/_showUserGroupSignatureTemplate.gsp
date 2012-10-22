@@ -1,6 +1,6 @@
 <%@page import="species.utils.ImageType"%>
 <div class="span4" style="margin: 5px 0px;position:relative;">
-	<g:link mapping="userGroup" action="show" absolute='true' params="['webaddress':userGroup.webaddress, 'pos':pos]"
+	<g:link base="${userGroup.domainName}" mapping="userGroup" action="show" absolute='true' params="['webaddress':userGroup.webaddress, 'pos':pos]"
 		style="display:inline-block;width:135%">
 		<img class="logo ${showDetails ? 'profile_pic' : 'small_profile_pic'}" style="vertical-align: middle;"
 			src="${userGroup.mainImage()?.fileName}" title="${userGroup.name}"

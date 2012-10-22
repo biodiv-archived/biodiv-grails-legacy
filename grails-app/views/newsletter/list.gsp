@@ -1,7 +1,8 @@
-
+<%@page import="species.utils.Utils"%>
 <%@ page import="utils.Newsletter" %>
 <html>
     <head>
+    <link rel="canonical" href="${Utils.getIBPServerDomain() + createLink(controller:'newsletter', action:'list')}" />
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="main" />
         <link rel="stylesheet" type="text/css" media="all"
