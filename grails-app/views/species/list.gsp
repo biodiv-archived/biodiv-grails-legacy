@@ -3,8 +3,10 @@
 <%@page import="species.TaxonomyDefinition.TaxonomyRank"%>
 <%@ page import="species.Species"%>
 <%@ page import="species.groups.SpeciesGroup"%>
+<%@page import="species.utils.Utils"%>
 <html>
 <head>
+<link rel="canonical" href="${Utils.getIBPServerDomain() + createLink(controller:'species', action:'list')}" />
 <meta http-equiv="Content-Type" content="text/html" />
 <meta name="layout" content="main" />
 

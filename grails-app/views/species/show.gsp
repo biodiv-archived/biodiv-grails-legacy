@@ -7,8 +7,10 @@
 <%@ page import="species.Synonyms"%>
 <%@ page import="species.CommonNames"%>
 <%@ page import="species.Language"%>
+<%@page import="species.utils.Utils"%>
 <html>
 <head>
+<link rel="canonical" href="${Utils.getIBPServerDomain() + createLink(controller:'species', action:'show', id:speciesInstance.id)}" />
 <meta name="layout" content="main" />
 <r:require modules="species_show"/>
 
