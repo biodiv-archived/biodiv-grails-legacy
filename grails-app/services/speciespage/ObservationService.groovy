@@ -557,7 +557,7 @@ class ObservationService {
 
 		if(params.speciesName && (params.speciesName != grailsApplication.config.speciesPortal.group.ALL)){
 			filterQuery += " and obv.maxVotedReco is null "
-			queryParams["speciesName"] = params.speciesName
+			//queryParams["speciesName"] = params.speciesName
 			activeFilters["speciesName"] = params.speciesName
 		}
 
