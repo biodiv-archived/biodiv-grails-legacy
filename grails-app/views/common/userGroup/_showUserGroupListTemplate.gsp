@@ -89,15 +89,15 @@ $(document).ready(function(){
 	var leaveUrl = "${createLink(controller:'userGroup', action:'leaveUs') }";
 	
 	$(".joinUs").live('click', function() {
-		window.joinUsUrl = joinUsUrl + "/" + $(this).attr('data-group-id')+"/joinUs";
+		window.joinUsUrl = joinUsUrl + "/?id=" + $(this).attr('data-group-id') //+"/joinUs";
 	});
 	
 	$(".requestMembership").live('click', function() {
-		window.requestMembershipUrl = requestMembershipUrl+"/"+$(this).attr('data-group-id')+"/requestMembership";
+		window.requestMembershipUrl = requestMembershipUrl+"/?id="+$(this).attr('data-group-id')//+"/requestMembership";
 	});
 	
 	$(".leaveUs").live('click', function() {
-		window.leaveUrl = leaveUrl+"/"+$(this).attr('data-group-id')+"/leaveUs";
+		window.leaveUrl = leaveUrl //+"/"+$(this).attr('data-group-id')+"/leaveUs";
 		$("#leave").attr('data-group-id', $(this).attr('data-group-id'))
 	});
 });

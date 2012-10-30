@@ -63,11 +63,13 @@ $(document).ready(function(){
 	$("#leave").click(function() {
 		if($(this).hasClass('disabled')) return false;
 		var dataGroupId = $(this).attr('data-group-id');
+		
 		var me = $(".leaveUs[data-group-id="+dataGroupId+"]");
 		$.ajax({
         	url: window.leaveUrl,
             method: "POST",
             dataType: "json",
+            data:{'id':dataGroupId},
             success: function(data) {
             	if(data.statusComplete) {
             		$("me").html("Thank You").removeClass("btn-info").addClass("disabled");
