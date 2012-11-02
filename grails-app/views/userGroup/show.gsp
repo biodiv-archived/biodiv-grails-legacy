@@ -49,6 +49,9 @@
 .comment-textbox {
 	width: 100%;
 }
+.homepage-content .value.date {
+	display:none;
+}
 </style>
 </head>
 <body>

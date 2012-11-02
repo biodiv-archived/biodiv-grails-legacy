@@ -1,7 +1,8 @@
-
+<%@ page import="species.utils.Utils"%>
 <%@ page import="species.TaxonomyDefinition" %>
 <html>
     <head>
+    	<link rel="canonical" href="${Utils.getIBPServerDomain() + createLink(controller:'taxonomyDefinition', action:'list')}" />
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="main" />
         <g:set var="entityName" value="${message(code: 'taxonomyDefinition.label', default: 'TaxonomyDefinition')}" />

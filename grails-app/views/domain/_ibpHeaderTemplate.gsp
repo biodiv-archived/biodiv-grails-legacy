@@ -17,8 +17,7 @@
 
 
 						<ul class="nav pull-right">
-							<li><search:searchBox />
-							</li>
+<%--							<li><search:searchBox /></li>--%>
 							<g:if test="${userGroupInstance  && userGroupInstance.id }">
 								<li>
 							</g:if>

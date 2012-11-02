@@ -90,10 +90,9 @@
 					</label>
 				</div>
 
-
 				<g:if test="${params.userGroup}">
 					<input type="hidden" name="userGroup"
-						value="${params.userGroup}" />
+						value="${params.userGroup.webaddress}" />
 				</g:if>
 
 			</div>

@@ -3,6 +3,7 @@
 <%@ page import="species.utils.Utils"%>
 <html>
 <head>
+<link rel="canonical" href="${Utils.getIBPServerDomain() + createLink(controller:'SUser', action:'show', id:user.id)}" />
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="main" />
 <r:require modules="observations_show"/>

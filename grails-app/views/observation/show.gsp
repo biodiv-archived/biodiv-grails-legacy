@@ -6,6 +6,7 @@
 
 <html>
 <head>
+<link rel="canonical" href="${Utils.getIBPServerDomain() + createLink(controller:'observation', action:'show', id:observationInstance.id)}" />
 <meta property="og:type" content="article" />
 <meta property="og:title" content="${(!observationInstance.fetchSpeciesCall()?.equalsIgnoreCase('Unknown'))?observationInstance.fetchSpeciesCall():'Help Identify'}"/>
 <meta property="og:url" content="${uGroup.createLink([controller:'observation', action:'show', id:observationInstance.id, base:Utils.getDomainServerUrl(request), 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress])}" />
@@ -425,7 +426,7 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
          		url: "${createLink(controller:'observation', action:'getRecommendationVotes', id:observationInstance.id) }",
 				method: "POST",
 				dataType: "json",
-				data: {max:max , offset:0, 'userGroupWebaddress':"${userGroup?userGroup.webaddress:userGroupWebaddress}"},	
+				data: {max:max , offset:0, 'webaddress':"${userGroup?userGroup.webaddress:userGroupWebaddress}"},	
 				success: function(data) {
 					$("#recoSummary").html(data.recoHtml);
 					var uniqueVotes = parseInt(data.uniqueVotes);

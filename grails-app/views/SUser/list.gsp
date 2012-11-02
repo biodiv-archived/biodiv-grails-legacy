@@ -1,6 +1,7 @@
+<%@page import="species.utils.Utils"%>
 <html>
-
 <head>
+<link rel="canonical" href="${Utils.getIBPServerDomain() + createLink(controller:'SUser', action:'list')}" />
 <meta name='layout' content='main' />
 <title><g:message code='spring.security.ui.user.search' /></title>
 <r:require modules="susers_list"/>
