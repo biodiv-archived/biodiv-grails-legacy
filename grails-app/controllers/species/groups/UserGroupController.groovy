@@ -898,14 +898,14 @@ class UserGroupController {
 	   return jsonData;
    }
    
-   def allGroups= {
+   def allGroups = {
 	   log.debug params;
 		def userGroupInstance = findInstance(params.id, params.webaddress)
 		if (!userGroupInstance) return;
 		render (view:'allGroups', model:['userGroupInstance':userGroupInstance])
    }
    
-   def myGroups= {
+   def myGroups = {
 	   log.debug params;
 		def userGroupInstance = findInstance(params.id, params.webaddress)
 		if (!userGroupInstance) return;

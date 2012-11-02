@@ -13,11 +13,11 @@ def otherUsergroups =  userGroups[true] %>
 				<li>
 					<%
 		boolean checked = userGroup.value;
-		if(params.userGroup) {
-			if(params.userGroup instanceof String) {
-				checked = checked || (params.userGroup == String.valueOf(userGroup.key.id));
+		if(params.userGroupId) {
+			if(params.userGroupId instanceof String) {
+				checked = checked || (params.userGroupId == String.valueOf(userGroup.key.id));
 			} else {
-				checked = checked || params.userGroup.containsValue(String.valueOf(userGroup.key.id))
+				checked = checked || params.userGroupId.containsValue(String.valueOf(userGroup.key.id))
 			}
 		}
 	 %> <label class="radio">
@@ -41,11 +41,11 @@ or with any of these groups
 			<li>
 				<%
 		boolean checked = userGroup.value;
-		if(params.userGroup) {
-			if(params.userGroup instanceof String) {
-				checked = checked || (params.userGroup == String.valueOf(userGroup.key.id));
+		if(params.userGroupId) {
+			if(params.userGroupId instanceof String) {
+				checked = checked || (params.userGroupId == String.valueOf(userGroup.key.id));
 			} else {
-				checked = checked || params.userGroup.containsValue(String.valueOf(userGroup.key.id))
+				checked = checked || params.userGroupId.containsValue(String.valueOf(userGroup.key.id))
 			}
 		}
 	 %> <label class="checkbox">

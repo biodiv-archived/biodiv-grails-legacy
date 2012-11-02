@@ -25,10 +25,11 @@
 
 			<div class="btn-group pull-right" style="z-index: 10;">
 				<uGroup:isAMember model="['userGroupInstance':userGroupInstance]">
-					<g:link controller="observation" action="create"
-						params="['userGroup':userGroupInstance.id]"
+					<a href="${uGroup.createLink(mapping:'userGroupModule',
+						controller:'observation', action:'create', 'userGroupWebaddress':userGroupInstance.webaddress,
+						'userGroupId':userGroupInstance.id)}"
 						class="btn btn-large btn-info">
-						<i class="icon-plus"></i>Add an Observation</g:link>
+						<i class="icon-plus"></i>Add an Observation</a>
 				</uGroup:isAMember>
 			</div>
 
