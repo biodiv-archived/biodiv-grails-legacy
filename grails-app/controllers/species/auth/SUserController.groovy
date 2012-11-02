@@ -494,12 +494,15 @@ class SUserController extends UserController {
 	def header = {
 		//TODO:HACK FOR NOW
 		String domainUrl = Utils.getDomainServerUrl(request);
-		if(!domainUrl.equals(Utils.getIBPServerUrl()) && params.webaddress) {			
+		
+		if(params.webaddress) {			
 			def userGroupInstance = userGroupService.get(params['webaddress'])
-			render (template:"/domain/ibpHeaderTemplate", model:['userGroupInstance':userGroupInstance])
-		} else {
-			render template:"/domain/ibpHeaderTemplate"
-		}
+			if(userGroupInstance) {
+				render (template:"/domain/ibpHeaderTemplate", model:['userGroupInstance':userGroupInstance])
+				return
+			}
+		} 
+		render template:"/domain/ibpHeaderTemplate"
 	}
 	def sidebar = {
 		render template:"/common/userGroup/sidebarTemplate"
