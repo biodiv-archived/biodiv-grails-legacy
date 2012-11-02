@@ -37,6 +37,14 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 <g:layoutHead />
 
 <!-- script src="http://cdn.wibiya.com/Toolbars/dir_1100/Toolbar_1100354/Loader_1100354.js" type="text/javascript"></script><noscript><a href="http://www.wibiya.com/">Web Toolbar by Wibiya</a></noscript-->
+	<%
+		def userGroupInstance;
+		if(params.userGroup) {
+			userGroupInstance = UserGroup.get(params.long('userGroup'));
+		} else if(params.webaddress) {
+			userGroupInstance = UserGroup.findByWebaddress(params.webaddress);
+		}
+	%>
 <g:if test="${userGroupInstance && userGroupInstance.theme}">
 	<link rel="stylesheet" type="text/css" href="${resource(dir:'group-themes', file:userGroupInstance.theme + '.css')}"/>
 </g:if>
@@ -49,15 +57,6 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 	
 	<auth:ajaxLogin />
 	<div id="fb-root"></div>
-	<%
-		def userGroupInstance;
-		if(params.userGroup) {
-			userGroupInstance = UserGroup.get(params.long('userGroup'));
-		} else if(params.webaddress) {
-			userGroupInstance = UserGroup.findByWebaddress(params.webaddress);
-		}
-	%>
-	
 	<div id="species_main_wrapper" style="clear:both;">
 		<domain:showIBPHeader model="['userGroupInstance':userGroupInstance]"/>
 
