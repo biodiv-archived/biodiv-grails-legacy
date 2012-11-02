@@ -41,9 +41,8 @@
 					</g:else>
 				</div>
 			</div>
-
 			<g:include controller="newsletter" action="show"
-				id="${newsletterId }" />
+				id="${params.newsletterId}" />
 			<div class="btn-group pull-right" style="z-index: 10;">
 
 				<g:if test="${userGroupInstance}">
