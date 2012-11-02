@@ -19,6 +19,7 @@ class NewsletterController {
 
 	@Secured(['ROLE_USER'])
 	def create = {
+		log.debug params
 		def newsletterInstance = new Newsletter()
 		newsletterInstance.properties = params
 		return [newsletterInstance: newsletterInstance]
@@ -29,10 +30,10 @@ class NewsletterController {
 		log.debug params
 		def newsletterInstance = new Newsletter(params)
 		if(params.userGroup) {
-			def userGroupInstance = userGroupService.get(params.userGroup);
+			def userGroupInstance = UserGroup.findByWebaddress(params.userGroup);
 			userGroupInstance.addToNewsletters(newsletterInstance);
 			if (userGroupInstance.save(flush: true)) {
-				flash.message = "${message(code: 'default.created.message', args: [message(code: 'newsletter.label', default: 'Newsletter'), newsletterInstance.id])}"
+				flash.message = "${message(code: 'default.created.message', args: [message(code: 'newsletter.label', default: 'Newsletter'), newsletterInstance.title])}"
 				redirect url: createLink(mapping:'userGroupPageShow', params:['webaddress':newsletterInstance.userGroup.webaddress, 'newsletterId':newsletterInstance.id])
 			}
 			else {
@@ -51,6 +52,7 @@ class NewsletterController {
 	}
 
 	def show = {
+		log.debug params
 		def newsletterInstance = Newsletter.get(params.id)
 		if (!newsletterInstance) {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'newsletter.label', default: 'Newsletter'), params.id])}"
@@ -94,15 +96,17 @@ class NewsletterController {
 					return
 				}
 			}
-			newsletterInstance.properties = params
+			//XXX removing user group info from cloned params as its coming as string
+			Map validMap = new HashMap(params)
+			validMap.remove("userGroup")
+			newsletterInstance.properties = validMap
 			if(params.userGroup) {
-				def userGroupInstance = userGroupService.get(params.userGroup);
+				def userGroupInstance = UserGroup.findByWebaddress(params.userGroup);
 				userGroupInstance.addToNewsletters(newsletterInstance);
-				if (userGroupInstance.save(flush: true)) {
+				if (userGroupInstance.save(flush: true) && !newsletterInstance.hasErrors() && newsletterInstance.save(flush: true)) {
 					flash.message = "${message(code: 'default.updated.message', args: [message(code: 'newsletter.label', default: 'Newsletter'), newsletterInstance.id])}"
 					redirect url: createLink(mapping:'userGroupPageShow', params:['webaddress':newsletterInstance.userGroup.webaddress, 'newsletterId':newsletterInstance.id, userGroupInstance:userGroupInstance])
-				}
-				else {
+				}else {
 					render(view: "edit", model: [userGroupInstance:userGroupInstance, newsletterInstance: newsletterInstance])
 				}
 			} else {

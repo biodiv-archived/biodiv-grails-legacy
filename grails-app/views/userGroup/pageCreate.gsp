@@ -19,9 +19,8 @@
 	<div class="observation span12">
 		<uGroup:showSubmenuTemplate />
 		<div class="userGroup-section">
-
 			<g:include controller="newsletter" action="create"
-				id="${newsletterId }" params="['userGroup':userGroupInstance?.webaddress]" />
+				id="${newsletterId }" params="['userGroup':userGroupInstance?:null]" />
 			<div class="btn-group pull-right" style="z-index: 10;">
 
 				<g:if test="${userGroupInstance}">

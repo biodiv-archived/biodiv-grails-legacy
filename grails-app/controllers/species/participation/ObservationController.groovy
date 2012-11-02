@@ -151,7 +151,7 @@ class ObservationController {
 					} else {
 						if(params.userGroupsList) {
 							def userGroups = (params.userGroupsList != null) ? params.userGroupsList.split(',').collect{k->k} : new ArrayList();
-							println userGroups
+							
 							setUserGroups(observationInstance, userGroups);
 						}	
 					}
@@ -222,7 +222,6 @@ class ObservationController {
 					} else {
 						if(params.userGroupsList) {
 							def userGroups = (params.userGroupsList != null) ? params.userGroupsList.split(',').collect{k->k} : new ArrayList();
-							println userGroups
 							setUserGroups(observationInstance, userGroups);
 						}						
 					}
@@ -286,9 +285,6 @@ class ObservationController {
 			listParamsKey = userGroupWebaddress + listParamsKey;
 		}
 		def lastListParams = session[listParamsKey]?.clone();
-		println session;
-		println listKey
-		println listParamsKey
 		if(lastListParams) {
 			if(!session[listKey]) {
 				log.debug "Fetching observations list as its not present in session "

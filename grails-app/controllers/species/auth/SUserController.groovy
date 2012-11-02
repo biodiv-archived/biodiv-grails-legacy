@@ -33,6 +33,7 @@ class SUserController extends UserController {
 	def namesIndexerService;
 	def observationService;
 	def SUserService;
+	def userGroupService;
 	
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
@@ -491,7 +492,14 @@ class SUserController extends UserController {
     }
 	
 	def header = {
-		render template:"/domain/ibpHeaderTemplate"
+		//TODO:HACK FOR NOW
+		String domainUrl = Utils.getDomainServerUrl(request);
+		if(!domainUrl.equals(Utils.getIBPServerUrl()) && params.webaddress) {			
+			def userGroupInstance = userGroupService.get(params['webaddress'])
+			render (template:"/domain/ibpHeaderTemplate", model:['userGroupInstance':userGroupInstance])
+		} else {
+			render template:"/domain/ibpHeaderTemplate"
+		}
 	}
 	def sidebar = {
 		render template:"/common/userGroup/sidebarTemplate"
