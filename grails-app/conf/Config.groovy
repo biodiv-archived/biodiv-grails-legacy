@@ -486,7 +486,7 @@ environments {
 	}
 
 	saturn {
-		grails.serverURL = "http://wgp.saturn.strandls.com/${appName}"
+		grails.serverURL = "http://ibp.saturn.strandls.com/${appName}"
 		
 		speciesPortal {
 			app.rootDir = "/data/species"
