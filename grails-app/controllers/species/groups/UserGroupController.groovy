@@ -280,6 +280,9 @@ class UserGroupController {
 	}
 
 	private UserGroup findInstance(id=null, webaddress='', boolean redirectToList=true) {
+		println "0000"
+		println id;
+		println webaddress
 		def userGroup
 		
 		if(id) {

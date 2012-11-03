@@ -1,7 +1,7 @@
 /**
  * 
  */
-$(document).ready(function(){
+function membership_actions() {
 	$(".joinUs").live('click', function() {
 		if($(this).hasClass('disabled')) return false;
 		var me = this;
@@ -144,5 +144,61 @@ $(document).ready(function(){
 				} 
 	     	});
 	});
+}
+
+var members_autofillUsersComp;
+
+//this is called from domain/_headerTemplate
+function init_group_header() {
+	window.reloadActionsHeaderUrl = "${uGroup.createLink(mapping:'userGroup', action:'actionsHeader','userGroup':userGroupInstance) }";
+	window.joinUsUrl =  "${uGroup.createLink(mapping:'userGroup', action:'joinUs','userGroup':userGroupInstance) }";
+	window.requestMembershipUrl = "${uGroup.createLink(mapping:'userGroup', action:'requestMembership','userGroup':userGroupInstance) }";
+	window.leaveUrl = "${uGroup.createLink(mapping:'userGroup', action:'leaveUs', 'userGroup':userGroupInstance) }";
+	window.inviteMembersFormUrl = "${uGroup.createLink(mapping:'userGroup', action:'inviteMembers', 'userGroup':userGroupInstance)}";
+	window.isLoggedInUrl = "${createLink(controller:'SUser', action:'isLoggedIn')}";
+	window.loginUrl = "${createLink(controller:'login')}"
+	window.aboutUrl = "${uGroup.createLink(mapping:'userGroup', action:'about', 'userGroup':userGroupInstance) }";
+	window.userTermsUrl = "${createLink(controller:'SUser', action: 'terms')}";
+	
+	$(".ellipsis.multiline.group_desc").trunk8({
+		lines:2,
+		fill: '&hellip;&nbsp;<a href='+window.aboutUrl+'>read more</a>&nbsp;'
+	});
+	
+	members_autofillUsersComp = $("#userAndEmailList_${members_autofillUsersId}").autofillUsers({
+		usersUrl : window.userTermsUrl
+	});
+}
+
+/*
+ * needs to be called only once for a page
+ * as calling this function multiple times would result in
+ * multiple bindings of following event handlers
+ */
+function init_header() {
+	$("#allGroups").click(function(){
 		
-});
+			$("#myGroupsInfo").slideUp('fast');
+			$("#allGroupsInfo").slideDown('slow');
+		
+		return false;
+	});
+	$("#myGroups").click(function(){
+		
+			$("#allGroupsInfo").slideUp('fast');
+			$("#myGroupsInfo").slideDown('slow');
+		
+		return false;
+	});
+	
+	$(".close").click(function(){
+		$(this).parent().slideUp('fast');
+		return false;
+	})
+	$(".active .submenu").show();
+	
+	init_group_header();
+
+	membership_actions();
+	
+}
