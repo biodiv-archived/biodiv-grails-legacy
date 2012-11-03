@@ -1,4 +1,3 @@
-
 <a class="span3 logo" style="margin-left: 0px;"
 	href="${uGroup.createLink(mapping:'userGroup',  action:'show',
 			'userGroup':userGroupInstance)}">

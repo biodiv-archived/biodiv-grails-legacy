@@ -256,16 +256,18 @@ class ObservationController {
 			}
 			else {
 				observationInstance.incrementPageVisit();
+				def userGroupInstance = userGroupService.get(params.webaddress);
 				if(params.pos) {
 					int pos = params.int('pos');
 					def prevNext = getPrevNextObservations(pos, params.webaddress);
+					
 					if(prevNext) {
-						[observationInstance: observationInstance, 'userGroupWebaddress':params.webaddress, prevObservationId:prevNext.prevObservationId, nextObservationId:prevNext.nextObservationId, lastListParams:prevNext.lastListParams]
+						[observationInstance: observationInstance, 'userGroupInstance':userGroupInstance, 'userGroupWebaddress':params.webaddress, prevObservationId:prevNext.prevObservationId, nextObservationId:prevNext.nextObservationId, lastListParams:prevNext.lastListParams]
 					} else {
-						[observationInstance: observationInstance, 'userGroupWebaddress':params.webaddress]
+						[observationInstance: observationInstance, 'userGroupInstance':userGroupInstance, 'userGroupWebaddress':params.webaddress]
 					}
 				} else {
-					[observationInstance: observationInstance, 'userGroupWebaddress':params.webaddress]
+					[observationInstance: observationInstance, 'userGroupInstance':userGroupInstance, 'userGroupWebaddress':params.webaddress]
 				}
 			}
 		}
