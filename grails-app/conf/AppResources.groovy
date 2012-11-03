@@ -55,6 +55,7 @@ modules = {
 		resource url:[dir:'js',file:'jquery/jquery.checkbox.js',plugin:'spring-security-ui']
 		resource url:[dir:'js',file:'spring-security-ui.js', plugin:'spring-security-ui']
 		resource url:'/js/jquery/trunk8.js'
+		resource url:'/js/species/membership.js'
 	}
 
 	auth {
@@ -102,7 +103,6 @@ modules = {
 
 		resource url:'/js/jsrender.js'
 		resource url:'/js/species/observations/show.js'
-		resource url:'/js/species/membership.js'
 	}
 
 	observations_create {
@@ -168,7 +168,6 @@ modules = {
 		dependsOn 'observations, gallery, carousel, activityfeed'
 
 		resource url:'/js/jsrender.js'
-		resource url:'/js/species/membership.js'
 		resource url:'/js/species/observations/show.js'
 		resource url:'/js/species/userGroups/main.js'
 	}
@@ -180,7 +179,7 @@ modules = {
 	userGroups_list {
 		dependsOn 'observations, location_utils, list_utils'
 		
-		resource url:'/js/species/membership.js'
+		
 		resource url:'/js/species/observations/list.js'
 		resource url:'/js/species/userGroups/main.js'		
 	}

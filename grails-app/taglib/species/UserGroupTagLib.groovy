@@ -403,7 +403,7 @@ class UserGroupTagLib {
 			} else {
 				url = g.createLink(mapping:mappingName, 'controller':controller, 'action':action, params:attrs)
 				def userGroupController = new UserGroupController();
-				userGroup = userGroupController.findInstance(null, userGroupWebaddress);
+				userGroup = userGroupController.findInstance(null, webaddress:userGroupWebaddress);
 				if((userGroup?.domainName) && (userGroup.domainName == "http://"+Utils.getDomain(request))) {
 					url = url.replace( g.createLink(mapping:'onlyUserGroup', params:['webaddress':attrs.webaddress]), "");
 				}

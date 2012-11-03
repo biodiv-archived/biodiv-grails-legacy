@@ -1,29 +1,30 @@
-		<a class="span3 logo" style="margin-left:0px;" href="${uGroup.createLink(mapping:'userGroup',  action:'show',
+
+<a class="span3 logo" style="margin-left: 0px;"
+	href="${uGroup.createLink(mapping:'userGroup',  action:'show',
 			'userGroup':userGroupInstance)}">
-			<img class="logo" src="${userGroupInstance.mainImage()?.fileName}"
-				title="${userGroupInstance.name}" alt="${userGroupInstance.name}" />
-		</a>
+	<img class="logo" src="${userGroupInstance.mainImage()?.fileName}"
+	title="${userGroupInstance.name}" alt="${userGroupInstance.name}" /> </a>
 
-		<h1>
-			${userGroupInstance.name}
-		</h1>
-		<span class="ellipsis multiline"> ${userGroupInstance.description}
-		</span>
-		<div id="actionsHeader" style="position: relative; overflow: visible;">
-			<uGroup:showActionsHeaderTemplate
-				model="['userGroupInstance':userGroupInstance]" />
-		</div>
-	
+<h1>
+	${userGroupInstance.name}
+</h1>
+<span class="ellipsis multiline"> ${userGroupInstance.description}
+</span>
+<div id="actionsHeader" style="position: relative; overflow: visible;">
+	<uGroup:showActionsHeaderTemplate
+		model="['userGroupInstance':userGroupInstance]" />
+</div>
 
 
 
 
-<r:script>
-	window.reloadActionsHeaderUrl = "${uGroup.createLink(mapping:'userGroup', action:'actionsHeader','userGroupWebaddress':userGroupInstance.webaddress) }";
-	window.joinUsUrl =  "${uGroup.createLink(mapping:'userGroup', action:'joinUs','userGroupWebaddress':userGroupInstance.webaddress) }";
-	window.requestMembershipUrl = "${uGroup.createLink(mapping:'userGroup', action:'requestMembership','userGroupWebaddress':userGroupInstance.webaddress) }";
-	window.leaveUrl = "${uGroup.createLink(mapping:'userGroup', action:'leaveUs', 'userGroupWebaddress':userGroupInstance.webaddress) }";
-	window.inviteMembersFormUrl = "${uGroup.createLink(mapping:'userGroup', action:'inviteMembers', 'userGroupWebaddress':userGroupInstance.webaddress)}";
+
+<g:javascript>
+	window.reloadActionsHeaderUrl = "${uGroup.createLink(mapping:'userGroup', action:'actionsHeader','userGroup':userGroupInstance) }";
+	window.joinUsUrl =  "${uGroup.createLink(mapping:'userGroup', action:'joinUs','userGroup':userGroupInstance) }";
+	window.requestMembershipUrl = "${uGroup.createLink(mapping:'userGroup', action:'requestMembership','userGroup':userGroupInstance) }";
+	window.leaveUrl = "${uGroup.createLink(mapping:'userGroup', action:'leaveUs', 'userGroup':userGroupInstance) }";
+	window.inviteMembersFormUrl = "${uGroup.createLink(mapping:'userGroup', action:'inviteMembers', 'userGroup':userGroupInstance)}";
 	window.isLoggedInUrl = "${createLink(controller:'SUser', action:'isLoggedIn')}";
 	window.loginUrl = '${createLink(controller:'login')}'
 	
@@ -34,8 +35,10 @@
 	$(document).ready(function(){
 		$(".ellipsis").trunk8({
 			lines:2,
-			fill: '&hellip;&nbsp;<a	href="${uGroup.createLink(mapping:'userGroup', action:'aboutUs', 'userGroupWebaddress':userGroupInstance.webaddress) }">read more</a>&nbsp;'
+			fill: '&hellip;&nbsp;<a
+		href="${uGroup.createLink(mapping:'userGroup', action:'about', 'userGroup':userGroupInstance) }">read
+		more</a>&nbsp;'
 		})
 	})
 
-</r:script>
+</g:javascript>
