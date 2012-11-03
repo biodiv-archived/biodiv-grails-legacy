@@ -152,35 +152,9 @@
 
 <g:javascript>
 $(document).ready(function(){
-	$("#allGroups").click(function(){
-		
-			$("#myGroupsInfo").slideUp('fast');
-			$("#allGroupsInfo").slideDown('slow');
-		
-		return false;
-	});
-	$("#myGroups").click(function(){
-		
-			$("#allGroupsInfo").slideUp('fast');
-			$("#myGroupsInfo").slideDown('slow');
-		
-		return false;
-	});
-	
-	$(".close").click(function(){
-		$(this).parent().slideUp('fast');
-		return false;
-	})
-	$(".active .submenu").show()
+	//IMP:Header is loaded in drupal pages as well. Any code in this block is not run when loaded by ajax
+	//So please don't put any code here. Put it in init_header function in membership.js
+	 init_header();
 });
+
 </g:javascript>
-
-
-<style>
-.submenu {
-	padding: 0;
-	border: 0;
-	background-color: transparent;
-	box-shadow: none;
-}
-</style>
