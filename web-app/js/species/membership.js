@@ -150,15 +150,6 @@ var members_autofillUsersComp;
 
 //this is called from domain/_headerTemplate
 function init_group_header() {
-	window.reloadActionsHeaderUrl = "${uGroup.createLink(mapping:'userGroup', action:'actionsHeader','userGroup':userGroupInstance) }";
-	window.joinUsUrl =  "${uGroup.createLink(mapping:'userGroup', action:'joinUs','userGroup':userGroupInstance) }";
-	window.requestMembershipUrl = "${uGroup.createLink(mapping:'userGroup', action:'requestMembership','userGroup':userGroupInstance) }";
-	window.leaveUrl = "${uGroup.createLink(mapping:'userGroup', action:'leaveUs', 'userGroup':userGroupInstance) }";
-	window.inviteMembersFormUrl = "${uGroup.createLink(mapping:'userGroup', action:'inviteMembers', 'userGroup':userGroupInstance)}";
-	window.isLoggedInUrl = "${createLink(controller:'SUser', action:'isLoggedIn')}";
-	window.loginUrl = "${createLink(controller:'login')}"
-	window.aboutUrl = "${uGroup.createLink(mapping:'userGroup', action:'about', 'userGroup':userGroupInstance) }";
-	window.userTermsUrl = "${createLink(controller:'SUser', action: 'terms')}";
 	
 	$(".ellipsis.multiline.group_desc").trunk8({
 		lines:2,
