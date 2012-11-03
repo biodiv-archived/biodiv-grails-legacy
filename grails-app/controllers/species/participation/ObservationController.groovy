@@ -256,16 +256,18 @@ class ObservationController {
 			}
 			else {
 				observationInstance.incrementPageVisit();
+				def userGroupInstance = userGroupService.get(params.webaddress);
 				if(params.pos) {
 					int pos = params.int('pos');
 					def prevNext = getPrevNextObservations(pos, params.webaddress);
+					
 					if(prevNext) {
-						[observationInstance: observationInstance, 'userGroupWebaddress':params.webaddress, prevObservationId:prevNext.prevObservationId, nextObservationId:prevNext.nextObservationId, lastListParams:prevNext.lastListParams]
+						[observationInstance: observationInstance, 'userGroupInstance':userGroupInstance, 'userGroupWebaddress':params.webaddress, prevObservationId:prevNext.prevObservationId, nextObservationId:prevNext.nextObservationId, lastListParams:prevNext.lastListParams]
 					} else {
-						[observationInstance: observationInstance, 'userGroupWebaddress':params.webaddress]
+						[observationInstance: observationInstance, 'userGroupInstance':userGroupInstance, 'userGroupWebaddress':params.webaddress]
 					}
 				} else {
-					[observationInstance: observationInstance, 'userGroupWebaddress':params.webaddress]
+					[observationInstance: observationInstance, 'userGroupInstance':userGroupInstance, 'userGroupWebaddress':params.webaddress]
 				}
 			}
 		}
@@ -681,6 +683,15 @@ class ObservationController {
 
 		if(relatedObv.observations) {
 			relatedObv.observations = observationService.createUrlList2(relatedObv.observations);
+		}
+		if(params.contextGroupWebaddress){
+			def group = UserGroup.findByWebaddress(params.contextGroupWebaddress)
+			relatedObv.observations.each { map ->
+				boolean inGroup =  Observation.read(map.obvId).userGroups.find{it.webaddress == group.webaddress} != null
+				if(inGroup){
+					map.groupContextLink = uGroup.createLink(controller:'observation', action:'show', 'userGroup':group, 'userGroupWebaddress':group.webaddress)
+				}
+			}
 		}
 		render relatedObv as JSON
 	}
