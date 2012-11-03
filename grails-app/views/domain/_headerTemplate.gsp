@@ -51,17 +51,17 @@
 
 					<li
 						class="${(params.controller == 'userGroup' && params.action == 'activity')?' active':''}"><a
-						href="${uGroup.createLink(mapping:"userGroup", 'action':"activity", 'userGroupWebaddress':userGroupInstance.webaddress)}"
+						href="${uGroup.createLink(mapping:"userGroup", 'action':"activity", 'userGroup':userGroupInstance)}"
 						title="Activity">Activity</a>
 					</li>
 					<li
 						class="${(params.controller == 'userGroup' && params.action == 'user')?' active':''}"><a
-						href="${uGroup.createLink(mapping:"userGroup", 'action':"user", 'userGroupWebaddress':userGroupInstance.webaddress)}"
+						href="${uGroup.createLink(mapping:"userGroup", 'action':"user", 'userGroup':userGroupInstance)}"
 						title="Members">Members</a>
 					</li>
 
 					<li class="${(params.controller == 'userGroup' && params.action == 'about')?' active':''}"><a
-						href="${uGroup.createLink(mapping:"userGroup", 'action':"about", 'userGroupWebaddress':userGroupInstance.webaddress)}"
+						href="${uGroup.createLink(mapping:"userGroup", 'action':"about", 'userGroup':userGroupInstance)}"
 						title="About Us">About Us</a>
 					</li>
 					<li class="dropdown"><a href="#" class="dropdown-toggle"
@@ -69,7 +69,7 @@
 						<ul class="dropdown-menu" style="text-align: left;">
 
 							<li class="${(params.controller == 'userGroup' && params.action == 'pages')?' active':''}"><a
-								href="${uGroup.createLink(mapping:"userGroup", 'action':"pages", 'userGroupWebaddress':userGroupInstance.webaddress)}"
+								href="${uGroup.createLink(mapping:"userGroup", 'action':"pages", 'userGroup':userGroupInstance)}"
 								title="Pages">Pages</a>
 							</li>
 							<li
@@ -150,7 +150,7 @@
 </div>
 
 
-<r:script>
+<g:javascript>
 $(document).ready(function(){
 	$("#allGroups").click(function(){
 		
@@ -173,7 +173,7 @@ $(document).ready(function(){
 	})
 	$(".active .submenu").show()
 });
-</r:script>
+</g:javascript>
 
 
 <style>
