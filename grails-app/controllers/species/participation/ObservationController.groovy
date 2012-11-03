@@ -682,6 +682,15 @@ class ObservationController {
 		if(relatedObv.observations) {
 			relatedObv.observations = observationService.createUrlList2(relatedObv.observations);
 		}
+		if(params.contextGroupWebaddress){
+			def group = UserGroup.findByWebaddress(params.contextGroupWebaddress)
+			relatedObv.observations.each { map ->
+				boolean inGroup =  Observation.read(map.obvId).userGroups.find{it.webaddress == group.webaddress} != null
+				if(inGroup){
+					map.groupContextLink = uGroup.createLink(controller:'observation', action:'show', 'userGroup':group, 'userGroupWebaddress':group.webaddress)
+				}
+			}
+		}
 		render relatedObv as JSON
 	}
 

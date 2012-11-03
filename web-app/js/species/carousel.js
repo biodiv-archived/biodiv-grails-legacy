@@ -3,7 +3,8 @@ var itemLoadCallback = function(carousel, state) {
 		"limit" : carousel.last - carousel.first,
 		"offset" :carousel.first,
 		"filterProperty": carousel.options.filterProperty,
-		"filterPropertyValue": carousel.options.filterPropertyValue
+		"filterPropertyValue": carousel.options.filterPropertyValue,
+		"contextGroupWebaddress":carousel.options.contextGroupWebaddress
 	}
 	
 	if (state == 'prev'){
@@ -27,7 +28,7 @@ var itemAddCallback = function(carousel, first, last, data, state) {
 	for (i = 0; i < items.length; i++) {
 		var actualIndex = first + i;
 		if (!carousel.has(actualIndex)) {
-			var item = carousel.add(actualIndex, getItemHTML(carousel.options.contextUrl, items[i]));
+			var item = carousel.add(actualIndex, getItemHTML(carousel.options.contextFreeUrl, carousel.options.contextGroupWebaddress, items[i]));
 			resizeImage(item);
 		}
 	}
@@ -103,9 +104,16 @@ function resizeImage(item) {
 /**
  * Item html creation helper.
  */
-var getItemHTML = function(contextUrl, item) {
+var getItemHTML = function(contextFreeUrl, contextGroup, item) {
 	var imageTag = '<img style="height:100%;" src="' + item.imageLink + '" title="' + item.imageTitle  +'" alt="" />';
-	return '<a href='+contextUrl +'/'+ item.obvId + '>' + imageTag + '</a>';
+	if(contextGroup){
+		if(item.groupContextLink){
+			return '<a href='+item.groupContextLink +'/'+ item.obvId + '>' + imageTag + '</a>';
+		}else{
+			return '<a  target="_blank" href='+contextFreeUrl +'/'+ item.obvId + '>' + imageTag + '</a>';
+		}
+	}
+	return '<a href='+contextFreeUrl +'/'+ item.obvId + '>' + imageTag + '</a>';
 };
 
 var reloadCarousel = function(carousel, fitlerProperty, filterPropertyValue){

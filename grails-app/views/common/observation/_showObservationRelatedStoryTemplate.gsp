@@ -11,7 +11,8 @@ $(document).ready(function() {
         carouselMsgDivId:"#relatedObservationMsg_" + "${id}",
         carouselAddObvDivId:"#relatedObservationAddButton_" + "${id}",
         itemFallbackDimension : 75,
-        contextUrl:"${uGroup.createLink(controller:resultController?:controller, action:'show', 'userGroup':userGroupInstance, 'userGroupWebaddress':userGroupWebaddress)}"
+        contextFreeUrl:"${createLink(controller:resultController?:controller, action:'show')}",
+        contextGroupWebaddress:"${userGroupWebaddress}"
 	});
 	
 	$('#carousel_${id} img').hover( function () {
