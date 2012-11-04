@@ -167,6 +167,7 @@ function init_group_header() {
  * multiple bindings of following event handlers
  */
 function init_header() {
+	console.log("initializing header")
 	$("#allGroups").click(function(){
 		
 			$("#myGroupsInfo").slideUp('fast');

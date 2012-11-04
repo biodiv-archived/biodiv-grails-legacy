@@ -19,6 +19,7 @@
 
 
 <g:javascript>
+
 	window.reloadActionsHeaderUrl = "${uGroup.createLink(mapping:'userGroup', action:'actionsHeader','userGroup':userGroupInstance) }";
 	window.joinUsUrl =  "${uGroup.createLink(mapping:'userGroup', action:'joinUs','userGroup':userGroupInstance) }";
 	window.requestMembershipUrl = "${uGroup.createLink(mapping:'userGroup', action:'requestMembership','userGroup':userGroupInstance) }";
@@ -28,6 +29,6 @@
 	window.loginUrl = "${createLink(controller:'login')}"
 	window.aboutUrl = "${uGroup.createLink(mapping:'userGroup', action:'about', 'userGroup':userGroupInstance) }";
 	window.userTermsUrl = "${createLink(controller:'SUser', action: 'terms')}";
-	
+	console.log(window.requestMembershipUrl);
 	// Don''t put any code here. Put it in init_header function in membership.js
 </g:javascript>
