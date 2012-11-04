@@ -29,6 +29,5 @@
 	window.loginUrl = "${createLink(controller:'login')}"
 	window.aboutUrl = "${uGroup.createLink(mapping:'userGroup', action:'about', 'userGroup':userGroupInstance) }";
 	window.userTermsUrl = "${createLink(controller:'SUser', action: 'terms')}";
-	console.log(window.requestMembershipUrl);
 	// Don''t put any code here. Put it in init_header function in membership.js
 </g:javascript>
