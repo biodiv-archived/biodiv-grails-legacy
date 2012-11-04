@@ -256,7 +256,10 @@ class ObservationController {
 			}
 			else {
 				observationInstance.incrementPageVisit();
-				def userGroupInstance = userGroupService.get(params.webaddress);
+				def userGroupInstance;
+				if(params.webaddress) {
+					userGroupInstance = userGroupService.get(params.webaddress);
+				}
 				if(params.pos) {
 					int pos = params.int('pos');
 					def prevNext = getPrevNextObservations(pos, params.webaddress);
