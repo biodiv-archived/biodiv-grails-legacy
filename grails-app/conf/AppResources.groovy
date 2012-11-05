@@ -55,7 +55,7 @@ modules = {
 		resource url:[dir:'js',file:'jquery/jquery.checkbox.js',plugin:'spring-security-ui']
 		resource url:[dir:'js',file:'spring-security-ui.js', plugin:'spring-security-ui']
 		resource url:'/js/jquery/trunk8.js'
-		resource url:'/js/species/membership.js'
+		resource url:'/js/species/membership.js' 
 	}
 
 	auth {

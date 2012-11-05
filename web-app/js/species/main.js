@@ -44,7 +44,7 @@ var ajaxLoginSuccessCallbackFunction, ajaxLoginErrorCallbackFunction;
 
 var reloadLoginInfo = function() {
 	$.ajax({
-		url : appContext+"/SUser/login",
+		url : window.appContext+"/SUser/login",
 		success : function(data) {
 			$('.header:visible .header_userInfo').html(data);
 		}, error: function (xhr, ajaxOptions, thrownError){

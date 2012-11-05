@@ -1,72 +1,86 @@
 /**
  * 
  */
+
+function joinAction(me, joinUsUrl) {
+	if(me.hasClass('disabled')) return false;
+	
+	$.ajax({
+    	url: joinUsUrl,
+        method: "POST",
+        dataType: "json",
+        success: function(data) {
+        	if(data.statusComplete) {
+        		$(me).html("Joined").removeClass("btn-success").addClass("disabled");
+        		$(".alertMsg").removeClass('alert-error').addClass('alert-success').html(data.msg);
+        	} else {
+        		$(me).html("Error sending request").removeClass("btn-success").addClass("disabled");
+        		$(".alertMsg").removeClass('alert alert-success').addClass('alert alert-error').html(data.msg);
+        		//reloadActionsHeader();
+        	}
+        	document.location.reload(true);
+        }, error: function(xhr, status, error) {
+			handleError(xhr, status, error, this.success, function() {
+            	var msg = $.parseJSON(xhr.responseText);
+                $(".alertMsg").html(msg.msg).removeClass('alert-success').addClass('alert-error');
+			});
+        }
+	});
+	return false;
+}
+
+function requestMembershipAction(me, requestMembershipUrl) {
+	if(me.hasClass('disabled')) return false;
+	$.ajax({
+    	url: requestMembershipUrl,
+        method: "POST",
+        dataType: "json",
+        success: function(data) {
+        	if(data.statusComplete) {
+        		$(me).html("Sent Request").removeClass("btn-success").addClass("disabled");
+        		$(".alertMsg").removeClass('alert alert-error').addClass('alert alert-success').html(data.msg);
+        	} else {
+        		$(me).html("Error sending request").removeClass("btn-success").addClass("disabled");
+        		$(".alertMsg").removeClass('alert alert-success').addClass('alert alert-error').html(data.msg);
+        		//reloadActionsHeader();
+        	}
+        	document.location.reload(true);
+        }, error: function(xhr, status, error) {
+			handleError(xhr, status, error, this.success, function() {
+            	var msg = $.parseJSON(xhr.responseText);
+                $(".alertMsg").html(msg.msg).removeClass('alert alert-success').addClass('alert alert-error');
+			});
+        }
+	});
+	return false;
+}
+
 function membership_actions() {
-	$(".joinUs").live('click', function() {
-		if($(this).hasClass('disabled')) return false;
-		var me = this;
-		$.ajax({
-        	url: window.joinUsUrl,
-            method: "POST",
-            dataType: "json",
-            success: function(data) {
-            	if(data.statusComplete) {
-            		$(me).html("Joined").removeClass("btn-success").addClass("disabled");
-            		$(".alertMsg").removeClass('alert-error').addClass('alert-success').html(data.msg);
-            	} else {
-            		$(me).html("Error sending request").removeClass("btn-success").addClass("disabled");
-            		$(".alertMsg").removeClass('alert alert-success').addClass('alert alert-error').html(data.msg);
-            		//reloadActionsHeader();
-            	}
-            	document.location.reload(true);
-            }, error: function(xhr, status, error) {
-				handleError(xhr, status, error, this.success, function() {
-                	var msg = $.parseJSON(xhr.responseText);
-                    $(".alertMsg").html(msg.msg).removeClass('alert-success').addClass('alert-error');
-				});
-            }
-		});
-		return false;
+	$(".joinUs").bind('click', function() {
+		console.log('binded fn');
+		joinAction($(this), window.joinUsUrl);
 	})
 	
-	$(".requestMembership").live('click', function() {
-		if($(this).hasClass('disabled')) return false;
-		var me = this;
-		$.ajax({
-        	url: window.requestMembershipUrl,
-            method: "POST",
-            dataType: "json",
-            success: function(data) {
-            	if(data.statusComplete) {
-            		$(me).html("Sent Request").removeClass("btn-success").addClass("disabled");
-            		$(".alertMsg").removeClass('alert alert-error').addClass('alert alert-success').html(data.msg);
-            	} else {
-            		$(me).html("Error sending request").removeClass("btn-success").addClass("disabled");
-            		$(".alertMsg").removeClass('alert alert-success').addClass('alert alert-error').html(data.msg);
-            		reloadActionsHeader();
-            	}
-            }, error: function(xhr, status, error) {
-				handleError(xhr, status, error, this.success, function() {
-                	var msg = $.parseJSON(xhr.responseText);
-                    $(".alertMsg").html(msg.msg).removeClass('alert alert-success').addClass('alert alert-error');
-				});
-            }
-		});
-		return false;
+	$(".requestMembership").bind('click', function() {
+		console.log('binded reMem fn');
+		requestMembershipAction($(this), window.requestMembershipUrl);
 	})
 	
-	$(".leaveUs").live('click', function() {
+	$(".leaveUs").bind('click', function() {
 		if($(this).hasClass('disabled')) return false;
 		$('#leaveUsModalDialog').modal('show');
+		return false;
 	});
 	
 	$("#leave").click(function() {
 		if($(this).hasClass('disabled')) return false;
 		var dataGroupId = $(this).attr('data-group-id');
+		var leaveUrl = $(this).attr('data-leaveUrl');
 		
 		var me = $(".leaveUs[data-group-id="+dataGroupId+"]");
+		
 		$.ajax({
-        	url: window.leaveUrl,
+        	url: leaveUrl,
             method: "POST",
             dataType: "json",
             data:{'id':dataGroupId},
