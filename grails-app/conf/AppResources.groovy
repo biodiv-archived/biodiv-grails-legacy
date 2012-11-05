@@ -46,7 +46,7 @@ modules = {
 		resource url:'/js/jquery/jquery.cookie.js'
 		//resource url:'/js/jquery/jquery.checkbox.js'
 		resource url:'/js/jquery/jquery.ellipses.js'
-		resource url:'/js/species/popuplib.js'
+		resource url:'/js/species/popuplib.js', disposition: 'head'
 		resource url:'/js/species/ajaxLogin.js'
 		resource url:'/js/species/users.js'
 		resource url:'/js/jquery/jquery.linkify-1.0.js'
