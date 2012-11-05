@@ -24,7 +24,7 @@
 				<li><a style="margin-right:5px;display:inline-block;"
 					href="${createLink(controller:'observation', absolute:'true', action:'list', params:['user':sUser.renderCurrentUserId()])}"><i
 						class="icon-screenshot"></i>My Observations</a><a class="pull-right" style="display:inline-block;"
-					href="${createLink(action:'create', absolute:'true')}"><i class="icon-plus"></i>
+					href="${createLink(controller:'observation', action:'create', absolute:'true')}"><i class="icon-plus"></i>
 				</a></li>
 
 				<li><a
