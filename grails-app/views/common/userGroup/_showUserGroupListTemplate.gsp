@@ -1,7 +1,7 @@
 
 <div class="observations_list observation" style="clear: both;">
 	<div class="btn-group button-bar" data-toggle="buttons-radio"
-		style="float: right;">
+		style="float: right;visibility:hidden;">
 		<button class="list_view_bttn btn list_style_button active">
 			<i class="icon-align-justify"></i>
 		</button>

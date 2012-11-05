@@ -10,7 +10,6 @@
 			</a>
 			<h1>India Biodiversity Portal</h1>
 		</g:else>
-		
 	</div>
 </div>
 <div class="navbar navbar-static-top btn"
@@ -37,11 +36,11 @@
 						title="Observations">Observations</a>
 					</li>
 					<li
-						class="${(request.getHeader('referer')?.contains('/map'))?' active':''}"><a
-						href="/map" title="Maps">Maps</a></li>
+						class="${(request.getHeader('referer')?.contains('/map') && params.action == 'header')?' active':''}"><a
+						href="${userGroupInstance.domainName}/map" title="Maps">Maps</a></li>
 					<li
-						class="${(request.getHeader('referer')?.contains('/browsechecklists'))?' active':''}"><a
-						href="/browsechecklists" title="Checklists">Checklists</a></li>
+						class="${(request.getHeader('referer')?.contains('/browsechecklists') && params.action == 'header')?' active':''}"><a
+						href="${userGroupInstance.domainName}/browsechecklists" title="Checklists">Checklists</a></li>
 
 
 
@@ -73,18 +72,18 @@
 								title="Pages">Pages</a>
 							</li>
 							<li
-								class="${(request.getHeader('referer')?.contains('/calendar'))?' active':''}"><a
+								class="${(request.getHeader('referer')?.contains('/calendar') && params.action == 'header')?' active':''}"><a
 								href="/calendar" title="Events">Events</a></li>
 							<li
-								class="${(request.getHeader('referer')?.contains('/biodiversity_news'))?' active':''}"><a
+								class="${(request.getHeader('referer')?.contains('/biodiversity_news') && params.action == 'header')?' active':''}"><a
 								href="/biodiversity_news" title="News">News</a></li>
 							<li
-								class="${(request.getHeader('referer')?.contains('/cepf_grantee_database'))?' active':''}"><a
+								class="${(request.getHeader('referer')?.contains('/cepf_grantee_database') && params.action == 'header')?' active':''}"><a
 								href="/cepf_grantee_database"
 								title="Western Ghats CEPF Projects">Western Ghats CEPF
 									Projects</a></li>
 							<li
-								class="${(request.getHeader('referer')?.contains('/themepages/list'))?' active':''}"><a
+								class="${(request.getHeader('referer')?.contains('/themepages/list') && params.action == 'header')?' active':''}"><a
 								href="/themepages/list" title="Themes">Themes</a></li>
 						</ul></li>
 				</ul>
@@ -102,10 +101,10 @@
 						href="${createLink("controller":"observation")}"
 						title="Observations">Observations</a></li>
 					<li
-						class="${(request.getHeader('referer')?.contains('/map'))?' active':''}"><a
+						class="${(request.getHeader('referer')?.contains('/map') && params.action == 'header')?' active':''}"><a
 						href="/map" title="Maps">Maps</a></li>
 					<li
-						class="${(request.getHeader('referer')?.contains('/browsechecklists'))?' active':''}"><a
+						class="${(request.getHeader('referer')?.contains('/browsechecklists') && params.action == 'header')?' active':''}"><a
 						href="/browsechecklists" title="Checklists">Checklists</a></li>
 
 
@@ -122,7 +121,7 @@
 						href="${createLink(controller:'user', action:'list')}"
 						title="Members">Members</a></li>
 					<li
-						class="${(request.getHeader('referer')?.contains('/about'))?' active':''}"><a
+						class="${(request.getHeader('referer')?.contains('/about') && params.action == 'header')?' active':''}"><a
 						href="/about" title="About Us">About Us </a></li>
 					<li class="dropdown"><a href="#" class="dropdown-toggle"
 						data-toggle="dropdown"> More <b class="caret"></b> </a>
@@ -133,10 +132,10 @@
 								title="Pages">Pages</a>
 							</li>
 							<li
-								class="${(request.getHeader('referer')?.contains('/calendar'))?' active':''}"><a
+								class="${(request.getHeader('referer')?.contains('/calendar') && params.action == 'header')?' active':''}"><a
 								href="/calendar" title="Events">Events</a></li>
 							<li
-								class="${(request.getHeader('referer')?.contains('/biodiversity_news'))?' active':''}"><a
+								class="${(request.getHeader('referer')?.contains('/biodiversity_news') && params.action == 'header')?' active':''}"><a
 								href="/biodiversity_news" title="News">News</a></li>
 
 						</ul>

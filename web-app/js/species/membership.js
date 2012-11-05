@@ -156,7 +156,7 @@ function init_group_header() {
 		fill: '&hellip;&nbsp;<a href='+window.aboutUrl+'>read more</a>&nbsp;'
 	});
 	
-	members_autofillUsersComp = $("#userAndEmailList_${members_autofillUsersId}").autofillUsers({
+	members_autofillUsersComp = $("#userAndEmailList_"+window.members_autofillUsersId).autofillUsers({
 		usersUrl : window.userTermsUrl
 	});
 }
