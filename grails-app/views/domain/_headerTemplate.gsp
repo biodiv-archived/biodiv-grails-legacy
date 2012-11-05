@@ -1,3 +1,9 @@
+<g:javascript>
+    window.appContext = '${request.contextPath}';
+    window.appIBPDomain = '${grailsApplication.config.ibp.domain}'
+    window.appWGPDomain = '${grailsApplication.config.wgp.domain}'
+</g:javascript>
+
 <div class="container group-theme" style="width:100%;">
 	<div style="padding: 10px 0px;">
 		<g:if test="${userGroupInstance  && userGroupInstance.id }">

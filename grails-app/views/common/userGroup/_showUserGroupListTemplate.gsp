@@ -84,21 +84,26 @@ thead th {
 </style>
 <g:javascript>
 $(document).ready(function(){
-	var joinUsUrl =  "${createLink(controller:'userGroup', action:'joinUs') }";
-	var requestMembershipUrl = "${createLink(controller:'userGroup', action:'requestMembership') }";
-	var leaveUrl = "${createLink(controller:'userGroup', action:'leaveUs') }";
 	
-	$(".joinUs").live('click', function() {
-		window.joinUsUrl = joinUsUrl + "/?id=" + $(this).attr('data-group-id') //+"/joinUs";
+	$(".joinUs").unbind('click').live('click', function() {
+		console.log('livejoin ');
+		var joinUsUrl =  "${createLink(controller:'userGroup', action:'joinUs') }";
+		joinUsUrl = joinUsUrl + "/?id=" + $(this).attr('data-group-id') //+"/joinUs";
+		joinAction($(this), joinUsUrl);
 	});
 	
-	$(".requestMembership").live('click', function() {
-		window.requestMembershipUrl = requestMembershipUrl+"/?id="+$(this).attr('data-group-id')//+"/requestMembership";
+	$(".requestMembership").unbind('click').live('click', function() {
+		var requestMembershipUrl = "${createLink(controller:'userGroup', action:'requestMembership') }";
+		requestMembershipUrl = requestMembershipUrl+"/?id="+$(this).attr('data-group-id')//+"/requestMembership";
+		requestMembershipAction($(this), requestMembershipUrl);
 	});
 	
-	$(".leaveUs").live('click', function() {
-		window.leaveUrl = leaveUrl //+"/"+$(this).attr('data-group-id')+"/leaveUs";
+	$(".leaveUs").unbind('click').live('click', function() {
+		var leaveUrl = "${createLink(controller:'userGroup', action:'leaveUs') }";
+		leaveUrl = leaveUrl //+"/"+$(this).attr('data-group-id')+"/leaveUs";
 		$("#leave").attr('data-group-id', $(this).attr('data-group-id'))
+		$("#leave").attr('data-leaveUrl', leaveUrl)
+		$('#leaveUsModalDialog').modal('show');
 	});
 });
 </g:javascript>

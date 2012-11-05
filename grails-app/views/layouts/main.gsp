@@ -23,11 +23,6 @@
 	<link rel="shortcut icon"
 		href="/sites/all/themes/wg/images/favicon.png" type="image/x-icon" />
 </g:else>
-<g:javascript>
-    window.appContext = '${request.contextPath}';
-    window.appIBPDomain = '${grailsApplication.config.ibp.domain}'
-    window.appWGPDomain = '${grailsApplication.config.wgp.domain}'
-</g:javascript>
 
 <g:layoutHead />
 
