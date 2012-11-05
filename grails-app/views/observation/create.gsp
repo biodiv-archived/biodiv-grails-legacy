@@ -524,7 +524,10 @@ input.dms_field {
 						<div class="section" style="position: relative; overflow: visible;">
 							<h3>Post to User Groups</h3>
 							<div>
-								<ul id="userGroups" name="userGroups" style="list-style:none;clear:both;">
+								<%
+									def obvActionMarkerClass = (params.action == 'create' || params.action == 'save')? 'create' : '' 
+								%>
+								<ul id="userGroups" class="${obvActionMarkerClass}" name="userGroups" style="list-style:none;clear:both;">
 									<uGroup:getCurrentUserUserGroups model="['observationInstance':observationInstance]"/>
 								</ul>
 							</div>
@@ -786,7 +789,7 @@ input.dms_field {
 		
 		function getSelectedUserGroups() {
 		    var userGroups = []; 
-		    $('.userGroups button[class~="active"]').each (function() {
+		    $('.userGroups button[class~="btn-success"]').each (function() {
 	            userGroups.push($(this).attr('value'));
 		    });
 		    return userGroups;	
