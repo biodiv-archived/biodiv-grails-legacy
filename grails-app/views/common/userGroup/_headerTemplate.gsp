@@ -11,7 +11,7 @@
 </span>
 <div id="actionsHeader" style="position: relative; overflow: visible;">
 	<uGroup:showActionsHeaderTemplate
-		model="['userGroupInstance':userGroupInstance]" />
+		model="['userGroupInstance':userGroupInstance, members_autofillUsersId:1]" />
 </div>
 
 
@@ -29,5 +29,6 @@
 	window.loginUrl = "${createLink(controller:'login')}"
 	window.aboutUrl = "${uGroup.createLink(mapping:'userGroup', action:'about', 'userGroup':userGroupInstance) }";
 	window.userTermsUrl = "${createLink(controller:'SUser', action: 'terms')}";
+	window.members_autofillUsersId = 1;
 	// Don''t put any code here. Put it in init_header function in membership.js
 </g:javascript>

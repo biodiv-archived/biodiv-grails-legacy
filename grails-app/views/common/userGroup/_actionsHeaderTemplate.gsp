@@ -50,10 +50,10 @@
 		
 
 		<uGroup:joinLeaveGroupTemplate model="['showLeave':false, 'showJoin':true, 'userGroupInstance':userGroupInstance]" />
-	<div class="modal hide" id="leaveUsModalDialog">
+	<div class="modal hide fade in" id="leaveUsModalDialog" tabindex="-1" role="dialog" aria-labelledby="leaveUsModalDialogLabel" >
 		<div class="modal-header">
-			<button type="button" class="close" data-dismiss="modal">×</button>
-			<h3>Do you want to leave this group???</h3>
+			<!-- a href="#" class="btn close" data-dismiss="modal">&times;</a-->
+			<h3 id="leaveUsModalDialogLabel">Do you want to leave this group???</h3>
 		</div>
 		<div class="modal-body">
 			<p>We would like to know your feedback and any ideas on making
