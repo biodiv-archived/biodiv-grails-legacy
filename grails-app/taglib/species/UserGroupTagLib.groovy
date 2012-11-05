@@ -382,12 +382,13 @@ class UserGroupTagLib {
 			attrs.remove('userGroupWebaddress');
 			
 			if(base) {
-				url = g.createLink(mapping:mappingName,  'controller':controller, 'action':action, 'base':base, params:attrs);
+				url = g.createLink(mapping:mappingName, 'controller':controller, 'action':action, 'base':base, params:attrs);
 			} else {
-				url = g.createLink(mapping:mappingName,  'controller':controller, 'action':action, params:attrs);
-				if((userGroup?.domainName) && (userGroup.domainName == "http://"+Utils.getDomain(request))) {
-					url = url.replace( g.createLink(mapping:'onlyUserGroup', params:['webaddress':attrs.webaddress]), "");
-				} 
+				url = g.createLink(mapping:mappingName, 'controller':controller, 'action':action, params:attrs);
+			}
+			if((userGroup?.domainName)) {// && (userGroup.domainName == "http://"+Utils.getDomain(request))) {
+				String onlyGroupUrl = g.createLink(mapping:'onlyUserGroup', params:['webaddress':attrs.webaddress]).replace("/"+grailsApplication.metadata['app.name'],'')
+				url = url.replace(onlyGroupUrl, "");
 			}
 		} else if(attrs.userGroupWebaddress) {
 			attrs.webaddress = attrs.userGroupWebaddress
@@ -397,16 +398,17 @@ class UserGroupTagLib {
 			String mappingName = attrs.remove('mapping')?:'userGroupModule';
 			def userGroup = attrs.remove('userGroup');
 			String userGroupWebaddress = attrs.remove('userGroupWebaddress');
+			def userGroupController = new UserGroupController();
+			userGroup = userGroupController.findInstance(null, userGroupWebaddress);
 			
 			if(base) {
-				url = g.createLink(mapping:mappingName,  'controller':controller, 'action':action, 'base':base, params:attrs)
+				url = g.createLink(mapping:mappingName, 'controller':controller, 'action':action, 'base':base, params:attrs)
 			} else {
 				url = g.createLink(mapping:mappingName, 'controller':controller, 'action':action, params:attrs)
-				def userGroupController = new UserGroupController();
-				userGroup = userGroupController.findInstance(null, userGroupWebaddress);
-				if((userGroup?.domainName) && (userGroup.domainName == "http://"+Utils.getDomain(request))) {
-					url = url.replace( g.createLink(mapping:'onlyUserGroup', params:['webaddress':attrs.webaddress]), "");
-				}
+			}
+			if((userGroup?.domainName)) {// && (userGroup.domainName == "http://"+Utils.getDomain(request))) {
+				String onlyGroupUrl = g.createLink(mapping:'onlyUserGroup', params:['webaddress':attrs.webaddress]).replace("/"+grailsApplication.metadata['app.name'],'')
+				url = url.replace(onlyGroupUrl, "");
 			}
 		} else {
 			String base = attrs.remove('base')
