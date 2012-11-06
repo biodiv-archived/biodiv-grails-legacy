@@ -40,7 +40,7 @@ form {
 				<g:else>
 
 					<form
-						action='${createLink(controller:'register', action:'forgotPassword')}'
+						action='${uGroup.createLink(controller:'register', action:'forgotPassword', userGroupWebaddress:params.webaddress)}'
 						name="forgotPasswordForm" method="POST" class="form-horizontal">
 
 						<div class="control-group"

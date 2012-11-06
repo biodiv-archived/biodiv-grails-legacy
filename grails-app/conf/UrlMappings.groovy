@@ -70,10 +70,38 @@ class UrlMappings {
 			controller='userGroup'
 			action='observation'
 		}
-
-		"/group/$webaddress/login/$action/$id?" {
-			controller = "openId"
+		"/group/$webaddress/species/list" {
+			controller='userGroup'
+			action='species'
 		}
+
+		"/group/$webaddress/login/$action?" {
+			controller = "login"
+		}
+		
+		"/group/$webaddress/login/auth/$id?" {
+			controller = "openId"
+			action = "auth"
+		}
+		
+		"/group/$webaddress/login/openIdCreateAccount/$id?" {
+			controller = "openId"
+			action = "openIdCreateAccount"
+		}
+		
+		"/group/$webaddress/login/facebookCreateAccount/$id?" {
+			controller = "openId"
+			action = "facebookCreateAccount"
+		}
+		
+		"/group/$webaddress/register/$action?/$id?" {
+			controller = "register"
+		}
+		
+		"/group/$webaddress/logout/$action?" {
+			controller = "logout"
+		}
+		
 		name userGroupModule:"/group/$webaddress/$controller/$action/$id?" {
 		
 		}

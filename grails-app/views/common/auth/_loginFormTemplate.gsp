@@ -41,10 +41,10 @@
 				<div class="controls">
 					<label class="checkbox"> <input type="checkbox"
 						name="${rememberMeParameter}" for='remember_me'> <g:message
-							code='spring.security.ui.login.rememberme' /> | <g:link
-							controller='register' action='forgotPassword'>
+							code='spring.security.ui.login.rememberme' /> | <a href="${uGroup.createLink(
+							controller:'register', action:'forgotPassword','userGroupWebaddress':params.webaddress)}">
 							<g:message code='spring.security.ui.login.forgotPassword' />
-						</g:link> </label> <input class="btn btn-primary" type="submit" value="Login"
+						</a> </label> <input class="btn btn-primary" type="submit" value="Login"
 						class="s2ui_hidden_button" style="float: right;margin: 3px;">
 				</div>
 			</div>

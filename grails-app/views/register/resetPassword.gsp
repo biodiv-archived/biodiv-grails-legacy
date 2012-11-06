@@ -28,7 +28,7 @@
 						default="Reset password" />
 				</legend>
 				<form
-					action='${createLink(controller:'register', action:'resetPassword')}'
+					action='${uGroup.createLink(controller:'register', action:'resetPassword', userGroupWebaddress:params.webaddress)}'
 					name='resetPasswordForm' autocomplete='off' method="POST"
 					class="form-horizontal">
 					<g:hiddenField name='t' value='${token}' />

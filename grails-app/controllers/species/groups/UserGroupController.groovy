@@ -919,7 +919,7 @@ class UserGroupController {
 	   log.debug params;
 	   def userGroupInstance = findInstance(params.id, params.webaddress)
 	   if (!userGroupInstance) return;
-	   render (view:'species', model:['userGroupInstance':userGroupInstance])
+	   render (view:'species', model:['userGroupInstance':userGroupInstance, params:params])
    }
 }
 

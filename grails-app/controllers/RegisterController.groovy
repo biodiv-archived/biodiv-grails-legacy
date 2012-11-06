@@ -243,8 +243,8 @@ class RegisterController extends grails.plugins.springsecurity.ui.RegisterContro
 	}
 
 	protected String generateLink(String controller, String action, linkParams, request) {
-		createLink(base: Utils.getDomainServerUrl(request),
-				controller: controller, action: action,
+		uGroup.createLink(base: Utils.getDomainServerUrl(request),
+				controller: controller, action: action, 'userGroupWebaddress':params.webaddress,
 				params: linkParams)
 	}
 

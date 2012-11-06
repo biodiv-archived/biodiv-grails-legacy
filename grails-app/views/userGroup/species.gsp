@@ -15,6 +15,6 @@
 <r:require modules="species" />
 </head>
 <body>
-	<g:include controller="species" action="list" model="['userGroup':userGroupInstance]"/>
+	<g:include controller="species" action="list" model="['userGroup':userGroupInstance, 'params':params]"/>
 </body>
 </html>
