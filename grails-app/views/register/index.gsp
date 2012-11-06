@@ -57,7 +57,7 @@
 							model='["openidIdentifier":openidIdentifier]' />
 					</div>
 					<form
-						action="${createLink(controller:'register', action:'register')}"
+						action="${uGroup.createLink(controller:'register', action:'register', userGroupWebaddress:params.webaddress)}"
 						name='registerForm' method="POST" class="form-horizontal">
 						<div class="control-group"
 							style="clear: both; border-top: 1px solid #Eee; padding-top: 5px;">Or,

@@ -452,7 +452,7 @@ class UserGroupController {
 				render ([success:true, 'statusComplete':false, 'msg':'Already a member.']as JSON);
 			} else {
 				if(userGroupInstance.addMember(user)) {
-					flash.message = "You have joined ${userGroupInstance} group. We look forward for your contribution.";
+					flash.message = "You have joined ${userGroupInstance.name} group. We look forward for your contribution.";
 					render ([success:true, 'statusComplete':true, 'msg':"You have joined ${userGroupInstance} group. We look forward for your contribution."]as JSON);
 					return;
 				}
@@ -919,7 +919,7 @@ class UserGroupController {
 	   log.debug params;
 	   def userGroupInstance = findInstance(params.id, params.webaddress)
 	   if (!userGroupInstance) return;
-	   render (view:'species', model:['userGroupInstance':userGroupInstance])
+	   render (view:'species', model:['userGroupInstance':userGroupInstance, params:params])
    }
 }
 

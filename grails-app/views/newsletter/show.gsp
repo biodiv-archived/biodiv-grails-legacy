@@ -45,7 +45,7 @@
 						${fieldValue(bean: newsletterInstance, field: "title")}
 					</h1>
 		</div>
-		<div class="description notes_view bodymarker">
+		<div class="description  bodymarker">
 			<table>
 				<tbody>
 

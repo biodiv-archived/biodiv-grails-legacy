@@ -27,12 +27,23 @@
 <g:layoutHead />
 
 <!-- script src="http://cdn.wibiya.com/Toolbars/dir_1100/Toolbar_1100354/Loader_1100354.js" type="text/javascript"></script><noscript><a href="http://www.wibiya.com/">Web Toolbar by Wibiya</a></noscript-->
+<g:set var="userGroupInstance" value="${userGroupInstance}"/>
 <%
-		def userGroupInstance;
-		if(params.userGroup) {
-			userGroupInstance = UserGroup.get(params.long('userGroup'));
-		} else if(params.webaddress) {
-			userGroupInstance = UserGroup.findByWebaddress(params.webaddress);
+	//TODO: conditions needs to be cleaned 
+		if(!userGroupInstance) {
+			if(userGroup) {
+				userGroupInstance = userGroup
+			} else if(params.userGroup) {
+				if(params.userGroup instanceof UserGroup) {
+					userGroupInstance = params.userGroup	
+				} else {
+					userGroupInstance = UserGroup.get(params.long('userGroup'));
+				}
+			} else if(params.webaddress) {
+				userGroupInstance = UserGroup.findByWebaddress(params.webaddress);
+			} else if(params.userGroupWebaddress) {
+				userGroupInstance = UserGroup.findByWebaddress(params.userGroupWebaddress);
+			}
 		}
 	%>
 <g:if test="${userGroupInstance && userGroupInstance.theme}">
@@ -45,7 +56,6 @@
 	<div id="loading" class="loading" style="display: none;">
 		<span>Loading ...</span>
 	</div>
-
 
 	<div id="species_main_wrapper" style="clear: both;">
 		<domain:showIBPHeader model="['userGroupInstance':userGroupInstance]" />

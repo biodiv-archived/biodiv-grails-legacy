@@ -60,7 +60,7 @@
 								</ul>
 							</div>
 
-							<obv:showGroupFilter />
+							<obv:showGroupFilter model="['hideHabitatFilter':true]"/>
 
 						</div>
 					</div>

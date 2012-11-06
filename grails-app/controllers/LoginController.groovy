@@ -38,7 +38,8 @@ class LoginController {
 			redirect uri: SpringSecurityUtils.securityConfig.successHandler.defaultTargetUrl
 		}
 		else {
-			redirect action: 'auth', params: params
+			redirect url:uGroup.createLink(action:'auth', controller:"login", 'userGroupWebaddress':params.webaddress, params:params)
+			//redirect action: 'auth', params: params
 		}
 	}
 
@@ -93,7 +94,8 @@ class LoginController {
 		if (springSecurityService.isLoggedIn() &&
 		authenticationTrustResolver.isRememberMe(SCH.context?.authentication)) {
 			// have cookie but the page is guarded with IS_AUTHENTICATED_FULLY
-			redirect action: 'full', params: params
+			//redirect action: 'full', params: params
+			redirect url:uGroup.createLink(action:'full', controller:"login", 'userGroupWebaddress':params.webaddress, params:params)
 		}
 	}
 
@@ -138,7 +140,8 @@ class LoginController {
 		}
 		else {
 			flash.error = msg
-			redirect action: 'auth', params: params
+			//redirect action: 'auth', params: params
+			redirect url:uGroup.createLink(action:'auth', controller:"login", 'userGroupWebaddress':params.webaddress, params:params)
 		}
 	}
 
@@ -183,7 +186,8 @@ class LoginController {
 			response.setHeader 'Location', request.getHeader('referer')
 			response.sendError HttpServletResponse.SC_UNAUTHORIZED
 		} else {
-			redirect (action:'auth');
+			redirect url:uGroup.createLink(action:'auth', controller:"login", 'userGroupWebaddress':params.webaddress)
+			//redirect (action:'auth');
 		}
 	}
 }

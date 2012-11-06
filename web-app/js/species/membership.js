@@ -12,13 +12,14 @@ function joinAction(me, joinUsUrl) {
         success: function(data) {
         	if(data.statusComplete) {
         		$(me).html("Joined").removeClass("btn-success").addClass("disabled");
-        		$(".alertMsg").removeClass('alert-error').addClass('alert-success').html(data.msg);
+        		$(".alertMsg").removeClass('alert-error').addClass('alert-success').html(data.msg+". Please press <a href='#' onclick='document.location.reload(true);'>reload</a> to load new changes.");
+        		//document.location.reload(true);
         	} else {
         		$(me).html("Error sending request").removeClass("btn-success").addClass("disabled");
         		$(".alertMsg").removeClass('alert alert-success').addClass('alert alert-error').html(data.msg);
         		//reloadActionsHeader();
         	}
-        	document.location.reload(true);
+        	
         }, error: function(xhr, status, error) {
 			handleError(xhr, status, error, this.success, function() {
             	var msg = $.parseJSON(xhr.responseText);
@@ -39,12 +40,12 @@ function requestMembershipAction(me, requestMembershipUrl) {
         	if(data.statusComplete) {
         		$(me).html("Sent Request").removeClass("btn-success").addClass("disabled");
         		$(".alertMsg").removeClass('alert alert-error').addClass('alert alert-success').html(data.msg);
+        		//document.location.reload(true);
         	} else {
         		$(me).html("Error sending request").removeClass("btn-success").addClass("disabled");
         		$(".alertMsg").removeClass('alert alert-success').addClass('alert alert-error').html(data.msg);
         		//reloadActionsHeader();
         	}
-        	document.location.reload(true);
         }, error: function(xhr, status, error) {
 			handleError(xhr, status, error, this.success, function() {
             	var msg = $.parseJSON(xhr.responseText);
