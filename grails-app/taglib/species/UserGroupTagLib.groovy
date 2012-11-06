@@ -433,9 +433,9 @@ class UserGroupTagLib {
 				attrs.remove('params');
 			}
 			if(base) {
-				url = g.createLink('base':base, 'controller':controller, 'action':action, params:attrs)
+				url = g.createLink('base':base, 'controller':controller, 'action':action, params:attrs).replace("/"+grailsApplication.metadata['app.name'],'')
 			} else {
-				url = g.createLink('controller':controller, 'action':action, params:attrs)
+				url = g.createLink('controller':controller, 'action':action, params:attrs).replace("/"+grailsApplication.metadata['app.name'],'')
 			}
 		}
 		println url;
