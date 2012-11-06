@@ -383,17 +383,16 @@ class UserGroupTagLib {
 			
 			if(base) {
 				url = g.createLink(mapping:mappingName, 'controller':controller, 'action':action, 'base':base, params:attrs);
-				if((userGroup?.domainName)) {// && (userGroup.domainName == "http://"+Utils.getDomain(request))) {
-					String onlyGroupUrl = g.createLink(mapping:'onlyUserGroup', params:['webaddress':attrs.webaddress]).replace("/"+grailsApplication.metadata['app.name'],'')
-					url = url.replace(onlyGroupUrl, "");
-				}
 			} else {
 				url = g.createLink(mapping:mappingName, 'controller':controller, 'action':action, params:attrs);
-				if((userGroup?.domainName)) {// && (userGroup.domainName == "http://"+Utils.getDomain(request))) {
-					String onlyGroupUrl = g.createLink(mapping:'onlyUserGroup', params:['webaddress':attrs.webaddress])
-					url = url.replace(onlyGroupUrl, "");
+				if((userGroup?.domainName)) { // && (userGroup.domainName == "http://"+Utils.getDomain(request))) {
+					url = g.createLink(mapping:mappingName, 'controller':controller, base:userGroup.domainName, 'action':action, params:attrs);
 				}
 			}
+			String onlyGroupUrl = g.createLink(mapping:'onlyUserGroup', params:['webaddress':attrs.webaddress]).replace("/"+grailsApplication.metadata['app.name'],'')
+			println url
+			println onlyGroupUrl
+			url = url.replace(onlyGroupUrl, "");
 		} else if(attrs.userGroupWebaddress) {
 			attrs.webaddress = attrs.userGroupWebaddress
 			String base = attrs.remove('base')
@@ -407,21 +406,16 @@ class UserGroupTagLib {
 			
 			if(base) {
 				url = g.createLink(mapping:mappingName, 'controller':controller, 'action':action, 'base':base, params:attrs)
-//				if((userGroup?.domainName)) {// && (userGroup.domainName == "http://"+Utils.getDomain(request))) {
-//					String onlyGroupUrl = g.createLink(mapping:'onlyUserGroup', params:['webaddress':attrs.webaddress]).replace("/"+grailsApplication.metadata['app.name'],'')
-//					url = url.replace(onlyGroupUrl, "");
-//				}
 			} else {
 				url = g.createLink(mapping:mappingName, 'controller':controller, 'action':action, params:attrs)
-//				if((userGroup?.domainName)) {// && (userGroup.domainName == "http://"+Utils.getDomain(request))) {
-//					String onlyGroupUrl = g.createLink(mapping:'onlyUserGroup', params:['webaddress':attrs.webaddress])
-//					url = url.replace(onlyGroupUrl, "");
-//				}
+				if((userGroup?.domainName)) { // && (userGroup.domainName == "http://"+Utils.getDomain(request))) {
+					url = g.createLink(mapping:mappingName, 'controller':controller, base:userGroup.domainName, 'action':action, params:attrs)
+				}
 			}
-			if((userGroup?.domainName)) {// && (userGroup.domainName == "http://"+Utils.getDomain(request))) {
-				String onlyGroupUrl = g.createLink(mapping:'onlyUserGroup', params:['webaddress':attrs.webaddress]).replace("/"+grailsApplication.metadata['app.name'],'')
-				url = url.replace(onlyGroupUrl, "");
-			}
+			String onlyGroupUrl = g.createLink(mapping:'onlyUserGroup', params:['webaddress':attrs.webaddress]).replace("/"+grailsApplication.metadata['app.name'],'')
+			println url
+			println onlyGroupUrl
+			url = url.replace(onlyGroupUrl, "");
 		} else {
 			String base = attrs.remove('base')
 			String controller = attrs.remove('controller')
