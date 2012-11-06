@@ -101,10 +101,10 @@
 				</ul>
 				<ul class="nav">
 					<li class=" ${(params.controller == 'species')?'active':''}"><a
-						href="${createLink("controller":"species")}" title="Species">
+						href="${uGroup.createLink("controller":"species")}" title="Species">
 							Species</a></li>
 					<li class="${(params.controller == 'observation')?'active':''}"><a
-						href="${createLink("controller":"observation")}"
+						href="${uGroup.createLink("controller":"observation")}"
 						title="Observations">Observations</a></li>
 					<li
 						class="${(request.getHeader('referer')?.contains('/map') && params.action == 'header')?' active':''}"><a
@@ -118,13 +118,13 @@
 
 				<ul class="nav pull-right">
 					<li class=" ${(params.controller == 'activityFeed')?'active':''}"><a
-						href="${createLink("controller":"activityFeed")}" title="Activity">Activity</a>
+						href="${uGroup.createLink("controller":"activityFeed")}" title="Activity">Activity</a>
 					</li>
 
 					<!--li class="menu-449 first"><a href="/" title="">Home</a></li-->
 					<li
 						class="${((params.controller == 'user' || params.controller == 'SUser') && params.action != 'header')?' active':''}"><a
-						href="${createLink(controller:'user', action:'list')}"
+						href="${uGroup.createLink(controller:'user', action:'list')}"
 						title="Members">Members</a></li>
 					<li
 						class="${(request.getHeader('referer')?.contains('/about') && params.action == 'header')?' active':''}"><a
@@ -134,7 +134,7 @@
 
 						<ul class="dropdown-menu" style="text-align: left; color: #000">
 							<li class="${(params.action == 'pages')?' active':''}"><a
-								href="${createLink(mapping:"pages", 'action':"pages")}"
+								href="${uGroup.createLink(mapping:"pages", controller:"userGroup", 'action':"pages")}"
 								title="Pages">Pages</a>
 							</li>
 							<li
