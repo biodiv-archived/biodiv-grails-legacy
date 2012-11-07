@@ -34,7 +34,8 @@
 		</div>
 	</g:if>
 	<div class="paginateButtons" style="visibility: hidden; clear: both">
-		<g:paginate total="${userInstanceTotal}" max="${params.max}" action="${params.action}"
+		<p:paginate total="${userInstanceTotal}" max="${params.max}" action="${params.action}"
+			userGroup="${userGroupInstance}" userGroupWebaddress="${userGroupWebaddress}"
 			params="${params}" />
 	</div>
 </div>

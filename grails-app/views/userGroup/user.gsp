@@ -30,11 +30,11 @@
 				<ul class="nav nav-tabs">
 					<li
 						class="${(!params.action || params.action == 'user')?'active':'' }"><a
-						href="${createLink(mapping:'userGroup', action:'user', params:['webaddress':userGroupInstance.webaddress])}"> All
+						href="${uGroup.createLink(mapping:'userGroup', action:'user', 'userGroup':userGroupInstance)}"> All
 							Members (${membersTotalCount})</a></li>
 
 					<li class="${(params.action == 'founders')?'active':'' }"><a
-						href="${createLink(mapping:'userGroup', action:'founders', params:['webaddress':userGroupInstance.webaddress])}">
+						href="${uGroup.createLink(mapping:'userGroup', action:'founders', 'userGroup':userGroupInstance)}">
 							Founders (${foundersTotalCount})</a></li>
 					
 				</ul>

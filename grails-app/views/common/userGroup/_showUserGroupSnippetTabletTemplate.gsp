@@ -4,8 +4,8 @@
 
 	<div class="figure" style="height:150px;"
 		title='<g:if test="${userGroupTitle != null}">${userGroupTitle}</g:if>'>
-		<g:link action="show" 
-			id="${userGroupInstance.id}" params="['pos':pos]">
+		<g:link link="${uGroup.createLink(controller:'SUser', action:'show', 
+			id:userGroupInstance.id, params:['pos':pos])}">
 			<img class="logo" alt="${userGroupInstance.name}"
 					src="${createLink(url: userGroupInstance.mainImage()?.fileName)}">
 		</g:link>
