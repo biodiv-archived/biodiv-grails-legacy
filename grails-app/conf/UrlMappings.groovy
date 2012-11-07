@@ -102,6 +102,16 @@ class UrlMappings {
 			controller = "logout"
 		}
 		
+		
+		name userGroupModule:"/group/$webaddress/group/$action/$id?" {
+			controller = "group"
+		}
+		
+		
+		name userGroupModule:"/group/$webaddress/user/$action/$id?" {
+			controller = "SUser"
+		}
+		
 		name userGroupModule:"/group/$webaddress/$controller/$action/$id?" {
 		
 		}
