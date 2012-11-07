@@ -117,7 +117,8 @@
 
 					<div class="paginateButtons span11">
 						<center>
-							<p:paginate controller="species" action="list" total="${speciesInstanceTotal}"   userGroup="${userGroup}" userGroupWebaddress="${userGroupWebaddress}"
+							<p:paginate controller="species" action="list" total="${speciesInstanceTotal}"   
+								userGroup="${userGroup}" userGroupWebaddress="${userGroupWebaddress}"
 								params="['startsWith':params.startsWith]" max="${params.max }" offset="${params.offset}" maxsteps="10" />
 						</center>
 					</div>
