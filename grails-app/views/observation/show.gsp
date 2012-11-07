@@ -19,11 +19,12 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 <meta property="og:site_name" content="${Utils.getDomainName(request)}" />
 
 <g:set var="domain" value="${Utils.getDomain(request)}" />
+<g:set var="fbAppId"/>
 <%
-		String fbAppId;
+		
 		if(domain.equals(grailsApplication.config.wgp.domain)) {
 			fbAppId = grailsApplication.config.speciesPortal.wgp.facebook.appId;
-		} else if(domain.equals(grailsApplication.config.ibp.domain)) {
+		} else { //if(domain.equals(grailsApplication.config.ibp.domain)) {
 			fbAppId =  grailsApplication.config.speciesPortal.ibp.facebook.appId;
 		}
 		

@@ -53,8 +53,8 @@ or with any of these groups
 	 %> 
 	 <label class="checkbox">
 					<button type="button" class="btn ${checked? 'active btn-success ' + obvActionMarkerClass :''} multi-post"  value="${userGroup.key.id}">
-						<img class="logo" src="${userGroup.key.icon().fileName}"
-							title="${userGroup.key.name}" alt="${userGroup.key.name}" />
+						<uGroup:showUserGroupSignature  model="[ 'userGroup':userGroup.key]" />
+						
 					</button> </label>
 		</g:each>
 	</ul>

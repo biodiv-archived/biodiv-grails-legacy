@@ -538,7 +538,7 @@ input.dms_field {
 				<div class="span12" style="margin-top: 20px; margin-bottom: 40px;">
 					
 					<g:if test="${observationInstance?.id}">
-						<a href="${uGroup.createLink(action:'show', id:observationInstance.id)}" class="btn"
+						<a href="${uGroup.createLink(controller:params.controller, action:'show', id:observationInstance.id)}" class="btn"
 							style="float: right; margin-right: 5px;"> Cancel </a>
 					</g:if>
 					<g:else>

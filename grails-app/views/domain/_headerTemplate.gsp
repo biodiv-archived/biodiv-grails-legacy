@@ -33,11 +33,11 @@
 				<ul class="nav pull-left">
 
 					<li
-						class="${((params.controller == 'userGroup' && params.action == 'species'))?' active':''}"><a
+						class="${((params.controller == 'userGroup' && params.action == 'species')||(params.controller == 'species'))?' active':''}"><a
 						href="${uGroup.createLink('mapping':'userGroup', 'action':'species', 'userGroup':userGroupInstance)}"
 						title="Species">Species</a>
 					</li>
-					<li class="${((params.controller == 'userGroup' && params.action == 'observation'))?' active':''}"><a
+					<li class="${((params.controller == 'userGroup' && params.action == 'observation') ||(params.controller == 'observation'))?' active':''}"><a
 						href="${uGroup.createLink('mapping':'userGroup', 'action':'observation', 'userGroup':userGroupInstance)}"
 						title="Observations">Observations</a>
 					</li>
