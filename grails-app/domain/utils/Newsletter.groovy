@@ -10,6 +10,8 @@ class Newsletter {
 
 	static belongsTo = [userGroup: UserGroup]
     static constraints = {
+		title nullable: false, blank:false
+		title nullable: false
         newsitem type:'text'
 		userGroup nullable:true;
     }

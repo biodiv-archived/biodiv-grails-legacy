@@ -21,7 +21,7 @@
 						<a
 							href="${uGroup.createLink('mapping':'userGroup', action:"pages", 'userGroup':userGroupInstance)}">Pages </a>
 				</g:if> <g:else>
-					<g:link controller="userGroup" action="pages">Pages</g:link>
+					<g:link url="${uGroup.createLink(controller:'userGroup', action:'pages')}">Pages</g:link>
 				</g:else>
 			</li>
 		</ul>

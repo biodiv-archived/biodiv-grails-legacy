@@ -405,7 +405,7 @@ class UserGroupTagLib {
 			def userGroup = attrs.remove('userGroup');
 			String userGroupWebaddress = attrs.remove('userGroupWebaddress');
 			def userGroupController = new UserGroupController();
-			userGroup = userGroupController.findInstance(null, userGroupWebaddress);
+			userGroup = userGroupController.findInstance(null, userGroupWebaddress, false);
 			if(attrs.params) {
 				attrs.putAll(attrs.params);
 				attrs.remove('params');
@@ -428,14 +428,15 @@ class UserGroupTagLib {
 			String action = attrs.remove('action');			
 			attrs.remove('userGroup');
 			attrs.remove('userGroupWebaddress');
+			String mappingName = attrs.remove('mapping');
 			if(attrs.params) {
 				attrs.putAll(attrs.params);
 				attrs.remove('params');
 			}
 			if(base) {
-				url = g.createLink('base':base, 'controller':controller, 'action':action, params:attrs).replace("/"+grailsApplication.metadata['app.name'],'')
+				url = g.createLink(mapping:mappingName, 'base':base, 'controller':controller, 'action':action, params:attrs).replace("/"+grailsApplication.metadata['app.name'],'')
 			} else {
-				url = g.createLink('controller':controller, 'action':action, params:attrs).replace("/"+grailsApplication.metadata['app.name'],'')
+				url = g.createLink(mapping:mappingName, 'controller':controller, 'action':action, params:attrs).replace("/"+grailsApplication.metadata['app.name'],'')
 			}
 		}
 		println url;

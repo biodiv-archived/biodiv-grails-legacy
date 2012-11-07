@@ -280,9 +280,6 @@ class UserGroupController {
 	}
 
 	private UserGroup findInstance(id=null, webaddress='', boolean redirectToList=true) {
-		println "0000"
-		println id;
-		println webaddress
 		def userGroup
 		
 		if(id) {
@@ -291,11 +288,14 @@ class UserGroupController {
 		if(webaddress) {
 			userGroup = userGroupService.get(params['webaddress'])
 		}
-		
+		println '1'
 		if (!userGroup && redirectToList) {
+			println '2'
 			flash.message = "${message(code: 'userGroup.default.not.found.message', args: [params.webaddress])}"
 			redirect url: uGroup.createLink(mapping: 'userGroupGeneric', action:'list')
 		}
+		println userGroup
+		println '3'
 		userGroup
 	}
 

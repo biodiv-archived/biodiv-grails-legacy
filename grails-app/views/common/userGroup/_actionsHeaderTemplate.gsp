@@ -5,15 +5,15 @@
 			permission='${org.springframework.security.acls.domain.BasePermission.ADMINISTRATION}'>
 
 			<a class="btn btn-large btn-primary "
-				href="${createLink(mapping:'userGroup', action:'edit', params:['webaddress':userGroupInstance.webaddress])}"> <i
+				href="${uGroup.createLink(mapping:'userGroup', action:'edit', userGroup:userGroupInstance)}"> <i
 				class="icon-edit"></i>Edit Group </a>
-			<!-- a class="btn btn-large btn-primary" href="${createLink(mapping:'userGroup', action:'settings', params:['webaddress':userGroupInstance.webaddress])}"><i class="icon-cog"></i>Settings</a-->
+			<!-- a class="btn btn-large btn-primary" href="${uGroup.createLink(mapping:'userGroup', action:'settings', userGroup:userGroupInstance)}"><i class="icon-cog"></i>Settings</a-->
 		</sec:permitted>
 
 		<sec:permitted className='species.groups.UserGroup'
 			id='${userGroupInstance.id}'
 			permission='${org.springframework.security.acls.domain.BasePermission.WRITE}'>
-			<a class="btn btn-large btn-primary" href="${createLink(mapping:'userGroup', action:'settings', params:['webaddress':userGroupInstance.webaddress])}"><i class="icon-cog"></i>Settings</a>
+			<a class="btn btn-large btn-primary" href="${uGroup.createLink(mapping:'userGroup', action:'settings', 'userGroup':userGroupInstance)}"><i class="icon-cog"></i>Settings</a>
 		</sec:permitted>
 
 		<sec:permitted className='species.groups.UserGroup'

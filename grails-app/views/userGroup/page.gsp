@@ -28,14 +28,14 @@
 							id='${userGroupInstance.id}'
 							permission='${org.springframework.security.acls.domain.BasePermission.ADMINISTRATION}'>
 
-							<g:link mapping="userGroup" action="pageCreate" params="['webaddress':userGroupInstance.webaddress]"
-								class="btn btn-large btn-info">
-								<i class="icon-plus"></i>Add a Newsletter</g:link>
+								<a href="${uGroup.createLink(mapping:"userGroup", action:"pageCreate", 'userGroup':userGroupInstance)}"
+							class="btn btn-large btn-info">
+							<i class="icon-plus"></i>Add a Newsletter</a>
 						</sec:permitted>
 					</g:if>
 					<g:else>
 						<sUser:isAdmin>
-							<g:link mapping="userGroupGeneric" action="pageCreate" class="btn btn-large btn-info">
+							<g:link url="${uGroup.createLink(mapping:"userGroupGeneric", action:"pageCreate")}" class="btn btn-large btn-info">
 								<i class="icon-plus"></i>Add a Newsletter</g:link>
 						</sUser:isAdmin>
 					</g:else>
@@ -43,14 +43,15 @@
 			</div>
 			<g:include controller="newsletter" action="show"
 				id="${params.newsletterId}" />
-			<div class="btn-group pull-right" style="z-index: 10;">
+				
+			<div class="btn-group pull-right" style="z-index: 10;clear:both;margin-top:5px;">
 
 				<g:if test="${userGroupInstance}">
-					<g:link mapping="userGroup" action="pages" params="['webaddress':userGroupInstance.webaddress]"
+					<g:link url="${uGroup.createLink(mapping:'userGroup', controller:'userGroup', action:'pages', 'userGroup':userGroupInstance)}"
 						class="btn btn-large btn-info">< Back to Newsletters</g:link>
 				</g:if>
 				<g:else>
-					<g:link mapping="userGroupGeneric" action="pages" class="btn btn-large btn-info">< Back to Newsletters</g:link>
+					<g:link url="${uGroup.createLink(mapping:'userGroupGeneric', action:'pages')}" class="btn btn-large btn-info">< Back to Newsletters</g:link>
 				</g:else>
 
 
