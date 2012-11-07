@@ -90,8 +90,8 @@
 
 
 	<div class="btn btn-primary view-button">
-		<g:link action="show" controller="observation"
-			id="${observationInstance.id}">View</g:link>
+		<a href="${uGroup.createLink(action:"show", controller:"observation",
+			id:observationInstance.id)}">View</a>
 	</div>
 
 

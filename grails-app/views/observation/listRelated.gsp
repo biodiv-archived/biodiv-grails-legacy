@@ -26,7 +26,7 @@
 				println '"'+key+'":"'+value+'",'
 			}
 		%>
-			"tagsLink":"${g.createLink(action: 'tags')}",
+			"tagsLink":"${uGroup.createLink(controller:params.controller, action: 'tags')}",
 			"queryParamsMax":"${params.queryParams?.max}"
 		}
 	});
@@ -69,7 +69,7 @@
 
 		$('#tc_tagcloud a').click(function(){
 			var tg = $(this).contents().first().text();
-			window.location.href = "${g.createLink(controller:'observation', action: 'list')}?tag=" + tg ;
+			window.location.href = "${uGroup.createLink(controller:'observation', action: 'list')}?tag=" + tg ;
 	    	return false;
 	 	});
 	});

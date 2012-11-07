@@ -31,6 +31,7 @@
 		}
 	});
 </g:javascript>
+
 <div id="tags_section">
 	<h5>
 		<i class="icon-tags"></i>
@@ -44,6 +45,6 @@
 		<obv:showTagsCloud model="['tags': tags, 'isAjaxLoad':isAjaxLoad]" />
 	</div>
 	<div id="tagList" class="tagsView" style="display: none;">
-		<obv:showTagsList model="['tags': tags, 'isAjaxLoad':isAjaxLoad]" />
+		<obv:showTagsList model="['tags': tags, 'isAjaxLoad':isAjaxLoad, controller:params.controller]" />
 	</div>
 </div>

@@ -14,7 +14,7 @@
 					<g:each var="recoVoteInstance" in="${recoComments}">
 						<li style="padding: 0 5px; clear: both;"><span
 							class="flagInstanceClass ellipsis multiline">
-							<g:link controller="SUser" action="show" id="${recoVoteInstance.author?.id}">
+							<g:link url="${uGroup.createLink(controller:"SUser", action:"show", id:recoVoteInstance.author?.id)}">
 							<img class="small_profile_pic"
 								src="${recoVoteInstance.author?.icon(ImageType.VERY_SMALL)}"
 								title="${recoVoteInstance.author.name}"/>

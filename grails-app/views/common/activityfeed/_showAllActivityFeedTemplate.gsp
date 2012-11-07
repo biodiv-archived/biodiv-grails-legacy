@@ -43,6 +43,6 @@
 </div>
 <r:script>
 	$(document).ready(function(){
-		setUpFeed("${createLink(controller:'activityFeed', action:'getServerTime')}");
+		setUpFeed("${uGroup.createLink(controller:'activityFeed', action:'getServerTime')}");
 	});
 </r:script>

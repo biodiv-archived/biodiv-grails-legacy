@@ -538,11 +538,11 @@ input.dms_field {
 				<div class="span12" style="margin-top: 20px; margin-bottom: 40px;">
 					
 					<g:if test="${observationInstance?.id}">
-						<a href="${createLink(action:'show', id:observationInstance.id)}" class="btn"
+						<a href="${uGroup.createLink(action:'show', id:observationInstance.id)}" class="btn"
 							style="float: right; margin-right: 5px;"> Cancel </a>
 					</g:if>
 					<g:else>
-					<a href="${createLink(action:'list')}" class="btn"
+					<a href="${uGroup.createLink(controller:params.controller, action:'list')}" class="btn"
 							style="float: right; margin-right: 5px;"> Cancel </a>
 					</g:else>
 					
@@ -550,7 +550,7 @@ input.dms_field {
 						<div class="btn btn-danger"
 							style="float: right; margin-right: 5px;">
 							<a
-								href="${createLink(controller:'observation', action:'flagDeleted', id:observationInstance.id)}"
+								href="${uGroup.createLink(controller:'observation', action:'flagDeleted', id:observationInstance.id)}"
 								onclick="return confirm('${message(code: 'default.observatoin.delete.confirm.message', default: 'This observation will be deleted. Are you sure ?')}');">Delete
 								Observation </a>
 						</div>
@@ -655,7 +655,7 @@ input.dms_field {
         }
 
      	$('#upload_resource').ajaxForm({ 
-			url:'${createLink(controller:'observation', action:'upload_resource')}',
+			url:'${uGroup.createLink(controller:'observation', action:'upload_resource')}',
 			dataType: 'xml',//could not parse json wih this form plugin 
 			clearForm: true,
 			resetForm: true,
@@ -770,7 +770,7 @@ input.dms_field {
         });
         
  		$(".tagit-input").watermark("Add some tags");
-        $("#tags").tagit({select:true,  tagSource: "${g.createLink(action: 'tags')}", triggerKeys:['enter', 'comma', 'tab'], maxLength:30});
+        $("#tags").tagit({select:true,  tagSource: "${uGroup.createLink(controller:'observation', action: 'tags')}", triggerKeys:['enter', 'comma', 'tab'], maxLength:30});
 		$(".tagit-hiddenSelect").css('display','none');
 
  		 $("#addObservationSubmit").click(function(){

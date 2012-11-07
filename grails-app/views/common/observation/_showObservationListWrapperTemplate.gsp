@@ -100,7 +100,7 @@ $(document).ready(function() {
 			println '"'+key+'":"'+value+'",'
 		}
 	%>
-		"tagsLink":"${g.createLink(action: 'tags')}",
+		"tagsLink":"${uGroup.createLink(controller:'observation', action: 'tags')}",
 		"queryParamsMax":"${queryParams?.max}"
 	}
 });

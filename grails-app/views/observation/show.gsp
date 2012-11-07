@@ -6,7 +6,7 @@
 
 <html>
 <head>
-<link rel="canonical" href="${Utils.getIBPServerDomain() + createLink(controller:'observation', action:'show', id:observationInstance.id)}" />
+<link rel="canonical" href="${Utils.getIBPServerDomain() + uGroup.createLink(controller:'observation', action:'show', id:observationInstance.id)}" />
 <meta property="og:type" content="article" />
 <meta property="og:title" content="${(!observationInstance.fetchSpeciesCall()?.equalsIgnoreCase('Unknown'))?observationInstance.fetchSpeciesCall():'Help Identify'}"/>
 <meta property="og:url" content="${uGroup.createLink([controller:'observation', action:'show', id:observationInstance.id, base:Utils.getDomainServerUrl(request), 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress])}" />
@@ -92,7 +92,7 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 								Edit Observation </a>
 
 								<a class="btn btn-danger btn-primary pull-right" style="margin-right: 5px;margin-bottom:10px;"
-									href="${createLink(controller:'observation', action:'flagDeleted', id:observationInstance.id)}"
+									href="${uGroup.createLink(controller:'observation', action:'flagDeleted', id:observationInstance.id)}"
 									onclick="return confirm('${message(code: 'default.observatoin.delete.confirm.message', default: 'This observation will be deleted. Are you sure ?')}');">Delete
 									Observation </a>
 									
@@ -179,7 +179,7 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 							</g:hasErrors>
 
 							<form id="addRecommendation" name="addRecommendation"
-								action="${createLink(controller:'observation', action:'addRecommendationVote')}"
+								action="${uGroup.createLink(controller:'observation', action:'addRecommendationVote')}"
 								method="GET" class="form-horizontal">
 								<div class="reco-input">
 								<reco:create
@@ -269,7 +269,7 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 	Galleria.loadTheme('${resource(dir:'js/galleria/1.2.7/themes/classic/',file:'galleria.classic.min.js')}');
 	
 	$(document).ready(function(){
-<%--		initRelativeTime("${createLink(controller:'activityFeed', action:'getServerTime')}");--%>
+<%--		initRelativeTime("${uGroup.createLink(controller:'activityFeed', action:'getServerTime')}");--%>
 
 		dcorateCommentBody($('.comment .yj-message-body'));
 		$("#seeMoreMessage").hide();
@@ -318,11 +318,11 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
         	$('#voteDetails').hide();
         });
                         
-        $("ul[name='tags']").tagit({select:true,  tagSource: "${g.createLink(action: 'tags')}"});
+        $("ul[name='tags']").tagit({select:true,  tagSource: "${uGroup.createLink(controller:params.controller, action: 'tags')}"});
      	 
      	$("li.tagit-choice").click(function(){
 	    	var tg = $(this).contents().first().text();
-	        window.location.href = "${g.createLink(controller:'observation', action: 'list')}?tag=" + tg ;
+	        window.location.href = "${uGroup.createLink(controller:'observation', action: 'list')}?tag=" + tg ;
 	     });
          
        
@@ -335,7 +335,7 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
          
      	$('#addRecommendation').bind('submit', function(event) {
      		$(this).ajaxSubmit({ 
-	         	url:"${createLink(controller:'observation', action:'addRecommendationVote')}",
+	         	url:"${uGroup.createLink(controller:'observation', action:'addRecommendationVote')}",
 				dataType: 'json', 
 				clearForm: true,
 				resetForm: true,
@@ -347,7 +347,7 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 	            success: function(data, statusText, xhr, form) {
 	            	showRecos(data, null);
 	            	$('#canName').val('');
-	            	updateUnionComment(null, "${createLink(controller:'comment', action:'getAllNewerComments')}");
+	            	updateUnionComment(null, "${uGroup.createLink(controller:'comment', action:'getAllNewerComments')}");
 	            	updateFeeds();
 	            	return false;
 	            },
@@ -371,7 +371,7 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 			        console.log(data.pop().from.name);
 			    });*/
 	  			$.ajax({
-	  				url: "${createLink(action:'newComment')}",
+	  				url: "${uGroup.createLink(controller:params.controller, action:'newComment')}",
 	  				method:"POST",
 	  				dataType:'json',
 	  				data:{'obvId':${observationInstance.id}, 'href':response.href, 'commentId':response.commentID},
@@ -384,7 +384,7 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 			FB.Event.subscribe('comment.remove', function(response) {
 	  			//console.log(response);
 	  			$.ajax({
-	  				url: "${createLink(action:'removeComment')}",
+	  				url: "${uGroup.createLink(controller:params.controller, action:'removeComment')}",
 	  				method:"POST",
 	  				data:{'obvId':${observationInstance.id}, 'href':response.href, 'commentId':response.commentID},
 					error: function (xhr, status, thrownError){
@@ -423,7 +423,7 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
          	$("#seeMore").hide();
          	
         	$.ajax({
-         		url: "${createLink(controller:'observation', action:'getRecommendationVotes', id:observationInstance.id) }",
+         		url: "${uGroup.createLink(controller:'observation', action:'getRecommendationVotes', id:observationInstance.id) }",
 				method: "POST",
 				dataType: "json",
 				data: {max:max , offset:0, 'webaddress':"${userGroup?userGroup.webaddress:userGroupWebaddress}"},	

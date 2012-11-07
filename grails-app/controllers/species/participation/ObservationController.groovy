@@ -905,7 +905,7 @@ class ObservationController {
 	}
 
 	private String generateLink( String controller, String action, linkParams, request) {
-		createLink(base: Utils.getDomainServerUrl(request),
+		uGroup.createLink(base: Utils.getDomainServerUrl(request),
 				controller:controller, action: action,
 				params: linkParams)
 	}
