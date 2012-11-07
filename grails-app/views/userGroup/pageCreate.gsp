@@ -19,16 +19,18 @@
 	<div class="observation span12">
 		<uGroup:showSubmenuTemplate />
 		<div class="userGroup-section">
+			
 			<g:include controller="newsletter" action="create"
 				id="${newsletterId }" params="['userGroup':userGroupInstance?:null]" />
-			<div class="btn-group pull-right" style="z-index: 10;">
+				
+			<div class="btn-group pull-right" style="z-index: 10;clear:both;margin-top:5px;">
 
 				<g:if test="${userGroupInstance}">
-					<g:link action="pages" id="${userGroupInstance.id}"
+					<g:link url="${uGroup.createLink(mapping:'userGroup', action:'pages', id:userGroupInstance.id, userGroup:userGroupInstance)}"
 						class="btn btn-large btn-info">< Back to Newsletters</g:link>
 				</g:if>
 				<g:else>
-					<g:link action="pages" class="btn btn-large btn-info">< Back to Newsletters</g:link>
+					<g:link url="${uGroup.createLink(mapping:'userGroupGeneric', action:'pages')}" class="btn btn-large btn-info">< Back to Newsletters</g:link>
 				</g:else>
 
 

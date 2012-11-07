@@ -12,11 +12,9 @@
 <r:require modules="core" />
 </head>
 <body>
-	<div class="span12">
+	<div class="span11">
 		<div class="page-header">
-			<h1>
-				Edit
-			</h1>
+			<h1>Edit</h1>
 		</div>
 		<g:if test="${flash.message}">
 			<div class="message">
@@ -28,7 +26,9 @@
 				<g:renderErrors bean="${newsletterInstance}" as="list" />
 			</div>
 		</g:hasErrors>
-		<g:form method="post">
+		<form
+			action="${uGroup.createLink(controller:'newsletter', action:'update', userGroupWebaddress:params.webaddress)}"
+			method="POST">
 			<g:hiddenField name="id" value="${newsletterInstance?.id}" />
 			<g:hiddenField name="version" value="${newsletterInstance?.version}" />
 			<div class="dialog">
@@ -45,7 +45,8 @@
 							<td valign="top"
 								class="value ${hasErrors(bean: newsletterInstance, field: 'date', 'errors')}">
 								<g:datePicker name="date" precision="day"
-									value="${newsletterInstance?.date}" /></td>
+									value="${newsletterInstance?.date}" />
+							</td>
 						</tr>
 
 						<tr class="prop">
@@ -53,7 +54,8 @@
 								class="value ${hasErrors(bean: newsletterInstance, field: 'newsitem', 'errors')}">
 								<ckeditor:editor name="newsitem" height="300px" width="100%">
 									${newsletterInstance?.newsitem}
-								</ckeditor:editor></td>
+								</ckeditor:editor>
+							</td>
 						</tr>
 
 						<tr class="prop">
@@ -74,16 +76,15 @@
 				</table>
 			</div>
 			<div class="buttons">
-				<span class="button"><g:actionSubmit class="save"
-						action="update"
-						value="${message(code: 'default.button.update.label', default: 'Update')}" />
-				</span> <span class="button"><g:actionSubmit class="delete"
-						action="delete"
-						value="${message(code: 'default.button.delete.label', default: 'Delete')}"
-						onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
-				</span>
+				<span class="button"> <input class="btn btn-primary"
+					style="float: right; margin-right: 5px;" type="submit" value="Update" />
+				</span> <span class="button"> <a class="btn btn-danger"
+					style="float: right; margin-right: 5px;"
+					href="${uGroup.createLink(controller:'newsletter', action:'delete', id:newsletterInstance.id)}"
+					onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">Delete
+				</a> </span>
 			</div>
-		</g:form>
+		</form>
 	</div>
 </body>
 </html>

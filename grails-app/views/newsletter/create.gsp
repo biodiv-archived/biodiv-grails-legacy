@@ -1,5 +1,6 @@
 
 
+<%@page import="species.groups.UserGroup"%>
 <%@ page import="utils.Newsletter"%>
 <html>
 <head>
@@ -17,7 +18,7 @@
 <r:require modules="core" />
 </head>
 <body>
-	<div class="span12">
+	<div class="span11">
 		<div class="page-header">
 		<h1>
 			<g:message code="default.create.label" args="[entityName]" />
@@ -30,10 +31,10 @@
 		</g:if>
 		<g:hasErrors bean="${newsletterInstance}">
 			<div class="errors">
-				<g:renderErrors bean="${newsletterInstance}" as="list" />
+				Please fix following error before proceeding
 			</div>
 		</g:hasErrors>
-		<g:form action="save">
+		<form action="${uGroup.createLink(controller:'newsletter', action:'save', userGroupWebaddress:params.webaddress)}" method="POST">
 			<div class="dialog">
 				<div
 					class="control-group ${hasErrors(bean: newsletterInstance, field: 'title', 'errors')}">
@@ -92,17 +93,18 @@
 
 				<g:if test="${params.userGroup}">
 					<input type="hidden" name="userGroup"
-						value="${params.userGroup.webaddress}" />
+						value="${(!(params.userGroup instanceof UserGroup))?params.userGroup:params.userGroup.webaddress}" />
 				</g:if>
 
 			</div>
 			<div class="buttons">
-				<span class="button"><g:submitButton name="create"
-						class="save"
-						value="${message(code: 'default.button.create.label', default: 'Create')}" />
+				<span class="button">
+				<input class="btn btn-primary"
+					style="float: right; margin-right: 5px;" type="submit" value="Create" />
+				
 				</span>
 			</div>
-		</g:form>
+		</form>
 	</div>
 	<script>
 		$(document).ready(function() {

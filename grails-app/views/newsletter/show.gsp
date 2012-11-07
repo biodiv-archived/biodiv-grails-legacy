@@ -3,7 +3,8 @@
 
 <html>
 <head>
-<link rel="canonical" href="${Utils.getIBPServerDomain() + createLink(controller:'newsletter', action:'show', id:newsletterInstance.id)}" />
+<link rel="canonical"
+	href="${Utils.getIBPServerDomain() + createLink(controller:'newsletter', action:'show', id:newsletterInstance.id)}" />
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="main" />
 <g:set var="entityName"
@@ -40,10 +41,10 @@
 <body>
 	<div>
 		<div class="page-header">
-			
-					<h1>
-						${fieldValue(bean: newsletterInstance, field: "title")}
-					</h1>
+
+			<h1>
+				${fieldValue(bean: newsletterInstance, field: "title")}
+			</h1>
 		</div>
 		<div class="description  bodymarker">
 			<table>
@@ -51,10 +52,9 @@
 
 					<tr class="prop">
 						<td valign="top" class="value date"><g:formatDate
-								date="${newsletterInstance?.date}" />
-						</td>
+								date="${newsletterInstance?.date}" /></td>
 					</tr>
-					
+
 					<tr class="prop">
 						<td valign="top" class="value">
 							${newsletterInstance?.newsitem}
@@ -66,21 +66,21 @@
 			</table>
 		</div>
 		<sec:ifLoggedIn>
-			<div class="buttons">
-				<g:form>
+			<div class="buttons" style="clear:both;">
+				<form
+					action="${uGroup.createLink(controller:'newsletter', action:'edit', userGroupWebaddress:params.webaddress)}"
+					method="POST">
 					<g:hiddenField name="id" value="${newsletterInstance?.id}" />
 					<g:hiddenField name="userGroup"
 						value="${newsletterInstance?.userGroup?.webaddress}" />
-					<span class="button"><g:actionSubmit class="edit"
-							action="edit"
-							value="${message(code: 'default.button.edit.label', default: 'Edit')}" />
-					</span>
-					<span class="button"><g:actionSubmit class="delete"
-							action="delete"
-							value="${message(code: 'default.button.delete.label', default: 'Delete')}"
-							onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
-					</span>
-				</g:form>
+					<span class="button">
+						<input class="btn btn-primary" style="float: right; margin-right: 5px;" type="submit" value="Edit"/>
+					</span> <span class="button"> <a class="btn btn-danger"
+						style="float: right; margin-right: 5px;"
+						href="${uGroup.createLink(controller:'newsletter', action:'delete', id:newsletterInstance.id)}"
+						onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">Delete
+					</a> </span>
+				</form>
 			</div>
 		</sec:ifLoggedIn>
 	</div>
