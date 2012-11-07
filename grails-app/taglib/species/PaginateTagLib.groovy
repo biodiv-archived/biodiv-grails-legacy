@@ -292,7 +292,9 @@ class PaginateTagLib {
 	   if (currentstep > firststep) {
 		   linkTagAttrs.class = 'prevLink'
 		   linkTagAttrs.offset = offset - max
-		   writer << link([url:uGroup.createLink(linkTagAttrs.clone())]) {
+		   def temp = linkTagAttrs.clone();
+		   temp['url'] = uGroup.createLink(temp)
+		   writer << link(temp) {
 			   (attrs.prev ?: messageSource.getMessage('paginate.prev', null, messageSource.getMessage('default.paginate.prev', null, 'Previous', locale), locale))
 		   }
 	   }
@@ -320,7 +322,9 @@ class PaginateTagLib {
 		   // display firststep link when beginstep is not firststep
 		   if (beginstep > firststep) {
 			   linkParams.offset = 0
-			   writer << link([url:uGroup.createLink(linkTagAttrs.clone())]) {firststep.toString()}
+			   def temp = linkTagAttrs.clone();
+			   temp['url'] = uGroup.createLink(temp)
+			   writer << link(temp) {firststep.toString()}
 			   writer << '<span class="step">..</span>'
 		   }
 
@@ -331,7 +335,9 @@ class PaginateTagLib {
 			   }
 			   else {
 				   linkTagAttrs.offset = (i - 1) * max
-				   writer << link([url:uGroup.createLink(linkTagAttrs.clone())]) {i.toString()}
+				   def temp = linkTagAttrs.clone();
+				   temp['url'] = uGroup.createLink(temp)
+				   writer << link(temp) {i.toString()}
 			   }
 		   }
 
@@ -339,7 +345,9 @@ class PaginateTagLib {
 		   if (endstep < laststep) {
 			   writer << '<span class="step">..</span>'
 			   linkTagAttrs.offset = (laststep -1) * max
-			   writer << link([url:uGroup.createLink(linkTagAttrs.clone())]) { laststep.toString() }
+			   def temp = linkTagAttrs.clone();
+			   temp['url'] = uGroup.createLink(temp)
+			   writer << link(temp) { laststep.toString() }
 		   }
 	   }
 
@@ -347,7 +355,9 @@ class PaginateTagLib {
 	   if (currentstep < laststep) {
 		   linkTagAttrs.class = 'nextLink'
 		   linkTagAttrs.offset = offset + max
-		   writer << link([url:uGroup.createLink(linkTagAttrs.clone())]) {
+		   def temp = linkTagAttrs.clone();
+		   temp['url'] = uGroup.createLink(temp)
+		   writer << link(temp) {
 			   (attrs.next ? attrs.next : messageSource.getMessage('paginate.next', null, messageSource.getMessage('default.paginate.next', null, 'Next', locale), locale))
 		   }
 	   }
