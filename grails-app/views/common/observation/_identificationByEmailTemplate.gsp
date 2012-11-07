@@ -56,12 +56,12 @@
 
 $(function() {
 	var autofillUsersComp = $("#userAndEmailList_${autofillUsersId}").autofillUsers({
-		usersUrl : '${createLink(controller:'SUser', action: 'terms')}'
+		usersUrl : '${uGroup.createLink(controller:'SUser', action: 'terms')}'
 	});
 	
 	$('#identification-email').click(function(){
 			$.ajax({ 
-	         	url:"${createLink(controller:'SUser', action:'isLoggedIn')}",
+	         	url:"${uGroup.createLink(controller:'SUser', action:'isLoggedIn')}",
 				success: function(data, statusText, xhr, form) {
 					if(data === "true"){
 						$('#userIdsAndEmailIds').val('');
@@ -69,7 +69,7 @@ $(function() {
 						$('#email-form').show();
 						return false;
 					}else{
-						window.location.href = "${createLink(controller:'login')}?spring-security-redirect="+window.location.href;
+						window.location.href = "${uGroup.createLink(controller:'login')}?spring-security-redirect="+window.location.href;
 					}
 	            },
 	            error:function (xhr, ajaxOptions, thrownError){
@@ -101,7 +101,7 @@ $(function() {
 		UpdateCKEditors();
 		
 		$(this).ajaxSubmit({ 
-         	url:"${createLink(controller:'observation', action:'sendIdentificationMail')}",
+         	url:"${uGroup.createLink(controller:'observation', action:'sendIdentificationMail')}",
 			dataType: 'json', 
 			type: 'POST',
 			data:{sourcePageUrl : window.location.href, source:"${source}"},

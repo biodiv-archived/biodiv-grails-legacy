@@ -9,12 +9,12 @@ class NewsletterController {
 	def userGroupService
 	
 	def index = {
-		redirect url: createLink(mapping:'userGroupGeneric', action: "pages", params: params)
+		redirect url: uGroup.createLink(mapping:'userGroupGeneric', action: "pages", params: params)
 	}
 
 	def list = {
 		params.max = Math.min(params.max ? params.int('max') : 10, 100)
-		redirect url: createLink(mapping:'userGroupGeneric', action: "pages", params: params)
+		redirect url: uGroup.createLink(mapping:'userGroupGeneric', action: "pages", params: params)
 	}
 
 	@Secured(['ROLE_USER'])
@@ -34,7 +34,7 @@ class NewsletterController {
 			userGroupInstance.addToNewsletters(newsletterInstance);
 			if (userGroupInstance.save(flush: true)) {
 				flash.message = "${message(code: 'default.created.message', args: [message(code: 'newsletter.label', default: 'Newsletter'), newsletterInstance.title])}"
-				redirect url: createLink(mapping:'userGroupPageShow', params:['webaddress':newsletterInstance.userGroup.webaddress, 'newsletterId':newsletterInstance.id])
+				redirect url: uGroup.createLink(mapping:'userGroupPageShow', params:['webaddress':newsletterInstance.userGroup.webaddress, 'newsletterId':newsletterInstance.id])
 			}
 			else {
 				render(view: "create", model: [userGroupInstance:userGroupInstance, newsletterInstance: newsletterInstance])
@@ -56,7 +56,7 @@ class NewsletterController {
 		def newsletterInstance = Newsletter.get(params.id)
 		if (!newsletterInstance) {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'newsletter.label', default: 'Newsletter'), params.id])}"
-			redirect  url: createLink(mapping:'userGroupGeneric', action: "pages")
+			redirect  url: uGroup.createLink(mapping:'userGroupGeneric', action: "pages")
 		}
 		else {
 			if(newsletterInstance.userGroup) {
@@ -73,7 +73,7 @@ class NewsletterController {
 		def newsletterInstance = Newsletter.get(params.id)
 		if (!newsletterInstance) {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'newsletter.label', default: 'Newsletter'), params.id])}"
-			redirect  url: createLink(mapping:'userGroupGeneric', action: "pages")
+			redirect  url: uGroup.createLink(mapping:'userGroupGeneric', action: "pages")
 		}
 		else {
 			return [newsletterInstance: newsletterInstance]
@@ -105,7 +105,7 @@ class NewsletterController {
 				userGroupInstance.addToNewsletters(newsletterInstance);
 				if (userGroupInstance.save(flush: true) && !newsletterInstance.hasErrors() && newsletterInstance.save(flush: true)) {
 					flash.message = "${message(code: 'default.updated.message', args: [message(code: 'newsletter.label', default: 'Newsletter'), newsletterInstance.id])}"
-					redirect url: createLink(mapping:'userGroupPageShow', params:['webaddress':newsletterInstance.userGroup.webaddress, 'newsletterId':newsletterInstance.id, userGroupInstance:userGroupInstance])
+					redirect url: uGroup.createLink(mapping:'userGroupPageShow', params:['webaddress':newsletterInstance.userGroup.webaddress, 'newsletterId':newsletterInstance.id, userGroupInstance:userGroupInstance])
 				}else {
 					render(view: "edit", model: [userGroupInstance:userGroupInstance, newsletterInstance: newsletterInstance])
 				}
@@ -113,7 +113,7 @@ class NewsletterController {
 				if (!newsletterInstance.hasErrors() && newsletterInstance.save(flush: true)) {
 					flash.message = "${message(code: 'default.updated.message', args: [message(code: 'newsletter.label', default: 'Newsletter'), newsletterInstance.id])}"
 
-					redirect  url: createLink(mapping:'userGroupGeneric', action: "page", id: newsletterInstance.id)
+					redirect  url: uGroup.createLink(mapping:'userGroupGeneric', action: "page", id: newsletterInstance.id)
 				}
 				else {
 					render(view: "edit", model: [newsletterInstance: newsletterInstance])
@@ -122,7 +122,7 @@ class NewsletterController {
 		}
 		else {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'newsletter.label', default: 'Newsletter'), params.id])}"
-			redirect  url: createLink(mapping:'userGroupGeneric', action: "pages")
+			redirect  url: uGroup.createLink(mapping:'userGroupGeneric', action: "pages")
 		}
 	}
 
@@ -134,27 +134,27 @@ class NewsletterController {
 				newsletterInstance.delete(flush: true)
 				flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'newsletter.label', default: 'Newsletter'), params.id])}"
 				if(newsletterInstance.userGroup) {
-					redirect  url: createLink(mapping:'userGroup', action: "pages", params:['webaddress':newsletterInstance.userGroup.webaddress])
+					redirect  url: uGroup.createLink(mapping:'userGroup', action: "pages", params:['webaddress':newsletterInstance.userGroup.webaddress])
 					return;
 				}
-				redirect  url: createLink(mapping:'userGroupGeneric', action: "pages")
+				redirect  url: uGroup.createLink(mapping:'userGroupGeneric', action: "pages")
 			}
 			catch (org.springframework.dao.DataIntegrityViolationException e) {
 				flash.message = "${message(code: 'default.not.deleted.message', args: [message(code: 'newsletter.label', default: 'Newsletter'), params.id])}"
 				if(params.userGroup) {
-					redirect url: createLink(mapping:'userGroupPageShow', params:['webaddress':params.userGroup, 'newsletterId':params.id])
+					redirect url: uGroup.createLink(mapping:'userGroupPageShow', params:['webaddress':params.userGroup, 'newsletterId':params.id])
 					return;
 				}
-				redirect  url: createLink(mapping:'userGroupGeneric', action: "page", id: params.id)
+				redirect  url: uGroup.createLink(mapping:'userGroupGeneric', action: "page", id: params.id)
 			}
 		}
 		else {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'newsletter.label', default: 'Newsletter'), params.id])}"
 			if(params.userGroup) {
-				redirect url: createLink(mapping:'userGroupPageShow', params:['webaddress':params.userGroup, 'newsletterId':params.id])
+				redirect url: uGroup.createLink(mapping:'userGroupPageShow', params:['webaddress':params.userGroup, 'newsletterId':params.id])
 				return;
 			}
-			redirect  url: createLink(mapping:'userGroupGeneric', action: "pages")
+			redirect  url: uGroup.createLink(mapping:'userGroupGeneric', action: "pages")
 		}
 	}
 }

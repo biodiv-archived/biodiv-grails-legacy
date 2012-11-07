@@ -124,12 +124,12 @@ class ObservationTagLib {
 	}
 		
 	def showTagsList = {attrs, body->
-		out << render(template:"/common/observation/showTagsListTemplate", model:[tags:attrs.model.tags, isAjaxLoad:attrs.model.isAjaxLoad]);
+		out << render(template:"/common/observation/showTagsListTemplate", model:attrs.model);
 	}
 	
 	
 	def showTagsCloud = {attrs, body->
-		out << render(template:"/common/observation/showTagsCloudTemplate", model:[tags:attrs.model.tags, isAjaxLoad:attrs.model.isAjaxLoad]);
+		out << render(template:"/common/observation/showTagsCloudTemplate", model:attrs.model);
 	}
 	
 	

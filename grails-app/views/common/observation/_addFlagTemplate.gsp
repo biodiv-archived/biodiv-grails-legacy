@@ -15,7 +15,7 @@
 		<div id="flag-options" class="popup-form" style="display: none">
 			<h5>Why?</h5>
 			<form id="flag-form"
-				action="${createLink(controller:'observation', action:'flagObservation', id:observationInstance.id)}">
+				action="${uGroup.createLink(controller:'observation', action:'flagObservation', id:observationInstance.id)}">
 				<g:each in="${FlagType.list() }" var="flag" status="i">
 					<g:if test="${i > 0}">
 						<input type="radio" name="obvFlag" value="${flag}">
@@ -44,10 +44,10 @@
 					<g:each var="flagInstance" in="${observationInstance.fetchAllFlags()}">
 						<li style="padding: 0 5px; clear: both;">
 							<span class="flagInstanceClass">
-							<g:link controller="SUser" action="show" id="${flagInstance.author?.id}">
+							<a href="${uGroup.createLink(controller:"SUser", action:"show", id:flagInstance.author?.id)}">
 							<img class="small_profile_pic"
 								src="${flagInstance.author?.icon(ImageType.VERY_SMALL)}"
-								title="${flagInstance.author.name}"/></g:link> : ${flagInstance.flag.value()} ${flagInstance.notes ? ": " + flagInstance.notes : ""}</span>
+								title="${flagInstance.author.name}"/></a> : ${flagInstance.flag.value()} ${flagInstance.notes ? ": " + flagInstance.notes : ""}</span>
 							<sUser:ifOwns model="['user':flagInstance.author]">
 								<a href="#" onclick="removeFlag(${flagInstance.id}, ${flagInstance.observation.id}, $(this).parent()); return false;"><span class="deleteFlagIcon" data-original-title="Remove this flag" ><i class="icon-trash"></i></span></a>
 							</sUser:ifOwns>
@@ -81,7 +81,7 @@ $('#flag-close').click(function(){
 
 function removeFlag(flagId, obvId, flagComponent){ 
 	$.ajax({
-		url: "${createLink(controller:'observation', action:'deleteObvFlag')}",
+		url: "${uGroup.createLink(controller:'observation', action:'deleteObvFlag')}",
 		data:{"id":flagId, "obvId":obvId},
 		
 		success: function(data){

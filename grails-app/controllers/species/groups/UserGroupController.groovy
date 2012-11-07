@@ -36,7 +36,7 @@ class UserGroupController {
 
 	def index = {
 		log.debug params
-		redirect  url: createLink(mapping: 'userGroup', action: "show", params: params)
+		redirect  url: uGroup.createLink(mapping: 'userGroup', action: "show", params: params)
 	}
 
 	def activity = {
@@ -108,20 +108,20 @@ class UserGroupController {
 
 		switch(params.filterProperty) {
 			case 'featuredObservations':
-				redirect  url: createLink(mapping: 'userGroup', action:'observation', params:['webaddress':params.webaddress]);
+				redirect  url: uGroup.createLink(mapping: 'userGroup', action:'observation', params:['webaddress':params.webaddress]);
 				break;
 			case 'featuredMembers':
-				redirect  url: createLink(mapping: 'userGroup', action:'user',params:['webaddress':params.webaddress]);
+				redirect  url: uGroup.createLink(mapping: 'userGroup', action:'user',params:['webaddress':params.webaddress]);
 				break;
 			case 'obvRelatedUserGroups':
-				redirect  url: createLink(mapping: 'userGroupGeneric', action:'list', params:[observation:params.id]);
+				redirect  url: uGroup.createLink(mapping: 'userGroupGeneric', action:'list', params:[observation:params.id]);
 				break;
 			case 'userUserGroups':
-				redirect  url: createLink(mapping: 'userGroupGeneric', action:'list', params:[user:params.id]);
+				redirect  url: uGroup.createLink(mapping: 'userGroupGeneric', action:'list', params:[user:params.id]);
 				break;
 			default:
 				flash:message "Invalid command"
-				redirect  url: createLink(mapping: 'userGroupGeneric', action:'list')
+				redirect  url: uGroup.createLink(mapping: 'userGroupGeneric', action:'list')
 		}
 		return
 	}
@@ -147,7 +147,7 @@ class UserGroupController {
 			log.debug "Successfully created usergroup : "+userGroupInstance
 			activityFeedService.addActivityFeed(userGroupInstance, null, springSecurityService.currentUser, activityFeedService.USERGROUP_CREATED);
 			flash.message = "${message(code: 'default.created.message', args: [message(code: 'userGroup.label', default: 'UserGroup'), userGroupInstance.webaddress])}"
-			redirect  url: createLink(mapping: 'userGroup', action: "show", params:['webaddress': userGroupInstance.webaddress])
+			redirect  url: uGroup.createLink(mapping: 'userGroup', action: "show", params:['webaddress': userGroupInstance.webaddress])
 		}
 	}
 
@@ -219,7 +219,7 @@ class UserGroupController {
 			render(view: "create", model: [userGroupInstance: userGroupInstance, 'springSecurityService':springSecurityService])
 		} else {
 			flash.message = "${message(code: 'default.not.permitted.message', args: [params.action, message(code: 'userGroup.label', default: 'UserGroup'), userGroupInstance.name])}"
-			redirect  url: createLink(mapping: 'userGroupGeneric', action: "list")
+			redirect  url: uGroup.createLink(mapping: 'userGroupGeneric', action: "list")
 		}
 	}
 
@@ -253,7 +253,7 @@ class UserGroupController {
 				if(params.founders) {
 					flash.message += ". Sent email invitation to ${params.founders} to join as founders"
 				}
-				redirect  url: createLink(mapping: 'userGroup', action: "show", params:['webaddress':userGroupInstance.webaddress])
+				redirect  url: uGroup.createLink(mapping: 'userGroup', action: "show", params:['webaddress':userGroupInstance.webaddress])
 			}
 		}
 	
@@ -268,12 +268,12 @@ class UserGroupController {
 				userGroupService.delete(userGroupInstance)
 				activityFeedService.deleteFeed(userGroupInstance);
 				flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'userGroup.label', default: 'UserGroup'), params.webaddress])}"
-				redirect url: createLink(mapping: 'userGroupGeneric',action: "list")
+				redirect url: uGroup.createLink(mapping: 'userGroupGeneric',action: "list")
 				return
 			}
 			catch (org.springframework.dao.DataIntegrityViolationException e) {
 				flash.message = "${message(code: 'default.not.deleted.message', args: [message(code: 'userGroup.label', default: 'UserGroup'), params.webaddress])}"
-				redirect url: createLink(mapping: 'userGroup',action: "show", params:['webaddress': params.webaddress])
+				redirect url: uGroup.createLink(mapping: 'userGroup',action: "show", params:['webaddress': params.webaddress])
 				return;
 			}
 		}
@@ -294,7 +294,7 @@ class UserGroupController {
 		
 		if (!userGroup && redirectToList) {
 			flash.message = "${message(code: 'userGroup.default.not.found.message', args: [params.webaddress])}"
-			redirect url: createLink(mapping: 'userGroupGeneric', action:'list')
+			redirect url: uGroup.createLink(mapping: 'userGroupGeneric', action:'list')
 		}
 		userGroup
 	}
@@ -522,7 +522,7 @@ class UserGroupController {
 	}
 
 	private String generateLink( String controller, String action, linkParams, request) {
-		createLink(base: Utils.getDomainServerUrl(request),
+		uGroup.createLink(base: Utils.getDomainServerUrl(request),
 				controller:controller, action: action,
 				params: linkParams)
 	}
@@ -566,11 +566,11 @@ class UserGroupController {
 					flash.error="Couldn't add user to the group because of missing information."
 				}
 			}
-			redirect url: createLink(mapping: 'userGroup', action:"show", params:['webaddress':userGroupInstance.webaddress]);
+			redirect url: uGroup.createLink(mapping: 'userGroup', action:"show", params:['webaddress':userGroupInstance.webaddress]);
 			return;
 		}
 		flash.error="There seems to be some problem. You are not the user to whom this confirmation request is sent as per our records."
-		redirect url: createLink(mapping: 'userGroupGeneric', action:"list");
+		redirect url: uGroup.createLink(mapping: 'userGroupGeneric', action:"list");
 	}
 
 	@Secured(['ROLE_USER', 'RUN_AS_ADMIN'])

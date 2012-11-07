@@ -10,18 +10,18 @@
 					<div class="iAgree ">
 						<g:if test="${customsecurity.hasPermissionToMakeSpeciesCall([id:r.obvId, className:species.participation.Observation.class.getCanonicalName(),
 										permission:org.springframework.security.acls.domain.BasePermission.WRITE]).toBoolean()}">
-							<a href="#" class="btn btn-primary btn-small" onclick="addAgreeRecoVote(${r.obvId}, ${r.recoId}, ${r.noOfVotes}, $(this).closest('li'), '${createLink(controller:'observation', action:'addAgreeRecommendationVote')}'); return false;">Agree</a>
+							<a href="#" class="btn btn-primary btn-small" onclick="addAgreeRecoVote(${r.obvId}, ${r.recoId}, ${r.noOfVotes}, $(this).closest('li'), '${uGroup.createLink(controller:'observation', action:'addAgreeRecommendationVote')}'); return false;">Agree</a>
 						</g:if><g:else>
 								<a href="#" onclick="$('#selectedGroupList').modal('show'); return false;"
 								title="Protected to group members/experts. Need to join any of the user groups this observation belongs to inorder to add a species call" class="btn btn-primary btn-small">Join Groups / Be an expert</a>
 						</g:else>
 					</div>
 					<g:each in="${r.authors}" var="author">
-						<g:link controller="SUser" action="show" id="${author?.id}">
+						<a href="${uGroup.createLink(controller:"SUser", action:"show", id:author?.id)}" title="${author?.name }">
 							<img class="small_profile_pic"
 								src="${author?.icon(ImageType.VERY_SMALL)}"
 								title="${author.name}" />
-						</g:link>
+						</a>
 					</g:each>
 				</div>
 

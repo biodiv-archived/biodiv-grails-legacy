@@ -1,7 +1,7 @@
 <%@page import="species.utils.Utils"%>
 <html>
 <head>
-<link rel="canonical" href="${Utils.getIBPServerDomain() + createLink(controller:'observation', action:'list')}" />
+<link rel="canonical" href="${Utils.getIBPServerDomain() + uGroup.createLink(controller:'observation', action:'list')}" />
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="main" />
 <g:set var="entityName"
@@ -26,16 +26,16 @@
 					println '"'+key+'":"'+value+'",'
 				}
 			%>
-				"tagsLink":"${g.createLink(action: 'tags')}",
+				"tagsLink":"${uGroup.createLink(controller:'observation', action: 'tags')}",
 				"queryParamsMax":"${queryParams?.max}"
 			}
-			initRelativeTime("${createLink(controller:'activityFeed', action:'getServerTime')}");
+			initRelativeTime("${uGroup.createLink(controller:'activityFeed', action:'getServerTime')}");
 		});
 	</g:javascript>
 	<r:script>
 		$( "#search" ).unbind('click');
 		$( "#search" ).click(function() {          
-			var target = "${createLink(action:'search')}" + window.location.search;
+			var target = "${uGroup.createLink(controller:'observation', action:'search')}" + window.location.search;
 			updateGallery(target, ${queryParams.max}, 0, undefined, false);
         	return false;
 		});
