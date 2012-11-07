@@ -84,14 +84,14 @@ class UrlMappings {
 			action = "auth"
 		}
 		
-		"/group/$webaddress/login/openIdCreateAccount/$id?" {
+		"/group/$webaddress/login/openIdCreateAccount" {
 			controller = "openId"
-			action = "openIdCreateAccount"
+			action = "createAccount"
 		}
 		
-		"/group/$webaddress/login/facebookCreateAccount/$id?" {
+		"/group/$webaddress/login/facebookCreateAccount" {
 			controller = "openId"
-			action = "facebookCreateAccount"
+			action = "createFacebookAccount"
 		}
 		
 		"/group/$webaddress/register/$action?/$id?" {
