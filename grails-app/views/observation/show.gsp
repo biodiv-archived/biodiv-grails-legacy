@@ -195,7 +195,7 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 									</g:if>
 									<g:else>
 										<a href="#" onclick="$('#selectedGroupList').modal('show'); return false;"
-											title="Protected to group members/experts. Need to join any of the user groups this observation belongs to inorder to add a species call" class="btn btn-primary btn-small pull-right" style="position: relative;top: -30px;">Join Groups / Be an expert</a>
+											title="Protected to group members/experts. Need to join any of the user groups this observation belongs to inorder to add a species call" class="btn btn-primary btn-small pull-right" style="position: relative;top: -30px;">Join Groups</a>
 											<uGroup:showUserGroupsListInModal
 												model="['userGroupInstanceList':observationInstance.userGroups]" />
 									</g:else>

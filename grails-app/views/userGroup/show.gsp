@@ -57,9 +57,6 @@
 <body>
 	<div class="homepage-content">
 	</div>
-<%--	<g:include controller="userGroup" action="activity" id="${userGroupInstance.id}"/>--%>
-<%--	<g:include controller="userGroup" action="about" id="${userGroupInstance.id}"/>--%>
-<%--	<g:include controller="userGroup" action="page" id="${userGroupInstance.id}"/>--%>
 	<g:javascript>
 		$(document).ready(function() {
 			window.params = {
@@ -71,7 +68,7 @@
 				"tagsLink":"${g.createLink(action: 'tags')}",
 				"queryParamsMax":"${queryParams?.max}"
 			}
-			var url = "${userGroupInstance.homePage ?: g.createLink(mapping:'userGroup', action:'about', params:['webaddress':userGroupInstance.webaddress])}";
+			var url = "${userGroupInstance.homePage ?: uGroup.createLink(mapping:'userGroup', controller:'userGroup', action:'about', userGroup:userGroupInstance)}";
 			$.get(url, function(data) {
 				$('.homepage-content').append($(data).find('.bodymarker'));
 			});
