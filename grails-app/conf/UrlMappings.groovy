@@ -52,6 +52,7 @@ class UrlMappings {
 			action = 'page'
 		}
 		
+		//just for replacement sake in taglib..not to be used for mapping
 		name onlyUserGroup:"/group/$webaddress" {
 			controller='userGroup'
 			action='index'
@@ -75,9 +76,9 @@ class UrlMappings {
 			action='species'
 		}
 
-		"/group/$webaddress/login/$action?" {
-			controller = "login"
-		}
+//		"/group/$webaddress/login/$action?" {
+//			controller = "login"
+//		}
 		
 		"/group/$webaddress/login/auth/$id?" {
 			controller = "openId"
@@ -94,25 +95,17 @@ class UrlMappings {
 			action = "createFacebookAccount"
 		}
 		
-		"/group/$webaddress/register/$action?/$id?" {
-			controller = "register"
-		}
 		
-		"/group/$webaddress/logout/$action?" {
-			controller = "logout"
+		"/group/$webaddress/group/$action/$id?" {
+			controller = "userGroup"
 		}
 		
 		
-		name userGroupModule:"/group/$webaddress/group/$action/$id?" {
-			controller = "group"
-		}
-		
-		
-		name userGroupModule:"/group/$webaddress/user/$action/$id?" {
+		"/group/$webaddress/user/$action/$id?" {
 			controller = "SUser"
 		}
 		
-		name userGroupModule:"/group/$webaddress/$controller/$action/$id?" {
+		name userGroupModule:"/group/$webaddress/$controller/$action?/$id?" {
 		
 		}
 	}
