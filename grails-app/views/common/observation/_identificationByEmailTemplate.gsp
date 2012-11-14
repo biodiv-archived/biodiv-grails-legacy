@@ -1,4 +1,3 @@
-
 <div>
 	<div class="btn-group"
 		style="z-index: 10; float: left; margin-left: 5px;">
@@ -10,7 +9,7 @@
 			<div class="form-row">
 				<span class="keyname">To</span>
 				<ul class="userOrEmail-list">
-					<li id="userOrEmail-new"><input id="userAndEmailList"
+					<li id="userOrEmail-new"><input id="userAndEmailList_${autofillUsersId}"
 						placeholder='Type user name or email id' style="float: left"
 						type="text" /></li>
 				</ul>

@@ -15,7 +15,7 @@
 	<input type="hidden" name='rootHolderType' value="${rootHolder?.class?.getCanonicalName()}"/>
 	<input type="hidden" name='activityHolderId' value="${activityHolder?.id}"/>
 	<input type="hidden" name='activityHolderType' value="${activityHolder?.class?.getCanonicalName()}"/>
-	<input type="hidden" name='feedUrl' value="${createLink(controller:'activityFeed', action: 'getFeeds')}"/>
+	<input type="hidden" name='feedUrl' value="${uGroup.createLink(controller:'activityFeed', action: 'getFeeds')}"/>
 	<input type="hidden" name='webaddress' value="${(rootHolder instanceof UserGroup) ? rootHolder.webaddress: null}"/>
 	
 	<input type="hidden" name='isCommentThread' value="${isCommentThread}"/>

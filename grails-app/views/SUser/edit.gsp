@@ -64,20 +64,29 @@
 
 					<div class="super-section" style="clear: both;">
 						<div class="row section">
-								<div class="figure span3" style="float: left; max-height: 220px; max-width: 200px">
+								<div class="figure span3 ${hasErrors(bean: user, field: 'icon', 'error')}" style="float: left; max-height: 220px; max-width: 200px">
 								
 								<%def thumbnail = user.icon%>
-								<div class='pull-left' style="height:80px; width:auto;margin-left: 0px;">
+								<div class='pull-left' style="height:100px; width:auto;margin-left: 0px;">
 									<a onclick="$('#attachFile').select()[0].click();return false;" style="postiion:relative;">
 										<img id="thumbnail"
 										src='${createLink(url: user.mainImage().fileName)}' class='logo '/>
 										<div style="clear:both;">
 											<i class="icon-picture"></i>
-											<span>Upload picture of size < 1MB</span>
+											<span>Upload picture of size < 2MB</span>
 										</div>
 									</a>
 								</div>
+								
 								<input id="icon" name="icon" type="hidden" value='${thumbnail}' />
+									
+											<div id="image-resources-msg" class="help-inline">
+												<g:hasErrors bean="${user}" field="icon">
+													<g:eachError bean="${user}" field="icon">
+    													<li><g:message error="${it}" /></li>
+													</g:eachError>
+												</g:hasErrors>
+											</div>
 								
 								
 <%--								<g:link controller="SUser" action="show" id="${user.id }">--%>
@@ -481,7 +490,7 @@
 		});
 
      	$('#upload_resource').ajaxForm({ 
-			url:'${createLink(controller:'SUser', action:'upload_resource')}',
+			url:'${uGroup.createLink(controller:'SUser', action:'upload_resource')}',
 			dataType: 'xml',//could not parse json wih this form plugin 
 			clearForm: true,
 			resetForm: true,

@@ -8,7 +8,7 @@ import org.codehaus.groovy.grails.plugins.springsecurity.ui.RegistrationCode;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
-
+import org.grails.taggable.*
 import com.grailsrocks.emailconfirmation.PendingEmailConfirmation;
 
 import species.auth.Role;
@@ -32,7 +32,7 @@ class UserGroupController {
 	def emailConfirmationService;
 	def namesIndexerService;
 	def activityFeedService;
-	static allowedMethods = [save: "POST", update: "POST",]
+	static allowedMethods = [save: "POST", update: "POST"]
 
 	def index = {
 		log.debug params
@@ -253,7 +253,7 @@ class UserGroupController {
 				if(params.founders) {
 					flash.message += ". Sent email invitation to ${params.founders} to join as founders"
 				}
-				redirect  url: uGroup.createLink(mapping: 'userGroup', action: "show", params:['webaddress':userGroupInstance.webaddress])
+				redirect  url: uGroup.createLink(mapping: 'userGroup', action: "show", userGroup:userGroupInstance)
 			}
 		}
 	
@@ -283,19 +283,18 @@ class UserGroupController {
 		def userGroup
 		
 		if(id) {
-			userGroup = userGroupService.get(params.long('id'))
+			userGroup = userGroupService.get(id)
 		} 
 		if(webaddress) {
-			userGroup = userGroupService.get(params['webaddress'])
-		}
-		println '1'
-		if (!userGroup && redirectToList) {
-			println '2'
-			flash.message = "${message(code: 'userGroup.default.not.found.message', args: [params.webaddress])}"
-			redirect url: uGroup.createLink(mapping: 'userGroupGeneric', action:'list')
+			userGroup = userGroupService.get(webaddress)
 		}
 		println userGroup
-		println '3'
+		println id
+		println webaddress
+		if (!userGroup && redirectToList) {
+			flash.message = "${message(code: 'userGroup.default.not.found.message', args: [params.webaddress])}"
+			redirect url: uGroup.createLink(controller:'userGroup', action:'list')
+		}
 		userGroup
 	}
 
@@ -920,6 +919,11 @@ class UserGroupController {
 	   def userGroupInstance = findInstance(params.id, params.webaddress)
 	   if (!userGroupInstance) return;
 	   render (view:'species', model:['userGroupInstance':userGroupInstance, params:params])
+   }
+
+   def tags = {
+	   log.debug params;
+	   render Tag.findAllByNameIlike("${params.term}%")*.name as JSON
    }
 }
 

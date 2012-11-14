@@ -103,12 +103,12 @@ max-width: 100%;
 			
 			<%
 				def form_id = "createGroup"
-				def form_action = createLink(mapping:'userGroupGeneric', action:'save')
+				def form_action = uGroup.createLink(mapping:'userGroupGeneric', controller:'userGroup', action:'save')
 				def form_button_name = "Create Group"
 				def form_button_val = "Create Group"
 				if(params.action == 'edit' || params.action == 'update'){
 					//form_id = "updateGroup"
-					form_action = createLink(mapping:'userGroup', action:'update', params:['webaddress':userGroupInstance.webaddress])
+					form_action = uGroup.createLink(mapping:'userGroup', controller:'userGroup', action:'update', 'userGroup':userGroupInstance)
 				 	form_button_name = "Update Group"
 					form_button_val = "Update Group"
 				}
@@ -117,6 +117,7 @@ max-width: 100%;
 			<g:set var="members_autofillUsersId" value="id2" />
 			<form id="${form_id}" action="${form_action}" method="POST"
 				class="form-horizontal">
+				<input type="hidden" name="id" value="${userGroupInstance?.id}"/>
 				<div class="super-section">
 					<div class="section"
 						style="position: relative; overflow: visible;">
@@ -128,8 +129,12 @@ max-width: 100%;
 									code="userGroup.name.label" default="Group Name" /> </label>
 							<div class="controls textbox">
 								<div id="groups_div" class="btn-group" style="z-index: 3;">
-									<g:textField name="name" value="${userGroupInstance?.name}" placeholder="Enter a group name..."/>
-
+									<g:if test="${userGroupInstance?.domainName }">
+										<g:textField name="name" value="${userGroupInstance?.name}" placeholder="Enter a group name..." readonly="true"/>
+									</g:if>
+									<g:else>
+										<g:textField name="name" value="${userGroupInstance?.name}" placeholder="Enter a group name..." />
+									</g:else>
 									<div class="help-inline">
 										<g:hasErrors bean="${userGroupInstance}" field="name">
 											<g:eachError bean="${userGroupInstance}" field="name">
@@ -201,17 +206,17 @@ max-width: 100%;
 											class="resources control-group ${hasErrors(bean: userGroupInstance, field: 'icon', 'error')}">
 
 											<%def thumbnail = userGroupInstance.icon%>
-											<div class='pull-left' style="height:80px; width:auto;margin-left: 0px;">
-												<a id="change_picture" onclick="$('#attachFile').select()[0].click();return false;" style="postiion:relative;">
+											<div style="max-height:100px; width:auto;margin-left: 0px;">
+												<a id="change_picture" onclick="$('#attachFile').select()[0].click();return false;">
 													<img id="thumbnail"
 													src='${createLink(url: userGroupInstance.mainImage().fileName)}' class='logo '/>
-													<i class="icon-picture"></i><span>Upload group icon preferably of dimensions 150px X 50px and size < 50KB</span>
+													<div><i class="icon-picture"></i>Upload group icon preferably of dimensions 150px X 50px and size < 50KB</div>
 												</a>
 												
 											</div>
 											<input id="icon" name="icon" type="hidden" value='${thumbnail}' />
 											
-											<div class="help-inline">
+											<div id="image-resources-msg" class="help-inline">
 												<g:hasErrors bean="${userGroupInstance}" field="icon">
 													<g:eachError bean="${userGroupInstance}" field="icon">
     													<li><g:message error="${it}" /></li>
@@ -402,7 +407,7 @@ $(document).ready(function() {
 		});
 
      	$('#upload_resource').ajaxForm({ 
-			url:'${createLink(mapping:'userGroupGeneric', action:'upload_resource')}',
+			url:'${uGroup.createLink(controller:'userGroup', action:'upload_resource')}',
 			dataType: 'xml',//could not parse json wih this form plugin 
 			clearForm: true,
 			resetForm: true,
@@ -520,7 +525,7 @@ $(document).ready(function() {
 	});
 	
 	$("#tags .tagit-input").watermark("Add some tags");	
-	$("#tags").tagit({select:true,  tagSource: "${g.createLink(mapping:'userGroupGeneric', action: 'tags')}", triggerKeys:['enter', 'comma', 'tab'], maxLength:30});
+	$("#tags").tagit({select:true,  tagSource: "${uGroup.createLink(controller:'userGroup', action: 'tags')}", triggerKeys:['enter', 'comma', 'tab'], maxLength:30});
 	$(".tagit-hiddenSelect").css('display','none');
 	
 	$('#speciesGroupFilter button').attr('data-toggle', 'buttons-checkbox').click(function(){

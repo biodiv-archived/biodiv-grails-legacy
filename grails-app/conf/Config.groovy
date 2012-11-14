@@ -242,7 +242,7 @@ speciesPortal {
 		rootDir = "${app.rootDir}/users"
 		serverURL = "http://localhost/${appName}/users"
 		logo {
-			MAX_IMAGE_SIZE = 104857600
+			MAX_IMAGE_SIZE = 2097000
 		}
 	}
 
