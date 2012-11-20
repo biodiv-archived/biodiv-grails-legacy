@@ -2,7 +2,7 @@
 
 Hai ${founder.name.capitalize()},
 <br/><br/><br/>
-User <g:link url="${uGroup.createLink(controller:"user", action:"show", id:user.id) }" absolute="true">${user.name.capitalize()}</g:link> is requesting membership in one of the group <g:link mapping="userGroup" action="show" params="['webaddress':userGroupInstance.webaddress]" absolute="true">${userGroupInstance.name}</g:link> you own on portal <b>${domain}</b>.
+User <g:link url="${uGroup.createLink(controller:'user', action:'show', id:user.id, userGroup:userGroupInstance) }">${user.name.capitalize()}</g:link> is requesting membership in one of the group <g:link url="${uGroup.createLink(mapping:'userGroup', controller:'userGroup', action:'show', userGroup:userGroupInstance)}">${userGroupInstance.name}</g:link> you own on portal <b>${domain}</b>.
 <br/> 
 
 Please <a href="${uri}" title="Confirmation code">click here</a> to confirm the membership.

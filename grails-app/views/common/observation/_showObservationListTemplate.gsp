@@ -59,6 +59,7 @@
 		activeFilters?.loadMore = true
 		activeFilters?.webaddress = userGroup?.webaddress
 	%>
+	
 	<div class="paginateButtons" style="visibility: hidden; clear: both">
 		<p:paginate total="${instanceTotal?:0}" action="${params.action}" controller="${params.controller}"
 			userGroup="${userGroup}" userGroupWebaddress="${userGroupWebaddress}"

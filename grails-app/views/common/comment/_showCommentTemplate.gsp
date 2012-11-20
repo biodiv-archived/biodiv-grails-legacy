@@ -18,6 +18,7 @@
 		</div>
 		<div class="yj-attributes">
 			<time class="timeago" datetime="${commentInstance.lastUpdated.getTime()}"></time>
+			${commentInstance.author }
 			<sUser:ifOwns model="['user':commentInstance.author]">
 				<a href="#"
 					onclick="deleteComment(${commentInstance.id}, '${createLink(controller:'comment', action:'removeComment')}'); return false;">

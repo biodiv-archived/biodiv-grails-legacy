@@ -5,7 +5,7 @@
 </g:javascript>
 
 <div class="container group-theme" style="width:100%;">
-	<div style="padding: 10px 0px;">
+	<div>
 		<g:if test="${userGroupInstance  && userGroupInstance.id }">
 			<uGroup:showHeader model="[ 'userGroupInstance':userGroupInstance]" />
 		</g:if>

@@ -10,11 +10,7 @@
 			<!-- a class="btn btn-large btn-primary" href="${uGroup.createLink(mapping:'userGroup', action:'settings', userGroup:userGroupInstance)}"><i class="icon-cog"></i>Settings</a-->
 		</sec:permitted>
 
-		<sec:permitted className='species.groups.UserGroup'
-			id='${userGroupInstance.id}'
-			permission='${org.springframework.security.acls.domain.BasePermission.WRITE}'>
-			<a class="btn btn-large btn-primary" href="${uGroup.createLink(mapping:'userGroup', action:'settings', 'userGroup':userGroupInstance)}"><i class="icon-cog"></i>Settings</a>
-		</sec:permitted>
+		
 
 		<sec:permitted className='species.groups.UserGroup'
 			id='${userGroupInstance.id}'

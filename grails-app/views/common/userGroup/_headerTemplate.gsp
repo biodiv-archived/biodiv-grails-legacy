@@ -7,28 +7,37 @@
 <h1>
 	${userGroupInstance.name}
 </h1>
-<span class="group-desc ellipsis multiline"> ${userGroupInstance.description}
-</span>
+<!-- span class="group-desc ellipsis multiline"> ${userGroupInstance.description}
+</span-->
 <div id="actionsHeader" style="position: relative; overflow: visible;">
 	<uGroup:showActionsHeaderTemplate
 		model="['userGroupInstance':userGroupInstance, members_autofillUsersId:1]" />
+	
+	<g:if test="${flash.error}">
+		<div class="alertMsg alert alert-error" style="clear: both;">
+			${flash.error}
+		</div>
+	</g:if>
+	
+	<div class="alertMsg ${(flash.message)?'alert':'' }"  style="clear: both; margin:0px">
+		${flash.message}
+	</div>
+		
 </div>
-
-
 
 
 
 <g:javascript>
 
-	window.reloadActionsHeaderUrl = "${uGroup.createLink(mapping:'userGroup', action:'actionsHeader','userGroup':userGroupInstance) }";
-	window.joinUsUrl =  "${uGroup.createLink(mapping:'userGroup', action:'joinUs','userGroup':userGroupInstance) }";
-	window.requestMembershipUrl = "${uGroup.createLink(mapping:'userGroup', action:'requestMembership','userGroup':userGroupInstance) }";
-	window.leaveUrl = "${uGroup.createLink(mapping:'userGroup', action:'leaveUs', 'userGroup':userGroupInstance) }";
-	window.inviteMembersFormUrl = "${uGroup.createLink(mapping:'userGroup', action:'inviteMembers', 'userGroup':userGroupInstance)}";
-	window.isLoggedInUrl = "${createLink(controller:'SUser', action:'isLoggedIn')}";
-	window.loginUrl = "${createLink(controller:'login')}"
-	window.aboutUrl = "${uGroup.createLink(mapping:'userGroup', action:'about', 'userGroup':userGroupInstance) }";
-	window.userTermsUrl = "${createLink(controller:'SUser', action: 'terms')}";
+	window.reloadActionsHeaderUrl = "${uGroup.createLink(controller:'userGroup', action:'actionsHeader','userGroup':userGroupInstance) }";
+	window.joinUsUrl =  "${uGroup.createLink(controller:'userGroup',action:'joinUs','userGroup':userGroupInstance) }";
+	window.requestMembershipUrl = "${uGroup.createLink(controller:'userGroup',action:'requestMembership','userGroup':userGroupInstance) }";
+	window.leaveUrl = "${uGroup.createLink(controller:'userGroup',action:'leaveUs', 'userGroup':userGroupInstance) }";
+	window.inviteMembersFormUrl = "${uGroup.createLink(controller:'userGroup',action:'inviteMembers', 'userGroup':userGroupInstance)}";
+	window.isLoggedInUrl = "${createLink(controller:'SUser', action:'isLoggedIn','userGroup':userGroupInstance)}";
+	window.loginUrl = "${createLink(controller:'login','userGroup':userGroupInstance)}"
+	window.aboutUrl = "${uGroup.createLink(controller:'userGroup',action:'about', 'userGroup':userGroupInstance) }";
+	window.userTermsUrl = "${createLink(controller:'SUser', action: 'terms','userGroup':userGroupInstance)}";
 	window.members_autofillUsersId = 1;
 	// Don''t put any code here. Put it in init_header function in membership.js
 </g:javascript>

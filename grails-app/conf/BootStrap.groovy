@@ -3,10 +3,12 @@ import org.codehaus.groovy.grails.plugins.springsecurity.SecurityFilterPosition
 import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
 
 import species.Field;
+import species.UserGroupTagLib;
 import species.auth.Role
 import species.auth.SUser
 import species.auth.SUserRole
 import species.groups.SpeciesGroup;
+import species.groups.UserGroupController;
 import species.groups.UserGroupMemberRole.UserGroupMemberRoleType;
 import species.participation.UserToken;
 import org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib
@@ -21,7 +23,7 @@ class BootStrap {
 	def navigationService
 	def springSecurityService
 	def emailConfirmationService
-	
+	def userGroupService
 	/**
 	 * 
 	 */
@@ -129,11 +131,15 @@ class BootStrap {
 			if(userToken) {
 				userToken.params.tokenId = userToken.id.toString();
 				userToken.params.confirmationToken = confirmationToken;
+				def userGroupController = new UserGroupController();
+				def userGroup = userGroupController.findInstance(Long.parseLong(userToken.params.userGroupInstanceId), null, false);
+				println "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&"
+				println userGroup
 				println userToken.params
 				println userToken.controller
 				println userToken.action
-				println new ApplicationTagLib().createLink(mapping: 'userGroupGeneric', action:'confirmMembershipRequest', params:userToken.params)
-				return [url: new ApplicationTagLib().createLink(mapping: 'userGroupGeneric', action:userToken.action, params:userToken.params)]
+				println userGroupService.userGroupBasedLink(mapping: 'userGroupGeneric', controller:userToken.controller, action:userToken.action, userGroup:userGroup, params:userToken.params)
+				return [url: userGroupService.userGroupBasedLink(mapping: 'userGroupGeneric', controller:userToken.controller, action:userToken.action, userGroup:userGroup, params:userToken.params)]
 			} else {
 				//TODO
 			}

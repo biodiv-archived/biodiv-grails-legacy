@@ -108,5 +108,10 @@ class UrlMappings {
 		name userGroupModule:"/group/$webaddress/$controller/$action?/$id?" {
 		
 		}
+		
+		"/confirm/$id?" {
+			controller = 'emailConfirmation'
+			action = "index"
+		}
 	}
 }

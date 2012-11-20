@@ -10,32 +10,28 @@
 <meta name="layout" content="main" />
 <g:set var="entityName" value="${userGroupInstance.name}" />
 <title><g:message code="default.show.label"
-		args="[userGroupInstance.name]" />
-</title>
+		args="[userGroupInstance.name]" /></title>
 <r:require modules="userGroups_show" />
 </head>
 <body>
 
 	<div class="observation span12">
 		<uGroup:showSubmenuTemplate />
+
+
 		<div class="userGroup-section">
-			<ul class="nav nav-tabs" data-tabs="tabs">
-				<li class="active"><a href="#general">General</a>
-					<uGroup:showGeneralSettings model="['userGroupInstance':userGroupInstance]"/>
-				</li>
-				<li class="active"><a href="#userPermissions">User
-						Permissions</a>
-				</li>
-				<li><a href="#">...</a></li>
-				<li><a href="#">...</a></li>
-			</ul>
-
-			<div id="my-tab-content" class="tab-content">
-				<div class="tab-pane active" id="general"></div>
-
-				<div class="tab-pane" id="userPermissions"></div>
-			</div>
-		</div>
+		
+			<div class="super-section"><a 
+				href="${uGroup.createLink(mapping:'userGroup', action:'edit', userGroup:userGroupInstance)}"> <i
+				class="icon-edit"></i>Edit Group </a></div>
+			<div class="super-section" style="clear: both;">
+			
+				<div class="section" style="position: relative; overflow: visible;">
+				<h3>Display Settings</h3>
+				<uGroup:showGeneralSettings
+						model="['userGroupInstance':userGroupInstance]" /></div></div>
+			
+					</div>
 	</div>
 
 	<r:script>

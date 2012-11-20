@@ -99,7 +99,7 @@
 				<b class="caret" style="border-top-color: black;border-bottom-color: black;"></b>
 			</a>	
 				<ul class="dropdown-menu">
-					<li><a id="logout" href="${createLink(controller:'logout')}">Logout</a></li>
+					<li><a id="logout" href="${uGroup.createLink(controller:'logout', 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress) }">Logout</a></li>
 				</ul>
 			<div class="login-box"><sUser:renderProfileLink /></div>
 		</li>
