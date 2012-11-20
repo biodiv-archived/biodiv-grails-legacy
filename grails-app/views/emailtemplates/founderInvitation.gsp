@@ -3,7 +3,7 @@
 
 Hai ${name},
 <br/><br/><br/>
-<g:link url="${uGroup.createLink(controller:"user", action:"show", id:fromUser.id) }" absolute="true">${fromUser.name.capitalize()}</g:link> is inviting you to be a founder for the group <g:link mapping="userGroup" action="show" params="['webaddress':userGroupInstance.webaddress]" absolute="true">${userGroupInstance.name}</g:link> on <b>${domain}</b>.
+<g:link url="${uGroup.createLink(controller:'user', action:'show', id:fromUser.id, userGroup:userGroupInstance) }">${fromUser.name.capitalize()}</g:link> is inviting you to be a founder for the group <g:link url="${uGroup.createLink(mapping:'userGroup', controller:'userGroup', action:'show', userGroup:userGroupInstance)}">${userGroupInstance.name}</g:link> on <b>${domain}</b>.
 <br/><br/> 
 ${foundersMsg}
 <br/><br/>

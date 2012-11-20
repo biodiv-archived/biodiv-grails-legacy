@@ -88,7 +88,20 @@ max-width: 100%;
 
 </head>
 <body>
-
+<%
+				def form_id = "createGroup"
+				def form_action = uGroup.createLink(mapping:'userGroupGeneric', controller:'userGroup', action:'save')
+				def form_button_name = "Create Group"
+				def form_button_val = "Create Group"
+				
+				if(params.action == 'edit' || params.action == 'update'){
+					//form_id = "updateGroup"
+					form_action = uGroup.createLink(mapping:'userGroup', controller:'userGroup', action:'update', 'userGroup':userGroupInstance)
+				 	form_button_name = "Update Group"
+					form_button_val = "Update Group"
+					entityName = "Edit Group"
+				}
+				%>
 		<div class="observation_create">
 			<div class="span12">
 				<uGroup:showSubmenuTemplate  model="['entityName':entityName]"/>
@@ -101,18 +114,7 @@ max-width: 100%;
 					<%--<g:renderErrors bean="${userGroupInstance}" as="list" />--%>
 				</g:hasErrors>
 			
-			<%
-				def form_id = "createGroup"
-				def form_action = uGroup.createLink(mapping:'userGroupGeneric', controller:'userGroup', action:'save')
-				def form_button_name = "Create Group"
-				def form_button_val = "Create Group"
-				if(params.action == 'edit' || params.action == 'update'){
-					//form_id = "updateGroup"
-					form_action = uGroup.createLink(mapping:'userGroup', controller:'userGroup', action:'update', 'userGroup':userGroupInstance)
-				 	form_button_name = "Update Group"
-					form_button_val = "Update Group"
-				}
-				%>
+			
 			<g:set var="founders_autofillUsersId" value="id1" />
 			<g:set var="members_autofillUsersId" value="id2" />
 			<form id="${form_id}" action="${form_action}" method="POST"
@@ -345,6 +347,7 @@ max-width: 100%;
 												name="allowNonMembersToComment" checked="${userGroupInstance.allowNonMembersToComment}"/>
 								 <g:message code="userGroup.permissions.comments.bynonmembers" default="Can non-members comment on Observations of the Group? " /> </label>
 						</div>
+						
 					</div>
 				</div>
 

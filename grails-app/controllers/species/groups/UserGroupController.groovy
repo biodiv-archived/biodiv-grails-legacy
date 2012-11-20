@@ -565,7 +565,7 @@ class UserGroupController {
 					flash.error="Couldn't add user to the group because of missing information."
 				}
 			}
-			redirect url: uGroup.createLink(mapping: 'userGroup', action:"show", params:['webaddress':userGroupInstance.webaddress]);
+			redirect url: uGroup.createLink(mapping: 'userGroup', action:"show", 'userGroup':userGroupInstance);
 			return;
 		}
 		flash.error="There seems to be some problem. You are not the user to whom this confirmation request is sent as per our records."

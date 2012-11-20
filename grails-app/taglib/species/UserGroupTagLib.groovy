@@ -360,102 +360,12 @@ class UserGroupTagLib {
 	}
 	
 	def createLink = { attrs, body ->
-		out << userGroupBasedLink(attrs);
+		out << userGroupService.userGroupBasedLink(attrs);
 	}
 	
 	def link = { attrs, body ->
-		out << userGroupBasedLink(attrs);
+		out << userGroupService.userGroupBasedLink(attrs);
 	}
 	
-	private String userGroupBasedLink(attrs) {
-		println '-------------'
-		println attrs
-		String url = "";
-		
-		if(attrs.userGroup) {			
-			attrs.webaddress = attrs.userGroup.webaddress
-			String base = attrs.remove('base')
-			String controller = attrs.remove('controller')
-			String action = attrs.remove('action');			
-			String mappingName = attrs.remove('mapping')?:'userGroupModule';
-			def userGroup = attrs.remove('userGroup');
-			attrs.remove('userGroupWebaddress');
-			if(attrs.params) {
-				attrs.putAll(attrs.params);
-				attrs.remove('params');
-			}
-			if(base) {
-				url = g.createLink(mapping:mappingName, 'controller':controller, 'action':action, 'base':base, params:attrs);
-				String onlyGroupUrl = g.createLink(mapping:'onlyUserGroup', params:['webaddress':attrs.webaddress]).replace("/"+grailsApplication.metadata['app.name'],'')
-				println url
-				println onlyGroupUrl
-				url = url.replace(onlyGroupUrl, "");
-			} else {
-				
-				if((userGroup?.domainName)) { // && (userGroup.domainName == "http://"+Utils.getDomain(request))) {
-					url = g.createLink(mapping:mappingName, 'controller':controller, base:userGroup.domainName, 'action':action, params:attrs);
-					String onlyGroupUrl = g.createLink(mapping:'onlyUserGroup', params:['webaddress':attrs.webaddress]).replace("/"+grailsApplication.metadata['app.name'],'')
-					println url
-					println onlyGroupUrl
-					url = url.replace(onlyGroupUrl, "");
-				} else {
-					url = g.createLink(mapping:mappingName, 'controller':controller, base:Utils.getIBPServerDomain(), 'action':action, params:attrs);
-					//url = url.replace("/"+grailsApplication.metadata['app.name'],'')
-				}
-			}
-			
-		} else if(attrs.userGroupWebaddress) {
-			attrs.webaddress = attrs.userGroupWebaddress
-			String base = attrs.remove('base')
-			String controller = attrs.remove('controller')
-			String action = attrs.remove('action');			
-			String mappingName = attrs.remove('mapping')?:'userGroupModule';
-			def userGroup = attrs.remove('userGroup');
-			String userGroupWebaddress = attrs.remove('userGroupWebaddress');
-			def userGroupController = new UserGroupController();
-			userGroup = userGroupController.findInstance(null, userGroupWebaddress, false);
-			if(attrs.params) {
-				attrs.putAll(attrs.params);
-				attrs.remove('params');
-			}
-			if(base) {
-				url = g.createLink(mapping:mappingName, 'controller':controller, 'action':action, 'base':base, params:attrs)
-				String onlyGroupUrl = g.createLink(mapping:'onlyUserGroup', params:['webaddress':attrs.webaddress]).replace("/"+grailsApplication.metadata['app.name'],'')
-				println url
-				println onlyGroupUrl
-				url = url.replace(onlyGroupUrl, "");
-			} else {
-				
-				if((userGroup?.domainName)) { // && (userGroup.domainName == "http://"+Utils.getDomain(request))) {
-					url = g.createLink(mapping:mappingName, 'controller':controller, base:userGroup.domainName, 'action':action, params:attrs)
-					String onlyGroupUrl = g.createLink(mapping:'onlyUserGroup', params:['webaddress':attrs.webaddress]).replace("/"+grailsApplication.metadata['app.name'],'')
-					println url
-					println onlyGroupUrl
-					url = url.replace(onlyGroupUrl, "");
-				} else {
-					url = g.createLink(mapping:mappingName, 'controller':controller, base:Utils.getIBPServerDomain(), 'action':action, params:attrs)
-					//url = url.replace("/"+grailsApplication.metadata['app.name'],'')
-				}
-			}
-			
-		} else {
-			String base = attrs.remove('base')
-			String controller = attrs.remove('controller')
-			String action = attrs.remove('action');			
-			attrs.remove('userGroup');
-			attrs.remove('userGroupWebaddress');
-			String mappingName = attrs.remove('mapping');
-			if(attrs.params) {
-				attrs.putAll(attrs.params);
-				attrs.remove('params');
-			}
-			if(base) {
-				url = g.createLink(mapping:mappingName, 'base':base, 'controller':controller, 'action':action, params:attrs).replace("/"+grailsApplication.metadata['app.name'],'')
-			} else {
-				url = g.createLink(mapping:mappingName, 'controller':controller, 'action':action, params:attrs).replace("/"+grailsApplication.metadata['app.name'],'')
-			}
-		}
-		println url;
-		return url;
-	}
+	
 }
