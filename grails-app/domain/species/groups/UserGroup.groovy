@@ -283,10 +283,13 @@ class UserGroup implements Taggable {
 			def groupClass = "'" + this.class.getCanonicalName() + "'"
 			
 			String query = "select umg.s_user_id as user, count(*) as activitycount from user_group_member_role as umg, activity_feed as af where umg.s_user_id = af.author_id and umg.user_group_id = $groupId and af.root_holder_id = $groupId and af.root_holder_type = $groupClass"
-			query += (roleId) ? " and umg.role_id $roleId" : ""
+			query += (roleId) ? " and umg.role_id = $roleId" : ""
 			query += " group by umg.s_user_id  order by activitycount desc limit $max offset $offset"
 			
+			log.debug query
+			
 			def sql =  Sql.newInstance(dataSource);
+			
 			sql.rows(query).each{
 				res.add(SUser.read(it.getProperty("user")));
 			};

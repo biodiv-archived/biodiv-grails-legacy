@@ -27,7 +27,7 @@
 						var="userGroupInstance">
 						<tr class="mainContent">
 							<uGroup:showSnippet
-								model="['userGroupInstance':userGroupInstance, 'userGroupTitle':userGroupTitleList?.get(i), 'pos':userGroupPos+i, 'showLeave':true]"></uGroup:showSnippet>
+								model="['userGroupInstance':userGroupInstance, 'userGroupTitle':userGroupTitleList?.get(i), 'pos':userGroupPos+i, 'showLeave':showLeave?:true]"></uGroup:showSnippet>
 						</tr>
 					</g:each>
 				</tbody>
@@ -87,19 +87,19 @@ $(document).ready(function(){
 	
 	$(".joinUs").unbind('click').live('click', function() {
 		console.log('livejoin ');
-		var joinUsUrl =  "${createLink(controller:'userGroup', action:'joinUs') }";
+		var joinUsUrl =  "${uGroup.createLink(controller:'userGroup', action:'joinUs') }";
 		joinUsUrl = joinUsUrl + "/?id=" + $(this).attr('data-group-id') //+"/joinUs";
 		joinAction($(this), joinUsUrl);
 	});
 	
 	$(".requestMembership").unbind('click').live('click', function() {
-		var requestMembershipUrl = "${createLink(controller:'userGroup', action:'requestMembership') }";
+		var requestMembershipUrl = "${uGroup.createLink(controller:'userGroup', action:'requestMembership') }";
 		requestMembershipUrl = requestMembershipUrl+"/?id="+$(this).attr('data-group-id')//+"/requestMembership";
 		requestMembershipAction($(this), requestMembershipUrl);
 	});
 	
 	$(".leaveUs").unbind('click').live('click', function() {
-		var leaveUrl = "${createLink(controller:'userGroup', action:'leaveUs') }";
+		var leaveUrl = "${uGroup.createLink(controller:'userGroup', action:'leaveUs') }";
 		leaveUrl = leaveUrl //+"/"+$(this).attr('data-group-id')+"/leaveUs";
 		$("#leave").attr('data-group-id', $(this).attr('data-group-id'))
 		$("#leave").attr('data-leaveUrl', leaveUrl)
