@@ -194,10 +194,7 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 											value="Add" class="btn btn-primary btn-small pull-right" style="position: relative;top: -30px; border-radius:4px" />
 									</g:if>
 									<g:else>
-										<a href="#" onclick="$('#selectedGroupList').modal('show'); return false;"
-											title="Protected to group members/experts. Need to join any of the user groups this observation belongs to inorder to add a species call" class="btn btn-primary btn-small pull-right" style="position: relative;top: -30px;">Join Groups</a>
-											<uGroup:showUserGroupsListInModal
-												model="['userGroupInstanceList':observationInstance.userGroups]" />
+										<uGroup:joinGroup model="['userGroupInstanceList':observationInstance.userGroups]"/>
 									</g:else>
 								</div>
 							</form>
@@ -226,12 +223,12 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 
 					<div class="sidebar_section">
 						<h5>Related observations</h5>
-						<div class="sidebar_section tile" style="clear: both">
+						<div class="tile" style="clear: both">
 							<div class="title">Other observations of the same species</div>
 							<obv:showRelatedStory
 								model="['observationInstance':observationInstance, 'observationId': observationInstance.id, 'controller':'observation', 'action':'getRelatedObservation', 'filterProperty': 'speciesName', 'id':'a','userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress]" />
 						</div>
-						<div class="sidebar_section tile">
+						<div class="tile">
 							<div class="title">Observations nearby</div>
 							<obv:showRelatedStory
 								model="['observationInstance':observationInstance, 'observationId': observationInstance.id, 'controller':'observation', 'action':'getRelatedObservation', 'filterProperty': 'nearBy', 'id':'nearBy', 'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress]" />
@@ -242,11 +239,11 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 					<g:if test="${observationInstance.userGroups}">
 						<div class="sidebar_section">
 							<h5>Observation is in groups</h5>
-							<div class="sidebar_section" style="clear: both">
+							<div style="clear: both">
 								<!-- div class="title">This observation belongs to following groups</div-->
-								<ul class="thumbnails">
+								<ul class="unstyled">
 									<g:each in="${observationInstance.userGroups}" var="userGroup">
-										<li class="thumbnail">
+										<li style="width:100%;">
 											<uGroup:showUserGroupSignature  model="[ 'userGroup':userGroup]" />
 										</li>
 									</g:each>

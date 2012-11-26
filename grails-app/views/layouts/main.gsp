@@ -11,7 +11,7 @@
 </title>
 
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <r:layoutResources />
 <ckeditor:resources />
 
@@ -60,11 +60,9 @@
 	<div id="species_main_wrapper" style="clear: both;">
 		<domain:showIBPHeader model="['userGroupInstance':userGroupInstance]" />
 
-		<div class="container outer-wrapper">
-			<div>
-				<div style="padding: 10px 0px; margin-left: -20px">
-					<g:layoutBody />
-				</div>
+		<div class="container-fluid outer-wrapper">
+			<div class="row-fluid">
+				<g:layoutBody />
 			</div>
 		</div>
 

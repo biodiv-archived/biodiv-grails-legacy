@@ -1,21 +1,21 @@
 <%@page import="species.utils.Utils"%>
 <div id="ibp-header" class="gradient-bg">
-	<div class="navbar navbar-static-top" style="margin-bottom: 0px;">
-		<div class="navbar-inner"
-			style="box-shadow: none; background-color: #dddbbb; background-image: none;">
+	<div class="navbar navbar-inverse navbar-static-top" style="margin-bottom: 0px;">
+		<div class="navbar-inner">
 			<div class="container" style="width: 100%">
-				<a class="btn btn-navbar" data-toggle="collapse"
-					data-target=".nav-collapse"> <span class="icon-bar"></span> </a> <a
+				 <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+			      <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+			        <span class="icon-bar"></span>
+			        <span class="icon-bar"></span>
+			        <span class="icon-bar"></span>
+			      </a>
+      
+				<a
 					class="brand"
 					href="${createLink(url:grailsApplication.config.grails.serverURL+"/..") }">
 					India Biodiversity Portal</a>
-				</li>
-				<div class="nav-collapse">
-					<ul class="nav">
-
-					</ul>
-
-
+				
+				<div class="nav-collapse collapse">
 					<ul class="nav pull-right">
 						<%--							<li><search:searchBox /></li>--%>
 <%--						<g:if test="${userGroupInstance  && userGroupInstance.id}">--%>
@@ -89,7 +89,7 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 				window.fbEnsure(function() {
 					FB.login(function(response) {
 						if (response.status == 'connected') {
-							$.cookie("fb_login", "true", { path: '/', domain:".${Utils.getDomain(request)}"});
+							$.cookie("fb_login", "true", { path: '/', domain:".${Utils.getCookieDomain()}"});
 							if($(clickedObject).hasClass('ajaxForm')) {
 								$('#loginMessage').html("Logging in ...").removeClass().addClass('alter alert-info').show();
 								$.ajax({

@@ -3,7 +3,7 @@
 								code='user.username.label' default='Username' />:</label-->
 
 <g:if test='${searched}'>
-	<div class=" center_panel">
+	<div class="span9">
 		<div class="list">
 			<div class="observations thumbwrap">
 				<%

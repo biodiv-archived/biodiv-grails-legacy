@@ -8,21 +8,9 @@
 		model="['observationInstance':observationInstance]" />
 </div>
 
-<g:if test="${showTags != false}">
-	<div class="tags_section span3" style="float: right;">
-		<g:if test="${params.action == 'search' }">
-			<obv:showAllTags
-				model="['tags':tags , 'count':tags?tags.size():0, 'isAjaxLoad':true]" />
-		</g:if>
-		<g:else>
-			<obv:showAllTags
-				model="['tagFilterByProperty':'All' , 'params':params, 'isAjaxLoad':true]" />
-		</g:else>
-	</div>
-</g:if>
-<div class="">
+<div class="row-fluid">
 	<!-- main_content -->
-	<div class="list span9" style="margin-left:0px;">
+	<div class="list span9">
 
 		<div class="observations thumbwrap">
 			<div class="observation">
@@ -89,6 +77,18 @@
 			<obv:showObservationsList  model="['totalObservationInstanceList':totalObservationInstanceList, 'observationInstanceList':observationInstanceList, 'instanceTotal':instanceTotal, 'queryParams':queryParams, 'activeFilters':activeFilters, 'userGroup':userGroup]"  />
 		</div>
 	</div>
+	<g:if test="${showTags != false}">
+		<div class="tags_section span3">
+			<g:if test="${params.action == 'search' }">
+				<obv:showAllTags
+					model="['tags':tags , 'count':tags?tags.size():0, 'isAjaxLoad':true]" />
+			</g:if>
+			<g:else>
+				<obv:showAllTags
+					model="['tagFilterByProperty':'All' , 'params':params, 'isAjaxLoad':true]" />
+			</g:else>
+		</div>
+	</g:if>
 
 	<!-- main_content end -->
 </div>
