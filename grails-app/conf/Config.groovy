@@ -245,7 +245,13 @@ speciesPortal {
 			MAX_IMAGE_SIZE = 2097000
 		}
 	}
+	
+	checklist{
+		rootDir = "${app.rootDir}/checklist"
+		serverURL = "http://localhost/${appName}/checklist"
+	}
 
+	
 		
 	names.parser.serverURL = "saturn.strandls.com"
 	names.parser.port = 4334

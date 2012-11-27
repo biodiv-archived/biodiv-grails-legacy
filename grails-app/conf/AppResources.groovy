@@ -199,4 +199,8 @@ modules = {
 		resource url:'/js/activityfeed.js'
 	}
 	
+	checklist {
+		dependsOn 'core'
+	}
+	
 }
