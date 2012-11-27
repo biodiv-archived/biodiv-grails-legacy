@@ -192,6 +192,10 @@ class Utils {
 		}
 		return result;
 	}
+	
+	static String getCookieDomain() {
+		return org.codehaus.groovy.grails.commons.ConfigurationHolder.config.subdomain;
+	}
 
 }
 

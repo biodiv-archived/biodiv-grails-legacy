@@ -367,5 +367,7 @@ class UserGroupTagLib {
 		out << userGroupService.userGroupBasedLink(attrs);
 	}
 	
-	
+	def joinGroup = { attrs, body ->
+		out << render(template:"/common/userGroup/joinGroupTemplate", model:attrs.model);
+	}	
 }

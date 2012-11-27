@@ -4,13 +4,9 @@
 			<ul class="grid_view thumbnails">
 	
 				<g:each in="${userInstanceList}" status="i" var="userInstance">
-					<g:if test="${i% ((params.controller != 'userGroup')?3:3) == 0}">
-						<li class="thumbnail" style="clear: both;">
-					</g:if>
-					<g:else>
-						<li class="thumbnail" style="margin:0px;">
-					</g:else>
-					<sUser:showUserSnippetTablet model="['userInstance':userInstance, 'userGroupInstance':userGroupInstance]"></sUser:showUserSnippetTablet>
+					
+					<li class="span3">
+						<sUser:showUserSnippetTablet model="['userInstance':userInstance, 'userGroupInstance':userGroupInstance]"></sUser:showUserSnippetTablet>
 					</li>
 				</g:each>
 			</ul>

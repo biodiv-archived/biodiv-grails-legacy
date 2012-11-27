@@ -56,6 +56,8 @@
 </head>
 <body>
 	<div class="homepage-content">
+		<div id="aboutUs" style="display:none;">
+		</div>
 	</div>
 	<g:javascript>
 		$(document).ready(function() {
