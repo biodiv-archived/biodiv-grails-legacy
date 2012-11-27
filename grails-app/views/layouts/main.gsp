@@ -284,6 +284,11 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 	  })();
 	
 	</r:script>
+	<r:script>
+    	$(document).ready( function(){
+        	$.ajaxSetup({cache:false});
+         })
+     </r:script>
 		
 	<r:layoutResources/>
 </body>
