@@ -1,6 +1,6 @@
 <g:set var="mainImage" value="${observationInstance.mainImage()}" />
 <%def imagePath = mainImage?mainImage.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.thumbnail.suffix): null%>
-<div class="thumbnail snippet tablet">
+<div class="thumbnail snippet tablet" style="height:280px">
 
 	<div class="figure" style="height:150px;"
 		title='<g:if test="${obvTitle != null}">${obvTitle}</g:if>'>
@@ -17,7 +17,7 @@
 			</g:else>
 		</g:link>
 	</div>
-	<div class="all_content">
+	<div class="caption" >
 		<obv:showStoryTablet
 			model="['observationInstance':observationInstance, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress]"></obv:showStoryTablet>
 	</div>

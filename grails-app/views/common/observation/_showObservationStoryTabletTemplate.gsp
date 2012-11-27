@@ -1,11 +1,9 @@
 
 <%@page import="species.utils.Utils"%>
 <%@page import="species.utils.ImageType"%>
-<div class="observation_story tablet">
-        
         <h5><obv:showSpeciesName model="['observationInstance':observationInstance, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress]" /></h5>
-        <div class="icons-bar">
-            <div class="observation-icons">
+        <div class="icons-bar clearfix">
+            <div class="pull-left">
                     <span class="group_icon species_groups_sprites active ${observationInstance.group.iconClass()}" title="${observationInstance.group?.name}"></span>
 
                     <g:if test="${observationInstance.habitat}">
@@ -16,7 +14,7 @@
 
             </div>
 
-            <div class="user-icon">
+            <div class="user-icon pull-right">
                     <a href="${uGroup.createLink(controller:'SUser', action:'show', id:observationInstance.author.id, 'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress)}"> <img
                             src="${observationInstance.author.icon()}" class="small_profile_pic"
                             title="${observationInstance.author.name}" /> </a>
@@ -25,4 +23,3 @@
         </div>
 
        <obv:showFooter model="['observationInstance':observationInstance, 'showDetails':showDetails]"/>
-</div>
