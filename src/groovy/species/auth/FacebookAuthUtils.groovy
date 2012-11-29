@@ -145,7 +145,7 @@ class FacebookAuthUtils {
 		if (cookie != null) {
 			cookie.maxAge = 0
 			cookie.path = '/'
-			cookie.domain = "."+Utils.getCookieDomain();
+			cookie.domain = "."+Utils.getDomain(httpServletRequest);
 			httpServletResponse.addCookie(cookie)
 		}
 
@@ -153,7 +153,7 @@ class FacebookAuthUtils {
 		if (cookie2 != null) {
 			cookie2.maxAge = 0
 			cookie2.path = '/'
-			cookie2.domain = "."+Utils.getCookieDomain();
+			cookie2.domain = "."+Utils.getDomain(httpServletRequest);
 			httpServletResponse.addCookie(cookie2)
 		}
 	}

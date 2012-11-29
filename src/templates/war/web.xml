@@ -15,16 +15,7 @@
         <param-name>webAppRootKey</param-name>
         <param-value>@grails.project.key@</param-value>
     </context-param>
-
-    <context-param>
-    	<param-name>org.eclipse.jetty.servlet.SessionCookie</param-name>
-    	<param-value>JSESSIONID</param-value>
-  	</context-param>
-  	<context-param>
-    	<param-name>org.eclipse.jetty.servlet.SessionDomain</param-name>
-    	<param-value>*.saturn.strandls.com</param-value>
-  	</context-param>
-  
+    
     <filter>
         <filter-name>sitemesh</filter-name>
         <filter-class>org.codehaus.groovy.grails.web.sitemesh.GrailsPageFilter</filter-class>

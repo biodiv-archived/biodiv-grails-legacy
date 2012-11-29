@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- The contents of this file will be loaded for each web application   
 --> 
-<Context allowLinking="true" > 
+<Context allowLinking="true" sessionCookiePath="/"> 
            
 </Context> 

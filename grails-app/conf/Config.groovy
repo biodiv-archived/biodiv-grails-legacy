@@ -428,8 +428,7 @@ environments {
 		}
 
         ibp.domain='indiabiodiversity.localhost.org'
-        wgp.domain='thewesternghats.indiabiodiversity.localhost.org'
-		subdomain='indiabiodiversity.loclahost.org'
+        wgp.domain='thewesternghats.localhost.in'
 		//grails.resources.debug=true
 		grails.resources.mappers.hashandcache.excludes = ['**']
 		//grails.resources.flatten = false
@@ -482,7 +481,6 @@ environments {
 
         ibp.domain='indiabiodiversity.localhost.org'
         wgp.domain='thewesternghats.localhost.in'
-		subdomain='indiabiodiversity.loclahost.org'
 		//grails.resources.debug=true
 		grails.resources.mappers.hashandcache.excludes = ['**']
 		//grails.resources.flatten = false
@@ -544,7 +542,6 @@ environments {
 
 	    ibp.domain='ibp.saturn.strandls.com'
         wgp.domain='wgp.saturn.strandls.com' 
-		subdomain='saturn.strandls.com'
 		
 		grails.plugins.springsecurity.successHandler.defaultTargetUrl = "/list/../../"
 		grails.plugins.springsecurity.logout.afterLogoutUrl = '/list/../../'
@@ -613,7 +610,6 @@ environments {
 		
         ibp.domain='indiabiodiversity.org'
         wgp.domain='thewesternghats.in'   
-		subdomain='indiabiodiversity.org'
 		
 		grails.plugins.springsecurity.successHandler.defaultTargetUrl = "/list/../../"
 		grails.plugins.springsecurity.logout.afterLogoutUrl = '/list/../../'
@@ -632,7 +628,6 @@ environments {
 	}
 }
 
-/*
 navigation.species_dashboard = [
         [controller:'species', title:'Species Gallery', order:1, action:"list"],
         [controller:'species', title:'Taxonomy Browser', order:10, action:'taxonBrowser'],
@@ -680,7 +675,7 @@ navigation.dashboard = [
 	[group:'users', order:50, controller:'SUser', title:'Users', action:'list'],
 	[group:'search', order:60, controller:'search', title:'Advanced Search', action:'advSelect'],
 ]
-*/
+
 
 //ckeditor  = {
 //	skipAllowedItemsCheck = false

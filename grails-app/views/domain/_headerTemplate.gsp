@@ -5,6 +5,7 @@
 </g:javascript>
 
 <div class="container group-theme" style="width:100%;">
+	<div>
 		<g:if test="${userGroupInstance  && userGroupInstance.id }">
 			<uGroup:showHeader model="[ 'userGroupInstance':userGroupInstance]" />
 		</g:if>
@@ -15,6 +16,7 @@
 			</a>
 			<h1>India Biodiversity Portal</h1>
 		</g:else>
+	</div>
 </div>
 <div class="navbar navbar-static-top btn"
 	style="margin-bottom: 0px; position: relative; width: 100%;padding: 0px; ">

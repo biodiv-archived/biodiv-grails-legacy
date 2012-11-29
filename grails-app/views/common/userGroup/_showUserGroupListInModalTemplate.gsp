@@ -5,7 +5,7 @@
 	</div>
 	<div class="modal-body">
 		<uGroup:showUserGroupsList
-			model="['userGroupInstanceList':userGroupInstanceList, instanceTotal:0, showLeave:false]" />
+			model="['userGroupInstanceList':userGroupInstanceList, instanceTotal:0]" />
 	</div>
 	<div class="modal-footer">
 		<a href="#" class="btn" data-dismiss="modal" aria-hidden="true">Close</a>

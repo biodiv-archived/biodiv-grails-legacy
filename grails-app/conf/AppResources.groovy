@@ -24,15 +24,14 @@ modules = {
 	core {
 		dependsOn 'jquery, jquery-ui'
 		defaultBundle 'core'
-		
+
 		resource url:'/bootstrap/css/bootstrap.min.css'
-		resource url:'/bootstrap/css/bootstrap-responsive.min.css'
 		resource url:'/css/bootstrap-combobox.css'
 		resource url:'/js/jquery/jquery.jqGrid-4.1.2/css/ui.jqgrid.css'
 		resource url:'/css/auth.css'
-//		resource url:[dir:'css',file:'spring-security-ui.css',plugin:'spring-security-ui']
-//		resource url:[dir:'css',file:'jquery.safari-checkbox.css',plugin:'spring-security-ui']
-//		resource url:'/css/text.css'
+		resource url:[dir:'css',file:'spring-security-ui.css',plugin:'spring-security-ui']
+		resource url:[dir:'css',file:'jquery.safari-checkbox.css',plugin:'spring-security-ui']
+		resource url:'/css/text.css'
 		resource url:'/css/navigation.css'
 		resource url:'/css/jquery.rating.css'
 		resource url:'/css/wgp.css'
