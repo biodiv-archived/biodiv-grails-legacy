@@ -757,11 +757,12 @@ input.dms_field {
         $("#tags").tagit({select:true,  tagSource: "${g.createLink(action: 'tags')}", triggerKeys:['enter', 'comma', 'tab'], maxLength:30});
 
  		 $("#addObservationSubmit").click(function(){
+ 		 	$(this).addClass("disabled");
         	var tags = $("ul[name='tags']").tagit("tags");
         	$.each(tags, function(index){
         		var input = $("<input>").attr("type", "hidden").attr("name", "tags."+index).val(this);
 				$('#addObservation').append($(input));	
-        	})
+        	})        	
         	$("#addObservation").submit();        	
         	return false;
         
