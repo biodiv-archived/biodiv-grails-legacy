@@ -30,7 +30,7 @@ class SetupService {
 	 *
 	 */
 	def setupDefs() {
-		uploadFields(grailsApplication.config.speciesPortal.data.rootDir+"/templates/Definitions.xlsx");
+		uploadFields(grailsApplication.config.speciesPortal.data.rootDir+"/templates/DefinitionsAbridged_prabha.xlsx");
 		uploadLanguages(grailsApplication.config.speciesPortal.data.rootDir+"/templates/Language_iso639-2.csv");
 		uploadCountries(grailsApplication.config.speciesPortal.data.rootDir+"/templates/Countries_ISO-3166-1.csv");
 		uploadClassifications(grailsApplication.config.speciesPortal.data.rootDir+"/templates/Classifications.xlsx", 0, 0);
@@ -67,6 +67,7 @@ class SetupService {
 		log.info " uploading habitats"
 		HabitatType.toList().each { hbType ->
 			def habitat = new Habitat(name:hbType.toString(), habitatOrder:HabitatType.getOrdering(hbType));
+			println hbType;
 			if(!habitat.save(flush:true, failOnError: true)) {
 				habitat.errors.each { log.error it }
 			}

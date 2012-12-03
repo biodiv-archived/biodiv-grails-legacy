@@ -504,6 +504,9 @@ class SUserController extends UserController {
 		} 
 		render template:"/domain/ibpHeaderTemplate"
 	}
+	def sidebar = {
+		render template:"/common/userGroup/sidebarTemplate"
+	}
 
 	def footer = {
 		render template:"/domain/ibpFooterTemplate"

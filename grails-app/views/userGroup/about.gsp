@@ -41,7 +41,8 @@
 					Founders
 				</h5>
 				<div id="founders_sidebar"></div>
-				<g:link url="${uGroup.createLink(mapping:'userGroup', action:'founders','userGroup':userGroupInstance)}">...</g:link>
+				<g:link mapping="userGroup" action="founders"
+					params="['webaddress':userGroupInstance.webaddress]">...</g:link>
 			</div>
 
 			<div class="section">
@@ -49,7 +50,8 @@
 					Members
 				</h5>
 				<div id="members_sidebar"></div>
-				<g:link url="${uGroup.createLink(mapping:'userGroup', action:'user', 'userGroup':userGroupInstance)}">...</g:link>
+				<g:link mapping="userGroup" action="user"
+					params="['webaddress':userGroupInstance.webaddress]">...</g:link>
 			</div>
 		</div>
 
@@ -93,7 +95,7 @@
 
 <r:script>
 			function reloadMembers(url) {
-				var membersUrl = (url)?url:"${uGroup.createLink(mapping:'userGroup', action:'user', userGroup:userGroupInstance) }"  
+				var membersUrl = (url)?url:"${createLink(mapping:'userGroup', action:'members', params:['webaddress':userGroupInstance.webaddress]) }"  
 				$.ajax({
 			       	url: membersUrl,
 			           method: "GET",
@@ -103,7 +105,7 @@
 					function(data) {
 			           	var html='';
 			           	$.each(data.result, function(i, item) {
-			           		html +="<a href='"+"${uGroup.createLink(controller:'SUser', action:'show')}/"+item.id+"'>"	+ 
+			           		html +="<a href='"+"${createLink(controller:'SUser', action:'show')}/"+item.id+"'>"	+ 
 			           				"<img src='"+item.icon+"' class='pull-left small_profile_pic'title='"+item.name+"'>"+ 
 			           				"</a>";
 			           	});
@@ -117,7 +119,7 @@
 				});
 			}
 			function reloadFounders(url) {
-				var foundersUrl = (url)?url:"${uGroup.createLink(mapping:'userGroup', action:'founders','userGroup':userGroupInstance) }"  
+				var foundersUrl = (url)?url:"${createLink(mapping:'userGroup', action:'founders',params:['webaddress':userGroupInstance.webaddress]) }"  
 				$.ajax({
 			       		url: foundersUrl,
 			           method: "GET",
@@ -126,7 +128,7 @@
 			           success: function(data) {
 			           	var html = "";
 			           	$.each(data.result, function(i, item) {
-			           		html += "<a	href='"+"${uGroup.createLink(controller:'SUser', action:'show')}/"+item.id+"'>"+
+			           		html += "<a	href='"+"${createLink(controller:'SUser', action:'show')}/"+item.id+"'>"+
 			           				"<img src='"+item.icon+"' class='pull-left small_profile_pic' title='"+item.name+"'>"+ "</a>";
 			           	});
 			           	$("#founders_sidebar").html(html);
