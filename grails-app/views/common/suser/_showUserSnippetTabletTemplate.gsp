@@ -1,5 +1,5 @@
 
-<div class="thumbnail">
+<div class="snippet tablet">
 	<g:set var="mainImage" value="${userInstance.icon()}" />
 	<div class="figure" style="height:150px;">
 		<a href="${uGroup.createLink([action:"show", controller:"SUser", id:userInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':userGroupWebaddress])}">
