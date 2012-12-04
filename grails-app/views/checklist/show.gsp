@@ -32,13 +32,19 @@
 							<th>Species Group</th>
 							<th>No. of Species</th>
 							<th>Place Name</th>
+							<th>State(s)</th>
+							<th>District(s)</th>
+							<th>Taluk(s)</th>
 						</tr>
 					</thead>
 					<tbody>
 							<tr>
 								<td>${checklistInstance.speciesGroup?.name}</td>
-								<td>X</td>
+								<td>${checklistInstance.speciesCount}</td>
 								<td>${checklistInstance.placeName}</td>
+								<td>${checklistInstance.state.join(",")}</td>
+								<td>${checklistInstance.district.join(",")}</td>
+								<td>${checklistInstance.taluka.join(",")}</td>
 							</tr>
 					</tbody>
 				</table>
@@ -59,22 +65,32 @@
 <%--						title="${checklistInstance.license.name}" />--%>
 <%--					</dd>--%>
 <%--    				--%>
-    				<dt>References</dt>
-    				<dd>${checklistInstance.refText}</dd>
-    				<dt>Links</dt>
-    				<dd>${checklistInstance.linkText}</dd>
+					<g:if test="${checklistInstance.refText}">
+						<dt>References</dt>
+    					<dd>${checklistInstance.refText}</dd>
+					</g:if>
+    				<g:if test="${checklistInstance.sourceText}" >
+    					<dt>Links</dt>
+    					<dd>${checklistInstance.sourceText}</dd>
+    				</g:if>
+    				<dt>Lat/Long</dt>
+    				<dd>${checklistInstance.latitude + " " + checklistInstance.longitude}</dd>
+    				<dt>All India</dt>
+    				<dd>${checklistInstance.allIndia}</dd>
+    				
     			</dl>
 			</div>
 			
 			<div>
 				<table class="table table-hover span8" style="margin-left: 0px;">
-<%--					<thead>--%>
-<%--						<tr>--%>
-<%--							<th>Species Group</th>--%>
-<%--							<th>No. of Species</th>--%>
-<%--							<th>Place Name</th>--%>
-<%--						</tr>--%>
-<%--					</thead>--%>
+					
+					<thead>
+						<tr>
+							<g:each in="${checklistInstance.fetchColumnNames()}" var="cName">
+								<th>${cName}</th>
+							</g:each>
+						</tr>
+					</thead>
 					<tbody>
 						<%
 							def preRowNo = -1
@@ -101,8 +117,13 @@
 				</table>
 			
 			</div>	
-				
-				
+			<div class="union-comment" style="clear: both;">
+				<%
+					def canPostComment = customsecurity.hasPermissionAsPerGroups([object:checklistInstance, permission:org.springframework.security.acls.domain.BasePermission.WRITE]).toBoolean()
+				%>
+				<comment:showAllComments model="['commentHolder':checklistInstance, commentType:'super', 'canPostComment':true, 'showCommentList':true]" />
+			</div>
+			
 			</div>
 		
 	<r:script>

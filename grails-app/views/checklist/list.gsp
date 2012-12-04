@@ -41,8 +41,7 @@
 						<tr>
 							<td><a href="${uGroup.createLink(controller:'checklist', action:'show', id:checklistInstance.id)}">${checklistInstance.title}</a></td>
 							<td>${checklistInstance.speciesGroup?.name}</td>
-<%--							<td>${checklistInstance.row.size()}</td>--%>
-							<td>X</td>
+							<td>${checklistInstance.speciesCount}</td>
 							<td>${checklistInstance.placeName}</td>
 						</tr>
 					</g:each>

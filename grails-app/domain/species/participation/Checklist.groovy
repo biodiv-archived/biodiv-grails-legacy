@@ -17,9 +17,10 @@ class Checklist {
 	String title;
 	int speciesCount;
 	String description; //info;
-	String attribution; 
+	String attribution;
+	 
 	String refText;
-	String linkText;
+	String sourceText;
 	String rawChecklist;
 	
 	License license;
@@ -27,20 +28,30 @@ class Checklist {
 	SUser validator;
 	
 	//location related
-	float sw_latitude;
-	float sw_longitude;
-	float ne_latitude;
-	float ne_longitude;
+	float latitude;
+	float longitude;
 	String placeName;
+	/*
+	String state;
+	String district;
+	String taluka;
+	*/
 	
 	//dates
 	Date fromDate;
 	Date toDate;
 	Date publicationDate;
-	Date lastUpdated;
-	SortedSet row;
+	Date lastUpdated; 
 	
-	static hasMany = [row:ChecklistRowData, reference:Reference]
+	//content data
+	SortedSet row;
+	String columnNames 
+	
+	//others
+	boolean allIndia =  false;
+	String reservesValue;
+	
+	static hasMany = [row:ChecklistRowData, reference:Reference, state : String, district:String, taluka: String]
 	static belongsTo = [author:SUser];
 
 	static constraints = {
@@ -49,19 +60,23 @@ class Checklist {
 		validator nullable:true;
 		description nullable:true;
 		attribution nullable:true;
+		reservesValue nullable:true;
+		placeName nullable:true;
+		state nullable:true;
+		district nullable:true;
+		taluka nullable:true;
 		
 		refText nullable:true;
-		linkText nullable:true;
+		sourceText nullable:true;
 		reference nullable:true;
 		
 		//XXX to be removed
 		speciesGroup nullable:true; 
 		rawChecklist nullable:true; 
 		publicationDate  nullable:true;
-		sw_latitude nullable:true;
-		sw_longitude nullable:true;
-		ne_latitude nullable:true;
-		ne_longitude nullable:true;
+		latitude nullable:true;
+		longitude nullable:true;
+		
 	}
 
 	static mapping = {
@@ -69,19 +84,11 @@ class Checklist {
 		description type:'text';
 		attribution type:'text';
 		refText type:'text';
-		linkText type:'text';
-		//row sort:"rowId", "key"
+		sourceText type:'text';
+		columnNames type:'text';
 	}
 	
-	//  contributed by => author
-	//	geography_given_name | character varying(255) |
-	//	all_india            | character varying(3)   |
-		
-	//	raw_checklist        | text                   |
-	//	processed_checklist  | text                   |
-	//	checklist_references | text                   |
-	//	link                 | text                   |
-	//	validated            | character varying(3)   |
-	//	validated_by         | integer
-	
+	def fetchColumnNames(){
+		return columnNames.split("\t")
+	}
 }

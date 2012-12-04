@@ -4,6 +4,8 @@ import java.text.SimpleDateFormat
 import java.util.Iterator;
 import java.util.List;
 
+import org.springframework.transaction.annotation.Transactional;
+
 import species.auth.SUser
 import species.Species;
 import species.groups.SpeciesGroup;
@@ -16,6 +18,7 @@ import species.utils.Utils;
 import au.com.bytecode.opencsv.CSVReader
 
 class ChecklistService {
+	static transactional = false
 
 	def grailsApplication
 
@@ -24,47 +27,53 @@ class ChecklistService {
 	String userName = "postgres";
 	String password = "postgres123";
 
+	def dateFormatStrings =  Arrays.asList("yyyy-MM-dd'T'HH:mm:ss")//y-M-d", "y-M", "y", "M-yyyy", "d-M-y");
+
 	def migrateChecklist(){
 		def sql = Sql.newInstance(connectionUrl, userName, password, "org.postgresql.Driver");
 		int i=0;
-		sql.eachRow("select * from ibp_checklist limit 20") { row ->
+		sql.eachRow("select nid, vid, title from node where type = 'checklist'") { row ->
 			log.debug " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>     title ===  $i " + row.title
 			Checklist checklist = createCheckList(row, sql)
 			i++
 		}
 	}
 
-	def Checklist createCheckList(row, sql){
+	@Transactional
+	def Checklist createCheckList(nodeRow, Sql sql){
+		String query = "select * from content_type_checklist where nid = $nodeRow.nid and vid = $nodeRow.vid"
+		def row = sql.firstRow(query)
+
 		Checklist cl = new Checklist()
-		cl.title = row.title
-		cl.description = row.info
-		cl.attribution = row.attribution
 
+		cl.title = nodeRow.title
+		cl.speciesCount = row.field_numentities_value
+		cl.description = row.field_clinfo_value
+		cl.attribution = row.field_attribution_value
+
+
+		cl.license = getLicense(row.field_cclicense_value.toInteger())
+		cl.speciesGroup = getSpeciesGroup(nodeRow.nid, nodeRow.vid, cl.title, sql)
 		cl.author = SUser.findByUsername("admin")
-		cl.speciesGroup = getSpeciesGroup(row.id, sql)
-		cl.license = getLicense(row.license)
-		cl.refText = row.checklist_references
-
-		cl.placeName = row.geography_given_name
-
-		cl.linkText = row.link
+		cl.refText = row.field_references_value
+		cl.sourceText = row.field_source_value
 		//addReferences(cl, row.link)
-
 		//write one file in web server location
-		saveRawFile(cl, row.raw_checklist)
-
+		saveRawFile(cl, row.field_rawchecklist_value)
 		//get actual data
-		fillData(cl, row.raw_checklist)
+		fillData(cl, row.field_rawchecklist_value)
 
-		/*
-		 //locatoin related  
-		 //date related  
-		 cl.fromDate = row.from_date
-		 cl.toDate = row.to_date
-		 cl.publicationDate = row. publication_date
-		 cl.lastUpdated = row.last_updated
-		 */
-
+		//location related
+		cl.placeName = row.field_place_value
+		updateLocation(cl, nodeRow.nid, nodeRow.vid, sql)
+		// date related
+		cl.fromDate = getDate(row.field_fromdate_value)
+		cl.toDate = getDate(row.field_todate_value)
+		cl.publicationDate = getDate(row.field_publicationdate_value)
+		cl.lastUpdated = getDate(row.field_updateddate_value)
+		//others
+		cl.allIndia = new Boolean((row.field_allindia_value > 0)).booleanValue()
+		cl.reservesValue = row.field_checklist_reserves_value
 		if(!cl.save(flush:true)){
 			cl.errors.allErrors.each { log.error it }
 			return null
@@ -72,6 +81,8 @@ class ChecklistService {
 			log.debug "saved successfully  >>>>>>> " + cl
 			return cl
 		}
+
+
 	}
 
 	private saveRawFile(cl, String rawText){
@@ -92,6 +103,30 @@ class ChecklistService {
 	}
 
 	private fillData(cl, String rawText){
+		def formatType = detectFormat(rawText)
+
+		if(formatType == "CSV"){
+			parseCSV(cl,rawText)
+		}else{
+			parseTSV(cl, rawText)
+		}
+	}
+
+	private String detectFormat(String txt){
+		Scanner scanner = new Scanner(txt);
+		String[] keys = scanner.nextLine().split(",");
+		scanner.close()
+
+		if(keys.length > 1){
+			return "CSV"
+		}
+		return "TSV"
+	}
+
+	private parseCSV(cl, String rawText){
+
+		log.debug "================================= CCCCCCCCCCCCCCC === SSSSSSSSSSSVVVVVVVVVVVVV"
+
 		CSVReader csvReader = new CSVReader(new StringReader(rawText))
 		List arrayList = csvReader.readAll()
 
@@ -107,7 +142,28 @@ class ChecklistService {
 			}
 		}
 		csvReader.close()
+
+		Arrays.sort(keyNames)
+		cl.columnNames = keyNames.join("\t");
 	}
+
+	private parseTSV(cl, String txt){
+		log.debug "================================= TTTTTTTTTTSSSSSSSSSSSVVVVVVVVVVVVV"
+		Scanner scanner = new Scanner(txt);
+		String[] keyNames = scanner.nextLine().split("\t");
+
+		int i = 0
+		while (scanner.hasNextLine()) {
+			populateData(cl, keyNames, scanner.nextLine().split("\t"), ++i)
+		}
+		scanner.close()
+
+		Arrays.sort(keyNames)
+		cl.columnNames = keyNames.join("\t");
+	}
+
+
+
 
 	private populateData(cl, String[] keys, String[] values, rowId){
 		//log.debug "keys ===  " +  keys.length   + "  "  + keys
@@ -150,15 +206,126 @@ class ChecklistService {
 	}
 
 
-	private SpeciesGroup getSpeciesGroup(id, Sql sql){
-		String query = "select common_name as cn from ibpcl_taxa as ita, checklist_taxa as clt where clt.taxa_id = ita.id and clt.checklist_id = " + id
+	private SpeciesGroup getSpeciesGroup(nid, vid, title, Sql sql){
+		String query = "select common_name as cn from ibpcl_taxa as ita where ita.id = " + sql.firstRow("select field_taxa_value as tt from content_field_taxa as t1 where t1.nid = $nid and t1.vid = $vid").get("tt")
 		String taxaName = sql.firstRow(query).get("cn")
-		//XXX handle missing group things
 		def sg = SpeciesGroup.findByName(taxaName)
 		if(!sg){
-			log.debug " no group for     $taxaName"
+			if("Algae".equalsIgnoreCase(taxaName))
+				sg = SpeciesGroup.findByName("Others")
+			else{
+				// in this case group name is invertebrates
+				title = title.trim()
+				if(title == "Checklist of Annelids of Punjab" || title ==  "Checklist of Protozoans of Punjab" || title == "Checklist of Nematodes of Punjab" || title == "Checklist of Platyhelminthes of Punjab" || title == "Checklist of Crustaceans of Punjab"){
+					sg = SpeciesGroup.findByName("Others")
+				}else if(title == "Checklist of Molluscs of Punjab"){
+					sg = SpeciesGroup.findByName("Mullusks")
+				}else if(title == "Checklist of Thrips of Punjab" || title == "Checklist of Dipterans of Punjab"){
+					sg = SpeciesGroup.findByName("Insects")
+				}else{
+					sg = SpeciesGroup.findByName("Arachnids")
+				}
+			}
 		}
 		return sg
 	}
 
+
+	private updateLocation(Checklist cl, nid, vid, Sql sql){
+		def point = sql.firstRow("select ST_AsText(ST_Centroid(__mlocate__topology)) as tt from  public.lyr_210_india_checklists where ibp_node = " + nid)?.get("tt")
+		if(point){
+			println "=================<<<<<<<<<<< $point >>>>>>>>>>>>>>>>>>>>> "
+			parsePoint(cl, point)
+		}
+
+		def ss =  sql.rows("select field_taluks_value as tt from content_field_taluks where nid = $nid and vid = $vid").size()
+		if(ss > 1){
+			println "========================== more that one taluka " + ss
+		}
+
+		def talukas =  sql.rows("select field_taluks_value as tt from content_field_taluks where nid = $nid and vid = $vid").collect { it.get("tt") }
+		println "   taluea " + talukas
+		if(talukas){
+			talukas.each { taluka ->
+				if(taluka){
+					def res = sql.firstRow("select ST_AsText(ST_Centroid(__mlocate__topology)) as tt, tahsil, district, state from lyr_115_india_tahsils where __mlocate__id = " + taluka)
+					//def point = res.get("tt")
+					println "====1 point " + point
+					cl.addToTaluka(res.get("tahsil"))
+					cl.addToDistrict(res.get("district"))
+					cl.addToState(res.get("state"))
+					//parsePoint(cl, point)
+				}
+
+			}
+			return
+		}
+		ss = sql.rows("select field_districts_value as tt from content_field_districts where nid = $nid and vid = $vid").size()
+		if(ss > 1){
+			println "========================== more that one distrcit " + ss
+		}
+		def districts = sql.rows("select field_districts_value as tt from content_field_districts where nid = $nid and vid = $vid").collect { it.get("tt") }
+		//println "   district " + district
+		if(districts){
+			districts.each{district ->
+				if(district){
+					def res = sql.firstRow("select ST_AsText(ST_Centroid(__mlocate__topology)) as tt, district, state from lyr_105_india_districts where __mlocate__id = " + district)
+					//def point = res.get("tt")
+					cl.addToDistrict(res.get("district"))
+					cl.addToState(res.get("state"))
+					println "====2 point " + point
+					//parsePoint(cl, point)
+				}
+			}
+			return
+		}
+
+		ss = sql.rows("select field_states_value as tt from content_field_states where nid = $nid and vid = $vid").size()
+		if(ss > 1){
+			println "========================== more that one state " + ss
+		}
+
+
+		def states = sql.rows("select field_states_value as tt from content_field_states where nid = $nid and vid = $vid").collect { it.get("tt") }
+		//println " state " + state
+		if(states){
+			states.each{state ->
+				if(state){
+					def res = sql.firstRow("select ST_AsText(ST_Centroid(__mlocate__topology)) as tt, state from lyr_116_india_states where __mlocate__id = " + state)
+					//def point = res.get("tt")
+					cl.addToState(res.get("state"))
+					println "====3 point " + point
+					//parsePoint(cl, point)
+				}
+			}
+		}
+
+	}
+
+	private parsePoint(Checklist cl, pointStr){
+		String[] ar = pointStr.substring(pointStr.indexOf("(") + 1, pointStr.indexOf(")")).split(" ")
+		cl.latitude = ar[0].trim().toFloat().floatValue()
+		cl.longitude = ar[1].trim().toFloat().floatValue()
+	}
+
+	private Date getDate(String dateString){
+		if(!dateString || dateString.trim() == '')
+			return null
+
+		println "================= date string " +  dateString
+		for (String formatString : dateFormatStrings)
+		{
+			try
+			{
+				def d = new SimpleDateFormat(formatString).parse(dateString.trim());
+				println "=========== parsed date " + d + "  class " + d.getClass()
+
+				return d
+			}
+			catch (Exception e){
+				println " failed in format " + formatString
+			}
+		}
+		return null;
+	}
 }
