@@ -48,10 +48,9 @@ class Checklist {
 	String columnNames 
 	
 	//others
-	boolean allIndia =  false;
 	String reservesValue;
 	
-	static hasMany = [row:ChecklistRowData, reference:Reference, state : String, district:String, taluka: String]
+	static hasMany = [row:ChecklistRowData, reference:Reference, state : String, district:String, taluka: String, userGroups:UserGroup]
 	static belongsTo = [author:SUser];
 
 	static constraints = {
@@ -69,6 +68,7 @@ class Checklist {
 		refText nullable:true;
 		sourceText nullable:true;
 		reference nullable:true;
+		columnNames  nullable:true;
 		
 		//XXX to be removed
 		speciesGroup nullable:true; 

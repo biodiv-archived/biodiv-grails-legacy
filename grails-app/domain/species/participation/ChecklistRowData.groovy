@@ -5,11 +5,14 @@ class ChecklistRowData implements Comparable {
 	String key;
 	String value;
 	int rowId;
+	//for scientific name
+	Recommendation reco;
 		
 	static belongsTo = [checklist:Checklist];
 
 	static constraints = {
 		value nullable:true;
+		reco  nullable:true;
 	}
 
 	static mapping = {

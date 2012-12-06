@@ -21,7 +21,11 @@ class ChecklistService {
 	static transactional = false
 
 	def grailsApplication
-
+	def observationService 
+	
+	static final String SN_NAME = "scientific_name"
+	static final String CN_NAME = "common_name"
+	
 	String connectionUrl1 =  "jdbc:postgresql://192.168.4.172:5432/ibp";
 	String connectionUrl =  "jdbc:postgresql://localhost/ibp";
 	String userName = "postgres";
@@ -58,10 +62,11 @@ class ChecklistService {
 		cl.refText = row.field_references_value
 		cl.sourceText = row.field_source_value
 		//addReferences(cl, row.link)
+		
 		//write one file in web server location
 		saveRawFile(cl, row.field_rawchecklist_value)
 		//get actual data
-		fillData(cl, row.field_rawchecklist_value)
+		//fillData(cl, row.field_rawchecklist_value)
 
 		//location related
 		cl.placeName = row.field_place_value
@@ -71,20 +76,30 @@ class ChecklistService {
 		cl.toDate = getDate(row.field_todate_value)
 		cl.publicationDate = getDate(row.field_publicationdate_value)
 		cl.lastUpdated = getDate(row.field_updateddate_value)
+		
+		addGroup(cl, row.field_allindia_value)
+		
 		//others
-		cl.allIndia = new Boolean((row.field_allindia_value > 0)).booleanValue()
 		cl.reservesValue = row.field_checklist_reserves_value
 		if(!cl.save(flush:true)){
 			cl.errors.allErrors.each { log.error it }
 			return null
 		}else{
+			//get actual data
+			fillData(cl, row.field_rawchecklist_value)
 			log.debug "saved successfully  >>>>>>> " + cl
 			return cl
 		}
 
-
 	}
 
+	private addGroup(cl, val){
+		//XXX change to point wgp group
+		if(val == 0){
+			cl.addToUserGroups(UserGroup.read(3))
+		}
+	}
+	
 	private saveRawFile(cl, String rawText){
 		def rootDir = grailsApplication.config.speciesPortal.checklist.rootDir
 		def checklistRootDir = new File(rootDir);
@@ -110,6 +125,12 @@ class ChecklistService {
 		}else{
 			parseTSV(cl, rawText)
 		}
+		
+		if(!cl.save(flush:true)){
+			cl.errors.allErrors.each { log.error it }
+		}
+		log.debug "saved data as well " + cl
+		
 	}
 
 	private String detectFormat(String txt){
@@ -168,15 +189,38 @@ class ChecklistService {
 	private populateData(cl, String[] keys, String[] values, rowId){
 		//log.debug "keys ===  " +  keys.length   + "  "  + keys
 		//log.debug "values === " + values.length  + "  " + values
-
+		def snVal, snKey, snRowId, cn
 		for (int i = 0; i < keys.length; i++) {
+			def key = keys[i].trim()
 			def value = null
 			if(i < values.length){
 				value = values[i]
 			}
-			def clr = new ChecklistRowData(key:keys[i], value:value, rowId:rowId)
-			//handle scintific name link and interacti with scientific name infrastructre
-			cl.addToRow(clr);
+			
+			if(key.equalsIgnoreCase(SN_NAME)){
+				snVal = value
+				snKey = key 
+				snRowId = i
+			}
+			
+			if(key.equalsIgnoreCase(CN_NAME)){
+				cn = value
+			}
+			
+			//storing all the key value pair except scientific name
+			if(i != snRowId){
+				def clr = new ChecklistRowData(key:key, value:value, rowId:rowId)
+				cl.addToRow(clr);
+			}
+		}
+		
+		//handling scientific name infrastructre
+		if(snRowId){
+			Recommendation reco = observationService.getRecommendation([recoName:snVal, canName:snVal, commonName:cn, refObject:cl]).mainReco
+			log.debug "===================== reco info ========================" + reco
+			//log.debug " species id " + reco.taxonConcept?.findSpeciesId()
+			//log.debug " cannonical form " + reco.taxonConcept?.canonicalForm
+			cl.addToRow(new ChecklistRowData(key:snKey, value:snVal, rowId:rowId, reco:reco))
 		}
 	}
 
@@ -234,14 +278,14 @@ class ChecklistService {
 	private updateLocation(Checklist cl, nid, vid, Sql sql){
 		def point = sql.firstRow("select ST_AsText(ST_Centroid(__mlocate__topology)) as tt from  public.lyr_210_india_checklists where ibp_node = " + nid)?.get("tt")
 		if(point){
-			println "=================<<<<<<<<<<< $point >>>>>>>>>>>>>>>>>>>>> "
+			//println "=================<<<<<<<<<<< $point >>>>>>>>>>>>>>>>>>>>> "
 			parsePoint(cl, point)
 		}
 
-		def ss =  sql.rows("select field_taluks_value as tt from content_field_taluks where nid = $nid and vid = $vid").size()
-		if(ss > 1){
-			println "========================== more that one taluka " + ss
-		}
+//		def ss =  sql.rows("select field_taluks_value as tt from content_field_taluks where nid = $nid and vid = $vid").size()
+//		if(ss > 1){
+//			println "========================== more that one taluka " + ss
+//		}
 
 		def talukas =  sql.rows("select field_taluks_value as tt from content_field_taluks where nid = $nid and vid = $vid").collect { it.get("tt") }
 		println "   taluea " + talukas
@@ -260,10 +304,10 @@ class ChecklistService {
 			}
 			return
 		}
-		ss = sql.rows("select field_districts_value as tt from content_field_districts where nid = $nid and vid = $vid").size()
-		if(ss > 1){
-			println "========================== more that one distrcit " + ss
-		}
+//		ss = sql.rows("select field_districts_value as tt from content_field_districts where nid = $nid and vid = $vid").size()
+//		if(ss > 1){
+//			println "========================== more that one distrcit " + ss
+//		}
 		def districts = sql.rows("select field_districts_value as tt from content_field_districts where nid = $nid and vid = $vid").collect { it.get("tt") }
 		//println "   district " + district
 		if(districts){
@@ -280,10 +324,10 @@ class ChecklistService {
 			return
 		}
 
-		ss = sql.rows("select field_states_value as tt from content_field_states where nid = $nid and vid = $vid").size()
-		if(ss > 1){
-			println "========================== more that one state " + ss
-		}
+//		ss = sql.rows("select field_states_value as tt from content_field_states where nid = $nid and vid = $vid").size()
+//		if(ss > 1){
+//			println "========================== more that one state " + ss
+//		}
 
 
 		def states = sql.rows("select field_states_value as tt from content_field_states where nid = $nid and vid = $vid").collect { it.get("tt") }
@@ -312,18 +356,18 @@ class ChecklistService {
 		if(!dateString || dateString.trim() == '')
 			return null
 
-		println "================= date string " +  dateString
+		//println "================= date string " +  dateString
 		for (String formatString : dateFormatStrings)
 		{
 			try
 			{
 				def d = new SimpleDateFormat(formatString).parse(dateString.trim());
-				println "=========== parsed date " + d + "  class " + d.getClass()
+				//println "=========== parsed date " + d + "  class " + d.getClass()
 
 				return d
 			}
 			catch (Exception e){
-				println " failed in format " + formatString
+				log.debug " failed in format " + formatString
 			}
 		}
 		return null;

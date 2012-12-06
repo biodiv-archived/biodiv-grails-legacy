@@ -8,19 +8,22 @@ import species.participation.Observation
 class UnCuratedVotes {
 	
 	Date votedOn = new Date();
-	Observation obv;
+	//Observation obv;
 	UnCuratedScientificNames sciName;
 	UnCuratedCommonNames commonName;
-
+	String refType;
+	long refId
 	static constraints = {
 		author(nullable:false, unique:[
 			'author',
 			'sciName',
 			'commonName',
-			'obv'
+			'refType',
+			'refId'
 		]);
 		votedOn validator : {val -> val < new Date()};
-		obv(nullable:false);
+		refType(nullable:false);
+		refId(nullable:false);
 		sciName(nullable:true);
 		commonName(nullable:true);
 	}

@@ -200,7 +200,7 @@ modules = {
 	}
 	
 	checklist {
-		dependsOn 'core'
+		dependsOn 'core, comment, activityfeed'
 	}
 	
 }

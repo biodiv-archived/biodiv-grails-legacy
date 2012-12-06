@@ -75,9 +75,10 @@
     				</g:if>
     				<dt>Lat/Long</dt>
     				<dd>${checklistInstance.latitude + " " + checklistInstance.longitude}</dd>
-    				<dt>All India</dt>
-    				<dd>${checklistInstance.allIndia}</dd>
     				
+<%--    				<dt>All India</dt>--%>
+<%--    				<dd>${checklistInstance.allIndia}</dd>--%>
+<%--    				--%>
     			</dl>
 			</div>
 			
@@ -107,7 +108,19 @@
 									preRowNo = currentRowNo
 								%>
 								<tr>
-									<td>${row.value}</td>
+							</g:if>
+							
+							<g:if test="${row.reco}">
+								<g:if test="${row.reco.taxonConcept && row.reco.taxonConcep.canonicalForm != null}">
+									<td>
+									<a href="${uGroup.createLink(action:'show', controller:'species', id:reco.taxonConcept.findSpeciesId(), 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
+										<i> ${row.reco.taxonConcept.canonicalForm}</i>
+									</a>
+									</td>
+								</g:if>
+								<g:else>
+									<td><i>${row.value}</i></td>
+								</g:else>
 							</g:if>
 							<g:else>
 								<td>${row.value}</td>
@@ -118,10 +131,11 @@
 			
 			</div>	
 			<div class="union-comment" style="clear: both;">
+				<feed:showAllActivityFeeds model="['rootHolder':checklistInstance, feedType:'Specific', refreshType:'manual', 'feedPermission':'editable']" />
 				<%
 					def canPostComment = customsecurity.hasPermissionAsPerGroups([object:checklistInstance, permission:org.springframework.security.acls.domain.BasePermission.WRITE]).toBoolean()
 				%>
-				<comment:showAllComments model="['commentHolder':checklistInstance, commentType:'super', 'canPostComment':true, 'showCommentList':true]" />
+				<comment:showAllComments model="['commentHolder':checklistInstance, commentType:'super', 'canPostComment':canPostComment, 'showCommentList':false]" />
 			</div>
 			
 			</div>

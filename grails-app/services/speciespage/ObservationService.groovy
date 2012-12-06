@@ -279,12 +279,15 @@ class ObservationService {
 		def canName = params.canName;
 		def commonName = params.commonName;
 		def languageId = Language.getLanguage(params.languageName).id;
-		def obv = params.observation?:Observation.get(params.obvId);
+		def refObject = params.observation?:Observation.get(params.obvId);
+		
+		//if source of recommendation is other that observation (i.e Checklist)
+		refObject = refObject ?: params.refObject
 		
 		Recommendation commonNameReco = findReco(commonName, false, languageId, null);
 		Recommendation scientificNameReco = getRecoForScientificName(recoName, canName, commonNameReco);
 		
-		curationService.add(scientificNameReco, commonNameReco, obv, springSecurityService.currentUser);
+		curationService.add(scientificNameReco, commonNameReco, refObject, springSecurityService.currentUser);
 		
 		//giving priority to scientific name if its available. same will be used in determining species call
 		return [mainReco : (scientificNameReco ?:commonNameReco), commonNameReco:commonNameReco];
