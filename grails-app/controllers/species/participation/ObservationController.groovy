@@ -1109,7 +1109,7 @@ class ObservationController {
 		model['isSearch'] = true;
 		log.debug "Storing all observations ids list in session ${session['obv_ids_list']}";
 		
-		if(!params.isGalleryUpdate?.toBoolean()){
+		if(!params.isGalleryUpdate?.toBoolean()) {
 			params.remove('isGalleryUpdate');
 			render (view:"search", model:model)
 		} else {
@@ -1157,20 +1157,7 @@ class ObservationController {
 	def nameTerms = {
 		log.debug params;
 		params.field = params.field?:"autocomplete";
-		List result = new ArrayList();
-
-		params.max = Math.min(params.max ? params.int('max') : 5, 10)
-		def namesLookupResults = namesIndexerService.suggest(params)
-		result.addAll(namesLookupResults);
-
-		def queryResponse = observationsSearchService.terms(params);
-		NamedList tags = (NamedList) ((NamedList)queryResponse.getResponse().terms)[params.field];
-
-		for (Iterator iterator = tags.iterator(); iterator.hasNext();) {
-			Map.Entry tag = (Map.Entry) iterator.next();
-			result.add([value:tag.getKey().toString(), label:tag.getKey().toString(),  "category":"Observations"]);
-		}
-
+		List result = observationService.nameTerms(params);
 		render result as JSON;
 	}
 
@@ -1186,7 +1173,7 @@ class ObservationController {
 
 		for (Iterator iterator = tags.iterator(); iterator.hasNext();) {
 			Map.Entry tag = (Map.Entry) iterator.next();
-			result.add([value:tag.getKey().toString(), label:tag.getKey().toString(),  "category":""]);
+			result.add([value:tag.getKey().toString(), label:tag.getKey().toString(),  "category":"Species"]);
 		}
 
 		render result as JSON;

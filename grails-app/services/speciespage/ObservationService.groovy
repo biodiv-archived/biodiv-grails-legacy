@@ -41,6 +41,7 @@ class ObservationService {
 	def springSecurityService;
 	def curationService;
 	def commentService;
+	def namesIndexerService;
 	
 	/**
 	 * 
@@ -856,7 +857,7 @@ println queryParams
 		}*/
 		
 		
-		return [responseHeader:responseHeader, observationInstanceList:instanceList, observationInstanceTotal:noOfResults, queryParams:queryParams, activeFilters:activeFilters, tags:facetResults, totalObservationIdList:totalObservationIdList]
+		return [responseHeader:responseHeader, observationInstanceList:instanceList, instanceTotal:noOfResults, queryParams:queryParams, activeFilters:activeFilters, tags:facetResults, totalObservationIdList:totalObservationIdList]
 	}
 	
 	File getUniqueFile(File root, String fileName){
@@ -889,4 +890,16 @@ println queryParams
 			commentService.addComment(m);
 		}
 	}
+	
+	def nameTerms(params) {
+		List result = new ArrayList();
+		
+		def queryResponse = observationsSearchService.terms(params.term, params.max);
+		NamedList tags = (NamedList) ((NamedList)queryResponse.getResponse().terms)[params.field];
+		for (Iterator iterator = tags.iterator(); iterator.hasNext();) {
+			Map.Entry tag = (Map.Entry) iterator.next();
+			result.add([value:tag.getKey().toString(), label:tag.getKey().toString(),  "category":"Observations"]);
+		}
+		return result;
+	} 
 }

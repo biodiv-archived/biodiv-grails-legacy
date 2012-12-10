@@ -14,15 +14,13 @@
 
 	<div class="span12">
 		<obv:showSubmenuTemplate />
+		
 		<div class="page-header clearfix">
 			<search:searchResultsHeading />
 		</div>
-
-		<div class="searchResults">
-			<obv:showObservationsListWrapper />
-		</div>
-
-
+		
+		<uGroup:rightSidebar/>
+		<obv:showObservationsListWrapper />
 	</div>
 
 	<g:javascript>

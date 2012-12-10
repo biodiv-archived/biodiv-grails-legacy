@@ -166,9 +166,8 @@ var members_autofillUsersComp;
 //this is called from domain/_headerTemplate
 function init_group_header() {
 	
-	$(".ellipsis.multiline.group_desc").trunk8({
-		lines:2,
-		fill: '&hellip;&nbsp;<a href='+window.aboutUrl+'>read more</a>&nbsp;'
+	$(".ellipsis.multiline").trunk8({
+		lines:2,		
 	});
 	
 	members_autofillUsersComp = $("#userAndEmailList_"+window.members_autofillUsersId).autofillUsers({

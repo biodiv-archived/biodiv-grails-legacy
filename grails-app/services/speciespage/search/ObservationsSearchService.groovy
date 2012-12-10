@@ -190,14 +190,15 @@ class ObservationsSearchService {
 	 * @param query
 	 * @return
 	 */
-	def terms(query) {
-		def field = query?.field?:"autocomplete";
+	def terms(query, limit) {
+		def field = "autocomplete";
 		SolrParams q = new SolrQuery().setQueryType("/terms")
 				.set(TermsParams.TERMS, true).set(TermsParams.TERMS_FIELD, field)
-				.set(TermsParams.TERMS_LOWER, query.term)
-				.set(TermsParams.TERMS_LOWER_INCLUSIVE, false)
-				.set(TermsParams.TERMS_REGEXP_STR, query.term+".*")
+				.set(TermsParams.TERMS_LOWER, query)
+				.set(TermsParams.TERMS_LOWER_INCLUSIVE, true)
+				.set(TermsParams.TERMS_REGEXP_STR, query+".*")
 				.set(TermsParams.TERMS_REGEXP_FLAG, "case_insensitive")
+				.set(TermsParams.TERMS_LIMIT, limit)
 				.set(TermsParams.TERMS_RAW, true);
 		log.info "Running observation search query : "+q
 		return solrServer.query( q );

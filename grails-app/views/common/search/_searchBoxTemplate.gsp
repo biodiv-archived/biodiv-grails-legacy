@@ -19,7 +19,7 @@ $(document).ready(function(){
 					return;
 				}
 
-				lastXhr = $.getJSON( "${createLink(action: 'nameTerms')}", request, function( data, status, xhr ) {
+				lastXhr = $.getJSON( "${uGroup.createLink(controller:'search', action: 'nameTerms')}", request, function( data, status, xhr ) {
 					cache[ term ] = data;
 					if ( xhr === lastXhr ) {
 						response( data );
@@ -36,7 +36,20 @@ $(document).ready(function(){
 				} else {
 					$( "#searchTextField" ).val( ui.item.label.replace(/<.*?>/g,'') );
 				}
+				
+				if(ui.item.category == 'Species Pages') {
+					$("#category").val('species');
+				} else if(ui.item.category == 'Observations') {
+					$("#category").val('observation');
+				} else if(ui.item.category == 'Groups') {
+					$("#category").val('group');
+				} else if(ui.item.category == 'Members') {
+					$("#category").val('SUser');
+				} else {
+					$("#category").val('species');
+				}
 				$( "#canName" ).val( ui.item.value );
+
 				//$( "#name-description" ).html( ui.item.value ? ui.item.label.replace(/<.*?>/g,"")+" ("+ui.item.value+")" : "" );
 				//ui.item.icon ? $( "#name-icon" ).attr( "src",  ui.item.icon).show() : $( "#name-icon" ).hide();
 				$( "#search" ).click();
@@ -64,12 +77,13 @@ $(document).ready(function(){
 		};;
 });
 $( "#search" ).click(function() {
+	$("#searchbox").attr("action", '/'+$('#category').val()+'/search');
 	$( "#searchbox" ).submit();
 });
 </r:script>
 <div id="mainSearchForm" class="dropdown pull-left" style="margin-top:5px;">
 	<form method="get"
-		action="${createLink(action:'search') }"
+		action="${uGroup.createLink(controller:params.controller, action:'search', absolute:true) }"
 		id="searchbox" class="navbar-search"  style="margin-top:0px;">
 		<div class="input-append">
 			<input type="text" name="query" id="searchTextField" value=""
@@ -81,7 +95,8 @@ $( "#search" ).click(function() {
 		<g:hiddenField name="start" value="0" />
 		<g:hiddenField name="rows" value="10" />
 		<g:hiddenField id="searchBoxSort"  name="sort" value="score" />
-		<g:hiddenField name="fl" value="id,name" />
+		<input type="hidden" name="fl" value="id,name" />
+		<g:hiddenField name="category" value="species" />
 
 		<!-- 
 		<g:hiddenField name="hl" value="true" />

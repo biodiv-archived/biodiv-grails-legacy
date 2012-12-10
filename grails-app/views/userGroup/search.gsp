@@ -3,23 +3,9 @@
 <head>
 <meta name='layout' content='main' />
 <title><g:message code='spring.security.ui.user.search' /></title>
-<r:require modules="susers_list"/>
+<r:require modules="userGroups_list"/>
 <g:set var="entityName"
 	value="${message(code: 'searchlabel', default: 'Search Results')}" />
-
-<style type="text/css">
-.snippet.tablet .figure img {
-	height: auto;
-}
-
-.figure .thumbnail {
-	height: 120px;
-	margin: 0 auto;
-	text-align: center;
-	*font-size: 120px;
-	line-height: 120px;
-}
-</style>
 
 </head>
 
@@ -30,20 +16,15 @@
 			<search:searchResultsHeading />
 		</div>
 		<uGroup:rightSidebar/>
-
 		<div class="searchResults span9" style="margin-left:0px;">
-			<sUser:showUserListWrapper />
+			<uGroup:showUserGroupsListWrapper
+				model="['totalUserGroupInstanceList':totalUserGroupInstanceList, 'userGroupInstanceList':UserGroupInstanceList, 'userGroupInstanceTotal':userGroupInstanceTotal, 'queryParams':queryParams, 'activeFilters':activeFilters]" />
 		</div>
 	</div>
 
 
 	<r:script>
 	$(document).ready(function() {
-		/*$("#username").focus().autocomplete({
-			minLength: 3,
-			cache: false,
-			source: "${createLink(action: 'ajaxUserSearch')}"
-		});*/
 
 		$('.sort_filter_label').click(function() {
 			$('.sort_filter_label.active').removeClass('active');

@@ -258,96 +258,99 @@ class SUserController extends UserController {
 		boolean useOffset = params.containsKey('offset')
 		setIfMissing 'max', 12, 100
 		setIfMissing 'offset', 0
+		int totalCount = 0;
+		def results = [];
 		
-		def hql = new StringBuilder('FROM ').append(lookupUserClassName()).append(' u WHERE 1=1 ')
-		def cond = new StringBuilder("");
-		def queryParams = [:]
-
-		def userLookup = SpringSecurityUtils.securityConfig.userLookup
-		String usernameFieldName = 'name'
-
-		params.sort = params.sort && params.sort != 'score' ? params.sort : "activity";
-		String userNameQuery = "";
-		if (params['query']) {
-			def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields			
-			if(params['query'].startsWith(searchFieldsConfig.CANONICAL_NAME)) {
+		if(params.action != 'search' || (params.action == 'search' && params.query)) {
+			def hql = new StringBuilder('FROM ').append(lookupUserClassName()).append(' u WHERE 1=1 ')
+			def cond = new StringBuilder("");
+			def queryParams = [:]
+	
+			def userLookup = SpringSecurityUtils.securityConfig.userLookup
+			String usernameFieldName = 'name'
+	
+			params.sort = params.sort && params.sort != 'score' ? params.sort : "activity";
+			String userNameQuery = "";
+			if (params['query']) {
+				def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields			
+				if(params['query'].startsWith(searchFieldsConfig.CANONICAL_NAME)) {
+					def usernamesList = searchObservations(params);
+					String usernames = getUsernamesSearchCondition(usernamesList);
+					userNameQuery = " AND LOWER(u.${usernameFieldName}) IN ${usernames}"
+					//queryParams['username'] = usernames
+				} else {
+					userNameQuery = " AND LOWER(u.${usernameFieldName}) LIKE :username"
+					queryParams['username'] = params['query'].toLowerCase() + '%'
+				}
+			}
+			
+	
+			String enabledPropertyName = userLookup.enabledPropertyName
+			String accountExpiredPropertyName = userLookup.accountExpiredPropertyName
+			String accountLockedPropertyName = userLookup.accountLockedPropertyName
+			String passwordExpiredPropertyName = userLookup.passwordExpiredPropertyName
+	
+			for (name in [enabled: enabledPropertyName,
+				accountExpired: accountExpiredPropertyName,
+				accountLocked: accountLockedPropertyName,
+				passwordExpired: passwordExpiredPropertyName]) {
+				Integer value = params.int(name.key)
+				if (value) {
+					cond.append " AND u.${name.value}=:${name.key}"
+					queryParams[name.key] = value == 1
+				}
+			}
+	
+			String q = hql.toString() + cond.toString() + userNameQuery;
+			totalCount = lookupUserClass().executeQuery("SELECT COUNT(DISTINCT u) $q", queryParams)[0]
+			//if(totalCount) {
+				cond.append userNameQuery
+				hql = q;
+			/*} else {
+				queryParams.remove('username')
+				//Searching observations core when no user is found.
 				def usernamesList = searchObservations(params);
 				String usernames = getUsernamesSearchCondition(usernamesList);
-				userNameQuery = " AND LOWER(u.${usernameFieldName}) IN ${usernames}"
+				cond.append " AND LOWER(u.${usernameFieldName}) IN ${usernames}"
 				//queryParams['username'] = usernames
+				hql.append cond
+				totalCount = lookupUserClass().executeQuery("SELECT COUNT(DISTINCT u) $hql", queryParams)[0]
+			}*/
+	
+			Integer max = params.int('max')
+			Integer offset = params.int('offset')
+	
+			String orderBy = ''
+			if (params.sort == 'lastLoginDate') {
+				orderBy = " ORDER BY u.$params.sort ${params.order ?: 'DESC'},  u.$usernameFieldName ASC"
 			} else {
-				userNameQuery = " AND LOWER(u.${usernameFieldName}) LIKE :username"
-				queryParams['username'] = params['query'].toLowerCase() + '%'
+				orderBy = " ORDER BY u.$params.sort ${params.order ?: 'ASC'}"
 			}
-		}
-		
-
-		String enabledPropertyName = userLookup.enabledPropertyName
-		String accountExpiredPropertyName = userLookup.accountExpiredPropertyName
-		String accountLockedPropertyName = userLookup.accountLockedPropertyName
-		String passwordExpiredPropertyName = userLookup.passwordExpiredPropertyName
-
-		for (name in [enabled: enabledPropertyName,
-			accountExpired: accountExpiredPropertyName,
-			accountLocked: accountLockedPropertyName,
-			passwordExpired: passwordExpiredPropertyName]) {
-			Integer value = params.int(name.key)
-			if (value) {
-				cond.append " AND u.${name.value}=:${name.key}"
-				queryParams[name.key] = value == 1
+	
+			
+			
+			if(params.sort == 'activity') {
+				String query = "select u.id, u.$usernameFieldName from Observation obv right outer join obv.author u WHERE 1=1 $cond and (obv.isDeleted = false or obv.isDeleted is null) group by u.id, u.$usernameFieldName order by count(obv.id)  desc, u.$usernameFieldName asc";
+	//			println query;
+	//			println queryParams;
+				def uids =  lookupUserClass().executeQuery(query, queryParams, [max: max, offset: offset])
+				uids.each {
+					results.add(SUser.read(it[0]));
+				}
+			} else {
+				String query = "SELECT DISTINCT u $hql $orderBy";
+				results = lookupUserClass().executeQuery(query, queryParams, [max: max, offset: offset])
 			}
-		}
-
-		String q = hql.toString() + cond.toString() + userNameQuery;
-		int totalCount = lookupUserClass().executeQuery("SELECT COUNT(DISTINCT u) $q", queryParams)[0]
-		//if(totalCount) {
-			cond.append userNameQuery
-			hql = q;
-		/*} else {
-			queryParams.remove('username')
-			//Searching observations core when no user is found.
-			def usernamesList = searchObservations(params);
-			String usernames = getUsernamesSearchCondition(usernamesList);
-			cond.append " AND LOWER(u.${usernameFieldName}) IN ${usernames}"
-			//queryParams['username'] = usernames
-			hql.append cond
-			totalCount = lookupUserClass().executeQuery("SELECT COUNT(DISTINCT u) $hql", queryParams)[0]
-		}*/
-
-		Integer max = params.int('max')
-		Integer offset = params.int('offset')
-
-		String orderBy = ''
-		if (params.sort == 'lastLoginDate') {
-			orderBy = " ORDER BY u.$params.sort ${params.order ?: 'DESC'},  u.$usernameFieldName ASC"
-		} else {
-			orderBy = " ORDER BY u.$params.sort ${params.order ?: 'ASC'}"
-		}
-
-		
-		def results = [];
-		if(params.sort == 'activity') {
-			String query = "select u.id, u.$usernameFieldName from Observation obv right outer join obv.author u WHERE 1=1 $cond and (obv.isDeleted = false or obv.isDeleted is null) group by u.id, u.$usernameFieldName order by count(obv.id)  desc, u.$usernameFieldName asc";
-			println query;
-			println queryParams;
-			def uids =  lookupUserClass().executeQuery(query, queryParams, [max: max, offset: offset])
-			uids.each {
-				results.add(SUser.read(it[0]));
-			}
-		} else {
-			String query = "SELECT DISTINCT u $hql $orderBy";
-			results = lookupUserClass().executeQuery(query, queryParams, [max: max, offset: offset])
-		}
-
-		def sorted = results;
-//		//sorts only current page results
-//		if(results && params['username']) {
-//			println params['username'].toLowerCase();
-//			sorted = results.sort( sorter.rcurry(params['username'].toLowerCase()))
+	
+			
+	//		//sorts only current page results
+	//		if(results && params['username']) {
+	//			println params['username'].toLowerCase();
+	//			sorted = results.sort( sorter.rcurry(params['username'].toLowerCase()))
 //		}
-		
+		}
 
-		return [results: sorted, totalCount: totalCount, searched: true]
+		return [results: results, totalCount: totalCount, searched: true]
 
 	}
 	
@@ -426,7 +429,7 @@ class SUserController extends UserController {
 		def namesLookupResults = namesIndexerService.suggest(params)
 		jsonData.addAll(namesLookupResults);
  
-		jsonData.addAll(getUserSuggestions(params));
+		jsonData.addAll(SUserService.getUserSuggestions(params));
 		render jsonData as JSON
 	}
 	
@@ -436,32 +439,10 @@ class SUserController extends UserController {
 	def terms = {
 		log.debug params;
 		setIfMissing 'max', 5, 10
-		render getUserSuggestions(params) as JSON;
+		render SUserService.getUserSuggestions(params) as JSON;
 	}
 
-	private getUserSuggestions(params){
-		def jsonData = []
-		String username = params.term
 		
-		String usernameFieldName = 'name';//SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
-		String userId = 'id';
-
-
-		def results = lookupUserClass().executeQuery(
-				"SELECT DISTINCT u.$usernameFieldName, u.$userId " +
-				"FROM ${lookupUserClassName()} u " +
-				"WHERE LOWER(u.$usernameFieldName) LIKE :name " +
-				"ORDER BY u.$usernameFieldName",
-				[name: "${username.toLowerCase()}%"],
-				[max: params.max])
-
-		for (result in results) {
-			jsonData << [value: result[0], label:result[0] , userId:result[1] , "category":"Users"]
-		}
-		
-		return jsonData;
-	} 
-	
 	private Map getUnBlockedMailList(String userIdsAndEmailIds, request){
 		Map result = new HashMap();
 		userIdsAndEmailIds.split(",").each{

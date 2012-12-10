@@ -221,7 +221,7 @@ th.desc a {
 	border: 0px solid #ccc;
 	border-color: #ccc #aaa #aaa #ccc;
 	margin: 0 3px;
-	padding: 2px 6px;
+	padding: 2px 4px;
 	text-shadow: 0 1px 2px #afafaf;
 	font-size: 1.2em;
 }
@@ -491,14 +491,14 @@ th.name {
 	border: 1px solid #AEAEAE;
 	background-color: #FAFAFA;
 	padding: 10px;
-	position: absolute;
-	min-width: 300px;
-	max-width: 600px;
+/* 	position: absolute; */
+/* 	min-width: 300px; */
+/* 	max-width: 600px; */
 	box-shadow: 0 1px 3px #c6c6c6;
 	font-size: 0.8em;
 	font-style: normal;
 	z-index: 100;
-	right: 0
+/* 	right: 0 */
 }
 
 .toolbar_link:hover {
@@ -535,6 +535,7 @@ th.name {
 
 .rank6,.rank7,.rank8,.speciesName {
 	font-style: italic;
+	white-space:normal;
 }
 
 .taxonExpandAll {
@@ -1014,17 +1015,17 @@ ul.thumbwrap li a {
 	border-radius: 5px;
 }
 
-.thumbwrap .searchSnippet {
-	float: left;
-	display: inline-block;
-	padding: 10px;
-	max-width: 640px;
-	width: 100%;
-}
+/* .thumbwrap .searchSnippet { */
+/* 	float: left; */
+/* 	display: inline-block; */
+/* 	padding: 10px; */
+/* 	max-width: 640px; */
+/* 	width: 100%; */
+/* } */
 
-.thumbwrap .figure img {
-	border-width: 0;
-}
+/* .thumbwrap .figure img { */
+/* 	border-width: 0; */
+/* } */
 
 #menu {
 	margin-bottom: 15px;
@@ -1468,12 +1469,6 @@ ul.thumbwrap .license_options li:hover {
 	opacity: 0.5;
 	cursor: pointer;
 
-}
-
-.tags_section {
-	position: relative;
-	top: 20px;
-	float: right;
 }
 
 #add_file {

@@ -25,6 +25,7 @@ class SpeciesController {
 	def grailsApplication
 	def speciesSearchService;
 	def namesIndexerService;
+	def speciesService;
 	
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
@@ -38,7 +39,7 @@ class SpeciesController {
 		params.startsWith = params.startsWith?:"A-Z"
 		def allGroup = SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.ALL);
 		params.sGroup = params.sGroup ?: allGroup.id+""
-		params.max = Math.min(params.max ? params.int('max') : 51, 100);
+		params.max = Math.min(params.max ? params.int('max') : 50, 100);
 		params.offset = params.offset ? params.int('offset') : 0
 		params.sort = params.sort?:"percentOfInfo"
 		params.order = params.sort.equals("percentOfInfo")?"desc":params.sort.equals("title")?"asc":"asc"
@@ -446,19 +447,7 @@ class SpeciesController {
    def nameTerms = {
 	   log.debug params;
 	   params.field = params.field?:"autocomplete";
-	   List result = new ArrayList();
-
-	   params.max = params.max ?: 5;
-	   def namesLookupResults = namesIndexerService.suggest(params)
-	   result.addAll(namesLookupResults);
-
-	   def queryResponse = speciesSearchService.terms(params);
-	   NamedList tags = (NamedList) ((NamedList)queryResponse.getResponse().terms)[params.field];
-
-	   for (Iterator iterator = tags.iterator(); iterator.hasNext();) {
-		   Map.Entry tag = (Map.Entry) iterator.next();
-		   result.add([value:tag.getKey().toString(), label:tag.getKey().toString(),  "category":"General"]);
-	   }
+	   List result = speciesService.nameTerms(params);
 	   render result as JSON;
    }
 

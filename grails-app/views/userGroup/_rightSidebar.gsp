@@ -26,4 +26,14 @@
 			</li>
 		</ul>
 	</div>
+	<div class="tags_section sidebar_section">
+<%--		<g:if test="${params.action == 'search' }">--%>
+<%--			<obv:showAllTags--%>
+<%--				model="['tags':tags , 'count':tags?tags.size():0, 'isAjaxLoad':true, 'context':userGroupInstance]" />--%>
+<%--		</g:if>--%>
+<%--		<g:else>--%>
+			<obv:showAllTags
+				model="['tagFilterByProperty':'All' , 'params':params, 'isAjaxLoad':true, 'context':userGroupInstance]" />
+<%--		</g:else>--%>
+	</div>
 </div>

@@ -293,7 +293,7 @@ $(document).ready(function(){
 
 <body>
 <div class="span12">
-<div class="container_16 outer_wrapper">
+	<div class="container_16 outer_wrapper">
 			<s:showSubmenuTemplate/>
 				<div class="page-header">
 						<h1>

@@ -712,8 +712,8 @@ class UserGroupService {
 	def userGroupBasedLink(attrs) {
 		def g = new org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib()
 		
-		println '-------------'
-		println attrs
+//		println '-------------'
+//		println attrs
 		String url = "";
 		
 		if(attrs.userGroup) {
@@ -732,16 +732,16 @@ class UserGroupService {
 			if(base) {
 				url = g.createLink(mapping:mappingName, 'controller':controller, 'action':action, 'base':base, absolute:absolute, params:attrs);
 				String onlyGroupUrl = g.createLink(mapping:'onlyUserGroup', params:['webaddress':attrs.webaddress]).replace("/"+grailsApplication.metadata['app.name'],'')
-				println url
-				println onlyGroupUrl
+//				println url
+//				println onlyGroupUrl
 				url = url.replace(onlyGroupUrl, "");
 			} else {
 				
 				if((userGroup?.domainName)) { // && (userGroup.domainName == "http://"+Utils.getDomain(request))) {
 					url = g.createLink(mapping:mappingName, 'controller':controller, base:userGroup.domainName, 'action':action, absolute:absolute, params:attrs);
 					String onlyGroupUrl = g.createLink(mapping:'onlyUserGroup', params:['webaddress':attrs.webaddress]).replace("/"+grailsApplication.metadata['app.name'],'')
-					println url
-					println onlyGroupUrl
+//					println url
+//					println onlyGroupUrl
 					url = url.replace(onlyGroupUrl, "");
 				} else {
 					url = g.createLink(mapping:mappingName, 'controller':controller, base:Utils.getIBPServerDomain(), 'action':action, absolute:absolute, params:attrs);
@@ -767,16 +767,16 @@ class UserGroupService {
 			if(base) {
 				url = g.createLink(mapping:mappingName, 'controller':controller, 'action':action, 'base':base, absolute:absolute, params:attrs)
 				String onlyGroupUrl = g.createLink(mapping:'onlyUserGroup', params:['webaddress':attrs.webaddress]).replace("/"+grailsApplication.metadata['app.name'],'')
-				println url
-				println onlyGroupUrl
+//				println url
+//				println onlyGroupUrl
 				url = url.replace(onlyGroupUrl, "");
 			} else {
 				
 				if((userGroup?.domainName)) { // && (userGroup.domainName == "http://"+Utils.getDomain(request))) {
 					url = g.createLink(mapping:mappingName, 'controller':controller, base:userGroup.domainName, 'action':action, absolute:absolute, params:attrs)
 					String onlyGroupUrl = g.createLink(mapping:'onlyUserGroup', params:['webaddress':attrs.webaddress]).replace("/"+grailsApplication.metadata['app.name'],'')
-					println url
-					println onlyGroupUrl
+//					println url
+//					println onlyGroupUrl
 					url = url.replace(onlyGroupUrl, "");
 				} else {
 					url = g.createLink(mapping:mappingName, 'controller':controller, base:Utils.getIBPServerDomain(), 'action':action, absolute:absolute, params:attrs)
@@ -802,7 +802,35 @@ class UserGroupService {
 				url = g.createLink(mapping:mappingName, 'controller':controller, 'action':action, absolute:absolute, params:attrs).replace("/"+grailsApplication.metadata['app.name'],'')
 			}
 		}
-		println url;
+		//println url;
 		return url;
 	}
+	
+	def nameTerms(params) {
+		return getUserGroupSuggestions(params);
+	}
+	
+	private getUserGroupSuggestions(params){
+		def jsonData = []
+		String name = params.term
+		
+		String usernameFieldName = 'name';//SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
+		String userId = 'id';
+ 
+ 
+		def results = UserGroup.executeQuery(
+				"SELECT DISTINCT u.$usernameFieldName, u.$userId " +
+				"FROM UserGroup u " +
+				"WHERE LOWER(u.$usernameFieldName) LIKE :name " +
+				"ORDER BY u.$usernameFieldName",
+				[name: "${name.toLowerCase()}%"],
+				[max: params.max])
+ 
+		for (result in results) {
+			jsonData << [value: result[0], label:result[0] , userId:result[1] , "category":"Groups"]
+		}
+		
+		return jsonData;
+	}
+ 
 }

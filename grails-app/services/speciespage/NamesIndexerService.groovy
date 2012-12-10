@@ -193,7 +193,7 @@ class NamesIndexerService {
 		log.info "Suggest name using params : "+params
 		def result = new ArrayList();
 		if(params.term) {
-			int max = params.max ?: 10;
+			int max = params.max ?: 5;
 			List<LookupResult> lookupResults = lookup.lookup(params.term.toLowerCase(), true, max, params.nameFilter);
 			result = getFormattedResult(lookupResults,  params.term)
 		}

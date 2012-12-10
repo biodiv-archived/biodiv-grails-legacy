@@ -796,14 +796,14 @@ i {
 	border: 1px solid #AEAEAE;
 	background-color: #FAFAFA;
 	padding: 10px;
-	position: absolute;
-	min-width: 300px;
-	max-width: 600px;
+/* 	position: absolute; */
+/* 	min-width: 300px; */
+/* 	max-width: 600px; */
 	box-shadow: 0 1px 3px #c6c6c6;
 	font-size: 0.8em;
 	font-style: normal;
 	z-index: 100;
-	right: 0
+/* 	right: 0 */
 }
 
 .toolbar_link:hover {

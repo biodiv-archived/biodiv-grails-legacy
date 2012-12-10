@@ -7,17 +7,13 @@
 <head>
 
 <meta name="layout" content="main" />
-<r:require modules="species"/>
+<r:require modules="species" />
 <title>Search Species</title>
 
 <r:script>
 
 $(document).ready(function(){
-	//$(".readmore").readmore({
-	//	substr_len : 300,
-	//	more_link : '<a class="more readmore">&nbsp;More</a>'
-	//});
-	
+		
 	$("#removeQueryFilter").live('click', function(){
            	$( "#searchTextField" ).val('');
           	$("#search").click();
@@ -25,9 +21,10 @@ $(document).ready(function(){
     });
 
 });
-$( "#search" ).unbind('click');
+	$( "#search" ).unbind('click');
 	
 	$( "#search" ).click(function() {
+		$("#searchBox").attr("action", '/'+$('#category').val()+'/search');
 		$("#searchBox").submit();
 	});
 
@@ -35,32 +32,22 @@ $( "#search" ).unbind('click');
 </r:script>
 </head>
 <body>
-	<div class="container big_wrapper outer_wrapper">
-		<s:showSubmenuTemplate/>
-		<div class="page-header clearfix">
-			<search:searchResultsHeading/>
-		</div>
-
-			<g:if test="${flash.message}">
-				<div class="message">
-					${flash.message}
-				</div>
-			</g:if>
-
-
-
-
-			<div class="searchResults clearfix">
-				<div class="row">
+	<div class="span12">
+		<div class="outer_wrapper">
+			<s:showSubmenuTemplate />
+			<div class="page-header clearfix">
+				<search:searchResultsHeading />
+			</div>
+			<uGroup:rightSidebar/>
 					<!-- main_content -->
-					<div class="list span12">
+					<div class="list span9" style="margin-left:0px;">
 						<div class="observations thumbwrap">
 
 							<div class="controls info-message">
 
 								<div>
 									<g:if test="${!total}">
-										<search:noSearchResults/>
+										<search:noSearchResults />
 									</g:if>
 
 									<g:set var="start"
@@ -68,23 +55,18 @@ $( "#search" ).unbind('click');
 									<g:set var="rows"
 										value="${Integer.parseInt(responseHeader?.params?.rows?:'0') }" />
 
-									 <g:if test="${total>0 }">
-									<span class="name" style="color: #b1b1b1;"><i
-										class="icon-search"></i>
-												Showing
-												${start+1}-${Math.min(start+rows, total)}
-												of
-												${total}
-										
-									</span> species
+									<g:if test="${total>0 }">
+										<span class="name" style="color: #b1b1b1;"><i
+											class="icon-search"></i> Showing ${start+1}-${Math.min(start+rows, total)}
+											of ${total} </span> species
 									<g:if test="${responseHeader?.params?.q}">
 									for search key <span class="highlight"> <g:link
-												controller="species" action="search"
-												params="[query: responseHeader?.params?.q]">
-												${responseHeader?.params?.q}
-												<a id="removeQueryFilter" href="#">[X]</a>
-											</g:link> </span>
-									</g:if>
+													controller="species" action="search"
+													params="[query: responseHeader?.params?.q]">
+													${responseHeader?.params?.q}
+													<a id="removeQueryFilter" href="#">[X]</a>
+												</g:link> </span>
+										</g:if>
 									</g:if>
 								</div>
 								<g:if test="${total > 0}">
@@ -96,8 +78,7 @@ $( "#search" ).unbind('click');
 
 												<div class="figure"
 													style="clear: both; float: left; max-height: 220px; max-width: 200px; padding: 10px;">
-													<g:link action="show" controller="species"
-														id="${speciesInstance.id}">
+													<g:link url="${uGroup.createLink(action:'show', controller:'species', id:speciesInstance.id)}">
 
 														<g:set var="mainImage"
 															value="${speciesInstance.mainImage()}" />
@@ -117,10 +98,9 @@ $( "#search" ).unbind('click');
 
 													</g:link>
 												</div>
-												<div class="searchSnippet">
+												<div>
 													<h6>
-														<g:link action="show" controller="species"
-															id="${speciesInstance.id}">
+														<g:link url="${uGroup.createLink(action:'show', controller:'species', id:speciesInstance.id)}">
 															${speciesInstance.taxonConcept.italicisedForm }
 														</g:link>
 													</h6>
@@ -145,19 +125,19 @@ $( "#search" ).unbind('click');
 
 
 														<g:each in="${speciesInstance.fetchTaxonomyRegistry()}">
-															<span> <a
-																class="taxaHierarchy icon ui-icon-control"
+															<div class="dropdown"> <a href="#" class="dropdown-toggle icon taxaHierarchy"
+																data-toggle="dropdown"
 																title="${it.key.name}"></a> <%def sortedTaxon = it.value.sort {it.rank} %>
 																<div
-																	class="ui-corner-all toolbarIconContent attribution"
-																	style="display: none;">
-																	<a class="ui-icon ui-icon-close" style="float: right;"></a>
+																	class="dropdown-menu toolbarIconContent">
 																	<g:each in="${sortedTaxon}" var="taxonDefinition">
 																		<span class='rank${taxonDefinition.rank} '> ${taxonDefinition.italicisedForm}
 																		</span>
 																		<g:if test="${taxonDefinition.rank<8}">></g:if>
 																	</g:each>
-																</div> </span>
+																</div>
+															</div>
+															
 														</g:each>
 
 
@@ -172,7 +152,7 @@ $( "#search" ).unbind('click');
 														</g:if>
 													</div>
 
-													<div class="readmore">
+													<div class="ellipsis multiline">
 														<g:set var="summary"
 															value="${speciesInstance.findSummary()}"></g:set>
 														<g:if test="${summary != null && summary.length() > 300}">
@@ -183,12 +163,11 @@ $( "#search" ).unbind('click');
 														</g:else>
 													</div>
 
-												</div>
-											</li>
+												</div></li>
 										</g:each>
 									</ul>
 									<div class="paginateButtons" style="clear: both;">
-										<g:paginateOnSearchResult total="${total}" action="search"
+										<p:paginateOnSearchResult total="${total}" action="search"
 											params="[query:responseHeader.params.q, fl:responseHeader.params.fl]" />
 									</div>
 								</g:if>
@@ -196,8 +175,9 @@ $( "#search" ).unbind('click');
 							</div>
 						</div>
 					</div>
-				</div>
-			</div>
+			
 		</div>
+	</div>
+	
 </body>
 </html>
