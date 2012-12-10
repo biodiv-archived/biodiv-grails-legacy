@@ -125,7 +125,7 @@ $(document).ready(function(){
 
 
 														<g:each in="${speciesInstance.fetchTaxonomyRegistry()}">
-															<div class="dropdown"> <a href="#" class="dropdown-toggle icon taxaHierarchy"
+															<div class="dropdown icon"> <a href="#" class="dropdown-toggle icon taxaHierarchy"
 																data-toggle="dropdown"
 																title="${it.key.name}"></a> <%def sortedTaxon = it.value.sort {it.rank} %>
 																<div
@@ -167,8 +167,10 @@ $(document).ready(function(){
 										</g:each>
 									</ul>
 									<div class="paginateButtons" style="clear: both;">
+										<center>
 										<p:paginateOnSearchResult total="${total}" action="search"
 											params="[query:responseHeader.params.q, fl:responseHeader.params.fl]" />
+										</center>
 									</div>
 								</g:if>
 

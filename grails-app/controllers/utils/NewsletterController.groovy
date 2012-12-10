@@ -195,7 +195,7 @@ class NewsletterController {
 		   params.remove('query');
 		   paramsList.add('start', params['start']?:"0");
 		   paramsList.add('rows', params['rows']?:"10");
-		   paramsList.add('sort', params['sort']+" desc"?:"score");
+		   paramsList.add('sort', params['sort']?params['sort']+" desc":"score desc");
 		   paramsList.add('fl', params['fl']?:"id, name");
 //		   paramsList.add('facet', "true");
 //		   paramsList.add('facet.limit', "-1");

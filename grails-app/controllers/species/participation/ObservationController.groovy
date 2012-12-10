@@ -1109,23 +1109,29 @@ class ObservationController {
 		model['isSearch'] = true;
 		log.debug "Storing all observations ids list in session ${session['obv_ids_list']}";
 		
-		if(!params.isGalleryUpdate?.toBoolean()) {
+		if(params.loadMore?.toBoolean()){
+			params.remove('isGalleryUpdate');
+			render(template:"/common/observation/showObservationListTemplate", model:model);
+			return;
+		} else if(!params.isGalleryUpdate?.toBoolean()){
 			params.remove('isGalleryUpdate');
 			render (view:"search", model:model)
+			return;
 		} else {
 			params.remove('isGalleryUpdate');
 			def obvListHtml =  g.render(template:"/common/observation/showObservationListTemplate", model:model);
 			def obvFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
-
-			def filteredTags = model.tags;
+	
+			def filteredTags = observationService.getTagsFromObservation(model.totalObservationInstanceList.collect{it[0]})
 			def tagsHtml = g.render(template:"/common/observation/showAllTagsTemplate", model:[count: count, tags:filteredTags, isAjaxLoad:true]);
 			def mapViewHtml = g.render(template:"/common/observation/showObservationMultipleLocationTemplate", model:[observationInstanceList:model.totalObservationInstanceList]);
-
+	
 			def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml, tagsHtml:tagsHtml, mapViewHtml:mapViewHtml]
 			render result as JSON
+			return;
 		}
 	}
-
+	
 	/**
 	 *
 	 */

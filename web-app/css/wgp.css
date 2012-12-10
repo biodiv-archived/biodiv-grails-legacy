@@ -1266,6 +1266,7 @@ span.cke_skin_kama {
 
 .ui-autocomplete-category {
 	font-weight: bold;
+	clear:both;
 }
 
 .sidebar-section {

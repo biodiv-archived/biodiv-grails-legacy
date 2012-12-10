@@ -54,10 +54,20 @@
                             <td><g:formatDate date="${newsletterInstance.date}" type="date" style="MEDIUM"/></td>
                         
                             <td>
-                            	<g:link url="${uGroup.createLink(mapping:'userGroup', action:'page', id:newsletterInstance.id, userGroup:newsletterInstance.userGroup)}">${fieldValue(bean: newsletterInstance, field: "title")}</g:link>
+                            	<g:if test="${newsletterInstance.userGroup}">
+                            		<g:link url="${uGroup.createLink(mapping:'userGroup', action:'page', id:newsletterInstance.id, userGroup:newsletterInstance.userGroup)}">${fieldValue(bean: newsletterInstance, field: "title")}</g:link>
+                            	</g:if>
+                            	
+                            	<g:else>
+                            		<g:link url="${uGroup.createLink(mapping:'userGroupGeneric', action:'page', id:newsletterInstance.id)}">${fieldValue(bean: newsletterInstance, field: "title")}</g:link>
+                            	</g:else>
                             	
                             </td>
-                            <td><g:link url="${uGroup.createLink(controller:'userGroup', action:'show', id:newsletterInstance.userGroup.id)}">${newsletterInstance.userGroup?newsletterInstance.userGroup.name:''}</g:link></td>
+                            <td>
+                            <g:if test="${newsletterInstance.userGroup}">
+                            	<g:link url="${uGroup.createLink(controller:'userGroup', action:'show', id:newsletterInstance.userGroup.id)}">${newsletterInstance.userGroup?newsletterInstance.userGroup.name:''}</g:link>
+                            </g:if>
+                            </td>
                         
                         </tr>
                     </g:each>
