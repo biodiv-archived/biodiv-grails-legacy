@@ -31,5 +31,6 @@
   <cores adminPath="/admin/cores">
     <core name="species" instanceDir="species" />
     <core name="observations" instanceDir="observations" />
+    <core name="newsletters" instanceDir="newsletters" />
   </cores>
 </solr>

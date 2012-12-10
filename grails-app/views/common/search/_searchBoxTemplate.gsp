@@ -45,6 +45,8 @@ $(document).ready(function(){
 					$("#category").val('group');
 				} else if(ui.item.category == 'Members') {
 					$("#category").val('SUser');
+				} else if(ui.item.category == 'Pages') {
+					$("#category").val('newsletter');
 				} else {
 					$("#category").val('species');
 				}

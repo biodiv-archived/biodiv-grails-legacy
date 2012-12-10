@@ -381,9 +381,9 @@ class SpeciesController {
 		   paramsList.add('rows', params['rows']?:"10");
 		   paramsList.add('sort', params['sort']+" desc"?:"score");
 		   paramsList.add('fl', params['fl']?:"id, name");
-		   paramsList.add('facet', "true");
-		   paramsList.add('facet.limit', "-1");
-		   paramsList.add('facet.mincount', "1");
+//		   paramsList.add('facet', "true");
+//		   paramsList.add('facet.limit', "-1");
+//		   paramsList.add('facet.mincount', "1");
 		   
 		   
 		   /*paramsList.add('facet.field', searchFieldsConfig.NAME_EXACT);
@@ -407,8 +407,8 @@ class SpeciesController {
 				   if(speciesInstance)
 					   speciesInstanceList.add(speciesInstance);
 			   }
-			   log.debug(queryResponse.getFacetFields());
-			   [responseHeader:queryResponse.responseHeader, total:queryResponse.getResults().getNumFound(), speciesInstanceList:speciesInstanceList, snippets:queryResponse.getHighlighting(), facets:queryResponse.getFacetFields()];
+			   
+			   [responseHeader:queryResponse.responseHeader, total:queryResponse.getResults().getNumFound(), speciesInstanceList:speciesInstanceList, snippets:queryResponse.getHighlighting()];
 		   } catch(SolrException e) {
 			   e.printStackTrace();
 			   [params:params, speciesInstanceList:[]];

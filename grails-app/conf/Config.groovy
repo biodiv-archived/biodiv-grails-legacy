@@ -367,6 +367,7 @@ speciesPortal {
 		TAG = "tag"
 		ISFLAGGED = "isflagged"
 		LATLONG = "latlong"
+		USER_GROUP = "group"
 	}
 
 	nameSearchFields {
@@ -379,6 +380,7 @@ speciesPortal {
 		SPECIES_ID = "species_id"
 		AUTOCOMPLETE = "autocomplete"
 	}
+	
 	drupal {
 		getAuthentication = "/getAuthentication.php"
 	}

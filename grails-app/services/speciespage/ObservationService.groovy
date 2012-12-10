@@ -41,7 +41,6 @@ class ObservationService {
 	def springSecurityService;
 	def curationService;
 	def commentService;
-	def namesIndexerService;
 	
 	/**
 	 * 

@@ -22,6 +22,7 @@ class SearchController {
 	def speciesService;
 	def SUserService;
 	def userGroupService;
+	def newsletterService;
 	
 	/**
 	 * Default action : select
@@ -41,6 +42,7 @@ class SearchController {
 		suggestions.addAll(speciesService.nameTerms(params));
 		suggestions.addAll(observationService.nameTerms(params));
 		suggestions.addAll(userGroupService.nameTerms(params));
+		suggestions.addAll(newsletterService.nameTerms(params));
 		suggestions.addAll(SUserService.nameTerms(params));
 		render suggestions as JSON 
 	}
