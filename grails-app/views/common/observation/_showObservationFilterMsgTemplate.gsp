@@ -19,8 +19,7 @@
 	</g:if>
 	<g:else>
 		<span class="name" style="color: #b1b1b1;"><i
-			class="icon-screenshot"></i> ${instanceTotal}</span>${resultType?:'observation'}
-			<g:if test="${instanceTotal!=1}">s</g:if>
+			class="icon-screenshot"></i> ${instanceTotal} </span>${resultType?:'observation'}<g:if test="${instanceTotal!=1}">s</g:if>
 
 
 

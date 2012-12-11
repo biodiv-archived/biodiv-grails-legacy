@@ -57,7 +57,8 @@ $(document).ready(function(){
 				$( "#search" ).click();
 				return false;
 			},open: function(event, ui) {
-				$("#nameSuggestionsMain ul").removeAttr('style').css({'display': 'block'}); 
+				$("#nameSuggestionsMain ul").removeAttr('style').addClass('dropdown-menu');
+				$("#nameSuggestionsMain .dropdown-toggle").dropdown('toggle');				
 			}
 	}).data( "catcomplete" )._renderItem = function( ul, item ) {
 			ul.removeClass().addClass("dropdown-menu")
@@ -83,10 +84,10 @@ $( "#search" ).click(function() {
 	$( "#searchbox" ).submit();
 });
 </r:script>
-<div id="mainSearchForm" class="dropdown pull-left" style="margin-top:5px;">
+<div id="nameSuggestionsMain"  class="dropdown">
 	<form method="get"
 		action="${uGroup.createLink(controller:params.controller, action:'search', absolute:true) }"
-		id="searchbox" class="navbar-search"  style="margin-top:0px;">
+		id="searchbox" class="navbar-search" style="float:none;">
 		<div class="input-append">
 			<input type="text" name="query" id="searchTextField" value=""
 				class="search-query span3"
@@ -97,7 +98,7 @@ $( "#search" ).click(function() {
 		<g:hiddenField name="start" value="0" />
 		<g:hiddenField name="rows" value="10" />
 		<g:hiddenField id="searchBoxSort"  name="sort" value="score" />
-		<input type="hidden" name="fl" value="id,name" />
+		<input type="hidden" name="fl" value="id" />
 		<g:hiddenField name="category" value="species" />
 
 		<!-- 
@@ -107,5 +108,5 @@ $( "#search" ).click(function() {
 		 -->
 		
 	</form>
-	<div id="nameSuggestionsMain" style="display:block;"></div>
+	<a class="dropdown-toggle"  role="button" data-toggle="dropdown" data-target="#" href="#"></a>
 </div>

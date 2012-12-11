@@ -579,11 +579,11 @@ th.name {
 	cursor: pointer;
 }
 /*\*/
-.thumbwrap  .figure .wrimg {
+.wrimg {
 	display: table-cell;
 	vertical-align: middle;
-	width: 200px;
-	height: 200px;
+/* 	width: 200px; */
+/* 	height: 200px; */
 }
 /**/
 .thumbwrap .figure a:hover {

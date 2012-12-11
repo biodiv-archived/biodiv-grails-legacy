@@ -592,10 +592,6 @@ ul#recoSummary {
 	white-space: normal;
 }
 
-.dropdown-menu li {
-	margin-left:0px;
-}
-
 /* .dropdown-menu li>a:hover,.dropdown-menu .active>a,.dropdown-menu .active>a:hover */
 /* 	{ */
 /* 	color: #000000; */
@@ -1037,7 +1033,7 @@ ul,ol {
 	min-width: 1220px;
 	height: auto;
 	margin-top: 0;
-	font-weight: bold;
+/* 	font-weight: bold; */
 }
 
 .gradient-bg {

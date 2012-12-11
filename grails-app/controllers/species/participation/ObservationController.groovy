@@ -672,8 +672,13 @@ class ObservationController {
 	def listRelated = {
 		log.debug params;
 		def result = observationService.getRelatedObservations(params);
-
-		def model = [observationInstanceList: result.relatedObv.observations.observation, obvTitleList:result.relatedObv.observations.title, observationInstanceTotal: result.relatedObv.count, queryParams: [max:result.max], activeFilters:new HashMap(params), parentObservation:Observation.read(params.long('id')), filterProperty:params.filterProperty, initialParams:new HashMap(params)]
+		
+		def inGroupMap = [:]
+		result.relatedObv.observations.each { m-> 
+			inGroupMap[(m.observation.id)] = m.inGroup == null ?'false':m.inGroup
+		}
+		
+		def model = [observationInstanceList: result.relatedObv.observations.observation, inGroupMap:inGroupMap, observationInstanceTotal: result.relatedObv.count, queryParams: [max:result.max], activeFilters:new HashMap(params), parentObservation:Observation.read(params.long('id')), filterProperty:params.filterProperty, initialParams:new HashMap(params)]
 		render (view:'listRelated', model:model)
 	}
 
@@ -683,19 +688,11 @@ class ObservationController {
 	def getRelatedObservation = {
 		log.debug params;
 		def relatedObv = observationService.getRelatedObservations(params).relatedObv;
-
+		
 		if(relatedObv.observations) {
 			relatedObv.observations = observationService.createUrlList2(relatedObv.observations);
 		}
-		if(params.contextGroupWebaddress){
-			def group = UserGroup.findByWebaddress(params.contextGroupWebaddress)
-			relatedObv.observations.each { map ->
-				boolean inGroup =  Observation.read(map.obvId).userGroups.find{it.webaddress == group.webaddress} != null
-				if(inGroup){
-					map.groupContextLink = uGroup.createLink(controller:'observation', action:'show', 'userGroup':group, 'userGroupWebaddress':group.webaddress)
-				}
-			}
-		}
+		
 		render relatedObv as JSON
 	}
 

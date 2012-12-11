@@ -23,7 +23,7 @@
 		<s:showSubmenuTemplate model="['entityName':'Species']" />
 		<uGroup:rightSidebar/>
 		<div class="tabbable span9" style="margin-left:0px;">
-			<ul class="nav nav-tabs pull-right" style="margin-bottom: 0px">
+			<ul class="nav nav-tabs" style="margin-bottom: 0px">
 				<li class="active"><a href="#list" data-toggle="tab">Gallery</a>
 				</li>
 				<li><a href="#contribute" data-toggle="tab">Contribute</a>

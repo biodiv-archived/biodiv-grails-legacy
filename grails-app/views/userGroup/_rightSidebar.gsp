@@ -1,7 +1,7 @@
 
 <div class="sidebar right-sidebar span3">
 	<div class="sidebar_section" style="left: 0px">
-		<h5 class="nav-header">Bookmarks</h5>
+		<h5><i class=" icon-bookmark"></i>Bookmarks</h5>
 		
 		<ul class="nav block-tagadelic">
 			<g:each in="${pages}" var="newsletterInstance">
