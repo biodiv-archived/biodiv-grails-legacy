@@ -23,7 +23,7 @@
 		window.params = {
 		<%
 			params.each { key, value ->
-				println '"'+key+'":"'+value+'",'
+				println '"'+key.replaceAll('"','')+'":"'+(value+'').replaceAll('"','')+'",'
 			}
 		%>
 			"tagsLink":"${g.createLink(action: 'tags')}",

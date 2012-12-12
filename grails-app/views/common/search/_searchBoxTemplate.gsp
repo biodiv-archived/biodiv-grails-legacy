@@ -2,12 +2,8 @@
 
 $(document).ready(function(){
 
-	if('${responseHeader?.params?.q}'){
-		$("#searchTextField").val('${responseHeader?.params?.q}')
-	} else {
-		$("#searchTextField").val('${params.query}');
-	}
-	
+	$("#searchTextField").val('${responseHeader?.params?.q?:params.query}')
+
 	var cache = {},
 		lastXhr;
 	$("#searchTextField").catcomplete({
@@ -31,8 +27,10 @@ $(document).ready(function(){
 				return false;
 			},
 			select: function( event, ui ) {
-				if( ui.item.category == 'Names') {
-					$( "#searchTextField" ).val( 'canonical_name:"'+ui.item.value+'" '+ui.item.label.replace(/<.*?>/g,'') );
+				if( ui.item.category == 'Names' && ui.item.value != 'null') {
+					if(ui.item.value != 'null') {
+						$( "#searchTextField" ).val( 'canonical_name:"'+ui.item.value+'" '+ui.item.label.replace(/<.*?>/g,'') );
+					}
 				} else {
 					$( "#searchTextField" ).val( ui.item.label.replace(/<.*?>/g,'') );
 				}

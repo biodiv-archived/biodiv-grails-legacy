@@ -259,8 +259,8 @@ class SUserController extends UserController {
 			if(params['query'].startsWith(searchFieldsConfig.CANONICAL_NAME)) {
 				def usernamesList = searchObservations(params);
 				String usernames = getUsernamesSearchCondition(usernamesList);
-				userNameQuery = " AND LOWER(u.${usernameFieldName}) IN ${usernames}"
-				//queryParams['username'] = usernames
+				userNameQuery = " AND LOWER(u.${usernameFieldName}) IN(:username)"
+				queryParams['username'] = usernames
 			} else {
 				userNameQuery = " AND LOWER(u.${usernameFieldName}) LIKE :username"
 				queryParams['username'] = params['query'].toLowerCase() + '%'
