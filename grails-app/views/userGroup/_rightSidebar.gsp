@@ -1,7 +1,7 @@
 
 <div class="sidebar right-sidebar span3">
 	<div class="sidebar_section" style="left: 0px">
-		<h5 class="nav-header">Bookmarks</h5>
+		<h5><i class=" icon-bookmark"></i>Bookmarks</h5>
 		
 		<ul class="nav block-tagadelic">
 			<g:each in="${pages}" var="newsletterInstance">
@@ -25,5 +25,15 @@
 				</g:else>
 			</li>
 		</ul>
+	</div>
+	<div class="tags_section sidebar_section">
+<%--		<g:if test="${params.action == 'search' }">--%>
+<%--			<obv:showAllTags--%>
+<%--				model="['tags':tags , 'count':tags?tags.size():0, 'isAjaxLoad':true, 'context':userGroupInstance]" />--%>
+<%--		</g:if>--%>
+<%--		<g:else>--%>
+			<obv:showAllTags
+				model="['tagFilterByProperty':'All' , 'params':params, 'isAjaxLoad':true, 'context':userGroupInstance]" />
+<%--		</g:else>--%>
 	</div>
 </div>

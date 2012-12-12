@@ -47,6 +47,7 @@ class ObservationController {
 	def namesIndexerService;
 	def userGroupService;
 	def activityFeedService;
+	def SUserService;
 	
 	static allowedMethods = [save:"POST", update: "POST", delete: "POST"]
 
@@ -672,8 +673,13 @@ class ObservationController {
 	def listRelated = {
 		log.debug params;
 		def result = observationService.getRelatedObservations(params);
-
-		def model = [observationInstanceList: result.relatedObv.observations.observation, obvTitleList:result.relatedObv.observations.title, observationInstanceTotal: result.relatedObv.count, queryParams: [max:result.max], activeFilters:new HashMap(params), parentObservation:Observation.read(params.long('id')), filterProperty:params.filterProperty, initialParams:new HashMap(params)]
+		
+		def inGroupMap = [:]
+		result.relatedObv.observations.each { m-> 
+			inGroupMap[(m.observation.id)] = m.inGroup == null ?'false':m.inGroup
+		}
+		
+		def model = [observationInstanceList: result.relatedObv.observations.observation, inGroupMap:inGroupMap, observationInstanceTotal: result.relatedObv.count, queryParams: [max:result.max], activeFilters:new HashMap(params), parentObservation:Observation.read(params.long('id')), filterProperty:params.filterProperty, initialParams:new HashMap(params)]
 		render (view:'listRelated', model:model)
 	}
 
@@ -683,19 +689,11 @@ class ObservationController {
 	def getRelatedObservation = {
 		log.debug params;
 		def relatedObv = observationService.getRelatedObservations(params).relatedObv;
-
+		
 		if(relatedObv.observations) {
 			relatedObv.observations = observationService.createUrlList2(relatedObv.observations);
 		}
-		if(params.contextGroupWebaddress){
-			def group = UserGroup.findByWebaddress(params.contextGroupWebaddress)
-			relatedObv.observations.each { map ->
-				boolean inGroup =  Observation.read(map.obvId).userGroups.find{it.webaddress == group.webaddress} != null
-				if(inGroup){
-					map.groupContextLink = uGroup.createLink(controller:'observation', action:'show', 'userGroup':group, 'userGroupWebaddress':group.webaddress)
-				}
-			}
-		}
+		
 		render relatedObv as JSON
 	}
 
@@ -707,9 +705,9 @@ class ObservationController {
 	@Secured(['ROLE_USER'])
 	def flagDeleted = {
 		log.debug params;
-		params.author = springSecurityService.currentUser;
-		def observationInstance = Observation.findWhere(id:params.id.toLong(), author: params.author)
-		if (observationInstance) {
+		//params.author = springSecurityService.currentUser;
+		def observationInstance = Observation.get(id:params.id.toLong())
+		if (observationInstance && SUserService.ifOwns(observationInstance.author)) {
 			try {
 				observationInstance.isDeleted = true;
 				observationInstance.save(flush: true)
@@ -1109,23 +1107,29 @@ class ObservationController {
 		model['isSearch'] = true;
 		log.debug "Storing all observations ids list in session ${session['obv_ids_list']}";
 		
-		if(!params.isGalleryUpdate?.toBoolean()){
+		if(params.loadMore?.toBoolean()){
+			params.remove('isGalleryUpdate');
+			render(template:"/common/observation/showObservationListTemplate", model:model);
+			return;
+		} else if(!params.isGalleryUpdate?.toBoolean()){
 			params.remove('isGalleryUpdate');
 			render (view:"search", model:model)
+			return;
 		} else {
 			params.remove('isGalleryUpdate');
 			def obvListHtml =  g.render(template:"/common/observation/showObservationListTemplate", model:model);
 			def obvFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
-
-			def filteredTags = model.tags;
+	
+			def filteredTags = observationService.getTagsFromObservation(model.totalObservationInstanceList.collect{it[0]})
 			def tagsHtml = g.render(template:"/common/observation/showAllTagsTemplate", model:[count: count, tags:filteredTags, isAjaxLoad:true]);
 			def mapViewHtml = g.render(template:"/common/observation/showObservationMultipleLocationTemplate", model:[observationInstanceList:model.totalObservationInstanceList]);
-
+	
 			def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml, tagsHtml:tagsHtml, mapViewHtml:mapViewHtml]
 			render result as JSON
+			return;
 		}
 	}
-
+	
 	/**
 	 *
 	 */
@@ -1157,20 +1161,7 @@ class ObservationController {
 	def nameTerms = {
 		log.debug params;
 		params.field = params.field?:"autocomplete";
-		List result = new ArrayList();
-
-		params.max = Math.min(params.max ? params.int('max') : 5, 10)
-		def namesLookupResults = namesIndexerService.suggest(params)
-		result.addAll(namesLookupResults);
-
-		def queryResponse = observationsSearchService.terms(params);
-		NamedList tags = (NamedList) ((NamedList)queryResponse.getResponse().terms)[params.field];
-
-		for (Iterator iterator = tags.iterator(); iterator.hasNext();) {
-			Map.Entry tag = (Map.Entry) iterator.next();
-			result.add([value:tag.getKey().toString(), label:tag.getKey().toString(),  "category":"Observations"]);
-		}
-
+		List result = observationService.nameTerms(params);
 		render result as JSON;
 	}
 
@@ -1186,7 +1177,7 @@ class ObservationController {
 
 		for (Iterator iterator = tags.iterator(); iterator.hasNext();) {
 			Map.Entry tag = (Map.Entry) iterator.next();
-			result.add([value:tag.getKey().toString(), label:tag.getKey().toString(),  "category":""]);
+			result.add([value:tag.getKey().toString(), label:tag.getKey().toString(),  "category":"Species"]);
 		}
 
 		render result as JSON;

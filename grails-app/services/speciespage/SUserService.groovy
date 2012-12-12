@@ -170,5 +170,31 @@ class SUserService extends SpringSecurityUiService {
 		new SimpleTemplateEngine().createTemplate(s).make(binding)
 	}
 	
+	def nameTerms(params) {
+		return getUserSuggestions(params);
+	}	
 	
+	def getUserSuggestions(params){
+		def jsonData = []
+		String username = params.term
+		
+		String usernameFieldName = 'name';//SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
+		String userId = 'id';
+
+
+		def results = grailsApplication.getDomainClass(SpringSecurityUtils.securityConfig.userLookup.userDomainClassName).clazz.executeQuery(
+				"SELECT DISTINCT u.$usernameFieldName, u.$userId " +
+				"FROM ${SpringSecurityUtils.securityConfig.userLookup.userDomainClassName} u " +
+				"WHERE LOWER(u.$usernameFieldName) LIKE :name " +
+				"ORDER BY u.$usernameFieldName",
+				[name: "${username.toLowerCase()}%"],
+				[max: params.max])
+
+		for (result in results) {
+			jsonData << [value: result[0], label:result[0] , userId:result[1] , "category":"Members"]
+		}
+		
+		return jsonData;
+	}
+
 }

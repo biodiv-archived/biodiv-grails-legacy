@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.List
 
 import org.apache.commons.logging.LogFactory
+import org.apache.solr.common.util.NamedList;
 import org.codehaus.groovy.grails.commons.ApplicationHolder;
 import org.hibernate.exception.ConstraintViolationException;
 
@@ -38,6 +39,7 @@ class SpeciesService {
 	def sessionFactory;
 	def externalLinksService;
 	def speciesSearchService;
+	def namesIndexerService;
 
 	static int BATCH_SIZE = 10;
 	int noOfFields = Field.count();
@@ -322,6 +324,19 @@ class SpeciesService {
 			}
 			hibSession.clear()
 		}
+	}
+	
+	def nameTerms(params) {
+		List result = new ArrayList();
+		
+	   def queryResponse = speciesSearchService.terms(params.term, params.max);
+	   NamedList tags = (NamedList) ((NamedList)queryResponse.getResponse().terms)[params.field];
+
+	   for (Iterator iterator = tags.iterator(); iterator.hasNext();) {
+		   Map.Entry tag = (Map.Entry) iterator.next();
+		   result.add([value:tag.getKey().toString(), label:tag.getKey().toString(),  "category":"Species Pages"]);
+	   }
+		return result;
 	}
 
 }

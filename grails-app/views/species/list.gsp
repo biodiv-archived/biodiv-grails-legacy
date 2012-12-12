@@ -21,8 +21,9 @@
 <body>
 	<div class="span12">
 		<s:showSubmenuTemplate model="['entityName':'Species']" />
-		<div class="tabbable">
-			<ul class="nav nav-tabs pull-right" style="margin-bottom: 0px">
+		<uGroup:rightSidebar/>
+		<div class="tabbable span9" style="margin-left:0px;">
+			<ul class="nav nav-tabs" style="margin-bottom: 0px">
 				<li class="active"><a href="#list" data-toggle="tab">Gallery</a>
 				</li>
 				<li><a href="#contribute" data-toggle="tab">Contribute</a>
@@ -74,15 +75,15 @@
 
 
 
-								<g:if test="${i%3 == 0}">
+								<g:if test="${i%2 == 0}">
 									<li
 										class=" pull-left thumbnail ${speciesInstance.percentOfInfo > 0?'rich_species_content':'poor_species_content'}"
-										style="clear: both;margin:5px">
+										style="clear: both;margin:5px 0px 5px 35px">
 								</g:if>
 								<g:else>
 									<li
 										class="pull-left thumbnail ${speciesInstance.percentOfInfo > 0?'rich_species_content':'poor_species_content'}"
-										style="margin:5px">
+										style="margin:5px 0px 5px 35px">
 								</g:else>
 								<g:set var="mainImage" value="${speciesInstance.mainImage()}" />
 								<%def thumbnailPath = ImageUtils.getFileName(mainImage?.fileName, ImageType.SMALL, null)%>
@@ -115,7 +116,7 @@
 					</div>
 					<br />
 
-					<div class="paginateButtons span11">
+					<div class="paginateButtons">
 						<center>
 							<p:paginate controller="species" action="list" total="${speciesInstanceTotal}"   
 								userGroup="${userGroup}" userGroupWebaddress="${userGroupWebaddress}"
@@ -124,7 +125,7 @@
 					</div>
 					<br />
 
-					<div class="paginateButtons span11">
+					<div class="paginateButtons">
 						<center>
 							<p:paginateOnAlphabet controller="species" action="list" total="${speciesInstanceTotal}"  userGroup="${userGroup }" userGroupWebaddress="${userGroupWebaddress}"/>
 						</center>
@@ -142,7 +143,7 @@ $(document).ready(function(){
 	window.params = {
 	<%
 		params.each { key, value ->
-			println '"'+key+'":"'+value+'",'
+			println '"'+key.replaceAll('"','')+'":"'+(value+'').replaceAll('"','')+'",'
 		}
 	%>
 		"tagsLink":"${g.createLink(action: 'tags')}",
@@ -157,7 +158,7 @@ $(document).ready(function(){
 $(document).ready(function(){
 	
 	$('#speciesGallerySort').change(function(){
-		updateGallery(window.location.pathname + window.location.search, ${params.limit?:51}, 0, undefined, false);
+		updateGallery(window.location.pathname + window.location.search, ${params.limit?:50}, 0, undefined, false);
 		return false;
 	});
 	

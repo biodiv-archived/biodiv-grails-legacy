@@ -29,14 +29,9 @@
 		<div class="page-header">
 			<search:searchResultsHeading />
 		</div>
+		<uGroup:rightSidebar/>
 
-		<g:if test="${flash.message}">
-			<div class="message">
-				${flash.message}
-			</div>
-		</g:if>
-
-		<div class="searchResults">
+		<div class="searchResults span9" style="margin-left:0px;">
 			<sUser:showUserListWrapper />
 		</div>
 	</div>

@@ -39,14 +39,15 @@
 <r:require modules="core" />
 </head>
 <body>
-	<div>
-		<div class="page-header">
+	<div class="observation  span9"  style="margin-left:0px;">
+		<div class="page-header clearfix">
 
 			<h1>
 				${fieldValue(bean: newsletterInstance, field: "title")}
 			</h1>
 		</div>
-		<div class="description  bodymarker">
+		
+		<div class="description bodymarker" >
 			<table>
 				<tbody>
 
@@ -64,8 +65,7 @@
 
 				</tbody>
 			</table>
-		</div>
-		<sec:ifLoggedIn>
+			<sec:ifLoggedIn>
 			<div class="buttons" style="clear:both;">
 				<form
 					action="${uGroup.createLink(controller:'newsletter', action:'edit', userGroupWebaddress:params.webaddress)}"
@@ -83,6 +83,8 @@
 				</form>
 			</div>
 		</sec:ifLoggedIn>
+		</div>
+		
 	</div>
 </body>
 </html>

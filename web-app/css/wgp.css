@@ -154,21 +154,21 @@ body { /*     background-color: #ffffff; */
 	padding-right: 3px;
 }
 
-.observation_story .prop {
-	clear:none;
-}
+/* .observation_story .prop { */
+/* 	clear:none; */
+/* } */
 	
-.observation_story .prop .name {
-	width: 100px;
-}
+/* .observation_story .prop .name { */
+/* 	width: 100px; */
+/* } */
 
-.observation .prop .value {
- 	margin-left: 110px; 
-}
+/* .observation .prop .value { */
+/*  	margin-left: 110px;  */
+/* } */
 
-.prop .value, .observations_list .prop .value, .activityfeed .prop .value{
- 	margin-left: 22px; 
-}
+/* .prop .value, .observations_list .prop .value, .activityfeed .prop .value{ */
+/*  	margin-left: 22px;  */
+/* } */
 
 .observation-icons {
 	float: right;
@@ -206,8 +206,7 @@ body { /*     background-color: #ffffff; */
 }
 
 .loadMore {
-	width: 440px;
-	/*     margin-left:100px;        */
+	width: 50%;
 	margin-top: 50px;
 }
 
@@ -593,10 +592,6 @@ ul#recoSummary {
 	white-space: normal;
 }
 
-.dropdown-menu li {
-	margin-left:0px;
-}
-
 /* .dropdown-menu li>a:hover,.dropdown-menu .active>a,.dropdown-menu .active>a:hover */
 /* 	{ */
 /* 	color: #000000; */
@@ -607,16 +602,16 @@ ul#recoSummary {
 /* border-radius: 0; */
 /* top: 20px; */
 /* } */
-.observation_story.tablet .observation-icons,.observation_info .observation-icons
-	{
-	float: left;
-}
+/* .observation_story.tablet .observation-icons,.observation_info .observation-icons */
+/* 	{ */
+/* 	float: left; */
+/* } */
 
-.observation_story.tablet .user-icon,.observation_info .user-icon {
-	float: right;
-}
+/* .observation_story.tablet .user-icon,.observation_info .user-icon { */
+/* 	float: right; */
+/* } */
 
-.observation_story.tablet .icons-bar {
+.icons-bar {
 	bottom: 0;
 }
 
@@ -714,7 +709,7 @@ ul#recoSummary {
 }
 
 .user-icon {
-	height: 32px;
+/* 	height: 32px; */
 	width: 32px;
 	margin: 0 auto;
 	text-align: center;
@@ -797,14 +792,14 @@ i {
 	border: 1px solid #AEAEAE;
 	background-color: #FAFAFA;
 	padding: 10px;
-	position: absolute;
-	min-width: 300px;
-	max-width: 600px;
+/* 	position: absolute; */
+/* 	min-width: 300px; */
+/* 	max-width: 600px; */
 	box-shadow: 0 1px 3px #c6c6c6;
 	font-size: 0.8em;
 	font-style: normal;
 	z-index: 100;
-	right: 0
+/* 	right: 0 */
 }
 
 .toolbar_link:hover {
@@ -1038,7 +1033,7 @@ ul,ol {
 	min-width: 1220px;
 	height: auto;
 	margin-top: 0;
-	font-weight: bold;
+/* 	font-weight: bold; */
 }
 
 .gradient-bg {
@@ -1267,6 +1262,7 @@ span.cke_skin_kama {
 
 .ui-autocomplete-category {
 	font-weight: bold;
+	clear:both;
 }
 
 .sidebar-section {
@@ -1308,7 +1304,7 @@ span.cke_skin_kama {
 	border: 0px;
 }
 
-.observation_story.tablet .species_title {
+.tablet .species_title {
 	height: 38px;
 }
 

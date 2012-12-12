@@ -3,27 +3,15 @@
 <%@ page import="species.groups.SpeciesGroup"%>
 <%@ page import="species.Habitat"%>
 
-<div class="filters" style="position: relative;">
-	<obv:showGroupFilter
-		model="['observationInstance':observationInstance]" />
-</div>
 
-<g:if test="${showTags != false}">
-	<div class="tags_section span3" style="float: right;">
-		<g:if test="${params.action == 'search' }">
-			<obv:showAllTags
-				model="['tags':tags , 'count':tags?tags.size():0, 'isAjaxLoad':true]" />
-		</g:if>
-		<g:else>
-			<obv:showAllTags
-				model="['tagFilterByProperty':'All' , 'params':params, 'isAjaxLoad':true]" />
-		</g:else>
-	</div>
-</g:if>
+
 <div class="">
 	<!-- main_content -->
 	<div class="list span9" style="margin-left:0px;">
-
+		<div class="filters" style="position: relative;">
+			<obv:showGroupFilter
+				model="['observationInstance':observationInstance, forObservations:true]" />
+		</div>
 		<div class="observations thumbwrap">
 			<div class="observation">
 				<div>
@@ -97,7 +85,7 @@ $(document).ready(function() {
 	window.params = {
 	<%
 		params.each { key, value ->
-			println '"'+key+'":"'+value+'",'
+			println '"'+key.replaceAll('"','')+'":"'+(value+'').replaceAll('"','')+'",'
 		}
 	%>
 		"tagsLink":"${uGroup.createLink(controller:'observation', action: 'tags')}",

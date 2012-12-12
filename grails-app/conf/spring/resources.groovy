@@ -77,6 +77,22 @@ beans = {
 		solrServer = ref('observationsSolrServer');
 	}
 
+	newsletterSolrServer(org.apache.solr.client.solrj.impl.StreamingUpdateSolrServer,config.serverURL+"/newsletters", config.queueSize, config.threadCount ) {
+		setSoTimeout(config.soTimeout);
+		setConnectionTimeout(config.connectionTimeout);
+		setDefaultMaxConnectionsPerHost(config.defaultMaxConnectionsPerHost);
+		setMaxTotalConnections(config.maxTotalConnections);
+		setFollowRedirects(config.followRedirects);
+		setAllowCompression(config.allowCompression);
+		setMaxRetries(config.maxRetries);
+		//setParser(new XMLResponseParser()); // binary parser is used by default
+		log.debug "Initialized search server to "+config.serverURL+"/newsletters"
+	}
+
+	newsletterSearchService(speciespage.search.NewsletterSearchService) {
+		solrServer = ref('newsletterSolrServer');
+	}
+	
 	preAuthenticationChecks(DefaultPreAuthenticationChecks)
 	postAuthenticationChecks(DefaultPostAuthenticationChecks)
 	

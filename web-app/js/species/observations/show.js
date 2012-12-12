@@ -57,6 +57,7 @@ function addAgreeRecoVote(obvId, recoId, currentVotes, liComponent, url){
 		success: function(data){
 			preLoadRecos(3, false, obvId, liComponent);
 			updateFeeds();
+			showRecoUpdateStatus(data.recoVoteMsg, 'success');
 			return false;
 		},
 		

@@ -115,6 +115,7 @@ class ObservationTagLib {
 				count = tags.size()
 			}
 			else {
+				attrs.model.params.remove('sort')
 				tags =  observationService.getFilteredTags(attrs.model.params);
 				count = tags.size();
 			} 

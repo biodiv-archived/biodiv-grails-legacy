@@ -15,6 +15,7 @@
 
 	<div class="span12">
 		<obv:showSubmenuTemplate model="['entityName':entityName]" />
+		<uGroup:rightSidebar/>
 		<obv:showObservationsListWrapper />
 	</div>
 

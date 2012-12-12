@@ -89,6 +89,13 @@ class UserGroupController {
 		def totalUserGroupInstanceList = userGroupService.getFilteredUserGroups(params, -1, -1, true).userGroupInstanceList
 		def count = totalUserGroupInstanceList.size()
 
+		
+		if(params.action == 'search' && !params.query) {
+			count = 0
+			totalUserGroupInstanceList = 0
+			userGroupInstanceList = []
+		}
+		
 		//storing this filtered obvs ids list in session for next and prev links
 		//http://grepcode.com/file/repo1.maven.org/maven2/org.codehaus.groovy/groovy-all/1.8.2/org/codehaus/groovy/runtime/DefaultGroovyMethods.java
 		//returns an arraylist and invalidates prev listing result
@@ -279,18 +286,19 @@ class UserGroupController {
 		}
 	}
 
-	private UserGroup findInstance(id=null, webaddress='', boolean redirectToList=true) {
+	private UserGroup findInstance(id=null, String webaddress='', boolean redirectToList=true) {
 		def userGroup
 		
 		if(id) {
+			if(id instanceof String) {
+				id = Long.parseLong(id);
+			}
 			userGroup = userGroupService.get(id)
 		} 
 		if(webaddress) {
 			userGroup = userGroupService.get(webaddress)
 		}
-		println userGroup
-		println id
-		println webaddress
+		
 		if (!userGroup && redirectToList) {
 			flash.message = "${message(code: 'userGroup.default.not.found.message', args: [params.webaddress])}"
 			redirect url: uGroup.createLink(controller:'userGroup', action:'list')
@@ -493,6 +501,7 @@ class UserGroupController {
 		def user = springSecurityService.currentUser;
 		if(user) {
 			def userGroupInstance = findInstance(params.id, params.webaddress)
+			println userGroupInstance;
 			if (!userGroupInstance) {
 				render (['success':true, 'statusComplete':false, 'msg':'No userGroup selected.'] as JSON);
 				return;
@@ -505,7 +514,6 @@ class UserGroupController {
 			
 			String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
 			def founders = userGroupInstance.getFounders(userGroupInstance.getFoundersCount(), 0);
-
 			founders.each { founder ->
 				log.debug "Sending email to  founder ${founder}"
 				def userToken = new UserToken(username: user."$usernameFieldName", controller:'userGroupGeneric', action:'confirmMembershipRequest', params:['userGroupInstanceId':userGroupInstance.id.toString(), 'userId':user.id.toString(), 'role':UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value()]);
@@ -838,7 +846,7 @@ class UserGroupController {
 		
 		def model = getUserGroupList(params);
 		if(!params.isGalleryUpdate?.toBoolean()){
-			render (view:"list", model:model)
+			render (view:"search", model:model)
 		} else{
 			def userGroupListHtml =  g.render(template:"/common/userGroup/showUserGroupListTemplate", model:model);
 			def userGroupFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
@@ -864,42 +872,10 @@ class UserGroupController {
 	   def namesLookupResults = namesIndexerService.suggest(params)
 	   jsonData.addAll(namesLookupResults);
 
-	   jsonData.addAll(getUserGroupSuggestions(params));
+	   jsonData.addAll(userGroupService.getUserGroupSuggestions(params));
 	   render jsonData as JSON
    }
-   
-   /**
-	*
-	*/
-   def terms = {
-	   log.debug params;
-	   params.max = Math.min(params.max ? params.int('max') : 5, 10);
-	   render getUserGroupSuggestions(params) as JSON;
-   }
-
-   private getUserGroupSuggestions(params){
-	   def jsonData = []
-	   String name = params.term
-	   
-	   String usernameFieldName = 'name';//SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
-	   String userId = 'id';
-
-
-	   def results = UserGroup.executeQuery(
-			   "SELECT DISTINCT u.$usernameFieldName, u.$userId " +
-			   "FROM UserGroup u " +
-			   "WHERE LOWER(u.$usernameFieldName) LIKE :name " +
-			   "ORDER BY u.$usernameFieldName",
-			   [name: "${name.toLowerCase()}%"],
-			   [max: params.max])
-
-	   for (result in results) {
-		   jsonData << [value: result[0], label:result[0] , userId:result[1] , "category":"User Groups"]
-	   }
-	   
-	   return jsonData;
-   }
-   
+      
    def allGroups = {
 	   log.debug params;
 		def userGroupInstance = findInstance(params.id, params.webaddress)

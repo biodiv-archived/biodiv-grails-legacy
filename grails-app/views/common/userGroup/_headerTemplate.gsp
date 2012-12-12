@@ -12,17 +12,6 @@
 <div id="actionsHeader" style="position: relative; overflow: visible;">
 	<uGroup:showActionsHeaderTemplate
 		model="['userGroupInstance':userGroupInstance, members_autofillUsersId:1]" />
-	
-	<g:if test="${flash.error}">
-		<div class="alertMsg alert alert-error" style="clear: both;">
-			${flash.error}
-		</div>
-	</g:if>
-	
-	<div class="alertMsg ${(flash.message)?'alert':'' }"  style="clear: both; margin:0px">
-		${flash.message}
-	</div>
-		
 </div>
 
 

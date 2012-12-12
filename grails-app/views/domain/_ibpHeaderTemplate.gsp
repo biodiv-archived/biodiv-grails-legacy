@@ -17,7 +17,7 @@
 
 
 					<ul class="nav pull-right">
-						<%--							<li><search:searchBox /></li>--%>
+							<li><search:searchBox /></li>
 <%--						<g:if test="${userGroupInstance  && userGroupInstance.id}">--%>
 <%--							<li>--%>
 <%--						</g:if>--%>
@@ -37,7 +37,15 @@
 		</div>
 	</div>
 	<domain:showHeader model="['userGroupInstance':userGroupInstance]" />
-
+	<g:if test="${flash.error}">
+		<div class="alertMsg alert alert-error" style="clear: both;">
+			${flash.error}
+		</div>
+	</g:if>
+	
+	<div class="alertMsg ${(flash.message)?'alert':'' }"  style="clear: both; margin:0px">
+		${flash.message}
+	</div>
 
 <auth:ajaxLogin />
 <div id="fb-root"></div>

@@ -108,6 +108,17 @@ class ObservationService {
 		}else{
 			relatedObv = getRelatedObservation(params.filterProperty, params.id.toLong(), max, offset)
 		}
+		
+		if(params.contextGroupWebaddress || params.webaddress){
+			//def group = UserGroup.findByWebaddress(params.contextGroupWebaddress)
+			//println group.webaddress
+			relatedObv.observations.each { map ->
+				boolean inGroup = map.observation.userGroups.find { it.webaddress == params.contextGroupWebaddress || it.webaddress == params.webaddress} != null
+				map.inGroup = inGroup;
+				//map.observation.inGroup = inGroup;
+			}
+		}
+		
 		return [relatedObv:relatedObv, max:max]
 	}
 
@@ -235,8 +246,8 @@ class ObservationService {
 			return ["observations":[], "count":0];
 		}
 		def count = Observation.countByMaxVotedRecoAndIsDeleted(parentObv.maxVotedReco, false) - 1;
-		def c = Observation.createCriteria();
-		def observations = c.list (max: limit, offset: offset) {
+		//def c = Observation.createCriteria();
+		def observations = Observation.withCriteria (max: limit, offset: offset) {
 			and {
 				eq("maxVotedReco", parentObv.maxVotedReco)
 				eq("isDeleted", false)
@@ -244,7 +255,6 @@ class ObservationService {
 			}
 			order("lastRevised", "desc")
 		}
-		
 		def result = [];
 		observations.each {
 			result.add(['observation':it, 'title':it.fetchSpeciesCall()]);
@@ -264,12 +274,14 @@ class ObservationService {
 	static List createUrlList2(observations, String iconBasePath){
 		List urlList = []
 		for(param in observations){
-			def obv = param['observation']
-			def title = param['title']
+			def item = [:];
+			item.obvId = param['observation'].id
+			item.imageTitle = param['title']
 			def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
-			def image = obv.mainImage()
-			def imageLink = iconBasePath +  image.fileName.trim()
-			urlList.add(["obvId":obv.id, "imageLink":imageLink, "imageTitle": title])
+			def image = param['observation'].mainImage()
+			item.imageLink = iconBasePath +  image.fileName.trim()
+			item.inGroup = param.inGroup;
+			urlList << item;
 		}
 		return urlList
 	}
@@ -612,9 +624,7 @@ class ObservationService {
 		}
 		
 		def orderByClause = " order by obv." + (params.sort ? params.sort : "lastRevised") +  " desc, obv.id asc"
-		println "----"
-println query
-println queryParams
+
 		return [query:query, mapViewQuery:mapViewQuery, filterQuery:filterQuery, orderByClause:orderByClause, queryParams:queryParams, activeFilters:activeFilters]
 
 	}
@@ -858,8 +868,7 @@ println queryParams
 			responseHeader.params.remove('q');
 		}*/
 		
-		
-		return [responseHeader:responseHeader, observationInstanceList:instanceList, observationInstanceTotal:noOfResults, queryParams:queryParams, activeFilters:activeFilters, tags:facetResults, totalObservationIdList:totalObservationIdList]
+		return [responseHeader:responseHeader, observationInstanceList:instanceList, instanceTotal:noOfResults, queryParams:queryParams, activeFilters:activeFilters, tags:facetResults, totalObservationIdList:totalObservationIdList]
 	}
 	
 	File getUniqueFile(File root, String fileName){
@@ -892,4 +901,16 @@ println queryParams
 			commentService.addComment(m);
 		}
 	}
+	
+	def nameTerms(params) {
+		List result = new ArrayList();
+		
+		def queryResponse = observationsSearchService.terms(params.term, params.max);
+		NamedList tags = (NamedList) ((NamedList)queryResponse.getResponse().terms)[params.field];
+		for (Iterator iterator = tags.iterator(); iterator.hasNext();) {
+			Map.Entry tag = (Map.Entry) iterator.next();
+			result.add([value:tag.getKey().toString(), label:tag.getKey().toString(),  "category":"Observations"]);
+		}
+		return result;
+	} 
 }
