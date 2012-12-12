@@ -39,6 +39,7 @@ class ObservationController {
 	def mailService;
 	def observationsSearchService;
 	def namesIndexerService;
+	def SUserService;
 	
 	static allowedMethods = [update: "POST", delete: "POST"]
 
@@ -629,9 +630,9 @@ class ObservationController {
 	@Secured(['ROLE_USER'])
 	def flagDeleted = {
 		log.debug params;
-		params.author = springSecurityService.currentUser;
-		def observationInstance = Observation.findWhere(id:params.id.toLong(), author: params.author)
-		if (observationInstance) {
+		//params.author = springSecurityService.currentUser;
+		def observationInstance = Observation.get(id:params.id.toLong())
+		if (observationInstance && SUserService.ifOwns(observationInstance.author)) {
 			try {
 				observationInstance.isDeleted = true;
 				observationInstance.save(flush: true)
