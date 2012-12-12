@@ -85,7 +85,7 @@ $(document).ready(function() {
 	window.params = {
 	<%
 		params.each { key, value ->
-			println '"'+key+'":"'+value+'",'
+			println '"'+key.replaceAll('"','')+'":"'+(value+'').replaceAll('"','')+'",'
 		}
 	%>
 		"tagsLink":"${uGroup.createLink(controller:'observation', action: 'tags')}",
