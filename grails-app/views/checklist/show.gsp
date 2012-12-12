@@ -51,81 +51,78 @@
 			</div>
 			
 			<div>
-			    <dl class="dl-horizontal">
-			     	<dt>Description</dt>
-    				<dd>${checklistInstance.description}</dd>
-			    	<dt>Attribution</dt>
-    				<dd>${checklistInstance.attribution}</dd>
+				<div class="ui-widget">
+					<div class="speciesFieldHeader ui-dialog-titlebar ui-helper-clearfix ui-widget-header">
+						<span class="ui-icon ui-icon-circle-triangle-s" style="float: left; margin-right: .3em;"></span>
+						<a href="#license_information">License information</a> 
+					</div>
+					<div class="ui-widget-content speciesField">
+						<dl class="dl">
+			     			<dt>Attribution</dt>
+    						<dd>${checklistInstance.attribution}</dd>
     				
-			    	<dt>License</dt>
-			    	<dd><img src="${resource(dir:'images/license',file:checklistInstance?.license?.name?.getIconFilename()+'.png', absolute:true)}"
-							title="${checklistInstance.license.name}"/>
-					</dd>
-			    	<g:if test="${checklistInstance.refText}">
-						<dt>References</dt>
-    					<dd>${checklistInstance.refText}</dd>
-					</g:if>
-    				<g:if test="${checklistInstance.sourceText}" >
-    					<dt>Links</dt>
-    					<dd>${checklistInstance.sourceText}</dd>
-    				</g:if>
-    				<dt>Lat/Long</dt>
-    				<dd>${checklistInstance.latitude + " " + checklistInstance.longitude}</dd>
-    				
-<%--    				<dt>All India</dt>--%>
-<%--    				<dd>${checklistInstance.allIndia}</dd>--%>
-<%--    				--%>
-    			</dl>
+    						<dt>License</dt>
+			    			<dd><img src="${resource(dir:'images/license',file:checklistInstance?.license?.name?.getIconFilename()+'.png', absolute:true)}"
+								title="${checklistInstance.license.name}"/>
+							</dd>
+						</dl>
+					</div>
+				</div>	
+				
+				<g:if test="${checklistInstance.sourceText}" >
+					<div class="ui-widget">
+						<div class="speciesFieldHeader ui-dialog-titlebar ui-helper-clearfix ui-widget-header">
+							<span class="ui-icon ui-icon-circle-triangle-s" style="float: left; margin-right: .3em;"></span>
+							<a href="#source">Source</a> 
+						</div>
+						<div class="ui-widget-content speciesField">
+							<dl class="dl">
+								<dd>${checklistInstance.sourceText}</dd>
+							</dl>
+						</div>
+					</div>		
+				</g:if>
+				
+				<div class="ui-widget">
+						<div class="speciesFieldHeader ui-dialog-titlebar ui-helper-clearfix ui-widget-header">
+							<span class="ui-icon ui-icon-circle-triangle-s" style="float: left; margin-right: .3em;"></span>
+							<a href="#checklist_details">Checklist details</a> 
+						</div>
+						<div class="ui-widget-content speciesField">
+							<dl class="dl">
+								<dd>${checklistInstance.description}</dd>
+    						</dl>
+    					</div>
+    			</div>
+				
+				
+			<div class="ui-widget">
+				<div class="speciesFieldHeader ui-dialog-titlebar ui-helper-clearfix ui-widget-header">
+						<span class="ui-icon ui-icon-circle-triangle-s" style="float: left; margin-right: .3em;"></span>
+						<a href="#checklist"> Checklist</a> 
+				</div>
+				<div class="ui-widget-content speciesField">
+					<clist:showData
+						model="['checklistInstance':checklistInstance]">
+					</clist:showData>
+				</div>
 			</div>
 			
-			<div>
-				<table class="table table-hover span8" style="margin-left: 0px;">
-					
-					<thead>
-						<tr>
-							<g:each in="${checklistInstance.fetchColumnNames()}" var="cName">
-								<th>${cName}</th>
-							</g:each>
-						</tr>
-					</thead>
-					<tbody>
-						<%
-							def preRowNo = -1
-						%>
-						<g:each in="${checklistInstance.row}" var="row">
-							<%
-								def currentRowNo = row.rowId
-							%>
-							<g:if test="${preRowNo !=  currentRowNo}">
-								<g:if test="${preRowNo != -1}">
-									</tr>
-								</g:if>
-								<%
-									preRowNo = currentRowNo
-								%>
-								<tr>
-							</g:if>
-							
-							<g:if test="${row.reco}">
-								<g:if test="${row.reco.taxonConcept && row.reco.taxonConcep.canonicalForm != null}">
-									<td>
-									<a href="${uGroup.createLink(action:'show', controller:'species', id:reco.taxonConcept.findSpeciesId(), 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
-										<i> ${row.reco.taxonConcept.canonicalForm}</i>
-									</a>
-									</td>
-								</g:if>
-								<g:else>
-									<td><i>${row.value}</i></td>
-								</g:else>
-							</g:if>
-							<g:else>
-								<td>${row.value}</td>
-							</g:else>
-						</g:each>
-					</tbody>
-				</table>
-			
-			</div>	
+			<g:if test="${checklistInstance.refText}" >
+					<div class="ui-widget">
+						<div class="speciesFieldHeader ui-dialog-titlebar ui-helper-clearfix ui-widget-header">
+							<span class="ui-icon ui-icon-circle-triangle-s" style="float: left; margin-right: .3em;"></span>
+							<a href="#references">References</a> 
+						</div>
+						<div class="ui-widget-content speciesField">
+						<dl class="dl">
+							<dd>${checklistInstance.refText}</dd>
+						</dl>
+						</div>
+					</div>		
+			</g:if>
+				
+				
 			<div class="union-comment" style="clear: both;">
 				<feed:showAllActivityFeeds model="['rootHolder':checklistInstance, feedType:'Specific', refreshType:'manual', 'feedPermission':'editable']" />
 				<%
@@ -135,8 +132,34 @@
 			</div>
 			
 			</div>
-		
-	<r:script>
-	</r:script>
+	</div>	
+	<g:javascript>
+	$(document).ready(function(){
+	window.params = {};
+	
+	$('div.speciesFieldHeader').collapser({
+		target: 'next',
+		effect: 'slide',
+		changeText: false
+		},function(){
+			var ele = $(this);
+			var x = ele.find(".ui-icon")
+			if(ele.next('.speciesField').is(":visible")) {				 
+				x.removeClass('ui-icon-circle-triangle-s').addClass('ui-icon-circle-triangle-e');
+			} else {
+				x.removeClass('ui-icon-circle-triangle-e').addClass('ui-icon-circle-triangle-s')
+			}
+		} , function(){
+					
+		}
+	);
+
+    $(".speciesField").each(function() {
+	    if(jQuery.trim($(this).text()).length == 0) {
+		    $(this).prev("div.speciesFieldHeader").children("span").removeClass("ui-icon ui-icon-circle-triangle-s")
+		}
+	})	
+	});
+	</g:javascript>
 </body>
 </html>

@@ -200,7 +200,7 @@ modules = {
 	}
 	
 	checklist {
-		dependsOn 'core, location_utils, list_utils, tagit, comment, activityfeed'
+		dependsOn 'core, location_utils, species_show, list_utils, tagit, comment, activityfeed'
 		resource url:'/js/species/observations/list.js'
 		resource url:'/js/species/checklist.js'
 	}
