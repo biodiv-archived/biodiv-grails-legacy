@@ -36,7 +36,7 @@ class ChecklistService {
 	def migrateChecklist(){
 		def sql = Sql.newInstance(connectionUrl, userName, password, "org.postgresql.Driver");
 		int i=0;
-		sql.eachRow("select nid, vid, title from node where type = 'checklist'") { row ->
+		sql.eachRow("select nid, vid, title from node where type = 'checklist' limit 100") { row ->
 			log.debug " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>     title ===  $i " + row.title
 			Checklist checklist = createCheckList(row, sql)
 			i++
@@ -216,7 +216,7 @@ class ChecklistService {
 		
 		//handling scientific name infrastructre
 		if(snRowId){
-			Recommendation reco = observationService.getRecommendation([recoName:snVal, canName:snVal, commonName:cn, refObject:cl]).mainReco
+			Recommendation reco = null //observationService.getRecommendation([recoName:snVal, canName:snVal, commonName:cn, refObject:cl]).mainReco
 			log.debug "===================== reco info ========================" + reco
 			//log.debug " species id " + reco.taxonConcept?.findSpeciesId()
 			//log.debug " cannonical form " + reco.taxonConcept?.canonicalForm
@@ -348,8 +348,8 @@ class ChecklistService {
 
 	private parsePoint(Checklist cl, pointStr){
 		String[] ar = pointStr.substring(pointStr.indexOf("(") + 1, pointStr.indexOf(")")).split(" ")
-		cl.latitude = ar[0].trim().toFloat().floatValue()
-		cl.longitude = ar[1].trim().toFloat().floatValue()
+		cl.longitude = ar[0].trim().toFloat().floatValue()
+		cl.latitude = ar[1].trim().toFloat().floatValue()
 	}
 
 	private Date getDate(String dateString){

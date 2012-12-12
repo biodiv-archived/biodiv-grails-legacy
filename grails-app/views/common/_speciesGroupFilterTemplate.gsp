@@ -35,7 +35,7 @@ $(document).ready(function(){
 </div>
 
 
-<g:if test="${params.controller != 'species' && !hideHabitatFilter}">
+<g:if test="${(params.controller != 'species' ||  params.controller != 'checklist') && !hideHabitatFilter}">
 	<div id="habitatFilter" data-toggle="buttons-radio">
 		<%def othersHabitat = species.Habitat.findByName(HabitatType.OTHERS.value())%>
 		<g:each in="${species.Habitat.list()}" var="habitat" status="i">
@@ -55,7 +55,7 @@ $(document).ready(function(){
 	</div>
 </g:if>
 
-<g:if test="${params.controller != 'species' && !hideHabitatFilter && params.controller != 'userGroup' && params.controller != 'SUser' }">
+<g:if test="${params.controller != 'species' && params.controller != 'checklist' && !hideHabitatFilter && params.controller != 'userGroup' && params.controller != 'SUser' }">
 	<div id="speciesNameFilter" class="btn-group"
 		style="float: right; margin-right: 5px; z-index: 10; position: absolute; margin-top: -65px; right: 0;">
 		<input type="text" id="speciesNameFilter"

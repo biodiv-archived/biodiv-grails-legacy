@@ -58,14 +58,10 @@
     				<dd>${checklistInstance.attribution}</dd>
     				
 			    	<dt>License</dt>
-			    	<dd>${checklistInstance.license.name}</dd>
-<%--    				<dd>--%>
-<%--    					<img class="small_profile_pic"--%>
-<%--						src="${checklistInstance.license.name.getIconFilename()}"--%>
-<%--						title="${checklistInstance.license.name}" />--%>
-<%--					</dd>--%>
-<%--    				--%>
-					<g:if test="${checklistInstance.refText}">
+			    	<dd><img src="${resource(dir:'images/license',file:checklistInstance?.license?.name?.getIconFilename()+'.png', absolute:true)}"
+							title="${checklistInstance.license.name}"/>
+					</dd>
+			    	<g:if test="${checklistInstance.refText}">
 						<dt>References</dt>
     					<dd>${checklistInstance.refText}</dd>
 					</g:if>
