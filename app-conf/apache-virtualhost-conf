@@ -1,0 +1,161 @@
+<VirtualHost *:80>
+	ServerAdmin webmaster@localhost
+
+	DocumentRoot /var/www
+	<Directory />
+		Options FollowSymLinks
+		AllowOverride None
+	</Directory>
+	<Directory /var/www/>
+		Options Indexes FollowSymLinks MultiViews
+		AllowOverride None
+		Order allow,deny
+		allow from all
+	</Directory>
+
+	ScriptAlias /cgi-bin/ /usr/lib/cgi-bin/
+	<Directory "/usr/lib/cgi-bin">
+		AllowOverride None
+		Options +ExecCGI -MultiViews +SymLinksIfOwnerMatch
+		Order allow,deny
+		Allow from all
+	</Directory>
+
+	# Possible values include: debug, info, notice, warn, error, crit,
+	# alert, emerg.
+	LogLevel warn
+
+
+    Alias /doc/ "/usr/share/doc/"
+    <Directory "/usr/share/doc/">
+        Options Indexes MultiViews FollowSymLinks
+        AllowOverride None
+        Order deny,allow
+        Deny from all
+        Allow from 127.0.0.0/255.0.0.0 ::1/128
+    </Directory>
+
+</VirtualHost>
+
+#<VirtualHost *:80>
+#    ProxyRequests Off
+#    ProxyPass /biodiv http://localhost:8080/biodiv
+#    ProxyPassReverse /biodiv http://localhost:8080/biodiv
+#    ServerName localhost.local
+#    DocumentRoot /var/www/
+#</VirtualHost> 
+
+<VirtualHost *:80>
+    ProxyRequests Off
+
+    ServerName thewesternghats.indiabiodiversity.localhost.org
+    ServerAlias www.thewesternghats.indiabiodiversity.localhost.org
+    DocumentRoot /home/sandeept/augmentedmaps
+    DirectoryIndex index.php index.html index.html index.htm index.shtml
+    ScriptAlias /cgi-bin/ /usr/lib/cgi-bin/
+
+ProxyPass /geoserver http://saturn.strandls.com:8080/geoserver
+ProxyPassReverse /geoserver http://saturn.strandls.com:8080/geoserver
+    ProxyPassReverseCookiePath /biodiv_usergroups /
+RewriteEngine on
+
+RewriteCond %{REQUEST_URI} ^/
+RewriteRule /$ /show [QSA,L,P]
+
+RewriteCond %{REQUEST_URI} ^/user/login
+RewriteRule ^(.*)$ $1 [QSA,L]
+
+RewriteCond %{REQUEST_URI} ^/logout
+RewriteCond %{QUERY_STRING} destination
+RewriteRule ^(.*)$ $1 [QSA,L]
+
+RewriteCond %{REQUEST_URI} ^/biodiv_usergroups/(static|plugins|data|bootstrap|js|css|j_spring_security_check|j_spring_openid_security_check|images|j_spring_security_logout|observation/upload_resource|recommendation|comment|newsletter|edit|emailConfirmation).*
+#domainanme here need to be wgp instead of localhost as google uses this address in its return to url
+RewriteRule ^/biodiv_usergroups(.*)$ http://thewesternghats.indiabiodiversity.localhost.org:8080/biodiv_usergroups$1 [P]
+ProxyPassReverse /biodiv_usergroups http://thewesternghats.indiabiodiversity.localhost.org:8080/biodiv_usergroups
+
+RewriteCond %{REQUEST_URI} ^/biodiv_usergroups/group/wgp_fb_
+RewriteRule ^/biodiv_usergroups/group/wgp_fb_(.*)$ $1 [R=301]
+ProxyPassReverse / http://localhost:8080/biodiv_usergroups/group/wgp_fb_
+
+RewriteCond %{REQUEST_URI} ^/biodiv_usergroups
+RewriteCond %{REQUEST_URI} !(^/biodiv_usergroups/(observations|newsletters|group-themes|users|userGroups))
+RewriteRule ^/biodiv_usergroups(.*)$ $1 [R=301]
+ProxyPassReverse / http://localhost:8080/biodiv_usergroups
+
+
+RewriteCond %{REQUEST_URI} ^/(species|observation|activity|activityFeed|SUser|user|page|pages|login|logout|register|about|requestMembership|joinUs|leaveUs|inviteMembers|show|newsletter|edit|update|delete|founders|members|experts|terms|upload_resource|group|emailConfirmation|settings|search|checklist).*
+RewriteRule ^(.*)$ http://thewesternghats.indiabiodiversity.localhost.org:8080/biodiv_usergroups/group/wgp_fb_$1 [P]
+ProxyPassReverse / http://thewesternghats.indiabiodiversity.localhost.org:8080/biodiv_usergroups/group/wgp_fb_
+
+RewriteCond %{REQUEST_URI} !(^/(species|observation|activity|SUser|user|page|pages|login|logout|register|biodiv_usergroups|geoserver|sites|about))
+RewriteRule ^(.*)$ $1?userGroup=wgp_fb_ [QSA,L]
+
+RewriteCond %{REQUEST_URI} ^/user/login
+RewriteRule ^(.*)$ $1 [QSA,L]
+
+
+    <Location /geoserver>
+        Order allow,deny 
+        Allow from all 
+    </Location>
+    <Location /biodiv>
+        Order allow,deny 
+        Allow from all 
+    </Location>
+     <Location /biodiv_usergroups>
+        Order allow,deny 
+        Allow from all 
+    </Location>
+
+ <Location />
+        Order allow,deny 
+        Allow from all 
+    </Location>
+
+</VirtualHost>
+
+<VirtualHost *:80>
+    ProxyRequests Off
+    ProxyPass /geoserver http://saturn.strandls.com:8080/geoserver
+#    ProxyPass /biodiv_usergroups http://indiabiodiversity.localhost.org:8080/biodiv_usergroups
+    ProxyPassReverse /geoserver http://saturn.strandls.com:8080/geoserver
+#    ProxyPassReverse /biodiv_usergroups http://indiabiodiversity.localhost.org:8080/biodiv_usergroups
+    ServerName indiabiodiversity.localhost.org
+    ServerAlias www.indiabiodiversity.localhost.org
+    DocumentRoot /home/sandeept/augmentedmaps
+    DirectoryIndex index.php index.html index.html index.htm index.shtml
+    ScriptAlias /cgi-bin/ /usr/lib/cgi-bin/
+
+
+RewriteEngine on
+RewriteCond %{REQUEST_URI} ^/(species|observation|activity|activityFeed|SUser|user|page|pages|requestMembership|joinUs|leaveUs|inviteMembers|login|logout|register|static|group|j_spring_security_logout|recommendation|comment|newsletter|emailConfirmation|search|checklist).*
+RewriteRule ^(.*)$ http://indiabiodiversity.localhost.org:8080/biodiv_usergroups$1 [P,L]
+ProxyPassReverse / http://indiabiodiversity.localhost.org:8080/biodiv_usergroups/
+ProxyPassReverse / http://indiabiodiversity.localhost.org:8080/
+
+
+RewriteCond %{REQUEST_URI} ^/biodiv_usergroups/(static|plugins|data|bootstrap|js|css|j_spring_security_check|j_spring_openid_security_check|images|j_spring_security_logout|observation/upload_resource|emailConfirmation).*
+RewriteRule ^/biodiv_usergroups(.*)$ http://indiabiodiversity.localhost.org:8080/biodiv_usergroups$1 [P]
+ProxyPassReverse /biodiv_usergroups http://indiabiodiversity.localhost.org:8080/biodiv_usergroups
+
+RewriteCond %{REQUEST_URI} ^/biodiv_usergroups
+RewriteCond %{REQUEST_URI} !(^(/biodiv_usergroups/(observations|newsletters|group-themes|users|userGroups)|(wgp_maps|geoserver)))
+RewriteRule ^/biodiv_usergroups/(.*)$ /$1 [R=301,L]
+ProxyPassReverse / http://indiabiodiversity.localhost.org:8080/biodiv_usergroups/
+
+    ProxyPassReverseCookiePath /biodiv_usergroups /
+
+<IfModule mod_proxy.c>
+  ProxyRequests Off
+  <Proxy *>
+    Order deny,allow
+    Deny from all
+    Allow from localhost
+  </Proxy>
+  ProxyVia On
+</IfModule>
+
+</VirtualHost>
+
+ 

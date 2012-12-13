@@ -164,7 +164,7 @@ class ChecklistService {
 		}
 		csvReader.close()
 
-		Arrays.sort(keyNames)
+		//Arrays.sort(keyNames)
 		cl.columnNames = keyNames.join("\t");
 	}
 
@@ -179,7 +179,7 @@ class ChecklistService {
 		}
 		scanner.close()
 
-		Arrays.sort(keyNames)
+		//Arrays.sort(keyNames)
 		cl.columnNames = keyNames.join("\t");
 	}
 
@@ -189,7 +189,7 @@ class ChecklistService {
 	private populateData(cl, String[] keys, String[] values, rowId){
 		//log.debug "keys ===  " +  keys.length   + "  "  + keys
 		//log.debug "values === " + values.length  + "  " + values
-		def snVal, snKey, snRowId, cn
+		def snVal, snKey, snColumnOrder, cn
 		for (int i = 0; i < keys.length; i++) {
 			def key = keys[i].trim()
 			def value = null
@@ -200,7 +200,7 @@ class ChecklistService {
 			if(key.equalsIgnoreCase(SN_NAME)){
 				snVal = value
 				snKey = key 
-				snRowId = i
+				snColumnOrder = i
 			}
 			
 			if(key.equalsIgnoreCase(CN_NAME)){
@@ -208,19 +208,19 @@ class ChecklistService {
 			}
 			
 			//storing all the key value pair except scientific name
-			if(i != snRowId){
-				def clr = new ChecklistRowData(key:key, value:value, rowId:rowId)
+			if(i != snColumnOrder){
+				def clr = new ChecklistRowData(key:key, value:value, rowId:rowId, columnOrderId:i)
 				cl.addToRow(clr);
 			}
 		}
 		
 		//handling scientific name infrastructre
-		if(snRowId){
+		if(snColumnOrder){
 			Recommendation reco = null //observationService.getRecommendation([recoName:snVal, canName:snVal, commonName:cn, refObject:cl]).mainReco
-			log.debug "===================== reco info ========================" + reco
+			//log.debug "===================== reco info ========================" + reco
 			//log.debug " species id " + reco.taxonConcept?.findSpeciesId()
 			//log.debug " cannonical form " + reco.taxonConcept?.canonicalForm
-			cl.addToRow(new ChecklistRowData(key:snKey, value:snVal, rowId:rowId, reco:reco))
+			cl.addToRow(new ChecklistRowData(key:snKey, value:snVal, rowId:rowId, reco:reco, columnOrderId:snColumnOrder))
 		}
 	}
 

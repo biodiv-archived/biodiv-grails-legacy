@@ -31,11 +31,6 @@ class Checklist {
 	float latitude;
 	float longitude;
 	String placeName;
-	/*
-	String state;
-	String district;
-	String taluka;
-	*/
 	
 	//dates
 	Date fromDate;
@@ -71,12 +66,10 @@ class Checklist {
 		columnNames  nullable:true;
 		
 		//XXX to be removed
-		speciesGroup nullable:true; 
 		rawChecklist nullable:true; 
 		publicationDate  nullable:true;
 		latitude nullable:true;
 		longitude nullable:true;
-		
 	}
 
 	static mapping = {

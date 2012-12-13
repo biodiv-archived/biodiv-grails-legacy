@@ -12,7 +12,7 @@
 		<g:each in="${checklistInstanceList}" status="i"
 			var="checklistInstance">
 			<tr>
-				<td><a href="${uGroup.createLink(controller:'checklist', action:'show', id:checklistInstance.id)}">${checklistInstance.title}</a></td>
+				<td><a href="${uGroup.createLink(controller:'checklist', action:'show', pos:i, id:checklistInstance.id, userGroupWebaddress:params.webaddress)}">${checklistInstance.title}</a></td>
 				<td>${checklistInstance.speciesGroup?.name}</td>
 				<td>${checklistInstance.speciesCount}</td>
 				<td>${checklistInstance.placeName}</td>

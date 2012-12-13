@@ -5,6 +5,8 @@ class ChecklistRowData implements Comparable {
 	String key;
 	String value;
 	int rowId;
+	//to keep column order same as raw file
+	int columnOrderId
 	//for scientific name
 	Recommendation reco;
 		
@@ -25,7 +27,7 @@ class ChecklistRowData implements Comparable {
 		// TODO Auto-generated method stub
 		int rowOrder = rowId.compareTo(o.rowId)
 		if(rowOrder == 0){
-			return key.compareTo(o.key)
+			return columnOrderId.compareTo(o.columnOrderId)
 		}
 		return rowOrder
 	}
