@@ -2,13 +2,15 @@ package species.participation
 
 import grails.converters.JSON
 import species.groups.SpeciesGroup;
+import grails.plugins.springsecurity.Secured;
 
 class ChecklistController {
 	
 	def userGroupService;
 	def activityFeedService;
 	def springSecurityService;
-
+	def checklistService;
+	
 	def index = {
 		redirect(action:list, params: params)
 	}
@@ -151,6 +153,18 @@ class ChecklistController {
 				}
 			}
 		}[0]
+	}
+	
+	@Secured(['ROLE_ADMIN'])
+	def migrateTable = {
+		checklistService.updateUncuratedVotesTable()
+		render "=== Done"
+	}
+	
+	@Secured(['ROLE_ADMIN'])
+	def migrateChecklist = {
+		checklistService.migrateChecklist()
+		render "Done ==== " 
 	}
 	
 }

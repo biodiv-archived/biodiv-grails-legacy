@@ -8,7 +8,7 @@ import species.participation.Observation
 class UnCuratedVotes {
 	
 	Date votedOn = new Date();
-	//Observation obv;
+	Observation obv;
 	UnCuratedScientificNames sciName;
 	UnCuratedCommonNames commonName;
 	String refType;
@@ -26,6 +26,9 @@ class UnCuratedVotes {
 		refId(nullable:false);
 		sciName(nullable:true);
 		commonName(nullable:true);
+		obv(nullable:true);
+		refType(nullable:true);
+		refId(nullable:true);
 	}
 
 	static mapping = { version false; }

@@ -329,7 +329,10 @@ class ObservationService {
 	
 	private  Recommendation findReco(name, isScientificName, languageId, taxonConceptForNewReco){
 		if(name){
-			name = Utils.cleanName(name);
+			//name = Utils.cleanName(name);
+			
+			//XXX for getting name through parser
+			name = Utils.getCanonicalForm(name);
 			def c = Recommendation.createCriteria();
 			def result = c.list {
 				ilike('name', name);
@@ -339,6 +342,7 @@ class ObservationService {
 			def reco = result?result[0]:null;
 			if(!reco) {
 				reco = new Recommendation(name:name, taxonConcept:taxonConceptForNewReco, isScientificName:isScientificName, languageId:languageId);
+				log.debug "createing new recommendation $reco"
 				if(!recommendationService.save(reco)) {
 					reco = null;
 				}
