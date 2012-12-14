@@ -158,7 +158,9 @@ class Utils {
 
 	static String getDomainName(HttpServletRequest request) {
 		def domain = getDomain(request);
-		if(domain.startsWith("thewesternghats.in")) {
+		def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+		
+		if(domain.startsWith(config.wgp.domain)) {
 			return "The Westernghats Portal"
 		} else {
 			return "India Biodiversity Portal"

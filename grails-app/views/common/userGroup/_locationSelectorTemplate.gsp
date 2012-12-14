@@ -86,7 +86,7 @@
 <div class="observation_location">
 <div id="map_canvas" style="width:100%; height: 300px;"></div>
 </div>
-<input id="sw_latitude" type="hidden" name="sw_latitude"/>
-<input id="sw_longitude" type="hidden" name="sw_longitude"/>
-<input id="ne_latitude" type="hidden" name="ne_latitude"/>
-<input id="ne_longitude" type="hidden" name="ne_longitude"/>
+<input id="sw_latitude" type="hidden" name="sw_latitude" value="${userGroupInstance?.sw_latitude}"/>
+<input id="sw_longitude" type="hidden" name="sw_longitude" value="${userGroupInstance?.sw_longitude}"/>
+<input id="ne_latitude" type="hidden" name="ne_latitude" value="${userGroupInstance?.ne_latitude}"/>
+<input id="ne_longitude" type="hidden" name="ne_longitude" value="${userGroupInstance?.ne_longitude}"/>

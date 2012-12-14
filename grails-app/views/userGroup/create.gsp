@@ -276,7 +276,7 @@ max-width: 100%;
 					<div class="section"
 						style="position: relative; overflow: visible;">
 						<h3>Location</h3>
-                                                <uGroup:locationSelector/>
+                                                <uGroup:locationSelector model="['userGroupInstance':userGroupInstance]"/>
                                         </div>
                                 </div>
 

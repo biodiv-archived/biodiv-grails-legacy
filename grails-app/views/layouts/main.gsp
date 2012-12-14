@@ -14,7 +14,7 @@
 
 <r:layoutResources />
 <ckeditor:resources />
-
+<g:set var="domain" value="${Utils.getDomain(request)}"/>
 <g:if test="${domain.equals(grailsApplication.config.ibp.domain) }">
 	<link rel="shortcut icon" href="/sites/default/files/ibp_favicon_2.png"
 		type="image/x-icon" />
