@@ -134,6 +134,8 @@ class ChecklistController {
 			if(offset){
 				firstResult offset
 			}
+			
+			order 'fromDate', 'desc'
 		}
 	}
 	
