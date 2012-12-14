@@ -28,7 +28,7 @@ class ChecklistService {
 	static final String SN_NAME = "scientific_name"
 	static final String CN_NAME = "common_name"
 
-	String connectionUrl =  "jdbc:postgresql://localhost/ibp";
+	String connectionUrl =  "jdbc:postgresql://localhost/ibppamba";
 	String userName = "postgres";
 	String password = "postgres123";
 
@@ -37,9 +37,16 @@ class ChecklistService {
 	def migrateChecklist(){
 		def sql = Sql.newInstance(connectionUrl, userName, password, "org.postgresql.Driver");
 		int i=0;
-		sql.eachRow("select nid, vid, title from node where type = 'checklist'") { row ->
-			log.debug " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>     title ===  $i " + row.title
-			Checklist checklist = createCheckList(row, sql)
+		sql.eachRow("select nid, vid, title from node where type = 'checklist' order by nid offset 12") { row ->
+			log.debug " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>     title ===  $i  $row.title  nid == $row.nid , vid == $row.vid"
+			try{
+				Checklist checklist = createCheckList(row, sql)
+			}catch (Exception e) {
+				println "=============================== EXCEPTION in create checklist ======================="
+				println " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>     title ===  $i  $row.title  nid == $row.nid , vid == $row.vid"
+				e.printStackTrace()
+				println "====================================================================================="
+			}
 			i++
 		}
 	}
@@ -80,6 +87,7 @@ class ChecklistService {
 
 		//others
 		cl.reservesValue = row.field_checklist_reserves_value
+		
 		if(!cl.save(flush:true)){
 			cl.errors.allErrors.each { log.error it }
 			return null
@@ -89,6 +97,7 @@ class ChecklistService {
 			log.debug "saved successfully  >>>>>>> " + cl
 			return cl
 		}
+		
 
 	}
 
@@ -225,17 +234,17 @@ class ChecklistService {
 	private License getLicense(licId){
 		switch (licId) {
 			case 1:
-				return License.read(7)
+				return License.read(827)
 			case 2:
-				return License.read(6)
+				return License.read(826)
 			case 3:
-				return License.read(5)
+				return License.read(825)
 			case 4:
-				return License.read(4)
+				return License.read(824)
 			case 5:
-				return License.read(3)
+				return License.read(823)
 			case 6:
-				return License.read(2)
+				return License.read(822)
 			default:
 				log.debug "========== licId " + licId
 				return null;
@@ -246,23 +255,36 @@ class ChecklistService {
 	private SpeciesGroup getSpeciesGroup(nid, vid, title, Sql sql){
 		String query = "select common_name as cn from ibpcl_taxa as ita where ita.id = " + sql.firstRow("select field_taxa_value as tt from content_field_taxa as t1 where t1.nid = $nid and t1.vid = $vid").get("tt")
 		String taxaName = sql.firstRow(query).get("cn")
+		if(taxaName.equalsIgnoreCase("Insects")){
+			taxaName = "Arthropods"
+		}else if(taxaName.equalsIgnoreCase("Fungi including lichens")){
+			taxaName = "Fungi"
+		}else if("Algae".equalsIgnoreCase(taxaName)){
+			taxaName = "Others"
+		}else if(taxaName.equalsIgnoreCase("Higher Plants")){
+			taxaName = "Plants"
+		}else if(taxaName.equalsIgnoreCase("Viruses") ||taxaName.equalsIgnoreCase("Bacteria and Protozoans")){
+			taxaName = "Others"
+		}
+		
+		
 		def sg = SpeciesGroup.findByName(taxaName)
 		if(!sg){
-			if("Algae".equalsIgnoreCase(taxaName))
-				sg = SpeciesGroup.findByName("Others")
-			else{
 				// in this case group name is invertebrates
 				title = title.trim()
 				if(title == "Checklist of Annelids of Punjab" || title ==  "Checklist of Protozoans of Punjab" || title == "Checklist of Nematodes of Punjab" || title == "Checklist of Platyhelminthes of Punjab" || title == "Checklist of Crustaceans of Punjab"){
 					sg = SpeciesGroup.findByName("Others")
 				}else if(title == "Checklist of Molluscs of Punjab"){
-					sg = SpeciesGroup.findByName("Mullusks")
+					sg = SpeciesGroup.findByName("Molluscs")
 				}else if(title == "Checklist of Thrips of Punjab" || title == "Checklist of Dipterans of Punjab"){
-					sg = SpeciesGroup.findByName("Insects")
+					sg = SpeciesGroup.findByName("Arthropods")
 				}else{
-					sg = SpeciesGroup.findByName("Arachnids")
+					sg = SpeciesGroup.findByName("Arthropods")
 				}
-			}
+			
+		}
+		if(!sg){
+			sg = SpeciesGroup.findByName("Others")
 		}
 		return sg
 	}

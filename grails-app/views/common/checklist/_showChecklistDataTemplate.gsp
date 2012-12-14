@@ -27,9 +27,9 @@
 				</g:if>
 				
 				<g:if test="${row.reco}">
-					<g:if test="${row.reco.taxonConcept && row.reco.taxonConcep.canonicalForm != null}">
+					<g:if test="${row.reco.taxonConcept && row.reco.taxonConcept.canonicalForm != null}">
 						<td>
-						<a href="${uGroup.createLink(action:'show', controller:'species', id:reco.taxonConcept.findSpeciesId(), 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
+						<a href="${uGroup.createLink(action:'show', controller:'species', id:row.reco.taxonConcept.findSpeciesId(), 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
 							<i> ${row.reco.taxonConcept.canonicalForm}</i>
 						</a>
 						</td>

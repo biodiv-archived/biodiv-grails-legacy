@@ -76,7 +76,11 @@ class Utils {
 	}
 
 	static String getCanonicalForm(String name){
-		return namesParser.parse([name])?.get(0)?.canonicalForm
+		def taxonDef = namesParser.parse([name])?.get(0)
+		if(taxonDef){
+			return taxonDef.canonicalForm ?:taxonDef.name
+		}
+		return cleanName(name)
 	}
 
 	static void populateHttpServletRequestParams(ServletRequest request, Map params) {
