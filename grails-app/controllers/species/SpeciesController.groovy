@@ -16,6 +16,8 @@ import groovy.sql.Sql
 import groovy.xml.MarkupBuilder;
 import org.apache.solr.common.SolrException;
 import org.apache.solr.common.util.NamedList
+import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
+
 import species.utils.Utils;
 import grails.plugins.springsecurity.Secured
 
@@ -26,7 +28,7 @@ class SpeciesController {
 	def speciesSearchService;
 	def namesIndexerService;
 	def speciesService;
-	
+
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
 	def index = {
@@ -43,14 +45,14 @@ class SpeciesController {
 		params.offset = params.offset ? params.int('offset') : 0
 		params.sort = params.sort?:"percentOfInfo"
 		params.order = params.sort.equals("percentOfInfo")?"desc":params.sort.equals("title")?"asc":"asc"
-		
+
 		log.debug params
 		def groupIds = params.sGroup.tokenize(',')?.collect {Long.parseLong(it)}
-			 
+
 		int count = 0;
 		if (params.startsWith && params.sGroup) {
 			String query, countQuery;
-			
+
 			if(groupIds.size() == 1 && groupIds[0] == allGroup.id) {
 				if(params.startsWith == "A-Z") {
 					query = "select s from Species s order by s.${params.sort} ${params.order}";
@@ -68,7 +70,7 @@ class SpeciesController {
 					countQuery = "select count(*) as count from Species s, TaxonomyDefinition t where s.title like '<i>${params.startsWith}%' and s.taxonConcept = t and t.group.id  in (:sGroup)";
 				}
 			}
-			
+
 			def speciesInstanceList;
 			if(groupIds.size() == 1 && groupIds[0] == allGroup.id) {
 				speciesInstanceList = Species.executeQuery(query, [max:params.max, offset:params.offset]);
@@ -365,113 +367,105 @@ class SpeciesController {
 	///////////////////////////////////////////////////////////////////////////////
 	////////////////////////////// SEARCH /////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////
-	
+
 	/**
-	*
-	*/
-   def search = {
-	   log.debug params;
-	   def searchFieldsConfig = grailsApplication.config.speciesPortal.searchFields
+	 *
+	 */
+	def search = {
+		log.debug params;
+		def searchFieldsConfig = grailsApplication.config.speciesPortal.searchFields
+		def queryParams = [:]
+		String query = params.query?:'';
+		params.remove('query');
+		
+		if(SpringSecurityUtils.isAjax(request)) {
+			if(query) query += " AND "
+			for(field in params) {
+				if(!(field.key ==~ /action|controller|sort|fl|start|rows|webaddress/) && field.value ) {
+					if(field.key.equalsIgnoreCase('name')) {
+						query = query + " " +field.value;
+					} else {
+						query = query + " " + field.key + ': ('+field.value+')';
+					}
+				}
+			}
+		}
+		
+		query = params.query = Utils.cleanSearchQuery(query);
+		
+		if(query) {
+			NamedList paramsList = new NamedList();
+			paramsList.add('q', query);
+			paramsList.add('start', params['offset']?:"0");
+			paramsList.add('rows', params['max']?:"10");
+			paramsList.add('sort', params['sort']?params['sort']+" desc":"score desc");
+			paramsList.add('fl', params['fl']?:"id, name");
+			//		   paramsList.add('facet', "true");
+			//		   paramsList.add('facet.limit', "-1");
+			//		   paramsList.add('facet.mincount', "1");
 
-	   if(params.query) {
-		   NamedList paramsList = new NamedList();
-		   paramsList.add('q', Utils.cleanSearchQuery(params.query));
-		   params.remove('query');
-		   paramsList.add('start', params['start']?:"0");
-		   paramsList.add('rows', params['rows']?:"10");
-		   paramsList.add('sort', params['sort']?params['sort']+" desc":"score desc");
-		   paramsList.add('fl', params['fl']?:"id, name");
-//		   paramsList.add('facet', "true");
-//		   paramsList.add('facet.limit', "-1");
-//		   paramsList.add('facet.mincount', "1");
-		   
-		   
-		   /*paramsList.add('facet.field', searchFieldsConfig.NAME_EXACT);
-		   paramsList.add('facet.field', searchFieldsConfig.CANONICAL_NAME_EXACT);
-		   paramsList.add('facet.field', searchFieldsConfig.COMMON_NAME_EXACT);
-		   paramsList.add('facet.field', searchFieldsConfig.UNINOMIAL_EXACT)
-		   paramsList.add('facet.field', searchFieldsConfig.GENUS)
-		   paramsList.add('facet.field', searchFieldsConfig.SPECIES)
-		   paramsList.add('facet.field', searchFieldsConfig.AUTHOR)
-		   paramsList.add('facet.field', searchFieldsConfig.YEAR)
-		   */
-		   
-		   log.debug "Along with faceting params : "+paramsList;
-		   try {
-			   def queryResponse = speciesSearchService.search(paramsList);
-			   List<Species> speciesInstanceList = new ArrayList<Species>();
-			   Iterator iter = queryResponse.getResults().listIterator();
-			   while(iter.hasNext()) {
-				   def doc = iter.next();
-				   def speciesInstance = Species.get(doc.getFieldValue("id"));
-				   if(speciesInstance)
-					   speciesInstanceList.add(speciesInstance);
-			   }
-			   
-			   [responseHeader:queryResponse.responseHeader, total:queryResponse.getResults().getNumFound(), speciesInstanceList:speciesInstanceList, snippets:queryResponse.getHighlighting()];
-		   } catch(SolrException e) {
-			   e.printStackTrace();
-			   [params:params, speciesInstanceList:[]];
-		   }
-	   } else {
-		   [params:params, speciesInstanceList:[]];
-	   }
-   }
 
-   /**
-	*
-	*/
-   def advSearch = {
-	   log.debug params;
-	   String query  = "";
-	   def newParams = [:]
-	   for(field in params) {
-		   if(!(field.key ==~ /action|controller|sort|fl|start|rows/) && field.value ) {
-			   if(field.key.equalsIgnoreCase('name')) {
-				   newParams[field.key] = field.value;
-				   query = query + " " +field.value;
-			   } else {
-				   newParams[field.key] = field.value;
-				   query = query + " " + field.key + ': "'+field.value+'"';
-			   }
-		   }
-	   }
-	   if(query) {
-		   newParams['query'] = query;
-		   redirect (action:"search", params:newParams);
-	   }
-	   render (view:'advSearch', params:newParams);
-   }
-   
+			/*paramsList.add('facet.field', searchFieldsConfig.NAME_EXACT);
+			 paramsList.add('facet.field', searchFieldsConfig.CANONICAL_NAME_EXACT);
+			 paramsList.add('facet.field', searchFieldsConfig.COMMON_NAME_EXACT);
+			 paramsList.add('facet.field', searchFieldsConfig.UNINOMIAL_EXACT)
+			 paramsList.add('facet.field', searchFieldsConfig.GENUS)
+			 paramsList.add('facet.field', searchFieldsConfig.SPECIES)
+			 paramsList.add('facet.field', searchFieldsConfig.AUTHOR)
+			 paramsList.add('facet.field', searchFieldsConfig.YEAR)
+			 */
 
-   def nameTerms = {
-	   log.debug params;
-	   params.field = params.field?:"autocomplete";
-	   List result = speciesService.nameTerms(params);
-	   render result as JSON;
-   }
+			log.debug "Along with faceting params : "+paramsList;
+			try {
+				def queryResponse = speciesSearchService.search(paramsList);
+				List<Species> speciesInstanceList = new ArrayList<Species>();
+				Iterator iter = queryResponse.getResults().listIterator();
+				while(iter.hasNext()) {
+					def doc = iter.next();
+					def speciesInstance = Species.get(doc.getFieldValue("id"));
+					if(speciesInstance)
+						speciesInstanceList.add(speciesInstance);
+				}
+				
+				queryParams = queryResponse.responseHeader.params
+				def model = [queryParams:queryParams, total:queryResponse.getResults().getNumFound(), speciesInstanceList:speciesInstanceList, snippets:queryResponse.getHighlighting()]
+				if(SpringSecurityUtils.isAjax(request)) {
+					render(template:'/species/searchResultsTemplate', model:model);
+					return;
+				} else {
+					return model;
+					
+				}
+				
+			} catch(e) {
+				e.printStackTrace();
+			}
+		} 
+		
+		if(SpringSecurityUtils.isAjax(request)) {
+			render(template:'/species/searchResultsTemplate', model:[queryParams:queryParams, total:0, speciesInstanceList:[]]);
+		} else {
+			render(view:'search', model:[queryParams:queryParams, total:0, speciesInstanceList:[]]);
+		}
+		return;
+	}
 
-   /**
-	*
-	*/
-   def terms = {
-	   log.debug params;
-	   params.field = params.field?:"autocomplete";
-	   List result = new ArrayList();
+	
 
-	   if(params.field == "autocomplete" || params.field == 'name') {
-		   def namesLookupResults = namesIndexerService.suggest(params)
-		   result.addAll(namesLookupResults);
-	   } else {
+	/**
+	 *
+	 */
+	def terms = {
+		log.debug params;
+		params.field = params.field?:"autocomplete";
+		List result = new ArrayList();
 
-		   def queryResponse = speciesSearchService.terms(params);
-		   NamedList tags = (NamedList) ((NamedList)queryResponse.getResponse().terms)[params.field];
-
-		   for (Iterator iterator = tags.iterator(); iterator.hasNext();) {
-			   Map.Entry tag = (Map.Entry) iterator.next();
-			   result.add([value:tag.getKey().toString(), label:tag.getKey().toString(),  "category":"General"]);
-		   }
-	   }
-	   render result as JSON;
-   }
+		if(params.field == "autocomplete" || params.field == 'name') {
+			def namesLookupResults = namesIndexerService.suggest(params)
+			result.addAll(namesLookupResults);
+		} else {
+			result = speciesService.nameTerms(params);
+		}
+		render (result.value as JSON);
+	}
 }

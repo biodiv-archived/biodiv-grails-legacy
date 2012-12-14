@@ -329,7 +329,7 @@ class SpeciesService {
 	def nameTerms(params) {
 		List result = new ArrayList();
 		
-	   def queryResponse = speciesSearchService.terms(params.term, params.max);
+	   def queryResponse = speciesSearchService.terms(params.term, params.field, params.max);
 	   NamedList tags = (NamedList) ((NamedList)queryResponse.getResponse().terms)[params.field];
 
 	   for (Iterator iterator = tags.iterator(); iterator.hasNext();) {

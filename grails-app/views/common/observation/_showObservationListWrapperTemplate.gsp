@@ -83,11 +83,8 @@
 <g:javascript>
 $(document).ready(function() {
 	window.params = {
-	<%
-		params.each { key, value ->
-			println '"'+key.replaceAll('"','')+'":"'+(value+'').replaceAll('"','')+'",'
-		}
-	%>
+		'offset':"${params.offset}",
+		'isGalleryUpdate':"${params.isGalleryUpdate}",	
 		"tagsLink":"${uGroup.createLink(controller:'observation', action: 'tags')}",
 		"queryParamsMax":"${queryParams?.max}"
 	}

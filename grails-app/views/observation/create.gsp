@@ -774,12 +774,12 @@ input.dms_field {
 		$(".tagit-hiddenSelect").css('display','none');
 
  		 $("#addObservationSubmit").click(function(){
+ 		 	$(this).addClass("disabled");
         	var tags = $("ul[name='tags']").tagit("tags");
         	$.each(tags, function(index){
         		var input = $("<input>").attr("type", "hidden").attr("name", "tags."+index).val(this);
 				$('#addObservation').append($(input));	
         	})
-        	
         	
 			$("#userGroupsList").val(getSelectedUserGroups());	       	
         	$("#addObservation").submit();        	

@@ -14,7 +14,7 @@ import species.utils.ImageUtils;
 class Species {
 
 	String title; 
-	String guid;
+	String guid; 
 	TaxonomyDefinition taxonConcept;
 	Resource reprImage;
 	Float percentOfInfo; 

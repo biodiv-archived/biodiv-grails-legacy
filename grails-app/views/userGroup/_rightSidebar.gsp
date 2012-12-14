@@ -1,9 +1,14 @@
 
-<div class="sidebar right-sidebar span3">
+<div id="right-sidebar" class="sidebar right-sidebar span3">
 	<div class="sidebar_section" style="left: 0px">
-		<h5><i class=" icon-bookmark"></i>Bookmarks</h5>
+      <a data-toggle="collapse" href="#advSearchBox"><h5><i class=" icon-search"></i>Advanced Search</h5></a>
+      <search:advSearch/>
+	</div>
+	
+	<div class="sidebar_section" style="left: 0px">
+		<a data-toggle="collapse" href="#bookmarks"><h5><i class=" icon-bookmark"></i>Bookmarks</h5></a>
 		
-		<ul class="nav block-tagadelic">
+		<ul class="nav block-tagadelic" id="bookmarks">
 			<g:each in="${pages}" var="newsletterInstance">
 
 				<li><g:if test="${userGroupInstance}">

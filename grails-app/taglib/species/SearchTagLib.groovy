@@ -14,5 +14,15 @@ class SearchTagLib {
 	
 	def noSearchResults =  {attrs, body ->
 		out << render(template:"/common/search/noSearchResultsTemplate", model:attrs.model);
-	} 
+	}
+	
+	def advSearch =  {attrs, body ->
+		def model = attrs.model;
+	
+		if(params.controller == "species") {
+			out << render(template:"/species/advSearchTemplate", model:attrs.model);
+		} else if(params.controller == "observation") {
+			out << render(template:"/observation/advSearchTemplate", model:attrs.model);
+		}
+	}
 }

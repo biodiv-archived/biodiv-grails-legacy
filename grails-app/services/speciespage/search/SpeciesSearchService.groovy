@@ -229,8 +229,8 @@ class SpeciesSearchService {
 	 * @param query
 	 * @return
 	 */
-	def terms(query, limit) {
-		def field = "autocomplete";
+	def terms(query, field, limit) {
+		field = field?:"autocomplete";
 		SolrParams q = new SolrQuery().setQueryType("/terms")
 				.set(TermsParams.TERMS, true).set(TermsParams.TERMS_FIELD, field)
 				.set(TermsParams.TERMS_LOWER, query)

@@ -35,6 +35,7 @@ modules = {
 		resource url:'/css/navigation.css'
 		resource url:'/css/jquery.rating.css'
 		resource url:'/css/wgp.css'
+		resource url:'/css/daterangepicker.css'
 
 
 		resource url:'/bootstrap/js/bootstrap.min.js'
@@ -55,7 +56,9 @@ modules = {
 		resource url:[dir:'js',file:'jquery/jquery.checkbox.js',plugin:'spring-security-ui']
 		resource url:[dir:'js',file:'spring-security-ui.js', plugin:'spring-security-ui']
 		resource url:'/js/jquery/trunk8.js'
-		resource url:'/js/species/membership.js' 
+		resource url:'/js/species/membership.js'
+		resource url:'/js/date.js'
+		resource url:'/js/daterangepicker.js'
 	}
 
 	auth {
@@ -94,7 +97,7 @@ modules = {
 		resource url:'/css/habitats.css'
 		resource url:'/js/jquery/jquery.watermark.min.js'
 		resource url:'/js/jsrender.js'
-		resource url:'/js/bootstrap-typeahead.js'
+		//resource url:'/js/bootstrap-typeahead.js'
 		resource url:'/js/bootstrap-combobox.js'
 	}
 

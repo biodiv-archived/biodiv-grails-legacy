@@ -352,7 +352,10 @@ class UserGroupTagLib {
 	def rightSidebar = {attrs, body->
 		def userGroupInstance = attrs.model?.userGroupInstance;
 		def result = userGroupService.getUserGroupsStickyPages(userGroupInstance, -1, -1);
-		out << render(template:"/userGroup/rightSidebar", model:['pages':result, 'userGroupInstance':userGroupInstance]);
+		if(!attrs.model) attrs.model = [:]
+		attrs.model.pages = result
+		attrs.model.userGroupInstance = userGroupInstance;
+		out << render(template:"/userGroup/rightSidebar", model:attrs.model);
 	}
 	
 	def showGeneralSettings = {attrs, body->

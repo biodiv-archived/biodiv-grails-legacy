@@ -1,8 +1,32 @@
+<div id="nameSuggestionsMain" class="dropdown">
+	<form method="get"
+		action="${uGroup.createLink(controller:params.controller, action:'search', absolute:true) }"
+		id="searchbox" class="navbar-search" style="float:none;">
+		<div class="input-append">
+			<input type="text" name="query" id="searchTextField" value="${(queryParams?.query)?:(queryParams?.q)}"
+				class="search-query span3"
+				placeholder="Search" />
+            <input id="search"  class="btn btn-default" type="submit"
+				value="Search" style="display:none;"/></div>
+
+		<g:hiddenField name="offset" value="0" />
+		<g:hiddenField name="max" value="10" />
+		<g:hiddenField id="searchBoxSort"  name="sort" value="score" />
+		<input type="hidden" name="fl" value="id" />
+		<g:hiddenField name="category" value="species" />
+
+		<!-- 
+		<g:hiddenField name="hl" value="true" />
+		<g:hiddenField name="hl.fl" value="message" />
+		<g:hiddenField name="hl.snippets" value="3" />
+		 -->
+		
+	</form>
+	<a class="dropdown-toggle"  role="button" data-toggle="dropdown" data-target="#" href="#"></a>
+</div>
 <r:script>
 
 $(document).ready(function(){
-
-	$("#searchTextField").val('${responseHeader?.params?.q?:params.query}')
 
 	var cache = {},
 		lastXhr;
@@ -82,29 +106,3 @@ $( "#search" ).click(function() {
 	$( "#searchbox" ).submit();
 });
 </r:script>
-<div id="nameSuggestionsMain"  class="dropdown">
-	<form method="get"
-		action="${uGroup.createLink(controller:params.controller, action:'search', absolute:true) }"
-		id="searchbox" class="navbar-search" style="float:none;">
-		<div class="input-append">
-			<input type="text" name="query" id="searchTextField" value=""
-				class="search-query span3"
-				placeholder="Search" />
-            <input id="search"  class="btn btn-default" type="submit"
-				value="Search" style="display:none;"/></div>
-
-		<g:hiddenField name="start" value="0" />
-		<g:hiddenField name="rows" value="10" />
-		<g:hiddenField id="searchBoxSort"  name="sort" value="score" />
-		<input type="hidden" name="fl" value="id" />
-		<g:hiddenField name="category" value="species" />
-
-		<!-- 
-		<g:hiddenField name="hl" value="true" />
-		<g:hiddenField name="hl.fl" value="message" />
-		<g:hiddenField name="hl.snippets" value="3" />
-		 -->
-		
-	</form>
-	<a class="dropdown-toggle"  role="button" data-toggle="dropdown" data-target="#" href="#"></a>
-</div>

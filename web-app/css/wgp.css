@@ -175,11 +175,6 @@ body { /*     background-color: #ffffff; */
 	margin-right: 10px;
 }
 
-#advSearchForm .prop .name {
-	float: right;
-	text-align: right;
-}
-
 .list_view.thumbnails {
 	margin-left:0px;
 }
@@ -514,9 +509,23 @@ ul#recoSummary {
 }
 
 .sidebar_section {
-	overflow: hidden;
-	padding-bottom: 10px;
+	overflow: visible;
+/* 	padding-bottom: 10px; */
 	margin-bottom: 20px;
+	border: 1px solid #CECECE;
+}
+
+.sidebar_section h5{
+	background: rgba(106, 201, 162, 0.2);
+ 	padding:5px;
+	display: block;
+	font-size : 15px; 
+	font-weight: bold;
+	line-height: 20px;
+	text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+	text-transform: uppercase;
+	margin:0px;
+	cursor:pointer;
 }
 
 .sidebar_section .title {
@@ -733,7 +742,7 @@ ul#recoSummary {
 
 .observations {
 	padding: 10px;
-	box-shadow: 8px 0 6px -6px #5e5e5e;
+/* 	box-shadow: 8px 0 6px -6px #5e5e5e; */
 }
 
 .observations_list {
@@ -1265,11 +1274,6 @@ span.cke_skin_kama {
 	clear:both;
 }
 
-.sidebar-section {
-	width: 450px;
-	margin: 0px 0px 20px -10px;
-	float: right;
-}
 
 .reco-comment-table {
 	background-clip: padding-box;
@@ -1486,6 +1490,9 @@ li#userOrEmail-new {
 
 .right-sidebar {
 	float: right;
+/* 	box-shadow: -7px 0px 8px -6px #5E5E5E; */
+	margin-left: 10px;
+	padding-left: 10px;
 }
 
 .center_panel {
@@ -1494,14 +1501,14 @@ li#userOrEmail-new {
 }
 
 .block-tagadelic {
-	background-color: #D4EDC9;
-	padding: 10px;
-	margin: 5px;
+/* 	background-color: #D4EDC9; */
+/* 	padding: 5px 0px; */
+	margin: 0px 5px 0px 5px;
 	position: relative;
 	/* 	top: 40px; */
 /* 	left: 10px; */
 	/* width: 230px; */
-	border-radius: 7px;
+/* 	border-radius: 7px; */
 	position: relative;
 }
 
@@ -1576,5 +1583,5 @@ li#userOrEmail-new {
 }
 
 #searchTextField {
-border-radius:0;
+	border-radius:0;
 }

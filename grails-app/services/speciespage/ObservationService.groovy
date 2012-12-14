@@ -8,6 +8,7 @@ import org.grails.taggable.TagLink;
 
 import java.util.Date;
 import java.util.Map;
+import java.text.SimpleDateFormat;
 
 import species.Resource;
 import species.Habitat;
@@ -24,9 +25,12 @@ import species.participation.RecommendationVote.ConfidenceType;
 import species.sourcehandler.XMLConverter;
 import species.utils.Utils;
 
+import org.apache.lucene.document.DateField;
+import org.apache.lucene.document.DateTools;
 import org.apache.solr.common.SolrException;
 import org.apache.solr.common.util.NamedList
 
+import org.apache.solr.common.util.DateUtil;
 import org.apache.solr.common.util.NamedList;
 import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
 
@@ -748,11 +752,57 @@ class ObservationService {
 		NamedList paramsList = new NamedList();
 		
 		//params.userName = springSecurityService.currentUser.username;
-		
 		queryParams["query"] = params.query
 		activeFilters["query"] = params.query
 		params.query = params.query ?: "";
+		
+		String aq = "";
+		int i=0;
+		params.aq.each { key, value ->
+			queryParams["aq."+key] = value;
+			activeFilters["aq."+key] = value;
+			if(!(key ==~ /action|controller|sort|fl|start|rows|webaddress/) && value ) {
+				if(i++ == 0) {
+					aq = key + ': ('+value+')';
+				} else {
+					aq = aq + " AND " + key + ': ('+value+')';
+				}
+			}
+		}
+		
+		SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+		if(params.daterangepicker_start && params.daterangepicker_end) {
+			if(i > 0) aq += " AND";
+			String lastRevisedStartDate = dateFormatter.format(DateUtil.parseDate(params.daterangepicker_start, ['dd/MM/yyyy']));
+			String lastRevisedEndDate = dateFormatter.format(DateUtil.parseDate(params.daterangepicker_end, ['dd/MM/yyyy']));
+			aq += " lastrevised:["+lastRevisedStartDate+" TO "+lastRevisedEndDate+"]";
+			queryParams['daterangepicker_start'] = params.daterangepicker_start;
+			queryParams['daterangepicker_end'] = params.daterangepicker_end;
+			activeFilters['daterangepicker_start'] = params.daterangepicker_start;
+			activeFilters['daterangepicker_end'] = params.daterangepicker_end;
 			
+		} else if(params.daterangepicker_start) {
+			if(i > 0) aq += " AND";
+			String lastRevisedStartDate = dateFormatter.format(DateTools.dateToString(DateUtil.parseDate(params.daterangepicker_start, ['dd/MM/yyyy']), DateTools.Resolution.DAY));
+			aq += " lastrevised:["+lastRevisedStartDate+" TO NOW]";
+			queryParams['daterangepicker_start'] = params.daterangepicker_start;
+			activeFilters['daterangepicker_start'] = params.daterangepicker_endparams.daterangepicker_end;
+		} else if (params.daterangepicker_end) {
+			if(i > 0) aq += " AND";
+			String lastRevisedEndDate = dateFormatter.format(DateTools.dateToString(DateUtil.parseDate(params.daterangepicker_end, ['dd/MM/yyyy']), DateTools.Resolution.DAY));
+			aq += " lastrevised:[NOW TO "+lastRevisedEndDate+"]";
+			queryParams['daterangepicker_end'] = params.daterangepicker_end;
+			activeFilters['daterangepicker_end'] = params.daterangepicker_end;
+		}
+		
+		if(params.query && aq) {
+			params.query = params.query + " AND "+aq
+		} else if (aq) {
+			params.query = aq;
+		}
+		
+	
+		
 		paramsList.add('q', Utils.cleanSearchQuery(params.query));
 		//options
 		paramsList.add('start', offset);
@@ -778,7 +828,7 @@ class ObservationService {
 		paramsList.add('facet.mincount', "1");
 		
 		//Filters
-		if(params.sGroup){
+		if(params.sGroup) {
 			params.sGroup = params.sGroup.toLong()
 			def groupId = getSpeciesGroupIds(params.sGroup)
 			if(!groupId){
@@ -825,6 +875,7 @@ class ObservationService {
 			 paramsList.add('fq', searchFieldsConfig.LATLONG+":["+swLat+","+swLon+" TO "+neLat+","+neLon+"]");
 			 activeFilters["bounds"] = params.bounds
 		}
+		
 		log.debug "Along with faceting params : "+paramsList;
 		
 		if(isMapView) {
@@ -834,7 +885,7 @@ class ObservationService {
 			queryParams["max"] = max
 			queryParams["offset"] = offset
 		}
-		
+
 		List<Observation> instanceList = new ArrayList<Observation>();
 		def totalObservationIdList = [];
 		def facetResults = [:], responseHeader
@@ -902,7 +953,7 @@ class ObservationService {
 	def nameTerms(params) {
 		List result = new ArrayList();
 		
-		def queryResponse = observationsSearchService.terms(params.term, params.max);
+		def queryResponse = observationsSearchService.terms(params.term, params.field, params.max);
 		NamedList tags = (NamedList) ((NamedList)queryResponse.getResponse().terms)[params.field];
 		for (Iterator iterator = tags.iterator(); iterator.hasNext();) {
 			Map.Entry tag = (Map.Entry) iterator.next();

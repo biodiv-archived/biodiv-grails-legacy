@@ -1,7 +1,3 @@
-/**
- * 
- */
-
 $(document).ready(function(){
 	$('#selected_sort').tooltip({placement:'right'});
     $('button').tooltip();
@@ -149,6 +145,9 @@ $(document).ready(function(){
     
     $("#removeQueryFilter").live('click', function(){
     	$( "#searchTextField" ).val('');
+    	$("#advSearchForm :input").each(function(index, ele) {
+    		$(this).val('');
+    	});
     	updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
     	return false;
     });
@@ -393,6 +392,20 @@ function getFilterParameters(url, limit, offset, removeUser, removeObv) {
 			delete params['query'];
 		}
 	}
+	
+	$("#advSearchForm :input").each(function(index, ele) {
+		var field = $(this).attr('name');
+		var query = $( this ).val();
+		console.log(query);
+		if(query){
+			params[field] = query;
+		} else {
+			// removing old tag from url
+			if(params[field] != undefined){
+				delete params[field];
+			}
+		}
+	});
 	
 	if(removeUser){
 		if(params['user'] != undefined){

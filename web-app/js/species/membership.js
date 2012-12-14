@@ -58,12 +58,10 @@ function requestMembershipAction(me, requestMembershipUrl) {
 
 function membership_actions() {
 	$(".joinUs").bind('click', function() {
-		console.log('binded fn');
 		joinAction($(this), window.joinUsUrl);
 	})
 	
 	$(".requestMembership").bind('click', function() {
-		console.log('binded reMem fn');
 		requestMembershipAction($(this), window.requestMembershipUrl);
 	})
 	
@@ -182,7 +180,6 @@ function init_group_header() {
  * multiple bindings of following event handlers
  */
 function init_header() {
-	console.log("initializing header")
 	$("#allGroups").click(function(){
 		
 			$("#myGroupsInfo").slideUp('fast');

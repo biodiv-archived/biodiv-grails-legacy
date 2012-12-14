@@ -94,4 +94,10 @@ class SpeciesTagLib {
 	def showSubmenuTemplate = {attrs, body->
 		out << render(template:"/species/speciesSubmenuTemplate", model:attrs.model);
 	}
+	
+	def searchResults = {attrs, body->
+		println "---"
+		println attrs.model
+		out << render(template:"/species/searchResultsTemplate", model:attrs.model);
+	}
 }

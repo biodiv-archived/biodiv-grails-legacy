@@ -1106,7 +1106,8 @@ class ObservationController {
 		model.remove('totalObservationIdList');
 		model['isSearch'] = true;
 		log.debug "Storing all observations ids list in session ${session['obv_ids_list']}";
-		
+		params.action = 'search'
+		params.controller = 'observation'
 		if(params.loadMore?.toBoolean()){
 			params.remove('isGalleryUpdate');
 			render(template:"/common/observation/showObservationListTemplate", model:model);
@@ -1129,58 +1130,17 @@ class ObservationController {
 			return;
 		}
 	}
-	
-	/**
-	 *
-	 */
-	def advSearch = {
-		log.debug params;
-		String query  = "";
-		def newParams = [:]
-		for(field in params) {
-			if(!(field.key ==~ /action|controller|sort|fl|start|rows/) && field.value ) {
-				if(field.key.equalsIgnoreCase('name')) {
-					newParams[field.key] = field.value;
-					query = query + " " +field.value;
-				} else {
-					newParams[field.key] = field.value;
-					query = query + " " + field.key + ': "'+field.value+'"';
-				}
-			}
-		}
-		if(query) {
-			newParams['query'] = query;
-			redirect (action:"search", params:newParams);
-		}
-		render (view:'advSearch', params:newParams);
-	}
-
-	/**
-	 * 
-	 */
-	def nameTerms = {
-		log.debug params;
-		params.field = params.field?:"autocomplete";
-		List result = observationService.nameTerms(params);
-		render result as JSON;
-	}
 
 	/**
 	 *
 	 */
 	def terms = {
 		log.debug params;
-		params.field = params.field?:"autocomplete";
-		List result = new ArrayList();
-		def queryResponse = observationsSearchService.terms(params);
-		NamedList tags = (NamedList) ((NamedList)queryResponse.getResponse().terms)[params.field];
+		params.field = params.field?params.field.replace('aq.',''):"autocomplete";
+		
+		List result = observationService.nameTerms(params)
 
-		for (Iterator iterator = tags.iterator(); iterator.hasNext();) {
-			Map.Entry tag = (Map.Entry) iterator.next();
-			result.add([value:tag.getKey().toString(), label:tag.getKey().toString(),  "category":"Species"]);
-		}
-
-		render result as JSON;
+		render result.value as JSON;
 	}
 
 	///////////////////////////////////////////////////////////////////////////////

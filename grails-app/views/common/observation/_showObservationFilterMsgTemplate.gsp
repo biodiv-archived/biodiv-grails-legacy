@@ -12,89 +12,87 @@
 		$(defId).click();
 	}
 </g:javascript>
-
+ 
 <div class="info-message" id="info-message">
 	<g:if test="${instanceTotal == 0}">
 		<search:noSearchResults />
 	</g:if>
 	<g:else>
 		<span class="name" style="color: #b1b1b1;"><i
-			class="icon-screenshot"></i> ${instanceTotal} </span>${resultType?:'observation'}<g:if test="${instanceTotal!=1}">s</g:if>
+			class="icon-search"></i> ${instanceTotal} </span>
+		${resultType?:'observation'}<g:if test="${instanceTotal!=1}">s</g:if> found 
 
-
-
-
-		<g:if test="${queryParams.groupId instanceof Long }">
+		<g:each in="${queryParams}" var="queryParam">
 			<g:if
-				test="${queryParams.groupId && SpeciesGroup.get(queryParams.groupId)}">
-                                    of <span class="highlight"> <a href="${uGroup.createLink(
+				test="${queryParam.key == 'groupId' && queryParam.value instanceof Long }">
+				<g:if
+					test="${queryParam.value && SpeciesGroup.get(queryParam.value)}">
+                                    of <span class="highlight"> <a
+						href="${uGroup.createLink(
 						controller:"observation", action:"list",
-						params:[sGroup: queryParams.groupId])}">
-						${SpeciesGroup.get(queryParams.groupId).name}
-						<a href="#" onclick="setDefaultGroup(); return false;">[X]</a>
-					</a> </span> group
+						params:[sGroup: queryParam.value])}">
+							${SpeciesGroup.get(queryParam.value).name} <a href="#"
+							onclick="setDefaultGroup(); return false;">[X]</a> </a> </span> group
                             </g:if>
-		</g:if>
-		<g:elseif test="${queryParams.groupId }">
-                           		of <span class="highlight"><a href="${uGroup.createLink(
+			</g:if>
+			<g:elseif test="${queryParam.key == 'groupId' && queryParam.value }">
+                           		of <span class="highlight"><a
+					href="${uGroup.createLink(
 					mapping:"userGroupGeneric", action:"list",
-					params:[sGroup: queryParams.groupId])}">
-					${queryParams.groupId }
-					<a href="#" onclick="setDefaultGroup(); return false;">[X]</a>
-				</a>
-			</span> species group
+					params:[sGroup: queryParam.value])}">
+						${queryParam.value } <a href="#"
+						onclick="setDefaultGroup(); return false;">[X]</a> </a> </span> species group
                            </g:elseif>
 
-		<g:if test="${queryParams.habitat instanceof Long }">
 			<g:if
-				test="${queryParams.habitat && Habitat.get(queryParams.habitat)}">
-                                    in <span class="highlight"><a href="${uGroup.createLink(
+				test="${queryParam.key == 'habitat' && queryParam.value instanceof Long }">
+				<g:if test="${queryParam.value && Habitat.get(queryParam.value)}">
+                                    in <span class="highlight"><a
+						href="${uGroup.createLink(
 						controller:"observation", action:"list",
-						params:[habitat: queryParams.habitat])}">
-						${Habitat.get(queryParams.habitat).name}
-						<a href="#" onclick="setDefaultHabitat(); return false;">[X]</a>
-					</a> </span> habitat
+						params:[habitat: queryParam.value])}">
+							${Habitat.get(queryParam.value).name} <a href="#"
+							onclick="setDefaultHabitat(); return false;">[X]</a> </a> </span> habitat
                             </g:if>
-		</g:if>
-		<g:elseif test="${queryParams.habitat }">
-                           		in <span class="highlight"><a href="${uGroup.createLink(
+			</g:if>
+			<g:elseif test="${queryParam.key == 'habitat' && queryParam.value}">
+                           		in <span class="highlight"><a
+					href="${uGroup.createLink(
 					mapping:"userGroupGeneric", action:"list",
-					params:[habitat: queryParams.habitat])}">
-					${queryParams.habitat }
-					<a href="#" onclick="setDefaultHabitat(); return false;">[X]</a>
-				</a> </span>habitat
+					params:[habitat: queryParam.value])}">
+						${queryParam.value } <a href="#"
+						onclick="setDefaultHabitat(); return false;">[X]</a> </a> </span>habitat
                            </g:elseif>
-		<g:if test="${queryParams.tag}">
+			<g:if test="${queryParam.key == 'tag' && queryParam.value}">
                                     tagged <span class="highlight">
-				<a href="${uGroup.createLink(controller:"observation", action:"list",
-					params:[tag: queryParams.tag])}">
-					${queryParams.tag}
-					<a id="removeTagFilter" href="#">[X]</a>
-				</a> </span>
-		</g:if>
-		<g:if test="${queryParams.user && SUser.read(queryParams.user)}">
+					<a
+					href="${uGroup.createLink(controller:"observation", action:"list",
+					params:[tag: queryParam.value])}">
+						${queryParam.value} <a id="removeTagFilter" href="#">[X]</a> </a> </span>
+			</g:if>
+			<g:if
+				test="${queryParam.key == 'user' && SUser.read(queryParam.value)}">
                                     by user <span class="highlight">
-				<a href="${uGroup.createLink(controller:"SUser", action:"show", id:queryParams.user)}">
-					${SUser.read(queryParams.user).name.encodeAsHTML()}
-					<a id="removeUserFilter" href="#">[X]</a>
-				</a> </span>
-		</g:if>
-		<g:if test="${queryParams.observation}">
+					<a
+					href="${uGroup.createLink(controller:"SUser", action:"show", id:queryParam.value)}">
+						${SUser.read(queryParam.value).name.encodeAsHTML()} <a
+						id="removeUserFilter" href="#">[X]</a> </a> </span>
+			</g:if>
+			<g:if test="${queryParam.key == 'observation' && queryParam.value}">
                                     for  <span class="highlight">
-				<a href="${uGroup.createLink(controller:"observation", action:"show",
-					id:queryParams.observation)}">
-					observation
-					<a id="removeObvFilter" href="#">[X]</a>
-				</a> </span>
-		</g:if>
-		<g:if test="${queryParams.query}">
+					<a
+					href="${uGroup.createLink(controller:"observation", action:"show",
+					id:queryParam.value)}">
+						observation <a id="removeObvFilter" href="#">[X]</a> </a> </span>
+			</g:if>
+			<g:if test="${(queryParam.key == 'query' || queryParam.key == 'q') && queryParam.value}">
                                     for search key <span
-				class="highlight"> <a href="${uGroup.createLink(controller:"observation",
-					action:"search", params:[query: queryParams.query])}">
-					${queryParams.query.encodeAsHTML()}
-					<a id="removeQueryFilter" href="#">[X]</a>
-				</a> </span>
-		</g:if>
-
+					class="highlight"> <a
+					href="${uGroup.createLink(controller:"observation",
+					action:"search", params:[query: queryParam.value])}">
+						${queryParam.value.encodeAsHTML()} <a id="removeQueryFilter"
+						href="#">[X]</a> </a> </span>
+			</g:if>
+		</g:each>
 	</g:else>
 </div>

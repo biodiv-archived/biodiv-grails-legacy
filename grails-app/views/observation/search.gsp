@@ -22,19 +22,5 @@
 		<uGroup:rightSidebar/>
 		<obv:showObservationsListWrapper />
 	</div>
-
-	<g:javascript>
-		$(document).ready(function() {
-			window.params = {
-			<%
-				params.each { key, value ->
-					println '"'+key+'":"'+value+'",'
-				}
-			%>
-				"tagsLink":"${g.createLink(action: 'tags')}",
-				"queryParamsMax":"${queryParams?.max}"
-			}
-		});
-	</g:javascript>
 </body>
 </html>

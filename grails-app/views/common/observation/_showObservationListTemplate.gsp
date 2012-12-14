@@ -1,4 +1,3 @@
-
 <div class="observations_list observation" style="clear: both;">
 	<div class="btn-group button-bar" data-toggle="buttons-radio"
 		style="float: right;">
