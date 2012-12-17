@@ -141,12 +141,7 @@
 <g:javascript>
 $(document).ready(function(){
 	window.params = {
-	<%
-		params.each { key, value ->
-			println '"'+key.replaceAll('"','')+'":"'+(value+'').replaceAll('"','')+'",'
-		}
-	%>
-		"tagsLink":"${g.createLink(action: 'tags')}",
+		"tagsLink":"${uGroup.createLink(controller:'species', action: 'tags')}",
 		"queryParamsMax":"${params.max}",
 		"isGalleryUpdate":false,
 		"offset":0

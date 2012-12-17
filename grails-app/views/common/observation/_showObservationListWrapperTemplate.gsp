@@ -86,7 +86,9 @@ $(document).ready(function() {
 		'offset':"${params.offset}",
 		'isGalleryUpdate':"${params.isGalleryUpdate}",	
 		"tagsLink":"${uGroup.createLink(controller:'observation', action: 'tags')}",
-		"queryParamsMax":"${queryParams?.max}"
+		"queryParamsMax":"${queryParams?.max}",
+		'speciesName':"${params.speciesName }",
+		'isFlagged':"${params.isFlagged }"
 	}
 });
 

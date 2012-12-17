@@ -22,13 +22,12 @@
 	<g:javascript>
 		$(document).ready(function() {
 			window.params = {
-			<%
-				params.each { key, value ->
-					println '"'+key+'":"'+value+'",'
-				}
-			%>
+				'offset':"${params.offset}",
+				'isGalleryUpdate':"${params.isGalleryUpdate}",	
 				"tagsLink":"${uGroup.createLink(controller:'observation', action: 'tags')}",
-				"queryParamsMax":"${queryParams?.max}"
+				"queryParamsMax":"${queryParams?.max}",
+				'speciesName':"${params.speciesName }",
+				'isFlagged':"${params.isFlagged }"
 			}
 			initRelativeTime("${uGroup.createLink(controller:'activityFeed', action:'getServerTime')}");
 		});

@@ -21,13 +21,12 @@
 	$(document).ready(function() {
 
 		window.params = {
-		<%
-			params.each { key, value ->
-				println '"'+key.replaceAll('"','')+'":"'+(value+'').replaceAll('"','')+'",'
-			}
-		%>
-			"tagsLink":"${uGroup.createLink(controller:params.controller, action: 'tags')}",
-			"queryParamsMax":"${params.queryParams?.max}"
+			'offset':"${params.offset}",
+			'isGalleryUpdate':"${params.isGalleryUpdate}",	
+			"tagsLink":"${uGroup.createLink(controller:'observation', action: 'tags')}",
+			"queryParamsMax":"${queryParams?.max}",
+			'speciesName':"${params.speciesName }",
+			'isFlagged':"${params.isFlagged }"
 		}
 	});
 </g:javascript>
