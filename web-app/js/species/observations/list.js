@@ -396,7 +396,6 @@ function getFilterParameters(url, limit, offset, removeUser, removeObv) {
 	$("#advSearchForm :input").each(function(index, ele) {
 		var field = $(this).attr('name');
 		var query = $( this ).val();
-		console.log(query);
 		if(query){
 			params[field] = query;
 		} else {

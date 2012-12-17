@@ -32,7 +32,6 @@
 
 		<g:hiddenField name="offset" value="0" />
 		<g:hiddenField name="max" value="9" />
-		<g:hiddenField name="sort" value="score" />
 		<g:hiddenField name="fl" value="id" />
 
 	</form>
@@ -47,6 +46,10 @@
 <r:script>
 
 $(document).ready(function(){
+	var startDate = "${params.daterangepicker_start}";
+	var endDate = "${params.daterangepicker_end}";
+	startDate = Date.parse(startDate?startDate:(new Date(0)).toString('dd/MM/yyyy'));
+	endDate =  (endDate?Date.parse(endDate):Date.today());
 	
 	$("#uploadedOn").daterangepicker({
 	     ranges: {
@@ -58,6 +61,8 @@ $(document).ready(function(){
               'From beginning of time' : [new Date(0), 'now']
            },
            format: 'dd/MM/yyyy',
+           startDate: startDate,
+           endDate: endDate,
            maxDate: Date.today(),
            parentEl:$("#uploadedOnDatePicker"),
            clickApply: function (e) {
@@ -69,9 +74,8 @@ $(document).ready(function(){
            $('#uploadedOn span.date').html(start.toString('dd/MM/yyyy') + ' - ' + end.toString('dd/MM/yyyy'));
         });
 
-	var startDate = "${params.daterangepicker_start}";
-	var endDate = "${params.daterangepicker_end}";
-    $('#uploadedOn span.date').html((startDate?startDate:(new Date(0)).toString('dd/MM/yyyy')) + ' - ' + (endDate?endDate:Date.today().toString('dd/MM/yyyy')));
+	
+    $('#uploadedOn span.date').html(startDate.toString('dd/MM/yyyy') + ' - ' +endDate.toString('dd/MM/yyyy'));
 	
 	$('#advSearchForm :input:not(input[type=hidden])').each(function(index, ele) {
 		var field = $(this).attr('name');
