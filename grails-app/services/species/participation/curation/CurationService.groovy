@@ -1,5 +1,6 @@
 package species.participation.curation
 
+import species.auth.SUser;
 import species.Language;
 import species.participation.Observation
 import species.participation.Recommendation
@@ -10,7 +11,7 @@ class CurationService {
 
 	def springSecurityService
 
-	def add(Recommendation recoForSciName,  Recommendation recoForCommonName, Observation obv, author){
+	def add(Recommendation recoForSciName,  Recommendation recoForCommonName, refObject, author){
 		UnCuratedScientificNames unSciName;
 		UnCuratedCommonNames unCn;
 
@@ -44,7 +45,7 @@ class CurationService {
 			}
 		}
 
-		addUnCuratedRecommendationVote(unSciName, unCn, obv, author);
+		addUnCuratedRecommendationVote(unSciName, unCn, refObject, author);
 	}
 
 	private boolean isAuthenticRecos(Recommendation recoForSciName, Recommendation recoForCommonName){
@@ -53,13 +54,20 @@ class CurationService {
 	}
 
 
-	private addUnCuratedRecommendationVote(sn, cn, obv, author){
+	private addUnCuratedRecommendationVote(sn, cn, refObject, author){
+		
+		println "ref object ===== " + refObject + "  $sn " + "  $cn " + "  $author"
+ 		
+		//XXX for migrating check list
+		//author = SUser.read(1)
 		author = author?:springSecurityService.currentUser;
-		UnCuratedVotes uv = UnCuratedVotes.findWhere(author:author, sciName:sn, commonName:cn, obv:obv)
+		
+		UnCuratedVotes uv = UnCuratedVotes.findWhere(author:author, sciName:sn, commonName:cn, refType: refObject.class.getCanonicalName(), refId:refObject.id)
 		if(!uv){
-			uv = new UnCuratedVotes(author:author, sciName:sn, commonName:cn, obv:obv);
+			uv = new UnCuratedVotes(author:author, sciName:sn, commonName:cn, refType:refObject.class.getCanonicalName(), refId:refObject.id);
 			if(!uv.save(flush:true)){
-				log.error "Error during UnCuratedVotes save"
+				log.error "Error during UnCuratedVotes save === "
+				uv.errors.allErrors.each { log.error it }
 			}
 
 			//incrementing referecne counter

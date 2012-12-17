@@ -45,8 +45,10 @@
 						class="${(request.getHeader('referer')?.contains('/map') && params.action == 'header')?' active':''}"><a
 						href="${userGroupInstance.domainName}/map" title="Maps">Maps</a></li>
 					<li
-						class="${(request.getHeader('referer')?.contains('/browsechecklists') && params.action == 'header')?' active':''}"><a
-						href="${userGroupInstance.domainName}/browsechecklists" title="Checklists">Checklists</a></li>
+						class="${((params.controller == 'userGroup' && params.action == 'checklist') ||(params.controller == 'checklist'))?' active':''}"><a
+						href="${uGroup.createLink('mapping':'userGroup', 'action':'checklist', 'userGroup':userGroupInstance)}"
+						title="Checklists">Checklists</a>
+					</li>
 
 
 
@@ -110,10 +112,8 @@
 						class="${(request.getHeader('referer')?.contains('/map') && params.action == 'header')?' active':''}"><a
 						href="/map" title="Maps">Maps</a></li>
 					<li
-						class="${(request.getHeader('referer')?.contains('/browsechecklists') && params.action == 'header')?' active':''}"><a
-						href="/browsechecklists" title="Checklists">Checklists</a></li>
-
-
+						class="${(params.controller == 'checklist')?'active':''}"><a
+						href='${uGroup.createLink("controller":"checklist")}' title="Checklists">Checklists</a></li>
 				</ul>
 
 				<ul class="nav pull-right">

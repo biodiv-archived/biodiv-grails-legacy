@@ -11,18 +11,24 @@ class UnCuratedVotes {
 	Observation obv;
 	UnCuratedScientificNames sciName;
 	UnCuratedCommonNames commonName;
-
+	String refType;
+	long refId
 	static constraints = {
 		author(nullable:false, unique:[
 			'author',
 			'sciName',
 			'commonName',
-			'obv'
+			'refType',
+			'refId'
 		]);
 		votedOn validator : {val -> val < new Date()};
-		obv(nullable:false);
+		refType(nullable:false);
+		refId(nullable:false);
 		sciName(nullable:true);
 		commonName(nullable:true);
+		obv(nullable:true);
+		refType(nullable:true);
+		refId(nullable:true);
 	}
 
 	static mapping = { version false; }

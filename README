@@ -1,2 +1,13 @@
+1. Install grails 1.3.7 http://grails.org/download/archive/Grails
 
-README is empty.
+2. Install git http://git-scm.com/book/en/Getting-Started-Installing-Git
+
+3. Go to grails home directory
+	a. git clone https://github.com/strandls/biodiv.git
+	b. cd biodiv; grails upgrade
+	
+4. install solr
+	http://wiki.apache.org/solr/SolrInstall
+	
+5. copy spreadsheets from saturn and run load script
+	

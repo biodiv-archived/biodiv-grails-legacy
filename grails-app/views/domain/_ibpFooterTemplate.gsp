@@ -12,8 +12,8 @@
 					class="nav-header bold ${(request.getHeader('referer')?.contains('/map'))?' active':''}"><a
 					href="${ '/map'}" title="Maps">All Maps</a></li>
 				<li
-					class="nav-header bold ${(request.getHeader('referer')?.contains('/browsechecklists'))?' active':''}"><a
-					href="${ '/browsechecklists'}" title="Checklists">All Checklists</a></li>
+					class=" nav-header bold${(params.controller == 'checklist')?' active':''}"><a
+					href="${uGroup.createLink(controller:'checklist', action:'list')}" title="Checklists">All Checklists</a></li>
 				<!-- li
 					class="nav-header bold ${(params.controller == 'userGroup' && params.action== 'list')?' active':''}"><a
 					href="${ uGroup.createLink(controller:"userGroup", "action":"list")}"
