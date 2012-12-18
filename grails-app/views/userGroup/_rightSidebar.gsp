@@ -1,11 +1,15 @@
 
-<div id="right-sidebar" class="sidebar right-sidebar span3">
-	<div class="sidebar_section" style="left: 0px">
-      <a data-toggle="collapse" href="#advSearchBox"><h5><i class=" icon-search"></i>Advanced Search</h5></a>
-      <search:advSearch/>
-	</div>
+<div id="right-sidebar" class="sidebar right-sidebar span12">
+	<g:if test="${params.action=='search'}">
+		<div class="sidebar_section" style="left: 0px">
+	      <a data-toggle="collapse" href="#advSearchBox"><h5><i class=" icon-search"></i>Advanced Search</h5></a>
+	      <div id="advSearchBox" class="collapse">
+	      	<search:advSearch/>
+	      </div>
+		</div>
+	</g:if>
 	
-	<div class="sidebar_section" style="left: 0px">
+	<!-- div class="sidebar_section" style="left: 0px">
 		<a data-toggle="collapse" href="#bookmarks"><h5><i class=" icon-bookmark"></i>Bookmarks</h5></a>
 		
 		<ul class="nav block-tagadelic" id="bookmarks">
@@ -30,15 +34,15 @@
 				</g:else>
 			</li>
 		</ul>
-	</div>
-	<div class="tags_section sidebar_section">
+	</div-->
+<%--	<div class="tags_section sidebar_section">--%>
 <%--		<g:if test="${params.action == 'search' }">--%>
 <%--			<obv:showAllTags--%>
 <%--				model="['tags':tags , 'count':tags?tags.size():0, 'isAjaxLoad':true, 'context':userGroupInstance]" />--%>
 <%--		</g:if>--%>
 <%--		<g:else>--%>
-			<obv:showAllTags
-				model="['tagFilterByProperty':'All' , 'params':params, 'isAjaxLoad':true, 'context':userGroupInstance]" />
+<%--			<obv:showAllTags--%>
+<%--				model="['tagFilterByProperty':'All' , 'params':params, 'isAjaxLoad':true, 'context':userGroupInstance]" />--%>
 <%--		</g:else>--%>
-	</div>
+<%--	</div>--%>
 </div>

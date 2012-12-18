@@ -96,7 +96,7 @@ class XMLConverter extends SourceConverter {
 			def speciesName = getData(speciesNameNode?.data);
 			if(speciesName) {
 				//getting classification hierarchies and saving these taxon definitions
-				List<TaxonomyRegistry> taxonHierarchy = getClassifications(species.children(), speciesName);
+				List<TaxonomyRegistry> taxonHierarchy = getClassifications(species.children(), speciesName, false);
 
 				//taxonConcept is being taken from only author contributed taxonomy hierarchy
 				TaxonomyDefinition taxonConcept = getTaxonConcept(taxonHierarchy, Classification.findByName(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY));
@@ -988,12 +988,12 @@ class XMLConverter extends SourceConverter {
 	 * Creating the given classification entries hierarchy.
 	 * Saves any new taxondefinition found 
 	 */
-	private List<TaxonomyRegistry> getClassifications(List speciesNodes, String scientificName) {
+	private List<TaxonomyRegistry> getClassifications(List speciesNodes, String scientificName, boolean saveHierarchy = true) {
 		def classifications = Classification.list();
 		def taxonHierarchies = new ArrayList();
 		classifications.each {
 			List taxonNodes = getNodesFromCategory(speciesNodes, it.name);
-			def t = getTaxonHierarchy(taxonNodes, it, scientificName);
+			def t = getTaxonHierarchy(taxonNodes, it, scientificName, saveHierarchy);
 			if(t) {
 				cleanUpGorm();
 				taxonHierarchies.addAll(t);
@@ -1022,7 +1022,7 @@ class XMLConverter extends SourceConverter {
 	 * @param scientificName
 	 * @return
 	 */
-	private List<TaxonomyRegistry> getTaxonHierarchy(List fieldNodes, Classification classification, String scientificName) {
+	private List<TaxonomyRegistry> getTaxonHierarchy(List fieldNodes, Classification classification, String scientificName, boolean saveTaxonHierarchy=true) {
 		log.debug "Getting classification hierarchy : "+classification.name;
 
 		List<TaxonomyRegistry> taxonEntities = new ArrayList<TaxonomyRegistry>();
@@ -1065,7 +1065,8 @@ class XMLConverter extends SourceConverter {
 						eq("rank", rank);
 						ilike("canonicalForm", parsedName.canonicalForm);
 					}
-					if(!taxon) {
+
+					if(!taxon && saveTaxonHierarchy) {
 						log.debug "Saving taxon definition"
 						taxon = parsedName;
 						taxon.rank = rank;
@@ -1092,7 +1093,7 @@ class XMLConverter extends SourceConverter {
 					if(registry) {
 						log.debug "Taxon registry already exists : "+registry;
 						taxonEntities.add(registry);
-					} else {
+					} else if(saveTaxonHierarchy) {
 						log.debug "Saving taxon registry entity : "+ent;
 						if(!ent.save()) {
 							ent.errors.each { log.error it }
@@ -1271,4 +1272,5 @@ class XMLConverter extends SourceConverter {
 			//		   hibSession.clear()
 		}
 	}
+	
 }

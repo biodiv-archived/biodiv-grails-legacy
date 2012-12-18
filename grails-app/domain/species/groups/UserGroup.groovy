@@ -242,7 +242,14 @@ class UserGroup implements Taggable {
 	}
 
 	def getAllMembersCount() {
-		return UserGroupMemberRole.countByUserGroup(this);
+		def c = UserGroupMemberRole.createCriteria()
+		def memberCount = c.get {
+			eq('userGroup', this)
+			projections {
+				countDistinct "sUser"
+			}
+		}
+		return memberCount;
 	}
 
 	boolean isFounder(SUser user) {
@@ -286,6 +293,8 @@ class UserGroup implements Taggable {
 			query += (roleId) ? " and umg.role_id $roleId" : ""
 			query += " group by umg.s_user_id  order by activitycount desc limit $max offset $offset"
 			
+			log.debug "Getting users list : $query"
+			
 			def sql =  Sql.newInstance(dataSource);
 			sql.rows(query).each{
 				res.add(SUser.read(it.getProperty("user")));
@@ -297,6 +306,7 @@ class UserGroup implements Taggable {
 		String query = "from UserGroupMemberRole as umr where umr.userGroup = :userGroup"
 		query += (roleId) ? " and umg.role.id $roleId" : ""
 		query += " order by umr.sUser.$sortBy $sortOrder"
+		log.debug "Getting users list : $query"
 		return UserGroupMemberRole.findAll(query, [userGroup:this, max:max, offset:offset]).collect{it.sUser}
 	}
 

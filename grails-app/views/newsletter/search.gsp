@@ -18,68 +18,40 @@
             padding: 5px;
         }
         </style>
-        <r:require modules="core"/>
+        <r:require modules="observations_list"/>
     </head>
     <body>
         <div class="span12">
 			<div class="page-header clearfix">
 				<search:searchResultsHeading />
 			</div>
-			<uGroup:rightSidebar/>
-            
-            <g:if test="${flash.message}">
+			
+			<g:if test="${flash.message}">
 	            <div class="message">${flash.message}</div>
             </g:if>
-            <div class="list span9"  style="margin-left:0px;">
-            <g:if test="${!total}">
-				<search:noSearchResults />
-			</g:if>
-			<g:else>
             
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                        
-                            <g:sortableColumn property="date" title="${message(code: 'newsletter.date.label', default: 'Date')}" />
-                        
-                            <g:sortableColumn property="title" title="${message(code: 'newsletter.title.label', default: 'Title')}" />
-                            <g:sortableColumn property="userGroup" title="${message(code: 'newsletter.userGroup.label', default: 'Group')}" />
-                        
-                        </tr>
-                    </thead>
-                    <tbody>
-                    <g:each in="${instanceList}" status="i" var="newsletterInstance">
-                        <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-                        
-                            <td><g:formatDate date="${newsletterInstance.date}" type="date" style="MEDIUM"/></td>
-                        
-                            <td>
-                            	<g:if test="${newsletterInstance.userGroup}">
-                            		<g:link url="${uGroup.createLink(mapping:'userGroup', action:'page', id:newsletterInstance.id, userGroup:newsletterInstance.userGroup)}">${fieldValue(bean: newsletterInstance, field: "title")}</g:link>
-                            	</g:if>
-                            	
-                            	<g:else>
-                            		<g:link url="${uGroup.createLink(mapping:'userGroupGeneric', action:'page', id:newsletterInstance.id)}">${fieldValue(bean: newsletterInstance, field: "title")}</g:link>
-                            	</g:else>
-                            	
-                            </td>
-                            <td>
-                            <g:if test="${newsletterInstance.userGroup}">
-                            	<g:link url="${uGroup.createLink(controller:'userGroup', action:'show', id:newsletterInstance.userGroup.id)}">${newsletterInstance.userGroup?newsletterInstance.userGroup.name:''}</g:link>
-                            </g:if>
-                            </td>
-                        
-                        </tr>
-                    </g:each>
-                    </tbody>
-                </table>
-            
-            <div class="paginateButtons">
-                <p:paginateOnSearchResult total="${total}" action="search"
-											params="[query:responseHeader.params.q, fl:responseHeader.params.fl]" />
-            </div>
-            </g:else>
-            </div>
-        </div>
+			<uGroup:rightSidebar/>
+			
+			<!-- main_content -->
+			<div id="searchResults" class="list" style="margin-left: 0px; clear:both;">
+				<newsletter:searchResults/>
+			</div>
+		</div>
+         
+<g:javascript>
+$(document).ready(function() {
+	window.params = {
+		'offset':"${params.offset}",
+		'isGalleryUpdate':"${params.isGalleryUpdate}",	
+		"tagsLink":"${uGroup.createLink(controller:'newsletter', action: 'tags')}",
+		"queryParamsMax":"${queryParams?.max}",
+		'speciesName':"${params.speciesName }",
+		'isFlagged':"${params.isFlagged }"
+	}
+	
+});
+
+</g:javascript>
     </body>
+
 </html>

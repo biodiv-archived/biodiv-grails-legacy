@@ -25,9 +25,12 @@
 	<div class="observation span12">
 		<uGroup:showSubmenuTemplate model="['entityName':'Members']"/>
 		<uGroup:rightSidebar  model="['userGroupInstance':userGroupInstance]"/>
-		<div class="userGroup-section center_panel">
+		<div class="userGroup-section">
 			<div class="tabbable">
 				<ul class="nav nav-tabs">
+					<li
+						class="${(!params.action || params.action == 'about')?'active':'' }"><a
+						href="${uGroup.createLink(mapping:'userGroup', action:'about', 'userGroup':userGroupInstance)}"> About Us</a></li>
 					<li
 						class="${(!params.action || params.action == 'user')?'active':'' }"><a
 						href="${uGroup.createLink(mapping:'userGroup', action:'user', 'userGroup':userGroupInstance)}"> All

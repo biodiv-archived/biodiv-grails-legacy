@@ -91,7 +91,7 @@ class ObservationController {
 	}
 
 	protected def getObservationList(params) {
-		def max = Math.min(params.max ? params.int('max') : 9, 100)
+		def max = Math.min(params.max ? params.int('max') : 12, 100)
 		def offset = params.offset ? params.int('offset') : 0
 		def filteredObservation = observationService.getFilteredObservations(params, max, offset, false)
 		def observationInstanceList = filteredObservation.observationInstanceList
@@ -303,7 +303,7 @@ class ObservationController {
 			def nextObservationId = (pos+1 < session[listKey].size()) ? session[listKey][pos+1] : null;
 			if(nextObservationId == null) {			
 				lastListParams.put("append", true);
-				def max = Math.min(lastListParams.max ? lastListParams.int('max') : 9, 100)
+				def max = Math.min(lastListParams.max ? lastListParams.int('max') : 12, 100)
 				def offset = lastListParams.offset ? lastListParams.int('offset') : 0
 				lastListParams.offset = offset + session[listKey].size();
 				log.debug "Fetching new page of observations using params ${lastListParams}";

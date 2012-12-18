@@ -156,7 +156,7 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 					<obv:showStory
 						model="['observationInstance':observationInstance, 'showDetails':true, 'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress]" />
 					
-					<div class="recommendations sidebar_section" style="overflow:visible;">
+					<div class="recommendations sidebar_section" style="overflow:visible;clear:both;">
 						<div>
 							<ul id="recoSummary" class="pollBars">
 
@@ -223,12 +223,12 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 
 					<div class="sidebar_section">
 						<h5>Related observations</h5>
-						<div class="sidebar_section tile" style="clear: both">
+						<div class="tile" style="clear: both">
 							<div class="title">Other observations of the same species</div>
 							<obv:showRelatedStory
 								model="['observationInstance':observationInstance, 'observationId': observationInstance.id, 'controller':'observation', 'action':'getRelatedObservation', 'filterProperty': 'speciesName', 'id':'a','userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress]" />
 						</div>
-						<div class="sidebar_section tile">
+						<div class="tile">
 							<div class="title">Observations nearby</div>
 							<obv:showRelatedStory
 								model="['observationInstance':observationInstance, 'observationId': observationInstance.id, 'controller':'observation', 'action':'getRelatedObservation', 'filterProperty': 'nearBy', 'id':'nearBy', 'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress]" />
@@ -239,7 +239,6 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 					<g:if test="${observationInstance.userGroups}">
 						<div class="sidebar_section">
 							<h5>Observation is in groups</h5>
-							<div class="sidebar_section" style="clear: both">
 								<!-- div class="title">This observation belongs to following groups</div-->
 								<ul class="thumbnails">
 									<g:each in="${observationInstance.userGroups}" var="userGroup">
@@ -250,7 +249,6 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 								</ul>
 								<!-- obv:showRelatedStory
 									model="['observationInstance':observationInstance, 'observationId': observationInstance.id, 'controller':'userGroup', 'action':'getRelatedUserGroups', 'filterProperty': 'obvRelatedUserGroups', 'id':'relatedGroups']" /-->
-							</div>
 						</div>
 					</g:if>
 					

@@ -97,7 +97,7 @@ class ObservationService {
 	 */
 	Map getRelatedObservations(params) {
 		log.debug params;
-		def max = Math.min(params.limit ? params.limit.toInteger() : 9, 100)
+		def max = Math.min(params.limit ? params.limit.toInteger() : 12, 100)
 		def offset = params.offset ? params.offset.toInteger() : 0
 
 		def relatedObv
@@ -726,7 +726,7 @@ class ObservationService {
 	* @return
 	*/
    def getObservationsFromSearch(params) {
-	   def max = Math.min(params.max ? params.int('max') : 9, 100)
+	   def max = Math.min(params.max ? params.int('max') : 12, 100)
 	   def offset = params.offset ? params.long('offset') : 0
 
 	   def model;

@@ -29,9 +29,9 @@
 		<div class="page-header">
 			<search:searchResultsHeading />
 		</div>
-		<uGroup:rightSidebar/>
+		<!-- uGroup:rightSidebar/-->
 
-		<div class="searchResults span9" style="margin-left:0px;">
+		<div class="searchResults" style="margin-left:0px;">
 			<sUser:showUserListWrapper />
 		</div>
 	</div>

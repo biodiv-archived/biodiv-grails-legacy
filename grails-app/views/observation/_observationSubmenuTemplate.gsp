@@ -1,6 +1,6 @@
 
 <g:if test="${entityName}">
-	<div class="page-header">
+	<div class="page-header clearfix">
 		<h1>
 			${entityName}
 		</h1>

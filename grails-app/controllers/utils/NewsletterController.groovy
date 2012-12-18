@@ -2,9 +2,11 @@ package utils
 
 import org.apache.solr.common.SolrException;
 import org.apache.solr.common.util.NamedList;
+import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
 
 import species.groups.UserGroup;
 import species.utils.Utils;
+import grails.converters.JSON;
 import grails.plugins.springsecurity.Secured;
 
 class NewsletterController {
@@ -12,8 +14,10 @@ class NewsletterController {
 	static allowedMethods = [save: "POST", update: "POST"]
 	def userGroupService
 	def newsletterSearchService;
+	def newsletterService
+
 	public static final boolean COMMIT = true;
-	
+
 	def index = {
 		redirect url: uGroup.createLink(mapping:'userGroupGeneric', action: "pages", params: params)
 	}
@@ -40,7 +44,7 @@ class NewsletterController {
 			params.userGroup = userGroupInstance;
 			newsletterInstance = new Newsletter(params)
 			userGroupInstance.addToNewsletters(newsletterInstance);
-			
+
 			if (newsletterInstance.save() && userGroupInstance.save(flush: true)) {
 				postProcessNewsletter(newsletterInstance);
 				flash.message = "${message(code: 'default.created.message', args: [message(code: 'newsletter.label', default: 'Newsletter'), newsletterInstance.title])}"
@@ -73,7 +77,7 @@ class NewsletterController {
 		}
 		else {
 			if(newsletterInstance.userGroup) {
-				[userGroupInstance:newsletterInstance.userGroup, newsletterInstance: newsletterInstance]	
+				[userGroupInstance:newsletterInstance.userGroup, newsletterInstance: newsletterInstance]
 			}
 			else {
 				[newsletterInstance: newsletterInstance]
@@ -173,7 +177,7 @@ class NewsletterController {
 			redirect  url: uGroup.createLink(mapping:'userGroupGeneric', action: "pages")
 		}
 	}
-	
+
 	def postProcessNewsletter(newsletterInstance) {
 		try {
 			newsletterSearchService.publishSearchIndex(newsletterInstance, COMMIT);
@@ -181,47 +185,31 @@ class NewsletterController {
 			e.printStackTrace()
 		}
 	}
-	
-	/**
-	*
-	*/
-   def search = {
-	   log.debug params;
-	   def searchFieldsConfig = grailsApplication.config.speciesPortal.searchFields
 
-	   if(params.query) {
-		   NamedList paramsList = new NamedList();
-		   paramsList.add('q', Utils.cleanSearchQuery(params.query));
-		   params.remove('query');
-		   paramsList.add('start', params['start']?:"0");
-		   paramsList.add('rows', params['rows']?:"10");
-		   paramsList.add('sort', params['sort']?params['sort']+" desc":"score desc");
-		   paramsList.add('fl', params['fl']?:"id, name");
-//		   paramsList.add('facet', "true");
-//		   paramsList.add('facet.limit', "-1");
-//		   paramsList.add('facet.mincount', "1");
-	
-		   
-		   log.debug "Along with faceting params : "+paramsList;
-		   try {
-			   def queryResponse = newsletterSearchService.search(paramsList);
-			   List<Newsletter> instanceList = new ArrayList<Newsletter>();
-			   Iterator iter = queryResponse.getResults().listIterator();
-			   while(iter.hasNext()) {
-				   def doc = iter.next();
-				   def instance = Newsletter.get(doc.getFieldValue("id"));
-				   if(instance)
-					   instanceList.add(instance);
-			   }
-			   
-			   [responseHeader:queryResponse.responseHeader, total:queryResponse.getResults().getNumFound(), instanceList:instanceList, snippets:queryResponse.getHighlighting()];
-		   } catch(SolrException e) {
-			   e.printStackTrace();
-			   [params:params, instanceList:[]];
-		   }
-	   } else {
-		   [params:params, instanceList:[]];
-	   }
-   }
+	/**
+	 *
+	 */
+	def search = {
+		log.debug params;
+
+		def model = newsletterService.search(params)
+
+		if(SpringSecurityUtils.isAjax(request)) {
+			render(template:'/newsletter/searchResultsTemplate', model:model);
+			return;
+		} else {
+			return model;
+		}
+	}
+
+	def terms = {
+		log.debug params;
+		params.field = params.field?params.field.replace('aq.',''):"autocomplete";
+
+		List result = newsletterService.nameTerms(params)
+
+		render result.value as JSON;
+	}
+
 
 }

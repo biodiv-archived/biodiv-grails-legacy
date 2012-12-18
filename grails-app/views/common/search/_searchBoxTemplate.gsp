@@ -1,28 +1,45 @@
-<div id="nameSuggestionsMain" class="dropdown">
+<div class="input-append">
 	<form method="get"
 		action="${uGroup.createLink(controller:params.controller, action:'search', absolute:true) }"
-		id="searchbox" class="navbar-search" style="float:none;">
-		<div class="input-append">
-			<input type="text" name="query" id="searchTextField" value="${(queryParams?.query)?:(queryParams?.q)}"
-				class="search-query span3"
-				placeholder="Search" />
-            <input id="search"  class="btn btn-default" type="submit"
-				value="Search" style="display:none;"/></div>
+		id="searchbox" class="navbar-search" style="float: none;">
+
+		<input type="text" name="query" id="searchTextField"
+			value="${(queryParams?.query)?:((queryParams?.q)?:params.query)}"
+			class="search-query span3" placeholder="Search" />
+
 
 		<g:hiddenField name="offset" value="0" />
 		<g:hiddenField name="max" value="10" />
-		<g:hiddenField id="searchBoxSort"  name="sort" value="score" />
+		<g:hiddenField id="searchBoxSort" name="sort" value="score" />
 		<input type="hidden" name="fl" value="id" />
-		<g:hiddenField name="category" value="species" />
+		<g:hiddenField name="category" value="${params.controller}" />
+
+		<div class="btn-group">
+			<button id="search" class="btn"><i
+						class="icon-search"></i> Search in all groups</button>
+			<button class="btn dropdown-toggle" data-toggle="dropdown">
+				<span class="caret"></span>
+			</button>
+			<ul class="dropdown-menu">
+				<li><a id="searchWithInGroup" href="#"
+					title="Search within this group"><i class="icon-search"></i>Search
+						within this group</a>
+				</li>
+			</ul>
+		</div>
+
 
 		<!-- 
 		<g:hiddenField name="hl" value="true" />
 		<g:hiddenField name="hl.fl" value="message" />
 		<g:hiddenField name="hl.snippets" value="3" />
 		 -->
-		
+
 	</form>
-	<a class="dropdown-toggle"  role="button" data-toggle="dropdown" data-target="#" href="#"></a>
+	<div id="nameSuggestionsMain" class="dropdown">
+		<a class="dropdown-toggle" role="button" data-toggle="dropdown"
+			data-target="#" href="#"></a>
+	</div>
 </div>
 <r:script>
 

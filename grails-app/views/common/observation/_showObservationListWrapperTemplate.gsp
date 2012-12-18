@@ -7,7 +7,7 @@
 
 <div class="">
 	<!-- main_content -->
-	<div class="list span9" style="margin-left:0px;">
+	<div class="list" style="margin-left:0px;clear:both">
 		<div class="filters" style="position: relative;">
 			<obv:showGroupFilter
 				model="['observationInstance':observationInstance, forObservations:true]" />

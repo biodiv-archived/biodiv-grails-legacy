@@ -27,10 +27,10 @@
 
 				<g:if test="${userGroupInstance}">
 					<g:link url="${uGroup.createLink(mapping:'userGroup', action:'pages', id:userGroupInstance.id, userGroup:userGroupInstance)}"
-						class="btn btn-large btn-info">< Back to Newsletters</g:link>
+						class="btn btn-large btn-info">< Back to Pages</g:link>
 				</g:if>
 				<g:else>
-					<g:link url="${uGroup.createLink(mapping:'userGroupGeneric', action:'pages')}" class="btn btn-large btn-info">< Back to Newsletters</g:link>
+					<g:link url="${uGroup.createLink(mapping:'userGroupGeneric', action:'pages')}" class="btn btn-large btn-info">< Back to Pages</g:link>
 				</g:else>
 
 

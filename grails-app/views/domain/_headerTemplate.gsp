@@ -61,10 +61,10 @@
 						href="${uGroup.createLink(mapping:"userGroup", 'action':"activity", 'userGroup':userGroupInstance)}"
 						title="Activity">Activity</a>
 					</li>
-					<li
-						class="${(params.controller == 'userGroup' && params.action == 'user')?' active':''}"><a
-						href="${uGroup.createLink(mapping:"userGroup", 'action':"user", 'userGroup':userGroupInstance)}"
-						title="Members">Members</a>
+					
+					<li class="${(params.controller == 'userGroup' && params.action == 'pages')?' active':''}"><a
+								href="${uGroup.createLink(mapping:"userGroup", 'action':"pages", 'userGroup':userGroupInstance)}"
+								title="Pages">Pages</a>
 					</li>
 
 					<li class="${(params.controller == 'userGroup' && params.action == 'about')?' active':''}"><a
@@ -74,25 +74,19 @@
 					<li class="dropdown"><a href="#" class="dropdown-toggle"
 						data-toggle="dropdown"> More <b class="caret"></b> </a>
 						<ul class="dropdown-menu" style="text-align: left;">
-
-							<li class="${(params.controller == 'userGroup' && params.action == 'pages')?' active':''}"><a
-								href="${uGroup.createLink(mapping:"userGroup", 'action':"pages", 'userGroup':userGroupInstance)}"
-								title="Pages">Pages</a>
-							</li>
+							<!-- li
+								class="${(params.controller == 'userGroup' && params.action == 'user')?' active':''}"><a
+								href="${uGroup.createLink(mapping:"userGroup", 'action':"user", 'userGroup':userGroupInstance)}"
+								title="Members">Members</a>
+							</li-->
+							
 							<li
 								class="${(request.getHeader('referer')?.contains('/calendar') && params.action == 'header')?' active':''}"><a
 								href="/calendar" title="Events">Events</a></li>
 							<li
 								class="${(request.getHeader('referer')?.contains('/biodiversity_news') && params.action == 'header')?' active':''}"><a
 								href="/biodiversity_news" title="News">News</a></li>
-							<li
-								class="${(request.getHeader('referer')?.contains('/cepf_grantee_database') && params.action == 'header')?' active':''}"><a
-								href="/cepf_grantee_database"
-								title="Western Ghats CEPF Projects">Western Ghats CEPF
-									Projects</a></li>
-							<li
-								class="${(request.getHeader('referer')?.contains('/themepages/list') && params.action == 'header')?' active':''}"><a
-								href="/themepages/list" title="Themes">Themes</a></li>
+							
 						</ul></li>
 				</ul>
 
@@ -122,10 +116,11 @@
 					</li>
 
 					<!--li class="menu-449 first"><a href="/" title="">Home</a></li-->
-					<li
-						class="${((params.controller == 'user' || params.controller == 'SUser') && params.action != 'header')?' active':''}"><a
-						href="${uGroup.createLink(controller:'user', action:'list')}"
-						title="Members">Members</a></li>
+					<li class="${(params.action == 'pages')?' active':''}"><a
+								href="${uGroup.createLink(mapping:"pages", controller:"userGroup", 'action':"pages")}"
+								title="Pages">Pages</a>
+					</li>
+					
 					<li
 						class="${(request.getHeader('referer')?.contains('/about') && params.action == 'header')?' active':''}"><a
 						href="/about" title="About Us">About Us </a></li>
@@ -133,10 +128,10 @@
 						data-toggle="dropdown"> More <b class="caret"></b> </a>
 
 						<ul class="dropdown-menu" style="text-align: left; color: #000">
-							<li class="${(params.action == 'pages')?' active':''}"><a
-								href="${uGroup.createLink(mapping:"pages", controller:"userGroup", 'action':"pages")}"
-								title="Pages">Pages</a>
-							</li>
+							<!-- li
+								class="${((params.controller == 'user' || params.controller == 'SUser') && params.action != 'header')?' active':''}"><a
+								href="${uGroup.createLink(controller:'user', action:'list')}"
+								title="Members">Members</a></li-->
 							<li
 								class="${(request.getHeader('referer')?.contains('/calendar') && params.action == 'header')?' active':''}"><a
 								href="/calendar" title="Events">Events</a></li>

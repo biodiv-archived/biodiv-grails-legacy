@@ -1,4 +1,4 @@
-<div id="advSearchBox" class="block-tagadelic ">
+<div  class="block-tagadelic ">
 	<form id="advSearchForm" method="get" action="" title="Advanced Search"
 		class="searchbox">
 		<label class="control-label" for="contributor">Contributor</label> <input

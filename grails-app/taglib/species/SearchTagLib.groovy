@@ -23,6 +23,8 @@ class SearchTagLib {
 			out << render(template:"/species/advSearchTemplate", model:attrs.model);
 		} else if(params.controller == "observation") {
 			out << render(template:"/observation/advSearchTemplate", model:attrs.model);
+		} else if(params.controller == "newsletter") {
+			out << render(template:"/newsletter/advSearchTemplate", model:attrs.model);
 		}
 	}
 }

@@ -3,7 +3,7 @@
 								code='user.username.label' default='Username' />:</label-->
 
 <g:if test='${searched}'>
-	<div class=" center_panel">
+	<div class="">
 		<div class="list">
 			<div class="observations thumbwrap">
 				<%
@@ -61,8 +61,7 @@ def queryParams = [username: username, enabled: enabled, accountExpired: account
 						<div>
 
 							<span class="name" style="color: #b1b1b1;"><i
-								class="icon-user"></i> ${totalCount} </span> User
-							<g:if test="${totalCount!=1}">s</g:if>
+								class="icon-user"></i> ${totalCount} </span> User<g:if test="${totalCount!=1}">s</g:if>
 
 							<g:if test="${params.query}">
                                     for search key <span

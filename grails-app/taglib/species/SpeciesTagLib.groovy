@@ -96,8 +96,6 @@ class SpeciesTagLib {
 	}
 	
 	def searchResults = {attrs, body->
-		println "---"
-		println attrs.model
 		out << render(template:"/species/searchResultsTemplate", model:attrs.model);
 	}
 }

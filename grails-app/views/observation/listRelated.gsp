@@ -43,8 +43,7 @@
 					model="['tagFilterByProperty':'Related', 'relatedObvParams':initialParams, 'isAjaxLoad':false]" />
 			</div>
 
-			<div class="row">
-				<div class="list span9">
+				<div class="list">
 
 					<div class="observations thumbwrap">
 						<obv:showSnippet model="['observationInstance':parentObservation]"></obv:showSnippet>
@@ -56,10 +55,11 @@
 										Observations of same species
 									</g:elseif>
 						</h5>
-						<obv:showObservationsList />
+						<div>
+							<obv:showObservationsList />
+						</div>
 					</div>
 				</div>
-			</div>
 		</div>
 	</div>
 

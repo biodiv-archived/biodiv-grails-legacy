@@ -26,7 +26,7 @@
 					</div>
 				</g:if>
 				<uGroup:rightSidebar model="['userGroupInstance':userGroupInstance]"/>
-				<div class="userGroup-section center_panel">
+				<div class="userGroup-section">
 					<feed:showFeedWithFilter model="[feedType:feedType, feedCategory:'All','feedOrder':'latestFirst']" />
 				</div>
 			</div>

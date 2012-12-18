@@ -1,17 +1,19 @@
 <%@page import="species.utils.Utils"%>
 <%@page import="species.utils.ImageType"%>
 
-<div class="observation_story">
+<div class="observation_story" style="inline-block;overflow:hidden">
 	<div class="observation-icons">
-		 <span class="group_icon species_groups_sprites active ${observationInstance.group.iconClass()}" title="${observationInstance.group?.name}"></span>
+		<span
+			class="group_icon species_groups_sprites active ${observationInstance.group.iconClass()}"
+			title="${observationInstance.group?.name}"></span>
 
 		<g:if test="${observationInstance.habitat}">
-			<span class="habitat_icon group_icon habitats_sprites active ${observationInstance.habitat.iconClass()}"
-                                    title="${observationInstance.habitat.name}" ></span>
+			<span
+				class="habitat_icon group_icon habitats_sprites active ${observationInstance.habitat.iconClass()}"
+				title="${observationInstance.habitat.name}"></span>
 		</g:if>
 	</div>
 
-	<div>
 
 		<div class="prop">
 			<g:if test="${showDetails}">
@@ -66,10 +68,11 @@
 				<i class="pull-left icon-time"></i>
 			</g:else>
 			<div class="value">
-				<time class="timeago" datetime="${observationInstance.observedOn.getTime()}"></time>
+				<time class="timeago"
+					datetime="${observationInstance.observedOn.getTime()}"></time>
 			</div>
 		</div>
-		
+
 		<g:if test="${showDetails}">
 			<div class="prop">
 				<g:if test="${showDetails}">
@@ -79,10 +82,11 @@
 					<i class="pull-left icon-time"></i>
 				</g:else>
 				<div class="value">
-					<time class="timeago" datetime="${observationInstance.createdOn.getTime()}"></time>
+					<time class="timeago"
+						datetime="${observationInstance.createdOn.getTime()}"></time>
 				</div>
 			</div>
-			
+
 			<div class="prop">
 				<g:if test="${showDetails}">
 					<span class="name"><i class="icon-time"></i>Updated</span>
@@ -91,7 +95,8 @@
 					<i class="pull-left icon-time"></i>
 				</g:else>
 				<div class="value">
-					<time class="timeago" datetime="${observationInstance.lastRevised?.getTime()}"></time>
+					<time class="timeago"
+						datetime="${observationInstance.lastRevised?.getTime()}"></time>
 				</div>
 			</div>
 			<g:if test="${observationInstance.notes}">
@@ -103,38 +108,38 @@
 				</div>
 			</g:if>
 		</g:if>
-	</div>
-	
-	<g:if test="${showDetails}">
-		<obv:showTagsSummary
-			model="['observationInstance':observationInstance, 'isAjaxLoad':false]" />
-	</g:if>
-	
-	<g:if test="${!showDetails}">
-		<div class="prop">
-			<i class="pull-left icon-eye-open"></i>
-			<div class="value">
-				${observationInstance.getPageVisitCount()}
-			</div>
-		</div>
-		
-		<g:if test="${observationInstance.flagCount>0}">
-			<div id="show-flag-count" class="prop">
-				<i class="pull-left icon-flag"></i>
-				<div class="value">	
-					${observationInstance.flagCount}
+		<g:if test="${showDetails}">
+			<obv:showTagsSummary
+				model="['observationInstance':observationInstance, 'isAjaxLoad':false]" />
+		</g:if>
+
+		<g:if test="${!showDetails}">
+			<div class="prop">
+				<i class="pull-left icon-eye-open"></i>
+				<div class="value">
+					${observationInstance.getPageVisitCount()}
 				</div>
 			</div>
+
+			<g:if test="${observationInstance.flagCount>0}">
+				<div id="show-flag-count" class="prop">
+					<i class="pull-left icon-flag"></i>
+					<div class="value">
+						${observationInstance.flagCount}
+					</div>
+				</div>
+			</g:if>
 		</g:if>
-	</g:if>
-	<g:if test="${showDetails}">
-		<div
-			style="display: block; width: 100%; overflow: auto; margin-bottom: 10px;">
+		<obv:showFooter
+			model="['observationInstance':observationInstance, 'showDetails':showDetails]" />
 			<div style="float: right; clear: both;">
-				<sUser:showUserTemplate
-					model="['userInstance':observationInstance.author]" />
-			</div>
-		</div>
-	</g:if>
-	<obv:showFooter model="['observationInstance':observationInstance, 'showDetails':showDetails]"/>
+		<sUser:showUserTemplate
+			model="['userInstance':observationInstance.author, 'userGroup':userGroup]" />
+	</div>
+
+
+	
+
+
+	
 </div>

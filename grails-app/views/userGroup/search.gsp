@@ -16,7 +16,7 @@
 			<search:searchResultsHeading />
 		</div>
 		<uGroup:rightSidebar/>
-		<div class="searchResults span9" style="margin-left:0px;">
+		<div class="searchResults" style="margin-left:0px;">
 			<uGroup:showUserGroupsListWrapper
 				model="['totalUserGroupInstanceList':totalUserGroupInstanceList, 'userGroupInstanceList':UserGroupInstanceList, 'userGroupInstanceTotal':userGroupInstanceTotal, 'queryParams':queryParams, 'activeFilters':activeFilters]" />
 		</div>

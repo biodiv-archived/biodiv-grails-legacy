@@ -315,11 +315,13 @@ class UserGroupController {
 		params.offset = params.offset ? params.int('offset') : 0
 
 		def allMembers;
-		if(params.onlyMembers) {
+		if(params.onlyMembers?.toBoolean()) {
+			println 'onlyMembers'
 			allMembers = userGroupInstance.getMembers(params.max, params.offset, params.sort);
 		} else {
 			allMembers = userGroupInstance.getAllMembers(params.max, params.offset, params.sort);
 		}
+		println allMembers;
 		if(params.isAjaxLoad?.toBoolean()) {
 			def membersJSON = []
 			for(m in allMembers) {
@@ -604,7 +606,7 @@ class UserGroupController {
 		def userGroupInstance = findInstance(params.id, params.webaddress)
 		if (!userGroupInstance) return;
 
-		return ['userGroupInstance':userGroupInstance]
+		return ['userGroupInstance':userGroupInstance, 'foundersTotalCount':userGroupInstance.getFoundersCount(), 'membersTotalCount':userGroupInstance.getAllMembersCount()]
 	}
 
 	def getRelatedUserGroups = {

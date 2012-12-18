@@ -283,13 +283,6 @@
 						</div>
 
 
-
-
-						<div class="section" style="clear: both; overflow: auto;">
-							<obv:showAllTags
-								model="['tagFilterByProperty':'User', 'tagFilterByPropertyValue':user.id, 'isAjaxLoad':false]" />
-						</div>
-
 						<sUser:isAdmin model="['user':user]">
 							<div class="section" style="clear: both;">
 								<h5>

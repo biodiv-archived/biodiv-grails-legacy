@@ -14,7 +14,7 @@
 			</div>
 			<uGroup:rightSidebar />
 			<!-- main_content -->
-			<div id="searchResults" class="list span9" style="margin-left: 0px;">
+			<div id="searchResults" class="list" style="margin-left: 0px; clear:both;">
 				<s:searchResults/>
 			</div>
 

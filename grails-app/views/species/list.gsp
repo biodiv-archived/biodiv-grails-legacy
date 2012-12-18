@@ -22,7 +22,7 @@
 	<div class="span12">
 		<s:showSubmenuTemplate model="['entityName':'Species']" />
 		<uGroup:rightSidebar/>
-		<div class="tabbable span9" style="margin-left:0px;">
+		<div class="tabbable" style="margin-left:0px;clear:both;">
 			<ul class="nav nav-tabs" style="margin-bottom: 0px">
 				<li class="active"><a href="#list" data-toggle="tab">Gallery</a>
 				</li>
@@ -75,15 +75,15 @@
 
 
 
-								<g:if test="${i%2 == 0}">
+								<g:if test="${i%3 == 0}">
 									<li
 										class=" pull-left thumbnail ${speciesInstance.percentOfInfo > 0?'rich_species_content':'poor_species_content'}"
-										style="clear: both;margin:5px 0px 5px 35px">
+										style="clear: both;margin:5px 0px 5px 5px">
 								</g:if>
 								<g:else>
 									<li
 										class="pull-left thumbnail ${speciesInstance.percentOfInfo > 0?'rich_species_content':'poor_species_content'}"
-										style="margin:5px 0px 5px 35px">
+										style="margin:5px 0px 5px 5px">
 								</g:else>
 								<g:set var="mainImage" value="${speciesInstance.mainImage()}" />
 								<%def thumbnailPath = ImageUtils.getFileName(mainImage?.fileName, ImageType.SMALL, null)%>

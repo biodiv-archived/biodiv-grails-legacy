@@ -1,5 +1,5 @@
 <%@page import="species.utils.ImageType"%>
-<div class=" ${showDetails ? 'pull-left' : 'span4'}" style="margin: 5px 0px;position:relative;${showDetails ? 'width:100%;' : ''}">
+<div class="signature ${showDetails ? 'pull-left' : 'span3'}" style="margin: 5px 0px;position:relative;${showDetails ? 'width:100%;' : ''}">
 	<a href="${uGroup.createLink(mapping:'userGroup', controller:'userGroup', action:'show', base:userGroup.domainName, 'userGroup':userGroup, 'pos':pos)}"
 		style="display:inline-block;float:left; ${showDetails ? 'width:100%;' : ''}">
 		<img class="logo ${showDetails ? 'normal_profile_pic' : 'small_profile_pic'}" style="vertical-align: middle;"

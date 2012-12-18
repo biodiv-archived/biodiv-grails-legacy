@@ -21,7 +21,7 @@
 	<div class="observation span12">
 		<uGroup:showSubmenuTemplate model="['entityName':'Observations']" />
 		<uGroup:rightSidebar model="['userGroupInstance':userGroupInstance]" />
-		<div class="userGroup-section center_panel">
+		<div class="userGroup-section">
 
 			<div class="btn-group pull-right" style="z-index: 10;">
 				<uGroup:isAMember model="['userGroupInstance':userGroupInstance]">

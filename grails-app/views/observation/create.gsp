@@ -110,6 +110,11 @@ input.dms_field {
 .observation_create .super-section {
 	margin-left:0px;
 }
+.sidebar-section {
+	width: 450px;
+	margin: 0px 0px 20px -10px;
+	float: right;
+}
 </style>
 </head>
 <body>
@@ -331,7 +336,7 @@ input.dms_field {
 							</div>
 						</div>
 						</div>
-						<div class="span6 sidebar-section map_section" style="margin-top:-5px;">
+						<div class="span6 sidebar-section" style="margin-top:-5px;">
 						<g:if
 							test="${observationInstance?.fetchSpeciesCall() == 'Unknown'}">
 							<div id="help-identify" class="control-label">
@@ -444,7 +449,7 @@ input.dms_field {
 	                        </div>
 	                  
 	                </div>
-	                	<div class=" span6 sidebar-section section map_section" style="padding:0;">
+	                	<div class=" span6 sidebar-section section" style="padding:0;">
                                     <div class="map_search">
                                             <div id="geotagged_images" style="padding:10px;">
                                                     <div class="title" style="display: none">Use location
@@ -458,11 +463,12 @@ input.dms_field {
                                             </div>
                                             <input id="address" type="text" title="Find by place name"
                                                     class="section-item" />
-                                                                               </div>
+                                                                               
 
 
 	                    	<div id="map_area">
 	                        	<div id="map_canvas"></div>
+	                    	</div>
 	                    	</div>
 	                    </div>
 	                </div>
