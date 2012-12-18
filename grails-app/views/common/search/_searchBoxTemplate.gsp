@@ -112,6 +112,6 @@ $(document).ready(function(){
 $( "#search" ).click(function() {
 	$( "#searchbox" ).submit();
 });
-	$("#userGroupSelectFilter").val("${queryParams.uGroup?:(params.webaddress?'THIS_GROUP':'ALL')}");
+	$("#userGroupSelectFilter").val("${(queryParams && queryParams.uGroup)?:(params.webaddress?'THIS_GROUP':'ALL')}");
 
 </r:script>
