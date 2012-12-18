@@ -414,7 +414,19 @@ class SpeciesController {
 			 paramsList.add('facet.field', searchFieldsConfig.AUTHOR)
 			 paramsList.add('facet.field', searchFieldsConfig.YEAR)
 			 */
-
+			if(params.uGroup) {
+				if(params.uGroup == "THIS_GROUP") {
+					String uGroup = params.webaddress
+					if(uGroup) {
+						//AS we dont have selecting species for group ... we are ignoring this filter
+						//paramsList.add('fq', searchFieldsConfig.USER_GROUP_WEBADDRESS+":"+uGroup);
+					}
+					queryParams["uGroup"] = params.uGroup
+				} else {
+					queryParams["uGroup"] = "ALL"
+				}
+			}
+			
 			log.debug "Along with faceting params : "+paramsList;
 			try {
 				def queryResponse = speciesSearchService.search(paramsList);

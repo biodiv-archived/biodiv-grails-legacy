@@ -28,7 +28,13 @@
         		<i class="icon-calendar icon-large"></i> <span class="date"></span>
     		</div>
 		</div>
-
+		
+		<div style="${params.webaddress?:'display:none;'}">
+		<label class="radio inline"> <input type="radio" id="uGroup_ALL" name="uGroup" 
+			value="ALL"> Search in all groups </label> <label
+			class="radio inline"> <input type="radio" id="uGroup_THIS_GROUP" name="uGroup" 
+			value="THIS_GROUP"> Search within this group </label>
+		</div>
 
 		<g:hiddenField name="offset" value="0" />
 		<g:hiddenField name="max" value="9" />
@@ -93,6 +99,9 @@ $(document).ready(function(){
 		updateGallery();
     	return false;
 	});
+	
+	$("#uGroup_${queryParams.uGroup?:(params.webaddress?'THIS_GROUP':'ALL')}").click();
+	
 	
 });
 </r:script>

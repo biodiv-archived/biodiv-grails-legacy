@@ -1,6 +1,6 @@
 <div class="input-append">
 	<form method="get"
-		action="${uGroup.createLink(controller:params.controller, action:'search', absolute:true) }"
+		action="${uGroup.createLink(controller:params.controller, action:'search') }"
 		id="searchbox" class="navbar-search" style="float: none;">
 
 		<input type="text" name="query" id="searchTextField"
@@ -14,19 +14,10 @@
 		<input type="hidden" name="fl" value="id" />
 		<g:hiddenField name="category" value="${params.controller}" />
 
-		<div class="btn-group">
-			<button id="search" class="btn"><i
-						class="icon-search"></i> Search in all groups</button>
-			<button class="btn dropdown-toggle" data-toggle="dropdown">
-				<span class="caret"></span>
-			</button>
-			<ul class="dropdown-menu">
-				<li><a id="searchWithInGroup" href="#"
-					title="Search within this group"><i class="icon-search"></i>Search
-						within this group</a>
-				</li>
-			</ul>
-		</div>
+		<select id="userGroupSelectFilter" class="btn" name="uGroup">	
+			<option value="ALL"> Search in all groups </option>
+			<option value="THIS_GROUP"> Search within this group </option>
+		</select>
 
 
 		<!-- 
@@ -119,7 +110,8 @@ $(document).ready(function(){
 		};;
 });
 $( "#search" ).click(function() {
-	$("#searchbox").attr("action", '/'+$('#category').val()+'/search');
 	$( "#searchbox" ).submit();
 });
+	$("#userGroupSelectFilter").val("${queryParams.uGroup?:(params.webaddress?'THIS_GROUP':'ALL')}");
+
 </r:script>

@@ -89,6 +89,7 @@ class NewsletterSearchService {
 				doc.addField(searchFieldsConfig.UPDATED_ON, obv.date);
 				if(obv.userGroup) {
 					doc.addField(searchFieldsConfig.USER_GROUP, obv.userGroup.id);
+					doc.addField(searchFieldsConfig.USER_GROUP_WEBADDRESS, obv.userGroup.webaddress);
 				}
 				if(obv.newsitem) {
 					doc.addField(searchFieldsConfig.MESSAGE, obv.newsitem);

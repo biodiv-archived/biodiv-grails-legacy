@@ -30,7 +30,12 @@
 			class="control-label" for="reference">References</label> <input data-provide="typeahead"
 			type="text" class="input-block-level" name="reference" value=""
 			placeholder="Field to search all references" /-->
-
+		<div style="${params.webaddress?:'display:none;'}">
+		<label class="radio inline"> <input type="radio" id="uGroup_ALL" name="uGroup" 
+			value="ALL"> Search in all groups </label> <label
+			class="radio inline"> <input type="radio" id="uGroup_THIS_GROUP" name="uGroup" 
+			value="THIS_GROUP"> Search within this group </label>
+		</div>
 				
 		<g:hiddenField name="start" value="0" />
 		<g:hiddenField name="rows" value="10" />
@@ -80,6 +85,7 @@ $(document).ready(function(){
            		}
    		});
 	});
+	$("#uGroup_${queryParams.uGroup?:(params.webaddress?'THIS_GROUP':'ALL')}").click();
 
 });
 </g:javascript>

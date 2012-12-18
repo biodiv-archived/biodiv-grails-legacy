@@ -339,6 +339,10 @@ function getSelectedTag() {
     }	
 } 
 
+function getSelectedUserGroup() {
+	return $('#advSearchForm input[name=uGroup]:radio:checked').val()
+} 
+
 function getFilterParameters(url, limit, offset, removeUser, removeObv) {
     var params = url.param();
     var sortBy = getSelectedSortBy();
@@ -417,6 +421,16 @@ function getFilterParameters(url, limit, offset, removeUser, removeObv) {
 			delete params['observation'];
 		}
 	}
+	
+	var uGroup = getSelectedUserGroup();
+	console.log(uGroup);
+    if(uGroup) {
+    	params['uGroup'] = uGroup;
+    } else {
+		if(params['uGroup'] != undefined){
+			delete params['uGroup'];
+		}
+    }
 	return params;
 }	
 
@@ -476,7 +490,7 @@ function updateGallery(target, limit, offset, removeUser, isGalleryUpdate, remov
     var History = window.History;
     delete params["isGalleryUpdate"]
     History.pushState({state:1}, "Species Portal", '?'+decodeURIComponent($.param(params))); 
-    // alert("doc_url " + doc_url);
+    console.log("doc_url " + doc_url);
     if(isGalleryUpdate) {
        	$.ajax({
 				url: doc_url,

@@ -374,6 +374,7 @@ speciesPortal {
 		ISFLAGGED = "isflagged"
 		LATLONG = "latlong"
 		USER_GROUP = "group"
+		USER_GROUP_WEBADDRESS = "group_webaddress"
 	}
 
 	nameSearchFields {

@@ -41,7 +41,9 @@
 			that manipulate the value into a string value that isn't human-readable in 
 			its internal form, but with a lexicographic ordering the same as the numeric 
 			ordering, so that range queries work correctly. -->
-		<fieldType name="sint" class="solr.SortableIntField"
+		<fieldType name="sint" class="solr.TrieIntField"
+			sortMissingLast="true" omitNorms="true" />
+		<fieldType name="long" class="solr.TrieLongField"
 			sortMissingLast="true" omitNorms="true" />
 
 		<!-- solr.TextField allows the specification of custom text analyzers specified 
@@ -212,7 +214,8 @@
 		<field name="text" type="text" indexed="true" stored="false" required="true" multiValued="true" />
 		<field name="createdon" type="tdate" indexed="true" required="true"/>
 		<field name="lastrevised" type="tdate" indexed="true" required="true"/>
-		<field name="group" type="string" indexed="true" stored="true" multiValued="false" />
+		<field name="group" type="long" indexed="true" stored="true" multiValued="false" />
+		<field name="group_webaddress" type="string" indexed="true" stored="true" multiValued="false" />
 		
 		
 		<copyField source="name" dest="text" />

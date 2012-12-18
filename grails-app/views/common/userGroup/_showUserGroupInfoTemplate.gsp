@@ -6,7 +6,7 @@
 		${userGroupInstance.name }
 	</h5>
 
-	<div class="prop tablet">
+	<div class="signature">
 		<span class="name tablet"><i class="icon-time"></i>Founded</span>
 		<obv:showDate
 			model="['userGroupInstance':userGroupInstance, 'propertyName':'FoundedOn']" />

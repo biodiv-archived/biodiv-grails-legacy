@@ -41,9 +41,10 @@
 			that manipulate the value into a string value that isn't human-readable in 
 			its internal form, but with a lexicographic ordering the same as the numeric 
 			ordering, so that range queries work correctly. -->
-		<fieldType name="sint" class="solr.SortableIntField"
+		<fieldType name="sint" class="solr.TrieIntField"
 			sortMissingLast="true" omitNorms="true" />
-
+		<fieldType name="long" class="solr.TrieLongField"
+			sortMissingLast="true" omitNorms="true" />
 		<!-- solr.TextField allows the specification of custom text analyzers specified 
 			as a tokenizer and a list of token filters. Different analyzers may be specified 
 			for indexing and querying. The optional positionIncrementGap puts space between 
@@ -261,6 +262,9 @@
 		<copyField source="name" dest="autocomplete" />
 		<copyField source="taxon" dest="autocomplete" />
 
+		<field name="group" type="long" indexed="true" stored="true"  multiValued="true"/>
+		<field name="group_webaddress" type="string" indexed="true" stored="true" multiValued="true"/>
+		
 		<dynamicField name="*" type="text" indexed="true" stored="true"
 			multiValued="true" />
 

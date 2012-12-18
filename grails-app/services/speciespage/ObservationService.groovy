@@ -883,6 +883,20 @@ class ObservationService {
 			 activeFilters["bounds"] = params.bounds
 		}
 		
+		if(params.uGroup) {
+			if(params.uGroup == "THIS_GROUP") {
+				String uGroup = params.webaddress
+				if(uGroup) {
+					paramsList.add('fq', searchFieldsConfig.USER_GROUP_WEBADDRESS+":"+uGroup);
+				}
+				queryParams["uGroup"] = params.uGroup
+				activeFilters["uGroup"] = params.uGroup
+			} else {
+				queryParams["uGroup"] = "ALL"
+				activeFilters["uGroup"] = "ALL"
+			}
+		}
+		
 		log.debug "Along with faceting params : "+paramsList;
 		
 		if(isMapView) {
