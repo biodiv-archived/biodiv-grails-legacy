@@ -260,11 +260,12 @@ class SUserController extends UserController {
 		setIfMissing 'offset', 0
 		int totalCount = 0;
 		def results = [];
+		def queryParams = [:]
 		
 		if(params.action != 'search' || (params.action == 'search' && params.query)) {
 			def hql = new StringBuilder('FROM ').append(lookupUserClassName()).append(' u WHERE 1=1 ')
 			def cond = new StringBuilder("");
-			def queryParams = [:]
+			
 	
 			def userLookup = SpringSecurityUtils.securityConfig.userLookup
 			String usernameFieldName = 'name'
@@ -350,7 +351,7 @@ class SUserController extends UserController {
 //		}
 		}
 
-		return [results: results, totalCount: totalCount, searched: true]
+		return [results: results, totalCount: totalCount, queryParams:queryParams, searched: true]
 
 	}
 	
