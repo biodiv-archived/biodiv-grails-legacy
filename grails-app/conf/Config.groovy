@@ -339,6 +339,7 @@ speciesPortal {
 	searchFields {
 		ID = "id"
 		GUID = "guid"
+		TITLE = "title"
 		CONTRIBUTOR = "contributor"
 		NAME = "name"
 		NAME_EXACT = "name_exact"

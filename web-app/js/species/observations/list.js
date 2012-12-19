@@ -103,7 +103,9 @@ $(document).ready(function(){
    });
         
     $(".paginateButtons a").click(function() {
-        updateGallery($(this).attr('href'), window.params.queryParamsMax, undefined, undefined, window.params.isGalleryUpdate);
+    	$('.paginateButtons a.active').removeClass('active');
+    	$(this).addClass('active');
+        updateGallery($(this).attr('href'), window.params.queryParamsMax, undefined, undefined, false);
         return false;
     });
     
@@ -423,7 +425,6 @@ function getFilterParameters(url, limit, offset, removeUser, removeObv) {
 	}
 	
 	var uGroup = getSelectedUserGroup();
-	console.log(uGroup);
     if(uGroup) {
     	params['uGroup'] = uGroup;
     } else {

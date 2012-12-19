@@ -1,6 +1,7 @@
+<%@page import="species.utils.Utils"%>
 <div class="block-tagadelic">
 	<form id="advSearchForm" method="get"
-		action="${uGroup.createLink(controller:'newsletter', action:'search')}"
+		action="${uGroup.createLink(controller:(params.controller!='userGroup')?params.controller:'newsletter', action:'search') }"
 		title="Advanced Search" class="searchbox">
 
 		<label class="control-label" for="aq.name">Title</label> <input
@@ -44,9 +45,15 @@ $(document).ready(function(){
 		});
 	});
 	
-	$( "#advSearch" ).button().click(function() {
-		updateGallery(undefined, undefined, undefined, undefined, false, undefined);
-    	return false;
+	$("#advSearch").click(function() {
+		$( "#advSearchForm" ).submit();
+	});
+	$( "#advSearchForm" ).submit(function() {
+		if($('#uGroup_ALL').is(':checked')) {
+			$( "#advSearchForm" ).attr('action', "${Utils.getIBPServerDomain()}"+$( "#advSearchForm" ).attr('action'));
+			updateGallery($( "#advSearchForm" ).attr('action'), undefined, undefined, undefined, false);
+		} 
+		updateGallery($( "#advSearchForm" ).attr('action'), undefined, undefined, undefined, false);
 	});
 	
 	$("#uGroup_${queryParams.uGroup?:(params.webaddress?'THIS_GROUP':'ALL')}").click();

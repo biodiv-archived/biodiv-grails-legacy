@@ -154,8 +154,7 @@ modules = {
 	}
 	
 	species_list {
-		dependsOn 'species'
-		resource url:'/js/species/observations/list.js'
+		dependsOn 'observations_list'
 	}
 
 	search {

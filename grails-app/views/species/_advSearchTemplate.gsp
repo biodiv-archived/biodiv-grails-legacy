@@ -1,34 +1,34 @@
+<%@page import="species.utils.Utils"%>
 <div id="advSearchBox" class="block-tagadelic">
-	<form id="advSearchForm" method="get" action="${uGroup.createLink(controller:'species', action:'search')}"
+	<form id="advSearchForm" method="get" 		
+		action="${uGroup.createLink(controller:(params.controller!='userGroup')?params.controller:'species', action:'search') }"
 		title="Advanced Search" class="searchbox">
-		<!-- label class="control-label" for="name">Name</label> <input data-provide="typeahead"
-			type="text" class="input-block-level" name="name"
-			id="advSearchTextField" placeholder="Search using species name" /--> <label
-			class="control-label" for="taxon">Taxon Hierarchy</label> <input data-provide="typeahead"
-			type="text" class="input-block-level" name="taxon" value=""
+	 <label
+			class="control-label" for="aq.taxon">Taxon Hierarchy</label> <input data-provide="typeahead"
+			type="text" class="input-block-level" name="aq.taxon" value=""
 			placeholder="Search using taxon hierarchy" />
 			
 			<label
-			class="control-label" for="contributor">Contributor</label> <input data-provide="typeahead"
-			type="text" class="input-block-level" name="contributor" value="" 
+			class="control-label" for="aq.contributor">Contributor</label> <input data-provide="typeahead"
+			type="text" class="input-block-level" name="aq.contributor" value="" 
 			placeholder="Field to search all contributors" /> <label
-			class="control-label" for="attribution">Attributions</label> <input data-provide="typeahead"
-			type="text" class="input-block-level" name="attribution" value=""
+			class="control-label" for="aq.attribution">Attributions</label> <input data-provide="typeahead"
+			type="text" class="input-block-level" name="aq.attribution" value=""
 			placeholder="Field to search all attributions" />
 			
 			<!-- label
-			class="control-label" for="author">Species Author</label> <input data-provide="typeahead"
-			type="text" name="author" class="input-block-level"
+			class="control-label" for="aq.author">Species Author</label> <input data-provide="typeahead"
+			type="text" name="aq.author" class="input-block-level"
 			placeholder="Search using species author or basionym author" /> <label
-			class="control-label" for="year">Year</label> <input data-provide="typeahead" type="text"
-			class="input-block-level" name="year"
+			class="control-label" for="aq.year">Year</label> <input data-provide="typeahead" type="text"
+			class="input-block-level" name="aq.year"
 			placeholder="Search using year of finding the species and basionym year" /-->
 
-		<label class="control-label" for="text">Content</label> <input data-provide="typeahead"
-			type="text" class="input-block-level" name="text" value=""
+		<label class="control-label" for="aq.text">Content</label> <input data-provide="typeahead"
+			type="text" class="input-block-level" name="aq.text" value=""
 			placeholder="Search all text content" />  <!-- label
-			class="control-label" for="reference">References</label> <input data-provide="typeahead"
-			type="text" class="input-block-level" name="reference" value=""
+			class="control-label" for="aq.reference">References</label> <input data-provide="typeahead"
+			type="text" class="input-block-level" name="aq.reference" value=""
 			placeholder="Field to search all references" /-->
 		<div style="${params.webaddress?:'display:none;'}">
 		<label class="radio inline"> <input type="radio" id="uGroup_ALL" name="uGroup" 
@@ -36,11 +36,11 @@
 			class="radio inline"> <input type="radio" id="uGroup_THIS_GROUP" name="uGroup" 
 			value="THIS_GROUP"> Search within this group </label>
 		</div>
-				
-		<g:hiddenField name="start" value="0" />
-		<g:hiddenField name="rows" value="10" />
-		<g:hiddenField name="sort" value="score" />
-		<g:hiddenField name="fl" value="id" />
+
+<%--		<g:hiddenField name="start" value="0" />--%>
+<%--		<g:hiddenField name="rows" value="10" />--%>
+<%--		<g:hiddenField name="sort" value="score" />--%>
+<%--		<g:hiddenField name="fl" value="id" />--%>
 
 
 
@@ -53,7 +53,7 @@
 
 
 </div>
-<g:javascript>
+<r:script>
 
 $(document).ready(function(){
 	
@@ -68,24 +68,17 @@ $(document).ready(function(){
 		});
 	});
 
-	$( "#advSearch" ).button().click(function() {
-		$( "#advSearchForm" ).ajaxSubmit({
-               url:"${uGroup.createLink(controller:'species', action:'search')}",
-               dataType: 'html',
-               type: 'POST',
-               data: {'query':$('#searchTextField').val()},
-               success: function(data, statusText, xhr, form) {
-					$("#searchResults").html(data);
-          			return false;
-       			},
-       			error:function (xhr, ajaxOptions, thrownError){
-           			var successHandler = this.success;
-           			handleError(xhr, ajaxOptions, thrownError, successHandler, function() { return false;});
-            			return false;
-           		}
-   		});
+	$("#advSearch").click(function() {
+		$( "#advSearchForm" ).submit();
+	});
+	$( "#advSearchForm" ).submit(function() {
+		if($('#uGroup_ALL').is(':checked')) {
+			$( "#advSearchForm" ).attr('action', "${Utils.getIBPServerDomain()}"+$( "#advSearchForm" ).attr('action'));
+			updateGallery($( "#advSearchForm" ).attr('action'), undefined, undefined, undefined, false);
+		} 
+		updateGallery($( "#advSearchForm" ).attr('action'), undefined, undefined, undefined, true);
 	});
 	$("#uGroup_${queryParams.uGroup?:(params.webaddress?'THIS_GROUP':'ALL')}").click();
 
 });
-</g:javascript>
+</r:script>

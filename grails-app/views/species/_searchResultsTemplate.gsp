@@ -4,12 +4,9 @@
 <%@ page import="species.Language"%>
 <%@ page import="species.CommonNames"%>
 
-<div class="observations thumbwrap">
+<div class="observations_list thumbwrap" style="top:0px;">
 
-	<div class="controls">
-		<obv:showObservationFilterMessage
-			model="['instanceTotal':total, 'queryParams':queryParams, resultType:'species page']" />
-		<g:if test="${total > 0}">
+		<g:if test="${instanceTotal > 0}">
 			<g:each in="${speciesInstanceList}" status="i" var="speciesInstance">
 
 				<div class="media"
@@ -97,11 +94,9 @@
 			</g:each>
 			<div class="paginateButtons" style="clear: both;">
 				<center>
-					<p:paginateOnSearchResult total="${total}" action="search"
+					<p:paginateOnSearchResult total="${instanceTotal}" controller="species" action="search"
 						params="[query:queryParams.q, fl:queryParams.fl]" />
 				</center>
 			</div>
 		</g:if>
-
-	</div>
 </div>

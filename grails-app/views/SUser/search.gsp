@@ -36,15 +36,9 @@
 		</div>
 	</div>
 
-
 	<r:script>
 	$(document).ready(function() {
-		/*$("#username").focus().autocomplete({
-			minLength: 3,
-			cache: false,
-			source: "${createLink(action: 'ajaxUserSearch')}"
-		});*/
-
+		
 		$('.sort_filter_label').click(function() {
 			$('.sort_filter_label.active').removeClass('active');
 			$(this).addClass('active');
@@ -60,24 +54,7 @@
         });
 	});
 	
-	$( "#search" ).unbind('click');
-	
-	$( "#search" ).click(function() {
-		var sortBy = '';
-		$('.sort_filter_label').each(function() {
-			if ($(this).hasClass('active')) {
-				sortBy += $(this).attr('value') + ',';
-			}
-		});
 
-		sortBy = sortBy.replace(/\s*\,\s*$/, '');
-		
-		var sortParam = sortBy;
-		if (sortParam) {
-			$("#searchBoxSort").val(sortParam);
-		}
-		$("#searchBox").submit();
-	});
 	</r:script>
 </body>
 </html>

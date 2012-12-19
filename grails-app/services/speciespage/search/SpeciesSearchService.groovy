@@ -163,6 +163,7 @@ class SpeciesSearchService {
 	private void addNameToDoc(SolrInputDocument doc, TaxonomyDefinition name) {
 		def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields
 
+		if(name.name) doc.addField(searchFieldsConfig.TITLE, name.name);
 		if(name.canonicalForm) doc.addField(searchFieldsConfig.CANONICAL_NAME, name.canonicalForm);
 		//if(name.normalizedForm) doc.addField(searchFieldsConfig.SCIENTIFIC_NAME, name.normalizedForm);
 		if(name.normalizedForm) doc.addField(searchFieldsConfig.NAME, name.normalizedForm);
