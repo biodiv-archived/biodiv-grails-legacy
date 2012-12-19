@@ -3,11 +3,10 @@
 <%@ page import="species.groups.SpeciesGroup"%>
 <%@ page import="species.Habitat"%>
 
-<r:script>
+<g:javascript>
 
 $(document).ready(function(){
 	$("#speciesGroupFilter").button();
-	console.log($('#speciesGroupFilter button[value="${params.sGroup}"]'))
 	$('#speciesGroupFilter button[value="${params.sGroup}"]').addClass('active');
     $('#speciesGroupFilter button').tooltip({placement:'top'});
 	
@@ -18,7 +17,7 @@ $(document).ready(function(){
 		
 });
 
-</r:script>
+</g:javascript>
 <div id="speciesGroupFilter" data-toggle="buttons-radio">
 	<%def othersGroup = SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.OTHERS)%>
 	<g:each in="${SpeciesGroup.list() }" var="sGroup" status="i">

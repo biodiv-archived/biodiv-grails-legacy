@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.List
 
 import org.apache.commons.logging.LogFactory
+import org.apache.solr.common.SolrException;
 import org.apache.solr.common.util.NamedList;
 import org.codehaus.groovy.grails.commons.ApplicationHolder;
 import org.hibernate.exception.ConstraintViolationException;
@@ -26,6 +27,7 @@ import species.sourcehandler.MappedSpreadsheetConverter
 import species.sourcehandler.NewSpreadsheetConverter
 import species.sourcehandler.SpreadsheetConverter
 import species.sourcehandler.XMLConverter
+import species.utils.Utils;
 
 class SpeciesService {
 
@@ -40,7 +42,8 @@ class SpeciesService {
 	def externalLinksService;
 	def speciesSearchService;
 	def namesIndexerService;
-
+	def observationService;
+	
 	static int BATCH_SIZE = 10;
 	int noOfFields = Field.count();
 
@@ -339,4 +342,122 @@ class SpeciesService {
 		return result;
 	}
 
+	def search(params) {
+		def result;
+		def searchFieldsConfig = grailsApplication.config.speciesPortal.searchFields
+		def queryParams = [:]
+		def activeFilters = [:]
+
+		NamedList paramsList = new NamedList();
+		queryParams["query"] = params.query
+		activeFilters["query"] = params.query
+		params.query = params.query ?: "";
+
+		String aq = "";
+		int i=0;
+		params.aq.each { key, value ->
+			queryParams["aq."+key] = value;
+			activeFilters["aq."+key] = value;
+			if(!(key ==~ /action|controller|sort|fl|start|rows|webaddress/) && value ) {
+				if(i++ == 0) {
+					aq = key + ': ('+value+')';
+				} else {
+					aq = aq + " AND " + key + ': ('+value+')';
+				}
+			}
+		}
+		if(params.query && aq) {
+			params.query = params.query + " AND "+aq
+		} else if (aq) {
+			params.query = aq;
+		}
+
+		paramsList.add('q', Utils.cleanSearchQuery(params.query));
+		paramsList.add('start', params['offset']?:"0");
+		paramsList.add('rows', params['max']?:"51");
+		params['sort'] = params['sort']?:"score"
+		String sort = params['sort'].toLowerCase();
+		if(sort.indexOf(' desc') == -1 && sort.indexOf(' asc') == -1 ) {
+			sort += " desc";
+		}
+		paramsList.add('sort', sort);
+
+		paramsList.add('fl', params['fl']?:"id");
+
+		if(params.sGroup) {
+			params.sGroup = params.sGroup.toLong()
+			def groupId = observationService.getSpeciesGroupIds(params.sGroup)
+			if(!groupId){
+				log.debug("No groups for id " + params.sGroup)
+			} else{
+				paramsList.add('fq', searchFieldsConfig.SGROUP+":"+groupId);
+				queryParams["groupId"] = groupId
+				activeFilters["sGroup"] = groupId
+			}
+		}
+		
+		if(params.habitat && (params.habitat != Habitat.findByName(grailsApplication.config.speciesPortal.group.ALL).id)){
+			paramsList.add('fq', searchFieldsConfig.HABITAT+":"+params.habitat);
+			queryParams["habitat"] = params.habitat
+			activeFilters["habitat"] = params.habitat
+		}
+		if(params.tag) {
+			paramsList.add('fq', searchFieldsConfig.TAG+":"+params.tag);
+			queryParams["tag"] = params.tag
+			queryParams["tagType"] = 'observation'
+			activeFilters["tag"] = params.tag
+		}
+		if(params.user){
+			paramsList.add('fq', searchFieldsConfig.USER+":"+params.user);
+			queryParams["user"] = params.user.toLong()
+			activeFilters["user"] = params.user.toLong()
+		}
+		if(params.speciesName && (params.speciesName != grailsApplication.config.speciesPortal.group.ALL)) {
+			paramsList.add('fq', searchFieldsConfig.MAX_VOTED_SPECIES_NAME+":"+params.speciesName);
+			queryParams["speciesName"] = params.speciesName
+			activeFilters["speciesName"] = params.speciesName
+		}
+		
+		if(params.uGroup) {
+			if(params.uGroup == "THIS_GROUP") {
+				String uGroup = params.webaddress
+				if(uGroup) {
+					//AS we dont have selecting species for group ... we are ignoring this filter
+					//paramsList.add('fq', searchFieldsConfig.USER_GROUP_WEBADDRESS+":"+uGroup);
+				}
+				queryParams["uGroup"] = params.uGroup
+				activeFilters["uGroup"] = params.uGroup
+			} else {
+				queryParams["uGroup"] = "ALL"
+				activeFilters["uGroup"] = "ALL"
+			}
+		}
+
+		if(params.startsWith && params.startsWith != "A-Z"){
+			paramsList.add('fq', searchFieldsConfig.TITLE+":"+params.startsWith+"*");
+			queryParams["startsWith"] = params.startsWith
+			activeFilters["startsWith"] = params.startsWith
+		}
+		log.debug "Along with faceting params : "+paramsList;
+		try {
+			def queryResponse = speciesSearchService.search(paramsList);
+			List<Species> speciesInstanceList = new ArrayList<Species>();
+			Iterator iter = queryResponse.getResults().listIterator();
+			while(iter.hasNext()) {
+				def doc = iter.next();
+				def speciesInstance = Species.get(doc.getFieldValue("id"));
+				if(speciesInstance)
+					speciesInstanceList.add(speciesInstance);
+			}
+
+			//queryParams = queryResponse.responseHeader.params
+			result = [queryParams:queryParams, instanceTotal:queryResponse.getResults().getNumFound(), speciesInstanceList:speciesInstanceList, snippets:queryResponse.getHighlighting()]
+			return result;
+		} catch(SolrException e) {
+			e.printStackTrace();
+		}
+
+		result = [queryParams:queryParams, instanceTotal:0, speciesInstanceList:[]];
+		return result;
+	}
 }

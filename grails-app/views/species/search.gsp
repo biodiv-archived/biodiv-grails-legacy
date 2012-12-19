@@ -2,7 +2,7 @@
 <head>
 
 <meta name="layout" content="main" />
-<r:require modules="species" />
+<r:require modules="species, observations_list" />
 <title>Search Species</title>
 </head>
 <body>
@@ -15,6 +15,7 @@
 			<uGroup:rightSidebar />
 			<!-- main_content -->
 			<div id="searchResults" class="list" style="margin-left: 0px; clear:both;">
+				<s:speciesFilter/>
 				<s:searchResults/>
 			</div>
 
@@ -31,12 +32,6 @@ $(document).ready(function(){
            	return false;
     });
 });
-	$( "#search" ).unbind('click');
-	
-	$( "#search" ).click(function() {
-		$("#searchBox").attr("action", '/'+$('#category').val()+'/search');
-		$("#searchBox").submit();
-	});
 
 
 </r:script>

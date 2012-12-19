@@ -209,6 +209,7 @@
 			required="true" multiValued="false" />
 		<field name="guid" type="string" indexed="true" stored="true"
 			required="true" multiValued="false" />
+		<field name="title" type="taxonText" indexed="true" stored="true" required="true" multiValued="false" />
 		
 		<field name="contributor" type="taxonText" indexed="true" stored="true" multiValued="true" />
 		<field name="location" type="text" indexed="true" stored="true" multiValued="true"/>

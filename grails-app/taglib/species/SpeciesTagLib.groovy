@@ -98,4 +98,11 @@ class SpeciesTagLib {
 	def searchResults = {attrs, body->
 		out << render(template:"/species/searchResultsTemplate", model:attrs.model);
 	}
+	
+	def speciesFilter = {attrs, body->
+		out << render(template:"/species/speciesFilterTemplate", model:attrs.model);
+	}
+	def showSpeciesList = {attrs, body->
+		out << render(template:"/species/showSpeciesListTemplate", model:attrs.model);
+	}
 }
