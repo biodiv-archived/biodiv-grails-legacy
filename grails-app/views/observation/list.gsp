@@ -21,24 +21,9 @@
 
 	<g:javascript>
 		$(document).ready(function() {
-			window.params = {
-				'offset':"${params.offset}",
-				'isGalleryUpdate':"${params.isGalleryUpdate}",	
-				"tagsLink":"${uGroup.createLink(controller:'observation', action: 'tags')}",
-				"queryParamsMax":"${queryParams?.max}",
-				'speciesName':"${params.speciesName }",
-				'isFlagged':"${params.isFlagged }"
-			}
+			window.params.tagsLink = "${uGroup.createLink(controller:'observation', action: 'tags')}";
 			initRelativeTime("${uGroup.createLink(controller:'activityFeed', action:'getServerTime')}");
 		});
 	</g:javascript>
-	<r:script>
-		$( "#search" ).unbind('click');
-		$( "#search" ).click(function() {          
-			var target = "${uGroup.createLink(controller:'observation', action:'search')}" + window.location.search;
-			updateGallery(target, ${queryParams.max}, 0, undefined, false);
-        	return false;
-		});
-	</r:script>
 </body>
 </html>

@@ -3,7 +3,9 @@ import species.Synonyms;
 import speciespage.TaxonService;
 
 def namesLoaderService = ctx.getBean("namesLoaderService");
-namesLoaderService.syncNamesAndRecos(true);
+namesLoaderService.syncNamesAndRecos(false);
+//def namesLoaderService = ctx.getBean("namesIndexerService");
+//namesLoaderService.rebuild();
 
 /*
 NamesParser namesParser = new NamesParser();

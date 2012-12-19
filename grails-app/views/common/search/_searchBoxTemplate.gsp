@@ -1,7 +1,7 @@
 <%@page import="species.utils.Utils"%>
 <div class="input-append">
 	<form method="get"
-		action="${uGroup.createLink(controller:(params.controller!='userGroup')?params.controller:'species', action:'search') }"
+		action="${uGroup.createLink(controller:controller, action:'search') }"
 		id="searchbox" class="navbar-search" style="float: none;">
 		<select id="userGroupSelectFilter" class="btn" name="uGroup">	
 			<option value="ALL"> Search in all groups </option>
@@ -15,7 +15,7 @@
 			class="search-query span3" placeholder="Search" />
 		<button id="search" class="btn" type="button"><i class="icon-search"></i></button>
 		<input type="hidden" name="fl" value="id" />
-		<g:hiddenField name="category" value="${params.controller}" />
+		<g:hiddenField name="category" value="${controller}" />
 		
 <%--		<g:hiddenField name="offset" value="0" />--%>
 <%--		<g:hiddenField name="max" value="10" />--%>
@@ -68,13 +68,14 @@ $(document).ready(function(){
 				return false;
 			},
 			select: function( event, ui ) {
-				if( ui.item.category == 'Names' && ui.item.value != 'null') {
+				/*if( ui.item.category == 'Names' && ui.item.value != null) {
+					console.log(ui.item.value);
 					if(ui.item.value != 'null') {
 						$( "#searchTextField" ).val( 'canonical_name:"'+ui.item.value+'" '+ui.item.label.replace(/<.*?>/g,'') );
 					}
-				} else {
+				} else {*/
 					$( "#searchTextField" ).val( ui.item.label.replace(/<.*?>/g,'') );
-				}
+				//}
 				
 				if(ui.item.category == 'Species Pages') {
 					$("#category").val('species');
@@ -123,10 +124,16 @@ $(document).ready(function(){
 		$( "#searchbox" ).submit();
 	});
 	$( "#searchbox" ).submit(function() {
-		if($("#userGroupSelectFilter").val() == 'ALL') {
-			$( "#searchbox" ).attr('action', "${Utils.getIBPServerDomain()}"+$( "#searchbox" ).attr('action'));
+		var action = $( "#searchbox" ).attr('action');
+		var category = $("#category").val();
+		if(category) {
+			action = action.replace("${controller}", category);
 		}
-		updateGallery($( "#searchbox" ).attr('action'), undefined, undefined, undefined, false);
+		if($("#userGroupSelectFilter").val() == 'ALL') {
+			$( "#searchbox" ).attr('action', "${Utils.getIBPServerDomain()}"+action);
+		}
+		
+		updateGallery(action, undefined, undefined, undefined, false);
     	return false;
 	});
 	$("#userGroupSelectFilter").val("${(queryParams && queryParams.uGroup)?queryParams.uGroup:(params.webaddress?'THIS_GROUP':'ALL')}");

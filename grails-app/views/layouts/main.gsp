@@ -25,7 +25,7 @@
 </g:else>
 
 <g:layoutHead />
-
+<r:require modules="observations_list" />
 <!-- script src="http://cdn.wibiya.com/Toolbars/dir_1100/Toolbar_1100354/Loader_1100354.js" type="text/javascript"></script><noscript><a href="http://www.wibiya.com/">Web Toolbar by Wibiya</a></noscript-->
 <g:set var="userGroupInstance" value="${userGroupInstance}"/>
 <%

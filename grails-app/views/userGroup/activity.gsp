@@ -21,7 +21,7 @@
 	<div class="observation span12 bodymarker">
 		<uGroup:showSubmenuTemplate model="['entityName':'Activity Stream']"/>
 		<uGroup:rightSidebar model="['userGroupInstance':userGroupInstance]"/>
-		<div class="userGroup-section center_panel">
+		<div class="userGroup-section">
 			<div>
 				<%
 					def canPostComment = customsecurity.hasPermissionForAction([object:userGroupInstance, permission:org.springframework.security.acls.domain.BasePermission.WRITE]).toBoolean()

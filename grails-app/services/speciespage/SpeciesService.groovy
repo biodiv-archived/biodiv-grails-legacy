@@ -14,6 +14,7 @@ import species.Classification
 import species.CommonNames;
 import species.Country
 import species.Field
+import species.Habitat;
 import species.Language
 import species.Species
 import species.SpeciesField;

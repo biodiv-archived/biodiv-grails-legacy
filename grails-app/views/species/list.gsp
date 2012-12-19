@@ -60,6 +60,7 @@
 		}, function(){
 			$(this).children('.poor_species_content').slideUp(200);
 		});
+		$(".grid_view").show();
 	});
 	</r:script>
 	<style>
