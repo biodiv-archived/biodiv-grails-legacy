@@ -11,6 +11,9 @@
 		var defId = "#habitat_" + "${Habitat.findByName(grailsApplication.config.speciesPortal.group.ALL).id}"
 		$(defId).click();
 	}
+	$(document).ready(function() {
+			initRelativeTime("${uGroup.createLink(controller:'activityFeed', action:'getServerTime')}");
+	});
 </g:javascript>
  
 <div class="info-message" id="info-message">

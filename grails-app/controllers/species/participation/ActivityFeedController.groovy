@@ -34,6 +34,7 @@ class ActivityFeedController {
 	}
 	
 	def getServerTime = {
+		log.debug params
 		render ("" + new Date().getTime()) as JSON
 	}
 	
