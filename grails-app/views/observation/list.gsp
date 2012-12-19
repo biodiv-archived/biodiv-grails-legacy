@@ -21,16 +21,7 @@
 
 	<g:javascript>
 		$(document).ready(function() {
-			window.params = {
-				'offset':"${params.offset}",
-				'isGalleryUpdate':"${params.isGalleryUpdate}",	
-				"tagsLink":"${uGroup.createLink(controller:'observation', action: 'tags')}",
-				"queryParamsMax":"${queryParams?.max}",
-				'speciesName':"${params.speciesName }",
-				'isFlagged':"${params.isFlagged }"
-			}
-			alert(" calling init relative time");
-			initRelativeTime("${uGroup.createLink(controller:'activityFeed', action:'getServerTime')}");
+			window.params.tagsLink = "${uGroup.createLink(controller:'observation', action: 'tags')}";
 		});
 	</g:javascript>
 	<r:script>

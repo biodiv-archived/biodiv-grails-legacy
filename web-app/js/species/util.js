@@ -46,19 +46,15 @@ function dcorateCommentBody(comp){
 
 
 function initRelativeTime(url){
-	alert(" url " + url);
 	if(!serverTimeDiff){
 		$.ajax({
 	 		url: url,
 			dataType: "json",
 			success: function(data) {
 				serverTimeDiff = parseInt(data) - new Date().getTime();
-				alert("server time diff " + serverTimeDiff )
 				$('body').timeago({serverTimeDiff:serverTimeDiff});
-				alert("after calling time ago");
 			}, error: function(xhr, status, error) {
 				//alert(xhr.responseText);
-				alert("error in getting server time " +  xhr.responseText);
 		   	}
 		});	
 	}
