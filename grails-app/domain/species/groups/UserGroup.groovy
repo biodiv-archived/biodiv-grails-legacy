@@ -289,7 +289,7 @@ class UserGroup implements Taggable {
 			def groupId = this.id
 			def groupClass = "'" + this.class.getCanonicalName() + "'"
 			
-			String query = "select umg.s_user_id as user, count(*) as activitycount from user_group_member_role as umg, activity_feed as af where umg.s_user_id = af.author_id and umg.user_group_id = $groupId and af.root_holder_id = $groupId and af.root_holder_type = $groupClass"
+			String query = "select umg.s_user_id as user, count(*) as activitycount from user_group_member_role as umg left outer join activity_feed as af on(umg.s_user_id = af.author_id) where umg.user_group_id = $groupId and af.root_holder_id = $groupId and af.root_holder_type = $groupClass"
 			query += (roleId) ? " and umg.role_id $roleId" : ""
 			query += " group by umg.s_user_id  order by activitycount desc limit $max offset $offset"
 			

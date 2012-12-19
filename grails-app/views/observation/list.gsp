@@ -29,6 +29,7 @@
 				'speciesName':"${params.speciesName }",
 				'isFlagged':"${params.isFlagged }"
 			}
+			alert(" calling init relative time");
 			initRelativeTime("${uGroup.createLink(controller:'activityFeed', action:'getServerTime')}");
 		});
 	</g:javascript>
