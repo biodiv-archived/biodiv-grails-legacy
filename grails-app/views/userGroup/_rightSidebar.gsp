@@ -1,40 +1,43 @@
 
 <div id="right-sidebar" class="sidebar right-sidebar span12">
-	<g:if test="${params.action=='search'}">
-		<div class="sidebar_section" style="left: 0px">
-	      <a data-toggle="collapse" href="#advSearchBox"><h5><i class=" icon-search"></i>Advanced Search</h5></a>
-	      <div id="advSearchBox" class="collapse">
-	      	<search:advSearch/>
-	      </div>
-		</div>
-	</g:if>
-	
-	<!-- div class="sidebar_section" style="left: 0px">
-		<a data-toggle="collapse" href="#bookmarks"><h5><i class=" icon-bookmark"></i>Bookmarks</h5></a>
-		
-		<ul class="nav block-tagadelic" id="bookmarks">
-			<g:each in="${pages}" var="newsletterInstance">
-
-				<li><g:if test="${userGroupInstance}">
-						<a
-							href="${uGroup.createLink('mapping':'userGroup', 'action':'page', 'id':newsletterInstance.id, 'userGroup':userGroupInstance) }">
-							${fieldValue(bean: newsletterInstance, field: "title")} </a>
-					</g:if>
-					<g:else>
-						<a
-							href="${uGroup.createLink(controller:'userGroup', action:'page', id:newsletterInstance.id) }">
-							${fieldValue(bean: newsletterInstance, field: "title")} </a>
-					</g:else></li>
-			</g:each>
-			<li><g:if test="${userGroupInstance}">
-						<a
-							href="${uGroup.createLink('mapping':'userGroup', action:"pages", 'userGroup':userGroupInstance)}">Pages </a>
-				</g:if> <g:else>
-					<g:link url="${uGroup.createLink(controller:'userGroup', action:'pages')}">Pages</g:link>
-				</g:else>
-			</li>
-		</ul>
-	</div-->
+<%--	<g:if test="${params.action=='search'}">--%>
+<%--		<div class="sidebar_section" style="left: 0px">--%>
+<%--			<a data-toggle="collapse" href="#advSearchBox"><h5>--%>
+<%--					<i class=" icon-search"></i>Advanced Search--%>
+<%--				</h5>--%>
+<%--			</a>--%>
+<%--			<div id="advSearchBox" class="collapse">--%>
+<%--				<search:advSearch />--%>
+<%--			</div>--%>
+<%--		</div>--%>
+<%--	</g:if>--%>
+<%----%>
+<%--	<div class="sidebar_section" style="left: 0px">--%>
+<%--		<a data-toggle="collapse" href="#bookmarks"><h5><i class=" icon-bookmark"></i>Bookmarks</h5></a>--%>
+<%--		--%>
+<%--		<ul class="nav block-tagadelic" id="bookmarks">--%>
+<%--			<g:each in="${pages}" var="newsletterInstance">--%>
+<%----%>
+<%--				<li><g:if test="${userGroupInstance}">--%>
+<%--						<a--%>
+<%--							href="${uGroup.createLink('mapping':'userGroup', 'action':'page', 'id':newsletterInstance.id, 'userGroup':userGroupInstance) }">--%>
+<%--							${fieldValue(bean: newsletterInstance, field: "title")} </a>--%>
+<%--					</g:if>--%>
+<%--					<g:else>--%>
+<%--						<a--%>
+<%--							href="${uGroup.createLink(controller:'userGroup', action:'page', id:newsletterInstance.id) }">--%>
+<%--							${fieldValue(bean: newsletterInstance, field: "title")} </a>--%>
+<%--					</g:else></li>--%>
+<%--			</g:each>--%>
+<%--			<li><g:if test="${userGroupInstance}">--%>
+<%--						<a--%>
+<%--							href="${uGroup.createLink('mapping':'userGroup', action:"pages", 'userGroup':userGroupInstance)}">Pages </a>--%>
+<%--				</g:if> <g:else>--%>
+<%--					<g:link url="${uGroup.createLink(controller:'userGroup', action:'pages')}">Pages</g:link>--%>
+<%--				</g:else>--%>
+<%--			</li>--%>
+<%--		</ul>--%>
+<%--	</div>--%>
 <%--	<div class="tags_section sidebar_section">--%>
 <%--		<g:if test="${params.action == 'search' }">--%>
 <%--			<obv:showAllTags--%>

@@ -103,8 +103,10 @@ $(document).ready(function(){
 		if($('#uGroup_ALL').is(':checked')) {
 			$( "#advSearchForm" ).attr('action', "${Utils.getIBPServerDomain()}"+$( "#advSearchForm" ).attr('action'));
 			updateGallery($( "#advSearchForm" ).attr('action'), undefined, undefined, undefined, false);
+			return false;
 		} 
 		updateGallery($( "#advSearchForm" ).attr('action'), undefined, undefined, undefined, true);
+		return false;
 	});
 	
 	$("#uGroup_${queryParams.uGroup?:(params.webaddress?'THIS_GROUP':'ALL')}").click();

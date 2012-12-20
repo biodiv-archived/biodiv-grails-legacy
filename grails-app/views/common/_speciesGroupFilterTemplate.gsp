@@ -74,3 +74,12 @@ $(document).ready(function(){
 			data-original-title="Show only flagged observations">Flagged</button>
 	</div>
 </g:if>
+
+<div class="sidebar_section" style="left: 0px; margin: 10px;">
+	<a data-toggle="collapse" href="#advSearchBox"><h5>
+			<i class=" icon-search"></i>Advanced Search
+		</h5> </a>
+	<div id="advSearchBox" class="collapse">
+		<search:advSearch />
+	</div>
+</div>

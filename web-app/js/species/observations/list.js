@@ -7,10 +7,11 @@ $(document).ready(function(){
     if(window.params.speciesName == 'Unknown'){
 		$("#speciesNameFilterButton").addClass('active');
 		$("#speciesNameAllButton").removeClass('active');
-	}else{
+	}else {
 		$("#speciesNameFilterButton").removeClass('active');
 		$("#speciesNameAllButton").addClass('active');
     }
+    $("#speciesNameFilter").val(window.params.speciesName);
     
 	$('#observationFlagFilter').button();
     if(window.params.isFlagged == 'true' ){

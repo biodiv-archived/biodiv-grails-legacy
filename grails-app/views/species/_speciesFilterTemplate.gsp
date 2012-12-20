@@ -1,8 +1,8 @@
 <div class="filters" style="position: relative; overflow: visible;">
 	<div class="paginateButtons">
 		<center>
-			<p:paginateOnAlphabet controller="species" action="${params.action?:'list' }"
-				total="${instanceTotal}"
+			<p:paginateOnAlphabet controller="species"
+				action="${params.action?:'list' }" total="${instanceTotal}"
 				userGroup="${userGroup }"
 				userGroupWebaddress="${userGroupWebaddress}" />
 		</center>
@@ -26,22 +26,21 @@
 		</button>
 		<ul id="sortFilter" class="dropdown-menu" style="width: auto;">
 			<li class="group_option"><a class=" sort_filter_label"
-				value="title"> Name </a>
-			</li>
+				value="title"> Name </a></li>
 			<g:if test="${isSearch}">
-							<li class="group_option"><a class=" sort_filter_label"
-								value="score"> Relevancy </a></li>
-						</g:if>
+				<li class="group_option"><a class=" sort_filter_label"
+					value="score"> Relevancy </a>
+				</li>
+			</g:if>
 			<g:else>
-			<li class="group_option"><a class=" sort_filter_label"
-				value="percentOfInfo"> Richness </a>
-			</li>
+				<li class="group_option"><a class=" sort_filter_label"
+					value="percentOfInfo"> Richness </a></li>
 			</g:else>
 		</ul>
 	</div>
 
 	<obv:showGroupFilter model="['hideHabitatFilter':true]" />
-
+	
 </div>
 <obv:showObservationFilterMessage
-			model="['instanceTotal':instanceTotal, 'queryParams':queryParams, resultType:'species page']" />
+	model="['instanceTotal':instanceTotal, 'queryParams':queryParams, resultType:'species page']" />
