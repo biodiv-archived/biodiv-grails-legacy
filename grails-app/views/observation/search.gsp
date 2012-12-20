@@ -15,9 +15,9 @@
 	<div class="span12">
 		<obv:showSubmenuTemplate />
 		
-		<div class="page-header clearfix">
+		
 			<search:searchResultsHeading />
-		</div>
+		
 		
 		<uGroup:rightSidebar/>
 		<obv:showObservationsListWrapper />

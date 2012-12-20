@@ -8,10 +8,8 @@
 <body>
 	<div class="span12">
 		<div class="outer_wrapper">
+			<search:searchResultsHeading />
 			<s:showSubmenuTemplate />
-			<div class="page-header clearfix">
-				<search:searchResultsHeading />
-			</div>
 			<uGroup:rightSidebar />
 			<!-- main_content -->
 			<div id="searchResults" class="list" style="margin-left: 0px; clear:both;">

@@ -22,9 +22,7 @@
     </head>
     <body>
         <div class="span12">
-			<div class="page-header clearfix">
-				<search:searchResultsHeading />
-			</div>
+			<search:searchResultsHeading />
 			
 			<g:if test="${flash.message}">
 	            <div class="message">${flash.message}</div>

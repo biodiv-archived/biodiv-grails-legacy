@@ -26,9 +26,7 @@
 <body>
 
 	<div class="span12">
-		<div class="page-header">
-			<search:searchResultsHeading />
-		</div>
+		<search:searchResultsHeading />
 		<!-- uGroup:rightSidebar/-->
 
 		<div class="searchResults" style="margin-left:0px;">
