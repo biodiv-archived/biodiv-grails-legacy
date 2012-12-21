@@ -174,62 +174,6 @@ $(document).ready(function(){
 		$('.list_view_bttn').removeClass('active');
 		$.cookie("observation_listing", "grid");
 	});
-
-	//alert(" executing  list.js ");
-	/*
-	alert(" executing  checklist ");
-	$('.loadMore').live('click', function() {
-		$.autopager({
-
-			autoLoad : false,
-			// a selector that matches a element of next page link
-			link : 'div.paginateButtons a.nextLink',
-
-			// a selector that matches page contents
-			content : 'tbody',
-
-			appendTo : 'div.checklist_list_main > .table > tbody',
-			//insertBefore: 'div.checklist_list_main > .table > .table-footer', 
-			// a callback function to be triggered when loading start 
-			start : function(current, next) {
-				$(".loadMore .progress").show();
-				$(".loadMore .buttonTitle").hide();
-			},
-
-			// a function to be executed when next page was loaded. 
-			// "this" points to the element of loaded content.
-			load : function(current, next) {
-				//$(".mainContent:last").hide().fadeIn(3000);
-				alert("=========== next.url " + next.url);
-				$("div.paginateButtons a.nextLink").attr('href', next.url);
-				if (next.url == undefined) {
-					alert("=== inside hide ");
-					$(".loadMore").hide();
-				} else {
-					$(".loadMore .progress").hide();
-					$(".loadMore .buttonTitle").show();
-				}
-				
-				var a = $('<a href="'+current.url+'"></a>');
-			    var url = a.url();
-			    var params = url.param();
-			    delete params["append"]
-			    delete params["loadMore"]
-			    params['max'] = parseInt(params['offset'])+parseInt(params['max']);
-			    params['offset'] = 0
-			    var History = window.History;
-			    History.pushState({state:1}, "Species Portal", '?'+decodeURIComponent($.param(params))); 
-				eatCookies();
-				updateRelativeTime();
-			}
-		});
-
-		$.autopager('load');
-		return false;
-	});
-		*/		
-
-			
 	
 	$('.loadMore').live('click', function() {
 		$.autopager({
@@ -254,7 +198,6 @@ $(document).ready(function(){
 			// a function to be executed when next page was loaded. 
 			// "this" points to the element of loaded content.
 			load : function(current, next) {
-				alert("after load  next.url " + next.url );
 				$(".mainContent:last").hide().fadeIn(3000);
 				
 				$("div.paginateButtons a.nextLink").attr('href', next.url);

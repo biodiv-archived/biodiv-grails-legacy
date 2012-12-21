@@ -1,63 +1,3 @@
-/*
-$(document).ready(function(){
-	alert(" executing  checklist ");
-	$('.loadMore').live('click', function() {
-		$.autopager({
-
-			autoLoad : false,
-			// a selector that matches a element of next page link
-			link : 'div.paginateButtons a.nextLink',
-
-			// a selector that matches page contents
-			content : 'tbody',
-
-			//appendTo : 'div.checklist_list_main > .table > tbody:last',
-			insertBefore: 'div.checklist_list_main > .table > .table-footer', 
-			// a callback function to be triggered when loading start 
-			start : function(current, next) {
-				$(".loadMore .progress").show();
-				$(".loadMore .buttonTitle").hide();
-			},
-
-			// a function to be executed when next page was loaded. 
-			// "this" points to the element of loaded content.
-			load : function(current, next) {
-				//$(".mainContent:last").hide().fadeIn(3000);
-				//alert("=========== next.url " + next.url);
-				$("div.paginateButtons a.nextLink").attr('href', next.url);
-				if (next.url == undefined) {
-					//alert("=== inside hide ");
-					$(".loadMore").hide();
-				} else {
-					$(".loadMore .progress").hide();
-					$(".loadMore .buttonTitle").show();
-				}
-				
-				var a = $('<a href="'+current.url+'"></a>');
-			    var url = a.url();
-			    var params = url.param();
-			    delete params["append"]
-			    delete params["loadMore"]
-			    //params['max'] = parseInt(params['offset'])+parseInt(params['max']);
-			    //params['offset'] = 0
-			    var History = window.History;
-			    History.pushState({state:1}, "Species Portal", '?'+decodeURIComponent($.param(params))); 
-				eatCookies();
-				updateRelativeTime();
-			}
-		});
-
-		$.autopager('load');
-		return false;
-	});
-	
-	eatCookies();
-});
-
-
-*/
-
-
 function showChecklistMapView() {
 	$('#checklist_list_map').slideToggle(function() {
 	
@@ -126,7 +66,7 @@ function updateGallery(target, limit, offset, removeUser, isGalleryUpdate) {
 
 function updateListPage(activeTag) {
 	return function (data) {
-		$('.mainContentList').replaceWith(data.checklistListHtml);
+		$('.checklist_list_main').replaceWith(data.checklistListHtml);
 		$('.info-message').replaceWith(data.checklistMsgtHtml);
 		//$('#tags_section').replaceWith(data.tagsHtml);
 		//$('.observation_location_wrapper').replaceWith(data.mapViewHtml);

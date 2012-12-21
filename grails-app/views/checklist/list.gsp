@@ -12,65 +12,47 @@
 <r:require modules="checklist"/>
 </head>
 <body>
-	
-			<div class="span12">
-				<div class="page-header clearfix">
-						<h1>
-							<g:message code="default.observation.heading" args="[entityName]" />
-						</h1>
-				</div>
-
-				<g:if test="${flash.message}">
-					<div class="message alert alert-info">
-						${flash.message}
-					</div>
-				</g:if>
-				
-				<div class="gallerytoolbar">
-						<div class="filters" style="position: relative; overflow: visible;">
-							<obv:showGroupFilter model="['hideHabitatFilter':true]"/>
-						</div>
-				</div>
-				
-				<clist:showChecklistMsg model="['instanceTotal':instanceTotal]" />
-				
-				<g:if test="${!isSearch}">
-					<div id="map_view_bttn" class="btn-group" style="clear:both;">
-						<a class="btn btn-success dropdown-toggle" data-toggle="dropdown"
-							href="#"
-							onclick="$(this).parent().css('background-color', '#9acc57'); showChecklistMapView(); return false;">
-							Map view <span class="caret"></span> </a>
-					</div>
-				</g:if>
-				
-				<div id="checklist_list_map" class="observation"
-					style="clear: both; display: none;">
-					<clist:showChecklistLocation
-						model="['checklistInstanceList':checklistMapInstanceList, 'userGroup':userGroup]">
-					</clist:showChecklistLocation>
-				</div>
-				
-				<div class="checklist_list_main" style="clear:both;">
-				<table class="table table-hover span8" style="margin-left: 0px;">
-					<thead>
-						<tr>
-							<th>Title</th>
-							<th>Species Group</th>
-							<th>No. of Species</th>
-							<th>Place Name</th>
-						</tr>
-					</thead>
-<%--						<clist:showFilteredCheckList />--%>
-					<tfoot class="table-footer"></tfoot>
-				</table>
-				
-				
-				</div>
-
-				<clist:showFilteredCheckList />
-	
+<div class="span12">
+			<div class="page-header clearfix">
+					<h1>
+						<g:message code="default.observation.heading" args="[entityName]" />
+					</h1>
 			</div>
-	<g:javascript>
+
+			<g:if test="${flash.message}">
+				<div class="message alert alert-info">
+					${flash.message}
+				</div>
+			</g:if>
+			
+			<div class="gallerytoolbar">
+					<div class="filters" style="position: relative; overflow: visible;">
+						<obv:showGroupFilter model="['hideHabitatFilter':true]"/>
+					</div>
+			</div>
+			
+			<clist:showChecklistMsg model="['instanceTotal':instanceTotal]" />
+			
+			<g:if test="${!isSearch}">
+				<div id="map_view_bttn" class="btn-group" style="clear:both;">
+					<a class="btn btn-success dropdown-toggle" data-toggle="dropdown"
+						href="#"
+						onclick="$(this).parent().css('background-color', '#9acc57'); showChecklistMapView(); return false;">
+						Map view <span class="caret"></span> </a>
+				</div>
+			</g:if>
+			
+			<div id="checklist_list_map" class="observation"
+				style="clear: both; display: none;">
+				<clist:showChecklistLocation
+					model="['checklistInstanceList':checklistMapInstanceList, 'userGroup':userGroup]">
+				</clist:showChecklistLocation>
+			</div>
+			
+			<clist:showList />
+</div>
+
+<g:javascript>
 $(document).ready(function(){
 	window.params = {
 	<%

@@ -20,13 +20,13 @@ class ChecklistController {
 		def model = getFilteredChecklist(params)
 		
 		if(params.loadMore?.toBoolean()){
-			render(template:"/common/checklist/showFilteredChecklistTemplate", model:model);
+			render(template:"/common/checklist/showChecklistListTemplate", model:model);
 			return;
 		} else if(!params.isGalleryUpdate?.toBoolean()){
 			render (view:"list", model:model)
 			return;
 		} else{
-			def checklistListHtml =  g.render(template:"/common/checklist/showFilteredChecklistTemplate", model:model);
+			def checklistListHtml =  g.render(template:"/common/checklist/showChecklistListTemplate", model:model);
 			def checklistMsgtHtml =  g.render(template:"/common/checklist/showChecklistMsgTemplate", model:model);
 			def result = [checklistListHtml:checklistListHtml, checklistMsgtHtml:checklistMsgtHtml]
 			render result as JSON
