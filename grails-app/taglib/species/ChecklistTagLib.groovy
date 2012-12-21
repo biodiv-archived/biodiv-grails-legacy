@@ -19,4 +19,8 @@ class ChecklistTagLib {
 	def showData= {attrs, body->
 		out << render(template:"/common/checklist/showChecklistDataTemplate", model:attrs.model);
 	}
+	
+	def showChecklistMsg= {attrs, body->
+		out << render(template:"/common/checklist/showChecklistMsgTemplate", model:attrs.model);
+	}
 }

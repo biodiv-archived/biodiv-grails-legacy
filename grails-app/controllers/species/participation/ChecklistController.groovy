@@ -26,9 +26,9 @@ class ChecklistController {
 			render (view:"list", model:model)
 			return;
 		} else{
-			println "============= size ============== " + model.checklistInstanceList.size()
 			def checklistListHtml =  g.render(template:"/common/checklist/showFilteredChecklistTemplate", model:model);
-			def result = [checklistListHtml:checklistListHtml]
+			def checklistMsgtHtml =  g.render(template:"/common/checklist/showChecklistMsgTemplate", model:model);
+			def result = [checklistListHtml:checklistListHtml, checklistMsgtHtml:checklistMsgtHtml]
 			render result as JSON
 			return;
 		}

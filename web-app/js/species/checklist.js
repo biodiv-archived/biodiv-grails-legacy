@@ -79,7 +79,6 @@ function showChecklistMapView() {
 
 
 function updateGallery(target, limit, offset, removeUser, isGalleryUpdate) {
-	alert(" load of checklist");
 	if(target === undefined) {
             target = window.location.pathname + window.location.search;
     }
@@ -127,8 +126,8 @@ function updateGallery(target, limit, offset, removeUser, isGalleryUpdate) {
 
 function updateListPage(activeTag) {
 	return function (data) {
-		$('div.checklist_list_main > .table > tbody').replaceWith(data.checklistListHtml);
-		//$('#info-message').replaceWith(data.obvFilterMsgHtml);
+		$('.mainContentList').replaceWith(data.checklistListHtml);
+		$('.info-message').replaceWith(data.checklistMsgtHtml);
 		//$('#tags_section').replaceWith(data.tagsHtml);
 		//$('.observation_location_wrapper').replaceWith(data.mapViewHtml);
 		//setActiveTag(activeTag);
