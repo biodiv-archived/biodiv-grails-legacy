@@ -18,7 +18,20 @@ class ChecklistController {
 	def list = {
 		log.debug params
 		def model = getFilteredChecklist(params)
-		[checklistInstanceList:model.checklistInstanceList, checklistMapInstanceList:model.checklistMapInstanceList, checklistInstanceTotal:model.checklistInstanceTotal, 'userGroupWebaddress':params.webaddress]
+		
+		if(params.loadMore?.toBoolean()){
+			render(template:"/common/checklist/showFilteredChecklistTemplate", model:model);
+			return;
+		} else if(!params.isGalleryUpdate?.toBoolean()){
+			render (view:"list", model:model)
+			return;
+		} else{
+			println "============= size ============== " + model.checklistInstanceList.size()
+			def checklistListHtml =  g.render(template:"/common/checklist/showFilteredChecklistTemplate", model:model);
+			def result = [checklistListHtml:checklistListHtml]
+			render result as JSON
+			return;
+		}
 	}
 
 
@@ -103,16 +116,19 @@ class ChecklistController {
 		def userGroupInstance = userGroupService.get("" + params.webaddress);
 		
 		speciesGroup = (speciesGroup != allGroup) ? speciesGroup : null
-		 
+		
 		def checklistInstanceList = getChecklist(speciesGroup, userGroupInstance, max, offset)
 		def checklistInstanceTotal = getChecklistCount(speciesGroup, userGroupInstance)
 		def checklistMapInstanceList = getChecklist(speciesGroup, userGroupInstance, null, null)
 		
+		def queryParams = [sGroup : params.sGroup, max:max, offset:offset]
+		
+		def activeFilters = [sGroup : params.sGroup]
 		//storing in session for prev <-> next checklist
 		String webAddress = (userGroupInstance)? userGroupInstance.webaddress : ""
 		session[webAddress + "checklist_ids_list_params"] = params.clone();
 		session[webAddress + "checklist_ids_list"] = checklistInstanceList.collect {it.id};
-		return [checklistInstanceList:checklistInstanceList, checklistInstanceTotal:checklistInstanceTotal, checklistMapInstanceList:checklistMapInstanceList]
+		return [checklistInstanceList:checklistInstanceList, instanceTotal:checklistInstanceTotal, checklistMapInstanceList:checklistMapInstanceList, 'userGroupWebaddress':params.webaddress, activeFilters:activeFilters, queryParams:queryParams]
 	}
 
 	

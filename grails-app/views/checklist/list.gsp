@@ -33,10 +33,10 @@
 				</div>
 					
 				<div class="info-message">
-				<g:if test="${checklistInstanceTotal > 0}">
+				<g:if test="${instanceTotal > 0}">
 					<span class="name" style="color: #b1b1b1;margin-top: 10px;"><i
-						class="icon-screenshot"></i> ${checklistInstanceTotal} </span>
-						checklist<g:if test="${checklistInstanceTotal > 1}">s</g:if>
+						class="icon-screenshot"></i> ${instanceTotal} </span>
+						checklist<g:if test="${instanceTotal > 1}">s</g:if>
 				</g:if>
 				</div>
 				<g:if test="${!isSearch}">
@@ -56,17 +56,46 @@
 				</div>
 				
 				<div class="checklist_list_main" style="clear:both;">
-        			<clist:showFilteredCheckList />
+				<table class="table table-hover span8" style="margin-left: 0px;">
+					<thead>
+						<tr>
+							<th>Title</th>
+							<th>Species Group</th>
+							<th>No. of Species</th>
+							<th>Place Name</th>
+						</tr>
+					</thead>
+<%--						<clist:showFilteredCheckList />--%>
+					<tfoot class="table-footer"></tfoot>
+				</table>
+				<div class="mainContentList">
+					<clist:showFilteredCheckList />
+				</div>
     			</div>
 			
-				<div class="paginateButtons" style="clear:both;">
-					<center>
-							<p:paginate controller="checklist" action="list" total="${checklistInstanceTotal}"   
-								max="${params.max }" offset="${params.offset}" maxsteps="10" />
-					</center>
+			<g:if test="${instanceTotal > (queryParams.max?:0)}">
+				<div class="centered">
+					<div class="btn loadMore">
+						<span class="progress" style="display: none;">Loading ... </span>
+						<span class="buttonTitle">Load more</span>
+					</div>
 				</div>
-
-
+			</g:if>
+	
+			<%
+				activeFilters?.loadMore = true
+				activeFilters?.append = true
+				activeFilters?.webaddress = userGroup?.webaddress
+			%>
+		active Filters ====== ${ activeFilters}
+	query params ================ ${queryParams }
+	total === ${instanceTotal}
+			<div class="paginateButtons" style="visibility: hidden; clear: both">
+				<p:paginate total="${instanceTotal?:0}" action="${params.action}" controller="${params.controller?:'checklist'}"
+					userGroup="${userGroup}" userGroupWebaddress="${userGroupWebaddress}"
+				 	max="${queryParams.max}" params="${activeFilters}" />
+			</div>
+	
 			</div>
 	<g:javascript>
 $(document).ready(function(){
@@ -76,7 +105,7 @@ $(document).ready(function(){
 			println '"'+key+'":"'+value+'",'
 		}
 	%>
-		"isGalleryUpdate":false,
+		"isGalleryUpdate":true,
 		"offset":0
 	}
 
