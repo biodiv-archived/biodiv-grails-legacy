@@ -174,7 +174,7 @@ $(document).ready(function(){
 		$('.list_view_bttn').removeClass('active');
 		$.cookie("observation_listing", "grid");
 	});
-
+	
 	$('.loadMore').live('click', function() {
 		$.autopager({
 
@@ -184,7 +184,8 @@ $(document).ready(function(){
 
 			// a selector that matches page contents
 			content : '.mainContent',
-
+			
+			//insertBefore: 'div.checklist_list_main > .table > .table-footer', 
 			appendTo : '.mainContentList',
 
 			// a callback function to be triggered when loading start 

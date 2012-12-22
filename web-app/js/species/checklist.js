@@ -17,3 +17,63 @@ function showChecklistMapView() {
 	});
 }
 
+
+function updateGallery(target, limit, offset, removeUser, isGalleryUpdate) {
+	if(target === undefined) {
+            target = window.location.pathname + window.location.search;
+    }
+    
+    var a = $('<a href="'+target+'"></a>');
+    var url = a.url();
+    var href = url.attr('path');
+    var params = getFilterParameters(url, limit, offset);
+    isGalleryUpdate = (isGalleryUpdate == undefined)?true:isGalleryUpdate
+    if(isGalleryUpdate)
+    	params["isGalleryUpdate"] = isGalleryUpdate;
+    var recursiveDecoded = decodeURIComponent($.param(params));
+    
+    var doc_url = href+'?'+recursiveDecoded;
+    var History = window.History;
+    delete params["isGalleryUpdate"]
+    History.pushState({state:1}, "Species Portal", '?'+decodeURIComponent($.param(params))); 
+    console.log("doc_url " + doc_url);
+    if(isGalleryUpdate) {
+       	$.ajax({
+				url: doc_url,
+				dataType: 'json',
+				
+				beforeSend : function(){
+					$('div.checklist_list_main > div.checklist_list').css({"opacity": 0.5});
+					//$('#tags_section').css({"opacity": 0.5});
+				},
+				
+				success: updateListPage(params["tag"]),
+				statusCode: {
+				401: function() {
+					show_login_dialog();	
+				}	    				    			
+			},
+			error: function(xhr, status, error) {
+				var msg = $.parseJSON(xhr.responseText);
+				$('.message').html(msg);
+			}
+		});
+	} else {
+		window.location = doc_url;
+	}
+	
+}
+
+function updateListPage(activeTag) {
+	return function (data) {
+		$('.checklist_list_main').replaceWith(data.checklistListHtml);
+		$('.info-message').replaceWith(data.checklistMsgtHtml);
+		//$('#tags_section').replaceWith(data.tagsHtml);
+		//$('.observation_location_wrapper').replaceWith(data.mapViewHtml);
+		//setActiveTag(activeTag);
+		eatCookies();
+	}
+}
+
+
+   

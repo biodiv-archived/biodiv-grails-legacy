@@ -24,7 +24,7 @@
 		</div>
 		<div class="links_box_column">
 			<ul>
-				<li class="nav-header bold"><a href='/about'>The Portal</a></li>
+				<li class="nav-header bold"><a href='/theportal'>The Portal</a></li>
 				<li><a href="${ '/biodiversity_in_india'}">Biodiversity in India</a>
 				</li>
 				<li><a href="${ '/about/whats-new'}">What's new?</a></li>
