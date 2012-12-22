@@ -1,7 +1,7 @@
 
 <%@page import="species.utils.Utils"%>
 <%@page import="species.utils.ImageType"%>
-        <h5><obv:showSpeciesName model="['observationInstance':observationInstance, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress]" /></h5>
+        <h5><obv:showSpeciesName model="['observationInstance':observationInstance, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress,isListView:true]" /></h5>
         <div class="icons-bar clearfix">
             <div class="pull-left">
                     <span class="group_icon species_groups_sprites active ${observationInstance.group.iconClass()}" title="${observationInstance.group?.name}"></span>

@@ -1,12 +1,9 @@
 		<g:if test="${speciesFieldInstance?.field.description}">
-			<div class="help">
-				<span class="ui-icon-control ui-icon-help" title="Show help"
-					style="float: right;"></span>
-				<div class="grid_10 ui-corner-all toolbarIconContent helpContent"
-					style="display: none;">
-					<a class="ui-icon ui-icon-close" style="float: right;"></a>
-					${speciesFieldInstance?.field.description.encodeAsHTML()}
-
-				</div>
+			<div class="dropdown pull-right">
+				<a href="#" class="dropdown-toggle" data-toggle="dropdown" title="About field"><i class="  icon-question-sign"></i></a>			
+			
+				<ul class="dropdown-menu span6 helpContent">
+					<li>${speciesFieldInstance?.field.description.encodeAsHTML()}</li>
+				</ul>
 			</div>
 		</g:if>

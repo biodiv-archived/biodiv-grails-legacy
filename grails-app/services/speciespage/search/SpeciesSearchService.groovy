@@ -38,7 +38,7 @@ class SpeciesSearchService {
 		log.info "Initializing publishing to search index"
 		
 		//TODO: change limit
-		int limit=Species.count()+1, offset = 0;
+		int limit=BATCH_SIZE, offset = 0;
 		
 		def species;
 		def startTime = System.currentTimeMillis()

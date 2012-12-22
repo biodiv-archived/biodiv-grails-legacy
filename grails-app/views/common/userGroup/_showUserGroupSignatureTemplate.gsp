@@ -1,25 +1,31 @@
 <%@page import="species.utils.ImageType"%>
-<div class="signature ${showDetails ? 'pull-left' : 'span3'}" style="margin: 5px 0px;position:relative;${showDetails ? 'width:100%;' : ''}">
-	<a href="${uGroup.createLink(mapping:'userGroup', controller:'userGroup', action:'show', base:userGroup.domainName, 'userGroup':userGroup, 'pos':pos)}"
-		style="display:inline-block;float:left; ${showDetails ? 'width:100%;' : ''}">
-		<img class="logo ${showDetails ? 'normal_profile_pic' : 'small_profile_pic'}" style="vertical-align: middle;"
-			src="${userGroup.mainImage()?.fileName}" title="${userGroup.name}"
-			alt="${userGroup.name}" />
-		<span class="" style="margin: 0px 5px;">
-			${userGroup.name}
-		</span>
-<%--		<g:if test="${showDetails}">--%>
-<%--			<span class="ellipsis" style="margin: 0px 5px;">--%>
-<%--				${userGroup.description}--%>
-<%--			</span>--%>
-<%--		</g:if>--%>
-	</a>
-	<g:if test="${!showDetails}">
-		<g:link url="${uGroup.createLink(mapping:"userGroup", action:"members", absolute:'true', params=['webaddress':userGroup.webaddress])}"
-			title="No ofMembers"
-			style="float:right;margin-right:10px;display:inline-block;">
-			<i class="icon-user"></i>
-			${userGroup.getAllMembersCount()}
-		</g:link>
-	</g:if>
+
+<div class="media signature  ${showDetails ? '' : 'span3'}" style="margin-left:0px">
+	<a class="pull-left"
+		href="${uGroup.createLink(mapping:'userGroup', controller:'userGroup', action:'show', base:userGroup.domainName, 'userGroup':userGroup, 'pos':pos)}">
+		<img
+		class="media-object   ${showDetails ? 'normal_profile_pic' : 'user-icon small_profile_pic'}"
+		style="vertical-align: middle;"
+		src="${userGroup.mainImage()?.fileName}" title="${userGroup.name}"
+		alt="${userGroup.name}" /> </a>
+	<div class="media-body">
+		<div class="media-heading"  style="text-align:left;">
+			<a
+				href="${uGroup.createLink(mapping:'userGroup', controller:'userGroup', action:'show', base:userGroup.domainName, 'userGroup':userGroup, 'pos':pos)}">
+				<span class="ellipsis" title="${userGroup.name}">${userGroup.name}</span> </a>
+		</div>
+
+
+		<!-- Nested media object -->
+		<div class="pull-left">
+			<g:if test="${!showDetails}">
+				<g:link
+					url="${uGroup.createLink(mapping:"userGroup", action:"members", absolute:'true', params=['webaddress':userGroup.webaddress])}"
+					title="No ofMembers">
+					<i class="icon-user"></i>
+					${userGroup.getAllMembersCount()}
+				</g:link>
+			</g:if>
+		</div>
+	</div>
 </div>

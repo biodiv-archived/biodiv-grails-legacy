@@ -10,7 +10,7 @@
 			<g:each in="${speciesInstanceList}" status="i" var="speciesInstance">
 
 				<div class="media"
-					style="margin: 5px; padding: 10px; height: 220px; overflow: hidden; border-bottom: 1px solid #c6c6c6; background-color: #fdfdfd;">
+					style="margin: 5px; padding: 10px; height: 180px; border-bottom: 1px solid #c6c6c6; background-color: #fdfdfd;">
 					<a class="pull-left figure"
 						style="max-height: 220px; max-width: 200px;"
 						href="${uGroup.createLink(action:'show', controller:'species', id:speciesInstance.id)}">
@@ -27,7 +27,7 @@
 								title="${speciesInstance.taxonConcept.name}"
 								src="${createLinkTo(dir:'images', file: speciesInstance.fetchSpeciesGroupIcon(ImageType.NORMAL)?.fileName, absolute:true)}" />
 						</g:else> </a>
-					<div class="media-body">
+					<div class="media-body" style="">
 						<h6 class="media-heading">
 							<g:link class="ellipsis"
 								url="${uGroup.createLink(action:'show', controller:'species', id:speciesInstance.id)}">

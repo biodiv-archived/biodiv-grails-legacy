@@ -4,7 +4,7 @@
 .combobox-container {
 	position: absolute;
 	top: 0;
-	left: 210px;
+	left: 190px;
 	
 }
 .combobox-container input:first-child {

@@ -2,19 +2,16 @@
 <g:if test="${speciesFieldInstance}">
 	<g:if test="${speciesFieldInstance?.description}">
 			<!--  content attribution -->
-			<div class="attributionBlock">
-				<span class="ui-icon-info ui-icon-control " title="Show details"
-					style="float: right;"></span>
-				<div class="grid_10 ui-corner-all toolbarIconContent attribution"
-					style="display: none;">
-					<a class="ui-icon ui-icon-close" style="float: right;"></a>
+			<div class="attributionBlock dropdown pull-right">
+				<a href="#" class="dropdown-toggle" data-toggle="dropdown" title="Show details"><i class=" icon-info-sign"></i></a>			
+				<div class="dropdown-menu ">
 					<table>
 						<g:if test="${speciesFieldInstance?.contributors}">
 							<tr class="prop">
 								<td valign="top" class="grid_1 name">Contributors</td>
 								<td valign="top" class="grid_8 value"><g:each
 										in="${ speciesFieldInstance?.contributors}" var="contributor">
-										<a> ${contributor.name} </a>
+										${contributor.name} 
 									</g:each>
 								</td>
 							</tr>
@@ -22,8 +19,8 @@
 						<g:if test="${speciesFieldInstance?.status}">
 							<tr class="prop">
 								<td valign="top" class="grid_1 name">Status</td>
-								<td valign="top" class="grid_8 value"><a> ${speciesFieldInstance?.status?.value()}
-								</a>
+								<td valign="top" class="grid_8 value">${speciesFieldInstance?.status?.value()}
+								
 								</td>
 							</tr>
 						</g:if>
@@ -33,7 +30,7 @@
 								<td valign="top" class="grid_8 value"><g:each
 										in="${ speciesFieldInstance?.audienceTypes}"
 										var="audienceType">
-										<a> ${audienceType.value} </a>
+										${audienceType.value}
 									</g:each>
 								</td>
 							</tr>
@@ -75,7 +72,7 @@
 								<td valign="top" class="grid_8">
 									<ol>
 										<g:each in="${speciesFieldInstance.references}" var="r">
-											<li style="margin-left: 20px;"><g:if test="${r.url}">
+											<li style="margin-left: 20px;" title="${r.title?:r.url}"><g:if test="${r.url}">
 													<a href="${r.url}" target="_blank"> ${r.title?r.title:r.url}
 													</a>
 												</g:if> <g:else>

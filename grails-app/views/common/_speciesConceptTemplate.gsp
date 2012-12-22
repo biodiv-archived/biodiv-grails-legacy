@@ -1,23 +1,19 @@
 
 <%@page import="species.Reference"%>
 <%@page import="species.TaxonomyDefinition.TaxonomyRank"%>
-<div class="ui-widget  <%=sparse?'':'menubutton'%>">
+<div class="sidebar_section  <%=sparse?'':'menubutton'%>">
 	<g:set var="fieldCounter" value="${1}" />
 	<a href="#content" <%=sparse?'style=\"display:none\"':''%>> ${concept.key} </a>
 
 	<!-- speciesConcept section -->
 	<div
 		class="speciesConcept <%=concept.key.equals(grailsApplication.config.speciesPortal.fields.OVERVIEW)?'defaultSpeciesConcept':''%>"
-		id="speciesConcept${conceptCounter++}" <%=sparse?'':'style=\"display:none\"'%>>
-		<div class="speciesFieldHeader ui-dialog-titlebar  ui-helper-clearfix ui-widget-header">
-						<span class="ui-icon ui-icon-circle-triangle-s" style="float: left; margin-right: .3em;"></span>
-							<a href="#taxonRecordName"> ${concept.key}</a> 
-		</div>
-		
+		id="speciesConcept${conceptCounter}" <%=sparse?'':'style=\"display:none\"'%>>
+		<a class="speciesFieldHeader" data-toggle="collapse" data-parent="#speciesConcept${conceptCounter++}"  href="#speciesField${conceptCounter}_${fieldCounter}"> <h5>${concept.key}</h5></a> 
 
 		<!-- speciesField section -->
-		<div id="speciesField${conceptCounter}.${fieldCounter++}"
-			class="speciesField ui-widget-content">
+		<div id="speciesField${conceptCounter}_${fieldCounter++}"
+			class="speciesField collapse in">
 
 			<g:if test="${concept.value.containsKey('speciesFieldInstance')}">
 				<g:showSpeciesField
@@ -25,22 +21,16 @@
 			</g:if>
 			<g:else>
 				<g:each in="${concept.value}" var="category">
-					<br/>
 					<g:if test="${!category.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.SUMMARY) }">
 
-						<div class="" style="clear:both">
-							<div
-								class="speciesFieldHeader category-header ui-dialog-titlebar  ui-helper-clearfix ">
+						<div class="clearfix">
 
+							<a class="category-header-heading speciesFieldHeader" data-toggle="collapse"
+								href="#speciesField${conceptCounter}_${fieldCounter}"><h6> ${category.key} </h6>
+							</a>
 
-								<a class="category-header-heading"
-									href="#speciesField${conceptCounter}.${fieldCounter}"><h4> ${category.key} </h4>
-								</a>
-
-							</div>
-
-							<div id="speciesField${conceptCounter}.${fieldCounter++}"
-								class="<%=category.key.equals(grailsApplication.config.speciesPortal.fields.BRIEF)?'defaultSpeciesField':''%> speciesField  ">
+							<div id="speciesField${conceptCounter}_${fieldCounter++}"
+								class="collapse <%=category.key.equals(grailsApplication.config.speciesPortal.fields.BRIEF)?'defaultSpeciesField':''%> speciesField  ">
 
 								<g:if test="${category.value.containsKey('speciesFieldInstance') || category.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.OCCURRENCE_RECORDS) || category.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.REFERENCES)}">
 									<g:if test="${category.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.COMMON_NAME)}">
@@ -117,7 +107,7 @@
 										references = refs.values();
 										%>
 										<g:if test="${references }">
-											<ol class="references">
+											<ol class="references" style="list-style:disc;list-style-type:decimal">
 												<g:each in="${references}" var="r">
 													<li><g:if test="${r.url}">
 															<a href="${r.url}" target="_blank"> ${r.title?r.title:r.url}

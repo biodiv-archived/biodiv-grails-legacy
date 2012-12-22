@@ -112,30 +112,6 @@ $(document).ready(function(){
 		$("#resourceTabs").tabs("remove", 0);
 	}
 
-	$('div.speciesFieldHeader').collapser({
-		target: 'next',
-		effect: 'slide',
-		changeText: false
-		},function(){
-			var ele = $(this);
-			var x = ele.find(".ui-icon")
-			if(ele.next('.speciesField').is(":visible")) {				 
-				x.removeClass('ui-icon-circle-triangle-s').addClass('ui-icon-circle-triangle-e');
-			} else {
-				x.removeClass('ui-icon-circle-triangle-e').addClass('ui-icon-circle-triangle-s')
-			}
-		} , function(){
-					
-		}
-	);
-
-    $(".speciesField").each(function() {
-	    if(jQuery.trim($(this).text()).length == 0) {
-		    $(this).prev("div.speciesFieldHeader").children("span").removeClass("ui-icon ui-icon-circle-triangle-s")
-		}
-		// $(this).children(".toolbar").appendTo($(this).parent().children(".ui-dialog-titlebar"))
-	})		
-
 	$(".defaultSpeciesConcept").prev("a").trigger('click');	
 
 	var flickrGallery;
@@ -269,9 +245,6 @@ $(document).ready(function(){
 	  	}
 	  );
   	
-  	$('.attribution').mouseleave(function(){
-  		$(this).hide();
-  	});
   	
   	$('.helpContent').mouseleave(function(){
   		$(this).hide();
@@ -408,12 +381,11 @@ $(document).ready(function(){
 			<div class="grid_16" style="float:left;margin-right: .3em;">
 				<%def nameRecords = fields.get(grailsApplication.config.speciesPortal.fields.NOMENCLATURE_AND_CLASSIFICATION)?.get(grailsApplication.config.speciesPortal.fields.TAXON_RECORD_NAME).collect{it.value.get('speciesFieldInstance')} %>
 				<g:if test="${nameRecords}">
-				<div class="ui-widget">
-					<div class="speciesFieldHeader ui-dialog-titlebar ui-helper-clearfix ui-widget-header">
-						<span class="ui-icon ui-icon-circle-triangle-s" style="float: left; margin-right: .3em;"></span>
-							<a href="#taxonRecordName"> Taxon Record Name</a> 
-					</div>
-					<div class="ui-widget-content speciesField">
+				<div class="sidebar_section">
+					<a class="speciesFieldHeader"  data-toggle="collapse" href="#taxonRecordName">
+						<h5>Taxon Record Name</h5>
+					</a> 
+					<div id="taxonRecordName" class="speciesField collapse">
 						<table>
 						<tr class="prop">
 								<td><span class="grid_3 name">${grailsApplication.config.speciesPortal.fields.SCIENTIFIC_NAME }</span></td><td> ${speciesInstance.taxonConcept.italicisedForm}</td>
@@ -444,12 +416,11 @@ $(document).ready(function(){
 				<!-- Synonyms -->
 				<%def synonyms = Synonyms.findAllByTaxonConcept(speciesInstance.taxonConcept) %>
 				<g:if test="${synonyms }">
-				<div class="ui-widget">
-					<div class="speciesFieldHeader ui-dialog-titlebar ui-helper-clearfix ui-widget-header">
-						<span class="ui-icon ui-icon-circle-triangle-s" style="float: left; margin-right: .3em;"></span>
-						<a href="#synonyms"> Synonyms</a> 
-					</div>
-					<div class="ui-widget-content speciesField">
+				<div class="sidebar_section">
+					<a class="speciesFieldHeader"  data-toggle="collapse" href="#synonyms"> 
+						<h5>Synonyms</h5>
+					</a> 
+					<div id="synonyms" class="speciesField collapse">
 						<table>
 						<g:each in="${synonyms}" var="synonym">
 						<tr><td class="prop">
@@ -479,13 +450,9 @@ $(document).ready(function(){
 					
 				%>
 				<g:if test="${names}">
-				<div class="ui-widget">
-				
-					<div class="speciesFieldHeader ui-dialog-titlebar ui-helper-clearfix ui-widget-header">
-						<span class="ui-icon ui-icon-circle-triangle-s" style="float: left; margin-right: .3em;"></span>
-						<a href="#commonNames"> Common Names</a> 
-					</div>
-					<div class="ui-widget-content speciesField">
+				<div class="sidebar_section">
+					<a class="speciesFieldHeader" data-toggle="collapse" href="#commonNames"><h5> Common Names</h5></a> 
+					<div id="commonNames" class="speciesField collapse">
 						
 							<table>
 								<g:each in="${names}">
@@ -497,7 +464,6 @@ $(document).ready(function(){
 									</tr>
 								</g:each>
 							</table>
-						
 					</div>
 				</div>
 				<br/>
@@ -521,8 +487,8 @@ $(document).ready(function(){
 								<li style="clear: both; margin-left: 0px">
 							</g:if>
 							<g:else>
-								<li class="nav ui-state-default"
-									onClick="showSpeciesConcept('${conceptCounter}'); showSpeciesField('${conceptCounter}.${fieldCounter}')">
+								<li class="nav ui-state-default">
+<%--									onClick="showSpeciesConcept('${conceptCounter}'); showSpeciesField('${conceptCounter}.${fieldCounter}')">--%>
 							</g:else>
 							<g:showSpeciesConcept
 								model="['speciesInstance':speciesInstance, 'concept':concept, 'conceptCounter':conceptCounter, 'sparse':sparse]" />

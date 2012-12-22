@@ -47,7 +47,7 @@
 
 .textbox input{
 	text-align: left;
-	width: 290px;
+	/*width: 290px;*/
 	height:34px;
 	padding:5px;
 }
@@ -239,7 +239,7 @@ input.dms_field {
 										<g:each in="${species.groups.SpeciesGroup.list()}" var="g">
 											<g:if
 												test="${!g.name.equals(grailsApplication.config.speciesPortal.group.ALL)}">
-												<li class="span2 group_option" value="${g.id}" title="${g.name}">
+												<li class="group_option" value="${g.id}" title="${g.name}">
 													<a>
 														<i class="group_icon pull-left species_groups_sprites active ${g.iconClass()}"></i>
 															${g.name}
@@ -287,7 +287,7 @@ input.dms_field {
 											<g:each in="${species.Habitat.list()}" var="h">
 											<g:if
 												test="${!h.name.equals(grailsApplication.config.speciesPortal.group.ALL)}">
-												<li class="span2 habitat_option" value="${h.id}" title="${h.name}"><a>
+												<li class="habitat_option" value="${h.id}" title="${h.name}"><a>
 												
 												<i class="group_icon pull-left habitats_sprites active ${h.iconClass()}"></i>
 												${h.name}</a>
@@ -317,7 +317,7 @@ input.dms_field {
 									default="Observed on" /></label>
 
 							<div class="controls textbox">
-								<input name="observedOn" type="text" id="observedOn"
+								<input name="observedOn" type="text" id="observedOn" class="input-block-level"
 									value="${observationInstance?.observedOn?.format('dd/MM/yyyy')}"
 									placeholder="Select date of observation (dd/MM/yyyy)" />
 								
@@ -371,7 +371,7 @@ input.dms_field {
 									default="Location title" /> </label>
 									
 								<div class="controls textbox">
-									<input id="place_name" type="text" name="place_name"
+									<input id="place_name" type="text" name="place_name" class="input-block-level"
 										value="${defaultPlaceName}"></input>
 								</div>
 
@@ -399,7 +399,7 @@ input.dms_field {
 									default="Geoprivacy" /> </label>
 	                                
 	                            <div class="controls">  
-                						<input type="checkbox"
+                						<input type="checkbox" class="input-block-level"
 	                                        name="geo_privacy" value="geo_privacy" />
                 						Hide precise location
 	                            </div>
@@ -411,11 +411,11 @@ input.dms_field {
 									default="Geocode name" /> </label>
 								<div class="controls">                
 	                                <div class="location_picker_value" id="reverse_geocoded_name"></div>
-	                                <input id="reverse_geocoded_name_field" type="hidden"
+	                                <input id="reverse_geocoded_name_field" type="hidden"  class="input-block-level"
 	                                        name="reverse_geocoded_name" > </input>
 	                            </div>
 	                        </div>
-                                <div><input id="use_dms" type="checkbox" name="use_dms" value="use_dms" />
+                                <div><input id="use_dms" class="input-block-level" type="checkbox" name="use_dms" value="use_dms" />
                                     Use deg-min-sec format for lat/long
 	                        </div>
 
@@ -426,7 +426,7 @@ input.dms_field {
 	                            <div class="controls textbox">             
 	                                <!-- div class="location_picker_value" id="latitude"></div>
 	                                <input id="latitude_field" type="hidden" name="latitude"></input-->
-	                                <input class="degree_field" id="latitude_field" type="text" name="latitude"></input>
+	                                <input class="degree_field input-block-level" id="latitude_field" type="text" name="latitude"></input>
 	                                <input class="dms_field" id="latitude_deg_field" type="text" name="latitude_deg" placeholder="deg"></input>
 	                                <input class="dms_field" id="latitude_min_field" type="text" name="latitude_min" placeholder="min"></input>
 	                                <input class="dms_field" id="latitude_sec_field" type="text" name="latitude_sec" placeholder="sec"></input>
@@ -440,7 +440,7 @@ input.dms_field {
 	                            <div class="controls textbox">               
 	                                <!--div class="location_picker_value" id="longitude"></div>
 	                                <input id="longitude_field" type="hidden" name="longitude"></input-->
-	                                <input class="degree_field" id="longitude_field" type="text" name="longitude"></input>
+	                                <input class="degree_field input-block-level" id="longitude_field" type="text" name="longitude"></input>
 	                                <input class="dms_field" id="longitude_deg_field" type="text" name="longitude_deg" placeholder="deg"></input>
 	                                <input class="dms_field" id="longitude_min_field" type="text" name="longitude_min" placeholder="min"></input>
 	                                <input class="dms_field" id="longitude_sec_field" type="text" name="longitude_sec" placeholder="sec"></input>
@@ -449,7 +449,7 @@ input.dms_field {
 	                        </div>
 	                  
 	                </div>
-	                	<div class=" span6 sidebar-section section" style="padding:0;">
+	                	<div class=" span6 sidebar-section section" style="padding:0;width:430px;">
                                     <div class="map_search">
                                             <div id="geotagged_images" style="padding:10px;">
                                                     <div class="title" style="display: none">Use location
@@ -461,7 +461,7 @@ input.dms_field {
                                             <div id="current_location" class="section-item">
                                                     <div class="location_picker_button"><a href="#" onclick="return false;">Use current location</a></div>
                                             </div>
-                                            <input id="address" type="text" title="Find by place name"
+                                            <input id="address" type="text" title="Find by place name"  class="input-block-level"
                                                     class="section-item" />
                                                                                
 
@@ -533,9 +533,9 @@ input.dms_field {
 								<%
 									def obvActionMarkerClass = (params.action == 'create' || params.action == 'save')? 'create' : '' 
 								%>
-								<ul id="userGroups" class="${obvActionMarkerClass}" name="userGroups" style="list-style:none;clear:both;">
+								<div id="userGroups" class="${obvActionMarkerClass}" name="userGroups" style="list-style:none;clear:both;">
 									<uGroup:getCurrentUserUserGroups model="['observationInstance':observationInstance]"/>
-								</ul>
+								</div>
 							</div>
 						</div>
 					</div>

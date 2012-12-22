@@ -1,3 +1,4 @@
+
 <% def userGroups = userGroups.groupBy{it.key.allowObvCrossPosting};
 def exclusiveUsergroups =  userGroups[false]
 def otherUsergroups =  userGroups[true] 
@@ -7,8 +8,8 @@ def obvActionMarkerClass = (params.action == 'create' || params.action == 'save'
 <g:if test="${exclusiveUsergroups}">
 	<div id="groupsWithSharingNotAllowed" class="btn-group userGroups"
 		data-toggle="buttons-radio">
-		Share with either of these groups
-		<ul class="thumbnails" style="clear:both;">
+		<div>Share with either of these groups</div><br/>
+		<ul class="thumbnails clearfix">
 			<g:each in="${exclusiveUsergroups}" var="userGroup" status="i">
 
 				<li>
@@ -21,23 +22,25 @@ def obvActionMarkerClass = (params.action == 'create' || params.action == 'save'
 				checked = checked || params.userGroupId.containsValue(String.valueOf(userGroup.key.id))
 			}
 		}
-	 %>
+	 %> 
 	 <label class="radio">
-						<button type="button" class="btn ${checked?'active btn-success ' + obvActionMarkerClass :''} single-post" value="${userGroup.key.id}">
-							<uGroup:showUserGroupSignature  model="[ 'userGroup':userGroup.key]" />
-						</button> </label>
-			</g:each>
+						<button type="button"
+							class="btn ${checked?'active btn-success ' + obvActionMarkerClass :''} single-post"
+							value="${userGroup.key.id}">
+							<uGroup:showUserGroupSignature
+								model="[ 'userGroup':userGroup.key]" />
+						</button> </label></g:each>
 		</ul>
 	</div>
 
 </g:if>
 
 <g:if test="${exclusiveUsergroups && otherUsergroups}">
-or with any of these groups
+	<div>or with any of these groups</div>
 </g:if>
 <div id="groupsWithSharingAllowed" class="btn-group userGroups"
 	data-toggle="buttons-checkbox">
-	<ul class="thumbnails"  style="clear:both;">
+	<ul class="thumbnails" style="clear: both;">
 		<g:each in="${otherUsergroups}" var="userGroup" status="i">
 
 			<li>
@@ -50,11 +53,13 @@ or with any of these groups
 				checked = checked || params.userGroupId.containsValue(String.valueOf(userGroup.key.id))
 			}
 		}
-	 %> 
-	 <label class="checkbox">
-					<button type="button" class="btn ${checked? 'active btn-success ' + obvActionMarkerClass :''} multi-post"  value="${userGroup.key.id}">
-						<uGroup:showUserGroupSignature  model="[ 'userGroup':userGroup.key]" />
-						
+	 %> <label class="checkbox">
+					<button type="button"
+						class="btn ${checked? 'active btn-success ' + obvActionMarkerClass :''} multi-post"
+						value="${userGroup.key.id}">
+						<uGroup:showUserGroupSignature
+							model="[ 'userGroup':userGroup.key]" />
+
 					</button> </label>
 		</g:each>
 	</ul>

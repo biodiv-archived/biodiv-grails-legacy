@@ -2,9 +2,9 @@
 
 	<!-- sub-category heading -->
 	<g:if test="${speciesFieldInstance?.field?.subCategory}">
-		<h5 style="margin-bottom: 0px">
+		<h6 style="margin-bottom: 0px">
 			${speciesFieldInstance?.field?.subCategory}
-		</h5>
+		</h6>
 	</g:if>
 
 	<!-- message -->
@@ -37,12 +37,13 @@
 			</g:else>
 				<g:each in="${speciesFieldInstance.resources}" var="r">
 					<g:if test="${r.type == species.Resource.ResourceType.IMAGE}">
-						<li class="figure" style="list-style:none;float: right;"><div class="attributionBlock">
-							<span class="ui-icon-info ui-icon-control " title="Show details"
-								style="float: right;"></span>
-							<div class="grid_3 ui-corner-all toolbarIconContent attribution"
-								style="display: none;">
-								<a class="ui-icon ui-icon-close" style="float: right;"></a>
+						<li class="figure" style="list-style:none;">
+						
+						
+						<div class="attributionBlock dropdown" style="text-align:right;margin-right:3px;">
+							<span href="#" class="dropdown-toggle" data-toggle="dropdown" title="Show details"><i class=" icon-info-sign"></i></span>			
+
+							<div class="dropdown-menu">
 								<g:imageAttribution model="['resource':r]"/>
 							</div>
 						</div><div>

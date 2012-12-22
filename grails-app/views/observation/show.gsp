@@ -78,7 +78,7 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 				<obv:showSubmenuTemplate/>
 				<div class="page-header clearfix">
 					<div style="width:100%;">
-						<div class="span8 main_heading">
+						<div class="span8 main_heading" style="margin-left:0px;">
 							<obv:showSpeciesName
 								model="['observationInstance':observationInstance]" />
 						</div>

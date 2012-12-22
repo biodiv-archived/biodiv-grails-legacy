@@ -6,7 +6,7 @@ class SearchTagLib {
 	
 	def searchBox = {attrs, body ->
 		if(!attrs.model) attrs.model = [:]
-		if(params.controller=='species'||params.controller=='observation'||params.controller=='newsletter'||params.controller=='members'||params.controller=="checklist") {
+		if(params.controller=='species'||params.controller=='observation'||params.controller=='newsletter'||params.controller=='members') {
 			attrs.model.controller= params.controller
 		} else if (params.controller=='userGroup' && (params.action=='species'||params.action=='observation'||params.action=='newsletter'||params.action=='members')) {
 			attrs.model.controller= params.action
@@ -27,11 +27,11 @@ class SearchTagLib {
 	def advSearch =  {attrs, body ->
 		def model = attrs.model;
 	
-		if(params.controller == "species") {
+		if(params.controller == "species" || (params.controller == 'userGroup' && params.action == 'species')) {
 			out << render(template:"/species/advSearchTemplate", model:attrs.model);
-		} else if(params.controller == "observation") {
+		} else if(params.controller == "observation" || (params.controller == 'userGroup' && params.action == 'observation')) {
 			out << render(template:"/observation/advSearchTemplate", model:attrs.model);
-		} else if(params.controller == "newsletter") {
+		} else if(params.controller == "newsletter"  || (params.controller == 'userGroup' && params.action == 'newsletter')) {
 			out << render(template:"/newsletter/advSearchTemplate", model:attrs.model);
 		}
 	}

@@ -698,12 +698,6 @@ ul#recoSummary {
 	float: right;
 }
 
-.habitat_option {
-	display: inline-block;
-	padding: 5px;
-	width: 160px;
-}
-
 #ui-datepicker-div {
 	width: auto;
 	z-index: 4 !important;
@@ -724,6 +718,7 @@ ul#recoSummary {
 	text-align: center;
 	*font-size: 32px;
 	line-height: 32px;
+	vertical-align: middle;
 }
 
 .small_profile_pic {
@@ -1098,17 +1093,6 @@ margin-top:   0; clear: both  ;
 	/* 	padding: 0; */
 	/* } */  
 
-#wgp-header {
-	background-color: #f9f9f9;
-	box-shadow: 0 6px 6px -6px #5E5E5E;
-	color: #5E5E5E;
-	font-family: Verdana, Helvetica, Sans-Serif;
-	/* height: 80px; */
-	width: 100%;
-	z-index: 2000;
-	min-width: 1220px;
-}
-
 #upload_resource {
 	margin-left: 45px;
 	position: absolute;
@@ -1189,28 +1173,6 @@ span.cke_skin_kama {
 .top_nav_bar li:hover {
 	background-color: #e8f7f1;
 	border-bottom: 3px solid #003846;
-}
-
-#wgp-footer {
-	background-image: url(../images/footer-big.jpg);
-	color: #5E5E5E;
-	font-family: Verdana, Helvetica, Sans-Serif;
-	height: 160px;
-	width: 100%;
-	position: relative;
-	margin-top: 50px;
-}
-
-#wgp-footer ul {
-	list-style: none;
-	position: absolute;
-	bottom: 20px;
-	right: 20px;
-}
-
-#wgp-footer li {
-	display: inline;
-	cursor: pointer;
 }
 
 #ibp-footer {
@@ -1321,6 +1283,11 @@ span.cke_skin_kama {
         margin-right: 16px;
 }
 /*USER GROUP END*/
+
+.sci_name {
+	font-style:italic;
+}
+
 h1,.main_heading .species_title .sci_name {
 	font-size: 25px;
 }
@@ -1595,12 +1562,58 @@ li#userOrEmail-new {
 	cursor: pointer;
 }
 
-.signature {
-	background-color:#FFFFFF
+/* .signature { */
+/* 	background-color:#FFFFFF */
+/* 	background-clip: padding-box; */
+/* 	border-color: rgba(0, 0, 0, 0.2); */
+/* 	border-radius: 5px; */
+/* 	border-style: solid; */
+/* 	border-width: 1px; */
+/* 	box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2); */
+/* } */
+
+#reco-options {
 	background-clip: padding-box;
+	background-color: #FFFFFF;
 	border-color: rgba(0, 0, 0, 0.2);
-	border-radius: 5px;
+	border-radius: 0 0 5px 5px;
 	border-style: solid;
 	border-width: 1px;
 	box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+	display: none;
+	float: left;
+	left: 0;
+	list-style: none outside none;
+	margin: 0;
+	min-width: 400px;
+	max-width: 400px;
+	width: 400px;
+	padding: 10px;
+	top: 100%;
+	z-index: 1000;
+	color: #000000;
+}
+
+#reco-close {
+	position: absolute;
+	top: 0;
+	right: 0;
+}
+
+.nameContainer {
+	position:relative;
+}
+
+#nameSuggestions {
+	width:290px;
+}
+#commonName {
+	width:180px;
+}
+
+#group_options, #habitat_options {
+	width: 300px;
+}
+.btn-group > .btn-large {
+	font-size: 14px;
 }

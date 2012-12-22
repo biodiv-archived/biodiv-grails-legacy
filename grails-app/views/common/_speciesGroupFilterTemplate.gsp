@@ -75,7 +75,7 @@ $(document).ready(function(){
 	</div>
 </g:if>
 
-<div class="sidebar_section" style="left: 0px; margin: 10px;">
+<div class="sidebar_section" style="left: 0px; margin: 10px 0px;">
 	<a data-toggle="collapse" href="#advSearchBox"><h5>
 			<i class=" icon-search"></i>Advanced Search
 		</h5> </a>
@@ -83,3 +83,8 @@ $(document).ready(function(){
 		<search:advSearch />
 	</div>
 </div>
+<style>
+	.collapse.in {
+		overflow:visible;
+	}
+</style>

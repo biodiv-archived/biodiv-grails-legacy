@@ -17,7 +17,7 @@
 
 
 
-					<g:if test="${i%3 == 0}">
+					<g:if test="${i%4 == 0}">
 						<li
 							class=" pull-left thumbnail ${speciesInstance.percentOfInfo > 0?'rich_species_content':'poor_species_content'}"
 							style="clear: both; margin: 5px 0px 5px 5px">
@@ -29,7 +29,7 @@
 					</g:else>
 					<g:set var="mainImage" value="${speciesInstance.mainImage()}" />
 					<%def thumbnailPath = ImageUtils.getFileName(mainImage?.fileName, ImageType.SMALL, null)%>
-					<div class="snippet tablet" style="width: 285px; height: auto;">
+					<div class="snippet tablet" style="height: 80px; ">
 						<a
 							href="${uGroup.createLink([controller:'species', action:'show', id:speciesInstance.id, userGroup:userGroup, userGroupWebaddress:userGroupWebaddress])}">
 
@@ -45,7 +45,7 @@
 									src="${createLinkTo(dir: 'images', file:speciesInstance.fetchSpeciesGroupIcon(ImageType.VERY_SMALL)?.fileName, absolute:true)}"
 									style="float: right;"></img>
 							</g:else>
-							<p class="caption">
+							<p class="caption ellipsis multiline" title="${speciesInstance.taxonConcept.name}">
 								${speciesInstance.taxonConcept.italicisedForm}
 							</p> </a>
 
