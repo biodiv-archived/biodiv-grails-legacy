@@ -26,8 +26,8 @@ class SearchTagLib {
 	
 	def advSearch =  {attrs, body ->
 		def model = attrs.model;
-	
-		if(params.controller == "species" || (params.controller == 'userGroup' && params.action == 'species')) {
+		
+		if(params.controller == "species") {
 			out << render(template:"/species/advSearchTemplate", model:attrs.model);
 		} else if(params.controller == "observation" || (params.controller == 'userGroup' && params.action == 'observation')) {
 			out << render(template:"/observation/advSearchTemplate", model:attrs.model);

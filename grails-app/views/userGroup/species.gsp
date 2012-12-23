@@ -16,5 +16,21 @@
 </head>
 <body>
 	<g:include controller="species" action="list" model="['userGroup':userGroupInstance, 'params':params]"/>
+	<g:javascript>
+		$(document).ready(function(){
+			window.params.tagsLink = "${uGroup.createLink(controller:'species', action: 'tags')}";
+			$('#speciesGallerySort').change(function(){
+				updateGallery(window.location.pathname + window.location.search, ${params.limit?:40}, 0, undefined, false);
+				return false;
+			});
+		});
+		
+	</g:javascript>
+	<r:script>
+		$(document).ready(function(){
+			$(".grid_view").toggle();
+		});
+		
+	</r:script>
 </body>
 </html>

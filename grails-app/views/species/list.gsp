@@ -44,44 +44,14 @@
 	
 	<g:javascript>
 		$(document).ready(function(){
-			window.params.tagsLink = "${uGroup.createLink(controller:'species', action: 'tags')}"
-		});
-	</g:javascript>
-	<r:script>
-	
-	$(document).ready(function() {
-		$('#speciesGallerySort').change(function(){
-			updateGallery(window.location.pathname + window.location.search, ${params.limit?:51}, 0, undefined, false);
-			return false;
+			window.params.tagsLink = "${uGroup.createLink(controller:'species', action: 'tags')}";
+			$('#speciesGallerySort').change(function(){
+				updateGallery(window.location.pathname + window.location.search, ${params.limit?:40}, 0, undefined, false);
+				return false;
+			});
 		});
 		
-		$('li.poor_species_content').hover(function(){
-			$(this).children('.poor_species_content').slideDown(200);
-		}, function(){
-			$(this).children('.poor_species_content').slideUp(200);
-		});
-		$(".grid_view").show();
-	});
-	</r:script>
-	<style>
-	
-	
-	.snippet.tablet .figure img {
-		height: auto;
-	}
-	
-	.figure .thumbnail {
-		height: 120px;
-		margin: 0 auto;
-		text-align: center;
-		*font-size: 120px;
-		line-height: 120px;
-	}
-	
-	.thumbnails > li {
-		margin: 0 0 18px 10px;
-	}
-	</style>
+	</g:javascript>
 	
 </body>
 </html>

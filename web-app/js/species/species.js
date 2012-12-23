@@ -185,3 +185,14 @@ function loadIFrame() {
 	uBioLink.remove();
 	$('iframe#uBioIframe').attr('src', url).height("500px").width("100%");
 }
+
+
+$(document).ready(function() {
+	
+	$('li.poor_species_content').hover(function(){
+		$(this).children('.poor_species_content').slideDown(200);
+	}, function(){
+		$(this).children('.poor_species_content').slideUp(200);
+	});
+	$(".grid_view").toggle();
+});

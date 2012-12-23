@@ -1617,3 +1617,19 @@ li#userOrEmail-new {
 .btn-group > .btn-large {
 	font-size: 14px;
 }
+
+	.snippet.tablet .figure img {
+		height: auto;
+	}
+	
+	.figure .thumbnail {
+		height: 120px;
+		margin: 0 auto;
+		text-align: center;
+		*font-size: 120px;
+		line-height: 120px;
+	}
+	
+	.thumbnails > li {
+		margin: 0 0 18px 10px;
+	}

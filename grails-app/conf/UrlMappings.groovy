@@ -71,10 +71,10 @@ class UrlMappings {
 			controller='userGroup'
 			action='observation'
 		}
-		"/group/$webaddress/species/list" {
-			controller='userGroup'
-			action='species'
-		}
+//		"/group/$webaddress/species/list" {
+//			controller='userGroup'
+//			action='species'
+//		}
 
 //		"/group/$webaddress/login/$action?" {
 //			controller = "login"

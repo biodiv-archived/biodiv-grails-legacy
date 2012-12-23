@@ -385,7 +385,7 @@ $(document).ready(function(){
 					<a class="speciesFieldHeader"  data-toggle="collapse" href="#taxonRecordName">
 						<h5>Taxon Record Name</h5>
 					</a> 
-					<div id="taxonRecordName" class="speciesField collapse">
+					<div id="taxonRecordName" class="speciesField collapse in">
 						<table>
 						<tr class="prop">
 								<td><span class="grid_3 name">${grailsApplication.config.speciesPortal.fields.SCIENTIFIC_NAME }</span></td><td> ${speciesInstance.taxonConcept.italicisedForm}</td>
@@ -420,7 +420,7 @@ $(document).ready(function(){
 					<a class="speciesFieldHeader"  data-toggle="collapse" href="#synonyms"> 
 						<h5>Synonyms</h5>
 					</a> 
-					<div id="synonyms" class="speciesField collapse">
+					<div id="synonyms" class="speciesField collapse in">
 						<table>
 						<g:each in="${synonyms}" var="synonym">
 						<tr><td class="prop">
@@ -452,7 +452,7 @@ $(document).ready(function(){
 				<g:if test="${names}">
 				<div class="sidebar_section">
 					<a class="speciesFieldHeader" data-toggle="collapse" href="#commonNames"><h5> Common Names</h5></a> 
-					<div id="commonNames" class="speciesField collapse">
+					<div id="commonNames" class="speciesField collapse in">
 						
 							<table>
 								<g:each in="${names}">
@@ -476,7 +476,7 @@ $(document).ready(function(){
 			
 			
 			<div id="fieldstoc" class="<%=sparse?'grid_16':'grid_4'%>">
-				<ul style="list-style: none;">
+				<ul style="list-style: none;margin:0px;">
 					<g:each in="${fields}" var="concept">
 						<g:if
 							test="${concept.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.TAXONRECORDID) || concept.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.GLOBALUNIQUEIDENTIFIER) || concept.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.NOMENCLATURE_AND_CLASSIFICATION)}">

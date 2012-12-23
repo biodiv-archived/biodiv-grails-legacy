@@ -39,6 +39,8 @@ class SpeciesController {
 		log.debug params
 		
 		def model = getSpeciesList(params);
+		params.controller="species"
+		params.action="list"
 		if(params.loadMore?.toBoolean()){
 			render(template:"/species/showSpeciesListTemplate", model:model);
 			return;
