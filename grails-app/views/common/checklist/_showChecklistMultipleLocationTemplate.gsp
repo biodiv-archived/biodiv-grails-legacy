@@ -1,4 +1,3 @@
-<div id="map_results_list">
 <div class="observation_location_wrapper">
 	<div class="observation_location">
 		<div class="checklist_list">
@@ -158,4 +157,3 @@
                 refreshList();
             });
         </g:javascript>
-</div>
