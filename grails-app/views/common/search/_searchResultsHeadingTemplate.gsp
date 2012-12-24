@@ -42,5 +42,13 @@
 		$('.ellipsis.multiline').trunk8({
 		  lines: 2
 		});
+		
+		var t = "${uGroup.createLink(controller:params.controller?:'search', action:params.action?:'') }";
+		$("#searchResultsTabs a[href='"+t+"']").parent().addClass("active");
+			
+		$('#searchResultsTabs a').click(function (e) {
+			updateGallery($(this).attr('href'), undefined, undefined, undefined, false, undefined, true);
+			e.preventDefault();
+		})
 	});
 </r:script>

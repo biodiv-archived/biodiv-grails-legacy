@@ -347,11 +347,15 @@ function getSelectedUserGroup() {
 	return $('#advSearchForm input[name=uGroup]:radio:checked').val()
 } 
 
-function getFilterParameters(url, limit, offset, removeUser, removeObv) {
+function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSort) {
     var params = url.param();
-    var sortBy = getSelectedSortBy();
-    if(sortBy) {
-            params['sort'] = sortBy;
+    removeSort = (typeof removeSort === "undefined") ? false : removeSort;
+
+    if(!removeSort) {
+	    var sortBy = getSelectedSortBy();
+	    if(sortBy) {
+	            params['sort'] = sortBy;
+	    }
     }
 
     var sName = getSelectedSpeciesName();
@@ -474,7 +478,7 @@ function updateListPage(activeTag) {
 	}
 }
 
-function updateGallery(target, limit, offset, removeUser, isGalleryUpdate, removeObv) {
+function updateGallery(target, limit, offset, removeUser, isGalleryUpdate, removeObv, removeSort) {
     if(target === undefined) {
             target = window.location.pathname + window.location.search;
     }
@@ -482,7 +486,7 @@ function updateGallery(target, limit, offset, removeUser, isGalleryUpdate, remov
     var a = $('<a href="'+target+'"></a>');
     var url = a.url();
     var href = url.attr('path');
-    var params = getFilterParameters(url, limit, offset, removeUser, removeObv);
+    var params = getFilterParameters(url, limit, offset, removeUser, removeObv, removeSort);
     // alert(" tag in params " + params['tag'] );
     isGalleryUpdate = (isGalleryUpdate == undefined)?true:isGalleryUpdate
     if(isGalleryUpdate)

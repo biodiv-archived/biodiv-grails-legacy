@@ -19,7 +19,7 @@
 			<a id="inviteMembers" class="btn btn-large btn-primary" href="#"><i
 				class="icon-envelope"></i> <g:message code="userGroup.members.label"
 					default="Invite Members" /> </a>
-			<div class="modal hide" id="inviteMembersDialog">
+			<div class="modal hide" id="inviteMembersDialog" tabindex='-1'>
 			<div class="modal-header">
 				<button type="button" class="close" data-dismiss="modal">×</button>
 				<h3>Invite friends as members</h3>

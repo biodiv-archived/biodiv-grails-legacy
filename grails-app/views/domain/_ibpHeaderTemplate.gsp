@@ -119,16 +119,6 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 				});
 			});
 			
-			var t = "${createLink(controller:params.controller?:'search', action:params.action?:'') }";
-			//t = t.replace(/\//g, "\\\\/");
-			//console.log(t);
-			$("#searchResultsTabs a[href='"+t+"']").parent().addClass("active");
-			
-			$('#searchResultsTabs a').click(function (e) {
-				$( "#searchbox" ).attr('action', $(this).attr('href')).submit();
-				e.preventDefault();
-			})
-			
 			$(".ellipsis").trunk8();
 			 
 		}); 

@@ -51,7 +51,7 @@
 	</div>
 	
 	
-	<div class="modal hide" id="leaveUsModalDialog">
+	<div class="modal hide" id="leaveUsModalDialog" tabindex='-1'>
 				<div class="modal-header">
 					<button type="button" class="close" data-dismiss="modal">×</button>
 					<h3>Do you want to leave this group???</h3>

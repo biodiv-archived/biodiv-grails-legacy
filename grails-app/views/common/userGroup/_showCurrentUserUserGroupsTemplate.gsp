@@ -1,4 +1,4 @@
-
+m
 <% def userGroups = userGroups.groupBy{it.key.allowObvCrossPosting};
 def exclusiveUsergroups =  userGroups[false]
 def otherUsergroups =  userGroups[true] 
@@ -64,7 +64,7 @@ def obvActionMarkerClass = (params.action == 'create' || params.action == 'save'
 		</g:each>
 	</ul>
 </div>
-<div class="modal hide" id="userGroupSelectionModal">
+<div class="modal hide" id="userGroupSelectionModal"  tabindex='-1'>
 	<div class="modal-body"></div>
 
 </div>

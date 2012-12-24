@@ -4,7 +4,7 @@
 	z-index : 10000;
 }
 </style>
-<div id="ajaxLogin" class="modal" style="display: none;z-index:3000;">
+<div id="ajaxLogin" class="modal" style="display: none;z-index:3000;" tabindex='-1'>
 	<div class="modal-body">
 		<div class="openid-loginbox super-section">
 			<div id="loginMessage" class="alert alert-error" style="display:none"></div>

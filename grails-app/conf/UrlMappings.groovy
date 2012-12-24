@@ -79,6 +79,10 @@ class UrlMappings {
 			controller='userGroup'
 			action='user'
 		}
+		"/group/$webaddress/user" {
+			controller='userGroup'
+			action='user'
+		}
 //		"/group/$webaddress/species/list" {
 //			controller='userGroup'
 //			action='species'
