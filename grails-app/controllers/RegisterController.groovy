@@ -106,7 +106,6 @@ class RegisterController extends grails.plugins.springsecurity.ui.RegisterContro
 		SUserService.sendNotificationMail(SUserService.NEW_USER, user, request, userProfileUrl);
 		
 		if(command.openId) {
-			flash.message = message(code: 'spring.security.ui.register.complete')
 			authenticateAndRedirect user.email
 			return	
 		} else {
@@ -309,10 +308,12 @@ class RegisterController extends grails.plugins.springsecurity.ui.RegisterContro
 
 		def savedRequest = session[DefaultSavedRequest.SPRING_SECURITY_SAVED_REQUEST_KEY]
 		if (savedRequest && !config.successHandler.alwaysUseDefault) {
+			flash.message = message(code: 'spring.security.ui.register.completeSimple')
 			redirect url: savedRequest.redirectUrl
 		}
 		else {
-			redirect uri: config.successHandler.defaultTargetUrl
+			flash.message = message(code: 'spring.security.ui.register.complete')
+			redirect uri: config.ui.register.postRegisterUrl ?: config.successHandler.defaultTargetUrl
 		}
 	}
 

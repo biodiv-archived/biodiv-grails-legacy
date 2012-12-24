@@ -52,6 +52,11 @@
 		});
 		
 	</g:javascript>
-	
+	<r:script>
+		$(document).ready(function(){
+			$(".grid_view").show();
+		});
+		
+	</r:script>
 </body>
 </html>

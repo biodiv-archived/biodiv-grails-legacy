@@ -50,7 +50,7 @@ class SUserController extends UserController {
 		//params.sort = params.sort && params.sort != 'score' ? params.sort : "activity";
 		params.query='%';
 		def model = getUsersList(params);
-		println model;
+		
 		// add query params to model for paging
 		for (name in [
 			'username',
@@ -196,7 +196,7 @@ class SUserController extends UserController {
 			lookupUserClass().withTransaction { status ->
 				user.observations.each { obv -> 
 					UnCuratedVotes.findAllByObv(obv).each { vote ->
-						println "deleting $vote"
+						log.debug "deleting $vote"
 						vote.delete();
 					}
 				}
@@ -216,16 +216,16 @@ class SUserController extends UserController {
 			}
 			//updating SpeciesName
 			obvToUpdate.each { obv ->
-				println "Updating speciesname for ${obv}"
+				log.debug "Updating speciesname for ${obv}"
 				obv.calculateMaxVotedSpeciesName();
 			}
 			userCache.removeUserFromCache user[usernameFieldName]
-			flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'user.label', default: 'User'), params.id])}"
+			flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'user.label', default: 'User'), user.name])}"
 			redirect action: search
 		}
 		catch (DataIntegrityViolationException e) {
 			e.printStackTrace();
-			flash.error = "${message(code: 'default.not.deleted.message', args: [message(code: 'user.label', default: 'User'), params.id])}"
+			flash.error = "${message(code: 'default.not.deleted.message', args: [message(code: 'user.label', default: 'User'), user.name])}"
 			redirect (url:uGroup.createLink(action:'edit', controller:"SUser", id:params.id, 'userGroupWebaddress':params.webaddress))
 			//redirect action: edit, id: params.id
 		}

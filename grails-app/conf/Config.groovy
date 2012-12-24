@@ -633,7 +633,7 @@ environments {
                     image.allowed = ['jpg', 'gif', 'jpeg', 'png']
                     image.denied = []
                 }
-		}
+				}
 		
 	}
 }
@@ -686,67 +686,6 @@ navigation.dashboard = [
 	[group:'search', order:60, controller:'search', title:'Advanced Search', action:'advSelect'],
 ]
 
-
-//ckeditor  = {
-//	skipAllowedItemsCheck = false
-//	defaultFileBrowser = "ofm"
-//	upload {
-//		basedir = "/images/resources/"
-//		overwrite = false
-//		link {
-//			browser = true
-//			upload = false
-//			allowed = []
-//			denied = [
-//				'html',
-//				'htm',
-//				'php',
-//				'php2',
-//				'php3',
-//				'php4',
-//				'php5',
-//				'phtml',
-//				'pwml',
-//				'inc',
-//				'asp',
-//				'aspx',
-//				'ascx',
-//				'jsp',
-//				'cfm',
-//				'cfc',
-//				'pl',
-//				'bat',
-//				'exe',
-//				'com',
-//				'dll',
-//				'vbs',
-//				'js',
-//				'reg',
-//				'cgi',
-//				'htaccess',
-//				'asis',
-//				'sh',
-//				'shtml',
-//				'shtm',
-//				'phtm'
-//			]
-//		}
-//		image {
-//			browser = true
-//			upload = true
-//			allowed = ['jpg', 'gif', 'jpeg', 'png']
-//			denied = []
-//		}
-//		flash {
-//			browser = false
-//			upload = false
-//			allowed = ['swf']
-//			denied = []
-//		}
-//	}
-//}
-
-
 jquery {
 	sources = 'jquery'
 	coreSuffix = 'core'
@@ -764,6 +703,7 @@ grails.plugins.springsecurity.userLookup.authorityJoinClassName = 'species.auth.
 grails.plugins.springsecurity.authority.className = 'species.auth.Role'
 grails.plugins.springsecurity.userLookup.usernamePropertyName = 'email'
 //grails.plugins.springsecurity.auth.loginFormUrl = "/login/authFromDrupal"
+
 
 //grails.plugins.springsecurity.auth.defaultRoleNames = ['ROLE_USER']
 //grails.plugins.springsecurity.apf.filterProcessesUrl = '/j_drupal_spring_security_check'
@@ -808,7 +748,7 @@ grails.plugins.springsecurity.password.algorithm = 'MD5'
 grails.plugins.springsecurity.ui.password.minLength=6
 grails.plugins.springsecurity.ui.password.maxLength=64
 grails.plugins.springsecurity.ui.password.validationRegex='^.*$'
-grails.plugins.springsecurity.ui.register.postRegisterUrl  = null // use defaultTargetUrl if not set
+grails.plugins.springsecurity.ui.register.postRegisterUrl  = "${grails.serverURL}/group/list" // use defaultTargetUrl if not set
 grails.plugins.springsecurity.ui.register.defaultRoleNames = ['ROLE_USER']
 
 grails.plugins.springsecurity.ui.notification.emailFrom = 'notification@thewesternghats.in'

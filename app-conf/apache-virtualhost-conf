@@ -13,7 +13,7 @@
 
 
 RewriteEngine on
-RewriteCond %{REQUEST_URI} ^/(species|observation|activity|activityFeed|SUser|user|page|pages|requestMembership|joinUs|leaveUs|inviteMembers|login|logout|register|static|group|j_spring_security_logout|recommendation|comment|newsletter|emailConfirmation|search|checklist).*
+RewriteCond %{REQUEST_URI} ^/(species|observation|activity|activityFeed|SUser|user|page|pages|requestMembership|joinUs|leaveUs|inviteMembers|login|logout|register|static|group|j_spring_security_logout|recommendation|comment|newsletter|emailConfirmation|search|checklist|jcaptcha).*
 RewriteRule ^(.*)$ http://indiabiodiversity.localhost.org:8080/biodiv_usergroups$1 [P,L]
 ProxyPassReverse / http://indiabiodiversity.localhost.org:8080/biodiv_usergroups/
 ProxyPassReverse / http://indiabiodiversity.localhost.org:8080/
@@ -66,7 +66,7 @@ RewriteCond %{REQUEST_URI} ^/logout
 RewriteCond %{QUERY_STRING} destination
 RewriteRule ^(.*)$ $1 [QSA,L]
 
-RewriteCond %{REQUEST_URI} ^/biodiv_usergroups/(static|plugins|data|bootstrap|js|css|j_spring_security_check|j_spring_openid_security_check|images|j_spring_security_logout|observation/upload_resource|recommendation|comment|newsletter|edit|emailConfirmation).*
+RewriteCond %{REQUEST_URI} ^/biodiv_usergroups/(static|plugins|data|bootstrap|js|css|j_spring_security_check|j_spring_openid_security_check|images|j_spring_security_logout|observation/upload_resource|recommendation|comment|newsletter|edit|emailConfirmation|jcaptcha).*
 #domainanme here need to be wgp instead of localhost as google uses this address in its return to url
 RewriteRule ^/biodiv_usergroups(.*)$ http://thewesternghats.indiabiodiversity.localhost.org:8080/biodiv_usergroups$1 [P]
 ProxyPassReverse /biodiv_usergroups http://thewesternghats.indiabiodiversity.localhost.org:8080/biodiv_usergroups

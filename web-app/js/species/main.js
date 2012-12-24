@@ -11,7 +11,7 @@ if (typeof (console.log) == "undefined") {
 function show_login_dialog(successHandler, errorHandler) {
 	ajaxLoginSuccessCallbackFunction = successHandler;
 	ajaxLoginErrorCallbackFunction = errorHandler;
-	$('#ajaxLogin').modal('show');
+	$('#ajaxLogin').modal({'keyboard':true, 'show':true});
 }
 
 function cancelLogin() {

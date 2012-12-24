@@ -1,7 +1,9 @@
 <div>
 	<fieldset>
 		<legend>
-			<g:message code="springSecurity.login.title" default="Log in" />
+			<a href="${uGroup.createLink(controller:'login', 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress) }">Login</a> | 
+			<g:link controller='register'>Register</g:link>
+			 
 		</legend>
 		<div class="control-group"
 			style="clear: both; float: left; line-height: 40px;">Using:</div>

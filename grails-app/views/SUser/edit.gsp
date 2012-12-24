@@ -366,7 +366,33 @@
 				
 				<sUser:isAdmin model="['user':user]">
 					<g:if test='${user}'>
-						<s2ui:deleteButtonForm instanceId='${user.id}' />
+						<form action="${uGroup.createLink(controller:'SUser', action:'delete')}" method='POST' name='deleteForm'>
+							<input type="hidden" name="id" value="${user.id}" />
+						</form>
+						<div id="deleteConfirmDialog" title="Are you sure?"></div>
+
+						<r:script>
+							$(document).ready(function() {
+								$("#deleteButton").button().bind('click', function() {
+									$('#deleteConfirmDialog').dialog('open');
+								});
+				
+								$("#deleteConfirmDialog").dialog({
+									autoOpen: false,
+									resizable: false,
+									height: 100,
+									modal: true,
+									buttons: {
+										'Delete': function() {
+											document.forms.deleteForm.submit();
+										},
+										Cancel: function() {
+											$(this).dialog('close');
+										}
+									}
+								});
+							});
+						</r:script>
 					</g:if>
 				</sUser:isAdmin>
 

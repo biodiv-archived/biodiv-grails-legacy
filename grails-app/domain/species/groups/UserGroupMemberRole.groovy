@@ -93,7 +93,11 @@ class UserGroupMemberRole implements Serializable {
 	static void removeAll(Role role) {
 		executeUpdate 'DELETE FROM UserGroupMemberRole WHERE role=:role', [role: role]
 	}
-
+	
+	static void removeAll(SUser user) {
+		executeUpdate 'DELETE FROM UserGroupMemberRole WHERE sUser=:sUser', [sUser: user]
+	}
+	
 	static int setRole(UserGroup userGroup, SUser sUser, Role role) {
 		return executeUpdate('UPDATE UserGroupMemberRole SET role=:role WHERE sUser=:sUser and userGroup=:userGroup', [userGroup:userGroup, sUser:sUser, role: role]);
 	}

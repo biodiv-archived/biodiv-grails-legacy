@@ -28,7 +28,7 @@
 	</g:javascript>
 	<r:script>
 		$(document).ready(function(){
-			$(".grid_view").toggle();
+			$(".grid_view").show();
 		});
 		
 	</r:script>

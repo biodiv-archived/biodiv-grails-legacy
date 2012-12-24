@@ -22,7 +22,8 @@ class SUser {
 	def aclUtilService
 	def grailsApplication;
 	def commentService;
-
+	def activityFeedService;
+	
 	String username
 	String name;
 	String password
@@ -101,6 +102,11 @@ class SUser {
 		if (isDirty('password')) {
 			encodePassword()
 		}
+	}
+	
+	def beforeDelete() {
+		activityFeedService.deleteFeed(this)
+		UserGroupMemberRole.removeAll(this);
 	}
 
 	protected void encodePassword() {
