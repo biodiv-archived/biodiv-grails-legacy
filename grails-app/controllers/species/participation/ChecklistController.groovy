@@ -30,7 +30,7 @@ class ChecklistController {
 			def checklistMsgtHtml =  g.render(template:"/common/checklist/showChecklistMsgTemplate", model:model);
 			def checklistMapHtml =  g.render(template:"/common/checklist/showChecklistMultipleLocationTemplate", model:model);
 			
-			def result = [checklistListHtml:checklistListHtml, checklistMsgtHtml:checklistMsgtHtml, checklistMapHtml:checklistMapHtml]
+			def result = [obvListHtml:checklistListHtml, obvFilterMsgHtml:checklistMsgtHtml, mapViewHtml:checklistMapHtml]
 			render result as JSON
 			return;
 		}
@@ -89,7 +89,7 @@ class ChecklistController {
 			log.debug "Current ids list in session ${session[listKey]} and position ${pos}";
 			def nextId = (pos+1 < session[listKey].size()) ? session[listKey][pos+1] : null;
 			if(nextId == null) {
-				def max = Math.min(lastListParams.max ? lastListParams.int('max') : 10, 100)
+				def max = Math.min(lastListParams.max ? lastListParams.int('max') : 50, 100)
 				def offset = lastListParams.offset ? lastListParams.int('offset') : 0
 				lastListParams.offset = offset + max;
 				log.debug "Fetching new list of checklist using params ${lastListParams}";
@@ -113,7 +113,7 @@ class ChecklistController {
 	protected getFilteredChecklist(params){
 		def allGroup = SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.ALL);
 		def speciesGroup = params.sGroup ? SpeciesGroup.get(params.sGroup.toLong()) : allGroup
-		def max = Math.min(params.max ? params.int('max') : 10, 100);
+		def max = Math.min(params.max ? params.int('max') : 50, 100);
 		def offset = params.offset ? params.int('offset') : 0
 		def userGroupInstance = userGroupService.get("" + params.webaddress);
 		

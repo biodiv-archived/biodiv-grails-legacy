@@ -42,7 +42,7 @@
 				</div>
 			</g:if>
 			
-			<div id="checklist_list_map" class="observation"
+			<div id="observations_list_map" class="observation"
 				style="clear: both; display: none;">
 				<clist:showChecklistLocation
 					model="['checklistInstanceList':checklistMapInstanceList, 'userGroup':userGroup]">
@@ -50,6 +50,7 @@
 			</div>
 			
 			<clist:showList />
+		
 </div>
 
 <g:javascript>
