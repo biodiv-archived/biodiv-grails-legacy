@@ -28,7 +28,9 @@ class ChecklistController {
 		} else{
 			def checklistListHtml =  g.render(template:"/common/checklist/showChecklistListTemplate", model:model);
 			def checklistMsgtHtml =  g.render(template:"/common/checklist/showChecklistMsgTemplate", model:model);
-			def result = [checklistListHtml:checklistListHtml, checklistMsgtHtml:checklistMsgtHtml]
+			def checklistMapHtml =  g.render(template:"/common/checklist/showChecklistMultipleLocationTemplate", model:model);
+			
+			def result = [checklistListHtml:checklistListHtml, checklistMsgtHtml:checklistMsgtHtml, checklistMapHtml:checklistMapHtml]
 			render result as JSON
 			return;
 		}
