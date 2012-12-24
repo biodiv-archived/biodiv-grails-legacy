@@ -16,6 +16,7 @@
 	</div>
 </div>
 </div>
+
 <ul id="searchResultsTabs" class=" nav nav-tabs">
 			<li class="${params.controller=='species'?'active':'' }" data-toggle="tab"><a
 				href="${uGroup.createLink(controller:'species', action:'search')}"

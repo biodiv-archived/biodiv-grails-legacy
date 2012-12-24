@@ -37,6 +37,10 @@ class UrlMappings {
 */		
 		"/static/$path"(controller:"species", action:"staticContent")
 		
+		name userGroupModule:"/group/$webaddress/$controller/$action?/$id?" {
+		
+		}
+		
 		name pages:"/pages" {
 			controller = 'userGroup'
 			action = 'pages'
@@ -71,6 +75,10 @@ class UrlMappings {
 			controller='userGroup'
 			action='observation'
 		}
+		"/group/$webaddress/user/list" {
+			controller='userGroup'
+			action='user'
+		}
 //		"/group/$webaddress/species/list" {
 //			controller='userGroup'
 //			action='species'
@@ -103,10 +111,6 @@ class UrlMappings {
 		
 		"/group/$webaddress/user/$action/$id?" {
 			controller = "SUser"
-		}
-		
-		name userGroupModule:"/group/$webaddress/$controller/$action?/$id?" {
-		
 		}
 		
 		"/confirm/$id?" {

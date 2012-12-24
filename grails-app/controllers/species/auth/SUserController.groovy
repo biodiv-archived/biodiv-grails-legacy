@@ -64,7 +64,28 @@ class SUserController extends UserController {
 			model[name] = params[name]
 		}
 		params.remove('query');
-		render view: 'list', model: model
+		
+		if(params.loadMore?.toBoolean()){
+			render(template:"/common/suser/showUserListTemplate", model:model);
+			return;
+		} else if(!params.isGalleryUpdate?.toBoolean()){
+			render (view:"list", model:model)
+			return;
+		} else{
+			model['resultType'] = 'user'
+			def obvListHtml =  g.render(template:"/common/suser/showUserListTemplate", model:model);
+			def obvFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
+
+//			def filteredTags = observationService.getTagsFromObservation(model.totalObservationInstanceList.collect{it[0]})
+//			def tagsHtml = g.render(template:"/common/observation/showAllTagsTemplate", model:[count: count, tags:filteredTags, isAjaxLoad:true]);
+//			def mapViewHtml = g.render(template:"/common/observation/showObservationMultipleLocationTemplate", model:[observationInstanceList:model.totalObservationInstanceList]);
+
+			def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml]
+			render result as JSON
+			return;
+		}
+		
+//		render view: 'list', model: model
 		//render view: 'list', model: [results: SUser.list(params), totalCount: SUser.count(), searched:"true"]
 	}
 
@@ -232,7 +253,6 @@ class SUserController extends UserController {
 	}
 
 	def search = {
-		//[enabled: 0, accountExpired: 0, accountLocked: 0, passwordExpired: 0]
 		
 		log.debug params
 		
@@ -250,8 +270,32 @@ class SUserController extends UserController {
 		]) {
 			model[name] = params[name]
 		}
+		model['isSearch'] = true;
+		params.action = 'search'
+		params.controller = 'SUser'
 		
-		render view: 'search', model: model
+		if(params.loadMore?.toBoolean()){
+			params.remove('isGalleryUpdate');
+			render(template:"/common/suser/showUserListTemplate", model:model);
+			return;
+		} else if(!params.isGalleryUpdate?.toBoolean()){
+			params.remove('isGalleryUpdate');
+			render (view:"search", model:model)
+			return;
+		} else {
+			params.remove('isGalleryUpdate');
+			model['resultType'] = 'user'
+			def obvListHtml =  g.render(template:"/common/suser/showUserListTemplate", model:model);
+			def obvFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
+
+//			def filteredTags = observationService.getTagsFromObservation(model.totalObservationInstanceList.collect{it[0]})
+//			def tagsHtml = g.render(template:"/common/observation/showAllTagsTemplate", model:[count: count, tags:filteredTags, isAjaxLoad:true]);
+//			def mapViewHtml = g.render(template:"/common/observation/showObservationMultipleLocationTemplate", model:[observationInstanceList:model.totalObservationInstanceList]);
+
+			def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml]
+			render result as JSON
+			return;
+		}
 	}
 
 	private def getUsersList(params) {
@@ -303,6 +347,7 @@ class SUserController extends UserController {
 			}
 	
 			String q = hql.toString() + cond.toString() + userNameQuery;
+			log.debug "CountQuery : ${q} with params ${queryParams}"
 			totalCount = lookupUserClass().executeQuery("SELECT COUNT(DISTINCT u) $q", queryParams)[0]
 			//if(totalCount) {
 				cond.append userNameQuery
@@ -332,14 +377,14 @@ class SUserController extends UserController {
 			
 			if(params.sort == 'activity') {
 				String query = "select u.id, u.$usernameFieldName from Observation obv right outer join obv.author u WHERE 1=1 $cond and (obv.isDeleted = false or obv.isDeleted is null) group by u.id, u.$usernameFieldName order by count(obv.id)  desc, u.$usernameFieldName asc";
-	//			println query;
-	//			println queryParams;
+				log.debug "UserQuery : ${query} with params ${queryParams}"
 				def uids =  lookupUserClass().executeQuery(query, queryParams, [max: max, offset: offset])
 				uids.each {
 					results.add(SUser.read(it[0]));
 				}
 			} else {
 				String query = "SELECT DISTINCT u $hql $orderBy";
+				log.debug "UserQuery : ${query} with params ${queryParams}"
 				results = lookupUserClass().executeQuery(query, queryParams, [max: max, offset: offset])
 			}
 	
@@ -351,7 +396,7 @@ class SUserController extends UserController {
 //		}
 		}
 
-		return [results: results, totalCount: totalCount, queryParams:queryParams, searched: true]
+		return ['userInstanceList': results, instanceTotal: totalCount, queryParams:queryParams, searched: true]
 
 	}
 	
@@ -486,6 +531,7 @@ class SUserController extends UserController {
 		} 
 		render template:"/domain/ibpHeaderTemplate"
 	}
+	
 	def sidebar = {
 		render template:"/common/userGroup/sidebarTemplate"
 	}

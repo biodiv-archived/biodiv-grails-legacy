@@ -2,8 +2,9 @@
 
 <head>
 <meta name='layout' content='main' />
-<title><g:message code='spring.security.ui.user.search' /></title>
-<r:require modules="susers_list"/>
+<title><g:message code='spring.security.ui.user.search' />
+</title>
+<r:require modules="susers_list" />
 <g:set var="entityName"
 	value="${message(code: 'searchlabel', default: 'Search Results')}" />
 
@@ -29,30 +30,11 @@
 		<search:searchResultsHeading />
 		<!-- uGroup:rightSidebar/-->
 
-		<div class="searchResults" style="margin-left:0px;">
+		<div class="searchResults" style="margin-left: 0px;">
 			<sUser:showUserListWrapper />
 		</div>
 	</div>
 
-	<r:script>
-	$(document).ready(function() {
-		
-		$('.sort_filter_label').click(function() {
-			$('.sort_filter_label.active').removeClass('active');
-			$(this).addClass('active');
-			$('#selected_sort').html($(this).html());
-			$("#search").click();
-			return false;
-		});
 
-		$("#removeQueryFilter").live('click', function(){
-           	$( "#searchTextField" ).val('');
-          	$("#search").click();
-           	return false;
-        });
-	});
-	
-
-	</r:script>
 </body>
 </html>

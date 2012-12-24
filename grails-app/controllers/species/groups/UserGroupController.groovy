@@ -316,12 +316,11 @@ class UserGroupController {
 
 		def allMembers;
 		if(params.onlyMembers?.toBoolean()) {
-			println 'onlyMembers'
 			allMembers = userGroupInstance.getMembers(params.max, params.offset, params.sort);
 		} else {
 			allMembers = userGroupInstance.getAllMembers(params.max, params.offset, params.sort);
 		}
-		println allMembers;
+		
 		if(params.isAjaxLoad?.toBoolean()) {
 			def membersJSON = []
 			for(m in allMembers) {
@@ -330,9 +329,36 @@ class UserGroupController {
 			render ([result:membersJSON] as JSON);
 			return;
 		}
-		['userGroupInstance':userGroupInstance, 'members':allMembers, 'foundersTotalCount':userGroupInstance.getFoundersCount(), 'membersTotalCount':userGroupInstance.getAllMembersCount(), 'expertsTotalCount':0]
+		
+		def instanceTotal = userGroupInstance.getAllMembersCount();
+		def model = ['userGroupInstance':userGroupInstance, 'userInstanceList':allMembers, 'instanceTotal':instanceTotal, 'foundersTotalCount':userGroupInstance.getFoundersCount(), 'membersTotalCount':instanceTotal, 'expertsTotalCount':0]
+		renderUsersModel(params, model);
 	}
 
+	private renderUsersModel (params,  model) {
+		if(params.loadMore?.toBoolean()){
+			params.remove('isGalleryUpdate');
+			render(template:"/common/suser/showUserListTemplate", model:model);
+			return;
+		} else if(!params.isGalleryUpdate?.toBoolean()){
+			params.remove('isGalleryUpdate');
+			render( view:'user', model: model);
+		} else {
+			params.remove('isGalleryUpdate');
+			model['resultType'] = 'user'
+			def obvListHtml =  g.render(template:"/common/suser/showUserListTemplate", model:model);
+			def obvFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
+
+//			def filteredTags = observationService.getTagsFromObservation(model.totalObservationInstanceList.collect{it[0]})
+//			def tagsHtml = g.render(template:"/common/observation/showAllTagsTemplate", model:[count: count, tags:filteredTags, isAjaxLoad:true]);
+//			def mapViewHtml = g.render(template:"/common/observation/showObservationMultipleLocationTemplate", model:[observationInstanceList:model.totalObservationInstanceList]);
+
+			def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml]
+			render result as JSON
+			return;
+		}
+	}
+	
 	def founders = {
 		def userGroupInstance = findInstance(params.id, params.webaddress)
 		if (!userGroupInstance) return
@@ -350,18 +376,20 @@ class UserGroupController {
 			render ([result:foundersJSON] as JSON);
 			return;
 		}
-		render(view:"user", model:['userGroupInstance':userGroupInstance, 'founders':founders, 'foundersTotalCount':userGroupInstance.getFoundersCount(), 'membersTotalCount':userGroupInstance.getAllMembersCount(), 'expertsTotalCount':0]);
+		def instanceTotal = userGroupInstance.getFoundersCount();
+		def model = ['userGroupInstance':userGroupInstance, 'userInstanceList':founders, 'instanceTotal':instanceTotal, 'foundersTotalCount':instanceTotal, 'membersTotalCount':userGroupInstance.getAllMembersCount(), 'expertsTotalCount':0]
+		renderUsersModel(params, model);
 	}
 
 	def experts = {
-		def userGroupInstance = findInstance(params.id, params.webaddress)
-		if (!userGroupInstance) return
-
-			params.max = Math.min(params.max ? params.int('max') : 9, 100)
-		params.offset = params.offset ? params.int('offset') : 0
-
-		def experts = [];//userGroupInstance.getExperts(params.max, params.offset);
-		render(view:"user", model:['userGroupInstance':userGroupInstance, 'experts':experts, 'foundersTotalCount':userGroupInstance.getFoundersCount(), 'membersTotalCount':userGroupInstance.getAllMembersCount(), 'expertsTotalCount':0]);
+//		def userGroupInstance = findInstance(params.id, params.webaddress)
+//		if (!userGroupInstance) return
+//
+//			params.max = Math.min(params.max ? params.int('max') : 9, 100)
+//		params.offset = params.offset ? params.int('offset') : 0
+//
+//		def experts = [];//userGroupInstance.getExperts(params.max, params.offset);
+//		render(view:"user", model:['userGroupInstance':userGroupInstance, 'experts':experts, 'foundersTotalCount':userGroupInstance.getFoundersCount(), 'membersTotalCount':userGroupInstance.getAllMembersCount(), 'expertsTotalCount':0]);
 	}
 
 	def observation = {

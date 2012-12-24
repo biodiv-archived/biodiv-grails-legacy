@@ -438,7 +438,7 @@ environments {
 		}
 
         ibp.domain='indiabiodiversity.localhost.org'
-        wgp.domain='thewesternghats.localhost.in'
+        wgp.domain='thewesternghats.indiabiodiversity.localhost.org'
 		//grails.resources.debug=true
 		grails.resources.mappers.hashandcache.excludes = ['**']
 		//grails.resources.flatten = false
@@ -490,7 +490,7 @@ environments {
 		}
 
         ibp.domain='indiabiodiversity.localhost.org'
-        wgp.domain='thewesternghats.localhost.in'
+        wgp.domain='thewesternghats.indiabiodiversity.localhost.org'
 		//grails.resources.debug=true
 		grails.resources.mappers.hashandcache.excludes = ['**']
 		//grails.resources.flatten = false
@@ -619,7 +619,7 @@ environments {
 		}
 		
         ibp.domain='indiabiodiversity.org'
-        wgp.domain='thewesternghats.in'   
+        wgp.domain='thewesternghats.indiabiodiversity.org'   
 		
 		grails.plugins.springsecurity.successHandler.defaultTargetUrl = "/list/../../"
 		grails.plugins.springsecurity.logout.afterLogoutUrl = '/list/../../'

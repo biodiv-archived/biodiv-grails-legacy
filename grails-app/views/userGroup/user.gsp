@@ -47,20 +47,20 @@
 				<g:if test="${params.action == 'founders' }">
 					<div class="tab-pane" id="founders">
 						<sUser:showUserListWrapper
-							model="['results':founders, 'totalCount':foundersTotalCount, 'queryParams':queryParams, 'searched':true, 'userGroupInstance':userGroupInstance]" />
+							model="['results':userInstanceList, 'instanceTotal':foundersTotalCount, 'queryParams':queryParams, 'searched':true, 'userGroupInstance':userGroupInstance]" />
 					</div>
 				</g:if>
 
 				<g:elseif test="${params.action == 'experts' }">
 					<div class="tab-pane" id="experts">
 						<sUser:showUserListWrapper
-							model="['results':experts, 'totalCount':expertsTotalCount, 'queryParams':queryParams, 'searched':true, 'userGroupInstance':userGroupInstance]" />
+							model="['results':userInstanceList, 'instanceTotal':expertsTotalCount, 'queryParams':queryParams, 'searched':true, 'userGroupInstance':userGroupInstance]" />
 					</div>
 				</g:elseif>
 				<g:else>
 					<div class="tab-pane" id="members">
 						<sUser:showUserListWrapper
-							model="['results':members, 'totalCount':membersTotalCount, 'queryParams':queryParams, 'searched':true, 'userGroupInstance':userGroupInstance]" />
+							model="['results':userInstanceList, 'instanceTotal':membersTotalCount, 'queryParams':queryParams, 'searched':true, 'userGroupInstance':userGroupInstance]" />
 					</div>
 				</g:else>
 
@@ -68,10 +68,5 @@
 		</div>
 
 	</div>
-	<r:script>
-		$(document).ready(function(){
-			
-		});
-	</r:script>
 </body>
 </html>

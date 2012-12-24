@@ -464,13 +464,16 @@ class UserGroupService {
 	@Transactional
 	boolean addMember(UserGroup userGroup, SUser user, Role role, Permission... permissions) {
 		log.debug "Adding member ${user} with role ${role} to group ${userGroup}"
+		log.debug "Granting permissions ${permissions}"
 		def userMemberRole = UserGroupMemberRole.findBySUserAndUserGroup(user, userGroup);
 		if(!userMemberRole) {
 			userMemberRole = UserGroupMemberRole.create(userGroup, user, role);
-			permissions.each { permission ->
-				addPermission userGroup, user, permission
+			if(userMemberRole) {
+				permissions.each { permission ->
+					addPermission userGroup, user, permission
+				}
+				activityFeedService.addActivityFeed(userGroup, user, user, activityFeedService.MEMBER_JOINED);
 			}
-			activityFeedService.addActivityFeed(userGroup, user, user, activityFeedService.MEMBER_JOINED);
 			return true;
 		} else {
 			log.debug "${user} is already a member of ${userGroup}"

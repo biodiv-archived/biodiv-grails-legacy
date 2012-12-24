@@ -281,7 +281,6 @@ class UserGroupTagLib {
 	def perm = { attrs, body ->
 		println aclUtilService.hasPermission(gormUserDetailsService.loadUserByUsername(attrs.model.user.email, true), attrs.model.userGroupInstance, attrs.model.permission)
 		//println aclUtilService.readAcl(attrs.model.userGroupInstance);
-		println "====="
 	}
 
 	def showActivityOnMap = {attrs, body ->
