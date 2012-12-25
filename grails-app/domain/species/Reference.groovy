@@ -7,7 +7,7 @@ class Reference {
 	String title;
 	String url;
 
-	static belongsTo = [speciesField:SpeciesField, checklist:Checklist];
+	static belongsTo = [speciesField:SpeciesField];
 		
     static constraints = {
 		url(url:true, nullable:true);
