@@ -1342,7 +1342,7 @@ li#userOrEmail-new {
 	margin: 2px 5px 2px 0;
 	position: relative;
 }
-
+/*
 #email-form {
 	background-clip: padding-box;
 	background-color: #FFFFFF;
@@ -1371,7 +1371,7 @@ li#userOrEmail-new {
 	top: 0;
 	right: 0;
 }
-
+*/
 .form-row {
 	margin: 10px;
 }
@@ -1416,6 +1416,8 @@ li#userOrEmail-new {
 	top: 100%;
 	z-index: 3000;
 	color: #000000;
+	font-size: small;
+	white-space: normal;
 }
 
 .popup-form-close {
