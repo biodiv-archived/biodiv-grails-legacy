@@ -487,10 +487,15 @@ class ObservationController {
 		log.debug params;
 
 		if(params.obvId) {
+			boolean canMakeSpeciesCall = getSpeciesCallPermission(params.obvId)
+			
 			//Saves recommendation if its not present
-			def recVoteResult = getRecommendationVote(params)
-			def recommendationVoteInstance = recVoteResult?.recVote;
-			def recoVoteMsg = recVoteResult?.msg;
+			def recVoteResult, recommendationVoteInstance, recoVoteMsg
+			if(canMakeSpeciesCall){
+				recVoteResult = getRecommendationVote(params)
+				recommendationVoteInstance = recVoteResult?.recVote;
+				recoVoteMsg = recVoteResult?.msg;
+			}
 			
 			def observationInstance = Observation.get(params.obvId);
 			log.debug params;
@@ -501,7 +506,7 @@ class ObservationController {
 					observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
 
 					if(!params["createNew"]){
-						redirect(action:getRecommendationVotes, id:params.obvId, params:[max:3, offset:0, recoVoteMsg:recoVoteMsg])
+						redirect(action:getRecommendationVotes, id:params.obvId, params:[max:3, offset:0, recoVoteMsg:recoVoteMsg, canMakeSpeciesCall:canMakeSpeciesCall])
 					}else if(params["isMobileApp"]?.toBoolean()){
 						render (['success:true, obvId:$observationInstance.id']as JSON);
 					}else{
@@ -522,7 +527,7 @@ class ObservationController {
 					if(!params["createNew"]){
 						//sending mail to user
 						sendNotificationMail(SPECIES_RECOMMENDED, observationInstance, request);
-						redirect(action:getRecommendationVotes, id:params.obvId, params:[max:3, offset:0, recoVoteMsg:recoVoteMsg])
+						redirect(action:getRecommendationVotes, id:params.obvId, params:[max:3, offset:0, recoVoteMsg:recoVoteMsg, canMakeSpeciesCall:canMakeSpeciesCall])
 					}else if(params["isMobileApp"]?.toBoolean()){
 						render (['success:true, obvId:$observationInstance.id'] as JSON);
 					}else{
@@ -564,10 +569,14 @@ class ObservationController {
 
 		if(params.obvId) {
 			//Saves recommendation if its not present
-			def recVoteResult = getRecommendationVote(params)
-			def recommendationVoteInstance = recVoteResult?.recVote;
-			def recoVoteMsg = recVoteResult?.msg;
-
+			boolean canMakeSpeciesCall = getSpeciesCallPermission(params.obvId)
+			def recVoteResult, recommendationVoteInstance, recoVoteMsg
+			if(canMakeSpeciesCall){
+				recVoteResult = getRecommendationVote(params)
+				recommendationVoteInstance = recVoteResult?.recVote;
+				recoVoteMsg = recVoteResult?.msg;
+			}
+			
 			def observationInstance = Observation.get(params.obvId);
 			log.debug params;
 			try {
@@ -575,7 +584,8 @@ class ObservationController {
 					def result = ['votes':params.int('currentVotes')];
 					def r = [
 						success : 'true',
-						recoVoteMsg:recoVoteMsg]
+						recoVoteMsg:recoVoteMsg,
+						canMakeSpeciesCall:canMakeSpeciesCall]
 					render r as JSON
 					//redirect(action:getRecommendationVotes, id:params.obvId, params:[ max:3, offset:0, recoVoteMsg:recoVoteMsg])
 					return
@@ -590,7 +600,8 @@ class ObservationController {
 					sendNotificationMail(SPECIES_AGREED_ON, observationInstance, request);
 					def r = [
 						success : 'true',
-						recoVoteMsg:recoVoteMsg]
+						recoVoteMsg:recoVoteMsg,
+						canMakeSpeciesCall:canMakeSpeciesCall]
 					render r as JSON
 					//redirect(action:getRecommendationVotes, id:params.obvId, params:[max:3, offset:0, recoVoteMsg:recoVoteMsg])
 					return
@@ -624,6 +635,7 @@ class ObservationController {
 					def speciesNameHtml =  g.render(template:"/common/observation/showSpeciesNameTemplate", model:['observationInstance':observationInstance]);
 					def result = [
 								success : 'true',
+								canMakeSpeciesCall:params.canMakeSpeciesCall,
 								recoHtml:html,
 								uniqueVotes:results.uniqueVotes,
 								recoVoteMsg:params.recoVoteMsg,
@@ -1228,5 +1240,9 @@ class ObservationController {
 		res["username"] = u.username
 		res["website"] = u.website
 		render res as JSON
+	}
+	
+	private getSpeciesCallPermission(obvId){
+		return customsecurity.hasPermissionToMakeSpeciesCall([id:obvId, className:species.participation.Observation.class.getCanonicalName(), permission:org.springframework.security.acls.domain.BasePermission.WRITE]).toBoolean()
 	}
 }
