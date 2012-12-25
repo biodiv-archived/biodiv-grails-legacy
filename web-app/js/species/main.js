@@ -54,11 +54,11 @@ var reloadLoginInfo = function() {
 }
 		
 var ajaxLoginSuccessHandler = function(json, statusText, xhr, $form) {
-	$('#ajaxLogin').modal('hide');
-	$('#loginMessage').html('').removeClass().hide();
-	reloadLoginInfo();
-	
 	if (json.success) {
+		$('#ajaxLogin').modal('hide');
+		$('#loginMessage').html('').removeClass().hide();
+		reloadLoginInfo();
+		
 		if (ajaxLoginSuccessCallbackFunction) {
 			ajaxLoginSuccessCallbackFunction(json,
 					statusText, xhr);
