@@ -21,15 +21,13 @@
 		<uGroup:showSubmenuTemplate model="['entityName':'Pages']" />
 		<uGroup:rightSidebar model="['userGroupInstance':userGroupInstance]" />
 		<div class="userGroup-section">
-
-			<div class="btn-group pull-right"
-				style="z-index: 10; margin-bottom: 10px;">
+			<div class="pull-right">
 				<g:if test="${userGroupInstance}">
 					<sec:permitted className='species.groups.UserGroup'
 						id='${userGroupInstance.id}'
 						permission='${org.springframework.security.acls.domain.BasePermission.ADMINISTRATION}'>
 
-						<a
+						<a style="margin-bottom: 10px;"
 							href="${uGroup.createLink(mapping:"userGroup", action:"pageCreate", 'userGroup':userGroupInstance)}"
 							class="btn btn-large btn-info"> <i class="icon-plus"></i>Add
 							a Page</a>
@@ -37,58 +35,34 @@
 				</g:if>
 				<g:else>
 					<sUser:isAdmin>
-						<a
+						<a style="margin-bottom: 10px;"
 							href="${uGroup.createLink(mapping:"userGroupGeneric", controller:'userGroup', action:"pageCreate") }"
 							class="btn btn-large btn-info"> <i class="icon-plus"></i>Add
 							a Page</a>
 					</sUser:isAdmin>
 				</g:else>
 			</div>
+			<div class="list" style="clear: both;">
 
-			<div class="list">
-
-
-				<table class="table table-hover table-bordered">
-					<thead>
-						<tr>
-							<g:sortableColumn property="title"
-								title="${message(code: 'newsletter.title.label', default: 'Title')}" />
-
-							<g:sortableColumn property="date"
-								title="${message(code: 'newsletter.date.label', default: 'Date')}" />
-						</tr>
-					</thead>
-					<tbody>
+				<div id="contentMenu" class="tabbable tabs-right" style="">
+					<ul class="nav nav-tabs sidebar" id="pageTabs">
 						<g:if test="${userGroupInstance}">
-							<tr>
-								<td><a href="/cepf_grantee_database"
-									title="Western Ghats CEPF Projects">Western Ghats CEPF
-										Projects</a></td>
-								<td></td>
-							</tr>
-							<tr>
-								<td><a href="/themepages/list" title="Themes">Themes</a></td>
-								<td></td>
-							</tr>
+							<li><a href="/cepf_grantee_database">Western Ghats CEPF
+									Projects</a></li>
+							<li><a href="/themepages/list">Themes</a></li>
 						</g:if>
 						<g:each in="${newsletters}" var="newsletterInstance" status="i">
-							<tr>
-
-								<td><g:if test="${userGroupInstance}">
-										<a
-											href="${uGroup.createLink('mapping':'userGroup', 'action':'page', 'id':newsletterInstance.id, 'userGroup':userGroupInstance) }">
-											${fieldValue(bean: newsletterInstance, field: "title")} </a>
-									</g:if> <g:else>
-										<a
-											href="${uGroup.createLink(controller:'userGroup', action:'page', id:newsletterInstance.id) }">
-											${fieldValue(bean: newsletterInstance, field: "title")} </a>
-									</g:else></td>
-								<td><g:formatDate date="${newsletterInstance.date}"
-										type="date" style="MEDIUM" /></td>
-							</tr>
+							<li><a data-toggle="tab" class="pageTab" href="#${newsletterInstance.id}">
+									${fieldValue(bean: newsletterInstance, field: "title")} </a></li>
 						</g:each>
-					</tbody>
-				</table>
+					</ul>
+					<div class="tab-content">
+						<g:each in="${newsletters}" var="newsletterInstance" status="i">
+							<div class="tab-pane active" id=${newsletterInstance.id}></div>
+						</g:each>
+					</div>
+				</div>
+
 			</div>
 		</div>
 	</div>
@@ -96,7 +70,28 @@
 
 	<r:script>
 		$(document).ready(function(){
-
+			var baseURL = "${uGroup.createLink('controller':'newsletter', 'action':'show', 'userGroup':userGroupInstance) }";
+			<%if(userGroupInstance ) {%>
+				var pageURL = "${uGroup.createLink('mapping':'userGroup', 'action':'page', 'userGroup':userGroupInstance) }";
+			<%} else {%>
+				var pageURL = "/page";
+			<%}%>
+			
+	        $('#pageTabs a').click(function (e) {
+  				
+  				var me = $(this);
+  				var contentID = e.target.hash; //get anchor
+  				if(contentID) {
+	  				e.preventDefault();
+	  				var History = window.History; 
+		           	$(contentID).load(baseURL+'/'+contentID.replace('#','')+' #pageContent', function(){
+				    	History.pushState({state:1}, "Species Portal", pageURL+'/'+contentID.replace('#',''));
+		            	me.tab('show');
+		           	});
+	           	} 
+			});
+			
+			$('a.pageTab:first').click();
 		});
 	</r:script>
 </body>

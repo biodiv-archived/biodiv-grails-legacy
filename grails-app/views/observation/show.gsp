@@ -232,7 +232,7 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 						<div class="sidebar_section">
 							<h5>Observation is in groups</h5>
 								<!-- div class="title">This observation belongs to following groups</div-->
-								<ul class="thumbnails">
+								<ul class="thumbnails" style="margin-left:0px;">
 									<g:each in="${observationInstance.userGroups}" var="userGroup">
 										<li class="thumbnail">
 											<uGroup:showUserGroupSignature  model="[ 'userGroup':userGroup]" />

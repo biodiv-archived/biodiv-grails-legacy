@@ -20,7 +20,7 @@
 	<div class="observation span12 bodymarker">
 		<uGroup:showSubmenuTemplate model="['entityName':'Pages']" />
 		<uGroup:rightSidebar model="['userGroupInstance':userGroupInstance]" />
-		<div class="center_panel">
+		<div class="">
 			<div class="userGroup-section">
 				<div class="btn-group pull-right" style="z-index: 10;">
 					<g:if test="${userGroupInstance}">
@@ -28,30 +28,38 @@
 							id='${userGroupInstance.id}'
 							permission='${org.springframework.security.acls.domain.BasePermission.ADMINISTRATION}'>
 
-								<a href="${uGroup.createLink(mapping:"userGroup", action:"pageCreate", 'userGroup':userGroupInstance)}"
-							class="btn btn-large btn-info">
-							<i class="icon-plus"></i>Add a Page</a>
+							<a
+								href="${uGroup.createLink(mapping:"userGroup", action:"pageCreate", 'userGroup':userGroupInstance)}"
+								class="btn btn-large btn-info"> <i class="icon-plus"></i>Add
+								a Page</a>
 						</sec:permitted>
 					</g:if>
 					<g:else>
 						<sUser:isAdmin>
-							<g:link url="${uGroup.createLink(mapping:"userGroupGeneric", action:"pageCreate")}" class="btn btn-large btn-info">
-								<i class="icon-plus"></i>Add a PageN</g:link>
+							<g:link
+								url="${uGroup.createLink(mapping:"userGroupGeneric", action:"pageCreate")}"
+								class="btn btn-large btn-info">
+								<i class="icon-plus"></i>Add a Page</g:link>
 						</sUser:isAdmin>
 					</g:else>
 				</div>
 			</div>
+
+
 			<g:include controller="newsletter" action="show"
 				id="${params.newsletterId}" />
-				
-			<div class="btn-group pull-right" style="z-index: 10;clear:both;margin-top:5px;">
+			<div class="btn-group pull-right"
+				style="z-index: 10; clear: both; margin-top: 5px;">
 
 				<g:if test="${userGroupInstance}">
-					<g:link url="${uGroup.createLink(mapping:'userGroup', controller:'userGroup', action:'pages', 'userGroup':userGroupInstance)}"
+					<g:link
+						url="${uGroup.createLink(mapping:'userGroup', controller:'userGroup', action:'pages', 'userGroup':userGroupInstance)}"
 						class="btn btn-large btn-info">< Back to Pages</g:link>
 				</g:if>
 				<g:else>
-					<g:link url="${uGroup.createLink(mapping:'userGroupGeneric', action:'pages')}" class="btn btn-large btn-info">< Back to Pages</g:link>
+					<g:link
+						url="${uGroup.createLink(mapping:'userGroupGeneric', action:'pages')}"
+						class="btn btn-large btn-info">< Back to Pages</g:link>
 				</g:else>
 
 

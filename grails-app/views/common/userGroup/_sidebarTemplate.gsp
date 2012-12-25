@@ -3,7 +3,7 @@
 <%@ page import="species.Habitat"%>
 <%@ page import="species.participation.ActivityFeedService"%>
 
-<ul class="nav sidebar left-sidebar span3">
+<ul class="nav left-sidebar span3">
 
 	<li class="dropdown">
 		<a href="#" class="dropdown-toggle" data-toggle="dropdown">

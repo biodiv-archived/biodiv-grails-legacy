@@ -1,5 +1,5 @@
 
-<div id="right-sidebar" class="sidebar right-sidebar span12">
+<%--<div id="right-sidebar" class="sidebar right-sidebar span12">--%>
 <%--	<g:if test="${params.action=='search'}">--%>
 <%--		<div class="sidebar_section" style="left: 0px">--%>
 <%--			<a data-toggle="collapse" href="#advSearchBox"><h5>--%>
@@ -48,4 +48,4 @@
 <%--				model="['tagFilterByProperty':'All' , 'params':params, 'isAjaxLoad':true, 'context':userGroupInstance]" />--%>
 <%--		</g:else>--%>
 <%--	</div>--%>
-</div>
+<%--</div>--%>

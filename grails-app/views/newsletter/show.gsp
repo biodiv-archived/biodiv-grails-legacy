@@ -39,8 +39,8 @@
 <r:require modules="core" />
 </head>
 <body>
-	<div class="observation  span9"  style="margin-left:0px;">
-		<div class="page-header clearfix">
+	<div id="pageContent" class="observation  span9"  style="margin-left:0px;">
+		<div class=" clearfix">
 
 			<h1>
 				${fieldValue(bean: newsletterInstance, field: "title")}
@@ -69,7 +69,7 @@
 			<div class="buttons" style="clear:both;">
 				<form
 					action="${uGroup.createLink(controller:'newsletter', action:'edit', userGroupWebaddress:params.webaddress)}"
-					method="POST">
+					method="GET">
 					<g:hiddenField name="id" value="${newsletterInstance?.id}" />
 					<g:hiddenField name="userGroup"
 						value="${newsletterInstance?.userGroup?.webaddress}" />

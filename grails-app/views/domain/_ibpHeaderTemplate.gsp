@@ -21,11 +21,7 @@
 <%--						<g:if test="${userGroupInstance  && userGroupInstance.id}">--%>
 <%--							<li>--%>
 <%--						</g:if>--%>
-						<g:if
-							test="${params.controller != 'openId' && params.controller != 'login' &&  params.controller != 'register'}">
-							<li><uGroup:showSidebar />
-							</li>
-						</g:if>
+						<li><uGroup:showSidebar />
 						<li><sUser:userLoginBox
 								model="['userGroup':userGroupInstance]" />
 						</li>

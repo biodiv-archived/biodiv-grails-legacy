@@ -486,17 +486,17 @@ class UserGroupController {
 		if(user) {
 			if(userGroupInstance.isMember(user)) {
 				flash.message = 'Already a member.';
-				render ([success:true, 'statusComplete':false, 'msg':'Already a member.']as JSON);
+				render ([success:true, 'statusComplete':false, 'shortMsg':'Already a member', 'msg':'Already a member.']as JSON);
 			} else {
 				if(userGroupInstance.addMember(user)) {
 					flash.message = "You have joined ${userGroupInstance.name} group. We look forward for your contribution.";
-					render ([success:true, 'statusComplete':true, 'msg':"You have joined ${userGroupInstance} group. We look forward for your contribution."]as JSON);
+					render ([success:true, 'statusComplete':true, 'shortMsg':'Joined', 'msg':"You have joined ${userGroupInstance} group. We look forward for your contribution."]as JSON);
 					return;
 				}
 			}
 		}
 		flash.error = 'We are extremely sorry as we are not able to process your request now. Please try again.';
-		render ([success:true, 'statusComplete':false, 'msg':'We are extremely sorry as we are not able to process your request now. Please try again.']as JSON);
+		render ([success:true, 'statusComplete':false, 'shortMsg':'Cannot process now', 'msg':'We are extremely sorry as we are not able to process your request now. Please try again.']as JSON);
 	}
 
 	@Secured(['ROLE_USER'])
@@ -507,7 +507,7 @@ class UserGroupController {
 		if(members) {
 			def userGroupInstance = findInstance(params.id, params.webaddress)
 			if (!userGroupInstance) {
-				render (['success':true, 'statusComplete':false, 'msg':'No userGroup selected.'] as JSON);
+				render (['success':true, 'statusComplete':false, 'shortMsg':'No userGroup selected', 'msg':'No userGroup is selected.'] as JSON);
 				return;
 			}
 
@@ -519,10 +519,10 @@ class UserGroupController {
 
 				msg += " as other "+alreadyMembersCount+" member(s) were already found to be members of this group."
 			}
-			render (['success':true, 'statusComplete':true, 'msg':msg] as JSON)
+			render (['success':true, 'statusComplete':true, 'shortMsg':'Sent request', 'msg':msg] as JSON)
 			return
 		}
-		render (['success':true, 'statusComplete':false, 'msg':'Please provide details of people you want to invite to join this group.'] as JSON)
+		render (['success':true, 'statusComplete':false, 'shortMsg':'Please provide details', 'msg':'Please provide details of people you want to invite to join this group.'] as JSON)
 	}
 
 	@Secured(['ROLE_USER'])
@@ -531,14 +531,13 @@ class UserGroupController {
 		def user = springSecurityService.currentUser;
 		if(user) {
 			def userGroupInstance = findInstance(params.id, params.webaddress)
-			println userGroupInstance;
 			if (!userGroupInstance) {
-				render (['success':true, 'statusComplete':false, 'msg':'No userGroup selected.'] as JSON);
+				render (['success':true, 'statusComplete':false, 'shortMsg':'No userGroup selected', 'msg':'No userGroup selected.'] as JSON);
 				return;
 			}
 
 			if(userGroupInstance.isMember(user)) {
-				render (['success':true, 'statusComplete':false, 'msg':'Already a member.'] as JSON);
+				render (['success':true, 'statusComplete':false, 'shortMsg':'Already a member', 'msg':'Already a member.'] as JSON);
 				return;
 			}
 			
@@ -551,10 +550,10 @@ class UserGroupController {
 				emailConfirmationService.sendConfirmation(founder.email,
 						"Please confirm users membership",  [founder:founder, user: user, userGroupInstance:userGroupInstance,domain:Utils.getDomainName(request), view:'/emailtemplates/requestMembership'], userToken.token);
 			}
-			render (['success':true, 'statusComplete':true, 'msg':'Sent request to all founders for confirmation.'] as JSON);
+			render (['success':true, 'statusComplete':true, 'shortMsg':'Sent request', 'msg':'Sent request to all founders for confirmation.'] as JSON);
 			return;
 		}
-		render (['success':true,'statusComplete':false, 'msg':'Please login to request membership.'] as JSON);
+		render (['success':true,'statusComplete':false, 'shortMsg':'Please login', 'msg':'Please login to request membership.'] as JSON);
 
 	}
 
@@ -615,7 +614,7 @@ class UserGroupController {
 		def userGroupInstance = findInstance(params.id, params.webaddress)
 		if (!userGroupInstance) {
 			flash.error = 'No userGroup selected.'
-			render (['success':true, 'statusComplete':false, 'msg':'No userGroup selected.'] as JSON);
+			render (['success':true, 'statusComplete':false, 'shortMsg':'No userGroup selected', 'msg':'No userGroup selected.'] as JSON);
 			return;
 		}
 
@@ -623,11 +622,11 @@ class UserGroupController {
 		if(user && userGroupInstance.deleteMember(user)) {
 			activityFeedService.addActivityFeed(userGroupInstance, user, user, activityFeedService.MEMBER_LEFT);
 			flash.message = 'Thank you for being with us.'
-			render (['msg':'Thank you for being with us.', 'success':true, 'statusComplete':true] as JSON);
+			render (['msg':'Thank you for being with us.', 'shortMsg':'Thank you', 'success':true, 'statusComplete':true] as JSON);
 			return;
 		}
 		flash.error = 'Your presence is important to us. Cannot let you leave at present.'
-		render (['msg':'Your presence is important to us. Cannot let you leave at present.','success':true, 'statusComplete':false]as JSON);
+		render (['msg':'Your presence is important to us. Cannot let you leave at present.', 'shortMsg':'Cannot let you leave', 'success':true, 'statusComplete':false]as JSON);
 	}
 
 	def about = {

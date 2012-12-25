@@ -21,6 +21,16 @@
 		<uGroup:rightSidebar model="['userGroupInstance':userGroupInstance]" />
 
 		<div class="userGroup-section">
+			<sec:permitted className='species.groups.UserGroup'
+				id='${userGroupInstance.id}'
+				permission='${org.springframework.security.acls.domain.BasePermission.ADMINISTRATION}'>
+
+				<a class="btn btn-large btn-primary pull-right"
+					href="${uGroup.createLink(mapping:'userGroup', action:'edit', userGroup:userGroupInstance)}"> <i
+					class="icon-edit"></i>Edit Group </a>
+			<!-- a class="btn btn-large btn-primary" href="${uGroup.createLink(mapping:'userGroup', action:'settings', userGroup:userGroupInstance)}"><i class="icon-cog"></i>Settings</a-->
+			</sec:permitted>
+			
 			<div class="tabbable">
 				<ul class="nav nav-tabs">
 					<li
