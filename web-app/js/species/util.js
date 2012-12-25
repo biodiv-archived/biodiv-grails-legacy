@@ -2,7 +2,7 @@
  * 
  */
 var serverTimeDiff = null;
-
+var alwaysRelativeTime = false;
 $(function() {
 	var spt = $('span.mailme');
 	var at = /\(at\)/;
@@ -52,7 +52,7 @@ function initRelativeTime(url){
 			dataType: "json",
 			success: function(data) {
 				serverTimeDiff = parseInt(data) - new Date().getTime();
-				$('body').timeago({serverTimeDiff:serverTimeDiff});
+				$('body').timeago({serverTimeDiff:serverTimeDiff, alwaysRelativeTime:alwaysRelativeTime});
 			}, error: function(xhr, status, error) {
 				//alert(xhr.responseText);
 		   	}
@@ -61,7 +61,7 @@ function initRelativeTime(url){
 }
 
 function updateRelativeTime(){
-	$('.timeago').timeago({serverTimeDiff:serverTimeDiff});
+	$('.timeago').timeago({serverTimeDiff:serverTimeDiff, alwaysRelativeTime:alwaysRelativeTime});
 }
 
 
