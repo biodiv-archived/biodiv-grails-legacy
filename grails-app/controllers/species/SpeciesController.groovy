@@ -193,7 +193,12 @@ class SpeciesController {
 				}
 			}
 			if(finalLoc.containsKey('field')) {
-				finalLoc.put('speciesFieldInstance', sField);
+				def t = finalLoc.get('speciesFieldInstance');
+				if(!t) {
+					t = [];
+					finalLoc.put('speciesFieldInstance', t);
+				}
+				t.add(sField);
 				/*
 				 def sfList;
 				 if(!(sfList = finalLoc.get('speciesFieldInstance'))) {
@@ -211,6 +216,12 @@ class SpeciesController {
 			//log.debug "Concept : "+concept
 			Map newConceptMap = new LinkedHashMap();
 			if(hasContent(concept.value.get('speciesFieldInstance'))) {
+//				List speciesFieldInstances = newConceptMap.get('speciesFieldInstance');
+//				if(speciesFieldInstances == null) {
+//					speciesFieldInstances = [];
+//					newConceptMap.put('speciesFieldInstance', speciesFieldInstances);
+//				}
+//				speciesFieldInstances.add(concept.value.get('speciesFieldInstance'));
 				newConceptMap.put('speciesFieldInstance', concept.value.get('speciesFieldInstance'));
 			}
 			for(category in concept.value) {
@@ -234,6 +245,12 @@ class SpeciesController {
 						newConceptMap.put(category.key, category.value);
 					}
 				} else if(hasContent(category.value.get('speciesFieldInstance'))) {
+//					List speciesFieldInstances = newCategoryMap.get('speciesFieldInstance');
+//					if(speciesFieldInstances == null) {
+//						speciesFieldInstances = [];
+//						newCategoryMap.put('speciesFieldInstance', speciesFieldInstances);
+//					}
+//					speciesFieldInstances.add(category.value.get('speciesFieldInstance'));
 					newCategoryMap.put('speciesFieldInstance', category.value.get('speciesFieldInstance'));
 				}
 				for(subCategory in category.value) {
@@ -261,7 +278,7 @@ class SpeciesController {
 				newMap.put(concept.key, newConceptMap)
 			}
 		}
-		//log.debug newMap;
+		log.debug newMap;
 		return newMap;
 		//return map;
 	}

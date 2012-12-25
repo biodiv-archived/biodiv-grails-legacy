@@ -77,7 +77,7 @@ class XMLConverter extends SourceConverter {
 
 	public Species convertSpecies(Node species) {
 		//TODO default action to be merge
-		convertSpecies(species, SaveAction.IGNORE);
+		convertSpecies(species, SaveAction.MERGE);
 	}
 
 	public Species convertSpecies(Node species, SaveAction defaultSaveAction) {
@@ -161,29 +161,56 @@ class XMLConverter extends SourceConverter {
 								List<Synonyms> synonyms = createSynonyms(fieldNode, s.taxonConcept);
 								//synonyms.each { s.addToSynonyms(it); }
 							} else if(subcategory && subcategory.equalsIgnoreCase(fieldsConfig.GLOBAL_DISTRIBUTION_GEOGRAPHIC_ENTITY)) {
-								List<GeographicEntity> countryGeoEntities = getCountryGeoEntity(fieldNode);
-								countryGeoEntities.each { s.addToGlobalDistributionEntities(it); }
+								List<GeographicEntity> countryGeoEntities = getCountryGeoEntity(s, fieldNode);
+								countryGeoEntities.each {
+									if(it.species == null) {
+										s.addToGlobalDistributionEntities(it);
+									} 
+								}
 							} else if(subcategory && subcategory.equalsIgnoreCase(fieldsConfig.GLOBAL_ENDEMICITY_GEOGRAPHIC_ENTITY)) {
-								List<GeographicEntity> countryGeoEntities = getCountryGeoEntity(fieldNode);
-								countryGeoEntities.each { s.addToGlobalEndemicityEntities(it); }
+								List<GeographicEntity> countryGeoEntities = getCountryGeoEntity(s, fieldNode);
+								countryGeoEntities.each { 
+									if(it.species == null) {
+										s.addToGlobalEndemicityEntities(it); 
+									}
+								}
 							}  else if(subcategory && subcategory.equalsIgnoreCase(fieldsConfig.INDIAN_DISTRIBUTION_GEOGRAPHIC_ENTITY)) {
-								List<GeographicEntity> countryGeoEntities = getCountryGeoEntity(fieldNode);
-								countryGeoEntities.each { s.addToIndianDistributionEntities(it); }
+								List<GeographicEntity> countryGeoEntities = getCountryGeoEntity(s, fieldNode);
+								countryGeoEntities.each {
+									if(it.species == null) {
+										s.addToIndianDistributionEntities(it); 
+									}
+								}
 							} else if(subcategory && subcategory.equalsIgnoreCase(fieldsConfig.INDIAN_ENDEMICITY_GEOGRAPHIC_ENTITY)) {
-								List<GeographicEntity> countryGeoEntities = getCountryGeoEntity(fieldNode);
-								countryGeoEntities.each { s.addToIndianEndemicityEntities(it); }
+								List<GeographicEntity> countryGeoEntities = getCountryGeoEntity(s, fieldNode);
+								countryGeoEntities.each {
+									if(it.species == null) {
+										s.addToIndianEndemicityEntities(it);
+									} 
+								}
 							} else if(category && category.toLowerCase().contains(fieldsConfig.TAXONOMIC_HIERARCHY)) {
 								//ignore
 							} else {
-								List<SpeciesField> speciesFields = createSpeciesFields(fieldNode, SpeciesField.class, species.images[0], species.icons[0], species.audio[0], species.video[0]);
-								speciesFields.each { s.addToFields(it); }
+								List<SpeciesField> speciesFields = createSpeciesFields(s, fieldNode, SpeciesField.class, species.images[0], species.icons[0], species.audio[0], species.video[0]);
+								speciesFields.each {
+									if(it.species == null) { // if its already associated this field will be populated
+										log.debug "Adding new fields to species ${s}"
+										s.addToFields(it);
+									} 
+								}
 							}
 						}
 					}
 
 					//adding taxonomy classifications
 					taxonHierarchy.each { s.addToTaxonomyRegistry(it); }
-
+					
+//					if(defaultSaveAction == SaveAction.MERGE){
+//						log.info "Merging with already existing species information : "+existingSpecies.id;
+//						mergeSpecies(existingSpecies, s);
+//						s = existingSpecies;
+//					}
+					
 					return s;
 				}
 			} else {
@@ -239,13 +266,17 @@ class XMLConverter extends SourceConverter {
 	 * @param videosNode
 	 * @return
 	 */
-	private List<SpeciesField> createSpeciesFields(Node fieldNode, Class sFieldClass, Node imagesNode, Node iconsNode, Node audiosNode, Node videosNode) {
+	private List<SpeciesField> createSpeciesFields(Species s, Node fieldNode, Class sFieldClass, Node imagesNode, Node iconsNode, Node audiosNode, Node videosNode) {
 		log.debug "Creating species field from node : "+fieldNode;
 		List<SpeciesField> speciesFields = new ArrayList<SpeciesField>();
 		def field = getField(fieldNode, false);
 		if(field == null) {
 			log.warn "NO SUCH FIELD : "+field;
 			return;
+		}
+		List sFields = SpeciesField.withCriteria() {
+			eq("field", field)
+			eq('species', s)
 		}
 		for(Node dataNode : fieldNode.data) {
 			String data = getData(dataNode);
@@ -255,7 +286,29 @@ class XMLConverter extends SourceConverter {
 			List<Resource> resources = getResources(dataNode, imagesNode, iconsNode, audiosNode, videosNode);
 			List<Reference> references = getReferences(dataNode, true);
 			List<Contributor> attributors = getAttributions(dataNode, true);
-			SpeciesField speciesField = sFieldClass.newInstance(field:field, description:data);
+			SpeciesField speciesField;
+			
+			for (sField in sFields) {
+				if(sField.contributors.isEmpty() || sField.contributors.contains(contributors[0])) {
+					speciesField = sField;
+					break; 
+				}
+			}
+			
+			if(!speciesField) {
+				log.debug "Adding new field ${speciesField} to species ${s}"
+				speciesField = sFieldClass.newInstance(field:field, description:data);
+			} else {
+				log.debug "Overwriting existing ${speciesField}. Removing all metadata associate with previous field."
+				speciesField.description = data;
+				//TODO: Will have to clean up orphaned entried from following tables 
+				speciesField.contributors.clear()
+				speciesField.licenses.clear()
+				speciesField.audienceTypes.clear()
+				speciesField.attributors.clear()
+				speciesField.resources.clear()
+				speciesField.references.clear()
+			}
 
 			contributors.each { speciesField.addToContributors(it); }
 			licenses.each { speciesField.addToLicenses(it); }
@@ -955,9 +1008,9 @@ class XMLConverter extends SourceConverter {
 	 * @param fieldNode
 	 * @return
 	 */
-	private List<GeographicEntity> getCountryGeoEntity(Node fieldNode) {
+	private List<GeographicEntity> getCountryGeoEntity(Species s, Node fieldNode) {
 		List<GeographicEntity> geographicEntities = new ArrayList<GeographicEntity>();
-		List<SpeciesField> sfields = createSpeciesFields(fieldNode, GeographicEntity.class, null, null, null, null);
+		List<SpeciesField> sfields = createSpeciesFields(s, fieldNode, GeographicEntity.class, null, null, null, null);
 		fieldNode.data.eachWithIndex { c, index ->
 			if(c?.country) {
 				def countryCriteria = Country.createCriteria();
@@ -1210,21 +1263,20 @@ class XMLConverter extends SourceConverter {
 	 * @param existingSpecies
 	 * @param newSpecies
 	 */
-	void mergeSpecies(existingSpecies, newSpecies) {
-		//TODO
-		//check duplicate fields
-		//		newSpecies.fields.each { field ->
-		//			existingSpecies.addToFields(field);
-		//		}
-		//		newSpecies.synonyms.each { field ->
-		//			existingSpecies.addToSynonyms(field);
-		//		}
-		//		newSpecies.commonNames.each { field ->
-		//			existingSpecies.addToFields(field);
-		//		}
-		//		newfields,
-		//		synonyms, commonNames, globalDistributionEntities, globalEndemicityEntities,
-		//		taxonomyRegistry;
+	void mergeSpecies(Species existingSpecies, Species newSpecies) {
+//				newSpecies.fields.each { field ->
+//					existingSpecies.addToFields(field);
+//				}
+//				newSpecies.synonyms.each { field ->
+//					existingSpecies.addToSynonyms(field);
+//				}
+//				newSpecies.commonNames.each { field ->
+//					existingSpecies.addToFields(field);
+//				}
+//				newfields,
+//				synonyms, commonNames, globalDistributionEntities, globalEndemicityEntities,
+//				taxonomyRegistry;
+		
 	}
 
 	private String cleanSciName(String scientificName) {

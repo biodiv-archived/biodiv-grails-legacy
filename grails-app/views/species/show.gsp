@@ -406,7 +406,7 @@ $(document).ready(function(){
 		<!-- species toc and content -->
 		<div class="container_16" id="content">
 			<div class="grid_16" style="float:left;margin-right: .3em;">
-				<%def nameRecords = fields.get(grailsApplication.config.speciesPortal.fields.NOMENCLATURE_AND_CLASSIFICATION)?.get(grailsApplication.config.speciesPortal.fields.TAXON_RECORD_NAME).collect{it.value.get('speciesFieldInstance')} %>
+				<%def nameRecords = fields.get(grailsApplication.config.speciesPortal.fields.NOMENCLATURE_AND_CLASSIFICATION)?.get(grailsApplication.config.speciesPortal.fields.TAXON_RECORD_NAME).collect{it.value.get('speciesFieldInstance')[0]} %>
 				<g:if test="${nameRecords}">
 				<div class="ui-widget">
 					<div class="speciesFieldHeader ui-dialog-titlebar ui-helper-clearfix ui-widget-header">
