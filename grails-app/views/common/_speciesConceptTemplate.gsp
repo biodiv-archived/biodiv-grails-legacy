@@ -16,8 +16,10 @@
 			class="speciesField collapse in">
 
 			<g:if test="${concept.value.containsKey('speciesFieldInstance')}">
+				<g:each in="${ concept.value.get('speciesFieldInstance')}" var="speciesFieldInstance">
 				<g:showSpeciesField
-					model="['speciesFieldInstance':concept.value.get('speciesFieldInstance'), 'speciesId':speciesInstance.id]" />
+					model="['speciesFieldInstance':speciesFieldInstance, 'speciesId':speciesInstance.id]" />
+				</g:each>
 			</g:if>
 			<g:else>
 				<g:each in="${concept.value}" var="category">
@@ -67,7 +69,7 @@
 
 									<g:elseif
 										test="${category.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.OCCURRENCE_RECORDS)}">
-										<g:showSpeciesFieldToolbar model="${category.value}" />
+										<g:showSpeciesFieldToolbar model="${category.value[0]}" />
 										<br />
 										<div id="map">
 										<div class=" message ui-state-highlight ui-corner-all">
@@ -82,7 +84,7 @@
 									</g:elseif>
 
 									<g:elseif test="${category.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.REFERENCES)}">
-										<g:showSpeciesFieldToolbar model="${category.value}" />
+										<g:showSpeciesFieldToolbar model="${category.value[0]}" />
 										<%def references = speciesInstance.fields.collect{it.references};
 										Map refs = new LinkedHashMap();
 										references.each(){
@@ -93,8 +95,8 @@
 											}
 										};
 									
-										if(category.value.get('speciesFieldInstance')?.description) {
-											category.value.get('speciesFieldInstance')?.description?.replaceAll(/<.*?>/, '\n').split('\n').each() {
+										if(category.value.get('speciesFieldInstance')[0]?.description) {
+											category.value.get('speciesFieldInstance')[0]?.description?.replaceAll(/<.*?>/, '\n').split('\n').each() {
 												if(it) {
 												if(it.startsWith("http://")) {
 													refs.put(it, new Reference(url:it));
@@ -123,8 +125,10 @@
 									</g:elseif>
 
 									<g:else>
+										<g:each in="${ category.value.get('speciesFieldInstance')}" var="speciesFieldInstance">
 										<g:showSpeciesField
-											model="['speciesInstance' : speciesInstance, 'speciesFieldInstance':category.value.get('speciesFieldInstance'), 'speciesId':speciesInstance.id]" />
+											model="['speciesInstance' : speciesInstance, 'speciesFieldInstance':speciesFieldInstance, 'speciesId':speciesInstance.id]" />
+										</g:each>
 									</g:else>
 								</g:if>
 
@@ -162,8 +166,10 @@
 											test="${!it.key.equals('field') && !it.key.equals('speciesFieldInstance')}">
 
 											<div>
+												<g:each in="${ it.value.get('speciesFieldInstance')}" var="speciesFieldInstance">
 												<g:showSpeciesField
-													model="['speciesInstance': speciesInstance, 'speciesFieldInstance':it.value.get('speciesFieldInstance'), 'speciesId':speciesInstance.id]" />
+													model="['speciesInstance': speciesInstance, 'speciesFieldInstance':speciesFieldInstance, 'speciesId':speciesInstance.id]" />
+												</g:each>
 											</div>
 										</g:if>
 									</g:each>

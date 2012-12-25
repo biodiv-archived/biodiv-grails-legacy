@@ -76,6 +76,5 @@
 
 
 	<r:layoutResources />
-
 </body>
 </html>

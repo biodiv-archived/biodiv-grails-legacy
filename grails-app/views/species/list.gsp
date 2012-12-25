@@ -16,7 +16,6 @@
 <g:set var="entityName"
 	value="${message(code: 'species.label', default: 'Species')}" />
 <title>Species List</title>
-
 </head>
 <body>
 	<div class="span12">
