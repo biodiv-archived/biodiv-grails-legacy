@@ -71,15 +71,26 @@
 	<r:script>
 		$(document).ready(function(){
 			var baseURL = "${uGroup.createLink('controller':'newsletter', 'action':'show', 'userGroup':userGroupInstance) }";
+			<%if(userGroupInstance ) {%>
+				var pageURL = "${uGroup.createLink('mapping':'userGroup', 'action':'page', 'userGroup':userGroupInstance) }";
+			<%} else {%>
+				var pageURL = "/page";
+			<%}%>
 			
 	        $('#pageTabs a').click(function (e) {
-  				e.preventDefault();
+  				
   				var me = $(this);
-  				var contentID = e.target.hash; //get anchor 
-	           	$(contentID).load(baseURL+'/'+contentID.replace('#','')+' #pageContent', function(){
-	            	me.tab('show');
-	           	});
+  				var contentID = e.target.hash; //get anchor
+  				if(contentID) {
+	  				e.preventDefault();
+	  				var History = window.History; 
+		           	$(contentID).load(baseURL+'/'+contentID.replace('#','')+' #pageContent', function(){
+				    	History.pushState({state:1}, "Species Portal", pageURL+'/'+contentID.replace('#',''));
+		            	me.tab('show');
+		           	});
+	           	} 
 			});
+			
 			$('a.pageTab:first').click();
 		});
 	</r:script>
