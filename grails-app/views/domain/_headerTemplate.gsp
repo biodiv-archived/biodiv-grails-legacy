@@ -123,15 +123,15 @@
 					
 					<li
 						class="${(request.getHeader('referer')?.contains('/about') && params.action == 'header')?' active':''}"><a
-						href="/about" title="About Us">About Us </a></li>
+						href="/theportal" title="About Us">About Us </a></li>
 					<li class="dropdown"><a href="#" class="dropdown-toggle"
 						data-toggle="dropdown"> More <b class="caret"></b> </a>
 
 						<ul class="dropdown-menu" style="text-align: left; color: #000">
-							<!-- li
+							<li
 								class="${((params.controller == 'user' || params.controller == 'SUser') && params.action != 'header')?' active':''}"><a
 								href="${uGroup.createLink(controller:'user', action:'list')}"
-								title="Members">Members</a></li-->
+								title="Members">Members</a></li>
 							<li
 								class="${(request.getHeader('referer')?.contains('/calendar') && params.action == 'header')?' active':''}"><a
 								href="/calendar" title="Events">Events</a></li>

@@ -1,4 +1,3 @@
-m
 <% def userGroups = userGroups.groupBy{it.key.allowObvCrossPosting};
 def exclusiveUsergroups =  userGroups[false]
 def otherUsergroups =  userGroups[true] 

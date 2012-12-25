@@ -93,7 +93,12 @@ class NewsletterController {
 			redirect  url: uGroup.createLink(mapping:'userGroupGeneric', action: "pages")
 		}
 		else {
-			return [newsletterInstance: newsletterInstance]
+			if(newsletterInstance.userGroup) {
+				[userGroupInstance:newsletterInstance.userGroup, newsletterInstance: newsletterInstance]
+			}
+			else {
+				[newsletterInstance: newsletterInstance]
+			}
 		}
 	}
 

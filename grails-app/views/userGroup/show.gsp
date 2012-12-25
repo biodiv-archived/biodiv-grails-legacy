@@ -59,15 +59,7 @@
 	</div>
 	<g:javascript>
 		$(document).ready(function() {
-			window.params = {
-			<%
-				params.each { key, value ->
-					println '"'+key+'":"'+value?.trim()+'",'
-				}
-			%>
-				"tagsLink":"${g.createLink(action: 'tags')}",
-				"queryParamsMax":"${queryParams?.max}"
-			}
+			window.params.tagsLink = "${g.createLink(action: 'tags')}";
 			var url = "${userGroupInstance.homePage ?: uGroup.createLink(mapping:'userGroup', controller:'userGroup', action:'about', userGroup:userGroupInstance)}";
 			$.get(url, function(data) {
 				$('.homepage-content').append($(data).find('.bodymarker'));

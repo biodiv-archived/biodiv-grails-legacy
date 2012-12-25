@@ -11,11 +11,11 @@ function joinAction(me, joinUsUrl) {
         dataType: "json",
         success: function(data) {
         	if(data.statusComplete) {
-        		$(me).html("Joined").removeClass("btn-success").addClass("disabled");
+        		$(me).html(data.shortMsg).removeClass("btn-success").addClass("disabled");
         		$(".alertMsg").removeClass('alert-error').addClass('alert-success').html(data.msg+". Please press <a href='#' onclick='document.location.reload(true);'>reload</a> to load new changes.");
         		//document.location.reload(true);
         	} else {
-        		$(me).html("Error sending request").removeClass("btn-success").addClass("disabled");
+        		$(me).html(data.shortMsg).removeClass("btn-success").addClass("disabled");
         		$(".alertMsg").removeClass('alert alert-success').addClass('alert alert-error').html(data.msg);
         		//reloadActionsHeader();
         	}
@@ -38,11 +38,11 @@ function requestMembershipAction(me, requestMembershipUrl) {
         dataType: "json",
         success: function(data) {
         	if(data.statusComplete) {
-        		$(me).html("Sent Request").removeClass("btn-success").addClass("disabled");
+        		$(me).html(data.shortMsg).removeClass("btn-success").addClass("disabled");
         		$(".alertMsg").removeClass('alert alert-error').addClass('alert alert-success').html(data.msg);
         		//document.location.reload(true);
         	} else {
-        		$(me).html("Error sending request").removeClass("btn-success").addClass("disabled");
+        		$(me).html(data.shortMsg).removeClass("btn-success").addClass("disabled");
         		$(".alertMsg").removeClass('alert alert-success').addClass('alert alert-error').html(data.msg);
         		//reloadActionsHeader();
         	}
@@ -85,11 +85,11 @@ function membership_actions() {
             data:{'id':dataGroupId},
             success: function(data) {
             	if(data.statusComplete) {
-            		$("me").html("Thank You").removeClass("btn-info").addClass("disabled");
+            		$("me").html(data.shortMsg).removeClass("btn-info").addClass("disabled");
             		$(".alertMsg").removeClass('alert alert-error').addClass('alert alert-success').html(data.msg);
             		//reloadMembers();
             	} else {
-            		$("me").html("Couldn't Leave").removeClass("btn-success").addClass("disabled");
+            		$("me").html(data.shortMsg).removeClass("btn-success").addClass("disabled");
             		$(".alertMsg").removeClass('alert alert-success').addClass('alert alert-error').html(data.msg);
             	}
             	$('#leaveUsModalDialog').modal('hide');
