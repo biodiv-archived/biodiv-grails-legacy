@@ -21,14 +21,13 @@
 		<uGroup:showSubmenuTemplate model="['entityName':'Pages']" />
 		<uGroup:rightSidebar model="['userGroupInstance':userGroupInstance]" />
 		<div class="userGroup-section">
-
-			<div class="btn-group pull-right">
+			<div class="pull-right">
 				<g:if test="${userGroupInstance}">
 					<sec:permitted className='species.groups.UserGroup'
 						id='${userGroupInstance.id}'
 						permission='${org.springframework.security.acls.domain.BasePermission.ADMINISTRATION}'>
 
-						<a
+						<a style="margin-bottom: 10px;"
 							href="${uGroup.createLink(mapping:"userGroup", action:"pageCreate", 'userGroup':userGroupInstance)}"
 							class="btn btn-large btn-info"> <i class="icon-plus"></i>Add
 							a Page</a>
@@ -36,17 +35,16 @@
 				</g:if>
 				<g:else>
 					<sUser:isAdmin>
-						<a
+						<a style="margin-bottom: 10px;"
 							href="${uGroup.createLink(mapping:"userGroupGeneric", controller:'userGroup', action:"pageCreate") }"
 							class="btn btn-large btn-info"> <i class="icon-plus"></i>Add
 							a Page</a>
 					</sUser:isAdmin>
 				</g:else>
 			</div>
-
 			<div class="list" style="clear: both;">
 
-				<div id="contentMenu" class="tabbable tabs-right">
+				<div id="contentMenu" class="tabbable tabs-right" style="">
 					<ul class="nav nav-tabs sidebar" id="pageTabs">
 						<g:if test="${userGroupInstance}">
 							<li><a href="/cepf_grantee_database">Western Ghats CEPF
@@ -54,7 +52,7 @@
 							<li><a href="/themepages/list">Themes</a></li>
 						</g:if>
 						<g:each in="${newsletters}" var="newsletterInstance" status="i">
-							<li><a data-toggle="tab" href="#${newsletterInstance.id}">
+							<li><a data-toggle="tab" class="pageTab" href="#${newsletterInstance.id}">
 									${fieldValue(bean: newsletterInstance, field: "title")} </a></li>
 						</g:each>
 					</ul>
@@ -82,7 +80,7 @@
 	            	me.tab('show');
 	           	});
 			});
-			$('#pageTabs a:first').click();
+			$('a.pageTab:first').click();
 		});
 	</r:script>
 </body>

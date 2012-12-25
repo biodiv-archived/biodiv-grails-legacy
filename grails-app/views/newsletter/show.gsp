@@ -40,7 +40,7 @@
 </head>
 <body>
 	<div id="pageContent" class="observation  span9"  style="margin-left:0px;">
-		<div class="page-header clearfix">
+		<div class=" clearfix">
 
 			<h1>
 				${fieldValue(bean: newsletterInstance, field: "title")}
