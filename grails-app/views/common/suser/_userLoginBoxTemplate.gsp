@@ -85,7 +85,7 @@
 	margin-top: 5px;
 }
 </style>
-<ul class="nav">
+<ul class="nav header_userInfo">
 	<sec:ifNotLoggedIn>
 		<li><a href="${uGroup.createLink(controller:'login', 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress) }">Login</a>
 		</li>

@@ -84,7 +84,12 @@
     TimeAgo.prototype.timeAgoInWords = function(timeString) {
       var absolutTime;
       absolutTime = this.parse(timeString);
-      return "" + this.options.lang.prefixes.ago + (this.distanceOfTimeInWords(absolutTime)) + this.options.lang.suffix;
+      var diffTime = this.getTimeDistanceInMinutes(absolutTime);
+      
+      if((diffTime > 60*24) && !this.options.alwaysRelativeTime){
+    	  return absolutTime.toString("MMMM  d, yyyy");
+      }
+      return "" + this.options.lang.prefixes.ago + (this.distanceOfTimeInWords(diffTime)) + this.options.lang.suffix;
     };
 
     TimeAgo.prototype.parse = function(iso8601) {
@@ -103,9 +108,8 @@
       return Math.round((Math.abs(timeDistance) / 1000) / 60);
     };
 
-    TimeAgo.prototype.distanceOfTimeInWords = function(absolutTime) {
+    TimeAgo.prototype.distanceOfTimeInWords = function(dim) {
       var dim;
-      dim = this.getTimeDistanceInMinutes(absolutTime);
       if (dim === 0) {
         return "" + this.options.lang.prefixes.lt + " " + this.options.lang.units.minute;
       } else if (dim === 1) {

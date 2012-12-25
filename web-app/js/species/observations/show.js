@@ -55,20 +55,20 @@ function addAgreeRecoVote(obvId, recoId, currentVotes, liComponent, url){
 		data:{'obvId':obvId, 'recoId':recoId, 'currentVotes':currentVotes},
 		
 		success: function(data){
-			preLoadRecos(3, false, obvId, liComponent);
-			updateFeeds();
-			showRecoUpdateStatus(data.recoVoteMsg, 'success');
+			if(data.canMakeSpeciesCall === false){
+         		$('#selectedGroupList').modal('show');
+         	}else{
+         		preLoadRecos(3, false, obvId, liComponent);
+         		updateFeeds();
+         		showRecoUpdateStatus(data.recoVoteMsg, 'success');
+         	}
 			return false;
 		},
 		
-		statusCode: {
-			401: function() {
-				show_login_dialog();
-			}	    				    			
-		},
-		error: function(xhr, status, error) {
-			handleError(xhr, status, error, this.success,showRecoUpdateStatus);
-			return false;
-		}
+		error:function (xhr, ajaxOptions, thrownError){
+			//successHandler is used when ajax login succedes
+        	var successHandler = this.success, errorHandler = showRecoUpdateStatus;
+        	handleError(xhr, ajaxOptions, thrownError, successHandler, errorHandler);
+		} 
 	});
 }

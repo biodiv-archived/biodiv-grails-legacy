@@ -76,9 +76,13 @@ class Utils {
 	}
 
 	static String getCanonicalForm(String name){
-		def taxonDef = namesParser.parse([name])?.get(0)
-		if(taxonDef){
-			return taxonDef.canonicalForm ?:taxonDef.name
+		try {
+			def taxonDef = namesParser.parse([name])?.get(0)
+			if(taxonDef){
+				return taxonDef.canonicalForm ?:taxonDef.name
+			}
+		} catch (Exception e) {
+			log.error e.printStackTrace();
 		}
 		return cleanName(name)
 	}

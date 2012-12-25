@@ -185,20 +185,12 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 									<input type="hidden" name='obvId'
 											value="${observationInstance.id}" />
 									
-									<g:if test="${customsecurity.hasPermissionToMakeSpeciesCall([object:observationInstance,
-										permission:org.springframework.security.acls.domain.BasePermission.WRITE]).toBoolean()}">
-										 <input type="submit"
+									 <input type="submit"
 											value="Add" class="btn btn-primary btn-small pull-right" style="position: relative;top: -30px; border-radius:4px" />
-									</g:if>
-									<g:else>
-										<a href="#" onclick="$('#selectedGroupList').modal('show'); return false;"
-											title="Protected to group members/experts. Need to join any of the user groups this observation belongs to inorder to add a species call" class="btn btn-primary btn-small pull-right" style="position: relative;top: -30px;">Join Groups</a>
-											<uGroup:showUserGroupsListInModal
-												model="['userGroupInstanceList':observationInstance.userGroups]" />
-									</g:else>
 								</div>
+								
 							</form>
-						
+							<uGroup:showUserGroupsListInModal model="['userGroupInstanceList':observationInstance.userGroups]" />
 						</div>
 						
 					</div>
@@ -333,18 +325,22 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
      		$(this).ajaxSubmit({ 
 	         	url:"${uGroup.createLink(controller:'observation', action:'addRecommendationVote')}",
 				dataType: 'json', 
-				clearForm: true,
-				resetForm: true,
 				type: 'GET',
 				beforeSubmit: function(formData, jqForm, options) {
 					updateCommonNameLanguage();
 					return true;
 				}, 
 	            success: function(data, statusText, xhr, form) {
-	            	showRecos(data, null);
-	            	$('#canName').val('');
-	            	updateUnionComment(null, "${uGroup.createLink(controller:'comment', action:'getAllNewerComments')}");
-	            	updateFeeds();
+	             	if(data.canMakeSpeciesCall === 'false'){
+	             		$('#selectedGroupList').modal('show');
+	             	}else{
+	             		showRecos(data, null);
+	            		$('#canName').val('');
+	            		$('#commonName').val('');
+	            		$('#recoComment').val('');
+	            		updateUnionComment(null, "${uGroup.createLink(controller:'comment', action:'getAllNewerComments')}");
+	            		updateFeeds();
+	            	}
 	            	return false;
 	            },
 	            error:function (xhr, ajaxOptions, thrownError){
@@ -415,7 +411,7 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 		})
 	});
 	  function preLoadRecos(max, seeAllClicked){
-         	$("#seeMoreMessage").hide();
+	  		$("#seeMoreMessage").hide();
          	$("#seeMore").hide();
          	
         	$.ajax({

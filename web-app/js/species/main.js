@@ -46,7 +46,7 @@ var reloadLoginInfo = function() {
 	$.ajax({
 		url : window.appContext+"/SUser/login",
 		success : function(data) {
-			$('.header:visible .header_userInfo').html(data);
+			$('.header_userInfo').replaceWith(data);
 		}, error: function (xhr, ajaxOptions, thrownError){
 			alert("Error while getting login information : "+xhr.responseText);
 		}
@@ -54,24 +54,20 @@ var reloadLoginInfo = function() {
 }
 		
 var ajaxLoginSuccessHandler = function(json, statusText, xhr, $form) {
+	$('#ajaxLogin').modal('hide');
+	$('#loginMessage').html('').removeClass().hide();
+	reloadLoginInfo();
+	
 	if (json.success) {
-		$('#ajaxLogin').modal('hide');
-		$('#loginMessage').html('').removeClass().hide();
-		reloadLoginInfo();
 		if (ajaxLoginSuccessCallbackFunction) {
 			ajaxLoginSuccessCallbackFunction(json,
 					statusText, xhr);
 			ajaxLoginSuccessCallbackFunction = undefined;
 		}
 	} else if (json.error) {
-		$('#loginMessage').html(json.error)
-				.removeClass().addClass(
-						'alter alert-error')
-				.show();
+		$('#loginMessage').html(json.error).removeClass().addClass('alter alert-error').show();
 	} else {
-		$('#loginMessage').html(json).removeClass()
-				.addClass('alter alert-info')
-				.show();
+		$('#loginMessage').html(json).removeClass().addClass('alter alert-info').show();
 	}
 }
 
