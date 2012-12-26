@@ -14,7 +14,9 @@
 					var="checklistInstance">
 					<tr class="mainContent">
 						<td><a href="${uGroup.createLink(controller:'checklist', action:'show', pos:i, id:checklistInstance.id, userGroupWebaddress:params.webaddress)}">${checklistInstance.title}</a></td>
-						<td>${checklistInstance.speciesGroup?.name}</td>
+						<td><button class="btn species_groups_sprites ${checklistInstance.speciesGroup.iconClass()} active"
+									id="${"group_" + checklistInstance.speciesGroup.id}" value="${checklistInstance.speciesGroup.id}"
+									title="${checklistInstance.speciesGroup?.name}"></button></td>
 						<td>${checklistInstance.speciesCount}</td>
 						<td>${checklistInstance.placeName}</td>
 					</tr>
