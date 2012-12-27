@@ -110,8 +110,8 @@ class NewSimpleSpreadsheetConverter extends SourceConverter {
 			Species s = converter.convertSpecies(speciesElement)
 			if(s)
 				species.add(s);
-			//if(i==0)break;
-			//i++
+//			if(i==0)break;
+//			i++
 		}
 		return species;
 	}
@@ -267,7 +267,7 @@ class NewSimpleSpreadsheetConverter extends SourceConverter {
 	
 	private void createImages(Node speciesElement, List<String> imageIds, List<Map> imageMetaData) {
 		log.debug "Creating images ${imageIds}"
-		println imageMetaData
+		
 		if(!imageIds) return;
 		
 		Node images = new Node(speciesElement, "images");
@@ -283,8 +283,21 @@ class NewSimpleSpreadsheetConverter extends SourceConverter {
 				new Node(image, "fileName", file.getAbsolutePath());
 				new Node(image, "source", imageData.get("source"));
 				new Node(image, "caption", imageData.get("possiblecaption"));
-				new Node(image, "attribution", imageData.get("attribution"));
-				new Node(image, "license", imageData.get("license"));
+				
+				List<String> contributors = getContributors(imageData.get("contributor"));
+				for(c in contributors) {
+					new Node(image, "contributor", c);
+				}
+				
+				List<String> attributions = getAttributions(imageData.get("attribution"));
+				for(a in attributions) {
+					new Node(image, "attribution", a);
+				}
+				
+				List<String> licenses = getLicenses(imageData.get('getLicenses'))
+				for (l in licenses) {
+					new Node(image, "license", l);
+				}
 			}
 		}
 		log.debug images
