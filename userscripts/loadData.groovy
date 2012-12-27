@@ -40,7 +40,8 @@ def speciesService = ctx.getBean("speciesService");
 
 //speciesService.uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/abct/uploadready/abctrust_amphibians.xls", grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/abct/uploadready/abctrust_amphibians_mappingfile.xls", 0, 0, 0, 0);
 //speciesService.uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/abct/uploadready/abctrust_mosses.xls", grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/abct/uploadready/abctrust_mosses_mappingfile.xls", 0, 0, 0, 0);
+speciesService.uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/abct/uploadready/abctrust_reptiles.xls", grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/abct/uploadready/abctrust_reptiles_mappingfile.xls", 0, 0, 0, 0);
 
-grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/sushantsanaye/uploadready/images";
-speciesService.uploadNewSimpleSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/sushantsanaye/uploadready/Indian_Reef_Fishes_SushantSanaye.xls");
+//grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/sushantsanaye/uploadready/images";
+//speciesService.uploadNewSimpleSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/sushantsanaye/uploadready/Indian_Reef_Fishes_SushantSanaye.xls");
 

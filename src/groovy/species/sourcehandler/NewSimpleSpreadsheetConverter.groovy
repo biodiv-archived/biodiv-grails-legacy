@@ -298,18 +298,18 @@ class NewSimpleSpreadsheetConverter extends SourceConverter {
 			int i=0;
 			for(String ref : text.split("\\\n")) {
 				//TODO : remove other protocols as well if present
-				if(!ref.startsWith("http://") && ref.indexOf("http://") != -1) {
-					ref = ref.substring(ref.indexOf("http://"));
-				}
+//				if(!ref.startsWith("http://") && ref.indexOf("http://") != -1) {
+//					ref = ref.substring(ref.indexOf("http://"));
+//				}
 
-				if(ref.startsWith("http://")) {
+//				if(ref.startsWith("http://")) {
+//					def refNode = new Node(field, "reference")
+//					new Node(refNode, "title", attrs?attrs.get(i):"");
+//					new Node(refNode, "url", ref);
+//				} else {
 					def refNode = new Node(field, "reference")
 					new Node(refNode, "title", attrs?attrs.get(i):"");
-					new Node(refNode, "url", ref);
-				} else {
-					def refNode = new Node(field, "reference")
-					new Node(refNode, "title", attrs?attrs.get(i):"");
-				}
+//				}
 				i++;
 			}
 		}
