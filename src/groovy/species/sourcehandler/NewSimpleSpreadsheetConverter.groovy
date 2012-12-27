@@ -110,8 +110,8 @@ class NewSimpleSpreadsheetConverter extends SourceConverter {
 			Species s = converter.convertSpecies(speciesElement)
 			if(s)
 				species.add(s);
-			if(i==0)break;
-			i++
+//			if(i==0)break;
+//			i++
 		}
 		return species;
 	}
