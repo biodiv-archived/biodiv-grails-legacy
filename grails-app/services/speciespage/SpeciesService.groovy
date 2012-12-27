@@ -26,6 +26,7 @@ import species.formatReader.SpreadsheetReader
 import species.sourcehandler.KeyStoneDataConverter
 import species.sourcehandler.MappedSpreadsheetConverter
 import species.sourcehandler.NewSpreadsheetConverter
+import species.sourcehandler.NewSimpleSpreadsheetConverter
 import species.sourcehandler.SpreadsheetConverter
 import species.sourcehandler.XMLConverter
 import species.utils.Utils;
@@ -82,8 +83,8 @@ class SpeciesService {
 //
 //		grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/Eurasian Curlew/png ec";
 //		noOfInsertions += uploadNewSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/Eurasian Curlew/EurasianCurlew_v4_2.xlsm");
-
-		noOfInsertions += uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/zoooutreach/uploadready/primates.xlsx", grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/zoooutreach/uploadready/primates_mappingfile.xls", 0, 0, 0, 0);
+//
+//		noOfInsertions += uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/zoooutreach/uploadready/primates.xlsx", grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/zoooutreach/uploadready/primates_mappingfile.xls", 0, 0, 0, 0);
 		
 		return noOfInsertions;
 	}
@@ -133,6 +134,17 @@ class SpeciesService {
 
 	/**
 	 * 
+	 * @param file
+	 * @return
+	 */
+	int uploadNewSimpleSpreadsheet (String file) {
+		log.info "Uploading new simple spreadsheet : "+file;
+		List<Species> species = NewSimpleSpreadsheetConverter.getInstance().convertSpecies(file);
+		return saveSpecies(species);
+	}
+	
+	/**
+	 * 
 	 * @param connectionUrl
 	 * @param userName
 	 * @param password
@@ -176,7 +188,7 @@ class SpeciesService {
 		}
 
 		log.info "Time taken to save : "+(( System.currentTimeMillis()-startTime)/1000) + "(sec)"
-
+		log.info "Total number of species that got added : ${noOfInsertions}"
 		//log.debug "Publishing to search index"
 
 		try {
@@ -218,7 +230,7 @@ class SpeciesService {
 				}
 			}
 		}
-		log.debug "Saved batch with insertions : "+noOfInsertions
+		log.debug "Saved species batch with insertions : "+noOfInsertions
 		//TODO : probably required to clear hibernate cache
 		//Reference : http://naleid.com/blog/2009/10/01/batch-import-performance-with-grails-and-mysql/
 		return addedSpecies;

@@ -84,6 +84,7 @@
 									</g:elseif>
 
 									<g:elseif test="${category.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.REFERENCES)}">
+										<g:if test="${category.value.get('speciesFieldInstance')}">
 										<g:showSpeciesFieldToolbar model="${category.value[0]}" />
 										<%def references = speciesInstance.fields.collect{it.references};
 										Map refs = new LinkedHashMap();
@@ -122,8 +123,9 @@
 
 											</ol>
 										</g:if>
+										</g:if>
 									</g:elseif>
-
+								
 									<g:else>
 										<g:each in="${ category.value.get('speciesFieldInstance')}" var="speciesFieldInstance">
 										<g:showSpeciesField

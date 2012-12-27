@@ -322,8 +322,14 @@ speciesPortal {
 		GLOBALUNIQUEIDENTIFIER = "GlobalUniqueIdentifier"
 		NOMENCLATURE_AND_CLASSIFICATION = "Nomenclature and Classification"
 		TAXON_RECORD_NAME = "Taxon Record Name"
-
-
+		ATTRIBUTIONS = "attributions"
+		CONTRIBUTOR = "contributor"
+		LICENSE = 'license'
+		AUDIENCE = 'audience'
+		STATUS = 'status'
+		INFORMATION_LISTING = "Information Listing"
+		REFERENCES = "References"
+		
 		CONCEPT = "concept"
 		CATEGORY = "category"
 		SUBCATEGORY = "subcategory"
@@ -347,6 +353,7 @@ speciesPortal {
 		COMMON_NAME_EXACT = "common_name_exact"
 		LOCATION = "location"
 		ATTRIBUTION = "attribution"
+		
 		REFERENCE = "reference"
 		TAXON = "taxon"
 		MESSAGE = "text"

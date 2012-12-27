@@ -254,7 +254,7 @@ class SpreadsheetConverter extends SourceConverter {
 		}
 	}
 	private void createLanguage(Node dataNode, String s) {
-		if(!s || s.equals("") || !s.trim().matches(".+\\(.+\\)")) return null;
+		if(!s || s.equals("")) return null; //|| !s.trim().matches(".+\\(.+\\)")
 		String[] str = s.split("\\(|\\)");
 		Node langNode = new Node(dataNode, "language");
 		new Node(langNode, "threeLetterCode", str[1]?.trim());

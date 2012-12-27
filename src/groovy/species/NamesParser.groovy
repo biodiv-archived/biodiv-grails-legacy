@@ -228,6 +228,7 @@ class NamesParser {
 
 		italicisedForm += "</i>";
 		italicisedForm = italicisedForm.replaceAll(/\<i\>\s*\<\/i\>/, " ");
+		italicisedForm = italicisedForm.replaceAll(/\<i\>\s*,\s*<\/i\>/, ", ");
 		log.debug "Italicized form : "+italicisedForm
 		return italicisedForm;
 	}

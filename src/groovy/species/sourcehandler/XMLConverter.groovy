@@ -96,7 +96,7 @@ class XMLConverter extends SourceConverter {
 			def speciesName = getData(speciesNameNode?.data);
 			if(speciesName) {
 				//getting classification hierarchies and saving these taxon definitions
-				List<TaxonomyRegistry> taxonHierarchy = getClassifications(species.children(), speciesName, false);
+				List<TaxonomyRegistry> taxonHierarchy = getClassifications(species.children(), speciesName, true);
 
 				//taxonConcept is being taken from only author contributed taxonomy hierarchy
 				TaxonomyDefinition taxonConcept = getTaxonConcept(taxonHierarchy, Classification.findByName(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY));
@@ -274,9 +274,12 @@ class XMLConverter extends SourceConverter {
 			log.warn "NO SUCH FIELD : "+field;
 			return;
 		}
-		List sFields = SpeciesField.withCriteria() {
-			eq("field", field)
-			eq('species', s)
+		List sFields = [];
+		if(s.isAttached()) {
+			sFields = SpeciesField.withCriteria() {
+				eq("field", field)
+				eq('species', s)
+			}
 		}
 		for(Node dataNode : fieldNode.data) {
 			String data = getData(dataNode);
@@ -289,6 +292,7 @@ class XMLConverter extends SourceConverter {
 			SpeciesField speciesField;
 			
 			for (sField in sFields) {
+				log.debug "Found already existing species fields for field ${field}"
 				if(sField.contributors.isEmpty() || sField.contributors.contains(contributors[0])) {
 					speciesField = sField;
 					break; 
@@ -296,7 +300,7 @@ class XMLConverter extends SourceConverter {
 			}
 			
 			if(!speciesField) {
-				log.debug "Adding new field ${speciesField} to species ${s}"
+				log.debug "Adding new field to species ${s}"
 				speciesField = sFieldClass.newInstance(field:field, description:data);
 			} else {
 				log.debug "Overwriting existing ${speciesField}. Removing all metadata associate with previous field."
@@ -340,9 +344,9 @@ class XMLConverter extends SourceConverter {
 
 		Field field = fieldCriteria.get {
 			and {
-				eq("concept", concept);
-				category ? eq("category", category) : isNull("category");
-				subCategory ? eq("subCategory", subCategory) : isNull("subCategory");
+				ilike("concept", concept);
+				category ? ilike("category", category) : isNull("category");
+				subCategory ? ilike("subCategory", subCategory) : isNull("subCategory");
 			}
 		}
 
@@ -1088,6 +1092,8 @@ class XMLConverter extends SourceConverter {
 			if(classification.name.equalsIgnoreCase(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY) && rank == TaxonomyRank.SPECIES.ordinal()) {
 				def cleanSciName = cleanSciName(scientificName);
 				name = cleanSciName
+			} else {
+				name = cleanSciName(name);
 			}
 			if(name) {
 				names.add(name);
@@ -1104,12 +1110,13 @@ class XMLConverter extends SourceConverter {
 			log.debug "Taxon : "+name+" and rank : "+rank;
 			if(name && rank >= 0) {
 				//TODO:HACK to populate sciName in species level of taxon hierarchy
-				if(classification.name.equalsIgnoreCase(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY) && rank == TaxonomyRank.SPECIES.ordinal()) {
-					def cleanSciName = cleanSciName(scientificName);
-					name = cleanSciName
-				}
+//				if(classification.name.equalsIgnoreCase(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY)) {// && rank == TaxonomyRank.SPECIES.ordinal()) {
+//					def cleanSciName = cleanSciName(scientificName);
+//					name = cleanSciName
+//				}
 
 				def parsedName = parsedNames.get(i++);
+				log.debug "Parsed name ${parsedName?.canonicalForm}"
 				if(parsedName?.canonicalForm) {
 					//TODO: IMP equality of given name with the one in db should include synonyms of taxonconcepts
 					//i.e., parsedName.canonicalForm == taxonomyDefinition.canonicalForm or Synonym.canonicalForm
@@ -1284,6 +1291,10 @@ class XMLConverter extends SourceConverter {
 		def cleanSciName = Utils.cleanName(scientificName);
 		if(cleanSciName =~ /s\.\s*str\./) {
 			cleanSciName = cleanSciName.replaceFirst(/s\.\s*str\./, cleanSciName.split()[0]);
+		}
+		
+		if(cleanSciName.indexOf(' ') == -1) {
+			cleanSciName = cleanSciName.toLowerCase().capitalize();
 		}
 		return cleanSciName;
 	}
