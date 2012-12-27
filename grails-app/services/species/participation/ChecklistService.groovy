@@ -16,6 +16,7 @@ import species.Reference;
 import groovy.sql.Sql;
 import species.participation.curation.UnCuratedVotes;
 import species.utils.Utils;
+import species.formatReader.SpreadsheetReader;
 
 import au.com.bytecode.opencsv.CSVReader
 
@@ -28,7 +29,7 @@ class ChecklistService {
 	static final String SN_NAME = "scientific_name"
 	static final String CN_NAME = "common_name"
 
-	String connectionUrl =  "jdbc:postgresql://localhost/ibppamba";
+	String connectionUrl =  "jdbc:postgresql://localhost/ibp_test";
 	String userName = "postgres";
 	String password = "postgres123";
 
@@ -37,7 +38,7 @@ class ChecklistService {
 	def migrateChecklist(){
 		def sql = Sql.newInstance(connectionUrl, userName, password, "org.postgresql.Driver");
 		int i=0;
-		sql.eachRow("select nid, vid, title from node where type = 'checklist' order by nid offset 12") { row ->
+		sql.eachRow("select nid, vid, title from node where type = 'checklist' order by nid") { row ->
 			log.debug " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>     title ===  $i  $row.title  nid == $row.nid , vid == $row.vid"
 			try{
 				Checklist checklist = createCheckList(row, sql)
@@ -49,6 +50,7 @@ class ChecklistService {
 			}
 			i++
 		}
+		println "================================= finish time " + new Date()
 	}
 
 	@Transactional
@@ -83,7 +85,7 @@ class ChecklistService {
 		cl.publicationDate = getDate(row.field_publicationdate_value)
 		cl.lastUpdated = getDate(row.field_updateddate_value)
 
-		addGroup(cl, row.field_allindia_value)
+		addGroup(cl, nodeRow.nid, sql)
 
 		//others
 		cl.reservesValue = row.field_checklist_reserves_value
@@ -101,9 +103,12 @@ class ChecklistService {
 
 	}
 
-	private addGroup(cl, val){
-		//XXX change to point wgp group
-		if(val == 0){
+	private addGroup(cl, nid, sql){
+		def query = "select gid from domain_access where nid = $nid"
+		def row = sql.firstRow(query)
+		
+		//XXX change to point wgp group here gid 2 represent checklist belongs to wgp group
+		if(row.gid == 2){
 			cl.addToUserGroups(UserGroup.read(1))
 		}
 	}
@@ -394,4 +399,22 @@ class ChecklistService {
 		}
 	}
 	
+	def updateLocation(){
+		SpreadsheetReader.readSpreadSheet("/home/sandeept/checklist_location_byThomas.xls").get(0).each{ m ->
+			//println "title === " + m.title + "||||| lat === $m.lat  ||||| long === " + m.long
+			def cl = Checklist.findByTitle(m.title.trim())
+			if(cl){
+				cl.latitude = m.lat.toFloat()
+				cl.longitude = m.long.toFloat() 
+				if(!cl.save(flush:true)){
+					cl.errors.allErrors.each { log.error it }
+				}
+			}else{
+				//cl = Checklist.read(m.id.toFloat().toLong())
+				log.error " no cheklist $m.id === $m.title   ||| cl ==" + cl?.title 
+				
+				
+			}
+		}
+	}
 }

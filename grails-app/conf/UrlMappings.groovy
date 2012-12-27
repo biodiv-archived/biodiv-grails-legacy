@@ -37,7 +37,7 @@ class UrlMappings {
 */		
 		"/static/$path"(controller:"species", action:"staticContent")
 		
-		name userGroupModule:"/group/$webaddress/$controller/$action?/$id?" {
+		name userGroupModule:"/group/$webaddress?/$controller/$action?/$id?" {
 		
 		}
 		

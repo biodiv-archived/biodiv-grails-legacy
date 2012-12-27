@@ -399,6 +399,7 @@ speciesPortal {
 	drupal {
 		getAuthentication = "/getAuthentication.php"
 	}
+	flushImmediately = true
 }
 
 speciesPortal.validCrossDomainOrigins = [
@@ -418,7 +419,7 @@ environments {
 		grails.serverURL = "http://indiabiodiversity.localhost.org/${appName}"
 		speciesPortal {
 			search.serverURL = "http://localhost:8090/solr"
-			names.parser.serverURL = "127.0.0.1"
+			names.parser.serverURL = "saturn.strandls.com"
 			wgp {
 				facebook {
 					appId= "327308053982589"
@@ -460,6 +461,8 @@ environments {
                     image.denied = []
                 }
 		}
+		
+		
 
 	}
 	test {
@@ -575,6 +578,81 @@ environments {
 
 		}
 	}
+	pambaTest {
+		appName = "biodiv_test"
+		grails.serverURL = "http://indiabiodiversity.saturn.strandls.com/${appName}"
+		
+		speciesPortal {
+			app.rootDir = "/data/pambaTest/species"
+			data.rootDir = "${app.rootDir}/data"
+
+			resources {
+				rootDir = "${app.rootDir}/images"
+				serverURL = "http://saturn.strandls.com/${appName}/images"
+			}
+
+			nameSearch.indexStore = "${app.rootDir}/data/names"
+
+			observations {
+				rootDir = "${app.rootDir}/observations"
+				serverURL = "http://indiabiodiversity.saturn.strandls.com/${appName}/observations"
+				//serverURL = "http://localhost/${appName}/observations"
+			}
+			userGroups {
+				rootDir = "${app.rootDir}/userGroups"
+				serverURL = "http://indiabiodiversity.saturn.strandls.com/${appName}/userGroups"
+				//serverURL = "http://localhost/${appName}/observations"
+			}
+			users {
+				rootDir = "${app.rootDir}/users"
+				serverURL = "http://indiabiodiversity.saturn.strandls.com/${appName}/users"
+			}
+			search.serverURL="http://saturn.strandls.com:8080/solrPamba"
+			grails.project.war.file = "/data/jetty-6.1.26/webapps/${appName}.war"
+			grails {
+				mail {
+					 host = "127.0.0.1"
+					 port = 25
+				}
+			}
+			wgp {
+				facebook {
+					appId= "310694198984953"
+					secret= "eedf76e46272190fbd26e578ae764a60"
+				}
+				supportEmail = "team(at)thewesternghats(dot)in"
+			}
+			ibp {
+				facebook {
+					appId= "310694198984953"
+					secret= "eedf76e46272190fbd26e578ae764a60"
+				}
+				supportEmail = "support(at)indiabiodiversity(dot)org"
+			}
+			flushImmediately = false
+		}
+		google.analytics.enabled = false
+
+	    ibp.domain='indiabiodiversity.saturn.strandls.com'
+            wgp.domain='thewesternghats.indiabiodiversity.saturn.strandls.com' 
+		
+		grails.plugins.springsecurity.successHandler.defaultTargetUrl = "/list/../../"
+		grails.plugins.springsecurity.logout.afterLogoutUrl = '/list/../../'
+
+                ckeditor {
+                    upload {
+                    baseurl = "/newsletters"
+                    basedir = "/data/pambaTest/species/newsletters/"
+                    image.browser = true
+                    image.upload = true    
+                    image.allowed = ['jpg', 'gif', 'jpeg', 'png']
+                    image.denied = []
+                }
+
+		}
+		
+	}
+
 
 	pamba {
 		grails.serverURL = "http://indiabiodiversity.org/${appName}"

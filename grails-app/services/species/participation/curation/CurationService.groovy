@@ -10,7 +10,8 @@ class CurationService {
 	static transactional = false
 
 	def springSecurityService
-
+	def grailsApplication
+	
 	def add(Recommendation recoForSciName,  Recommendation recoForCommonName, refObject, author){
 		UnCuratedScientificNames unSciName;
 		UnCuratedCommonNames unCn;
@@ -39,7 +40,8 @@ class CurationService {
 			//can hold common names mapping
 			if(unCn){
 				unSciName = unSciName?:getUnCuratedScientificName(recoForSciName);
-				if(!unSciName.addToCommonNames(unCn).save(flush:true)){
+				def flushImmediately  = grailsApplication.config.speciesPortal.flushImmediately
+				if(!unSciName.addToCommonNames(unCn).save(flush:flushImmediately)){
 					log.error "Error during add of cn in sn"
 				}
 			}
@@ -55,17 +57,16 @@ class CurationService {
 
 
 	private addUnCuratedRecommendationVote(sn, cn, refObject, author){
+		def flushImmediately  = grailsApplication.config.speciesPortal.flushImmediately
 		
-		println "ref object ===== " + refObject + "  $sn " + "  $cn " + "  $author"
- 		
 		//XXX for migrating check list
-		//author = SUser.read(1)
-		author = author?:springSecurityService.currentUser;
+		author = SUser.read(1)
+		//author = author?:springSecurityService.currentUser;
 		
 		UnCuratedVotes uv = UnCuratedVotes.findWhere(author:author, sciName:sn, commonName:cn, refType: refObject.class.getCanonicalName(), refId:refObject.id)
 		if(!uv){
 			uv = new UnCuratedVotes(author:author, sciName:sn, commonName:cn, refType:refObject.class.getCanonicalName(), refId:refObject.id);
-			if(!uv.save(flush:true)){
+			if(!uv.save(flush:flushImmediately)){
 				log.error "Error during UnCuratedVotes save === "
 				uv.errors.allErrors.each { log.error it }
 			}
@@ -73,14 +74,14 @@ class CurationService {
 			//incrementing referecne counter
 			if(sn){
 				sn.referanceCounter++
-				if(!sn.save(flush:true)){
+				if(!sn.save(flush:flushImmediately)){
 					log.error "Error during UnCuratedVotes(sn, cn) save"
 				}
 			}
 
 			if(cn){
 				cn.referanceCounter++
-				if(!cn.save(flush:true)){
+				if(!cn.save(flush:flushImmediately)){
 					log.error "Error during UnCuratedVotes(sn, cn) save"
 				}
 			}
@@ -123,7 +124,8 @@ class CurationService {
 		UnCuratedCommonNames unCn = UnCuratedCommonNames.findByNameIlikeAndLanguage(reco.name, lang);
 		if(!unCn){
 			unCn = new UnCuratedCommonNames(name:reco.name, language:lang, reco:reco);
-			if(!unCn.save(flush:true)){
+			def flushImmediately  = grailsApplication.config.speciesPortal.flushImmediately
+			if(!unCn.save(flush:flushImmediately)){
 				log.error "Error during UnCuratedCommonNames save"
 				unCn = null
 			}
@@ -137,7 +139,8 @@ class CurationService {
 		boolean isAuthenticated = (recoForSciName.taxonConcept != null);
 		if(!unSciName){
 			unSciName = new UnCuratedScientificNames(name:recoForSciName.name, reco:recoForSciName,isAuthenticated:isAuthenticated)
-			if(!unSciName.save(flush:true)){
+			def flushImmediately  = grailsApplication.config.speciesPortal.flushImmediately
+			if(!unSciName.save(flush:flushImmediately)){
 				log.error "Error during UnCuratedScientificNames save"
 				unSciName = null
 			}
