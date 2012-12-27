@@ -31,6 +31,7 @@ class RecommendationService {
 	boolean save(Recommendation reco) {
 		def flushImmediately  = grailsApplication.config.speciesPortal.flushImmediately
 		if(reco.save(flush:flushImmediately)) {
+			//XXX uncomment this
 			//namesIndexerService.add(reco);
 			return true;
 		}

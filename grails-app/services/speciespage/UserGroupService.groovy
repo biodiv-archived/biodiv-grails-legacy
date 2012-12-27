@@ -51,7 +51,7 @@ class UserGroupService {
 	}
 
 	private void addPermission(UserGroup userGroup, SUser user, Permission permission) {
-		aclUtilService.addPermission userGroup, user.email, permission
+		//aclUtilService.addPermission userGroup, user.email, permission
 	}
 
 	@Transactional
@@ -360,7 +360,7 @@ class UserGroupService {
 	}
 
 	@Transactional
-	@PreAuthorize("hasPermission(#userGroup, write)")
+//	@PreAuthorize("hasPermission(#userGroup, write)")
 	void postObservationToUserGroup(Observation observation, UserGroup userGroup) {
 		userGroup.addToObservations(observation);
 		if(!userGroup.save()) {

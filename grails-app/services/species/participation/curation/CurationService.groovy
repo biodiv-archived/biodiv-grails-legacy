@@ -61,6 +61,7 @@ class CurationService {
 		
 		//XXX for migrating check list
 		author = SUser.read(1)
+		//uncomment this
 		//author = author?:springSecurityService.currentUser;
 		
 		UnCuratedVotes uv = UnCuratedVotes.findWhere(author:author, sciName:sn, commonName:cn, refType: refObject.class.getCanonicalName(), refId:refObject.id)

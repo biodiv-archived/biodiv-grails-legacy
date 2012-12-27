@@ -45,8 +45,10 @@ def migrateUserToWGPGroup(){
 	def feedService = ctx.getBean("activityFeedService");
 
 	SUser.findAllByDateCreatedGreaterThanEquals(wgpUserDate).each{ user ->
-		wgpGroup.addMember(user)
-		println "== done user addition " + user
+		if(!wgpGroup.isMember(user) && !wgpGroup.isFounder(user)){
+			wgpGroup.addMember(user)
+			println "== done user addition " + user
+		}
 	}
 	
 	ActivityFeed.findAllByActivityType(feedService.MEMBER_JOINED).each{ af ->
