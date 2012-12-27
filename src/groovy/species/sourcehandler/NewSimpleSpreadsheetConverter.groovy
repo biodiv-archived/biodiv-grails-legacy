@@ -110,8 +110,8 @@ class NewSimpleSpreadsheetConverter extends SourceConverter {
 			Species s = converter.convertSpecies(speciesElement)
 			if(s)
 				species.add(s);
-//			if(i==0)break;
-//			i++
+			if(i==0)break;
+			i++
 		}
 		return species;
 	}
@@ -282,7 +282,7 @@ class NewSimpleSpreadsheetConverter extends SourceConverter {
 				new Node(image, "refKey", refKey);
 				new Node(image, "fileName", file.getAbsolutePath());
 				new Node(image, "source", imageData.get("source"));
-				new Node(image, "caption", imageData.get("possiblecaption"));
+				new Node(image, "caption", imageData.get("caption"));
 				
 				List<String> contributors = getContributors(imageData.get("contributor"));
 				for(c in contributors) {

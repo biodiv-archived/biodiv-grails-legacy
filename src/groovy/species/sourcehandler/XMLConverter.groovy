@@ -609,8 +609,17 @@ class XMLConverter extends SourceConverter {
 					res.addToLicenses(l);
 				}
 			} else {
+				res.url = sourceUrl
 				res.description = imageNode.caption?.text();
 				res.licenses?.clear()
+				res.contributors?.clear()
+				res.attributors?.clear();
+				for(Contributor con : getContributors(imageNode, true)) {
+					res.addToContributors(con);
+				}
+				for(Contributor con : getAttributions(imageNode, true)) {
+					res.addToAttributors(con);
+				}
 				for(License l : getLicenses(imageNode, true)) {
 					res.addToLicenses(l);
 				}
