@@ -29,13 +29,14 @@ class RecommendationService {
 	 * @return
 	 */
 	boolean save(Recommendation reco) {
-		if(reco.save(flush:true)) {
-			namesIndexerService.add(reco);
+		def flushImmediately  = grailsApplication.config.speciesPortal.flushImmediately
+		if(reco.save(flush:flushImmediately)) {
+			//namesIndexerService.add(reco);
 			return true;
 		}
 		log.error "Error saving recommendation"
 		reco.errors.allErrors.each { log.error it }
-		return false;
+		return false;	
 	}
 
 	/**

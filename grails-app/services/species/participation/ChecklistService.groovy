@@ -29,7 +29,7 @@ class ChecklistService {
 	static final String SN_NAME = "scientific_name"
 	static final String CN_NAME = "common_name"
 
-	String connectionUrl =  "jdbc:postgresql://localhost/ibppamba";
+	String connectionUrl =  "jdbc:postgresql://localhost/ibp_test";
 	String userName = "postgres";
 	String password = "postgres123";
 
@@ -50,6 +50,7 @@ class ChecklistService {
 			}
 			i++
 		}
+		println "================================= finish time " + new Date()
 	}
 
 	@Transactional

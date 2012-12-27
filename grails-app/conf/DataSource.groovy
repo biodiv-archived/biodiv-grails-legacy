@@ -44,4 +44,10 @@ environments {
 			url = "jdbc:postgresql://localhost:5432/${appName}"
 		}
 	}
+	pambaTest {
+		dataSource {
+			dbCreate = "update" // one of 'create', 'create-drop','update'
+			url = "jdbc:postgresql://localhost:5432/${appName}"
+		}
+	}
 }
