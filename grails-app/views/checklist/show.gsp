@@ -74,9 +74,7 @@
 					</thead>
 					<tbody>
 							<tr>
-								<td><button class="btn species_groups_sprites ${checklistInstance.speciesGroup.iconClass()} active"
-									id="${"group_" + checklistInstance.speciesGroup.id}" value="${checklistInstance.speciesGroup.id}"
-									title="${checklistInstance.speciesGroup?.name}"></button></td>
+								<td><sUser:interestedSpeciesGroups model="['userInstance':checklistInstance]"/></td>
 								<td>${checklistInstance.speciesCount}</td>
 								<td>${checklistInstance.placeName}</td>
 								<td>${checklistInstance.state.join(",")}</td>

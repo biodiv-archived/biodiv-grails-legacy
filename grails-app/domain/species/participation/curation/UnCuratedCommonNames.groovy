@@ -12,7 +12,7 @@ class UnCuratedCommonNames {
 	int referanceCounter = 0;
 	
 	static constraints = {
-		name(blank:false, nullable:false, unique:['name', 'language']);
+		name(blank:false, nullable:false, unique:['name', 'language', 'reco']);
 		language(nullable:true);
 		reco(nullable:true);
 	}

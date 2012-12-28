@@ -77,6 +77,7 @@ $(document).ready(function(){
 		}
 		$('#speciesGroupFilter button.active').removeClass('active');
     	$(this).addClass('active');
+    	
     	updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
     	return false;
  	});
@@ -545,6 +546,23 @@ function showMapView() {
 		google.maps.event.trigger(big_map, 'resize');
 		big_map.setCenter(nagpur_latlng);
 	});
+}
+
+function speciesHabitatInterestHandler(){
+	if($(this).hasClass('active')) {
+		$(this).removeClass('active');
+	} else {
+		$(this).addClass('active');
+	}
+	return false;
+}
+
+function intializesSeciesHabitatInterest(){
+	$('#speciesGroupFilter button').unbind('click');
+	$('#speciesGroupFilter button').attr('data-toggle', 'buttons-checkbox').click(speciesHabitatInterestHandler);
+	
+    $('#habitatFilter button').unbind('click');
+    $('#habitatFilter button').attr('data-toggle', 'buttons-checkbox').click(speciesHabitatInterestHandler);
 }
 
 

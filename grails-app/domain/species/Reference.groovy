@@ -1,7 +1,5 @@
 package species
 
-import species.participation.Checklist;
-
 class Reference {
 
 	String title;

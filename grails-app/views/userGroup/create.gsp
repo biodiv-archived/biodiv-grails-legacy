@@ -292,7 +292,7 @@ max-width: 100%;
 							
 							<div class="filters controls textbox" style="position: relative;">
 								<obv:showGroupFilter
-									model="['observationInstance':observationInstance]" />
+									model="['observationInstance':observationInstance, 'hideAdvSearchBar':true]" />
 							</div>
 						</div>
 						
@@ -531,25 +531,8 @@ $(document).ready(function() {
 	$("#tags").tagit({select:true,  tagSource: "${uGroup.createLink(controller:'userGroup', action: 'tags')}", triggerKeys:['enter', 'comma', 'tab'], maxLength:30});
 	$(".tagit-hiddenSelect").css('display','none');
 	
-	$('#speciesGroupFilter button').attr('data-toggle', 'buttons-checkbox').click(function(){
-    	if($(this).hasClass('active')) {
-    		$(this).removeClass('active');
-    	} else {
-    		$(this).addClass('active');
-    	}
-    	return false;
- 	});
+	intializesSeciesHabitatInterest()
 	
-        
- 	$('#habitatFilter button').attr('data-toggle', 'buttons-checkbox').click(function(){
-    	if($(this).hasClass('active')) {
-    		$(this).removeClass('active');
-    	} else {
-    		$(this).addClass('active');
-    	}
-    	return false;
- 	});
- 	
  	<%
  		userGroupInstance.speciesGroups.each {
 			out << "jQuery('#group_${it.id}').addClass('active');";

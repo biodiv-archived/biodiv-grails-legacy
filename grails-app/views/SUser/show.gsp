@@ -127,13 +127,9 @@
 							<g:message code="suser.website.label" default="Website" />
 						</dt>
 						<dd>
-							<g:if test="${Utils.isURL(user.website) }">
-								<a target="_blank" href="${user.getWebsiteLink()}"> ${fieldValue(bean: user, field: 'website')}
-								</a>
-							</g:if>
-							<g:else>
+							<div class="linktext">
 								${fieldValue(bean: user, field: 'website')}
-							</g:else>
+							</div>
 							<% def openId = user.openIds.find { it.url.indexOf('facebook') != -1 }
 									def facebookUrl = openId?.url %>
 							<g:if test="${facebookUrl}">
@@ -265,6 +261,7 @@
          
          //preLoadRecos(max, true);
          userRecoffset = max + userRecoffset;
+         $('.linktext').linkify();
 	});
 	   function preLoadRecos(max, seeAllClicked, obvId, liComponent){
          	$("#seeMoreMessage").hide();        	

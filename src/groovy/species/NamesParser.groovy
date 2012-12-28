@@ -113,46 +113,50 @@ class NamesParser {
 						if(sciName.verbatim) parsedName.name = sciName.verbatim;
 						parsedName.italicisedForm = getItalicisedForm(sciName);
 						//if(part.uninomial?.string) parsedName.uninomial = part.uninomial.string;
-						if(part.genus?.string && part.species?.string) parsedName.binomialForm = part.genus.string + " " + part.species.string;
+						if(part.genus instanceof Map){
+							if(part.genus?.string && part.species?.string) parsedName.binomialForm = part.genus.string + " " + part.species.string;
+						}	
 						//if(part.infraGenus?.string) parsedName.infraGenus = part.infraGenus.string;
 						//if(part.infraSpecies?.string) parsedName.infraSpecies = part.infraSpecies.string;
 
 						//TODO make this descendant selector & there shd be a better way to write this
-						if(part.species?.combinationAuthorTeam?.author) {
-							for( author in (part.species.combinationAuthorTeam.author[0][0]) ) {
-								parsedName.addToAuthor(author);
+						if(part.species instanceof Map){
+							if(part.species?.combinationAuthorTeam?.author) {
+								for( author in (part.species.combinationAuthorTeam.author[0][0]) ) {
+									parsedName.addToAuthor(author);
+								}
 							}
-						}
-
-						if(part.species?.basionymAuthorTeam?.author) {
-							for( author in part.species.basionymAuthorTeam.author[0][0] ) {
-								parsedName.addToAuthor(author);
+	
+							if(part.species?.basionymAuthorTeam?.author) {
+								for( author in part.species.basionymAuthorTeam.author[0][0] ) {
+									parsedName.addToAuthor(author);
+								}
 							}
+	
+							//						if(part.infraSpecies?.combinationAuthorTeam?.author) {
+							//							for( author in part.infraSpecies.combinationAuthorTeam.author[0][0]) {
+							//								parsedName.addToAuthors(author);
+							//							}
+							//						}
+							//
+							//						if(part.infraSpecies?.basionymAuthorTeam?.author) {
+							//							for(author in part.infraSpecies.basionymAuthorTeam.author[0][0]) {
+							//								parsedName.addToBasionymAuthors(author);
+							//							}
+							//						}
+	
+							if(part.species?.combinationAuthorTeam?.year)
+								parsedName.addToYear(part.species.combinationAuthorTeam.year[0][0].toString());
+							if(part.species?.basionymAuthorTeam?.year)
+								parsedName.addToYear(part.species.basionymAuthorTeam.year[0][0].toString());
+							//						if(part.infraSpecies?.combinationAuthorTeam?.year)
+							//							parsedName.addToYear(part.infraSpecies.combinationAuthorTeam.year[0][0]);
+							//						if(part.infraSpecies?.basionymAuthorTeam?.year)
+							//							parsedName.addToBasionymYear(part.infraSpecies.basionymAuthorTeam.year[0][0]);
+	
+							//ignoring rank;
+							//ignoring cultivar name type
 						}
-
-						//						if(part.infraSpecies?.combinationAuthorTeam?.author) {
-						//							for( author in part.infraSpecies.combinationAuthorTeam.author[0][0]) {
-						//								parsedName.addToAuthors(author);
-						//							}
-						//						}
-						//
-						//						if(part.infraSpecies?.basionymAuthorTeam?.author) {
-						//							for(author in part.infraSpecies.basionymAuthorTeam.author[0][0]) {
-						//								parsedName.addToBasionymAuthors(author);
-						//							}
-						//						}
-
-						if(part.species?.combinationAuthorTeam?.year)
-							parsedName.addToYear(part.species.combinationAuthorTeam.year[0][0].toString());
-						if(part.species?.basionymAuthorTeam?.year)
-							parsedName.addToYear(part.species.basionymAuthorTeam.year[0][0].toString());
-						//						if(part.infraSpecies?.combinationAuthorTeam?.year)
-						//							parsedName.addToYear(part.infraSpecies.combinationAuthorTeam.year[0][0]);
-						//						if(part.infraSpecies?.basionymAuthorTeam?.year)
-						//							parsedName.addToBasionymYear(part.infraSpecies.basionymAuthorTeam.year[0][0]);
-
-						//ignoring rank;
-						//ignoring cultivar name type
 
 						if(sciName.hybrid) {
 							//hybridName.addToNames(parsedName);

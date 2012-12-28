@@ -180,6 +180,8 @@ class SUserController extends UserController {
 			addInterestedSpeciesGroups(user, params.speciesGroup)
 			addInterestedHabitats(user, params.habitat)
 			
+			user.website = (params.website.trim() != "") ? params.website.trim().split(",").join(", ") : null
+			
 			if (!user.save(flush: true)) {
 				render view: 'edit', model: buildUserModel(user)
 				return

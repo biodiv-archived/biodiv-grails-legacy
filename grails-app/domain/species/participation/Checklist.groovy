@@ -24,7 +24,7 @@ class Checklist {
 	String rawChecklist;
 	
 	License license;
-	SpeciesGroup speciesGroup;
+	//SpeciesGroup speciesGroup;
 	SUser validator;
 	
 	//location related
@@ -45,7 +45,7 @@ class Checklist {
 	//others
 	String reservesValue;
 	
-	static hasMany = [row:ChecklistRowData, reference:Reference, state : String, district:String, taluka: String, userGroups:UserGroup]
+	static hasMany = [row:ChecklistRowData, reference:Reference, state : String, district:String, taluka: String, userGroups:UserGroup, speciesGroups:SpeciesGroup]
 	static belongsTo = [author:SUser];
 
 	static constraints = {
