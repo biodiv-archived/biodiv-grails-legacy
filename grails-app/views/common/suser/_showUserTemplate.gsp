@@ -9,9 +9,10 @@
 		</div>
 		<div class="story" style="margin-left:35px">
 
-		
-			<span class="ellipsis"> ${userInstance.name}
-		
+		<a title="${userInstance.name}"
+			href="${uGroup.createLink('controller':'SUser', action:'show', id:userInstance.id,  userGroup:userGroup, 'userGroupWebaddress':userGroupWebaddress)}">
+			<span class="ellipsis" style="display:block;"> ${userInstance.name}
+		</span>
 			 </a>
 
 		<%--			<g:if test="${userInstance.location}">--%>

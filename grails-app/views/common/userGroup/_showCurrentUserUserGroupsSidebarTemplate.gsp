@@ -1,4 +1,4 @@
-<ul class="nav" style="overflow:hidden;margin-botom:0px;">
+<ul class="nav span3" style="overflow:hidden;margin-bottom:0px;margin-left:40px;">
 	<!-- li class="nav-header">My Groups</li-->
 	<li style="clear: both;" />
 	<g:each in="${userGroups}" var="userGroup">
