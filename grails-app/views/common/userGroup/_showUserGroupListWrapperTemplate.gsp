@@ -1,7 +1,7 @@
 <%@page import="species.auth.SUser"%>
 <%@ page import="species.groups.UserGroup"%>
 <div class="filters" style="position: relative;">
-	<obv:showGroupFilter />
+	<obv:showGroupFilter model="['hideAdvSearchBar':true]" />
 </div>
 
 <div>

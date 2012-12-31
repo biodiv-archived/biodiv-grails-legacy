@@ -51,7 +51,7 @@ class UserGroupService {
 	}
 
 	private void addPermission(UserGroup userGroup, SUser user, Permission permission) {
-		aclUtilService.addPermission userGroup, user.email, permission
+		//aclUtilService.addPermission userGroup, user.email, permission
 	}
 
 	@Transactional
@@ -137,7 +137,7 @@ class UserGroupService {
 
 	private void addInterestedSpeciesGroups(userGroupInstance, speciesGroups) {
 		log.debug "Adding species group interests ${speciesGroups}"
-		userGroupInstance.speciesGroups?.removeAll()
+		userGroupInstance.speciesGroups = []
 		speciesGroups.each {key, value ->
 			userGroupInstance.addToSpeciesGroups(SpeciesGroup.read(value.toLong()));
 		}
@@ -145,7 +145,7 @@ class UserGroupService {
 
 	private void addInterestedHabitats(userGroupInstance, habitats) {
 		log.debug "Adding habitat interests ${habitats}"
-		userGroupInstance.habitats?.removeAll()
+		userGroupInstance.habitats = []
 		habitats.each { key, value ->
 			userGroupInstance.addToHabitats(Habitat.read(value.toLong()));
 		}
@@ -360,7 +360,7 @@ class UserGroupService {
 	}
 
 	@Transactional
-	@PreAuthorize("hasPermission(#userGroup, write)")
+//	@PreAuthorize("hasPermission(#userGroup, write)")
 	void postObservationToUserGroup(Observation observation, UserGroup userGroup) {
 		userGroup.addToObservations(observation);
 		if(!userGroup.save()) {

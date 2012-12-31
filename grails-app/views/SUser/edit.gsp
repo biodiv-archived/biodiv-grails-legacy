@@ -166,7 +166,7 @@
 											default="Website" /> </label>
 									<div class="controls">
 										<input type="text" name="website" class="input-xlarge"
-											id="website" value="${user.website ?: 'http://'}">
+											id="website" value="${user.website ?: null}"  placeholder="Provide a comma separated list of urls">
 										<div class="help-inline">
 											<g:hasErrors bean="${user}" field="website">
 												<g:renderErrors bean="${user}" as="list" field="website" />
@@ -225,7 +225,7 @@
 									
 									<div class="filters controls textbox" style="position: relative;">
 										<obv:showGroupFilter
-											model="['observationInstance':observationInstance]" />
+											model="['observationInstance':observationInstance, 'hideAdvSearchBar':true]" />
 									</div>
 								</div>						
 						</div>
@@ -467,26 +467,7 @@
 			    });
 			    return hbt;	
 			}
-			
-			$('#speciesGroupFilter button').attr('data-toggle', 'buttons-checkbox').click(function(){
-		    	if($(this).hasClass('active')) {
-		    		$(this).removeClass('active');
-		    	} else {
-		    		$(this).addClass('active');
-		    	}
-		    	return false;
-		 	});
-			
-		        
-		 	$('#habitatFilter button').attr('data-toggle', 'buttons-checkbox').click(function(){
-		    	if($(this).hasClass('active')) {
-		    		$(this).removeClass('active');
-		    	} else {
-		    		$(this).addClass('active');
-		    	}
-		    	return false;
-		 	});
-						
+			intializesSeciesHabitatInterest()
 			<%
 				user.speciesGroups.each {
 					out << "jQuery('#group_${it.id}').addClass('active');";

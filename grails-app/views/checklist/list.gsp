@@ -17,7 +17,7 @@
 
 			<div class="gallerytoolbar">
 					<div class="filters" style="position: relative; overflow: visible;">
-						<obv:showGroupFilter model="['hideHabitatFilter':true]"/>
+						<obv:showGroupFilter model="['hideHabitatFilter':true, 'hideAdvSearchBar':true]"/>
 					</div>
 			</div>
 			

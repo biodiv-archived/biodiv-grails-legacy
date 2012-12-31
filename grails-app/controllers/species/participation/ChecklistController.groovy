@@ -138,7 +138,9 @@ class ChecklistController {
 		return Checklist.withCriteria(){
 			and{
 				if(speciesGroup){
-					eq('speciesGroup', speciesGroup)
+					speciesGroups{
+						eq('id', speciesGroup.id)
+					}
 				}
 				if(userGroupInstance){
 					userGroups{
@@ -164,7 +166,9 @@ class ChecklistController {
 			}
 			and{
 				if(speciesGroup){
-					eq('speciesGroup', speciesGroup)
+					speciesGroups{
+						eq('id', speciesGroup.id)
+					}
 				}
 				if(userGroupInstance){
 					userGroups{

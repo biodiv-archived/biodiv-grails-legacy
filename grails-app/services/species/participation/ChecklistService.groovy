@@ -25,11 +25,12 @@ class ChecklistService {
 
 	def grailsApplication
 	def observationService
+	def sessionFactory
 	
 	static final String SN_NAME = "scientific_name"
 	static final String CN_NAME = "common_name"
 
-	String connectionUrl =  "jdbc:postgresql://localhost/ibp_test";
+	String connectionUrl =  "jdbc:postgresql://localhost/ibp";
 	String userName = "postgres";
 	String password = "postgres123";
 
@@ -38,8 +39,8 @@ class ChecklistService {
 	def migrateChecklist(){
 		def sql = Sql.newInstance(connectionUrl, userName, password, "org.postgresql.Driver");
 		int i=0;
-		sql.eachRow("select nid, vid, title from node where type = 'checklist' order by nid") { row ->
-			log.debug " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>     title ===  $i  $row.title  nid == $row.nid , vid == $row.vid"
+		sql.eachRow("select nid, vid, title from node where type = 'checklist' order by nid asc ") { row ->
+			//log.debug " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>     title ===  $i  $row.title  nid == $row.nid , vid == $row.vid"
 			try{
 				Checklist checklist = createCheckList(row, sql)
 			}catch (Exception e) {
@@ -57,7 +58,7 @@ class ChecklistService {
 	def Checklist createCheckList(nodeRow, Sql sql){
 		String query = "select * from content_type_checklist where nid = $nodeRow.nid and vid = $nodeRow.vid"
 		def row = sql.firstRow(query)
-
+		
 		Checklist cl = new Checklist()
 
 		cl.title = nodeRow.title
@@ -67,7 +68,7 @@ class ChecklistService {
 
 
 		cl.license = getLicense(row.field_cclicense_value.toInteger())
-		cl.speciesGroup = getSpeciesGroup(nodeRow.nid, nodeRow.vid, cl.title, sql)
+		addSpeciesGroup(cl, nodeRow.nid, nodeRow.vid, cl.title, sql)
 		cl.author = SUser.findByUsername("admin")
 		cl.refText = row.field_references_value
 		cl.sourceText = row.field_source_value
@@ -96,11 +97,9 @@ class ChecklistService {
 		}else{
 			//get actual data
 			fillData(cl, row.field_rawchecklist_value)
-			log.debug "saved successfully  >>>>>>> " + cl
+			//log.debug "saved successfully  >>>>>>> " + cl
 			return cl
 		}
-		
-
 	}
 
 	private addGroup(cl, nid, sql){
@@ -131,18 +130,24 @@ class ChecklistService {
 	}
 
 	private fillData(cl, String rawText){
+		
+		Set commonNameSet = new HashSet()
+		Set sciNameSet = new HashSet()
+		
 		def formatType = detectFormat(rawText)
+		
+		
 
 		if(formatType == "CSV"){
-			parseCSV(cl,rawText)
+			parseCSV(cl,rawText, commonNameSet, sciNameSet)
 		}else{
-			parseTSV(cl, rawText)
+			parseTSV(cl, rawText, commonNameSet, sciNameSet)
 		}
 
 		if(!cl.save(flush:true)){
 			cl.errors.allErrors.each { log.error it }
 		}
-		log.debug "saved data as well " + cl
+		//log.debug "saved data as well " + cl
 
 	}
 
@@ -157,11 +162,11 @@ class ChecklistService {
 		return "TSV"
 	}
 
-	private parseCSV(cl, String rawText){
+	private parseCSV(cl, String rawText, commonNameSet, sciNameSet){
 		CSVReader csvReader = new CSVReader(new StringReader(rawText))
 		List arrayList = csvReader.readAll()
 
-		log.debug " total size of rows " + arrayList.size()
+		//log.debug " total size of rows " + arrayList.size()
 
 		int i = 0
 		def keyNames = null
@@ -169,7 +174,7 @@ class ChecklistService {
 			if(!keyNames){
 				keyNames = ar
 			}else{
-				populateData(cl, keyNames, ar, i++)
+				populateData(cl, keyNames, ar, i++, commonNameSet, sciNameSet)
 			}
 		}
 		csvReader.close()
@@ -178,13 +183,14 @@ class ChecklistService {
 		cl.columnNames = keyNames.join("\t");
 	}
 
-	private parseTSV(cl, String txt){
+	private parseTSV(cl, String txt, commonNameSet, sciNameSet){
 		Scanner scanner = new Scanner(txt);
 		String[] keyNames = scanner.nextLine().split("\t");
 
+		
 		int i = 0
 		while (scanner.hasNextLine()) {
-			populateData(cl, keyNames, scanner.nextLine().split("\t"), ++i)
+			populateData(cl, keyNames, scanner.nextLine().split("\t"), ++i, commonNameSet, sciNameSet)
 		}
 		scanner.close()
 
@@ -195,7 +201,7 @@ class ChecklistService {
 
 
 
-	private populateData(cl, String[] keys, String[] values, rowId){
+	private populateData(cl, String[] keys, String[] values, rowId, HashSet commonNameSet, HashSet sciNameSet){
 		def snVal, snKey, snColumnOrder, cn
 		for (int i = 0; i < keys.length; i++) {
 			def key = keys[i].trim()
@@ -204,14 +210,14 @@ class ChecklistService {
 				value = values[i]
 			}
 
-			if(key.equalsIgnoreCase(SN_NAME)){
+			if(key.equalsIgnoreCase(SN_NAME) && value && (value.trim() != "") && (value.trim() != "?")){
 				snVal = value
 				snKey = key
 				snColumnOrder = i
 			}
 
 			if(key.equalsIgnoreCase(CN_NAME)){
-				cn = value
+				cn = (value && (value.trim() != "") && (value.trim() != "No common name found"))? value.trim() : null
 			}
 
 			//storing all the key value pair except scientific name
@@ -220,9 +226,32 @@ class ChecklistService {
 				cl.addToRow(clr);
 			}
 		}
+		
+		
+		
 
 		//handling scientific name infrastructre
-		if(snColumnOrder){
+		if(snColumnOrder && snVal){
+			
+			if(sciNameSet.contains(snVal)){
+				println "========================== duplicate sn ==============================" + snVal
+				cleanUpGorm()
+				sciNameSet.clear()
+				commonNameSet.clear()
+			}else{
+				sciNameSet.add(snVal)
+			}
+			
+			if(cn && commonNameSet.contains(cn)){
+				println "========================== duplicate cn =======  $cn ================ for sn =======" + snVal
+				cleanUpGorm()
+				sciNameSet.clear()
+				commonNameSet.clear()
+			}else{
+				sciNameSet.add(snVal)
+				commonNameSet.add(cn)
+			}
+			
 			Recommendation reco = observationService.getRecommendation([recoName:snVal, canName:snVal, commonName:cn, refObject:cl]).mainReco
 //			log.debug "===================== reco info ========================" + reco
 //			log.debug " species id " + reco.taxonConcept?.findSpeciesId()
@@ -251,15 +280,19 @@ class ChecklistService {
 			case 6:
 				return License.read(822)
 			default:
-				log.debug "========== licId " + licId
 				return null;
 		}
 	}
 
 
-	private SpeciesGroup getSpeciesGroup(nid, vid, title, Sql sql){
-		String query = "select common_name as cn from ibpcl_taxa as ita where ita.id = " + sql.firstRow("select field_taxa_value as tt from content_field_taxa as t1 where t1.nid = $nid and t1.vid = $vid").get("tt")
-		String taxaName = sql.firstRow(query).get("cn")
+	private addSpeciesGroup(cl, nid, vid, title, Sql sql){
+		String query = "select common_name as cn from ibpcl_taxa as ita where ita.id in (" + sql.rows("select field_taxa_value as tt from content_field_taxa as t1 where t1.nid = $nid and t1.vid = $vid").collect{ rr -> rr.tt}.join(", ") + ")"
+		sql.rows(query).each{ row ->
+			cl.addToSpeciesGroups(resolveSpeciesGroup(row.cn, title))
+		}
+	}
+	
+	private SpeciesGroup resolveSpeciesGroup(taxaName, title){
 		if(taxaName.equalsIgnoreCase("Insects")){
 			taxaName = "Arthropods"
 		}else if(taxaName.equalsIgnoreCase("Fungi including lichens")){
@@ -308,7 +341,7 @@ class ChecklistService {
 		//		}
 
 		def talukas =  sql.rows("select field_taluks_value as tt from content_field_taluks where nid = $nid and vid = $vid").collect { it.get("tt") }
-		println "   taluea " + talukas
+		//println "   taluea " + talukas
 		if(talukas){
 			talukas.each { taluka ->
 				if(taluka){
@@ -417,4 +450,19 @@ class ChecklistService {
 			}
 		}
 	}
+	
+	private void cleanUpGorm() {
+		
+				def hibSession = sessionFactory?.getCurrentSession();
+		
+				if(hibSession) {
+					log.debug "Flushing and clearing session"
+					try {
+						hibSession.flush()
+					} catch(Exception e) {
+						e.printStackTrace()
+					}
+					hibSession.clear()
+				}
+			}
 }
