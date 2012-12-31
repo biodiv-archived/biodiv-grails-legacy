@@ -73,31 +73,27 @@
 			</div>
 			
 			<div>
-				<div class="ui-widget">
-					<div class="speciesFieldHeader ui-dialog-titlebar ui-helper-clearfix ui-widget-header">
-						<span class="ui-icon ui-icon-circle-triangle-s" style="float: left; margin-right: .3em;"></span>
-						<a href="#license_information">License information</a> 
-					</div>
-					<div class="ui-widget-content speciesField">
-						<dl class="dl">
-			     			<dt>Attribution</dt>
-    						<dd>${checklistInstance.attribution}</dd>
-    				
-    						<dt>License</dt>
-			    			<dd><img src="${resource(dir:'images/license',file:checklistInstance?.license?.name?.getIconFilename()+'.png', absolute:true)}"
-								title="${checklistInstance.license.name}"/>
-							</dd>
-						</dl>
+				<div class="sidebar_section" >
+					<a class="speciesFieldHeader" data-toggle="collapse" href="#license_information"><h5>License information</h5></a>
+					<div id="license_information" class="collapse in">
+							<table>
+								<tr>
+									<td class="prop"><span class="grid_3 name">Attribution</span></td> 
+									<td>${checklistInstance.attribution}</td>
+								</tr>
+								<tr>
+									<td class="prop"><span class="grid_3 name">License</span></td> 
+									<td><img src="${resource(dir:'images/license',file:checklistInstance?.license?.name?.getIconFilename()+'.png', absolute:true)}"
+										title="${checklistInstance.license.name}"/></td>
+								</tr>
+							</table>
 					</div>
 				</div>	
 				
 				<g:if test="${checklistInstance.sourceText}" >
-					<div class="ui-widget">
-						<div class="speciesFieldHeader ui-dialog-titlebar ui-helper-clearfix ui-widget-header">
-							<span class="ui-icon ui-icon-circle-triangle-s" style="float: left; margin-right: .3em;"></span>
-							<a href="#source">Source</a> 
-						</div>
-						<div class="ui-widget-content speciesField">
+					<div class="sidebar_section">
+						<a class="speciesFieldHeader" data-toggle="collapse" href="#source"><h5>Source</h5></a>
+						<div id="source" class="collapse in">
 							<dl class="dl linktext">
 								<dd>${checklistInstance.sourceText}</dd>
 							</dl>
@@ -105,25 +101,18 @@
 					</div>		
 				</g:if>
 				
-				<div class="ui-widget">
-						<div class="speciesFieldHeader ui-dialog-titlebar ui-helper-clearfix ui-widget-header">
-							<span class="ui-icon ui-icon-circle-triangle-s" style="float: left; margin-right: .3em;"></span>
-							<a href="#checklist_details">Checklist details</a> 
-						</div>
-						<div class="ui-widget-content speciesField">
+				<div class="sidebar_section">
+						<a class="speciesFieldHeader" data-toggle="collapse" href="#checklist_details"><h5>Checklist details</h5></a>
+						<div id="checklist_details" class="collapse in">
 							<dl class="dl linktext">
 								<dd>${checklistInstance.description}</dd>
     						</dl>
     					</div>
     			</div>
 				
-				
-			<div class="ui-widget">
-				<div class="speciesFieldHeader ui-dialog-titlebar ui-helper-clearfix ui-widget-header">
-						<span class="ui-icon ui-icon-circle-triangle-s" style="float: left; margin-right: .3em;"></span>
-						<a href="#checklist"> Checklist</a> 
-				</div>
-				<div class="ui-widget-content speciesField">
+				<div class="sidebar_section">
+						<a class="speciesFieldHeader" data-toggle="collapse" href="#checklist"><h5>Checklist</h5></a>
+					<div id="checklist" class="collapse in">
 					<clist:showData
 						model="['checklistInstance':checklistInstance]">
 					</clist:showData>
@@ -131,12 +120,9 @@
 			</div>
 			
 			<g:if test="${checklistInstance.refText}" >
-					<div class="ui-widget">
-						<div class="speciesFieldHeader ui-dialog-titlebar ui-helper-clearfix ui-widget-header">
-							<span class="ui-icon ui-icon-circle-triangle-s" style="float: left; margin-right: .3em;"></span>
-							<a href="#references">References</a> 
-						</div>
-						<div class="ui-widget-content speciesField">
+				<div class="sidebar_section">
+						<a class="speciesFieldHeader" data-toggle="collapse" href="#references"><h5>References</h5></a>
+					<div id="references" class="collapse in">
 						<dl class="dl linktext">
 							<dd>${checklistInstance.refText}</dd>
 						</dl>
