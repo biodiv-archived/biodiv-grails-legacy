@@ -1,11 +1,11 @@
 /**!
- * trunk8 v1.2.1
+ * trunk8 v1.3.2
  * https://github.com/rviscomi/trunk8
  * 
  * Copyright 2012 Rick Viscomi
  * Released under the MIT License.
  * 
- * Date: September 1, 2012
+ * Date: October 21, 2012
  */
 
 (function ($) {
@@ -21,21 +21,26 @@
 		},
 		WIDTH = {
 			auto: 'auto'
-		},
-		settings = {
-			fill: '&hellip;',
-			lines: 1,
-			side: SIDES.right,
-			tooltip: true,
-			width: WIDTH.auto
 		};
+	
+	function trunk8(element) {
+		this.$element = $(element);
+		this.original_text = this.$element.html();
+		this.settings = $.extend({}, $.fn.trunk8.defaults);
+	}
+	
+	trunk8.prototype.updateSettings = function (options) {
+		this.settings = $.extend(this.settings, options);
+	};
 
 	function truncate() {
-		var width = settings.width,
+		var data = this.data('trunk8'),
+			settings = data.settings,
+			width = settings.width,
 			side = settings.side,
 			fill = settings.fill,
 			line_height = utils.getLineHeight(this) * settings.lines,
-			str = this.data('trunk8') || this.text(),
+			str = data.original_text,
 			length = str.length,
 			max_bite = '',
 			lower, upper,
@@ -43,7 +48,7 @@
 			bite;
 		
 		/* Reset the field to the original string. */
-		this.html(str).data('trunk8', str);
+		this.html(str);
 
 		if (width === WIDTH.auto) {
 			/* Assuming there is no "overflow: hidden". */
@@ -104,29 +109,48 @@
 
 	methods = {
 		init: function (options) {
-			settings = $.extend(settings, options);
-			
 			return this.each(function () {
-				truncate.call($(this));
+				var $this = $(this),
+					data = $this.data('trunk8');
+				
+				if (!data) {
+					$this.data('trunk8', (data = new trunk8(this)));
+				}
+				
+				data.updateSettings(options);
+				
+				truncate.call($this);
 			});
 		},
 
 		/** Updates the text value of the elements while maintaining truncation. */
-		update: function (text) {
+		update: function (new_string) {
 			return this.each(function () {
+				var $this = $(this);
+				
 				/* Update text. */
-				if (text) {
-					$(this).data('trunk8', text);
+				if (new_string) {
+					$this.data('trunk8').original_text = new_string;
 				}
 
 				/* Truncate accordingly. */
-				truncate.call($(this));
+				truncate.call($this);
+			});
+		},
+		
+		revert: function () {
+			return this.each(function () {
+				/* Get original text. */
+				var text = $(this).data('trunk8').original_text;
+				
+				/* Revert element to original text. */
+				$(this).html(text);
 			});
 		},
 
 		/** Returns this instance's settings object. NOT CHAINABLE. */
 		getSettings: function () {
-			return settings;
+			return this.get(0).data('trunk8').settings;
 		}
 	};
 
@@ -187,21 +211,35 @@
 		},
 		
 		getLineHeight: function (elem) {
-			var html = $(elem).html(),
-				wrapper_id = 'line-height-test',
-				line_height;
-			
-			/* Set the content to a small single character and wrap. */
-			$(elem).html('i').wrap('<div id="' + wrapper_id + '" />');
-			
-			/* Calculate the line height by measuring the wrapper.*/
-			line_height = $('#' + wrapper_id).innerHeight();
-			
-			/* Remove the wrapper and reset the content. */
-			$(elem).html(html).unwrap();
-			
-			return line_height;
-		}
+	            var $elem = $(elem),
+	            	float = $elem.css('float'),
+	            	position = $elem.css('position'),
+	            	html = $elem.html(),
+			        wrapper_id = 'line-height-test',
+			        line_height;
+	            
+	            if (float !== 'none') {
+	            	$elem.css('float', 'none');
+	            }
+	            
+	            if (position === 'absolute') {
+	            	$elem.css('position', 'static');
+	            }
+	
+	            /* Set the content to a small single character and wrap. */
+	            $elem.html('i').wrap('<div id="' + wrapper_id + '" />');
+	
+	            /* Calculate the line height by measuring the wrapper.*/
+	            line_height = $('#' + wrapper_id).innerHeight();
+	
+	            /* Remove the wrapper and reset the style/content. */
+	            $elem.html(html).css({
+	            	'float': float,
+	            	'position': position
+	            }).unwrap();
+	
+	            return line_height;
+	        }
 	};
 
 	utils.eatStr.cache = {};
@@ -219,5 +257,14 @@
 		else {
 			$.error('Method ' + method + ' does not exist on jQuery.trunk8');
 		}
+	};
+	
+	/* Default trunk8 settings. */
+	$.fn.trunk8.defaults = {
+		fill: '&hellip;',
+		lines: 1,
+		side: SIDES.right,
+		tooltip: true,
+		width: WIDTH.auto
 	};
 })(jQuery);
