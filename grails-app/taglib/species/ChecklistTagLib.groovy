@@ -12,7 +12,8 @@ class ChecklistTagLib {
 	}
 	
 	def showSnippet= {attrs, body->
-		out << render(template:"/common/checklist/showChecklistSnippetTabletTemplate", model:attrs.model);
+		//out << render(template:"/common/checklist/showChecklistSnippetTabletTemplate", model:attrs.model);
+		out << render(template:"/common/checklist/showChecklistSnippetTemplate", model:attrs.model);
 	}
 	
 	def showData= {attrs, body->
