@@ -105,9 +105,10 @@ a {
 /* 	max-height: 220px; */
 /* 	max-width: 200px */
 /* } */
-.thumbnail .figure img {
+.thumbnail .figure .img-polaroid {
 	max-height: 150px;
 	max-width: 190px;
+	width:auto;
 }
 
 .grid_view.thumbnails {

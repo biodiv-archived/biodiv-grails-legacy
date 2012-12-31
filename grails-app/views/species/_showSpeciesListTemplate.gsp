@@ -36,12 +36,12 @@
 
 
 							<g:if test="${thumbnailPath }">
-								<img class="span1 img-polaroid pull-left" style="margin-left:0px"
+								<img class="span1 img-polaroid pull-left" style="max-height:80px;margin-left:0px;width:auto;"
 									src="${createLinkTo( base:grailsApplication.config.speciesPortal.resources.serverURL,
 											file: thumbnailPath)}"
 									title=" ${speciesInstance.taxonConcept.name}" />
 							</g:if> <g:else>
-								<img class="span1 img-polaroid pull-left" style="margin-left:0px"
+								<img class="span1 img-polaroid pull-left" style="max-height:80px;margin-left:0px;width:auto;"
 									title="${speciesInstance.taxonConcept.name}"
 									src="${createLinkTo(dir: 'images', file:speciesInstance.fetchSpeciesGroupIcon(ImageType.VERY_SMALL)?.fileName, absolute:true)}"></img>
 							</g:else> 

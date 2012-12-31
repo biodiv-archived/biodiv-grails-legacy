@@ -5,8 +5,8 @@
 	<a 
 		href="${uGroup.createLink(mapping:'userGroup', controller:'userGroup', action:'show', base:userGroup.domainName, 'userGroup':userGroup, 'pos':pos)}">
 		<img
-		class="media-object   ${showDetails ? 'normal_profile_pic' : 'user-icon small_profile_pic'}"
-		style="vertical-align: middle;"
+		class="media-object ${showDetails ? 'normal_profile_pic' : 'user-icon small_profile_pic'}"
+		
 		src="${userGroup.mainImage()?.fileName}" title="${userGroup.name}"
 		alt="${userGroup.name}" /> </a>
 		</div>
