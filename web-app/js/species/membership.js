@@ -167,7 +167,8 @@ function init_group_header() {
 	$(".ellipsis.multiline").trunk8({
 		lines:2,		
 	});
-	$(".ellipsis").trunk8();
+	
+	$(".ellipsis:not(.multiline)").trunk8();
 	
 	members_autofillUsersComp = $("#userAndEmailList_"+window.members_autofillUsersId).autofillUsers({
 		usersUrl : window.userTermsUrl
