@@ -75,7 +75,7 @@
 			<div>
 				<div class="sidebar_section" >
 					<a class="speciesFieldHeader" data-toggle="collapse" href="#license_information"><h5>License information</h5></a>
-					<div id="license_information" class="collapse in">
+					<div id="license_information" class="speciesField collapse in">
 							<table>
 								<tr>
 									<td class="prop"><span class="grid_3 name">Attribution</span></td> 
@@ -93,7 +93,7 @@
 				<g:if test="${checklistInstance.sourceText}" >
 					<div class="sidebar_section">
 						<a class="speciesFieldHeader" data-toggle="collapse" href="#source"><h5>Source</h5></a>
-						<div id="source" class="collapse in">
+						<div id="source" class="speciesField collapse in">
 							<dl class="dl linktext">
 								<dd>${checklistInstance.sourceText}</dd>
 							</dl>
@@ -103,7 +103,7 @@
 				
 				<div class="sidebar_section">
 						<a class="speciesFieldHeader" data-toggle="collapse" href="#checklist_details"><h5>Checklist details</h5></a>
-						<div id="checklist_details" class="collapse in">
+						<div id="checklist_details" class="speciesField collapse in">
 							<dl class="dl linktext">
 								<dd>${checklistInstance.description}</dd>
     						</dl>
@@ -112,7 +112,7 @@
 				
 				<div class="sidebar_section">
 						<a class="speciesFieldHeader" data-toggle="collapse" href="#checklist"><h5>Checklist</h5></a>
-					<div id="checklist" class="collapse in">
+					<div id="checklist" class="speciesField collapse in">
 					<clist:showData
 						model="['checklistInstance':checklistInstance]">
 					</clist:showData>
@@ -122,7 +122,7 @@
 			<g:if test="${checklistInstance.refText}" >
 				<div class="sidebar_section">
 						<a class="speciesFieldHeader" data-toggle="collapse" href="#references"><h5>References</h5></a>
-					<div id="references" class="collapse in">
+					<div id="references" class="speciesField collapse in">
 						<dl class="dl linktext">
 							<dd>${checklistInstance.refText}</dd>
 						</dl>
@@ -144,30 +144,7 @@
 	<g:javascript>
 	$(document).ready(function(){
 	window.params = {};
-	
-	$('div.speciesFieldHeader').collapser({
-		target: 'next',
-		effect: 'slide',
-		changeText: false
-		},function(){
-			var ele = $(this);
-			var x = ele.find(".ui-icon")
-			if(ele.next('.speciesField').is(":visible")) {				 
-				x.removeClass('ui-icon-circle-triangle-s').addClass('ui-icon-circle-triangle-e');
-			} else {
-				x.removeClass('ui-icon-circle-triangle-e').addClass('ui-icon-circle-triangle-s')
-			}
-		} , function(){
-					
-		}
-	);
-
-    $(".speciesField").each(function() {
-	    if(jQuery.trim($(this).text()).length == 0) {
-		    $(this).prev("div.speciesFieldHeader").children("span").removeClass("ui-icon ui-icon-circle-triangle-s")
-		}
-	})
-	$('.linktext').linkify();
+		$('.linktext').linkify();
 	});
 	</g:javascript>
 </body>
