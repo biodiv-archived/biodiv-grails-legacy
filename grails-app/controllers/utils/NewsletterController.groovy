@@ -39,12 +39,14 @@ class NewsletterController {
 	def save = {
 		log.debug params
 		def newsletterInstance;
+		
 		if(params.userGroup) {
 			def userGroupInstance = UserGroup.findByWebaddress(params.userGroup);
 			params.userGroup = userGroupInstance;
 			newsletterInstance = new Newsletter(params)
 			userGroupInstance.addToNewsletters(newsletterInstance);
 
+			newsletterInstance.title = newsletterInstance.title.capitalize()
 			if (newsletterInstance.save() && userGroupInstance.save(flush: true)) {
 				postProcessNewsletter(newsletterInstance);
 				flash.message = "${message(code: 'default.created.message', args: [message(code: 'newsletter.label', default: 'Newsletter'), newsletterInstance.title])}"

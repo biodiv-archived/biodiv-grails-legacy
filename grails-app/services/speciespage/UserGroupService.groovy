@@ -659,7 +659,14 @@ class UserGroupService {
 		def queryParams = [:]
 		if(userGroupInstance) {
 			queryParams['userGroupInstance'] = userGroupInstance;
-			query += " where newsletter.userGroup=:userGroupInstance "
+			if(userGroupInstance.homePage) {
+				queryParams['homePageId'] = userGroupInstance.homePage.tokenize('/').last()
+				queryParams['homePageId'] = Long.parseLong(queryParams['homePageId']);
+				query += " where newsletter.userGroup=:userGroupInstance and newsletter.id != :homePageId"
+			}
+			else {
+				query += " where newsletter.userGroup=:userGroupInstance"
+			}
 		} else {
 			query += " where newsletter.userGroup is null"
 		}

@@ -48,12 +48,12 @@ class UrlMappings {
 		
 		name page:"/page/$newsletterId" {
 			controller = 'userGroup'
-			action = 'page'
+			action = 'pages'
 		}
 		
 		name userGroupPageShow: "/group/$webaddress/page/$newsletterId" {
 			controller = 'userGroup'
-			action = 'page'
+			action = 'pages'
 		}
 		
 		//just for replacement sake in taglib..not to be used for mapping

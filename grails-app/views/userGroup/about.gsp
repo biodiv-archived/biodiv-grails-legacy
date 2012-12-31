@@ -10,44 +10,51 @@
 <meta name="layout" content="main" />
 <g:set var="entityName" value="${userGroupInstance.name}" />
 <title><g:message code="default.show.label"
-		args="[userGroupInstance.name]" />
-</title>
+		args="[userGroupInstance.name]" /></title>
 <script src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>
 <r:require modules="userGroups_show" />
 </head>
 <body>
 	<div class="observation span12 bodymarker">
-		<uGroup:showSubmenuTemplate model="['entityName':'About Us']" />
+		<div class="page-header clearfix">
+			<div style="width: 100%;">
+				<div class="span8 main_heading" style="margin-left: 0px;">
+					<h1>About Us</h1>
+				</div>
+				<sec:permitted className='species.groups.UserGroup'
+					id='${userGroupInstance.id}'
+					permission='${org.springframework.security.acls.domain.BasePermission.ADMINISTRATION}'>
+
+					<a class="btn btn-info pull-right"
+						href="${uGroup.createLink(mapping:'userGroup', action:'edit', userGroup:userGroupInstance)}">
+						<i class="icon-edit"></i>Edit Group </a>
+					<!-- a class="btn btn-large btn-primary" href="${uGroup.createLink(mapping:'userGroup', action:'settings', userGroup:userGroupInstance)}"><i class="icon-cog"></i>Settings</a-->
+				</sec:permitted>
+
+			</div>
+		</div>
+		<div style="clear: both;"></div>
+
+		
 		<uGroup:rightSidebar model="['userGroupInstance':userGroupInstance]" />
 
 		<div class="userGroup-section">
-			<sec:permitted className='species.groups.UserGroup'
-				id='${userGroupInstance.id}'
-				permission='${org.springframework.security.acls.domain.BasePermission.ADMINISTRATION}'>
 
-				<a class="btn btn-large btn-primary pull-right"
-					href="${uGroup.createLink(mapping:'userGroup', action:'edit', userGroup:userGroupInstance)}"> <i
-					class="icon-edit"></i>Edit Group </a>
-			<!-- a class="btn btn-large btn-primary" href="${uGroup.createLink(mapping:'userGroup', action:'settings', userGroup:userGroupInstance)}"><i class="icon-cog"></i>Settings</a-->
-			</sec:permitted>
-			
+
 			<div class="tabbable">
 				<ul class="nav nav-tabs">
 					<li
 						class="${(!params.action || params.action == 'about')?'active':'' }"><a
 						href="${uGroup.createLink(mapping:'userGroup', action:'about', 'userGroup':userGroupInstance)}">
-							About Us</a>
-					</li>
+							About Us</a></li>
 					<li
 						class="${(!params.action || params.action == 'user')?'active':'' }"><a
 						href="${uGroup.createLink(mapping:'userGroup', action:'user', 'userGroup':userGroupInstance)}">
-							All Members (${membersTotalCount})</a>
-					</li>
+							All Members (${membersTotalCount})</a></li>
 
 					<li class="${(params.action == 'founders')?'active':'' }"><a
 						href="${uGroup.createLink(mapping:'userGroup', action:'founders', 'userGroup':userGroupInstance)}">
-							Founders (${foundersTotalCount})</a>
-					</li>
+							Founders (${foundersTotalCount})</a></li>
 				</ul>
 
 
@@ -137,8 +144,10 @@
 					function(data) {
 			           	var html='';
 			           	$.each(data.result, function(i, item) {
-			           		html +="<a href='"+"${createLink(controller:'SUser', action:'show')}/"+item.id+"'>"
-			+ "<img src='"+item.icon+"' class='pull-left small_profile_pic'	title='"+item.name+"'>"+ "</a>";
+			           		html +="<a
+			href='"+"${createLink(controller:'SUser', action:'show')}/"+item.id+"'>"
+			+ "<img src='"+item.icon+"' class='pull-left small_profile_pic'
+			title='"+item.name+"'>"+ "</a>";
 			           	});
 			           	$("#members_sidebar").html(html);
 			           }, error: function(xhr, status, error) {
@@ -159,8 +168,10 @@
 			           success: function(data) {
 			           	var html = "";
 			           	$.each(data.result, function(i, item) {
-			           		html += "<a href='"+"${createLink(controller:'SUser', action:'show')}/"+item.id+"'>"+
-			"<img src='"+item.icon+"' class='pull-left small_profile_pic' title='"+item.name+"'>"+ "</a>";
+			           		html += "<a
+			href='"+"${createLink(controller:'SUser', action:'show')}/"+item.id+"'>"+
+			"<img src='"+item.icon+"' class='pull-left small_profile_pic'
+			title='"+item.name+"'>"+ "</a>";
 			           	});
 			           	$("#founders_sidebar").html(html);
 			           }, 
