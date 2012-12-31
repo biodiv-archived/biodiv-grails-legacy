@@ -3,7 +3,7 @@
 
 <div class="snippet tablet">
 
-	<div class="figure" style="height:150px;width:200px;display:table;"
+	<div class="figure" style="height:150px;"
 		title='<g:if test="${obvTitle != null}">${obvTitle}</g:if>'>
 		<g:link url="${uGroup.createLink(controller:'observation', action:'show', id:observationInstance.id, 'pos':pos, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress) }" name="g${pos}">
 			<g:if

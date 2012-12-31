@@ -8,9 +8,14 @@
 				class="small_profile_pic" title="${userInstance.name}" /></a>
 		</div>
 		<div class="story" style="margin-left:35px">
-			<a class="ellipsis" title="${userInstance.name}" href="${uGroup.createLink('controller':'SUser', action:'show', id:userInstance.id,  userGroup:userGroup, 'userGroupWebaddress':userGroupWebaddress)}"> ${userInstance.name} </a>
-			
-<%--			<g:if test="${userInstance.location}">--%>
+
+		<a title="${userInstance.name}"
+			href="${uGroup.createLink('controller':'SUser', action:'show', id:userInstance.id,  userGroup:userGroup, 'userGroupWebaddress':userGroupWebaddress)}">
+			<span class="ellipsis"> ${userInstance.name}
+		</span>
+			 </a>
+
+		<%--			<g:if test="${userInstance.location}">--%>
 <%--				<div>--%>
 <%--					<i class="icon-map-marker"></i>--%>
 <%--					${userInstance.location}--%>
