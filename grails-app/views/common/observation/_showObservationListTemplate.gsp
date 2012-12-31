@@ -22,10 +22,10 @@
 					var="observationInstance">
 
 					<g:if test="${i%4 == 0}">
-						<li class="thumbnail" style="clear: both;${!inGroupMap || inGroupMap[observationInstance.id]?'':'background-color:transparent;'}">
+						<li class="thumbnail" style="clear: both;margin-left:0px;${!inGroupMap || inGroupMap[observationInstance.id]?'':'background-color:transparent;'}">
 					</g:if>
 					<g:else>
-						<li class="thumbnail" style="margin: 0;${!inGroupMap || inGroupMap[observationInstance.id]?'':'background-color:transparent;'}">
+						<li class="thumbnail" style="${!inGroupMap || inGroupMap[observationInstance.id]?'':'background-color:transparent;'}">
 					</g:else>
 					<obv:showSnippetTablet
 						model="['observationInstance':observationInstance, 'obvTitle':obvTitleList?.get(i), 'pos': observationPos+i, 'userGroup':userGroup]"></obv:showSnippetTablet>
@@ -37,7 +37,7 @@
 			<ul class="list_view thumbnails" style="display: none;">
 				<g:each in="${observationInstanceList}" status="i"
 					var="observationInstance">
-					<li class="thumbnail" style="clear: both;${!inGroupMap || inGroupMap[observationInstance.id]?'':'background-color:transparent;'}"><obv:showSnippet
+					<li class="thumbnail clearfix" style="${!inGroupMap || inGroupMap[observationInstance.id]?'':'background-color:transparent;'}"><obv:showSnippet
 							model="['observationInstance':observationInstance, 'obvTitle':obvTitleList?.get(i), 'pos':observationPos+i, 'userGroup':userGroup]"></obv:showSnippet>
 					</li>
 				</g:each>

@@ -52,7 +52,7 @@ class NewSimpleSpreadsheetConverter extends SourceConverter {
 				subcategories[index-1] = content.get(2).get(index)?.toLowerCase().trim();
 		}
 		List<String> contributors, attributions,  licenses,  audiences,  status, imageIds;
-		Node references = new Node(null, '');
+		
 		int i=0;
 		for(int index = 4; index < content.size(); index++) {
 			List<String> speciesContent = content.get(index);
@@ -89,7 +89,8 @@ class NewSimpleSpreadsheetConverter extends SourceConverter {
 					} else if (field.concept.text().equalsIgnoreCase((String)fieldsConfig.STATUS)) {
 						status = getStatus(fieldContent);
 					} else if (field.concept.text().equalsIgnoreCase((String)fieldsConfig.INFORMATION_LISTING) && field.category.text().equalsIgnoreCase((String)fieldsConfig.REFERENCES)) {
-						createReferences(references, fieldContent);
+						Node data = new Node(field, "data", '');
+						createReferences(data, fieldContent);
 					} else {
 						createDataNode(field , fieldContent);
 					}
@@ -98,7 +99,7 @@ class NewSimpleSpreadsheetConverter extends SourceConverter {
 			
 			for(field in speciesElement.field) {
 				for (data in field.data) {
-					attachMetadata(data, contributors, attributions, licenses, audiences, status, references);
+					attachMetadata(data, contributors, attributions, licenses, audiences, status);
 				}
 			}
 			
@@ -123,7 +124,7 @@ class NewSimpleSpreadsheetConverter extends SourceConverter {
 		return data;
 	}
 
-	private void attachMetadata(Node data, List<String> contributors, List<String> attributions, List<String> licenses, List<String> audiences, List<String> status, Node references) {
+	private void attachMetadata(Node data, List<String> contributors, List<String> attributions, List<String> licenses, List<String> audiences, List<String> status) {
 		log.debug "Attaching metadata $contributors $attributions $licenses $audiences $status"
 		for(contributor in contributors) {
 			new Node(data, "contributor", contributor);
@@ -139,10 +140,6 @@ class NewSimpleSpreadsheetConverter extends SourceConverter {
 		}
 		for(s in status) {
 			new Node(data, "status", s);
-		}
-		
-		for(r in references.reference) {
-			data.append(r)
 		}
 	}
 	

@@ -1,7 +1,15 @@
 <%@page import="species.utils.Utils"%>
 <%@page import="species.utils.ImageType"%>
+<style>
+<g:if test="${!showDetails}">
 
-<div class="observation_story" style="inline-block;overflow:hidden">
+.observation .prop .value {
+	margin-left:10px;
+}
+
+</g:if>
+</style>
+<div class="observation_story" style="${showDetails?'':'overflow:auto;'}">
 	<div class="observation-icons">
 		<span
 			class="group_icon species_groups_sprites active ${observationInstance.group.iconClass()}"
@@ -13,7 +21,7 @@
 				title="${observationInstance.habitat.name}"></span>
 		</g:if>
 	</div>
-
+	<div class="span7">
 
 		<div class="prop">
 			<g:if test="${showDetails}">
@@ -25,7 +33,6 @@
 			<div class="value">
 				<obv:showSpeciesName
 					model="['observationInstance':observationInstance, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress, 'isListView':!showDetails]" />
-				<%--				<i class="icon-ok"></i>--%>
 			</div>
 		</div>
 
@@ -130,11 +137,14 @@
 				</div>
 			</g:if>
 		</g:if>
+		</div>
+		<div class="row" style="margin-left:0px;">
 		<obv:showFooter
 			model="['observationInstance':observationInstance, 'showDetails':showDetails]" />
 			<div style="float: right; clear: both;">
 		<sUser:showUserTemplate
 			model="['userInstance':observationInstance.author, 'userGroup':userGroup]" />
+		</div>
 	</div>
 
 

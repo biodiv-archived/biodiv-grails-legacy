@@ -80,22 +80,27 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 					<div style="width:100%;">
 						<div class="span8 main_heading" style="margin-left:0px;">
 							<obv:showSpeciesName
-								model="['observationInstance':observationInstance]" />
+								model="['observationInstance':observationInstance, 'isHeading':true]" />
 						</div>
-					<div style="float:right;">
-						<sUser:ifOwns model="['user':observationInstance.author]">
-							
-							<a class="btn btn-primary pull-right"
-								href="${uGroup.createLink(controller:'observation', action:'edit', id:observationInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
-								Edit Observation </a>
-
-								<a class="btn btn-danger btn-primary pull-right" style="margin-right: 5px;margin-bottom:10px;"
-									href="${uGroup.createLink(controller:'observation', action:'flagDeleted', id:observationInstance.id)}"
-									onclick="return confirm('${message(code: 'default.observatoin.delete.confirm.message', default: 'This observation will be deleted. Are you sure ?')}');">Delete
-									Observation </a>
-									
-						</sUser:ifOwns>
-					</div>
+							<a class="btn btn-info pull-right"
+				href="${uGroup.createLink(
+						controller:'observation', action:'create')}"
+				class="btn btn-info"> <i class="icon-plus"></i>Add an
+				Observation</a>
+						<div style="float:right;margin:10px 0;">
+							<sUser:ifOwns model="['user':observationInstance.author]">
+								
+								<a class="btn btn-primary pull-right"
+									href="${uGroup.createLink(controller:'observation', action:'edit', id:observationInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
+									<i class="icon-edit"></i>Edit Observation </a>
+	
+									<a class="btn btn-danger btn-primary pull-right" style="margin-right: 5px;margin-bottom:10px;"
+										href="${uGroup.createLink(controller:'observation', action:'flagDeleted', id:observationInstance.id)}"
+										onclick="return confirm('${message(code: 'default.observatoin.delete.confirm.message', default: 'This observation will be deleted. Are you sure ?')}');"><i class="icon-trash"></i>Delete
+										Observation </a>
+										
+							</sUser:ifOwns>
+						</div>
 					</div>
 					<div style="clear:both;"></div>
 					<g:if test="${params.pos && lastListParams}">

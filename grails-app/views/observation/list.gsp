@@ -16,10 +16,6 @@
 	<div class="span12">
 		<obv:showSubmenuTemplate model="['entityName':entityName]" />
 		<uGroup:rightSidebar/>
-		<a class="btn btn-large btn-info pull-right" href="${uGroup.createLink(
-						controller:'observation', action:'create')}"
-						class="btn btn-large btn-info">
-						<i class="icon-plus"></i>Add an Observation</a>
 		<obv:showObservationsListWrapper />
 	</div>
 

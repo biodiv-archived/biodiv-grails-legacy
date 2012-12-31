@@ -5,7 +5,7 @@
 <%@ page import="species.groups.SpeciesGroup"%>
 <%@page import="species.utils.Utils"%>
 
-<div class="observations_list" style="clear: both;top:0px;">
+<div class="observations_list" style="clear: both; top: 0px;">
 
 
 	<div class="mainContentList">
@@ -19,64 +19,71 @@
 
 					<g:if test="${i%4 == 0}">
 						<li
-							class=" pull-left thumbnail ${speciesInstance.percentOfInfo > 0?'rich_species_content':'poor_species_content'}"
-							style="clear: both; margin: 5px 0px 5px 5px">
+							class="clearfix thumbnail ${speciesInstance.percentOfInfo > 0?'rich_species_content':'poor_species_content'}">
 					</g:if>
 					<g:else>
 						<li
-							class="pull-left thumbnail ${speciesInstance.percentOfInfo > 0?'rich_species_content':'poor_species_content'}"
-							style="margin: 5px 0px 5px 5px">
+							class="thumbnail ${speciesInstance.percentOfInfo > 0?'rich_species_content':'poor_species_content'}">
 					</g:else>
 					<g:set var="mainImage" value="${speciesInstance.mainImage()}" />
 					<%def thumbnailPath = ImageUtils.getFileName(mainImage?.fileName, ImageType.SMALL, null)%>
-					<div class="snippet tablet" style="height: 80px; ">
-						<a
+
+					<div class="snippet tablet "
+						style="display: table; height: 80px;">
+						<div class="pull-left figure" style="height:80px;display:table;">
+						<a 
 							href="${uGroup.createLink([controller:'species', action:'show', id:speciesInstance.id, userGroup:userGroup, userGroupWebaddress:userGroupWebaddress])}">
 
 
 							<g:if test="${thumbnailPath }">
-								<img class="icon pull-right"
+								<img class="span1 img-polaroid pull-left" style="margin-left:0px"
 									src="${createLinkTo( base:grailsApplication.config.speciesPortal.resources.serverURL,
 											file: thumbnailPath)}"
 									title=" ${speciesInstance.taxonConcept.name}" />
 							</g:if> <g:else>
-								<img class="icon pull-right"
+								<img class="span1 img-polaroid pull-left" style="margin-left:0px"
 									title="${speciesInstance.taxonConcept.name}"
-									src="${createLinkTo(dir: 'images', file:speciesInstance.fetchSpeciesGroupIcon(ImageType.VERY_SMALL)?.fileName, absolute:true)}"
-									style="float: right;"></img>
-							</g:else>
-							<p class="caption ellipsis multiline" title="${speciesInstance.taxonConcept.name}">
-								${speciesInstance.taxonConcept.italicisedForm}
-							</p> </a>
-
+									src="${createLinkTo(dir: 'images', file:speciesInstance.fetchSpeciesGroupIcon(ImageType.VERY_SMALL)?.fileName, absolute:true)}"></img>
+							</g:else> 
+						</a>
+						</div>
+						<a 
+							href="${uGroup.createLink([controller:'species', action:'show', id:speciesInstance.id, userGroup:userGroup, userGroupWebaddress:userGroupWebaddress])}">
+						
+						<div class="species_story ellipsis multiline sci_name"
+							title="${speciesInstance.taxonConcept.name}">
+							${speciesInstance.taxonConcept.italicisedForm}
+						</div>
 
 						<div class="poor_species_content" style="display: none;">No
 							information yet</div>
-
+						</a>
 					</div>
+
+
+
 					</li>
-				</g:each>
-			</ul>
+		</g:each>
+		</ul>
 
 
-
-		</div>
-	</div>
-
-
-	<div class="paginateButtons centered">
-		<p:paginate controller="species" action="list"
-			total="${instanceTotal}" userGroup="${userGroup}"
-			userGroupWebaddress="${userGroupWebaddress}"
-			params="['startsWith':params.startsWith]" max="${params.max }"
-			offset="${params.offset}" maxsteps="10" />
-	</div>
-	<div class="paginateButtons centered">
-		<p:paginateOnAlphabet controller="species" action="list"
-			total="${instanceTotal}" userGroup="${userGroup }"
-			userGroupWebaddress="${userGroupWebaddress}" />
 
 	</div>
+</div>
+
+
+<div class="paginateButtons centered">
+	<p:paginate controller="species" action="list" total="${instanceTotal}"
+		userGroup="${userGroup}" userGroupWebaddress="${userGroupWebaddress}"
+		params="['startsWith':params.startsWith]" max="${params.max }"
+		offset="${params.offset}" maxsteps="10" />
+</div>
+<div class="paginateButtons centered">
+	<p:paginateOnAlphabet controller="species" action="list"
+		total="${instanceTotal}" userGroup="${userGroup }"
+		userGroupWebaddress="${userGroupWebaddress}" />
+
+</div>
 
 
 </div>

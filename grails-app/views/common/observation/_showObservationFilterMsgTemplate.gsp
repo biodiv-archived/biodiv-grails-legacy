@@ -21,10 +21,13 @@
 		<search:noSearchResults />
 	</g:if>
 	<g:else>
+		<g:if test="${speciesCountWithContent }"><span class="name" style="color: #b1b1b1;"><i
+			class="icon-search"></i></span> ${speciesCountWithContent} species page<g:if test="${speciesCountWithContent>1}">s</g:if> and ${instanceTotal- speciesCountWithContent} species stubs are found</g:if>
+		<g:else>
 		<span class="name" style="color: #b1b1b1;"><i
-			class="icon-search"></i> ${instanceTotal} </span>
+			class="icon-search"></i></span> ${instanceTotal} 
 		${resultType?:'observation'}<g:if test="${instanceTotal!=1}">s</g:if> found 
-
+		</g:else>
 		<g:each in="${queryParams}" var="queryParam">
 			<g:if
 				test="${queryParam.key == 'groupId' && queryParam.value instanceof Long }">

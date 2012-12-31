@@ -3,7 +3,7 @@
 <%@page import="species.groups.UserGroup"%>
 <%@page import="species.participation.ActivityFeedService"%>
 <div class="activityFeedContext" >
-	<div class="feedParentContext">
+	<div class="feedParentContext thumbnail">
 		<g:if test="${feedInstance.rootHolderType ==  Observation.class.getCanonicalName()}" >
 			<%
 				def tmpUserGroup = (feedHomeObject && feedHomeObject.class.getCanonicalName() == UserGroup.class.getCanonicalName()) ? feedHomeObject : null

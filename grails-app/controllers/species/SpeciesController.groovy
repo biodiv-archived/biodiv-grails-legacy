@@ -49,7 +49,7 @@ class SpeciesController {
 			return;
 		} else{
 			def obvListHtml =  g.render(template:"/species/showSpeciesListTemplate", model:model);
-			model.resultType = "species page"
+			model.resultType = "species"
 			def obvFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
 
 			def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml]
@@ -79,32 +79,37 @@ class SpeciesController {
 			if(groupIds.size() == 1 && groupIds[0] == allGroup.id) {
 				if(params.startsWith == "A-Z") {
 					query = "select s from Species s order by s.${params.sort} ${params.order}";
-					countQuery = "select count(*) as count from Species s"
+					countQuery = "select s.percentOfInfo, count(*) as count from Species s group by s.percentOfInfo"
 				} else {
 					query = "select s from Species s where s.title like '<i>${params.startsWith}%' order by s.${params.sort} ${params.order}";
-					countQuery = "select count(*) as count from Species s where s.title like '<i>${params.startsWith}%'"
+					countQuery = "select s.percentOfInfo, count(*) as count from Species s where s.title like '<i>${params.startsWith}%'  s group by s.percentOfInfo"
 				}
 			} else {
 				if(params.startsWith == "A-Z") {
 					query = "select s from Species s, TaxonomyDefinition t where s.taxonConcept = t and t.group.id  in (:sGroup) order by s.${params.sort} ${params.order}"
-					countQuery = "select count(*) as count from Species s, TaxonomyDefinition t where s.taxonConcept = t and t.group.id  in (:sGroup)";
+					countQuery = "select s.percentOfInfo, count(*) as count from Species s, TaxonomyDefinition t where s.taxonConcept = t and t.group.id  in (:sGroup)  group by s.percentOfInfo";
 				} else {
 					query = "select s from Species s, TaxonomyDefinition t where title like '<i>${params.startsWith}%' and s.taxonConcept = t and t.group.id  in (:sGroup) order by s.${params.sort} ${params.order}"
-					countQuery = "select count(*) as count from Species s, TaxonomyDefinition t where s.title like '<i>${params.startsWith}%' and s.taxonConcept = t and t.group.id  in (:sGroup)";
+					countQuery = "select s.percentOfInfo, count(*) as count from Species s, TaxonomyDefinition t where s.title like '<i>${params.startsWith}%' and s.taxonConcept = t and t.group.id  in (:sGroup)  group by s.percentOfInfo";
 				}
 			}
 
-			def speciesInstanceList;
+			def speciesInstanceList, rs;
 			if(groupIds.size() == 1 && groupIds[0] == allGroup.id) {
 				speciesInstanceList = Species.executeQuery(query, [max:params.max, offset:params.offset]);
-				def rs = Species.executeQuery(countQuery)
-				count = rs[0];
+				rs = Species.executeQuery(countQuery)
 			} else {
 				speciesInstanceList = Species.executeQuery(query, [sGroup:groupIds], [max:params.max, offset:params.offset]);
-				def rs = Species.executeQuery(countQuery,[sGroup:groupIds]);
-				count = rs[0];
+				rs = Species.executeQuery(countQuery,[sGroup:groupIds]);
 			}
-			return [speciesInstanceList: speciesInstanceList, instanceTotal: count, 'userGroupWebaddress':params.webaddress]
+			def speciesCountWithContent = 0;
+			
+			for(c in rs) {
+				count += c[1];
+				if (c[0] >0)
+					speciesCountWithContent += c[1];
+			}
+			return [speciesInstanceList: speciesInstanceList, instanceTotal: count, speciesCountWithContent:speciesCountWithContent, 'userGroupWebaddress':params.webaddress]
 		} else {
 			//Not being used for now
 			params.max = Math.min(params.max ? params.int('max') : 40, 100)
@@ -424,7 +429,7 @@ class SpeciesController {
 			return;
 		} else {
 			def obvListHtml =  g.render(template:"/species/searchResultsTemplate", model:model);
-			model.resultType = "species page"
+			model.resultType = "species"
 			def obvFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
 
 			def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml]

@@ -135,9 +135,11 @@ class SpeciesSearchService {
 					message += field.description+" ";
 				}
 			}
+			
+			doc.addField(searchFieldsConfig.PERCENT_OF_INFO, s.percentOfInfo);
 			doc.addField(searchFieldsConfig.MESSAGE, message);
+			
 			docs.add(doc);
-
 		}
 
 		//log.debug docs;

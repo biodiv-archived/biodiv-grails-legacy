@@ -43,4 +43,4 @@
 	
 </div>
 <obv:showObservationFilterMessage
-	model="['instanceTotal':instanceTotal, 'queryParams':queryParams, resultType:'species page']" />
+	model="['instanceTotal':instanceTotal, 'queryParams':queryParams, resultType:'species']" />

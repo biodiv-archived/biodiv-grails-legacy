@@ -100,7 +100,7 @@ class GroupHandlerService {
 	int updateGroups() {
 		int noOfUpdations = 0;
 		int offset = 0;
-		int limit = 50000;
+		int limit = 60000;
 		
 		def taxonConcepts;
 		

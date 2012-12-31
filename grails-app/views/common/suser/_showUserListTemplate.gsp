@@ -16,10 +16,10 @@
 	
 				<g:each in="${userInstanceList}" status="i" var="userInstance">
 					<g:if test="${i% ((params.controller != 'userGroup')?4:4) == 0}">
-						<li class="thumbnail" style="clear: both;">
+						<li class="thumbnail" style="clear: both;margin-left:0px;">
 					</g:if>
 					<g:else>
-						<li class="thumbnail" style="margin:0px;">
+						<li class="thumbnail">
 					</g:else>
 					<sUser:showUserSnippetTablet model="['userInstance':userInstance, 'userGroupInstance':userGroupInstance]"></sUser:showUserSnippetTablet>
 					</li>
@@ -29,7 +29,7 @@
 	
 			<ul class="list_view thumbnails" style="display: none;">
 				<g:each in="${userInstanceList}" status="i" var="userInstance">
-					<li class="thumbnail" style="clear: both;"><sUser:showUserSnippet
+					<li class="thumbnail clearfix"><sUser:showUserSnippet
 							model="['userInstance':userInstance, 'userGroupInstance':userGroupInstance]"></sUser:showUserSnippet></li>
 				</g:each>
 			</ul>

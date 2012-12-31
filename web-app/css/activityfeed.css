@@ -7,10 +7,10 @@
 	list-style: none none;
 }
 
-.activityfeed a {
-    color: #16509E;
-    text-decoration: none;
-}
+/* .activityfeed a { */
+/*     color: #16509E; */
+/*     text-decoration: none; */
+/* } */
 .activityfeed .feedParentContext table{
 	margin-left: 0px;
 	margin-bottom: -8px;
@@ -53,7 +53,7 @@
 /*     background-color:#e5e5e5; */
 }
 
-.activityfeed .feedActivityHolderContext{
+.activityfeed .feedActivityHolderContext {
 	background-color: #EBEBEB;
 	clear:both;
 }
@@ -65,10 +65,10 @@
     margin-bottom: 0;
 }
 
-.activityfeed .activiyfeednewermsg{
+.activityfeed .activiyfeednewermsg {
 	background-color: #E7F0FE;
 }
-.userGroup-section .comment-textbox{
+.userGroup-section .comment-textbox {
 	width:99%;	
 }
 .userGroup-section .comment-post-btn {

@@ -36,7 +36,8 @@ modules = {
 		resource url:'/css/jquery.rating.css'
 		resource url:'/css/wgp.css'
 		resource url:'/css/daterangepicker.css'
-
+		resource url:'/css/speciesGroups.css'
+		resource url:'/css/habitats.css'
 
 		resource url:'/bootstrap/js/bootstrap.min.js'
 		resource url:'/js/species/main.js'
@@ -93,8 +94,7 @@ modules = {
 		dependsOn 'core, tagit'
 		defaultBundle 'core'
 
-		resource url:'/css/speciesGroups.css'
-		resource url:'/css/habitats.css'
+		
 		resource url:'/js/jquery/jquery.watermark.min.js'
 		resource url:'/js/jsrender.js'
 		//resource url:'/js/bootstrap-typeahead.js'

@@ -165,7 +165,7 @@ input.dms_field {
 											<div class='metadata prop'
 												style="position: relative; left: 5px; top: -40px;">
 												<input name="file_${i}" type="hidden" value='${r.fileName}' />
-												<div id="license_div_${i}" class="licence_div btn-group"
+												<div id="license_div_${i}" class="licence_div dropdown"
 													style="z-index: 2; cursor: pointer;">
 
 													<div id="selected_license_${i}"
@@ -606,8 +606,7 @@ input.dms_field {
                         </div>
                         <span class="caret"></span>
                     </div>
-                    <div id="license_options_{{=i}}" class="license_options">
-                        <ul class="dropdown-menu">
+                        <ul id="license_options_{{=i}}" class="dropdown-menu license_options">
                             <span>Choose a license</span>
                             <g:each in="${species.License.list()}" var="l">
                                 <li class="license_option" onclick="$('#license_{{=i}}').val($.trim($(this).text()));$('#selected_license_{{=i}}').children('div').html($(this).html());$('#license_options_{{=i}}').hide();">
@@ -616,7 +615,6 @@ input.dms_field {
                                 </li>
                             </g:each>
                         </ul>
-                    </div>
                 </div>
             </div>	
 	    	<input id="license_{{=i}}" type="hidden" name="license_{{=i}}"></input>

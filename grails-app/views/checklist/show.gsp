@@ -19,21 +19,8 @@
 <body>
 	
 			<div class="span12">
-				<div class="page-header clearfix" style="padding-bottom: 0px;">
-						<h1>
-							${checklistInstance.title}
-						</h1>
-						<h6>
-						${checklistInstance.attribution}
-						</h6>
-				</div>
-
-				<g:if test="${flash.message}">
-					<div class="message alert alert-info">
-						${flash.message}
-					</div>
-				</g:if>
-				
+				<clist:showSubmenuTemplate model="['entityName':checklistInstance.title, 'subHeading':checklistInstance.attribution]" />
+			
 				<div style="clear:both;"></div>
 					<g:if test="${params.pos && lastListParams}">
 						<div class="nav" style="width:100%;">

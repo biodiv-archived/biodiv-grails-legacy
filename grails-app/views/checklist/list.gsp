@@ -13,18 +13,8 @@
 </head>
 <body>
 <div class="span12">
-			<div class="page-header clearfix">
-					<h1>
-						<g:message code="default.observation.heading" args="[entityName]" />
-					</h1>
-			</div>
+			<clist:showSubmenuTemplate model="['entityName':entityName]" />
 
-			<g:if test="${flash.message}">
-				<div class="message alert alert-info">
-					${flash.message}
-				</div>
-			</g:if>
-			
 			<div class="gallerytoolbar">
 					<div class="filters" style="position: relative; overflow: visible;">
 						<obv:showGroupFilter model="['hideHabitatFilter':true]"/>

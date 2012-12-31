@@ -7,6 +7,11 @@ body { /*     background-color: #ffffff; */
 	background-repeat: no-repeat;
 }
 
+a {
+	color: #16509E;
+	text-decoration: none;
+}
+
 .page-footer {
 	height: 221px;
 	width: 725px;
@@ -26,9 +31,10 @@ body { /*     background-color: #ffffff; */
 	-ms-filter:
 		"progid:DXImageTransform.Microsoft.gradient(startColorstr=#336AC9A2,endColorstr=#336AC9A2)";
 	/* IE8 */
-	filter: progid :         DXImageTransform.Microsoft.gradient (      
-		  startColorstr =    
-		    #336AC9A2, endColorstr =         #336AC9A2 ); /* IE6 & 7 */
+	filter: progid :             DXImageTransform.Microsoft.gradient (
+		       
+		    startColorstr =      
+		      #336AC9A2, endColorstr =             #336AC9A2 ); /* IE6 & 7 */
 	zoom: 1;
 	box-shadow: 0 4px 3px -3px #5e5e5e;
 }
@@ -70,8 +76,8 @@ body { /*     background-color: #ffffff; */
 }
 
 .snippet.tablet {
-	width: 213px;
-	height: 280px;
+	width: 210px;
+	height: 200px;
 	overflow: hidden;
 	position: relative;
 }
@@ -85,21 +91,20 @@ body { /*     background-color: #ffffff; */
 	bottom: 0;
 }
 
-.snippet .figure {
-	margin-bottom: 5px;
-	max-width: 200px;
-	margin-left: auto;
-	margin-right: auto;
-	display: table;
-}
+/* .snippet .figure { */
+/* 	margin-bottom: 5px; */
+/* 	max-width: 200px; */
+/* 	margin-left: auto; */
+/* 	margin-right: auto; */
+/* 	display: table; */
+/* } */
 
-.snippet .figure a {
-	display: table-cell;
-	vertical-align: middle;
-	max-height: 220px;
-	max-width: 200px
-}
-
+/* .snippet .figure a { */
+/* 	display: table-cell; */
+/* 	vertical-align: middle; */
+/* 	max-height: 220px; */
+/* 	max-width: 200px */
+/* } */
 .grid_view.thumbnails {
 	margin-left: 0px;
 }
@@ -107,11 +112,19 @@ body { /*     background-color: #ffffff; */
 .grid_view li.thumbnail {
 	background-color: #ffffff;
 	border: 0px solid #bee6d3;
-	margin: 0px;
+	/* 	margin: 0px; */
+/* 	margin: 10px 0px 0px 10px; */
 }
 
 .grid_view li.thumbnail:hover {
 	background-color: #fefad5;
+}
+
+.thumbnail .figure a {
+	display: table-cell;
+	vertical-align: middle;
+	max-height: 220px;
+	max-width: 200px;
 }
 
 .button-bar {
@@ -158,13 +171,13 @@ body { /*     background-color: #ffffff; */
 /* 	clear:none; */
 /* } */
 
-/* .observation_story .prop .name { */
-/* 	width: 100px; */
-/* } */
+.observation_story .prop .name {
+	width: 120px;
+}
 
-/* .observation .prop .value { */
-/*  	margin-left: 110px;  */
-/* } */
+.observation .prop .value {
+ 	margin-left: 130px; 
+}
 
 /* .prop .value, .observations_list .prop .value, .activityfeed .prop .value{ */
 /*  	margin-left: 22px;  */
@@ -178,21 +191,16 @@ body { /*     background-color: #ffffff; */
 	margin-left: 0px;
 }
 
-.list_view li.thumbnail {
-	margin: 0;
-	border-radius: 0;
-	border-bottom: 0;
+.list_view li.thumbnail { /* 	margin: 0; */
+	/* 	border-radius: 0; */
+	/* 	border-bottom: 0; */
 	background-color: #ffffff;
-	border: 1px solid #bee6d3;
-	width: 100%;
+	/* 	border: 1px solid #bee6d3; */
+	/* 	width: 100%; */
 }
 
 .list_view li.thumbnail:hover {
 	background-color: #fefad5;
-}
-
-.list_view li.thumbnail .observation_story {
-	background-color: transparent;
 }
 
 .list_view .figure .thumbnail {
@@ -300,9 +308,10 @@ div.errors {
 	-ms-filter:
 		"progid:DXImageTransform.Microsoft.gradient(startColorstr=#336AC9A2,endColorstr=#336AC9A2)";
 	/* IE8 */
-	filter: progid :         DXImageTransform.Microsoft.gradient (      
-		  startColorstr =    
-		    #336AC9A2, endColorstr =         #336AC9A2 ); /* IE6 & 7 */
+	filter: progid :             DXImageTransform.Microsoft.gradient (
+		       
+		    startColorstr =      
+		      #336AC9A2, endColorstr =             #336AC9A2 ); /* IE6 & 7 */
 	zoom: 1;
 	border-radius: 5px;
 	margin-bottom: 10px;
@@ -457,14 +466,14 @@ ul#recoSummary {
 	padding-right: 10px;
 }
 
-.observation_story {
-	padding: 10px;
+.observation_story,.species_story {
+	padding: 5px;
 	position: relative;
 }
 
-.observation_story.tablet {
-	height: 100px;
-}
+/* .observation_story.tablet { */
+/* 	height: 100px; */
+/* } */
 
 .observation .observation_story {
 	background-color: #ffffff;
@@ -523,7 +532,7 @@ ul#recoSummary {
 	font-weight: bold;
 	line-height: 20px;
 	text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
-	text-transform: uppercase;
+/* 	text-transform: uppercase; */
 	margin: 0px;
 	cursor: pointer;
 }
@@ -581,7 +590,7 @@ ul#recoSummary {
 }
 
 .snippet.tablet .figure img {
-	max-height: 150px;
+/* 	max-height: 150px; */
 	max-width: 200px
 }
 
@@ -1024,7 +1033,8 @@ ul,ol {
 }
 
 #ibp-header {
-	border-bottom: 1px solid #E5E5E5; box-shadow : 0 6px 6px -6px #5E5E5E;
+	border-bottom: 1px solid #E5E5E5;
+	box-shadow: 0 6px 6px -6px #5E5E5E;
 	color: #5E5E5E;
 	/* 	font-family: Verdana, Helvetica, Sans-Serif; */
 	/* height: 80px; */
@@ -1062,14 +1072,15 @@ ul,ol {
 }
 
 /* #mainMenu,#myGroups {     margin-left: 10px; */
-margin-top:    0; clear: both   ;
+margin-top:      0; clear: both     ;
 	/* 	font-size: 12pt; */
 	/* 	margin-left: 240px; */
 	/* 	margin-right: 240px; */
-	/* 	font-weight: bold; */ position:absolute   ; top:    0px   ; left:  
-	 200px   ;
+	/* 	font-weight: bold; */ position:absolute     ; top:      0px     ;
+	left:  
+	   200px     ;
 	/* 	padding: 5px; */
-	/* 	min-width: 540px; */ width:   960px  ;
+	/* 	min-width: 540px; */ width:     960px    ;
 	/* 	overflow: visible; */
 	/* } */
 	/* #mainMenu ul.links li a:link,#mainMenu ul li a:visited,#mainMenu ul li a:hover,#mainMenu ul li a:active,#myGroups a:link,#myGroups  a:visited,#myGroups a:hover,#myGroups a:active */
@@ -1283,10 +1294,18 @@ span.cke_skin_kama {
 
 h1,.main_heading .species_title .sci_name {
 	font-size: 25px;
+	line-height: 40px;
+ 	margin: 0; 
+	font-family: inherit;
+	font-weight: bold;
 }
 
-.main_heading .species_title .common_name {
-	font-size: 19px;
+h4,.main_heading .species_title .common_name {
+	font-size: 17.5px;
+	line-height: 20px;
+	margin: 10px 0;
+	font-family: inherit;
+	font-weight: bold;
 }
 
 .userGroup-section { /* 	width:600px; */
@@ -1630,10 +1649,56 @@ li#userOrEmail-new {
 	*font-size: 120px;
 	line-height: 120px;
 }
-.tabs-right > .nav-tabs {
-	margin-left:10px;
+
+.tabs-right>.nav-tabs {
+	margin-left: 10px;
 }
 
 .thumbnails>li {
-	margin: 0 0 18px 10px;
+	margin: 0 0 10px 10px;
 }
+
+.login-box {
+	font-weight: normal;
+	margin: 0;
+	top: 0;
+	max-width: 200px;
+	float: right;
+}
+
+.login-box:hover {
+	background-color: #ffffff;
+	box-shadow: 0 6px 8px -6px #5e5e5e;
+}
+
+.login-box-options {
+	float: right;
+	right: 0;
+	padding-right: 10px;
+	padding-bottom: 10px;
+}
+
+.login-box img {
+	max-height: 32px;
+	min-height: 16px;
+	max-width: 32px;
+}
+
+.loginLink {
+	margin: 0;
+	position: relative;
+	float: right;
+}
+
+.register {
+	float: right;
+	margin-right: 10px;
+}
+
+/* .user_signature { */
+/* 	height: 30px; */
+/* 	padding-left: 5px; */
+/* 	padding-top: 2px; */
+/* 	text-align: left; */
+/* 	max-width: 175px; */
+/* } */

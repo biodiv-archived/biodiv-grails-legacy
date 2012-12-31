@@ -3,16 +3,16 @@
 
 <div class="snippet tablet">
 
-	<div class="figure" style="height:150px;"
+	<div class="figure" style="height:150px;width:200px;display:table;"
 		title='<g:if test="${obvTitle != null}">${obvTitle}</g:if>'>
 		<g:link url="${uGroup.createLink(controller:'observation', action:'show', id:observationInstance.id, 'pos':pos, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress) }" name="g${pos}">
 			<g:if
 				test="${imagePath && (new File(grailsApplication.config.speciesPortal.observations.rootDir + imagePath)).exists()}">
-				<img
+				<img class="img-polaroid"
 					src="${createLinkTo(base:grailsApplication.config.speciesPortal.observations.serverURL,	file: imagePath)}" />
 			</g:if>
 			<g:else>
-				<img
+				<img class="img-polaroid"
 					src="${createLinkTo( file:"no-image.jpg", base:grailsApplication.config.speciesPortal.resources.serverURL)}"
 					title="You can contribute!!!" />
 			</g:else>

@@ -1,36 +1,36 @@
 <%@page import="species.participation.Observation"%>
 <%@page import="species.utils.Utils"%>
-<div class="observation_story tablet">
-	<h5>
-		<a href="${uGroup.createLink([action:"show", controller:"SUser", id:userInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':userGroupWebaddress])}"> ${userInstance.name}
+<div>
+	<h5 style="margin:0">
+		<a class="ellipsis" href="${uGroup.createLink([action:"show", controller:"SUser", id:userInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':userGroupWebaddress])}"> ${userInstance.name}
 		</a>
 	</h5>
-	<div class="icons-bar">
-		<div class="observation-icons"></div>
-	</div>
-
-	<div class="story">
-		<g:if test="${userInstance.location}">
-			<div>
-				<i class="icon-map-marker"></i>
-				${userInstance.location}
-			</div>
-		</g:if>
-
-		<g:if test="${userInstance.website}">
-			<div>
-				<i class="icon-road"></i>
-				<g:if test="${Utils.isURL(userInstance.website) }">
-					<a target="_blank"
-						href="${userInstance.getWebsiteLink()}"> ${fieldValue(bean: userInstance, field: 'website')}
-					</a>
-				</g:if><g:else>
-					${fieldValue(bean: userInstance, field: 'website')}
-				</g:else>
-			</div>
-		</g:if>
-
-	</div>
+<%--	<div class="icons-bar">--%>
+<%--		<div class="observation-icons"></div>--%>
+<%--	</div>--%>
+<%----%>
+<%--	<div class="story">--%>
+<%--		<g:if test="${userInstance.location}">--%>
+<%--			<div>--%>
+<%--				<i class="icon-map-marker"></i>--%>
+<%--				${userInstance.location}--%>
+<%--			</div>--%>
+<%--		</g:if>--%>
+<%----%>
+<%--		<g:if test="${userInstance.website}">--%>
+<%--			<div>--%>
+<%--				<i class="icon-road"></i>--%>
+<%--				<g:if test="${Utils.isURL(userInstance.website) }">--%>
+<%--					<a target="_blank"--%>
+<%--						href="${userInstance.getWebsiteLink()}"> ${fieldValue(bean: userInstance, field: 'website')}--%>
+<%--					</a>--%>
+<%--				</g:if><g:else>--%>
+<%--					${fieldValue(bean: userInstance, field: 'website')}--%>
+<%--				</g:else>--%>
+<%--			</div>--%>
+<%--		</g:if>--%>
+<%----%>
+<%--	</div>--%>
 
 	<div class="story-footer">
 		<span class="footer-item" title="No of Observations">

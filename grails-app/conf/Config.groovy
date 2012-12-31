@@ -253,7 +253,7 @@ speciesPortal {
 
 	
 		
-	names.parser.serverURL = "saturn.strandls.com"
+	names.parser.serverURL = "127.0.0.1"
 	names.parser.port = 4334
 	search {
 		serverURL = "http://localhost:8090/solr"
@@ -353,6 +353,7 @@ speciesPortal {
 		COMMON_NAME_EXACT = "common_name_exact"
 		LOCATION = "location"
 		ATTRIBUTION = "attribution"
+		PERCENT_OF_INFO = "percent_of_info"
 		
 		REFERENCE = "reference"
 		TAXON = "taxon"
@@ -419,7 +420,7 @@ environments {
 		grails.serverURL = "http://indiabiodiversity.localhost.org/${appName}"
 		speciesPortal {
 			search.serverURL = "http://localhost:8090/solr"
-			names.parser.serverURL = "saturn.strandls.com"
+			names.parser.serverURL = "127.0.0.1"
 			wgp {
 				facebook {
 					appId= "327308053982589"

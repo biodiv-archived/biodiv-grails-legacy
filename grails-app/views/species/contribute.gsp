@@ -10,7 +10,7 @@
 </head>
 <body>
 	<div>
-		<s:showSubmenuTemplate model="['entityName':'Contribute to Species Pages']"/>
+		<s:showSubmenuTemplate model="['subHeading':'Contribute to Species Pages']"/>
 				
 <%
 String supportEmail = "";

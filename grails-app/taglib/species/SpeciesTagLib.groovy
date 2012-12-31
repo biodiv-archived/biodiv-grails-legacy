@@ -105,4 +105,7 @@ class SpeciesTagLib {
 	def showSpeciesList = {attrs, body->
 		out << render(template:"/species/showSpeciesListTemplate", model:attrs.model);
 	}
+	def showHeadingAndSubHeading = {attrs, body->
+		out << render(template:"/common/headingAndSubHeading", model:attrs.model);
+	}
 }

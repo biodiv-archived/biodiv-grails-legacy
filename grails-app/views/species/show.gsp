@@ -267,14 +267,8 @@ $(document).ready(function(){
 <body>
 <div class="span12">
 	<div class="container_16 outer_wrapper">
-			<s:showSubmenuTemplate/>
-				<div class="page-header">
-						<h1>
-					${speciesInstance.taxonConcept.italicisedForm }
-						</h1>
-										<h4><%=CommonNames.findByTaxonConceptAndLanguage(speciesInstance.taxonConcept, Language.findByThreeLetterCode('eng'))?.name%></h4>
-				</div>
-
+			<s:showSubmenuTemplate model="['entityName':speciesInstance.taxonConcept.italicisedForm , 'subHeading':CommonNames.findByTaxonConceptAndLanguage(speciesInstance.taxonConcept, Language.findByThreeLetterCode('eng'))?.name, 'headingClass':'sci_name']"/>
+		
 			<g:if test="${!speciesInstance.percentOfInfo}">
 				<div
 					class="poor_species_content ui-state-highlight ui-corner-all span12">

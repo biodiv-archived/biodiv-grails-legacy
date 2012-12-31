@@ -1,24 +1,27 @@
 <%@page import="species.participation.Observation"%>
 <%@page import="species.utils.Utils"%>
-<div class="observation_story" style="display: inline-block">
+<div class="observation_story" style="overflow:auto;">
 	<h5>
-		<a
+		<a class="ellipsis"
 			href="${uGroup.createLink([action:"show", controller:"SUser", id:userInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':userGroupWebaddress])}">
 			${userInstance.name} </a>
 	</h5>
 
-	<dl class="dl-horizontal" style="padding-bottom:10px;">
+
+	<div class="span8" style="padding-bottom: 10px;">
 		<g:if test="${userInstance.location}">
-			<dt>
-				<i class="icon-map-marker"></i>
+			<div class="prop">
+				<span class="name"><i class="icon-map-marker"></i>Location</span>
+				<div class="value">
 				${userInstance.location}
-			</dt>
-			<dd></dd>
+				</div>
+			</div>
 		</g:if>
 
 		<g:if test="${userInstance.website}">
-			<dt>
-				<i class="icon-road"></i>
+			<div class="prop">
+				<span class="name"><i class="icon-road"></i>Website</span>
+				<div class="value">
 				<g:if test="${Utils.isURL(userInstance.website) }">
 					<a target="_blank" href="${userInstance.getWebsiteLink()}"> ${fieldValue(bean: userInstance, field: 'website')}
 					</a>
@@ -26,28 +29,26 @@
 				<g:else>
 					${fieldValue(bean: userInstance, field: 'website')}
 				</g:else>
-			</dt>
-			<dd></dd>
+				</div>
+			</div>
 		</g:if>
 
-		<dt>
-			<i class="icon-time"></i>Member since
-		</dt>
-		<dd>
-			<time class="timeago"
+		<div class="prop">
+			<span class="name"><i class="icon-time"></i>Member since </span>
+			<div class="value">
+				<time class="timeago"
 					datetime="${userInstance.dateCreated.getTime()}"></time>
-			
-		</dd>
-
-		<dt>
-			<i class="icon-time"></i>Last visited
-		</dt>
-		<dd>
-			<time class="timeago"
+			</div>
+		</div>
+		<div class="prop">
+			<span class="name"><i class="icon-time"></i>Last visited </span>
+			<div class="value">
+				<time class="timeago"
 					datetime="${userInstance.lastLoginDate.getTime()}"></time>
+			</div>
+		</div>
 
-		</dd>
-	</dl>
+	</div>
 	<div class="story-footer">
 		<span class="footer-item" title="No of Observations"> <i
 			class="icon-screenshot"></i> <obv:showNoOfObservationsOfUser
@@ -59,5 +60,8 @@
 	</div>
 
 </div>
+
+
+
 
 

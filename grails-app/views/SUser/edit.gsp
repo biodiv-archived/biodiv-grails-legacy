@@ -31,25 +31,24 @@
 
 <body>
 	
-			<div class=" user span12">
-				<div class="page-header">
-
-					<h1>
-						${fieldValue(bean: user, field: "name")}
-
-						<span style="font-size: 60%; float: right;"
-							class="btn btn-primary">
-							<a href="${uGroup.createLink(action:'show', controller:"SUser", id:user.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">View my profile
-							</a> </span>
-					</h1>
-
-				</div>
-
-				<g:if test="${flash.message}">
-					<div class="message">
-						${flash.message}
+			<div class="span12">
+				<div class="page-header clearfix">
+					<div style="width: 100%;">
+						<div class="span8 main_heading" style="margin-left: 0px;">
+							<h1>
+								${fieldValue(bean: user, field: "name")}
+							</h1>
+						</div>
+		
+						<div style="float: right; margin: 10px 0;">
+							<a class="btn btn-info pull-right"
+								href="${uGroup.createLink(action:'show', controller:"SUser", id:user.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">View
+								my profile </a>
+						</div>
 					</div>
-				</g:if>
+				</div>
+				<div style="clear: both;"></div>
+
 
 				<g:hasErrors bean="${user}">
 					<i class="icon-warning-sign"></i>

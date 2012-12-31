@@ -21,25 +21,27 @@
 </head>
 <body>
 	<div class="span12">
-		<div class="page-header">
+		<div class="page-header clearfix">
+			<div style="width: 100%;">
+				<div class="span8 main_heading" style="margin-left: 0px;">
+					<h1>
+						${fieldValue(bean: user, field: "name")}
+					</h1>
+				</div>
 
-			<h1>
-				${fieldValue(bean: user, field: "name")}
-				<sUser:ifOwns model="['user':user]">
-					<span style="font-size: 60%; float: right;" class="btn btn-primary">
-						<a
-						href="${uGroup.createLink(action:'edit', controller:'SUser', id:user.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">Edit
-							Profile </a> </span>
-				</sUser:ifOwns>
-			</h1>
+				<div style="float: right; margin: 10px 0;">
+					<sUser:ifOwns model="['user':user]">
 
-		</div>
-
-		<g:if test="${flash.message}">
-			<div class="message">
-				${flash.message}
+						<a class="btn btn-info pull-right"
+							href="${uGroup.createLink(action:'edit', controller:'SUser', id:user.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"><i
+							class="icon-edit"></i>Edit Profile </a>
+					</sUser:ifOwns>
+				</div>
 			</div>
-		</g:if>
+		</div>
+		<div style="clear: both;"></div>
+
+
 		<%--				<obv:identificationByEmail model="['source':'userProfileShow', 'requestObject':request]" />--%>
 		<div class="super-section">
 			<div class="row section" style="">
@@ -138,7 +140,7 @@
 									def facebookUrl = openId?.url %>
 							<g:if test="${facebookUrl}">
 								<div class="facebookButton"
-									style="background-repeat: no-repeat;height: 33px;">
+									style="background-repeat: no-repeat; height: 33px;">
 									<a class="fbJustConnect" target="_blank" href="${facebookUrl}">Facebook
 										Profile</a>
 								</div>
@@ -186,8 +188,7 @@
 			<div class="section" style="clear: both;">
 				<h5>
 					<span class="name" style="color: #b1b1b1;"> <i
-						class="icon-screenshot"></i>
-					</span> Species Groups
+						class="icon-screenshot"></i> </span> Species Groups
 				</h5>
 				<sUser:interestedSpeciesGroups model="['userInstance':user]" />
 			</div>
@@ -195,8 +196,7 @@
 			<div class="section" style="clear: both;">
 				<h5>
 					<span class="name" style="color: #b1b1b1;"> <i
-						class="icon-screenshot"></i>
-					</span> Habitat
+						class="icon-screenshot"></i> </span> Habitat
 				</h5>
 				<sUser:interestedHabitats model="['userInstance':user]" />
 			</div>
@@ -204,9 +204,8 @@
 			<div class="section" style="clear: both;">
 				<h5>
 					<span class="name" style="color: #b1b1b1;"> <i
-						class="icon-screenshot"></i>
-					<obv:showNoOfObservationsOfUser model="['user':user]" /> </span>
-					Observations
+						class="icon-screenshot"></i> <obv:showNoOfObservationsOfUser
+							model="['user':user]" /> </span> Observations
 				</h5>
 				<obv:showRelatedStory
 					model="['controller':'observation', 'action':'getRelatedObservation', 'filterProperty': 'user', 'filterPropertyValue':user.id, 'id':'a', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress]" />
@@ -234,8 +233,8 @@
 			<div class="section" style="clear: both;">
 				<h5>
 					<span class="name" style="color: #b1b1b1;"> <i
-						class="icon-screenshot"></i>
-					<uGroup:showNoOfUserGroupsOfUser model="['user':user]" /> </span> Groups
+						class="icon-screenshot"></i> <uGroup:showNoOfUserGroupsOfUser
+							model="['user':user]" /> </span> Groups
 				</h5>
 				<uGroup:showUserUserGroups model="['userInstance':user]"></uGroup:showUserUserGroups>
 

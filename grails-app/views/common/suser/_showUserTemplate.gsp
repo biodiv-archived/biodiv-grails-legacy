@@ -1,14 +1,14 @@
 <%@page import="species.groups.UserGroup"%>
 <%@page import="species.utils.ImageType"%>
 <%@page import="species.participation.Observation"%>
-<div class="signature clearfix">
-		<div class="figure user-icon" style="float:left;">
+<div class="signature clearfix thumbnail">
+		<div class="figure user-icon pull-left" style="display:table;height:40px;">
 			<a href="${uGroup.createLink( 'controller':'SUser', action:'show', id:userInstance.id, userGroup:userGroup, 'userGroupWebaddress':userGroupWebaddress)}"> <img
 				style="float: left;" src="${userInstance.icon(ImageType.SMALL)}"
 				class="small_profile_pic" title="${userInstance.name}" /></a>
 		</div>
 		<div class="story" style="margin-left:35px">
-			<a href="${uGroup.createLink('controller':'SUser', action:'show', id:userInstance.id,  userGroup:userGroup, 'userGroupWebaddress':userGroupWebaddress)}"> ${userInstance.name} </a>
+			<a class="ellipsis" title="${userInstance.name}" href="${uGroup.createLink('controller':'SUser', action:'show', id:userInstance.id,  userGroup:userGroup, 'userGroupWebaddress':userGroupWebaddress)}"> ${userInstance.name} </a>
 			
 <%--			<g:if test="${userInstance.location}">--%>
 <%--				<div>--%>

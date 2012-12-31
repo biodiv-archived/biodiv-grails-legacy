@@ -265,6 +265,7 @@
 
 		<field name="group" type="long" indexed="true" stored="true"  multiValued="true"/>
 		<field name="group_webaddress" type="string" indexed="true" stored="true" multiValued="true"/>
+		<field name="percent_of_info" type="long" indexed="true" stored="true"  multiValued="false"/>
 		
 		<dynamicField name="*" type="text" indexed="true" stored="true"
 			multiValued="true" />
