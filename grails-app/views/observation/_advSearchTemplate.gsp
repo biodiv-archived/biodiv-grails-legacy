@@ -39,7 +39,7 @@
 		</div>
 
 		<g:hiddenField name="offset" value="0" />
-		<g:hiddenField name="max" value="9" />
+		<g:hiddenField name="max" value="12" />
 		<g:hiddenField name="fl" value="id" />
 
 	</form>
