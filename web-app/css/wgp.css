@@ -127,6 +127,11 @@ a {
 	max-width: 200px;
 }
 
+.thumbnail .observation_story {
+	display: table-cell;
+	vertical-align: middle;
+}
+
 .button-bar {
 	margin-top: 10px;
 	margin-bottom: 10px;
@@ -197,6 +202,8 @@ a {
 	background-color: #ffffff;
 	/* 	border: 1px solid #bee6d3; */
 	/* 	width: 100%; */
+	display: table;
+	height:220px;
 }
 
 .list_view li.thumbnail:hover {
@@ -1581,15 +1588,26 @@ li#userOrEmail-new {
 	cursor: pointer;
 }
 
-/* .signature { */
-/* 	background-color:#FFFFFF */
+.signature {
+	width:170px;
+	background-color:rgba(106, 201, 162, 0.2);
 /* 	background-clip: padding-box; */
-/* 	border-color: rgba(0, 0, 0, 0.2); */
-/* 	border-radius: 5px; */
-/* 	border-style: solid; */
-/* 	border-width: 1px; */
+	border-color: rgba(0, 0, 0, 0.2);
+	border-radius: 5px;
+	border-style: solid;
+	border-width: 1px;
 /* 	box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2); */
-/* } */
+	margin-bottom:3px;
+}
+
+.login-box .signature {
+	background-color:transparent;
+}
+
+.signature:hover {
+	background-color:white;
+}
+
 #reco-options {
 	background-clip: padding-box;
 	background-color: #FFFFFF;
@@ -1694,11 +1712,3 @@ li#userOrEmail-new {
 	float: right;
 	margin-right: 10px;
 }
-
-/* .user_signature { */
-/* 	height: 30px; */
-/* 	padding-left: 5px; */
-/* 	padding-top: 2px; */
-/* 	text-align: left; */
-/* 	max-width: 175px; */
-/* } */

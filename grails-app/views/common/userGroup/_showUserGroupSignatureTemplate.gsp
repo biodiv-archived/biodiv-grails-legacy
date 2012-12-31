@@ -1,13 +1,15 @@
 <%@page import="species.utils.ImageType"%>
 
-<div class="media signature  ${showDetails ? '' : 'span3'}" style="margin-left:0px">
-	<a class="pull-left"
+<div class="media signature thumbnail ${showDetails ? '' : 'span3'}" style="margin-left:0px">
+	<div class="figure pull-left" style="display:table;height:40px;">
+	<a 
 		href="${uGroup.createLink(mapping:'userGroup', controller:'userGroup', action:'show', base:userGroup.domainName, 'userGroup':userGroup, 'pos':pos)}">
 		<img
 		class="media-object   ${showDetails ? 'normal_profile_pic' : 'user-icon small_profile_pic'}"
 		style="vertical-align: middle;"
 		src="${userGroup.mainImage()?.fileName}" title="${userGroup.name}"
 		alt="${userGroup.name}" /> </a>
+		</div>
 	<div class="media-body">
 		<div class="media-heading"  style="text-align:left;">
 			<a
