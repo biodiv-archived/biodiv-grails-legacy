@@ -311,7 +311,7 @@ class UserGroupController {
 		def userGroupInstance = findInstance(params.id, params.webaddress)
 		if (!userGroupInstance) return
 
-		params.max = Math.min(params.max ? params.int('max') : 9, 100)
+		params.max = Math.min(params.max ? params.int('max') : 12, 100)
 		params.offset = params.offset ? params.int('offset') : 0
 
 		def allMembers;
@@ -363,7 +363,7 @@ class UserGroupController {
 		def userGroupInstance = findInstance(params.id, params.webaddress)
 		if (!userGroupInstance) return
 
-		params.max = Math.min(params.max ? params.int('max') : 9, 100)
+		params.max = Math.min(params.max ? params.int('max') : 12, 100)
 		params.offset = params.offset ? params.int('offset') : 0
 
 		def founders = userGroupInstance.getFounders(params.max, params.offset);
