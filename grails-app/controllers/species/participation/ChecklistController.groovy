@@ -116,7 +116,7 @@ class ChecklistController {
 	protected getFilteredChecklist(params){
 		def allGroup = SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.ALL);
 		def speciesGroup = params.sGroup ? SpeciesGroup.get(params.sGroup.toLong()) : allGroup
-		def max = 5//Math.min(params.max ? params.int('max') : 50, 100);
+		def max = Math.min(params.max ? params.int('max') : 50, 100);
 		def offset = params.offset ? params.int('offset') : 0
 		def userGroupInstance = userGroupService.get("" + params.webaddress);
 		
