@@ -564,8 +564,8 @@ environments {
 	    ibp.domain='ibp.saturn.strandls.com'
         wgp.domain='wgp.saturn.strandls.com' 
 		
-		grails.plugins.springsecurity.successHandler.defaultTargetUrl = "/list/../../"
-		grails.plugins.springsecurity.logout.afterLogoutUrl = '/list/../../'
+		grails.plugins.springsecurity.successHandler.defaultTargetUrl = "/"
+		grails.plugins.springsecurity.logout.afterLogoutUrl = '/'
 
                 ckeditor {
                     upload {
@@ -637,8 +637,8 @@ environments {
 	    ibp.domain='indiabiodiversity.saturn.strandls.com'
             wgp.domain='thewesternghats.indiabiodiversity.saturn.strandls.com' 
 		
-		grails.plugins.springsecurity.successHandler.defaultTargetUrl = "/list/../../"
-		grails.plugins.springsecurity.logout.afterLogoutUrl = '/list/../../'
+		grails.plugins.springsecurity.successHandler.defaultTargetUrl = "/"
+		grails.plugins.springsecurity.logout.afterLogoutUrl = '/'
 
                 ckeditor {
                     upload {
@@ -707,8 +707,8 @@ environments {
         ibp.domain='indiabiodiversity.org'
         wgp.domain='thewesternghats.indiabiodiversity.org'   
 		
-		grails.plugins.springsecurity.successHandler.defaultTargetUrl = "/list/../../"
-		grails.plugins.springsecurity.logout.afterLogoutUrl = '/list/../../'
+		grails.plugins.springsecurity.successHandler.defaultTargetUrl = "/"
+		grails.plugins.springsecurity.logout.afterLogoutUrl = '/'
 
                 ckeditor {
                     upload {

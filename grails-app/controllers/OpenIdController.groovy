@@ -53,7 +53,9 @@ class OpenIdController {
 			redirect uri: config.successHandler.defaultTargetUrl
 			return
 		}
-
+		println "-------------------------------------"
+println request.contextPath
+println openIDAuthenticationFilter.filterProcessesUrl
 		[openIdPostUrl: "${request.contextPath}$openIDAuthenticationFilter.filterProcessesUrl",
 					daoPostUrl:"${request.contextPath}${config.apf.filterProcessesUrl}",
 					persistentRememberMe: config.rememberMe.persistent,
