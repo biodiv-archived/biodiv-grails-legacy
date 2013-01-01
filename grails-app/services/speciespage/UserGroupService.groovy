@@ -463,12 +463,6 @@ class UserGroupService {
 	 */
 	@Transactional
 	boolean addMember(UserGroup userGroup, SUser user, Role role, Permission... permissions) {
-		
-		permissions.each { permission ->
-			addPermission userGroup, user, permission
-		}
-		return true
-		/*
 		log.debug "Adding member ${user} with role ${role} to group ${userGroup}"
 		log.debug "Granting permissions ${permissions}"
 		def userMemberRole = UserGroupMemberRole.findBySUserAndUserGroup(user, userGroup);
@@ -500,7 +494,6 @@ class UserGroupService {
 			}
 		}
 		return false;
-		*/
 	}
 
 	void addMember(UserGroup userGroup, SUser user, Role role, List<Permission> permissions) {
