@@ -66,16 +66,15 @@
 	</div>
 </div>
 
-
 <div class="paginateButtons centered">
 	<p:paginate controller="species" action="list" total="${instanceTotal}"
 		userGroup="${userGroup}" userGroupWebaddress="${userGroupWebaddress}"
-		params="['startsWith':params.startsWith]" max="${params.max }"
+		params="${params}" max="${params.max }"
 		offset="${params.offset}" maxsteps="10" />
 </div>
 <div class="paginateButtons centered">
 	<p:paginateOnAlphabet controller="species" action="list"
-		total="${instanceTotal}" userGroup="${userGroup }"
+		total="${instanceTotal}" userGroup="${userGroup }" params="${params}"
 		userGroupWebaddress="${userGroupWebaddress}" />
 
 </div>

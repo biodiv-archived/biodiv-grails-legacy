@@ -61,12 +61,13 @@ class PaginateTagLib {
 		def total = attrs.int('total') ?: 0
 		def action = (attrs.action ? attrs.action : (params.action ? params.action : "list"))
 
-		def linkParams = attrs
+		def linkParams = [:];
+		if(attrs.params) linkParams = attrs.params
 		
-		if (attrs.params) linkParams.putAll(attrs.params)
+	   //if (attrs.params) linkParams.putAll(attrs.params)
 		if (params.sort) linkParams.sort = params.sort
 		if (params.order) linkParams.order = params.order
-
+		linkParams.isGalleryUpdate = false;
 		
 		def linkTagAttrs = linkParams
 		linkTagAttrs['action'] = action;
@@ -97,11 +98,11 @@ class PaginateTagLib {
 			}
 			else {
 				if(i==-1) {
-					linkParams.startsWith = 'A-Z';
+					linkTagAttrs.startsWith = 'A-Z';
 					writer << link([url:uGroup.createLink(linkTagAttrs.clone())]) {'A-Z'}
 				} else {
 					//linkParams.offset = (i - 1) * max
-					linkParams.startsWith = Character.toChars(i+65)[0];
+					linkTagAttrs.startsWith = Character.toChars(i+65)[0];
 					writer << link([url:uGroup.createLink(linkTagAttrs.clone())]) {Character.toChars(i+65)[0]}
 				}
 			}
@@ -284,9 +285,6 @@ class PaginateTagLib {
 	   int currentstep = (offset / max) + 1
 	   int firststep = 1
 	   int laststep = Math.round(Math.ceil(total / max))
-	   println "==="
-	   println linkTagAttrs;
-	   println uGroup.createLink(linkTagAttrs.clone())
 	   
 	   // display previous link when not on firststep
 	   if (currentstep > firststep) {
