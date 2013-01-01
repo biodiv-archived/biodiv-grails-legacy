@@ -56,10 +56,6 @@
 	padding-top: 15px;
 }
 
-.btn-large {
-	font-size: 13px;
-}
-
 .block {
 	border-radius: 5px;
 	background-color: #a6dfc8; 
