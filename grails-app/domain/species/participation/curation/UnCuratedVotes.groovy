@@ -26,9 +26,6 @@ class UnCuratedVotes {
 		refId(nullable:false);
 		sciName(nullable:true);
 		commonName(nullable:true);
-		//obv(nullable:true);
-		refType(nullable:true);
-		refId(nullable:true);
 	}
 
 	static mapping = { version false; }

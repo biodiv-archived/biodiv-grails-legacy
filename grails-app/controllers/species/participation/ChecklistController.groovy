@@ -4,6 +4,11 @@ import grails.converters.JSON
 import species.groups.SpeciesGroup;
 import grails.plugins.springsecurity.Secured;
 
+import species.groups.UserGroup
+import species.auth.SUser
+import org.springframework.security.acls.domain.BasePermission;
+
+
 class ChecklistController {
 	
 	def userGroupService;
@@ -180,6 +185,31 @@ class ChecklistController {
 				}
 			}
 		}[0]
+	}
+	
+	
+	def test = {
+		def wgpGroup = UserGroup.read(2)
+		wgpGroup.addMember(SUser.read(2963))
+		render "======== done "
+		
+	}
+	
+	def addPermissionToWgp = {
+		UserGroup wgpGroup = UserGroup.read(1)
+		def wgpUserDate = new Date(111, 7, 8)
+		
+		SUser.findAllByDateCreatedGreaterThanEquals(wgpUserDate).each{ user ->
+			if(wgpGroup.isMember(user) && !wgpGroup.isFounder(user)){
+				wgpGroup.addMember(user)
+				log.debug "added permission $user"
+			}
+		}
+		/*
+		wgpGroup.addFounder(SUser.read(797));
+		log.debug "added founder"
+		*/
+		render "=== Done"
 	}
 	
 	/*

@@ -19,11 +19,23 @@ def wgpUserDate = new Date(112, 7, 8)
 */
 
 def migrate(){
+	//migrateUserToWGPGroup()
+	//migreateObvToTWGPGroup()
 	migrateCommentAsFeeds()
-	migrateUserToWGPGroup()
-	migreateObvToTWGPGroup()
+	//addFounder()
+	test()
 }
 
+def test(){
+	def wgpGroup = UserGroup.read(2)
+	wgpGroup.addMember(SUser.read(2963))
+}
+
+
+def addFounder(){
+	def wgpGroup = UserGroup.read(1)
+	wgpGroup.addFounder(SUser.read(797))
+}
 
 def migrateCommentAsFeeds(){
 	def feedService = ctx.getBean("activityFeedService");
@@ -31,7 +43,7 @@ def migrateCommentAsFeeds(){
 		def rootHolder = feedService.getDomainObject(c.rootHolderType, c.rootHolderId)
 		def af = feedService.addActivityFeed(rootHolder, c,  c.author, feedService.COMMENT_ADDED)
 		
-		if(!af){
+		if(!af.save(flush:true)){
 			println "=========== error while save "
 		}
 		updateTime(af, c)
@@ -97,9 +109,14 @@ def getAllWgpObvs(){
 def updateTime(af, c){
 	af.dateCreated = c.dateCreated 
 	af.lastUpdated = c.dateCreated
+	
+	
+	println "new date " + af.dateCreated
+	
 	if(!af.save(flush:true)){
 		af.errors.allErrors.each { println  it }
 	}
+	println "after save " +  af.dateCreated
 }
 
 migrate()
