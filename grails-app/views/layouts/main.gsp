@@ -72,7 +72,7 @@
 		<domain:showIBPFooter />
 
 	</div>
-	<div id="feedback_button" onclick="location.href='/feedback_wgp';" style="left: -10px;"></div>
+	<div id="feedback_button" onclick="location.href='/feedback_form';" style="left: -10px;"></div>
 
 
 	<r:layoutResources />

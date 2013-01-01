@@ -225,4 +225,8 @@ class ChecklistController {
 		render "Done ==== " 
 	}
 	*/
+
+	def count = {
+		render Checklist.count();
+	}
 }
