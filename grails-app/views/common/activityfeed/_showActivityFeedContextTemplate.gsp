@@ -1,3 +1,4 @@
+<%@page import="species.participation.Checklist"%>
 <%@page import="species.participation.Observation"%>
 <%@page import="species.participation.Comment"%>
 <%@page import="species.groups.UserGroup"%>
@@ -13,6 +14,10 @@
 		<g:elseif test="${feedInstance.rootHolderType ==  UserGroup.class.getCanonicalName()}" >
 			<uGroup:showUserGroupSignature model="['userGroup':feedParentInstance, 'showDetails':true]"></uGroup:showUserGroupSignature>
 		</g:elseif>
+		<g:elseif test="${feedInstance.rootHolderType ==  Checklist.class.getCanonicalName()}" >
+			<clist:showSnippet model="['checklistInstance':feedParentInstance, userGroup:tmpUserGroup]"></clist:showSnippet>
+		</g:elseif>
+		
 		<g:else>
 			${feedInstance.rootHolderType}
 		</g:else>
