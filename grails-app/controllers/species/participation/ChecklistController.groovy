@@ -99,6 +99,9 @@ class ChecklistController {
 			}
 			
 			def prevId = pos > 0 ? session[listKey][pos-1] : null;
+			lastListParams.remove('isGalleryUpdate');
+			lastListParams.remove("append");
+			lastListParams.remove("loadMore");
 			lastListParams['max'] = noOfChecklist;
 			lastListParams['offset'] = 0;
 			return ['prevObservationId':prevId, 'nextObservationId':nextId, 'lastListParams':lastListParams];
@@ -113,7 +116,7 @@ class ChecklistController {
 	protected getFilteredChecklist(params){
 		def allGroup = SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.ALL);
 		def speciesGroup = params.sGroup ? SpeciesGroup.get(params.sGroup.toLong()) : allGroup
-		def max = Math.min(params.max ? params.int('max') : 50, 100);
+		def max = 5//Math.min(params.max ? params.int('max') : 50, 100);
 		def offset = params.offset ? params.int('offset') : 0
 		def userGroupInstance = userGroupService.get("" + params.webaddress);
 		
@@ -179,6 +182,7 @@ class ChecklistController {
 		}[0]
 	}
 	
+	/*
 	@Secured(['ROLE_ADMIN'])
 	def migrateTable = {
 		checklistService.updateUncuratedVotesTable()
@@ -190,5 +194,5 @@ class ChecklistController {
 		checklistService.migrateChecklist()
 		render "Done ==== " 
 	}
-	
+	*/
 }
