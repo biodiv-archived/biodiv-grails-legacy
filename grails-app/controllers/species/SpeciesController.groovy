@@ -82,7 +82,7 @@ class SpeciesController {
 					countQuery = "select s.percentOfInfo, count(*) as count from Species s group by s.percentOfInfo"
 				} else {
 					query = "select s from Species s where s.title like '<i>${params.startsWith}%' order by s.${params.sort} ${params.order}";
-					countQuery = "select s.percentOfInfo, count(*) as count from Species s where s.title like '<i>${params.startsWith}%'  s group by s.percentOfInfo"
+					countQuery = "select s.percentOfInfo, count(*) as count from Species s where s.title like '<i>${params.startsWith}%'  group by s.percentOfInfo"
 				}
 			} else {
 				if(params.startsWith == "A-Z") {

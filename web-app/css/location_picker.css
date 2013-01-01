@@ -69,11 +69,11 @@ background: #c8e6ed;
 }
 
 
-.thumbnail {
-float:left;
-width: 80px;
-height: 80px;       
-}
+/* .thumbnail { */
+/* float:left; */
+/* width: 80px; */
+/* height: 80px;        */
+/* } */
 
 #result_box {
 clear: both;

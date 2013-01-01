@@ -12,29 +12,36 @@
 <r:require modules="userGroups_show, observations_list" />
 <g:set var="entityName" value="${userGroupInstance.name}" />
 <title><g:message code="default.show.label"
-		args="[userGroupInstance.name]" />
-</title>
+		args="[userGroupInstance.name]" /></title>
 
 </head>
 <body>
 
 	<div class="observation span12">
-		<uGroup:showSubmenuTemplate model="['entityName':'Observations']" />
-		<uGroup:rightSidebar model="['userGroupInstance':userGroupInstance]" />
-		<div class="userGroup-section">
+		
+		<div class="page-header clearfix">
+			<div style="width: 100%;">
+				<div class="span8 main_heading" style="margin-left: 0px;">
+					<h1>Observations</h1>
+				</div>
 
-			<div class="btn-group pull-right" style="z-index: 10;">
-				<sec:permitted className='species.groups.UserGroup'
-					id='${userGroupInstance.id}'
-					permission='${org.springframework.security.acls.domain.BasePermission.WRITE}'>
-					<a href="${uGroup.createLink(mapping:'userGroupModule',
+				<div style="float: right; margin: 10px 0;">
+					<sec:permitted className='species.groups.UserGroup'
+						id='${userGroupInstance.id}'
+						permission='${org.springframework.security.acls.domain.BasePermission.WRITE}'>
+						<a
+							href="${uGroup.createLink(mapping:'userGroupModule',
 						controller:'observation', action:'create', 'userGroupWebaddress':userGroupInstance.webaddress,
 						'userGroupId':userGroupInstance.id)}"
-						class="btn btn-large btn-info">
-						<i class="icon-plus"></i>Add an Observation</a>
-				</sec:permitted>
+							class="btn btn-info"> <i class="icon-plus"></i>Add
+							an Observation</a>
+					</sec:permitted>
+				</div>
 			</div>
-
+		</div>
+		<div style="clear: both;"></div>
+		<uGroup:rightSidebar model="['userGroupInstance':userGroupInstance]" />
+		<div class="userGroup-section">
 			<obv:showObservationsListWrapper
 				model="['totalObservationInstanceList':totalObservationInstanceList, 'observationInstanceList':observationInstanceList, 'instanceTotal':instanceTotal, 'queryParams':queryParams, 'activeFilters':activeFilters, 'userGroup':userGroupInstance]" />
 		</div>
