@@ -4,12 +4,6 @@ import grails.converters.JSON
 import species.groups.SpeciesGroup;
 import grails.plugins.springsecurity.Secured;
 
-
-import species.groups.UserGroup
-import species.auth.SUser
-import org.springframework.security.acls.domain.BasePermission;
-
-
 class ChecklistController {
 	
 	def userGroupService;
@@ -187,63 +181,12 @@ class ChecklistController {
 			}
 		}[0]
 	}
-	
 
-/*
-		
+	@Secured(['ROLE_USER'])
 	def test = {
-		def perm = BasePermission.WRITE
-		UserGroup wgpGroup = UserGroup.read(1)
-		render " sandee " + wgpGroup.hasPermission(SUser.read(1188), perm) + " other " +  wgpGroup.hasPermission(SUser.read(716), perm)
-	}
-	
-	
-	def test1 ={
-		def wgpUserDate = new Date(111, 7, 8)
-		def aa = []
-		SUser.findAllByDateCreatedGreaterThanEquals(wgpUserDate).each{ user ->
-			aa.add(user.id)
-		}
-		render aa
-	}
-
-	
-	def test = {
-		def wgpGroup = UserGroup.read(2)
-		wgpGroup.addMember(SUser.read(2963))
-		render "======== done "
-		
-	}
-	
-	def addPermissionToWgp = {
-		UserGroup wgpGroup = UserGroup.read(1)
-		def wgpUserDate = new Date(111, 7, 8)
-		
-		SUser.findAllByDateCreatedGreaterThanEquals(wgpUserDate).each{ user ->
-			if(wgpGroup.isMember(user) && !wgpGroup.isFounder(user)){
-				wgpGroup.addMember(user)
-				log.debug "added permission $user"
-			}
-		}
-		wgpGroup.addFounder(SUser.read(797));
-		log.debug "added founder"
-		render "=== Done"
-	}
-	
-*/
-	/*
-	@Secured(['ROLE_ADMIN'])
-	def migrateTable = {
-		checklistService.updateUncuratedVotesTable()
-		render "=== Done"
-	}
-	
-	@Secured(['ROLE_ADMIN'])
-	def migrateChecklist = {
-		checklistService.migrateChecklist()
-		render "Done ==== " 
-	}
-	*/
+		userGroupService.migrateUserPermission()
+		render "=== done "
+	}	
 
 	def count = {
 		render Checklist.count();

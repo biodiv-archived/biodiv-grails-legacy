@@ -45,6 +45,8 @@ class UserGroupService {
 	def emailConfirmationService;
 	def sessionFactory
 	def activityFeedService;
+	
+	
 
 	private void addPermission(UserGroup userGroup, SUser user, int permission) {
 		addPermission userGroup, user, aclPermissionFactory.buildFromMask(permission)
@@ -841,6 +843,32 @@ class UserGroupService {
 		}
 		
 		return jsonData;
+	}
+	
+	
+	def migrateUserPermission(){
+		UserGroup wgpGroup = UserGroup.read(1)
+		def wgpUserDate = new Date(111, 7, 8)
+		SUser.findAllByDateCreatedGreaterThanEquals(wgpUserDate, [sort:"id", order:"asc"]).each{ user ->
+			if(!wgpGroup.isFounder(user)){
+				log.debug "user id  $user.id"
+				aclUtilService.deletePermission(wgpGroup, user.email, BasePermission.WRITE);
+				log.debug "deleting permission $user"
+				addPermission(wgpGroup, user, BasePermission.WRITE)
+				log.debug "adding permission $user"
+			}
+		}
+	}
+	
+	def addRemaining(){
+		UserGroup wgpGroup = UserGroup.read(1)
+		def sql =  Sql.newInstance(dataSource);
+		sql.eachRow("select id from suser where date_created >= '2011-08-01 00:00:00' and id not in (select s_user_id from user_group_member_role )") { row ->
+			def user = SUser.read(row.id.toLong())
+			log.debug "user  $user"
+			wgpGroup.addMember(user);
+		}
+			
 	}
  
 }
