@@ -21,13 +21,15 @@ def wgpUserDate = new Date(112, 7, 8)
 
 
 def migrate(){
+	/*
 	def userGroupService = ctx.getBean("userGroupService");
-	userGroupService.addRemaining()
+	userGroupService.migrateUserPermission()
 	println "=== done "
+	*/
 	
 	//migrateUserToWGPGroup()
 	//migreateObvToTWGPGroup()
-	//migrateCommentAsFeeds()
+	migrateCommentAsFeeds()
 	//addFounder()
 	//test()
 }

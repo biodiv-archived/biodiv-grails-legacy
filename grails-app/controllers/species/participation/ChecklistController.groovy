@@ -188,6 +188,12 @@ class ChecklistController {
 		render "=== done "
 	}	
 
+	@Secured(['ROLE_USER'])
+	def addSpecialFounder = {
+		userGroupService.addSpecialFounder()
+		render "=== done "
+	}
+	
 	def count = {
 		render Checklist.count();
 	}

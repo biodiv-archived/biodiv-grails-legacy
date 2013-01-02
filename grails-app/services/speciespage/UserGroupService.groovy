@@ -849,15 +849,23 @@ class UserGroupService {
 	def migrateUserPermission(){
 		UserGroup wgpGroup = UserGroup.read(1)
 		def wgpUserDate = new Date(111, 7, 8)
-		SUser.findAllByDateCreatedGreaterThanEquals(wgpUserDate, [sort:"id", order:"asc"]).each{ user ->
+		
+		SUser.findAllByDateCreatedGreaterThanEqualsAndIdGreaterThan(wgpUserDate, 1129, [sort:"id", order:"desc"]).each{ user ->
 			if(!wgpGroup.isFounder(user)){
 				log.debug "user id  $user.id"
 				//aclUtilService.deletePermission(wgpGroup, user.email, BasePermission.WRITE);
 				//log.debug "deleting permission $user"
+				
 				addPermission(wgpGroup, user, BasePermission.WRITE)
 				log.debug "adding permission $user"
 			}
 		}
+	}
+	
+	def addSpecialFounder(){
+		UserGroup wgpGroup = UserGroup.read(1)
+		wgpGroup.addFounder(SUser.read(797))
+		log.debug "founder added "
 	}
 	
 	def addRemaining(){
