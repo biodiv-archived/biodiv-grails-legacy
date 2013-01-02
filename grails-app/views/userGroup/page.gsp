@@ -30,15 +30,15 @@
 
 							<a
 								href="${uGroup.createLink(mapping:"userGroup", action:"pageCreate", 'userGroup':userGroupInstance)}"
-								class="btn btn-large btn-info"> <i class="icon-plus"></i>Add
+								class="btn btn-info"> <i class="icon-plus"></i>Add
 								a Page</a>
 						</sec:permitted>
 					</g:if>
 					<g:else>
 						<sUser:isAdmin>
 							<g:link
-								url="${uGroup.createLink(mapping:"userGroupGeneric", action:"pageCreate")}"
-								class="btn btn-large btn-info">
+								url="${uGroup.createLink(mapping:'userGroupGeneric', controller:'userGroup', action:'pageCreate')}"
+								class="btn  btn-info">
 								<i class="icon-plus"></i>Add a Page</g:link>
 						</sUser:isAdmin>
 					</g:else>
@@ -54,12 +54,12 @@
 				<g:if test="${userGroupInstance}">
 					<g:link
 						url="${uGroup.createLink(mapping:'userGroup', controller:'userGroup', action:'pages', 'userGroup':userGroupInstance)}"
-						class="btn btn-large btn-info">< Back to Pages</g:link>
+						class="btn btn-info">< Back to Pages</g:link>
 				</g:if>
 				<g:else>
 					<g:link
 						url="${uGroup.createLink(mapping:'userGroupGeneric', action:'pages')}"
-						class="btn btn-large btn-info">< Back to Pages</g:link>
+						class="btn btn-info">< Back to Pages</g:link>
 				</g:else>
 
 

@@ -3,6 +3,7 @@ package utils
 import org.apache.solr.common.SolrException;
 import org.apache.solr.common.util.NamedList;
 import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
+import org.springframework.security.acls.domain.BasePermission;
 
 import species.groups.UserGroup;
 import species.utils.Utils;
@@ -15,7 +16,10 @@ class NewsletterController {
 	def userGroupService
 	def newsletterSearchService;
 	def newsletterService
-
+	def aclUtilService
+	def springSecurityService
+	def SUserService
+	
 	public static final boolean COMMIT = true;
 
 	def index = {
@@ -30,9 +34,32 @@ class NewsletterController {
 	@Secured(['ROLE_USER'])
 	def create = {
 		log.debug params
-		def newsletterInstance = new Newsletter()
-		newsletterInstance.properties = params
-		return [newsletterInstance: newsletterInstance]
+		boolean permitted = false;
+		if(params.webaddress) { 
+			def userGroupInstance = UserGroup.findByWebaddress(params.webaddress);
+			params.userGroup = userGroupInstance;
+			if(aclUtilService.hasPermission(springSecurityService.getAuthentication(), userGroupInstance, BasePermission.ADMINISTRATION)) {
+				permitted = true
+			} else {
+				flash.message = "${message(code: 'default.not.permitted.message', args: ['add new', message(code: 'page.label', default: 'page'), ''])}"
+				redirect  url: uGroup.createLink(mapping:'userGroup', action: "pages", userGroup:userGroupInstance)
+				return;			
+			}
+		} else {
+			if(SUserService.isAdmin(springSecurityService.currentUser)) {
+				permitted = true;
+			} else {
+				redirect  url: uGroup.createLink(mapping:'userGroupGeneric', action: "pages")
+				return;
+			}
+		}
+		
+		if(permitted) {
+			def newsletterInstance = new Newsletter()
+			newsletterInstance.properties = params
+			return [newsletterInstance: newsletterInstance]
+		}
+		
 	}
 
 	@Secured(['ROLE_USER'])
@@ -43,29 +70,39 @@ class NewsletterController {
 		if(params.userGroup) {
 			def userGroupInstance = UserGroup.findByWebaddress(params.userGroup);
 			params.userGroup = userGroupInstance;
-			newsletterInstance = new Newsletter(params)
-			userGroupInstance.addToNewsletters(newsletterInstance);
-
-			newsletterInstance.title = newsletterInstance.title.capitalize()
-			if (newsletterInstance.save() && userGroupInstance.save(flush: true)) {
-				postProcessNewsletter(newsletterInstance);
-				flash.message = "${message(code: 'default.created.message', args: [message(code: 'newsletter.label', default: 'Newsletter'), newsletterInstance.title])}"
-				//redirect url: uGroup.createLink(mapping:'userGroupPageShow', params:['webaddress':newsletterInstance.userGroup.webaddress, 'newsletterId':newsletterInstance.id])
-				redirect url:uGroup.createLink(controller:"userGroup", action: "page", 'userGroup':userGroupInstance, params:['newsletterId':newsletterInstance.id])
-			}
-			else {
-				render(view: "create", model: ['userGroup':userGroupInstance, newsletterInstance: newsletterInstance])
+			if(aclUtilService.hasPermission(springSecurityService.getAuthentication(), userGroupInstance, BasePermission.ADMINISTRATION)) {
+				newsletterInstance = new Newsletter(params)
+				userGroupInstance.addToNewsletters(newsletterInstance);
+	
+				newsletterInstance.title = newsletterInstance.title.capitalize()
+				if (newsletterInstance.save() && userGroupInstance.save(flush: true)) {
+					postProcessNewsletter(newsletterInstance);
+					flash.message = "${message(code: 'default.created.message', args: [message(code: 'newsletter.label', default: 'Newsletter'), newsletterInstance.title])}"
+					//redirect url: uGroup.createLink(mapping:'userGroupPageShow', params:['webaddress':newsletterInstance.userGroup.webaddress, 'newsletterId':newsletterInstance.id])
+					redirect url:uGroup.createLink(controller:"userGroup", action: "page", 'userGroup':userGroupInstance, params:['newsletterId':newsletterInstance.id])
+				}
+				else {
+					render(view: "create", model: ['userGroup':userGroupInstance, newsletterInstance: newsletterInstance])
+				}
+			} else {
+				flash.message = "${message(code: 'default.not.permitted.message', args: ['add new', message(code: 'page.label', default: 'page'), ''])}"
+				redirect  url: uGroup.createLink(mapping:'userGroup', action: "pages", userGroup:userGroupInstance)
 			}
 		} else {
-			newsletterInstance = new Newsletter(params)
-			if (newsletterInstance.save(flush: true)) {
-				postProcessNewsletter(newsletterInstance);
-				flash.message = "${message(code: 'default.created.message', args: [message(code: 'newsletter.label', default: 'Newsletter'), newsletterInstance.id])}"
-				redirect(controller:"userGroup", action: "page", params:['newsletterId':newsletterInstance.id])
-			}
-
-			else {
-				render(view: "create", model: [newsletterInstance: newsletterInstance])
+			if(SUserService.isAdmin(springSecurityService.currentUser)) {
+				newsletterInstance = new Newsletter(params)
+				if (newsletterInstance.save(flush: true)) {
+					postProcessNewsletter(newsletterInstance);
+					flash.message = "${message(code: 'default.created.message', args: [message(code: 'newsletter.label', default: 'Newsletter'), newsletterInstance.id])}"
+					redirect(controller:"userGroup", action: "page", params:['newsletterId':newsletterInstance.id])
+				}
+	
+				else {
+					render(view: "create", model: [newsletterInstance: newsletterInstance])
+				}
+			} else {
+				flash.message = "${message(code: 'default.not.permitted.message', args: ['add new', message(code: 'page.label', default: 'page'), ''])}"
+				redirect  url: uGroup.createLink(mapping:'userGroupGeneric', action: "pages")
 			}
 		}
 	}
@@ -96,12 +133,20 @@ class NewsletterController {
 		}
 		else {
 			if(newsletterInstance.userGroup) {
-				[userGroupInstance:newsletterInstance.userGroup, newsletterInstance: newsletterInstance]
+				if(aclUtilService.hasPermission(springSecurityService.getAuthentication(), newsletterInstance.userGroup, BasePermission.ADMINISTRATION)) {
+					[userGroupInstance:newsletterInstance.userGroup, newsletterInstance: newsletterInstance]
+				} else {
+					flash.message = "${message(code: 'edit.denied.message')}"
+					redirect url:uGroup.createLink(controller:"userGroup", action: "page", 'userGroup':userGroupInstance, params:['newsletterId':newsletterInstance.id])
+				}
 			}
-			else {
+			else if(SUserService.isAdmin(springSecurityService.currentUser)) {
 				[newsletterInstance: newsletterInstance]
+			} else {
+				flash.message = "${message(code: 'edit.denied.message')}"
+				redirect(controller:"userGroup", action: "page", params:['newsletterId':newsletterInstance.id])
 			}
-		}
+		} 
 	}
 
 	@Secured(['ROLE_USER'])
@@ -126,23 +171,32 @@ class NewsletterController {
 			newsletterInstance.properties = validMap
 			if(params.userGroup) {
 				def userGroupInstance = UserGroup.findByWebaddress(params.userGroup);
-				userGroupInstance.addToNewsletters(newsletterInstance);
-				if (userGroupInstance.save(flush: true) && !newsletterInstance.hasErrors() && newsletterInstance.save(flush: true)) {
-					postProcessNewsletter(newsletterInstance);
-					flash.message = "${message(code: 'default.updated.message', args: [message(code: 'newsletter.label', default: 'Newsletter'), newsletterInstance.id])}"
-					redirect url: uGroup.createLink(mapping:'userGroupPageShow', userGroupWebaddress:newsletterInstance.userGroup.webaddress, params:['newsletterId':newsletterInstance.id, userGroupInstance:userGroupInstance])
+				if(aclUtilService.hasPermission(springSecurityService.getAuthentication(), userGroupInstance, BasePermission.ADMINISTRATION)) {
+					userGroupInstance.addToNewsletters(newsletterInstance);
+					if (userGroupInstance.save(flush: true) && !newsletterInstance.hasErrors() && newsletterInstance.save(flush: true)) {
+						postProcessNewsletter(newsletterInstance);
+						flash.message = "${message(code: 'default.updated.message', args: [message(code: 'newsletter.label', default: 'Newsletter'), newsletterInstance.id])}"
+						redirect url:uGroup.createLink(controller:"userGroup", action: "page", 'userGroup':userGroupInstance, params:['newsletterId':newsletterInstance.id])
+					} else {
+						flash.message = "${message(code: 'update.denied.message')}"
+						redirect url:uGroup.createLink(controller:"userGroup", action: "page", 'userGroup':userGroupInstance, params:['newsletterId':newsletterInstance.id])
+					}
 				}else {
 					render(view: "edit", model: [userGroupInstance:userGroupInstance, newsletterInstance: newsletterInstance])
 				}
 			} else {
-				if (!newsletterInstance.hasErrors() && newsletterInstance.save(flush: true)) {
-					postProcessNewsletter(newsletterInstance);
-					flash.message = "${message(code: 'default.updated.message', args: [message(code: 'newsletter.label', default: 'Newsletter'), newsletterInstance.id])}"
-
-					redirect  url: uGroup.createLink(mapping:'userGroupGeneric', action: "page", id: newsletterInstance.id)
-				}
-				else {
-					render(view: "edit", model: [newsletterInstance: newsletterInstance])
+				if(SUserService.isAdmin(springSecurityService.currentUser)) {
+					if (!newsletterInstance.hasErrors() && newsletterInstance.save(flush: true)) {
+						postProcessNewsletter(newsletterInstance);
+						flash.message = "${message(code: 'default.updated.message', args: [message(code: 'newsletter.label', default: 'Newsletter'), newsletterInstance.id])}"
+						redirect  url: uGroup.createLink(mapping:'userGroupGeneric', action: "page", id: newsletterInstance.id)
+					}
+					else {
+						render(view: "edit", model: [newsletterInstance: newsletterInstance])
+					}
+				} else {
+					flash.message = "${message(code: 'update.denied.message')}"
+					redirect(controller:"userGroup", action: "page", params:['newsletterId':newsletterInstance.id])
 				}
 			}
 		}
@@ -156,29 +210,48 @@ class NewsletterController {
 	def delete = {
 		def newsletterInstance = Newsletter.get(params.id)
 		if (newsletterInstance) {
-			try {
-				newsletterInstance.delete(flush: true)
-				newsletterSearchService.delete(newsletterInstance.id);
-				flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'newsletter.label', default: 'Newsletter'), params.id])}"
-				if(newsletterInstance.userGroup) {
-					redirect  url: uGroup.createLink(mapping:'userGroup', action: "pages", userGroupWebaddress:newsletterInstance.userGroup.webaddress)
-					return;
+			boolean permitted = false;
+			if(newsletterInstance.userGroup) {
+				if(aclUtilService.hasPermission(springSecurityService.getAuthentication(), newsletterInstance.userGroup, BasePermission.ADMINISTRATION)) {
+					permitted = true;
+				} else {
+					flash.message = "${message(code: 'default.not.permitted.message', args: ['delete', message(code: 'page.label', default: 'page'), ''])}"
+					redirect url:uGroup.createLink(controller:"group", action: "page", 'userGroup':newsletterInstance.userGroup, params:['newsletterId':newsletterInstance.id])
 				}
-				redirect  url: uGroup.createLink(mapping:'userGroupGeneric', action: "pages")
 			}
-			catch (org.springframework.dao.DataIntegrityViolationException e) {
-				flash.message = "${message(code: 'default.not.deleted.message', args: [message(code: 'newsletter.label', default: 'Newsletter'), params.id])}"
-				if(params.userGroup) {
-					redirect url: uGroup.createLink(mapping:'userGroupPageShow', userGroupWebaddress: params.userGroup, params:['newsletterId':params.id])
-					return;
+			else {
+				if(SUserService.isAdmin(springSecurityService.currentUser)) {
+					permitted = true;	
+				} else {
+					flash.message = "${message(code: 'default.not.permitted.message', args: ['delete', message(code: 'page.label', default: 'page'), ''])}"
+					redirect  url: uGroup.createLink(mapping:'userGroupGeneric', action: "page", id: newsletterInstance.id)
+				}			
+			}
+			if(permitted) {
+				try {
+					newsletterInstance.delete(flush: true)
+					newsletterSearchService.delete(newsletterInstance.id);
+					flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'newsletter.label', default: 'Newsletter'), params.id])}"
+					if(newsletterInstance.userGroup) {
+						redirect  url: uGroup.createLink(mapping:'userGroup', action: "pages", userGroupWebaddress:newsletterInstance.userGroup.webaddress)
+						return;
+					}
+					redirect  url: uGroup.createLink(mapping:'userGroupGeneric', action: "pages")
 				}
-				redirect  url: uGroup.createLink(mapping:'userGroupGeneric', action: "page", id: params.id)
+				catch (org.springframework.dao.DataIntegrityViolationException e) {
+					flash.message = "${message(code: 'default.not.deleted.message', args: [message(code: 'newsletter.label', default: 'Newsletter'), params.id])}"
+					if(params.userGroup) {
+						redirect url: uGroup.createLink(mapping:'userGroupPageShow', userGroupWebaddress: params.userGroup, params:['newsletterId':params.id])
+						return;
+					}
+					redirect  url: uGroup.createLink(mapping:'userGroupGeneric', action: "page", id: params.id)
+				}
 			}
 		}
 		else {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'newsletter.label', default: 'Newsletter'), params.id])}"
 			if(params.userGroup) {
-				redirect url: uGroup.createLink(mapping:'userGroupPageShow', userGroupWebaddress:params.userGroup,  params:['newsletterId':params.id])
+				redirect  url: uGroup.createLink(mapping:'userGroup', action: "pages", userGroupWebaddress:newsletterInstance.userGroup.webaddress)
 				return;
 			}
 			redirect  url: uGroup.createLink(mapping:'userGroupGeneric', action: "pages")

@@ -307,6 +307,7 @@ class UserGroupController {
 	}
 
 	def user = {
+		println "user"
 		log.debug params
 		def userGroupInstance = findInstance(params.id, params.webaddress)
 		if (!userGroupInstance) return
