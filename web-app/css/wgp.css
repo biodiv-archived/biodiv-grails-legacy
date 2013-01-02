@@ -774,9 +774,9 @@ ul#recoSummary {
 	cursor: pointer;
 }
 
-.licence_div img {
-	height: 15px;
-}
+/* .licence_div img { */
+/* 	height: 15px; */
+/* } */
 
 .observation_links {
 	margin-top: 5px;

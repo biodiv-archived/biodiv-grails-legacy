@@ -159,33 +159,32 @@ input.dms_field {
 											</div>
 
 											<div class='metadata prop'
-												style="position: relative; left: 5px; top: -40px;">
+												style="position: relative; left: 5px; top: -30px;">
 												<input name="file_${i}" type="hidden" value='${r.fileName}' />
-												<div id="license_div_${i}" class="licence_div dropdown"
-													style="z-index: 2; cursor: pointer;">
+												<div id="license_div_${i}" class="licence_div dropdown">
 
-													<div id="selected_license_${i}"
-														onclick="$(this).next().show();"
+													<a id="selected_license_${i}"
 														class="btn dropdown-toggle btn-mini"
 														data-toggle="dropdown">
-														<div>
+														
 															<img
 																src="${resource(dir:'images/license',file:r?.licenses?.asList().first()?.name?.getIconFilename()+'.png', absolute:true)}"
 																title="Set a license for this image" />
-														</div>
-														<span class="caret"></span>
-													</div>
-													<div id="license_options_${i}" class="license_options">
-														<ul class="dropdown-menu">
+														
+														 <b class="caret"></b>
+													</a>
+													
+														<ul id="license_options_${i}" class="dropdown-menu license_options">
+															<span>Choose a license</span>
 															<g:each in="${species.License.list()}" var="l">
 																<li class="license_option"
-																	onclick="$('#license_${i}').val($.trim($(this).text()));$('#selected_license_${i}').children('div').html($(this).html());$('#license_options_${i}').hide();">
+																	onclick="$('#license_${i}').val($.trim($(this).text()));$('#selected_license_${i}').find('img:first').replaceWith($(this).html());">
 																	<img
 																	src="${resource(dir:'images/license',file:l?.name?.getIconFilename()+'.png', absolute:true)}" /><span style="display:none;">${l?.name?.value}</span> 
 																</li>
 															</g:each>
 														</ul>
-													</div>
+													
 												</div>
 											</div> <input id="license_${i}" type="hidden" name="license_${i}"></input>
 											<div class="close_button"
@@ -593,30 +592,27 @@ input.dms_field {
                 </span>
 	    </div>
 				
-	    <div class='metadata prop' style="position:relative; left: 5px; top:-40px;">
-	        <input name="file_{{=i}}" type="hidden" value='{{=file}}'/>
-                <div id="license_div_{{=i}}" class="licence_div btn-group">
-                    <div id="selected_license_{{=i}}" onclick="$(this).next().show();" class="btn dropdown-toggle btn-mini" data-toggle="dropdown">
-                        <div>
-                            <img src="${resource(dir:'images/license',file:'cc_by.png', absolute:true)}" title="Set a license for this image"/>
-                        </div>
-                        <span class="caret"></span>
-                    </div>
-                        <ul id="license_options_{{=i}}" class="dropdown-menu license_options">
-                            <span>Choose a license</span>
-                            <g:each in="${species.License.list()}" var="l">
-                                <li class="license_option" onclick="$('#license_{{=i}}').val($.trim($(this).text()));$('#selected_license_{{=i}}').children('div').html($(this).html());$('#license_options_{{=i}}').hide();">
-                                    <img src="${resource(dir:'images/license',file:l?.name.getIconFilename()+'.png', absolute:true)}"/><span style="display:none;">${l?.name?.value}</span>
-                                    
-                                </li>
-                            </g:each>
-                        </ul>
-                </div>
-            </div>	
-	    	<input id="license_{{=i}}" type="hidden" name="license_{{=i}}"></input>
-            
-        	<!--a href="#" onclick="removeResource(event);$('#geotagged_images').trigger('update_map');">Remove</a-->
-        	<div class="close_button" onclick="removeResource(event, {{=i}});$('#geotagged_images').trigger('update_map');"></div>
+	    <div class='metadata prop' style="position:relative; left: 5px; top:-30px;">
+	            <input name="file_{{=i}}" type="hidden" value='{{=file}}'/>
+                <div id="license_div_{{=i}}" class="licence_div dropdown">
+                    <a id="selected_license_{{=i}}" class="btn dropdown-toggle btn-mini" data-toggle="dropdown">
+                        <img src="${resource(dir:'images/license',file:'cc_by.png', absolute:true)}" title="Set a license for this image"/>
+                        <b class="caret"></b>
+                    </a>
+                    <ul id="license_options_{{=i}}" class="dropdown-menu license_options">
+                         <span>Choose a license</span>
+                         <g:each in="${species.License.list()}" var="l">
+                             <li class="license_option" onclick="$('#license_{{=i}}').val($.trim($(this).text()));$('#selected_license_{{=i}}').find('img:first').replaceWith($(this).html());">
+                                 <img src="${resource(dir:'images/license',file:l?.name.getIconFilename()+'.png', absolute:true)}"/><span style="display:none;">${l?.name?.value}</span>
+                             </li>
+                         </g:each>
+                     </ul>
+           		</div>	
+	    	    <input id="license_{{=i}}" type="hidden" name="license_{{=i}}"></input>
+          
+        	    <!--a href="#" onclick="removeResource(event);$('#geotagged_images').trigger('update_map');">Remove</a-->
+		</div>
+       	<div class="close_button" onclick="removeResource(event, {{=i}});$('#geotagged_images').trigger('update_map');"></div>
 	</li>
 	
 </script>

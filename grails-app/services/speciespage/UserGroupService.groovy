@@ -9,7 +9,6 @@ import groovy.sql.Sql;
 
 import org.apache.solr.common.SolrException;
 import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
-
 import org.codehaus.groovy.grails.plugins.springsecurity.acl.AclEntry
 import org.codehaus.groovy.grails.plugins.springsecurity.acl.AclSid
 import org.springframework.security.access.prepost.PostFilter
@@ -21,6 +20,15 @@ import org.springframework.security.acls.model.ObjectIdentity
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.acls.model.Sid
 import org.springframework.security.core.Authentication
+import org.codehaus.groovy.grails.plugins.springsecurity.acl.AclSid;
+import org.springframework.security.access.prepost.PostFilter
+import org.springframework.security.access.prepost.PreAuthorize
+import org.springframework.security.acls.domain.BasePermission;
+import org.springframework.security.acls.model.MutableAcl;
+import org.springframework.security.acls.model.NotFoundException;
+import org.springframework.security.acls.model.ObjectIdentity;
+import org.springframework.security.acls.model.Permission;
+import org.springframework.security.acls.model.Sid;
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.util.Assert
 import org.codehaus.groovy.grails.plugins.springsecurity.acl.AclObjectIdentity

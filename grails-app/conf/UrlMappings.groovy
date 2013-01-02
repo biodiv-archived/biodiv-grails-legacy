@@ -30,6 +30,7 @@ class UrlMappings {
 		
 		"500"(view:'/error')
 		"403"(view:'/error')
+		"404"(view:'/notfound')
 /*		"403"(controller: "errors", action: "error403")
 		"500"(controller: "errors", action: "error500")
 		"500"(controller: "errors", action: "error403", exception: AccessDeniedException)
