@@ -690,8 +690,8 @@ environments {
 			}
 			wgp {
 				facebook {
-					appId= "320284831369968"
-					secret= "900d0811194fe28503006b31792690ae"
+					appId= "327308053982589"
+					secret= "f36074901fc24b904794692755796fd1"
 				}
 				supportEmail = "team(at)thewesternghats(dot)in"
 			}
