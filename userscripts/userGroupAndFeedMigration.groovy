@@ -29,20 +29,16 @@ def migrate(){
 	
 	//migrateUserToWGPGroup()
 	//migreateObvToTWGPGroup()
-	migrateCommentAsFeeds()
-	//addFounder()
-	//test()
-}
-
-def test(){
-	def wgpGroup = UserGroup.read(2)
-	wgpGroup.addMember(SUser.read(2963))
+	//migrateCommentAsFeeds()
+	migratePermission()
 }
 
 
-def addFounder(){
-	def wgpGroup = UserGroup.read(1)
-	wgpGroup.addFounder(SUser.read(797))
+def migratePermission(){
+	
+	def userGroupService = ctx.getBean("userGroupService");
+	userGroupService.migrateUserPermission()
+	
 }
 
 def migrateCommentAsFeeds(){

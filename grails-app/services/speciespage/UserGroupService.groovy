@@ -9,11 +9,21 @@ import groovy.sql.Sql;
 
 import org.apache.solr.common.SolrException;
 import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
+
+import org.codehaus.groovy.grails.plugins.springsecurity.acl.AclEntry
+import org.codehaus.groovy.grails.plugins.springsecurity.acl.AclSid
 import org.springframework.security.access.prepost.PostFilter
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.acls.domain.BasePermission;
+import org.springframework.security.acls.domain.GrantedAuthoritySid
+import org.springframework.security.acls.domain.PrincipalSid
+import org.springframework.security.acls.model.ObjectIdentity
 import org.springframework.security.acls.model.Permission;
+import org.springframework.security.acls.model.Sid
+import org.springframework.security.core.Authentication
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.util.Assert
+import org.codehaus.groovy.grails.plugins.springsecurity.acl.AclObjectIdentity
 
 import species.Habitat;
 import species.Resource;
@@ -45,8 +55,8 @@ class UserGroupService {
 	def emailConfirmationService;
 	def sessionFactory
 	def activityFeedService;
-	
-	
+
+
 
 	private void addPermission(UserGroup userGroup, SUser user, int permission) {
 		addPermission userGroup, user, aclPermissionFactory.buildFromMask(permission)
@@ -453,7 +463,7 @@ class UserGroupService {
 		return result;
 	}
 
-	
+
 	////////////////////MEMBERS RELATED/////////////////////////
 	/**
 	 *
@@ -716,18 +726,23 @@ class UserGroupService {
 		}
 
 	}
-	
+
 	def getGroupThemes(){
-		return ["default", "blue", "green", "black"]
+		return [
+			"default",
+			"blue",
+			"green",
+			"black"
+		]
 	}
-	
+
 	def userGroupBasedLink(attrs) {
 		def g = new org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib()
-		
-//		println '-------------'
-//		println attrs
+
+		//		println '-------------'
+		//		println attrs
 		String url = "";
-		
+
 		if(attrs.userGroup) {
 			attrs.webaddress = attrs.userGroup.webaddress
 			String base = attrs.remove('base')
@@ -744,23 +759,23 @@ class UserGroupService {
 			if(base) {
 				url = g.createLink(mapping:mappingName, 'controller':controller, 'action':action, 'base':base, absolute:absolute, params:attrs);
 				String onlyGroupUrl = g.createLink(mapping:'onlyUserGroup', params:['webaddress':attrs.webaddress]).replace("/"+grailsApplication.metadata['app.name'],'')
-//				println url
-//				println onlyGroupUrl
+				//				println url
+				//				println onlyGroupUrl
 				url = url.replace(onlyGroupUrl, "");
 			} else {
-				
+
 				if((userGroup?.domainName)) { // && (userGroup.domainName == "http://"+Utils.getDomain(request))) {
 					url = g.createLink(mapping:mappingName, 'controller':controller, base:userGroup.domainName, 'action':action, absolute:absolute, params:attrs);
 					String onlyGroupUrl = g.createLink(mapping:'onlyUserGroup', params:['webaddress':attrs.webaddress]).replace("/"+grailsApplication.metadata['app.name'],'')
-//					println url
-//					println onlyGroupUrl
+					//					println url
+					//					println onlyGroupUrl
 					url = url.replace(onlyGroupUrl, "");
 				} else {
 					url = g.createLink(mapping:mappingName, 'controller':controller, base:Utils.getIBPServerDomain(), 'action':action, absolute:absolute, params:attrs);
 					//url = url.replace("/"+grailsApplication.metadata['app.name'],'')
 				}
 			}
-			
+
 		} else if(attrs.userGroupWebaddress) {
 			attrs.webaddress = attrs.userGroupWebaddress
 			String base = attrs.remove('base')
@@ -779,23 +794,23 @@ class UserGroupService {
 			if(base) {
 				url = g.createLink(mapping:mappingName, 'controller':controller, 'action':action, 'base':base, absolute:absolute, params:attrs)
 				String onlyGroupUrl = g.createLink(mapping:'onlyUserGroup', params:['webaddress':attrs.webaddress]).replace("/"+grailsApplication.metadata['app.name'],'')
-//				println url
-//				println onlyGroupUrl
+				//				println url
+				//				println onlyGroupUrl
 				url = url.replace(onlyGroupUrl, "");
 			} else {
-				
+
 				if((userGroup?.domainName)) { // && (userGroup.domainName == "http://"+Utils.getDomain(request))) {
 					url = g.createLink(mapping:mappingName, 'controller':controller, base:userGroup.domainName, 'action':action, absolute:absolute, params:attrs)
 					String onlyGroupUrl = g.createLink(mapping:'onlyUserGroup', params:['webaddress':attrs.webaddress]).replace("/"+grailsApplication.metadata['app.name'],'')
-//					println url
-//					println onlyGroupUrl
+					//					println url
+					//					println onlyGroupUrl
 					url = url.replace(onlyGroupUrl, "");
 				} else {
 					url = g.createLink(mapping:mappingName, 'controller':controller, base:Utils.getIBPServerDomain(), 'action':action, absolute:absolute, params:attrs)
 					//url = url.replace("/"+grailsApplication.metadata['app.name'],'')
 				}
 			}
-			
+
 		} else {
 			String base = attrs.remove('base')
 			String controller = attrs.remove('controller')
@@ -817,19 +832,19 @@ class UserGroupService {
 		//println url;
 		return url;
 	}
-	
+
 	def nameTerms(params) {
 		return getUserGroupSuggestions(params);
 	}
-	
+
 	private getUserGroupSuggestions(params){
 		def jsonData = []
 		String name = params.term
-		
+
 		String usernameFieldName = 'name';//SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
 		String userId = 'id';
- 
- 
+
+
 		def results = UserGroup.executeQuery(
 				"SELECT DISTINCT u.$usernameFieldName, u.$userId " +
 				"FROM UserGroup u " +
@@ -837,37 +852,48 @@ class UserGroupService {
 				"ORDER BY u.$usernameFieldName",
 				[name: "${name.toLowerCase()}%"],
 				[max: params.max])
- 
+
 		for (result in results) {
 			jsonData << [value: result[0], label:result[0] , userId:result[1] , "category":"Groups"]
 		}
-		
+
 		return jsonData;
 	}
 	
+	//////////////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////// User migration to wgp ///////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	def migrateUserPermission(){
 		UserGroup wgpGroup = UserGroup.read(1)
 		def wgpUserDate = new Date(111, 7, 8)
-		
-		SUser.findAllByDateCreatedGreaterThanEqualsAndIdGreaterThan(wgpUserDate, 1129, [sort:"id", order:"desc"]).each{ user ->
-			if(!wgpGroup.isFounder(user)){
-				log.debug "user id  $user.id"
-				//aclUtilService.deletePermission(wgpGroup, user.email, BasePermission.WRITE);
-				//log.debug "deleting permission $user"
-				
-				addPermission(wgpGroup, user, BasePermission.WRITE)
-				log.debug "adding permission $user"
+
+		int i = 0
+		SUser.withTransaction {
+
+			SUser.findAllByDateCreatedGreaterThanEquals(wgpUserDate, [sort:"id", order:"desc"]).each{ user ->
+
+				if(!wgpGroup.isFounder(user)){
+					log.debug "user id  $user.id"
+					log.debug "adding permission $user"
+					addPermissionTest(user.email, 2, i++ )
+				}else{
+					log.debug "adding foudner permission"
+					addPermissionTest(user.email, 16, i++)
+				}
+
 			}
+			//adding fouder permission to ramesh br
+			addPermissionTest(SUser.read(797).email, 16, i++)
 		}
 	}
-	
+
 	def addSpecialFounder(){
 		UserGroup wgpGroup = UserGroup.read(1)
 		wgpGroup.addFounder(SUser.read(797))
 		log.debug "founder added "
 	}
-	
+
 	def addRemaining(){
 		UserGroup wgpGroup = UserGroup.read(1)
 		def sql =  Sql.newInstance(dataSource);
@@ -876,7 +902,90 @@ class UserGroupService {
 			log.debug "user  $user"
 			wgpGroup.addMember(user);
 		}
-			
+
+
 	}
- 
+
+	void addPermissionTest(recipient, permission, i) {
+		Sid sid = createSid(recipient)
+
+		save new AclEntry(
+				aclObjectIdentity: AclObjectIdentity.read(1),
+				aceOrder: i,
+				sid: createOrRetrieveSid(sid, true),
+				mask: permission,
+				granting: true,
+				auditSuccess: false,
+				auditFailure: false)
+		log.debug "Added permission $permission for Sid $sid"
+	}
+
+	protected AclSid createOrRetrieveSid(Sid sid, boolean allowCreate) {
+		Assert.notNull sid, 'Sid required'
+
+		String sidName
+		boolean principal
+		if (sid instanceof PrincipalSid) {
+			sidName = sid.principal
+			principal = true
+		}
+		else if (sid instanceof GrantedAuthoritySid) {
+			sidName = sid.grantedAuthority
+			principal = false
+		}
+		else {
+			throw new IllegalArgumentException('Unsupported implementation of Sid')
+		}
+
+		AclSid aclSid = AclSid.findBySidAndPrincipal(sidName, principal)
+		if (!aclSid && allowCreate) {
+			aclSid = save(new AclSid(sid: sidName, principal: principal))
+		}
+		return aclSid
+	}
+
+	private Sid createSid(recipient) {
+		if (recipient instanceof String) {
+			return recipient.startsWith('ROLE_') ?
+			new GrantedAuthoritySid(recipient) :
+			new PrincipalSid(recipient)
+		}
+
+		if (recipient instanceof Sid) {
+			return recipient
+		}
+
+		if (recipient instanceof Authentication) {
+			return new PrincipalSid(recipient)
+		}
+
+		throw new IllegalArgumentException('recipient must be a String, Sid, or Authentication')
+	}
+
+	private save(bean) {
+		bean.validate()
+		if (bean.hasErrors()) {
+			if (log.isEnabledFor(Level.WARN)) {
+				def message = new StringBuilder(
+						"problem creating ${bean.getClass().simpleName}: $bean")
+				def locale = Locale.getDefault()
+				for (fieldErrors in bean.errors) {
+					for (error in fieldErrors.allErrors) {
+						message.append('\n\t')
+						message.append(messageSource.getMessage(error, locale))
+					}
+				}
+				log.warn message
+			}
+		}
+		else {
+			println "================== sving   " + bean
+			if(!bean.save()){
+				bean.errors.allErrors.each { println  it }
+			}else{
+				println "saved succssful"
+			}
+		}
+		bean
+	}
 }

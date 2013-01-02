@@ -182,6 +182,7 @@ class ChecklistController {
 		}[0]
 	}
 
+	/*
 	@Secured(['ROLE_USER'])
 	def test = {
 		userGroupService.migrateUserPermission()
@@ -193,7 +194,7 @@ class ChecklistController {
 		userGroupService.addSpecialFounder()
 		render "=== done "
 	}
-	
+	*/
 	def count = {
 		render Checklist.count();
 	}
