@@ -1,17 +1,19 @@
 
-	<div class="observation-icons pull-right">
+<div class="observation-icons pull-right">
 
-		<sec:permitted className='species.groups.UserGroup'
-			id='${userGroupInstance.id}'
-			permission='${org.springframework.security.acls.domain.BasePermission.WRITE}'>
+	<sec:permitted className='species.groups.UserGroup'
+		id='${userGroupInstance.id}'
+		permission='${org.springframework.security.acls.domain.BasePermission.WRITE}'>
 
-			<a id="inviteMembers" class="btn btn-large btn-primary" href="#"><i
-				class="icon-envelope"></i> <g:message code="userGroup.members.label"
-					default="Invite Members" /> </a>
-			<div class="modal hide" id="inviteMembersDialog" tabindex='-1'>
+		<a id="inviteMembers" class="btn btn-primary" href="#inviteMembersDialog" role="button" data-toggle="modal"><i
+			class="icon-envelope"></i> <g:message code="userGroup.members.label"
+				default="Invite Friends" /> </a>
+		<div class="modal hide fade" id="inviteMembersDialog" tabindex='-1'
+			role="dialog" aria-labelledby="inviteMembersModalLabel"
+			aria-hidden="true">
 			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal">×</button>
-				<h3>Invite friends as members</h3>
+			    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+				<h3 id="inviteMembersModalLabel">Invite friends</h3>
 			</div>
 			<div class="modal-body">
 				<p>Send an invitation to invite your friends to join and
@@ -26,18 +28,18 @@
 				</div>
 			</div>
 			<div class="modal-footer">
-				<a href="#" class="btn" data-dismiss="modal">Close</a> <a href="#"
-					id="invite" class="btn btn-primary">Invite</a>
+				<a href="#" class="btn" data-dismiss="modal" aria-hidden="true">Close</a>
+				<a href="#" id="invite" class="btn btn-large btn-primary">Invite</a>
 			</div>
 		</div>
-		</sec:permitted>
+	</sec:permitted>
 
-		
+	
 
-		<uGroup:joinLeaveGroupTemplate model="['showLeave':false, 'showJoin':true, 'userGroupInstance':userGroupInstance]" />
+	<uGroup:joinLeaveGroupTemplate model="['showLeave':false, 'showJoin':true, 'userGroupInstance':userGroupInstance]" />
 	<div class="modal hide fade in" id="leaveUsModalDialog" tabindex="-1" role="dialog" aria-labelledby="leaveUsModalDialogLabel" >
 		<div class="modal-header">
-			<!-- a href="#" class="btn close" data-dismiss="modal">&times;</a-->
+			<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
 			<h3 id="leaveUsModalDialogLabel">Do you want to leave this group???</h3>
 		</div>
 		<div class="modal-body">
