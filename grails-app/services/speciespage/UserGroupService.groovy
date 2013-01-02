@@ -892,7 +892,15 @@ class UserGroupService {
 
 			}
 			//adding fouder permission to ramesh br
+			addPermissionTest(SUser.read(797).email, 2, i++)
 			addPermissionTest(SUser.read(797).email, 16, i++)
+			
+			addPermissionTest(SUser.read(1117).email, 2, i++)
+			addPermissionTest(SUser.read(1117).email, 16, i++)
+			
+			//adding dummy founder 
+			addPermissionTest(SUser.read(1184).email, 16, i++)
+			addPermissionTest(SUser.read(1188).email, 16, i++)
 		}
 	}
 
