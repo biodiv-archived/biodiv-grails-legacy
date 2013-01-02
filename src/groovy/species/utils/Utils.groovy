@@ -146,6 +146,11 @@ class Utils {
 
 	static String getDomainServerUrl(HttpServletRequest request) {
 		def domain = getDomain(request);
+		return "$request.scheme://$domain";
+	}
+	
+	static String getDomainServerUrlWithContext(HttpServletRequest request) {
+		def domain = getDomain(request);
 		return "$request.scheme://$domain$request.contextPath";
 	}
 	

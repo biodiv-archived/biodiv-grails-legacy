@@ -174,7 +174,7 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 			var authParams = window.mynewparams;
 <%--			authParams["openid.return_to"] = 'http://indiabiodiversity.localhost.org/biodiv/j_spring_openid_security_check' --%>
 			 $.ajax({
-              url:  "${Utils.getDomainServerUrl(request)}/j_spring_openid_security_check" ,
+              url:  "${Utils.getDomainServerUrlWithContext(request)}/j_spring_openid_security_check" ,
               method: "POST",
 			  data: authParams,	
               success: function(data, statusText, xhr) {
@@ -208,18 +208,18 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 			'openid.ui.icon' : 'true'
 		};
 		var googleOpener = popupManager.createPopupOpener({
-			'realm' : "${Utils.getDomainServerUrl(request)}",
+			'realm' : 'http://*.'+"${Utils.getIBPServerCookieDomain()}",
 			'opEndpoint' : 'https://www.google.com/accounts/o8/ud',
-			'returnToUrl' :	"${createLink(controller:'openId', action:'checkauth', base:Utils.getDomainServerUrl(request))}",
+			'returnToUrl' :	"${uGroup.createLink(controller:'openId', action:'checkauth', base:Utils.getDomainServerUrl(request))}",
 			'onCloseHandler' : closeHandler,
 			'shouldEncodeUrls' : true,
 			'extensions' : extensions
 		});
 		
 		var yahooOpener = popupManager.createPopupOpener({
-			'realm' : "${Utils.getDomainServerUrl(request)}",
+			'realm' : 'http://*.'+"${Utils.getDomainServerUrl(request)}",
 			'opEndpoint' : 'https://open.login.yahooapis.com/openid/op/auth',
-			'returnToUrl' :	"${createLink(controller:'openId', action:'checkauth', base:Utils.getDomainServerUrl(request))}",
+			'returnToUrl' :	"${uGroup.createLink(controller:'openId', action:'checkauth', base:Utils.getDomainServerUrl(request))}",
 			'onCloseHandler' : closeHandler,
 			'shouldEncodeUrls' : true,
 			'extensions' : extensions

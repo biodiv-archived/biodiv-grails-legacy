@@ -34,7 +34,7 @@ class FacebookAuthUtils {
 		def json = JSON.parse(jsonData)
 
 		if (json.algorithm != 'HMAC-SHA256') {
-			throw new BadCredentialsException("Unknown hashing algoright: $json.algorithm")
+			throw new BadCredentialsException("Unknown hashing algorightm: $json.algorithm")
 		}
 
 		//log.debug("Payload: $jsonData")

@@ -108,8 +108,8 @@ class FacebookAuthCookieFilter extends GenericFilterBean implements ApplicationE
 				if(!fbLoginCookie) {
 					logger.warn("No fb_login cookie");
 				}
-				logger.debug("Found following cookies");
-				request.cookies.each { logger.debug it.name+":"+it.value }
+//				logger.debug("Found following cookies");
+//				request.cookies.each { logger.debug it.name+":"+it.value }
 			}
 		} else {
 			logger.debug("SecurityContextHolder not populated with FacebookAuthToken token , as it already contained: $SecurityContextHolder.context.authentication");
