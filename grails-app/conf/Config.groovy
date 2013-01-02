@@ -813,6 +813,7 @@ grails.plugins.springsecurity.userLookup.usernamePropertyName = 'email'
 checkin.drupal = false;
 
 grails.plugins.springsecurity.openid.domainClass = 'species.auth.OpenID'
+grails.plugins.springsecurity.openid.userLookup.openIdsPropertyName = "openIds"
 grails.plugins.springsecurity.rememberMe.persistent = true
 grails.plugins.springsecurity.rememberMe.persistentToken.domainClassName = 'species.auth.PersistentLogin'
 grails.plugins.springsecurity.roleHierarchy = '''
