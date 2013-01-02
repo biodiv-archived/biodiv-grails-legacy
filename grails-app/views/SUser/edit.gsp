@@ -489,7 +489,7 @@
 		});
 
      	$('#upload_resource').ajaxForm({ 
-			url:'${uGroup.createLink(controller:'SUser', action:'upload_resource')}',
+			url:'${g.createLink(controller:'SUser', action:'upload_resource')}',
 			dataType: 'xml',//could not parse json wih this form plugin 
 			clearForm: true,
 			resetForm: true,
