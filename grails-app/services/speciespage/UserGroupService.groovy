@@ -852,8 +852,8 @@ class UserGroupService {
 		SUser.findAllByDateCreatedGreaterThanEquals(wgpUserDate, [sort:"id", order:"asc"]).each{ user ->
 			if(!wgpGroup.isFounder(user)){
 				log.debug "user id  $user.id"
-				aclUtilService.deletePermission(wgpGroup, user.email, BasePermission.WRITE);
-				log.debug "deleting permission $user"
+				//aclUtilService.deletePermission(wgpGroup, user.email, BasePermission.WRITE);
+				//log.debug "deleting permission $user"
 				addPermission(wgpGroup, user, BasePermission.WRITE)
 				log.debug "adding permission $user"
 			}
