@@ -8,7 +8,7 @@
 }
 
 .comment-textbox {
-	width: 98%;
+	width: 97%;
     height: 100%;
     resize: vertical;
  }
@@ -83,7 +83,7 @@
 }
 
 .comment-post-btn {
-	position: absolute;
+	position: relative;
     right: 8px;
     margin-top : 5px;
 }
