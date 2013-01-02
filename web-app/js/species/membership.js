@@ -196,10 +196,10 @@ function init_header() {
 		return false;
 	});
 	
-	$(".close").click(function(){
-		$(this).parent().slideUp('fast');
-		return false;
-	})
+//	$(".close").click(function(){
+//		$(this).parent().slideUp('fast');
+//		return false;
+//	})
 	$(".active .submenu").show();
 	
 	init_group_header();

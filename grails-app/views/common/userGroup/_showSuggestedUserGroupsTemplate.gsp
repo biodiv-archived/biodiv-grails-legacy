@@ -12,6 +12,6 @@
 				groups functionality. </small>
 		</li>
 	</g:if>
-	<li class="pull-right"><g:link mapping="userGroupGeneric"
-			action="list" absolute='true'>All Groups ...</g:link></li>
+	<li style="float:right;"><g:link mapping="userGroupGeneric"
+			action="list" absolute='true'>More ...</g:link></li>
 </ul>
