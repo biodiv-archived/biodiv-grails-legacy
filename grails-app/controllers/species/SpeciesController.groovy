@@ -309,7 +309,7 @@ class SpeciesController {
 				newMap.put(concept.key, newConceptMap)
 			}
 		}
-		log.debug newMap;
+		//log.debug newMap;
 		return newMap;
 		//return map;
 	}
