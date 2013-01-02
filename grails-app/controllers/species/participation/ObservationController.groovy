@@ -1003,7 +1003,7 @@ class ObservationController {
 	 * Count   
 	 */
 	def count = {
-		render Observation.count();
+		render Observation.countByIsDeleted(false);
 	}
 
 	/**
