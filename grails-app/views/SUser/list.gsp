@@ -36,12 +36,7 @@
 				<g:message code="default.list.label" args="[entityName]" />
 			</h1>
 		</div>
-
-		<g:if test="${flash.message}">
-			<div class="message">
-				${flash.message}
-			</div>
-		</g:if>
+		
 		<uGroup:rightSidebar model="['userGroupInstance':userGroupInstance]"/>
 		<sUser:showUserListWrapper
 			model="['results':results, 'totalCount':totalCount]" />

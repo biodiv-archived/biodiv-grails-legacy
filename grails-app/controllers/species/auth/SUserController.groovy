@@ -42,10 +42,12 @@ class SUserController extends UserController {
     }
 
 	def index = {
+		println "index"
 		redirect(action: "list", params: params)
 	}
 
 	def list = {
+		println "list"
 		params.max = Math.min(params.max ? params.int('max') : 12, 100)
 		//params.sort = params.sort && params.sort != 'score' ? params.sort : "activity";
 		params.query='%';
@@ -255,7 +257,7 @@ class SUserController extends UserController {
 	}
 
 	def search = {
-		
+		println "search"
 		log.debug params
 		
 		def model = getUsersList(params);
