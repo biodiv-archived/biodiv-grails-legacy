@@ -39,7 +39,7 @@ class ChecklistService {
 	def migrateChecklist(){
 		def sql = Sql.newInstance(connectionUrl, userName, password, "org.postgresql.Driver");
 		int i=0;
-		sql.eachRow("select nid, vid, title from node where type = 'checklist' order by nid asc ") { row ->
+		sql.eachRow("select nid, vid, title from node where type = 'checklist' order by nid asc") { row ->
 			log.debug " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>     title ===  $i  $row.title  nid == $row.nid , vid == $row.vid"
 			try{
 				Checklist checklist = createCheckList(row, sql)
@@ -114,6 +114,7 @@ class ChecklistService {
 
 	private saveRawFile(cl, String rawText){
 		def rootDir = grailsApplication.config.speciesPortal.checklist.rootDir
+		
 		def checklistRootDir = new File(rootDir);
 		if(!checklistRootDir.exists()) {
 			checklistRootDir.mkdir();
@@ -233,24 +234,29 @@ class ChecklistService {
 		//handling scientific name infrastructre
 		if(snColumnOrder && snVal){
 			
+			snVal = Utils.getCanonicalForm(snVal);
+			
 			if(sciNameSet.contains(snVal)){
 				println "========================== duplicate sn ==============================" + snVal
 				cleanUpGorm()
 				sciNameSet.clear()
 				commonNameSet.clear()
-			}else{
-				sciNameSet.add(snVal)
 			}
+			sciNameSet.add(snVal)
 			
-			if(cn && commonNameSet.contains(cn)){
-				println "========================== duplicate cn =======  $cn ================ for sn =======" + snVal
-				cleanUpGorm()
-				sciNameSet.clear()
-				commonNameSet.clear()
-			}else{
+			
+			if(cn){
+				cn =  Utils.getCanonicalForm(cn);
+				if(commonNameSet.contains(cn)){
+					println "========================== duplicate cn =======  $cn ================ for sn =======" + snVal
+					cleanUpGorm()
+					sciNameSet.clear()
+					commonNameSet.clear()
+				}
 				sciNameSet.add(snVal)
 				commonNameSet.add(cn)
 			}
+			
 			
 			Recommendation reco = observationService.getRecommendation([recoName:snVal, canName:snVal, commonName:cn, refObject:cl]).mainReco
 //			log.debug "===================== reco info ========================" + reco
@@ -433,7 +439,7 @@ class ChecklistService {
 	}
 	
 	def updateLocation(){
-		SpreadsheetReader.readSpreadSheet("/home/sandeept/checklist_location_byThomas.xls").get(0).each{ m ->
+		SpreadsheetReader.readSpreadSheet("/tmp/checklist_location_byThomas.xls").get(0).each{ m ->
 			//println "title === " + m.title + "||||| lat === $m.lat  ||||| long === " + m.long
 			def cl = Checklist.findByTitle(m.title.trim())
 			if(cl){
