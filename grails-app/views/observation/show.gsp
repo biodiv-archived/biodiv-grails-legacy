@@ -53,9 +53,10 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 
 
 <style>
-#nameContainer {
+.nameContainer {
 	float: left;
 }
+
 
 .textbox input{
 	text-align: left;
@@ -68,6 +69,12 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 }
 .btn .caret {
     margin-top: 3px;
+}
+#commonName {
+	width: 200px;
+}
+.nameContainer .combobox-container {
+	left:210px;
 }
 
 </style>

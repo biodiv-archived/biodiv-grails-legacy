@@ -204,6 +204,7 @@ class ObservationController {
 		log.debug params;
 
 		def observationInstance = Observation.get(params.id.toLong())
+		def currentUser = springSecurityService.currentUser
 		params.author = observationInstance.author;
 		if(observationInstance)	{
 			try {
@@ -216,7 +217,7 @@ class ObservationController {
 					params.obvId = observationInstance.id
 					def tags = (params.tags != null) ? Arrays.asList(params.tags) : new ArrayList();
 					observationInstance.setTags(tags);
-					activityFeedService.addActivityFeed(observationInstance, null, observationInstance.author, activityFeedService.OBSERVATION_UPDATED);
+					activityFeedService.addActivityFeed(observationInstance, null, currentUser, activityFeedService.OBSERVATION_UPDATED);
 					
 					if(params.groupsWithSharingNotAllowed) {
 						setUserGroups(observationInstance, [params.groupsWithSharingNotAllowed]);
