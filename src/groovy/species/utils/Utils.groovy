@@ -158,6 +158,11 @@ class Utils {
 		def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config;
 		return "http://$config.ibp.domain";
 	}
+	
+	static String getIBPServerCookieDomain() {
+		def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config;
+		return "$config.ibp.domain";
+	}
 
 
 	static String getDomainName(HttpServletRequest request) {

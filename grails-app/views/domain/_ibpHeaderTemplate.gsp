@@ -93,7 +93,7 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 				window.fbEnsure(function() {
 					FB.login(function(response) {
 						if (response.status == 'connected') {
-							$.cookie("fb_login", "true", { path: '/', domain:".${Utils.getDomain(request)}"});
+							$.cookie("fb_login", "true", { path: '/', domain:".${Utils.getIBPServerCookieDomain()}"});
 							if($(clickedObject).hasClass('ajaxForm')) {
 								$('#loginMessage').html("Logging in ...").removeClass().addClass('alter alert-info').show();
 								$.ajax({
