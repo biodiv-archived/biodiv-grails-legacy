@@ -39,6 +39,7 @@
 }
 .feedParentContext {
 	background-color:#ffffff;
+	display:table;
 }
 
 .feedSubParentContext, .feedSubParentContext .yj-message-body pre {
