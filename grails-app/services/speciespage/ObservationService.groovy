@@ -333,10 +333,13 @@ class ObservationService {
 	
 	private  Recommendation findReco(name, isScientificName, languageId, taxonConceptForNewReco){
 		if(name){
-			//name = Utils.cleanName(name);
+			// if sn then only sending to names parser for common name only cleaning
+			if(isScientificName){
+				name = Utils.getCanonicalForm(name);
+			}else{
+				name = Utils.cleanName(name);
+			}
 			
-			//XXX for getting name through parser
-			name = Utils.getCanonicalForm(name);
 			def c = Recommendation.createCriteria();
 			def result = c.list {
 				ilike('name', name);
