@@ -6,6 +6,7 @@
 <%@ page import="species.groups.SpeciesGroup"%>
 <%@ page import="species.Habitat"%>
 <%@ page import="org.grails.taggable.Tag"%>
+<%@ page import="species.utils.Utils"%>
 
 <html>
 <head>
@@ -669,7 +670,8 @@ input.dms_field {
             },
 			success: function(responseXML, statusText, xhr, form) {
 				$(form).find("span.msg").html("");
-				var rootDir = '${grailsApplication.config.speciesPortal.observations.serverURL}'
+				//var rootDir = '${grailsApplication.config.speciesPortal.observations.serverURL}'
+				var rootDir = '${Utils.getDomainServerUrlWithContext(request)}' + '/observations'
 				var obvDir = $(responseXML).find('dir').text();
 				var obvDirInput = $('#upload_resource input[name="obvDir"]');
 				if(!obvDirInput.val()){
