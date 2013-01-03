@@ -28,29 +28,32 @@
 					<g:set var="mainImage" value="${speciesInstance.mainImage()}" />
 					<%def thumbnailPath = ImageUtils.getFileName(mainImage?.fileName, ImageType.SMALL, null)%>
 
-					<div class="snippet tablet "
-						style="display: table; height: 80px;">
-						<div class="pull-left figure" style="height:80px;display:table;">
-						<a 
-							href="${uGroup.createLink([controller:'species', action:'show', id:speciesInstance.id, userGroup:userGroup, userGroupWebaddress:userGroupWebaddress])}">
+					<div class="snippet tablet " style="display: table; height: 80px;">
+						<div class="pull-left figure"
+							style="height: 80px; display: table;">
+							<a
+								href="${uGroup.createLink([controller:'species', action:'show', id:speciesInstance.id, userGroup:userGroup, userGroupWebaddress:userGroupWebaddress])}">
 
 
-							<g:if test="${thumbnailPath }">
-								<img class="span1 img-polaroid pull-left" style="max-height:80px;margin-left:0px;width:auto;"
-									src="${createLinkTo( base:grailsApplication.config.speciesPortal.resources.serverURL,
+								<g:if test="${thumbnailPath }">
+									<img class="span1 img-polaroid pull-left"
+										style="max-height: 80px; margin-left: 0px; width: auto;"
+										src="${createLinkTo( base:grailsApplication.config.speciesPortal.resources.serverURL,
 											file: thumbnailPath)}"
-									title=" ${speciesInstance.taxonConcept.name}" />
-							</g:if> <g:else>
-								<img class="span1 img-polaroid pull-left" style="max-height:80px;margin-left:0px;width:auto;"
-									title="${speciesInstance.taxonConcept.name}"
-									src="${createLinkTo(dir: 'images', file:speciesInstance.fetchSpeciesGroupIcon(ImageType.VERY_SMALL)?.fileName, absolute:true)}"></img>
-							</g:else> 
-						</a>
+										title=" ${speciesInstance.taxonConcept.name}" />
+								</g:if> <g:else>
+									<img class="span1 img-polaroid pull-left"
+										style="max-height: 80px; margin-left: 0px; width: auto;"
+										title="${speciesInstance.taxonConcept.name}"
+										src="${createLinkTo(dir: 'images', file:speciesInstance.fetchSpeciesGroupIcon(ImageType.VERY_SMALL)?.fileName, absolute:true)}"></img>
+								</g:else> </a>
 						</div>
-						<a 
+						<a
 							href="${uGroup.createLink([controller:'species', action:'show', id:speciesInstance.id, userGroup:userGroup, userGroupWebaddress:userGroupWebaddress])}">
-							<span class="species_story ellipsis multiline sci_name" style="display:block;">${speciesInstance.taxonConcept.italicisedForm}</span>
-						</a>
+							<span class="species_story ellipsis multiline sci_name"
+							style="display: block;">
+								${speciesInstance.taxonConcept.italicisedForm}
+						</span> </a>
 						<div class="poor_species_content" style="display: none;">No
 							information yet</div>
 					</div>
@@ -58,26 +61,26 @@
 
 
 					</li>
-		</g:each>
-		</ul>
+				</g:each>
+			</ul>
 
 
+
+		</div>
+	</div>
+	<% params['isGalleryUpdate'] = false; %>
+	<div class="paginateButtons centered">
+		<p:paginate controller="species" action="list"
+			total="${instanceTotal}" userGroup="${userGroup}"
+			userGroupWebaddress="${userGroupWebaddress}" params="${params}"
+			max="${params.max }" offset="${params.offset}" maxsteps="10" />
+	</div>
+	<div class="paginateButtons centered">
+		<p:paginateOnAlphabet controller="species" action="list"
+			total="${instanceTotal}" userGroup="${userGroup }" params="${params}"
+			userGroupWebaddress="${userGroupWebaddress}" />
 
 	</div>
-</div>
-
-<div class="paginateButtons centered">
-	<p:paginate controller="species" action="list" total="${instanceTotal}"
-		userGroup="${userGroup}" userGroupWebaddress="${userGroupWebaddress}"
-		params="${params}" max="${params.max }"
-		offset="${params.offset}" maxsteps="10" />
-</div>
-<div class="paginateButtons centered">
-	<p:paginateOnAlphabet controller="species" action="list"
-		total="${instanceTotal}" userGroup="${userGroup }" params="${params}"
-		userGroupWebaddress="${userGroupWebaddress}" />
-
-</div>
 
 
 </div>

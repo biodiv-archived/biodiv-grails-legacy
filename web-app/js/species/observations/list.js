@@ -476,6 +476,7 @@ function updateListPage(activeTag) {
 			$('.observation_location_wrapper').replaceWith(data.mapViewHtml);
 			setActiveTag(activeTag);
 			eatCookies();
+			last_actions();
 	}
 }
 

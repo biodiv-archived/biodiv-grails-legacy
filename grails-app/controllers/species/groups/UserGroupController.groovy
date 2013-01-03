@@ -920,12 +920,12 @@ class UserGroupController {
 		render (view:'myGroups', model:['userGroupInstance':userGroupInstance])
    }
 
-   def species = {
-	   log.debug params;
-	   def userGroupInstance = findInstance(params.id, params.webaddress)
-	   if (!userGroupInstance) return;
-	   render (view:'species', model:['userGroupInstance':userGroupInstance, params:params])
-   }
+//   def species = {
+//	   log.debug params;
+//	   def userGroupInstance = findInstance(params.id, params.webaddress)
+//	   if (!userGroupInstance) return;
+//	   render (view:'species', model:['userGroupInstance':userGroupInstance, params:params])
+//   }
 
    def tags = {
 	   log.debug params;
