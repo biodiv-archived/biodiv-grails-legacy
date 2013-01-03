@@ -208,4 +208,13 @@ function last_actions() {
 	});
 	
 	$(".ellipsis:not(.multiline)").trunk8();
+	
+	$('#advSearchContainer .collapse').on({
+	    shown: function(){
+	        $(this).css('overflow','visible');
+	    },
+	    hide: function(){
+	        $(this).css('overflow','hidden');
+	    }
+	});
 }

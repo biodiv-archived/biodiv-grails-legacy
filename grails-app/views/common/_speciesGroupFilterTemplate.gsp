@@ -76,8 +76,8 @@ $(document).ready(function(){
 </g:if>
 
 <g:if test="${!hideAdvSearchBar}">
-	<div class="sidebar_section" style="left: 0px; margin: 10px 0px;">
-		<a data-toggle="collapse" href="#advSearchBox"><h5>
+	<div id="advSearchContainer" class="sidebar_section" style="left: 0px; margin: 10px 0px;">
+		<a data-toggle="collapse" data-parent="#advSearchContainer" href="#advSearchBox"><h5>
 				<i class=" icon-search"></i>Advanced Search
 			</h5> </a>
 		<div id="advSearchBox" class="collapse">
@@ -85,8 +85,3 @@ $(document).ready(function(){
 		</div>
 	</div>
 </g:if>
-<style>
-	.collapse.in {
-		overflow:visible;
-	}
-</style>

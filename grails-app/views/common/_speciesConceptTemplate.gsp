@@ -25,14 +25,14 @@
 				<g:each in="${concept.value}" var="category">
 					<g:if test="${!category.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.SUMMARY) }">
 
-						<div class="clearfix">
+						<div id="speciesField${conceptCounter}_${fieldCounter++}" class="clearfix speciesCategory">
 
-							<a class="category-header-heading speciesFieldHeader" data-toggle="collapse"
+							<a class="category-header-heading speciesFieldHeader" 
 								href="#speciesField${conceptCounter}_${fieldCounter}"><h6> ${category.key} </h6>
 							</a>
 
-							<div id="speciesField${conceptCounter}_${fieldCounter++}"
-								class="collapse in <%=category.key.equals(grailsApplication.config.speciesPortal.fields.BRIEF)?'defaultSpeciesField':''%> speciesField  ">
+							<div 
+								class="<%=category.key.equals(grailsApplication.config.speciesPortal.fields.BRIEF)?'defaultSpeciesField':''%> speciesField  ">
 
 								<g:if test="${category.value.containsKey('speciesFieldInstance') || category.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.OCCURRENCE_RECORDS) || category.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.REFERENCES)}">
 									<g:if test="${category.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.COMMON_NAME)}">

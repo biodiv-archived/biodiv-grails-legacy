@@ -167,12 +167,13 @@ th.name {
 .speciesField {
 	padding: 0px 10px;
 	background-color:white;
-	overflow: hidden;
 }
+/* 	overflow: hidden; */
+/* } */
 
-.speciesField.collapse.in {
-	overflow: visible;
-}
+/* .speciesField.collapse.in { */
+/* 	overflow: visible; */
+/* } */
 
 .icon {
 	padding: 1px;

@@ -1,4 +1,4 @@
-<div class="filters" style="position: relative; overflow: visible;">
+<div class="filters" style="position: relative;">
 	<div class="paginateButtons">
 		<center>
 			<p:paginateOnAlphabet controller="species"

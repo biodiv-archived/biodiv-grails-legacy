@@ -532,7 +532,7 @@ ul#recoSummary {
 }
 
 .sidebar_section {
-	overflow: visible;
+/* 	overflow: visible; */
 	/* 	padding-bottom: 10px; */
 	margin-bottom: 20px;
 	border: 1px solid #CECECE;
