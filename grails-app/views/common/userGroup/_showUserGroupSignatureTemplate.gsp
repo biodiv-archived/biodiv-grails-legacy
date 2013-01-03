@@ -20,12 +20,9 @@
 
 	<g:if test="${!showDetails}">
 		<div class="pull-left">
-			<g:link
-				url="${uGroup.createLink(mapping:"userGroup", action:"members", absolute:'true', params=['webaddress':userGroup.webaddress])}"
-				title="No ofMembers">
+			
 				<i class="icon-user"></i>
 				${userGroup.getAllMembersCount()}
-			</g:link>
 		</div>
 	</g:if>
 	</div>
