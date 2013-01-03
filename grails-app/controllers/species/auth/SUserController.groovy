@@ -153,15 +153,17 @@ class SUserController extends UserController {
 		log.debug params;
 		String passwordFieldName = SpringSecurityUtils.securityConfig.userLookup.passwordPropertyName
 
-		def user = findById()
 
-		if (!user) return
 
+		if(SUserService.ifOwns(params.long('id'))) {
+			def user = findById()
+			
+			if (!user) return
+	
 			if (!versionCheck('user.label', 'User', user, [user: user])) {
 				return
 			}
-
-		if(SUserService.ifOwns(params.long('id'))) {
+			
 			//Cannot change email id with which user was registered
 			params.email = user.email;
 			
