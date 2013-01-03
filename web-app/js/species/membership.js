@@ -164,12 +164,6 @@ var members_autofillUsersComp;
 //this is called from domain/_headerTemplate
 function init_group_header() {
 	
-	$(".ellipsis.multiline").trunk8({
-		lines:2,		
-	});
-	
-	$(".ellipsis:not(.multiline)").trunk8();
-	
 	members_autofillUsersComp = $("#userAndEmailList_"+window.members_autofillUsersId).autofillUsers({
 		usersUrl : window.userTermsUrl
 	});
@@ -206,4 +200,12 @@ function init_header() {
 
 	membership_actions();
 	
+}
+
+function last_actions() {
+	$(".ellipsis.multiline").trunk8({
+		lines:2,		
+	});
+	
+	$(".ellipsis:not(.multiline)").trunk8();
 }

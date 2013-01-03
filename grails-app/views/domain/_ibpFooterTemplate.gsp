@@ -73,16 +73,8 @@
 
 	</div>
 </div>
-
-
-<!-- 
-<li><a href="${ '/about/what-are-biodiversity-hotspots'}">What are
-		Biodiversity Hotspots?</a></li>
-<li><a href="${ '/about/portal-objectives'}">Portal Objectives</a></li>
-<li><a href="${ '/about/data-sharing-guidelines'}">Data Sharing
-		Guidelines</a></li>
-<li><a href="${ '/about/participation-and-action'}">Participation and
-		Action</a></li>
-<li><a href="${ '/about/roadmap1'}">Roadmap</a></li>
-<li><a href="${ '/about/team'}">Team</a></li>
- -->
+<r:script>
+$(document).ready(function(){
+	 last_actions();
+});
+</r:script>
