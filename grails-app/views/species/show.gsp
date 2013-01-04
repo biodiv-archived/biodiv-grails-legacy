@@ -271,8 +271,8 @@ $(document).ready(function(){
 		
 			<g:if test="${!speciesInstance.percentOfInfo}">
 				<div
-					class="poor_species_content ui-state-highlight ui-corner-all span12">
-					<span class="ui-icon-info" style="float: left; margin-right: .3em;"></span>
+					class="poor_species_content alert">
+					<i class="icon-info"></i>
 					No information yet.
 					
 				</div>
