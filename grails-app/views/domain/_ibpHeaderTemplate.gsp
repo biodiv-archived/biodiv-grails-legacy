@@ -2,7 +2,7 @@
 <div id="ibp-header" class="gradient-bg">
 	<div class="navbar navbar-static-top" style="margin-bottom: 0px;">
 		<div class="navbar-inner"
-			style="box-shadow: none; background-color: #dddbbb; background-image: none;padding:0px 5px;">
+			style="box-shadow: none; background-color: #dddbbb; background-image: none; padding: 0px 5px;">
 			<div class="container" style="width: 100%">
 				<a class="btn btn-navbar" data-toggle="collapse"
 					data-target=".nav-collapse"> <span class="icon-bar"></span> </a> <a
@@ -17,14 +17,11 @@
 
 
 					<ul class="nav pull-right">
-							<li><search:searchBox /></li>
-<%--						<g:if test="${userGroupInstance  && userGroupInstance.id}">--%>
-<%--							<li>--%>
-<%--						</g:if>--%>
+						<li><search:searchBox />
+						</li>
 						<li><uGroup:showSidebar />
 						<li><sUser:userLoginBox
-								model="['userGroup':userGroupInstance]" />
-						</li>
+								model="['userGroup':userGroupInstance]" /></li>
 
 					</ul>
 				</div>
@@ -38,16 +35,17 @@
 			${flash.error}
 		</div>
 	</g:if>
-	
-	<div class="alertMsg ${(flash.message)?'alert':'' }"  style="clear: both; margin:0px">
+
+	<div class="alertMsg ${(flash.message)?'alert':'' }"
+		style="clear: both; margin: 0px">
 		${flash.message}
 	</div>
 
-<auth:ajaxLogin />
-<div id="fb-root"></div>
+	<auth:ajaxLogin />
+	<div id="fb-root"></div>
 
-<g:set var="fbAppId" value="" />
-<%
+	<g:set var="fbAppId" value="" />
+	<%
 String domain = Utils.getDomain(request);
 if(domain.equals(grailsApplication.config.wgp.domain)) {
 	fbAppId = grailsApplication.config.speciesPortal.wgp.facebook.appId;

@@ -51,7 +51,7 @@
 						<a
 							href="${uGroup.createLink([controller:'species', action:'show', id:speciesInstance.id, userGroup:userGroup, userGroupWebaddress:userGroupWebaddress])}">
 							<span class="species_story ellipsis multiline sci_name"
-							style="display: block;">
+							style="display: block;height:60px;" title="${speciesInstance.taxonConcept.name}">
 								${speciesInstance.taxonConcept.italicisedForm}
 						</span> </a>
 						<div class="poor_species_content" style="display: none;">No
