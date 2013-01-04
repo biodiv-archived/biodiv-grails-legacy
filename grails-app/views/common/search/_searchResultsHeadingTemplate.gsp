@@ -39,10 +39,6 @@
 		</ul>
 <r:script>
 	$(document).ready(function() {
-		$('.ellipsis.multiline').trunk8({
-		  lines: 2
-		});
-		
 		var t = "${uGroup.createLink(controller:params.controller?:'search', action:params.action?:'') }";
 		$("#searchResultsTabs a[href='"+t+"']").parent().addClass("active");
 			

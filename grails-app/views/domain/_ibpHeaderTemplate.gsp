@@ -114,9 +114,6 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 					}, scope);
 				});
 			});
-			
-			$(".ellipsis").trunk8();
-			 
 		}); 
 	
 	//////////////////////// FB RELATED CALLS ///////////////////////
