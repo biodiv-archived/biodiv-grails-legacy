@@ -1716,3 +1716,35 @@ li#userOrEmail-new {
 	float: right;
 	margin-right: 10px;
 }
+
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+select {
+display: inline-block;
+width: 210px;
+height: 18px;
+padding: 4px;
+margin-bottom: 9px;
+font-size: 13px;
+line-height: 18px;
+color: #555555;
+border: 1px solid #ccc;
+-webkit-border-radius: 3px;
+-moz-border-radius: 3px;
+border-radius: 3px;
+}
+select {
+height: 28px;
+/* In IE7, the height of the select element cannot be changed by height, only font-size /
+*margin-top: 4px;
+/ For IE7, add top margin to align select with labels */
+line-height: 11px;
+}
+select {
+width: 220px;
+background-color: #ffffff;
+}
+select[multiple], select[size] {
+height: auto;
+}
+
+}

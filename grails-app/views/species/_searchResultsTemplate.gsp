@@ -33,6 +33,10 @@
 				<div class="observation_story" style="overflow: visible;width:100%">
 
 				<div class="observation-icons">
+					<g:if test="${speciesInstance.taxonConcept.threatenedStatus}">
+							<s:showThreatenedStatus
+								model="['threatenedStatus':speciesInstance.taxonConcept.threatenedStatus]" />
+					</g:if>
 					<span
 							class="group_icon species_groups_sprites active ${speciesInstance.fetchSpeciesGroup()?.iconClass()}"
 							title="${speciesInstance.fetchSpeciesGroup()?.name}"></span>			
@@ -79,10 +83,7 @@
 
 						</g:each>
 	
-						<g:if test="${speciesInstance.taxonConcept.threatenedStatus}">
-							<s:showThreatenedStatus
-								model="['threatenedStatus':speciesInstance.taxonConcept.threatenedStatus]" />
-						</g:if>
+					
 					</div>
 
 					<div class="ellipsis multiline">
@@ -98,16 +99,17 @@
 			</li>
 		</g:each>
 		<li>
-			<div class="paginateButtons" style="clear: both;">
+			<div class="paginateButtons" style="clear: both">
 				<center>
-					<p:paginateOnSearchResult total="${instanceTotal}"
-						controller="species" action="search"
-						params="[query:queryParams.q, fl:queryParams.fl]" />
-				</center>
-			</div></li>
+				<p:paginate total="${instanceTotal?:0}" action="${params.action}" controller="${params.controller?:'species'}"
+					userGroup="${userGroup}" userGroupWebaddress="${userGroupWebaddress}"
+			 		max="${queryParams.max}" params="${activeFilters}" />
+			 	</center>
+			</div>
+		</li>
+		
+	</ul>
 	</g:if>
-
-</ul>
 </div>
 </div>
 <r:script>

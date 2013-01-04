@@ -385,16 +385,21 @@ class SpeciesService {
 			params.query = aq;
 		}
 
+		def max = Math.min(params.max ? params.int('max') : 12, 100)
+		def offset = params.offset ? params.long('offset') : 0
+ 
 		paramsList.add('q', Utils.cleanSearchQuery(params.query));
-		paramsList.add('start', params['offset']?:"0");
-		paramsList.add('rows', params['max']?:"51");
+		paramsList.add('start', offset);
+		paramsList.add('rows', max);
 		params['sort'] = params['sort']?:"score"
 		String sort = params['sort'].toLowerCase();
 		if(sort.indexOf(' desc') == -1 && sort.indexOf(' asc') == -1 ) {
 			sort += " desc";
 		}
 		paramsList.add('sort', sort);
-
+		queryParams["max"] = max
+		queryParams["offset"] = offset
+		
 		paramsList.add('fl', params['fl']?:"id");
 
 		if(params.sGroup) {
