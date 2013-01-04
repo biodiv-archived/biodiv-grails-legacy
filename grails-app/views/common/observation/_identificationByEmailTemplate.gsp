@@ -50,6 +50,11 @@
 	</div>
 
 </div>
+<style>
+#cke_message .cke_wrapper {
+	max-width: 370px;
+}
+</style>
 
 <g:javascript>
 
