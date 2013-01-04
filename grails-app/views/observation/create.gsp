@@ -154,7 +154,7 @@ input.dms_field {
 										<li class="addedResource thumbnail">
 											<%def thumbnail = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.thumbnail.suffix)%>
 											<div class='figure' style="height: 200px; overflow: hidden;">
-												<span> <img style="width: 100%; height: auto;"
+												<span> <img style="width: auto; height: auto;"
 													src='${createLinkTo(file: thumbnail, base:grailsApplication.config.speciesPortal.observations.serverURL)}'
 													class='geotagged_image' exif='true' /> </span>
 											</div>
@@ -589,7 +589,7 @@ input.dms_field {
 	<li class="addedResource thumbnail">
 	    <div class='figure' style='height: 200px; overflow:hidden;'>
                 <span> 
-                        <img id='image_{{=i}}' style="width:100%; height: auto;" src='{{=thumbnail}}' class='geotagged_image' exif='true'/> 
+                        <img id='image_{{=i}}' style="width:auto; height: auto;" src='{{=thumbnail}}' class='geotagged_image' exif='true'/> 
                 </span>
 	    </div>
 				
