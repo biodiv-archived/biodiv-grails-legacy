@@ -1,5 +1,5 @@
 $(document).ready(function(){
-	$('#selected_sort').tooltip({placement:'right'});
+	$('#selected_sort').tooltip({placement:'top'});
     $('button').tooltip();
     $('.dropdown-toggle').dropdown();
     	

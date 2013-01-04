@@ -30,7 +30,7 @@
 		<button type="submit" id="advSearch"
 			class="btn btn-primary pull-right">Search</button>
 	</div>
-
+	<div class="clearfix"></div>
 </div>
 <g:javascript>
 $(document).ready(function(){

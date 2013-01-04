@@ -27,7 +27,7 @@
 								title="${speciesInstance.taxonConcept.name}"
 								src="${createLinkTo(dir:'images', file: speciesInstance.fetchSpeciesGroupIcon(ImageType.NORMAL)?.fileName, absolute:true)}" />
 						</g:else> </a>
-					<div class="media-body" style="">
+					<div class="media-body" style="height:100%;">
 						<h6 class="media-heading">
 							<g:link class="ellipsis"
 								url="${uGroup.createLink(action:'show', controller:'species', id:speciesInstance.id)}">
