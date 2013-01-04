@@ -46,7 +46,7 @@ class SpeciesSearchService {
 			species = Species.list(max:limit, offset:offset);
 			if(!species) break;
 			publishSearchIndex(species);
-			species.clear();
+			species = null;
 			offset += limit;
 		}
 		log.info "Time taken to publish search index is ${System.currentTimeMillis()-startTime}(msec)";

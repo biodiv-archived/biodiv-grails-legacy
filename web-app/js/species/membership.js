@@ -209,7 +209,7 @@ function last_actions() {
 	
 	$(".ellipsis:not(.multiline)").trunk8();
 	
-	$('#advSearchContainer .collapse').on({
+	$('.collapse').on({
 	    shown: function(){
 	        $(this).css('overflow','visible');
 	    },

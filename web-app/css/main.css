@@ -167,9 +167,8 @@ th.name {
 .speciesField {
 	padding: 0px 10px;
 	background-color:white;
+	overflow: visible;
 }
-/* 	overflow: hidden; */
-/* } */
 
 /* .speciesField.collapse.in { */
 /* 	overflow: visible; */

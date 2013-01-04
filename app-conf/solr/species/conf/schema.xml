@@ -45,6 +45,9 @@
 			sortMissingLast="true" omitNorms="true" />
 		<fieldType name="long" class="solr.TrieLongField"
 			sortMissingLast="true" omitNorms="true" />
+		<fieldType name="sfloat" class="solr.TrieFloatField"
+            sortMissingLast="true" omitNorms="true" />
+		
 		<!-- solr.TextField allows the specification of custom text analyzers specified 
 			as a tokenizer and a list of token filters. Different analyzers may be specified 
 			for indexing and querying. The optional positionIncrementGap puts space between 
@@ -265,7 +268,7 @@
 
 		<field name="group" type="long" indexed="true" stored="true"  multiValued="true"/>
 		<field name="group_webaddress" type="string" indexed="true" stored="true" multiValued="true"/>
-		<field name="percent_of_info" type="long" indexed="true" stored="true"  multiValued="false"/>
+		<field name="percent_of_info" type="sfloat" indexed="true" stored="true"  multiValued="false"/>
 		
 		<dynamicField name="*" type="text" indexed="true" stored="true"
 			multiValued="true" />
