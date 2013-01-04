@@ -979,10 +979,13 @@ class ObservationController {
 					if(existingRecVote.commonNameReco != commonNameReco){
 						log.debug "Updating recoVote as common name changed"
 						existingRecVote.commonNameReco = commonNameReco;
+						return [recVote:existingRecVote, msg:msg]
+						/*
 						if(!existingRecVote.save(flush:true)){
 							existingRecVote.errors.allErrors.each { log.error it }
 						}
 						observationService.addRecoComment(existingRecVote.recommendation, observation, params.recoComment);
+						*/
 					}
 					return [recVote:null, msg:msg]
 				}else{
