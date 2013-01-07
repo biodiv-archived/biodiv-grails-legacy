@@ -31,6 +31,8 @@ import species.sourcehandler.SpreadsheetConverter
 import species.sourcehandler.XMLConverter
 import species.utils.Utils;
 
+import species.sourcehandler.exporter.DwCAExporter
+
 class SpeciesService {
 
 	private static final log = LogFactory.getLog(this);
@@ -56,11 +58,11 @@ class SpeciesService {
 	def loadData() {
 		int noOfInsertions = 0;
 
-//		grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/images";
-//		noOfInsertions += uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/Dung_beetle_Species_pages_IBP_v13.xlsx", grailsApplication.config.speciesPortal.data.rootDir+"/mappings/dungbeetles_mapping.xlsx", 0, 0, 0, 0);
+		grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/images";
+		noOfInsertions += uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/Dung_beetle_Species_pages_IBP_v13.xlsx", grailsApplication.config.speciesPortal.data.rootDir+"/mappings/dungbeetles_mapping.xlsx", 0, 0, 0, 0);
 
-//		grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/images";
-//		noOfInsertions += uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/Trees_descriptives_prabha_final_6.xlsx", grailsApplication.config.speciesPortal.data.rootDir+"/mappings/ifp_tree_mapping_v2.xlsx", 0, 0, 0, 2);
+		grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/images";
+		noOfInsertions += uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/Trees_descriptives_prabha_final_6.xlsx", grailsApplication.config.speciesPortal.data.rootDir+"/mappings/ifp_tree_mapping_v2.xlsx", 0, 0, 0, 2);
 
 //		//grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/images";
 //		noOfInsertions += uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/Bats/WG_bats_account_01Nov11_sanjayMolur.xls", grailsApplication.config.speciesPortal.data.rootDir+"/mappings/WG_bats_account_01Nov11_sanjayMolurspecies_mapping_v2.xlsx", 0, 0, 0, 0);
@@ -83,7 +85,6 @@ class SpeciesService {
 //
 //		grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/Eurasian Curlew/png ec";
 //		noOfInsertions += uploadNewSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/Eurasian Curlew/EurasianCurlew_v4_2.xlsm");
-//
 //		noOfInsertions += uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/zoooutreach/uploadready/primates.xlsx", grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/zoooutreach/uploadready/primates_mappingfile.xls", 0, 0, 0, 0);
 		
 		return noOfInsertions;
@@ -347,7 +348,6 @@ class SpeciesService {
 		
 	   def queryResponse = speciesSearchService.terms(params.term, params.field, params.max);
 	   NamedList tags = (NamedList) ((NamedList)queryResponse.getResponse().terms)[params.field];
-
 	   for (Iterator iterator = tags.iterator(); iterator.hasNext();) {
 		   Map.Entry tag = (Map.Entry) iterator.next();
 		   result.add([value:tag.getKey().toString(), label:tag.getKey().toString(),  "category":"Species Pages"]);
@@ -479,4 +479,12 @@ class SpeciesService {
 		result = [queryParams:queryParams, instanceTotal:0, speciesInstanceList:[]];
 		return result;
 	}
+	
+	/**
+	* export species data
+	*/
+   def exportSpeciesData(String directory) {
+		   DwCAExporter.getInstance().exportSpeciesData(directory)
+   }
+	
 }
