@@ -20,6 +20,6 @@ class Field {
 		subCategory(nullable:true);
 		description(nullable:true);
 		description (blank : true);
-		url_identifier(blank : true, nullable:true);
+		urlIdentifier(blank : true, nullable:true);
     }
 }

@@ -1,9 +1,7 @@
-import species.DataLoader;
-import species.SpeciesGroup;
-import speciespage.GroupHandlerService;
+import speciespage.SetupService;
 
 
-def speciesService = ctx.getBean("setupService");
+def setupService = ctx.getBean("setupService");
 
 setupService.uploadFields(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/templates/Definitions.xlsx");
 //dataLoader.uploadLanguages(grailsApplication.config.speciesPortal.data.rootDir+"/templates/Language_iso639-2.csv");
