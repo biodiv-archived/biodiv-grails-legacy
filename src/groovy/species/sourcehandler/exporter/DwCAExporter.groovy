@@ -105,12 +105,6 @@ class DwCAExporter {
 
 		taxonRow[1] = taxon.name
 
-		for (parentTaxonEntry in parentTaxon) {
-			switch (parentTaxonEntry.rank) {
-				case TaxonomyRank.KINGDOM : taxonRow[2] = parentTaxonEntry.id
-				case TaxonomyRank.PHYLUM : taxonRow[3] = parentTaxonEntry.id
-			}
-		}
 		//		Parent Taxon ID
 		
                 for(TaxonomyDefinition parentTaxonEntry: parentTaxon) {
@@ -133,7 +127,7 @@ class DwCAExporter {
                             break
                         case TaxonomyRank.GENUS:
                             taxonRow[8] = parentTaxonEntry.name
-                            taxonRow[2] = parentTaxonEntry.id
+//                            taxonRow[2] = parentTaxonEntry.id
                             break;
                         }
                 }
@@ -182,39 +176,7 @@ class DwCAExporter {
 			
 					// scientificName
 					taxonRow[1] = synonym.name
-
-					if(parentTaxon) {
-			
-					//		Parent Taxon ID
-					if(parentTaxon[6])
-					taxonRow[2] = parentTaxon[6].id
-			
-					//		t['Kingdom'] =  
-					if(parentTaxon[0])
-					taxonRow[3] = parentTaxon[0].name
-			
-					//		Phylum
-					if(parentTaxon[1])
-					taxonRow[4] = parentTaxon[1].name
-			
-					//		Class 
-					if(parentTaxon[2])
-					taxonRow[5] = parentTaxon[2].name
-			
-					//		Order 
-					if(parentTaxon[3])
-					taxonRow[6] = parentTaxon[3].name
-			
-					//		Family 
-					if(parentTaxon[4])
-					taxonRow[7] = parentTaxon[4].name
-			
-					//		Genus
-					if(parentTaxon[6])
-					taxonRow[8] = parentTaxon[6].name
-
-					}
-			
+					taxonRow[2] = taxon
 					//		TaxonRank 
 					taxonRow[9] = "Species"
 			
