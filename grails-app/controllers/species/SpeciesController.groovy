@@ -49,7 +49,7 @@ class SpeciesController {
 			return;
 		} else{
 			def obvListHtml =  g.render(template:"/species/showSpeciesListTemplate", model:model);
-			model.resultType = "species"
+			model.resultType = "specie"
 			def obvFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
 
 			def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml]
@@ -429,7 +429,7 @@ class SpeciesController {
 			return;
 		} else {
 			def obvListHtml =  g.render(template:"/species/searchResultsTemplate", model:model);
-			model.resultType = "species"
+			model.resultType = "specie"
 			def obvFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
 
 			def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml]

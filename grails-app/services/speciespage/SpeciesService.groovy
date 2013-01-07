@@ -422,7 +422,7 @@ class SpeciesService {
 		if(params.tag) {
 			paramsList.add('fq', searchFieldsConfig.TAG+":"+params.tag);
 			queryParams["tag"] = params.tag
-			queryParams["tagType"] = 'observation'
+			queryParams["tagType"] = 'species'
 			activeFilters["tag"] = params.tag
 		}
 		if(params.user){
@@ -451,8 +451,9 @@ class SpeciesService {
 			}
 		}
 
-		if(params.startsWith && params.startsWith != "A-Z"){
-			paramsList.add('fq', searchFieldsConfig.TITLE+":"+params.startsWith+"*");
+		if(params.query && params.startsWith && params.startsWith != "A-Z"){
+			params.query = params.query + " AND "+searchFieldsConfig.TITLE+":"+params.startsWith+"*"
+			//paramsList.add('fq', searchFieldsConfig.TITLE+":"+params.startsWith+"*");
 			queryParams["startsWith"] = params.startsWith
 			activeFilters["startsWith"] = params.startsWith
 		}

@@ -1,9 +1,7 @@
 package species.participation
 
-import species.Contributor;
 import species.TaxonomyDefinition;
 import species.auth.SUser;
-
 
 class RecommendationVote {
 	

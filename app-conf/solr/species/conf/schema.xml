@@ -213,6 +213,8 @@
 		<field name="guid" type="string" indexed="true" stored="true"
 			required="true" multiValued="false" />
 		<field name="title" type="taxonText" indexed="true" stored="true" required="true" multiValued="false" />
+		<!-- field name="title_exact" type="textExact" indexed="true" stored="true" required="true" multiValued="false" />
+		<copyField source="title" dest="title_exact" /-->
 		
 		<field name="contributor" type="taxonText" indexed="true" stored="true" multiValued="true" />
 		<field name="location" type="text" indexed="true" stored="true" multiValued="true"/>
