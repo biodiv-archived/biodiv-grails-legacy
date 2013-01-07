@@ -493,22 +493,27 @@ class ChecklistService {
 				cn.name = Utils.getTitleCase(cn.name)
 				cn.save()
 			}
+			log.debug " done common names"
 			
 			Recommendation.findAllByIsScientificName(false).each{ Recommendation r ->
 				r.name = Utils.getTitleCase(r.name)
 				r.save()
 			}
+			log.debug " done recommendation names"
 			
 			UnCuratedCommonNames.list().each{ UnCuratedCommonNames uncn ->
 				uncn.name = Utils.getTitleCase(uncn.name)
 				uncn.save()
 			}
+			log.debug " done un curated common names"
 			
 		}
 		
 	}
 	
 	def mCn(){
+		def flushImmediately  = grailsApplication.config.speciesPortal.flushImmediately
+		
 		Date startTime = new Date()
 		println "stat time ====== " + startTime
 		
@@ -525,7 +530,9 @@ class ChecklistService {
 			def clPairs = getPairs(cl.row)
 			println "== got paris " + clPairs.size()
 			updateCl(clPairs, cl)
-			//cleanUpGorm(true)
+			if(!flushImmediately){
+				cleanUpGorm(true)
+			}
 			println "================ done checklist === " + cl
 		}
 		Date finishTime = new Date()

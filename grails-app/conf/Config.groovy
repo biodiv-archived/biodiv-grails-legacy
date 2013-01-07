@@ -847,9 +847,10 @@ Hi $username,<br/>
 <br/>
 Thank you for registering with us at <b>$domain</b>.<br/>
 <br/> 
-We look forward for your contribution to the portal. The portal is a public participatory portal that thrives by participation from users like you. Will also appreciate any feedback you may have to offer.<br/>
+We look forward to your contribution on the portal. The portal is a public participatory portal that thrives by participation from users like you. Will also appreciate any feedback you may have to offer.<br/>
 <br/>
 You will be notified by mail on any social activity on the observation.<br/>
+Please update your <a href="$userProfileUrl">user profile</a>.<br/>
 <br/>
 If you do not want to receive notifications please go to your <a href="$userProfileUrl">user profile</a> and switch it off.<br/>
 <br/>
