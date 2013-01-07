@@ -53,7 +53,7 @@ class DwCAExporter {
 
 		// percentOfInfo>0 - one way
 
-		List<Species> speciesList = Species.list(max:100)
+		List<Species> speciesList = Species.findAllByPercentOfInfoGreaterThan(0)
 
 		for(Species specie: speciesList) {
 			exportSpecies(specie)
