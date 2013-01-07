@@ -128,7 +128,6 @@ class DwCAExporter {
 					break
 				case TaxonomyRank.GENUS.ordinal:
 					taxonRow[8] = parentTaxonEntry.name
-				//                            taxonRow[2] = parentTaxonEntry.id
 					break;
 			}
 		}
@@ -210,7 +209,7 @@ class DwCAExporter {
 
 
 	/**
-	 *MediaID	TaxonID	Type	Subtype	Format	Subject	Title	Description	AccessURI	ThumbnailURL	FurtherInformationURL	DerivedFrom	CreateDate	Modified	Language	Rating	Audience	License	Rights	Owner	BibliographicCitation	Publisher	Contributor	Creator	AgentID	LocationCreated	GenericLocation	Latitude	Longitude	Altitude	ReferenceID
+	 *MediaID	TaxonID	Type	Subtype	Format	Subject	Title	Description	AccessURI	ThumbnailURL	FurtherInformationURL	DerivedFrom	CreateDate	Modified	Language	Rating	Audience	License	Rights	Owner	BibliographicCitation	Publisher	Contributor     Attributor	Creator	AgentID	LocationCreated	GenericLocation	Latitude	Longitude	Altitude	ReferenceID
 	 * 
 	 * @param species
 	 */
@@ -300,6 +299,13 @@ class DwCAExporter {
 				contributorsSet.add(contributor)
 			}
 			row[22] = contributors.join(",")
+
+                        def attributors = []
+                        for(Contributor attributor: media.attributors) {
+                            attributors.add(String.valueOf(attributor.id))
+                            contributorsSet.add(attributor)
+                        }
+                        row[23] = attributors.join(",")
 			//Creator
 			//AgentID
 			//LocationCreated
@@ -385,6 +391,13 @@ class DwCAExporter {
 				}
 				row[22] = contributors.join(",")
 
+                                def attributors = []
+                                for(Contributor attributor: speciesField.attributors) {
+                                    attributors.add(String.valueOf(attributor.id))
+                                    contributorsSet.add(attributor)
+                                }
+                                row[23] = attributors.join(",")
+
 				//Creator
 				//AgentID
 				//LocationCreated
@@ -396,7 +409,7 @@ class DwCAExporter {
 				for(Reference ref: speciesField.references) {
 					referenceID.add(String.valueOf(ref.id))
 				}
-				row[30] = referenceID.join(",")
+				row[31] = referenceID.join(",")
 
 				mediaWriter.writeNext(row)
 			}
@@ -562,6 +575,7 @@ class DwCAExporter {
 			"BibliographicCitation",
 			"Publisher",
 			"Contributor",
+                        "Attributor",
 			"Creator",
 			"AgentID",
 			"LocationCreated",
