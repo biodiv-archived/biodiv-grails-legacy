@@ -105,6 +105,12 @@ class DwCAExporter {
 
 		taxonRow[1] = taxon.name
 
+		for (parentTaxonEntry in parentTaxon) {
+			switch (parentTaxonEntry.rank) {
+				case TaxonomyRank.KINGDOM : taxonRow[2] = parentTaxonEntry.id
+				case TaxonomyRank.PHYLUM : taxonRow[3] = parentTaxonEntry.id
+			}
+		}
 		//		Parent Taxon ID
 		if(parentTaxon && parentTaxon[6]) {
 			taxonRow[2] = parentTaxon[6].id
@@ -156,7 +162,9 @@ class DwCAExporter {
                 def referenceID = []
                 for(SpeciesField field: species.fields) {
                     for(Reference ref: field.references) {
-                        referenceID.add(String.valueOf(ref.id))
+						if(field.id == 15) {
+							referenceID.add(String.valueOf(ref.id))
+						}
                     }
                 }
 
@@ -215,7 +223,7 @@ class DwCAExporter {
 			
 					//		furtherInformationURL  #TODO
 					//      speciespage url
-					taxonRow[10] = ""
+					taxonRow[10] = "${org.codehaus.groovy.grails.commons.ConfigurationHolder.config.grails.serverURL}/species/show/" + species.id
 			
 					//		taxonomicStatus   #TODO
 					//      synonyms
@@ -228,7 +236,7 @@ class DwCAExporter {
 					taxonRow[13] = ""
 			
 					//              referenceID
-					taxonRow[14] = referenceID.join(",")
+					taxonRow[14] =""
 			
 					taxaWriter.writeNext(taxonRow)
                     
@@ -245,7 +253,7 @@ class DwCAExporter {
 	 */
 	protected void exportMedia(Species species) {
 
-		def resources = species.resources
+		def resources = species.getImages();
 
 		String[] row
 
@@ -275,27 +283,27 @@ class DwCAExporter {
 			row[6] = media.description
 
 			//Description
-			row[7] = media.description
+			row[7] = ""
 
 			//AccessURI  -- get absolute url by appending domain name and base path(/biodiv/images/)
-			row[8] = media.fileName
+			row[8] = "${org.codehaus.groovy.grails.commons.ConfigurationHolder.config.grails.serverURL}${media.fileName}"
 
 			//ThumbnailURL - get thumbnail url-- there must be some function
-			row[9] = media.fileName
+			row[9] ="" 
 
 			//FurtherInformationURL #TODO - put thumbnail url
 			row[10] = media.url
 
 			//DerivedFrom
-                        row[11] = ""
+            row[11] = ""
 
 			//CreateDate
 			row[12] = ""
 
 			//Modified	
-                        row[13] = ""
+            row[13] = ""
 			//Language
-                        row[14] = "eng"
+            row[14] = ""
 			//Rating	
 			//Audience #Do not export audience field
                         /*
@@ -309,7 +317,7 @@ class DwCAExporter {
 
 
 			//License 
-                        row[17] = media.licenses.name.join(",")
+                        row[17] = media.licenses.url.join(",")
 
 			//Rights 
 			//Owner #TODO: http://ns.adobe.com/xap/1.0/rights/Owner???
@@ -370,7 +378,7 @@ class DwCAExporter {
 			row[9] = ""
 
 			//FurtherInformationURL #TODO - put thumbnail url
-			row[10] = ""
+			row[10] = "${org.codehaus.groovy.grails.commons.ConfigurationHolder.config.grails.serverURL}/species/show/" + species.id
 
 			//DerivedFrom
 
@@ -393,7 +401,7 @@ class DwCAExporter {
 
 
 			//License 
-                        row[17] = speciesField.licenses.name.join(",")
+                        row[17] = speciesField.licenses.url.join(",")
 
 			//Rights 
 			//Owner #TODO: http://ns.adobe.com/xap/1.0/rights/Owner???
