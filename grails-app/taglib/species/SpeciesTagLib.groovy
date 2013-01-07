@@ -38,7 +38,7 @@ class SpeciesTagLib {
 				out << "<a href=\"http://www.ubio.org/browser/search.php?search_all=${attrs.model.taxonConcept.binomialForm}\" title=\"View on uBio\" target=\"_blank\"><img class=\"group_icon\" src=\"${createLinkTo(dir: 'images/icons/externalLinks', file:'uBio.png', absolute:true)}\"/></a>";
 				break;
 			case "wikipedia" :
-				out << "<a href=\"http://en.wikipedia.org/wiki/${attrs.model.taxonConcept.binomialForm}\" title=\"View on Wikipedia\"  target=\"_blank\"><img class=\"group_icon\" src=\"${createLinkTo(dir: 'images/icons/externalLinks', file:'wiki.png', absolute:true)}\"/></a>";
+				out << "<a href=\"http://en.wikipedia.org/wiki/${attrs.model.taxonConcept.binomialForm?:attrs.model.taxonConcept.name}\" title=\"View on Wikipedia\"  target=\"_blank\"><img class=\"group_icon\" src=\"${createLinkTo(dir: 'images/icons/externalLinks', file:'wiki.png', absolute:true)}\"/></a>";
 				break;
 		}
 	}

@@ -25,14 +25,14 @@
 			<span class="caret"></span>
 		</button>
 		<ul id="sortFilter" class="dropdown-menu" style="width: auto;">
-			<li class="group_option"><a class=" sort_filter_label"
-				value="title"> Name </a></li>
 			<g:if test="${isSearch}">
 				<li class="group_option"><a class=" sort_filter_label"
 					value="score"> Relevancy </a>
 				</li>
 			</g:if>
 			<g:else>
+				<li class="group_option"><a class=" sort_filter_label"
+					value="title"> Name </a></li>
 				<li class="group_option"><a class=" sort_filter_label"
 					value="percentOfInfo"> Richness </a></li>
 			</g:else>

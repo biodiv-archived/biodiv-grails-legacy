@@ -32,6 +32,8 @@ class SpeciesSearchService {
 	private SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 	
 	static int BATCH_SIZE = 50;
+	
+	def sessionFactory;
 
 	/**
 	 * 
