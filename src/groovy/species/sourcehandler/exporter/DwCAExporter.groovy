@@ -39,21 +39,23 @@ class DwCAExporter {
 	}
 
 
-
+	public void exportSpeciesData(String directory) {
+		exportSpeciesData(directory, Species.findAllByPercentOfInfoGreaterThan(0));
+	}
 
 	/**
 	 * Export species
 	 * #TODO : Iterate over species and export one at a time or export everything at once?
 	 *
 	 */
-	public void exportSpeciesData(String directory) {
+	public void exportSpeciesData(String directory, List<Species> speciesList) {
 
 		initWriters(directory)
 		fillHeaders()
 
 		// percentOfInfo>0 - one way
-
-		List<Species> speciesList = Species.findAllByPercentOfInfoGreaterThan(0)
+		//["query":"contributor:chitra OR contributor:Seena", "webaddress":"the_western_ghats", "action":"search", "controller":"species"]
+		//List<Species> speciesList = Species.findAllByPercentOfInfoGreaterThan(0)
 
 		for(Species specie: speciesList) {
 			exportSpecies(specie)
@@ -138,6 +140,8 @@ class DwCAExporter {
 		//		furtherInformationURL  #TODO
 		//      speciespage url
 		taxonRow[10] = "${org.codehaus.groovy.grails.commons.ConfigurationHolder.config.grails.serverURL}/species/show/" + species.id
+		taxonRow[10] = taxonRow[10].replace(":8080", "");
+		taxonRow[10] = taxonRow[10].replace("/biodiv", "");
 
 		//		taxonomicStatus   #TODO
 		//      synonyms
@@ -186,7 +190,8 @@ class DwCAExporter {
 			//		furtherInformationURL  #TODO
 			//      speciespage url
 			taxonRow[10] = "${org.codehaus.groovy.grails.commons.ConfigurationHolder.config.grails.serverURL}/species/show/" + species.id
-
+			taxonRow[10] = taxonRow[10].replace(":8080", "");
+			taxonRow[10] = taxonRow[10].replace("/biodiv", "");
 			//		taxonomicStatus   #TODO
 			//      synonyms
 			taxonRow[11] = synonym.relationship.value().toLowerCase();
@@ -242,14 +247,15 @@ class DwCAExporter {
 			//row[5] = ""
 
 			//Title
-			row[6] = media.description
+			row[6] = media.description.replaceAll("\\t|\\n", ' ');
 
 			//Description
 			//row[7] = ""
 
 			//AccessURI  -- get absolute url by appending domain name and base path(/biodiv/images/)
-			row[8] = ""+org.codehaus.groovy.grails.commons.ConfigurationHolder.config.grails.serverURL+media.fileName
-
+			row[8] = ""+org.codehaus.groovy.grails.commons.ConfigurationHolder.config.resources.serverURL+media.fileName
+			row[8] = row[8].replace(":8080", "");
+			
 			//ThumbnailURL - get thumbnail url-- there must be some function
 			//row[9] =""
 
@@ -344,7 +350,7 @@ class DwCAExporter {
 				row[6] = speciesField.field.category
 
 				//Description
-				row[7] = speciesField.description
+				row[7] = speciesField.description.replaceAll("\\t|\\n", ' ');
 
 				//AccessURI
 				//row[8] = ""
@@ -354,7 +360,8 @@ class DwCAExporter {
 
 				//FurtherInformationURL #TODO - put thumbnail url
 				row[10] = "${org.codehaus.groovy.grails.commons.ConfigurationHolder.config.grails.serverURL}/species/show/" + species.id
-
+				row[10] = row[10].replace(":8080", "");
+				row[10] = row[10].replace("/biodiv", "");
 				//DerivedFrom
 
 				//CreateDate
@@ -663,7 +670,7 @@ class DwCAExporter {
 	public CSVWriter getCSVWriter(def directory, def fileName) {
 		char separator = '\t'
 		new File(directory).mkdir()
-		CSVWriter writer = new CSVWriter(new FileWriter("$directory/$fileName"), separator);//, CSVWriter.NO_QUOTE_CHARACTER
+		CSVWriter writer = new CSVWriter(new FileWriter("$directory/$fileName"), separator, CSVWriter.NO_QUOTE_CHARACTER);
 		return writer
 	}
 
