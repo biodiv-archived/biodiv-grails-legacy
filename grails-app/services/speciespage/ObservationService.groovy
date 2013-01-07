@@ -331,15 +331,15 @@ class ObservationService {
 		return null;
 	}
 	
-	private  Recommendation findReco(name, isScientificName, languageId, taxonConceptForNewReco){
+	public Recommendation findReco(name, isScientificName, languageId, taxonConceptForNewReco){
 		if(name){
 			// if sn then only sending to names parser for common name only cleaning
 			if(isScientificName){
 				name = Utils.getCanonicalForm(name);
 			}else{
-				name = Utils.cleanName(name);
+				//converting common name to title case
+				name = Utils.getTitleCase(Utils.cleanName(name));
 			}
-			
 			def c = Recommendation.createCriteria();
 			def result = c.list {
 				ilike('name', name);

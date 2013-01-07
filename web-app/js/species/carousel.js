@@ -106,6 +106,7 @@ function resizeImage(item) {
  */
 var getItemHTML = function(contextFreeUrl, contextGroup, item) {
 	var imageTag = '<img style="height:100%;" src="' + item.imageLink + '" title="' + item.imageTitle  +'" alt="" />';
+	/*
 	if(contextGroup){
 		if(item.groupContextLink){
 			return '<a href='+item.groupContextLink +'/'+ item.obvId + '>' + imageTag + '</a>';
@@ -113,6 +114,7 @@ var getItemHTML = function(contextFreeUrl, contextGroup, item) {
 			return '<a  target="_blank" href='+contextFreeUrl +'/'+ item.obvId + '>' + imageTag + '</a>';
 		}
 	}
+	*/
 	return '<a href='+contextFreeUrl +'/'+ item.obvId + '>' + imageTag + '</a>';
 };
 

@@ -10,6 +10,7 @@ class ChecklistController {
 	def activityFeedService;
 	def springSecurityService;
 	def checklistService;
+	def grailsApplication
 	
 	def index = {
 		redirect(action:list, params: params)
@@ -181,7 +182,18 @@ class ChecklistController {
 			}
 		}[0]
 	}
-
+	
+	@Secured(['ROLE_ADMIN'])
+	def correctCn = {
+		checklistService.mCn()
+		render "=== done "
+	}
+	
+	
+	def test1 ={
+		def flushImmediately  = grailsApplication.config.speciesPortal.flushImmediately
+		render flushImmediately
+	}
 	/*
 	@Secured(['ROLE_USER'])
 	def test = {

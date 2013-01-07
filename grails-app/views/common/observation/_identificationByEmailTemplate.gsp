@@ -51,7 +51,7 @@
 
 </div>
 <style>
-#cke_message .cke_wrapper {
+#cke_message #cke_userMessage{
 	max-width: 370px;
 }
 </style>

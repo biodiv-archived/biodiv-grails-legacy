@@ -27,7 +27,13 @@ class Recommendation {
 	}
 
 	void setName(String name) {
-		this.name = Utils.cleanName(name);
+		name = Utils.cleanName(name);
+		//if common name
+		if(!isScientificName){
+			name = Utils.getTitleCase(name)
+		}
+		
+		this.name = name
 	}	
 	
 	/**

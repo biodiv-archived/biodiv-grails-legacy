@@ -32,7 +32,7 @@ class RecommendationService {
 		def flushImmediately  = grailsApplication.config.speciesPortal.flushImmediately
 		if(reco.save(flush:flushImmediately)) {
 			//XXX uncomment this
-			namesIndexerService.add(reco);
+			//namesIndexerService.add(reco);
 			return true;
 		}
 		log.error "Error saving recommendation"

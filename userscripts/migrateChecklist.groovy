@@ -11,7 +11,9 @@ def checklistService = ctx.getBean("checklistService");
 
 //checklistService.updateLocation()
 
-checklistService.mCn()
+//checklistService.mCn()
+
+checklistService.changeCnName()
 
 def getWrongCommonName(){
 	def shared = 0

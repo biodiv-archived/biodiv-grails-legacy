@@ -21,6 +21,8 @@ import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import species.auth.SUser;
 import species.NamesParser;
 
+import org.apache.commons.lang.WordUtils
+
 class Utils {
 
 	private static final log = LogFactory.getLog(this);
@@ -211,6 +213,10 @@ class Utils {
 			}
 		}
 		return result;
+	}
+	
+	static String getTitleCase(String str){
+		return WordUtils.capitalize(str)
 	}
 
 }

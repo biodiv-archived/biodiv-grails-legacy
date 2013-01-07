@@ -4,6 +4,8 @@ import java.text.SimpleDateFormat
 import java.util.Iterator;
 import java.util.List;
 
+import species.participation.curation.UnCuratedCommonNames
+
 import org.springframework.transaction.annotation.Transactional;
 
 
@@ -11,6 +13,7 @@ import species.auth.SUser
 import species.Species;
 import species.groups.SpeciesGroup;
 import species.groups.UserGroup;
+import species.CommonNames;
 import species.License;
 import species.Reference;
 import groovy.sql.Sql;
@@ -483,6 +486,28 @@ class ChecklistService {
 	
 	
 	
+	def changeCnName(){
+		Recommendation.withTransaction(){
+			
+			CommonNames.list().each { CommonNames cn ->
+				cn.name = Utils.getTitleCase(cn.name)
+				cn.save()
+			}
+			
+			Recommendation.findAllByIsScientificName(false).each{ Recommendation r ->
+				r.name = Utils.getTitleCase(r.name)
+				r.save()
+			}
+			
+			UnCuratedCommonNames.list().each{ UnCuratedCommonNames uncn ->
+				uncn.name = Utils.getTitleCase(uncn.name)
+				uncn.save()
+			}
+			
+		}
+		
+	}
+	
 	def mCn(){
 		Date startTime = new Date()
 		println "stat time ====== " + startTime
@@ -500,7 +525,7 @@ class ChecklistService {
 			def clPairs = getPairs(cl.row)
 			println "== got paris " + clPairs.size()
 			updateCl(clPairs, cl)
-			cleanUpGorm(true)
+			//cleanUpGorm(true)
 			println "================ done checklist === " + cl
 		}
 		Date finishTime = new Date()
@@ -522,32 +547,38 @@ class ChecklistService {
 		if(!cnName && !snReco){
 			return
 		}
+		def originalCnName = cnName
 		
-		if(snReco){
-			if(recoIdSet.contains(snReco.id)){
-				println "========================== duplicate sn =============================="
-				cleanUpGorm(false)
-				recoIdSet.clear()
-				cnSet.clear()
-			}
-			recoIdSet.add(snReco.id)
-		}
-		
-		if(cnName){
-			cnName = Utils.cleanName(cnName)
-			if(cnSet.contains(cnName)){
-				println "========================== duplicate cn =======  $cnName ================"
-				cleanUpGorm(false)
-				recoIdSet.clear()
-				cnSet.clear()
-			}
+		def flushImmediately  = grailsApplication.config.speciesPortal.flushImmediately
+		if(!flushImmediately){
+			// creating batches for optimization
 			if(snReco){
+				if(recoIdSet.contains(snReco.id)){
+					println "========================== duplicate sn =============================="
+					cleanUpGorm(false)
+					recoIdSet.clear()
+					cnSet.clear()
+				}
 				recoIdSet.add(snReco.id)
 			}
-			cnSet.add(cnName)
+			
+			
+			if(cnName){
+				cnName = Utils.getTitleCase(Utils.cleanName(cnName))
+				if(cnSet.contains(cnName)){
+					println "========================== duplicate cn =======  $cnName ================"
+					cleanUpGorm(false)
+					recoIdSet.clear()
+					cnSet.clear()
+				}
+				if(snReco){
+					recoIdSet.add(snReco.id)
+				}
+				cnSet.add(cnName)
+			}
 		}
 		
-		def cnReco = observationService.findReco(cnName, false, null, null)
+		def cnReco = observationService.findReco(originalCnName, false, null, null)
 		curationService.add(snReco, cnReco, cl, user);
 	}
 	
