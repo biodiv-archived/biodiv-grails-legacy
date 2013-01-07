@@ -53,7 +53,7 @@ class DwCAExporter {
 
                 // percentOfInfo>0 - one way
 
-		List<Species> speciesList = Species.list(max:1000)
+		List<Species> speciesList = Species.list(max:100)
 	        	
 		for(Species specie: speciesList) {
 			exportSpecies(specie)
@@ -106,34 +106,31 @@ class DwCAExporter {
 		taxonRow[1] = taxon.name
 
 		//		Parent Taxon ID
-		if(parentTaxon && parentTaxon[6]) {
-			taxonRow[2] = parentTaxon[6].id
-		}
-
-		//		t['Kingdom'] = 
-		if(parentTaxon && parentTaxon[0]) 
-			taxonRow[3] = parentTaxon[0].name
-
-		//		Phylum
-		if(parentTaxon && parentTaxon[1]) 
-			taxonRow[4] = parentTaxon[1].name
-
-		//		Class 
-		if(parentTaxon && parentTaxon[2]) 
-			taxonRow[5] = parentTaxon[2].name
-
-		//		Order 
-		if(parentTaxon && parentTaxon[3]) 
-			taxonRow[6] = parentTaxon[3].name
-
-		//		Family 
-		if(parentTaxon && parentTaxon[4]) 
-			taxonRow[7] = parentTaxon[4].name
-
-		//		Genus
-		if(parentTaxon && parentTaxon[6]) 
-			taxonRow[8] = parentTaxon[6].name
 		
+                for(TaxonomyDefinition parentTaxonEntry: parentTaxon) {
+                    switch(parentTaxonEntry.rank) {
+
+                        case TaxonomyRank.KINGDOM:
+        	            taxonRow[3] = parentTaxonEntry.name
+                            break                            
+                        case TaxonomyRank.PHYLUM:
+			    taxonRow[4] = parentTaxonEntry.name
+                            break
+                        case TaxonomyRank.CLASS:
+                            taxonRow[5] = parentTaxonEntry.name
+                            break
+                        case TaxonomyRank.ORDER:
+                            taxonRow[6] = parentTaxonEntry.name
+                            break
+                        case TaxonomyRank.FAMILY:
+                            taxonRow[7] = parentTaxonEntry.name
+                            break
+                        case TaxonomyRank.GENUS:
+                            taxonRow[8] = parentTaxonEntry.name
+                            taxonRow[2] = parentTaxonEntry.id
+                            break;
+                        }
+                }
 
 		//		TaxonRank = taxon.rank
 		taxonRow[9] = "Species"
