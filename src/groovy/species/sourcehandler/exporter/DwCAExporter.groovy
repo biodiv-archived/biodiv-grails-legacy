@@ -110,29 +110,6 @@ class DwCAExporter {
 		//		Parent Taxon ID
 
 		for(TaxonomyDefinition parentTaxonEntry: parentTaxon) {
-<<<<<<< HEAD
-			switch(parentTaxonEntry.rank) {
-
-				case TaxonomyRank.KINGDOM:
-					taxonRow[3] = parentTaxonEntry.name
-					break
-				case TaxonomyRank.PHYLUM:
-					taxonRow[4] = parentTaxonEntry.name
-					break
-				case TaxonomyRank.CLASS:
-					taxonRow[5] = parentTaxonEntry.name
-					break
-				case TaxonomyRank.ORDER:
-					taxonRow[6] = parentTaxonEntry.name
-					break
-				case TaxonomyRank.FAMILY:
-					taxonRow[7] = parentTaxonEntry.name
-					break
-				case TaxonomyRank.GENUS:
-					taxonRow[8] = parentTaxonEntry.name
-				//                            taxonRow[2] = parentTaxonEntry.id
-=======
-			println parentTaxonEntry.rank
 			switch(parentTaxonEntry.rank) {
 
 				case TaxonomyRank.KINGDOM.ordinal():
@@ -152,7 +129,7 @@ class DwCAExporter {
 					break
 				case TaxonomyRank.GENUS.ordinal():
 					taxonRow[8] = parentTaxonEntry.name
->>>>>>> refs/remotes/origin/master
+
 					break;
 			}
 		}
@@ -203,22 +180,6 @@ class DwCAExporter {
 
 			// scientificName
 			taxonRow[1] = synonym.name
-<<<<<<< HEAD
-			
-			//parentTaxon
-			taxonRow[2] = taxon.id.toString();
-			
-			//		TaxonRank
-			taxonRow[9] = "Species"
-
-			//		furtherInformationURL  #TODO
-			//      speciespage url
-			taxonRow[10] = "${org.codehaus.groovy.grails.commons.ConfigurationHolder.config.grails.serverURL}/species/show/" + species.id
-
-			//		taxonomicStatus   #TODO
-			//      synonyms
-			taxonRow[11] = synonym.relationship.value()
-=======
 
 			//parentTaxon
 			taxonRow[2] = taxon.id.toString();
@@ -234,7 +195,7 @@ class DwCAExporter {
 			//		taxonomicStatus   #TODO
 			//      synonyms
 			taxonRow[11] = synonym.relationship.value().toLowerCase();
->>>>>>> refs/remotes/origin/master
+
 
 			//		taxonRemarks
 			//taxonRow[12] = ""
@@ -287,20 +248,14 @@ class DwCAExporter {
 			//row[5] = ""
 
 			//Title
-			row[6] = media.description.replaceAll("\\t|\\n", ' ');
+			row[6] = media.description?.replaceAll("\\t|\\n", ' ');
 
 			//Description
 			//row[7] = ""
 
 			//AccessURI  -- get absolute url by appending domain name and base path(/biodiv/images/)
-<<<<<<< HEAD
-			row[8] = ""+org.codehaus.groovy.grails.commons.ConfigurationHolder.config.grails.serverURL+media.fileName
-
-=======
 			row[8] = ""+org.codehaus.groovy.grails.commons.ConfigurationHolder.config.resources.serverURL+media.fileName
 			row[8] = row[8].replace(":8080", "");
-			
->>>>>>> refs/remotes/origin/master
 			//ThumbnailURL - get thumbnail url-- there must be some function
 			//row[9] =""
 
@@ -315,25 +270,10 @@ class DwCAExporter {
 
 			//Modified
 			//row[13] = ""
-<<<<<<< HEAD
-			
-=======
-
->>>>>>> refs/remotes/origin/master
 			//Language
 			//row[14] = ""
-<<<<<<< HEAD
-			
-=======
-
->>>>>>> refs/remotes/origin/master
 			//Rating
 			//Audience #Do not export audience field
-<<<<<<< HEAD
-			
-=======
-
->>>>>>> refs/remotes/origin/master
 			/*
 			 String str=""
 			 for(AudienceType aud : media.speciesFields.audienceTypes) {
@@ -353,23 +293,6 @@ class DwCAExporter {
 			//BibliographicCitation
 			//Publisher
 			//Contributor
-<<<<<<< HEAD
-			def contributors = []
-			for(Contributor contributor: media.contributors) {
-				contributors.add(String.valueOf(contributor.id))
-				contributorsSet.add(contributor)
-			}
-			row[22] = contributors.join(",")
-			//Creator
-			//AgentID
-			//LocationCreated
-			//GenericLocation
-			//Latitude
-			//Altitude
-			//ReferenceID
-=======
-			println "media contributors"
-			println  media.contributors;
 			def contributors = []
 			for(Contributor contributor: media.contributors) {
 				println contributor;
@@ -377,10 +300,6 @@ class DwCAExporter {
 				contributorsSet.add(contributor)
 			}
 			row[22] = contributors.join(",")
->>>>>>> refs/remotes/origin/master
-
-<<<<<<< HEAD
-=======
                         def attributors = []
                         for(Contributor attributor: media.attributors) {
                             attributors.add(String.valueOf(attributor.id))
@@ -395,7 +314,7 @@ class DwCAExporter {
 			//Altitude
 			//ReferenceID
 
->>>>>>> refs/remotes/origin/master
+
 			mediaWriter.writeNext(row)
 
 		}
@@ -403,11 +322,8 @@ class DwCAExporter {
 		// SpeciesFields of a species
 		for(SpeciesField speciesField: species.fields) {
 			if((speciesField.field.id >= 3 && speciesField.field.id <= 10) || (speciesField.field.id >= 37 && speciesField.field.id <= 75) ) {
-<<<<<<< HEAD
-				row = new String[31]
-=======
 				row = new String[32]
->>>>>>> refs/remotes/origin/master
+
 				// Media ID
 				row[0] = speciesField.id
 
@@ -430,11 +346,7 @@ class DwCAExporter {
 				row[6] = speciesField.field.category
 
 				//Description
-<<<<<<< HEAD
-				row[7] = speciesField.description
-=======
-				row[7] = speciesField.description.replaceAll("\\t|\\n", ' ');
->>>>>>> refs/remotes/origin/master
+				row[7] = speciesField.description?.replaceAll("\\t|\\n", ' ');
 
 				//AccessURI
 				//row[8] = ""
@@ -444,26 +356,12 @@ class DwCAExporter {
 
 				//FurtherInformationURL #TODO - put thumbnail url
 				row[10] = "${org.codehaus.groovy.grails.commons.ConfigurationHolder.config.grails.serverURL}/species/show/" + species.id
-<<<<<<< HEAD
-=======
 				row[10] = row[10].replace(":8080", "");
 				row[10] = row[10].replace("/biodiv", "");
 				//DerivedFrom
->>>>>>> refs/remotes/origin/master
-
-<<<<<<< HEAD
-				//DerivedFrom
-=======
-				//CreateDate
-				//row[12] =
->>>>>>> refs/remotes/origin/master
-
-<<<<<<< HEAD
 				//CreateDate
 				//row[12] =
 
-=======
->>>>>>> refs/remotes/origin/master
 				//Modified
 				//Language
 				row[14] = "eng"
@@ -494,25 +392,6 @@ class DwCAExporter {
 					contributorsSet.add(contributor)
 				}
 				row[22] = contributors.join(",")
-<<<<<<< HEAD
-				
-				//Creator
-				//AgentID
-				//LocationCreated
-				//GenericLocation
-				//Latitude
-				//Altitude
-				//ReferenceId
-				def referenceID = []
-				for(Reference ref: speciesField.references) {
-					referenceID.add(String.valueOf(ref.id))
-				}
-				row[30] = referenceID.join(",")
-=======
->>>>>>> refs/remotes/origin/master
-
-<<<<<<< HEAD
-=======
                                 def attributors = []
                                 for(Contributor attributor: speciesField.attributors) {
                                     attributors.add(String.valueOf(attributor.id))
@@ -533,7 +412,6 @@ class DwCAExporter {
 				}
 				row[31] = referenceID.join(",")
 
->>>>>>> refs/remotes/origin/master
 				mediaWriter.writeNext(row)
 			}
 
@@ -566,18 +444,10 @@ class DwCAExporter {
 			//row[2] = ""
 
 			//			Language
-<<<<<<< HEAD
-			row[3] = cName.language?.name
-=======
 			row[3] = cName.language?.threeLetterCode?:''
->>>>>>> refs/remotes/origin/master
 
 			//			Language Code
-<<<<<<< HEAD
-			row[4] = cName.language?.threeLetterCode
-=======
 			//row[4] = cName.language?.threeLetterCode
->>>>>>> refs/remotes/origin/master
 
 			//			Locality == cName.language.region?? #TODO
 			//row[5] = ""
@@ -612,7 +482,7 @@ class DwCAExporter {
 
 				//PublicationType
 				//Full Reference
-				row[2] = reference.title
+				row[2] = reference.title?.replaceAll("\\t|\\n", " ")
 				//PrimaryTitle
 				//row[3] = ""
 				//SecondaryTitle
@@ -706,10 +576,7 @@ class DwCAExporter {
 			"BibliographicCitation",
 			"Publisher",
 			"Contributor",
-<<<<<<< HEAD
-=======
                         "Attributor",
->>>>>>> refs/remotes/origin/master
 			"Creator",
 			"AgentID",
 			"LocationCreated",
@@ -726,11 +593,7 @@ class DwCAExporter {
 			"Name",
 			"Source Reference",
 			"Language",
-<<<<<<< HEAD
-			"Language Code",
-=======
 			//"Language Code",
->>>>>>> refs/remotes/origin/master
 			"Locality",
 			"CountryCode",
 			"IsPreferredName",
@@ -801,11 +664,7 @@ class DwCAExporter {
 	public CSVWriter getCSVWriter(def directory, def fileName) {
 		char separator = '\t'
 		new File(directory).mkdir()
-<<<<<<< HEAD
-		CSVWriter writer = new CSVWriter(new FileWriter("$directory/$fileName"), separator, CSVWriter.NO_QUOTE_CHARACTER)
-=======
 		CSVWriter writer = new CSVWriter(new FileWriter("$directory/$fileName"), separator, CSVWriter.NO_QUOTE_CHARACTER);
->>>>>>> refs/remotes/origin/master
 		return writer
 	}
 

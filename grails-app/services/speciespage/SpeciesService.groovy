@@ -487,4 +487,10 @@ class SpeciesService {
 		   DwCAExporter.getInstance().exportSpeciesData(directory)
    }
 	
+   /**
+   * export species data
+   */
+  def exportSpeciesData(String directory, List<Species> species) {
+		  DwCAExporter.getInstance().exportSpeciesData(directory, species)
+  }
 }
