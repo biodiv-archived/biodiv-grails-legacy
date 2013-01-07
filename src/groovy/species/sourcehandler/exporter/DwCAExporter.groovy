@@ -111,22 +111,22 @@ class DwCAExporter {
 			println parentTaxonEntry.rank
 			switch(parentTaxonEntry.rank) {
 
-				case TaxonomyRank.KINGDOM.ordinal:
+				case TaxonomyRank.KINGDOM.ordinal():
 					taxonRow[3] = parentTaxonEntry.name
 					break
-				case TaxonomyRank.PHYLUM.ordinal:
+				case TaxonomyRank.PHYLUM.ordinal():
 					taxonRow[4] = parentTaxonEntry.name
 					break
-				case TaxonomyRank.CLASS.ordinal:
+				case TaxonomyRank.CLASS.ordinal():
 					taxonRow[5] = parentTaxonEntry.name
 					break
-				case TaxonomyRank.ORDER.ordinal:
+				case TaxonomyRank.ORDER.ordinal():
 					taxonRow[6] = parentTaxonEntry.name
 					break
-				case TaxonomyRank.FAMILY.ordinal:
+				case TaxonomyRank.FAMILY.ordinal():
 					taxonRow[7] = parentTaxonEntry.name
 					break
-				case TaxonomyRank.GENUS.ordinal:
+				case TaxonomyRank.GENUS.ordinal():
 					taxonRow[8] = parentTaxonEntry.name
 					break;
 			}
@@ -220,7 +220,7 @@ class DwCAExporter {
 		String[] row
 
 		for(Resource media: resources) {
-			row = new String[31]
+			row = new String[32]
 			// Media ID
 			row[0] = media.id
 
@@ -321,7 +321,7 @@ class DwCAExporter {
 		// SpeciesFields of a species
 		for(SpeciesField speciesField: species.fields) {
 			if((speciesField.field.id >= 3 && speciesField.field.id <= 10) || (speciesField.field.id >= 37 && speciesField.field.id <= 75) ) {
-				row = new String[31]
+				row = new String[32]
 				// Media ID
 				row[0] = speciesField.id
 
@@ -431,7 +431,7 @@ class DwCAExporter {
 		List<CommonNames> commonNames = CommonNames.findAllByTaxonConcept(taxonConcept)
 		String[] row
 		for(CommonNames cName: commonNames) {
-			row = new String[8]
+			row = new String[7]
 
 			//			taxonId
 			row[0] = cName.taxonConcept.id
@@ -443,10 +443,10 @@ class DwCAExporter {
 			//row[2] = ""
 
 			//			Language
-			row[3] = cName.language?.name
+			row[3] = cName.language?.threeLetterCode?:''
 
 			//			Language Code
-			row[4] = cName.language?.threeLetterCode
+			//row[4] = cName.language?.threeLetterCode
 
 			//			Locality == cName.language.region?? #TODO
 			//row[5] = ""
@@ -592,7 +592,7 @@ class DwCAExporter {
 			"Name",
 			"Source Reference",
 			"Language",
-			"Language Code",
+			//"Language Code",
 			"Locality",
 			"CountryCode",
 			"IsPreferredName",
