@@ -26,6 +26,7 @@ class ChecklistService {
 	def grailsApplication
 	def observationService
 	def sessionFactory
+	def curationService
 	
 	static final String SN_NAME = "scientific_name"
 	static final String CN_NAME = "common_name"
@@ -37,9 +38,10 @@ class ChecklistService {
 	def dateFormatStrings =  Arrays.asList("yyyy-MM-dd'T'HH:mm:ss")
 
 	def migrateChecklist(){
+		def startDate = new Date()
 		def sql = Sql.newInstance(connectionUrl, userName, password, "org.postgresql.Driver");
 		int i=0;
-		sql.eachRow("select nid, vid, title from node where type = 'checklist' order by nid asc") { row ->
+		sql.eachRow("select nid, vid, title from node where type = 'checklist' order by nid asc ") { row ->
 			log.debug " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>     title ===  $i  $row.title  nid == $row.nid , vid == $row.vid"
 			try{
 				Checklist checklist = createCheckList(row, sql)
@@ -51,6 +53,7 @@ class ChecklistService {
 			}
 			i++
 		}
+		println "================= start date " + startDate
 		println "================================= finish time " + new Date()
 	}
 
@@ -246,7 +249,7 @@ class ChecklistService {
 			
 			
 			if(cn){
-				cn =  Utils.getCanonicalForm(cn);
+				cn =  Utils.cleanName(cn);
 				if(commonNameSet.contains(cn)){
 					println "========================== duplicate cn =======  $cn ================ for sn =======" + snVal
 					cleanUpGorm()
@@ -457,7 +460,11 @@ class ChecklistService {
 		}
 	}
 	
-	private void cleanUpGorm() {
+	private void cleanUpGorm(){
+		cleanUpGorm(true)
+	}
+	
+	private void cleanUpGorm(boolean clearSession) {
 		
 				def hibSession = sessionFactory?.getCurrentSession();
 		
@@ -468,7 +475,118 @@ class ChecklistService {
 					} catch(Exception e) {
 						e.printStackTrace()
 					}
-					hibSession.clear()
+					if(clearSession){
+						hibSession.clear()
+					}
 				}
 			}
+	
+	
+	
+	def mCn(){
+		Date startTime = new Date()
+		println "stat time ====== " + startTime
+		
+		def clIdList = []
+		Checklist.listOrderById(order: "asc").each{ Checklist cl ->
+				clIdList.add(cl.id)
+		}
+		
+		println "=== total ids $clIdList.size()"
+		
+		clIdList.each{ id ->
+			Checklist cl = Checklist.get(id)
+			println "================ starting checklist === " + cl
+			def clPairs = getPairs(cl.row)
+			println "== got paris " + clPairs.size()
+			updateCl(clPairs, cl)
+			cleanUpGorm(true)
+			println "================ done checklist === " + cl
+		}
+		Date finishTime = new Date()
+		println "  start time " + startTime + "   and finish time $finishTime"
+		println ">>>>>>>>>>> finish time period ======  hours " +  finishTime.getHours() - startTime.getHours() + "   mintes " +  finishTime.getMinutes() - startTime.getMinutes() 
+	}
+	
+	
+	private void updateCl(List snCnPairs, cl){
+		Set recoIdSet = new HashSet()
+		Set cnSet = new HashSet()
+		def user = SUser.read(1)
+		snCnPairs.each { pair ->
+			updateCNSN(pair[0], pair[1], cl, user, cnSet, recoIdSet)
+		}
+	}
+	
+	private updateCNSN(snReco, cnName, cl, user, Set cnSet, Set recoIdSet){
+		if(!cnName && !snReco){
+			return
+		}
+		
+		if(snReco){
+			if(recoIdSet.contains(snReco.id)){
+				println "========================== duplicate sn =============================="
+				cleanUpGorm(false)
+				recoIdSet.clear()
+				cnSet.clear()
+			}
+			recoIdSet.add(snReco.id)
+		}
+		
+		if(cnName){
+			cnName = Utils.cleanName(cnName)
+			if(cnSet.contains(cnName)){
+				println "========================== duplicate cn =======  $cnName ================"
+				cleanUpGorm(false)
+				recoIdSet.clear()
+				cnSet.clear()
+			}
+			if(snReco){
+				recoIdSet.add(snReco.id)
+			}
+			cnSet.add(cnName)
+		}
+		
+		def cnReco = observationService.findReco(cnName, false, null, null)
+		curationService.add(snReco, cnReco, cl, user);
+	}
+	
+	private getPairs(clDataRows){
+		def res = []
+		def preRowNo = -1
+		def snReco = null
+		def cName = null
+		clDataRows.each { ChecklistRowData crd ->
+			def currentRowNo = crd.rowId
+			//row is changed
+			if(currentRowNo != preRowNo){
+				res.add([snReco, cName])
+				preRowNo = currentRowNo
+				snReco = null
+				cName = null
+				
+			}
+			if(crd.key.equalsIgnoreCase(SN_NAME)){
+				snReco = crd.reco
+			}else if(crd.key.equalsIgnoreCase(CN_NAME)){
+				def value = crd.value
+				cName = (value && (value.trim() != "") && (value.trim() != "No common name found"))? value.trim() : null
+			}
+		}
+		return res
+	}
+	
+	
 }
+/*
+
+drop table checklist_district ; drop table checklist_state; drop table checklist_taluka; drop table checklist_user_group;drop table checklist_reference; drop table checklist_row_data; drop table checklist CASCADE ; 
+
+
+delete from un_curated_votes where id > 3287;
+delete from un_curated_scientific_names_un_curated_common_names where un_curated_common_names_id > 1235 or un_curated_scientific_names_common_names_id > 1119;
+delete from un_curated_common_names where id > 1235;
+delete from un_curated_scientific_names where id > 1119;
+delete from recommendation where id > 369304 and id < 380677 and is_scientific_name = false and id not in(select common_name_reco_id from recommendation_vote where common_name_reco_id  > 369304 and common_name_reco_id < 380677);
+
+*/
