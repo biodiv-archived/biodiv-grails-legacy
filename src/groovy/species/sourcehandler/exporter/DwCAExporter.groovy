@@ -3,14 +3,21 @@ package species.sourcehandler.exporter
 import species.*
 import species.Contributor
 import species.TaxonomyDefinition.TaxonomyRank
+import java.util.HashSet
 
 import au.com.bytecode.opencsv.CSVWriter
 
-class DwCAExporter {
+/**
+ * Exports data into Darwin core format
+ */
 
-	protected static DwCAExporter _instance;
-	def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+class DwCAExporter {
+        
+        def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 	def fieldsConfig = config.speciesPortal.fields
+
+        protected static DwCAExporter _instance
+        private HashSet contributorsSet
 
         private CSVWriter taxaWriter
         private CSVWriter mediaWriter
@@ -20,7 +27,8 @@ class DwCAExporter {
         
 
 	public DwCAExporter() {
-	}
+            contributorsSet = new HashSet()
+        }
 
 	//#TODO
 	public static  DwCAExporter getInstance() {
@@ -42,12 +50,15 @@ class DwCAExporter {
 
                 initWriters(directory)
                 fillHeaders()
-		List<Species> speciesList = Species.list()
-		
-		exportAgents(directory)
+
+                // percentOfInfo>0 - one way
+
+		List<Species> speciesList = Species.list(max:1000)
+	        	
 		for(Species specie: speciesList) {
 			exportSpecies(specie)
 		}
+		exportAgents(directory)
                 closeWriters()
                 
 	}
@@ -60,10 +71,7 @@ class DwCAExporter {
 	 */
 	public void exportSpecies(Species species) {
 
-		//to export all synonyms, taxonDefinition and its parent classification
-		def classification = Classification.findByName(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY);
-		List<TaxonomyDefinition> parentTaxon = species.taxonConcept.parentTaxonRegistry(classification).get(classification);
-		exportTaxon(species.taxonConcept, parentTaxon);
+		exportTaxon(species)
 
 		exportCommonNames(species.taxonConcept)
 		exportMedia(species)
@@ -77,12 +85,15 @@ class DwCAExporter {
 	 * @param taxon
 	 * @return
 	 */
-	protected def exportTaxon(TaxonomyDefinition taxon, List<TaxonomyRegistry> parentTaxon) {
+	protected def exportTaxon(Species species) {
 
+		//to export all synonyms, taxonDefinition and its parent classification
+		def classification = Classification.findByName(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY);
+		List<TaxonomyDefinition> parentTaxon = species.taxonConcept.parentTaxonRegistry(classification).get(classification)
+                TaxonomyDefinition taxon = species.taxonConcept
 
 		String[] taxonRow
-
-		// for each taxon
+// for each taxon
 
 		taxonRow = new String[15]
 
@@ -90,33 +101,42 @@ class DwCAExporter {
 		taxonRow[0] = taxon.id
 		
 
-		// scientificName= taxon.binomialForm
+		// scientificName
 
 		taxonRow[1] = taxon.name
 
 		//		Parent Taxon ID
-		taxonRow[2] = parentTaxon[6].id
+		if(parentTaxon && parentTaxon[6]) {
+			taxonRow[2] = parentTaxon[6].id
+		}
 
-		//		t['Kingdom'] =  
-		taxonRow[3] = parentTaxon[0].name
+		//		t['Kingdom'] = 
+		if(parentTaxon && parentTaxon[0]) 
+			taxonRow[3] = parentTaxon[0].name
 
 		//		Phylum
-		taxonRow[4] = parentTaxon[1].name
+		if(parentTaxon && parentTaxon[1]) 
+			taxonRow[4] = parentTaxon[1].name
 
 		//		Class 
-		taxonRow[5] = parentTaxon[2].name
+		if(parentTaxon && parentTaxon[2]) 
+			taxonRow[5] = parentTaxon[2].name
 
 		//		Order 
-		taxonRow[6] = parentTaxon[3].name
+		if(parentTaxon && parentTaxon[3]) 
+			taxonRow[6] = parentTaxon[3].name
 
 		//		Family 
-		taxonRow[7] = parentTaxon[4].name
+		if(parentTaxon && parentTaxon[4]) 
+			taxonRow[7] = parentTaxon[4].name
 
 		//		Genus
-		taxonRow[8] = parentTaxon[6].name
+		if(parentTaxon && parentTaxon[6]) 
+			taxonRow[8] = parentTaxon[6].name
+		
 
-		//		TaxonRank 
-		taxonRow[9] = taxon.rank
+		//		TaxonRank = taxon.rank
+		taxonRow[9] = "Species"
 
 		//		furtherInformationURL  #TODO
 		//      speciespage url
@@ -124,7 +144,7 @@ class DwCAExporter {
 
 		//		taxonomicStatus   #TODO
 		//      synonyms
-		taxonRow[11] =  
+		taxonRow[11] =  "accepted"
 
 		//		taxonRemarks 
 		taxonRow[12] = ""
@@ -133,9 +153,87 @@ class DwCAExporter {
 		taxonRow[13] = ""
 
 		//              referenceID
-		taxonRow[14] = ""
+                def referenceID = []
+                for(SpeciesField field: species.fields) {
+                    for(Reference ref: field.references) {
+                        referenceID.add(String.valueOf(ref.id))
+                    }
+                }
+
+		taxonRow[14] = referenceID.join(",")
 
 		taxaWriter.writeNext(taxonRow)
+
+
+                // Get sysnonyms for a taxon
+                Synonyms[] synonyms = Synonyms.findByTaxonConcept(taxon)
+                for(Synonyms synonym: synonyms) {
+    				        
+					taxonRow = new String[15]
+			
+					// Taxon ID = taxon.id
+					taxonRow[0] = synonym.id
+					
+			
+					// scientificName
+					taxonRow[1] = synonym.name
+
+					if(parentTaxon) {
+			
+					//		Parent Taxon ID
+					if(parentTaxon[6])
+					taxonRow[2] = parentTaxon[6].id
+			
+					//		t['Kingdom'] =  
+					if(parentTaxon[0])
+					taxonRow[3] = parentTaxon[0].name
+			
+					//		Phylum
+					if(parentTaxon[1])
+					taxonRow[4] = parentTaxon[1].name
+			
+					//		Class 
+					if(parentTaxon[2])
+					taxonRow[5] = parentTaxon[2].name
+			
+					//		Order 
+					if(parentTaxon[3])
+					taxonRow[6] = parentTaxon[3].name
+			
+					//		Family 
+					if(parentTaxon[4])
+					taxonRow[7] = parentTaxon[4].name
+			
+					//		Genus
+					if(parentTaxon[6])
+					taxonRow[8] = parentTaxon[6].name
+
+					}
+			
+					//		TaxonRank 
+					taxonRow[9] = "Species"
+			
+					//		furtherInformationURL  #TODO
+					//      speciespage url
+					taxonRow[10] = ""
+			
+					//		taxonomicStatus   #TODO
+					//      synonyms
+					taxonRow[11] = synonym.relationship.value() 
+			
+					//		taxonRemarks 
+					taxonRow[12] = ""
+			
+					//		namePublishedIn 
+					taxonRow[13] = ""
+			
+					//              referenceID
+					taxonRow[14] = referenceID.join(",")
+			
+					taxaWriter.writeNext(taxonRow)
+                    
+                }
+
 
 	}
 
@@ -189,14 +287,17 @@ class DwCAExporter {
 			row[10] = media.url
 
 			//DerivedFrom
+                        row[11] = ""
 
 			//CreateDate
-			//row[12] = 
+			row[12] = ""
 
 			//Modified	
-			//Language	
+                        row[13] = ""
+			//Language
+                        row[14] = "eng"
 			//Rating	
-			//Audience #TODO: comma separated values from speciesFields
+			//Audience #Do not export audience field
                         /*
                         String str=""
                         for(AudienceType aud : media.speciesFields.audienceTypes) {
@@ -216,12 +317,19 @@ class DwCAExporter {
 			//BibliographicCitation	
 			//Publisher	
 			//Contributor
-                        row[22] = media.contributors.join(",")
+                        def contributors = []
+                        for(Contributor contributor: media.contributors) {
+                            contributors.add(String.valueOf(contributor.id))
+                            contributorsSet.add(contributor)
+                        }
+                        row[22] = contributors.join(",")
 			//Creator	
 			//AgentID	
 			//LocationCreated	
 			//GenericLocation	
 			//Latitude
+                        //Altitude
+                        //ReferenceID
 
            	 mediaWriter.writeNext(row)
 
@@ -229,6 +337,7 @@ class DwCAExporter {
 
                 // SpeciesFields of a species
                 for(SpeciesField speciesField: species.fields) {
+                    if((speciesField.field.id >= 3 && speciesField.field.id <= 10) || (speciesField.field.id >= 37 && speciesField.field.id <= 75) ) {
 			row = new String[31]
 			// Media ID
 			row[0] = speciesField.id
@@ -269,7 +378,8 @@ class DwCAExporter {
 			//row[12] = 
 
 			//Modified	
-			//Language	
+			//Language
+                        row[14] = "eng"
 			//Rating	
 			//Audience #TODO: comma separated values from speciesFields
                         /*
@@ -290,15 +400,28 @@ class DwCAExporter {
 
 			//BibliographicCitation	
 			//Publisher	
-			//Contributor
-                        row[22] = speciesField.contributors.join(",")
+			//Contributor = speciesField.contributors.join(",")
+                        def contributors = []
+                        for(Contributor contributor: speciesField.contributors) {
+                            contributors.add(String.valueOf(contributor.id))
+                            contributorsSet.add(contributor)
+                        }
+                        row[22] = contributors.join(",")
 			//Creator	
 			//AgentID	
 			//LocationCreated	
 			//GenericLocation	
 			//Latitude
+                        //Altitude
+                        //ReferenceId
+                        def referenceID = []
+                        for(Reference ref: speciesField.references) {
+                            referenceID.add(String.valueOf(ref.id))
+                        }
+                        row[30] = referenceID.join(",")
 
-           	 mediaWriter.writeNext(row)
+           	    mediaWriter.writeNext(row)
+                    }
 
 		}
 
@@ -329,10 +452,10 @@ class DwCAExporter {
 	        row[2] = ""
 
         	//			Language
-        	row[3] = cName.language.name
+        	row[3] = cName.language?.name
         	
         	//			Language Code
-        	row[4] = cName.language.threeLetterCode
+        	row[4] = cName.language?.threeLetterCode
 
         	//			Locality == cName.language.region?? #TODO
 	        row[5] = ""							
@@ -342,7 +465,6 @@ class DwCAExporter {
 
 			commonNameWriter.writeNext(row)
 		}
-
 
 	}
 
@@ -369,8 +491,9 @@ class DwCAExporter {
 
 				 //PublicationType	
 				 //Full Reference	
+                                 row[2] = reference.title
 				 //PrimaryTitle
-				 row[3] = reference.title
+				 row[3] = ""
 				 //SecondaryTitle	
 				 //Pages	
 				 //PageStart	
@@ -400,12 +523,8 @@ class DwCAExporter {
 	 */
 	protected void exportAgents(String targetDir) {
 
-                
-                //TODO: Should the contributors list be taken from SUser??
-                
-                def agents = Contributor.list()
                 String[] row
-                for (Contributor agent: agents) {
+                for (Contributor agent: contributorsSet) {
                     row = new String[12]
                     
                     //AgentID
