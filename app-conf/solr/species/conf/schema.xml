@@ -270,6 +270,11 @@
 		<field name="group_webaddress" type="string" indexed="true" stored="true" multiValued="true"/>
 		<field name="percent_of_info" type="sfloat" indexed="true" stored="true"  multiValued="false"/>
 		
+		<field name="createdon" type="tdate" indexed="true" required="true"/>
+		<field name="lastrevised" type="tdate" indexed="true" required="true"/>
+		<field name="sgroup" type="long" indexed="true" required="true"/>
+		<field name="habitat" type="long" indexed="true" required="false"/>
+		
 		<dynamicField name="*" type="text" indexed="true" stored="true"
 			multiValued="true" />
 

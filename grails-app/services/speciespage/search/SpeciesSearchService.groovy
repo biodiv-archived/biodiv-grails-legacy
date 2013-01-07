@@ -12,6 +12,8 @@ import org.apache.solr.client.solrj.SolrServerException
 import org.apache.solr.common.SolrInputDocument
 import org.apache.solr.common.params.SolrParams
 import org.apache.solr.common.params.TermsParams
+import org.hibernate.exception.ConstraintViolationException;
+import org.springframework.transaction.annotation.Transactional
 
 import species.CommonNames
 import species.NamesParser
@@ -43,14 +45,36 @@ class SpeciesSearchService {
 		def species;
 		def startTime = System.currentTimeMillis()
 		while(true) {
-			species = Species.list(max:limit, offset:offset);
+			species = listSpecies(0, [max:limit, offset:offset,sort:'id',order:'asc']);
 			if(!species) break;
 			publishSearchIndex(species);
 			species = null;
 			offset += limit;
+			cleanUpGorm();
 		}
 		log.info "Time taken to publish search index is ${System.currentTimeMillis()-startTime}(msec)";
 	}
+	
+	@Transactional(readOnly = true)
+	def listSpecies(id, params) {
+			return Species.findAllByIdGreaterThan(id,params);
+	}
+
+	private void cleanUpGorm() {
+
+		def hibSession = sessionFactory?.getCurrentSession();
+
+		if(hibSession) {
+			log.debug "Flushing and clearing session"
+			try {
+				hibSession.flush()
+			} catch(ConstraintViolationException e) {
+				e.printStackTrace()
+			}
+			hibSession.clear()
+		}
+	}
+
 
 	/**
 	 * 
@@ -138,6 +162,11 @@ class SpeciesSearchService {
 			
 			doc.addField(searchFieldsConfig.PERCENT_OF_INFO, s.percentOfInfo);
 			doc.addField(searchFieldsConfig.MESSAGE, message);
+			
+			doc.addField(searchFieldsConfig.UPLOADED_ON, s.dateCreated);
+			doc.addField(searchFieldsConfig.UPDATED_ON, s.lastUpdated);
+			doc.addField(searchFieldsConfig.SGROUP, s.fetchSpeciesGroup().id);
+			//doc.addField(searchFieldsConfig.HABITAT, s.);
 			
 			docs.add(doc);
 		}
