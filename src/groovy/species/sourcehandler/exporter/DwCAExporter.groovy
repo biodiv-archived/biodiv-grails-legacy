@@ -140,7 +140,7 @@ class DwCAExporter {
 
 		//		furtherInformationURL  #TODO
 		//      speciespage url
-		taxonRow[10] = ""
+		taxonRow[10] = "${org.codehaus.groovy.grails.commons.ConfigurationHolder.config.grails.serverURL}/species/show/" + species.id
 
 		//		taxonomicStatus   #TODO
 		//      synonyms
@@ -355,7 +355,7 @@ class DwCAExporter {
 			row[4] = "text/html"
 
 			//Subject #TODO
-			row[5] = "http://rs.tdwg.org/ontology/voc/SPMInfoItems#GeneralDescription"
+			row[5] = speciesField.field.urlIdentifier
 
 			//Title
 			row[6] = speciesField.field.category
