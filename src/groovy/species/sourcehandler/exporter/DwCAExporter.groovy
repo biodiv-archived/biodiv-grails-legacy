@@ -108,24 +108,25 @@ class DwCAExporter {
 		//		Parent Taxon ID
 
 		for(TaxonomyDefinition parentTaxonEntry: parentTaxon) {
+			println parentTaxonEntry.rank
 			switch(parentTaxonEntry.rank) {
 
-				case TaxonomyRank.KINGDOM:
+				case TaxonomyRank.KINGDOM.ordinal:
 					taxonRow[3] = parentTaxonEntry.name
 					break
-				case TaxonomyRank.PHYLUM:
+				case TaxonomyRank.PHYLUM.ordinal:
 					taxonRow[4] = parentTaxonEntry.name
 					break
-				case TaxonomyRank.CLASS:
+				case TaxonomyRank.CLASS.ordinal:
 					taxonRow[5] = parentTaxonEntry.name
 					break
-				case TaxonomyRank.ORDER:
+				case TaxonomyRank.ORDER.ordinal:
 					taxonRow[6] = parentTaxonEntry.name
 					break
-				case TaxonomyRank.FAMILY:
+				case TaxonomyRank.FAMILY.ordinal:
 					taxonRow[7] = parentTaxonEntry.name
 					break
-				case TaxonomyRank.GENUS:
+				case TaxonomyRank.GENUS.ordinal:
 					taxonRow[8] = parentTaxonEntry.name
 				//                            taxonRow[2] = parentTaxonEntry.id
 					break;
@@ -189,7 +190,7 @@ class DwCAExporter {
 
 			//		taxonomicStatus   #TODO
 			//      synonyms
-			taxonRow[11] = synonym.relationship.value()
+			taxonRow[11] = synonym.relationship.value().toLowerCase();
 
 			//		taxonRemarks
 			//taxonRow[12] = ""
@@ -290,8 +291,11 @@ class DwCAExporter {
 			//BibliographicCitation
 			//Publisher
 			//Contributor
+			println "media contributors"
+			println  media.contributors;
 			def contributors = []
 			for(Contributor contributor: media.contributors) {
+				println contributor;
 				contributors.add(String.valueOf(contributor.id))
 				contributorsSet.add(contributor)
 			}
@@ -645,7 +649,7 @@ class DwCAExporter {
 	public CSVWriter getCSVWriter(def directory, def fileName) {
 		char separator = '\t'
 		new File(directory).mkdir()
-		CSVWriter writer = new CSVWriter(new FileWriter("$directory/$fileName"), separator, CSVWriter.NO_QUOTE_CHARACTER)
+		CSVWriter writer = new CSVWriter(new FileWriter("$directory/$fileName"), separator);//, CSVWriter.NO_QUOTE_CHARACTER
 		return writer
 	}
 
