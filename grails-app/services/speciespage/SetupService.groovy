@@ -30,10 +30,10 @@ class SetupService {
 	 *
 	 */
 	def setupDefs() {
-		uploadFields(grailsApplication.config.speciesPortal.data.rootDir+"/templates/DefinitionsAbridged_prabha.xlsx");
-		uploadLanguages(grailsApplication.config.speciesPortal.data.rootDir+"/templates/Language_iso639-2.csv");
-		uploadCountries(grailsApplication.config.speciesPortal.data.rootDir+"/templates/Countries_ISO-3166-1.csv");
-		uploadClassifications(grailsApplication.config.speciesPortal.data.rootDir+"/templates/Classifications.xlsx", 0, 0);
+		uploadFields(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/templates/Definitions.xlsx");
+		uploadLanguages(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/templates/Language_iso639-2.csv");
+		uploadCountries(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/templates/Countries_ISO-3166-1.csv");
+		uploadClassifications(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/templates/Classifications.xlsx", 0, 0);
 		uploadLicences();
 		uploadHabitats();
 		
@@ -98,7 +98,7 @@ class SetupService {
 			String description = row.get("description");
 			int displayOrder = Math.round(Float.parseFloat(row.get("s.no.")));
 			String url_identifier = row.get("url identifier");
-			
+			println url_identifier
 			def fieldCriteria = Field.createCriteria();
 
 			Field field = fieldCriteria.get {
