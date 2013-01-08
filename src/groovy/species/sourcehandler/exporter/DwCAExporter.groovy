@@ -254,7 +254,7 @@ class DwCAExporter {
 			//row[7] = ""
 
 			//AccessURI  -- get absolute url by appending domain name and base path(/biodiv/images/)
-			row[8] = ""+org.codehaus.groovy.grails.commons.ConfigurationHolder.config.resources.serverURL+media.fileName
+			row[8] = ""+org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.resources.serverURL+media.fileName
 			row[8] = row[8].replace(":8080", "");
 			//ThumbnailURL - get thumbnail url-- there must be some function
 			//row[9] =""
