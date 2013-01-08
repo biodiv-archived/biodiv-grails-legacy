@@ -30,10 +30,10 @@ class SetupService {
 	 *
 	 */
 	def setupDefs() {
-		uploadFields(grailsApplication.config.speciesPortal.data.rootDir+"/templates/DefinitionsAbridged_prabha.xlsx");
-		uploadLanguages(grailsApplication.config.speciesPortal.data.rootDir+"/templates/Language_iso639-2.csv");
-		uploadCountries(grailsApplication.config.speciesPortal.data.rootDir+"/templates/Countries_ISO-3166-1.csv");
-		uploadClassifications(grailsApplication.config.speciesPortal.data.rootDir+"/templates/Classifications.xlsx", 0, 0);
+		uploadFields(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/templates/Definitions.xlsx");
+		uploadLanguages(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/templates/Language_iso639-2.csv");
+		uploadCountries(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/templates/Countries_ISO-3166-1.csv");
+		uploadClassifications(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/templates/Classifications.xlsx", 0, 0);
 		uploadLicences();
 		uploadHabitats();
 		
@@ -97,7 +97,8 @@ class SetupService {
 			String subCategory = row.get("subcategory");
 			String description = row.get("description");
 			int displayOrder = Math.round(Float.parseFloat(row.get("s.no.")));
-
+			String url_identifier = row.get("url identifier");
+			println url_identifier
 			def fieldCriteria = Field.createCriteria();
 
 			Field field = fieldCriteria.get {
@@ -109,10 +110,14 @@ class SetupService {
 			}
 
 			if(!field) {
-				field = new Field(concept:concept, category:category, subCategory:subCategory, displayOrder:displayOrder, description:description);
-				if(!field.save(flush:true, failOnError: true)) {
-					field.errors.each { log.error it }
-				}
+				field = new Field(concept:concept, category:category, subCategory:subCategory, displayOrder:displayOrder, description:description, urlIdentifier:url_identifier);
+			} else {
+				field.displayOrder = displayOrder;
+				field.description = description;
+				field.urlIdentifier = url_identifier;
+			}
+			if(!field.save(flush:true, failOnError: true)) {
+				field.errors.each { log.error it }
 			}
 		}
 	}
