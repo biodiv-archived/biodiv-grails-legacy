@@ -627,4 +627,5 @@ delete from un_curated_common_names where id > 1235;
 delete from un_curated_scientific_names where id > 1119;
 delete from recommendation where id > 369304 and id < 380677 and is_scientific_name = false and id not in(select common_name_reco_id from recommendation_vote where common_name_reco_id  > 369304 and common_name_reco_id < 380677);
 
+update suser set last_login_date = null where last_login_date <= date_created;
 */
