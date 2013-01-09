@@ -212,7 +212,7 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 		});
 		
 		var yahooOpener = popupManager.createPopupOpener({
-			'realm' : 'http://*.'+"${Utils.getDomainServerUrl(request)}",
+			'realm' : 'http://*.'+"${Utils.getIBPServerCookieDomain()}",
 			'opEndpoint' : 'https://open.login.yahooapis.com/openid/op/auth',
 			'returnToUrl' :	"${uGroup.createLink(controller:'openId', action:'checkauth', base:Utils.getDomainServerUrl(request))}",
 			'onCloseHandler' : closeHandler,
