@@ -1,5 +1,15 @@
 <g:if test="${resource}">
 	<div class="notes" style="text-align: left;">
+		<g:if test="${resource.contributors?.size() > 0}">
+			<b>Contributors:</b>
+			<ol>
+				<g:each in="${resource.contributors}" var="a">
+					<li>
+						${a?.name}
+					</li>
+				</g:each>
+			</ol>
+		</g:if>
 		<g:if test="${resource.attributors?.size() > 0}">
 			<b>Attributions:</b>
 			<ol>
