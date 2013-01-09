@@ -1748,3 +1748,17 @@ height: auto;
 }
 
 }
+
+.contributor_entry {
+	border-color: rgba(0, 0, 0, 0.2);
+	border-radius: 5px;
+	border-style: solid;
+	border-width: 1px;
+	margin-bottom:10px;
+}
+
+.contributor_entry .toolbar {
+	background: #fff url(../images/skin/shadow.jpg) repeat-x center;
+	font-size : 12px;
+	line-height:35px;
+}
