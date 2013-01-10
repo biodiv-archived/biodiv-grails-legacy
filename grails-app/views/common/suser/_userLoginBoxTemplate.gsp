@@ -15,7 +15,7 @@
 
 <ul class="nav header_userInfo">
 	<sec:ifNotLoggedIn>
-		<li><a href="${uGroup.createLink(controller:'login', 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress) }">Login</a>
+		<li><a id="loginLink" href="${uGroup.createLink(controller:'login', 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress) }">Login</a>
 		</li>
 		
 		<li><g:link controller='register'>Register</g:link>

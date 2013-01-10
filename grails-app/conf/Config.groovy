@@ -106,14 +106,14 @@ log4j = {
 	debug	'species',
 			'speciespage',
 			'grails.app',
-//			'org.springframework.security',
-//			'org.springframework.security.core',
-//			'org.springframework.security.web',
+			'org.springframework.security',
+			'org.springframework.security.core',
+			'org.springframework.security.web',
 //			'org.springframework.security.openid',
 //			'org.openid4java',
 			'species.auth'
 //			"org.springframework.security.acls",
-//			"org.springframework.security.access"
+			"org.springframework.security.access"
 			//'com.the6hours.grails.springsecurity.facebook'
 	
 	
@@ -787,7 +787,7 @@ grails.plugins.springsecurity.userLookup.authorityJoinClassName = 'species.auth.
 grails.plugins.springsecurity.authority.className = 'species.auth.Role'
 grails.plugins.springsecurity.userLookup.usernamePropertyName = 'email'
 //grails.plugins.springsecurity.auth.loginFormUrl = "/login/authFromDrupal"
-
+grails.plugins.springsecurity.successHandler.useReferer = true;
 
 //grails.plugins.springsecurity.auth.defaultRoleNames = ['ROLE_USER']
 //grails.plugins.springsecurity.apf.filterProcessesUrl = '/j_drupal_spring_security_check'

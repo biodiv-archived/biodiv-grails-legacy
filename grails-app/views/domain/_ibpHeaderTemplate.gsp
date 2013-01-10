@@ -95,16 +95,16 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 							if($(clickedObject).hasClass('ajaxForm')) {
 								$('#loginMessage').html("Logging in ...").removeClass().addClass('alter alert-info').show();
 								$.ajax({
-								  url: "${createLink(controller:'login', action:'authSuccess')}",
+								  url: "${uGroup.createLink(controller:'login', action:'authSuccess')}",
 								  method:"GET",
-								  data:{'uid':response.authResponse.userID, ${params['spring-security-redirect']?'"spring-security-redirect":"'+params['spring-security-redirect']+'"':''}},
+								  data:{'uid':response.authResponse.userID, ${targetUrl?'"spring-security-redirect":"'+targetUrl+'"':''}},
 								  success: function(data, statusText, xhr) {
 								  	ajaxLoginSuccessHandler(data, statusText, xhr);
 								  }
 								});
 							} else{
-								var redirectTarget = ${params['spring-security-redirect']?'"&spring-security-redirect='+params['spring-security-redirect']+'"':'""'};
-								window.location = "${createLink(controller:'login', action:'authSuccess')}"+"?uid="+response.authResponse.userID+redirectTarget
+								var redirectTarget = ${targetUrl?'"&spring-security-redirect='+targetUrl+'"':'""'};
+								window.location = "${uGroup.createLink(controller:'login', action:'authSuccess')}"+"?uid="+response.authResponse.userID+redirectTarget
 							}
 						} else {
 							alert("Failed to connect to Facebook");

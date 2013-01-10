@@ -1,12 +1,18 @@
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+
 import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
 import org.codehaus.groovy.grails.plugins.springsecurity.openid.OpenIdAuthenticationFailureHandler as OIAFH
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.AuthenticationException
+import org.springframework.security.web.PortResolver;
+import org.springframework.security.web.WebAttributes;
 import org.springframework.security.web.savedrequest.DefaultSavedRequest
 import org.springframework.social.facebook.api.FacebookProfile;
 import org.springframework.social.facebook.api.impl.FacebookTemplate;
 import org.springframework.social.oauth2.Spring30OAuth2RequestFactory;
 import org.springframework.social.support.ClientHttpRequestFactorySelector;
+import org.springframework.util.StringUtils;
 
 import com.the6hours.grails.springsecurity.facebook.FacebookAuthToken;
 
@@ -54,11 +60,26 @@ class OpenIdController {
 			return
 		}
 		
-		[openIdPostUrl: "${request.contextPath}$openIDAuthenticationFilter.filterProcessesUrl",
-					daoPostUrl:"${request.contextPath}${config.apf.filterProcessesUrl}",
+		def targetUrl = "";
+		def savedRequest = request.getSession()?.getAttribute(WebAttributes.SAVED_REQUEST)
+		if(savedRequest == null) {
+			targetUrl = request.getHeader("Referer")?:"";
+			if (StringUtils.hasText(targetUrl)) {
+				try {
+					targetUrl = URLEncoder.encode(targetUrl, "UTF-8");
+				} catch (UnsupportedEncodingException e) {
+					throw new IllegalStateException("UTF-8 not supported. Shouldn't be possible");
+				}
+				log.debug "Passing targetUrlParameter for redirect: " + targetUrl;
+			}
+			params["spring-security-redirect"] = targetUrl
+		}
+		[openIdPostUrl: "${request.contextPath}$openIDAuthenticationFilter.filterProcessesUrl?spring-security-redirect=${targetUrl}",
+					daoPostUrl:"${request.contextPath}${config.apf.filterProcessesUrl}?spring-security-redirect=${targetUrl}",
 					persistentRememberMe: config.rememberMe.persistent,
 					rememberMeParameter: config.rememberMe.parameter,
-					openidIdentifier: config.openid.claimedIdentityFieldName]
+					openidIdentifier: config.openid.claimedIdentityFieldName,
+					'targetUrl':targetUrl]
 	}
 
 	/**

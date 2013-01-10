@@ -60,10 +60,16 @@ class LoginController {
 
 	def authSuccess = {
 		if(params.uid) {
-			def target = request.getParameter(AbstractAuthenticationTargetUrlRequestHandler.DEFAULT_TARGET_PARAMETER);
-			if (StringUtils.hasText(target)) {
-				log.debug "Redirecting to target : $target";
-				(new DefaultRedirectStrategy()).sendRedirect(request, response, target);
+			def targetUrl = request.getParameter(AbstractAuthenticationTargetUrlRequestHandler.DEFAULT_TARGET_PARAMETER);
+			if (StringUtils.hasText(targetUrl)) {
+				try {
+					targetUrl = URLDecoder.decode(targetUrl, "UTF-8");
+				} catch (UnsupportedEncodingException e) {
+					throw new IllegalStateException("UTF-8 not supported. Shouldn't be possible");
+				}
+				
+				log.debug "Redirecting to target : $targetUrl";
+				(new DefaultRedirectStrategy()).sendRedirect(request, response, targetUrl);
 				return;
 			}
 
