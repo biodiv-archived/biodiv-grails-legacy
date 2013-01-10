@@ -33,7 +33,7 @@ class SUser {
 	boolean passwordExpired
 	String email
 	Date dateCreated = new Date();
-	Date lastLoginDate = new Date();
+	Date lastLoginDate
 	String profilePic
 	String icon
 	
@@ -61,7 +61,7 @@ class SUser {
 		timezone nullable:true
 		aboutMe nullable:true
 		location nullable:true
-
+		lastLoginDate nullable:true
 	}
 
 	static mapping = {

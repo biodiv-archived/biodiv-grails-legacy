@@ -493,22 +493,27 @@ class ChecklistService {
 				cn.name = Utils.getTitleCase(cn.name)
 				cn.save()
 			}
+			log.debug " done common names"
 			
 			Recommendation.findAllByIsScientificName(false).each{ Recommendation r ->
 				r.name = Utils.getTitleCase(r.name)
 				r.save()
 			}
+			log.debug " done recommendation names"
 			
 			UnCuratedCommonNames.list().each{ UnCuratedCommonNames uncn ->
 				uncn.name = Utils.getTitleCase(uncn.name)
 				uncn.save()
 			}
+			log.debug " done un curated common names"
 			
 		}
 		
 	}
 	
 	def mCn(){
+		def flushImmediately  = grailsApplication.config.speciesPortal.flushImmediately
+		
 		Date startTime = new Date()
 		println "stat time ====== " + startTime
 		
@@ -525,7 +530,9 @@ class ChecklistService {
 			def clPairs = getPairs(cl.row)
 			println "== got paris " + clPairs.size()
 			updateCl(clPairs, cl)
-			//cleanUpGorm(true)
+			if(!flushImmediately){
+				cleanUpGorm(true)
+			}
 			println "================ done checklist === " + cl
 		}
 		Date finishTime = new Date()
@@ -620,4 +627,5 @@ delete from un_curated_common_names where id > 1235;
 delete from un_curated_scientific_names where id > 1119;
 delete from recommendation where id > 369304 and id < 380677 and is_scientific_name = false and id not in(select common_name_reco_id from recommendation_vote where common_name_reco_id  > 369304 and common_name_reco_id < 380677);
 
+update suser set last_login_date = null where last_login_date <= date_created;
 */

@@ -3,8 +3,9 @@
 		<div class="observation_story tablet">
 		  	<h5><a href="${uGroup.createLink(controller:'checklist', action:'show', id:checklistInstance.id, 'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress)}">${checklistInstance.title}</a></h5> 
         	<div class="icons-bar">
+        		
             	<div class="observation-icons">
-                    <span class="group_icon species_groups_sprites active ${checklistInstance.speciesGroup.iconClass()}" title="${checklistInstance.speciesGroup?.name}"></span>
+            		<sUser:interestedSpeciesGroups model="['userInstance':checklistInstance]" />
             	</div>
 
             	<div class="user-icon">

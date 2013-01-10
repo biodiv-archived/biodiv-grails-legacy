@@ -46,7 +46,7 @@
 		<div class="super-section">
 			<div class="row section" style="">
 				<div class="figure span3"
-					style="float: left; max-height: 220px; max-width: 200px">
+					style="float: left; max-height: 220px; max-width: 220px">
 					<a
 						href="${uGroup.createLink(action:"show", controller:"SUser", id:user.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
 						<img class="normal_profile_pic" src="${user.icon()}" /> </a>
@@ -74,13 +74,17 @@
 								type="datetime" style="MEDIUM" />
 						</div>
 					</div>
-					<div class="prop">
-						<span class="name"><i class="icon-time"></i>Last visited </span>
-						<div class="value">
-							<g:formatDate format="dd/MM/yyyy" date="${user.lastLoginDate}"
-								type="datetime" style="MEDIUM" />
+					<g:if test="${user.lastLoginDate}">
+						<div class="prop">
+							<span class="name"><i class="icon-time"></i>Last visited </span>
+							<div class="value">
+								
+									<g:formatDate format="dd/MM/yyyy" date="${user.lastLoginDate}"
+										type="datetime" style="MEDIUM" />
+							
+							</div>
 						</div>
-					</div>
+					</g:if>
 				</div>
 
 

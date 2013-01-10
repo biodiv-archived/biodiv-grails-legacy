@@ -216,7 +216,7 @@ class Utils {
 	}
 	
 	static String getTitleCase(String str){
-		return WordUtils.capitalize(str)
+		return WordUtils.capitalizeFully(str, ' (/'.toCharArray())
 	}
 
 }

@@ -157,7 +157,7 @@ class RegisterController extends grails.plugins.springsecurity.ui.RegisterContro
 		springSecurityService.reauthenticate user."$usernamePropertyName"
 
 		flash.message = message(code: 'spring.security.ui.register.complete')
-		redirect uri: conf.ui.register.postRegisterUrl ?: defaultTargetUrl
+		redirect url: conf.ui.register.postRegisterUrl 
 	}
 
 	def forgotPassword = {
@@ -313,7 +313,7 @@ class RegisterController extends grails.plugins.springsecurity.ui.RegisterContro
 		}
 		else {
 			flash.message = message(code: 'spring.security.ui.register.complete')
-			redirect uri: config.ui.register.postRegisterUrl ?: config.successHandler.defaultTargetUrl
+			redirect url: config.ui.register.postRegisterUrl
 		}
 	}
 
@@ -363,8 +363,14 @@ class CustomRegisterCommand {
 		captcha_response blank:false, nullable:false, validator: { value, command ->
 			def session = RCH.requestAttributes.session
 			def request = RCH.requestAttributes.request
-			if (!command.jcaptchaService.validateResponse("imageCaptcha", session.id, command.captcha_response)) {
-				//if(!command.recaptchaService.verifyAnswer(session, request.getRemoteAddr(), command)) {
+			try{
+				if (!command.jcaptchaService.validateResponse("imageCaptcha", session.id, command.captcha_response)) {
+					//if(!command.recaptchaService.verifyAnswer(session, request.getRemoteAddr(), command)) {
+					return 'reCaptcha.invalid.message'
+				}
+			}catch (com.octo.captcha.service.CaptchaServiceException e) {
+				// TODO: handle exception
+				e.printStackTrace()
 				return 'reCaptcha.invalid.message'
 			}
 		}

@@ -38,15 +38,17 @@
 		<obv:showSubmenuTemplate model="['entityName':'Related Observations']" />
 
 		<div>
-			<div class="tags_section span3" style="float: right;">
-				<obv:showAllTags
-					model="['tagFilterByProperty':'Related', 'relatedObvParams':initialParams, 'isAjaxLoad':false]" />
-			</div>
+<%--			<div class="tags_section span3" style="float: right;">--%>
+<%--				<obv:showAllTags--%>
+<%--					model="['tagFilterByProperty':'Related', 'relatedObvParams':initialParams, 'isAjaxLoad':false]" />--%>
+<%--			</div>--%>
 
 				<div class="list">
 
-					<div class="observations thumbwrap">
-						<obv:showSnippet model="['observationInstance':parentObservation]"></obv:showSnippet>
+					<div class="observations thumbwrap ">
+						<div class="thumbnail clearfix" style="background-color: #FFFFFF; display: table; width:894px;">
+							<obv:showSnippet model="['observationInstance':parentObservation]"></obv:showSnippet>
+						</div>	
 						<h5 style="position: relative; top: 40px; clear: both">
 							<g:if test="${filterProperty == 'nearBy'}">
 										Observations nearby
@@ -65,7 +67,7 @@
 
 	<r:script>
 	$(document).ready(function() {
-
+		initRelativeTime("${uGroup.createLink(controller:'activityFeed', action:'getServerTime')}");
 		$('#tc_tagcloud a').click(function(){
 			var tg = $(this).contents().first().text();
 			window.location.href = "${uGroup.createLink(controller:'observation', action: 'list')}?tag=" + tg ;
