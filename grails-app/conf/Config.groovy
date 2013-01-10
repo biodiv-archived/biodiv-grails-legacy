@@ -111,7 +111,7 @@ log4j = {
 //			'org.springframework.security.web',
 //			'org.springframework.security.openid',
 //			'org.openid4java',
-			'species.auth'
+//			'species.auth'
 //			"org.springframework.security.acls",
 //			"org.springframework.security.access"
 			//'com.the6hours.grails.springsecurity.facebook'
