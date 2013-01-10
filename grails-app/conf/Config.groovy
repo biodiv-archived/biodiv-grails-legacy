@@ -105,7 +105,7 @@ log4j = {
 
 	debug	'species',
 			'speciespage',
-			'grails.app',
+			'grails.app'
 //			'org.springframework.security',
 //			'org.springframework.security.core',
 //			'org.springframework.security.web',
