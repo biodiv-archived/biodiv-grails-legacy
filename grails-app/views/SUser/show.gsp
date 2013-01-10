@@ -46,7 +46,7 @@
 		<div class="super-section">
 			<div class="row section" style="">
 				<div class="figure span3"
-					style="float: left; max-height: 220px; max-width: 250px">
+					style="float: left; max-height: 220px; max-width: 220px">
 					<a
 						href="${uGroup.createLink(action:"show", controller:"SUser", id:user.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
 						<img class="normal_profile_pic" src="${user.icon()}" /> </a>
