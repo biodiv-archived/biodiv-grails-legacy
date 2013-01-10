@@ -190,13 +190,10 @@ function init_header() {
 		return false;
 	});
 	
-//	$("#loginLink").click(function() {
-//			
-//		var loginLink = $(this).attr('href');
-//		console.log(loginLink);
-//		$(this).attr('href', loginLink+"?spring-security-redirect="+window.location.href);	
-//	});
-	
+	$('body').on('click.collapse-next.data-api', '[data-toggle=collapse-next]', function (e) {
+		  $(this).parent().nextAll($(this).attr("data-target")).collapse('toggle')
+	});
+		
 //	$(".close").click(function(){
 //		$(this).parent().slideUp('fast');
 //		return false;

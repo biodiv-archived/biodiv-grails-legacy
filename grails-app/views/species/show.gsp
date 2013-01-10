@@ -246,9 +246,7 @@ $(document).ready(function(){
 	  );
   	
   	
-  	$('.helpContent').mouseleave(function(){
-  		$(this).hide();
-  	});
+  	
   	
 });
 

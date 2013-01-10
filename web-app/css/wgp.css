@@ -13,6 +13,14 @@ a {
 	text-decoration: none;
 }
 
+h5 {
+	font-size:16px;
+}
+
+h6 {
+	font-size:14px;
+}
+
 .page-footer {
 	height: 221px;
 	width: 725px;
@@ -32,10 +40,11 @@ a {
 	-ms-filter:
 		"progid:DXImageTransform.Microsoft.gradient(startColorstr=#336AC9A2,endColorstr=#336AC9A2)";
 	/* IE8 */
-	filter: progid :             DXImageTransform.Microsoft.gradient (
+	filter: progid :               DXImageTransform.Microsoft.gradient ( 
 		       
-		    startColorstr =      
-		      #336AC9A2, endColorstr =             #336AC9A2 ); /* IE6 & 7 */
+		     startColorstr =       
+		       #336AC9A2, endColorstr =               #336AC9A2 );
+	/* IE6 & 7 */
 	zoom: 1;
 	box-shadow: 0 4px 3px -3px #5e5e5e;
 }
@@ -92,9 +101,8 @@ a {
 	bottom: 0;
 }
 
-.thumbnail .figure {
-/* 	margin-bottom: 5px; */
-/* 	max-width: 200px; */
+.thumbnail .figure { /* 	margin-bottom: 5px; */
+	/* 	max-width: 200px; */
 	margin-left: auto;
 	margin-right: auto;
 	display: table;
@@ -109,7 +117,7 @@ a {
 .thumbnail .figure .img-polaroid {
 	max-height: 150px;
 	max-width: 190px;
-	width:auto;
+	width: auto;
 }
 
 .grid_view.thumbnails {
@@ -120,7 +128,7 @@ a {
 	background-color: #ffffff;
 	border: 0px solid #bee6d3;
 	/* 	margin: 0px; */
-/* 	margin: 10px 0px 0px 10px; */
+	/* 	margin: 10px 0px 0px 10px; */
 }
 
 .grid_view li.thumbnail:hover {
@@ -182,13 +190,12 @@ a {
 /* .observation_story .prop { */
 /* 	clear:none; */
 /* } */
-
 .observation_story .prop .name {
 	width: 120px;
 }
 
 .observation .prop .value {
- 	margin-left: 130px; 
+	margin-left: 130px;
 }
 
 /* .prop .value, .observations_list .prop .value, .activityfeed .prop .value{ */
@@ -210,7 +217,7 @@ a {
 	/* 	border: 1px solid #bee6d3; */
 	/* 	width: 100%; */
 	display: table;
-	height:220px;
+	height: 220px;
 }
 
 .list_view li.thumbnail:hover {
@@ -322,10 +329,11 @@ div.errors {
 	-ms-filter:
 		"progid:DXImageTransform.Microsoft.gradient(startColorstr=#336AC9A2,endColorstr=#336AC9A2)";
 	/* IE8 */
-	filter: progid :             DXImageTransform.Microsoft.gradient (
+	filter: progid :               DXImageTransform.Microsoft.gradient ( 
 		       
-		    startColorstr =      
-		      #336AC9A2, endColorstr =             #336AC9A2 ); /* IE6 & 7 */
+		     startColorstr =       
+		       #336AC9A2, endColorstr =               #336AC9A2 );
+	/* IE6 & 7 */
 	zoom: 1;
 	border-radius: 5px;
 	margin-bottom: 10px;
@@ -488,7 +496,6 @@ ul#recoSummary {
 /* .observation_story.tablet { */
 /* 	height: 100px; */
 /* } */
-
 .observation .observation_story {
 	background-color: #ffffff;
 }
@@ -531,8 +538,7 @@ ul#recoSummary {
 	margin-right: 5px;
 }
 
-.sidebar_section {
-/* 	overflow: visible; */
+.sidebar_section { /* 	overflow: visible; */
 	/* 	padding-bottom: 10px; */
 	margin-bottom: 20px;
 	border: 1px solid #CECECE;
@@ -542,11 +548,11 @@ ul#recoSummary {
 	background: rgba(106, 201, 162, 0.2);
 	padding: 5px;
 	display: block;
-	font-size: 15px;
+	font-size: 16px;
 	font-weight: bold;
 	line-height: 20px;
 	text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
-/* 	text-transform: uppercase; */
+	/* 	text-transform: uppercase; */
 	margin: 0px;
 	cursor: pointer;
 }
@@ -602,7 +608,6 @@ ul#recoSummary {
 	padding: 0;
 	margin: 0;
 }
-
 
 .consizedtext,.dropdown-menu a { /* 	width: 100%; */
 	overflow: hidden;
@@ -777,7 +782,6 @@ ul#recoSummary {
 /* .licence_div img { */
 /* 	height: 15px; */
 /* } */
-
 .observation_links {
 	margin-top: 5px;
 	float: right;
@@ -1082,15 +1086,15 @@ ul,ol {
 }
 
 /* #mainMenu,#myGroups {     margin-left: 10px; */
-margin-top:      0; clear: both     ;
+margin-top:       0; clear: both      ;
 	/* 	font-size: 12pt; */
 	/* 	margin-left: 240px; */
 	/* 	margin-right: 240px; */
-	/* 	font-weight: bold; */ position:absolute     ; top:      0px     ;
-	left:  
-	   200px     ;
+	/* 	font-weight: bold; */ position:absolute      ; top:       0px     
+	; left:  
+	    200px      ;
 	/* 	padding: 5px; */
-	/* 	min-width: 540px; */ width:     960px    ;
+	/* 	min-width: 540px; */ width:      960px     ;
 	/* 	overflow: visible; */
 	/* } */
 	/* #mainMenu ul.links li a:link,#mainMenu ul li a:visited,#mainMenu ul li a:hover,#mainMenu ul li a:active,#myGroups a:link,#myGroups  a:visited,#myGroups a:hover,#myGroups a:active */
@@ -1305,7 +1309,7 @@ span.cke_skin_kama {
 h1,.main_heading .species_title .sci_name {
 	font-size: 25px;
 	line-height: 40px;
- 	margin: 0; 
+	margin: 0;
 	font-family: inherit;
 	font-weight: bold;
 }
@@ -1592,24 +1596,24 @@ li#userOrEmail-new {
 }
 
 .signature {
-	max-width:170px;
-	background-color:rgba(106, 201, 162, 0.2);
-/* 	background-clip: padding-box; */
+	max-width: 170px;
+	background-color: rgba(106, 201, 162, 0.2);
+	/* 	background-clip: padding-box; */
 	border-color: rgba(0, 0, 0, 0.2);
 	border-radius: 5px;
 	border-style: solid;
 	border-width: 1px;
-/* 	box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2); */
-	margin-bottom:3px;
-	overflow:hidden;
+	/* 	box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2); */
+	margin-bottom: 3px;
+	overflow: hidden;
 }
 
 .login-box .signature {
-	background-color:transparent;
+	background-color: transparent;
 }
 
 .signature:hover {
-	background-color:white;
+	background-color: white;
 }
 
 #reco-options {
@@ -1718,35 +1722,34 @@ li#userOrEmail-new {
 }
 
 @media screen and (-webkit-min-device-pixel-ratio:0) {
-select {
-display: inline-block;
-width: 210px;
-height: 18px;
-padding: 4px;
-margin-bottom: 9px;
-font-size: 13px;
-line-height: 18px;
-color: #555555;
-border: 1px solid #ccc;
--webkit-border-radius: 3px;
--moz-border-radius: 3px;
-border-radius: 3px;
-}
-select {
-height: 28px;
-/* In IE7, the height of the select element cannot be changed by height, only font-size /
+	select {
+		display: inline-block;
+		width: 210px;
+		height: 18px;
+		padding: 4px;
+		margin-bottom: 9px;
+		font-size: 13px;
+		line-height: 18px;
+		color: #555555;
+		border: 1px solid #ccc;
+		-webkit-border-radius: 3px;
+		-moz-border-radius: 3px;
+		border-radius: 3px;
+	}
+	select {
+		height: 28px;
+		/* In IE7, the height of the select element cannot be changed by height, only font-size /
 *margin-top: 4px;
 / For IE7, add top margin to align select with labels */
-line-height: 11px;
-}
-select {
-width: 220px;
-background-color: #ffffff;
-}
-select[multiple], select[size] {
-height: auto;
-}
-
+		line-height: 11px;
+	}
+	select {
+		width: 220px;
+		background-color: #ffffff;
+	}
+	select[multiple],select[size] {
+		height: auto;
+	}
 }
 
 .contributor_entry {
@@ -1754,11 +1757,22 @@ height: auto;
 	border-radius: 5px;
 	border-style: solid;
 	border-width: 1px;
-	margin-bottom:10px;
+	margin-bottom: 10px;
 }
 
 .contributor_entry .toolbar {
-	background: #fff url(../images/skin/shadow.jpg) repeat-x center;
-	font-size : 12px;
-	line-height:35px;
+	font-size: 12px;
+	line-height: 25px;
+	border-color: rgba(0, 0, 0, 0.2);
+	/* 	border-radius: 5px; */
+	border-style: solid;
+	border-width: 1px 0px 0px 0px;
+	background-image: none;
+	outline: 0;
+	-webkit-box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 1px 2px
+		rgba(0, 0, 0, 0.05);
+	-moz-box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 1px 2px
+		rgba(0, 0, 0, 0.05);
+	box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 1px 2px
+		rgba(0, 0, 0, 0.05);
 }

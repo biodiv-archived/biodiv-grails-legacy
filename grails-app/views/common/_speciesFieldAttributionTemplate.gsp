@@ -2,9 +2,8 @@
 <g:if test="${speciesFieldInstance}">
 	<g:if test="${speciesFieldInstance?.description}">
 			<!--  content attribution -->
-			<div class="attributionBlock dropdown pull-right">
-				<a href="#" class="dropdown-toggle" data-toggle="dropdown" title="Show details"><i class=" icon-info-sign"></i></a>			
-				<div class="dropdown-menu ">
+			<div class="attributionContent collapse">
+							
 					<table>
 						<g:if test="${speciesFieldInstance?.contributors}">
 							<tr class="prop">
@@ -87,6 +86,5 @@
 
 					</table>
 				</div>
-			</div>
 		</g:if>
 </g:if>

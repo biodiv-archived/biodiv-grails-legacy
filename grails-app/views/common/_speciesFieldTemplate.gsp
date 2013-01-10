@@ -7,10 +7,6 @@
 			</h6>
 		</g:if>
 
-		<g:showSpeciesFieldToolbar
-			model="['speciesFieldInstance':speciesFieldInstance]" />
-
-		<br />
 		<div class="">
 			<g:each in="${speciesFieldInstance.resources}" var="r">
 				<g:if test="${r.type == species.Resource.ResourceType.ICON}">
@@ -112,6 +108,10 @@
 		<g:showSpeciesFieldToolbar
 			model="['speciesFieldInstance':speciesFieldInstance]" />
 	</g:elseif>
+	
+	<g:showSpeciesFieldToolbar
+			model="['speciesFieldInstance':speciesFieldInstance]" />
+	
 </div>
 
 
