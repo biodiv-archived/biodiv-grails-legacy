@@ -98,7 +98,7 @@ class SetupService {
 			String description = row.get("description");
 			int displayOrder = Math.round(Float.parseFloat(row.get("s.no.")));
 			String url_identifier = row.get("url identifier");
-			println url_identifier
+			
 			def fieldCriteria = Field.createCriteria();
 
 			Field field = fieldCriteria.get {

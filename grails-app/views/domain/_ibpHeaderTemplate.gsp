@@ -70,14 +70,6 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 				}
 			});
 		
-			$(".ui-icon-edit").click(function() {
-				var ele =$(this).siblings("div.toolbarIconContent").find("textArea.fieldEditor");
-				if(ele) { 
-					ele.ckeditor(function(){}, {customConfig:"${resource(dir:'js',file:'ckEditorConfig.js')}"});
-					CKEDITOR.replace( ele.attr('id') );
-				}
-			});
-		
 			$("a.ui-icon-close").click(function() {
 				$(this).parent().hide("slow");
 			});

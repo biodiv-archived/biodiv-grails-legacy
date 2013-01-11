@@ -1,4 +1,3 @@
-
 <div class="external_providers">
 
 	<div class="sign_in_external_bttn external_bttn facebookButton">
@@ -20,9 +19,9 @@
 			<input type="hidden" name="${openidIdentifier}"
 				class="openid-identifier"
 				value="https://www.google.com/accounts/o8/id" />
-			<g:if test="${params['spring-security-redirect']}">
+			<g:if test="${targetUrl}">
 				<input type="hidden" name="spring-security-redirect"
-					value="${params['spring-security-redirect']}" />
+					value="${targetUrl}" />
 			</g:if>
 			<input type="submit" value="" class="external_bttn googleButton" />
 		</form>
@@ -33,9 +32,9 @@
 			name='yahoo_openIdLoginForm'>
 			<input type="hidden" name="${openidIdentifier}"
 				class="yahoo openid-identifier" value="http://me.yahoo.com/" />
-			<g:if test="${params['spring-security-redirect']}">
+			<g:if test="${targetUrl}">
 				<input type="hidden" name="spring-security-redirect"
-					value="${params['spring-security-redirect']}" />
+					value="${targetUrl}" />
 			</g:if>
 			<input type="submit" value="" class="external_bttn yahooButton" />
 		</form>

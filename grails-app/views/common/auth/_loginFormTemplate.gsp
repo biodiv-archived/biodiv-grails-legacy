@@ -33,9 +33,9 @@
 				</div>
 			</div>
 			
-			<g:if test="${params['spring-security-redirect']}">
+			<g:if test="${targetUrl}">
 				<input type="hidden" name="spring-security-redirect"
-					value="${params['spring-security-redirect']}" />
+					value="${targetUrl}" />
 			</g:if>
 			
 			<div class="control-group">
