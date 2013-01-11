@@ -57,7 +57,14 @@ class RegisterController extends grails.plugins.springsecurity.ui.RegisterContro
 	}
 	
 	def register = { CustomRegisterCommand command ->
-
+		def config = SpringSecurityUtils.securityConfig
+		
+		def redirectModel = [openIdPostUrl: "${request.contextPath}$openIDAuthenticationFilter.filterProcessesUrl",
+					daoPostUrl:    "${request.contextPath}${config.apf.filterProcessesUrl}",
+					persistentRememberMe: config.rememberMe.persistent,
+					rememberMeParameter: config.rememberMe.parameter,
+					openidIdentifier: config.openid.claimedIdentityFieldName]
+		
 		log.debug "Registering user $command"
 		if (springSecurityService.isLoggedIn()) {
 			redirect uri: SpringSecurityUtils.securityConfig.successHandler.defaultTargetUrl
@@ -66,7 +73,8 @@ class RegisterController extends grails.plugins.springsecurity.ui.RegisterContro
 		
 		def conf = SpringSecurityUtils.securityConfig
 		if (command.hasErrors()) {
-			render view: 'index', model: [command: command]
+			redirectModel.command = command
+			render view: 'index', model: redirectModel
 			return
 		}
 
@@ -109,8 +117,9 @@ class RegisterController extends grails.plugins.springsecurity.ui.RegisterContro
 			authenticateAndRedirect user.email
 			return	
 		} else {
-			registerAndEmail user.username, user.email, request			
-			render view: 'index', model: [emailSent: true]
+			registerAndEmail user.username, user.email, request		
+			redirectModel.emailSent = true
+			render view: 'index', model: redirectModel
 			return
 		}
 

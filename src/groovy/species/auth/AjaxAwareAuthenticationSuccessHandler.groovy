@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.security.core.Authentication;
+import org.springframework.security.web.WebAttributes;
 
 import species.utils.Utils;
 
@@ -38,6 +39,9 @@ org.codehaus.groovy.grails.plugins.springsecurity.AjaxAwareAuthenticationSuccess
 
 		
 		super.onAuthenticationSuccess(request, response, authentication);
+		//removing login referrer
+		request.getSession().removeAttribute("LOGIN_REFERRER");
+		
 	}
 
 	private getLoginStatusCookie(HttpServletRequest request) {

@@ -54,7 +54,7 @@ class FacebookAuthCookieFilter extends GenericFilterBean implements ApplicationE
 		HttpServletRequest request = servletRequest
 		HttpServletResponse response = servletResponse
 		String url = request.requestURI.substring(request.contextPath.length())
-		logger.debug("Processing url: $url")
+		logger.debug("Processing url: $url with params : ${request.getParameterMap()}")
 		if (url != logoutUrl && SecurityContextHolder.context.authentication == null) {
 			logger.debug("Applying facebook auth filter")
 			assert facebookAuthUtils != null

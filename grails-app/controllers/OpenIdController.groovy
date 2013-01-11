@@ -37,12 +37,11 @@ class OpenIdController {
 
 	def facebookAuthService
 	def SUserService
-	
+	def portResolver
+
 	static defaultAction = 'auth'
-	
-	def checkauth = {
-		log.debug "inside check auth " + params
-	}
+
+	def checkauth = { log.debug "inside check auth " + params }
 
 	/**
 	 * Shows the login page. The user has the choice between using an OpenID and a username
@@ -59,27 +58,32 @@ class OpenIdController {
 			redirect uri: config.successHandler.defaultTargetUrl
 			return
 		}
-		
+
 		def targetUrl = "";
 		def savedRequest = request.getSession()?.getAttribute(WebAttributes.SAVED_REQUEST)
 		if(savedRequest == null) {
-			targetUrl = request.getHeader("Referer")?:"";
-			if (StringUtils.hasText(targetUrl)) {
-				try {
-					targetUrl = URLEncoder.encode(targetUrl, "UTF-8");
-				} catch (UnsupportedEncodingException e) {
-					throw new IllegalStateException("UTF-8 not supported. Shouldn't be possible");
+			if(params.login_error) {
+				targetUrl = request.getSession().getAttribute("LOGIN_REFERRER");
+			} else {
+				targetUrl = request.getHeader("Referer")?:"";
+				if (StringUtils.hasText(targetUrl)) {
+					try {
+						targetUrl = URLEncoder.encode(targetUrl, "UTF-8");
+					} catch (UnsupportedEncodingException e) {
+						throw new IllegalStateException("UTF-8 not supported. Shouldn't be possible");
+					}
 				}
-				log.debug "Passing targetUrlParameter for redirect: " + targetUrl;
+				//params["spring-security-redirect"] = targetUrl
 			}
-			params["spring-security-redirect"] = targetUrl
+			request.getSession().setAttribute("LOGIN_REFERRER", targetUrl);
+			log.debug "Passing targetUrlParameter for redirect: " + targetUrl;
 		}
-		[openIdPostUrl: "${request.contextPath}$openIDAuthenticationFilter.filterProcessesUrl?spring-security-redirect=${targetUrl}",
-					daoPostUrl:"${request.contextPath}${config.apf.filterProcessesUrl}?spring-security-redirect=${targetUrl}",
+		render (view:'auth', model:[openIdPostUrl: "${request.contextPath}$openIDAuthenticationFilter.filterProcessesUrl",
+					daoPostUrl:"${request.contextPath}${config.apf.filterProcessesUrl}",
 					persistentRememberMe: config.rememberMe.persistent,
 					rememberMeParameter: config.rememberMe.parameter,
 					openidIdentifier: config.openid.claimedIdentityFieldName,
-					'targetUrl':targetUrl]
+					targetUrl:targetUrl]);
 	}
 
 	/**
@@ -102,7 +106,7 @@ class OpenIdController {
 		}
 
 		log.debug "Processing OpenId authentication in createAccount/merge"
-		
+
 		def emailAttribute = attributes.find { l ->
 			if(l.name == 'email') {
 				return l;
@@ -121,7 +125,7 @@ class OpenIdController {
 		if(email) {
 			user = SUser.findByEmail(email)
 		}
-		
+
 		if(user) {
 			log.info "Found existing user with same emailId $email"
 			log.info "Merging details with existing account $user"
@@ -168,12 +172,12 @@ class OpenIdController {
 			flash.error = 'Sorry, no user was found with that username and password'
 			return [command: command, openId: openId]
 		}
-		
+
 		def usernamePropertyName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
 		authenticateAndRedirect user."$usernamePropertyName"
-		
+
 	}
-	
+
 	def createFacebookAccount = {
 
 		def token = session["LAST_FACEBOOK_USER"]
@@ -200,14 +204,14 @@ class OpenIdController {
 		if(email) {
 			user = SUser.findByEmail(email)
 		}
-		
+
 		if(user) {
 			log.info "Found existing user with same emailId $email"
 			log.info "Merging details with existing account $user"
 			facebookAuthService.mergeFacebookUserDetails user, fbProfile
 			registerAccountOpenId user.email, fbProfile.link
 			facebookAuthService.registerFacebookUser token, user
-			
+
 			def usernamePropertyName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
 			authenticateAndRedirect user."$usernamePropertyName"
 		} else {
@@ -232,7 +236,7 @@ class OpenIdController {
 		session.removeAttribute OIAFH.LAST_OPENID_USERNAME
 		session.removeAttribute OIAFH.LAST_OPENID_ATTRIBUTES
 		session.removeAttribute "LAST_FACEBOOK_USER"
-		
+
 		springSecurityService.reauthenticate username
 
 		def config = SpringSecurityUtils.securityConfig
@@ -299,13 +303,13 @@ class OpenIdController {
 			if (!user.save(flush:true, failOnError:true)) {
 				status.setRollbackOnly()
 			}
-			
+
 			SUserService.assignRoles(user);
 		}
-		
+
 	}
 
-	
+
 
 	/**
 	 * For the initial form display, copy any registered AX values into the command.
@@ -315,25 +319,25 @@ class OpenIdController {
 		List attributes = session[OIAFH.LAST_OPENID_ATTRIBUTES] ?: []
 		String firstName, lastName="";
 		for (attribute in attributes) {
-			
+
 			String name = attribute.name
 			if(name == "firstname") {
-				firstName = attribute.values[0]	
+				firstName = attribute.values[0]
 			} else if(name == "lastname") {
 				lastName = attribute.values[0]
 			}
-			
+
 			if (command.hasProperty(name)) {
 				command."$name" = attribute.values[0]
 			}
 		}
-		
+
 		if(firstName) {
 			command.name = firstName + " "+ lastName
 			command.name = command.name.trim();
-		} 
+		}
 	}
-	
+
 }
 
 class OpenIdRegisterCommand {
