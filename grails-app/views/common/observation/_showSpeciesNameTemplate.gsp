@@ -1,7 +1,7 @@
 <div class="species_title">
 	<g:set var="sName" value="${observationInstance.fetchSpeciesCall()}" />
 	<g:if test="${sName == 'Unknown'}">
-		<div class="sci_name" title="${sName}">
+		<div class="sci_name ellipsis" title="${sName}">
 			${sName} <a
 				href="${uGroup.createLink(controller:'observation', action:'show', id:observationInstance.id, 'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress) }">Help
 				identify</a>
