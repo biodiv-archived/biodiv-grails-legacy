@@ -121,10 +121,13 @@ class CurationService {
 	}
 
 	private UnCuratedCommonNames getUnCuratedCommonName(Recommendation reco){
-		Language lang = Language.read(reco.languageId);
-		UnCuratedCommonNames unCn = UnCuratedCommonNames.findByNameIlikeAndLanguage(reco.name, lang);
+		def c = UnCuratedCommonNames.createCriteria()
+		UnCuratedCommonNames unCn = c.get{
+			ilike('name', name);
+			(reco.languageId) ? eq('language', Language.read(reco.languageId)) : isNull('language');
+		}
 		if(!unCn){
-			unCn = new UnCuratedCommonNames(name:reco.name, language:lang, reco:reco);
+			unCn = new UnCuratedCommonNames(name:reco.name, language:Language.read(reco.languageId), reco:reco);
 			def flushImmediately  = grailsApplication.config.speciesPortal.flushImmediately
 			if(!unCn.save(flush:flushImmediately)){
 				log.error "Error during UnCuratedCommonNames save"

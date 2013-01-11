@@ -33,7 +33,7 @@ class SUser {
 	boolean passwordExpired
 	String email
 	Date dateCreated = new Date();
-	Date lastLoginDate
+	Date lastLoginDate = new Date();
 	String profilePic
 	String icon
 	

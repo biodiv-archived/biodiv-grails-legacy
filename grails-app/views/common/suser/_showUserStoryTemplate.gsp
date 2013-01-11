@@ -40,13 +40,15 @@
 					datetime="${userInstance.dateCreated.getTime()}"></time>
 			</div>
 		</div>
-		<div class="prop">
-			<span class="name"><i class="icon-time"></i>Last visited </span>
-			<div class="value">
-				<time class="timeago"
-					datetime="${userInstance.lastLoginDate.getTime()}"></time>
+		<g:if test="${userInstance.lastLoginDate}">
+			<div class="prop">
+				<span class="name"><i class="icon-time"></i>Last visited </span>
+				<div class="value">
+					<time class="timeago"
+						datetime="${userInstance.lastLoginDate.getTime()}"></time>
+				</div>
 			</div>
-		</div>
+		</g:if>
 
 	</div>
 	<div class="story-footer">
