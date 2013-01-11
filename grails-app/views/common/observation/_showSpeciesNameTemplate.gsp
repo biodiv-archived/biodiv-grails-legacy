@@ -37,10 +37,10 @@
 			</div>
 		</g:if>
 		<g:else>
-			<s:showHeadingAndSubHeading model="['heading':sName, 'headingClass':headingClass]"/>
-<%--			<div class="ellipsis" title="${sName}">--%>
-<%--				${sName}--%>
-<%--			</div>--%>
+<%--			<s:showHeadingAndSubHeading model="['heading':sName, 'headingClass':headingClass]"/>--%>
+			<div class="ellipsis" title="${sName}">
+				${sName}
+			</div>
 		</g:else>
 	</g:else>
 </div>
