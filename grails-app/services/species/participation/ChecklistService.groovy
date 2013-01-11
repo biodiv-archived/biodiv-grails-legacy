@@ -628,4 +628,8 @@ delete from un_curated_scientific_names where id > 1119;
 delete from recommendation where id > 369304 and id < 380677 and is_scientific_name = false and id not in(select common_name_reco_id from recommendation_vote where common_name_reco_id  > 369304 and common_name_reco_id < 380677);
 
 update suser set last_login_date = null where last_login_date <= date_created;
+
+select count(r.id) from recommendation as r where r.is_scientific_name = false and (select count(*) from recommendation as r1 where r1.name = r.name and r1.taxon_concept_id = r.taxon_concept_id and ((r1.language_id is null and r.language_id is null)) and r.id != r1.id ) > 0;
+
+
 */

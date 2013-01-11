@@ -26,7 +26,7 @@
 		<g:else>
 		<span class="name" style="color: #b1b1b1;"><i
 			class="icon-search"></i></span> ${instanceTotal} 
-		${resultType?:'observation'}<g:if test="${instanceTotal!=1}">s</g:if> found 
+		${resultType?:'observation'}<g:if test="${instanceTotal>1 && resultType != 'species'}">s</g:if> found 
 		</g:else>
 		<g:each in="${queryParams}" var="queryParam">
 			<g:if

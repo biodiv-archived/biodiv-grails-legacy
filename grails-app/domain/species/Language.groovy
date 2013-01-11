@@ -2,7 +2,7 @@ package species
 
 class Language {
 	public static final String DEFAULT_LANGUAGE = "English";
-	public static final Random NUMBER_GENERATOR = new Random();
+	private static final Random NUMBER_GENERATOR = new Random();
 	
 	String threeLetterCode;
 	String twoLetterCode;

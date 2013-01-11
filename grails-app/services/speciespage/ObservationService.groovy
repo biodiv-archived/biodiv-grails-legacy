@@ -341,12 +341,13 @@ class ObservationService {
 				name = Utils.getTitleCase(Utils.cleanName(name));
 			}
 			def c = Recommendation.createCriteria();
-			def result = c.list {
+			def reco = c.get {
 				ilike('name', name);
 				eq('isScientificName', isScientificName);
 			    (languageId) ? eq('languageId', languageId) : isNull('languageId');
+				(taxonConceptForNewReco) ? eq('taxonConcept', taxonConceptForNewReco) : isNull('taxonConcept');
 			}
-			def reco = result?result[0]:null;
+			//def reco = result?result[0]:null;
 			if(!reco) {
 				reco = new Recommendation(name:name, taxonConcept:taxonConceptForNewReco, isScientificName:isScientificName, languageId:languageId);
 				log.debug "createing new recommendation $reco"
