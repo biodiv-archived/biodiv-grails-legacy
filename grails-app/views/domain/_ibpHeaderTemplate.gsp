@@ -2,7 +2,7 @@
 <div id="ibp-header" class="gradient-bg">
 	<div class="navbar navbar-static-top" style="margin-bottom: 0px;">
 		<div class="navbar-inner"
-			style="box-shadow: none; background-color: #dddbbb; background-image: none; padding: 0px 5px;">
+			style="box-shadow: none; background-color: #dddbbb; background-image: none; padding: 0px 5px;  filter: progid :DXImageTransform.Microsoft.gradient (startColorstr = '#dddbbb', endColorstr = '#dddbbb' );">
 			<div class="container" style="width: 100%">
 				<a class="btn btn-navbar" data-toggle="collapse"
 					data-target=".nav-collapse"> <span class="icon-bar"></span> </a> <a

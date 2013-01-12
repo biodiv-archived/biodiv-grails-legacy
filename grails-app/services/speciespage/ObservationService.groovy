@@ -308,9 +308,10 @@ class ObservationService {
 		//giving priority to scientific name if its available. same will be used in determining species call
 		return [mainReco : (scientificNameReco ?:commonNameReco), commonNameReco:commonNameReco];
 	}
-		
+	
 	private Recommendation getRecoForScientificName(String recoName, String canonicalName, Recommendation commonNameReco){
 		def reco, taxonConcept;
+		// 
 		
 		//first searching by canonical name. this name is present if user select from auto suggest
 		if(canonicalName && (canonicalName.trim() != "")){
@@ -334,20 +335,15 @@ class ObservationService {
 	public Recommendation findReco(name, isScientificName, languageId, taxonConceptForNewReco){
 		if(name){
 			// if sn then only sending to names parser for common name only cleaning
+			//XXX setting language id null for scientific name
 			if(isScientificName){
 				name = Utils.getCanonicalForm(name);
+				languageId = null
 			}else{
 				//converting common name to title case
 				name = Utils.getTitleCase(Utils.cleanName(name));
 			}
-			def c = Recommendation.createCriteria();
-			def reco = c.get {
-				ilike('name', name);
-				eq('isScientificName', isScientificName);
-			    (languageId) ? eq('languageId', languageId) : isNull('languageId');
-				(taxonConceptForNewReco) ? eq('taxonConcept', taxonConceptForNewReco) : isNull('taxonConcept');
-			}
-			//def reco = result?result[0]:null;
+			def reco = searchReco(name, isScientificName, languageId, taxonConceptForNewReco)
 			if(!reco) {
 				reco = new Recommendation(name:name, taxonConcept:taxonConceptForNewReco, isScientificName:isScientificName, languageId:languageId);
 				log.debug "createing new recommendation $reco"
@@ -358,6 +354,32 @@ class ObservationService {
 			return reco;
 		}
 		return null;
+	}
+	
+	private Recommendation searchReco(name, isScientificName, languageId, taxonConcept){
+		def c = Recommendation.createCriteria();
+		def recoList = c.list {
+			ilike('name', name);
+			eq('isScientificName', isScientificName);
+			(languageId) ? eq('languageId', languageId) : isNull('languageId');
+			if(taxonConcept){
+				eq('taxonConcept', taxonConcept)
+			}
+		}
+		
+		if(!recoList || recoList.isEmpty()){
+			return null
+		}
+		
+		// giving priority to reco which has taxon concept 
+		recoList.each { Recommendation r ->
+			if(r.taxonConcept){
+				return r
+			}
+		}
+		
+		//no reco with taxon concept found so returning first one 
+		return recoList[0]
 	}
 	
 	/**
