@@ -89,65 +89,9 @@
 
 
 
-				<div class="span8 observation_story">
-					<dl class="dl-horizontal">
-						<dt>
-							<i class="icon-user"></i>
-							<g:message code="suser.username.label" default="Username" />
-						</dt>
-						<dd>
-							${fieldValue(bean: user, field: "username")}
-						</dd>
-						<dt>
-							<i class="icon-user"></i>
-							<g:message code="suser.name.label" default="Full Name" />
-						</dt>
-						<dd>
-							${fieldValue(bean: user, field: "name")}
-						</dd>
-
-						<sUser:ifOwnsOrIsPublic
-							model="['user':user, 'isPublic':!user.hideEmailId]">
-							<dt>
-								<i class="icon-envelope"></i>
-								<g:message code="suser.email.label" default="Email" />
-							</dt>
-							<dd>
-								<a href="mailto:${fieldValue(bean: user, field: 'email')}">
-									${fieldValue(bean: user, field: "email")} </a>
-							</dd>
-						</sUser:ifOwnsOrIsPublic>
-
-						<g:if test="${user.location}">
-							<dt>
-								<i class="icon-map-marker"></i>
-								<g:message code="suser.location.label" default="Location" />
-							</dt>
-							<dd>
-								${fieldValue(bean: user, field: "location")}
-							</dd>
-						</g:if>
-
-						<dt>
-							<i class="icon-road"></i>
-							<g:message code="suser.website.label" default="Website" />
-						</dt>
-						<dd>
-							<div class="linktext">
-								${fieldValue(bean: user, field: 'website')}
-							</div>
-							<% def openId = user.openIds.find { it.url.indexOf('facebook') != -1 }
-									def facebookUrl = openId?.url %>
-							<g:if test="${facebookUrl}">
-								<div class="facebookButton"
-									style="background-repeat: no-repeat; height: 33px;">
-									<a class="fbJustConnect" target="_blank" href="${facebookUrl}">Facebook
-										Profile</a>
-								</div>
-							</g:if>
-						</dd>
-					</dl>
-				</div>
+				
+				<sUser:showUserStory model="['userInstance':user, 'showDetails':true]"></sUser:showUserStory>
+				
 			</div>
 
 

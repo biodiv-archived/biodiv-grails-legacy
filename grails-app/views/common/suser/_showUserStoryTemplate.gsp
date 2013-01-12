@@ -1,19 +1,53 @@
 <%@page import="species.participation.Observation"%>
 <%@page import="species.utils.Utils"%>
-<div class="observation_story" style="overflow:auto;">
-	<h5 class="ellipsis">
-		<a 
-			href="${uGroup.createLink([action:"show", controller:"SUser", id:userInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':userGroupWebaddress])}">
-			${userInstance.name} </a>
-	</h5>
-
+<div class="observation_story" style="overflow: auto;">
+	<g:if test="${!showDetails }">
+		<h5 class="ellipsis">
+			<a
+				href="${uGroup.createLink([action:"show", controller:"SUser", id:userInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':userGroupWebaddress])}">
+				${userInstance.name} </a>
+		</h5>
+	</g:if>
 
 	<div class="span8" style="padding-bottom: 10px;">
+		<g:if test="${showDetails}">
+			<div class="prop">
+				<span class="name"><i class="icon-user"></i> <g:message
+						code="suser.username.label" default="Username" /> </span>
+				<div class="value">
+					${fieldValue(bean: userInstance, field: "username")}
+				</div>
+			</div>
+
+			<div class="prop">
+				<span class="name"><i class="icon-user"></i> <g:message
+						code="suser.name.label" default="Full Name" /> </span>
+				<div class="value">
+					${fieldValue(bean: userInstance, field: "name")}
+				</div>
+			</div>
+
+
+
+			<sUser:ifOwnsOrIsPublic
+				model="['user':userInstance, 'isPublic':!userInstance.hideEmailId]">
+				<div class="prop">
+					<span class="name"> <i class="icon-envelope"></i> <g:message
+							code="suser.email.label" default="Email" /> </span>
+					<div class="value">
+
+						<a href="mailto:${fieldValue(bean: userInstance, field: 'email')}">
+							${fieldValue(bean: userInstance, field: "email")} </a>
+					</div>
+				</div>
+			</sUser:ifOwnsOrIsPublic>
+
+		</g:if>
 		<g:if test="${userInstance.location}">
 			<div class="prop">
 				<span class="name"><i class="icon-map-marker"></i>Location</span>
 				<div class="value">
-				${userInstance.location}
+					${userInstance.location}
 				</div>
 			</div>
 		</g:if>
@@ -22,45 +56,52 @@
 			<div class="prop">
 				<span class="name"><i class="icon-road"></i>Website</span>
 				<div class="value">
-				<g:if test="${Utils.isURL(userInstance.website) }">
-					<a target="_blank" href="${userInstance.getWebsiteLink()}"> ${fieldValue(bean: userInstance, field: 'website')}
-					</a>
-				</g:if>
-				<g:else>
-					${fieldValue(bean: userInstance, field: 'website')}
-				</g:else>
+					<div class="linktext pull-left">
+						${fieldValue(bean: userInstance, field: 'website')}
+					</div>
+					<% def openId = userInstance.openIds.find { it.url.indexOf('facebook') != -1 }
+									def facebookUrl = openId?.url %>
+					<g:if test="${facebookUrl}">
+						<div class="facebookButton pull-left"
+							style="background-repeat: no-repeat; height: 33px;">
+							<a class="fbJustConnect" target="_blank" href="${facebookUrl}">Facebook
+								Profile</a>
+						</div>
+					</g:if>
 				</div>
 			</div>
 		</g:if>
 
-		<div class="prop">
-			<span class="name"><i class="icon-time"></i>Member since </span>
-			<div class="value">
-				<time class="timeago"
-					datetime="${userInstance.dateCreated.getTime()}"></time>
-			</div>
-		</div>
-		<g:if test="${userInstance.lastLoginDate}">
+		<g:if test="${!showDetails }">
 			<div class="prop">
-				<span class="name"><i class="icon-time"></i>Last visited </span>
+				<span class="name"><i class="icon-time"></i>Member since </span>
 				<div class="value">
 					<time class="timeago"
-						datetime="${userInstance.lastLoginDate.getTime()}"></time>
+						datetime="${userInstance.dateCreated.getTime()}"></time>
 				</div>
 			</div>
+			<g:if test="${userInstance.lastLoginDate}">
+				<div class="prop">
+					<span class="name"><i class="icon-time"></i>Last visited </span>
+					<div class="value">
+						<time class="timeago"
+							datetime="${userInstance.lastLoginDate.getTime()}"></time>
+					</div>
+				</div>
+			</g:if>
 		</g:if>
-
 	</div>
-	<div class="">
-		<span class="footer-item" title="No of Observations"> <i
-			class="icon-screenshot"></i> <obv:showNoOfObservationsOfUser
-				model="['user':userInstance]" /> </span> <span class="footer-item"
-			title="No of Tags"> <i class="icon-tags"></i> <obv:showNoOfTagsOfUser
-				model="['userId':userInstance.id]" /> </span> <span class="footer-item"
-			title="No of Identifications"> <i class="icon-check"></i> <obv:showNoOfRecommendationsOfUser
-				model="['user':userInstance]" /> </span>
-	</div>
-
+	<g:if test="${!showDetails }">
+		<div class="">
+			<span class="footer-item" title="No of Observations"> <i
+				class="icon-screenshot"></i> <obv:showNoOfObservationsOfUser
+					model="['user':userInstance]" /> </span> <span class="footer-item"
+				title="No of Tags"> <i class="icon-tags"></i> <obv:showNoOfTagsOfUser
+					model="['userId':userInstance.id]" /> </span> <span class="footer-item"
+				title="No of Identifications"> <i class="icon-check"></i> <obv:showNoOfRecommendationsOfUser
+					model="['user':userInstance]" /> </span>
+		</div>
+	</g:if>
 </div>
 
 

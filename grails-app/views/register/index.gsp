@@ -18,9 +18,7 @@
 .openid-loginbox .form-horizontal .controls input {
 	width: 290px;
 }
-.s2ui_hidden_button {
-	display:none;
-}
+
 
 </style>
 </head>

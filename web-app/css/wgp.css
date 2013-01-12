@@ -88,7 +88,7 @@ h6 {
 
 .snippet.tablet .figure {
 	height:150px;
-	width:200px;
+	width:auto;
 }
 .snippet.tablet .caption {
 	height:40px;
@@ -1706,3 +1706,6 @@ li#userOrEmail-new {
 		rgba(0, 0, 0, 0.05);
 }
 
+.s2ui_hidden_button {
+	display:none;
+}
