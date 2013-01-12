@@ -4,7 +4,7 @@
 		<thead>
 			<tr>
 				<g:each in="${checklistInstance.fetchColumnNames()}" var="cName">
-					<th>${cName}</th>
+					<th class="ellipsis" title="${cName}">${cName}</th>
 				</g:each>
 			</tr>
 		</thead>
