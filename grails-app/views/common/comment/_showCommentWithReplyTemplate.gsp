@@ -22,7 +22,7 @@
 	<g:if test="${feedPermission != 'readOnly' && commentInstance}">
 		<sUser:ifOwns model="['user':commentInstance.author]">
 			<div class="reco-comment-close" value="close" title="delete comment"
-				onclick="deleteCommentActivity(this, ${commentInstance.id}, '${createLink(controller:'comment', action:'removeComment')}'); return false;">
+				onclick="deleteCommentActivity(this, ${commentInstance.id}, '${uGroup.createLink(controller:'comment', action:'removeComment',  userGroup:feedInstance.fetchUserGroup(), 'userGroupWebaddress':feedInstance.fetchUserGroup()?.webaddress)}'); return false;">
 				<i class="icon-remove"></i>
 			</div>
 		</sUser:ifOwns>
@@ -34,7 +34,7 @@
 				<i class="icon-remove"></i>
 			</div>
 			<textarea name="commentBody" class="comment-textbox" placeholder="Reply on comment"></textarea>
-			<a href="#" class="btn btn-mini pull-right" title="post comment" onclick='replyOnComment($(this), ${commentInstance.id}, "${createLink(controller:'comment', action:'addComment')}"); $(this).parent().hide();return false;'>Post</a>	
+			<a href="#" class="btn btn-mini pull-right" title="post comment" onclick='replyOnComment($(this), ${commentInstance.id}, "${uGroup.createLink(controller:'comment', action:'addComment',  userGroup:feedInstance.fetchUserGroup(), 'userGroupWebaddress':feedInstance.fetchUserGroup()?.webaddress)}"); $(this).parent().hide();return false;'>Post</a>	
 		</div>
 	</div>
 	<time class="timeago" datetime="${feedInstance.lastUpdated.getTime()}"></time>

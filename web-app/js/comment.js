@@ -129,6 +129,7 @@ function replyOnComment(comp, parentId, url){
  		url: url,
 		dataType: "json",
 		data: params,
+		type: 'POST',
 		success: function(data) {
 			if(data.success){
 				updateFeeds();
