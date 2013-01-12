@@ -64,4 +64,6 @@
 	$('#ajaxLogin').on('hidden', function () {
 		$('#ajaxLogin form')[0].reset();
 	})
+	
+	$(".s2ui_hidden_button").hide();
 })(jQuery);

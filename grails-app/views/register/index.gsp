@@ -18,8 +18,6 @@
 .openid-loginbox .form-horizontal .controls input {
 	width: 290px;
 }
-
-
 </style>
 </head>
 
