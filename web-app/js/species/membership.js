@@ -221,4 +221,6 @@ function last_actions() {
 	        $(this).css('overflow','hidden');
 	    }
 	});
+	
+	$('.linktext').linkify();   
 }

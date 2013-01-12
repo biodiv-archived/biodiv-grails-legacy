@@ -143,8 +143,7 @@
 	</div>	
 	<g:javascript>
 	$(document).ready(function(){
-	window.params = {};
-		$('.linktext').linkify();
+		window.params = {};
 	});
 	</g:javascript>
 </body>
