@@ -12,6 +12,8 @@ ul.tagit li.tagit-choice {
     background-color: #DEE7F8;
     border: 1px solid #CAD8F3;
 /*     padding: 2px 13px 3px 4px; */
+/*     max-width: 200px; */
+/*     width:auto; */
 }
 
 ul.tagit li.tagit-choice.selected {
