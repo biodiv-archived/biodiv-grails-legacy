@@ -125,6 +125,7 @@ modules = {
 	susers_list { 
 		dependsOn 'core, list_utils'
 		
+		resource url:'/js/species/observations/list.js'
 		//resource url:'/js/species/users/list.js'
 	}
 
