@@ -134,9 +134,12 @@ function replyOnComment(comp, parentId, url){
 			if(data.success){
 				updateFeeds();
 			}
-		}, error: function(xhr, status, error) {
-			alert(xhr.responseText);
-	   	}
+		},
+		error:function (xhr, ajaxOptions, thrownError){
+        	//successHandler is used when ajax login succedes
+        	var successHandler = this.success, errorHandler = null;
+        	handleError(xhr, ajaxOptions, thrownError, successHandler, errorHandler);
+		}
 	});
 }
  

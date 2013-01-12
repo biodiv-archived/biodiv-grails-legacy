@@ -630,6 +630,11 @@ delete from recommendation where id > 369304 and id < 380677 and is_scientific_n
 update suser set last_login_date = null where last_login_date <= date_created;
 
 select count(r.id) from recommendation as r where r.is_scientific_name = false and (select count(*) from recommendation as r1 where r1.name = r.name and r1.taxon_concept_id = r.taxon_concept_id and ((r1.language_id is null and r.language_id is null)) and r.id != r1.id ) > 0;
+387438, 387437, 387436, 387435, 387427
 
+delete from un_curated_votes where voted_on >= '2013-01-11 08:05:55.705'
+delete from un_curated_scientific_names_un_curated_common_names where un_curated_scientific_names_common_names_id in (11890, 11892, 11894, 11895, 11895,  11896);
+delete from un_curated_scientific_names where id in (11890, 11892, 11894, 11895, 11895,  11896);
+delete from recommendation where id in (387438, 387437, 387436, 387435, 387427);
 
 */

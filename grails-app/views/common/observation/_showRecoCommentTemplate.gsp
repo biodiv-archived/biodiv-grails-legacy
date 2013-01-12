@@ -21,7 +21,7 @@
 							</g:link> on <g:formatDate date="${recoVoteInstance.votedOn}" type="datetime" style="LONG" timeStyle="SHORT"/> : ${recoVoteInstance.comment} 
 						</span>
 						<sUser:ifOwns model="['user':recoVoteInstance.author]">
-								<a href="#" onclick="removeRecoComment(${recoVoteInstance.recoVoteId},'#reco_comment_' + ${recoId}, '${createLink(controller:'observation', action:'deleteRecoVoteComment')}',$(this).parent()); return false;"><span class="deleteCommentIcon" data-original-title="Remove this comment" ><i class="icon-trash icon-red"></i></span></a>
+								<a href="#" onclick="removeRecoComment(${recoVoteInstance.recoVoteId},'#reco_comment_' + ${recoId}, '${uGroup.createLink(controller:'observation', action:'deleteRecoVoteComment')}',$(this).parent()); return false;"><span class="deleteCommentIcon" data-original-title="Remove this comment" ><i class="icon-trash icon-red"></i></span></a>
 						</sUser:ifOwns>
 						</li>
 					</g:each>

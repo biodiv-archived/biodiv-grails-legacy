@@ -217,7 +217,7 @@ def createFile(){
 
 def checkValidity(List res, o1, o2){
 	def pres = o1[0].plus(o2[0])
-	
+
 	boolean flag = true
 	res.each{ List l ->
 		Set s = new HashSet(l)
@@ -313,7 +313,7 @@ def testFinal(){
 		299672L,
 		299664L
 	])
-	
+
 	println "==== s " + npres.size()
 
 	println "  remove all " + npres.removeAll(ttList)
@@ -383,7 +383,7 @@ def cleanCommonName(){
 				(cn.taxonConcept) ? eq('taxonConcept', cn.taxonConcept) : isNull('taxonConcept');
 				(cn.language) ? eq('languageId', cn.language.id) : isNull('languageId');
 			}
-			
+
 			if(result.size() > 1){
 				println " recommme error "
 			}
@@ -407,7 +407,7 @@ def cleanCommonName(){
 				r.save()
 
 			}
-			
+
 
 			cn.name = newName
 			cn.language = newCnLang
@@ -416,6 +416,50 @@ def cleanCommonName(){
 		}
 	}
 }
+
+
+
+def newSn(){
+	def d = new Date(113, 0, 11)
+	def delRecos = new HashSet()
+	def usnList = []
+	RecommendationVote.withTransaction(){
+		RecommendationVote.findAllByVotedOnGreaterThanEquals(d).each { RecommendationVote rv ->
+			Recommendation r = rv.recommendation
+			if(r.isScientificName && !r.taxonConcept){
+				def c = Recommendation.createCriteria();
+				def reco = c.get{
+					ilike('name', r.name);
+					eq('isScientificName', r.isScientificName);
+					isNotNull('taxonConcept');
+				}
+				if(reco){
+					println "sn === orig $r.id tax on $r.taxonConcept new $reco.id tax on $reco.taxonConcept"
+					rv.recommendation = reco
+					rv.save()
+					delRecos.add(r.id)
+					
+					Observation.findAllByMaxVotedReco(r).each{ Observation obs ->
+						obs.maxVotedReco = reco
+						obs.save()
+					}
+					
+					UnCuratedScientificNames.findAllByReco(r).each { UnCuratedScientificNames usn ->
+						usnList.add(usn.id)
+					}
+				}
+			}
+		}
+		
+		
+		println "uncn " + usnList.join(", ")
+		println "reco " + delRecos.join(", ")
+		
+	}
+	
+}
+
+newSn()
 
 /*
  def test(){
