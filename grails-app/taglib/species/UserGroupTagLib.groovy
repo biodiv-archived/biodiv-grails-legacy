@@ -239,7 +239,7 @@ class UserGroupTagLib {
 
 	def showSuggestedUserGroups = {attrs, body ->
 		def user = springSecurityService.getCurrentUser();
-		Set userGroups = userGroupService.getSuggestedUserGroups(user);
+		Set userGroups = UserGroup.list(max:5)//userGroupService.getSuggestedUserGroups(user);
 		def subList= []
 		int i=0;
 		userGroups.each {
