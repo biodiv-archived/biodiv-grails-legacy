@@ -111,7 +111,7 @@ $(document).ready(function(){
         return false;
     });
     
-    $("ul[name='tags']").tagit({select:true,  tagSource: window.params.tagsLink});
+//    $("ul[name='tags']").tagit({select:true,  tagSource: window.params.tagsLink});
 	$("li.tagit-choice").live('click', function(){
    		setActiveTag($(this).contents().first().text());
     	updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);

@@ -300,7 +300,7 @@ max-width: 100%;
 								</label>
 							
 							<div class="create_tags controls  textbox" >
-								<ul id="tags">
+								<ul id="tags" style="margin-left:0px;">
 									<g:each in="${userGroupInstance.tags}" var="tag">
 										<li>${tag}</li>
 									</g:each>
@@ -524,7 +524,16 @@ $(document).ready(function() {
 	});
 	
 	$("#tags .tagit-input").watermark("Add some tags");	
-	$("#tags").tagit({select:true,  tagSource: "${uGroup.createLink(controller:'userGroup', action: 'tags')}", triggerKeys:['enter', 'comma', 'tab'], maxLength:30});
+	$("#tags").tagit({
+		select:true, 
+		allowSpaces:true, 
+		placeholderText:'Add some tags', 
+		autocomplete:{
+			source: "${uGroup.createLink(controller:'userGroup', action: 'tags')}"
+		}, 
+		triggerKeys:['enter', 'comma', 'tab'], 
+		maxLength:30
+	});
 	$(".tagit-hiddenSelect").css('display','none');
 	
 	intializesSeciesHabitatInterest()

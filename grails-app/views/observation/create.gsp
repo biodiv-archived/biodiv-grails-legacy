@@ -768,7 +768,16 @@ input.dms_field {
         });
         
  		$(".tagit-input").watermark("Add some tags");
-        $("#tags").tagit({select:true,  tagSource: "${uGroup.createLink(controller:'observation', action: 'tags')}", triggerKeys:['enter', 'comma', 'tab'], maxLength:30});
+        $("#tags").tagit({
+        	select:true, 
+        	allowSpaces:true, 
+        	placeholderText:'Add some tags', 
+        	autocomplete:{
+        		source: '/observation/tags'
+        	}, 
+        	triggerKeys:['enter', 'comma', 'tab'], 
+        	maxLength:30
+        });
 		$(".tagit-hiddenSelect").css('display','none');
 
  		 $("#addObservationSubmit").click(function(){

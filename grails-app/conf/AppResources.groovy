@@ -78,8 +78,9 @@ modules = {
 	}
 
 	tagit {
+		resource url:'/css/tagit/jquery.tagit.css'
 		resource url:'/css/tagit/tagit-custom.css'
-		resource url:'/js/tagit.js'
+		resource url:'/js/tag-it.js'
 	}
 
 	list_utils {

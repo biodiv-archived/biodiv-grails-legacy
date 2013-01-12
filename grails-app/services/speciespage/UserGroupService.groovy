@@ -103,7 +103,7 @@ class UserGroupService {
 			userGroup.ne_longitude = Float.parseFloat(params.ne_longitude)
 
 		if(!userGroup.hasErrors() && userGroup.save()) {
-			def tags = (params.tags != null) ? params.tags.values() as List : new ArrayList();
+			def tags = (params.tags != null) ? Arrays.asList(params.tags) : new ArrayList();
 			userGroup.setTags(tags);
 
 			List founders = Utils.getUsersList(params.founderUserIds);
