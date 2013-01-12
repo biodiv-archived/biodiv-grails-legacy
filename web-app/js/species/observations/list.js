@@ -164,7 +164,7 @@ $(document).ready(function(){
 		$('.list_view').show();
 		$(this).addClass('active');
 		$('.grid_view_bttn').removeClass('active');
-		$.cookie("observation_listing", "list");
+		$.cookie("listing", "list", {path    : '/'});
 		adjustHeight();
 	});
 
@@ -173,7 +173,7 @@ $(document).ready(function(){
 		$('.list_view').hide();
 		$(this).addClass('active');
 		$('.list_view_bttn').removeClass('active');
-		$.cookie("observation_listing", "grid");
+		$.cookie("listing", "grid", {path    : '/'});
 	});
 	
 	$('.loadMore').live('click', function() {
@@ -247,7 +247,7 @@ if (typeof String.prototype.startsWith != 'function') {
 function eatCookies() {
 	
 	var hashString = window.location.hash.substring(1)
-	if ($.cookie("observation_listing") == "list") {
+	if ($.cookie("listing") == "list") {
 		if(!hashString.startsWith('l')) {
 			if(hashString.startsWith('g')) {
 				window.location.hash = "l"+hashString.substring(1);

@@ -956,11 +956,13 @@ class ObservationController {
 		ConfidenceType confidence = observationService.getConfidenceType(params.confidence?:ConfidenceType.CERTAIN.name());
 		RecommendationVote existingRecVote = RecommendationVote.findByAuthorAndObservation(author, observation);
 		
-		def reco, commonNameReco;
+		def reco, commonNameReco, isAgreeRecommendation = false;
 		if(params.recoId) {
+			//user presses on agree button so getting reco from id and creating new recoVote without additional common name
 			reco = Recommendation.get(params.long('recoId'));
-			commonNameReco = existingRecVote.commonNameReco;
+			isAgreeRecommendation = true
 		} else{
+			//add recommendation used so taking both reco and common name reco if available
 			def recoResultMap = observationService.getRecommendation(params);
 			reco = recoResultMap.mainReco;
 			commonNameReco =  recoResultMap.commonNameReco;
@@ -977,10 +979,17 @@ class ObservationController {
 				def msg = "${message(code: 'recommendations.added.message', args: [reco.name])}"
 				return [recVote:newRecVote, msg:msg]
 			}else{
+				/**
+				 *  if old recommendation is same as new recommendation then
+				 *  case 1 : user might want to update(add new common name or delete existing one) the common name
+				 *  case 2 : if user gave sn and cn earlier and the by mistake clicks on agree then this case should not affect any thing on recovote
+				 *  		so added boolean flag before updating common name				   
+				 *  if old reco and new reco not same then deleting old reco vote 
+				 */
 				if(existingRecVote.recommendation.id == reco.id){
 					log.debug " Same recommendation already made by user " + author.id +  " reco name " + reco.name + " leaving as it is"
 					def msg = "${message(code: 'reco.vote.duplicate.message', args: [reco.name])}"
-					if(existingRecVote.commonNameReco != commonNameReco){
+					if(!isAgreeRecommendation && existingRecVote.commonNameReco != commonNameReco){
 						log.debug "Updating recoVote as common name changed"
 						existingRecVote.commonNameReco = commonNameReco;
 						return [recVote:existingRecVote, msg:msg]
