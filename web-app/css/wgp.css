@@ -1289,9 +1289,9 @@ span.cke_skin_kama {
 	border: 0px;
 }
 
-.tablet .species_title {
-	height: 38px;
-}
+/* .tablet .species_title { */
+/* 	height: 38px; */
+/* } */
 
 /*USER GROUP START*/
 .logo {
@@ -1318,6 +1318,12 @@ h4,.main_heading .species_title .common_name {
 	font-size: 17.5px;
 	line-height: 20px;
 	margin: 10px 0;
+	
+}
+
+.main_heading .species_title {
+	font-size: 17.5px;
+	line-height: 70px;
 	font-family: inherit;
 	font-weight: bold;
 }

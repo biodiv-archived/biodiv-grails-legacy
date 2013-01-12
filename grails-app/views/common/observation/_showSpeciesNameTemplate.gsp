@@ -36,6 +36,11 @@
 				${commonName}
 			</div>
 		</g:if>
+		<g:elseif test="${commonName}">
+			<div class="common_name ellipsis" title="${commonName }">
+				${commonName}
+			</div>
+		</g:elseif>
 		<g:else>
 <%--			<s:showHeadingAndSubHeading model="['heading':sName, 'headingClass':headingClass]"/>--%>
 			<div class="ellipsis" title="${sName}">

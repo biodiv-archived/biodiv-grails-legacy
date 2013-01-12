@@ -343,16 +343,19 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 					return true;
 				}, 
 	            success: function(data, statusText, xhr, form) {
-	             	if(data.canMakeSpeciesCall === 'false'){
-	             		$('#selectedGroupList').modal('show');
-	             	}else{
-	             		showRecos(data, null);
-	            		$('#canName').val('');
-	            		$('#commonName').val('');
-	            		$('#recoComment').val('');
-	            		updateUnionComment(null, "${uGroup.createLink(controller:'comment', action:'getAllNewerComments')}");
-	            		updateFeeds();
-	            	}
+	            	if(data.status == 'success') {
+		             	if(data.canMakeSpeciesCall === 'false'){
+		             		$('#selectedGroupList').modal('show');
+		             	}else{
+		             		showRecos(data, null);
+		            		updateUnionComment(null, "${uGroup.createLink(controller:'comment', action:'getAllNewerComments')}");
+		            		updateFeeds();
+		            		showRecoUpdateStatus(data.msg, data.status);
+		            	}
+	            	} else {
+         				showRecoUpdateStatus(data.msg, data.status);
+         			}
+         			$("#addRecommendation")[0].reset();
 	            	return false;
 	            },
 	            error:function (xhr, ajaxOptions, thrownError){
@@ -432,23 +435,23 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 				dataType: "json",
 				data: {max:max , offset:0, 'webaddress':"${userGroup?userGroup.webaddress:userGroupWebaddress}"},	
 				success: function(data) {
-					$("#recoSummary").html(data.recoHtml);
-					var uniqueVotes = parseInt(data.uniqueVotes);
-					if(uniqueVotes > 3 && !seeAllClicked){
-						$("#seeMore").show();
+					if(data.status == 'success') {
+						showRecos(data, null);
+						//$("#recoSummary").html(data.recoHtml);
+						var uniqueVotes = parseInt(data.uniqueVotes);
+						if(uniqueVotes > 3 && !seeAllClicked){
+							$("#seeMore").show();
+						} else {
+							$("#seeMore").hide();
+						}
+						showRecoUpdateStatus(data.msg, data.status);
 					} else {
-						$("#seeMore").hide();
+						showRecoUpdateStatus(data.msg, data.status);
 					}
 				}, error: function(xhr, status, error) {
 	    			handleError(xhr, status, error, undefined, function() {
 		    			var msg = $.parseJSON(xhr.responseText);
-		    			if(msg.info) {
-		    				showRecoUpdateStatus(msg.info, 'info');
-		    			}else if(msg.success){
-		    				showRecoUpdateStatus(msg.success, 'success');
-						} else {
-							showRecoUpdateStatus(msg.error, 'error');
-						}
+		    			showRecoUpdateStatus(msg.msg, msg.status);
 					});
 			   	}
 			});

@@ -123,7 +123,7 @@ class CurationService {
 	private UnCuratedCommonNames getUnCuratedCommonName(Recommendation reco){
 		def c = UnCuratedCommonNames.createCriteria()
 		UnCuratedCommonNames unCn = c.get{
-			ilike('name', name);
+			ilike('name', reco.name);
 			(reco.languageId) ? eq('language', Language.read(reco.languageId)) : isNull('language');
 		}
 		if(!unCn){

@@ -60,4 +60,8 @@
 		"show" : false,
 		"backdrop" : "static"
 	});
+
+	$('#ajaxLogin').on('hidden', function () {
+		$('#ajaxLogin form')[0].reset();
+	})
 })(jQuery);

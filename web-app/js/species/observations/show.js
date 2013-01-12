@@ -3,8 +3,7 @@ function showRecos(data, textStatus) {
 	var speciesName =  data.speciesName;
 	$('.species_title').html(data.speciesNameTemplate);
 	reloadCarousel($('#carousel_a').data('jcarousel'), 'speciesName', speciesName);
-	var infoMsg = data.recoVoteMsg;
-	showRecoUpdateStatus(infoMsg, 'success');
+	showRecoUpdateStatus(data.msg, data.status);
 }
 
 function showRecoUpdateStatus(msg, type) {
@@ -55,13 +54,17 @@ function addAgreeRecoVote(obvId, recoId, currentVotes, liComponent, url){
 		data:{'obvId':obvId, 'recoId':recoId, 'currentVotes':currentVotes},
 		
 		success: function(data){
-			if(data.canMakeSpeciesCall === false){
-         		$('#selectedGroupList').modal('show');
-         	}else{
-         		preLoadRecos(3, false, obvId, liComponent);
-         		updateFeeds();
-         		showRecoUpdateStatus(data.recoVoteMsg, 'success');
-         	}
+			if(data.status == 'success') {
+				if(data.canMakeSpeciesCall === false){
+	         		$('#selectedGroupList').modal('show');
+	         	} else {
+	         		preLoadRecos(3, false, obvId, liComponent);
+	         		updateFeeds();
+	         		showRecoUpdateStatus(data.msg, data.status);
+	         	}
+			} else {
+				showRecoUpdateStatus(data.msg, data.status);
+			}
 			return false;
 		},
 		

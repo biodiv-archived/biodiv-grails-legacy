@@ -493,25 +493,25 @@ class ObservationController {
 			boolean canMakeSpeciesCall = getSpeciesCallPermission(params.obvId)
 			
 			//Saves recommendation if its not present
-			def recVoteResult, recommendationVoteInstance, recoVoteMsg
+			def recVoteResult, recommendationVoteInstance, msg
 			if(canMakeSpeciesCall){
 				recVoteResult = getRecommendationVote(params)
 				recommendationVoteInstance = recVoteResult?.recVote;
-				recoVoteMsg = recVoteResult?.msg;
+				msg = recVoteResult?.msg;
 			}
 			
 			def observationInstance = Observation.get(params.obvId);
 			log.debug params;
 			try {
-				if(!recommendationVoteInstance){
+				if(!recommendationVoteInstance) {
 					//saving max voted species name for observation instance needed when observation created without species name
 					//observationInstance.calculateMaxVotedSpeciesName();
 					observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
 
 					if(!params["createNew"]){
-						redirect(action:getRecommendationVotes, id:params.obvId, params:[max:3, offset:0, recoVoteMsg:recoVoteMsg, canMakeSpeciesCall:canMakeSpeciesCall])
+						redirect(action:getRecommendationVotes, id:params.obvId, params:[max:3, offset:0, msg:msg, canMakeSpeciesCall:canMakeSpeciesCall])
 					}else if(params["isMobileApp"]?.toBoolean()){
-						render (['success:true, obvId:$observationInstance.id']as JSON);
+						render (['status':'success', 'success':'true', 'obvId':observationInstance.id]as JSON);
 					}else{
 						redirect (url:uGroup.createLink(action:'show', controller:"observation", id:observationInstance.id, 'userGroupWebaddress':params.webaddress, postToFB:(params.postToFB?:false)))
 						//redirect(action: "show", id: observationInstance.id, params:[postToFB:(params.postToFB?:false)]);
@@ -530,9 +530,9 @@ class ObservationController {
 					if(!params["createNew"]){
 						//sending mail to user
 						sendNotificationMail(SPECIES_RECOMMENDED, observationInstance, request);
-						redirect(action:getRecommendationVotes, id:params.obvId, params:[max:3, offset:0, recoVoteMsg:recoVoteMsg, canMakeSpeciesCall:canMakeSpeciesCall])
+						redirect(action:getRecommendationVotes, id:params.obvId, params:[max:3, offset:0, msg:msg, canMakeSpeciesCall:canMakeSpeciesCall])
 					}else if(params["isMobileApp"]?.toBoolean()){
-						render (['success:true, obvId:$observationInstance.id'] as JSON);
+						render (['status':'success', 'success':'true', 'obvId':observationInstance.id] as JSON);
 					}else{
 						redirect (url:uGroup.createLink(action:'show', controller:"observation", id:observationInstance.id, 'userGroupWebaddress':params.webaddress, postToFB:(params.postToFB?:false)))
 						//redirect(action: "show", id: observationInstance.id, params:[postToFB:(params.postToFB?:false)]);
@@ -547,7 +547,7 @@ class ObservationController {
 			} catch(e) {
 				e.printStackTrace()
 				if(params["isMobileApp"]?.toBoolean()){
-					render (['success:true, obvId:$observationInstance.id'] as JSON);
+					render (['status':'success', 'success':'true', 'obvId':observationInstance.id] as JSON);
 				}else{
 					render(view: "show", model: [observationInstance:observationInstance, recommendationVoteInstance: recommendationVoteInstance], params:[postToFB:(params.postToFB?:false)])
 				}
@@ -573,11 +573,11 @@ class ObservationController {
 		if(params.obvId) {
 			//Saves recommendation if its not present
 			boolean canMakeSpeciesCall = getSpeciesCallPermission(params.obvId)
-			def recVoteResult, recommendationVoteInstance, recoVoteMsg
+			def recVoteResult, recommendationVoteInstance, msg
 			if(canMakeSpeciesCall){
 				recVoteResult = getRecommendationVote(params)
 				recommendationVoteInstance = recVoteResult?.recVote;
-				recoVoteMsg = recVoteResult?.msg;
+				msg = recVoteResult?.msg;
 			}
 			
 			def observationInstance = Observation.get(params.obvId);
@@ -586,11 +586,12 @@ class ObservationController {
 				if(!recommendationVoteInstance){
 					def result = ['votes':params.int('currentVotes')];
 					def r = [
+						status : 'success',
 						success : 'true',
-						recoVoteMsg:recoVoteMsg,
+						msg:msg,
 						canMakeSpeciesCall:canMakeSpeciesCall]
 					render r as JSON
-					//redirect(action:getRecommendationVotes, id:params.obvId, params:[ max:3, offset:0, recoVoteMsg:recoVoteMsg])
+					//redirect(action:getRecommendationVotes, id:params.obvId, params:[ max:3, offset:0, msg:msg])
 					return
 				}else if(recommendationVoteInstance.save(flush: true)) {
 					log.debug "Successfully added reco vote : "+recommendationVoteInstance
@@ -602,11 +603,12 @@ class ObservationController {
 					//sending mail to user
 					sendNotificationMail(SPECIES_AGREED_ON, observationInstance, request);
 					def r = [
+						status : 'success',
 						success : 'true',
-						recoVoteMsg:recoVoteMsg,
+						msg:msg,
 						canMakeSpeciesCall:canMakeSpeciesCall]
 					render r as JSON
-					//redirect(action:getRecommendationVotes, id:params.obvId, params:[max:3, offset:0, recoVoteMsg:recoVoteMsg])
+					//redirect(action:getRecommendationVotes, id:params.obvId, params:[max:3, offset:0, msg:msg])
 					return
 				}
 				else {
@@ -637,37 +639,37 @@ class ObservationController {
 					def html =  g.render(template:"/common/observation/showObservationRecosTemplate", model:['observationInstance':observationInstance, 'result':results.recoVotes, 'totalVotes':results.totalVotes, 'uniqueVotes':results.uniqueVotes, 'userGroupWebaddress':params.userGroupWebaddress]);
 					def speciesNameHtml =  g.render(template:"/common/observation/showSpeciesNameTemplate", model:['observationInstance':observationInstance]);
 					def result = [
-								success : 'true',
+								'status' : 'success',
 								canMakeSpeciesCall:params.canMakeSpeciesCall,
 								recoHtml:html,
 								uniqueVotes:results.uniqueVotes,
-								recoVoteMsg:params.recoVoteMsg,
+								msg:params.msg,
 								speciesNameTemplate:speciesNameHtml,
 								speciesName:observationInstance.fetchSpeciesCall()]
 
 					render result as JSON
 					return
 				} else {
-					response.setStatus(500);
+					//response.setStatus(500);
 					def message = "";
 					if(params.offset > 0) {
-						message = [info: g.message(code: 'recommendations.nomore.message', default:'No more recommendations made. Please suggest')];
+						message = [status:'info', 'msg':g.message(code: 'recommendations.nomore.message', default:'No more recommendations made. Please suggest')];
 					} else {
-						message = [info:g.message(code: 'recommendations.zero.message', default:'No recommendations made. Please suggest')];
+						message = [status:'info', 'msg':g.message(code: 'recommendations.zero.message', default:'No recommendations made. Please suggest')];
 					}
 					render message as JSON
 					return
 				}
 			} catch(e){
 				e.printStackTrace();
-				response.setStatus(500);
-				def message = ['error' : g.message(code: 'error', default:'Error while processing the request.')];
+				//response.setStatus(500);
+				def message = ['status':'error', 'msg':g.message(code: 'error', default:'Error while processing the request.')];
 				render message as JSON
 			}
 		}
 		else {
-			response.setStatus(500)
-			def message = ['error':g.message(code: 'error', default:'Error while processing the request.')]
+			//response.setStatus(500)
+			def message = ['status':'error', 'msg':g.message(code: 'error', default:'Error while processing the request.')]
 			render message as JSON
 		}
 	}
@@ -951,17 +953,19 @@ class ObservationController {
 		def observation = params.observation?:Observation.get(params.obvId);
 		def author = params.author;
 		
+		ConfidenceType confidence = observationService.getConfidenceType(params.confidence?:ConfidenceType.CERTAIN.name());
+		RecommendationVote existingRecVote = RecommendationVote.findByAuthorAndObservation(author, observation);
+		
 		def reco, commonNameReco;
-		if(params.recoId)
+		if(params.recoId) {
 			reco = Recommendation.get(params.long('recoId'));
-		else{
+			commonNameReco = existingRecVote.commonNameReco;
+		} else{
 			def recoResultMap = observationService.getRecommendation(params);
 			reco = recoResultMap.mainReco;
 			commonNameReco =  recoResultMap.commonNameReco;
 		}
-		ConfidenceType confidence = observationService.getConfidenceType(params.confidence?:ConfidenceType.CERTAIN.name());
-
-		RecommendationVote existingRecVote = RecommendationVote.findByAuthorAndObservation(author, observation);
+		
 		RecommendationVote newRecVote = new RecommendationVote(observation:observation, recommendation:reco, commonNameReco:commonNameReco, author:author, confidence:confidence);
 
 		if(!reco){

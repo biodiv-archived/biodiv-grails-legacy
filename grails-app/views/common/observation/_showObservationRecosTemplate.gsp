@@ -8,7 +8,7 @@
 			<div>
 				<div class="users">
 					<div class="iAgree ">
-						<a href="#" class="btn btn-primary btn-small" onclick="addAgreeRecoVote(${r.obvId}, ${r.recoId}, ${r.noOfVotes}, $(this).closest('li'), '${uGroup.createLink(controller:'observation', action:'addAgreeRecommendationVote')}'); return true;">Agree</a>
+						<button class="btn btn-primary btn-small" onclick="addAgreeRecoVote(${r.obvId}, ${r.recoId}, ${r.noOfVotes}, $(this).closest('li'), '${uGroup.createLink(controller:'observation', action:'addAgreeRecommendationVote')}'); return true;">Agree</button>
 					</div>
 					<g:each in="${r.authors}" var="author">
 						<a href="${uGroup.createLink(controller:"SUser", action:"show", id:author?.id)}" title="${author?.name }">
@@ -40,7 +40,7 @@
 					</g:elseif>
 					<g:else>
 						${r.name}
-					</g:else>${r.commonNames} </span>
+					</g:else>${r.commonNames}</span>
 				<comment:showCommentPopup model="['commentHolder':Recommendation.read(r.recoId), 'rootHolder':observationInstance]" />
 <%--				<obv:showRecoComment--%>
 <%--					model="['recoComments':r.recoComments, 'recoId': r.recoId]" />--%>

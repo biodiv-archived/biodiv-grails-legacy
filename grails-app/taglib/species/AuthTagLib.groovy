@@ -29,8 +29,6 @@ class AuthTagLib {
    *
    */
   def loginForm = {attrs, body ->
-	  println '--------'
-	  println attrs
 	  out << render(template:"/common/auth/loginFormTemplate", model:attrs.model);
   }
 }
