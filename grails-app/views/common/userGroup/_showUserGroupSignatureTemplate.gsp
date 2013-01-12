@@ -1,10 +1,11 @@
 <%@page import="species.utils.ImageType"%>
 
-<div class="media signature thumbnail clearfix ${showDetails ? '' : 'span3'}"
-	style="margin-left: 0px;width:auto;">
+<div class="media thumbnail clearfix ${showDetails ? '' : 'signature'}"
+	style="margin-left: 0px;width:${showDetails?'auto':'200px;'}">
 	<div class="snippet tablet "
-						style="display: table; height: ${showDetails ? '100px;width:100%;':'40px;'}">
-	<div class="figure pull-left" style="display: table; height: ${showDetails ? '100px;':'40px;'};">
+						style="display: table; width:100%;height: ${showDetails ? '100px;':'40px;'}">
+						
+	<div class="figure pull-left" style="display: table; width:auto;height: ${showDetails ? '100px;':'40px;'};">
 		<a
 			href="${uGroup.createLink(mapping:'userGroup', controller:'userGroup', action:'show', base:userGroup.domainName, 'userGroup':userGroup, 'pos':pos)}">
 			<img
@@ -15,7 +16,7 @@
 
 	<a
 		href="${uGroup.createLink(mapping:'userGroup', controller:'userGroup', action:'show', base:userGroup.domainName, 'userGroup':userGroup, 'pos':pos)}">
-		<span class="ellipsis multiline" style="display: block;"
+		<span class="ellipsis multiline" style="display: block;text-align:left"
 		title="${userGroup.name}"> ${userGroup.name} </span> </a>
 
 	<g:if test="${!showDetails}">
