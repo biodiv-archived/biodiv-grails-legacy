@@ -4,55 +4,57 @@
 			<!--  content attribution -->
 			<div class="attributionContent collapse">
 							
-					<table>
+					
 						<g:if test="${speciesFieldInstance?.contributors}">
-							<tr class="prop">
-								<td valign="top" class="grid_1 name">Contributors</td>
-								<td valign="top" class="grid_8 value"><g:each
+							<div class="prop span11">
+								<div class="span2 name">Contributors</div>
+								<div class="span8 value">
+								<ul style="list-style:none;margin-left:0px;"><g:each
 										in="${ speciesFieldInstance?.contributors}" var="contributor">
-										${contributor.name} 
+										<li>${contributor.name}</li> 
 									</g:each>
-								</td>
-							</tr>
+								</ul>
+								</div>
+							</div>
 						</g:if>
 						<g:if test="${speciesFieldInstance?.status}">
-							<tr class="prop">
-								<td valign="top" class="grid_1 name">Status</td>
-								<td valign="top" class="grid_8 value">${speciesFieldInstance?.status?.value()}
+							<div class="prop span11">
+								<div class="span2 name">Status</div>
+								<div class="span8 value">${speciesFieldInstance?.status?.value()}
 								
-								</td>
-							</tr>
+								</div>
+							</div>
 						</g:if>
 						<g:if test="${speciesFieldInstance?.audienceTypes}">
-							<tr class="prop">
-								<td valign="top" class="grid_1 name">Audiences</td>
-								<td valign="top" class="grid_8 value"><g:each
+							<div class="prop span11">
+								<div class="span2 name">Audiences</div>
+								<div class="span8 value"><g:each
 										in="${ speciesFieldInstance?.audienceTypes}"
 										var="audienceType">
 										${audienceType.value}
 									</g:each>
-								</td>
-							</tr>
+								</div>
+							</div>
 						</g:if>
 						<g:if test="${speciesFieldInstance?.licenses.size() > 0}">
-							<tr class="prop">
-								<td valign="top" class="grid_1 name">Licenses</td>
-								<td valign="top" class="grid_8 value"><g:each
+							<div class="prop span11">
+								<div class="span2 name">Licenses</div>
+								<div class="span8 value"><g:each
 										in="${speciesFieldInstance?.licenses}" var="license">
 										<a class="license" href="${license?.url}" target="_blank"><img
 											class="icon" style="float: left;"
 											src="${createLinkTo(dir:'images/license', file: license?.name.value().toLowerCase().replaceAll('\\s+','')+'.png', absolute:true)}"
 											alt="${license?.name.value()}" /> </a>
 									</g:each>
-								</td>
-							</tr>
+								</div>
+							</div>
 						</g:if>
 
 						<!-- attributions -->
 						<g:if test="${speciesFieldInstance.attributors.size() > 0}">
-							<tr class="prop">
-								<td valign="top" class="name grid_1">Attributions</td>
-								<td valign="top" class="grid_8">
+							<div class="prop span11">
+								<div class="name span2">Attributions</div>
+								<div class="span8">
 									<ol>
 										<g:each in="${speciesFieldInstance.attributors}" var="r">
 											<li style="margin-left: 20px;">
@@ -60,31 +62,30 @@
 											</li>
 										</g:each>
 									</ol>
-								</td>
-							</tr>
+								</div>
+							</div>
 						</g:if>
 						
 						<!-- references -->
 						<g:if test="${speciesFieldInstance.references.size() > 0}">
-							<tr class="prop">
-								<td valign="top" class="name grid_1">References</td>
-								<td valign="top" class="grid_8">
-									<ol>
-										<g:each in="${speciesFieldInstance.references}" var="r">
-											<li style="margin-left: 20px;" title="${r.title?:r.url}"><g:if test="${r.url}">
-													<a href="${r.url}" target="_blank"> ${r.title?r.title:r.url}
-													</a>
-												</g:if> <g:else>
-													${r.title }
-												</g:else>
-											</li>
-										</g:each>
-									</ol>
-								</td>
-							</tr>
-						</g:if>
+				<div class="prop span11">
+					<div class="name span2">References</div>
+					<div class="span8">
+						<ol>
+							<g:each in="${speciesFieldInstance.references}" var="r">
+								<li style="margin-left: 20px;" title="${r.title?:r.url}"><g:if
+										test="${r.url}">
+										<a href="${r.url}" target="_blank"> ${r.title?r.title:r.url}
+										</a>
+									</g:if> <g:else>
+										${r.title }
+									</g:else></li>
+							</g:each>
+						</ol>
+					</div>
+				</div>
+			</g:if>
 
-					</table>
 				</div>
 		</g:if>
 </g:if>
