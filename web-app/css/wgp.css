@@ -359,6 +359,12 @@ div.errors {
 	cursor: pointer;
 }
 
+#add_photo_ie {
+	display: block;
+	width: 200px;
+	margin-bottom: 2px; 
+}
+
 .progress {
 	border-radius: 3px 3px 3px 3px;
 	position: relative;
@@ -1039,12 +1045,12 @@ ul,ol {
 	top: 0;
 	right: 0;
 }
-	
+/* Hide the file input.important to position it offscreen as opposed display:none. some browsers don't like that*/
 #upload_resource {
 	margin-left: 45px;
 	position: absolute;
-	top: 525px;
-	z-index: 2;
+	left: -9999em;
+	/*z-index: 2;*/
 }
 
 span.cke_skin_kama {
