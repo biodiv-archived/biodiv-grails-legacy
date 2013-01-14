@@ -499,11 +499,11 @@ $(document).ready(function() {
 	 $("#createGroupSubmit").click(function(){
 		$('#founderUserIds').val(founders_autofillUsersComp[0].getEmailAndIdsList().join(","));
 		//$('#memberUserIds').val(members_autofillUsersComp[0].getEmailAndIdsList().join(","));
-		var tags = $("#tags").tagit("tags");
+		/*var tags = $("#tags").tagit("tags");
        	$.each(tags, function(index){
        		var input = $("<input>").attr("type", "hidden").attr("name", "tags."+index).val(this.label);
 			$('#${form_id}').append($(input));	
-       	})
+       	})*/
         
         var speciesGroups = getSelectedGroup();
         var habitats = getSelectedHabitat();
@@ -523,11 +523,12 @@ $(document).ready(function() {
         
 	});
 	
-	$("#tags .tagit-input").watermark("Add some tags");	
+	//$("#tags .tagit-input").watermark("Add some tags");	
 	$("#tags").tagit({
 		select:true, 
 		allowSpaces:true, 
-		placeholderText:'Add some tags', 
+		placeholderText:'Add some tags',
+		fieldName:'tags', 
 		autocomplete:{
 			source: "${uGroup.createLink(controller:'userGroup', action: 'tags')}"
 		}, 

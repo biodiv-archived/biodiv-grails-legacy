@@ -497,7 +497,7 @@ input.dms_field {
 									class="icon-tags"></i>Tags <small><g:message code="observation.tags.message" default="" /></small></label>
 								</h5>
 								<div class="create_tags section-item" style="clear: both;">
-									<ul id="tags" name="tags">
+									<ul id="tags">
 										<g:each in="${observationInstance.tags}" var="tag">
 											<li>${tag}</li>
 										</g:each>
@@ -769,11 +769,12 @@ input.dms_field {
                 }
         });
         
- 		$(".tagit-input").watermark("Add some tags");
+ 		//$(".tagit-input").watermark("Add some tags");
         $("#tags").tagit({
         	select:true, 
         	allowSpaces:true, 
-        	placeholderText:'Add some tags', 
+        	placeholderText:'Add some tags',
+        	fieldName: 'tags', 
         	autocomplete:{
         		source: '/observation/tags'
         	}, 
@@ -784,12 +785,12 @@ input.dms_field {
 
  		 $("#addObservationSubmit").click(function(){
  		 	$(this).addClass("disabled");
-        	var tags = $("ul[name='tags']").tagit("tags");
+        	/*var tags = $("ul[name='tags']").tagit("tags");
         	$.each(tags, function(index){
         		var input = $("<input>").attr("type", "hidden").attr("name", "tags."+index).val(this);
 				$('#addObservation').append($(input));	
         	})
-        	
+        	*/
 			$("#userGroupsList").val(getSelectedUserGroups());	       	
         	$("#addObservation").submit();        	
         	return false;
