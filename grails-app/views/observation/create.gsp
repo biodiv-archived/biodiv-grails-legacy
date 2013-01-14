@@ -145,7 +145,9 @@ input.dms_field {
 						<div>
 							<i class="icon-picture"></i><span>Upload photos of a
 								single observation and species</span>
-						<label for="attachFiles" id="add_photo_ie" class="btn btn-info" >Add a Photo</label>
+					<div id="add_photo_ie" style="display: block; margin-bottom: 2px;"><label for="attachFiles" class="btn btn-info" style="width: 200px;">Add a Photo</label>
+					<span id="iemsg" ></span></div>
+					
 							<div
 								class="resources control-group ${hasErrors(bean: observationInstance, field: 'resource', 'error')}">
 								<ul id="imagesList" class="thumbwrap thumbnails"
@@ -542,11 +544,11 @@ input.dms_field {
 					
 					<g:if test="${observationInstance?.id}">
 						<a href="${uGroup.createLink(controller:params.controller, action:'show', id:observationInstance.id)}" class="btn"
-							style="float: right; margin-right: 5px;"> Cancel </a>
+							style="float: right; margin-right: 30px;"> Cancel </a>
 					</g:if>
 					<g:else>
 					<a href="${uGroup.createLink(controller:params.controller, action:'list')}" class="btn"
-							style="float: right; margin-right: 5px;"> Cancel </a>
+							style="float: right; margin-right: 30px;"> Cancel </a>
 					</g:else>
 					
 					<g:if test="${observationInstance?.id}">
@@ -639,6 +641,7 @@ input.dms_field {
 		
 		$('#attachFiles').change(function(e){
   			$('#upload_resource').submit().find("span.msg").html("Uploading... Please wait...");
+  			$("#iemsg").html("Uploading... Please wait...");
 		});
        	
         function progressHandlingFunction(e){
@@ -672,6 +675,7 @@ input.dms_field {
             },
 			success: function(responseXML, statusText, xhr, form) {
 				$(form).find("span.msg").html("");
+				$("#iemsg").html("");
 				//var rootDir = '${grailsApplication.config.speciesPortal.observations.serverURL}'
 				var rootDir = '${Utils.getDomainServerUrlWithContext(request)}' + '/observations'
 				var obvDir = $(responseXML).find('dir').text();
@@ -829,7 +833,11 @@ input.dms_field {
 
 
 	function removeResource(event, imageId) {
-		$(event.target).parent('.addedResource').remove();
+		var targ;
+		if (!event) var event = window.event;
+		if (event.target) targ = event.target;
+		else if (event.srcElement) targ = event.srcElement; //for IE
+		$(targ).parent('.addedResource').remove();
 		$("#image_"+imageId).remove();
 	}
 	

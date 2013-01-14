@@ -359,11 +359,6 @@ div.errors {
 	cursor: pointer;
 }
 
-#add_photo_ie {
-	display: block;
-	width: 200px;
-	margin-bottom: 2px; 
-}
 
 .progress {
 	border-radius: 3px 3px 3px 3px;
