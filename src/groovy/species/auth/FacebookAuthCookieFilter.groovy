@@ -90,12 +90,18 @@ class FacebookAuthCookieFilter extends GenericFilterBean implements ApplicationE
 					}
 				} catch(UsernameNotFoundException e) {
 					def referer = request.getHeader("referer");
-					if(url == '/login/authSuccess' && !SpringSecurityUtils.isAjax(request)) {
-						logger.error e.getMessage();
-						request.getSession().setAttribute("LAST_FACEBOOK_USER", e.extraInformation);
-						logger.debug "Redirecting to $createAccountUrl"
-						(new DefaultRedirectStrategy()).sendRedirect(request, response, createAccountUrl);
-						return;
+					if(url == '/login/authSuccess') {
+						if(SpringSecurityUtils.isAjax(request)) {
+							logger.error "Unsuccessful authentication.";
+							unsuccessfulAuthentication(request, response, e);
+							return;
+						} else {
+							logger.error e.getMessage();
+							request.getSession().setAttribute("LAST_FACEBOOK_USER", e.extraInformation);
+							logger.debug "Redirecting to $createAccountUrl"
+							(new DefaultRedirectStrategy()).sendRedirect(request, response, createAccountUrl);
+							return;
+						}
 					}
 				} catch (BadCredentialsException e) {
 					logger.info("Invalid cookie, skip. Message was: $e.message")
