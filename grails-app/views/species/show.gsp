@@ -245,7 +245,7 @@ $(document).ready(function(){
 	  	}
 	  );
   	
-  	
+	$(".contributor_ellipsis").trunk8({width:35});  	
   	
   	
 });

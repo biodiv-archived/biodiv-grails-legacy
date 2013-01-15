@@ -107,6 +107,7 @@ class FacebookAuthCookieFilter extends GenericFilterBean implements ApplicationE
 					logger.info("Invalid cookie, skip. Message was: $e.message")
 				} catch(AuthenticationException e) {
 					unsuccessfulAuthentication(request, response, e);
+					return;
 				}
 			} else {
 				if(!cookie) {

@@ -3,16 +3,14 @@
 	<div style="clear:both;"></div>
 	<div class="toolbar">
 
-		<div class="span8">
+		<div class="span6" style="height:30px;">
 			<g:if test="${speciesFieldInstance?.contributors}">
-				<span class="name" style="color: #b1b1b1; margin-top: 10px;"><i
-					class="icon-user"></i> by </span>
-
-				<ul class="tagit">
+				<ul class="tagit" style="list-style:none;display:inline-block;margin-left:0px;">
+					<li><span class="name" style="color: #b1b1b1;"><i
+					class="icon-user"></i> by </span></li>
 					<g:each in="${ speciesFieldInstance?.contributors}"
 						var="contributor">
-						<li class="tagit-choice ellipsis" title="${contributor.name}"
-							style="width: 200px;">
+						<li class="contributor_ellipsis" title="${contributor.name}">
 							${contributor.name}
 						</li>
 					</g:each>
@@ -39,7 +37,7 @@
 				<i class="icon-question-sign"></i>
 			</button>
 		</div>
-
+		<div class="clearfix"></div>
 		<g:showSpeciesFieldAttribution
 			model="['speciesFieldInstance':speciesFieldInstance]" />
 		<g:showSpeciesFieldHelp
