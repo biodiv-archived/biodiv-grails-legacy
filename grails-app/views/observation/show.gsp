@@ -270,8 +270,8 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 	
 	$(document).ready(function(){
 <%--		initRelativeTime("${uGroup.createLink(controller:'activityFeed', action:'getServerTime')}");--%>
+<%--		dcorateCommentBody($('.yj-message-body')); --%>
 
-		dcorateCommentBody($('.comment .yj-message-body'));
 		$("#seeMoreMessage").hide();
 		
 		$(".readmore").readmore({

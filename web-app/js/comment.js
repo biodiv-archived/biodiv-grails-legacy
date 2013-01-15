@@ -68,7 +68,7 @@ function postAsAjax(postComp, url, newCommentUrl, update){
         success: function(data, statusText, xhr, form) {
         	if(data.showCommentListHtml){
     			var htmlData = $(data.showCommentListHtml);
-    			dcorateCommentBody(htmlData.find('.yj-message-body'));
+    			//dcorateCommentBody(htmlData.find('.yj-message-body'));
     			$(targetComp).children('ul').prepend(htmlData);
     			$(postComp).children('input[name="newerTimeRef"]').val(data.newerTimeRef);
     			updateCountOnPopup(postComp, data.newlyAddedCommentCount);
@@ -106,7 +106,7 @@ function loadOlderComment(targetComp, commentType, commentHolderId, commentHolde
 		data: {commentType:commentType, commentHolderId:commentHolderId , commentHolderType:commentHolderType, rootHolderId:rootHolderId, rootHolderType:rootHolderType, refTime:refTime},	
 		success: function(data) {
 			var htmlData = $(data.showCommentListHtml);
-			dcorateCommentBody(htmlData.find('.yj-message-body'));
+			//dcorateCommentBody(htmlData.find('.yj-message-body'));
 			$(targetComp).children('ul').append(htmlData);
 			$(targetComp).children('input[name="olderTimeRef"]').val(data.olderTimeRef);
 			if(data.remainingCommentCount == 0){
@@ -114,6 +114,7 @@ function loadOlderComment(targetComp, commentType, commentHolderId, commentHolde
 			}else{
 				$(targetComp).children('a').text("Show " + data.remainingCommentCount + " older comments >>");
 			}
+			feedPostProcess();
 		}, error: function(xhr, status, error) {
 			alert(xhr.responseText);
 	   	}

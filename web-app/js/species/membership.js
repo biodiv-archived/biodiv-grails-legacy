@@ -222,5 +222,6 @@ function last_actions() {
 	    }
 	});
 	
+	$('.yj-message-body').linkify();
 	$('.linktext').linkify();   
 }
