@@ -18,6 +18,13 @@ function cancelLogin() {
 	$('#ajaxLogin').modal('hide');
 }
 
+
+function updateLoginInfo(){
+	$('#ajaxLogin').modal('hide');
+	$('#loginMessage').html('').removeClass().hide();
+	reloadLoginInfo();
+}
+
 function handleError(xhr, textStatus, errorThrown, successHandler, errorHandler) {
 	if (xhr.status == 401) {
 		show_login_dialog(successHandler, errorHandler);
@@ -55,9 +62,7 @@ var reloadLoginInfo = function() {
 		
 var ajaxLoginSuccessHandler = function(json, statusText, xhr, $form) {
 	if (json.success || json.status == 'success') {
-		$('#ajaxLogin').modal('hide');
-		$('#loginMessage').html('').removeClass().hide();
-		reloadLoginInfo();
+		updateLoginInfo()
 		
 		if (ajaxLoginSuccessCallbackFunction) {
 			ajaxLoginSuccessCallbackFunction(json,
