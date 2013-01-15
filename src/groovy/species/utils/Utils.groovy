@@ -14,7 +14,11 @@ import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.validator.EmailValidator;
+import org.codehaus.groovy.grails.plugins.springsecurity.ReflectionUtils;
 import org.codehaus.groovy.grails.validation.routines.UrlValidator
+import org.springframework.security.web.WebAttributes;
+import org.springframework.security.web.savedrequest.DefaultSavedRequest;
+import org.springframework.security.web.savedrequest.SavedRequest;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
@@ -150,22 +154,22 @@ class Utils {
 		def domain = getDomain(request);
 		return "$request.scheme://$domain";
 	}
-	
+
 	static String getDomainServerUrlWithContext(HttpServletRequest request) {
 		def domain = getDomain(request);
 		return "$request.scheme://$domain$request.contextPath";
 	}
-	
-//	static String getIBPServerUrl() {
-//		def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config;
-//		return getIBPServerDomain() + "/$config.appName";
-//	}
-	
+
+	//	static String getIBPServerUrl() {
+	//		def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config;
+	//		return getIBPServerDomain() + "/$config.appName";
+	//	}
+
 	static String getIBPServerDomain() {
 		def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config;
 		return "http://$config.ibp.domain";
 	}
-	
+
 	static String getIBPServerCookieDomain() {
 		def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config;
 		return "$config.ibp.domain";
@@ -175,7 +179,7 @@ class Utils {
 	static String getDomainName(HttpServletRequest request) {
 		def domain = getDomain(request);
 		def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
-		
+
 		if(domain.startsWith(config.wgp.domain)) {
 			return "The Westernghats Portal"
 		} else {
@@ -214,10 +218,15 @@ class Utils {
 		}
 		return result;
 	}
-	
+
 	static String getTitleCase(String str){
 		return WordUtils.capitalizeFully(str, ' (/'.toCharArray())
 	}
 
+	public static boolean isAjax(final DefaultSavedRequest savedRequest) {
+
+		String ajaxHeaderName = (String)ReflectionUtils.getConfigProperty("ajaxHeader");
+		return !savedRequest.getHeaderValues(ajaxHeaderName).isEmpty();
+	}
 }
 

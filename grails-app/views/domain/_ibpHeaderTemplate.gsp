@@ -56,7 +56,7 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 
 	<g:javascript>
 
-		$(document).ready(function(){
+		$(document).ready(function() {
 			
 			$(".ui-icon-control").click(function() {
 				var div = $(this).siblings("div.toolbarIconContent");
@@ -92,7 +92,9 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 								  data:{'uid':response.authResponse.userID, ${targetUrl?'"spring-security-redirect":"'+targetUrl+'"':''}},
 								  success: function(data, statusText, xhr) {
 								  	ajaxLoginSuccessHandler(data, statusText, xhr);
-								  }
+								  },  error: function(xhr, ajaxOptions, thrownError) {
+              						$('#loginMessage').html(xhr.responseText).removeClass().addClass('alter alert-error').show();
+              					  }
 								});
 							} else{
 								var redirectTarget = ${targetUrl?'"&spring-security-redirect='+targetUrl+'"':'""'};
@@ -194,6 +196,7 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 			'openid.oauth.scope' : 'http://www.google.com/m8/feeds/',
 			'openid.ui.icon' : 'true'
 		};
+	
 		var googleOpener = popupManager.createPopupOpener({
 			'realm' : 'http://*.'+"${Utils.getIBPServerCookieDomain()}",
 			'opEndpoint' : 'https://www.google.com/accounts/o8/ud',

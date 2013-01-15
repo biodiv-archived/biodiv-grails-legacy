@@ -19,6 +19,7 @@ import com.the6hours.grails.springsecurity.facebook.FacebookAuthToken;
 import species.auth.Role
 import species.auth.SUser
 import species.auth.SUserRole
+import species.utils.Utils;
 
 /**
  * Manages associating OpenIDs with application users, both by creating a new local user
@@ -58,6 +59,8 @@ class OpenIdController {
 			redirect uri: config.successHandler.defaultTargetUrl
 			return
 		}
+		
+		
 
 		def targetUrl = "";
 		def savedRequest = request.getSession()?.getAttribute(WebAttributes.SAVED_REQUEST)
@@ -77,6 +80,10 @@ class OpenIdController {
 			}
 			request.getSession().setAttribute("LOGIN_REFERRER", targetUrl);
 			log.debug "Passing targetUrlParameter for redirect: " + targetUrl;
+		} else {
+			if(Utils.isAjax(savedRequest)) {
+				request.getSession()?.removeAttribute(WebAttributes.SAVED_REQUEST)
+			}
 		}
 		render (view:'auth', model:[openIdPostUrl: "${request.contextPath}$openIDAuthenticationFilter.filterProcessesUrl",
 					daoPostUrl:"${request.contextPath}${config.apf.filterProcessesUrl}",

@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
 import org.codehaus.groovy.grails.plugins.springsecurity.ReflectionUtils
+import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.context.ApplicationEventPublisherAware
 import org.springframework.security.authentication.AuthenticationManager
@@ -89,7 +90,7 @@ class FacebookAuthCookieFilter extends GenericFilterBean implements ApplicationE
 					}
 				} catch(UsernameNotFoundException e) {
 					def referer = request.getHeader("referer");
-					if(url == '/login/authSuccess') {
+					if(url == '/login/authSuccess' && !SpringSecurityUtils.isAjax(request)) {
 						logger.error e.getMessage();
 						request.getSession().setAttribute("LAST_FACEBOOK_USER", e.extraInformation);
 						logger.debug "Redirecting to $createAccountUrl"

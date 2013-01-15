@@ -54,7 +54,7 @@ var reloadLoginInfo = function() {
 }
 		
 var ajaxLoginSuccessHandler = function(json, statusText, xhr, $form) {
-	if (json.success) {
+	if (json.success || json.status == 'success') {
 		$('#ajaxLogin').modal('hide');
 		$('#loginMessage').html('').removeClass().hide();
 		reloadLoginInfo();
@@ -64,7 +64,7 @@ var ajaxLoginSuccessHandler = function(json, statusText, xhr, $form) {
 					statusText, xhr);
 			ajaxLoginSuccessCallbackFunction = undefined;
 		}
-	} else if (json.error) {
+	} else if (json.error || json.status == 'error') {
 		$('#loginMessage').html(json.error).removeClass().addClass('alter alert-error').show();
 	} else {
 		$('#loginMessage').html(json).removeClass().addClass('alter alert-info').show();

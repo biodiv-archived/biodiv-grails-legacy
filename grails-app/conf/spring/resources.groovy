@@ -28,7 +28,7 @@ import speciespage.FacebookAuthService;
 // Place your Spring DSL code here
 beans = {
 	def conf = SpringSecurityUtils.securityConfig;
-	
+
 	authenticationSuccessHandler(species.auth.AjaxAwareAuthenticationSuccessHandler) {
 		requestCache = ref('requestCache')
 		defaultTargetUrl = conf.successHandler.defaultTargetUrl // '/'
@@ -39,13 +39,11 @@ beans = {
 		redirectStrategy = ref('redirectStrategy')
 	}
 
-	userDetailsService(OpenIdUserDetailsService) {
-		grailsApplication = ref('grailsApplication')
-	}
+	userDetailsService(OpenIdUserDetailsService) { grailsApplication = ref('grailsApplication') }
 
 	def configRoot = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 	def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.search
-	speciesSolrServer(org.apache.solr.client.solrj.impl.StreamingUpdateSolrServer,config.serverURL+"/species", config.queueSize, config.threadCount ) { 
+	speciesSolrServer(org.apache.solr.client.solrj.impl.StreamingUpdateSolrServer,config.serverURL+"/species", config.queueSize, config.threadCount ) {
 		setSoTimeout(config.soTimeout);
 		setConnectionTimeout(config.connectionTimeout);
 		setDefaultMaxConnectionsPerHost(config.defaultMaxConnectionsPerHost);
@@ -57,8 +55,8 @@ beans = {
 		log.debug "Initialized search server to "+config.serverURL+"/species"
 	}
 
-	speciesSearchService(speciespage.search.SpeciesSearchService) { 
-		solrServer = ref('speciesSolrServer');		
+	speciesSearchService(speciespage.search.SpeciesSearchService) {
+		solrServer = ref('speciesSolrServer');
 	}
 
 	observationsSolrServer(org.apache.solr.client.solrj.impl.StreamingUpdateSolrServer,config.serverURL+"/observations", config.queueSize, config.threadCount ) {
@@ -92,19 +90,15 @@ beans = {
 	newsletterSearchService(speciespage.search.NewsletterSearchService) {
 		solrServer = ref('newsletterSolrServer');
 	}
-	
+
 	preAuthenticationChecks(DefaultPreAuthenticationChecks)
 	postAuthenticationChecks(DefaultPostAuthenticationChecks)
-	
-	facebookAuthUtils(FacebookAuthUtils) {
-		grailsApplication = ref('grailsApplication')
-	}
 
-	facebookAuthCookieLogout(FacebookAuthCookieLogoutHandler) {
-		facebookAuthUtils = ref('facebookAuthUtils')
-	}
+	facebookAuthUtils(FacebookAuthUtils) { grailsApplication = ref('grailsApplication') }
+
+	facebookAuthCookieLogout(FacebookAuthCookieLogoutHandler) { facebookAuthUtils = ref('facebookAuthUtils') }
 	SpringSecurityUtils.registerLogoutHandler('facebookAuthCookieLogout')
-	
+
 	fbAuthenticationFailureHandler(AjaxAwareAuthenticationFailureHandler) {
 		redirectStrategy = ref('redirectStrategy')
 		defaultFailureUrl = conf.failureHandler.defaultFailureUrl //'/login/authfail?login_error=1'
@@ -127,8 +121,8 @@ beans = {
 		grailsApplication = ref('grailsApplication')
 		userDomainClassName = conf.userLookup.userDomainClassName
 	}
-	
-	
+
+
 
 	facebookAuthProvider(FacebookAuthProvider) {
 		facebookAuthDao = ref('facebookAuthDao')
@@ -137,25 +131,21 @@ beans = {
 		postAuthenticationChecks = ref('postAuthenticationChecks')
 	}
 
-	openIDConsumerManager(ConsumerManager) {
-		nonceVerifier = ref('openIDNonceVerifier')
+	openIDConsumerManager(ConsumerManager) { nonceVerifier = ref('openIDNonceVerifier') }
+
+	openIdAuthenticationFailureHandler(OpenIdAuthenticationFailureHandler) {
+		redirectStrategy = ref('redirectStrategy')
+		defaultFailureUrl = conf.failureHandler.defaultFailureUrl //'/login/authfail?login_error=1'
+		useForward = conf.failureHandler.useForward // false
+		ajaxAuthenticationFailureUrl = conf.failureHandler.ajaxAuthFailUrl // '/login/authfail?ajax=true'
+		exceptionMappings = conf.failureHandler.exceptionMappings // [:]
 	}
-	
-//	authenticationFailureHandler(OpenIdAuthenticationFailureHandler) {
-//		grailsApplication = ref('grailsApplication')
-//		userDomainClassName = conf.userLookup.userDomainClassName
-//		redirectStrategy = ref('redirectStrategy')
-//		defaultFailureUrl = conf.failureHandler.defaultFailureUrl //'/login/authfail?login_error=1'
-//		useForward = conf.failureHandler.useForward // false
-//		ajaxAuthenticationFailureUrl = conf.failureHandler.ajaxAuthFailUrl // '/login/authfail?ajax=true'
-//		exceptionMappings = conf.failureHandler.exceptionMappings // [:]
-//	}
-	
-	
+
+
 
 	openIDAuthProvider(OpenIDAuthenticationProvider) {
 		userDetailsService = ref('userDetailsService')
-		preAuthenticationChecks = ref('preAuthenticationChecks')
+		preAuthenticationChecks 	= ref('preAuthenticationChecks')
 		postAuthenticationChecks = ref('postAuthenticationChecks')
 	}
 
@@ -165,13 +155,11 @@ beans = {
 		rememberMeServices = ref('rememberMeServices')
 		authenticationManager = ref('authenticationManager')
 		authenticationSuccessHandler = ref('authenticationSuccessHandler')
-		authenticationFailureHandler = ref('authenticationFailureHandler')
+		authenticationFailureHandler = ref('openIdAuthenticationFailureHandler')
 		authenticationDetailsSource = ref('authenticationDetailsSource')
 		sessionAuthenticationStrategy = ref('sessionAuthenticationStrategy')
 		filterProcessesUrl = '/j_spring_openid_security_check' // not configurable
 	}
-	
-	emailConfirmationService(EmailConfirmationService) {
-		mailService = ref('mailService')
-	}
+
+	emailConfirmationService(EmailConfirmationService) { mailService = ref('mailService') }
 }

@@ -10,7 +10,7 @@ import org.springframework.web.context.request.RequestContextHolder as RCH
 import species.auth.SUser;
 import species.participation.Observation;
 import species.utils.Utils;
-
+import org.springframework.security.web.WebAttributes;
 import com.the6hours.grails.springsecurity.facebook.FacebookAuthToken;
 
 class RegisterController extends grails.plugins.springsecurity.ui.RegisterController {
@@ -27,6 +27,13 @@ class RegisterController extends grails.plugins.springsecurity.ui.RegisterContro
 		if (springSecurityService.isLoggedIn()) {
 			redirect uri: SpringSecurityUtils.securityConfig.successHandler.defaultTargetUrl
 			return;
+		}
+		
+		def savedRequest = request.getSession()?.getAttribute(WebAttributes.SAVED_REQUEST)
+		if(savedRequest != null) {
+			if(Utils.isAjax(savedRequest)) {
+				request.getSession()?.removeAttribute(WebAttributes.SAVED_REQUEST)
+			}
 		}
 		
 		def config = SpringSecurityUtils.securityConfig
