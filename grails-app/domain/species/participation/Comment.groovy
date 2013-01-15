@@ -192,4 +192,12 @@ class Comment{
 		}
 		return null
 	}
+	
+	def onAddComment(Comment comment){
+		try {
+			activityFeedService.getDomainObject(comment.rootHolderType, params.rootHolderId).onAddComment(comment)
+		}catch (MissingMethodException e) {
+			//e.printStackTrace();
+		}
+	}
 }

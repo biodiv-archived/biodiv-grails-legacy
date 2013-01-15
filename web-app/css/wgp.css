@@ -1711,3 +1711,7 @@ li#userOrEmail-new {
 .s2ui_hidden_button {
 	display:none;
 }
+.map_wrapper img {
+	max-width:none;
+}
+

@@ -111,8 +111,8 @@
     			</div>
 				
 				<div class="sidebar_section">
-						<a class="speciesFieldHeader" data-toggle="collapse" href="#checklist"><h5>Checklist</h5></a>
-					<div id="checklist" class="speciesField collapse in">
+						<a class="speciesFieldHeader" data-toggle="collapse" href="#checklistdata"><h5>Checklist</h5></a>
+					<div id="checklistdata" class="speciesField collapse in">
 					<clist:showData
 						model="['checklistInstance':checklistInstance]">
 					</clist:showData>

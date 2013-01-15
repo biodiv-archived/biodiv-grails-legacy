@@ -1,10 +1,10 @@
 <div>
-	<table class="table table-hover span8" style="margin-left: 0px;">
+	<table class="table table-hover" style="margin-left: 0px;">
 		
 		<thead>
 			<tr>
 				<g:each in="${checklistInstance.fetchColumnNames()}" var="cName">
-					<th class="ellipsis" title="${cName}">${cName}</th>
+					<th title="${cName}">${cName.replaceAll("_", " ")}</th>
 				</g:each>
 			</tr>
 		</thead>

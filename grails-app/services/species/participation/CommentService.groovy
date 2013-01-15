@@ -103,8 +103,8 @@ class CommentService {
 		if(params.parentId){
 			Comment parentComment = Comment.read(params.parentId.toLong());
 			params.mainParentId = parentComment.mainParentId ?: parentComment.id
-			params.commentHolderId = parentComment.commentHolderId
-			params.commentHolderType = parentComment.commentHolderType
+			params.commentHolderId = parentComment.id
+			params.commentHolderType = parentComment.getClass().getCanonicalName()
 			params.rootHolderId = parentComment.rootHolderId
 			params.rootHolderType = parentComment.rootHolderType
 		} 
