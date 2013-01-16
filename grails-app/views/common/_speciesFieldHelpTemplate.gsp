@@ -1,6 +1,6 @@
 
 <g:if test="${speciesFieldInstance?.field.description}">
-	<div class="helpContent collapse span11">
+	<div class="helpContent span11"  style="display:none;">
 		<div>
 		${speciesFieldInstance?.field.description.encodeAsHTML()}
 		</div>

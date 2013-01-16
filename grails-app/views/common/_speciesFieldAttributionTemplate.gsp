@@ -2,7 +2,7 @@
 <g:if test="${speciesFieldInstance}">
 	<g:if test="${speciesFieldInstance?.description}">
 			<!--  content attribution -->
-			<div class="attributionContent collapse">
+			<div class="attributionContent" style="display:none;">
 							
 					
 						<g:if test="${speciesFieldInstance?.contributors}">

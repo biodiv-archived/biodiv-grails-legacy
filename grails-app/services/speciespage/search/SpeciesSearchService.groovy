@@ -167,7 +167,7 @@ class SpeciesSearchService {
 			
 			doc.addField(searchFieldsConfig.UPLOADED_ON, s.dateCreated);
 			doc.addField(searchFieldsConfig.UPDATED_ON, s.lastUpdated);
-			doc.addField(searchFieldsConfig.SGROUP, s.fetchSpeciesGroup().id);
+			doc.addField(searchFieldsConfig.SGROUP, s.fetchSpeciesGroup().id.longValue());
 			//doc.addField(searchFieldsConfig.HABITAT, s.);
 			
 			docs.add(doc);

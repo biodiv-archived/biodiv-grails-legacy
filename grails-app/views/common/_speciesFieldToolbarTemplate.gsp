@@ -10,9 +10,7 @@
 					class="icon-user"></i> by </span></li>
 					<g:each in="${ speciesFieldInstance?.contributors}"
 						var="contributor">
-						<li class="contributor_ellipsis" title="${contributor.name}">
-							${contributor.name}
-						</li>
+						<li class="contributor_ellipsis" title="${contributor.name.trim()}">${contributor.name.trim()}</li>
 					</g:each>
 				</ul>
 			</g:if>

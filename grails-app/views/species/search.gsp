@@ -2,7 +2,7 @@
 <head>
 
 <meta name="layout" content="main" />
-<r:require modules="species, observations_list" />
+<r:require modules="species, species_list" />
 <title>Search Species</title>
 </head>
 <body>

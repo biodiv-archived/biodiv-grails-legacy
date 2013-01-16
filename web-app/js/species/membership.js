@@ -191,7 +191,7 @@ function init_header() {
 	});
 	
 	$('body').on('click.collapse-next.data-api', '[data-toggle=collapse-next]', function (e) {
-		  $(this).parent().nextAll($(this).attr("data-target")).collapse('toggle')
+		  $(this).parent().nextAll($(this).attr("data-target")).slideToggle();
 	});
 		
 //	$(".close").click(function(){
