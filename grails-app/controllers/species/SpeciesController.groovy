@@ -257,7 +257,7 @@ class SpeciesController {
 			}
 			for(category in concept.value) {
 				Map newCategoryMap = new LinkedHashMap();
-				//log.debug "Category : "+category
+				log.debug "Category : "+category
 				if(category.key.equals("field") || category.key.equals("speciesFieldInstance") || category.key.equalsIgnoreCase('Species Resources'))  {
 					continue;
 				} else if(category.key.equals(config.OCCURRENCE_RECORDS) || category.key.equals(config.REFERENCES) ) {
@@ -286,7 +286,7 @@ class SpeciesController {
 				}
 				for(subCategory in category.value) {
 
-					//log.debug "subCategory : "+subCategory;
+					log.debug "subCategory : "+subCategory;
 					if(subCategory.key.equals("field") || subCategory.key.equals("speciesFieldInstance")) continue;
 
 					if((subCategory.key.equals(config.GLOBAL_DISTRIBUTION_GEOGRAPHIC_ENTITY) && speciesInstance.globalDistributionEntities.size()>0)  ||
@@ -294,7 +294,7 @@ class SpeciesController {
 					(subCategory.key.equals(config.INDIAN_DISTRIBUTION_GEOGRAPHIC_ENTITY) && speciesInstance.indianDistributionEntities.size()>0) ||
 					(subCategory.key.equals(config.INDIAN_ENDEMICITY_GEOGRAPHIC_ENTITY) && speciesInstance.indianEndemicityEntities.size()>0)||
 					hasContent(subCategory.value.get('speciesFieldInstance'))) {
-
+						log.debug "Putting distribution entities ${subCategory.key}"
 						newCategoryMap.put(subCategory.key, subCategory.value)
 					}
 				}

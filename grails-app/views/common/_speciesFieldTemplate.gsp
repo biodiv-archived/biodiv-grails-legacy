@@ -74,12 +74,11 @@
 	<g:if
 		test="${speciesFieldInstance?.field.subCategory?.equalsIgnoreCase('Global Distribution Geographic Entity') && speciesInstance.globalDistributionEntities.size()>0}">
 		<div>
-			<h5>
+			<h6 style="margin-bottom: 0px">
 				${speciesFieldInstance?.field?.subCategory}
-			</h5>
+			</h6>
 		</div>
-		<g:showSpeciesFieldToolbar
-			model="['speciesFieldInstance':speciesFieldInstance]" />
+		
 		<g:each in="${speciesInstance.globalDistributionEntities}">
 			<p>
 				<span class=""> ${it?.country.countryName} (${it?.country.twoLetterCode})
@@ -90,12 +89,11 @@
 	<g:elseif
 		test="${speciesFieldInstance?.field.subCategory?.equalsIgnoreCase('Global Endemicity Geographic Entity') && speciesInstance.globalEndemicityEntities.size() > 0}">
 		<div>
-			<h5>
+			<h6 style="margin-bottom: 0px">
 				${speciesFieldInstance?.field?.subCategory}
-			</h5>
+			</h6>
 		</div>
-		<g:showSpeciesFieldToolbar
-			model="['speciesFieldInstance':speciesFieldInstance]" />
+		
 		<g:each in="${speciesInstance.globalEndemicityEntities}">
 			<p>
 				<span class=""> ${it?.country.countryName} (${it?.country.twoLetterCode})
@@ -105,8 +103,7 @@
 	</g:elseif>
 	<g:elseif
 		test="${!speciesFieldInstance?.description && !speciesFieldInstance?.field?.subCategory}">
-		<g:showSpeciesFieldToolbar
-			model="['speciesFieldInstance':speciesFieldInstance]" />
+		
 	</g:elseif>
 	
 	<g:showSpeciesFieldToolbar

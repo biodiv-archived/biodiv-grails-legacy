@@ -164,16 +164,21 @@
 								</g:elseif>
 								<g:else>
 									<g:each in="${category.value}">
-										<g:if
+										<g:if test="${(it.key.equals(grailsApplication.config.speciesPortal.fields.GLOBAL_DISTRIBUTION_GEOGRAPHIC_ENTITY))||
+											(it.key.equals(grailsApplication.config.speciesPortal.fields.GLOBAL_ENDEMICITY_GEOGRAPHIC_ENTITY))||
+											(it.key.equals(grailsApplication.config.speciesPortal.fields.INDIAN_DISTRIBUTION_GEOGRAPHIC_ENTITY)) ||
+											(it.key.equals(grailsApplication.config.speciesPortal.fields.INDIAN_ENDEMICITY_GEOGRAPHIC_ENTITY))
+											 }">
+											 <g:showSpeciesField
+													model="['speciesInstance': speciesInstance, 'speciesFieldInstance':it.value.get('speciesFieldInstance')?.getAt(0), 'speciesId':speciesInstance.id]" />
+										</g:if>
+										<g:elseif
 											test="${!it.key.equals('field') && !it.key.equals('speciesFieldInstance')}">
-
-											<div>
 												<g:each in="${ it.value.get('speciesFieldInstance')}" var="speciesFieldInstance">
 												<g:showSpeciesField
 													model="['speciesInstance': speciesInstance, 'speciesFieldInstance':speciesFieldInstance, 'speciesId':speciesInstance.id]" />
 												</g:each>
-											</div>
-										</g:if>
+										</g:elseif>
 									</g:each>
 								</g:else>
 							</div>
