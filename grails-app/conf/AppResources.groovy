@@ -60,6 +60,7 @@ modules = {
 		resource url:'/js/species/membership.js'
 		resource url:'/js/date.js'
 		resource url:'/js/daterangepicker.js'
+		resource url:'/js/stats.js'
 	}
 
 	auth {

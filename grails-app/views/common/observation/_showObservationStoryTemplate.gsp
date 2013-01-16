@@ -9,7 +9,7 @@
 
 </g:if>
 </style>
-<div class="observation_story" style="${showDetails?'':'overflow:auto;'}">
+<div class="observation_story" style="${showDetails?'':'overflow:visible;'}">
 	<div class="observation-icons">
 		<span
 			class="group_icon species_groups_sprites active ${observationInstance.group.iconClass()}"
