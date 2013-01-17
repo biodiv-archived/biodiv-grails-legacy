@@ -101,7 +101,7 @@
 			</g:if>
 			
 			<g:if test="${queryParam.key.startsWith('aq.') && queryParam.value}">
-                                    ${queryParam.key}:<span
+                                    ${queryParam.key.replace('aq.','')}:<span
 					class="highlight"> <a
 					href="${uGroup.createLink(controller:"observation",
 					action:"search", params:[(queryParam.key): queryParam.value])}">
