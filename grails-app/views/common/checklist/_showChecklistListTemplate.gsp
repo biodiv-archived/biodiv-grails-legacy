@@ -1,6 +1,6 @@
 <div class="observations_list" style="clear:both;padding-top:50px;">
 	<div>
-		<table class="table table-hover span8" style="margin-left: 0px; clear:both;">
+		<table class="table table-hover span8 tablesorter" style="margin-left: 0px; clear:both;">
 			<thead>
 				<tr>
 					<th>Title</th>

@@ -24,6 +24,8 @@ ul.tagit li.tagit-choice.selected {
 ul.tagit li.tagit-choice:hover {
     background-color: #bbcef1;
     border-color: #6d95e0;
+    cursor: hand; 
+    cursor: pointer;
 }
 
 /* ul.tagit li.tagit-new { */

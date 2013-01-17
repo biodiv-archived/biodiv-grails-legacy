@@ -14,7 +14,7 @@ function loadOlderFeedsInAjax(targetComp){
 			if(data.showFeedListHtml){
 				var htmlData = $(data.showFeedListHtml);
 				//dcorateCommentBody(htmlData.find('.yj-message-body'));
-				feedInterMediateProcess(htmlData);
+				//feedInterMediateProcess(htmlData);
 				htmlData = removeDuplicateFeed($(targetComp).children('ul'), htmlData, feedType, "older", targetComp);
 				if(feedOrder === "latestFirst"){
 					$(targetComp).children('ul').append(htmlData);
@@ -64,7 +64,7 @@ function loadNewerFeedsInAjax(targetComp, checkFeed){
         			$(targetComp).children('.activiyfeednewermsg').hide();
         		}
     			var htmlData = $(data.showFeedListHtml);
-    			feedInterMediateProcess(htmlData);
+    			//feedInterMediateProcess(htmlData);
     			//dcorateCommentBody(htmlData.find('.yj-message-body'));
     			htmlData = removeDuplicateFeed($(targetComp).children('ul'), htmlData, feedType, "newer", targetComp);
     			if(feedOrder === "latestFirst"){

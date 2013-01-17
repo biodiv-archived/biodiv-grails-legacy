@@ -223,5 +223,7 @@ function last_actions() {
 	});
 	
 	$('.yj-message-body').linkify();
-	$('.linktext').linkify();   
+	$('.linktext').linkify(); 
+	//applying table sorting
+	$("table.tablesorter").tablesorter();
 }

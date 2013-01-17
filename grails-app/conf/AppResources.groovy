@@ -38,6 +38,7 @@ modules = {
 		resource url:'/css/daterangepicker.css'
 		resource url:'/css/speciesGroups.css'
 		resource url:'/css/habitats.css'
+		resource url:'/css/tableSorter.css'
 
 		resource url:'/bootstrap/js/bootstrap.min.js'
 		resource url:'/js/species/main.js'
@@ -61,6 +62,7 @@ modules = {
 		resource url:'/js/date.js'
 		resource url:'/js/daterangepicker.js'
 		resource url:'/js/stats.js'
+		resource url:'/js/jquery.tablesorter.js'
 	}
 
 	auth {

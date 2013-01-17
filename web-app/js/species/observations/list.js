@@ -227,6 +227,7 @@ $(document).ready(function(){
 			    History.pushState({state:1}, "Species Portal", '?'+decodeURIComponent($.param(params))); 
 				eatCookies();
 				updateRelativeTime();
+				$("table.tablesorter").tablesorter();
 			}
 		});
 

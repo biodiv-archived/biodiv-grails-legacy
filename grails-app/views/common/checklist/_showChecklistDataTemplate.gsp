@@ -1,5 +1,5 @@
 <div>
-	<table class="table table-hover" style="margin-left: 0px;">
+	<table class="table table-hover tablesorter" style="margin-left: 0px;">
 		
 		<thead>
 			<tr>
