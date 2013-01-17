@@ -1,5 +1,5 @@
 <%@page import="species.utils.Utils"%>
-<div id="advSearchBox" class="block-tagadelic">
+<div class="block-tagadelic">
 	<form id="advSearchForm" method="get" 		
 		action="${uGroup.createLink(controller:(params.controller!='userGroup')?params.controller:'species', action:'search') }"
 		title="Advanced Search" class="searchbox">

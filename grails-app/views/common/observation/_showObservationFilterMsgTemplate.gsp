@@ -97,7 +97,7 @@
 					href="${uGroup.createLink(controller:"observation",
 					action:"search", params:[query: queryParam.value])}">
 						${queryParam.value.encodeAsHTML()} <a id="removeQueryFilter"
-						href="#">[X]</a> </a> </span>
+						href="#">[X]</a> </span>
 			</g:if>
 		</g:each>
 	</g:else>

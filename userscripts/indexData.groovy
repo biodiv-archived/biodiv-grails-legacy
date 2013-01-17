@@ -4,9 +4,9 @@ import speciespage.search.NewsletterSearchService;
 import species.SpeciesField.AudienceType;
 
 def speciesSearchService = ctx.getBean("speciesSearchService");
-speciesSearchService.deleteIndex();
+//speciesSearchService.deleteIndex();
 speciesSearchService.publishSearchIndex();
-speciesSearchService.optimize();
+//speciesSearchService.optimize();
 
 //def newsletterSearchService = ctx.getBean("newsletterSearchService");
 //newsletterSearchService.deleteIndex();

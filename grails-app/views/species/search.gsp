@@ -12,15 +12,19 @@
 			<s:showSubmenuTemplate />
 			<uGroup:rightSidebar />
 			<!-- main_content -->
-			<div id="searchResults" class="list" style="margin-left: 0px; clear:both;">
-				<s:speciesFilter/>
-				<s:searchResults/>
+			<div id="searchResults" class="list"
+				style="margin-left: 0px; clear: both;">
+				<s:speciesFilter />
+
+				<div class="observations_list_wrapper" style="top: 0px;">
+					<s:searchResults />
+				</div>
 			</div>
 
 		</div>
 	</div>
 
-<r:script>
+	<r:script>
 
 $(document).ready(function(){
 		
@@ -29,6 +33,13 @@ $(document).ready(function(){
           	$("#search").click();
            	return false;
     });
+
+	$(".list_view").show();
+	
+    $('.observations_list_wrapper').on('updatedGallery', function(event) {
+    	$(".list_view").show();
+    });
+	
 });
 
 

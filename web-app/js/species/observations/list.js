@@ -477,6 +477,7 @@ function updateListPage(activeTag) {
 			setActiveTag(activeTag);
 			eatCookies();
 			last_actions();
+			$('.observations_list_wrapper').trigger('updatedGallery');
 	}
 }
 

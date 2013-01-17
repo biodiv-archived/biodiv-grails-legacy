@@ -7,15 +7,11 @@
 				<a class="btn btn-navbar" data-toggle="collapse"
 					data-target=".nav-collapse"> <span class="icon-bar"></span> </a> <a
 					class="brand"
-					href="${createLink(url:grailsApplication.config.grails.serverURL+"/..") }">
+					href="${createLink(url:Utils.getIBPServerDomain()) }">
 					India Biodiversity Portal</a>
-				</li>
+				
 				<div class="nav-collapse">
-					<ul class="nav">
-
-					</ul>
-
-
+					
 					<ul class="nav pull-right">
 						<li><search:searchBox />
 						</li>

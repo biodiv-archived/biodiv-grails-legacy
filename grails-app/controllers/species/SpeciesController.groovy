@@ -420,7 +420,7 @@ class SpeciesController {
 		log.debug params;
 		def model = speciesService.search(params)
 		model['isSearch'] = true;
-		
+		println model;
 		if(params.loadMore?.toBoolean()){
 			render(template:"/species/searchResultsTemplate", model:model);
 			return;

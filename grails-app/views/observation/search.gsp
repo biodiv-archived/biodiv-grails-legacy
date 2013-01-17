@@ -14,12 +14,8 @@
 
 	<div class="span12">
 		<obv:showSubmenuTemplate />
-		
-		
-			<search:searchResultsHeading />
-		
-		
-		<uGroup:rightSidebar/>
+		<search:searchResultsHeading />
+		<uGroup:rightSidebar />
 		<obv:showObservationsListWrapper />
 	</div>
 </body>
