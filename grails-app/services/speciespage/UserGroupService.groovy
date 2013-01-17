@@ -429,6 +429,15 @@ class UserGroupService {
 		return count[0]
 	}
 
+	def long getObservationCountByGroup(UserGroup userGroupInstance){
+		def queryParams = [:]
+		queryParams['userGroup'] = userGroupInstance
+		queryParams['isDeleted'] = false;
+		
+		def query = "select count(*) from Observation obv join obv.userGroups userGroup where obv.isDeleted = :isDeleted and userGroup=:userGroup"
+		return Observation.executeQuery(query, queryParams)[0]
+	}
+	
 	def getUserGroupObservations(UserGroup userGroupInstance, params, int max, long offset, boolean isMapView=false) {
 
 		if(!userGroupInstance) return;

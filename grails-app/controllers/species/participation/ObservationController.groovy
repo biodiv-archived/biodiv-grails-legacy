@@ -1019,7 +1019,17 @@ class ObservationController {
 	 * Count   
 	 */
 	def count = {
-		render Observation.countByIsDeleted(false);
+		log.debug params
+		def userGroup 
+		if(params.webaddress) {
+			userGroup = userGroupService.get(params.webaddress)
+		}
+		
+		if(userGroup){
+			render userGroupService.getObservationCountByGroup(userGroup);
+		}else{
+			render Observation.countByIsDeleted(false);
+		}
 	}
 
 	/**
