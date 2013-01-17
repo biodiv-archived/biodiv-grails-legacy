@@ -35,14 +35,14 @@
 						<div class="observation_story"
 							style="overflow: visible; width: 100%">
 
-							<div class="observation-icons">
+							<div class="observation-icons">								
+								<span
+									class="group_icon species_groups_sprites active pull-right ${speciesInstance.fetchSpeciesGroup()?.iconClass()}"
+									title="${speciesInstance.fetchSpeciesGroup()?.name}"></span>
 								<g:if test="${speciesInstance.taxonConcept.threatenedStatus}">
 									<s:showThreatenedStatus
 										model="['threatenedStatus':speciesInstance.taxonConcept.threatenedStatus]" />
 								</g:if>
-								<span
-									class="group_icon species_groups_sprites active ${speciesInstance.fetchSpeciesGroup()?.iconClass()}"
-									title="${speciesInstance.fetchSpeciesGroup()?.name}"></span>
 							</div>
 
 							<h6>

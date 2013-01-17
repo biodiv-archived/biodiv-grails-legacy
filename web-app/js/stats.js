@@ -1,5 +1,5 @@
 function getStatistics(group) {
-    var url = 'http://' + document.domain + '/ml_orchestrator.php?action=getGroupStats&group=' + group;
+    var url = 'http://' + document.domain + '/ml_orchestrator.php?action=getStatistics&group=' + group;
 
     var stats;
     $.ajax({
@@ -52,7 +52,7 @@ layer_count:'<span class="stats_normal">Number of</span><br><span class="stats_b
 
 $(window).load(function(){
 	if ($("#statistics_box").length > 0){
-                var group = 'deault';
+                var group = 'default';
 		var stats = getStatisticsHTML(group);
 		$("#statistics_box").html(stats);
 	}

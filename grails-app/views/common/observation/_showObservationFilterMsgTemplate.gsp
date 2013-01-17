@@ -96,7 +96,16 @@
 					class="highlight"> <a
 					href="${uGroup.createLink(controller:"observation",
 					action:"search", params:[query: queryParam.value])}">
-						${queryParam.value.encodeAsHTML()} <a id="removeQueryFilter"
+						${queryParam.value.encodeAsHTML()} <a id="removeQueryFilter" data-target="#searchTextField"
+						href="#">[X]</a> </span>
+			</g:if>
+			
+			<g:if test="${queryParam.key.startsWith('aq.') && queryParam.value}">
+                                    ${queryParam.key}:<span
+					class="highlight"> <a
+					href="${uGroup.createLink(controller:"observation",
+					action:"search", params:[(queryParam.key): queryParam.value])}">
+						${queryParam.value.encodeAsHTML()} <a id="removeQueryFilter" data-target="#${queryParam.key}"
 						href="#">[X]</a> </span>
 			</g:if>
 		</g:each>

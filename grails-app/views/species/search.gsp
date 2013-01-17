@@ -27,12 +27,6 @@
 	<r:script>
 
 $(document).ready(function(){
-		
-	$("#removeQueryFilter").live('click', function(){
-           	$( "#searchTextField" ).val('');
-          	$("#search").click();
-           	return false;
-    });
 
 	$(".list_view").show();
 	
