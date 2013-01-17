@@ -44,7 +44,7 @@ class ChecklistService {
 		def startDate = new Date()
 		def sql = Sql.newInstance(connectionUrl, userName, password, "org.postgresql.Driver");
 		int i=0;
-		sql.eachRow("select nid, vid, title from node where type = 'checklist' order by nid asc ") { row ->
+		sql.eachRow("select nid, vid, title from node where type = 'checklist' order by nid asc offset 293") { row ->
 			log.debug " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>     title ===  $i  $row.title  nid == $row.nid , vid == $row.vid"
 			try{
 				Checklist checklist = createCheckList(row, sql)
@@ -115,6 +115,10 @@ class ChecklistService {
 		//XXX change to point wgp group here gid 2 represent checklist belongs to wgp group
 		if(row.gid == 2){
 			cl.addToUserGroups(UserGroup.read(1))
+		}
+		
+		if(nid == 1959 || 1960){
+			cl.addToUserGroups(UserGroup.read(2))
 		}
 	}
 
@@ -252,7 +256,7 @@ class ChecklistService {
 			
 			
 			if(cn){
-				cn =  Utils.cleanName(cn);
+				cn =  Utils.getTitleCase(Utils.cleanName(cn));
 				if(commonNameSet.contains(cn)){
 					println "========================== duplicate cn =======  $cn ================ for sn =======" + snVal
 					cleanUpGorm()
