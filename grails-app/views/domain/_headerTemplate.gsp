@@ -19,7 +19,7 @@
 	</div>
 </div>
 <div class="navbar navbar-static-top btn"
-	style="margin-bottom: 0px; position: relative; width: 100%;padding: 0px; ">
+	style="margin-bottom: 0px; position: relative; width: 100%;padding: 0px; border-left-width:0; border-right-width: 0;">
 	<div class="navbar-inner"
 		style="box-shadow: none; background-color: transparent; background-image: none;">
 		<div class="container outer-wrapper"

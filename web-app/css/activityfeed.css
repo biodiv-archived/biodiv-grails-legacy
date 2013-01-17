@@ -69,6 +69,8 @@
 
 .activityfeed .activiyfeednewermsg {
 	background-color: #E7F0FE;
+	min-height: 30px;
+	font-size: 20px;
 }
 .userGroup-section .comment-textbox {
 	width:99%;	
