@@ -133,7 +133,7 @@ $(document).ready(function(){
 			$( "#searchbox" ).attr('action', "${Utils.getIBPServerDomain()}"+action);
 		}
 		
-		updateGallery(action, undefined, undefined, undefined, false);
+		updateGallery(action, undefined, undefined, undefined, false,undefined,undefined,true);
     	return false;
 	});
 	$("#userGroupSelectFilter").val("${(queryParams && queryParams.uGroup)?queryParams.uGroup:(params.webaddress?'THIS_GROUP':'ALL')}");

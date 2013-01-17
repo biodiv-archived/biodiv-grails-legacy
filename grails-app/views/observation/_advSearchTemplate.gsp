@@ -3,7 +3,7 @@
 	<form id="advSearchForm" method="get"  title="Advanced Search"
 		action="${uGroup.createLink(controller:(params.controller!='userGroup')?params.controller:'observation', action:'search') }"
 		class="searchbox">
-		<label class="control-label" for="contributor">Contributor</label> <input
+		<label class="control-label" for="contributor">Contributor</label> <input id="aq.contributor"
 			data-provide="typeahead" type="text" class="input-block-level"
 			name="aq.contributor" value="${params['aq.contributor'] }"
 			placeholder="Field to search all contributors" />
@@ -17,10 +17,10 @@
 			type="text" class="input-block-level" name="aq.common_name"
 			placeholder="Search using common name" /-->
 
-		<label class="control-label" for="location">Location</label> <input
+		<label class="control-label" for="location">Location</label> <input id="aq.location"
 			data-provide="typeahead" type="text" class="input-block-level"
 			name="aq.location" value="${params['aq.location']}" placeholder="Search by location name" />
-		<label class="control-label" for="text">Content</label> <input
+		<label class="control-label" for="text">Content</label> <input id="aq.text"
 			data-provide="typeahead" type="text" class="input-block-level"
 			name="aq.text" value="${params['aq.text']}" placeholder="Search all text content" /> <label
 			class="control-label" for="uploadedOn">Uploaded during</label>

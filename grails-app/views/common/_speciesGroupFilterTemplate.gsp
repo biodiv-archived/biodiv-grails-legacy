@@ -14,6 +14,8 @@ $(document).ready(function(){
 	$("#habitatFilter").button();
 	$('#habitatFilter button[value="${params.habitat}"]').addClass('active');
 	$('#habitatFilter button').tooltip({placement:'bottom'});
+	
+	
 		
 });
 
@@ -80,7 +82,7 @@ $(document).ready(function(){
 		<a data-toggle="collapse" data-parent="#advSearchContainer" href="#advSearchBox"><h5>
 				<i class=" icon-search"></i>Advanced Search
 			</h5> </a>
-		<div id="advSearchBox" class="collapse">
+		<div id="advSearchBox" class="collapse ${params.aq?'in':'' }">
 			<search:advSearch />
 		</div>
 	</div>

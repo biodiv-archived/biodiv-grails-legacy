@@ -4,16 +4,16 @@
 		action="${uGroup.createLink(controller:(params.controller!='userGroup')?params.controller:'species', action:'search') }"
 		title="Advanced Search" class="searchbox">
 	 <label
-			class="control-label" for="aq.taxon">Taxon Hierarchy</label> <input data-provide="typeahead"
-			type="text" class="input-block-level" name="aq.taxon" value=""
+			class="control-label" for="aq.taxon">Taxon Hierarchy</label> <input data-provide="typeahead" id="aq.taxon"
+			type="text" class="input-block-level" name="aq.taxon" value="${queryParams?.get('aq.taxon')}"
 			placeholder="Search using taxon hierarchy" />
 			
 			<label
-			class="control-label" for="aq.contributor">Contributor</label> <input data-provide="typeahead"
-			type="text" class="input-block-level" name="aq.contributor" value="" 
+			class="control-label" for="aq.contributor">Contributor</label> <input data-provide="typeahead" id="aq.contributor"
+			type="text" class="input-block-level" name="aq.contributor" value="${queryParams?.get('aq.contributor')}" 
 			placeholder="Field to search all contributors" /> <label
-			class="control-label" for="aq.attribution">Attributions</label> <input data-provide="typeahead"
-			type="text" class="input-block-level" name="aq.attribution" value=""
+			class="control-label" for="aq.attribution">Attributions</label> <input data-provide="typeahead" id="aq.attribution"
+			type="text" class="input-block-level" name="aq.attribution" value="${queryParams?.get('aq.attribution') }"
 			placeholder="Field to search all attributions" />
 			
 			<!-- label
@@ -24,8 +24,8 @@
 			class="input-block-level" name="aq.year"
 			placeholder="Search using year of finding the species and basionym year" /-->
 
-		<label class="control-label" for="aq.text">Content</label> <input data-provide="typeahead"
-			type="text" class="input-block-level" name="aq.text" value=""
+		<label class="control-label" for="aq.text">Content</label> <input data-provide="typeahead" id="aq.text"
+			type="text" class="input-block-level" name="aq.text" value="${queryParams?.get('aq.text') }"
 			placeholder="Search all text content" />  <!-- label
 			class="control-label" for="aq.reference">References</label> <input data-provide="typeahead"
 			type="text" class="input-block-level" name="aq.reference" value=""

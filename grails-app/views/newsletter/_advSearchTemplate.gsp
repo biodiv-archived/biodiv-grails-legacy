@@ -4,11 +4,11 @@
 		action="${uGroup.createLink(controller:(params.controller!='userGroup')?params.controller:'newsletter', action:'search') }"
 		title="Advanced Search" class="searchbox">
 
-		<label class="control-label" for="aq.name">Title</label> <input
+		<label class="control-label" for="aq.name">Title</label> <input id="aq.name"
 			data-provide="typeahead" type="text" class="input-block-level"
 			name="aq.name" value="${params['aq.name'] }"
 			placeholder="Search all titles" /> <label class="control-label"
-			for="aq.text">Content</label> <input data-provide="typeahead"
+			for="aq.text">Content</label> <input data-provide="typeahead" id="aq.text"
 			type="text" class="input-block-level" name="aq.text"
 			value="${params['aq.text'] }" placeholder="Search all text content" />
 	

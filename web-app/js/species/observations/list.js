@@ -149,9 +149,7 @@ $(document).ready(function(){
     
     $("#removeQueryFilter").live('click', function(){
     	$( "#searchTextField" ).val('');
-    	$("#advSearchForm :input").each(function(index, ele) {
-    		$(this).val('');
-    	});
+    	$($(this).attr('data-target').replace('.','\\.')).val('')
     	updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
     	return false;
     });
@@ -348,7 +346,7 @@ function getSelectedUserGroup() {
 	return $('#advSearchForm input[name=uGroup]:radio:checked').val()
 } 
 
-function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSort) {
+function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSort, isRegularSearch) {
     var params = url.param();
     removeSort = (typeof removeSort === "undefined") ? false : removeSort;
 
@@ -406,6 +404,7 @@ function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSo
 		}
 	}
 	
+	if(!isRegularSearch) {
 	$("#advSearchForm :input").each(function(index, ele) {
 		var field = $(this).attr('name');
 		var query = $( this ).val();
@@ -418,6 +417,7 @@ function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSo
 			}
 		}
 	});
+	}
 	
 	if(removeUser){
 		if(params['user'] != undefined){
@@ -481,7 +481,7 @@ function updateListPage(activeTag) {
 	}
 }
 
-function updateGallery(target, limit, offset, removeUser, isGalleryUpdate, removeObv, removeSort) {
+function updateGallery(target, limit, offset, removeUser, isGalleryUpdate, removeObv, removeSort, isRegularSearch) {
     if(target === undefined) {
             target = window.location.pathname + window.location.search;
     }
@@ -489,7 +489,7 @@ function updateGallery(target, limit, offset, removeUser, isGalleryUpdate, remov
     var a = $('<a href="'+target+'"></a>');
     var url = a.url();
     var href = url.attr('path');
-    var params = getFilterParameters(url, limit, offset, removeUser, removeObv, removeSort);
+    var params = getFilterParameters(url, limit, offset, removeUser, removeObv, removeSort, isRegularSearch);
     // alert(" tag in params " + params['tag'] );
     isGalleryUpdate = (isGalleryUpdate == undefined)?true:isGalleryUpdate
     if(isGalleryUpdate)
