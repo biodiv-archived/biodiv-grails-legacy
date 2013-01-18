@@ -1225,7 +1225,7 @@ span.cke_skin_kama {
 .logo {
 	border: 0 none;
 	height: 80px;
-	width: auto;
+/* 	width: auto; */
 	margin-left: 16px;
 	margin-right: 16px;
 }
