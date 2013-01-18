@@ -63,7 +63,7 @@
 
 					<div class="super-section" style="clear: both;">
 						<div class="row section">
-								<div class="figure span3 ${hasErrors(bean: user, field: 'icon', 'error')}" style="float: left; max-height: 220px; max-width: 200px">
+							<div class="figure span3 ${hasErrors(bean: user, field: 'icon', 'error')}" style="float: left; max-height: 220px; max-width: 200px">
 								
 								<%def thumbnail = user.icon%>
 								<div class='pull-left' style="height:100px; width:auto;margin-left: 0px;">
@@ -75,6 +75,7 @@
 											<span>Upload picture of size < 2MB</span>
 										</div>
 									</a>
+									<a href="${uGroup.createLink(controller:'SUser', action:'resetPassword', id:user.id) }">Change Password</a>
 								</div>
 								
 								<input id="icon" name="icon" type="hidden" value='${thumbnail}' />
@@ -87,27 +88,6 @@
 												</g:hasErrors>
 											</div>
 								
-								
-<%--								<g:link controller="SUser" action="show" id="${user.id }">--%>
-<%--									<img class="normal_profile_pic" src="${user.icon()}" />--%>
-<%--								</g:link>--%>
-<%--								--%>
-<%--								<div class="prop">--%>
-<%--									<span class="name"><i class="icon-time"></i>Member since--%>
-<%--									</span>--%>
-<%--									<div class="value">--%>
-<%--										<g:formatDate format="dd/MM/yyyy" date="${user.dateCreated}"--%>
-<%--											type="datetime" style="MEDIUM" />--%>
-<%--									</div>--%>
-<%--								</div>--%>
-<%--								<div class="prop">--%>
-<%--									<span class="name"><i class="icon-time"></i>Last visited--%>
-<%--									</span>--%>
-<%--									<div class="value">--%>
-<%--										<g:formatDate format="dd/MM/yyyy" date="${user.lastLoginDate}"--%>
-<%--											type="datetime" style="MEDIUM" />--%>
-<%--									</div>--%>
-<%--								</div>--%>
 							</div>
 							<div class="span8 observation_story">
 

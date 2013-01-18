@@ -3,6 +3,8 @@ package species.auth
 import grails.converters.JSON
 import grails.plugins.springsecurity.Secured;
 import grails.plugins.springsecurity.ui.AbstractS2UiController;
+import grails.plugins.springsecurity.ui.RegisterController;
+import grails.plugins.springsecurity.ui.ResetPasswordCommand;
 import grails.plugins.springsecurity.ui.SpringSecurityUiService
 import grails.plugins.springsecurity.ui.UserController;
 import grails.util.GrailsNameUtils
@@ -34,25 +36,22 @@ class SUserController extends UserController {
 	def observationService;
 	def SUserService;
 	def userGroupService;
-	
+	def saltSource;
+
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
-    def isLoggedIn = {
-        render springSecurityService.isLoggedIn()
-    }
+	def isLoggedIn = { render springSecurityService.isLoggedIn() }
 
 	def index = {
-		println "index"
 		redirect(action: "list", params: params)
 	}
 
 	def list = {
-		println "list"
 		params.max = Math.min(params.max ? params.int('max') : 12, 100)
 		//params.sort = params.sort && params.sort != 'score' ? params.sort : "activity";
 		params.query='%';
 		def model = getUsersList(params);
-		
+
 		// add query params to model for paging
 		for (name in [
 			'username',
@@ -66,7 +65,7 @@ class SUserController extends UserController {
 			model[name] = params[name]
 		}
 		params.remove('query');
-		
+
 		if(params.loadMore?.toBoolean()){
 			render(template:"/common/suser/showUserListTemplate", model:model);
 			return;
@@ -78,16 +77,16 @@ class SUserController extends UserController {
 			def obvListHtml =  g.render(template:"/common/suser/showUserListTemplate", model:model);
 			def obvFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
 
-//			def filteredTags = observationService.getTagsFromObservation(model.totalObservationInstanceList.collect{it[0]})
-//			def tagsHtml = g.render(template:"/common/observation/showAllTagsTemplate", model:[count: count, tags:filteredTags, isAjaxLoad:true]);
-//			def mapViewHtml = g.render(template:"/common/observation/showObservationMultipleLocationTemplate", model:[observationInstanceList:model.totalObservationInstanceList]);
+			//			def filteredTags = observationService.getTagsFromObservation(model.totalObservationInstanceList.collect{it[0]})
+			//			def tagsHtml = g.render(template:"/common/observation/showAllTagsTemplate", model:[count: count, tags:filteredTags, isAjaxLoad:true]);
+			//			def mapViewHtml = g.render(template:"/common/observation/showObservationMultipleLocationTemplate", model:[observationInstanceList:model.totalObservationInstanceList]);
 
 			def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml]
 			render result as JSON
 			return;
 		}
-		
-//		render view: 'list', model: model
+
+		//		render view: 'list', model: model
 		//render view: 'list', model: [results: SUser.list(params), totalCount: SUser.count(), searched:"true"]
 	}
 
@@ -141,7 +140,7 @@ class SUserController extends UserController {
 			if (!user) user = findById()
 			if (!user) return
 
-			return buildUserModel(user)
+				return buildUserModel(user)
 		}
 		flash.message = "${message(code: 'edit.denied.message')}";
 		redirect (url:uGroup.createLink(action:'show', controller:"SUser", id:params.id, 'userGroupWebaddress':params.webaddress))
@@ -157,40 +156,40 @@ class SUserController extends UserController {
 
 		if(SUserService.ifOwns(params.long('id'))) {
 			def user = findById()
-			
+
 			if (!user) return
-	
-			if (!versionCheck('user.label', 'User', user, [user: user])) {
-				return
-			}
-			
+
+				if (!versionCheck('user.label', 'User', user, [user: user])) {
+					return
+				}
+
 			//Cannot change email id with which user was registered
 			params.email = user.email;
-			
+
 			def oldPassword = user."$passwordFieldName"
-			
+
 			def allowIdenMail = (params.allowIdentifactionMail?.equals('on'))?true:false;
 			updateBlockMailList(allowIdenMail, user);
-			
+
 			user.properties = getTrimmedParams(params)
-			if (params.password && !params.password.equals(oldPassword)) {
-				String salt = saltSource instanceof NullSaltSource ? null : params.username
-				user."$passwordFieldName" = springSecurityUiService.encodePassword(params.password, salt)
-			}
-			
+//			if (params.password && !params.password.equals(oldPassword)) {
+//				String salt = saltSource instanceof NullSaltSource ? null : params.username
+//				user."$passwordFieldName" = springSecurityUiService.encodePassword(params.password, salt)
+//			}
+
 			user.sendNotification = (params.sendNotification?.equals('on'))?true:false;
-			
+
 			user.icon = getUserIcon(params.icon);
 			addInterestedSpeciesGroups(user, params.speciesGroup)
 			addInterestedHabitats(user, params.habitat)
-			
+
 			user.website = (params.website.trim() != "") ? params.website.trim().split(",").join(", ") : null
-			
+
 			if (!user.save(flush: true)) {
 				render view: 'edit', model: buildUserModel(user)
 				return
 			}
-			
+
 			//if(params.allowIdentifactionMail?.equals('on'));
 
 			String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
@@ -200,7 +199,7 @@ class SUserController extends UserController {
 				lookupUserRoleClass().removeAll user
 				addRoles user
 			}
-			
+
 			userCache.removeUserFromCache user[usernameFieldName]
 			flash.message = "${message(code: 'default.updated.message', args: [message(code: 'user.label', default: 'User'), user.id])}"
 			redirect (url:uGroup.createLink(action:'show', controller:"SUser", id:user.id, 'userGroupWebaddress':params.webaddress))
@@ -211,7 +210,7 @@ class SUserController extends UserController {
 			//redirect (action:'show', id:params.id)
 		}
 	}
-	
+
 	@Secured(['ROLE_ADMIN'])
 	def delete = {
 		def user = findById()
@@ -221,22 +220,22 @@ class SUserController extends UserController {
 		try {
 			List obvToUpdate = [];
 			lookupUserClass().withTransaction { status ->
-				user.observations.each { obv -> 
+				user.observations.each { obv ->
 					UnCuratedVotes.findAllByObv(obv).each { vote ->
 						log.debug "deleting $vote"
 						vote.delete();
 					}
 				}
-				
+
 				user.recoVotes.each { vote ->
 					if(vote.observation.author.id != user.id) {
 						obvToUpdate.add(vote.observation);
 					}
 				}
-				
+
 				FacebookUser.removeAll user;
 				lookupUserRoleClass().removeAll user
-				
+
 				SUserService.sendNotificationMail(SUserService.USER_DELETED, user, request, "");
 				user.delete();
 
@@ -261,9 +260,9 @@ class SUserController extends UserController {
 	def search = {
 		println "search"
 		log.debug params
-		
+
 		def model = getUsersList(params);
-		
+
 		// add query params to model for paging
 		for (name in [
 			'username',
@@ -279,7 +278,7 @@ class SUserController extends UserController {
 		model['isSearch'] = true;
 		params.action = 'search'
 		params.controller = 'SUser'
-		
+
 		if(params.loadMore?.toBoolean()){
 			params.remove('isGalleryUpdate');
 			render(template:"/common/suser/showUserListTemplate", model:model);
@@ -294,9 +293,9 @@ class SUserController extends UserController {
 			def obvListHtml =  g.render(template:"/common/suser/showUserListTemplate", model:model);
 			def obvFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
 
-//			def filteredTags = observationService.getTagsFromObservation(model.totalObservationInstanceList.collect{it[0]})
-//			def tagsHtml = g.render(template:"/common/observation/showAllTagsTemplate", model:[count: count, tags:filteredTags, isAjaxLoad:true]);
-//			def mapViewHtml = g.render(template:"/common/observation/showObservationMultipleLocationTemplate", model:[observationInstanceList:model.totalObservationInstanceList]);
+			//			def filteredTags = observationService.getTagsFromObservation(model.totalObservationInstanceList.collect{it[0]})
+			//			def tagsHtml = g.render(template:"/common/observation/showAllTagsTemplate", model:[count: count, tags:filteredTags, isAjaxLoad:true]);
+			//			def mapViewHtml = g.render(template:"/common/observation/showObservationMultipleLocationTemplate", model:[observationInstanceList:model.totalObservationInstanceList]);
 
 			def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml]
 			render result as JSON
@@ -311,19 +310,19 @@ class SUserController extends UserController {
 		int totalCount = 0;
 		def results = [];
 		def queryParams = [:]
-		
+
 		if(params.action != 'search' || (params.action == 'search' && params.query)) {
 			def hql = new StringBuilder('FROM ').append(lookupUserClassName()).append(' u WHERE 1=1 ')
 			def cond = new StringBuilder("");
-			
-	
+
+
 			def userLookup = SpringSecurityUtils.securityConfig.userLookup
 			String usernameFieldName = 'name'
-	
+
 			params.sort = params.sort && params.sort != 'score' ? params.sort : "activity";
 			String userNameQuery = "";
 			if (params['query']) {
-				def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields			
+				def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields
 				if(params['query'].startsWith(searchFieldsConfig.CANONICAL_NAME)) {
 					def usernamesList = searchObservations(params);
 					String usernames = getUsernamesSearchCondition(usernamesList);
@@ -334,13 +333,13 @@ class SUserController extends UserController {
 					queryParams['username'] = params['query'].toLowerCase() + '%'
 				}
 			}
-			
-	
+
+
 			String enabledPropertyName = userLookup.enabledPropertyName
 			String accountExpiredPropertyName = userLookup.accountExpiredPropertyName
 			String accountLockedPropertyName = userLookup.accountLockedPropertyName
 			String passwordExpiredPropertyName = userLookup.passwordExpiredPropertyName
-	
+
 			for (name in [enabled: enabledPropertyName,
 				accountExpired: accountExpiredPropertyName,
 				accountLocked: accountLockedPropertyName,
@@ -351,36 +350,36 @@ class SUserController extends UserController {
 					queryParams[name.key] = value == 1
 				}
 			}
-	
+
 			String q = hql.toString() + cond.toString() + userNameQuery;
 			log.debug "CountQuery : ${q} with params ${queryParams}"
 			totalCount = lookupUserClass().executeQuery("SELECT COUNT(DISTINCT u) $q", queryParams)[0]
 			//if(totalCount) {
-				cond.append userNameQuery
-				hql = q;
+			cond.append userNameQuery
+			hql = q;
 			/*} else {
-				queryParams.remove('username')
-				//Searching observations core when no user is found.
-				def usernamesList = searchObservations(params);
-				String usernames = getUsernamesSearchCondition(usernamesList);
-				cond.append " AND LOWER(u.${usernameFieldName}) IN ${usernames}"
-				//queryParams['username'] = usernames
-				hql.append cond
-				totalCount = lookupUserClass().executeQuery("SELECT COUNT(DISTINCT u) $hql", queryParams)[0]
-			}*/
-	
+			 queryParams.remove('username')
+			 //Searching observations core when no user is found.
+			 def usernamesList = searchObservations(params);
+			 String usernames = getUsernamesSearchCondition(usernamesList);
+			 cond.append " AND LOWER(u.${usernameFieldName}) IN ${usernames}"
+			 //queryParams['username'] = usernames
+			 hql.append cond
+			 totalCount = lookupUserClass().executeQuery("SELECT COUNT(DISTINCT u) $hql", queryParams)[0]
+			 }*/
+
 			Integer max = params.int('max')
 			Integer offset = params.int('offset')
-	
+
 			String orderBy = ''
 			if (params.sort == 'lastLoginDate') {
 				orderBy = " ORDER BY u.$params.sort ${params.order ?: 'DESC'},  u.$usernameFieldName ASC"
 			} else {
 				orderBy = " ORDER BY u.$params.sort ${params.order ?: 'ASC'}"
 			}
-	
-			
-			
+
+
+
 			if(params.sort == 'activity') {
 				String query = "select u.id, u.$usernameFieldName from Observation obv right outer join obv.author u WHERE 1=1 $cond and (obv.isDeleted = false or obv.isDeleted is null) group by u.id, u.$usernameFieldName order by count(obv.id)  desc, u.$usernameFieldName asc";
 				log.debug "UserQuery : ${query} with params ${queryParams}"
@@ -393,34 +392,34 @@ class SUserController extends UserController {
 				log.debug "UserQuery : ${query} with params ${queryParams}"
 				results = lookupUserClass().executeQuery(query, queryParams, [max: max, offset: offset])
 			}
-	
-			
-	//		//sorts only current page results
-	//		if(results && params['username']) {
-	//			println params['username'].toLowerCase();
-	//			sorted = results.sort( sorter.rcurry(params['username'].toLowerCase()))
-//		}
+
+
+			//		//sorts only current page results
+			//		if(results && params['username']) {
+			//			println params['username'].toLowerCase();
+			//			sorted = results.sort( sorter.rcurry(params['username'].toLowerCase()))
+			//		}
 		}
 
 		return ['userInstanceList': results, instanceTotal: totalCount, queryParams:queryParams, searched: true]
 
 	}
-	
+
 	// Define a closure that will do the sorting
 	def sorter = { SUser a, SUser b, String prefix ->
-	  // Get the index into order for a and b
-	  // if not found, set to being Integer.MAX_VALUE
-	  def (aidx,bidx) = [a,b].collect {
-		  it.name.toLowerCase().startsWith(prefix); 
-		  }.collect {
-	    it ? 1 : Integer.MAX_VALUE
-	  }
-	  
-	  // Compare the two indexes.
-	  // If they are the same, compare alphabetically
-	  aidx <=> bidx ?: a.name <=> b.name
+		// Get the index into order for a and b
+		// if not found, set to being Integer.MAX_VALUE
+		def (aidx,bidx) = [a, b].collect {
+			it.name.toLowerCase().startsWith(prefix);
+		}.collect {
+			it ? 1 : Integer.MAX_VALUE
+		}
+
+		// Compare the two indexes.
+		// If they are the same, compare alphabetically
+		aidx <=> bidx ?: a.name <=> b.name
 	}
-	
+
 	private def searchObservations(params) {
 		def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields
 		def newParams = [:];
@@ -430,17 +429,17 @@ class SUserController extends UserController {
 		newParams["query"] = params.query;
 		def obvSearchModel = observationService.getObservationsFromSearch(newParams);
 		def contributorNames = obvSearchModel.tags
-		
+
 		return (contributorNames.collect {"'"+it.getKey()+"'"});
 	}
-	
+
 	private String getUsernamesSearchCondition(List usernamesList) {
 		String usernames = usernamesList.toString().replaceFirst('\\[', '(');
 		usernames = usernames[0..-2]+")";
 		if(!usernamesList) {
 			usernames = "('')"
 		}
-		
+
 		return usernames;
 	}
 	/**
@@ -467,7 +466,7 @@ class SUserController extends UserController {
 		}
 		render (view:'advSearch', params:newParams);
 	}
-	
+
 	/**
 	 * Ajax call used by autocomplete textfield.
 	 */
@@ -475,16 +474,16 @@ class SUserController extends UserController {
 		log.debug params
 
 		setIfMissing 'max', 5, 10
-		
+
 		def jsonData = []
 
 		def namesLookupResults = namesIndexerService.suggest(params)
 		jsonData.addAll(namesLookupResults);
- 
+
 		jsonData.addAll(SUserService.getUserSuggestions(params));
 		render jsonData as JSON
 	}
-	
+
 	/**
 	 *
 	 */
@@ -494,7 +493,7 @@ class SUserController extends UserController {
 		render SUserService.getUserSuggestions(params) as JSON;
 	}
 
-		
+
 	private Map getUnBlockedMailList(String userIdsAndEmailIds, request){
 		Map result = new HashMap();
 		userIdsAndEmailIds.split(",").each{
@@ -519,33 +518,27 @@ class SUserController extends UserController {
 		}
 		return result;
 	}
-	
-    def login = {
-		render template:"/common/suser/userLoginBoxTemplate" 
-    }
-	
+
+	def login = { render template:"/common/suser/userLoginBoxTemplate"  }
+
 	def header = {
 		//TODO:HACK FOR NOW
 		String domainUrl = Utils.getDomainServerUrl(request);
-		
-		if(params.webaddress) {			
+
+		if(params.webaddress) {
 			def userGroupInstance = userGroupService.get(params['webaddress'])
 			if(userGroupInstance) {
 				render (template:"/domain/ibpHeaderTemplate", model:['userGroupInstance':userGroupInstance])
 				return
 			}
-		} 
+		}
 		render template:"/domain/ibpHeaderTemplate"
 	}
-	
-	def sidebar = {
-		render template:"/common/userGroup/sidebarTemplate"
-	}
 
-	def footer = {
-		render template:"/domain/ibpFooterTemplate"
-	}
-	
+	def sidebar = { render template:"/common/userGroup/sidebarTemplate" }
+
+	def footer = { render template:"/domain/ibpFooterTemplate" }
+
 	protected void addRoles(user) {
 		String upperAuthorityFieldName = GrailsNameUtils.getClassName(
 				SpringSecurityUtils.securityConfig.authority.nameField, null)
@@ -592,14 +585,14 @@ class SUserController extends UserController {
 	protected List sortedRoles() {
 		lookupRoleClass().list().sort { it.authority }
 	}
-	
-	
+
+
 	private Map getTrimmedParams(Map m){
 		def res = [:]
 		m.each {key, value -> res[key] = value.toString().trim()}
 		return res
 	}
-	
+
 	private updateBlockMailList(allowIdenMail, user){
 		if(user.allowIdentifactionMail != allowIdenMail){
 			if(allowIdenMail){
@@ -615,148 +608,191 @@ class SUserController extends UserController {
 			}
 		}
 	}
-	
+
 	/**
-	*
-	*/
-   def getRecommendationVotes = {
-	   log.debug params;
-	   params.max = params.max ? params.int('max') : 1
-	   params.offset = params.offset ? params.long('offset'): 0
-	   
-	   def userInstance = SUser.get(params.id)
-	   if (userInstance) {
-		   def recommendationVoteList 
-		   if(params.obvId){
-			   	recommendationVoteList = RecommendationVote.findAllByAuthorAndObservation(springSecurityService.currentUser, Observation.read(params.long('obvId')));
-		   }else{
-		   		recommendationVoteList = observationService.getRecommendationsOfUser(userInstance, params.max, params.offset);
-		   }
-		   processResult(recommendationVoteList, params)
-		   return
-	   }
-	   else {
-		   response.setStatus(500)
-		   def message = ['error':g.message(code: 'error', default:'Error while processing the request.')]
-		   render message as JSON
-	   }
-   }
-   
-   @Secured(['ROLE_USER'])
-   def upload_resource = {
-	   log.debug params;
+	 *
+	 */
+	def getRecommendationVotes = {
+		log.debug params;
+		params.max = params.max ? params.int('max') : 1
+		params.offset = params.offset ? params.long('offset'): 0
 
-	   try {
-		   if(ServletFileUpload.isMultipartContent(request)) {
-			   MultipartHttpServletRequest multiRequest = (MultipartHttpServletRequest) request;
-			   def rs = [:]
-			   Utils.populateHttpServletRequestParams(request, rs);
-			   def resourcesInfo = [];
-			   def rootDir = grailsApplication.config.speciesPortal.users.rootDir
-			   File usersDir;
-			   def message;
+		def userInstance = SUser.get(params.id)
+		if (userInstance) {
+			def recommendationVoteList
+			if(params.obvId){
+				recommendationVoteList = RecommendationVote.findAllByAuthorAndObservation(springSecurityService.currentUser, Observation.read(params.long('obvId')));
+			}else{
+				recommendationVoteList = observationService.getRecommendationsOfUser(userInstance, params.max, params.offset);
+			}
+			processResult(recommendationVoteList, params)
+			return
+		}
+		else {
+			response.setStatus(500)
+			def message = ['error':g.message(code: 'error', default:'Error while processing the request.')]
+			render message as JSON
+		}
+	}
 
-			   if(!params.resources) {
-				   message = g.message(code: 'no.file.attached', default:'No file is attached')
-			   }
+	@Secured(['ROLE_USER'])
+	def upload_resource = {
+		log.debug params;
 
-			   params.resources.each { f ->
-				   log.debug "Saving userGroup logo file ${f.originalFilename}"
+		try {
+			if(ServletFileUpload.isMultipartContent(request)) {
+				MultipartHttpServletRequest multiRequest = (MultipartHttpServletRequest) request;
+				def rs = [:]
+				Utils.populateHttpServletRequestParams(request, rs);
+				def resourcesInfo = [];
+				def rootDir = grailsApplication.config.speciesPortal.users.rootDir
+				File usersDir;
+				def message;
 
-				   // List of OK mime-types
-				   //TODO Move to config
-				   def okcontents = [
-					   'image/png',
-					   'image/jpeg',
-					   'image/pjpeg',
-					   'image/gif',
-					   'image/jpg'
-				   ]
+				if(!params.resources) {
+					message = g.message(code: 'no.file.attached', default:'No file is attached')
+				}
 
-				   if (! okcontents.contains(f.contentType)) {
-					   message = g.message(code: 'resource.file.invalid.extension.message', args: [
-						   okcontents,
-						   f.originalFilename
-					   ])
-				   }
-				   else if(f.size > grailsApplication.config.speciesPortal.users.logo.MAX_IMAGE_SIZE) {
-					   message = g.message(code: 'resource.file.invalid.max.message', args: [
-						   grailsApplication.config.speciesPortal.users.logo.MAX_IMAGE_SIZE/1024,
-						   f.originalFilename,
-						   f.size/1024
-					   ], default:"File size cannot exceed ${grailsApplication.config.speciesPortal.users.logo.MAX_IMAGE_SIZE/1024}KB");
-				   }
-				   else if(f.empty) {
-					   message = g.message(code: 'file.empty.message', default:'File cannot be empty');
-				   }
-				   else {
-					   if(!usersDir) {
-						   if(!params.dir) {
-							   usersDir = new File(rootDir);
-							   if(!usersDir.exists()) {
-								   usersDir.mkdir();
-							   }
-							   usersDir = new File(usersDir, UUID.randomUUID().toString()+File.separator+"resources");
-							   usersDir.mkdirs();
-						   } else {
-							   usersDir = new File(rootDir, params.dir);
-							   usersDir.mkdir();
-						   }
-					   }
+				params.resources.each { f ->
+					log.debug "Saving userGroup logo file ${f.originalFilename}"
 
-					   File file = observationService.getUniqueFile(usersDir, Utils.cleanFileName(f.originalFilename));
-					   f.transferTo( file );
-					   ImageUtils.createScaledImages(file, usersDir);
-					   resourcesInfo.add([fileName:file.name, size:f.size]);
-				   }
-			   }
-			   log.debug resourcesInfo
-			   // render some XML markup to the response
-			   if(usersDir && resourcesInfo) {
-				   render(contentType:"text/xml") {
-					   userGroup {
-						   dir(usersDir.absolutePath.replace(rootDir, ""))
-						   resources {
-							   for(r in resourcesInfo) {
-								   image('fileName':r.fileName, 'size':r.size){}
-							   }
-						   }
-					   }
-				   }
-			   } else {
-				   response.setStatus(500)
-				   message = [error:message]
-				   render message as JSON
-			   }
-		   } else {
-			   response.setStatus(500)
-			   def message = [error:g.message(code: 'no.file.attached', default:'No file is attached')]
-			   render message as JSON
-		   }
-	   } catch(e) {
-		   e.printStackTrace();
-		   response.setStatus(500)
-		   def message = [error:g.message(code: 'file.upload.fail', default:'Error while processing the request.')]
-		   render message as JSON
-	   }
-   }
-   
-   private String getUserIcon(String icon) {
-	   if(!icon) return;
+					// List of OK mime-types
+					//TODO Move to config
+					def okcontents = [
+						'image/png',
+						'image/jpeg',
+						'image/pjpeg',
+						'image/gif',
+						'image/jpg'
+					]
 
-	   def resource = null;
-	   def rootDir = grailsApplication.config.speciesPortal.users.rootDir
+					if (! okcontents.contains(f.contentType)) {
+						message = g.message(code: 'resource.file.invalid.extension.message', args: [
+							okcontents,
+							f.originalFilename
+						])
+					}
+					else if(f.size > grailsApplication.config.speciesPortal.users.logo.MAX_IMAGE_SIZE) {
+						message = g.message(code: 'resource.file.invalid.max.message', args: [
+							grailsApplication.config.speciesPortal.users.logo.MAX_IMAGE_SIZE/1024,
+							f.originalFilename,
+							f.size/1024
+						], default:"File size cannot exceed ${grailsApplication.config.speciesPortal.users.logo.MAX_IMAGE_SIZE/1024}KB");
+					}
+					else if(f.empty) {
+						message = g.message(code: 'file.empty.message', default:'File cannot be empty');
+					}
+					else {
+						if(!usersDir) {
+							if(!params.dir) {
+								usersDir = new File(rootDir);
+								if(!usersDir.exists()) {
+									usersDir.mkdir();
+								}
+								usersDir = new File(usersDir, UUID.randomUUID().toString()+File.separator+"resources");
+								usersDir.mkdirs();
+							} else {
+								usersDir = new File(rootDir, params.dir);
+								usersDir.mkdir();
+							}
+						}
 
-	   File iconFile = new File(rootDir , Utils.cleanFileName(icon));
-	   if(!iconFile.exists()) {
-		   log.error "COULD NOT locate icon file ${iconFile.getAbsolutePath()}";
-	   }
+						File file = observationService.getUniqueFile(usersDir, Utils.cleanFileName(f.originalFilename));
+						f.transferTo( file );
+						ImageUtils.createScaledImages(file, usersDir);
+						resourcesInfo.add([fileName:file.name, size:f.size]);
+					}
+				}
+				log.debug resourcesInfo
+				// render some XML markup to the response
+				if(usersDir && resourcesInfo) {
+					render(contentType:"text/xml") {
+						userGroup {
+							dir(usersDir.absolutePath.replace(rootDir, ""))
+							resources {
+								for(r in resourcesInfo) {
+									image('fileName':r.fileName, 'size':r.size){}
+								}
+							}
+						}
+					}
+				} else {
+					response.setStatus(500)
+					message = [error:message]
+					render message as JSON
+				}
+			} else {
+				response.setStatus(500)
+				def message = [error:g.message(code: 'no.file.attached', default:'No file is attached')]
+				render message as JSON
+			}
+		} catch(e) {
+			e.printStackTrace();
+			response.setStatus(500)
+			def message = [error:g.message(code: 'file.upload.fail', default:'Error while processing the request.')]
+			render message as JSON
+		}
+	}
 
-	   resource = iconFile.absolutePath.replace(rootDir, "");
-	   return resource;
-   }
-   
-   private processResult(List recommendationVoteList, Map params) {
+	@Secured(['ROLE_USER'])
+	def resetPassword = {  ResetPasswordCommand command ->
+		log.debug params;
+		String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
+		if(SUserService.ifOwns(params.long('id'))) {
+
+			if (!request.post) {
+				return [command: new ResetPasswordCommand()]
+			}
+			def user = springSecurityService.currentUser
+//			command.username = user.username?:email
+//			println command.username;
+//			String usernamePropertyName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
+			def command2 = new ResetPasswordCommand(username:user.username?:email, currentPassword:command.currentPassword, password:command.password, password2:command.password2, springSecurityService:springSecurityService
+,saltSource:saltSource);
+			command2.validate()
+//
+			if (command2.hasErrors()) {
+				return [command: command2]
+			}
+			
+			println 'no errors'
+
+			String salt = saltSource instanceof NullSaltSource ? null : registrationCode.username
+			SUser.withTransaction { status ->
+				//def user = lookupUserClass().findWhere((usernamePropertyName): command.username)
+				user.password = command2.password
+				if(!user.save()) {
+					log.error "Error saving password"
+				}
+			}
+
+			//springSecurityService.reauthenticate command.username
+
+			flash.message = message(code: 'spring.security.ui.resetPassword.success')
+			redirect (url:uGroup.createLink(action:'show', controller:"SUser", id:params.id, 'userGroupWebaddress':params.webaddress))
+
+		} else {
+			flash.message = "${message(code: 'edit.denied.message')}";
+			redirect (url:uGroup.createLink(action:'show', controller:"SUser", id:params.id, 'userGroupWebaddress':params.webaddress))
+		}
+	}
+
+	private String getUserIcon(String icon) {
+		if(!icon) return;
+
+		def resource = null;
+		def rootDir = grailsApplication.config.speciesPortal.users.rootDir
+
+		File iconFile = new File(rootDir , Utils.cleanFileName(icon));
+		if(!iconFile.exists()) {
+			log.error "COULD NOT locate icon file ${iconFile.getAbsolutePath()}";
+		}
+
+		resource = iconFile.absolutePath.replace(rootDir, "");
+		return resource;
+	}
+
+	private processResult(List recommendationVoteList, Map params) {
 		try {
 			if(recommendationVoteList.size() > 0) {
 				def result = [];
@@ -799,11 +835,11 @@ class SUserController extends UserController {
 			render message as JSON
 		}
 	}
-	
+
 	private void addInterestedSpeciesGroups(userInstance, speciesGroups) {
 		log.debug "Adding species group interests ${speciesGroups}"
 		userInstance.speciesGroups = []
-		
+
 		speciesGroups.each {key, value ->
 			userInstance.addToSpeciesGroups(SpeciesGroup.read(value.toLong()));
 		}
@@ -820,3 +856,27 @@ class SUserController extends UserController {
 
 }
 
+
+
+class ResetPasswordCommand {
+	String username
+	String currentPassword
+	String password
+	String password2
+	def springSecurityService
+	def saltSource
+
+	static constraints = {
+		username nullable: false
+		currentPassword nullable: false, blank:false, validator: { value, command ->
+			def currentUser = command.springSecurityService.currentUser;
+			String salt = command.saltSource instanceof NullSaltSource ? null : params.username
+			if (!currentUser.password.equals(command.springSecurityService.encodePassword(value, salt))) { 
+				println "doesn't match"
+				return 'spring.security.ui.resetPassword.currentPassword.doesnt.match' 
+			}
+		} 
+		password blank: false, nullable: false, validator: grails.plugins.springsecurity.ui.RegisterController.passwordValidator
+		password2 validator: RegisterController.password2Validator
+	}
+}
