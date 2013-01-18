@@ -35,8 +35,8 @@ class NewsletterController {
 	def create = {
 		log.debug params
 		boolean permitted = false;
-		if(params.webaddress) { 
-			def userGroupInstance = UserGroup.findByWebaddress(params.webaddress);
+		if(params.webaddress||params.userGroup) { 
+			def userGroupInstance = (params.userGroup)?params.userGroup:UserGroup.findByWebaddress(params.webaddress);
 			params.userGroup = userGroupInstance;
 			if(aclUtilService.hasPermission(springSecurityService.getAuthentication(), userGroupInstance, BasePermission.ADMINISTRATION)) {
 				permitted = true
