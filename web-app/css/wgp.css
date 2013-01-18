@@ -595,6 +595,8 @@ ul#recoSummary {
 .ellipsis {
 	white-space: nowrap;
 	overflow: hidden;
+	text-overflow: ellipsis;
+	display: block;
 }
 
 .ellipsis.multiline {
@@ -1225,7 +1227,7 @@ span.cke_skin_kama {
 .logo {
 	border: 0 none;
 	height: 80px;
-/* 	width: auto; */
+	max-width: 220px;
 	margin-left: 16px;
 	margin-right: 16px;
 }
@@ -1537,7 +1539,7 @@ li#userOrEmail-new {
 	border-style: solid;
 	border-width: 1px;
 	/* 	box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2); */
-	margin-bottom: 3px;
+/* 	margin-bottom: 3px; */
 	overflow: hidden;
 }
 

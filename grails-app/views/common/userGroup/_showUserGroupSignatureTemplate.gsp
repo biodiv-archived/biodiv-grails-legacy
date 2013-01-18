@@ -16,7 +16,7 @@
 
 	<a
 		href="${uGroup.createLink(mapping:'userGroup', controller:'userGroup', action:'show', base:userGroup.domainName, 'userGroup':userGroup, 'pos':pos)}">
-		<span class="ellipsis multiline" style="display: block;text-align:left"
+		<span class="ellipsis  ${showDetails ? 'multiline' : ''}" style="display: block;text-align:left;${showDetails ? 'width:auto' : 'width:120px'};"
 		title="${userGroup.name}"> ${userGroup.name} </span> </a>
 
 	<g:if test="${!showDetails}">

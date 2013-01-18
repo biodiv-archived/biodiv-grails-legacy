@@ -4,17 +4,19 @@
     window.appWGPDomain = '${grailsApplication.config.wgp.domain}'
 </g:javascript>
 
-<div class="container group-theme" style="width:100%;">
+<div class="container group-theme navbar" style="width:100%;margin-bottom:0px;">
 	<div>
 		<g:if test="${userGroupInstance  && userGroupInstance.id }">
 			<uGroup:showHeader model="[ 'userGroupInstance':userGroupInstance]" />
 		</g:if>
 		<g:else>
-			<a href="${createLink(url:grailsApplication.config.grails.serverURL+"/..") }" class="span3 logo" style="margin-left: 0px;"> <img
+			<a class="pull-left" href="${createLink(url:grailsApplication.config.grails.serverURL+"/..") }" style="margin-left: 0px;"> <img
 				class="logo" src="/sites/all/themes/ibp/images/map-logo.gif"
 				title="India Biodiversity Portal" alt="India Biodiversity Portal">
 			</a>
-			<h1>India Biodiversity Portal</h1>
+			<a href="${createLink(url:grailsApplication.config.grails.serverURL+"/..") }" class="brand">
+				<h1>India Biodiversity Portal</h1>
+			</a>
 		</g:else>
 	</div>
 </div>

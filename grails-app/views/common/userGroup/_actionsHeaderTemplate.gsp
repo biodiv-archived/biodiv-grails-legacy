@@ -1,11 +1,10 @@
-
-<div class="observation-icons pull-right">
+<div class="observation-icons pull-right" style="position: absolute;bottom: -80px;right: 0px;">
 
 	<sec:permitted className='species.groups.UserGroup'
 		id='${userGroupInstance.id}'
 		permission='${org.springframework.security.acls.domain.BasePermission.WRITE}'>
 
-		<a id="inviteMembers" class="btn btn-primary" href="#inviteMembersDialog" role="button" data-toggle="modal"><i
+		<a id="inviteMembers" class="btn btn-large btn-primary" href="#inviteMembersDialog" role="button" data-toggle="modal"><i
 			class="icon-envelope"></i> <g:message code="userGroup.members.label"
 				default="Invite Friends" /> </a>
 		<div class="modal hide fade" id="inviteMembersDialog" tabindex='-1'
@@ -29,7 +28,7 @@
 			</div>
 			<div class="modal-footer">
 				<a href="#" class="btn" data-dismiss="modal" aria-hidden="true">Close</a>
-				<a href="#" id="invite" class="btn btn-large btn-primary">Invite</a>
+				<a href="#" id="invite" class="btn btn-primary">Invite</a>
 			</div>
 		</div>
 	</sec:permitted>

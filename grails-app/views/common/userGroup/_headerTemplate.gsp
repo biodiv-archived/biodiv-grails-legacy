@@ -1,12 +1,15 @@
-<a class="span3 logo" style="margin-left: 0px;"
+<a class="pull-left" style="margin-left: 0px;"
 	href="${uGroup.createLink(mapping:'userGroup',  action:'show',
 			'userGroup':userGroupInstance)}">
 	<img class="logo" src="${userGroupInstance.mainImage()?.fileName}"
 	title="${userGroupInstance.name}" alt="${userGroupInstance.name}" /> </a>
 
-<h1>
+<a class="brand"
+	href="${uGroup.createLink(mapping:'userGroup',  action:'show',
+			'userGroup':userGroupInstance)}"><h1>
 	${userGroupInstance.name}
 </h1>
+</a>
 <!-- span class="group-desc ellipsis multiline"> ${userGroupInstance.description}
 </span-->
 <div id="actionsHeader" style="position: relative; overflow: visible;">

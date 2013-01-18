@@ -55,7 +55,7 @@
 </style>
 </head>
 <body>
-	<div class="homepage-content">
+	<div class="homepage-content" style="margin-left:20px;">
 	</div>
 	<g:javascript>
 		$(document).ready(function() {

@@ -50,10 +50,10 @@
 			<table>
 				<tbody>
 
-					<tr class="prop">
-						<td valign="top" class="value date"><g:formatDate
-								date="${newsletterInstance?.date}" /></td>
-					</tr>
+<%--					<tr class="prop">--%>
+<%--						<td valign="top" class="value date"><g:formatDate--%>
+<%--								date="${newsletterInstance?.date}" /></td>--%>
+<%--					</tr>--%>
 
 					<tr class="prop">
 						<td valign="top" class="value">

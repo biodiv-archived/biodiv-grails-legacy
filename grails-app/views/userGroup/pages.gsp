@@ -46,7 +46,7 @@
 
 				<div id="contentMenu" class="tabbable tabs-right" style="">
 					<ul class="nav nav-tabs sidebar" id="pageTabs">
-						<g:if test="${userGroupInstance}">
+						<g:if test="${userGroupInstance && userGroupInstance.name.equals('The Western Ghats')}">
 							<li><a href="/cepf_grantee_database">Western Ghats CEPF
 									Projects</a></li>
 						</g:if>
