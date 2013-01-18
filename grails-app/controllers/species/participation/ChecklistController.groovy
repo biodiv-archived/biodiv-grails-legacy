@@ -208,6 +208,16 @@ class ChecklistController {
 	}
 	*/
 	def count = {
-		render Checklist.count();
+		log.debug params
+		def userGroup
+		if(params.webaddress) {
+			userGroup = userGroupService.get(params.webaddress)
+		}
+		
+		if(userGroup){
+			render getChecklistCount(null, userGroup)
+		}else{
+			render Checklist.count();
+		}
 	}
 }

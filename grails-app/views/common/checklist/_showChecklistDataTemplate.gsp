@@ -1,4 +1,4 @@
-<div>
+<div style="overflow:auto;">
 	<table class="table table-hover tablesorter" style="margin-left: 0px;">
 		
 		<thead>
