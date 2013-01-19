@@ -3,7 +3,7 @@
     window.appIBPDomain = '${grailsApplication.config.ibp.domain}'
     window.appWGPDomain = '${grailsApplication.config.wgp.domain}'
 </g:javascript>
-${params.controller}${params.action}
+
 <div class="container group-theme navbar" style="width:100%;margin-bottom:0px;">
 	<div>
 		<g:if test="${userGroupInstance  && userGroupInstance.id }">
@@ -40,7 +40,7 @@ ${params.controller}${params.action}
 						title="Observations">Observations</a>
 					</li>
 					<li
-						class="${((params.controller == 'userGroup' && params.action == 'map') ||(params.controller == 'map'))?' active':''}"><a
+						class="${((params.controller == 'SUser' && params.action == 'header') ||(params.controller == 'map'))?' active':''}"><a
 						href="${uGroup.createLink('mapping':'userGroup', 'action':'map', 'userGroup':userGroupInstance)}" title="Maps">Maps</a></li>
 					
 					<li
