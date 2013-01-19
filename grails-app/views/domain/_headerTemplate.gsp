@@ -44,8 +44,9 @@
 						title="Observations">Observations</a>
 					</li>
 					<li
-						class="${(request.getHeader('referer')?.contains('/map') && params.action == 'header')?' active':''}"><a
-						href="${userGroupInstance.domainName}/map" title="Maps">Maps</a></li>
+						class="${((params.controller == 'userGroup' && params.action == 'map') ||(params.controller == 'map'))?' active':''}"><a
+						href="${uGroup.createLink('mapping':'userGroup', 'action':'map', 'userGroup':userGroupInstance)}" title="Maps">Maps</a></li>
+					
 					<li
 						class="${((params.controller == 'userGroup' && params.action == 'checklist') ||(params.controller == 'checklist'))?' active':''}"><a
 						href="${uGroup.createLink('mapping':'userGroup', 'action':'checklist', 'userGroup':userGroupInstance)}"

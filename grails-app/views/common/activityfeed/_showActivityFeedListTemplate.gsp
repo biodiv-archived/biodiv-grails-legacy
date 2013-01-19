@@ -9,6 +9,6 @@
 			tmpliclass = (feedInstance.subRootHolderType)?(feedInstance.subRootHolderType + feedInstance.subRootHolderId) : (ActivityFeedService.OTHER + feedInstance.id)
 		}
 	%>
-	<li class="activity_post ${tmpliclass}"><feed:showActivityFeed
+	<li class="${tmpliclass} activity_post"><feed:showActivityFeed
 			model="['feedInstance':feedInstance, 'feedType':feedType, 'feedPermission':feedPermission, feedHomeObject:feedHomeObject]" /></li>
 </g:each>
