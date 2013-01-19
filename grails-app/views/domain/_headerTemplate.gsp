@@ -3,7 +3,7 @@
     window.appIBPDomain = '${grailsApplication.config.ibp.domain}'
     window.appWGPDomain = '${grailsApplication.config.wgp.domain}'
 </g:javascript>
-
+${params.controller}${params.action}
 <div class="container group-theme navbar" style="width:100%;margin-bottom:0px;">
 	<div>
 		<g:if test="${userGroupInstance  && userGroupInstance.id }">
@@ -26,12 +26,8 @@
 		style="box-shadow: none; background-color: transparent; background-image: none;">
 		<div class="container outer-wrapper"
 			style="background-color: transparent; padding-bottom: 0px;">
-
 			<g:if test="${userGroupInstance && userGroupInstance.id}">
 
-				<ul class="nav pull-left">
-
-				</ul>
 				<ul class="nav pull-left">
 
 					<li
@@ -74,23 +70,23 @@
 						href="${uGroup.createLink(mapping:"userGroup", 'action':"about", 'userGroup':userGroupInstance)}"
 						title="About Us">About Us</a>
 					</li>
-					<li class="dropdown"><a href="#" class="dropdown-toggle"
-						data-toggle="dropdown"> More <b class="caret"></b> </a>
-						<ul class="dropdown-menu" style="text-align: left;">
-							<!-- li
-								class="${(params.controller == 'userGroup' && params.action == 'user')?' active':''}"><a
-								href="${uGroup.createLink(mapping:"userGroup", 'action':"user", 'userGroup':userGroupInstance)}"
-								title="Members">Members</a>
-							</li-->
-							
-							<li
-								class="${(request.getHeader('referer')?.contains('/calendar') && params.action == 'header')?' active':''}"><a
-								href="/calendar" title="Events">Events</a></li>
-							<li
-								class="${(request.getHeader('referer')?.contains('/biodiversity_news') && params.action == 'header')?' active':''}"><a
-								href="/biodiversity_news" title="News">News</a></li>
-							
-						</ul></li>
+<%--					<li class="dropdown"><a href="#" class="dropdown-toggle"--%>
+<%--						data-toggle="dropdown"> More <b class="caret"></b> </a>--%>
+<%--						<ul class="dropdown-menu" style="text-align: left;">--%>
+<%--							<!-- li--%>
+<%--								class="${(params.controller == 'userGroup' && params.action == 'user')?' active':''}"><a--%>
+<%--								href="${uGroup.createLink(mapping:"userGroup", 'action':"user", 'userGroup':userGroupInstance)}"--%>
+<%--								title="Members">Members</a>--%>
+<%--							</li-->--%>
+<%--							--%>
+<%--							<li--%>
+<%--								class="${(request.getHeader('referer')?.contains('/calendar') && params.action == 'header')?' active':''}"><a--%>
+<%--								href="/calendar" title="Events">Events</a></li>--%>
+<%--							<li--%>
+<%--								class="${(request.getHeader('referer')?.contains('/biodiversity_news') && params.action == 'header')?' active':''}"><a--%>
+<%--								href="/biodiversity_news" title="News">News</a></li>--%>
+<%--							--%>
+<%--						</ul></li>--%>
 				</ul>
 
 			</g:if>
