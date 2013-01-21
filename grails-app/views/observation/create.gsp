@@ -190,7 +190,7 @@ input.dms_field {
 														</ul>
 													
 												</div>
-											</div> <input id="license_${i}" type="hidden" name="license_${i}"></input>
+											</div> <input id="license_${i}" type="hidden" name="license_${i}" value="${r?.licenses?.asList().first()?.name}"></input>
 											<div class="close_button"
 												onclick="removeResource(event, ${i});$('#geotagged_images').trigger('update_map');"></div>
 
@@ -612,7 +612,7 @@ input.dms_field {
                          </g:each>
                      </ul>
            		</div>	
-	    	    <input id="license_{{=i}}" type="hidden" name="license_{{=i}}"></input>
+	    	    <input id="license_{{=i}}" type="hidden" name="license_{{=i}}" value="CC BY"></input>
           
         	    <!--a href="#" onclick="removeResource(event);$('#geotagged_images').trigger('update_map');">Remove</a-->
 		</div>

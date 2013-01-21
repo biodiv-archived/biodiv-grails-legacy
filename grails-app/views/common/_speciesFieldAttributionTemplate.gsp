@@ -4,6 +4,21 @@
 			<!--  content attribution -->
 			<div class="attributionContent" style="display:none;">
 							
+						<!-- attributions -->
+						<g:if test="${speciesFieldInstance.attributors.size() > 0}">
+							<div class="prop span11">
+								<div class="name span2">Attributions</div>
+								<div class="span8">
+									<ol>
+										<g:each in="${speciesFieldInstance.attributors}" var="r">
+											<li style="margin-left: 20px;">
+												${r.name}
+											</li>
+										</g:each>
+									</ol>
+								</div>
+							</div>
+						</g:if>
 					
 						<g:if test="${speciesFieldInstance?.contributors}">
 							<div class="prop span11">
@@ -50,22 +65,7 @@
 							</div>
 						</g:if>
 
-						<!-- attributions -->
-						<g:if test="${speciesFieldInstance.attributors.size() > 0}">
-							<div class="prop span11">
-								<div class="name span2">Attributions</div>
-								<div class="span8">
-									<ol>
-										<g:each in="${speciesFieldInstance.attributors}" var="r">
-											<li style="margin-left: 20px;">
-												${r.name}
-											</li>
-										</g:each>
-									</ol>
-								</div>
-							</div>
-						</g:if>
-						
+					
 						<!-- references -->
 						<g:if test="${speciesFieldInstance.references.size() > 0}">
 				<div class="prop span11">

@@ -74,7 +74,7 @@
 
 								<g:each in="${speciesInstance.fetchTaxonomyRegistry()}">
 									<span class="dropdown"> <a href="#"
-										class="dropdown-toggle small_profile_pic taxaHierarchy ellipsis"
+										class="dropdown-toggle small_profile_pic taxaHierarchy pull-left"
 										data-toggle="dropdown" title="${it.key.name}"></a> <%def sortedTaxon = it.value.sort {it.rank} %>
 										<span class="dropdown-menu toolbarIconContent"> <g:each
 												in="${sortedTaxon}" var="taxonDefinition">
@@ -88,7 +88,7 @@
 
 							</div>
 
-							<div class="ellipsis multiline">
+							<div class="ellipsis multiline clearfix">
 								<g:set var="summary" value="${speciesInstance.findSummary()}"></g:set>
 								<g:if test="${summary != null && summary.length() > 300}">
 									${summary[0..300] + ' ...'}

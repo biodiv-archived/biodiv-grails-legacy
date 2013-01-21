@@ -27,7 +27,7 @@
 	</div>
 	<domain:showHeader model="['userGroupInstance':userGroupInstance]" />
 	<g:if test="${flash.error}">
-		<div class="alertMsg alert alert-error" style="clear: both;">
+		<div class="alertMsg alert alert-error" style="clear: both;margin-bottom:0px">
 			${flash.error}
 		</div>
 	</g:if>
