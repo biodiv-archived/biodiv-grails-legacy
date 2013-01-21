@@ -70,13 +70,6 @@ function feedPostProcess(){
 	updateRelativeTime();
 }
 
-function feedInterMediateProcess(ellipsisComp){
-	$(ellipsisComp).find(".ellipsis.multiline").trunk8({
-		lines:2,		
-	});
-	$(ellipsisComp).find(".ellipsis:not(.multiline)").trunk8();
-}
-
 //to show relative date
 //function updateRelativeTime(currentTime){
 //	//toRelativeTime('.activityfeed .timestamp', currentTime);

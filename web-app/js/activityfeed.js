@@ -13,8 +13,6 @@ function loadOlderFeedsInAjax(targetComp){
 		success: function(data) {
 			if(data.showFeedListHtml){
 				var htmlData = $(data.showFeedListHtml);
-				//dcorateCommentBody(htmlData.find('.yj-message-body'));
-				//feedInterMediateProcess(htmlData);
 				htmlData = removeDuplicateFeed($(targetComp).children('ul'), htmlData, feedType, "older", targetComp);
 				if(feedOrder === "latestFirst"){
 					$(targetComp).children('ul').append(htmlData);
@@ -22,9 +20,8 @@ function loadOlderFeedsInAjax(targetComp){
 					$(targetComp).children('ul').prepend(htmlData);
 				}
     			$(targetComp).children('input[name="olderTimeRef"]').val(data.olderTimeRef);
-				//updateRelativeTime(data.currentTime);
 				if(data.remainingFeedCount && data.remainingFeedCount > 0){
-					$(targetComp).children('.activiyfeedoldermsg').text("Show " + data.remainingFeedCount + " older feeds >>");
+					$(targetComp).children('.activiyfeedoldermsg').text("Show " + ((feedType !== "GroupSpecific") ? data.remainingFeedCount: "") + " older feeds >>");
 				}else{
 					$(targetComp).children('.activiyfeedoldermsg').hide();
 				}
@@ -64,8 +61,6 @@ function loadNewerFeedsInAjax(targetComp, checkFeed){
         			$(targetComp).children('.activiyfeednewermsg').hide();
         		}
     			var htmlData = $(data.showFeedListHtml);
-    			//feedInterMediateProcess(htmlData);
-    			//dcorateCommentBody(htmlData.find('.yj-message-body'));
     			htmlData = removeDuplicateFeed($(targetComp).children('ul'), htmlData, feedType, "newer", targetComp);
     			if(feedOrder === "latestFirst"){
     				$(targetComp).children('ul').prepend(htmlData);
@@ -73,7 +68,6 @@ function loadNewerFeedsInAjax(targetComp, checkFeed){
 					$(targetComp).children('ul').append(htmlData);
 				}
     			$(targetComp).children('input[name="newerTimeRef"]').val(data.newerTimeRef);
-    			//updateRelativeTime(data.currentTime);
     			newFeedProcessing = false;
     			feedPostProcess();
         	}
