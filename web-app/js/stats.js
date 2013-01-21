@@ -1,5 +1,5 @@
 function getStatistics(group) {
-    var url = 'http://' + document.domain + '/ml_orchestrator.php?action=getStatistics&group=' + group;
+    var url = 'http://' + document.domain + '/ml_orchestrator.php?action=getGroupStats&group=' + group;
 
     var stats;
     $.ajax({
