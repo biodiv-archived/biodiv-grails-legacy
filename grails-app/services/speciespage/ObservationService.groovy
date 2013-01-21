@@ -76,8 +76,8 @@ class ObservationService {
 		observation.placeName = params.place_name;
 		observation.reverseGeocodedName = params.reverse_geocoded_name;
 		observation.location = 'POINT(' + params.longitude + ' ' + params.latitude + ')'
-		observation.latitude = Float.parseFloat(params.latitude);
-		observation.longitude = Float.parseFloat(params.longitude);
+		observation.latitude = params.float('latitude')
+		observation.longitude = params.float('longitude');
 		observation.locationAccuracy = params.location_accuracy;
 		observation.geoPrivacy = false;
 		observation.habitat = Habitat.get(params.habitat_id);

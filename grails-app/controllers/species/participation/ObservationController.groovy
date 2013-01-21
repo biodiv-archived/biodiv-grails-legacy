@@ -171,6 +171,7 @@ class ObservationController {
 					}
 				}
 			} catch(e) {
+			println "------"
 				e.printStackTrace();
 				if(params["isMobileApp"]?.toBoolean()){
 					render (['error:true']as JSON);
