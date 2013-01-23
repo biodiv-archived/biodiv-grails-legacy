@@ -244,6 +244,7 @@ class RegisterController extends grails.plugins.springsecurity.ui.RegisterContro
 		RegistrationCode.withTransaction { status ->
 			def user = lookupUserClass().findWhere((usernamePropertyName): registrationCode.username)
 			user.password = springSecurityUiService.encodePassword(command.password, salt)
+			user.accountLocked = false;
 			user.save()
 			registrationCode.delete()
 		}
