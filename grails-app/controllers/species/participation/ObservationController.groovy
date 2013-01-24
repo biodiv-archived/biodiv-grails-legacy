@@ -851,7 +851,7 @@ class ObservationController {
 				mailSubject = "Observation flagged"
 				body = conf.ui.observationFlagged.emailBody
 				templateMap["currentUser"] = springSecurityService.currentUser
-				replyTo = templateMap["currentUser"].email
+				//replyTo = templateMap["currentUser"].email
 				break
 
 			case OBSERVATION_DELETED :
@@ -866,7 +866,7 @@ class ObservationController {
 				body = conf.ui.addRecommendationVote.emailBody
 				templateMap["currentUser"] = springSecurityService.currentUser
 				templateMap["currentActivity"] = "recommended a species name"
-				replyTo = templateMap["currentUser"].email
+				//replyTo = templateMap["currentUser"].email
 				break
 
 			case SPECIES_AGREED_ON:
@@ -874,7 +874,7 @@ class ObservationController {
 				body = conf.ui.addRecommendationVote.emailBody
 				templateMap["currentUser"] = springSecurityService.currentUser
 				templateMap["currentActivity"] = "agreed on a species suggested"
-				replyTo = templateMap["currentUser"].email
+				//replyTo = templateMap["currentUser"].email
 				break
 
 			case SPECIES_NEW_COMMENT:
@@ -900,7 +900,7 @@ class ObservationController {
 					to obv.author.email
 					bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com", "thomas.vee@gmail.com"
 					from conf.ui.notification.emailFrom
-					replyTo replyTo
+					//replyTo replyTo
 					subject mailSubject
 					html body.toString()
 				}
@@ -909,7 +909,7 @@ class ObservationController {
 				mailService.sendMail {
 					bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com", "thomas.vee@gmail.com"
 					from conf.ui.notification.emailFrom
-					replyTo replyTo
+					//replyTo replyTo
 					subject mailSubject
 					html body.toString()
 				}
@@ -919,7 +919,7 @@ class ObservationController {
 				mailService.sendMail {
 					to obv.author.email
 					from conf.ui.notification.emailFrom
-					replyTo replyTo
+					//replyTo replyTo
 					subject mailSubject
 					html body.toString()
 				}
@@ -1094,13 +1094,15 @@ class ObservationController {
 		if(emailList.isEmpty()){
 			log.debug "No valid email specified for identification."
 		}else if (Environment.getCurrent().getName().equalsIgnoreCase("pamba") || Environment.getCurrent().getName().equalsIgnoreCase("saturn")) {
-			def mailSubject = params.mailSubject
+			def conf = SpringSecurityUtils.securityConfig
+			mailSubject = params.mailSubject
 			for(entry in emailList.entrySet()){
 				def body = observationService.getIdentificationEmailInfo(params, request, entry.getValue()).mailBody
 				mailService.sendMail {
 					to entry.getKey()
 					bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com", "thomas.vee@gmail.com"
-					from currentUserMailId
+					from conf.ui.notification.emailFrom
+					replyTo currentUserMailId
 					subject mailSubject
 					html body.toString()
 				}
