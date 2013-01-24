@@ -839,6 +839,7 @@ class ObservationController {
 
 		def mailSubject = ""
 		def body = ""
+		def replyTo = conf.ui.notification.emailReplyTo;
 
 		switch ( notificationType ) {
 			case OBSERVATION_ADDED:
@@ -850,12 +851,14 @@ class ObservationController {
 				mailSubject = "Observation flagged"
 				body = conf.ui.observationFlagged.emailBody
 				templateMap["currentUser"] = springSecurityService.currentUser
+				replyTo = templateMap["currentUser"].email
 				break
 
 			case OBSERVATION_DELETED :
 				mailSubject = conf.ui.observationDeleted.emailSubject
 				body = conf.ui.observationDeleted.emailBody
 				templateMap["currentUser"] = springSecurityService.currentUser
+				replyTo = templateMap["currentUser"].email
 				break
 
 			case SPECIES_RECOMMENDED :
@@ -863,6 +866,7 @@ class ObservationController {
 				body = conf.ui.addRecommendationVote.emailBody
 				templateMap["currentUser"] = springSecurityService.currentUser
 				templateMap["currentActivity"] = "recommended a species name"
+				replyTo = templateMap["currentUser"].email
 				break
 
 			case SPECIES_AGREED_ON:
@@ -870,6 +874,7 @@ class ObservationController {
 				body = conf.ui.addRecommendationVote.emailBody
 				templateMap["currentUser"] = springSecurityService.currentUser
 				templateMap["currentActivity"] = "agreed on a species suggested"
+				replyTo = templateMap["currentUser"].email
 				break
 
 			case SPECIES_NEW_COMMENT:
@@ -895,6 +900,7 @@ class ObservationController {
 					to obv.author.email
 					bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com", "thomas.vee@gmail.com"
 					from conf.ui.notification.emailFrom
+					replyTo replyTo
 					subject mailSubject
 					html body.toString()
 				}
@@ -903,6 +909,7 @@ class ObservationController {
 				mailService.sendMail {
 					bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com", "thomas.vee@gmail.com"
 					from conf.ui.notification.emailFrom
+					replyTo replyTo
 					subject mailSubject
 					html body.toString()
 				}
@@ -912,6 +919,7 @@ class ObservationController {
 				mailService.sendMail {
 					to obv.author.email
 					from conf.ui.notification.emailFrom
+					replyTo replyTo
 					subject mailSubject
 					html body.toString()
 				}
