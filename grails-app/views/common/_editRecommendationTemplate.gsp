@@ -123,6 +123,31 @@ $(document).ready(function() {
 	</div>
 </g:hasErrors>
 
+
+
+<div class="row control-group ">
+	<label for="recommendationVote" class="control-label"> <g:message
+			code="observation.recommendationVote.label" default="Common name" />
+	</label>
+	<div class="controls">
+		<div class="nameContainer textbox" style="position:relative;">
+			
+			<input type="text" name="commonName" id="commonName"
+				value="${species_cn_name}" placeholder='Suggest a common name'
+				class="input-xlarge ${hasErrors(bean: recommendationInstance, field: 'name', 'errors')} ${hasErrors(bean: recommendationVoteInstance, field: 'recommendation', 'errors')}" />
+			<input type="hidden" id="mappedRecoNameForcanName" />
+			
+			<div style="width:90px;">
+			<s:chooseLanguage />
+			</div>
+			<div id="commonNameSuggestions" style="display: block;"></div>
+
+		</div>
+	</div>
+</div>
+
+
+
 <div class="row control-group " style="margin-top:5px;">
 	<label for="recommendationVote" class="control-label"> <g:message
 			code="observation.recommendationVote.label" default="Scientific name" />
@@ -155,29 +180,6 @@ $(document).ready(function() {
 				class="input-xlarge ${hasErrors(bean: recommendationInstance, field: 'name', 'errors')} ${hasErrors(bean: recommendationVoteInstance, field: 'recommendation', 'errors')}" />
 			<input type="hidden" name="canName" id="canName" />
 			<div id="nameSuggestions" style="display: block;"></div>
-
-		</div>
-	</div>
-</div>
-
-
-
-<div class="row control-group ">
-	<label for="recommendationVote" class="control-label"> <g:message
-			code="observation.recommendationVote.label" default="Common name" />
-	</label>
-	<div class="controls">
-		<div class="nameContainer textbox" style="position:relative;">
-			
-			<input type="text" name="commonName" id="commonName"
-				value="${species_cn_name}" placeholder='Suggest a common name'
-				class="input-xlarge ${hasErrors(bean: recommendationInstance, field: 'name', 'errors')} ${hasErrors(bean: recommendationVoteInstance, field: 'recommendation', 'errors')}" />
-			<input type="hidden" id="mappedRecoNameForcanName" />
-			
-			<div style="width:90px;">
-			<s:chooseLanguage />
-			</div>
-			<div id="commonNameSuggestions" style="display: block;"></div>
 
 		</div>
 	</div>

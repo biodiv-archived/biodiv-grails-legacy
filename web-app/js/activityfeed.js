@@ -1,5 +1,7 @@
 var newFeedProcessing = false;
 var oldFeedProcessing = false;
+var oldFeedRetry = 0;
+var maxOldFeedRetry = 3;
 
 function loadOlderFeedsInAjax(targetComp){
 	var url = $(targetComp).children('input[name="feedUrl"]').val();
@@ -25,11 +27,20 @@ function loadOlderFeedsInAjax(targetComp){
 				}else{
 					$(targetComp).children('.activiyfeedoldermsg').hide();
 				}
+				//if no new component added and still feeds availabel at server then calling loading again
+				if((htmlData.val() === undefined) && (data.remainingFeedCount > 0) && (oldFeedRetry < maxOldFeedRetry) ){
+					oldFeedRetry++;
+					loadOlderFeedsInAjax(targetComp)
+					return
+				}
+				
 				feedPostProcess();
 			}
 			oldFeedProcessing = false;
+			oldFeedRetry = 0;
 		}, error: function(xhr, status, error) {
 			oldFeedProcessing = false;
+			oldFeedRetry = 0;
 			alert(xhr.responseText);
 	   	}
 	});
