@@ -4,7 +4,6 @@ import grails.converters.JSON
 import grails.plugins.springsecurity.Secured;
 import grails.plugins.springsecurity.ui.AbstractS2UiController;
 import grails.plugins.springsecurity.ui.RegisterController;
-import grails.plugins.springsecurity.ui.ResetPasswordCommand;
 import grails.plugins.springsecurity.ui.SpringSecurityUiService
 import grails.plugins.springsecurity.ui.UserController;
 import grails.util.GrailsNameUtils

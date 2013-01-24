@@ -117,7 +117,7 @@ input.dms_field {
 <body>
 		<div class="observation_create">
 			<div class="span12">
-				<obv:showSubmenuTemplate model="['entityName':'Add an Observation']"/>
+				<obv:showSubmenuTemplate model="['entityName':(params.action == 'edit' || params.action == 'update')?'Edit Observation':'Add Observation']"/>
 			
 
 			<%
@@ -418,7 +418,7 @@ input.dms_field {
                                     Use deg-min-sec format for lat/long
 	                        </div>
 
-	                        <div class="row control-group">
+	                        <div class="row control-group  ${hasErrors(bean: observationInstance, field: 'latitude', 'error')}">
 	                        	<label for="location_accuracy" class="control-label"><g:message
 									code="observation.latitude.label"
 									default="Latitude" /> </label>
@@ -430,9 +430,14 @@ input.dms_field {
 	                                <input class="dms_field" id="latitude_min_field" type="text" name="latitude_min" placeholder="min"></input>
 	                                <input class="dms_field" id="latitude_sec_field" type="text" name="latitude_sec" placeholder="sec"></input>
 	                                <input class="dms_field" id="latitude_direction_field" type="text" name="latitude_direction" placeholder="direction"></input>
+	                                <div class="help-inline">
+											<g:hasErrors bean="${observationInstance}" field="latitude">
+												<g:renderErrors bean="${observationInstance}" as="list" field="latitude"/>
+											</g:hasErrors>
+									</div>
 	                            </div>
 	                        </div>
-	                        <div class="row control-group">
+	                        <div class="row control-group ${hasErrors(bean: observationInstance, field: 'longitude', 'error')}">
 	                      	  <label for="location_accuracy" class="control-label"><g:message
 									code="observation.longitude.label"
 									default="Longitude" /> </label>
@@ -444,6 +449,11 @@ input.dms_field {
 	                                <input class="dms_field" id="longitude_min_field" type="text" name="longitude_min" placeholder="min"></input>
 	                                <input class="dms_field" id="longitude_sec_field" type="text" name="longitude_sec" placeholder="sec"></input>
 	                                <input class="dms_field" id="longitude_direction_field" type="text" name="longitude_direction" placeholder="direction"></input>
+	                                 <div class="help-inline">
+											<g:hasErrors bean="${observationInstance}" field="longitude">
+												<g:renderErrors bean="${observationInstance}" as="list" field="longitude"/>
+											</g:hasErrors>
+									</div>
 	                            </div>
 	                        </div>
 	                  
@@ -808,6 +818,7 @@ input.dms_field {
 		    });
 		    return userGroups;	
 		}
+		
 		$('input:radio[name=groupsWithSharingNotAllowed]').click(function() {
 		    var previousValue = $(this).attr('previousValue');
     

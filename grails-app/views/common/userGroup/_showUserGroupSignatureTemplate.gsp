@@ -1,6 +1,6 @@
 <%@page import="species.utils.ImageType"%>
 
-<div class="media thumbnail clearfix ${showDetails ? '' : 'signature'}"
+<div class="thumbnail clearfix ${showDetails ? '' : 'signature'}"
 	style="margin-left: 0px;width:${showDetails?'auto':'200px;'}">
 	<div class="snippet tablet "
 						style="display: table; width:100%;height: ${showDetails ? '100px;':'40px;'}">
@@ -14,16 +14,15 @@
 			alt="${userGroup.name}" /> </a>
 	</div>
 
-	<a
+	<a 
 		href="${uGroup.createLink(mapping:'userGroup', controller:'userGroup', action:'show', base:userGroup.domainName, 'userGroup':userGroup, 'pos':pos)}">
 		<span class="ellipsis  ${showDetails ? 'multiline' : ''}" style="display: block;text-align:left;${showDetails ? 'width:auto' : 'width:120px'};"
 		title="${userGroup.name}"> ${userGroup.name} </span> </a>
 
 	<g:if test="${!showDetails}">
 		<div class="pull-left">
-			
-				<i class="icon-user"></i>
-				${userGroup.getAllMembersCount()}
+			<i class="icon-user"></i>
+			${userGroup.getAllMembersCount()}
 		</div>
 	</g:if>
 	</div>
