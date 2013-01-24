@@ -73,16 +73,16 @@ class Observation implements Taggable{
 			if(Float.isNaN(val)) {
 				return 'typeMismatch.java.lang.Integer'
 			}
-			if( val < 8.0 || val > 37.2) {
-				return ['value.not.in.range', 'Latitude', '8.0', '37.2']
+			if( val < 6.74678 || val > 35.51769) {
+				return ['value.not.in.range', 'Latitude', '6.74678', '35.51769']
 			}
 		}
 		longitude validator : { val, obj -> 
 			if(Float.isNaN(val)) {
 				return 'typeMismatch.java.lang.Integer'
 			}
-			if( val < 68.1 || val > 97.5) {
-				return ['value.not.in.range', 'Longitude', '68.1', '97.5']
+			if( val < 68.03215 || val > 97.40238) {
+				return ['value.not.in.range', 'Longitude', '68.03215', '97.40238']
 			}
 		}
 	}
