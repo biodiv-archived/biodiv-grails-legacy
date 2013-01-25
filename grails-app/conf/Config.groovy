@@ -825,8 +825,8 @@ grails.plugins.springsecurity.facebook.domain.classname='species.auth.FacebookUs
 grails.taggable.tag.autoImport=true
 grails.taggable.tagLink.autoImport=true
 
-grails.mail.default.from="notification@thewesternghats.in"
-emailConfirmation.from="notification@thewesternghats.in"
+grails.mail.default.from="notification@indiabiodiversity.org"
+emailConfirmation.from="notification@indiabiodiversity.org"
 
 grails.plugins.springsecurity.password.algorithm = 'MD5'
 
@@ -836,10 +836,11 @@ grails.plugins.springsecurity.ui.password.validationRegex='^.*$'
 grails.plugins.springsecurity.ui.register.postRegisterUrl  = "${grails.serverURL}/group/list" // use defaultTargetUrl if not set
 grails.plugins.springsecurity.ui.register.defaultRoleNames = ['ROLE_USER']
 
-grails.plugins.springsecurity.ui.notification.emailFrom = 'notification@thewesternghats.in'
+grails.plugins.springsecurity.ui.notification.emailFrom = 'notification@indiabiodiversity.org'
+grails.plugins.springsecurity.ui.notification.emailReplyTo = "prabha.prabhakar@gmail.com";
 
 grails.plugins.springsecurity.ui.register.emailBody = '''Hi $username,<br/><br/>You (or someone pretending to be you) created an account with this email address.<br/><br/>If you made the request, please click <a href="$url">here</a> to finish the registration and activate your account.'''
-grails.plugins.springsecurity.ui.register.emailFrom = 'notification@thewesternghats.in'
+grails.plugins.springsecurity.ui.register.emailFrom = 'notification@indiabiodiversity.org'
 grails.plugins.springsecurity.ui.register.emailSubject = 'Activate your account with $domain'
 
 grails.plugins.springsecurity.ui.newuser.emailBody = '''\
@@ -855,7 +856,7 @@ Please update your <a href="$userProfileUrl">user profile</a>.<br/>
 If you do not want to receive notifications please go to your <a href="$userProfileUrl">user profile</a> and switch it off.<br/>
 <br/>
 -The portal team'''
-grails.plugins.springsecurity.ui.newuser.emailFrom = 'notification@thewesternghats.in'
+grails.plugins.springsecurity.ui.newuser.emailFrom = 'notification@indiabiodiversity.org'
 grails.plugins.springsecurity.ui.newuser.emailSubject = 'Welcome to $domain'
 
 grails.plugins.springsecurity.ui.userdeleted.emailBody = '''\
@@ -864,7 +865,7 @@ Hi Admin,<br/>
 A user with email address $email is being deleted from <b>$domain</b>.<br/>
 <br/>
 -The portal team'''
-grails.plugins.springsecurity.ui.userdeleted.emailFrom = 'notification@thewesternghats.in'
+grails.plugins.springsecurity.ui.userdeleted.emailFrom = 'notification@indiabiodiversity.org'
 grails.plugins.springsecurity.ui.userdeleted.emailSubject = 'User is being deleted on $domain'
 
 grails.plugins.springsecurity.ui.forgotPassword.emailBody = '''\
@@ -876,7 +877,7 @@ If you didn't make this request then ignore the email; no changes have been made
 <br/>
 If you did make the request, then click <a href="$url">here</a> to reset your password.
 '''
-grails.plugins.springsecurity.ui.forgotPassword.emailFrom = 'notification@thewesternghats.in'
+grails.plugins.springsecurity.ui.forgotPassword.emailFrom = 'notification@indiabiodiversity.org'
 grails.plugins.springsecurity.ui.forgotPassword.emailSubject = "Password Reset"
 
 grails.plugins.springsecurity.ui.addObservation.emailSubject = 'Observation added'

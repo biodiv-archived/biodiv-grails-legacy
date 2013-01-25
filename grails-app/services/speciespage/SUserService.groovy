@@ -132,7 +132,8 @@ class SUserService extends SpringSecurityUiService {
 
 		def mailSubject = ""
 		def body = ""
-
+		def replyTo = conf.ui.notification.emailReplyTo;
+		
 		switch ( notificationType ) {
 			case NEW_USER:
 				mailSubject = conf.ui.newuser.emailSubject
@@ -155,10 +156,12 @@ class SUserService extends SpringSecurityUiService {
 		}
 
 		if ( Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
+			
 			mailService.sendMail {
 				to user.email
 				bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com","thomas.vee@gmail.com"
 				from conf.ui.notification.emailFrom
+				//replyTo replyTo
 				subject mailSubject
 				html body.toString()
 			}

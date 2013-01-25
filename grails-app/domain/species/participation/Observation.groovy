@@ -69,7 +69,22 @@ class Observation implements Taggable{
 		maxVotedReco nullable:true
 		resource validator : { val, obj -> val && val.size() > 0 }
 		observedOn validator : {val -> val < new Date()}
-
+		latitude validator : { val, obj -> 
+			if(Float.isNaN(val)) {
+				return 'typeMismatch.java.lang.Integer'
+			}
+			if( val < 6.74678 || val > 35.51769) {
+				return ['value.not.in.range', 'Latitude', '6.74678', '35.51769']
+			}
+		}
+		longitude validator : { val, obj -> 
+			if(Float.isNaN(val)) {
+				return 'typeMismatch.java.lang.Integer'
+			}
+			if( val < 68.03215 || val > 97.40238) {
+				return ['value.not.in.range', 'Longitude', '68.03215', '97.40238']
+			}
+		}
 	}
 
 	static mapping = {
