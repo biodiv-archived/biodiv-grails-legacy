@@ -300,8 +300,8 @@ class ObservationService {
 		//if source of recommendation is other that observation (i.e Checklist)
 		refObject = refObject ?: params.refObject
 		
-		Recommendation commonNameReco = findReco(commonName, false, languageId, null);
-		Recommendation scientificNameReco = getRecoForScientificName(recoName, canName, commonNameReco);
+		Recommendation commonNameReco = recommendationService.findReco(commonName, false, languageId, null);
+		Recommendation scientificNameReco = recommendationService.getRecoForScientificName(recoName, canName, commonNameReco);
 		
 		curationService.add(scientificNameReco, commonNameReco, refObject, springSecurityService.currentUser);
 		
@@ -309,78 +309,6 @@ class ObservationService {
 		return [mainReco : (scientificNameReco ?:commonNameReco), commonNameReco:commonNameReco];
 	}
 	
-	private Recommendation getRecoForScientificName(String recoName, String canonicalName, Recommendation commonNameReco){
-		def reco, taxonConcept;
-		// 
-		
-		//first searching by canonical name. this name is present if user select from auto suggest
-		if(canonicalName && (canonicalName.trim() != "")){
-			return findReco(canonicalName, true, null, taxonConcept);
-		}
-		
-		//searching on whatever user typed in scientific name text box
-		if(recoName) {
-			return findReco(recoName, true, null, taxonConcept);
-		}
-		
-		//it may possible certain common name may point to species id in that case getting the SN for it
-		if(commonNameReco && commonNameReco.taxonConcept){
-			TaxonomyDefinition taxOnConcept = commonNameReco.taxonConcept
-			return findReco(taxOnConcept.canonicalForm, true, null, taxOnConcept)
-		}
-		
-		return null;
-	}
-	
-	public Recommendation findReco(name, isScientificName, languageId, taxonConceptForNewReco){
-		if(name){
-			// if sn then only sending to names parser for common name only cleaning
-			//XXX setting language id null for scientific name
-			if(isScientificName){
-				name = Utils.getCanonicalForm(name);
-				languageId = null
-			}else{
-				//converting common name to title case
-				name = Utils.getTitleCase(Utils.cleanName(name));
-			}
-			def reco = searchReco(name, isScientificName, languageId, taxonConceptForNewReco)
-			if(!reco) {
-				reco = new Recommendation(name:name, taxonConcept:taxonConceptForNewReco, isScientificName:isScientificName, languageId:languageId);
-				log.debug "createing new recommendation $reco"
-				if(!recommendationService.save(reco)) {
-					reco = null;
-				}
-			}
-			return reco;
-		}
-		return null;
-	}
-	
-	private Recommendation searchReco(name, isScientificName, languageId, taxonConcept){
-		def c = Recommendation.createCriteria();
-		def recoList = c.list {
-			ilike('name', name);
-			eq('isScientificName', isScientificName);
-			(languageId) ? eq('languageId', languageId) : isNull('languageId');
-			if(taxonConcept){
-				eq('taxonConcept', taxonConcept)
-			}
-		}
-		
-		if(!recoList || recoList.isEmpty()){
-			return null
-		}
-		
-		// giving priority to reco which has taxon concept 
-		recoList.each { Recommendation r ->
-			if(r.taxonConcept){
-				return r
-			}
-		}
-		
-		//no reco with taxon concept found so returning first one 
-		return recoList[0]
-	}
 	
 	/**
 	 * 

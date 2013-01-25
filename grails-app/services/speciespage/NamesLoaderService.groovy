@@ -89,8 +89,13 @@ class NamesLoaderService {
 	int updateTaxOnConceptForReco(){
 		String taxOnDefQuery = "select r.id as recoid, t.id as taxonid from recommendation as r, taxonomy_definition as t where r.name = t.canonical_form and r.taxon_concept_id is null and r.is_scientific_name = true"
 		String synonymQuery = "select r.id as recoid, t.id as taxonid from recommendation as r, taxonomy_definition as t where r.name = t.canonical_form and r.taxon_concept_id is null and r.is_scientific_name = true"
-		String commnonNameQuery = "select r.id as recoid,  t.id as taxonid from recommendation as r, taxonomy_definition as t, common_names as c where r.name = c.name and r.language_id = c.language_id and c.taxon_concept_id = t.id and r.taxon_concept_id is null and c.taxon_concept_id is not null and r.is_scientific_name = false"
-		
+		String commnonNameQuery = """
+		select r.id as recoid,  t.id as taxonid, r.language_id as rl, c.language_id as c_lang from recommendation as r, taxonomy_definition as t, common_names as c where 
+			r.name like c.name and 
+        	((r.language_id is null and c.language_id is null) or (r.language_id is not null and c.language_id is not null and r.language_id = c.language_id ) or (r.language_id = c.language_id )) and 
+			c.taxon_concept_id = t.id and c.taxon_concept_id is not null and
+			r.taxon_concept_id is null and r.is_scientific_name = false;
+		"""
 		def queryList = [taxOnDefQuery, synonymQuery, commnonNameQuery]
 		int limit = BATCH_SIZE, noOfNames = 0
 		
@@ -170,7 +175,15 @@ class NamesLoaderService {
 		int offset = 0, noOfNames = 0, limit=BATCH_SIZE;
 		def conn = new Sql(sessionFactory.currentSession.connection())
 		def tmpTableName = "tmp_common_names"
-		conn.executeUpdate("CREATE TABLE " + tmpTableName +  " as select n.name as name, n.taxon_concept_id as taxonConcept, n.language_id as language from common_names n left outer join recommendation r on n.name = r.name and n.taxon_concept_id = r.taxon_concept_id and n.language_id = r.language_id where r.name is null group by n.name, n.taxon_concept_id, n.language_id, n.id order by n.taxon_concept_id");
+		def selectQuery = """
+		select n.name as name, n.taxon_concept_id as taxonConcept, n.language_id as language from common_names n left outer join recommendation r on 
+			n.name = r.name and 
+			((n.taxon_concept_id is null and r.taxon_concept_id is null) or (n.taxon_concept_id is not null and r.taxon_concept_id is not null and n.taxon_concept_id = r.taxon_concept_id) or (n.taxon_concept_id = r.taxon_concept_id)) and
+			((r.language_id is null and n.language_id is null) or (r.language_id is not null and n.language_id is not null and r.language_id = n.language_id ) or (r.language_id = n.language_id ))
+		where r.name is null 
+		group by n.name, n.taxon_concept_id, n.language_id, n.id order by n.taxon_concept_id
+		"""
+		conn.executeUpdate("CREATE TABLE " + tmpTableName +  " as " + selectQuery );
 		
 		while(true) {
 			def commonNames = conn.rows("select name, taxonConcept, language from " + tmpTableName + " order by taxonConcept limit "+limit+" offset "+offset)

@@ -356,6 +356,7 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
          				showRecoUpdateStatus(data.msg, data.status);
          			}
          			$("#addRecommendation")[0].reset();
+         			$("#canName").val("");
 	            	return false;
 	            },
 	            error:function (xhr, ajaxOptions, thrownError){

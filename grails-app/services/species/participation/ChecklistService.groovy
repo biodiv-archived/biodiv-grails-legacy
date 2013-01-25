@@ -30,6 +30,7 @@ class ChecklistService {
 	def observationService
 	def sessionFactory
 	def curationService
+	def recommendationService
 	
 	static final String SN_NAME = "scientific_name"
 	static final String CN_NAME = "common_name"
@@ -589,7 +590,7 @@ class ChecklistService {
 			}
 		}
 		
-		def cnReco = observationService.findReco(originalCnName, false, null, null)
+		def cnReco = recommendationService.findReco(originalCnName, false, null, null)
 		curationService.add(snReco, cnReco, cl, user);
 	}
 	
