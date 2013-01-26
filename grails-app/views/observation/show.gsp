@@ -91,7 +91,7 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 						</div>
 							<a class="btn btn-info pull-right"
 				href="${uGroup.createLink(
-						controller:'observation', action:'create')}"
+						controller:'observation', action:'create', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"
 				class="btn btn-info"> <i class="icon-plus"></i>Add an
 				Observation</a>
 						<div style="float:right;margin:10px 0;">

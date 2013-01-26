@@ -9,7 +9,7 @@
 			</div>
 			<a class="btn btn-info pull-right"
 				href="${uGroup.createLink(
-						controller:'observation', action:'create')}"
+						controller:'observation', action:'create', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"
 				> <i class="icon-plus"></i>Add an
 				Observation</a>
 		</div>
