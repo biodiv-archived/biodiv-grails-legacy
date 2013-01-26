@@ -4,6 +4,7 @@ def exclusiveUsergroups =  userGroups[false]
 def otherUsergroups =  userGroups[true] 
 def obvActionMarkerClass = (params.action == 'create' || params.action == 'save')? 'create' : ''
 %>
+
 <input type="hidden" id="userGroupsList" name="userGroupsList" value="" />
 <g:if test="${exclusiveUsergroups}">
 	<div>Share with either of these groups</div>
@@ -24,7 +25,11 @@ def obvActionMarkerClass = (params.action == 'create' || params.action == 'save'
 				checked = checked || params.userGroupId.containsValue(String.valueOf(userGroup.key.id))
 			}
 		}
-	 %> <label class="radio">
+		
+		if( params.webaddress) {
+			checked = checked || params.webaddress == userGroup.key.webaddress
+		}
+	 %>  <label class="radio">
 						<button type="button"
 							class="btn input-prepend ${checked?'active btn-success ' + obvActionMarkerClass :''} single-post"
 							value="${userGroup.key.id}"
@@ -63,6 +68,10 @@ def obvActionMarkerClass = (params.action == 'create' || params.action == 'save'
 			} else {
 				checked = checked || params.userGroupId.containsValue(String.valueOf(userGroup.key.id))
 			}
+		}
+		
+		if( params.webaddress) {
+			checked = checked || params.webaddress == userGroup.key.webaddress
 		}
 	 %> <label class="checkbox">
 					<button type="button"

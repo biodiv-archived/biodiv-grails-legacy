@@ -94,7 +94,7 @@ var showOccurence = function(speciesName) {
 	var mapOptions = {
 		popup_enabled : true,
 		toolbar_enabled : true,
-		bbox : "7461654.5592605,881162.00757659,9259453.4642059,2246021.5843922"
+		bbox : "5801108.428222222,674216.547942332, 12138100.077777777, 4439106.786632658"
 	};
 	var layersOptions = [ {
 		title : 'Occurrence',
