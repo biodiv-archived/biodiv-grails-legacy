@@ -60,6 +60,12 @@ class Recommendation {
 	   }
 	   map.put("authors", recos.collect{it.author})
 	   map.put("votedOn", recos.collect{it.votedOn})
+	   map.put("noOfVotes", recos.size())
+	   
+	   def allRecos = RecommendationVote.withCriteria {
+		   eq('observation', obv)
+	   }
+	   map.put("totalVotes", allRecos.size())
 	   
 	   def recoComments = []
 	   recos.each {

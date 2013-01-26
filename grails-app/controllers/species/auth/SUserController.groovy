@@ -797,13 +797,14 @@ class SUserController extends UserController {
 				def result = [];
 				recommendationVoteList.each { recoVote ->
 					def map = recoVote.recommendation.getRecommendationDetails(recoVote.observation);
-					map.put("noOfVotes", 1);
+					//map.put("noOfVotes", map.);
 					def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 					def image = recoVote.observation.mainImage()
 					def imagePath = image.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, config.speciesPortal.resources.images.thumbnail.suffix)
 					def imageLink = config.speciesPortal.observations.serverURL +  imagePath
 					map.put('observationImage', imageLink);
 					map.put("obvId", recoVote.observation.id);
+					map.put('observationInstance', recoVote.observation);
 					map.put("maxVotedSpeciesName", recoVote.observation.maxVotedReco?.id == recoVote.recommendation.id)
 					result.add(map);
 				}

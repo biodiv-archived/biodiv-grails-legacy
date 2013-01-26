@@ -30,7 +30,7 @@
 				</g:if>
 
 				<span class="voteCount"><span id="votes_${r.recoId}">
-						${r.noOfVotes} </span> of ${totalVotes} <g:if test="${totalVotes <= 1}"> user thinks</g:if>
+						${r.noOfVotes} </span> of ${r.totalVotes?:totalVotes} <g:if test="${r.totalVotes?:totalVotes <= 1}"> user thinks</g:if>
 					<g:else> users think</g:else> it is:</span><span class="highlight">
 					<g:if test="${r.canonicalForm}">
 						<a href="${uGroup.createLink(action:'show', controller:'species', id:r.speciesId, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
@@ -43,7 +43,7 @@
 					<g:else>
 						${r.name}
 					</g:else>${r.commonNames}</span>
-				<comment:showCommentPopup model="['commentHolder':Recommendation.read(r.recoId), 'rootHolder':observationInstance]" />
+				<comment:showCommentPopup model="['commentHolder':Recommendation.read(r.recoId), 'rootHolder':r.observationInstance?:observationInstance]" />
 <%--				<obv:showRecoComment--%>
 <%--					model="['recoComments':r.recoComments, 'recoId': r.recoId]" />--%>
 
