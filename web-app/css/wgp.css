@@ -964,6 +964,10 @@ li.reco_block {
 	min-height: 30px;
 }
 
+.reco_block.max_voted_species_name {
+	background-color:#FCF8E3
+}
+
 .reco {
 	background-color: #ffffff;
 	padding: 3px;

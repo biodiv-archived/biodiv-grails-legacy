@@ -155,7 +155,7 @@
 					model="['controller':'observation', 'action':'getRelatedObservation', 'filterProperty': 'user', 'filterPropertyValue':user.id, 'id':'a', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress]" />
 			</div>
 
-			<!-- div class="section" style="clear: both;">
+			<div class="section" style="clear: both;">
 				<h5>
 					<span class="name" style="color: #b1b1b1;"> <i
 						class="icon-check"></i>
@@ -172,7 +172,7 @@
 				</div>
 
 
-			</div-->
+			</div>
 
 			<div class="section" style="clear: both;">
 				<h5>
@@ -206,7 +206,7 @@
          	userRecoffset = max + userRecoffset;
 		 });
          
-         //preLoadRecos(max, true);
+         preLoadRecos(max, true);
          userRecoffset = max + userRecoffset;
          $('.linktext').linkify();
 	});

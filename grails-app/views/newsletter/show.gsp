@@ -47,23 +47,8 @@
 		</div>
 		
 		<div class="description bodymarker" >
-			<table>
-				<tbody>
-
-<%--					<tr class="prop">--%>
-<%--						<td valign="top" class="value date"><g:formatDate--%>
-<%--								date="${newsletterInstance?.date}" /></td>--%>
-<%--					</tr>--%>
-
-					<tr class="prop">
-						<td valign="top" class="value">
-							${newsletterInstance?.newsitem}
-						</td>
-					</tr>
-
-
-				</tbody>
-			</table>
+			
+			${newsletterInstance?.newsitem}
 			<g:if test="${newsletterInstance?.userGroup}">
 				<sec:permitted className='species.groups.UserGroup'
 							id='${newsletterInstance.userGroup.id}'

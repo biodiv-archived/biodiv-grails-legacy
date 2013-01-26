@@ -4,12 +4,14 @@
 
 <g:if test="${result.size() > 0 }">
 	<g:each in="${result}" var="r">
-		<li class="reco_block">
-			<div>
+		<li class="reco_block ${r.maxVotedSpeciesName?'max_voted_species_name':''}">
+			<div class="">
 				<div class="users">
+					<g:if test="${!hideAgree}">
 					<div class="iAgree ">
 						<button class="btn btn-primary btn-small" onclick="addAgreeRecoVote(${r.obvId}, ${r.recoId}, ${r.noOfVotes}, $(this).closest('li'), '${uGroup.createLink(controller:'observation', action:'addAgreeRecommendationVote')}'); return true;">Agree</button>
 					</div>
+					</g:if>
 					<g:each in="${r.authors}" var="author">
 						<a href="${uGroup.createLink(controller:"SUser", action:"show", id:author?.id)}" title="${author?.name }">
 							<img class="small_profile_pic"
@@ -28,7 +30,7 @@
 				</g:if>
 
 				<span class="voteCount"><span id="votes_${r.recoId}">
-						${r.noOfVotes} </span> <g:if test="${r.noOfVotes <= 1}"> user thinks</g:if>
+						${r.noOfVotes} </span> of ${totalVotes} <g:if test="${totalVotes <= 1}"> user thinks</g:if>
 					<g:else> users think</g:else> it is:</span><span class="highlight">
 					<g:if test="${r.canonicalForm}">
 						<a href="${uGroup.createLink(action:'show', controller:'species', id:r.speciesId, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">

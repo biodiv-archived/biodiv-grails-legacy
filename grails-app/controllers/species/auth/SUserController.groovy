@@ -804,10 +804,11 @@ class SUserController extends UserController {
 					def imageLink = config.speciesPortal.observations.serverURL +  imagePath
 					map.put('observationImage', imageLink);
 					map.put("obvId", recoVote.observation.id);
+					map.put("maxVotedSpeciesName", recoVote.observation.maxVotedReco?.id == recoVote.recommendation.id)
 					result.add(map);
 				}
 				//def noOfVotes = observationService.getAllRecommendationsOfUser(userInstance);
-				def model = ['result':result, 'totalVotes':result.size(), 'uniqueVotes':result.size(), 'userGroupWebaddress':params.webaddress];
+				def model = ['hideAgree':true, 'result':result, 'totalVotes':result.size(), 'uniqueVotes':result.size(), 'userGroupWebaddress':params.webaddress];
 				def html = g.render(template:"/common/observation/showObservationRecosTemplate", model:model);
 				def r = [
 							success : 'true',
