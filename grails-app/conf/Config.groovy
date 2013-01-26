@@ -421,8 +421,8 @@ environments {
 			names.parser.serverURL = "127.0.0.1"
 			wgp {
 				facebook {
-					appId= "327308053982589"
-					secret= "f36074901fc24b904794692755796fd1"
+					appId= "424071494335902"
+					secret= "bb87b98979ae30936342364178c7b170"
 				}
 				supportEmail = "team(at)thewesternghats(dot)in"
 			}
@@ -688,8 +688,10 @@ environments {
 			}
 			wgp {
 				facebook {
-					appId= "327308053982589"
-					secret= "f36074901fc24b904794692755796fd1"
+//					appId= "327308053982589"
+//					secret= "f36074901fc24b904794692755796fd1"
+					appId= "320284831369968"
+					secret= "900d0811194fe28503006b31792690ae"
 				}
 				supportEmail = "team(at)thewesternghats(dot)in"
 			}

@@ -89,14 +89,15 @@ class FacebookAuthCookieFilter extends GenericFilterBean implements ApplicationE
 						return
 					}
 				} catch(UsernameNotFoundException e) {
+					logger.info("UsernameNotFoundException: $e.message")
 					def referer = request.getHeader("referer");
 					if(url == '/login/authSuccess') {
 						if(SpringSecurityUtils.isAjax(request)) {
-							logger.error "Unsuccessful authentication.";
+							logger.error "Unsuccessful ajax authentication:  $e.getMessage()";
 							unsuccessfulAuthentication(request, response, e);
 							return;
 						} else {
-							logger.error e.getMessage();
+							logger.error "Unsuccessful authentication:  $e.getMessage()";
 							request.getSession().setAttribute("LAST_FACEBOOK_USER", e.extraInformation);
 							logger.debug "Redirecting to $createAccountUrl"
 							(new DefaultRedirectStrategy()).sendRedirect(request, response, createAccountUrl);
@@ -106,6 +107,7 @@ class FacebookAuthCookieFilter extends GenericFilterBean implements ApplicationE
 				} catch (BadCredentialsException e) {
 					logger.info("Invalid cookie, skip. Message was: $e.message")
 				} catch(AuthenticationException e) {
+					logger.info("Auth exception. Message was: $e.message")
 					unsuccessfulAuthentication(request, response, e);
 					return;
 				}
