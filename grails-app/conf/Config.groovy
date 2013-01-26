@@ -988,6 +988,34 @@ $user has invited you to be founder of the group <a href="$groupUrl">$group</a> 
 If you do not want to receive notifications please go to your <a href="$userProfileUrl">user profile</a> and switch it off.<br/>
 <br/>
 -The portal team'''
+grails.plugins.springsecurity.ui.bBird.emailSubject = 'Welcome to the India Biodiversity Portal'
+grails.plugins.springsecurity.ui.bBird.emailBody = '''\
+Hi $username,<br/>
+<br/>
+An account has been created for you on <b>$domain</b> as part of the <a href="$bBirdUrl">Mumbai BirdRace 2013</a>. You are now a member of the group on the portal.
+<br/>
+Please use the following details to login<br/>
+email : $email <br/>
+password : $password
+<br/>
+Please change your password from the <a href="$changePasswordUrl">reset password</a> page.
+<br/>
+<br/>
+We look forward to your contribution on the portal. You can add images of Birds observed during the BirdRace on the  <a href="$obvModuleUrl">Observation module</a>.<br/> 
+The portal is a public participatory portal that thrives by participation from users like you.<br/><br/>
+We will appreciate any feedback you may have to offer.<br/><br/>
+-The portal team'''
+
+grails.plugins.springsecurity.ui.bBirdExistingUser.emailBody = '''\
+Hi $username,<br/>
+<br/>
+You have been added as a member of the <a href="$bBirdUrl">Mumbai BirdRace 2013</a> group on the India Biodiversity Portal. Please use your existing credentials to login. <br/>
+<br/>
+We look forward to your contribution on the portal. You can add images of Birds observed during the BirdRace on the  <a href="$obvModuleUrl">Observation module</a>.<br/> 
+The portal is a public participatory portal that thrives by participation from users like you.<br/><br/>
+We will appreciate any feedback you may have to offer.<br/><br/>
+-The portal team
+'''
 
 grails.plugins.springsecurity.ui.encodePassword = false
 

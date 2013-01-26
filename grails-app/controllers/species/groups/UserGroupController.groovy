@@ -20,6 +20,7 @@ import species.utils.ImageUtils;
 import species.utils.Utils;
 import grails.converters.JSON;
 import grails.plugins.springsecurity.Secured;
+import groovy.text.SimpleTemplateEngine
 
 class UserGroupController {
 
@@ -32,6 +33,7 @@ class UserGroupController {
 	def emailConfirmationService;
 	def namesIndexerService;
 	def activityFeedService;
+	
 	static allowedMethods = [save: "POST", update: "POST"]
 
 	def index = {
@@ -557,12 +559,20 @@ class UserGroupController {
 		render (['success':true,'statusComplete':false, 'shortMsg':'Please login', 'msg':'Please login to request membership.'] as JSON);
 
 	}
-
-	private String generateLink( String controller, String action, linkParams, request) {
-		uGroup.createLink(base: Utils.getDomainServerUrl(request),
-				controller:controller, action: action,
-				params: linkParams)
+	
+	private String generateLink( String controller, String action, linkAttrs, linkParams, request) {
+		linkAttrs.controller = controller
+		linkAttrs.action = action
+		linkAttrs.absolute = true
+		linkAttrs.params = linkParams
+		uGroup.createLink(linkAttrs)
 	}
+	
+//	private String generateLink( String controller, String action, linkParams, request) {
+//		uGroup.createLink(base: Utils.getDomainServerUrl(request),
+//				controller:controller, action: action,
+//				params: linkParams)
+//	}
 
 	@Secured(['ROLE_USER', 'RUN_AS_ADMIN'])
 	def confirmMembershipRequest = {
@@ -931,6 +941,148 @@ class UserGroupController {
 	   log.debug params;
 	   render Tag.findAllByNameIlike("${params.term}%")*.name as JSON
    }
+   
+   
+   /////////////////////////////////////////////////////////////////////////////////////////////
+   ////////////////////To create and add user to a specific group (i.e BirdRace)////////////////
+   /////////////////////////////////////////////////////////////////////////////////////////////
+   
+   @Secured(['ROLE_USER'])
+   def addUserToGroup = {
+	   UserGroup ug = UserGroup.read(params.groupId.toLong())
+	   def res = createFromFile("/tmp/users.tsv")
+	   def oldUsers = res[0]
+	   def newUsers = res[1]
+	   
+	   SUser.withTransaction(){
+		   newUsers.each{ user ->
+			   ug.addMember(user);
+			   sendNotificationMail(user, request, params, true, ug)
+		   }
+		   oldUsers.each{ user ->
+			   ug.addMember(user);
+			   sendNotificationMail(user, request, params, false, ug)
+		   } 
+	   }
+	   render "== done"
+   }
+   
+   private void sendNotificationMail(SUser user, request, params, boolean isNewUser, userGroupInstance){
+	   def conf = SpringSecurityUtils.securityConfig
+	   
+//	   def userGroupInstance;
+//	   if(params.groupId || params.webaddress) {
+//		   userGroupInstance = findInstance(params.groupId, params.webaddress);
+//	   }
+//	   
+	   def userProfileUrl = generateLink("user", "show", [userGroup:userGroupInstance], ["id": user.id], request)
+	   def changePasswordUrl = generateLink("user", "resetPassword", [userGroup:userGroupInstance], ["id": user.id], request)
+	   def obvModuleUrl = generateLink("observation", "list", [userGroup:userGroupInstance], [], request);
+	   def bBirdUrl;
+	   
+	   if(userGroupInstance)
+			bBirdUrl = generateLink("group", "show", [mapping:'userGroup', userGroup:userGroupInstance], [], request)
+		else
+			bBirdUrl = generateLink("group", "show", [base: Utils.getDomainServerUrl(request)], [], request)
+	   def templateMap = [username: user.name.capitalize(), bBirdUrl:bBirdUrl, obvModuleUrl:obvModuleUrl, changePasswordUrl:changePasswordUrl, email:user.email, password:user.email.split("@")[0].trim(), userProfileUrl:userProfileUrl, domain:Utils.getDomainName(request)]
+	   
+	   def mailSubject = conf.ui.bBird.emailSubject
+	   def body
+	   
+	   if(isNewUser)
+	   		body = conf.ui.bBird.emailBody
+	   else
+	   		body = conf.ui.bBirdExistingUser.emailBody 
+	   
+	   if (body.contains('$')) {
+		   body = evaluate(body, templateMap)
+	   }
+	   
+	   if (mailSubject.contains('$')) {
+		   mailSubject = evaluate(mailSubject, [domain: Utils.getDomainName(request)])
+	   }
+
+	   //if ( Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
+		   mailService.sendMail {
+			   to user.email
+			   bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com","thomas.vee@gmail.com"
+			   from conf.ui.notification.emailFrom
+			   subject mailSubject
+			   html body.toString()
+		   }
+	   //}
+		//   log.debug "Sent mail for notificationType ${notificationType} to ${user.email}"
+   }
+   
+   private String evaluate(s, binding) {
+	   new SimpleTemplateEngine().createTemplate(s).make(binding)
+   }
+   
+   private createFromFile(String fileName){
+	   Set emailList = new HashSet()
+	   new File(fileName).splitEachLine("\\t") {
+		   def fields = it;
+		   def email = fields[0].trim()
+		   emailList.add(email)
+	   }
+	   return createUserByEmail(emailList)
+	}
+   
+   private createUserByEmail(emailList){
+	   Set oldUsers = new HashSet()
+	   Set newUsers = new HashSet() 
+	   def defaultRoleNames = ['ROLE_USER']
+	   emailList.each { email ->
+		   def user = SUser.findByEmail(email)
+		   if(user){
+			   oldUsers.add(user)
+		   }else{
+		   	   //creating new user	
+			   def username = email.split("@")[0].trim()
+			   user = new SUser (
+					   username : username,
+					   name : username,
+					   password : username,
+					   enabled : true,
+					   accountExpired : false,
+					   accountLocked : false,
+					   passwordExpired : false,
+					   email : email
+					   );
+				   
+		   
+			   SUser.withTransaction {
+				   if(!user.save(flush: true) ){
+					   user.errors.each { println it; }
+				   }else {
+				   	   def securityConf = SpringSecurityUtils.securityConfig
+					   Class<?> PersonRole = grailsApplication.getDomainClass(securityConf.userLookup.authorityJoinClassName).clazz
+					   Class<?> Authority = grailsApplication.getDomainClass(securityConf.authority.className).clazz
+					   PersonRole.withTransaction { status ->
+						   defaultRoleNames.each { String roleName ->
+							   String findByField = securityConf.authority.nameField[0].toUpperCase() + securityConf.authority.nameField.substring(1)
+							   def auth = Authority."findBy${findByField}"(roleName)
+							   if (auth) {
+								   PersonRole.create(user, auth)
+							   } else {
+								   println "Can't find authority for name '$roleName'"
+							   }
+						   }
+					   }
+					   newUsers.add(user)
+				   }
+			   }
+		   }
+	   }
+	   return [oldUsers, newUsers]
+   }
+   
+   
+   def test = {
+	   render generateLink("observation", "list", [userGroup:UserGroup.read(2)], [], request);
+   } 
+   
+	   
 }
 
 class UserGroupCommand {
