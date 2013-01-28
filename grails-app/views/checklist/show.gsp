@@ -79,7 +79,7 @@
 							<table>
 								<tr>
 									<td class="prop"><span class="grid_3 name">Attribution</span></td> 
-									<td>${checklistInstance.attribution}</td>
+									<td class="linktext">${checklistInstance.attribution}</td>
 								</tr>
 								<tr>
 									<td class="prop"><span class="grid_3 name">License</span></td> 
