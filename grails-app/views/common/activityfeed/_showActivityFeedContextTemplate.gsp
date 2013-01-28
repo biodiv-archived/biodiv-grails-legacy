@@ -23,7 +23,7 @@
 		</g:else>
 	</div>
 	<%
-		def isCommentThread = (feedInstance.subRootHolderType == Comment.class.getCanonicalName() && feedInstance.rootHolderType != Observation.class.getCanonicalName()) 
+		def isCommentThread = (feedInstance.subRootHolderType == Comment.class.getCanonicalName() && feedInstance.rootHolderType == UserGroup.class.getCanonicalName()) 
 	%>
 	<g:if test="${isCommentThread}">
 		<div class="feedSubParentContext ${feedInstance.fetchMainCommentFeed().subRootHolderType + feedInstance.fetchMainCommentFeed().subRootHolderId}">

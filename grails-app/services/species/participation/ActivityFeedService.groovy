@@ -111,17 +111,17 @@ class ActivityFeedService {
 		}
 		
 		// aggregating object based on feed type
-		Set obvFeedSet = new HashSet()
+		Set genericFeedSet = new HashSet()
 		Set commentFeedSet = new HashSet()
 		Set otherFeedSet = new HashSet()
 		def retList = []
 		feeds.each { it ->
-			if(it.rootHolderType == Observation.class.getCanonicalName()){
+			if(it.rootHolderType == Observation.class.getCanonicalName() || it.rootHolderType == Checklist.class.getCanonicalName()){
 				//aggregating observation object
 				def feedKey = it.rootHolderType + it.rootHolderId;
-				if(!obvFeedSet.contains(feedKey)){
+				if(!genericFeedSet.contains(feedKey)){
 					retList.add(it)
-					obvFeedSet.add(feedKey)
+					genericFeedSet.add(feedKey)
 				}
 			}else if(it.rootHolderType == UserGroup.class.getCanonicalName() && it.subRootHolderType == Comment.class.getCanonicalName()){
 				//aggregating comment
