@@ -1,6 +1,6 @@
 <form class="form-horizontal"
-	action="${createLink(mapping:'userGroup', action:'settings', params:['webaddress':userGroupInstance.webaddress])}"
-	name='groupSettingForm' method="POST">
+	action="${uGroup.createLink(mapping:'userGroup', action:'settings', params:['webaddress':userGroupInstance.webaddress])}"
+	id='groupSettingForm' name='groupSettingForm' method="POST">
 	<g:hiddenField name="id" value="${userGroupInstance.id}" />
 
 	<div class="prop">
@@ -18,20 +18,20 @@
 					</button>
 					<ul class="dropdown-menu" style="width: auto;">
 						<li class="group_option"><a class=" home_page_label"
-							value="${createLink(mapping:'userGroup', action:'about', params:['webaddress':userGroupInstance.webaddress])}">
-								${createLink(mapping:'userGroup', action:'about', params:['webaddress':userGroupInstance.webaddress])}
+							value="${uGroup.createLink(mapping:'userGroup', action:'about', params:['webaddress':userGroupInstance.webaddress])}">
+								${uGroup.createLink(mapping:'userGroup', action:'about', params:['webaddress':userGroupInstance.webaddress])}
 						</a>
 						</li>
 						<li class="group_option"><a class=" home_page_label"
-							value="${createLink(mapping:'userGroup', action:'activity', params:['webaddress':userGroupInstance.webaddress])}">
-								${createLink(mapping:'userGroup', action:'activity', params:['webaddress':userGroupInstance.webaddress])}
+							value="${uGroup.createLink(mapping:'userGroup', action:'activity', params:['webaddress':userGroupInstance.webaddress])}">
+								${uGroup.createLink(mapping:'userGroup', action:'activity', params:['webaddress':userGroupInstance.webaddress])}
 						</a>
 						</li>
 						<li class="divider"></li>
 						<g:each var="newsletterInstance"
 							in="${userGroupInstance.getPages()}">
 							<li class="group_option"><a class=" home_page_label"
-								value="${createLink(controller:'newsletter', action:'show', id:newsletterInstance.id)}">
+								value="${uGroup.createLink(controller:'newsletter', action:'show', id:newsletterInstance.id)}">
 									${newsletterInstance.title + " "}
 							</a>
 							</li>
@@ -73,3 +73,24 @@
 			style="clear: both; float:right; border-radius: 5px" />
 	</div>
 </form>
+<r:script>
+$(document).ready(function(){
+
+	function getSelectedVal(labelClass) {
+		var retVal = ''; 
+    	$('.' + labelClass).each (function() {
+    		if($(this).hasClass('active')) {
+    			retVal += $(this).attr('value') + ',';
+            }
+    	});
+    	retVal = retVal.replace(/\s*\,\s*$/,'');
+    	return retVal;
+    } 
+
+	$('#groupSettingForm').bind('submit', function(event) {
+		$('#homePage').val(getSelectedVal('home_page_label'));
+		$('#theme').val(getSelectedVal('theme_label')); 
+	});
+});
+</r:script>
+
