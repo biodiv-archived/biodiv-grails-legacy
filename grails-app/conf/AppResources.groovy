@@ -145,7 +145,7 @@ modules = {
 	}
 
 	species_show {
-		dependsOn 'species, gallery'
+		dependsOn 'species, gallery, comment, activityfeed'
 
 		resource url:'/css/augmented-maps.css'
 		resource url:[dir:'js/jquery/jquery.jqGrid-4.1.2/css',file:'ui.jqgrid.css']
@@ -180,12 +180,12 @@ modules = {
 	}
 
 	userGroups_create {
-		dependsOn 'observations'		
+		dependsOn 'observations'	
+		resource url:'/js/species/userGroups/main.js'
 	}
 
 	userGroups_list {
 		dependsOn 'observations, location_utils, list_utils'
-		
 		
 		resource url:'/js/species/observations/list.js'
 		resource url:'/js/species/userGroups/main.js'		

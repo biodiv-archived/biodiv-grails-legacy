@@ -376,7 +376,8 @@ $(document).ready(function(){
 				<div class="sidebar_section">
 					<a class="speciesFieldHeader"  data-toggle="collapse" href="#taxonRecordName">
 						<h5>Taxon Record Name</h5>
-					</a> 
+					</a>
+					
 					<div id="taxonRecordName" class="speciesField collapse in">
 						<table>
 						<tr class="prop">
@@ -490,11 +491,20 @@ $(document).ready(function(){
 						</g:else>
 					</g:each>
 				</ul>
+				<div class="union-comment" style="clear: both;">
+				<feed:showAllActivityFeeds model="['rootHolder':speciesInstance, feedType:'Specific', refreshType:'manual', 'feedPermission':'editable']" />
+				<%
+					def canPostComment = true //customsecurity.hasPermissionAsPerGroups([object:speciesInstance, permission:org.springframework.security.acls.domain.BasePermission.WRITE]).toBoolean()
+				%>
+				<comment:showAllComments model="['commentHolder':speciesInstance, commentType:'super', 'canPostComment':canPostComment, 'showCommentList':false]" />
+			</div>
 			</div>
 			
 			<g:if test="${!sparse}">
 				<div id="speciesFieldContainer" class="grid_12"></div>
 			</g:if>
+
+			
 
 	</div>
 		

@@ -1,6 +1,8 @@
 <%@page import="species.participation.Recommendation"%>
 <%@page import="species.participation.Observation"%>
 <%@page import="species.participation.ChecklistRowData"%>
+<%@page import="species.SpeciesField"%>
+
 <div class="yj-context ellipsis">Comment on  
 	<g:if test="${commentInstance.commentHolderType ==  Recommendation.class.getName()}" >
 	<%
@@ -22,6 +24,9 @@
 	</g:elseif>
 	<g:elseif test="${commentInstance.commentHolderType == ChecklistRowData.class.getName()}" >
 		checklist data
+	</g:elseif>
+	<g:elseif test="${commentInstance.commentHolderType == SpeciesField.class.getName()}" >
+		species field
 	</g:elseif>
 	<g:else>
 		media

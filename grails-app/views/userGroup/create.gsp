@@ -227,6 +227,9 @@ max-width: 100%;
 								</div>
 							</div>
 						</div>
+						
+						<uGroup:showGeneralSettings model="['userGroupInstance':userGroupInstance]" />
+					
 					</div>
 				</div>
 
@@ -495,8 +498,8 @@ $(document).ready(function() {
 	    });
 	    return hbt;	
 	}
-	 
-	 $("#createGroupSubmit").click(function(){
+	
+	$("#createGroupSubmit").click(function(){
 		$('#founderUserIds').val(founders_autofillUsersComp[0].getEmailAndIdsList().join(","));
 		//$('#memberUserIds').val(members_autofillUsersComp[0].getEmailAndIdsList().join(","));
 		/*var tags = $("#tags").tagit("tags");
@@ -517,6 +520,9 @@ $(document).ready(function() {
        		var input = $("<input>").attr("type", "hidden").attr("name", "habitat."+index).val(this);
 			$('#${form_id}').append($(input));	
        	})
+       	
+       	$('#homePage').val(getSelectedVal('home_page_label'));
+		$('#theme').val(getSelectedVal('theme_label')); 
        	
         $("#${form_id}").submit();
         return false;
@@ -548,6 +554,7 @@ $(document).ready(function() {
 		}
 	%>
  	
+        $('.dropdown-toggle').dropdown()
 });
 </r:script>
 

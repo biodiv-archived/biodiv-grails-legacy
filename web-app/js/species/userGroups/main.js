@@ -39,3 +39,16 @@ $('.theme_label').click(function(){
     return true;   
 });
 
+
+function getSelectedVal(labelClass) {
+	var retVal = ''; 
+	$('.' + labelClass).each (function() {
+		if($(this).hasClass('active')) {
+			retVal += $(this).attr('value') + ',';
+        }
+	});
+	retVal = retVal.replace(/\s*\,\s*$/,'');
+	return retVal;
+} 
+
+

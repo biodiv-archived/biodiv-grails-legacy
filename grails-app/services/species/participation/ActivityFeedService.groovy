@@ -3,6 +3,7 @@ package species.participation
 import java.text.SimpleDateFormat
 
 import species.groups.UserGroup;
+import species.Species;
 
 class ActivityFeedService {
 	
@@ -116,7 +117,7 @@ class ActivityFeedService {
 		Set otherFeedSet = new HashSet()
 		def retList = []
 		feeds.each { it ->
-			if(it.rootHolderType == Observation.class.getCanonicalName() || it.rootHolderType == Checklist.class.getCanonicalName()){
+			if(it.rootHolderType == Observation.class.getCanonicalName() || it.rootHolderType == Checklist.class.getCanonicalName() || it.rootHolderType == Species.class.getCanonicalName()){
 				//aggregating observation object
 				def feedKey = it.rootHolderType + it.rootHolderId;
 				if(!genericFeedSet.contains(feedKey)){

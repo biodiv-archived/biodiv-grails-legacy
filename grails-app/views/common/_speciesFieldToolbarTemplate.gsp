@@ -41,5 +41,6 @@
 			model="['speciesFieldInstance':speciesFieldInstance]" />
 		<g:showSpeciesFieldHelp
 			model="['speciesFieldInstance':speciesFieldInstance]" />
+		<comment:showCommentPopup model="['commentHolder':speciesFieldInstance, 'rootHolder':speciesInstance]" />
 	</div>
 </g:if>

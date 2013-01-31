@@ -92,7 +92,9 @@ class UserGroupService {
 		userGroup.icon = getUserGroupIcon(params.icon);
 		addInterestedSpeciesGroups(userGroup, params.speciesGroup)
 		addInterestedHabitats(userGroup, params.habitat)
-
+		updateHomePage(userGroup, params)
+		
+		
 		if(params.sw_latitude)
 			userGroup.sw_latitude = Float.parseFloat(params.sw_latitude)
 		if(params.sw_longitude)
@@ -168,6 +170,15 @@ class UserGroupService {
 		userGroupInstance.habitats = []
 		habitats.each { key, value ->
 			userGroupInstance.addToHabitats(Habitat.read(value.toLong()));
+		}
+	}
+	
+	private void updateHomePage(userGroup, params){
+		//on create correcting webaddress of home page in other cases(i.e update) no need to do any thing
+		if(params.action == 'save' && params.homePage){
+			def page = params.homePage.tokenize('/').last().trim()
+			def uGroup = grailsApplication.mainContext.getBean('species.UserGroupTagLib');
+			userGroup.homePage = uGroup.createLink(mapping:'userGroup', action:page, params:['webaddress':userGroup.webaddress])
 		}
 	}
 
@@ -746,12 +757,7 @@ class UserGroupService {
 	}
 
 	def getGroupThemes(){
-		return [
-			"default",
-			"blue",
-			"green",
-			"black"
-		]
+		return ["default"]
 	}
 
 	def userGroupBasedLink(attrs) {
