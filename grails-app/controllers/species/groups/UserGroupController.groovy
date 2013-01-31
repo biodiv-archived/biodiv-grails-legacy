@@ -949,22 +949,49 @@ class UserGroupController {
    
    @Secured(['ROLE_USER'])
    def addUserToGroup = {
+	   log.debug "===========" + params
 	   UserGroup ug = UserGroup.read(params.groupId.toLong())
+	   boolean sendMail = (params.sendMail ? params.sendMail.toBoolean() : false)
+	   boolean postObs = (params.postObs ? params.postObs.toBoolean() : false)
 	   def res = createFromFile("/tmp/users.tsv")
 	   def oldUsers = res[0]
 	   def newUsers = res[1]
 	   
 	   SUser.withTransaction(){
+		   println "adding new uesr " + user
 		   newUsers.each{ user ->
 			   ug.addMember(user);
-			   sendNotificationMail(user, request, params, true, ug)
+			   if(sendMail){
+				   sendNotificationMail(user, request, params, true, ug)
+			   }
 		   }
 		   oldUsers.each{ user ->
+			   println "======== adding old user " + user
 			   ug.addMember(user);
-			   sendNotificationMail(user, request, params, false, ug)
+			   if(sendMail){
+				   sendNotificationMail(user, request, params, false, ug)
+			   }
 		   } 
 	   }
+	   
+	   SUser.withTransaction(){
+		   oldUsers.each{ user ->
+			   if(postObs){
+				   postObvToGroup(ug, user)
+			   }
+		   }
+	   }
+	   
 	   render "== done"
+   }
+   
+   private postObvToGroup(group, SUser user){
+	   user.observations.each { obv ->
+		   if(!obv.isDeleted){
+		   		userGroupService.postObservationToUserGroup(obv, group)
+				println "posting obs"
+		   }
+	   }
    }
    
    private void sendNotificationMail(SUser user, request, params, boolean isNewUser, userGroupInstance){
