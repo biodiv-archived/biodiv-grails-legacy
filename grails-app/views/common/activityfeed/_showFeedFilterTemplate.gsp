@@ -1,5 +1,8 @@
 <%@page import="species.participation.Observation"%>
 <%@page import="species.groups.UserGroup"%>
+<%@page import="species.participation.Checklist"%>
+<%@page import="species.Species"%>
+
 <div class="feedFilterDiv">
 	<div class="btn-group pull-right" style="z-index: 10; clear:both">
 		<button id="feedFilterButton" class="btn dropdown-toggle" data-toggle="dropdown" href="#" rel="tooltip"
@@ -13,6 +16,10 @@
 				value="${Observation.class.getCanonicalName()}"> Observation </a></li>
 			<li class="group_option"><a class=" feed_filter_label"
 				value="${UserGroup.class.getCanonicalName()}"> Group </a></li>
+			<li class="group_option"><a class=" feed_filter_label"
+				value="${Checklist.class.getCanonicalName()}"> Checklist </a></li>
+			<li class="group_option"><a class=" feed_filter_label"
+				value="${Species.class.getCanonicalName()}"> Species </a></li>
 		</ul>
 	</div>
 </div>
