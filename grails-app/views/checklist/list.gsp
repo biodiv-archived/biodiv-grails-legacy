@@ -23,7 +23,7 @@
 			
 			<clist:showChecklistMsg model="['instanceTotal':instanceTotal]" />
 			
-			<g:if test="${!isSearch}">
+			<g:if test="${!isSearch && instanceTotal > 0}">
 				<div id="map_view_bttn" class="btn-group" style="clear:both;">
 					<a class="btn btn-success dropdown-toggle" data-toggle="dropdown"
 						href="#"

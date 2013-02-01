@@ -1,3 +1,4 @@
+<g:if test="${instanceTotal > 0 }">
 <div class="observations_list" style="clear:both;padding-top:50px;">
 	<div>
 		<table class="table table-hover span8 tablesorter" style="margin-left: 0px; clear:both;">
@@ -42,3 +43,4 @@
 				action="${params.action}" params="${activeFilters}" />
 	</div>
 </div>
+</g:if>
