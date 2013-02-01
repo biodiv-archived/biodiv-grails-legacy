@@ -70,9 +70,12 @@
 					class="control-group ${hasErrors(bean: newsletterInstance, field: 'newsitem', 'errors')}">
 
 					<div class="controls">
-						<ckeditor:editor name="newsitem" height="300px">
+						
+						
+						<ckeditor:editor name="newsItem" height="400px" userSpace="${params.webaddress }">
 							${newsletterInstance?.newsitem}
 						</ckeditor:editor>
+						
 						<g:hasErrors bean="${newsletterInstance}" field="newsitem">
 							<div class="help-inline">
 								<g:renderErrors bean="${newsletterInstance}" field="newsitem" />

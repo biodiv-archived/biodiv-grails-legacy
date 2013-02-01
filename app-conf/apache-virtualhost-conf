@@ -19,7 +19,7 @@ ProxyPassReverse / http://indiabiodiversity.localhost.org:8080/biodiv_usergroups
 ProxyPassReverse / http://indiabiodiversity.localhost.org:8080/
 
 
-RewriteCond %{REQUEST_URI} ^/biodiv_usergroups/(static|plugins|data|bootstrap|js|css|j_spring_security_check|j_spring_openid_security_check|images|j_spring_security_logout|observation/upload_resource|emailConfirmation).*
+RewriteCond %{REQUEST_URI} ^/biodiv_usergroups/(static|plugins|data|bootstrap|js|css|j_spring_security_check|j_spring_openid_security_check|images|j_spring_security_logout|observation/upload_resource|emailConfirmation|ck).*
 RewriteRule ^/biodiv_usergroups(.*)$ http://indiabiodiversity.localhost.org:8080/biodiv_usergroups$1 [P]
 ProxyPassReverse /biodiv_usergroups http://indiabiodiversity.localhost.org:8080/biodiv_usergroups
 
@@ -66,7 +66,7 @@ RewriteCond %{REQUEST_URI} ^/logout
 RewriteCond %{QUERY_STRING} destination
 RewriteRule ^(.*)$ $1 [QSA,L]
 
-RewriteCond %{REQUEST_URI} ^/biodiv_usergroups/(static|plugins|data|bootstrap|js|css|j_spring_security_check|j_spring_openid_security_check|images|j_spring_security_logout|observation/upload_resource|recommendation|comment|newsletter|edit|emailConfirmation|jcaptcha).*
+RewriteCond %{REQUEST_URI} ^/biodiv_usergroups/(static|plugins|data|bootstrap|js|css|j_spring_security_check|j_spring_openid_security_check|images|j_spring_security_logout|observation/upload_resource|recommendation|comment|newsletter|edit|emailConfirmation|jcaptcha|ck).*
 #domainanme here need to be wgp instead of localhost as google uses this address in its return to url
 RewriteRule ^/biodiv_usergroups(.*)$ http://thewesternghats.indiabiodiversity.localhost.org:8080/biodiv_usergroups$1 [P]
 ProxyPassReverse /biodiv_usergroups http://thewesternghats.indiabiodiversity.localhost.org:8080/biodiv_usergroups
@@ -81,7 +81,7 @@ RewriteRule ^/biodiv_usergroups(.*)$ $1 [R=301]
 ProxyPassReverse / http://localhost:8080/biodiv_usergroups
 
 
-RewriteCond %{REQUEST_URI} ^/(species|observation|activity|activityFeed|SUser|user|page|pages|login|logout|register|about|requestMembership|joinUs|leaveUs|inviteMembers|show|newsletter|edit|update|delete|founders|user|experts|terms|upload_resource|group|emailConfirmation|settings|search|checklist|comment|openId).*
+RewriteCond %{REQUEST_URI} ^/(species|observation|activity|activityFeed|SUser|user|page|pages|login|logout|register|about|requestMembership|joinUs|leaveUs|inviteMembers|show|newsletter|edit|update|delete|founders|user|experts|terms|upload_resource|group|emailConfirmation|settings|search|checklist|comment|openId|ck).*
 RewriteRule ^(.*)$ http://thewesternghats.indiabiodiversity.localhost.org:8080/biodiv_usergroups/group/wgp_fb_$1 [P]
 ProxyPassReverse / http://thewesternghats.indiabiodiversity.localhost.org:8080/biodiv_usergroups/group/wgp_fb_
 
