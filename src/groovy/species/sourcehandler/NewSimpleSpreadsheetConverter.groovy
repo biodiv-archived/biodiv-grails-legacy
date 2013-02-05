@@ -307,6 +307,7 @@ class NewSimpleSpreadsheetConverter extends SourceConverter {
 		if(text && !text.equals("")) {
 			int i=0;
 			for(String ref : text.split("\\\n")) {
+				if(!ref.trim().equals("")) {
 				//TODO : remove other protocols as well if present
 //				if(!ref.startsWith("http://") && ref.indexOf("http://") != -1) {
 //					ref = ref.substring(ref.indexOf("http://"));
@@ -321,6 +322,7 @@ class NewSimpleSpreadsheetConverter extends SourceConverter {
 					new Node(refNode, "title", attrs?attrs.get(i):"");
 //				}
 				i++;
+				}
 			}
 		}
 	}

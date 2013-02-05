@@ -28,8 +28,8 @@ def speciesService = ctx.getBean("speciesService");
 ////grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/images";
 //speciesService.uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/Bats/WG_bats_account_01Nov11_sanjayMolur.xls", grailsApplication.config.speciesPortal.data.rootDir+"/mappings/WG_bats_account_01Nov11_sanjayMolurspecies_mapping_v2.xlsx", 0, 0, 0, 0);
 
-grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/careearth/1.0";
-speciesService.uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/careearth/1.0/species accounts188.xlsx", grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/careearth/1.0/speciesaccount188_mapping.xlsx", 0, 0, 0, 0);
+//grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/careearth/1.0";
+//speciesService.uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/careearth/1.0/species accounts188.xlsx", grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/careearth/1.0/speciesaccount188_mapping.xlsx", 0, 0, 0, 0);
 
 //grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/keystone/1.0";
 //String mappingFile = grailsApplication.config.speciesPortal.data.rootDir+"/keystone/1.0/keystone_mapping.xlsx";
@@ -50,3 +50,16 @@ speciesService.uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.da
 
 //grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/chitra/ne_butterflies/1.5/NE_Butterflies_RG4";
 //speciesService.uploadNewSimpleSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/chitra/ne_butterflies/1.5/Northeast Butterflies-RG4.xlsx");
+
+//grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/chitra/indian_molluscs/uploadready/molluscs_images";
+//speciesService.uploadNewSimpleSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/chitra/indian_molluscs/uploadready/indian_molluscs_asr_cr1.xlsx");
+
+//grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/chitra/indian_molluscs/uploadready/molluscs_images";
+//speciesService.uploadNewSimpleSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/chitra/indian_molluscs/uploadready/indian_molluscs_asr_cr2.xlsx");
+
+grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/chitra/indian_birds/uploadready/india_birds_cr1_images";
+speciesService.uploadNewSimpleSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/chitra/indian_birds/uploadready/india_birds_cr1.xlsx");
+
+//speciesService.uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/zoooutreach/uploadready/aquaticplants.xls", grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/zoooutreach/uploadready/aquaticplants_mapping.xls", 0, 0, 0, 0);
+
+

@@ -72,7 +72,7 @@
 					<div class="controls">
 						
 						
-						<ckeditor:editor name="newsItem" height="400px" userSpace="${params.webaddress }">
+						<ckeditor:editor name="newsitem" height="400px" userSpace="${params.webaddress }">
 							${newsletterInstance?.newsitem}
 						</ckeditor:editor>
 						

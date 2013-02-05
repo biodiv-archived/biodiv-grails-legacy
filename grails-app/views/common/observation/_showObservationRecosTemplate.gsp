@@ -30,7 +30,7 @@
 				</g:if>
 
 				<span class="voteCount"><span id="votes_${r.recoId}">
-						${r.noOfVotes} </span> of ${r.totalVotes?:totalVotes} <g:if test="${r.totalVotes?:totalVotes <= 1}"> user thinks</g:if>
+						${r.noOfVotes} </span> <g:if test="${r.noOfVotes <= 1}"> user thinks</g:if>
 					<g:else> users think</g:else> it is:</span><span class="highlight">
 					<g:if test="${r.canonicalForm}">
 						<a href="${uGroup.createLink(action:'show', controller:'species', id:r.speciesId, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
