@@ -14,11 +14,28 @@
 			<obv:showSnippet model="['observationInstance':feedParentInstance, userGroup:tmpUserGroup, userGroupWebaddress:tmpUserGroup?.webaddress]"></obv:showSnippet>
 		</g:if>
 		<g:elseif test="${feedInstance.rootHolderType ==  UserGroup.class.getCanonicalName()}" >
-			<uGroup:showSnippet model="['userGroupInstance':feedParentInstance, 'showLeave':false]"></uGroup:showSnippet>
-<%--			<uGroup:showUserGroupSignature model="['userGroup':feedParentInstance, 'showDetails':true]"></uGroup:showUserGroupSignature>--%>
+		<div class="span10">
+			<table class="table" style="margin-left: 0px;">
+				<thead>
+					<tr>
+						<th>Group</th>
+						<th>Species Groups</th>
+						<th>Habitats</th>
+						<th>Members</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<uGroup:showSnippet model="['userGroupInstance':feedParentInstance, 'showLeave':false, showJoin:false ,'userGroupTitle':feedParentInstance.name]"></uGroup:showSnippet>
+					</tr>
+				</tbody>
+			</table>
+		</div>
 		</g:elseif>
 		<g:elseif test="${feedInstance.rootHolderType ==  Checklist.class.getCanonicalName()}" >
-			<clist:showSnippet model="['checklistInstance':feedParentInstance, userGroup:tmpUserGroup]"></clist:showSnippet>
+			<div class="span10">
+				<clist:showSnippet model="['checklistInstance':feedParentInstance, userGroup:tmpUserGroup]"></clist:showSnippet>
+			</div>	
 		</g:elseif>
 		<g:elseif test="${feedInstance.rootHolderType ==  Species.class.getCanonicalName()}" >
 			<s:showSnippet model="['speciesInstance':feedParentInstance]" />

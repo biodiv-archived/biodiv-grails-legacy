@@ -1,3 +1,4 @@
+<g:if test="${instanceTotal > 0 }">
 <div class="observation_location_wrapper">
 	<div class="observation_location">
 		<div class="checklist_list">
@@ -133,6 +134,7 @@
 		</div>
 	</div>
 </div>
+</g:if>
 	<g:javascript>
             function refreshList(bounds){
             	<g:if test="{params.id}">

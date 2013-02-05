@@ -110,6 +110,9 @@
 			model="['speciesFieldInstance':speciesFieldInstance]" />
 	
 </div>
+<g:if test="${speciesFieldInstance != null}">
+	<comment:showCommentPopup model="['commentHolder':speciesFieldInstance, 'rootHolder':speciesInstance]" />
+</g:if>
 
 
 

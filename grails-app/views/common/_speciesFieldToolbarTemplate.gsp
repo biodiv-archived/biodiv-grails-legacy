@@ -1,6 +1,7 @@
 <!-- field toolbar -->
 <g:if test="${speciesFieldInstance}">
 	<div style="clear:both;"></div>
+	
 	<div class="toolbar">
 
 		<div class="span6" style="height:30px;margin-left:0px;">
@@ -41,6 +42,6 @@
 			model="['speciesFieldInstance':speciesFieldInstance]" />
 		<g:showSpeciesFieldHelp
 			model="['speciesFieldInstance':speciesFieldInstance]" />
-		<comment:showCommentPopup model="['commentHolder':speciesFieldInstance, 'rootHolder':speciesInstance]" />
 	</div>
+	
 </g:if>
