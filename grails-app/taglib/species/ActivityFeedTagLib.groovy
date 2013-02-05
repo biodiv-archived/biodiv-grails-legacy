@@ -123,7 +123,7 @@ class ActivityFeedTagLib {
 				activityTitle = "Joined group " + activityFeedService.getUserGroupHyperLink(activityRootObj)
 				break
 			case activityFeedService.MEMBER_ROLE_UPDATED:
-				activityTitle = getUserHyperLink(activityDomainObj, model.feedInstance.fetchUserGroup()) + "'s role updated"
+				activityTitle = activityFeedService.getUserHyperLink(activityDomainObj, model.feedInstance.fetchUserGroup()) + "'s role updated"
 				break
 			case activityFeedService.MEMBER_LEFT:
 				activityTitle = "Left group " + activityFeedService.getUserGroupHyperLink(activityRootObj)
