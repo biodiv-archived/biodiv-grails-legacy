@@ -6,6 +6,10 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
+import groovyx.net.http.ContentType;
+import groovyx.net.http.HTTPBuilder;
+import groovyx.net.http.Method;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
@@ -228,5 +232,23 @@ class Utils {
 		String ajaxHeaderName = (String)ReflectionUtils.getConfigProperty("ajaxHeader");
 		return !savedRequest.getHeaderValues(ajaxHeaderName).isEmpty();
 	}
+	
+	public static def getPremailer(baseUrl, html) {
+		def parsedJSON;
+		def http = new HTTPBuilder()
+		http.request("http://premailer.dialect.ca/api/0.1/documents", Method.POST, ContentType.JSON) {
+			body = [ 'html' : html, 'base_url':baseUrl ]
+
+			response.success = { resp, json ->
+				println resp.status
+				println json
+			}
+			response.failure = { resp ->  log.error "Premailer request failed with response $resp" 
+				println "Unexpected error: ${resp.status} : ${resp.statusLine.reasonPhrase}"
+			}
+		}
+		return parsedJSON;
+	}
+
 }
 

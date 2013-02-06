@@ -6,28 +6,34 @@ import groovy.text.SimpleTemplateEngine;
 
 import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
 import org.codehaus.groovy.grails.plugins.springsecurity.ui.RegistrationCode;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
+import org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib
 
 import species.auth.SUser;
 import species.utils.Utils;
 
-class SUserService extends SpringSecurityUiService {
+class SUserService extends SpringSecurityUiService implements ApplicationContextAware {
 
 	def grailsApplication
 
 	def springSecurityService
 	def mailService
-	
+	private ApplicationTagLib g
+	ApplicationContext applicationContext
+
 	public static final String NEW_USER = "newUser";
 	public static final String USER_DELETED = "deleteUser";
-	
+
+
 	/**
 	 * 
 	 */
 	SUser create(Map propsMap) {
 		log.debug("Creating new User");
 		propsMap = propsMap ?: [:];
-		
+
 		propsMap.remove('metaClass')
 		propsMap.remove('class')
 
@@ -83,14 +89,14 @@ class SUserService extends SpringSecurityUiService {
 	 * @param user
 	 */
 	void assignRoles(SUser user) {
-		
+
 		def securityConf = SpringSecurityUtils.securityConfig
 
 		def defaultRoleNames = securityConf.ui.register.defaultRoleNames;
 
 		Class<?> PersonRole = grailsApplication.getDomainClass(securityConf.userLookup.authorityJoinClassName).clazz
 		Class<?> Authority = grailsApplication.getDomainClass(securityConf.authority.className).clazz
-		
+
 		PersonRole.withTransaction { status ->
 			defaultRoleNames.each { String roleName ->
 				String findByField = securityConf.authority.nameField[0].toUpperCase() + securityConf.authority.nameField.substring(1)
@@ -104,20 +110,20 @@ class SUserService extends SpringSecurityUiService {
 			}
 		}
 	}
-	
+
 	/**
 	 * 
 	 * @param user
 	 * @return
 	 */
 	boolean ifOwns(SUser user) {
-		return springSecurityService.isLoggedIn() && (springSecurityService.currentUser?.id == user.id || SpringSecurityUtils.ifAllGranted('ROLE_ADMIN'))	
+		return springSecurityService.isLoggedIn() && (springSecurityService.currentUser?.id == user.id || SpringSecurityUtils.ifAllGranted('ROLE_ADMIN'))
 	}
-	
+
 	boolean ifOwns(id) {
 		return springSecurityService.isLoggedIn() && (springSecurityService.currentUser?.id == id || SpringSecurityUtils.ifAllGranted('ROLE_ADMIN'))
 	}
-	
+
 	boolean isAdmin(id) {
 		if(!id) return false
 		return SpringSecurityUtils.ifAllGranted('ROLE_ADMIN')
@@ -125,62 +131,76 @@ class SUserService extends SpringSecurityUiService {
 
 	public void sendNotificationMail(String notificationType, SUser user, request, String userProfileUrl){
 		def conf = SpringSecurityUtils.securityConfig
-		
+		g = applicationContext.getBean(ApplicationTagLib)
+
 		//def userProfileUrl = generateLink("SUser", "show", ["id": user.id], request)
 
 		def templateMap = [username: user.name.capitalize(), email:user.email, userProfileUrl:userProfileUrl, domain:Utils.getDomainName(request)]
 
 		def mailSubject = ""
-		def body = ""
+		def bodyContent = ""
+
 		def replyTo = conf.ui.notification.emailReplyTo;
-		
+
 		switch ( notificationType ) {
 			case NEW_USER:
 				mailSubject = conf.ui.newuser.emailSubject
-				body = conf.ui.newuser.emailBody
-				break
+			//bodyContent = g.render(template:"/emailtemplates/welcomeEmail", model:templateMap)
+				if (mailSubject.contains('$')) {
+					mailSubject = evaluate(mailSubject, [domain: Utils.getDomainName(request)])
+				}
+
+				if ( Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
+
+					mailService.sendMail {
+						to user.email
+						bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com","thomas.vee@gmail.com"
+						from conf.ui.notification.emailFrom
+						subject mailSubject
+						body(view:"/emailtemplates/welcomeEmail", model:templateMap)
+					}
+				}
+
+				log.debug "Sent mail for notificationType ${notificationType} to ${user.email}"
+				return;
 			case USER_DELETED:
 				mailSubject = conf.ui.userdeleted.emailSubject
-				body = conf.ui.userdeleted.emailBody
+				bodyContent = conf.ui.userdeleted.emailBody
+				if (bodyContent.contains('$')) {
+					bodyContent = evaluate(bodyContent, templateMap)
+				}
+
+				if (mailSubject.contains('$')) {
+					mailSubject = evaluate(mailSubject, [domain: Utils.getDomainName(request)])
+				}
+
+				if ( Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
+					mailService.sendMail {
+						bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com","thomas.vee@gmail.com"
+						from conf.ui.notification.emailFrom
+						subject mailSubject
+						html bodyContent.toString()
+					}
+				}
 				break
 			default:
 				log.debug "invalid notification type"
 		}
 
-		if (body.contains('$')) {
-			body = evaluate(body, templateMap)
-		}
-		
-		if (mailSubject.contains('$')) {
-			mailSubject = evaluate(mailSubject, [domain: Utils.getDomainName(request)])
-		}
-
-		if ( Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
-			
-			mailService.sendMail {
-				to user.email
-				bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com","thomas.vee@gmail.com"
-				from conf.ui.notification.emailFrom
-				//replyTo replyTo
-				subject mailSubject
-				html body.toString()
-			}
-		}
-			log.debug "Sent mail for notificationType ${notificationType} to ${user.email}"
 	}
-	
+
 	protected String evaluate(s, binding) {
 		new SimpleTemplateEngine().createTemplate(s).make(binding)
 	}
-	
+
 	def nameTerms(params) {
 		return getUserSuggestions(params);
-	}	
-	
+	}
+
 	def getUserSuggestions(params){
 		def jsonData = []
 		String username = params.term
-		
+
 		String usernameFieldName = 'name';//SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
 		String userId = 'id';
 
@@ -196,7 +216,7 @@ class SUserService extends SpringSecurityUiService {
 		for (result in results) {
 			jsonData << [value: result[0], label:result[0] , userId:result[1] , "category":"Members"]
 		}
-		
+
 		return jsonData;
 	}
 
