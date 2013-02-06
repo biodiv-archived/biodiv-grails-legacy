@@ -1218,8 +1218,8 @@ span.cke_skin_kama {
 
 .reco-comment-close {
 	position: absolute;
-	top: 0;
-	right: 0;
+	top: -12px;
+	right: -2px;
 }
 
 .thumbnail {
