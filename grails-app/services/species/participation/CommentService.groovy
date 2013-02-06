@@ -3,7 +3,9 @@ package species.participation
 class CommentService {
 
 	static transactional = false
+	
 	def grailsApplication
+	def activityFeedService
 
 	def addComment(params){
 		validateParams(params);
@@ -92,11 +94,7 @@ class CommentService {
 	}
 
 	def getDomainObject(className, id){
-		if(!className || className.trim() == ""){
-			return null
-		}
-		id = id.toLong()
-		return grailsApplication.getArtefact("Domain",className)?.getClazz()?.read(id)
+		return activityFeedService.getDomainObject(className, id)
 	}
 
 	private validateParams(params){

@@ -25,7 +25,7 @@
 	<g:elseif test="${commentInstance.commentHolderType == ChecklistRowData.class.getName()}" >
 		checklist data
 	</g:elseif>
-	<g:elseif test="${commentInstance.commentHolderType == SpeciesField.class.getName()}" >
+	<g:elseif test="${commentInstance.commentHolderType == SpeciesField.class.getName() || commentInstance.commentHolderType.startsWith('species_')}" >
 		species field
 	</g:elseif>
 	<g:else>

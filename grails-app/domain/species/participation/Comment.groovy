@@ -53,11 +53,11 @@ class Comment{
 				and{
 					if(commentHolder){
 						eq('commentHolderId', commentHolder.id)
-						eq('commentHolderType', getType(commentHolder))
+						eq('commentHolderType', ActivityFeedService.getType(commentHolder))
 					}
 					if(rootHolder){
 						eq('rootHolderId', rootHolder.id)
-						eq('rootHolderType', getType(rootHolder))
+						eq('rootHolderType', ActivityFeedService.getType(rootHolder))
 					}
 					if(refTime){
 						(timeLine == "older") ? lt('lastUpdated', refTime) : gt('lastUpdated', refTime)
@@ -84,11 +84,11 @@ class Comment{
 			and{
 				if(commentHolder){
 					eq('commentHolderId', commentHolder.id)
-					eq('commentHolderType', getType(commentHolder))
+					eq('commentHolderType', ActivityFeedService.getType(commentHolder))
 				}
 				if(rootHolder){
 					eq('rootHolderId', rootHolder.id)
-					eq('rootHolderType', getType(rootHolder))
+					eq('rootHolderType', ActivityFeedService.getType(rootHolder))
 				}
 				(timeLine == "older") ? lt('lastUpdated', refTime) : gt('lastUpdated', refTime)
 			}
@@ -101,11 +101,6 @@ class Comment{
 		return fetchComments(null, rootHolder, max, refTime, timeLine)
 	}
 	
-	private static getType(obj){
-		return Hibernate.getClass(obj).getName();
-	}
-
-
 	private static getValidDate(String timeIn){
 		if(!timeIn){
 			return null

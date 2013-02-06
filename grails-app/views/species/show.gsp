@@ -8,6 +8,8 @@
 <%@ page import="species.CommonNames"%>
 <%@ page import="species.Language"%>
 <%@page import="species.utils.Utils"%>
+<%@page import="species.participation.ActivityFeedService"%>
+
 <html>
 <head>
 <link rel="canonical" href="${Utils.getIBPServerDomain() + createLink(controller:'species', action:'show', id:speciesInstance.id)}" />
@@ -409,6 +411,7 @@ $(document).ready(function(){
 						</g:each>
 						</table>
 					</div>
+					<comment:showCommentPopup model="['commentHolder':[objectType:ActivityFeedService.SPECIES_TAXON_RECORD_NAME, id:speciesInstance.id], 'rootHolder':speciesInstance]" />
 				</div>
 				<br/>
 				</g:if>
@@ -428,6 +431,7 @@ $(document).ready(function(){
 						</g:each>
 						</table>
 					</div>
+					<comment:showCommentPopup model="['commentHolder':[objectType:ActivityFeedService.SPECIES_SYNONYMS, id:speciesInstance.id], 'rootHolder':speciesInstance]" />
 				</div>
 				<br/>
 				</g:if>
@@ -465,6 +469,7 @@ $(document).ready(function(){
 								</g:each>
 							</table>
 					</div>
+					<comment:showCommentPopup model="['commentHolder':[objectType:ActivityFeedService.SPECIES_COMMON_NAMES, id:speciesInstance.id], 'rootHolder':speciesInstance]" />
 				</div>
 				<br/>
 				</g:if>

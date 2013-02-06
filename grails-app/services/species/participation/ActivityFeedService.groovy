@@ -1,6 +1,7 @@
 package species.participation
 
 import java.text.SimpleDateFormat
+import org.hibernate.Hibernate;
 
 import species.groups.UserGroup;
 import species.Species;
@@ -54,6 +55,13 @@ class ActivityFeedService {
 	static final String ALL = "All"
 	static final String OTHER = "other"
 	
+	//classes for non-db object this should not use as root holder object in any manner 
+	//these should be used only for comment with proper root holder object(some domain class)
+	static final String SPECIES_SYNONYMS = "species_Synonyms"
+	static final String SPECIES_COMMON_NAMES = "species_Common Names"
+	static final String SPECIES_MAPS = "species_Maps"
+	static final String SPECIES_TAXON_RECORD_NAME = "species_Taxon Record Name"
+	
 	private static DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mmZ");
 	
 	
@@ -99,12 +107,30 @@ class ActivityFeedService {
 	}
 	
 	def getDomainObject(className, id){
+		def retObj = null
 		if(!className || className.trim() == ""){
-			return null
+			return retObj
 		}
 		
 		id = id.toLong()
-		return grailsApplication.getArtefact("Domain",className)?.getClazz()?.read(id)
+		switch (className) {
+			case [SPECIES_SYNONYMS, SPECIES_COMMON_NAMES, SPECIES_MAPS, SPECIES_TAXON_RECORD_NAME]:
+				retObj = [objectType:className, id:id]
+				break
+			default:
+				retObj = grailsApplication.getArtefact("Domain",className)?.getClazz()?.read(id)
+				break
+		}
+		return retObj
+	}
+	
+	// this will return class of object in general used in comment framework
+	static getType(obj){
+		if(obj instanceof Map){
+			return obj.objectType
+		}
+		
+		return Hibernate.getClass(obj).getName();
 	}
 	
 	private aggregateFeeds(List feeds, params){
@@ -151,6 +177,67 @@ class ActivityFeedService {
 		ActivityFeed.deleteFeed(obj);
 	}
 	
+	
+	def getContextInfo(ActivityFeed feedInstance, params){
+		
+		def activityType = feedInstance.activityType
+		def activityDomainObj = getDomainObject(feedInstance.activityHolderType, feedInstance.activityHolderId)
+		def activityRootObj = 	getDomainObject(feedInstance.rootHolderType, feedInstance.rootHolderId)
+		
+		def text = null
+		def activityTitle = null
+		
+		log.debug "=== feed === $feedInstance.id === $feedInstance.activityType"
+		switch (activityType) {
+			case COMMENT_ADDED:
+				activityTitle = COMMENT_ADDED  + getCommentContext(activityDomainObj, params)
+				text = activityDomainObj.body
+				break
+			case SPECIES_RECOMMENDED:
+				activityTitle = SPECIES_RECOMMENDED + " " + getSpeciesNameHtml(activityDomainObj, params)
+				break
+			case SPECIES_AGREED_ON:
+				activityTitle =  SPECIES_AGREED_ON + " " + getSpeciesNameHtml(activityDomainObj, params)
+				break
+			case OBSERVATION_FLAGGED:
+				activityTitle = OBSERVATION_FLAGGED
+				text = activityDomainObj.flag.value() + ( activityDomainObj.notes ? " \n" + activityDomainObj.notes : "")
+				break
+			case OBSERVATION_UPDATED:
+				activityTitle = OBSERVATION_UPDATED
+				text = "User updated the observation details"
+				break
+			case USERGROUP_CREATED:
+				activityTitle = "Group " + getUserGroupHyperLink(activityRootObj) + " created"
+				break
+			case USERGROUP_UPDATED:
+				activityTitle = "Group " + getUserGroupHyperLink(activityRootObj) + " updated"
+				break
+			case OBSERVATION_POSTED_ON_GROUP:
+				activityTitle = OBSERVATION_POSTED_ON_GROUP + " " + getUserGroupHyperLink(activityDomainObj)
+				break
+			case OBSERVATION_REMOVED_FROM_GROUP:
+				activityTitle = OBSERVATION_REMOVED_FROM_GROUP + " " + getUserGroupHyperLink(activityDomainObj)
+				break
+			case MEMBER_JOINED:
+				activityTitle = "Joined group " + getUserGroupHyperLink(activityRootObj)
+				break
+			case MEMBER_ROLE_UPDATED:
+				activityTitle = getUserHyperLink(activityDomainObj, feedInstance.fetchUserGroup()) + "'s role updated"
+				break
+			case MEMBER_LEFT:
+				activityTitle = "Left group " + getUserGroupHyperLink(activityRootObj)
+				break
+			default:
+				activityTitle = activityType
+				break
+		}
+		
+		return [activityTitle:activityTitle, text:text]
+	}
+	
+	
+	
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////// Template rendering related //////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////
@@ -167,6 +254,10 @@ class ActivityFeedService {
 			case SpeciesField.class.getCanonicalName():
 				SpeciesField sf = getDomainObject(comment.commentHolderType,comment.commentHolderId)
 				result += " on species field: " +  sf.field.category + (sf.field.subCategory ? ":" + sf.field.subCategory : "")
+				break
+			case [SPECIES_SYNONYMS, SPECIES_COMMON_NAMES, SPECIES_MAPS, SPECIES_TAXON_RECORD_NAME]:
+				result += " on species field: " + comment.commentHolderType.split("_")[1]
+				break
 			default:
 				break
 		}

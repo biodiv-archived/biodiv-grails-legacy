@@ -1,4 +1,4 @@
-
+<%@page import="species.participation.ActivityFeedService"%>
 <%@page import="species.Reference"%>
 <%@page import="species.TaxonomyDefinition.TaxonomyRank"%>
 <div class="sidebar_section  <%=sparse?'':'menubutton'%>">
@@ -80,6 +80,7 @@
 										<br />
 										<div id="map1311326056727" class="occurenceMap"
 											style="height: 600px; width: 100%"></div>
+										<comment:showCommentPopup model="['commentHolder':[objectType:ActivityFeedService.SPECIES_MAPS, id:speciesInstance.id], 'rootHolder':speciesInstance]" />	
 										</div>
 									</g:elseif>
 

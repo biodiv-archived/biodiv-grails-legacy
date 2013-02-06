@@ -181,9 +181,11 @@ function setUpFeedForTarget(targetComp){
 	if(targetComp === null){
 		return; 
 	}
+	//resetting time range
+	$(targetComp).children('input[name="newerTimeRef"]').val("");
+	$(targetComp).children('input[name="olderTimeRef"]').val("");
 	
 	var refreshType = $(targetComp).children('input[name="refreshType"]').val();
-	
 	if(refreshType === "auto"){
 		pollForFeeds(targetComp); //to get newer feeds
 		autoLoadOnScroll(targetComp); // to get older feeds on scroll bottom

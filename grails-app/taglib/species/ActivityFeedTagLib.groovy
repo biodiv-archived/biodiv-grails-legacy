@@ -76,66 +76,13 @@ class ActivityFeedTagLib {
 		model.remainingFeedCount = activityFeedService.getCount(newParams);
 	}
 	
-	//XXX this should be formatted in better way
 	def showActivity = {attrs, body->
 		def model = attrs.model
-		def activityType = model.feedInstance.activityType
 		def activityDomainObj = activityFeedService.getDomainObject( model.feedInstance.activityHolderType, model.feedInstance.activityHolderId)
-		def activityRootObj = activityFeedService.getDomainObject( model.feedInstance.rootHolderType, model.feedInstance.rootHolderId)
-		
-		def text = null
-		def activityTitle = null
-		
-		println "=== feed === $model.feedInstance.id === $model.feedInstance.activityType" 
-		switch (activityType) {
-			case activityFeedService.COMMENT_ADDED:
-				println "came here "
-				activityTitle = activityFeedService.COMMENT_ADDED  + activityFeedService.getCommentContext(activityDomainObj, params)
-				text = activityDomainObj.body
-				break
-			case activityFeedService.SPECIES_RECOMMENDED:
-				activityTitle = activityFeedService.SPECIES_RECOMMENDED + " " + activityFeedService.getSpeciesNameHtml(activityDomainObj, params)
-				break
-			case activityFeedService.SPECIES_AGREED_ON:
-				activityTitle =  activityFeedService.SPECIES_AGREED_ON + " " + activityFeedService.getSpeciesNameHtml(activityDomainObj, params)
-				break
-			case activityFeedService.OBSERVATION_FLAGGED:
-				activityTitle = activityFeedService.OBSERVATION_FLAGGED
-				text = activityDomainObj.flag.value() + ( activityDomainObj.notes ? " \n" + activityDomainObj.notes : "")
-				break
-			case activityFeedService.OBSERVATION_UPDATED:
-				activityTitle = activityFeedService.OBSERVATION_UPDATED
-				text = "User updated the observation details"
-				break
-			case activityFeedService.USERGROUP_CREATED:
-				activityTitle = "Group " + activityFeedService.getUserGroupHyperLink(activityRootObj) + " created"
-				break
-			case activityFeedService.USERGROUP_UPDATED:
-				activityTitle = "Group " + activityFeedService.getUserGroupHyperLink(activityRootObj) + " updated"
-				break
-			case activityFeedService.OBSERVATION_POSTED_ON_GROUP:
-				activityTitle = activityFeedService.OBSERVATION_POSTED_ON_GROUP + " " + activityFeedService.getUserGroupHyperLink(activityDomainObj)
-				break
-			case activityFeedService.OBSERVATION_REMOVED_FROM_GROUP:
-				activityTitle = activityFeedService.OBSERVATION_REMOVED_FROM_GROUP + " " + activityFeedService.getUserGroupHyperLink(activityDomainObj) 
-				break
-			case activityFeedService.MEMBER_JOINED:
-				activityTitle = "Joined group " + activityFeedService.getUserGroupHyperLink(activityRootObj)
-				break
-			case activityFeedService.MEMBER_ROLE_UPDATED:
-				activityTitle = activityFeedService.getUserHyperLink(activityDomainObj, model.feedInstance.fetchUserGroup()) + "'s role updated"
-				break
-			case activityFeedService.MEMBER_LEFT:
-				activityTitle = "Left group " + activityFeedService.getUserGroupHyperLink(activityRootObj)
-				break
-			default:
-				activityTitle = activityType
-				break
-		}
-		
+		def result = activityFeedService.getContextInfo(model.feedInstance, params)
 		model.activityInstance = activityDomainObj
-		model.feedText = text
-		model.activityTitle = activityTitle
+		model.feedText = result.text
+		model.activityTitle = result.activityTitle
 		out << render(template:"/common/activityfeed/showActivityTemplate", model:attrs.model);
 	}	
 }
