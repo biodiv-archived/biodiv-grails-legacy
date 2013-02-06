@@ -59,7 +59,7 @@ class ActivityFeedService {
 	//these should be used only for comment with proper root holder object(some domain class)
 	static final String SPECIES_SYNONYMS = "species_Synonyms"
 	static final String SPECIES_COMMON_NAMES = "species_Common Names"
-	static final String SPECIES_MAPS = "species_Maps"
+	static final String SPECIES_MAPS = "species_Occurrence Records"
 	static final String SPECIES_TAXON_RECORD_NAME = "species_Taxon Record Name"
 	
 	private static DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mmZ");

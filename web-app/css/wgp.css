@@ -950,6 +950,9 @@ input,button,select,textarea {
 .icon-red {
 	background-image: url(../bootstrap/img/glyphicons-halflings-red.png);
 }
+.icon-gray {
+	background-image: url(../bootstrap/img/glyphicons-halflings-gray.png);
+}
 
 li.reco_block {
 	margin: 0;
