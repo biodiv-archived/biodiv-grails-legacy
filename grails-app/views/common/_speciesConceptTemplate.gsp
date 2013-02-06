@@ -112,7 +112,7 @@
 										<g:if test="${references }">
 											<ol class="references" style="list-style:disc;list-style-type:decimal">
 												<g:each in="${references}" var="r">
-													<li><g:if test="${r.url}">
+													<li class="linktext"><g:if test="${r.url}">
 															<a href="${r.url}" target="_blank"> ${r.title?r.title:r.url}
 															</a>
 														</g:if> <g:else>

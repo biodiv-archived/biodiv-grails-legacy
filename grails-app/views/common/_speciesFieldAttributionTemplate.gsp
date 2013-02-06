@@ -9,13 +9,13 @@
 							<div class="prop span11">
 								<div class="name span2">Attributions</div>
 								<div class="span8">
-									<ol>
+									<ul style="list-style:none;margin-left:0px;">
 										<g:each in="${speciesFieldInstance.attributors}" var="r">
-											<li style="margin-left: 20px;">
+											<li>
 												${r.name}
 											</li>
 										</g:each>
-									</ol>
+									</ul>
 								</div>
 							</div>
 						</g:if>

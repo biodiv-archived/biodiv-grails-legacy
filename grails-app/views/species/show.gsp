@@ -245,7 +245,11 @@ $(document).ready(function(){
 	  	}
 	  );
   	
-	$(".contributor_ellipsis").trunk8({width:35});  	
+  	try {
+		$(".contributor_ellipsis").trunk8({width:35});
+	} catch(e) {
+  		console.log(e)
+	}  	
   	
   	
 });
@@ -387,13 +391,16 @@ $(document).ready(function(){
 							<tr class="prop">
 							 
 								<g:if test="${it?.field?.subCategory?.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.REFERENCES)}">
-									<td><span class="grid_3 name">${it?.field?.subCategory} </span></td> <td><a href="${it?.description}" target="_blank"> ${it?.description}</a></td>
+									<td><span class="grid_3 name">${it?.field?.subCategory} </span></td> <td class="linktext">${it?.description}</td>
 								</g:if> 
 								<g:elseif test="${it?.field?.subCategory?.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.GENERIC_SPECIFIC_NAME)}">
 									
 								</g:elseif> 
 								<g:elseif test="${it?.field?.subCategory?.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.SCIENTIFIC_NAME)}">
 									
+								</g:elseif> 
+								<g:elseif test="${it?.field?.subCategory?.equalsIgnoreCase('year')}">
+									<td><span class="grid_3 name">${it?.field?.subCategory} </span></td> <td> ${(int)Float.parseFloat(it?.description)}</td>
 								</g:elseif> 
 								<g:else>
 									<td><span class="grid_3 name">${it?.field?.subCategory} </span></td> <td> ${it?.description}</td>

@@ -7,7 +7,7 @@ $(document).ready(function() {
 	
 	
   	$('#taxonHierarchy').jqGrid({
-		url:'${createLink(controller:'data', action:'listHierarchy')}',
+		url:'${uGroup.createLink(controller:'data', action:'listHierarchy', userGroupWebaddress:params.webaddress)}',
 		datatype: "xml",
    		colNames:['Id', '_Id_', '', '#Species', 'SpeciesId', 'Class System'],
    		colModel:[
