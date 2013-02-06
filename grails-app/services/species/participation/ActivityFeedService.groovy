@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat
 
 import species.groups.UserGroup;
 import species.Species;
+import species.SpeciesField
 
 class ActivityFeedService {
 	
@@ -149,6 +150,67 @@ class ActivityFeedService {
 	def deleteFeed(obj){
 		ActivityFeed.deleteFeed(obj);
 	}
+	
+	////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////// Template rendering related //////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	def getCommentContext(Comment comment, params){
+		String result = ""
+		switch (comment.commentHolderType) {
+			case ChecklistRowData.class.getCanonicalName():
+				def checklistRow = getDomainObject(comment.commentHolderType,comment.commentHolderId)
+				if(checklistRow.reco){
+					result += " on " + getSpeciesNameHtmlFromReco(checklistRow.reco, params) + ": Row " + (checklistRow.rowId + 1) 
+				}
+				break
+			case SpeciesField.class.getCanonicalName():
+				SpeciesField sf = getDomainObject(comment.commentHolderType,comment.commentHolderId)
+				result += " on species field: " +  sf.field.category + (sf.field.subCategory ? ":" + sf.field.subCategory : "")
+			default:
+				break
+		}
+		return result
+	}
+	
+	def getSpeciesNameHtml(recoVote, params){
+		return getSpeciesNameHtmlFromReco(recoVote.recommendation, params)
+	}
+	
+	def getSpeciesNameHtmlFromReco(reco, params){
+		if(!reco){
+			return ""
+		}
+		
+		def speciesId = reco?.taxonConcept?.findSpeciesId();
+		String sb = ""
+		def uGroup = grailsApplication.mainContext.getBean('species.UserGroupTagLib');
+		if(speciesId != null){
+			sb =  '<a href="' + uGroup.createLink(controller:"species", action:"show", id:speciesId, 'userGroupWebaddress':params?.webaddress) + '">' + "<i>$reco.name</i>" + "</a>"
+		}else if(reco.isScientificName){
+			sb = "<i>$reco.name</i>"
+		}else{
+			sb = reco.name
+		}
+		 return "" + sb
+	}
+	
+	def getUserHyperLink(user, userGroup){
+		def uGroup = grailsApplication.mainContext.getBean('species.UserGroupTagLib');
+		return '<a href="' + uGroup.createLink(controller:'SUser', action:'show', id:user.id, userGroup:userGroup, 'userGroupWebaddress':userGroup?.webaddress)  + '">' + "<i>$user.name</i>" + "</a>"
+	}
+	
+	def getUserGroupHyperLink(userGroupInstance){
+		def uGroup = grailsApplication.mainContext.getBean('species.UserGroupTagLib');
+		return '<a href="' + uGroup.createLink(mapping:'userGroup',  action:'show', 'userGroup':userGroupInstance) + '">' + "<i>$userGroupInstance.name</i>" + "</a>"
+	}
+	
+	
+	
+	//	private getObservationHyperLink(obv){
+	//		return "" + (g.link(controller:"observation", action:"show", id:obv.id){"<i>Observation</i>"})
+	//	}
+	
 	
 //	static getDateInISO(date){
 //		return date.getTime()//DATE_FORMAT.format(date)

@@ -29,7 +29,7 @@
 				<comment:showAllComments
 					model="['commentHolder':userGroupInstance, commentType:'super', 'canPostComment':canPostComment, 'showCommentList':false]" />
 			</div>
-			<feed:showFeedWithFilter model="['rootHolder':userGroupInstance, feedType:'GroupSpecific', refreshType:'manual', feedPermission:'editable', feedCategory:'All','feedOrder':'latestFirst']" />
+			<feed:showFeedWithFilter model="['rootHolder':userGroupInstance, feedType:'GroupSpecific', feedPermission:'editable', feedCategory:'All','feedOrder':'latestFirst']" />
 		</div>	
 	</div>
 </body>

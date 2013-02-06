@@ -9,7 +9,7 @@
 	</div>
 	<b> ${feedInstance.author.name} :
 	<g:if test="${commentInstance.isMainThread()}">
-		<span class="yj-context"> ${feedInstance.activityType} </span>
+		<span class="yj-context"> ${commentContext} </span>
 	</g:if>
 	<g:else>	
 		<span class="yj-context" title="${commentInstance.fetchParentText()}">In reply to</span><g:link controller="SUser" action="show"

@@ -1,5 +1,8 @@
 package species
 
+import species.participation.ChecklistRowData;
+import species.participation.Comment
+
 class ActivityFeedTagLib {
 	static namespace = "feed"
 	
@@ -83,17 +86,18 @@ class ActivityFeedTagLib {
 		def text = null
 		def activityTitle = null
 		
-		println "==============$model.feedInstance === $model.feedInstance.activityType"
+		println "=== feed === $model.feedInstance.id === $model.feedInstance.activityType" 
 		switch (activityType) {
 			case activityFeedService.COMMENT_ADDED:
-				activityTitle = activityFeedService.COMMENT_ADDED
+				println "came here "
+				activityTitle = activityFeedService.COMMENT_ADDED  + activityFeedService.getCommentContext(activityDomainObj, params)
 				text = activityDomainObj.body
 				break
 			case activityFeedService.SPECIES_RECOMMENDED:
-				activityTitle = activityFeedService.SPECIES_RECOMMENDED + " " + getSpeciesNameHtml(activityDomainObj)
+				activityTitle = activityFeedService.SPECIES_RECOMMENDED + " " + activityFeedService.getSpeciesNameHtml(activityDomainObj, params)
 				break
 			case activityFeedService.SPECIES_AGREED_ON:
-				activityTitle =  activityFeedService.SPECIES_AGREED_ON + " " + getSpeciesNameHtml(activityDomainObj)
+				activityTitle =  activityFeedService.SPECIES_AGREED_ON + " " + activityFeedService.getSpeciesNameHtml(activityDomainObj, params)
 				break
 			case activityFeedService.OBSERVATION_FLAGGED:
 				activityTitle = activityFeedService.OBSERVATION_FLAGGED
@@ -104,25 +108,25 @@ class ActivityFeedTagLib {
 				text = "User updated the observation details"
 				break
 			case activityFeedService.USERGROUP_CREATED:
-				activityTitle = "Group " + getUserGroupHyperLink(activityRootObj) + " created"
+				activityTitle = "Group " + activityFeedService.getUserGroupHyperLink(activityRootObj) + " created"
 				break
 			case activityFeedService.USERGROUP_UPDATED:
-				activityTitle = "Group " + getUserGroupHyperLink(activityRootObj) + " updated"
+				activityTitle = "Group " + activityFeedService.getUserGroupHyperLink(activityRootObj) + " updated"
 				break
 			case activityFeedService.OBSERVATION_POSTED_ON_GROUP:
-				activityTitle = activityFeedService.OBSERVATION_POSTED_ON_GROUP + " " + getUserGroupHyperLink(activityDomainObj)
+				activityTitle = activityFeedService.OBSERVATION_POSTED_ON_GROUP + " " + activityFeedService.getUserGroupHyperLink(activityDomainObj)
 				break
 			case activityFeedService.OBSERVATION_REMOVED_FROM_GROUP:
-				activityTitle = activityFeedService.OBSERVATION_REMOVED_FROM_GROUP + " " + getUserGroupHyperLink(activityDomainObj) 
+				activityTitle = activityFeedService.OBSERVATION_REMOVED_FROM_GROUP + " " + activityFeedService.getUserGroupHyperLink(activityDomainObj) 
 				break
 			case activityFeedService.MEMBER_JOINED:
-				activityTitle = "Joined group " +  getUserGroupHyperLink(activityRootObj)
+				activityTitle = "Joined group " + activityFeedService.getUserGroupHyperLink(activityRootObj)
 				break
 			case activityFeedService.MEMBER_ROLE_UPDATED:
-				activityTitle = getUserHyperLink(activityDomainObj, model.feedInstance.fetchUserGroup()) + "'s role updated"
+				activityTitle = activityFeedService.getUserHyperLink(activityDomainObj, model.feedInstance.fetchUserGroup()) + "'s role updated"
 				break
 			case activityFeedService.MEMBER_LEFT:
-				activityTitle = "Left group " + getUserGroupHyperLink(activityRootObj)
+				activityTitle = "Left group " + activityFeedService.getUserGroupHyperLink(activityRootObj)
 				break
 			default:
 				activityTitle = activityType
@@ -133,32 +137,5 @@ class ActivityFeedTagLib {
 		model.feedText = text
 		model.activityTitle = activityTitle
 		out << render(template:"/common/activityfeed/showActivityTemplate", model:attrs.model);
-	}
-	
-	private getSpeciesNameHtml(recoVote){
-		def reco = recoVote.recommendation
-		def speciesId = reco?.taxonConcept?.findSpeciesId();
-		String sb = ""
-		if(speciesId != null){
-			sb = (g.link(controller:"species", action:"show", id:speciesId){"<i>$reco.name</i>"})
-		}else if(reco.isScientificName){
-			sb = "<i>$reco.name</i>"
-		}else{
-			sb = reco.name
-		}
- 		return "" + sb
-	}
-	
-//	private getObservationHyperLink(obv){
-//		return "" + (g.link(controller:"observation", action:"show", id:obv.id){"<i>Observation</i>"})
-//	}
-	
-	private getUserHyperLink(user, userGroup){
-		return '<a href="' + uGroup.createLink(controller:'SUser', action:'show', id:user.id, userGroup:userGroup, 'userGroupWebaddress':userGroup?.webaddress)  + '">' + "<i>$user.name</i>" + "</a>"
-	}
-	
-	private getUserGroupHyperLink(userGroupInstance){
-		return '<a href="' + uGroup.createLink(mapping:'userGroup',  action:'show', 'userGroup':userGroupInstance) + '">' + "<i>$userGroupInstance.name</i>" + "</a>"
-	}
-	
+	}	
 }

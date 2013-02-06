@@ -94,7 +94,7 @@ function updateCountOnPopup(postComp, newlyAddedCount){
 	var popupButton = $(postComp).closest('.comment-popup').children('a');
 	if(popupButton.attr("class")){
 		var newCount = parseInt(popupButton.text()) + newlyAddedCount;
-		popupButton.html('<i class="icon-comment"></i>' + newCount);
+		popupButton.html('<i class="icon-comment"></i>' + ' ' + newCount);
 	}
 }
 

@@ -4,6 +4,7 @@ class CommentTagLib {
 	static namespace = "comment"
 	
 	def commentService
+	def activityFeedService
 	
 	def showComment = {attrs, body->
 		out << render(template:"/common/comment/showCommentTemplate", model:attrs.model);
@@ -27,8 +28,10 @@ class CommentTagLib {
 //		def showAlways = (model.showAlways != null)?model.showAlways:false
 //		 
 //		if(showAlways || model.feedInstance.showComment()){
-			model.commentInstance = commentService.getDomainObject( model.feedInstance.activityHolderType, model.feedInstance.activityHolderId)
-			out << render(template:"/common/comment/showCommentWithReplyTemplate", model:attrs.model);
+		model.commentInstance = commentService.getDomainObject( model.feedInstance.activityHolderType, model.feedInstance.activityHolderId)
+		//this is for checklist row and species field comment
+		model.commentContext = activityFeedService.COMMENT_ADDED  + activityFeedService.getCommentContext(model.commentInstance, params)
+		out << render(template:"/common/comment/showCommentWithReplyTemplate", model:attrs.model);
 //		}
 	}
 	

@@ -18,7 +18,7 @@
 		<tbody>
 			<%
 				def preRowNo = -1
-				def prevRow = null
+				def snRow = null
 				def totalRows = checklistInstance.row.size()
 			%>
 			<g:each in="${checklistInstance.row}"  status="i" var="row">
@@ -28,17 +28,20 @@
 				<g:if test="${preRowNo !=  currentRowNo}">
 					<g:if test="${preRowNo != -1}">
 						<td>
-							<comment:showCommentPopup model="['commentHolder':prevRow, 'rootHolder':checklistInstance]" />
+							<comment:showCommentPopup model="['commentHolder':snRow, 'rootHolder':checklistInstance]" />
 						</td>
 						</tr>
 					</g:if>
 					<%
 						preRowNo = currentRowNo
-						prevRow = row 
 					%>
 					<tr>
 				</g:if>
-				
+				<%
+					if(row.key.equalsIgnoreCase("scientific_name")){
+						snRow = row
+					}
+				%>
 				<g:if test="${row.reco}">
 					<g:if test="${row.reco.taxonConcept && row.reco.taxonConcept.canonicalForm != null}">
 						<td>
@@ -56,7 +59,7 @@
 				</g:else>
 				<g:if test="${totalRows > 1 && i == (totalRows-1)}">
 					<td>
-						<comment:showCommentPopup model="['commentHolder':prevRow, 'rootHolder':checklistInstance]" />
+						<comment:showCommentPopup model="['commentHolder':snRow, 'rootHolder':checklistInstance]" />
 					</td>
 				</g:if>
 			</g:each>
