@@ -204,7 +204,7 @@ function pollForFeeds(targetComp){
 		if(!newFeedProcessing){
 			loadNewerFeedsInAjax(targetComp, true);
 		}
-	}, 5000);
+	}, 20000);
 } 
 
 // on automatic fetch
