@@ -40,6 +40,16 @@ class Comment{
 	static mapping = {
 		version : false;
 		body type:'text';
+		
+		//fething this right away
+		author fetch: 'join'
+		
+		rootHolderId index: 'rootHolderId_Index'
+		rootHolderType index: 'rootHolderType_Index'
+		lastUpdated index: 'lastUpdated_Index'
+		
+		commentHolderId index: 'commentHolderId_Index'
+		commentHolderType index: 'commentHolderType_Index'
 	}
 
 	static int fetchCount(commentHolder, rootHolder, refTime, timeLine){

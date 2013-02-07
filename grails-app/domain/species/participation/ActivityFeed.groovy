@@ -47,6 +47,16 @@ class ActivityFeed {
 
 	static mapping = {
 		version : false;
+		
+		//fething this right away
+		author fetch: 'join'
+		
+		rootHolderId index: 'rootHolderId_Index'
+		rootHolderType index: 'rootHolderType_Index'
+		lastUpdated index: 'lastUpdated_Index'
+		
+		subRootHolderId index: 'subRootHolderId_Index'
+		subRootHolderType index: 'subRootHolderType_Index'
 	}
 
 	static fetchFeeds(params){
