@@ -22,7 +22,7 @@ function loadOlderFeedsInAjax(targetComp){
 					$(targetComp).children('ul').prepend(htmlData);
 				}
     			$(targetComp).children('input[name="olderTimeRef"]').val(data.olderTimeRef);
-				if(data.remainingFeedCount && data.remainingFeedCount > 0){
+    			if(data.remainingFeedCount && data.remainingFeedCount > 0){
 					$(targetComp).children('.activiyfeedoldermsg').text("Show " + ((feedType !== "GroupSpecific") ? data.remainingFeedCount: "") + " older feeds >>");
 				}else{
 					$(targetComp).children('.activiyfeedoldermsg').hide();
@@ -47,6 +47,7 @@ function loadOlderFeedsInAjax(targetComp){
 }
 
 function loadNewerFeedsInAjax(targetComp, checkFeed){
+	
 	var url = $(targetComp).children('input[name="feedUrl"]').val();
 	var feedType = $(targetComp).children('input[name="feedType"]').val();
 	var paramData =  getFeedParams("newer", targetComp);
@@ -181,21 +182,28 @@ function setUpFeedForTarget(targetComp){
 	if(targetComp === null){
 		return; 
 	}
+	
 	//resetting time range
-	$(targetComp).children('input[name="newerTimeRef"]').val("");
-	$(targetComp).children('input[name="olderTimeRef"]').val("");
+	setUpTimeRef(targetComp);
 	
 	var refreshType = $(targetComp).children('input[name="refreshType"]').val();
 	if(refreshType === "auto"){
-		pollForFeeds(targetComp); //to get newer feeds
-		autoLoadOnScroll(targetComp); // to get older feeds on scroll bottom
 		loadOlderFeedsInAjax(targetComp); // to load some feeds to start with
+		autoLoadOnScroll(targetComp); // to get older feeds on scroll bottom
+		pollForFeeds(targetComp); //to get newer feeds
 	}
 }
 
 function setUpFeed(timeUrl){
 	initRelativeTime(timeUrl);
 	setUpFeedForTarget(getTargetComp());
+}
+
+
+function setUpTimeRef(targetComp){
+	var refTime = new Date().getTime()
+	$(targetComp).children('input[name="newerTimeRef"]').val(refTime);
+	$(targetComp).children('input[name="olderTimeRef"]').val(refTime);
 }
 
 //on user click fetch
@@ -266,14 +274,18 @@ function updateFeeds(){
 		var refreshType = $(targetComp).children('input[name="refreshType"]').val();
 		if(refreshType == "manual"){
 			loadNewerFeedsInAjax(targetComp, false);	
+		}else{
+			//on auto refresh forcing to check new feeds right away
+			if(!newFeedProcessing){
+				loadNewerFeedsInAjax(targetComp, true);	
+			}
 		}
 	}
 }
 
 function updateFeedComponent(targetComp, feedCategory){
 	 $(targetComp).children('input[name="feedCategory"]').val(feedCategory);
-	 $(targetComp).children('input[name="newerTimeRef"]').val("");
-	 $(targetComp).children('input[name="olderTimeRef"]').val("");
+	 setUpTimeRef(targetComp);
 	 $(targetComp).children('ul').empty();
 	 loadOlderFeedsInAjax(targetComp);
 }

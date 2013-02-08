@@ -503,7 +503,7 @@ $(document).ready(function(){
 						</g:else>
 					</g:each>
 				</ul>
-				<div class="union-comment" style="clear: both;">
+				<div class="union-comment">
 				<feed:showAllActivityFeeds model="['rootHolder':speciesInstance, feedType:'Specific', refreshType:'manual', 'feedPermission':'editable']" />
 				<%
 					def canPostComment = true //customsecurity.hasPermissionAsPerGroups([object:speciesInstance, permission:org.springframework.security.acls.domain.BasePermission.WRITE]).toBoolean()

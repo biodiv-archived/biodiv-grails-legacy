@@ -74,7 +74,7 @@ function postAsAjax(postComp, url, newCommentUrl, update){
     			updateCountOnPopup(postComp, data.newlyAddedCommentCount);
     			if(update){
     				updateFeeds();
-        			updateUnionComment(postComp, newCommentUrl);
+    				updateUnionComment(postComp, newCommentUrl);
     			}
     			if(data.clearForm){
     				$(postComp).children('textarea[name=commentBody]').val("");

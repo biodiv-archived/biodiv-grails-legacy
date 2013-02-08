@@ -76,7 +76,9 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 .nameContainer .combobox-container {
 	left:210px;
 }
-
+.observation .union-comment {
+	width:99%
+}
 </style>
 </head>
 <body>
@@ -206,7 +208,7 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 						</div>
 						
 					</div>
-					<div class="union-comment" style="clear: both;">
+					<div class="union-comment">
 					<feed:showAllActivityFeeds model="['rootHolder':observationInstance, feedType:'Specific', refreshType:'manual', 'feedPermission':'editable']" />
 					<%
 						def canPostComment = customsecurity.hasPermissionAsPerGroups([object:observationInstance, permission:org.springframework.security.acls.domain.BasePermission.WRITE]).toBoolean()

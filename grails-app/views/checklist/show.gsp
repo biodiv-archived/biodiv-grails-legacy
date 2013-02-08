@@ -10,11 +10,6 @@
 </title>
 <%--<script src="http://maps.google.com/maps/api/js?sensor=true"></script>--%>
 <r:require modules="checklist"/>
-<style>
-.comment-post-btn{
-	position:relative;
-}
-</style>
 </head>
 <body>
 	
@@ -131,7 +126,7 @@
 			</g:if>
 				
 				
-			<div class="union-comment" style="clear: both;">
+			<div class="union-comment">
 				<feed:showAllActivityFeeds model="['rootHolder':checklistInstance, feedType:'Specific', refreshType:'manual', 'feedPermission':'editable']" />
 				<%
 					def canPostComment = customsecurity.hasPermissionAsPerGroups([object:checklistInstance, permission:org.springframework.security.acls.domain.BasePermission.WRITE]).toBoolean()
