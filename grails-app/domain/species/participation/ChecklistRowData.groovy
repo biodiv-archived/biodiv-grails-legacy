@@ -20,6 +20,8 @@ class ChecklistRowData implements Comparable {
 	static mapping = {
 		version : false;
 		value type:'text';
+		
+		rowId index: 'rowId_Index'
 	}	
 
 	@Override

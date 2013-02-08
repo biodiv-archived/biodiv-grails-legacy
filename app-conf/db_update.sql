@@ -22,14 +22,21 @@ CREATE INDEX sub_root_holder_type_idx ON activity_feed(sub_root_holder_type);
 /*
  indexes on comment table 
  */
-CREATE INDEX root_holder_id_idx ON comment(root_holder_id);
-CREATE INDEX root_holder_type_idx ON comment(root_holder_type);
-CREATE INDEX last_updated_idx ON comment(last_updated);
+CREATE INDEX root_holder_id_comment_idx ON comment(root_holder_id);
+CREATE INDEX root_holder_type_comment_idx ON comment(root_holder_type);
+CREATE INDEX last_updated_comment_idx ON comment(last_updated);
 CREATE INDEX comment_holder_id_idx ON comment(comment_holder_id);
 CREATE INDEX comment_holder_type_idx ON comment(comment_holder_type);
+
+
+/*
+ indexes on checlist row table 
+ */
+CREATE INDEX rowId_checklist_data_idx ON checklist_row_data(row_id);
 
 /*
  *  To update query planner to use available indexes
  */
 ANALYZE activity_feed;
 ANALYZE comment;
+ANALYZE checklist_row_data;

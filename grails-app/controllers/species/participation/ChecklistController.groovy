@@ -41,7 +41,8 @@ class ChecklistController {
 	def show = {
 		log.debug params
 		if(params.id){
-			def checklistInstance = Checklist.read(params.id.toLong())
+			//def checklistInstance = Checklist.read(params.id.toLong())
+			def checklistInstance = Checklist.findById(params.id.toLong(), [fetch: [row: 'join']])
 			if (!checklistInstance) {
 				flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'checklist.label', default: 'Checklist'), params.id])}"
 				redirect (url:uGroup.createLink(action:'list', controller:"checklist", 'userGroupWebaddress':params.webaddress))
