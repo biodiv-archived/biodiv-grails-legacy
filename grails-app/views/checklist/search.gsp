@@ -17,16 +17,30 @@
 		<search:searchResultsHeading />
 		<uGroup:rightSidebar />
 		<!-- main_content -->
-			<div id="searchResults" class="list"
-				style="margin-left: 0px; clear: both;">
-				<clist:filterTemplate />
+		<div id="searchResults" class="list"
+			style="margin-left: 0px; clear: both;">
+			<clist:filterTemplate />
 
-				<div class="observations_list_wrapper" style="top: 0px;">
-					<clist:showList />
-				</div>
+			<div class="observations_list_wrapper" style="top: 0px;">
+				<clist:showList />
 			</div>
-		
-		
+		</div>
+
 	</div>
+
+	<r:script>
+
+$(document).ready(function(){
+
+	$(".list_view").show();
+	
+    $('.observations_list_wrapper').on('updatedGallery', function(event) {
+    	$(".list_view").show();
+    });
+	
+});
+
+
+</r:script>
 </body>
 </html>

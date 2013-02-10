@@ -671,10 +671,12 @@ class ChecklistService {
 		paramsList.add('rows', max);
 		params['sort'] = params['sort']?:"score"
 		String sort = params['sort'].toLowerCase();
-		if(sort.indexOf(' desc') == -1 && sort.indexOf(' asc') == -1 ) {
-			sort += " desc";
+		if(isValidSortParam(sort)) {
+			if(sort.indexOf(' desc') == -1 && sort.indexOf(' asc') == -1 ) {
+				sort += " desc";
+			}
+			paramsList.add('sort', sort);
 		}
-		paramsList.add('sort', sort);
 		queryParams["max"] = max
 		queryParams["offset"] = offset
 		
@@ -692,11 +694,6 @@ class ChecklistService {
 			}
 		}
 		
-		if(params.habitat && (params.habitat != Habitat.findByName(grailsApplication.config.speciesPortal.group.ALL).id)){
-			paramsList.add('fq', searchFieldsConfig.HABITAT+":"+params.habitat);
-			queryParams["habitat"] = params.habitat
-			activeFilters["habitat"] = params.habitat
-		}
 		if(params.tag) {
 			paramsList.add('fq', searchFieldsConfig.TAG+":"+params.tag);
 			queryParams["tag"] = params.tag
@@ -747,6 +744,12 @@ class ChecklistService {
 		return result;
 	}
 
+	private boolean isValidSortParam(String sortParam) {
+		if(sortParam.equalsIgnoreCase("score"))
+			return true
+		else
+			return false;
+	}
 }
 /*
 

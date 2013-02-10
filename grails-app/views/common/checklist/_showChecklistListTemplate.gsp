@@ -1,5 +1,5 @@
-<g:if test="${instanceTotal > 0 }">
 <div class="observations_list" style="clear:both;padding-top:50px;">
+<g:if test="${instanceTotal > 0 }">
 	<div>
 		<table class="table table-hover span8 tablesorter" style="margin-left: 0px; clear:both;">
 			<thead>
@@ -42,5 +42,5 @@
 		<g:paginate total="${instanceTotal}" max="${queryParams?.max}"
 				action="${params.action}" params="${activeFilters}" />
 	</div>
-</div>
 </g:if>
+</div>
