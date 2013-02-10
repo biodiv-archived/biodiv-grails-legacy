@@ -896,7 +896,7 @@ If you do not want to receive notifications please go to your <a href="$userProf
 Thank you for your contribution to the portal.<br/>
 <br/>
 -The portal team'''
-
+grails.plugins.springsecurity.ui.addRecommendationVote.emailSubject = 'Species name suggested'
 grails.plugins.springsecurity.ui.addRecommendationVote.emailBody = '''
 Hi $username,<br/>
 <br/>

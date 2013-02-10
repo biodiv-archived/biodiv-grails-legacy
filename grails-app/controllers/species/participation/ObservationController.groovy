@@ -843,8 +843,8 @@ class ObservationController {
 		String htmlContent = ""
 		String bodyView = '';
 		def replyTo = conf.ui.notification.emailReplyTo;
-		//Set bcc = ["prabha.prabhakar@gmail.com", "sravanthi@strandls.com", "thomas.vee@gmail.com"];
-		Set bcc = ["xyz@xyz.com"];
+		Set bcc = ["prabha.prabhakar@gmail.com", "sravanthi@strandls.com", "thomas.vee@gmail.com"];
+		//Set bcc = ["xyz@xyz.com"];
 		//def activityModel = ['feedInstance':feedInstance, 'feedType':ActivityFeedService.GENERIC, 'feedPermission':ActivityFeedService.READ_ONLY, feedHomeObject:null] 
 		if(obv.author.sendNotification){
 			bcc.add(obv.author.email);
@@ -870,28 +870,29 @@ class ObservationController {
 				break
 
 			case SPECIES_RECOMMENDED :
-				
 				bodyView = "/emailtemplates/addRecommendation"
+				//mailSubject = conf.ui.addRecommendationVote.emailSubject
 				templateMap['actor'] = feedInstance.author;
 				templateMap["actorProfileUrl"] = generateLink("SUser", "show", ["id": feedInstance.author.id], request)
 				templateMap["actorIconUrl"] = feedInstance.author.icon(ImageType.SMALL)
 				templateMap["actorName"] = feedInstance.author.name
 				templateMap["activity"] = activityFeedService.getContextInfo(feedInstance, [webaddress:params.webaddress])
 				templateMap["userGroupWebaddress"] = params.webaddress
-				mailSubject = feedInstance.author.name +" : "+ templateMap["activity"].activityTitle.replaceAll(/<.*?>/, '')
+				//mailSubject = feedInstance.author.name +" : "+ templateMap["activity"].activityTitle.replaceAll(/<.*?>/, '')
 				//replyTo = templateMap["currentUser"].email
 				bcc.addAll(getParticipants(obv)*.email)
 				break
 
 			case SPECIES_AGREED_ON:
 				bodyView = "/emailtemplates/addRecommendation"
+				//mailSubject = conf.ui.addRecommendationVote.emailSubject
 				templateMap['actor'] = feedInstance.author;
 				templateMap["actorProfileUrl"] = generateLink("SUser", "show", ["id": feedInstance.author.id], request)
 				templateMap["actorIconUrl"] = feedInstance.author.icon(ImageType.SMALL)
 				templateMap["actorName"] = feedInstance.author.name
 				templateMap["userGroupWebaddress"] = params.webaddress
 				templateMap["activity"] = activityFeedService.getContextInfo(feedInstance, [webaddress:params.webaddress])
-				mailSubject = feedInstance.author.name +" : "+ templateMap["activity"].activityTitle.replaceAll(/<.*?>/, '')
+				//mailSubject = feedInstance.author.name +" : "+ templateMap["activity"].activityTitle.replaceAll(/<.*?>/, '')
 				//replyTo = templateMap["currentUser"].email
 				bcc.addAll(getParticipants(obv)*.email)
 				break
@@ -914,14 +915,14 @@ class ObservationController {
 		}
 
 		String[] bccArr = bcc.toArray(new String[0]);
-		println bccArr
+		
 		if(htmlContent) {
 			 htmlContent = Utils.getPremailer(grailsApplication.config.grails.serverURL, htmlContent)
 		}
-		//if ( Environment.getCurrent().getName().equalsIgnoreCase("pamba") || Environment.getCurrent().getName().equalsIgnoreCase("saturn")) {
-		if ( Environment.getCurrent().getName().equalsIgnoreCase("development")) {
+		if ( Environment.getCurrent().getName().equalsIgnoreCase("pamba") || Environment.getCurrent().getName().equalsIgnoreCase("saturn")) {
+		//if ( Environment.getCurrent().getName().equalsIgnoreCase("development")) {
 			mailService.sendMail {
-				cc bccArr
+				to bccArr
 				from conf.ui.notification.emailFrom
 				//replyTo replyTo
 				subject mailSubject

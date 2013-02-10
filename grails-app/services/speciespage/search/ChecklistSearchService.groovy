@@ -88,20 +88,24 @@ class ChecklistSearchService {
 				doc.addField(searchFieldsConfig.TITLE, chk.title);
 				
 				doc.addField(searchFieldsConfig.CONTRIBUTOR, chk.author.name);
-				doc.addField(searchFieldsConfig.ATTRIBUTION, chk.attribution.name);
+				doc.addField(searchFieldsConfig.ATTRIBUTION, chk.attribution);
 				doc.addField(searchFieldsConfig.LOCATION, chk.placeName);
 				doc.addField(searchFieldsConfig.LATLONG, chk.latitude+","+chk.longitude);
 				
 				
 				doc.addField(searchFieldsConfig.UPLOADED_ON, chk.publicationDate);
-				doc.addField(searchFieldsConfig.UPDATED_ON, chk.lastRevised);
+				doc.addField(searchFieldsConfig.UPDATED_ON, chk.lastUpdated);
 				doc.addField(searchFieldsConfig.FROM_DATE, chk.fromDate);
 				doc.addField(searchFieldsConfig.TO_DATE, chk.toDate);
 				
-				doc.addField(searchFieldsConfig.SGROUP, chk.group.id);			
-				doc.addField(searchFieldsConfig.HABITAT, chk.habitat.id);
+				//doc.addField(searchFieldsConfig.SGROUP, chk.group.id);			
+				//doc.addField(searchFieldsConfig.HABITAT, chk.habitat.id);
 				doc.addField(searchFieldsConfig.REFERENCE, chk.refText);
-			
+				
+				chk.speciesGroups.each { sGroup ->
+					doc.addField(searchFieldsConfig.USER_GROUP, sGroup.id);
+				}
+				
 				chk.userGroups.each { userGroup ->
 					doc.addField(searchFieldsConfig.USER_GROUP, userGroup.id);
 					doc.addField(searchFieldsConfig.USER_GROUP_WEBADDRESS, userGroup.webaddress);

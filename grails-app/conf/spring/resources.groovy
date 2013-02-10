@@ -162,4 +162,20 @@ beans = {
 	}
 
 	emailConfirmationService(EmailConfirmationService) { mailService = ref('mailService') }
+	
+	checklistSolrServer(org.apache.solr.client.solrj.impl.StreamingUpdateSolrServer,config.serverURL+"/checklists", config.queueSize, config.threadCount ) {
+		setSoTimeout(config.soTimeout);
+		setConnectionTimeout(config.connectionTimeout);
+		setDefaultMaxConnectionsPerHost(config.defaultMaxConnectionsPerHost);
+		setMaxTotalConnections(config.maxTotalConnections);
+		setFollowRedirects(config.followRedirects);
+		setAllowCompression(config.allowCompression);
+		setMaxRetries(config.maxRetries);
+		//setParser(new XMLResponseParser()); // binary parser is used by default
+		log.debug "Initialized search server to "+config.serverURL+"/checklists"
+	}
+
+	checklistSearchService(speciespage.search.ObservationsSearchService) {
+		solrServer = ref('checklistSolrServer');
+	}
 }
