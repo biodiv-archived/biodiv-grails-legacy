@@ -420,14 +420,17 @@ class SpeciesController {
 		log.debug params;
 		def model = speciesService.search(params)
 		model['isSearch'] = true;
-		println model;
+		
 		if(params.loadMore?.toBoolean()){
+			params.remove('isGalleryUpdate');
 			render(template:"/species/searchResultsTemplate", model:model);
 			return;
 		} else if(!params.isGalleryUpdate?.toBoolean()){
+			params.remove('isGalleryUpdate');
 			render (view:"search", model:model)
 			return;
 		} else {
+			params.remove('isGalleryUpdate');
 			def obvListHtml =  g.render(template:"/species/searchResultsTemplate", model:model);
 			model.resultType = "specie"
 			def obvFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);

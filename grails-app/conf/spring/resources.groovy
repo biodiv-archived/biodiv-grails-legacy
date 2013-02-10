@@ -175,7 +175,7 @@ beans = {
 		log.debug "Initialized search server to "+config.serverURL+"/checklists"
 	}
 
-	checklistSearchService(speciespage.search.ObservationsSearchService) {
+	checklistSearchService(speciespage.search.ChecklistSearchService) {
 		solrServer = ref('checklistSolrServer');
 	}
 }

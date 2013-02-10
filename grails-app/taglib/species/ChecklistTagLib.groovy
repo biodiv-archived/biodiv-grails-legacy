@@ -31,4 +31,8 @@ class ChecklistTagLib {
 	def showSubmenuTemplate = {attrs, body->
 		out << render(template:"/checklist/submenuTemplate", model:attrs.model);
 	}
+	
+	def filterTemplate = {attrs, body->
+		out << render(template:"/checklist/filterTemplate", model:attrs.model);
+	}
 }

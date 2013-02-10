@@ -217,19 +217,19 @@
 		<field name="attribution" type="taxonText" indexed="true" stored="true" multiValued="true"/>
 		<field name="latlong" type="location" indexed="true" multiValued="false"/>
 		
-		<field name="createdon" type="tdate" indexed="true" required="true"/>
+		<field name="createdon" type="tdate" indexed="true"/>
 		<field name="lastrevised" type="tdate" indexed="true" required="true"/>
-		<field name="fromdate" type="tdate" indexed="true" required="true"/>
-		<field name="todate" type="tdate" indexed="true" required="true"/>
+		<field name="fromdate" type="tdate" indexed="true" />
+		<field name="todate" type="tdate" indexed="true" />
 		<field name="sgroup" type="long" indexed="true" required="true" multiValues="true"/>
-		<field name="habitat" type="long" indexed="true" required="true"/>
+		<!-- field name="habitat" type="long" indexed="true" required="true"/-->
 				
 		<field name="reference" type="text" indexed="true" stored="true" multiValued="true"/>	
 		
 		<field name="group" type="long" indexed="true" stored="true"  multiValued="true"/>
 		<field name="group_webaddress" type="string" indexed="true" stored="true" multiValued="true"/>
 		
-		<field name="name" type="taxonText" indexed="true" stored="true" required="true" multiValued="true" />
+		<field name="name" type="taxonText" indexed="true" stored="true" multiValued="true" />
 
 		<!-- using stored=true for highlighting...needs to change -->
 		<field name="text" type="text" indexed="true" stored="true" required="true" multiValued="true"  termVectors="true" termPositions="true" termOffsets="true"/>

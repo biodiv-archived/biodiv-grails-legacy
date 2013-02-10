@@ -20,6 +20,7 @@ class SearchController {
 	def namesIndexerService;
 	def observationService;
 	def speciesService;
+	def checklistService;
 	def SUserService;
 	def userGroupService;
 	def newsletterService;
@@ -32,7 +33,6 @@ class SearchController {
 	}
 
 	def nameTerms = {
-		log.debug params;
 		params.field = params.field?:"autocomplete";
 		params.max = Math.min(params.max ? params.int('max') : 5, 10)
 		List suggestions = new ArrayList();
@@ -41,6 +41,7 @@ class SearchController {
 		suggestions.addAll(namesLookupResults);
 		suggestions.addAll(speciesService.nameTerms(params));
 		suggestions.addAll(observationService.nameTerms(params));
+		suggestions.addAll(checklistService.nameTerms(params));
 		suggestions.addAll(userGroupService.nameTerms(params));
 		suggestions.addAll(newsletterService.nameTerms(params));
 		suggestions.addAll(SUserService.nameTerms(params));

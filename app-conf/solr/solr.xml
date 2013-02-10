@@ -32,5 +32,6 @@
     <core name="species" instanceDir="species" />
     <core name="observations" instanceDir="observations" />
     <core name="newsletters" instanceDir="newsletters" />
+    <core name="checklists" instanceDir="checklists" />
   </cores>
 </solr>

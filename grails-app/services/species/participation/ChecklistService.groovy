@@ -6,6 +6,8 @@ import java.util.List;
 
 import species.participation.curation.UnCuratedCommonNames
 
+import org.apache.solr.common.SolrException;
+import org.apache.solr.common.util.NamedList;
 import org.springframework.transaction.annotation.Transactional;
 
 
@@ -31,7 +33,7 @@ class ChecklistService {
 	def sessionFactory
 	def curationService
 	def recommendationService
-	
+	def checklistSearchService;
 	static final String SN_NAME = "scientific_name"
 	static final String CN_NAME = "common_name"
 
@@ -619,7 +621,132 @@ class ChecklistService {
 		return res
 	}
 	
+	def nameTerms(params) {
+		List result = new ArrayList();
+		
+		def queryResponse = checklistSearchService.terms(params.term, params.field, params.max);
+		NamedList tags = (NamedList) ((NamedList)queryResponse.getResponse().terms)[params.field];
+		for (Iterator iterator = tags.iterator(); iterator.hasNext();) {
+			Map.Entry tag = (Map.Entry) iterator.next();
+			result.add([value:tag.getKey().toString(), label:tag.getKey().toString(),  "category":"Checklists"]);
+		}
+		return result;
+	}
 	
+	def search(params) {
+		def result;
+		def searchFieldsConfig = grailsApplication.config.speciesPortal.searchFields
+		def queryParams = [:]
+		def activeFilters = [:]
+
+		NamedList paramsList = new NamedList();
+		queryParams["query"] = params.query
+		activeFilters["query"] = params.query
+		params.query = params.query ?: "";
+
+		String aq = "";
+		int i=0;
+		params.aq.each { key, value ->
+			queryParams["aq."+key] = value;
+			activeFilters["aq."+key] = value;
+			if(!(key ==~ /action|controller|sort|fl|start|rows|webaddress/) && value ) {
+				if(i++ == 0) {
+					aq = key + ': ('+value+')';
+				} else {
+					aq = aq + " AND " + key + ': ('+value+')';
+				}
+			}
+		}
+		if(params.query && aq) {
+			params.query = params.query + " AND "+aq
+		} else if (aq) {
+			params.query = aq;
+		}
+
+		def max = Math.min(params.max ? params.int('max') : 12, 100)
+		def offset = params.offset ? params.long('offset') : 0
+ 
+		paramsList.add('q', Utils.cleanSearchQuery(params.query));
+		paramsList.add('start', offset);
+		paramsList.add('rows', max);
+		params['sort'] = params['sort']?:"score"
+		String sort = params['sort'].toLowerCase();
+		if(sort.indexOf(' desc') == -1 && sort.indexOf(' asc') == -1 ) {
+			sort += " desc";
+		}
+		paramsList.add('sort', sort);
+		queryParams["max"] = max
+		queryParams["offset"] = offset
+		
+		paramsList.add('fl', params['fl']?:"id");
+
+		if(params.sGroup) {
+			params.sGroup = params.sGroup.toLong()
+			def groupId = observationService.getSpeciesGroupIds(params.sGroup)
+			if(!groupId){
+				log.debug("No groups for id " + params.sGroup)
+			} else{
+				paramsList.add('fq', searchFieldsConfig.SGROUP+":"+groupId);
+				queryParams["groupId"] = groupId
+				activeFilters["sGroup"] = groupId
+			}
+		}
+		
+		if(params.habitat && (params.habitat != Habitat.findByName(grailsApplication.config.speciesPortal.group.ALL).id)){
+			paramsList.add('fq', searchFieldsConfig.HABITAT+":"+params.habitat);
+			queryParams["habitat"] = params.habitat
+			activeFilters["habitat"] = params.habitat
+		}
+		if(params.tag) {
+			paramsList.add('fq', searchFieldsConfig.TAG+":"+params.tag);
+			queryParams["tag"] = params.tag
+			queryParams["tagType"] = 'species'
+			activeFilters["tag"] = params.tag
+		}
+		if(params.user){
+			paramsList.add('fq', searchFieldsConfig.USER+":"+params.user);
+			queryParams["user"] = params.user.toLong()
+			activeFilters["user"] = params.user.toLong()
+		}
+		
+		if(params.uGroup) {
+			if(params.uGroup == "THIS_GROUP") {
+				String uGroup = params.webaddress
+				if(uGroup) {
+					//AS we dont have selecting species for group ... we are ignoring this filter
+					//paramsList.add('fq', searchFieldsConfig.USER_GROUP_WEBADDRESS+":"+uGroup);
+				}
+				queryParams["uGroup"] = params.uGroup
+				activeFilters["uGroup"] = params.uGroup
+			} else {
+				queryParams["uGroup"] = "ALL"
+				activeFilters["uGroup"] = "ALL"
+			}
+		}
+
+		log.debug "Along with faceting params : "+paramsList;
+		try {
+			def queryResponse = checklistSearchService.search(paramsList);
+			List<Species> checklistInstanceList = new ArrayList<Species>();
+			Iterator iter = queryResponse.getResults().listIterator();
+			while(iter.hasNext()) {
+				def doc = iter.next();
+				def checklistInstance = Checklist.get(doc.getFieldValue("id"));
+				if(checklistInstance)
+					checklistInstanceList.add(checklistInstance);
+			}
+
+			//queryParams = queryResponse.responseHeader.params
+			result = [queryParams:queryParams, instanceTotal:queryResponse.getResults().getNumFound(), checklistInstanceList:checklistInstanceList, snippets:queryResponse.getHighlighting()]
+			return result;
+		} catch(SolrException e) {
+			e.printStackTrace();
+		}
+
+		result = [queryParams:queryParams, instanceTotal:0, speciesInstanceList:[]];
+		return result;
+	}
+
 }
 /*
 

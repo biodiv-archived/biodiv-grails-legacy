@@ -31,11 +31,11 @@ class ChecklistSearchService {
 	static transactional = false
 
 	def grailsApplication
-	
+
 	SolrServer solrServer;
-	
+
 	private SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-	
+
 	static int BATCH_SIZE = 50;
 
 	/**
@@ -43,10 +43,10 @@ class ChecklistSearchService {
 	 */
 	def publishSearchIndex() {
 		log.info "Initializing publishing to checklist search index"
-		
+
 		//TODO: change limit
 		int limit = Checklist.count()+1, offset = 0;
-		
+
 		def checklists;
 		def startTime = System.currentTimeMillis()
 		while(true) {
@@ -56,7 +56,7 @@ class ChecklistSearchService {
 			checklists.clear();
 			offset += limit;
 		}
-		
+
 		log.info "Time taken to publish checklists search index is ${System.currentTimeMillis()-startTime}(msec)";
 	}
 
@@ -80,56 +80,54 @@ class ChecklistSearchService {
 		Map docsMap = [:]
 
 		chks.each { chk ->
-			log.debug "Reading Observation : "+chk.id;
-			if(!chk.isDeleted) {
-				SolrInputDocument doc = new SolrInputDocument();
-				doc.addField(searchFieldsConfig.ID, chk.id.toString());
-			
-				doc.addField(searchFieldsConfig.TITLE, chk.title);
-				
-				doc.addField(searchFieldsConfig.CONTRIBUTOR, chk.author.name);
-				doc.addField(searchFieldsConfig.ATTRIBUTION, chk.attribution);
-				doc.addField(searchFieldsConfig.LOCATION, chk.placeName);
-				doc.addField(searchFieldsConfig.LATLONG, chk.latitude+","+chk.longitude);
-				
-				
-				doc.addField(searchFieldsConfig.UPLOADED_ON, chk.publicationDate);
-				doc.addField(searchFieldsConfig.UPDATED_ON, chk.lastUpdated);
-				doc.addField(searchFieldsConfig.FROM_DATE, chk.fromDate);
-				doc.addField(searchFieldsConfig.TO_DATE, chk.toDate);
-				
-				//doc.addField(searchFieldsConfig.SGROUP, chk.group.id);			
-				//doc.addField(searchFieldsConfig.HABITAT, chk.habitat.id);
-				doc.addField(searchFieldsConfig.REFERENCE, chk.refText);
-				
-				chk.speciesGroups.each { sGroup ->
-					doc.addField(searchFieldsConfig.USER_GROUP, sGroup.id);
-				}
-				
-				chk.userGroups.each { userGroup ->
-					doc.addField(searchFieldsConfig.USER_GROUP, userGroup.id);
-					doc.addField(searchFieldsConfig.USER_GROUP_WEBADDRESS, userGroup.webaddress);
-				}
-				
-				chk.row.each { row ->
-					if(row.reco) {
-						doc.addField(searchFieldsConfig.NAME, row.reco.name);
-					}
-					doc.addField(searchFieldsConfig.MESSAGE, row.value);
-				}
-				doc.addField(searchFieldsConfig.MESSAGE, chk.description);
-				chk.state.each { s->
-					doc.addField(searchFieldsConfig.MESSAGE, chk.state);
-				}
-				chk.district.each { s->
-					doc.addField(searchFieldsConfig.MESSAGE, chk.district);
-				}
-				chk.taluka.each { s->
-					doc.addField(searchFieldsConfig.MESSAGE, chk.taluka);
-				}
-				
-				docs.add(doc);
+			log.debug "Reading Checklist : "+chk.id;
+			SolrInputDocument doc = new SolrInputDocument();
+			doc.addField(searchFieldsConfig.ID, chk.id.toString());
+
+			doc.addField(searchFieldsConfig.TITLE, chk.title);
+
+			doc.addField(searchFieldsConfig.CONTRIBUTOR, chk.author.name);
+			doc.addField(searchFieldsConfig.ATTRIBUTION, chk.attribution);
+			doc.addField(searchFieldsConfig.LOCATION, chk.placeName);
+			doc.addField(searchFieldsConfig.LATLONG, chk.latitude+","+chk.longitude);
+
+
+			doc.addField(searchFieldsConfig.UPLOADED_ON, chk.publicationDate);
+			doc.addField(searchFieldsConfig.UPDATED_ON, chk.lastUpdated);
+			doc.addField(searchFieldsConfig.FROM_DATE, chk.fromDate);
+			doc.addField(searchFieldsConfig.TO_DATE, chk.toDate);
+
+			//doc.addField(searchFieldsConfig.SGROUP, chk.group.id);
+			//doc.addField(searchFieldsConfig.HABITAT, chk.habitat.id);
+			doc.addField(searchFieldsConfig.REFERENCE, chk.refText);
+
+			chk.speciesGroups.each { sGroup ->
+				doc.addField(searchFieldsConfig.SGROUP, sGroup.id);
 			}
+
+			chk.userGroups.each { userGroup ->
+				doc.addField(searchFieldsConfig.USER_GROUP, userGroup.id);
+				doc.addField(searchFieldsConfig.USER_GROUP_WEBADDRESS, userGroup.webaddress);
+			}
+
+			chk.row.each { row ->
+				if(row.reco) {
+					doc.addField(searchFieldsConfig.NAME, row.reco.name);
+				}
+				doc.addField(searchFieldsConfig.MESSAGE, row.value);
+			}
+			doc.addField(searchFieldsConfig.MESSAGE, chk.description);
+			chk.state.each { s->
+				doc.addField(searchFieldsConfig.MESSAGE, chk.state);
+			}
+			chk.district.each { s->
+				doc.addField(searchFieldsConfig.MESSAGE, chk.district);
+			}
+			chk.taluka.each { s->
+				doc.addField(searchFieldsConfig.MESSAGE, chk.taluka);
+			}
+
+			docs.add(doc);
 		}
 
 		//log.debug docs;
@@ -161,15 +159,15 @@ class ChecklistSearchService {
 	}
 
 	/**
-	* delete requires an immediate commit
-	* @return
-	*/
-   def delete(long id) {
-	   log.info "Deleting checklist from search index"
-	   solrServer.deleteByQuery("id:${id}");
-	   solrServer.commit();
-   }
-   
+	 * delete requires an immediate commit
+	 * @return
+	 */
+	def delete(long id) {
+		log.info "Deleting checklist from search index"
+		solrServer.deleteByQuery("id:${id}");
+		solrServer.commit();
+	}
+
 	/**
 	 * 
 	 * @return

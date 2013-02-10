@@ -26,6 +26,9 @@
 				href="${uGroup.createLink(controller:'observation', action:'search')}"
 				data-toggle="tab">Observations</a>
 			</li>
+			<li class="${params.controller=='checklist'?'active':'' }" data-toggle="tab"><a href="${uGroup.createLink(controller:'checklist', action:'search')}"
+				data-toggle="tab">Checklists</a>
+			</li>
 			<!-- >li class="${params.controller=='userGroup'?'active':'' }" data-toggle="tab"><a href="${uGroup.createLink(controller:'userGroup', action:'search')}"
 				data-toggle="tab">Groups</a>
 			</li-->

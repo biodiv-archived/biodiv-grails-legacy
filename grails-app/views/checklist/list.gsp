@@ -16,12 +16,10 @@
 			<clist:showSubmenuTemplate model="['entityName':entityName]" />
 
 			<div class="gallerytoolbar">
-					<div class="filters" style="position: relative; overflow: visible;">
-						<obv:showGroupFilter model="['hideHabitatFilter':true, 'hideAdvSearchBar':true]"/>
-					</div>
+				<clist:filterTemplate />		
 			</div>
 			
-			<clist:showChecklistMsg model="['instanceTotal':instanceTotal]" />
+			
 			
 			<g:if test="${!isSearch && instanceTotal > 0}">
 				<div id="map_view_bttn" class="btn-group" style="clear:both;">
