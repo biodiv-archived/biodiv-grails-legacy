@@ -19,7 +19,7 @@
 				<clist:filterTemplate />		
 			</div>
 			
-			
+			<div style="clear: both;"></div>
 			
 			<g:if test="${!isSearch && instanceTotal > 0}">
 				<div id="map_view_bttn" class="btn-group" style="clear:both;">

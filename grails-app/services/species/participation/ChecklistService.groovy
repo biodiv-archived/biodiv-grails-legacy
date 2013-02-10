@@ -734,7 +734,7 @@ class ChecklistService {
 			}
 
 			//queryParams = queryResponse.responseHeader.params
-			result = [queryParams:queryParams, instanceTotal:queryResponse.getResults().getNumFound(), checklistInstanceList:checklistInstanceList, snippets:queryResponse.getHighlighting()]
+			result = [queryParams:queryParams, activeFilters:activeFilters, instanceTotal:queryResponse.getResults().getNumFound(), checklistInstanceList:checklistInstanceList, snippets:queryResponse.getHighlighting()]
 			return result;
 		} catch(SolrException e) {
 			e.printStackTrace();

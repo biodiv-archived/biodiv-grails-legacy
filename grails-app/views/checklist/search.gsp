@@ -13,7 +13,6 @@
 <body>
 
 	<div class="span12">
-		<clist:showSubmenuTemplate model="['entityName':entityName]" />
 		<search:searchResultsHeading />
 		<uGroup:rightSidebar />
 		<!-- main_content -->
@@ -21,7 +20,7 @@
 			style="margin-left: 0px; clear: both;">
 			<clist:filterTemplate />
 
-			<div class="observations_list_wrapper" style="top: 0px;">
+			<div class="observations_list_wrapper">
 				<clist:showList />
 			</div>
 		</div>
