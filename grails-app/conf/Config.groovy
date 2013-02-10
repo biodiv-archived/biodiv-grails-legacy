@@ -372,6 +372,8 @@ speciesPortal {
 		OBSERVED_ON = "observedon"
 		UPLOADED_ON = "createdon"
 		UPDATED_ON = "lastrevised"
+		FROM_DATE = "fromdate"
+		TO_DATE = "todate"
 		SGROUP = "sgroup"
 		HABITAT = "habitat"
 		LATITUDE = "latitude"
@@ -898,10 +900,14 @@ Thank you for your contribution to the portal.<br/>
 grails.plugins.springsecurity.ui.addRecommendationVote.emailBody = '''
 Hi $username,<br/>
 <br/>
-Your <a href="$obvUrl">observation</a> has some social activity on <b>$domain</b>.<br/>
-$currentUser.username has $currentActivity on your Observation.<br/>
-<br/>
-You can see the posting on your observation <a href="$obvUrl">here</a><br/>
+
+                       <a href="${actorProfileUrl}">
+                               <img class="small_profile_pic"
+                                       src="$actorIconUrl"
+                                       title="$actorName" /> $actorName
+                       </a>
+               
+: $activity on the observation <a href="$obvUrl">here</a><br/>
 <br/>
 You will be notified by mail on any social activity on the observation.<br/>
 <br/>

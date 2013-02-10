@@ -46,7 +46,7 @@
 		<g:if test="${engCommonName}">
 			<b class="commonName"> ${engCommonName} </b>
 		</g:if>
-		<div class="icons">
+		<div class="icons clearfix">
 			<g:collect in="${speciesInstance}" expr="${it.fields.resources}"
 				var="resourcesCollection">
 				<g:each in="${resourcesCollection}" var="rs">

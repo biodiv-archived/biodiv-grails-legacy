@@ -16,6 +16,7 @@ import grails.plugins.springsecurity.Secured
 import grails.util.Environment;
 import species.participation.RecommendationVote.ConfidenceType
 import species.participation.ObservationFlag.FlagType
+import species.utils.ImageType;
 import species.utils.ImageUtils
 import species.utils.Utils;
 import species.groups.SpeciesGroup;
@@ -524,12 +525,12 @@ class ObservationController {
 					observationInstance.lastRevised = new Date();
 					//saving max voted species name for observation instance
 					observationInstance.calculateMaxVotedSpeciesName();
-					activityFeedService.addActivityFeed(observationInstance, recommendationVoteInstance, recommendationVoteInstance.author, activityFeedService.SPECIES_RECOMMENDED);
+					def activityFeed = activityFeedService.addActivityFeed(observationInstance, recommendationVoteInstance, recommendationVoteInstance.author, activityFeedService.SPECIES_RECOMMENDED);
 					observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
 					
 					if(!params["createNew"]){
 						//sending mail to user
-						sendNotificationMail(SPECIES_RECOMMENDED, observationInstance, request);
+						sendNotificationMail(SPECIES_RECOMMENDED, observationInstance, request, activityFeed);
 						redirect(action:getRecommendationVotes, id:params.obvId, params:[max:3, offset:0, msg:msg, canMakeSpeciesCall:canMakeSpeciesCall])
 					}else if(params["isMobileApp"]?.toBoolean()){
 						render (['status':'success', 'success':'true', 'obvId':observationInstance.id] as JSON);
@@ -597,11 +598,11 @@ class ObservationController {
 					log.debug "Successfully added reco vote : "+recommendationVoteInstance
 					observationInstance.lastRevised = new Date();
 					observationInstance.calculateMaxVotedSpeciesName();
-					activityFeedService.addActivityFeed(observationInstance, recommendationVoteInstance, recommendationVoteInstance.author, activityFeedService.SPECIES_AGREED_ON);
+					def activityFeed = activityFeedService.addActivityFeed(observationInstance, recommendationVoteInstance, recommendationVoteInstance.author, activityFeedService.SPECIES_AGREED_ON);
 					observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
 					
 					//sending mail to user
-					sendNotificationMail(SPECIES_AGREED_ON, observationInstance, request);
+					sendNotificationMail(SPECIES_AGREED_ON, observationInstance, request, activityFeed);
 					def r = [
 						status : 'success',
 						success : 'true',
@@ -830,7 +831,7 @@ class ObservationController {
 		render (template:"/common/observation/showObservationSnippetTabletTemplate", model:[observationInstance:observationInstance, 'userGroupWebaddress':params.webaddress]);
 	}
 
-	private sendNotificationMail(String notificationType, Observation obv, request){
+	private sendNotificationMail(String notificationType, Observation obv, request, ActivityFeed feedInstance=null){
 		def conf = SpringSecurityUtils.securityConfig
 		def obvUrl = generateLink("observation", "show", ["id": obv.id], request)
 		def userProfileUrl = generateLink("SUser", "show", ["id": obv.author.id], request)
@@ -838,81 +839,100 @@ class ObservationController {
 		def templateMap = [username: obv.author.name.capitalize(), obvUrl:obvUrl, userProfileUrl:userProfileUrl, domain:Utils.getDomainName(request)]
 
 		def mailSubject = ""
-		def body = ""
+		def bodyContent = ""
+		String htmlContent = ""
+		String bodyView = '';
 		def replyTo = conf.ui.notification.emailReplyTo;
-
+		//Set bcc = ["prabha.prabhakar@gmail.com", "sravanthi@strandls.com", "thomas.vee@gmail.com"];
+		Set bcc = ["xyz@xyz.com"];
+		//def activityModel = ['feedInstance':feedInstance, 'feedType':ActivityFeedService.GENERIC, 'feedPermission':ActivityFeedService.READ_ONLY, feedHomeObject:null] 
+		if(obv.author.sendNotification){
+			bcc.add(obv.author.email);
+		}
 		switch ( notificationType ) {
 			case OBSERVATION_ADDED:
 				mailSubject = conf.ui.addObservation.emailSubject
-				body = conf.ui.addObservation.emailBody
+				bodyContent = conf.ui.addObservation.emailBody
 				break
 
 			case OBSERVATION_FLAGGED :
 				mailSubject = "Observation flagged"
-				body = conf.ui.observationFlagged.emailBody
+				bodyContent = conf.ui.observationFlagged.emailBody
 				templateMap["currentUser"] = springSecurityService.currentUser
 				//replyTo = templateMap["currentUser"].email
 				break
 
 			case OBSERVATION_DELETED :
 				mailSubject = conf.ui.observationDeleted.emailSubject
-				body = conf.ui.observationDeleted.emailBody
+				bodyContent = conf.ui.observationDeleted.emailBody
 				templateMap["currentUser"] = springSecurityService.currentUser
-				replyTo = templateMap["currentUser"].email
+				//replyTo = templateMap["currentUser"].email
 				break
 
 			case SPECIES_RECOMMENDED :
-				mailSubject = "Species name suggested"
-				body = conf.ui.addRecommendationVote.emailBody
-				templateMap["currentUser"] = springSecurityService.currentUser
-				templateMap["currentActivity"] = "recommended a species name"
+				
+				bodyView = "/emailtemplates/addRecommendation"
+				templateMap['actor'] = feedInstance.author;
+				templateMap["actorProfileUrl"] = generateLink("SUser", "show", ["id": feedInstance.author.id], request)
+				templateMap["actorIconUrl"] = feedInstance.author.icon(ImageType.SMALL)
+				templateMap["actorName"] = feedInstance.author.name
+				templateMap["activity"] = activityFeedService.getContextInfo(feedInstance, [webaddress:params.webaddress])
+				templateMap["userGroupWebaddress"] = params.webaddress
+				mailSubject = feedInstance.author.name +" : "+ templateMap["activity"].activityTitle.replaceAll(/<.*?>/, '')
 				//replyTo = templateMap["currentUser"].email
+				bcc.addAll(getParticipants(obv)*.email)
 				break
 
 			case SPECIES_AGREED_ON:
-				mailSubject = "Species name suggested"
-				body = conf.ui.addRecommendationVote.emailBody
-				templateMap["currentUser"] = springSecurityService.currentUser
-				templateMap["currentActivity"] = "agreed on a species suggested"
+				bodyView = "/emailtemplates/addRecommendation"
+				templateMap['actor'] = feedInstance.author;
+				templateMap["actorProfileUrl"] = generateLink("SUser", "show", ["id": feedInstance.author.id], request)
+				templateMap["actorIconUrl"] = feedInstance.author.icon(ImageType.SMALL)
+				templateMap["actorName"] = feedInstance.author.name
+				templateMap["userGroupWebaddress"] = params.webaddress
+				templateMap["activity"] = activityFeedService.getContextInfo(feedInstance, [webaddress:params.webaddress])
+				mailSubject = feedInstance.author.name +" : "+ templateMap["activity"].activityTitle.replaceAll(/<.*?>/, '')
 				//replyTo = templateMap["currentUser"].email
+				bcc.addAll(getParticipants(obv)*.email)
 				break
 
 			case SPECIES_NEW_COMMENT:
 				mailSubject = conf.ui.newComment.emailSubject
-				body = conf.ui.newComment.emailBody
+				bodyContent = conf.ui.newComment.emailBody
 				break;
 			case SPECIES_REMOVE_COMMENT:
 				mailSubject = conf.ui.removeComment.emailSubject
-				body = conf.ui.removeComment.emailBody
+				bodyContent = conf.ui.removeComment.emailBody
 				break;
 
 			default:
 				log.debug "invalid notification type"
 		}
 
-		if (body.contains('$')) {
-			body = evaluate(body, templateMap)
+		if (bodyContent.contains('$')) {
+			bodyContent = evaluate(bodyContent, templateMap)
 		}
 
-		if ( Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
-			if(obv.author.sendNotification){
-				mailService.sendMail {
-					to obv.author.email
-					bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com", "thomas.vee@gmail.com"
-					from conf.ui.notification.emailFrom
-					//replyTo replyTo
-					subject mailSubject
-					html body.toString()
+		String[] bccArr = bcc.toArray(new String[0]);
+		println bccArr
+		if(htmlContent) {
+			 htmlContent = Utils.getPremailer(grailsApplication.config.grails.serverURL, htmlContent)
+		}
+		//if ( Environment.getCurrent().getName().equalsIgnoreCase("pamba") || Environment.getCurrent().getName().equalsIgnoreCase("saturn")) {
+		if ( Environment.getCurrent().getName().equalsIgnoreCase("development")) {
+			mailService.sendMail {
+				cc bccArr
+				from conf.ui.notification.emailFrom
+				//replyTo replyTo
+				subject mailSubject
+				if(bodyView) {
+					body (view:bodyView, model:templateMap)
 				}
-			}else{
-				//sending mail only to website manager
-				mailService.sendMail {
-					bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com", "thomas.vee@gmail.com"
-					from conf.ui.notification.emailFrom
-					//replyTo replyTo
-					subject mailSubject
-					html body.toString()
-				}
+				else if(htmlContent) {
+					html htmlContent
+				} else if(bodyContent) {
+					html bodyContent
+				} 
 			}
 		} else {
 			if(obv.author.sendNotification){
@@ -921,7 +941,7 @@ class ObservationController {
 					from conf.ui.notification.emailFrom
 					//replyTo replyTo
 					subject mailSubject
-					html body.toString()
+					html bodyContent.toString()
 				}
 			}
 		}
@@ -937,6 +957,21 @@ class ObservationController {
 		new SimpleTemplateEngine().createTemplate(s).make(binding)
 	}
 
+//	def participants = {
+//		render getParticipants(Observation.read(params.long('id')))
+//	}
+	
+	private List getParticipants(Observation observation) {
+		def participants = [];
+		def result = ActivityFeed.findAllByRootHolderIdAndRootHolderType(observation.id, observation.class.getCanonicalName())*.author.unique()
+		result.each { user ->
+			if(user.sendNotification){
+				participants << user
+			}			
+		}
+		return participants;
+	}
+	
 	def unsubscribeToIdentificationMail = {
 		log.debug "$params"
 		if(params.userId){
@@ -1095,7 +1130,7 @@ class ObservationController {
 			log.debug "No valid email specified for identification."
 		}else if (Environment.getCurrent().getName().equalsIgnoreCase("pamba") || Environment.getCurrent().getName().equalsIgnoreCase("saturn")) {
 			def conf = SpringSecurityUtils.securityConfig
-			mailSubject = params.mailSubject
+			def mailSubject = params.mailSubject
 			for(entry in emailList.entrySet()){
 				def body = observationService.getIdentificationEmailInfo(params, request, entry.getValue()).mailBody
 				mailService.sendMail {

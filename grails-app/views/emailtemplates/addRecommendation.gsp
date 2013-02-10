@@ -1,0 +1,45 @@
+<%@page import="species.utils.ImageType"%>
+<%@page import="species.utils.Utils"%>
+<%@ page contentType="text/html"%>
+
+Hi
+${username},
+<br />
+<br />
+<table>
+	<tr>
+		<td style="width: 40px;"><g:link
+				url="${uGroup.createLink(controller:'user', action:'show', id:actor.id, userGroupWebaddress:userGroupWebaddress, absolute:true) }">
+				<img
+					style="max-height: 32px; min-height: 16px; max-width: 32px; width: auto;"
+					src="${actor.icon(ImageType.SMALL)}" title="$actorName" />
+
+			</g:link>
+		</td>
+		<td><g:link
+				url="${uGroup.createLink(controller:'user', action:'show', id:actor.id, userGroupWebaddress:userGroupWebaddress, absolute:true) }">
+				${actor.name}
+			</g:link> : ${activity.activityTitle} on the <a href="${obvUrl}">observation</a><br />
+			<g:if test="${activity.text }">
+				${activity.text }
+			</g:if></td>
+	</tr>
+	<tr>
+		<td></td>
+		<td>You will be notified by mail on any social activity on the
+			observation.<br />
+		</td>
+	</tr>
+	<tr>
+		<td></td>
+		<td>If you do not want to receive notifications please go to your
+			<a href="${userProfileUrl}">user profile</a> and switch it off.<br />
+		</td>
+	</tr>
+</table>
+<br />
+<br />
+<br />
+Thank you,
+<br />
+-The portal team
