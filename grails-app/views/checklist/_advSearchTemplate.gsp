@@ -25,8 +25,7 @@
 			
 		<label class="control-label" for="text">Content</label> <input id="aq.text"
 			data-provide="typeahead" type="text" class="input-block-level"
-			name="aq.text" value="${queryParams['aq.text']?.encodeAsHTML()}" placeholder="Search all text content" /> <label
-			class="control-label" for="uploadedOn">Uploaded during</label>
+			name="aq.text" value="${queryParams['aq.text']?.encodeAsHTML()}" placeholder="Search all text content" /> 
 			
 		
 		
