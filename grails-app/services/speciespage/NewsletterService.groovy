@@ -71,17 +71,17 @@ class NewsletterService {
 
 		paramsList.add('fl', params['fl']?:"id");
 
-		if(params.tag) {
-			paramsList.add('fq', searchFieldsConfig.TAG+":"+params.tag);
-			queryParams["tag"] = params.tag
-			queryParams["tagType"] = 'observation'
-			activeFilters["tag"] = params.tag
-		}
-		if(params.user){
-			paramsList.add('fq', searchFieldsConfig.USER+":"+params.user);
-			queryParams["user"] = params.user.toLong()
-			activeFilters["user"] = params.user.toLong()
-		}
+//		if(params.tag) {
+//			paramsList.add('fq', searchFieldsConfig.TAG+":"+params.tag);
+//			queryParams["tag"] = params.tag
+//			queryParams["tagType"] = 'observation'
+//			activeFilters["tag"] = params.tag
+//		}
+//		if(params.user){
+//			paramsList.add('fq', searchFieldsConfig.USER+":"+params.user);
+//			queryParams["user"] = params.user.toLong()
+//			activeFilters["user"] = params.user.toLong()
+//		}
 		
 		if(params.uGroup) {
 			if(params.uGroup == "THIS_GROUP") {

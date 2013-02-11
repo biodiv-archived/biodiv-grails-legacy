@@ -4,6 +4,10 @@
 	<form id="advSearchForm" method="get"  title="Advanced Search"
 		action="${uGroup.createLink(controller:(params.controller!='userGroup')?params.controller:'observation', action:'search') }"
 		class="searchbox">
+		<label class="control-label" for="name">Species</label> <input id="aq.name"
+			data-provide="typeahead" type="text" class="input-block-level"
+			name="aq.name" value="${queryParams['aq.name']?.encodeAsHTML() }"
+			placeholder="Search by species name" />
 		<label class="control-label" for="contributor">Contributor</label> <input id="aq.contributor"
 			data-provide="typeahead" type="text" class="input-block-level"
 			name="aq.contributor" value="${queryParams['aq.contributor']?.encodeAsHTML() }"

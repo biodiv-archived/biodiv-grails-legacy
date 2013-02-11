@@ -770,11 +770,12 @@ class ObservationService {
 		paramsList.add('rows', max);
 		params['sort'] = params['sort']?:"score"
 		String sort = params['sort'].toLowerCase(); 
-		if(sort.indexOf(' desc') == -1) {
-			sort += " desc";
-			
+		if(isValidSortParam(sort)) {
+			if(sort.indexOf(' desc') == -1) {
+				sort += " desc";
+			}
+			paramsList.add('sort', sort);
 		}
-		paramsList.add('sort', sort);
 		
 		paramsList.add('fl', params['fl']?:"id");
 		
@@ -817,10 +818,10 @@ class ObservationService {
 			queryParams["user"] = params.user.toLong()
 			activeFilters["user"] = params.user.toLong()
 		}
-		if(params.speciesName && (params.speciesName != grailsApplication.config.speciesPortal.group.ALL)) {
-			paramsList.add('fq', searchFieldsConfig.MAX_VOTED_SPECIES_NAME+":"+params.speciesName);
-			queryParams["speciesName"] = params.speciesName
-			activeFilters["speciesName"] = params.speciesName
+		if(params.name && (params.name != grailsApplication.config.speciesPortal.group.ALL)) {
+			paramsList.add('fq', searchFieldsConfig.MAX_VOTED_SPECIES_NAME+":"+params.name);
+			queryParams["name"] = params.name
+			activeFilters["name"] = params.name
 		}
 		if(params.isFlagged && params.isFlagged.toBoolean()){
 			paramsList.add('fq', searchFieldsConfig.ISFLAGGED+":"+params.isFlagged.toBoolean());
@@ -892,6 +893,12 @@ class ObservationService {
 		}*/
 		
 		return [responseHeader:responseHeader, observationInstanceList:instanceList, instanceTotal:noOfResults, queryParams:queryParams, activeFilters:activeFilters, tags:facetResults, totalObservationIdList:totalObservationIdList]
+	}
+	
+	private boolean isValidSortParam(String sortParam) {
+		if(sortParam.equalsIgnoreCase("score") || sortParam.equalsIgnoreCase("visitCount")  || sortParam.equalsIgnoreCase("createdOn") || sortParam.equalsIgnoreCase("lastRevised") )
+			return true;
+		return false;
 	}
 	
 	File getUniqueFile(File root, String fileName){

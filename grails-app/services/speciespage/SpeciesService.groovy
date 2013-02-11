@@ -393,10 +393,12 @@ class SpeciesService {
 		paramsList.add('rows', max);
 		params['sort'] = params['sort']?:"score"
 		String sort = params['sort'].toLowerCase();
-		if(sort.indexOf(' desc') == -1 && sort.indexOf(' asc') == -1 ) {
-			sort += " desc";
+		if(isValidSortParam(sort)) {
+			if(sort.indexOf(' desc') == -1 && sort.indexOf(' asc') == -1 ) {
+				sort += " desc";
+			}
+			paramsList.add('sort', sort);
 		}
-		paramsList.add('sort', sort);
 		queryParams["max"] = max
 		queryParams["offset"] = offset
 		
@@ -414,26 +416,26 @@ class SpeciesService {
 			}
 		}
 		
-		if(params.habitat && (params.habitat != Habitat.findByName(grailsApplication.config.speciesPortal.group.ALL).id)){
-			paramsList.add('fq', searchFieldsConfig.HABITAT+":"+params.habitat);
-			queryParams["habitat"] = params.habitat
-			activeFilters["habitat"] = params.habitat
-		}
-		if(params.tag) {
-			paramsList.add('fq', searchFieldsConfig.TAG+":"+params.tag);
-			queryParams["tag"] = params.tag
-			queryParams["tagType"] = 'species'
-			activeFilters["tag"] = params.tag
-		}
-		if(params.user){
-			paramsList.add('fq', searchFieldsConfig.USER+":"+params.user);
-			queryParams["user"] = params.user.toLong()
-			activeFilters["user"] = params.user.toLong()
-		}
-		if(params.speciesName && (params.speciesName != grailsApplication.config.speciesPortal.group.ALL)) {
-			paramsList.add('fq', searchFieldsConfig.MAX_VOTED_SPECIES_NAME+":"+params.speciesName);
-			queryParams["speciesName"] = params.speciesName
-			activeFilters["speciesName"] = params.speciesName
+//		if(params.habitat && (params.habitat != Habitat.findByName(grailsApplication.config.speciesPortal.group.ALL).id)){
+//			paramsList.add('fq', searchFieldsConfig.HABITAT+":"+params.habitat);
+//			queryParams["habitat"] = params.habitat
+//			activeFilters["habitat"] = params.habitat
+//		}
+//		if(params.tag) {
+//			paramsList.add('fq', searchFieldsConfig.TAG+":"+params.tag);
+//			queryParams["tag"] = params.tag
+//			queryParams["tagType"] = 'species'
+//			activeFilters["tag"] = params.tag
+//		}
+//		if(params.user){
+//			paramsList.add('fq', searchFieldsConfig.USER+":"+params.user);
+//			queryParams["user"] = params.user.toLong()
+//			activeFilters["user"] = params.user.toLong()
+//		}
+		if(params.name) {
+			paramsList.add('fq', searchFieldsConfig.NAME+":"+params.name);
+			queryParams["name"] = params.name
+			activeFilters["name"] = params.name
 		}
 		
 		if(params.uGroup) {
@@ -480,6 +482,11 @@ class SpeciesService {
 		return result;
 	}
 	
+	private boolean isValidSortParam(String sortParam) {
+		if(sortParam.equalsIgnoreCase("score"))
+			return true;
+		return false;
+	}
 	/**
 	* export species data
 	*/
