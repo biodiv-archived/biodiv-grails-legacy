@@ -28,11 +28,7 @@
 			name="aq.text" value="${queryParams['aq.text']?.encodeAsHTML()}" placeholder="Search all text content" /> <label
 			class="control-label" for="uploadedOn">Uploaded during</label>
 			
-		<div id="uploadedOnDatePicker" style="position: relative;overflow:visible">
-			<div id="uploadedOn" class="btn pull-left" style="text-align:left;padding:5px;" >
-        		<i class="icon-calendar icon-large"></i> <span class="date"></span>
-    		</div>
-		</div>
+		
 		
 		<div style="${params.webaddress?:'display:none;'}">
 		<label class="radio inline"> <input type="radio" id="uGroup_ALL" name="uGroup" 
@@ -57,38 +53,7 @@
 <r:script>
 
 $(document).ready(function(){
-	var startDate = "${params.daterangepicker_start}";
-	var endDate = "${params.daterangepicker_end}";
-	startDate = Date.parse(startDate?startDate:(new Date(0)).toString('dd/MM/yyyy'));
-	endDate =  (endDate?Date.parse(endDate):Date.today());
-	
-	$("#uploadedOn").daterangepicker({
-	     ranges: {
-              'Today': ['today', 'today'],
-              'Yesterday': ['yesterday', 'yesterday'],
-              'Last 7 Days': [Date.today().add({ days: -6 }), 'today'],
-              'This Month': [Date.today().moveToFirstDayOfMonth(), Date.today().moveToLastDayOfMonth()],
-              'Last Month': [Date.today().moveToFirstDayOfMonth().add({ months: -1 }), Date.today().moveToFirstDayOfMonth().add({ days: -1 })],
-              'From beginning of time' : [new Date(0), 'now']
-           },
-           format: 'dd/MM/yyyy',
-           startDate: startDate,
-           endDate: endDate,
-           maxDate: Date.today(),
-           parentEl:$("#uploadedOnDatePicker"),
-           clickApply: function (e) {
-            	this.hide();
-            	return false;
-        	}
-        }, 
-        function(start, end) {
-           $('#uploadedOn span.date').html(start.toString('dd/MM/yyyy') + ' - ' + end.toString('dd/MM/yyyy'));
-        });
-
-	
-    $('#uploadedOn span.date').html(startDate.toString('dd/MM/yyyy') + ' - ' +endDate.toString('dd/MM/yyyy'));
-	
-	$('#advSearchForm :input:not(input[type=hidden])').each(function(index, ele) {
+		$('#advSearchForm :input:not(input[type=hidden])').each(function(index, ele) {
 		var field = $(this).attr('name');
 		$(this).typeahead({
 			source: function (query, process) {
