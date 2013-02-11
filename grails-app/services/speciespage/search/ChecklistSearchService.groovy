@@ -118,13 +118,13 @@ class ChecklistSearchService {
 			}
 			doc.addField(searchFieldsConfig.MESSAGE, chk.description);
 			chk.state.each { s->
-				doc.addField(searchFieldsConfig.MESSAGE, chk.state);
+				doc.addField(searchFieldsConfig.LOCATION, chk.placeName);
 			}
 			chk.district.each { s->
-				doc.addField(searchFieldsConfig.MESSAGE, chk.district);
+				doc.addField(searchFieldsConfig.LOCATION, chk.placeName);
 			}
 			chk.taluka.each { s->
-				doc.addField(searchFieldsConfig.MESSAGE, chk.taluka);
+				doc.addField(searchFieldsConfig.LOCATION, chk.placeName);
 			}
 
 			docs.add(doc);

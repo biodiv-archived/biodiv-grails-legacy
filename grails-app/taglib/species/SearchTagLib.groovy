@@ -33,6 +33,8 @@ class SearchTagLib {
 			out << render(template:"/observation/advSearchTemplate", model:attrs.model);
 		} else if(params.controller == "newsletter"  || (params.controller == 'userGroup' && params.action == 'newsletter')) {
 			out << render(template:"/newsletter/advSearchTemplate", model:attrs.model);
+		}else if(params.controller == "checklist"  || (params.controller == 'userGroup' && params.action == 'checklist')) {
+			out << render(template:"/checklist/advSearchTemplate", model:attrs.model);
 		}
 	}
 }

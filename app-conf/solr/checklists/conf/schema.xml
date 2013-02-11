@@ -239,9 +239,10 @@
 		<copyField source="title" dest="text" />
 		<copyField source="sgroup" dest="text" />
 		<copyField source="habitat" dest="text" />
-		<copyField source="text" dest="autocomplete" />
+		
 		
 		<field name="autocomplete" type="textSpell" indexed="true" stored="true" multiValued="true"/>
+		<copyField source="text" dest="autocomplete" />
 				
 		<dynamicField name="*" type="text" indexed="true"
 			multiValued="true" />

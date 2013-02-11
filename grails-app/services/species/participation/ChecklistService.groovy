@@ -6,6 +6,7 @@ import java.util.List;
 
 import species.participation.curation.UnCuratedCommonNames
 
+import org.apache.commons.httpclient.util.DateUtil;
 import org.apache.solr.common.SolrException;
 import org.apache.solr.common.util.NamedList;
 import org.springframework.transaction.annotation.Transactional;
@@ -657,6 +658,32 @@ class ChecklistService {
 				}
 			}
 		}
+		
+		SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+		if(params.daterangepicker_start && params.daterangepicker_end) {
+			if(i > 0) aq += " AND";
+			String lastRevisedStartDate = dateFormatter.format(DateUtil.parseDate(params.daterangepicker_start, ['dd/MM/yyyy']));
+			String lastRevisedEndDate = dateFormatter.format(DateUtil.parseDate(params.daterangepicker_end, ['dd/MM/yyyy']));
+			aq += " fromdate:["+lastRevisedStartDate+" TO *] AND todate:[* TO "+lastRevisedEndDate+"]";
+			queryParams['daterangepicker_start'] = params.daterangepicker_start;
+			queryParams['daterangepicker_end'] = params.daterangepicker_end;
+			activeFilters['daterangepicker_start'] = params.daterangepicker_start;
+			activeFilters['daterangepicker_end'] = params.daterangepicker_end;
+			
+		} else if(params.daterangepicker_start) {
+			if(i > 0) aq += " AND";
+			String lastRevisedStartDate = dateFormatter.format(DateTools.dateToString(DateUtil.parseDate(params.daterangepicker_start, ['dd/MM/yyyy']), DateTools.Resolution.DAY));
+			aq += " fromdate:["+lastRevisedStartDate+" TO NOW]";
+			queryParams['daterangepicker_start'] = params.daterangepicker_start;
+			activeFilters['daterangepicker_start'] = params.daterangepicker_endparams.daterangepicker_end;
+		} else if (params.daterangepicker_end) {
+			if(i > 0) aq += " AND";
+			String lastRevisedEndDate = dateFormatter.format(DateTools.dateToString(DateUtil.parseDate(params.daterangepicker_end, ['dd/MM/yyyy']), DateTools.Resolution.DAY));
+			aq += " todate:[NOW TO "+lastRevisedEndDate+"]";
+			queryParams['daterangepicker_end'] = params.daterangepicker_end;
+			activeFilters['daterangepicker_end'] = params.daterangepicker_end;
+		}
+		
 		if(params.query && aq) {
 			params.query = params.query + " AND "+aq
 		} else if (aq) {
