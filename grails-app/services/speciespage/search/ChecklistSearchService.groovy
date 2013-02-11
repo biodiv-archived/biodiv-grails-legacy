@@ -113,6 +113,8 @@ class ChecklistSearchService {
 			chk.row.each { row ->
 				if(row.reco) {
 					doc.addField(searchFieldsConfig.NAME, row.reco.name);
+				} else if (row.key.equalsIgnoreCase(ChecklistService.CN_NAME)) {
+					doc.addField(searchFieldsConfig.NAME, row.value);
 				}
 				doc.addField(searchFieldsConfig.MESSAGE, row.value);
 			}
