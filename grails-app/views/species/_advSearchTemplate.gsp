@@ -5,15 +5,15 @@
 		title="Advanced Search" class="searchbox">
 	 <label
 			class="control-label" for="aq.taxon">Taxon Hierarchy</label> <input data-provide="typeahead" id="aq.taxon"
-			type="text" class="input-block-level" name="aq.taxon" value="${queryParams?.get('aq.taxon')}"
+			type="text" class="input-block-level" name="aq.taxon" value="${(queryParams?.get('aq.taxon'))?.encodeAsHTML()}"
 			placeholder="Search using taxon hierarchy" />
 			
 			<label
 			class="control-label" for="aq.contributor">Contributor</label> <input data-provide="typeahead" id="aq.contributor"
-			type="text" class="input-block-level" name="aq.contributor" value="${queryParams?.get('aq.contributor')}" 
+			type="text" class="input-block-level" name="aq.contributor" value="${(queryParams?.get('aq.contributor'))?.encodeAsHTML()}" 
 			placeholder="Field to search all contributors" /> <label
 			class="control-label" for="aq.attribution">Attributions</label> <input data-provide="typeahead" id="aq.attribution"
-			type="text" class="input-block-level" name="aq.attribution" value="${queryParams?.get('aq.attribution') }"
+			type="text" class="input-block-level" name="aq.attribution" value="${(queryParams?.get('aq.attribution'))?.encodeAsHTML() }"
 			placeholder="Field to search all attributions" />
 			
 			<!-- label
@@ -25,7 +25,7 @@
 			placeholder="Search using year of finding the species and basionym year" /-->
 
 		<label class="control-label" for="aq.text">Content</label> <input data-provide="typeahead" id="aq.text"
-			type="text" class="input-block-level" name="aq.text" value="${queryParams?.get('aq.text') }"
+			type="text" class="input-block-level" name="aq.text" value="${(queryParams?.get('aq.text'))?.encodeAsHTML() }"
 			placeholder="Search all text content" />  <!-- label
 			class="control-label" for="aq.reference">References</label> <input data-provide="typeahead"
 			type="text" class="input-block-level" name="aq.reference" value=""

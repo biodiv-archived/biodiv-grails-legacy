@@ -6,11 +6,11 @@
 
 		<label class="control-label" for="aq.name">Title</label> <input id="aq.name"
 			data-provide="typeahead" type="text" class="input-block-level"
-			name="aq.name" value="${params['aq.name'] }"
+			name="aq.name" value="${params['aq.name']?.encodeAsHTML() }"
 			placeholder="Search all titles" /> <label class="control-label"
 			for="aq.text">Content</label> <input data-provide="typeahead" id="aq.text"
 			type="text" class="input-block-level" name="aq.text"
-			value="${params['aq.text'] }" placeholder="Search all text content" />
+			value="${params['aq.text']?.encodeAsHTML() }" placeholder="Search all text content" />
 	
 		<div id="uGroupFilter" style="${params.webaddress?:'display:none;'}">	
 		<label class="radio inline"> <input type="radio" id="uGroup_ALL" name="uGroup" 

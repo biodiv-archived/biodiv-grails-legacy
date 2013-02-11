@@ -1,4 +1,4 @@
-<div class="observations_list" style="clear: both;">
+<div class="observations_list" style="clear: both;top:0px;">
 	<g:if test="${instanceTotal > 0 }">
 		<div>
 			<table class="table table-hover span8 tablesorter"

@@ -11,7 +11,7 @@
 		</select>
 		
 		<input type="text" name="query" id="searchTextField"
-			value="${(queryParams?.query)?:((queryParams?.q)?:params.query)}"
+			value="${((queryParams?.query)?:((queryParams?.q)?:params.query))?.encodeAsHTML()}"
 			class="search-query span3" placeholder="Search" />
 		<button id="search" class="btn" type="button"><i class="icon-search"></i></button>
 		<input type="hidden" name="fl" value="id" />
