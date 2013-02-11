@@ -25,20 +25,18 @@ ${username},
 			</g:if></td>
 	</tr>
 	<tr>
-		<td></td>
-		<td>You will be notified by mail on any social activity on the
+		<td colspan="2">
+			You will be notified by mail on any social activity on the
 			observation.<br />
 		</td>
 	</tr>
 	<tr>
-		<td></td>
-		<td>If you do not want to receive notifications please go to your
+		<td colspan="2">
+			If you do not want to receive notifications please go to your
 			<a href="${userProfileUrl}">user profile</a> and switch it off.<br />
 		</td>
 	</tr>
 </table>
-<br />
-<br />
 <br />
 Thank you,
 <br />

@@ -843,11 +843,11 @@ class ObservationController {
 		String htmlContent = ""
 		String bodyView = '';
 		def replyTo = conf.ui.notification.emailReplyTo;
-		Set bcc = ["prabha.prabhakar@gmail.com", "sravanthi@strandls.com", "thomas.vee@gmail.com"];
+		Set toUsers = []
 		//Set bcc = ["xyz@xyz.com"];
 		//def activityModel = ['feedInstance':feedInstance, 'feedType':ActivityFeedService.GENERIC, 'feedPermission':ActivityFeedService.READ_ONLY, feedHomeObject:null] 
 		if(obv.author.sendNotification){
-			bcc.add(obv.author.email);
+			toUsers.add(obv.author);
 		}
 		switch ( notificationType ) {
 			case OBSERVATION_ADDED:
@@ -880,7 +880,7 @@ class ObservationController {
 				templateMap["userGroupWebaddress"] = params.webaddress
 				//mailSubject = feedInstance.author.name +" : "+ templateMap["activity"].activityTitle.replaceAll(/<.*?>/, '')
 				//replyTo = templateMap["currentUser"].email
-				bcc.addAll(getParticipants(obv)*.email)
+				toUsers.addAll(getParticipants(obv))
 				break
 
 			case SPECIES_AGREED_ON:
@@ -894,7 +894,7 @@ class ObservationController {
 				templateMap["activity"] = activityFeedService.getContextInfo(feedInstance, [webaddress:params.webaddress])
 				//mailSubject = feedInstance.author.name +" : "+ templateMap["activity"].activityTitle.replaceAll(/<.*?>/, '')
 				//replyTo = templateMap["currentUser"].email
-				bcc.addAll(getParticipants(obv)*.email)
+				toUsers.addAll(getParticipants(obv))
 				break
 
 			case SPECIES_NEW_COMMENT:
@@ -914,37 +914,34 @@ class ObservationController {
 			bodyContent = evaluate(bodyContent, templateMap)
 		}
 
-		String[] bccArr = bcc.toArray(new String[0]);
+		//String[] bccArr = bcc.toArray(new String[0]);
 		
 		if(htmlContent) {
 			 htmlContent = Utils.getPremailer(grailsApplication.config.grails.serverURL, htmlContent)
 		}
-		if ( Environment.getCurrent().getName().equalsIgnoreCase("pamba") || Environment.getCurrent().getName().equalsIgnoreCase("saturn")) {
-		//if ( Environment.getCurrent().getName().equalsIgnoreCase("development")) {
-			mailService.sendMail {
-				to bccArr
-				from conf.ui.notification.emailFrom
-				//replyTo replyTo
-				subject mailSubject
-				if(bodyView) {
-					body (view:bodyView, model:templateMap)
-				}
-				else if(htmlContent) {
-					html htmlContent
-				} else if(bodyContent) {
-					html bodyContent
-				} 
-			}
-		} else {
-			if(obv.author.sendNotification){
+		
+		toUsers.eachWithIndex { toUser, index ->
+			templateMap['username'] = toUser.name.capitalize();
+			if ( Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
+			//if ( Environment.getCurrent().getName().equalsIgnoreCase("development")) {
 				mailService.sendMail {
-					to obv.author.email
+					to toUser.email
+					if(index == 0) {
+						bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com", "thomas.vee@gmail.com"
+					}
 					from conf.ui.notification.emailFrom
 					//replyTo replyTo
 					subject mailSubject
-					html bodyContent.toString()
+					if(bodyView) {
+						body (view:bodyView, model:templateMap)
+					}
+					else if(htmlContent) {
+						html htmlContent
+					} else if(bodyContent) {
+						html bodyContent
+					} 
 				}
-			}
+			} 
 		}
 	}
 
