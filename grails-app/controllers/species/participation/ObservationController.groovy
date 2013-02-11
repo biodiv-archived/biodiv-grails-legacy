@@ -871,7 +871,7 @@ class ObservationController {
 
 			case SPECIES_RECOMMENDED :
 				bodyView = "/emailtemplates/addRecommendation"
-				//mailSubject = conf.ui.addRecommendationVote.emailSubject
+				mailSubject = conf.ui.addRecommendationVote.emailSubject
 				templateMap['actor'] = feedInstance.author;
 				templateMap["actorProfileUrl"] = generateLink("SUser", "show", ["id": feedInstance.author.id], request)
 				templateMap["actorIconUrl"] = feedInstance.author.icon(ImageType.SMALL)
@@ -885,7 +885,7 @@ class ObservationController {
 
 			case SPECIES_AGREED_ON:
 				bodyView = "/emailtemplates/addRecommendation"
-				//mailSubject = conf.ui.addRecommendationVote.emailSubject
+				mailSubject = conf.ui.addRecommendationVote.emailSubject
 				templateMap['actor'] = feedInstance.author;
 				templateMap["actorProfileUrl"] = generateLink("SUser", "show", ["id": feedInstance.author.id], request)
 				templateMap["actorIconUrl"] = feedInstance.author.icon(ImageType.SMALL)
