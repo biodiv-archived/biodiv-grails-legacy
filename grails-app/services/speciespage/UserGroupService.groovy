@@ -699,15 +699,7 @@ class UserGroupService {
 		def queryParams = [:]
 		if(userGroupInstance) {
 			queryParams['userGroupInstance'] = userGroupInstance;
-			//XXX: home page can be about/ activity page as well in this case remvoing them from query
-			if(userGroupInstance.homePage && userGroupInstance.homePage.tokenize('/').last().isNumber()){
-				def homePageId = userGroupInstance.homePage.tokenize('/').last()
-				queryParams['homePageId'] = Long.parseLong(homePageId);
-				query += " where newsletter.userGroup=:userGroupInstance and newsletter.id != :homePageId"
-			}
-			else {
-				query += " where newsletter.userGroup=:userGroupInstance"
-			}
+			query += " where newsletter.userGroup=:userGroupInstance"
 		} else {
 			query += " where newsletter.userGroup is null"
 		}
@@ -760,6 +752,26 @@ class UserGroupService {
 		return ["default"]
 	}
 
+	def fetchHomePageTitle(UserGroup userGroupInstance){
+		if(!userGroupInstance.homePage)
+			return null
+		
+		//if home page is news letter then getting title from newsletter
+		String newsletterId = userGroupInstance.homePage.tokenize('/').last()
+		if(newsletterId.isNumber()){
+			def newsletter = Newsletter.read(newsletterId.toLong())
+			//if news letter not deleted
+			if(newsletter)
+				return 	newsletter.title
+			else
+				return null
+		}else{
+			//returning one of about/activity page
+			return userGroupInstance.homePage
+		}	
+	}
+	
+	
 	def userGroupBasedLink(attrs) {
 		def g = new org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib()
 

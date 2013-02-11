@@ -124,6 +124,24 @@ $(document).ready(function() {
 </g:hasErrors>
 
 
+	<%
+		def species_sn_name = ""
+		def species_cn_name = ""
+		def species_call_comment = null
+		
+		//showing vote added by creator of the observation
+		if(params.action == 'edit' || params.action == 'update'){
+			def tmp_reco_vote = observationInstance?.fetchOwnerRecoVote()
+			def tmp_cn_reco	= tmp_reco_vote?.commonNameReco
+			
+			species_call_comment =  tmp_reco_vote?.comment
+			species_cn_name = (tmp_cn_reco)? tmp_cn_reco.name : ""
+			
+			if(tmp_reco_vote && tmp_reco_vote.recommendation.isScientificName){
+				species_sn_name = tmp_reco_vote.recommendation.name
+			}
+		}
+	%>
 
 <div class="row control-group ">
 	<label for="recommendationVote" class="control-label"> <g:message
@@ -155,24 +173,6 @@ $(document).ready(function() {
 	<div class="controls">
 		<div class="textbox nameContainer">
 
-	<%
-		def species_sn_name = ""
-		def species_cn_name = ""
-		def species_call_comment = null
-		
-		//showing vote added by creator of the observation
-		if(params.action == 'edit' || params.action == 'update'){
-			def tmp_reco_vote = observationInstance?.fetchOwnerRecoVote()
-			def tmp_cn_reco	= tmp_reco_vote?.commonNameReco
-			
-			species_call_comment =  tmp_reco_vote?.comment
-			species_cn_name = (tmp_cn_reco)? tmp_cn_reco.name : ""
-			
-			if(tmp_reco_vote && tmp_reco_vote.recommendation.isScientificName){
-				species_sn_name = tmp_reco_vote.recommendation.name
-			}
-		}
-	%>
 	<g:set var="species_sn_lang"
 	value="${species_sn_lang}" />
 			<input type="text" name="recoName" id="name" value="${species_sn_name}"

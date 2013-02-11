@@ -8,7 +8,7 @@
 					<button id="homePageSelector" class="btn dropdown-toggle"
 						data-toggle="dropdown" href="#" rel="tooltip"
 						data-original-title="Home page">
-						${userGroupInstance.homePage ?: 'Select home page '}<span
+						${userGroupInstance.fetchHomePageTitle() ?: 'Select home page '}<span
 							class="caret"></span>
 					</button>
 					<ul class="dropdown-menu" style="width: auto;">
