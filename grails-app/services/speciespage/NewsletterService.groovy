@@ -110,7 +110,7 @@ class NewsletterService {
 			}
 
 			//queryParams = queryResponse.responseHeader.params
-			result = [queryParams:queryParams, total:queryResponse.getResults().getNumFound(), instanceList:instanceList, snippets:queryResponse.getHighlighting()]
+			result = [queryParams:queryParams, activeFilters:activeFilters, total:queryResponse.getResults().getNumFound(), instanceList:instanceList, snippets:queryResponse.getHighlighting()]
 			return result;
 		} catch(SolrException e) {
 			e.printStackTrace();

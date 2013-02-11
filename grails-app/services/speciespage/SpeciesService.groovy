@@ -470,13 +470,13 @@ class SpeciesService {
 			}
 
 			//queryParams = queryResponse.responseHeader.params
-			result = [queryParams:queryParams, instanceTotal:queryResponse.getResults().getNumFound(), speciesInstanceList:speciesInstanceList, snippets:queryResponse.getHighlighting()]
+			result = [queryParams:queryParams, activeFilters:activeFilters, instanceTotal:queryResponse.getResults().getNumFound(), speciesInstanceList:speciesInstanceList, snippets:queryResponse.getHighlighting()]
 			return result;
 		} catch(SolrException e) {
 			e.printStackTrace();
 		}
 
-		result = [queryParams:queryParams, instanceTotal:0, speciesInstanceList:[]];
+		result = [queryParams:queryParams, activeFilters:activeFilters, instanceTotal:0, speciesInstanceList:[]];
 		return result;
 	}
 	
