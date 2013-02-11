@@ -146,6 +146,8 @@ function membership_actions() {
 				success: function(data, statusText, xhr, form) {
 					if(data === "true"){
 						$('#memberUserIds').val('');
+						$('#userAndEmailList_1').val('');
+						$('ul.userOrEmail-list > li').remove();
 						$('#inviteMembersDialog').modal('show');
 						return false;
 					}else{
