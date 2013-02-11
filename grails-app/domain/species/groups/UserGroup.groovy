@@ -317,4 +317,8 @@ class UserGroup implements Taggable {
 	def getThemes(){
 		return userGroupService.getGroupThemes()
 	}
+	
+	def fetchHomePageTitle(){
+		return userGroupService.fetchHomePageTitle(this)
+	}
 }
