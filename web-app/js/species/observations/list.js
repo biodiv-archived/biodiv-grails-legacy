@@ -206,6 +206,13 @@ $(document).ready(function(){
 					$(".loadMore .progress").hide();
 					$(".loadMore .buttonTitle").show();
 				}
+				if ($('.grid_view_bttn.active')[0]) {
+					$('.grid_view').show();
+					$('.list_view').hide();
+				} else {
+					$('.grid_view').hide();
+					$('.list_view').show();
+				}
 					
 				var a = $('<a href="'+current.url+'"></a>');
 			    var url = a.url();
