@@ -11,7 +11,7 @@
 <meta property="og:url"
 	content="${uGroup.createLink(action:params.action, controller:'userGroup', userGroupWebaddress:params.webaddress,absolute:true)}" />
 <meta property="og:site_name" content="Observations (${Utils.getDomainName(request)})" />
-<g:set var="description" value="" />
+
 <g:set var="domain" value="${Utils.getDomain(request)}" />
 <%
 				String fbAppId;
@@ -20,9 +20,6 @@
 				} else { //if(domain.equals(grailsApplication.config.ibp.domain)) {
 					fbAppId =  grailsApplication.config.speciesPortal.ibp.facebook.appId;
 				}
-				
-				description = userGroupInstance.description.replaceAll(/<.*?>/, '').trim() ;
-				
 		%>
 
 <meta property="fb:app_id" content="${fbAppId }" />
