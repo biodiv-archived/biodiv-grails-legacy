@@ -152,7 +152,6 @@ function membership_actions() {
 						$('#memberUserIds').val('');
 						$('#userAndEmailList_1').val('');
 						$('ul.userOrEmail-list > li').each(function(){
-							console.log($(this));
 							members_autofillUsersComp[0].removeChoice($(this).find('span')[0]);
 						});
 						$('#inviteMembersForm')[0].reset()

@@ -70,7 +70,10 @@ $(function() {
 					if(data === "true"){
 						$('#userIdsAndEmailIds').val('');
 						$('.userAndEmailList').val('')
-						$('ul.userOrEmail-list > li').remove();
+						$('ul.userOrEmail-list > li').each(function(){
+							autofillUsersComp[0].removeChoice($(this).find('span')[0]);
+						});
+						$('#email-form')[0].reset()
 						$('#email-form').show();
 						return false;
 					}else{
