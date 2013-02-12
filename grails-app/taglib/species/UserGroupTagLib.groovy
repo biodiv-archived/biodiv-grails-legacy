@@ -238,18 +238,20 @@ class UserGroupTagLib {
 	}
 
 	def showSuggestedUserGroups = {attrs, body ->
-		def user = springSecurityService.getCurrentUser();
-		Set userGroups = UserGroup.list(max:5)//userGroupService.getSuggestedUserGroups(user);
-		def subList= []
-		int i=0;
-		userGroups.each {
-			if(i++<5) {
-				subList.push(it)
-				return;
-			}
-		}
-
-		out << render(template:"/common/userGroup/showSuggestedUserGroupsTemplate", model:['userGroups':subList]);
+//		
+//		def user = springSecurityService.getCurrentUser();
+//		Set userGroups = UserGroup.list(max:5)//userGroupService.getSuggestedUserGroups(user);
+//		def subList= []
+//		int i=0;
+//		userGroups.each {
+//			if(i++<5) {
+//				subList.push(it)
+//				return;
+//			}
+//		}
+		
+		def gList = userGroupService.getFilteredUserGroups([:], 5, 0, false).userGroupInstanceList
+		out << render(template:"/common/userGroup/showSuggestedUserGroupsTemplate", model:['userGroups':gList]);
 	}
 	
 	def isUserGroupMember = { attrs, body->
