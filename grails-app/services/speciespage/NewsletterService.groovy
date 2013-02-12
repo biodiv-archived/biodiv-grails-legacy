@@ -41,14 +41,16 @@ class NewsletterService {
 
 		String aq = "";
 		int i=0;
-		params.aq.each { key, value ->
-			queryParams["aq."+key] = value;
-			activeFilters["aq."+key] = value;
-			if(!(key ==~ /action|controller|sort|fl|start|rows|webaddress/) && value ) {
-				if(i++ == 0) {
-					aq = key + ': ('+value+')';
-				} else {
-					aq = aq + " AND " + key + ': ('+value+')';
+		if(params.aq instanceof List) {
+			params.aq.each { key, value ->
+				queryParams["aq."+key] = value;
+				activeFilters["aq."+key] = value;
+				if(!(key ==~ /action|controller|sort|fl|start|rows|webaddress/) && value ) {
+					if(i++ == 0) {
+						aq = key + ': ('+value+')';
+					} else {
+						aq = aq + " AND " + key + ': ('+value+')';
+					}
 				}
 			}
 		}
