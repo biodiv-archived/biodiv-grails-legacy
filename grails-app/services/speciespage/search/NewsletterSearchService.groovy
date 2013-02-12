@@ -78,7 +78,6 @@ class NewsletterSearchService {
 		Collection<SolrInputDocument> docs = new ArrayList<SolrInputDocument>();
 		Map names = [:];
 		Map docsMap = [:]
-
 		obvs.each { obv ->
 			log.debug "Reading Newsletter : "+obv.id;
 
@@ -92,6 +91,7 @@ class NewsletterSearchService {
 					doc.addField(searchFieldsConfig.USER_GROUP_WEBADDRESS, obv.userGroup.webaddress);
 				}
 				if(obv.newsitem) {
+					
 					doc.addField(searchFieldsConfig.MESSAGE, obv.newsitem);
 				}
 				

@@ -70,7 +70,9 @@ class NewsletterService {
 		paramsList.add('sort', sort);
 
 		paramsList.add('fl', params['fl']?:"id");
-
+		paramsList.add('hl', true);
+		paramsList.add('hl.fl', 'text');
+		paramsList.add('hl.fragsize', 300);
 //		if(params.tag) {
 //			paramsList.add('fq', searchFieldsConfig.TAG+":"+params.tag);
 //			queryParams["tag"] = params.tag
@@ -108,7 +110,8 @@ class NewsletterService {
 				if(instance)
 					instanceList.add(instance);
 			}
-
+			println "------------"
+println queryResponse.getHighlighting();
 			//queryParams = queryResponse.responseHeader.params
 			result = [queryParams:queryParams, activeFilters:activeFilters, total:queryResponse.getResults().getNumFound(), instanceList:instanceList, snippets:queryResponse.getHighlighting()]
 			return result;

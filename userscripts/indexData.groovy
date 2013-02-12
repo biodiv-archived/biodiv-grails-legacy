@@ -16,7 +16,7 @@ newsletterSearchService.publishSearchIndex();
 //observationsSearchService.deleteIndex();
 //observationsSearchService.publishSearchIndex();
 
-def cSearchService = ctx.getBean("checklistSearchService");
+//def cSearchService = ctx.getBean("checklistSearchService");
 //cSearchService.deleteIndex();
 //cSearchService.publishSearchIndex();
-cSearchService.optimize();
+//cSearchService.optimize();

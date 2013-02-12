@@ -23,14 +23,9 @@
 								</g:link>
 							</g:else>
 						</h6>
-						<div class="ellipsis multiline">
-							<g:set var="summary" value="${newsletterInstance.newsitem}"></g:set>
-							<g:if test="${summary != null && summary.length() > 300}">
-								${summary[0..300] + ' ...'}
-							</g:if>
-							<g:else>
-								${summary?:''}
-							</g:else>
+						<div class="    	">
+							<g:set var="summary" value="${snippets.get(newsletterInstance.id.toString()).text[0]}"></g:set>
+								${summary?summary.replaceAll(/<.*?>/, '').encodeAsHTML()+' ...':''}
 						</div>
 
 						<div class="pull-right">

@@ -61,7 +61,7 @@
 		<fieldType name="text" class="solr.TextField"
 			positionIncrementGap="100">
 			<analyzer type="index">
-				<charFilter class="solr.HTMLStripCharFilterFactory" />
+				<charFilter class="solr.HTMLStripCharFilterFactory"  escapedTags="a, title"/>
 				<tokenizer class="solr.StandardTokenizerFactory" />
 				<!-- in this example, we will only use synonyms at query time <filter 
 					class="solr.SynonymFilterFactory" synonyms="index_synonyms.txt" ignoreCase="true" 
@@ -210,8 +210,8 @@
 			required="true" multiValued="false" />
 				
 				
-		<field name="name" type="textExact" indexed="true" stored="true" required="true" multiValued="false" />					
-		<field name="text" type="text" indexed="true" stored="false" required="true" multiValued="true" />
+		<field name="name" type="text" indexed="true" stored="true" required="true" multiValued="false" />					
+		<field name="text" type="text" indexed="true" stored="true" multiValued="true" />
 		<field name="createdon" type="tdate" indexed="true" required="true"/>
 		<field name="lastrevised" type="tdate" indexed="true" required="true"/>
 		<field name="group" type="long" indexed="true" stored="true" multiValued="false" />
