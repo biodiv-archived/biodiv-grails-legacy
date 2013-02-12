@@ -5,7 +5,7 @@
 		title="Advanced Search" class="searchbox">
 		<label class="control-label" for="name">Species</label> <input id="aq.name"
 			data-provide="typeahead" type="text" class="input-block-level"
-			name="aq.name" value="${queryParams['aq.name']?.encodeAsHTML() }"
+			name="aq.name" value="${(queryParams?.get('aq.name'))?.encodeAsHTML() }"
 			placeholder="Search by species name" />
 	 <label
 			class="control-label" for="aq.taxon">Taxon Hierarchy</label> <input data-provide="typeahead" id="aq.taxon"
