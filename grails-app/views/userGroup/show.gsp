@@ -9,15 +9,11 @@
 <meta property="og:type" content="article" />
 <meta property="og:title" content="${userGroupInstance.name}" />
 <meta property="og:url"
-	content="${createLink(action:'show', id:userGroupInstance.id, base:Utils.getDomainServerUrl(request))}" />
-<g:set var="fbImagePath" value="" />
-<%
-		def r = userGroupInstance.icon(ImageType.NORMAL);
-		fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.thumbnail.suffix)
-%>
+	content="${uGroup.createLink(action:params.action, controller:'userGroup', userGroup:userGroupInstance,absolute:true)}" />
+
 <meta property="og:image"
-	content="${createLinkTo(file: fbImagePath, base:grailsApplication.config.speciesPortal.observations.serverURL)}" />
-<meta property="og:site_name" content="${Utils.getDomainName(request)}" />
+	content="${userGroupInstance.mainImage()?.fileName}" />
+<meta property="og:site_name" content="${userGroupInstance.name?:Utils.getDomainName(request)}" />
 <g:set var="description" value="" />
 <g:set var="domain" value="${Utils.getDomain(request)}" />
 <%
@@ -28,13 +24,13 @@
 					fbAppId =  grailsApplication.config.speciesPortal.ibp.facebook.appId;
 				}
 				
-				description = userGroupInstance.description.trim() ;
+				description = userGroupInstance.description.replaceAll(/<.*?>/, '').trim() ;
 				
 		%>
 
 <meta property="fb:app_id" content="${fbAppId }" />
 <meta property="fb:admins" content="581308415,100000607869577" />
-<meta property="og:description" content='${description}' />
+<meta property="og:description" content="${description?:''}" />
 
 <link rel="image_src"
 	href="${createLinkTo(file: gallImagePath, base:grailsApplication.config.speciesPortal.observations.serverURL)}" />
