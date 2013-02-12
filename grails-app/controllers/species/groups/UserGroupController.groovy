@@ -520,7 +520,7 @@ class UserGroupController {
 			if(membersCount > members.size()) {
 				int alreadyMembersCount = membersCount-members.size();
 
-				msg += " as other "+alreadyMembersCount+" member(s) were already found to be members of this group."
+				msg += " as other "+alreadyMembersCount+" member(s) were already found to be already part of this group."
 			}
 			render (['success':true, 'statusComplete':true, 'shortMsg':'Sent request', 'msg':msg] as JSON)
 			return

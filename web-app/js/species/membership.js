@@ -2,6 +2,8 @@
  * 
  */
 
+var members_autofillUsersComp;
+
 function joinAction(me, joinUsUrl) {
 	if(me.hasClass('disabled')) return false;
 	
@@ -119,14 +121,16 @@ function membership_actions() {
 					$(".alertMsg").removeClass('alert alert-error').addClass('alert alert-success').html(data.msg);
 				} else {
 					$("#invite_memberMsg").removeClass('alert alert-error').addClass('alert alert-success').html(data.msg);
-				}				
+				}
+				$('#inviteMembersForm')[0].reset()
 			}, error:function (xhr, ajaxOptions, thrownError){
 					//successHandler is used when ajax login succedes
 	            	var successHandler = this.success;
 	            	handleError(xhr, ajaxOptions, thrownError, successHandler, function() {
 						var response = $.parseJSON(xhr.responseText);
 						
-					});
+				});
+	            $('#inviteMembersForm')[0].reset()
            } 
      	});	
 	});
@@ -147,7 +151,11 @@ function membership_actions() {
 					if(data === "true"){
 						$('#memberUserIds').val('');
 						$('#userAndEmailList_1').val('');
-						$('ul.userOrEmail-list > li').remove();
+						$('ul.userOrEmail-list > li').each(function(){
+							console.log($(this));
+							members_autofillUsersComp[0].removeChoice($(this).find('span')[0]);
+						});
+						$('#inviteMembersForm')[0].reset()
 						$('#inviteMembersDialog').modal('show');
 						return false;
 					}else{
@@ -160,8 +168,6 @@ function membership_actions() {
 	     	});
 	});
 }
-
-var members_autofillUsersComp;
 
 //this is called from domain/_headerTemplate
 function init_group_header() {
