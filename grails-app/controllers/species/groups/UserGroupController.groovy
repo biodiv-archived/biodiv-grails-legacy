@@ -493,7 +493,7 @@ class UserGroupController {
 			} else {
 				if(userGroupInstance.addMember(user)) {
 					flash.message = "You have joined ${userGroupInstance.name} group. We look forward for your contribution.";
-					render ([success:true, 'statusComplete':true, 'shortMsg':'Joined', 'msg':"You have joined ${userGroupInstance} group. We look forward for your contribution."]as JSON);
+					render ([success:true, 'statusComplete':true, 'shortMsg':'Joined', 'msg':"You have joined ${userGroupInstance.name} group. We look forward for your contribution."]as JSON);
 					return;
 				}
 			}
@@ -516,7 +516,7 @@ class UserGroupController {
 
 			int membersCount = members.size();
 			userGroupService.sendMemberInvitation(userGroupInstance, members, Utils.getDomainName(request));
-			String msg = "Successfully sent invitation messsage to ${members.size()} member(s)"
+			String msg = "Successfully sent invitation message to ${members.size()} member(s)"
 			if(membersCount > members.size()) {
 				int alreadyMembersCount = membersCount-members.size();
 
