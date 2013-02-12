@@ -650,7 +650,7 @@ input.dms_field {
             $('#add_file').show();
         }
 		
-		$('#add_file').click(function(){
+		$('#add_file').live('click', function(){
 filepicker.pickMultiple({
     mimetypes: ['image/*'],
     maxSize: 104857600,
@@ -659,7 +659,6 @@ filepicker.pickMultiple({
   },
   function(FPFiles){
     console.log(JSON.stringify(FPFiles));
-    //FPfiles = [{"url":"https://www.filepicker.io/api/file/4uaf7xjVSySXfbna8z4i","filename":"facebook photo.jpg","mimetype":"image/jpeg","size":44020,"isWriteable":true},{"url":"https://www.filepicker.io/api/file/E7B8RxeTb95Py3LYK1wG","filename":"facebook photo.jpg","mimetype":"image/jpeg","size":37797,"isWriteable":true}]; 
     $.each(FPFiles, function(){
 	    $('<input>').attr({
 	    type: 'hidden',
@@ -672,6 +671,7 @@ filepicker.pickMultiple({
   },
   function(FPError){
     console.log(FPError.toString());
+    
   }
 );		
 		});
@@ -772,6 +772,8 @@ filepicker.pickMultiple({
 						} else {
 							messageNode.append(response?response.error:"Error");
 						}
+						
+						$("upload_resource").remove('input');
 					});
            } 
      	});  

@@ -399,7 +399,11 @@ class ObservationController {
 					message = g.message(code: 'no.file.attached', default:'No file is attached')
 				}
 				
+				if(params.resources instanceof String) {
+					params.resources = [params.resources]
+				}
 				params.resources.each { f ->
+					println f;
 					f = JSON.parse(f);
 					log.debug "Saving observation file ${f.filename}"
 
