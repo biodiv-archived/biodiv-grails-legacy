@@ -221,7 +221,7 @@
 		<field name="lastrevised" type="tdate" indexed="true" required="true"/>
 		<field name="fromdate" type="tdate" indexed="true" />
 		<field name="todate" type="tdate" indexed="true" />
-		<field name="sgroup" type="long" indexed="true" required="true" multiValues="true"/>
+		<field name="sgroup" type="long" indexed="true" required="true" multiValued="true"/>
 		<!-- field name="habitat" type="long" indexed="true" required="true"/-->
 				
 		<field name="reference" type="text" indexed="true" stored="true" multiValued="true"/>	

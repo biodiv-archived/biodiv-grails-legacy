@@ -22,7 +22,7 @@
 			class="icon-search"></i></span> ${speciesCountWithContent} species page<g:if test="${speciesCountWithContent>1}">s</g:if> and ${instanceTotal- speciesCountWithContent} species stubs are found</g:if>
 		<g:else>
 		<span class="name" style="color: #b1b1b1;"><i
-			class="icon-search"></i></span> <g:if test="${instanceTotal==0}">No results </g:if><g:else>${instanceTotal} ${resultType?:'observation'} <g:if test="${instanceTotal>1 && resultType != 'species'}">s</g:if></g:else> 
+			class="icon-search"></i></span> <g:if test="${instanceTotal==0}">No results </g:if><g:else>${instanceTotal} ${resultType?:'observation'}<g:if test="${instanceTotal>1 && resultType != 'species'}">s</g:if></g:else> 
 		 found 
 		</g:else>
 		<g:each in="${queryParams}" var="queryParam">
