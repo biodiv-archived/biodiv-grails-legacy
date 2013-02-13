@@ -67,7 +67,10 @@ class SpeciesController {
 		params.max = Math.min(params.max ? params.int('max') : 40, 100);
 		params.offset = params.offset ? params.int('offset') : 0
 		params.sort = params.sort?:"percentOfInfo"
-		params.order = params.sort.equals("percentOfInfo")?"desc":params.sort.equals("title")?"asc":"asc"
+		if(params.sort == 'lastrevised') {
+			params.sort = 'lastUpdated'
+		}
+		params.order = (params.sort.equals("percentOfInfo")||params.sort.equals("lastUpdated"))?"desc":params.sort.equals("title")?"asc":"asc"
 
 		log.debug params
 		def groupIds = params.sGroup.tokenize(',')?.collect {Long.parseLong(it)}

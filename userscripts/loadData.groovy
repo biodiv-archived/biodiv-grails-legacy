@@ -60,7 +60,14 @@ def speciesService = ctx.getBean("speciesService");
 //grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/chitra/indian_birds/uploadready/india_birds_cr1_images";
 //speciesService.uploadNewSimpleSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/chitra/indian_birds/uploadready/india_birds_cr1.xls");
 
-speciesService.uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/zoooutreach/uploadready/aquaticplants.xls", grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/zoooutreach/uploadready/aquaticplants_mapping.xls", 0, 0, 0, 0);
-speciesService.uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/zoooutreach/uploadready/fish_dk.xls", grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/zoooutreach/uploadready/fish_mapping.xls", 0, 0, 0, 0);
+//speciesService.uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/zoooutreach/uploadready/aquaticplants.xls", grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/zoooutreach/uploadready/aquaticplants_mapping.xls", 0, 0, 0, 0);
+//speciesService.uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/zoooutreach/uploadready/fish_dk.xls", grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/zoooutreach/uploadready/fish_mapping.xls", 0, 0, 0, 0);
 
+//grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+" /datarep/species/thomas/uploadready/images";
+//speciesService.uploadNewSimpleSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/thomas/uploadready/MammalsspeciesPages.xlsx");
+
+grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/chitra/ne_butterflies/uploadready/NE_Butterflies_RG1";
+speciesService.uploadNewSimpleSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/chitra/ne_butterflies/uploadready/NortheastButterflies-RG1.xlsx");
+grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/chitra/ne_butterflies/uploadready/NE_Butterflies_RG25";
+speciesService.uploadNewSimpleSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/chitra/ne_butterflies/uploadready/NortheastButterflies-RG25.xlsx");
 

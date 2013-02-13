@@ -32,6 +32,8 @@ import species.utils.HttpUtils
 import species.utils.ImageUtils
 import species.utils.Utils
 
+import org.grails.plugins.sanitizer.MarkupSanitizerResult
+
 
 class XMLConverter extends SourceConverter {
 
@@ -46,12 +48,13 @@ class XMLConverter extends SourceConverter {
 	private Species s;
 
 	def groupHandlerService;
+	//def markupSanitizerService;
 
 	public enum SaveAction {
 		MERGE("merge"),
 		OVERWRITE("overwrite"),
 		IGNORE("ignore");
-		
+
 		private String value;
 
 		SaveAction(String value) {
@@ -65,6 +68,8 @@ class XMLConverter extends SourceConverter {
 
 	private XMLConverter() {
 		namesParser = new NamesParser();
+		def ctx = ApplicationHolder.getApplication().getMainContext();
+		//markupSanitizerService = ctx.getBean("markupSanitizerService");
 	}
 
 	//should be synchronized
@@ -143,6 +148,8 @@ class XMLConverter extends SourceConverter {
 					List<Resource> resources = createMedia(species, s.taxonConcept.canonicalForm);
 					resources.each { s.addToResources(it); }
 
+					List<Synonyms> synonyms;
+
 					for(Node fieldNode : species.children()) {
 						if(fieldNode.name().equals("field")) {
 							if(!isValidField(fieldNode)) {
@@ -158,27 +165,27 @@ class XMLConverter extends SourceConverter {
 								List<CommonNames> commNames = createCommonNames(fieldNode, s.taxonConcept);
 								//commNames.each { s.addToCommonNames(it); }
 							} else if(category && category.equalsIgnoreCase(fieldsConfig.SYNONYMS)) {
-								List<Synonyms> synonyms = createSynonyms(fieldNode, s.taxonConcept);
+								synonyms = createSynonyms(fieldNode, s.taxonConcept);
 								//synonyms.each { s.addToSynonyms(it); }
 							} else if(subcategory && subcategory.equalsIgnoreCase(fieldsConfig.GLOBAL_DISTRIBUTION_GEOGRAPHIC_ENTITY)) {
 								List<GeographicEntity> countryGeoEntities = getCountryGeoEntity(s, fieldNode);
 								countryGeoEntities.each {
 									if(it.species == null) {
 										s.addToGlobalDistributionEntities(it);
-									} 
+									}
 								}
 							} else if(subcategory && subcategory.equalsIgnoreCase(fieldsConfig.GLOBAL_ENDEMICITY_GEOGRAPHIC_ENTITY)) {
 								List<GeographicEntity> countryGeoEntities = getCountryGeoEntity(s, fieldNode);
-								countryGeoEntities.each { 
+								countryGeoEntities.each {
 									if(it.species == null) {
-										s.addToGlobalEndemicityEntities(it); 
+										s.addToGlobalEndemicityEntities(it);
 									}
 								}
 							}  else if(subcategory && subcategory.equalsIgnoreCase(fieldsConfig.INDIAN_DISTRIBUTION_GEOGRAPHIC_ENTITY)) {
 								List<GeographicEntity> countryGeoEntities = getCountryGeoEntity(s, fieldNode);
 								countryGeoEntities.each {
 									if(it.species == null) {
-										s.addToIndianDistributionEntities(it); 
+										s.addToIndianDistributionEntities(it);
 									}
 								}
 							} else if(subcategory && subcategory.equalsIgnoreCase(fieldsConfig.INDIAN_ENDEMICITY_GEOGRAPHIC_ENTITY)) {
@@ -186,17 +193,17 @@ class XMLConverter extends SourceConverter {
 								countryGeoEntities.each {
 									if(it.species == null) {
 										s.addToIndianEndemicityEntities(it);
-									} 
+									}
 								}
 							} else if(category && category.toLowerCase().contains(fieldsConfig.TAXONOMIC_HIERARCHY)) {
 								//ignore
 							} else {
-								List<SpeciesField> speciesFields = createSpeciesFields(s, fieldNode, SpeciesField.class, species.images[0], species.icons[0], species.audio[0], species.video[0]);
+								List<SpeciesField> speciesFields = createSpeciesFields(s, fieldNode, SpeciesField.class, species.images[0], species.icons[0], species.audio[0], species.video[0], synonyms);
 								speciesFields.each {
 									if(it.species == null) { // if its already associated this field will be populated
 										log.debug "Adding new fields to species ${s}"
 										s.addToFields(it);
-									} 
+									}
 								}
 							}
 						}
@@ -204,13 +211,13 @@ class XMLConverter extends SourceConverter {
 
 					//adding taxonomy classifications
 					taxonHierarchy.each { s.addToTaxonomyRegistry(it); }
-					
-//					if(defaultSaveAction == SaveAction.MERGE){
-//						log.info "Merging with already existing species information : "+existingSpecies.id;
-//						mergeSpecies(existingSpecies, s);
-//						s = existingSpecies;
-//					}
-					
+
+					//					if(defaultSaveAction == SaveAction.MERGE){
+					//						log.info "Merging with already existing species information : "+existingSpecies.id;
+					//						mergeSpecies(existingSpecies, s);
+					//						s = existingSpecies;
+					//					}
+
 					return s;
 				}
 			} else {
@@ -266,7 +273,7 @@ class XMLConverter extends SourceConverter {
 	 * @param videosNode
 	 * @return
 	 */
-	private List<SpeciesField> createSpeciesFields(Species s, Node fieldNode, Class sFieldClass, Node imagesNode, Node iconsNode, Node audiosNode, Node videosNode) {
+	private List<SpeciesField> createSpeciesFields(Species s, Node fieldNode, Class sFieldClass, Node imagesNode, Node iconsNode, Node audiosNode, Node videosNode, List<Synonyms> synonyms) {
 		log.debug "Creating species field from node : "+fieldNode;
 		List<SpeciesField> speciesFields = new ArrayList<SpeciesField>();
 		def field = getField(fieldNode, false);
@@ -283,29 +290,30 @@ class XMLConverter extends SourceConverter {
 		}
 		for(Node dataNode : fieldNode.data) {
 			String data = getData(dataNode);
+			data = cleanData(data, s.taxonConcept, synonyms);
 			List<Contributor> contributors = getContributors(dataNode, true);
 			List<License> licenses = getLicenses(dataNode, false);
 			List<AudienceType> audienceTypes = getAudienceTypes(dataNode, true);
 			List<Resource> resources = getResources(dataNode, imagesNode, iconsNode, audiosNode, videosNode);
-			List<Reference> references = getReferences(dataNode, true);
+			List<Reference> references = getReferences(dataNode, true,s.taxonConcept, synonyms);
 			List<Contributor> attributors = getAttributions(dataNode, true);
 			SpeciesField speciesField;
-			
+
 			for (sField in sFields) {
 				log.debug "Found already existing species fields for field ${field}"
 				if(sField.contributors.isEmpty() || sField.contributors.contains(contributors[0])) {
 					speciesField = sField;
-					break; 
+					break;
 				}
 			}
-			
+
 			if(!speciesField) {
 				log.debug "Adding new field to species ${s}"
 				speciesField = sFieldClass.newInstance(field:field, description:data);
 			} else {
 				log.debug "Overwriting existing ${speciesField}. Removing all metadata associate with previous field."
 				speciesField.description = data;
-				//TODO: Will have to clean up orphaned entried from following tables 
+				//TODO: Will have to clean up orphaned entried from following tables
 				speciesField.contributors.clear()
 				speciesField.licenses.clear()
 				speciesField.audienceTypes.clear()
@@ -328,6 +336,24 @@ class XMLConverter extends SourceConverter {
 	private String getData(Node dataNode) {
 		//sanitize the html text
 		return dataNode.text()?:"";
+	}
+
+	private String cleanData(String text, TaxonomyDefinition taxon, List<Synonyms> synonyms) {
+		//MarkupSanitizerResult result = markupSanitizerService.sanitize(text)
+		//if(!result.isInvalidMarkup()) {
+			String cleanString = text;//result.cleanString
+			cleanString.replaceAll(taxon.name, '<i>'+taxon.name+'</i>');
+			if(synonyms) {
+				synonyms.each {
+					cleanString.replaceAll(it.name, '<i>'+it.name+'</i>');
+				}
+			}
+			cleanString = cleanString.replaceAll('<i>\\s+<i>','<i>').replaceAll('</i>\\s+</i>','</i>')
+			return cleanString;
+		//} else {
+		//	log.error result.errorMessages
+		//	return ''
+		//}
 	}
 
 	/**
@@ -418,11 +444,11 @@ class XMLConverter extends SourceConverter {
 				log.warn "NOT A SUPPORTED LICENSE TYPE: "+licenseType;
 			}
 		}
-		
+
 		if(!licenses) {
 			licenses.add(getLicenseByType(LicenseType.CC_BY, createNew));
 		}
-		
+
 		return licenses;
 	}
 
@@ -658,6 +684,12 @@ class XMLConverter extends SourceConverter {
 			}
 		} else {
 			tempFile = new File(fileName);
+			if(!tempFile.exists()) {
+				tempFile = new File(fileName+".jpg");
+				if(!tempFile.exists()) {
+					tempFile = new File(fileName+".png");
+				}
+			}
 		}
 		return tempFile;
 	}
@@ -852,12 +884,12 @@ class XMLConverter extends SourceConverter {
 	 * @param createNew
 	 * @return
 	 */
-	private List<Reference> getReferences(Node dataNode, boolean createNew) {
+	private List<Reference> getReferences(Node dataNode, boolean createNew, TaxonomyDefinition taxon, List<Synonyms> synonyms) {
 		List<Reference> references = new ArrayList<Reference>();
 
 		NodeList refs = dataNode.reference;
 		refs.each {
-			String title = it?.title?.text().trim();
+			String title = cleanData(it?.title?.text().trim(), taxon, synonyms);
 			String url = it?.url?.text().trim();
 			if(title || url) {
 				def ref = new Reference(title:title, url:url);
@@ -892,7 +924,7 @@ class XMLConverter extends SourceConverter {
 	private List<CommonNames> createCommonNames(Node fieldNode, TaxonomyDefinition taxonConcept) {
 		log.debug "Creating common names";
 		List<CommonNames> commonNames = new ArrayList<CommonNames>();
-		//List<SpeciesField> sfields = createSpeciesFields(fieldNode, CommonNames.class, null, null, null, null);
+		//List<SpeciesField> sfields = createSpeciesFields(fieldNode, CommonNames.class, null, null, null, null,null);
 		fieldNode.data.eachWithIndex { n, index ->
 			Language lang = getLanguage(n.language?.name?.text(), n.language?.threeLetterCode?.text());
 
@@ -959,13 +991,13 @@ class XMLConverter extends SourceConverter {
 	private List<Synonyms> createSynonyms(Node fieldNode, TaxonomyDefinition taxonConcept) {
 		log.debug "Creating synonyms";
 		List<Synonyms> synonyms = new ArrayList<Synonyms>();
-		//List<SpeciesField> sfields = createSpeciesFields(fieldNode, Synonyms.class, null, null, null, null);
+		//List<SpeciesField> sfields = createSpeciesFields(fieldNode, Synonyms.class, null, null, null, null,null);
 		fieldNode.data.eachWithIndex { n, index ->
 			RelationShip rel = getRelationship(n.relationship?.text());
 			if(rel) {
 				def cleanName = Utils.cleanName(n.text()?.trim());
 				def parsedNames = namesParser.parse([cleanName]);
-				
+
 				if(parsedNames[0]?.canonicalForm) {
 					//TODO: IMP equality of given name with the one in db should include synonyms of taxonconcepts
 					//i.e., parsedName.canonicalForm == taxonomyDefinition.canonicalForm or Synonym.canonicalForm
@@ -981,12 +1013,12 @@ class XMLConverter extends SourceConverter {
 						sfield.name = cleanName;
 						sfield.relationship = rel;
 						sfield.taxonConcept = taxonConcept;
-						
+
 						sfield.canonicalForm = parsedNames[0].canonicalForm;
 						sfield.normalizedForm = parsedNames[0].normalizedForm;;
 						sfield.italicisedForm = parsedNames[0].italicisedForm;;
 						sfield.binomialForm = parsedNames[0].binomialForm;;
-						
+
 						if(!sfield.save(flush:true)) {
 							sfield.errors.each { log.error it }
 						}
@@ -1023,7 +1055,7 @@ class XMLConverter extends SourceConverter {
 	 */
 	private List<GeographicEntity> getCountryGeoEntity(Species s, Node fieldNode) {
 		List<GeographicEntity> geographicEntities = new ArrayList<GeographicEntity>();
-		List<SpeciesField> sfields = createSpeciesFields(s, fieldNode, GeographicEntity.class, null, null, null, null);
+		List<SpeciesField> sfields = createSpeciesFields(s, fieldNode, GeographicEntity.class, null, null, null, null, null);
 		fieldNode.data.eachWithIndex { c, index ->
 			if(c?.country) {
 				def countryCriteria = Country.createCriteria();
@@ -1119,10 +1151,10 @@ class XMLConverter extends SourceConverter {
 			log.debug "Taxon : "+name+" and rank : "+rank;
 			if(name && rank >= 0) {
 				//TODO:HACK to populate sciName in species level of taxon hierarchy
-//				if(classification.name.equalsIgnoreCase(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY)) {// && rank == TaxonomyRank.SPECIES.ordinal()) {
-//					def cleanSciName = cleanSciName(scientificName);
-//					name = cleanSciName
-//				}
+				//				if(classification.name.equalsIgnoreCase(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY)) {// && rank == TaxonomyRank.SPECIES.ordinal()) {
+				//					def cleanSciName = cleanSciName(scientificName);
+				//					name = cleanSciName
+				//				}
 
 				def parsedName = parsedNames.get(i++);
 				log.debug "Parsed name ${parsedName?.canonicalForm}"
@@ -1283,19 +1315,19 @@ class XMLConverter extends SourceConverter {
 	 * @param newSpecies
 	 */
 	void mergeSpecies(Species existingSpecies, Species newSpecies) {
-//				newSpecies.fields.each { field ->
-//					existingSpecies.addToFields(field);
-//				}
-//				newSpecies.synonyms.each { field ->
-//					existingSpecies.addToSynonyms(field);
-//				}
-//				newSpecies.commonNames.each { field ->
-//					existingSpecies.addToFields(field);
-//				}
-//				newfields,
-//				synonyms, commonNames, globalDistributionEntities, globalEndemicityEntities,
-//				taxonomyRegistry;
-		
+		//				newSpecies.fields.each { field ->
+		//					existingSpecies.addToFields(field);
+		//				}
+		//				newSpecies.synonyms.each { field ->
+		//					existingSpecies.addToSynonyms(field);
+		//				}
+		//				newSpecies.commonNames.each { field ->
+		//					existingSpecies.addToFields(field);
+		//				}
+		//				newfields,
+		//				synonyms, commonNames, globalDistributionEntities, globalEndemicityEntities,
+		//				taxonomyRegistry;
+
 	}
 
 	private String cleanSciName(String scientificName) {
@@ -1303,7 +1335,7 @@ class XMLConverter extends SourceConverter {
 		if(cleanSciName =~ /s\.\s*str\./) {
 			cleanSciName = cleanSciName.replaceFirst(/s\.\s*str\./, cleanSciName.split()[0]);
 		}
-		
+
 		if(cleanSciName.indexOf(' ') == -1) {
 			cleanSciName = cleanSciName.toLowerCase().capitalize();
 		}
@@ -1346,5 +1378,5 @@ class XMLConverter extends SourceConverter {
 			//		   hibSession.clear()
 		}
 	}
-	
+
 }

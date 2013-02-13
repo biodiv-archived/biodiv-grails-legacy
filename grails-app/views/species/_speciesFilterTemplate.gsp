@@ -16,6 +16,9 @@
 			<g:if test="${params.sort == 'title'}">
             	Name
             </g:if>
+            <g:elseif test="${params.sort == 'lastrevised'}">
+				Last Updated
+            </g:elseif>
 			<g:elseif test="${params.sort == 'score'}">
 				Relevancy
             </g:elseif>
@@ -35,6 +38,8 @@
 					value="title"> Name </a></li>
 				<li class="group_option"><a class=" sort_filter_label"
 					value="percentOfInfo"> Richness </a></li>
+				<li class="group_option"><a class=" sort_filter_label"
+					value="lastrevised"> Last Updated </a></li>
 			</g:else>
 		</ul>
 	</div>

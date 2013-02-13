@@ -40,20 +40,18 @@
 										style="max-height: 80px; margin-left: 0px; width: auto;"
 										src="${createLinkTo( base:grailsApplication.config.speciesPortal.resources.serverURL,
 											file: thumbnailPath)}"
-										title=" ${speciesInstance.taxonConcept.name}" />
+										title=" ${speciesInstance.taxonConcept.name.replaceAll('<.*>','')}" />
 								</g:if> <g:else>
 									<img class="span1 img-polaroid pull-left"
 										style="max-height: 80px; margin-left: 0px; width: auto;"
-										title="${speciesInstance.taxonConcept.name}"
+										title="${speciesInstance.taxonConcept.name.replaceAll('<.*>','')}"
 										src="${createLinkTo(dir: 'images', file:speciesInstance.fetchSpeciesGroupIcon(ImageType.VERY_SMALL)?.fileName, absolute:true)}"></img>
 								</g:else> </a>
 						</div>
 						<a
 							href="${uGroup.createLink([controller:'species', action:'show', id:speciesInstance.id, userGroup:userGroup, userGroupWebaddress:userGroupWebaddress])}">
 							<span class="species_story ellipsis multiline sci_name"
-							style="display: block;height:60px;" title="${speciesInstance.taxonConcept.name}">
-								${speciesInstance.taxonConcept.italicisedForm}
-						</span> </a>
+							style="display: block;height:60px;" title="${speciesInstance.taxonConcept.name.replaceAll('<.*>','')}">${speciesInstance.taxonConcept.name.trim()}</span> </a>
 						<div class="poor_species_content" style="display: none;">No
 							information yet</div>
 					</div>

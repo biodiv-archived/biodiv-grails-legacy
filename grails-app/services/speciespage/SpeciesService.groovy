@@ -216,7 +216,7 @@ class SpeciesService {
 		Species.withTransaction {
 			for(Species s in batch) {
 				try {
-					externalLinksService.updateExternalLinks(s.taxonConcept);
+					//externalLinksService.updateExternalLinks(s.taxonConcept);
 				} catch(e) {
 					e.printStackTrace()
 				}
@@ -387,11 +387,11 @@ class SpeciesService {
 			params.query = aq;
 		}
 
-		def max = Math.min(params.max ? params.int('max') : 12, 100)
 		def offset = params.offset ? params.long('offset') : 0
  
 		paramsList.add('q', Utils.cleanSearchQuery(params.query));
 		paramsList.add('start', offset);
+		def max = Math.min(params.max ? params.int('max') : 12, 100)
 		paramsList.add('rows', max);
 		params['sort'] = params['sort']?:"score"
 		String sort = params['sort'].toLowerCase();
@@ -485,7 +485,7 @@ class SpeciesService {
 	}
 	
 	private boolean isValidSortParam(String sortParam) {
-		if(sortParam.equalsIgnoreCase("score"))
+		if(sortParam.equalsIgnoreCase("score") || sortParam.equalsIgnoreCase('lastrevised'))
 			return true;
 		return false;
 	}
