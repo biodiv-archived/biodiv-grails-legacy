@@ -67,7 +67,7 @@ class SpeciesController {
 		params.max = Math.min(params.max ? params.int('max') : 40, 100);
 		params.offset = params.offset ? params.int('offset') : 0
 		params.sort = params.sort?:"percentOfInfo"
-		if(params.sort == 'lastrevised') {
+		if(params.sort.equals('lastrevised')) {
 			params.sort = 'lastUpdated'
 		}
 		params.order = (params.sort.equals("percentOfInfo")||params.sort.equals("lastUpdated"))?"desc":params.sort.equals("title")?"asc":"asc"
