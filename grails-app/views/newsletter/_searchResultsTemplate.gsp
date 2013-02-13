@@ -23,7 +23,7 @@
 								</g:link>
 							</g:else>
 						</h6>
-						<div class="  ">
+						<div class="    	">
 							<g:set var="summary" value="${snippets.get(newsletterInstance.id.toString()).text[0]}"></g:set>
 								${summary?summary.replaceAll(/<.*?>/, '').encodeAsHTML()+' ...':''}
 						</div>

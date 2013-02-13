@@ -197,7 +197,8 @@ input.dms_field {
 										</li>
 										<g:set var="i" value="${i+1}" />
 									</g:each>
-									<li id="add_file" class="addedResource">
+									<li id="add_file" class="addedResource"
+										onclick="$('#attachFiles').select()[0].click();return false;">
 										<div class="progress">
 											<div id="translucent_box"></div>
 											<div id="progress_bar"></div>
@@ -582,14 +583,14 @@ input.dms_field {
 				def obvTmpFileName = observationInstance?.resource?.iterator()?.next()?.fileName
 				def obvDir = obvTmpFileName ?  obvTmpFileName.substring(0, obvTmpFileName.lastIndexOf("/")) : ""
 	       %>
-            <form id="upload_resource" 
+            <form id="upload_resource" enctype="multipart/form-data"
 				title="Add a photo for this observation"
                                 method="post"
 				class="${hasErrors(bean: observationInstance, field: 'resource', 'errors')}">
 
 				<!-- TODO multiple attribute is HTML5. need to chk if this gracefully falls back to default in non compatible browsers -->
-				<!-- input type="file" id="attachFiles" name="resources"
-					accept="image/*" multiple/--> <span class="msg" style="float: right"></span>
+				<input type="file" id="attachFiles" name="resources"
+					accept="image/*" multiple/> <span class="msg" style="float: right"></span>
 				<input type="hidden" name='obvDir' value="${obvDir}" />
 			</form>
 
@@ -597,7 +598,7 @@ input.dms_field {
             </div>
        </div>
 		<!--====== Template ======-->
-<script id="metadataTmpl" type="text/x-jquery-tmpl">
+		<script id="metadataTmpl" type="text/x-jquery-tmpl">
 	<li class="addedResource thumbnail">
 	    <div class='figure' style='height: 200px; overflow:hidden;'>
                 <span> 
@@ -629,12 +630,10 @@ input.dms_field {
 	</li>
 	
 </script>
-	
-	<script type="text/javascript" src="//api.filepicker.io/v1/filepicker.js"></script>
-	
+
 	<r:script>
 	
-    var add_file_button = '<li id="add_file" class="addedResource" style="display:none;"><div class="progress"><div id="translucent_box"></div><div id="progress_bar"></div ><div id="progress_msg"></div ></div></li>';
+    var add_file_button = '<li id="add_file" class="addedResource" style="display:none;" onclick="$(\'#attachFiles\').select()[0].click();return false;"><div class="progress"><div id="translucent_box"></div><div id="progress_bar"></div ><div id="progress_msg"></div ></div></li>';
 
 	$(document).ready(function(){
 		$('.dropdown-toggle').dropdown();
@@ -649,32 +648,6 @@ input.dms_field {
 	    $('#add_photo_ie').hide();
             $('#add_file').show();
         }
-		
-		$('#add_file').live('click', function(){
-filepicker.pickMultiple({
-    mimetypes: ['image/*'],
-    maxSize: 104857600,
-    //debug:true,
-    services:['COMPUTER', 'FACEBOOK', 'FLICKR', 'PICASA', 'DROPBOX', 'URL', 'IMAGE_SEARCH'],
-  },
-  function(FPFiles){
-    console.log(JSON.stringify(FPFiles));
-    $.each(FPFiles, function(){
-	    $('<input>').attr({
-	    type: 'hidden',
-	    name: 'resources',
-	    value:JSON.stringify(this)
-		}).appendTo('#upload_resource');
-	})
-	$('#upload_resource').submit().find("span.msg").html("Uploading... Please wait...");
-  	$("#iemsg").html("Uploading... Please wait...");
-  },
-  function(FPError){
-    console.log(FPError.toString());
-    
-  }
-);		
-		});
 		
 		$('#attachFiles').change(function(e){
   			$('#upload_resource').submit().find("span.msg").html("Uploading... Please wait...");
@@ -772,8 +745,6 @@ filepicker.pickMultiple({
 						} else {
 							messageNode.append(response?response.error:"Error");
 						}
-						
-						$("upload_resource").remove('input');
 					});
            } 
      	});  
@@ -869,8 +840,6 @@ filepicker.pickMultiple({
                     $('.degree_field').fadeIn();
                 }
         });
-        
-        filepicker.setKey('AXCVl73JWSwe7mTPb2kXdz');
 	});
 
 
@@ -890,7 +859,6 @@ filepicker.pickMultiple({
 	});
 	
 </r:script>
-
 </body>
 </html>
 
