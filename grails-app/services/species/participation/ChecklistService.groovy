@@ -9,6 +9,7 @@ import species.participation.curation.UnCuratedCommonNames
 import org.apache.commons.httpclient.util.DateUtil;
 import org.apache.solr.common.SolrException;
 import org.apache.solr.common.util.NamedList;
+import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap;
 import org.springframework.transaction.annotation.Transactional;
 
 
@@ -647,7 +648,7 @@ class ChecklistService {
 
 		String aq = "";
 		int i=0;
-		if(params.aq instanceof List) {
+		if(params.aq instanceof GrailsParameterMap) {
 			params.aq.each { key, value ->
 				queryParams["aq."+key] = value;
 				activeFilters["aq."+key] = value;

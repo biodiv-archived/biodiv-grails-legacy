@@ -8,7 +8,7 @@
 		</center>
 	</div>
 
-	<div class="btn-group" style="float: right; z-index: 10">
+	<div class="btn-group pull-right" style="z-index: 10">
 		<button id="selected_sort" class="btn dropdown-toggle"
 			data-toggle="dropdown" href="#" rel="tooltip"
 			data-original-title="Sort by">
@@ -27,7 +27,7 @@
             </g:else>
 			<span class="caret"></span>
 		</button>
-		<ul id="sortFilter" class="dropdown-menu" style="width: auto;">
+		<ul id="sortFilter" class="dropdown-menu">
 			<g:if test="${isSearch}">
 				<li class="group_option"><a class=" sort_filter_label"
 					value="score"> Relevancy </a>

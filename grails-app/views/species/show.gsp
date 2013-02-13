@@ -427,7 +427,7 @@ $(document).ready(function(){
 						<table>
 						<g:each in="${synonyms}" var="synonym">
 						<tr><td class="prop">
-							<span class="grid_3 name">${synonym?.relationship?.value()} </span></td><td> ${synonym?.name}  </td></tr>
+							<span class="grid_3 name">${synonym?.relationship?.value()} </span></td><td> ${synonym?.italicisedForm}  </td></tr>
 						</g:each>
 						</table>
 					</div>

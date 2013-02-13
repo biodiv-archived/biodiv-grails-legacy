@@ -33,6 +33,7 @@ import org.apache.solr.common.util.NamedList
 import org.apache.solr.common.util.DateUtil;
 import org.apache.solr.common.util.NamedList;
 import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
+import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap;
 
 class ObservationService {
 
@@ -719,7 +720,7 @@ class ObservationService {
 		
 		String aq = "";
 		int i=0;
-		if(params.aq instanceof List) {
+		if(params.aq instanceof GrailsParameterMap) {
 			params.aq.each { key, value ->
 				queryParams["aq."+key] = value;
 				activeFilters["aq."+key] = value;

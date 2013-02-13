@@ -32,7 +32,9 @@
 			<div class="tab-content">
 				<div id="list" class="tab-pane active">
 						<s:speciesFilter></s:speciesFilter>
-						<s:showSpeciesList></s:showSpeciesList>
+						<div class="observations_list_wrapper" style="top: 0px;">
+							<s:showSpeciesList></s:showSpeciesList>
+						</div>
 				</div>
 				<div id="contribute" class="tab-pane">
 					<g:include controller="species" action="contribute" />
@@ -52,9 +54,9 @@
 		
 	</g:javascript>
 	<r:script>
-		$(document).ready(function(){
-			$(".grid_view").show();
-		});
+		$('.observations_list_wrapper').on('updatedGallery', function(event) {
+    		$(".grid_view").show();
+    	});
 		
 	</r:script>
 </body>

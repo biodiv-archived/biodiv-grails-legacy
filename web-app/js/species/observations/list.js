@@ -228,10 +228,10 @@ $(document).ready(function(){
 			    params['offset'] = 0
 			    var History = window.History;
 			    History.pushState({state:1}, "Species Portal", '?'+decodeURIComponent($.param(params))); 
-				eatCookies();
 				updateRelativeTime();
 				$("table.tablesorter").tablesorter();
 				last_actions();
+				eatCookies();
 				$('.observations_list_wrapper').trigger('updatedGallery');
 			
 			}
@@ -241,8 +241,8 @@ $(document).ready(function(){
 		return false;
 	});
 	
-	eatCookies();
 	last_actions();
+	eatCookies();
 	$('.observations_list_wrapper').trigger('updatedGallery');
 });
 
@@ -490,8 +490,8 @@ function updateListPage(activeTag) {
 			$('#tags_section').replaceWith(data.tagsHtml);
 			$('.observation_location_wrapper').replaceWith(data.mapViewHtml);
 			setActiveTag(activeTag);
-			eatCookies();
 			last_actions();
+			eatCookies();			
 			$('.observations_list_wrapper').trigger('updatedGallery');
 	}
 }
