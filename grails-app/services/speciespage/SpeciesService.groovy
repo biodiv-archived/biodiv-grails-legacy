@@ -192,8 +192,6 @@ class SpeciesService {
 		log.info "Total number of species that got added : ${noOfInsertions}"
 		//log.debug "Publishing to search index"
 
-		cleanUpGorm();
-
 		postProcessSpecies(addedSpecies);
 
 		try {
@@ -201,6 +199,8 @@ class SpeciesService {
 		} catch(e) {
 			e.printStackTrace()
 		}
+
+		cleanUpGorm();
 		
 		return noOfInsertions;
 	}
