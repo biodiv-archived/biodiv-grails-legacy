@@ -192,16 +192,16 @@ class SpeciesService {
 		log.info "Total number of species that got added : ${noOfInsertions}"
 		//log.debug "Publishing to search index"
 
+		cleanUpGorm();
+
+		postProcessSpecies(addedSpecies);
+
 		try {
 			speciesSearchService.publishSearchIndex(addedSpecies);
 		} catch(e) {
 			e.printStackTrace()
 		}
-
-		cleanUpGorm();
-
-		postProcessSpecies(addedSpecies);
-
+		
 		return noOfInsertions;
 	}
 
@@ -216,7 +216,7 @@ class SpeciesService {
 		Species.withTransaction {
 			for(Species s in batch) {
 				try {
-					//externalLinksService.updateExternalLinks(s.taxonConcept);
+					externalLinksService.updateExternalLinks(s.taxonConcept);
 				} catch(e) {
 					e.printStackTrace()
 				}
@@ -260,7 +260,7 @@ class SpeciesService {
 	def postProcessSpecies(List<Species> species) {
 		//TODO: got to move this to the end of taxon creation
 		try{
-			//groupHandlerService.updateGroups(species);
+			groupHandlerService.updateGroups(species);
 		} catch(e) {
 			e.printStackTrace()
 		}
