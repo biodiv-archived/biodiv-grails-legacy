@@ -183,15 +183,18 @@ function setUpFeedForTarget(targetComp){
 		return; 
 	}
 	
+	var refreshType = $(targetComp).children('input[name="refreshType"]').val();
+	if(refreshType !== "auto"){
+		//for manual refresh will add feeds during page creation and not in ajax call
+		return
+	}
+	
 	//resetting time range
 	setUpTimeRef(targetComp);
 	
-	var refreshType = $(targetComp).children('input[name="refreshType"]').val();
-	if(refreshType === "auto"){
-		loadOlderFeedsInAjax(targetComp); // to load some feeds to start with
-		autoLoadOnScroll(targetComp); // to get older feeds on scroll bottom
-		pollForFeeds(targetComp); //to get newer feeds
-	}
+	loadOlderFeedsInAjax(targetComp); // to load some feeds to start with
+	autoLoadOnScroll(targetComp); // to get older feeds on scroll bottom
+	pollForFeeds(targetComp); //to get newer feeds
 }
 
 function setUpFeed(timeUrl){

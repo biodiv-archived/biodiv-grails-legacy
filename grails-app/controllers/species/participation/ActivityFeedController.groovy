@@ -39,7 +39,7 @@ class ActivityFeedController {
 	}
 	
 	def index = {
-		redirect(action:list, params:['feedType':params.feedType, 'feedCategory':params.feedCategory])
+		redirect(action:list, params:params)
 	}
 	
 	def list = {
