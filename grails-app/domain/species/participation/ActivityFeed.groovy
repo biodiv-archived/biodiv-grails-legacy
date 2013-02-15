@@ -205,7 +205,7 @@ class ActivityFeed {
 		params.timeLine = params.timeLine?:ActivityFeedService.OLDER
 		params.refTime = params.refTime?:((params.timeLine == ActivityFeedService.OLDER) ?  new Date().time.toString(): new Date().previous().time.toString())
 		
-		params.max = params.max ?: ((params.timeLine == ActivityFeedService.OLDER) ? ((params.feedType == ActivityFeedService.SPECIFIC) ? 2 : 5)  :null)
+		params.max = params.max ?: ((params.timeLine == ActivityFeedService.OLDER) ? ((params.feedType == ActivityFeedService.SPECIFIC) ? 5 : 5)  :null)
 		
 		return true
 	}

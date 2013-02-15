@@ -49,6 +49,7 @@ class ObservationController {
 	def userGroupService;
 	def activityFeedService;
 	def SUserService;
+	def obvUtilService;
 	
 	static allowedMethods = [save:"POST", update: "POST", delete: "POST"]
 
@@ -149,12 +150,12 @@ class ObservationController {
 					observationInstance.setTags(tags);
 
 					if(params.groupsWithSharingNotAllowed) {
-						setUserGroups(observationInstance, [params.groupsWithSharingNotAllowed]);
+						observationService.setUserGroups(observationInstance, [params.groupsWithSharingNotAllowed]);
 					} else {
 						if(params.userGroupsList) {
 							def userGroups = (params.userGroupsList != null) ? params.userGroupsList.split(',').collect{k->k} : new ArrayList();
 							
-							setUserGroups(observationInstance, userGroups);
+							observationService.setUserGroups(observationInstance, userGroups);
 						}	
 					}
 										
@@ -187,19 +188,7 @@ class ObservationController {
 		}
 	}
 
-	private void setUserGroups(Observation observationInstance, List userGroupIds) {
-		if(!observationInstance) return
-		
-		def obvInUserGroups = observationInstance.userGroups.collect { it.id + ""}
-		def toRemainInUserGroups =  obvInUserGroups.intersect(userGroupIds);
-		
-		userGroupIds.removeAll(toRemainInUserGroups)
-		userGroupService.postObservationtoUserGroups(observationInstance, userGroupIds);
-		obvInUserGroups.removeAll(toRemainInUserGroups)
-		userGroupService.removeObservationFromUserGroups(observationInstance, obvInUserGroups);
-				
-	}
-	
+
 	@Secured(['ROLE_USER'])
 	def update = {
 		log.debug params;
@@ -221,11 +210,11 @@ class ObservationController {
 					activityFeedService.addActivityFeed(observationInstance, null, currentUser, activityFeedService.OBSERVATION_UPDATED);
 					
 					if(params.groupsWithSharingNotAllowed) {
-						setUserGroups(observationInstance, [params.groupsWithSharingNotAllowed]);
+						observationService.setUserGroups(observationInstance, [params.groupsWithSharingNotAllowed]);
 					} else {
 						if(params.userGroupsList) {
 							def userGroups = (params.userGroupsList != null) ? params.userGroupsList.split(',').collect{k->k} : new ArrayList();
-							setUserGroups(observationInstance, userGroups);
+							observationService.setUserGroups(observationInstance, userGroups);
 						}						
 					}
 					//redirect(action: "show", id: observationInstance.id)
@@ -1317,4 +1306,12 @@ class ObservationController {
 	private getSpeciesCallPermission(obvId){
 		return customsecurity.hasPermissionToMakeSpeciesCall([id:obvId, className:species.participation.Observation.class.getCanonicalName(), permission:org.springframework.security.acls.domain.BasePermission.WRITE]).toBoolean()
 	}
+	
+	@Secured(['ROLE_ADMIN'])
+	def batchUpload = {
+		log.debug params
+		obvUtilService.batchUpload(request, params)
+		render "== done"
+	}
+	
 }

@@ -7,6 +7,7 @@ import groovy.text.SimpleTemplateEngine
 import org.grails.taggable.TagLink;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.text.SimpleDateFormat;
 
@@ -46,6 +47,7 @@ class ObservationService {
 	def springSecurityService;
 	def curationService;
 	def commentService;
+	def userGroupService;
 	
 	/**
 	 * 
@@ -77,8 +79,8 @@ class ObservationService {
 		observation.placeName = params.place_name;
 		observation.reverseGeocodedName = params.reverse_geocoded_name;
 		observation.location = 'POINT(' + params.longitude + ' ' + params.latitude + ')'
-		observation.latitude = params.float('latitude')
-		observation.longitude = params.float('longitude');
+		observation.latitude = params.latitude.toFloat();
+		observation.longitude = params.longitude.toFloat();
 		observation.locationAccuracy = params.location_accuracy;
 		observation.geoPrivacy = false;
 		observation.habitat = Habitat.get(params.habitat_id);
@@ -902,6 +904,18 @@ class ObservationService {
 		if(sortParam.equalsIgnoreCase("score") || sortParam.equalsIgnoreCase("visitCount")  || sortParam.equalsIgnoreCase("createdOn") || sortParam.equalsIgnoreCase("lastRevised") )
 			return true;
 		return false;
+	}
+	
+	def setUserGroups(Observation observationInstance, List userGroupIds) {
+		if(!observationInstance) return
+		
+		def obvInUserGroups = observationInstance.userGroups.collect { it.id + ""}
+		def toRemainInUserGroups =  obvInUserGroups.intersect(userGroupIds);
+		
+		userGroupIds.removeAll(toRemainInUserGroups)
+		userGroupService.postObservationtoUserGroups(observationInstance, userGroupIds);
+		obvInUserGroups.removeAll(toRemainInUserGroups)
+		userGroupService.removeObservationFromUserGroups(observationInstance, obvInUserGroups);
 	}
 	
 	File getUniqueFile(File root, String fileName){

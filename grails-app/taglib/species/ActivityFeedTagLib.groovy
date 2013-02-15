@@ -64,6 +64,8 @@ class ActivityFeedTagLib {
 		
 		newParams["rootHolderType"] = model.rootHolder?.class?.getCanonicalName()
 		newParams["rootHolderId"] = "" + model.rootHolder?.id
+		newParams["max"] = 2
+		
 		model.feeds = activityFeedService.getActivityFeeds(newParams);
 		if(model.feeds){
 			model.newerTimeRef = (model.feedOrder == activityFeedService.LATEST_FIRST) ? model.feeds.first().lastUpdated.time.toString() :  model.feeds.last().lastUpdated.time.toString()
