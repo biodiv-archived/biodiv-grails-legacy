@@ -5,18 +5,17 @@
 <%@ page import="species.groups.UserGroup"%>
 <%@ page import="species.participation.ActivityFeedService"%>
 <script>
-	bo<sec:ifLoggedIn>nction() {
-			$('.login-box-options').show();
-		});
-
-		$('.login-box').mouseout(function() {
-			$('.login-box-options').hide();
-		});
+<sec:ifLoggedIn>
+$(function() {
+	$('.login-box').mouseover(function() {
+		$('.login-box-options').show();
 	});
-	_$tag____________
 
-	_$tag___________
-	$(functio</sec:ifLoggedIn>-
+	$('.login-box').mouseout(function() {
+		$('.login-box-options').hide();
+	});
+});
+</sec:ifLoggedIn>
 </script>
 
 <ul class="nav header_userInfo">
