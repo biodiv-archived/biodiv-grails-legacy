@@ -1728,3 +1728,12 @@ li#userOrEmail-new {
 	clear: both;
 }
 
+.header_group .jcarousel-skin-ie7 img {
+	height : 65%;
+}
+.icon-group {
+	background-image: url('../images/glyphicons_043_group.png');
+	background-position:0 0;
+	width:22px;
+		
+}

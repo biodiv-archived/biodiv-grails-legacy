@@ -105,7 +105,7 @@ function resizeImage(item) {
  * Item html creation helper.
  */
 var getItemHTML = function(contextFreeUrl, contextGroup, item) {
-	var imageTag = '<img style="height:100%;" src="' + item.imageLink + '" title="' + item.imageTitle  +'" alt="" />';
+	var imageTag = '<img src="' + item.imageLink + '" title="' + item.imageTitle  +'" alt="" />';
 	/*
 	if(contextGroup){
 		if(item.groupContextLink){

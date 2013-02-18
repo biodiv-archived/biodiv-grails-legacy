@@ -17,9 +17,6 @@
 	<sec:ifNotLoggedIn>
 		<li><a id="loginLink" href="${uGroup.createLink(controller:'login', 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress) }">Login</a>
 		</li>
-		
-		<li><g:link controller='register'>Register</g:link>
-		</li>
 	</sec:ifNotLoggedIn>
 	<sec:ifLoggedIn>
 		<li class="dropdown">

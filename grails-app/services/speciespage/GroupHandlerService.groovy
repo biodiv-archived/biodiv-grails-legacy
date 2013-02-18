@@ -1,6 +1,7 @@
 package speciespage
 
 import org.apache.commons.logging.LogFactory;
+import org.hibernate.exception.ConstraintViolationException;
 
 import species.Classification;
 import species.Species;
@@ -147,19 +148,19 @@ class GroupHandlerService {
 	 * A species should not have multiple paths in the same classification
 	 * @return
 	 */
-	int updateGroups(List<Species> species) {
+	int updateGroups(List<Species> species, boolean flush) {
 		int noOfUpdations = 0;
 
 		species.each { s ->
 			if(updateGroup(s.taxonConcept)) {
 				noOfUpdations ++;
 			}
-			if(noOfUpdations % BATCH_SIZE == 0) {
+			if(noOfUpdations % BATCH_SIZE == 0 && flush) {
 				cleanUpGorm();
 			}
 		}
 
-		if(noOfUpdations) {
+		if(noOfUpdations && flush) {
 			cleanUpGorm();
 		}
 		return noOfUpdations;
@@ -243,7 +244,11 @@ class GroupHandlerService {
 		def hibSession = sessionFactory?.getCurrentSession()
 		if(hibSession) {
 			log.debug "Flushing and clearing session"
-			hibSession.flush()
+			try {
+				hibSession.flush()
+			} catch(ConstraintViolationException e) {
+				e.printStackTrace()
+			}
 			hibSession.clear()
 			speciesGroupMappings.each { mapping ->
 				if(!mapping.isAttached()) {

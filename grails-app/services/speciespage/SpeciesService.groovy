@@ -261,7 +261,7 @@ class SpeciesService {
 	def postProcessSpecies(List<Species> species) {
 		//TODO: got to move this to the end of taxon creation
 		try{
-			groupHandlerService.updateGroups(species);
+			groupHandlerService.updateGroups(species, false);
 		} catch(e) {
 			e.printStackTrace()
 		}

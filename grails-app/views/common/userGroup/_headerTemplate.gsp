@@ -12,6 +12,7 @@
 </a>
 <!-- span class="group-desc ellipsis multiline"> ${userGroupInstance.description}
 </span-->
+
 <div id="actionsHeader" style="position: relative; overflow: visible;">
 	<uGroup:showActionsHeaderTemplate
 		model="['userGroupInstance':userGroupInstance, members_autofillUsersId:1]" />
