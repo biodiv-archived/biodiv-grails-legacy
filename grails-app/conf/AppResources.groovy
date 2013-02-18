@@ -215,4 +215,9 @@ modules = {
 		resource url:'/js/species/checklist.js'
 	}
 	
+	chart {
+		dependsOn 'core'
+		
+		resource url:'/js/chart.js'
+	}
 }

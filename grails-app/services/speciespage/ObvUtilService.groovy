@@ -152,6 +152,8 @@ class ObvUtilService {
 				log.debug "Successfully created observation : "+observationInstance
 
 				params.obvId = observationInstance.id
+				activityFeedService.addActivityFeed(observationInstance, null, observationInstance.author, activityFeedService.OBSERVATION_CREATED);
+				addReco(params, observationInstance)
 
 				def tags = (params.tags != null) ? Arrays.asList(params.tags) : new ArrayList();
 				observationInstance.setTags(tags);
@@ -164,11 +166,6 @@ class ObvUtilService {
 						observationService.setUserGroups(observationInstance, userGroups);
 					}
 				}
-									
-				activityFeedService.addActivityFeed(observationInstance, null, observationInstance.author, activityFeedService.OBSERVATION_CREATED);
-				params['obvId'] = observationInstance.id
-				addReco(params, observationInstance)
-				
 			}else {
 					observationInstance.errors.allErrors.each { log.error it }
 			}
