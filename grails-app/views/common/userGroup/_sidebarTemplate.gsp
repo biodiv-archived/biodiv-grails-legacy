@@ -1,28 +1,17 @@
 <%@page import="species.utils.ImageType"%>
 <%@ page import="species.groups.SpeciesGroup"%>
 <%@ page import="species.Habitat"%>
+<%@ page import="species.groups.UserGroup"%>
 <%@ page import="species.participation.ActivityFeedService"%>
 
 <ul class="nav left-sidebar pull-right">
 
-	<li><div class="header_group span2" style="height: 50px;">
-			<obv:showRelatedStory
-				model="['controller':'userGroup', 'observationId': 1, 'action':'getFeaturedUserGroups', 'id':'uG', hideShowAll:true]" />
-		</div></li>
-	<li class="dropdown"><a class="dropdown-toggle"
-			data-toggle="dropdown"
-		href="${uGroup.createLink(controller:'userGroup', absolute:'true', action:'list')}">
-			<i class="icon-group" title="Groups"></i><sup>Beta</sup>
-			<b class="caret"
-				style="border-top-color: black; border-bottom-color: black;"></b> </a>
-			<ul class="dropdown-menu">
-				<li><a
-					href="${uGroup.createLink(controller:'userGroup', absolute:'true', action:'list')}">
-						<i class="icon-user"></i>All Groups<sup>Beta</sup> </a></li>
-				<li><uGroup:showSuggestedUserGroups /></li>
+<%--	<li><div class="header_group span2" style="height: 50px;">--%>
+<%--			<obv:showRelatedStory--%>
+<%--				model="['controller':'userGroup', 'observationId': 1, 'action':'getFeaturedUserGroups', 'id':'uG', hideShowAll:true]" />--%>
+<%--		</div></li>--%>
+<uGroup:showSuggestedUserGroups />
 	
-			</ul>
-		</li>
 	<li><search:searchBox />
 	</li>
 	<sec:ifLoggedIn>
