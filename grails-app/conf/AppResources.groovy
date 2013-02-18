@@ -22,7 +22,7 @@ modules = {
 	}
 
 	core {
-		dependsOn 'jquery, jquery-ui'
+		dependsOn 'jquery, jquery-ui,carousel'
 		defaultBundle 'core'
 
 		resource url:'/bootstrap/css/bootstrap.min.css'

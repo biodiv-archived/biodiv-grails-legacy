@@ -11,13 +11,14 @@
 					India Biodiversity Portal</a>
 				
 				<div class="nav-collapse">
-					
+				
+				
 					<ul class="nav pull-right">
-						<li><search:searchBox />
-						</li>
-						<li><uGroup:showSidebar />
-						<li><sUser:userLoginBox
-								model="['userGroup':userGroupInstance]" /></li>
+						
+						
+						<li><uGroup:showSidebar /></li>
+<%--						<li><sUser:userLoginBox--%>
+<%--								model="['userGroup':userGroupInstance]" /></li>--%>
 
 					</ul>
 				</div>

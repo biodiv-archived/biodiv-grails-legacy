@@ -21,7 +21,7 @@ class Species {
 	Date updatedOn;
 	Date createdOn = new Date();
 	Date dateCreated;
-	Date lastUpdated;
+	Date lastUpdated ;
 	
 	def grailsApplication; 
 	

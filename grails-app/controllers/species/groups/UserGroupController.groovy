@@ -129,7 +129,7 @@ class UserGroupController {
 				redirect  url: uGroup.createLink(mapping: 'userGroupGeneric', action:'list', params:[user:params.id]);
 				break;
 			default:
-				flash:message "Invalid command"
+				//flash.message "Invalid command"
 				redirect  url: uGroup.createLink(mapping: 'userGroupGeneric', action:'list')
 		}
 		return
@@ -674,6 +674,25 @@ class UserGroupController {
 		render r as JSON
 	}
 
+	def getFeaturedUserGroups = {
+		log.debug params;
+		def max = Math.min(params.limit ? params.limit.toInteger() : 9, 100)
+		def offset = params.offset ? params.offset.toInteger() : 0
+
+		def userGroups = userGroupService.getSuggestedUserGroups(null);
+
+		def result = [];
+		userGroups.each {
+			result.add(['observation':it, 'title':it.name]);
+		}
+
+		def r = ["observations":result, "count":result.size()]
+		if(r.observations) {
+			r.observations = observationService.createUrlList2(r.observations, '');
+		}
+		render r as JSON
+	}
+
 	@Secured(['ROLE_USER'])
 	def upload_resource = {
 		log.debug params;
@@ -843,6 +862,7 @@ class UserGroupController {
 		if(r.observations) {
 			r.observations = observationService.createUrlList2(r.observations, '');
 		}
+		
 		render r as JSON
 	}
 	

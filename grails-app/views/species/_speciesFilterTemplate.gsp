@@ -16,7 +16,7 @@
 			<g:if test="${params.sort == 'title'}">
             	Name
             </g:if>
-            <g:elseif test="${params.sort == 'lastrevised'}">
+            <g:elseif test="${params.sort == 'lastrevised' || params.sort == 'lastUpdated'}">
 				Last Updated
             </g:elseif>
 			<g:elseif test="${params.sort == 'score'}">
