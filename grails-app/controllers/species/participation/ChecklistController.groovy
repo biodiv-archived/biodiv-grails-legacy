@@ -190,6 +190,12 @@ class ChecklistController {
 		render "=== done "
 	}
 	
+	@Secured(['ROLE_ADMIN'])
+	def migrateNewChecklist = {
+		log.debug params
+		checklistService.migrateNewChecklist(params)
+		render "=== done "
+	}
 	
 	def test1 ={
 		def flushImmediately  = grailsApplication.config.speciesPortal.flushImmediately

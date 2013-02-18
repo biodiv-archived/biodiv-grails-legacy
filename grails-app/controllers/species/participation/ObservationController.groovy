@@ -143,9 +143,9 @@ class ObservationController {
 				if(!observationInstance.hasErrors() && observationInstance.save(flush:true)) {
 					//flash.message = "${message(code: 'default.created.message', args: [message(code: 'observation.label', default: 'Observation'), observationInstance.id])}"
 					log.debug "Successfully created observation : "+observationInstance
-
 					params.obvId = observationInstance.id
-
+					activityFeedService.addActivityFeed(observationInstance, null, observationInstance.author, activityFeedService.OBSERVATION_CREATED);
+					
 					def tags = (params.tags != null) ? Arrays.asList(params.tags) : new ArrayList();
 					observationInstance.setTags(tags);
 
@@ -159,7 +159,7 @@ class ObservationController {
 						}	
 					}
 										
-					activityFeedService.addActivityFeed(observationInstance, null, observationInstance.author, activityFeedService.OBSERVATION_CREATED);
+					
 					sendNotificationMail(OBSERVATION_ADDED, observationInstance, request);
 					params["createNew"] = true
 					chain(action: 'addRecommendationVote', model:['chainedParams':params]);
