@@ -7,7 +7,8 @@ import species.Species;
 import species.auth.SUser
 import species.groups.SpeciesGroup;
 import species.groups.UserGroup
-import species.participation.Observation
+import species.participation.ActivityFeed;
+import species.participation.Observation;
 
 class ChartService {
 
@@ -153,6 +154,40 @@ class ChartService {
 			order 'total', 'desc'
 		}
 		return [data : result, columns : [['string', 'User'], ['number', 'Observations']]]
+	}
+	
+	def getPortalActivityStatsByDay(params){
+		int days = params.days ? params.days.toInteger() : 700
+		
+		UserGroup userGroupInstance
+		if(params.webaddress) {
+			userGroupInstance = userGroupService.get(params.webaddress);
+		}
+		
+		Date currentDate = new Date()
+		
+		def result = []
+		for(int i = 0; i < days ; i++){
+			Date endDate = currentDate.minus(i)
+			Date startDate = currentDate.minus(i+1)
+			result.add([endDate, ActivityFeed.withCriteria(){
+				projections {
+					rowCount('total') //alias given to count
+				}
+				and{
+					between('lastUpdated', startDate, endDate)
+							
+//					//filter by usergroup
+//					if(userGroupInstance){
+//						userGroups{
+//							eq('id', userGroupInstance.id)
+//						}
+//					}
+				}
+			}[0]])
+		}
+		
+		return [data:result, columns : [['date', 'Date'], ['number', 'Activity Count']]]
 	}
 	
 }
