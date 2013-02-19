@@ -910,12 +910,17 @@ class ObservationService {
 		if(!observationInstance) return
 		
 		def obvInUserGroups = observationInstance.userGroups.collect { it.id + ""}
+		println obvInUserGroups;
 		def toRemainInUserGroups =  obvInUserGroups.intersect(userGroupIds);
-		
-		userGroupIds.removeAll(toRemainInUserGroups)
-		userGroupService.postObservationtoUserGroups(observationInstance, userGroupIds);
-		obvInUserGroups.removeAll(toRemainInUserGroups)
-		userGroupService.removeObservationFromUserGroups(observationInstance, obvInUserGroups);
+		if(userGroupIds.size() == 0) {
+			println 'removing'
+			userGroupService.removeObservationFromUserGroups(observationInstance, obvInUserGroups);
+		} else {
+			userGroupIds.removeAll(toRemainInUserGroups)
+			userGroupService.postObservationtoUserGroups(observationInstance, userGroupIds);
+			obvInUserGroups.removeAll(toRemainInUserGroups)
+			userGroupService.removeObservationFromUserGroups(observationInstance, obvInUserGroups);
+		}
 	}
 	
 	File getUniqueFile(File root, String fileName){

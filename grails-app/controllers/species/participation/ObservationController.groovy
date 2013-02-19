@@ -215,7 +215,9 @@ class ObservationController {
 						if(params.userGroupsList) {
 							def userGroups = (params.userGroupsList != null) ? params.userGroupsList.split(',').collect{k->k} : new ArrayList();
 							observationService.setUserGroups(observationInstance, userGroups);
-						}						
+						} else {
+							observationService.setUserGroups(observationInstance, []);
+						}
 					}
 					//redirect(action: "show", id: observationInstance.id)
 					params["createNew"] = true
