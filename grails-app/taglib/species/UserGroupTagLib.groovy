@@ -250,7 +250,7 @@ class UserGroupTagLib {
 //			}
 //		}
 		
-		def gList = userGroupService.getFilteredUserGroups([:], 5, 0, false).userGroupInstanceList
+		def gList = userGroupService.getSuggestedUserGroups(null)
 		out << render(template:"/common/userGroup/showSuggestedUserGroupsTemplate", model:['userGroups':gList]);
 	}
 	
