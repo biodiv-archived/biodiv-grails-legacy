@@ -118,12 +118,11 @@ class ChecklistController {
 	protected getFilteredChecklist(params){
 		def allGroup = SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.ALL);
 		def speciesGroup = params.sGroup ? SpeciesGroup.get(params.sGroup.toLong()) : allGroup
-		def max = Math.min(params.max ? params.int('max') : 50, 100);
+		def max = Math.min(params.max ? params.int('max') : 12, 100);
 		def offset = params.offset ? params.int('offset') : 0
 		def userGroupInstance = userGroupService.get("" + params.webaddress);
 		
 		speciesGroup = (speciesGroup != allGroup) ? speciesGroup : null
-		
 		def checklistInstanceList = getChecklist(speciesGroup, userGroupInstance, max, offset)
 		def checklistInstanceTotal = getChecklistCount(speciesGroup, userGroupInstance)
 		def checklistMapInstanceList = getChecklist(speciesGroup, userGroupInstance, null, null)
@@ -160,7 +159,7 @@ class ChecklistController {
 				firstResult offset
 			}
 			
-			order 'fromDate', 'desc'
+			order 'id', 'desc'
 		}
 	}
 	

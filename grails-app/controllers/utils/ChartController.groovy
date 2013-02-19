@@ -12,11 +12,12 @@ class ChartController {
 	
 	def test = {
 		//render chartService.getObservationStats(params, null) as JSON
-		render chartService.getSpeciesPageStats(params) as JSON
+		//render chartService.getSpeciesPageStats(params) as JSON
+		render chartService.activeUserStats(params) as JSON
 	}
 	
 	def show = {
 		log.debug params
-		[obvData:chartService.getObservationStats(params, null), speciesData: chartService.getSpeciesPageStats(params)]
+		[obvData:chartService.getObservationStats(params, null), speciesData: chartService.getSpeciesPageStats(params), userData:chartService.activeUserStats(params)]
 	}
 }
