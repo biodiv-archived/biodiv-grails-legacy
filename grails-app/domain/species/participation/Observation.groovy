@@ -16,6 +16,7 @@ class Observation implements Taggable{
 	def commentService;
 	def activityFeedService
 	
+	
 	public enum OccurrenceStatus {
 		ABSENT ("Absent"),	//http://rs.gbif.org/terms/1.0/occurrenceStatus#absent
 		CASUAL ("Casual"),	// http://rs.gbif.org/terms/1.0/occurrenceStatus#casual
@@ -58,7 +59,7 @@ class Observation implements Taggable{
 	int flagCount = 0;
 	String searchText;
 	Recommendation maxVotedReco;
-
+	boolean agreeTerms = false;
 
 	static hasMany = [resource:Resource, recommendationVote:RecommendationVote, obvFlags:ObservationFlag, userGroups:UserGroup];
 	static belongsTo = [SUser, UserGroup]
@@ -85,6 +86,7 @@ class Observation implements Taggable{
 				return ['value.not.in.range', 'Longitude', '68.03215', '97.40238']
 			}
 		}
+		agreeTerms nullable:true
 	}
 
 	static mapping = {

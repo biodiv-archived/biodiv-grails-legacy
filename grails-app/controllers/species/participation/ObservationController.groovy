@@ -366,12 +366,19 @@ class ObservationController {
 	@Secured(['ROLE_USER'])
 	def upload_resource = {
 		log.debug params;
-
+		if(!params.resources) {
+			message = g.message(code: 'no.file.attached', default:'No file is attached')
+			response.setStatus(500)
+			message = [error:message]
+			render message as JSON
+			return;
+		}
+		
 		try {
-			if(ServletFileUpload.isMultipartContent(request)) {
-				MultipartHttpServletRequest multiRequest = (MultipartHttpServletRequest) request;
+			//if(ServletFileUpload.isMultipartContent(request)) {
+				//MultipartHttpServletRequest multiRequest = (MultipartHttpServletRequest) request;
 				def rs = [:]
-				Utils.populateHttpServletRequestParams(request, rs);
+				//Utils.populateHttpServletRequestParams(request, rs);
 				def resourcesInfo = [];
 				def rootDir = grailsApplication.config.speciesPortal.observations.rootDir
 				File obvDir 
@@ -381,8 +388,13 @@ class ObservationController {
 					message = g.message(code: 'no.file.attached', default:'No file is attached')
 				}
 				
+				if(params.resources instanceof String) {
+						params.resources = [params.resources]
+				}
 				params.resources.each { f ->
-					log.debug "Saving observation file ${f.originalFilename}"
+					println f;
+					f = JSON.parse(f);
+					log.debug "Saving observation file ${f.filename}"
 
 					// List of OK mime-types
 					//TODO Move to config
@@ -394,22 +406,22 @@ class ObservationController {
 						'image/jpg'
 					]
 
-					if (! okcontents.contains(f.contentType)) {
+					if (! okcontents.contains(f.mimetype)) {
 						message = g.message(code: 'resource.file.invalid.extension.message', args: [
 							okcontents,
-							f.originalFilename
+							f.filename
 						])
 					}
 					else if(f.size > grailsApplication.config.speciesPortal.observations.MAX_IMAGE_SIZE) {
 						message = g.message(code: 'resource.file.invalid.max.message', args: [
 							grailsApplication.config.speciesPortal.observations.MAX_IMAGE_SIZE/1024,
-							f.originalFilename,
+							f.filename,
 							f.size/1024
 						], default:'File size cannot exceed ${104857600/1024}KB');
 					}
-					else if(f.empty) {
-						message = g.message(code: 'file.empty.message', default:'File cannot be empty');
-					}
+//					else if(f.empty) {
+//						message = g.message(code: 'file.empty.message', default:'File cannot be empty');
+//					}
 					else {
 						if(!obvDir) {
 							if(!params.obvDir) {
@@ -425,8 +437,8 @@ class ObservationController {
 							}
 						}
 
-						File file = observationService.getUniqueFile(obvDir, Utils.cleanFileName(f.originalFilename));
-						f.transferTo( file );
+						File file = observationService.getUniqueFile(obvDir, Utils.cleanFileName(f.filename));
+						download(f.url, file );
 						ImageUtils.createScaledImages(file, obvDir);
 						resourcesInfo.add([fileName:file.name, size:f.size]);
 					}
@@ -449,11 +461,11 @@ class ObservationController {
 					message = [error:message]
 					render message as JSON
 				}
-			} else {
+			/*} else {
 				response.setStatus(500)
 				def message = [error:g.message(code: 'no.file.attached', default:'No file is attached')]
 				render message as JSON
-			}
+			}*/
 		} catch(e) {
 			e.printStackTrace();
 			response.setStatus(500)
@@ -461,6 +473,14 @@ class ObservationController {
 			render message as JSON
 		}
 	}
+	
+	def download(url, File file)
+	{
+		def out = new BufferedOutputStream(new FileOutputStream(file))
+		out << new URL(url).openStream()
+		out.close()
+	}
+
 
 	/**
 	 * adds a recommendation and 1 vote to it attributed to the logged in user
