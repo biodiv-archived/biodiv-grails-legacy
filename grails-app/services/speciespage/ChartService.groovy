@@ -67,6 +67,7 @@ class ChartService {
 					}
 				}
 			}
+			
 			order 'total', 'desc'
 		}
 		return getFormattedResult(result)
@@ -120,6 +121,38 @@ class ChartService {
 		}
 		
 		return [data : finalResult, columns : [['string', 'Species Group'], ['number', 'Content'], ['number', 'Stubs']]]
+	}
+	
+	def activeUserStats(params){
+		int days = params.days ? params.days.toInteger() : 7
+		int max = params.max ? params.max.toInteger() : 10
+		
+		UserGroup userGroupInstance
+		if(params.webaddress) {
+			userGroupInstance = userGroupService.get(params.webaddress);
+		}
+		
+		def result = Observation.withCriteria(){
+			projections {
+				groupProperty('author')
+				rowCount('total') //alias given to count
+			}
+			and{
+				// taking undeleted observation
+				eq('isDeleted', false)
+				ge('createdOn', new Date().minus(days))
+				
+				//filter by usergroup
+				if(userGroupInstance){
+					userGroups{
+						eq('id', userGroupInstance.id)
+					}
+				}
+			}
+			maxResults max
+			order 'total', 'desc'
+		}
+		return [data : result, columns : [['string', 'User'], ['number', 'Observations']]]
 	}
 	
 }
