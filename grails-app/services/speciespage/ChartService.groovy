@@ -157,7 +157,7 @@ class ChartService {
 	}
 	
 	def getPortalActivityStatsByDay(params){
-		int days = params.days ? params.days.toInteger() : 7
+		int days = params.days ? params.days.toInteger() : 700
 		
 		UserGroup userGroupInstance
 		if(params.webaddress) {
