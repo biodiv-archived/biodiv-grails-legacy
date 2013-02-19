@@ -18,18 +18,22 @@ $(function() {
 </sec:ifLoggedIn>
 </script>
 
-<ul class="nav header_userInfo">
+<ul class="nav header_userInfo pull-right">
 	<sec:ifNotLoggedIn>
 		<li><a id="loginLink"
 			href="${uGroup.createLink(controller:'login', 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress) }">Login</a>
 		</li>
 	</sec:ifNotLoggedIn>
 	<sec:ifLoggedIn>
-		<li class="dropdown"><a href="#" class="dropdown-toggle" style="float:right;height:30px;"
-			data-toggle="dropdown"> <i class="icon-home" title="Home"></i><b
+		<li class="dropdown"><a href="#" class="dropdown-toggle" style="padding:0"
+			data-toggle="dropdown"> 
+<%--			<i class="icon-home" title="Home"></i>--%>
+			<b
 				class="caret"
-				style="border-top-color: black; border-bottom-color: black;"></b> </a> <!--h5 class="nav-header">Home</h5-->
-			<ul class="dropdown-menu">
+				style="border-top-color: black; border-bottom-color: black;display:none;"></b>
+				
+				 </a> <!--h5 class="nav-header">Home</h5-->
+			<ul class="dropdown-menu"  style="margin:0px;padding:0px;">
 
 
 				<li><a
