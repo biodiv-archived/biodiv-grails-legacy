@@ -21,6 +21,10 @@ h6 {
 	font-size:14px;
 }
 
+#ibp-header-bar .dropdown-toggle, #ibp-header-bar #loginLink {
+	font-size: 17px;
+}
+
 .page-footer {
 	height: 221px;
 	width: 725px;
@@ -1738,10 +1742,10 @@ li#userOrEmail-new {
 		
 }
 
-ul.nav li.dropdown:hover > ul.dropdown-menu{
-    display: block;    
-}
+/* ul.nav li.dropdown:hover > ul.dropdown-menu{ */
+/*     display: block;     */
+/* } */
 
-a.menu:after, .dropdown-toggle:after {
-  content: none;
-}
+/* a.menu:after, .dropdown-toggle:after { */
+/*   content: none; */
+/* } */

@@ -5,17 +5,17 @@
 <%@ page import="species.groups.UserGroup"%>
 <%@ page import="species.participation.ActivityFeedService"%>
 <script>
-<sec:ifLoggedIn>
-$(function() {
-	$('.login-box').mouseover(function() {
-		$('.login-box-options').show();
-	});
+	<sec:ifLoggedIn>
+	$(function() {
+		$('.login-box').mouseover(function() {
+			$('.login-box-options').show();
+		});
 
-	$('.login-box').mouseout(function() {
-		$('.login-box-options').hide();
+		$('.login-box').mouseout(function() {
+			$('.login-box-options').hide();
+		});
 	});
-});
-</sec:ifLoggedIn>
+	</sec:ifLoggedIn>
 </script>
 
 <ul class="nav header_userInfo pull-right">
@@ -25,15 +25,16 @@ $(function() {
 		</li>
 	</sec:ifNotLoggedIn>
 	<sec:ifLoggedIn>
-		<li class="dropdown"><a href="#" class="dropdown-toggle" style="padding:0"
-			data-toggle="dropdown"> 
-<%--			<i class="icon-home" title="Home"></i>--%>
-			<b
-				class="caret"
-				style="border-top-color: black; border-bottom-color: black;display:none;"></b>
-				
-				 </a> <!--h5 class="nav-header">Home</h5-->
-			<ul class="dropdown-menu"  style="margin:0px;padding:0px;">
+		<li><div class="login-box">
+				<sUser:renderProfileLink />
+			</div></li>
+		<li class="dropdown"  style="height:50px;">
+		
+		<a href="#" class="dropdown-toggle"  style="height:30px;"
+			data-toggle="dropdown"> <%--			<i class="icon-home" title="Home"></i>--%>
+				<b class="caret"
+				style="border-top-color: black; border-bottom-color: black;"></b> </a> <!--h5 class="nav-header">Home</h5-->
+			<ul class="dropdown-menu">
 
 
 				<li><a
@@ -62,10 +63,8 @@ $(function() {
 					href="${uGroup.createLink(controller:'logout', 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress) }"><i
 						class="icon-off"></i>Logout</a></li>
 
-			</ul>
-			<div class="login-box">
-				<sUser:renderProfileLink />
-			</div></li>
+			</ul></li>
+
 
 	</sec:ifLoggedIn>
 </ul>

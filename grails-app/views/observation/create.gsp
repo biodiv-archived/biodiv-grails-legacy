@@ -658,31 +658,34 @@ input.dms_field {
             $('#add_file').show();
         }
 		
-		$('#add_file').live('click', function(){
-filepicker.pickMultiple({
-    mimetypes: ['image/*'],
-    maxSize: 104857600,
-    //debug:true,
-    services:['COMPUTER', 'FACEBOOK', 'FLICKR', 'PICASA', 'GOOGLE_DRIVE', 'DROPBOX'],
-  },
-  function(FPFiles){
-    console.log(JSON.stringify(FPFiles));
-    $.each(FPFiles, function(){
-	    $('<input>').attr({
-	    type: 'hidden',
-	    name: 'resources',
-	    value:JSON.stringify(this)
-		}).appendTo('#upload_resource');
-	})
-	$('#upload_resource').submit().find("span.msg").html("Uploading... Please wait...");
-  	$("#iemsg").html("Uploading... Please wait...");
-  	$('#progress_msg').html('Uploading ...');
-  },
-  function(FPError){
-    console.log(FPError.toString());
-  }
-);		
-		});
+		var filePick = function() {
+			filepicker.pickMultiple({
+			    mimetypes: ['image/*'],
+			    maxSize: 104857600,
+			    //debug:true,
+			    services:['COMPUTER', 'FACEBOOK', 'PICASA', 'GOOGLE_DRIVE', 'DROPBOX'],
+			  },
+			  function(FPFiles){
+			    console.log(JSON.stringify(FPFiles));
+			    $.each(FPFiles, function(){
+				    $('<input>').attr({
+				    type: 'hidden',
+				    name: 'resources',
+				    value:JSON.stringify(this)
+					}).appendTo('#upload_resource');
+				})
+				$('#upload_resource').submit().find("span.msg").html("Uploading... Please wait...");
+			  	$("#iemsg").html("Uploading... Please wait...");
+			  	$('#progress_msg').html('Uploading ...');
+			  },
+			  function(FPError){
+			    console.log(FPError.toString());
+			  }
+			);		
+		}
+	
+		$('#add_file').live('click', filePick);
+		$('#add_photo_ie').live('click', filePick);
 		
 		$('#attachFiles').change(function(e){
   			$('#upload_resource').submit().find("span.msg").html("Uploading... Please wait...");
