@@ -177,12 +177,12 @@ class ChartService {
 				and{
 					between('lastUpdated', startDate, endDate)
 							
-					//filter by usergroup
-					if(userGroupInstance){
-						userGroups{
-							eq('id', userGroupInstance.id)
-						}
-					}
+//					//filter by usergroup
+//					if(userGroupInstance){
+//						userGroups{
+//							eq('id', userGroupInstance.id)
+//						}
+//					}
 				}
 			}[0]])
 		}
