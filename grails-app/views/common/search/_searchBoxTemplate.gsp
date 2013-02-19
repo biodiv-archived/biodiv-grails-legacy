@@ -28,7 +28,7 @@
 <%--		<g:hiddenField name="hl.snippets" value="3" />--%>
 
 	</form>
-<div id="nameSuggestionsMain" class="dropdown span3" style="left:200px;">
+<div id="nameSuggestionsMain" class="dropdown span3" style="left:-20px;">
 			<a class="dropdown-toggle" role="button" data-toggle="dropdown"
 			data-target="#" href="#"></a>
 		</div>	
@@ -43,8 +43,6 @@ $(document).ready(function() {
 		'isFlagged':"${params.isFlagged }"
 	}
 });
-</g:javascript>
-<r:script>
 
 $(document).ready(function(){
 
@@ -134,8 +132,9 @@ $(document).ready(function(){
 		if(category) {
 			action = action.replace("${controller}", category);
 		}
+		
 		if($("#userGroupSelectFilter").val() == 'ALL') {
-			$( "#searchbox" ).attr('action', "${Utils.getIBPServerDomain()}"+action);
+			action = "${Utils.getIBPServerDomain()}"+action;
 		}
 		
 		updateGallery(action, undefined, undefined, undefined, false,undefined,undefined,true);
@@ -148,4 +147,4 @@ $(document).ready(function(){
 		$('#searchToggleBox').slideToggle();
 	});
 });
-</r:script>
+</g:javascript>

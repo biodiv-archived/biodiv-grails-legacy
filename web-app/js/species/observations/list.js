@@ -538,7 +538,7 @@ function updateGallery(target, limit, offset, removeUser, isGalleryUpdate, remov
 			}
 		});
 	} else {
-		window.location = doc_url;
+		window.location = url.attr('base')+doc_url;
 	}
 }
    

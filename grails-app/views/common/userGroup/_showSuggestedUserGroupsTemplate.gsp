@@ -7,7 +7,7 @@
 		
 </a>
 
-	<ul class="dropdown-menu" style="">
+	<ul class="dropdown-menu" style="padding:5px">
 		<g:if test="${userGroups}">
 
 			<g:each in="${userGroups}"
