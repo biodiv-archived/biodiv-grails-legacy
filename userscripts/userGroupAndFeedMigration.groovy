@@ -1,3 +1,5 @@
+import java.sql.Timestamp;
+
 import javax.sql.DataSource
 import groovy.sql.Sql
 
@@ -123,7 +125,34 @@ def updateTime(af, c){
 	println "after save " +  af.dateCreated
 }
 
-migrate()
+
+def correctObvActivityOrder(){
+	def feedService = ctx.getBean("activityFeedService");
+	
+	ActivityFeed.withTransaction(){
+		ActivityFeed.findAllByActivityType(feedService.OBSERVATION_CREATED).each{ af ->
+			def createdTime = af.dateCreated
+			
+			ActivityFeed.findAllByActivityType(feedService.OBSERVATION_POSTED_ON_GROUP).each{ af1 ->
+				if(createdTime >=  af1.dateCreated){
+					createdTime = new Timestamp(af1.dateCreated.getTime() - 1)
+				}
+			}
+			
+			if(createdTime < af.dateCreated){
+				af.dateCreated = createdTime
+				if(!af.save()){
+					af.errors.allErrors.each { println  it }
+				}
+				println "========== updating " + af
+			}
+		}
+	}
+	//biodiv=#  update activity_feed set last_updated = date_created where activity_type = 'Observation created';
+}
+
+correctObvActivityOrder()
+//migrate()
 
 /*
 //please run following command on database
