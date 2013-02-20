@@ -663,7 +663,7 @@ input.dms_field {
 			    mimetypes: ['image/*'],
 			    maxSize: 104857600,
 			    //debug:true,
-			    services:['COMPUTER', 'FACEBOOK', 'PICASA', 'GOOGLE_DRIVE', 'DROPBOX'],
+			    services:['COMPUTER', 'FACEBOOK', 'FLICKR', 'PICASA', 'GOOGLE_DRIVE', 'DROPBOX'],
 			  },
 			  function(FPFiles){
 			    console.log(JSON.stringify(FPFiles));
