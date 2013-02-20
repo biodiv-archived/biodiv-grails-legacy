@@ -56,7 +56,7 @@
 
 				<li><a
 					href="${uGroup.createLink(controller:'userGroup', absolute:'true', action:'list', params:['user':sUser.renderCurrentUserId()])}"
-					title="Groups is in Beta. We would like you to provide valuable feedback, suggestions and interest in using the groups functionality."><i
+					title="Groups"><i
 						class="icon-user"></i>My Groups<sup>Beta</sup> </a> <uGroup:getCurrentUserUserGroupsSidebar />
 				</li>
 				<li><a id="logout"
