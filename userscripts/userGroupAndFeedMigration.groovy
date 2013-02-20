@@ -133,7 +133,7 @@ def correctObvActivityOrder(){
 		ActivityFeed.findAllByActivityType(feedService.OBSERVATION_CREATED).each{ af ->
 			def createdTime = af.dateCreated
 			
-			ActivityFeed.findAllByActivityType(feedService.OBSERVATION_POSTED_ON_GROUP).each{ af1 ->
+			ActivityFeed.findAllWhere(activityType:feedService.OBSERVATION_POSTED_ON_GROUP, rootHolderType:af.rootHolderType, rootHolderId:af.rootHolderId).each{ af1 ->
 				if(createdTime >=  af1.dateCreated){
 					createdTime = new Timestamp(af1.dateCreated.getTime() - 1)
 				}
@@ -148,9 +148,35 @@ def correctObvActivityOrder(){
 			}
 		}
 	}
+	
+	
+	
 	//biodiv=#  update activity_feed set last_updated = date_created where activity_type = 'Observation created';
 }
 
+def addFeedForObvCreate(){
+	def feedService = ctx.getBean("activityFeedService");
+	Observation.findAllWhere(isDeleted:false).each { obv ->
+		def af1 = ActivityFeed.findWhere(activityType:feedService.OBSERVATION_CREATED, rootHolderType:Observation.class.getCanonicalName(), rootHolderId:obv.id)
+		if(!af1){
+			ActivityFeed newaf = feedService.addActivityFeed(obv, null, obv.author, feedService.OBSERVATION_CREATED);
+			println "saved feed"
+		}
+	}
+	ActivityFeed.withTransaction(){
+	ActivityFeed.findAllByActivityType(feedService.OBSERVATION_CREATED).each{ af ->
+		def obv = feedService.getDomainObject(af.rootHolderType, af.rootHolderId)
+		af.dateCreated = obv.createdOn
+		af.lastUpdated = obv.createdOn
+		if(!af.save()){
+			af.errors.allErrors.each { println  it }
+		}
+		println "== done updating user time addition " + af.dateCreated
+	}
+	}
+}
+
+//addFeedForObvCreate()
 correctObvActivityOrder()
 //migrate()
 
