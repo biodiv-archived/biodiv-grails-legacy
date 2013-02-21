@@ -28,8 +28,11 @@
 			</div>
 		</g:if>
 		<chart:showActivityStats model="['title':'Activity Stats', columns:activityData.columns, data:activityData.data]"/>
+		<br>
 		<chart:showStats model="['title':'User Stats (7 days) ', columns:userData.columns, data:userData.data, hAxisTitle:'User']"/>
-		<chart:showStats model="['title':'Obsrvations', columns:obvData.columns, data:obvData.data]"/>
+		
+		<chart:showStats model="['title':'Observations', columns:obvData.columns, data:obvData.data]"/>
+		
 		<chart:showStats model="['title':'Speices', columns:speciesData.columns, data:speciesData.data]"/>
 	</div>
 	<r:script>

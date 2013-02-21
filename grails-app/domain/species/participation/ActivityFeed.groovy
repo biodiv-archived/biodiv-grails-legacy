@@ -229,7 +229,7 @@ class ActivityFeed {
 		return null
 	}
 	
-	private static getGroupAndObsevations(groups){
+	public static getGroupAndObsevations(groups){
 		def m = [:]
 		m[Observation.class.getCanonicalName()] = getObvIds(groups)
 		m[UserGroup.class.getCanonicalName()] = groups.collect{ it.id}
