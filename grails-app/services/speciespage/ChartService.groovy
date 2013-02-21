@@ -18,6 +18,7 @@ class ChartService {
 	private static final Date PORTAL_START_DATE = new Date(111, 7, 8)
 
 	def userGroupService
+	def activityFeedService
 
 	def getObservationStats(params, SUser author){
 		UserGroup userGroupInstance
@@ -171,6 +172,13 @@ class ChartService {
 			maxResults max
 			order 'total', 'desc'
 		}
+		
+//		
+//		def finalResult = []
+//		result.each { r ->
+//			finalResult.add([activityFeedService.getUserHyperLink(r[0], userGroupInstance), r[1]])
+//		}
+		
 		return [data : result, columns : [
 				['string', 'User'],
 				['number', 'Observations']
@@ -192,11 +200,13 @@ class ChartService {
 		
 		def result = []
 		Date currentDate = new Date()
-		for(int i = 0; i <= days ; i++){
+		DateGroovyMethods.clearTime(currentDate)
+		
+		for(int i = -1; i <= days ; i++){
 			Date endDate = currentDate.minus(i)
 			Date startDate = currentDate.minus(i+1)
 			result.add([
-				endDate,
+				startDate,
 				getActivityCount(startDate, endDate, typeToIdFilterMap, userGroupInstance)
 			])
 		}
