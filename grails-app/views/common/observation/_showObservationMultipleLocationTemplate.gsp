@@ -85,7 +85,7 @@
                       $.ajax({
                         url: "${snippetUrl }"+"/"+id,
                         success: function(data){
-                          infowindow.setContent("<div id='info-content'>" + data + "</div>");
+                          infowindow.setContent("<div id='info-content' class='thumbnail'>" + data + "</div>");
                           infowindow.open(map, marker);
                         }
                       });

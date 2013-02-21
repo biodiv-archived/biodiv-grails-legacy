@@ -199,7 +199,7 @@ class UserGroupService {
 
 	@Transactional
 	def getUserGroups(SUser userInstance) {
-		return getSuggestedUserGroups(userInstance);
+		return userInstance.getUserGroups()
 	}
 
 	@Transactional
