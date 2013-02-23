@@ -399,6 +399,9 @@ class ObservationController {
 				params.resources.each { f ->
 					println f;
 					f = JSON.parse(f);
+					if(f.size instanceof String) {
+						f.size = Integer.parseInt(f.size)
+					}
 					log.debug "Saving observation file ${f.filename}"
 
 					// List of OK mime-types

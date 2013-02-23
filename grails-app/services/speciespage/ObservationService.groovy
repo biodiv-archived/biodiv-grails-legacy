@@ -85,6 +85,8 @@ class ObservationService {
 		observation.geoPrivacy = false;
 		observation.habitat = Habitat.get(params.habitat_id);
 
+		observation.agreeTerms = (params.agreeTerms?.equals('on'))?true:false;
+		
 		def resourcesXML = createResourcesXML(params);
 		def resources = saveResources(observation, resourcesXML);
 		observation.resource?.clear();
