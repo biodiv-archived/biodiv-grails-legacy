@@ -8,6 +8,7 @@ import species.Resource;
 import species.auth.SUser;
 import species.groups.SpeciesGroup;
 import species.groups.UserGroup;
+import speciespage.ObvUtilService;
 
 class Observation implements Taggable{
 
@@ -326,4 +327,66 @@ class Observation implements Taggable{
 		activityFeedService.deleteFeed(this)
 	}
 	
+	def Map fetchExportableValue(){
+		Map res = [:]
+		
+		res[ObvUtilService.IMAGE_FILE_NAMES] = fetchImageUrlList().join(", ")
+		
+		res[ObvUtilService.SPECIES_GROUP] = group.name
+		res[ObvUtilService.HABITAT] = habitat.name
+		res[ObvUtilService.OBSERVED_ON] = "" + observedOn
+		
+		def snName = ""
+		def cnName = ""
+		if(maxVotedReco){
+			if(maxVotedReco.isScientificName){
+				snName = maxVotedReco.name
+				cnName = fetchSuggestedCommonNames()
+			}else{
+				cnName = maxVotedReco.name
+			}
+		}
+		res[ObvUtilService.CN] =cnName
+		res[ObvUtilService.SN] =snName
+		
+		
+		res[ObvUtilService.LOCATION] =placeName
+		res[ObvUtilService.LONGITUDE] = "" + latitude
+		res[ObvUtilService.LATITUDE] = "" + longitude
+		res[ObvUtilService.NOTES] = notes
+		
+		
+		res[ObvUtilService.TAGS] =this.tags.join(", ")
+		def ugList = []
+		
+		this.userGroups.each{ ug ->
+			ugList.add(ug.name)
+		}
+		
+		res[ObvUtilService.USER_GROUPS] = ugList.join(", ")
+		
+		def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+		def g = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
+		String base = config.speciesPortal.observations.serverURL
+		res[ObvUtilService.AUTHOR_URL] = "" + g.createLink(controller:'SUser', action:'show', id:author.id, 'base':base)
+		
+		return res 
+	}
+	
+	private fetchImageUrlList(){
+		
+		def res = []
+		
+		def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+		String base = config.speciesPortal.observations.serverURL
+		
+		Iterator iterator = resource?.iterator();
+		while(iterator.hasNext()) {
+			def reprImage = iterator.next();
+			if(reprImage && (new File(grailsApplication.config.speciesPortal.observations.rootDir+reprImage.fileName.trim())).exists()) {
+				res.add(base + reprImage.fileName.trim());
+			}
+		}
+		return res
+	}
 }

@@ -2,6 +2,8 @@ package speciespage
 
 import java.util.Map;
 
+import au.com.bytecode.opencsv.CSVWriter;
+
 import species.auth.SUser
 import species.groups.SpeciesGroup;
 import species.groups.UserGroup
@@ -12,27 +14,29 @@ import species.utils.Utils;
 import species.formatReader.SpreadsheetReader;
 import species.utils.ImageType;
 import species.utils.ImageUtils
+
 class ObvUtilService {
 
 	static transactional = false
 
 
-	private static final String IMAGE_FILE_NAMES = "filename"
-	private static final String SPECIES_GROUP = "group"
-	private static final String HABITAT = "habitat"
-	private static final String OBSERVED_ON   = "observed on"
-	private static final String  CN    = "common name"
-	private static final String  SN    = "scientific name"
-	private static final String  LOCATION   = "location title"
-	private static final String  LONGITUDE    = "longitude"
-	private static final String   LATITUDE   = "latitude"
-	private static final String   LICENSE   = "license"
-	private static final String   COMMENT   = "comment"
-	private static final String    NOTES  = "notes"
-	private static final String    USER_GROUPS  = "post to user groups"
-	private static final String    HELP_IDENTIFY  = "help identify?"
-	private static final String   TAGS   = "tags"
-	private static final String   AUTHOR_EMAIL   = "user email"
+	static final String IMAGE_FILE_NAMES = "filename"
+	static final String SPECIES_GROUP = "group"
+	static final String HABITAT = "habitat"
+	static final String OBSERVED_ON   = "observed on"
+	static final String CN    = "common name"
+	static final String SN    = "scientific name"
+	static final String LOCATION   = "location title"
+	static final String LONGITUDE    = "longitude"
+	static final String LATITUDE   = "latitude"
+	static final String LICENSE   = "license"
+	static final String COMMENT   = "comment"
+	static final String NOTES  = "notes"
+	static final String USER_GROUPS  = "post to user groups"
+	static final String HELP_IDENTIFY  = "help identify?"
+	static final String TAGS   = "tags"
+	static final String AUTHOR_EMAIL   = "user email"
+	static final String AUTHOR_URL   = "user"
 
 	def userGroupService
 	def observationService
@@ -40,6 +44,76 @@ class ObvUtilService {
 	def grailsApplication
 	def activityFeedService
 	def observationsSearchService
+	
+	
+	
+	
+	///////////////////////////////////////////////////////////////////////
+	/////////////////////////////// Export ////////////////////////////////
+	///////////////////////////////////////////////////////////////////////
+	
+	
+	def export(params){
+		log.debug(params)
+		def m = observationService.getFilteredObservations(params, -1, -1, false)
+		def observationInstanceList = m.observationInstanceList
+		def queryParams = m.queryParams
+		log.debug " Obv total $observationInstanceList.size  queryParams   $queryParams"
+		return exportObservation(observationInstanceList)
+	}
+	
+	
+	
+	private String exportObservation(List obvList){
+		if(! obvList || obvList.isEmpty())
+			return null
+			
+		boolean headerAdded = false
+		File csvFile = new File("/tmp/obvDownload", "obv_" + new Date().getTime() + ".csv")
+		CSVWriter writer = getCSVWriter(csvFile.getParent(), csvFile.getName())
+		
+		obvList.each { obv ->
+			log.debug "==== writting " + obv
+			Map m = obv.fetchExportableValue()
+			//println "================ " + m
+			if(!headerAdded){
+				def header = []
+				for(entry in m){
+					header.add(entry.getKey())
+				}
+				//println " header " + header
+				writer.writeNext(header.toArray(new String[0]))
+				headerAdded = true
+			}
+			writer.writeNext(m.values().toArray(new String[0]))
+		}
+		writer.flush()
+		writer.close()
+		
+		return csvFile.getAbsolutePath()
+	}
+	
+	private CSVWriter getCSVWriter(def directory, def fileName) {
+		char separator = '\t'
+		File dir =  new File(directory)
+		if(!dir.exists()){
+			dir.mkdirs()
+		}
+		return new CSVWriter(new FileWriter("$directory/$fileName"), separator);
+	}
+
+
+
+	
+	
+	
+	
+	
+	
+	
+	////////////////////////////////// End export//////////////////////////////
+	
+	
 	
 	def batchUpload(request, params){
 		/*
@@ -237,5 +311,7 @@ class ObvUtilService {
 		log.debug resourcesInfo
 		return resourcesInfo
 	}
+	
+	
 
 }

@@ -1336,4 +1336,8 @@ class ObservationController {
 		render "== done"
 	}
 	
+	def test = {
+		obvUtilService.export(params)
+		render " done "
+	}
 }
