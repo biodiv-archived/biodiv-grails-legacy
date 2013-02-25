@@ -1342,10 +1342,21 @@ class ObservationController {
 		render "== done"
 	}
 	
-	def test = {
-		obvUtilService.export(params)
-		render " done "
+	@Secured(['ROLE_USER'])
+	def exportAsCSV = {
+		def file = obvUtilService.export(request, params)
+		if(!file){
+			response.setStatus(500)
+			def message = [error:"Error in download"]
+			render message as JSON
+		}else{
+			response.contentType  = 'text/csv' 
+			response.setHeader("Content-disposition", "filename=${file.getName()}")
+			response.outputStream << file.getBytes()
+			response.outputStream.flush()
+		}
 	}
+	
 //	@Secured(['ROLE_USER'])
 	def exportAsKML = {
 		log.debug params

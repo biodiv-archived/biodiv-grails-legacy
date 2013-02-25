@@ -53,35 +53,43 @@ class ObvUtilService {
 	///////////////////////////////////////////////////////////////////////
 	
 	
-	def export(params){
+	def export(request, params){
 		log.debug(params)
 		def m = observationService.getFilteredObservations(params, -1, -1, false)
 		def observationInstanceList = m.observationInstanceList
 		def queryParams = m.queryParams
 		log.debug " Obv total $observationInstanceList.size  queryParams   $queryParams"
-		return exportObservation(observationInstanceList)
+		File f = exportObservation(observationInstanceList)
+		if(f){
+			log.debug "creating download log"
+			DownloadLogs.createLog(springSecurityService.currentUser, f.getAbsolutePath(), "" + request.forwardURI + "?" + request.getQueryString())
+		}
+		return f
 	}
 	
 	
 	
-	private String exportObservation(List obvList){
+	private File exportObservation(List obvList){
 		if(! obvList || obvList.isEmpty())
 			return null
 			
-		boolean headerAdded = false
-		File csvFile = new File("/tmp/obvDownload", "obv_" + new Date().getTime() + ".csv")
+		File downloadDir = new File(grailsApplication.config.speciesPortal.observations.observationDownloadDir)
+		if(!downloadDir.exists()){
+			downloadDir.mkdirs()
+		}
+				
+		File csvFile = new File(downloadDir, "obv_" + new Date().getTime() + ".csv")
 		CSVWriter writer = getCSVWriter(csvFile.getParent(), csvFile.getName())
 		
+		boolean headerAdded = false
 		obvList.each { obv ->
 			log.debug "==== writting " + obv
 			Map m = obv.fetchExportableValue()
-			//println "================ " + m
 			if(!headerAdded){
 				def header = []
 				for(entry in m){
 					header.add(entry.getKey())
 				}
-				//println " header " + header
 				writer.writeNext(header.toArray(new String[0]))
 				headerAdded = true
 			}
@@ -90,7 +98,7 @@ class ObvUtilService {
 		writer.flush()
 		writer.close()
 		
-		return csvFile.getAbsolutePath()
+		return csvFile
 	}
 	
 	private CSVWriter getCSVWriter(def directory, def fileName) {
@@ -102,15 +110,6 @@ class ObvUtilService {
 		return new CSVWriter(new FileWriter("$directory/$fileName"), separator);
 	}
 
-
-
-	
-	
-	
-	
-	
-	
-	
 	////////////////////////////////// End export//////////////////////////////
 	
 	

@@ -195,6 +195,7 @@ else {
 speciesPortal {
 	app.rootDir = "${userHome}/species"
 	data.rootDir = "${app.rootDir}/data"
+	download.rootDir = "${data.rootDir}/datarep/downloads"
 	domain = "localhost"
 	resources {
 		rootDir = "${app.rootDir}/images"
@@ -223,6 +224,7 @@ speciesPortal {
 	}
 	observations {
 		rootDir = "${app.rootDir}/observations"
+		observationDownloadDir = "${download.rootDir}/observations"
 		serverURL = "http://localhost/${appName}/observations"
 		//serverURL = "http://localhost/${appName}/observations"
 		MAX_IMAGE_SIZE = 104857600
