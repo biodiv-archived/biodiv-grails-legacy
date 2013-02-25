@@ -253,8 +253,7 @@ if (typeof String.prototype.startsWith != 'function') {
 	  };
 	}
 
-function eatCookies() {
-	
+function eatCookies() {	
 	var hashString = window.location.hash.substring(1)
 	if ($.cookie("listing") == "list") {
 		if(!hashString.startsWith('l')) {
@@ -277,7 +276,7 @@ function eatCookies() {
 			}
 		}
 		$('.grid_view').show();
-		$('.list_view').hide();
+		$('.list_view').not('.single_list_view').hide();
 		$('.grid_view_bttn').addClass('active');
 		$('.list_view_bttn').removeClass('active');
 	}
