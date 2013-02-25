@@ -34,14 +34,8 @@ import org.apache.solr.common.util.NamedList
 class ObservationController {
 	
 
-	private static final String OBSERVATION_ADDED = "observationAdded";
-	private static final String SPECIES_RECOMMENDED = "speciesRecommended";
-	private static final String SPECIES_AGREED_ON = "speciesAgreedOn";
-	private static final String SPECIES_NEW_COMMENT = "speciesNewComment";
-	private static final String SPECIES_REMOVE_COMMENT = "speciesRemoveComment";
-	private static final String OBSERVATION_FLAGGED = "observationFlagged";
+	
 	public static final boolean COMMIT = true;
-	private static final String OBSERVATION_DELETED = "observationDeleted";
 
 	def grailsApplication;
 	def observationService;
@@ -163,7 +157,7 @@ class ObservationController {
 					}
 										
 					
-					sendNotificationMail(OBSERVATION_ADDED, observationInstance, request);
+					observationService.sendNotificationMail(observationService.OBSERVATION_ADDED, observationInstance, observationInstance.author, request, params.webaddress);
 					params["createNew"] = true
 					chain(action: 'addRecommendationVote', model:['chainedParams':params]);
 				} else {
@@ -547,7 +541,7 @@ class ObservationController {
 					
 					if(!params["createNew"]){
 						//sending mail to user
-						sendNotificationMail(SPECIES_RECOMMENDED, observationInstance, request, activityFeed);
+						observationService.sendNotificationMail(observationService.SPECIES_RECOMMENDED, observationInstance, observationInstance.author, request, params.webaddress, activityFeed);
 						redirect(action:getRecommendationVotes, id:params.obvId, params:[max:3, offset:0, msg:msg, canMakeSpeciesCall:canMakeSpeciesCall])
 					}else if(params["isMobileApp"]?.toBoolean()){
 						render (['status':'success', 'success':'true', 'obvId':observationInstance.id] as JSON);
@@ -619,7 +613,7 @@ class ObservationController {
 					observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
 					
 					//sending mail to user
-					sendNotificationMail(SPECIES_AGREED_ON, observationInstance, request, activityFeed);
+					observationService.sendNotificationMail(observationService.SPECIES_AGREED_ON, observationInstance, observationInstance.author, request, params.webaddress, activityFeed);
 					def r = [
 						status : 'success',
 						success : 'true',
@@ -746,7 +740,7 @@ class ObservationController {
 			try {
 				observationInstance.isDeleted = true;
 				observationInstance.save(flush: true)
-				sendNotificationMail(OBSERVATION_DELETED, observationInstance, request);
+				observationService.sendNotificationMail(observationService.OBSERVATION_DELETED, observationInstance, observationInstance.author, request, params.webaddress);
 				activityFeedService.deleteFeed(observationInstance);
 				observationsSearchService.delete(observationInstance.id);
 				flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
@@ -783,7 +777,7 @@ class ObservationController {
 				
 				observationsSearchService.publishSearchIndex(obv, COMMIT);
 				
-				sendNotificationMail(OBSERVATION_FLAGGED, obv, request)
+				observationService.sendNotificationMail(observationService.OBSERVATION_FLAGGED, obv, obv.author, request, params.webaddress)
 				flash.message = "${message(code: 'observation.flag.added', default: 'Observation flag added')}"
 			}
 			catch (org.springframework.dao.DataIntegrityViolationException e) {
@@ -848,144 +842,11 @@ class ObservationController {
 		render (template:"/common/observation/showObservationSnippetTabletTemplate", model:[observationInstance:observationInstance, 'userGroupWebaddress':params.webaddress]);
 	}
 
-	private sendNotificationMail(String notificationType, Observation obv, request, ActivityFeed feedInstance=null){
-		def conf = SpringSecurityUtils.securityConfig
-		def obvUrl = generateLink("observation", "show", ["id": obv.id], request)
-		def userProfileUrl = generateLink("SUser", "show", ["id": obv.author.id], request)
-
-		def templateMap = [username: obv.author.name.capitalize(), obvUrl:obvUrl, userProfileUrl:userProfileUrl, domain:Utils.getDomainName(request)]
-
-		def mailSubject = ""
-		def bodyContent = ""
-		String htmlContent = ""
-		String bodyView = '';
-		def replyTo = conf.ui.notification.emailReplyTo;
-		Set toUsers = []
-		//Set bcc = ["xyz@xyz.com"];
-		//def activityModel = ['feedInstance':feedInstance, 'feedType':ActivityFeedService.GENERIC, 'feedPermission':ActivityFeedService.READ_ONLY, feedHomeObject:null] 
-		if(obv.author.sendNotification){
-			toUsers.add(obv.author);
-		}
-		switch ( notificationType ) {
-			case OBSERVATION_ADDED:
-				mailSubject = conf.ui.addObservation.emailSubject
-				bodyContent = conf.ui.addObservation.emailBody
-				break
-
-			case OBSERVATION_FLAGGED :
-				mailSubject = "Observation flagged"
-				bodyContent = conf.ui.observationFlagged.emailBody
-				templateMap["currentUser"] = springSecurityService.currentUser
-				//replyTo = templateMap["currentUser"].email
-				break
-
-			case OBSERVATION_DELETED :
-				mailSubject = conf.ui.observationDeleted.emailSubject
-				bodyContent = conf.ui.observationDeleted.emailBody
-				templateMap["currentUser"] = springSecurityService.currentUser
-				//replyTo = templateMap["currentUser"].email
-				break
-
-			case SPECIES_RECOMMENDED :
-				bodyView = "/emailtemplates/addRecommendation"
-				mailSubject = conf.ui.addRecommendationVote.emailSubject
-				templateMap['actor'] = feedInstance.author;
-				templateMap["actorProfileUrl"] = generateLink("SUser", "show", ["id": feedInstance.author.id], request)
-				templateMap["actorIconUrl"] = feedInstance.author.icon(ImageType.SMALL)
-				templateMap["actorName"] = feedInstance.author.name
-				templateMap["activity"] = activityFeedService.getContextInfo(feedInstance, [webaddress:params.webaddress])
-				templateMap["userGroupWebaddress"] = params.webaddress
-				//mailSubject = feedInstance.author.name +" : "+ templateMap["activity"].activityTitle.replaceAll(/<.*?>/, '')
-				//replyTo = templateMap["currentUser"].email
-				toUsers.addAll(getParticipants(obv))
-				break
-
-			case SPECIES_AGREED_ON:
-				bodyView = "/emailtemplates/addRecommendation"
-				mailSubject = conf.ui.addRecommendationVote.emailSubject
-				templateMap['actor'] = feedInstance.author;
-				templateMap["actorProfileUrl"] = generateLink("SUser", "show", ["id": feedInstance.author.id], request)
-				templateMap["actorIconUrl"] = feedInstance.author.icon(ImageType.SMALL)
-				templateMap["actorName"] = feedInstance.author.name
-				templateMap["userGroupWebaddress"] = params.webaddress
-				templateMap["activity"] = activityFeedService.getContextInfo(feedInstance, [webaddress:params.webaddress])
-				//mailSubject = feedInstance.author.name +" : "+ templateMap["activity"].activityTitle.replaceAll(/<.*?>/, '')
-				//replyTo = templateMap["currentUser"].email
-				toUsers.addAll(getParticipants(obv))
-				break
-
-			case SPECIES_NEW_COMMENT:
-				mailSubject = conf.ui.newComment.emailSubject
-				bodyContent = conf.ui.newComment.emailBody
-				break;
-			case SPECIES_REMOVE_COMMENT:
-				mailSubject = conf.ui.removeComment.emailSubject
-				bodyContent = conf.ui.removeComment.emailBody
-				break;
-
-			default:
-				log.debug "invalid notification type"
-		}
-
-		if (bodyContent.contains('$')) {
-			bodyContent = evaluate(bodyContent, templateMap)
-		}
-
-		//String[] bccArr = bcc.toArray(new String[0]);
-		
-		if(htmlContent) {
-			 htmlContent = Utils.getPremailer(grailsApplication.config.grails.serverURL, htmlContent)
-		}
-		
-		toUsers.eachWithIndex { toUser, index ->
-			templateMap['username'] = toUser.name.capitalize();
-			if ( Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
-			//if ( Environment.getCurrent().getName().equalsIgnoreCase("development")) {
-				mailService.sendMail {
-					to toUser.email
-					if(index == 0) {
-						bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com", "thomas.vee@gmail.com"
-					}
-					from conf.ui.notification.emailFrom
-					//replyTo replyTo
-					subject mailSubject
-					if(bodyView) {
-						body (view:bodyView, model:templateMap)
-					}
-					else if(htmlContent) {
-						html htmlContent
-					} else if(bodyContent) {
-						html bodyContent
-					} 
-				}
-			} 
-		}
-	}
-
-	private String generateLink( String controller, String action, linkParams, request) {
-		uGroup.createLink(base: Utils.getDomainServerUrl(request),
-				controller:controller, action: action,
-				params: linkParams)
-	}
-
-	private String evaluate(s, binding) {
-		new SimpleTemplateEngine().createTemplate(s).make(binding)
-	}
+	
 
 //	def participants = {
 //		render getParticipants(Observation.read(params.long('id')))
 //	}
-	
-	private List getParticipants(Observation observation) {
-		def participants = [];
-		def result = ActivityFeed.findAllByRootHolderIdAndRootHolderType(observation.id, observation.class.getCanonicalName())*.author.unique()
-		result.each { user ->
-			if(user.sendNotification){
-				participants << user
-			}			
-		}
-		return participants;
-	}
 	
 	def unsubscribeToIdentificationMail = {
 		log.debug "$params"
@@ -1104,7 +965,7 @@ class ObservationController {
 		if(observationInstance) {
 			observationInstance.updateObservationTimeStamp();
 			//observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
-			sendNotificationMail(SPECIES_NEW_COMMENT, observationInstance, request);
+			observationService.sendNotificationMail(observationService.SPECIES_NEW_COMMENT, observationInstance, observationInstance.author, request, params.webaddress);
 			render (['success:true']as JSON);
 		} else {
 			response.setStatus(500)
@@ -1128,7 +989,7 @@ class ObservationController {
 
 			observationInstance.updateObservationTimeStamp();
 			//observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
-			sendNotificationMail(SPECIES_REMOVE_COMMENT, observationInstance, request);
+			observationService.sendNotificationMail(observationService.SPECIES_REMOVE_COMMENT, observationInstance, observationInstance.author, request, params.webaddress);
 			render (['success:true']as JSON);
 		} else {
 			response.setStatus(500)

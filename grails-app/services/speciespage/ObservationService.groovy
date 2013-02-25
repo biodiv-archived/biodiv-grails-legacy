@@ -1,5 +1,6 @@
 package speciespage
 
+import grails.util.Environment;
 import grails.util.GrailsNameUtils;
 import groovy.sql.Sql
 import groovy.text.SimpleTemplateEngine
@@ -18,12 +19,14 @@ import species.utils.Utils;
 import species.TaxonomyDefinition;
 import species.auth.SUser;
 import species.groups.SpeciesGroup;
+import species.participation.ActivityFeed;
 import species.participation.Observation;
 import species.participation.Recommendation;
 import species.participation.RecommendationVote;
 import species.participation.ObservationFlag.FlagType
 import species.participation.RecommendationVote.ConfidenceType;
 import species.sourcehandler.XMLConverter;
+import species.utils.ImageType;
 import species.utils.Utils;
 
 import org.apache.lucene.document.DateField;
@@ -48,6 +51,16 @@ class ObservationService {
 	def curationService;
 	def commentService;
 	def userGroupService;
+	def activityFeedService;
+	def mailService;
+	
+	static final String OBSERVATION_ADDED = "observationAdded";
+	static final String SPECIES_RECOMMENDED = "speciesRecommended";
+	static final String SPECIES_AGREED_ON = "speciesAgreedOn";
+	static final String SPECIES_NEW_COMMENT = "speciesNewComment";
+	static final String SPECIES_REMOVE_COMMENT = "speciesRemoveComment";
+	static final String OBSERVATION_FLAGGED = "observationFlagged";
+	static final String OBSERVATION_DELETED = "observationDeleted";
 	
 	/**
 	 * 
@@ -967,4 +980,138 @@ class ObservationService {
 		}
 		return result;
 	} 
+
+	//////////////////////////////////////////////////////////////////////////////////////////////
+	
+	public sendNotificationMail(String notificationType, def obv, obvOwner, request, String userGroupWebaddress, ActivityFeed feedInstance=null){
+		def conf = SpringSecurityUtils.securityConfig
+		def obvUrl = generateLink(obv.getClass().getCanonicalName().toLowerCase(), "show", ["id": obv.id], request)
+		def userProfileUrl = generateLink("SUser", "show", ["id": obvOwner.id], request)
+
+		def templateMap = [username: obvOwner.name.capitalize(), obvUrl:obvUrl, userProfileUrl:userProfileUrl, domain:Utils.getDomainName(request)]
+
+		def mailSubject = ""
+		def bodyContent = ""
+		String htmlContent = ""
+		String bodyView = '';
+		def replyTo = conf.ui.notification.emailReplyTo;
+		Set toUsers = []
+		//Set bcc = ["xyz@xyz.com"];
+		//def activityModel = ['feedInstance':feedInstance, 'feedType':ActivityFeedService.GENERIC, 'feedPermission':ActivityFeedService.READ_ONLY, feedHomeObject:null]
+		if(obvOwner.sendNotification){
+			toUsers.add(obvOwner);
+		}
+		switch ( notificationType ) {
+			case OBSERVATION_ADDED:
+				mailSubject = conf.ui.addObservation.emailSubject
+				bodyContent = conf.ui.addObservation.emailBody
+				break
+
+			case OBSERVATION_FLAGGED :
+				mailSubject = "Observation flagged"
+				bodyContent = conf.ui.observationFlagged.emailBody
+				templateMap["currentUser"] = springSecurityService.currentUser
+				//replyTo = templateMap["currentUser"].email
+				break
+
+			case OBSERVATION_DELETED :
+				mailSubject = conf.ui.observationDeleted.emailSubject
+				bodyContent = conf.ui.observationDeleted.emailBody
+				templateMap["currentUser"] = springSecurityService.currentUser
+				//replyTo = templateMap["currentUser"].email
+				break
+
+			case SPECIES_RECOMMENDED :
+				bodyView = "/emailtemplates/addRecommendation"
+				mailSubject = conf.ui.addRecommendationVote.emailSubject
+				templateMap['actor'] = feedInstance.author;
+				templateMap["actorProfileUrl"] = generateLink("SUser", "show", ["id": feedInstance.author.id], request)
+				templateMap["actorIconUrl"] = feedInstance.author.icon(ImageType.SMALL)
+				templateMap["actorName"] = feedInstance.author.name
+				templateMap["activity"] = activityFeedService.getContextInfo(feedInstance, [webaddress:userGroupWebaddress])
+				templateMap["userGroupWebaddress"] = userGroupWebaddress
+				//mailSubject = feedInstance.author.name +" : "+ templateMap["activity"].activityTitle.replaceAll(/<.*?>/, '')
+				//replyTo = templateMap["currentUser"].email
+				toUsers.addAll(getParticipants(obv))
+				break
+
+			case SPECIES_AGREED_ON:
+				bodyView = "/emailtemplates/addRecommendation"
+				mailSubject = conf.ui.addRecommendationVote.emailSubject
+				templateMap['actor'] = feedInstance.author;
+				templateMap["actorProfileUrl"] = generateLink("SUser", "show", ["id": feedInstance.author.id], request)
+				templateMap["actorIconUrl"] = feedInstance.author.icon(ImageType.SMALL)
+				templateMap["actorName"] = feedInstance.author.name
+				templateMap["userGroupWebaddress"] = userGroupWebaddress
+				templateMap["activity"] = activityFeedService.getContextInfo(feedInstance, [webaddress:userGroupWebaddress])
+				//mailSubject = feedInstance.author.name +" : "+ templateMap["activity"].activityTitle.replaceAll(/<.*?>/, '')
+				//replyTo = templateMap["currentUser"].email
+				toUsers.addAll(getParticipants(obv))
+				break
+
+			case SPECIES_NEW_COMMENT:
+				mailSubject = conf.ui.newComment.emailSubject
+				bodyContent = conf.ui.newComment.emailBody
+				break;
+			case SPECIES_REMOVE_COMMENT:
+				mailSubject = conf.ui.removeComment.emailSubject
+				bodyContent = conf.ui.removeComment.emailBody
+				break;
+
+			default:
+				log.debug "invalid notification type"
+		}
+
+		if (bodyContent.contains('$')) {
+			bodyContent = evaluate(bodyContent, templateMap)
+		}
+
+		//String[] bccArr = bcc.toArray(new String[0]);
+		
+		if(htmlContent) {
+			 htmlContent = Utils.getPremailer(grailsApplication.config.grails.serverURL, htmlContent)
+		}
+		
+		toUsers.eachWithIndex { toUser, index ->
+			templateMap['username'] = toUser.name.capitalize();
+			//if ( Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
+			if ( Environment.getCurrent().getName().equalsIgnoreCase("development")) {
+				mailService.sendMail {
+					to toUser.email
+					if(index == 0) {
+						//bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com", "thomas.vee@gmail.com"
+						bcc "sravanthi@strandls.com"
+					}
+					from conf.ui.notification.emailFrom
+					//replyTo replyTo
+					subject mailSubject
+					if(bodyView) {
+						body (view:bodyView, model:templateMap)
+					}
+					else if(htmlContent) {
+						html htmlContent
+					} else if(bodyContent) {
+						html bodyContent
+					}
+				}
+			}
+		}
+	}
+
+	private String generateLink( String controller, String action, linkParams, request) {
+		userGroupService.userGroupBasedLink(base: Utils.getDomainServerUrl(request),
+				controller:controller, action: action,
+				params: linkParams)
+	}
+	
+	private List getParticipants(Observation observation) {
+		def participants = [];
+		def result = ActivityFeed.findAllByRootHolderIdAndRootHolderType(observation.id, observation.class.getCanonicalName())*.author.unique()
+		result.each { user ->
+			if(user.sendNotification){
+				participants << user
+			}
+		}
+		return participants;
+	}
 }

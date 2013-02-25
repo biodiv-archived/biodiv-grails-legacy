@@ -93,11 +93,11 @@ class FacebookAuthCookieFilter extends GenericFilterBean implements ApplicationE
 					def referer = request.getHeader("referer");
 					if(url == '/login/authSuccess') {
 						if(SpringSecurityUtils.isAjax(request)) {
-							logger.error "Unsuccessful ajax authentication:  $e.getMessage()";
+							logger.error "Unsuccessful ajax authentication:  $e.message";
 							unsuccessfulAuthentication(request, response, e);
 							return;
 						} else {
-							logger.error "Unsuccessful authentication:  $e.getMessage()";
+							logger.error "Unsuccessful authentication:  $e.message";
 							request.getSession().setAttribute("LAST_FACEBOOK_USER", e.extraInformation);
 							logger.debug "Redirecting to $createAccountUrl"
 							(new DefaultRedirectStrategy()).sendRedirect(request, response, createAccountUrl);
