@@ -582,4 +582,7 @@ function intializesSeciesHabitatInterest(){
     $('#habitatFilter button').attr('data-toggle', 'buttons-checkbox').click(speciesHabitatInterestHandler);
 }
 
-
+function downloadAsCSV(url){
+	var url = url  + window.location.search
+	window.location.href = url;
+}
