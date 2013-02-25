@@ -574,10 +574,9 @@ input.dms_field {
 						style="float: right; margin-right: 5px;"> ${form_button_val} </a>
 				
 						<div class="row control-group">
-							
 								<label class="checkbox" style="text-align: left;"> 
 								 <g:checkBox style="margin-left:0px;"
-									name="agreeTerms" checked="${observationInstance?.agreeTerms}"/>
+									name="agreeTerms" value="${observationInstance.agreeTerms}"/>
 								 <span class="policy-text"> By submitting this form, you agree that the photos you are submitting are taken by you, or you have permission of the copyright holder to upload the photos on creative commons licenses. </span></label>
 						</div>
 					
@@ -712,6 +711,7 @@ input.dms_field {
 			type: 'POST',
 			 
 			beforeSubmit: function(formData, jqForm, options) {
+				$("#addObservationSubmit").addClass('disabled');
 				return true;
 			}, 
             /*xhr: function() {  // custom xhr
@@ -722,6 +722,7 @@ input.dms_field {
                 return myXhr;
             },*/
 			success: function(responseXML, statusText, xhr, form) {
+				$("#addObservationSubmit").removeClass('disabled');
 				$(form).find("span.msg").html("");
 				$('#progress_msg').html('');
 				$("#iemsg").html("");
@@ -765,8 +766,11 @@ input.dms_field {
                 $( "#add_file" ).fadeIn(3000);
                 $("#image-resources-msg").parent(".resources").removeClass("error");
                 $("#image-resources-msg").html("");
-
+				$("#upload_resource input[name='resources']").remove();
+				
 			}, error:function (xhr, ajaxOptions, thrownError){
+					$("#addObservationSubmit").removeClass('disabled');
+					$("#upload_resource input[name='resources']").remove();
 					//xhr.upload.removeEventListener( 'progress', progressHandlingFunction, false); 
 					
 					//successHandler is used when ajax login succedes
@@ -784,7 +788,8 @@ input.dms_field {
 						} else {
 							messageNode.append(response?response.error:"Error");
 						}
-						$("upload_resource").remove('input');
+						
+						
 					});
            } 
      	});  
@@ -837,7 +842,12 @@ input.dms_field {
         });
 		$(".tagit-hiddenSelect").css('display','none');
 
- 		 $("#addObservationSubmit").click(function(){
+ 		 $("#addObservationSubmit").click(function(event){
+ 		 	if($(this).hasClass('disabled')) {
+ 		 		alert("Uploading is in progress. Please submit after it is over.");
+ 		 		event.preventDefault();
+      			return false; 		 		
+ 		 	}
  		 	if (document.getElementById('agreeTerms').checked){
 	 		 	$(this).addClass("disabled");
 	        	/*var tags = $("ul[name='tags']").tagit("tags");

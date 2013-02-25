@@ -5,6 +5,9 @@ import java.util.Map;
 
 import org.grails.taggable.*
 import groovy.text.SimpleTemplateEngine
+import groovy.xml.MarkupBuilder;
+import groovy.xml.StreamingMarkupBuilder;
+import groovy.xml.XmlUtil;
 
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.springframework.web.multipart.MultipartHttpServletRequest
@@ -396,6 +399,9 @@ class ObservationController {
 				params.resources.each { f ->
 					println f;
 					f = JSON.parse(f);
+					if(f.size instanceof String) {
+						f.size = Integer.parseInt(f.size)
+					}
 					log.debug "Saving observation file ${f.filename}"
 
 					// List of OK mime-types
@@ -1339,5 +1345,50 @@ class ObservationController {
 	def test = {
 		obvUtilService.export(params)
 		render " done "
+	}
+//	@Secured(['ROLE_USER'])
+	def exportAsKML = {
+		log.debug params
+		def model = getObservationList(params);
+		def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+		String iconBasePath = config.speciesPortal.observations.serverURL
+		
+		def builder = new StreamingMarkupBuilder()
+		builder.encoding = 'UTF-8'
+		def books = builder.bind {
+			mkp.xmlDeclaration()
+			namespaces << ['':'http://www.opengis.net/kml/2.2'] 
+			kml() {
+				Document(){
+					for ( obvDetails in model.totalObservationInstanceList) {
+						def obv = Observation.read(obvDetails[0])
+						PhotoOverlay() {
+							Name(obv.maxVotedReco?obv.maxVotedReco.name:"Unknown")
+							def snippet = g.render (template:"/common/observation/showObservationSnippetTabletTemplate", model:[observationInstance:obv, 'userGroupWebaddress':params.webaddress])
+							Description () {
+								 mkp.yield "$snippet" 
+							}
+							Camera() {
+								longitude(obv.longitude)
+								latitude(obv.latitude)
+								altitude(5)
+								roll(0)
+								altitudeMode('relativeToGround')
+							}
+							ImagePyramid() {
+								maxWidth(300)
+								maxHeight(300)
+							}
+							Icon() {
+								def iconPath = iconBasePath +  obv.mainImage().fileName.trim()
+								href(iconPath.replaceFirst(/\.[a-zA-Z]{3,4}$/, config.speciesPortal.resources.images.thumbnail.suffix))
+							}
+						}
+					}				
+				}
+			}
+		}
+		
+		render  XmlUtil.serialize(books)
 	}
 }
