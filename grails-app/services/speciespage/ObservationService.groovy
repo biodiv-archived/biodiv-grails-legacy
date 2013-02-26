@@ -986,9 +986,9 @@ class ObservationService {
 	public sendNotificationMail(String notificationType, def obv, obvOwner, request, String userGroupWebaddress, ActivityFeed feedInstance=null){
 		def conf = SpringSecurityUtils.securityConfig
 		def obvUrl = generateLink(obv.getClass().getCanonicalName().toLowerCase(), "show", ["id": obv.id], request)
-		def userProfileUrl = generateLink("SUser", "show", ["id": obvOwner.id], request)
+		
 
-		def templateMap = [username: obvOwner.name.capitalize(), obvUrl:obvUrl, userProfileUrl:userProfileUrl, domain:Utils.getDomainName(request)]
+		def templateMap = [obvUrl:obvUrl, domain:Utils.getDomainName(request)]
 
 		def mailSubject = ""
 		def bodyContent = ""
@@ -1074,13 +1074,14 @@ class ObservationService {
 		
 		toUsers.eachWithIndex { toUser, index ->
 			templateMap['username'] = toUser.name.capitalize();
-			//if ( Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
-			if ( Environment.getCurrent().getName().equalsIgnoreCase("development")) {
+			templateMap['userProfileUrl'] = generateLink("SUser", "show", ["id": toUser.id], request)
+			if ( Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
+			//if ( Environment.getCurrent().getName().equalsIgnoreCase("development")) {
 				mailService.sendMail {
 					to toUser.email
 					if(index == 0) {
-						//bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com", "thomas.vee@gmail.com"
-						bcc "sravanthi@strandls.com"
+						bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com", "thomas.vee@gmail.com"
+						//bcc "sravanthi@strandls.com"
 					}
 					from conf.ui.notification.emailFrom
 					//replyTo replyTo
