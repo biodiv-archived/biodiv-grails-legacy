@@ -1,6 +1,8 @@
 <%@page import="species.participation.Observation"%>
 <%@ page import="species.auth.SUser"%>
 <%@ page import="species.utils.Utils"%>
+<%@page import="species.participation.DownloadLog"%>
+
 <html>
 <head>
 <link rel="canonical"
@@ -173,6 +175,14 @@
 
 
 			</div>
+			
+			<div class="section" style="clear: both;">
+				<h5>
+					<span class="name" style="color: #b1b1b1;"> <i
+						class="icon-screenshot"></i></span> Downloads
+				</h5>
+				<obv:downloadTable model="[downloadLogList:DownloadLog.findAllByAuthor(user)]" />
+			</div>
 
 			<div class="section" style="clear: both;">
 				<h5>
@@ -184,7 +194,7 @@
 
 			</div>
 			<%--			</div>--%>
-
+				
 		</div>
 	</div>
 

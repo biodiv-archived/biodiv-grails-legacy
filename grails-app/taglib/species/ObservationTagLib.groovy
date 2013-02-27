@@ -204,6 +204,15 @@ class ObservationTagLib {
 	
 	def showSubmenuTemplate = {attrs, body->
 		out << render(template:"/observation/observationSubmenuTemplate", model:attrs.model);
-	} 	
+	}
+	
+	def download = {attrs, body->
+		out << render(template:"/common/downloadTemplate", model:attrs.model);
+	}
+	
+	def downloadTable = {attrs, body->
+		out << render(template:"/common/downloadTableTemplate", model:attrs.model);
+	}
+	
 }
 

@@ -1203,19 +1203,26 @@ class ObservationController {
 		render "== done"
 	}
 	
+	
+	
 	@Secured(['ROLE_USER'])
-	def exportAsCSV = {
-		def file = obvUtilService.export(request, params)
-		if(!file){
-			response.setStatus(500)
-			def message = [error:"Error in download"]
-			render message as JSON
-		}else{
-			response.contentType  = 'text/csv' 
-			response.setHeader("Content-disposition", "filename=${file.getName()}")
-			response.outputStream << file.getBytes()
-			response.outputStream.flush()
-		}
+	def export = {
+		log.debug "================ export "  + params
+		def file = obvUtilService.export(params)
+		flash.message = "${message(code: 'observation.download.requsted', default: 'Your request in under processing. Please check your user profile after some time.')}"
+		def r = [:]
+		render r as JSON
+	}
+	
+	
+	@Secured(['ROLE_USER'])
+	def downloadFile = {
+		log.debug(params)
+		File file = new File(DownloadLog.read(params.id.toLong()).filePath)
+		response.contentType  = 'text/csv' 
+		response.setHeader("Content-disposition", "filename=${file.getName()}")
+		response.outputStream << file.getBytes()
+		response.outputStream.flush()
 	}
 	
 //	@Secured(['ROLE_USER'])

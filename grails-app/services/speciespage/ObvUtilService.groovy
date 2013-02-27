@@ -53,7 +53,7 @@ class ObvUtilService {
 	///////////////////////////////////////////////////////////////////////
 	
 	
-	def export(request, params){
+	def export(params){
 		log.debug(params)
 		def m = observationService.getFilteredObservations(params, -1, -1, false)
 		def observationInstanceList = m.observationInstanceList
@@ -61,9 +61,10 @@ class ObvUtilService {
 		log.debug " Obv total $observationInstanceList.size  queryParams   $queryParams"
 		File f = exportObservation(observationInstanceList)
 		if(f){
-			log.debug "creating download log"
-			DownloadLogs.createLog(springSecurityService.currentUser, f.getAbsolutePath(), "" + request.forwardURI + "?" + request.getQueryString())
+			log.debug "creating download log " 
+			DownloadLog.createLog(springSecurityService.currentUser, f.getAbsolutePath(), params.filterUrl, params.downloadType, params.notes)
 		}
+		
 		return f
 	}
 	
