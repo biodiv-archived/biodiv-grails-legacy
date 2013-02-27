@@ -157,7 +157,7 @@ class ObservationController {
 					}
 										
 					
-					observationService.sendNotificationMail(observationService.OBSERVATION_ADDED, observationInstance, observationInstance.author, request, params.webaddress);
+					observationService.sendNotificationMail(observationService.OBSERVATION_ADDED, observationInstance, request, params.webaddress);
 					params["createNew"] = true
 					chain(action: 'addRecommendationVote', model:['chainedParams':params]);
 				} else {
@@ -541,7 +541,7 @@ class ObservationController {
 					
 					if(!params["createNew"]){
 						//sending mail to user
-						observationService.sendNotificationMail(observationService.SPECIES_RECOMMENDED, observationInstance, observationInstance.author, request, params.webaddress, activityFeed);
+						observationService.sendNotificationMail(observationService.SPECIES_RECOMMENDED, observationInstance, request, params.webaddress, activityFeed);
 						redirect(action:getRecommendationVotes, id:params.obvId, params:[max:3, offset:0, msg:msg, canMakeSpeciesCall:canMakeSpeciesCall])
 					}else if(params["isMobileApp"]?.toBoolean()){
 						render (['status':'success', 'success':'true', 'obvId':observationInstance.id] as JSON);
@@ -613,7 +613,7 @@ class ObservationController {
 					observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
 					
 					//sending mail to user
-					observationService.sendNotificationMail(observationService.SPECIES_AGREED_ON, observationInstance, observationInstance.author, request, params.webaddress, activityFeed);
+					observationService.sendNotificationMail(observationService.SPECIES_AGREED_ON, observationInstance, request, params.webaddress, activityFeed);
 					def r = [
 						status : 'success',
 						success : 'true',
@@ -740,7 +740,7 @@ class ObservationController {
 			try {
 				observationInstance.isDeleted = true;
 				observationInstance.save(flush: true)
-				observationService.sendNotificationMail(observationService.OBSERVATION_DELETED, observationInstance, observationInstance.author, request, params.webaddress);
+				observationService.sendNotificationMail(observationService.OBSERVATION_DELETED, observationInstance, request, params.webaddress);
 				activityFeedService.deleteFeed(observationInstance);
 				observationsSearchService.delete(observationInstance.id);
 				flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
@@ -777,7 +777,7 @@ class ObservationController {
 				
 				observationsSearchService.publishSearchIndex(obv, COMMIT);
 				
-				observationService.sendNotificationMail(observationService.OBSERVATION_FLAGGED, obv, obv.author, request, params.webaddress)
+				observationService.sendNotificationMail(observationService.OBSERVATION_FLAGGED, obv, request, params.webaddress)
 				flash.message = "${message(code: 'observation.flag.added', default: 'Observation flag added')}"
 			}
 			catch (org.springframework.dao.DataIntegrityViolationException e) {
@@ -965,7 +965,7 @@ class ObservationController {
 		if(observationInstance) {
 			observationInstance.updateObservationTimeStamp();
 			//observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
-			observationService.sendNotificationMail(observationService.SPECIES_NEW_COMMENT, observationInstance, observationInstance.author, request, params.webaddress);
+			observationService.sendNotificationMail(activityFeedService.COMMENT_ADDED, observationInstance, request, params.webaddress);
 			render (['success:true']as JSON);
 		} else {
 			response.setStatus(500)
@@ -989,7 +989,7 @@ class ObservationController {
 
 			observationInstance.updateObservationTimeStamp();
 			//observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
-			observationService.sendNotificationMail(observationService.SPECIES_REMOVE_COMMENT, observationInstance, observationInstance.author, request, params.webaddress);
+			observationService.sendNotificationMail(observationService.SPECIES_REMOVE_COMMENT, observationInstance, request, params.webaddress);
 			render (['success:true']as JSON);
 		} else {
 			response.setStatus(500)

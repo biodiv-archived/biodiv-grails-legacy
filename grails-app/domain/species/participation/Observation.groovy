@@ -389,4 +389,8 @@ class Observation implements Taggable{
 		}
 		return res
 	}
+
+	def getOwner() {
+		return author;
+	}	
 }

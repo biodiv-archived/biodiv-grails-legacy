@@ -983,10 +983,14 @@ class ObservationService {
 
 	//////////////////////////////////////////////////////////////////////////////////////////////
 	
-	public sendNotificationMail(String notificationType, def obv, obvOwner, request, String userGroupWebaddress, ActivityFeed feedInstance=null){
+	public sendNotificationMail(String notificationType, def obv, request, String userGroupWebaddress, ActivityFeed feedInstance=null){
 		def conf = SpringSecurityUtils.securityConfig
-		def obvUrl = generateLink(obv.getClass().getCanonicalName().toLowerCase(), "show", ["id": obv.id], request)
-		
+		log.debug "Sending email"
+		try {
+			
+		def targetController =  obv.getClass().getCanonicalName().split('\\.')[-1]
+		targetController = targetController.replaceFirst(targetController[0], targetController[0].toLowerCase());
+		def obvUrl = generateLink(targetController, "show", ["id": obv.id], request)
 
 		def templateMap = [obvUrl:obvUrl, domain:Utils.getDomainName(request)]
 
@@ -998,13 +1002,12 @@ class ObservationService {
 		Set toUsers = []
 		//Set bcc = ["xyz@xyz.com"];
 		//def activityModel = ['feedInstance':feedInstance, 'feedType':ActivityFeedService.GENERIC, 'feedPermission':ActivityFeedService.READ_ONLY, feedHomeObject:null]
-		if(obvOwner.sendNotification){
-			toUsers.add(obvOwner);
-		}
+		
 		switch ( notificationType ) {
 			case OBSERVATION_ADDED:
 				mailSubject = conf.ui.addObservation.emailSubject
 				bodyContent = conf.ui.addObservation.emailBody
+				toUsers.add(getOwner(obv))
 				break
 
 			case OBSERVATION_FLAGGED :
@@ -1012,6 +1015,7 @@ class ObservationService {
 				bodyContent = conf.ui.observationFlagged.emailBody
 				templateMap["currentUser"] = springSecurityService.currentUser
 				//replyTo = templateMap["currentUser"].email
+				toUsers.add(getOwner(obv))
 				break
 
 			case OBSERVATION_DELETED :
@@ -1019,6 +1023,7 @@ class ObservationService {
 				bodyContent = conf.ui.observationDeleted.emailBody
 				templateMap["currentUser"] = springSecurityService.currentUser
 				//replyTo = templateMap["currentUser"].email
+				toUsers.add(getOwner(obv))
 				break
 
 			case SPECIES_RECOMMENDED :
@@ -1049,53 +1054,65 @@ class ObservationService {
 				toUsers.addAll(getParticipants(obv))
 				break
 
-			case SPECIES_NEW_COMMENT:
+			case activityFeedService.COMMENT_ADDED:
 				mailSubject = conf.ui.newComment.emailSubject
-				bodyContent = conf.ui.newComment.emailBody
+				bodyView = "/emailtemplates/addComment"
+				templateMap['actor'] = feedInstance.author;
+				templateMap["actorProfileUrl"] = generateLink("SUser", "show", ["id": feedInstance.author.id], request)
+				templateMap["actorIconUrl"] = feedInstance.author.icon(ImageType.SMALL)
+				templateMap["actorName"] = feedInstance.author.name
+				templateMap["userGroupWebaddress"] = userGroupWebaddress
+				templateMap["activity"] = activityFeedService.getContextInfo(feedInstance, [webaddress:userGroupWebaddress])
+				templateMap['domainObjectType'] = feedInstance.rootHolderType.split('\\.')[-1].toLowerCase()
+				toUsers.addAll(getParticipants(obv))
 				break;
 			case SPECIES_REMOVE_COMMENT:
 				mailSubject = conf.ui.removeComment.emailSubject
 				bodyContent = conf.ui.removeComment.emailBody
+				toUsers.add(getOwner(obv))
 				break;
 
 			default:
 				log.debug "invalid notification type"
 		}
-
-		if (bodyContent.contains('$')) {
-			bodyContent = evaluate(bodyContent, templateMap)
-		}
-
-		//String[] bccArr = bcc.toArray(new String[0]);
 		
-		if(htmlContent) {
-			 htmlContent = Utils.getPremailer(grailsApplication.config.grails.serverURL, htmlContent)
-		}
-		
+		log.debug "Sending email to ${toUsers}"
 		toUsers.eachWithIndex { toUser, index ->
-			templateMap['username'] = toUser.name.capitalize();
-			templateMap['userProfileUrl'] = generateLink("SUser", "show", ["id": toUser.id], request)
-			if ( Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
-			//if ( Environment.getCurrent().getName().equalsIgnoreCase("development")) {
-				mailService.sendMail {
-					to toUser.email
-					if(index == 0) {
-						bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com", "thomas.vee@gmail.com"
-						//bcc "sravanthi@strandls.com"
-					}
-					from conf.ui.notification.emailFrom
-					//replyTo replyTo
-					subject mailSubject
-					if(bodyView) {
-						body (view:bodyView, model:templateMap)
-					}
-					else if(htmlContent) {
-						html htmlContent
-					} else if(bodyContent) {
-						html bodyContent
+			if(toUser) {
+				templateMap['username'] = toUser.name.capitalize();
+				templateMap['userProfileUrl'] = generateLink("SUser", "show", ["id": toUser.id], request)
+				
+				if ( Environment.getCurrent().getName().startsWith("pamba")) {
+				//if ( Environment.getCurrent().getName().equalsIgnoreCase("development")) {
+					mailService.sendMail {
+						to toUser.email
+						if(index == 0) {
+							bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com", "thomas.vee@gmail.com"
+							//bcc "sravanthi@strandls.com"
+						}
+						from conf.ui.notification.emailFrom
+						//replyTo replyTo
+						subject mailSubject
+						if(bodyView) {
+							body (view:bodyView, model:templateMap)
+						}
+						else if(htmlContent) {
+							htmlContent = Utils.getPremailer(grailsApplication.config.grails.serverURL, htmlContent)
+							html htmlContent
+						} else if(bodyContent) {
+							if (bodyContent.contains('$')) {
+								bodyContent = evaluate(bodyContent, templateMap)
+							}
+							html bodyContent
+						}
 					}
 				}
 			}
+		}
+		
+		} catch (e) {
+			log.errorEnabled "Error sending email $e.message"
+			e.printStackTrace();
 		}
 	}
 
@@ -1105,7 +1122,7 @@ class ObservationService {
 				params: linkParams)
 	}
 	
-	private List getParticipants(Observation observation) {
+	private List getParticipants(observation) {
 		def participants = [];
 		def result = ActivityFeed.findAllByRootHolderIdAndRootHolderType(observation.id, observation.class.getCanonicalName())*.author.unique()
 		result.each { user ->
@@ -1114,5 +1131,16 @@ class ObservationService {
 			}
 		}
 		return participants;
+	}
+	
+	private SUser getOwner(observation) {
+		def author = null;
+		if(observation.metaClass.hasProperty(observation, 'author')) {
+			author = observation.author;
+			if(!author.sendNotification) {
+				author = null;
+			}
+		}
+		return null;
 	}
 }
