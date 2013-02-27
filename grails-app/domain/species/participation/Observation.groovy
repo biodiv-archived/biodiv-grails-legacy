@@ -325,5 +325,8 @@ class Observation implements Taggable{
 	def afterDelete(){
 		activityFeedService.deleteFeed(this)
 	}
-	
+
+	def getOwner() {
+		return author;
+	}	
 }

@@ -6,8 +6,10 @@ class CommentService {
 	
 	def grailsApplication
 	def activityFeedService
-
-	def addComment(params){
+	def observationService
+	
+	def addComment(params, request){
+		log.debug "Adding comment ${params}"
 		validateParams(params);
 		Comment c = new Comment(author:params.author, body:params.commentBody.trim(), commentHolderId:params.commentHolderId, \
 						commentHolderType:params.commentHolderType, rootHolderId:params.rootHolderId, rootHolderType:params.rootHolderType, \
@@ -27,10 +29,14 @@ class CommentService {
 			return null
 		}else{
 			try {
-				getDomainObject(params.commentHolderType, params.commentHolderId).onAddComment(c)
+				def commentHolderType = getDomainObject(params.commentHolderType, params.commentHolderId)
+				commentHolderType.onAddComment(c)
 			}catch (MissingMethodException e) {
 				//e.printStackTrace();
 			}
+			def domainObject = activityFeedService.getDomainObject(c.rootHolderType, c.rootHolderId)
+			def feedInstance = activityFeedService.addActivityFeed(activityFeedService.getDomainObject(c.rootHolderType, c.rootHolderId), c, c.author, activityFeedService.COMMENT_ADDED)
+			observationService.sendNotificationMail(activityFeedService.COMMENT_ADDED, domainObject, request, params.webaddress, feedInstance);
 			return c
 		}
 	}
