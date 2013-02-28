@@ -19,7 +19,14 @@ ${username},
 		<td><g:link
 				url="${uGroup.createLink(controller:'user', action:'show', id:actor.id, userGroupWebaddress:userGroupWebaddress, absolute:true) }">
 				${actor.name}
-			</g:link> : ${activity.activityTitle} on the <a href="${obvUrl}">${domainObjectType}</a><br />
+			</g:link> : ${activity.activityTitle} on a
+			<g:if test="${domainObjectTitle}">
+				${domainObjectType} <a href="${obvUrl}">${domainObjectTitle}</a>
+			</g:if>
+			<g:else>
+				<a href="${obvUrl}">${domainObjectType}</a>
+			</g:else> 
+			<br />
 			<g:if test="${activity.text }">
 				${activity.text }
 			</g:if></td>

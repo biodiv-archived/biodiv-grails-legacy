@@ -1323,13 +1323,13 @@ class ObservationController {
 							Point() {
 								coordinates(obv.longitude+","+obv.latitude)
 							}
-							Style() {
-								IconStyle() {
-									Icon() {
-										href('http://maps.google.com/mapfiles/kml/pal3/icon21.png')
-									}
-								}
-							}
+//							Style() {
+//								IconStyle() {
+//									Icon() {
+//										href('http://maps.google.com/mapfiles/kml/pal3/icon21.png')
+//									}
+//								}
+//							}
 						}
 					}				
 				}
