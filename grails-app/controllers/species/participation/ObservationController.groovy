@@ -1217,13 +1217,94 @@ class ObservationController {
 			namespaces << ['':'http://www.opengis.net/kml/2.2'] 
 			kml() {
 				Document(){
+					Style(id:"displayName-value") {
+						BalloonStyle() {
+							text() {
+								mkp.yield '''
+<a href='$[Observation]' style="height:150px" ><img src='$[Image]' title='$[Species Name]'/></a>
+<table>
+<tr><td><b>Species Name</b></td><td>$[Species Name]</td></tr>
+<tr><td><b>Common Name</b></td><td>$[Common Name]</td></tr>
+<tr><td><b><b>Place</b></td><td>$[Place]</td></tr>
+<tr><td><b>Observed On</b></td><td>$[Observed on]</td></tr>
+<tr><td><b>Species Group</b></b></td><td>$[Species Group]</td></tr>
+<tr><td><b>Habitat</td><td>$[Habitat]</td></tr>
+<tr><td><b>By</b></td><td><a href='$[AuthorProfile]'>$[Author]</a></td></tr>
+<tr><td><b>Posted to User Groups</b></td><td>$[UserGroups]</td></tr>
+<tr><td><b>Notes</b></td><td>$[Notes]</td></tr>
+</table>
+											'''
+							}
+						}
+					
+					IconStyle() {
+					   color('ff00ff00')
+					   colorMode('random')
+					   scale('1.1')
+					   Icon() {
+						  href('http://maps.google.com/mapfiles/kml/pal3/icon21.png')
+					   }
+					}
+					}
 					for ( obvDetails in model.totalObservationInstanceList) {
+						
 						def obv = Observation.read(obvDetails[0])
+						def mainImage = obv.mainImage()
+						def imagePath = mainImage?mainImage.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.thumbnail.suffix): null
+						def commonName = obv.fetchSuggestedCommonNames()
 						PhotoOverlay() {
-							Name(obv.maxVotedReco?obv.maxVotedReco.name:"Unknown")
-							def snippet = g.render (template:"/common/observation/showObservationSnippetTabletTemplate", model:[observationInstance:obv, 'userGroupWebaddress':params.webaddress])
-							Description () {
-								 mkp.yield "$snippet" 
+							name(obv.fetchSpeciesCall())
+							styleUrl('#displayName-value')
+//							def snippet = g.render (template:"/common/observation/showObservationSnippetTabletTemplate", model:[observationInstance:obv, 'userGroupWebaddress':params.webaddress])
+//							description () {
+//								 mkp.yield "$snippet" 
+//							}
+							ExtendedData() {
+								Data(name:'Observation') {
+									value("${userGroupService.userGroupBasedLink(controller:'observation', action:'show', id:obv.id, 'userGroupWebaddress':params.webaddress, absolute:true) }")
+								}
+								Data(name:'Image') {
+									if(imagePath) {
+										value("${createLinkTo(base:grailsApplication.config.speciesPortal.observations.serverURL,	file: imagePath, absolute:true)}")
+									} else {
+										value()
+									}
+								}
+								Data(name:'Species Name') {
+									value(obv.fetchSpeciesCall());
+								}
+								
+								Data(name:'Common Name') {
+										
+										value(commonName)
+									
+								}
+								Data(name:'Place') {
+									value(obv.reverseGeocodedName)
+								}
+								Data(name:'Observed on') {
+									value(String.format('%tA %<te %<tB %<ty', obv.observedOn))
+								}
+								Data(name:'Notes') {
+									value() {
+										 mkp.yield obv.notes
+									}
+								}
+								Data(name:'Species Group') {
+									value(obv.group?.name)
+								}								
+								Data(name:'Habitat') {
+									value(obv.habitat?.name)
+								}
+								Data(name:'Author') {
+									value(obv.author.name)
+								}
+								Data(name:'AuthorProfile') {
+									value("${userGroupService.userGroupBasedLink('controller':'SUser', action:'show', id:obv.author.id,  'userGroupWebaddress':params.webaddress, absolute:true)}")
+								}
+								Data(name:'UserGroups') {
+									value(obv.userGroups*.name.join(','))
+								}
 							}
 							Camera() {
 								longitude(obv.longitude)
@@ -1233,12 +1314,21 @@ class ObservationController {
 								altitudeMode('relativeToGround')
 							}
 							ImagePyramid() {
-								maxWidth(300)
-								maxHeight(300)
+								maxWidth(512)
+								maxHeight(512)
 							}
 							Icon() {
-								def iconPath = iconBasePath +  obv.mainImage().fileName.trim()
-								href(iconPath.replaceFirst(/\.[a-zA-Z]{3,4}$/, config.speciesPortal.resources.images.thumbnail.suffix))
+								href(createLinkTo(base:grailsApplication.config.speciesPortal.observations.serverURL,	file: imagePath, absolute:true))
+							}
+							Point() {
+								coordinates(obv.longitude+","+obv.latitude)
+							}
+							Style() {
+								IconStyle() {
+									Icon() {
+										href('http://maps.google.com/mapfiles/kml/pal3/icon21.png')
+									}
+								}
 							}
 						}
 					}				
@@ -1247,6 +1337,5 @@ class ObservationController {
 		}
 		
 		render  XmlUtil.serialize(books)
-	}
-	
+	}	
 }
