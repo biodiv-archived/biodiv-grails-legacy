@@ -8,6 +8,7 @@ import species.participation.DownloadLog;
 class ExportJob {
 	
 	def obvUtilService
+	def observationService
 	
     static triggers = {
       simple startDelay: 1000l, repeatInterval: 5000l // starts after 5 minutes and execute job once in 5 seconds 
@@ -29,6 +30,7 @@ class ExportJob {
 					dl.filePath = f.getAbsolutePath()
 					setStatus(dl, ObvUtilService.SUCCESS)
 					log.debug "finish task $dl"
+					observationService.sendNotificationMail(observationService.DOWNLOAD_REQUEST, dl, null, null, null);
 				}else{
 					setStatus(dl, ObvUtilService.FAILED)
 					log.debug "Error $dl"

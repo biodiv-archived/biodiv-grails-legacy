@@ -181,6 +181,10 @@ class Utils {
 
 
 	static String getDomainName(HttpServletRequest request) {
+		if(!request){
+			return ""
+		}
+		
 		def domain = getDomain(request);
 		def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 

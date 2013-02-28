@@ -1203,8 +1203,6 @@ class ObservationController {
 		render "== done"
 	}
 	
-	
-	
 	@Secured(['ROLE_USER'])
 	def requestExport = {
 		log.debug params

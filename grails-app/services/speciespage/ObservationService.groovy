@@ -61,7 +61,7 @@ class ObservationService {
 	static final String SPECIES_REMOVE_COMMENT = "speciesRemoveComment";
 	static final String OBSERVATION_FLAGGED = "observationFlagged";
 	static final String OBSERVATION_DELETED = "observationDeleted";
-	
+	static final String DOWNLOAD_REQUEST = "downloadRequest";
 	/**
 	 * 
 	 * @param params
@@ -1003,6 +1003,8 @@ class ObservationService {
 		//Set bcc = ["xyz@xyz.com"];
 		//def activityModel = ['feedInstance':feedInstance, 'feedType':ActivityFeedService.GENERIC, 'feedPermission':ActivityFeedService.READ_ONLY, feedHomeObject:null]
 		
+		log.debug "before switch "
+		
 		switch ( notificationType ) {
 			case OBSERVATION_ADDED:
 				mailSubject = conf.ui.addObservation.emailSubject
@@ -1074,7 +1076,15 @@ class ObservationService {
 				bodyContent = conf.ui.removeComment.emailBody
 				toUsers.add(getOwner(obv))
 				break;
+			
+			case DOWNLOAD_REQUEST:
+				mailSubject = conf.ui.downloadRequest.emailSubject
+				bodyContent = conf.ui.downloadRequest.emailBody
+				templateMap['domain'] = "India Biodiversity Portal"
+				toUsers.add(getOwner(obv))
+				break;
 
+				
 			default:
 				log.debug "invalid notification type"
 		}
@@ -1114,13 +1124,13 @@ class ObservationService {
 		}
 		
 		} catch (e) {
-			log.errorEnabled "Error sending email $e.message"
+			log.error "Error sending email $e.message"
 			e.printStackTrace();
 		}
 	}
 
 	private String generateLink( String controller, String action, linkParams, request) {
-		userGroupService.userGroupBasedLink(base: Utils.getDomainServerUrl(request),
+		userGroupService.userGroupBasedLink(absolute:true, // base: Utils.getDomainServerUrl(request),
 				controller:controller, action: action,
 				params: linkParams)
 	}
