@@ -6,7 +6,9 @@
 					<th>Date</th>
 					<th>Filter Url</th>
 					<th>File Type</th>
-					<th>File</th>
+					<sUser:ifOwns model="['user':user]">
+						<th>File</th>
+					</sUser:ifOwns>
 					<th>Notes</th>
 				</tr>
 			</thead>
@@ -14,10 +16,12 @@
 				<g:each in="${downloadLogList}" status="i"
 					var="downloadLog">
 					<tr class="mainContent">
-						<td>${downloadLog.dateCreated}</td>
+						<td>${downloadLog.createdOn}</td>
 						<td><a href="${downloadLog.filterUrl}" title="${downloadLog.filterUrl}">filter url</a></td>
 						<td>${downloadLog.type}</td>
-						<td><a href="${uGroup.createLink(action:'downloadFile', controller:'observation', id:downloadLog.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">click here to download</a></td>
+						<sUser:ifOwns model="['user':user]">
+							<td><a class="btn btn-mini" href="${uGroup.createLink(action:'downloadFile', controller:'observation', id:downloadLog.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">Download</a></td>
+						</sUser:ifOwns>
 						<td>${downloadLog.notes}</td>
 					</tr>
 				</g:each>

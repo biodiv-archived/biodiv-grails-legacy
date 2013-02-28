@@ -1,8 +1,7 @@
 <%@ page import="species.participation.DownloadLog.DownloadType"%>
-<div>
-	<div class="btn-group">
+<div id="download-box" class="btn-group pull-left">
 		<a id="download-action" class="btn dropdown-toggle" data-toggle="dropdown"
-			href="#"> <i class="icon-download"></i>
+			href="#"> <i class=" icon-download-alt"></i>
 			Download
 		</a>
 
@@ -10,18 +9,19 @@
 			<form id="download-form">
 				<g:each in="${DownloadType.list()}" var="downloadType" status="i">
 					<g:if test="${i > 0}">
-						<input type="radio" name="downloadType" value="${downloadType}">
-						${downloadType.value()}</input>
+						<input type="radio" style="margin-top: 0px;" name="downloadType" value="${downloadType}">
+						${'Export as ' + downloadType.value()}</input>
 						<br />
 					</g:if>
 					<g:else>
-						<input type="radio" name="downloadType" value="${downloadType}" CHECKED>
-						${downloadType.value()}</input>
+						<input type="radio" style="margin-top: 0px;" name="downloadType" value="${downloadType}" CHECKED>
+						${'Export as ' + downloadType.value()}</input>
 						<br />
 					</g:else>
 				</g:each>
 				<br />
-				<input class="input-xlarge" type="text" name="notes" placeholder="Any comment"></input><br />
+				<textarea class="comment-textbox" placeholder="Please let us know how you intend to use this data" name="notes"></textarea>
+<%--				<input style="width:385px" type="text" name="notes"></input><br />--%>
 				<input class="btn pull-right" type="submit" value="OK"></input>
 				<div id="download-close" class="popup-form-close" value="close">
 					<i class="icon-remove"></i>
@@ -31,16 +31,28 @@
 			<div id="downloadMessage">
 			</div>
 		</div>
-	</div>
 </div>
 
 <r:script>
-
-$('#download-action').click(function(){
-	$('#download-options').show();
-});
 $('#download-close').click(function(){
 	$('#download-options').hide();
+});
+
+$('#download-action').click(function(){
+	$.ajax({ 
+        	url:"${uGroup.createLink(controller:'SUser', action:'isLoggedIn')}",
+		success: function(data, statusText, xhr, form) {
+			if(data === "true"){
+				$('#download-options').show();
+				return false;
+			}else{
+				window.location.href = "${uGroup.createLink(controller:'login')}?spring-security-redirect="+window.location.href;
+			}
+           },
+           error:function (xhr, ajaxOptions, thrownError){
+           	return false;
+		} 
+    	});
 });
 
 $(document).ready(function(){
@@ -48,14 +60,14 @@ $(document).ready(function(){
 			var filterUrl = window.location.href
 			var queryString =  window.location.search
      		$(this).ajaxSubmit({ 
-	         	url:"${uGroup.createLink(controller:'observation', action:'export')}" + queryString,
+	         	url:"${uGroup.createLink(controller:'observation', action:'requestExport')}" + queryString,
 				dataType: 'json', 
 				type: 'POST',
 				beforeSubmit: function(formData, jqForm, options) {
 					formData.push({ "name": "filterUrl", "value": filterUrl});
 				}, 
 	            success: function(data, statusText, xhr, form) {
-	            	//alert("Your request in under processing. Please check your user profile after some time.");
+	            	$(".alertMsg").removeClass('alert alert-error').addClass('alert alert-success').html(data.msg);
 	            	$('#download-options').hide();
 	            	return false;
 	            },

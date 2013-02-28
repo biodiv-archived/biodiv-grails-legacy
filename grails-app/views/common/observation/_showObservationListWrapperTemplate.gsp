@@ -68,10 +68,10 @@
 
 
 				</div>
-
+				
 				<obv:identificationByEmail
 					model="['source':'observationList', 'requestObject':request, autofillUsersId:'shareUsers']" />
-								
+				
 				
 					
 				<div id="observations_list_map" class="observation"

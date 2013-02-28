@@ -175,15 +175,18 @@
 
 
 			</div>
-			
-			<div class="section" style="clear: both;">
-				<h5>
-					<span class="name" style="color: #b1b1b1;"> <i
-						class="icon-screenshot"></i></span> Downloads
-				</h5>
-				<obv:downloadTable model="[downloadLogList:DownloadLog.findAllByAuthor(user)]" />
-			</div>
-
+			<%
+				def downloadLogList = DownloadLog.findAllByAuthorAndStatus(user, 'Success')
+			%>
+			<g:if test="${!downloadLogList.isEmpty()}">
+				<div class="section" style="clear: both;">
+					<h5>
+						<span class="name" style="color: #b1b1b1;"> <i
+							class="icon-screenshot"></i></span> Downloads
+					</h5>
+					<obv:downloadTable model="[downloadLogList:downloadLogList]" />
+				</div>
+			</g:if>
 			<div class="section" style="clear: both;">
 				<h5>
 					<span class="name" style="color: #b1b1b1;"> <i

@@ -489,6 +489,7 @@ function updateListPage(activeTag) {
 			$('#tags_section').replaceWith(data.tagsHtml);
 			$('.observation_location_wrapper').replaceWith(data.mapViewHtml);
 			setActiveTag(activeTag);
+			updateDownloadBox(data.instanceTotal)
 			last_actions();
 			eatCookies();			
 			$('.observations_list_wrapper').trigger('updatedGallery');
@@ -581,7 +582,11 @@ function intializesSeciesHabitatInterest(){
     $('#habitatFilter button').attr('data-toggle', 'buttons-checkbox').click(speciesHabitatInterestHandler);
 }
 
-function downloadAsCSV(url){
-	var url = url  + window.location.search
-	window.location.href = url;
+function updateDownloadBox(instanceTotal){
+	if(instanceTotal > 0){
+		$('#download-box').show();
+	}else{
+		$('#download-box').hide();
+	}
 }
+	

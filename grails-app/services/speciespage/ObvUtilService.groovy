@@ -37,6 +37,12 @@ class ObvUtilService {
 	static final String TAGS   = "tags"
 	static final String AUTHOR_EMAIL   = "user email"
 	static final String AUTHOR_URL   = "user"
+	
+	//task related
+	static final String  SUCCESS = "Success";
+	static final String  FAILED = "Failed";
+	static final String  SCHEDULED = "Scheduled";
+	static final String  EXECUTING = "Executing";
 
 	def userGroupService
 	def observationService
@@ -53,22 +59,20 @@ class ObvUtilService {
 	///////////////////////////////////////////////////////////////////////
 	
 	
+	def requestExport(params){
+		log.debug(params)
+		log.debug "creating download request"
+		DownloadLog.createLog(springSecurityService.currentUser, params.filterUrl, params.downloadType, params.notes)
+	}
+	
 	def export(params){
 		log.debug(params)
 		def m = observationService.getFilteredObservations(params, -1, -1, false)
 		def observationInstanceList = m.observationInstanceList
 		def queryParams = m.queryParams
 		log.debug " Obv total $observationInstanceList.size  queryParams   $queryParams"
-		File f = exportObservation(observationInstanceList)
-		if(f){
-			log.debug "creating download log " 
-			DownloadLog.createLog(springSecurityService.currentUser, f.getAbsolutePath(), params.filterUrl, params.downloadType, params.notes)
-		}
-		
-		return f
+		return exportObservation(observationInstanceList)
 	}
-	
-	
 	
 	private File exportObservation(List obvList){
 		if(! obvList || obvList.isEmpty())
@@ -84,7 +88,7 @@ class ObvUtilService {
 		
 		boolean headerAdded = false
 		obvList.each { obv ->
-			log.debug "==== writting " + obv
+			log.debug "Writting " + obv
 			Map m = obv.fetchExportableValue()
 			if(!headerAdded){
 				def header = []

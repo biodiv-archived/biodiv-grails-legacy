@@ -83,7 +83,7 @@ class ObservationController {
 			def tagsHtml = g.render(template:"/common/observation/showAllTagsTemplate", model:[count: count, tags:filteredTags, isAjaxLoad:true]);
 			def mapViewHtml = g.render(template:"/common/observation/showObservationMultipleLocationTemplate", model:[observationInstanceList:model.totalObservationInstanceList]);
 
-			def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml, tagsHtml:tagsHtml, mapViewHtml:mapViewHtml]
+			def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml, tagsHtml:tagsHtml, mapViewHtml:mapViewHtml, instanceTotal:model.instanceTotal]
 			render result as JSON
 			return;
 		}
@@ -1206,11 +1206,11 @@ class ObservationController {
 	
 	
 	@Secured(['ROLE_USER'])
-	def export = {
-		log.debug "================ export "  + params
-		def file = obvUtilService.export(params)
-		flash.message = "${message(code: 'observation.download.requsted', default: 'Your request in under processing. Please check your user profile after some time.')}"
+	def requestExport = {
+		log.debug params
+		obvUtilService.requestExport(params)
 		def r = [:]
+		r['msg']= "${message(code: 'observation.download.requsted', default: 'Processing... You will be notified by email when it is completed. Login and check your user profile for download link.')}"
 		render r as JSON
 	}
 	
@@ -1218,11 +1218,14 @@ class ObservationController {
 	@Secured(['ROLE_USER'])
 	def downloadFile = {
 		log.debug(params)
-		File file = new File(DownloadLog.read(params.id.toLong()).filePath)
-		response.contentType  = 'text/csv' 
-		response.setHeader("Content-disposition", "filename=${file.getName()}")
-		response.outputStream << file.getBytes()
-		response.outputStream.flush()
+		def dl = DownloadLog.read(params.id.toLong())
+		if(dl && dl.author == springSecurityService.currentUser){
+			File file = new File(dl.filePath)
+			response.contentType  = 'text/csv' 
+			response.setHeader("Content-disposition", "filename=${file.getName()}")
+			response.outputStream << file.getBytes()
+			response.outputStream.flush()
+		}
 	}
 	
 //	@Secured(['ROLE_USER'])

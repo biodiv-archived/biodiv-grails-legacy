@@ -1,5 +1,6 @@
 package species.participation
 
+import species.utils.Utils
 import org.grails.taggable.*
 import groovy.sql.Sql;
 import species.Habitat
@@ -366,9 +367,10 @@ class Observation implements Taggable{
 		res[ObvUtilService.USER_GROUPS] = ugList.join(", ")
 		
 		def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
-		def g = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
+		//def g = ApplicationHolder.application.mainContext.getBean( 'org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib' )
+		//def g = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
 		String base = config.speciesPortal.observations.serverURL
-		res[ObvUtilService.AUTHOR_URL] = "" + g.createLink(controller:'SUser', action:'show', id:author.id, 'base':base)
+		res[ObvUtilService.AUTHOR_URL] = "" + Utils.getIBPServerDomain() + "/user/show/$author.id"
 		
 		return res 
 	}

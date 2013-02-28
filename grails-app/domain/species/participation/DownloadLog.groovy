@@ -3,7 +3,7 @@ package species.participation
 import java.util.Date;
 
 import species.auth.SUser;
-
+import speciespage.ObvUtilService;
 
 class DownloadLog {
 	
@@ -26,24 +26,30 @@ class DownloadLog {
 		}
 	}
 	
-	Date dateCreated;
+	Date createdOn;
 	String filePath;
 	String filterUrl;
 	DownloadType type;
 	String notes;
+	String status;
 	
 	static belongsTo = [author:SUser];
 	
     static constraints = {
 		notes nullable:true, blank: true, size:0..400
+		filePath nullable:true
     }
 	static mapping = {
 		version : false;
 		notes type:'text';
     }
 	
-	static createLog(SUser author, String filePath, String filterUrl, String downloadTypeString, String notes){
-		DownloadLog dl = new DownloadLog (author:author, filePath:filePath, filterUrl:filterUrl, type:getType(downloadTypeString), notes:notes)
+	static createLog(SUser author, String filterUrl, String downloadTypeString, String notes){
+		return createLog(author, null, filterUrl, downloadTypeString, notes, new Date(),  ObvUtilService.SCHEDULED)
+	}
+	
+	static createLog(SUser author, String filePath, String filterUrl, String downloadTypeString, String notes, Date createdOn, String status){
+		DownloadLog dl = new DownloadLog (author:author, filePath:filePath, filterUrl:filterUrl, type:getType(downloadTypeString), notes:notes, createdOn:createdOn, status:status)
 		if(!dl.save(flush:true)){
 			dl.errors.allErrors.each { println it }
 			return null

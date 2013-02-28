@@ -121,8 +121,8 @@ modules = {
 	}
 
 	observations_list { 
-		dependsOn 'observations, location_utils, list_utils'
-		 
+		dependsOn 'observations, location_utils, list_utils, comment'
+		
 		resource url:'/js/species/observations/list.js'
 	}
 
