@@ -1054,8 +1054,7 @@ class ObservationService {
 				toUsers.addAll(getParticipants(obv))
 				break
 
-			case activityFeedService.COMMENT_ADDED:
-				mailSubject = conf.ui.newComment.emailSubject
+			case activityFeedService.COMMENT_ADDED:				
 				bodyView = "/emailtemplates/addComment"
 				templateMap['actor'] = feedInstance.author;
 				templateMap["actorProfileUrl"] = generateLink("SUser", "show", ["id": feedInstance.author.id], request)
@@ -1063,7 +1062,11 @@ class ObservationService {
 				templateMap["actorName"] = feedInstance.author.name
 				templateMap["userGroupWebaddress"] = userGroupWebaddress
 				templateMap["activity"] = activityFeedService.getContextInfo(feedInstance, [webaddress:userGroupWebaddress])
+				println"add"
+				templateMap['domainObjectTitle'] = getTitle(activityFeedService.getDomainObject(feedInstance.rootHolderType, feedInstance.rootHolderId))
+				println 'sdf'
 				templateMap['domainObjectType'] = feedInstance.rootHolderType.split('\\.')[-1].toLowerCase()
+				mailSubject = "New comment in ${templateMap['domainObjectType']}"
 				toUsers.addAll(getParticipants(obv))
 				break;
 			case SPECIES_REMOVE_COMMENT:
@@ -1142,5 +1145,14 @@ class ObservationService {
 			}
 		}
 		return null;
+	}
+	
+	private String getTitle(observation) {
+		if(observation.metaClass.hasProperty(observation, 'title')) {
+			return observation.title
+		} else if(observation.metaClass.hasProperty(observation, 'name')) {
+			return observation.name
+		} else
+			return null
 	}
 }

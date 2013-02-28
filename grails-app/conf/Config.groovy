@@ -917,7 +917,7 @@ If you do not want to receive notifications please go to your <a href="$userProf
 <br/>
 -The portal team'''
 
-grails.plugins.springsecurity.ui.newComment.emailSubject = 'New comment on your observation'
+grails.plugins.springsecurity.ui.newComment.emailSubject = 'New comment'
 grails.plugins.springsecurity.ui.newComment.emailBody = '''
 Hi $username,<br/>
 <br/>
@@ -930,7 +930,7 @@ Thank you for your contribution to the portal.<br/>
 <br/>
 -The portal team'''
 
-grails.plugins.springsecurity.ui.removeComment.emailSubject = 'Removed a comment from your observation'
+grails.plugins.springsecurity.ui.removeComment.emailSubject = 'Removed a comment'
 grails.plugins.springsecurity.ui.removeComment.emailBody = '''
 Hi $username,<br/>
 <br/>

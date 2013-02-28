@@ -139,7 +139,7 @@ class Comment{
 	}
 	
 	def afterInsert(){
-		activityFeedService.addActivityFeed(activityFeedService.getDomainObject(rootHolderType, rootHolderId), this, author, activityFeedService.COMMENT_ADDED)
+		//activityFeedService.addActivityFeed(activityFeedService.getDomainObject(rootHolderType, rootHolderId), this, author, activityFeedService.COMMENT_ADDED)
 	}
 	
 	def afterDelete(){
