@@ -25,7 +25,7 @@ class ExportJob {
 			try{
 				log.debug "strating task $dl"
 				
-				File f = obvUtilService.export(getParamsMap(dl.filterUrl), dl.type)
+				File f = obvUtilService.export(getParamsMap(dl.filterUrl), dl)
 				if(f){
 					dl.filePath = f.getAbsolutePath()
 					setStatus(dl, ObvUtilService.SUCCESS)

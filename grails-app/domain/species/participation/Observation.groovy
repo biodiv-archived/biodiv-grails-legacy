@@ -331,7 +331,7 @@ class Observation implements Taggable{
 	def Map fetchExportableValue(){
 		Map res = [:]
 		
-		res[ObvUtilService.IMAGE_FILE_NAMES] = fetchImageUrlList().join(", ")
+		res[ObvUtilService.IMAGE_PATH] = fetchImageUrlList().join(", ")
 		
 		res[ObvUtilService.SPECIES_GROUP] = group.name
 		res[ObvUtilService.HABITAT] = habitat.name

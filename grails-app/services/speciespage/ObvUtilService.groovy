@@ -23,7 +23,7 @@ class ObvUtilService {
 
 	static transactional = false
 
-
+	static final String IMAGE_PATH = "image file"
 	static final String IMAGE_FILE_NAMES = "filename"
 	static final String SPECIES_GROUP = "group"
 	static final String HABITAT = "habitat"
@@ -69,13 +69,21 @@ class ObvUtilService {
 		DownloadLog.createLog(springSecurityService.currentUser, params.filterUrl, params.downloadType, params.notes)
 	}
 	
-	def export(params, exportType){
+	def export(params, dl){
 		log.debug(params)
-		def m = observationService.getFilteredObservations(params, -1, -1, false)
-		def observationInstanceList = m.observationInstanceList
-		def queryParams = m.queryParams
-		log.debug " Obv total $observationInstanceList.size  queryParams   $queryParams"
-		return exportObservation(observationInstanceList, exportType)
+		def observationInstanceList = getObservationList(params, dl)
+		log.debug " Obv total $observationInstanceList.size " 
+		return exportObservation(observationInstanceList, dl.type)
+	}
+	
+	
+	private getObservationList(params, dl){
+		String action = new URL(dl.filterUrl).getPath().split("/")[2]
+		if("list".equalsIgnoreCase(action)){
+			return observationService.getFilteredObservations(params, -1, -1, false).observationInstanceList
+		}else{
+			return observationService.getFilteredObservationsFromSearch(params, -1, -1, false).observationInstanceList
+		}
 	}
 	
 	private File exportObservation(List obvList, exportType){
@@ -119,12 +127,12 @@ class ObvUtilService {
 	}
 	
 	private CSVWriter getCSVWriter(def directory, def fileName) {
-		char separator = '\t'
+		//char separator = '\t'
 		File dir =  new File(directory)
 		if(!dir.exists()){
 			dir.mkdirs()
 		}
-		return new CSVWriter(new FileWriter("$directory/$fileName"), separator);
+		return new CSVWriter(new FileWriter("$directory/$fileName"))//, separator);
 	}
 	
 	def exportAsKML(downloadDir, obvList){
