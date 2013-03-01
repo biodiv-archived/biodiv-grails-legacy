@@ -17,8 +17,7 @@
 				<div>
 					<obv:showObservationFilterMessage
 						model="['observationInstanceList':observationInstanceList, 'observationInstanceTotal':observationInstanceTotal, 'queryParams':queryParams]" />
-					<obv:download
-					model="['source':'observationList', 'requestObject':request]" />	
+						
 				</div>
 				<div style="clear: both;"></div>
 				
@@ -72,7 +71,8 @@
 				<obv:identificationByEmail
 					model="['source':'observationList', 'requestObject':request, autofillUsersId:'shareUsers']" />
 				
-				
+				<obv:download
+					model="['source':'observationList', 'requestObject':request]" />
 					
 				<div id="observations_list_map" class="observation"
 					style="clear: both; display: none;">

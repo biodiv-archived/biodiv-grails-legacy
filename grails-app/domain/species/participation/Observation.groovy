@@ -370,7 +370,7 @@ class Observation implements Taggable{
 		//def g = ApplicationHolder.application.mainContext.getBean( 'org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib' )
 		//def g = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
 		String base = config.speciesPortal.observations.serverURL
-		res[ObvUtilService.AUTHOR_URL] = "" + Utils.getIBPServerDomain() + "/user/show/$author.id"
+		res[ObvUtilService.AUTHOR_URL] = ObvUtilService.createHardLink('user', 'show', author.id) 
 		
 		return res 
 	}

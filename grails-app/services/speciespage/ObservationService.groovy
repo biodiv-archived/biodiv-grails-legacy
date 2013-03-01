@@ -990,9 +990,13 @@ class ObservationService {
 			
 		def targetController =  obv.getClass().getCanonicalName().split('\\.')[-1]
 		targetController = targetController.replaceFirst(targetController[0], targetController[0].toLowerCase());
-		def obvUrl = generateLink(targetController, "show", ["id": obv.id], request)
+		def obvUrl, domain
+		if(request){
+			 obvUrl = generateLink(targetController, "show", ["id": obv.id], request)
+			 domain = Utils.getDomainName(request)
+		}
 
-		def templateMap = [obvUrl:obvUrl, domain:Utils.getDomainName(request)]
+		def templateMap = [obvUrl:obvUrl, domain:domain]
 
 		def mailSubject = ""
 		def bodyContent = ""
@@ -1082,6 +1086,7 @@ class ObservationService {
 				bodyContent = conf.ui.downloadRequest.emailBody
 				templateMap['domain'] = "India Biodiversity Portal"
 				toUsers.add(getOwner(obv))
+				templateMap['userProfileUrl'] = ObvUtilService.createHardLink('user', 'show', obv.author.id)
 				break;
 
 				
@@ -1093,7 +1098,9 @@ class ObservationService {
 		toUsers.eachWithIndex { toUser, index ->
 			if(toUser) {
 				templateMap['username'] = toUser.name.capitalize();
-				templateMap['userProfileUrl'] = generateLink("SUser", "show", ["id": toUser.id], request)
+				if(request){
+					templateMap['userProfileUrl'] = generateLink("SUser", "show", ["id": toUser.id], request)
+				}
 				
 				if ( Environment.getCurrent().getName().startsWith("pamba")) {
 				//if ( Environment.getCurrent().getName().equalsIgnoreCase("development")) {
@@ -1130,7 +1137,7 @@ class ObservationService {
 	}
 
 	private String generateLink( String controller, String action, linkParams, request) {
-		userGroupService.userGroupBasedLink(absolute:true, // base: Utils.getDomainServerUrl(request),
+		userGroupService.userGroupBasedLink(base: Utils.getDomainServerUrl(request),
 				controller:controller, action: action,
 				params: linkParams)
 	}

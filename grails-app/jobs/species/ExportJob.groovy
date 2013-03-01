@@ -15,17 +15,17 @@ class ExportJob {
     }
 
     def execute() {
-		List scheduledTaskList = DownloadLog.findAllByStatus(ObvUtilService.SCHEDULED, [sort: "createdOn", order: "asc"])
-		if(scheduledTaskList.isEmpty()){
+		
+		List scheduledTaskList = getDownloadRequest()
+		if(!scheduledTaskList){
 			return
 		}
 		
 		scheduledTaskList.each { DownloadLog dl ->
 			try{
 				log.debug "strating task $dl"
-				setStatus(dl, ObvUtilService.EXECUTING)
 				
-				File f = obvUtilService.export(getParamsMap(dl.filterUrl))
+				File f = obvUtilService.export(getParamsMap(dl.filterUrl), dl.type)
 				if(f){
 					dl.filePath = f.getAbsolutePath()
 					setStatus(dl, ObvUtilService.SUCCESS)
@@ -58,5 +58,17 @@ class ExportJob {
 			m[pair[0]] = pair[1]
 		}
 		return m
+	}
+	
+	private synchronized getDownloadRequest(){
+		List scheduledTaskList = DownloadLog.findAllByStatus(ObvUtilService.SCHEDULED, [sort: "createdOn", order: "asc", max:1])
+		if(scheduledTaskList.isEmpty()){
+			return null
+		}
+		scheduledTaskList.each { DownloadLog dl ->
+			setStatus(dl, ObvUtilService.EXECUTING)
+		}
+		
+		return scheduledTaskList
 	}
 }
