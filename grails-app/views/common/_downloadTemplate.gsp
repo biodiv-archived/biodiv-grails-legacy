@@ -7,7 +7,7 @@
 
 		<div id="download-options" class="popup-form" style="display: none">
 			<form id="download-form">
-				<div><span class="label label-important" style="padding:5px;margin-bottom: 10px;">The download link will be available on your user profile page</span></div>
+				<div><span class="label label-info" style="padding:5px;margin-bottom: 10px;">The download link will be available on your user profile page</span></div>
 				<g:each in="${DownloadType.list()}" var="downloadType" status="i">
 					<g:if test="${i > 0}">
 						<input type="radio" style="margin-top: 0px;" name="downloadType" value="${downloadType}">
@@ -70,6 +70,7 @@ $(document).ready(function(){
 	            success: function(data, statusText, xhr, form) {
 	            	$(".alertMsg").removeClass('alert alert-error').addClass('alert alert-success').html(data.msg);
 	            	$('#download-options').hide();
+	            	$("html, body").animate({ scrollTop: 0 });
 	            	return false;
 	            },
 	            error:function (xhr, ajaxOptions, thrownError){
