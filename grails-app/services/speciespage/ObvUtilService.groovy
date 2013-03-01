@@ -82,7 +82,12 @@ class ObvUtilService {
 		if("list".equalsIgnoreCase(action)){
 			return observationService.getFilteredObservations(params, -1, -1, false).observationInstanceList
 		}else{
-			return observationService.getFilteredObservationsFromSearch(params, -1, -1, false).observationInstanceList
+			def idList = observationService.getObservationsFromSearch(params).totalObservationIdList
+			def res = []
+			idList.each { obvId ->
+				res.add(Observation.read(obvId))
+			}
+			return res
 		}
 	}
 	
