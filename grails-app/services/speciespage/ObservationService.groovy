@@ -1161,7 +1161,7 @@ class ObservationService {
 				author = null;
 			}
 		}
-		return null;
+		return author;
 	}
 	
 	private String getTitle(observation) {
