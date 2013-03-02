@@ -698,8 +698,8 @@ class ObservationService {
 	* @return
 	*/
    def getObservationsFromSearch(params) {
-	   def max = Math.min(params.max ? params.int('max') : 12, 100)
-	   def offset = params.offset ? params.long('offset') : 0
+	   def max = Math.min(params.max ? params.max.toInteger() : 12, 100)
+	   def offset = params.offset ? params.offset.toLong() : 0
 
 	   def model;
 	   

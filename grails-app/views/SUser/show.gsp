@@ -176,7 +176,7 @@
 
 			</div>
 			<%
-				def downloadLogList = DownloadLog.findAllByAuthorAndStatus(user, 'Success')
+				def downloadLogList = DownloadLog.findAllByAuthorAndStatus(user, 'Success', [sort: 'createdOn', order: 'asc'])
 			%>
 			<g:if test="${!downloadLogList.isEmpty()}">
 				<div class="section" style="clear: both;">
