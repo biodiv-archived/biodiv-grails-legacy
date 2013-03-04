@@ -82,7 +82,7 @@ $(document).ready(function(){
 		<a data-toggle="collapse" data-parent="#advSearchContainer" href="#advSearchBox"><h5>
 				<i class=" icon-search"></i>Advanced Search
 			</h5> </a>
-		<div id="advSearchBox" class="collapse ${params.aq?'in':'' }">
+		<div id="advSearchBox" class="collapse ${params.aq?'in':'' }" style="${params.aq?'overflow:visible;height:auto;':'' }" >
 			<search:advSearch />
 		</div>
 	</div>

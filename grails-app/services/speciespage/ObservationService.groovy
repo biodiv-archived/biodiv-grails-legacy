@@ -753,25 +753,55 @@ class ObservationService {
 		}
 		
 		SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-		if(params.daterangepicker_start && params.daterangepicker_end) {
+		String lastRevisedStartDate = '';
+		String lastRevisedEndDate = '';
+		if(params.daterangepicker_start) {
+			Date s = DateUtil.parseDate(params.daterangepicker_start, ['dd/MM/yyyy']);
+			Calendar cal = Calendar.getInstance(); // locale-specific
+			cal.setTime(s)
+			cal.set(Calendar.HOUR_OF_DAY, 0);
+			cal.set(Calendar.MINUTE, 0);
+			cal.set(Calendar.MINUTE, 0);
+			s = new Date(cal.getTimeInMillis())
+			StringWriter str1 = new StringWriter();
+			
+			DateUtil.formatDate(s, cal, str1)
+			println str1
+			lastRevisedStartDate = str1;
+			
+		}
+		
+		if(params.daterangepicker_end) {
+			Calendar cal = Calendar.getInstance(); // locale-specific
+			Date e = DateUtil.parseDate(params.daterangepicker_end, ['dd/MM/yyyy']);
+			cal.setTime(e)
+			cal.set(Calendar.HOUR_OF_DAY, 23);
+			cal.set(Calendar.MINUTE, 59);
+			cal.set(Calendar.MINUTE, 59);
+			e = new Date(cal.getTimeInMillis())
+			StringWriter str2 = new StringWriter();
+			DateUtil.formatDate(e, cal, str2)
+			println str2
+			lastRevisedEndDate = str2;
+		}
+		
+		if(lastRevisedStartDate && lastRevisedEndDate) {
 			if(i > 0) aq += " AND";
-			String lastRevisedStartDate = dateFormatter.format(DateUtil.parseDate(params.daterangepicker_start, ['dd/MM/yyyy']));
-			String lastRevisedEndDate = dateFormatter.format(DateUtil.parseDate(params.daterangepicker_end, ['dd/MM/yyyy']));
 			aq += " lastrevised:["+lastRevisedStartDate+" TO "+lastRevisedEndDate+"]";
 			queryParams['daterangepicker_start'] = params.daterangepicker_start;
 			queryParams['daterangepicker_end'] = params.daterangepicker_end;
 			activeFilters['daterangepicker_start'] = params.daterangepicker_start;
 			activeFilters['daterangepicker_end'] = params.daterangepicker_end;
 			
-		} else if(params.daterangepicker_start) {
+		} else if(lastRevisedStartDate) {
 			if(i > 0) aq += " AND";
-			String lastRevisedStartDate = dateFormatter.format(DateTools.dateToString(DateUtil.parseDate(params.daterangepicker_start, ['dd/MM/yyyy']), DateTools.Resolution.DAY));
+			//String lastRevisedStartDate = dateFormatter.format(DateTools.dateToString(DateUtil.parseDate(params.daterangepicker_start, ['dd/MM/yyyy']), DateTools.Resolution.DAY));
 			aq += " lastrevised:["+lastRevisedStartDate+" TO NOW]";
 			queryParams['daterangepicker_start'] = params.daterangepicker_start;
 			activeFilters['daterangepicker_start'] = params.daterangepicker_endparams.daterangepicker_end;
-		} else if (params.daterangepicker_end) {
+		} else if (lastRevisedEndDate) {
 			if(i > 0) aq += " AND";
-			String lastRevisedEndDate = dateFormatter.format(DateTools.dateToString(DateUtil.parseDate(params.daterangepicker_end, ['dd/MM/yyyy']), DateTools.Resolution.DAY));
+			//String lastRevisedEndDate = dateFormatter.format(DateTools.dateToString(DateUtil.parseDate(params.daterangepicker_end, ['dd/MM/yyyy']), DateTools.Resolution.DAY));
 			aq += " lastrevised:[NOW TO "+lastRevisedEndDate+"]";
 			queryParams['daterangepicker_end'] = params.daterangepicker_end;
 			activeFilters['daterangepicker_end'] = params.daterangepicker_end;
