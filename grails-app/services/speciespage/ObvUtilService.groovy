@@ -99,7 +99,7 @@ class ObvUtilService {
 		if(!downloadDir.exists()){
 			downloadDir.mkdirs()
 		}
-		log.debug "export type " + exportType + "  $DownloadLog.DownloadType.CSV     $DownloadLog.DownloadType.CSV.value()"
+		log.debug "export type " + exportType 
 		if(exportType == DownloadLog.DownloadType.CSV){
 			return exportAsCSV(downloadDir, obvList)
 		}else{
