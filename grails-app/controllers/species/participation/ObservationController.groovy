@@ -1031,7 +1031,7 @@ class ObservationController {
 				SUser user = SUser.get(candidateEmail.toLong());
 				candidateEmail = user.email.trim();
 				if(user.allowIdentifactionMail){
-					result[candidateEmail] = generateLink("observation", "unsubscribeToIdentificationMail", [email:candidateEmail, userId:user.id], request) ;
+					result[candidateEmail] = observationService.generateLink("observation", "unsubscribeToIdentificationMail", [email:candidateEmail, userId:user.id], request) ;
 				}else{
 					log.debug "User $user.id has unsubscribed for identification mail."
 				}
@@ -1039,7 +1039,7 @@ class ObservationController {
 				if(BlockedMails.findByEmail(candidateEmail)){
 					log.debug "Email $candidateEmail is unsubscribed for identification mail."
 				}else{
-					result[candidateEmail] = generateLink("observation", "unsubscribeToIdentificationMail", [email:candidateEmail], request) ;
+					result[candidateEmail] = observationService.generateLink("observation", "unsubscribeToIdentificationMail", [email:candidateEmail], request) ;
 				}
 			}
 		}

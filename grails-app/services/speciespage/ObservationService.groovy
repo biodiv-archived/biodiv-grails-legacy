@@ -1135,7 +1135,7 @@ class ObservationService {
 		}
 	}
 
-	private String generateLink( String controller, String action, linkParams, request) {
+	public String generateLink( String controller, String action, linkParams, request) {
 		userGroupService.userGroupBasedLink(base: Utils.getDomainServerUrl(request),
 				controller:controller, action: action,
 				params: linkParams)
