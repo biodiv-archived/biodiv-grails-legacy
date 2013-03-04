@@ -8,13 +8,13 @@ import species.SpeciesField.AudienceType;
 //speciesSearchService.publishSearchIndex();
 //speciesSearchService.optimize();
 
-def newsletterSearchService = ctx.getBean("newsletterSearchService");
-newsletterSearchService.deleteIndex();
-newsletterSearchService.publishSearchIndex();
+//def newsletterSearchService = ctx.getBean("newsletterSearchService");
+//newsletterSearchService.deleteIndex();
+//newsletterSearchService.publishSearchIndex();
 //
-//def observationsSearchService = ctx.getBean("observationsSearchService");
-//observationsSearchService.deleteIndex();
-//observationsSearchService.publishSearchIndex();
+def observationsSearchService = ctx.getBean("observationsSearchService");
+observationsSearchService.deleteIndex();
+observationsSearchService.publishSearchIndex();
 
 //def cSearchService = ctx.getBean("checklistSearchService");
 //cSearchService.deleteIndex();

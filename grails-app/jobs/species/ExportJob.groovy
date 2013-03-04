@@ -62,7 +62,7 @@ class ExportJob {
 //	}
 	
 	private synchronized getDownloadRequest(){
-		List scheduledTaskList = DownloadLog.findAllByStatus(ObvUtilService.SCHEDULED, [sort: "createdOn", order: "asc", max:1])
+		List scheduledTaskList = DownloadLog.findAllByStatus(ObvUtilService.SCHEDULED, [sort: "createdOn", order: "asc", max:5])
 		if(scheduledTaskList.isEmpty()){
 			return null
 		}

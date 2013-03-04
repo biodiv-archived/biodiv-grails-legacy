@@ -3,6 +3,7 @@ package species.participation
 import species.utils.Utils
 import org.grails.taggable.*
 import groovy.sql.Sql;
+import java.text.SimpleDateFormat
 import species.Habitat
 import species.Language;
 import species.Resource;
@@ -335,7 +336,7 @@ class Observation implements Taggable{
 		
 		res[ObvUtilService.SPECIES_GROUP] = group.name
 		res[ObvUtilService.HABITAT] = habitat.name
-		res[ObvUtilService.OBSERVED_ON] = "" + observedOn
+		res[ObvUtilService.OBSERVED_ON] = new SimpleDateFormat("dd/MM/yyyy").format(observedOn)
 		
 		def snName = ""
 		def cnName = ""
