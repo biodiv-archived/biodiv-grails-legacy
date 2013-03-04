@@ -47,7 +47,10 @@ class ObvUtilService {
 	static final String  FAILED = "Failed";
 	static final String  SCHEDULED = "Scheduled";
 	static final String  EXECUTING = "Executing";
-
+	
+	static final int MAX_EXPORT_SIZE = 5000;
+	
+	
 	def userGroupService
 	def observationService
 	def springSecurityService
@@ -66,7 +69,7 @@ class ObvUtilService {
 	def requestExport(params){
 		log.debug(params)
 		log.debug "creating download request"
-		DownloadLog.createLog(springSecurityService.currentUser, params.filterUrl, params.downloadType, params.notes)
+		DownloadLog.createLog(springSecurityService.currentUser, params.filterUrl, params.downloadType, params.notes, params)
 	}
 	
 	def export(params, dl){
@@ -80,9 +83,10 @@ class ObvUtilService {
 	private getObservationList(params, dl){
 		String action = new URL(dl.filterUrl).getPath().split("/")[2]
 		if("list".equalsIgnoreCase(action)){
-			return observationService.getFilteredObservations(params, -1, -1, false).observationInstanceList
+			return observationService.getFilteredObservations(params, MAX_EXPORT_SIZE, 0, false).observationInstanceList
 		}else{
-			def idList = observationService.getObservationsFromSearch(params).totalObservationIdList
+			//getting result from solr
+			def idList = observationService.getFilteredObservationsFromSearch(params, MAX_EXPORT_SIZE, 0, false).totalObservationIdList
 			def res = []
 			idList.each { obvId ->
 				res.add(Observation.read(obvId))

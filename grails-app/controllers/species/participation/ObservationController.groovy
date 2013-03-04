@@ -1087,7 +1087,7 @@ class ObservationController {
 			def tagsHtml = g.render(template:"/common/observation/showAllTagsTemplate", model:[count: count, tags:filteredTags, isAjaxLoad:true]);
 			def mapViewHtml = g.render(template:"/common/observation/showObservationMultipleLocationTemplate", model:[observationInstanceList:model.totalObservationInstanceList]);
 	
-			def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml, tagsHtml:tagsHtml, mapViewHtml:mapViewHtml]
+			def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml, tagsHtml:tagsHtml, mapViewHtml:mapViewHtml, instanceTotal:model.totalObservationIdList.size()]
 			render result as JSON
 			return;
 		}

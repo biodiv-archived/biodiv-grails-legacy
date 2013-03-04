@@ -1035,7 +1035,7 @@ Your data download request on the <b>$domain</b> has been processed.
 <br/>
 You can download your data from your <a href="$userProfileUrl">user profile</a>.
 <br/> 
-Please note that you will need to logged in to see the download link.
+Please note that you will need to be logged in to see the download link.
 <br/><br/>
 -The portal team
 '''

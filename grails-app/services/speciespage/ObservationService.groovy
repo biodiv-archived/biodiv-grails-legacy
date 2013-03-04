@@ -737,7 +737,8 @@ class ObservationService {
 		
 		String aq = "";
 		int i=0;
-		if(params.aq instanceof GrailsParameterMap) {
+		if(params.aq instanceof GrailsParameterMap || params.aq instanceof Map) {
+			
 			params.aq.each { key, value ->
 				queryParams["aq."+key] = value;
 				activeFilters["aq."+key] = value;
@@ -783,7 +784,6 @@ class ObservationService {
 		}
 		
 	
-		
 		paramsList.add('q', Utils.cleanSearchQuery(params.query));
 		//options
 		paramsList.add('start', offset);
@@ -871,7 +871,6 @@ class ObservationService {
 				activeFilters["uGroup"] = "ALL"
 			}
 		}
-		
 		log.debug "Along with faceting params : "+paramsList;
 		
 		if(isMapView) {

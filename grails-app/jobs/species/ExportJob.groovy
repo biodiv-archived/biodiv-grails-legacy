@@ -11,7 +11,7 @@ class ExportJob {
 	def observationService
 	
     static triggers = {
-      simple startDelay: 1000l, repeatInterval: 5000l // starts after 5 minutes and execute job once in 5 seconds 
+      simple startDelay: 60000l, repeatInterval: 5000l // starts after 5 minutes and execute job once in 5 seconds 
     }
 
     def execute() {
@@ -25,7 +25,7 @@ class ExportJob {
 			try{
 				log.debug "strating task $dl"
 				
-				File f = obvUtilService.export(getParamsMap(dl.filterUrl), dl)
+				File f = obvUtilService.export(dl.fetchMapFromText(), dl)
 				if(f){
 					dl.filePath = f.getAbsolutePath()
 					setStatus(dl, ObvUtilService.SUCCESS)
@@ -50,15 +50,16 @@ class ExportJob {
 		}
 	}
 	
-	private Map getParamsMap(String urlString){
-		def u = new URL(urlString)
-		def m = [:]
-		URLDecoder.decode(u.getQuery(), "UTF-8").split("&").each { token ->
-			def pair = token.split("=")
-			m[pair[0]] = pair[1]
-		}
-		return m
-	}
+//	
+//	private Map getParamsMap(String urlString){
+//		def u = new URL(urlString)
+//		def m = [:]
+//		URLDecoder.decode(u.getQuery(), "UTF-8").split("&").each { token ->
+//			def pair = token.split("=")
+//			m[pair[0]] = pair[1]
+//		}
+//		return m
+//	}
 	
 	private synchronized getDownloadRequest(){
 		List scheduledTaskList = DownloadLog.findAllByStatus(ObvUtilService.SCHEDULED, [sort: "createdOn", order: "asc", max:1])
