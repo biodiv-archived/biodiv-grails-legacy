@@ -763,11 +763,11 @@ class ObservationService {
 			cal.set(Calendar.MINUTE, 0);
 			cal.set(Calendar.MINUTE, 0);
 			s = new Date(cal.getTimeInMillis())
-			StringWriter str1 = new StringWriter();
-			
-			DateUtil.formatDate(s, cal, str1)
-			println str1
-			lastRevisedStartDate = str1;
+			//StringWriter str1 = new StringWriter();
+			lastRevisedStartDate = dateFormatter.format(s)
+			//DateUtil.formatDate(s, cal, str1)
+			//println str1
+			//lastRevisedStartDate = str1;
 			
 		}
 		
@@ -779,10 +779,10 @@ class ObservationService {
 			cal.set(Calendar.MINUTE, 59);
 			cal.set(Calendar.MINUTE, 59);
 			e = new Date(cal.getTimeInMillis())
-			StringWriter str2 = new StringWriter();
-			DateUtil.formatDate(e, cal, str2)
-			println str2
-			lastRevisedEndDate = str2;
+//			StringWriter str2 = new StringWriter();
+//			DateUtil.formatDate(e, cal, str2)
+//			println str2
+			lastRevisedEndDate = dateFormatter.format(e);
 		}
 		
 		if(lastRevisedStartDate && lastRevisedEndDate) {
