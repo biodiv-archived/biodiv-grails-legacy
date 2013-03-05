@@ -1,6 +1,8 @@
 <%@page import="species.participation.Observation"%>
 <%@ page import="species.auth.SUser"%>
 <%@ page import="species.utils.Utils"%>
+<%@page import="species.participation.DownloadLog"%>
+
 <html>
 <head>
 <link rel="canonical"
@@ -173,7 +175,18 @@
 
 
 			</div>
-
+			<%
+				def downloadLogList = DownloadLog.findAllByAuthorAndStatus(user, 'Success', [sort: 'createdOn', order: 'asc'])
+			%>
+			<g:if test="${!downloadLogList.isEmpty()}">
+				<div class="section" style="clear: both;">
+					<h5>
+						<span class="name" style="color: #b1b1b1;"> <i
+							class="icon-screenshot"></i></span> Downloads
+					</h5>
+					<obv:downloadTable model="[downloadLogList:downloadLogList]" />
+				</div>
+			</g:if>
 			<div class="section" style="clear: both;">
 				<h5>
 					<span class="name" style="color: #b1b1b1;"> <i
@@ -184,7 +197,7 @@
 
 			</div>
 			<%--			</div>--%>
-
+				
 		</div>
 	</div>
 

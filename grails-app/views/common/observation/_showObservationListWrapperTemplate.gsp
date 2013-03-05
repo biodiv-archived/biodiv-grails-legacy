@@ -17,8 +17,11 @@
 				<div>
 					<obv:showObservationFilterMessage
 						model="['observationInstanceList':observationInstanceList, 'observationInstanceTotal':observationInstanceTotal, 'queryParams':queryParams]" />
+						
 				</div>
 				<div style="clear: both;"></div>
+				
+				
 				<!-- needs to be fixed -->
 				<g:if test="${!isSearch}">
 					<div id="map_view_bttn" class="btn-group">
@@ -64,9 +67,13 @@
 
 
 				</div>
-
+				
 				<obv:identificationByEmail
 					model="['source':'observationList', 'requestObject':request, autofillUsersId:'shareUsers']" />
+				
+				<obv:download
+					model="['source':'observationList', 'requestObject':request]" />
+					
 				<div id="observations_list_map" class="observation"
 					style="clear: both; display: none;">
 					<obv:showObservationsLocation
@@ -83,6 +90,7 @@
 <g:javascript>
 $(document).ready(function() {
 	window.params.tagsLink = "${uGroup.createLink(controller:'observation', action: 'tags')}"
+	
 });
 </g:javascript>
 

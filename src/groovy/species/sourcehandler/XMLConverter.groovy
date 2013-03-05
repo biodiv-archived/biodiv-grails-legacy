@@ -32,7 +32,7 @@ import species.utils.HttpUtils
 import species.utils.ImageUtils
 import species.utils.Utils
 
-import org.grails.plugins.sanitizer.MarkupSanitizerResult
+//import org.grails.plugins.sanitizer.MarkupSanitizerResult
 
 
 class XMLConverter extends SourceConverter {

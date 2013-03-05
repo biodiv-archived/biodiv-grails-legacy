@@ -9,6 +9,7 @@ import species.participation.curation.UnCuratedCommonNames
 import org.apache.commons.httpclient.util.DateUtil;
 import org.apache.solr.common.SolrException;
 import org.apache.solr.common.util.NamedList;
+import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap;
 import org.springframework.transaction.annotation.Transactional;
 
 
@@ -43,12 +44,22 @@ class ChecklistService {
 	String password = "postgres123";
 
 	def dateFormatStrings =  Arrays.asList("yyyy-MM-dd'T'HH:mm:ss")
+	
+	
+	def migrateNewChecklist(params){
+		def startId = params.startId
+		if(!startId || !startId.isNumber()){
+			log.debug "Please enter valid start id"
+			return
+		} 
+		migrateChecklist(startId.toLong())
+	}
 
-	def migrateChecklist(){
+	def migrateChecklist(startOffset){
 		def startDate = new Date()
 		def sql = Sql.newInstance(connectionUrl, userName, password, "org.postgresql.Driver");
 		int i=0;
-		sql.eachRow("select nid, vid, title from node where type = 'checklist' order by nid asc offset 293") { row ->
+		sql.eachRow("select nid, vid, title from node where type = 'checklist' order by nid asc offset $startOffset") { row ->
 			log.debug " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>     title ===  $i  $row.title  nid == $row.nid , vid == $row.vid"
 			try{
 				Checklist checklist = createCheckList(row, sql)
@@ -647,7 +658,7 @@ class ChecklistService {
 
 		String aq = "";
 		int i=0;
-		if(params.aq instanceof List) {
+		if(params.aq instanceof GrailsParameterMap) {
 			params.aq.each { key, value ->
 				queryParams["aq."+key] = value;
 				activeFilters["aq."+key] = value;

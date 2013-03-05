@@ -82,7 +82,21 @@ class FacebookAuthUtils {
 		try {
 			String authUrl = "https://graph.facebook.com/oauth/access_token?client_id=$applicationId&redirect_uri=&client_secret=$secret&code=$code"
 			URL url = new URL(authUrl)
-			return url.readLines().first().split('&').first().split('=')[1]
+			HttpURLConnection httpConn = (HttpURLConnection)url.openConnection()
+			InputStream is;
+			if (httpConn.getResponseCode() >= 400) {
+				is = httpConn.getErrorStream();
+				List lines = is.readLines();
+				log.error "Error reading from facebook : ${lines} for url ${authUrl}"
+				return null;
+			} else {
+				is = httpConn.getInputStream();
+				List lines = is.readLines();
+				log.debug "Access token lines ${lines} for url ${authUrl}"
+				return lines.first().split('&').first().split('=')[1]
+			}
+			
+			
 		} catch (IOException e) {
 			log.error("Can't read data from Facebook", e)
 			return null

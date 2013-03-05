@@ -228,10 +228,10 @@ $(document).ready(function(){
 			    params['offset'] = 0
 			    var History = window.History;
 			    History.pushState({state:1}, "Species Portal", '?'+decodeURIComponent($.param(params))); 
-				eatCookies();
 				updateRelativeTime();
 				$("table.tablesorter").tablesorter();
 				last_actions();
+				eatCookies();
 				$('.observations_list_wrapper').trigger('updatedGallery');
 			
 			}
@@ -241,8 +241,8 @@ $(document).ready(function(){
 		return false;
 	});
 	
-	eatCookies();
 	last_actions();
+	eatCookies();
 	$('.observations_list_wrapper').trigger('updatedGallery');
 });
 
@@ -253,8 +253,7 @@ if (typeof String.prototype.startsWith != 'function') {
 	  };
 	}
 
-function eatCookies() {
-	
+function eatCookies() {	
 	var hashString = window.location.hash.substring(1)
 	if ($.cookie("listing") == "list") {
 		if(!hashString.startsWith('l')) {
@@ -277,7 +276,7 @@ function eatCookies() {
 			}
 		}
 		$('.grid_view').show();
-		$('.list_view').hide();
+		$('.list_view').not('.single_list_view').hide();
 		$('.grid_view_bttn').addClass('active');
 		$('.list_view_bttn').removeClass('active');
 	}
@@ -490,8 +489,9 @@ function updateListPage(activeTag) {
 			$('#tags_section').replaceWith(data.tagsHtml);
 			$('.observation_location_wrapper').replaceWith(data.mapViewHtml);
 			setActiveTag(activeTag);
-			eatCookies();
+			updateDownloadBox(data.instanceTotal)
 			last_actions();
+			eatCookies();			
 			$('.observations_list_wrapper').trigger('updatedGallery');
 	}
 }
@@ -538,7 +538,7 @@ function updateGallery(target, limit, offset, removeUser, isGalleryUpdate, remov
 			}
 		});
 	} else {
-		window.location = doc_url;
+		window.location = url.attr('base')+doc_url;
 	}
 }
    
@@ -582,4 +582,11 @@ function intializesSeciesHabitatInterest(){
     $('#habitatFilter button').attr('data-toggle', 'buttons-checkbox').click(speciesHabitatInterestHandler);
 }
 
-
+function updateDownloadBox(instanceTotal){
+	if(instanceTotal > 0){
+		$('#download-box').show();
+	}else{
+		$('#download-box').hide();
+	}
+}
+	

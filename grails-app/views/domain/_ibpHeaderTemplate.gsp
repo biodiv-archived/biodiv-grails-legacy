@@ -1,6 +1,6 @@
 <%@page import="species.utils.Utils"%>
 <div id="ibp-header" class="gradient-bg">
-	<div class="navbar navbar-static-top" style="margin-bottom: 0px;">
+	<div id="ibp-header-bar" class="navbar navbar-static-top" style="margin-bottom: 0px;">
 		<div class="navbar-inner"
 			style="box-shadow: none; background-color: #dddbbb; background-image: none; padding: 0px 5px;  filter: progid :DXImageTransform.Microsoft.gradient (startColorstr = '#dddbbb', endColorstr = '#dddbbb' );">
 			<div class="container" style="width: 100%">
@@ -11,13 +11,14 @@
 					India Biodiversity Portal</a>
 				
 				<div class="nav-collapse">
-					
+				
+				
 					<ul class="nav pull-right">
-						<li><search:searchBox />
-						</li>
-						<li><uGroup:showSidebar />
-						<li><sUser:userLoginBox
-								model="['userGroup':userGroupInstance]" /></li>
+						
+						
+						<li><uGroup:showSidebar /></li>
+<%--						<li><sUser:userLoginBox--%>
+<%--								model="['userGroup':userGroupInstance]" /></li>--%>
 
 					</ul>
 				</div>
@@ -157,6 +158,7 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 		function closeHandler() {
 			$('#loginMessage').html("Logging in ...").removeClass().addClass('alter alert-info').show();
 			var authParams = window.mynewparams;
+			console.log(authParams);
 <%--			authParams["openid.return_to"] = 'http://indiabiodiversity.localhost.org/biodiv/j_spring_openid_security_check' --%>
 			 $.ajax({
               url:  "${Utils.getDomainServerUrlWithContext(request)}/j_spring_openid_security_check" ,

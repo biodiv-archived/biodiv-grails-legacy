@@ -22,7 +22,7 @@ modules = {
 	}
 
 	core {
-		dependsOn 'jquery, jquery-ui'
+		dependsOn 'jquery, jquery-ui,carousel'
 		defaultBundle 'core'
 
 		resource url:'/bootstrap/css/bootstrap.min.css'
@@ -121,8 +121,8 @@ modules = {
 	}
 
 	observations_list { 
-		dependsOn 'observations, location_utils, list_utils'
-		 
+		dependsOn 'observations, location_utils, list_utils, comment'
+		
 		resource url:'/js/species/observations/list.js'
 	}
 
@@ -215,4 +215,9 @@ modules = {
 		resource url:'/js/species/checklist.js'
 	}
 	
+	chart {
+		dependsOn 'core'
+		
+		resource url:'/js/chart.js'
+	}
 }

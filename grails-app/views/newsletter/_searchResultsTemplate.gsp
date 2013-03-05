@@ -3,7 +3,7 @@
 	<div class="mainContentList">
 		<div class="mainContent">
 
-			<ul class="list_view thumbnails">
+			<ul class="list_view single_list_view thumbnails">
 
 				<g:each in="${instanceList}" status="i" var="newsletterInstance">
 					<li class="thumbnail clearfix" style="width: 100%;">

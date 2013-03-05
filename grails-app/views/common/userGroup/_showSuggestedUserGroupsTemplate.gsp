@@ -1,17 +1,25 @@
 
-<ul class="nav span3"
-	style="overflow: hidden; margin-bottom: 0px; margin-left: 40px;">
-	<g:if test="${userGroups}">
-		<g:each in="${userGroups}" var="userGroup">
-			<li><uGroup:showUserGroupSignature
-					model="['userGroup':userGroup]" />
-			</li>
-		</g:each>
-		<li><small>Groups is in Beta. We would like you to
-				provide valuable feedback, suggestions and interest in using the
-				groups functionality. </small>
+<li class="dropdown" style="height:50px;"><a class="dropdown-toggle"  style="height:30px;top:10px"
+	data-toggle="dropdown"
+	href="${uGroup.createLink(controller:'userGroup', absolute:'true', action:'list')}">
+		<i class="icon-group"></i> Groups <b class="caret"
+		style="border-top-color: black; border-bottom-color: black;"></b>
+		
+</a>
+
+	<ul class="dropdown-menu" style="padding:5px">
+		<g:if test="${userGroups}">
+
+			<g:each in="${userGroups}"
+				var="userGroup">
+				<li><uGroup:showUserGroupSignature
+						model="['userGroup':userGroup]" /></li>
+			</g:each>
+		</g:if>
+<%--		<li><obv:showRelatedStory--%>
+<%--					model="['controller':'userGroup', 'observationId': 1, 'action':'getFeaturedUserGroups', 'id':'uG', hideShowAll:true]" /></li>--%>
+		<li style="float: right;"><g:link mapping="userGroupGeneric"
+				action="list" absolute='true'>More ...</g:link>
 		</li>
-	</g:if>
-	<li style="float:right;"><g:link mapping="userGroupGeneric"
-			action="list" absolute='true'>More ...</g:link></li>
-</ul>
+	</ul>
+</li>

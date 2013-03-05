@@ -205,7 +205,7 @@ class ActivityFeed {
 		params.timeLine = params.timeLine?:ActivityFeedService.OLDER
 		params.refTime = params.refTime?:((params.timeLine == ActivityFeedService.OLDER) ?  new Date().time.toString(): new Date().previous().time.toString())
 		
-		params.max = params.max ?: ((params.timeLine == ActivityFeedService.OLDER) ? ((params.feedType == ActivityFeedService.SPECIFIC) ? 2 : 5)  :null)
+		params.max = params.max ?: ((params.timeLine == ActivityFeedService.OLDER) ? ((params.feedType == ActivityFeedService.SPECIFIC) ? 5 : 5)  :null)
 		
 		return true
 	}
@@ -229,7 +229,7 @@ class ActivityFeed {
 		return null
 	}
 	
-	private static getGroupAndObsevations(groups){
+	public static getGroupAndObsevations(groups){
 		def m = [:]
 		m[Observation.class.getCanonicalName()] = getObvIds(groups)
 		m[UserGroup.class.getCanonicalName()] = groups.collect{ it.id}

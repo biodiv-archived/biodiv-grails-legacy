@@ -1,0 +1,96 @@
+package species.participation
+
+import java.util.Date;
+import grails.converters.JSON;
+
+import species.auth.SUser;
+import speciespage.ObvUtilService;
+import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap;
+
+class DownloadLog {
+	
+	public enum DownloadType {
+		CSV("CSV"),
+		KML("KML")
+		
+		private String value;
+
+		DownloadType(String value) {
+			this.value = value;
+		}
+		
+		static list() {
+			return [CSV, KML];
+		}
+		
+		String value() {
+			return this.value;
+		}
+	}
+	
+	Date createdOn;
+	String filePath;
+	String filterUrl;
+	DownloadType type;
+	String notes;
+	String status;
+	String paramsMapAsText
+	
+	static belongsTo = [author:SUser];
+	
+    static constraints = {
+		notes nullable:true, blank: true, size:0..400
+		paramsMapAsText nullable:true, blank: true
+		filePath nullable:true
+    }
+	static mapping = {
+		version : false;
+		notes type:'text';
+		paramsMapAsText type:'text';
+    }
+	
+	static createLog(SUser author, String filterUrl, String downloadTypeString, String notes, params){
+		return createLog(author, null, filterUrl, downloadTypeString, notes, new Date(),  ObvUtilService.SCHEDULED, params)
+	}
+	
+	static createLog(SUser author, String filePath, String filterUrl, String downloadTypeString, String notes, Date createdOn, String status, params){
+		def paramsMapAsText = getTextFromMap(params)
+		DownloadLog dl = new DownloadLog (author:author, filePath:filePath, filterUrl:filterUrl, type:getType(downloadTypeString), notes:notes, createdOn:createdOn, status:status, paramsMapAsText:paramsMapAsText)
+		if(!dl.save(flush:true)){
+			dl.errors.allErrors.each { println it }
+			return null
+		}else{
+			return dl
+		}
+	}
+	
+	static DownloadType getType(String dType){
+		if(!dType) return null;
+		for(DownloadType type : DownloadType) {
+			if(type.name().equals(dType)) {
+				return type;
+			}
+		}
+		return null;
+	}
+	
+	private static String  getTextFromMap(params){
+		Map newMap = new HashMap(params)
+		
+		newMap.remove("action")
+		newMap.remove("controller")
+		newMap.remove("max")
+		newMap.remove("offset")
+		newMap.remove("filterUrl")
+		newMap.remove("notes")
+		newMap.remove("downloadType")
+		
+		return newMap as JSON
+	}
+	
+	def fetchMapFromText(){
+		return JSON.parse(paramsMapAsText)
+	}
+	
+	
+}

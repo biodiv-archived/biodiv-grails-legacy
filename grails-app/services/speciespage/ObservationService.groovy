@@ -1,5 +1,6 @@
 package speciespage
 
+import grails.util.Environment;
 import grails.util.GrailsNameUtils;
 import groovy.sql.Sql
 import groovy.text.SimpleTemplateEngine
@@ -7,6 +8,7 @@ import groovy.text.SimpleTemplateEngine
 import org.grails.taggable.TagLink;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.text.SimpleDateFormat;
 
@@ -17,12 +19,14 @@ import species.utils.Utils;
 import species.TaxonomyDefinition;
 import species.auth.SUser;
 import species.groups.SpeciesGroup;
+import species.participation.ActivityFeed;
 import species.participation.Observation;
 import species.participation.Recommendation;
 import species.participation.RecommendationVote;
 import species.participation.ObservationFlag.FlagType
 import species.participation.RecommendationVote.ConfidenceType;
 import species.sourcehandler.XMLConverter;
+import species.utils.ImageType;
 import species.utils.Utils;
 
 import org.apache.lucene.document.DateField;
@@ -33,6 +37,7 @@ import org.apache.solr.common.util.NamedList
 import org.apache.solr.common.util.DateUtil;
 import org.apache.solr.common.util.NamedList;
 import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
+import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap;
 
 class ObservationService {
 
@@ -45,7 +50,18 @@ class ObservationService {
 	def springSecurityService;
 	def curationService;
 	def commentService;
+	def userGroupService;
+	def activityFeedService;
+	def mailService;
 	
+	static final String OBSERVATION_ADDED = "observationAdded";
+	static final String SPECIES_RECOMMENDED = "speciesRecommended";
+	static final String SPECIES_AGREED_ON = "speciesAgreedOn";
+	static final String SPECIES_NEW_COMMENT = "speciesNewComment";
+	static final String SPECIES_REMOVE_COMMENT = "speciesRemoveComment";
+	static final String OBSERVATION_FLAGGED = "observationFlagged";
+	static final String OBSERVATION_DELETED = "observationDeleted";
+	static final String DOWNLOAD_REQUEST = "downloadRequest";
 	/**
 	 * 
 	 * @param params
@@ -76,12 +92,14 @@ class ObservationService {
 		observation.placeName = params.place_name;
 		observation.reverseGeocodedName = params.reverse_geocoded_name;
 		observation.location = 'POINT(' + params.longitude + ' ' + params.latitude + ')'
-		observation.latitude = params.float('latitude')
-		observation.longitude = params.float('longitude');
+		observation.latitude = params.latitude.toFloat();
+		observation.longitude = params.longitude.toFloat();
 		observation.locationAccuracy = params.location_accuracy;
 		observation.geoPrivacy = false;
 		observation.habitat = Habitat.get(params.habitat_id);
 
+		observation.agreeTerms = (params.agreeTerms?.equals('on'))?true:false;
+		
 		def resourcesXML = createResourcesXML(params);
 		def resources = saveResources(observation, resourcesXML);
 		observation.resource?.clear();
@@ -680,8 +698,8 @@ class ObservationService {
 	* @return
 	*/
    def getObservationsFromSearch(params) {
-	   def max = Math.min(params.max ? params.int('max') : 12, 100)
-	   def offset = params.offset ? params.long('offset') : 0
+	   def max = Math.min(params.max ? params.max.toInteger() : 12, 100)
+	   def offset = params.offset ? params.offset.toLong() : 0
 
 	   def model;
 	   
@@ -719,7 +737,8 @@ class ObservationService {
 		
 		String aq = "";
 		int i=0;
-		if(params.aq instanceof List) {
+		if(params.aq instanceof GrailsParameterMap || params.aq instanceof Map) {
+			
 			params.aq.each { key, value ->
 				queryParams["aq."+key] = value;
 				activeFilters["aq."+key] = value;
@@ -734,25 +753,55 @@ class ObservationService {
 		}
 		
 		SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-		if(params.daterangepicker_start && params.daterangepicker_end) {
+		String lastRevisedStartDate = '';
+		String lastRevisedEndDate = '';
+		if(params.daterangepicker_start) {
+			Date s = DateUtil.parseDate(params.daterangepicker_start, ['dd/MM/yyyy']);
+			Calendar cal = Calendar.getInstance(); // locale-specific
+			cal.setTime(s)
+			cal.set(Calendar.HOUR_OF_DAY, 0);
+			cal.set(Calendar.MINUTE, 0);
+			cal.set(Calendar.MINUTE, 0);
+			s = new Date(cal.getTimeInMillis())
+			//StringWriter str1 = new StringWriter();
+			lastRevisedStartDate = dateFormatter.format(s)
+			//DateUtil.formatDate(s, cal, str1)
+			//println str1
+			//lastRevisedStartDate = str1;
+			
+		}
+		
+		if(params.daterangepicker_end) {
+			Calendar cal = Calendar.getInstance(); // locale-specific
+			Date e = DateUtil.parseDate(params.daterangepicker_end, ['dd/MM/yyyy']);
+			cal.setTime(e)
+			cal.set(Calendar.HOUR_OF_DAY, 23);
+			cal.set(Calendar.MINUTE, 59);
+			cal.set(Calendar.MINUTE, 59);
+			e = new Date(cal.getTimeInMillis())
+//			StringWriter str2 = new StringWriter();
+//			DateUtil.formatDate(e, cal, str2)
+//			println str2
+			lastRevisedEndDate = dateFormatter.format(e);
+		}
+		
+		if(lastRevisedStartDate && lastRevisedEndDate) {
 			if(i > 0) aq += " AND";
-			String lastRevisedStartDate = dateFormatter.format(DateUtil.parseDate(params.daterangepicker_start, ['dd/MM/yyyy']));
-			String lastRevisedEndDate = dateFormatter.format(DateUtil.parseDate(params.daterangepicker_end, ['dd/MM/yyyy']));
 			aq += " lastrevised:["+lastRevisedStartDate+" TO "+lastRevisedEndDate+"]";
 			queryParams['daterangepicker_start'] = params.daterangepicker_start;
 			queryParams['daterangepicker_end'] = params.daterangepicker_end;
 			activeFilters['daterangepicker_start'] = params.daterangepicker_start;
 			activeFilters['daterangepicker_end'] = params.daterangepicker_end;
 			
-		} else if(params.daterangepicker_start) {
+		} else if(lastRevisedStartDate) {
 			if(i > 0) aq += " AND";
-			String lastRevisedStartDate = dateFormatter.format(DateTools.dateToString(DateUtil.parseDate(params.daterangepicker_start, ['dd/MM/yyyy']), DateTools.Resolution.DAY));
+			//String lastRevisedStartDate = dateFormatter.format(DateTools.dateToString(DateUtil.parseDate(params.daterangepicker_start, ['dd/MM/yyyy']), DateTools.Resolution.DAY));
 			aq += " lastrevised:["+lastRevisedStartDate+" TO NOW]";
 			queryParams['daterangepicker_start'] = params.daterangepicker_start;
 			activeFilters['daterangepicker_start'] = params.daterangepicker_endparams.daterangepicker_end;
-		} else if (params.daterangepicker_end) {
+		} else if (lastRevisedEndDate) {
 			if(i > 0) aq += " AND";
-			String lastRevisedEndDate = dateFormatter.format(DateTools.dateToString(DateUtil.parseDate(params.daterangepicker_end, ['dd/MM/yyyy']), DateTools.Resolution.DAY));
+			//String lastRevisedEndDate = dateFormatter.format(DateTools.dateToString(DateUtil.parseDate(params.daterangepicker_end, ['dd/MM/yyyy']), DateTools.Resolution.DAY));
 			aq += " lastrevised:[NOW TO "+lastRevisedEndDate+"]";
 			queryParams['daterangepicker_end'] = params.daterangepicker_end;
 			activeFilters['daterangepicker_end'] = params.daterangepicker_end;
@@ -765,7 +814,6 @@ class ObservationService {
 		}
 		
 	
-		
 		paramsList.add('q', Utils.cleanSearchQuery(params.query));
 		//options
 		paramsList.add('start', offset);
@@ -853,7 +901,6 @@ class ObservationService {
 				activeFilters["uGroup"] = "ALL"
 			}
 		}
-		
 		log.debug "Along with faceting params : "+paramsList;
 		
 		if(isMapView) {
@@ -903,6 +950,23 @@ class ObservationService {
 		return false;
 	}
 	
+	def setUserGroups(Observation observationInstance, List userGroupIds) {
+		if(!observationInstance) return
+		
+		def obvInUserGroups = observationInstance.userGroups.collect { it.id + ""}
+		println obvInUserGroups;
+		def toRemainInUserGroups =  obvInUserGroups.intersect(userGroupIds);
+		if(userGroupIds.size() == 0) {
+			println 'removing'
+			userGroupService.removeObservationFromUserGroups(observationInstance, obvInUserGroups);
+		} else {
+			userGroupIds.removeAll(toRemainInUserGroups)
+			userGroupService.postObservationtoUserGroups(observationInstance, userGroupIds);
+			obvInUserGroups.removeAll(toRemainInUserGroups)
+			userGroupService.removeObservationFromUserGroups(observationInstance, obvInUserGroups);
+		}
+	}
+	
 	File getUniqueFile(File root, String fileName){
 		File imageFile = new File(root, fileName);
 		
@@ -945,4 +1009,196 @@ class ObservationService {
 		}
 		return result;
 	} 
+
+	//////////////////////////////////////////////////////////////////////////////////////////////
+	
+	public sendNotificationMail(String notificationType, def obv, request, String userGroupWebaddress, ActivityFeed feedInstance=null){
+		def conf = SpringSecurityUtils.securityConfig
+		log.debug "Sending email"
+		try {
+			
+		def targetController =  obv.getClass().getCanonicalName().split('\\.')[-1]
+		targetController = targetController.replaceFirst(targetController[0], targetController[0].toLowerCase());
+		def obvUrl, domain
+		if(request){
+			 obvUrl = generateLink(targetController, "show", ["id": obv.id], request)
+			 domain = Utils.getDomainName(request)
+		}
+
+		def templateMap = [obvUrl:obvUrl, domain:domain]
+
+		def mailSubject = ""
+		def bodyContent = ""
+		String htmlContent = ""
+		String bodyView = '';
+		def replyTo = conf.ui.notification.emailReplyTo;
+		Set toUsers = []
+		//Set bcc = ["xyz@xyz.com"];
+		//def activityModel = ['feedInstance':feedInstance, 'feedType':ActivityFeedService.GENERIC, 'feedPermission':ActivityFeedService.READ_ONLY, feedHomeObject:null]
+		
+		log.debug "before switch "
+		
+		switch ( notificationType ) {
+			case OBSERVATION_ADDED:
+				mailSubject = conf.ui.addObservation.emailSubject
+				bodyContent = conf.ui.addObservation.emailBody
+				toUsers.add(getOwner(obv))
+				break
+
+			case OBSERVATION_FLAGGED :
+				mailSubject = "Observation flagged"
+				bodyContent = conf.ui.observationFlagged.emailBody
+				templateMap["currentUser"] = springSecurityService.currentUser
+				//replyTo = templateMap["currentUser"].email
+				toUsers.add(getOwner(obv))
+				break
+
+			case OBSERVATION_DELETED :
+				mailSubject = conf.ui.observationDeleted.emailSubject
+				bodyContent = conf.ui.observationDeleted.emailBody
+				templateMap["currentUser"] = springSecurityService.currentUser
+				//replyTo = templateMap["currentUser"].email
+				toUsers.add(getOwner(obv))
+				break
+
+			case SPECIES_RECOMMENDED :
+				bodyView = "/emailtemplates/addRecommendation"
+				mailSubject = conf.ui.addRecommendationVote.emailSubject
+				templateMap['actor'] = feedInstance.author;
+				templateMap["actorProfileUrl"] = generateLink("SUser", "show", ["id": feedInstance.author.id], request)
+				templateMap["actorIconUrl"] = feedInstance.author.icon(ImageType.SMALL)
+				templateMap["actorName"] = feedInstance.author.name
+				templateMap["activity"] = activityFeedService.getContextInfo(feedInstance, [webaddress:userGroupWebaddress])
+				templateMap["userGroupWebaddress"] = userGroupWebaddress
+				//mailSubject = feedInstance.author.name +" : "+ templateMap["activity"].activityTitle.replaceAll(/<.*?>/, '')
+				//replyTo = templateMap["currentUser"].email
+				toUsers.addAll(getParticipants(obv))
+				break
+
+			case SPECIES_AGREED_ON:
+				bodyView = "/emailtemplates/addRecommendation"
+				mailSubject = conf.ui.addRecommendationVote.emailSubject
+				templateMap['actor'] = feedInstance.author;
+				templateMap["actorProfileUrl"] = generateLink("SUser", "show", ["id": feedInstance.author.id], request)
+				templateMap["actorIconUrl"] = feedInstance.author.icon(ImageType.SMALL)
+				templateMap["actorName"] = feedInstance.author.name
+				templateMap["userGroupWebaddress"] = userGroupWebaddress
+				templateMap["activity"] = activityFeedService.getContextInfo(feedInstance, [webaddress:userGroupWebaddress])
+				//mailSubject = feedInstance.author.name +" : "+ templateMap["activity"].activityTitle.replaceAll(/<.*?>/, '')
+				//replyTo = templateMap["currentUser"].email
+				toUsers.addAll(getParticipants(obv))
+				break
+
+			case activityFeedService.COMMENT_ADDED:				
+				bodyView = "/emailtemplates/addComment"
+				templateMap['actor'] = feedInstance.author;
+				templateMap["actorProfileUrl"] = generateLink("SUser", "show", ["id": feedInstance.author.id], request)
+				templateMap["actorIconUrl"] = feedInstance.author.icon(ImageType.SMALL)
+				templateMap["actorName"] = feedInstance.author.name
+				templateMap["userGroupWebaddress"] = userGroupWebaddress
+				templateMap["activity"] = activityFeedService.getContextInfo(feedInstance, [webaddress:userGroupWebaddress])
+				println"add"
+				templateMap['domainObjectTitle'] = getTitle(activityFeedService.getDomainObject(feedInstance.rootHolderType, feedInstance.rootHolderId))
+				println 'sdf'
+				templateMap['domainObjectType'] = feedInstance.rootHolderType.split('\\.')[-1].toLowerCase()
+				mailSubject = "New comment in ${templateMap['domainObjectType']}"
+				toUsers.addAll(getParticipants(obv))
+				break;
+			case SPECIES_REMOVE_COMMENT:
+				mailSubject = conf.ui.removeComment.emailSubject
+				bodyContent = conf.ui.removeComment.emailBody
+				toUsers.add(getOwner(obv))
+				break;
+			
+			case DOWNLOAD_REQUEST:
+				mailSubject = conf.ui.downloadRequest.emailSubject
+				bodyContent = conf.ui.downloadRequest.emailBody
+				templateMap['domain'] = "India Biodiversity Portal"
+				toUsers.add(getOwner(obv))
+				templateMap['userProfileUrl'] = ObvUtilService.createHardLink('user', 'show', obv.author.id)
+				break;
+
+				
+			default:
+				log.debug "invalid notification type"
+		}
+		
+		log.debug "Sending email to ${toUsers}"
+		toUsers.eachWithIndex { toUser, index ->
+			if(toUser) {
+				templateMap['username'] = toUser.name.capitalize();
+				if(request){
+					templateMap['userProfileUrl'] = generateLink("SUser", "show", ["id": toUser.id], request)
+				}
+				
+				if ( Environment.getCurrent().getName().startsWith("pamba")) {
+				//if ( Environment.getCurrent().getName().equalsIgnoreCase("development")) {
+					mailService.sendMail {
+						to toUser.email
+						if(index == 0) {
+							bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com", "thomas.vee@gmail.com"
+							//bcc "sravanthi@strandls.com"
+						}
+						from conf.ui.notification.emailFrom
+						//replyTo replyTo
+						subject mailSubject
+						if(bodyView) {
+							body (view:bodyView, model:templateMap)
+						}
+						else if(htmlContent) {
+							htmlContent = Utils.getPremailer(grailsApplication.config.grails.serverURL, htmlContent)
+							html htmlContent
+						} else if(bodyContent) {
+							if (bodyContent.contains('$')) {
+								bodyContent = evaluate(bodyContent, templateMap)
+							}
+							html bodyContent
+						}
+					}
+				}
+			}
+		}
+		
+		} catch (e) {
+			log.error "Error sending email $e.message"
+			e.printStackTrace();
+		}
+	}
+
+	public String generateLink( String controller, String action, linkParams, request) {
+		userGroupService.userGroupBasedLink(base: Utils.getDomainServerUrl(request),
+				controller:controller, action: action,
+				params: linkParams)
+	}
+	
+	private List getParticipants(observation) {
+		def participants = [];
+		def result = ActivityFeed.findAllByRootHolderIdAndRootHolderType(observation.id, observation.class.getCanonicalName())*.author.unique()
+		result.each { user ->
+			if(user.sendNotification){
+				participants << user
+			}
+		}
+		return participants;
+	}
+	
+	private SUser getOwner(observation) {
+		def author = null;
+		if(observation.metaClass.hasProperty(observation, 'author')) {
+			author = observation.author;
+			if(!author.sendNotification) {
+				author = null;
+			}
+		}
+		return author;
+	}
+	
+	private String getTitle(observation) {
+		if(observation.metaClass.hasProperty(observation, 'title')) {
+			return observation.title
+		} else if(observation.metaClass.hasProperty(observation, 'name')) {
+			return observation.name
+		} else
+			return null
+	}
 }

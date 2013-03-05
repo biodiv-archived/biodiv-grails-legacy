@@ -224,7 +224,7 @@ class UserGroupTagLib {
 
 	def getCurrentUserUserGroupsSidebar = {attrs, body ->
 		def user = springSecurityService.getCurrentUser();
-		Set userGroups = userGroupService.getUserGroups(user);
+		List userGroups = userGroupService.getSuggestedUserGroups(user);
 		def subList= []
 		int i=0;
 		userGroups.each {
@@ -250,7 +250,7 @@ class UserGroupTagLib {
 //			}
 //		}
 		
-		def gList = userGroupService.getFilteredUserGroups([:], 5, 0, false).userGroupInstanceList
+		def gList = userGroupService.getSuggestedUserGroups(null)
 		out << render(template:"/common/userGroup/showSuggestedUserGroupsTemplate", model:['userGroups':gList]);
 	}
 	

@@ -197,8 +197,7 @@ input.dms_field {
 										</li>
 										<g:set var="i" value="${i+1}" />
 									</g:each>
-									<li id="add_file" class="addedResource"
-										onclick="$('#attachFiles').select()[0].click();return false;">
+									<li id="add_file" class="addedResource">
 										<div class="progress">
 											<div id="translucent_box"></div>
 											<div id="progress_bar"></div>
@@ -573,6 +572,13 @@ input.dms_field {
 					
 					<a id="addObservationSubmit" class="btn btn-primary"
 						style="float: right; margin-right: 5px;"> ${form_button_val} </a>
+				
+						<div class="row control-group">
+								<label class="checkbox" style="text-align: left;"> 
+								 <g:checkBox style="margin-left:0px;"
+									name="agreeTerms" value="${observationInstance.agreeTerms}"/>
+								 <span class="policy-text"> By submitting this form, you agree that the photos you are submitting are taken by you, or you have permission of the copyright holder to upload the photos on creative commons licenses. </span></label>
+						</div>
 					
 				</div>
 				
@@ -583,14 +589,14 @@ input.dms_field {
 				def obvTmpFileName = observationInstance?.resource?.iterator()?.next()?.fileName
 				def obvDir = obvTmpFileName ?  obvTmpFileName.substring(0, obvTmpFileName.lastIndexOf("/")) : ""
 	       %>
-            <form id="upload_resource" enctype="multipart/form-data"
+            <form id="upload_resource" 
 				title="Add a photo for this observation"
                                 method="post"
 				class="${hasErrors(bean: observationInstance, field: 'resource', 'errors')}">
 
 				<!-- TODO multiple attribute is HTML5. need to chk if this gracefully falls back to default in non compatible browsers -->
-				<input type="file" id="attachFiles" name="resources"
-					accept="image/*" multiple/> <span class="msg" style="float: right"></span>
+				<!-- input type="file" id="attachFiles" name="resources"
+					accept="image/*" multiple/--> <span class="msg" style="float: right"></span>
 				<input type="hidden" name='obvDir' value="${obvDir}" />
 			</form>
 
@@ -598,7 +604,7 @@ input.dms_field {
             </div>
        </div>
 		<!--====== Template ======-->
-		<script id="metadataTmpl" type="text/x-jquery-tmpl">
+<script id="metadataTmpl" type="text/x-jquery-tmpl">
 	<li class="addedResource thumbnail">
 	    <div class='figure' style='height: 200px; overflow:hidden;'>
                 <span> 
@@ -630,10 +636,12 @@ input.dms_field {
 	</li>
 	
 </script>
-
+	
+	<script type="text/javascript" src="//api.filepicker.io/v1/filepicker.js"></script>
+	
 	<r:script>
 	
-    var add_file_button = '<li id="add_file" class="addedResource" style="display:none;" onclick="$(\'#attachFiles\').select()[0].click();return false;"><div class="progress"><div id="translucent_box"></div><div id="progress_bar"></div ><div id="progress_msg"></div ></div></li>';
+    var add_file_button = '<li id="add_file" class="addedResource" style="display:none;"><div class="progress"><div id="translucent_box"></div><div id="progress_bar"></div ><div id="progress_msg"></div ></div></li>';
 
 	$(document).ready(function(){
 		$('.dropdown-toggle').dropdown();
@@ -648,6 +656,35 @@ input.dms_field {
 	    $('#add_photo_ie').hide();
             $('#add_file').show();
         }
+		
+		var filePick = function() {
+			filepicker.pickMultiple({
+			    mimetypes: ['image/*'],
+			    maxSize: 104857600,
+			    //debug:true,
+			    services:['COMPUTER', 'FACEBOOK', 'FLICKR', 'PICASA', 'GOOGLE_DRIVE', 'DROPBOX'],
+			  },
+			  function(FPFiles){
+			    console.log(JSON.stringify(FPFiles));
+			    $.each(FPFiles, function(){
+				    $('<input>').attr({
+				    type: 'hidden',
+				    name: 'resources',
+				    value:JSON.stringify(this)
+					}).appendTo('#upload_resource');
+				})
+				$('#upload_resource').submit().find("span.msg").html("Uploading... Please wait...");
+			  	$("#iemsg").html("Uploading... Please wait...");
+			  	$('#progress_msg').html('Uploading ...');
+			  },
+			  function(FPError){
+			    console.log(FPError.toString());
+			  }
+			);		
+		}
+	
+		$('#add_file').live('click', filePick);
+		$('#add_photo_ie').live('click', filePick);
 		
 		$('#attachFiles').change(function(e){
   			$('#upload_resource').submit().find("span.msg").html("Uploading... Please wait...");
@@ -674,17 +711,20 @@ input.dms_field {
 			type: 'POST',
 			 
 			beforeSubmit: function(formData, jqForm, options) {
+				$("#addObservationSubmit").addClass('disabled');
 				return true;
 			}, 
-            xhr: function() {  // custom xhr
+            /*xhr: function() {  // custom xhr
                 myXhr = $.ajaxSettings.xhr();
                 if(myXhr.upload){ // check if upload property exists
                     myXhr.upload.addEventListener('progress', progressHandlingFunction, false); // for handling the progress of the upload
                 }
                 return myXhr;
-            },
+            },*/
 			success: function(responseXML, statusText, xhr, form) {
+				$("#addObservationSubmit").removeClass('disabled');
 				$(form).find("span.msg").html("");
+				$('#progress_msg').html('');
 				$("#iemsg").html("");
 				//var rootDir = '${grailsApplication.config.speciesPortal.observations.serverURL}'
 				var rootDir = '${Utils.getDomainServerUrlWithContext(request)}' + '/observations'
@@ -726,8 +766,11 @@ input.dms_field {
                 $( "#add_file" ).fadeIn(3000);
                 $("#image-resources-msg").parent(".resources").removeClass("error");
                 $("#image-resources-msg").html("");
-
+				$("#upload_resource input[name='resources']").remove();
+				
 			}, error:function (xhr, ajaxOptions, thrownError){
+					$("#addObservationSubmit").removeClass('disabled');
+					$("#upload_resource input[name='resources']").remove();
 					//xhr.upload.removeEventListener( 'progress', progressHandlingFunction, false); 
 					
 					//successHandler is used when ajax login succedes
@@ -745,6 +788,8 @@ input.dms_field {
 						} else {
 							messageNode.append(response?response.error:"Error");
 						}
+						
+						
 					});
            } 
      	});  
@@ -797,18 +842,26 @@ input.dms_field {
         });
 		$(".tagit-hiddenSelect").css('display','none');
 
- 		 $("#addObservationSubmit").click(function(){
- 		 	$(this).addClass("disabled");
-        	/*var tags = $("ul[name='tags']").tagit("tags");
-        	$.each(tags, function(index){
-        		var input = $("<input>").attr("type", "hidden").attr("name", "tags."+index).val(this);
-				$('#addObservation').append($(input));	
-        	})
-        	*/
-			$("#userGroupsList").val(getSelectedUserGroups());	       	
-        	$("#addObservation").submit();        	
-        	return false;
-        
+ 		 $("#addObservationSubmit").click(function(event){
+ 		 	if($(this).hasClass('disabled')) {
+ 		 		alert("Uploading is in progress. Please submit after it is over.");
+ 		 		event.preventDefault();
+      			return false; 		 		
+ 		 	}
+ 		 	if (document.getElementById('agreeTerms').checked){
+	 		 	$(this).addClass("disabled");
+	        	/*var tags = $("ul[name='tags']").tagit("tags");
+	        	$.each(tags, function(index){
+	        		var input = $("<input>").attr("type", "hidden").attr("name", "tags."+index).val(this);
+					$('#addObservation').append($(input));	
+	        	})
+	        	*/
+				$("#userGroupsList").val(getSelectedUserGroups());	       	
+	        	$("#addObservation").submit();        	
+	        	return false;
+			} else {
+				alert("Please agree to the terms mentioned at the end of the form to submit the observation.")
+			}
 		});
 		
 		function getSelectedUserGroups() {
@@ -840,6 +893,8 @@ input.dms_field {
                     $('.degree_field').fadeIn();
                 }
         });
+        
+        filepicker.setKey('AXCVl73JWSwe7mTPb2kXdz');
 	});
 
 
@@ -859,6 +914,6 @@ input.dms_field {
 	});
 	
 </r:script>
+
 </body>
 </html>
-

@@ -195,6 +195,7 @@ else {
 speciesPortal {
 	app.rootDir = "${userHome}/species"
 	data.rootDir = "${app.rootDir}/data"
+	download.rootDir = "${data.rootDir}/datarep/downloads"
 	domain = "localhost"
 	resources {
 		rootDir = "${app.rootDir}/images"
@@ -223,6 +224,7 @@ speciesPortal {
 	}
 	observations {
 		rootDir = "${app.rootDir}/observations"
+		observationDownloadDir = "${download.rootDir}/observations"
 		serverURL = "http://localhost/${appName}/observations"
 		//serverURL = "http://localhost/${appName}/observations"
 		MAX_IMAGE_SIZE = 104857600
@@ -420,7 +422,7 @@ environments {
 		grails.serverURL = "http://indiabiodiversity.localhost.org/${appName}"
 		speciesPortal {
 			search.serverURL = "http://localhost:8090/solr"
-			names.parser.serverURL = "127.0.0.1"
+			names.parser.serverURL = "saturn.strandls.com"
 			wgp {
 				facebook {
 					appId= "424071494335902"
@@ -915,7 +917,7 @@ If you do not want to receive notifications please go to your <a href="$userProf
 <br/>
 -The portal team'''
 
-grails.plugins.springsecurity.ui.newComment.emailSubject = 'New comment on your observation'
+grails.plugins.springsecurity.ui.newComment.emailSubject = 'New comment'
 grails.plugins.springsecurity.ui.newComment.emailBody = '''
 Hi $username,<br/>
 <br/>
@@ -928,7 +930,7 @@ Thank you for your contribution to the portal.<br/>
 <br/>
 -The portal team'''
 
-grails.plugins.springsecurity.ui.removeComment.emailSubject = 'Removed a comment from your observation'
+grails.plugins.springsecurity.ui.removeComment.emailSubject = 'Removed a comment'
 grails.plugins.springsecurity.ui.removeComment.emailBody = '''
 Hi $username,<br/>
 <br/>
@@ -1022,6 +1024,19 @@ You have been added as a member of the <a href="$bBirdUrl">Mumbai BirdRace 2013<
 We look forward to your contribution on the portal. You can add images of Birds observed during the BirdRace on the  <a href="$obvModuleUrl">Observation module</a>.<br/> 
 The portal is a public participatory portal that thrives by participation from users like you.<br/><br/>
 We will appreciate any feedback you may have to offer.<br/><br/>
+-The portal team
+'''
+
+grails.plugins.springsecurity.ui.downloadRequest.emailSubject = 'Download request'
+grails.plugins.springsecurity.ui.downloadRequest.emailBody = '''\
+Hi $username,<br/>
+<br/>
+Your data download request on the <b>$domain</b> has been processed. 
+<br/>
+You can download your data from your <a href="$userProfileUrl">user profile</a>.
+<br/> 
+Please note that you will need to be logged in to see the download link.
+<br/><br/>
 -The portal team
 '''
 

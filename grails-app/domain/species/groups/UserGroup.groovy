@@ -321,4 +321,5 @@ class UserGroup implements Taggable {
 	def fetchHomePageTitle(){
 		return userGroupService.fetchHomePageTitle(this)
 	}
+	
 }

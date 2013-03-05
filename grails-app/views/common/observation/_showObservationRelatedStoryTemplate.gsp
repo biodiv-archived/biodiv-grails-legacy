@@ -30,6 +30,7 @@ $(document).ready(function() {
     <ul> 
       <!-- The content will be dynamically loaded in here --> 
     </ul> 
+    <g:if test="${!hideShowAll}">
     <div class="observation_links">
   		<g:if test="${observationId}">
 		    <a class="btn btn-mini" href="${uGroup.createLink(controller:controller, action:'listRelated', id: observationId, filterProperty : filterProperty, offset:0, limit:9, 'userGroup':userGroupInstance, 'userGroupWebaddress':userGroupWebaddress)}">Show all</a>
@@ -38,6 +39,7 @@ $(document).ready(function() {
 		    <a class="btn btn-mini" href="${uGroup.createLink(controller:controller, action:'list', (filterProperty) : filterPropertyValue, 'userGroup':userGroupInstance, 'userGroupWebaddress':userGroupWebaddress)}">Show all</a>
 		</g:else>
 	</div>
+	</g:if>
 
 </div>
 <div id="relatedObservationAddButton_${id}" style="display:none">

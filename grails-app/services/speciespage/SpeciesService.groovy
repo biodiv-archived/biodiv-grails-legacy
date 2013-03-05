@@ -8,6 +8,7 @@ import org.apache.commons.logging.LogFactory
 import org.apache.solr.common.SolrException;
 import org.apache.solr.common.util.NamedList;
 import org.codehaus.groovy.grails.commons.ApplicationHolder;
+import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap;
 import org.hibernate.exception.ConstraintViolationException;
 
 import species.Classification
@@ -260,7 +261,7 @@ class SpeciesService {
 	def postProcessSpecies(List<Species> species) {
 		//TODO: got to move this to the end of taxon creation
 		try{
-			groupHandlerService.updateGroups(species);
+			groupHandlerService.updateGroups(species, false);
 		} catch(e) {
 			e.printStackTrace()
 		}
@@ -368,7 +369,8 @@ class SpeciesService {
 
 		String aq = "";
 		int i=0;
-		if(params.aq instanceof List) {
+		if(params.aq instanceof GrailsParameterMap) {
+			println '-----------------'
 			params.aq.each { key, value ->
 				queryParams["aq."+key] = value;
 				activeFilters["aq."+key] = value;

@@ -9,7 +9,7 @@ import species.SpeciesField
 
 class ActivityFeedService {
 	
-	static final String COMMENT_ADDED = "Added comment"
+	static final String COMMENT_ADDED = "Added a comment"
 	static final String COMMENT_IN_REPLY_TO = "In reply to"
 	
 	

@@ -5,6 +5,7 @@ import java.util.Map;
 import org.apache.solr.common.SolrException;
 import org.apache.solr.common.util.NamedList;
 import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
+import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap;
 
 import species.utils.Utils;
 import utils.Newsletter;
@@ -41,7 +42,7 @@ class NewsletterService {
 
 		String aq = "";
 		int i=0;
-		if(params.aq instanceof List) {
+		if(params.aq instanceof GrailsParameterMap) {
 			params.aq.each { key, value ->
 				queryParams["aq."+key] = value;
 				activeFilters["aq."+key] = value;
