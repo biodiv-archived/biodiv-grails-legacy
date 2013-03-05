@@ -41,7 +41,7 @@ class ObvUtilService {
 	static final String TAGS   = "tags"
 	static final String AUTHOR_EMAIL   = "user email"
 	static final String AUTHOR_URL   = "user"
-	
+	static final String AUTHOR_NAME   = "user name"
 	//task related
 	static final String  SUCCESS = "Success";
 	static final String  FAILED = "Failed";
@@ -57,7 +57,6 @@ class ObvUtilService {
 	def grailsApplication
 	def activityFeedService
 	def observationsSearchService
-	
 	
 	
 	
@@ -82,9 +81,7 @@ class ObvUtilService {
 	
 	private getObservationList(params, dl){
 		String action = new URL(dl.filterUrl).getPath().split("/")[2]
-		if("list".equalsIgnoreCase(action)){
-			return observationService.getFilteredObservations(params, MAX_EXPORT_SIZE, 0, false).observationInstanceList
-		}else{
+		if("search".equalsIgnoreCase(action)){
 			//getting result from solr
 			def idList = observationService.getFilteredObservationsFromSearch(params, MAX_EXPORT_SIZE, 0, false).totalObservationIdList
 			def res = []
@@ -92,6 +89,17 @@ class ObvUtilService {
 				res.add(Observation.read(obvId))
 			}
 			return res
+		}else if(params.webaddress){
+			def userGroupInstance =	userGroupService.get(params.webaddress)
+			if (!userGroupInstance){
+				log.error "user group not found for id  $params.id  and webaddress $params.webaddress"
+				return []
+			}
+			return userGroupService.getUserGroupObservations(userGroupInstance, params, MAX_EXPORT_SIZE, 0).observationInstanceList;
+		}
+		else{
+			return observationService.getFilteredObservations(params, MAX_EXPORT_SIZE, 0, false).observationInstanceList
+			
 		}
 	}
 	

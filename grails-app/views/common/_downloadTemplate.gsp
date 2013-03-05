@@ -60,8 +60,8 @@ $(document).ready(function(){
 	$('#download-form').bind('submit', function(event) {
 			var filterUrl = window.location.href
 			var queryString =  window.location.search
-     		$(this).ajaxSubmit({ 
-	         	url:"${uGroup.createLink(controller:'observation', action:'requestExport')}" + queryString,
+			$(this).ajaxSubmit({ 
+	         	url:"${uGroup.createLink(controller:'observation', action:'requestExport', userGroupWebaddress:params.webaddress)}" + queryString,
 				dataType: 'json', 
 				type: 'POST',
 				beforeSubmit: function(formData, jqForm, options) {
