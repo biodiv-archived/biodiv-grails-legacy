@@ -173,13 +173,13 @@ class ChartService {
 			order 'total', 'desc'
 		}
 		
-//		
-//		def finalResult = []
-//		result.each { r ->
-//			finalResult.add([activityFeedService.getUserHyperLink(r[0], userGroupInstance), r[1]])
-//		}
 		
-		return [data : result, columns : [
+		def finalResult = []
+		result.each { r ->
+			finalResult.add([activityFeedService.getUserHyperLink(r[0], userGroupInstance), r[1]])
+		}
+		
+		return [data : result, htmlData:finalResult, columns : [
 				['string', 'User'],
 				['number', 'Observations']
 			]]
