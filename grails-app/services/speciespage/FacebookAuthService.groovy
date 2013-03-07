@@ -159,6 +159,11 @@ class FacebookAuthService {
 		if(!appUser['timezone'] && fbProfile.timezone) {
 			appUser['timezone'] = fbProfile.timezone;
 		}
+		
+		appUser[securityConf.userLookup.enabledPropertyName] = true
+		appUser[securityConf.userLookup.accountExpiredPropertyName] = false
+		appUser[securityConf.userLookup.accountLockedPropertyName] = false
+		appUser[securityConf.userLookup.passwordExpiredPropertyName] = false
 	}
 	
 }

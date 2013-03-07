@@ -58,6 +58,7 @@
 				</g:each>
 				</ul>
 			</g:if>
+			<div class="editField" data-type="wysihtml5" data-pk="${speciesFieldInstance.id}"  data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="description" data-original-title="Edit description">
 			<g:each in="${speciesFieldInstance?.description.split('\n')}"
 				var="para">
 				<g:if test="${para}">
@@ -67,7 +68,7 @@
 				</g:if>
 
 			</g:each>
-
+			</div>
 		</div>
 	</g:if>
 	<!-- description -->

@@ -9,6 +9,7 @@
 <%@ page import="species.Language"%>
 <%@page import="species.utils.Utils"%>
 <%@page import="species.participation.ActivityFeedService"%>
+<%@page import="org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils"%>
 
 <html>
 <head>
@@ -69,6 +70,7 @@ function getOccurrenceCount(data) {
 	occurrenceCount = data.count;
 }
 
+window.is_species_admin = ${SpringSecurityUtils.ifAllGranted('ROLE_SPECIES_ADMIN')} 
 </g:javascript>
 
 <script type="text/javascript"

@@ -414,7 +414,7 @@ class XMLConverter extends SourceConverter {
 	 * @param createNew
 	 * @return
 	 */
-	private Contributor getContributorByName(String contributorName, boolean createNew) {
+	public Contributor getContributorByName(String contributorName, boolean createNew) {
 		if(!contributorName) return;
 
 		def contributor = Contributor.findByName(contributorName);
@@ -466,6 +466,9 @@ class XMLConverter extends SourceConverter {
 			type = licenseType
 		} else {
 			licenseType = licenseType?.toString().trim();
+			if(!licenseType.startsWith("CC")) {
+				licenseType = "CC "+licenseType.trim()
+			}
 			for(LicenseType t : LicenseType) {
 				if(t.value().equalsIgnoreCase(licenseType)) {
 					type = t;

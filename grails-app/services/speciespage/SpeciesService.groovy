@@ -13,6 +13,7 @@ import org.hibernate.exception.ConstraintViolationException;
 
 import species.Classification
 import species.CommonNames;
+import species.Contributor;
 import species.Country
 import species.Field
 import species.Habitat;
@@ -48,7 +49,7 @@ class SpeciesService {
 	def speciesSearchService;
 	def namesIndexerService;
 	def observationService;
-	
+
 	static int BATCH_SIZE = 10;
 	int noOfFields = Field.count();
 
@@ -65,29 +66,29 @@ class SpeciesService {
 		grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/images";
 		noOfInsertions += uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/Trees_descriptives_prabha_final_6.xlsx", grailsApplication.config.speciesPortal.data.rootDir+"/mappings/ifp_tree_mapping_v2.xlsx", 0, 0, 0, 2);
 
-//		//grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/images";
-//		noOfInsertions += uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/Bats/WG_bats_account_01Nov11_sanjayMolur.xls", grailsApplication.config.speciesPortal.data.rootDir+"/mappings/WG_bats_account_01Nov11_sanjayMolurspecies_mapping_v2.xlsx", 0, 0, 0, 0);
-//
-//		grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/speciespages";
-//		noOfInsertions += uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/speciespages/species accounts188_v2.xlsx", grailsApplication.config.speciesPortal.data.rootDir+"/mappings/speciesaccount188_mapping_v1.xlsx", 0, 0, 0, 0);
+		//		//grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/images";
+		//		noOfInsertions += uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/Bats/WG_bats_account_01Nov11_sanjayMolur.xls", grailsApplication.config.speciesPortal.data.rootDir+"/mappings/WG_bats_account_01Nov11_sanjayMolurspecies_mapping_v2.xlsx", 0, 0, 0, 0);
+		//
+		//		grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/speciespages";
+		//		noOfInsertions += uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/speciespages/species accounts188_v2.xlsx", grailsApplication.config.speciesPortal.data.rootDir+"/mappings/speciesaccount188_mapping_v1.xlsx", 0, 0, 0, 0);
 
-//		grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/keystone";
-//		String mappingFile = grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/keystone/keystone_mapping_v1.xlsx";
-//		noOfInsertions += uploadKeyStoneData("jdbc:mysql://localhost:3306/ezpz", "sravanthi", "sra123", mappingFile, 0, 0);
+		//		grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/keystone";
+		//		String mappingFile = grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/keystone/keystone_mapping_v1.xlsx";
+		//		noOfInsertions += uploadKeyStoneData("jdbc:mysql://localhost:3306/ezpz", "sravanthi", "sra123", mappingFile, 0, 0);
 
-//		grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/speciespageszip/mango/mango";
-//		noOfInsertions += uploadSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/speciespageszip/mango/mango/MangoMangifera_indica_prabha_v4 (copy).xlsx", 0, 0, 1, 4);
-//
-//		grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/speciespageszip/grey_falcolin";
-//		noOfInsertions += uploadSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/speciespageszip/grey_falcolin/GreyFrancolin_v4.xlsx", 0, 0, 1, 4);
-//
-//		grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/Rufous Woodpecker/images";
-//		noOfInsertions += uploadNewSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/Rufous Woodpecker/RufousWoodepecker_v4_1.xlsm");
-//
-//		grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/Eurasian Curlew/png ec";
-//		noOfInsertions += uploadNewSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/Eurasian Curlew/EurasianCurlew_v4_2.xlsm");
-//		noOfInsertions += uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/zoooutreach/uploadready/primates.xlsx", grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/zoooutreach/uploadready/primates_mappingfile.xls", 0, 0, 0, 0);
-		
+		//		grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/speciespageszip/mango/mango";
+		//		noOfInsertions += uploadSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/speciespageszip/mango/mango/MangoMangifera_indica_prabha_v4 (copy).xlsx", 0, 0, 1, 4);
+		//
+		//		grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/speciespageszip/grey_falcolin";
+		//		noOfInsertions += uploadSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/speciespageszip/grey_falcolin/GreyFrancolin_v4.xlsx", 0, 0, 1, 4);
+		//
+		//		grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/Rufous Woodpecker/images";
+		//		noOfInsertions += uploadNewSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/Rufous Woodpecker/RufousWoodepecker_v4_1.xlsm");
+		//
+		//		grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/Eurasian Curlew/png ec";
+		//		noOfInsertions += uploadNewSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/Eurasian Curlew/EurasianCurlew_v4_2.xlsm");
+		//		noOfInsertions += uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/zoooutreach/uploadready/primates.xlsx", grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/zoooutreach/uploadready/primates_mappingfile.xls", 0, 0, 0, 0);
+
 		return noOfInsertions;
 	}
 
@@ -144,7 +145,7 @@ class SpeciesService {
 		List<Species> species = NewSimpleSpreadsheetConverter.getInstance().convertSpecies(file);
 		return saveSpecies(species);
 	}
-	
+
 	/**
 	 * 
 	 * @param connectionUrl
@@ -202,7 +203,7 @@ class SpeciesService {
 		}
 
 		cleanUpGorm();
-		
+
 		return noOfInsertions;
 	}
 
@@ -221,9 +222,9 @@ class SpeciesService {
 				} catch(e) {
 					e.printStackTrace()
 				}
-				
+
 				s.percentOfInfo = calculatePercentOfInfo(s);
-				
+
 				if(!s.save()) {
 					s.errors.allErrors.each { log.error it }
 				} else {
@@ -294,36 +295,33 @@ class SpeciesService {
 
 	/**
 	 * EOL automatically calculates some statistics about its pages. These statistics recalculate every day or two.
-		
-		Richness Score
-		Richness Score is a composite of many different factors:
-		
-		how much text a page has
-		how many multimedia or map files are available
-		how many different topics are covered
-		how many different sources contribute information
-		whether information has been reviewed or not
-
+	 Richness Score
+	 Richness Score is a composite of many different factors:
+	 how much text a page has
+	 how many multimedia or map files are available
+	 how many different topics are covered
+	 how many different sources contribute information
+	 whether information has been reviewed or not
 	 */
 	protected float calculatePercentOfInfo(Species s) {
-//		int synonyms = Synonyms.countByTaxonConcept(s.taxonConcept);
-//		int commonNames = CommonNames.countByTaxonConcept(s.taxonConcept);
-//		def authClassification = Classification.findByName(grailsApplication.config.speciesPortal.fields.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY)
-//		int taxaHierarchies = TaxonomyRegistry.countByTaxonDefinitionAndClassification(s.taxonConcept, authClassification);
+		//		int synonyms = Synonyms.countByTaxonConcept(s.taxonConcept);
+		//		int commonNames = CommonNames.countByTaxonConcept(s.taxonConcept);
+		//		def authClassification = Classification.findByName(grailsApplication.config.speciesPortal.fields.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY)
+		//		int taxaHierarchies = TaxonomyRegistry.countByTaxonDefinitionAndClassification(s.taxonConcept, authClassification);
 		//TODO: int occRecords =
-		//TODO: observations =  
+		//TODO: observations =
 		int textSize = 0;
 		s.fields.each { field ->
 			textSize += field.description?.length();
 		}
 		int noOfMultimedia = s.resources?.size()?:0;
-		//int diffSources = 
-		//TODO: int reviewedFields = 
+		//int diffSources =
+		//TODO: int reviewedFields =
 		int richness = s.fields?.size()?:0 + s.globalDistributionEntities?.size()?:0 + s.globalEndemicityEntities?.size()?:0 + s.indianDistributionEntities?.size()?:0 + s.indianEndemicityEntities?.size()?:0;
 		richness += noOfMultimedia;
 		//richness += textSize;
 		return richness;
-		
+
 	}
 
 	/**
@@ -343,16 +341,16 @@ class SpeciesService {
 			hibSession.clear()
 		}
 	}
-	
+
 	def nameTerms(params) {
 		List result = new ArrayList();
-		
-	   def queryResponse = speciesSearchService.terms(params.term, params.field, params.max);
-	   NamedList tags = (NamedList) ((NamedList)queryResponse.getResponse().terms)[params.field];
-	   for (Iterator iterator = tags.iterator(); iterator.hasNext();) {
-		   Map.Entry tag = (Map.Entry) iterator.next();
-		   result.add([value:tag.getKey().toString(), label:tag.getKey().toString(),  "category":"Species Pages"]);
-	   }
+
+		def queryResponse = speciesSearchService.terms(params.term, params.field, params.max);
+		NamedList tags = (NamedList) ((NamedList)queryResponse.getResponse().terms)[params.field];
+		for (Iterator iterator = tags.iterator(); iterator.hasNext();) {
+			Map.Entry tag = (Map.Entry) iterator.next();
+			result.add([value:tag.getKey().toString(), label:tag.getKey().toString(),  "category":"Species Pages"]);
+		}
 		return result;
 	}
 
@@ -390,7 +388,7 @@ class SpeciesService {
 		}
 
 		def offset = params.offset ? params.long('offset') : 0
- 
+
 		paramsList.add('q', Utils.cleanSearchQuery(params.query));
 		paramsList.add('start', offset);
 		def max = Math.min(params.max ? params.int('max') : 12, 100)
@@ -405,7 +403,7 @@ class SpeciesService {
 		}
 		queryParams["max"] = max
 		queryParams["offset"] = offset
-		
+
 		paramsList.add('fl', params['fl']?:"id");
 
 		if(params.sGroup) {
@@ -419,29 +417,29 @@ class SpeciesService {
 				activeFilters["sGroup"] = groupId
 			}
 		}
-		
-//		if(params.habitat && (params.habitat != Habitat.findByName(grailsApplication.config.speciesPortal.group.ALL).id)){
-//			paramsList.add('fq', searchFieldsConfig.HABITAT+":"+params.habitat);
-//			queryParams["habitat"] = params.habitat
-//			activeFilters["habitat"] = params.habitat
-//		}
-//		if(params.tag) {
-//			paramsList.add('fq', searchFieldsConfig.TAG+":"+params.tag);
-//			queryParams["tag"] = params.tag
-//			queryParams["tagType"] = 'species'
-//			activeFilters["tag"] = params.tag
-//		}
-//		if(params.user){
-//			paramsList.add('fq', searchFieldsConfig.USER+":"+params.user);
-//			queryParams["user"] = params.user.toLong()
-//			activeFilters["user"] = params.user.toLong()
-//		}
+
+		//		if(params.habitat && (params.habitat != Habitat.findByName(grailsApplication.config.speciesPortal.group.ALL).id)){
+		//			paramsList.add('fq', searchFieldsConfig.HABITAT+":"+params.habitat);
+		//			queryParams["habitat"] = params.habitat
+		//			activeFilters["habitat"] = params.habitat
+		//		}
+		//		if(params.tag) {
+		//			paramsList.add('fq', searchFieldsConfig.TAG+":"+params.tag);
+		//			queryParams["tag"] = params.tag
+		//			queryParams["tagType"] = 'species'
+		//			activeFilters["tag"] = params.tag
+		//		}
+		//		if(params.user){
+		//			paramsList.add('fq', searchFieldsConfig.USER+":"+params.user);
+		//			queryParams["user"] = params.user.toLong()
+		//			activeFilters["user"] = params.user.toLong()
+		//		}
 		if(params.name) {
 			paramsList.add('fq', searchFieldsConfig.NAME+":"+params.name);
 			queryParams["name"] = params.name
 			activeFilters["name"] = params.name
 		}
-		
+
 		if(params.uGroup) {
 			if(params.uGroup == "THIS_GROUP") {
 				String uGroup = params.webaddress
@@ -485,23 +483,82 @@ class SpeciesService {
 		result = [queryParams:queryParams, activeFilters:activeFilters, instanceTotal:0, speciesInstanceList:[]];
 		return result;
 	}
-	
+
 	private boolean isValidSortParam(String sortParam) {
 		if(sortParam.equalsIgnoreCase("score") || sortParam.equalsIgnoreCase('lastrevised'))
 			return true;
 		return false;
 	}
 	/**
-	* export species data
-	*/
-   def exportSpeciesData(String directory) {
-		   DwCAExporter.getInstance().exportSpeciesData(directory)
-   }
-	
-   /**
-   * export species data
-   */
-  def exportSpeciesData(String directory, List<Species> species) {
-		  DwCAExporter.getInstance().exportSpeciesData(directory, species)
-  }
+	 * export species data
+	 */
+	def exportSpeciesData(String directory) {
+		DwCAExporter.getInstance().exportSpeciesData(directory)
+	}
+
+	/**
+	 * export species data
+	 */
+	def exportSpeciesData(String directory, List<Species> species) {
+		DwCAExporter.getInstance().exportSpeciesData(directory, species)
+	}
+
+	def updateContributor(long contributorId, long speciesFieldId, def value, String type) {
+		if(!value) {
+			return [success:false, msg:"Field content cannot be empty"]
+		}
+
+		Contributor oldContrib = Contributor.read(contributorId);
+		if(!oldContrib) {
+			return [success:false, msg:"${type.capitalize()} with id ${contributorId} is not found"]
+		} else if(oldContrib.name == value) {
+			return [success:true, msg:"Nothing to change"]
+		}
+
+		SpeciesField speciesField = SpeciesField.get(speciesFieldId);
+		if(!speciesField) {
+			return [success:false, msg:"SpeciesFeild with id ${speciesFieldId} is not found"]
+		}
+		
+		SpeciesField.withTransaction { status ->
+			Contributor c = (new XMLConverter()).getContributorByName(value, true);
+			if(!c) {
+				return [success:false, msg:"Error while updating ${type}"]
+			} else {
+				if(type == 'contributor') {
+					speciesField.removeFromContributors(oldContrib);
+					speciesField.addToContributors(c);
+				} else if (type == 'attributor') {
+					speciesField.removeFromAttributors(oldContrib);
+					speciesField.addToAttributors(c);
+				}
+				if(!speciesField.save()) {
+					speciesField.errors.each { log.error it }
+					return [success:false, msg:"Error while updating ${type}"]
+				}
+				return [success:true, msg:""]
+			}
+		}
+	}
+
+	def updateDescription(long id, def value) {
+		if(!value) {
+			return [success:false, msg:"Field content cannot be empty"]
+		}
+		
+		SpeciesField c = SpeciesField.get(id)
+		if(!c) {
+			return [success:false, msg:"SpeciesField with id ${id} is not found"]
+		} else {
+			SpeciesField.withTransaction {
+				c.description = value.trim()
+				if (!c.save()) {
+					c.errors.each { log.error it }
+					return [success:false, msg:"Error while updating species field name"]
+				}
+			}
+			return [success:true, msg:""]
+		}
+	}
+
 }

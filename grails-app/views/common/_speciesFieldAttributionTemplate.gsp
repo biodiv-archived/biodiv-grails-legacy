@@ -12,7 +12,8 @@
 									<ul style="list-style:none;margin-left:0px;">
 										<g:each in="${speciesFieldInstance.attributors}" var="r">
 											<li>
-												${r.name}
+												<a href="#" class="editField" data-type="text" data-pk="${speciesFieldInstance.id}" data-params="{cid:${r.id}}" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="attributor" data-original-title="Edit attributor name">${r.name}
+												</a>
 											</li>
 										</g:each>
 									</ul>
@@ -26,7 +27,9 @@
 								<div class="span8 value">
 								<ul style="list-style:none;margin-left:0px;"><g:each
 										in="${ speciesFieldInstance?.contributors}" var="contributor">
-										<li>${contributor.name}</li> 
+										<li>
+										<a href="#" class="editField" data-type="text" data-pk="${speciesFieldInstance.id}" data-params="{cid:${contributor.id}}"  data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="contributor" data-original-title="Edit contributor name">${contributor.name}</a>
+										</li> 
 									</g:each>
 								</ul>
 								</div>

@@ -39,7 +39,6 @@ class CommentService {
 			def domainObject = activityFeedService.getDomainObject(c.rootHolderType, c.rootHolderId)
 			def feedInstance = activityFeedService.addActivityFeed(activityFeedService.getDomainObject(c.rootHolderType, c.rootHolderId), c, c.author, activityFeedService.COMMENT_ADDED)
 			def webUtils = WebUtils.retrieveGrailsWebRequest()
-			println webUtils.getCurrentRequest()
 			observationService.sendNotificationMail(activityFeedService.COMMENT_ADDED, domainObject, webUtils.getCurrentRequest(), params.webaddress, feedInstance);
 			return c
 		}

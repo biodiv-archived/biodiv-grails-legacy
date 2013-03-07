@@ -25,7 +25,8 @@
 						src="${createLinkTo(dir:'images/license', file: license?.name.value().toLowerCase().replaceAll('\\s+','')+'.png', absolute:true)}"
 						alt="${license?.name.value()}" /> </a>
 				</g:each>
-			</g:if>
+			</g:if>			
+
 			<button type="button" class="btn btn-link pull-right"
 				data-toggle="collapse-next" data-target=".helpContent"
 				title="About field" style="padding: 2px 2px;">
