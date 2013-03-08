@@ -1,4 +1,3 @@
-<%@ page import="species.participation.DownloadLog.DownloadType"%>
 <div id="download-box" class="btn-group pull-left"  style="z-index: 10; float: left; margin-left: 5px;${instanceTotal == 0 ? 'display:none;' :'' }">
 		<a id="download-action" class="btn dropdown-toggle" data-toggle="dropdown"
 			href="#"> <i class=" icon-download-alt"></i>
@@ -8,7 +7,7 @@
 		<div id="download-options" class="popup-form" style="display: none">
 			<form id="download-form">
 				<div><span class="label label-info" style="padding:5px;margin-bottom: 10px;">The download link will be available on your user profile page</span></div>
-				<g:each in="${DownloadType.list()}" var="downloadType" status="i">
+				<g:each in="${downloadTypes}" var="downloadType" status="i">
 					<g:if test="${i > 0}">
 						<input type="radio" style="margin-top: 0px;" name="downloadType" value="${downloadType}">
 						${'Export as ' + downloadType.value()}</input>
@@ -66,6 +65,8 @@ $(document).ready(function(){
 				type: 'POST',
 				beforeSubmit: function(formData, jqForm, options) {
 					formData.push({ "name": "filterUrl", "value": filterUrl});
+					formData.push({ "name": "source", "value": "${source}"});
+					formData.push({ "name": "downloadObjectId", "value": "${downloadObjectId}"});
 				}, 
 	            success: function(data, statusText, xhr, form) {
 	            	$(".alertMsg").removeClass('alert alert-error').addClass('alert alert-success').html(data.msg);

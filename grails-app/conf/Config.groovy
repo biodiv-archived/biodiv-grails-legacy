@@ -249,6 +249,7 @@ speciesPortal {
 	checklist{
 		rootDir = "${app.rootDir}/checklist"
 		serverURL = "http://localhost/${appName}/checklist"
+		checklistDownloadDir = "${download.rootDir}/checklist"
 	}
 
 	
