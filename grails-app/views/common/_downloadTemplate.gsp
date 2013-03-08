@@ -1,5 +1,5 @@
 <%@ page import="species.participation.DownloadLog.DownloadType"%>
-<div id="download-box" class="btn-group pull-left"  style="z-index: 10; float: left; margin-left: 5px;">
+<div id="download-box" class="btn-group pull-left"  style="z-index: 10; float: left; margin-left: 5px;${instanceTotal == 0 ? 'display:none;' :'' }">
 		<a id="download-action" class="btn dropdown-toggle" data-toggle="dropdown"
 			href="#"> <i class=" icon-download-alt"></i>
 			Download
@@ -81,5 +81,6 @@ $(document).ready(function(){
 	     	});
 	     	event.preventDefault();
      	});
+
 });     	
 </r:script>
