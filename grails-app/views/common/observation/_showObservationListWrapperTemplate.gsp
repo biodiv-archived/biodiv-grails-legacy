@@ -2,8 +2,7 @@
 <%@ page import="species.participation.Observation"%>
 <%@ page import="species.groups.SpeciesGroup"%>
 <%@ page import="species.Habitat"%>
-
-
+<%@ page import="species.participation.DownloadLog.DownloadType"%>
 
 <div class="">
 	<!-- main_content -->
@@ -72,7 +71,7 @@
 					model="['source':'observationList', 'requestObject':request, autofillUsersId:'shareUsers']" />
 				
 				<obv:download
-					model="['source':'observationList', 'requestObject':request]" />
+					model="['source':'Observations', 'requestObject':request, 'downloadTypes':DownloadType.list() ]" />
 					
 				<div id="observations_list_map" class="observation"
 					style="clear: both; display: none;">

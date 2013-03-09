@@ -9,6 +9,7 @@
 					<sUser:ifOwns model="['user':user]">
 						<th>File</th>
 					</sUser:ifOwns>
+					<th>Category</th>
 					<th>Notes</th>
 				</tr>
 			</thead>
@@ -22,6 +23,7 @@
 						<sUser:ifOwns model="['user':user]">
 							<td><a class="btn btn-mini" href="${uGroup.createLink(action:'downloadFile', controller:'observation', id:downloadLog.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">Download</a></td>
 						</sUser:ifOwns>
+						<td>${downloadLog.sourceType}</td>
 						<td>${downloadLog.notes}</td>
 					</tr>
 				</g:each>

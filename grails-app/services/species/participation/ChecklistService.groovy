@@ -1,5 +1,6 @@
 package species.participation
 
+import java.io.File;
 import java.text.SimpleDateFormat
 import java.util.Iterator;
 import java.util.List;
@@ -26,6 +27,7 @@ import species.utils.Utils;
 import species.formatReader.SpreadsheetReader;
 
 import au.com.bytecode.opencsv.CSVReader
+import au.com.bytecode.opencsv.CSVWriter;
 
 class ChecklistService {
 	static transactional = false
@@ -36,6 +38,8 @@ class ChecklistService {
 	def curationService
 	def recommendationService
 	def checklistSearchService;
+	def obvUtilService;
+	
 	static final String SN_NAME = "scientific_name"
 	static final String CN_NAME = "common_name"
 
@@ -789,6 +793,101 @@ class ChecklistService {
 			return true
 		else
 			return false;
+	}
+	
+	
+	////////////////////////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////  Export ////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	def export(params, DownloadLog dlog){
+		log.debug(params)
+		return exportAsCSV(Checklist.read(params.downloadObjectId.toLong()))
+	}
+	
+	private File exportAsCSV(Checklist cl){
+		if(!cl){
+			return null
+		}
+		
+		File downloadDir = new File(grailsApplication.config.speciesPortal.checklist.checklistDownloadDir)
+		if(!downloadDir.exists()){
+			downloadDir.mkdirs()
+		}
+		
+		File csvFile = new File(downloadDir, "checklist_" + new Date().getTime() + ".csv")
+		CSVWriter writer = obvUtilService.getCSVWriter(csvFile.getParent(), csvFile.getName())
+		log.debug "Writing " + cl
+		
+		writeChecklistMetaData(cl, writer)
+		writeChecklistData(cl, writer)
+		
+		writer.flush()
+		writer.close()
+		
+		return csvFile
+	}
+	
+	private writeChecklistMetaData(Checklist cl, CSVWriter writer){
+		String keyPrefix = "## "
+		String sep = ":"
+		
+		writer.writeNext([keyPrefix + "title" + sep,  cl.title].toArray(new String[0]))
+		writer.writeNext([keyPrefix + "license" + sep,  "" + cl.license.name].toArray(new String[0]))
+		writer.writeNext([keyPrefix + "attribution" + sep,  "" + cl.attribution].toArray(new String[0]))
+		
+		writer.writeNext([keyPrefix + "speciesCount" + sep, "" + cl.speciesCount].toArray(new String[0]))
+		writer.writeNext([keyPrefix + "description" + sep,  cl.description].toArray(new String[0]))
+		writer.writeNext([keyPrefix + "refText" + sep,  cl.refText].toArray(new String[0]))
+		writer.writeNext([keyPrefix + "sourceText" + sep,  cl.sourceText].toArray(new String[0]))
+		writer.writeNext([keyPrefix + "reservesValue" + sep,  "" + cl.reservesValue].toArray(new String[0]))
+		
+		writer.writeNext([keyPrefix + "latitude" + sep, "" + cl.latitude].toArray(new String[0]))
+		writer.writeNext([keyPrefix + "longitude" + sep, "" + cl.longitude].toArray(new String[0]))
+		writer.writeNext([keyPrefix + "placeName" + sep, cl.placeName].toArray(new String[0]))
+		writer.writeNext([keyPrefix + "state" + sep,  cl.state.join(", ")].toArray(new String[0]))
+		writer.writeNext([keyPrefix + "district" + sep,  cl.district.join(", ")].toArray(new String[0]))
+		writer.writeNext([keyPrefix + "taluka" + sep,  cl.taluka.join(", ")].toArray(new String[0]))
+		
+		
+		writer.writeNext([keyPrefix + "fromDate" + sep,  "" + cl.fromDate].toArray(new String[0]))
+		writer.writeNext([keyPrefix + "toDate" + sep,  "" + cl.toDate].toArray(new String[0]))
+		writer.writeNext([keyPrefix + "publicationDate" + sep,  "" + cl.publicationDate].toArray(new String[0]))
+		
+		
+		def ug = []
+		cl.userGroups.collect{ ug.add(it.name)}
+		
+		def sg = []
+		cl.speciesGroups.collect{ sg.add(it.name)}
+		
+		writer.writeNext([keyPrefix + "userGroups" + sep,  ug.join(", ")].toArray(new String[0]))
+		writer.writeNext([keyPrefix + "speciesGroups" + sep,  sg.join(", ")].toArray(new String[0]))
+		
+		writer.writeNext([keyPrefix + obvUtilService.AUTHOR_URL + sep, obvUtilService.createHardLink('user', 'show', cl.author.id)].toArray(new String[0]))
+		writer.writeNext([keyPrefix + obvUtilService.AUTHOR_NAME + sep, cl.author.name].toArray(new String[0]))
+	}
+	
+	private writeChecklistData(Checklist cl, CSVWriter writer){
+		writer.writeNext("## Checklist Data:")
+		def colNameArray = cl.fetchColumnNames()
+		writer.writeNext(colNameArray)
+		
+		int prevRowId = -1
+		def valueList = []
+		cl.row.each { ChecklistRowData r ->
+			if(prevRowId == -1){
+				prevRowId = r.rowId
+			}
+			
+			if(prevRowId != r.rowId){
+				writer.writeNext(valueList.toArray(new String[0]))
+				valueList.clear()
+				prevRowId = r.rowId
+			}
+			valueList.add(r.value)
+		}
+		writer.writeNext(valueList.toArray(new String[0]))
 	}
 }
 /*
