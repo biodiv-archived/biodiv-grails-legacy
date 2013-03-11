@@ -14,7 +14,9 @@ class MappedSpreadsheetConverter extends SourceConverter {
 
 	protected static SourceConverter _instance;
 	private static final log = LogFactory.getLog(this);
-
+	def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+	def fieldsConfig = config.speciesPortal.fields
+	
 	private MappedSpreadsheetConverter() {
 	}
 
@@ -58,6 +60,9 @@ class MappedSpreadsheetConverter extends SourceConverter {
 					} else if (customFormat && category.text().equalsIgnoreCase("video")) {
 						//						Node images = getVideo(fieldName, customFormat, speciesContent);
 						//						new Node(speciesElement, video);
+					} else if (category.text().equalsIgnoreCase((String)fieldsConfig.INFORMATION_LISTING) && field.category.text().equalsIgnoreCase((String)fieldsConfig.REFERENCES)) {
+						Node data = new Node(field, "data", '');
+						createReferences(data, speciesContent, mappedField);
 					} else if(customFormat) {
 						String text = getCustomFormattedText(mappedField.get("field name(s)"), customFormat, speciesContent);
 						createDataNode(field, text, speciesContent, mappedField);
@@ -98,7 +103,7 @@ class MappedSpreadsheetConverter extends SourceConverter {
 			Species s = converter.convertSpecies(speciesElement)
 			if(s)
 				species.add(s);
-			//if(i==0)break;
+			if(i==2)break;
 			i++
 		}
 		return species;
@@ -254,12 +259,16 @@ class MappedSpreadsheetConverter extends SourceConverter {
 		} else {
 			List<String> groupValues = new ArrayList<String>();
 			fieldName.split(",").eachWithIndex { t, index ->
-				String txt = speciesContent.get(t);
+				try{
+				String txt = speciesContent.get(t.trim());
 				if (index != 0 && index % group == 0) {
 					populateImageNode(images, groupValues, delimiter, location, source, caption, attribution, license, name, incremental);
 					groupValues = new ArrayList<String>();
 				}
 				groupValues.add(txt);
+				}catch(e) {
+					e.printStackTrace()
+				}
 			}
 			populateImageNode(images, groupValues, delimiter, location, source, caption, attribution, license, name, incremental);
 		}
@@ -287,7 +296,6 @@ class MappedSpreadsheetConverter extends SourceConverter {
 		String refKey = loc;
 		loc = cleanLoc(loc);
 		File imagesLocation = new File(uploadDir, loc);
-
 		if(imagesLocation.isDirectory()) {
 			imagesLocation.listFiles().eachWithIndex { file, index ->
 				Node image = new Node(images, "image");
@@ -337,6 +345,20 @@ class MappedSpreadsheetConverter extends SourceConverter {
 			new Node(refNode, "url", text);
 		} else {
 			new Node(refNode, "title", text);
+		}
+	}
+	
+	private void createReferences(Node dataNode, speciesContent, mappedField) {
+		def referenceFields = mappedField.get("field name(s)");		
+		if(referenceFields) {
+			referenceFields.split(",").each { referenceField ->
+				String references = speciesContent.get(referenceField.toLowerCase());
+				String delimiter = mappedField.get("content delimiter") ?: "\n";
+				references?.split(delimiter).each {
+					Node refNode = new Node(dataNode, "reference");
+					getReferenceNode(refNode, it);
+				}
+			}
 		}
 	}
 }
