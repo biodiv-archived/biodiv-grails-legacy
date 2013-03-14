@@ -11,8 +11,8 @@ class DownloadLog {
 	
 	public enum DownloadType {
 		CSV("CSV"),
-		KML("KML")
-		
+		KML("KML"),
+		PDF("PDF")
 		private String value;
 
 		DownloadType(String value) {
@@ -20,7 +20,7 @@ class DownloadLog {
 		}
 		
 		static list() {
-			return [CSV, KML];
+			return [CSV, KML, PDF];
 		}
 		
 		String value() {
@@ -35,6 +35,7 @@ class DownloadLog {
 	String notes;
 	String status;
 	String paramsMapAsText
+	String sourceType
 	
 	static belongsTo = [author:SUser];
 	
@@ -49,13 +50,13 @@ class DownloadLog {
 		paramsMapAsText type:'text';
     }
 	
-	static createLog(SUser author, String filterUrl, String downloadTypeString, String notes, params){
-		return createLog(author, null, filterUrl, downloadTypeString, notes, new Date(),  ObvUtilService.SCHEDULED, params)
+	static createLog(SUser author, String filterUrl, String downloadTypeString, String notes, String sourceType, params){
+		return createLog(author, null, filterUrl, downloadTypeString, notes, sourceType, new Date(),  ObvUtilService.SCHEDULED, params)
 	}
 	
-	static createLog(SUser author, String filePath, String filterUrl, String downloadTypeString, String notes, Date createdOn, String status, params){
+	static createLog(SUser author, String filePath, String filterUrl, String downloadTypeString, String notes,  String sourceType, Date createdOn, String status, params){
 		def paramsMapAsText = getTextFromMap(params)
-		DownloadLog dl = new DownloadLog (author:author, filePath:filePath, filterUrl:filterUrl, type:getType(downloadTypeString), notes:notes, createdOn:createdOn, status:status, paramsMapAsText:paramsMapAsText)
+		DownloadLog dl = new DownloadLog (author:author, filePath:filePath, filterUrl:filterUrl, type:getType(downloadTypeString), notes:notes, createdOn:createdOn, status:status, sourceType:sourceType, paramsMapAsText:paramsMapAsText)
 		if(!dl.save(flush:true)){
 			dl.errors.allErrors.each { println it }
 			return null

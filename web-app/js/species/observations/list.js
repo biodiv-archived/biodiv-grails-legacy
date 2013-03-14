@@ -590,3 +590,8 @@ function updateDownloadBox(instanceTotal){
 	}
 }
 	
+//
+//$(".observations_list .thumbnail").hover(function() {
+//	
+//	$("#postToUGroup").fadeToggle("fast");
+//})

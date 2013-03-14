@@ -1,5 +1,7 @@
 package species.participation
 
+import org.codehaus.groovy.grails.web.util.WebUtils;
+
 class CommentService {
 
 	static transactional = false
@@ -8,7 +10,7 @@ class CommentService {
 	def activityFeedService
 	def observationService
 	
-	def addComment(params, request){
+	def addComment(params){
 		log.debug "Adding comment ${params}"
 		validateParams(params);
 		Comment c = new Comment(author:params.author, body:params.commentBody.trim(), commentHolderId:params.commentHolderId, \
@@ -36,7 +38,8 @@ class CommentService {
 			}
 			def domainObject = activityFeedService.getDomainObject(c.rootHolderType, c.rootHolderId)
 			def feedInstance = activityFeedService.addActivityFeed(activityFeedService.getDomainObject(c.rootHolderType, c.rootHolderId), c, c.author, activityFeedService.COMMENT_ADDED)
-			observationService.sendNotificationMail(activityFeedService.COMMENT_ADDED, domainObject, request, params.webaddress, feedInstance);
+			def webUtils = WebUtils.retrieveGrailsWebRequest()
+			observationService.sendNotificationMail(activityFeedService.COMMENT_ADDED, domainObject, webUtils.getCurrentRequest(), params.webaddress, feedInstance);
 			return c
 		}
 	}

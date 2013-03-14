@@ -68,7 +68,7 @@ class ObvUtilService {
 	def requestExport(params){
 		log.debug(params)
 		log.debug "creating download request"
-		DownloadLog.createLog(springSecurityService.currentUser, params.filterUrl, params.downloadType, params.notes, params)
+		DownloadLog.createLog(springSecurityService.currentUser, params.filterUrl, params.downloadType, params.notes, params.source, params)
 	}
 	
 	def export(params, dl){
@@ -143,7 +143,7 @@ class ObvUtilService {
 		return csvFile
 	}
 	
-	private CSVWriter getCSVWriter(def directory, def fileName) {
+	def CSVWriter getCSVWriter(def directory, def fileName) {
 		//char separator = '\t'
 		File dir =  new File(directory)
 		if(!dir.exists()){

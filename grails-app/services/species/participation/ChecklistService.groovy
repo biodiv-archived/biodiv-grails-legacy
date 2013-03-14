@@ -1,5 +1,6 @@
 package species.participation
 
+import java.io.File;
 import java.text.SimpleDateFormat
 import java.util.Iterator;
 import java.util.List;
@@ -25,7 +26,28 @@ import species.participation.curation.UnCuratedVotes;
 import species.utils.Utils;
 import species.formatReader.SpreadsheetReader;
 
+//csv related
 import au.com.bytecode.opencsv.CSVReader
+import au.com.bytecode.opencsv.CSVWriter;
+
+//pdf related
+import com.itextpdf.text.Anchor;
+import com.itextpdf.text.BadElementException;
+import com.itextpdf.text.BaseColor;
+import com.itextpdf.text.Chapter;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Element;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.Image
+import com.itextpdf.text.List;
+import com.itextpdf.text.ListItem;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Phrase;
+import com.itextpdf.text.Section;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
 
 class ChecklistService {
 	static transactional = false
@@ -36,6 +58,8 @@ class ChecklistService {
 	def curationService
 	def recommendationService
 	def checklistSearchService;
+	def obvUtilService;
+	
 	static final String SN_NAME = "scientific_name"
 	static final String CN_NAME = "common_name"
 
@@ -789,6 +813,97 @@ class ChecklistService {
 			return true
 		else
 			return false;
+	}
+	
+	
+	////////////////////////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////  Export ////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	def export(params, DownloadLog dlog){
+		log.debug(params)
+		def cl = Checklist.read(params.downloadObjectId.toLong())
+		if(!cl){
+			return null
+		}
+		
+		File downloadDir = new File(grailsApplication.config.speciesPortal.checklist.checklistDownloadDir)
+		if(!downloadDir.exists()){
+			downloadDir.mkdirs()
+		}
+		if(dlog.type == DownloadLog.DownloadType.CSV){
+			return exportAsCSV(cl, downloadDir)
+		}else{
+			return exportAsPDF(cl, downloadDir)
+		}
+	}
+	
+	private File exportAsPDF(Checklist cl, downloadDir){
+		log.debug "Writing pdf checklist" + cl
+		File pdfFile = new File(downloadDir, "checklist_" + new Date().getTime() + ".pdf")
+		Document document = new Document()
+		PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(pdfFile))
+		
+		document.open()
+		Map m = cl.fetchExportableValue()
+		
+		
+		//adding site banner
+		Image image2 = Image.getInstance(grailsApplication.config.speciesPortal.app.rootDir + "/sites/all/themes/ibp/images/map-logo.gif");
+		//image2.scaleToFit(120f, 120f);
+		document.add(image2);
+		
+		//writing meta data
+		List list = new List(10);
+		for(item in m[cl.META_DATA]){
+			list.add(new ListItem(item.join("  ")));
+		}
+		document.add(list)
+		
+		//writing data
+		def columnNames = cl.fetchColumnNames()
+		PdfPTable t = new PdfPTable(columnNames.length)
+		t.setSpacingBefore(25);
+		t.setSpacingAfter(25);
+		
+		//writing header
+		for(c in columnNames){
+			t.addCell(new PdfPCell(new Phrase(c)))
+		}
+		//t.setHeaderRows(1)
+		//writing actual data
+		for(item in m[cl.DATA]){
+			for(obj in item){
+				t.addCell(new PdfPCell(new Phrase(obj?:"")))
+			}
+		}
+		document.add(t)
+		
+		document.close()
+		return pdfFile
+	}
+	
+	private File exportAsCSV(Checklist cl, downloadDir){
+		File csvFile = new File(downloadDir, "checklist_" + new Date().getTime() + ".csv")
+		CSVWriter writer = obvUtilService.getCSVWriter(csvFile.getParent(), csvFile.getName())
+		log.debug "Writing csv checklist" + cl
+		
+		Map m = cl.fetchExportableValue()
+		
+		for(item in m[cl.META_DATA]){
+			writer.writeNext(item.toArray(new String[0]))
+		}
+		
+		writer.writeNext("## Checklist Data:")
+		writer.writeNext(cl.fetchColumnNames())
+		for(item in m[cl.DATA]){
+			writer.writeNext(item.toArray(new String[0]))
+		}
+		
+		writer.flush()
+		writer.close()
+		
+		return csvFile
 	}
 }
 /*

@@ -306,6 +306,12 @@ class OpenIdController {
 	private void registerAccountOpenId(String email, String openId) {
 		SUser.withTransaction { status ->
 			def user = SUser.findByEmail(email);
+			def securityConf = SpringSecurityUtils.securityConfig
+			user[securityConf.userLookup.enabledPropertyName] = true
+			user[securityConf.userLookup.accountExpiredPropertyName] = false
+			user[securityConf.userLookup.accountLockedPropertyName] = false
+			user[securityConf.userLookup.passwordExpiredPropertyName] = false
+			
 			user.addToOpenIds(url: openId)
 			if (!user.save(flush:true, failOnError:true)) {
 				status.setRollbackOnly()

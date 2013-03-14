@@ -344,34 +344,34 @@ class SpeciesController {
 		}
 	}
 
-	@Secured(['ROLE_USER'])
+	@Secured(['ROLE_SPECIES_ADMIN'])
 	def update = {
-		def speciesInstance = Species.get(params.id)
-		if (speciesInstance) {
-			if (params.version) {
-				def version = params.version.toLong()
-				if (speciesInstance.version > version) {
-
-					speciesInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [
-						message(code: 'species.label', default: 'Species')]
-					as Object[], "Another user has updated this Species while you were editing")
-					render(view: "edit", model: [speciesInstance: speciesInstance])
-					return
-				}
-			}
-			speciesInstance.properties = params
-			if (!speciesInstance.hasErrors() && speciesInstance.save(flush: true)) {
-				flash.message = "${message(code: 'default.updated.message', args: [message(code: 'species.label', default: 'Species'), speciesInstance.id])}"
-				redirect(action: "show", id: speciesInstance.id)
-			}
-			else {
-				render(view: "edit", model: [speciesInstance: speciesInstance])
-			}
+		log.debug params;
+		if(!params.name || !params.pk) {
+			render ([success:false, msg:'Either field name or field id is missing'] as JSON)
+			return;
+		} 
+		
+		def result;
+		long speciesFieldId = params.pk ? params.long('pk'):null;
+		def value = params.value;
+		
+		switch(params.name) {
+			case "contributor":
+				long cid = params.cid?params.long('cid'):null;
+				result = speciesService.updateContributor(cid, speciesFieldId, value, params.name);
+				break;
+			case "attributor":
+				long cid = params.cid?params.long('cid'):null;
+				result = speciesService.updateContributor(cid, speciesFieldId, value, params.name);
+				break;
+			case "description":
+				result = speciesService.updateDescription(speciesFieldId, value);
+				break;
+			
 		}
-		else {
-			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'species.label', default: 'Species'), params.id])}"
-			redirect(action: "list")
-		}
+		
+		render result as JSON
 	}
 
 	@Secured(['ROLE_ADMIN'])

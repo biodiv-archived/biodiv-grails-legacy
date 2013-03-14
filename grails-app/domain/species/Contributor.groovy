@@ -12,4 +12,5 @@ class Contributor {
 		name type:"text";
 		version false;
 	}
+	
 }

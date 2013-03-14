@@ -39,6 +39,7 @@ modules = {
 		resource url:'/css/speciesGroups.css'
 		resource url:'/css/habitats.css'
 		resource url:'/css/tableSorter.css'
+		resource url:'/css/bootstrap-editable.css'
 
 		resource url:'/bootstrap/js/bootstrap.min.js'
 		resource url:'/js/species/main.js'
@@ -63,6 +64,7 @@ modules = {
 		resource url:'/js/daterangepicker.js'
 		resource url:'/js/stats.js'
 		resource url:'/js/jquery.tablesorter.js'
+		resource url:'/js/bootstrap-editable.min.js'
 	}
 
 	auth {
@@ -149,13 +151,17 @@ modules = {
 
 		resource url:'/css/augmented-maps.css'
 		resource url:[dir:'js/jquery/jquery.jqGrid-4.1.2/css',file:'ui.jqgrid.css']
-
+		resource url:'/css/bootstrap-wysihtml5-0.0.2.css'
+		
 		resource url:'/js/jquery/jquery.jqGrid-4.1.2/js/i18n/grid.locale-en.js'
 		resource url:'/js/jquery/jquery.jqGrid-4.1.2/js/jquery.jqGrid.src.js'
 		resource url:'/js/galleria/1.2.7/plugins/flickr/galleria.flickr.min.js'
 		//resource url:'/js/jquery.collapser/jquery.collapser.min.js'
 		resource url:'/js/jquery/jquery.jqDock-1.8/jquery.jqDock.min.js'
 		resource url:'/js/floating-1.7.js'
+		resource url:'/js/wysihtml5-0.3.0_rc2.min.js'
+		resource url:'/js/bootstrap-wysihtml5-0.0.2.min.js'		
+		resource url:'/js/wysihtml5.js'
 	}
 	
 	species_list {

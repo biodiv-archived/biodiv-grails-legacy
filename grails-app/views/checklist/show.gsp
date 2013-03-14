@@ -1,4 +1,6 @@
 <%@page import="species.utils.Utils"%>
+<%@ page import="species.participation.DownloadLog.DownloadType"%>
+
 <html>
 <head>
 <link rel="canonical" href="${Utils.getIBPServerDomain() + createLink(controller:'checklist', action:'show', id:checklistInstance.id)}" />
@@ -15,7 +17,10 @@
 	
 			<div class="span12">
 				<clist:showSubmenuTemplate model="['entityName':checklistInstance.title, 'subHeading':checklistInstance.attribution]" />
-			
+			<div style="padding-top: 0px; margin-top: -30px; padding-bottom: 40px; padding-left: 0px; margin-left: -5px;">
+			<obv:download
+					model="['source':'Checklist', 'requestObject':request, 'downloadTypes':[DownloadType.CSV, DownloadType.PDF], downloadObjectId:checklistInstance.id ]" />
+			</div>		
 				<div style="clear:both;"></div>
 					<g:if test="${params.pos && lastListParams}">
 						<div class="nav" style="width:100%;">

@@ -3,9 +3,9 @@
 <%@page import="species.utils.Utils"%>
 <%@page
 	import="org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils"%>
-<html lang="en" xmlns:fb="http://ogp.me/ns/fb#"
-	xmlns:og="og: http://ogp.me/ns#">
-<head>
+<html  xmlns="http://www.w3.org/1999/xhtml" xmlns:og="http://ogp.me/ns#" 
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
 <title>
 	${Utils.getDomainName(request)}
 </title>
@@ -54,7 +54,10 @@
 	<div id="loading" class="loading" style="display: none;">
 		<span>Loading ...</span>
 	</div>
-
+	<div id="postToUGroup" class="overlay" style="display: none;">
+        <i class="icon-plus"></i>
+    </div>
+    
 	<div id="species_main_wrapper" style="clear: both;">
 		<domain:showIBPHeader model="['userGroupInstance':userGroupInstance]" />
 

@@ -7,11 +7,15 @@ import species.participation.DownloadLog;
 
 class ExportJob {
 	
+	private final static String OBSERVATION_LIST = "Observations"
+	private final static String CHECKLIST = "Checklist"
+	
 	def obvUtilService
 	def observationService
+	def checklistService
 	
     static triggers = {
-      simple startDelay: 60000l, repeatInterval: 5000l // starts after 5 minutes and execute job once in 5 seconds 
+      simple startDelay: 600l, repeatInterval: 5000l // starts after 5 minutes and execute job once in 5 seconds 
     }
 
     def execute() {
@@ -24,8 +28,19 @@ class ExportJob {
 		scheduledTaskList.each { DownloadLog dl ->
 			try{
 				log.debug "strating task $dl"
+				File f
 				
-				File f = obvUtilService.export(dl.fetchMapFromText(), dl)
+				switch (dl.sourceType) {
+					case OBSERVATION_LIST:
+						f = obvUtilService.export(dl.fetchMapFromText(), dl)
+						break
+					case CHECKLIST:
+						f = checklistService.export(dl.fetchMapFromText(), dl)
+						break
+					default:
+						log.debug "Invalid source Type $dl.sourceType"
+				}
+				
 				if(f){
 					dl.filePath = f.getAbsolutePath()
 					setStatus(dl, ObvUtilService.SUCCESS)

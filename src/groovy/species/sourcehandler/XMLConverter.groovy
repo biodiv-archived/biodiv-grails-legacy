@@ -104,7 +104,7 @@ class XMLConverter extends SourceConverter {
 				List<TaxonomyRegistry> taxonHierarchy = getClassifications(species.children(), speciesName, true);
 
 				//taxonConcept is being taken from only author contributed taxonomy hierarchy
-				TaxonomyDefinition taxonConcept = getTaxonConcept(taxonHierarchy, Classification.findByName(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY));
+				TaxonomyDefinition taxonConcept = getTaxonConcept(taxonHierarchy);
 
 				// if the author contributed taxonomy hierarchy is not specified
 				// then the taxonConept is null and sciName of species is saved as concept and is used to create the page
@@ -146,6 +146,7 @@ class XMLConverter extends SourceConverter {
 					}
 
 					List<Resource> resources = createMedia(species, s.taxonConcept.canonicalForm);
+					log.debug "Resources ${resources}"
 					resources.each { s.addToResources(it); }
 
 					List<Synonyms> synonyms;
@@ -195,6 +196,7 @@ class XMLConverter extends SourceConverter {
 										s.addToIndianEndemicityEntities(it);
 									}
 								}
+								
 							} else if(category && category.toLowerCase().contains(fieldsConfig.TAXONOMIC_HIERARCHY)) {
 								//ignore
 							} else {
@@ -219,6 +221,8 @@ class XMLConverter extends SourceConverter {
 					//					}
 
 					return s;
+				} else {
+					log.error "TaxonConcept is not found"
 				}
 			} else {
 				log.error "IGNORING SPECIES AS SCIENTIFIC NAME COULD NOT BE PARSED : "+speciesName;
@@ -414,7 +418,7 @@ class XMLConverter extends SourceConverter {
 	 * @param createNew
 	 * @return
 	 */
-	private Contributor getContributorByName(String contributorName, boolean createNew) {
+	public Contributor getContributorByName(String contributorName, boolean createNew) {
 		if(!contributorName) return;
 
 		def contributor = Contributor.findByName(contributorName);
@@ -466,6 +470,9 @@ class XMLConverter extends SourceConverter {
 			type = licenseType
 		} else {
 			licenseType = licenseType?.toString().trim();
+			if(!licenseType.startsWith("CC")) {
+				licenseType = "CC "+licenseType.trim()
+			}
 			for(LicenseType t : LicenseType) {
 				if(t.value().equalsIgnoreCase(licenseType)) {
 					type = t;
@@ -535,7 +542,8 @@ class XMLConverter extends SourceConverter {
 			def iconsNode = resourcesXML.icons;
 			def audiosNode = resourcesXML.audios;
 			def videosNode = resourcesXML.videos;
-
+			println '******'
+println imagesNode
 			resources.addAll(createResourceByType(imagesNode[0], ResourceType.IMAGE, relResFolder));
 			//resources.addAll(createResourceByType(iconsNode, ResourceType.ICON));
 			//resources.addAll(createResourceByType(audiosNode, ResourceType.AUDIO));
@@ -1077,6 +1085,8 @@ class XMLConverter extends SourceConverter {
 				} else {
 					log.warn "NOT A SUPPORTED COUNTRY: "+c?.country?.name?.text();
 				}
+			} else {
+				log.error " NO COUNTRY IS SPECIFIED in $c"
 			}
 		}
 		return geographicEntities;
@@ -1122,7 +1132,7 @@ class XMLConverter extends SourceConverter {
 	 */
 	private List<TaxonomyRegistry> getTaxonHierarchy(List fieldNodes, Classification classification, String scientificName, boolean saveTaxonHierarchy=true) {
 		log.debug "Getting classification hierarchy : "+classification.name;
-
+println fieldNodes
 		List<TaxonomyRegistry> taxonEntities = new ArrayList<TaxonomyRegistry>();
 
 		List<String> names = new ArrayList<String>();
@@ -1253,6 +1263,19 @@ class XMLConverter extends SourceConverter {
 		return parentTaxon;
 	}
 
+	TaxonomyDefinition getTaxonConcept(List taxonomyRegistry) {
+		def taxonConcept = getTaxonConcept(taxonomyRegistry, Classification.findByName(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY));
+		if(!taxonConcept) {
+			taxonConcept = getTaxonConcept(taxonomyRegistry, Classification.findByName(fieldsConfig.CATALOGUE_OF_LIFE_TAXONOMIC_HIERARCHY));
+		}
+		if(!taxonConcept) {
+			taxonConcept = getTaxonConcept(taxonomyRegistry, Classification.findByName(fieldsConfig.GBIF_TAXONOMIC_HIERARCHY));
+		}
+		if(!taxonConcept) {
+			taxonConcept = getTaxonConcept(taxonomyRegistry, Classification.findByName(fieldsConfig.IUCN_TAXONOMIC_HIERARCHY));
+		}
+		return taxonConcept;
+	}
 	/**
 	 * 
 	 */

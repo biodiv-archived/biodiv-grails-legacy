@@ -13,7 +13,7 @@
 <%--				columns="${columns}" data="${data}" />--%>
 <%--			<div id="piechart_${title}" style="float:right;"></div>--%>
 			<gvisualization:table elementId="table_${title}" width="${350}" height="${300}"
-				columns="${columns}" data="${data}" showRowNumber="${true}" select="selectHandler" />
+				columns="${columns}" data="${htmlData?:data}" showRowNumber="${true}" allowHtml="${true}" />
 <%--			<h5>Table Data</h5>--%>
 			<div id="table_${title}" style="float: right;"></div>
 		</div>
