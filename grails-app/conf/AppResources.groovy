@@ -220,4 +220,11 @@ modules = {
 		
 		resource url:'/js/chart.js'
 	}
+
+	add_file {
+		dependsOn 'core, tagit'
+
+		resource url:'/css/content.css'
+		resource url:'/js/content.js'
+	}
 }

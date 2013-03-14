@@ -13,7 +13,7 @@
 
 
 RewriteEngine on
-RewriteCond %{REQUEST_URI} ^/(species|observation|activity|activityFeed|SUser|user|page|pages|requestMembership|joinUs|leaveUs|inviteMembers|login|logout|register|static|group|j_spring_security_logout|recommendation|comment|newsletter|emailConfirmation|search|checklist|jcaptcha|openId|data|chart).*
+RewriteCond %{REQUEST_URI} ^/(species|observation|activity|activityFeed|SUser|user|page|pages|requestMembership|joinUs|leaveUs|inviteMembers|login|logout|register|static|group|j_spring_security_logout|recommendation|comment|newsletter|emailConfirmation|search|checklist|jcaptcha|openId|data|chart|UFile|project).*
 RewriteRule ^(.*)$ http://indiabiodiversity.localhost.org:8080/biodiv_usergroups$1 [P,L]
 ProxyPassReverse / http://indiabiodiversity.localhost.org:8080/biodiv_usergroups/
 ProxyPassReverse / http://indiabiodiversity.localhost.org:8080/
@@ -81,7 +81,7 @@ RewriteRule ^/biodiv_usergroups(.*)$ $1 [R=301]
 ProxyPassReverse / http://localhost:8080/biodiv_usergroups
 
 
-RewriteCond %{REQUEST_URI} ^/(species|observation|activity|activityFeed|SUser|user|page|pages|login|logout|register|about|requestMembership|joinUs|leaveUs|inviteMembers|show|newsletter|edit|update|delete|founders|user|experts|terms|upload_resource|group|emailConfirmation|settings|search|checklist|comment|openId|ck|chart).*
+RewriteCond %{REQUEST_URI} ^/(species|observation|activity|activityFeed|SUser|user|page|pages|login|logout|register|about|requestMembership|joinUs|leaveUs|inviteMembers|show|newsletter|edit|update|delete|founders|user|experts|terms|upload_resource|group|emailConfirmation|settings|search|checklist|comment|openId|ck|chart|UFile|project).*
 RewriteRule ^(.*)$ http://thewesternghats.indiabiodiversity.localhost.org:8080/biodiv_usergroups/group/wgp_fb_$1 [P]
 ProxyPassReverse / http://thewesternghats.indiabiodiversity.localhost.org:8080/biodiv_usergroups/group/wgp_fb_
 
