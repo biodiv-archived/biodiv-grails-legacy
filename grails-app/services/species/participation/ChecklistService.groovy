@@ -26,28 +26,8 @@ import species.participation.curation.UnCuratedVotes;
 import species.utils.Utils;
 import species.formatReader.SpreadsheetReader;
 
-//csv related
 import au.com.bytecode.opencsv.CSVReader
 import au.com.bytecode.opencsv.CSVWriter;
-
-//pdf related
-import com.itextpdf.text.Anchor;
-import com.itextpdf.text.BadElementException;
-import com.itextpdf.text.BaseColor;
-import com.itextpdf.text.Chapter;
-import com.itextpdf.text.Document;
-import com.itextpdf.text.DocumentException;
-import com.itextpdf.text.Element;
-import com.itextpdf.text.Font;
-import com.itextpdf.text.Image
-import com.itextpdf.text.List;
-import com.itextpdf.text.ListItem;
-import com.itextpdf.text.Paragraph;
-import com.itextpdf.text.Phrase;
-import com.itextpdf.text.Section;
-import com.itextpdf.text.pdf.PdfPCell;
-import com.itextpdf.text.pdf.PdfPTable;
-import com.itextpdf.text.pdf.PdfWriter;
 
 class ChecklistService {
 	static transactional = false
@@ -822,7 +802,10 @@ class ChecklistService {
 	
 	def export(params, DownloadLog dlog){
 		log.debug(params)
-		def cl = Checklist.read(params.downloadObjectId.toLong())
+		return exportAsCSV(Checklist.read(params.downloadObjectId.toLong()))
+	}
+	
+	private File exportAsCSV(Checklist cl){
 		if(!cl){
 			return null
 		}
@@ -831,79 +814,80 @@ class ChecklistService {
 		if(!downloadDir.exists()){
 			downloadDir.mkdirs()
 		}
-		if(dlog.type == DownloadLog.DownloadType.CSV){
-			return exportAsCSV(cl, downloadDir)
-		}else{
-			return exportAsPDF(cl, downloadDir)
-		}
-	}
-	
-	private File exportAsPDF(Checklist cl, downloadDir){
-		log.debug "Writing pdf checklist" + cl
-		File pdfFile = new File(downloadDir, "checklist_" + new Date().getTime() + ".pdf")
-		Document document = new Document()
-		PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(pdfFile))
 		
-		document.open()
-		Map m = cl.fetchExportableValue()
-		
-		
-		//adding site banner
-		Image image2 = Image.getInstance(grailsApplication.config.speciesPortal.app.rootDir + "/sites/all/themes/ibp/images/map-logo.gif");
-		//image2.scaleToFit(120f, 120f);
-		document.add(image2);
-		
-		//writing meta data
-		List list = new List(10);
-		for(item in m[cl.META_DATA]){
-			list.add(new ListItem(item.join("  ")));
-		}
-		document.add(list)
-		
-		//writing data
-		def columnNames = cl.fetchColumnNames()
-		PdfPTable t = new PdfPTable(columnNames.length)
-		t.setSpacingBefore(25);
-		t.setSpacingAfter(25);
-		
-		//writing header
-		for(c in columnNames){
-			t.addCell(new PdfPCell(new Phrase(c)))
-		}
-		//t.setHeaderRows(1)
-		//writing actual data
-		for(item in m[cl.DATA]){
-			for(obj in item){
-				t.addCell(new PdfPCell(new Phrase(obj?:"")))
-			}
-		}
-		document.add(t)
-		
-		document.close()
-		return pdfFile
-	}
-	
-	private File exportAsCSV(Checklist cl, downloadDir){
 		File csvFile = new File(downloadDir, "checklist_" + new Date().getTime() + ".csv")
 		CSVWriter writer = obvUtilService.getCSVWriter(csvFile.getParent(), csvFile.getName())
-		log.debug "Writing csv checklist" + cl
+		log.debug "Writing " + cl
 		
-		Map m = cl.fetchExportableValue()
-		
-		for(item in m[cl.META_DATA]){
-			writer.writeNext(item.toArray(new String[0]))
-		}
-		
-		writer.writeNext("## Checklist Data:")
-		writer.writeNext(cl.fetchColumnNames())
-		for(item in m[cl.DATA]){
-			writer.writeNext(item.toArray(new String[0]))
-		}
+		writeChecklistMetaData(cl, writer)
+		writeChecklistData(cl, writer)
 		
 		writer.flush()
 		writer.close()
 		
 		return csvFile
+	}
+	
+	private writeChecklistMetaData(Checklist cl, CSVWriter writer){
+		String keyPrefix = "## "
+		String sep = ":"
+		
+		writer.writeNext([keyPrefix + "title" + sep,  cl.title].toArray(new String[0]))
+		writer.writeNext([keyPrefix + "license" + sep,  "" + cl.license.name].toArray(new String[0]))
+		writer.writeNext([keyPrefix + "attribution" + sep,  "" + cl.attribution].toArray(new String[0]))
+		
+		writer.writeNext([keyPrefix + "speciesCount" + sep, "" + cl.speciesCount].toArray(new String[0]))
+		writer.writeNext([keyPrefix + "description" + sep,  cl.description].toArray(new String[0]))
+		writer.writeNext([keyPrefix + "refText" + sep,  cl.refText].toArray(new String[0]))
+		writer.writeNext([keyPrefix + "sourceText" + sep,  cl.sourceText].toArray(new String[0]))
+		writer.writeNext([keyPrefix + "reservesValue" + sep,  "" + cl.reservesValue].toArray(new String[0]))
+		
+		writer.writeNext([keyPrefix + "latitude" + sep, "" + cl.latitude].toArray(new String[0]))
+		writer.writeNext([keyPrefix + "longitude" + sep, "" + cl.longitude].toArray(new String[0]))
+		writer.writeNext([keyPrefix + "placeName" + sep, cl.placeName].toArray(new String[0]))
+		writer.writeNext([keyPrefix + "state" + sep,  cl.state.join(", ")].toArray(new String[0]))
+		writer.writeNext([keyPrefix + "district" + sep,  cl.district.join(", ")].toArray(new String[0]))
+		writer.writeNext([keyPrefix + "taluka" + sep,  cl.taluka.join(", ")].toArray(new String[0]))
+		
+		
+		writer.writeNext([keyPrefix + "fromDate" + sep,  "" + cl.fromDate].toArray(new String[0]))
+		writer.writeNext([keyPrefix + "toDate" + sep,  "" + cl.toDate].toArray(new String[0]))
+		writer.writeNext([keyPrefix + "publicationDate" + sep,  "" + cl.publicationDate].toArray(new String[0]))
+		
+		
+		def ug = []
+		cl.userGroups.collect{ ug.add(it.name)}
+		
+		def sg = []
+		cl.speciesGroups.collect{ sg.add(it.name)}
+		
+		writer.writeNext([keyPrefix + "userGroups" + sep,  ug.join(", ")].toArray(new String[0]))
+		writer.writeNext([keyPrefix + "speciesGroups" + sep,  sg.join(", ")].toArray(new String[0]))
+		
+		writer.writeNext([keyPrefix + obvUtilService.AUTHOR_URL + sep, obvUtilService.createHardLink('user', 'show', cl.author.id)].toArray(new String[0]))
+		writer.writeNext([keyPrefix + obvUtilService.AUTHOR_NAME + sep, cl.author.name].toArray(new String[0]))
+	}
+	
+	private writeChecklistData(Checklist cl, CSVWriter writer){
+		writer.writeNext("## Checklist Data:")
+		def colNameArray = cl.fetchColumnNames()
+		writer.writeNext(colNameArray)
+		
+		int prevRowId = -1
+		def valueList = []
+		cl.row.each { ChecklistRowData r ->
+			if(prevRowId == -1){
+				prevRowId = r.rowId
+			}
+			
+			if(prevRowId != r.rowId){
+				writer.writeNext(valueList.toArray(new String[0]))
+				valueList.clear()
+				prevRowId = r.rowId
+			}
+			valueList.add(r.value)
+		}
+		writer.writeNext(valueList.toArray(new String[0]))
 	}
 }
 /*

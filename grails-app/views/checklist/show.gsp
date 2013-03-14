@@ -19,7 +19,7 @@
 				<clist:showSubmenuTemplate model="['entityName':checklistInstance.title, 'subHeading':checklistInstance.attribution]" />
 			<div style="padding-top: 0px; margin-top: -30px; padding-bottom: 40px; padding-left: 0px; margin-left: -5px;">
 			<obv:download
-					model="['source':'Checklist', 'requestObject':request, 'downloadTypes':[DownloadType.CSV, DownloadType.PDF], downloadObjectId:checklistInstance.id ]" />
+					model="['source':'Checklist', 'requestObject':request, 'downloadTypes':[DownloadType.CSV], downloadObjectId:checklistInstance.id ]" />
 			</div>		
 				<div style="clear:both;"></div>
 					<g:if test="${params.pos && lastListParams}">
