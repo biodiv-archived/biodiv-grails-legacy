@@ -542,12 +542,11 @@ class XMLConverter extends SourceConverter {
 			def iconsNode = resourcesXML.icons;
 			def audiosNode = resourcesXML.audios;
 			def videosNode = resourcesXML.videos;
-			println '******'
-println imagesNode
+			
 			resources.addAll(createResourceByType(imagesNode[0], ResourceType.IMAGE, relResFolder));
 			//resources.addAll(createResourceByType(iconsNode, ResourceType.ICON));
 			//resources.addAll(createResourceByType(audiosNode, ResourceType.AUDIO));
-			//resources.addAll(createResourceByType(videosNode, ResourceType.VIDEO));
+			resources.addAll(createResourceByType(videosNode[0], ResourceType.VIDEO, relResFolder));
 		}
 
 		return resources;
@@ -738,23 +737,47 @@ println imagesNode
 	}
 
 	private Resource createVideo(Node videoNode) {
-		String fileName = imageNode.get("fileName");
-
-		//		def fieldCriteria = Resource.createCriteria();
-		//		def res = fieldCriteria.get {
-		//			and {
-		//				eq("fileName", fileName);
-		//				eq("type", ResourceType.VIDEO);
-		//			}
-		//		}
-		//		if(!res) {
-		def attributors = getAttributions(videoNode, true);
-		res = new Resource(type : ResourceType.AUDIO, fileName:videoNode.get("fileName"), url:videoNode.get("source"), description:videoNode.get("caption"), license:getLicenses(videoNode, true), contributor:getContributors(videoNode, true));
-		for(Contributor con : attributors) {
-			res.addToAttributors(con);
+		log.debug "Creating video from data $videoNode"
+		def sourceUrl = videoNode.source?.text() ? videoNode.source?.text() : "";
+		def fieldCriteria = Resource.createCriteria();
+		def res = fieldCriteria.get {
+			and {
+				sourceUrl ? eq("url", sourceUrl) : isNull("url");
+				eq("type", ResourceType.VIDEO);
+			}
 		}
-		//		}
+		if(!res) {
+			def attributors = getAttributions(videoNode, true);
+			res = new Resource(type : ResourceType.AUDIO, fileName:videoNode.get("fileName"), url:sourceUrl, description:videoNode.get("caption"), license:getLicenses(videoNode, true), contributor:getContributors(videoNode, true));
+			for(Contributor con : getContributors(videoNode, true)) {
+				res.addToContributors(con);
+			}
+			for(Contributor con : getAttributions(videoNode, true)) {
+				res.addToAttributors(con);
+			}
+			for(License l : getLicenses(videoNode, true)) {
+				res.addToLicenses(l);
+			}
+		} else {
+			res.url = sourceUrl
+			res.description = videoNode.caption?.text();
+			res.licenses?.clear()
+			res.contributors?.clear()
+			res.attributors?.clear();
+			for(Contributor con : getContributors(videoNode, true)) {
+				res.addToContributors(con);
+			}
+			for(Contributor con : getAttributions(videoNode, true)) {
+				res.addToAttributors(con);
+			}
+			for(License l : getLicenses(videoNode, true)) {
+				res.addToLicenses(l);
+			}
+		}
+
+		//s.addToResources(res);
 		videoNode.appendNode("resource", res);
+		log.debug "Successfully created resource";
 		return res;
 	}
 
@@ -1005,35 +1028,9 @@ println imagesNode
 			if(rel) {
 				def cleanName = Utils.cleanName(n.text()?.trim());
 				def parsedNames = namesParser.parse([cleanName]);
-
-				if(parsedNames[0]?.canonicalForm) {
-					//TODO: IMP equality of given name with the one in db should include synonyms of taxonconcepts
-					//i.e., parsedName.canonicalForm == taxonomyDefinition.canonicalForm or Synonym.canonicalForm
-					def criteria = Synonyms.createCriteria();
-					Synonyms sfield = criteria.get {
-						ilike("canonicalForm", parsedNames[0].canonicalForm);
-						eq("relationship", rel);
-						eq("taxonConcept", taxonConcept);
-					}
-					if(!sfield) {
-						log.debug "Saving synonym : "+cleanName;
-						sfield = new Synonyms();
-						sfield.name = cleanName;
-						sfield.relationship = rel;
-						sfield.taxonConcept = taxonConcept;
-
-						sfield.canonicalForm = parsedNames[0].canonicalForm;
-						sfield.normalizedForm = parsedNames[0].normalizedForm;;
-						sfield.italicisedForm = parsedNames[0].italicisedForm;;
-						sfield.binomialForm = parsedNames[0].binomialForm;;
-
-						if(!sfield.save(flush:true)) {
-							sfield.errors.each { log.error it }
-						}
-					}
+				def sfield = saveSynonym(parsedNames[0], rel, taxonConcept);
+				if(sfield) {
 					synonyms.add(sfield);
-				} else {
-					log.error "Ignoring synonym taxon entry as the name is not parsed : "+cleanName
 				}
 			} else {
 				log.warn "NOT A SUPPORTED RELATIONSHIP: "+n.relationship?.text();
@@ -1042,15 +1039,51 @@ println imagesNode
 		return synonyms;
 	}
 
+	private Synonyms saveSynonym(TaxonomyDefinition parsedName, RelationShip rel, TaxonomyDefinition taxonConcept) {
+		
+		if(parsedName && parsedName.canonicalForm) {
+			//TODO: IMP equality of given name with the one in db should include synonyms of taxonconcepts
+			//i.e., parsedName.canonicalForm == taxonomyDefinition.canonicalForm or Synonym.canonicalForm
+			def criteria = Synonyms.createCriteria();
+			Synonyms sfield = criteria.get {
+				ilike("canonicalForm", parsedName.canonicalForm);
+				eq("relationship", rel);
+				eq("taxonConcept", taxonConcept);
+			}
+			if(!sfield) {
+				log.debug "Saving synonym : "+cleanName;
+				sfield = new Synonyms();
+				sfield.name = cleanName;
+				sfield.relationship = rel;
+				sfield.taxonConcept = taxonConcept;
+
+				sfield.canonicalForm = parsedName.canonicalForm;
+				sfield.normalizedForm = parsedName.normalizedForm;;
+				sfield.italicisedForm = parsedName.italicisedForm;;
+				sfield.binomialForm = parsedName.binomialForm;;
+
+				if(!sfield.save(flush:true)) {
+					sfield.errors.each { log.error it }
+				}
+			}
+			return sfield;
+		} else {
+			log.error "Ignoring synonym taxon entry as the name is not parsed : "+cleanName
+		}
+
+	}
+	
 	/**
 	 * 
 	 * @param rel
 	 * @return
 	 */
 	private RelationShip getRelationship(String rel) {
-		for(RelationShip type : RelationShip) {
-			if(type.value().equals(rel)) {
-				return type;
+		if(rel) {
+			for(RelationShip type : RelationShip) {
+				if(type.value().equals(rel)) {
+					return type;
+				}
 			}
 		}
 		return RelationShip.SYNONYM;
@@ -1184,6 +1217,8 @@ println fieldNodes
 						if(!taxon.save()) {
 							taxon.errors.each { log.error it }
 						}
+					} else if(taxon.name != parsedName.name) {
+						saveSynonym(parsedName, getRelationship(null), taxon);
 					}
 
 

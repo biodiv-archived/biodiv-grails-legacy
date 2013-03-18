@@ -103,7 +103,7 @@ class MappedSpreadsheetConverter extends SourceConverter {
 			Species s = converter.convertSpecies(speciesElement)
 			if(s)
 				species.add(s);
-			if(i==2)break;
+			//if(i==2)break;
 			i++
 		}
 		return species;
