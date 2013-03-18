@@ -94,33 +94,34 @@ class Checklist {
 		return columnNames.split("\t")
 	}
 	
-	def Map fetchExportableValue(){
+	def Map fetchExportableValue(boolean isPdf){
 		Map res = [:]
 		Checklist cl = this
-		
+		def keyPrefix = (!isPdf) ? KEY_PREFIX : ""
+		 
 		List metaDataList = []
 		
-		metaDataList.add([KEY_PREFIX + "title" + SEPARATOR,  cl.title] )
-		metaDataList.add([KEY_PREFIX + "license" + SEPARATOR,  "" + cl.license.name] )
-		metaDataList.add([KEY_PREFIX + "attribution" + SEPARATOR,  "" + cl.attribution] )
+		metaDataList.add([keyPrefix + "title" + SEPARATOR,  cl.title] )
+		metaDataList.add([keyPrefix + "license" + SEPARATOR,  "" + cl.license.name] )
+		metaDataList.add([keyPrefix + "attribution" + SEPARATOR,  "" + cl.attribution] )
 		
-		metaDataList.add([KEY_PREFIX + "speciesCount" + SEPARATOR, "" + cl.speciesCount] )
-		metaDataList.add([KEY_PREFIX + "description" + SEPARATOR,  cl.description])
-		metaDataList.add([KEY_PREFIX + "refText" + SEPARATOR,  cl.refText])
-		metaDataList.add([KEY_PREFIX + "sourceText" + SEPARATOR,  cl.sourceText])
-		metaDataList.add([KEY_PREFIX + "reservesValue" + SEPARATOR,  "" + cl.reservesValue])
+		metaDataList.add([keyPrefix + "speciesCount" + SEPARATOR, "" + cl.speciesCount] )
+		metaDataList.add([keyPrefix + "description" + SEPARATOR,  cl.description])
+		metaDataList.add([keyPrefix + "refText" + SEPARATOR,  cl.refText])
+		metaDataList.add([keyPrefix + "sourceText" + SEPARATOR,  cl.sourceText])
+		metaDataList.add([keyPrefix + "reservesValue" + SEPARATOR,  "" + cl.reservesValue])
 		
-		metaDataList.add([KEY_PREFIX + "latitude" + SEPARATOR, "" + cl.latitude])
-		metaDataList.add([KEY_PREFIX + "longitude" + SEPARATOR, "" + cl.longitude])
-		metaDataList.add([KEY_PREFIX + "placeName" + SEPARATOR, cl.placeName])
-		metaDataList.add([KEY_PREFIX + "state" + SEPARATOR,  cl.state.join(", ")])
-		metaDataList.add([KEY_PREFIX + "district" + SEPARATOR,  cl.district.join(", ")])
-		metaDataList.add([KEY_PREFIX + "taluka" + SEPARATOR,  cl.taluka.join(", ")])
+		metaDataList.add([keyPrefix + "latitude" + SEPARATOR, "" + cl.latitude])
+		metaDataList.add([keyPrefix + "longitude" + SEPARATOR, "" + cl.longitude])
+		metaDataList.add([keyPrefix + "placeName" + SEPARATOR, cl.placeName])
+		metaDataList.add([keyPrefix + "state" + SEPARATOR,  cl.state.join(", ")])
+		metaDataList.add([keyPrefix + "district" + SEPARATOR,  cl.district.join(", ")])
+		metaDataList.add([keyPrefix + "taluka" + SEPARATOR,  cl.taluka.join(", ")])
 		
 		
-		metaDataList.add([KEY_PREFIX + "fromDate" + SEPARATOR,  "" + cl.fromDate])
-		metaDataList.add([KEY_PREFIX + "toDate" + SEPARATOR,  "" + cl.toDate])
-		metaDataList.add([KEY_PREFIX + "publicationDate" + SEPARATOR,  "" + cl.publicationDate])
+		metaDataList.add([keyPrefix + "fromDate" + SEPARATOR,  "" + cl.fromDate])
+		metaDataList.add([keyPrefix + "toDate" + SEPARATOR,  "" + cl.toDate])
+		metaDataList.add([keyPrefix + "publicationDate" + SEPARATOR,  "" + cl.publicationDate])
 		
 		
 		def ug = []
@@ -129,18 +130,18 @@ class Checklist {
 		def sg = []
 		cl.speciesGroups.collect{ sg.add(it.name)}
 		
-		metaDataList.add([KEY_PREFIX + "userGroups" + SEPARATOR,  ug.join(", ")])
-		metaDataList.add([KEY_PREFIX + "speciesGroups" + SEPARATOR,  sg.join(", ")])
+		metaDataList.add([keyPrefix + "userGroups" + SEPARATOR,  ug.join(", ")])
+		metaDataList.add([keyPrefix + "speciesGroups" + SEPARATOR,  sg.join(", ")])
 		
-		metaDataList.add([KEY_PREFIX + obvUtilService.AUTHOR_URL + SEPARATOR, obvUtilService.createHardLink('user', 'show', cl.author.id)])
-		metaDataList.add([KEY_PREFIX + obvUtilService.AUTHOR_NAME + SEPARATOR, cl.author.name])
+		metaDataList.add([keyPrefix + obvUtilService.AUTHOR_URL + SEPARATOR, obvUtilService.createHardLink('user', 'show', cl.author.id)])
+		metaDataList.add([keyPrefix + obvUtilService.AUTHOR_NAME + SEPARATOR, cl.author.name])
 		
 		res[META_DATA] = metaDataList
-		res[DATA] = fetchData()
+		res[DATA] = fetchData(isPdf)
 		return res
 	}
 		
-	private List fetchData(){
+	private List fetchData(boolean isPdf){
 		Checklist cl = this
 		List data = []
 		
@@ -156,10 +157,28 @@ class Checklist {
 				valueList = []
 				prevRowId = r.rowId
 			}
-			valueList.add(r.value)
+			
+			//only adding sn and cn for pdf
+			if(isPdf){
+				if(r.key.equalsIgnoreCase(ChecklistService.SN_NAME) || r.key.equalsIgnoreCase(ChecklistService.CN_NAME)){
+					valueList.add(r.value)
+				}
+			}else{
+				valueList.add(r.value)
+			}
 		}
 		
 		data.add(valueList)
+		
+		//adding serial number and notes column for pdf
+		if(isPdf){
+			int i = 0
+			data.each { List valList ->
+				valList.add(0, "" + (++i))
+				valList.add("")
+			}
+		}
+		
 		return data
 	}
 	

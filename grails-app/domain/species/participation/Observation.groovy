@@ -353,8 +353,8 @@ class Observation implements Taggable{
 		
 		
 		res[ObvUtilService.LOCATION] =placeName
-		res[ObvUtilService.LONGITUDE] = "" + latitude
-		res[ObvUtilService.LATITUDE] = "" + longitude
+		res[ObvUtilService.LONGITUDE] = "" + longitude
+		res[ObvUtilService.LATITUDE] = "" + latitude
 		res[ObvUtilService.NOTES] = notes
 		
 		
