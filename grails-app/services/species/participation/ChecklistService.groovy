@@ -849,7 +849,7 @@ class ChecklistService {
 		
 		
 		//adding site banner
-		Image image2 = Image.getInstance(grailsApplication.config.speciesPortal.app.rootDir + "/sites/all/themes/ibp/images/map-logo.gif");
+		Image image2 = Image.getInstance(new URL(Utils.getIBPServerDomain() + "/sites/all/themes/ibp/images/map-logo.gif"));
 		//image2.scaleToFit(120f, 120f);
 		document.add(image2);
 		
