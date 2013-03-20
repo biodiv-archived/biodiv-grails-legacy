@@ -4,7 +4,7 @@ import content.Project
 
 class ProjectTagLib {
 	
-	static namespace = 'content'
+	static namespace = 'project'
 	
 	def projectListItem = {attrs, body->
 		if(attrs.model.projectInstance) {

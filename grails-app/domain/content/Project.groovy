@@ -42,13 +42,20 @@ class Project implements Taggable{
 	
 	Date dateCreated;
 	
-/*	static mapping = {
-		analysisFiles cascade:"all-delete-orphan"
-		proposalFiles cascade:"all-delete-orphan"
-		reportFiles cascade:"all-delete-orphan"
+	static mapping = {
+		
+			summary type:"text"
+			projectProposal type:"text"
+			projectReport type:"text"
+			projectReport type:"text"
+			dataContributionIntensity type:"text"
+			analysis type:"text"
+			misc type:"text"
+			
+
 		
 	}
-*/
+
 
 
     static hasMany = [ locations: Location,
