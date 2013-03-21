@@ -15,91 +15,87 @@ import species.auth.SUser
 
 
 class Project implements Taggable{
-    
-    StrategicDirection direction;
-    String title;
+
+	StrategicDirection direction;
+	String title;
 	String summary;
-    //Grantee grantee;    
-    //  File granteeLogo; // TODO
-    String granteeURL;
-    String granteeName;
-    SUser granteeContact; //TODO
+	//Grantee grantee;
+	//  File granteeLogo; // TODO
+	String granteeURL;
+	String granteeName;
+	SUser granteeContact; //TODO
 
 
-    Date grantFrom;
-    Date grantTo;
-    Integer grantedAmount;
+	Date grantFrom;
+	Date grantTo;
+	Integer grantedAmount;
 
-    String projectProposal;
+	String projectProposal;
 
-    String projectReport;
+	String projectReport;
 
-    String dataContributionIntensity;
+	String dataContributionIntensity;
 
-    String analysis;
-        
-    String misc;
-	
+	String analysis;
+
+	String misc;
+
 	Date dateCreated;
-	
-	static mapping = {
-		
-			summary type:"text"
-			projectProposal type:"text"
-			projectReport type:"text"
-			projectReport type:"text"
-			dataContributionIntensity type:"text"
-			analysis type:"text"
-			misc type:"text"
-			
 
-		
+	static mapping = {
+
+		summary type:"text"
+		projectProposal type:"text"
+		projectReport type:"text"
+		projectReport type:"text"
+		dataContributionIntensity type:"text"
+		analysis type:"text"
+		misc type:"text"
+
+
 	}
 
 
 
-    static hasMany = [ locations: Location,
-						proposalFiles: UFile,
-						reportFiles: UFile,
-						analysisFiles: UFile,
-						
-                ];
-			
-/*	static mappedBy = [proposalFiles: "proposalProject",
-				reportFiles: "reportProject",
-				analysisFiles: "analysisProject"]*/
-	
-    static constraints = {
-        title(nullable: false);
-		summary(nullable:true);
-        direction(nullable: true);
-        granteeURL();
-        granteeName(nullable: false);
-		granteeContact(nullable:true);
-        locations();
-        grantFrom();
-        grantTo();
-        grantedAmount(nullable: true);
-        projectProposal(nullable: true);
-		proposalFiles(nullable: true);
-        projectReport(nullable: true);
-		reportFiles(nullable: true);
-        dataContributionIntensity(nullable: true);
-        analysis(nullable: true);
-		analysisFiles(nullable: true);
-        misc(nullable: true);
+	static hasMany = [ locations: Location,
+		proposalFiles: UFile,
+		reportFiles: UFile,
+		analysisFiles: UFile,
 
-    }
-	
+	];
+
+
+	static constraints = {
+		title(nullable: false);
+		summary(nullable:true);
+		direction(nullable: true);
+		granteeURL();
+		granteeName(nullable: false);
+		granteeContact(nullable:true);
+		locations();
+		grantFrom();
+		grantTo();
+		grantedAmount(nullable: true);
+		projectProposal(nullable: true);
+		proposalFiles(nullable: true);
+		projectReport(nullable: true);
+		reportFiles(nullable: true);
+		dataContributionIntensity(nullable: true);
+		analysis(nullable: true);
+		analysisFiles(nullable: true);
+		misc(nullable: true);
+
+	}
+
 	def getReportFilesList() {
 		return LazyList.decorate(
-			reportFiles,
-			FactoryUtils.instantiateFactory(UFile.class))
+		reportFiles,
+		FactoryUtils.instantiateFactory(UFile.class))
 	}
-	
+
 	def getAnalysisFilesList() {
 		return LazyList.decorate(
-			analysisFiles,
-			FactoryUtils.instantiateFactory(UFile.class))
+		analysisFiles,
+		FactoryUtils.instantiateFactory(UFile.class))
 	}
 }

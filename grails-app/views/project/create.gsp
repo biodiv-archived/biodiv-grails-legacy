@@ -112,90 +112,100 @@
 					</div>
 				</div>
 				<div class="super-section">
+					<a data-toggle="collapse" href="#locationsDiv">
+						<h5>Grantee Details</h5>
+					</a>
+					<div id="locationsDiv" class="section in collapse">
+						        <g:render template="phones" model="['contactInstance':contactInstance]" />
+						
+					</div>
 
-						<a data-toggle="collapse" href="#granteeDetails">
-							<h5>Grantee Details</h5>
-						</a>
-						<div id="granteeDetails" class="section in collapse">
-							<div>
-								<div
-									class="control-group ${hasErrors(bean: projectInstance, field: 'granteeName', 'error')}">
-									<label class="control-label" for="granteeName"><g:message
-											code="project.granteeName.label" default="Grantee Name" /></label>
+				</div>
+				<div class="super-section">
 
-									<div class="controls">
+					<a data-toggle="collapse" href="#granteeDetails">
+						<h5>Grantee Details</h5>
+					</a>
+					<div id="granteeDetails" class="section in collapse">
+						<div>
+							<div
+								class="control-group ${hasErrors(bean: projectInstance, field: 'granteeName', 'error')}">
+								<label class="control-label" for="granteeName"><g:message
+										code="project.granteeName.label" default="Grantee Name" /></label>
 
-										<g:textField name="granteeName"
-											value="${projectInstance?.granteeName}" />
-									</div>
-								</div>
+								<div class="controls">
 
-
-								<div
-									class="control-group ${hasErrors(bean: projectInstance, field: 'granteeURL', 'error')}">
-									<label class="control-label" for="granteeURL"><g:message
-											code="project.granteeURL.label" default="Grantee URL" /></label>
-
-									<div class="controls">
-
-										<g:textField name="granteeURL"
-											value="${projectInstance?.granteeURL}" />
-									</div>
-								</div>
-
-
-								<div
-									class="control-group ${hasErrors(bean: projectInstance, field: 'granteeLogo', 'error')}">
-
-									<label class="control-label" for="granteeLogo"><g:message
-											code="project.granteeLogo.label" default="GranteeLogo" /></label> <input
-										type="file" name="granteeLogo" />
-								</div>
-							</div>
-							<div >
-								<div
-									class="control-group ${hasErrors(bean: projectInstance, field: 'granteeFrom', 'error')}">
-
-									<label class="control-label" for="grantFrom"><g:message
-											code="project.grantFrom.label" default="Grant From" /></label>
-									<div class="controls">
-
-										<input name="grantFrom" type="text" id="grantFrom"
-											class="date-popup"
-											value="${projectInstance?.grantFrom?.format('dd/MM/yyyy')}"
-											placeholder="Select date" />
-									</div>
-								</div>
-
-								<div
-									class="control-group ${hasErrors(bean: projectInstance, field: 'granteeTo', 'error')}">
-									<label class="control-label" for="grantTo"><g:message
-											code="project.grantTo.label" default="Grant To" /></label>
-									<div class="controls">
-
-										<input name="grantTo" type="text" id="grantTo"
-											class="date-popup"
-											value="${projectInstance?.grantTo?.format('dd/MM/yyyy')}"
-											placeholder="Select date" />
-									</div>
-								</div>
-
-
-								<div
-									class="control-group ${hasErrors(bean: projectInstance, field: 'granteeAmount', 'error')}">
-
-									<label class="control-label" for="grantedAmount"><g:message
-											code="project.grantedAmount.label" default="Granted Amount" /></label>
-									<div class="controls">
-
-										<g:textField name="grantedAmount"
-											value="${fieldValue(bean: projectInstance, field: 'grantedAmount')}" />
-									</div>
-
+									<g:textField name="granteeName"
+										value="${projectInstance?.granteeName}" />
 								</div>
 							</div>
 
+
+							<div
+								class="control-group ${hasErrors(bean: projectInstance, field: 'granteeURL', 'error')}">
+								<label class="control-label" for="granteeURL"><g:message
+										code="project.granteeURL.label" default="Grantee URL" /></label>
+
+								<div class="controls">
+
+									<g:textField name="granteeURL"
+										value="${projectInstance?.granteeURL}" />
+								</div>
+							</div>
+
+
+							<div
+								class="control-group ${hasErrors(bean: projectInstance, field: 'granteeLogo', 'error')}">
+
+								<label class="control-label" for="granteeLogo"><g:message
+										code="project.granteeLogo.label" default="GranteeLogo" /></label> <input
+									type="file" name="granteeLogo" />
+							</div>
 						</div>
+						<div>
+							<div
+								class="control-group ${hasErrors(bean: projectInstance, field: 'granteeFrom', 'error')}">
+
+								<label class="control-label" for="grantFrom"><g:message
+										code="project.grantFrom.label" default="Grant From" /></label>
+								<div class="controls">
+
+									<input name="grantFrom" type="text" id="grantFrom"
+										class="date-popup"
+										value="${projectInstance?.grantFrom?.format('dd/MM/yyyy')}"
+										placeholder="Select date" />
+								</div>
+							</div>
+
+							<div
+								class="control-group ${hasErrors(bean: projectInstance, field: 'granteeTo', 'error')}">
+								<label class="control-label" for="grantTo"><g:message
+										code="project.grantTo.label" default="Grant To" /></label>
+								<div class="controls">
+
+									<input name="grantTo" type="text" id="grantTo"
+										class="date-popup"
+										value="${projectInstance?.grantTo?.format('dd/MM/yyyy')}"
+										placeholder="Select date" />
+								</div>
+							</div>
+
+
+							<div
+								class="control-group ${hasErrors(bean: projectInstance, field: 'granteeAmount', 'error')}">
+
+								<label class="control-label" for="grantedAmount"><g:message
+										code="project.grantedAmount.label" default="Granted Amount" /></label>
+								<div class="controls">
+
+									<g:textField name="grantedAmount"
+										value="${fieldValue(bean: projectInstance, field: 'grantedAmount')}" />
+								</div>
+
+							</div>
+						</div>
+
+					</div>
 				</div>
 				<div class="super-section">
 					<div class="section">

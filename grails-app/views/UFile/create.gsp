@@ -35,7 +35,6 @@
 			<div class="dialog">
 				
 			
-			<fm:uploadForm model="['id'='browser', 'multiple'=false]" />
 			</div>
 			
 

@@ -12,7 +12,7 @@ ${username},
 				url="${uGroup.createLink(controller:'user', action:'show', id:actor.id, userGroupWebaddress:userGroupWebaddress, absolute:true) }">
 				<img
 					style="max-height: 32px; min-height: 16px; max-width: 32px; width: auto;"
-					src="${actor.icon(ImageType.SMALL)}" title="$actorName" />
+					src="${actor.icon(ImageType.SMALL)}" title="${actor.name}" />
 
 			</g:link>
 		</td>
