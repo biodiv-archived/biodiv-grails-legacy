@@ -13,7 +13,10 @@ import species.groups.UserGroup;
 import speciespage.ObvUtilService;
 
 class Observation implements Taggable{
-
+	
+	//for saving object in concurrent envirnoment
+	private static final Object SAVE_LOCK = new Object()
+	
 	def dataSource
 	def grailsApplication;
 	def commentService;
@@ -154,9 +157,7 @@ class Observation implements Taggable{
 
 	void calculateMaxVotedSpeciesName(){
 		maxVotedReco = findMaxRepeatedReco();
-		if(!save(flush:true)){
-			errors.allErrors.each { log.error it }
-		}
+		lastRevised = new Date();
 	}
 
 	String fetchSuggestedCommonNames(){
@@ -272,12 +273,9 @@ class Observation implements Taggable{
 		return result[0]["count"]
 	}
 
+	
 	def incrementPageVisit(){
-		visitCount++;
-
-		if(!save(flush:true)){
-			this.errors.allErrors.each { log.error it }
-		}
+		visitCount++
 	}
 
 	def beforeUpdate(){
@@ -298,11 +296,12 @@ class Observation implements Taggable{
 		return ObservationFlag.findAllWhere(observation:this);
 	}
 
-	def updateObservationTimeStamp(){
+	private updateObservationTimeStamp(){
 		lastRevised = new Date();
-		if(!save(flush:true)){
-			this.errors.allErrors.each { log.error it }
-		}
+//		saveConcurrently({lastRevised = new Date()});
+//		if(!save(flush:true)){
+//			this.errors.allErrors.each { log.error it }
+//		}
 	}
 
 	String fetchSpeciesCall(){
@@ -322,7 +321,7 @@ class Observation implements Taggable{
 	}
 	
 	def onAddComment(comment){
-		updateObservationTimeStamp();
+		saveConcurrently(this.&updateObservationTimeStamp)
 	}
 	
 	def afterDelete(){
@@ -395,5 +394,23 @@ class Observation implements Taggable{
 
 	def getOwner() {
 		return author;
-	}	
+	}
+	
+	def saveConcurrently(f = {}){
+		try{
+			f()
+			if(!save(flush:true)){
+				errors.allErrors.each { log.error it }
+			}
+		}catch(org.hibernate.StaleObjectStateException e){
+			synchronized(SAVE_LOCK){
+				refresh()
+				f()
+				if(!save(flush:true)){
+					errors.allErrors.each { log.error it }
+				}
+			}
+		}
+	}
+		
 }
