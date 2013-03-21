@@ -152,6 +152,10 @@ class SpeciesSearchService {
 						if(contributor.name)
 							doc.addField(searchFieldsConfig.CONTRIBUTOR, contributor.name);
 					}
+					resource.attributors.each { attributor ->
+						if(attributor.name)
+							doc.addField(searchFieldsConfig.ATTRIBUTION, attributor.name);
+					}
 				}
 				field.references.each { reference ->
 					if(reference.title)

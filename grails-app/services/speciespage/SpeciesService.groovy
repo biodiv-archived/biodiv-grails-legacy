@@ -18,6 +18,7 @@ import species.Country
 import species.Field
 import species.Habitat;
 import species.Language
+import species.Resource;
 import species.Species
 import species.SpeciesField;
 import species.Synonyms;
@@ -25,6 +26,7 @@ import species.TaxonomyDefinition;
 import species.License.LicenseType
 import species.TaxonomyRegistry;
 import species.formatReader.SpreadsheetReader
+import species.participation.Observation;
 import species.sourcehandler.KeyStoneDataConverter
 import species.sourcehandler.MappedSpreadsheetConverter
 import species.sourcehandler.NewSpreadsheetConverter
@@ -49,6 +51,7 @@ class SpeciesService {
 	def speciesSearchService;
 	def namesIndexerService;
 	def observationService;
+	def springSecurityService
 
 	static int BATCH_SIZE = 10;
 	int noOfFields = Field.count();
@@ -60,11 +63,11 @@ class SpeciesService {
 	def loadData() {
 		int noOfInsertions = 0;
 
-		grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/images";
-		noOfInsertions += uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/Dung_beetle_Species_pages_IBP_v13.xlsx", grailsApplication.config.speciesPortal.data.rootDir+"/mappings/dungbeetles_mapping.xlsx", 0, 0, 0, 0);
-
-		grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/images";
-		noOfInsertions += uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/Trees_descriptives_prabha_final_6.xlsx", grailsApplication.config.speciesPortal.data.rootDir+"/mappings/ifp_tree_mapping_v2.xlsx", 0, 0, 0, 2);
+		//		grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/images";
+		//		noOfInsertions += uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/Dung_beetle_Species_pages_IBP_v13.xlsx", grailsApplication.config.speciesPortal.data.rootDir+"/mappings/dungbeetles_mapping.xlsx", 0, 0, 0, 0);
+		//
+		//		grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/images";
+		//		noOfInsertions += uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/Trees_descriptives_prabha_final_6.xlsx", grailsApplication.config.speciesPortal.data.rootDir+"/mappings/ifp_tree_mapping_v2.xlsx", 0, 0, 0, 2);
 
 		//		//grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/images";
 		//		noOfInsertions += uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/Bats/WG_bats_account_01Nov11_sanjayMolur.xls", grailsApplication.config.speciesPortal.data.rootDir+"/mappings/WG_bats_account_01Nov11_sanjayMolurspecies_mapping_v2.xlsx", 0, 0, 0, 0);
@@ -89,6 +92,16 @@ class SpeciesService {
 		//		noOfInsertions += uploadNewSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/speciespages/Eurasian Curlew/EurasianCurlew_v4_2.xlsm");
 		//		noOfInsertions += uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/zoooutreach/uploadready/primates.xlsx", grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/zoooutreach/uploadready/primates_mappingfile.xls", 0, 0, 0, 0);
 
+		//grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/abct/1.5/photos_bryo/";
+		//noOfInsertions += uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/abct/1.5/abctrust_mosses.xls", grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/abct/1.5/abctrust_mosses_mappingfile.xls", 0, 0, 0, 0);
+
+		//		grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/ranwa/uploadready/";
+		//		noOfInsertions += uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/ranwa/uploadready/plant_speciesimages.xlsx", grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/ranwa/uploadready/plant_speciesimages_mapping.xlsx", 0, 0, 0, 0);
+		grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/keystone/rawdata/forest_plants_HTML/climbers_images";
+		noOfInsertions += uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/keystone/inprocess/climbers.xls", grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/keystone/inprocess/climbers_mapping.xlsx", 0, 0, 0, 0, 1);
+
+		//noOfInsertions += uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/mcccollege/uploadready/Database_on_Diots_of_Western_Ghats_1.xls", grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/mcccollege/uploadready/Database_on_Diots_of_Western_Ghats_mappingfile.xls", 0, 0, 0, 0);
+
 		return noOfInsertions;
 	}
 
@@ -103,10 +116,47 @@ class SpeciesService {
 	 * @param contentHeaderRowNo
 	 * @return
 	 */
-	int uploadMappedSpreadsheet (String file, String mappingFile, int mappingSheetNo, int mappingHeaderRowNo, int contentSheetNo, int contentHeaderRowNo) {
+	int uploadMappedSpreadsheet (String file, String mappingFile, int mappingSheetNo, int mappingHeaderRowNo, int contentSheetNo, int contentHeaderRowNo, int imageMetaDataSheetNo = -1) {
 		log.info "Uploading mapped spreadsheet : "+file;
-		List<Species> species = MappedSpreadsheetConverter.getInstance().convertSpecies(file, mappingFile, mappingSheetNo, mappingHeaderRowNo, contentSheetNo, contentHeaderRowNo);
-		return saveSpecies(species);
+
+		List<Species> species = new ArrayList<Species>();
+		MappedSpreadsheetConverter mappedSpreadsheetConverter = MappedSpreadsheetConverter.getInstance();
+		XMLConverter converter = new XMLConverter();
+
+		def startTime = System.currentTimeMillis()
+
+		List<Map> mappingConfig = SpreadsheetReader.readSpreadSheet(mappingFile, mappingSheetNo, mappingHeaderRowNo);
+		List<Map> content = SpreadsheetReader.readSpreadSheet(file, contentSheetNo, contentHeaderRowNo);
+		List<Map> imagesMetaData;
+		if(imageMetaDataSheetNo && imageMetaDataSheetNo  >= 0) {
+			imagesMetaData = SpreadsheetReader.readSpreadSheet(file, imageMetaDataSheetNo, 0);
+		}
+
+		int noOfInsertions = 0;
+		for(Map speciesContent : content) {
+			Node speciesElement = mappedSpreadsheetConverter.createSpeciesXML(speciesContent, mappingConfig, imagesMetaData);
+			//log.debug "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
+			//log.debug speciesElement;
+			//log.debug "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
+			Species s = converter.convertSpecies(speciesElement)
+			if(s)
+				species.add(s);
+
+			if(species.size() >= BATCH_SIZE) {
+				noOfInsertions += saveSpecies(species);
+				species.clear();
+			}
+		}
+
+		if(species.size() > 0) {
+			noOfInsertions += saveSpecies(species);
+			species.clear();
+		}
+
+		log.info "Total time taken to save : "+(( System.currentTimeMillis()-startTime)/1000) + "(sec)"
+		log.info "Total number of species that got added : ${noOfInsertions}"
+		//List<Species> species = MappedSpreadsheetConverter.getInstance().convertSpecies(file, mappingFile, mappingSheetNo, mappingHeaderRowNo, contentSheetNo, contentHeaderRowNo);
+		return noOfInsertions;
 	}
 
 	/**
@@ -191,7 +241,7 @@ class SpeciesService {
 		}
 
 		log.info "Time taken to save : "+(( System.currentTimeMillis()-startTime)/1000) + "(sec)"
-		log.info "Total number of species that got added : ${noOfInsertions}"
+		log.info "Number of species that got added : ${noOfInsertions}"
 		//log.debug "Publishing to search index"
 
 		postProcessSpecies(addedSpecies);
@@ -215,7 +265,9 @@ class SpeciesService {
 	private List saveSpeciesBatch(List<Species> batch) {
 		int noOfInsertions = 0;
 		List<Species> addedSpecies = [];
-		Species.withTransaction {
+
+		Species.withTransaction { status ->
+
 			for(Species s in batch) {
 				try {
 					externalLinksService.updateExternalLinks(s.taxonConcept);
@@ -225,11 +277,32 @@ class SpeciesService {
 
 				s.percentOfInfo = calculatePercentOfInfo(s);
 
-				if(!s.save()) {
-					s.errors.allErrors.each { log.error it }
-				} else {
-					noOfInsertions++;
-					addedSpecies.add(s);
+				try {
+					if(s.id && !s.isAttached()) {
+						//merging only if it was already a persistent object
+						s = s.merge();
+					}
+					if(!s.save()) {
+						s.errors.allErrors.each { log.error it }
+					} else {
+						noOfInsertions++;
+						addedSpecies.add(s);
+					}
+				}catch (org.springframework.dao.OptimisticLockingFailureException e) {
+					log.error "OptimisticLockingFailureException : $e.message"
+					log.error "Trying to add species  ${s}"
+					e.printStackTrace()
+					status.setRollbackOnly()
+				}catch (org.springframework.dao.DataIntegrityViolationException e) {
+					log.error "OptimisticLockingFailureException : $e.message"
+					log.error "Trying to add species  ${s}"
+					e.printStackTrace()
+					status.setRollbackOnly()
+				} catch(ConstraintViolationException e) {
+					log.error "ConstraintViolationException : $e.message"
+					log.error "Trying to add species in the batch are ${batch}"
+					e.printStackTrace()
+					status.setRollbackOnly()
 				}
 			}
 		}
@@ -368,7 +441,6 @@ class SpeciesService {
 		String aq = "";
 		int i=0;
 		if(params.aq instanceof GrailsParameterMap) {
-			println '-----------------'
 			params.aq.each { key, value ->
 				queryParams["aq."+key] = value;
 				activeFilters["aq."+key] = value;
@@ -519,7 +591,7 @@ class SpeciesService {
 		if(!speciesField) {
 			return [success:false, msg:"SpeciesFeild with id ${speciesFieldId} is not found"]
 		}
-		
+
 		SpeciesField.withTransaction { status ->
 			Contributor c = (new XMLConverter()).getContributorByName(value, true);
 			if(!c) {
@@ -545,7 +617,7 @@ class SpeciesService {
 		if(!value) {
 			return [success:false, msg:"Field content cannot be empty"]
 		}
-		
+
 		SpeciesField c = SpeciesField.get(id)
 		if(!c) {
 			return [success:false, msg:"SpeciesField with id ${id} is not found"]
@@ -561,4 +633,65 @@ class SpeciesService {
 		}
 	}
 
+	private def createImagesXML(params) {
+		NodeBuilder builder = NodeBuilder.newInstance();
+		XMLConverter converter = new XMLConverter();
+		def resources = builder.createNode("resources");
+		Node images = new Node(resources, "images");
+		List files = [];
+		List titles = [];
+		List licenses = [];
+		params.each { key, val ->
+			int index = -1;
+			if(key.startsWith('file_')) {
+				index = Integer.parseInt(key.substring(key.lastIndexOf('_')+1));
+
+			}
+			if(index != -1) {
+				files.add(val);
+				titles.add(params.get('title_'+index));
+				licenses.add(params.get('license_'+index));
+			}
+		}
+		files.eachWithIndex { file, key ->
+			Node image = new Node(images, "image");
+			if(file) {
+				File f = new File(uploadDir, file);
+				new Node(image, "fileName", f.absolutePath);
+				//new Node(image, "source", imageData.get("source"));
+				new Node(image, "caption", titles.getAt(key));
+				new Node(image, "contributor", params.author.username);
+				new Node(image, "license", licenses.getAt(key));
+			} else {
+				log.warn("No reference key for image : "+key);
+			}
+		}
+		return resources;
+	}
+
+	private def createVideoXML(params) {
+		NodeBuilder builder = NodeBuilder.newInstance();
+		XMLConverter converter = new XMLConverter();
+		def resources = builder.createNode("resources");
+		Node videos = new Node(resources, "videos");
+
+		Node video = new Node(videos, "video");
+		new Node(video, 'fileName', 'video')
+		new Node(video, "source", params.video);
+		new Node(video, "caption", params.description);
+		new Node(video, "contributor", springSecurityService.currentUser.name);
+		new Node(video, "attributor", params.attributor);
+		new Node(video, "license", "CC BY");
+
+		return resources;
+	}
+
+	/**
+	 * 
+	 */
+	private List<Resource> saveResources(Node resourcesXML, String relImagesContext) {
+		XMLConverter converter = new XMLConverter();
+		converter.setResourcesRootDir(grailsApplication.config.speciesPortal.resources.rootDir);
+		return converter.createMedia(resourcesXML, relImagesContext);
+	}
 }

@@ -277,7 +277,7 @@ class ActivityFeedService {
 		String sb = ""
 		def uGroup = grailsApplication.mainContext.getBean('species.UserGroupTagLib');
 		if(speciesId != null){
-			sb =  '<a href="' + uGroup.createLink(controller:"species", action:"show", id:speciesId, 'userGroupWebaddress':params?.webaddress) + '">' + "<i>$reco.name</i>" + "</a>"
+			sb =  '<a href="' + uGroup.createLink(controller:"species", action:"show", id:speciesId, 'userGroupWebaddress':params?.webaddress, absolute:true) + '">' + "<i>$reco.name</i>" + "</a>"
 		}else if(reco.isScientificName){
 			sb = "<i>$reco.name</i>"
 		}else{
@@ -288,12 +288,12 @@ class ActivityFeedService {
 	
 	def getUserHyperLink(user, userGroup){
 		def uGroup = grailsApplication.mainContext.getBean('species.UserGroupTagLib');
-		return '<a href="' + uGroup.createLink(controller:'SUser', action:'show', id:user.id, userGroup:userGroup, 'userGroupWebaddress':userGroup?.webaddress)  + '">' + "<i>$user.name</i>" + "</a>"
+		return '<a href="' + uGroup.createLink(controller:'SUser', action:'show', id:user.id, userGroup:userGroup, 'userGroupWebaddress':userGroup?.webaddress, absolute:true)  + '">' + "<i>$user.name</i>" + "</a>"
 	}
 	
 	def getUserGroupHyperLink(userGroupInstance){
 		def uGroup = grailsApplication.mainContext.getBean('species.UserGroupTagLib');
-		return '<a href="' + uGroup.createLink(mapping:'userGroup',  action:'show', 'userGroup':userGroupInstance) + '">' + "<i>$userGroupInstance.name</i>" + "</a>"
+		return '<a href="' + uGroup.createLink(mapping:'userGroup',  action:'show', 'userGroup':userGroupInstance, absolute:true) + '">' + "<i>$userGroupInstance.name</i>" + "</a>"
 	}
 	
 	

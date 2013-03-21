@@ -27,19 +27,21 @@ class ExternalLinksService {
 		
 		while(true) {
 
+
 			def taxonConcepts = TaxonomyDefinition.findAll("from TaxonomyDefinition as taxonomyDefinition where taxonomyDefinition.rank = :speciesTaxonRank  order by taxonomyDefinition.id",[speciesTaxonRank:TaxonomyRank.SPECIES.ordinal()],[max:limit, offset:offset]);
 			
 			if(!taxonConcepts) break;
-			
-			taxonConcepts.eachWithIndex { taxonConcept, index ->
-				if(!taxonConcept.externalLinks?.eolId && updateExternalLinks(taxonConcept)) {
-					noOfUpdations ++;
-				} else {
-					noOfFailures++;
-				}	
-			}
-			log.info "Updated external links for taxonConcepts ${noOfUpdations}"
-			cleanUpGorm();
+			//TaxonomyDefinition.withNewSession { session ->
+				taxonConcepts.eachWithIndex { taxonConcept, index ->
+					if(!taxonConcept.externalLinks?.eolId && updateExternalLinks(taxonConcept)) {
+						noOfUpdations ++;
+					} else {
+						noOfFailures++;
+					}	
+				}
+				log.info "Updated external links for taxonConcepts ${noOfUpdations}"
+			//}
+//			cleanUpGorm();
 			offset += limit;
 		}
 		if(noOfUpdations) {
@@ -62,7 +64,7 @@ class ExternalLinksService {
 			updateOtherIdsFromEOL(http, taxonConcept.externalLinks?.eolId, taxonConcept);
 		}
 
-		taxonConcept = taxonConcept.merge();
+		//taxonConcept = session.merge(taxonConcept);
 		if(!taxonConcept.save()) {
 			taxonConcept.errors.each { log.error it};
 			return false;

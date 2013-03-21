@@ -305,7 +305,7 @@ class XMLConverter extends SourceConverter {
 
 			for (sField in sFields) {
 				log.debug "Found already existing species fields for field ${field}"
-				if(sField.contributors.isEmpty() || sField.contributors.contains(contributors[0])) {
+				if(sField.contributors.isEmpty() || isDuplicateSpeciesField(sField,contributors)) {
 					speciesField = sField;
 					break;
 				}
@@ -340,6 +340,17 @@ class XMLConverter extends SourceConverter {
 	private String getData(Node dataNode) {
 		//sanitize the html text
 		return dataNode.text()?:"";
+	}
+	
+	private boolean isDuplicateSpeciesField(SpeciesField sField, contributors) {
+		for(c1 in sField.contributors) {
+			for(c2 in contributors) {
+				if(c1.id == c2.id) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	private String cleanData(String text, TaxonomyDefinition taxon, List<Synonyms> synonyms) {
@@ -544,7 +555,7 @@ class XMLConverter extends SourceConverter {
 			def videosNode = resourcesXML.videos;
 			
 			resources.addAll(createResourceByType(imagesNode[0], ResourceType.IMAGE, relResFolder));
-			//resources.addAll(createResourceByType(iconsNode, ResourceType.ICON));
+			resources.addAll(createResourceByType(iconsNode[0], ResourceType.ICON, relResFolder));
 			//resources.addAll(createResourceByType(audiosNode, ResourceType.AUDIO));
 			resources.addAll(createResourceByType(videosNode[0], ResourceType.VIDEO, relResFolder));
 		}
@@ -566,7 +577,7 @@ class XMLConverter extends SourceConverter {
 				case ResourceType.IMAGE:
 					resourceNode?.image.each {
 						if(!it?.id) {
-							def resource = createImage(it, relResFolder);
+							def resource = createImage(it, relResFolder, ResourceType.IMAGE);
 							if(resource) {
 								resources.add(resource);
 							}
@@ -574,7 +585,14 @@ class XMLConverter extends SourceConverter {
 					}
 					break;
 				case ResourceType.ICON:
-					resourceNode?.icon.each { if(!it?.id) resources.add(createIcon(it)); }
+					resourceNode?.image.each {
+						if(!it?.id) {
+							def resource = createImage(it, relResFolder+File.separator+"icons", ResourceType.ICON);
+							if(resource) {
+								resources.add(resource);
+							}
+						}
+					}
 					break;
 				case ResourceType.AUDIO:
 					resourceNode?.audio.each { if(!it?.id) resources.add(createAudio(it)); }
@@ -592,7 +610,7 @@ class XMLConverter extends SourceConverter {
 	 * @param imageNode
 	 * @return
 	 */
-	private Resource createImage(Node imageNode, String relImagesFolder) {
+	private Resource createImage(Node imageNode, String relImagesFolder, ResourceType resourceType) {
 		File tempFile = getImageFile(imageNode);
 		def sourceUrl = imageNode.source?.text() ? imageNode.source?.text() : "";
 
@@ -603,7 +621,7 @@ class XMLConverter extends SourceConverter {
 			relImagesFolder = Utils.cleanFileName(relImagesFolder.trim());
 
 			File root = new File(resourcesRootDir , relImagesFolder);
-			if(!root.exists() && !root.mkdir()) {
+			if(!root.exists() && !root.mkdirs()) {
 				log.error "COULD NOT CREATE DIR FOR SPECIES : "+root.getAbsolutePath();
 			}
 			log.debug "in dir : "+root.absolutePath;
@@ -625,13 +643,14 @@ class XMLConverter extends SourceConverter {
 				and{
 					eq("fileName", path);
 					sourceUrl ? eq("url", sourceUrl) : isNull("url");
-					eq("type", ResourceType.IMAGE);
+					eq("type", resourceType);
 				}
 
 			}
 
 			if(!res) {
-				res = new Resource(type : ResourceType.IMAGE, fileName:path, url:sourceUrl, description:imageNode.caption?.text(), mimeType:imageNode.mimeType?.text());
+				log.debug "Creating new resource"
+				res = new Resource(type : resourceType, fileName:path, url:sourceUrl, description:imageNode.caption?.text(), mimeType:imageNode.mimeType?.text());
 				for(Contributor con : getContributors(imageNode, true)) {
 					res.addToContributors(con);
 				}
@@ -642,6 +661,7 @@ class XMLConverter extends SourceConverter {
 					res.addToLicenses(l);
 				}
 			} else {
+				log.debug "Updating resource metadata"
 				res.url = sourceUrl
 				res.description = imageNode.caption?.text();
 				res.licenses?.clear()
@@ -701,19 +721,19 @@ class XMLConverter extends SourceConverter {
 		return tempFile;
 	}
 
-	private Resource createIcon(Node iconNode) {
-		String fileName = iconNode.text()?.trim();
-		log.debug "Creating icon : "+fileName;
-
-		def l = getLicenseByType(LicenseType.CC_PUBLIC_DOMAIN, false);
-		def res = new Resource(type : ResourceType.ICON, fileName:fileName);
-		res.addToLicenses(l);
-		if(!res.save(flush:true)) {
-			res.errors.each { log.error it }
-		}
-		iconNode.appendNode("resource", res);
-		return res;
-	}
+//	private Resource createIcon(Node iconNode) {
+//		String fileName = iconNode.text()?.trim();
+//		log.debug "Creating icon : "+fileName;
+//
+//		def l = getLicenseByType(LicenseType.CC_PUBLIC_DOMAIN, false);
+//		def res = new Resource(type : ResourceType.ICON, fileName:fileName);
+//		res.addToLicenses(l);
+//		if(!res.save(flush:true)) {
+//			res.errors.each { log.error it }
+//		}
+//		iconNode.appendNode("resource", res);
+//		return res;
+//	}
 
 	private Resource createAudio(Node audioNode) {
 		String fileName = imageNode.get("fileName");
@@ -783,22 +803,22 @@ class XMLConverter extends SourceConverter {
 
 	private List<Resource> getResources(Node dataNode, Node imagesNode, Node iconsNode, Node audiosNode, Node videosNode) {
 		List<Resource> resources = new ArrayList<Resource>();
-		List<Resource> res =  getImages(dataNode, imagesNode);
+		List<Resource> res =  getImages(dataNode.images?.image, imagesNode);
 		if(res) resources.addAll(res);
-
-		res =  getIcons(dataNode, iconsNode);
+		res =  getImages(dataNode.icons?.icon, iconsNode);
 		if(res) resources.addAll(res);
 
 		//resources.addAll(getAudio(dataNode, audiosNode));
 		//resources.addAll(getVideo(dataNode, videosNode));
+		log.debug "Getting resources for dataNode : "+resources;
 		return resources;
 	}
 
-	private List<Resource> getImages(Node dataNode, Node imagesNode) {
+	private List<Resource> getImages(NodeList imagesRefNode, Node imagesNode) {
 		List<Resource> resources = new ArrayList<Resource>();
 
-		if(!dataNode || !imagesNode) return resources;
-		dataNode.images.image.each {
+		if(!imagesRefNode || !imagesNode) return resources;
+		imagesRefNode.each {
 			String fileName = it?.text()?.trim();
 
 			log.debug fileName;
@@ -818,40 +838,39 @@ class XMLConverter extends SourceConverter {
 
 			}
 		}
-		log.debug "Getting resources for dataNode : "+resources;
 		return resources;
 	}
 
-	private List<Resource> getIcons(Node dataNode, Node iconsNode) {
-		List<Resource> resources = new ArrayList<Resource>();
-
-		if(!dataNode) return resources;
-
-		dataNode.icons.icon.each {
-			String fileName = it.text();
-			def fieldCriteria = Resource.createCriteria();
-			def res = fieldCriteria.get {
-				and {
-					eq("fileName", fileName);
-					eq("type", ResourceType.ICON);
-				}
-			}
-
-			if(!res) {
-				log.debug "Creating icon : "+fileName
-				res = new Resource(type : ResourceType.ICON, fileName:fileName);
-				def l = getLicenseByType(LicenseType.CC_PUBLIC_DOMAIN, false);
-				res.addToLicenses(l);
-				if(!res.save(flush:true)) {
-					res.errors.each { log.error it }
-				}
-			}
-
-			resources.add(res);
-			s.addToResources(res);
-		}
-		return resources;
-	}
+//	private List<Resource> getIcons(Node dataNode, Node iconsNode) {
+//		List<Resource> resources = new ArrayList<Resource>();
+//
+//		if(!dataNode) return resources;
+//
+//		dataNode.icons.icon.each {
+//			String fileName = it.text();
+//			def fieldCriteria = Resource.createCriteria();
+//			def res = fieldCriteria.get {
+//				and {
+//					eq("fileName", fileName);
+//					eq("type", ResourceType.ICON);
+//				}
+//			}
+//
+//			if(!res) {
+//				log.debug "Creating icon : "+fileName
+//				res = new Resource(type : ResourceType.ICON, fileName:fileName);
+//				def l = getLicenseByType(LicenseType.CC_PUBLIC_DOMAIN, false);
+//				res.addToLicenses(l);
+//				if(!res.save(flush:true)) {
+//					res.errors.each { log.error it }
+//				}
+//			}
+//
+//			resources.add(res);
+//			s.addToResources(res);
+//		}
+//		return resources;
+//	}
 
 	private List<Resource> getAudio(Node dataNode, Node audiosNode) {
 		List<Resource> resources = new ArrayList<Resource>();
@@ -1008,9 +1027,13 @@ class XMLConverter extends SourceConverter {
 		}
 
 		if(!langs && name) {
-			return Language.findByNameIlike(name);
+			def lang = Language.findByNameIlike(name);
+			if(!lang && name.size() == 3) {
+				return Language.findByThreeLetterCode(name.toLowerCase());
+			} else {
+				return lang;
+			}
 		}
-
 		return langs ? langs[0] : null;
 	}
 
@@ -1051,9 +1074,9 @@ class XMLConverter extends SourceConverter {
 				eq("taxonConcept", taxonConcept);
 			}
 			if(!sfield) {
-				log.debug "Saving synonym : "+cleanName;
+				log.debug "Saving synonym : "+parsedName.name;
 				sfield = new Synonyms();
-				sfield.name = cleanName;
+				sfield.name = parsedName.name;
 				sfield.relationship = rel;
 				sfield.taxonConcept = taxonConcept;
 
@@ -1165,7 +1188,7 @@ class XMLConverter extends SourceConverter {
 	 */
 	private List<TaxonomyRegistry> getTaxonHierarchy(List fieldNodes, Classification classification, String scientificName, boolean saveTaxonHierarchy=true) {
 		log.debug "Getting classification hierarchy : "+classification.name;
-println fieldNodes
+
 		List<TaxonomyRegistry> taxonEntities = new ArrayList<TaxonomyRegistry>();
 
 		List<String> names = new ArrayList<String>();
@@ -1364,7 +1387,11 @@ println fieldNodes
 	 * @return
 	 */
 	static Species findDuplicateSpecies(s) {
-		return Species.findByGuid(s.guid);
+		def species = Species.findByGuid(s.guid);
+//		if(!species.isAttached()) {
+//			species.attach();
+//		}
+		return species
 	}
 
 	/**

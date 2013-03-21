@@ -13,7 +13,7 @@
 
 
 RewriteEngine on
-RewriteCond %{REQUEST_URI} ^/(species|observation|activity|activityFeed|SUser|user|page|pages|requestMembership|joinUs|leaveUs|inviteMembers|login|logout|register|static|group|j_spring_security_logout|recommendation|comment|newsletter|emailConfirmation|search|checklist|jcaptcha|openId|data|chart).*
+RewriteCond %{REQUEST_URI} ^/(species|observation|activity|activityFeed|SUser|user|page|pages|requestMembership|joinUs|leaveUs|inviteMembers|login|logout|register|static|group|j_spring_security_logout|recommendation|comment|newsletter|emailConfirmation|search|checklist|jcaptcha|openId|data|chart|admin).*
 RewriteRule ^(.*)$ http://indiabiodiversity.localhost.org:8080/biodiv_usergroups$1 [P,L]
 ProxyPassReverse / http://indiabiodiversity.localhost.org:8080/biodiv_usergroups/
 ProxyPassReverse / http://indiabiodiversity.localhost.org:8080/

@@ -10,14 +10,18 @@
 		<div class="">
 			<g:each in="${speciesFieldInstance.resources}" var="r">
 				<g:if test="${r.type == species.Resource.ResourceType.ICON}">
+
+					<%def imagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.thumbnail.suffix)%>
+
 					<img class="icon"
-						src="${createLinkTo(dir: 'images/icons', file: r.fileName.trim(), absolute:true)}"
+						src="${createLinkTo(file: imagePath, base:grailsApplication.config.speciesPortal.resources.serverURL)}"
 						title="${r?.description}" />
+
 				</g:if>
 			</g:each>
 		</div>
 
-		<div style="padding:5px;">
+		<div style="padding: 5px;">
 
 			<!-- images -->
 
@@ -36,8 +40,7 @@
 							<div class="attributionBlock dropdown"
 								style="text-align: right; margin-right: 3px;">
 								<span href="#" class="dropdown-toggle" data-toggle="dropdown"
-									title="Show details"><i class=" icon-info-sign"></i>
-								</span>
+									title="Show details"><i class=" icon-info-sign"></i> </span>
 
 								<div class="dropdown-menu">
 									<g:imageAttribution model="['resource':r]" />
@@ -52,22 +55,26 @@
 										src="${createLinkTo(file: imagePath, base:grailsApplication.config.speciesPortal.resources.serverURL)}"
 										title="${r?.description}" /> </span> </a> <span class="caption">
 									${r?.description} </span>
-							</div></li>
+							</div>
+						</li>
 
 					</g:if>
 				</g:each>
 				</ul>
 			</g:if>
-			<div class="editField" data-type="wysihtml5" data-pk="${speciesFieldInstance.id}"  data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="description" data-original-title="Edit description">
-			<g:each in="${speciesFieldInstance?.description.split('\n')}"
-				var="para">
-				<g:if test="${para}">
-					<p>
-						${para.trim()}
-					</p>
-				</g:if>
+			<div class="editField" data-type="wysihtml5"
+				data-pk="${speciesFieldInstance.id}"
+				data-url="${uGroup.createLink(controller:'species', action:'update') }"
+				data-name="description" data-original-title="Edit description">
+				<g:each in="${speciesFieldInstance?.description.split('\n')}"
+					var="para">
+					<g:if test="${para}">
+						<p>
+							${para.trim()}
+						</p>
+					</g:if>
 
-			</g:each>
+				</g:each>
 			</div>
 		</div>
 	</g:if>
@@ -79,7 +86,7 @@
 				${speciesFieldInstance?.field?.subCategory}
 			</h6>
 		</div>
-		
+
 		<g:each in="${speciesInstance.globalDistributionEntities}">
 			<p>
 				<span class=""> ${it?.country.countryName} (${it?.country.twoLetterCode})
@@ -94,7 +101,7 @@
 				${speciesFieldInstance?.field?.subCategory}
 			</h6>
 		</div>
-		
+
 		<g:each in="${speciesInstance.globalEndemicityEntities}">
 			<p>
 				<span class=""> ${it?.country.countryName} (${it?.country.twoLetterCode})
@@ -104,15 +111,16 @@
 	</g:elseif>
 	<g:elseif
 		test="${!speciesFieldInstance?.description && !speciesFieldInstance?.field?.subCategory}">
-		
+
 	</g:elseif>
-	
+
 	<g:showSpeciesFieldToolbar
-			model="['speciesFieldInstance':speciesFieldInstance]" />
-	
+		model="['speciesFieldInstance':speciesFieldInstance]" />
+
 </div>
 <g:if test="${speciesFieldInstance != null}">
-	<comment:showCommentPopup model="['commentHolder':speciesFieldInstance, 'rootHolder':speciesInstance]" />
+	<comment:showCommentPopup
+		model="['commentHolder':speciesFieldInstance, 'rootHolder':speciesInstance]" />
 </g:if>
 
 

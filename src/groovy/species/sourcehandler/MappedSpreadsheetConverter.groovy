@@ -28,15 +28,38 @@ class MappedSpreadsheetConverter extends SourceConverter {
 		return _instance;
 	}
 
-	public List<Species> convertSpecies(String file, String mappingFile, int mappingSheetNo, int mappingHeaderRowNo, int contentSheetNo, int contentHeaderRowNo) {
+	public List<Species> convertSpecies(String file, String mappingFile, int mappingSheetNo, int mappingHeaderRowNo, int contentSheetNo, int contentHeaderRowNo, int imageMetaDataSheetNo) {
 		List<Map> mappingConfig = SpreadsheetReader.readSpreadSheet(mappingFile, mappingSheetNo, mappingHeaderRowNo);
 		List<Map> content = SpreadsheetReader.readSpreadSheet(file, contentSheetNo, contentHeaderRowNo);
+		List<Map> imagesMetaData;
+		if(imageMetaDataSheetNo && imageMetaDataSheetNo  >= 0) {
+			imagesMetaData = SpreadsheetReader.readSpreadSheet(file, imageMetaDataSheetNo, 0);
+		}
+		
+		return convertSpecies(content, mappingConfig, imagesMetaData);
+	}
 
+	public List<Species> convertSpecies(List<Map> content, List<Map> mappingConfig, List<Map> imagesMetaData) {
 		List<Species> species = new ArrayList<Species>();
-
+		
+		XMLConverter converter = new XMLConverter();
+		
+		for(Map speciesContent : content) {
+			Node speciesElement = createSpeciesXML(content, mappingConfig);
+			//log.debug "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
+			//log.debug speciesElement;
+			//log.debug "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
+			Species s = converter.convertSpecies(speciesElement)
+			if(s)
+				species.add(s);
+		}
+		return species;
+	}
+	
+	public Node createSpeciesXML(Map speciesContent, List<Map> mappingConfig, List<Map> imagesMetaData) {
 		NodeBuilder builder = NodeBuilder.newInstance();
 		int i=0;
-		for(Map speciesContent : content) {
+		
 			//log.debug speciesContent;
 			Node speciesElement = builder.createNode("species");
 			for(Map mappedField : mappingConfig) {
@@ -50,10 +73,9 @@ class MappedSpreadsheetConverter extends SourceConverter {
 					Node category = new Node(field, "category", mappedField.get("category"));
 					Node subcategory = new Node(field, "subcategory", mappedField.get("subcategory"));
 					if (customFormat && mappedField.get("category")?.equalsIgnoreCase("images")) {
-						Node images = getImages(file, fieldName, customFormat, delimiter, speciesContent, speciesElement);
+						Node images = getImages(imagesMetaData, fieldName, 'images', customFormat, delimiter, speciesContent, speciesElement);
 					} else if (customFormat && category.text().equalsIgnoreCase("icons")) {
-						//						Node images = getIcons(fieldName, customFormat, speciesContent);
-						//						new Node(speciesElement, icons);
+						Node icons = getImages(imagesMetaData, fieldName, 'icons', customFormat, delimiter, speciesContent, speciesElement);
 					} else if (customFormat && category.text().equalsIgnoreCase("audio")) {
 						//						Node images = getAudio(fieldName, customFormat, speciesContent);
 						//						new Node(speciesElement, audio);
@@ -96,17 +118,7 @@ class MappedSpreadsheetConverter extends SourceConverter {
 					}
 				}
 			}
-			//log.debug "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
-			//log.debug speciesElement;
-			//log.debug "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
-			XMLConverter converter = new XMLConverter();
-			Species s = converter.convertSpecies(speciesElement)
-			if(s)
-				species.add(s);
-			//if(i==2)break;
-			i++
-		}
-		return species;
+			return speciesElement
 	}
 
 	private Node createDataNode(Node field, String text, Map speciesContent, Map mappedField) {
@@ -182,10 +194,26 @@ class MappedSpreadsheetConverter extends SourceConverter {
 				if(images) {
 					def imagesNode = data;
 					imagesNode = new Node(data, "images");
-					String delimiter = mappedField.get("content delimiter") ?: "\n|\\s{3,}";
+					String delimiter = mappedField.get("content delimiter") ?: "\n|\\s{3,}|,|;";
 					images.split(delimiter).each {
 						String loc = cleanLoc(it)
 						new Node(imagesNode, "image", loc);
+					}
+				}
+			}
+		}
+		
+		String iconsField = mappedField.get("icons");
+		if(iconsField) {
+			iconsField.split(",").each { iconField ->
+				String icons = speciesContent.get(iconField.toLowerCase());
+				if(icons) {
+					def iconsNode = data;
+					iconsNode = new Node(data, "icons");
+					String delimiter = mappedField.get("content delimiter") ?: "\n|\\s{3,}|,|;";
+					icons.split(delimiter).each {
+						String loc = cleanLoc(it)
+						new Node(iconsNode, "icon", loc);
 					}
 				}
 			}
@@ -232,8 +260,8 @@ class MappedSpreadsheetConverter extends SourceConverter {
 		return con;
 	}
 
-	private Node getImages(String file, String fieldName, String customFormat, String delimiter, Map speciesContent, Node speciesElement) {
-		Node images = new Node(speciesElement, "images");
+	private Node getImages(List<Map> imagesMetaData, String fieldName, String fieldType, String customFormat, String delimiter, Map speciesContent, Node speciesElement) {
+		Node images = new Node(speciesElement, fieldType);
 
 		def result = getCustomFormat(customFormat);
 		int group = result.get("group") ? Integer.parseInt(result.get("group")?.toString()):-1
@@ -241,13 +269,13 @@ class MappedSpreadsheetConverter extends SourceConverter {
 		int source = result.get("source") ? Integer.parseInt(result.get("source")?.toString())-1:-1
 		int caption = result.get("caption") ? Integer.parseInt(result.get("caption")?.toString())-1:-1
 		int attribution = result.get("attribution") ? Integer.parseInt(result.get("attribution")?.toString())-1:-1
+		int contributor = result.get("contributor") ? Integer.parseInt(result.get("contributor")?.toString())-1:-1
 		int license = result.get("license") ? Integer.parseInt(result.get("license")?.toString())-1:-1
 		int name = result.get("name") ? Integer.parseInt(result.get("name")?.toString())-1:-1
 		boolean incremental = result.get("incremental") ? new Boolean(result.get("incremental")) : false
-		int imagesMetaDataSheet = result.get("imagesmetadatasheet") ? Integer.parseInt(result.get("imagesmetadatasheet")?.toString()):-1;
-		if(imagesMetaDataSheet != -1) {
+		
+		if(imagesMetaData) {
 			//TODO:This is getting repeated for every row in spreadsheet costly
-			List<Map> imagesMetaData = SpreadsheetReader.readSpreadSheet(file, imagesMetaDataSheet, 0);
 			fieldName.split(",").eachWithIndex { t, index ->
 				String txt = speciesContent.get(t);
 				txt.split(delimiter).each { loc ->
@@ -262,7 +290,7 @@ class MappedSpreadsheetConverter extends SourceConverter {
 				try{
 				String txt = speciesContent.get(t.trim());
 				if (index != 0 && index % group == 0) {
-					populateImageNode(images, groupValues, delimiter, location, source, caption, attribution, license, name, incremental);
+					populateImageNode(images, groupValues, delimiter, location, source, caption, attribution, contributor, license, name, incremental);
 					groupValues = new ArrayList<String>();
 				}
 				groupValues.add(txt);
@@ -270,12 +298,12 @@ class MappedSpreadsheetConverter extends SourceConverter {
 					e.printStackTrace()
 				}
 			}
-			populateImageNode(images, groupValues, delimiter, location, source, caption, attribution, license, name, incremental);
+			populateImageNode(images, groupValues, delimiter, location, source, caption, attribution, contributor, license, name, incremental);
 		}
 		return images;
 	}
 
-	private void populateImageNode(Node images, List<String> groupValues, String delimiter, int location, int source, int caption, int attribution, int license, int name, boolean incremental) {
+	private void populateImageNode(Node images, List<String> groupValues, String delimiter, int location, int source, int caption, int attribution, int contributor, int license, int name, boolean incremental) {
 		if(location != -1 && groupValues.get(location)) {
 			String locationStr = groupValues.get(location);
 			def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
@@ -283,16 +311,16 @@ class MappedSpreadsheetConverter extends SourceConverter {
 			if(locationStr) {
 				if(delimiter) {
 					locationStr.split(delimiter).each { loc ->
-						createImageNode(images, groupValues, loc, uploadDir, source, caption, attribution, license, name, incremental);
+						createImageNode(images, groupValues, loc, uploadDir, source, caption, attribution, contributor, license, name, incremental);
 					}
 				} else {
-					createImageNode(images, groupValues, locationStr, uploadDir, source, caption, attribution, license, name, incremental);
+					createImageNode(images, groupValues, locationStr, uploadDir, source, caption, attribution, contributor, license, name, incremental);
 				}
 			}
 		}
 	}
 
-	private void createImageNode(Node images, List<String> groupValues, String loc, String uploadDir, int source, int caption, int attribution, int license, int name, boolean incremental) {
+	private void createImageNode(Node images, List<String> groupValues, String loc, String uploadDir, int source, int caption, int attribution, int contributor, int license, int name, boolean incremental) {
 		String refKey = loc;
 		loc = cleanLoc(loc);
 		File imagesLocation = new File(uploadDir, loc);
@@ -304,6 +332,7 @@ class MappedSpreadsheetConverter extends SourceConverter {
 				if(source != -1 && groupValues.get(source)) new Node(image, "source", groupValues.get(source));
 				if(caption != -1 && groupValues.get(caption)) new Node(image, "caption", groupValues.get(caption));
 				if(attribution != -1 && groupValues.get(attribution)) new Node(image, "attribution", groupValues.get(attribution));
+				if(contributor != -1 && groupValues.get(contributor)) new Node(image, "contributor", groupValues.get(contributor));
 				if(license != -1 && groupValues.get(license)) new Node(image, "license", groupValues.get(license));
 			}
 		} else if(imagesLocation.exists()){
@@ -313,6 +342,7 @@ class MappedSpreadsheetConverter extends SourceConverter {
 			if(source != -1 && groupValues.get(source)) new Node(image, "source", groupValues.get(source));
 			if(caption != -1 && groupValues.get(caption)) new Node(image, "caption", groupValues.get(caption));
 			if(attribution != -1 && groupValues.get(attribution)) new Node(image, "attribution", groupValues.get(attribution));
+			if(contributor != -1 && groupValues.get(contributor)) new Node(image, "contributor", groupValues.get(contributor));
 			if(license != -1 && groupValues.get(license)) new Node(image, "license", groupValues.get(license));
 		}
 	}
@@ -324,13 +354,14 @@ class MappedSpreadsheetConverter extends SourceConverter {
 			String refKey = imageData.get("id");
 			if(refKey.trim().equals(imageId.trim())) {
 				Node image = new Node(images, "image");
-				String loc = imageData.get("imageno.");
+				String loc = imageData.get("imageno.")?:imageData.get("id");
 				File file = new File(uploadDir, cleanLoc(loc));
 				new Node(image, "refKey", refKey);
 				new Node(image, "fileName", file.getAbsolutePath());
 				new Node(image, "source", imageData.get("source"));
 				new Node(image, "caption", imageData.get("possiblecaption"));
 				new Node(image, "attribution", imageData.get("attribution"));
+				new Node(image, "contributor", imageData.get("contributor"));
 				new Node(image, "license", imageData.get("license"));
 			}
 		}
