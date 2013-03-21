@@ -33,7 +33,7 @@ import org.apache.solr.common.util.NamedList
 
 class ObservationController {
 	
-
+	private static final Object LOCK = new Object() 
 	
 	public static final boolean COMMIT = true;
 
@@ -239,14 +239,14 @@ class ObservationController {
 	def show = {
 		log.debug params;
 		if(params.id) {
-			def observationInstance = Observation.findWhere(id:params.id.toLong(), isDeleted:false)
+			def observationInstance = Observation.findByIdAndIsDeleted(params.id.toLong(), false)
 			if (!observationInstance) {
 				flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
 				redirect (url:uGroup.createLink(action:'list', controller:"observation", 'userGroupWebaddress':params.webaddress))
 				//redirect(action: "list")
 			}
 			else {
-				observationInstance.incrementPageVisit();
+				observationInstance.incrementPageVisit()
 				def userGroupInstance;
 				if(params.webaddress) {
 					userGroupInstance = userGroupService.get(params.webaddress);
@@ -533,9 +533,8 @@ class ObservationController {
 				}else if(!recommendationVoteInstance.hasErrors() && recommendationVoteInstance.save(flush: true)) {
 					log.debug "Successfully added reco vote : "+recommendationVoteInstance
 					observationService.addRecoComment(recommendationVoteInstance.recommendation, observationInstance, params.recoComment);
-					observationInstance.lastRevised = new Date();
 					//saving max voted species name for observation instance
-					observationInstance.calculateMaxVotedSpeciesName();
+					observationInstance.saveConcurrently(observationInstance.&calculateMaxVotedSpeciesName);
 					def activityFeed = activityFeedService.addActivityFeed(observationInstance, recommendationVoteInstance, recommendationVoteInstance.author, activityFeedService.SPECIES_RECOMMENDED);
 					observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
 					
@@ -607,8 +606,7 @@ class ObservationController {
 					return
 				}else if(recommendationVoteInstance.save(flush: true)) {
 					log.debug "Successfully added reco vote : "+recommendationVoteInstance
-					observationInstance.lastRevised = new Date();
-					observationInstance.calculateMaxVotedSpeciesName();
+					observationInstance.saveConcurrently(observationInstance.&calculateMaxVotedSpeciesName);
 					def activityFeed = activityFeedService.addActivityFeed(observationInstance, recommendationVoteInstance, recommendationVoteInstance.author, activityFeedService.SPECIES_AGREED_ON);
 					observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
 					
@@ -1225,5 +1223,4 @@ class ObservationController {
 			response.outputStream.flush()
 		}
 	}
-
 }

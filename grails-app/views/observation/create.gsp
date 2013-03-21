@@ -910,7 +910,7 @@ input.dms_field {
 	$( "#observedOn" ).datepicker({ 
 			changeMonth: true,
 			changeYear: true,
-			dateFormat: 'dd/mm/yy' 
+			format: 'dd/mm/yyyy' 
 	});
 	
 </r:script>
