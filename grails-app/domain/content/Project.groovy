@@ -19,6 +19,9 @@ class Project implements Taggable{
 	StrategicDirection direction;
 	String title;
 	String summary;
+	
+	List locations = new ArrayList();
+	
 	//Grantee grantee;
 	//  File granteeLogo; // TODO
 	String granteeURL;
@@ -51,6 +54,9 @@ class Project implements Taggable{
 		dataContributionIntensity type:"text"
 		analysis type:"text"
 		misc type:"text"
+		
+		locations cascade:"all-delete-orphan"
+		
 
 
 	}
@@ -87,15 +93,13 @@ class Project implements Taggable{
 
 	}
 
-	def getReportFilesList() {
-		return LazyList.decorate(
-		reportFiles,
-		FactoryUtils.instantiateFactory(UFile.class))
-	}
 
-	def getAnalysisFilesList() {
+
+	def getLocationsList() {
 		return LazyList.decorate(
-		analysisFiles,
-		FactoryUtils.instantiateFactory(UFile.class))
+		locations,
+		FactoryUtils.instantiateFactory(Location.class))
 	}
+	
+
 }

@@ -1,5 +1,5 @@
 <script type="text/javascript">
-    var childCount = ${projectInstance?.locations.size()} + 0;
+    var childCount = ${projectInstance?.locations?.size()} + 0;
 
     function addlocation(){
       var clone = $("#location_clone").clone()
@@ -16,17 +16,32 @@
               .attr('id',htmlId + 'new')
               .attr('name',htmlId + 'new')
               .attr('value', 'true');
-      locationInput.attr('id',htmlId + 'number')
-              .attr('name',htmlId + 'number');
-      clone.find("select[id$=type]")
-              .attr('id',htmlId + 'type')
-              .attr('name',htmlId + 'type');
+      clone.find("input[id$=siteName]")
+      .attr('id',htmlId + 'siteName')
+      .attr('name',htmlId + 'siteName')
+      clone.find("input[id$=corridor]")
+      .attr('id',htmlId + 'corridor')
+      .attr('name',htmlId + 'corridor')
 
       clone.attr('id', 'location'+childCount);
       $("#childList").append(clone);
       clone.show();
       locationInput.focus();
       childCount++;
+
+  	$(".site-name").autocomplete({
+  		source: '/project/locationSites',
+  		minLength: 2
+  		
+  		 
+  	});
+
+  		
+  		$(".corridor").autocomplete({
+  		source: '/project/locationCorridors',
+  		minLength: 2
+  		
+  		});
     }
 
     //bind click event on delete buttons using jquery live
@@ -48,4 +63,19 @@
         }
     });
 
-"grails-app/views/contact/_locations.gsp" 62L, 2133C                                                                                                                                  1,1           Top
+	
+
+		
+
+    </script>
+    
+<div id="childList">
+    <g:each var="location" in="${projectInstance.locations}" status="i">
+
+        <!-- Render the location template (_location.gsp) here -->
+        <g:render template='location' model="['location':location,'i':i,'hidden':false]"/>
+        <!-- Render the location template (_location.gsp) here -->
+
+    </g:each>
+</div>
+<input type="button" value="Add location" onclick="addlocation();" />

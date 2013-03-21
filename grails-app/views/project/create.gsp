@@ -37,6 +37,14 @@
 		</g:hasErrors>
 		<%
                 def form_action = uGroup.createLink(action:'save', controller:'project', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)
+				def form_button_name = "Create Project"
+				def form_button_val = "Create Project"
+				if(params.action == 'edit' || params.action == 'update'){
+					form_action = uGroup.createLink(action:'update', controller:'project', id:projectInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)
+					 form_button_name = "Update Project"
+					form_button_val = "Update Project"
+				}
+			
             %>
 		<form action="${form_action}" method="POST" id="create-project"
 			class="project-form form-horizontal" enctype="multipart/form-data">
@@ -111,16 +119,19 @@
 						</div>
 					</div>
 				</div>
+
 				<div class="super-section">
 					<a data-toggle="collapse" href="#locationsDiv">
-						<h5>Grantee Details</h5>
+						<h5>Location</h5>
 					</a>
 					<div id="locationsDiv" class="section in collapse">
-						        <g:render template="phones" model="['contactInstance':contactInstance]" />
-						
+						<g:render template="locations"
+							model="['projectInstance':projectInstance]" />
+
 					</div>
 
 				</div>
+
 				<div class="super-section">
 
 					<a data-toggle="collapse" href="#granteeDetails">
@@ -326,12 +337,15 @@
 				</div>
 
 				<div class="form-actions">
-					<button type="submit" class="btn btn-primary">Create</button>
+					<button type="submit" class="btn btn-primary">${form_button_name}</button>
 					<button class="btn">Cancel</button>
 				</div>
 		</form>
 
+
 	</div>
+	<g:render template='location' model="['i':'_clone','hidden':true]" />
+
 
 	<r:script>
         $(document).ready(function(){ 
@@ -347,6 +361,9 @@
         	maxLength:30
         });
 		$(".tagit-hiddenSelect").css('display','none');
+		
+
+		
         });
         
         $( ".date-popup" ).datepicker({ 
@@ -354,6 +371,8 @@
 			changeYear: true,
 			dateFormat: 'dd/mm/yy' 
 	});
+
+
         </r:script>
 
 
