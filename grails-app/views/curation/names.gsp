@@ -44,9 +44,9 @@
 							${fieldValue(bean: parsedName, field: "canonicalForm")}
 						</td>
 						
-						<td  title="${taxonConcept?.normalizedForm }"><g:link action="show" id="${taxonConcept?.id}">
+						<td  title="${taxonConcept?.normalizedForm }"><a target="_blank" href="${uGroup.createLink(controller:'species', action:'show', id:(taxonConcept?(Species.findByTaxonConcept(taxonConcept)?.id):''), userGroupWebaddress:params.webaddress)}">
 								${fieldValue(bean: taxonConcept, field: "name")}
-							</g:link>
+							</a>
 						</td>
 						<td>
 							${fieldValue(bean: taxonConcept, field: "canonicalForm")}
