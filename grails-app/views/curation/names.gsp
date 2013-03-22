@@ -13,11 +13,12 @@
 		<uGroup:rightSidebar />
 
 
-<form id="namesFileForm"  enctype="multipart/form-data" method="POST">
-<label>Please provide a simple text file with a single scientific name per line </label>
-  <input type="file" name="namesFile" placeholder="Names file with <5000 names">
-  <button type="submit" class="btn">Upload & Curate</button>
-</form>
+		<form id="namesFileForm" enctype="multipart/form-data" method="POST">
+			<label>Please provide a simple text file with a single
+				scientific name per line </label> <input type="file" name="namesFile"
+				placeholder="Names file with <5000 names">
+			<button type="submit" class="btn">Upload & Curate</button>
+		</form>
 
 		<table class="table table-bordered">
 			<thead>
@@ -34,20 +35,27 @@
 			</thead>
 			<tbody>
 				<g:each in="${parsedNames}" status="i" var="parsedName">
-				<%def taxonConcept = TaxonomyDefinition.findByCanonicalFormIlikeAndRank(parsedName.canonicalForm, TaxonomyRank.SPECIES.ordinal()) %>
-					<tr class="${parsedName.normalizedForm && parsedName.normalizedForm.equalsIgnoreCase(taxonConcept?.normalizedForm)?:'error'}">
+					<%def taxonConcept = TaxonomyDefinition.findByCanonicalFormIlikeAndRank(parsedName.canonicalForm, TaxonomyRank.SPECIES.ordinal()) %>
+					<tr
+						class="${parsedName.normalizedForm && parsedName.normalizedForm.equalsIgnoreCase(taxonConcept?.normalizedForm)?:'error'}">
 
-						<td>
-							<span title="${parsedName?.normalizedForm }">${fieldValue(bean: parsedName, field: "name")}</span>
-						</td>
+						<td><span title="${parsedName?.normalizedForm }">
+								${fieldValue(bean: parsedName, field: "name")}
+						</span></td>
 						<td>
 							${fieldValue(bean: parsedName, field: "canonicalForm")}
 						</td>
-						
-						<td  title="${taxonConcept?.normalizedForm }"><a target="_blank" href="${uGroup.createLink(controller:'species', action:'show', id:(taxonConcept?(Species.findByTaxonConcept(taxonConcept)?.id):''), userGroupWebaddress:params.webaddress)}">
+
+
+						<td title="${taxonConcept?.normalizedForm }">
+							<% def species =  taxonConcept?Species.findByTaxonConcept(taxonConcept):null%>
+							<g:if test="${species}">
+								<a target="_blank"
+									href="${uGroup.createLink(controller:'species', action:'show', id:species.id, userGroupWebaddress:params.webaddress)}">
+									${fieldValue(bean: taxonConcept, field: "name")} </a>
+							</g:if> <g:else>
 								${fieldValue(bean: taxonConcept, field: "name")}
-							</a>
-						</td>
+							</g:else></td>
 						<td>
 							${fieldValue(bean: taxonConcept, field: "canonicalForm")}
 						</td>
