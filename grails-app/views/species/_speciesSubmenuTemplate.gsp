@@ -5,11 +5,6 @@
 	</div>
 </g:if>
 
-<g:if test="${flash.message}">
-	<div class="message alert alert-info">
-		${flash.message}
-	</div>
-</g:if>
 <g:hasErrors bean="${speciesInstance}">
 	<i class="icon-warning-sign"></i>
 	<span class="label label-important"> <g:message
