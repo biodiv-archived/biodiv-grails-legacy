@@ -14,6 +14,7 @@
 
 
 <form id="namesFileForm"  enctype="multipart/form-data" method="POST">
+<label>Please provide a simple text file with a single scientific name per line </label>
   <input type="file" name="namesFile" placeholder="Names file with <5000 names">
   <button type="submit" class="btn">Upload & Curate</button>
 </form>
@@ -34,16 +35,16 @@
 			<tbody>
 				<g:each in="${parsedNames}" status="i" var="parsedName">
 				<%def taxonConcept = TaxonomyDefinition.findByCanonicalFormIlikeAndRank(parsedName.canonicalForm, TaxonomyRank.SPECIES.ordinal()) %>
-					<tr class="${parsedName.normalizedForm.equalsIgnoreCase(taxonConcept.normalizedForm)?:'error'}">
+					<tr class="${parsedName.normalizedForm && parsedName.normalizedForm.equalsIgnoreCase(taxonConcept?.normalizedForm)?:'error'}">
 
 						<td>
-							<span title="${parsedName.normalizedForm }">${fieldValue(bean: parsedName, field: "name")}</span>
+							<span title="${parsedName?.normalizedForm }">${fieldValue(bean: parsedName, field: "name")}</span>
 						</td>
 						<td>
 							${fieldValue(bean: parsedName, field: "canonicalForm")}
 						</td>
 						
-						<td  title="${taxonConcept.normalizedForm }"><g:link action="show" id="${taxonConcept.id}">
+						<td  title="${taxonConcept?.normalizedForm }"><g:link action="show" id="${taxonConcept?.id}">
 								${fieldValue(bean: taxonConcept, field: "name")}
 							</g:link>
 						</td>
