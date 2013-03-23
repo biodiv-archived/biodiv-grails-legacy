@@ -403,13 +403,13 @@ class Observation implements Taggable{
 				errors.allErrors.each { log.error it }
 			}
 		}catch(org.hibernate.StaleObjectStateException e){
-			synchronized(SAVE_LOCK){
+			//synchronized(SAVE_LOCK){
 				refresh()
 				f()
 				if(!save(flush:true)){
 					errors.allErrors.each { log.error it }
 				}
-			}
+			//}
 		}
 	}
 		

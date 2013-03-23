@@ -33,8 +33,6 @@ import org.apache.solr.common.util.NamedList
 
 class ObservationController {
 	
-	private static final Object LOCK = new Object() 
-	
 	public static final boolean COMMIT = true;
 
 	def grailsApplication;

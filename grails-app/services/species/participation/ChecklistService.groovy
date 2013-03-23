@@ -40,7 +40,6 @@ import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Element;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.Image
-import com.itextpdf.text.List;
 import com.itextpdf.text.ListItem;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Phrase;
@@ -854,7 +853,7 @@ class ChecklistService {
 		document.add(image2);
 		
 		//writing meta data
-		List list = new List(10);
+		com.itextpdf.text.List list = new com.itextpdf.text.List(10);
 		for(item in m[cl.META_DATA]){
 			list.add(new ListItem(item.join("  ")));
 		}
