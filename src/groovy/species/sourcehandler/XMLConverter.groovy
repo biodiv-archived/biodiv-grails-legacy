@@ -610,7 +610,7 @@ class XMLConverter extends SourceConverter {
 	 * @param imageNode
 	 * @return
 	 */
-	private Resource createImage(Node imageNode, String relImagesFolder, ResourceType resourceType) {
+	private Resource createImage(Node imageNode, String relImagesFolder, resourceType) {
 		File tempFile = getImageFile(imageNode);
 		def sourceUrl = imageNode.source?.text() ? imageNode.source?.text() : "";
 
@@ -637,17 +637,11 @@ class XMLConverter extends SourceConverter {
 			}
 
 			String path = imageFile.absolutePath.replace(resourcesRootDir, "");
-
-			def fieldCriteria = Resource.createCriteria();
-			def res = fieldCriteria.get {
-				and{
-					eq("fileName", path);
-					sourceUrl ? eq("url", sourceUrl) : isNull("url");
-					eq("type", resourceType);
-				}
-
-			}
-
+println path
+println sourceUrl
+println resourceType
+			def res = Resource.findByFileNameAndType(path, resourceType);
+				
 			if(!res) {
 				log.debug "Creating new resource"
 				res = new Resource(type : resourceType, fileName:path, url:sourceUrl, description:imageNode.caption?.text(), mimeType:imageNode.mimeType?.text());
@@ -821,7 +815,6 @@ class XMLConverter extends SourceConverter {
 		imagesRefNode.each {
 			String fileName = it?.text()?.trim();
 
-			log.debug fileName;
 			def imageNode = imagesNode.image.find { it?.refKey?.text()?.trim() == fileName };
 
 			if(imageNode) {

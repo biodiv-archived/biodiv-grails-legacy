@@ -273,8 +273,9 @@ class MappedSpreadsheetConverter extends SourceConverter {
 		int license = result.get("license") ? Integer.parseInt(result.get("license")?.toString())-1:-1
 		int name = result.get("name") ? Integer.parseInt(result.get("name")?.toString())-1:-1
 		boolean incremental = result.get("incremental") ? new Boolean(result.get("incremental")) : false
-		
-		if(imagesMetaData) {
+		boolean imagesmetadatasheet = result.get("imagesmetadatasheet") ? new Boolean(result.get("imagesmetadatasheet")) : false
+	println 	"+++++++"+imagesmetadatasheet
+		if(imagesmetadatasheet && imagesMetaData) {
 			//TODO:This is getting repeated for every row in spreadsheet costly
 			fieldName.split(",").eachWithIndex { t, index ->
 				String txt = speciesContent.get(t);
@@ -298,6 +299,8 @@ class MappedSpreadsheetConverter extends SourceConverter {
 					e.printStackTrace()
 				}
 			}
+			println images
+			println groupValues
 			populateImageNode(images, groupValues, delimiter, location, source, caption, attribution, contributor, license, name, incremental);
 		}
 		return images;
@@ -354,12 +357,12 @@ class MappedSpreadsheetConverter extends SourceConverter {
 			String refKey = imageData.get("id");
 			if(refKey.trim().equals(imageId.trim())) {
 				Node image = new Node(images, "image");
-				String loc = imageData.get("imageno.")?:imageData.get("id");
+				String loc = imageData.get("imageno.")?:imageData.get("image")?:imageData.get("id");
 				File file = new File(uploadDir, cleanLoc(loc));
 				new Node(image, "refKey", refKey);
 				new Node(image, "fileName", file.getAbsolutePath());
-				new Node(image, "source", imageData.get("source"));
-				new Node(image, "caption", imageData.get("possiblecaption"));
+				new Node(image, "source", imageData.get("source")?:imageData.get("url"));
+				new Node(image, "caption", imageData.get("possiblecaption")?:imageData.get("caption"));
 				new Node(image, "attribution", imageData.get("attribution"));
 				new Node(image, "contributor", imageData.get("contributor"));
 				new Node(image, "license", imageData.get("license"));

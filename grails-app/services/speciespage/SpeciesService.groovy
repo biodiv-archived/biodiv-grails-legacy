@@ -265,7 +265,7 @@ class SpeciesService {
 	private List saveSpeciesBatch(List<Species> batch) {
 		int noOfInsertions = 0;
 		List<Species> addedSpecies = [];
-
+		try {
 		Species.withTransaction { status ->
 
 			for(Species s in batch) {
@@ -277,7 +277,7 @@ class SpeciesService {
 
 				s.percentOfInfo = calculatePercentOfInfo(s);
 
-				try {
+				
 					if(s.id && !s.isAttached()) {
 						//merging only if it was already a persistent object
 						s = s.merge();
@@ -288,24 +288,29 @@ class SpeciesService {
 						noOfInsertions++;
 						addedSpecies.add(s);
 					}
-				}catch (org.springframework.dao.OptimisticLockingFailureException e) {
-					log.error "OptimisticLockingFailureException : $e.message"
-					log.error "Trying to add species  ${s}"
-					e.printStackTrace()
-					status.setRollbackOnly()
-				}catch (org.springframework.dao.DataIntegrityViolationException e) {
-					log.error "OptimisticLockingFailureException : $e.message"
-					log.error "Trying to add species  ${s}"
-					e.printStackTrace()
-					status.setRollbackOnly()
-				} catch(ConstraintViolationException e) {
-					log.error "ConstraintViolationException : $e.message"
-					log.error "Trying to add species in the batch are ${batch}"
-					e.printStackTrace()
-					status.setRollbackOnly()
-				}
+			
 			}
 		}
+		}catch (org.springframework.dao.OptimisticLockingFailureException e) {
+		log.error "OptimisticLockingFailureException : $e.message"
+		log.error "Trying to add species in the batch are ${batch*.taxonConcept*.name.join(' , ')}"
+		e.printStackTrace()
+		noOfInsertions = 0
+		addedSpecies.clear();
+	}catch (org.springframework.dao.DataIntegrityViolationException e) {
+		log.error "OptimisticLockingFailureException : $e.message"
+		log.error "Trying to add species in the batch are ${batch*.taxonConcept*.name.join(' , ')}"
+		e.printStackTrace()
+		noOfInsertions = 0
+		addedSpecies.clear();
+	} catch(ConstraintViolationException e) {
+		log.error "ConstraintViolationException : $e.message"
+		log.error "Trying to add species in the batch are ${batch*.taxonConcept*.name.join(' , ')}"
+		e.printStackTrace()
+		noOfInsertions = 0
+		addedSpecies.clear();
+		
+	}
 		log.debug "Saved species batch with insertions : "+noOfInsertions
 		//TODO : probably required to clear hibernate cache
 		//Reference : http://naleid.com/blog/2009/10/01/batch-import-performance-with-grails-and-mysql/
