@@ -637,9 +637,7 @@ class XMLConverter extends SourceConverter {
 			}
 
 			String path = imageFile.absolutePath.replace(resourcesRootDir, "");
-println path
-println sourceUrl
-println resourceType
+
 			def res = Resource.findByFileNameAndType(path, resourceType);
 				
 			if(!res) {
