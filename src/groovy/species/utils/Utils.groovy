@@ -253,6 +253,17 @@ class Utils {
 		}
 		return parsedJSON;
 	}
+	
+	public static String getYouTubeVideoId(String url) {
+		if(!url) return;
+		else {
+			//TODO : Improve youtube video id extraction reg ex
+			//http://stackoverflow.com/questions/5830387/how-to-find-all-youtube-video-ids-in-a-string-using-a-regex/5831191#5831191
+			println (url =~ (/(?<=v=).*$/))
+			return  (url =~ (/(?<=v=).*$/)).getAt(0)
+		}
+		
+	}
 
 }
 

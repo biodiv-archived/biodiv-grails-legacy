@@ -17,6 +17,7 @@ import species.Habitat;
 import species.Language;
 import species.utils.Utils;
 import species.TaxonomyDefinition;
+import species.Resource.ResourceType;
 import species.auth.SUser;
 import species.groups.SpeciesGroup;
 import species.participation.ActivityFeed;
@@ -102,6 +103,7 @@ class ObservationService {
 		
 		def resourcesXML = createResourcesXML(params);
 		def resources = saveResources(observation, resourcesXML);
+		
 		observation.resource?.clear();
 		resources.each { resource ->
 			observation.addToResource(resource);
@@ -127,7 +129,9 @@ class ObservationService {
 			relatedObv = getRelatedObservationByUser(params.filterPropertyValue.toLong(), max, offset, params.sort)
 		}else if(params.filterProperty == "nearBy"){
 			relatedObv = getNearbyObservations(params.id, max, offset)
-		}else{
+		} else if(params.filterProperty == "taxonConcept") {
+			relatedObv = getRelatedObservationByTaxonConcept(params.filterPropertyValue.toLong(), max, offset)
+		} else{
 			relatedObv = getRelatedObservation(params.filterProperty, params.id.toLong(), max, offset)
 		}
 		
@@ -267,13 +271,15 @@ class ObservationService {
 		if(!parentObv.maxVotedReco) {
 			return ["observations":[], "count":0];
 		}
-		def count = Observation.countByMaxVotedRecoAndIsDeleted(parentObv.maxVotedReco, false) - 1;
-		//def c = Observation.createCriteria();
+		return getRelatedObservationByReco(obvId, parentObv.maxVotedReco, limit, offset)
+	}
+	
+	private Map getRelatedObservationByReco(long obvId, Recommendation maxVotedReco, int limit, long offset){
 		def observations = Observation.withCriteria (max: limit, offset: offset) {
 			and {
-				eq("maxVotedReco", parentObv.maxVotedReco)
+				eq("maxVotedReco", maxVotedReco)
 				eq("isDeleted", false)
-				ne("id", obvId)
+				if(obvId) ne("id", obvId)
 			}
 			order("lastRevised", "desc")
 		}
@@ -281,16 +287,40 @@ class ObservationService {
 		observations.each {
 			result.add(['observation':it, 'title':it.fetchSpeciesCall()]);
 		}
+		def count = Observation.countByMaxVotedRecoAndIsDeleted(maxVotedReco, false) - 1;
 		return ["observations":result, "count":count]
 	}
-
+	
+	Map getRelatedObservationByTaxonConcept(long taxonConceptId, int limit, long offset){
+		def taxonConcept = TaxonomyDefinition.read(taxonConceptId);
+		if(!taxonConcept) return ['observations':[], 'count':0]
+		
+		List<Recommendation> scientificNameRecos = recommendationService.searchRecoByTaxonConcept(taxonConcept);
+		if(scientificNameRecos) {
+			def observations = Observation.withCriteria (max: limit, offset: offset) {
+				and {
+					'in'("maxVotedReco", scientificNameRecos)
+					eq("isDeleted", false)
+				}
+				order("lastRevised", "desc")
+			}
+			def result = [];
+			observations.each {
+				result.add(['observation':it, 'title':it.fetchSpeciesCall()]);
+			}
+			def count = Observation.countByMaxVotedRecoInListAndIsDeleted(scientificNameRecos, false) - 1;
+			
+			return ['observations':result, 'count':count]
+		}
+	}
+	
 	static List createUrlList2(observations){
 		def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 		String iconBasePath = config.speciesPortal.observations.serverURL
 		def urlList = createUrlList2(observations, iconBasePath)
-		urlList.each {
-			it.imageLink = it.imageLink.replaceFirst(/\.[a-zA-Z]{3,4}$/, config.speciesPortal.resources.images.thumbnail.suffix)
-		}
+//		urlList.each {
+//			it.imageLink = it.imageLink.replaceFirst(/\.[a-zA-Z]{3,4}$/, config.speciesPortal.resources.images.thumbnail.suffix)
+//		}
 		return urlList
 	}
 	static List createUrlList2(observations, String iconBasePath){
@@ -300,8 +330,12 @@ class ObservationService {
 			item.obvId = param['observation'].id
 			item.imageTitle = param['title']
 			def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
-			def image = param['observation'].mainImage()
-			item.imageLink = iconBasePath +  image.fileName.trim()
+			Resource image = param['observation'].mainImage()
+			if(image.type == ResourceType.IMAGE) {
+				item.imageLink = iconBasePath +  image.thumbnailUrl()
+			} else if(image.type == ResourceType.VIDEO) {
+				item.imageLink = image.thumbnailUrl()
+			}			
 			item.inGroup = param.inGroup;
 			urlList << item;
 		}
@@ -376,10 +410,13 @@ class ObservationService {
 		XMLConverter converter = new XMLConverter();
 		def resources = builder.createNode("resources");
 		Node images = new Node(resources, "images");
+		Node videos = new Node(resources, "videos");
 		String uploadDir =  grailsApplication.config.speciesPortal.observations.rootDir;
 		List files = [];
 		List titles = [];
 		List licenses = [];
+		List type = [];
+		List url = []
 		params.each { key, val ->
 			int index = -1;
 			if(key.startsWith('file_')) {
@@ -390,14 +427,22 @@ class ObservationService {
 				files.add(val);
 				titles.add(params.get('title_'+index));
 				licenses.add(params.get('license_'+index));
+				type.add(params.get('type_'+index));
+				url.add(params.get('url_'+index));
 			}
 		}
 		files.eachWithIndex { file, key ->
-			Node image = new Node(images, "image");
+			Node image;
 			if(file) {
-				File f = new File(uploadDir, file);
-				new Node(image, "fileName", f.absolutePath);
-				//new Node(image, "source", imageData.get("source"));
+				if(type.getAt(key).equalsIgnoreCase(ResourceType.IMAGE.value())) {
+				 	image = new Node(images, "image");
+					File f = new File(uploadDir, file);
+					new Node(image, "fileName", f.absolutePath);
+				} else if(type.getAt(key).equalsIgnoreCase(ResourceType.VIDEO.value())) {
+					image = new Node(videos, "video");
+					new Node(image, "fileName", file);
+					new Node(image, "source", url.getAt(key));
+				}				
 				new Node(image, "caption", titles.getAt(key));
 				new Node(image, "contributor", params.author.username);
 				new Node(image, "license", licenses.getAt(key));
@@ -405,6 +450,7 @@ class ObservationService {
 				log.warn("No reference key for image : "+key);
 			}
 		}
+
 		return resources;
 	}
 
@@ -954,10 +1000,8 @@ class ObservationService {
 		if(!observationInstance) return
 		
 		def obvInUserGroups = observationInstance.userGroups.collect { it.id + ""}
-		println obvInUserGroups;
 		def toRemainInUserGroups =  obvInUserGroups.intersect(userGroupIds);
 		if(userGroupIds.size() == 0) {
-			println 'removing'
 			userGroupService.removeObservationFromUserGroups(observationInstance, obvInUserGroups);
 		} else {
 			userGroupIds.removeAll(toRemainInUserGroups)
@@ -1097,9 +1141,7 @@ class ObservationService {
 				templateMap["actorName"] = feedInstance.author.name
 				templateMap["userGroupWebaddress"] = userGroupWebaddress
 				templateMap["activity"] = activityFeedService.getContextInfo(feedInstance, [webaddress:userGroupWebaddress])
-				println"add"
 				templateMap['domainObjectTitle'] = getTitle(activityFeedService.getDomainObject(feedInstance.rootHolderType, feedInstance.rootHolderId))
-				println 'sdf'
 				templateMap['domainObjectType'] = feedInstance.rootHolderType.split('\\.')[-1].toLowerCase()
 				mailSubject = "New comment in ${templateMap['domainObjectType']}"
 				toUsers.addAll(getParticipants(obv))

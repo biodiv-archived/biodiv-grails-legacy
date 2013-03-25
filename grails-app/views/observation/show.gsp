@@ -3,6 +3,7 @@
 <%@ page import="species.participation.Observation"%>
 <%@ page import="species.participation.Recommendation"%>
 <%@ page import="species.participation.RecommendationVote"%>
+<%@page import="species.Resource.ResourceType"%>
 
 <html>
 <head>
@@ -13,9 +14,19 @@
 <g:set var="fbImagePath" value="" />
 <%
 def r = observationInstance.mainImage();
-fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.thumbnail.suffix)
+
+def thumbnail = r.thumbnailUrl()?:null;
+def imagePath = '';
+if(r && thumbnail) {
+	if(r.type == ResourceType.IMAGE) {
+		imagePath = g.createLinkTo(base:grailsApplication.config.speciesPortal.observations.serverURL,	file: thumbnail)
+	} else if(r.type == ResourceType.VIDEO){
+		imagePath = g.createLinkTo(base:thumbnail,	file: '')
+	}
+}
+
 %>
-<meta property="og:image" content="${createLinkTo(file: fbImagePath, base:grailsApplication.config.speciesPortal.observations.serverURL)}" />
+<meta property="og:image" content="${imagePath}" />
 <meta property="og:site_name" content="${Utils.getDomainName(request)}" />
 
 <g:set var="domain" value="${Utils.getDomain(request)}" />
@@ -143,7 +154,7 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 					<div id="gallery1">
 						<g:if test="${observationInstance.resource}">
 							<g:each in="${observationInstance.resource}" var="r">
-
+								<g:if test="${r.type == ResourceType.IMAGE}">
 								<%def gallImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.gallery.suffix)%>
 								<%def gallThumbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.galleryThumbnail.suffix)%>
 								<a target="_blank"
@@ -154,6 +165,11 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 									title="${r?.description}" /> </a>
 
 								<g:imageAttribution model="['resource':r]" />
+								</g:if>
+								<g:elseif test="${r.type == ResourceType.VIDEO}">
+									<a href="${r.url }"><span class="video galleryImage">Watch this at YouTube</span></a>
+									<g:imageAttribution model="['resource':video]" />
+								</g:elseif>
 							</g:each>
 						</g:if>
 						<g:else>
@@ -232,7 +248,7 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 						<div class="tile" style="clear: both">
 							<div class="title">Other observations of the same species</div>
 							<obv:showRelatedStory
-								model="['observationInstance':observationInstance, 'observationId': observationInstance.id, 'controller':'observation', 'action':'getRelatedObservation', 'filterProperty': 'speciesName', 'id':'a','userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress]" />
+								model="['observationInstance':observationInstance, 'observationId': observationInstance.id, 'controller':'observation', 'action':'getRelatedObservation','filterProperty': 'speciesName', 'id':'a','userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress]" />
 						</div>
 						<div class="tile">
 							<div class="title">Observations nearby</div>
@@ -288,12 +304,19 @@ fbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplicati
 			transition : 'pulse',
 			image_pan_smoothness : 5,
 			showInfo : true,
-			dataSelector : "img.galleryImage",
+			dataSelector : ".galleryImage",
 			debug : false,
 			thumbQuality : false,
 			maxScaleRatio : 1,
 			minScaleRatio : 1,
-	
+			youtube:{
+		    	modestbranding: 1,
+		    	autohide: 1,
+		    	color: 'white',
+		    	hd: 1,
+		    	rel: 0,
+		    	showinfo: 0
+			},
 			dataConfig : function(img) {
 				return {
 					// tell Galleria to grab the content from the .desc div as caption

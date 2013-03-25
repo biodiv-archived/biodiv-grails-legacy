@@ -26,7 +26,9 @@ import species.groups.SpeciesGroup;
 import species.groups.UserGroup;
 import species.groups.UserGroupController;
 import species.Habitat;
+import species.Resource;
 import species.BlockedMails;
+import species.Resource.ResourceType;
 import species.auth.SUser;
 import org.apache.solr.common.SolrException;
 import org.apache.solr.common.util.NamedList
@@ -363,7 +365,7 @@ class ObservationController {
 	@Secured(['ROLE_USER'])
 	def upload_resource = {
 		log.debug params;
-		if(!params.resources) {
+		if(!params.resources && !params.videoUrl) {
 			message = g.message(code: 'no.file.attached', default:'No file is attached')
 			response.setStatus(500)
 			message = [error:message]
@@ -381,15 +383,14 @@ class ObservationController {
 				File obvDir 
 				def message;
 
-				if(!params.resources) {
+				if(!params.resources && !params.videoUrl) {
 					message = g.message(code: 'no.file.attached', default:'No file is attached')
 				}
 				
 				if(params.resources instanceof String) {
 						params.resources = [params.resources]
 				}
-				params.resources.each { f ->
-					println f;
+				params.resources.each { f ->					
 					f = JSON.parse(f);
 					if(f.size instanceof String) {
 						f.size = Integer.parseInt(f.size)
@@ -440,18 +441,37 @@ class ObservationController {
 						File file = observationService.getUniqueFile(obvDir, Utils.cleanFileName(f.filename));
 						download(f.url, file );
 						ImageUtils.createScaledImages(file, obvDir);
-						resourcesInfo.add([fileName:file.name, size:f.size]);
+						
+						String obvDirPath = obvDir.absolutePath.replace(rootDir, "")
+						def res = new Resource(fileName:obvDirPath+"/"+file.name, type:ResourceType.IMAGE);
+						def baseUrl = grailsApplication.config.speciesPortal.observations.serverURL						
+						def thumbnail = baseUrl + res.thumbnailUrl();
+						
+						resourcesInfo.add([fileName:file.name, url:'', thumbnail:thumbnail ,type:ResourceType.IMAGE]);
 					}
 				}
+				
+				if(params.videoUrl) {
+					//TODO:validate url;
+					def videoUrl = params.videoUrl;
+					if(videoUrl && Utils.isURL(videoUrl)) {
+						def res = new Resource(fileName:'v', type:ResourceType.VIDEO);		
+						res.setUrl(videoUrl);				
+						resourcesInfo.add([fileName:'v', url:res.url, thumbnail:res.thumbnailUrl(), type:res.type]);
+					} else {
+						message = "Not a valid video url"
+					}
+				}
+				
 				log.debug resourcesInfo
 				// render some XML markup to the response
-				if(obvDir && resourcesInfo) {
+				if(resourcesInfo) {
 					render(contentType:"text/xml") {
-						observations {
-							dir(obvDir.absolutePath.replace(rootDir, ""))
+						observations {							
+							dir(obvDir?obvDir.absolutePath.replace(rootDir, ""):'')							
 							resources {
 								for(r in resourcesInfo) {
-									image('fileName':r.fileName, 'size':r.size){}
+									res('fileName':r.fileName, 'url':r.url,'thumbnail':r.thumbnail, type:r.type){}
 								}
 							}
 						}

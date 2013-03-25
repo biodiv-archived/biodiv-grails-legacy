@@ -13,7 +13,7 @@ import species.utils.ImageUtils;
 
 class Species {
 
-	String title; 
+	String title;
 	String guid; 
 	TaxonomyDefinition taxonConcept;
 	Resource reprImage;
@@ -97,6 +97,16 @@ class Species {
 		return icons;
 	}
 
+	List<Resource> getVideos() {
+		def res = new ArrayList<Resource>();
+		resources.each {
+			if(it?.type == species.Resource.ResourceType.VIDEO) {
+				res.add(it);
+			}
+		}
+		return res;
+	}
+	
 	String findSummary() {
 		def f = this.fields.find { speciesField ->
 			Field field = speciesField.field;

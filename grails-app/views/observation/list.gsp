@@ -1,4 +1,5 @@
 <%@page import="species.utils.Utils"%>
+<%@page import="species.Resource.ResourceType"%>
 <html>
 <head>
 <link rel="canonical" href="${Utils.getIBPServerDomain() + uGroup.createLink(controller:'observation', action:'list')}" />
