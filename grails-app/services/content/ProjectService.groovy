@@ -9,6 +9,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import content.fileManager.UFile;
 import content.fileManager.UFileService
+
+//import de.ailis.pherialize
+import org.lorecraft.phparser.SerializedPhpParser;
+
 class ProjectService {
 
 	static transactional = true
@@ -37,21 +41,6 @@ class ProjectService {
 		def projectInstance = new Project(projectParams)
 
 
-		/*
-		 projectInstance.title = params.title
-		 projectInstance.granteeURL = params.granteeURL
-		 projectInstance.granteeName = params.granteeName
-		 projectInstance.grantFrom = parseDate(params.granteeFrom)
-		 projectInstance.grantTo = parseDate(params.granteeTo)
-		 projectInstance.grantedAmount = params.int('grantedAmount')
-		 projectInstance.projectProposal = params.proposal
-		 projectInstance.projectReport = params.report
-		 projectInstance.dataContributionIntensity = params.dataContributionIntensity
-		 projectInstance.analysis = params.analysis
-		 projectInstance.misc = params.misc
-		 */
-
-
 		return projectInstance;
 	}
 
@@ -72,12 +61,18 @@ class ProjectService {
 		sql.eachRow("select nid, vid, title from node where type = 'project' order by nid asc") { row ->
 			log.debug " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>     title ===  $i  $row.title  nid == $row.nid , vid == $row.vid"
 			try{
-				Project project = createProject(row, sql)
+				//Project project = createProject(row, sql)
+				migrateFiles(sql,'content_field_project_proposal_files',row.nid, 'field_project_proposal_files_fid', 'field_project_proposal_files_data')
+				migrateFiles(sql,'content_field_data_contribution_files',row.nid, 'field_data_contribution_files_fid', 'field_data_contribution_files_data')
+				migrateFiles(sql,'content_field_miscellaneous_files',row.nid, 'field_data_contribution_files_fid', 'field_data_contribution_files_data')
+				migrateFiles(sql,'content_field_midterm_assessment_files',row.nid, 'field_midterm_assessment_files_fid', 'field_midterm_assessment_files_data')
+
 			}catch (Exception e) {
 				println "=============================== EXCEPTION in create project ======================="
 				println " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>     title ===  $i  $row.title  nid == $row.nid , vid == $row.vid"
 				e.printStackTrace()
 				println "====================================================================================="
+				throw new Exception()
 			}
 			i++
 		}
@@ -85,39 +80,37 @@ class ProjectService {
 		println "================================= finish time " + new Date()
 	}
 
-	
+
 	@Transactional
 	def Project createProject(nodeRow, Sql sql){
 
 		String query = "select * from content_type_project where nid = $nodeRow.nid and vid = $nodeRow.vid"
-		def row = sql.firstRow(query)		
-		
+		def row = sql.firstRow(query)
+
 		Project proj = new Project();
 
 		proj.title = nodeRow.title;
 		proj.summary = row.field_project_summary_value
-		
-		proj.grantedAmount = row.field_project_amount_value
-		proj.granteeName = row.field_grantee_email_email
-		proj.granteeURL = row.field_grantee_email_email
-		
-		proj.grantFrom = new Date()
-		proj.grantTo = new Date()
-	
-		proj.projectProposal = row.field_project_proposal_value
-	
-		proj.projectReport = row.field_midterm_assessment_value
-	
-		proj.dataContributionIntensity = row.field_data_contribution_value
-	
-		proj.analysis = row.field_analysis_results_value
-			
-		proj.misc = row.field_miscellaneous_value
-		
-		//Date dateCreated;
 
-		
-		
+		int direction_nid = row.field_strategic_direction_nid
+
+		proj.granteeOrganization = row.field_project_grantee_org_value
+		proj.granteeContact = row.field_grantee_name_value
+		proj.granteeEmail = row.field_grantee_email_email
+
+		proj.grantFrom = row.field_grantterm_value
+		proj.grantTo = row.field_grantterm_value2
+		proj.grantedAmount = row.field_project_amount_value
+
+		proj.projectProposal = row.field_project_proposal_value
+
+		proj.projectReport = row.field_midterm_assessment_value
+
+		proj.dataContributionIntensity = row.field_data_contribution_value
+
+		//proj.analysis = row.field_analysis_results_value
+
+		proj.misc = row.field_miscellaneous_value
 
 		if(!proj.save(flush:true)){
 			proj.errors.allErrors.each { log.error it }
@@ -128,5 +121,44 @@ class ProjectService {
 
 			return proj
 		}
+	}
+
+	def migrateFiles( sql,field_table, nid, fid_field, data_field) {
+		String query = "select $fid_field as fid, $data_field as metadata from " + field_table + " where nid=" +nid
+		println query
+
+		def files
+
+		sql.eachRow(query) { row ->
+			if(row.fid) {
+
+				def filedata = sql.firstRow("select * from files where fid = $row.fid")
+
+				UFile file = new UFile();
+
+				file.name = filedata.filename
+				file.path = filedata.filepath
+				file.size = filedata.filesize
+				file.mimetype = filedata.filemime
+
+				def metadata = row.metadata
+
+				if(row.metadata) {
+					println "metadata is "+ row.metadata
+
+					SerializedPhpParser serializedPhpParser = new SerializedPhpParser(row.metadata);
+
+					Object result = serializedPhpParser.parse();
+
+
+					file.name = result.description;
+					file.description = result.shortnote.body
+					//file.setTags(result.tags.body)
+
+				}
+			}
+		}
+
+
 	}
 }
