@@ -157,8 +157,6 @@ input.dms_field {
 									<g:set var="i" value="${1}" />
 									<g:each in="${observationInstance?.resource}" var="r">
 										<li class="addedResource thumbnail">
-										
-											
 <%
 def thumbnail = r.thumbnailUrl()?:null;
 def imagePath = '';
@@ -183,6 +181,7 @@ if(r && thumbnail) {
 												<input name="file_${i}" type="hidden" value='${r.fileName}' />
 												<input name="url_${i}" type="hidden" value='${r.url}' />
 												<input name="type_${i}" type="hidden" value='${r.type}'/>
+												<g:if test="${r.type == ResourceType.IMAGE}">
 												<div id="license_div_${i}" class="licence_div dropdown">
 
 													<a id="selected_license_${i}"
@@ -206,9 +205,10 @@ if(r && thumbnail) {
 																</li>
 															</g:each>
 														</ul>
-													
+													<input id="license_${i}" type="hidden" name="license_${i}" value="${r?.licenses?.asList().first()?.name}"></input>
 												</div>
-											</div> <input id="license_${i}" type="hidden" name="license_${i}" value="${r?.licenses?.asList().first()?.name}"></input>
+												</g:if>
+											</div> 
 											<div class="close_button"
 												onclick="removeResource(event, ${i});$('#geotagged_images').trigger('update_map');"></div>
 
@@ -216,12 +216,20 @@ if(r && thumbnail) {
 										<g:set var="i" value="${i+1}" />
 									</g:each>
 									<li id="add_file" class="addedResource">
-										<div><div id="add_image"></div> <div style="text-align:center;">or</div> <div id="add_video" class="editable"></div></div>
+										<div id="add_file_container">
+											<div id="add_image"></div> 
+											<div style="text-align:center;">
+												or
+											</div> 
+											<div id="add_video" class="editable"></div>
+										</div>
 										<div class="progress">
 											<div id="translucent_box"></div>
 											<div id="progress_bar"></div>
 											<div id="progress_msg"></div>
-										</div></li>
+										</div>
+										
+									</li>
 								</ul>
 								<div id="image-resources-msg" class="help-inline">
 									<g:renderErrors bean="${observationInstance}" as="list"
@@ -628,33 +636,33 @@ if(r && thumbnail) {
 	<li class="addedResource thumbnail">
 	    <div class='figure' style='height: 200px; overflow:hidden;'>
                 <span> 
-                        <img id='image_{{=i}}' style="width:auto; height: auto;" src='{{=thumbnail}}' class='geotagged_image' exif='true'/> 
+                        <img id='image_{{>i}}' style="width:auto; height: auto;" src='{{>thumbnail}}' class='geotagged_image' exif='true'/> 
                 </span>
 	    </div>
 				
 	    <div class='metadata prop' style="position:relative; left: 5px; top:-30px;">
-	            <input name="file_{{=i}}" type="hidden" value='{{=file}}'/>
-	            <input name="url_{{=i}}" type="hidden" value='{{=url}}'/>
-				<input name="type_{{=i}}" type="hidden" value='{{=type}}'/>
-                <div id="license_div_{{=i}}" class="licence_div dropdown">
-                    <a id="selected_license_{{=i}}" class="btn dropdown-toggle btn-mini" data-toggle="dropdown">
+	            <input name="file_{{>i}}" type="hidden" value='{{>file}}'/>
+	            <input name="url_{{>i}}" type="hidden" value='{{>url}}'/>
+				<input name="type_{{>i}}" type="hidden" value='{{>type}}'/>
+				{{if type == '${ResourceType.IMAGE}'}}
+                <div id="license_div_{{>i}}" class="licence_div dropdown">
+                    <a id="selected_license_{{>i}}" class="btn dropdown-toggle btn-mini" data-toggle="dropdown">
                         <img src="${resource(dir:'images/license',file:'cc_by.png', absolute:true)}" title="Set a license for this image"/>
                         <b class="caret"></b>
                     </a>
-                    <ul id="license_options_{{=i}}" class="dropdown-menu license_options">
+                    <ul id="license_options_{{>i}}" class="dropdown-menu license_options">
                          <span>Choose a license</span>
                          <g:each in="${species.License.list()}" var="l">
-                             <li class="license_option" onclick="$('#license_{{=i}}').val($.trim($(this).text()));$('#selected_license_{{=i}}').find('img:first').replaceWith($(this).html());">
+                             <li class="license_option" onclick="$('#license_{{>i}}').val($.trim($(this).text()));$('#selected_license_{{>i}}').find('img:first').replaceWith($(this).html());">
                                  <img src="${resource(dir:'images/license',file:l?.name.getIconFilename()+'.png', absolute:true)}"/><span style="display:none;">${l?.name?.value}</span>
                              </li>
                          </g:each>
-                     </ul>
+                    </ul>
+					<input id="license_{{>i}}" type="hidden" name="license_{{>i}}" value="CC BY"></input>
            		</div>	
-	    	    <input id="license_{{=i}}" type="hidden" name="license_{{=i}}" value="CC BY"></input>
-          
-        	    <!--a href="#" onclick="removeResource(event);$('#geotagged_images').trigger('update_map');">Remove</a-->
+				{{/if}}
 		</div>
-       	<div class="close_button" onclick="removeResource(event, {{=i}});$('#geotagged_images').trigger('update_map');"></div>
+       	<div class="close_button" onclick="removeResource(event, {{>i}});$('#geotagged_images').trigger('update_map');"></div>
 	</li>
 	
 </script>
@@ -663,7 +671,7 @@ if(r && thumbnail) {
 	
 	<r:script>
 	
-    var add_file_button = '<li id="add_file" class="addedResource" style="display:none;"><div><div id="add_image"></div><div id="add_video" class="editable"></div></div><div class="progress"><div id="translucent_box"></div><div id="progress_bar"></div ><div id="progress_msg"></div ></div></li>';
+    var add_file_button = '<li id="add_file" class="addedResource" style="display:none;"><div id="add_file_container"><div id="add_image"></div><div id="add_video" class="editable"></div></div><div class="progress"><div id="translucent_box"></div><div id="progress_bar"></div ><div id="progress_msg"></div ></div></li>';
 
 	$(document).ready(function(){
 		$('.dropdown-toggle').dropdown();
@@ -697,6 +705,7 @@ if(r && thumbnail) {
 				})
 				$('#upload_resource').submit().find("span.msg").html("Uploading... Please wait...");
 			  	$("#iemsg").html("Uploading... Please wait...");
+			  	$(".progress").css('z-index',110);
 			  	$('#progress_msg').html('Uploading ...');
 			  },
 			  function(FPError){
@@ -708,34 +717,32 @@ if(r && thumbnail) {
 		$('#add_image').bind('click', filePick);
 		$('#add_photo_ie').bind('click', filePick);
 		
-			$('#add_video').editable({
-			    type: 'text',
-			    mode:'popup',
-			    emptytext:'',
-			    url: function(params) {
-    				var d = new $.Deferred;
-    				if(!params.value) {
-        				return d.reject('This field is required'); //returning error via deferred object
-    				} else {
-    					$('#videoUrl').val(params.value);
-        				$('#upload_resource').submit().find("span.msg").html("Uploading... Please wait...");
-			  			$("#iemsg").html("Uploading... Please wait...");
-			  			$('#progress_msg').html('Uploading ...');
-			  			d.resolve();
-        			}
-        			return d.promise()  
-        		},
-        		validate : function(value) {
-  					if($.trim(value) == '') {
-        				return 'This field is required';
-    				}
-				},
-			    title: 'Enter YouTube watch url like http://www.youtube.com/watch?v=v8HVWDrGr6o'
-			});
+		$('#add_video').editable({
+		    type: 'text',
+		    mode:'popup',
+		    emptytext:'',
+		    url: function(params) {
+   				var d = new $.Deferred;
+   				if(!params.value) {
+       				return d.reject('This field is required'); //returning error via deferred object
+   				} else {
+   					$('#videoUrl').val(params.value);
+       				$('#upload_resource').submit().find("span.msg").html("Uploading... Please wait...");
+		  			$("#iemsg").html("Uploading... Please wait...");
+		  			$(".progress").css('z-index',110);
+		  			$('#progress_msg').html('Uploading ...');
+		  			d.resolve();
+       			}
+       			return d.promise()  
+       		},
+       		validate : function(value) {
+ 					if($.trim(value) == '') {
+       				return 'This field is required';
+   				}
+			},
+		    title: 'Enter YouTube watch url like http://www.youtube.com/watch?v=v8HVWDrGr6o'
+		});
 		
-		
-		
-	
 		$('#attachFiles').change(function(e){
   			$('#upload_resource').submit().find("span.msg").html("Uploading... Please wait...");
   			$("#iemsg").html("Uploading... Please wait...");
@@ -749,6 +756,7 @@ if(r && thumbnail) {
                 var percentVal = ((position/total)*100).toFixed(0) + '%';
                 $('#progress_bar').width(percentVal)
                 $('#translucen*/box').width('100%')
+                $(".progress").css('z-index',110);
                 $('#progress_msg').html('Uploaded '+percentVal);
              }
         }
@@ -774,6 +782,7 @@ if(r && thumbnail) {
 			success: function(responseXML, statusText, xhr, form) {
 				$("#addObservationSubmit").removeClass('disabled');
 				$(form).find("span.msg").html("");
+				$(".progress").css('z-index',90);
 				$('#progress_msg').html('');
 				$("#iemsg").html("");
 				//var rootDir = '${grailsApplication.config.speciesPortal.observations.serverURL}'
@@ -816,10 +825,15 @@ if(r && thumbnail) {
                 $( "#add_file" ).fadeIn(3000);
                 $("#image-resources-msg").parent(".resources").removeClass("error");
                 $("#image-resources-msg").html("");
-				$("#upload_resource input[name='resources' || name='videoUrl']").remove();		
+				$("#upload_resource input[name='resources']").remove();
+				$('#videoUrl').val('');
+				$('#add_video').editable('setValue','', false);		
 			}, error:function (xhr, ajaxOptions, thrownError){
 					$("#addObservationSubmit").removeClass('disabled');
 					$("#upload_resource input[name='resources']").remove();
+					$('#videoUrl').val('');
+					$(".progress").css('z-index',90);
+					$('#add_video').editable('setValue','', false);
 					//xhr.upload.removeEventListener( 'progress', progressHandlingFunction, false); 
 					
 					//successHandler is used when ajax login succedes

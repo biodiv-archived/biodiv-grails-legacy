@@ -365,6 +365,7 @@ class ObservationController {
 	@Secured(['ROLE_USER'])
 	def upload_resource = {
 		log.debug params;
+		def message;
 		if(!params.resources && !params.videoUrl) {
 			message = g.message(code: 'no.file.attached', default:'No file is attached')
 			response.setStatus(500)
@@ -381,7 +382,7 @@ class ObservationController {
 				def resourcesInfo = [];
 				def rootDir = grailsApplication.config.speciesPortal.observations.rootDir
 				File obvDir 
-				def message;
+				
 
 				if(!params.resources && !params.videoUrl) {
 					message = g.message(code: 'no.file.attached', default:'No file is attached')
@@ -489,7 +490,7 @@ class ObservationController {
 		} catch(e) {
 			e.printStackTrace();
 			response.setStatus(500)
-			def message = [error:g.message(code: 'file.upload.fail', default:'Error while processing the request.')]
+			message = [error:g.message(code: 'file.upload.fail', default:'Error while processing the request.')]
 			render message as JSON
 		}
 	}

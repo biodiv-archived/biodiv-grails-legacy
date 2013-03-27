@@ -753,13 +753,10 @@ class XMLConverter extends SourceConverter {
 	private Resource createVideo(Node videoNode) {
 		log.debug "Creating video from data $videoNode"
 		def sourceUrl = videoNode.source?.text() ? videoNode.source?.text() : "";
-		def fieldCriteria = Resource.createCriteria();
-		def res = fieldCriteria.get {
-			and {
-				sourceUrl ? eq("url", sourceUrl) : isNull("url");
-				eq("type", ResourceType.VIDEO);
-			}
-		}
+		
+		if(!sourceUrl) return;
+		
+		def res = Resource.findByUrlAndType(sourceUrl, ResourceType.VIDEO);
 		
 		if(!res) {
 			def attributors = getAttributions(videoNode, true);
