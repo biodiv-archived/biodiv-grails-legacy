@@ -1780,3 +1780,22 @@ li#userOrEmail-new {
     z-index:9999;
     color:white;
 }
+
+.youtube_container {
+  background-color: #F7F7F7;
+  border: 1px solid rgba(0, 0, 0, .05);
+  padding: 3px;
+}
+
+.youtube_container .preview {
+  position: relative;
+  cursor: pointer;
+  float: left;
+  padding-right: 5px;
+}
+
+.youtube_container .play {
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+}
