@@ -5,13 +5,20 @@ package content
  * Strategic Direction contains the message regarding the strategy of the CPEF grantee project
  */
 class StrategicDirection {
-    
+	
+	
+    String title;
     String strategy;
 
     static constraints = {
     }
 	
-	public String toString() {
-		return strategy;
+	static mapping = {
+		strategy type:"text"
 	}
+	
+	public String toString ()  {
+		return title;
+	}
+
 }

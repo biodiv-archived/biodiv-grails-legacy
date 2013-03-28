@@ -2,56 +2,54 @@ package content.fileManager
 
 import java.util.Date;
 import org.grails.taggable.Taggable
+import species.License
 import species.auth.SUser
 import content.Project
 
 class UFile implements Taggable{
-	
+
 	String size
 	String path
 	String name
 	String description
-	String extension
+	String mimetype
 	Date dateCreated
 	Integer downloads
 	String doi
 	int weight	//saves the order in a group
 	//boolean deleted
-	SUser owner
-	
+	SUser creator
+	License license
+
+	String contributor;
+	String attribution;
+
 	//source holder(i.e project, group)
 	Long sourceHolderId;
 	String sourceHolderType;
-	
-/*	Project analysisProject
-	Project reportProject
-	Project proposalProject*/
-	
-	
-	//static transients = [ 'deleted' ]
-	
-	// BelongsTO 
-	// File can be belonged to CEPFproject, a Group(Media material of a group like posters etc.), Checklists, Species Page
-	//static belongsTo = [project:Project]
-	 
-	static mapping = {
 
+	//static transients = [ 'deleted' ]
+
+	static mapping = {
+		description type:"text"
 	}
+
 	static constraints = {
 		size(nullable:true)
 		path(nullable:false)
 		name(nullable:false)
 		description(nullable:true)
-		extension(nullable:true)
-		downloads(default:0)
+		mimetype(nullable:true)
+		downloads(default:0, nullable:true)
 		doi(nullable:true)
-		weight(default:0)
-/*		analysisProject(nullable:true)
-		reportProject(nullable:true)
-		proposalProject(nullable:true)*/
+		weight(default:0, nullable:true)
 		sourceHolderId(nullable:true)
 		sourceHolderType(nullable:true)
-		owner(nullable:true)
+		creator(nullable:true)
+		license(nullable:true)
+		contributor(nullable:true)
+		attribution(nullable:true)
+
 	}
 
 	def afterDelete() {

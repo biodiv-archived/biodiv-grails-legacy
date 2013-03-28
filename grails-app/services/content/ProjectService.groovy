@@ -22,14 +22,10 @@ class ProjectService {
 	String userName = "postgres";
 	String password = "postgres123";
 
+	HashMap directionsMap = new HashMap();
+
 
 	def createProject(params) {
-
-		//def projectInstance = new Project(params)
-		//uFileService = new UFileService()
-		//def uFiles = uFileService.saveUFiles(params)
-
-
 
 		def projectParams = params
 		projectParams.grantFrom = parseDate(params.grantFrom)
@@ -57,15 +53,12 @@ class ProjectService {
 	def migrateProjects() {
 		def startDate = new Date()
 		def sql = Sql.newInstance(connectionUrl, userName, password, "org.postgresql.Driver");
-		int i=0;
+		migrateDirections(sql)
+		int i=0
 		sql.eachRow("select nid, vid, title from node where type = 'project' order by nid asc") { row ->
 			log.debug " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>     title ===  $i  $row.title  nid == $row.nid , vid == $row.vid"
 			try{
-				//Project project = createProject(row, sql)
-				migrateFiles(sql,'content_field_project_proposal_files',row.nid, 'field_project_proposal_files_fid', 'field_project_proposal_files_data')
-				migrateFiles(sql,'content_field_data_contribution_files',row.nid, 'field_data_contribution_files_fid', 'field_data_contribution_files_data')
-				migrateFiles(sql,'content_field_miscellaneous_files',row.nid, 'field_data_contribution_files_fid', 'field_data_contribution_files_data')
-				migrateFiles(sql,'content_field_midterm_assessment_files',row.nid, 'field_midterm_assessment_files_fid', 'field_midterm_assessment_files_data')
+				Project project = createProject(row, sql)
 
 			}catch (Exception e) {
 				println "=============================== EXCEPTION in create project ======================="
@@ -78,6 +71,29 @@ class ProjectService {
 		}
 		println "================= start date " + startDate
 		println "================================= finish time " + new Date()
+	}
+
+	def migrateDirections(sql) {
+
+		String query = "select * from node where type like 'strategic_direction'"
+
+		sql.eachRow(query) { row ->
+			log.debug "Importing direction :" + row.nid
+			def direction = sql.firstRow("select title, body from node_revisions where nid=$row.nid")
+
+			log.debug "Direction Title: "+ direction.title
+			log.debug "Direction Body: "+ direction.body
+
+			def sd = new StrategicDirection()
+			sd.title = direction.title
+			sd.strategy = direction.body
+			if(!sd.save(flush:true)) {
+				sd.errors.allErrors.each { log.error it }
+				return null
+			} else {
+				directionsMap.put(row.nid,sd.id)
+			}
+		}
 	}
 
 
@@ -94,12 +110,13 @@ class ProjectService {
 
 		int direction_nid = row.field_strategic_direction_nid
 
+		proj.direction = StrategicDirection.get(directionsMap.get(direction_nid))
 		proj.granteeOrganization = row.field_project_grantee_org_value
 		proj.granteeContact = row.field_grantee_name_value
 		proj.granteeEmail = row.field_grantee_email_email
 
-		proj.grantFrom = row.field_grantterm_value
-		proj.grantTo = row.field_grantterm_value2
+		proj.grantFrom = parseDate(row.field_grantterm_value)
+		proj.grantTo = parseDate(row.field_grantterm_value2)
 		proj.grantedAmount = row.field_project_amount_value
 
 		proj.projectProposal = row.field_project_proposal_value
@@ -107,6 +124,28 @@ class ProjectService {
 		proj.projectReport = row.field_midterm_assessment_value
 
 		proj.dataContributionIntensity = row.field_data_contribution_value
+
+		proj.proposalFiles = migrateFiles(sql,'content_field_project_proposal_files',nodeRow.nid, 'field_project_proposal_files_fid', 'field_project_proposal_files_data')
+		proj.dataContribFiles =  migrateFiles(sql,'content_field_data_contribution_files',nodeRow.nid, 'field_data_contribution_files_fid', 'field_data_contribution_files_data')
+		proj.miscFiles =  migrateFiles(sql,'content_field_miscellaneous_files',nodeRow.nid, 'field_miscellaneous_files_fid', 'field_miscellaneous_files_data')
+		proj.reportFiles = migrateFiles(sql,'content_field_midterm_assessment_files',nodeRow.nid, 'field_midterm_assessment_files_fid', 'field_midterm_assessment_files_data')
+
+
+		//locations
+		List locations  = new ArrayList()
+
+		String locationsQuery = "select s.nid as nid, s.field_project_sitename_value as sitename, c.field_project_corridor_value as corridor from content_field_project_sitename s, content_field_project_corridor c where s.nid=c.nid and s.vid=c.vid and s.delta=c.delta and s.vid=$nodeRow.vid";
+
+		sql.eachRow(locationsQuery) { lrow ->
+			Location location = new Location()
+			location.siteName = lrow.sitename
+			location.corridor = lrow.corridor
+
+			locations.add(location)
+		}
+
+		proj.locations = locations
+
 
 		//proj.analysis = row.field_analysis_results_value
 
@@ -117,7 +156,7 @@ class ProjectService {
 			return null
 		}else{
 
-			println " ****************** Project Saved *********************"
+			println " ****************** Project Saved *********************" + proj
 
 			return proj
 		}
@@ -127,7 +166,8 @@ class ProjectService {
 		String query = "select $fid_field as fid, $data_field as metadata from " + field_table + " where nid=" +nid
 		println query
 
-		def files
+
+		List files = new ArrayList()
 
 		sql.eachRow(query) { row ->
 			if(row.fid) {
@@ -156,9 +196,11 @@ class ProjectService {
 					//file.setTags(result.tags.body)
 
 				}
+
+				files.add(file)
 			}
 		}
 
-
+		return files.size()>0?files:null;
 	}
 }

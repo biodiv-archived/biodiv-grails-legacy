@@ -24,9 +24,9 @@ class Project implements Taggable{
 	
 	//Grantee grantee;
 	//  File granteeLogo; // TODO
-	String granteeURL;
-	String granteeName;
-	SUser granteeContact; //TODO
+	String granteeOrganization;
+	String granteeContact;
+	String granteeEmail; 
 
 
 	Date grantFrom;
@@ -38,8 +38,6 @@ class Project implements Taggable{
 	String projectReport;
 
 	String dataContributionIntensity;
-
-	String analysis;
 
 	String misc;
 
@@ -58,15 +56,14 @@ class Project implements Taggable{
 		locations cascade:"all-delete-orphan"
 		
 
-
 	}
-
 
 
 	static hasMany = [ locations: Location,
 		proposalFiles: UFile,
 		reportFiles: UFile,
-		analysisFiles: UFile,
+		dataContribFiles: UFile,
+		miscFiles: UFile,
 
 	];
 
@@ -75,21 +72,29 @@ class Project implements Taggable{
 		title(nullable: false);
 		summary(nullable:true);
 		direction(nullable: true);
-		granteeURL();
-		granteeName(nullable: false);
+		
+		locations(nullable: true);
+		
+		granteeOrganization(nullable: true);
 		granteeContact(nullable:true);
-		locations();
-		grantFrom();
-		grantTo();
+		granteeEmail(nullable:true);
+		
+		grantFrom(nullable: true);
+		grantTo(nullable: true);
 		grantedAmount(nullable: true);
+		
 		projectProposal(nullable: true);
 		proposalFiles(nullable: true);
+		
 		projectReport(nullable: true);
 		reportFiles(nullable: true);
+		
 		dataContributionIntensity(nullable: true);
-		analysis(nullable: true);
-		analysisFiles(nullable: true);
+		dataContribFiles(nullable: true);
+		
 		misc(nullable: true);
+		miscFiles(nullable: true);
+		
 
 	}
 
