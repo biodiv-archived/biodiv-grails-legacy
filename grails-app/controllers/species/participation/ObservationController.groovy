@@ -456,9 +456,14 @@ class ObservationController {
 					//TODO:validate url;
 					def videoUrl = params.videoUrl;
 					if(videoUrl && Utils.isURL(videoUrl)) {
+						String videoId = Utils.getYouTubeVideoId(videoUrl);
+						if(videoId) {
 						def res = new Resource(fileName:'v', type:ResourceType.VIDEO);		
 						res.setUrl(videoUrl);				
 						resourcesInfo.add([fileName:'v', url:res.url, thumbnail:res.thumbnailUrl(), type:res.type]);
+						} else {
+						message = "Not a valid youtube video url"
+						}
 					} else {
 						message = "Not a valid video url"
 					}
