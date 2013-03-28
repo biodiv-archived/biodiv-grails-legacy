@@ -558,7 +558,7 @@ class ObservationController {
 					log.debug "Successfully added reco vote : "+recommendationVoteInstance
 					observationService.addRecoComment(recommendationVoteInstance.recommendation, observationInstance, params.recoComment);
 					//saving max voted species name for observation instance
-					observationInstance.saveConcurrently(observationInstance.&calculateMaxVotedSpeciesName);
+					observationInstance.calculateMaxVotedSpeciesName();
 					def activityFeed = activityFeedService.addActivityFeed(observationInstance, recommendationVoteInstance, recommendationVoteInstance.author, activityFeedService.SPECIES_RECOMMENDED);
 					observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
 					
@@ -630,7 +630,7 @@ class ObservationController {
 					return
 				}else if(recommendationVoteInstance.save(flush: true)) {
 					log.debug "Successfully added reco vote : "+recommendationVoteInstance
-					observationInstance.saveConcurrently(observationInstance.&calculateMaxVotedSpeciesName);
+					observationInstance.calculateMaxVotedSpeciesName();
 					def activityFeed = activityFeedService.addActivityFeed(observationInstance, recommendationVoteInstance, recommendationVoteInstance.author, activityFeedService.SPECIES_AGREED_ON);
 					observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
 					
@@ -655,6 +655,41 @@ class ObservationController {
 			flash.message  = "${message(code: 'observation.invalid', default:'Invalid observation')}"
 		}
 	}
+	
+	/**
+	* Deletes recommendation vote
+	*/
+   @Secured(['ROLE_USER'])
+   def removeRecommendationVote = {
+	   log.debug params;
+
+	   def author = springSecurityService.currentUser;
+
+	   if(params.obvId) {
+		   def observationInstance = Observation.get(params.obvId);
+		   def recommendationVoteInstance = RecommendationVote.findWhere(recommendation:Recommendation.read(params.recoId.toLong()), author:author, observation:observationInstance)
+		   try {
+			   recommendationVoteInstance.delete(flush: true, failOnError:true)
+			   log.debug "Successfully deleted reco vote : "+recommendationVoteInstance
+			   observationInstance.calculateMaxVotedSpeciesName();
+			   def activityFeed = activityFeedService.addActivityFeed(observationInstance, observationInstance, author, activityFeedService.RECOMMENDATION_REMOVED, activityFeedService.getSpeciesNameHtmlFromReco(recommendationVoteInstance.recommendation, null));
+			   observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
+			   //sending mail to user
+			   //observationService.sendNotificationMail(observationService.SPECIES_AGREED_ON, observationInstance, request, params.webaddress, activityFeed);
+			   def r = [
+				   status : 'success',
+				   success : 'true',
+				   msg:"${message(code: 'recommendations.deleted.message', args: [recommendationVoteInstance.recommendation.name])}"]
+			   render r as JSON
+			   return
+		   } catch(e) {
+			   e.printStackTrace();
+		   }
+	   } else {
+		   flash.message  = "${message(code: 'observation.invalid', default:'Invalid observation')}"
+	   }
+   }
+
 
 	/**
 	 * 
@@ -669,29 +704,30 @@ class ObservationController {
 			try {
 				def results = observationInstance.getRecommendationVotes(params.max, params.offset);
 				log.debug results;
+				def html =  g.render(template:"/common/observation/showObservationRecosTemplate", model:['observationInstance':observationInstance, 'result':results.recoVotes, 'totalVotes':results.totalVotes, 'uniqueVotes':results.uniqueVotes, 'userGroupWebaddress':params.userGroupWebaddress]);
+				def speciesNameHtml =  g.render(template:"/common/observation/showSpeciesNameTemplate", model:['observationInstance':observationInstance]);
+				def result = [
+					'status' : 'success',
+					canMakeSpeciesCall:params.canMakeSpeciesCall,
+					recoHtml:html,
+					uniqueVotes:results.uniqueVotes,
+					msg:params.msg,
+					speciesNameTemplate:speciesNameHtml,
+					speciesName:observationInstance.fetchSpeciesCall()]
+				
 				if(results?.recoVotes.size() > 0) {
-					def html =  g.render(template:"/common/observation/showObservationRecosTemplate", model:['observationInstance':observationInstance, 'result':results.recoVotes, 'totalVotes':results.totalVotes, 'uniqueVotes':results.uniqueVotes, 'userGroupWebaddress':params.userGroupWebaddress]);
-					def speciesNameHtml =  g.render(template:"/common/observation/showSpeciesNameTemplate", model:['observationInstance':observationInstance]);
-					def result = [
-								'status' : 'success',
-								canMakeSpeciesCall:params.canMakeSpeciesCall,
-								recoHtml:html,
-								uniqueVotes:results.uniqueVotes,
-								msg:params.msg,
-								speciesNameTemplate:speciesNameHtml,
-								speciesName:observationInstance.fetchSpeciesCall()]
-
 					render result as JSON
 					return
 				} else {
 					//response.setStatus(500);
 					def message = "";
 					if(params.offset > 0) {
-						message = [status:'info', 'msg':g.message(code: 'recommendations.nomore.message', default:'No more recommendations made. Please suggest')];
+						message = g.message(code: 'recommendations.nomore.message', default:'No more recommendations made. Please suggest');
 					} else {
-						message = [status:'info', 'msg':g.message(code: 'recommendations.zero.message', default:'No recommendations made. Please suggest')];
+						message = g.message(code: 'recommendations.zero.message', default:'No recommendations made. Please suggest');
 					}
-					render message as JSON
+					result["msg"] = message
+					render result as JSON
 					return
 				}
 			} catch(e){
@@ -946,7 +982,7 @@ class ObservationController {
 					log.debug " Overwriting old recommendation vote for user " + author.id +  " new reco name " + reco.name + " old reco name " + existingRecVote.recommendation.name
 					def msg = "${message(code: 'recommendations.overwrite.message', args: [existingRecVote.recommendation.name, reco.name])}"
 					try{
-						existingRecVote.delete(flush: true,, failOnError:true)
+						existingRecVote.delete(flush: true, failOnError:true)
 					}catch (Exception e) {
 						e.printStackTrace();
 					}

@@ -60,6 +60,7 @@ function addAgreeRecoVote(obvId, recoId, currentVotes, liComponent, url){
 	         	} else {
 	         		preLoadRecos(3, false, obvId, liComponent);
 	         		updateFeeds();
+	         		setFollowButton();
 	         		showRecoUpdateStatus(data.msg, data.status);
 	         	}
 			} else {
@@ -74,4 +75,29 @@ function addAgreeRecoVote(obvId, recoId, currentVotes, liComponent, url){
         	handleError(xhr, ajaxOptions, thrownError, successHandler, errorHandler);
 		} 
 	});
+}
+
+function removeRecoVote(obvId, recoId, url){
+	$.ajax({
+		url: url,
+		data:{'obvId':obvId, 'recoId':recoId},
+		
+		success: function(data){
+			if(data.status == 'success') {
+				preLoadRecos(3, false, obvId);
+	         	updateFeeds();
+	         	showRecoUpdateStatus(data.msg, data.status);
+			} else {
+				showRecoUpdateStatus(data.msg, data.status);
+			}
+			return false;
+		},
+		
+		error:function (xhr, ajaxOptions, thrownError){
+			//successHandler is used when ajax login suceedes
+        	var successHandler = this.success, errorHandler = showRecoUpdateStatus;
+        	handleError(xhr, ajaxOptions, thrownError, successHandler, errorHandler);
+		} 
+	});
+	
 }

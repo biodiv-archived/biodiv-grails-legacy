@@ -274,6 +274,12 @@ if(r && thumbnail) {
 						</div>
 					</g:if>
 					
+					<div class="sidebar_section">
+						<h5>Actions</h5>
+						<div class="tile" style="clear: both">
+							<feed:follow model="['sourceObject':observationInstance]" />
+						</div>
+					</div>	
 					<!-- obv:showTagsSummary model="['observationInstance':observationInstance]" /-->
 					<!-- obv:showObvStats  model="['observationInstance':observationInstance]"/-->
 
@@ -375,6 +381,7 @@ if(r && thumbnail) {
 		             		showRecos(data, null);
 		            		updateUnionComment(null, "${uGroup.createLink(controller:'comment', action:'getAllNewerComments')}");
 		            		updateFeeds();
+		            		setFollowButton();
 		            		showRecoUpdateStatus(data.msg, data.status);
 		            	}
 	            	} else {
