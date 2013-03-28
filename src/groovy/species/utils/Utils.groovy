@@ -276,7 +276,24 @@ class Utils {
 		else {
 			String re = /https?:\/\/(?:[0-9A-Z-]+\.)?(?:www\.)?(?:youtu\.be\/|youtube\.com\S*[^\w\-\s])([\w\-]{11})(?=[^\w\-]|$)(?![?=&+%\w]*(?:['"][^<>]*>|<\/a>))[?=&+%\w-]*/;
 			text = text.replaceAll(~re, {
-				getYouTubeEmbedUrl(it[1], 300,400);
+				//getYouTubeEmbedUrl(it[1], 295,480);
+				"""
+				<div class="youtube_container">
+				
+				<div class="preview">
+					<span class="videoId" style="display:none;">${it[1]}</span>
+				  <img class="thumb" src="http://img.youtube.com/vi/${it[1]}/default.jpg"/>
+				  <img class="play" src="https://s-static.ak.fbcdn.net/rsrc.php/v2/yG/r/Gj2ad6O09TZ.png">
+				</div>
+				<div class="info">
+				  
+				</div>
+				<div class="info-small">
+				  www.youtube.com
+				</div>
+				<div style="clear: both;"></div>
+			  </div>
+			"""
 			})
 			
 		}

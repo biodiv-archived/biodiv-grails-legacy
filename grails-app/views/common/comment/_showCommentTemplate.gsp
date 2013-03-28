@@ -15,7 +15,7 @@
 		<comment:showCommentContext
 			model="['commentInstance' : commentInstance]" />
 		<div class="yj-message-body">
-			<pre>${Utils.linkifyYoutubeLink(commentInstance.body)}</pre>
+			${Utils.linkifyYoutubeLink(commentInstance.body?.replaceAll("\\n",'<br/>'))}
 		</div>
 		<div class="yj-attributes">
 			<time class="timeago" datetime="${commentInstance.lastUpdated.getTime()}"></time>

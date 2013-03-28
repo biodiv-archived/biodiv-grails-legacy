@@ -18,7 +18,7 @@
 	</g:else>
 	</b>
 	<div class="feedActivityHolderContext yj-message-body">
-		<pre>${Utils.linkifyYoutubeLink(commentInstance.body)}</pre>
+		${Utils.linkifyYoutubeLink(commentInstance.body?.replaceAll("\\n",'<br/>'))}
 	</div>
 	<g:if test="${feedPermission != 'readOnly' && commentInstance}">
 		<sUser:ifOwns model="['user':commentInstance.author]">
