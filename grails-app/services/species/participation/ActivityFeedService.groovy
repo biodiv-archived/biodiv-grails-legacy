@@ -106,11 +106,10 @@ class ActivityFeedService {
 			if(!af.save(flush:true)){
 				af.errors.allErrors.each { log.error it }
 				return null
-			}else{
-				Follow.addFollower(rootHolder, author)
-				return af
 			}
 		}
+		Follow.addFollower(rootHolder, author)
+		return af
 	}
 	
 	def getDomainObject(className, id){
