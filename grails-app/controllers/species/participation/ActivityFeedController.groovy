@@ -1,6 +1,7 @@
 package species.participation
 
 import grails.converters.JSON
+import grails.plugins.springsecurity.Secured
 
 class ActivityFeedController {
 
@@ -45,5 +46,32 @@ class ActivityFeedController {
 	def list = {
 		log.debug params
 		['feedType':params.feedType, 'feedCategory':params.feedCategory]
+	}
+	
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////// Follow Related////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////
+	@Secured(['ROLE_USER'])
+	def follow = {
+		log.debug params
+		def author = springSecurityService.currentUser;
+		def domainObj = activityFeedService.getDomainObject(params.className, params.id)
+		def msg
+		
+		if(params.follow.toBoolean()){
+			Follow.addFollower(domainObj, author)
+			msg = "Following..."
+			if(!author.sendNotification){
+				msg += " Please turn on notification mail from your profile page."
+			}
+		}else{
+			Follow.deleteFollower(domainObj, author)
+			msg = "Unfollowing..."
+		}
+		
+		
+		def r = [status:'success']
+		r['msg']= msg 
+		render r as JSON
 	}
 }

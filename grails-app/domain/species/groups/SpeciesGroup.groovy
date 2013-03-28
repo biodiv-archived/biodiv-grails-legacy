@@ -60,6 +60,8 @@ class SpeciesGroup {
 	 */
 	@Override
 	public boolean equals(Object obj) {
+		if (this.is(obj))
+			return true;
 		if (obj == null)
 			return false;
 		if (!(obj instanceof SpeciesGroup))

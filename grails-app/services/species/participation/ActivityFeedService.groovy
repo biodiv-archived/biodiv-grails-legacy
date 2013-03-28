@@ -3,6 +3,7 @@ package species.participation
 import java.text.SimpleDateFormat
 import org.hibernate.Hibernate;
 
+import species.auth.SUser;
 import species.groups.UserGroup;
 import species.Species;
 import species.SpeciesField
@@ -22,6 +23,7 @@ class ActivityFeedService {
 	
 	static final String SPECIES_RECOMMENDED = "Suggested species name"
 	static final String SPECIES_AGREED_ON = "Agreed on species name"
+	static final String RECOMMENDATION_REMOVED = "Suggestion removed"
 	static final String OBSERVATION_POSTED_ON_GROUP = "Posted observation to group"
 	static final String OBSERVATION_REMOVED_FROM_GROUP = "Removed observation from group"
 	
@@ -68,6 +70,7 @@ class ActivityFeedService {
 	static transactional = false
 	
 	def grailsApplication
+	def springSecurityService
 	
 	def getActivityFeeds(params){
 		log.debug params;
@@ -81,8 +84,11 @@ class ActivityFeedService {
 	def getCount(params){
 		return ActivityFeed.fetchCount(params)
 	}
-	
 	def addActivityFeed(rootHolder, activityHolder, author, activityType){
+		return addActivityFeed(rootHolder, activityHolder, author, activityType, null)
+	}
+	
+	def addActivityFeed(rootHolder, activityHolder, author, activityType, description){
 		//to support discussion on comment thread
 		def subRootHolderType = rootHolder?.class?.getCanonicalName()
 		def subRootHolderId = rootHolder?.id
@@ -94,13 +100,14 @@ class ActivityFeedService {
 		ActivityFeed af = new ActivityFeed(author:author, activityHolderId:activityHolder?.id, \
 						activityHolderType:activityHolder?.class?.getCanonicalName(), \
 						rootHolderId:rootHolder?.id, rootHolderType:rootHolder?.class?.getCanonicalName(), \
-						activityType:activityType, subRootHolderType:subRootHolderType, subRootHolderId:subRootHolderId);
+						activityType:activityType, subRootHolderType:subRootHolderType, subRootHolderId:subRootHolderId, activityDescrption:description);
 					
 		ActivityFeed.withNewSession {
 			if(!af.save(flush:true)){
 				af.errors.allErrors.each { log.error it }
 				return null
 			}else{
+				Follow.addFollower(rootHolder, author)
 				return af
 			}
 		}
@@ -227,6 +234,9 @@ class ActivityFeedService {
 				break
 			case MEMBER_LEFT:
 				activityTitle = "Left group " + getUserGroupHyperLink(activityRootObj)
+				break
+			case RECOMMENDATION_REMOVED:
+				activityTitle = "Removed species name " + feedInstance.activityDescrption
 				break
 			default:
 				activityTitle = activityType

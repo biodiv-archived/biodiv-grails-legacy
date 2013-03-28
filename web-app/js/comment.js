@@ -74,6 +74,7 @@ function postAsAjax(postComp, url, newCommentUrl, update){
     			updateCountOnPopup(postComp, data.newlyAddedCommentCount);
     			if(update){
     				updateFeeds();
+    				setFollowButton();
     				updateUnionComment(postComp, newCommentUrl);
     			}
     			if(data.clearForm){

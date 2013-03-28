@@ -86,5 +86,10 @@ class ActivityFeedTagLib {
 		model.feedText = result.text
 		model.activityTitle = result.activityTitle
 		out << render(template:"/common/activityfeed/showActivityTemplate", model:attrs.model);
-	}	
+	}
+	
+	def follow = {attrs, body->
+		out << render(template:"/common/followTemplate", model:attrs.model);
+	}
+		
 }

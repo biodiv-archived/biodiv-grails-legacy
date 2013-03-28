@@ -20,6 +20,7 @@ import species.TaxonomyDefinition;
 import species.auth.SUser;
 import species.groups.SpeciesGroup;
 import species.participation.ActivityFeed;
+import species.participation.Follow;
 import species.participation.Observation;
 import species.participation.Recommendation;
 import species.participation.RecommendationVote;
@@ -1172,10 +1173,11 @@ class ObservationService {
 	}
 	
 	private List getParticipants(observation) {
-		def participants = [];
-		def result = ActivityFeed.findAllByRootHolderIdAndRootHolderType(observation.id, observation.class.getCanonicalName())*.author.unique()
+		List participants = [];
+		//def result = ActivityFeed.findAllByRootHolderIdAndRootHolderType(observation.id, observation.class.getCanonicalName())*.author.unique()
+		def result = Follow.getFollowers(observation)
 		result.each { user ->
-			if(user.sendNotification){
+			if(user.sendNotification && !participants.contains(user)){
 				participants << user
 			}
 		}

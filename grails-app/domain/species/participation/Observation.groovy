@@ -14,14 +14,11 @@ import speciespage.ObvUtilService;
 
 class Observation implements Taggable{
 	
-	//for saving object in concurrent envirnoment
-	private static final Object SAVE_LOCK = new Object()
-	
 	def dataSource
 	def grailsApplication;
 	def commentService;
-	def activityFeedService
-	
+	def activityFeedService;
+	def springSecurityService;
 	
 	public enum OccurrenceStatus {
 		ABSENT ("Absent"),	//http://rs.gbif.org/terms/1.0/occurrenceStatus#absent
@@ -158,6 +155,7 @@ class Observation implements Taggable{
 	void calculateMaxVotedSpeciesName(){
 		maxVotedReco = findMaxRepeatedReco();
 		lastRevised = new Date();
+		saveConcurrently();
 	}
 
 	String fetchSuggestedCommonNames(){
@@ -251,7 +249,7 @@ class Observation implements Taggable{
 		//			eq('observation', this)
 		//			order 'voteCount', 'desc'
 		//		}
-
+		def currentUser = springSecurityService.currentUser;
 		def result = [];
 		recoVoteCount.each { recoVote ->
 			def reco = Recommendation.read(recoVote[0]);
@@ -260,6 +258,7 @@ class Observation implements Taggable{
 			map.put("obvId", this.id);
 			String cNames = fetchSuggestedCommonNames(reco.id, true)
 			map.put("commonNames", (cNames == "")?"":"(" + cNames + ")");
+			map.put("disAgree", (currentUser in map.authors));
 			result.add(map);
 		}
 		return ['recoVotes':result, 'totalVotes':this.recommendationVote.size(), 'uniqueVotes':getRecommendationCount()];
@@ -298,10 +297,7 @@ class Observation implements Taggable{
 
 	private updateObservationTimeStamp(){
 		lastRevised = new Date();
-//		saveConcurrently({lastRevised = new Date()});
-//		if(!save(flush:true)){
-//			this.errors.allErrors.each { log.error it }
-//		}
+		saveConcurrently();
 	}
 
 	String fetchSpeciesCall(){
@@ -321,7 +317,7 @@ class Observation implements Taggable{
 	}
 	
 	def onAddComment(comment){
-		saveConcurrently(this.&updateObservationTimeStamp)
+		updateObservationTimeStamp()
 	}
 	
 	def afterDelete(){
@@ -403,14 +399,17 @@ class Observation implements Taggable{
 				errors.allErrors.each { log.error it }
 			}
 		}catch(org.hibernate.StaleObjectStateException e){
-			//synchronized(SAVE_LOCK){
-				refresh()
-				f()
-				if(!save(flush:true)){
-					errors.allErrors.each { log.error it }
-				}
-			//}
+			attach()
+			def m = merge()
+			//refresh()
+			//f()
+			if(!m.save(flush:true)){
+				m.errors.allErrors.each { log.error it }
+			}
 		}
 	}
-		
+	
+	def boolean fetchIsFollowing(SUser user=springSecurityService.currentUser){
+		return Follow.fetchIsFollowing(this, user)
+	}
 }

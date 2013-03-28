@@ -308,3 +308,40 @@ $('.feed_filter_label').click(function(){
 });
 
 
+function followObject(className, id, comp, url){
+	var doFollow = ($(comp).text() == 'Unfollow') ? false : true;
+	$.ajax({
+		url: url,
+		data:{'className':className, 'id':id, 'follow':doFollow},
+		
+		success: function(data){
+			if(data.status == 'success') {
+				$(".alertMsg").removeClass('alert alert-error').addClass('alert alert-success').html(data.msg);
+				$("html, body").animate({ scrollTop: 0 });
+				toggleFollowButton(comp);
+			}
+			return false;
+		},
+		
+		error:function (xhr, ajaxOptions, thrownError){
+			//successHandler is used when ajax login suceedes
+        	var successHandler = this.success, errorHandler = showRecoUpdateStatus;
+        	handleError(xhr, ajaxOptions, thrownError, successHandler, errorHandler);
+		} 
+	});
+}
+
+function toggleFollowButton(comp){
+	if(($(comp).text() == 'Unfollow')){
+		$(comp).html('Follow')
+	}else{
+		$(comp).html('Unfollow')
+	}
+}
+
+function setFollowButton(){
+	var comp = $("#followButton");
+	if(($(comp).text() == 'Follow')){
+		$(comp).html('Unfollow')
+	}
+}
