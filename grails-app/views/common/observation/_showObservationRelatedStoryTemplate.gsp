@@ -33,8 +33,11 @@ $(document).ready(function() {
     <g:if test="${!hideShowAll}">
     <div class="observation_links">
   		<g:if test="${observationId}">
-		    <a class="btn btn-mini" href="${uGroup.createLink(controller:controller, action:'listRelated', id: observationId, filterProperty : filterProperty, offset:0, limit:9, 'userGroup':userGroupInstance, 'userGroupWebaddress':userGroupWebaddress)}">Show all</a>
+		    <a class="btn btn-mini" href="${uGroup.createLink(controller:controller, action:'listRelated', id: observationId, parentType:'observation', filterProperty : filterProperty, offset:0, limit:9, 'userGroup':userGroupInstance, 'userGroupWebaddress':userGroupWebaddress)}">Show all</a>
 		</g:if>
+		<g:elseif test="${speciesId}">
+		    <a class="btn btn-mini" href="${uGroup.createLink(controller:controller, action:'listRelated', id: speciesId, parentType:'species', filterProperty : filterProperty, filterPropertyValue:filterPropertyValue, offset:0, limit:9, 'userGroup':userGroupInstance, 'userGroupWebaddress':userGroupWebaddress)}">Show all</a>
+		</g:elseif>
         <g:else>
 		    <a class="btn btn-mini" href="${uGroup.createLink(controller:controller, action:'list', (filterProperty) : filterPropertyValue, 'userGroup':userGroupInstance, 'userGroupWebaddress':userGroupWebaddress)}">Show all</a>
 		</g:else>

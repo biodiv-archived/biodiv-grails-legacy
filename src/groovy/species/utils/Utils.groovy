@@ -253,6 +253,35 @@ class Utils {
 		}
 		return parsedJSON;
 	}
+	
+	public static String getYouTubeVideoId(String url) {
+		if(!url) return;
+		else {
+			String re = /https?:\/\/(?:[0-9A-Z-]+\.)?(?:www\.)?(?:youtu\.be\/|youtube\.com\S*[^\w\-\s])([\w\-]{11})(?=[^\w\-]|$)(?![?=&+%\w]*(?:['"][^<>]*>|<\/a>))[?=&+%\w-]*/;
+			def matcher = (url =~ re)
+			if(matcher.getCount() > 0) {
+				return matcher.getAt(0)[1]
+			} else {
+				return null;
+			}
+		}
+	}
+	
+	public static String getYouTubeEmbedUrl(String videoId, int height, int width) {
+		return "<iframe width='${width}' height='${height}' src='http://www.youtube.com/embed/${videoId}' frameborder='0' allowfullscreen></iframe>";
+	}
+	
+	public static String linkifyYoutubeLink(String text) {
+		if(!text) return;
+		else {
+			String re = /https?:\/\/(?:[0-9A-Z-]+\.)?(?:www\.)?(?:youtu\.be\/|youtube\.com\S*[^\w\-\s])([\w\-]{11})(?=[^\w\-]|$)(?![?=&+%\w]*(?:['"][^<>]*>|<\/a>))[?=&+%\w-]*/;
+			text = text.replaceAll(~re, {
+				getYouTubeEmbedUrl(it[1], 300,400);
+			})
+			
+		}
+		return text;
+	}
 
 }
 

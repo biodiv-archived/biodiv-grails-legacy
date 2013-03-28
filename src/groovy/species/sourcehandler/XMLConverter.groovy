@@ -637,14 +637,13 @@ class XMLConverter extends SourceConverter {
 			}
 
 			String path = imageFile.absolutePath.replace(resourcesRootDir, "");
-println path
-println sourceUrl
-println resourceType
+
 			def res = Resource.findByFileNameAndType(path, resourceType);
 				
 			if(!res) {
 				log.debug "Creating new resource"
-				res = new Resource(type : resourceType, fileName:path, url:sourceUrl, description:imageNode.caption?.text(), mimeType:imageNode.mimeType?.text());
+				res = new Resource(type : resourceType, fileName:path, description:imageNode.caption?.text(), mimeType:imageNode.mimeType?.text());
+				res.url = sourceUrl
 				for(Contributor con : getContributors(imageNode, true)) {
 					res.addToContributors(con);
 				}
@@ -741,7 +740,8 @@ println resourceType
 		//		}
 		//		if(!res) {
 		def attributors = getAttributions(audioNode, true);
-		res = new Resource(type : ResourceType.AUDIO, fileName:audioNode.get("fileName"), url:audioNode.get("source"), description:audioNode.get("caption"), license:getLicenses(audioNode, true), contributor:getContributors(audioNode, true));
+		def res = new Resource(type : ResourceType.AUDIO, fileName:audioNode.get("fileName"), description:audioNode.get("caption"), license:getLicenses(audioNode, true), contributor:getContributors(audioNode, true));
+		res.url = audioNode.get("source")
 		for(Contributor con : attributors) {
 			res.addToAttributors(con);
 		}
@@ -753,16 +753,15 @@ println resourceType
 	private Resource createVideo(Node videoNode) {
 		log.debug "Creating video from data $videoNode"
 		def sourceUrl = videoNode.source?.text() ? videoNode.source?.text() : "";
-		def fieldCriteria = Resource.createCriteria();
-		def res = fieldCriteria.get {
-			and {
-				sourceUrl ? eq("url", sourceUrl) : isNull("url");
-				eq("type", ResourceType.VIDEO);
-			}
-		}
+		
+		if(!sourceUrl) return;
+		
+		def res = Resource.findByUrlAndType(sourceUrl, ResourceType.VIDEO);
+		
 		if(!res) {
 			def attributors = getAttributions(videoNode, true);
-			res = new Resource(type : ResourceType.AUDIO, fileName:videoNode.get("fileName"), url:sourceUrl, description:videoNode.get("caption"), license:getLicenses(videoNode, true), contributor:getContributors(videoNode, true));
+			res = new Resource(type : ResourceType.VIDEO, fileName:videoNode.get("fileName")?.text(), description:videoNode.get("caption"), license:getLicenses(videoNode, true), contributor:getContributors(videoNode, true));
+			res.url = sourceUrl;
 			for(Contributor con : getContributors(videoNode, true)) {
 				res.addToContributors(con);
 			}
@@ -773,6 +772,7 @@ println resourceType
 				res.addToLicenses(l);
 			}
 		} else {
+			res.fileName = videoNode.get("fileName")?.text(); 
 			res.url = sourceUrl
 			res.description = videoNode.caption?.text();
 			res.licenses?.clear()
@@ -787,6 +787,7 @@ println resourceType
 			for(License l : getLicenses(videoNode, true)) {
 				res.addToLicenses(l);
 			}
+			
 		}
 
 		//s.addToResources(res);
@@ -802,8 +803,6 @@ println resourceType
 		res =  getImages(dataNode.icons?.icon, iconsNode);
 		if(res) resources.addAll(res);
 
-		//resources.addAll(getAudio(dataNode, audiosNode));
-		//resources.addAll(getVideo(dataNode, videosNode));
 		log.debug "Getting resources for dataNode : "+resources;
 		return resources;
 	}

@@ -47,20 +47,13 @@
 			<b class="commonName"> ${engCommonName} </b>
 		</g:if>
 		<div class="icons clearfix">
-			<g:collect in="${speciesInstance}" expr="${it.fields.resources}"
-				var="resourcesCollection">
-				<g:each in="${resourcesCollection}" var="rs">
-					<g:each in="${rs}" var="r">
-						<g:if test="${r.type == species.Resource.ResourceType.ICON}">
-							<a href="${href}">
-							<img class="small_profile_pic"
-								src="${createLinkTo(dir: 'images/icons', file: r.fileName.trim(), absolute:true)}"
-								title="${r?.description}" />
-							</a>
-						</g:if>
-					</g:each>
-				</g:each>
-			</g:collect>
+			<g:each in="${speciesInstance.getIcons()}" var="r">
+				<%def imagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.thumbnail.suffix)%>
+				<img class="icon group_icon" href="${href}"
+					src="${createLinkTo(file: imagePath, base:grailsApplication.config.speciesPortal.resources.serverURL)}"
+					title="${r?.description}" />
+			</g:each>
+
 
 
 			<g:each in="${speciesInstance.fetchTaxonomyRegistry()}">

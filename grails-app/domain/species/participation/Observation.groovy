@@ -7,6 +7,7 @@ import java.text.SimpleDateFormat
 import species.Habitat
 import species.Language;
 import species.Resource;
+import species.Resource.ResourceType;
 import species.auth.SUser;
 import species.groups.SpeciesGroup;
 import species.groups.UserGroup;
@@ -109,12 +110,14 @@ class Observation implements Taggable{
 		if(iterator.hasNext()) {
 			reprImage = iterator.next();
 		}
-
-		if(reprImage && (new File(grailsApplication.config.speciesPortal.observations.rootDir+reprImage.fileName.trim())).exists()) {
-			return reprImage;
-		} else {
-			return null;
-		}
+		
+		return reprImage;
+//
+//		if(reprImage && (new File(grailsApplication.config.speciesPortal.observations.rootDir+reprImage.fileName.trim())).exists()) {
+//			return reprImage;
+//		} else {
+//			return null;
+//		}
 	}
 
 	/**

@@ -105,7 +105,7 @@ h6 {
 	display: table;
 }
 
-.thumbnail .figure a {
+.thumbnail .figure a, .thumbnail .figure span {
 	display: table-cell;
 	vertical-align: middle;
 	max-height: 150px;
@@ -354,23 +354,42 @@ div.errors {
 	padding-right: 5px;
 }
 
-#add_file {
+#add_image {
 	background-image: url('../images/add-photo.png');
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src=url('../images/add-photo.png'),sizingMethod='crop');
 	background-repeat: no-repeat;
-	background-position: 2px 2px;
+/* 	background-position: 2px 2px; */
 	width: 200px;
+	height:90px;
+	cursor: pointer;
+	border-bottom: 3px red;
+}
+#add_video {
+	background-image: url('../images/add-video.png');
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src=url('../images/add-video.png'),sizingMethod='crop');
+	background-repeat: no-repeat;
+/* 	background-position: 2px 2px; */
+	width: 200px;
+	height:90px;
 	cursor: pointer;
 }
 
 
-.progress {
+#add_file .progress {
 	border-radius: 3px 3px 3px 3px;
-	position: relative;
+	position: absolute;
 	height: 200px;
+	width:200px;
 	background-image: none;
 	background-color: transparent;
 	box-shadow: none;
+	top:0;
+	left:0;
+}
+
+#add_file_container {
+	position:relative;
+	z-index:100;
 }
 
 #translucent_box {

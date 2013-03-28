@@ -1,14 +1,22 @@
+<%@page import="species.Resource.ResourceType"%>
 <g:set var="mainImage" value="${observationInstance.mainImage()}" />
-<%def imagePath = mainImage?mainImage.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.thumbnail.suffix): null%>
+<%def path = mainImage?mainImage.thumbnailUrl(): null;
+def imagePath;
+if(mainImage.type == ResourceType.IMAGE) {
+	imagePath = g.createLinkTo(base:grailsApplication.config.speciesPortal.observations.serverURL,	file: path)
+} else if(mainImage.type == ResourceType.VIDEO){
+	imagePath = g.createLinkTo(base:path,	file: '')
+}
+%>
 
 <div class="figure span3 observation_story_image" style="display: table;height:220px;" 
 	title='<g:if test="${obvTitle != null}">${obvTitle}</g:if>'>
 	<g:link url="${uGroup.createLink(controller:'observation', action:'show', id:observationInstance.id, 'pos':pos, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress) }" name="l${pos}"
 		>
 		<g:if
-			test="${imagePath && (new File(grailsApplication.config.speciesPortal.observations.rootDir + imagePath)).exists()}">
+			test="${imagePath}">
 			<img class="img-polaroid"
-				src="${createLinkTo(base:grailsApplication.config.speciesPortal.observations.serverURL,	file: imagePath)}"
+				src="${imagePath}"
 				/>
 		</g:if>
 		<g:else>

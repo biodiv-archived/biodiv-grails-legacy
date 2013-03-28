@@ -38,7 +38,7 @@ class RecommendationService {
 		
 		def flushImmediately  = grailsApplication.config.speciesPortal.flushImmediately
 		if(reco.save(flush:flushImmediately)) {
-			log.debug "createing new recommendation $reco"
+			log.debug "creating new recommendation $reco"
 			//XXX uncomment this
 			namesIndexerService.add(reco);
 			return true;
@@ -213,5 +213,20 @@ class RecommendationService {
 		
 		//no reco with taxon concept found so returning first one
 		return recoList[0]
+	}
+	
+	List<Recommendation> searchRecoByTaxonConcept(taxonConcept){
+		if(!taxonConcept) return;
+		
+		def c = Recommendation.createCriteria();
+		def recoList = c.list {
+			eq('taxonConcept', taxonConcept)
+		}
+		
+		if(!recoList || recoList.isEmpty()){
+			return null
+		}
+		
+		return recoList;
 	}
 }

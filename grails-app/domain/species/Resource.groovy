@@ -1,6 +1,7 @@
 package species
 
 import species.participation.Observation;
+import species.utils.Utils;
 
 class Resource {
 
@@ -27,12 +28,14 @@ class Resource {
 	String description;
 	String mimeType; //TODO:validate
 	
+	def grailsApplication
 
 	static hasMany = [contributors:Contributor, attributors:Contributor, speciesFields:SpeciesField, observation:Observation, licenses:License];
 	static belongsTo = [SpeciesField, Observation];
 	
 	static mapping = {
 		description type:'text';
+		sort "id"
 	}
 	
     static constraints = {
@@ -42,4 +45,34 @@ class Resource {
 		mimeType(nullable:true);
 		licenses  validator : { val, obj -> val && val.size() > 0 }
     }
+	
+	String thumbnailUrl() {
+		String thumbnailUrl = '';
+		switch(type) {
+			case ResourceType.IMAGE :
+				thumbnailUrl = this.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.thumbnail.suffix);
+				break;
+			case ResourceType.VIDEO :				
+				String videoId = Utils.getYouTubeVideoId(this.url);
+				thumbnailUrl = "http://img.youtube.com/vi/${videoId}/default.jpg"
+				break;
+			default :
+				log.error "Not a valid type"
+		}		
+		return thumbnailUrl;
+	}
+	
+	String getUrl() {
+		if(this.type == ResourceType.IMAGE) {
+			return this.fileName;
+		}
+		return this.@url;
+	}
+	
+	void setUrl(String url) {
+		if(!url) return;
+		if(Utils.isURL(url)) {
+			this.url = url;
+		}
+	}
 }
