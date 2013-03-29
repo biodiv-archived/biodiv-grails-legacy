@@ -1,6 +1,6 @@
 package content
 
-class StrategicDirectionController {
+class DirectionController {
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 

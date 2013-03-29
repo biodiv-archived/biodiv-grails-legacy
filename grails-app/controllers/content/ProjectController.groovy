@@ -3,6 +3,8 @@ package content
 import content.fileManager.UFileService
 import grails.converters.JSON
 import content.Location
+import grails.plugins.springsecurity.Secured
+
 
 class ProjectController {
 
@@ -20,12 +22,14 @@ class ProjectController {
 		[projectInstanceList: Project.list(params), projectInstanceTotal: Project.count()]
 	}
 
+	@Secured(['ROLE_CEPF_ADMIN'])
 	def create = {
 		def projectInstance = new Project()
 		projectInstance.properties = params
 		return [projectInstance: projectInstance]
 	}
 
+	@Secured(['ROLE_CEPF_ADMIN'])
 	def save = {
 		log.debug ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
 		log.debug params
@@ -58,6 +62,7 @@ class ProjectController {
 		}
 	}
 
+	@Secured(['ROLE_CEPF_ADMIN'])
 	def edit = {
 		def projectInstance = Project.get(params.id)
 		if (!projectInstance) {
@@ -69,6 +74,7 @@ class ProjectController {
 		}
 	}
 
+	@Secured(['ROLE_CEPF_ADMIN'])
 	def update = {
 		def projectInstance = projectService.createProject(params)
 		if (projectInstance) {

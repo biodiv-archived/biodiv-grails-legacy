@@ -11,6 +11,11 @@
 		args="[entityName]" /></title>
 <r:require modules="add_file" />
 <uploader:head />
+<style type="text/css">
+ul.tagit {
+	margin-left: 0px;
+}
+</style>
 </head>
 <body>
 	<div class="nav">
@@ -57,7 +62,7 @@
 						<div
 							class="control-group ${hasErrors(bean: projectInstance, field: 'direction', 'error')}">
 							<label class="control-label" for="direction"><g:message
-									code="project.direction.label" default="Direction" /></label>
+									code="project.direction.label" default="Strategic Direction" /></label>
 
 							<div class="controls">
 								<g:select name="direction.id"
@@ -70,10 +75,10 @@
 						<div
 							class="control-group ${hasErrors(bean: projectInstance, field: 'title', 'error')}">
 							<label class="control-label" for="title"><g:message
-									code="project.title.label" default="Title" /></label>
+									code="project.title.label" default="Project Title" /><span class="req">*</span></label>
 							<div class="controls">
 
-								<g:textField class="input-xxlarge" name="title"
+								<g:textField class="input-xxlarge" name="title" 
 									value="${projectInstance?.title}" />
 							</div>
 
@@ -83,14 +88,14 @@
 							class="row control-group ${hasErrors(bean: projectInstance, field: 'summary', 'error')}">
 
 							<label class="control-label" for="summary"><g:message
-									code="project.summary.label" default="Project Summary" /></label>
+									code="project.summary.label" default="Summary of the Project" /></label>
 
 							<div class="controls">
 
 
 								<ckeditor:config var="toolbar_editorToolbar">
 									[
-    									[ 'Bold', 'Italic' ]
+    									[ 'Bold', 'Italic', 'Image' ]
 									]
 									</ckeditor:config>
 								<ckeditor:editor name="summary" height="200px"
@@ -103,10 +108,11 @@
 						<div
 							class="control-group ${hasErrors(bean: projectInstance, field: 'tags', 'error')}">
 
-							<label class="control-label" for="tags"><g:message
+							<label class="control-label" for="tags"><i class="icon-tags"></i><g:message
 									code="project.tags.label" default="Project Tags" /></label>
 
 							<div class="controls">
+							
 
 								<ul id="tags" name="tags">
 									<g:each in="${projectInstance.tags}" var="tag">
@@ -140,30 +146,44 @@
 					<div id="granteeDetails" class="section in collapse">
 						<div>
 							<div
-								class="control-group ${hasErrors(bean: projectInstance, field: 'granteeName', 'error')}">
-								<label class="control-label" for="granteeName"><g:message
-										code="project.granteeName.label" default="Grantee Name" /></label>
+								class="control-group ${hasErrors(bean: projectInstance, field: 'granteeOrganization', 'error')}">
+								<label class="control-label" for="granteeOrganization"><g:message
+										code="project.granteeOrganization.label"
+										default="Grantee Organization" /></label>
 
 								<div class="controls">
 
-									<g:textField name="granteeName"
-										value="${projectInstance?.granteeName}" />
+									<g:textField name="granteeOrganization"
+										value="${projectInstance?.granteeOrganization}" />
 								</div>
 							</div>
 
 
 							<div
-								class="control-group ${hasErrors(bean: projectInstance, field: 'granteeURL', 'error')}">
-								<label class="control-label" for="granteeURL"><g:message
-										code="project.granteeURL.label" default="Grantee URL" /></label>
+								class="control-group ${hasErrors(bean: projectInstance, field: 'granteeContact', 'error')}">
+								<label class="control-label" for="granteeContact"><g:message
+										code="project.granteeContact.label" default="Primary Contact" /></label>
 
 								<div class="controls">
 
-									<g:textField name="granteeURL"
-										value="${projectInstance?.granteeURL}" />
+									<g:textField name="granteeContact"
+										value="${projectInstance?.granteeContact}" />
 								</div>
 							</div>
 
+							<div
+								class="control-group ${hasErrors(bean: projectInstance, field: 'granteeEmail', 'error')}">
+								<label class="control-label" for="granteeEmail"><g:message
+										code="project.granteeEmail.label" default="Email" /></label>
+
+								<div class="controls">
+    <div class="input-prepend"><span class="add-on"><i class="icon-envelope"></i></span>
+
+									<g:textField name="granteeEmail"
+										value="${projectInstance?.granteeEmail}" />
+										</div>
+								</div>
+							</div>
 
 							<div
 								class="control-group ${hasErrors(bean: projectInstance, field: 'granteeLogo', 'error')}">
@@ -180,11 +200,13 @@
 								<label class="control-label" for="grantFrom"><g:message
 										code="project.grantFrom.label" default="Grant From" /></label>
 								<div class="controls">
+    <div class="input-prepend"><span class="add-on"><i class="icon-calendar"></i></span>
 
 									<input name="grantFrom" type="text" id="grantFrom"
 										class="date-popup"
 										value="${projectInstance?.grantFrom?.format('dd/MM/yyyy')}"
 										placeholder="Select date" />
+										</div>
 								</div>
 							</div>
 
@@ -193,11 +215,13 @@
 								<label class="control-label" for="grantTo"><g:message
 										code="project.grantTo.label" default="Grant To" /></label>
 								<div class="controls">
+    <div class="input-prepend"><span class="add-on"><i class="icon-calendar"></i></span>
 
 									<input name="grantTo" type="text" id="grantTo"
 										class="date-popup"
 										value="${projectInstance?.grantTo?.format('dd/MM/yyyy')}"
 										placeholder="Select date" />
+										</div>
 								</div>
 							</div>
 
@@ -208,9 +232,14 @@
 								<label class="control-label" for="grantedAmount"><g:message
 										code="project.grantedAmount.label" default="Granted Amount" /></label>
 								<div class="controls">
-
+								<div class="input-prepend input-append">
+								  <span class="add-on">$</span>
+								
 									<g:textField name="grantedAmount"
 										value="${fieldValue(bean: projectInstance, field: 'grantedAmount')}" />
+										  <span class="add-on">.00</span>
+										
+										</div>
 								</div>
 
 							</div>
@@ -218,6 +247,7 @@
 
 					</div>
 				</div>
+
 				<div class="super-section">
 					<div class="section">
 
@@ -229,8 +259,17 @@
 
 							<div class="controls">
 
-								<g:textArea name="projectProposal"
-									value="${projectInstance?.projectProposal}" rows="5" cols="40" />
+								<ckeditor:config var="toolbar_editorToolbar">
+									[
+    									[ 'Bold', 'Italic' ]
+									]
+									</ckeditor:config>
+								<ckeditor:editor name="projectProposal" height="200px"
+									toolbar="editorToolbar">
+									${projectInstance?.projectProposal}
+								</ckeditor:editor>
+
+
 							</div>
 						</div>
 
@@ -247,17 +286,28 @@
 								<fileManager:uploader model="['name':'proposalFiles']" />
 							</div>
 						</div>
+					</div>
 
+				</div>
 
+				<div class="super-section">
+					<div class="section">
 						<div
 							class="control-group ${hasErrors(bean: projectInstance, field: 'projectReport', 'error')}">
 
 							<label class="control-label" for="projectReport"><g:message
 									code="project.projectReport.label" default="Project Report" /></label>
 							<div class="controls">
+								<ckeditor:config var="toolbar_editorToolbar">
+									[
+    									[ 'Bold', 'Italic' ]
+									]
+									</ckeditor:config>
+								<ckeditor:editor name="projectReport" height="200px"
+									toolbar="editorToolbar">
+									${projectInstance?.projectReport}
+								</ckeditor:editor>
 
-								<g:textArea name="projectReport"
-									value="${projectInstance?.projectReport}" rows="5" cols="40" />
 							</div>
 
 						</div>
@@ -274,77 +324,82 @@
 
 								<fileManager:uploader model="['name':'reportFiles']" />
 							</div>
-
-
-							<div
-								class="control-group ${hasErrors(bean: projectInstance, field: 'dataContributionIntensity', 'error')}">
-
-								<label class="control-label" for="dataContributionIntensity"><g:message
-										code="project.dataContributionIntensity.label"
-										default="Data Contribution Intensity" /></label>
-
-								<div class="controls">
-
-									<g:textArea name="dataContributionIntensity"
-										value="${projectInstance?.dataContributionIntensity}" rows="5"
-										cols="40" />
-								</div>
-							</div>
-
-
-							<div
-								class="control-group ${hasErrors(bean: projectInstance, field: 'analysis', 'error')}">
-								<label class="control-label" for=analysis"><g:message
-										code="project.analysis.label" default="Analysis" /> </label>
-
-								<div class="controls">
-									<g:textArea name="analysis"
-										value="${projectInstance?.analysis}" rows="5" cols="40" />
-								</div>
-							</div>
-
-							<div
-								class="control-group ${hasErrors(bean: projectInstance, field: 'analysisFiles', 'error')}">
-
-								<label class="control-label" for=analysisFiles"><g:message
-										code="project.analysisFiles.label" default="Analysis Files" /></label>
-								<div class="controls file-upload">
-
-
-									<fileManager:uploader model="['name':'analysisFiles']" />
-								</div>
-
-
-							</div>
-
-							<div
-								class="control-group ${hasErrors(bean: projectInstance, field: 'misc', 'error')}">
-								<label class="control-label" for="misc"><g:message
-										code="project.misc.label" default="Misc" /></label>
-								<div class="controls">
-
-
-									<g:textArea name="misc" value="${projectInstance?.misc}"
-										rows="5" cols="40" />
-								</div>
-							</div>
-
 						</div>
-
+					</div>
+				</div>
+				
+				
+								<div class="super-section">
+					<a data-toggle="collapse" href="#data-links">
+						<h5>Data Contribution</h5>
+					</a>
+					<div id="data-links" class="section in collapse">
+						<g:render template="dataLinks"
+							model="['projectInstance':projectInstance]" />
 
 					</div>
 
 				</div>
 
-				<div class="form-actions">
-					<button type="submit" class="btn btn-primary">${form_button_name}</button>
-					<button class="btn">Cancel</button>
+
+				<div class="super-section">
+					<div class="section">
+						<div
+							class="control-group ${hasErrors(bean: projectInstance, field: 'misc', 'error')}">
+							<label class="control-label" for="misc"><g:message
+									code="project.misc.label" default="Misc" /></label>
+							<div class="controls">
+
+
+								<ckeditor:config var="toolbar_editorToolbar">
+									[
+    									[ 'Bold', 'Italic' ]
+									]
+									</ckeditor:config>
+								<ckeditor:editor name="misc" height="200px"
+									toolbar="editorToolbar">
+									${projectInstance?.misc}
+								</ckeditor:editor>
+
+
+
+							</div>
+						</div>
+
+						<div
+							class="control-group ${hasErrors(bean: projectInstance, field: 'miscFiles', 'error')}">
+
+							<label class="control-label" for=miscFiles"><g:message
+									code="project.miscFiles.label" default="Misc Files" /></label>
+							<div class="controls file-upload">
+
+
+								<fileManager:uploader model="['name':'miscFiles']" />
+							</div>
+
+
+						</div>
+					</div>
 				</div>
-		</form>
+
+			</div>
+	</div>
+
+
+
+	<div class="form-actions">
+		<button type="submit" class="btn btn-primary">
+			${form_button_name}
+		</button>
+		<button class="btn">Cancel</button>
+	</div>
+	</form>
 
 
 	</div>
 	<g:render template='location' model="['i':'_clone','hidden':true]" />
+		<g:render template='dataLink' model="['i':'_clone','hidden':true]" />
+	
 
 
 	<r:script>

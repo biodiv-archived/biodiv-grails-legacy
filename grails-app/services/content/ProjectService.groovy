@@ -11,7 +11,7 @@ import content.fileManager.UFile;
 import content.fileManager.UFileService
 
 //import de.ailis.pherialize
-import org.lorecraft.phparser.SerializedPhpParser;
+//import org.lorecraft.phparser.SerializedPhpParser;
 
 class ProjectService {
 
@@ -49,6 +49,18 @@ class ProjectService {
 		}
 		return null;
 	}
+
+	private Date parseDBDate(date){
+		try {
+			return date? Date.parse("yyyy-mm-dd'T'HH:mm:ss", date):new Date();
+		} catch (Exception e) {
+			// TODO: handle exception
+			print e.toString();
+			throw new Exception();
+		}
+		return null;
+	}
+
 
 	def migrateProjects() {
 		def startDate = new Date()
@@ -115,8 +127,8 @@ class ProjectService {
 		proj.granteeContact = row.field_grantee_name_value
 		proj.granteeEmail = row.field_grantee_email_email
 
-		proj.grantFrom = parseDate(row.field_grantterm_value)
-		proj.grantTo = parseDate(row.field_grantterm_value2)
+		proj.grantFrom = parseDBDate(row.field_grantterm_value)
+		proj.grantTo = parseDBDate(row.field_grantterm_value2)
 		proj.grantedAmount = row.field_project_amount_value
 
 		proj.projectProposal = row.field_project_proposal_value
@@ -151,11 +163,18 @@ class ProjectService {
 
 		proj.misc = row.field_miscellaneous_value
 
+
+
+
 		if(!proj.save(flush:true)){
 			proj.errors.allErrors.each { log.error it }
 			return null
 		}else{
+			String tagsQuery = "select term_data.name from term_data, term_node where term_data.tid=term_node.tid and term_node.nid=$nodeRow.nid and term_node.vid=$nodeRow.vid"
 
+			def tagsRows = sql.rows(tagsQuery)
+
+			proj.setTags(tagsRows.name)
 			println " ****************** Project Saved *********************" + proj
 
 			return proj
@@ -186,15 +205,25 @@ class ProjectService {
 				if(row.metadata) {
 					println "metadata is "+ row.metadata
 
-					SerializedPhpParser serializedPhpParser = new SerializedPhpParser(row.metadata);
+					/*SerializedPhpParser serializedPhpParser = new SerializedPhpParser(row.metadata);
 
 					Object result = serializedPhpParser.parse();
 
 
 					file.name = result.description;
 					file.description = result.shortnote.body
-					//file.setTags(result.tags.body)
 
+					//before setting tags object should be saved
+					if(!file.save(flush:true)){
+						file.errors.allErrors.each { log.error it }
+						return null
+					}else{
+					//get tags list by splitting string by comma and stripping whitespace
+					List tags = Arrays.asList(result.tags.body.split("\\s*,\\s*"));
+
+					file.setTags(tags)
+					}
+*/
 				}
 
 				files.add(file)

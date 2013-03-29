@@ -7,6 +7,8 @@
         <meta name="layout" content="main" />
         <g:set var="entityName" value="${message(code: 'strategicDirection.label', default: 'StrategicDirection')}" />
         <title><g:message code="default.edit.label" args="[entityName]" /></title>
+        <r:require modules="core" />
+        
     </head>
     <body>
         <div class="nav">

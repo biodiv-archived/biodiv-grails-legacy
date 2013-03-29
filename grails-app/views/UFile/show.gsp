@@ -59,9 +59,9 @@
                         </tr>
                     
                         <tr class="prop">
-                            <td valign="top" class="name"><g:message code="UFile.extension.label" default="Extension" /></td>
+                            <td valign="top" class="name"><g:message code="UFile.mimetype.label" default="Mimetype" /></td>
                             
-                            <td valign="top" class="value">${fieldValue(bean: UFileInstance, field: "extension")}</td>
+                            <td valign="top" class="value">${fieldValue(bean: UFileInstance, field: "mimetype")}</td>
                             
                         </tr>
                     

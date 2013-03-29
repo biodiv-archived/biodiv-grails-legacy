@@ -1,16 +1,12 @@
 @CHARSET "UTF-8";
 
 .ufile-block {
-	max-width: 450px;	
 	border: solid 1px;
 	padding: 5px;
 	margin: 15px;
 }
 }
 
-.add-file .field {
-	max-width: 220px;
-}
 
 .desc-field {
 }
@@ -23,14 +19,14 @@ div.field{
 	
 }
 
-ul.tagit {
-	max-width: 450px;
-}
 
 .upload-form {
-margin-left: 45px;
 position: absolute;
 left: -9999em;
+}
+
+ul.file-tags {
+	margin-left: 0px;
 }
 
 .qq-upload-success {

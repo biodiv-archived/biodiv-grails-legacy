@@ -37,7 +37,6 @@ class Project implements Taggable{
 
 	String projectReport;
 
-	String dataContributionIntensity;
 
 	String misc;
 
@@ -49,7 +48,6 @@ class Project implements Taggable{
 		projectProposal type:"text"
 		projectReport type:"text"
 		projectReport type:"text"
-		dataContributionIntensity type:"text"
 		analysis type:"text"
 		misc type:"text"
 		
@@ -60,9 +58,9 @@ class Project implements Taggable{
 
 
 	static hasMany = [ locations: Location,
+		dataLinks:DataLink,
 		proposalFiles: UFile,
 		reportFiles: UFile,
-		dataContribFiles: UFile,
 		miscFiles: UFile,
 
 	];
@@ -88,10 +86,7 @@ class Project implements Taggable{
 		
 		projectReport(nullable: true);
 		reportFiles(nullable: true);
-		
-		dataContributionIntensity(nullable: true);
-		dataContribFiles(nullable: true);
-		
+				
 		misc(nullable: true);
 		miscFiles(nullable: true);
 		
@@ -104,6 +99,13 @@ class Project implements Taggable{
 		return LazyList.decorate(
 		locations,
 		FactoryUtils.instantiateFactory(Location.class))
+	}
+	
+	
+	def getDataLinksList() {
+		return LazyList.decorate(
+		dataLinks,
+		FactoryUtils.instantiateFactory(DataLink.class))
 	}
 	
 

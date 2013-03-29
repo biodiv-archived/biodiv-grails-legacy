@@ -34,11 +34,13 @@
 					def canUploadFile = true //based on configuration
 		%>
 		<g:if test="${canUploadFile}">
+		<sec:ifLoggedIn>
 			<%
                 def form_action = uGroup.createLink(action:'save_browser', controller:'UFile', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)
 				def name = 'browser'
             %>
-			<form action="${form_action}" method="POST" id="upload-file">
+            
+			<form class="form-horizontal" action="${form_action}" method="POST" id="upload-file">
 
 
         <fileManager:uploader model="['name':'browser']"/>
@@ -50,7 +52,7 @@
 				</div>
 			</form>
 
-
+</sec:ifLoggedIn>
 		</g:if>
 
 
