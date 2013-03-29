@@ -604,7 +604,7 @@ if(r && thumbnail) {
 								<label class="checkbox" style="text-align: left;"> 
 								 <g:checkBox style="margin-left:0px;"
 									name="agreeTerms" value="${observationInstance.agreeTerms}"/>
-								 <span class="policy-text"> By submitting this form, you agree that the photos you are submitting are taken by you, or you have permission of the copyright holder to upload the photos on creative commons licenses. </span></label>
+								 <span class="policy-text"> By submitting this form, you agree that the photos or videos you are submitting are taken by you, or you have permission of the copyright holder to upload them on creative commons licenses. </span></label>
 						</div>
 					
 				</div>
