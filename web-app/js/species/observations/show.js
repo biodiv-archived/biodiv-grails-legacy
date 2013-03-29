@@ -1,7 +1,9 @@
 function showRecos(data, textStatus) {
 	$('#recoSummary').html(data.recoHtml);
 	var speciesName =  data.speciesName;
-	$('.species_title').html(data.speciesNameTemplate);
+	$('.observation_story .species_title').replaceWith(data.speciesNameTemplate);
+	$('.page-header .species_title').replaceWith(data.speciesNameTemplateForHeader);
+	$('.species-external-link').replaceWith(data.speciesExternalLinkHtml);
 	reloadCarousel($('#carousel_a').data('jcarousel'), 'speciesName', speciesName);
 	showRecoUpdateStatus(data.msg, data.status);
 }
@@ -86,6 +88,7 @@ function removeRecoVote(obvId, recoId, url){
 			if(data.status == 'success') {
 				preLoadRecos(3, false, obvId);
 	         	updateFeeds();
+	         	setFollowButton();
 	         	showRecoUpdateStatus(data.msg, data.status);
 			} else {
 				showRecoUpdateStatus(data.msg, data.status);

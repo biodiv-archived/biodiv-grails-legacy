@@ -1,4 +1,12 @@
 <div class="species_title">
+	<%
+		def commonName = observationInstance.fetchSuggestedCommonNames()
+		def speciesId = observationInstance.maxVotedReco?.taxonConcept?.findSpeciesId();
+		def speciesLink = " "
+		if(speciesId && !isHeading){
+			speciesLink += '<a href="' + uGroup.createLink(controller:'species', action:'show', id:speciesId, 'userGroupWebaddress':params?.webaddress, absolute:true) + '">' + "<i class='icon-info-sign' style='margin-right: 0px; margin-left: 10px;'></i>know more" + "</a>"
+		}
+	%>
 	<g:set var="sName" value="${observationInstance.fetchSpeciesCall()}" />
 	<g:if test="${sName == 'Unknown'}">
 		<div class="sci_name ellipsis" title="${sName}">
@@ -8,8 +16,6 @@
 		</div>
 	</g:if>
 	<g:elseif test="${isListView}">
-		<%def commonName = observationInstance.fetchSuggestedCommonNames() %>
-
 		<g:if test="${commonName}">
 			<div class="common_name ellipsis" title="${commonName }">
 				${commonName}
@@ -27,10 +33,9 @@
 		</g:else>
 	</g:elseif>
 	<g:else>
-		<%def commonName = observationInstance.fetchSuggestedCommonNames() %>
 		<g:if test="${observationInstance.maxVotedReco.isScientificName}">
 			<div class="sci_name ellipsis" title="${sName }">
-				${sName}
+				${sName + speciesLink}
 			</div>
 			<div class="common_name ellipsis" title="${commonName }">
 				${commonName}
@@ -39,7 +44,7 @@
 		<g:else>
 <%--			<s:showHeadingAndSubHeading model="['heading':sName, 'headingClass':headingClass]"/>--%>
 			<div class="ellipsis" title="${sName}">
-				${sName}
+				${sName + speciesLink}
 			</div>
 		</g:else>
 	</g:else>

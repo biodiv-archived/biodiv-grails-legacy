@@ -26,6 +26,7 @@ import species.groups.SpeciesGroup;
 import species.groups.UserGroup;
 import species.groups.UserGroupController;
 import species.Habitat;
+import species.Species;
 import species.Resource;
 import species.BlockedMails;
 import species.Resource.ResourceType;
@@ -706,6 +707,8 @@ class ObservationController {
 				log.debug results;
 				def html =  g.render(template:"/common/observation/showObservationRecosTemplate", model:['observationInstance':observationInstance, 'result':results.recoVotes, 'totalVotes':results.totalVotes, 'uniqueVotes':results.uniqueVotes, 'userGroupWebaddress':params.userGroupWebaddress]);
 				def speciesNameHtml =  g.render(template:"/common/observation/showSpeciesNameTemplate", model:['observationInstance':observationInstance]);
+				def speciesNameHtmlForHeader =  g.render(template:"/common/observation/showSpeciesNameTemplate", model:['observationInstance':observationInstance, 'isHeading':true]);
+				def speciesExternalLinkHtml =  g.render(template:"/species/showSpeciesExternalLinkTemplate", model:['speciesInstance':Species.read(observationInstance.maxVotedReco?.taxonConcept?.findSpeciesId())]);
 				def result = [
 					'status' : 'success',
 					canMakeSpeciesCall:params.canMakeSpeciesCall,
@@ -713,6 +716,8 @@ class ObservationController {
 					uniqueVotes:results.uniqueVotes,
 					msg:params.msg,
 					speciesNameTemplate:speciesNameHtml,
+					speciesNameTemplateForHeader:speciesNameHtmlForHeader,
+					speciesExternalLinkHtml:speciesExternalLinkHtml,
 					speciesName:observationInstance.fetchSpeciesCall()]
 				
 				if(results?.recoVotes.size() > 0) {
