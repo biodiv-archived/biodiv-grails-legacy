@@ -18,7 +18,7 @@ class ChartController {
 		//render chartService.getPortalActivityStatsByDay(params) as JSON
 		[]
 	}
-	@Secured(['ROLE_ADMIN'])
+	//@Secured(['ROLE_ADMIN'])
 	def show = {
 		log.debug params
 		[obvData:chartService.getObservationStats(params, null), speciesData: chartService.getSpeciesPageStats(params), userData:chartService.activeUserStats(params),  activityData:chartService.getPortalActivityStatsByDay(params)]
