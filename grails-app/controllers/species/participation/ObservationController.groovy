@@ -676,7 +676,7 @@ class ObservationController {
 			   def activityFeed = activityFeedService.addActivityFeed(observationInstance, observationInstance, author, activityFeedService.RECOMMENDATION_REMOVED, activityFeedService.getSpeciesNameHtmlFromReco(recommendationVoteInstance.recommendation, null));
 			   observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
 			   //sending mail to user
-			   //observationService.sendNotificationMail(observationService.SPECIES_AGREED_ON, observationInstance, request, params.webaddress, activityFeed);
+			   observationService.sendNotificationMail(activityFeedService.RECOMMENDATION_REMOVED, observationInstance, request, params.webaddress, activityFeed);
 			   def r = [
 				   status : 'success',
 				   success : 'true',

@@ -422,7 +422,8 @@ class UserGroupService {
 			log.error "Could not add ${observation} to ${usergroup}"
 			log.error  userGroup.errors.allErrors.each { log.error it }
 		} else {
-			activityFeedService.addActivityFeed(observation, userGroup, observation.author, activityFeedService.OBSERVATION_POSTED_ON_GROUP);
+			def activityFeed = activityFeedService.addActivityFeed(observation, userGroup, observation.author, activityFeedService.OBSERVATION_POSTED_ON_GROUP);
+			observationService.sendNotificationMail(activityFeedService.OBSERVATION_POSTED_ON_GROUP, observation, null, null, activityFeed);
 			log.debug "Added ${observation} to userGroup ${userGroup}"
 		}
 	}
@@ -447,7 +448,8 @@ class UserGroupService {
 			log.error "Could not remove ${observation} from ${usergroup}"
 			log.error  userGroup.errors.allErrors.each { log.error it }
 		} else {
-			activityFeedService.addActivityFeed(observation, userGroup, observation.author, activityFeedService.OBSERVATION_REMOVED_FROM_GROUP);
+			def activityFeed = activityFeedService.addActivityFeed(observation, userGroup, observation.author, activityFeedService.OBSERVATION_REMOVED_FROM_GROUP);
+			observationService.sendNotificationMail(activityFeedService.OBSERVATION_REMOVED_FROM_GROUP, observation, null, null, activityFeed);
 			log.debug "Removed ${observation} from userGroup ${userGroup}"
 		}
 	}

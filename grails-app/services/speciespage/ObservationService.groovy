@@ -1133,6 +1133,46 @@ class ObservationService {
 				//replyTo = templateMap["currentUser"].email
 				toUsers.addAll(getParticipants(obv))
 				break
+				
+			case activityFeedService.RECOMMENDATION_REMOVED:
+				mailSubject = conf.ui.removeRecommendationVote.emailSubject
+				bodyContent = conf.ui.removeRecommendationVote.emailBody
+				templateMap["actorProfileUrl"] = generateLink("SUser", "show", ["id": feedInstance.author.id], request)
+				templateMap["actorName"] = feedInstance.author.name
+				//templateMap["userGroupWebaddress"] = userGroupWebaddress
+				//templateMap["activity"] = activityFeedService.getContextInfo(feedInstance, [webaddress:userGroupWebaddress])
+				//templateMap['actor'] = feedInstance.author;
+				//templateMap["actorIconUrl"] = feedInstance.author.icon(ImageType.SMALL)
+				toUsers.addAll(getParticipants(obv))
+				break
+			
+			case activityFeedService.OBSERVATION_POSTED_ON_GROUP:
+				mailSubject = conf.ui.observationPostedToGroup.emailSubject
+				bodyContent = conf.ui.observationPostedToGroup.emailBody
+				templateMap["actorProfileUrl"] = generateLink("SUser", "show", ["id": feedInstance.author.id], request)
+				templateMap["actorName"] = feedInstance.author.name
+				templateMap["groupNameWithlink"] = activityFeedService.getUserGroupHyperLink(activityFeedService.getDomainObject(feedInstance.activityHolderType, feedInstance.activityHolderId))
+				//templateMap["userGroupWebaddress"] = userGroupWebaddress
+				//templateMap["activity"] = activityFeedService.getContextInfo(feedInstance, [webaddress:userGroupWebaddress])
+				//templateMap['actor'] = feedInstance.author;
+				//templateMap["actorIconUrl"] = feedInstance.author.icon(ImageType.SMALL)
+				toUsers.addAll(getParticipants(obv))
+				break
+
+			case activityFeedService.OBSERVATION_REMOVED_FROM_GROUP:
+				mailSubject = conf.ui.observationRemovedFromGroup.emailSubject
+				bodyContent = conf.ui.observationRemovedFromGroup.emailBody
+				templateMap["actorProfileUrl"] = generateLink("SUser", "show", ["id": feedInstance.author.id], request)
+				templateMap["actorName"] = feedInstance.author.name
+				templateMap["groupNameWithlink"] = activityFeedService.getUserGroupHyperLink(activityFeedService.getDomainObject(feedInstance.activityHolderType, feedInstance.activityHolderId))
+				//templateMap["userGroupWebaddress"] = userGroupWebaddress
+				//templateMap["activity"] = activityFeedService.getContextInfo(feedInstance, [webaddress:userGroupWebaddress])
+				//templateMap['actor'] = feedInstance.author;
+				//templateMap["actorIconUrl"] = feedInstance.author.icon(ImageType.SMALL)
+				toUsers.addAll(getParticipants(obv))
+				break
+
+
 
 			case activityFeedService.COMMENT_ADDED:				
 				bodyView = "/emailtemplates/addComment"
@@ -1147,6 +1187,7 @@ class ObservationService {
 				mailSubject = "New comment in ${templateMap['domainObjectType']}"
 				toUsers.addAll(getParticipants(obv))
 				break;
+				
 			case SPECIES_REMOVE_COMMENT:
 				mailSubject = conf.ui.removeComment.emailSubject
 				bodyContent = conf.ui.removeComment.emailBody
