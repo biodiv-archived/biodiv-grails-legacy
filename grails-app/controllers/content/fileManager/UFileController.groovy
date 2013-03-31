@@ -167,6 +167,28 @@ class UFileController {
 		render Tag.findAllByNameIlike("${params.term}%")*.name as JSON
 	}
 
+	// for uploading a file.
+	// File is uploaded to a temporary location. No UFile object is created in controller
+	def fileUpload = {
+		log.debug params
+		try {
+
+			File uploaded = createFile(params.qqfile)
+			InputStream inputStream = selectInputStream(request)
+
+			ajaxUploaderService.upload(inputStream, uploaded)
+			
+			log.debug "url for uploaded file >>>>>>>>>>>>>>>>>>>>>>>>"
+			log.debug createLink(url:uploaded.getPath())
+
+			return render(text: [success:true, filePath:uploaded.getPath(), fileURL: createLink(url:uploaded.getPath())] as JSON, contentType:'text/json')
+		} catch (FileUploadException e) {
+
+			log.error("Failed to upload file.", e)
+			return render(text: [success:false] as JSON, contentType:'text/json')
+		}
+	}
+	
 	def upload = {
 		log.debug params
 		try {

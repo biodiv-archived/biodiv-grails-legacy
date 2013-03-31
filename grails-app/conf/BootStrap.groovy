@@ -68,6 +68,9 @@ class BootStrap {
 		def fbRole = Role.findByAuthority('ROLE_FACEBOOK') ?: new Role(authority: 'ROLE_FACEBOOK').save(flush:true, failOnError: true)
 		def drupalAdminRole = Role.findByAuthority('ROLE_DRUPAL_ADMIN') ?: new Role(authority: 'ROLE_DRUPAL_ADMIN').save(flush:true, failOnError: true)
 
+		def cepfAdminRole = Role.findByAuthority('ROLE_CEPF_ADMIN') ?: new Role(authority: 'ROLE_CEPF_ADMIN').save(flush:true, failOnError: true)
+		
+		
 		def user = SUser.findByEmail(email) ?: new SUser(
 				email: email,
 				password: password,

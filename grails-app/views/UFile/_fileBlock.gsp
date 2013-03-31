@@ -38,7 +38,30 @@
 							</g:each>
 						</g:if>
 					</ul>
-				</div> <label class="control-label" for="License"> License </label>
+				</div> 
+				
+				
+						<div
+			class="control-group ${hasErrors(bean: uFileInstance, field: 'contributors', 'error')}">
+			<label class="control-label" for="contributors">Contributors</label>
+			<div class="controls">
+				<g:textField name="${fileId}.contributors"
+					value="${uFileInstance?.contributors }" />
+			</div>
+		</div>
+
+
+
+		<div
+			class="control-group ${hasErrors(bean: uFileInstance, field: 'attribution', 'error')}">
+			<label class="control-label" for="attribution">Attribution</label>
+			<div class="controls">
+				<g:textField name="${fileId}.attribution"
+					value="${uFileInstance?.attribution}" />
+			</div>
+		</div>
+				
+				<label class="control-label" for="License"> License </label>
 
 				<div id="${fileId}.license" class="licence_div dropdown">
 

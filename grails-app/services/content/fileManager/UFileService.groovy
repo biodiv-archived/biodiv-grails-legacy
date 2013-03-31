@@ -20,6 +20,19 @@ class UFileService {
 			if(params."${fileId}.description") {
 				uFileInstance.description = params."${fileId}.description"
 			}
+			
+			if(params."${fileId}.contributors") {
+				uFileInstance.contributors = params."${fileId}.contributors"
+			}
+			
+			if(params."${fileId}.attribution") {
+				uFileInstance.attribution = params."${fileId}.attribution"
+			}
+			
+			if(params."${fileId}.license") {
+				uFileInstance.license = params."${fileId}.license"
+			}
+			
 			if(params."${fileId}.tags") {
 				def tags = (params."${fileId}.tags" != null) ? Arrays.asList(params."${fileId}.tags") : new ArrayList();				
 				uFileInstance.setTags(tags);

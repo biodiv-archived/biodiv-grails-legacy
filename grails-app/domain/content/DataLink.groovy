@@ -6,7 +6,7 @@ class DataLink {
 	String url
 
     static constraints = {
-		description(nullable:false)
-		url(nullable:false)
+		description(nullable:true)
+		url(nullable:true)
     }
 }

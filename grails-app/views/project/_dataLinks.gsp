@@ -1,9 +1,9 @@
 <script type="text/javascript">
-    var childCount = ${projectInstance?.dataLinks?.size()} + 0;
+    var dataLinksCount = ${projectInstance?.dataLinks?.size()} + 0;
 
     function adddataLink(){
       var clone = $("#dataLink_clone").clone()
-      var htmlId = 'dataLinksList['+childCount+'].';
+      var htmlId = 'dataLinksList['+dataLinksCount+'].';
       var dataLinkInput = clone.find("input[id$=number]");
 
       clone.find("input[id$=id]")
@@ -16,18 +16,18 @@
               .attr('id',htmlId + 'new')
               .attr('name',htmlId + 'new')
               .attr('value', 'true');
-      clone.find("input[id$=description]")
+      clone.find("textarea[name$=description]")
       .attr('id',htmlId + 'description')
       .attr('name',htmlId + 'description')
       clone.find("input[id$=url]")
       .attr('id',htmlId + 'url')
       .attr('name',htmlId + 'url')
 
-      clone.attr('id', 'dataLink'+childCount);
+      clone.attr('id', 'dataLink'+dataLinksCount);
       $("#dataLinksList").append(clone);
       clone.show();
       dataLinkInput.focus();
-      childCount++;
+      dataLinksCount++;
 
     }
 

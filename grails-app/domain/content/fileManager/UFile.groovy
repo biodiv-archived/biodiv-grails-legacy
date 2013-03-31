@@ -21,7 +21,7 @@ class UFile implements Taggable{
 	SUser creator
 	License license
 
-	String contributor;
+	String contributors;
 	String attribution;
 
 	//source holder(i.e project, group)
@@ -47,7 +47,7 @@ class UFile implements Taggable{
 		sourceHolderType(nullable:true)
 		creator(nullable:true)
 		license(nullable:true)
-		contributor(nullable:true)
+		contributors(nullable:true)
 		attribution(nullable:true)
 
 	}

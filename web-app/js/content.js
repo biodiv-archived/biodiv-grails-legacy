@@ -1,19 +1,26 @@
 //bind click event on delete buttons using jquery live
 $('.del-ufile').live('click', function() {
-	//find the parent div
+	// find the parent div
 	var prnt = $(this).parents(".ufile-block");
-	//find the deleted hidden input
+	// find the deleted hidden input
 	var delInput = prnt.find("input[id$=deleted]");
-	//check if this is still not persisted
+	// check if this is still not persisted
 	var newValue = prnt.find("input[id$=new]").attr('value');
-	//if it is new then i can safely remove from dom
+	// if it is new then i can safely remove from dom
 	if (newValue === 'true') {
 		prnt.remove();
 	} else {
-		//set the deletedFlag to true
+		// set the deletedFlag to true
 		delInput.attr('value', 'true');
-		//hide the div
+		// hide the div
 		prnt.hide();
 
 	}
+});
+
+$(document).ready(function() {
+	var ft = $(".file-tags");
+	ft.tagit({
+		fieldName : ft.name
+	});
 });

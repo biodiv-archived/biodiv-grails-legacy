@@ -8,7 +8,6 @@ import java.util.List;
 import org.springframework.transaction.annotation.Transactional;
 
 import content.fileManager.UFile;
-import content.fileManager.UFileService
 
 //import de.ailis.pherialize
 //import org.lorecraft.phparser.SerializedPhpParser;
@@ -17,6 +16,8 @@ class ProjectService {
 
 	static transactional = true
 	def uFileService;
+	def observationService
+	def grailsApplication
 
 	String connectionUrl =  "jdbc:postgresql://localhost/ibp";
 	String userName = "postgres";
@@ -35,7 +36,7 @@ class ProjectService {
 		log.debug projectParams
 
 		def projectInstance = new Project(projectParams)
-
+				
 
 		return projectInstance;
 	}
@@ -70,7 +71,7 @@ class ProjectService {
 		sql.eachRow("select nid, vid, title from node where type = 'project' order by nid asc") { row ->
 			log.debug " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>     title ===  $i  $row.title  nid == $row.nid , vid == $row.vid"
 			try{
-				Project project = createProject(row, sql)
+				Project project = createProjectFromRow(row, sql)
 
 			}catch (Exception e) {
 				println "=============================== EXCEPTION in create project ======================="
@@ -110,7 +111,7 @@ class ProjectService {
 
 
 	@Transactional
-	def Project createProject(nodeRow, Sql sql){
+	def Project createProjectFromRow(nodeRow, Sql sql){
 
 		String query = "select * from content_type_project where nid = $nodeRow.nid and vid = $nodeRow.vid"
 		def row = sql.firstRow(query)

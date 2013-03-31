@@ -86,6 +86,8 @@
 				<a class="speciesFieldHeader" data-toggle="collapse"
 					href="#grantee-details"><h5>Grantee Details</h5></a>
 				<div id="grantee-details" class="speciesField collapse in">
+				
+				<fileManager:displayFile filePath="${ projectInstance?.granteeLogo}"  fileName="${projectInstance?.granteeOrganization}"></fileManager:displayFile>
 
 					<dl class="dl-horizontal">
 						<dt>Organization</dt>

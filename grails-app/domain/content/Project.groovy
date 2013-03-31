@@ -21,9 +21,9 @@ class Project implements Taggable{
 	String summary;
 	
 	List locations = new ArrayList();
+	List dataLinks = new ArrayList();
 	
-	//Grantee grantee;
-	//  File granteeLogo; // TODO
+	String granteeLogo; // Path to grantee Logo image
 	String granteeOrganization;
 	String granteeContact;
 	String granteeEmail; 
@@ -76,6 +76,7 @@ class Project implements Taggable{
 		granteeOrganization(nullable: true);
 		granteeContact(nullable:true);
 		granteeEmail(nullable:true);
+		granteeLogo(nullable:true)
 		
 		grantFrom(nullable: true);
 		grantTo(nullable: true);

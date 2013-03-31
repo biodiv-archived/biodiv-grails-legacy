@@ -253,7 +253,7 @@ speciesPortal {
 	}
 
 	content{
-		fileUploadDir = "/tmp/files"
+		fileUploadDir = "${app.rootDir}/content"
 	}	
 		
 	names.parser.serverURL = "127.0.0.1"

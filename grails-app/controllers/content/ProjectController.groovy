@@ -6,11 +6,13 @@ import content.Location
 import grails.plugins.springsecurity.Secured
 
 
+
 class ProjectController {
 
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
 	def projectService
+	def observationService
 	def uFileService = new UFileService()
 
 	def index = {
@@ -34,7 +36,7 @@ class ProjectController {
 		log.debug ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
 		log.debug params
 		def projectInstance = projectService.createProject(params)
-
+		
 
 
 		def tags = (params.tags != null) ? Arrays.asList(params.tags) : new ArrayList();

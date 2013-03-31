@@ -67,19 +67,19 @@ ul.tagit {
 							<div class="controls">
 								<g:select name="direction.id"
 									from="${content.StrategicDirection.list()}" optionKey="id"
-									value="${projectInstance?.direction?.id}"
-									noSelection="['null': '']" />
+									value="${projectInstance?.direction?.id}" />
 							</div>
 						</div>
 
 						<div
 							class="control-group ${hasErrors(bean: projectInstance, field: 'title', 'error')}">
 							<label class="control-label" for="title"><g:message
-									code="project.title.label" default="Project Title" /><span class="req">*</span></label>
+									code="project.title.label" default="Project Title" /><span
+								class="req">*</span></label>
 							<div class="controls">
 
-								<g:textField class="input-xxlarge" name="title" 
-									value="${projectInstance?.title}" />
+								<input type="text" class="input-xxlarge" name="title"
+									value="${projectInstance?.title}" required />
 							</div>
 
 						</div>
@@ -108,11 +108,12 @@ ul.tagit {
 						<div
 							class="control-group ${hasErrors(bean: projectInstance, field: 'tags', 'error')}">
 
-							<label class="control-label" for="tags"><i class="icon-tags"></i><g:message
-									code="project.tags.label" default="Project Tags" /></label>
+							<label class="control-label" for="tags"><i
+								class="icon-tags"></i> <g:message code="project.tags.label"
+									default="Project Tags" /></label>
 
 							<div class="controls">
-							
+
 
 								<ul id="tags" name="tags">
 									<g:each in="${projectInstance.tags}" var="tag">
@@ -177,11 +178,12 @@ ul.tagit {
 										code="project.granteeEmail.label" default="Email" /></label>
 
 								<div class="controls">
-    <div class="input-prepend"><span class="add-on"><i class="icon-envelope"></i></span>
+									<div class="input-prepend">
+										<span class="add-on"><i class="icon-envelope"></i></span>
 
-									<g:textField name="granteeEmail"
-										value="${projectInstance?.granteeEmail}" />
-										</div>
+										<g:textField name="granteeEmail"
+											value="${projectInstance?.granteeEmail}" />
+									</div>
 								</div>
 							</div>
 
@@ -189,8 +191,14 @@ ul.tagit {
 								class="control-group ${hasErrors(bean: projectInstance, field: 'granteeLogo', 'error')}">
 
 								<label class="control-label" for="granteeLogo"><g:message
-										code="project.granteeLogo.label" default="GranteeLogo" /></label> <input
-									type="file" name="granteeLogo" />
+										code="project.granteeLogo.label" default="GranteeLogo" /></label>
+
+								<div class="controls">
+
+									<g:render template='/UFile/imgUpload'
+										model="['name': 'granteeLogo', 'path': projectInstance?.granteeLogo]" />
+
+								</div>
 							</div>
 						</div>
 						<div>
@@ -200,13 +208,13 @@ ul.tagit {
 								<label class="control-label" for="grantFrom"><g:message
 										code="project.grantFrom.label" default="Grant From" /></label>
 								<div class="controls">
-    <div class="input-prepend"><span class="add-on"><i class="icon-calendar"></i></span>
-
-									<input name="grantFrom" type="text" id="grantFrom"
-										class="date-popup"
-										value="${projectInstance?.grantFrom?.format('dd/MM/yyyy')}"
-										placeholder="Select date" />
-										</div>
+									<div class="input-prepend">
+										<span class="add-on"><i class="icon-calendar"></i></span> <input
+											name="grantFrom" type="text" id="grantFrom"
+											class="date-popup"
+											value="${projectInstance?.grantFrom?.format('dd/MM/yyyy')}"
+											placeholder="Select date" />
+									</div>
 								</div>
 							</div>
 
@@ -215,13 +223,12 @@ ul.tagit {
 								<label class="control-label" for="grantTo"><g:message
 										code="project.grantTo.label" default="Grant To" /></label>
 								<div class="controls">
-    <div class="input-prepend"><span class="add-on"><i class="icon-calendar"></i></span>
-
-									<input name="grantTo" type="text" id="grantTo"
-										class="date-popup"
-										value="${projectInstance?.grantTo?.format('dd/MM/yyyy')}"
-										placeholder="Select date" />
-										</div>
+									<div class="input-prepend">
+										<span class="add-on"><i class="icon-calendar"></i></span> <input
+											name="grantTo" type="text" id="grantTo" class="date-popup"
+											value="${projectInstance?.grantTo?.format('dd/MM/yyyy')}"
+											placeholder="Select date" />
+									</div>
 								</div>
 							</div>
 
@@ -232,14 +239,14 @@ ul.tagit {
 								<label class="control-label" for="grantedAmount"><g:message
 										code="project.grantedAmount.label" default="Granted Amount" /></label>
 								<div class="controls">
-								<div class="input-prepend input-append">
-								  <span class="add-on">$</span>
-								
-									<g:textField name="grantedAmount"
-										value="${fieldValue(bean: projectInstance, field: 'grantedAmount')}" />
-										  <span class="add-on">.00</span>
-										
-										</div>
+									<div class="input-prepend input-append">
+										<span class="add-on">$</span>
+
+										<g:textField name="grantedAmount"
+											value="${fieldValue(bean: projectInstance, field: 'grantedAmount')}" />
+										<span class="add-on">.00</span>
+
+									</div>
 								</div>
 
 							</div>
@@ -283,7 +290,8 @@ ul.tagit {
 
 							<div class="controls">
 
-								<fileManager:uploader model="['name':'proposalFiles']" />
+								<fileManager:uploader
+									model="['name':'proposalFiles', 'uFiles':projectInstance?.proposalFiles]" />
 							</div>
 						</div>
 					</div>
@@ -327,9 +335,9 @@ ul.tagit {
 						</div>
 					</div>
 				</div>
-				
-				
-								<div class="super-section">
+
+
+				<div class="super-section">
 					<a data-toggle="collapse" href="#data-links">
 						<h5>Data Contribution</h5>
 					</a>
@@ -398,8 +406,8 @@ ul.tagit {
 
 	</div>
 	<g:render template='location' model="['i':'_clone','hidden':true]" />
-		<g:render template='dataLink' model="['i':'_clone','hidden':true]" />
-	
+	<g:render template='dataLink' model="['i':'_clone','hidden':true]" />
+
 
 
 	<r:script>
