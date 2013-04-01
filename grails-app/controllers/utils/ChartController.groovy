@@ -32,6 +32,6 @@ class ChartController {
 	
 	def smallStat = {
 		log.debug params
-		render(template:"/chart/homePageStatTemplate", model:[activityData:chartService.getPortalActivityStatsByDay(params)])
+		render template:"/chart/homePageStatTemplate", model:[activityData:chartService.getPortalActivityStatsByDay(params)]
 	} 
 }

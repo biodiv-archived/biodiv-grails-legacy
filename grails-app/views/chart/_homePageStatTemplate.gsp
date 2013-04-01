@@ -1,8 +1,9 @@
 <%@page import="species.utils.Utils"%>
 <%@ page import="org.grails.plugins.google.visualization.data.Cell; org.grails.plugins.google.visualization.util.DateUtil" %>
 <div style="clear:both;">
-	<gvisualization:annotatedTimeLine elementId="annotatedtimeline_activity" columns="${activityData.columns}" data="${activityData.data}" select="selectHandler"/>
 	<div id="annotatedtimeline_activity" style='width: 900px; height: 180px;'></div>
+	<gvisualization:annotatedTimeLine dynamicLoading="${true}" elementId="annotatedtimeline_activity" columns="${activityData.columns}" data="${activityData.data}"/>
+	
 </div>
 <a href="${uGroup.createLink(controller:'chart')}"> more...</a>
 <%--<div style="clear:both;">--%>
