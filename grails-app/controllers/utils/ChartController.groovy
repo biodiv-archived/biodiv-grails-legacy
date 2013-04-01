@@ -21,7 +21,7 @@ class ChartController {
 	//@Secured(['ROLE_ADMIN'])
 	def show = {
 		log.debug params
-		[obvData:chartService.getObservationStats(params, null), speciesData: chartService.getSpeciesPageStats(params), userData:chartService.activeUserStats(params),  activityData:chartService.getPortalActivityStatsByDay(params)]
+		[obvData:chartService.getObservationStats(params, null, request), speciesData: chartService.getSpeciesPageStats(params, request), userData:chartService.activeUserStats(params, request),  activityData:chartService.getPortalActivityStatsByDay(params)]
 	}
 	
 	def homePageStat = {

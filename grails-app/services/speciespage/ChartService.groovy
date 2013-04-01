@@ -1,5 +1,6 @@
 package speciespage
 
+import java.text.SimpleDateFormat
 import org.codehaus.groovy.runtime.DateGroovyMethods;
 import org.hibernate.Hibernate;
 import org.hibernate.criterion.DetachedCriteria
@@ -19,8 +20,9 @@ class ChartService {
 
 	def userGroupService
 	def activityFeedService
-
-	def getObservationStats(params, SUser author){
+	def observationService
+	
+	def getObservationStats(params, SUser author, request){
 		UserGroup userGroupInstance
 		if(params.webaddress) {
 			userGroupInstance = userGroupService.get(params.webaddress);
@@ -33,6 +35,7 @@ class ChartService {
 		def unidentifiedResult = getFilteredObservationStats(userGroupInstance, author, false)
 
 		mergeResult(allResult, unidentifiedResult)
+		addHtmlResultForObv(allResult, request)
 		return allResult
 	}
 
@@ -109,6 +112,43 @@ class ChartService {
 		]
 	}
 
+	private addHtmlResultForObv(Map res, request){
+		List htmlData = []
+		res.data.each{ r ->
+			htmlData.add([r[0], getHyperLink(r[0], r[1], false, request, true), getHyperLink(r[0], r[2], true, request, true)])
+		}
+		
+		res.htmlData = htmlData
+		res.htmlColumns = [
+			['string', 'Species Group'],
+			['string', 'All'],
+			['string', 'UnIdentified']
+		]
+	}
+	
+	private getHyperLink(String speciesGroup, count, boolean isUnIdentified, request, boolean isObv){
+		def fitlerParams = [:]
+		if(isUnIdentified){
+			if(isObv){
+				fitlerParams.speciesName="Unknown"
+			}
+		}
+		fitlerParams.sGroup = SpeciesGroup.findByName(speciesGroup).id
+		def link = observationService.generateLink((isObv)?"observation":"species", "list", fitlerParams, request)
+		return "" + '<a href="' +  link +'">' + count + "</a>"
+	}
+	
+	
+	private getHyperLinkForUser(userId, Date startDate, count, request){
+		def fitlerParams = [:]
+		if(startDate){
+			fitlerParams.daterangepicker_start= new SimpleDateFormat("dd/MM/yyyy").format(startDate)
+		}
+		fitlerParams.user = userId
+		def link = observationService.generateLink("observation", "list", fitlerParams, request)
+		return "" + '<a href="' +  link +'">' + count + "</a>"
+	}
+	
 	private serachInList(unidentifiedResult, String key){
 		for(ur in unidentifiedResult.data){
 			if((""+ur[0]).equalsIgnoreCase("" + key)){
@@ -119,7 +159,7 @@ class ChartService {
 	}
 
 
-	def getSpeciesPageStats(params){
+	def getSpeciesPageStats(params, request){
 		def stubCountQuery = "select t.group.id, count(*) as count from Species s, TaxonomyDefinition t where s.taxonConcept = t group by t.group.id";
 		def contentCountQuery = "select t.group.id, count(*) as count from Species s, TaxonomyDefinition t where s.taxonConcept = t and s.percentOfInfo > 0.0 group by t.group.id";
 
@@ -136,14 +176,30 @@ class ChartService {
 			])
 		}
 
-		return [data : finalResult, columns : [
+		def res = [data : finalResult, columns : [
 				['string', 'Species Group'],
 				['number', 'Content'],
 				['number', 'Stubs']
 			]]
+		addHtmlResultForSpecies(res, , request)
+		return res
 	}
 
-	def activeUserStats(params){
+	private addHtmlResultForSpecies(Map res, request){
+		List htmlData = []
+		res.data.each{ r ->
+			htmlData.add([r[0], getHyperLink(r[0], r[1], false, request, false), getHyperLink(r[0], r[2], false, request, false)])
+		}
+		
+		res.htmlData = htmlData
+		res.htmlColumns = [
+			['string', 'Species Group'],
+			['string', 'Content'],
+			['string', 'Stubs']
+		]
+	}
+	
+	def activeUserStats(params, request){
 		int days = params.days ? params.days.toInteger() : 7
 		int max = params.max ? params.max.toInteger() : 10
 
@@ -152,6 +208,9 @@ class ChartService {
 			userGroupInstance = userGroupService.get(params.webaddress);
 		}
 
+		def startDate = new Date().minus(days)
+		DateGroovyMethods.clearTime(startDate)
+		
 		def result = Observation.withCriteria(){
 			projections {
 				groupProperty('author')
@@ -160,7 +219,7 @@ class ChartService {
 			and{
 				// taking undeleted observation
 				eq('isDeleted', false)
-				ge('createdOn', new Date().minus(days))
+				ge('createdOn', startDate)
 
 				//filter by usergroup
 				if(userGroupInstance){
@@ -176,13 +235,18 @@ class ChartService {
 		
 		def finalResult = []
 		result.each { r ->
-			finalResult.add([activityFeedService.getUserHyperLink(r[0], userGroupInstance), r[1]])
+			finalResult.add([activityFeedService.getUserHyperLink(r[0], userGroupInstance), getHyperLinkForUser(r[0].id, startDate, r[1], request)])
 		}
 		
 		return [data : result, htmlData:finalResult, columns : [
-				['string', 'User'],
-				['number', 'Observations']
-			]]
+					['string', 'User'],
+					['number', 'Observations']
+				],
+				htmlColumns : [
+					['string', 'User'],
+					['string', 'Observations']
+				]
+			]
 	}
 
 	def getPortalActivityStatsByDay(params){
