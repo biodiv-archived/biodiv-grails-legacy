@@ -1041,7 +1041,7 @@ Please note that you will need to be logged in to see the download link.
 -The portal team
 '''
 
-grails.plugins.springsecurity.ui.removeRecommendationVote.emailSubject = 'Recommendation removed'
+grails.plugins.springsecurity.ui.removeRecommendationVote.emailSubject = 'Species name deleted'
 grails.plugins.springsecurity.ui.removeRecommendationVote.emailBody = '''\
 Hi $username,<br/>
 <br/>

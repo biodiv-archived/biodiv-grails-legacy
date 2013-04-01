@@ -12,4 +12,8 @@ class ChartTagLib {
 	def showActivityStats = {attrs, body->
 		out << render(template:"/chart/activityStatTemplate", model:attrs.model);
 	}
+	
+	def showHomePageStats = {attrs, body->
+		out << render(template:"/chart/homePageStatTemplate", model:attrs.model);
+	}
 }

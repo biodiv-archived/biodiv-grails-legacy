@@ -76,6 +76,13 @@
 						href="${uGroup.createLink(mapping:"userGroup", 'action':"about", 'userGroup':userGroupInstance)}"
 						title="About Us">About Us</a>
 					</li>
+					
+					<li
+						class="${((params.controller == 'userGroup' && params.action == 'chart') ||(params.controller == 'chart'))?' active':''}"><a
+						href="${uGroup.createLink('mapping':'userGroup', 'action':'chart', 'userGroup':userGroupInstance)}"
+						title="Stats">Stats</a>
+					</li>
+
 <%--					<li class="dropdown"><a href="#" class="dropdown-toggle"--%>
 <%--						data-toggle="dropdown"> More <b class="caret"></b> </a>--%>
 <%--						<ul class="dropdown-menu" style="text-align: left;">--%>
@@ -146,7 +153,11 @@
 							<li
 								class="${(request.getHeader('referer')?.contains('/biodiversity_news') && params.action == 'header')?' active':''}"><a
 								href="/biodiversity_news" title="News">News</a></li>
-
+							
+							<li
+								class="${(params.controller == 'chart')?' active':''}"><a
+								href="${uGroup.createLink(controller:'chart')}"
+								title="Stats">Stats</a> </li>
 						</ul>
 					</li>
 				</ul>

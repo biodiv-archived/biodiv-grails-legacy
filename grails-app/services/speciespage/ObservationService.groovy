@@ -1137,7 +1137,7 @@ class ObservationService {
 			case activityFeedService.RECOMMENDATION_REMOVED:
 				mailSubject = conf.ui.removeRecommendationVote.emailSubject
 				bodyContent = conf.ui.removeRecommendationVote.emailBody
-				templateMap["actorProfileUrl"] = generateLink("SUser", "show", ["id": feedInstance.author.id], request)
+				templateMap["actorProfileUrl"] = activityFeedService.getUserHyperLink(feedInstance.author, null)
 				templateMap["actorName"] = feedInstance.author.name
 				//templateMap["userGroupWebaddress"] = userGroupWebaddress
 				//templateMap["activity"] = activityFeedService.getContextInfo(feedInstance, [webaddress:userGroupWebaddress])
@@ -1149,7 +1149,7 @@ class ObservationService {
 			case activityFeedService.OBSERVATION_POSTED_ON_GROUP:
 				mailSubject = conf.ui.observationPostedToGroup.emailSubject
 				bodyContent = conf.ui.observationPostedToGroup.emailBody
-				templateMap["actorProfileUrl"] = generateLink("SUser", "show", ["id": feedInstance.author.id], request)
+				templateMap["actorProfileUrl"] = activityFeedService.getUserHyperLink(feedInstance.author, null)
 				templateMap["actorName"] = feedInstance.author.name
 				templateMap["groupNameWithlink"] = activityFeedService.getUserGroupHyperLink(activityFeedService.getDomainObject(feedInstance.activityHolderType, feedInstance.activityHolderId))
 				//templateMap["userGroupWebaddress"] = userGroupWebaddress
