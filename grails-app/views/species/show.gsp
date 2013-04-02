@@ -451,26 +451,18 @@ $(document).ready(function(){
 								src="${createLinkTo(file: imagePath, base:grailsApplication.config.speciesPortal.resources.serverURL)}"
 								title="${r?.description}" />
 						</g:each>
-						<g:each in="${speciesInstance.taxonConcept.externalLinks}" var="r">
-							<g:each in="${['eolId', 'iucnId', 'gbifId']}" var="extLinkKey">
-								<g:if test="${r[extLinkKey]}">
-									<s:showExternalLink
-										model="['key':extLinkKey, 'externalLinks':r, 'taxonConcept':speciesInstance.taxonConcept]" />
-								</g:if>
-							</g:each>
-						</g:each>
-						<s:showExternalLink
-							model="['key':'wikipedia', 'taxonConcept':speciesInstance.taxonConcept]" />
-
-
-						<img class="group_icon species_group_icon"
-							title="${speciesInstance.fetchSpeciesGroup()?.name}"
-							src='${createLinkTo(dir: 'images', file: speciesInstance.fetchSpeciesGroupIcon(ImageType.VERY_SMALL)?.fileName?.trim(), absolute:true)}' />
-
-						<g:if test="${speciesInstance.taxonConcept.threatenedStatus}">
-							<s:showThreatenedStatus
-								model="['threatenedStatus':speciesInstance.taxonConcept.threatenedStatus]" />
-						</g:if>
+						
+							
+							<s:showSpeciesExternalLink model="['speciesInstance':speciesInstance]"/>
+							
+							 <img class="group_icon species_group_icon"  
+							  	title="${speciesInstance.fetchSpeciesGroup()?.name}"
+							 	 src='${createLinkTo(dir: 'images', file: speciesInstance.fetchSpeciesGroupIcon(ImageType.VERY_SMALL)?.fileName?.trim(), absolute:true)}'/>
+							  
+							  <g:if test="${speciesInstance.taxonConcept.threatenedStatus}">
+							  		<s:showThreatenedStatus model="['threatenedStatus':speciesInstance.taxonConcept.threatenedStatus]"/>
+							  </g:if>
+							</div>
 					</div>
 				</div>
 

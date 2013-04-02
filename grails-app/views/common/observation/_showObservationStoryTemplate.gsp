@@ -1,4 +1,5 @@
 <%@page import="species.utils.Utils"%>
+<%@page import="species.Species"%>
 <%@page import="species.utils.ImageType"%>
 <style>
 <g:if test="${!showDetails}">
@@ -10,7 +11,15 @@
 </g:if>
 </style>
 <div class="observation_story" style="${showDetails?'':'overflow:visible;'}">
+	<g:if test="${showDetails}">
+		<%
+			def speciesInstance = Species.read(observationInstance.maxVotedReco?.taxonConcept?.findSpeciesId())
+		%>
+		<s:showSpeciesExternalLink model="['speciesInstance':speciesInstance]"/>
+	</g:if>
 	<div class="observation-icons">
+		
+		
 		<span
 			class="group_icon species_groups_sprites active ${observationInstance.group.iconClass()}"
 			title="${observationInstance.group?.name}"></span>

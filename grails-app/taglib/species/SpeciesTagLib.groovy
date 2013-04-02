@@ -111,4 +111,7 @@ class SpeciesTagLib {
 	def showSnippet = {attrs, body->
 		out << render(template:"/species/showSpeciesTemplate", model:attrs.model);
 	}
+	def showSpeciesExternalLink = {attrs, body->
+		out << render(template:"/species/showSpeciesExternalLinkTemplate", model:attrs.model);
+	}
 }

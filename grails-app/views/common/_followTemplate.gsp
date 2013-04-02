@@ -1,4 +1,4 @@
-<div>
+<div style="margin: 5px 0px 5px 10px;">
 	<%
 		boolean isFollowing = sourceObject.fetchIsFollowing()
 		def followButtonTitle = isFollowing  ? 'Unfollow' : 'Follow'

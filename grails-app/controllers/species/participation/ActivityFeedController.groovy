@@ -60,13 +60,13 @@ class ActivityFeedController {
 		
 		if(params.follow.toBoolean()){
 			Follow.addFollower(domainObj, author)
-			msg = "Following..."
+			msg = "Followed..."
 			if(!author.sendNotification){
 				msg += " Please turn on notification mail from your profile page."
 			}
 		}else{
 			Follow.deleteFollower(domainObj, author)
-			msg = "Unfollowing..."
+			msg = "Unfollowed..."
 		}
 		
 		
