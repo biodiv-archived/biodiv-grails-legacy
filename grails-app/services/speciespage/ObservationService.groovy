@@ -585,7 +585,7 @@ class ObservationService {
 			if(offset != -1)
 				queryParts.queryParams["offset"] = offset
 		}
-
+		
 		def observationInstanceList = Observation.executeQuery(query, queryParts.queryParams)
 		
 		return [observationInstanceList:observationInstanceList, queryParams:queryParts.queryParams, activeFilters:queryParts.activeFilters]
@@ -647,6 +647,15 @@ class ObservationService {
 		if(params.isFlagged && params.isFlagged.toBoolean()){
 			filterQuery += " and obv.flagCount > 0 "
 			activeFilters["isFlagged"] = params.isFlagged.toBoolean()
+		}
+		
+		if(params.daterangepicker_start && params.daterangepicker_end){
+			def df = new SimpleDateFormat("dd/MM/yyyy")
+			def startDate = df.parse(params.daterangepicker_start)
+			def endDate = df.parse(params.daterangepicker_end)
+			filterQuery += " and ( created_on between :daterangepicker_start and :daterangepicker_end) "
+			queryParams["daterangepicker_start"] =  activeFilters["daterangepicker_start"] = startDate   
+			queryParams["daterangepicker_end"] =  activeFilters["daterangepicker_end"] = endDate
 		}
 		
 		if(params.bounds){
@@ -860,7 +869,7 @@ class ObservationService {
 		} else if (lastRevisedEndDate) {
 			if(i > 0) aq += " AND";
 			//String lastRevisedEndDate = dateFormatter.format(DateTools.dateToString(DateUtil.parseDate(params.daterangepicker_end, ['dd/MM/yyyy']), DateTools.Resolution.DAY));
-			aq += " lastrevised:[NOW TO "+lastRevisedEndDate+"]";
+			aq += " lastrevised:[ * "+lastRevisedEndDate+"]";
 			queryParams['daterangepicker_end'] = params.daterangepicker_end;
 			activeFilters['daterangepicker_end'] = params.daterangepicker_end;
 		}

@@ -142,7 +142,8 @@ class ChartService {
 	private getHyperLinkForUser(userId, Date startDate, count, request){
 		def fitlerParams = [:]
 		if(startDate){
-			fitlerParams.daterangepicker_start= new SimpleDateFormat("dd/MM/yyyy").format(startDate)
+			fitlerParams.daterangepicker_start = new SimpleDateFormat("dd/MM/yyyy").format(startDate)
+			fitlerParams.daterangepicker_end = new SimpleDateFormat("dd/MM/yyyy").format(new Date())
 		}
 		fitlerParams.user = userId
 		def link = observationService.generateLink("observation", "list", fitlerParams, request)
