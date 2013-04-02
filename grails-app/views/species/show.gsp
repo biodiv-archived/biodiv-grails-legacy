@@ -214,7 +214,7 @@ $(document).ready(function(){
 		imageSearch.setResultSetSize(8);
 		imageSearch.setNoHtmlGeneration();
 		google.search.Search.getBranding(document.getElementById("googleBranding"));
-		$('#gallery2').galleria({
+		$('#gallery4').galleria({
 			height:400,
 			carousel:true,
 			transition:'pulse',
@@ -299,71 +299,68 @@ $(document).ready(function(){
   		console.log(e)
 	}  	
   	
-  	//init editables 
-$('.myeditable').editable({
-    url: '/post' //this url will not be used for creating new user, it is only for update
-});
- 
-//make username required
-$('#video').editable('option', 'validate', function(v) {
-    if(!v) return 'Required field!';
-});
- 
-//automatically show next editable
-$('.myeditable').on('save.newuser', function(){
-    var that = this;
-    setTimeout(function() {
-        $(that).closest('tr').next().find('.myeditable').editable('show');
-    }, 200);
-});
-$('#save-btn').click(function() {
-   $('.myeditable').editable('submit', { 
-       url: '${uGroup.createLink(controller:'species', action:'addResource', id:speciesInstance.id) }', 
-       ajaxOptions: {
-           dataType: 'json'//assuming json response
-           
-       },          
-       success: function(data, config) {
-       console.log(data);
-       console.log(config);
-       
-           if(data && data.id) {  //record created, response like {"id": 2}
-               //set pk
-               $(this).editable('option', 'pk', data.id);
-               //remove unsaved class
-               $(this).removeClass('editable-unsaved');
-               //show messages
-               var msg = 'New user created! Now editables submit individually.';
-               $('#msg').addClass('alert-success').removeClass('alert-error').html(msg).show();
-               $('#save-btn').hide(); 
-               $(this).off('save.newuser');                     
-           } else if(data && data.errors){ 
-               //server-side validation error, response like {"errors": {"username": "username already exist"} }
-               config.error.call(this, data.errors);
-           }               
-       },
-       error: function(errors) {
-           var msg = '';
-           if(errors && errors.responseText) { //ajax error, errors = xhr object
-               msg = errors.responseText;
-           } else { //validation error (client-side or server-side)
-               $.each(errors, function(k, v) { msg += k+": "+v+"<br>"; });
-           } 
-           $('#msg').removeClass('alert-success').addClass('alert-error').html(msg).show();
-       }
-   });
-});
-$('#reset-btn').click(function() {
-    $('.myeditable').editable('setValue', null)  //clear values
-        .editable('option', 'pk', null)          //clear pk
-        .removeClass('editable-unsaved');        //remove bold css
-                   
-    $('#save-btn').show();
-    $('#msg').hide();                
-});
-$("#contributeVideo").click(function(){
-	$(this).next("#contributeVideoForm").toggle();
-});
+<%--  	//init editables --%>
+<%--$('.myeditable').editable({--%>
+<%--    url: '/post' //this url will not be used for creating new user, it is only for update--%>
+<%--});--%>
+<%-- --%>
+<%--//make username required--%>
+<%--$('#video').editable('option', 'validate', function(v) {--%>
+<%--    if(!v) return 'Required field!';--%>
+<%--});--%>
+<%-- --%>
+<%--//automatically show next editable--%>
+<%--$('.myeditable').on('save.newuser', function(){--%>
+<%--    var that = this;--%>
+<%--    setTimeout(function() {--%>
+<%--        $(that).closest('tr').next().find('.myeditable').editable('show');--%>
+<%--    }, 200);--%>
+<%--});--%>
+<%--$('#save-btn').click(function() {--%>
+<%--   $('.myeditable').editable('submit', { --%>
+<%--       url: '${uGroup.createLink(controller:'species', action:'addResource', id:speciesInstance.id) }', --%>
+<%--       ajaxOptions: {--%>
+<%--           dataType: 'json'//assuming json response--%>
+<%--           --%>
+<%--       },          --%>
+<%--       success: function(data, config) {--%>
+<%--           if(data && data.id) {  //record created, response like {"id": 2}--%>
+<%--               //set pk--%>
+<%--               $(this).editable('option', 'pk', data.id);--%>
+<%--               //remove unsaved class--%>
+<%--               $(this).removeClass('editable-unsaved');--%>
+<%--               //show messages--%>
+<%--               var msg = 'New user created! Now editables submit individually.';--%>
+<%--               $('#msg').addClass('alert-success').removeClass('alert-error').html(msg).show();--%>
+<%--               $('#save-btn').hide(); --%>
+<%--               $(this).off('save.newuser');                     --%>
+<%--           } else if(data && data.errors){ --%>
+<%--               //server-side validation error, response like {"errors": {"username": "username already exist"} }--%>
+<%--               config.error.call(this, data.errors);--%>
+<%--           }               --%>
+<%--       },--%>
+<%--       error: function(errors) {--%>
+<%--           var msg = '';--%>
+<%--           if(errors && errors.responseText) { //ajax error, errors = xhr object--%>
+<%--               msg = errors.responseText;--%>
+<%--           } else { //validation error (client-side or server-side)--%>
+<%--               $.each(errors, function(k, v) { msg += k+": "+v+"<br>"; });--%>
+<%--           } --%>
+<%--           $('#msg').removeClass('alert-success').addClass('alert-error').html(msg).show();--%>
+<%--       }--%>
+<%--   });--%>
+<%--});--%>
+<%--$('#reset-btn').click(function() {--%>
+<%--    $('.myeditable').editable('setValue', null)  //clear values--%>
+<%--        .editable('option', 'pk', null)          //clear pk--%>
+<%--        .removeClass('editable-unsaved');        //remove bold css--%>
+<%--                   --%>
+<%--    $('#save-btn').show();--%>
+<%--    $('#msg').hide();                --%>
+<%--});--%>
+<%--$("#contributeVideo").click(function(){--%>
+<%--	$(this).next("#contributeVideoForm").toggle();--%>
+<%--});--%>
 
 });
 
@@ -399,13 +396,13 @@ $("#contributeVideo").click(function(){
 				<div id="resourceTabs">
 					<ul>
 						<li><a href="#resourceTabs-1">Images</a></li>
-						<li><a href="#resourceTabs-2">Video</a></li>
+<%--						<li><a href="#resourceTabs-2">Video</a></li>--%>
 						<li><a id="flickrImages" href="#resourceTabs-3">Flickr Images</a></li>
 <%--						<li><a id="googleImages" href="#resourceTabs-4">Google Images</a></li>--%>
 						
 					</ul>
 					<div id="resourceTabs-1">
-						<a href="#">Contribute Images</a>
+<%--						<a href="#">Contribute Images</a>--%>
 						<div id="gallery1" class="gallery" >
 							<g:if test="${speciesInstance.getImages()}">
 								<s:showSpeciesImages model="['speciesInstance':speciesInstance]"></s:showSpeciesImages>
@@ -419,44 +416,6 @@ $("#contributeVideo").click(function(){
 						</div>
 					</div>
 					
-					<div id="resourceTabs-2">
-<a id="contributeVideo">Contribute Video</a>
-<div id="contributeVideoForm" style="display:none;">
-    <div id="msg" class="alert hide"></div>
-    <table id="user" class="table table-bordered table-striped">
-        <tbody> 
-            <tr>         
-                <td width="40%">Youtube link</td>
-                <td><a href="#" class="myeditable editable editable-click editable-empty" id="video" data-type="text" data-name="video" data-original-title="Enter YouTube link">Enter YouTube link</a></td>
-            </tr>
-            <tr>         
-                <td>Attribution</td>
-                <td><a href="#" class="myeditable editable editable-click editable-empty" data-type="text" data-name="attributor" data-original-title="Enter attribution">Enter Attribution</a></td>
-            </tr>  
-              
-            <tr>         
-                <td>Comments</td>
-                <td><a href="#" class="myeditable editable editable-click editable-empty" data-type="textarea" data-name="description" data-original-title="Enter description">Enter Description</a></td>
-            </tr> 
-        </tbody>
-    </table>
-    <div>
-    <button id="save-btn" class="btn btn-primary">Save link!</button>
-    <button id="reset-btn" class="btn pull-right">Reset</button>
-    </div>
-</div>"${speciesInstance.getVideos()}"
-						<div id="gallery2" class="gallery">							
-							<g:set var="videos" value="${speciesInstance.getVideos()}"/>
-							
-							<g:if test="${videos}">
-								<g:each in="${videos}" var="video">								
-									<a href="${video.url }"><span class="video galleryImage">Watch this at YouTube</span></a>
-									<g:imageAttribution model="['resource':video]" />
-								</g:each>
-							</g:if>				  		
-								<% def fileName = speciesInstance.fetchSpeciesGroupIcon(ImageType.LARGE)?.fileName; %>
-						</div>
-					</div>
 					
 					<div id="resourceTabs-3">						
 						<div id="gallery3"></div>
@@ -465,7 +424,7 @@ $("#contributeVideo").click(function(){
 					</div>
 					<!--div id="resourceTabs-4">
 						
-						<div id="gallery2"></div>
+						<div id="gallery4"></div>
 						<div id="googleBranding"></div><br/>
 						<div class="message ui-corner-all">These images are fetched from other sites and may contain some irrevelant images. Please use them at your own discretion.</div>
 						<div>
