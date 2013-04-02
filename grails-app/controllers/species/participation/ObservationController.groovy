@@ -782,10 +782,12 @@ class ObservationController {
 		log.debug params;
 		def relatedObv = observationService.getRelatedObservations(params).relatedObv;
 		
-		if(relatedObv.observations) {
-			relatedObv.observations = observationService.createUrlList2(relatedObv.observations);
+		if(relatedObv) {
+			if(relatedObv.observations)
+				relatedObv.observations = observationService.createUrlList2(relatedObv.observations);
+		} else {
 		}
-		
+		println relatedObv
 		render relatedObv as JSON
 	}
 

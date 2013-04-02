@@ -312,6 +312,8 @@ class ObservationService {
 			def count = Observation.countByMaxVotedRecoInListAndIsDeleted(scientificNameRecos, false);
 			
 			return ['observations':result, 'count':count]
+		} else {
+			return ['observations':[], 'count':0]
 		}
 	}
 	

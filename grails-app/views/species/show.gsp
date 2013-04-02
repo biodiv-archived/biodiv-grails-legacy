@@ -140,14 +140,14 @@ $(document).ready(function(){
 			thumbQuality : false,
 			maxScaleRatio : 1,
 			minScaleRatio : 1,
-	youtube:{
-    modestbranding: 1,
-    autohide: 1,
-    color: 'white',
-    hd: 1,
-    rel: 0,
-    showinfo: 0
-},
+			youtube:{
+		    	modestbranding: 1,
+		    	autohide: 1,
+		    	color: 'white',
+		    	hd: 1,
+		    	rel: 0,
+		    	showinfo: 0
+			},
 			dataConfig : function(img) {
 				return {
 					// tell Galleria to grab the content from the .desc div as caption
@@ -439,7 +439,20 @@ $(document).ready(function(){
 					</div-->
 					<div id="tagcloud"></div>
 				</div>
+				<!--  static species content -->
+				</div>
+				
+				<div class="grid_6 classifications" style="width:330px;margin-left:0px;">
+					<t:showTaxonBrowser model="['speciesInstance':speciesInstance, 'expandSpecies':true, 'expandAll':false, 'speciesId':speciesInstance.taxonConcept?.id, expandAllIcon:false]"/>
+					<br />
+	
+					<div class="readmore" style="float:left;">
+						${speciesInstance.findSummary() }
+					</div>
+				</div>
+	
 				<br />
+				
 				<!-- species page icons -->
 				<div class="grid_10">
 
@@ -453,34 +466,22 @@ $(document).ready(function(){
 						</g:each>
 						
 							
-							<s:showSpeciesExternalLink model="['speciesInstance':speciesInstance]"/>
+						<s:showSpeciesExternalLink model="['speciesInstance':speciesInstance]"/>
 							
-							 <img class="group_icon species_group_icon"  
+						<img class="group_icon species_group_icon"  
 							  	title="${speciesInstance.fetchSpeciesGroup()?.name}"
 							 	 src='${createLinkTo(dir: 'images', file: speciesInstance.fetchSpeciesGroupIcon(ImageType.VERY_SMALL)?.fileName?.trim(), absolute:true)}'/>
 							  
-							  <g:if test="${speciesInstance.taxonConcept.threatenedStatus}">
-							  		<s:showThreatenedStatus model="['threatenedStatus':speciesInstance.taxonConcept.threatenedStatus]"/>
-							  </g:if>
-							</div>
+						<g:if test="${speciesInstance.taxonConcept.threatenedStatus}">
+						  		<s:showThreatenedStatus model="['threatenedStatus':speciesInstance.taxonConcept.threatenedStatus]"/>
+						</g:if>
 					</div>
+					
 				</div>
 
 				
 
-			</div>
-
-			<!--  static species content -->
-			<div class="grid_6 classifications" style="width:330px;margin-left:0px;">
-				<t:showTaxonBrowser model="['speciesInstance':speciesInstance, 'expandSpecies':true, 'expandAll':false, 'speciesId':speciesInstance.taxonConcept?.id, expandAllIcon:false]"/>
-				<br />
-
-				<div class="readmore" style="float:left;">
-					${speciesInstance.findSummary() }
-				</div>
-			</div>
-
-			<br />
+			
 		</div>
 		<br />
 

@@ -10,6 +10,7 @@
 	${Utils.getDomainName(request)}
 </title>
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="description" content="Welcome to the India Biodiversity Portal (IBP) - A repository of information designed to harness and disseminate collective intelligence on the biodiversity of the Indian subcontinent.">
 <r:layoutResources />
 <ckeditor:resources />
 <g:set var="domain" value="${Utils.getDomain(request)}"/>
