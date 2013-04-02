@@ -2,6 +2,7 @@
 <%@ page import="species.participation.Observation"%>
 <%@ page import="species.groups.SpeciesGroup"%>
 <%@ page import="species.Habitat"%>
+<%@ page import="java.text.SimpleDateFormat"%>
 <g:javascript>
 	function setDefaultGroup(){
 		var defId = "#group_" + "${SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.ALL).id}"
@@ -17,7 +18,6 @@
 </g:javascript>
  
 <div class="info-message" id="info-message">
-	
 		<g:if test="${speciesCountWithContent }"><span class="name" style="color: #b1b1b1;"><i
 			class="icon-search"></i></span> ${speciesCountWithContent} species page<g:if test="${speciesCountWithContent>1}">s</g:if> and ${instanceTotal- speciesCountWithContent} species stubs are found</g:if>
 		<g:else>
@@ -25,6 +25,9 @@
 			class="icon-search"></i></span> <g:if test="${instanceTotal==0}">No results </g:if><g:else>${instanceTotal} ${resultType?:'observation'}<g:if test="${instanceTotal>1 && resultType != 'species'}">s</g:if></g:else> 
 		 found 
 		</g:else>
+		<%
+			boolean dateRangeSet = false	
+		%>
 		<g:each in="${queryParams}" var="queryParam">
 			<g:if
 				test="${queryParam.key == 'groupId' && queryParam.value instanceof Long }">
@@ -80,6 +83,20 @@
 					href="${uGroup.createLink(controller:"SUser", action:"show", id:queryParam.value)}">
 						${SUser.read(queryParam.value).name.encodeAsHTML()} <a
 						id="removeUserFilter" href="#">[X]</a> </a> </span>
+			</g:if>
+			<g:if
+				test="${!dateRangeSet && (queryParam.key == 'daterangepicker_start' || queryParam.key == 'daterangepicker_end')}">
+                                    on date <span class="highlight">
+                    <%
+						dateRangeSet = true
+						def df = new SimpleDateFormat("dd/MM/yyyy")
+						def startDate = (queryParams.daterangepicker_start instanceof String) ?queryParams.daterangepicker_start: df.format(queryParams.daterangepicker_start)
+						def endDate = (queryParams.daterangepicker_end instanceof String) ?queryParams.daterangepicker_end: df.format(queryParams.daterangepicker_end)			
+					%>                
+					<a
+					href="${uGroup.createLink(controller:"observation", action:"list", params:[daterangepicker_start:startDate,daterangepicker_end:endDate])}">
+						${'' + startDate + ' - ' + endDate} <a
+						id="removeDateRange" href="#">[X]</a> </a> </span>
 			</g:if>
 			<g:if test="${queryParam.key == 'observation' && queryParam.value}">
                                     for  <span class="highlight">

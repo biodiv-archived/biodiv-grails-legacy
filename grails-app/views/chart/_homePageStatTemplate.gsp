@@ -1,11 +1,14 @@
 <%@page import="species.utils.Utils"%>
 <%@ page import="org.grails.plugins.google.visualization.data.Cell; org.grails.plugins.google.visualization.util.DateUtil" %>
-<div style="clear:both;">
-	<div id="annotatedtimeline_activity" style='width: 900px; height: 180px;'></div>
-	<gvisualization:annotatedTimeLine dynamicLoading="${true}" elementId="annotatedtimeline_activity" columns="${activityData.columns}" data="${activityData.data}"/>
+
+<div class="entry" style="clear:both;border-style:groove;border-width:6px;color:green;border-radius:10px;">
+	<h6>Activity Profile</h6>
 	
+	<div id="annotatedtimeline_activity" style='width: 947px; height: 180px;'></div>
+	<gvisualization:annotatedTimeLine dynamicLoading="${true}" elementId="annotatedtimeline_activity" columns="${activityData.columns}" data="${activityData.data}"/>
+	<a style="margin-right: 0px; margin-left: 830px;" href="${uGroup.createLink(controller:'chart')}">View more stats...</a>
 </div>
-<a href="${uGroup.createLink(controller:'chart')}"> more...</a>
+
 <%--<div style="clear:both;">--%>
 <%--		<div>			--%>
 <%--			<gvisualization:table elementId="table_user" width="${450}" height="${200}"--%>
