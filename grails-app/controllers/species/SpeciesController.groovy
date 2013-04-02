@@ -170,7 +170,8 @@ class SpeciesController {
 			};
 			Map map = getTreeMap(fields);
 			map = mapSpeciesInstanceFields(speciesInstance, speciesInstance.fields, map);
-			[speciesInstance: speciesInstance, fields:map]
+			def relatedObservations = observationService.getRelatedObservationByTaxonConcept(speciesInstance.taxonConcept.id, 1,0);
+			[speciesInstance: speciesInstance, fields:map, totalObservationInstanceList:[:], observationInstanceList:relatedObservations.observations.observation, instanceTotal:relatedObservations.count, queryParams:[max:1, offset:0], 'userGroupWebaddress':params.webaddress]
 		}
 	}
 

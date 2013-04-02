@@ -17,6 +17,43 @@
 <meta name="layout" content="main" />
 <r:require modules="species_show"/>
 
+<style>
+
+.jcarousel-skin-ie7 .jcarousel-item .snippet.tablet .figure {
+	height:150px;
+}
+
+.jcarousel-skin-ie7 .jcarousel-item  .thumbnail .figure a {
+	max-width:210px;
+	max-height:150px;
+}
+
+.jcarousel-skin-ie7 .jcarousel-item  .thumbnail .img-polaroid {
+	max-width:210px;
+	max-height:140px;
+}
+
+.jcarousel-skin-ie7 .jcarousel-item {
+	width:210px;
+	height:250px;
+}
+
+.jcarousel-skin-ie7 .jcarousel-item .snippet.tablet {
+	width:210px;
+	height:250px;
+}
+
+.jcarousel-skin-ie7 .jcarousel-clip-horizontal {
+	height:250px;
+}
+
+.jcarousel-item .snippet.tablet .caption {
+	height:75px;
+	padding:9px;
+}
+
+</style>
+
 <!--[if lt IE 8]><style>
 .thumbwrap > li {
 	width: 201px;
@@ -91,19 +128,26 @@ $(document).ready(function(){
 	if($("#resourceTabs-1 img").length > 0) {
 	
 		//TODO:load gallery  images by ajax call getting response in json  
-		$('#gallery1').galleria({
+		$('.gallery').galleria({
 			height : 400,
 			preload : 1,
 			carousel : true,
 			transition : 'pulse',
 			image_pan_smoothness : 5,
 			showInfo : true,
-			dataSelector : "img.galleryImage",
+			dataSelector : ".galleryImage",
 			debug : false,
 			thumbQuality : false,
 			maxScaleRatio : 1,
 			minScaleRatio : 1,
-	
+	youtube:{
+    modestbranding: 1,
+    autohide: 1,
+    color: 'white',
+    hd: 1,
+    rel: 0,
+    showinfo: 0
+},
 			dataConfig : function(img) {
 				return {
 					// tell Galleria to grab the content from the .desc div as caption
@@ -170,7 +214,7 @@ $(document).ready(function(){
 		imageSearch.setResultSetSize(8);
 		imageSearch.setNoHtmlGeneration();
 		google.search.Search.getBranding(document.getElementById("googleBranding"));
-		$('#gallery2').galleria({
+		$('#gallery4').galleria({
 			height:400,
 			carousel:true,
 			transition:'pulse',
@@ -255,7 +299,69 @@ $(document).ready(function(){
   		console.log(e)
 	}  	
   	
-  	
+<%--  	//init editables --%>
+<%--$('.myeditable').editable({--%>
+<%--    url: '/post' //this url will not be used for creating new user, it is only for update--%>
+<%--});--%>
+<%-- --%>
+<%--//make username required--%>
+<%--$('#video').editable('option', 'validate', function(v) {--%>
+<%--    if(!v) return 'Required field!';--%>
+<%--});--%>
+<%-- --%>
+<%--//automatically show next editable--%>
+<%--$('.myeditable').on('save.newuser', function(){--%>
+<%--    var that = this;--%>
+<%--    setTimeout(function() {--%>
+<%--        $(that).closest('tr').next().find('.myeditable').editable('show');--%>
+<%--    }, 200);--%>
+<%--});--%>
+<%--$('#save-btn').click(function() {--%>
+<%--   $('.myeditable').editable('submit', { --%>
+<%--       url: '${uGroup.createLink(controller:'species', action:'addResource', id:speciesInstance.id) }', --%>
+<%--       ajaxOptions: {--%>
+<%--           dataType: 'json'//assuming json response--%>
+<%--           --%>
+<%--       },          --%>
+<%--       success: function(data, config) {--%>
+<%--           if(data && data.id) {  //record created, response like {"id": 2}--%>
+<%--               //set pk--%>
+<%--               $(this).editable('option', 'pk', data.id);--%>
+<%--               //remove unsaved class--%>
+<%--               $(this).removeClass('editable-unsaved');--%>
+<%--               //show messages--%>
+<%--               var msg = 'New user created! Now editables submit individually.';--%>
+<%--               $('#msg').addClass('alert-success').removeClass('alert-error').html(msg).show();--%>
+<%--               $('#save-btn').hide(); --%>
+<%--               $(this).off('save.newuser');                     --%>
+<%--           } else if(data && data.errors){ --%>
+<%--               //server-side validation error, response like {"errors": {"username": "username already exist"} }--%>
+<%--               config.error.call(this, data.errors);--%>
+<%--           }               --%>
+<%--       },--%>
+<%--       error: function(errors) {--%>
+<%--           var msg = '';--%>
+<%--           if(errors && errors.responseText) { //ajax error, errors = xhr object--%>
+<%--               msg = errors.responseText;--%>
+<%--           } else { //validation error (client-side or server-side)--%>
+<%--               $.each(errors, function(k, v) { msg += k+": "+v+"<br>"; });--%>
+<%--           } --%>
+<%--           $('#msg').removeClass('alert-success').addClass('alert-error').html(msg).show();--%>
+<%--       }--%>
+<%--   });--%>
+<%--});--%>
+<%--$('#reset-btn').click(function() {--%>
+<%--    $('.myeditable').editable('setValue', null)  //clear values--%>
+<%--        .editable('option', 'pk', null)          //clear pk--%>
+<%--        .removeClass('editable-unsaved');        //remove bold css--%>
+<%--                   --%>
+<%--    $('#save-btn').show();--%>
+<%--    $('#msg').hide();                --%>
+<%--});--%>
+<%--$("#contributeVideo").click(function(){--%>
+<%--	$(this).next("#contributeVideoForm").toggle();--%>
+<%--});--%>
+
 });
 
 </r:script>
@@ -271,6 +377,7 @@ $(document).ready(function(){
 </head>
 
 <body>
+
 <div class="span12">
 	<div class="container_16 outer_wrapper">
 			<s:showSubmenuTemplate model="['entityName':speciesInstance.taxonConcept.italicisedForm , 'subHeading':CommonNames.findByTaxonConceptAndLanguage(speciesInstance.taxonConcept, Language.findByThreeLetterCode('eng'))?.name, 'headingClass':'sci_name']"/>
@@ -283,17 +390,20 @@ $(document).ready(function(){
 					
 				</div>
 			</g:if>
-
 			<!-- media gallery -->
 			<div class="grid_10">
+			
 				<div id="resourceTabs">
 					<ul>
 						<li><a href="#resourceTabs-1">Images</a></li>
+<%--						<li><a href="#resourceTabs-2">Video</a></li>--%>
 						<li><a id="flickrImages" href="#resourceTabs-3">Flickr Images</a></li>
-						<li><a id="googleImages" href="#resourceTabs-4">Google Images</a></li>
+<%--						<li><a id="googleImages" href="#resourceTabs-4">Google Images</a></li>--%>
+						
 					</ul>
 					<div id="resourceTabs-1">
-						<div id="gallery1">
+<%--						<a href="#">Contribute Images</a>--%>
+						<div id="gallery1" class="gallery" >
 							<g:if test="${speciesInstance.getImages()}">
 								<s:showSpeciesImages model="['speciesInstance':speciesInstance]"></s:showSpeciesImages>
 							</g:if>
@@ -301,19 +411,20 @@ $(document).ready(function(){
 								<% def fileName = speciesInstance.fetchSpeciesGroupIcon(ImageType.LARGE)?.fileName; %>
 								<img class="group_icon galleryImage" src="${createLinkTo(dir: 'images', file: fileName, absolute:true)}" 
 							  		title="Contribute!!!"/>
-							</g:else>							
-						</div>
-
-					</div>
-					<div id="resourceTabs-3">
+							</g:else>
 						
+						</div>
+					</div>
+					
+					
+					<div id="resourceTabs-3">						
 						<div id="gallery3"></div>
 						<div id="flickrBranding"></div><br/>
 						<div class="message ui-corner-all">These images are fetched from other sites and may contain some irrevelant images. Please use them at your own discretion.</div>
 					</div>
-					<div id="resourceTabs-4">
+					<!--div id="resourceTabs-4">
 						
-						<div id="gallery2"></div>
+						<div id="gallery4"></div>
 						<div id="googleBranding"></div><br/>
 						<div class="message ui-corner-all">These images are fetched from other sites and may contain some irrevelant images. Please use them at your own discretion.</div>
 						<div>
@@ -325,20 +436,22 @@ $(document).ready(function(){
 							</form>
 							</center>
 						</div>
-					</div>
-
+					</div-->
+					<div id="tagcloud"></div>
 				</div>
 				<br />
 				<!-- species page icons -->
 				<div class="grid_10">
 
-							<div>
-							
-							<g:each in="${speciesInstance.getIcons()}" var="r">
-									<img class="group_icon" href="${href}"
-										src="${createLinkTo(dir: 'images/icons', file: r.fileName.trim(), absolute:true)}"
-										title="${r?.description}" />
-							</g:each>
+					<div>
+
+						<g:each in="${speciesInstance.getIcons()}" var="r">
+							<%def imagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.thumbnail.suffix)%>
+							<img class="icon group_icon" href="${href}"
+								src="${createLinkTo(file: imagePath, base:grailsApplication.config.speciesPortal.resources.serverURL)}"
+								title="${r?.description}" />
+						</g:each>
+						
 							
 							<s:showSpeciesExternalLink model="['speciesInstance':speciesInstance]"/>
 							
@@ -351,7 +464,9 @@ $(document).ready(function(){
 							  </g:if>
 							</div>
 					</div>
-				<div id="tagcloud"></div>
+				</div>
+
+				
 
 			</div>
 
@@ -422,7 +537,7 @@ $(document).ready(function(){
 						<table>
 						<g:each in="${synonyms}" var="synonym">
 						<tr><td class="prop">
-							<span class="grid_3 name">${synonym?.relationship?.value()} </span></td><td> ${synonym?.italicisedForm}  </td></tr>
+							<span class="grid_3 sci_name">${synonym?.relationship?.value()} </span></td><td> ${(synonym?.italicisedForm)?:'<i>'+synonym?.name+'</i>'}  </td></tr>
 						</g:each>
 						</table>
 					</div>
@@ -491,13 +606,14 @@ $(document).ready(function(){
 <%--									onClick="showSpeciesConcept('${conceptCounter}'); showSpeciesField('${conceptCounter}.${fieldCounter}')">--%>
 							</g:else>
 							<g:showSpeciesConcept
-								model="['speciesInstance':speciesInstance, 'concept':concept, 'conceptCounter':conceptCounter, 'sparse':sparse]" />
+								model="['speciesInstance':speciesInstance, 'concept':concept, 'conceptCounter':conceptCounter, 'sparse':sparse, 'observationInstanceList':observationInstanceList, 'instanceTotal':instanceTotal, 'queryParams':queryParams, 'activeFilters':activeFilters, 'userGroupWebaddress':userGroupWebaddress]" />
 							</li>
 							<br/>
 							<%conceptCounter++%>
 						</g:else>
 					</g:each>
 				</ul>
+					
 				<div class="union-comment">
 				<feed:showAllActivityFeeds model="['rootHolder':speciesInstance, feedType:'Specific', refreshType:'manual', 'feedPermission':'editable']" />
 				<%
@@ -505,7 +621,7 @@ $(document).ready(function(){
 				%>
 				<comment:showAllComments model="['commentHolder':speciesInstance, commentType:'super', 'canPostComment':canPostComment, 'showCommentList':false]" />
 			</div>
-			</div>
+			</div>			
 			
 			<g:if test="${!sparse}">
 				<div id="speciesFieldContainer" class="grid_12"></div>
@@ -517,7 +633,13 @@ $(document).ready(function(){
 		
 </div>		
 			
-	
+<g:javascript>
+$(document).ready(function() {
+	window.params = {
+		 carousel:{maxHeight:150, maxWidth:210}
+	}
+});
+</g:javascript>	
 
 </body>
 

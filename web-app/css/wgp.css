@@ -125,16 +125,16 @@ h6 {
 	margin-left: 0px;
 }
 
-li.thumbnail {
+.thumbnail {
 	background-color: #ffffff;
 	border: 0px solid #bee6d3;
 	/* 	margin: 0px; */
 	/* 	margin: 10px 0px 0px 10px; */
 	position:relative; /*needed to place footer*/
-	display:table;
+/* 	display:table; */
 }
 
-li.thumbnail:hover {
+.thumbnail:hover {
 	background-color: #fefad5;
 }
 
@@ -527,7 +527,7 @@ ul#recoSummary {
 }
 
 .observation_location {
-	background-color: #f7f7f7;
+/* 	background-color: #f7f7f7; */
 	padding: 10px;
 	box-shadow: 1px 1px 3px #5e5e5e inset;
 }
@@ -566,10 +566,10 @@ ul#recoSummary {
 }
 
 .tile {
-	background-color: #FFFFFF;
-	color: #333333;
+/* 	background-color: #FFFFFF; */
+/* 	color: #333333; */
 	display: block;
-	margin-bottom: 12px;
+	margin: 10px 0px;
 	overflow: hidden;
 }
 
@@ -1754,6 +1754,7 @@ li#userOrEmail-new {
 .header_group .jcarousel-skin-ie7 img {
 	height : 65%;
 }
+
 .icon-group {
 	background-image: url('../images/glyphicons_043_group.png');
 	background-position:0 0;
@@ -1798,4 +1799,46 @@ li#userOrEmail-new {
   position: absolute;
   left: 10px;
   bottom: 10px;
+}
+
+.jcarousel-skin-ie7 .jcarousel-item  .thumbnail {
+	padding:0px;
+}
+
+.jcarousel-item .snippet.tablet .caption {
+	height:0px;
+	padding:0px;
+}
+
+.jcarousel-skin-ie7 .jcarousel-item  .thumbnail .img-polaroid {
+	padding:0px;
+	border:0px;
+	max-width:75px;
+	max-height:75px;
+/* 	max-width:210px; */
+}
+
+.jcarousel-skin-ie7 .jcarousel-item  .thumbnail .figure a {
+	max-width:75px;
+	max-height:75px;
+}
+
+.jcarousel-skin-ie7 .jcarousel-item {
+	width:75px;
+	height:75px;
+}
+
+.jcarousel-skin-ie7 .jcarousel-item .snippet.tablet {
+	width:75px;
+	height:75px;
+}
+
+.jcarousel-skin-ie7 .jcarousel-item .snippet.tablet .figure {
+	height:75px;
+}
+
+
+
+.jcarousel-skin-ie7 .jcarousel-clip-horizontal {
+	height:75px;
 }

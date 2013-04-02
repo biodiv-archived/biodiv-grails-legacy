@@ -28,7 +28,7 @@
 						<li class="thumbnail" style="${!inGroupMap || inGroupMap[observationInstance.id]?'':'background-color:transparent;'}">
 					</g:else>
 					<obv:showSnippetTablet
-						model="['observationInstance':observationInstance, 'obvTitle':obvTitleList?.get(i), 'pos': observationPos+i, 'userGroup':userGroup]"></obv:showSnippetTablet>
+						model="['observationInstance':observationInstance, 'obvTitle':obvTitleList?.get(i), 'pos': (observationPos?observationPos+i:0), 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress]"></obv:showSnippetTablet>
 					</li>
 
 				</g:each>
@@ -38,7 +38,7 @@
 				<g:each in="${observationInstanceList}" status="i"
 					var="observationInstance">
 					<li class="thumbnail clearfix" style="${!inGroupMap || inGroupMap[observationInstance.id]?'':'background-color:transparent;'}"><obv:showSnippet
-							model="['observationInstance':observationInstance, 'obvTitle':obvTitleList?.get(i), 'pos':observationPos+i, 'userGroup':userGroup]"></obv:showSnippet>
+							model="['observationInstance':observationInstance, 'obvTitle':obvTitleList?.get(i), 'pos':(observationPos?observationPos+i:0), 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress]"></obv:showSnippet>
 					</li>
 				</g:each>
 			</ul>
