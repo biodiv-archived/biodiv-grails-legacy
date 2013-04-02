@@ -147,8 +147,9 @@ input.dms_field {
 						<div>
 							<i class="icon-picture"></i><span>Upload photos of a
 								single observation and species</span>
-					<div id="add_photo_ie" style="display: block; margin-bottom: 2px;"><label for="attachFiles" class="btn btn-info" style="width: 200px;">Add a Photo</label>
-					<div id="add_video_ie" style="display: block; margin-bottom: 2px;"><label for="attachFiles" class="btn btn-info" style="width: 200px;">Add a Video</label>
+					<div>
+					<div id="add_photo_ie" style="display: block; margin-bottom: 2px;"><label for="attachFiles" class="btn btn-info" style="width: 200px;">Add a Photo</label></div>
+					<div id="add_video_ie" style="display: block; margin-bottom: 2px;"><label for="attachFiles" class="btn btn-info" style="width: 200px;">Add a Video</label></div>
 					<span id="iemsg" ></span></div>
 					
 							<div

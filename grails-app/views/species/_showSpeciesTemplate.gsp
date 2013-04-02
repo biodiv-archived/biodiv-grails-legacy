@@ -36,15 +36,15 @@
 			</g:if>
 		</div>
 
-		<h6>
-			<g:link class="ellipsis"
+		<h6 class="span7 ellipsis"  style="display:block;margin-left:0px;float:none;">
+			<g:link 
 				url="${uGroup.createLink(action:'show', controller:'species', id:speciesInstance.id)}">
 				${speciesInstance.taxonConcept.italicisedForm }
 			</g:link>
 		</h6>
 		<%def engCommonName=CommonNames.findByTaxonConceptAndLanguage(speciesInstance.taxonConcept, Language.findByThreeLetterCode('eng'))?.name%>
 		<g:if test="${engCommonName}">
-			<b class="commonName"> ${engCommonName} </b>
+			<div><b class="commonName"> ${engCommonName} </b></div>
 		</g:if>
 		<div class="icons clearfix">
 			<g:each in="${speciesInstance.getIcons()}" var="r">

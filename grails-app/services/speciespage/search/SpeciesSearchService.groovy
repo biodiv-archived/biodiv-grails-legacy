@@ -59,7 +59,7 @@ class SpeciesSearchService {
 	
 	@Transactional(readOnly = true)
 	def listSpecies(id, params) {
-			return Species.findAllByIdGreaterThan(id,params);
+			return Species.findAllByIdGreaterThanAndPercentOfInfoGreaterThan(id,params);
 	}
 
 	private void cleanUpGorm() {
@@ -144,25 +144,27 @@ class SpeciesSearchService {
 					if(attribution.name)
 						doc.addField(searchFieldsConfig.ATTRIBUTION, attribution.name);
 				}
-				field.resources.each { resource ->
 
-					doc.addField(resource.type.value().toLowerCase(), resource.description);
-
-					resource.contributors.each { contributor ->
-						if(contributor.name)
-							doc.addField(searchFieldsConfig.CONTRIBUTOR, contributor.name);
-					}
-					resource.attributors.each { attributor ->
-						if(attributor.name)
-							doc.addField(searchFieldsConfig.ATTRIBUTION, attributor.name);
-					}
-				}
 				field.references.each { reference ->
 					if(reference.title)
 						doc.addField(searchFieldsConfig.REFERENCE, reference.title)
 				}
 				if(field.description && copyDesc) {
 					message += field.description+" ";
+				}
+			}
+
+			s.resources.each { resource ->
+
+				doc.addField(resource.type.value().toLowerCase(), resource.description);
+
+				resource.contributors.each { contributor ->
+					if(contributor.name)
+						doc.addField(searchFieldsConfig.CONTRIBUTOR, contributor.name);
+				}
+				resource.attributors.each { attributor ->
+					if(attributor.name)
+						doc.addField(searchFieldsConfig.ATTRIBUTION, attributor.name);
 				}
 			}
 			

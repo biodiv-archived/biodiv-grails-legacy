@@ -44,7 +44,9 @@ $(document).ready(function() {
 		'nameTermsUrl': "${uGroup.createLink(controller:'search', action: 'nameTerms')}",
 		'noImageUrl' : "${createLinkTo(file:"no-image.jpg", base:grailsApplication.config.speciesPortal.resources.serverURL)}",
 		'IBPDomainUrl':"${Utils.getIBPServerDomain()}",
-		'searchController' : "${controller}"
+		'searchController' : "${controller}",
+		 carousel:{maxHeight:75, maxWidth:75}
+		 
 	}
 	$("#userGroupSelectFilter").val("${(queryParams && queryParams.uGroup)?queryParams.uGroup:(params.webaddress?'THIS_GROUP':'ALL')}");
 });

@@ -10,7 +10,7 @@
 <meta property="og:type" content="article" />
 <meta property="og:title" content="${Utils.getDomainName(request)}" />
 <meta property="og:url"
-	content="${uGroup.createLink(action:params.action, controller:'userGroup', userGroupWebaddress:params.webaddress,absolute:true)}" />
+	content="${uGroup.createLink(action:params.action, controller:params.controller?:'observation', userGroupWebaddress:params.webaddress,absolute:true)}" />
 <meta property="og:site_name" content="Observations (${Utils.getDomainName(request)})" />
 
 <g:set var="domain" value="${Utils.getDomain(request)}" />
@@ -22,6 +22,8 @@
 					fbAppId =  grailsApplication.config.speciesPortal.ibp.facebook.appId;
 				}
 		%>
+<meta property="og:image" content="${Utils.getDomainServerUrl(request)}/sites/default/files/ibp_favicon_2.png" />
+<meta property="og:description" content='Welcome to the India Biodiversity Portal (IBP) - A repository of information designed to harness and disseminate collective intelligence on the biodiversity of the Indian subcontinent.'/>
 
 <meta property="fb:app_id" content="${fbAppId }" />
 <meta property="fb:admins" content="581308415,100000607869577" />

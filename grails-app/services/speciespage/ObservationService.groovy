@@ -309,7 +309,7 @@ class ObservationService {
 			observations.each {
 				result.add(['observation':it, 'title':it.fetchSpeciesCall()]);
 			}
-			def count = Observation.countByMaxVotedRecoInListAndIsDeleted(scientificNameRecos, false) - 1;
+			def count = Observation.countByMaxVotedRecoInListAndIsDeleted(scientificNameRecos, false);
 			
 			return ['observations':result, 'count':count]
 		}
@@ -337,7 +337,16 @@ class ObservationService {
 			} else if(image.type == ResourceType.VIDEO) {
 				item.imageLink = image.thumbnailUrl()
 			}			
-			item.inGroup = param.inGroup;
+			if(param.inGroup) {
+				item.inGroup = param.inGroup;
+			}
+			if(param['observation'].notes) {
+				item.notes = param['observation'].notes
+			} else {
+				String location = "Observed at '" + (param['observation'].placeName.trim()?:param['observation'].reverseGeocodedName) +"'"
+				String desc = "- "+ location +" by "+param['observation'].author.name.capitalize()+" in species group "+param['observation'].group.name + " and habitat "+ param['observation'].habitat.name;
+				item.notes = desc;				
+			}
 			urlList << item;
 		}
 		return urlList

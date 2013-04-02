@@ -35,7 +35,6 @@
 
 </head>
 <body>
-
 	<div class="span12">
 		<obv:showSubmenuTemplate model="['entityName':'Related Observations']" />
 
@@ -50,13 +49,13 @@
 				<div class="observations thumbwrap ">
 					<div class="thumbnail clearfix"
 						style="background-color: #FFFFFF; display: table; width: 894px;">
-						<g:if test="${parentType.equalsIgnoreCase('observation')}">
+						<g:if test="${params.parentType.equalsIgnoreCase('observation')}">
 
 							<obv:showSnippet
 								model="['observationInstance':Observation.get(parentId)]"></obv:showSnippet>
 
 						</g:if>
-						<g:elseif test="${parentType.equalsIgnoreCase('species')}">
+						<g:elseif test="${params.parentType.equalsIgnoreCase('species')}">
 							<s:showSnippet model="['speciesInstance':Species.read(parentId)]" />
 						</g:elseif>
 					</div>
