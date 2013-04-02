@@ -26,12 +26,13 @@ class ChartController {
 	
 	def homePageStat = {
 		log.debug params
+		[obvData:chartService.getObservationStats(params, null, request), speciesData: chartService.getSpeciesPageStats(params, request), userData:chartService.activeUserStats(params, request),  activityData:chartService.getPortalActivityStatsByDay(params), combineData:chartService.combineStats(params, request) ]
 		//render(template:"/chart/homePageStatTemplate", model:[activityData:chartService.getPortalActivityStatsByDay(params)])
 		//[obvData:chartService.getObservationStats(params, null), speciesData: chartService.getSpeciesPageStats(params), userData:chartService.activeUserStats(params),  activityData:chartService.getPortalActivityStatsByDay(params)]
 	}
 	
 	def smallStat = {
 		log.debug params
-		render template:"/chart/homePageStatTemplate", model:[activityData:chartService.getPortalActivityStatsByDay(params)]
+		render template:"/chart/homePageStatTemplate", model:[activityData:chartService.getPortalActivityStatsByDay(params), userData:chartService.activeUserStats(params, request), combineData:chartService.combineStats(params, request) ]
 	} 
 }
