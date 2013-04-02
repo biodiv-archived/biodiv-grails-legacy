@@ -39,7 +39,7 @@ h6 {
 	/* overflow: auto; */
 	padding: 10px;
 	/* background-color: #ffffff;          */
-	background-color: rgba(106, 201, 162, 0.2);
+	background-color: rgba(106, 201, 162, 0.2);	
 	background: transparent\9; /* IE9 */
 	-ms-filter:"progid:DXImageTransform.Microsoft.gradient(startColorstr=#336AC9A2,endColorstr=#336AC9A2)";	/* IE8 */
 	filter: progid :DXImageTransform.Microsoft.gradient (startColorstr = '#336AC9A2', endColorstr = '#336AC9A2' );/* IE6 & 7 */
@@ -221,7 +221,6 @@ h6 {
 }
 
 .outer-wrapper {
-	background-color: #dfcdfc;
 	background-color: rgba(106, 201, 162, 0.15);
 	background: transparent\9;
 	-ms-filter:"progid:DXImageTransform.Microsoft.gradient(startColorstr='#266AC9A2',endColorstr='#266AC9A2')";	/* IE8 */
@@ -527,7 +526,7 @@ ul#recoSummary {
 }
 
 .observation_location {
-/* 	background-color: #f7f7f7; */
+	background-color: #FFFFFF;
 	padding: 10px;
 	box-shadow: 1px 1px 3px #5e5e5e inset;
 }
@@ -544,6 +543,7 @@ ul#recoSummary {
 }
 
 .sidebar_section h5 {
+	background: rgb(106, 201, 162);
 	background: rgba(106, 201, 162, 0.2);
 	padding: 5px;
 	display: block;
@@ -566,7 +566,7 @@ ul#recoSummary {
 }
 
 .tile {
-/* 	background-color: #FFFFFF; */
+	background-color: #FFFFFF;
 /* 	color: #333333; */
 	display: block;
 	margin: 10px 0px;
@@ -1562,6 +1562,7 @@ li#userOrEmail-new {
 
 .signature {
 	max-width: 170px;
+	background-color: rgb(106, 201, 162);
 	background-color: rgba(106, 201, 162, 0.2);
 	/* 	background-clip: padding-box; */
 	border-color: rgba(0, 0, 0, 0.2);
@@ -1776,6 +1777,7 @@ li#userOrEmail-new {
     left:0;
     right:0;
     bottom:0;
+    background-color:rgb(0, 0, 0);
     background-color:rgba(0, 0, 0, 0.85);
     background: url(data:;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAABl0RVh0U29mdHdhcmUAUGFpbnQuTkVUIHYzLjUuNUmK/OAAAAATSURBVBhXY2RgYNgHxGAAYuwDAA78AjwwRoQYAAAAAElFTkSuQmCC) repeat scroll transparent\9;
     z-index:9999;

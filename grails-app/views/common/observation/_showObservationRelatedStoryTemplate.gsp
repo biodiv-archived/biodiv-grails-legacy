@@ -74,5 +74,5 @@ $(document).ready(function() {
 </div>
 
 <div id="relatedObservationMsg_${id}" style="display:none;">
-	<span class="msg">This is the first observation</span>
+	<span class="msg">No observations</span>
 </div>

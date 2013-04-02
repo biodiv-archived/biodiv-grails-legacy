@@ -555,7 +555,7 @@ class XMLConverter extends SourceConverter {
 			def videosNode = resourcesXML.videos;
 			
 			resources.addAll(createResourceByType(imagesNode[0], ResourceType.IMAGE, relResFolder));
-			resources.addAll(createResourceByType(iconsNode[0], ResourceType.ICON, relResFolder));
+			resources.addAll(createResourceByType(iconsNode[0], ResourceType.ICON, "icons"));
 			//resources.addAll(createResourceByType(audiosNode, ResourceType.AUDIO));
 			resources.addAll(createResourceByType(videosNode[0], ResourceType.VIDEO, relResFolder));
 		}
@@ -587,7 +587,7 @@ class XMLConverter extends SourceConverter {
 				case ResourceType.ICON:
 					resourceNode?.image.each {
 						if(!it?.id) {
-							def resource = createImage(it, relResFolder+File.separator+"icons", ResourceType.ICON);
+							def resource = createImage(it, relResFolder, ResourceType.ICON);
 							if(resource) {
 								resources.add(resource);
 							}
