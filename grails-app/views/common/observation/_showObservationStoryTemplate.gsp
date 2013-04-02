@@ -11,24 +11,24 @@
 </g:if>
 </style>
 <div class="observation_story" style="${showDetails?'':'overflow:visible;'}">
-	<g:if test="${showDetails}">
-		<%
-			def speciesInstance = Species.read(observationInstance.maxVotedReco?.taxonConcept?.findSpeciesId())
-		%>
-		<s:showSpeciesExternalLink model="['speciesInstance':speciesInstance]"/>
-	</g:if>
-	<div class="observation-icons">
-		
-		
-		<span
-			class="group_icon species_groups_sprites active ${observationInstance.group.iconClass()}"
-			title="${observationInstance.group?.name}"></span>
-
-		<g:if test="${observationInstance.habitat}">
-			<span
-				class="habitat_icon group_icon habitats_sprites active ${observationInstance.habitat.iconClass()}"
-				title="${observationInstance.habitat.name}"></span>
+	<div>
+		<g:if test="${showDetails}">
+			<%
+				def speciesInstance = Species.read(observationInstance.maxVotedReco?.taxonConcept?.findSpeciesId())
+			%>
+			<s:showSpeciesExternalLink model="['speciesInstance':speciesInstance]"/>
 		</g:if>
+		<div class="observation-icons">		
+			<span
+				class="group_icon species_groups_sprites active ${observationInstance.group.iconClass()}"
+				title="${observationInstance.group?.name}"></span>
+	
+			<g:if test="${observationInstance.habitat}">
+				<span
+					class="habitat_icon group_icon habitats_sprites active ${observationInstance.habitat.iconClass()}"
+					title="${observationInstance.habitat.name}"></span>
+			</g:if>
+		</div>
 	</div>
 	<div class="span7">
 

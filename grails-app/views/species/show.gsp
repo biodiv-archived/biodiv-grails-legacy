@@ -392,82 +392,62 @@ $(document).ready(function(){
 			</g:if>
 			<!-- media gallery -->
 			<div class="grid_10">
-			
-				<div id="resourceTabs">
-					<ul>
-						<li><a href="#resourceTabs-1">Images</a></li>
-<%--						<li><a href="#resourceTabs-2">Video</a></li>--%>
-						<li><a id="flickrImages" href="#resourceTabs-3">Flickr Images</a></li>
-<%--						<li><a id="googleImages" href="#resourceTabs-4">Google Images</a></li>--%>
-						
-					</ul>
-					<div id="resourceTabs-1">
-<%--						<a href="#">Contribute Images</a>--%>
-						<div id="gallery1" class="gallery" >
-							<g:if test="${speciesInstance.getImages()}">
-								<s:showSpeciesImages model="['speciesInstance':speciesInstance]"></s:showSpeciesImages>
-							</g:if>
-							<g:else>
-								<% def fileName = speciesInstance.fetchSpeciesGroupIcon(ImageType.LARGE)?.fileName; %>
-								<img class="group_icon galleryImage" src="${createLinkTo(dir: 'images', file: fileName, absolute:true)}" 
-							  		title="Contribute!!!"/>
-							</g:else>
-						
+				<div style="padding:10px 0px">			
+					<div id="resourceTabs">
+						<ul>
+							<li><a href="#resourceTabs-1">Images</a></li>
+	<%--						<li><a href="#resourceTabs-2">Video</a></li>--%>
+							<li><a id="flickrImages" href="#resourceTabs-3">Flickr Images</a></li>
+	<%--						<li><a id="googleImages" href="#resourceTabs-4">Google Images</a></li>--%>
+							
+						</ul>
+						<div id="resourceTabs-1">
+	<%--						<a href="#">Contribute Images</a>--%>
+							<div id="gallery1" class="gallery" >
+								<g:if test="${speciesInstance.getImages()}">
+									<s:showSpeciesImages model="['speciesInstance':speciesInstance]"></s:showSpeciesImages>
+								</g:if>
+								<g:else>
+									<% def fileName = speciesInstance.fetchSpeciesGroupIcon(ImageType.LARGE)?.fileName; %>
+									<img class="group_icon galleryImage" src="${createLinkTo(dir: 'images', file: fileName, absolute:true)}" 
+								  		title="Contribute!!!"/>
+								</g:else>
+							
+							</div>
 						</div>
-					</div>
-					
-					
-					<div id="resourceTabs-3">						
-						<div id="gallery3"></div>
-						<div id="flickrBranding"></div><br/>
-						<div class="message ui-corner-all">These images are fetched from other sites and may contain some irrevelant images. Please use them at your own discretion.</div>
-					</div>
-					<!--div id="resourceTabs-4">
 						
-						<div id="gallery4"></div>
-						<div id="googleBranding"></div><br/>
-						<div class="message ui-corner-all">These images are fetched from other sites and may contain some irrevelant images. Please use them at your own discretion.</div>
-						<div>
-							<center>
-							<form method="get" action="http://images.google.com/images"
-								target="_blank">
-								<input type="text" name="q" value='"${speciesName}"' />
-								<input type="submit" value="Search Google Images" />
-							</form>
-							</center>
+						
+						<div id="resourceTabs-3">						
+							<div id="gallery3"></div>
+							<div id="flickrBranding"></div><br/>
+							<div class="message ui-corner-all">These images are fetched from other sites and may contain some irrevelant images. Please use them at your own discretion.</div>
 						</div>
-					</div-->
-					<div id="tagcloud"></div>
-				</div>
+						<!--div id="resourceTabs-4">
+							
+							<div id="gallery4"></div>
+							<div id="googleBranding"></div><br/>
+							<div class="message ui-corner-all">These images are fetched from other sites and may contain some irrevelant images. Please use them at your own discretion.</div>
+							<div>
+								<center>
+								<form method="get" action="http://images.google.com/images"
+									target="_blank">
+									<input type="text" name="q" value='"${speciesName}"' />
+									<input type="submit" value="Search Google Images" />
+								</form>
+								</center>
+							</div>
+						</div-->
+						<div id="tagcloud"></div>
+					</div>
 				<!--  static species content -->
 				</div>
 				
-				<div class="grid_6 classifications" style="width:330px;margin-left:0px;">
-					<t:showTaxonBrowser model="['speciesInstance':speciesInstance, 'expandSpecies':true, 'expandAll':false, 'speciesId':speciesInstance.taxonConcept?.id, expandAllIcon:false]"/>
-					<br />
 	
-					<div class="readmore" style="float:left;">
-						${speciesInstance.findSummary() }
-					</div>
-				</div>
-	
-				<br />
 				
 				<!-- species page icons -->
-				<div class="grid_10">
-
-					<div>
-
-						<g:each in="${speciesInstance.getIcons()}" var="r">
-							<%def imagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.thumbnail.suffix)%>
-							<img class="icon group_icon" href="${href}"
-								src="${createLinkTo(file: imagePath, base:grailsApplication.config.speciesPortal.resources.serverURL)}"
-								title="${r?.description}" />
-						</g:each>
-						
-							
-						<s:showSpeciesExternalLink model="['speciesInstance':speciesInstance]"/>
-							
+				<div>
+					<s:showSpeciesExternalLink model="['speciesInstance':speciesInstance]"/>
+					<div class="observation_icons">
 						<img class="group_icon species_group_icon"  
 							  	title="${speciesInstance.fetchSpeciesGroup()?.name}"
 							 	 src='${createLinkTo(dir: 'images', file: speciesInstance.fetchSpeciesGroupIcon(ImageType.VERY_SMALL)?.fileName?.trim(), absolute:true)}'/>
@@ -476,11 +456,26 @@ $(document).ready(function(){
 						  		<s:showThreatenedStatus model="['threatenedStatus':speciesInstance.taxonConcept.threatenedStatus]"/>
 						</g:if>
 					</div>
-					
 				</div>
+				<div>
+					<g:each in="${speciesInstance.getIcons()}" var="r">
+							<%def imagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.thumbnail.suffix)%>
+							<img class="icon group_icon" href="${href}"
+								src="${createLinkTo(file: imagePath, base:grailsApplication.config.speciesPortal.resources.serverURL)}"
+								title="${r?.description}" />
+					</g:each>
+				</div>
+			</div>
 
-				
-
+			<div class="grid_6 classifications" style="width:330px;margin-left:0px;">
+					<t:showTaxonBrowser model="['speciesInstance':speciesInstance, 'expandSpecies':true, 'expandAll':false, 'speciesId':speciesInstance.taxonConcept?.id, expandAllIcon:false]"/>
+					<br />
+	
+					<div class="readmore" style="float:left;">
+						${speciesInstance.findSummary() }
+					</div>
+			</div>
+	
 			
 		</div>
 		<br />
