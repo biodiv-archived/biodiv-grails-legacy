@@ -21,6 +21,31 @@
 				<g:message code="default.new.label" args="[entityName]" />
 			</g:link></span>
 	</div>
+	
+	<% 
+	def prevProjectId = "" 
+	def nextProjectId = ""
+	def lastLinkParams = "/project/list"
+	
+	 %>
+		<div class="nav" style="width:100%;">
+							<g:if test="${test}">
+								<a class="pull-left btn ${prevProjectId?:'disabled'}" href="${uGroup.createLink([action:"show", controller:"project", id:prevProjectId, 'userGroupWebaddress':(userGroup?userGroup.webaddress:userGroupWebaddress)])}">Prev Project</a>
+								<a class="pull-right  btn ${nextProjectId?:'disabled'}"  href="${uGroup.createLink([action:"show", controller:"project",
+									id:nextProjectId,  'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress])}">Next Project</a>
+
+								<a class="btn" href="${uGroup.createLink(lastListParams)}" style="text-align: center;display: block;width: 125px;margin: 0 auto;">List Projects</a>
+							</g:if>
+							<g:else>
+								<a class="pull-left btn ${prevProjectId?:'disabled'}" href="${uGroup.createLink([action:"show", controller:"project",
+									id:prevProjectId,  'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress])}">Prev Project</a>
+								<a class="pull-right  btn ${nextProjectId?:'disabled'}"  href="${uGroup.createLink([action:"show", controller:"observation",
+									id:nextProjectId,  'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress])}">Next Project</a>
+
+								<a class="btn" href="${uGroup.createLink(lastListParams)}" style="text-align: center;display: block;width: 125px;margin: 0 auto;">List Projects</a>
+							</g:else>
+						</div>
+	
 	<div class="body">
 
 		<g:if test="${flash.message}">

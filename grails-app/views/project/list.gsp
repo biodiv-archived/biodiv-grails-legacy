@@ -10,11 +10,20 @@
 <r:require modules="core" />
 
 <style>
+<!--
 .project-list .odd {
 	background-color: ghostwhite;
 }
+-->
 
 .item {
+	
+	border-top: 5px solid #c2c2c2;
+	border-bottom: 2px solid #c2c2c2;
+	background-color: #ffffff;
+}
+
+.project-list-item {
 	margin: 20px;
 }
 </style>
@@ -35,6 +44,10 @@
 				${flash.message}
 			</div>
 		</g:if>
+		
+		<!--
+		<project:search model="['queryParams':[]]"/> 
+		-->
 		<div class="project-list">
 
 			<g:each in="${projectInstanceList}" status="i" var="projectInstance">
