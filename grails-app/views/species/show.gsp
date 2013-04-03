@@ -394,7 +394,7 @@ $(document).ready(function(){
 			</g:if>
 			<!-- media gallery -->
 			<div class="grid_10">
-				<div style="padding:10px 0px">			
+				<div style="padding-bottom:10px">			
 					<div id="resourceTabs">
 						<ul>
 							<li><a href="#resourceTabs-1">Images</a></li>

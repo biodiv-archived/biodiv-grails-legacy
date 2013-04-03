@@ -147,6 +147,7 @@ class XMLConverter extends SourceConverter {
 
 					List<Resource> resources = createMedia(species, s.taxonConcept.canonicalForm);
 					log.debug "Resources ${resources}"
+					s.resources.clear();
 					resources.each { s.addToResources(it); }
 
 					List<Synonyms> synonyms;
