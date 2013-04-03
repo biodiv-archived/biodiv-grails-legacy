@@ -105,19 +105,17 @@ if(r && thumbnail) {
 							<a class="btn btn-info pull-right"
 				href="${uGroup.createLink(
 						controller:'observation', action:'create', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"
-				class="btn btn-info"> <i class="icon-plus"></i>Add an
-				Observation</a>
+				class="btn btn-info" style="margin-top: 10px; margin-left: 5px;"> <i class="icon-plus"></i>Add</a>
 						<div style="float:right;margin:10px 0;">
 							<sUser:ifOwns model="['user':observationInstance.author]">
 								
 								<a class="btn btn-primary pull-right"
 									href="${uGroup.createLink(controller:'observation', action:'edit', id:observationInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
-									<i class="icon-edit"></i>Edit Observation </a>
+									<i class="icon-edit"></i>Edit</a>
 	
 									<a class="btn btn-danger btn-primary pull-right" style="margin-right: 5px;margin-bottom:10px;"
 										href="${uGroup.createLink(controller:'observation', action:'flagDeleted', id:observationInstance.id)}"
-										onclick="return confirm('${message(code: 'default.observatoin.delete.confirm.message', default: 'This observation will be deleted. Are you sure ?')}');"><i class="icon-trash"></i>Delete
-										Observation </a>
+										onclick="return confirm('${message(code: 'default.observatoin.delete.confirm.message', default: 'This observation will be deleted. Are you sure ?')}');"><i class="icon-trash"></i>Delete</a>
 										
 							</sUser:ifOwns>
 						</div>
