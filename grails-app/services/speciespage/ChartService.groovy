@@ -163,19 +163,19 @@ class ChartService {
 
 
 	def getSpeciesPageStats(params, request){
-		def stubCountQuery = "select t.group.id, count(*) as count from Species s, TaxonomyDefinition t where s.taxonConcept = t group by t.group.id";
-		def contentCountQuery = "select t.group.id, count(*) as count from Species s, TaxonomyDefinition t where s.taxonConcept = t and s.percentOfInfo > 0.0 group by t.group.id";
+		def totalCountQuery = "select t.group.id, count(*) as count from Species s, TaxonomyDefinition t where s.taxonConcept = t group by t.group.id order by count(*) desc";
+		def contentCountQuery = "select t.group.id, count(*) as count from Species s, TaxonomyDefinition t where s.taxonConcept = t and s.percentOfInfo > 0.0 group by t.group.id order by count(*) desc";
 
-		def allResult = Species.executeQuery(stubCountQuery)
-		def contentResult = [data:Species.executeQuery(contentCountQuery)]
+		def allResult = [data:Species.executeQuery(totalCountQuery)]
+		def contentResult = Species.executeQuery(contentCountQuery)
 		def finalResult = []
-		allResult.each{ r ->
+		contentResult.each{ r ->
 			def sgName = (r[0] ? SpeciesGroup.read(r[0]).name : "Others" )
-			int contentCount = serachInList(contentResult, "" + r[0])
+			int all = serachInList(allResult, "" + r[0])
 			finalResult.add([
 				sgName,
-				contentCount,
-				r[1] - contentCount
+				r[1],
+				all - r[1]
 			])
 		}
 
@@ -191,15 +191,15 @@ class ChartService {
 	private addHtmlResultForSpecies(Map res, request){
 		List htmlData = []
 		res.data.each{ r ->
-			htmlData.add([getSpeciesGroupImage(r[0]), getHyperLink(r[0], r[0], false, request, false), getHyperLink(r[0], r[1], false, request, false), getHyperLink(r[0], r[2], false, request, false)])
+			htmlData.add([getSpeciesGroupImage(r[0]), getHyperLink(r[0], r[0], false, request, false), r[1], r[2]])
 		}
 		
 		res.htmlData = htmlData
 		res.htmlColumns = [
 			['string', ''],
 			['string', 'Species Group'],
-			['string', 'Content'],
-			['string', 'Stubs']
+			['number', 'Content'],
+			['number', 'Stubs']
 		]
 	}
 	
