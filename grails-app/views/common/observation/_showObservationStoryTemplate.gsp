@@ -10,8 +10,8 @@
 
 </g:if>
 </style>
-<div class="observation_story" style="${showDetails?'':'overflow:visible;'}">
-	<div>		
+<div class="observation_story" style="${showDetails?'':'overflow:visible;width:100%'}">
+	<div>
 		<g:if test="${showDetails}">
 			<%
 				def speciesInstance = Species.read(observationInstance.maxVotedReco?.taxonConcept?.findSpeciesId())

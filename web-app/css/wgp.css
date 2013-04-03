@@ -1041,7 +1041,7 @@ ul,ol {
 	width: 100%;
 	z-index: 2000;
 	/* margin-top:50px; */
-	min-width: 1220px;
+	min-width: 960px;
 	height: auto;
 	margin-top: 0;
 	box-shadow: 0 6px 6px -6px #5E5E5E;
@@ -1848,4 +1848,10 @@ li#userOrEmail-new {
 
 .jcarousel-skin-ie7 .jcarousel-clip-horizontal {
 	height:75px;
+}
+
+
+.feedParentContext {
+	background-color: white;
+	display: table;
 }
