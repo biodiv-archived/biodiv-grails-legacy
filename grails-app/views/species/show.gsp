@@ -50,7 +50,7 @@
 
 .jcarousel-item .snippet.tablet .caption {
 	height:75px;
-	padding:16px 9px;
+	padding:9px;
 	background-color : #fff;
 }
 
@@ -449,7 +449,7 @@ $(document).ready(function(){
 				<!-- species page icons -->
 				<div>
 					<s:showSpeciesExternalLink model="['speciesInstance':speciesInstance]"/>
-					
+					<div class="observation-icons">		
 						<img class="group_icon species_group_icon"  
 							  	title="${speciesInstance.fetchSpeciesGroup()?.name}"
 							 	 src='${createLinkTo(dir: 'images', file: speciesInstance.fetchSpeciesGroupIcon(ImageType.VERY_SMALL)?.fileName?.trim(), absolute:true)}'/>
@@ -457,7 +457,7 @@ $(document).ready(function(){
 						<g:if test="${speciesInstance.taxonConcept.threatenedStatus}">
 						  		<s:showThreatenedStatus model="['threatenedStatus':speciesInstance.taxonConcept.threatenedStatus]"/>
 						</g:if>
-					
+					</div>
 				</div>
 				<div>
 					<g:each in="${speciesInstance.getIcons()}" var="r">
