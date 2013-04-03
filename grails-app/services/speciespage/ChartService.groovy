@@ -116,7 +116,7 @@ class ChartService {
 	private addHtmlResultForObv(Map res, request){
 		List htmlData = []
 		res.data.each{ r ->
-			htmlData.add([getSpeciesGroupImage(r[0]), r[0], getHyperLink(r[0], r[1], false, request, true), getHyperLink(r[0], r[2], true, request, true)])
+			htmlData.add([getSpeciesGroupImage(r[0]), getHyperLink(r[0], r[0], false, request, true), getHyperLink(r[0], r[1], false, request, true), getHyperLink(r[0], r[2], true, request, true)])
 		}
 		
 		res.htmlData = htmlData
@@ -191,7 +191,7 @@ class ChartService {
 	private addHtmlResultForSpecies(Map res, request){
 		List htmlData = []
 		res.data.each{ r ->
-			htmlData.add([getSpeciesGroupImage(r[0]), r[0], getHyperLink(r[0], r[1], false, request, false), getHyperLink(r[0], r[2], false, request, false)])
+			htmlData.add([getSpeciesGroupImage(r[0]), getHyperLink(r[0], r[0], false, request, false), getHyperLink(r[0], r[1], false, request, false), getHyperLink(r[0], r[2], false, request, false)])
 		}
 		
 		res.htmlData = htmlData

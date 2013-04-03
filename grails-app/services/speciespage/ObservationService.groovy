@@ -40,6 +40,7 @@ import org.apache.solr.common.util.DateUtil;
 import org.apache.solr.common.util.NamedList;
 import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap;
+import org.codehaus.groovy.grails.web.util.WebUtils;
 
 class ObservationService {
 
@@ -1085,6 +1086,8 @@ class ObservationService {
 		def targetController =  obv.getClass().getCanonicalName().split('\\.')[-1]
 		targetController = targetController.replaceFirst(targetController[0], targetController[0].toLowerCase());
 		def obvUrl, domain
+		
+		request = (request) ?:(WebUtils.retrieveGrailsWebRequest()?.getCurrentRequest())
 		if(request){
 			 obvUrl = generateLink(targetController, "show", ["id": obv.id], request)
 			 domain = Utils.getDomainName(request)
@@ -1155,21 +1158,18 @@ class ObservationService {
 				break
 				
 			case activityFeedService.RECOMMENDATION_REMOVED:
+				bodyView = "/emailtemplates/addRecommendation"
 				mailSubject = conf.ui.removeRecommendationVote.emailSubject
-				bodyContent = conf.ui.removeRecommendationVote.emailBody
-				templateMap["actorProfileUrl"] = activityFeedService.getUserHyperLink(feedInstance.author, null)
-				templateMap["actorName"] = feedInstance.author.name
-				//templateMap["userGroupWebaddress"] = userGroupWebaddress
-				//templateMap["activity"] = activityFeedService.getContextInfo(feedInstance, [webaddress:userGroupWebaddress])
-				//templateMap['actor'] = feedInstance.author;
-				//templateMap["actorIconUrl"] = feedInstance.author.icon(ImageType.SMALL)
+				templateMap['actor'] = feedInstance.author;
+				templateMap["userGroupWebaddress"] = userGroupWebaddress
+				templateMap["activity"] = activityFeedService.getContextInfo(feedInstance, [webaddress:userGroupWebaddress])
 				toUsers.addAll(getParticipants(obv))
 				break
 			
 			case activityFeedService.OBSERVATION_POSTED_ON_GROUP:
 				mailSubject = conf.ui.observationPostedToGroup.emailSubject
 				bodyContent = conf.ui.observationPostedToGroup.emailBody
-				templateMap["actorProfileUrl"] = activityFeedService.getUserHyperLink(feedInstance.author, null)
+				templateMap["actorProfileUrl"] = generateLink("SUser", "show", ["id": feedInstance.author.id], request)
 				templateMap["actorName"] = feedInstance.author.name
 				templateMap["groupNameWithlink"] = activityFeedService.getUserGroupHyperLink(activityFeedService.getDomainObject(feedInstance.activityHolderType, feedInstance.activityHolderId))
 				//templateMap["userGroupWebaddress"] = userGroupWebaddress

@@ -1042,19 +1042,12 @@ Please note that you will need to be logged in to see the download link.
 '''
 
 grails.plugins.springsecurity.ui.removeRecommendationVote.emailSubject = 'Species name deleted'
-grails.plugins.springsecurity.ui.removeRecommendationVote.emailBody = '''\
-Hi $username,<br/>
-<br/>
-Species name suggested by <a href="$actorProfileUrl">$actorName</a> has been deleted from <a href="$obvUrl">observation</a> on the <b>$domain</b>.
-<br/><br/>
--The portal team
-'''
 
 grails.plugins.springsecurity.ui.observationPostedToGroup.emailSubject = 'Observation posted to group'
 grails.plugins.springsecurity.ui.observationPostedToGroup.emailBody = '''\
 Hi $username,<br/>
 <br/>
-<a href="$actorProfileUrl">$actorName</a> has posted <a href="$obvUrl">observation</a> to $groupNameWithlink.
+<a href="$actorProfileUrl">$actorName</a> has posted an <a href="$obvUrl">observation</a> to $groupNameWithlink.
 <br/><br/>
 -The portal team
 '''
@@ -1063,7 +1056,7 @@ grails.plugins.springsecurity.ui.observationRemovedFromGroup.emailSubject = 'Obs
 grails.plugins.springsecurity.ui.observationRemovedFromGroup.emailBody = '''\
 Hi $username,<br/>
 <br/>
-<a href="$actorProfileUrl">$actorName</a> has removed <a href="$obvUrl">observation</a> from $groupNameWithlink.
+<a href="$actorProfileUrl">$actorName</a> has removed an <a href="$obvUrl">observation</a> from $groupNameWithlink.
 <br/><br/>
 -The portal team
 '''
