@@ -34,10 +34,10 @@
 				</g:each>
 			</ul>
 			
-			<ul class="list_view thumbnails" style="display: none;">
+			<ul class="list_view thumbnails" style="display: none;clear:both;">
 				<g:each in="${observationInstanceList}" status="i"
 					var="observationInstance">
-					<li class="thumbnail clearfix" style="${!inGroupMap || inGroupMap[observationInstance.id]?'':'background-color:transparent;'}"><obv:showSnippet
+					<li class="thumbnail feedParentContext  clearfix" style="${!inGroupMap || inGroupMap[observationInstance.id]?'':'background-color:transparent;'}"><obv:showSnippet
 							model="['observationInstance':observationInstance, 'obvTitle':obvTitleList?.get(i), 'pos':(observationPos?observationPos+i:0), 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress]"></obv:showSnippet>
 					</li>
 				</g:each>

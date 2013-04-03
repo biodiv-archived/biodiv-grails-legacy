@@ -148,7 +148,7 @@ input.dms_field {
 						<div>
 							<i class="icon-picture"></i><span>Upload photos of a
 								single observation and species</span>
-					<div>
+					
 					
 							<div
 								class="resources control-group ${hasErrors(bean: observationInstance, field: 'resource', 'error')}">
