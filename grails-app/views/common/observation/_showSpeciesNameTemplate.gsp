@@ -4,7 +4,7 @@
 		def speciesId = observationInstance.maxVotedReco?.taxonConcept?.findSpeciesId();
 		def speciesLink = " "
 		if(speciesId && !isHeading){
-			speciesLink += '<a style="font-style: normal;" href="' + uGroup.createLink(controller:'species', action:'show', id:speciesId, 'userGroupWebaddress':params?.webaddress, absolute:true) + '">' + "<i class='icon-info-sign' style='margin-right: 1px; margin-left: 10px;'></i>See species page" + "</a>"
+			speciesLink += '<a class="species-page-link" style="font-style: normal;" href="' + uGroup.createLink(controller:'species', action:'show', id:speciesId, 'userGroupWebaddress':params?.webaddress, absolute:true) + '">' + "<i class='icon-info-sign' style='margin-right: 1px; margin-left: 10px;'></i>See species page" + "</a>"
 		}
 	%>
 	<g:set var="sName" value="${observationInstance.fetchSpeciesCall()}" />
