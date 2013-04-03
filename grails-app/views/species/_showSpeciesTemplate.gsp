@@ -47,17 +47,9 @@
 			<div><b class="commonName"> ${engCommonName} </b></div>
 		</g:if>
 		<div class="icons clearfix">
-			<g:each in="${speciesInstance.getIcons()}" var="r">
-				<%def imagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.thumbnail.suffix)%>
-				<img class="icon group_icon" href="${href}"
-					src="${createLinkTo(file: imagePath, base:grailsApplication.config.speciesPortal.resources.serverURL)}"
-					title="${r?.description}" />
-			</g:each>
-
-
-
+			
 			<g:each in="${speciesInstance.fetchTaxonomyRegistry()}">
-				<span class="dropdown"> <a href="#"
+				<div class="dropdown" style="display:inline-block;"> <a href="#"
 					class="dropdown-toggle small_profile_pic taxaHierarchy pull-left"
 					data-toggle="dropdown" title="${it.key.name}"></a> <%def sortedTaxon = it.value.sort {it.rank} %>
 					<span class="dropdown-menu toolbarIconContent"> <g:each
@@ -65,9 +57,19 @@
 							<span class='rank${taxonDefinition.rank} '> ${taxonDefinition.italicisedForm}
 							</span>
 							<g:if test="${taxonDefinition.rank<8}">></g:if>
-						</g:each> </span> </span>
+						</g:each> </span> </div>
 
 			</g:each>
+			
+			<div>
+				<g:each in="${speciesInstance.getIcons()}" var="r">
+					<%def imagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.thumbnail.suffix)%>
+					<img class="icon group_icon" href="${href}"
+						src="${createLinkTo(file: imagePath, base:grailsApplication.config.speciesPortal.resources.serverURL)}"
+						title="${r?.description}" />
+				</g:each>
+			</div>
+
 
 
 		</div>

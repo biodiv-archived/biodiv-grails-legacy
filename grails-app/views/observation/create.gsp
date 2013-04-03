@@ -148,9 +148,6 @@ input.dms_field {
 							<i class="icon-picture"></i><span>Upload photos of a
 								single observation and species</span>
 					<div>
-					<div id="add_photo_ie" style="display: block; margin-bottom: 2px;"><label for="attachFiles" class="btn btn-info" style="width: 200px;">Add a Photo</label></div>
-					<div id="add_video_ie" style="display: block; margin-bottom: 2px;"><label for="attachFiles" class="btn btn-info" style="width: 200px;">Add a Video</label></div>
-					<span id="iemsg" ></span></div>
 					
 							<div
 								class="resources control-group ${hasErrors(bean: observationInstance, field: 'resource', 'error')}">
@@ -678,19 +675,6 @@ if(r && thumbnail) {
 	$(document).ready(function(){
 		$('.dropdown-toggle').dropdown();
 
-        //hack: for fixing ie image upload
-        if (navigator.appName.indexOf('Microsoft') != -1) {
-            $('#upload_resource').css({'visibility':'visible'}); // made hidden using css
-	    	$('#add_photo_ie').show();
-	    	$('#add_video_ie').show();
-            $('#add_file').hide();
-        } else {
-            $('#upload_resource').css({'visibility':'hidden'});
-	    	$('#add_photo_ie').hide();
-	    	$('#add_video_ie').hide();
-            $('#add_file').show();
-        }
-		
 		var filePick = function() {
 			filepicker.pickMultiple({
 			    mimetypes: ['image/*'],
@@ -717,9 +701,6 @@ if(r && thumbnail) {
 			);		
 		}
 		
-		$('#add_image').bind('click', filePick);
-		$('#add_photo_ie').bind('click', filePick);
-		
 		var addVideoOptions = {
 		    type: 'text',
 		    mode:'popup',
@@ -745,9 +726,6 @@ if(r && thumbnail) {
 			},
 		    title: 'Enter YouTube watch url like http://www.youtube.com/watch?v=v8HVWDrGr6o'
 		}
-		
-		$('#add_video').editable(addVideoOptions);
-		$('#add_video_ie').editable(addVideoOptions);
 		
 		$('#attachFiles').change(function(e){
   			$('#upload_resource').submit().find("span.msg").html("Uploading... Please wait...");

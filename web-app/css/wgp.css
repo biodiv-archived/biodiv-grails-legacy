@@ -1,6 +1,6 @@
 body { /*     background-color: #ffffff; */
 	/*     background-image: url('../images/header.png'); */
-	background-color: #ffffff; /*rgba(106, 201, 162, 0.15);*/
+	background-color: #ffffff;
 	background-repeat: no-repeat;
 	background-position: 0 38px;
 	height: 100%;
@@ -35,14 +35,12 @@ h6 {
 	z-index: -1000;
 }
 
-.filters { /* border: 1px solid #ffffff; */
-	/* overflow: auto; */
+.filters {
 	padding: 10px;
-	/* background-color: #ffffff;          */
-	background-color: rgba(106, 201, 162, 0.2);	
-	background: transparent\9; /* IE9 */
-	-ms-filter:"progid:DXImageTransform.Microsoft.gradient(startColorstr=#336AC9A2,endColorstr=#336AC9A2)";	/* IE8 */
-	filter: progid :DXImageTransform.Microsoft.gradient (startColorstr = '#336AC9A2', endColorstr = '#336AC9A2' );/* IE6 & 7 */
+	background-color: rgba(106, 201, 162, 0.15);
+	background: transparent\9;/*IE9*/
+	-ms-filter:"progid:DXImageTransform.Microsoft.gradient(startColorstr=#336AC9A2,endColorstr=#336AC9A2)"; /*IE8*/
+	filter: progid : DXImageTransform.Microsoft.gradient (startColorstr ='#336AC9A2', endColorstr = '#336AC9A2' ); /*IE6 & IE7*/
 	zoom: 1;
 	box-shadow: 0 4px 3px -3px #5e5e5e;
 }
@@ -50,12 +48,7 @@ h6 {
 .filterBar .ui-button,.group_icon {
 	background: none;
 	border: 0;
-	/* opacity: 0.4; */
 	display: inline-block;
-}
-
-.filterBar .ui-button:hover { /* opacity: 0.9; */
-	
 }
 
 .filterBar .ui-button-text {
@@ -313,11 +306,7 @@ div.errors {
 	-ms-filter:
 		"progid:DXImageTransform.Microsoft.gradient(startColorstr=#336AC9A2,endColorstr=#336AC9A2)";
 	/* IE8 */
-	filter: progid :               DXImageTransform.Microsoft.gradient ( 
-		       
-		     startColorstr =       
-		      '#336AC9A2', endColorstr =               '#336AC9A2' );
-	/* IE6 & 7 */
+	filter: progid : DXImageTransform.Microsoft.gradient (startColorstr ='#336AC9A2', endColorstr = '#336AC9A2' );
 	zoom: 1;
 	border-radius: 5px;
 	margin-bottom: 10px;
@@ -544,8 +533,14 @@ ul#recoSummary {
 }
 
 .sidebar_section h5 {
-	background: rgb(106, 201, 162);
+	
 	background: rgba(106, 201, 162, 0.2);
+	background: transparent\9;
+	-ms-filter:
+		"progid:DXImageTransform.Microsoft.gradient(startColorstr=#336AC9A2,endColorstr=#336AC9A2)";
+	/* IE8 */
+	filter: progid : DXImageTransform.Microsoft.gradient (startColorstr ='#336AC9A2', endColorstr = '#336AC9A2' );
+	zoom: 1;
 	padding: 5px;
 	display: block;
 	font-size: 16px;
@@ -961,7 +956,7 @@ input,button,select,textarea {
 	/* IE10 */
 	background-image: -o-linear-gradient(top, #addbc6, #3ebb8c);
 	/* Opera 11.10+ */
-	background-image: linear-gradient(to bottom, #addbc6, #3ebb8c);
+	background-image: linear-gradient(bottom, #addbc6, #3ebb8c);
 	text-shadow: 1px 0px 1px #ffffff;
 	color: #000000;
 }
@@ -1220,7 +1215,7 @@ span.cke_skin_kama {
 .reco-comment-table {
 	background-clip: padding-box;
 	background-color: #FFFFFF;
-	border-color: rgba(0, 0, 0, 0.2);
+	border-color: #33000000;
 	border-radius: 0 0 5px 5px;
 	border-style: solid;
 	border-width: 1px;
@@ -1569,8 +1564,9 @@ li#userOrEmail-new {
 		"progid:DXImageTransform.Microsoft.gradient(startColorstr=#336AC9A2,endColorstr=#336AC9A2)";
 	/* IE8 */
 	filter: progid : DXImageTransform.Microsoft.gradient (startColorstr ='#336AC9A2', endColorstr = '#336AC9A2' );
+	zoom: 1;
 	/* 	background-clip: padding-box; */
-	border-color: rgba(0, 0, 0, 0.2);
+	border-color: #33000000;
 	border-radius: 5px;
 	border-style: solid;
 	border-width: 1px;
@@ -1590,11 +1586,11 @@ li#userOrEmail-new {
 #reco-options {
 	background-clip: padding-box;
 	background-color: #FFFFFF;
-	border-color: rgba(0, 0, 0, 0.2);
+	border-color: #33000000;
 	border-radius: 0 0 5px 5px;
 	border-style: solid;
 	border-width: 1px;
-	box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+	box-shadow: 0 5px 10px #33000000;
 	display: none;
 	float: left;
 	left: 0;
@@ -1721,7 +1717,7 @@ li#userOrEmail-new {
 }
 
 .contributor_entry {
-	border-color: rgba(0, 0, 0, 0.2);
+	border-color: #33000000;
 	border-radius: 5px;
 	border-style: solid;
 	border-width: 1px;
@@ -1731,7 +1727,7 @@ li#userOrEmail-new {
 .contributor_entry .toolbar {
 	font-size: 12px;
 	line-height: 25px;
-	border-color: rgba(0, 0, 0, 0.2);
+	border-color: #33000000;
 	/* 	border-radius: 5px; */
 	border-style: solid;
 	border-width: 1px 0px 0px 0px;
@@ -1782,8 +1778,12 @@ li#userOrEmail-new {
     left:0;
     right:0;
     bottom:0;
-    background-color:rgb(0, 0, 0);
+    
     background-color:rgba(0, 0, 0, 0.85);
+    background-color:transparent\9;
+	-ms-filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#D8000000,endColorstr=#D8000000);
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#D8000000,endColorstr=#D8000000);
+	zoom: 1;
     background: url(data:;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAABl0RVh0U29mdHdhcmUAUGFpbnQuTkVUIHYzLjUuNUmK/OAAAAATSURBVBhXY2RgYNgHxGAAYuwDAA78AjwwRoQYAAAAAElFTkSuQmCC) repeat scroll transparent\9;
     z-index:9999;
     color:white;
@@ -1791,7 +1791,7 @@ li#userOrEmail-new {
 
 .youtube_container {
   background-color: #F7F7F7;
-  border: 1px solid rgba(0, 0, 0, .05);
+  border: 1px solid #0C000000;
   padding: 3px;
 }
 
