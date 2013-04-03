@@ -139,6 +139,7 @@ class XMLConverter extends SourceConverter {
 							log.info "Merging with already existing species information : "+existingSpecies.id;
 							//mergeSpecies(existingSpecies, s);
 							s = existingSpecies;
+							s.resources.clear();
 						} else {
 							log.warn "Ignoring species as a duplicate is already present : "+existingSpecies.id;
 							return;
@@ -147,7 +148,6 @@ class XMLConverter extends SourceConverter {
 
 					List<Resource> resources = createMedia(species, s.taxonConcept.canonicalForm);
 					log.debug "Resources ${resources}"
-					s.resources.clear();
 					resources.each { s.addToResources(it); }
 
 					List<Synonyms> synonyms;
@@ -1015,19 +1015,24 @@ class XMLConverter extends SourceConverter {
 			if(threeLetterCode) eq("threeLetterCode", threeLetterCode);
 		}
 
-		if(!langs && threeLetterCode) {
+		if(langs && langs[0]) {
+			return langs[0]
+		} 
+		
+		if(threeLetterCode) {
 			return Language.findByThreeLetterCode(threeLetterCode);
 		}
-
-		if(!langs && name) {
+		
+		if(name) {
 			def lang = Language.findByNameIlike(name);
 			if(!lang && name.size() == 3) {
 				return Language.findByThreeLetterCode(name.toLowerCase());
-			} else {
-				return lang;
-			}
+			} 
 		}
-		return langs ? langs[0] : null;
+		
+		log.debug "Creating new language ${name} and ${threeLetterCode}"		
+		Language lang = Language.getLanguage(name);	
+		return lang;
 	}
 
 	/**

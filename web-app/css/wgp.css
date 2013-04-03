@@ -490,7 +490,7 @@ ul#recoSummary {
 
 #addObservation #imagesList {
 	background-color: #fefad5;
-	borderdisplay_value-bottom: 1px solid #9E9E9E;
+	border-bottom: 1px solid #9E9E9E;
 	border-top: 1px solid #9E9E9E;
 	box-shadow: 0 2px 11px -3px inset;
 	padding: 10px;
@@ -1215,7 +1215,7 @@ span.cke_skin_kama {
 .reco-comment-table {
 	background-clip: padding-box;
 	background-color: #FFFFFF;
-	border-color: #33000000;
+	border-color: #CECECE;
 	border-radius: 0 0 5px 5px;
 	border-style: solid;
 	border-width: 1px;
@@ -1566,7 +1566,7 @@ li#userOrEmail-new {
 	filter: progid : DXImageTransform.Microsoft.gradient (startColorstr ='#336AC9A2', endColorstr = '#336AC9A2' );
 	zoom: 1;
 	/* 	background-clip: padding-box; */
-	border-color: #33000000;
+	border-color: #CECECE;
 	border-radius: 5px;
 	border-style: solid;
 	border-width: 1px;
@@ -1586,11 +1586,11 @@ li#userOrEmail-new {
 #reco-options {
 	background-clip: padding-box;
 	background-color: #FFFFFF;
-	border-color: #33000000;
+	border-color: #CECECE;
 	border-radius: 0 0 5px 5px;
 	border-style: solid;
 	border-width: 1px;
-	box-shadow: 0 5px 10px #33000000;
+	box-shadow: 0 5px 10px #CECECE;
 	display: none;
 	float: left;
 	left: 0;
@@ -1717,7 +1717,7 @@ li#userOrEmail-new {
 }
 
 .contributor_entry {
-	border-color: #33000000;
+	border-color: #CECECE;
 	border-radius: 5px;
 	border-style: solid;
 	border-width: 1px;
@@ -1727,7 +1727,7 @@ li#userOrEmail-new {
 .contributor_entry .toolbar {
 	font-size: 12px;
 	line-height: 25px;
-	border-color: #33000000;
+	border-color: #CECECE;
 	/* 	border-radius: 5px; */
 	border-style: solid;
 	border-width: 1px 0px 0px 0px;

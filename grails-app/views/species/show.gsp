@@ -48,9 +48,9 @@
 	height:250px;
 }
 
-.jcarousel-item .snippet.tablet .caption {
+.jcarousel-skin-ie7 .jcarousel-item .snippet.tablet .caption {
 	height:75px;
-	padding:9px;
+	padding:16px 0px;
 	background-color : #fff;
 }
 
@@ -547,8 +547,12 @@ $(document).ready(function(){
 				<!-- Common Names -->
 				<%
 					Map names = new LinkedHashMap();
-					CommonNames.findAllByTaxonConcept(speciesInstance.taxonConcept).each(){
+					CommonNames.findAllByTaxonConcept(speciesInstance.taxonConcept).each() {
 						String languageName = it?.language?.name ?: "Others";
+						
+						if(it?.language?.isDirty) {
+							languageName = "Others";	
+						}
 						if(!names.containsKey(languageName)) {
 							names.put(languageName, new ArrayList());
 						}
@@ -571,7 +575,7 @@ $(document).ready(function(){
 								<tr><td class="prop">
 									<span class="grid_3 name">${it.key} </span></td> 
 									<td><g:each in="${it.value}"  status="i" var ="n">
-												 ${n.name}<g:if test="${i < it.value.size()-1}">,</g:if>
+												 <g:if test="${n.language?.isDirty}">${n.language.name+ " : "} </g:if>${n.name}<g:if test="${i < it.value.size()-1}">,</g:if>
 											</g:each></td>
 									</tr>
 								</g:each>

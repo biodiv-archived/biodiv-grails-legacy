@@ -701,6 +701,8 @@ if(r && thumbnail) {
 			);		
 		}
 		
+		$('#add_image').bind('click', filePick);
+		
 		var addVideoOptions = {
 		    type: 'text',
 		    mode:'popup',
@@ -727,6 +729,8 @@ if(r && thumbnail) {
 		    title: 'Enter YouTube watch url like http://www.youtube.com/watch?v=v8HVWDrGr6o'
 		}
 		
+		$('#add_video').editable(addVideoOptions);
+		
 		$('#attachFiles').change(function(e){
   			$('#upload_resource').submit().find("span.msg").html("Uploading... Please wait...");
   			$("#iemsg").html("Uploading... Please wait...");
@@ -739,7 +743,7 @@ if(r && thumbnail) {
 
                 var percentVal = ((position/total)*100).toFixed(0) + '%';
                 $('#progress_bar').width(percentVal)
-                $('#translucen*/box').width('100%')
+                $('#translucent_box').width('100%')
                 $(".progress").css('z-index',110);
                 $('#progress_msg').html('Uploaded '+percentVal);
              }
@@ -785,14 +789,9 @@ if(r && thumbnail) {
 				}
 				$(responseXML).find('resources').find('res').each(function() {
 					var fileName = $(this).attr('fileName');
-					var type = $(this).attr('type');
-					//var size = $(this).attr('size');
-					//var image = rootDir + obvDir + "/" + fileName.replace(/\.[a-zA-Z]{3,4}$/, "${grailsApplication.config.speciesPortal.resources.images.gallery.suffix}");
-					//var thumbnail = rootDir + obvDir + "/" + fileName.replace(/\.[a-zA-Z]{3,4}$/, "${grailsApplication.config.speciesPortal.resources.images.thumbnail.suffix}");
+					var type = $(this).attr('type');					
   					images.push({i:++i, file:obvDir + "/" + fileName, url:$(this).attr('url'), thumbnail:$(this).attr('thumbnail'), type:type, title:fileName});
 				});
-
-                //$("#add_file").remove();                                
 				
 				var html = $( "#metadataTmpl" ).render( images );
 				var metadataEle = $(html)
