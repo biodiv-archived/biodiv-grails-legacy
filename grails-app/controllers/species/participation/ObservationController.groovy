@@ -167,7 +167,7 @@ class ObservationController {
 						render (['error:true']as JSON);
 						return
 					}else{
-						render(view: "create", model: [observationInstance: observationInstance, lastCreatedObv:null])
+						render(view: "create", model: [observationInstance: observationInstance, saveParams:params, lastCreatedObv:null])
 					}
 				}
 			} catch(e) {

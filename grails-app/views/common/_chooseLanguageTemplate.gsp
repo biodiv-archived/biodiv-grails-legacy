@@ -33,6 +33,9 @@
 			species_sn_lang = Language.read(tmp_cn_reco.languageId).name
 		}
 	}
+	if(params.action == 'save'){
+		species_sn_lang = saveParams.languageName
+	}
 %>
 <r:script>
 $(document).ready(function() {
