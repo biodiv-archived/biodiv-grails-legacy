@@ -383,7 +383,8 @@ $(document).ready(function(){
 <div class="span12">
 	<div class="container_16 outer_wrapper">
 			<s:showSubmenuTemplate model="['entityName':speciesInstance.taxonConcept.italicisedForm , 'subHeading':CommonNames.findByTaxonConceptAndLanguage(speciesInstance.taxonConcept, Language.findByThreeLetterCode('eng'))?.name, 'headingClass':'sci_name']"/>
-		
+			
+			<div class="pull-right" style="margin-top:-40px; margin-right: 12px;"><feed:follow model="['sourceObject':speciesInstance]" /></div>					
 			<g:if test="${!speciesInstance.percentOfInfo}">
 				<div
 					class="poor_species_content alert">
@@ -394,7 +395,7 @@ $(document).ready(function(){
 			</g:if>
 			<!-- media gallery -->
 			<div class="grid_10">
-				<div style="padding-bottom:10px">			
+				<div style="padding-bottom:10px">
 					<div id="resourceTabs">
 						<ul>
 							<li><a href="#resourceTabs-1">Images</a></li>

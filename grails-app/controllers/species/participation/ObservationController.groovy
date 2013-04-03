@@ -167,7 +167,7 @@ class ObservationController {
 						render (['error:true']as JSON);
 						return
 					}else{
-						render(view: "create", model: [observationInstance: observationInstance, lastCreatedObv:null])
+						render(view: "create", model: [observationInstance: observationInstance, saveParams:params, lastCreatedObv:null])
 					}
 				}
 			} catch(e) {
@@ -707,7 +707,6 @@ class ObservationController {
 				log.debug results;
 				def html =  g.render(template:"/common/observation/showObservationRecosTemplate", model:['observationInstance':observationInstance, 'result':results.recoVotes, 'totalVotes':results.totalVotes, 'uniqueVotes':results.uniqueVotes, 'userGroupWebaddress':params.userGroupWebaddress]);
 				def speciesNameHtml =  g.render(template:"/common/observation/showSpeciesNameTemplate", model:['observationInstance':observationInstance]);
-				def speciesNameHtmlForHeader =  g.render(template:"/common/observation/showSpeciesNameTemplate", model:['observationInstance':observationInstance, 'isHeading':true]);
 				def speciesExternalLinkHtml =  g.render(template:"/species/showSpeciesExternalLinkTemplate", model:['speciesInstance':Species.read(observationInstance.maxVotedReco?.taxonConcept?.findSpeciesId())]);
 				def result = [
 					'status' : 'success',
@@ -716,7 +715,6 @@ class ObservationController {
 					uniqueVotes:results.uniqueVotes,
 					msg:params.msg,
 					speciesNameTemplate:speciesNameHtml,
-					speciesNameTemplateForHeader:speciesNameHtmlForHeader,
 					speciesExternalLinkHtml:speciesExternalLinkHtml,
 					speciesName:observationInstance.fetchSpeciesCall()]
 				

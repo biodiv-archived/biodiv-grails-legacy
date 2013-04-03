@@ -10,7 +10,7 @@
 					<g:if test="${!hideAgree}">
 						<div class="iAgree ">
 							<g:if test="${!r.disAgree}">
-								<button class="btn btn-primary btn-small" onclick="addAgreeRecoVote(${r.obvId}, ${r.recoId}, ${r.noOfVotes}, $(this).closest('li'), '${uGroup.createLink(controller:'observation', action:'addAgreeRecommendationVote')}'); return true;">Agree</button>
+								<button class="btn btn-primary btn-small" style="margin-left: 1px;" onclick="addAgreeRecoVote(${r.obvId}, ${r.recoId}, ${r.noOfVotes}, $(this).closest('li'), '${uGroup.createLink(controller:'observation', action:'addAgreeRecommendationVote')}'); return true;">Agree</button>
 							</g:if>
 							<g:else>
 								<button class="btn btn-primary btn-small" style="margin-left: 1px;" onclick="removeRecoVote(${r.obvId}, ${r.recoId}, '${uGroup.createLink(controller:'observation', action:'removeRecommendationVote')}'); return true;">Remove</button>

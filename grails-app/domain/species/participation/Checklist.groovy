@@ -23,6 +23,7 @@ class Checklist {
 	
 	def activityFeedService;
 	def obvUtilService;
+	def springSecurityService;
 	
 	String title;
 	int speciesCount;
@@ -182,4 +183,7 @@ class Checklist {
 		return data
 	}
 	
+	def boolean fetchIsFollowing(SUser user=springSecurityService.currentUser){
+		return Follow.fetchIsFollowing(this, user)
+	}
 }

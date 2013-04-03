@@ -9,6 +9,7 @@
 <%@ page import="org.grails.taggable.Tag"%>
 <%@ page import="species.utils.Utils"%>
 <%@page import="species.Resource.ResourceType"%>
+<%@page import="java.util.Arrays"%>
 
 <html>
 <head>
@@ -528,14 +529,20 @@ if(r && thumbnail) {
 									</ckeditor:editor>
 								</div>
 							</div>
-
+							<%
+								def obvTags = observationInstance.tags
+								if(params.action == 'save'){
+									obvTags = Arrays.asList(saveParams.tags)
+								}				
+							%>
+								
 							<div class="span6 block sidebar-section" style="margin:0px 0px 20px -10px;">
 								<h5><label><i
 									class="icon-tags"></i>Tags <small><g:message code="observation.tags.message" default="" /></small></label>
 								</h5>
 								<div class="create_tags section-item" style="clear: both;">
 									<ul id="tags">
-										<g:each in="${observationInstance.tags}" var="tag">
+										<g:each in="${obvTags}" var="tag">
 											<li>${tag}</li>
 										</g:each>
 									</ul>
