@@ -59,7 +59,7 @@ class SpeciesSearchService {
 	
 	@Transactional(readOnly = true)
 	def listSpecies(id, params) {
-			return Species.findAllByIdGreaterThanAndPercentOfInfoGreaterThan(id,params);
+			return Species.findAllByIdGreaterThanAndPercentOfInfoGreaterThan(id,0, params);
 	}
 
 	private void cleanUpGorm() {

@@ -536,7 +536,7 @@ $(document).ready(function(){
 						<table>
 						<g:each in="${synonyms}" var="synonym">
 						<tr><td class="prop">
-							<span class="grid_3 sci_name">${synonym?.relationship?.value()} </span></td><td> ${(synonym?.italicisedForm)?:'<i>'+synonym?.name+'</i>'}  </td></tr>
+							<span class="grid_3 sci_name">${synonym?.relationship?.value()} </span></td><td> ${(synonym?.italicisedForm):'<i>'+(synonym?.name)+'</i>'}  </td></tr>
 						</g:each>
 						</table>
 					</div>
