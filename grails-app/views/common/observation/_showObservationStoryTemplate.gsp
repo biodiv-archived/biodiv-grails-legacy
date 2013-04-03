@@ -11,14 +11,14 @@
 </g:if>
 </style>
 <div class="observation_story" style="${showDetails?'':'overflow:visible;'}">
-	<div>
+	<div>		
 		<g:if test="${showDetails}">
 			<%
 				def speciesInstance = Species.read(observationInstance.maxVotedReco?.taxonConcept?.findSpeciesId())
 			%>
 			<s:showSpeciesExternalLink model="['speciesInstance':speciesInstance]"/>
 		</g:if>
-		<div class="observation-icons">		
+		<div class="observation-icons">
 			<span
 				class="group_icon species_groups_sprites active ${observationInstance.group.iconClass()}"
 				title="${observationInstance.group?.name}"></span>

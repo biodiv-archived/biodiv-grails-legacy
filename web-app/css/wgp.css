@@ -1568,10 +1568,7 @@ li#userOrEmail-new {
 	-ms-filter:
 		"progid:DXImageTransform.Microsoft.gradient(startColorstr=#336AC9A2,endColorstr=#336AC9A2)";
 	/* IE8 */
-	filter: progid :               DXImageTransform.Microsoft.gradient ( 
-		       
-		     startColorstr =       
-		      '#336AC9A2', endColorstr =               '#336AC9A2' );
+	filter: progid : DXImageTransform.Microsoft.gradient (startColorstr ='#336AC9A2', endColorstr = '#336AC9A2' );
 	/* 	background-clip: padding-box; */
 	border-color: rgba(0, 0, 0, 0.2);
 	border-radius: 5px;
@@ -1813,6 +1810,7 @@ li#userOrEmail-new {
 
 .jcarousel-skin-ie7 .jcarousel-item  .thumbnail {
 	padding:0px;
+	background-color : #000;
 }
 
 .jcarousel-item .snippet.tablet .caption {

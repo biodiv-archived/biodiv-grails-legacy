@@ -1,5 +1,5 @@
 <g:if test="${speciesInstance}">
-<div class="species-external-link" style="float:left;padding-bottom: 15px;">
+<span class="species-external-link" style="float:left;padding-bottom: 15px;">
 	<g:each in="${speciesInstance.taxonConcept.externalLinks}" var="r">
 		<g:each in="${['eolId', 'iucnId', 'gbifId']}" var="extLinkKey">
 			<g:if test="${r[extLinkKey]}">
@@ -8,5 +8,5 @@
 		</g:each>									
 	</g:each>
 	<s:showExternalLink model="['key':'wikipedia', 'taxonConcept':speciesInstance.taxonConcept]"/>
-</div>	
+</span>	
 </g:if>
