@@ -20,6 +20,8 @@ class SpeciesGroup {
 	
 	static hasMany = [taxonConcept:TaxonomyDefinition, speciesGroupMapping:SpeciesGroupMapping]
 	
+	static fetchMode = [parentGroup: 'eager']
+	
     static constraints = {
 		name(blank:false, unique:true);
 		parentGroup nullable:true;
