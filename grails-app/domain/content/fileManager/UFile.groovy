@@ -18,7 +18,7 @@ class UFile implements Taggable{
 	String doi
 	int weight	//saves the order in a group
 	//boolean deleted
-	SUser creator
+	SUser author
 	License license
 
 	String contributors;
@@ -45,7 +45,7 @@ class UFile implements Taggable{
 		weight(default:0, nullable:true)
 		sourceHolderId(nullable:true)
 		sourceHolderType(nullable:true)
-		creator(nullable:true)
+		author(nullable:true)
 		license(nullable:true)
 		contributors(nullable:true)
 		attribution(nullable:true)
@@ -64,6 +64,11 @@ class UFile implements Taggable{
 			log.error "Error deleting file: ${e.message}"
 			log.error exp
 		}
+	}
+	
+	def setSource(parent) {
+		this.sourceHolderId = parent.id
+		this.sourceHolderType = parent.class.getCanonicalName()
 	}
 
 }

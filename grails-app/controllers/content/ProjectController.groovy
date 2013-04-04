@@ -43,6 +43,9 @@ class ProjectController {
 		if (projectInstance.save(flush: true)) {
 			flash.message = "${message(code: 'default.created.message', args: [message(code: 'project.label', default: 'Project'), projectInstance.id])}"
 			projectInstance.setTags(tags);
+			
+			params.sourceHolderId = projectInstance.id
+			params.sourceHolderType = projectInstance.class.getCanonicalName()
 			def uFiles = uFileService.updateUFiles(params)
 			redirect(action: "show", id: projectInstance.id)
 		}
@@ -141,6 +144,10 @@ class ProjectController {
 			ilike 'corridor', params.term + '%'
 		}.corridor
 		render (corridorsFound as JSON)
+	}
+	
+	def search = {
+		
 	}
 
 }

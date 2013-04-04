@@ -39,6 +39,14 @@ class UFileService {
 				
 			}
 			
+			if(params."sourceHolderId") {
+				uFileInstance.sourceHolderId = params.sourceHolderId
+			}
+			
+			if(params."sourceHolderType") {
+				uFileInstance.sourceHolderType = params.sourceHolderType
+			}
+ 			
 			
 			if (uFileInstance.save(flush: true)) {
 				//flash.message = "${message(code: 'default.created.message', args: [message(code: 'UFile.label', default: 'UFile'), uFileInstance.id])}"

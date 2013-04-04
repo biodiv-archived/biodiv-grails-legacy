@@ -5,13 +5,13 @@
 	padding: 5px;
 	margin: 15px;
 }
+
 }
-
-
 .desc-field {
+	
 }
 
-div.field{
+div.field {
 	display: inline-block;
 }
 
@@ -19,10 +19,9 @@ div.field{
 	
 }
 
-
 .upload-form {
-position: absolute;
-left: -9999em;
+	position: absolute;
+	left: -9999em;
 }
 
 ul.file-tags {
@@ -30,5 +29,12 @@ ul.file-tags {
 }
 
 .qq-upload-success {
-	display:none;
+	display: none;
+}
+
+.pdficon {
+	width: 16px;
+	height: 16px;
+	background: url(../images/pdficon.jpg);
+	cursor: pointer;
 }

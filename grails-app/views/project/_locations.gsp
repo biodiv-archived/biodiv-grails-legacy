@@ -1,3 +1,4 @@
+<div class="locations-block">
 <script type="text/javascript">
     var childCount = ${projectInstance?.locations?.size()} + 0;
 
@@ -78,4 +79,7 @@
 
     </g:each>
 </div>
-<input type="button" value="Add location" onclick="addlocation();" />
+<div >
+<input type="button" class="btn btn-primary" value="Add location" onclick="addlocation();" />
+</div>
+</div>

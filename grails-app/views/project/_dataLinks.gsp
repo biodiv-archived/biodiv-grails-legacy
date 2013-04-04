@@ -66,4 +66,4 @@
 
 	</g:each>
 </div>
-<input type="button" value="Add dataLink" onclick="adddataLink();" />
+<input type="button"  class="btn btn-primary" value="Add dataLink" onclick="adddataLink();" />

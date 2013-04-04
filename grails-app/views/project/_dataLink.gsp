@@ -16,7 +16,7 @@
 				code="project.dataLink.description.label" default="Description" /> </label>
 
 		<div class="controls">
-			<textArea name='dataLinksList[${i}].description' class="site-name"
+			<textArea rows="4" name='dataLinksList[${i}].description' class="site-name"
 				value='${dataLink?.description}' ></textArea>
 		</div>
 	</div>

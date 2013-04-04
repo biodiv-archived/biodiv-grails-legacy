@@ -1,5 +1,6 @@
 <%@ page import="content.fileManager.UFile"%>
 <%@ page import="org.grails.taggable.Tag"%>
+<%@ page import="species.participation.ActivityFeedService"%>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -11,18 +12,8 @@
 <uploader:head />
 </head>
 <body>
-	<div class="nav">
-		<span class="menuButton"><a class="home"
-			href="${createLink(uri: '/')}"><g:message
-					code="default.home.label" /></a></span> <span class="menuButton"><g:link
-				class="create" action="create">
-				<g:message code="default.new.label" args="[entityName]" />
-			</g:link></span>
-	</div>
 	<div class="body">
-		<h1>
-			File Manager
-		</h1>
+		<h1>Browse Files</h1>
 		<g:if test="${flash.message}">
 			<div class="message">
 				${flash.message}
@@ -30,86 +21,65 @@
 		</g:if>
 
 
-		<%
-					def canUploadFile = true //based on configuration
-		%>
-		<g:if test="${canUploadFile}">
-		<sec:ifLoggedIn>
-			<%
-                def form_action = uGroup.createLink(action:'save_browser', controller:'UFile', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)
-				def name = 'browser'
-            %>
-            
-			<form class="form-horizontal" action="${form_action}" method="POST" id="upload-file">
-
-
-        <fileManager:uploader model="['name':'browser']"/>
-
-				<div class="buttons">
-					<span class="button"><g:submitButton name="create"
-							class="save"
-							value="${message(code: 'default.button.save.label', default: 'Save')}" /></span>
-				</div>
-			</form>
-
-</sec:ifLoggedIn>
-		</g:if>
-
-
 		<div class="list">
-			<table class="table table-hover">
-				<thead>
-					<tr>
 
-						<g:sortableColumn property="name"
-							title="${message(code: 'UFile.name.label', default: 'Name')}" />
+			<div id="contentMenu" class="tabbable tabs-right" style="">
 
-						<g:sortableColumn property="description"
-							title="${message(code: 'UFile.description.label', default: 'Description')}" />
+				<g:render template="/project/projectSidebar" />
+				<div class="project-list tab-content span8">
 
-						<g:sortableColumn property="tags"
-							title="${message(code: 'UFile.tags.label', default: 'Tags')}" />
+					<table class="table table-hover">
+						<thead>
+							<tr>
 
-						<g:sortableColumn property="size"
-							title="${message(code: 'UFile.size.label', default: 'Size')}"
-							colspan="3" />
+								<g:sortableColumn property="name"
+									title="${message(code: 'UFile.name.label', default: 'Title')}" />
 
-					</tr>
-				</thead>
-				<tbody>
-					<g:each in="${UFileInstanceList}" status="i" var="UFileInstance">
-						<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
+								<g:sortableColumn property="description"
+									title="${message(code: 'UFile.source.label', default: 'Source')}" />
 
-							<td>
-								<g:link controller="UFile" action="show"  id="${UFileInstance.id}"> ${fieldValue(bean: UFileInstance, field: "name")}</g:link>
-							</td>
 
-							<td>
-								${fieldValue(bean: UFileInstance, field: "description")}
-							</td>
-							
-							<td>
-								${UFileInstance.tags}
-							</td>
+								<g:sortableColumn property="size"
+									title="${message(code: 'UFile.file.label', default: 'File')}" />
 
-							<td>
-								${fieldValue(bean: UFileInstance, field: "size")}
-							</td>
-							
-							
-							<td>
-							<fileManager:download id="${UFileInstance.id}">Download</fileManager:download>
-							</td>
+							</tr>
+						</thead>
+						<tbody>
+							<g:each in="${UFileInstanceList}" status="i" var="UFileInstance">
+								<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 
-							
-						</tr>
-					</g:each>
-				</tbody>
-			</table>
+									<td><g:link controller="UFile" action="show"
+											id="${UFileInstance.id}">
+											${fieldValue(bean: UFileInstance, field: "name")}
+										</g:link></td>
+									<%
+
+	def className = UFileInstance.sourceHolderType
+	def id = UFileInstance.sourceHolderId
+	def sourceObj = grailsApplication.getArtefact("Domain",className)?.getClazz()?.read(id)
+	//XXX Needs to be made generic.
+	def parentLink = uGroup.createLink(controller:"project", action:"show", id:id, 'userGroupWebaddress':params?.webaddress)
+ %>
+
+									<td><a href="${parentLink}">
+										${sourceObj}</a>
+									</td>
+
+
+
+									<td><fileManager:displayIcon id="${UFileInstance.id}" /></td>
+
+
+								</tr>
+							</g:each>
+						</tbody>
+					</table>
+				</div>
+			</div>
 		</div>
-		            <div class="paginateButtons">
-                <g:paginate total="${UFileInstanceTotal}" />
-            </div>
+		<div class="paginateButtons">
+			<g:paginate total="${UFileInstanceTotal}" />
+		</div>
 	</div>
 
 

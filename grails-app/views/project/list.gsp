@@ -14,10 +14,9 @@
 .project-list .odd {
 	background-color: ghostwhite;
 }
--->
 
+-->
 .item {
-	
 	border-top: 5px solid #c2c2c2;
 	border-bottom: 2px solid #c2c2c2;
 	background-color: #ffffff;
@@ -30,38 +29,33 @@
 
 </head>
 <body>
-	<div class="nav">
-		<span class="menuButton"><g:link class="create" action="create">
-				<g:message code="default.new.label" args="[entityName]" />
-			</g:link></span>
-	</div>
-	<div class="body">
+	<div class="body span8" style="padding-left: 20px;">
 		<h1>
-			<g:message code="default.list.label" args="[entityName]" />
+		Western Ghats CEPF Projects
 		</h1>
 		<g:if test="${flash.message}">
 			<div class="message">
 				${flash.message}
 			</div>
 		</g:if>
-		
-		<!--
-		<project:search model="['queryParams':[]]"/> 
-		-->
-		<div class="project-list">
+<br />
+		<div class="project-list tab-content span">
 
 			<g:each in="${projectInstanceList}" status="i" var="projectInstance">
 				<div class="${(i % 2) == 0 ? 'odd' : 'even'} item">
 					<project:projectListItem
-						model="['projectInstance':projectInstance]" />
+						model="['projectInstance':projectInstance, 'pos':i]" />
 				</div>
 
 			</g:each>
 
-		</div>
-		<div class="paginateButtons">
-			<g:paginate total="${projectInstanceTotal}" />
+
+			<div class="paginateButtons">
+				<g:paginate total="${projectInstanceTotal}" />
+			</div>
 		</div>
 	</div>
+	<g:render template="/project/projectSidebar" />
+
 </body>
 </html>

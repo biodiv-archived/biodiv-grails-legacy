@@ -48,9 +48,10 @@
 						default="Accuracy" /> </label>
 
 				<div class="controls">
-					<input type="radio" name="coverage.location_accuracy" value="Accurate"
-						${isAccurateChecked}>Accurate <input type="radio"
-						name="coverage.location_accuracy" value="Approximate" ${isApproxChecked}>Approximate<br />
+					<input type="radio" name="coverage.location_accuracy"
+						value="Accurate" ${isAccurateChecked}>Accurate <input
+						type="radio" name="coverage.location_accuracy" value="Approximate"
+						${isApproxChecked}>Approximate<br />
 				</div>
 			</div>
 
@@ -60,8 +61,9 @@
 						default="Geoprivacy" /> </label>
 
 				<div class="controls">
-					<input type="checkbox" class="input-block-level" name="coverage.geo_privacy"
-						value="geo_privacy" /> Hide precise location
+					<input type="checkbox" class="input-block-level"
+						name="coverage.geo_privacy" value="geo_privacy" /> Hide precise
+					location
 				</div>
 			</div>
 			<hr>
@@ -72,13 +74,14 @@
 				<div class="controls">
 					<div class="location_picker_value" id="reverse_geocoded_name"></div>
 					<input id="reverse_geocoded_name_field" type="hidden"
-						class="input-block-level" name="coverage.reverse_geocoded_name"> </input>
+						class="input-block-level" name="coverage.reverse_geocoded_name">
+					</input>
 				</div>
 			</div>
 			<div>
 				<input id="use_dms" class="input-block-level" type="checkbox"
-					name="coverage.use_dms" value="use_dms" /> Use deg-min-sec format for
-				lat/long
+					name="coverage.use_dms" value="use_dms" /> Use deg-min-sec format
+				for lat/long
 			</div>
 
 			<div
@@ -88,14 +91,14 @@
 				<div class="controls textbox">
 
 					<input class="degree_field input-block-level" id="latitude_field"
-						type="text" name="coverage.latitude"></input> <input class="dms_field"
-						id="latitude_deg_field" type="text" name="coverage.latitude_deg"
-						placeholder="deg"></input> <input class="dms_field"
-						id="latitude_min_field" type="text" name="coverage.latitude_min"
-						placeholder="min"></input> <input class="dms_field"
-						id="latitude_sec_field" type="text" name="coverage.latitude_sec"
-						placeholder="sec"></input> <input class="dms_field"
-						id="latitude_direction_field" type="text"
+						type="text" name="coverage.latitude"></input> <input
+						class="dms_field" id="latitude_deg_field" type="text"
+						name="coverage.latitude_deg" placeholder="deg"></input> <input
+						class="dms_field" id="latitude_min_field" type="text"
+						name="coverage.latitude_min" placeholder="min"></input> <input
+						class="dms_field" id="latitude_sec_field" type="text"
+						name="coverage.latitude_sec" placeholder="sec"></input> <input
+						class="dms_field" id="latitude_direction_field" type="text"
 						name="coverage.latitude_direction" placeholder="direction"></input>
 					<div class="help-inline">
 						<g:hasErrors bean="${coverageInstance}" field="latitude">
@@ -112,14 +115,14 @@
 				<div class="controls textbox">
 
 					<input class="degree_field input-block-level" id="longitude_field"
-						type="text" name="coverage.longitude"></input> <input class="dms_field"
-						id="longitude_deg_field" type="text" name="coverage.longitude_deg"
-						placeholder="deg"></input> <input class="dms_field"
-						id="longitude_min_field" type="text" name="coverage.longitude_min"
-						placeholder="min"></input> <input class="dms_field"
-						id="longitude_sec_field" type="text" name="coverage.longitude_sec"
-						placeholder="sec"></input> <input class="dms_field"
-						id="longitude_direction_field" type="text"
+						type="text" name="coverage.longitude"></input> <input
+						class="dms_field" id="longitude_deg_field" type="text"
+						name="coverage.longitude_deg" placeholder="deg"></input> <input
+						class="dms_field" id="longitude_min_field" type="text"
+						name="coverage.longitude_min" placeholder="min"></input> <input
+						class="dms_field" id="longitude_sec_field" type="text"
+						name="coverage.longitude_sec" placeholder="sec"></input> <input
+						class="dms_field" id="longitude_direction_field" type="text"
 						name="coverage.longitude_direction" placeholder="direction"></input>
 					<div class="help-inline">
 						<g:hasErrors bean="${coverageInstance}" field="longitude">
@@ -162,4 +165,12 @@
 
 
 </div>
+
+
+<r:script>
+	$(document).ready(function() {
+		intializesSeciesHabitatInterest();
+		
+	});
+</r:script>
 

@@ -15,6 +15,18 @@
 ul.tagit {
 	margin-left: 0px;
 }
+
+.location-div {
+	margin: 10px;
+}
+
+.locations-block {
+
+}
+
+textarea {
+	max-width: 680px;
+}
 </style>
 </head>
 <body>
@@ -291,7 +303,7 @@ ul.tagit {
 							<div class="controls">
 
 								<fileManager:uploader
-									model="['name':'proposalFiles', 'uFiles':projectInstance?.proposalFiles]" />
+									model="['name':'proposalFiles', 'uFiles':projectInstance?.proposalFiles, 'sourceHolder': projectInstance]" />
 							</div>
 						</div>
 					</div>

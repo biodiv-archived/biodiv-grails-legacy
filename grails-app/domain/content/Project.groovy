@@ -109,5 +109,9 @@ class Project implements Taggable{
 		FactoryUtils.instantiateFactory(DataLink.class))
 	}
 	
+	
+	String toString() {
+		return title
+	}
 
 }

@@ -9,7 +9,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import content.fileManager.UFile;
 
-//import de.ailis.pherialize
 //import org.lorecraft.phparser.SerializedPhpParser;
 
 class ProjectService {
@@ -136,10 +135,12 @@ class ProjectService {
 
 		proj.projectReport = row.field_midterm_assessment_value
 
-		proj.dataContributionIntensity = row.field_data_contribution_value
+		// Migrate Data Contribution Intensity to misc
+		proj.misc= row.field_data_contribution_value
 
 		proj.proposalFiles = migrateFiles(sql,'content_field_project_proposal_files',nodeRow.nid, 'field_project_proposal_files_fid', 'field_project_proposal_files_data')
-		proj.dataContribFiles =  migrateFiles(sql,'content_field_data_contribution_files',nodeRow.nid, 'field_data_contribution_files_fid', 'field_data_contribution_files_data')
+		//TODO Migrate DataContrib files also to miscFiles
+		proj.miscFiles =  migrateFiles(sql,'content_field_data_contribution_files',nodeRow.nid, 'field_data_contribution_files_fid', 'field_data_contribution_files_data')
 		proj.miscFiles =  migrateFiles(sql,'content_field_miscellaneous_files',nodeRow.nid, 'field_miscellaneous_files_fid', 'field_miscellaneous_files_data')
 		proj.reportFiles = migrateFiles(sql,'content_field_midterm_assessment_files',nodeRow.nid, 'field_midterm_assessment_files_fid', 'field_midterm_assessment_files_data')
 
@@ -177,6 +178,8 @@ class ProjectService {
 
 			proj.setTags(tagsRows.name)
 			println " ****************** Project Saved *********************" + proj
+			
+			setSourceToProjectFiles(proj)
 
 			return proj
 		}
@@ -200,6 +203,7 @@ class ProjectService {
 				file.path = filedata.filepath
 				file.size = filedata.filesize
 				file.mimetype = filedata.filemime
+				
 
 				def metadata = row.metadata
 
@@ -224,7 +228,8 @@ class ProjectService {
 
 					file.setTags(tags)
 					}
-*/
+					*/
+
 				}
 
 				files.add(file)
@@ -233,4 +238,20 @@ class ProjectService {
 
 		return files.size()>0?files:null;
 	}
+	
+	def setSourceToProjectFiles(Project proj)
+	{
+	
+		for( file in proj.miscFiles) {
+			file.setSource(proj)
+		}
+		
+		for( file in proj.reportFiles) {
+			file.setSource(proj)
+		}
+			 
+		for( file in proj.proposalFiles) {
+			file.setSource(proj)
+		}
+	}	
 }

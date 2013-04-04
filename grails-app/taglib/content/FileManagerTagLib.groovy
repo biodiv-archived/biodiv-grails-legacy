@@ -18,7 +18,7 @@ class FileManagerTagLib {
 		
 		//checking required fields
 		if (!attrs.id) {
-			def errorMsg = "'id' attribute not found in file-uploader download tag."
+			def errorMsg = "'id' attribute not found in file-manager download tag."
 			log.error (errorMsg)
 			throw new GrailsTagException(errorMsg)
 		}
@@ -35,7 +35,32 @@ class FileManagerTagLib {
 		out << body
 	}
 	
+	
+	def displayIcon = {attrs, body ->
+		//checking required fields
+		if (!attrs.id) {
+			def errorMsg = "'id' attribute not found in file manager display icon tag."
+			log.error (errorMsg)
+			throw new GrailsTagException(errorMsg)
+		}
+		
+		//XXX - ICON should be based on extension type
+		out << g.link(['uri': UFile.findById(attrs.id)?.path], '<p class="pdficon"></p>')
+	}
 
+	def displayIconName = {attrs, body->
+		//checking required fields
+		if (!attrs.id) {
+			def errorMsg = "'id' attribute not found in file manager display icon tag."
+			log.error (errorMsg)
+			throw new GrailsTagException(errorMsg)
+		}
+		
+		//XXX - ICON should be based on extension type		
+		out << g.link(['uri': UFile.findById(attrs.id)?.path], '<span class="pdficon" style="display:inline-block;"></span>' + UFile.findById(attrs.id)?.name )
+		
+	}
+	
 	def displayFile = {attrs, body->
 		def filePath = attrs["filePath"]
 		def fileName = attrs["fileName"]

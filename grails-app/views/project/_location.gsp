@@ -1,7 +1,7 @@
 <div id="location${i}" class="location-div"
 	<g:if test="${hidden}">style="display:none;"</g:if>>
 	
-	<table>
+	<table style="background-color: whitesmoke;">
 	<thead></thead>
 	<tbody>
 	<tr>
@@ -20,7 +20,8 @@
 				value='${location?.siteName}' />
 		</div>
 	</div>
-
+</td>
+<td>
 	<div class="control-group">
 		<label class="control-label" for="corridor"><g:message
 				code="project.location.corridor.label" default="Corridor" /> </label>
@@ -33,8 +34,8 @@
 
 </td>
 <td>
-	<span class="del-location"> <img
-		src="${resource(dir:'images/skin', file:'close.png')}"
+	<span class="del-location" style="margin-left:20px; padding:5px;"> <img
+		src="${resource(dir:'images/skin', file:'remove.jpg')}"
 		style="vertical-align: middle;" />
 	</span>
 	</td>
