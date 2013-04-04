@@ -60,15 +60,17 @@ class ExternalLinksService {
 	boolean updateExternalLinks(TaxonomyDefinition taxonConcept) {
 		def http = new HTTPBuilder();
 
-		updateEOLId(http, taxonConcept);
-		if(taxonConcept.externalLinks?.eolId) {
-			updateOtherIdsFromEOL(http, taxonConcept.externalLinks?.eolId, taxonConcept);
-		}
-
-		//taxonConcept = session.merge(taxonConcept);
-		if(!taxonConcept.save()) {
-			taxonConcept.errors.each { log.error it};
-			return false;
+		if(!Environment.getCurrent().getName().startsWith("development")) {
+			updateEOLId(http, taxonConcept);
+			if(taxonConcept.externalLinks?.eolId) {
+				updateOtherIdsFromEOL(http, taxonConcept.externalLinks?.eolId, taxonConcept);
+			}
+	
+			//taxonConcept = session.merge(taxonConcept);
+			if(!taxonConcept.save()) {
+				taxonConcept.errors.each { log.error it};
+				return false;
+			}
 		}
 		return true;
 	}
@@ -170,7 +172,6 @@ class ExternalLinksService {
 	private void updateOtherIdsFromEOL(HTTPBuilder http, String eolId, TaxonomyDefinition taxonConcept) {
 		log.debug "Fetching EOL ID for taxon : "+taxonConcept
 
-		if(!Environment.getCurrent().getName().startsWith("development")) {
 		http.request( "http://eol.org/api/pages/1.0" , Method.GET, ContentType.JSON) {
 			uri.path = eolId + '.json'
 			uri.query = [ common_names:1, details:1, subjects:'all', text:2 ]
@@ -199,7 +200,6 @@ class ExternalLinksService {
 				}
 			}
 			response.failure = { resp ->  log.error 'EOL page request failed for eolId : '+eolId }
-		}
 		}
 	}
 
