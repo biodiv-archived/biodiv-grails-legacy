@@ -654,6 +654,13 @@ class ObservationService {
 			def df = new SimpleDateFormat("dd/MM/yyyy")
 			def startDate = df.parse(params.daterangepicker_start)
 			def endDate = df.parse(params.daterangepicker_end)
+			Calendar cal = Calendar.getInstance(); // locale-specific
+			cal.setTime(endDate)
+			cal.set(Calendar.HOUR_OF_DAY, 23);
+			cal.set(Calendar.MINUTE, 59);
+			cal.set(Calendar.MINUTE, 59);
+			endDate = new Date(cal.getTimeInMillis())
+			
 			filterQuery += " and ( created_on between :daterangepicker_start and :daterangepicker_end) "
 			queryParams["daterangepicker_start"] =  activeFilters["daterangepicker_start"] = startDate   
 			queryParams["daterangepicker_end"] =  activeFilters["daterangepicker_end"] = endDate
