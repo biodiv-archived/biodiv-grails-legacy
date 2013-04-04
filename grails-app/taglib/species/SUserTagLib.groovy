@@ -152,5 +152,13 @@ class SUserTagLib {
 	def interestedHabitats = {attrs, body ->
 		out<<render(template:"/common/suser/interestedHabitatsTemplate", model:attrs.model);
 	}
+	
+	def isCEPFAdmin = { attrs, body ->
+		def user = attrs.model ? attrs.model.user : null;
+		user = user?:springSecurityService.getCurrentUser()
+		if (SUserService.isCEPFAdmin(user?.id)) {
+			out << body()
+		}
+	}
 
 }

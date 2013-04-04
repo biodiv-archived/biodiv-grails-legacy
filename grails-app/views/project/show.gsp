@@ -14,7 +14,6 @@
 	background-color: #E0EAF1;
 	border-bottom: 1px solid #b3cee1;
 	border-right: 1px solid #b3cee1;
-	padding: 3px 4px 3px 4px;
 	margin: 2px 6px 2px 0;
 	text-decoration: none;
 	font-size: 90%;
@@ -26,6 +25,8 @@
 	margin-bottom: 10px;
 	clear: both;
 }
+
+
 </style>
 </head>
 <body>
@@ -53,6 +54,7 @@
 	def curr_id = projectInstance.id
 	def prevProjectId =  Project.countByIdLessThan(curr_id)>0?Project.findAllByIdLessThan(curr_id)?.last()?.id:''
 	def nextProjectId = Project.countByIdGreaterThan(curr_id)>0?Project.findByIdGreaterThan(curr_id)?.id:''
+	
 	
 	 %>
 		<div class="nav" style="width: 100%;">
@@ -91,14 +93,15 @@
 		</div>
 
 		<g:if test="${projectInstance.tags}">
+			<b>Keywords : </b>
+			<ul class="inline">
 
-			<div class="tags">
-				<b>Keywords : </b>
 				<g:each in="${projectInstance.tags}" var="tag">
-					<span class="tag"> ${tag}
-					</span>
+					<li class="tag">
+						${tag}
+					</li>
 				</g:each>
-			</div>
+			</ul>
 		</g:if>
 
 		<div class="sidebar_section">
@@ -182,59 +185,82 @@
 		</div>
 
 
-		<g:if test="${projectInstance?.projectProposal}">
+		<g:if
+			test="${projectInstance?.projectProposal || projectInstance?.proposalFiles}">
 			<div class="sidebar_section">
 				<a href="speciesFieldHeader" data-toggle="collapse" href="#proposal"><h5>Project
 						Proposal</h5></a>
 				<div id="proposal" class="speciesField collapse in">
 					${projectInstance?.projectProposal}
+
+					<g:each in="${projectInstance?.proposalFiles}" var="proposalFile">
+						<g:render template="/UFile/showUFile"
+							model="['uFileInstance':proposalFile]" />
+					</g:each>
 				</div>
 			</div>
 		</g:if>
 
 
+		<g:if
+			test="${projectInstance?.projectReport || projectInstance?.reportFiles}">
 
 			<div class="sidebar_section">
 				<a href="speciesFieldHeader" data-toggle="collapse" href="#report"><h5>Project
 						Report</h5></a>
 				<div id="report" class="speciesField collapse in">
 					${projectInstance?.projectReport}
-					
-					<g:each in ="${projectInstance?.reportFiles}" var="reportFile">
-	<p>				
-<fileManager:displayIconName id="${reportFile?.id}" /></p>
-</g:each>
-				</div>
-			</div>
 
-
-
-
-		<g:if test="${projectInstance?.misc}">
-
-			<div class="sidebar_section">
-				<a href="speciesFieldHeader" data-toggle="collapse" href="#misc"><h5>Miscellaneous</h5></a>
-				<div id="misc" class="speciesField collapse in">
-					${projectInstance?.misc}
+					<g:each in="${projectInstance?.reportFiles}" var="reportFile">
+						<g:render template="/UFile/showUFile"
+							model="['uFileInstance':reportFile]" />
+					</g:each>
 				</div>
 			</div>
 		</g:if>
 
 
-		<div class="buttons">
-			<g:form>
-				<g:hiddenField name="id" value="${projectInstance?.id}" />
-				<span class="button"><g:actionSubmit class="edit"
-						action="edit"
-						value="${message(code: 'default.button.edit.label', default: 'Edit')}" /></span>
-				<span class="button"><g:actionSubmit class="delete"
-						action="delete"
-						value="${message(code: 'default.button.delete.label', default: 'Delete')}"
-						onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" /></span>
-			</g:form>
-		</div>
-	</div>
-	<g:render template="/project/projectSidebar" />
 
+
+		<g:if test="${projectInstance?.misc || projectInstance?.miscFiles}">
+
+			<div class="sidebar_section">
+				<a href="speciesFieldHeader" data-toggle="collapse" href="#misc"><h5>Miscellaneous</h5></a>
+				<div id="misc" class="speciesField collapse in">
+					${projectInstance?.misc}
+					<g:each in="${projectInstance?.miscFiles}" var="miscFile">
+						<g:render template="/UFile/showUFile"
+							model="['uFileInstance':miscFile]" />
+					</g:each>
+				</div>
+			</div>
+		</g:if>
+
+
+		<sUser:isCEPFAdmin>
+			<div class="buttons" style="clear: both;">
+				<form
+					action="${uGroup.createLink(controller:'project', action:'edit', userGroupWebaddress:params.webaddress)}"
+					method="GET">
+					<g:hiddenField name="id" value="${projectInstance?.id}" />
+					<g:hiddenField name="userGroup"
+						value="${newsletterInstance?.userGroup?.webaddress}" />
+					<span class="button"> <input class="btn btn-primary"
+						style="float: right; margin-right: 5px;" type="submit"
+						value="Edit" />
+					</span> <span class="button"> <a class="btn btn-danger"
+						style="float: right; margin-right: 5px;"
+						href="${uGroup.createLink(controller:'project', action:'delete', id:projectInstance?.id)}"
+						onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">Delete
+					</a>
+					</span>
+				</form>
+			</div>
+		</sUser:isCEPFAdmin>
+		</div>
+		
+
+
+		<g:render template="/project/projectSidebar" />
 </body>
 </html>

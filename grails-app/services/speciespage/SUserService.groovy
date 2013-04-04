@@ -128,6 +128,11 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 		if(!id) return false
 		return SpringSecurityUtils.ifAllGranted('ROLE_ADMIN')
 	}
+	
+	boolean isCEPFAdmin(id) {
+		if(!id) return false
+		return SpringSecurityUtils.ifAllGranted('ROLE_CEPF_ADMIN')
+	}
 
 	public void sendNotificationMail(String notificationType, SUser user, request, String userProfileUrl){
 		def conf = SpringSecurityUtils.securityConfig

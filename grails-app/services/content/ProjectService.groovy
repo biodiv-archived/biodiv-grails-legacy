@@ -28,16 +28,24 @@ class ProjectService {
 	def createProject(params) {
 
 		def projectParams = params
-		projectParams.grantFrom = parseDate(params.grantFrom)
-		projectParams.grantTo = parseDate(params.grantTo)
 
-		log.debug " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
-		log.debug projectParams
+		def projectInstance = new Project()
 
-		def projectInstance = new Project(projectParams)
-				
+		updateProject(params, projectInstance)
 
 		return projectInstance;
+	}
+
+	def updateProject(params, project) {
+		log.debug " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+		log.debug params
+
+		project.properties = params
+
+
+		project.grantFrom = parseDate(params.grantFrom)
+		project.grantTo = parseDate(params.grantTo)
+
 	}
 
 	private Date parseDate(date){
@@ -178,7 +186,7 @@ class ProjectService {
 
 			proj.setTags(tagsRows.name)
 			println " ****************** Project Saved *********************" + proj
-			
+
 			setSourceToProjectFiles(proj)
 
 			return proj
@@ -203,7 +211,7 @@ class ProjectService {
 				file.path = filedata.filepath
 				file.size = filedata.filesize
 				file.mimetype = filedata.filemime
-				
+
 
 				def metadata = row.metadata
 
@@ -211,24 +219,19 @@ class ProjectService {
 					println "metadata is "+ row.metadata
 
 					/*SerializedPhpParser serializedPhpParser = new SerializedPhpParser(row.metadata);
-
-					Object result = serializedPhpParser.parse();
-
-
-					file.name = result.description;
-					file.description = result.shortnote.body
-
-					//before setting tags object should be saved
-					if(!file.save(flush:true)){
-						file.errors.allErrors.each { log.error it }
-						return null
-					}else{
-					//get tags list by splitting string by comma and stripping whitespace
-					List tags = Arrays.asList(result.tags.body.split("\\s*,\\s*"));
-
-					file.setTags(tags)
-					}
-					*/
+					 Object result = serializedPhpParser.parse();
+					 file.name = result.description;
+					 file.description = result.shortnote.body
+					 //before setting tags object should be saved
+					 if(!file.save(flush:true)){
+					 file.errors.allErrors.each { log.error it }
+					 return null
+					 }else{
+					 //get tags list by splitting string by comma and stripping whitespace
+					 List tags = Arrays.asList(result.tags.body.split("\\s*,\\s*"));
+					 file.setTags(tags)
+					 }
+					 */
 
 				}
 
@@ -238,20 +241,20 @@ class ProjectService {
 
 		return files.size()>0?files:null;
 	}
-	
+
 	def setSourceToProjectFiles(Project proj)
 	{
-	
+
 		for( file in proj.miscFiles) {
 			file.setSource(proj)
 		}
-		
+
 		for( file in proj.reportFiles) {
 			file.setSource(proj)
 		}
-			 
+
 		for( file in proj.proposalFiles) {
 			file.setSource(proj)
 		}
-	}	
+	}
 }

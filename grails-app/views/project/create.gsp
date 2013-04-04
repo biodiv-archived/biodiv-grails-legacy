@@ -67,6 +67,7 @@ textarea {
 			class="project-form form-horizontal" enctype="multipart/form-data">
 			<div class="dialog">
 
+				<input name="id" type="hidden" value="${projectInstance?.id}"/>
 
 				<div class="super-section">
 					<div class="section">

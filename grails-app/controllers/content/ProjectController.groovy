@@ -36,14 +36,14 @@ class ProjectController {
 		log.debug ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
 		log.debug params
 		def projectInstance = projectService.createProject(params)
-		
+
 
 
 		def tags = (params.tags != null) ? Arrays.asList(params.tags) : new ArrayList();
 		if (projectInstance.save(flush: true)) {
 			flash.message = "${message(code: 'default.created.message', args: [message(code: 'project.label', default: 'Project'), projectInstance.id])}"
 			projectInstance.setTags(tags);
-			
+
 			params.sourceHolderId = projectInstance.id
 			params.sourceHolderType = projectInstance.class.getCanonicalName()
 			def uFiles = uFileService.updateUFiles(params)
@@ -81,7 +81,8 @@ class ProjectController {
 
 	@Secured(['ROLE_CEPF_ADMIN'])
 	def update = {
-		def projectInstance = projectService.createProject(params)
+		def projectInstance = Project.get(params.id)
+		projectService.updateProject(params, projectInstance)
 		if (projectInstance) {
 			if (params.version) {
 				def version = params.version.toLong()
@@ -145,9 +146,7 @@ class ProjectController {
 		}.corridor
 		render (corridorsFound as JSON)
 	}
-	
-	def search = {
-		
-	}
 
+	def search = {
+	}
 }

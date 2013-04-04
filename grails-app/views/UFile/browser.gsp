@@ -21,38 +21,34 @@
 		</g:if>
 
 
-		<div class="list">
 
-			<div id="contentMenu" class="tabbable tabs-right" style="">
+		<div class="project-list tab-content span8">
 
-				<g:render template="/project/projectSidebar" />
-				<div class="project-list tab-content span8">
+			<table class="table table-hover">
+				<thead>
+					<tr>
 
-					<table class="table table-hover">
-						<thead>
-							<tr>
+						<g:sortableColumn property="name"
+							title="${message(code: 'UFile.name.label', default: 'Title')}" />
 
-								<g:sortableColumn property="name"
-									title="${message(code: 'UFile.name.label', default: 'Title')}" />
-
-								<g:sortableColumn property="description"
-									title="${message(code: 'UFile.source.label', default: 'Source')}" />
+						<g:sortableColumn property="description"
+							title="${message(code: 'UFile.source.label', default: 'Source')}" />
 
 
-								<g:sortableColumn property="size"
-									title="${message(code: 'UFile.file.label', default: 'File')}" />
+						<g:sortableColumn property="size"
+							title="${message(code: 'UFile.file.label', default: 'File')}" />
 
-							</tr>
-						</thead>
-						<tbody>
-							<g:each in="${UFileInstanceList}" status="i" var="UFileInstance">
-								<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
+					</tr>
+				</thead>
+				<tbody>
+					<g:each in="${UFileInstanceList}" status="i" var="UFileInstance">
+						<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 
-									<td><g:link controller="UFile" action="show"
-											id="${UFileInstance.id}">
-											${fieldValue(bean: UFileInstance, field: "name")}
-										</g:link></td>
-									<%
+							<td><g:link controller="UFile" action="show"
+									id="${UFileInstance.id}">
+									${fieldValue(bean: UFileInstance, field: "name")}
+								</g:link></td>
+							<%
 
 	def className = UFileInstance.sourceHolderType
 	def id = UFileInstance.sourceHolderId
@@ -61,26 +57,25 @@
 	def parentLink = uGroup.createLink(controller:"project", action:"show", id:id, 'userGroupWebaddress':params?.webaddress)
  %>
 
-									<td><a href="${parentLink}">
-										${sourceObj}</a>
-									</td>
+							<td><a href="${parentLink}"> ${sourceObj}</a></td>
 
 
 
-									<td><fileManager:displayIcon id="${UFileInstance.id}" /></td>
+							<td><fileManager:displayIcon id="${UFileInstance.id}" /></td>
 
 
-								</tr>
-							</g:each>
-						</tbody>
-					</table>
-				</div>
-			</div>
+						</tr>
+					</g:each>
+				</tbody>
+			</table>
 		</div>
 		<div class="paginateButtons">
 			<g:paginate total="${UFileInstanceTotal}" />
 		</div>
 	</div>
+
+
+	<g:render template="/project/projectSidebar" />
 
 
 </body>
