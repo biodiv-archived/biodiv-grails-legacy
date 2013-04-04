@@ -6,6 +6,7 @@ import species.ExternalLinks;
 import species.Species;
 import species.TaxonomyDefinition.TaxonomyRank;
 import grails.converters.JSON;
+import grails.util.Environment;
 import groovyx.net.http.HTTPBuilder;
 import groovyx.net.http.ContentType;
 import groovyx.net.http.Method;
@@ -169,7 +170,7 @@ class ExternalLinksService {
 	private void updateOtherIdsFromEOL(HTTPBuilder http, String eolId, TaxonomyDefinition taxonConcept) {
 		log.debug "Fetching EOL ID for taxon : "+taxonConcept
 
-
+		if(!Environment.getCurrent().getName().startsWith("development")) {
 		http.request( "http://eol.org/api/pages/1.0" , Method.GET, ContentType.JSON) {
 			uri.path = eolId + '.json'
 			uri.query = [ common_names:1, details:1, subjects:'all', text:2 ]
@@ -198,6 +199,7 @@ class ExternalLinksService {
 				}
 			}
 			response.failure = { resp ->  log.error 'EOL page request failed for eolId : '+eolId }
+		}
 		}
 	}
 

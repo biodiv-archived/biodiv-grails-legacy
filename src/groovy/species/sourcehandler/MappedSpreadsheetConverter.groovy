@@ -274,7 +274,6 @@ class MappedSpreadsheetConverter extends SourceConverter {
 		int name = result.get("name") ? Integer.parseInt(result.get("name")?.toString())-1:-1
 		boolean incremental = result.get("incremental") ? new Boolean(result.get("incremental")) : false
 		boolean imagesmetadatasheet = result.get("imagesmetadatasheet") ? new Boolean(result.get("imagesmetadatasheet")) : false
-	println 	"+++++++"+imagesmetadatasheet
 		if(imagesmetadatasheet && imagesMetaData) {
 			//TODO:This is getting repeated for every row in spreadsheet costly
 			fieldName.split(",").eachWithIndex { t, index ->
@@ -299,8 +298,6 @@ class MappedSpreadsheetConverter extends SourceConverter {
 					e.printStackTrace()
 				}
 			}
-			println images
-			println groupValues
 			populateImageNode(images, groupValues, delimiter, location, source, caption, attribution, contributor, license, name, incremental);
 		}
 		return images;
