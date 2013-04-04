@@ -236,7 +236,6 @@ $(document).ready(function(){
 			    var History = window.History;
 			    History.pushState({state:1}, "Species Portal", '?'+decodeURIComponent($.param(params))); 
 				updateRelativeTime();
-				$("table.tablesorter").tablesorter();
 				last_actions();
 				eatCookies();
 				$('.observations_list_wrapper').trigger('updatedGallery');
@@ -501,6 +500,7 @@ function updateListPage(activeTag) {
 			$('.observation_location_wrapper').replaceWith(data.mapViewHtml);
 			setActiveTag(activeTag);
 			updateDownloadBox(data.instanceTotal)
+			updateRelativeTime();
 			last_actions();
 			eatCookies();			
 			$('.observations_list_wrapper').trigger('updatedGallery');
