@@ -26,23 +26,23 @@
 					<g:if test="${params.pos && lastListParams}">
 						<div class="nav" style="width:100%;">
 							<g:if test="${test}">
-								<a class="pull-left btn ${prevObservationId?:'disabled'}" href="${uGroup.createLink([action:"show", controller:"checklist", id:prevObservationId, 'pos':params.int('pos')-1, 'userGroupWebaddress':(userGroup?userGroup.webaddress:userGroupWebaddress)])}">Prev Checklist</a>
+								<a class="pull-left btn ${prevObservationId?:'disabled'}" href="${uGroup.createLink([action:"show", controller:"checklist", id:prevObservationId, 'pos':params.int('pos')-1, 'userGroupWebaddress':(userGroup?userGroup.webaddress:userGroupWebaddress)])}"><i class="icon-backward"></i>Prev</a>
 								<a class="pull-right  btn ${nextObservationId?:'disabled'}"  href="${uGroup.createLink([action:"show", controller:"checklist",
-									id:nextObservationId, 'pos':params.int('pos')+1, 'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress])}">Next Checklist</a>
+									id:nextObservationId, 'pos':params.int('pos')+1, 'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress])}">Next<i style="margin-right: 0px; margin-left: 3px;" class="icon-forward"></i></a>
 								<%lastListParams.put('userGroupWebaddress', userGroup?userGroup.webaddress:userGroupWebaddress);
 									lastListParams.put('fragment', params.pos);
 								 %>
-								<a class="btn" href="${uGroup.createLink(lastListParams)}" style="text-align: center;display: block;width: 125px;margin: 0 auto;">List Checklist</a>
+								<a class="btn" href="${uGroup.createLink(lastListParams)}" style="text-align: center;display: block;width: 30px;margin: 0 auto;">List</a>
 							</g:if>
 							<g:else>
 								<a class="pull-left btn ${prevObservationId?:'disabled'}" href="${uGroup.createLink([action:"show", controller:"checklist",
-									id:prevObservationId, 'pos':params.int('pos')-1, 'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress])}">Prev Checklist</a>
+									id:prevObservationId, 'pos':params.int('pos')-1, 'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress])}"><i class="icon-backward"></i>Prev</a>
 								<a class="pull-right  btn ${nextObservationId?:'disabled'}"  href="${uGroup.createLink([action:"show", controller:"checklist",
-									id:nextObservationId, 'pos':params.int('pos')+1, 'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress])}">Next Checklist</a>
+									id:nextObservationId, 'pos':params.int('pos')+1, 'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress])}">Next<i style="margin-right: 0px; margin-left: 3px;" class="icon-forward"></i></a>
 								<%lastListParams.put('userGroupWebaddress', userGroup?userGroup.webaddress:userGroupWebaddress);
 								lastListParams.put('fragment', params.pos);	 
 								%>
-								<a class="btn" href="${uGroup.createLink(lastListParams)}" style="text-align: center;display: block;width: 125px;margin: 0 auto;">List Checklist</a>
+								<a class="btn" href="${uGroup.createLink(lastListParams)}" style="text-align: center;display: block;width: 30px;margin: 0 auto;">List</a>
 							</g:else>
 						</div>
 					</g:if>
