@@ -2,6 +2,7 @@ import org.codehaus.groovy.grails.commons.ApplicationHolder;
 
 import speciespage.SpeciesService;
 import speciespage.SetupService;
+import species.Species;
 
 //def s = ctx.getBean("setupService");
 //s.uploadHabitats();
@@ -14,7 +15,7 @@ def speciesService = ctx.getBean("speciesService");
 //speciesService.uploadSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/ibp/1.0/grey_falcolin/GreyFrancolin.xlsx", 0, 0, 1, 4);
 //
 //grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/ibp/1.0/Rufous Woodpecker/images";
-//speciesService.uploadNewSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/ibp/1.0/Rufous Woodpecker/RufousWoodepecker.xlsm");	
+//speciesService.uploadNewSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/ibp/1.0/Rufous Woodpecker/RufousWoodepecker.xlsm");
 //
 //grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/ibp/1.0/Eurasian Curlew/png ec";
 //speciesService.uploadNewSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/ibp/1.0/Eurasian Curlew/EurasianCurlew.xlsm");
@@ -78,10 +79,11 @@ def speciesService = ctx.getBean("speciesService");
 
 //grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/abct/uploadready/";
 //speciesService.uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/abct/uploadready/keralafloweringplants.xls", grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/abct/uploadready/keralafloweringplants_mappingfile.xls", 0, 0, 0, 0);
-//speciesService.uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/mcccollege/uploadready/Database_on_Diots_of_Western_Ghats_1.xls", grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/mcccollege/uploadready/Database_on_Diots_of_Western_Ghats_mappingfile.xls", 0, 0, 0, 0);
+speciesService.uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/mcccollege/uploadready/Database_on_Diots_of_Western_Ghats.xls", grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/mcccollege/uploadready/Database_on_Diots_of_Western_Ghats_mappingfile.xls", 0, 0, 0, 0);
 //
-grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/keystone/rawdata/forest_plants_HTML/climbers_images";
-speciesService.uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/keystone/inprocess/climbers.xls", grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/keystone/inprocess/climbers_mapping.xlsx", 0, 0, 0, 0,1);
+
+//grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/keystone/rawdata/forest_plants_HTML/climbers_images";
+//speciesService.uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/keystone/inprocess/climbers.xls", grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/keystone/inprocess/climbers_mapping.xlsx", 0, 0, 0, 0,1);
 
 //grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/keystone/rawdata/forest_plants_HTML/epi_saprophytes_images";
 //speciesService.uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/keystone/inprocess/epi_saprophytes.xls", grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/keystone/inprocess/epi_saprophytes_mapping.xlsx", 0, 0, 0, 0,1);
@@ -94,3 +96,6 @@ speciesService.uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.da
 //
 //grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/keystone/rawdata/forest_plants_HTML/trees_images";
 //speciesService.uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/keystone/inprocess/trees.xls", grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/keystone/inprocess/trees_mapping.xlsx", 0, 0, 0, 0,1);
+
+//grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/aparnawatve/inprocess/images";
+//speciesService.uploadNewSimpleSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/aparnawatve/inprocess/aparnawatve.xlsx");

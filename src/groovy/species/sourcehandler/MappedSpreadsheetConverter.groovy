@@ -17,7 +17,11 @@ class MappedSpreadsheetConverter extends SourceConverter {
 	def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 	def fieldsConfig = config.speciesPortal.fields
 	
+	public List<Map> imagesMetaData;
+	public List<Map> mappingConfig;
+	
 	private MappedSpreadsheetConverter() {
+		imagesMetaData = [];		
 	}
 
 	//should be synchronized
@@ -29,9 +33,8 @@ class MappedSpreadsheetConverter extends SourceConverter {
 	}
 
 	public List<Species> convertSpecies(String file, String mappingFile, int mappingSheetNo, int mappingHeaderRowNo, int contentSheetNo, int contentHeaderRowNo, int imageMetaDataSheetNo) {
-		List<Map> mappingConfig = SpreadsheetReader.readSpreadSheet(mappingFile, mappingSheetNo, mappingHeaderRowNo);
 		List<Map> content = SpreadsheetReader.readSpreadSheet(file, contentSheetNo, contentHeaderRowNo);
-		List<Map> imagesMetaData;
+		mappingConfig = SpreadsheetReader.readSpreadSheet(mappingFile, mappingSheetNo, mappingHeaderRowNo);				
 		if(imageMetaDataSheetNo && imageMetaDataSheetNo  >= 0) {
 			imagesMetaData = SpreadsheetReader.readSpreadSheet(file, imageMetaDataSheetNo, 0);
 		}
@@ -39,24 +42,29 @@ class MappedSpreadsheetConverter extends SourceConverter {
 		return convertSpecies(content, mappingConfig, imagesMetaData);
 	}
 
-	public List<Species> convertSpecies(List<Map> content, List<Map> mappingConfig, List<Map> imagesMetaData) {
-		List<Species> species = new ArrayList<Species>();
-		
-		XMLConverter converter = new XMLConverter();
-		
-		for(Map speciesContent : content) {
-			Node speciesElement = createSpeciesXML(content, mappingConfig);
-			//log.debug "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
-			//log.debug speciesElement;
-			//log.debug "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
-			Species s = converter.convertSpecies(speciesElement)
-			if(s)
-				species.add(s);
-		}
-		return species;
-	}
+//	public List<Species> convertSpecies(List<Map> content, List<Map> mappingConfig, List<Map> imagesMetaData) {
+//		List<Species> species = new ArrayList<Species>();
+//		
+//		XMLConverter converter = new XMLConverter();
+//		
+//		for(Map speciesContent : content) {
+//			Node speciesElement = createSpeciesXML(content, mappingConfig);
+//			//log.debug "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
+//			//log.debug speciesElement;
+//			//log.debug "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
+//			Species s = converter.convertSpecies(speciesElement)
+//			if(s)
+//				species.add(s);
+//		}
+//		return species;
+//	}
 	
-	public Node createSpeciesXML(Map speciesContent, List<Map> mappingConfig, List<Map> imagesMetaData) {
+	public Node createSpeciesXML(Map speciesContent) {
+		if(!mappingConfig) {
+			log.error "No mapping config";
+			return;
+		}
+		
 		NodeBuilder builder = NodeBuilder.newInstance();
 		int i=0;
 		

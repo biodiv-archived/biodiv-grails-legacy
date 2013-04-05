@@ -4,37 +4,34 @@ import java.util.List;
 
 import java.util.List
 
+import org.apache.solr.common.SolrException;
+import org.apache.solr.common.util.NamedList
+
+import org.apache.solr.common.util.DateUtil;
+import org.apache.solr.common.util.NamedList;
+
 import org.apache.commons.logging.LogFactory
 import org.apache.solr.common.SolrException;
 import org.apache.solr.common.util.NamedList;
-import org.codehaus.groovy.grails.commons.ApplicationHolder;
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap;
 import org.hibernate.exception.ConstraintViolationException;
 
-import species.Classification
-import species.CommonNames;
 import species.Contributor;
-import species.Country
 import species.Field
-import species.Habitat;
-import species.Language
 import species.Resource;
 import species.Species
 import species.SpeciesField;
-import species.Synonyms;
 import species.TaxonomyDefinition;
-import species.License.LicenseType
-import species.TaxonomyRegistry;
 import species.formatReader.SpreadsheetReader
-import species.participation.Observation;
 import species.sourcehandler.KeyStoneDataConverter
 import species.sourcehandler.MappedSpreadsheetConverter
 import species.sourcehandler.NewSpreadsheetConverter
 import species.sourcehandler.NewSimpleSpreadsheetConverter
+import species.sourcehandler.SourceConverter;
 import species.sourcehandler.SpreadsheetConverter
 import species.sourcehandler.XMLConverter
 import species.utils.Utils;
-
+import java.text.SimpleDateFormat;
 import species.sourcehandler.exporter.DwCAExporter
 
 class SpeciesService {
@@ -133,42 +130,17 @@ class SpeciesService {
 		log.info "Uploading mapped spreadsheet : "+file;
 
 		List<Species> species = new ArrayList<Species>();
-		MappedSpreadsheetConverter mappedSpreadsheetConverter = MappedSpreadsheetConverter.getInstance();
+		MappedSpreadsheetConverter converter = MappedSpreadsheetConverter.getInstance();
 
 
-		def startTime = System.currentTimeMillis()
-
-		List<Map> mappingConfig = SpreadsheetReader.readSpreadSheet(mappingFile, mappingSheetNo, mappingHeaderRowNo);
+		converter.mappingConfig = SpreadsheetReader.readSpreadSheet(mappingFile, mappingSheetNo, mappingHeaderRowNo);
 		List<Map> content = SpreadsheetReader.readSpreadSheet(file, contentSheetNo, contentHeaderRowNo);
 		List<Map> imagesMetaData;
 		if(imageMetaDataSheetNo && imageMetaDataSheetNo  >= 0) {
-			imagesMetaData = SpreadsheetReader.readSpreadSheet(file, imageMetaDataSheetNo, 0);
+			converter.imagesMetaData = SpreadsheetReader.readSpreadSheet(file, imageMetaDataSheetNo, 0);
 		}
 
-		int noOfInsertions = 0;
-		def speciesElements = [];
-		for(int i=0; i<content.size(); i++) {
-			if(speciesElements.size() == BATCH_SIZE) {
-				noOfInsertions += saveSpeciesElements(speciesElements);
-				speciesElements.clear();
-				cleanUpGorm();
-			}
-
-			Map speciesContent = content.get(i);
-			Node speciesElement = mappedSpreadsheetConverter.createSpeciesXML(speciesContent, mappingConfig, imagesMetaData);
-			if(speciesElement)
-				speciesElements.add(speciesElement);
-		}
-		if(speciesElements.size() > 0) {
-			noOfInsertions += saveSpeciesElements(speciesElements);
-			speciesElements.clear();
-			cleanUpGorm();
-		}
-
-		log.info "Total time taken to save : "+(( System.currentTimeMillis()-startTime)/1000) + "(sec)"
-		log.info "Total number of species that got added : ${noOfInsertions}"
-		//List<Species> species = MappedSpreadsheetConverter.getInstance().convertSpecies(file, mappingFile, mappingSheetNo, mappingHeaderRowNo, contentSheetNo, contentHeaderRowNo);
-		return noOfInsertions;
+		return saveSpecies(converter, content);
 	}
 
 	/**
@@ -204,8 +176,9 @@ class SpeciesService {
 	 */
 	int uploadNewSimpleSpreadsheet (String file) {
 		log.info "Uploading new simple spreadsheet : "+file;
-		List<Species> species = NewSimpleSpreadsheetConverter.getInstance().convertSpecies(file);
-		return saveSpecies(species);
+		def converter = NewSimpleSpreadsheetConverter.getInstance();
+		List<List<Map>> content = SpreadsheetReader.readSpreadSheet(file);
+		return saveSpecies(converter, content);
 	}
 
 	/**
@@ -224,37 +197,69 @@ class SpeciesService {
 		return saveSpecies(species);
 	}
 
+	private int saveSpecies(SourceConverter converter, List content) {
+		def startTime = System.currentTimeMillis()
+		int noOfInsertions = 0;
+		def speciesElements = [];
+		for(int i=0; i<content.size(); i++) {
+			if(speciesElements.size() == BATCH_SIZE) {
+				noOfInsertions += saveSpeciesElements(speciesElements);
+				speciesElements.clear();
+				cleanUpGorm();
+			}
+
+			Map speciesContent = content.get(i);
+			Node speciesElement = converter.createSpeciesXML(speciesContent);
+			if(speciesElement)
+				speciesElements.add(speciesElement);
+		}
+		if(speciesElements.size() > 0) {
+			noOfInsertions += saveSpeciesElements(speciesElements);
+			speciesElements.clear();
+			cleanUpGorm();
+		}
+
+		log.info "Total time taken to save : "+(( System.currentTimeMillis()-startTime)/1000) + "(sec)"
+		log.info "Total number of species that got added : ${noOfInsertions}"
+		return noOfInsertions;
+	}
+
 	private int saveSpeciesElements(List speciesElements) {
 		XMLConverter converter = new XMLConverter();
 		List<Species> species = new ArrayList<Species>();
 
+
 		int noOfInsertions = 0;
 		try {
-			Species.withTransaction { status ->
+			List<Species> addedSpecies = new ArrayList<Species>();
+			//Species.withTransaction { status ->
 				for(Node speciesElement : speciesElements) {
 					Species s = converter.convertSpecies(speciesElement)
 					if(s)
 						species.add(s);
 				}
 				noOfInsertions += saveSpecies(species);
-				species.clear();
-			}
+				//addedSpecies = saveSpeciesBatch(species);
+				//noOfInsertions += addedSpecies.size()
+			//}
+
 		}catch (org.springframework.dao.OptimisticLockingFailureException e) {
 			log.error "OptimisticLockingFailureException : $e.message"
 			log.error "Trying to add species in the batch are ${species*.taxonConcept*.name.join(' , ')}"
 			e.printStackTrace()
-			noOfInsertions = 0
 		}catch (org.springframework.dao.DataIntegrityViolationException e) {
-			log.error "OptimisticLockingFailureException : $e.message"
+			log.error "DataIntegrityViolationException : $e.message"
 			log.error "Trying to add species in the batch are ${species*.taxonConcept*.name.join(' , ')}"
 			e.printStackTrace()
-			noOfInsertions = 0
 		} catch(ConstraintViolationException e) {
 			log.error "ConstraintViolationException : $e.message"
 			log.error "Trying to add species in the batch are ${species*.taxonConcept*.name.join(' , ')}"
 			e.printStackTrace()
-			noOfInsertions = 0
 		}
+
+
+
+
 		return noOfInsertions;
 	}
 
@@ -262,45 +267,31 @@ class SpeciesService {
 	 * 
 	 * @param species
 	 * @return
-	 */
-	int saveSpecies(List species) {
+	 */	
+	int saveSpecies(List<Species> species) {
 		log.info "Saving species : "+species.size()
-		int noOfInsertions = 0;
-
-		def startTime = System.currentTimeMillis()
-		def addedSpecies = []
-		List <Species> batch =[]
-		species.each {
-			batch.add(it);
-			if(batch.size() > BATCH_SIZE){
-				def newlyAddedSpecies = saveSpeciesBatch(batch);
-				noOfInsertions += newlyAddedSpecies.size();
-				addedSpecies.addAll(newlyAddedSpecies);
-				batch.clear();
-				return
-			}
-		}
-		if(batch.size() > 0) {
-			def newlyAddedSpecies = saveSpeciesBatch(batch);
-			noOfInsertions += newlyAddedSpecies.size();
-			addedSpecies.addAll(newlyAddedSpecies);
-			batch.clear();
-		}
-
-		log.info "Time taken to save : "+(( System.currentTimeMillis()-startTime)/1000) + "(sec)"
-		log.info "Number of species that got added : ${noOfInsertions}"
-		//log.debug "Publishing to search index"
-
-		postProcessSpecies(addedSpecies);
+		int noOfInsertions = saveSpeciesToDB(species);
+		//All species should be saved before updating any group information or publishing it to search index
+		postProcessSpecies(species);
 
 		try {
-			speciesSearchService.publishSearchIndex(addedSpecies);
+			speciesSearchService.publishSearchIndex(species);
 		} catch(e) {
 			e.printStackTrace()
 		}
-
-
-
+		return noOfInsertions;
+	}
+	
+	
+	private int saveSpeciesToDB(List<Species> species) {
+		int noOfInsertions = 0;
+		long startTime = System.currentTimeMillis();
+		
+		Species.withTransaction { status ->		
+			noOfInsertions += saveSpeciesBatch(species);			
+		}
+		log.info "Time taken to save : "+(( System.currentTimeMillis()-startTime)/1000) + "(sec)"
+		log.info "Number of species that got added : ${noOfInsertions}"
 		return noOfInsertions;
 	}
 
@@ -309,11 +300,9 @@ class SpeciesService {
 	 * @param batch
 	 * @return
 	 */
-	private List saveSpeciesBatch(List<Species> batch) {
-		//int noOfInsertions = 0;
-		List<Species> addedSpecies = [];
-
-
+	private int saveSpeciesBatch(List<Species> batch) {
+		int noOfInsertions = 0;
+		//List<Species> addedSpecies = [];
 
 		for(Species s in batch) {
 			try {
@@ -324,30 +313,19 @@ class SpeciesService {
 
 			s.percentOfInfo = calculatePercentOfInfo(s);
 
-
-			//			if(s != null && s.id) {
-			//				if(!s.isAttached()) {
-			//					//merging only if it was already a persistent object
-			//					s = s.merge();
-			//				}
-			//			} else {
-			//				log.debug "Saving new object"
-			//			}
-
 			if(!s.save()) {
 				s.errors.allErrors.each { log.error it }
 			} else {
-				//noOfInsertions++;
-				addedSpecies.add(s);
+				noOfInsertions++;
+				//addedSpecies.add(s);
 			}
 
 		}
 
-
 		//log.debug "Saved species batch with insertions : "+noOfInsertions
 		//TODO : probably required to clear hibernate cache
 		//Reference : http://naleid.com/blog/2009/10/01/batch-import-performance-with-grails-and-mysql/
-		return addedSpecies;
+		return noOfInsertions;
 	}
 
 	/**
@@ -373,8 +351,17 @@ class SpeciesService {
 	def postProcessSpecies(List<Species> species) {
 		//TODO: got to move this to the end of taxon creation
 		try{
-			groupHandlerService.updateGroups(species, false);
+			//TaxonomyDefinition.withTransaction { status ->
+			for(Species s : species) {
+				def taxonConcept = s.taxonConcept;
+				if(!taxonConcept.isAttached()) {
+					taxonConcept.attach();
+				}
+				groupHandlerService.updateGroup(taxonConcept);
+			}
+			//}
 		} catch(e) {
+			log.error "$e.message"
 			e.printStackTrace()
 		}
 
@@ -491,6 +478,62 @@ class SpeciesService {
 				}
 			}
 		}
+		
+		SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+		String lastRevisedStartDate = '';
+		String lastRevisedEndDate = '';
+		if(params.daterangepicker_start) {
+			Date s = DateUtil.parseDate(params.daterangepicker_start, ['dd/MM/yyyy']);
+			Calendar cal = Calendar.getInstance(); // locale-specific
+			cal.setTime(s)
+			cal.set(Calendar.HOUR_OF_DAY, 0);
+			cal.set(Calendar.MINUTE, 0);
+			cal.set(Calendar.MINUTE, 0);
+			s = new Date(cal.getTimeInMillis())
+			//StringWriter str1 = new StringWriter();
+			lastRevisedStartDate = dateFormatter.format(s)
+			//DateUtil.formatDate(s, cal, str1)
+			//println str1
+			//lastRevisedStartDate = str1;
+			
+		}
+		
+		if(params.daterangepicker_end) {
+			Calendar cal = Calendar.getInstance(); // locale-specific
+			Date e = DateUtil.parseDate(params.daterangepicker_end, ['dd/MM/yyyy']);
+			cal.setTime(e)
+			cal.set(Calendar.HOUR_OF_DAY, 23);
+			cal.set(Calendar.MINUTE, 59);
+			cal.set(Calendar.MINUTE, 59);
+			e = new Date(cal.getTimeInMillis())
+//			StringWriter str2 = new StringWriter();
+//			DateUtil.formatDate(e, cal, str2)
+//			println str2
+			lastRevisedEndDate = dateFormatter.format(e);
+		}
+		
+		if(lastRevisedStartDate && lastRevisedEndDate) {
+			if(i > 0) aq += " AND";
+			aq += " lastrevised:["+lastRevisedStartDate+" TO "+lastRevisedEndDate+"]";
+			queryParams['daterangepicker_start'] = params.daterangepicker_start;
+			queryParams['daterangepicker_end'] = params.daterangepicker_end;
+			activeFilters['daterangepicker_start'] = params.daterangepicker_start;
+			activeFilters['daterangepicker_end'] = params.daterangepicker_end;
+			
+		} else if(lastRevisedStartDate) {
+			if(i > 0) aq += " AND";
+			//String lastRevisedStartDate = dateFormatter.format(DateTools.dateToString(DateUtil.parseDate(params.daterangepicker_start, ['dd/MM/yyyy']), DateTools.Resolution.DAY));
+			aq += " lastrevised:["+lastRevisedStartDate+" TO NOW]";
+			queryParams['daterangepicker_start'] = params.daterangepicker_start;
+			activeFilters['daterangepicker_start'] = params.daterangepicker_endparams.daterangepicker_end;
+		} else if (lastRevisedEndDate) {
+			if(i > 0) aq += " AND";
+			//String lastRevisedEndDate = dateFormatter.format(DateTools.dateToString(DateUtil.parseDate(params.daterangepicker_end, ['dd/MM/yyyy']), DateTools.Resolution.DAY));
+			aq += " lastrevised:[ * "+lastRevisedEndDate+"]";
+			queryParams['daterangepicker_end'] = params.daterangepicker_end;
+			activeFilters['daterangepicker_end'] = params.daterangepicker_end;
+		}
+		
 		if(params.query && aq) {
 			params.query = params.query + " AND "+aq
 		} else if (aq) {

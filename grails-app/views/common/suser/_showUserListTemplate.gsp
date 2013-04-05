@@ -29,7 +29,7 @@
 	
 			<ul class="list_view thumbnails" style="display: none;">
 				<g:each in="${userInstanceList}" status="i" var="userInstance">
-					<li class="thumbnail clearfix"><sUser:showUserSnippet
+					<li class="thumbnail feedParentContext clearfix"><sUser:showUserSnippet
 							model="['userInstance':userInstance, 'userGroupInstance':userGroupInstance]"></sUser:showUserSnippet></li>
 				</g:each>
 			</ul>
