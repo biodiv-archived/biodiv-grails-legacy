@@ -21,7 +21,7 @@ ul.tagit {
 }
 
 .locations-block {
-
+	
 }
 
 textarea {
@@ -39,8 +39,23 @@ textarea {
 			</g:link></span>
 	</div>
 	<div class="body">
+	
+			<%
+                def form_action = uGroup.createLink(action:'save', controller:'project', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)
+				def form_title = "Create Project"				
+				def form_button_name = "Create Project"
+				def form_button_val = "Create Project"
+				if(params.action == 'edit' || params.action == 'update'){
+					form_action = uGroup.createLink(action:'update', controller:'project', id:projectInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)
+					 form_button_name = "Update Project"
+					form_button_val = "Update Project"
+					form_title = "Update Project"
+					
+				}
+			
+            %>
 		<h1>
-			<g:message code="default.create.label" args="[entityName]" />
+			${form_title}
 		</h1>
 		<g:if test="${flash.message}">
 			<div class="message">
@@ -52,22 +67,12 @@ textarea {
 				<g:renderErrors bean="${projectInstance}" as="list" />
 			</div>
 		</g:hasErrors>
-		<%
-                def form_action = uGroup.createLink(action:'save', controller:'project', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)
-				def form_button_name = "Create Project"
-				def form_button_val = "Create Project"
-				if(params.action == 'edit' || params.action == 'update'){
-					form_action = uGroup.createLink(action:'update', controller:'project', id:projectInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)
-					 form_button_name = "Update Project"
-					form_button_val = "Update Project"
-				}
-			
-            %>
+
 		<form action="${form_action}" method="POST" id="create-project"
 			class="project-form form-horizontal" enctype="multipart/form-data">
 			<div class="dialog">
 
-				<input name="id" type="hidden" value="${projectInstance?.id}"/>
+				<input name="id" type="hidden" value="${projectInstance?.id}" />
 
 				<div class="super-section">
 					<div class="section">
@@ -343,7 +348,8 @@ textarea {
 											def canUploadFile = true //customsecurity.hasPermissionAsPerGroups([permission:org.springframework.security.acls.domain.BasePermission.WRITE]).toBoolean()
 									%>
 
-								<fileManager:uploader model="['name':'reportFiles']" />
+								<fileManager:uploader
+									model="['name':'reportFiles', 'uFiles':projectInstance?.reportFiles, 'sourceHolder': projectInstance]" />
 							</div>
 						</div>
 					</div>
@@ -395,7 +401,8 @@ textarea {
 							<div class="controls file-upload">
 
 
-								<fileManager:uploader model="['name':'miscFiles']" />
+								<fileManager:uploader
+									model="['name':'miscFiles', 'uFiles':projectInstance?.miscFiles, 'sourceHolder': projectInstance]" />
 							</div>
 
 

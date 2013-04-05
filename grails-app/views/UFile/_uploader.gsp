@@ -3,13 +3,14 @@
 
 <%
 	def canUploadFile = true //based on configuration
+	def allowedExtensions = "[ 'pdf']" //should be taken from attributes
 %>
 <g:if test="${canUploadFile}">
 
 	<uploader:uploader id="${name}"
 		url="${uGroup.createLink(controller:'UFile', action:'upload', userGroupWebaddress:params.webaddress)}"
-		multiple="true">
-		
+		multiple="true" allowedExtensions="${allowedExtensions}">
+
 		<uploader:onComplete>
 				//Available variables: id, fileName, responseJSON
 		
@@ -44,15 +45,16 @@
         <g:render template='/UFile/fileBlock' model="[name:name,  'fileId':'{{=fileId}}','filePath':'{{=filePath}}', 'fileName':'{{=fileName}}', 'fileSize':'{{=fileSize}}']"/>
 
 	</script>
-	
-	<g:if test='${uFiles}'>
-	    <g:each var="uFile" in="${uFiles}" status="i">
-    
-       		<g:render template='/UFile/fileBlock' model="[name:name,   'fileId':uFile.id,'filePath':uFile.path, 'fileName':uFile.name, 'fileSize':uFile.size, 'uFileInstance':uFile]"/>
 
-        </g:each>
-	
+	<g:if test='${uFiles}'>
+		<g:each var="uFile" in="${uFiles}" status="i">
+
+			<g:render template='/UFile/fileBlock'
+				model="[name:name,   'fileId':uFile.id,'filePath':uFile.path, 'fileName':uFile.name, 'fileSize':uFile.size, 'uFileInstance':uFile]" />
+
+		</g:each>
+
 	</g:if>
-		
-	
+
+
 </g:if>

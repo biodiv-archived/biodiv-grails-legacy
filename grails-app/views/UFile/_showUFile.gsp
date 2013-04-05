@@ -9,10 +9,11 @@
 			${uFileInstance?.description }
 		</p>
 	</g:if>
-	<p></p>
+
+
 	<g:if test="${uFileInstance?.contributors}">
 		<p>
-			Contributors:
+			<b>Contributors:</b>
 			${
 			uFileInstance?.description
 		}
@@ -20,13 +21,13 @@
 	</g:if>
 	<g:if test="${uFileInstance?.attribution}">
 		<p>
-			Attribution:
+			<b>Attribution:</b>
 			${uFileInstance?.attribution}
 		</p>
 	</g:if>
 	<g:if test="${uFileInstance?.license}">
 		<p>
-			License:
+			<b>License:</b>
 			${uFileInstance?.license}
 		</p>
 	</g:if>

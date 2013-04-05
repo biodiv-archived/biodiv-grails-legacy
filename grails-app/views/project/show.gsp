@@ -26,7 +26,11 @@
 	clear: both;
 }
 
-
+.textarea-value {
+	background-color: whitesmoke;
+	margin: 10px;
+	padding-left: 10px;
+}
 </style>
 </head>
 <body>
@@ -54,7 +58,6 @@
 	def curr_id = projectInstance.id
 	def prevProjectId =  Project.countByIdLessThan(curr_id)>0?Project.findAllByIdLessThan(curr_id)?.last()?.id:''
 	def nextProjectId = Project.countByIdGreaterThan(curr_id)>0?Project.findByIdGreaterThan(curr_id)?.id:''
-	
 	
 	 %>
 		<div class="nav" style="width: 100%;">
@@ -163,8 +166,8 @@
 
 
 		<div class="sidebar_section">
-			<a class="speciesFieldHeader" data-toggle="collapse"
-				href="#project-details"><h5>Project Details</h5></a>
+			<a data-toggle="collapse" href="#project-details"><h5>Project
+					Details</h5></a>
 			<div id="project-details" class="speciesField collapse">
 				<dl class="dl-horizontal">
 
@@ -188,15 +191,23 @@
 		<g:if
 			test="${projectInstance?.projectProposal || projectInstance?.proposalFiles}">
 			<div class="sidebar_section">
-				<a href="speciesFieldHeader" data-toggle="collapse" href="#proposal"><h5>Project
+				<a data-toggle="collapse" href="#proposal"><h5>Project
 						Proposal</h5></a>
 				<div id="proposal" class="speciesField collapse in">
-					${projectInstance?.projectProposal}
 
-					<g:each in="${projectInstance?.proposalFiles}" var="proposalFile">
-						<g:render template="/UFile/showUFile"
-							model="['uFileInstance':proposalFile]" />
-					</g:each>
+					<g:if test="${projectInstance?.projectProposal}">
+						<div class="textarea-value">
+							${projectInstance?.projectProposal}
+						</div>
+					</g:if>
+
+					<g:if test="${projectInstance?.proposalFiles}">
+						<b>Files</b>
+						<g:each in="${projectInstance?.proposalFiles}" var="proposalFile">
+							<g:render template="/UFile/showUFile"
+								model="['uFileInstance':proposalFile]" />
+						</g:each>
+					</g:if>
 				</div>
 			</div>
 		</g:if>
@@ -206,15 +217,23 @@
 			test="${projectInstance?.projectReport || projectInstance?.reportFiles}">
 
 			<div class="sidebar_section">
-				<a href="speciesFieldHeader" data-toggle="collapse" href="#report"><h5>Project
-						Report</h5></a>
+				<a data-toggle="collapse" href="#report"><h5>Project Report</h5></a>
 				<div id="report" class="speciesField collapse in">
-					${projectInstance?.projectReport}
 
-					<g:each in="${projectInstance?.reportFiles}" var="reportFile">
-						<g:render template="/UFile/showUFile"
-							model="['uFileInstance':reportFile]" />
-					</g:each>
+					<g:if test="${projectInstance?.projectReport}">
+						<div class="textarea-value">
+							${projectInstance?.projectReport}
+						</div>
+					</g:if>
+
+					<g:if test="${projectInstance?.reportFiles}">
+						<b>Files</b>
+
+						<g:each in="${projectInstance?.reportFiles}" var="reportFile">
+							<g:render template="/UFile/showUFile"
+								model="['uFileInstance':reportFile]" />
+						</g:each>
+					</g:if>
 				</div>
 			</div>
 		</g:if>
@@ -225,13 +244,22 @@
 		<g:if test="${projectInstance?.misc || projectInstance?.miscFiles}">
 
 			<div class="sidebar_section">
-				<a href="speciesFieldHeader" data-toggle="collapse" href="#misc"><h5>Miscellaneous</h5></a>
+				<a data-toggle="collapse" href="#misc"><h5>Miscellaneous</h5></a>
 				<div id="misc" class="speciesField collapse in">
-					${projectInstance?.misc}
-					<g:each in="${projectInstance?.miscFiles}" var="miscFile">
-						<g:render template="/UFile/showUFile"
-							model="['uFileInstance':miscFile]" />
-					</g:each>
+					<g:if test="${projectInstance?.misc}">
+						<div class="textarea-value">
+							${projectInstance?.misc}
+						</div>
+					</g:if>
+
+					<g:if test="${projectInstance?.miscFiles}">
+						<b>Files</b>
+
+						<g:each in="${projectInstance?.miscFiles}" var="miscFile">
+							<g:render template="/UFile/showUFile"
+								model="['uFileInstance':miscFile]" />
+						</g:each>
+					</g:if>
 				</div>
 			</div>
 		</g:if>
@@ -254,13 +282,15 @@
 						onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">Delete
 					</a>
 					</span>
+					
+
 				</form>
 			</div>
 		</sUser:isCEPFAdmin>
-		</div>
-		
+	</div>
 
 
-		<g:render template="/project/projectSidebar" />
+
+	<g:render template="/project/projectSidebar" />
 </body>
 </html>

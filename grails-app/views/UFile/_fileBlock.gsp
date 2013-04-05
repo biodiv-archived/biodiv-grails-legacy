@@ -1,6 +1,6 @@
 
 <%@page import="species.License"%>
-<table class="ufile-block">
+<table class="ufile-block span8">
 	<thead></thead>
 	<tbody>
 		<tr>
@@ -16,30 +16,41 @@
 					<span class="qq-upload-file"><i class="icon-file"></i> ${fileName}
 					</span> <span class="qq-upload-size"> ${fileSize}
 					</span>
-				</div> <label class="control-label" for="name"> Title </label>
-				<div class="controls">
-					<input class="input-xlarge" type='text' name='${fileId}.name'
-						value='${fileName}' placeholder=".input-xlarge" />
-				</div> <label class="control-label" for="description"> Description
-			</label>
-				<div class="controls">
-					<textarea rows='5' columns='10' name='${fileId}.description'
-						value='${uFileInstance?.description}'> </textarea>
-				</div> <label class="control-label" for='tags'> <i
-					class="icon-tags"></i>Tags
-			</label>
-				<div class="controls">
-					<ul class='file-tags' id="${fileId}-tags" name="${fileId}.tags">
-						<g:if test='${uFileInstance}'>
-							<g:each in="${uFileInstance.tags}" var="tag">
-								<li>
-									${tag}
-								</li>
-							</g:each>
-						</g:if>
-					</ul>
+
 				</div>
 
+				<div class="control-group">
+					<label class="control-label" for="name"> Title </label>
+
+					<div class="controls">
+						<input class="input-xlarge" type='text' name='${fileId}.name'
+							value='${fileName}' placeholder="Name for the file" />
+
+					</div>
+
+				</div>
+
+				<div class="control-group">
+					<label class="control-label" for="description"> Description
+					</label>
+					<div class="controls">
+						<textarea rows='5' name='${fileId}.description'
+							value='${uFileInstance?.description}'
+							placeholder="Describe the file"> </textarea>
+					</div>
+
+
+				</div>
+
+				<div class="control-group">
+					<label class="control-label" for='tags'> <i
+						class="icon-tags"></i>Tags
+					</label>
+					<div class="controls">
+						
+
+					</div>
+				</div>
 
 				<div
 					class="control-group ${hasErrors(bean: uFileInstance, field: 'contributors', 'error')}">

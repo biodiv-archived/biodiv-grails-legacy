@@ -38,3 +38,10 @@ ul.file-tags {
 	background: url(../images/pdficon.jpg);
 	cursor: pointer;
 }
+
+.show-ufile {
+	background-color: #f7f7f7;
+	margin: 5px;
+	padding: 10px;
+}
+

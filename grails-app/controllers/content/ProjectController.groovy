@@ -109,6 +109,7 @@ class ProjectController {
 		}
 	}
 
+	@Secured(['ROLE_CEPF_ADMIN'])
 	def delete = {
 		def projectInstance = Project.get(params.id)
 		if (projectInstance) {
