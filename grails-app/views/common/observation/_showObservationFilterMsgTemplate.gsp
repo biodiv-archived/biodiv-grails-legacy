@@ -2,7 +2,6 @@
 <%@ page import="species.participation.Observation"%>
 <%@ page import="species.groups.SpeciesGroup"%>
 <%@ page import="species.Habitat"%>
-<%@ page import="java.text.SimpleDateFormat"%>
 <g:javascript>
 	function setDefaultGroup(){
 		var defId = "#group_" + "${SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.ALL).id}"
@@ -89,9 +88,8 @@
                                     on date <span class="highlight">
                     <%
 						dateRangeSet = true
-						def df = new SimpleDateFormat("dd/MM/yyyy")
-						def startDate = (queryParams.daterangepicker_start instanceof String) ?queryParams.daterangepicker_start: df.format(queryParams.daterangepicker_start)
-						def endDate = (queryParams.daterangepicker_end instanceof String) ?queryParams.daterangepicker_end: df.format(queryParams.daterangepicker_end)			
+						def startDate = queryParams.daterangepicker_start
+						def endDate =  queryParams.daterangepicker_end 			
 					%>                
 					<a
 					href="${uGroup.createLink(controller:"observation", action:"list", params:[daterangepicker_start:startDate,daterangepicker_end:endDate])}">
