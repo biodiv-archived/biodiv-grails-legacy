@@ -260,7 +260,7 @@ if(r && thumbnail) {
 						<div class="sidebar_section">
 							<h5>Observation is in groups</h5>
 								<!-- div class="title">This observation belongs to following groups</div-->
-								<ul class="tile" style="list-style:none">
+								<ul class="tile" style="list-style:none; padding-left: 10px;">
 									<g:each in="${observationInstance.userGroups}" var="userGroup">
 										<li class="">
 											<uGroup:showUserGroupSignature  model="[ 'userGroup':userGroup]" />

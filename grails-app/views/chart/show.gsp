@@ -35,7 +35,7 @@
 		
 		<chart:showStats model="['title':'Observations', columns:obvData.columns, data:obvData.data, htmlData:obvData.htmlData, htmlColumns:obvData.htmlColumns]"/>
 		
-		<chart:showStats model="['title':'Species', columns:speciesData.columns, data:speciesData.data,, htmlData:speciesData.htmlData, htmlColumns:speciesData.htmlColumns]"/>
+		<chart:showStats model="['title':'Species Pages', columns:speciesData.columns, data:speciesData.data,, htmlData:speciesData.htmlData, htmlColumns:speciesData.htmlColumns]"/>
 	</div>
 	<r:script>
 	</r:script>
