@@ -10,6 +10,29 @@
 <title>File Manager</title>
 <r:require modules="add_file" />
 <uploader:head />
+<style type="text/css">
+.paginateButtons { 
+    margin: 3px 0px 3px 0px; 
+} 
+
+.paginateButtons a { 
+    padding: 2px 4px 2px 4px; 
+    background-color: #A4A4A4; 
+    border: 1px solid #EEEEEE; 
+    text-decoration: none; 
+    font-size: 10pt; 
+    font-variant: small-caps; 
+    color: #EEEEEE; 
+} 
+
+.paginateButtons a:hover { 
+    text-decoration: underline; 
+    background-color: #888888; 
+    border: 1px solid #AA4444; 
+    color: #FFFFFF; 
+} 
+
+</style>
 </head>
 <body>
 	<div class="body">
@@ -68,9 +91,10 @@
 					</g:each>
 				</tbody>
 			</table>
-		</div>
-		<div class="paginateButtons">
-			<g:paginate total="${UFileInstanceTotal}" />
+
+			<div class="paginateButtons">
+				<g:paginate total="${UFileInstanceTotal}" />
+			</div>
 		</div>
 	</div>
 

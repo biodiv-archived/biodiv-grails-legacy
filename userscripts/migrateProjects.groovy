@@ -1,5 +1,5 @@
 import content.*
 
-def projectservice = ctx.getBean("projectService");
+def projectservice = ctx.getBean("migrationService");
 
 projectservice.migrateProjects()

@@ -9,7 +9,7 @@ import grails.plugins.springsecurity.Secured
 
 class ProjectController {
 
-	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
+	static allowedMethods = [save: "POST", update: "POST", delete: "GET"]
 
 	def projectService
 	def observationService
@@ -82,7 +82,6 @@ class ProjectController {
 	@Secured(['ROLE_CEPF_ADMIN'])
 	def update = {
 		def projectInstance = Project.get(params.id)
-		projectService.updateProject(params, projectInstance)
 		if (projectInstance) {
 			if (params.version) {
 				def version = params.version.toLong()
@@ -94,7 +93,9 @@ class ProjectController {
 					return
 				}
 			}
-			projectInstance.properties = params
+			
+			projectService.updateProject(params, projectInstance)
+			
 			if (!projectInstance.hasErrors() && projectInstance.save(flush: true)) {
 				flash.message = "${message(code: 'default.updated.message', args: [message(code: 'project.label', default: 'Project'), projectInstance.id])}"
 				redirect(action: "show", id: projectInstance.id)

@@ -17,7 +17,6 @@ class UFile implements Taggable{
 	Integer downloads
 	String doi
 	int weight	//saves the order in a group
-	//boolean deleted
 	SUser author
 	License license
 
@@ -27,8 +26,10 @@ class UFile implements Taggable{
 	//source holder(i.e project, group)
 	Long sourceHolderId;
 	String sourceHolderType;
-
-	//static transients = [ 'deleted' ]
+	
+	boolean deleted
+	
+	static transients = [ 'deleted' ]
 
 	static mapping = {
 		description type:"text"
