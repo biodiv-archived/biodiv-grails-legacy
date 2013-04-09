@@ -2,5 +2,5 @@
 <div style="clear:both;">
 	<h3>${title}</h3>
 	<gvisualization:annotatedTimeLine elementId="annotatedtimeline_${title}" columns="${columns}" data="${data}" />
-	<div id="annotatedtimeline_${title}" style='width: 900px; height: 350px;'></div>
+	<div id="annotatedtimeline_${title}" style='width: 940px; height: 350px;'></div>
 </div>

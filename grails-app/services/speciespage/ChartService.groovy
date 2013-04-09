@@ -149,7 +149,7 @@ class ChartService {
 		}
 		fitlerParams.user = userId
 		def link = observationService.generateLink("observation", "list", fitlerParams, request)
-		return "" + '<a href="' +  link +'">' + count + "</a>"
+		return "" + '<a  href="' +  link +'">' + count + "</a>"
 	}
 	
 	private serachInList(unidentifiedResult, String key){
@@ -246,7 +246,9 @@ class ChartService {
 		
 		def finalResult = []
 		result.each { r ->
-			finalResult.add([ getUserImage(r[0]), activityFeedService.getUserHyperLink(r[0], userGroupInstance), getHyperLinkForUser(r[0].id, startDate, r[1], request)])
+			def link = observationService.generateLink("SUser", "show", ["id": r[0].id], request)
+			link =  "" + '<a  href="' +  link +'"><i>' + r[0].name + "</i></a>"
+			finalResult.add([ getUserImage(r[0]), link, getHyperLinkForUser(r[0].id, startDate, r[1], request)])
 		}
 		
 		return [data : result, htmlData:finalResult, columns : [

@@ -30,7 +30,7 @@
 		
 		
 		<chart:showActivityStats model="['title':'Activity Monitor', columns:activityData.columns, data:activityData.data]"/>
-		<br>
+		
 		<chart:showStats model="['title':'User Stats (Last 7 days) ', columns:userData.columns, data:userData.data, hAxisTitle:'User', htmlData:userData.htmlData, htmlColumns:userData.htmlColumns]"/>
 		
 		<chart:showStats model="['title':'Observations', columns:obvData.columns, data:obvData.data, htmlData:obvData.htmlData, htmlColumns:obvData.htmlColumns]"/>
