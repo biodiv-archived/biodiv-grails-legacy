@@ -198,8 +198,9 @@ class XMLConverter extends SourceConverter {
 									}
 								}
 								
-							} else if(category && category.toLowerCase().contains(fieldsConfig.TAXONOMIC_HIERARCHY)) {
+							} else if(category && category.toLowerCase().endsWith(fieldsConfig.TAXONOMIC_HIERARCHY.toLowerCase())) {
 								//ignore
+							println "ignoring hierarchy" 
 							} else {
 								List<SpeciesField> speciesFields = createSpeciesFields(s, fieldNode, SpeciesField.class, species.images[0], species.icons[0], species.audio[0], species.video[0], synonyms);
 								speciesFields.each {
@@ -306,7 +307,7 @@ class XMLConverter extends SourceConverter {
 
 			for (sField in sFields) {
 				log.debug "Found already existing species fields for field ${field}"
-				if(sField.contributors.isEmpty() || isDuplicateSpeciesField(sField,contributors)) {
+				if(isDuplicateSpeciesField(sField,contributors, data)) {
 					speciesField = sField;
 					break;
 				}
@@ -327,13 +328,18 @@ class XMLConverter extends SourceConverter {
 				speciesField.references.clear()
 			}
 
-			contributors.each { speciesField.addToContributors(it); }
-			licenses.each { speciesField.addToLicenses(it); }
-			audienceTypes.each { speciesField.addToAudienceTypes(it); }
-			attributors.each {  speciesField.addToAttributors(it); }
-			resources.each {  speciesField.addToResources(it); }
-			references.each {  speciesField.addToReferences(it); }
-			speciesFields.add(speciesField);
+			if(contributors) {
+				contributors.each { speciesField.addToContributors(it); }
+				licenses.each { speciesField.addToLicenses(it); }
+				audienceTypes.each { speciesField.addToAudienceTypes(it); }
+				attributors.each {  speciesField.addToAttributors(it); }
+				resources.each {  speciesField.addToResources(it); }
+				references.each {  speciesField.addToReferences(it); }
+				speciesFields.add(speciesField);
+			} else {
+				log.error "IGNORING SPECIES FIELD AS THERE ARE NO CONTRIBUTORS"
+			}
+			println "----${speciesField.field.category}......${speciesField.contributors}"
 		}
 		return speciesFields;
 	}
@@ -344,13 +350,17 @@ class XMLConverter extends SourceConverter {
 		return dataNode.text()?:"";
 	}
 	
-	private boolean isDuplicateSpeciesField(SpeciesField sField, contributors) {
+	private boolean isDuplicateSpeciesField(SpeciesField sField, contributors, data) {
 		for(c1 in sField.contributors) {
 			for(c2 in contributors) {
 				if(c1.id == c2.id) {
 					return true;
 				}
 			}
+		}
+		//HACK .. contributors shd never be empty
+		if(sField.contributors.isEmpty() && sField.description.equals(data)) {
+			return true;
 		}
 		return false;
 	}

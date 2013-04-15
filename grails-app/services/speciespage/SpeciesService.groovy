@@ -165,8 +165,10 @@ class SpeciesService {
 	 */
 	int uploadNewSpreadsheet (String file) {
 		log.info "Uploading new spreadsheet : "+file;
-		List<Species> species = NewSpreadsheetConverter.getInstance().convertSpecies(file);
-		return saveSpecies(species);
+		def converter = NewSpreadsheetConverter.getInstance();
+		List<List<Map>> content = SpreadsheetReader.readSpreadSheet(file);
+		return saveSpecies(converter, content);
+		
 	}
 
 	/**
@@ -176,9 +178,8 @@ class SpeciesService {
 	 */
 	int uploadNewSimpleSpreadsheet (String file) {
 		log.info "Uploading new simple spreadsheet : "+file;
-		def converter = NewSimpleSpreadsheetConverter.getInstance();
-		List<List<Map>> content = SpreadsheetReader.readSpreadSheet(file);
-		return saveSpecies(converter, content);
+		List<Species> species = NewSimpleSpreadsheetConverter.getInstance().convertSpecies(file);
+		return saveSpecies(species);
 	}
 
 	/**
@@ -201,14 +202,15 @@ class SpeciesService {
 		def startTime = System.currentTimeMillis()
 		int noOfInsertions = 0;
 		def speciesElements = [];
-		for(int i=0; i<content.size(); i++) {
+		int noOfSpecies = content.size() 
+		for(int i=0; i<noOfSpecies; i++) {
 			if(speciesElements.size() == BATCH_SIZE) {
 				noOfInsertions += saveSpeciesElements(speciesElements);
 				speciesElements.clear();
 				cleanUpGorm();
 			}
 
-			Map speciesContent = content.get(i);
+			def speciesContent = content.get(i);
 			Node speciesElement = converter.createSpeciesXML(speciesContent);
 			if(speciesElement)
 				speciesElements.add(speciesElement);
