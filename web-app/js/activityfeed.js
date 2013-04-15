@@ -325,7 +325,7 @@ function followObject(className, id, comp, url){
 		
 		error:function (xhr, ajaxOptions, thrownError){
 			//successHandler is used when ajax login suceedes
-        	var successHandler = this.success, errorHandler = showRecoUpdateStatus;
+        	var successHandler = this.success, errorHandler = null;
         	handleError(xhr, ajaxOptions, thrownError, successHandler, errorHandler);
 		} 
 	});

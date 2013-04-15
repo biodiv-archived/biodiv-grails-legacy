@@ -531,7 +531,7 @@ if(r && thumbnail) {
 							</div>
 							<%
 								def obvTags = observationInstance.tags
-								if(params.action == 'save'){
+								if(params.action == 'save' && saveParams.tags){
 									obvTags = Arrays.asList(saveParams.tags)
 								}				
 							%>

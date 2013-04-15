@@ -588,6 +588,12 @@ class ObservationService {
 		}
 		
 		def observationInstanceList = Observation.executeQuery(query, queryParts.queryParams)
+		if(params.daterangepicker_start){
+			queryParts.queryParams["daterangepicker_start"] = params.daterangepicker_start
+		}
+		if(params.daterangepicker_end){
+			queryParts.queryParams["daterangepicker_end"] =  params.daterangepicker_end
+		}
 		
 		return [observationInstanceList:observationInstanceList, queryParams:queryParts.queryParams, activeFilters:queryParts.activeFilters]
 	}
@@ -662,8 +668,11 @@ class ObservationService {
 			endDate = new Date(cal.getTimeInMillis())
 			
 			filterQuery += " and ( created_on between :daterangepicker_start and :daterangepicker_end) "
-			queryParams["daterangepicker_start"] =  activeFilters["daterangepicker_start"] = startDate   
-			queryParams["daterangepicker_end"] =  activeFilters["daterangepicker_end"] = endDate
+			queryParams["daterangepicker_start"] =  startDate   
+			queryParams["daterangepicker_end"] =  endDate
+			
+			activeFilters["daterangepicker_start"] = params.daterangepicker_start
+			activeFilters["daterangepicker_end"] =  params.daterangepicker_end
 		}
 		
 		if(params.bounds){
