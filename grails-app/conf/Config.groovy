@@ -389,6 +389,11 @@ speciesPortal {
 		LATLONG = "latlong"
 		USER_GROUP = "group"
 		USER_GROUP_WEBADDRESS = "group_webaddress"
+		
+		GRANTEE_ORGANIZATION = "grantee_organization"
+		SITENAME = "sitename"
+		CORRIDOR = "corridor"
+		DESCRIPTION = "description"
 	}
 
 	nameSearchFields {
