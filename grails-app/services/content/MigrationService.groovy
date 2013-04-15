@@ -9,6 +9,7 @@ import java.util.List;
 import org.springframework.transaction.annotation.Transactional;
 
 import content.fileManager.UFile;
+import species.License
 
 //import org.lorecraft.phparser.SerializedPhpParser;
 
@@ -101,12 +102,22 @@ def migrateProjects() {
 		proj.misc= row.field_data_contribution_value
 
 		proj.proposalFiles = migrateFiles(sql,'content_field_project_proposal_files',nodeRow.nid, 'field_project_proposal_files_fid', 'field_project_proposal_files_data')
-		//TODO Migrate DataContrib files also to miscFiles
-		proj.miscFiles =  migrateFiles(sql,'content_field_data_contribution_files',nodeRow.nid, 'field_data_contribution_files_fid', 'field_data_contribution_files_data')
-		proj.miscFiles =  migrateFiles(sql,'content_field_miscellaneous_files',nodeRow.nid, 'field_miscellaneous_files_fid', 'field_miscellaneous_files_data')
 		proj.reportFiles = migrateFiles(sql,'content_field_midterm_assessment_files',nodeRow.nid, 'field_midterm_assessment_files_fid', 'field_midterm_assessment_files_data')
+		
+		proj.miscFiles =  migrateFiles(sql,'content_field_miscellaneous_files',nodeRow.nid, 'field_miscellaneous_files_fid', 'field_miscellaneous_files_data')
+		
+		
+		//TODO Migrate DataContrib files also to miscFiles
+		def dataContribFiles =  migrateFiles(sql,'content_field_data_contribution_files',nodeRow.nid, 'field_data_contribution_files_fid', 'field_data_contribution_files_data')
 
+		for(dataContribFile in dataContribFiles)
+			proj.addToMiscFiles(dataContribFile)
+		
 
+		def analysisFiles =  migrateFiles(sql,'content_field_analysis_results_files',nodeRow.nid, 'field_analysis_results_files_fid', 'field_analysis_results_files_data')
+		for(analysisFile in analysisFiles)
+			proj.addToMiscFiles(analysisFile)	
+		
 		//locations
 		List locations  = new ArrayList()
 
@@ -171,8 +182,8 @@ def migrateProjects() {
 
 				if(row.metadata) {
 					println "metadata is "+ row.metadata
-
-					/*SerializedPhpParser serializedPhpParser = new SerializedPhpParser(row.metadata);
+/*
+					SerializedPhpParser serializedPhpParser = new SerializedPhpParser(row.metadata);
 					Object result = serializedPhpParser.parse();
 					file.name = result.description;
 					file.description = result.shortnote.body
@@ -201,16 +212,43 @@ def migrateProjects() {
 	def setSourceToProjectFiles(Project proj)
 	{
 
+		
 		for( file in proj.miscFiles) {
 			file.setSource(proj)
+			file.contributors = proj.granteeOrganization
+			file.attribution = proj.granteeOrganization
+			file.license = License.findByName(License.LicenseType.CC_BY)
+			
+			println "**********************License id is "+file.license
+			
+			if(!file.save(flush:true)){
+				throw new Exception()
+			}
 		}
 
 		for( file in proj.reportFiles) {
 			file.setSource(proj)
+			file.contributors = proj.granteeContact
+			file.attribution = proj.granteeContact
+			file.license = License.findByName(License.LicenseType.CC_BY)
+			println "**********************License id is "+file.license
+			
+			
+			if(!file.save(flush:true)){
+				throw new Exception()
+			}
 		}
 
 		for( file in proj.proposalFiles) {
 			file.setSource(proj)
+			file.contributors = proj.granteeContact
+			file.attribution = proj.granteeContact
+			file.license = License.findByName(License.LicenseType.CC_BY)
+			println "**********************License id is "+file.license
+			
+			if(!file.save(flush:true)){
+				throw new Exception()
+			}
 		}
 	}
 	

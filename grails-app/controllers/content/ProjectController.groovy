@@ -13,6 +13,7 @@ class ProjectController {
 
 	def projectService
 	def observationService
+	def projectSearchService
 	def uFileService = new UFileService()
 
 	def index = {
@@ -20,8 +21,12 @@ class ProjectController {
 	}
 
 	def list = {
-		params.max = Math.min(params.max ? params.int('max') : 10, 100)
-		[projectInstanceList: Project.list(params), projectInstanceTotal: Project.count()]
+		log.debug params
+		
+		def model = getProjectList(params)	
+		render (view:"list", model:model)
+		return;
+		
 	}
 
 	@Secured(['ROLE_CEPF_ADMIN'])
@@ -37,8 +42,6 @@ class ProjectController {
 		log.debug params
 		def projectInstance = projectService.createProject(params)
 
-
-
 		def tags = (params.tags != null) ? Arrays.asList(params.tags) : new ArrayList();
 		if (projectInstance.save(flush: true)) {
 			flash.message = "${message(code: 'default.created.message', args: [message(code: 'project.label', default: 'Project'), projectInstance.id])}"
@@ -46,7 +49,8 @@ class ProjectController {
 
 			params.sourceHolderId = projectInstance.id
 			params.sourceHolderType = projectInstance.class.getCanonicalName()
-			def uFiles = uFileService.updateUFiles(params)
+			//TODO: set source to files
+			//def uFiles = uFileService.updateUFiles(params)
 			redirect(action: "show", id: projectInstance.id)
 		}
 		else {
@@ -150,5 +154,38 @@ class ProjectController {
 	}
 
 	def search = {
+		
+		[projectInstanceList: Project.list(params), projectInstanceTotal: Project.count()]		
 	}
+	
+	def tagcloud = {
+		render (view:"tagcloud")
+	}
+	
+	protected def getProjectList(params) {
+		def max = Math.min(params.max ? params.int('max') : 12, 100)
+		def offset = params.offset ? params.int('offset') : 0
+		def filteredProject = projectService.getFilteredProjects(params, max, offset)
+		def projectInstanceList = filteredProject.projectInstanceList
+		def queryParams = filteredProject.queryParams
+		def activeFilters = filteredProject.activeFilters
+		activeFilters.put("append", true);//needed for adding new page proj ids into existing session["proj_ids_list"]
+		
+		def totalProjectInstanceList = projectService.getFilteredProjects(params, -1, -1).projectInstanceList
+		def count = totalProjectInstanceList.size()
+		
+		//storing this filtered proj ids list in session for next and prev links
+		//http://grepcode.com/file/repo1.maven.org/maven2/org.codehaus.groovy/groovy-all/1.8.2/org/codehaus/groovy/runtime/DefaultGroovyMethods.java
+		//returns an arraylist and invalidates prev listing result
+		if(params.append?.toBoolean()) {
+			session["proj_ids_list"].addAll(projectInstanceList.collect {it.id});
+		} else {
+			session["proj_ids_list_params"] = params.clone();
+			session["proj_ids_list"] = projectInstanceList.collect {it.id};
+		}
+		
+		log.debug "Storing all project ids list in session ${session['proj_ids_list']} for params ${params}";
+		return [totalProjectInstanceList:totalProjectInstanceList, projectInstanceList: projectInstanceList, projectInstanceTotal: count, queryParams: queryParams, activeFilters:activeFilters]
+	}
+	
 }

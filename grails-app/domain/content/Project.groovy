@@ -37,10 +37,10 @@ class Project implements Taggable{
 
 	String projectReport;
 
-
 	String misc;
 
 	Date dateCreated;
+	Date lastUpdated;
 
 	static mapping = {
 
@@ -53,7 +53,6 @@ class Project implements Taggable{
 		
 		locations cascade:"all-delete-orphan"
 		
-
 	}
 
 

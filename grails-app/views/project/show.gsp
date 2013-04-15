@@ -97,14 +97,9 @@
 
 		<g:if test="${projectInstance.tags}">
 			<b>Keywords : </b>
-			<ul class="inline">
+			
+			<g:render template="/project/showProjectTagsList" model="['projectInstance': projectInstance]"/>
 
-				<g:each in="${projectInstance.tags}" var="tag">
-					<li class="tag">
-						${tag}
-					</li>
-				</g:each>
-			</ul>
 		</g:if>
 
 		<div class="sidebar_section">
@@ -149,15 +144,18 @@
 						${projectInstance?.granteeOrganization}
 					</dd>
 
-					<dt>Contact</dt>
-					<dd>
-						${projectInstance?.granteeContact}
-					</dd>
+					<sUser:isCEPFAdmin>
 
-					<dt>Email</dt>
-					<dd>
-						${projectInstance?.granteeEmail}
-					</dd>
+						<dt>Contact</dt>
+						<dd>
+							${projectInstance?.granteeContact}
+						</dd>
+
+						<dt>Email</dt>
+						<dd>
+							${projectInstance?.granteeEmail}
+						</dd>
+					</sUser:isCEPFAdmin>
 				</dl>
 
 
@@ -282,7 +280,7 @@
 						onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">Delete
 					</a>
 					</span>
-					
+
 
 				</form>
 			</div>

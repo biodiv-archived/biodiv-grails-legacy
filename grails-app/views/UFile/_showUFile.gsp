@@ -13,9 +13,9 @@
 
 	<g:if test="${uFileInstance?.contributors}">
 		<p>
-			<b>Contributors:</b>
+			<b>Contributor(s):</b>
 			${
-			uFileInstance?.description
+			uFileInstance?.contributors
 		}
 		</p>
 	</g:if>
@@ -28,7 +28,11 @@
 	<g:if test="${uFileInstance?.license}">
 		<p>
 			<b>License:</b>
-			${uFileInstance?.license}
+			
+							<a class="license" href="${uFileInstance?.license?.url}" target="_blank"><img
+						src="${createLinkTo(dir:'images/license', file: uFileInstance?.license?.name.value().toLowerCase().replaceAll('\\s+','')+'.png', absolute:true)}"
+						alt="${uFileInstance?.license?.name.value()}" /> </a>
+			
 		</p>
 	</g:if>
 

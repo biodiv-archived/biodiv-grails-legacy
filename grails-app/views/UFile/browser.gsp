@@ -46,6 +46,7 @@
 
 
 		<div class="project-list tab-content span8">
+		<g:render template="/UFile/search" />
 
 			<table class="table table-hover">
 				<thead>
@@ -67,10 +68,9 @@
 					<g:each in="${UFileInstanceList}" status="i" var="UFileInstance">
 						<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 
-							<td><g:link controller="UFile" action="show"
-									id="${UFileInstance.id}">
+							<td>
 									${fieldValue(bean: UFileInstance, field: "name")}
-								</g:link></td>
+								</td>
 							<%
 
 	def className = UFileInstance.sourceHolderType

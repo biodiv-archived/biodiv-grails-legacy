@@ -79,7 +79,7 @@
 
     </g:each>
 </div>
-<div >
+<div style="text-align:center;">
 <input type="button" class="btn btn-primary" value="Add location" onclick="addlocation();" />
 </div>
 </div>

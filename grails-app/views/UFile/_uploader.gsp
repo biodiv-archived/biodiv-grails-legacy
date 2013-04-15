@@ -47,8 +47,12 @@
 	</script>
 
 	<g:if test='${uFiles}'>
-		<g:each var="uFile" in="${uFiles}" status="i">
-
+		<g:each var="fileAssist" in="${uFiles}" status="i">
+		
+			<%
+			// To overcome hibernate fileassist issue - http://www.intelligrape.com/blog/2012/09/21/extract-correct-class-from-hibernate-object-wrapped-with-javassist/
+			 def uFile = UFile.get(fileAssist.id)
+%>
 			<g:render template='/UFile/fileBlock'
 				model="[name:name,   'fileId':uFile.id,'filePath':uFile.path, 'fileName':uFile.name, 'fileSize':uFile.size, 'uFileInstance':uFile]" />
 

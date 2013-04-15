@@ -42,19 +42,25 @@
 
 				</div>
 
-				<div class="control-group">
-					<label class="control-label" for='tags'> <i
-						class="icon-tags"></i>Tags
-					</label>
-					<div class="controls">
-						
-
-					</div>
-				</div>
+ <label class="control-label" for='tags'> <i
+					class="icon-tags"></i>Tags
+			</label>
+				<div class="controls">
+					<ul class='file-tags' id="${fileId}-tags" name="${fileId}.tags">
+						<g:if test='${uFileInstance}'>
+							<g:each in="${uFileInstance.tags}" var="tag">
+								<li>
+									${tag}
+								</li>
+							</g:each>
+						</g:if>
+					</ul>
+				</div> 
+			
 
 				<div
 					class="control-group ${hasErrors(bean: uFileInstance, field: 'contributors', 'error')}">
-					<label class="control-label" for="contributors">Contributors</label>
+					<label class="control-label" for="contributors">Contributor(s)</label>
 					<div class="controls">
 						<g:textField name="${fileId}.contributors"
 							value="${uFileInstance?.contributors }" />
@@ -74,17 +80,18 @@
 
 				<div id="${fileId}.license" class="licence_div dropdown">
 
-					<a id="selected_license_${i}" class="btn dropdown-toggle btn-mini"
-						data-toggle="dropdown"> <img
+					<a id="selected_license_${fileId}"
+						class="btn dropdown-toggle btn-mini" data-toggle="dropdown"> <img
 						src="${resource(dir:'images/license',file:'', absolute:true)}"
-						title="Set a license for this image" /> <b class="caret"></b>
+						title="Set a license for this file" /> <b class="caret"></b>
 					</a>
 
-					<ul id="license_options_${i}" class="dropdown-menu license_options">
+					<ul id="license_options_${fileId}"
+						class="controls dropdown-menu license_options">
 						<span>Choose a license</span>
-						<g:each in="${species.License.list()}" var="l">
+						<g:each in="${License.list()}" var="l">
 							<li class="license_option"
-								onclick="$('#license_${i}').val($.trim($(this).text()));$('#selected_license_${i}').find('img:first').replaceWith($(this).html());">
+								onclick="$('#license_${fileId}').val($.trim($(this).text()));$('#selected_license_${fileId}').find('img:first').replaceWith($(this).html());">
 								<img
 								src="${resource(dir:'images/license',file:l?.name?.getIconFilename()+'.png', absolute:true)}" /><span
 								style="display: none;"> ${l?.name?.value}

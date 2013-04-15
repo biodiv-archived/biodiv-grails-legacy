@@ -7,7 +7,7 @@
 <g:set var="entityName"
 	value="${message(code: 'project.label', default: 'Project')}" />
 <title><g:message code="default.list.label" args="[entityName]" /></title>
-<r:require modules="core" />
+<r:require modules="add_file" />
 
 <style>
 <!--
@@ -26,27 +26,26 @@
 	margin: 20px;
 }
 
+.paginateButtons {
+	margin: 3px 0px 3px 0px;
+}
 
-.paginateButtons { 
-    margin: 3px 0px 3px 0px; 
-} 
+.paginateButtons a {
+	padding: 2px 4px 2px 4px;
+	background-color: #A4A4A4;
+	border: 1px solid #EEEEEE;
+	text-decoration: none;
+	font-size: 10pt;
+	font-variant: small-caps;
+	color: #EEEEEE;
+}
 
-.paginateButtons a { 
-    padding: 2px 4px 2px 4px; 
-    background-color: #A4A4A4; 
-    border: 1px solid #EEEEEE; 
-    text-decoration: none; 
-    font-size: 10pt; 
-    font-variant: small-caps; 
-    color: #EEEEEE; 
-} 
-
-.paginateButtons a:hover { 
-    text-decoration: underline; 
-    background-color: #888888; 
-    border: 1px solid #AA4444; 
-    color: #FFFFFF; 
-} 
+.paginateButtons a:hover {
+	text-decoration: underline;
+	background-color: #888888;
+	border: 1px solid #AA4444;
+	color: #FFFFFF;
+}
 
 
 </style>
@@ -54,15 +53,15 @@
 </head>
 <body>
 	<div class="body span8" style="padding-left: 20px;">
-		<h1>
-		Western Ghats CEPF Projects
-		</h1>
+		<h1>Western Ghats CEPF Projects</h1>
 		<g:if test="${flash.message}">
 			<div class="message">
 				${flash.message}
 			</div>
 		</g:if>
-<br />
+		<br />
+		
+		<g:render template="/project/search" model="['sortBy':params.sort]"/>
 		<div class="project-list tab-content span">
 
 			<g:each in="${projectInstanceList}" status="i" var="projectInstance">
