@@ -97,8 +97,9 @@
 
 		<g:if test="${projectInstance.tags}">
 			<b>Keywords : </b>
-			
-			<g:render template="/project/showProjectTagsList" model="['projectInstance': projectInstance]"/>
+
+			<g:render template="/project/showProjectTagsList"
+				model="['projectInstance': projectInstance]" />
 
 		</g:if>
 
@@ -232,6 +233,27 @@
 								model="['uFileInstance':reportFile]" />
 						</g:each>
 					</g:if>
+				</div>
+			</div>
+		</g:if>
+
+
+		<g:if test="${projectInstance?.dataLinks}">
+
+			<div class="sidebar_section">
+				<a data-toggle="collapse" href="#data-links"><h5>Data
+						Contribution Links</h5></a>
+
+					<div id="data-links" class="speciesField collapse in">
+
+				<g:each in="${projectInstance?.dataLinks}" var="dataLink">
+				<dl class="dl-horizontal">
+					<dt> Description</dt>
+					<dd>${dataLink.description}</dd>
+					<dt>URL</dt>
+					<dd>${dataLink.url}</dd>
+					</dl>
+				</g:each>
 				</div>
 			</div>
 		</g:if>

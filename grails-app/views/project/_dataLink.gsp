@@ -16,8 +16,8 @@
 				code="project.dataLink.description.label" default="Description" /> </label>
 
 		<div class="controls">
-			<textArea rows="4" name='dataLinksList[${i}].description' class="site-name"
-				value='${dataLink?.description}' ></textArea>
+			<textArea rows="4" name='dataLinksList[${i}].description' class="description"
+				 >${dataLink?.description}</textArea>
 		</div>
 	</div>
 
@@ -26,7 +26,7 @@
 				code="project.dataLink.url.label" default="url" /> </label>
 
 		<div class="controls">
-			<g:textField name='dataLinksList[${i}].url' class="url"
+			<input type="url" name='dataLinksList[${i}].url' class="url"
 				value='${dataLink?.url}' />
 		</div>
 	</div>
