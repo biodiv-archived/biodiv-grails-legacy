@@ -144,14 +144,14 @@ class UFileService {
 		
 
 		if(params.title) {
-			filterQuery += " and ufile.name = :title "
-			queryParams["title"] = params.title
+			filterQuery += " and ufile.name like :title "
+			queryParams["title"] = '%'+params.title + '%'
 			activeFilters["title"] = params.title
 		}
 		
 		if(params.description) {
 			filterQuery += " and ufile.description like :description "
-			queryParams["description"] = params.description
+			queryParams["description"] = '%'+ params.description+'%'
 			activeFilters["description"] = params.description
 		}
 		

@@ -13,15 +13,6 @@
 			name="grantee"
 			placeholder="Search by Grantee" value="${params.grantee}"/>
 
-		<label class="control-label" for="sitename">Site Name</label> <input id="sitename"
-			data-provide="typeahead" type="text" class="input-block-level"
-			name="sitename"
-			placeholder="Search by Site Name" value="${params.sitename}"/>
-			
-					<label class="control-label" for="corridor">Corridor</label> <input id="corridor"
-			data-provide="typeahead" type="text" class="input-block-level"
-			name="corridor"
-			placeholder="Search by Corridior" value="${params.corridor}" />
 			
 					<label class="control-label" for="keywords">Keywords</label> <input id="keywords"
 			data-provide="typeahead" type="text" class="input-block-level"

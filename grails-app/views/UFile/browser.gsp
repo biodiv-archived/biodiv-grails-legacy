@@ -58,7 +58,6 @@
 						<g:sortableColumn property="description"
 							title="${message(code: 'UFile.source.label', default: 'Source')}" />
 
-
 						<g:sortableColumn property="size"
 							title="${message(code: 'UFile.file.label', default: 'File')}" />
 

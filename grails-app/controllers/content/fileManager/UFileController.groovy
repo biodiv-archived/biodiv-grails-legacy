@@ -289,5 +289,9 @@ class UFileController {
 		return [totalUFileInstanceList:totalUFileInstanceList, UFileInstanceList: UFileInstanceList, UFileInstanceTotal: count, queryParams: queryParams, activeFilters:activeFilters, total:count]
 		
 	}
+	
+	def tagcloud = {
+		render (view:"tagcloud")
+	}
 
 }

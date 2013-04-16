@@ -6,18 +6,18 @@
 		<label class="control-label" for="name">Title</label> <input id="title"
 			data-provide="typeahead" type="text" class="input-block-level"
 			name="name" 
-			placeholder="Search by File title" />
+			placeholder="Search by File title" value="${params.title}" />
 			
 		<label class="control-label" for="description">Description</label> <input id="grantee"
 			data-provide="typeahead" type="text" class="input-block-level"
 			name="description"
-			placeholder="Search in Description" />
+			placeholder="Search in Description" value="${params.description}"/>
 
 		
 					<label class="control-label" for="keywords">Keywords</label> <input id="keywords"
 			data-provide="typeahead" type="text" class="input-block-level"
 			name="keywords"
-			placeholder="Search by Keywords" />
+			placeholder="Search by Keywords" value="${params.keywords}"/>
 
 		<g:hiddenField name="offset" value="0" />
 		<g:hiddenField name="max" value="12" />
