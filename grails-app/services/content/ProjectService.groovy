@@ -109,30 +109,62 @@ class ProjectService {
 			queryParts.queryParams["offset"] = offset
 
 
-		log.debug "Project Query >>>>>>>>>"+ query
+		log.debug "Project Query >>>>>>>>>"+ query + " >>>>>params " + queryParts.queryParams
 		def projectInstanceList = Project.executeQuery(query, queryParts.queryParams)
 
 		return [projectInstanceList:projectInstanceList, queryParams:queryParts.queryParams, activeFilters:queryParts.activeFilters]
 	}
 
-
+	/**
+	 * Prepare database wuery based on paramaters
+	 * @param params
+	 * @return
+	 */
 	def getProjectsFilterQuery(params) {
 
 		def query = "select proj from Project proj "
 		def queryParams = [:]
 		def activeFilters = [:]
-		def filterQuery = ""
+		def filterQuery = "where proj.id is not NULL "  //Dummy stmt
 
 
 		if(params.tag){
 			query = "select proj from Project proj,  TagLink tagLink "
-			//TODO - append filterquery
-			filterQuery =  " where proj.id = tagLink.tagRef and tagLink.type = :tagType and tagLink.tag.name = :tag "
+			//TODO - 
+			filterQuery += " and proj.id = tagLink.tagRef and tagLink.type = :tagType and tagLink.tag.name = :tag "
 			queryParams["tag"] = params.tag
 			queryParams["tagType"] = GrailsNameUtils.getPropertyName(Project.class)
 			activeFilters["tag"] = params.tag
 		}
 
+		if(params.keywords) {
+			query = "select proj from Project proj,  TagLink tagLink "
+			//TODO - contains
+			filterQuery += " and proj.id = tagLink.tagRef and tagLink.type = :tagType and tagLink.tag.name = :keywords "
+			queryParams["keywords"] = params.tag
+			queryParams["tagType"] = GrailsNameUtils.getPropertyName(Project.class)
+			activeFilters["keywords"] = params.tag
+		}
+		
+		/*
+		if(params.sitename) {
+			query = "select proj from Project proj, Location loc "
+			
+		}
+		*/
+		if(params.title) {
+			filterQuery += " and proj.title = :title "
+			queryParams["title"] = params.title 
+			activeFilters["title"] = params.title
+		}
+		
+		if(params.grantee) {
+			filterQuery += " and proj.granteeOrganization like :grantee "
+			queryParams["grantee"] = params.grantee
+			activeFilters["grantee"] = params.grantee
+		}
+		
+		
 
 		def sortBy = params.sort ? params.sort : " lastUpdated "
 

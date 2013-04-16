@@ -1,4 +1,4 @@
-<g:if test="${sortBy=='lastUpdated'}">
+<g:if test="${params.sort=='lastUpdated'}">
 	<g:link class="pull-right"
 		url="${uGroup.createLink(controller:'project', action:'list', 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress) }?sort=granteeOrganization">
 Sort by Grantee

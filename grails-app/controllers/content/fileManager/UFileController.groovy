@@ -19,6 +19,7 @@ import org.springframework.web.multipart.commons.CommonsMultipartFile
 import org.springframework.web.multipart.MultipartFile
 import javax.servlet.http.HttpServletRequest
 import uk.co.desirableobjects.ajaxuploader.AjaxUploaderService
+import grails.util.GrailsNameUtils
 
 import speciespage.ObservationService
 import species.utils.Utils
@@ -36,13 +37,21 @@ class UFileController {
     }
 
     def list = {
-        params.max = Math.min(params.max ? params.int('max') : 10, 100)
-        [UFileInstanceList: UFile.list(params), UFileInstanceTotal: UFile.count()]
+		
+		log.debug params
+		
+		def model = getUFileList(params)
+		render (view:"list", model:model)
+		return;
+
     }
 
 	def browser = {
-		params.max = Math.min(params.max ? params.int('max') : 10, 100)
-		[UFileInstanceList: UFile.list(params), UFileInstanceTotal: UFile.count()]
+		log.debug params
+		
+		def model = getUFileList(params)
+		render (view:"browser", model:model)
+		return;
 	}
 	
 	def fm = {
@@ -265,5 +274,20 @@ class UFileController {
 		}
 	}
 
+	protected def getUFileList(params) {
+		
+		def max = Math.min(params.max ? params.int('max') : 12, 100)
+		def offset = params.offset ? params.int('offset') : 0
+		def filteredUFile = uFileService.getFilteredUFiles(params, max, offset)
+		def UFileInstanceList = filteredUFile.UFileInstanceList
+		def queryParams = filteredUFile.queryParams
+		def activeFilters = filteredUFile.activeFilters
+		
+		def totalUFileInstanceList = uFileService.getFilteredUFiles(params, -1, -1).UFileInstanceList
+		def count = totalUFileInstanceList.size()
+		
+		return [totalUFileInstanceList:totalUFileInstanceList, UFileInstanceList: UFileInstanceList, UFileInstanceTotal: count, queryParams: queryParams, activeFilters:activeFilters, total:count]
+		
+	}
 
 }

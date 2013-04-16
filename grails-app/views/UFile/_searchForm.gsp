@@ -1,7 +1,7 @@
 <div  class="block-tagadelic ">
 
 	<form id="search-ufiles" method="get"  title="Search"
-		action="${uGroup.createLink(controller:'UFile', action:'search') }"
+		action="${uGroup.createLink(controller:'UFile', action:'browser') }"
 		class="searchbox">
 		<label class="control-label" for="name">Title</label> <input id="title"
 			data-provide="typeahead" type="text" class="input-block-level"

@@ -61,7 +61,7 @@
 		</g:if>
 		<br />
 		
-		<g:render template="/project/search" model="['sortBy':params.sort]"/>
+		<g:render template="/project/search" model="['params':params]"/>
 		<div class="project-list tab-content span">
 
 			<g:each in="${projectInstanceList}" status="i" var="projectInstance">

@@ -4,6 +4,8 @@ import content.fileManager.UFileService
 import grails.converters.JSON
 import content.Location
 import grails.plugins.springsecurity.Secured
+import org.grails.taggable.Taggable
+import content.fileManager.UFile
 
 
 
@@ -162,6 +164,11 @@ class ProjectController {
 		render (view:"tagcloud")
 	}
 	
+	/**
+	 * From the params passed filter teh projects and pass the model for view
+	 * @param params
+	 * @return
+	 */
 	protected def getProjectList(params) {
 		def max = Math.min(params.max ? params.int('max') : 12, 100)
 		def offset = params.offset ? params.int('offset') : 0

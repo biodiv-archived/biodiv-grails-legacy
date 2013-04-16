@@ -46,7 +46,7 @@
 
 
 		<div class="project-list tab-content span8">
-		<g:render template="/UFile/search" />
+		<g:render template="/UFile/search" model="['params':params]"/>
 
 			<table class="table table-hover">
 				<thead>
