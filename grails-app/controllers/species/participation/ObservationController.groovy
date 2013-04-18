@@ -785,7 +785,7 @@ class ObservationController {
 				relatedObv.observations = observationService.createUrlList2(relatedObv.observations);
 		} else {
 		}
-		println relatedObv
+		//println relatedObv
 		render relatedObv as JSON
 	}
 

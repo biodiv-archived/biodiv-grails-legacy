@@ -153,6 +153,10 @@ class ObservationService {
 
 
 	List getRelatedObservation(String property, long obvId, int limit, long offset){
+		if(!property){
+			return []
+		}
+		
 		def propertyValue = Observation.read(obvId)[property]
 		def query = "from Observation as obv where obv." + property + " = :propertyValue and obv.id != :parentObvId and obv.isDeleted = :isDeleted order by obv.createdOn desc"
 		def obvs = Observation.findAll(query, [propertyValue:propertyValue, parentObvId:obvId, max:limit, offset:offset, isDeleted:false])
