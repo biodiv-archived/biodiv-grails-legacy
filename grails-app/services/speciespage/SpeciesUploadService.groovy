@@ -42,7 +42,7 @@ import org.apache.log4j.FileAppender;
 
 class SpeciesUploadService {
 
-    private def log = LogFactory.getLog(this);
+    private static def log = LogFactory.getLog(this);
     private FileAppender fa;
 
 	static transactional = false

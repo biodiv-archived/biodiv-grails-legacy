@@ -41,7 +41,7 @@ class XMLConverter extends SourceConverter {
 
 
     //protected static SourceConverter instance;
-    private def log = LogFactory.getLog(this);
+    private static def log = LogFactory.getLog(this);
     def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
     def fieldsConfig = config.speciesPortal.fields
     NamesParser namesParser;
