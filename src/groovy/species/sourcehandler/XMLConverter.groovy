@@ -326,12 +326,12 @@ class XMLConverter extends SourceConverter {
                     for(sField in temp) {
 
                     //HACK for deleting keystone fields with different content and contributor 
-                    if(dt.equals(sField.description.replaceAll("</?p>",""))) {
+                    /*if(dt.equals(sField.description.replaceAll("</?p>",""))) {
                         println "Deleting same description field"
                         s.removeFromFields(sField);
                         sField.delete();
 
-                    } else if(sField.description.contains(dt)){
+                    } else */if(sField.description.contains(dt)){
                         log.debug "Field already contains given text"
                     } else {
                         log.debug "Merging description from existing ${sField}. Removing all metadata associate with previous field."
@@ -343,13 +343,13 @@ class XMLConverter extends SourceConverter {
                     for(sField in temp) {
 
                         //HACK for deleting keystone fields with different content and contributor 
-                        if(!dt.equals(sField.description.replaceAll("</?p>",""))) {
+                        /*if(!dt.equals(sField.description.replaceAll("</?p>",""))) {
                             println "Deleting different description field & retaining new description field"
                             s.removeFromFields(sField);
                             sField.delete()
-                        } else {
+                        } else {*/
                             speciesField = sField
-                        }
+                       // }
                     }
                 }
 
@@ -360,12 +360,12 @@ class XMLConverter extends SourceConverter {
                 log.debug "Overwriting existing ${speciesField}. Removing all metadata associate with previous field."
                 speciesField.description = data;
                 //TODO: Will have to clean up orphaned entries from following tables
-                speciesField.contributors.clear()
-                speciesField.licenses.clear()
-                speciesField.audienceTypes.clear()
-                speciesField.attributors.clear()
-                speciesField.resources.clear()
-                speciesField.references.clear()
+                speciesField.contributors?.clear()
+                speciesField.licenses?.clear()
+                speciesField.audienceTypes?.clear()
+                speciesField.attributors?.clear()
+                speciesField.resources?.clear()
+                speciesField.references?.clear()
             }
 
             if(speciesField && contributors) {
@@ -408,7 +408,7 @@ class XMLConverter extends SourceConverter {
         * Resetting contributor back to the fields contributors.
         * TODO: need to remove
         **/
-        for(c1 in sField.contributors) {
+        i/*for(c1 in sField.contributors) {
             if((c1.name.equals("dummy")||c1.name.equals("pearlsravanthi"))) {
                 println 'is dummy node'
                 println sField.description
@@ -424,6 +424,7 @@ class XMLConverter extends SourceConverter {
                 }
             }
         }
+
         //HACK .. contributors shd never be empty
         def desc = sField.description.replaceAll("</?p>","");
         if(sField.contributors.isEmpty() && desc.equals(data)) {
@@ -431,7 +432,7 @@ class XMLConverter extends SourceConverter {
             contributors.each { sField.addToContributors(it); }
             sField.save();
             return true;
-        }
+        }*/
         return false;
     }
 

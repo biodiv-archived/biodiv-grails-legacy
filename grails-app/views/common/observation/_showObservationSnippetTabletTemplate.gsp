@@ -8,7 +8,6 @@ if(mainImage.type == ResourceType.IMAGE) {
 	imagePath = g.createLinkTo(base:path,	file: '')
 }
 %>
-
 <div class="snippet tablet">
 
 	<div class="figure" style="height:150px;"
