@@ -638,9 +638,7 @@ $(document).ready(function(){
 			
 <g:javascript>
 $(document).ready(function() {
-	window.params = {
-		 carousel:{maxHeight:150, maxWidth:210}
-	}
+	window.params.carousel = {maxHeight:150, maxWidth:210}
 });
 </g:javascript>	
 

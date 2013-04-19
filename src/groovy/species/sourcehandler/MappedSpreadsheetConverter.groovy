@@ -9,27 +9,21 @@ import org.apache.commons.logging.LogFactory;
 
 import species.Species;
 import species.formatReader.SpreadsheetReader;
+import org.apache.log4j.Logger; 
+import org.apache.log4j.FileAppender;
 
 class MappedSpreadsheetConverter extends SourceConverter {
 
-	protected static SourceConverter _instance;
-	private static final log = LogFactory.getLog(this);
+	//protected static SourceConverter _instance;
+	private def log = LogFactory.getLog(this);
 	def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 	def fieldsConfig = config.speciesPortal.fields
 	
 	public List<Map> imagesMetaData;
 	public List<Map> mappingConfig;
 	
-	private MappedSpreadsheetConverter() {
+	public MappedSpreadsheetConverter() {
 		imagesMetaData = [];		
-	}
-
-	//should be synchronized
-	public static MappedSpreadsheetConverter getInstance() {
-		if(!_instance) {
-			_instance = new MappedSpreadsheetConverter();
-		}
-		return _instance;
 	}
 
 	public List<Species> convertSpecies(String file, String mappingFile, int mappingSheetNo, int mappingHeaderRowNo, int contentSheetNo, int contentHeaderRowNo, int imageMetaDataSheetNo) {
@@ -226,6 +220,15 @@ class MappedSpreadsheetConverter extends SourceConverter {
 				}
 			}
 		}
+		
+		String customFormat = mappedField.get("content format");
+		if(customFormat) {
+		def format = getCustomFormat(customFormat);
+		String action = format.get("action") ?:null;
+		if(action) {
+			new Node(data, "action", action);
+		}
+		}
 	}
 
 	private Map getCustomFormat(String customFormat) {
@@ -400,4 +403,12 @@ class MappedSpreadsheetConverter extends SourceConverter {
 			}
 		}
 	}
+
+    void setLogAppender(FileAppender fa) {
+        if(fa) {
+            Logger LOG = Logger.getLogger(this.class);
+            LOG.addAppender(fa);
+        }
+    }
+
 }

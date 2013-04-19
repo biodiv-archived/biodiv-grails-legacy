@@ -142,10 +142,5 @@
 			
 			</div>
 	</div>	
-	<g:javascript>
-	$(document).ready(function(){
-		window.params = {};
-	});
-	</g:javascript>
 </body>
 </html>

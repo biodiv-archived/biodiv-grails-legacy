@@ -13,8 +13,8 @@ alias gra='git remote add'
 alias grr='git remote rm'
 alias gpu='git pull'
 alias gcl='git clone'
-alias ra='cd ~/git/biodiv; grails run-app ~/git/biodiv > ~/Desktop/op.txt &'
+alias ra='cd ~/git/biodiv; grails run-app ~/git/biodiv &> ~/Desktop/op.txt &'
 _run-script () {  
-    cd ~/git/biodiv; grails run-script ~/git/biodiv/userscripts/$1.groovy > ~/Desktop/op1.txt &
+    cd ~/git/biodiv; grails run-script ~/git/biodiv/userscripts/$1.groovy &> ~/Desktop/op1.txt &
 }
 alias rs=_run-script

@@ -22,15 +22,15 @@
 
 	<g:javascript>
 		$(document).ready(function(){
-			window.params = {
+			def p = {
 			<%
 				params.each { key, value ->
 					println '"'+key+'":"'+value+'",'
 				}
 			%>
 				"tagsLink":"${g.createLink(action: 'tags')}",
-				"queryParamsMax":"${params.queryParams?.max}"
-			}
+                        }
+                        jQuery.extend(window.params, p);
 		});
 	</g:javascript>
 	<r:script>

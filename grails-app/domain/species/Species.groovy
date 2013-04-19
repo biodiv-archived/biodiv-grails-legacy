@@ -15,7 +15,7 @@ import species.participation.Follow;
 
 class Species {
 
-	String title; 
+	String title;
 	String guid; 
 	TaxonomyDefinition taxonConcept;
 	Resource reprImage;

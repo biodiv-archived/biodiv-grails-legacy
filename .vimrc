@@ -8,6 +8,10 @@ filetype plugin indent on
 set wildignore+=*.class,.git,.hg,.svn,target/**
 set runtimepath^=~/.vim/bundle/ctrlp.vim
 
+"Bash doesn’t load your .bashrc unless it’s interactive. Use
+"to make Vim’s :! shell behave like your command prompt
+set shellcmdflag=-ic
+
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Files, backups and undo
 " """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
