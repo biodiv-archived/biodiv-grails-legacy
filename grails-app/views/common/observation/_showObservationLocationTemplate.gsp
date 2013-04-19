@@ -4,13 +4,15 @@
 	<div id="map_canvas_${observationInstance.id}" style="height: 170px;"></div>
 	<div class="prop">
 		<span class="name"><i class="icon-map-marker"> </i>Place name</span>
-		<div class="value">
 			<g:if test="${observationInstance.placeName != ''}">
-				${observationInstance.placeName}
+                            <g:set var="location" value="${observationInstance.placeName}"/>
 			</g:if>
 			<g:else>
-				${observationInstance.reverseGeocodedName}
+			    <g:set var="location" value="${observationInstance.reverseGeocodedName}"/>
 			</g:else>
+                    
+                        <div class="value ellipsis" title="${location}">
+                    ${location}
 		</div>
 	</div>
 
