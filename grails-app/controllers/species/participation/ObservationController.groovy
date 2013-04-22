@@ -105,8 +105,8 @@ class ObservationController {
 		//storing this filtered obvs ids list in session for next and prev links
 		//http://grepcode.com/file/repo1.maven.org/maven2/org.codehaus.groovy/groovy-all/1.8.2/org/codehaus/groovy/runtime/DefaultGroovyMethods.java
 		//returns an arraylist and invalidates prev listing result
-		if(params.append?.toBoolean()) {
-			session["obv_ids_list"].addAll(observationInstanceList.collect {it.id});
+		if(params.append?.toBoolean() && session["obv_ids_list"]) {
+    		session["obv_ids_list"].addAll(observationInstanceList.collect {it.id});
 		} else {
 			session["obv_ids_list_params"] = params.clone();
 			session["obv_ids_list"] = observationInstanceList.collect {it.id};
@@ -1122,7 +1122,7 @@ class ObservationController {
 
 		def model = observationService.getObservationsFromSearch(params);
 		
-		if(params.append) {
+		if(params.append?.toBoolean() && session["obv_ids_list"]) {
 			session["obv_ids_list"].addAll(model.totalObservationIdList);
 		} else {
 			session["obv_ids_list_params"] = params.clone();

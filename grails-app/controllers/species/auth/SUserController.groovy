@@ -1,5 +1,6 @@
 package species.auth
 
+import groovy.sql.Sql;
 import grails.converters.JSON
 import grails.plugins.springsecurity.Secured;
 import grails.plugins.springsecurity.ui.AbstractS2UiController;
@@ -36,6 +37,7 @@ class SUserController extends UserController {
 	def SUserService;
 	def userGroupService;
 	def saltSource;
+    def dataSource;
 
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
@@ -624,14 +626,22 @@ class SUserController extends UserController {
 			}else{
 				recommendationVoteList = observationService.getRecommendationsOfUser(userInstance, params.max, params.offset);
 			}
-			processResult(recommendationVoteList, params)
+
+            def uniqueVotes = observationService.getAllRecommendationsOfUser(userInstance);
+			processResult(recommendationVoteList, uniqueVotes, params)
 			return
 		}
 		else {
-			response.setStatus(500)
-			def message = ['error':g.message(code: 'error', default:'Error while processing the request.')]
+			//response.setStatus(500)
+			def message = ['status':'error', 'msg':g.message(code: 'error', default:'Error while processing the request.')]
 			render message as JSON
 		}
+	}
+
+    def getRecommendationCount(userInstance){
+		Sql sql =  Sql.newInstance(dataSource);
+		def result = sql.rows("select count(distinct(recoVote.recommendation_id)) from recommendation_vote as recoVote where recoVote.author_id = :userId", [userId:userInstance?.id])
+		return result[0]["count"]
 	}
 
 	@Secured(['ROLE_USER'])
@@ -791,9 +801,9 @@ class SUserController extends UserController {
 		return resource;
 	}
 
-	private processResult(List recommendationVoteList, Map params) {
-		try {
-			if(recommendationVoteList.size() > 0) {
+	private processResult(List  recommendationVoteList, Long uniqueVotes, Map params) {
+		try { 
+			if (recommendationVoteList.size() > 0) {
 				def result = [];
 				recommendationVoteList.each { recoVote ->
 					def map = recoVote.recommendation.getRecommendationDetails(recoVote.observation);
@@ -809,30 +819,31 @@ class SUserController extends UserController {
 					result.add(map);
 				}
 				//def noOfVotes = observationService.getAllRecommendationsOfUser(userInstance);
-				def model = ['hideAgree':true, 'result':result, 'totalVotes':result.size(), 'uniqueVotes':result.size(), 'userGroupWebaddress':params.webaddress];
+				def model = ['hideAgree':true, 'result':result, 'totalVotes':result.size(), 'uniqueVotes':uniqueVotes, 'userGroupWebaddress':params.webaddress];
 				def html = g.render(template:"/common/observation/showObservationRecosTemplate", model:model);
 				def r = [
-							success : 'true',
+							status : 'success',
 							uniqueVotes:model.uniqueVotes,
 							recoHtml:html,
-							recoVoteMsg:params.recoVoteMsg]
+							msg:params.recoVoteMsg]
 				render r as JSON
 				return
 			} else {
-				response.setStatus(500);
+				//response.setStatus(500);
 				def message = "";
 				if(params.offset > 0) {
-					message = [info: g.message(code: 'user.recommendations.nomore.message', default:'No more recommendations made.')];
+					message = g.message(code: 'user.recommendations.nomore.message', default:'No more recommendations made.');
 				} else {
-					message = [info:g.message(code: 'user.recommendations.zero.message', default:'No recommendations made.')];
+					message = g.message(code: 'user.recommendations.zero.message', default:'No recommendations made.');
 				}
-				render message as JSON
+                def r = ['status':'info', 'msg':message];
+				render r as JSON
 				return
 			}
 		} catch(e){
 			e.printStackTrace();
-			response.setStatus(500);
-			def message = ['error' : g.message(code: 'error', default:'Error while processing the request.')];
+			//response.setStatus(500);
+			def message = ['status':'error', 'msg':g.message(code: 'error', default:'Error while processing the request.')];
 			render message as JSON
 		}
 	}

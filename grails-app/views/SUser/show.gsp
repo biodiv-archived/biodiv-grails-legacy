@@ -154,7 +154,7 @@
 							model="['user':user]" /> </span> Observations
 				</h5>
 				<obv:showRelatedStory
-					model="['controller':'observation', 'action':'getRelatedObservation', 'filterProperty': 'user', 'filterPropertyValue':user.id, 'id':'a', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress]" />
+					model="['controller':'observation', 'action':'getRelatedObservation', 'filterProperty': 'user', 'filterPropertyValue':user.id, 'id':'user', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress]" />
 			</div>
 
 			<div class="section" style="clear: both;">
@@ -212,18 +212,26 @@
 			window.location.href = "${uGroup.createLink(controller:'observation', action: 'list', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}?tag=" + tg ;
 	    	return false;
 	 	});
-	 	
-      	var max =  3;
+            var max = 3;
+	    $("#seeMore").click(function(){
+                preLoadRecos(max, userRecoffset, true);
+                userRecoffset = max + userRecoffset;
+            });
+
+            preLoadRecos(max, userRecoffset, false);
+            userRecoffset = max + userRecoffset;
+            $('.linktext').linkify();
+	});
+	
+  /*    	var max =  3;
          $("#seeMore").click(function() {   
          	preLoadRecos(max, true);
          	userRecoffset = max + userRecoffset;
 		 });
          
          preLoadRecos(max, true);
-         userRecoffset = max + userRecoffset;
-         $('.linktext').linkify();
-	});
-	   function preLoadRecos(max, seeAllClicked, obvId, liComponent){
+         userRecoffset = max + userRecoffset;*/
+/*	   function preLoadRecos(max, seeAllClicked, obvId, liComponent){
          	$("#seeMoreMessage").hide();        	
          	$.ajax({
          		url: "${uGroup.createLink(controller:params.controller, action:'getRecommendationVotes', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress, id:user.id) }",
@@ -257,9 +265,14 @@
 			   	}
 			});
          }
-	
+*/	
          
 </r:script>
+<g:javascript>
+$(document).ready(function(){
+    window.params.observation.getRecommendationVotesURL = "${uGroup.createLink(controller:'SUser', action:'getRecommendationVotes', id:user.id, userGroupWebaddress:params.webaddress) }";
+});
+</g:javascript>
 </body>
 
 </html>

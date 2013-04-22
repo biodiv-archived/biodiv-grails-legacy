@@ -354,14 +354,7 @@ if(r && thumbnail) {
 	        window.location.href = "${uGroup.createLink(controller:'observation', action: 'list')}?tag=" + tg ;
 	     });
          
-       
-         
-         $("#seeMore").click(function(){
-         	preLoadRecos(-1, hide);
-		 });
-         
-         preLoadRecos(3, false);
-         
+               
      	$('#addRecommendation').bind('submit', function(event) {
      		$(this).ajaxSubmit({ 
 	         	url:"${uGroup.createLink(controller:'observation', action:'addRecommendationVote')}",
@@ -455,39 +448,20 @@ if(r && thumbnail) {
 		$(".nav a.disabled").click(function() {
 			return false;
 		})
+
+                $("#seeMore").click(function(){
+                    preLoadRecos(-1, 3, true);
+                });
+
+                preLoadRecos(3, 0, false);
+
 	});
-	  function preLoadRecos(max, seeAllClicked){
-	  		$("#seeMoreMessage").hide();
-         	$("#seeMore").hide();
-         	
-        	$.ajax({
-         		url: "${uGroup.createLink(controller:'observation', action:'getRecommendationVotes', id:observationInstance.id) }",
-				method: "POST",
-				dataType: "json",
-				data: {max:max , offset:0, 'webaddress':"${userGroup?userGroup.webaddress:userGroupWebaddress}"},	
-				success: function(data) {
-					if(data.status == 'success') {
-						showRecos(data, null);
-						//$("#recoSummary").html(data.recoHtml);
-						var uniqueVotes = parseInt(data.uniqueVotes);
-						if(uniqueVotes > 3 && !seeAllClicked){
-							$("#seeMore").show();
-						} else {
-							$("#seeMore").hide();
-						}
-						showRecoUpdateStatus(data.msg, data.status);
-					} else {
-						showRecoUpdateStatus(data.msg, data.status);
-					}
-				}, error: function(xhr, status, error) {
-	    			handleError(xhr, status, error, undefined, function() {
-		    			var msg = $.parseJSON(xhr.responseText);
-		    			showRecoUpdateStatus(msg.msg, msg.status);
-					});
-			   	}
-			});
-         }
 </r:script>
+<g:javascript>
+$(document).ready(function(){
+    window.params.observation.getRecommendationVotesURL = "${uGroup.createLink(controller:'observation', action:'getRecommendationVotes', id:observationInstance.id, userGroupWebaddress:params.webaddress) }";
+});
+</g:javascript>
 
 </body>
 </html>

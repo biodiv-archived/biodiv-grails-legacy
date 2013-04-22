@@ -1,10 +1,15 @@
 function showRecos(data, textStatus) {
-	$('#recoSummary').html(data.recoHtml);
+        if(textStatus && textStatus == 'append')
+        	$('#recoSummary').append(data.recoHtml);
+        else
+        	$('#recoSummary').html(data.recoHtml);
 	var speciesName =  data.speciesName;
 	$('.species_title').replaceWith(data.speciesNameTemplate);
 	$('.page-header .species-page-link').hide();
 	$('.species-external-link').replaceWith(data.speciesExternalLinkHtml);
-	reloadCarousel($('#carousel_a').data('jcarousel'), 'speciesName', speciesName);
+        if($('#carousel_a').length > 0) {
+    	    reloadCarousel($('#carousel_a').data('jcarousel'), 'speciesName', speciesName);
+        }
 	showRecoUpdateStatus(data.msg, data.status);
 }
 
@@ -104,3 +109,39 @@ function removeRecoVote(obvId, recoId, url){
 	});
 	
 }
+
+function preLoadRecos(max, offset, seeAllClicked) {
+    $("#seeMoreMessage").hide();
+    $("#seeMore").hide();
+
+    $.ajax({
+        url: window.params.observation.getRecommendationVotesURL,
+        method: "POST",
+        dataType: "json",
+        data: {max:max , offset:offset},	
+        success: function(data) {
+            if(data.status == 'success') {
+                if(offset>0)
+                    showRecos(data, 'append');
+                else
+                    showRecos(data, null);
+                //$("#recoSummary").html(data.recoHtml);
+                var uniqueVotes = parseInt(data.uniqueVotes);
+                if(uniqueVotes > offset+max){
+                    $("#seeMore").show();
+                } else {
+                    $("#seeMore").hide();
+                }
+                showRecoUpdateStatus(data.msg, data.status);
+            } else {
+                showRecoUpdateStatus(data.msg, data.status);
+            }
+        }, error: function(xhr, status, error) {
+            handleError(xhr, status, error, undefined, function() {
+                var msg = $.parseJSON(xhr.responseText);
+                showRecoUpdateStatus(msg.msg, msg.status);
+            });
+        }
+    });
+}
+ 

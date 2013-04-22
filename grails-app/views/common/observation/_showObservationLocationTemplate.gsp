@@ -11,7 +11,7 @@
 			    <g:set var="location" value="${observationInstance.reverseGeocodedName}"/>
 			</g:else>
                     
-                        <div class="value ellipsis" title="${location}">
+                        <div class="value ellipsis multiline" title="${location}">
                     ${location}
 		</div>
 	</div>
