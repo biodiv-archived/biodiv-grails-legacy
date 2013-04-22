@@ -155,10 +155,42 @@ class ProjectController {
 		render (corridorsFound as JSON)
 	}
 
+	/**
+	 *
+	 */
 	def search = {
+		log.debug params;
+		def model = projectService.search(params)
+		model['isSearch'] = true;
 		
-		[projectInstanceList: Project.list(params), projectInstanceTotal: Project.count()]		
+		if(params.loadMore?.toBoolean()){
+			params.remove('isGalleryUpdate');
+			render(template:"/species/searchResultsTemplate", model:model);
+			return;
+		} else if(!params.isGalleryUpdate?.toBoolean()){
+			params.remove('isGalleryUpdate');
+			render (view:"search", model:model)
+			return;
+		} else {
+			params.remove('isGalleryUpdate');
+			def obvListHtml =  g.render(template:"/species/searchResultsTemplate", model:model);
+			model.resultType = "project"
+			def obvFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
+
+			def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml]
+			
+			render (result as JSON)
+			return;
+		}
 	}
+	
+	def terms = {
+		log.debug params;
+		params.field = params.field?params.field.replace('aq.',''):"autocomplete";
+		List result = projectService.nameTerms(params)
+		render result.value as JSON;
+	}
+
 	
 	def tagcloud = {
 		render (view:"tagcloud")

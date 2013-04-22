@@ -46,8 +46,6 @@
 	border: 1px solid #AA4444;
 	color: #FFFFFF;
 }
-
-
 </style>
 
 </head>
@@ -60,21 +58,24 @@
 			</div>
 		</g:if>
 		<br />
-		
-		<g:render template="/project/search" model="['params':params]"/>
-		<div class="project-list tab-content span">
 
-			<g:each in="${projectInstanceList}" status="i" var="projectInstance">
-				<div class="${(i % 2) == 0 ? 'odd' : 'even'} item">
-					<project:projectListItem
-						model="['projectInstance':projectInstance, 'pos':i]" />
+		<g:render template="/project/search" model="['params':params]" />
+
+		<div class="observations_list" style="clear: both; top: 0px;">
+			<div class="project-list tab-content span">
+
+				<g:each in="${projectInstanceList}" status="i" var="projectInstance">
+					<div class="${(i % 2) == 0 ? 'odd' : 'even'} item">
+						<project:projectListItem
+							model="['projectInstance':projectInstance, 'pos':i]" />
+					</div>
+
+				</g:each>
+
+
+				<div class="paginateButtons">
+					<g:paginate total="${projectInstanceTotal}" />
 				</div>
-
-			</g:each>
-
-
-			<div class="paginateButtons">
-				<g:paginate total="${projectInstanceTotal}" />
 			</div>
 		</div>
 	</div>

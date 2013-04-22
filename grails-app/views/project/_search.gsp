@@ -21,7 +21,7 @@ Sort by most recent update
 		</h5> </a>
 	<div id="searchBox" class="collapse"
 		style="height: 0px; overflow: hidden;">
-		<g:render template="/project/searchForm" />
+		<g:render template="/project/aqSearchForm" />
 	</div>
 
 </div>

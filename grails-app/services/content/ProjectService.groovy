@@ -8,6 +8,7 @@ import grails.util.GrailsNameUtils
 import org.apache.solr.common.SolrException;
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap;
 import org.apache.solr.common.util.NamedList;
+import species.utils.Utils;
 
 
 
@@ -18,6 +19,10 @@ import content.fileManager.UFileService
 class ProjectService {
 
 	static transactional = false
+	def grailsApplication;
+	
+	def projectSearchService
+	
 	UFileService uFileService = new UFileService()
 
 	def createProject(params) {
@@ -120,7 +125,7 @@ class ProjectService {
 	}
 
 	/**
-	 * Prepare database wuery based on paramaters
+	 * Prepare database query based on parameters
 	 * @param params
 	 * @return
 	 */
@@ -185,40 +190,39 @@ class ProjectService {
 
 
 	
-	def getProjectsFromSearch(params) {
-		def max = Math.min(params.max ? params.max.toInteger() : 12, 100)
-		def offset = params.offset ? params.offset.toLong() : 0
- 
-		def model;
-		
-		try {
-			model = getFilteredProjectsFromSearch(params, max, offset);
-		} catch(SolrException e) {
-			e.printStackTrace();
-		}
-		return model;
-	}
-	
-	
-	Map getFilteredProjectsFromSearch(params, max, offset){
-		def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields
+	def nameTerms(params) {
+		List result = new ArrayList();
 
+		def queryResponse = projectSearchService.terms(params.term, params.field, params.max);
+		NamedList tags = (NamedList) ((NamedList)queryResponse.getResponse().terms)[params.field];
+		for (Iterator iterator = tags.iterator(); iterator.hasNext();) {
+			Map.Entry tag = (Map.Entry) iterator.next();
+			result.add([value:tag.getKey().toString(), label:tag.getKey().toString(),  "category":"Project Pages"]);
+		}
+		return result;
+	}
+
+	
+	/**
+	 * 
+	 * @param params
+	 * @return
+	 */
+	def search(params) {
+		def result;
+		def searchFieldsConfig = grailsApplication.config.speciesPortal.searchFields
 		def queryParams = [:]
-		
 		def activeFilters = [:]
-		
-		
+
 		NamedList paramsList = new NamedList();
-		
-		//params.userName = springSecurityService.currentUser.username;
 		queryParams["query"] = params.query
 		activeFilters["query"] = params.query
 		params.query = params.query ?: "";
-		
+
 		String aq = "";
 		int i=0;
-		if(params.aq instanceof GrailsParameterMap || params.aq instanceof Map) {
-			
+		if(params.aq instanceof GrailsParameterMap) {
+			println '-----------------'
 			params.aq.each { key, value ->
 				queryParams["aq."+key] = value;
 				activeFilters["aq."+key] = value;
@@ -231,44 +235,34 @@ class ProjectService {
 				}
 			}
 		}
-
-		
 		if(params.query && aq) {
 			params.query = params.query + " AND "+aq
 		} else if (aq) {
 			params.query = aq;
 		}
-		
-	
+
+		def offset = params.offset ? params.long('offset') : 0
+
 		paramsList.add('q', Utils.cleanSearchQuery(params.query));
-		//options
 		paramsList.add('start', offset);
+		def max = Math.min(params.max ? params.int('max') : 12, 100)
 		paramsList.add('rows', max);
 		params['sort'] = params['sort']?:"score"
 		String sort = params['sort'].toLowerCase();
 		if(isValidSortParam(sort)) {
-			if(sort.indexOf(' desc') == -1) {
+			if(sort.indexOf(' desc') == -1 && sort.indexOf(' asc') == -1 ) {
 				sort += " desc";
 			}
 			paramsList.add('sort', sort);
 		}
-		
+		queryParams["max"] = max
+		queryParams["offset"] = offset
+
 		paramsList.add('fl', params['fl']?:"id");
-		
-		//Facets
-		params["facet.field"] = params["facet.field"] ?: searchFieldsConfig.TAG;
-		paramsList.add('facet.field', params["facet.field"]);
-		paramsList.add('facet', "true");
-		params["facet.limit"] = params["facet.limit"] ?: 50;
-		paramsList.add('facet.limit', params["facet.limit"]);
-		params["facet.offset"] = params["facet.offset"] ?: 0;
-		paramsList.add('facet.offset', params["facet.offset"]);
-		paramsList.add('facet.mincount', "1");
-		
-		//Filters
+/*
 		if(params.sGroup) {
 			params.sGroup = params.sGroup.toLong()
-			def groupId = getSpeciesGroupIds(params.sGroup)
+			def groupId = observationService.getSpeciesGroupIds(params.sGroup)
 			if(!groupId){
 				log.debug("No groups for id " + params.sGroup)
 			} else{
@@ -277,48 +271,19 @@ class ProjectService {
 				activeFilters["sGroup"] = groupId
 			}
 		}
-		
-		if(params.habitat && (params.habitat != Habitat.findByName(grailsApplication.config.speciesPortal.group.ALL).id)){
-			paramsList.add('fq', searchFieldsConfig.HABITAT+":"+params.habitat);
-			queryParams["habitat"] = params.habitat
-			activeFilters["habitat"] = params.habitat
-		}
-		if(params.tag) {
-			paramsList.add('fq', searchFieldsConfig.TAG+":"+params.tag);
-			queryParams["tag"] = params.tag
-			queryParams["tagType"] = 'observation'
-			activeFilters["tag"] = params.tag
-		}
-		if(params.user){
-			paramsList.add('fq', searchFieldsConfig.USER+":"+params.user);
-			queryParams["user"] = params.user.toLong()
-			activeFilters["user"] = params.user.toLong()
-		}
-		if(params.name && (params.name != grailsApplication.config.speciesPortal.group.ALL)) {
-			paramsList.add('fq', searchFieldsConfig.MAX_VOTED_SPECIES_NAME+":"+params.name);
+*/
+		if(params.name) {
+			paramsList.add('fq', searchFieldsConfig.NAME+":"+params.name);
 			queryParams["name"] = params.name
 			activeFilters["name"] = params.name
 		}
-		if(params.isFlagged && params.isFlagged.toBoolean()){
-			paramsList.add('fq', searchFieldsConfig.ISFLAGGED+":"+params.isFlagged.toBoolean());
-			activeFilters["isFlagged"] = params.isFlagged.toBoolean()
-		}
-
-		if(params.bounds){
-			def bounds = params.bounds.split(",")
-			 def swLat = bounds[0]
-			 def swLon = bounds[1]
-			 def neLat = bounds[2]
-			 def neLon = bounds[3]
-			 paramsList.add('fq', searchFieldsConfig.LATLONG+":["+swLat+","+swLon+" TO "+neLat+","+neLon+"]");
-			 activeFilters["bounds"] = params.bounds
-		}
-		
+/*
 		if(params.uGroup) {
 			if(params.uGroup == "THIS_GROUP") {
 				String uGroup = params.webaddress
 				if(uGroup) {
-					paramsList.add('fq', searchFieldsConfig.USER_GROUP_WEBADDRESS+":"+uGroup);
+					//AS we dont have selecting species for group ... we are ignoring this filter
+					//paramsList.add('fq', searchFieldsConfig.USER_GROUP_WEBADDRESS+":"+uGroup);
 				}
 				queryParams["uGroup"] = params.uGroup
 				activeFilters["uGroup"] = params.uGroup
@@ -327,49 +292,41 @@ class ProjectService {
 				activeFilters["uGroup"] = "ALL"
 			}
 		}
-		log.debug "Along with faceting params : "+paramsList;
-		
-		if(isMapView) {
-			//query = mapViewQuery + filterQuery + orderByClause
-		} else {
-			//query += filterQuery + orderByClause
-			queryParams["max"] = max
-			queryParams["offset"] = offset
-		}
 
-		List<Project> instanceList = new ArrayList<Project>();
-		def totalObservationIdList = [];
-		def facetResults = [:], responseHeader
-		long noOfResults = 0;
-		if(paramsList.get('q')) {
-			def queryResponse = observationsSearchService.search(paramsList);
-			
+		if(params.query && params.startsWith && params.startsWith != "A-Z"){
+			params.query = params.query + " AND "+searchFieldsConfig.TITLE+":"+params.startsWith+"*"
+			//paramsList.add('fq', searchFieldsConfig.TITLE+":"+params.startsWith+"*");
+			queryParams["startsWith"] = params.startsWith
+			activeFilters["startsWith"] = params.startsWith
+		}
+		*/
+		log.debug "Along with faceting params : "+paramsList;
+		try {
+			def queryResponse = projectSearchService.search(paramsList);
+			List<Project> projectInstanceList = new ArrayList<Project>();
 			Iterator iter = queryResponse.getResults().listIterator();
 			while(iter.hasNext()) {
 				def doc = iter.next();
-				def instance = Observation.read(Long.parseLong(doc.getFieldValue("id")+""));
-				if(instance) {
-					totalObservationIdList.add(Long.parseLong(doc.getFieldValue("id")+""));
-					instanceList.add(instance);
-				}
+				def projectInstance = Project.get(doc.getFieldValue("id"));
+				if(projectInstance)
+					projectInstanceList.add(projectInstance);
 			}
-			
-			List facets = queryResponse.getFacetField(params["facet.field"]).getValues()
-			
-			facets.each {
-				facetResults.put(it.getName(),it.getCount());
-			}
-			
-			responseHeader = queryResponse?.responseHeader;
-			noOfResults = queryResponse.getResults().getNumFound()
+
+			result = [queryParams:queryParams, activeFilters:activeFilters, instanceTotal:queryResponse.getResults().getNumFound(), projectInstanceList:projectInstanceList, snippets:queryResponse.getHighlighting()]
+			return result;
+		} catch(SolrException e) {
+			e.printStackTrace();
 		}
-		/*if(responseHeader?.params?.q == "*:*") {
-			responseHeader.params.remove('q');
-		}*/
-		
-		return [responseHeader:responseHeader, projectInstanceList:instanceList, instanceTotal:noOfResults, queryParams:queryParams, activeFilters:activeFilters, tags:facetResults, totalObservationIdList:totalObservationIdList]
+
+		result = [queryParams:queryParams, activeFilters:activeFilters, instanceTotal:0, speciesInstanceList:[]];
+		return result;
 	}
 	
+	private boolean isValidSortParam(String sortParam) {
+		if(sortParam.equalsIgnoreCase("grantee") || sortParam.equalsIgnoreCase('lastUpdated'))
+			return true;
+		return false;
+	}
 
 
 }
