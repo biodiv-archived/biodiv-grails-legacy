@@ -42,7 +42,7 @@ class ProjectSearchService {
 		def startTime = System.currentTimeMillis()
 		while(true) {
 			projects = Project.list(max:limit, offset:offset);
-			if(!project) break;
+			if(!projects) break;
 			publishSearchIndex(projects, true);
 			projects.clear();
 			offset += limit;
