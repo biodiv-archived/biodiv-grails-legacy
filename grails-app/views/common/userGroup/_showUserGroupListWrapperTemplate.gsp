@@ -63,7 +63,7 @@
 <!--container end-->
 <g:javascript>
 $(document).ready(function() {
-	window.params = {
+	def p = {
 	<%
 		params.each { key, value ->
 			println '"'+key+'":"'+value+'",'
@@ -71,7 +71,9 @@ $(document).ready(function() {
 	%>
 		"tagsLink":"${g.createLink(action: 'tags')}",
 		"queryParamsMax":"${queryParams?.max}"
-	}
+        }
+        jQuery.extend(window.params, p);
+
 });
 
 $( "#search" ).click(function() {                		

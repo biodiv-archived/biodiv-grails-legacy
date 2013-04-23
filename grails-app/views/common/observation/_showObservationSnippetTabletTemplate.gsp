@@ -10,7 +10,6 @@ if(mainImage.type == ResourceType.IMAGE) {
 }
 }
 %>
-
 <div class="snippet tablet">
 
 	<div class="figure" style="height:150px;"

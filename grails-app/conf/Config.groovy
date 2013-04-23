@@ -116,7 +116,7 @@ log4j = {
 //			"org.springframework.security.access"
 			//'com.the6hours.grails.springsecurity.facebook'
 	
-	
+    info    'species.auth'	
 
 }
 

@@ -25,7 +25,7 @@
 	</div>
 	<div class="observation_story"
 		style="overflow: visible; width: 100%">
-
+            <div>
 		<div class="observation-icons">								
 			<span
 				class="group_icon species_groups_sprites active pull-right ${speciesInstance.fetchSpeciesGroup()?.iconClass()}"
@@ -34,54 +34,58 @@
 				<s:showThreatenedStatus
 					model="['threatenedStatus':speciesInstance.taxonConcept.threatenedStatus]" />
 			</g:if>
-		</div>
+                  </div>
+              </div>
+              <div class="span7">
+                    <h6>
+			<g:link
+                        url="${uGroup.createLink(action:'show', controller:'species', id:speciesInstance.id)}" title="${speciesInstance.taxonConcept.name}">
+                            <span class="ellipsis" style="display:block;width:100%;float:none">${speciesInstance.taxonConcept.italicisedForm }</span>
+                            </g:link>
+                    </h6>
+                    <%def engCommonName=CommonNames.findByTaxonConceptAndLanguage(speciesInstance.taxonConcept, Language.findByThreeLetterCode('eng'))?.name%>
+                    <g:if test="${engCommonName}">
+                            <div><b class="commonName"> ${engCommonName} </b></div>
+                    </g:if>
+                    <div class="icons clearfix">
+                            
+                            <g:each in="${speciesInstance.fetchTaxonomyRegistry()}">
+                                    <div class="dropdown" style="display:inline-block;"> <a href="#"
+                                            class="dropdown-toggle small_profile_pic taxaHierarchy pull-left"
+                                            data-toggle="dropdown" title="${it.key.name}"></a> <%def sortedTaxon = it.value.sort {it.rank} %>
+                                            <span class="dropdown-menu toolbarIconContent"> <g:each
+                                                            in="${sortedTaxon}" var="taxonDefinition">
+                                                            <span class='rank${taxonDefinition.rank} '> ${taxonDefinition.italicisedForm}
+                                                            </span>
+                                                            <g:if test="${taxonDefinition.rank<8}">></g:if>
+                                                    </g:each> </span> </div>
 
-		<h6 class="span7 ellipsis"  style="display:block;margin-left:0px;float:none;">
-			<g:link 
-				url="${uGroup.createLink(action:'show', controller:'species', id:speciesInstance.id)}">
-				${speciesInstance.taxonConcept.italicisedForm }
-			</g:link>
-		</h6>
-		<%def engCommonName=CommonNames.findByTaxonConceptAndLanguage(speciesInstance.taxonConcept, Language.findByThreeLetterCode('eng'))?.name%>
-		<g:if test="${engCommonName}">
-			<div><b class="commonName"> ${engCommonName} </b></div>
-		</g:if>
-		<div class="icons clearfix">
-			
-			<g:each in="${speciesInstance.fetchTaxonomyRegistry()}">
-				<div class="dropdown" style="display:inline-block;"> <a href="#"
-					class="dropdown-toggle small_profile_pic taxaHierarchy pull-left"
-					data-toggle="dropdown" title="${it.key.name}"></a> <%def sortedTaxon = it.value.sort {it.rank} %>
-					<span class="dropdown-menu toolbarIconContent"> <g:each
-							in="${sortedTaxon}" var="taxonDefinition">
-							<span class='rank${taxonDefinition.rank} '> ${taxonDefinition.italicisedForm}
-							</span>
-							<g:if test="${taxonDefinition.rank<8}">></g:if>
-						</g:each> </span> </div>
-
-			</g:each>
-			
-			<div>
-				<g:each in="${speciesInstance.getIcons()}" var="r">
-					<%def imagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.thumbnail.suffix)%>
-					<img class="icon group_icon" href="${href}"
-						src="${createLinkTo(file: imagePath, base:grailsApplication.config.speciesPortal.resources.serverURL)}"
-						title="${r?.description}" />
-				</g:each>
-			</div>
+                            </g:each>
+                            
+                            <div>
+                                    <g:each in="${speciesInstance.getIcons()}" var="r">
+                                            <%def imagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.thumbnail.suffix)%>
+                                            <img class="icon group_icon" href="${href}"
+                                                    src="${createLinkTo(file: imagePath, base:grailsApplication.config.speciesPortal.resources.serverURL)}"
+                                                    title="${r?.description}" />
+                                    </g:each>
+                            </div>
 
 
 
-		</div>
+                    </div>
 
-		<div class="ellipsis multiline clearfix">
-			<g:set var="summary" value="${speciesInstance.findSummary()}"></g:set>
-			<g:if test="${summary != null && summary.length() > 300}">
-				${summary[0..300] + ' ...'}
-			</g:if>
-			<g:else>
-				${summary?:''}
-			</g:else>
-		</div>
+                    <div class="ellipsis multiline clearfix">
+                            <g:set var="summary" value="${speciesInstance.findSummary()}"></g:set>
+                            <g:if test="${summary != null && summary.length() > 300}">
+                                    ${summary[0..300] + ' ...'}
+                            </g:if>
+                            <g:else>
+                                    ${summary?:''}
+                            </g:else>
+                    </div>
+                </div>
+
+
 	</div>
 

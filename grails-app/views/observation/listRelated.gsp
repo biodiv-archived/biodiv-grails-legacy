@@ -22,14 +22,7 @@
 <g:javascript>
 	$(document).ready(function() {
 
-		window.params = {
-			'offset':"${params.offset}",
-			'isGalleryUpdate':"${params.isGalleryUpdate}",	
-			"tagsLink":"${uGroup.createLink(controller:'observation', action: 'tags')}",
-			"queryParamsMax":"${queryParams?.max}",
-			'speciesName':"${params.speciesName }",
-			'isFlagged':"${params.isFlagged }"
-		}
+		window.params.tagsLink = "${uGroup.createLink(controller:'observation', action: 'tags')}"
 	});
 </g:javascript>
 

@@ -8,14 +8,12 @@
 			<i class="icon-th-large"></i>
 		</button>
 	</div>
-	
 	<div class="mainContentList">
 		<div class="mainContent" name="p${params?.offset}">
 		
 			<%
-				def observationPos = (queryParams?.offset != null) ? queryParams.offset : params?.offset
+				def observationPos = (queryParams.offset != null) ? queryParams.offset : params?.offset
 			%>
-			
 			<ul class="grid_view thumbnails">
 			
 				<g:each in="${observationInstanceList}" status="i"
@@ -28,7 +26,7 @@
 						<li class="thumbnail" style="${!inGroupMap || inGroupMap[observationInstance.id]?'':'background-color:transparent;'}">
 					</g:else>
 					<obv:showSnippetTablet
-						model="['observationInstance':observationInstance, 'obvTitle':obvTitleList?.get(i), 'pos': (observationPos?observationPos+i:0), 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress]"></obv:showSnippetTablet>
+						model="['observationInstance':observationInstance, 'obvTitle':obvTitleList?.get(i), 'pos': ((observationPos != null)?observationPos+i:0), 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress]"></obv:showSnippetTablet>
 					</li>
 
 				</g:each>
@@ -38,7 +36,7 @@
 				<g:each in="${observationInstanceList}" status="i"
 					var="observationInstance">
 					<li class="thumbnail feedParentContext  clearfix" style="${!inGroupMap || inGroupMap[observationInstance.id]?'':'background-color:transparent;'}"><obv:showSnippet
-							model="['observationInstance':observationInstance, 'obvTitle':obvTitleList?.get(i), 'pos':(observationPos?observationPos+i:0), 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress]"></obv:showSnippet>
+							model="['observationInstance':observationInstance, 'obvTitle':obvTitleList?.get(i), 'pos':(observationPos!=null?observationPos+i:0), 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress]"></obv:showSnippet>
 					</li>
 				</g:each>
 			</ul>

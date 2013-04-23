@@ -35,8 +35,8 @@ class NewSpreadsheetConverter extends SourceConverter {
 	public List<Species> convertSpecies(List<List<Map>> sheetContent) {
 		List<Species> species = new ArrayList<Species>();
 		List<Node> speciesElements = createSpeciesXML(sheetContent);
-		for(Node speciesElement : speciesElements) {
-			XMLConverter converter = new XMLConverter();
+		XMLConverter converter = new XMLConverter();
+		for(Node speciesElement : speciesElements) {			
 			Species s = converter.convertSpecies(speciesElement)
 			if(s)
 				species.add(s);
@@ -55,6 +55,7 @@ class NewSpreadsheetConverter extends SourceConverter {
 
 		Iterator iter = sheetContent.get(5).iterator();
 		while(iter.hasNext()) {
+			println iter;
 			Map row = iter.next();
 			references.put(row.get("id"), row);
 		}

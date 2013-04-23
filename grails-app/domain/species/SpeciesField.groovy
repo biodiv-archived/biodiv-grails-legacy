@@ -55,14 +55,14 @@ class SpeciesField {
 		contributors validator : { val, obj ->
 			if(!val) {
 				println "++++++${obj}"
-				obj.addToContributors(Contributor.findByName('dummy'));
-				//return ['species.field.empty', 'contributor', obj.field.category, obj.field.subCategory, obj.species.taxonConcept.name]
+				obj.addToContributors(Contributor.findByName('pearlsravanthi'));
+				//return ['species.field.empty', 'contributor',  obj.field.concept, obj.field.category, obj.field.subCategory, obj.species.taxonConcept.name]
 				return true;
 			}
 		}
 		licenses validator : { val, obj ->
 			if(!val) {
-				return ['species.field.empty', 'licenses', obj.field.category, obj.field.subCategory, obj.species.taxonConcept.name]
+				return ['species.field.empty', 'licenses',  obj.field.concept, obj.field.category, obj.field.subCategory, obj.species.taxonConcept.name]
 			}
 		}
 	}

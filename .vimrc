@@ -8,6 +8,24 @@ filetype plugin indent on
 set wildignore+=*.class,.git,.hg,.svn,target/**
 set runtimepath^=~/.vim/bundle/ctrlp.vim
 
+" keys for easy saving and restoring vim session
+map <F2> :mksession! ~/vim_session <cr> " Quick write session with F2
+map <F3> :source ~/vim_session <cr>     " And load session with F3
+
+source ~/.vim/bundle/matchit/plugin/matchit.vim 
+"the cursor will briefly jump to the matching brace when you insert one.
+set showmatch
+set matchtime=3
+"The 'showmatch' option will not scroll the screen. To scroll the screen you
+"can use a mapping like:
+inoremap } }<Left><c-o>%<c-o>:sleep 500m<CR><c-o>%<c-o>a
+inoremap ] ]<Left><c-o>%<c-o>:sleep 500m<CR><c-o>%<c-o>a
+inoremap ) )<Left><c-o>%<c-o>:sleep 500m<CR><c-o>%<c-o>a
+
+"Bash doesn’t load your .bashrc unless it’s interactive. Use
+"to make Vim’s :! shell behave like your command prompt
+set shellcmdflag=-ic
+
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Files, backups and undo
 " """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""

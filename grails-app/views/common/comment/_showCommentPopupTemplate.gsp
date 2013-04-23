@@ -1,4 +1,4 @@
-<div class="btn-group comment-popup">
+<div class="comment-popup" style="position:relative;">
 	<a class="btn btn-mini" data-toggle="dropdown" href="#"
 		onclick="$(this).next().show(); dcorateCommentBody($(this).next().find('.comment .yj-message-body')) ;return false;">
 		<g:if test="${totalCount == 0}">
