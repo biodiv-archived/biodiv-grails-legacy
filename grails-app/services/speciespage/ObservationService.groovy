@@ -668,6 +668,13 @@ class ObservationService {
 			activeFilters["isFlagged"] = params.isFlagged.toBoolean()
 		}
 		
+		// by default adding media filter if its null
+		if(params.isMediaFilter == null || params.isMediaFilter.toBoolean()){
+			filterQuery += " and obv.hasMedia = true "
+			activeFilters["isMediaFilter"] = params.isMediaFilter? params.isMediaFilter.toBoolean() : false
+		}
+		
+		
 		if(params.daterangepicker_start && params.daterangepicker_end){
 			def df = new SimpleDateFormat("dd/MM/yyyy")
 			def startDate = df.parse(params.daterangepicker_start)
