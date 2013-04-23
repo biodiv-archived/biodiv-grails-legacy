@@ -1,6 +1,7 @@
 package content.fileManager
 
 import grails.converters.JSON
+
 import org.grails.taggable.Tag
 
 import java.io.File;
@@ -20,6 +21,8 @@ import org.springframework.web.multipart.MultipartFile
 import javax.servlet.http.HttpServletRequest
 import uk.co.desirableobjects.ajaxuploader.AjaxUploaderService
 import grails.util.GrailsNameUtils
+import grails.plugins.springsecurity.Secured
+
 
 import speciespage.ObservationService
 import species.utils.Utils
@@ -54,16 +57,13 @@ class UFileController {
 		return;
 	}
 	
-	def fm = {
-		params.max = Math.min(params.max ? params.int('max') : 10, 100)
-		[UFileInstanceList: UFile.list(params), UFileInstanceTotal: UFile.count()]
-	}
-	
+	/*
     def create = {
         def UFileInstance = new UFile()
         UFileInstance.properties = params
         return [UFileInstance: UFileInstance]
     }
+  
 
     def save = {
 		log.debug params
@@ -82,7 +82,7 @@ class UFileController {
             render(view: "create", model: [UFileInstanceList: UFile.list(params), UFileInstanceTotal: UFile.count()])
         }
     }
-	
+	  */
 	def save_browser = {
 		log.debug params
 
@@ -198,12 +198,14 @@ class UFileController {
 		}
 	}
 	
+	@Secured(['ROLE_USER'])
 	def upload = {
 		log.debug params
 		try {
 
 			File uploaded = createFile(params.qqfile)
 			InputStream inputStream = selectInputStream(request)
+			//check for file size and file type
 
 			ajaxUploaderService.upload(inputStream, uploaded)
 			
@@ -293,5 +295,42 @@ class UFileController {
 	def tagcloud = {
 		render (view:"tagcloud")
 	}
+	
+	
+	
+	/**
+	 *
+	 */
+	def search = {
+		log.debug params;
+		def model = uFileService.search(params)
+		model['isSearch'] = true;
+		
+		if(params.loadMore?.toBoolean()){
+			params.remove('isGalleryUpdate');
+			render(template:"/UFile/searchResultsTemplate", model:model);
+			return;
+
+		} else {
+			params.remove('isGalleryUpdate');
+			def obvListHtml =  g.render(template:"/UFile/searchResultsTemplate", model:model);
+			model.resultType = "ufile"
+			def obvFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
+
+			def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml]
+			
+			render (result as JSON)
+			return;
+		}
+	}
+	
+	def terms = {
+		log.debug params;
+		params.field = params.field?params.field.replace('aq.',''):"autocomplete";
+		List result = uFileService.nameTerms(params)
+		render result.value as JSON;
+	}
+
+	
 
 }

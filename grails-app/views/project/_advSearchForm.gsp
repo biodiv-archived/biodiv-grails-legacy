@@ -11,7 +11,7 @@
 			
 		<label class="control-label" for="grantee">Grantee</label> <input id="grantee"
 			data-provide="typeahead" type="text" class="input-block-level"
-			name="aq.grantee"
+			name="aq.grantee_organization"
 			placeholder="Search by Grantee" value="${params.grantee}"/>
 
 		<label class="control-label" for="sitename">Site Name</label> <input id="sitename"
@@ -26,7 +26,7 @@
 			
 					<label class="control-label" for="keywords">Keywords</label> <input id="keywords"
 			data-provide="typeahead" type="text" class="input-block-level"
-			name="aq.keywords"
+			name="aq.tag"
 			placeholder="Search by Keywords" value="${params.keywords}" />
 
 		<g:hiddenField name="offset" value="0" />

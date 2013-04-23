@@ -31,7 +31,7 @@ class Project implements Taggable{
 
 	Date grantFrom;
 	Date grantTo;
-	Integer grantedAmount;
+	int grantedAmount;
 
 	String projectProposal;
 
@@ -51,7 +51,7 @@ class Project implements Taggable{
 		analysis type:"text"
 		misc type:"text"
 		
-		locations cascade:"all-delete-orphan"
+		//locations cascade:"all-delete-orphan"
 		
 	}
 
@@ -74,7 +74,7 @@ class Project implements Taggable{
 		
 		granteeOrganization(nullable: true);
 		granteeContact(nullable:true);
-		granteeEmail(nullable:true);
+		granteeEmail(nullable:true, email:true, blank:false);
 		granteeLogo(nullable:true)
 		
 		grantFrom(nullable: true);

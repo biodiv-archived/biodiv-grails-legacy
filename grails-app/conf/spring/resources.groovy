@@ -179,7 +179,7 @@ beans = {
 		solrServer = ref('checklistSolrServer');
 	}
 	
-	projectSolrServer(org.apache.solr.client.solrj.impl.StreamingUpdateSolrServer,config.serverURL+"/projects", config.queueSize, config.threadCount ) {
+	projectSolrServer(org.apache.solr.client.solrj.impl.StreamingUpdateSolrServer,config.serverURL +"/projects", config.queueSize, config.threadCount ) {
 		setSoTimeout(config.soTimeout);
 		setConnectionTimeout(config.connectionTimeout);
 		setDefaultMaxConnectionsPerHost(config.defaultMaxConnectionsPerHost);
@@ -191,7 +191,24 @@ beans = {
 		log.debug "Initialized search server to "+config.serverURL+"/projects"
 	}
 
-	projectSearchService(content.search.ProjectSearchService) {
+	projectSearchService(speciespage.search.ProjectSearchService) {
 		solrServer = ref('projectSolrServer');
 	}
+
+       ufileSolrServer(org.apache.solr.client.solrj.impl.StreamingUpdateSolrServer,config.serverURL+"/ufiles", config.queueSize, config.threadCount ) {
+                setSoTimeout(config.soTimeout);
+                setConnectionTimeout(config.connectionTimeout);
+                setDefaultMaxConnectionsPerHost(config.defaultMaxConnectionsPerHost);
+                setMaxTotalConnections(config.maxTotalConnections);
+                setFollowRedirects(config.followRedirects);
+                setAllowCompression(config.allowCompression);
+                setMaxRetries(config.maxRetries);
+                //setParser(new XMLResponseParser()); // binary parser is used by default
+                log.debug "Initialized search server to "+config.serverURL+"/ufiles"
+        }
+
+        ufileSearchService(speciespage.search.UFileSearchService) {
+                solrServer = ref('ufileSolrServer');
+        }
+
 }

@@ -215,10 +215,10 @@
 			
 		<field name="name" type="text" indexed="true" stored="true" required="true" multiValued="false" />
 		
-		<field name="description" type="text" indexed="true" required="true"/>
+		<field name="description" type="text" indexed="true" required="false"/>
 		
 
-		<field name="tag" type="string" indexed="true" multiValued="true" />
+		<field name="tag" type="string" indexed="true" required="false" multiValued="true" />
 
 		
 		

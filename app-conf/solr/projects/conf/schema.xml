@@ -209,13 +209,13 @@
 		<field name="grantee_organization" type="text" indexed="true"
 			required="true" />
 
-		<field name="sitename" type="string" indexed="true" required="true"
+		<field name="sitename" type="string" indexed="true" required="false"
 			multiValued="true" />
 
-		<field name="corridor" type="string" indexed="true" required="true"
+		<field name="corridor" type="string" indexed="true" required="false"
 			multiValued="true" />
 
-		<field name="tag" type="string" indexed="true" multiValued="true" />
+		<field name="tag" type="string" indexed="true" required="false" multiValued="true" />
 
 
 		<field name="text" type="text" indexed="true" stored="true"

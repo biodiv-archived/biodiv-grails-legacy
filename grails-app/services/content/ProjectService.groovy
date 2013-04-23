@@ -304,15 +304,18 @@ class ProjectService {
 		try {
 			def queryResponse = projectSearchService.search(paramsList);
 			List<Project> projectInstanceList = new ArrayList<Project>();
+			log.debug "query response: "+ queryResponse.getResults()
 			Iterator iter = queryResponse.getResults().listIterator();
 			while(iter.hasNext()) {
 				def doc = iter.next();
+				log.debug "doc : "+ doc
 				def projectInstance = Project.get(doc.getFieldValue("id"));
 				if(projectInstance)
 					projectInstanceList.add(projectInstance);
 			}
 
 			result = [queryParams:queryParams, activeFilters:activeFilters, instanceTotal:queryResponse.getResults().getNumFound(), projectInstanceList:projectInstanceList, snippets:queryResponse.getHighlighting()]
+			log.debug "result returned from search: "+ result
 			return result;
 		} catch(SolrException e) {
 			e.printStackTrace();

@@ -1,5 +1,8 @@
 package content
 
+import grails.plugins.springsecurity.Secured
+
+
 class DirectionController {
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
@@ -13,12 +16,14 @@ class DirectionController {
         [strategicDirectionInstanceList: StrategicDirection.list(params), strategicDirectionInstanceTotal: StrategicDirection.count()]
     }
 
+	@Secured(['ROLE_CEPF_ADMIN'])
     def create = {
         def strategicDirectionInstance = new StrategicDirection()
         strategicDirectionInstance.properties = params
         return [strategicDirectionInstance: strategicDirectionInstance]
     }
 
+	@Secured(['ROLE_CEPF_ADMIN'])	
     def save = {
         def strategicDirectionInstance = new StrategicDirection(params)
         if (strategicDirectionInstance.save(flush: true)) {
@@ -41,6 +46,7 @@ class DirectionController {
         }
     }
 
+	@Secured(['ROLE_CEPF_ADMIN'])	
     def edit = {
         def strategicDirectionInstance = StrategicDirection.get(params.id)
         if (!strategicDirectionInstance) {
@@ -51,7 +57,8 @@ class DirectionController {
             return [strategicDirectionInstance: strategicDirectionInstance]
         }
     }
-
+	
+	@Secured(['ROLE_CEPF_ADMIN'])
     def update = {
         def strategicDirectionInstance = StrategicDirection.get(params.id)
         if (strategicDirectionInstance) {
@@ -79,6 +86,7 @@ class DirectionController {
         }
     }
 
+	@Secured(['ROLE_CEPF_ADMIN'])	
     def delete = {
         def strategicDirectionInstance = StrategicDirection.get(params.id)
         if (strategicDirectionInstance) {

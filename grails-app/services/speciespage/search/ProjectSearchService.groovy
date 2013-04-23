@@ -1,4 +1,5 @@
-package content.search
+package speciespage.search
+
 
 import static groovyx.net.http.ContentType.JSON
 
@@ -14,9 +15,9 @@ import org.apache.solr.common.SolrInputDocument
 import org.apache.solr.common.params.SolrParams
 import org.apache.solr.common.params.TermsParams
 
-import content.fileManager.UFile
+import content.Project
 
-class UFileSearchService {
+class ProjectSearchService {
 
 	static transactional = false
 
@@ -35,34 +36,34 @@ class UFileSearchService {
 		log.info "Initializing publishing to projects search index"
 		
 		//TODO: change limit
-		int limit = UFile.count()+1, offset = 0;
+		int limit = Project.count()+1, offset = 0;
 		
-		def uFiles;
+		def projects;
 		def startTime = System.currentTimeMillis()
 		while(true) {
-			uFiles = UFile.list(max:limit, offset:offset);
-			if(!uFiles) break;
-			publishSearchIndex(uFIles, true);
-			uFiles.clear();
+			projects = Project.list(max:limit, offset:offset);
+			if(!projects) break;
+			publishSearchIndex(projects, true);
+			projects.clear();
 			offset += limit;
 		}
 		
 		log.info "Time taken to publish projects search index is ${System.currentTimeMillis()-startTime}(msec)";
 	}
 
-	def publishSearchIndex(UFile uFile, boolean commit) {
-		return publishSearchIndex([uFile], commit);
+	def publishSearchIndex(Project proj, boolean commit) {
+		return publishSearchIndex([proj], commit);
 	}
 
 	/**
-	 *
+	 * 
 	 * @param projects
 	 * @param commit
 	 * @return
 	 */
-	def publishSearchIndex(List<UFile> uFiles, boolean commit) {
-		if(!uFiles) return;
-		log.info "Initializing publishing to UFiles search index : "+uFiles.size();
+	def publishSearchIndex(List<Project> projects, boolean commit) {
+		if(!projects) return;
+		log.info "Initializing publishing to projects search index : "+projects.size();
 
 		def fieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.fields
 		def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields
@@ -70,16 +71,21 @@ class UFileSearchService {
 		Collection<SolrInputDocument> docs = new ArrayList<SolrInputDocument>();
 		Map names = [:];
 		Map docsMap = [:]
-		uFiles.each { uFile ->
-			log.debug "Reading UFile : "+uFile.id;
+		projects.each { proj ->
+			log.debug "Reading Project : "+proj.id;
 
 				SolrInputDocument doc = new SolrInputDocument();
-				doc.addField(searchFieldsConfig.ID, uFile.id.toString());
-				doc.addField(searchFieldsConfig.NAME, uFile.name);
-				doc.addField(searchFieldsConfig.DESCRIPTION, uFile.description);
+				doc.addField(searchFieldsConfig.ID, proj.id.toString());
+				doc.addField(searchFieldsConfig.TITLE, proj.title);
+				doc.addField(searchFieldsConfig.GRANTEE_ORGANIZATION, proj.granteeOrganization);
 				
+				proj.locations.each { location ->
+					doc.addField(searchFieldsConfig.SITENAME, location.siteName);				
+					doc.addField(searchFieldsConfig.CORRIDOR, location.corridor);
+				}				
+
 				
-				uFile.tags.each { tag ->
+				proj.tags.each { tag ->
 					doc.addField(searchFieldsConfig.TAG, tag);
 				}
 					
@@ -87,7 +93,7 @@ class UFileSearchService {
 			
 		}
 
-		//log.debug docs;
+		log.debug docs;
 
 		try {
 			solrServer.add(docs);
@@ -95,7 +101,7 @@ class UFileSearchService {
 				//commit ...server is configured to do an autocommit after 10000 docs or 1hr
 				solrServer.blockUntilFinished();
 				solrServer.commit();
-				log.info "Finished committing to UFile solr core"
+				log.info "Finished committing to project solr core"
 			}
 		} catch(SolrServerException e) {
 			e.printStackTrace();
@@ -111,7 +117,7 @@ class UFileSearchService {
 	 */
 	def search(query) {
 		def params = SolrParams.toSolrParams(query);
-		log.info "Running uFile search query : "+params
+		log.info "Running project search query : "+params
 		return solrServer.query( params );
 	}
 
@@ -121,7 +127,7 @@ class UFileSearchService {
 	* @return
 	*/
    def delete(long id) {
-	   log.info "Deleting uFile from search index"
+	   log.info "Deleting project from search index"
 	   solrServer.deleteByQuery("id:${id}");
 	   solrServer.commit();
    }
@@ -131,7 +137,7 @@ class UFileSearchService {
 	 * @return
 	 */
 	def deleteIndex() {
-		log.info "Deleting uFile search index"
+		log.info "Deleting project search index"
 		solrServer.deleteByQuery("*:*")
 		solrServer.commit();
 	}
@@ -141,12 +147,12 @@ class UFileSearchService {
 	 * @return
 	 */
 	def optimize() {
-		log.info "Optimizing uFile search index"
+		log.info "Optimizing project search index"
 		solrServer.optimize();
 	}
 
 	/**
-	 *
+	 * 
 	 * @param query
 	 * @param field
 	 * @param limit
@@ -162,7 +168,7 @@ class UFileSearchService {
 				.set(TermsParams.TERMS_REGEXP_FLAG, "case_insensitive")
 				.set(TermsParams.TERMS_LIMIT, limit)
 				.set(TermsParams.TERMS_RAW, true);
-		log.info "Running uFile search query : "+q
+		log.info "Running project search query : "+q
 		return solrServer.query( q );
 	}
 }

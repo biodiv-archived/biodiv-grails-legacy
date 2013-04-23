@@ -172,8 +172,9 @@ class ProjectController {
 			render (view:"search", model:model)
 			return;
 		} else {
+			log.debug "going to gallery update in controller"
 			params.remove('isGalleryUpdate');
-			def obvListHtml =  g.render(template:"/species/searchResultsTemplate", model:model);
+			def obvListHtml =  g.render(template:"/project/searchResultsTemplate", model:model);
 			model.resultType = "project"
 			def obvFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
 
