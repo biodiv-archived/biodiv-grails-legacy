@@ -6,6 +6,9 @@
 		if(speciesId && !isHeading){
 			speciesLink += '<a class="species-page-link" style="font-style: normal;" href="' + uGroup.createLink(controller:'species', action:'show', id:speciesId, 'userGroupWebaddress':params?.webaddress, absolute:true) + '">' + "<i class='icon-info-sign' style='margin-right: 1px; margin-left: 10px;'></i>See species page" + "</a>"
 		}
+		if(observationInstance.sourceType && !isHeading){
+			speciesLink += '<a class="species-page-link" title="source checklist" style="font-style: normal;" href="' + uGroup.createLink(controller:'checklist', action:'show', id:observationInstance.sourceId, 'userGroupWebaddress':params?.webaddress, absolute:true) + '">' + "<i class='icon-info-sign' style='margin-right: 1px; margin-left: 10px;'></i>See checklist" + "</a>"
+		}
 	%>
 	<g:set var="sName" value="${observationInstance.fetchSpeciesCall()}" />
 	<g:if test="${sName == 'Unknown'}">

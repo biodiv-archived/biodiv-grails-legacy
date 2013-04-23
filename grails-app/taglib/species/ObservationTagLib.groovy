@@ -214,5 +214,8 @@ class ObservationTagLib {
 		out << render(template:"/common/downloadTableTemplate", model:attrs.model);
 	}
 	
+	def showMetaData = {attrs, body->
+		out << render(template:"/common/observation/showMetaDataTemplate", model:attrs.model);
+	}
 }
 

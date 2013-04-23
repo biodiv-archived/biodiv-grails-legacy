@@ -619,7 +619,7 @@ if(r && thumbnail) {
 
             </form>
            <%
-				def obvTmpFileName = observationInstance?.resource?.iterator()?.next()?.fileName
+				def obvTmpFileName = (observationInstance?.resource?.iterator()?.hasNext())? observationInstance.resource.iterator().next().fileName : null
 				def obvDir = obvTmpFileName ?  obvTmpFileName.substring(0, obvTmpFileName.lastIndexOf("/")) : ""
 	       %>
 

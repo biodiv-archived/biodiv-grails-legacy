@@ -64,15 +64,21 @@ class Observation implements Taggable{
 	String searchText;
 	Recommendation maxVotedReco;
 	boolean agreeTerms = false;
-
-	static hasMany = [resource:Resource, recommendationVote:RecommendationVote, obvFlags:ObservationFlag, userGroups:UserGroup];
+	
+	//some observation may not have media
+	boolean hasMedia = true;
+	List metaData;
+	String sourceType;
+	Long sourceId;
+	
+	static hasMany = [resource:Resource, recommendationVote:RecommendationVote, obvFlags:ObservationFlag, userGroups:UserGroup, metaData:ObservationMetaData];
 	static belongsTo = [SUser, UserGroup]
 
 	static constraints = {
 		notes nullable:true
 		searchText nullable:true;
 		maxVotedReco nullable:true
-		resource validator : { val, obj -> val && val.size() > 0 }
+		//resource validator : { val, obj -> val && val.size() > 0 }
 		observedOn validator : {val -> val < new Date()}
 		latitude validator : { val, obj -> 
 			if(Float.isNaN(val)) {
@@ -91,6 +97,9 @@ class Observation implements Taggable{
 			}
 		}
 		agreeTerms nullable:true
+		metaData nullable:true
+		sourceType nullable:true
+		sourceId nullable:true
 	}
 
 	static mapping = {
@@ -98,6 +107,7 @@ class Observation implements Taggable{
 		notes type:'text'
 		searchText type:'text'
 		autoTimestamp false
+		metaData lazy: false
 	}
 
 	/**

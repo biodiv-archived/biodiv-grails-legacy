@@ -23,6 +23,7 @@ import species.groups.SpeciesGroup;
 import species.participation.ActivityFeed;
 import species.participation.Follow;
 import species.participation.Observation;
+import species.participation.ObservationMetaData
 import species.participation.Recommendation;
 import species.participation.RecommendationVote;
 import species.participation.ObservationFlag.FlagType
@@ -106,10 +107,13 @@ class ObservationService {
 		def resourcesXML = createResourcesXML(params);
 		def resources = saveResources(observation, resourcesXML);
 		
-		observation.resource?.clear();
+		observation.resource = new HashSet()//[]//?.clear();
 		resources.each { resource ->
 			observation.addToResource(resource);
 		}
+		observation.hasMedia = !observation.resource.isEmpty()
+		observation.sourceType = params.sourceType?:null
+		observation.sourceId = params.sourceId? params.sourceId.toLong() :null
 	}
 
 	/**
@@ -339,10 +343,14 @@ class ObservationService {
 			item.imageTitle = param['title']
 			def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 			Resource image = param['observation'].mainImage()
+			if(image){
 			if(image.type == ResourceType.IMAGE) {
 				item.imageLink = iconBasePath +  image.thumbnailUrl()
 			} else if(image.type == ResourceType.VIDEO) {
 				item.imageLink = image.thumbnailUrl()
+			}
+			}else{
+				item.imageLink = config.speciesPortal.resources.serverURL + "/no-image.jpg" 
 			}			
 			if(param.inGroup) {
 				item.inGroup = param.inGroup;
@@ -1325,5 +1333,10 @@ class ObservationService {
 			return observation.name
 		} else
 			return null
+	}
+	
+	def addMetaData(params, Observation obv){
+		def omd = new ObservationMetaData(params)
+		obv.addToMetaData(omd);
 	}
 }

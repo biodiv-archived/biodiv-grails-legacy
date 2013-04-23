@@ -56,7 +56,7 @@ class Checklist {
 	//others
 	String reservesValue;
 	
-	static hasMany = [row:ChecklistRowData, state : String, district:String, taluka: String, userGroups:UserGroup, speciesGroups:SpeciesGroup]
+	static hasMany = [row:ChecklistRowData, state : String, district:String, taluka: String, userGroups:UserGroup, speciesGroups:SpeciesGroup, observations:Observation]
 	static belongsTo = [author:SUser];
 
 	static constraints = {

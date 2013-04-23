@@ -15,7 +15,7 @@
 <%
 def r = observationInstance.mainImage();
 
-def thumbnail = r.thumbnailUrl()?:null;
+def thumbnail = (r && r.thumbnailUrl()) ? r.thumbnailUrl() :null;
 def imagePath = '';
 if(r && thumbnail) {
 	if(r.type == ResourceType.IMAGE) {
@@ -276,6 +276,12 @@ if(r && thumbnail) {
 						<h5>Actions</h5>
 						<div class="tile" style="clear: both">
 							<feed:follow model="['sourceObject':observationInstance]" />
+						</div>
+					</div>
+					<div class="sidebar_section">
+						<h5>Meta data</h5>
+						<div class="tile" style="clear: both">
+							<obv:showMetaData model="['observationInstance':observationInstance]" />
 						</div>
 					</div>	
 					<!-- obv:showTagsSummary model="['observationInstance':observationInstance]" /-->
