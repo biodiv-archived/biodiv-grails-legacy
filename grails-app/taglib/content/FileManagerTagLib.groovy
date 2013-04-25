@@ -9,7 +9,7 @@ class FileManagerTagLib {
 	
 	
 	def uploader = { attrs, body ->
-
+		
 		out << render(template:"/UFile/uploader", model: attrs.model);	
 	}
 	

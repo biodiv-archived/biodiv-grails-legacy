@@ -2,7 +2,7 @@
 <div class="block-tagadelic ">
 
 	<form id="advSearchForm" method="get" title="Search"
-		action="${uGroup.createLink(controller:'project', action:'search') }"
+		action="${uGroup.createLink(controller:'UFile', action:'search') }"
 		class="searchbox">
 
 

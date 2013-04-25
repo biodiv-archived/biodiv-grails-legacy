@@ -52,6 +52,15 @@ textarea {
 					form_title = "Update Project"
 					
 				}
+				
+				def uploadDir = grailsApplication.config.speciesPortal.content.fileDIr
+				if(projectInstance.uploadDir) {
+					uploadDir = uploadDir + "/" + projectInstance.uploadDir
+				} else {
+					
+					uploadDir = uploadDir + "/" + "project-"+UUID.randomUUID().toString()	
+				}
+				
 			
             %>
 		<h1>
@@ -321,7 +330,7 @@ textarea {
 						<div class="controls">
 
 							<fileManager:uploader
-								model="['name':'proposalFiles', 'uFiles':projectInstance?.proposalFiles, 'sourceHolder': projectInstance]" />
+								model="['name':'proposalFiles', 'uFiles':projectInstance?.proposalFiles, 'sourceHolder': projectInstance, 'fileParams':['uploadDir':'projects']]" />
 						</div>
 					</div>
 				</div>
@@ -365,7 +374,7 @@ textarea {
 									%>
 
 							<fileManager:uploader
-								model="['name':'reportFiles', 'uFiles':projectInstance?.reportFiles, 'sourceHolder': projectInstance]" />
+								model="['name':'reportFiles', 'uFiles':projectInstance?.reportFiles, 'sourceHolder': projectInstance, 'fileParams':['uploadDir':'projects']]" />
 						</div>
 					</div>
 				</div>
@@ -421,7 +430,7 @@ textarea {
 
 
 							<fileManager:uploader
-								model="['name':'miscFiles', 'uFiles':projectInstance?.miscFiles, 'sourceHolder': projectInstance]" />
+								model="['name':'miscFiles', 'uFiles':projectInstance?.miscFiles, 'sourceHolder': projectInstance, 'fileParams':['uploadDir':'projects']]" />
 						</div>
 
 

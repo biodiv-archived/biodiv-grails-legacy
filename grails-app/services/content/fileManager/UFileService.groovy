@@ -7,14 +7,14 @@ import grails.util.GrailsNameUtils
 import org.apache.solr.common.util.NamedList;
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap;
 import org.apache.solr.common.SolrException;
-
+import speciespage.search.UFileSearchService
 
 import org.codehaus.groovy.grails.web.taglib.exceptions.GrailsTagException
 class UFileService {
 
 	static transactional = true
 	
-	def UFileSearchService
+	UFileSearchService uFileSearchService = new UFileSearchService()
 	
 
 	/**
@@ -178,7 +178,7 @@ class UFileService {
 	def nameTerms(params) {
 		List result = new ArrayList();
 
-		def queryResponse = UFileSearchService.terms(params.term, params.field, params.max);
+		def queryResponse = uFileSearchService.terms(params.term, params.field, params.max);
 		NamedList tags = (NamedList) ((NamedList)queryResponse.getResponse().terms)[params.field];
 		for (Iterator iterator = tags.iterator(); iterator.hasNext();) {
 			Map.Entry tag = (Map.Entry) iterator.next();
@@ -287,7 +287,7 @@ class UFileService {
 		*/
 		log.debug "Along with faceting params : "+paramsList;
 		try {
-			def queryResponse = UFileSearchService.search(paramsList);
+			def queryResponse = uFileSearchService.search(paramsList);
 			List<UFile> projectInstanceList = new ArrayList<UFile>();
 			Iterator iter = queryResponse.getResults().listIterator();
 			while(iter.hasNext()) {

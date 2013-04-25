@@ -44,6 +44,8 @@ class Project implements Taggable{
 	Date dateCreated;
 	Date lastUpdated;
 	
+	String uploadDir;
+	
 	
 
 	static mapping = {
@@ -85,7 +87,7 @@ class Project implements Taggable{
 		grantFrom(nullable: true);
 		grantTo(nullable: true);
 
-		grantedAmount validator : { val, obj ->  val > 0 }
+		grantedAmount validator : { val, obj ->  val >= 0 }, nullable:true
 		
 		
 		projectProposal(nullable: true);
@@ -97,7 +99,7 @@ class Project implements Taggable{
 		misc(nullable: true);
 		miscFiles(nullable: true);
 		
-
+		uploadDir(nullable:true)
 	}
 
 

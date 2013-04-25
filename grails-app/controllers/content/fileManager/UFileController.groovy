@@ -186,6 +186,7 @@ class UFileController {
 
 	// for uploading a file.
 	// File is uploaded to a temporary location. No UFile object is created in controller
+	@Secured(['ROLE_USER'])	
 	def fileUpload = {
 		log.debug params
 		try {
@@ -196,9 +197,9 @@ class UFileController {
 			ajaxUploaderService.upload(inputStream, uploaded)
 					
 			
-			def url = uGroup.createLink(uri:uploaded.getPath() , 'userGroup':params.userGroupInstance, 'userGroupWebaddress':params.webaddress)
-			log.debug "url for uploaded file >>>>>>>>>>>>>>>>>>>>>>>>"+ url
-			
+			//def url = uGroup.createLink(uri:uploaded.getPath() , 'userGroup':params.userGroupInstance, 'userGroupWebaddress':params.webaddress)
+			def url = [uri:uploaded.getPath()]			
+			//log.debug "url for uploaded file >>>>>>>>>>>>>>>>>>>>>>>>"+ url
 
 			return render(text: [success:true, filePath:uploaded.getPath(), fileURL: url, fileSize:UFileService.getFileSize(uploaded)] as JSON, contentType:'text/json')
 		} catch (FileUploadException e) {
@@ -210,7 +211,7 @@ class UFileController {
 	
 	@Secured(['ROLE_USER'])
 	def upload = {
-		log.debug params
+		log.debug "&&&&&&&&&&&&&&&&&&& <><><<>>params in upload of file" +  params
 		try {
 
 			File uploaded = createFile(params.qqfile)
@@ -241,6 +242,7 @@ class UFileController {
 		return request.inputStream
 	}
 	
+	//Create file with given filename
 	private File createFile(String fileName) {
 		File uploaded
 		

@@ -5,11 +5,12 @@
 	def canUploadFile = true //based on configuration
 	def allowedExtensions = "[ 'pdf']" //should be taken from attributes
 %>
+
 <g:if test="${canUploadFile}">
 
 	<uploader:uploader id="${name}"
 		url="${uGroup.createLink(controller:'UFile', action:'upload', userGroupWebaddress:params.webaddress)}"
-		multiple="true" allowedExtensions="${allowedExtensions}">
+		multiple="true" allowedExtensions="${allowedExtensions}" params="${fileParams}">
 
 		<uploader:onComplete>
 				//Available variables: id, fileName, responseJSON
