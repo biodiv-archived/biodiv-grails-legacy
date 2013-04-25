@@ -16,7 +16,8 @@ class ProjectController {
 	def projectService
 	def observationService
 	def projectSearchService
-	def uFileService = new UFileService()
+	def springSecurityService
+	def UFileService
 
 	def index = {
 		redirect(action: "list", params: params)
@@ -24,11 +25,10 @@ class ProjectController {
 
 	def list = {
 		log.debug params
-		
-		def model = getProjectList(params)	
+
+		def model = getProjectList(params)
 		render (view:"list", model:model)
 		return;
-		
 	}
 
 	@Secured(['ROLE_CEPF_ADMIN'])
@@ -42,6 +42,9 @@ class ProjectController {
 	def save = {
 		log.debug ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
 		log.debug params
+
+		params.author = springSecurityService.currentUser;
+
 		def projectInstance = projectService.createProject(params)
 
 		def tags = (params.tags != null) ? Arrays.asList(params.tags) : new ArrayList();
@@ -52,7 +55,7 @@ class ProjectController {
 			params.sourceHolderId = projectInstance.id
 			params.sourceHolderType = projectInstance.class.getCanonicalName()
 			//TODO: set source to files
-			//def uFiles = uFileService.updateUFiles(params)
+			//def uFiles = UFileService.updateUFiles(params)
 			redirect(action: "show", id: projectInstance.id)
 		}
 		else {
@@ -99,9 +102,9 @@ class ProjectController {
 					return
 				}
 			}
-			
+
 			projectService.updateProject(params, projectInstance)
-			
+
 			if (!projectInstance.hasErrors() && projectInstance.save(flush: true)) {
 				flash.message = "${message(code: 'default.updated.message', args: [message(code: 'project.label', default: 'Project'), projectInstance.id])}"
 				redirect(action: "show", id: projectInstance.id)
@@ -162,7 +165,7 @@ class ProjectController {
 		log.debug params;
 		def model = projectService.search(params)
 		model['isSearch'] = true;
-		
+
 		if(params.loadMore?.toBoolean()){
 			params.remove('isGalleryUpdate');
 			render(template:"/species/searchResultsTemplate", model:model);
@@ -179,12 +182,12 @@ class ProjectController {
 			def obvFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
 
 			def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml]
-			
+
 			render (result as JSON)
 			return;
 		}
 	}
-	
+
 	def terms = {
 		log.debug params;
 		params.field = params.field?params.field.replace('aq.',''):"autocomplete";
@@ -192,11 +195,9 @@ class ProjectController {
 		render result.value as JSON;
 	}
 
-	
-	def tagcloud = {
-		render (view:"tagcloud")
-	}
-	
+
+	def tagcloud = { render (view:"tagcloud") }
+
 	/**
 	 * From the params passed filter teh projects and pass the model for view
 	 * @param params
@@ -210,10 +211,10 @@ class ProjectController {
 		def queryParams = filteredProject.queryParams
 		def activeFilters = filteredProject.activeFilters
 		activeFilters.put("append", true);//needed for adding new page proj ids into existing session["proj_ids_list"]
-		
+
 		def totalProjectInstanceList = projectService.getFilteredProjects(params, -1, -1).projectInstanceList
 		def count = totalProjectInstanceList.size()
-		
+
 		//storing this filtered proj ids list in session for next and prev links
 		//http://grepcode.com/file/repo1.maven.org/maven2/org.codehaus.groovy/groovy-all/1.8.2/org/codehaus/groovy/runtime/DefaultGroovyMethods.java
 		//returns an arraylist and invalidates prev listing result
@@ -223,9 +224,9 @@ class ProjectController {
 			session["proj_ids_list_params"] = params.clone();
 			session["proj_ids_list"] = projectInstanceList.collect {it.id};
 		}
-		
+
 		log.debug "Storing all project ids list in session ${session['proj_ids_list']} for params ${params}";
 		return [totalProjectInstanceList:totalProjectInstanceList, projectInstanceList: projectInstanceList, projectInstanceTotal: count, queryParams: queryParams, activeFilters:activeFilters]
 	}
-	
+
 }

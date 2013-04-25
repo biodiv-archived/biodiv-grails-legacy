@@ -39,15 +39,7 @@ class UFileController {
         redirect(action: "list", params: params)
     }
 
-    def list = {
-		
-		log.debug params
-		
-		def model = getUFileList(params)
-		render (view:"list", model:model)
-		return;
 
-    }
 
 	def browser = {
 		log.debug params
@@ -58,6 +50,17 @@ class UFileController {
 	}
 	
 	/*
+	 * 
+	 *     
+	def list = {
+		
+		log.debug params
+		
+		def model = getUFileList(params)
+		render (view:"list", model:model)
+		return;
+
+    }
     def create = {
         def UFileInstance = new UFile()
         UFileInstance.properties = params
@@ -82,37 +85,9 @@ class UFileController {
             render(view: "create", model: [UFileInstanceList: UFile.list(params), UFileInstanceTotal: UFile.count()])
         }
     }
-	  */
-	def save_browser = {
-		log.debug params
-
-	try {
-		
-		def uFiles = uFileService.updateUFiles(params)
-		redirect(action: "browser", model: [UFileInstanceList: UFile.list(params), UFileInstanceTotal: UFile.count()])
-		
-		
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-			redirect(action: "browser", model: [UFileInstanceList: UFile.list(params), UFileInstanceTotal: UFile.count()])
-			
-		}
-	}
-	
-
-
-    def show = {
-        def UFileInstance = UFile.get(params.id)
-        if (!UFileInstance) {
-            flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'UFile.label', default: 'UFile'), params.id])}"
-            redirect(action: "list")
-        }
-        else {
-            [UFileInstance: UFileInstance]
-        }
-    }
-
+    
+    
+    
     def edit = {
         def UFileInstance = UFile.get(params.id)
         if (!UFileInstance) {
@@ -169,7 +144,40 @@ class UFileController {
             redirect(action: "list")
         }
     }
+    
+    
 	
+	def save_browser = {
+		log.debug params
+
+	try {
+		
+		def uFiles = uFileService.updateUFiles(params)
+		redirect(action: "browser", model: [UFileInstanceList: UFile.list(params), UFileInstanceTotal: UFile.count()])
+		
+		
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			redirect(action: "browser", model: [UFileInstanceList: UFile.list(params), UFileInstanceTotal: UFile.count()])
+			
+		}
+	}
+	
+
+
+    def show = {
+        def UFileInstance = UFile.get(params.id)
+        if (!UFileInstance) {
+            flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'UFile.label', default: 'UFile'), params.id])}"
+            redirect(action: "list")
+        }
+        else {
+            [UFileInstance: UFileInstance]
+        }
+    }
+
+	*/
 	
 	def tags = {
 		log.debug params;
@@ -186,11 +194,13 @@ class UFileController {
 			InputStream inputStream = selectInputStream(request)
 
 			ajaxUploaderService.upload(inputStream, uploaded)
+					
 			
-			log.debug "url for uploaded file >>>>>>>>>>>>>>>>>>>>>>>>"
-			log.debug createLink(url:uploaded.getPath())
+			def url = uGroup.createLink(uri:uploaded.getPath() , 'userGroup':params.userGroupInstance, 'userGroupWebaddress':params.webaddress)
+			log.debug "url for uploaded file >>>>>>>>>>>>>>>>>>>>>>>>"+ url
+			
 
-			return render(text: [success:true, filePath:uploaded.getPath(), fileURL: createLink(url:uploaded.getPath())] as JSON, contentType:'text/json')
+			return render(text: [success:true, filePath:uploaded.getPath(), fileURL: url, fileSize:UFileService.getFileSize(uploaded)] as JSON, contentType:'text/json')
 		} catch (FileUploadException e) {
 
 			log.error("Failed to upload file.", e)

@@ -2,11 +2,6 @@
 
 	<div class="section" style="clear: both;">
 
-		<input name="uFile.path" type="hidden" value='filePath' /> <input
-			name="uFile.size" type="hidden" value='fileSize' /> <input
-			name="uFile.name" type="hidden" value='${uFileInstance?.name}' />
-
-
 
 		<div
 			class="control-group ${hasErrors(bean: uFileInstance, field: 'path', 'error')}">
@@ -14,7 +9,7 @@
 			<div class="controls">
 
 				<g:render template='/UFile/docUpload'
-					model="['name': 'ufilepath', 'path': uFileInstance?.path]" />
+					model="['name': 'ufilepath', 'path': uFileInstance?.path, 'size':uFileInstance?.size]" />
 			</div>
 		</div>
 
@@ -33,7 +28,7 @@
 			<label class="control-label" for="description"> Description </label>
 			<div class="controls">
 				<textarea rows='5' columns='10' name='uFile.description'
-					value='${uFileInstance?.description}'> </textarea>
+					> ${uFileInstance?.description}</textarea>
 			</div>
 
 		</div>
@@ -85,7 +80,7 @@
 
 				<a id="selected_license_${i}" class="btn dropdown-toggle btn-mini"
 					data-toggle="dropdown"> <img
-					src="${resource(dir:'images/license',file:'', absolute:true)}"
+					src="${uFileInstance?.license?uFileInstance.license.name.getIconFilename()+'.png':resource(dir:'images/license',file:'cc_by.png', absolute:true)}"
 					title="Set a license for this file" /> <b class="caret"></b>
 				</a>
 

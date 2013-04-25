@@ -1,73 +1,176 @@
 
-<%@ page import="content.eml.Document" %>
+<%@ page import="content.eml.Document"%>
 <html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-        <meta name="layout" content="main" />
-        <g:set var="entityName" value="${message(code: 'document.label', default: 'Document')}" />
-        <title><g:message code="default.show.label" args="[entityName]" /></title>
-        <r:require modules="core"/> 
-    </head>
-    <body>
-        <div class="nav">
-            <span class="menuButton"><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></span>
-            <span class="menuButton"><g:link class="list" action="list"><g:message code="default.list.label" args="[entityName]" /></g:link></span>
-            <span class="menuButton"><g:link class="create" action="create"><g:message code="default.new.label" args="[entityName]" /></g:link></span>
-        </div>
-        <div class="body">
-            <h1><g:message code="default.show.label" args="[entityName]" /></h1>
-            <g:if test="${flash.message}">
-            <div class="message">${flash.message}</div>
-            </g:if>
-            <div class="dialog">
-                <table>
-                    <tbody>
-                    
-                        <tr class="prop">
-                            <td valign="top" class="name"><g:message code="document.id.label" default="Id" /></td>
-                            
-                            <td valign="top" class="value">${fieldValue(bean: documentInstance, field: "id")}</td>
-                            
-                        </tr>
-                    
-                        <tr class="prop">
-                            <td valign="top" class="name"><g:message code="document.coverage.label" default="Coverage" /></td>
-                            
-                            <td valign="top" class="value"><g:link controller="coverage" action="show" id="${documentInstance?.coverage?.id}">${documentInstance?.coverage?.encodeAsHTML()}</g:link></td>
-                            
-                        </tr>
-                    
-                        <tr class="prop">
-                            <td valign="top" class="name"><g:message code="document.title.label" default="Title" /></td>
-                            
-                            <td valign="top" class="value">${fieldValue(bean: documentInstance, field: "title")}</td>
-                            
-                        </tr>
-                    
-                        <tr class="prop">
-                            <td valign="top" class="name"><g:message code="document.type.label" default="Type" /></td>
-                            
-                            <td valign="top" class="value">${documentInstance?.type?.encodeAsHTML()}</td>
-                            
-                        </tr>
-                    
-                        <tr class="prop">
-                            <td valign="top" class="name"><g:message code="document.uFile.label" default="UF ile" /></td>
-                            
-                            <td valign="top" class="value"><g:link controller="UFile" action="show" id="${documentInstance?.uFile?.id}">${documentInstance?.uFile?.encodeAsHTML()}</g:link></td>
-                            
-                        </tr>
-                    
-                    </tbody>
-                </table>
-            </div>
-            <div class="buttons">
-                <g:form>
-                    <g:hiddenField name="id" value="${documentInstance?.id}" />
-                    <span class="button"><g:actionSubmit class="edit" action="edit" value="${message(code: 'default.button.edit.label', default: 'Edit')}" /></span>
-                    <span class="button"><g:actionSubmit class="delete" action="delete" value="${message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" /></span>
-                </g:form>
-            </div>
-        </div>
-    </body>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="layout" content="main" />
+<g:set var="entityName"
+	value="${message(code: 'document.label', default: 'Document')}" />
+<title><g:message code="default.show.label" args="[entityName]" /></title>
+<r:require modules="add_file" />
+</head>
+<body>
+
+	<div style="float: right; margin: 10px 0;">
+		<sUser:ifOwns model="['user':documentInstance?.author]">
+
+			<a class="btn btn-primary pull-right"
+				href="${uGroup.createLink(controller:'document', action:'edit', id:documentInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
+				<i class="icon-edit"></i>Edit
+			</a>
+
+			<a class="btn btn-danger btn-primary pull-right"
+				style="margin-right: 5px; margin-bottom: 10px;"
+				href="${uGroup.createLink(controller:'document', action:'flagDeleted', id:documentInstance.id)}"
+				onclick="return confirm('${message(code: 'default.document.delete.confirm.message', default: 'This document will be deleted. Are you sure ?')}');"><i
+				class="icon-trash"></i>Delete</a>
+
+		</sUser:ifOwns>
+	</div>
+	<div class="body span8" style="padding-left: 20px;">
+
+		<g:if test="${flash.message}">
+			<div class="message">
+				${flash.message}
+			</div>
+		</g:if>
+
+
+
+		<div class="page-header">
+			<h1>
+				${fieldValue(bean: documentInstance, field: "title")}
+			</h1>
+		</div>
+
+
+
+		<dl class="dl-horizontal">
+			<dt>Type</dt>
+			<dd>
+				${documentInstance.type }
+			</dd>
+		</dl>
+
+		<dl class="dl-horizontal">
+			<dt>File</dt>
+			<dd>
+
+				<fileManager:displayFile
+					filePath="${ documentInstance?.uFile?.path}"
+					fileName="${documentInstance?.uFile?.name}"></fileManager:displayFile>
+			</dd>
+		</dl>
+
+		<g:if test="${documentInstance?.uFile?.description}">
+
+			<dl class="dl-horizontal">
+				<dt>Description</dt>
+				<dd>
+					${documentInstance?.uFile?.description}
+				</dd>
+			</dl>
+		</g:if>
+
+		<g:if test="${documentInstance?.uFile?.contributors}">
+
+
+			<dl class="dl-horizontal">
+				<dt>Contributors</dt>
+				<dd>
+					${documentInstance?.uFile?.contributors}
+				</dd>
+			</dl>
+
+		</g:if>
+
+		<g:if test="${documentInstance?.uFile?.attribution}">
+
+			<dl class="dl-horizontal">
+				<dt>Attribution</dt>
+				<dd>
+					${documentInstance?.uFile?.attribution}
+				</dd>
+			</dl>
+
+		</g:if>
+
+
+		<g:if test="${documentInstance?.uFile?.license}">
+
+			<dl class="dl-horizontal">
+				<dt>License</dt>
+				<dd>
+					${documentInstance?.uFile?.license}
+				</dd>
+			</dl>
+		</g:if>
+
+		<g:if test="${documentInstance?.uFile?.tags}">
+			<b>Keywords : </b>
+
+			<g:render template="/project/showProjectTagsList"
+				model="['projectInstance': documentInstance?.uFile]" />
+
+		</g:if>
+
+
+		<g:if test="${documentInstance.coverage?.speciesGroups}">
+
+
+			<dl class="dl-horizontal">
+				<dt>SpeciesGroups</dt>
+				<dd>
+					<g:each in="${documentInstance?.coverage?.speciesGroups}"
+						var="speciesGroup">
+						<button
+							class="btn species_groups_sprites ${speciesGroup.iconClass()} active"
+							id="${"group_" + speciesGroup.id}" value="${speciesGroup.id}"
+							title="${speciesGroup.name}"></button>
+					</g:each>
+				</dd>
+			</dl>
+		</g:if>
+
+
+
+		<g:if test="${documentInstance.coverage?.habitats}">
+			<dl class="dl-horizontal">
+				<dt>Habitats</dt>
+				<dd>
+
+					<g:each in="${documentInstance.coverage?.habitats}" var="habitat">
+						<button class="btn habitats_sprites ${habitat.iconClass()} active"
+							id="${"habitat_" + habitat.id}" value="${habitat.id}"
+							title="${habitat.name}"
+							data-content="${message(code: 'habitat.definition.' + habitat.name)}"
+							rel="tooltip" data-original-title="A Title"></button>
+					</g:each>
+				</dd>
+			</dl>
+		</g:if>
+
+
+		<g:if test="${documentInstance.coverage?.placeName}">
+
+			<dl class="dl-horizontal">
+				<dt>
+					<span class="name"><i class="icon-map-marker"></i>Place</span>
+				</dt>
+				<dd>
+					<g:if test="${documentInstance.coverage.placeName == ''}">
+						${documentInstance.coverage.reverseGeocodedName}
+					</g:if>
+					<g:else>
+						${documentInstance.coverage.placeName}
+					</g:else>
+				</dd>
+			</dl>
+		</g:if>
+
+
+	</div>
+		<g:render template="/project/projectSidebar" />
+	
+</body>
 </html>

@@ -32,7 +32,7 @@ class UFileSearchService {
 	 *
 	 */
 	def publishSearchIndex() {
-		log.info "Initializing publishing to projects search index"
+		log.info "Initializing publishing to ufiles search index"
 		
 		//TODO: change limit
 		int limit = UFile.count()+1, offset = 0;
@@ -42,7 +42,7 @@ class UFileSearchService {
 		while(true) {
 			uFiles = UFile.list(max:limit, offset:offset);
 			if(!uFiles) break;
-			publishSearchIndex(uFIles, true);
+			publishSearchIndex(uFiles, true);
 			uFiles.clear();
 			offset += limit;
 		}
@@ -56,7 +56,7 @@ class UFileSearchService {
 
 	/**
 	 *
-	 * @param projects
+	 * @param ufiles
 	 * @param commit
 	 * @return
 	 */
@@ -87,7 +87,7 @@ class UFileSearchService {
 			
 		}
 
-		//log.debug docs;
+		log.debug docs;
 
 		try {
 			solrServer.add(docs);

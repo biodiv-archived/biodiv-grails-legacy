@@ -59,10 +59,10 @@ class ProjectService {
 			project.dataLinks.removeAll(_toBeDeletedDataLinks)
 		}
 
-		def _toBeDeletedProposalFiles = project.proposalFiles.findAll{it?.deleted || !it}
+		
+		def _toBeDeletedProposalFiles = project.proposalFiles.findAll{it?.deleted }
 
-		log.debug "Proposal Files marked for delete.."
-		log.debug _toBeDeletedProposalFiles
+		log.debug "Proposal Files marked for delete.." + project.proposalFiles?.dump()
 
 		if(_toBeDeletedProposalFiles) {
 			project.proposalFiles.removeAll(_toBeDeletedProposalFiles)
@@ -86,6 +86,8 @@ class ProjectService {
 		if(_toBeDeletedMiscFiles) {
 			project.miscFiles.removeAll(_toBeDeletedMiscFiles)
 		}
+		
+		log.debug "Project object after updating with params: "+ project.dump()
 	}
 
 	private Date parseDate(date){

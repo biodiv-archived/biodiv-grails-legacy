@@ -5,7 +5,7 @@
 	<types>
 		<fieldType name="string" class="solr.StrField"
 			sortMissingLast="true" omitNorms="true" />
- 		
+
 		<!-- The optional sortMissingLast and sortMissingFirst attributes are currently 
 			supported on types that are sorted internally as strings. This includes "string","boolean","sint","slong","sfloat","sdouble","pdate" 
 			- If sortMissingLast="true", then a sort on this field will cause documents 
@@ -175,53 +175,61 @@
 		<fieldtype name="ignored" stored="false" indexed="false"
 			multiValued="true" class="solr.StrField" />
 
-		<!-- A specialized field for geospatial search. If indexed, this fieldType must not be multivalued. -->
-    	<fieldType name="location" class="solr.LatLonType" subFieldSuffix="_coordinate"/>
-		
+		<!-- A specialized field for geospatial search. If indexed, this fieldType 
+			must not be multivalued. -->
+		<fieldType name="location" class="solr.LatLonType"
+			subFieldSuffix="_coordinate" />
+
 	</types>
 
 
 	<fields>
-		<!-- Valid attributes for fields: 
-		name: mandatory - the name for the field 
-		type: mandatory - the name of a previously defined type from the <types> 
-			section 
-		indexed: true if this field should be indexed (searchable or sortable) 			
-		stored: true if this field should be retrievable 
-		compressed: [false] if this 
+		<!-- Valid attributes for fields: name: mandatory - the name for the field 
+			type: mandatory - the name of a previously defined type from the <types> 
+			section indexed: true if this field should be indexed (searchable or sortable) 
+			stored: true if this field should be retrievable compressed: [false] if this 
 			field should be stored using gzip compression (this will only apply if the 
 			field type is compressable; among the standard field types, only TextField 
-			and StrField are) 
-		multiValued: true if this field may contain multiple values 
-			per document 
-		omitNorms: (expert) set to true to omit the norms associated 
+			and StrField are) multiValued: true if this field may contain multiple values 
+			per document omitNorms: (expert) set to true to omit the norms associated 
 			with this field (this disables length normalization and index-time boosting 
 			for the field, and saves some memory). Only full-text fields or fields that 
-			need an index-time boost need norms. 
-		termVectors: [false] set to true to 
+			need an index-time boost need norms. termVectors: [false] set to true to 
 			store the term vector for a given field. When using MoreLikeThis, fields 
-			used for similarity should be stored for best performance. 
-		termPositions: 
+			used for similarity should be stored for best performance. termPositions: 
 			Store position information with the term vector. This will increase storage 
-			costs. 
-		termOffsets: Store offset information with the term vector. This will 
-			increase storage costs. default: a value that should be used if no value is 
-			specified when adding a document. -->
+			costs. termOffsets: Store offset information with the term vector. This will 
+			increase storage costs. default: a value that should be used if no value 
+			is specified when adding a document. -->
 
 		<!--document reference annotations -->
 		<field name="id" type="string" indexed="true" stored="true"
 			required="true" multiValued="false" />
-			
-			
-		<field name="name" type="text" indexed="true" stored="true" required="true" multiValued="false" />
-		
-		<field name="description" type="text" indexed="true" required="false"/>
-		
 
-		<field name="tag" type="string" indexed="true" required="false" multiValued="true" />
 
-		
-		
+		<field name="name" type="text" indexed="true" stored="true"
+			required="true" multiValued="false" />
+
+		<field name="description" type="text" indexed="true" required="false" />
+
+
+		<field name="tag" type="string" indexed="true" required="false"
+			multiValued="true" />
+
+		<field name="text" type="text" indexed="true" stored="true"
+			required="true" multiValued="true" termVectors="true" termPositions="true"
+			termOffsets="true" />
+		<copyField source="name" dest="text" />
+		<copyField source="description" dest="text" />
+		<copyField source="tag" dest="text" />
+
+
+		<field name="autocomplete" type="textSpell" indexed="true"
+			stored="true" multiValued="true" />
+		<copyField source="name" dest="autocomplete" />
+		<copyField source="description" dest="autocomplete" />
+		<copyField source="tag" dest="autocomplete" />
+
 
 	</fields>
 

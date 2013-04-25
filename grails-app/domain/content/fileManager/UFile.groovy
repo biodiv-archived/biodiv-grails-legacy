@@ -36,7 +36,7 @@ class UFile implements Taggable{
 	}
 
 	static constraints = {
-		size(nullable:true)
+		//size(nullable:true)
 		path(nullable:false)
 		name(nullable:false)
 		description(nullable:true)

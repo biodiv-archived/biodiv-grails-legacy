@@ -12,6 +12,8 @@ import org.grails.taggable.*
 import org.apache.commons.collections.list.LazyList
 import org.apache.commons.collections.FactoryUtils
 import species.auth.SUser
+import species.groups.UserGroup;
+
 
 
 class Project implements Taggable{
@@ -41,6 +43,8 @@ class Project implements Taggable{
 
 	Date dateCreated;
 	Date lastUpdated;
+	
+	
 
 	static mapping = {
 
@@ -61,9 +65,10 @@ class Project implements Taggable{
 		proposalFiles: UFile,
 		reportFiles: UFile,
 		miscFiles: UFile,
-
+		userGroups:UserGroup,
 	];
 
+	static belongsTo = [UserGroup]
 
 	static constraints = {
 		title(nullable: false);
@@ -79,7 +84,9 @@ class Project implements Taggable{
 		
 		grantFrom(nullable: true);
 		grantTo(nullable: true);
-		grantedAmount(nullable: true);
+
+		grantedAmount validator : { val, obj ->  val > 0 }
+		
 		
 		projectProposal(nullable: true);
 		proposalFiles(nullable: true);

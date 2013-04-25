@@ -18,7 +18,7 @@
 
 
 	<div class="section">
-		<h3>Geographical coverage</h3>
+		<h3>Geographical Coverage</h3>
 
 		<div class="span6" style="margin: 0px";>
 

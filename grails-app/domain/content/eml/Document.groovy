@@ -1,6 +1,9 @@
 package content.eml
 
 import content.fileManager.UFile
+import species.auth.SUser;
+import species.groups.UserGroup;
+
 
 /**
  * eml-literature module
@@ -16,6 +19,7 @@ class Document {
 
 
 		private String value;
+		
 
 		DocumentType(String value) {
 			this.value = value;
@@ -28,22 +32,34 @@ class Document {
 
 	DocumentType type
 	String title
-
+	SUser author;
+	
 	UFile uFile   //covers physical file formats, party info, access info
 
 	Coverage coverage 	//Coverage Information
 
 
 	static constraints = {
-		uFile(nullable: true)
-		coverage(nullable:true)
 		
-	
 	}
+	
+	static hasMany ={userGroups:UserGroup}
+	
+	static belongsTo = [SUser, UserGroup]
+	
 	
 	static mapping = {
 		coverage cascade: "all-delete-orphan"
 		uFile cascade: "all-delete-orphan"
 		
+	}
+	
+	
+	def getOwner() {
+		return author;
+	}
+	
+	String toString() {
+		return title;
 	}
 }

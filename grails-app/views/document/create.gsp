@@ -60,7 +60,8 @@ input.dms_field {
 			
 			%>
 
-		<form action="${form_action}" method="POST" class="form-horizontal">
+		<form id="documentForm" action="${form_action}" method="POST"
+			class="form-horizontal">
 
 			<div class="span12 super-section">
 				<div class="section">
@@ -75,7 +76,6 @@ input.dms_field {
 								from="${content.eml.Document$DocumentType?.values()}"
 								keys="${content.eml.Document$DocumentType?.values()*.name()}"
 								value="${documentInstance?.type?.name()}" />
-
 
 						</div>
 
@@ -97,20 +97,66 @@ input.dms_field {
 				</div>
 			</div>
 			<g:render template="/UFile/uFile"
-				model="['uFileInstance':documentInstance?.uFile]"></g:render>
+				model="['uFileInstance':documentInstance?.uFile, 'parent':documentInstance]"></g:render>
 			<g:render template="coverage"
 				model="['coverageInstance':documentInstance?.coverage]"></g:render>
 
 
-			<div class="buttons">
-				<span class="button"><g:submitButton name="create"
-						class="save"
-						value="${message(code: 'default.button.create.label', default: 'Create')}" /></span>
+
+			<uGroup:isUserGroupMember>
+				<div class="span12 super-section" style="clear: both">
+					<div class="section" style="position: relative; overflow: visible;">
+						<h3>Post to User Groups</h3>
+						<div>
+							<%
+									def docActionMarkerClass = (params.action == 'create' || params.action == 'save')? 'create' : '' 
+								%>
+							<div id="userGroups" class="${docActionMarkerClass}"
+								name="userGroups" style="list-style: none; clear: both;">
+								<uGroup:getCurrentUserUserGroups
+									model="['documentInstance':documentInstance]" />
+							</div>
+						</div>
+					</div>
+				</div>
+			</uGroup:isUserGroupMember>
+
+
+
+			<div class="span12" style="margin-top: 20px; margin-bottom: 40px;">
+
+				<g:if test="${documentInstance?.id}">
+					<a
+						href="${uGroup.createLink(controller:'document', action:'show', id:documentInstance.id)}"
+						class="btn" style="float: right; margin-right: 30px;"> Cancel
+					</a>
+				</g:if>
+				<g:else>
+					<a
+						href="${uGroup.createLink(controller:'UFile', action:'browser')}"
+						class="btn" style="float: right; margin-right: 30px;"> Cancel
+					</a>
+				</g:else>
+
+				<g:if test="${documentInstance?.id}">
+					<div class="btn btn-danger"
+						style="float: right; margin-right: 5px;">
+						<a
+							href="${uGroup.createLink(controller:'document', action:'flagDeleted', id:documentInstance.id)}"
+							onclick="return confirm('${message(code: 'default.document.delete.confirm.message', default: 'This document will be deleted. Are you sure ?')}');">Delete
+							Document </a>
+					</div>
+				</g:if>
+				<button id="documentFormSubmit" type="submit"
+					class="btn btn-primary" style="float: right; margin-right: 30px;">Save</button>
 			</div>
+
 		</form>
 	</div>
 
 	<r:script>
+	
+	$(document).ready(function() {
 		$('#use_dms').click(function(){
             if ($('#use_dms').is(':checked')) {
                 $('.dms_field').fadeIn();
@@ -120,6 +166,54 @@ input.dms_field {
                 $('.degree_field').fadeIn();
             }
     });
+    
+    			$("#documentFormSubmit").click(function(){
+				var speciesGroups = getSelectedGroup();
+		        var habitats = getSelectedHabitat();
+		        
+		       	$.each(speciesGroups, function(index){
+		       		var input = $("<input>").attr("type", "hidden").attr("name", "speciesGroup."+index).val(this);
+					$('#documentForm').append($(input));	
+		       	})
+		        
+		       	$.each(habitats, function(index){
+		       		var input = $("<input>").attr("type", "hidden").attr("name", "habitat."+index).val(this);
+					$('#documentForm').append($(input));	
+		       	})
+		       	
+		        $("#documentForm").submit();
+		        return false;
+			});
+			
+						function getSelectedGroup() {
+			    var grp = []; 
+			    $('#speciesGroupFilter button').each (function() {
+			            if($(this).hasClass('active')) {
+			                    grp.push($(this).attr('value'));
+			            }
+			    });
+			    return grp;	
+			} 
+			    
+			function getSelectedHabitat() {
+			    var hbt = []; 
+			    $('#habitatFilter button').each (function() {
+			            if($(this).hasClass('active')) {
+			                    hbt.push($(this).attr('value'));
+			            }
+			    });
+			    return hbt;	
+			}
+			<%
+				documentInstance?.coverage?.speciesGroups.each {
+					out << "jQuery('#group_${it.id}').addClass('active');";
+				}
+				documentInstance?.coverage?.habitats.each {
+					out << "jQuery('#habitat_${it.id}').addClass('active');";
+				}
+			%>
+			
+						});
     
         </r:script>
 </body>

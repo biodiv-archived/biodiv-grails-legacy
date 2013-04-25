@@ -84,6 +84,9 @@ class FileManagerTagLib {
 			case "HTML":
 				 out << "p>html</p>"
 				 break
+			case "PDF":
+				out << "${fileName}"
+				break
 			default:
 				 out << "<p>file</p>"
 				 break
