@@ -43,10 +43,6 @@ class Project implements Taggable{
 
 	Date dateCreated;
 	Date lastUpdated;
-	
-	String uploadDir;
-	
-	
 
 	static mapping = {
 
@@ -99,7 +95,6 @@ class Project implements Taggable{
 		misc(nullable: true);
 		miscFiles(nullable: true);
 		
-		uploadDir(nullable:true)
 	}
 
 
@@ -121,5 +116,6 @@ class Project implements Taggable{
 	String toString() {
 		return title
 	}
+	
 
 }

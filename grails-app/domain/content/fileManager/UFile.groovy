@@ -5,12 +5,33 @@ import org.grails.taggable.Taggable
 import species.License
 import species.auth.SUser
 import content.Project
+import content.eml.Document.DocumentType;
 
 class UFile implements Taggable{
 
+	
+	public enum FileType {
+		REPORT("Report"),
+		POSTER("Poster"),
+		PROPOSAL("Proposal"),
+		MISCELLANEOUS("Miscellaneous"),
+
+		private String value;
+		
+
+		FileType(String value) {
+			this.value = value;
+		}
+
+		public String value() {
+			return this.value;
+		}
+	}
+
+	FileType type
+	String name	
 	String size
 	String path
-	String name
 	String description
 	String mimetype
 	Date dateCreated

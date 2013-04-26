@@ -1,5 +1,5 @@
 
-<div class="span12 super-section" style="clear: both;">
+<div class="span12 super-section" style="clear: both; margin-left:0px;">
 
 	<div class="section"
 		style="position: relative; overflow: visible; clear: both;">

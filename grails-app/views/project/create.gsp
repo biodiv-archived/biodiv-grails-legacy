@@ -30,15 +30,8 @@ textarea {
 </style>
 </head>
 <body>
-	<div class="nav">
-		<span class="menuButton"><a class="home"
-			href="${createLink(uri: '/')}"><g:message
-					code="default.home.label" /></a></span> <span class="menuButton"><g:link
-				class="list" action="list">
-				<g:message code="default.list.label" args="[entityName]" />
-			</g:link></span>
-	</div>
-	<div class="body">
+
+	<div class="body" style="margin-left:20px;">
 
 		<%
                 def form_action = uGroup.createLink(action:'save', controller:'project', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)
@@ -53,13 +46,9 @@ textarea {
 					
 				}
 				
-				def uploadDir = grailsApplication.config.speciesPortal.content.fileDIr
-				if(projectInstance.uploadDir) {
-					uploadDir = uploadDir + "/" + projectInstance.uploadDir
-				} else {
-					
-					uploadDir = uploadDir + "/" + "project-"+UUID.randomUUID().toString()	
-				}
+				String uploadDir = grailsApplication.config.speciesPortal.content.fileUploadDir
+		
+				uploadDir = uploadDir + "/" + "project-"+UUID.randomUUID().toString()	
 				
 			
             %>
@@ -82,6 +71,8 @@ textarea {
 			<div class="dialog">
 
 				<input name="id" type="hidden" value="${projectInstance?.id}" />
+				<input name="uploadDir" type="hidden" value="${uploadDir}" />
+				
 
 				<div class="super-section">
 					<div class="section">
@@ -222,7 +213,7 @@ textarea {
 							<div class="controls">
 
 								<g:render template='/UFile/imgUpload'
-									model="['name': 'granteeLogo', 'path': projectInstance?.granteeLogo]" />
+									model="['name': 'granteeLogo', 'path': projectInstance?.granteeLogo, 'uploadDir': uploadDir]" />
 
 							</div>
 						</div>
@@ -330,7 +321,7 @@ textarea {
 						<div class="controls">
 
 							<fileManager:uploader
-								model="['name':'proposalFiles', 'uFiles':projectInstance?.proposalFiles, 'sourceHolder': projectInstance, 'fileParams':['uploadDir':'projects']]" />
+								model="['name':'proposalFiles', 'uFiles':projectInstance?.proposalFiles, 'sourceHolder': projectInstance, 'fileParams':['uploadDir':uploadDir]]" />
 						</div>
 					</div>
 				</div>
@@ -374,7 +365,7 @@ textarea {
 									%>
 
 							<fileManager:uploader
-								model="['name':'reportFiles', 'uFiles':projectInstance?.reportFiles, 'sourceHolder': projectInstance, 'fileParams':['uploadDir':'projects']]" />
+								model="['name':'reportFiles', 'uFiles':projectInstance?.reportFiles, 'sourceHolder': projectInstance, 'fileParams':['uploadDir':uploadDir]]" />
 						</div>
 					</div>
 				</div>
@@ -430,7 +421,7 @@ textarea {
 
 
 							<fileManager:uploader
-								model="['name':'miscFiles', 'uFiles':projectInstance?.miscFiles, 'sourceHolder': projectInstance, 'fileParams':['uploadDir':'projects']]" />
+								model="['name':'miscFiles', 'uFiles':projectInstance?.miscFiles, 'sourceHolder': projectInstance, 'fileParams':['uploadDir':uploadDir]]" />
 						</div>
 
 

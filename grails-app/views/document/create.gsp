@@ -32,15 +32,8 @@ input.dms_field {
 </style>
 </head>
 <body>
-	<div class="nav">
-		<span class="menuButton"><a class="home"
-			href="${createLink(uri: '/')}"><g:message
-					code="default.home.label" /></a></span> <span class="menuButton"><g:link
-				class="list" action="list">
-				<g:message code="default.list.label" args="[entityName]" />
-			</g:link></span>
-	</div>
-	<div class="body">
+
+	<div class="body" style="margin-left:20px;"> 
 		<h1>
 			<g:message code="default.create.label" args="[entityName]" />
 		</h1>
@@ -63,39 +56,7 @@ input.dms_field {
 		<form id="documentForm" action="${form_action}" method="POST"
 			class="form-horizontal">
 
-			<div class="span12 super-section">
-				<div class="section">
 
-					<div
-						class="control-group ${hasErrors(bean: documentInstance, field: 'type', 'error')}">
-						<label class="control-label" for="type"><g:message
-								code="document.type.label" default="Document Type" /><span
-							class="req">*</span></label>
-						<div class="controls">
-							<g:select name="type"
-								from="${content.eml.Document$DocumentType?.values()}"
-								keys="${content.eml.Document$DocumentType?.values()*.name()}"
-								value="${documentInstance?.type?.name()}" />
-
-						</div>
-
-					</div>
-					<div
-						class="control-group ${hasErrors(bean: documentInstance, field: 'title', 'error')}">
-						<label class="control-label" for="title"><g:message
-								code="document.title.label" default="Document Title" /><span
-							class="req">*</span></label>
-						<div class="controls">
-
-							<input type="text" class="input-xxlarge" name="title"
-								value="${documentInstance?.title}" required />
-						</div>
-
-					</div>
-
-
-				</div>
-			</div>
 			<g:render template="/UFile/uFile"
 				model="['uFileInstance':documentInstance?.uFile, 'parent':documentInstance]"></g:render>
 			<g:render template="coverage"
@@ -104,7 +65,7 @@ input.dms_field {
 
 
 			<uGroup:isUserGroupMember>
-				<div class="span12 super-section" style="clear: both">
+				<div class=" super-section" style="clear: both">
 					<div class="section" style="position: relative; overflow: visible;">
 						<h3>Post to User Groups</h3>
 						<div>
@@ -123,7 +84,7 @@ input.dms_field {
 
 
 
-			<div class="span12" style="margin-top: 20px; margin-bottom: 40px;">
+			<div class="" style="margin-top: 20px; margin-bottom: 40px;">
 
 				<g:if test="${documentInstance?.id}">
 					<a

@@ -13,24 +13,6 @@ import species.groups.UserGroup;
  */
 class Document {
 
-	public enum DocumentType {
-		REPORT("Report"),
-		POSTER("Poster"),
-
-
-		private String value;
-		
-
-		DocumentType(String value) {
-			this.value = value;
-		}
-
-		public String value() {
-			return this.value;
-		}
-	}
-
-	DocumentType type
 	String title
 	SUser author;
 	

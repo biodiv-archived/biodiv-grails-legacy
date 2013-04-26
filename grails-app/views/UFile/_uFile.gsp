@@ -1,11 +1,39 @@
-<div class="span12 super-section" style="clear: both;">
+<div class="super-section" style="clear: both;">
 
 	<div class="section" style="clear: both;">
+	
+	<div
+						class="control-group ${hasErrors(bean: uFileInstance, field: 'type', 'error')}">
+						<label class="control-label" for="type"><g:message
+								code="document.type.label" default="Type" /><span
+							class="req">*</span></label>
+						<div class="controls">
+							<g:select name="type"
+								from="${content.fileManager.UFile$FileType?.values()}"
+								keys="${content.fileManager.UFile$FileType?.values()*.name()}"
+								value="${uFileInstance?.type?.name()}" />
+
+						</div>
+
+					</div>
+					<div
+						class="control-group ${hasErrors(bean: uFileInstance, field: 'name', 'error')}">
+						<label class="control-label" for="title"><g:message
+								code="document.title.label" default="Title" /><span
+							class="req">*</span></label>
+						<div class="controls">
+
+							<input type="text" class="input-xxlarge" name="title"
+								value="${uFileInstance?.title}" required />
+						</div>
+
+					</div>
 
 
 		<div
 			class="control-group ${hasErrors(bean: uFileInstance, field: 'path', 'error')}">
-			<label class="control-label" for="file"> File </label>
+			<label class="control-label" for="file"> File <span
+							class="req">*</span></label>
 			<div class="controls">
 
 				<g:render template='/UFile/docUpload'
@@ -13,16 +41,7 @@
 			</div>
 		</div>
 
-		<!-- 
-		<div
-			class="control-group ${hasErrors(bean: uFileInstance, field: 'name', 'error')}">
-			<label class="control-label" for="name"> Title </label>
-			<div class="controls">
-				<input class="input-xlarge" type='text' name='uFile.name'
-					value='${uFileInstance?.name}' placeholder="File Name" />
-			</div>
-		</div>
-		 -->
+
 		<div
 			class="control-group ${hasErrors(bean: uFileInstance, field: 'description', 'error')}">
 			<label class="control-label" for="description"> Description </label>

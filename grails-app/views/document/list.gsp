@@ -6,6 +6,7 @@
         <meta name="layout" content="main" />
         <g:set var="entityName" value="${message(code: 'document.label', default: 'Document')}" />
         <title><g:message code="default.list.label" args="[entityName]" /></title>
+        <r:require modules="core" />
     </head>
     <body>
         <div class="nav">
