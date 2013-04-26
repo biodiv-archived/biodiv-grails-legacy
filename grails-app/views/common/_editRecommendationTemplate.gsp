@@ -122,13 +122,11 @@ $(document).ready(function() {
 		<g:renderErrors bean="${observationInstance}" as="list" />
 	</div>
 </g:hasErrors>
-
-
 	<%
 		def species_sn_name = ""
 		def species_cn_name = ""
-		def species_call_comment = null
-		
+		def species_call_comment = ""
+		def species_canonical_name = "" 
 		//showing vote added by creator of the observation
 		if(params.action == 'edit' || params.action == 'update'){
 			def tmp_reco_vote = observationInstance?.fetchOwnerRecoVote()
@@ -139,7 +137,14 @@ $(document).ready(function() {
 			
 			if(tmp_reco_vote && tmp_reco_vote.recommendation.isScientificName){
 				species_sn_name = tmp_reco_vote.recommendation.name
+				species_canonical_name = tmp_reco_vote.recommendation.taxonConcept?.canonicalForm
 			}
+		}
+		if(params.action == 'save'){
+			species_sn_name = saveParams.recoName
+			species_cn_name =  saveParams.commonName
+			species_call_comment = saveParams.recoComment
+			species_canonical_name = saveParams.canName
 		}
 	%>
 
@@ -178,7 +183,7 @@ $(document).ready(function() {
 			<input type="text" name="recoName" id="name" value="${species_sn_name}"
 				placeholder='Suggest a scientific name'
 				class="input-xlarge ${hasErrors(bean: recommendationInstance, field: 'name', 'errors')} ${hasErrors(bean: recommendationVoteInstance, field: 'recommendation', 'errors')}" />
-			<input type="hidden" name="canName" id="canName" />
+			<input type="hidden" name="canName" id="canName" value="${species_canonical_name }"/>
 			<div id="nameSuggestions" style="display: block;"></div>
 
 		</div>

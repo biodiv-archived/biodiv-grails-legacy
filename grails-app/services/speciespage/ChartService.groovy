@@ -1,5 +1,6 @@
 package speciespage
 
+import java.text.SimpleDateFormat
 import org.codehaus.groovy.runtime.DateGroovyMethods;
 import org.hibernate.Hibernate;
 import org.hibernate.criterion.DetachedCriteria
@@ -7,9 +8,11 @@ import org.hibernate.criterion.DetachedCriteria
 import species.Species;
 import species.auth.SUser
 import species.groups.SpeciesGroup;
-import species.groups.UserGroup
+import species.groups.UserGroup;
+import species.utils.ImageType;
 import species.participation.ActivityFeed;
 import species.participation.Observation;
+import species.participation.RecommendationVote;
 
 class ChartService {
 
@@ -18,9 +21,9 @@ class ChartService {
 	private static final Date PORTAL_START_DATE = new Date(111, 7, 8)
 
 	def userGroupService
-	def activityFeedService
-
-	def getObservationStats(params, SUser author){
+	def observationService
+	
+	def getObservationStats(params, SUser author, request){
 		UserGroup userGroupInstance
 		if(params.webaddress) {
 			userGroupInstance = userGroupService.get(params.webaddress);
@@ -33,9 +36,33 @@ class ChartService {
 		def unidentifiedResult = getFilteredObservationStats(userGroupInstance, author, false)
 
 		mergeResult(allResult, unidentifiedResult)
+    	allResult.columns = [
+			['string', 'Species Group'],
+			['number', 'All'],
+			['number', 'UnIdentified']
+		]
+
+		addHtmlResultForObv(allResult, request)
 		return allResult
 	}
 
+    def getUserStats(SUser user) {
+    	//getting all observation
+		def allObvResult = getFilteredObservationStats(null, user, null)
+
+        //getting ireco
+		def allRecoResult = getFilteredRecommendationStats(user)
+		
+        mergeResult(allObvResult, allRecoResult)
+    	allObvResult.columns = [
+			['string', 'Species Group'],
+			['number', 'Observations'],
+			['number', 'Identifications']
+		]
+
+		addHtmlResultForObv(allObvResult, null, user)
+		return allObvResult
+    }
 
 	/**
 	 * 
@@ -78,6 +105,23 @@ class ChartService {
 		return getFormattedResult(result)
 	}
 
+    /**
+	 * 
+	 * @param userGroupInstance
+	 * @param author
+	 * @param identifactionFlag if null then returning all obs, if true then returning only identified if false then returning unidentified
+	 * @return
+	 */
+	private getFilteredRecommendationStats(SUser author){
+        def result = RecommendationVote.executeQuery("select g.id, count(*) from RecommendationVote r, Observation o, SpeciesGroup g where r.observation = o and o.group = g and r.author=:author group by g.id", [author:author]);
+println result;
+        result.each {it->
+            it[0] = SpeciesGroup.read(it[0]);
+        }
+		return getFormattedResult(result)
+	}
+
+
 	private getFormattedResult(result){
 		def formattedResult = []
 		result.each { r ->
@@ -102,13 +146,53 @@ class ChartService {
 			r.add(unIdentified)
 		}
 
-		allResult.columns = [
-			['string', 'Species Group'],
-			['number', 'All'],
-			['number', 'UnIdentified']
-		]
 	}
 
+	private addHtmlResultForObv(Map res, request, SUser user=null){
+		List htmlData = []
+        def filterParams = [:]
+        if(user) {
+            filterParams['user'] = user.id;
+        }
+
+        boolean isUnidentified = (res.columns[2][2] == "UnIdentified")?:false
+		res.data.each{ r ->
+			htmlData.add([getSpeciesGroupImage(r[0]), getHyperLink(r[0], r[0], false, true, filterParams), getHyperLink(r[0], r[1], false, true, filterParams), getHyperLink(r[0], r[2], isUnidentified, true, filterParams)])
+		}
+		
+		res.htmlData = htmlData
+		res.htmlColumns = [
+			['string', '']
+		]
+        res.columns.each { col -> 
+            res.htmlColumns.add(['string', col[1]]);
+        }
+        println res;
+	}
+	
+	private getHyperLink(String speciesGroup, count, boolean isUnIdentified, boolean isObv, Map filterParams=[:]){
+		if(isUnIdentified){
+			if(isObv){
+				filterParams.speciesName="Unknown"
+			}
+		}
+		filterParams.sGroup = SpeciesGroup.findByName(speciesGroup).id
+		def link = observationService.generateLink((isObv)?"observation":"species", "list", filterParams, null)
+		return "" + '<a href="' +  link +'">' + count + "</a>"
+	}
+	
+	
+	private getHyperLinkForUser(userId, Date startDate, count, request){
+		def fitlerParams = [:]
+		if(startDate){
+			fitlerParams.daterangepicker_start = new SimpleDateFormat("dd/MM/yyyy").format(startDate)
+			fitlerParams.daterangepicker_end = new SimpleDateFormat("dd/MM/yyyy").format(new Date())
+		}
+		fitlerParams.user = userId
+		def link = observationService.generateLink("observation", "list", fitlerParams, request)
+		return "" + '<a  href="' +  link +'">' + count + "</a>"
+	}
+	
 	private serachInList(unidentifiedResult, String key){
 		for(ur in unidentifiedResult.data){
 			if((""+ur[0]).equalsIgnoreCase("" + key)){
@@ -119,31 +203,55 @@ class ChartService {
 	}
 
 
-	def getSpeciesPageStats(params){
-		def stubCountQuery = "select t.group.id, count(*) as count from Species s, TaxonomyDefinition t where s.taxonConcept = t group by t.group.id";
-		def contentCountQuery = "select t.group.id, count(*) as count from Species s, TaxonomyDefinition t where s.taxonConcept = t and s.percentOfInfo > 0.0 group by t.group.id";
+	def getSpeciesPageStats(params, request){
+		def totalCountQuery = "select t.group.id, count(*) as count from Species s, TaxonomyDefinition t where s.taxonConcept = t group by t.group.id order by count(*) desc";
+		def contentCountQuery = "select t.group.id, count(*) as count from Species s, TaxonomyDefinition t where s.taxonConcept = t and s.percentOfInfo > 0.0 group by t.group.id order by count(*) desc";
 
-		def allResult = Species.executeQuery(stubCountQuery)
-		def contentResult = [data:Species.executeQuery(contentCountQuery)]
+		def allResult = [data:Species.executeQuery(totalCountQuery)]
+		def contentResult = Species.executeQuery(contentCountQuery)
 		def finalResult = []
-		allResult.each{ r ->
+		contentResult.each{ r ->
 			def sgName = (r[0] ? SpeciesGroup.read(r[0]).name : "Others" )
-			int contentCount = serachInList(contentResult, "" + r[0])
+			int all = serachInList(allResult, "" + r[0])
 			finalResult.add([
 				sgName,
-				contentCount,
-				r[1] - contentCount
+				r[1],
+				all - r[1]
 			])
 		}
 
-		return [data : finalResult, columns : [
+		def res = [data : finalResult, columns : [
 				['string', 'Species Group'],
 				['number', 'Content'],
 				['number', 'Stubs']
 			]]
+		addHtmlResultForSpecies(res, , request)
+		return res
 	}
 
-	def activeUserStats(params){
+	private addHtmlResultForSpecies(Map res, request){
+		List htmlData = []
+		res.data.each{ r ->
+			htmlData.add([getSpeciesGroupImage(r[0]), getHyperLink(r[0], r[0], false, false), r[1], r[2]])
+		}
+		
+		res.htmlData = htmlData
+		res.htmlColumns = [
+			['string', ''],
+			['string', 'Species Group'],
+			['number', 'Content'],
+			['number', 'Stubs']
+		]
+	}
+	
+	private getSpeciesGroupImage(sName){
+		def speciesGroup = SpeciesGroup.findByName(sName)
+		def cssClass = '"' + "btn species_groups_sprites " + speciesGroup.iconClass() + " active" + '"'
+		def title = '"' +  speciesGroup.name + '"'
+		return "<button class=$cssClass title=$title></button>"  
+	} 
+	
+	def activeUserStats(params, request){
 		int days = params.days ? params.days.toInteger() : 7
 		int max = params.max ? params.max.toInteger() : 10
 
@@ -152,6 +260,9 @@ class ChartService {
 			userGroupInstance = userGroupService.get(params.webaddress);
 		}
 
+		def startDate = new Date().minus(days)
+		DateGroovyMethods.clearTime(startDate)
+		
 		def result = Observation.withCriteria(){
 			projections {
 				groupProperty('author')
@@ -160,7 +271,7 @@ class ChartService {
 			and{
 				// taking undeleted observation
 				eq('isDeleted', false)
-				ge('createdOn', new Date().minus(days))
+				ge('createdOn', startDate)
 
 				//filter by usergroup
 				if(userGroupInstance){
@@ -176,15 +287,27 @@ class ChartService {
 		
 		def finalResult = []
 		result.each { r ->
-			finalResult.add([activityFeedService.getUserHyperLink(r[0], userGroupInstance), r[1]])
+			def link = observationService.generateLink("SUser", "show", ["id": r[0].id], request)
+			link =  "" + '<a  href="' +  link +'"><i>' + r[0].name + "</i></a>"
+			finalResult.add([ getUserImage(r[0]), link, getHyperLinkForUser(r[0].id, startDate, r[1], request)])
 		}
 		
 		return [data : result, htmlData:finalResult, columns : [
-				['string', 'User'],
-				['number', 'Observations']
-			]]
+					['string', 'User'],
+					['number', 'Observations']
+				],
+				htmlColumns : [
+					['string', ''],
+					['string', 'User'],
+					['string', 'Observations']
+				]
+			]
 	}
 
+	private getUserImage(SUser actor){
+		return '<img style="max-height: 32px; min-height: 16px; max-width: 32px; width: auto;" src="' + actor.icon(ImageType.SMALL) +'" title="' + actor.name + '" />'
+	}
+	
 	def getPortalActivityStatsByDay(params){
 		UserGroup userGroupInstance
 		def typeToIdFilterMap
@@ -251,6 +374,34 @@ class ChartService {
 		}
 
 		return params.days ? params.days.toInteger() : ((new Date().getTime() - startDate.getTime())/((1000 * 60 * 60 * 24)))
+	}
+	
+	def combineStats(params, request){
+		List speciesData = getSpeciesPageStats(params, request).htmlData
+		List obvData = getObservationStats(params, null, request).htmlData
+		
+		List finalRes = []
+		obvData.each{ List obv ->
+			List res = []
+			res.add(obv[0])
+			res.add(obv[1])
+			res.add(obv[2])
+			
+			speciesData.each{ sg -> 
+				if(sg[1] == obv[1]){
+					res.add(sg[2])
+				}
+			}
+			finalRes.add(res)
+		}
+		return [htmlData : finalRes,
+				htmlColumns : [
+				['string', ''],
+				['string', 'Species Group'],
+				['string', 'Observations'],
+				['string', 'Species pages']
+				]
+			]
 	}
 
 }

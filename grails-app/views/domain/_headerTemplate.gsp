@@ -37,7 +37,8 @@
 					</li>
 					<li class="${((params.controller == 'userGroup' && params.action == 'observation') ||(params.controller == 'observation'))?' active':''}"><a
 						href="${uGroup.createLink('mapping':'userGroup', 'action':'observation', 'userGroup':userGroupInstance)}"
-						title="Observations">Observations</a>
+                                                title="Observations">Observations</a> 
+                                            <!--a style="position:absolute;top:-18px;right:140px;box-shadow:none;background-color:transparent;" href="${uGroup.createLink('controller':'observation', 'action':'create', 'userGroup':userGroupInstance)}"><span class="badge badge-important" title="Add Observation"><i class="icon-add"></i></span></a--> 
 					</li>
 					<li
 						class="${((params.controller == 'SUser' && params.action == 'header') ||(params.controller == 'map'))?' active':''}"><a
@@ -76,6 +77,13 @@
 						href="${uGroup.createLink(mapping:"userGroup", 'action':"about", 'userGroup':userGroupInstance)}"
 						title="About Us">About Us</a>
 					</li>
+					
+					<li
+						class="${((params.controller == 'userGroup' && params.action == 'chart') ||(params.controller == 'chart'))?' active':''}"><a
+						href="${uGroup.createLink('mapping':'userGroup', 'action':'chart', 'userGroup':userGroupInstance)}"
+						title="Stats">Stats</a>
+					</li>
+
 <%--					<li class="dropdown"><a href="#" class="dropdown-toggle"--%>
 <%--						data-toggle="dropdown"> More <b class="caret"></b> </a>--%>
 <%--						<ul class="dropdown-menu" style="text-align: left;">--%>
@@ -106,7 +114,9 @@
 							Species</a></li>
 					<li class="${(params.controller == 'observation')?'active':''}"><a
 						href="${uGroup.createLink("controller":"observation")}"
-						title="Observations">Observations</a></li>
+                                                title="Observations">Observations</a>
+                                            <!--a  style="position:absolute;top:-18px;right:140px;box-shadow:none;background-color:transparent;" href="${uGroup.createLink('controller':'observation', 'action':'create', 'userGroup':userGroupInstance)}"><span class="badge badge-important" title="Add Observation"><i class="icon-plus"></i></span></a--> 
+</li>
 					<li
 						class="${(request.getHeader('referer')?.contains('/map') && params.action == 'header')?' active':''}"><a
 						href="/map" title="Maps">Maps</a></li>
@@ -120,7 +130,7 @@
 
 				<ul class="nav pull-right">
 					<li class=" ${(params.controller == 'activityFeed')?'active':''}"><a
-						href="${uGroup.createLink("controller":"activityFeed")}" title="Activity">Activity</a>
+                                            href="${uGroup.createLink("controller":"activityFeed")}" title="Activity">Activity<span id="activityTicker" class="badge badge-important" style="position:absolute;top:-9px;right:220px"></span></a>
 					</li>
 
 					<!--li class="menu-449 first"><a href="/" title="">Home</a></li-->
@@ -146,7 +156,11 @@
 							<li
 								class="${(request.getHeader('referer')?.contains('/biodiversity_news') && params.action == 'header')?' active':''}"><a
 								href="/biodiversity_news" title="News">News</a></li>
-
+							
+							<li
+								class="${(params.controller == 'chart')?' active':''}"><a
+								href="${uGroup.createLink(controller:'chart')}"
+								title="Stats">Stats</a> </li>
 						</ul>
 					</li>
 				</ul>
@@ -156,7 +170,6 @@
 		</div>
 	</div>
 </div>
-
 
 <g:javascript>
 $(document).ready(function(){

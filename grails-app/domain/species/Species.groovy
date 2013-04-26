@@ -7,9 +7,11 @@ import org.codehaus.groovy.grails.commons.ConfigurationHolder;
 
 import species.Resource;
 import species.Resource.ResourceType;
+import species.auth.SUser;
 import species.groups.SpeciesGroup;
 import species.utils.ImageType;
 import species.utils.ImageUtils;
+import species.participation.Follow;
 
 class Species {
 
@@ -24,6 +26,7 @@ class Species {
 	Date lastUpdated ;
 	
 	def grailsApplication; 
+	def springSecurityService;
 	
 	private static final log = LogFactory.getLog(this);
 	
@@ -97,6 +100,16 @@ class Species {
 		return icons;
 	}
 
+	List<Resource> getVideos() {
+		def res = new ArrayList<Resource>();
+		resources.each {
+			if(it?.type == species.Resource.ResourceType.VIDEO) {
+				res.add(it);
+			}
+		}
+		return res;
+	}
+	
 	String findSummary() {
 		def f = this.fields.find { speciesField ->
 			Field field = speciesField.field;
@@ -142,4 +155,7 @@ class Species {
 		return classifications;
 	}
 
+	def boolean fetchIsFollowing(SUser user=springSecurityService.currentUser){
+		return Follow.fetchIsFollowing(this, user)
+	}
 }

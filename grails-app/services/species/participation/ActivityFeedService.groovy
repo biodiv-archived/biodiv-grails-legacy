@@ -3,6 +3,7 @@ package species.participation
 import java.text.SimpleDateFormat
 import org.hibernate.Hibernate;
 
+import species.auth.SUser;
 import species.groups.UserGroup;
 import species.Species;
 import species.SpeciesField
@@ -22,6 +23,7 @@ class ActivityFeedService {
 	
 	static final String SPECIES_RECOMMENDED = "Suggested species name"
 	static final String SPECIES_AGREED_ON = "Agreed on species name"
+	static final String RECOMMENDATION_REMOVED = "Suggestion removed"
 	static final String OBSERVATION_POSTED_ON_GROUP = "Posted observation to group"
 	static final String OBSERVATION_REMOVED_FROM_GROUP = "Removed observation from group"
 	
@@ -50,6 +52,7 @@ class ActivityFeedService {
 	static final String SELECTED = "Selected"
 	static final String GROUP_SPECIFIC = "GroupSpecific"
 	static final String MY_FEEDS = "MyFeeds"
+	static final String USER = "User"
 	
 	
 	static final String ALL = "All"
@@ -68,9 +71,10 @@ class ActivityFeedService {
 	static transactional = false
 	
 	def grailsApplication
+	def springSecurityService
 	
 	def getActivityFeeds(params){
-		log.debug params;
+//		log.debug params;
 		def feeds = ActivityFeed.fetchFeeds(params)
 		if(params.feedOrder == OLDEST_FIRST){
 			feeds = feeds.reverse()
@@ -81,8 +85,11 @@ class ActivityFeedService {
 	def getCount(params){
 		return ActivityFeed.fetchCount(params)
 	}
-	
 	def addActivityFeed(rootHolder, activityHolder, author, activityType){
+		return addActivityFeed(rootHolder, activityHolder, author, activityType, null)
+	}
+	
+	def addActivityFeed(rootHolder, activityHolder, author, activityType, description){
 		//to support discussion on comment thread
 		def subRootHolderType = rootHolder?.class?.getCanonicalName()
 		def subRootHolderId = rootHolder?.id
@@ -94,16 +101,16 @@ class ActivityFeedService {
 		ActivityFeed af = new ActivityFeed(author:author, activityHolderId:activityHolder?.id, \
 						activityHolderType:activityHolder?.class?.getCanonicalName(), \
 						rootHolderId:rootHolder?.id, rootHolderType:rootHolder?.class?.getCanonicalName(), \
-						activityType:activityType, subRootHolderType:subRootHolderType, subRootHolderId:subRootHolderId);
+						activityType:activityType, subRootHolderType:subRootHolderType, subRootHolderId:subRootHolderId, activityDescrption:description);
 					
 		ActivityFeed.withNewSession {
 			if(!af.save(flush:true)){
 				af.errors.allErrors.each { log.error it }
 				return null
-			}else{
-				return af
 			}
 		}
+		Follow.addFollower(rootHolder, author)
+		return af
 	}
 	
 	def getDomainObject(className, id){
@@ -228,6 +235,9 @@ class ActivityFeedService {
 			case MEMBER_LEFT:
 				activityTitle = "Left group " + getUserGroupHyperLink(activityRootObj)
 				break
+			case RECOMMENDATION_REMOVED:
+				activityTitle = "Removed species name " + feedInstance.activityDescrption
+				break
 			default:
 				activityTitle = activityType
 				break
@@ -277,7 +287,7 @@ class ActivityFeedService {
 		String sb = ""
 		def uGroup = grailsApplication.mainContext.getBean('species.UserGroupTagLib');
 		if(speciesId != null){
-			sb =  '<a href="' + uGroup.createLink(controller:"species", action:"show", id:speciesId, 'userGroupWebaddress':params?.webaddress) + '">' + "<i>$reco.name</i>" + "</a>"
+			sb =  '<a href="' + uGroup.createLink(controller:"species", action:"show", id:speciesId, 'userGroupWebaddress':params?.webaddress, absolute:true) + '">' + "<i>$reco.name</i>" + "</a>"
 		}else if(reco.isScientificName){
 			sb = "<i>$reco.name</i>"
 		}else{
@@ -288,12 +298,12 @@ class ActivityFeedService {
 	
 	def getUserHyperLink(user, userGroup){
 		def uGroup = grailsApplication.mainContext.getBean('species.UserGroupTagLib');
-		return '<a href="' + uGroup.createLink(controller:'SUser', action:'show', id:user.id, userGroup:userGroup, 'userGroupWebaddress':userGroup?.webaddress)  + '">' + "<i>$user.name</i>" + "</a>"
+		return '<a href="' + uGroup.createLink(controller:'SUser', action:'show', id:user.id, userGroup:userGroup, 'userGroupWebaddress':userGroup?.webaddress, absolute:true)  + '">' + "<i>$user.name</i>" + "</a>"
 	}
 	
 	def getUserGroupHyperLink(userGroupInstance){
 		def uGroup = grailsApplication.mainContext.getBean('species.UserGroupTagLib');
-		return '<a href="' + uGroup.createLink(mapping:'userGroup',  action:'show', 'userGroup':userGroupInstance) + '">' + "<i>$userGroupInstance.name</i>" + "</a>"
+		return '<a href="' + uGroup.createLink(mapping:'userGroup',  action:'show', 'userGroup':userGroupInstance, absolute:true) + '">' + "<i>$userGroupInstance.name</i>" + "</a>"
 	}
 	
 	

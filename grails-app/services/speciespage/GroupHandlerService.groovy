@@ -182,7 +182,7 @@ class GroupHandlerService {
 	 * @return
 	 */
 	boolean updateGroup(TaxonomyDefinition taxonConcept, SpeciesGroup group) {
-		log.info "Updating group associations for taxon concept : "+taxonConcept;
+		log.info "Updating group associations for taxon concept : "+taxonConcept + " to ${group}";
 		int noOfUpdations = 0;
 
 		if(taxonConcept && group) {
@@ -212,6 +212,9 @@ class GroupHandlerService {
 		speciesGroupMappings.each { mapping ->
 			if((taxonConcept.name.trim().equals(mapping.taxonName)) && taxonConcept.rank == mapping.rank) {
 				group = mapping.speciesGroup;
+				if(!group.isAttached()) {
+					group.attach();
+				}
 			}
 		}
 		return group;

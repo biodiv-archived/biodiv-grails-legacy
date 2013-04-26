@@ -1,4 +1,5 @@
 <%@page import="species.utils.ImageType"%>
+<%@page import="species.utils.Utils"%>
 <div class="yj-message-container">
 	<div class="yj-avatar">
 		<a href="${uGroup.createLink(controller:'SUser', action:'show', id:feedInstance.author.id, userGroup:feedInstance.fetchUserGroup(), 'userGroupWebaddress':feedInstance.fetchUserGroup()?.webaddress)}">
@@ -17,7 +18,7 @@
 	</g:else>
 	</b>
 	<div class="feedActivityHolderContext yj-message-body">
-		<pre>${commentInstance.body}</pre>
+		${Utils.linkifyYoutubeLink(commentInstance.body?.replaceAll("\\n",'<br/>'))}
 	</div>
 	<g:if test="${feedPermission != 'readOnly' && commentInstance}">
 		<sUser:ifOwns model="['user':commentInstance.author]">

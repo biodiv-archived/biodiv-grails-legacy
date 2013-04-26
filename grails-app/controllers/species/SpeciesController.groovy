@@ -17,6 +17,8 @@ import groovy.xml.MarkupBuilder;
 import org.apache.solr.common.SolrException;
 import org.apache.solr.common.util.NamedList
 import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 import species.utils.Utils;
 import grails.plugins.springsecurity.Secured
@@ -28,7 +30,9 @@ class SpeciesController {
 	def speciesSearchService;
 	def namesIndexerService;
 	def speciesService;
-
+	def observationService;
+	
+	
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
 	def index = {
@@ -37,7 +41,7 @@ class SpeciesController {
 
 	def list = {
 		log.debug params
-		
+
 		def model = getSpeciesList(params);
 		params.controller="species"
 		params.action="list"
@@ -53,12 +57,12 @@ class SpeciesController {
 			def obvFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
 
 			def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml]
-			
+
 			render (result as JSON)
 			return;
 		}
 	}
-	
+
 	private def getSpeciesList(params) {
 		//cache "taxonomy_results"
 		params.startsWith = params.startsWith?:"A-Z"
@@ -106,7 +110,7 @@ class SpeciesController {
 				rs = Species.executeQuery(countQuery,[sGroup:groupIds]);
 			}
 			def speciesCountWithContent = 0;
-			
+
 			for(c in rs) {
 				count += c[1];
 				if (c[0] >0)
@@ -154,7 +158,7 @@ class SpeciesController {
 
 	def show = {
 		//cache "content"
-		def speciesInstance = Species.get(params.id)
+		def speciesInstance = Species.get(params.long('id'))
 		if (!speciesInstance) {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'species.label', default: 'Species'), params.id])}"
 			redirect(action: "list")
@@ -166,7 +170,10 @@ class SpeciesController {
 			};
 			Map map = getTreeMap(fields);
 			map = mapSpeciesInstanceFields(speciesInstance, speciesInstance.fields, map);
-			[speciesInstance: speciesInstance, fields:map]
+			def relatedObservations = observationService.getRelatedObservationByTaxonConcept(speciesInstance.taxonConcept.id, 1,0);
+			def observationInstanceList = relatedObservations?.observations?.observation
+			def instanceTotal = relatedObservations?relatedObservations.count:0
+			[speciesInstance: speciesInstance, fields:map, totalObservationInstanceList:[:], observationInstanceList:observationInstanceList, instanceTotal:instanceTotal, queryParams:[max:1, offset:0], 'userGroupWebaddress':params.webaddress]
 		}
 	}
 
@@ -250,17 +257,17 @@ class SpeciesController {
 			//log.debug "Concept : "+concept
 			Map newConceptMap = new LinkedHashMap();
 			if(hasContent(concept.value.get('speciesFieldInstance'))) {
-//				List speciesFieldInstances = newConceptMap.get('speciesFieldInstance');
-//				if(speciesFieldInstances == null) {
-//					speciesFieldInstances = [];
-//					newConceptMap.put('speciesFieldInstance', speciesFieldInstances);
-//				}
-//				speciesFieldInstances.add(concept.value.get('speciesFieldInstance'));
+				//				List speciesFieldInstances = newConceptMap.get('speciesFieldInstance');
+				//				if(speciesFieldInstances == null) {
+				//					speciesFieldInstances = [];
+				//					newConceptMap.put('speciesFieldInstance', speciesFieldInstances);
+				//				}
+				//				speciesFieldInstances.add(concept.value.get('speciesFieldInstance'));
 				newConceptMap.put('speciesFieldInstance', concept.value.get('speciesFieldInstance'));
 			}
 			for(category in concept.value) {
 				Map newCategoryMap = new LinkedHashMap();
-//				log.debug "Category : "+category
+				//				log.debug "Category : "+category
 				if(category.key.equals("field") || category.key.equals("speciesFieldInstance") || category.key.equalsIgnoreCase('Species Resources'))  {
 					continue;
 				} else if(category.key.equals(config.OCCURRENCE_RECORDS) || category.key.equals(config.REFERENCES) ) {
@@ -279,17 +286,17 @@ class SpeciesController {
 						newConceptMap.put(category.key, category.value);
 					}
 				} else if(hasContent(category.value.get('speciesFieldInstance'))) {
-//					List speciesFieldInstances = newCategoryMap.get('speciesFieldInstance');
-//					if(speciesFieldInstances == null) {
-//						speciesFieldInstances = [];
-//						newCategoryMap.put('speciesFieldInstance', speciesFieldInstances);
-//					}
-//					speciesFieldInstances.add(category.value.get('speciesFieldInstance'));
+					//					List speciesFieldInstances = newCategoryMap.get('speciesFieldInstance');
+					//					if(speciesFieldInstances == null) {
+					//						speciesFieldInstances = [];
+					//						newCategoryMap.put('speciesFieldInstance', speciesFieldInstances);
+					//					}
+					//					speciesFieldInstances.add(category.value.get('speciesFieldInstance'));
 					newCategoryMap.put('speciesFieldInstance', category.value.get('speciesFieldInstance'));
 				}
 				for(subCategory in category.value) {
 
-//					log.debug "subCategory : "+subCategory;
+					//					log.debug "subCategory : "+subCategory;
 					if(subCategory.key.equals("field") || subCategory.key.equals("speciesFieldInstance")) continue;
 
 					if((subCategory.key.equals(config.GLOBAL_DISTRIBUTION_GEOGRAPHIC_ENTITY) && speciesInstance.globalDistributionEntities.size()>0)  ||
@@ -297,7 +304,7 @@ class SpeciesController {
 					(subCategory.key.equals(config.INDIAN_DISTRIBUTION_GEOGRAPHIC_ENTITY) && speciesInstance.indianDistributionEntities.size()>0) ||
 					(subCategory.key.equals(config.INDIAN_ENDEMICITY_GEOGRAPHIC_ENTITY) && speciesInstance.indianEndemicityEntities.size()>0)||
 					hasContent(subCategory.value.get('speciesFieldInstance'))) {
-//						log.debug "Putting distribution entities ${subCategory.key}"
+						//						log.debug "Putting distribution entities ${subCategory.key}"
 						newCategoryMap.put(subCategory.key, subCategory.value)
 					}
 				}
@@ -329,7 +336,7 @@ class SpeciesController {
 	@Secured(['ROLE_USER'])
 	def edit = {
 		if(params.id) {
-			def speciesInstance = Species.get(params.id)
+			def speciesInstance = Species.get(params.long('id'))
 			if (!speciesInstance) {
 				flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'species.label', default: 'Species'), params.id])}"
 				redirect(action: "list")
@@ -350,12 +357,12 @@ class SpeciesController {
 		if(!params.name || !params.pk) {
 			render ([success:false, msg:'Either field name or field id is missing'] as JSON)
 			return;
-		} 
-		
+		}
+
 		def result;
 		long speciesFieldId = params.pk ? params.long('pk'):null;
 		def value = params.value;
-		
+
 		switch(params.name) {
 			case "contributor":
 				long cid = params.cid?params.long('cid'):null;
@@ -368,15 +375,69 @@ class SpeciesController {
 			case "description":
 				result = speciesService.updateDescription(speciesFieldId, value);
 				break;
-			
 		}
-		
+
 		render result as JSON
+	}
+
+	@Secured(['ROLE_SPECIES_ADMIN'])
+	def addResource = {
+		log.debug params;
+		if(!params.id) {
+			render ([success:false, errors:[msg:'Species id is missing']] as JSON)
+			return;
+		}
+
+		def result;
+		long speciesInstanceId = params.long('id');
+		def speciesInstance = Species.get(speciesInstanceId);
+
+		if(!speciesInstance) {
+			render ([success:false, errors:[msg:'Species instance with id not found']] as JSON)
+			return;
+		}
+
+		try {
+			def resourcesXML;
+			if(params.image) {
+				resourcesXML = speciesService.createImagesXML(params);
+			} else if (params.video) {
+				resourcesXML = speciesService.createVideoXML(params);
+			} else {
+				log.error "No resource is given in the parameters"
+				render ([success:false, errors:[msg:'No resource is given in the parameters']] as JSON)
+				return;
+			}
+
+			println resourcesXML;
+			if(resourcesXML) {
+				def resources = speciesService.saveResources(resourcesXML,  speciesInstance.taxonConcept.canonicalForm);
+				println resources;
+				resources.each { resource ->
+					speciesInstance.addToResources(resource);
+				}
+
+
+				if(!speciesInstance.hasErrors() && speciesInstance.save(flush:true)) {
+					render ([success:true, id:resources[0].id, msg:""]) as JSON
+					return;
+				} else {
+					speciesInstance.errors.each { log.error it }
+					render ([success:false, errors:[msg:"Error while updating species "]]) as JSON
+					return;
+				}
+
+
+			}
+		} catch(e) {
+			render ([success:false, errors:[msg:'Error adding resource: $e.message']] as JSON)
+		}
+
 	}
 
 	@Secured(['ROLE_ADMIN'])
 	def delete = {
-		def speciesInstance = Species.get(params.id)
+		def speciesInstance = Species.get(params.long('id'))
 		if (speciesInstance) {
 			try {
 				speciesInstance.delete(flush: true)
@@ -423,7 +484,7 @@ class SpeciesController {
 		log.debug params;
 		def model = speciesService.search(params)
 		model['isSearch'] = true;
-		
+
 		if(params.loadMore?.toBoolean()){
 			params.remove('isGalleryUpdate');
 			render(template:"/species/searchResultsTemplate", model:model);
@@ -439,13 +500,13 @@ class SpeciesController {
 			def obvFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
 
 			def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml]
-			
+
 			render (result as JSON)
 			return;
 		}
 	}
 
-	
+
 
 	/**
 	 *
@@ -456,4 +517,108 @@ class SpeciesController {
 		List result = speciesService.nameTerms(params)
 		render result.value as JSON;
 	}
+
+
+	//	def getRelatedObservations = {
+	//		log.debug params
+	//
+	//		def speciesInstance = Species.get(params.long('id'))
+	//		if (speciesInstance) {
+	//			params.limit = Math.min(params.max ? params.int('limit') : 10, 100);
+	//			params.offset = params.offset ? params.int('offset') : 0
+	//			params.filterProperty = 'taxonConcept'
+	//			params.filterPropertyValue = speciesInstance.taxonConcept;
+	//
+	//			def relatedObv = observationService.getRelatedObservations(params).relatedObv;
+	//
+	//			if(relatedObv.observations) {
+	//				relatedObv.observations = observationService.createUrlList2(relatedObv.observations);
+	//			}
+	//
+	//			render relatedObv as JSON
+	//		}
+	//		else {
+	//			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'species.label', default: 'Species'), params.id])}"
+	//			render (['success':false, msg:'No species id'] as JSON)
+	//		}
+	//
+	//
+	//	}
+
+	@Secured(['ROLE_SPECIES_ADMIN'])
+	def upload = {
+		log.debug params
+		try {
+			if(ServletFileUpload.isMultipartContent(request)) {
+				def rs = [:]
+				Utils.populateHttpServletRequestParams(request, rs);
+				def resourcesInfo = [];
+				def rootDir = grailsApplication.config.speciesPortal.species.rootDir
+				File obvDir
+				def message;
+
+				if(!params.data_file) {
+					message = g.message(code: 'no.file.attached', default:'No file is attached')
+				}
+				def data_file = params.data_file
+
+				log.debug "Saving species spreadsheet data file ${data_file.originalFilename}"
+
+				// List of OK mime-types
+				//TODO Move to config
+				def okcontents = [
+					'image/png',
+					'image/jpeg',
+					'image/pjpeg',
+					'image/gif',
+					'image/jpg'
+				]
+
+				if (! okcontents.contains(data_file.contentType)) {
+					message = g.message(code: 'resource.file.invalid.extension.message', args: [
+						okcontents,
+						f.originalFilename
+					])
+				}
+				else if(data_file.size > grailsApplication.config.speciesPortal.observations.MAX_IMAGE_SIZE) {
+					message = g.message(code: 'resource.file.invalid.max.message', args: [
+						grailsApplication.config.speciesPortal.observations.MAX_IMAGE_SIZE/1024,
+						data_file.originalFilename,
+						data_file.size/1024
+					], default:'File size cannot exceed ${104857600/1024}KB');
+				}
+				else if(data_file.empty) {
+					message = g.message(code: 'file.empty.message', default:'File cannot be empty');
+				}
+				else {
+					if(!obvDir) {
+						if(!params.obvDir) {
+							obvDir = new File(rootDir);
+							if(!obvDir.exists()) {
+								obvDir.mkdir();
+							}
+							obvDir = new File(obvDir, UUID.randomUUID().toString());
+							obvDir.mkdir();
+						} else {
+							obvDir = new File(rootDir, params.obvDir);
+							obvDir.mkdir();
+						}
+					}
+
+					File file = observationService.getUniqueFile(obvDir, Utils.cleanFileName(f.originalFilename));
+					data_file.transferTo( file );
+
+				}
+			}
+
+
+		} catch(e) {
+			e.printStackTrace();
+			response.setStatus(500)
+			def message = [error:g.message(code: 'file.upload.fail', default:'Error while processing the request.')]
+			render message as JSON
+		}
+	}
+
+	
 }

@@ -82,6 +82,17 @@
 											style="height: 600px; width: 100%"></div>
 										<comment:showCommentPopup model="['commentHolder':[objectType:ActivityFeedService.SPECIES_MAPS, id:speciesInstance.id], 'rootHolder':speciesInstance]" />	
 										</div>
+<%--										--%>
+<%--										<obv:showObservationsList  model="['observationInstanceList':observationInstanceList, 'instanceTotal':instanceTotal, 'queryParams':queryParams, 'activeFilters':activeFilters, 'userGroupWebaddress':userGroupWebaddress]"  />--%>
+				
+					<div class="sidebar_section">
+						<h5>Related Observations</h5>
+						<div class="tile" style="clear: both">
+							<obv:showRelatedStory
+								model="['speciesId':speciesInstance.id, 'controller':'observation', 'action':'getRelatedObservation', 'filterProperty': 'taxonConcept',  'filterPropertyValue': speciesInstance.taxonConcept.id, 'id':'a','userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress]" />
+						</div>
+					</div>
+				
 									</g:elseif>
 
 									<g:elseif test="${category.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.REFERENCES)}">

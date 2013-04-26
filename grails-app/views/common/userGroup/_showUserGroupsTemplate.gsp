@@ -1,5 +1,5 @@
 <div class="row section">
-	<b>${title}</b>
+	<h6>${title}</h6>
 	<ul class="nav">
 		<g:each in="${userGroupInstanceList}" var="${userGroup}">
 			<li class="span4"><uGroup:showUserGroupSignature  model="[ 'userGroup':userGroup]" /></li>

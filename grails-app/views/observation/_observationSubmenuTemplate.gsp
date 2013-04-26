@@ -7,11 +7,10 @@
 				<s:showHeadingAndSubHeading
 					model="['heading':entityName, 'subHeading':subHeading, 'headingClass':headingClass, 'subHeadingClass':subHeadingClass]" />
 			</div>
-			<a class="btn btn-info pull-right"
+			<a class="btn btn-success pull-right"
 				href="${uGroup.createLink(
 						controller:'observation', action:'create', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"
-				> <i class="icon-plus"></i>Add an
-				Observation</a>
+				> <i class="icon-plus"></i>Add Observation</a>
 		</div>
 	</div>
 </g:if>

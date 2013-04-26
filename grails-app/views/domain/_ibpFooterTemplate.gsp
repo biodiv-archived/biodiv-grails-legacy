@@ -75,6 +75,10 @@
 </div>
 <r:script>
 $(document).ready(function(){
-	 last_actions();
+	$(".youtube_container").each(function(){
+		loadYoutube(this);
+	});
+	
+	last_actions();
 });
 </r:script>

@@ -17,9 +17,9 @@ function loadOlderFeedsInAjax(targetComp){
 				var htmlData = $(data.showFeedListHtml);
 				htmlData = removeDuplicateFeed($(targetComp).children('ul'), htmlData, feedType, "older", targetComp);
 				if(feedOrder === "latestFirst"){
-					$(targetComp).children('ul').append(htmlData);
+					htmlData.appendTo($(targetComp).children('ul')).hide().slideDown(1000);
 				}else{
-					$(targetComp).children('ul').prepend(htmlData);
+					htmlData.prependTo($(targetComp).children('ul')).hide().slideDown(1000);
 				}
     			$(targetComp).children('input[name="olderTimeRef"]').val(data.olderTimeRef);
     			if(data.remainingFeedCount && data.remainingFeedCount > 0){
@@ -64,6 +64,7 @@ function loadNewerFeedsInAjax(targetComp, checkFeed){
 				if(data.feedAvailable){
 					newFeedProcessing = true;
 					$(targetComp).children('.activiyfeednewermsg').show();
+                                        $("#activityTicker").html("New");
 				}
 			}
 			else if(data.showFeedListHtml){
@@ -75,10 +76,10 @@ function loadNewerFeedsInAjax(targetComp, checkFeed){
     			var htmlData = $(data.showFeedListHtml);
     			htmlData = removeDuplicateFeed($(targetComp).children('ul'), htmlData, feedType, "newer", targetComp);
     			if(feedOrder === "latestFirst"){
-    				$(targetComp).children('ul').prepend(htmlData);
-				}else{
-					$(targetComp).children('ul').append(htmlData);
-				}
+    				htmlData.prependTo($(targetComp).children('ul')).hide().slideDown(1000);
+			}else{
+                                htmlData.appendTo($(targetComp).children('ul')).hide().slideDown(1000);
+			}
     			$(targetComp).children('input[name="newerTimeRef"]').val(data.newerTimeRef);
     			newFeedProcessing = false;
     			feedPostProcess();
@@ -175,6 +176,7 @@ function getFeedParams(timeLine, targetComp){
 	}else{
 		feedParams["refTime"] = $(targetComp).children('input[name="olderTimeRef"]').val();
 	}
+	feedParams["user"] = $(targetComp).children('input[name="user"]').val();
 	return feedParams;
 }
 
@@ -268,6 +270,11 @@ function getTargetComp(){
 	if(targetComp.length == 1){
 		return targetComp;
 	}
+        
+        targetComp = $('.activityfeedUser');
+	if(targetComp.length == 1){
+		return targetComp;
+	}
 	return null;
 }
 
@@ -308,3 +315,40 @@ $('.feed_filter_label').click(function(){
 });
 
 
+function followObject(className, id, comp, url){
+	var doFollow = ($(comp).text() == 'Unfollow') ? false : true;
+	$.ajax({
+		url: url,
+		data:{'className':className, 'id':id, 'follow':doFollow},
+		
+		success: function(data){
+			if(data.status == 'success') {
+				$(".alertMsg").removeClass('alert alert-error').addClass('alert alert-success').html(data.msg);
+				$("html, body").animate({ scrollTop: 0 });
+				toggleFollowButton(comp);
+			}
+			return false;
+		},
+		
+		error:function (xhr, ajaxOptions, thrownError){
+			//successHandler is used when ajax login suceedes
+        	var successHandler = this.success, errorHandler = null;
+        	handleError(xhr, ajaxOptions, thrownError, successHandler, errorHandler);
+		} 
+	});
+}
+
+function toggleFollowButton(comp){
+	if(($(comp).text() == 'Unfollow')){
+		$(comp).html('Follow')
+	}else{
+		$(comp).html('Unfollow')
+	}
+}
+
+function setFollowButton(){
+	var comp = $("#followButton");
+	if(($(comp).text() == 'Follow')){
+		$(comp).html('Unfollow')
+	}
+}

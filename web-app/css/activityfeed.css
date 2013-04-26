@@ -15,7 +15,7 @@
 	margin-left: 0px;
 	margin-bottom: -8px;
 }
-.activityfeedAll, .activityfeedGeneric, .activityfeedMyFeeds{
+.activityfeedAll, .activityfeedGeneric, .activityfeedMyFeeds,.activityfeedUser{
 	background-color:#ffffff;
 }
 
@@ -24,7 +24,7 @@
 	background-color: rgba(106, 201, 162, 0.15);
 }
 
-.activityfeedSpecific .activityFeed-container, .activityfeedGroupSpecific .activityFeed-container, .activityfeedAll .activityFeed-container, .activityfeedMyFeeds .activityFeed-container  {
+.activityfeedSpecific .activityFeed-container, .activityfeedGroupSpecific .activityFeed-container, .activityfeedAll .activityFeed-container, .activityfeedMyFeeds .activityFeed-container,.activityfeedUser .activityFeed-container  {
 	background-color: #e5e5e5;
 }
 

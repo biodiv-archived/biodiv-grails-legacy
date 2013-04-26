@@ -1,4 +1,5 @@
 <%@page import="species.utils.ImageType"%>
+<%@page import="species.utils.Utils"%>
 <div class="yj-thread-replies-container">
 	<div class="yj-message-container">
 		<div class="yj-avatar">
@@ -14,7 +15,7 @@
 		<comment:showCommentContext
 			model="['commentInstance' : commentInstance]" />
 		<div class="yj-message-body">
-			<pre>${commentInstance.body}</pre>
+			${Utils.linkifyYoutubeLink(commentInstance.body?.replaceAll("\\n",'<br/>'))}
 		</div>
 		<div class="yj-attributes">
 			<time class="timeago" datetime="${commentInstance.lastUpdated.getTime()}"></time>

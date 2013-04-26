@@ -6,6 +6,7 @@ import species.ExternalLinks;
 import species.Species;
 import species.TaxonomyDefinition.TaxonomyRank;
 import grails.converters.JSON;
+import grails.util.Environment;
 import groovyx.net.http.HTTPBuilder;
 import groovyx.net.http.ContentType;
 import groovyx.net.http.Method;
@@ -24,22 +25,24 @@ class ExternalLinksService {
 		int offset = 0;
 		int noOfUpdations = 0;
 		int noOfFailures = 0;
-		
+
 		while(true) {
 
+
 			def taxonConcepts = TaxonomyDefinition.findAll("from TaxonomyDefinition as taxonomyDefinition where taxonomyDefinition.rank = :speciesTaxonRank  order by taxonomyDefinition.id",[speciesTaxonRank:TaxonomyRank.SPECIES.ordinal()],[max:limit, offset:offset]);
-			
+
 			if(!taxonConcepts) break;
-			
+			//TaxonomyDefinition.withNewSession { session ->
 			taxonConcepts.eachWithIndex { taxonConcept, index ->
 				if(!taxonConcept.externalLinks?.eolId && updateExternalLinks(taxonConcept)) {
 					noOfUpdations ++;
 				} else {
 					noOfFailures++;
-				}	
+				}
 			}
 			log.info "Updated external links for taxonConcepts ${noOfUpdations}"
-			cleanUpGorm();
+			//}
+			//			cleanUpGorm();
 			offset += limit;
 		}
 		if(noOfUpdations) {
@@ -57,15 +60,17 @@ class ExternalLinksService {
 	boolean updateExternalLinks(TaxonomyDefinition taxonConcept) {
 		def http = new HTTPBuilder();
 
-		updateEOLId(http, taxonConcept);
-		if(taxonConcept.externalLinks?.eolId) {
-			updateOtherIdsFromEOL(http, taxonConcept.externalLinks?.eolId, taxonConcept);
-		}
+		if(!Environment.getCurrent().getName().startsWith("development")) {
+			updateEOLId(http, taxonConcept);
+			if(taxonConcept.externalLinks?.eolId) {
+				updateOtherIdsFromEOL(http, taxonConcept.externalLinks?.eolId, taxonConcept);
+			}
 
-		taxonConcept = taxonConcept.merge();
-		if(!taxonConcept.save()) {
-			taxonConcept.errors.each { log.error it};
-			return false;
+			//taxonConcept = session.merge(taxonConcept);
+			if(!taxonConcept.save()) {
+				taxonConcept.errors.each { log.error it};
+				return false;
+			}
 		}
 		return true;
 	}
@@ -140,22 +145,26 @@ class ExternalLinksService {
 	 */
 	private boolean updateEOLId(HTTPBuilder http, TaxonomyDefinition taxonConcept) {
 		log.debug "Fetching EOL ID for taxon : "+taxonConcept
-
-		http.request( "http://eol.org/api/search/1.0" , Method.GET, ContentType.JSON) {
-			uri.path = taxonConcept.canonicalForm+'.json'
-			uri.query = [ exact:1 ]
-			response.success = { resp, json ->
-				if(resp.isSuccess()) {
-					log.debug "EOL search result for : "+json
-					if(json.results) {
-						updateExternalLink(taxonConcept, "eol", String.valueOf(json.results[0].id), false, new Date());
+		try {
+			http.request( "http://eol.org/api/search/1.0" , Method.GET, ContentType.JSON) {
+				uri.path = taxonConcept.canonicalForm+'.json'
+				uri.query = [ exact:1 ]
+				response.success = { resp, json ->
+					if(resp.isSuccess()) {
+						log.debug "EOL search result for : "+json
+						if(json.results) {
+							updateExternalLink(taxonConcept, "eol", String.valueOf(json.results[0].id), false, new Date());
+						}
 					}
 				}
+				response.failure = { resp ->  log.error 'EOL search request failed for taxon : '+taxonConcept }
 			}
-			response.failure = { resp ->  log.error 'EOL search request failed for taxon : '+taxonConcept }
-		}
 
-		return (taxonConcept.externalLinks?.eolId)
+			return (taxonConcept.externalLinks?.eolId)
+		} catch(e) {
+			log.error "$e.message"
+		}
+		return false;
 	}
 
 
@@ -166,36 +175,38 @@ class ExternalLinksService {
 	 */
 	private void updateOtherIdsFromEOL(HTTPBuilder http, String eolId, TaxonomyDefinition taxonConcept) {
 		log.debug "Fetching EOL ID for taxon : "+taxonConcept
-
-
-		http.request( "http://eol.org/api/pages/1.0" , Method.GET, ContentType.JSON) {
-			uri.path = eolId + '.json'
-			uri.query = [ common_names:1, details:1, subjects:'all', text:2 ]
-			response.success = { resp, json ->
-				if(resp.isSuccess()) {
-					json.taxonConcepts.each { r ->
-						log.debug r;
-						switch(r.nameAccordingTo) {
-							case "Species 2000 & ITIS Catalogue of Life: Annual Checklist 2010":
-								updateExternalLink(taxonConcept, "col", r.sourceIdentfier, false, new Date());
-								break;
-							case "Integrated Taxonomic Information System (ITIS)":
-								updateExternalLink(taxonConcept, "itis", r.sourceIdentfier, false, new Date());
-								break;
-							case "IUCN Red List (Species Assessed for Global Conservation)":
-								if(!taxonConcept.externalLinks?.iucnId)
-									updateExternalLink(taxonConcept, "iucn", r.sourceIdentfier, false, new Date());
-								break;
-							case "NCBI Taxonomy":
-								updateExternalLink(taxonConcept, "ncbi", r.sourceIdentfier, false, new Date());
-								break;
+		try {
+			http.request( "http://eol.org/api/pages/1.0" , Method.GET, ContentType.JSON) {
+				uri.path = eolId + '.json'
+				uri.query = [ common_names:1, details:1, subjects:'all', text:2 ]
+				response.success = { resp, json ->
+					if(resp.isSuccess()) {
+						json.taxonConcepts.each { r ->
+							log.debug r;
+							switch(r.nameAccordingTo) {
+								case "Species 2000 & ITIS Catalogue of Life: Annual Checklist 2010":
+									updateExternalLink(taxonConcept, "col", r.sourceIdentfier, false, new Date());
+									break;
+								case "Integrated Taxonomic Information System (ITIS)":
+									updateExternalLink(taxonConcept, "itis", r.sourceIdentfier, false, new Date());
+									break;
+								case "IUCN Red List (Species Assessed for Global Conservation)":
+									if(!taxonConcept.externalLinks?.iucnId)
+										updateExternalLink(taxonConcept, "iucn", r.sourceIdentfier, false, new Date());
+									break;
+								case "NCBI Taxonomy":
+									updateExternalLink(taxonConcept, "ncbi", r.sourceIdentfier, false, new Date());
+									break;
+							}
 						}
+						log.debug "No of data objects  : "+json.dataObjects.size();
+						taxonConcept.externalLinks.noOfDataObjects = json.dataObjects.size();
 					}
-					log.debug "No of data objects  : "+json.dataObjects.size();
-					taxonConcept.externalLinks.noOfDataObjects = json.dataObjects.size();
 				}
+				response.failure = { resp ->  log.error 'EOL page request failed for eolId : '+eolId }
 			}
-			response.failure = { resp ->  log.error 'EOL page request failed for eolId : '+eolId }
+		} catch(e) {
+			log.error "$e.message"
 		}
 	}
 

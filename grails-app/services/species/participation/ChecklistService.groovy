@@ -40,7 +40,6 @@ import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Element;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.Image
-import com.itextpdf.text.List;
 import com.itextpdf.text.ListItem;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Phrase;
@@ -845,24 +844,32 @@ class ChecklistService {
 		PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(pdfFile))
 		
 		document.open()
-		Map m = cl.fetchExportableValue()
+		Map m = cl.fetchExportableValue(true)
 		
 		
 		//adding site banner
-		Image image2 = Image.getInstance(grailsApplication.config.speciesPortal.app.rootDir + "/sites/all/themes/ibp/images/map-logo.gif");
+		Image image2 = Image.getInstance(new URL(Utils.getIBPServerDomain() + "/sites/all/themes/ibp/images/map-logo.gif"));
 		//image2.scaleToFit(120f, 120f);
 		document.add(image2);
 		
 		//writing meta data
-		List list = new List(10);
+		com.itextpdf.text.List list = new com.itextpdf.text.List(10);
 		for(item in m[cl.META_DATA]){
 			list.add(new ListItem(item.join("  ")));
 		}
 		document.add(list)
 		
 		//writing data
-		def columnNames = cl.fetchColumnNames()
-		PdfPTable t = new PdfPTable(columnNames.length)
+		def tmpColumnNames = cl.fetchColumnNames()
+		def columnNames = ["s.no"]
+		for(c in tmpColumnNames){
+			if(c.equalsIgnoreCase(ChecklistService.SN_NAME) || c.equalsIgnoreCase(ChecklistService.CN_NAME)){
+				columnNames.add(c)
+			}
+		}
+		columnNames.add("notes")
+		
+		PdfPTable t = new PdfPTable(columnNames.size())
 		t.setSpacingBefore(25);
 		t.setSpacingAfter(25);
 		
@@ -888,7 +895,7 @@ class ChecklistService {
 		CSVWriter writer = obvUtilService.getCSVWriter(csvFile.getParent(), csvFile.getName())
 		log.debug "Writing csv checklist" + cl
 		
-		Map m = cl.fetchExportableValue()
+		Map m = cl.fetchExportableValue(false)
 		
 		for(item in m[cl.META_DATA]){
 			writer.writeNext(item.toArray(new String[0]))

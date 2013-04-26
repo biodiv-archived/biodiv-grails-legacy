@@ -7,7 +7,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="main" />
 <g:set var="entityName"
-	value="${message(code: 'charts.label', default: 'Stats')}" />
+	value="${message(code: 'charts.label', default: 'Statistics')}" />
 <title><g:message code="default.list.label" args="[entityName]" />
 </title>
 <r:require modules="chart" />
@@ -27,13 +27,15 @@
 				${flash.message}
 			</div>
 		</g:if>
-		<chart:showActivityStats model="['title':'Activity Stats', columns:activityData.columns, data:activityData.data]"/>
-		<br>
-		<chart:showStats model="['title':'User Stats (7 days) ', columns:userData.columns, data:userData.data, hAxisTitle:'User', htmlData:userData.htmlData]"/>
 		
-		<chart:showStats model="['title':'Observations', columns:obvData.columns, data:obvData.data]"/>
 		
-		<chart:showStats model="['title':'Speices', columns:speciesData.columns, data:speciesData.data]"/>
+		<chart:showActivityStats model="['title':'Activity Monitor', columns:activityData.columns, data:activityData.data]"/>
+		
+		<chart:showStats model="['title':'User Stats (Last 7 days) ', columns:userData.columns, data:userData.data, hAxisTitle:'User', htmlData:userData.htmlData, htmlColumns:userData.htmlColumns]"/>
+		
+		<chart:showStats model="['title':'Observations', columns:obvData.columns, data:obvData.data, htmlData:obvData.htmlData, htmlColumns:obvData.htmlColumns]"/>
+		
+		<chart:showStats model="['title':'Species Pages', columns:speciesData.columns, data:speciesData.data,, htmlData:speciesData.htmlData, htmlColumns:speciesData.htmlColumns]"/>
 	</div>
 	<r:script>
 	</r:script>

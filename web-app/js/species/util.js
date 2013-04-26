@@ -41,7 +41,6 @@ function dcorateCommentBody(comp){
 	//var text = $(comp).text().replace(/\n\r?/g, '<br />');
 	//$(comp).html(text);
 	$(comp).linkify();
-	
 }
 
 
@@ -68,6 +67,10 @@ function feedPostProcess(){
 	$('.linktext').linkify();  
 	$('.yj-message-body').linkify();
 	updateRelativeTime();
+	
+	$(".youtube_container").each(function(){
+		loadYoutube(this);
+	});
 }
 
 //to show relative date
@@ -95,3 +98,11 @@ function feedPostProcess(){
 //			} 
 //		}); 
 //}
+
+function loadGoogleMapsScript() {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src = "http://maps.googleapis.com/maps/api/js?sensor=true&callback=initMap";
+    document.body.appendChild(script);
+}
+

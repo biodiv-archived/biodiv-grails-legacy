@@ -18,9 +18,21 @@ class ChartController {
 		//render chartService.getPortalActivityStatsByDay(params) as JSON
 		[]
 	}
-	@Secured(['ROLE_ADMIN'])
+	//@Secured(['ROLE_ADMIN'])
 	def show = {
 		log.debug params
-		[obvData:chartService.getObservationStats(params, null), speciesData: chartService.getSpeciesPageStats(params), userData:chartService.activeUserStats(params),  activityData:chartService.getPortalActivityStatsByDay(params)]
+		[obvData:chartService.getObservationStats(params, null, request), speciesData: chartService.getSpeciesPageStats(params, request), userData:chartService.activeUserStats(params, request),  activityData:chartService.getPortalActivityStatsByDay(params)]
 	}
+	
+	def homePageStat = {
+		log.debug params
+		[obvData:chartService.getObservationStats(params, null, request), speciesData: chartService.getSpeciesPageStats(params, request), userData:chartService.activeUserStats(params, request),  activityData:chartService.getPortalActivityStatsByDay(params), combineData:chartService.combineStats(params, request) ]
+		//render(template:"/chart/homePageStatTemplate", model:[activityData:chartService.getPortalActivityStatsByDay(params)])
+		//[obvData:chartService.getObservationStats(params, null), speciesData: chartService.getSpeciesPageStats(params), userData:chartService.activeUserStats(params),  activityData:chartService.getPortalActivityStatsByDay(params)]
+	}
+	
+	def smallStat = {
+		log.debug params
+		render template:"/chart/homePageStatTemplate", model:[activityData:chartService.getPortalActivityStatsByDay(params)]
+	} 
 }

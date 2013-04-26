@@ -213,6 +213,31 @@ function init_header() {
 	
 }
 
+function loadYoutube(youtube_container) {
+	var info = $(youtube_container).find(".info");
+	var preview = $(youtube_container).find(".preview")
+	
+	var youtube_video_id = $(preview).find('span.videoId').text();
+	if(youtube_video_id) {
+		var api_url = "https://gdata.youtube.com/feeds/api/videos/" + youtube_video_id + "?v=2&alt=json-in-script&callback=?";
+		 this;
+		$.getJSON(api_url, function(data) {
+		    $(info).html("<b><a href='http://youtube.com/watch?v=" + youtube_video_id + "' target='_blank'>" + data.entry.title.$t + "</a></b>");
+		});	
+	}
+	
+	
+	$(preview).click(function() {
+		var youtube_video_id = $(this).find('span.videoId').text();
+		if(youtube_video_id) {
+			var iframe_url = "http://www.youtube.com/embed/" + youtube_video_id + "?autoplay=1";
+		    $(preview).html("<iframe width='480' height='295' src='" + iframe_url + "' frameborder='0' allowfullscreen></iframe>");
+		    $(preview).css("float", "none");
+		    return false;
+		}
+	 });
+}
+
 function last_actions() {
 	$(".ellipsis.multiline").trunk8({
 		lines:2,		
@@ -234,3 +259,4 @@ function last_actions() {
 	//applying table sorting
 	$("table.tablesorter").tablesorter();
 }
+

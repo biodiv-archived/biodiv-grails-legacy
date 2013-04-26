@@ -40,20 +40,5 @@
 			<clist:showList />
 		
 </div>
-
-<g:javascript>
-$(document).ready(function(){
-	window.params = {
-	<%
-		params.each { key, value ->
-			println '"'+key+'":"'+value+'",'
-		}
-	%>
-		"isGalleryUpdate":true,
-		"offset":0
-	}
-
-});
-</g:javascript>		
 </body>
 </html>

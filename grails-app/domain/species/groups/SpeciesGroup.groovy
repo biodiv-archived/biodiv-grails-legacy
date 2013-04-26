@@ -20,6 +20,8 @@ class SpeciesGroup {
 	
 	static hasMany = [taxonConcept:TaxonomyDefinition, speciesGroupMapping:SpeciesGroupMapping]
 	
+	static fetchMode = [parentGroup: 'eager']
+	
     static constraints = {
 		name(blank:false, unique:true);
 		parentGroup nullable:true;
@@ -60,6 +62,8 @@ class SpeciesGroup {
 	 */
 	@Override
 	public boolean equals(Object obj) {
+		if (this.is(obj))
+			return true;
 		if (obj == null)
 			return false;
 		if (!(obj instanceof SpeciesGroup))

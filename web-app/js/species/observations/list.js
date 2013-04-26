@@ -147,6 +147,13 @@ $(document).ready(function(){
     	return false;
     });
     
+    $("#removeDateRange").live('click', function(){
+    	$("input[name='daterangepicker_start']").val("");
+        $("input[name='daterangepicker_end']").val("");
+        updateGallery(undefined, window.params.queryParamsMax, window.params.offset, false, window.params.isGalleryUpdate);
+    	return false;
+    });
+    
     $("#removeQueryFilter").live('click', function(){
     	$( "#searchTextField" ).val('');
     	var removeParam = undefined;
@@ -229,7 +236,6 @@ $(document).ready(function(){
 			    var History = window.History;
 			    History.pushState({state:1}, "Species Portal", '?'+decodeURIComponent($.param(params))); 
 				updateRelativeTime();
-				$("table.tablesorter").tablesorter();
 				last_actions();
 				eatCookies();
 				$('.observations_list_wrapper').trigger('updatedGallery');
@@ -430,7 +436,11 @@ function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSo
 				delete params[field];
 			}
 		}
-	});
+		});
+		if((params['daterangepicker_start'] === new Date(0).toString('dd/MM/yyyy')) && (params['daterangepicker_end'] === Date.today().toString('dd/MM/yyyy'))){
+			delete params['daterangepicker_start'];
+			delete params['daterangepicker_end'];
+		}
 	}
 	
 	if(removeUser){
@@ -490,6 +500,7 @@ function updateListPage(activeTag) {
 			$('.observation_location_wrapper').replaceWith(data.mapViewHtml);
 			setActiveTag(activeTag);
 			updateDownloadBox(data.instanceTotal)
+			updateRelativeTime();
 			last_actions();
 			eatCookies();			
 			$('.observations_list_wrapper').trigger('updatedGallery');

@@ -8,9 +8,14 @@
 			<div class="">
 				<div class="users">
 					<g:if test="${!hideAgree}">
-					<div class="iAgree ">
-						<button class="btn btn-primary btn-small" onclick="addAgreeRecoVote(${r.obvId}, ${r.recoId}, ${r.noOfVotes}, $(this).closest('li'), '${uGroup.createLink(controller:'observation', action:'addAgreeRecommendationVote')}'); return true;">Agree</button>
-					</div>
+						<div class="iAgree ">
+							<g:if test="${!r.disAgree}">
+								<button class="btn btn-primary btn-small" style="margin-left: 1px;" onclick="addAgreeRecoVote(${r.obvId}, ${r.recoId}, ${r.noOfVotes}, $(this).closest('li'), '${uGroup.createLink(controller:'observation', action:'addAgreeRecommendationVote')}'); return true;">Agree</button>
+							</g:if>
+							<g:else>
+								<button class="btn btn-primary btn-small" style="margin-left: 1px;" onclick="removeRecoVote(${r.obvId}, ${r.recoId}, '${uGroup.createLink(controller:'observation', action:'removeRecommendationVote')}'); return true;">Remove</button>
+							</g:else>	
+						</div>
 					</g:if>
 					<g:each in="${r.authors}" var="author">
 						<a href="${uGroup.createLink(controller:"SUser", action:"show", id:author?.id)}" title="${author?.name }">
@@ -61,9 +66,9 @@
    </g:javascript></li>
 	</g:each>
 </g:if>
-<g:else>
-	<g:message code="recommendations.zero.message" />
-</g:else>
+<%--<g:else>--%>
+<%--	<g:message code="recommendations.zero.message" />--%>
+<%--</g:else>--%>
 
 
 

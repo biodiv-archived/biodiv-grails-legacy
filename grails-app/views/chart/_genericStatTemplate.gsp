@@ -1,22 +1,38 @@
 <%@ page import="org.grails.plugins.google.visualization.data.Cell; org.grails.plugins.google.visualization.util.DateUtil" %>
-<div style="clear:both;">
-	<h3>${title}</h3>
-		<div>			
+<%--<style>--%>
+<%--td {--%>
+<%--	max-width:40px;--%>
+<%--}--%>
+<%--</style>--%>
+
+<div>
+	<h6>${title}</h6>
+        <g:if test="${data}">
+        <div>			
 			<gvisualization:columnCoreChart elementId="columnCoreChart_${title}"
-				width="${570}" height="${300}"
+				width="${width?:570}" height="${height?:415}"
 				vAxis="${new Expando(title: 'Count', titleColor: 'red')}" hAxis="${new Expando(title: (hAxisTitle?:'Species Group'), titleColor: 'red')}"
-				columns="${columns}" data="${data}"/>
+                                columns="${columns}" data="${data}" legend="bottom"/>
 			<div id="columnCoreChart_${title}" style="float: left;"></div>	
 			
 <%--			<gvisualization:pieCoreChart elementId="piechart_${title}"--%>
-<%--				width="${350}" height="${400}"--%>
+<%--				width="${width?:350}" height="${hright?:400}"--%>
 <%--				columns="${columns}" data="${data}" />--%>
 <%--			<div id="piechart_${title}" style="float:right;"></div>--%>
-			<gvisualization:table elementId="table_${title}" width="${350}" height="${300}"
-				columns="${columns}" data="${htmlData?:data}" showRowNumber="${true}" allowHtml="${true}" />
-<%--			<h5>Table Data</h5>--%>
-			<div id="table_${title}" style="float: right;"></div>
+
+
+                        <g:if test="${!hideTable}">
+			    <gvisualization:table elementId="table_${title}" width="${width?:350}" height="${height?:415}"
+				columns="${htmlColumns?:columns}" data="${htmlData?:data}" allowHtml="${true}" />
+<%--			    <h5>Table Data</h5>--%>
+			    <div id="table_${title}" style="float: right;"></div>
+                        </g:if>
 		</div>
-		
+        </g:if>
+        <g:else>
+            <div class="alert alert-info">
+                No ${title}
+            </div>
+        </g:else>
 		
 </div>

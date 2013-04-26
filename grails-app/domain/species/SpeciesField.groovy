@@ -38,17 +38,33 @@ class SpeciesField {
 	Status status = Status.UNDER_CREATION;
 	Field field;	
 	String description;
+	Date dateCreated
+	Date lastUpdated
+	
 	
 	static hasMany = [contributors:Contributor, licenses:License, audienceTypes:AudienceType, resources:Resource, references:Reference, attributors:Contributor];
 	static belongsTo = [species:Species];
 	
 	static mapping = {
 		description type:"text";
-		tablePerHierarchy true
+		tablePerHierarchy true		
 	}
 	
 	static constraints = {
-		
+	
+		contributors validator : { val, obj ->
+			if(!val) {
+				println "++++++${obj}"
+				obj.addToContributors(Contributor.findByName('pearlsravanthi'));
+				//return ['species.field.empty', 'contributor',  obj.field.concept, obj.field.category, obj.field.subCategory, obj.species.taxonConcept.name]
+				return true;
+			}
+		}
+		licenses validator : { val, obj ->
+			if(!val) {
+				return ['species.field.empty', 'licenses',  obj.field.concept, obj.field.category, obj.field.subCategory, obj.species.taxonConcept.name]
+			}
+		}
 	}
 
 	

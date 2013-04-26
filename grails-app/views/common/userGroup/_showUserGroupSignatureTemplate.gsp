@@ -5,7 +5,7 @@
 	<div class="snippet tablet "
 						style="display: table; width:100%;height: ${showDetails ? '100px;':'40px;'}">
 						
-	<div class="figure pull-left" style="display: table; width:auto;height: ${showDetails ? '100px;':'40px;'};">
+	<div class="figure pull-left" style="display: table; width:32px;height: ${showDetails ? '100px;':'40px;'};">
 		<a
 			href="${uGroup.createLink(mapping:'userGroup', controller:'userGroup', action:'show', base:userGroup.domainName, 'userGroup':userGroup, 'pos':pos)}">
 			<img

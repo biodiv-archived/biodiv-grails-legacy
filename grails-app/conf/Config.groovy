@@ -116,7 +116,7 @@ log4j = {
 //			"org.springframework.security.access"
 			//'com.the6hours.grails.springsecurity.facebook'
 	
-	
+    info    'species.auth'	
 
 }
 
@@ -425,7 +425,7 @@ environments {
 		grails.serverURL = "http://indiabiodiversity.localhost.org/${appName}"
 		speciesPortal {
 			search.serverURL = "http://localhost:8090/solr"
-			names.parser.serverURL = "saturn.strandls.com"
+			names.parser.serverURL = "127.0.0.1"
 			wgp {
 				facebook {
 					appId= "424071494335902"
@@ -1042,6 +1042,27 @@ Please note that you will need to be logged in to see the download link.
 <br/><br/>
 -The portal team
 '''
+
+grails.plugins.springsecurity.ui.removeRecommendationVote.emailSubject = 'Species name deleted'
+
+grails.plugins.springsecurity.ui.observationPostedToGroup.emailSubject = 'Observation posted to group'
+grails.plugins.springsecurity.ui.observationPostedToGroup.emailBody = '''\
+Hi $username,<br/>
+<br/>
+<a href="$actorProfileUrl">$actorName</a> has posted an <a href="$obvUrl">observation</a> to $groupNameWithlink.
+<br/><br/>
+-The portal team
+'''
+
+grails.plugins.springsecurity.ui.observationRemovedFromGroup.emailSubject = 'Observation removed from group'
+grails.plugins.springsecurity.ui.observationRemovedFromGroup.emailBody = '''\
+Hi $username,<br/>
+<br/>
+<a href="$actorProfileUrl">$actorName</a> has removed an <a href="$obvUrl">observation</a> from $groupNameWithlink.
+<br/><br/>
+-The portal team
+'''
+
 
 grails.plugins.springsecurity.ui.encodePassword = false
 

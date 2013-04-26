@@ -1,4 +1,5 @@
 <%@page import="species.utils.Utils"%>
+<%@page import="java.text.SimpleDateFormat" %>
 <div  class="block-tagadelic ">
 
 	<form id="advSearchForm" method="get"  title="Advanced Search"
@@ -59,11 +60,15 @@
 <r:script>
 
 $(document).ready(function(){
-	var startDate = "${params.daterangepicker_start}";
-	var endDate = "${params.daterangepicker_end}";
-	startDate = Date.parse(startDate?startDate:(new Date(0)).toString('dd/MM/yyyy'));
-	endDate =  (endDate?Date.parse(endDate):Date.today());
-	
+	<%
+		def df = new SimpleDateFormat('dd/MM/yyyy')
+		def startDate = (params.daterangepicker_end)? df.parse(params.daterangepicker_start).getTime()  : null
+		def endDate = (params.daterangepicker_end)? df.parse(params.daterangepicker_end).getTime(): null
+	%>
+	var startDate = "${startDate}";
+	var endDate = "${endDate}";
+	startDate = startDate? new Date(parseInt(startDate)):new Date(0);
+	endDate =  endDate? new Date(parseInt(endDate)) :Date.today();
 	$("#uploadedOn").daterangepicker({
 	     ranges: {
               'Today': ['today', 'today'],

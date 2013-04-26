@@ -1,3 +1,4 @@
+<%@page import="species.Resource.ResourceType"%>
 <%@page import="species.utils.ImageType"%>
 <%@page	import="org.springframework.web.context.request.RequestContextHolder"%>
 <%@page import="species.License"%>
@@ -7,6 +8,8 @@
 <%@ page import="species.Habitat"%>
 <%@ page import="org.grails.taggable.Tag"%>
 <%@ page import="species.utils.Utils"%>
+<%@page import="species.Resource.ResourceType"%>
+<%@page import="java.util.Arrays"%>
 
 <html>
 <head>
@@ -145,8 +148,7 @@ input.dms_field {
 						<div>
 							<i class="icon-picture"></i><span>Upload photos of a
 								single observation and species</span>
-					<div id="add_photo_ie" style="display: block; margin-bottom: 2px;"><label for="attachFiles" class="btn btn-info" style="width: 200px;">Add a Photo</label>
-					<span id="iemsg" ></span></div>
+					
 					
 							<div
 								class="resources control-group ${hasErrors(bean: observationInstance, field: 'resource', 'error')}">
@@ -155,16 +157,31 @@ input.dms_field {
 									<g:set var="i" value="${1}" />
 									<g:each in="${observationInstance?.resource}" var="r">
 										<li class="addedResource thumbnail">
-											<%def thumbnail = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.thumbnail.suffix)%>
+<%
+def thumbnail = r.thumbnailUrl()?:null;
+def imagePath = '';
+if(r && thumbnail) {
+	if(r.type == ResourceType.IMAGE) {
+		imagePath = g.createLinkTo(base:grailsApplication.config.speciesPortal.observations.serverURL,	file: thumbnail)
+	} else if(r.type == ResourceType.VIDEO){
+		imagePath = g.createLinkTo(base:thumbnail,	file: '')
+	}
+}
+%>
+											
 											<div class='figure' style="height: 200px; overflow: hidden;">
 												<span> <img style="width: auto; height: auto;"
-													src='${createLinkTo(file: thumbnail, base:grailsApplication.config.speciesPortal.observations.serverURL)}'
+													src='${imagePath}'
 													class='geotagged_image' exif='true' /> </span>
 											</div>
+											
 
 											<div class='metadata prop'
 												style="position: relative; left: 5px; top: -30px;">
 												<input name="file_${i}" type="hidden" value='${r.fileName}' />
+												<input name="url_${i}" type="hidden" value='${r.url}' />
+												<input name="type_${i}" type="hidden" value='${r.type}'/>
+												<g:if test="${r.type == ResourceType.IMAGE}">
 												<div id="license_div_${i}" class="licence_div dropdown">
 
 													<a id="selected_license_${i}"
@@ -188,9 +205,10 @@ input.dms_field {
 																</li>
 															</g:each>
 														</ul>
-													
+													<input id="license_${i}" type="hidden" name="license_${i}" value="${r?.licenses?.asList().first()?.name}"></input>
 												</div>
-											</div> <input id="license_${i}" type="hidden" name="license_${i}" value="${r?.licenses?.asList().first()?.name}"></input>
+												</g:if>
+											</div> 
 											<div class="close_button"
 												onclick="removeResource(event, ${i});$('#geotagged_images').trigger('update_map');"></div>
 
@@ -198,11 +216,20 @@ input.dms_field {
 										<g:set var="i" value="${i+1}" />
 									</g:each>
 									<li id="add_file" class="addedResource">
+										<div id="add_file_container">
+											<div id="add_image"></div> 
+											<div style="text-align:center;">
+												or
+											</div> 
+											<div id="add_video" class="editable"></div>
+										</div>
 										<div class="progress">
 											<div id="translucent_box"></div>
 											<div id="progress_bar"></div>
 											<div id="progress_msg"></div>
-										</div></li>
+										</div>
+										
+									</li>
 								</ul>
 								<div id="image-resources-msg" class="help-inline">
 									<g:renderErrors bean="${observationInstance}" as="list"
@@ -497,19 +524,25 @@ input.dms_field {
     									[ 'Bold', 'Italic' ]
 									]
 									</ckeditor:config>
-									<ckeditor:editor name="notes" height="200px" toolbar="editorToolbar">
+									<ckeditor:editor name="notes" height="53px" toolbar="editorToolbar">
 										${observationInstance?.notes}
 									</ckeditor:editor>
 								</div>
 							</div>
-
+							<%
+								def obvTags = observationInstance.tags
+								if(params.action == 'save' && saveParams.tags){
+									obvTags = Arrays.asList(saveParams.tags)
+								}				
+							%>
+								
 							<div class="span6 block sidebar-section" style="margin:0px 0px 20px -10px;">
 								<h5><label><i
 									class="icon-tags"></i>Tags <small><g:message code="observation.tags.message" default="" /></small></label>
 								</h5>
 								<div class="create_tags section-item" style="clear: both;">
 									<ul id="tags">
-										<g:each in="${observationInstance.tags}" var="tag">
+										<g:each in="${obvTags}" var="tag">
 											<li>${tag}</li>
 										</g:each>
 									</ul>
@@ -577,7 +610,7 @@ input.dms_field {
 								<label class="checkbox" style="text-align: left;"> 
 								 <g:checkBox style="margin-left:0px;"
 									name="agreeTerms" value="${observationInstance.agreeTerms}"/>
-								 <span class="policy-text"> By submitting this form, you agree that the photos you are submitting are taken by you, or you have permission of the copyright holder to upload the photos on creative commons licenses. </span></label>
+								 <span class="policy-text"> By submitting this form, you agree that the photos or videos you are submitting are taken by you, or you have permission of the copyright holder to upload them on creative commons licenses. </span></label>
 						</div>
 					
 				</div>
@@ -589,17 +622,18 @@ input.dms_field {
 				def obvTmpFileName = observationInstance?.resource?.iterator()?.next()?.fileName
 				def obvDir = obvTmpFileName ?  obvTmpFileName.substring(0, obvTmpFileName.lastIndexOf("/")) : ""
 	       %>
-            <form id="upload_resource" 
-				title="Add a photo for this observation"
-                                method="post"
-				class="${hasErrors(bean: observationInstance, field: 'resource', 'errors')}">
 
-				<!-- TODO multiple attribute is HTML5. need to chk if this gracefully falls back to default in non compatible browsers -->
-				<!-- input type="file" id="attachFiles" name="resources"
-					accept="image/*" multiple/--> <span class="msg" style="float: right"></span>
-				<input type="hidden" name='obvDir' value="${obvDir}" />
-			</form>
 
+            	<form id="upload_resource" 
+					title="Add a photo for this observation"
+	                                method="post"
+					class="${hasErrors(bean: observationInstance, field: 'resource', 'errors')}">
+	
+					<span class="msg" style="float: right"></span>
+					<input id="videoUrl" type="hidden" name='videoUrl'value="" />
+					<input type="hidden" name='obvDir' value="${obvDir}" />
+				</form>
+					
                 </div>
             </div>
        </div>
@@ -608,31 +642,33 @@ input.dms_field {
 	<li class="addedResource thumbnail">
 	    <div class='figure' style='height: 200px; overflow:hidden;'>
                 <span> 
-                        <img id='image_{{=i}}' style="width:auto; height: auto;" src='{{=thumbnail}}' class='geotagged_image' exif='true'/> 
+                        <img id='image_{{>i}}' style="width:auto; height: auto;" src='{{>thumbnail}}' class='geotagged_image' exif='true'/> 
                 </span>
 	    </div>
 				
 	    <div class='metadata prop' style="position:relative; left: 5px; top:-30px;">
-	            <input name="file_{{=i}}" type="hidden" value='{{=file}}'/>
-                <div id="license_div_{{=i}}" class="licence_div dropdown">
-                    <a id="selected_license_{{=i}}" class="btn dropdown-toggle btn-mini" data-toggle="dropdown">
+	            <input name="file_{{>i}}" type="hidden" value='{{>file}}'/>
+	            <input name="url_{{>i}}" type="hidden" value='{{>url}}'/>
+				<input name="type_{{>i}}" type="hidden" value='{{>type}}'/>
+				{{if type == '${ResourceType.IMAGE}'}}
+                <div id="license_div_{{>i}}" class="licence_div dropdown">
+                    <a id="selected_license_{{>i}}" class="btn dropdown-toggle btn-mini" data-toggle="dropdown">
                         <img src="${resource(dir:'images/license',file:'cc_by.png', absolute:true)}" title="Set a license for this image"/>
                         <b class="caret"></b>
                     </a>
-                    <ul id="license_options_{{=i}}" class="dropdown-menu license_options">
+                    <ul id="license_options_{{>i}}" class="dropdown-menu license_options">
                          <span>Choose a license</span>
                          <g:each in="${species.License.list()}" var="l">
-                             <li class="license_option" onclick="$('#license_{{=i}}').val($.trim($(this).text()));$('#selected_license_{{=i}}').find('img:first').replaceWith($(this).html());">
+                             <li class="license_option" onclick="$('#license_{{>i}}').val($.trim($(this).text()));$('#selected_license_{{>i}}').find('img:first').replaceWith($(this).html());">
                                  <img src="${resource(dir:'images/license',file:l?.name.getIconFilename()+'.png', absolute:true)}"/><span style="display:none;">${l?.name?.value}</span>
                              </li>
                          </g:each>
-                     </ul>
+                    </ul>
+					<input id="license_{{>i}}" type="hidden" name="license_{{>i}}" value="CC BY"></input>
            		</div>	
-	    	    <input id="license_{{=i}}" type="hidden" name="license_{{=i}}" value="CC BY"></input>
-          
-        	    <!--a href="#" onclick="removeResource(event);$('#geotagged_images').trigger('update_map');">Remove</a-->
+				{{/if}}
 		</div>
-       	<div class="close_button" onclick="removeResource(event, {{=i}});$('#geotagged_images').trigger('update_map');"></div>
+       	<div class="close_button" onclick="removeResource(event, {{>i}});$('#geotagged_images').trigger('update_map');"></div>
 	</li>
 	
 </script>
@@ -641,22 +677,11 @@ input.dms_field {
 	
 	<r:script>
 	
-    var add_file_button = '<li id="add_file" class="addedResource" style="display:none;"><div class="progress"><div id="translucent_box"></div><div id="progress_bar"></div ><div id="progress_msg"></div ></div></li>';
+    var add_file_button = '<li id="add_file" class="addedResource" style="display:none;"><div id="add_file_container"><div id="add_image"></div><div id="add_video" class="editable"></div></div><div class="progress"><div id="translucent_box"></div><div id="progress_bar"></div ><div id="progress_msg"></div ></div></li>';
 
 	$(document).ready(function(){
 		$('.dropdown-toggle').dropdown();
 
-        //hack: for fixing ie image upload
-        if (navigator.appName.indexOf('Microsoft') != -1) {
-            $('#upload_resource').css({'visibility':'visible'}); // made hidden using css
-	    $('#add_photo_ie').show();
-            $('#add_file').hide();
-        } else {
-            $('#upload_resource').css({'visibility':'hidden'});
-	    $('#add_photo_ie').hide();
-            $('#add_file').show();
-        }
-		
 		var filePick = function() {
 			filepicker.pickMultiple({
 			    mimetypes: ['image/*'],
@@ -665,7 +690,6 @@ input.dms_field {
 			    services:['COMPUTER', 'FACEBOOK', 'FLICKR', 'PICASA', 'GOOGLE_DRIVE', 'DROPBOX'],
 			  },
 			  function(FPFiles){
-			    console.log(JSON.stringify(FPFiles));
 			    $.each(FPFiles, function(){
 				    $('<input>').attr({
 				    type: 'hidden',
@@ -675,6 +699,7 @@ input.dms_field {
 				})
 				$('#upload_resource').submit().find("span.msg").html("Uploading... Please wait...");
 			  	$("#iemsg").html("Uploading... Please wait...");
+			  	$(".progress").css('z-index',110);
 			  	$('#progress_msg').html('Uploading ...');
 			  },
 			  function(FPError){
@@ -682,9 +707,36 @@ input.dms_field {
 			  }
 			);		
 		}
-	
-		$('#add_file').live('click', filePick);
-		$('#add_photo_ie').live('click', filePick);
+		
+		$('#add_image').bind('click', filePick);
+		
+		var addVideoOptions = {
+		    type: 'text',
+		    mode:'popup',
+		    emptytext:'',
+		    url: function(params) {
+   				var d = new $.Deferred;
+   				if(!params.value) {
+       				return d.reject('This field is required'); //returning error via deferred object
+   				} else {
+   					$('#videoUrl').val(params.value);
+       				$('#upload_resource').submit().find("span.msg").html("Uploading... Please wait...");
+		  			$("#iemsg").html("Uploading... Please wait...");
+		  			$(".progress").css('z-index',110);
+		  			$('#progress_msg').html('Uploading ...');
+		  			d.resolve();
+       			}
+       			return d.promise()  
+       		},
+       		validate : function(value) {
+ 					if($.trim(value) == '') {
+       				return 'This field is required';
+   				}
+			},
+		    title: 'Enter YouTube watch url like http://www.youtube.com/watch?v=v8HVWDrGr6o'
+		}
+		
+		$('#add_video').editable(addVideoOptions);
 		
 		$('#attachFiles').change(function(e){
   			$('#upload_resource').submit().find("span.msg").html("Uploading... Please wait...");
@@ -699,6 +751,7 @@ input.dms_field {
                 var percentVal = ((position/total)*100).toFixed(0) + '%';
                 $('#progress_bar').width(percentVal)
                 $('#translucent_box').width('100%')
+                $(".progress").css('z-index',110);
                 $('#progress_msg').html('Uploaded '+percentVal);
              }
         }
@@ -724,6 +777,7 @@ input.dms_field {
 			success: function(responseXML, statusText, xhr, form) {
 				$("#addObservationSubmit").removeClass('disabled');
 				$(form).find("span.msg").html("");
+				$(".progress").css('z-index',90);
 				$('#progress_msg').html('');
 				$("#iemsg").html("");
 				//var rootDir = '${grailsApplication.config.speciesPortal.observations.serverURL}'
@@ -740,16 +794,11 @@ input.dms_field {
 					var file_id = $(metadata.get(-1)).children("input").first().attr("name");
 					i = parseInt(file_id.substring(file_id.indexOf("_")+1));
 				}
-				$(responseXML).find('resources').find('image').each(function() {
+				$(responseXML).find('resources').find('res').each(function() {
 					var fileName = $(this).attr('fileName');
-					var size = $(this).attr('size');
-					var image = rootDir + obvDir + "/" + fileName.replace(/\.[a-zA-Z]{3,4}$/, "${grailsApplication.config.speciesPortal.resources.images.gallery.suffix}");
-					var thumbnail = rootDir + obvDir + "/" + fileName.replace(/\.[a-zA-Z]{3,4}$/, "${grailsApplication.config.speciesPortal.resources.images.thumbnail.suffix}");
-  					images.push({i:++i, file:obvDir + "/" + fileName, thumbnail:thumbnail, title:fileName});
+					var type = $(this).attr('type');					
+  					images.push({i:++i, file:obvDir + "/" + fileName, url:$(this).attr('url'), thumbnail:$(this).attr('thumbnail'), type:type, title:fileName});
 				});
-
-                                $("#add_file").remove();
-                                
 				
 				var html = $( "#metadataTmpl" ).render( images );
 				var metadataEle = $(html)
@@ -758,19 +807,23 @@ input.dms_field {
 						update_geotagged_images_list($(this));		
 					});
 				})
-				$( "#imagesList" ).append (metadataEle);
+				$( "#imagesList li:last" ).before (metadataEle);
 
-                if (navigator.appName.indexOf('Microsoft') == -1) {
+/*                if (navigator.appName.indexOf('Microsoft') == -1) {
                     $( "#imagesList" ).append (add_file_button);
-                }
+                }*/
                 $( "#add_file" ).fadeIn(3000);
                 $("#image-resources-msg").parent(".resources").removeClass("error");
                 $("#image-resources-msg").html("");
 				$("#upload_resource input[name='resources']").remove();
-				
+				$('#videoUrl').val('');
+				$('#add_video').editable('setValue','', false);		
 			}, error:function (xhr, ajaxOptions, thrownError){
 					$("#addObservationSubmit").removeClass('disabled');
 					$("#upload_resource input[name='resources']").remove();
+					$('#videoUrl').val('');
+					$(".progress").css('z-index',90);
+					$('#add_video').editable('setValue','', false);
 					//xhr.upload.removeEventListener( 'progress', progressHandlingFunction, false); 
 					
 					//successHandler is used when ajax login succedes
@@ -910,7 +963,7 @@ input.dms_field {
 	$( "#observedOn" ).datepicker({ 
 			changeMonth: true,
 			changeYear: true,
-			dateFormat: 'dd/mm/yy' 
+			format: 'dd/mm/yyyy' 
 	});
 	
 </r:script>

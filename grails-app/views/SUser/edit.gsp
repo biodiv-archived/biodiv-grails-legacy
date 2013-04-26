@@ -26,6 +26,11 @@
 .form-horizontal .controls {
 	margin-left: 110px;
 }
+.super-section  {
+    background-color:white;
+}
+
+
 </style>
 </head>
 
@@ -61,7 +66,7 @@
 					<g:hiddenField name="id" value="${user?.id}" />
 					<g:hiddenField name="version" value="${user?.version}" />
 
-					<div class="super-section" style="clear: both;">
+					<div style="clear: both;">
 						<div class="row section">
 							<div class="figure span3 ${hasErrors(bean: user, field: 'icon', 'error')}" style="float: left; max-height: 220px; max-width: 200px">
 								
@@ -176,12 +181,12 @@
 
 
 						<div
-							class="section control-group  ${hasErrors(bean: user, field: 'aboutMe', 'error')}"
+							class="super-section control-group  ${hasErrors(bean: user, field: 'aboutMe', 'error')}"
 							style="clear: both;">
 							<h5>
 								<i class="icon-user"></i>About Me
 							</h5>
-							<textarea cols='100' rows='3' style="width: 100%" name="aboutMe"
+							<textarea cols='70' rows='3' style="width: 100%" name="aboutMe"
 								id="aboutMe">
 								${user.aboutMe }
 							</textarea>
@@ -192,7 +197,7 @@
 							</div>
 						</div>
 						
-						<div class="section"
+						<div class="super-section"
 								style="position: relative; overflow: visible;">
 								<h5>
 									<i class="icon-screenshot"></i>Interests
@@ -210,7 +215,7 @@
 								</div>						
 						</div>
 						
-						<div class="section" style="clear: both;">
+						<div class="super-section" style="clear: both;">
 							<h5>
 								<i class="icon-cog"></i>Settings
 							</h5>
@@ -263,7 +268,7 @@
 
 
 						<sUser:isAdmin model="['user':user]">
-							<div class="section" style="clear: both;">
+							<div class="super-section" style="clear: both;">
 								<h5>
 									<i class="icon-cog"></i>
 									<g:message code="default.edit.label" args="[entityName]" />

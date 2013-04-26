@@ -33,9 +33,20 @@ class NewSpreadsheetConverter extends SourceConverter {
 	}
 
 	public List<Species> convertSpecies(List<List<Map>> sheetContent) {
-
 		List<Species> species = new ArrayList<Species>();
-
+		List<Node> speciesElements = createSpeciesXML(sheetContent);
+		XMLConverter converter = new XMLConverter();
+		for(Node speciesElement : speciesElements) {			
+			Species s = converter.convertSpecies(speciesElement)
+			if(s)
+				species.add(s);
+		}
+		return species;		
+	}
+	
+	public List<Node> createSpeciesXML(List<List<Map>> sheetContent) {
+		
+		List<Node> speciesElements = new ArrayList<Node>();
 		NodeBuilder builder = NodeBuilder.newInstance();
 		Node speciesElement = builder.createNode("species");
 
@@ -44,6 +55,7 @@ class NewSpreadsheetConverter extends SourceConverter {
 
 		Iterator iter = sheetContent.get(5).iterator();
 		while(iter.hasNext()) {
+			println iter;
 			Map row = iter.next();
 			references.put(row.get("id"), row);
 		}
@@ -80,12 +92,11 @@ class NewSpreadsheetConverter extends SourceConverter {
 		createImages(speciesElement, sheetContent.get(1));
 
 		log.debug speciesElement;
-
-		XMLConverter converter = new XMLConverter();
-		Species s = converter.convertSpecies(speciesElement)
-		if(s)
-			species.add(s);
-		return species;
+		if(speciesElement) {
+			speciesElements.add(speciesElement);
+		}
+		
+		return speciesElements;
 	}
 
 	private Node createDataNode(Node field, String text, Map speciesContent, Map attributions, Map references) {
