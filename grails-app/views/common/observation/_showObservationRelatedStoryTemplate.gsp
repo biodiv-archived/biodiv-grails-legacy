@@ -68,11 +68,10 @@ $(document).ready(function() {
 	</g:if>
 <%--	<div id="carouselItemDesc"></div>--%>
 </div>
-<div id="relatedObservationAddButton_${id}" style="display:none;">
-	<!--<g:link controller="observation" action="create"><div class="btn btn-warning">Add an observation</div></g:link>-->
-	<span class="msg">No observations</span>
+<div id="relatedObservationAddButton_${id}" class="alert alert-info" style="display:none;">
+	No observations
 </div>
 
-<div id="relatedObservationMsg_${id}" style="display:none;">
-	<span class="msg">No observations</span>
+<div id="relatedObservationMsg_${id}" class="alert alert-info" style="display:none;">
+	No observations
 </div>

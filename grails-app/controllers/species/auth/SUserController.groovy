@@ -38,6 +38,7 @@ class SUserController extends UserController {
 	def userGroupService;
 	def saltSource;
     def dataSource;
+    def chartService;
 
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
@@ -127,6 +128,9 @@ class SUserController extends UserController {
 		else {
 			def result = buildUserModel(SUserInstance)
 			result.put('userGroupWebaddress', params.webaddress)
+            result.put('obvData', chartService.getUserStats(SUserInstance));
+            def totalObservationInstanceList = observationService.getFilteredObservations(['user':SUserInstance.id.toString()], -1, -1, true).observationInstanceList
+            result.put('totalObservationInstanceList', totalObservationInstanceList); 
 			return result
 		}
 	}
@@ -615,27 +619,38 @@ class SUserController extends UserController {
 	 */
 	def getRecommendationVotes = {
 		log.debug params;
-		params.max = params.max ? params.int('max') : 1
+		params.max = params.limit ? params.int('limit') : 10
 		params.offset = params.offset ? params.long('offset'): 0
 
-		def userInstance = SUser.get(params.id)
+		def userInstance = SUser.get(params.filterPropertyValue)
 		if (userInstance) {
 			def recommendationVoteList
 			if(params.obvId){
 				recommendationVoteList = RecommendationVote.findAllByAuthorAndObservation(springSecurityService.currentUser, Observation.read(params.long('obvId')));
 			}else{
 				recommendationVoteList = observationService.getRecommendationsOfUser(userInstance, params.max, params.offset);
-			}
-
+			} 
+            
             def uniqueVotes = observationService.getAllRecommendationsOfUser(userInstance);
-			processResult(recommendationVoteList, uniqueVotes, params)
-			return
+
+            def observations = recommendationVoteList.collect{it.observation};	
+            def result = []
+            observations.each {
+                result.add(['observation':it, 'title':it.fetchSpeciesCall()]);
+            }
+            def relatedObv = ['observations':result, count:uniqueVotes];
+            if(relatedObv.observations) {
+                    relatedObv.observations = observationService.createUrlList2(relatedObv.observations);
+            } 
+            
+            render relatedObv as JSON
 		}
 		else {
 			//response.setStatus(500)
 			def message = ['status':'error', 'msg':g.message(code: 'error', default:'Error while processing the request.')]
 			render message as JSON
 		}
+        return
 	}
 
     def getRecommendationCount(userInstance){

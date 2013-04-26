@@ -12,7 +12,7 @@ set runtimepath^=~/.vim/bundle/ctrlp.vim
 map <F2> :mksession! ~/vim_session <cr> " Quick write session with F2
 map <F3> :source ~/vim_session <cr>     " And load session with F3
 
-source ~/.vim/bundle/matchit/plugin/matchit.vim 
+"source ~/.vim/bundle/matchit/plugin/matchit.vim 
 "the cursor will briefly jump to the matching brace when you insert one.
 set showmatch
 set matchtime=3

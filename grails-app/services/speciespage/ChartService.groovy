@@ -12,6 +12,7 @@ import species.groups.UserGroup;
 import species.utils.ImageType;
 import species.participation.ActivityFeed;
 import species.participation.Observation;
+import species.participation.RecommendationVote;
 
 class ChartService {
 
@@ -20,7 +21,6 @@ class ChartService {
 	private static final Date PORTAL_START_DATE = new Date(111, 7, 8)
 
 	def userGroupService
-	def activityFeedService
 	def observationService
 	
 	def getObservationStats(params, SUser author, request){
@@ -36,10 +36,33 @@ class ChartService {
 		def unidentifiedResult = getFilteredObservationStats(userGroupInstance, author, false)
 
 		mergeResult(allResult, unidentifiedResult)
+    	allResult.columns = [
+			['string', 'Species Group'],
+			['number', 'All'],
+			['number', 'UnIdentified']
+		]
+
 		addHtmlResultForObv(allResult, request)
 		return allResult
 	}
 
+    def getUserStats(SUser user) {
+    	//getting all observation
+		def allObvResult = getFilteredObservationStats(null, user, null)
+
+        //getting ireco
+		def allRecoResult = getFilteredRecommendationStats(user)
+		
+        mergeResult(allObvResult, allRecoResult)
+    	allObvResult.columns = [
+			['string', 'Species Group'],
+			['number', 'Observations'],
+			['number', 'Identifications']
+		]
+
+		addHtmlResultForObv(allObvResult, null, user)
+		return allObvResult
+    }
 
 	/**
 	 * 
@@ -82,6 +105,23 @@ class ChartService {
 		return getFormattedResult(result)
 	}
 
+    /**
+	 * 
+	 * @param userGroupInstance
+	 * @param author
+	 * @param identifactionFlag if null then returning all obs, if true then returning only identified if false then returning unidentified
+	 * @return
+	 */
+	private getFilteredRecommendationStats(SUser author){
+        def result = RecommendationVote.executeQuery("select g.id, count(*) from RecommendationVote r, Observation o, SpeciesGroup g where r.observation = o and o.group = g and r.author=:author group by g.id", [author:author]);
+println result;
+        result.each {it->
+            it[0] = SpeciesGroup.read(it[0]);
+        }
+		return getFormattedResult(result)
+	}
+
+
 	private getFormattedResult(result){
 		def formattedResult = []
 		result.each { r ->
@@ -106,37 +146,38 @@ class ChartService {
 			r.add(unIdentified)
 		}
 
-		allResult.columns = [
-			['string', 'Species Group'],
-			['number', 'All'],
-			['number', 'UnIdentified']
-		]
 	}
 
-	private addHtmlResultForObv(Map res, request){
+	private addHtmlResultForObv(Map res, request, SUser user=null){
 		List htmlData = []
+        def filterParams = [:]
+        if(user) {
+            filterParams['user'] = user.id;
+        }
+
+        boolean isUnidentified = (res.columns[2][2] == "UnIdentified")?:false
 		res.data.each{ r ->
-			htmlData.add([getSpeciesGroupImage(r[0]), getHyperLink(r[0], r[0], false, request, true), getHyperLink(r[0], r[1], false, request, true), getHyperLink(r[0], r[2], true, request, true)])
+			htmlData.add([getSpeciesGroupImage(r[0]), getHyperLink(r[0], r[0], false, true, filterParams), getHyperLink(r[0], r[1], false, true, filterParams), getHyperLink(r[0], r[2], isUnidentified, true, filterParams)])
 		}
 		
 		res.htmlData = htmlData
 		res.htmlColumns = [
-			['string', ''],
-			['string', 'Species Group'],
-			['string', 'All'],
-			['string', 'UnIdentified']
+			['string', '']
 		]
+        res.columns.each { col -> 
+            res.htmlColumns.add(['string', col[1]]);
+        }
+        println res;
 	}
 	
-	private getHyperLink(String speciesGroup, count, boolean isUnIdentified, request, boolean isObv){
-		def fitlerParams = [:]
+	private getHyperLink(String speciesGroup, count, boolean isUnIdentified, boolean isObv, Map filterParams=[:]){
 		if(isUnIdentified){
 			if(isObv){
-				fitlerParams.speciesName="Unknown"
+				filterParams.speciesName="Unknown"
 			}
 		}
-		fitlerParams.sGroup = SpeciesGroup.findByName(speciesGroup).id
-		def link = observationService.generateLink((isObv)?"observation":"species", "list", fitlerParams, request)
+		filterParams.sGroup = SpeciesGroup.findByName(speciesGroup).id
+		def link = observationService.generateLink((isObv)?"observation":"species", "list", filterParams, null)
 		return "" + '<a href="' +  link +'">' + count + "</a>"
 	}
 	
@@ -191,7 +232,7 @@ class ChartService {
 	private addHtmlResultForSpecies(Map res, request){
 		List htmlData = []
 		res.data.each{ r ->
-			htmlData.add([getSpeciesGroupImage(r[0]), getHyperLink(r[0], r[0], false, request, false), r[1], r[2]])
+			htmlData.add([getSpeciesGroupImage(r[0]), getHyperLink(r[0], r[0], false, false), r[1], r[2]])
 		}
 		
 		res.htmlData = htmlData
