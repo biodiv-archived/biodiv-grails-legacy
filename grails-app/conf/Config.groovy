@@ -252,7 +252,9 @@ speciesPortal {
 		checklistDownloadDir = "${download.rootDir}/checklist"
 	}
 
-	
+	content{
+		fileUploadDir = "/tmp/files"
+	}	
 		
 	names.parser.serverURL = "127.0.0.1"
 	names.parser.port = 4334
