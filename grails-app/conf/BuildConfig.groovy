@@ -50,6 +50,5 @@ grails.project.dependency.resolution = {
 		   //'org.springframework.web-3.0.5.RELEASE', 'spring-aop-3.0.3.RELEASE', 'spring-beans-3.0.3.RELEASE','spring-core-3.0.3.RELEASE', 'spring-tx-3.0.3.RELEASE','spring-asm-3.0.3.RELEASE','spring-context-3.0.3.RELEASE', 'spring-expression-3.0.3.RELEASE','spring-web-3.0.3.RELEASE'
 	   }
 	   compile('net.sf.opencsv:opencsv:2.3')
-	   compile('com.itextpdf:itextpdf:5.0.6')
     }
 }

@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import content.eml.Document
 import grails.plugins.springsecurity.Secured;
 import groovy.sql.Sql;
 
@@ -48,6 +49,7 @@ import species.participation.UserToken;
 import species.utils.ImageUtils;
 import species.utils.Utils;
 import utils.Newsletter;
+import content.eml.Document
 
 class UserGroupService {
 
@@ -1058,4 +1060,81 @@ class UserGroupService {
 		}
 		bean
 	}
+	
+	
+	
+	/////////////// DOCUMENTS RELATED /////////////////
+	void postDocumenttoUserGroups(Document document, List userGroupIds) {
+		log.debug "Posting ${document} to userGroups ${userGroupIds}"
+		userGroupIds.each {
+			if(it) {
+				def userGroup = UserGroup.read(Long.parseLong(it));
+				if(userGroup) {
+					postDocumentToUserGroup(document, userGroup)
+				}
+			}
+		}
+	}
+
+	@Transactional
+	@PreAuthorize("hasPermission(#userGroup, write)")
+	void postDocumentToUserGroup(Document document, UserGroup userGroup) {
+		userGroup.addToDocuments(document);
+		if(!userGroup.save()) {
+			log.error "Could not add ${document} to ${usergroup}"
+			log.error  userGroup.errors.allErrors.each { log.error it }
+		} else {
+			activityFeedService.addActivityFeed(document, userGroup, document.author, activityFeedService.OBSERVATION_POSTED_ON_GROUP);
+			log.debug "Added ${document} to userGroup ${userGroup}"
+		}
+	}
+
+	void removeDocumentFromUserGroups(Document document, List userGroupIds) {
+		log.debug "Removing ${document} from userGroups ${userGroupIds}"
+		userGroupIds.each {
+			if(it) {
+				def userGroup = UserGroup.read(Long.parseLong(it));
+				if(userGroup) {
+					removeDocumentFromUserGroup(document, userGroup)
+				}
+			}
+		}
+	}
+
+	@Transactional
+	@PreAuthorize("hasPermission(#userGroup, write)")
+	void removeDocumentFromUserGroup(Document document, UserGroup userGroup) {
+		userGroup.documents.remove(document);
+		if(!userGroup.save()) {
+			log.error "Could not remove ${document} from ${usergroup}"
+			log.error  userGroup.errors.allErrors.each { log.error it }
+		} else {
+			activityFeedService.addActivityFeed(document, userGroup, document.author, activityFeedService.OBSERVATION_REMOVED_FROM_GROUP);
+			log.debug "Removed ${document} from userGroup ${userGroup}"
+		}
+	}
+
+	def getDocumentUserGroups(Document documentInstance, int max, long offset) {
+		return documentInstance.userGroups;
+	}
+
+	long getNoOfDocumentUserGroups(Document documentInstance) {
+		String countQuery = "select count(*) from UserGroup userGroup " +
+				"join userGroup.documents document " +
+				"where document=:document and document.isDeleted=:docIsDeleted	and userGroup.isDeleted=:userGroupIsDeleted";
+		def count = UserGroup.executeQuery(countQuery, [document:documentInstance, docIsDeleted:false, userGroupIsDeleted:false])
+		return count[0]
+	}
+
+	def long getDocumentCountByGroup(UserGroup userGroupInstance){
+		def queryParams = [:]
+		queryParams['userGroup'] = userGroupInstance
+		queryParams['isDeleted'] = false;
+		
+		def query = "select count(*) from Document doc join doc.userGroups userGroup where doc.isDeleted = :isDeleted and userGroup=:userGroup"
+		return Document.executeQuery(query, queryParams)[0]
+	}
+	
+
+
 }

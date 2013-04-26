@@ -253,7 +253,7 @@ speciesPortal {
 	}
 
 	content{
-		fileUploadDir = "/tmp/files"
+		fileUploadDir = "${app.rootDir}/content"
 	}	
 		
 	names.parser.serverURL = "127.0.0.1"
@@ -389,6 +389,11 @@ speciesPortal {
 		LATLONG = "latlong"
 		USER_GROUP = "group"
 		USER_GROUP_WEBADDRESS = "group_webaddress"
+		
+		GRANTEE_ORGANIZATION = "grantee_organization"
+		SITENAME = "sitename"
+		CORRIDOR = "corridor"
+		DESCRIPTION = "description"
 	}
 
 	nameSearchFields {
