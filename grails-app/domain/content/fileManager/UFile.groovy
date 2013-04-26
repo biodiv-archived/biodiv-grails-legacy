@@ -5,7 +5,6 @@ import org.grails.taggable.Taggable
 import species.License
 import species.auth.SUser
 import content.Project
-import content.eml.Document.DocumentType;
 
 class UFile implements Taggable{
 
