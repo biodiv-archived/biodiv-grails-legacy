@@ -94,8 +94,7 @@
 <g:javascript src="ckEditorConfig.js" />
 -->
 
-<script
-		src="https://www.google.com/jsapi?key=ABQIAAAAk7I0Cw42MpifyYznFgPLhhRmb189gvdF0PvFEJbEHF8DoiJl8hRsYqpBTt5r5L9DCsFHIsqlwnMKHA"
+<script src="https://www.google.com/jsapi?key=ABQIAAAAk7I0Cw42MpifyYznFgPLhhRmb189gvdF0PvFEJbEHF8DoiJl8hRsYqpBTt5r5L9DCsFHIsqlwnMKHA"
 		type="text/javascript"></script>
 <script type="text/javascript"
 		src="http://maps.google.com/maps/api/js?sensor=false"></script>

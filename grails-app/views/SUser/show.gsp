@@ -174,11 +174,6 @@ h6 .btn-link, h5 .btn-link {
                                     style="margin:0px;margin-left:20px;">
                                     <h6>
                                         Observations Spread
-                 			<sUser:ifOwns model="['user':user]">
-						<a class="btn btn-link"
-							href="${uGroup.createLink(action:'create', controller:'observation', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"><i class="icon-plus"></i>Add Observation</a>
-					</sUser:ifOwns>
-
                                     </h6>
         			    <obv:showObservationsLocation
 						model="['observationInstanceList':totalObservationInstanceList, 'ignoreMouseOutListener':true, width:420, height:400]">
@@ -242,7 +237,7 @@ h6 .btn-link, h5 .btn-link {
 						class="icon-group"></i></span> Groups
                  			<sUser:ifOwns model="['user':user]">
 						<a class="btn btn-link"
-							href="${uGroup.createLink(action:'list', controller:'observation', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"><i class="icon-plus"></i>Join Groups</a>
+							href="${uGroup.createLink(action:'list', controller:'userGroup', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"><i class="icon-plus"></i>Join Groups</a>
 					</sUser:ifOwns>
 
 				</h5>
