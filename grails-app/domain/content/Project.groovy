@@ -7,12 +7,11 @@ package content
  * 
  */
 
-import content.fileManager.UFile
+import content.eml.Document
 import org.grails.taggable.*
 import org.apache.commons.collections.list.LazyList
 import org.apache.commons.collections.FactoryUtils
-import species.auth.SUser
-import species.groups.UserGroup;
+
 
 
 
@@ -60,9 +59,9 @@ class Project implements Taggable{
 
 	static hasMany = [ locations: Location,
 		dataLinks:DataLink,
-		proposalFiles: UFile,
-		reportFiles: UFile,
-		miscFiles: UFile,
+		proposalFiles: Document,
+		reportFiles: Document,
+		miscFiles: Document,
 		userGroups:UserGroup,
 	];
 

@@ -2,6 +2,7 @@ package content.eml
 
 import grails.plugins.springsecurity.Secured
 
+import grails.converters.JSON
 
 class DocumentController {
 
@@ -132,5 +133,9 @@ class DocumentController {
 	}
 
 
+	def tags = {
+		log.debug params;
+		render Tag.findAllByNameIlike("${params.term}%")*.name as JSON
+	}
 
 }

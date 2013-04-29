@@ -19,7 +19,7 @@
 				
 					var uploader = $('#au-${name}')
 					files = [];
-					files.push({i:id, fileName:responseJSON.fileName, filePath:responseJSON.filePath, fileId:responseJSON.fileId, fileSize:responseJSON.fileSize});
+					files.push({i:id, docName:responseJSON.fileName, filePath:responseJSON.filePath, docId:responseJSON.docId, fileSize:responseJSON.fileSize});
 					
 					var html = $('#${name}Tmpl').render(files);					
 					var metaDataEle = $(html);
@@ -43,19 +43,19 @@
 	<!--====== Template ======-->
 	<script id="${name}Tmpl" type="text/x-jquery-tmpl">
 
-        <g:render template='/UFile/fileBlock' model="[name:name,  'fileId':'{{=fileId}}','filePath':'{{=filePath}}', 'fileName':'{{=fileName}}', 'fileSize':'{{=fileSize}}']"/>
+        <g:render template='/document/projectDoc' model="[name:name,  'docId':'{{=docId}}','filePath':'{{=filePath}}', 'docName':'{{=docName}}', 'fileSize':'{{=fileSize}}']"/>
 
 	</script>
 
-	<g:if test='${uFiles}'>
-		<g:each var="fileAssist" in="${uFiles}" status="i">
+	<g:if test='${docs}'>
+		<g:each var="fileAssist" in="${docs}" status="i">
 		
 			<%
 			// To overcome hibernate fileassist issue - http://www.intelligrape.com/blog/2012/09/21/extract-correct-class-from-hibernate-object-wrapped-with-javassist/
-			 def uFile = UFile.get(fileAssist.id)
+			 def doc = Document.get(fileAssist.id)
 %>
-			<g:render template='/UFile/fileBlock'
-				model="[name:name,   'fileId':uFile.id,'filePath':uFile.path, 'fileName':uFile.name, 'fileSize':uFile.size, 'uFileInstance':uFile]" />
+			<g:render template='/document/projectDoc'
+				model="[name:name,   'docId':doc.id,'filePath':doc.uFile.path, 'docName':doc.title, 'fileSize':doc.uFile.size, 'documentInstance':doc]" />
 
 		</g:each>
 

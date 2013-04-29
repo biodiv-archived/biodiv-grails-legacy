@@ -26,6 +26,7 @@ import grails.plugins.springsecurity.Secured
 
 import speciespage.ObservationService
 import species.utils.Utils
+import content.eml.Document
 
 class UFileController {
 
@@ -49,113 +50,8 @@ class UFileController {
 		return;
 	}
 
-	/*
-	 * 
-	 *     
-	 def list = {
-	 log.debug params
-	 def model = getUFileList(params)
-	 render (view:"list", model:model)
-	 return;
-	 }
-	 def create = {
-	 def UFileInstance = new UFile()
-	 UFileInstance.properties = params
-	 return [UFileInstance: UFileInstance]
-	 }
-	 def save = {
-	 log.debug params
-	 def UFileInstance = new UFile(params)		
-	 if (UFileInstance.save(flush: true)) {
-	 def tags = (params.tags != null) ? Arrays.asList(params.tags) : new ArrayList();
-	 UFileInstance.setTags(tags)
-	 flash.message = "${message(code: 'default.created.message', args: [message(code: 'UFile.label', default: 'UFile'), UFileInstance.id])}"
-	 redirect(action: "show", id: UFileInstance.id)
-	 }
-	 else {
-	 render(view: "create", model: [UFileInstanceList: UFile.list(params), UFileInstanceTotal: UFile.count()])
-	 }
-	 }
-	 def edit = {
-	 def UFileInstance = UFile.get(params.id)
-	 if (!UFileInstance) {
-	 flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'UFile.label', default: 'UFile'), params.id])}"
-	 redirect(action: "list")
-	 }
-	 else {
-	 return [UFileInstance: UFileInstance]
-	 }
-	 }
-	 def update = {
-	 def UFileInstance = UFile.get(params.id)
-	 if (UFileInstance) {
-	 if (params.version) {
-	 def version = params.version.toLong()
-	 if (UFileInstance.version > version) {
-	 UFileInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [message(code: 'UFile.label', default: 'UFile')] as Object[], "Another user has updated this UFile while you were editing")
-	 render(view: "edit", model: [UFileInstance: UFileInstance])
-	 return
-	 }
-	 }
-	 UFileInstance.properties = params
-	 if (!UFileInstance.hasErrors() && UFileInstance.save(flush: true)) {
-	 flash.message = "${message(code: 'default.updated.message', args: [message(code: 'UFile.label', default: 'UFile'), UFileInstance.id])}"
-	 redirect(action: "show", id: UFileInstance.id)
-	 }
-	 else {
-	 render(view: "edit", model: [UFileInstance: UFileInstance])
-	 }
-	 }
-	 else {
-	 flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'UFile.label', default: 'UFile'), params.id])}"
-	 redirect(action: "list")
-	 }
-	 }
-	 def delete = {
-	 def UFileInstance = UFile.get(params.id)
-	 if (UFileInstance) {
-	 try {
-	 UFileInstance.delete(flush: true)
-	 flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'UFile.label', default: 'UFile'), params.id])}"
-	 redirect(action: "list")
-	 }
-	 catch (org.springframework.dao.DataIntegrityViolationException e) {
-	 flash.message = "${message(code: 'default.not.deleted.message', args: [message(code: 'UFile.label', default: 'UFile'), params.id])}"
-	 redirect(action: "show", id: params.id)
-	 }
-	 }
-	 else {
-	 flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'UFile.label', default: 'UFile'), params.id])}"
-	 redirect(action: "list")
-	 }
-	 }
-	 def save_browser = {
-	 log.debug params
-	 try {
-	 def uFiles = uFileService.updateUFiles(params)
-	 redirect(action: "browser", model: [UFileInstanceList: UFile.list(params), UFileInstanceTotal: UFile.count()])
-	 }
-	 catch (Exception e) {
-	 e.printStackTrace();
-	 redirect(action: "browser", model: [UFileInstanceList: UFile.list(params), UFileInstanceTotal: UFile.count()])
-	 }
-	 }
-	 def show = {
-	 def UFileInstance = UFile.get(params.id)
-	 if (!UFileInstance) {
-	 flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'UFile.label', default: 'UFile'), params.id])}"
-	 redirect(action: "list")
-	 }
-	 else {
-	 [UFileInstance: UFileInstance]
-	 }
-	 }
-	 */
+	
 
-	def tags = {
-		log.debug params;
-		render Tag.findAllByNameIlike("${params.term}%")*.name as JSON
-	}
 
 	// for uploading a file.
 	// File is uploaded to a temporary location. No UFile object is created in controller
@@ -182,6 +78,10 @@ class UFileController {
 		}
 	}
 
+	/**
+	 * upload of file in project.
+	 * Document is created after uploading of file. THe document id is passed to form and for further tracking.
+	 */
 	@Secured(['ROLE_USER'])
 	def upload = {
 		log.debug "&&&&&&&&&&&&&&&&&&& <><><<>>params in upload of file" +  params
@@ -194,12 +94,20 @@ class UFileController {
 			ajaxUploaderService.upload(inputStream, uploaded)
 
 			UFile uFileInstance = new UFile()
-			uFileInstance.properties = ['name':uploaded.getName(), 'path':uploaded.getPath()]
+			uFileInstance.path = uploaded.getPath()
 			uFileInstance.size = UFileService.getFileSize(uploaded)
 			uFileInstance.downloads = 0
-			uFileInstance.save(flush:true)
+			
+			Document documentInstance = new Document()
+			documentInstance.title  = uploaded.getName()
+			
+			documentInstance.uFile = uFileInstance
+			
+			
+			documentInstance.save(flush:true)
+			
 
-			return render(text: [success:true, filePath:uFileInstance.path, fileId:uFileInstance.id, fileSize:uFileInstance.size, fileName:uFileInstance.name] as JSON, contentType:'text/json')
+			return render(text: [success:true, filePath:uFileInstance.path, docId:documentInstance.id, fileSize:uFileInstance.size, docName:documentInstance.title] as JSON, contentType:'text/json')
 		} catch (FileUploadException e) {
 
 			log.error("Failed to upload file.", e)
