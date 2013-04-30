@@ -34,6 +34,6 @@
     <core name="newsletters" instanceDir="newsletters" />
     <core name="checklists" instanceDir="checklists" />
     <core name="projects" instanceDir="projects" />
-    <core name="ufiles" instanceDir="ufiles" />
+    <core name="documents" instanceDir="documents" />
   </cores>
 </solr>

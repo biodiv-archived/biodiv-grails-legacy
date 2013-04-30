@@ -85,6 +85,7 @@ class DocumentController {
 		}
 	}
 
+	@Secured(['ROLE_USER'])	
 	def update = {
 		def documentInstance = Document.get(params.id)
 		if (documentInstance) {
@@ -113,6 +114,7 @@ class DocumentController {
 		}
 	}
 
+	@Secured(['ROLE_USER'])	
 	def delete = {
 		def documentInstance = Document.get(params.id)
 		if (documentInstance) {
@@ -131,6 +133,31 @@ class DocumentController {
 			redirect(action: "list")
 		}
 	}
+	
+	def browser = {
+		log.debug params
+
+		def model = getDocumentList(params)
+		render (view:"browser", model:model)
+		return;
+	}
+
+	protected def getDocumentList(params) {
+		
+				def max = Math.min(params.max ? params.int('max') : 12, 100)
+				def offset = params.offset ? params.int('offset') : 0
+				def filteredDocument = documentService.getFilteredDocuments(params, max, offset)
+				def documentInstanceList = filteredDocument.documentInstanceList
+				def queryParams = filteredDocument.queryParams
+				def activeFilters = filteredDocument.activeFilters
+		
+				def totalDocumentInstanceList = documentService.getFilteredDocuments(params, -1, -1).documentInstanceList
+				def count = totalDocumentInstanceList.size()
+		
+				return [totalDocumentInstanceList:totalDocumentInstanceList, documentInstanceList: documentInstanceList, documentInstanceTotal: count, queryParams: queryParams, activeFilters:activeFilters, total:count]
+		
+			}
+		
 
 
 	def tags = {
@@ -138,4 +165,33 @@ class DocumentController {
 		render Tag.findAllByNameIlike("${params.term}%")*.name as JSON
 	}
 
+	
+	def tagcloud = { render (view:"tagcloud") }
+
+	//// SEARCH //////
+	/**
+	 * 	
+	 */
+	def search = {
+		log.debug params;
+		def model = documentService.search(params)
+		model['isSearch'] = true;
+
+		if(params.loadMore?.toBoolean()){
+			params.remove('isGalleryUpdate');
+			render(template:"/document/searchResultsTemplate", model:model);
+			return;
+
+		} else {
+			params.remove('isGalleryUpdate');
+			def obvListHtml =  g.render(template:"/document/searchResultsTemplate", model:model);
+			model.resultType = "document"
+			def obvFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
+
+			def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml]
+
+			render (result as JSON)
+			return;
+		}
+	}
 }

@@ -8,7 +8,8 @@ import java.util.List;
 
 import org.springframework.transaction.annotation.Transactional;
 
-import content.fileManager.UFile;
+import content.eml.UFile;
+import content.eml.Document
 import species.License
 
 //import org.lorecraft.phparser.SerializedPhpParser;
@@ -163,19 +164,20 @@ def migrateProjects() {
 		println query
 
 
-		List files = new ArrayList()
+		List docs = new ArrayList()
 
 		sql.eachRow(query) { row ->
 			if(row.fid) {
 
 				def filedata = sql.firstRow("select * from files where fid = $row.fid")
 
-				UFile file = new UFile();
+				Document document = new Document()
+				//UFile file = new UFile();
 
-				file.name = filedata.filename
-				file.path = filedata.filepath
-				file.size = filedata.filesize
-				file.mimetype = filedata.filemime
+				document.title = filedata.filename
+				document.uFile.path = filedata.filepath
+				document.uFile.size = filedata.filesize
+				document.uFile.mimetype = filedata.filemime
 
 
 				def metadata = row.metadata
@@ -185,28 +187,28 @@ def migrateProjects() {
 /*
 					SerializedPhpParser serializedPhpParser = new SerializedPhpParser(row.metadata);
 					Object result = serializedPhpParser.parse();
-					file.name = result.description;
-					file.description = result.shortnote.body
+					document.title = result.description;
+					document.description = result.shortnote.body
 					//before setting tags object should be saved
-					if(!file.save(flush:true)){
-						file.errors.allErrors.each { log.error it }
+					if(!document.save(flush:true)){
+						document.errors.allErrors.each { log.error it }
 						return new Exception()
 					}else{
 						//get tags list by splitting string by comma and stripping whitespace
 						List tags = Arrays.asList(result.tags.body.split("\\s*,\\s*"));
 
 						println "tags of file are "+ tags
-						file.setTags(tags)
+						document.setTags(tags)
 					}
 */
 
 				}
 
-				files.add(file)
+				docs.add(document)
 			}
 		}
 
-		return files.size()>0?files:null;
+		return docs.size()>0?docs:null;
 	}
 
 	def setSourceToProjectFiles(Project proj)

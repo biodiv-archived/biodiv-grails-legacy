@@ -1,6 +1,6 @@
 
 <%@ page import="content.eml.Document" %>
-<%@ page import="content.fileManager.UFile"%>
+<%@ page import="content.eml.UFile"%>
 <%@ page import="org.grails.taggable.Tag"%>
 <%@ page import="species.participation.ActivityFeedService"%>
 <html>

@@ -1,6 +1,7 @@
 package content.eml
 
-import content.fileManager.UFile
+import java.util.Date;
+
 import species.auth.SUser;
 import species.groups.UserGroup;
 import org.grails.taggable.Taggable;
@@ -50,14 +51,21 @@ class Document implements Taggable {
 
 	Coverage coverage 	//Coverage Information
 
-
+	Date dateCreated
+	Date lastUpdated
+	
 	boolean deleted
 	
 	static transients = [ 'deleted' ]
 
 
 	static constraints = {
-		
+		title nullable:false
+		uFile nullable:false
+		contributors nullable:true
+		attribution nullable:true	
+		sourceHolderId nullable:true
+		sourceHolderType nullable:true
 	}
 	
 	static hasMany ={userGroups:UserGroup}

@@ -1,6 +1,6 @@
 
 
-<%@ page import="content.fileManager.UFile" %>
+<%@ page import="content.eml.UFile" %>
 <%@ page import="org.grails.taggable.Tag"%>
 <html>
     <head>

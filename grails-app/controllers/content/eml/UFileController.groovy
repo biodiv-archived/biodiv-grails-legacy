@@ -1,4 +1,4 @@
-package content.fileManager
+package content.eml
 
 import grails.converters.JSON
 
@@ -27,6 +27,7 @@ import grails.plugins.springsecurity.Secured
 import speciespage.ObservationService
 import species.utils.Utils
 import content.eml.Document
+import content.eml.UFile;
 
 class UFileController {
 
@@ -51,7 +52,6 @@ class UFileController {
 	}
 
 	
-
 
 	// for uploading a file.
 	// File is uploaded to a temporary location. No UFile object is created in controller
@@ -187,43 +187,6 @@ class UFileController {
 
 		return [totalUFileInstanceList:totalUFileInstanceList, UFileInstanceList: UFileInstanceList, UFileInstanceTotal: count, queryParams: queryParams, activeFilters:activeFilters, total:count]
 
-	}
-
-	def tagcloud = { render (view:"tagcloud") }
-
-
-
-	/**
-	 *
-	 */
-	def search = {
-		log.debug params;
-		def model = uFileService.search(params)
-		model['isSearch'] = true;
-
-		if(params.loadMore?.toBoolean()){
-			params.remove('isGalleryUpdate');
-			render(template:"/UFile/searchResultsTemplate", model:model);
-			return;
-
-		} else {
-			params.remove('isGalleryUpdate');
-			def obvListHtml =  g.render(template:"/UFile/searchResultsTemplate", model:model);
-			model.resultType = "ufile"
-			def obvFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
-
-			def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml]
-
-			render (result as JSON)
-			return;
-		}
-	}
-
-	def terms = {
-		log.debug params;
-		params.field = params.field?params.field.replace('aq.',''):"autocomplete";
-		List result = uFileService.nameTerms(params)
-		render result.value as JSON;
 	}
 
 

@@ -1,4 +1,4 @@
-package content.fileManager
+package content.eml
 
 import java.util.Date;
 import species.License
@@ -15,7 +15,6 @@ class UFile{
 	String path
 	String size
 	String mimetype
-	Date dateCreated
 	Integer downloads
 	String doi
 	int weight	//saves the order in a group
@@ -24,6 +23,8 @@ class UFile{
 	boolean deleted
 	
 	static transients = [ 'deleted' ]
+	
+	static belongsTo = [Document]
 
 	static mapping = {
 	}

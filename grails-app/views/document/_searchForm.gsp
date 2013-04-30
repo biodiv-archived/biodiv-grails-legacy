@@ -1,12 +1,12 @@
 <div  class="block-tagadelic ">
 
 	<form id="search-ufiles" method="get"  title="Search"
-		action="${uGroup.createLink(controller:'UFile', action:'browser') }"
+		action="${uGroup.createLink(controller:'Document', action:'list') }"
 		class="searchbox">
 		<label class="control-label" for="name">Title</label> <input id="title"
 			data-provide="typeahead" type="text" class="input-block-level"
-			name="name" 
-			placeholder="Search by File title" value="${params.title}" />
+			name="title" 
+			placeholder="Search by title" value="${params.title}" />
 			
 		<label class="control-label" for="description">Description</label> <input id="grantee"
 			data-provide="typeahead" type="text" class="input-block-level"

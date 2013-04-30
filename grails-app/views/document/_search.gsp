@@ -3,7 +3,7 @@
 				<i class=" icon-search"></i>Search/Filter
 			</h5> </a>
 		<div id="searchBox" class="collapse" style="height: 0px; overflow: hidden;">
-		<g:render template="/UFile/advSearchForm" />
+		<g:render template="/document/advSearchForm" />
 		</div>
 		
 </div>

@@ -12,7 +12,7 @@ import org.grails.taggable.*
 import org.apache.commons.collections.list.LazyList
 import org.apache.commons.collections.FactoryUtils
 
-
+import species.groups.UserGroup;
 
 
 class Project implements Taggable{

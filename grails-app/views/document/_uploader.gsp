@@ -1,4 +1,4 @@
-<%@ page import="content.fileManager.UFile"%>
+<%@ page import="content.eml.UFile"%>
 <%@ page import="org.grails.taggable.Tag"%>
 
 <%
@@ -32,7 +32,7 @@
         			fieldName: responseJSON.fileId + '.tags',
         			placeholderText:'Add some tags',
         			autocomplete:{
-        				source: '/UFile/tags'
+        				source: '/document/tags'
         			}, 
         			triggerKeys:['enter', 'comma', 'tab'], 
         			maxLength:30

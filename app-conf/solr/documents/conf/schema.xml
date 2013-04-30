@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
-<schema name="observations" version="1.3">
+<schema name="documents" version="1.3">
 
 	<types>
 		<fieldType name="string" class="solr.StrField"
@@ -207,7 +207,7 @@
 			required="true" multiValued="false" />
 
 
-		<field name="name" type="text" indexed="true" stored="true"
+		<field name="title" type="text" indexed="true" stored="true"
 			required="true" multiValued="false" />
 
 		<field name="description" type="text" indexed="true" required="false" />
@@ -219,14 +219,14 @@
 		<field name="text" type="text" indexed="true" stored="true"
 			required="true" multiValued="true" termVectors="true" termPositions="true"
 			termOffsets="true" />
-		<copyField source="name" dest="text" />
+		<copyField source="title" dest="text" />
 		<copyField source="description" dest="text" />
 		<copyField source="tag" dest="text" />
 
 
 		<field name="autocomplete" type="textSpell" indexed="true"
 			stored="true" multiValued="true" />
-		<copyField source="name" dest="autocomplete" />
+		<copyField source="title" dest="autocomplete" />
 		<copyField source="description" dest="autocomplete" />
 		<copyField source="tag" dest="autocomplete" />
 

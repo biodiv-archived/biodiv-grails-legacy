@@ -1,5 +1,5 @@
 
-<%@ page import="content.fileManager.UFile"%>
+<%@ page import="content.eml.UFile"%>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />

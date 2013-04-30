@@ -1,6 +1,8 @@
 package content
 
-import content.fileManager.UFile
+import content.eml.UFile;
+import content.eml.Document
+
 import org.codehaus.groovy.grails.web.taglib.exceptions.GrailsTagException
 
 class FileManagerTagLib {
@@ -10,7 +12,7 @@ class FileManagerTagLib {
 	
 	def uploader = { attrs, body ->
 		
-		out << render(template:"/UFile/uploader", model: attrs.model);	
+		out << render(template:"/document/uploader", model: attrs.model);	
 	}
 	
 	
@@ -25,7 +27,7 @@ class FileManagerTagLib {
 				
 	
 		params.errorAction = "browser"
-		params.errorController = "UFile"
+		params.errorController = "document"
 		
 		out << g.link([controller: "UFile", action: "download", params: params, id: attrs.id], body)
 		

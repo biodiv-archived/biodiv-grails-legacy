@@ -1,4 +1,4 @@
-<%@ page import="content.fileManager.UFile"%>
+<%@ page import="content.eml.UFile"%>
 <%@ page import="org.grails.taggable.Tag"%>
 <%@ page import="species.participation.ActivityFeedService"%>
 <html>
@@ -6,8 +6,8 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="main" />
 <g:set var="entityName"
-	value="${message(code: 'UFile.label', default: 'UFile')}" />
-<title>File Manager</title>
+	value="${message(code: 'Document.label', default: 'Document')}" />
+<title>Document Browser</title>
 <r:require modules="add_file" />
 <uploader:head />
 <style type="text/css">
@@ -35,7 +35,7 @@
 </head>
 <body>
 	<div class="body">
-		<h1>Browse Files</h1>
+		<h1>Browse Documents</h1>
 		<g:if test="${flash.message}">
 			<div class="message">
 				${flash.message}
@@ -45,17 +45,15 @@
 
 
 		<div class="project-list tab-content span8">
-			<g:render template="/UFile/search" model="['params':params]" />
+			<g:render template="/document/search" model="['params':params]" />
 			<div class="observations_list" style="top: 0px;">
 
-				<g:render template="/UFile/showBrowserTable"
-					model="['UFileInstanceList':UFileInstanceList]" />
-
-
+				<g:render template="/document/showBrowserTable"
+					model="['documentInstanceList':documentInstanceList]" />
 
 
 				<div class="paginateButtons">
-					<g:paginate total="${UFileInstanceTotal}" />
+					<g:paginate total="${documentInstanceTotal}" />
 				</div>
 			</div>
 		</div>

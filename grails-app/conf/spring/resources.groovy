@@ -162,7 +162,7 @@ beans = {
 	}
 
 	emailConfirmationService(EmailConfirmationService) { mailService = ref('mailService') }
-	
+
 	checklistSolrServer(org.apache.solr.client.solrj.impl.StreamingUpdateSolrServer,config.serverURL+"/checklists", config.queueSize, config.threadCount ) {
 		setSoTimeout(config.soTimeout);
 		setConnectionTimeout(config.connectionTimeout);
@@ -178,7 +178,7 @@ beans = {
 	checklistSearchService(speciespage.search.ChecklistSearchService) {
 		solrServer = ref('checklistSolrServer');
 	}
-	
+
 	projectSolrServer(org.apache.solr.client.solrj.impl.StreamingUpdateSolrServer,config.serverURL +"/projects", config.queueSize, config.threadCount ) {
 		setSoTimeout(config.soTimeout);
 		setConnectionTimeout(config.connectionTimeout);
@@ -195,20 +195,20 @@ beans = {
 		solrServer = ref('projectSolrServer');
 	}
 
-       ufileSolrServer(org.apache.solr.client.solrj.impl.StreamingUpdateSolrServer,config.serverURL+"/ufiles", config.queueSize, config.threadCount ) {
-                setSoTimeout(config.soTimeout);
-                setConnectionTimeout(config.connectionTimeout);
-                setDefaultMaxConnectionsPerHost(config.defaultMaxConnectionsPerHost);
-                setMaxTotalConnections(config.maxTotalConnections);
-                setFollowRedirects(config.followRedirects);
-                setAllowCompression(config.allowCompression);
-                setMaxRetries(config.maxRetries);
-                //setParser(new XMLResponseParser()); // binary parser is used by default
-                log.debug "Initialized search server to "+config.serverURL+"/ufiles"
-        }
+	documentSolrServer(org.apache.solr.client.solrj.impl.StreamingUpdateSolrServer,config.serverURL+"/documents", config.queueSize, config.threadCount ) {
+		setSoTimeout(config.soTimeout);
+		setConnectionTimeout(config.connectionTimeout);
+		setDefaultMaxConnectionsPerHost(config.defaultMaxConnectionsPerHost);
+		setMaxTotalConnections(config.maxTotalConnections);
+		setFollowRedirects(config.followRedirects);
+		setAllowCompression(config.allowCompression);
+		setMaxRetries(config.maxRetries);
+		//setParser(new XMLResponseParser()); // binary parser is used by default
+		log.debug "Initialized search server to "+config.serverURL+"/documents"
+	}
 
-        ufileSearchService(speciespage.search.UFileSearchService) {
-                solrServer = ref('ufileSolrServer');
-        }
+	documentSearchService(speciespage.search.DocumentSearchService) {
+		solrServer = ref('documentSolrServer');
+	}
 
 }

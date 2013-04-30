@@ -2,32 +2,6 @@
 
 	<div class="section" style="clear: both;">
 	
-	<div
-						class="control-group ${hasErrors(bean: uFileInstance, field: 'type', 'error')}">
-						<label class="control-label" for="type"><g:message
-								code="document.type.label" default="Type" /><span
-							class="req">*</span></label>
-						<div class="controls">
-							<g:select name="type"
-								from="${content.fileManager.UFile$FileType?.values()}"
-								keys="${content.fileManager.UFile$FileType?.values()*.name()}"
-								value="${uFileInstance?.type?.name()}" />
-
-						</div>
-
-					</div>
-					<div
-						class="control-group ${hasErrors(bean: uFileInstance, field: 'name', 'error')}">
-						<label class="control-label" for="title"><g:message
-								code="document.title.label" default="Title" /><span
-							class="req">*</span></label>
-						<div class="controls">
-
-							<input type="text" class="input-xxlarge" name="title"
-								value="${uFileInstance?.title}" required />
-						</div>
-
-					</div>
 
 
 		<div
@@ -41,54 +15,6 @@
 			</div>
 		</div>
 
-
-		<div
-			class="control-group ${hasErrors(bean: uFileInstance, field: 'description', 'error')}">
-			<label class="control-label" for="description"> Description </label>
-			<div class="controls">
-				<textarea rows='5' columns='10' name='uFile.description'
-					> ${uFileInstance?.description}</textarea>
-			</div>
-
-		</div>
-
-		<div
-			class="control-group ${hasErrors(bean: uFileInstance, field: 'tags', 'error')}">
-			<label class="control-label" for='tags'> <i class="icon-tags"></i>Tags
-			</label>
-			<div class="controls">
-				<ul class='file-tags' id="${fileId}-tags" name="uFile.tags">
-					<g:if test='${uFileInstance}'>
-						<g:each in="${uFileInstance?.tags}" var="tag">
-							<li>
-								${tag}
-							</li>
-						</g:each>
-					</g:if>
-				</ul>
-			</div>
-		</div>
-
-
-		<div
-			class="control-group ${hasErrors(bean: uFileInstance, field: 'contributors', 'error')}">
-			<label class="control-label" for="contributors">Contributors</label>
-			<div class="controls">
-				<g:textField name="uFile.contributors"
-					value="${uFileInstance?.contributors }" />
-			</div>
-		</div>
-
-
-
-		<div
-			class="control-group ${hasErrors(bean: uFileInstance, field: 'attribution', 'error')}">
-			<label class="control-label" for="attribution">Attribution</label>
-			<div class="controls">
-				<g:textField name="uFile.attribution"
-					value="${uFileInstance?.attribution}" />
-			</div>
-		</div>
 
 
 		<div

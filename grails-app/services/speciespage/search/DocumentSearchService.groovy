@@ -14,9 +14,9 @@ import org.apache.solr.common.SolrInputDocument
 import org.apache.solr.common.params.SolrParams
 import org.apache.solr.common.params.TermsParams
 
-import content.fileManager.UFile
+import content.eml.Document;
 
-class UFileSearchService {
+class DocumentSearchService {
 
 	static transactional = false
 
@@ -35,23 +35,23 @@ class UFileSearchService {
 		log.info "Initializing publishing to ufiles search index"
 		
 		//TODO: change limit
-		int limit = UFile.count()+1, offset = 0;
+		int limit = Document.count()+1, offset = 0;
 		
-		def uFiles;
+		def documents;
 		def startTime = System.currentTimeMillis()
 		while(true) {
-			uFiles = UFile.list(max:limit, offset:offset);
-			if(!uFiles) break;
-			publishSearchIndex(uFiles, true);
-			uFiles.clear();
+			documents = Document.list(max:limit, offset:offset);
+			if(!documents) break;
+			publishSearchIndex(documents, true);
+			documents.clear();
 			offset += limit;
 		}
 		
 		log.info "Time taken to publish projects search index is ${System.currentTimeMillis()-startTime}(msec)";
 	}
 
-	def publishSearchIndex(UFile uFile, boolean commit) {
-		return publishSearchIndex([uFile], commit);
+	def publishSearchIndex(Document document, boolean commit) {
+		return publishSearchIndex([document], commit);
 	}
 
 	/**
@@ -60,9 +60,9 @@ class UFileSearchService {
 	 * @param commit
 	 * @return
 	 */
-	def publishSearchIndex(List<UFile> uFiles, boolean commit) {
-		if(!uFiles) return;
-		log.info "Initializing publishing to UFiles search index : "+uFiles.size();
+	def publishSearchIndex(List<Document> documents, boolean commit) {
+		if(!documents) return;
+		log.info "Initializing publishing to Documents search index : "+documents.size();
 
 		def fieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.fields
 		def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields
@@ -70,16 +70,16 @@ class UFileSearchService {
 		Collection<SolrInputDocument> docs = new ArrayList<SolrInputDocument>();
 		Map names = [:];
 		Map docsMap = [:]
-		uFiles.each { uFile ->
-			log.debug "Reading UFile : "+uFile.id;
+		documents.each { document ->
+			log.debug "Reading Document : "+document.id;
 
 				SolrInputDocument doc = new SolrInputDocument();
-				doc.addField(searchFieldsConfig.ID, uFile.id.toString());
-				doc.addField(searchFieldsConfig.NAME, uFile.name);
-				doc.addField(searchFieldsConfig.DESCRIPTION, uFile.description);
+				doc.addField(searchFieldsConfig.ID, document.id.toString());
+				doc.addField(searchFieldsConfig.TITLE, document.title);
+				doc.addField(searchFieldsConfig.DESCRIPTION, document.description);
 				
 				
-				uFile.tags.each { tag ->
+				document.tags.each { tag ->
 					doc.addField(searchFieldsConfig.TAG, tag);
 				}
 					
@@ -95,7 +95,7 @@ class UFileSearchService {
 				//commit ...server is configured to do an autocommit after 10000 docs or 1hr
 				solrServer.blockUntilFinished();
 				solrServer.commit();
-				log.info "Finished committing to UFile solr core"
+				log.info "Finished committing to Document solr core"
 			}
 		} catch(SolrServerException e) {
 			e.printStackTrace();
@@ -111,7 +111,7 @@ class UFileSearchService {
 	 */
 	def search(query) {
 		def params = SolrParams.toSolrParams(query);
-		log.info "Running uFile search query : "+params
+		log.info "Running document search query : "+params
 		return solrServer.query( params );
 	}
 
@@ -121,7 +121,7 @@ class UFileSearchService {
 	* @return
 	*/
    def delete(long id) {
-	   log.info "Deleting uFile from search index"
+	   log.info "Deleting document from search index"
 	   solrServer.deleteByQuery("id:${id}");
 	   solrServer.commit();
    }
@@ -131,7 +131,7 @@ class UFileSearchService {
 	 * @return
 	 */
 	def deleteIndex() {
-		log.info "Deleting uFile search index"
+		log.info "Deleting document search index"
 		solrServer.deleteByQuery("*:*")
 		solrServer.commit();
 	}
@@ -141,7 +141,7 @@ class UFileSearchService {
 	 * @return
 	 */
 	def optimize() {
-		log.info "Optimizing uFile search index"
+		log.info "Optimizing document search index"
 		solrServer.optimize();
 	}
 
@@ -162,7 +162,7 @@ class UFileSearchService {
 				.set(TermsParams.TERMS_REGEXP_FLAG, "case_insensitive")
 				.set(TermsParams.TERMS_LIMIT, limit)
 				.set(TermsParams.TERMS_RAW, true);
-		log.info "Running uFile search query : "+q
+		log.info "Running document search query : "+q
 		return solrServer.query( q );
 	}
 }

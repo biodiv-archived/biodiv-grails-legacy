@@ -1,5 +1,5 @@
 <%@ page import="content.Project"%>
-<%@ page import="content.fileManager.UFile"%>
+<%@ page import="content.eml.Document"%>
 
 
 <div id="project-sidebar"
@@ -53,9 +53,9 @@
 
 
 	<div style="width: 235px; max-height: 350px;">
-		<h3>File Tags</h3>
+		<h3>Document Tags</h3>
 		<g:if test="${tags}">
-			<tc:tagCloud bean="${UFile}" controller="UFile" action="browser"
+			<tc:tagCloud bean="${Document}" controller="document" action="browser"
 				sort="${true}" style color="${[start: '#084B91', end: '#9FBBE5']}"
 				size="${[start: 12, end: 30, unit: 'px']}" paramName='tag' />
 

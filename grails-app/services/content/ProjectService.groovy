@@ -12,8 +12,8 @@ import species.utils.Utils;
 
 
 
-import content.fileManager.UFile;
-import content.fileManager.UFileService
+import content.eml.UFile;
+import content.eml.UFileService;
 
 
 class ProjectService {

@@ -5,28 +5,28 @@
 				<thead>
 					<tr>
 
-						<g:sortableColumn property="name"
-							title="${message(code: 'UFile.name.label', default: 'Title')}" />
+						<g:sortableColumn property="title"
+							title="${message(code: 'Document.title.label', default: 'Title')}" />
 
 						<g:sortableColumn property="description"
-							title="${message(code: 'UFile.source.label', default: 'Source')}" />
+							title="${message(code: 'Dcoument.source.label', default: 'Source')}" />
 
-						<g:sortableColumn property="size"
-							title="${message(code: 'UFile.file.label', default: 'File')}" />
+						<g:sortableColumn property="uFile"
+							title="${message(code: 'Document.uFile.label', default: 'File')}" />
 
 					</tr>
 				</thead>
 				<tbody>
-					<g:each in="${UFileInstanceList}" status="i" var="UFileInstance">
+					<g:each in="${documentInstanceList}" status="i" var="documentInstance">
 						<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 
 							<td>
-									${fieldValue(bean: UFileInstance, field: "name")}
+									${fieldValue(bean: documentInstance, field: "title")}
 								</td>
 							<%
 
-	def className = UFileInstance.sourceHolderType
-	def id = UFileInstance.sourceHolderId
+	def className = documentInstance.sourceHolderType
+	def id = documentInstance.sourceHolderId
 	def sourceObj = grailsApplication.getArtefact("Domain",className)?.getClazz()?.read(id)
 	//XXX Needs to be made generic.
 	def controller = 'project'
@@ -35,11 +35,9 @@
 		case Project.class.getCanonicalName():
 			controller = 'project'
 			break
-		case Document.class.getCanonicalName():
-			controller = 'document'
-			break
+
 		default:
-			controller = 'project'
+			controller = 'document'
 			break
 	}
 	
@@ -50,7 +48,7 @@
 
 
 
-							<td><fileManager:displayIcon id="${UFileInstance.id}" /></td>
+							<td><fileManager:displayIcon id="${documentInstance.uFile.id}" /></td>
 
 
 						</tr>
