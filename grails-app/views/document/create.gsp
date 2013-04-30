@@ -58,55 +58,55 @@ input.dms_field {
 
 
 	<div
-						class="control-group ${hasErrors(bean: uFileInstance, field: 'type', 'error')}">
+						class="control-group ${hasErrors(bean: documentInstance, field: 'type', 'error')}">
 						<label class="control-label" for="type"><g:message
 								code="document.type.label" default="Type" /><span
 							class="req">*</span></label>
 						<div class="controls">
 							<g:select name="type"
-								from="${content.eml.UFile$FileType?.values()}"
-								keys="${content.eml.UFile$FileType?.values()*.name()}"
-								value="${uFileInstance?.type?.name()}" />
+								from="${content.eml.Document$DocumentType?.values()}"
+								keys="${content.eml.Document$DocumentType?.values()*.name()}"
+								value="${documentInstance?.type?.name()}" />
 
 						</div>
 
 					</div>
 					<div
-						class="control-group ${hasErrors(bean: uFileInstance, field: 'name', 'error')}">
+						class="control-group ${hasErrors(bean: documentInstance, field: 'title', 'error')}">
 						<label class="control-label" for="title"><g:message
 								code="document.title.label" default="Title" /><span
 							class="req">*</span></label>
 						<div class="controls">
 
 							<input type="text" class="input-xxlarge" name="title"
-								value="${uFileInstance?.title}" required />
+								value="${documentInstance?.title}" required />
 						</div>
 
 					</div>
 
 
-			<g:render template="/UFile/uFile"
-				model="['uFileInstance':documentInstance?.uFile, 'parent':documentInstance]"></g:render>
+			<g:render template="/UFile/ufile"
+				model="['uFileInstance':documentInstance?.uFile]"></g:render>
 				
 				
 		<div
-			class="control-group ${hasErrors(bean: uFileInstance, field: 'description', 'error')}">
+			class="control-group ${hasErrors(bean: documentInstance, field: 'description', 'error')}">
 			<label class="control-label" for="description"> Description </label>
 			<div class="controls">
-				<textarea rows='5' columns='10' name='uFile.description'
-					> ${uFileInstance?.description}</textarea>
+				<textarea rows='5' columns='10' name='document.description'
+					> ${documentInstance?.description}</textarea>
 			</div>
 
 		</div>
 
 		<div
-			class="control-group ${hasErrors(bean: uFileInstance, field: 'tags', 'error')}">
+			class="control-group ${hasErrors(bean: documentInstance, field: 'tags', 'error')}">
 			<label class="control-label" for='tags'> <i class="icon-tags"></i>Tags
 			</label>
 			<div class="controls">
-				<ul class='file-tags' id="${fileId}-tags" name="uFile.tags">
-					<g:if test='${uFileInstance}'>
-						<g:each in="${uFileInstance?.tags}" var="tag">
+				<ul class='file-tags' id="${fileId}-tags" name="document.tags">
+					<g:if test='${documentInstance}'>
+						<g:each in="${documentInstance?.tags}" var="tag">
 							<li>
 								${tag}
 							</li>
@@ -118,22 +118,22 @@ input.dms_field {
 
 
 		<div
-			class="control-group ${hasErrors(bean: uFileInstance, field: 'contributors', 'error')}">
+			class="control-group ${hasErrors(bean: documentInstance, field: 'contributors', 'error')}">
 			<label class="control-label" for="contributors">Contributors</label>
 			<div class="controls">
-				<g:textField name="uFile.contributors"
-					value="${uFileInstance?.contributors }" />
+				<g:textField name="document.contributors"
+					value="${documentInstance?.contributors }" />
 			</div>
 		</div>
 
 
 
 		<div
-			class="control-group ${hasErrors(bean: uFileInstance, field: 'attribution', 'error')}">
+			class="control-group ${hasErrors(bean: documentInstance, field: 'attribution', 'error')}">
 			<label class="control-label" for="attribution">Attribution</label>
 			<div class="controls">
-				<g:textField name="uFile.attribution"
-					value="${uFileInstance?.attribution}" />
+				<g:textField name="document.attribution"
+					value="${documentInstance?.attribution}" />
 			</div>
 		</div>
 				

@@ -31,7 +31,7 @@
 	<ul class="nav nav-tabs sidebar" id="project-menus">
 		<li><a href="/collaborate/partners">Project Partners</a></li>
 		<li><a href="/project/list">Western Ghats CEPF Projects</a></li>
-		<li><a href="/UFile/browser">Browse Files</a></li>
+		<li><a href="/document/browser">Browse Files</a></li>
 
 	</ul>
 
