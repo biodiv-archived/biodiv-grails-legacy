@@ -1,5 +1,5 @@
 <script type="text/javascript">
-    var dataLinksCount = ${projectInstance?.dataLinks?.size()} + 0;
+    var dataLinksCount = ${(projectInstance?.dataLinks?.size()>0)?projectInstance?.dataLinks?.size():1} 
 
     function adddataLink(){
       var clone = $("#dataLink_clone").clone()
@@ -57,15 +57,21 @@
     </script>
 
 <div id="dataLinksList">
-	<g:each var="dataLink" in="${projectInstance.dataLinks}" status="i">
+	<g:if test="${projectInstance?.dataLinks?.size()>0}">
+		<g:each var="dataLink" in="${projectInstance.dataLinks}" status="i">
 
-		<!-- Render the dataLink template (_dataLink.gsp) here -->
-		<g:render template='dataLink'
-			model="['dataLink':dataLink,'i':i,'hidden':false]" />
-		<!-- Render the dataLink template (_dataLink.gsp) here -->
+			<!-- Render the dataLink template (_dataLink.gsp) here -->
+			<g:render template='dataLink'
+				model="['dataLink':dataLink,'i':i,'hidden':false]" />
+			<!-- Render the dataLink template (_dataLink.gsp) here -->
 
-	</g:each>
+		</g:each>
+	</g:if>
+	<g:else>
+		<g:render template='dataLink' model="['i':0,'hidden':false]" />
+	</g:else>
 </div>
-<div style="text-align:center;">
-<input type="button"  class="btn btn-primary" value="Add dataLink" onclick="adddataLink();" />
+<div style="text-align: center;">
+	<input type="button" class="btn btn-primary" value="Add dataLink"
+		onclick="adddataLink();" />
 </div>

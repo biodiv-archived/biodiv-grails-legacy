@@ -85,7 +85,7 @@ input.dms_field {
 					</div>
 
 
-			<g:render template="/UFile/ufile"
+			<g:render template="/UFile/uFile"
 				model="['uFileInstance':documentInstance?.uFile]"></g:render>
 				
 				

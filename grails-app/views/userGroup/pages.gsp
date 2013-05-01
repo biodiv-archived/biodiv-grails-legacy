@@ -50,6 +50,7 @@
 							<li><a href="/project/list">Western Ghats CEPF
 									Projects</a></li>
 						</g:if>
+						<li><a href="/document/browser">Browse Documents</a></li>
 						<g:each in="${newsletters}" var="newsletterInstance" status="i">
 							<li><a data-toggle="tab" class="pageTab" href="#${newsletterInstance.id}">
 									${fieldValue(bean: newsletterInstance, field: "title")} </a></li>

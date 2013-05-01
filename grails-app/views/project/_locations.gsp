@@ -71,13 +71,19 @@
     </script>
     
 <div id="childList">
-    <g:each var="location" in="${projectInstance.locations}" status="i">
+	<g:if test="${projectInstance?.locations?.size()>0}">
+    <g:each var="location" in="${projectInstance?.locations}" status="i">
 
         <!-- Render the location template (_location.gsp) here -->
         <g:render template='location' model="['location':location,'i':i,'hidden':false]"/>
         <!-- Render the location template (_location.gsp) here -->
 
     </g:each>
+    </g:if>
+    <g:else>
+            <g:render template='location' model="['i':1,'hidden':false]"/>
+    
+    </g:else>
 </div>
 <div style="text-align:center;">
 <input type="button" class="btn btn-primary" value="Add location" onclick="addlocation();" />

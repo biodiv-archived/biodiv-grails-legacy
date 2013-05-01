@@ -12,13 +12,10 @@ class DocumentController {
 	def springSecurityService
 
 	def index = {
-		redirect(action: "list", params: params)
+		redirect(action: "browser", params: params)
 	}
 
-	def list = {
-		params.max = Math.min(params.max ? params.int('max') : 10, 100)
-		[documentInstanceList: Document.list(params), documentInstanceTotal: Document.count()]
-	}
+
 
 	@Secured(['ROLE_USER'])
 	def create = {

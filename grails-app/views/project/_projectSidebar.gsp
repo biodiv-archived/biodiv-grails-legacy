@@ -29,15 +29,14 @@
 
 
 	<ul class="nav nav-tabs sidebar" id="project-menus">
-		<li><a href="/collaborate/partners">Project Partners</a></li>
 		<li><a href="/project/list">Western Ghats CEPF Projects</a></li>
-		<li><a href="/document/browser">Browse Files</a></li>
+		<li><a href="/document/browser">Browse Documents</a></li>
 
 	</ul>
 
 
 	<div style="width: 235px;">
-		<h3>Project Tags</h3>
+		<h4>Project Tags</h4>
 		<g:if test="${tags}">
 			<tc:tagCloud bean="${Project}" controller="project" action="list"
 				sort="${true}" style color="${[start: '#084B91', end: '#9FBBE5']}"
@@ -53,7 +52,7 @@
 
 
 	<div style="width: 235px; max-height: 350px;">
-		<h3>Document Tags</h3>
+		<h4>Document Tags</h4>
 		<g:if test="${tags}">
 			<tc:tagCloud bean="${Document}" controller="document" action="browser"
 				sort="${true}" style color="${[start: '#084B91', end: '#9FBBE5']}"

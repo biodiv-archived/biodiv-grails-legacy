@@ -34,7 +34,7 @@
 </style>
 </head>
 <body>
-	<div class="body">
+	<div class="body" style="margin-left:20px;">
 		<h1>Browse Documents</h1>
 		<g:if test="${flash.message}">
 			<div class="message">

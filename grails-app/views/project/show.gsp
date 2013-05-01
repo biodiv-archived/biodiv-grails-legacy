@@ -145,18 +145,6 @@
 						${projectInstance?.granteeOrganization}
 					</dd>
 
-					<sUser:isCEPFAdmin>
-
-						<dt>Contact</dt>
-						<dd>
-							${projectInstance?.granteeContact}
-						</dd>
-
-						<dt>Email</dt>
-						<dd>
-							${projectInstance?.granteeEmail}
-						</dd>
-					</sUser:isCEPFAdmin>
 				</dl>
 
 
