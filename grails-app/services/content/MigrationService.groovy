@@ -225,7 +225,6 @@ def migrateProjects() {
 			file.contributors = proj.granteeOrganization
 			file.attribution = proj.granteeOrganization
 		
-			println "**********************License id is "+file.license
 			
 			if(!file.save(flush:true)){
 				throw new Exception()
@@ -236,7 +235,6 @@ def migrateProjects() {
 			file.setSource(proj)
 			file.contributors = proj.granteeContact
 			file.attribution = proj.granteeContact
-			println "**********************License id is "+file.license
 			
 			
 			if(!file.save(flush:true)){
@@ -248,7 +246,6 @@ def migrateProjects() {
 			file.setSource(proj)
 			file.contributors = proj.granteeContact
 			file.attribution = proj.granteeContact
-			println "**********************License id is "+file.license
 			
 			if(!file.save(flush:true)){
 				throw new Exception()

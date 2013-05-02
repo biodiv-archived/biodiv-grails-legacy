@@ -27,6 +27,7 @@ import grails.plugins.springsecurity.Secured
 import speciespage.ObservationService
 import species.utils.Utils
 import content.eml.Document
+import content.eml.Document.DocumentType
 import content.eml.UFile;
 
 class UFileController {
@@ -34,6 +35,8 @@ class UFileController {
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
 	def observationService
+	def springSecurityService;
+	
 	AjaxUploaderService ajaxUploaderService
 	UFileService uFileService = new UFileService()
 
@@ -100,12 +103,16 @@ class UFileController {
 			
 			Document documentInstance = new Document()
 			documentInstance.title  = uploaded.getName()
+			documentInstance.type = params.type?params.type:DocumentType.MISCELLANEOUS
+			documentInstance.author = springSecurityService.currentUser
 			
 			documentInstance.uFile = uFileInstance
 			
 			
 			documentInstance.save(flush:true)
 			
+			
+			log.debug " parameters to projectDoc block >>>> Path - "+ uFileInstance.path + " ,  Id: "+ documentInstance.id + ", fileSize:"+uFileInstance.size+", docName:"+documentInstance.title
 
 			return render(text: [success:true, filePath:uFileInstance.path, docId:documentInstance.id, fileSize:uFileInstance.size, docName:documentInstance.title] as JSON, contentType:'text/json')
 		} catch (FileUploadException e) {

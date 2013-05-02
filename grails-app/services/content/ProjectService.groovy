@@ -13,7 +13,7 @@ import species.utils.Utils;
 
 
 import content.eml.UFile;
-import content.eml.UFileService;
+import content.eml.DocumentService;
 
 
 class ProjectService {
@@ -23,8 +23,8 @@ class ProjectService {
 	
 	def projectSearchService
 	
-	UFileService uFileService = new UFileService()
-
+	def documentService
+	
 	def createProject(params) {
 
 		def projectInstance = new Project()
@@ -43,7 +43,7 @@ class ProjectService {
 		projectParams.grantTo = parseDate(params.grantTo)
 
 		project.properties = projectParams
-		def uFiles = uFileService.updateUFiles(params)
+		def uFiles = documentService.updateDocuments(params)
 
 		// delete Locations that are marked for removal
 		def _toBeDeletedLocations = project.locations.findAll{it?.deleted || !it}

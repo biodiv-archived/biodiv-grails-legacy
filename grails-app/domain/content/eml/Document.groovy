@@ -71,7 +71,7 @@ class Document implements Taggable {
 		sourceHolderType nullable:true
 		author nullable:true
 		coverage nullable:true
-		description blank:true
+		description nullable:true
 	}
 	
 	static hasMany ={userGroups:UserGroup}
