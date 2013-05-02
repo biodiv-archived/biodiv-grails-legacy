@@ -33,7 +33,7 @@ input.dms_field {
 </head>
 <body>
 
-	<div class="body" style="margin-left:20px;"> 
+	<div class="body" style="margin-left: 20px;">
 		<h1>
 			<g:message code="default.create.label" args="[entityName]" />
 		</h1>
@@ -56,12 +56,13 @@ input.dms_field {
 		<form id="documentForm" action="${form_action}" method="POST"
 			class="form-horizontal">
 
+			<div class="super-section">
+				<div class="section">
 
-	<div
+					<div
 						class="control-group ${hasErrors(bean: documentInstance, field: 'type', 'error')}">
 						<label class="control-label" for="type"><g:message
-								code="document.type.label" default="Type" /><span
-							class="req">*</span></label>
+								code="document.type.label" default="Type" /><span class="req">*</span></label>
 						<div class="controls">
 							<g:select name="type"
 								from="${content.eml.Document$DocumentType?.values()}"
@@ -74,70 +75,130 @@ input.dms_field {
 					<div
 						class="control-group ${hasErrors(bean: documentInstance, field: 'title', 'error')}">
 						<label class="control-label" for="title"><g:message
-								code="document.title.label" default="Title" /><span
-							class="req">*</span></label>
+								code="document.title.label" default="Title" /><span class="req">*</span></label>
 						<div class="controls">
 
-							<input type="text" class="input-xxlarge" name="title"
+							<input type="text" class="input-block-level" name="title"
 								value="${documentInstance?.title}" required />
 						</div>
 
 					</div>
 
 
-			<g:render template="/UFile/uFile"
-				model="['uFileInstance':documentInstance?.uFile]"></g:render>
-				
-				
-		<div
-			class="control-group ${hasErrors(bean: documentInstance, field: 'description', 'error')}">
-			<label class="control-label" for="description"> Description </label>
-			<div class="controls">
-				<textarea rows='5' columns='10' name='document.description'
-					> ${documentInstance?.description}</textarea>
+					<div
+						class="control-group ${hasErrors(bean: documentInstance.uFile, field: 'path', 'error')}">
+						<label class="control-label" for="file"> Resource <span
+							class="req">*</span></label>
+						<div class="controls" style="inline-block">
+							<div class="span2">
+								<g:render template='/UFile/docUpload'
+									model="['name': 'ufilepath', 'path': documentInstance.uFile?.path, 'size':uFileInstance?.size]" />
+									
+							</div>
+							<div class="span1">(OR)</div>
+							<div class="span5">
+								<input type="text" class="input-block-level" name="uri" placeholder="Enter URL for the resource"
+									value="${documentInstance?.uri}"  />
+							</div>
+						</div>
+					</div>
+
+
+
+					<div
+						class="control-group ${hasErrors(bean: documentInstance.uFile, field: 'license', 'error')}">
+						<label class="control-label" for="License"> License </label>
+
+						<div class="controls">
+
+							<div id="uFile.license" class="licence_div dropdown">
+
+								<a id="selected_license_${i}"
+									class="btn dropdown-toggle btn-mini" data-toggle="dropdown">
+									<img
+									src="${documentInstance.uFile?.license?documentInstance.uFile.license.name.getIconFilename()+'.png':resource(dir:'images/license',file:'cc_by.png', absolute:true)}"
+									title="Set a license for this file" /> <b class="caret"></b>
+								</a>
+
+								<ul id="license_options_${i}"
+									class="dropdown-menu license_options">
+									<span>Choose a license</span>
+									<g:each in="${species.License.list()}" var="l">
+										<li class="license_option"
+											onclick="$('#license_${i}').val($.trim($(this).text()));$('#selected_license_${i}').find('img:first').replaceWith($(this).html());">
+											<img
+											src="${resource(dir:'images/license',file:l?.name?.getIconFilename()+'.png', absolute:true)}" /><span
+											style="display: none;"> ${l?.name?.value}
+										</span>
+										</li>
+									</g:each>
+								</ul>
+							</div>
+						</div>
+					</div>
+
+					<div
+						class="control-group ${hasErrors(bean: documentInstance, field: 'description', 'error')}">
+						<label class="control-label" for="description">
+							Description </label>
+						<div class="controls">
+
+
+							<ckeditor:config var="toolbar_editorToolbar">
+									[
+    									[ 'Bold', 'Italic' ]
+									]
+									</ckeditor:config>
+							<ckeditor:editor name="description" height="200px"
+								toolbar="editorToolbar">
+								${documentInstance?.description}
+							</ckeditor:editor>
+
+						</div>
+
+					</div>
+
+					<div
+						class="control-group ${hasErrors(bean: documentInstance, field: 'tags', 'error')}">
+						<label class="control-label" for='tags'> <i
+							class="icon-tags"></i>Tags
+						</label>
+						<div class="controls">
+							<ul class='file-tags' id="${fileId}-tags" name="tags">
+								<g:if test='${documentInstance}'>
+									<g:each in="${documentInstance?.tags}" var="tag">
+										<li>
+											${tag}
+										</li>
+									</g:each>
+								</g:if>
+							</ul>
+						</div>
+					</div>
+
+
+					<div
+						class="control-group ${hasErrors(bean: documentInstance, field: 'contributors', 'error')}">
+						<label class="control-label" for="contributors">Contributors</label>
+						<div class="controls">
+							<g:textField name="contributors" class="input-block-level"
+								value="${documentInstance?.contributors }" />
+						</div>
+					</div>
+
+
+
+					<div
+						class="control-group ${hasErrors(bean: documentInstance, field: 'attribution', 'error')}">
+						<label class="control-label" for="attribution">Attribution</label>
+						<div class="controls">
+							<g:textField name="attribution" class="input-block-level"
+								value="${documentInstance?.attribution}" />
+						</div>
+					</div>
+				</div>
 			</div>
 
-		</div>
-
-		<div
-			class="control-group ${hasErrors(bean: documentInstance, field: 'tags', 'error')}">
-			<label class="control-label" for='tags'> <i class="icon-tags"></i>Tags
-			</label>
-			<div class="controls">
-				<ul class='file-tags' id="${fileId}-tags" name="document.tags">
-					<g:if test='${documentInstance}'>
-						<g:each in="${documentInstance?.tags}" var="tag">
-							<li>
-								${tag}
-							</li>
-						</g:each>
-					</g:if>
-				</ul>
-			</div>
-		</div>
-
-
-		<div
-			class="control-group ${hasErrors(bean: documentInstance, field: 'contributors', 'error')}">
-			<label class="control-label" for="contributors">Contributors</label>
-			<div class="controls">
-				<g:textField name="document.contributors"
-					value="${documentInstance?.contributors }" />
-			</div>
-		</div>
-
-
-
-		<div
-			class="control-group ${hasErrors(bean: documentInstance, field: 'attribution', 'error')}">
-			<label class="control-label" for="attribution">Attribution</label>
-			<div class="controls">
-				<g:textField name="document.attribution"
-					value="${documentInstance?.attribution}" />
-			</div>
-		</div>
-				
-				
 			<g:render template="coverage"
 				model="['coverageInstance':documentInstance?.coverage]"></g:render>
 

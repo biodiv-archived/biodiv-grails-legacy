@@ -60,7 +60,7 @@
 	</div>
 
 
-	<g:render template="/project/projectSidebar" />
+	<g:render template="/document/documentSidebar" />
 
 
 </body>

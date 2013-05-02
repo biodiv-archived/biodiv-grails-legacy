@@ -41,6 +41,8 @@ class Document implements Taggable {
 	
 	UFile uFile   //covers physical file formats
 	
+	String uri
+	
 	String description
 	String contributors;
 	String attribution;
@@ -61,11 +63,13 @@ class Document implements Taggable {
 
 	static constraints = {
 		title nullable:false
-		uFile nullable:false
+		uFile nullable:true
+		uri nullable:true
 		contributors nullable:true
 		attribution nullable:true	
 		sourceHolderId nullable:true
 		sourceHolderType nullable:true
+		author nullable:true
 	}
 	
 	static hasMany ={userGroups:UserGroup}

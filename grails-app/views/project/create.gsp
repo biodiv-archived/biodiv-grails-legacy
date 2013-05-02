@@ -236,7 +236,7 @@ textarea {
 									code="project.grantFrom.label" default="Grant From" /></label>
 							<div class="controls">
 								<div class="input-prepend">
-									<span class="add-on"><i class="icon-calendar"></i></span> <input
+									<span class="add-on date-popup"><i class="icon-calendar"></i></span> <input
 										name="grantFrom" type="text" id="grantFrom" class="date-popup"
 										value="${projectInstance?.grantFrom?.format('dd/MM/yyyy')}"
 										placeholder="Select date" />
@@ -250,7 +250,7 @@ textarea {
 									code="project.grantTo.label" default="Grant To" /></label>
 							<div class="controls">
 								<div class="input-prepend">
-									<span class="add-on"><i class="icon-calendar"></i></span> <input
+									<span class="add-on date-popup"><i class="icon-calendar"></i></span> <input
 										name="grantTo" type="text" id="grantTo" class="date-popup"
 										value="${projectInstance?.grantTo?.format('dd/MM/yyyy')}"
 										placeholder="Select date" />

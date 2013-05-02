@@ -10,6 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import content.eml.UFile;
 import content.eml.Document
+import content.eml.Document.DocumentType
+
 import species.License
 
 //import org.lorecraft.phparser.SerializedPhpParser;
@@ -28,6 +30,7 @@ class MigrationService {
 	HashMap directionsMap = new HashMap();
 
 def migrateProjects() {
+		println "Migrating projects from drupal to grails"
 		def startDate = new Date()
 		def sql = Sql.newInstance(connectionUrl, userName, password, "org.postgresql.Driver");
 		migrateDirections(sql)
@@ -102,20 +105,20 @@ def migrateProjects() {
 		// Migrate Data Contribution Intensity to misc
 		proj.misc= row.field_data_contribution_value
 
-		proj.proposalFiles = migrateFiles(sql,'content_field_project_proposal_files',nodeRow.nid, 'field_project_proposal_files_fid', 'field_project_proposal_files_data')
-		proj.reportFiles = migrateFiles(sql,'content_field_midterm_assessment_files',nodeRow.nid, 'field_midterm_assessment_files_fid', 'field_midterm_assessment_files_data')
+		proj.proposalFiles = migrateFiles(sql,'content_field_project_proposal_files',nodeRow.nid, 'field_project_proposal_files_fid', 'field_project_proposal_files_data', DocumentType.PROPOSAL)
+		proj.reportFiles = migrateFiles(sql,'content_field_midterm_assessment_files',nodeRow.nid, 'field_midterm_assessment_files_fid', 'field_midterm_assessment_files_data', DocumentType.REPORT)
 		
-		proj.miscFiles =  migrateFiles(sql,'content_field_miscellaneous_files',nodeRow.nid, 'field_miscellaneous_files_fid', 'field_miscellaneous_files_data')
+		proj.miscFiles =  migrateFiles(sql,'content_field_miscellaneous_files',nodeRow.nid, 'field_miscellaneous_files_fid', 'field_miscellaneous_files_data', DocumentType.MISCELLANEOUS)
 		
 		
 		//TODO Migrate DataContrib files also to miscFiles
-		def dataContribFiles =  migrateFiles(sql,'content_field_data_contribution_files',nodeRow.nid, 'field_data_contribution_files_fid', 'field_data_contribution_files_data')
+		def dataContribFiles =  migrateFiles(sql,'content_field_data_contribution_files',nodeRow.nid, 'field_data_contribution_files_fid', 'field_data_contribution_files_data', DocumentType.MISCELLANEOUS)
 
 		for(dataContribFile in dataContribFiles)
 			proj.addToMiscFiles(dataContribFile)
 		
 
-		def analysisFiles =  migrateFiles(sql,'content_field_analysis_results_files',nodeRow.nid, 'field_analysis_results_files_fid', 'field_analysis_results_files_data')
+		def analysisFiles =  migrateFiles(sql,'content_field_analysis_results_files',nodeRow.nid, 'field_analysis_results_files_fid', 'field_analysis_results_files_data', DocumentType.MISCELLANEOUS)
 		for(analysisFile in analysisFiles)
 			proj.addToMiscFiles(analysisFile)	
 		
@@ -159,7 +162,7 @@ def migrateProjects() {
 		}
 	}
 
-	def migrateFiles( sql,field_table, nid, fid_field, data_field) {
+	def migrateFiles( sql,field_table, nid, fid_field, data_field, type) {
 		String query = "select $fid_field as fid, $data_field as metadata from " + field_table + " where nid=" +nid
 		println query
 
@@ -172,8 +175,8 @@ def migrateProjects() {
 				def filedata = sql.firstRow("select * from files where fid = $row.fid")
 
 				Document document = new Document()
-				//UFile file = new UFile();
-
+				document.uFile = new UFile();
+				document.type = type
 				document.title = filedata.filename
 				document.uFile.path = filedata.filepath
 				document.uFile.size = filedata.filesize
@@ -182,6 +185,7 @@ def migrateProjects() {
 
 				def metadata = row.metadata
 
+				
 				if(row.metadata) {
 					println "metadata is "+ row.metadata
 /*
@@ -200,8 +204,8 @@ def migrateProjects() {
 						println "tags of file are "+ tags
 						document.setTags(tags)
 					}
-*/
 
+*/
 				}
 
 				docs.add(document)

@@ -37,7 +37,7 @@ class UFile{
 		downloads(default:0, nullable:true)
 		doi(nullable:true)
 		weight(default:0, nullable:true)
-
+		license nullable:true
 	}
 
 	def afterDelete() {
