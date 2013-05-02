@@ -18,10 +18,10 @@ def checklistService = ctx.getBean("checklistService");
 
 //checklistService.mCn()
 //
-def cl = Checklist.get(174)
-println  cl
+//def cl = Checklist.get(174)
+//println  cl
+////
+//checklistService.createObservationFromChecklist(cl)
+//checklistService.udpateObv(cl)
 
-checklistService.createObservationFromChecklist(cl)
-checklistService.udpateObv(cl)
-
-//checklistService.test()
+checklistService.migrateObv()

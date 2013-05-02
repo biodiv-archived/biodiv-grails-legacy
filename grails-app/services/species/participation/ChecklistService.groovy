@@ -920,6 +920,28 @@ class ChecklistService {
 	////////////////////////////////// create observation from checklist row //////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
+	def migrateObv(){
+		def startTime = new Date()
+		Checklist.listOrderById().each { Checklist cl ->
+			if(!cl.latitude || !cl.longitude || !cl.placeName){
+				log.debug " ingnoring cheklist $cl.id   $cl.title"
+			}else{
+				log.debug " STARTING cheklist $cl.id   $cl.title"
+				try{
+					createObservationFromChecklist(cl)
+					udpateObv(cl)
+					log.debug " FINISH cheklist $cl.id   $cl.title"
+				}catch (Exception e) {
+					log.debug " ERROR cheklist $cl.id   $cl.title ================"
+					e.printStackTrace()
+					// TODO: handle exception
+				}
+			}
+		}
+		
+		log.debug "   start time $startTime    endTime " + new Date()
+	}
+	
 	@Transactional
 	def createObservationFromChecklist(Checklist cl){
 		int prevRowId = -1
@@ -950,13 +972,16 @@ class ChecklistService {
 	private createObservationFromRow(List rowData, Checklist cl){
 		def basicData = getBasicObvData(cl)
 		def observationInstance = observationService.createObservation(basicData)
-		if(!observationInstance.hasErrors() && observationInstance.save(flush:true)) {
+		observationInstance.createdOn = observationInstance.lastRevised = observationInstance.observedOn
+		if(!observationInstance.hasErrors() && observationInstance.save(flush:true )) {
 			log.debug "saved observation $observationInstance"
 			activityFeedService.addActivityFeed(observationInstance, null, observationInstance.author, activityFeedService.OBSERVATION_CREATED);
 			//saving recommendation
 			saveRecoVote(observationInstance, rowData)
 			//saveMetaData
 			saveMetaData(observationInstance, rowData)
+			//species call
+			//observationInstance.calculateMaxVotedSpeciesName()
 		}else{
 			observationInstance.errors.allErrors.each { log.error it }
 			throw new RuntimeException("Error during observation save");
@@ -985,8 +1010,8 @@ class ChecklistService {
 		}
 		
 		ConfidenceType confidence = observationService.getConfidenceType(ConfidenceType.CERTAIN.name());
-		RecommendationVote recommendationVoteInstance = new RecommendationVote(observation:obv, recommendation:snData.reco, commonNameReco:cnReco, author:obv.author, confidence:confidence);
-		if(!recommendationVoteInstance.hasErrors() && recommendationVoteInstance.save(flush: true)) {
+		RecommendationVote recommendationVoteInstance = new RecommendationVote(observation:obv, recommendation:snData.reco, commonNameReco:cnReco, author:obv.author, confidence:confidence, votedOn:obv.observedOn);
+		if(!recommendationVoteInstance.hasErrors() && recommendationVoteInstance.save(flush:true)) {
 			log.debug "Successfully added reco vote : "+recommendationVoteInstance
 			activityFeedService.addActivityFeed(obv, recommendationVoteInstance, recommendationVoteInstance.author, activityFeedService.SPECIES_RECOMMENDED);
 			
