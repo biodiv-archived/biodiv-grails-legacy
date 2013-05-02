@@ -156,7 +156,7 @@ def migrateProjects() {
 			proj.setTags(tagsRows.name)
 			println " ****************** Project Saved *********************" + proj
 
-			setSourceToProjectFiles(proj)
+			setSourceToProjectDocuments(proj)
 
 			return proj
 		}
@@ -182,7 +182,8 @@ def migrateProjects() {
 				document.uFile.size = filedata.filesize
 				document.uFile.mimetype = filedata.filemime
 
-
+				document.uFile.license = License.findByName(License.LicenseType.CC_BY)
+				
 				def metadata = row.metadata
 
 				
@@ -215,7 +216,7 @@ def migrateProjects() {
 		return docs.size()>0?docs:null;
 	}
 
-	def setSourceToProjectFiles(Project proj)
+	def setSourceToProjectDocuments(Project proj)
 	{
 
 		
@@ -223,8 +224,7 @@ def migrateProjects() {
 			file.setSource(proj)
 			file.contributors = proj.granteeOrganization
 			file.attribution = proj.granteeOrganization
-			file.license = License.findByName(License.LicenseType.CC_BY)
-			
+		
 			println "**********************License id is "+file.license
 			
 			if(!file.save(flush:true)){
@@ -236,7 +236,6 @@ def migrateProjects() {
 			file.setSource(proj)
 			file.contributors = proj.granteeContact
 			file.attribution = proj.granteeContact
-			file.license = License.findByName(License.LicenseType.CC_BY)
 			println "**********************License id is "+file.license
 			
 			
@@ -249,7 +248,6 @@ def migrateProjects() {
 			file.setSource(proj)
 			file.contributors = proj.granteeContact
 			file.attribution = proj.granteeContact
-			file.license = License.findByName(License.LicenseType.CC_BY)
 			println "**********************License id is "+file.license
 			
 			if(!file.save(flush:true)){

@@ -58,43 +58,9 @@
 
 				<fileManager:displayFile
 					filePath="${ documentInstance?.uFile?.path}"
-					fileName="${documentInstance?.uFile?.name}"></fileManager:displayFile>
+					fileName="File}"></fileManager:displayFile>
 			</dd>
 		</dl>
-
-		<g:if test="${documentInstance?.uFile?.description}">
-
-			<dl class="dl-horizontal">
-				<dt>Description</dt>
-				<dd>
-					${documentInstance?.uFile?.description}
-				</dd>
-			</dl>
-		</g:if>
-
-		<g:if test="${documentInstance?.uFile?.contributors}">
-
-
-			<dl class="dl-horizontal">
-				<dt>Contributors</dt>
-				<dd>
-					${documentInstance?.uFile?.contributors}
-				</dd>
-			</dl>
-
-		</g:if>
-
-		<g:if test="${documentInstance?.uFile?.attribution}">
-
-			<dl class="dl-horizontal">
-				<dt>Attribution</dt>
-				<dd>
-					${documentInstance?.uFile?.attribution}
-				</dd>
-			</dl>
-
-		</g:if>
-
 
 		<g:if test="${documentInstance?.uFile?.license}">
 
@@ -106,13 +72,41 @@
 			</dl>
 		</g:if>
 
-		<g:if test="${documentInstance?.uFile?.tags}">
-			<b>Keywords : </b>
+		<g:if test="${documentInstance?.description}">
 
-			<g:render template="/project/showProjectTagsList"
-				model="['projectInstance': documentInstance?.uFile]" />
+			<dl class="dl-horizontal">
+				<dt>Description</dt>
+				<dd>
+					${documentInstance?.description}
+				</dd>
+			</dl>
+		</g:if>
+
+		<g:if test="${documentInstance?.contributors}">
+
+
+			<dl class="dl-horizontal">
+				<dt>Contributors</dt>
+				<dd>
+					${documentInstance?.contributors}
+				</dd>
+			</dl>
 
 		</g:if>
+
+		<g:if test="${documentInstance?.attribution}">
+
+			<dl class="dl-horizontal">
+				<dt>Attribution</dt>
+				<dd>
+					${documentInstance?.attribution}
+				</dd>
+			</dl>
+
+		</g:if>
+
+
+
 
 
 		<g:if test="${documentInstance.coverage?.speciesGroups}">
@@ -168,9 +162,15 @@
 			</dl>
 		</g:if>
 
+		<g:if test="${documentInstance?.tags}">
+			<b>Keywords : </b>
 
+			<g:render template="/project/showProjectTagsList"
+				model="['projectInstance': documentInstance]" />
+
+		</g:if>
 	</div>
-		<g:render template="/project/projectSidebar" />
+		<g:render template="/document/documentSidebar" />
 	
 </body>
 </html>

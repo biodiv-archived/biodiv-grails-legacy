@@ -34,14 +34,13 @@ class DocumentController {
 
 		log.debug( "document instance with params assigned >>>>>>>>>>>>>>>>: "+ documentInstance)
 		if (documentInstance.save(flush: true)) {
-			//In creation parent is set to uFile after document creation
-			documentInstance.uFile.setSource(documentInstance)
-			if(!documentInstance.uFile.save(flush:true)) {
-				log.error "Error saving ufile insatnce after setting document parent. Document:  "+ documentInstance.id+ " UFile ID: "+ documentInstance.uFile.id
-			} 
+
 			flash.message = "${message(code: 'default.created.message', args: [message(code: 'document.label', default: 'Document'), documentInstance.id])}"
 			redirect(action: "show", id: documentInstance.id)
 
+			def tags = (params.tags != null) ? Arrays.asList(params.tags) : new ArrayList();
+			
+			documentInstance.setTags(tags)
 			if(params.groupsWithSharingNotAllowed) {
 				documentService.setUserGroups(observationInstance, [
 					params.groupsWithSharingNotAllowed

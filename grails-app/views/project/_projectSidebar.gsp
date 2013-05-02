@@ -6,15 +6,6 @@
 	style="position: relative; top: 50px; margin: 10px; padding: 10px 15px 10px 15px;"
 	class="pull-right">
 
-	<sec:ifLoggedIn>
-		<a class="btn btn-info" style="margin-bottom: 5px;"
-			href="${uGroup.createLink(
-						controller:'document', action:'create', 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress)}">
-			<i class="icon-plus"></i>Add Document
-		</a>
-		<br>
-
-	</sec:ifLoggedIn>
 
 	<sUser:isCEPFAdmin>
 
@@ -58,7 +49,7 @@
 				sort="${true}" style color="${[start: '#084B91', end: '#9FBBE5']}"
 				size="${[start: 12, end: 30, unit: 'px']}" paramName='tag' />
 
-			<span class="pull-right"><a href="/UFile/tagcloud">more
+			<span class="pull-right"><a href="/document/tagcloud">more
 					tags</a></span>
 		</g:if>
 		<g:else>
