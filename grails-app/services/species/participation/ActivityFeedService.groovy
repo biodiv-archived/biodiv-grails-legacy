@@ -52,6 +52,7 @@ class ActivityFeedService {
 	static final String SELECTED = "Selected"
 	static final String GROUP_SPECIFIC = "GroupSpecific"
 	static final String MY_FEEDS = "MyFeeds"
+	static final String USER = "User"
 	
 	
 	static final String ALL = "All"
@@ -73,7 +74,7 @@ class ActivityFeedService {
 	def springSecurityService
 	
 	def getActivityFeeds(params){
-		log.debug params;
+//		log.debug params;
 		def feeds = ActivityFeed.fetchFeeds(params)
 		if(params.feedOrder == OLDEST_FIRST){
 			feeds = feeds.reverse()

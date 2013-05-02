@@ -17,9 +17,9 @@ function loadOlderFeedsInAjax(targetComp){
 				var htmlData = $(data.showFeedListHtml);
 				htmlData = removeDuplicateFeed($(targetComp).children('ul'), htmlData, feedType, "older", targetComp);
 				if(feedOrder === "latestFirst"){
-					$(targetComp).children('ul').append(htmlData);
+					htmlData.appendTo($(targetComp).children('ul')).hide().slideDown(1000);
 				}else{
-					$(targetComp).children('ul').prepend(htmlData);
+					htmlData.prependTo($(targetComp).children('ul')).hide().slideDown(1000);
 				}
     			$(targetComp).children('input[name="olderTimeRef"]').val(data.olderTimeRef);
     			if(data.remainingFeedCount && data.remainingFeedCount > 0){
@@ -64,6 +64,7 @@ function loadNewerFeedsInAjax(targetComp, checkFeed){
 				if(data.feedAvailable){
 					newFeedProcessing = true;
 					$(targetComp).children('.activiyfeednewermsg').show();
+                                        $("#activityTicker").html("New");
 				}
 			}
 			else if(data.showFeedListHtml){
@@ -75,10 +76,10 @@ function loadNewerFeedsInAjax(targetComp, checkFeed){
     			var htmlData = $(data.showFeedListHtml);
     			htmlData = removeDuplicateFeed($(targetComp).children('ul'), htmlData, feedType, "newer", targetComp);
     			if(feedOrder === "latestFirst"){
-    				$(targetComp).children('ul').prepend(htmlData);
-				}else{
-					$(targetComp).children('ul').append(htmlData);
-				}
+    				htmlData.prependTo($(targetComp).children('ul')).hide().slideDown(1000);
+			}else{
+                                htmlData.appendTo($(targetComp).children('ul')).hide().slideDown(1000);
+			}
     			$(targetComp).children('input[name="newerTimeRef"]').val(data.newerTimeRef);
     			newFeedProcessing = false;
     			feedPostProcess();
@@ -175,6 +176,7 @@ function getFeedParams(timeLine, targetComp){
 	}else{
 		feedParams["refTime"] = $(targetComp).children('input[name="olderTimeRef"]').val();
 	}
+	feedParams["user"] = $(targetComp).children('input[name="user"]').val();
 	return feedParams;
 }
 
@@ -265,6 +267,11 @@ function getTargetComp(){
 	}
 		
 	targetComp = $('.activityfeedSpecific');
+	if(targetComp.length == 1){
+		return targetComp;
+	}
+        
+        targetComp = $('.activityfeedUser');
 	if(targetComp.length == 1){
 		return targetComp;
 	}

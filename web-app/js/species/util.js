@@ -98,3 +98,11 @@ function feedPostProcess(){
 //			} 
 //		}); 
 //}
+
+function loadGoogleMapsScript() {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src = "http://maps.googleapis.com/maps/api/js?sensor=true&callback=initMap";
+    document.body.appendChild(script);
+}
+

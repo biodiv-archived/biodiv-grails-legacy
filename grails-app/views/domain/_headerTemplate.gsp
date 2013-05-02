@@ -37,7 +37,8 @@
 					</li>
 					<li class="${((params.controller == 'userGroup' && params.action == 'observation') ||(params.controller == 'observation'))?' active':''}"><a
 						href="${uGroup.createLink('mapping':'userGroup', 'action':'observation', 'userGroup':userGroupInstance)}"
-                                                title="Observations">Observations</a> <a style="position:absolute;top:-18px;right:140px;box-shadow:none;background-color:transparent;" href="${uGroup.createLink('controller':'observation', 'action':'create', 'userGroup':userGroupInstance)}"><span class="badge badge-important" title="Add Observation"><i class="icon-add"></i></span></a> 
+                                                title="Observations">Observations</a> 
+                                            <!--a style="position:absolute;top:-18px;right:140px;box-shadow:none;background-color:transparent;" href="${uGroup.createLink('controller':'observation', 'action':'create', 'userGroup':userGroupInstance)}"><span class="badge badge-important" title="Add Observation"><i class="icon-add"></i></span></a--> 
 					</li>
 					<li
 						class="${((params.controller == 'SUser' && params.action == 'header') ||(params.controller == 'map'))?' active':''}"><a
@@ -113,7 +114,8 @@
 							Species</a></li>
 					<li class="${(params.controller == 'observation')?'active':''}"><a
 						href="${uGroup.createLink("controller":"observation")}"
-                                                title="Observations">Observations</a><a  style="position:absolute;top:-18px;right:140px;box-shadow:none;background-color:transparent;" href="${uGroup.createLink('controller':'observation', 'action':'create', 'userGroup':userGroupInstance)}"><span class="badge badge-important" title="Add Observation"><i class="icon-plus"></i></span></a> 
+                                                title="Observations">Observations</a>
+                                            <!--a  style="position:absolute;top:-18px;right:140px;box-shadow:none;background-color:transparent;" href="${uGroup.createLink('controller':'observation', 'action':'create', 'userGroup':userGroupInstance)}"><span class="badge badge-important" title="Add Observation"><i class="icon-plus"></i></span></a--> 
 </li>
 					<li
 						class="${(request.getHeader('referer')?.contains('/map') && params.action == 'header')?' active':''}"><a
@@ -128,7 +130,7 @@
 
 				<ul class="nav pull-right">
 					<li class=" ${(params.controller == 'activityFeed')?'active':''}"><a
-                                            href="${uGroup.createLink("controller":"activityFeed")}" title="Activity">Activity<span class="badge badge-important" style="position:absolute;top:-9px;right:220px"></span></a>
+                                            href="${uGroup.createLink("controller":"activityFeed")}" title="Activity">Activity<span id="activityTicker" class="badge badge-important" style="position:absolute;top:-9px;right:220px"></span></a>
 					</li>
 
 					<!--li class="menu-449 first"><a href="/" title="">Home</a></li-->
@@ -168,7 +170,6 @@
 		</div>
 	</div>
 </div>
-
 
 <g:javascript>
 $(document).ready(function(){

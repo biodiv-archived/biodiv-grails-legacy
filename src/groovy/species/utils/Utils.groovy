@@ -28,6 +28,7 @@ import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 import species.auth.SUser;
 import species.NamesParser;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang.WordUtils
 
@@ -270,12 +271,34 @@ class Utils {
 	public static String getYouTubeEmbedUrl(String videoId, int height, int width) {
 		return "<iframe width='${width}' height='${height}' src='http://www.youtube.com/embed/${videoId}' frameborder='0' allowfullscreen></iframe>";
 	}
-	
+
+    /*
+    * http://stackoverflow.com/questions/5830387/how-to-find-all-youtube-video-ids-in-a-string-using-a-regex/5831191#5831191
+    https?://           # Required scheme. Either http or https.
+    (?:[0-9A-Z-]+\.)?   # Optional subdomain.
+    (?:                 # Group host alternatives.
+        youtu\.be/      # Either youtu.be,
+        | youtube\.com  # or youtube.com followed by
+        \S*             # Allow anything up to VIDEO_ID,
+        [^\w\-\s]       # but char before ID is non-ID char.
+    )                   # End host alternatives.
+    ([\w\-]{11})        # $1: VIDEO_ID is exactly 11 chars.
+    (?=[^\w\-]|$)       # Assert next char is non-ID or EOS.
+    (?!                 # Assert URL is not pre-linked.
+        [?=&+%\w]*      # Allow URL (query) remainder.
+        (?:             # Group pre-linked alternatives.
+            [\'"][^<>]*># Either inside a start tag,
+            | </a>      # or inside <a> element text contents.
+        )               # End recognized pre-linked alts.
+    )                   # End negative lookahead assertion.
+    [?=&+%\w-]*         # Consume any URL (query) remainder.
+    */
 	public static String linkifyYoutubeLink(String text) {
 		if(!text) return;
 		else {
-			String re = /https?:\/\/(?:[0-9A-Z-]+\.)?(?:www\.)?(?:youtu\.be\/|youtube\.com\S*[^\w\-\s])([\w\-]{11})(?=[^\w\-]|$)(?![?=&+%\w]*(?:['"][^<>]*>|<\/a>))[?=&+%\w-]*/;
-			text = text.replaceAll(~re, {
+            //Pattern re = ~/(?ix)https?:\/\/(?:[0-9A-Z-]+\.)?(?:www\.)?(?:youtu\.be\/|youtube\.com\S*[^\w\-\s])([\w\-]{11})(?=[^\w\-]|$)(?![?=&+%\w]*(?:['"][^<>]*>))[?=&+%\w-]*/;          
+            Pattern re = ~/(?ix)(?:<a.*>)?(?:https?:\/\/(?:[0-9A-Z-]+\.)?(?:www\.)?(?:youtu\.be\/|youtube\.com\S*[^\w\-\s])([\w\-]{11})(?=[^\w\-]|$))[?=&+%\w-;]*(?:<\/a>)?/;
+			text = text.replaceAll(re, {
 				//getYouTubeEmbedUrl(it[1], 295,480);
 				"""
 				<div class="youtube_container">

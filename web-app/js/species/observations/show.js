@@ -65,7 +65,7 @@ function addAgreeRecoVote(obvId, recoId, currentVotes, liComponent, url){
 				if(data.canMakeSpeciesCall === false){
 	         		$('#selectedGroupList').modal('show');
 	         	} else {
-	         		preLoadRecos(3, false, obvId, liComponent);
+	         		preLoadRecos(3, 0, false, obvId, liComponent);
 	         		updateFeeds();
 	         		setFollowButton();
 	         		showRecoUpdateStatus(data.msg, data.status);
@@ -91,7 +91,7 @@ function removeRecoVote(obvId, recoId, url){
 		
 		success: function(data){
 			if(data.status == 'success') {
-				preLoadRecos(3, false, obvId);
+				preLoadRecos(3, 0, false, obvId);
 	         	updateFeeds();
 	         	setFollowButton();
 	         	showRecoUpdateStatus(data.msg, data.status);

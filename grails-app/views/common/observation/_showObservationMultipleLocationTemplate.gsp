@@ -1,16 +1,19 @@
 <div class="observation_location_wrapper">
 	<div class="observation_location">
 		<g:set var="snippetUrl" value="${uGroup.createLink(controller:'observation', action:'snippet', 'userGroupWebaddress':userGroup?.webaddress) }"/>
-		<g:javascript>
-                var markers = [];
-                var big_map;
-                var nagpur_latlng = new google.maps.LatLng('21.07', '79.27');
-                var swRestriction = new google.maps.LatLng('8', '69');
-                var neRestriction = new google.maps.LatLng('36', '98');
-
-                var allowedBounds = new google.maps.LatLngBounds(swRestriction, neRestriction);
+		<r:script>
                 
                 $(document).ready(function() {
+                    loadGoogleMapsScript();
+                });
+                function initMap() {
+                    var markers = [];
+                    var big_map;
+                    var nagpur_latlng = new google.maps.LatLng('21.07', '79.27');
+                    var swRestriction = new google.maps.LatLng('8', '69');
+                    var neRestriction = new google.maps.LatLng('36', '98');
+                    var allowedBounds = new google.maps.LatLngBounds(swRestriction, neRestriction);
+
                   var options = {
                     zoom: 4,
                     center: nagpur_latlng,
@@ -67,11 +70,13 @@
                         addMarker(${observationInstance[0]}, ${observationInstance[1]},  ${observationInstance[2]}); 
 
 		    </g:each>	
-				  
+                    
+                    <g:if test="${!ignoreMouseOutListener}">
                     google.maps.event.addListener(big_map, 'mouseout', function() {
                         var bounds = getSelectedBounds();
                         refreshList(bounds);
                     });
+                    </g:if>
 
                     google.maps.event.addListener(big_map, 'zoom_changed', function() {
                     	jitterCloseMarker(big_map);
@@ -124,14 +129,21 @@
                      big_map.setCenter(new google.maps.LatLng(y, x));
                 }
 
-                });
-                </g:javascript>
+                }
+                </r:script>
 		<div class="map_wrapper">
-			<div id="big_map_canvas" style="height: 500px; width: 100%;"></div>
+                    <div id="big_map_canvas" style="height: ${height?:'500'}px; width: ${width?:'100%'};">
+                        <center>
+                            <div id="spinner" class="spinner">
+                            <img src="${resource(dir:'images',file:'spinner.gif', absolute:true)}"
+                                alt="${message(code:'spinner.alt',default:'Loading...')}" />
+                            </div>
+                       </center>
+                    </div>
 		</div>
 	</div>
 	<div id="map_results_list"></div>
-	<g:javascript>
+	<r:script>
             function refreshList(bounds){
             	<g:if test="{params.id}">
                 var url = "${uGroup.createLink( controller:'observation', action: "filteredMapBasedObservationsList",'userGroupWebaddress':userGroup?.webaddress, id:params.id)}" + location.search
@@ -154,5 +166,5 @@
             $(function(){
                 refreshList();
             });
-        </g:javascript>
+        </r:script>
 </div>

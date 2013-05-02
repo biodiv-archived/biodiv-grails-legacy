@@ -1298,6 +1298,7 @@ class ObservationService {
 	}
 
 	public String generateLink( String controller, String action, linkParams, request) {
+		request = (request) ?:(WebUtils.retrieveGrailsWebRequest()?.getCurrentRequest())
 		userGroupService.userGroupBasedLink(base: Utils.getDomainServerUrl(request),
 				controller:controller, action: action,
 				params: linkParams)
