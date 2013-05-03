@@ -345,12 +345,12 @@ if(r && thumbnail) {
                                 //console.log('loadfinish');
                                 //console.log(e.galleriaData.description);
                                 //console.log($.type(e.galleriaData.description));
-                                var imgRating = rate($(".galleria-info-description"), function(avgRate, noOfRatings){
-                                    console.log(imgRating);
+                                var ratingContainer = $(".galleria-info-description");
+                                var imgRating = rate(ratingContainer, function(avgRate, noOfRatings, ratingContainer){
                                     imgRating.select(avgRate);
-                                    $(".galleria-info-description").find(".noOfRatings").html('('+noOfRatings+' ratings)');
-//                                    $(e.galleriaData.description).children(".rating").children(".ratingForm").children("div").children("input[value="+avgRate+"]").attr( 'checked', 'checked' );
-//                                    e.galleriaData.description = $(e.galleriaData.description).html();
+                                    ratingContainer.find(".noOfRatings").html('('+noOfRatings+' ratings)');
+//                                  $(e.galleriaData.description).children(".rating").children(".ratingForm").children("div").children("input[value="+avgRate+"]").attr( 'checked', 'checked' );
+//                                  e.galleriaData.description = $(e.galleriaData.description).html();
                                     //console.log($(e.galleriaData.description).find("input[value="+rating+"]"))
                                     //console.log($(e.galleriaData.description).find("input:checked").val());
                                 });

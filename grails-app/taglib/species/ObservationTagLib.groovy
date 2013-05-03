@@ -6,6 +6,7 @@ import species.participation.RecommendationVote;
 import grails.util.GrailsNameUtils;
 import org.grails.rateable.RatingException;
 import org.codehaus.groovy.grails.orm.hibernate.cfg.GrailsHibernateUtil; 
+import java.lang.Math;
 
 class ObservationTagLib {
 	static namespace = "obv"
@@ -219,15 +220,12 @@ class ObservationTagLib {
 	
 	def rating = {attrs, body->
 		//out << render(template:"/common/ratingTemplate", model:attrs.model);
-        println '=============================='
-        println attrs
         def resource = attrs.model.resource
         boolean hideForm = attrs.model.hideForm
         int index = attrs.model.index
         if(resource) {
-            def averageRating = resource.averageRating ?(int) resource.averageRating: 0
             resource = GrailsHibernateUtil.unwrapIfProxy(resource);
-            println GrailsNameUtils.getPropertyName(resource.class);
+            long averageRating = resource.averageRating ? Math.round(resource.averageRating): 0
             out << """
                 <div class="rating pull-right">
             """

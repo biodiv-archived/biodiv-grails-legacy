@@ -14,7 +14,7 @@
 	value="${message(code: 'resource.label', default: 'Resources')}" />
 <title><g:message code="default.list.label" args="[entityName]" />
 </title>
-<r:require modules="observations_list" />
+<r:require modules="observations_list,prettyPhoto" />
 </head>
 <body>
 

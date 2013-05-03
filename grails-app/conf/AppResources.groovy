@@ -39,7 +39,6 @@ modules = {
 		resource url:'/css/habitats.css'
 		resource url:'/css/tableSorter.css'
 		resource url:'/css/bootstrap-editable.css'
-        resource url:'/css/prettyPhoto.css'
 		resource url:'/css/wgp.css'
 
 		resource url:'/bootstrap/js/bootstrap.min.js'
@@ -52,7 +51,6 @@ modules = {
 		resource url:'/js/jquery/jquery.cookie.js'
 		//resource url:'/js/jquery/jquery.checkbox.js'
 		resource url:'/js/jquery/jquery.ellipses.js'
-		resource url:'/js/jquery/jquery.prettyPhoto.js'
 		resource url:'/js/species/popuplib.js', disposition: 'head'
 		resource url:'/js/species/ajaxLogin.js'
 		resource url:'/js/species/users.js'
@@ -240,4 +238,8 @@ modules = {
 		resource url:'/js/species/observations/list.js'
 	}
 
+    prettyPhoto {
+        resource url:'/css/prettyPhoto.css'
+		resource url:'/js/jquery/jquery.prettyPhoto.js'
+    }
 }

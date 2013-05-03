@@ -425,7 +425,7 @@ class UserGroupService {
 			log.error  userGroup.errors.allErrors.each { log.error it }
 		} else {
 			def activityFeed = activityFeedService.addActivityFeed(observation, userGroup, observation.author, activityFeedService.OBSERVATION_POSTED_ON_GROUP);
-			observationService.sendNotificationMail(activityFeedService.OBSERVATION_POSTED_ON_GROUP, observation, null, null, activityFeed);
+			//observationService.sendNotificationMail(activityFeedService.OBSERVATION_POSTED_ON_GROUP, observation, null, null, activityFeed);
 			log.debug "Added ${observation} to userGroup ${userGroup}"
 		}
 	}
@@ -451,7 +451,7 @@ class UserGroupService {
 			log.error  userGroup.errors.allErrors.each { log.error it }
 		} else {
 			def activityFeed = activityFeedService.addActivityFeed(observation, userGroup, observation.author, activityFeedService.OBSERVATION_REMOVED_FROM_GROUP);
-			observationService.sendNotificationMail(activityFeedService.OBSERVATION_REMOVED_FROM_GROUP, observation, null, null, activityFeed);
+			//observationService.sendNotificationMail(activityFeedService.OBSERVATION_REMOVED_FROM_GROUP, observation, null, null, activityFeed);
 			log.debug "Removed ${observation} from userGroup ${userGroup}"
 		}
 	}

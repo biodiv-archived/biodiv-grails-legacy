@@ -11,11 +11,9 @@ function rate(ele, successHandler) {
                     type: 'GET',
                     success: function(data, statusText, xhr, form) {
                         var arr = data.split(',');
-                        successHandler(arr[0], arr[1]);
+                        successHandler(arr[0], arr[1], ele);
                     }, error:function (xhr, ajaxOptions, thrownError){
-                            //successHandler is used when ajax login succedes
-                            var successHandler = this.success, errorHandler;
-                            handleError(xhr, ajaxOptions, thrownError, successHandler, function() {
+                            handleError(xhr, ajaxOptions, thrownError, this.success, function() {
                                 var response = $.parseJSON(xhr.responseText);
                                 if(response.error){
                                 }
