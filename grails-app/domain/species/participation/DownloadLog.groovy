@@ -11,8 +11,8 @@ class DownloadLog {
 	
 	public enum DownloadType {
 		CSV("CSV"),
-		KML("KML")
-		
+		KML("KML"),
+		PDF("PDF")
 		private String value;
 
 		DownloadType(String value) {
@@ -20,7 +20,7 @@ class DownloadLog {
 		}
 		
 		static list() {
-			return [CSV, KML];
+			return [CSV, KML, PDF];
 		}
 		
 		String value() {

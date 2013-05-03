@@ -5,7 +5,6 @@ import java.text.SimpleDateFormat
 import java.util.Iterator;
 import java.util.List;
 
-import species.participation.RecommendationVote.ConfidenceType
 import species.participation.curation.UnCuratedCommonNames
 
 import org.apache.commons.httpclient.util.DateUtil;
@@ -26,8 +25,7 @@ import groovy.sql.Sql;
 import species.participation.curation.UnCuratedVotes;
 import species.utils.Utils;
 import species.formatReader.SpreadsheetReader;
-import species.Habitat;
-import species.Language;
+
 //csv related
 import au.com.bytecode.opencsv.CSVReader
 import au.com.bytecode.opencsv.CSVWriter;
@@ -42,6 +40,7 @@ import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Element;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.Image
+import com.itextpdf.text.List;
 import com.itextpdf.text.ListItem;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Phrase;
@@ -60,7 +59,6 @@ class ChecklistService {
 	def recommendationService
 	def checklistSearchService;
 	def obvUtilService;
-	def activityFeedService;
 	
 	static final String SN_NAME = "scientific_name"
 	static final String CN_NAME = "common_name"
@@ -847,32 +845,24 @@ class ChecklistService {
 		PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(pdfFile))
 		
 		document.open()
-		Map m = cl.fetchExportableValue(true)
+		Map m = cl.fetchExportableValue()
 		
 		
 		//adding site banner
-		Image image2 = Image.getInstance(new URL(Utils.getIBPServerDomain() + "/sites/all/themes/ibp/images/map-logo.gif"));
+		Image image2 = Image.getInstance(grailsApplication.config.speciesPortal.app.rootDir + "/sites/all/themes/ibp/images/map-logo.gif");
 		//image2.scaleToFit(120f, 120f);
 		document.add(image2);
 		
 		//writing meta data
-		com.itextpdf.text.List list = new com.itextpdf.text.List(10);
+		List list = new List(10);
 		for(item in m[cl.META_DATA]){
 			list.add(new ListItem(item.join("  ")));
 		}
 		document.add(list)
 		
 		//writing data
-		def tmpColumnNames = cl.fetchColumnNames()
-		def columnNames = ["s.no"]
-		for(c in tmpColumnNames){
-			if(c.equalsIgnoreCase(ChecklistService.SN_NAME) || c.equalsIgnoreCase(ChecklistService.CN_NAME)){
-				columnNames.add(c)
-			}
-		}
-		columnNames.add("notes")
-		
-		PdfPTable t = new PdfPTable(columnNames.size())
+		def columnNames = cl.fetchColumnNames()
+		PdfPTable t = new PdfPTable(columnNames.length)
 		t.setSpacingBefore(25);
 		t.setSpacingAfter(25);
 		
@@ -898,7 +888,7 @@ class ChecklistService {
 		CSVWriter writer = obvUtilService.getCSVWriter(csvFile.getParent(), csvFile.getName())
 		log.debug "Writing csv checklist" + cl
 		
-		Map m = cl.fetchExportableValue(false)
+		Map m = cl.fetchExportableValue()
 		
 		for(item in m[cl.META_DATA]){
 			writer.writeNext(item.toArray(new String[0]))
@@ -915,128 +905,6 @@ class ChecklistService {
 		
 		return csvFile
 	}
-	
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	////////////////////////////////// create observation from checklist row //////////////////////////////////////
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	
-	@Transactional
-	def createObservationFromChecklist(Checklist cl){
-		int prevRowId = -1
-		def rowData = []
-		cl.row.each { ChecklistRowData r ->
-			if(prevRowId == -1){
-				prevRowId = r.rowId
-			}
-			
-			if(prevRowId != r.rowId){
-				createObservationFromRow(rowData, cl)
-				rowData = []
-				prevRowId = r.rowId
-			}
-			rowData.add(r)
-		}
-		//create obs from last row
-		createObservationFromRow(rowData, cl)
-	}
-	
-	@Transactional
-	def udpateObv(Checklist cl){
-		Observation.findAllBySourceTypeAndSourceId(cl.class.getCanonicalName(), cl.id).each { Observation obv ->
-			obv.calculateMaxVotedSpeciesName()
-		}
-	}
-	
-	private createObservationFromRow(List rowData, Checklist cl){
-		def basicData = getBasicObvData(cl)
-		def observationInstance = observationService.createObservation(basicData)
-		if(!observationInstance.hasErrors() && observationInstance.save(flush:true)) {
-			log.debug "saved observation $observationInstance"
-			activityFeedService.addActivityFeed(observationInstance, null, observationInstance.author, activityFeedService.OBSERVATION_CREATED);
-			//saving recommendation
-			saveRecoVote(observationInstance, rowData)
-			//saveMetaData
-			saveMetaData(observationInstance, rowData)
-		}else{
-			observationInstance.errors.allErrors.each { log.error it }
-			throw new RuntimeException("Error during observation save");
-		}
-	}
-	
-	
-	private saveRecoVote(Observation obv, List rowData){
-		ChecklistRowData snData, cnData
-		rowData.each {ChecklistRowData r ->
-			if(r.key.equalsIgnoreCase(ChecklistService.SN_NAME)){
-				snData = r
-			}else if (r.key.equalsIgnoreCase(ChecklistService.CN_NAME)){
-				cnData = r
-			}
-		}
-		
-		rowData.remove(snData)
-		rowData.remove(cnData)
-		
-		
-		def cnReco
-		if(cnData){
-			def languageId = Language.getLanguage(null).id;
-			cnReco = recommendationService.findReco(cnData.value, false, languageId, null);
-		}
-		
-		ConfidenceType confidence = observationService.getConfidenceType(ConfidenceType.CERTAIN.name());
-		RecommendationVote recommendationVoteInstance = new RecommendationVote(observation:obv, recommendation:snData.reco, commonNameReco:cnReco, author:obv.author, confidence:confidence);
-		if(!recommendationVoteInstance.hasErrors() && recommendationVoteInstance.save(flush: true)) {
-			log.debug "Successfully added reco vote : "+recommendationVoteInstance
-			activityFeedService.addActivityFeed(obv, recommendationVoteInstance, recommendationVoteInstance.author, activityFeedService.SPECIES_RECOMMENDED);
-			
-			//saving max voted species name for observation instance
-			//obv.calculateMaxVotedSpeciesName();
-			
-		}else{
-			recommendationVoteInstance.errors.allErrors.each { log.error it }
-			throw new RuntimeException("Error during reco vote save");
-		}
-	}
-	
-	private saveMetaData(obv, List rowData){
-		rowData.each { ChecklistRowData r ->
-			observationService.addMetaData(['key': r.key, 'value': r.value, 'rowId':r.rowId, 'columnOrderId':r.columnOrderId, 'source': Checklist.class.getCanonicalName()], obv)
-		}
-		
-		if(!obv.hasErrors() && obv.save(flush:true)) {
-			log.debug "saved observation meta data $obv"
-		}else{
-			obv.errors.allErrors.each { log.error it }
-			throw new RuntimeException("Error during meta data save");
-		}
-	}
-	
-	private getBasicObvData(Checklist cl){
-		def observation = [:]
-		observation.author = cl.author
-		observation.group_id= cl.speciesGroups.iterator().next().id
-		//observation.notes = params.notes;
-		observation.observedOn = parseDate(cl);
-		observation.place_name = cl.placeName;
-		observation.reverse_geocoded_name = cl.placeName;
-		//observation.location = 'POINT(' + params.longitude + ' ' + params.latitude + ')'
-		observation.latitude = '' + cl.latitude;
-		observation.longitude = '' +  cl.longitude;
-		observation.location_accuracy = 'Approximate' 
-		observation.habitat_id = Habitat.findByName("Others").id
-		observation.agreeTerms = 'on'
-		observation.sourceType = cl.class.getCanonicalName()
-		observation.sourceId = '' + cl.id
-		return observation
-	}
-	
-	
-	private parseDate(Checklist cl){
-		def date = (cl.fromDate ?:(cl.toDate?:cl.lastUpdated))
-		return date.format("dd/MM/yyyy")
-	}
-
 }
 /*
 
