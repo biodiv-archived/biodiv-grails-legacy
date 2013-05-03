@@ -13,6 +13,7 @@ import species.groups.SpeciesGroup;
 import species.groups.UserGroup;
 import speciespage.ObvUtilService;
 import grails.util.GrailsNameUtils;
+import groovy.sql.Sql
 
 class Observation implements Taggable {
 	
@@ -65,7 +66,7 @@ class Observation implements Taggable {
 	String searchText;
 	Recommendation maxVotedReco;
 	boolean agreeTerms = false;
-
+    
 	static hasMany = [resource:Resource, recommendationVote:RecommendationVote, obvFlags:ObservationFlag, userGroups:UserGroup];
 	static belongsTo = [SUser, UserGroup]
 
@@ -425,13 +426,11 @@ class Observation implements Taggable {
 
         println type;
 
+		def sql =  Sql.newInstance(dataSource);
         params['cache'] = true;
-        def results = Resource.executeQuery("""
-            select r.ratingRef,avg(rating.stars),count(rating.stars) as c from RatingLink as r join r.rating rating 
-            group by r.ratingRef 
-            order by count(rating.stars) desc ,avg(rating.stars) desc
-            """, params)
-
+        params['type'] = type;
+        def results = sql.rows("select rating_link.rating_ref, avg(rating.stars), count(rating.stars) from rating_link , rating  where rating_link.type='$type' and rating_link.rating_id = rating.id and rating_link.rating_ref in "+getSqlInClause(resourceIds)+" group by rating_link.rating_ref order by count(rating.stars) desc , avg(rating.stars) desc", resourceIds)
+println results
         def instances = Resource.withCriteria {  
             inList 'id', results.collect { it[0] } 
             cache params.cache
@@ -444,7 +443,7 @@ class Observation implements Taggable {
     }
 
     private String getSqlInClause(list){
-		return "(" + list.collect {it}.join(", ") + ")"
+		return "(" + list.collect {'?'}.join(", ") + ")"
 	}
 
 

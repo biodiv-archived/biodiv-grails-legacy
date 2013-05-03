@@ -48,13 +48,7 @@
                         </g:if>
                     </div>
                     <div class="caption" >
-                        <div class="rating pull-right">
-                                <form class="ratingForm" method="get" title="Rate it"
-                                    action="${uGroup.createLink(controller:'resource', action:'rate', id:resourceInstance.id) }"
-                                    class="rating-container">
-                                    <obv:rating model="['selected':resourceInstance.rating]"/>
-                                </form>
-                        </div>
+                        <obv:rating model="['resource':resourceInstance]"/>
                     </div>
                 </div>
                 </li>

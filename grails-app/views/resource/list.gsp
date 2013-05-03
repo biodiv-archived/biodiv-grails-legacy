@@ -90,7 +90,11 @@ $(document).ready(function(){
         }
     }
 
-    rate(".ratingForm");
+    var imgRating = rate($(".rating"), function(avgRate, noOfRatings){
+        imgRating.select(avgRate);
+        $(".rating").find(".noOfRatings").html('('+noOfRatings+' ratings)');
+    });
+;
     $("a[rel^='prettyPhoto']").prettyPhoto({
         animation_speed: 'fast', /* fast/slow/normal */
         slideshow: 5000, /* false OR interval time in ms */

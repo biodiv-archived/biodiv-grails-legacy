@@ -146,7 +146,7 @@ if(r && thumbnail) {
 							</g:else>
 						</div>
 					</g:if>
-				</div>
+                                    </div>
 				
 				<div class="span8 right-shadow-box" style="margin: 0;">
 

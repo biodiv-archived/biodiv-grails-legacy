@@ -841,7 +841,7 @@ println rate+"++++++++++++++"
     private Resource createVideo(Node videoNode) {
         log.debug "Creating video from data $videoNode"
         def sourceUrl = videoNode.source?.text() ? videoNode.source?.text() : "";
-        def rate = imageNode.rating?.text() ? imageNode.rating?.text() : "";
+        def rate = videoNode.rating?.text() ? videoNode.rating?.text() : "";
 
         if(!sourceUrl) return;
 

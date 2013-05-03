@@ -5,6 +5,7 @@ import species.participation.Recommendation;
 import species.participation.RecommendationVote;
 import grails.util.GrailsNameUtils;
 import org.grails.rateable.RatingException;
+import org.codehaus.groovy.grails.orm.hibernate.cfg.GrailsHibernateUtil; 
 
 class ObservationTagLib {
 	static namespace = "obv"
@@ -225,6 +226,7 @@ class ObservationTagLib {
         int index = attrs.model.index
         if(resource) {
             def averageRating = resource.averageRating ?(int) resource.averageRating: 0
+            resource = GrailsHibernateUtil.unwrapIfProxy(resource);
             println GrailsNameUtils.getPropertyName(resource.class);
             out << """
                 <div class="rating pull-right">
