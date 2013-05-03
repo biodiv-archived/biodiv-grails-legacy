@@ -100,10 +100,15 @@ function feedPostProcess(){
 //}
 
 function loadGoogleMapsScript(callback) {
-    var script = document.createElement("script");
-    script.type = "text/javascript";
-    script.src = "http://maps.googleapis.com/maps/api/js?sensor=true&callback="+callback;
-    document.body.appendChild(script);
+    if(!google.maps) {
+        console.log("loading google maps")
+        var script = document.createElement("script");
+        script.type = "text/javascript";
+        script.src = "http://maps.googleapis.com/maps/api/js?sensor=true&callback="+callback;
+        document.body.appendChild(script);
+    } else {
+        console.log("google maps is already loaded")
+    }
 }
 
 

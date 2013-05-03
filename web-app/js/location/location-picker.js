@@ -14,9 +14,7 @@ var longitude;
 var swRestriction;
 var neRestriction;
 var allowedBounds;
-$(document).ready(function() {
-    loadGoogleMapsScript('initialize');
-});    
+
 function initialize(){
   var latlng = new google.maps.LatLng(21.07,79.27);
 
@@ -58,6 +56,7 @@ function initialize(){
 
              map.setCenter(new google.maps.LatLng(y, x));
     }
+  set_location(21.07, 79.27);				  
 }
 
 function set_location(lat, lng) {
@@ -201,7 +200,7 @@ $(document).ready(function() {
   
   $('#address').watermark('Search');
 
-  initialize();
+  loadGoogleMapsScript('initialize');
   //window.setTimeout(update_geotagged_images_list, 10);
     
   /*window.setTimeout(function() {
@@ -211,7 +210,6 @@ $(document).ready(function() {
         set_location(21.07, 79.27);
       } 
   }, 10);*/
-  set_location(21.07, 79.27);				  
   $(function() {
     $("#address").autocomplete({
       source: function(request, response) {

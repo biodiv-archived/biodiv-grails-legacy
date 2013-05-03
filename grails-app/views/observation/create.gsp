@@ -17,7 +17,6 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 
 <meta name="layout" content="main" />
-<script src="http://maps.google.com/maps/api/js?sensor=true"></script>
 <r:require modules="observations_create"/>
 
 <!-- The standard Google Loader script. --> 

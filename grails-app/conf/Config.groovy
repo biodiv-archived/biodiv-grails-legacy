@@ -1159,8 +1159,11 @@ grails.rateable.rater.evaluator = {
 	if (!User) {
 		println "Can't find domain: $domainClassName"
 		return null
-    }	
-    def user = User.get(org.springframework.security.core.context.SecurityContextHolder.context.authentication.principal.id)
-    return user
+    }
+    def id = org.springframework.security.core.context.SecurityContextHolder.context.authentication.principal?.id
+    if(id) {
+        def user = User.get(id);
+        return user
+    }
 }
 
