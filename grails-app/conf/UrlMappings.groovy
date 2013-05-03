@@ -123,10 +123,10 @@ class UrlMappings {
 			controller = 'emailConfirmation'
 			action = "index"
 		}
-    
-        "/rateable/**" {
-			controller = 'Rating'
-		}
-
+   
+        "/rating/rate/$id" {
+            controller = "rating"
+            action = "rate"
+        }
 	}
 }

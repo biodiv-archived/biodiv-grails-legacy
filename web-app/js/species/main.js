@@ -221,4 +221,5 @@ $(document).ready(function(){
 		$(this).hide();		
 		$('#searchToggleBox').slideToggle();
 	});
+
 });

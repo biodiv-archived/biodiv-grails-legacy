@@ -43,9 +43,6 @@ class RatingController extends RateableController {
             cache true
         }
         def avg = allRatings.size() ? allRatings*.stars.sum() / allRatings.size() : 0
-        println "----------------))))))))))))))))))";
-println allRatings
-println avg
         render "${avg},${allRatings.size()}"
     }
 

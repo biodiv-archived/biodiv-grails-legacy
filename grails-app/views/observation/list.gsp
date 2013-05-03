@@ -34,7 +34,6 @@
 	value="${message(code: 'observation.label', default: 'Observations')}" />
 <title><g:message code="default.list.label" args="[entityName]" />
 </title>
-<script src="http://maps.google.com/maps/api/js?sensor=true"></script>
 <r:require modules="observations_list" />
 </head>
 <body>

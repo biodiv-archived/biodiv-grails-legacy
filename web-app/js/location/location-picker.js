@@ -11,10 +11,12 @@ var marker;
 var latitude;
 var longitude;
 
-var swRestriction = new google.maps.LatLng('8', '69');
-var neRestriction = new google.maps.LatLng('36', '98');
-var allowedBounds = new google.maps.LatLngBounds(swRestriction, neRestriction);
-    
+var swRestriction;
+var neRestriction;
+var allowedBounds;
+$(document).ready(function() {
+    loadGoogleMapsScript('initialize');
+});    
 function initialize(){
   var latlng = new google.maps.LatLng(21.07,79.27);
 
@@ -23,6 +25,9 @@ function initialize(){
     center: latlng,
     mapTypeId: google.maps.MapTypeId.HYBRID
   };
+  swRestriction = new google.maps.LatLng('8', '69');
+  neRestriction = new google.maps.LatLng('36', '98');
+  allowedBounds = new google.maps.LatLngBounds(swRestriction, neRestriction);
         
   map = new google.maps.Map(document.getElementById("map_canvas"), options);
         

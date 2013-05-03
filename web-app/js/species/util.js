@@ -99,10 +99,10 @@ function feedPostProcess(){
 //		}); 
 //}
 
-function loadGoogleMapsScript() {
+function loadGoogleMapsScript(callback) {
     var script = document.createElement("script");
     script.type = "text/javascript";
-    script.src = "http://maps.googleapis.com/maps/api/js?sensor=true&callback=initMap";
+    script.src = "http://maps.googleapis.com/maps/api/js?sensor=true&callback="+callback;
     document.body.appendChild(script);
 }
 

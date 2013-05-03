@@ -232,7 +232,7 @@ class ObservationTagLib {
 
             if(!hideForm) {
                 out << """<form class="ratingForm" method="get" title="Rate it"
-                    action="${uGroup.createLink(controller:'rateable', action:'rate', id:resource.id, type:GrailsNameUtils.getPropertyName(resource.class)) }">
+                    action="${uGroup.createLink(controller:'rating', action:'rate', id:resource.id, type:GrailsNameUtils.getPropertyName(resource.class)) }">
                     """
             }
             String name = index?(resource.id?'rating_'+index:'rating_{{>i}}'):'rating'

@@ -2,17 +2,18 @@
 	<div class="observation_location">
 		<g:set var="snippetUrl" value="${uGroup.createLink(controller:'observation', action:'snippet', 'userGroupWebaddress':userGroup?.webaddress) }"/>
 		<r:script>
-                
+                var markers = [];
+                var big_map;
+                  var  nagpur_latlng, swRestriction, neRestriction, allowedBounds;
+  
                 $(document).ready(function() {
-                    loadGoogleMapsScript();
+                    loadGoogleMapsScript('initMap');
                 });
                 function initMap() {
-                    var markers = [];
-                    var big_map;
-                    var nagpur_latlng = new google.maps.LatLng('21.07', '79.27');
-                    var swRestriction = new google.maps.LatLng('8', '69');
-                    var neRestriction = new google.maps.LatLng('36', '98');
-                    var allowedBounds = new google.maps.LatLngBounds(swRestriction, neRestriction);
+                   nagpur_latlng = new google.maps.LatLng('21.07', '79.27');
+                   swRestriction = new google.maps.LatLng('8', '69');
+                   neRestriction = new google.maps.LatLng('36', '98');
+                   allowedBounds = new google.maps.LatLngBounds(swRestriction, neRestriction);
 
                   var options = {
                     zoom: 4,
