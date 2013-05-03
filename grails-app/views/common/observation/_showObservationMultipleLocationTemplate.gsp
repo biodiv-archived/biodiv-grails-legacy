@@ -4,7 +4,7 @@
 		<r:script>
                 var markers = [];
                 var big_map;
-                  var  nagpur_latlng, swRestriction, neRestriction, allowedBounds;
+                var  nagpur_latlng, swRestriction, neRestriction, allowedBounds;
   
                 $(document).ready(function() {
                     loadGoogleMapsScript('initMap');
