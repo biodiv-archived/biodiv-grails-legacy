@@ -23,6 +23,6 @@
 		</uploader:onComplete>
 </uploader:uploader>
 <div id="${name}_uploaded" style="display: ${path?'':'none'};">
-	<img id="${name}_thumbnail" class="logo" src="${createLink(url:path)}" />
+	<img id="${name}_thumbnail" class="logo" src="" />
 	<input type="hidden" name="${name}"  id="${name}_path" value="${path}">
 </div>

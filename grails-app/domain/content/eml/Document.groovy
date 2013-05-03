@@ -69,7 +69,7 @@ class Document implements Taggable {
 		attribution nullable:true	
 		sourceHolderId nullable:true
 		sourceHolderType nullable:true
-		author nullable:true
+		author nullable:false
 		coverage nullable:true
 		description nullable:true
 	}

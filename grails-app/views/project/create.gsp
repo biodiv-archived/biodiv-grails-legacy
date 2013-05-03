@@ -321,7 +321,7 @@ textarea {
 						<div class="controls">
 
 							<fileManager:uploader
-								model="['name':'proposalFiles', 'uFiles':projectInstance?.proposalFiles, 'sourceHolder': projectInstance, 'fileParams':['uploadDir':uploadDir]]" />
+								model="['name':'proposalFiles', 'docs':projectInstance?.proposalFiles, 'sourceHolder': projectInstance, 'fileParams':['uploadDir':uploadDir]]" />
 						</div>
 					</div>
 				</div>
@@ -365,7 +365,7 @@ textarea {
 									%>
 
 							<fileManager:uploader
-								model="['name':'reportFiles', 'uFiles':projectInstance?.reportFiles, 'sourceHolder': projectInstance, 'fileParams':['uploadDir':uploadDir]]" />
+								model="['name':'reportFiles', 'docs':projectInstance?.reportFiles, 'sourceHolder': projectInstance, 'fileParams':['uploadDir':uploadDir]]" />
 						</div>
 					</div>
 				</div>
@@ -421,7 +421,7 @@ textarea {
 
 
 							<fileManager:uploader
-								model="['name':'miscFiles', 'uFiles':projectInstance?.miscFiles, 'sourceHolder': projectInstance, 'fileParams':['uploadDir':uploadDir]]" />
+								model="['name':'miscFiles', 'docs':projectInstance?.miscFiles, 'sourceHolder': projectInstance, 'fileParams':['uploadDir':uploadDir]]" />
 						</div>
 
 
