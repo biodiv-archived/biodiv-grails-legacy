@@ -6,7 +6,7 @@ import species.participation.*
 import species.formatReader.SpreadsheetReader;
 import species.utils.*;
 
-def checklistService = ctx.getBean("checklistService");
+//def checklistService = ctx.getBean("checklistService");
 
 //checklistService.updateUncuratedVotesTable()
 
@@ -17,11 +17,4 @@ def checklistService = ctx.getBean("checklistService");
 //checklistService.changeCnName()
 
 //checklistService.mCn()
-//
-def cl = Checklist.get(174)
-println  cl
 
-checklistService.createObservationFromChecklist(cl)
-checklistService.udpateObv(cl)
-
-//checklistService.test()
