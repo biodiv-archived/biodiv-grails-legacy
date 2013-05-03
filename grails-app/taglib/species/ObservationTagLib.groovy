@@ -3,6 +3,8 @@ package species
 import species.participation.Observation;
 import species.participation.Recommendation;
 import species.participation.RecommendationVote;
+import grails.util.GrailsNameUtils;
+import org.grails.rateable.RatingException;
 
 class ObservationTagLib {
 	static namespace = "obv"
@@ -214,5 +216,42 @@ class ObservationTagLib {
 		out << render(template:"/common/downloadTableTemplate", model:attrs.model);
 	}
 	
+	def rating = {attrs, body->
+		//out << render(template:"/common/ratingTemplate", model:attrs.model);
+        println '=============================='
+        println attrs
+        def resource = attrs.model.resource
+        boolean hideForm = attrs.model.hideForm
+        int index = attrs.model.index
+        if(resource) {
+            def averageRating = resource.averageRating ?(int) resource.averageRating: 0
+            println GrailsNameUtils.getPropertyName(resource.class);
+            out << """
+                <div class="rating pull-right">
+            """
+
+            if(!hideForm) {
+                out << """<form class="ratingForm" method="get" title="Rate it"
+                    action="${uGroup.createLink(controller:'rateable', action:'rate', id:resource.id, type:GrailsNameUtils.getPropertyName(resource.class)) }">
+                    """
+            }
+            String name = index?(resource.id?'rating_'+index:'rating_{{>i}}'):'rating'
+            out << """
+                    <input class="star required" type="radio" name="${name}" value="1"
+                    title="Worst" ${(averageRating==1)?'checked':''} /> <input class="star" type="radio" name="${name}"
+                    value="2" title="Bad"  ${(averageRating==2)?'checked':''} /> <input class="star" type="radio"
+                    name="${name}" value="3" title="OK"  ${(averageRating==3)?'checked':''} /> <input class="star"
+                    type="radio" name="${name}" value="4" title="Good"  ${(averageRating==4)?'checked':''} /> <input
+                    class="star" type="radio" name="${name}" value="5" title="Best"  ${(averageRating==5)?'checked':''} />
+                    <div class="noOfRatings">(${resource.totalRatings ?: 0} ratings)</div>
+                """
+            if(!hideForm) {
+                out << "</form>"
+            } 
+            out <<  "</div>"
+        } else {
+            throw new RatingException("There must be a 'bean' domain object included in the ratings tag.")
+        }
+	}
 }
 

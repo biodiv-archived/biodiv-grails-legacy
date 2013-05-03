@@ -697,7 +697,9 @@ class XMLConverter extends SourceConverter {
     private Resource createImage(Node imageNode, String relImagesFolder, resourceType) {
         File tempFile = getImageFile(imageNode);
         def sourceUrl = imageNode.source?.text() ? imageNode.source?.text() : "";
-
+        def rate = imageNode.rating?.text() ? imageNode.rating?.text() : "";
+        println imageNode
+println rate+"++++++++++++++"
         log.debug "Creating image resource : "+tempFile;
 
         if(tempFile && tempFile.exists()) {
@@ -728,6 +730,7 @@ class XMLConverter extends SourceConverter {
                 log.debug "Creating new resource"
                 res = new Resource(type : resourceType, fileName:path, description:imageNode.caption?.text(), mimeType:imageNode.mimeType?.text());
                 res.url = sourceUrl
+                if(rate) res.rating = Integer.parseInt(rate);
                 for(Contributor con : getContributors(imageNode, true)) {
                     res.addToContributors(con);
                 }
@@ -740,6 +743,7 @@ class XMLConverter extends SourceConverter {
             } else {
                 log.debug "Updating resource metadata"
                 res.url = sourceUrl
+                if(rate) res.rating = Integer.parseInt(rate);
                 res.description = imageNode.caption?.text();
                 res.licenses?.clear()
                 res.contributors?.clear()
@@ -837,6 +841,7 @@ class XMLConverter extends SourceConverter {
     private Resource createVideo(Node videoNode) {
         log.debug "Creating video from data $videoNode"
         def sourceUrl = videoNode.source?.text() ? videoNode.source?.text() : "";
+        def rate = imageNode.rating?.text() ? imageNode.rating?.text() : "";
 
         if(!sourceUrl) return;
 
@@ -846,6 +851,8 @@ class XMLConverter extends SourceConverter {
             def attributors = getAttributions(videoNode, true);
             res = new Resource(type : ResourceType.VIDEO, fileName:videoNode.get("fileName")?.text(), description:videoNode.get("caption"), license:getLicenses(videoNode, true), contributor:getContributors(videoNode, true));
             res.url = sourceUrl;
+            if(rate) res.rating = Integer.parseInt(rate);
+
             for(Contributor con : getContributors(videoNode, true)) {
                 res.addToContributors(con);
             }
@@ -858,6 +865,7 @@ class XMLConverter extends SourceConverter {
         } else {
             res.fileName = videoNode.get("fileName")?.text(); 
             res.url = sourceUrl
+            if(rate) res.rating = Integer.parseInt(rate);
             res.description = videoNode.caption?.text();
             res.licenses?.clear()
             res.contributors?.clear()

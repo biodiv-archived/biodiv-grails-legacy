@@ -217,6 +217,14 @@ class ObservationController {
 							observationService.setUserGroups(observationInstance, []);
 						}
 					}
+                    
+                    log.debug "Saving ratings for the resources"
+                    observationInstance.resource.each { res ->
+                        if(res.rating) {
+                            println ")))))))))))))))))))"+res.rating
+                            res.rate(springSecurityService.currentUser, res.rating);
+                        }
+                    }
 					//redirect(action: "show", id: observationInstance.id)
 					params["createNew"] = true
 					chain(action: 'addRecommendationVote', model:['chainedParams':params]);

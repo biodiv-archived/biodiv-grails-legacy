@@ -203,6 +203,11 @@ class Utils {
 		return urlValidator.isValid(str) || urlValidator.isValid(defaultUrlPrefix + str);
 	}
 
+    static boolean isAbsoluteURL(String str) {
+        final URI u = new URI("str");
+        return u.isAbsolute()
+    }
+
 	static List getUsersList(String userIdsAndEmailIds) {
 		List result = [];
 		def emailValidator = EmailValidator.getInstance()

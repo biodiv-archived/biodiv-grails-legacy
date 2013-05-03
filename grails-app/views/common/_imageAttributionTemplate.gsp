@@ -1,5 +1,9 @@
+<%@page import="species.utils.Utils"%>
 <g:if test="${resource}">
 	<div class="notes" style="text-align: left;">
+            <div>
+                <obv:rating model="['resource':resource]"/>
+
 		<g:if test="${resource.contributors?.size() > 0}">
 			<b>Contributors:</b>
 			<ol>
@@ -24,7 +28,7 @@
 		<div class="license license_div">
 			<g:if test="${resource.url}">
 				<a href="${resource.url}" target="_blank"><b>View image
-						source</b> </a>
+                                        source</b> </a>
 			</g:if>
 			<g:each in="${resource?.licenses}" var="l">
 				<a href="${l?.url}" target="_blank"> <img class="icon" style="height:auto;"
@@ -32,5 +36,6 @@
 					alt="${l?.name.value()}" /> </a>
 			</g:each>
 		</div>
-	</div>
+            </div>
+        </div>
 </g:if>
