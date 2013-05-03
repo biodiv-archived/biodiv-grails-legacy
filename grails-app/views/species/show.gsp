@@ -363,6 +363,7 @@ $(document).ready(function(){
 <%--	$(this).next("#contributeVideoForm").toggle();--%>
 <%--});--%>
 
+    rate($(".ratingForm"));
 });
 
 </r:script>

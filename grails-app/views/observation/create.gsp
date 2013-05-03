@@ -1,4 +1,5 @@
 <%@page import="species.Resource.ResourceType"%>
+<%@page import="species.Resource"%>
 <%@page import="species.utils.ImageType"%>
 <%@page	import="org.springframework.web.context.request.RequestContextHolder"%>
 <%@page import="species.License"%>
@@ -181,12 +182,13 @@ if(r && thumbnail) {
 											
 
 											<div class='metadata prop'
-												style="position: relative; left: 5px; top: -30px;">
+												style="position: relative; top: -30px;">
 												<input name="file_${i}" type="hidden" value='${r.fileName}' />
 												<input name="url_${i}" type="hidden" value='${r.url}' />
 												<input name="type_${i}" type="hidden" value='${r.type}'/>
+                                                                                                <obv:rating model="['resource':r, 'hideForm':true, index:i]"/>
 												<g:if test="${r.type == ResourceType.IMAGE}">
-												<div id="license_div_${i}" class="licence_div dropdown">
+												<div id="license_div_${i}" class="licence_div pull-left dropdown">
 
 													<a id="selected_license_${i}"
 														class="btn dropdown-toggle btn-mini"
@@ -212,6 +214,7 @@ if(r && thumbnail) {
 													<input id="license_${i}" type="hidden" name="license_${i}" value="${r?.licenses?.asList().first()?.name}"></input>
 												</div>
 												</g:if>
+                                                                                                
 											</div> 
 											<div class="close_button"
 												onclick="removeResource(event, ${i});$('#geotagged_images').trigger('update_map');"></div>
@@ -650,10 +653,13 @@ if(r && thumbnail) {
                 </span>
 	    </div>
 				
-	    <div class='metadata prop' style="position:relative; left: 5px; top:-30px;">
+	    <div class='metadata prop' style="position:relative; top:-30px;">
 	            <input name="file_{{>i}}" type="hidden" value='{{>file}}'/>
 	            <input name="url_{{>i}}" type="hidden" value='{{>url}}'/>
 				<input name="type_{{>i}}" type="hidden" value='{{>type}}'/>
+                                 <%def r = new Resource();%>
+                                        <obv:rating model="['resource':r, 'hideForm':true, index:1]"/>
+
 				{{if type == '${ResourceType.IMAGE}'}}
                 <div id="license_div_{{>i}}" class="licence_div dropdown">
                     <a id="selected_license_{{>i}}" class="btn dropdown-toggle btn-mini" data-toggle="dropdown">
@@ -669,7 +675,7 @@ if(r && thumbnail) {
                          </g:each>
                     </ul>
 					<input id="license_{{>i}}" type="hidden" name="license_{{>i}}" value="CC BY"></input>
-           		</div>	
+                  		</div>	
 				{{/if}}
 		</div>
        	<div class="close_button" onclick="removeResource(event, {{>i}});$('#geotagged_images').trigger('update_map');"></div>
@@ -844,6 +850,10 @@ if(r && thumbnail) {
 					$('.geotagged_image', this).load(function(){
 						update_geotagged_images_list($(this));		
 					});
+                                        var imgRating = rate($(this), function(avgRate, noOfRatings){
+                                            imgRating.select(avgRate);
+                                            $(this).find(".noOfRatings").html('('+noOfRatings+' ratings)')
+                                        });
 				})
 				$( "#imagesList li:last" ).before (metadataEle);
 
@@ -884,10 +894,15 @@ if(r && thumbnail) {
 					});
            } 
 
-
+           
 
      	});  
-		
+		     var imgRating = rate($(".rating"), function(avgRate, noOfRatings){
+                        imgRating.select(avgRate);
+                        $(this).find(".noOfRatings").html('('+noOfRatings+' ratings)')
+                    });
+
+
         $(".group_option").click(function(){
                 $("#group_id").val($(this).val());
                 var caret = "<span class='caret'></span>";
@@ -923,18 +938,19 @@ if(r && thumbnail) {
         });
         
  		//$(".tagit-input").watermark("Add some tags");
-        $("#tags").tagit({
-        	select:true, 
-        	allowSpaces:true, 
-        	placeholderText:'Add some tags',
-        	fieldName: 'tags', 
-        	autocomplete:{
-        		source: '/observation/tags'
-        	}, 
-        	triggerKeys:['enter', 'comma', 'tab'], 
-        	maxLength:30
-        });
-		$(".tagit-hiddenSelect").css('display','none');
+                $("#tags").tagit({
+                        select:true, 
+                        allowSpaces:true, 
+                        placeholderText:'Add some tags',
+                        fieldName: 'tags', 
+                        autocomplete:{
+                                source: '/observation/tags'
+                        }, 
+                        triggerKeys:['enter', 'comma', 'tab'], 
+                        maxLength:30
+                });
+                
+                $(".tagit-hiddenSelect").css('display','none');
 
  		 $("#addObservationSubmit").click(function(event){
  		 	if($(this).hasClass('disabled')) {
@@ -986,6 +1002,7 @@ if(r && thumbnail) {
                     $('.dms_field').hide();
                     $('.degree_field').fadeIn();
                 }
+
         });
         
         filepicker.setKey('AXCVl73JWSwe7mTPb2kXdz');

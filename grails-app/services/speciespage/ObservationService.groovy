@@ -442,6 +442,7 @@ class ObservationService {
 		List licenses = [];
 		List type = [];
 		List url = []
+        List ratings = [];
 		params.each { key, val ->
 			int index = -1;
 			if(key.startsWith('file_')) {
@@ -454,6 +455,7 @@ class ObservationService {
 				licenses.add(params.get('license_'+index));
 				type.add(params.get('type_'+index));
 				url.add(params.get('url_'+index));
+				ratings.add(params.get('rating_'+index));
 			}
 		}
 		files.eachWithIndex { file, key ->
@@ -471,9 +473,11 @@ class ObservationService {
 				new Node(image, "caption", titles.getAt(key));
 				new Node(image, "contributor", params.author.username);
 				new Node(image, "license", licenses.getAt(key));
+				new Node(image, "rating", ratings.getAt(key));
+				new Node(image, "user", springSecurityService.currentUser?.id);
 			} else {
 				log.warn("No reference key for image : "+key);
-			}
+			} 
 		}
 
 		return resources;

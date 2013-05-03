@@ -2,8 +2,9 @@ package species
 
 import species.participation.Observation;
 import species.utils.Utils;
+import org.grails.rateable.*
 
-class Resource {
+class Resource implements Rateable {
 
 	public enum ResourceType {
 		ICON("Icon"),
@@ -27,7 +28,8 @@ class Resource {
 	String fileName;
 	String description;
 	String mimeType; //TODO:validate
-	
+    int rating = 0;
+
 	def grailsApplication
 
 	static hasMany = [contributors:Contributor, attributors:Contributor, speciesFields:SpeciesField, observation:Observation, licenses:License];
@@ -44,12 +46,13 @@ class Resource {
 		description(nullable:true);
 		mimeType(nullable:true);
 		licenses  validator : { val, obj -> val && val.size() > 0 }
+        rating(nullable:false, min:0, max:5);
     }
 	
 	String thumbnailUrl() {
 		String thumbnailUrl = '';
 		switch(type) {
-			case ResourceType.IMAGE :
+			case  ResourceType.IMAGE :
 				thumbnailUrl = this.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.thumbnail.suffix);
 				break;
 			case ResourceType.VIDEO :				
@@ -58,13 +61,18 @@ class Resource {
 				break;
 			default :
 				log.error "Not a valid type"
-		}		
+		}		 
 		return thumbnailUrl;
 	}
 	
 	String getUrl() {
 		if(this.type == ResourceType.IMAGE) {
-			return this.fileName;
+            if(Utils.isAbsoluteURL(this.fileName)) {
+    			return this.fileName;
+            } else {
+		        //def g = new org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib()
+                //return g.createLinkTo(base:grailsApplication.config.speciesPortal.observations.serverURL, this.fileName);
+            }
 		}
 		return this.@url;
 	}

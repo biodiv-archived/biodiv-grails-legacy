@@ -321,7 +321,7 @@ div.errors {
 	position: relative;
 	padding: 2px;
 	background-color: #ffffff;
-	height: 200px;
+	height: 210px;
 }
 
 .figure {
@@ -1111,6 +1111,22 @@ span.cke_skin_kama {
 	background-color: #000000 !important;
 }
 
+.galleria-info-text {
+    background-color: rgba(0, 0, 0, 0.1);
+    background: transparent\9;/*IE9*/
+    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#19000000,endColorstr=#19000000)"; /* IE8 */
+        filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#19000000,endColorstr=#19000000);   /* IE6 & 7 */
+    zoom: 1;
+}
+
+.galleria-info {
+    width: 100%;
+}
+
+.galleria-info-description {
+    color:white;
+}
+
 .notes_view { /* clear: both; */
 	background-color: #fdfdfd;
 	padding: 10px;
@@ -1854,4 +1870,12 @@ li#userOrEmail-new {
 .feedParentContext {
 	background-color: white;
 	display: table;
+}
+
+div.rating-cancel {
+    display:none;
+}
+
+div.noOfRatings {
+    clear:both;
 }

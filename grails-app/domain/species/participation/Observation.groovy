@@ -12,8 +12,9 @@ import species.auth.SUser;
 import species.groups.SpeciesGroup;
 import species.groups.UserGroup;
 import speciespage.ObvUtilService;
+import grails.util.GrailsNameUtils;
 
-class Observation implements Taggable{
+class Observation implements Taggable {
 	
 	def dataSource
 	def grailsApplication;
@@ -425,4 +426,36 @@ class Observation implements Taggable{
 	def boolean fetchIsFollowing(SUser user=springSecurityService.currentUser){
 		return Follow.fetchIsFollowing(this, user)
 	}
+
+    def listResourcesByRating() {
+        def params = [:]
+        def clazz = Resource.class;
+        def type = GrailsNameUtils.getPropertyName(clazz);
+        def resourceIds = this.resource.collect{it.id}
+
+        println type;
+
+        params['cache'] = true;
+        def results = Resource.executeQuery("""
+            select r.ratingRef,avg(rating.stars),count(rating.stars) as c from RatingLink as r join r.rating rating 
+            group by r.ratingRef 
+            order by count(rating.stars) desc ,avg(rating.stars) desc
+            """, params)
+
+        def instances = Resource.withCriteria {  
+            inList 'id', results.collect { it[0] } 
+            cache params.cache
+        }
+
+        println instances
+
+        results.collect {  r-> instances.find { i -> r[0] == i.id } }                           
+
+    }
+
+    private String getSqlInClause(list){
+		return "(" + list.collect {it}.join(", ") + ")"
+	}
+
+
 }

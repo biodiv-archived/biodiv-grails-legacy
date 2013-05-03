@@ -10,7 +10,7 @@ import com.octo.captcha.component.image.fontgenerator.RandomFontGenerator
 import com.octo.captcha.component.image.backgroundgenerator.GradientBackgroundGenerator
 import com.octo.captcha.component.image.color.SingleColorGenerator
 import com.octo.captcha.component.image.textpaster.NonLinearTextPaster
-
+import grails.plugins.springsecurity.SecurityConfigType;
 import com.octo.captcha.service.sound.DefaultManageableSoundCaptchaService
 
 
@@ -1099,6 +1099,7 @@ grails.plugins.springsecurity.acl.authority.modifyAuditingDetails = 'ROLE_ADMIN'
 grails.plugins.springsecurity.acl.authority.changeOwnership =       'ROLE_ADMIN'
 grails.plugins.springsecurity.acl.authority.changeAclDetails =      'ROLE_RUN_AS_ADMIN'//'ROLE_ACL_CHANGE_DETAILS'
 
+grails.plugins.springsecurity.securityConfigType = SecurityConfigType.Annotation 
 grails.plugins.springsecurity.controllerAnnotations.staticRules = [
 	'/role/**': ['ROLE_ADMIN'],
 	'/persistentLogin/**': ['ROLE_ADMIN'],
@@ -1110,7 +1111,8 @@ grails.plugins.springsecurity.controllerAnnotations.staticRules = [
 	'/registrationCode/**': ['ROLE_ADMIN'],
 	'/requestmap/**': ['ROLE_ADMIN'],
 	'/securityInfo/**': ['ROLE_ADMIN'],
-	'/securityInfo/**': ['ROLE_ADMIN']
+	'/securityInfo/**': ['ROLE_ADMIN'],
+    '/rateable/rate/**': ['ROLE_USER']
  ]
 
 
@@ -1151,3 +1153,14 @@ jcaptchas {
 
 NamesIndexerService.FILENAME = "${appName}_tstLookup.dat";
 ObservationController.COMMIT = false;
+
+grails.rateable.rater.evaluator = { 
+	Class<?> User = SUser.class
+	if (!User) {
+		println "Can't find domain: $domainClassName"
+		return null
+    }	
+    def user = User.get(org.springframework.security.core.context.SecurityContextHolder.context.authentication.principal.id)
+    return user
+}
+

@@ -4,6 +4,7 @@
 <%@ page import="species.participation.Recommendation"%>
 <%@ page import="species.participation.RecommendationVote"%>
 <%@page import="species.Resource.ResourceType"%>
+<%@page import="species.Resource"%>
 
 <html>
 <head>
@@ -96,6 +97,7 @@ if(r && thumbnail) {
 	
 			<div class="observation  span12">
 				<obv:showSubmenuTemplate/>
+
 				<div class="page-header clearfix">
 					<div style="width:100%;">
 						<div class="span8 main_heading" style="margin-left:0px;">
@@ -151,7 +153,7 @@ if(r && thumbnail) {
 
 					<div id="gallery1">
 						<g:if test="${observationInstance.resource}">
-							<g:each in="${observationInstance.resource}" var="r">
+							<g:each in="${observationInstance.listResourcesByRating()}" var="r">
 								<g:if test="${r.type == ResourceType.IMAGE}">
 								<%def gallImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.gallery.suffix)%>
 								<%def gallThumbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.galleryThumbnail.suffix)%>
@@ -168,7 +170,10 @@ if(r && thumbnail) {
 									<a href="${r.url }"><span class="video galleryImage">Watch this at YouTube</span></a>
 									<g:imageAttribution model="['resource':video]" />
 								</g:elseif>
-							</g:each>
+	
+
+                                                                </g:each>
+                                                
 						</g:if>
 						<g:else>
 							<img class="galleryImage"
@@ -179,11 +184,9 @@ if(r && thumbnail) {
 
 					</div>
 
-
-
 					<obv:showStory
 						model="['observationInstance':observationInstance, 'showDetails':true, 'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress]" />
-					
+			
 					<div class="recommendations sidebar_section" style="overflow:visible;clear:both;">
 						<div>
 							<ul id="recoSummary" class="pollBars">
@@ -319,32 +322,49 @@ if(r && thumbnail) {
 			thumbQuality : false,
 			maxScaleRatio : 1,
 			minScaleRatio : 1,
-			youtube:{
-		    	modestbranding: 1,
-		    	autohide: 1,
-		    	color: 'white',
-		    	hd: 1,
-		    	rel: 0,
-		    	showinfo: 0
+                        _toggleInfo: false,
+			youtube : {
+                            modestbranding: 1,
+                            autohide: 1,
+                            color: 'white',
+                            hd: 1,
+                            rel: 0,
+                            showinfo: 1
 			},
 			dataConfig : function(img) {
-				return {
-					// tell Galleria to grab the content from the .desc div as caption
-					description : $(img).parent().next('.notes').html()
-				};
+                            return {
+                                // tell Galleria to grab the content from the .desc div as caption
+                                description : $(img).parent().next('.notes').html()
+                            };
 			},
 			extend : function(options) {
-				// listen to when an image is shown
-				this.bind('image', function(e) {
-					// lets make galleria open a lightbox when clicking the main
-					// image:
-					$(e.imageTarget).click(this.proxy(function() {
-						this.openLightbox();
-					}));
-				});
-			}
-		});
+                            // listen to when an image is shown
+                            this.bind('image', function(e) {
+                                // lets make galleria open a lightbox when clicking the main
+                                // image:
+                                $(e.imageTarget).click(this.proxy(function() {
+                                        this.openLightbox();
+                                }));
+                            });
+                            
+                            this.bind('loadfinish', function(e){
+                                //console.log('loadfinish');
+                                //console.log(e.galleriaData.description);
+                                //console.log($.type(e.galleriaData.description));
+                                var imgRating = rate($(".galleria-info-description"), function(avgRate, noOfRatings){
+                                    console.log(imgRating);
+                                    imgRating.select(avgRate);
+                                    $(".galleria-info-description").find(".noOfRatings").html('('+noOfRatings+' ratings)');
+//                                    $(e.galleriaData.description).children(".rating").children(".ratingForm").children("div").children("input[value="+avgRate+"]").attr( 'checked', 'checked' );
+//                                    e.galleriaData.description = $(e.galleriaData.description).html();
+                                    //console.log($(e.galleriaData.description).find("input[value="+rating+"]"))
+                                    //console.log($(e.galleriaData.description).find("input:checked").val());
+                                });
+                            })
+                        }
+                });
 
+        
         $('#voteCountLink').click(function() {
         	$('#voteDetails').show();
         });
