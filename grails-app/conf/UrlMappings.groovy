@@ -123,5 +123,10 @@ class UrlMappings {
 			controller = 'emailConfirmation'
 			action = "index"
 		}
+    
+        "/rateable/**" {
+			controller = 'Rating'
+		}
+
 	}
 }

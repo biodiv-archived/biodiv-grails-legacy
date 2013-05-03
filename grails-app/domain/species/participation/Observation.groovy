@@ -422,24 +422,25 @@ class Observation implements Taggable {
         def params = [:]
         def clazz = Resource.class;
         def type = GrailsNameUtils.getPropertyName(clazz);
-        def resourceIds = this.resource.collect{it.id}
 
         println type;
 
 		def sql =  Sql.newInstance(dataSource);
         params['cache'] = true;
         params['type'] = type;
-        def results = sql.rows("select rating_link.rating_ref, avg(rating.stars), count(rating.stars) from rating_link , rating  where rating_link.type='$type' and rating_link.rating_id = rating.id and rating_link.rating_ref in "+getSqlInClause(resourceIds)+" group by rating_link.rating_ref order by count(rating.stars) desc , avg(rating.stars) desc", resourceIds)
-println results
-        def instances = Resource.withCriteria {  
-            inList 'id', results.collect { it[0] } 
-            cache params.cache
+        def results = sql.rows("select resource_id, observation_id, rating_ref, (case when avg is null then 0 else avg end) as avg, (case when count is null then 0 else count end) as count from observation_resource o left outer join (select rating_link.rating_ref, avg(rating.stars), count(rating.stars) from rating_link , rating  where rating_link.type='$type' and rating_link.rating_id = rating.id  group by rating_link.rating_ref) c on o.resource_id =  c.rating_ref where observation_id=:obvId order by avg desc, resource_id asc", [obvId:this.id]);
+        println results
+        def idList = results.collect { it[0] }
+
+        if(idList) {
+            def instances = Resource.withCriteria {  
+                inList 'id', idList 
+                cache params.cache
+            }
+            results.collect {  r-> instances.find { i -> r[0] == i.id } }                           
+        } else {
+            []
         }
-
-        println instances
-
-        results.collect {  r-> instances.find { i -> r[0] == i.id } }                           
-
     }
 
     private String getSqlInClause(list){
