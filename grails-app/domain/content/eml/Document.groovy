@@ -53,6 +53,8 @@ class Document implements Taggable {
 
 	Coverage coverage 	//Coverage Information
 
+	String doi
+	
 	Date dateCreated
 	Date lastUpdated
 	
@@ -72,6 +74,7 @@ class Document implements Taggable {
 		author nullable:true
 		coverage nullable:true
 		description nullable:true
+		doi nullable:true
 	}
 	
 	static hasMany ={userGroups:UserGroup}
