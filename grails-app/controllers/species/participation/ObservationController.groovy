@@ -347,7 +347,7 @@ class ObservationController {
 		}
 	}
 
-	@Secured(['ROLE_ADMIN'])
+	@Secured(['ROLE_CEPF_ADMIN'])
 	def delete = {
 		def observationInstance = Observation.get(params.id)
 		if (observationInstance) {

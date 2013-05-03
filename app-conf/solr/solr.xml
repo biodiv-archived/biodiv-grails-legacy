@@ -33,5 +33,7 @@
     <core name="observations" instanceDir="observations" />
     <core name="newsletters" instanceDir="newsletters" />
     <core name="checklists" instanceDir="checklists" />
+    <core name="projects" instanceDir="projects" />
+    <core name="documents" instanceDir="documents" />
   </cores>
 </solr>

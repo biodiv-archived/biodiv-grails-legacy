@@ -118,11 +118,11 @@ $(document).ready(function(){
     	return false;
     });
    
-   $('#tc_tagcloud a').live('click', function(){
-   		setActiveTag($(this).contents().first().text());
-		updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
-		return false;
-   });
+//   $('#tc_tagcloud a').live('click', function(){
+//   		setActiveTag($(this).contents().first().text());
+//		updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
+//		return false;
+//   });
    
     $("#removeTagFilter").live('click', function(){
     	var oldActiveTag = $("li.tagit-choice.active");
