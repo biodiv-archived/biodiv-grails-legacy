@@ -107,7 +107,7 @@ if(r && thumbnail) {
 							<a class="btn btn-success pull-right"
 				href="${uGroup.createLink(
 						controller:'observation', action:'create', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"
-				class="btn btn-info" style="margin-top: 10px; margin-left: 5px;"> <i class="icon-plus"></i>Add an Observation</a>
+				class="btn btn-info" style="margin-top: 10px; margin-bottom: 10px; margin-left: 5px;"> <i class="icon-plus"></i>Add an Observation</a>
 						<div style="float:right;margin:10px 0;">
 							<sUser:ifOwns model="['user':observationInstance.author]">
 								
