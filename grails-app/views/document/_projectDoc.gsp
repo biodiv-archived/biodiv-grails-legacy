@@ -14,14 +14,14 @@
 				<input name="${name}" type="hidden"
 				value='${docId}' />
 				
-				 <g:hiddenField name='${docId}.deleted'
+				 <input type="hidden" name='${docId}.deleted'
 					value='false' /> 
 					
-				<g:hiddenField name='${docId}.new'
+				<input type="hidden" name='${docId}.new'
 					value="${documentInstance?'false':'true'}" />
 
 				<div>
-					<span class="qq-upload-file"><i class="icon-file"></i> ${fileName}
+					<span class="qq-upload-file"><i class="icon-file"></i> ${docName}
 					</span> <span class="qq-upload-size"> ${fileSize}
 					</span>
 
