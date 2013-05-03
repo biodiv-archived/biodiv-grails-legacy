@@ -93,7 +93,7 @@ class DocumentController {
 
 					documentInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [
 						message(code: 'document.label', default: 'Document')] as Object[], "Another user has updated this Document while you were editing")
-					render(view: "edit", model: [documentInstance: documentInstance])
+					render(view: "create", model: [documentInstance: documentInstance])
 					return
 				}
 			}
@@ -103,7 +103,7 @@ class DocumentController {
 				redirect(action: "show", id: documentInstance.id)
 			}
 			else {
-				render(view: "edit", model: [documentInstance: documentInstance])
+				render(view: "create", model: [documentInstance: documentInstance])
 			}
 		}
 		else {

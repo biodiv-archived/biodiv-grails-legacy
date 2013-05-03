@@ -16,7 +16,6 @@ class UFile{
 	String size
 	String mimetype
 	Integer downloads
-	String doi
 	int weight	//saves the order in a group
 	License license
 	
@@ -35,7 +34,6 @@ class UFile{
 		name(nullable:false)
 		mimetype(nullable:true)
 		downloads(default:0, nullable:true)
-		doi(nullable:true)
 		weight(default:0, nullable:true)
 		license nullable:true
 	}

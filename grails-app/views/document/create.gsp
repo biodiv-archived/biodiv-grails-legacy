@@ -50,7 +50,18 @@ input.dms_field {
 
 		<% 
 				def form_action = uGroup.createLink(action:'save', controller:'document', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)
-			
+				def form_title = "Create Document"
+				def form_button_name = "Create Document"
+				def form_button_val = "Create Document"
+				if(params.action == 'edit' || params.action == 'update'){
+					form_action = uGroup.createLink(action:'update', controller:'document', id:documentInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)
+					 form_button_name = "Update Document"
+					form_button_val = "Update Document"
+					form_title = "Update Document"
+					
+				}
+				
+				String uploadDir = grailsApplication.config.speciesPortal.content.fileUploadDir
 			%>
 
 		<form id="documentForm" action="${form_action}" method="POST"
@@ -95,10 +106,11 @@ input.dms_field {
 									model="['name': 'ufilepath', 'path': documentInstance.uFile?.path, 'size':uFileInstance?.size]" />
 									
 							</div>
-							<div class="span1">(OR)</div>
+							<div class="span1">(OR) 
+							</div>
 							<div class="span5">
-								<input type="text" class="input-block-level" name="uri" placeholder="Enter URL for the resource"
-									value="${documentInstance?.uri}"  />
+							<b>URL</b>
+								<input type="text" class="input-block-level" name="uri" placeholder="Enter URL for the resource" 									value="${documentInstance?.uri}"  />
 							</div>
 						</div>
 					</div>

@@ -44,13 +44,29 @@
 		</div>
 
 
+		<div><span style="float: right;font-size: 12pt;font-weight: bold;">DOCUMENT | ${documentInstance.type } </span></div>
 
-		<dl class="dl-horizontal">
-			<dt>Type</dt>
-			<dd>
-				${documentInstance.type }
-			</dd>
-		</dl>
+
+	<g:if test="${documentInstance?.description}">
+
+			<dl>
+				<dt>Description</dt>
+				<dd>
+					${documentInstance?.description}
+				</dd>
+			</dl>
+		</g:if>
+		
+				
+
+		<g:if test="${documentInstance?.tags}">
+			<b>Tags : </b>
+
+			<g:render template="/project/showProjectTagsList"
+				model="['projectInstance': documentInstance]" />
+
+		</g:if>
+
 
 		<dl class="dl-horizontal">
 			<dt>File</dt>
@@ -58,7 +74,7 @@
 
 				<fileManager:displayFile
 					filePath="${ documentInstance?.uFile?.path}"
-					fileName="File}"></fileManager:displayFile>
+					fileName="${ documentInstance?.uFile?.path}"></fileManager:displayFile>
 			</dd>
 		</dl>
 
@@ -72,15 +88,6 @@
 			</dl>
 		</g:if>
 
-		<g:if test="${documentInstance?.description}">
-
-			<dl class="dl-horizontal">
-				<dt>Description</dt>
-				<dd>
-					${documentInstance?.description}
-				</dd>
-			</dl>
-		</g:if>
 
 		<g:if test="${documentInstance?.contributors}">
 
@@ -162,13 +169,7 @@
 			</dl>
 		</g:if>
 
-		<g:if test="${documentInstance?.tags}">
-			<b>Keywords : </b>
 
-			<g:render template="/project/showProjectTagsList"
-				model="['projectInstance': documentInstance]" />
-
-		</g:if>
 	</div>
 		<g:render template="/document/documentSidebar" />
 	
