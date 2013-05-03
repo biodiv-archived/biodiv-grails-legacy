@@ -46,4 +46,20 @@ class RatingController extends RateableController {
         render "${avg},${allRatings.size()}"
     }
 
+    def evaluateRater() {
+		def evaluator = grailsApplication.config.grails.rateable.rater.evaluator
+		def rater 
+		if(evaluator instanceof Closure) {
+			evaluator.delegate = this
+			evaluator.resolveStrategy = Closure.DELEGATE_ONLY
+			rater = evaluator.call()
+		}
+		
+		if(rater && rater.id) {
+		    return rater
+        } else {
+            
+        }
+	}
+
 }

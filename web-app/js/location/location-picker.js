@@ -57,6 +57,50 @@ function initialize(){
              map.setCenter(new google.maps.LatLng(y, x));
     }
   set_location(21.07, 79.27);				  
+
+  var lastPosition = marker.getPosition();
+  //add listener to marker for reverse geocoding
+  google.maps.event.addListener(marker, 'drag', function() {
+    
+    if(!allowedBounds.contains(marker.getPosition())){
+        marker.setPosition(lastPosition);
+    }else {
+        lastPosition = marker.getPosition();
+    };
+    
+    $('#latitude_field').val(marker.getPosition().lat());
+    $('#longitude_field').val(marker.getPosition().lng());
+
+    var dms_lat = convert_DD_to_DMS(marker.getPosition().lat(), 'lat');
+    var dms_lng = convert_DD_to_DMS(marker.getPosition().lng(), 'lng');
+    $('#latitude_deg_field').val(dms_lat['deg']);
+    $('#latitude_min_field').val(dms_lat['min']);
+    $('#latitude_sec_field').val(dms_lat['sec']);
+    $('#latitude_direction_field').val(dms_lat['dir']);
+    $('#longitude_deg_field').val(dms_lng['deg']);
+    $('#longitude_min_field').val(dms_lng['min']);
+    $('#longitude_sec_field').val(dms_lng['sec']);
+    $('#longitude_direction_field').val(dms_lng['dir']);
+
+    geocoder.geocode({'latLng': marker.getPosition()}, function(results, status) {
+      if (status == google.maps.GeocoderStatus.OK) {
+        if (results[0]) {
+          //$('#place_name').val(results[0].formatted_address);
+          $('#reverse_geocoded_name').html(results[0].formatted_address);
+          //$('#latitude').html(marker.getPosition().lat().toFixed(2));
+          //$('#longitude').html(marker.getPosition().lng().toFixed(2));
+          $('#reverse_geocoded_name_field').val(results[0].formatted_address);
+              
+          
+        }
+      }
+    });
+
+    $(".location_picker_button").removeClass("active_location_picker_button");
+
+    $('#location_info').html('You have selected this location');
+  });
+  
 }
 
 function set_location(lat, lng) {
@@ -237,49 +281,6 @@ $(document).ready(function() {
     });
   });
 
-  var lastPosition = marker.getPosition();
-  //add listener to marker for reverse geocoding
-  google.maps.event.addListener(marker, 'drag', function() {
-    
-    if(!allowedBounds.contains(marker.getPosition())){
-        marker.setPosition(lastPosition);
-    }else {
-        lastPosition = marker.getPosition();
-    };
-    
-    $('#latitude_field').val(marker.getPosition().lat());
-    $('#longitude_field').val(marker.getPosition().lng());
-
-    var dms_lat = convert_DD_to_DMS(marker.getPosition().lat(), 'lat');
-    var dms_lng = convert_DD_to_DMS(marker.getPosition().lng(), 'lng');
-    $('#latitude_deg_field').val(dms_lat['deg']);
-    $('#latitude_min_field').val(dms_lat['min']);
-    $('#latitude_sec_field').val(dms_lat['sec']);
-    $('#latitude_direction_field').val(dms_lat['dir']);
-    $('#longitude_deg_field').val(dms_lng['deg']);
-    $('#longitude_min_field').val(dms_lng['min']);
-    $('#longitude_sec_field').val(dms_lng['sec']);
-    $('#longitude_direction_field').val(dms_lng['dir']);
-
-    geocoder.geocode({'latLng': marker.getPosition()}, function(results, status) {
-      if (status == google.maps.GeocoderStatus.OK) {
-        if (results[0]) {
-          //$('#place_name').val(results[0].formatted_address);
-          $('#reverse_geocoded_name').html(results[0].formatted_address);
-          //$('#latitude').html(marker.getPosition().lat().toFixed(2));
-          //$('#longitude').html(marker.getPosition().lng().toFixed(2));
-          $('#reverse_geocoded_name_field').val(results[0].formatted_address);
-              
-          
-        }
-      }
-    });
-
-    $(".location_picker_button").removeClass("active_location_picker_button");
-
-    $('#location_info').html('You have selected this location');
-  });
-  
   function onSuccess(position) {
         var lat = position.coords.latitude;
         var lng = position.coords.longitude;

@@ -1112,7 +1112,8 @@ grails.plugins.springsecurity.controllerAnnotations.staticRules = [
 	'/requestmap/**': ['ROLE_ADMIN'],
 	'/securityInfo/**': ['ROLE_ADMIN'],
 	'/securityInfo/**': ['ROLE_ADMIN'],
-    '/rateable/rate/**': ['ROLE_USER']
+    '/rateable/rate/**': ['ROLE_USER'],
+    '/rating/rate/**': ['ROLE_USER']
  ]
 
 
@@ -1160,8 +1161,8 @@ grails.rateable.rater.evaluator = {
 		println "Can't find domain: $domainClassName"
 		return null
     }
-    def id = org.springframework.security.core.context.SecurityContextHolder.context.authentication.principal?.id
-    if(id) {
+    def u = org.springframework.security.core.context.SecurityContextHolder.context.authentication.principal
+    if(u && (u instanceof SUser)) {
         def user = User.get(id);
         return user
     }
