@@ -54,7 +54,6 @@ if(r && thumbnail) {
 <meta property="og:longitude" content="${observationInstance.longitude }"/>
 
 <meta name="layout" content="main" />
-<script src="http://maps.google.com/maps/api/js?sensor=true"></script>
 <r:require modules="observations_show"/>
 <link rel="image_src" href="${createLinkTo(file: gallImagePath, base:grailsApplication.config.speciesPortal.observations.serverURL)}" />
 
@@ -474,7 +473,6 @@ if(r && thumbnail) {
                 });
 
                 preLoadRecos(3, 0, false);
-
 	});
 </r:script>
 <g:javascript>

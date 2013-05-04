@@ -89,7 +89,5 @@
 <g:javascript>
 $(document).ready(function() {
 	window.params.tagsLink = "${uGroup.createLink(controller:'observation', action: 'tags')}"
-	
 });
 </g:javascript>
-

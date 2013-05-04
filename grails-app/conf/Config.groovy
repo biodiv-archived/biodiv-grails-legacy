@@ -1162,8 +1162,8 @@ grails.rateable.rater.evaluator = {
 		return null
     }
     def u = org.springframework.security.core.context.SecurityContextHolder.context.authentication.principal
-    if(u && (u instanceof SUser)) {
-        def user = User.get(id);
+    if(u && !(u instanceof String)) {
+        def user = User.get(u.id);
         return user
     }
 }

@@ -7,8 +7,11 @@
                 var  nagpur_latlng, swRestriction, neRestriction, allowedBounds;
   
                 $(document).ready(function() {
-                    loadGoogleMapsScript('initMap');
+                    loadGoogleMapsAPI(function() {
+                        initMap();
+                    });
                 });
+
                 function initMap() {
                    nagpur_latlng = new google.maps.LatLng('21.07', '79.27');
                    swRestriction = new google.maps.LatLng('8', '69');

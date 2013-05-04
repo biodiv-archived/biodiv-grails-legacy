@@ -22,6 +22,10 @@
 	<link rel="shortcut icon"
 		href="/sites/all/themes/wg/images/favicon.png" type="image/x-icon" />
 </g:else>
+<!-- The standard Google Loader script. --> 
+<script src="https://www.google.com/jsapi"
+		type="text/javascript"></script>
+
 
 <g:layoutHead />
 <r:require modules="observations_list" />

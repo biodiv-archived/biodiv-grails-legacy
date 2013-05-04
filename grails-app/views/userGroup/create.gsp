@@ -10,7 +10,6 @@
 <title>
 	${entityName}
 </title>
-<script src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>
 <r:require modules="userGroups_create" />
 <style>
 .btn-group.open .dropdown-menu {

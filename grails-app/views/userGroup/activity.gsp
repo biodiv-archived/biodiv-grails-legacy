@@ -9,7 +9,6 @@
 <title><g:message code="default.show.label"
 		args="[userGroupInstance.name]" />
 </title>
-<script src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>
 <r:require modules="userGroups_show,comment" />
 <style>
 .comment-textbox {

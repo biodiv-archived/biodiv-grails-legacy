@@ -94,10 +94,6 @@
 <g:javascript src="ckEditorConfig.js" />
 -->
 
-<script src="https://www.google.com/jsapi?key=ABQIAAAAk7I0Cw42MpifyYznFgPLhhRmb189gvdF0PvFEJbEHF8DoiJl8hRsYqpBTt5r5L9DCsFHIsqlwnMKHA"
-		type="text/javascript"></script>
-<script type="text/javascript"
-		src="http://maps.google.com/maps/api/js?sensor=false"></script>
 <script type="text/javascript"
 		src="/sites/all/themes/wg/scripts/OpenLayers-2.10/OpenLayers.js"></script>
 <script type="text/javascript" src="/sites/all/themes/wg/scripts/am.js"></script>
@@ -140,21 +136,38 @@ $(document).ready(function(){
 			debug : false,
 			thumbQuality : false,
 			maxScaleRatio : 1,
-			minScaleRatio : 1,
+                        minScaleRatio : 1,
+                        _toggleInfo: false,
 			youtube:{
-		    	modestbranding: 1,
-		    	autohide: 1,
-		    	color: 'white',
-		    	hd: 1,
-		    	rel: 0,
-		    	showinfo: 0
+                            modestbranding: 1,
+                            autohide: 1,
+                            color: 'white',
+                            hd: 1,
+                            rel: 0,
+                            showinfo: 1
 			},
 			dataConfig : function(img) {
 				return {
 					// tell Galleria to grab the content from the .desc div as caption
 					description : $(img).parent().next('.notes').html()
 				};
-			}
+                        },
+                        extend : function(options) {
+                            this.bind('image', function(e) {
+                                $(e.imageTarget).click(this.proxy(function() {
+                                        this.openLightbox();
+                                }));
+                            });
+                            
+                            this.bind('loadfinish', function(e){
+                                var ratingContainer = $(".galleria-info-description");
+                                var imgRating = rate(ratingContainer, function(avgRate, noOfRatings, ratingContainer){
+                                    imgRating.select(avgRate);
+                                    ratingContainer.find(".noOfRatings").html('('+noOfRatings+' ratings)');
+                                });
+                            })
+                        }
+ 
 		});	
 			
 	} else {

@@ -9,7 +9,6 @@
 	value="${message(code: 'document.label', default: 'Document')}" />
 <title><g:message code="default.create.label"
 		args="[entityName]" /></title>
-<script src="http://maps.google.com/maps/api/js?sensor=true"></script>
 
 <r:require modules="add_file" />
 <uploader:head />

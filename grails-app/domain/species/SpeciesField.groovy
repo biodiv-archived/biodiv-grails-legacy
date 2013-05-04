@@ -1,6 +1,8 @@
 package species
 
-class SpeciesField {
+import org.grails.rateable.*
+
+class SpeciesField implements Rateable {
 
 	public enum Status {
 		UNDER_CREATION("Under Creation"),

@@ -7,7 +7,7 @@ class RatingController extends RateableController {
     
     def rate = {
         def rater = evaluateRater()
-        
+ println rater       
         Rating.withTransaction {
             // for an existing rating, update it
             def rating = RatingLink.createCriteria().get {

@@ -8,7 +8,6 @@
 	value="${message(code: 'checklistList.label', default: 'Checklist')}" />
 <title><g:message code="default.list.label" args="[entityName]" />
 </title>
-<script src="http://maps.google.com/maps/api/js?sensor=true"></script>
 <r:require modules="checklist"/>
 </head>
 <body>

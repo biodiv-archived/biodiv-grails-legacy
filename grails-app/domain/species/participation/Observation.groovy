@@ -13,9 +13,9 @@ import species.groups.SpeciesGroup;
 import species.groups.UserGroup;
 import speciespage.ObvUtilService;
 import grails.util.GrailsNameUtils;
-import groovy.sql.Sql
+import org.grails.rateable.*
 
-class Observation implements Taggable {
+class Observation implements Taggable, Rateable {
 	
 	def dataSource
 	def grailsApplication;
@@ -442,10 +442,4 @@ class Observation implements Taggable {
             []
         }
     }
-
-    private String getSqlInClause(list){
-		return "(" + list.collect {'?'}.join(", ") + ")"
-	}
-
-
 }

@@ -99,16 +99,20 @@ function feedPostProcess(){
 //		}); 
 //}
 
-function loadGoogleMapsScript(callback) {
-    if(!google.maps) {
+function initLoader() {
+    var script = document.createElement("script");
+    script.src = "https://www.google.com/jsapi?callback=loadMaps";
+    script.type = "text/javascript";
+    document.getElementsByTagName("head")[0].appendChild(script);
+}
+
+function loadGoogleMapsAPI(callback) {
+    //if (typeof google === 'object' && typeof google.maps === 'object') {
+    //    console.log("google maps already loaded")
+    //} else {
         console.log("loading google maps")
-        var script = document.createElement("script");
-        script.type = "text/javascript";
-        script.src = "http://maps.googleapis.com/maps/api/js?sensor=true&callback="+callback;
-        document.body.appendChild(script);
-    } else {
-        console.log("google maps is already loaded")
-    }
+        google.load("maps", "3", {'callback':callback, other_params: "sensor=true"});
+    //}
 }
 
 

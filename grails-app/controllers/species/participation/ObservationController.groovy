@@ -156,7 +156,14 @@ class ObservationController {
 							observationService.setUserGroups(observationInstance, userGroups);
 						}	
 					}
-										
+				    
+                    log.debug "Saving ratings for the resources"
+                    observationInstance.resource.each { res ->
+                        if(res.rating) {
+                            res.rate(springSecurityService.currentUser, res.rating);
+                        }
+                    }
+						
 					
 					observationService.sendNotificationMail(observationService.OBSERVATION_ADDED, observationInstance, request, params.webaddress);
 					params["createNew"] = true
@@ -221,7 +228,6 @@ class ObservationController {
                     log.debug "Saving ratings for the resources"
                     observationInstance.resource.each { res ->
                         if(res.rating) {
-                            println ")))))))))))))))))))"+res.rating
                             res.rate(springSecurityService.currentUser, res.rating);
                         }
                     }

@@ -244,7 +244,8 @@ $(document).ready(function() {
   
   $('#address').watermark('Search');
 
-  loadGoogleMapsScript('initialize');
+  //loadGoogleMapsAPI(initialize);
+  //initialize();
   //window.setTimeout(update_geotagged_images_list, 10);
     
   /*window.setTimeout(function() {

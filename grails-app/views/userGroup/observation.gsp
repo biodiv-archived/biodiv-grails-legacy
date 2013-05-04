@@ -36,7 +36,6 @@
 
 <link rel="image_src"
 	href="${createLinkTo(file: gallImagePath, base:grailsApplication.config.speciesPortal.observations.serverURL)}" />
-<script src="http://maps.google.com/maps/api/js?sensor=true"></script>
 <r:require modules="userGroups_show, observations_list" />
 <g:set var="entityName" value="${userGroupInstance.name}" />
 <title><g:message code="default.show.label"

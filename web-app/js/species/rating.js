@@ -11,7 +11,7 @@ function rate(ele, successHandler) {
                     type: 'GET',
                     success: function(data, statusText, xhr, form) {
                         var arr = data.split(',');
-                        successHandler(arr[0], arr[1], ele);
+                        successHandler(arr[0], arr[1], form);
                     }, error:function (xhr, ajaxOptions, thrownError){
                             handleError(xhr, ajaxOptions, thrownError, this.success, function() {
                                 var response = $.parseJSON(xhr.responseText);

@@ -19,10 +19,6 @@
 <meta name="layout" content="main" />
 <r:require modules="observations_create"/>
 
-<!-- The standard Google Loader script. --> 
-<script src="https://www.google.com/jsapi?key=ABQIAAAAk7I0Cw42MpifyYznFgPLhhRmb189gvdF0PvFEJbEHF8DoiJl8hRsYqpBTt5r5L9DCsFHIsqlwnMKHA"
-		type="text/javascript"></script>
-
 <g:set var="entityName"
 	value="${message(code: 'observation.label', default: 'Observation')}" />
 <title><g:message code="default.create.label"
@@ -660,7 +656,7 @@ if(r && thumbnail) {
                                         <obv:rating model="['resource':r, 'hideForm':true, index:1]"/>
 
 				{{if type == '${ResourceType.IMAGE}'}}
-                <div id="license_div_{{>i}}" class="licence_div dropdown">
+                <div id="license_div_{{>i}}" class="licence_div pull-left dropdown">
                     <a id="selected_license_{{>i}}" class="btn dropdown-toggle btn-mini" data-toggle="dropdown">
                         <img src="${resource(dir:'images/license',file:'cc_by.png', absolute:true)}" title="Set a license for this image"/>
                         <b class="caret"></b>
@@ -723,13 +719,14 @@ if(r && thumbnail) {
 		    type: 'text',
 		    mode:'popup',
 		    emptytext:'',
+                    placement:'bottom',
 		    url: function(params) {
    				var d = new $.Deferred;
    				if(!params.value) {
        				return d.reject('This field is required'); //returning error via deferred object
    				} else {
    					$('#videoUrl').val(params.value);
-       				$('#upload_resource').submit().find("span.msg").html("Uploading... Please wait...");
+       				        $('#upload_resource').submit().find("span.msg").html("Uploading... Please wait...");
 		  			$("#iemsg").html("Uploading... Please wait...");
 		  			$(".progress").css('z-index',110);
 		  			$('#progress_msg').html('Uploading ...');
@@ -745,9 +742,7 @@ if(r && thumbnail) {
 		    title: 'Enter YouTube watch url like http://www.youtube.com/watch?v=v8HVWDrGr6o'
 		}
                 
-//                google.load('picker', '1');
-
-                   // Google Picker API for the Google Docs import
+/*                   // Google Picker API for the Google Docs import
                    function newPicker() {
                         google.load('picker', '1', {"callback" : createPicker});
                     }
@@ -758,6 +753,8 @@ if(r && thumbnail) {
                         setCallback(pickerCallback).
                         build();
                         picker.setVisible(true);
+                        //$(".picker-dialog-content").prepend("<div id='anyVideoUrl' class='editable'></div>");
+                        //$('#anyVideoUrl').editable(addVideoOptions);
                     }
 
                     // A simple callback implementation.
@@ -766,20 +763,20 @@ if(r && thumbnail) {
                             if (data[google.picker.Response.ACTION] == google.picker.Action.PICKED) {
                                 var doc = data[google.picker.Response.DOCUMENTS][0];
                                 url = doc[google.picker.Document.URL];
+                                if(url) {
+                                    $('#videoUrl').val(url);
+                                    $('#upload_resource').submit().find("span.msg").html("Uploading... Please wait...");
+                                    $("#iemsg").html("Uploading... Please wait...");
+                                    $(".progress").css('z-index',110);
+                                    $('#progress_msg').html('Uploading ...');
+                                }
                             }
-                            $('#videoUrl').val(url);
-                            $('#upload_resource').submit().find("span.msg").html("Uploading... Please wait...");
-                            $("#iemsg").html("Uploading... Please wait...");
-                            $(".progress").css('z-index',110);
-                            $('#progress_msg').html('Uploading ...');
-
                     }
-
-		//$('#add_video').editable(addVideoOptions);
-                $('#add_video').click(function(){
-                    newPicker();
-                    
-                });
+*/
+		$('#add_video').editable(addVideoOptions);
+                //$('#add_video').click(function(){
+                //    newPicker();                    
+                //});
 		
 		$('#attachFiles').change(function(e){
   			$('#upload_resource').submit().find("span.msg").html("Uploading... Please wait...");
@@ -849,9 +846,10 @@ if(r && thumbnail) {
 					$('.geotagged_image', this).load(function(){
 						update_geotagged_images_list($(this));		
 					});
-                                        var imgRating = rate($(this), function(avgRate, noOfRatings){
+                                        var $ratingContainer = $(this);
+                                        var imgRating = rate(ratingContainer, function(avgRate, noOfRatings){
                                             imgRating.select(avgRate);
-                                            $(this).find(".noOfRatings").html('('+noOfRatings+' ratings)')
+                                            $ratingContainer.find(".noOfRatings").html('('+noOfRatings+' ratings)')
                                         });
 				})
 				$( "#imagesList li:last" ).before (metadataEle);
@@ -864,13 +862,13 @@ if(r && thumbnail) {
                 $("#image-resources-msg").html("");
 				$("#upload_resource input[name='resources']").remove();
 				$('#videoUrl').val('');
-				//$('#add_video').editable('setValue','', false);		
+				$('#add_video').editable('setValue','', false);		
 			}, error:function (xhr, ajaxOptions, thrownError){
 					$("#addObservationSubmit").removeClass('disabled');
 					$("#upload_resource input[name='resources']").remove();
 					$('#videoUrl').val('');
 					$(".progress").css('z-index',90);
-					//$('#add_video').editable('setValue','', false);
+					$('#add_video').editable('setValue','', false);
 					//xhr.upload.removeEventListener( 'progress', progressHandlingFunction, false); 
 					
 					//successHandler is used when ajax login succedes
@@ -923,9 +921,12 @@ if(r && thumbnail) {
         $("#name").watermark("Suggest a species name");
         $("#place_name").watermark("Set a title for this location");
        
-        if(${obvInfoFeeder?.latitude && obvInfoFeeder?.longitude}){
-        	set_location(${obvInfoFeeder?.latitude}, ${obvInfoFeeder?.longitude});
-        }
+       loadGoogleMapsAPI(function() {
+            initialize();
+            if(${obvInfoFeeder?.latitude && obvInfoFeeder?.longitude}){
+              	set_location(${obvInfoFeeder?.latitude}, ${obvInfoFeeder?.longitude});
+            }
+        });
        
         $("#help-identify input").click(function(){
                 if ($(this).is(':checked')){
