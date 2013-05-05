@@ -160,8 +160,7 @@ $(document).ready(function(){
                             });
                             
                             this.bind('loadfinish', function(e){
-                                var ratingContainer = $(".galleria-info-description");
-                                var imgRating = rate(ratingContainer, function(avgRate, noOfRatings, ratingContainer){
+                                var imgRating = rate($(".galleria-info-description"), function(avgRate, noOfRatings, ratingContainer){
                                     imgRating.select(avgRate);
                                     ratingContainer.find(".noOfRatings").html('('+noOfRatings+' ratings)');
                                 });
@@ -471,6 +470,7 @@ $(document).ready(function(){
 						<g:if test="${speciesInstance.taxonConcept.threatenedStatus}">
 						  		<s:showThreatenedStatus model="['threatenedStatus':speciesInstance.taxonConcept.threatenedStatus]"/>
 						</g:if>
+                                                <obv:rating model="['resource':speciesInstance]"/>
 					</div>
 				</div>
 				<div>
