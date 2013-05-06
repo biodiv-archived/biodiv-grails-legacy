@@ -478,7 +478,7 @@ $(document).ready(function(){
 						<g:if test="${speciesInstance.taxonConcept.threatenedStatus}">
 						  		<s:showThreatenedStatus model="['threatenedStatus':speciesInstance.taxonConcept.threatenedStatus]"/>
 						</g:if>
-                                                <obv:rating model="['resource':speciesInstance]"/>
+                                                <obv:like model="['resource':speciesInstance]"/>
 					</div>
 				</div>
 				<div>

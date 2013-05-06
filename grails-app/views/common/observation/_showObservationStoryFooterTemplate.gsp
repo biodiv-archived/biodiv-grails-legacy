@@ -28,7 +28,7 @@
 		</div>
 	</g:if>
      <div class="footer-item">
-        <obv:rating model="['resource':observationInstance]"/>
+        <obv:like model="['resource':observationInstance]"/>
     </div>
 
 </div>

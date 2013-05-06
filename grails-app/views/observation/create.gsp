@@ -846,8 +846,7 @@ if(r && thumbnail) {
 					$('.geotagged_image', this).load(function(){
 						update_geotagged_images_list($(this));		
 					});
-                                        var $ratingContainer = $(this);
-                                        var imgRating = rate(ratingContainer, function(avgRate, noOfRatings){
+                                        var imgRating = rate($(this), function(avgRate, noOfRatings, $ratingContainer){
                                             imgRating.select(avgRate);
                                             $ratingContainer.find(".noOfRatings").html('('+noOfRatings+' ratings)')
                                         });

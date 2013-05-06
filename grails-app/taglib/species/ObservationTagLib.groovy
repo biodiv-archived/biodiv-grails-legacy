@@ -13,7 +13,8 @@ class ObservationTagLib {
 	
 	def observationService
 	def grailsApplication
-	
+    def springSecurityService;
+
 	def create = {attrs, body ->
 		out << render(template:"/common/observation/editObservationTemplate", model:attrs.model);
 	}
@@ -237,6 +238,7 @@ class ObservationTagLib {
                     """
             }
             String name = index?(resource.id?'rating_'+index:'rating_{{>i}}'):'rating'
+
             out << """
                     <input class="star required" type="radio" name="${name}" value="1"
                     title="Worst" ${(averageRating==1)?'checked':''} /> <input class="star" type="radio" name="${name}"
@@ -254,5 +256,40 @@ class ObservationTagLib {
             throw new RatingException("There must be a 'bean' domain object included in the ratings tag.")
         }
 	}
+
+    def like = {attrs, body->
+		//out << render(template:"/common/ratingTemplate", model:attrs.model);
+        def resource = attrs.model.resource
+        boolean hideForm = attrs.model.hideForm
+        int index = attrs.model.index
+        String divClass = attrs.model.class?:'rating'
+        if(resource) {
+            resource = GrailsHibernateUtil.unwrapIfProxy(resource);
+            int userRating = springSecurityService.currentUser?((resource.userRating(springSecurityService.currentUser).size()==1)?1:0):0;
+            out << """
+                <div class="${divClass} pull-right">
+            """
+
+            if(!hideForm) {
+                out << """<form class="ratingForm" method="get" title="Rate it"
+                    action="${uGroup.createLink(controller:'rating', action:'rate', id:resource.id, type:GrailsNameUtils.getPropertyName(resource.class)) }">
+                    """
+            }
+            String name = index?(resource.id?'rating_'+index:'rating_{{>i}}'):'rating'
+
+            out << """
+                    <input class="star required" type="radio" name="${name}" value="1"
+                    title="Like" ${(userRating==1)?'checked':''} />
+                    <div class="noOfRatings">(${resource.totalRatings ?: 0} ratings)</div>
+                """
+            if(!hideForm) {
+                out << "</form>"
+            } 
+            out <<  "</div>"
+        } else {
+            throw new RatingException("There must be a 'bean' domain object included in the ratings tag.")
+        }
+	}
+
 }
 
