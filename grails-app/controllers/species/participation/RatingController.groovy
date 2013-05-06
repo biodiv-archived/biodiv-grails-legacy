@@ -2,6 +2,7 @@ package species.participation
 
 import grails.util.*
 import org.grails.rateable.*
+import grails.converters.JSON;
 
 class RatingController extends RateableController {
     
@@ -42,7 +43,7 @@ class RatingController extends RateableController {
             cache true
         }
         def avg = allRatings.size() ? allRatings*.stars.sum() / allRatings.size() : 0
-        render "${avg},${allRatings.size()}"
+        render (['status':'success', 'avg':avg, 'noOfRatings':allRatings.size()] as JSON)
     }
 
     def evaluateRater() {
