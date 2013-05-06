@@ -65,7 +65,13 @@ class FileManagerTagLib {
 	
 	def displayFile = {attrs, body->
 		def filePath = attrs["filePath"]
-		def fileName = attrs["fileName"]
+		//def fileName = attrs["fileName"]
+		def fileName
+		
+		if(!fileName) {
+			int idx = filePath.lastIndexOf("/");
+			fileName = idx >= 0 ? filePath.substring(idx + 1) : filePath;
+		}
 	
 		if(filePath){
 		  def extension = filePath.split("\\.")[-1]

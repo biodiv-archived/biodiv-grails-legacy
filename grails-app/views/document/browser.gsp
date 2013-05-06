@@ -34,7 +34,7 @@
 </style>
 </head>
 <body>
-	<div class="body" style="margin-left:20px;">
+	<div class="body" style="margin-left: 20px;">
 		<h1>Browse Documents</h1>
 		<g:if test="${flash.message}">
 			<div class="message">
@@ -44,24 +44,12 @@
 
 
 
-		<div class="project-list tab-content span8">
+		<div class="document-list tab-content span8">
 			<g:render template="/document/search" model="['params':params]" />
-			<div class="observations_list" style="top: 0px;">
 
-				<g:render template="/document/showBrowserTable"
-					model="['documentInstanceList':documentInstanceList]" />
-
-
-				<div class="paginateButtons">
-					<g:paginate total="${documentInstanceTotal}" />
-				</div>
-			</div>
+			<g:render template="/document/documentListTemplate" />
 		</div>
 	</div>
-
-
 	<g:render template="/document/documentSidebar" />
-
-
 </body>
 </html>

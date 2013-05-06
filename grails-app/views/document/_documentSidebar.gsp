@@ -8,7 +8,6 @@
 	
 	
 	
-	<sec:ifLoggedIn>
 		<a class="btn btn-info" style="margin-bottom: 5px;"
 			href="${uGroup.createLink(
 						controller:'document', action:'create', 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress)}">
@@ -16,7 +15,6 @@
 		</a>
 		<br>
 
-	</sec:ifLoggedIn>
 	
 		<div style="margin-bottom: 10px;
 border: 1px solid green;

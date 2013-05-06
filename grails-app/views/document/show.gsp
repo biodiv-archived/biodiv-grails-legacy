@@ -170,21 +170,35 @@
 
 			</div>
 		</div>
-		
+
 
 
 		<div class="sidebar_section">
-		<dl class="dl-horizontal">
-			<dt>File</dt>
-			<dd>
 
-				<fileManager:displayFile
-					filePath="${ documentInstance?.uFile?.path}"
-					fileName="${ documentInstance?.uFile?.path}"></fileManager:displayFile>
-			</dd>
-		</dl>
-</div>
-		
+			<g:if test="${documentInstance.uFile}">
+
+				<dl class="dl-horizontal">
+
+					<dt>File</dt>
+					<dd>
+
+						<fileManager:displayFile
+							filePath="${ documentInstance?.uFile?.path}"
+							fileName="${ documentInstance?.uFile?.path}"></fileManager:displayFile>
+					</dd>
+				</dl>
+			</g:if>
+			<g:if test="${documentInstance.uri}">
+				<dl class="dl-horizontal">
+
+					<dt>URL</dt>
+					<dd>
+						${documentInstance.uri}
+					</dd>
+				</dl>
+			</g:if>
+		</div>
+
 		<g:if test="${documentInstance?.tags}">
 			<b>Tags : </b>
 
