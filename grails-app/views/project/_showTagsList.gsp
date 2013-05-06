@@ -1,8 +1,12 @@
 <%@ page import="org.grails.taggable.Tag"%>
+<%
+def controller = controller?controller:'document'
+def action = action?action:'browser'
+ %>
 <div class="view_tags">
-	<g:if test="${projectInstance?.tags}">
+	<g:if test="${instance?.tags}">
 		<ul class="tagit">
-		<g:each in="${projectInstance.tags}">
+		<g:each in="${instance.tags}">
 			<li class="tagit-choice" style="padding:0 5px;">
 				${it}
 			</li>
@@ -18,7 +22,7 @@
 		if((${isAjaxLoad?:'false'} == 'false') || (!${isAjaxLoad?1:0})){
 			 $("li.tagit-choice").click(function(){
 			 	var tg = $(this).contents().first().text();
-	         	window.location.href = "${uGroup.createLink(controller:'project', action: 'list')}?tag=" + tg ;
+	         	window.location.href = "${uGroup.createLink(controller:controller, action: action)}?tag=" + tg ;
 	         });
          }
 	})

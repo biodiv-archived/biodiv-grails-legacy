@@ -21,14 +21,17 @@
 
 		</tr>
 	</thead>
-	<tbody>
-		<g:each in="${documentInstanceList}" status="i" var="documentInstance">
-			<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 
-				<td>
-					<a href='${uGroup.createLink(controller: "document", action:"show", id:documentInstance.id, 'userGroupWebaddress':params?.webaddress)}'>${documentInstance.title}</a>
-				</td>
-				<td>
+	<tbody class="mainContentList" name="p${params?.offset}">
+
+		<g:each in="${documentInstanceList}" status="i" var="documentInstance">
+			<tr class="mainContent ${(i % 2) == 0 ? 'odd' : 'even'}">
+
+				<td><a
+					href='${uGroup.createLink(controller: "document", action:"show", id:documentInstance.id, 'userGroupWebaddress':params?.webaddress)}'>
+						${documentInstance.title}
+				</a></td>
+				<td class="ellipsis multiline" style="max-width: 250px;">
 					${documentInstance?.description }
 				</td>
 				<td>
@@ -59,18 +62,14 @@
 	
 	def parentLink = uGroup.createLink(controller: controller, action:"show", id:id, 'userGroupWebaddress':params?.webaddress)
  %>
- 
- <td>
- 
- <g:if test="${sourceObj}">
 
-				<a href="${parentLink}"> ${sourceObj}</a>
-				
-</g:if> 
-<g:else>
+				<td><g:if test="${sourceObj}">
+
+						<a href="${parentLink}"> ${sourceObj}</a>
+
+					</g:if> <g:else>
 Generic
-</g:else>
-</td>
+</g:else></td>
 
 
 

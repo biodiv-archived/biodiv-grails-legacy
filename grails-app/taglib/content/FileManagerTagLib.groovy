@@ -59,13 +59,19 @@ class FileManagerTagLib {
 		}
 		
 		//XXX - ICON should be based on extension type		
-		out << g.link(['uri': UFile.findById(attrs.id)?.path], ' <span class="pdficon" style="display:inline-block; margin-left: 5px; margin-right:5px;"></span>' + UFile.findById(attrs.id)?.name )
+		out << g.link(['uri': UFile.findById(attrs.id)?.path], ' <span class="pdficon" style="display:inline-block; margin-left: 5px; margin-right:5px;"></span>' + UFile.findById(attrs.id)?.path )
 		
 	}
 	
 	def displayFile = {attrs, body->
 		def filePath = attrs["filePath"]
-		def fileName = attrs["fileName"]
+		//def fileName = attrs["fileName"]
+		def fileName
+		
+		if(!fileName) {
+			int idx = filePath.lastIndexOf("/");
+			fileName = idx >= 0 ? filePath.substring(idx + 1) : filePath;
+		}
 	
 		if(filePath){
 		  def extension = filePath.split("\\.")[-1]
@@ -87,7 +93,8 @@ class FileManagerTagLib {
 				 out << "p>html</p>"
 				 break
 			case "PDF":
-				out << "${fileName}"
+				out << g.link(['uri':"${filePath}"] , ' <span class="pdficon" style="display:inline-block; margin-left: 5px; margin-right:5px;"></span>' + "${fileName}" )
+			
 				break
 			default:
 				 out << "<p>file</p>"

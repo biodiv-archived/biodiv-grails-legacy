@@ -131,13 +131,25 @@ class DocumentController {
 			redirect(action: "list")
 		}
 	}
+
 	
 	def browser = {
 		log.debug params
-
+		
 		def model = getDocumentList(params)
-		render (view:"browser", model:model)
-		return;
+		if(params.loadMore?.toBoolean()){
+			render(template:"/document/documentListTemplate", model:model);
+			return;
+		} else if(!params.isGalleryUpdate?.toBoolean()){
+			render (view:"browser", model:model)
+			return;
+		} else{
+			def obvListHtml =  g.render(template:"/document/documentListTemplate", model:model);
+
+			def result = [obvListHtml:obvListHtml, documentInstanceTotal:model.instanceTotal]
+			render result as JSON
+			return;
+		}
 	}
 
 	protected def getDocumentList(params) {

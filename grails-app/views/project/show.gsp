@@ -98,8 +98,8 @@
 		<g:if test="${projectInstance.tags}">
 			<b>Keywords : </b>
 
-			<g:render template="/project/showProjectTagsList"
-				model="['projectInstance': projectInstance]" />
+			<g:render template="/project/showTagsList"
+				model="['instance': projectInstance, 'controller': 'project', 'action':'list']" />
 
 		</g:if>
 
@@ -136,8 +136,11 @@
 				href="#grantee-details"><h5>Grantee Details</h5></a>
 			<div id="grantee-details" class="speciesField collapse in">
 
+				<g:if test="${projectInstance?.granteeLogo}">
 				<fileManager:displayFile filePath="${ projectInstance?.granteeLogo}"
 					fileName="${projectInstance?.granteeOrganization}"></fileManager:displayFile>
+					
+					</g:if>
 
 				<dl class="dl-horizontal">
 					<dt>Organization</dt>
@@ -192,7 +195,7 @@
 						<b>Files</b>
 						<g:each in="${projectInstance?.proposalFiles}" var="proposalFile">
 							<g:render template="/document/showDocument"
-								model="['uFileInstance':proposalFile]" />
+								model="['documentInstance':proposalFile]" />
 						</g:each>
 					</g:if>
 				</div>
@@ -218,7 +221,7 @@
 
 						<g:each in="${projectInstance?.reportFiles}" var="reportFile">
 							<g:render template="/document/showDocument"
-								model="['uFileInstance':reportFile]" />
+								model="['documentInstance':reportFile]" />
 						</g:each>
 					</g:if>
 				</div>
@@ -265,7 +268,7 @@
 
 						<g:each in="${projectInstance?.miscFiles}" var="miscFile">
 							<g:render template="/document/showDocument"
-								model="['uFileInstance':miscFile]" />
+								model="['documentInstance':miscFile]" />
 						</g:each>
 					</g:if>
 				</div>
