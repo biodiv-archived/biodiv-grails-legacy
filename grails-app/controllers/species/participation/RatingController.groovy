@@ -2,12 +2,12 @@ package species.participation
 
 import grails.util.*
 import org.grails.rateable.*
+import grails.converters.JSON;
 
 class RatingController extends RateableController {
     
     def rate = {
         def rater = evaluateRater()
- println rater       
         Rating.withTransaction {
             // for an existing rating, update it
             def rating = RatingLink.createCriteria().get {
@@ -20,12 +20,12 @@ class RatingController extends RateableController {
                 eq "r.raterId", rater.id.toLong()
                 cache true
             }
-            if (rating) {
+            if (rating && params.rating) {
                 rating.stars = params.rating.toDouble()
                 assert rating.save()
             }
             // create a new one otherwise
-            else {
+            else if(params.rating) {
                 // create Rating
                 rating = new Rating(stars: params.rating, raterId: rater.id, raterClass: rater.class.name)
                 assert rating.save()
@@ -43,7 +43,7 @@ class RatingController extends RateableController {
             cache true
         }
         def avg = allRatings.size() ? allRatings*.stars.sum() / allRatings.size() : 0
-        render "${avg},${allRatings.size()}"
+        render (['status':'success', 'avg':avg, 'noOfRatings':allRatings.size()] as JSON)
     }
 
     def evaluateRater() {

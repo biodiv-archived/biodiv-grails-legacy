@@ -223,11 +223,12 @@ class ObservationTagLib {
         def resource = attrs.model.resource
         boolean hideForm = attrs.model.hideForm
         int index = attrs.model.index
+        String divClass = attrs.model.class?:'rating'
         if(resource) {
             resource = GrailsHibernateUtil.unwrapIfProxy(resource);
             long averageRating = resource.averageRating ? Math.round(resource.averageRating): 0
             out << """
-                <div class="rating pull-right">
+                <div class="${divClass} pull-right">
             """
 
             if(!hideForm) {

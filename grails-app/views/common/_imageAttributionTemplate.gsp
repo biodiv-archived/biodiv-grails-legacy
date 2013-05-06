@@ -2,7 +2,7 @@
 <g:if test="${resource}">
 	<div class="notes" style="text-align: left;">
             <div>
-                <obv:rating model="['resource':resource]"/>
+                <obv:rating model="['resource':resource, 'class':'galleryRating']"/>
 
 		<g:if test="${resource.contributors?.size() > 0}">
 			<b>Contributors:</b>

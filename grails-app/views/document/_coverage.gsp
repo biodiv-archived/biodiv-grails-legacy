@@ -170,6 +170,9 @@
 <r:script>
 	$(document).ready(function() {
 		intializesSeciesHabitatInterest();
+                loadGoogleMapsAPI(function() {
+                    initialize();
+                });
 		
 	});
 </r:script>
