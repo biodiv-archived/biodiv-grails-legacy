@@ -87,7 +87,8 @@ class FileManagerTagLib {
 				 out << "p>html</p>"
 				 break
 			case "PDF":
-				out << "${fileName}"
+				out << g.link(['uri':"${filePath}"] , ' <span class="pdficon" style="display:inline-block; margin-left: 5px; margin-right:5px;"></span>' + "${fileName}" )
+			
 				break
 			default:
 				 out << "<p>file</p>"

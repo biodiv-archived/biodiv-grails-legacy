@@ -98,8 +98,8 @@
 		<g:if test="${projectInstance.tags}">
 			<b>Keywords : </b>
 
-			<g:render template="/project/showProjectTagsList"
-				model="['projectInstance': projectInstance]" />
+			<g:render template="/project/showTagsList"
+				model="['instance': projectInstance, 'controller': 'project', 'action':'list']" />
 
 		</g:if>
 
