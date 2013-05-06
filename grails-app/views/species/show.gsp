@@ -133,11 +133,12 @@ $(document).ready(function(){
 			image_pan_smoothness : 5,
 			showInfo : true,
 			dataSelector : ".galleryImage",
-			debug : false,
+			debug : true,
 			thumbQuality : false,
 			maxScaleRatio : 1,
                         minScaleRatio : 1,
                         _toggleInfo: false,
+                        wait:true,
 			youtube:{
                             modestbranding: 1,
                             autohide: 1,
@@ -160,14 +161,15 @@ $(document).ready(function(){
                             });
                             
                             this.bind('loadfinish', function(e){
-                                var imgRating = rate($(".galleria-info-description"), function(avgRate, noOfRatings, ratingContainer){
-                                    imgRating.select(avgRate);
-                                    ratingContainer.find(".noOfRatings").html('('+noOfRatings+' ratings)');
-                                });
+                                galleryImageLoadFinish();
                             })
                         }
  
 		});	
+                Galleria.ready(function() {
+                    $("#spinner").hide();
+                    $("#resourceTabs").css('visibility', 'visible');
+                });
 			
 	} else {
 		$("#resourceTabs").tabs("remove", 0);
@@ -374,8 +376,6 @@ $(document).ready(function(){
 <%--$("#contributeVideo").click(function(){--%>
 <%--	$(this).next("#contributeVideoForm").toggle();--%>
 <%--});--%>
-
-    rate($(".ratingForm"));
 });
 
 </r:script>
@@ -407,8 +407,16 @@ $(document).ready(function(){
 			</g:if>
 			<!-- media gallery -->
 			<div class="grid_10">
-				<div style="padding-bottom:10px">
-					<div id="resourceTabs">
+				<div style="padding-bottom:10px;background-color:white;height:475px;">
+                                    <center>
+                                        <div id="spinner" class="spinner">
+                                        <img src="${resource(dir:'images',file:'spinner.gif', absolute:true)}"
+                                            alt="${message(code:'spinner.alt',default:'Loading...')}" />
+                                        </div>
+                                    </center>
+
+
+					<div id="resourceTabs" style="visibility:hidden;">
 						<ul>
 							<li><a href="#resourceTabs-1">Images</a></li>
 	<%--						<li><a href="#resourceTabs-2">Video</a></li>--%>
@@ -418,7 +426,7 @@ $(document).ready(function(){
 						</ul>
 						<div id="resourceTabs-1">
 	<%--						<a href="#">Contribute Images</a>--%>
-							<div id="gallery1" class="gallery" >
+							<div id="gallery1" class="gallery">
 								<g:if test="${speciesInstance.getImages()}">
 									<s:showSpeciesImages model="['speciesInstance':speciesInstance]"></s:showSpeciesImages>
 								</g:if>

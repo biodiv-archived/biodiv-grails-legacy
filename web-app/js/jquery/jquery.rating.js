@@ -269,7 +269,7 @@
 					// ***** recursive calls to this method were like : ... .rating('select') it's now like .rating('select',undefined,wantCallBack); (parameters are set.)
 					// ***** line which is calling callback
 					// ***** /LIST OF MODIFICATION *****
-			
+		console.log(this)	
 			var control = this.data('rating'); if(!control) return this;
 			// do not execute when control is in read-only mode
 			if(control.readOnly) return;
@@ -279,11 +279,13 @@
 			if(typeof value!='undefined'){
 			 // select by index (0 based)
 				if(typeof value=='number')
+                                    console.log(control.stars);
  			 return $(control.stars[value]).rating('select',undefined,wantCallBack);
 				// select by literal value (must be passed as a string
 				if(typeof value=='string')
 					//return
 					$.each(control.stars, function(){
+                                            console.log($(this))
 						if($(this).data('rating.input').val()==value) $(this).rating('select',undefined,wantCallBack);
 					});
 			}

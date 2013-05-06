@@ -259,7 +259,7 @@ function last_actions() {
 	//applying table sorting
 	$("table.tablesorter").tablesorter();
         
-        var imgRating = rate($(".rating"), function(avgRate, noOfRatings, ratingContainer){
+       var imgRating = rate($(".rating"), function(avgRate, noOfRatings, ratingContainer){
             imgRating.select(avgRate);
             ratingContainer.find(".noOfRatings").html('('+noOfRatings+' ratings)');
         });
