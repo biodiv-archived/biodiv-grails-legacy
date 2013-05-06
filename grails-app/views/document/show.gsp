@@ -68,15 +68,7 @@
 			<a href="authoringInfo" data-toggle="collapse" href="#authoringInfo"><h5>Authoring
 					Information</h5></a>
 			<div id="authoringInfo" class="speciesField collapse in">
-				<g:if test="${documentInstance?.uFile?.license}">
 
-					<dl class="dl-horizontal">
-						<dt>License</dt>
-						<dd>
-							${documentInstance?.uFile?.license}
-						</dd>
-					</dl>
-				</g:if>
 
 
 
@@ -101,6 +93,22 @@
 						</dd>
 					</dl>
 
+				</g:if>
+
+				<g:if test="${documentInstance?.uFile?.license}">
+
+					<dl class="dl-horizontal">
+						<dt>License</dt>
+						<dd>
+
+
+							<a class="license"
+								href="${documentInstance?.uFile?.license?.url}" target="_blank"><img
+								src="${createLinkTo(dir:'images/license', file: documentInstance?.uFile?.license?.name.value().toLowerCase().replaceAll('\\s+','')+'.png', absolute:true)}"
+								alt="${documentInstance?.uFile?.license?.name.value()}" /> </a>
+
+						</dd>
+					</dl>
 				</g:if>
 
 			</div>

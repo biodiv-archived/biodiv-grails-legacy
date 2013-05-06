@@ -1,4 +1,5 @@
 <%@ page import="content.eml.UFile"%>
+<%@ page import="content.eml.Document"%>
 <%@ page import="org.grails.taggable.Tag"%>
 
 	<!--====== Template ======-->

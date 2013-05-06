@@ -1,7 +1,10 @@
 <div class="show-document">
 
 
-	<fileManager:displayIconName id="${documentInstance?.uFile?.id}" />
+	
+	<fileManager:displayFile
+							filePath="${ documentInstance?.uFile?.path}"
+							></fileManager:displayFile>
 
 	<g:if test="${documentInstance?.description}">
 		<p>

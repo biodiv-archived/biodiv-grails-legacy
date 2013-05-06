@@ -59,7 +59,7 @@ class FileManagerTagLib {
 		}
 		
 		//XXX - ICON should be based on extension type		
-		out << g.link(['uri': UFile.findById(attrs.id)?.path], ' <span class="pdficon" style="display:inline-block; margin-left: 5px; margin-right:5px;"></span>' + UFile.findById(attrs.id)?.name )
+		out << g.link(['uri': UFile.findById(attrs.id)?.path], ' <span class="pdficon" style="display:inline-block; margin-left: 5px; margin-right:5px;"></span>' + UFile.findById(attrs.id)?.path )
 		
 	}
 	
