@@ -238,6 +238,14 @@ function loadYoutube(youtube_container) {
 	 });
 }
 
+function rating() {
+    var imgRating = rate($(".rating"), function(avgRate, noOfRatings, ratingContainer){
+            imgRating.select(avgRate);
+            ratingContainer.find(".noOfRatings").html('('+noOfRatings+' ratings)');
+        });
+
+}
+
 function last_actions() {
 	$(".ellipsis.multiline").trunk8({
 		lines:2,		
@@ -258,12 +266,6 @@ function last_actions() {
 	$('.linktext').linkify(); 
 	//applying table sorting
 	$("table.tablesorter").tablesorter();
-        
-       var imgRating = rate($(".rating"), function(avgRate, noOfRatings, ratingContainer){
-            imgRating.select(avgRate);
-            ratingContainer.find(".noOfRatings").html('('+noOfRatings+' ratings)');
-        });
- 
-
+        rating();
 }
 

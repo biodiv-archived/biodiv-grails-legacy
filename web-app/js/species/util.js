@@ -67,7 +67,7 @@ function feedPostProcess(){
 	$('.linktext').linkify();  
 	$('.yj-message-body').linkify();
 	updateRelativeTime();
-	
+        rating();
 	$(".youtube_container").each(function(){
 		loadYoutube(this);
 	});
