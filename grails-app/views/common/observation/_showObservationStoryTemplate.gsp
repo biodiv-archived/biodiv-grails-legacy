@@ -19,18 +19,21 @@
         	<s:showSpeciesExternalLink model="['speciesInstance':speciesInstance]"/>
         </g:if>
             <div class="observation-icons">
-            	<g:if test="${showDetails && speciesInstance && speciesInstance.taxonConcept?.threatenedStatus}">
-					<s:showThreatenedStatus model="['threatenedStatus':speciesInstance.taxonConcept?.threatenedStatus]"/>
-				</g:if>
-                <span
-                    class="group_icon species_groups_sprites active ${observationInstance.group.iconClass()}"
-                    title="${observationInstance.group?.name}"></span>
-
-                <g:if test="${observationInstance.habitat}">
-                <span
+            	<g:if test="${observationInstance.habitat}">
+                <span style="float:right;"
                     class="habitat_icon group_icon habitats_sprites active ${observationInstance.habitat.iconClass()}"
                     title="${observationInstance.habitat.name}"></span>
                 </g:if>
+                <span style="float:right;"
+                    class="group_icon species_groups_sprites active ${observationInstance.group.iconClass()}"
+                    title="${observationInstance.group?.name}"></span>
+                
+                <g:if test="${showDetails && speciesInstance && speciesInstance.taxonConcept?.threatenedStatus}">
+            	 <span>
+					<s:showThreatenedStatus model="['threatenedStatus':speciesInstance.taxonConcept?.threatenedStatus]"/>
+				</span>
+				</g:if>
+                
             </div>
         </div>
         <div class="span7">
