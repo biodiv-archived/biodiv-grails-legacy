@@ -28,6 +28,10 @@ input.dms_field {
 	margin: 0px 0px 20px -10px;
 	float: right;
 }
+
+[class*="cke"] {
+	max-width:100%;
+}
 </style>
 </head>
 <body>
@@ -66,7 +70,7 @@ input.dms_field {
 		<form id="documentForm" action="${form_action}" method="POST"
 			class="form-horizontal">
 
-			<div class="super-section">
+			<div class="span12 super-section" style="margin-left: 0px;">
 				<div class="section">
 
 					<div
@@ -100,24 +104,46 @@ input.dms_field {
 						<label class="control-label" for="file"> Resource <span
 							class="req">*</span></label>
 						<div class="controls" style="inline-block">
-							<div class="span2">
+							<div class="span2" style="margin-left:0px;">
 								<g:render template='/UFile/docUpload'
 									model="['name': 'ufilepath', 'path': documentInstance?.uFile?.path, 'size':documentInstance?.uFile?.size]" />
 									
 							</div>
 							<div class="span1">(OR) 
 							</div>
-							<div class="span5">
-							<b>URL</b>
-								<input type="text" class="input-block-level" name="uri" placeholder="Enter URL for the resource" 									value="${documentInstance?.uri}"  />
+							<div class="span6 control-group" style="width:480px;">
+							<label class="control-label" for="uri" style="width:40px;">URL</label>
+							<div class="controls" style="margin-left:55px;">
+								<input type="text" class="input-block-level"  name="uri" placeholder="Enter URL for the resource" 									value="${documentInstance?.uri}"  />
 							</div>
+							</div>
+							
+						</div>
+					</div>
+
+
+					<div
+						class="control-group ${hasErrors(bean: documentInstance, field: 'contributors', 'error')}">
+						<label class="control-label" for="contributors">Contributors</label>
+						<div class="controls">
+							<g:textField name="contributors" class="input-block-level"
+								value="${documentInstance?.contributors }" />
 						</div>
 					</div>
 
 
 
 					<div
-						class="control-group ${hasErrors(bean: documentInstance.uFile, field: 'license', 'error')}">
+						class="control-group ${hasErrors(bean: documentInstance, field: 'attribution', 'error')}">
+						<label class="control-label" for="attribution">Attribution</label>
+						<div class="controls">
+							<g:textField name="attribution" class="input-block-level"
+								value="${documentInstance?.attribution}" />
+						</div>
+					</div>		
+
+					<div
+						class="control-group ${hasErrors(bean: documentInstance, field: 'license', 'error')}">
 						<label class="control-label" for="License"> License </label>
 
 						<div class="controls">
@@ -127,7 +153,7 @@ input.dms_field {
 								<a id="selected_license_${i}"
 									class="btn dropdown-toggle btn-mini" data-toggle="dropdown">
 									<img
-									src="${documentInstance.uFile?.license?documentInstance.uFile.license.name.getIconFilename()+'.png':resource(dir:'images/license',file:'cc_by.png', absolute:true)}"
+									src="${documentInstance.license?documentInstance.license.name.getIconFilename()+'.png':resource(dir:'images/license',file:'cc_by.png', absolute:true)}"
 									title="Set a license for this file" /> <b class="caret"></b>
 								</a>
 
@@ -147,6 +173,8 @@ input.dms_field {
 							</div>
 						</div>
 					</div>
+					
+					<hr>
 
 					<div
 						class="control-group ${hasErrors(bean: documentInstance, field: 'description', 'error')}">
@@ -188,25 +216,7 @@ input.dms_field {
 					</div>
 
 
-					<div
-						class="control-group ${hasErrors(bean: documentInstance, field: 'contributors', 'error')}">
-						<label class="control-label" for="contributors">Contributors</label>
-						<div class="controls">
-							<g:textField name="contributors" class="input-block-level"
-								value="${documentInstance?.contributors }" />
-						</div>
-					</div>
 
-
-
-					<div
-						class="control-group ${hasErrors(bean: documentInstance, field: 'attribution', 'error')}">
-						<label class="control-label" for="attribution">Attribution</label>
-						<div class="controls">
-							<g:textField name="attribution" class="input-block-level"
-								value="${documentInstance?.attribution}" />
-						</div>
-					</div>
 				</div>
 			</div>
 
@@ -216,7 +226,7 @@ input.dms_field {
 
 
 			<uGroup:isUserGroupMember>
-				<div class=" super-section" style="clear: both">
+				<div class="span12 super-section" style="clear: both; margin-left:0px;">
 					<div class="section" style="position: relative; overflow: visible;">
 						<h3>Post to User Groups</h3>
 						<div>

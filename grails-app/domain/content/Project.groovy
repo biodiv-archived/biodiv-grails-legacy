@@ -53,6 +53,10 @@ class Project implements Taggable{
 		misc type:"text"
 		
 		//locations cascade:"all-delete-orphan"
+				
+		//proposalFiles cascade: "all-delete-orphan"
+		//reportFiles cascade: "all-delete-orphan"
+		//miscFiles cascade: "all-delete-orphan"
 		
 	}
 
@@ -94,6 +98,7 @@ class Project implements Taggable{
 		misc(nullable: true);
 		miscFiles(nullable: true);
 		
+
 	}
 
 

@@ -26,7 +26,7 @@
 				code="project.dataLink.url.label" default="url" /> </label>
 
 		<div class="controls">
-			<input type="url" name='dataLinksList[${i}].url' class="url"
+			<input type="url" name='dataLinksList[${i}].url' class="input-block-level"
 				value='${dataLink?.url}' />
 		</div>
 	</div>

@@ -17,7 +17,6 @@ class UFile{
 	String mimetype
 	Integer downloads
 	int weight	//saves the order in a group
-	License license
 	
 	boolean deleted
 	
@@ -31,11 +30,9 @@ class UFile{
 	static constraints = {
 		//size(nullable:true)
 		path(nullable:false)
-		name(nullable:false)
 		mimetype(nullable:true)
 		downloads(default:0, nullable:true)
 		weight(default:0, nullable:true)
-		license nullable:true
 	}
 
 	def afterDelete() {

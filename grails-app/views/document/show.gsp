@@ -27,7 +27,8 @@
 
 		</sUser:ifOwns>
 	</div>
-	<div class="body span8" style="padding-left: 20px;">
+	<div class="body span8 right-shadow-box"
+		style="padding-left: 20px; padding-right: 5px;">
 
 		<g:if test="${flash.message}">
 			<div class="message">
@@ -44,9 +45,9 @@
 		</div>
 
 
-		<div>
-			<span style="float: right; font-size: 12pt; font-weight: bold;">DOCUMENT
-				| ${documentInstance.type }
+		<div style="height: 50px;">
+			<span style="float: right; font-size: 12pt; font-weight: bold;">Document
+				| ${documentInstance.type?.value }
 			</span>
 		</div>
 
@@ -63,125 +64,129 @@
 
 
 
-
-		<div class="sidebar_section">
-			<a href="authoringInfo" data-toggle="collapse" href="#authoringInfo"><h5>Authoring
-					Information</h5></a>
-			<div id="authoringInfo" class="speciesField collapse in">
-
-
-
-
-				<g:if test="${documentInstance?.contributors}">
+		<g:if
+			test="${documentInstance.contributors || documentInstance?.attribution || documentInstance.license}">
+			<div class="sidebar_section">
+				<a href="authoringInfo" data-toggle="collapse" href="#authoringInfo"><h5>Authoring
+						Information</h5></a>
+				<div id="authoringInfo" class="speciesField collapse in">
 
 
-					<dl class="dl-horizontal">
-						<dt>Contributors</dt>
-						<dd>
-							${documentInstance?.contributors}
-						</dd>
-					</dl>
-
-				</g:if>
-
-				<g:if test="${documentInstance?.attribution}">
-
-					<dl class="dl-horizontal">
-						<dt>Attribution</dt>
-						<dd>
-							${documentInstance?.attribution}
-						</dd>
-					</dl>
-
-				</g:if>
-
-				<g:if test="${documentInstance?.uFile?.license}">
-
-					<dl class="dl-horizontal">
-						<dt>License</dt>
-						<dd>
 
 
-							<a class="license"
-								href="${documentInstance?.uFile?.license?.url}" target="_blank"><img
-								src="${createLinkTo(dir:'images/license', file: documentInstance?.uFile?.license?.name.value().toLowerCase().replaceAll('\\s+','')+'.png', absolute:true)}"
-								alt="${documentInstance?.uFile?.license?.name.value()}" /> </a>
+					<g:if test="${documentInstance?.contributors}">
 
-						</dd>
-					</dl>
-				</g:if>
 
+						<dl class="dl-horizontal">
+							<dt>Contributors</dt>
+							<dd>
+								${documentInstance?.contributors}
+							</dd>
+						</dl>
+
+					</g:if>
+
+					<g:if test="${documentInstance?.attribution}">
+
+						<dl class="dl-horizontal">
+							<dt>Attribution</dt>
+							<dd>
+								${documentInstance?.attribution}
+							</dd>
+						</dl>
+
+					</g:if>
+
+					<g:if test="${documentInstance?.license}">
+
+						<dl class="dl-horizontal">
+							<dt>License</dt>
+							<dd>
+
+
+								<a class="license" href="${documentInstance?.license?.url}"
+									target="_blank"><img
+									src="${createLinkTo(dir:'images/license', file: documentInstance?.license?.name.value().toLowerCase().replaceAll('\\s+','')+'.png', absolute:true)}"
+									alt="${documentInstance?.license?.name.value()}" /> </a>
+
+							</dd>
+						</dl>
+					</g:if>
+
+				</div>
 			</div>
-		</div>
+		</g:if>
+
+		<g:if
+			test="${documentInstance?.coverage?.speciesGroups || documentInstance.coverage?.habitats || documentInstance.coverage?.placeName }">
+
+			<div class="sidebar_section">
+				<a href="coverageInfo" data-toggle="collapse" href="#coverageInfo"><h5>Coverage
+						Information</h5></a>
+				<div id="coverageInfo" class="speciesField collapse in">
+
+
+					<g:if test="${documentInstance.coverage?.speciesGroups}">
+
+
+						<dl class="dl-horizontal">
+							<dt>SpeciesGroups</dt>
+							<dd>
+								<g:each in="${documentInstance?.coverage?.speciesGroups}"
+									var="speciesGroup">
+									<button
+										class="btn species_groups_sprites ${speciesGroup.iconClass()} active"
+										id="${"group_" + speciesGroup.id}" value="${speciesGroup.id}"
+										title="${speciesGroup.name}"></button>
+								</g:each>
+							</dd>
+						</dl>
+					</g:if>
 
 
 
-		<div class="sidebar_section">
-			<a href="coverageInfo" data-toggle="collapse" href="#coverageInfo"><h5>Coverage
-					Information</h5></a>
-			<div id="coverageInfo" class="speciesField collapse in">
+					<g:if test="${documentInstance.coverage?.habitats}">
+						<dl class="dl-horizontal">
+							<dt>Habitats</dt>
+							<dd>
+
+								<g:each in="${documentInstance.coverage?.habitats}"
+									var="habitat">
+									<button
+										class="btn habitats_sprites ${habitat.iconClass()} active"
+										id="${"habitat_" + habitat.id}" value="${habitat.id}"
+										title="${habitat.name}"
+										data-content="${message(code: 'habitat.definition.' + habitat.name)}"
+										rel="tooltip" data-original-title="A Title"></button>
+								</g:each>
+							</dd>
+						</dl>
+					</g:if>
 
 
-				<g:if test="${documentInstance.coverage?.speciesGroups}">
+					<g:if test="${documentInstance.coverage?.placeName}">
 
+						<dl class="dl-horizontal">
+							<dt>
+								<span class="name"><i class="icon-map-marker"></i>Place</span>
+							</dt>
+							<dd>
+								<g:if test="${documentInstance.coverage.placeName == ''}">
+									${documentInstance.coverage.reverseGeocodedName}
+								</g:if>
+								<g:else>
+									${documentInstance.coverage.placeName}
+								</g:else>
+							</dd>
+						</dl>
+					</g:if>
 
-					<dl class="dl-horizontal">
-						<dt>SpeciesGroups</dt>
-						<dd>
-							<g:each in="${documentInstance?.coverage?.speciesGroups}"
-								var="speciesGroup">
-								<button
-									class="btn species_groups_sprites ${speciesGroup.iconClass()} active"
-									id="${"group_" + speciesGroup.id}" value="${speciesGroup.id}"
-									title="${speciesGroup.name}"></button>
-							</g:each>
-						</dd>
-					</dl>
-				</g:if>
-
-
-
-				<g:if test="${documentInstance.coverage?.habitats}">
-					<dl class="dl-horizontal">
-						<dt>Habitats</dt>
-						<dd>
-
-							<g:each in="${documentInstance.coverage?.habitats}" var="habitat">
-								<button
-									class="btn habitats_sprites ${habitat.iconClass()} active"
-									id="${"habitat_" + habitat.id}" value="${habitat.id}"
-									title="${habitat.name}"
-									data-content="${message(code: 'habitat.definition.' + habitat.name)}"
-									rel="tooltip" data-original-title="A Title"></button>
-							</g:each>
-						</dd>
-					</dl>
-				</g:if>
-
-
-				<g:if test="${documentInstance.coverage?.placeName}">
-
-					<dl class="dl-horizontal">
-						<dt>
-							<span class="name"><i class="icon-map-marker"></i>Place</span>
-						</dt>
-						<dd>
-							<g:if test="${documentInstance.coverage.placeName == ''}">
-								${documentInstance.coverage.reverseGeocodedName}
-							</g:if>
-							<g:else>
-								${documentInstance.coverage.placeName}
-							</g:else>
-						</dd>
-					</dl>
-				</g:if>
-
+				</div>
 			</div>
-		</div>
 
+		</g:if>
 
-
-		<div class="sidebar_section">
+		<div class="sidebar_section span6" style="margin-left:0px;">
 
 			<g:if test="${documentInstance.uFile}">
 
@@ -207,14 +212,19 @@
 			</g:if>
 		</div>
 
-		<g:if test="${documentInstance?.tags}">
-			<b>Tags : </b>
+		<div style="clear:both;" ></div>
+		<div>
+			<g:if test="${documentInstance?.tags}">
+				<b>Tags : </b>
 
-			<g:render template="/project/showTagsList"
-				model="['instance': documentInstance, 'controller': 'document', 'action':'browser']" />
+				<g:render template="/project/showTagsList"
+					model="['instance': documentInstance, 'controller': 'document', 'action':'browser']" />
 
-		</g:if>
+			</g:if>
+		</div>
+
 	</div>
+
 	<g:render template="/document/documentSidebar" />
 
 </body>

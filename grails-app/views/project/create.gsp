@@ -27,11 +27,19 @@ ul.tagit {
 textarea {
 	max-width: 680px;
 }
+
+.sidebar-section {
+	float: right;
+}
+
+[class*="cke"] {
+	max-width:100%;
+}
 </style>
 </head>
 <body>
 
-	<div class="body" style="margin-left:20px;">
+	<div class="body" style="margin-left: 20px;">
 
 		<%
                 def form_action = uGroup.createLink(action:'save', controller:'project', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)
@@ -70,9 +78,9 @@ textarea {
 			class="project-form form-horizontal" enctype="multipart/form-data">
 			<div class="dialog">
 
-				<input name="id" type="hidden" value="${projectInstance?.id}" />
-				<input name="uploadDir" type="hidden" value="${uploadDir}" />
-				
+				<input name="id" type="hidden" value="${projectInstance?.id}" /> <input
+					name="uploadDir" type="hidden" value="${uploadDir}" />
+
 
 				<div class="super-section">
 					<div class="section">
@@ -96,7 +104,7 @@ textarea {
 								class="req">*</span></label>
 							<div class="controls">
 
-								<input type="text" class="input-xxlarge" name="title"
+								<input type="text" class="input-block-level" name="title"
 									value="${projectInstance?.title}" required />
 							</div>
 
@@ -108,7 +116,7 @@ textarea {
 							<label class="control-label" for="summary"><g:message
 									code="project.summary.label" default="Summary of the Project" /></label>
 
-							<div class="controls">
+							<div class="controls" style="max-width: 100%;">
 
 
 								<ckeditor:config var="toolbar_editorToolbar">
@@ -116,7 +124,7 @@ textarea {
     									[ 'Bold', 'Italic', 'Image' ]
 									]
 									</ckeditor:config>
-								<ckeditor:editor name="summary" height="200px"
+								<ckeditor:editor name="summary" height="200px" width="100%"
 									toolbar="editorToolbar">
 									${projectInstance?.summary}
 								</ckeditor:editor>
@@ -146,9 +154,7 @@ textarea {
 				</div>
 
 				<div class="super-section">
-					<a data-toggle="collapse" href="#locationsDiv">
-						<h5>Location</h5>
-					</a>
+						<h3>Location</h3>
 					<div id="locationsDiv" class="section in collapse">
 						<g:render template="locations"
 							model="['projectInstance':projectInstance]" />
@@ -157,78 +163,77 @@ textarea {
 
 				</div>
 
-				<div class="super-section">
+				<div class=" span12 super-section" style="margin-left:0px;width:930px;">
 
-					<a data-toggle="collapse" href="#granteeDetails">
-						<h5>Grantee Details</h5>
-					</a>
-					<div id="granteeDetails" class="section in collapse">
-						<div
-							class="control-group ${hasErrors(bean: projectInstance, field: 'granteeOrganization', 'error')}">
-							<label class="control-label" for="granteeOrganization"><g:message
-									code="project.granteeOrganization.label"
-									default="Grantee Organization" /></label>
+					<h3>Grantee Details</h3>
+											<div class="span4">
+						
+							<div
+								class="control-group ${hasErrors(bean: projectInstance, field: 'granteeOrganization', 'error')}">
+								<label class="control-label" for="granteeOrganization"><g:message
+										code="project.granteeOrganization.label"
+										default="Grantee Organization" /></label>
 
-							<div class="controls">
+								<div class="controls">
 
-								<g:textField name="granteeOrganization"
-									value="${projectInstance?.granteeOrganization}" />
+									<g:textField name="granteeOrganization"
+										value="${projectInstance?.granteeOrganization}" />
+								</div>
 							</div>
-						</div>
 
 
-						<div
-							class="control-group ${hasErrors(bean: projectInstance, field: 'granteeContact', 'error')}">
-							<label class="control-label" for="granteeContact"><g:message
-									code="project.granteeContact.label" default="Primary Contact" /></label>
+							<div
+								class="control-group ${hasErrors(bean: projectInstance, field: 'granteeContact', 'error')}">
+								<label class="control-label" for="granteeContact"><g:message
+										code="project.granteeContact.label" default="Primary Contact" /></label>
 
-							<div class="controls">
+								<div class="controls">
 
-								<g:textField name="granteeContact"
-									value="${projectInstance?.granteeContact}" />
-							</div>
-						</div>
-
-						<div
-							class="control-group ${hasErrors(bean: projectInstance, field: 'granteeEmail', 'error')}">
-							<label class="control-label" for="granteeEmail"><g:message
-									code="project.granteeEmail.label" default="Email" /></label>
-
-							<div class="controls">
-								<div class="input-prepend">
-									<span class="add-on"><i class="icon-envelope"></i></span>
-
-									<g:textField name="granteeEmail"
-										value="${projectInstance?.granteeEmail}" />
+									<g:textField name="granteeContact"
+										value="${projectInstance?.granteeContact}" />
 								</div>
 							</div>
 						</div>
+						<div class="sidebar-section span6">
+							<div
+								class="control-group ${hasErrors(bean: projectInstance, field: 'granteeEmail', 'error')}">
+								<label class="control-label" for="granteeEmail"><g:message
+										code="project.granteeEmail.label" default="Email" /></label>
 
-						<div
-							class="control-group ${hasErrors(bean: projectInstance, field: 'granteeLogo', 'error')}">
+								<div class="controls">
+									<div class="input-prepend">
+										<span class="add-on"><i class="icon-envelope"></i></span>
 
-							<label class="control-label" for="granteeLogo"><g:message
-									code="project.granteeLogo.label" default="GranteeLogo" /></label>
-
-							<div class="controls">
-
-								<g:render template='/UFile/imgUpload'
-									model="['name': 'granteeLogo', 'path': projectInstance?.granteeLogo, 'uploadDir': uploadDir]" />
-
+										<g:textField name="granteeEmail"
+											value="${projectInstance?.granteeEmail}" />
+									</div>
+								</div>
 							</div>
-						</div>
+
+							<div
+								class="control-group ${hasErrors(bean: projectInstance, field: 'granteeLogo', 'error')}">
+
+								<label class="control-label" for="granteeLogo"><g:message
+										code="project.granteeLogo.label" default="GranteeLogo" /></label>
+
+								<div class="controls">
+
+									<g:render template='/UFile/imgUpload'
+										model="['name': 'granteeLogo', 'path': projectInstance?.granteeLogo, 'uploadDir': uploadDir]" />
+
+								</div>
+							</div>
 					</div>
 				</div>
 
 
-
+<div style="clear:both;"></div>
 
 				<div class="super-section">
+				
 
-					<a data-toggle="collapse" href="#projectDetails">
-						<h5>Project Details</h5>
-					</a>
-					<div id="projectDetails" class="section in collapse">
+						<h3>Project Details</h3>
+					<div id="projectDetails" class="section">
 						<div
 							class="control-group ${hasErrors(bean: projectInstance, field: 'granteeFrom', 'error')}">
 
@@ -236,8 +241,9 @@ textarea {
 									code="project.grantFrom.label" default="Grant From" /></label>
 							<div class="controls">
 								<div class="input-prepend">
-									<span class="add-on date-popup"><i class="icon-calendar"></i></span> <input
-										name="grantFrom" type="text" id="grantFrom" class="date-popup"
+									<span class="add-on date-popup"><i class="icon-calendar"></i></span>
+									<input name="grantFrom" type="text" id="grantFrom"
+										class="date-popup"
 										value="${projectInstance?.grantFrom?.format('dd/MM/yyyy')}"
 										placeholder="Select date" />
 								</div>
@@ -250,8 +256,9 @@ textarea {
 									code="project.grantTo.label" default="Grant To" /></label>
 							<div class="controls">
 								<div class="input-prepend">
-									<span class="add-on date-popup"><i class="icon-calendar"></i></span> <input
-										name="grantTo" type="text" id="grantTo" class="date-popup"
+									<span class="add-on date-popup"><i class="icon-calendar"></i></span>
+									<input name="grantTo" type="text" id="grantTo"
+										class="date-popup"
 										value="${projectInstance?.grantTo?.format('dd/MM/yyyy')}"
 										placeholder="Select date" />
 								</div>
@@ -282,11 +289,10 @@ textarea {
 			</div>
 
 			<div class="super-section">
-
-				<a data-toggle="collapse" href="#projectProposalSec">
-					<h5>Project Proposal</h5>
-				</a>
+								<h3>Project Proposal</h3>
+			
 				<div id="projectProposalSec" class="section">
+
 
 					<div
 						class="control-group ${hasErrors(bean: projectInstance, field: 'projectProposal', 'error')}">
@@ -294,7 +300,7 @@ textarea {
 						<label class="control-label" for="projectProposal"><g:message
 								code="project.projectProposal.label" default="Project Proposal" /></label>
 
-						<div class="controls">
+						<div class="controls" style="max-width: 100%;">
 
 							<ckeditor:config var="toolbar_editorToolbar">
 									[
@@ -330,22 +336,20 @@ textarea {
 
 			<div class="super-section">
 
-				<a data-toggle="collapse" href="#projectReportSec">
-					<h5>Project Report</h5>
-				</a>
-				<div id="projectReportSec" class="section in collapse">
+					<h3>Project Report</h3>
+				<div id="projectReportSec" class="section">
 					<div
 						class="control-group ${hasErrors(bean: projectInstance, field: 'projectReport', 'error')}">
 
 						<label class="control-label" for="projectReport"><g:message
 								code="project.projectReport.label" default="Project Report" /></label>
-						<div class="controls">
+						<div class="controls" style="max-width: 100%;" >
 							<ckeditor:config var="toolbar_editorToolbar">
 									[
     									[ 'Bold', 'Italic' ]
 									]
 									</ckeditor:config>
-							<ckeditor:editor name="projectReport" height="200px"
+							<ckeditor:editor name="projectReport" height="200px" width="100%"
 								toolbar="editorToolbar">
 								${projectInstance?.projectReport}
 							</ckeditor:editor>
@@ -373,9 +377,7 @@ textarea {
 
 
 			<div class="super-section">
-				<a data-toggle="collapse" href="#data-links">
-					<h5>Data Contribution</h5>
-				</a>
+					<h3>Data Contribution</h3>
 				<div id="data-links" class="section in collapse">
 					<g:render template="dataLinks"
 						model="['projectInstance':projectInstance]" />
@@ -386,14 +388,12 @@ textarea {
 
 
 			<div class="super-section">
-				<a data-toggle="collapse" href="#miscSec">
-					<h5>Miscelleneous</h5>
-				</a>
+					<h3>Miscellaneous</h3>
 				<div id="miscSec" class="section in collapse">
 					<div
 						class="control-group ${hasErrors(bean: projectInstance, field: 'misc', 'error')}">
 						<label class="control-label" for="misc"><g:message
-								code="project.misc.label" default="Miscelleneous" /></label>
+								code="project.misc.label" default="Miscellaneous" /></label>
 						<div class="controls">
 
 
@@ -416,7 +416,7 @@ textarea {
 						class="control-group ${hasErrors(bean: projectInstance, field: 'miscFiles', 'error')}">
 
 						<label class="control-label" for=miscFiles"><g:message
-								code="project.miscFiles.label" default="Miscelleneous Files" /></label>
+								code="project.miscFiles.label" default="Miscellaneous Files" /></label>
 						<div class="controls file-upload">
 
 

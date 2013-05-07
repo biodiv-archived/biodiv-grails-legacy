@@ -28,13 +28,13 @@
 			${documentInstance?.attribution}
 		</p>
 	</g:if>
-	<g:if test="${documentInstance?.uFile?.license}">
+	<g:if test="${documentInstance?.license}">
 		<p>
 			<b>License:</b>
 			
-							<a class="license" href="${documentInstance?.uFile?.license?.url}" target="_blank"><img
-						src="${createLinkTo(dir:'images/license', file: documentInstance?.uFile?.license?.name.value().toLowerCase().replaceAll('\\s+','')+'.png', absolute:true)}"
-						alt="${documentInstance?.uFile?.license?.name.value()}" /> </a>
+							<a class="license" href="${documentInstance?.license?.url}" target="_blank"><img
+						src="${createLinkTo(dir:'images/license', file: documentInstance?.license?.name.value().toLowerCase().replaceAll('\\s+','')+'.png', absolute:true)}"
+						alt="${documentInstance?.license?.name.value()}" /> </a>
 			
 		</p>
 	</g:if>

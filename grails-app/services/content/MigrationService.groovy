@@ -182,7 +182,7 @@ def migrateProjects() {
 				document.uFile.size = filedata.filesize
 				document.uFile.mimetype = filedata.filemime
 
-				document.uFile.license = License.findByName(License.LicenseType.CC_BY)
+				document.license = License.findByName(License.LicenseType.CC_BY)
 				
 				def metadata = row.metadata
 

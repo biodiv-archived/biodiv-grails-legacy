@@ -2,7 +2,9 @@ import speciespage.search.SpeciesSearchService;
 import speciespage.search.ObservationsSearchService;
 import speciespage.search.NewsletterSearchService;
 import species.SpeciesField.AudienceType;
-import content.search.ProjectSearchService
+import speciespage.search.ProjectSearchService
+import speciespage.search.DocumentSearchService
+
 
 //def speciesSearchService = ctx.getBean("speciesSearchService");
 //speciesSearchService.deleteIndex();
@@ -27,6 +29,6 @@ import content.search.ProjectSearchService
 //projectSearchService.deleteIndex();
 //projectSearchService.publishSearchIndex();
 
-def ufileSearchService = ctx.getBean("UFileSearchService");
-//ufileSearchService.deleteIndex();
-ufileSearchService.publishSearchIndex();
+def documentSearchService = ctx.getBean("documentSearchService");
+documentSearchService.deleteIndex();
+documentSearchService.publishSearchIndex();
