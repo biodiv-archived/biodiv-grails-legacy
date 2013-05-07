@@ -167,7 +167,7 @@ if(r && thumbnail) {
 								</g:if>
 								<g:elseif test="${r.type == ResourceType.VIDEO}">
 									<a href="${r.url }"><span class="video galleryImage">Watch this at YouTube</span></a>
-									<g:imageAttribution model="['resource':video]" />
+									<g:imageAttribution model="['resource':r]" />
 								</g:elseif>
 	
 
@@ -316,6 +316,7 @@ if(r && thumbnail) {
 			maxScaleRatio : 1,
 			minScaleRatio : 1,
                         _toggleInfo: false,
+                        thumbnails:false,
 			youtube : {
                             modestbranding: 1,
                             autohide: 1,

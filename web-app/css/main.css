@@ -1,7 +1,7 @@
 
 #species_main_wrapper .readmore {
 	float: none;
-	margin: 0px;
+        border:0px;
 }
 
 #species_main_wrapper a.readmore {
@@ -180,13 +180,6 @@ th.name {
 	height: 50px;
 	border-radius: 5px;
 	box-shadow: 1px 1px 1px #999999;
-}
-
-.license .icon {
-	width: 80px !important;
-	height: 15px !important;
-	padding: 5px;
-	float: right;
 }
 
 .thumbwrap .icons .icon {
@@ -701,14 +694,6 @@ ul.thumbwrap li a {
 	display: block;
 }
 
-.taxonomyBrowser {
-	background-color: #D4EDC9;
-	border-radius: 5px;
-}
-
-#taxaHierarchy {
-	margin: 10px;
-}
 
 #taxonHierarchy td {
 	height: 30px;
@@ -742,10 +727,6 @@ td input.text:focus {
 
 .ui-icon-control:hover {
 	opacity: 0.9;
-}
-
-#gbox_taxonHierarchy {
-	margin-top: 10px;
 }
 
 .taxaHierarchy {

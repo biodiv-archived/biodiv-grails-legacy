@@ -73,7 +73,7 @@ modules = {
 	}
 
 	gallery {
-		resource url:[dir:'js/galleria/1.2.7/themes/classic/',file:'galleria.classic.css']
+//		resource url:[dir:'js/galleria/1.2.7/themes/classic/',file:'galleria.classic.css']
 		resource url:'/js/galleria/1.2.7/galleria-1.2.7.min.js'
 	}
 
@@ -153,9 +153,11 @@ modules = {
 		resource url:'/css/augmented-maps.css'
 		resource url:[dir:'js/jquery/jquery.jqGrid-4.1.2/css',file:'ui.jqgrid.css']
 		resource url:'/css/bootstrap-wysihtml5-0.0.2.css'
+		resource url:'/css/jquery.tocify.css'
 		
 		resource url:'/js/jquery/jquery.jqGrid-4.1.2/js/i18n/grid.locale-en.js'
 		resource url:'/js/jquery/jquery.jqGrid-4.1.2/js/jquery.jqGrid.src.js'
+		resource url:'/js/jquery/jquery.tocify.min.js'
 		resource url:'/js/galleria/1.2.7/plugins/flickr/galleria.flickr.min.js'
 		//resource url:'/js/jquery.collapser/jquery.collapser.min.js'
 		resource url:'/js/jquery/jquery.jqDock-1.8/jquery.jqDock.min.js'

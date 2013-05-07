@@ -1,10 +1,12 @@
+
+<%@ page import="species.SpeciesField"%>
 <!-- field toolbar -->
 <g:if test="${speciesFieldInstance}">
 	<div style="clear:both;"></div>
 	
 	<div class="toolbar">
 
-		<div class="span6" style="height:40px;margin-left:0px;overflow:hidden">
+		<div class="span4" style="height:40px;margin-left:0px;overflow:hidden">
 			<g:set var="ca" value="${speciesFieldInstance?.attributors?:speciesFieldInstance?.contributors }"></g:set>
 			<g:if test="${ca}">
 				<ul class="tagit" style="list-style:none;display:inline-block;margin-left:0px;width:100%">
@@ -17,7 +19,8 @@
 				</ul>
 			</g:if>
 		</div>
-		<div class="pull-right span4">
+		<div class="pull-right">
+                        <obv:rating model="['resource':speciesFieldInstance]"/>
 			<g:if test="${speciesFieldInstance?.licenses.size() > 0}">
 				<g:each in="${speciesFieldInstance?.licenses}" var="license">
 					<a class="license" href="${license?.url}" target="_blank"><img
@@ -38,13 +41,14 @@
 				<i class=" icon-info-sign"></i>
 			</button>
 			
-                    <obv:rating model="['resource':speciesFieldInstance]"/>
 		</div>
 		<div class="clearfix"></div>
 		<g:showSpeciesFieldAttribution
 			model="['speciesFieldInstance':speciesFieldInstance]" />
-		<g:showSpeciesFieldHelp
-			model="['speciesFieldInstance':speciesFieldInstance]" />
+                <g:if test="${speciesFieldInstance instanceof SpeciesField}">
+        		<g:showSpeciesFieldHelp
+                            model="['field':speciesFieldInstance.field]" />
+                </g:if>
 	</div>
 	
 </g:if>

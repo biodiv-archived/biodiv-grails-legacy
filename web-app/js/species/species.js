@@ -94,8 +94,8 @@ var showOccurence = function(speciesName) {
         loadGoogleMapsAPI(function() {
             var mapOptions = {
                     popup_enabled : true,
-                    toolbar_enabled : true,
-                    bbox : "5801108.428222222,674216.547942332, 12138100.077777777, 4439106.786632658"
+                    toolbar_enabled : true
+                    //bbox : "5801108.428222222,674216.547942332, 12138100.077777777, 4439106.786632658"
             };
             var layersOptions = [ {
                     title : 'Occurrence',
@@ -113,6 +113,7 @@ var showOccurence = function(speciesName) {
             }
             ]
             showMap("map1311326056727", mapOptions, layersOptions)
+            $("#mapSpinner").hide();
         });
 }
 

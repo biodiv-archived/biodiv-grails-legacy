@@ -4,8 +4,11 @@ import grails.util.*
 import org.grails.rateable.*
 import grails.converters.JSON;
 
+import grails.plugins.springsecurity.Secured
+
 class RatingController extends RateableController {
     
+	@Secured(['ROLE_USER'])
     def rate = {
         def rater = evaluateRater()
         Rating.withTransaction {
