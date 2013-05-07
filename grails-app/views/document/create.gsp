@@ -80,8 +80,8 @@ input.dms_field {
 						<div class="controls">
 							<g:select name="type"
 								from="${content.eml.Document$DocumentType?.values()}"
-								keys="${content.eml.Document$DocumentType?.values()*.name()}"
-								value="${documentInstance?.type?.name()}" />
+								keys="${content.eml.Document$DocumentType?.values()*.value()}"
+								value="${documentInstance?.type?.value()}" />
 
 						</div>
 
@@ -302,12 +302,33 @@ input.dms_field {
 		       		var input = $("<input>").attr("type", "hidden").attr("name", "habitat."+index).val(this);
 					$('#documentForm').append($(input));	
 		       	})
+		       					$("#userGroupsList").val(getSelectedUserGroups());	       	
 		       	
 		        $("#documentForm").submit();
 		        return false;
 			});
 			
-						function getSelectedGroup() {
+			
+		$('input:radio[name=groupsWithSharingNotAllowed]').click(function() {
+		    var previousValue = $(this).attr('previousValue');
+    
+    		if(previousValue == 'true'){
+        		$(this).attr('checked', false)
+    		}
+    
+    		$(this).attr('previousValue', $(this).attr('checked'));
+		});
+		
+		function getSelectedUserGroups() {
+		    var userGroups = []; 
+		    $('.userGroups button[class~="btn-success"]').each (function() {
+	            userGroups.push($(this).attr('value'));
+		    });
+		    return userGroups;	
+		}
+		
+			
+		function getSelectedGroup() {
 			    var grp = []; 
 			    $('#speciesGroupFilter button').each (function() {
 			            if($(this).hasClass('active')) {

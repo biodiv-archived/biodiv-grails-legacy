@@ -20,6 +20,7 @@
 	border-top: 5px solid #c2c2c2;
 	border-bottom: 2px solid #c2c2c2;
 	background-color: #ffffff;
+	width:590px;
 }
 
 .project-list-item {

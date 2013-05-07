@@ -105,20 +105,20 @@ def migrateProjects() {
 		// Migrate Data Contribution Intensity to misc
 		proj.misc= row.field_data_contribution_value
 
-		proj.proposalFiles = migrateFiles(sql,'content_field_project_proposal_files',nodeRow.nid, 'field_project_proposal_files_fid', 'field_project_proposal_files_data', DocumentType.PROPOSAL)
-		proj.reportFiles = migrateFiles(sql,'content_field_midterm_assessment_files',nodeRow.nid, 'field_midterm_assessment_files_fid', 'field_midterm_assessment_files_data', DocumentType.REPORT)
+		proj.proposalFiles = migrateFiles(sql,'content_field_project_proposal_files',nodeRow.nid, 'field_project_proposal_files_fid', 'field_project_proposal_files_data', DocumentType.Proposal)
+		proj.reportFiles = migrateFiles(sql,'content_field_midterm_assessment_files',nodeRow.nid, 'field_midterm_assessment_files_fid', 'field_midterm_assessment_files_data', DocumentType.Report)
 		
-		proj.miscFiles =  migrateFiles(sql,'content_field_miscellaneous_files',nodeRow.nid, 'field_miscellaneous_files_fid', 'field_miscellaneous_files_data', DocumentType.MISCELLANEOUS)
+		proj.miscFiles =  migrateFiles(sql,'content_field_miscellaneous_files',nodeRow.nid, 'field_miscellaneous_files_fid', 'field_miscellaneous_files_data', DocumentType.Miscellaneous)
 		
 		
 		//TODO Migrate DataContrib files also to miscFiles
-		def dataContribFiles =  migrateFiles(sql,'content_field_data_contribution_files',nodeRow.nid, 'field_data_contribution_files_fid', 'field_data_contribution_files_data', DocumentType.MISCELLANEOUS)
+		def dataContribFiles =  migrateFiles(sql,'content_field_data_contribution_files',nodeRow.nid, 'field_data_contribution_files_fid', 'field_data_contribution_files_data', DocumentType.Miscellaneous)
 
 		for(dataContribFile in dataContribFiles)
 			proj.addToMiscFiles(dataContribFile)
 		
 
-		def analysisFiles =  migrateFiles(sql,'content_field_analysis_results_files',nodeRow.nid, 'field_analysis_results_files_fid', 'field_analysis_results_files_data', DocumentType.MISCELLANEOUS)
+		def analysisFiles =  migrateFiles(sql,'content_field_analysis_results_files',nodeRow.nid, 'field_analysis_results_files_fid', 'field_analysis_results_files_data', DocumentType.Miscellaneous)
 		for(analysisFile in analysisFiles)
 			proj.addToMiscFiles(analysisFile)	
 		

@@ -1,6 +1,7 @@
 
 
 <%@ page import="content.Project"%>
+<%@ page import="content.eml.Document.DocumentType"%>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -327,7 +328,7 @@ textarea {
 						<div class="controls">
 
 							<fileManager:uploader
-								model="['name':'proposalFiles', 'docs':projectInstance?.proposalFiles, 'sourceHolder': projectInstance, 'fileParams':['uploadDir':uploadDir]]" />
+								model="['name':'proposalFiles', 'docs':projectInstance?.proposalFiles, 'sourceHolder': projectInstance, 'fileParams':['uploadDir':uploadDir, 'type':DocumentType.Proposal.value]]" />
 						</div>
 					</div>
 				</div>
@@ -369,7 +370,7 @@ textarea {
 									%>
 
 							<fileManager:uploader
-								model="['name':'reportFiles', 'docs':projectInstance?.reportFiles, 'sourceHolder': projectInstance, 'fileParams':['uploadDir':uploadDir]]" />
+								model="['name':'reportFiles', 'docs':projectInstance?.reportFiles, 'sourceHolder': projectInstance, 'fileParams':['uploadDir':uploadDir, 'type':DocumentType.Report.value]]" />
 						</div>
 					</div>
 				</div>
@@ -421,7 +422,7 @@ textarea {
 
 
 							<fileManager:uploader
-								model="['name':'miscFiles', 'docs':projectInstance?.miscFiles, 'sourceHolder': projectInstance, 'fileParams':['uploadDir':uploadDir]]" />
+								model="['name':'miscFiles', 'docs':projectInstance?.miscFiles, 'sourceHolder': projectInstance, 'fileParams':['uploadDir':uploadDir, 'type':DocumentType.Miscellaneous.value]]" />
 						</div>
 
 

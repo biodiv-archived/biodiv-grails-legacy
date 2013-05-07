@@ -13,6 +13,8 @@ import grails.util.GrailsNameUtils
 import org.apache.solr.common.SolrException;
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap;
 import org.apache.solr.common.util.NamedList;
+
+import species.participation.Observation;
 import species.utils.Utils;
 
 
@@ -22,7 +24,7 @@ class DocumentService {
 	def userGroupService;
 	def documentSearchService
 	def grailsApplication
-
+	def userGroupsService
 
 
 	Document createDocument(params) {
@@ -360,6 +362,7 @@ class DocumentService {
 		return [query:query,filterQuery:filterQuery, orderByClause:orderByClause, queryParams:queryParams, activeFilters:activeFilters]
 
 	}
+
 
 
 

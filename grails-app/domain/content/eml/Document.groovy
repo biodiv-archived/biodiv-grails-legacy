@@ -17,10 +17,10 @@ class Document implements Taggable {
 
 
 	public enum DocumentType {
-		REPORT("Report"),
-		POSTER("Poster"),
-		PROPOSAL("Proposal"),
-		MISCELLANEOUS("Miscellaneous"),
+		Report("Report"),
+		Poster("Poster"),
+		Proposal("Proposal"),
+		Miscellaneous("Miscellaneous"),
 
 		private String value;
 		
@@ -83,7 +83,7 @@ class Document implements Taggable {
 		
 	}
 	
-	static hasMany ={userGroups:UserGroup}
+	static hasMany =[userGroups:UserGroup]
 	
 	static belongsTo = [SUser, UserGroup]
 	
