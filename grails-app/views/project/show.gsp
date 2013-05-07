@@ -36,7 +36,6 @@
 <body>
 
 
-
 	<div class="body span8" style="padding-left: 20px;">
 
 		<g:if test="${flash.message}">

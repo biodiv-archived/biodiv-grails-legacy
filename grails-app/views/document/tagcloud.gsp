@@ -13,10 +13,17 @@
 </head>
 <body>
 
+
+		<div class="page-header" style="margin-left:20px;">
+			<h1>
+				Document Tags
+			</h1>
+		</div>
+<div style="margin-left:20px">
 			<tc:tagCloud bean="${Document}" controller="Document" action="browser" sort="${true}" style
 				color="${[start: '#084B91', end: '#9FBBE5']}"
 				size="${[start: 12, end: 30, unit: 'px']}" paramName='tag' />
 
-	
+	</div>
 </body>
 </html>

@@ -8,9 +8,6 @@
 			<g:sortableColumn property="title"
 				title="${message(code: 'Document.title.label', default: 'Title')}" />
 
-			<g:sortableColumn property="description"
-				title="${message(code: 'Dcoument.description.label', default: 'Description')}" />
-
 			<g:sortableColumn property="type"
 				title="${message(code: 'Dcoument.type.label', default: 'Document Type')}" />
 
@@ -31,11 +28,9 @@
 					href='${uGroup.createLink(controller: "document", action:"show", id:documentInstance.id, 'userGroupWebaddress':params?.webaddress)}'>
 						${documentInstance.title}
 				</a></td>
-				<td class="ellipsis multiline" style="max-width: 250px;">
-					${documentInstance?.description }
-				</td>
+
 				<td>
-					${fieldValue(bean: documentInstance, field: "type")}
+					${documentInstance?.type?.value }
 				</td>
 				<%
 

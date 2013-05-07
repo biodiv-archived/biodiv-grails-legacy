@@ -16,12 +16,12 @@
 		<br>
 
 	
-		<div style="margin-bottom: 10px;
+		<div class="sidebar_section" style="margin-bottom: 10px;
 border: 1px solid green;
 padding: 5px;">
-	<h4>Document Manager in Beta</h4>
+	<h5>Document Manager in beta</h5>
 
-We have deployed a beta version of the document manager to facilitate sharing ecological datasets and documents with a <a href="http://knb.ecoinformatics.org/software/eml/eml-2.1.1/index.html" target="_blank">eml-2.1.1 metadata</a>. The eml standard has been developed by the ecology discipline and for the ecology discipline. The metadata can be shared and searched globally and has been adopted by the global <a href="http://www.dataone.org/" target="_blank">DataOne</a> project. We will comments and suggestions from users to further develop this function in the portal. 
+We have deployed a beta version of the document manager to facilitate sharing ecological datasets and documents with a <a href="http://knb.ecoinformatics.org/software/eml/eml-2.1.1/index.html" target="_blank">eml-2.1.1 metadata</a>. The eml standard has been developed by the ecology discipline and for the ecology discipline. The metadata can be shared and searched globally and has been adopted by the global <a href="http://www.dataone.org/" target="_blank">DataOne</a> project. We welcome comments and suggestions from users to further develop this function in the portal. 
 	</div>
 
 

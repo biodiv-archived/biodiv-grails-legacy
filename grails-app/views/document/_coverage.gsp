@@ -16,7 +16,7 @@
 		</div>
 	</div>
 
-
+<hr>
 	<div class="section">
 		<h3>Geographical Coverage</h3>
 

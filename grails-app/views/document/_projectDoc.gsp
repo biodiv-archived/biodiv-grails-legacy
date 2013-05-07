@@ -90,7 +90,7 @@
 
 					<a id="selected_license_${docId}"
 						class="btn dropdown-toggle btn-mini" data-toggle="dropdown"> <img
-						src="${documentInstance?.uFile?.license?documentInstance.uFile.license.name.getIconFilename()+'.png':resource(dir:'images/license',file:'cc_by.png', absolute:true)}"
+						src="${documentInstance?.license?documentInstance.license.name.getIconFilename()+'.png':resource(dir:'images/license',file:'cc_by.png', absolute:true)}"
 						title="Set a license for this file" /> <b class="caret"></b>
 					</a>
 

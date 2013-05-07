@@ -5,9 +5,7 @@ import content.eml.UFileService;
 import grails.converters.JSON
 import content.Location
 import grails.plugins.springsecurity.Secured
-import org.grails.taggable.Taggable
-
-
+import org.grails.taggable.*
 
 class ProjectController {
 

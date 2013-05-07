@@ -3,8 +3,7 @@ package content.eml
 import grails.plugins.springsecurity.Secured
 
 import grails.converters.JSON
-import org.grails.taggable.Taggable
-
+import org.grails.taggable.*
 
 class DocumentController {
 
@@ -204,4 +203,13 @@ class DocumentController {
 			return;
 		}
 	}
+	
+	
+	def terms = {
+		log.debug params;
+		params.field = params.field?params.field.replace('aq.',''):"autocomplete";
+		List result = documentService.nameTerms(params)
+		render result.value as JSON;
+	}
+
 }

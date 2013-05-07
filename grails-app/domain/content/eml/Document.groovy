@@ -2,6 +2,7 @@ package content.eml
 
 import java.util.Date;
 
+import species.License;
 import species.auth.SUser;
 import species.groups.UserGroup;
 import org.grails.taggable.Taggable;
@@ -46,6 +47,9 @@ class Document implements Taggable {
 	String description
 	String contributors;
 	String attribution;
+	
+	License license
+	
 
 	//source holder(i.e project, group)
 	Long sourceHolderId;
@@ -75,6 +79,8 @@ class Document implements Taggable {
 		coverage nullable:true
 		description nullable:true
 		doi nullable:true
+		license nullable:true
+		
 	}
 	
 	static hasMany ={userGroups:UserGroup}

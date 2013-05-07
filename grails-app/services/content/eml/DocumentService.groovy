@@ -21,6 +21,7 @@ class DocumentService {
 	static transactional = false
 	def userGroupService;
 	def documentSearchService
+	def grailsApplication
 
 
 
@@ -78,7 +79,7 @@ class DocumentService {
 		def docs = []
 		def docsList = (params.documents != null) ? Arrays.asList(params.documents) : new ArrayList()
 		for(docId in docsList) {
-			def documentInstance = Document.get(fileId)
+			def documentInstance = Document.get(docId)
 			if(!params."${docId}.deleted") {
 				if(params."${docId}.title") {
 					documentInstance.title = params."${docId}.title"
@@ -96,8 +97,8 @@ class DocumentService {
 					documentInstance.attribution = params."${docId}.attribution"
 				}
 
-				if(params."${docId}.uFile.license") {
-					documentInstance.uFile.license = params."${docId}.uFile.license"
+				if(params."${docId}.license") {
+					documentInstance.license = params."${docId}.license"
 				}
 
 				if(params."${docId}.tags") {
