@@ -246,7 +246,7 @@ class ObservationTagLib {
                     name="${name}" value="3" title="OK"  ${(averageRating==3)?'checked':''} /> <input class="star"
                     type="radio" name="${name}" value="4" title="Good"  ${(averageRating==4)?'checked':''} /> <input
                     class="star" type="radio" name="${name}" value="5" title="Best"  ${(averageRating==5)?'checked':''} />
-                    <div class="noOfRatings">(${resource.totalRatings ?: 0} ratings)</div>
+                    <div class="noOfRatings">(${resource.totalRatings ?: 0} rating${resource.totalRatings!=1?'s':''})</div>
                 """
             if(!hideForm) {
                 out << "</form>"
@@ -278,9 +278,9 @@ class ObservationTagLib {
             String name = index?(resource.id?'rating_'+index:'rating_{{>i}}'):'rating'
 
             out << """
-                    <input class="star required" type="radio" name="${name}" value="1"
-                    title="Like" ${(userRating==1)?'checked':''} />
-                    <div class="noOfRatings">(${resource.totalRatings ?: 0} ratings)</div>
+                    <input class="star like required  icon-thumbs-up" type="radio" name="${name}" value="1"
+                    title="Like" ${(userRating==1)?'checked':''} ></input>
+                    <div class="noOfRatings">(${resource.totalRatings ?: 0} like${resource.totalRatings!=1?'s':''})</div>
                 """
             if(!hideForm) {
                 out << "</form>"

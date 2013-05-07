@@ -106,7 +106,7 @@ if(r && thumbnail) {
 							<a class="btn btn-success pull-right"
 				href="${uGroup.createLink(
 						controller:'observation', action:'create', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"
-				class="btn btn-info" style="margin-top: 10px; margin-bottom: 10px; margin-left: 5px;"> <i class="icon-plus"></i>Add an Observation</a>
+				class="btn btn-info" style="margin-top: 10px;margin-bottom:-1px; margin-left: 5px;"> <i class="icon-plus"></i>Add an Observation</a>
 						<div style="float:right;margin:10px 0;">
 							<sUser:ifOwns model="['user':observationInstance.author]">
 								
@@ -123,7 +123,7 @@ if(r && thumbnail) {
 					</div>
 					<div style="clear:both;"></div>
 					<g:if test="${params.pos && lastListParams}">
-						<div class="nav" style="width:100%;">
+						<div class="nav" style="width:100%;margin-top: 10px;">
 							<g:if test="${test}">
 								<a class="pull-left btn ${prevObservationId?:'disabled'}" href="${uGroup.createLink([action:"show", controller:"observation", id:prevObservationId, 'pos':params.int('pos')-1, 'userGroupWebaddress':(userGroup?userGroup.webaddress:userGroupWebaddress)])}"><i class="icon-backward"></i>Prev</a>
 								<a class="pull-right  btn ${nextObservationId?:'disabled'}"  href="${uGroup.createLink([action:"show", controller:"observation",
@@ -167,7 +167,7 @@ if(r && thumbnail) {
 								</g:if>
 								<g:elseif test="${r.type == ResourceType.VIDEO}">
 									<a href="${r.url }"><span class="video galleryImage">Watch this at YouTube</span></a>
-									<g:imageAttribution model="['resource':video]" />
+									<g:imageAttribution model="['resource':r]" />
 								</g:elseif>
 	
 
@@ -316,6 +316,7 @@ if(r && thumbnail) {
 			maxScaleRatio : 1,
 			minScaleRatio : 1,
                         _toggleInfo: false,
+                        thumbnails:false,
 			youtube : {
                             modestbranding: 1,
                             autohide: 1,

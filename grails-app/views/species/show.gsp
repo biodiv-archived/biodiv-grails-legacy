@@ -121,8 +121,14 @@ $(document).ready(function(){
 		substr_len : 400,
 		more_link : '<a class="more readmore">&nbsp;More</a>'
 	});
-
-	if($("#resourceTabs-1 img").length > 0) {
+        
+        $("#toc").tocify({
+            selectors:'h5,h6',
+        }).data("toc-tocify");
+        
+        //$("#tocContainer").affix();
+        
+        if($("#resourceTabs-1 img").length > 0) {
 	
 		//TODO:load gallery  images by ajax call getting response in json  
 		$('.gallery').galleria({
@@ -133,7 +139,8 @@ $(document).ready(function(){
 			image_pan_smoothness : 5,
 			showInfo : true,
 			dataSelector : ".galleryImage",
-			debug : true,
+                        debug : false,
+                        thumbnails:false,
 			thumbQuality : false,
 			maxScaleRatio : 1,
                         minScaleRatio : 1,
@@ -167,7 +174,7 @@ $(document).ready(function(){
  
 		});	
                 Galleria.ready(function() {
-                    $("#spinner").hide();
+                    $("#gallerySpinner").hide();
                     $("#resourceTabs").css('visibility', 'visible');
                 });
 			
@@ -268,11 +275,11 @@ $(document).ready(function(){
             
      if(${sparse}) {
     	 if(occurrenceCount > 0) {
-    		 showOccurence('${speciesName}');
-    		 $("#map .message").html("Showing "+occurrenceCount+" occurrence records for <i>${speciesName}</i>.");
+            showOccurence('${speciesName}');
+            //$("#map .message").html("Showing "+occurrenceCount+" occurrence records for <i>${speciesName}</i>.");
     	} else {
-    		$("#map .message").html("Currently no occurrence records for <i>${speciesName}</i> is available on the portal.");
-    		$('#map1311326056727').hide();
+            //$("#map .message").html("Currently no occurrence records for <i>${speciesName}</i> is available on the portal.");
+            //$('#map1311326056727').hide();
     	}
      } else {
     	 showSpeciesConcept($(".defaultSpeciesConcept").attr("id"))
@@ -313,7 +320,7 @@ $(document).ready(function(){
 	} catch(e) {
   		console.log(e)
 	}  	
-  	
+
 <%--  	//init editables --%>
 <%--$('.myeditable').editable({--%>
 <%--    url: '/post' //this url will not be used for creating new user, it is only for update--%>
@@ -376,6 +383,7 @@ $(document).ready(function(){
 <%--$("#contributeVideo").click(function(){--%>
 <%--	$(this).next("#contributeVideoForm").toggle();--%>
 <%--});--%>
+
 });
 
 </r:script>
@@ -393,7 +401,6 @@ $(document).ready(function(){
 <body>
 
 <div class="span12">
-	<div class="container_16 outer_wrapper">
 			<s:showSubmenuTemplate model="['entityName':speciesInstance.taxonConcept.italicisedForm , 'subHeading':CommonNames.findByTaxonConceptAndLanguage(speciesInstance.taxonConcept, Language.findByThreeLetterCode('eng'))?.name, 'headingClass':'sci_name']"/>
 			
 			<div class="pull-right" style="margin-top:-40px; margin-right: 12px;"><feed:follow model="['sourceObject':speciesInstance]" /></div>					
@@ -405,11 +412,13 @@ $(document).ready(function(){
 					
 				</div>
 			</g:if>
+
+
 			<!-- media gallery -->
-			<div class="grid_10">
-				<div style="padding-bottom:10px;background-color:white;height:475px;">
+			<div class="span8 right-shadow-box" style="margin:0px;">
+				<div style="padding-bottom:10px;height:430px;">
                                     <center>
-                                        <div id="spinner" class="spinner">
+                                        <div id="gallerySpinner" class="spinner">
                                         <img src="${resource(dir:'images',file:'spinner.gif', absolute:true)}"
                                             alt="${message(code:'spinner.alt',default:'Loading...')}" />
                                         </div>
@@ -465,10 +474,9 @@ $(document).ready(function(){
 				<!--  static species content -->
 				</div>
 				
-	
 				
 				<!-- species page icons -->
-				<div>
+				<div style="margin:5px 0px;">
 					<s:showSpeciesExternalLink model="['speciesInstance':speciesInstance]"/>
 					<div class="observation-icons">		
 						<img class="group_icon species_group_icon"  
@@ -481,7 +489,7 @@ $(document).ready(function(){
                                                 <obv:like model="['resource':speciesInstance]"/>
 					</div>
 				</div>
-				<div>
+				<div style="margin:5px 0px;">
 					<g:each in="${speciesInstance.getIcons()}" var="r">
 							<%def imagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.thumbnail.suffix)%>
 							<img class="icon group_icon" href="${href}"
@@ -489,27 +497,13 @@ $(document).ready(function(){
 								title="${r?.description}" />
 					</g:each>
 				</div>
-			</div>
+                                <div class="readmore sidebar_section">
+				    ${speciesInstance.findSummary() }
+				</div>
 
-			<div class="grid_6 classifications" style="width:330px;margin-left:0px;">
-					<t:showTaxonBrowser model="['speciesInstance':speciesInstance, 'expandSpecies':true, 'expandAll':false, 'speciesId':speciesInstance.taxonConcept?.id, expandAllIcon:false]"/>
-					<br />
-	
-					<div class="readmore" style="float:left;">
-						${speciesInstance.findSummary() }
-					</div>
-			</div>
-	
-			
-		</div>
-		<br />
-
-		<!-- species toc and content -->
-		<div class="container_16" id="content">
-			<div class="grid_16" style="float:left;margin-right: .3em;">
 				<%def nameRecords = fields.get(grailsApplication.config.speciesPortal.fields.NOMENCLATURE_AND_CLASSIFICATION)?.get(grailsApplication.config.speciesPortal.fields.TAXON_RECORD_NAME).collect{it.value.get('speciesFieldInstance')[0]} %>
 				<g:if test="${nameRecords}">
-				<div class="sidebar_section">
+				<div class="sidebar_section" style="clear:both;">
 					<a class="speciesFieldHeader"  data-toggle="collapse" href="#taxonRecordName">
 						<h5>Taxon Record Name</h5>
 					</a>
@@ -611,10 +605,6 @@ $(document).ready(function(){
 				
 			
 			
-			</div>
-			
-			
-			<div id="fieldstoc" class="<%=sparse?'grid_16':'grid_4'%>">
 				<ul style="list-style: none;margin:0px;">
 					<g:each in="${fields}" var="concept">
 						<g:if
@@ -638,23 +628,57 @@ $(document).ready(function(){
 					</g:each>
 				</ul>
 					
-				<div class="union-comment">
-				<feed:showAllActivityFeeds model="['rootHolder':speciesInstance, feedType:'Specific', refreshType:'manual', 'feedPermission':'editable']" />
-				<%
-					def canPostComment = true //customsecurity.hasPermissionAsPerGroups([object:speciesInstance, permission:org.springframework.security.acls.domain.BasePermission.WRITE]).toBoolean()
-				%>
-				<comment:showAllComments model="['commentHolder':speciesInstance, commentType:'super', 'canPostComment':canPostComment, 'showCommentList':false]" />
-			</div>
 			</div>			
 			
 			<g:if test="${!sparse}">
 				<div id="speciesFieldContainer" class="grid_12"></div>
 			</g:if>
 
-			
+	                <!-- right side bar -->
+			<div class="span4 classifications">
+                            <div id="tocContainer" class="sidebar_section">
+                                <h5> Contents </h5>
+                                <div id="toc" class="tile"></div>
+                            </div>
 
-	</div>
+
+                            <t:showTaxonBrowser model="['speciesInstance':speciesInstance, 'expandSpecies':true, 'expandAll':false, 'speciesId':speciesInstance.taxonConcept?.id, expandAllIcon:false]"/>
+                            <br />
+                            <div id="map" class="sidebar_section">
+                                <h5>Occurrence Map</h5>
+                                    <div id="mapSpinner" class="spinner">
+                                        <center>
+                                            <img src="${resource(dir:'images',file:'spinner.gif', absolute:true)}"
+                                                alt="${message(code:'spinner.alt',default:'Loading...')}" />
+                                        </center>
+                                    </div>
+
+
+                               <div id="map1311326056727" class="occurenceMap"
+                                    style="height: 350px; width: 100%"></div>
+                                <div class="alert alert-info">
+                                The current map showing distribution of species is only indicative.
+                                </div>
+ 
+                                <comment:showCommentPopup model="['commentHolder':[objectType:ActivityFeedService.SPECIES_MAPS, id:speciesInstance.id], 'rootHolder':speciesInstance]" />	
+
+                            </div>
+
+                           <div class="sidebar_section">
+                                <h5> Activity </h5>
+                                    <div class="union-comment">
+                                        <feed:showAllActivityFeeds model="['rootHolder':speciesInstance, feedType:'Specific', refreshType:'manual', 'feedPermission':'editable']" />
+                                            <%
+                                            def canPostComment = true //customsecurity.hasPermissionAsPerGroups([object:speciesInstance, permission:org.springframework.security.acls.domain.BasePermission.WRITE]).toBoolean()
+                                            %>
+                                            <comment:showAllComments model="['commentHolder':speciesInstance, commentType:'super', 'canPostComment':canPostComment, 'showCommentList':false]" />
+                                    </div>
+                            </div>
+ 
+                        </div>
+
 		
+
 </div>		
 			
 <g:javascript>

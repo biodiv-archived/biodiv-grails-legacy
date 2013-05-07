@@ -532,8 +532,7 @@ ul#recoSummary {
 	border: 1px solid #CECECE;
 }
 
-.sidebar_section h5 {
-	
+.sidebar_section h5  {
 	background: rgba(106, 201, 162, 0.2);
 	background: transparent\9;
 	-ms-filter:
@@ -1021,10 +1020,10 @@ li.reco_block {
 	line-height: 0px;
 }
 
-ul,ol {
+/*ul,ol {
 	padding: 0;
 	margin: 0 0 10px 10px;
-}
+}*/
 
 .tooltip {
 	padding: 5px;
@@ -1119,12 +1118,20 @@ span.cke_skin_kama {
     zoom: 1;
 }
 
-.galleria-info {
-    width: 100%;
+.galleria-info-description {
+    color:black;
 }
 
-.galleria-info-description {
-    color:white;
+.galleria-info {
+    width: 100%;
+    top: 350px;
+    z-index: 2;
+    position: absolute;
+    background-color: white;
+    overflow:hidden;
+}
+.galleria-info-text {
+    padding:2px;
 }
 
 .notes_view { /* clear: both; */
@@ -1890,3 +1897,17 @@ div.noOfRatings {
     left: 150px;
     color: black;
 }
+.ui-tabs .ui-tabs-panel {
+    padding:0em 0em;
+}
+.ui-tabs {
+    padding: 0em;
+}
+.license .icon {
+	width: 80px !important;
+	height: 15px !important;
+	padding: 5px;
+	float: right;
+}
+
+

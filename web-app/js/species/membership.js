@@ -239,11 +239,7 @@ function loadYoutube(youtube_container) {
 }
 
 function rating() {
-    var imgRating = rate($(".rating"), function(avgRate, noOfRatings, ratingContainer){
-            imgRating.select(avgRate);
-            ratingContainer.find(".noOfRatings").html('('+noOfRatings+' ratings)');
-        });
-
+    var imgRating = rate($(".rating"), updateRating);
 }
 
 function last_actions() {

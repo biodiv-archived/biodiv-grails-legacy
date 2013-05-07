@@ -71,17 +71,6 @@
 										test="${category.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.OCCURRENCE_RECORDS)}">
 										<g:showSpeciesFieldToolbar model="${category.value[0]}" />
 										<br />
-										<div id="map">
-										<div class=" message ui-state-highlight ui-corner-all">
-											This is a
-											demo map component to show the distribution of the species.
-											The current map is only indicative.<br/>
-										</div>
-										<br />
-										<div id="map1311326056727" class="occurenceMap"
-											style="height: 600px; width: 100%"></div>
-										<comment:showCommentPopup model="['commentHolder':[objectType:ActivityFeedService.SPECIES_MAPS, id:speciesInstance.id], 'rootHolder':speciesInstance]" />	
-										</div>
 <%--										--%>
 <%--										<obv:showObservationsList  model="['observationInstanceList':observationInstanceList, 'instanceTotal':instanceTotal, 'queryParams':queryParams, 'activeFilters':activeFilters, 'userGroupWebaddress':userGroupWebaddress]"  />--%>
 				

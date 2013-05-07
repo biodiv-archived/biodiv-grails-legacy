@@ -736,6 +736,7 @@ environments {
 	}
 }
 
+/*
 navigation.species_dashboard = [
         [controller:'species', title:'Species Gallery', order:1, action:"list"],
         [controller:'species', title:'Taxonomy Browser', order:10, action:'taxonBrowser'],
@@ -783,6 +784,7 @@ navigation.dashboard = [
 	[group:'users', order:50, controller:'SUser', title:'Users', action:'list'],
 	[group:'search', order:60, controller:'search', title:'Advanced Search', action:'advSelect'],
 ]
+*/
 
 jquery {
 	sources = 'jquery'
@@ -1112,8 +1114,7 @@ grails.plugins.springsecurity.controllerAnnotations.staticRules = [
 	'/requestmap/**': ['ROLE_ADMIN'],
 	'/securityInfo/**': ['ROLE_ADMIN'],
 	'/securityInfo/**': ['ROLE_ADMIN'],
-    '/rateable/rate/**': ['ROLE_USER'],
-    '/rating/rate/**': ['ROLE_USER']
+    '/rateable/rate/**': ['ROLE_USER']
  ]
 
 

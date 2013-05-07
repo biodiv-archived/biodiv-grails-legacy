@@ -65,9 +65,13 @@
 }
 .galleria-info {
     width: 100%;
-    top: 15px;
+    top: 350px;
     z-index: 2;
     position: absolute;
+    overflow: hidden;
+    scroll: auto;
+    background-color: white;
+/*    height: 50px;*/
 }
 .galleria-info-text {
     background-color: rgba(0, 0, 0, 0.1);
@@ -89,7 +93,7 @@
 .galleria-info-description {
     font: italic 12px/1.4 georgia,serif;
     margin: 0;
-    color: #bbb;
+    color: black;
 }
 .galleria-info-close {
     width: 9px;

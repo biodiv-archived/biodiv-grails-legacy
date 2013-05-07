@@ -315,6 +315,7 @@ class SpeciesController {
 	}
 
     private sortAsPerRating(List fields) {
+        if(!fields) return;
         fields.sort( { a, b -> b.averageRating <=> a.averageRating } as Comparator )
     }
 

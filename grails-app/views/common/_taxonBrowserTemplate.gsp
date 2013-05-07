@@ -102,8 +102,8 @@ var heirarchyLevelFormatter = function(el, cellVal, opts) {
 </r:script>
 
 
-<div class="taxonomyBrowser" style="position: relative;">
-	
+<div class="taxonomyBrowser sidebar_section" style="position: relative;">
+        <h5>Classifications</h5>	
 		<g:if test="${speciesInstance}">
 			<g:set var="classifications" value="${speciesInstance.classifications()}" />
 		</g:if><g:else>
@@ -133,8 +133,5 @@ var heirarchyLevelFormatter = function(el, cellVal, opts) {
 			</div>
 		</div>
 	
-
-	<br />
-
 	<table id="taxonHierarchy"></table>
 </div>
