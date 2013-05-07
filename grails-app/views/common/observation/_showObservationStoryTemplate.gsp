@@ -12,13 +12,16 @@
 </style>
 <div class="observation_story" style="${showDetails?'':'overflow:visible;width:100%'}">
     <div>
-        <g:if test="${showDetails}">
-        <%
+    	<%
         def speciesInstance = Species.read(observationInstance.maxVotedReco?.taxonConcept?.findSpeciesId())
         %>
-        <s:showSpeciesExternalLink model="['speciesInstance':speciesInstance]"/>
-            </g:if>
+        <g:if test="${showDetails}">
+        	<s:showSpeciesExternalLink model="['speciesInstance':speciesInstance]"/>
+        </g:if>
             <div class="observation-icons">
+            	<g:if test="${showDetails && speciesInstance && speciesInstance.taxonConcept?.threatenedStatus}">
+					<s:showThreatenedStatus model="['threatenedStatus':speciesInstance.taxonConcept?.threatenedStatus]"/>
+				</g:if>
                 <span
                     class="group_icon species_groups_sprites active ${observationInstance.group.iconClass()}"
                     title="${observationInstance.group?.name}"></span>
