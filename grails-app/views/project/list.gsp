@@ -7,7 +7,7 @@
 <g:set var="entityName"
 	value="${message(code: 'project.label', default: 'Project')}" />
 <title><g:message code="default.list.label" args="[entityName]" /></title>
-<r:require modules="add_file" />
+<r:require modules="content_view" />
 
 <style>
 <!--
@@ -50,18 +50,16 @@
 						</div>
 
 					</g:each>
-
-
-					<% params['isGalleryUpdate'] = false; %>
-					<div class="paginateButtons centered">
-						<p:paginate controller="project" action="list"
-							total="${projectInstanceTotal}" userGroup="${userGroup}"
-							userGroupWebaddress="${userGroupWebaddress}" params="${params}"
-							max="${params.max }" offset="${params.offset}" maxsteps="10" />
-					</div>
-
-
 				</div>
+
+				<% params['isGalleryUpdate'] = false; %>
+				<div class="paginateButtons centered">
+					<p:paginate controller="project" action="list"
+						total="${projectInstanceTotal}" userGroup="${userGroup}"
+						userGroupWebaddress="${userGroupWebaddress}" params="${params}"
+						max="${queryParams.max }" maxsteps="10" />
+				</div>
+
 			</div>
 		</div>
 		<g:render template="/project/projectSidebar" />

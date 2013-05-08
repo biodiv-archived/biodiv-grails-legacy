@@ -30,8 +30,8 @@
 			placeholder="Search by Keywords" value="${params.keywords}" />
 
 		<g:hiddenField name="offset" value="0" />
-		<g:hiddenField name="max" value="12" />
-		<g:hiddenField name="fl" value="id" />
+	<%--	<g:hiddenField name="max" value="12" /> --%>
+	<%--	<g:hiddenField name="fl" value="id" />  --%>
 
 
 	<div class="form-action">
