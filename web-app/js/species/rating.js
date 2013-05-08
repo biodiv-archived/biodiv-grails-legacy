@@ -2,6 +2,7 @@ $(document).ready(function(){
     $.fn.raty.defaults.path = window.params.imagesPath 
     $.fn.raty.defaults.scoreName = 'rating'
     $.fn.raty.defaults.cancel = false
+    $.fn.raty.defaults.space = false
 });
 
 function rateCallback(ele, successHandler) {

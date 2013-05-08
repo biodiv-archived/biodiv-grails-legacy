@@ -846,10 +846,7 @@ if(r && thumbnail) {
 					$('.geotagged_image', this).load(function(){
 						update_geotagged_images_list($(this));		
 					});
-                                        var imgRating = rate($(this), function(avgRate, noOfRatings, $ratingContainer){
-                                            imgRating.select(avgRate);
-                                            $ratingContainer.find(".noOfRatings").html('('+noOfRatings+' ratings)')
-                                        });
+                                        rate($(this).find('.star_rating'))
 				})
 				$( "#imagesList li:last" ).before (metadataEle);
 
@@ -893,11 +890,6 @@ if(r && thumbnail) {
            
 
      	});  
-		     var imgRating = rate($(".rating"), function(avgRate, noOfRatings){
-                        imgRating.select(avgRate);
-                        $(this).find(".noOfRatings").html('('+noOfRatings+' ratings)')
-                    });
-
 
         $(".group_option").click(function(){
                 $("#group_id").val($(this).val());
