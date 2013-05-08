@@ -10,7 +10,7 @@
 		<p:paginate controller="document" action="browser"
 			total="${documentInstanceTotal}" userGroup="${userGroup}"
 			userGroupWebaddress="${userGroupWebaddress}" params="${params}"
-			max="${params.max }" offset="${params.offset}" maxsteps="10" />
+			max="${queryParams.max }" maxsteps="12" />
 	</div>
 
 </div>
