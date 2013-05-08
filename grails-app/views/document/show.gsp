@@ -10,27 +10,48 @@
 <r:require modules="content_view" />
 </head>
 <body>
-	<div class="span8">
-		<clist:showSubmenuTemplate
-			model="['entityName':documentInstance.title, 'subHeading':documentInstance.attribution]" />
-		<div style="float: right; margin: -50px 0;">
-			<sUser:ifOwns model="['user':documentInstance?.author]">
+	<div class="span12">
 
-				<a class="btn btn-primary pull-right"
-					href="${uGroup.createLink(controller:'document', action:'edit', id:documentInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
-					<i class="icon-edit"></i>Edit
+
+		<div class="page-header clearfix">
+			<div style="width: 100%;">
+				<div class="span8 main_heading" style="margin-left: 0px;">
+					<s:showHeadingAndSubHeading
+						model="['heading':documentInstance.title, 'subHeading':documentInstance.attribution, 'headingClass':headingClass, 'subHeadingClass':subHeadingClass]" />
+
+				</div>
+				<a class="btn btn-success pull-right"
+					href="${uGroup.createLink(
+						controller:'document', action:'create', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"
+					class="btn btn-info"
+					style="margin-top: 10px; margin-bottom: -1px; margin-left: 30px;">
+					<i class="icon-plus"></i>Add Document
 				</a>
 
-				<a class="btn btn-danger btn-primary pull-right"
-					style="margin-right: 5px; margin-bottom: 10px;"
-					href="${uGroup.createLink(controller:'document', action:'flagDeleted', id:documentInstance.id)}"
-					onclick="return confirm('${message(code: 'default.document.delete.confirm.message', default: 'This document will be deleted. Are you sure ?')}');"><i
-					class="icon-trash"></i>Delete</a>
+				<div style="float: right; margin: 10px 0;">
+					<sUser:ifOwns model="['user':documentInstance.author]">
 
-			</sUser:ifOwns>
+						<a class="btn btn-primary pull-right"
+							href="${uGroup.createLink(controller:'document', action:'edit', id:documentInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
+							<i class="icon-edit"></i>Edit
+						</a>
+
+						<a class="btn btn-danger btn-primary pull-right"
+							style="margin-right: 5px; margin-bottom: 10px;"
+							href="${uGroup.createLink(controller:'document', action:'flagDeleted', id:documentInstance.id)}"
+							onclick="return confirm('${message(code: 'default.document.delete.confirm.message', default: 'This document will be deleted. Are you sure ?')}');"><i
+							class="icon-trash"></i>Delete</a>
+
+					</sUser:ifOwns>
+				</div>
+			</div>
+
 		</div>
-		<div class="body right-shadow-box"
-			style="padding-left: 20px; padding-right: 5px;">
+
+
+
+		<div class="span8 right-shadow-box"
+			style=" padding-right: 5px;">
 
 
 			<div style="height: 50px;">
@@ -215,22 +236,22 @@
 
 
 			<g:if test="${documentInstance.userGroups}">
-						<div class="sidebar_section">
-							<h5>Document is in groups</h5>
-								<ul class="tile" style="list-style:none; padding-left: 10px;">
-									<g:each in="${documentInstance.userGroups}" var="userGroup">
-										<li class="">
-											<uGroup:showUserGroupSignature  model="[ 'userGroup':userGroup]" />
-										</li>
-									</g:each>
-								</ul>
-								
-						</div>
-					</g:if>
+				<div class="sidebar_section">
+					<h5>Document is in groups</h5>
+					<ul class="tile" style="list-style: none; padding-left: 10px;">
+						<g:each in="${documentInstance.userGroups}" var="userGroup">
+							<li class=""><uGroup:showUserGroupSignature
+									model="[ 'userGroup':userGroup]" /></li>
+						</g:each>
+					</ul>
+
+				</div>
+			</g:if>
 
 		</div>
+		<g:render template="/document/documentSidebar" />
+
 	</div>
 
-	<g:render template="/document/documentSidebar" />
 </body>
 </html>

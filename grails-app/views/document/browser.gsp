@@ -15,22 +15,20 @@
 </style>
 </head>
 <body>
-	<div class="page-header" style="margin-left: 20px;">
-		<h1>Browse Documents</h1>
-		<g:if test="${flash.message}">
-			<div class="message">
-				${flash.message}
-			</div>
-		</g:if>
 
-
+	<div class="span12">
+		<g:render template="/document/documentSubMenuTemplate" model="['entityName':'Browse Documents']" />
+		<uGroup:rightSidebar/>
+		
 
 		<div class="document-list span8 right-shadow-box" style="padding-right:5px;">
 			<g:render template="/document/search" model="['params':params]" />
 
 			<g:render template="/document/documentListTemplate" />
 		</div>
+		
+			<g:render template="/document/documentSidebar" />
 	</div>
-	<g:render template="/document/documentSidebar" />
+
 </body>
 </html>
