@@ -35,21 +35,10 @@ input.dms_field {
 </style>
 </head>
 <body>
-
-	<div class="body" style="margin-left: 20px;">
-		<h1>
-			<g:message code="default.create.label" args="[entityName]" />
-		</h1>
-		<g:if test="${flash.message}">
-			<div class="message">
-				${flash.message}
-			</div>
-		</g:if>
-		<g:hasErrors bean="${documentInstance}">
-			<div class="errors">
-				<g:renderErrors bean="${documentInstance}" as="list" />
-			</div>
-		</g:hasErrors>
+	<div class="span12 observation_create">
+		<g:render template="/document/documentSubMenuTemplate" model="['entityName':'Add Document']" />
+		<uGroup:rightSidebar/>
+		
 
 		<% 
 				def form_action = uGroup.createLink(action:'save', controller:'document', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)
@@ -245,7 +234,7 @@ input.dms_field {
 
 
 
-			<div  style="margin-top: 20px; margin-bottom: 40px;">
+			<div class="span12" style="margin-top: 20px; margin-bottom: 40px;">
 
 				<g:if test="${documentInstance?.id}">
 					<a
@@ -270,7 +259,7 @@ input.dms_field {
 					</div>
 				</g:if>
 				<button id="documentFormSubmit" type="submit"
-					class="btn btn-primary" style="float: right; margin-right: 30px;">Save</button>
+					class="btn btn-primary" style="float: right; margin-right: 5px;">Add Document</button>
 			</div>
 
 		</form>

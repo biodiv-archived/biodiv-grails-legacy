@@ -40,8 +40,10 @@ textarea {
 </head>
 <body>
 
-	<div class="body" style="margin-left: 20px;">
-
+        <div class="span12 observation_create">
+		<g:render template="/project/projectSubMenuTemplate" model="['entityName':'Add Project']" />
+		<uGroup:rightSidebar/>
+		
 		<%
                 def form_action = uGroup.createLink(action:'save', controller:'project', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)
 				def form_title = "Create Project"				
@@ -432,8 +434,7 @@ textarea {
 
 
 
-	<div class="form-actions">
-
+	<div class="span12" style="margin-top: 20px; margin-bottom: 40px;">
 
 		<g:if test="${projectInstance?.id}">
 			<a
@@ -448,7 +449,7 @@ textarea {
 		</g:else>
 
 		<button type="submit" class="btn btn-primary"
-			style="float: right; margin-right: 30px;">
+			style="float: right; margin-right: 5px;">
 			${form_button_name}
 		</button>
 	</div>
