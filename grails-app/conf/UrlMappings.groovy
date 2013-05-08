@@ -128,5 +128,13 @@ class UrlMappings {
             controller = "rating"
             action = "rate"
         }
+        "/rating/fetchRate/$id" {
+            controller = "rating"
+            action = "fetchRate"
+        }
+        "/rating/$action/$id" {
+            controller = "rateable"
+        }
+ 
 	}
 }

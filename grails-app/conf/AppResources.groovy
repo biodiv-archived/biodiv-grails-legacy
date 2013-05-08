@@ -33,7 +33,7 @@ modules = {
 //		resource url:[dir:'css',file:'jquery.safari-checkbox.css',plugin:'spring-security-ui']
 //		resource url:'/css/text.css'
 		resource url:'/css/navigation.css'
-		resource url:'/css/jquery.rating.css'
+//		resource url:'/css/jquery.rating.css'
 		resource url:'/css/daterangepicker.css'
 		resource url:'/css/speciesGroups.css'
 		resource url:'/css/habitats.css'
@@ -46,7 +46,8 @@ modules = {
 		resource url:'/js/species/util.js'
 		resource url:'/js/readmore/readmore.js'
 		resource url:'/js/jquery/jquery.form.js'
-		resource url:'/js/jquery/jquery.rating.js'
+//		resource url:'/js/jquery/jquery.rating.js'
+		resource url:'/js/jquery/jquery.raty.js'
 		resource url:'/js/species/rating.js'
 		resource url:'/js/jquery/jquery.cookie.js'
 		//resource url:'/js/jquery/jquery.checkbox.js'

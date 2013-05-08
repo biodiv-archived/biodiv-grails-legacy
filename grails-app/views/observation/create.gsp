@@ -181,7 +181,7 @@ if(r && thumbnail) {
 												<input name="file_${i}" type="hidden" value='${r.fileName}' />
 												<input name="url_${i}" type="hidden" value='${r.url}' />
 												<input name="type_${i}" type="hidden" value='${r.type}'/>
-                                                                                                <obv:rating model="['resource':r, 'hideForm':true, index:i]"/>
+                                                                                                <obv:rating model="['resource':r, class:'obvcreate', 'hideForm':true, index:i]"/>
 												<g:if test="${r.type == ResourceType.IMAGE}">
 												<div id="license_div_${i}" class="licence_div pull-left dropdown">
 
@@ -653,7 +653,7 @@ if(r && thumbnail) {
 	            <input name="url_{{>i}}" type="hidden" value='{{>url}}'/>
 				<input name="type_{{>i}}" type="hidden" value='{{>type}}'/>
                                  <%def r = new Resource();%>
-                                        <obv:rating model="['resource':r, 'hideForm':true, index:1]"/>
+                                        <obv:rating model="['resource':r, class:'obvcreate', 'hideForm':true, index:1]"/>
 
 				{{if type == '${ResourceType.IMAGE}'}}
                 <div id="license_div_{{>i}}" class="licence_div pull-left dropdown">
@@ -846,10 +846,8 @@ if(r && thumbnail) {
 					$('.geotagged_image', this).load(function(){
 						update_geotagged_images_list($(this));		
 					});
-                                        var imgRating = rate($(this), function(avgRate, noOfRatings, $ratingContainer){
-                                            imgRating.select(avgRate);
-                                            $ratingContainer.find(".noOfRatings").html('('+noOfRatings+' ratings)')
-                                        });
+                                        var $ratingContainer = $(this).find('.star_obvcreate');
+                                        rate($ratingContainer)
 				})
 				$( "#imagesList li:last" ).before (metadataEle);
 
@@ -893,11 +891,6 @@ if(r && thumbnail) {
            
 
      	});  
-		     var imgRating = rate($(".rating"), function(avgRate, noOfRatings){
-                        imgRating.select(avgRate);
-                        $(this).find(".noOfRatings").html('('+noOfRatings+' ratings)')
-                    });
-
 
         $(".group_option").click(function(){
                 $("#group_id").val($(this).val());
@@ -906,6 +899,10 @@ if(r && thumbnail) {
                 //$("#group_options").hide();
                 $("#selected_group").css({'background-color':'#e5e5e5', 'border-bottom-color':'#aeaeae'});
                 
+        });
+        
+        $.each($('.star_obvcreate'), function(index, value){
+            rate($(value));
         });
 
        

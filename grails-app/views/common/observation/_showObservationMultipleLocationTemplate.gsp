@@ -1,18 +1,19 @@
 <div class="observation_location_wrapper">
 	<div class="observation_location">
 		<g:set var="snippetUrl" value="${uGroup.createLink(controller:'observation', action:'snippet', 'userGroupWebaddress':userGroup?.webaddress) }"/>
-		<r:script>
-                var markers = [];
+		<g:javascript>
+                var markers;
                 var big_map;
                 var  nagpur_latlng, swRestriction, neRestriction, allowedBounds;
   
                 $(document).ready(function() {
                     loadGoogleMapsAPI(function() {
-                        initMap();
+                    	initMap();
                     });
                 });
 
                 function initMap() {
+                   markers = [];
                    nagpur_latlng = new google.maps.LatLng('21.07', '79.27');
                    swRestriction = new google.maps.LatLng('8', '69');
                    neRestriction = new google.maps.LatLng('36', '98');
@@ -72,8 +73,7 @@
                   <g:each in="${observationInstanceList}" status="i"
 						var="observationInstance">
                         addMarker(${observationInstance[0]}, ${observationInstance[1]},  ${observationInstance[2]}); 
-
-		    </g:each>	
+		    	</g:each>	
                     
                     <g:if test="${!ignoreMouseOutListener}">
                     google.maps.event.addListener(big_map, 'mouseout', function() {
@@ -134,7 +134,7 @@
                 }
 
                 }
-                </r:script>
+                </g:javascript>
 		<div class="map_wrapper">
                     <div id="big_map_canvas" style="height: ${height?:'500'}px; width: ${width?:'100%'};">
                         <center>

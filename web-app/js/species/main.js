@@ -8,14 +8,15 @@ if (typeof (console.log) == "undefined") {
 }
 
 
-function show_login_dialog(successHandler, errorHandler) {
+function show_login_dialog(successHandler, errorHandler, cancelHandler) {
 	ajaxLoginSuccessCallbackFunction = successHandler;
 	ajaxLoginErrorCallbackFunction = errorHandler;
+	ajaxLoginCancelCallbackFunction = cancelHandler;
 	$('#ajaxLogin').modal({'keyboard':true, 'show':true});
 }
 
 function cancelLogin() {
-	$('#ajaxLogin').modal('hide');
+    $('#ajaxLogin').modal('hide');
 }
 
 
@@ -25,9 +26,9 @@ function updateLoginInfo(){
 	reloadLoginInfo();
 }
 
-function handleError(xhr, textStatus, errorThrown, successHandler, errorHandler) {
+function handleError(xhr, textStatus, errorThrown, successHandler, errorHandler, cancelHandler) {
 	if (xhr.status == 401) {
-		show_login_dialog(successHandler, errorHandler);
+		show_login_dialog(successHandler, errorHandler, cancelHandler);
 		//window.location.href = "/biodiv/login?spring-security-redirect="+window.location.href;
 	} else {
 		if (errorHandler)
@@ -47,7 +48,7 @@ function adjustHeight() {
 }
 // Callback to execute whenever ajax login is successful.
 // Todo some thing meaningful with the response data
-var ajaxLoginSuccessCallbackFunction, ajaxLoginErrorCallbackFunction;
+var ajaxLoginSuccessCallbackFunction, ajaxLoginErrorCallbackFunction, ajaxLoginCancelCallbackFunction;
 
 var reloadLoginInfo = function() {
 	$.ajax({

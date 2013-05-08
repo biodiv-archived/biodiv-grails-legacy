@@ -227,9 +227,9 @@ class ObservationTagLib {
         String divClass = attrs.model.class?:'rating'
         if(resource) {
             resource = GrailsHibernateUtil.unwrapIfProxy(resource);
-            long averageRating = resource.averageRating ? Math.round(resource.averageRating): 0
+            long averageRating = resource.averageRating ?: 0
             out << """
-                <div class="${divClass} pull-right">
+                <div class="pull-right">
             """
 
             if(!hideForm) {
@@ -240,12 +240,8 @@ class ObservationTagLib {
             String name = index?(resource.id?'rating_'+index:'rating_{{>i}}'):'rating'
 
             out << """
-                    <input class="star required" type="radio" name="${name}" value="1"
-                    title="Worst" ${(averageRating==1)?'checked':''} /> <input class="star" type="radio" name="${name}"
-                    value="2" title="Bad"  ${(averageRating==2)?'checked':''} /> <input class="star" type="radio"
-                    name="${name}" value="3" title="OK"  ${(averageRating==3)?'checked':''} /> <input class="star"
-                    type="radio" name="${name}" value="4" title="Good"  ${(averageRating==4)?'checked':''} /> <input
-                    class="star" type="radio" name="${name}" value="5" title="Best"  ${(averageRating==5)?'checked':''} />
+               <span class="star_${divClass} 
+                    title="Rate" data-score='${averageRating}' data-input-name="${name}"></span>
                     <div class="noOfRatings">(${resource.totalRatings ?: 0} rating${resource.totalRatings!=1?'s':''})</div>
                 """
             if(!hideForm) {
@@ -258,16 +254,15 @@ class ObservationTagLib {
 	}
 
     def like = {attrs, body->
-		//out << render(template:"/common/ratingTemplate", model:attrs.model);
         def resource = attrs.model.resource
-        boolean hideForm = attrs.model.hideForm
-        int index = attrs.model.index
         String divClass = attrs.model.class?:'rating'
+        boolean hideForm = attrs.model.hideForm
         if(resource) {
             resource = GrailsHibernateUtil.unwrapIfProxy(resource);
             int userRating = springSecurityService.currentUser?((resource.userRating(springSecurityService.currentUser).size()==1)?1:0):0;
+            
             out << """
-                <div class="${divClass} pull-right">
+                <div class="pull-right">
             """
 
             if(!hideForm) {
@@ -275,17 +270,16 @@ class ObservationTagLib {
                     action="${uGroup.createLink(controller:'rating', action:'rate', id:resource.id, type:GrailsNameUtils.getPropertyName(resource.class)) }">
                     """
             }
-            String name = index?(resource.id?'rating_'+index:'rating_{{>i}}'):'rating'
-
             out << """
-                    <input class="star like required  icon-thumbs-up" type="radio" name="${name}" value="1"
-                    title="Like" ${(userRating==1)?'checked':''} ></input>
-                    <div class="noOfRatings">(${resource.totalRatings ?: 0} like${resource.totalRatings!=1?'s':''})</div>
+                <span class="like_${divClass} 
+                    title="Like" ${(userRating==1)?"data-score='1'":""}></span>
+                    <span class="noOfRatings badge" title='No of likes'>${resource.totalRatings ?: 0}</span>
                 """
             if(!hideForm) {
                 out << "</form>"
             } 
             out <<  "</div>"
+ 
         } else {
             throw new RatingException("There must be a 'bean' domain object included in the ratings tag.")
         }

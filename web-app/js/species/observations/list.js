@@ -247,7 +247,7 @@ $(document).ready(function(){
 		return false;
 	});
 	
-	last_actions();
+//	last_actions();
 	eatCookies();
 	$('.observations_list_wrapper').trigger('updatedGallery');
 });
