@@ -2,21 +2,7 @@
 <%@ page import="content.eml.Document"%>
 
 
-<div id="project-sidebar"
-	style="position: relative; top: 50px; margin: 10px; padding: 10px 15px 10px 15px;"
-	class="pull-right">
-
-
-	<sUser:isCEPFAdmin>
-
-		<a class="btn btn-info" style="margin-bottom: 5px;"
-			href="${uGroup.createLink(
-						controller:'project', action:'create', 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress)}">
-			<i class="icon-plus"></i>Add CEPF Project
-		</a>
-		<br>
-
-	</sUser:isCEPFAdmin>
+<div id="project-sidebar" class="span4"	class="pull-right" style=" position: relative; margin: 0px; padding: 10px 15px 10px 30px; width: 265px;">
 
 
 	<ul class="nav nav-tabs sidebar" id="project-menus">

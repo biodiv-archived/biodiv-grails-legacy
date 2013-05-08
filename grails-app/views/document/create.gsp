@@ -245,7 +245,7 @@ input.dms_field {
 
 
 
-			<div class="" style="margin-top: 20px; margin-bottom: 40px;">
+			<div  style="margin-top: 20px; margin-bottom: 40px;">
 
 				<g:if test="${documentInstance?.id}">
 					<a

@@ -20,67 +20,51 @@
 	border-top: 5px solid #c2c2c2;
 	border-bottom: 2px solid #c2c2c2;
 	background-color: #ffffff;
-	width:590px;
+	width: 590px;
 }
 
 .project-list-item {
 	margin: 20px;
 }
-
-.paginateButtons {
-	margin: 3px 0px 3px 0px;
-}
-
-.paginateButtons a {
-	padding: 2px 4px 2px 4px;
-	background-color: #A4A4A4;
-	border: 1px solid #EEEEEE;
-	text-decoration: none;
-	font-size: 10pt;
-	font-variant: small-caps;
-	color: #EEEEEE;
-}
-
-.paginateButtons a:hover {
-	text-decoration: underline;
-	background-color: #888888;
-	border: 1px solid #AA4444;
-	color: #FFFFFF;
-}
 </style>
 
 </head>
 <body>
-	<div class="body span8" style="padding-left: 20px;">
-		<h1>Western Ghats CEPF Projects</h1>
-		<g:if test="${flash.message}">
-			<div class="message">
-				${flash.message}
-			</div>
-		</g:if>
-		<br />
 
-		<g:render template="/project/search" model="['params':params]" />
+	<div class="span12">
+		<g:render template="/project/projectSubMenuTemplate"
+			model="['entityName':'Western Ghats CEPF Projects']" />
+		<uGroup:rightSidebar />
+		<div class="span8 right-shadow-box"
+			style="margin: 0px; padding-right: 5px;">
+			<g:render template="/project/search" model="['params':params]" />
 
-		<div class="observations_list" style="clear: both; top: 0px;">
-			<div class="project-list tab-content span">
+			<div class="observations_list" style="clear: both; top: 0px;">
+				<div class="project-list tab-content span">
 
-				<g:each in="${projectInstanceList}" status="i" var="projectInstance">
-					<div class="${(i % 2) == 0 ? 'odd' : 'even'} item">
-						<project:projectListItem
-							model="['projectInstance':projectInstance, 'pos':i]" />
+					<g:each in="${projectInstanceList}" status="i"
+						var="projectInstance">
+						<div class="${(i % 2) == 0 ? 'odd' : 'even'} item">
+							<project:projectListItem
+								model="['projectInstance':projectInstance, 'pos':i]" />
+						</div>
+
+					</g:each>
+
+
+					<% params['isGalleryUpdate'] = false; %>
+					<div class="paginateButtons centered">
+						<p:paginate controller="project" action="list"
+							total="${projectInstanceTotal}" userGroup="${userGroup}"
+							userGroupWebaddress="${userGroupWebaddress}" params="${params}"
+							max="${params.max }" offset="${params.offset}" maxsteps="10" />
 					</div>
 
-				</g:each>
 
-
-				<div class="paginateButtons">
-					<g:paginate total="${projectInstanceTotal}" />
 				</div>
 			</div>
 		</div>
+		<g:render template="/project/projectSidebar" />
 	</div>
-	<g:render template="/project/projectSidebar" />
-
 </body>
 </html>

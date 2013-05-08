@@ -3,7 +3,7 @@
 
 
 <div id="project-sidebar" class="span4"
-	style=" position: relative; margin: 0px; padding: 10px 15px 10px 15px; width: 265px;"">
+	style=" position: relative; margin: 0px; padding: 10px 15px 10px 15px; width: 265px;">
 
 
 	<div class="sidebar_section"
