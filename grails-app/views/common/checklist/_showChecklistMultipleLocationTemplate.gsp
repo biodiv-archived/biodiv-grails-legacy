@@ -3,7 +3,7 @@
 	<div class="observation_location">
 		<div class="checklist_list">
 		<g:set var="snippetUrl" value="${uGroup.createLink(controller:'checklist', action:'snippet', 'userGroupWebaddress':userGroup?.webaddress) }"/>
-		<r:script>
+		<g:javascript>
                 var markers = [];
                 var big_map;
                 var  nagpur_latlng, swRestriction, neRestriction, allowedBounds;
@@ -135,7 +135,7 @@
                 }
 
                 }
-                </r:script>
+                </g:javascript>
         </div>        
 		<div class="map_wrapper">
 			<div id="big_map_canvas" style="height: 500px; width: 100%;"></div>
