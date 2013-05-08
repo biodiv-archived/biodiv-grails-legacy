@@ -1,7 +1,6 @@
 package content
 
-import content.eml.UFile;
-import content.eml.UFileService;
+
 import grails.converters.JSON
 import content.Location
 import grails.plugins.springsecurity.Secured
@@ -15,7 +14,7 @@ class ProjectController {
 	def observationService
 	def projectSearchService
 	def springSecurityService
-	def UFileService
+	def documentService
 
 	def index = {
 		redirect(action: "list", params: params)
@@ -53,6 +52,7 @@ class ProjectController {
 			params.sourceHolderId = projectInstance.id
 			params.sourceHolderType = projectInstance.class.getCanonicalName()
 			//TODO: set source to files
+			documentService.updateDocuments(params)
 			//def uFiles = UFileService.updateUFiles(params)
 			redirect(action: "show", id: projectInstance.id)
 		}

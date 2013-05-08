@@ -136,13 +136,6 @@ grails.project.dependency.resolution = {
 	}
 }
 
-fileuploader {
-	docs {
-		maxSize = 1000 * 1024 * 1
-		allowedExtensions = ["xlsx"]
-		path = "/tmp/docs/"
-	}
-}
 
 // Prevent any client side caching for now
 cache.headers.enabled = true
@@ -253,7 +246,8 @@ speciesPortal {
 	}
 
 	content{
-		fileUploadDir = "${app.rootDir}/content"
+		rootDir = "${app.rootDir}/content"
+		serverURL = "http://localhost/${appName}/content"
 	}	
 		
 	names.parser.serverURL = "127.0.0.1"
@@ -618,6 +612,11 @@ environments {
 				rootDir = "${app.rootDir}/users"
 				serverURL = "http://indiabiodiversity.saturn.strandls.com/${appName}/users"
 			}
+			content{
+				rootDir = "${app.rootDir}/content"
+				serverURL = "http://indiabiodiversity.saturn.strandls.com//${appName}/content"
+			}	
+
 			search.serverURL="http://saturn.strandls.com:8080/solrPamba"
 			grails.project.war.file = "/data/jetty-6.1.26/webapps/${appName}.war"
 			grails {
@@ -691,6 +690,12 @@ environments {
 				rootDir = "${app.rootDir}/users"
 				serverURL = "http://thewesternghats.in/${appName}/users"
 			}
+
+			content{
+				rootDir = "${app.rootDir}/content"
+				serverURL = "http://thewesternghats.in/${appName}/content"
+			}	
+
 			search.serverURL="http://thewesternghats.in:8080/solr"
 			grails {
 				mail {

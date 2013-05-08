@@ -36,7 +36,13 @@ class UFileController {
 
 	def observationService
 	def springSecurityService;
-	
+	def grailsApplication
+
+	def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+
+	String contentRootDir = config.speciesPortal.content.rootDir
+
+
 	AjaxUploaderService ajaxUploaderService
 	UFileService uFileService = new UFileService()
 
@@ -54,10 +60,13 @@ class UFileController {
 		return;
 	}
 
-	
 
-	// for uploading a file.
-	// File is uploaded to a temporary location. No UFile object is created in controller
+	/**
+	 *  For uploading a file.
+	 *  File is uploaded to a temporary location. No UFile object is created in this method
+	 *  params takes the relative path. if not given, uploads to default content root directory
+	 */
+
 	@Secured(['ROLE_USER'])
 	def fileUpload = {
 		log.debug params
@@ -69,11 +78,14 @@ class UFileController {
 			ajaxUploaderService.upload(inputStream, uploaded)
 
 
+
+			String relPath = uploaded.absolutePath.replace(contentRootDir, "")
+
 			//def url = uGroup.createLink(uri:uploaded.getPath() , 'userGroup':params.userGroupInstance, 'userGroupWebaddress':params.webaddress)
-			def url = [uri:uploaded.getPath()]
+			def url = g.createLinkTo(base:contentRootDir, file: relPath)
 			//log.debug "url for uploaded file >>>>>>>>>>>>>>>>>>>>>>>>"+ url
 
-			return render(text: [success:true, filePath:uploaded.getPath(), fileURL: url, fileSize:UFileService.getFileSize(uploaded)] as JSON, contentType:'text/json')
+			return render(text: [success:true, filePath:relPath, fileURL: url, fileSize:UFileService.getFileSize(uploaded)] as JSON, contentType:'text/json')
 		} catch (FileUploadException e) {
 
 			log.error("Failed to upload file.", e)
@@ -96,18 +108,21 @@ class UFileController {
 
 			ajaxUploaderService.upload(inputStream, uploaded)
 
+
+			String relPath = uploaded.absolutePath.replace(contentRootDir, "")
+
 			UFile uFileInstance = new UFile()
-			uFileInstance.path = uploaded.getPath()
+			uFileInstance.path = relPath
 			uFileInstance.size = UFileService.getFileSize(uploaded)
 			uFileInstance.downloads = 0
-			
+
 			Document documentInstance = new Document()
 			documentInstance.title  = uploaded.getName()
-			
+
 			if(params.type) {
 				switch(params.type) {
 					case "Proposal":
-						documentInstance.type = DocumentType.Proposal					
+						documentInstance.type = DocumentType.Proposal
 						break
 					case "Report":
 						documentInstance.type = DocumentType.Report
@@ -118,22 +133,22 @@ class UFileController {
 					case "Miscellaneous":
 					default:
 						documentInstance.type = DocumentType.Miscellaneous
-						break						
+						break
 				}
 			} else {
 				documentInstance.type = DocumentType.Miscellaneous
 			}
 			documentInstance.author = springSecurityService.currentUser
-			
+
 			documentInstance.uFile = uFileInstance
-			
-			
+
+
 			documentInstance.save(flush:true)
-			
-			
+
+
 			log.debug " parameters to projectDoc block >>>> Path - "+ uFileInstance.path + " ,  Id: "+ documentInstance.id + ", fileSize:"+uFileInstance.size+", docName:"+documentInstance.title
 
-			return render(text: [success:true, filePath:uFileInstance.path, docId:documentInstance.id, fileSize:uFileInstance.size, docName:documentInstance.title] as JSON, contentType:'text/json')
+			return render(text: [success:true, filePath:relPath, docId:documentInstance.id, fileSize:uFileInstance.size, docName:documentInstance.title] as JSON, contentType:'text/json')
 		} catch (FileUploadException e) {
 
 			log.error("Failed to upload file.", e)
@@ -153,19 +168,21 @@ class UFileController {
 	private File createFile(String fileName, String uploadDir) {
 		File uploaded
 		if (uploadDir) {
-			File fileDir = new File(uploadDir)
+			File fileDir = new File(contentRootDir + "/"+ uploadDir)
 			if(!fileDir.exists())
-				fileDir.mkdir()
+				fileDir.mkdirs()
 			uploaded = observationService.getUniqueFile(fileDir, Utils.cleanFileName(fileName));
 
 		} else {
 
-			File fileDir = new File(grailsApplication.config.speciesPortal.content.fileUploadDir)
+			File fileDir = new File(contentRootDir)
 			if(!fileDir.exists())
-				fileDir.mkdir()
+				fileDir.mkdirs()
 			uploaded = observationService.getUniqueFile(fileDir, Utils.cleanFileName(fileName));
 			//uploaded = File.createTempFile('grails', 'ajaxupload')
 		}
+		
+		log.debug "New file created : "+ uploaded.getPath()
 		return uploaded
 	}
 

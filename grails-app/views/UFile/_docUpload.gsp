@@ -5,7 +5,7 @@
 	url="${uGroup.createLink(controller:'UFile', action:'fileUpload', userGroupWebaddress:params.webaddress)}"
 	multiple="false"
 	allowedExtensions="${allowedExtensions}" 
-	params="">
+	params="${fileParams}">
 
 	<uploader:onComplete>
 				//Available variables: id, fileName, responseJSON
@@ -25,12 +25,14 @@
 <div id="${name}_uploaded" style="display: ${path?'':'none'};">
 <%
 def fileName=""
+def fileURL = ""
 if(path) {
 int idx = path.lastIndexOf("/");
 fileName = idx >= 0 ? path.substring(idx + 1) : path;
+fileURL = g.createLinkTo(base:grailsApplication.config.speciesPortal.content.serverURL,	file: path)
 }
  %>
-	<i class="icon-file"></i> <a id="${name}_file" href="${path}">${fileName}</a>
+	<i class="icon-file"></i> <a id="${name}_file" href="${fileURL}">${fileName}</a>
 	
 	<input type="hidden" name="uFile.path"  id="${name}_path" value="${path}">
 		<input type="hidden" name="uFile.size"  id="${name}_size" value="${size}">

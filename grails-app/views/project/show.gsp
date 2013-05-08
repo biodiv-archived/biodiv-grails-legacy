@@ -108,7 +108,7 @@
 
 		<g:if test="${projectInstance.locations.size()}">
 			<div class="sidebar_section">
-				<a href="speciesFieldHeader" data-toggle="collapse"
+				<a class="speciesFieldHeader" data-toggle="collapse"
 					href="#locations"><h5>Project Sites</h5></a>
 				<div id="locations" class="speciesField collapse in">
 					<table class="table table-hover" style="margin-left: 0px;">
@@ -135,30 +135,38 @@
 				</div>
 			</div>
 		</g:if>
-		<div class="sidebar_section">
-			<a class="speciesFieldHeader" data-toggle="collapse"
-				href="#grantee-details"><h5>Grantee Details</h5></a>
-			<div id="grantee-details" class="speciesField collapse in">
+
+		<g:if
+			test="${projectInstance?.granteeLogo ||projectInstance?.granteeOrganization }">
+
+			<div class="sidebar_section">
+				<a class="speciesFieldHeader" data-toggle="collapse"
+					href="#grantee-details"><h5>Grantee Details</h5></a>
+				<div id="grantee-details" class="speciesField collapse in">
 
 
-				<g:if test="${projectInstance?.granteeLogo}">
-					<fileManager:displayFile
-						filePath="${ projectInstance?.granteeLogo}"
-						fileName="${projectInstance?.granteeOrganization}"></fileManager:displayFile>
+					<g:if test="${projectInstance?.granteeLogo}">
+						<fileManager:displayFile
+							filePath="${ projectInstance?.granteeLogo}"
+							fileName="${projectInstance?.granteeOrganization}"></fileManager:displayFile>
 
-				</g:if>
-				<table>
-					<tr>
-						<td class="prop"><span class="grid_3 name">Organization</td>
-						<td class="linktext">
-							${projectInstance?.granteeOrganization}
-						</td>
-					</tr>
-				</table>
+					</g:if>
+
+					<g:if test="${projectInstance?.granteeOrganization }">
+
+						<table>
+							<tr>
+								<td class="prop"><span class="grid_3 name">Organization</td>
+								<td class="linktext">
+									${projectInstance?.granteeOrganization}
+								</td>
+							</tr>
+						</table>
+					</g:if>
+				</div>
 			</div>
-		</div>
 
-
+		</g:if>
 		<div class="sidebar_section">
 			<a data-toggle="collapse" href="#project-details"><h5>Project
 					Details</h5></a>

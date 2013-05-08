@@ -7,7 +7,8 @@
 <uploader:uploader id="${name}_uploader"
 	url="${uGroup.createLink(controller:'UFile', action:'fileUpload', userGroupWebaddress:params.webaddress)}"
 	multiple="false"
-	allowedExtensions="${allowedExtensions}">
+	allowedExtensions="${allowedExtensions}"
+	params="${fileParams}">
 
 	<uploader:onComplete>
 				//Available variables: id, fileName, responseJSON

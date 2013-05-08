@@ -92,9 +92,10 @@ class FileManagerTagLib {
 				 out << "p>html</p>"
 				 break
 			case "PDF":
-				//out << g.link(['uri':"${filePath}"] , ' <span class="pdficon" style="display:inline-block; margin-left: 5px; margin-right:5px;"></span>' + "${fileName}" )
-				out << g.link(['base':"${filePath}", 'file':''] , ' <span class="pdficon" style="display:inline-block; margin-left: 5px; margin-right:5px;"></span>' + "${fileName}" )
-				break
+				def href = g.createLinkTo(base:grailsApplication.config.speciesPortal.content.serverURL, file: filePath)
+							
+				out <<'<a href='+href+'><span class="pdficon" style="display:inline-block; margin-left: 5px; margin-right:5px;"></span>'+ fileName +'</a>' 
+					break
 			default:
 				 out << "<p>file</p>"
 				 break

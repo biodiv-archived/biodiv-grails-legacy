@@ -76,13 +76,13 @@ class DocumentService {
 	 * @return List
 	 */
 	def updateDocuments(params) {
-		log.info "Updating Documents from params: "+ params
 
 		def docs = []
-		def docsList = (params.documents != null) ? Arrays.asList(params.documents) : new ArrayList()
+		def docsList = (params.docs != null) ? Arrays.asList(params.docs) : new ArrayList()
+		
 		for(docId in docsList) {
 			def documentInstance = Document.get(docId)
-			if(!params."${docId}.deleted") {
+				
 				if(params."${docId}.title") {
 					documentInstance.title = params."${docId}.title"
 				}
@@ -107,6 +107,11 @@ class DocumentService {
 					def tags = (params."${docId}.tags" != null) ? Arrays.asList(params."${docId}.tags") : new ArrayList();
 					documentInstance.setTags(tags);
 				}
+				
+				if(params."${docId}.deleted") {
+				//	TODO: Actual delete should be handled by parent form controllers.
+					documentInstance.deleted = (params."${docId}.deleted").toBoolean()
+				}
 
 				if(params."sourceHolderId") {
 					documentInstance.sourceHolderId = params.sourceHolderId
@@ -127,11 +132,8 @@ class DocumentService {
 					def errorMsg = "Errors in saving documentInstance"
 					throw new GrailsTagException(errorMsg)
 				}
-			} else {
-				//TODO: Actual delete should be handled by parent form controllers.
-				documentInstance.deleted = params."${docId}.deleted"
-
-			}
+	
+			log.info "Document properties updated from form: "+ documentInstance.dump()
 			docs.add(documentInstance)
 		}
 

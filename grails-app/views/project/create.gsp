@@ -55,10 +55,8 @@ textarea {
 					
 				}
 				
-				String uploadDir = grailsApplication.config.speciesPortal.content.fileUploadDir
-		
-				uploadDir = uploadDir + "/" + "project-"+UUID.randomUUID().toString()	
-				
+				String uploadDir = "projects/"+ "project-"+UUID.randomUUID().toString()	
+						
 			
             %>
 		<h1>
@@ -220,7 +218,7 @@ textarea {
 								<div class="controls">
 
 									<g:render template='/UFile/imgUpload'
-										model="['name': 'granteeLogo', 'path': projectInstance?.granteeLogo, 'uploadDir': uploadDir]" />
+										model="['name': 'granteeLogo', 'path': projectInstance?.granteeLogo, 'fileParams':['uploadDir':uploadDir]]" />
 
 								</div>
 							</div>

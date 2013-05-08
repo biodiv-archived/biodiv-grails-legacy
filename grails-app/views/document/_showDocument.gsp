@@ -4,7 +4,8 @@
 	<tr>
 		<td class="prop"><span class="grid_3 name">File</span></td>
 		<td class="linktext"><fileManager:displayFile
-				filePath="${ documentInstance?.uFile?.path}"></fileManager:displayFile>
+				filePath="${documentInstance?.uFile?.path}"
+				fileName="${documentInstance.title}"></fileManager:displayFile>
 
 		</td>
 

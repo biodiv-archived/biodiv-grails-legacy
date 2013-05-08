@@ -45,6 +45,10 @@ ul.file-tags {
 	padding: 10px;
 }
 
+.show-document {
+	margin:10px 0px;
+}
+
 #tc_tagcloud {
 	width:235px;
 	max-height: 310px;

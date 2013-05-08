@@ -64,7 +64,7 @@ input.dms_field {
 					
 				}
 				
-				String uploadDir = grailsApplication.config.speciesPortal.content.fileUploadDir
+				String uploadDir = "documents/"+ "document-"+UUID.randomUUID().toString()	
 			%>
 
 		<form id="documentForm" action="${form_action}" method="POST"
@@ -106,7 +106,7 @@ input.dms_field {
 						<div class="controls" style="inline-block">
 							<div class="span2" style="margin-left:0px;">
 								<g:render template='/UFile/docUpload'
-									model="['name': 'ufilepath', 'path': documentInstance?.uFile?.path, 'size':documentInstance?.uFile?.size]" />
+									model="['name': 'ufilepath', 'path': documentInstance?.uFile?.path, 'size':documentInstance?.uFile?.size,'fileParams':['uploadDir':uploadDir]]" />
 									
 							</div>
 							<div class="span1">(OR) 
