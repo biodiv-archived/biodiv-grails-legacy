@@ -243,10 +243,11 @@ modules = {
 	
 	
 	content_view {
-		dependsOn 'core'
+		dependsOn 'core,  tagit'
 		resource url:'/css/main.css'
 		
 		resource url:'/css/content.css'
+		resource url:'/js/content.js'
 		
 	}
 

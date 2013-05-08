@@ -7,7 +7,7 @@
 <g:set var="entityName"
 	value="${message(code: 'project.label', default: 'Project')}" />
 <title><g:message code="default.show.label" args="[entityName]" /></title>
-<r:require modules="add_file" />
+<r:require modules="content_view" />
 
 <style type="text/css">
 .tag {
@@ -75,24 +75,28 @@
 		</div>
 
 
-		<div id="strategic-direction" class="speciesField collapse in"
-			style="border: 1px solid #735005; padding: 10px; margin-top: 20px; margin-bottom: 20px; border-radius: 5px; background-color: #fff1a8; color: #735005; margin-left: 10px;">
+		<g:if test="${projectInstance?.direction}">
+			<div id="strategic-direction" class="speciesField collapse in"
+				style="border: 1px solid #735005; padding: 10px; margin-top: 20px; margin-bottom: 20px; border-radius: 5px; background-color: #fff1a8; color: #735005; margin-left: 10px;">
 
-			<h3 style="font-size: 16px; border-bottom: 1px solid #735005;">Strategic
-				Direction</h3>
-			${projectInstance?.direction?.title.encodeAsHTML()}
-			-
-			${projectInstance?.direction?.strategy.encodeAsHTML()}
+				<h3 style="font-size: 16px; border-bottom: 1px solid #735005;">Strategic
+					Direction</h3>
+				${projectInstance?.direction?.title.encodeAsHTML()}
+				-
+				${projectInstance?.direction?.strategy.encodeAsHTML()}
 
-		</div>
+			</div>
+		</g:if>
 
+		<g:if test="${projectInstance?.summary}">
 
-		<div>
-			<h4>Summary</h4>
-			<p>
-				${projectInstance?.summary}
-			</p>
-		</div>
+			<div>
+				<h4>Summary</h4>
+				<p>
+					${projectInstance?.summary}
+				</p>
+			</div>
+		</g:if>
 
 		<g:if test="${projectInstance.tags}">
 			<b>Keywords : </b>
@@ -102,54 +106,55 @@
 
 		</g:if>
 
-		<div class="sidebar_section">
-			<a href="speciesFieldHeader" data-toggle="collapse" href="#locations"><h5>Project
-					Sites</h5></a>
-			<div id="locations" class="speciesField collapse in">
-				<table class="table table-hover" style="margin-left: 0px;">
-					<thead>
-						<tr>
-							<th>Site Name</th>
-							<th>Corridor</th>
-						</tr>
-					</thead>
-					<tbody>
-						<g:each in="${projectInstance.locations}" var="l">
+		<g:if test="${projectInstance.locations.size()}">
+			<div class="sidebar_section">
+				<a href="speciesFieldHeader" data-toggle="collapse"
+					href="#locations"><h5>Project Sites</h5></a>
+				<div id="locations" class="speciesField collapse in">
+					<table class="table table-hover" style="margin-left: 0px;">
+						<thead>
 							<tr>
-								<td>
-									${l.siteName}
-								</td>
-								<td>
-									${l.corridor}
-								</td>
+								<th>Site Name</th>
+								<th>Corridor</th>
 							</tr>
-						</g:each>
+						</thead>
+						<tbody>
+							<g:each in="${projectInstance.locations}" var="l">
+								<tr>
+									<td>
+										${l.siteName}
+									</td>
+									<td>
+										${l.corridor}
+									</td>
+								</tr>
+							</g:each>
 
-					</tbody>
-				</table>
+						</tbody>
+					</table>
+				</div>
 			</div>
-		</div>
-
+		</g:if>
 		<div class="sidebar_section">
 			<a class="speciesFieldHeader" data-toggle="collapse"
 				href="#grantee-details"><h5>Grantee Details</h5></a>
 			<div id="grantee-details" class="speciesField collapse in">
 
+
 				<g:if test="${projectInstance?.granteeLogo}">
-				<fileManager:displayFile filePath="${ projectInstance?.granteeLogo}"
-					fileName="${projectInstance?.granteeOrganization}"></fileManager:displayFile>
-					
-					</g:if>
+					<fileManager:displayFile
+						filePath="${ projectInstance?.granteeLogo}"
+						fileName="${projectInstance?.granteeOrganization}"></fileManager:displayFile>
 
-				<dl class="dl-horizontal">
-					<dt>Organization</dt>
-					<dd>
-						${projectInstance?.granteeOrganization}
-					</dd>
-
-				</dl>
-
-
+				</g:if>
+				<table>
+					<tr>
+						<td class="prop"><span class="grid_3 name">Organization</td>
+						<td class="linktext">
+							${projectInstance?.granteeOrganization}
+						</td>
+					</tr>
+				</table>
 			</div>
 		</div>
 
@@ -157,22 +162,21 @@
 		<div class="sidebar_section">
 			<a data-toggle="collapse" href="#project-details"><h5>Project
 					Details</h5></a>
-			<div id="project-details" class="speciesField collapse">
-				<dl class="dl-horizontal">
+			<div id="project-details" class="speciesField in collapse">
+				<table>
+					<tr>
+						<td class="prop"><span class="grid_3 name">Grant Term</span></td>
+						<td class="linktext">
+							${projectInstance?.grantFrom} - ${projectInstance?.grantTo}
+						</td>
+					</tr>
 
-					<dt>Grant Term</dt>
-					<dd>
-						${projectInstance?.grantFrom}
-						-
-						${projectInstance?.grantTo}
-					</dd>
-
-
-					<dt>Amount</dt>
-					<dd>
-						$
-						${projectInstance?.grantedAmount}
-					</dd>
+					<tr>
+						<td class="prop"><span class="grid_3 name">Amount</td>
+						<td class="linktext">$ ${projectInstance?.grantedAmount}
+						</td>
+					</tr>
+				</table>
 			</div>
 		</div>
 
@@ -234,16 +238,20 @@
 				<a data-toggle="collapse" href="#data-links"><h5>Data
 						Contribution Links</h5></a>
 
-					<div id="data-links" class="speciesField collapse in">
+				<div id="data-links" class="speciesField collapse in">
 
-				<g:each in="${projectInstance?.dataLinks}" var="dataLink">
-				<dl class="dl-horizontal">
-					<dt> Description</dt>
-					<dd>${dataLink.description}</dd>
-					<dt>URL</dt>
-					<dd>${dataLink.url}</dd>
-					</dl>
-				</g:each>
+					<g:each in="${projectInstance?.dataLinks}" var="dataLink">
+						<dl class="dl-horizontal">
+							<dt>Description</dt>
+							<dd>
+								${dataLink.description}
+							</dd>
+							<dt>URL</dt>
+							<dd>
+								${dataLink.url}
+							</dd>
+						</dl>
+					</g:each>
 				</div>
 			</div>
 		</g:if>

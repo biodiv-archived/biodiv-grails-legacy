@@ -26,7 +26,7 @@
 	</ul>
 
 
-	<div style="width: 235px;">
+	<div style="width: 235px; margin:30px 0px;">
 		<h4>Project Tags</h4>
 		<g:if test="${tags}">
 			<tc:tagCloud bean="${Project}" controller="project" action="list"
@@ -42,7 +42,7 @@
 	</div>
 
 
-	<div style="width: 235px; max-height: 350px;">
+	<div style="width: 235px; max-height: 350px; margin:30px 0px;">
 		<h4>Document Tags</h4>
 		<g:if test="${tags}">
 			<tc:tagCloud bean="${Document}" controller="document" action="browser"
