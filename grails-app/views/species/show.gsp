@@ -413,6 +413,9 @@ $(document).ready(function(){
 				</div>
 			</g:if>
 
+                        <div class="span4 pull-right">
+                            <t:showTaxonBrowser model="['speciesInstance':speciesInstance, 'expandSpecies':true, 'expandAll':false, 'speciesId':speciesInstance.taxonConcept?.id, expandAllIcon:false]"/>
+                        </div>
 
 			<!-- media gallery -->
 			<div class="span8 right-shadow-box" style="margin:0px;">
@@ -629,6 +632,14 @@ $(document).ready(function(){
 						</g:else>
 					</g:each>
 				</ul>
+                                <div class="sidebar_section">
+                                        <h5>Related Observations</h5>
+                                        <div class="tile" style="clear: both">
+                                                <obv:showRelatedStory
+                                                        model="['speciesId':speciesInstance.id, 'controller':'observation', 'action':'getRelatedObservation', 'filterProperty': 'taxonConcept',  'filterPropertyValue': speciesInstance.taxonConcept.id, 'id':'a','userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress]" />
+                                        </div>
+                                </div>
+
 					
 			</div>			
 			
@@ -639,13 +650,10 @@ $(document).ready(function(){
 	                <!-- right side bar -->
 			<div class="span4 classifications">
                             <div id="tocContainer" class="sidebar_section">
-                                <h5> Contents </h5>
                                 <div id="toc" class="tile"></div>
                             </div>
 
 
-                            <t:showTaxonBrowser model="['speciesInstance':speciesInstance, 'expandSpecies':true, 'expandAll':false, 'speciesId':speciesInstance.taxonConcept?.id, expandAllIcon:false]"/>
-                            <br />
                             <div id="map" class="sidebar_section">
                                 <h5>Occurrence Map</h5>
                                     <div id="mapSpinner" class="spinner">
@@ -665,14 +673,7 @@ $(document).ready(function(){
                                 <comment:showCommentPopup model="['commentHolder':[objectType:ActivityFeedService.SPECIES_MAPS, id:speciesInstance.id], 'rootHolder':speciesInstance]" />	
 
                             </div>
-                                                                                <div class="sidebar_section">
-                                                                                        <h5>Related Observations</h5>
-                                                                                        <div class="tile" style="clear: both">
-                                                                                                <obv:showRelatedStory
-                                                                                                        model="['speciesId':speciesInstance.id, 'controller':'observation', 'action':'getRelatedObservation', 'filterProperty': 'taxonConcept',  'filterPropertyValue': speciesInstance.taxonConcept.id, 'id':'a','userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress]" />
-                                                                                        </div>
-                                                                                </div>
- 
+
                            <div class="sidebar_section">
                                 <h5> Activity </h5>
                                     <div class="union-comment">
