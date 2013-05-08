@@ -38,7 +38,7 @@
 
 						<a class="btn btn-danger btn-primary pull-right"
 							style="margin-right: 5px; margin-bottom: 10px;"
-							href="${uGroup.createLink(controller:'document', action:'flagDeleted', id:documentInstance.id)}"
+							href="${uGroup.createLink(controller:'document', action:'delete', id:documentInstance.id)}"
 							onclick="return confirm('${message(code: 'default.document.delete.confirm.message', default: 'This document will be deleted. Are you sure ?')}');"><i
 							class="icon-trash"></i>Delete</a>
 
