@@ -48,8 +48,9 @@
 
 					<a class="btn btn-success pull-right"
 						href="${uGroup.createLink(
-						controller:'project', action:'create', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}" style="margin-left:8px;">
-						<i class="icon-plus"></i>Add CEPF Project
+						controller:'project', action:'create', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"
+						style="margin-left: 8px;"> <i class="icon-plus"></i>Add CEPF
+						Project
 					</a>
 
 					<div style="float: right; margin: 10px 0;">
@@ -57,11 +58,40 @@
 						<a class="btn btn-primary pull-right"
 							href="${uGroup.createLink(controller:'project', action:'edit', id:projectInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
 							<i class="icon-edit"></i>Edit
-						</a> <a class="btn btn-danger btn-primary pull-right"
-							style="margin-right: 5px; margin-bottom: 10px;"
-							href="${uGroup.createLink(controller:'project', action:'delete', id:projectInstance.id)}"
-							onclick="return confirm('${message(code: 'default.document.delete.confirm.message', default: 'This document will be deleted. Are you sure ?')}');"><i
+						</a> <a class="btn btn-danger" id="deleteButton"
+							style="margin-right: 5px; margin-bottom: 10px;"><i
 							class="icon-trash"></i>Delete</a>
+
+						<form
+							action="${uGroup.createLink(controller:'project', action:'delete')}"
+							method='POST' name='deleteForm'>
+							<input type="hidden" name="id" value="${projectInstance.id}" />
+						</form>
+						<div id="deleteConfirmDialog" title="Are you sure?"></div>
+
+						<r:script>
+							$(document).ready(function() {
+								$("#deleteButton").button().bind('click', function() {
+									$('#deleteConfirmDialog').dialog('open');
+								});
+				
+								$("#deleteConfirmDialog").dialog({
+									autoOpen: false,
+									resizable: false,
+									height: 100,
+									modal: true,
+									buttons: {
+										'Delete': function() {
+											document.forms.deleteForm.submit();
+										},
+										Cancel: function() {
+											$(this).dialog('close');
+										}
+									}
+								});
+							});
+						</r:script>
+
 
 					</div>
 
@@ -73,7 +103,8 @@
 
 
 		<uGroup:rightSidebar />
-		<div class="span8 right-shadow-box" style="margin:0px; padding-right:5px;">
+		<div class="span8 right-shadow-box"
+			style="margin: 0px; padding-right: 5px;">
 
 
 

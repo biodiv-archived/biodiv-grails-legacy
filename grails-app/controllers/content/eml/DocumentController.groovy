@@ -63,7 +63,7 @@ class DocumentController {
 		def documentInstance = Document.get(params.id)
 		if (!documentInstance) {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'document.label', default: 'Document'), params.id])}"
-			redirect(action: "list")
+			redirect(action: "browser")
 		}
 		else {
 			[documentInstance: documentInstance]
@@ -75,7 +75,7 @@ class DocumentController {
 		def documentInstance = Document.get(params.id)
 		if (!documentInstance) {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'document.label', default: 'Document'), params.id])}"
-			redirect(action: "list")
+			redirect(action: "browser")
 		}
 		else {
 			render(view: "create", model: [documentInstance: documentInstance])
@@ -123,7 +123,7 @@ class DocumentController {
 		}
 		else {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'document.label', default: 'Document'), params.id])}"
-			redirect(action: "list")
+			redirect(action: "browser")
 		}
 	}
 
@@ -134,7 +134,7 @@ class DocumentController {
 			try {
 				documentInstance.delete(flush: true)
 				flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'document.label', default: 'Document'), params.id])}"
-				redirect(action: "list")
+				redirect(action: "browser")
 			}
 			catch (org.springframework.dao.DataIntegrityViolationException e) {
 				flash.message = "${message(code: 'default.not.deleted.message', args: [message(code: 'document.label', default: 'Document'), params.id])}"
@@ -143,7 +143,7 @@ class DocumentController {
 		}
 		else {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'document.label', default: 'Document'), params.id])}"
-			redirect(action: "list")
+			redirect(action: "browser")
 		}
 	}
 

@@ -27,6 +27,8 @@
 					style="margin-top: 10px; margin-bottom: -1px; margin-left: 30px;">
 					<i class="icon-plus"></i>Add Document
 				</a>
+				
+
 
 				<div style="float: right; margin: 10px 0;">
 					<sUser:ifOwns model="['user':documentInstance.author]">
@@ -35,12 +37,39 @@
 							href="${uGroup.createLink(controller:'document', action:'edit', id:documentInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
 							<i class="icon-edit"></i>Edit
 						</a>
-
-						<a class="btn btn-danger btn-primary pull-right"
-							style="margin-right: 5px; margin-bottom: 10px;"
-							href="${uGroup.createLink(controller:'document', action:'delete', id:documentInstance.id)}"
-							onclick="return confirm('${message(code: 'default.document.delete.confirm.message', default: 'This document will be deleted. Are you sure ?')}');"><i
+						
+															<a class="btn btn-danger" id="deleteButton" style="margin-right: 5px; margin-bottom: 10px;"><i
 							class="icon-trash"></i>Delete</a>
+						
+
+							
+							<form action="${uGroup.createLink(controller:'document', action:'delete')}" method='POST' name='deleteForm'>
+							<input type="hidden" name="id" value="${documentInstance.id}" />
+						</form>
+						<div id="deleteConfirmDialog" title="Are you sure?"></div>
+
+						<r:script>
+							$(document).ready(function() {
+								$("#deleteButton").button().bind('click', function() {
+									$('#deleteConfirmDialog').dialog('open');
+								});
+				
+								$("#deleteConfirmDialog").dialog({
+									autoOpen: false,
+									resizable: false,
+									height: 100,
+									modal: true,
+									buttons: {
+										'Delete': function() {
+											document.forms.deleteForm.submit();
+										},
+										Cancel: function() {
+											$(this).dialog('close');
+										}
+									}
+								});
+							});
+						</r:script>
 
 					</sUser:ifOwns>
 				</div>

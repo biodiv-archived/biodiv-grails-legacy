@@ -8,7 +8,7 @@ import org.grails.taggable.*
 
 class ProjectController {
 
-	static allowedMethods = [save: "POST", update: "POST", delete: "GET"]
+	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
 	def projectService
 	def observationService
