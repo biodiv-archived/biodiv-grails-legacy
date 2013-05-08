@@ -68,7 +68,7 @@ class Document implements Taggable {
 
 
 	static constraints = {
-		title nullable:false
+		title nullable:false, blank:false
 		uFile nullable:true
 		uri nullable:true
 		contributors nullable:true
@@ -90,10 +90,7 @@ class Document implements Taggable {
 	
 	static mapping = {
 		description type:"text"
-		
-		coverage cascade: "all-delete-orphan"
-		uFile cascade: "all-delete-orphan"
-		
+				
 	}
 	
 	

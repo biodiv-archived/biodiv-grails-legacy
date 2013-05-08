@@ -169,7 +169,7 @@
 
 
 								<tr>
-									<td class="prop"><span class="grid_3 name">SpeciesGroups</span></td>
+									<td class="prop"><span class="grid_3 name">Species Groups</span></td>
 									<td class="linktext"><g:each
 											in="${documentInstance?.coverage?.speciesGroups}"
 											var="speciesGroup">

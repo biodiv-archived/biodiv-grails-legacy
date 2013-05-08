@@ -13,10 +13,3 @@ $('.del-document').live('click', function() {
 	prnt.hide();
 
 });
-
-$(document).ready(function() {
-	var ft = $(".file-tags");
-	ft.tagit({
-		fieldName : ft.name
-	});
-});

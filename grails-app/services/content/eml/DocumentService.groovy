@@ -29,11 +29,37 @@ class DocumentService {
 
 	Document createDocument(params) {
 
+		
 		def document = new Document(params)
 
 		document.coverage.location = 'POINT(' + params.coverage.longitude + ' ' + params.coverage.latitude + ')'
 		document.coverage.reverseGeocodedName = params.coverage.reverse_geocoded_name
 		document.coverage.locationAccuracy = params.coverage.location_accuracy
+		
+		if(params.description) {
+			def description = params.description.trim()
+			if(description)
+				document.description =description
+			else
+				document.description = null
+		}
+		
+		if(params.contributors) { 
+			def contributors = params.contributors.trim()
+			if(contributors)
+				document.contributors =contributors
+			else 
+				document.contributors = null
+		}
+		
+		if(params.attribution) {
+			def attribution = params.attribution.trim()
+			if(attribution)
+				document.attribution = attribution
+			else
+				document.attribution = null
+		}
+					
 
 		document.coverage.speciesGroups = []
 		params.speciesGroup.each {key, value ->
