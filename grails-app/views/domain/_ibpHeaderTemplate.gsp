@@ -103,6 +103,7 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 					}, scope);
 				});
 			});
+
 		}); 
 	
 	//////////////////////// FB RELATED CALLS ///////////////////////

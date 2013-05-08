@@ -5,7 +5,7 @@
 		<div class="license license_div">
                                             <i class="slideUp icon-chevron-up pull-right"></i>
 
-		        <obv:rating model="['resource':resource, 'class':'galleryRating']"/>
+		        <obv:rating model="['resource':resource, 'class':'gallery_rating']"/>
                         
                         <g:each in="${resource?.licenses}" var="l">
 				<a href="${l?.url}" target="_blank"> <img class="icon" style="height:auto;margin-right:2px;"

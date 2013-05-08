@@ -116,7 +116,7 @@ class FacebookAuthCookieFilter extends GenericFilterBean implements ApplicationE
 					logger.warn("No auth cookie");
 				}
 				if(!fbLoginCookie) {
-					logger.warn("No fb_login cookie");
+					logger.debug("No fb_login cookie");
 				}
 //				logger.debug("Found following cookies");
 //				request.cookies.each { logger.debug it.name+":"+it.value }

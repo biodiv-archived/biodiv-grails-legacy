@@ -239,7 +239,8 @@ function loadYoutube(youtube_container) {
 }
 
 function rating() {
-    var imgRating = rate($(".rating"), updateRating);
+    rate($(".star_rating"));
+    like($(".like_rating"));
 }
 
 function last_actions() {

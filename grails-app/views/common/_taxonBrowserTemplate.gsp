@@ -110,7 +110,7 @@ var heirarchyLevelFormatter = function(el, cellVal, opts) {
 			<g:set var="classifications" value="${Classification.list()}" />
 		</g:else>
 		<select name="taxaHierarchy" id="taxaHierarchy"
-			class="value ui-corner-all">
+			class="value ui-corner-all" style="margin-bottom:0px;width:100%;background-color:whitesmoke;">
 			<g:each in="${classifications}" var="classification">
 				<option value="${classification.id}">
 					${classification.name}

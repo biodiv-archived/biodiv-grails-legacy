@@ -473,10 +473,11 @@ $(document).ready(function(){
 					</div>
 				<!--  static species content -->
 				</div>
-				
+
+                                <div style="background-color:white">
 				
 				<!-- species page icons -->
-				<div style="margin:5px 0px;">
+				<div style="padding:5px 0px;">
 					<s:showSpeciesExternalLink model="['speciesInstance':speciesInstance]"/>
 					<div class="observation-icons">		
 						<img class="group_icon species_group_icon"  
@@ -499,7 +500,8 @@ $(document).ready(function(){
 				</div>
                                 <div class="readmore sidebar_section">
 				    ${speciesInstance.findSummary() }
-				</div>
+                                </div>
+                            </div>
 
 				<%def nameRecords = fields.get(grailsApplication.config.speciesPortal.fields.NOMENCLATURE_AND_CLASSIFICATION)?.get(grailsApplication.config.speciesPortal.fields.TAXON_RECORD_NAME).collect{it.value.get('speciesFieldInstance')[0]} %>
 				<g:if test="${nameRecords}">

@@ -10,16 +10,6 @@
 }
 
 
-input,select,textarea {
-        /*	border: 1px solid #ccc; */
-	/* 	font: 12px Arial, Helvetica, sans-serif; */
-	/* padding: 5px; */
-}
-
-select {
-	padding: 2px 2px 2px 0;
-}
-
 textarea {
 	width: 250px;
 	height: 150px;
