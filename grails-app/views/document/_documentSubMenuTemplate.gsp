@@ -14,3 +14,8 @@
 		</div>
 	</div>
 </g:if>
+<g:hasErrors bean="${documentInstance}">
+	<i class="icon-warning-sign"></i>
+	<span class="label label-important"> <g:message
+			code="fix.errors.before.proceeding" default="Fix errors" /> </span>
+</g:hasErrors>

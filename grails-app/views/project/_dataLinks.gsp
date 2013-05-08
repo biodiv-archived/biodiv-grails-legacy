@@ -72,6 +72,6 @@
 	</g:else>
 </div>
 <div style="text-align: center;">
-	<input type="button" class="btn btn-primary" value="Add dataLink"
+	<input type="button" class="btn btn-primary" value="Add Data Link"
 		onclick="adddataLink();" />
 </div>

@@ -41,9 +41,7 @@ textarea {
 <body>
 
         <div class="span12 observation_create">
-		<g:render template="/project/projectSubMenuTemplate" model="['entityName':'Add Project']" />
-		<uGroup:rightSidebar/>
-		
+	
 		<%
                 def form_action = uGroup.createLink(action:'save', controller:'project', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)
 				def form_title = "Create Project"				
@@ -61,20 +59,9 @@ textarea {
 						
 			
             %>
-		<h1>
-			${form_title}
-		</h1>
-		<g:if test="${flash.message}">
-			<div class="message">
-				${flash.message}
-			</div>
-		</g:if>
-		<g:hasErrors bean="${projectInstance}">
-			<div class="errors">
-				<g:renderErrors bean="${projectInstance}" as="list" />
-			</div>
-		</g:hasErrors>
-
+            <g:render template="/project/projectSubMenuTemplate" model="['entityName':form_title]" />
+		<uGroup:rightSidebar/>
+	
 		<form action="${form_action}" method="POST" id="create-project"
 			class="project-form form-horizontal" enctype="multipart/form-data">
 			<div class="dialog">
@@ -268,7 +255,7 @@ textarea {
 
 
 						<div
-							class="control-group ${hasErrors(bean: projectInstance, field: 'granteeAmount', 'error')}">
+							class="control-group ${hasErrors(bean: projectInstance, field: 'grantedAmount', 'error')}">
 
 							<label class="control-label" for="grantedAmount"><g:message
 									code="project.grantedAmount.label" default="Granted Amount" /></label>
