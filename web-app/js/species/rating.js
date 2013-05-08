@@ -1,6 +1,5 @@
 $(document).ready(function(){
     $.fn.raty.defaults.path = window.params.imagesPath 
-    $.fn.raty.defaults.scoreName = 'rating'
     $.fn.raty.defaults.cancel = false
     $.fn.raty.defaults.space = false
 });
@@ -36,6 +35,7 @@ function like(ele, successHandler) {
     return ele.raty({
         number: 1,
         halfShow:false, 
+        scoreName:'rating',
         score: function() {
             return $(this).attr('data-score');
         },
@@ -48,10 +48,17 @@ function like(ele, successHandler) {
     });
 }
 
-function rate(ele, successHandler) {
+function rate(ele, successHandler, inputName) {
+    if(!inputName) {
+        inputName = ele.attr('data-input-name');
+        if (typeof inputName == 'undefined' || inputName == false) {
+            inputName = 'rating';
+        }
+    }
     return rateFn = ele.raty({
         number: 5,
         halfShow:true, 
+        scoreName:inputName,
         score: function() {
             return $(this).attr('data-score');
         },

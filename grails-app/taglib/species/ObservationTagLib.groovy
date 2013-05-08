@@ -241,7 +241,7 @@ class ObservationTagLib {
 
             out << """
                <span class="star_${divClass} 
-                    title="Rate" data-score='${averageRating}'></span>
+                    title="Rate" data-score='${averageRating}' data-input-name="${name}"></span>
                     <div class="noOfRatings">(${resource.totalRatings ?: 0} rating${resource.totalRatings!=1?'s':''})</div>
                 """
             if(!hideForm) {
