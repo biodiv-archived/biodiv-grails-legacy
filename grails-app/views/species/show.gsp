@@ -498,7 +498,7 @@ $(document).ready(function(){
 								title="${r?.description}" />
 					</g:each>
 				</div>
-                                <div class="readmore sidebar_section">
+                                <div class="readmore sidebar_section notes_view">
 				    ${speciesInstance.findSummary() }
                                 </div>
                             </div>
@@ -665,7 +665,14 @@ $(document).ready(function(){
                                 <comment:showCommentPopup model="['commentHolder':[objectType:ActivityFeedService.SPECIES_MAPS, id:speciesInstance.id], 'rootHolder':speciesInstance]" />	
 
                             </div>
-
+                                                                                <div class="sidebar_section">
+                                                                                        <h5>Related Observations</h5>
+                                                                                        <div class="tile" style="clear: both">
+                                                                                                <obv:showRelatedStory
+                                                                                                        model="['speciesId':speciesInstance.id, 'controller':'observation', 'action':'getRelatedObservation', 'filterProperty': 'taxonConcept',  'filterPropertyValue': speciesInstance.taxonConcept.id, 'id':'a','userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress]" />
+                                                                                        </div>
+                                                                                </div>
+ 
                            <div class="sidebar_section">
                                 <h5> Activity </h5>
                                     <div class="union-comment">

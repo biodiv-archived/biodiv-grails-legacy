@@ -266,7 +266,7 @@ class SpeciesController {
 							}
 						}
 					} else {
-						show = true;
+						show = false;
 					}
 					if(show) {
 						newConceptMap.put(category.key, category.value);

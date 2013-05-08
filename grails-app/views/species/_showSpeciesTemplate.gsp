@@ -75,7 +75,7 @@
 
                     </div>
 
-                    <div class="ellipsis multiline clearfix">
+                    <div class="ellipsis multiline clearfix notes_view">
                             <g:set var="summary" value="${speciesInstance.findSummary()}"></g:set>
                             <g:if test="${summary != null && summary.length() > 300}">
                                     ${summary[0..300] + ' ...'}
@@ -83,6 +83,11 @@
                             <g:else>
                                     ${summary?:''}
                             </g:else>
+                    </div>
+                </div>
+                <div class="story-footer" style="width: 100%">
+                    <div class="footer-item">
+                        <obv:like model="['resource':speciesInstance]"/>
                     </div>
                 </div>
 
