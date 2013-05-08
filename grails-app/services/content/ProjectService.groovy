@@ -53,7 +53,7 @@ class ProjectService {
 		}
 
 		// delete DataLinks that are marked for removal
-		def _toBeDeletedDataLinks = project.dataLinks.findAll{it?.deleted || !it}
+		/*def _toBeDeletedDataLinks = project.dataLinks.findAll{it?.deleted || !it}
 
 		if(_toBeDeletedDataLinks) {
 			project.dataLinks.removeAll(_toBeDeletedDataLinks)
@@ -86,7 +86,7 @@ class ProjectService {
 		if(_toBeDeletedMiscFiles) {
 			project.miscFiles.removeAll(_toBeDeletedMiscFiles)
 		}
-		
+*/		
 		log.debug "Project object after updating with params: "+ project.dump()
 	}
 

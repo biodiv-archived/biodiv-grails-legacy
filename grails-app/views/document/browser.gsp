@@ -8,7 +8,7 @@
 <g:set var="entityName"
 	value="${message(code: 'Document.label', default: 'Document')}" />
 <title>Document Browser</title>
-<r:require modules="core" />
+<r:require modules="add_file" />
 <uploader:head />
 <style type="text/css">
 
@@ -25,7 +25,7 @@
 
 
 
-		<div class="document-list tab-content span8 right-shadow-box" style="padding-right:5px;">
+		<div class="document-list span8 right-shadow-box" style="padding-right:5px;">
 			<g:render template="/document/search" model="['params':params]" />
 
 			<g:render template="/document/documentListTemplate" />

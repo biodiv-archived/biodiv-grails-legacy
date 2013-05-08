@@ -103,7 +103,26 @@ class UFileController {
 			
 			Document documentInstance = new Document()
 			documentInstance.title  = uploaded.getName()
-			documentInstance.type = params.type?params.type:DocumentType.MISCELLANEOUS
+			
+			if(params.type) {
+				switch(params.type) {
+					case "Proposal":
+						documentInstance.type = DocumentType.Proposal					
+						break
+					case "Report":
+						documentInstance.type = DocumentType.Report
+						break
+					case "Poster":
+						documentInstance.type = DocumentType.Poster
+						break
+					case "Miscellaneous":
+					default:
+						documentInstance.type = DocumentType.Miscellaneous
+						break						
+				}
+			} else {
+				documentInstance.type = DocumentType.Miscellaneous
+			}
 			documentInstance.author = springSecurityService.currentUser
 			
 			documentInstance.uFile = uFileInstance

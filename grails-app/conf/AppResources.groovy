@@ -233,12 +233,23 @@ modules = {
 
 	add_file {
 		dependsOn 'core, tagit'
-
+		
+		
 		resource url:'/css/content.css'
 		resource url:'/js/content.js'
 		resource url:'/css/location_picker.css'
 		resource url:'/js/location/location-picker.js'
 		resource url:'/js/species/observations/list.js'
+	}
+	
+	
+	content_view {
+		dependsOn 'core,  tagit'
+		resource url:'/css/main.css'
+		
+		resource url:'/css/content.css'
+		resource url:'/js/content.js'
+		
 	}
 
     prettyPhoto {

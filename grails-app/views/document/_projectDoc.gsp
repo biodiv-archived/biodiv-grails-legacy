@@ -31,8 +31,8 @@
 					<label class="control-label" for="name"> Title </label>
 
 					<div class="controls">
-						<input class="input-xlarge" type='text' name='${docId}.title'
-							value='${docName}' placeholder="Name for the file" />
+						<input class="input-block-level" type='text' name='${docId}.title'
+							value='${docName}' placeholder="Name for the Document" />
 
 					</div>
 
@@ -42,7 +42,7 @@
 					<label class="control-label" for="description"> Description
 					</label>
 					<div class="controls">
-						<textarea rows='5' name='${docId}.description'
+						<textarea rows='5' name='${docId}.description' width="100%"
 							value='${documentInstance?.description}'
 							placeholder="Describe the file"> </textarea>
 					</div>
@@ -70,7 +70,7 @@
 					class="control-group ${hasErrors(bean: documentInstance, field: 'contributors', 'error')}">
 					<label class="control-label" for="contributors">Contributor(s)</label>
 					<div class="controls">
-						<g:textField name="${docId}.contributors"
+						<input type="text" class="input-block-level" name="${docId}.contributors"
 							value="${documentInstance?.contributors }" />
 					</div>
 				</div>
@@ -81,7 +81,7 @@
 					class="control-group ${hasErrors(bean: documentInstance, field: 'attribution', 'error')}">
 					<label class="control-label" for="attribution">Attribution</label>
 					<div class="controls">
-						<g:textField name="${docId}.attribution"
+						<input type="text" class="input-block-level" name="${docId}.attribution"
 							value="${documentInstance?.attribution}" />
 					</div>
 				</div> <label class="control-label" for="License"> License </label>

@@ -5,8 +5,6 @@
 		model="['documentInstanceList':documentInstanceList]" />
 
 
-
-
 	<% params['isGalleryUpdate'] = false; %>
 	<div class="paginateButtons centered">
 		<p:paginate controller="document" action="browser"
@@ -16,5 +14,3 @@
 	</div>
 
 </div>
-
-

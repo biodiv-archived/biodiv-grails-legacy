@@ -84,6 +84,7 @@ class DocumentController {
 
 	@Secured(['ROLE_USER'])	
 	def update = {
+		log.debug "Params in Document update >> "+ params
 		def documentInstance = Document.get(params.id)
 		if (documentInstance) {
 			if (params.version) {
@@ -98,6 +99,21 @@ class DocumentController {
 			}
 			documentInstance.properties = params
 			if (!documentInstance.hasErrors() && documentInstance.save(flush: true)) {
+				
+				def tags = (params.tags != null) ? Arrays.asList(params.tags) : new ArrayList();
+				
+				documentInstance.setTags(tags)
+				
+				if(params.groupsWithSharingNotAllowed) {
+					documentService.setUserGroups(documentInstance, [params.groupsWithSharingNotAllowed]);
+				} else {
+					if(params.userGroupsList) {
+						def userGroups = (params.userGroupsList != null) ? params.userGroupsList.split(',').collect{k->k} : new ArrayList();
+						
+						documentService.setUserGroups(documentInstance, userGroups);
+					}
+				}
+				
 				flash.message = "${message(code: 'default.updated.message', args: [message(code: 'document.label', default: 'Document'), documentInstance.id])}"
 				redirect(action: "show", id: documentInstance.id)
 			}
