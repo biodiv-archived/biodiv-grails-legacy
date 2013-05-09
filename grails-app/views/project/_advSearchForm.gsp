@@ -4,27 +4,28 @@
 	<form id="advSearchForm" method="get"  title="Search"
 		action="${uGroup.createLink(controller:'project', action:'search') }"
 		class="searchbox">
-		<label class="control-label" for="name">Title</label> <input id="title"
+		<label class="control-label" for="name">Title</label>
+			<input id="aq.title"
 			data-provide="typeahead" type="text" class="input-block-level"
 			name="aq.title" 
 			placeholder="Search by Project title" value="${params.title}" />
 			
-		<label class="control-label" for="grantee">Grantee</label> <input id="grantee"
+		<label class="control-label" for="grantee">Grantee</label> <input id="aq.grantee"
 			data-provide="typeahead" type="text" class="input-block-level"
 			name="aq.grantee_organization"
 			placeholder="Search by Grantee" value="${params.grantee}"/>
 
-		<label class="control-label" for="sitename">Site Name</label> <input id="sitename"
+		<label class="control-label" for="sitename">Site Name</label> <input id="aq.sitename"
 			data-provide="typeahead" type="text" class="input-block-level"
 			name="aq.sitename"
 			placeholder="Search by Site Name" value="${params.sitename}"/>
 			
-					<label class="control-label" for="corridor">Corridor</label> <input id="corridor"
+		<label class="control-label" for="corridor">Corridor</label> <input id="aq.corridor"
 			data-provide="typeahead" type="text" class="input-block-level"
 			name="aq.corridor"
 			placeholder="Search by Corridior" value="${params.corridor}" />
 			
-					<label class="control-label" for="keywords">Keywords</label> <input id="keywords"
+		<label class="control-label" for="keywords">Keywords</label> <input id="aq.keywords"
 			data-provide="typeahead" type="text" class="input-block-level"
 			name="aq.tag"
 			placeholder="Search by Keywords" value="${params.keywords}" />

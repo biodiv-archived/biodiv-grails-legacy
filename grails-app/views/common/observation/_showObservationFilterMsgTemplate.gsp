@@ -71,7 +71,7 @@
 			<g:if test="${queryParam.key == 'tag' && queryParam.value}">
                                     tagged <span class="highlight">
 					<a
-					href="${uGroup.createLink(controller:"observation", action:"list",
+					href="${uGroup.createLink(controller:params.controller, action:"list",
 					params:[tag: queryParam.value])}">
 						${queryParam.value} <a id="removeTagFilter" href="#">[X]</a> </a> </span>
 			</g:if>
@@ -92,7 +92,7 @@
 						def endDate =  queryParams.daterangepicker_end 			
 					%>                
 					<a
-					href="${uGroup.createLink(controller:"observation", action:"list", params:[daterangepicker_start:startDate,daterangepicker_end:endDate])}">
+					href="${uGroup.createLink(controller:params.controller, action:"list", params:[daterangepicker_start:startDate,daterangepicker_end:endDate])}">
 						${'' + startDate + ' - ' + endDate} <a
 						id="removeDateRange" href="#">[X]</a> </a> </span>
 			</g:if>
@@ -106,8 +106,8 @@
 			<g:if test="${(queryParam.key == 'query' || queryParam.key == 'q') && queryParam.value}">
                                     for search key <span
 					class="highlight"> <a
-					href="${uGroup.createLink(controller:"observation",
-					action:"search", params:[query: queryParam.value])}">
+					href="${uGroup.createLink(controller:params.controller,
+					action:params.action, params:[query: queryParam.value])}">
 						${queryParam.value.encodeAsHTML()} <a id="removeQueryFilter" data-target="#searchTextField"
 						href="#">[X]</a> </span>
 			</g:if>
@@ -115,8 +115,8 @@
 			<g:if test="${queryParam.key.startsWith('aq.') && queryParam.value}">
                                     ${queryParam.key.replace('aq.','')}:<span
 					class="highlight"> <a
-					href="${uGroup.createLink(controller:"observation",
-					action:"search", params:[(queryParam.key): queryParam.value])}">
+					href="${uGroup.createLink(controller:params.controller,
+					action:params.action, params:[(queryParam.key): queryParam.value])}">
 						${queryParam.value.encodeAsHTML()} <a id="removeQueryFilter" data-target="#${queryParam.key}"
 						href="#">[X]</a> </span>
 			</g:if>

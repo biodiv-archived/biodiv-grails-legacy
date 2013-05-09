@@ -205,12 +205,16 @@ class DocumentController {
 
 		if(params.loadMore?.toBoolean()){
 			params.remove('isGalleryUpdate');
-			render(template:"/document/searchResultsTemplate", model:model);
+			render(template:"/document/documentListTemplate", model:model);
 			return;
 
+		} else if(!params.isGalleryUpdate?.toBoolean()){
+			params.remove('isGalleryUpdate');
+			render (view:"browser", model:model)
+			return;
 		} else {
 			params.remove('isGalleryUpdate');
-			def obvListHtml =  g.render(template:"/document/searchResultsTemplate", model:model);
+			def obvListHtml =  g.render(template:"/document/documentListTemplate", model:model);
 			model.resultType = "document"
 			def obvFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
 

@@ -178,16 +178,16 @@ class ProjectController {
 
 		if(params.loadMore?.toBoolean()){
 			params.remove('isGalleryUpdate');
-			render(template:"/species/searchResultsTemplate", model:model);
+			render(template:"/project/projectListTemplate", model:model);
 			return;
 		} else if(!params.isGalleryUpdate?.toBoolean()){
 			params.remove('isGalleryUpdate');
-			render (view:"search", model:model)
+			render (view:"list", model:model)
 			return;
 		} else {
 			log.debug "going to gallery update in controller"
 			params.remove('isGalleryUpdate');
-			def obvListHtml =  g.render(template:"/project/searchResultsTemplate", model:model);
+			def obvListHtml =  g.render(template:"/project/projectListTemplate", model:model);
 			model.resultType = "project"
 			def obvFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
 

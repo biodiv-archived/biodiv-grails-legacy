@@ -7,18 +7,20 @@
 
 
 		<label class="control-label" for="title">Title</label> <input
-			id="title" data-provide="typeahead" type="text"
+			id="aq.title" data-provide="typeahead" type="text"
 			class="input-block-level" name="aq.title"
-			placeholder="Search by Document title" value="${params.title}" /> <label
+			placeholder="Search by Document title" value="${params.title}" />
+		
+		<label
 			class="control-label" for="grantee">Description</label> <input
-			id="description" data-provide="typeahead" type="text"
+			id="aq.description" data-provide="typeahead" type="text"
 			class="input-block-level" name="aq.descriptionn"
 			placeholder="Search by Description" value="${params.description}" />
 
 
 
 		<label class="control-label" for="keywords">Keywords</label> <input
-			id="keywords" data-provide="typeahead" type="text"
+			id="aq.keywords" data-provide="typeahead" type="text"
 			class="input-block-level" name="aq.tag"
 			placeholder="Search by Keywords" value="${params.keywords}" />
 
