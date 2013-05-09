@@ -152,7 +152,6 @@
 					</p>
 				</div>
 			</g:if>
-
 			<g:if test="${projectInstance.tags}">
 				<b>Keywords : </b>
 
@@ -227,18 +226,21 @@
 						Details</h5></a>
 				<div id="project-details" class="speciesField in collapse">
 					<table>
+						<g:if test="${projectInstance.grantFrom || projectInstance.grantTo}">
 						<tr>
 							<td class="prop"><span class="grid_3 name">Grant Term</span></td>
 							<td class="linktext">
 								${projectInstance?.grantFrom} - ${projectInstance?.grantTo}
 							</td>
 						</tr>
-
+						</g:if>
+						<g:if test="${projectInstance.grantedAmount}">
 						<tr>
 							<td class="prop"><span class="grid_3 name">Amount</td>
 							<td class="linktext">$ ${projectInstance?.grantedAmount}
 							</td>
 						</tr>
+						</g:if>
 					</table>
 				</div>
 			</div>

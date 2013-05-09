@@ -83,9 +83,13 @@ class Project implements Taggable{
 		granteeEmail(nullable:true, email:true, blank:false);
 		granteeLogo(nullable:true)
 		
-		grantFrom(nullable: true);
 		grantTo(nullable: true);
-
+		grantFrom validator : {val, obj -> 
+			if(val && obj.grantTo){
+				val <=  obj.grantTo
+			}	 
+		}, nullable:true
+		
 		grantedAmount validator : { val, obj ->  val >= 0 }, nullable:true
 		
 		
@@ -97,8 +101,6 @@ class Project implements Taggable{
 				
 		misc(nullable: true);
 		miscFiles(nullable: true);
-		
-
 	}
 
 

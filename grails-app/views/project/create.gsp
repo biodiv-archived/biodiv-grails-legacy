@@ -225,31 +225,25 @@ textarea {
 						<div
 							class="control-group ${hasErrors(bean: projectInstance, field: 'granteeFrom', 'error')}">
 
-							<label class="control-label" for="grantFrom"><g:message
+							<label class="control-label" for="grantFrom"><i class="icon-calendar"></i><g:message
 									code="project.grantFrom.label" default="Grant From" /></label>
 							<div class="controls">
-								<div class="input-prepend">
-									<span class="add-on date-popup"><i class="icon-calendar"></i></span>
 									<input name="grantFrom" type="text" id="grantFrom"
 										class="date-popup"
 										value="${projectInstance?.grantFrom?.format('dd/MM/yyyy')}"
 										placeholder="Select date" />
-								</div>
 							</div>
 						</div>
 
 						<div
 							class="control-group ${hasErrors(bean: projectInstance, field: 'granteeTo', 'error')}">
-							<label class="control-label" for="grantTo"><g:message
+							<label class="control-label" for="grantTo"><i class="icon-calendar"></i><g:message
 									code="project.grantTo.label" default="Grant To" /></label>
 							<div class="controls">
-								<div class="input-prepend">
-									<span class="add-on date-popup"><i class="icon-calendar"></i></span>
 									<input name="grantTo" type="text" id="grantTo"
 										class="date-popup"
 										value="${projectInstance?.grantTo?.format('dd/MM/yyyy')}"
 										placeholder="Select date" />
-								</div>
 							</div>
 						</div>
 
@@ -263,8 +257,8 @@ textarea {
 								<div class="input-prepend input-append">
 									<span class="add-on">$</span>
 
-									<g:textField name="grantedAmount"
-										value="${fieldValue(bean: projectInstance, field: 'grantedAmount')}" />
+									<g:textField name="grantedAmount" placeholder="Enter amount"
+										value="${projectInstance?.grantedAmount?projectInstance.grantedAmount:null}" />
 									<span class="add-on">.00</span>
 
 								</div>

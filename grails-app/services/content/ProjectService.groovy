@@ -35,13 +35,11 @@ class ProjectService {
 	}
 
 	def updateProject(params, Project project) {
-		log.debug " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
-		log.debug params
-
+		log.debug " >>>>>>>>>>>>>>>>>>>>ccc>>>>>>>>>>>>>>>>>>"
 		def projectParams = params
 		projectParams.grantFrom = parseDate(params.grantFrom)
 		projectParams.grantTo = parseDate(params.grantTo)
-
+		projectParams.grantedAmount = (params.grantedAmount && params.grantedAmount != '') ? params.grantedAmount?.toInteger() : 0
 		project.properties = projectParams
 		def documents = documentService.updateDocuments(params)
 
@@ -92,7 +90,7 @@ class ProjectService {
 
 	private Date parseDate(date){
 		try {
-			return date? Date.parse("dd/MM/yyyy", date):new Date();
+			return date? Date.parse("dd/MM/yyyy", date):null;
 		} catch (Exception e) {
 			// TODO: handle exception
 			print e.toString();
