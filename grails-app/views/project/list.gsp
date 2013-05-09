@@ -51,13 +51,12 @@
 
 					</g:each>
 				</div>
-
 				<% params['isGalleryUpdate'] = false; %>
-				<div class="paginateButtons centered">
+				<div class="paginateButtons centered" style="clear: both; padding-top: 30px;">
 					<p:paginate controller="project" action="list"
 						total="${projectInstanceTotal}" userGroup="${userGroup}"
 						userGroupWebaddress="${userGroupWebaddress}" params="${params}"
-						max="${queryParams.max }" maxsteps="10" />
+						max="${queryParams.max }" maxsteps="12" />
 				</div>
 
 			</div>
