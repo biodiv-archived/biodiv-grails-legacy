@@ -35,7 +35,7 @@ class ProjectService {
 	}
 
 	def updateProject(params, Project project) {
-		log.debug " >>>>>>>>>>>>>>>>>>>>ccc>>>>>>>>>>>>>>>>>>"
+		log.debug " >>>>>>>>>>>>>>>>>>>>ccc>>>>>>>>>>>>>>>>>>" + params
 		def projectParams = params
 		projectParams.grantFrom = parseDate(params.grantFrom)
 		projectParams.grantTo = parseDate(params.grantTo)
@@ -68,8 +68,7 @@ class ProjectService {
 
 		def _toBeDeletedReportFiles = project.reportFiles.findAll{it?.deleted || !it}
 
-		log.debug "Report Files marked for delete.."
-		log.debug _toBeDeletedReportFiles
+		log.debug "Report Files marked for delete.." + _toBeDeletedReportFiles
 
 		if(_toBeDeletedReportFiles) {
 			project.reportFiles.removeAll(_toBeDeletedReportFiles)
@@ -78,8 +77,7 @@ class ProjectService {
 
 		def _toBeDeletedMiscFiles = project.miscFiles.findAll{it?.deleted || !it}
 
-		log.debug "Report Files marked for delete.."
-		log.debug _toBeDeletedReportFiles
+		log.debug "Report Files marked for delete.." + _toBeDeletedReportFiles
 
 		if(_toBeDeletedMiscFiles) {
 			project.miscFiles.removeAll(_toBeDeletedMiscFiles)

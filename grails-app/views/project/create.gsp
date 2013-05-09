@@ -34,14 +34,14 @@ textarea {
 }
 
 [class*="cke"] {
-	max-width:100%;
+	max-width: 100%;
 }
 </style>
 </head>
 <body>
 
-        <div class="span12 observation_create">
-	
+	<div class="span12 observation_create">
+
 		<%
                 def form_action = uGroup.createLink(action:'save', controller:'project', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)
 				def form_title = "Create Project"				
@@ -59,9 +59,10 @@ textarea {
 						
 			
             %>
-            <g:render template="/project/projectSubMenuTemplate" model="['entityName':form_title]" />
-		<uGroup:rightSidebar/>
-	
+		<g:render template="/project/projectSubMenuTemplate"
+			model="['entityName':form_title]" />
+		<uGroup:rightSidebar />
+
 		<form action="${form_action}" method="POST" id="create-project"
 			class="project-form form-horizontal" enctype="multipart/form-data">
 			<div class="dialog">
@@ -94,6 +95,12 @@ textarea {
 
 								<input type="text" class="input-block-level" name="title"
 									value="${projectInstance?.title}" required />
+
+								<div class="help-inline">
+									<g:hasErrors bean="${projectInstance}" field="title">
+										<g:message code="default.blank.message" args="['Title']" />
+									</g:hasErrors>
+								</div>
 							</div>
 
 						</div>
@@ -142,7 +149,7 @@ textarea {
 				</div>
 
 				<div class="super-section">
-						<h3>Location</h3>
+					<h3>Location</h3>
 					<div id="locationsDiv" class="section in collapse">
 						<g:render template="locations"
 							model="['projectInstance':projectInstance]" />
@@ -151,99 +158,107 @@ textarea {
 
 				</div>
 
-				<div class=" span12 super-section" style="margin-left:0px;width:930px;">
+				<div class=" span12 super-section"
+					style="margin-left: 0px; width: 930px;">
 
 					<h3>Grantee Details</h3>
-											<div class="span4">
-						
-							<div
-								class="control-group ${hasErrors(bean: projectInstance, field: 'granteeOrganization', 'error')}">
-								<label class="control-label" for="granteeOrganization"><g:message
-										code="project.granteeOrganization.label"
-										default="Grantee Organization" /></label>
+					<div class="span4 section">
 
-								<div class="controls">
+						<div
+							class="control-group ${hasErrors(bean: projectInstance, field: 'granteeOrganization', 'error')}">
+							<label class="control-label" for="granteeOrganization"><g:message
+									code="project.granteeOrganization.label"
+									default="Grantee Organization" /></label>
 
-									<g:textField name="granteeOrganization"
-										value="${projectInstance?.granteeOrganization}" />
-								</div>
-							</div>
+							<div class="controls">
 
-
-							<div
-								class="control-group ${hasErrors(bean: projectInstance, field: 'granteeContact', 'error')}">
-								<label class="control-label" for="granteeContact"><g:message
-										code="project.granteeContact.label" default="Primary Contact" /></label>
-
-								<div class="controls">
-
-									<g:textField name="granteeContact"
-										value="${projectInstance?.granteeContact}" />
-								</div>
+								<g:textField name="granteeOrganization"
+									value="${projectInstance?.granteeOrganization}" />
 							</div>
 						</div>
-						<div class="sidebar-section span6">
-							<div
-								class="control-group ${hasErrors(bean: projectInstance, field: 'granteeEmail', 'error')}">
-								<label class="control-label" for="granteeEmail"><g:message
-										code="project.granteeEmail.label" default="Email" /></label>
 
-								<div class="controls">
-									<div class="input-prepend">
-										<span class="add-on"><i class="icon-envelope"></i></span>
 
-										<g:textField name="granteeEmail"
-											value="${projectInstance?.granteeEmail}" />
+						<div
+							class="control-group ${hasErrors(bean: projectInstance, field: 'granteeContact', 'error')}">
+							<label class="control-label" for="granteeContact"><g:message
+									code="project.granteeContact.label" default="Primary Contact" /></label>
+
+							<div class="controls">
+
+								<g:textField name="granteeContact"
+									value="${projectInstance?.granteeContact}" />
+							</div>
+						</div>
+					</div>
+					<div class="sidebar-section span6 section">
+						<div
+							class="control-group ${hasErrors(bean: projectInstance, field: 'granteeEmail', 'error')}">
+							<label class="control-label" for="granteeEmail"><g:message
+									code="project.granteeEmail.label" default="Email" /></label>
+
+							<div class="controls">
+								<div class="input-prepend">
+									<span class="add-on"><i class="icon-envelope"></i></span>
+
+									<g:textField name="granteeEmail"
+										value="${projectInstance?.granteeEmail}" />
+									<div class="help-inline">
+										<g:hasErrors bean="${projectInstance}" field="title">
+											<g:message code="default.invalid.email.message" />
+										</g:hasErrors>
 									</div>
 								</div>
 							</div>
+						</div>
 
-							<div
-								class="control-group ${hasErrors(bean: projectInstance, field: 'granteeLogo', 'error')}">
+						<div
+							class="control-group ${hasErrors(bean: projectInstance, field: 'granteeLogo', 'error')}">
 
-								<label class="control-label" for="granteeLogo"><g:message
-										code="project.granteeLogo.label" default="GranteeLogo" /></label>
+							<label class="control-label" for="granteeLogo"><g:message
+									code="project.granteeLogo.label" default="GranteeLogo" /></label>
 
-								<div class="controls">
+							<div class="controls">
 
-									<g:render template='/UFile/imgUpload'
-										model="['name': 'granteeLogo', 'path': projectInstance?.granteeLogo, 'fileParams':['uploadDir':uploadDir]]" />
+								<g:render template='/UFile/imgUpload'
+									model="['name': 'granteeLogo', 'path': projectInstance?.granteeLogo, 'fileParams':['uploadDir':uploadDir]]" />
 
-								</div>
 							</div>
+						</div>
 					</div>
 				</div>
 
 
-<div style="clear:both;"></div>
+				<div style="clear: both;"></div>
 
 				<div class="super-section">
-				
 
-						<h3>Project Details</h3>
+
+					<h3>Project Details</h3>
 					<div id="projectDetails" class="section">
 						<div
 							class="control-group ${hasErrors(bean: projectInstance, field: 'granteeFrom', 'error')}">
 
-							<label class="control-label" for="grantFrom"><i class="icon-calendar"></i><g:message
+							<label class="control-label" for="grantFrom"><i
+								class="icon-calendar"></i> <g:message
 									code="project.grantFrom.label" default="Grant From" /></label>
 							<div class="controls">
-									<input name="grantFrom" type="text" id="grantFrom"
-										class="date-popup"
-										value="${projectInstance?.grantFrom?.format('dd/MM/yyyy')}"
-										placeholder="Select date" />
+								<input name="grantFrom" type="text" id="grantFrom"
+									class="date-popup"
+									value="${projectInstance?.grantFrom?.format('dd/MM/yyyy')}"
+									placeholder="Select date" />
 							</div>
 						</div>
 
 						<div
 							class="control-group ${hasErrors(bean: projectInstance, field: 'granteeTo', 'error')}">
-							<label class="control-label" for="grantTo"><i class="icon-calendar"></i><g:message
+							<label class="control-label" for="grantTo"><i
+								class="icon-calendar"></i> <g:message
 									code="project.grantTo.label" default="Grant To" /></label>
 							<div class="controls">
-									<input name="grantTo" type="text" id="grantTo"
-										class="date-popup"
-										value="${projectInstance?.grantTo?.format('dd/MM/yyyy')}"
-										placeholder="Select date" />
+								<input name="grantTo" type="text" id="grantTo"
+									class="date-popup"
+									value="${projectInstance?.grantTo?.format('dd/MM/yyyy')}"
+									placeholder="Select date" />
 							</div>
 						</div>
 
@@ -271,8 +286,8 @@ textarea {
 			</div>
 
 			<div class="super-section">
-								<h3>Project Proposal</h3>
-			
+				<h3>Project Proposal</h3>
+
 				<div id="projectProposalSec" class="section">
 
 
@@ -318,14 +333,14 @@ textarea {
 
 			<div class="super-section">
 
-					<h3>Project Report</h3>
+				<h3>Project Report</h3>
 				<div id="projectReportSec" class="section">
 					<div
 						class="control-group ${hasErrors(bean: projectInstance, field: 'projectReport', 'error')}">
 
 						<label class="control-label" for="projectReport"><g:message
 								code="project.projectReport.label" default="Project Report" /></label>
-						<div class="controls" style="max-width: 100%;" >
+						<div class="controls" style="max-width: 100%;">
 							<ckeditor:config var="toolbar_editorToolbar">
 									[
     									[ 'Bold', 'Italic' ]
@@ -359,7 +374,7 @@ textarea {
 
 
 			<div class="super-section">
-					<h3>Data Contribution</h3>
+				<h3>Data Contribution</h3>
 				<div id="data-links" class="section in collapse">
 					<g:render template="dataLinks"
 						model="['projectInstance':projectInstance]" />
@@ -370,7 +385,7 @@ textarea {
 
 
 			<div class="super-section">
-					<h3>Miscellaneous</h3>
+				<h3>Miscellaneous</h3>
 				<div id="miscSec" class="section in collapse">
 					<div
 						class="control-group ${hasErrors(bean: projectInstance, field: 'misc', 'error')}">
