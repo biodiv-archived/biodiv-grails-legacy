@@ -37,8 +37,11 @@
 
 	<div style="width: 235px; max-height: 350px;">
 		<h4>Document Tags</h4>
+		<%
+			params.offset = 0	
+		%>
 		<g:if test="${tags}">
-			<tc:tagCloud bean="${Document}" controller="document"
+			<tc:tagCloud bean="${Document}" 
 				action="browser" sort="${true}" style
 				color="${[start: '#084B91', end: '#9FBBE5']}"
 				size="${[start: 12, end: 30, unit: 'px']}" paramName='tag' />
