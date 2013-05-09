@@ -232,14 +232,13 @@ modules = {
 	}
 
 	add_file {
-		dependsOn 'core, tagit'
+		dependsOn 'core, tagit, list_utils'
 		
-		
+		resource url:'/css/main.css'
 		resource url:'/css/content.css'
 		resource url:'/js/content.js'
 		resource url:'/css/location_picker.css'
 		resource url:'/js/location/location-picker.js'
-		resource url:'/js/species/observations/list.js'
 	}
 	
 	

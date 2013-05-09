@@ -11,7 +11,9 @@
 
 	</ul>
 
-
+	<%
+		params.offset = 0
+	%>
 	<div style="width: 235px; margin:30px 0px;">
 		<h4>Project Tags</h4>
 		<g:if test="${tags}">

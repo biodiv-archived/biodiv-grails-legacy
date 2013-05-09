@@ -35,7 +35,6 @@
 
 	</g:if>
 
-
         <g:if test="${documentInstance}">
         <div class="sidebar_section" style="overflow:hidden">
             <g:if test="${documentInstance?.tags}">
@@ -78,8 +77,11 @@
 
 	<div class="sidebar_section" style="overflow:hidden">
 		<h5>Document Tags</h5>
+		<%
+			params.offset = 0	
+		%>
 		<g:if test="${tags}">
-			<tc:tagCloud bean="${Document}" controller="document"
+			<tc:tagCloud bean="${Document}" 
 				action="browser" sort="${true}" style
 				color="${[start: '#084B91', end: '#9FBBE5']}"
 				size="${[start: 12, end: 30, unit: 'px']}" paramName='tag' />

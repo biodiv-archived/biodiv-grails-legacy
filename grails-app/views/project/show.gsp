@@ -39,7 +39,7 @@
 
 		<div class="page-header clearfix">
 			<div style="width: 100%;">
-				<div class="span8 main_heading" style="margin-left: 0px;">
+				<div class="main_heading" style="margin-left: 0px;">
 
 					<s:showHeadingAndSubHeading
 						model="['heading':projectInstance.title, 'subHeading':subHeading, 'headingClass':headingClass, 'subHeadingClass':subHeadingClass]" />

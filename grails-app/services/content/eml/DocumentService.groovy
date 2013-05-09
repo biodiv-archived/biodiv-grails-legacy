@@ -274,7 +274,7 @@ class DocumentService {
 				def doc = iter.next();
 				log.debug "doc : "+ doc
 				def documentInstance = Document.get(doc.getFieldValue("id"));
-				if(projectInstance)
+				if(documentInstance)
 					documentInstanceList.add(documentInstance);
 			}
 
