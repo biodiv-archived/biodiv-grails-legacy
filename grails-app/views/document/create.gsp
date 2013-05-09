@@ -147,21 +147,21 @@ input.dms_field {
 
 						<div class="controls">
 
-							<div id="uFile.license" class="licence_div dropdown">
+							<div id="licenseDiv" class="licence_div dropdown">
 
-								<a id="selected_license_${i}"
+								<a id="selected_license"
 									class="btn dropdown-toggle btn-mini" data-toggle="dropdown">
 									<img
-									src="${documentInstance.license?documentInstance.license.name.getIconFilename()+'.png':resource(dir:'images/license',file:'cc_by.png', absolute:true)}"
+									src="${documentInstance.license?resource(dir:'images/license',file:documentInstance.license.name.getIconFilename()+'.png'):resource(dir:'images/license',file:'cc_by.png', absolute:true)}"
 									title="Set a license for this file" /> <b class="caret"></b>
 								</a>
 
-								<ul id="license_options_${i}"
+								<ul id="license_options"
 									class="dropdown-menu license_options">
 									<span>Choose a license</span>
 									<g:each in="${species.License.list()}" var="l">
 										<li class="license_option"
-											onclick="$('#license_${i}').val($.trim($(this).text()));$('#selected_license_${i}').find('img:first').replaceWith($(this).html());">
+											onclick="$('#license').val($.trim($(this).text()));$('#selected_license').find('img:first').replaceWith($(this).html());">
 											<img
 											src="${resource(dir:'images/license',file:l?.name?.getIconFilename()+'.png', absolute:true)}" /><span
 											style="display: none;"> ${l?.name?.value}
@@ -169,6 +169,9 @@ input.dms_field {
 										</li>
 									</g:each>
 								</ul>
+								
+								<input id="license" type="hidden" name="licenseName" value="${documentInstance.license?.name?.value()}"></input>
+								
 							</div>
 						</div>
 					</div>
@@ -236,7 +239,7 @@ input.dms_field {
 							<div id="userGroups" class="${docActionMarkerClass}"
 								name="userGroups" style="list-style: none; clear: both;">
 								<uGroup:getCurrentUserUserGroups
-									model="['documentInstance':documentInstance]" />
+									model="['observationInstance':documentInstance]" />
 							</div>
 						</div>
 					</div>

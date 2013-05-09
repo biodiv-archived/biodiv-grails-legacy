@@ -90,7 +90,7 @@
 
 					<a id="selected_license_${docId}"
 						class="btn dropdown-toggle btn-mini" data-toggle="dropdown"> <img
-						src="${documentInstance?.license?documentInstance.license.name.getIconFilename()+'.png':resource(dir:'images/license',file:'cc_by.png', absolute:true)}"
+						src="${documentInstance?.license?resource(dir:'images/license',file:documentInstance.license.name.getIconFilename()+'.png'):resource(dir:'images/license',file:'cc_by.png', absolute:true)}"
 						title="Set a license for this file" /> <b class="caret"></b>
 					</a>
 
@@ -107,6 +107,7 @@
 							</li>
 						</g:each>
 					</ul>
+								<input id="license_${docId}" type="hidden" name="${docId}.licenseName" value="${documentInstance?.license?.name?.value()}"></input>
 
 				</div></td>
 			<td><span class="del-document"> <img
