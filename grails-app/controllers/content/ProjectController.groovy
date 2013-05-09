@@ -24,8 +24,20 @@ class ProjectController {
 		log.debug params
 
 		def model = getProjectList(params)
-		render (view:"list", model:model)
-		return;
+		if(params.loadMore?.toBoolean()){
+			render(template:"/document/documentListTemplate", model:model);
+			return;
+		} else if(!params.isGalleryUpdate?.toBoolean()){
+			render (view:"list", model:model)
+			return;
+		} else{
+			def obvListHtml =  g.render(template:"/project/projectListTemplate", model:model);
+			def obvFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
+
+			def result = [obvFilterMsgHtml:obvFilterMsgHtml, obvListHtml:obvListHtml]
+			render result as JSON
+			return;
+		}
 	}
 
 	@Secured(['ROLE_CEPF_ADMIN'])
@@ -224,7 +236,7 @@ class ProjectController {
 		}
 
 		log.debug "Storing all project ids list in session ${session['proj_ids_list']} for params ${params}";
-		return [totalProjectInstanceList:totalProjectInstanceList, projectInstanceList: projectInstanceList, projectInstanceTotal: count, queryParams: queryParams, activeFilters:activeFilters]
+		return [totalProjectInstanceList:totalProjectInstanceList, projectInstanceList: projectInstanceList, instanceTotal: count, queryParams: queryParams, activeFilters:activeFilters, , resultType:'project']
 	}
 
 }

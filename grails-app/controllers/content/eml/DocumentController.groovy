@@ -161,8 +161,9 @@ class DocumentController {
 			return;
 		} else{
 			def obvListHtml =  g.render(template:"/document/documentListTemplate", model:model);
+			def obvFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
 
-			def result = [obvListHtml:obvListHtml, documentInstanceTotal:model.instanceTotal]
+			def result = [obvFilterMsgHtml:obvFilterMsgHtml, obvListHtml:obvListHtml]
 			render result as JSON
 			return;
 		}
@@ -180,7 +181,7 @@ class DocumentController {
 				def totalDocumentInstanceList = documentService.getFilteredDocuments(params, -1, -1).documentInstanceList
 				def count = totalDocumentInstanceList.size()
 		
-				return [totalDocumentInstanceList:totalDocumentInstanceList, documentInstanceList: documentInstanceList, documentInstanceTotal: count, queryParams: queryParams, activeFilters:activeFilters, total:count]
+				return [totalDocumentInstanceList:totalDocumentInstanceList, documentInstanceList: documentInstanceList, instanceTotal: count, queryParams: queryParams, activeFilters:activeFilters, resultType:'document']
 		
 			}
 		

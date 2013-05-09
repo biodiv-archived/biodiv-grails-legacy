@@ -23,7 +23,9 @@
 
 		<div class="document-list span8 right-shadow-box" style="padding-right:5px;">
 			<g:render template="/document/search" model="['params':params]" />
-
+			
+			<obv:showObservationFilterMessage />
+			
 			<g:render template="/document/documentListTemplate" />
 		</div>
 		
