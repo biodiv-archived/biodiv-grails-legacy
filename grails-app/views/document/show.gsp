@@ -200,7 +200,7 @@
 							</g:if>
 
 
-							<g:if test="${documentInstance.coverage?.placeName}">
+							<g:if test="${documentInstance.coverage?.placeName || documentInstance.coverage.reverseGeocodedName}">
 								<tr>
 
 									<td class="prop"><span class="grid_3 name"><i
