@@ -16,6 +16,9 @@ import org.apache.solr.common.util.NamedList;
 
 import species.participation.Observation;
 import species.utils.Utils;
+import species.License
+
+import species.sourcehandler.XMLConverter
 
 
 class DocumentService {
@@ -30,12 +33,25 @@ class DocumentService {
 	Document createDocument(params) {
 
 		
-		def document = new Document(params)
+		def document = new Document()
+		updateDocument(document, params)
+		
+		return document
+	}
 
+	
+	def updateDocument(document, params) {
+		
+		document.properties = params
 		document.coverage.location = 'POINT(' + params.coverage.longitude + ' ' + params.coverage.latitude + ')'
 		document.coverage.reverseGeocodedName = params.coverage.reverse_geocoded_name
 		document.coverage.locationAccuracy = params.coverage.location_accuracy
 		
+		
+		
+		document.license  = (new XMLConverter()).getLicenseByType(params.licenseName, false)
+		//document.license = License.findByName(License.LicenseType(params.licenseName))
+			
 		if(params.description) {
 			def description = params.description.trim()
 			if(description)
@@ -44,11 +60,11 @@ class DocumentService {
 				document.description = null
 		}
 		
-		if(params.contributors) { 
+		if(params.contributors) {
 			def contributors = params.contributors.trim()
 			if(contributors)
 				document.contributors =contributors
-			else 
+			else
 				document.contributors = null
 		}
 		
@@ -71,9 +87,9 @@ class DocumentService {
 		params.habitat.each {key, value ->
 			document.coverage.addToHabitats(Habitat.read(value.toLong()));
 		}
-		return document
 	}
-
+	
+	
 	def setUserGroups(Document documentInstance, List userGroupIds) {
 		if(!documentInstance) return
 
@@ -128,6 +144,11 @@ class DocumentService {
 				if(params."${docId}.license") {
 					documentInstance.license = params."${docId}.license"
 				}
+				
+				if(params."${docId}.licenseName") {
+					documentInstance.license  = (new XMLConverter()).getLicenseByType(params."${docId}.licenseName", false)
+				}
+
 
 				if(params."${docId}.tags") {
 					def tags = (params."${docId}.tags" != null) ? Arrays.asList(params."${docId}.tags") : new ArrayList();

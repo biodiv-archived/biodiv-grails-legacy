@@ -38,7 +38,7 @@
 							<i class="icon-edit"></i>Edit
 						</a>
 						
-															<a class="btn btn-danger" id="deleteButton" style="margin-right: 5px; margin-bottom: 10px;"><i
+						<a class="btn btn-danger" id="deleteButton" style="margin-right: 5px; margin-bottom: 10px;"><i
 							class="icon-trash"></i>Delete</a>
 						
 
@@ -79,82 +79,80 @@
 
 
 
-		<div class="span8 right-shadow-box"
-			style=" padding-right: 5px;">
+                <div class="span8 right-shadow-box observation" style="margin:0;">
+
+                    <div class="observation_story sidebar_section">
+                        <g:if test="${documentInstance.uFile || documentInstance.uri}">
+                        <div class="sidebar_section" style="margin-left: 0px;">
+
+                            <g:if test="${documentInstance.uFile}">
+
+                            <dl class="dl-horizontal">
+
+                                <dt>File</dt>
+                                <dd>
+
+                                <fileManager:displayFile
+                                filePath="${ documentInstance?.uFile?.path}"
+                                fileName="${ documentInstance?.uFile?.path}"></fileManager:displayFile>
+                                </dd>
+                            </dl>
+                            </g:if>
+                            <g:if test="${documentInstance.uri}">
+                            <dl class="dl-horizontal">
+
+                                <dt>URL</dt>
+                                <dd class="linktext">
+                                ${documentInstance.uri}
+                                </dd>
+                            </dl>
+                            </g:if>
+                        </div>
+                        </g:if>
+
+                        <div class="prop">
+                            <span class="name">Type</span>
+                            <div class="value">
+                                ${documentInstance.type?.value }
+                            </div>
+                        </div>
+
+                        <g:if test="${documentInstance?.description}">
+                        <div class="prop">
+                            <span class="name">Description</span>
+                            <div class="notes_view linktext">
+                                ${documentInstance?.description}
+                            </div>
+                        </div>
+                        </g:if>
+                        <g:if test="${documentInstance?.contributors}">
+                        <div class="prop">
+                            <span class="name">Contributor(s)</span>
+                            <div class="value">
+                                ${documentInstance?.contributors}
+                            </div>
+                        </div>
+                        </g:if>
+                        <g:if test="${documentInstance?.attribution}">
+                        <div class="prop">
+                            <span class="name">Attribution</span>
+                            <div class="value">
+                                ${documentInstance?.attribution}
+                            </div>
+                        </div>
+                        </g:if>
+                        <g:if test="${documentInstance?.license}">
+                        <div class="prop">
+                            <span class="name">License</span>
+
+                            <div class="value"><img
+                                src="${resource(dir:'images/license',file:documentInstance?.license?.name.value().toLowerCase().replaceAll('\\s+','')+'.png', absolute:true)}"
+                                title="${documentInstance.license.name}" /></div>
+                        </div>
+                        </g:if>
 
 
-			<div style="height: 50px;">
-				<span style="float: right; font-size: 12pt; font-weight: bold;">Document
-					| ${documentInstance.type?.value }
-				</span>
-			</div>
-
-
-
-			<g:if test="${documentInstance?.description}">
-				<div class="sidebar_section">
-					<a class="speciesFieldHeader" data-toggle="collapse"
-						href="#description"><h5>Description</h5></a>
-					<div id="description" class="speciesField collapse in">
-						<dl class="dl linktext">
-							<dd>
-								${documentInstance?.description}
-							</dd>
-						</dl>
-
-					</div>
-				</div>
-			</g:if>
-
-
-
-			<g:if
-				test="${documentInstance.contributors || documentInstance?.attribution || documentInstance.license}">
-				<div class="sidebar_section">
-					<a class="speciesFieldHeader" data-toggle="collapse"
-						href="#authoringInfo"><h5>Authoring Information</h5></a>
-					<div id="authoringInfo" class="speciesField collapse in">
-
-						<table>
-							<g:if test="${documentInstance?.contributors}">
-
-								<tr>
-									<td class="prop"><span class="grid_3 name">Contributors</span></td>
-									<td class="linktext">
-										${documentInstance?.contributors}
-									</td>
-								</tr>
-							</g:if>
-
-							<g:if test="${documentInstance?.attribution}">
-
-								<tr>
-									<td class="prop"><span class="grid_3 name">Attribution</span></td>
-									<td class="linktext">
-										${documentInstance?.attribution}
-									</td>
-
-
-								</tr>
-							</g:if>
-
-							<g:if test="${documentInstance?.license}">
-								<tr>
-									<td class="prop"><span class="grid_3 name">License</span></td>
-
-									<td><img
-										src="${resource(dir:'images/license',file:documentInstance?.license?.name.value().toLowerCase().replaceAll('\\s+','')+'.png', absolute:true)}"
-										title="${documentInstance.license.name}" /></td>
-								</tr>
-							</g:if>
-
-						</table>
-
-
-
-					</div>
-				</div>
-			</g:if>
+                    </div>
 
 			<g:if
 				test="${documentInstance?.coverage?.speciesGroups || documentInstance.coverage?.habitats || documentInstance.coverage?.placeName }">
@@ -200,10 +198,10 @@
 							</g:if>
 
 
-							<g:if test="${documentInstance.coverage?.placeName}">
+							<g:if test="${documentInstance.coverage?.placeName || documentInstance.coverage.reverseGeocodedName}">
 								<tr>
 
-									<td class="prop"><span class="grid_3 name"><i
+									<td class="prop"><span class="grid_3 name">
 											class="icon-map-marker"></i>Place</span></td>
 									<td><g:if
 											test="${documentInstance.coverage.placeName == ''}">
@@ -220,65 +218,9 @@
 
 			</g:if>
 
-			<g:if test="${documentInstance?.tags}">
-
-				<div class="sidebar_section">
-					<a class="speciesFieldHeader" href="#tags" data-toggle="collapse"><h5>Tags</h5></a>
-					<div id="tags" class="speciesField collapse in">
-						<table>
-							<tr>
-								<td><g:render template="/project/showTagsList"
-										model="['instance': documentInstance, 'controller': 'document', 'action':'browser']" />
-								</td>
-							</tr>
-						</table>
-					</div>
-				</div>
-			</g:if>
-			<g:if test="${documentInstance.uFile || documentInstance.uri}">
-				<div class="sidebar_section" style="margin-left: 0px;">
-
-					<g:if test="${documentInstance.uFile}">
-
-						<dl class="dl-horizontal">
-
-							<dt>File</dt>
-							<dd>
-
-								<fileManager:displayFile
-									filePath="${ documentInstance?.uFile?.path}"
-									fileName="${ documentInstance?.uFile?.path}"></fileManager:displayFile>
-							</dd>
-						</dl>
-					</g:if>
-					<g:if test="${documentInstance.uri}">
-						<dl class="dl-horizontal">
-
-							<dt>URL</dt>
-							<dd>
-								${documentInstance.uri}
-							</dd>
-						</dl>
-					</g:if>
-				</div>
-			</g:if>
-
-
-			<g:if test="${documentInstance.userGroups}">
-				<div class="sidebar_section">
-					<h5>Document is in groups</h5>
-					<ul class="tile" style="list-style: none; padding-left: 10px;">
-						<g:each in="${documentInstance.userGroups}" var="userGroup">
-							<li class=""><uGroup:showUserGroupSignature
-									model="[ 'userGroup':userGroup]" /></li>
-						</g:each>
-					</ul>
-
-				</div>
-			</g:if>
 
 		</div>
-		<g:render template="/document/documentSidebar" />
+		<g:render template="/document/documentSidebar" model="['documentInstance':documentInstance]"/>
 
 	</div>
 

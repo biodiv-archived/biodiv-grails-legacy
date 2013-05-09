@@ -97,7 +97,8 @@ class DocumentController {
 					return
 				}
 			}
-			documentInstance.properties = params
+			//documentInstance.properties = params
+			documentService.updateDocument(documentInstance, params)
 			if (!documentInstance.hasErrors() && documentInstance.save(flush: true)) {
 				
 				def tags = (params.tags != null) ? Arrays.asList(params.tags) : new ArrayList();
