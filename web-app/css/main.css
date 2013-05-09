@@ -116,7 +116,7 @@ th.name {
 	padding-left: 10px;
 }
 
-.prop .name {
+/*.prop .name {
 	float: left;
 	text-align: left;
 	width: 10em;
@@ -128,16 +128,16 @@ th.name {
 	width: auto;
 	padding-right: 3px;
 }
-
+*/
 #advSearchForm .prop .name {
 	float: right;
 	text-align: right;
 }
-
+/*
 .prop .value {
 	text-align: left;
 }
-
+*/
 
 .figure {
 	font-size: 80%;

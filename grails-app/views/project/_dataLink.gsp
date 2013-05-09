@@ -1,7 +1,7 @@
 <div id="dataLink${i}" class="dataLink-div"
 	<g:if test="${hidden}">style="display:none;"</g:if>>
 	
-	<table>
+	<table  style="background-color:whitesmoke;">
 	<thead></thead>
 	<tbody>
 	<tr>
@@ -20,10 +20,11 @@
 				 >${dataLink?.description}</textArea>
 		</div>
 	</div>
-
+    </td>
+    <td>
 	<div class="control-group">
 		<label class="control-label" for="url"><g:message
-				code="project.dataLink.url.label" default="url" /> </label>
+				code="project.dataLink.url.label" default="Url" /> </label>
 
 		<div class="controls">
 			<input type="url" name='dataLinksList[${i}].url' class="input-block-level"
@@ -33,8 +34,9 @@
 
 </td>
 <td>
-	<span class="del-dataLink"> <img
-		src="${resource(dir:'images/skin', file:'close.png')}"
+
+	<span class="del-dataLink" style="margin-left:20px; padding:5px;"> <img
+		src="${resource(dir:'images/skin', file:'remove.jpg')}"
 		style="vertical-align: middle;" />
 	</span>
 	</td>

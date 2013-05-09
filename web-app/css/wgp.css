@@ -771,7 +771,7 @@ ul#recoSummary {
 }
 
 .right-shadow-box {
-	box-shadow: 8px 0 6px -6px #5e5e5e;
+/*	box-shadow: 8px 0 6px -6px #5e5e5e;*/
 }
 
 i {
@@ -1910,4 +1910,8 @@ div.noOfRatings {
 	float: right;
 }
 
-
+.pull-down {
+   text-align:center; 
+   background-color:whitesmoke;
+   box-shadow: 0 4px 3px -3px #5e5e5e;
+}
