@@ -135,6 +135,7 @@ class ProjectController {
 		if (projectInstance) {
 			try {
 				projectInstance.delete(flush: true)
+				//userGroupService.removeDocumentFromUserGroups(documentInstance, documentInstance.userGroups.collect{it.id})
 				flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'project.label', default: 'Project'), params.id])}"
 				redirect(action: "list")
 			}

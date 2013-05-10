@@ -14,8 +14,7 @@ import org.grails.taggable.Taggable;
  *
  */
 class Document implements Taggable {
-
-
+	
 	public enum DocumentType {
 		Report("Report"),
 		Poster("Poster"),
@@ -90,7 +89,6 @@ class Document implements Taggable {
 	
 	static mapping = {
 		description type:"text"
-				
 	}
 	
 	
