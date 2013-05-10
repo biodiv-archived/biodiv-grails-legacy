@@ -18,7 +18,7 @@
 
             <fileManager:displayFile
             filePath="${ documentInstance?.uFile?.path}"
-            fileName="${ documentInstance?.uFile?.path}"></fileManager:displayFile>
+            fileName="${ documentInstance?.title}"></fileManager:displayFile>
             </dd>
         </dl>
         </g:if>
