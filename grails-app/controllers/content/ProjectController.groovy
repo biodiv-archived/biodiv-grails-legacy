@@ -113,8 +113,9 @@ class ProjectController {
 			}
 
 			projectService.updateProject(params, projectInstance)
-
+			def tags = (params.tags != null) ? Arrays.asList(params.tags) : new ArrayList();
 			if (!projectInstance.hasErrors() && projectInstance.save(flush: true)) {
+				projectInstance.setTags(tags);
 				flash.message = "${message(code: 'default.updated.message', args: [message(code: 'project.label', default: 'Project'), projectInstance.id])}"
 				redirect(action: "show", id: projectInstance.id)
 			}

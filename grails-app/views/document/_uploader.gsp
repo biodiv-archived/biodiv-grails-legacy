@@ -32,7 +32,21 @@
 %>
 			<g:render template='/document/projectDoc'
 				model="[name:name,  'docId':doc.id,'filePath':doc.uFile.path, 'docName':doc.title, 'fileSize':doc.uFile.size, 'documentInstance':doc]" />
-
+<r:script>
+	$(document).ready(function(){
+	$('#${doc.id}-tags').tagit({
+        			select:true, 
+        			allowSpaces:true, 
+        			fieldName: ${doc.id} + '.tags',
+        			placeholderText:'Add some tags',
+        			autocomplete:{
+        				source: '/document/tags'
+        			}, 
+        			triggerKeys:['enter', 'comma', 'tab'], 
+        			maxLength:30
+        		});	
+        		});
+</r:script>
 		</g:each>
 
 	</g:if>
@@ -64,7 +78,7 @@
 				$('#' + responseJSON.docId +'-tags').tagit({
         			select:true, 
         			allowSpaces:true, 
-        			fieldName: responseJSON.fileId + '.tags',
+        			fieldName: responseJSON.docId + '.tags',
         			placeholderText:'Add some tags',
         			autocomplete:{
         				source: '/document/tags'
