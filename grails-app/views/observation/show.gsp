@@ -44,7 +44,7 @@ if(r && thumbnail) {
 		String location = "Observed at '" + (observationInstance.placeName.trim()?:observationInstance.reverseGeocodedName) +"'"
 		String desc = "- "+ location +" by "+observationInstance.author.name.capitalize()+" in species group "+observationInstance.group.name + " and habitat "+ observationInstance.habitat.name;
 %>
-<g:set var="description" value="${observationInstance.description?observationInstance.description+" "+desc:desc }" />
+<g:set var="description" value="${observationInstance.description?observationInstance.description+' '+desc:desc }" />
 
 <meta property="fb:app_id" content="${fbAppId }" />
 <meta property="fb:admins" content="581308415,100000607869577" />
