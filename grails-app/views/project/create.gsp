@@ -33,6 +33,7 @@
     position: relative;
     overflow: visible;
 }
+
 .super-section {
     clear:both;
     width:930px;
@@ -138,7 +139,7 @@
 							<div class="controls">
 
 
-								<ul id="tags" name="tags">
+								<ul id="tags" name="tags" style="margin-left:0px;">
 									<g:each in="${projectInstance.tags}" var="tag">
 										<li>
 											${tag}

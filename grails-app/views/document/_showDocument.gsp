@@ -1,4 +1,11 @@
+<%@ page import="content.eml.Document"%>
 <div class="observation_story sidebar_section">
+    <%
+    // To overcome hibernate fileassist issue - http://www.intelligrape.com/blog/2012/09/21/extract-correct-class-from-hibernate-object-wrapped-with-javassist/
+     documentInstance = Document.read(documentInstance.id)
+    %>
+
+
     <g:if test="${documentInstance.uFile || documentInstance.uri}">
     <div class="sidebar_section" style="margin-left: 0px;">
 
@@ -27,14 +34,16 @@
     </div>
     </g:if>
 
+    <g:if test="${showDetails}">
     <div class="prop">
         <span class="name">Type</span>
         <div class="value">
             ${documentInstance.type?.value }
         </div>
     </div>
+    </g:if>
 
-    <g:if test="${documentInstance?.description}">
+    <g:if test="${documentInstance?.description && documentInstance?.description.trim() != ''}">
     <div class="prop">
         <span class="name">Description</span>
         <div class="notes_view linktext value">
@@ -67,4 +76,17 @@
             title="${documentInstance.license.name}" /></div>
     </div>
     </g:if>
+
+    <g:if test="${documentInstance?.tags}">
+
+        <div class="prop">
+            <span class="name">Tags</span>
+
+            <div class="value">
+                <g:render template="/project/showTagsList"
+                    model="['instance': documentInstance, 'controller': 'document', 'action':'browser']" />
+            </div>
+        </div>
+    </g:if>
+
 </div>
