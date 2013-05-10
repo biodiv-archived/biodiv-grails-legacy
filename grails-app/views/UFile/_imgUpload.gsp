@@ -8,7 +8,8 @@
 	url="${uGroup.createLink(controller:'UFile', action:'fileUpload', userGroupWebaddress:params.webaddress)}"
 	multiple="false"
 	allowedExtensions="${allowedExtensions}"
-	params="${fileParams}">
+	params="${fileParams}"
+	sizeLimit="${grailsApplication.config.speciesPortal.content.MAX_IMG_SIZE}">
 
 	<uploader:onComplete>
 				//Available variables: id, fileName, responseJSON

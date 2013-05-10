@@ -90,7 +90,7 @@ class ProjectService {
 	}
 
 	
-	private deleteDocumentsFromProject(List docs){
+	private deleteDocumentsFromProject(docs){
 		docs.each { it->
 			it.delete(flush:true)
 		}

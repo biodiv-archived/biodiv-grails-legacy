@@ -122,6 +122,20 @@ class Project implements Taggable{
 	String toString() {
 		return title
 	}
-	
+
+	def updateDocuments(){
+		proposalFiles.each {
+			it.setSource(this)
+			it.save(flush:true)
+		}
+		miscFiles.each {
+			it.setSource(this)
+			it.save(flush:true)
+		}
+		proposalFiles.each {
+			it.setSource(this)
+			it.save(flush:true)
+		}
+	}	
 
 }

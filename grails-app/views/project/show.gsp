@@ -37,7 +37,7 @@
 
 	<div class="span12">
 
-		<div class="page-header clearfix">
+		<div class="page-header clearfix" style="margin-bottom:0px;">
 			<div style="width: 100%;">
 				<div class="main_heading" style="margin-left: 0px;">
 
@@ -53,7 +53,7 @@
 						Project
 					</a>
 
-					<div style="float: right; margin: 10px 0;">
+					<div style="clear:both; float: right; margin: 10px 0;">
 
 						<a class="btn btn-primary pull-right"
 							href="${uGroup.createLink(controller:'project', action:'edit', id:projectInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">

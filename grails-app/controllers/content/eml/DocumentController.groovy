@@ -191,7 +191,7 @@ class DocumentController {
 
 	def tags = {
 		log.debug params;
-		render Tag.findAllByNameIlike("${params.term}%")*.name as JSON
+		render Tag.findAllByNameIlike("${params.term}%", [max:10])*.name as JSON
 	}
 
 	
