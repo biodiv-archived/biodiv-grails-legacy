@@ -1084,7 +1084,7 @@ class UserGroupService {
 			log.error "Could not add ${document} to ${usergroup}"
 			log.error  userGroup.errors.allErrors.each { log.error it }
 		} else {
-			activityFeedService.addActivityFeed(document, userGroup, document.author, activityFeedService.OBSERVATION_POSTED_ON_GROUP);
+			//activityFeedService.addActivityFeed(document, userGroup, document.author, activityFeedService.OBSERVATION_POSTED_ON_GROUP);
 			log.debug "Added ${document} to userGroup ${userGroup}"
 		}
 	}
@@ -1093,7 +1093,7 @@ class UserGroupService {
 		log.debug "Removing ${document} from userGroups ${userGroupIds}"
 		userGroupIds.each {
 			if(it) {
-				def userGroup = UserGroup.read(Long.parseLong(it));
+				def userGroup = UserGroup.read(Long.parseLong("" + it));
 				if(userGroup) {
 					removeDocumentFromUserGroup(document, userGroup)
 				}
@@ -1109,7 +1109,7 @@ class UserGroupService {
 			log.error "Could not remove ${document} from ${usergroup}"
 			log.error  userGroup.errors.allErrors.each { log.error it }
 		} else {
-			activityFeedService.addActivityFeed(document, userGroup, document.author, activityFeedService.OBSERVATION_REMOVED_FROM_GROUP);
+			//activityFeedService.addActivityFeed(document, userGroup, document.author, activityFeedService.OBSERVATION_REMOVED_FROM_GROUP);
 			log.debug "Removed ${document} from userGroup ${userGroup}"
 		}
 	}

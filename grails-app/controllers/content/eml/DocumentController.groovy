@@ -11,7 +11,8 @@ class DocumentController {
 
 	def documentService
 	def springSecurityService
-
+	def userGroupService
+	
 	def index = {
 		redirect(action: "browser", params: params)
 	}
@@ -43,7 +44,7 @@ class DocumentController {
 			
 			documentInstance.setTags(tags)
 			if(params.groupsWithSharingNotAllowed) {
-				documentService.setUserGroups(observationInstance, [
+				documentService.setUserGroups(documentInstance, [
 					params.groupsWithSharingNotAllowed
 				]);
 			} else {
@@ -133,6 +134,7 @@ class DocumentController {
 		def documentInstance = Document.get(params.id)
 		if (documentInstance) {
 			try {
+				userGroupService.removeDocumentFromUserGroups(documentInstance, documentInstance.userGroups.collect{it.id})
 				documentInstance.delete(flush: true)
 				flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'document.label', default: 'Document'), params.id])}"
 				redirect(action: "browser")
@@ -189,7 +191,7 @@ class DocumentController {
 
 	def tags = {
 		log.debug params;
-		render Tag.findAllByNameIlike("${params.term}%")*.name as JSON
+		render Tag.findAllByNameIlike("${params.term}%", [max:10])*.name as JSON
 	}
 
 	

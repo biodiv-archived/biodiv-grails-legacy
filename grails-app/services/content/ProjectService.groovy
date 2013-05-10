@@ -58,12 +58,13 @@ class ProjectService {
 		}
 
 		
-		def _toBeDeletedProposalFiles = project.proposalFiles.findAll{it?.deleted }
+		def _toBeDeletedProposalFiles = project.proposalFiles.findAll{it?.deleted || !it }
 
 		log.debug "Proposal Files marked for delete.." + project.proposalFiles?.dump()
 
 		if(_toBeDeletedProposalFiles) {
 			project.proposalFiles.removeAll(_toBeDeletedProposalFiles)
+			deleteDocumentsFromProject(_toBeDeletedProposalFiles)
 		}
 
 		def _toBeDeletedReportFiles = project.reportFiles.findAll{it?.deleted || !it}
@@ -72,6 +73,7 @@ class ProjectService {
 
 		if(_toBeDeletedReportFiles) {
 			project.reportFiles.removeAll(_toBeDeletedReportFiles)
+			deleteDocumentsFromProject(_toBeDeletedReportFiles)
 		}
 
 
@@ -81,11 +83,19 @@ class ProjectService {
 
 		if(_toBeDeletedMiscFiles) {
 			project.miscFiles.removeAll(_toBeDeletedMiscFiles)
+			deleteDocumentsFromProject(_toBeDeletedMiscFiles)
 		}
 		
 		log.debug "Project object after updating with params: "+ project.dump()
 	}
 
+	
+	private deleteDocumentsFromProject(docs){
+		docs.each { it->
+			it.delete(flush:true)
+		}
+	}
+	
 	private Date parseDate(date){
 		try {
 			return date? Date.parse("dd/MM/yyyy", date):null;

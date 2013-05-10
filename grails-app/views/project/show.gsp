@@ -37,7 +37,7 @@
 
 	<div class="span12">
 
-		<div class="page-header clearfix">
+		<div class="page-header clearfix" style="margin-bottom:0px;">
 			<div style="width: 100%;">
 				<div class="main_heading span8" style="margin-left: 0px;">
 
@@ -53,43 +53,30 @@
 						Project
 					</a>
 
-					<div style="float: right; margin: 10px 0;">
+					<div style="clear:both; float: right; margin: 10px 0;">
 
 						<a class="btn btn-primary pull-right"
 							href="${uGroup.createLink(controller:'project', action:'edit', id:projectInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
 							<i class="icon-edit"></i>Edit
-						</a> <a class="btn btn-danger" id="deleteButton"
-							style="margin-right: 5px; margin-bottom: 10px;"><i
-							class="icon-trash"></i>Delete</a>
-
+						</a> 
+						
+						<a class="btn btn-danger"  href="#" style="margin-right: 5px; margin-bottom: 10px;"
+							onclick="deleteProject(); return false;">
+							<i class="icon-trash"></i>Delete
+						</a>
+							
 						<form
 							action="${uGroup.createLink(controller:'project', action:'delete')}"
 							method='POST' name='deleteForm'>
 							<input type="hidden" name="id" value="${projectInstance.id}" />
 						</form>
-						<div id="deleteConfirmDialog" title="Are you sure?"></div>
-
+						
 						<r:script>
-							$(document).ready(function() {
-								$("#deleteButton").button().bind('click', function() {
-									$('#deleteConfirmDialog').dialog('open');
-								});
-				
-								$("#deleteConfirmDialog").dialog({
-									autoOpen: false,
-									resizable: false,
-									height: 100,
-									modal: true,
-									buttons: {
-										'Delete': function() {
-											document.forms.deleteForm.submit();
-										},
-										Cancel: function() {
-											$(this).dialog('close');
-										}
-									}
-								});
-							});
+						function deleteProject(){
+							if(confirm('This project will be deleted. Are you sure ?')){
+								document.forms.deleteForm.submit();
+							}
+						}
 						</r:script>
 
 

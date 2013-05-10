@@ -38,39 +38,22 @@
 							<i class="icon-edit"></i>Edit
 						</a>
 						
-						<a class="btn btn-danger" id="deleteButton" style="margin-right: 5px; margin-bottom: 10px;"><i
-							class="icon-trash"></i>Delete</a>
-						
-
+						<a class="btn btn-danger"  href="#" style="margin-right: 5px; margin-bottom: 10px;"
+							onclick="deleteDocument(); return false;">
+							<i class="icon-trash"></i>Delete
+						</a>
 							
-							<form action="${uGroup.createLink(controller:'document', action:'delete')}" method='POST' name='deleteForm'>
+						<form action="${uGroup.createLink(controller:'document', action:'delete')}" method='POST' name='deleteForm'>
 							<input type="hidden" name="id" value="${documentInstance.id}" />
 						</form>
-						<div id="deleteConfirmDialog" title="Are you sure?"></div>
-
 						<r:script>
-							$(document).ready(function() {
-								$("#deleteButton").button().bind('click', function() {
-									$('#deleteConfirmDialog').dialog('open');
-								});
-				
-								$("#deleteConfirmDialog").dialog({
-									autoOpen: false,
-									resizable: false,
-									height: 100,
-									modal: true,
-									buttons: {
-										'Delete': function() {
-											document.forms.deleteForm.submit();
-										},
-										Cancel: function() {
-											$(this).dialog('close');
-										}
-									}
-								});
-							});
+						function deleteDocument(){
+							if(confirm('This document will be deleted. Are you sure ?')){
+								document.forms.deleteForm.submit();
+							}
+						}
 						</r:script>
-
+						
 					</sUser:ifOwns>
 				</div>
 			</div>

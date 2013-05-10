@@ -63,8 +63,7 @@ class ProjectController {
 
 			params.sourceHolderId = projectInstance.id
 			params.sourceHolderType = projectInstance.class.getCanonicalName()
-			//TODO: set source to files
-			documentService.updateDocuments(params)
+			projectInstance.updateDocuments()
 			//def uFiles = UFileService.updateUFiles(params)
 			redirect(action: "show", id: projectInstance.id)
 		}
@@ -135,6 +134,7 @@ class ProjectController {
 		if (projectInstance) {
 			try {
 				projectInstance.delete(flush: true)
+				//userGroupService.removeDocumentFromUserGroups(documentInstance, documentInstance.userGroups.collect{it.id})
 				flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'project.label', default: 'Project'), params.id])}"
 				redirect(action: "list")
 			}
@@ -151,7 +151,7 @@ class ProjectController {
 
 	def tags = {
 		log.debug params;
-		render Tag.findAllByNameIlike("${params.term}%")*.name as JSON
+		render Tag.findAllByNameIlike("${params.term}%", [max:10])*.name as JSON
 	}
 
 	def locationSites = {

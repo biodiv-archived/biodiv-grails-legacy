@@ -11,7 +11,7 @@
 				<input name="${name}" type="hidden"
 				value='${docId}' />
 				
-				 <input type="hidden" name='${docId}.deleted'
+				 <input type="hidden" name='${docId}.deleted' id='${docId}.deleted'
 					value='false' /> 
 					
 				<input type="hidden" name='${docId}.new'

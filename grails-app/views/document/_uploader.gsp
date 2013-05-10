@@ -45,7 +45,7 @@
 <g:if test="${canUploadFile}">
 	<uploader:uploader id="${name}"
 		url="${uGroup.createLink(controller:'UFile', action:'upload', userGroupWebaddress:params.webaddress)}"
-		multiple="true" allowedExtensions="${allowedExtensions}" params="${fileParams}">
+		multiple="true" allowedExtensions="${allowedExtensions}" params="${fileParams}" sizeLimit="${grailsApplication.config.speciesPortal.content.MAX_DOC_SIZE}" >
 
 		<uploader:onComplete>
 				//Available variables: id, fileName, responseJSON
