@@ -60,6 +60,8 @@ input.dms_field {
 
 
 		<form id="documentForm" action="${form_action}" method="POST"
+				onsubmit="document.getElementById('documentFormSubmit').disabled = 1;"
+		
 			class="form-horizontal">
 
 			<div class="span12 super-section" style="margin-left: 0px;">
