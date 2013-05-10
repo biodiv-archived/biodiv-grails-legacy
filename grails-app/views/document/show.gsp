@@ -184,14 +184,21 @@
 							<g:if test="${documentInstance.coverage?.placeName || documentInstance.coverage.reverseGeocodedName}">
 								<tr>
 
-									<td class="prop"><span class="grid_3 name">
-											class="icon-map-marker"></i>Place</span></td>
-									<td><g:if
-											test="${documentInstance.coverage.placeName == ''}">
-											${documentInstance.coverage.reverseGeocodedName}
-										</g:if> <g:else>
-											${documentInstance.coverage.placeName}
-										</g:else></td>
+                                                                    <td class="prop"><span class="grid_3 name">
+                                                                            Place</span></td>
+                                                                    <td>
+                                                                        
+                                                                        <g:if test="${documentInstance.coverage.placeName}">
+                                                                        <g:set var="location" value="${documentInstance.coverage.placeName}"/>
+                                                                        </g:if>
+                                                                        <g:else>
+                                                                        <g:set var="location" value="${documentInstance.coverage.reverseGeocodedName}"/>
+                                                                        </g:else>
+
+                                                                        <div class="value ellipsis multiline" title="${location}">
+                                                                            ${location}
+                                                                        </div>
+										</td>
 								</tr>
 							</g:if>
 						</table>
