@@ -82,7 +82,7 @@ class UFileController {
 			String relPath = uploaded.absolutePath.replace(contentRootDir, "")
 
 			//def url = uGroup.createLink(uri:uploaded.getPath() , 'userGroup':params.userGroupInstance, 'userGroupWebaddress':params.webaddress)
-			def url = g.createLinkTo(base:contentRootDir, file: relPath)
+			def url = g.createLinkTo(base:config.speciesPortal.content.serverURL, file: relPath)
 			//log.debug "url for uploaded file >>>>>>>>>>>>>>>>>>>>>>>>"+ url
 
 			return render(text: [success:true, filePath:relPath, fileURL: url, fileSize:UFileService.getFileSize(uploaded)] as JSON, contentType:'text/json')

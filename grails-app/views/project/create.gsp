@@ -66,6 +66,7 @@
 		<uGroup:rightSidebar />
 
 		<form action="${form_action}" method="POST" id="create-project"
+			onsubmit="document.getElementById('projectFormSubmit').disabled = 1;"
 			class="project-form form-horizontal" enctype="multipart/form-data">
 
 				<input name="id" type="hidden" value="${projectInstance?.id}" /> <input
@@ -440,7 +441,7 @@
 				Cancel </a>
 		</g:else>
 
-		<button type="submit" class="btn btn-primary"
+		<button type="submit" class="btn btn-primary" id="projectFormSubmit"
 			style="float: right; margin-right: 5px;">
 			${form_button_name}
 		</button>
