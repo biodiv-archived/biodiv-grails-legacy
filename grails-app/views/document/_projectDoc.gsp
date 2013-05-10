@@ -42,7 +42,7 @@
 					<label class="control-label" for="description"> Description
 					</label>
 					<div class="controls">
-						<textarea rows='5' name='${docId}.description' width="100%"
+						<textarea rows='4' name='${docId}.description' width="100%" class="input-block-level"
 							value='${documentInstance?.description}'
 							placeholder="Describe the file"> </textarea>
 					</div>
@@ -50,22 +50,7 @@
 
 				</div>
 
- <label class="control-label" for='tags'> <i
-					class="icon-tags"></i>Tags
-			</label>
-				<div class="controls">
-					<ul class='file-tags' id="${docId}-tags" name="${docId}.tags">
-						<g:if test='${documentInstance}'>
-							<g:each in="${documentInstance.tags}" var="tag">
-								<li>
-									${tag}
-								</li>
-							</g:each>
-						</g:if>
-					</ul>
-				</div> 
-			
-
+                            
 				<div
 					class="control-group ${hasErrors(bean: documentInstance, field: 'contributors', 'error')}">
 					<label class="control-label" for="contributors">Contributor(s)</label>
@@ -110,5 +95,22 @@
 								<input id="license_${docId}" type="hidden" name="${docId}.licenseName" value="${documentInstance?.license?.name?.value()}"></input>
 
 				</div>
+                                <div class="control-group" style="clear:both;">
+                                    <label class="control-label" for='tags'> <i
+					class="icon-tags"></i>Tags
+			            </label>
+                                    <div class="controls">
+                                            <ul class='file-tags' id="${docId}-tags" name="${docId}.tags">
+                                                    <g:if test='${documentInstance}'>
+                                                            <g:each in="${documentInstance.tags}" var="tag">
+                                                                    <li>
+                                                                            ${tag}
+                                                                    </li>
+                                                            </g:each>
+                                                    </g:if>
+                                            </ul>
+                                    </div> 
+			        </div>
+
                                 <span class="del-document close_button"></span>
 </div>
