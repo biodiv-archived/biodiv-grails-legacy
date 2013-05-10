@@ -616,7 +616,7 @@ environments {
 			}
 			content{
 				rootDir = "${app.rootDir}/content"
-				serverURL = "http://indiabiodiversity.saturn.strandls.com//${appName}/content"
+				serverURL = "http://indiabiodiversity.saturn.strandls.com/${appName}/content"
 			}	
 
 			search.serverURL="http://saturn.strandls.com:8080/solrPamba"
