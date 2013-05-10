@@ -2,6 +2,7 @@ package content
 
 import groovy.sql.Sql;
 
+import java.io.File;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -13,12 +14,14 @@ import content.eml.Document
 import content.eml.Document.DocumentType
 
 import species.License
+import species.utils.Utils
+import species.auth.SUser
 
 //import org.lorecraft.phparser.SerializedPhpParser;
 
 class MigrationService {
 
-    static transactional = true
+    static transactional = false
 	def uFileService;
 	def observationService
 	def grailsApplication
@@ -26,6 +29,11 @@ class MigrationService {
 	String connectionUrl =  "jdbc:postgresql://localhost/ibp";
 	String userName = "postgres";
 	String password = "postgres123";
+	
+	
+	def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+
+	String contentRootDir = config.speciesPortal.content.rootDir
 
 	HashMap directionsMap = new HashMap();
 
@@ -104,21 +112,24 @@ def migrateProjects() {
 
 		// Migrate Data Contribution Intensity to misc
 		proj.misc= row.field_data_contribution_value
-
-		proj.proposalFiles = migrateFiles(sql,'content_field_project_proposal_files',nodeRow.nid, 'field_project_proposal_files_fid', 'field_project_proposal_files_data', DocumentType.Proposal)
-		proj.reportFiles = migrateFiles(sql,'content_field_midterm_assessment_files',nodeRow.nid, 'field_midterm_assessment_files_fid', 'field_midterm_assessment_files_data', DocumentType.Report)
 		
-		proj.miscFiles =  migrateFiles(sql,'content_field_miscellaneous_files',nodeRow.nid, 'field_miscellaneous_files_fid', 'field_miscellaneous_files_data', DocumentType.Miscellaneous)
+		String projectDir = contentRootDir + "/projects/"+ "project-"+UUID.randomUUID().toString()
+		
+
+		proj.proposalFiles = migrateFiles(sql,'content_field_project_proposal_files',nodeRow.nid, 'field_project_proposal_files_fid', 'field_project_proposal_files_data', DocumentType.Proposal, projectDir)
+		proj.reportFiles = migrateFiles(sql,'content_field_midterm_assessment_files',nodeRow.nid, 'field_midterm_assessment_files_fid', 'field_midterm_assessment_files_data', DocumentType.Report, projectDir)
+		
+		proj.miscFiles =  migrateFiles(sql,'content_field_miscellaneous_files',nodeRow.nid, 'field_miscellaneous_files_fid', 'field_miscellaneous_files_data', DocumentType.Miscellaneous, projectDir)
 		
 		
 		//TODO Migrate DataContrib files also to miscFiles
-		def dataContribFiles =  migrateFiles(sql,'content_field_data_contribution_files',nodeRow.nid, 'field_data_contribution_files_fid', 'field_data_contribution_files_data', DocumentType.Miscellaneous)
+		def dataContribFiles =  migrateFiles(sql,'content_field_data_contribution_files',nodeRow.nid, 'field_data_contribution_files_fid', 'field_data_contribution_files_data', DocumentType.Miscellaneous, projectDir)
 
 		for(dataContribFile in dataContribFiles)
 			proj.addToMiscFiles(dataContribFile)
 		
 
-		def analysisFiles =  migrateFiles(sql,'content_field_analysis_results_files',nodeRow.nid, 'field_analysis_results_files_fid', 'field_analysis_results_files_data', DocumentType.Miscellaneous)
+		def analysisFiles =  migrateFiles(sql,'content_field_analysis_results_files',nodeRow.nid, 'field_analysis_results_files_fid', 'field_analysis_results_files_data', DocumentType.Miscellaneous, projectDir)
 		for(analysisFile in analysisFiles)
 			proj.addToMiscFiles(analysisFile)	
 		
@@ -143,6 +154,9 @@ def migrateProjects() {
 		proj.misc = row.field_miscellaneous_value
 
 
+		//set author for the project
+		//TODO: Get CEPF RIT member id while migration
+		proj.author = SUser.get("3077")
 
 
 		if(!proj.save(flush:true)){
@@ -162,7 +176,17 @@ def migrateProjects() {
 		}
 	}
 
-	def migrateFiles( sql,field_table, nid, fid_field, data_field, type) {
+	/**
+	 * Copy files and metadata from drupal tables to grails
+	 * @param sql
+	 * @param field_table
+	 * @param nid
+	 * @param fid_field
+	 * @param data_field
+	 * @param type
+	 * @return
+	 */
+	def migrateFiles( sql,field_table, nid, fid_field, data_field, type, projectDir) {
 		String query = "select $fid_field as fid, $data_field as metadata from " + field_table + " where nid=" +nid
 		println query
 
@@ -175,10 +199,12 @@ def migrateProjects() {
 				def filedata = sql.firstRow("select * from files where fid = $row.fid")
 
 				Document document = new Document()
+				
+				String copiedFileName = transferProjectFileToGrails(filedata.filepath, projectDir)
 				document.uFile = new UFile();
 				document.type = type
-				document.title = filedata.filename
-				document.uFile.path = filedata.filepath
+				document.title = filedata.filename?filedata.filename:copiedFileName
+				document.uFile.path = projectDir + "/"+copiedFileName 				
 				document.uFile.size = filedata.filesize
 				document.uFile.mimetype = filedata.filemime
 
@@ -205,8 +231,8 @@ def migrateProjects() {
 						println "tags of file are "+ tags
 						document.setTags(tags)
 					}
-
 */
+
 				}
 
 				docs.add(document)
@@ -214,6 +240,38 @@ def migrateProjects() {
 		}
 
 		return docs.size()>0?docs:null;
+	}
+	
+	/**
+	 * In drupal files all project fiels are strored in common directory. Move them to projects directory in grails.
+	 * @param filePath
+	 * @param projectDir
+	 * @return fileName in project folder
+	 */
+	private String transferProjectFileToGrails(filePath, projectDirPath) {
+		log.info "Copying file " + filePath + "to "+ projectDirPath
+		int idx = filePath.lastIndexOf("/");
+		String fileName = idx >= 0 ? filePath.substring(idx + 1) : filePath;
+		
+		File projectDir = new File(projectDirPath)
+		if(!projectDir.exists())
+			projectDir.mkdirs()
+		File dst = observationService.getUniqueFile(projectDir, Utils.cleanFileName(fileName));
+		
+		//TODO : get domain url 
+		File src = new File("/data/augmenetedmaps/"+filePath)
+		if(!src.exists()) {
+			log.error " src file "+ filePath+" does not exist"
+			return "dummy"
+		}	
+				
+		if(!Utils.copy(new File("/var/www/biodiv/"+filePath), dst)) {
+			log.error "Tranferring project file "+ filePath +" from drupal to " + dst.getName()+ " failed"
+			throw new Exception();
+		}
+		
+		return dst.getName()
+		
 	}
 
 	def setSourceToProjectDocuments(Project proj)
