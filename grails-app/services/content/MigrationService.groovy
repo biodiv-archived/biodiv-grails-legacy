@@ -204,7 +204,7 @@ def migrateProjects() {
 				document.uFile = new UFile();
 				document.type = type
 				document.title = filedata.filename?filedata.filename:copiedFileName
-				document.uFile.path = projectDir + "/"+copiedFileName 				
+				document.uFile.path = projectDir.replace(contentRootDir, "") + "/"+copiedFileName 				
 				document.uFile.size = filedata.filesize
 				document.uFile.mimetype = filedata.filemime
 
@@ -215,8 +215,8 @@ def migrateProjects() {
 				
 				if(row.metadata) {
 					println "metadata is "+ row.metadata
-/*
-					SerializedPhpParser serializedPhpParser = new SerializedPhpParser(row.metadata);
+
+	/*				SerializedPhpParser serializedPhpParser = new SerializedPhpParser(row.metadata);
 					Object result = serializedPhpParser.parse();
 					document.title = result.description;
 					document.description = result.shortnote.body
