@@ -36,42 +36,18 @@
 	</g:if>
 
         <g:if test="${documentInstance}">
-        <div class="sidebar_section" style="overflow:hidden">
-            <a class="speciesFieldHeader" href="#tags" data-toggle="collapse"><h5>Document Tags</h5></a>
-            <g:if test="${documentInstance?.tags}">
+            <g:if test="${documentInstance.userGroups}">
+                <div class="sidebar_section">
+                    <h5>Document is in groups</h5>
+                    <ul class="tile" style="list-style: none; padding-left: 10px;">
+                        <g:each in="${documentInstance.userGroups}" var="userGroup">
+                        <li class=""><uGroup:showUserGroupSignature
+                        model="[ 'userGroup':userGroup]" /></li>
+                        </g:each>
+                    </ul>
 
-            <div id="tags" class="speciesField collapse in">
-                <table>
-                    <tr>
-                        <td><g:render template="/project/showTagsList"
-                            model="['instance': documentInstance, 'controller': 'document', 'action':'browser']" />
-                        </td>
-                    </tr>
-                </table>
-
-            </div>
+                </div>
             </g:if>
-            <g:else>
-            <span class="msg" style="padding-left: 50px;">No tags on this document</span>
-            </g:else>
-            <span class="pull-right"><a href="/document/tagcloud">all
-                    tags</a></span>
-
-
-        </div>
-
-        <g:if test="${documentInstance.userGroups}">
-            <div class="sidebar_section">
-                <h5>Document is in groups</h5>
-                <ul class="tile" style="list-style: none; padding-left: 10px;">
-                    <g:each in="${documentInstance.userGroups}" var="userGroup">
-                    <li class=""><uGroup:showUserGroupSignature
-                    model="[ 'userGroup':userGroup]" /></li>
-                    </g:each>
-                </ul>
-
-            </div>
-        </g:if>
         </g:if>
         <g:else>
 
