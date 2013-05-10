@@ -12,13 +12,15 @@
 
 </head>
 <body>
+    <div class="span12">
+        <g:render template="/project/projectSubMenuTemplate"
+            model="['entityName':'Project Tags']" />
+        <uGroup:rightSidebar />
 
-
-
-			<tc:tagCloud bean="${Project}" action="list" sort="${true}" style
-				color="${[start: '#084B91', end: '#9FBBE5']}"
-				size="${[start: 12, end: 30, unit: 'px']}" paramName='tag' />
-
+        <tc:tagCloud bean="${Project}" action="list" sort="${true}" style
+                color="${[start: '#084B91', end: '#9FBBE5']}"
+                size="${[start: 12, end: 30, unit: 'px']}" paramName='tag' />
+    </div>
 	
 </body>
 </html>

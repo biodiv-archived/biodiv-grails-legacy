@@ -1,8 +1,8 @@
 <div class="observations_list" style="clear: both; top: 0px;">
-	<div class="project-list tab-content span">
+	<div class="list_view thumbnails project-list tab-content span" style="width:100%;">
 		<g:each in="${projectInstanceList}" status="i"
 			var="projectInstance">
-			<div class="${(i % 2) == 0 ? 'odd' : 'even'} item">
+                        <div class="thumbnail feedParentContext clearfix ${(i % 2) == 0 ? 'odd' : 'even'}">
 				<project:projectListItem
 					model="['projectInstance':projectInstance, 'pos':i]" />
 			</div>

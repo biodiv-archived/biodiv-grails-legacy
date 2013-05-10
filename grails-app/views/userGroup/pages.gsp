@@ -43,9 +43,10 @@
 				</g:else>
 			</div>
 			<div class="list" style="clear: both;">
-
 				<div id="contentMenu" class="tabbable tabs-right" style="">
-					<ul class="nav nav-tabs sidebar" id="pageTabs">
+
+            					<ul class="nav nav-tabs sidebar_section span4" id="pageTabs">
+                                                <li><h5>Pages</h5></li>
 						<g:if test="${userGroupInstance && userGroupInstance.name.equals('The Western Ghats')}">
 							<li><a href="/project/list">Western Ghats CEPF
 									Projects</a></li>
@@ -55,14 +56,14 @@
 							<li><a data-toggle="tab" class="pageTab" href="#${newsletterInstance.id}">
 									${fieldValue(bean: newsletterInstance, field: "title")} </a></li>
 						</g:each>
-					</ul>
+                                            </ul>
 					<div class="tab-content">
 						<g:each in="${newsletters}" var="newsletterInstance" status="i">
 							<div class="tab-pane active" id=${newsletterInstance.id}></div>
 						</g:each>
-					</div>
+                                            </div>
 				</div>
-
+                            </div>
 			</div>
 		</div>
 	</div>

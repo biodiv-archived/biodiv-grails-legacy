@@ -2,20 +2,22 @@
 <%@ page import="content.eml.Document"%>
 
 
-<div id="project-sidebar" class="span4"	class="pull-right" style=" position: relative; margin: 0px; padding: 10px 15px 10px 30px; width: 265px;">
+<div id="project-sidebar" class="span4">
 
+    <div class="sidebar_section">
 
-	<ul class="nav nav-tabs sidebar" id="project-menus">
+        <ul class="nav nav-tabs" id="project-menus" style="margin-bottom:0px;">
 		<li><a href="/project/list">Western Ghats CEPF Projects</a></li>
 		<li><a href="/document/browser">Browse Documents</a></li>
 
-	</ul>
+            </ul>
+    </div>
 
 	<%
 		params.offset = 0
 	%>
-	<div style="width: 235px; margin:30px 0px;">
-		<h4>Project Tags</h4>
+	<div class="sidebar_section" style="overflow:hidden;">
+		<h5>Project Tags</h5>
 		<g:if test="${tags}">
 			<tc:tagCloud bean="${Project}" controller="project" action="list"
 				sort="${true}" style color="${[start: '#084B91', end: '#9FBBE5']}"
@@ -30,8 +32,8 @@
 	</div>
 
 
-	<div style="width: 235px; max-height: 350px; margin:30px 0px;">
-		<h4>Document Tags</h4>
+	<div class="sidebar_section" style="overflow:hidden;">
+		<h5>Document Tags</h5>
 		<g:if test="${tags}">
 			<tc:tagCloud bean="${Document}" controller="document" action="browser"
 				sort="${true}" style color="${[start: '#084B91', end: '#9FBBE5']}"

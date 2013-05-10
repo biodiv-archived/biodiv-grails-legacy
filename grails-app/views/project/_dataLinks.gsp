@@ -71,7 +71,7 @@
 		<g:render template='dataLink' model="['i':0,'hidden':false]" />
 	</g:else>
 </div>
-<div style="text-align: center;">
+<div style="text-align: center; clear:both;">
 	<input type="button" class="btn btn-primary" value="Add Data Link"
 		onclick="adddataLink();" />
 </div>

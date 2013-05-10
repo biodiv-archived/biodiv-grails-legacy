@@ -1450,7 +1450,7 @@ li#userOrEmail-new {
 	/* 	padding: 10px 15px 10px 15px; */
 	/* 	position: relative; */
 	/* 	top: 50px; */
-	width: 220px;
+	/*      width: 220px;*/
 	/* 	background-color: #8D9B87; */
 	box-shadow: 1px 1px 5px #AAA;
 }
@@ -1667,8 +1667,9 @@ li#userOrEmail-new {
 	margin-left: 10px;
 }
 
-.thumbnails>li {
-	margin: 0 0 10px 10px;
+.thumbnails>.thumbnail {
+	margin: 0 0 10px 0px;
+        width:100%;
 }
 
 .login-box {

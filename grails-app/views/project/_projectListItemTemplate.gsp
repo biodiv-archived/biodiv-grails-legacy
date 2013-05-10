@@ -1,7 +1,7 @@
-<div class="project-list-item">
+<div class="project-list-item observation_story">
 
 	<g:link
-		url="${uGroup.createLink(controller:'project', action:'show', id:projectInstance.id, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress) }?pos= ${pos}">
+		url="${uGroup.createLink(controller:'project', action:'show', id:projectInstance.id, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress, params:['pos':pos])}">
 		<g:if test="${projectInstance.title}">
 			<h5 class="project-title">
 				${projectInstance.title}

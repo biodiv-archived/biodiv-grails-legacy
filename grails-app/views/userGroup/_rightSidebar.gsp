@@ -1,4 +1,4 @@
-<div id="right-sidebar" class="span3" style="position:absolute; right:-220px;top:0px;margin-top:20px">
+<!--<div id="right-sidebar" class="span3" style="position:absolute; right:-220px;top:0px;margin-top:20px">
     			<a class="btn btn-success"
 				href="${uGroup.createLink(
 						controller:'observation', action:'create', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}" style="width:125px;margin-bottom:10px;" 
@@ -12,7 +12,8 @@
 					<i class="icon-plus"></i>Add Document
                                     </a>
 	
-</div>
+                                </div>
+-->
 <%--<div id="right-sidebar" class="sidebar right-sidebar span12">--%>
 <%--	<g:if test="${params.action=='search'}">--%>
 <%--		<div class="sidebar_section" style="left: 0px">--%>

@@ -1,10 +1,7 @@
 
 <%@page import="species.License"%>
-<table class="ufile-block span8">
-	<thead></thead>
-	<tbody>
-		<tr>
-			<td><input name="${docId}.uFile.path" type="hidden"
+<div class="ufile-block block" style="overflow:visible">
+			<input name="${docId}.uFile.path" type="hidden"
 				value='${filePath}' />
 				 <input name="${docId}.id" type="hidden"
 				value='${docId}' /> 
@@ -20,10 +17,13 @@
 				<input type="hidden" name='${docId}.new'
 					value="${documentInstance?'false':'true'}" />
 
-				<div>
+				<div class="control-group">
+					<label class="control-label" for="file"> File </label>
+                                        <div class="controls">
 					<span class="qq-upload-file"><i class="icon-file"></i> ${docName}
-					</span> <span class="qq-upload-size"> ${fileSize}
-					</span>
+					</span> of size <span class="qq-upload-size"> ${fileSize}
+                                    </span>
+                                </div>          
 
 				</div>
 
@@ -86,7 +86,7 @@
 					</div>
 				</div> <label class="control-label" for="License"> License </label>
 
-				<div id="${docId}.license" class="licence_div dropdown">
+				<div id="${docId}.license" class="licence_div dropdown controls">
 
 					<a id="selected_license_${docId}"
 						class="btn dropdown-toggle btn-mini" data-toggle="dropdown"> <img
@@ -95,7 +95,7 @@
 					</a>
 
 					<ul id="license_options_${docId}"
-						class="controls dropdown-menu license_options">
+						class="dropdown-menu license_options">
 						<span>Choose a license</span>
 						<g:each in="${License.list()}" var="l">
 							<li class="license_option"
@@ -109,10 +109,6 @@
 					</ul>
 								<input id="license_${docId}" type="hidden" name="${docId}.licenseName" value="${documentInstance?.license?.name?.value()}"></input>
 
-				</div></td>
-			<td><span class="del-document"> <img
-					src="${resource(dir:'images/skin', file:'close.png')}"
-					style="vertical-align: middle;" /></td>
-		</tr>
-	</tbody>
-</table>
+				</div>
+                                <span class="del-document close_button"></span>
+</div>

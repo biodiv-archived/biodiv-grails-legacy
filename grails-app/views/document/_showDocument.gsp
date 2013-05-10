@@ -1,56 +1,70 @@
-<table class="show-document">
+<div class="observation_story sidebar_section">
+    <g:if test="${documentInstance.uFile || documentInstance.uri}">
+    <div class="sidebar_section" style="margin-left: 0px;">
 
+        <g:if test="${documentInstance.uFile}">
 
-	<tr>
-		<td class="prop"><span class="grid_3 name">File</span></td>
-		<td class="linktext"><fileManager:displayFile
-				filePath="${documentInstance?.uFile?.path}"
-				fileName="${documentInstance.title}"></fileManager:displayFile>
+        <dl class="dl-horizontal">
 
-		</td>
+            <dt>File</dt>
+            <dd>
 
-		<g:if test="${documentInstance?.description}">
+            <fileManager:displayFile
+            filePath="${ documentInstance?.uFile?.path}"
+            fileName="${ documentInstance?.uFile?.path}"></fileManager:displayFile>
+            </dd>
+        </dl>
+        </g:if>
+        <g:if test="${documentInstance.uri}">
+        <dl class="dl-horizontal">
 
-			<tr>
-				<td class="prop"><span class="grid_3 name">Description</span></td>
-				<td class="linktext">
-					${documentInstance?.description }
-				</td>
-			</tr>
-		</g:if>
+            <dt>URL</dt>
+            <dd class="linktext">
+            ${documentInstance.uri}
+            </dd>
+        </dl>
+        </g:if>
+    </div>
+    </g:if>
 
+    <div class="prop">
+        <span class="name">Type</span>
+        <div class="value">
+            ${documentInstance.type?.value }
+        </div>
+    </div>
 
-		<g:if test="${documentInstance?.contributors}">
-			<tr>
-				<td class="prop"><span class="grid_3 name">Contributor(s)</span>
-			</td>
-			<td class="linktext">
-				${
-			documentInstance?.contributors
-		}
-			</td>
-	</tr>
-	</g:if>
-	<g:if test="${documentInstance?.attribution}">
-		<tr>
-			<td class="prop"><span class="grid_3 name">Attribution</span></td>
-			<td class="linktext">
-				${documentInstance?.attribution}
-			</td>
+    <g:if test="${documentInstance?.description}">
+    <div class="prop">
+        <span class="name">Description</span>
+        <div class="notes_view linktext value">
+            ${documentInstance?.description}
+        </div>
+    </div>
+    </g:if>
+    <g:if test="${documentInstance?.contributors}">
+    <div class="prop">
+        <span class="name">Contributor(s)</span>
+        <div class="value">
+            ${documentInstance?.contributors}
+        </div>
+    </div>
+    </g:if>
+    <g:if test="${documentInstance?.attribution}">
+    <div class="prop">
+        <span class="name">Attribution</span>
+        <div class="value">
+            ${documentInstance?.attribution}
+        </div>
+    </div>
+    </g:if>
+    <g:if test="${documentInstance?.license}">
+    <div class="prop">
+        <span class="name">License</span>
 
-		</tr>
-	</g:if>
-	<g:if test="${documentInstance?.license}">
-		<tr>
-			<td class="prop"><span class="grid_3 name">License</span></td>
-
-			<td class="linktext"><a class="license"
-				href="${documentInstance?.license?.url}" target="_blank"><img
-					src="${createLinkTo(dir:'images/license', file: documentInstance?.license?.name.value().toLowerCase().replaceAll('\\s+','')+'.png', absolute:true)}"
-					alt="${documentInstance?.license?.name.value()}" /> </a></td>
-
-		</tr>
-	</g:if>
-
-
-</table>
+        <div class="value"><img
+            src="${resource(dir:'images/license',file:documentInstance?.license?.name.value().toLowerCase().replaceAll('\\s+','')+'.png', absolute:true)}"
+            title="${documentInstance.license.name}" /></div>
+    </div>
+    </g:if>
+</div>

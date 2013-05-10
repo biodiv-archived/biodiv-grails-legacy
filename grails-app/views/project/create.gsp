@@ -13,28 +13,30 @@
 <r:require modules="add_file" />
 <uploader:head />
 <style type="text/css">
-ul.tagit {
-	margin-left: 0px;
+.block {
+    background-color:whitesmoke;
+    position:relative;
+    overflow:hidden;
+    margin-bottom:5px;
+    padding:5px 0px;
 }
 
-.location-div {
-	margin: 10px;
+.block label {
+    font-weight:bold;
 }
 
-.locations-block {
-	
+.super-section label {
+    font-weight:bold;
 }
 
-textarea {
-	max-width: 680px;
+.section {
+    position: relative;
+    overflow: visible;
 }
-
-.sidebar-section {
-	float: right;
-}
-
-[class*="cke"] {
-	max-width: 100%;
+.super-section {
+    clear:both;
+    width:930px;
+    margin-left:0px;
 }
 </style>
 </head>
@@ -65,13 +67,12 @@ textarea {
 
 		<form action="${form_action}" method="POST" id="create-project"
 			class="project-form form-horizontal" enctype="multipart/form-data">
-			<div class="dialog">
 
 				<input name="id" type="hidden" value="${projectInstance?.id}" /> <input
 					name="uploadDir" type="hidden" value="${uploadDir}" />
 
 
-				<div class="super-section">
+				<div class="span12 super-section">
 					<div class="section">
 
 						<div
@@ -80,7 +81,7 @@ textarea {
 									code="project.direction.label" default="Strategic Direction" /></label>
 
 							<div class="controls">
-								<g:select name="direction.id"
+								<g:select name="direction.id" class="input-block-level"
 									from="${content.StrategicDirection.list()}" optionKey="id"
 									value="${projectInstance?.direction?.id}" />
 							</div>
@@ -148,9 +149,9 @@ textarea {
 					</div>
 				</div>
 
-				<div class="super-section">
+				<div class="span12 super-section">
 					<h3>Location</h3>
-					<div id="locationsDiv" class="section in collapse">
+					<div id="locationsDiv">
 						<g:render template="locations"
 							model="['projectInstance':projectInstance]" />
 
@@ -158,11 +159,10 @@ textarea {
 
 				</div>
 
-				<div class=" span12 super-section"
-					style="margin-left: 0px; width: 930px;">
+				<div class=" span12 super-section">
 
 					<h3>Grantee Details</h3>
-					<div class="span4 section">
+					<div class="span5 section" style="margin-left:0px">
 
 						<div
 							class="control-group ${hasErrors(bean: projectInstance, field: 'granteeOrganization', 'error')}">
@@ -172,7 +172,7 @@ textarea {
 
 							<div class="controls">
 
-								<g:textField name="granteeOrganization"
+								<g:textField name="granteeOrganization" class="input-xlarge"
 									value="${projectInstance?.granteeOrganization}" />
 							</div>
 						</div>
@@ -185,12 +185,12 @@ textarea {
 
 							<div class="controls">
 
-								<g:textField name="granteeContact"
+								<g:textField name="granteeContact" class="input-xlarge"
 									value="${projectInstance?.granteeContact}" />
 							</div>
 						</div>
 					</div>
-					<div class="sidebar-section span6 section">
+					<div class="span5 section" style="margin-left;0px;">
 						<div
 							class="control-group ${hasErrors(bean: projectInstance, field: 'granteeEmail', 'error')}">
 							<label class="control-label" for="granteeEmail"><g:message
@@ -200,7 +200,7 @@ textarea {
 								<div class="input-prepend">
 									<span class="add-on"><i class="icon-envelope"></i></span>
 
-									<g:textField name="granteeEmail"
+									<g:textField name="granteeEmail" class="input-xlarge"
 										value="${projectInstance?.granteeEmail}" />
 									<div class="help-inline">
 										<g:hasErrors bean="${projectInstance}" field="title">
@@ -215,7 +215,7 @@ textarea {
 							class="control-group ${hasErrors(bean: projectInstance, field: 'granteeLogo', 'error')}">
 
 							<label class="control-label" for="granteeLogo"><g:message
-									code="project.granteeLogo.label" default="GranteeLogo" /></label>
+									code="project.granteeLogo.label" default="Grantee Logo" /></label>
 
 							<div class="controls">
 
@@ -228,13 +228,10 @@ textarea {
 				</div>
 
 
-				<div style="clear: both;"></div>
 
-				<div class="super-section">
-
-
+				<div class="span12 super-section">
+					<div id="projectDetails" class="section span6" style="margin-left:0px;">
 					<h3>Project Details</h3>
-					<div id="projectDetails" class="section">
 						<div
 							class="control-group ${hasErrors(bean: projectInstance, field: 'granteeFrom', 'error')}">
 
@@ -243,7 +240,7 @@ textarea {
 									code="project.grantFrom.label" default="Grant From" /></label>
 							<div class="controls">
 								<input name="grantFrom" type="text" id="grantFrom"
-									class="date-popup"
+									class="date-popup input-xlarge"
 									value="${projectInstance?.grantFrom?.format('dd/MM/yyyy')}"
 									placeholder="Select date" />
 							</div>
@@ -256,7 +253,7 @@ textarea {
 									code="project.grantTo.label" default="Grant To" /></label>
 							<div class="controls">
 								<input name="grantTo" type="text" id="grantTo"
-									class="date-popup"
+									class="date-popup input-xlarge"
 									value="${projectInstance?.grantTo?.format('dd/MM/yyyy')}"
 									placeholder="Select date" />
 							</div>
@@ -272,7 +269,7 @@ textarea {
 								<div class="input-prepend input-append">
 									<span class="add-on">$</span>
 
-									<g:textField name="grantedAmount" placeholder="Enter amount"
+									<g:textField name="grantedAmount" placeholder="Enter amount" class="input-xlarge" style="width:214px;"
 										value="${projectInstance?.grantedAmount?projectInstance.grantedAmount:null}" />
 									<span class="add-on">.00</span>
 
@@ -282,13 +279,12 @@ textarea {
 						</div>
 					</div>
 
-				</div>
 			</div>
 
 			<div class="super-section">
 				<h3>Project Proposal</h3>
 
-				<div id="projectProposalSec" class="section">
+				<div id="projectProposalSec">
 
 
 					<div
@@ -375,7 +371,7 @@ textarea {
 
 			<div class="super-section">
 				<h3>Data Contribution</h3>
-				<div id="data-links" class="section in collapse">
+				<div id="data-links">
 					<g:render template="dataLinks"
 						model="['projectInstance':projectInstance]" />
 

@@ -86,7 +86,7 @@
 				color="${[start: '#084B91', end: '#9FBBE5']}"
 				size="${[start: 12, end: 30, unit: 'px']}" paramName='tag' />
 
-			<span class="pull-right"><a href="/document/tagcloud">all
+			<span class="pull-right"><a href="/document/tagcloud">more
 					tags</a></span>
 		</g:if>
 		<g:else>

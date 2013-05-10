@@ -44,7 +44,7 @@ if(r && thumbnail) {
 		String location = "Observed at '" + (observationInstance.placeName.trim()?:observationInstance.reverseGeocodedName) +"'"
 		String desc = "- "+ location +" by "+observationInstance.author.name.capitalize()+" in species group "+observationInstance.group.name + " and habitat "+ observationInstance.habitat.name;
 %>
-<g:set var="description" value="${desc }" />
+<g:set var="description" value="${observationInstance.description?observationInstance.description+" "+desc:desc }" />
 
 <meta property="fb:app_id" content="${fbAppId }" />
 <meta property="fb:admins" content="581308415,100000607869577" />
@@ -141,7 +141,7 @@ if(r && thumbnail) {
 								<%lastListParams.put('userGroupWebaddress', userGroup?userGroup.webaddress:userGroupWebaddress);
 								lastListParams.put('fragment', params.pos);	 
 								%>
-								<a class="btn" href="${uGroup.createLink(lastListParams)}" style="text-align: center;display: block;width: 30px;margin: 0 auto;">List</a>
+								<a class="btn" href="${uGroup.createLink(lastListParams)}" style="text-align: center;display: block;margin: 0 auto;">List</a>
 							</g:else>
 						</div>
 					</g:if>

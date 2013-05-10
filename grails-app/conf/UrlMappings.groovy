@@ -124,17 +124,24 @@ class UrlMappings {
 			action = "index"
 		}
    
-        "/rating/rate/$id" {
-            controller = "rating"
-            action = "rate"
-        }
-        "/rating/fetchRate/$id" {
-            controller = "rating"
-            action = "fetchRate"
-        }
-        "/rating/$action/$id" {
-            controller = "rateable"
-        }
- 
-	}
+    "/rating/rate/$id" {
+        controller = "rating"
+        action = "rate"
+    }
+
+    "/rating/fetchRate/$id" {
+        controller = "rating"
+        action = "fetchRate"
+    }
+
+    "/rating/$action/$id" {
+        controller = "rateable"
+    }
+
+    "/document/list" {
+        controller = 'document'
+        action = 'browser'
+    }
+
+    }
 }

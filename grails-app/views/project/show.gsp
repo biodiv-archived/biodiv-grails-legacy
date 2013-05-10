@@ -39,7 +39,7 @@
 
 		<div class="page-header clearfix">
 			<div style="width: 100%;">
-				<div class="main_heading" style="margin-left: 0px;">
+				<div class="main_heading span8" style="margin-left: 0px;">
 
 					<s:showHeadingAndSubHeading
 						model="['heading':projectInstance.title, 'subHeading':subHeading, 'headingClass':headingClass, 'subHeadingClass':subHeadingClass]" />
@@ -103,8 +103,8 @@
 
 
 		<uGroup:rightSidebar />
-		<div class="span8 right-shadow-box"
-			style="margin: 0px; padding-right: 5px;">
+		<div class="span8 right-shadow-box observation"
+			style="margin: 0px;">
 
 
 
@@ -118,14 +118,13 @@
 
 				<a class="pull-left btn ${prevProjectId?:'disabled'}"
 					href="${uGroup.createLink([action:"show", controller:"project",
-									id:prevProjectId,  'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress])}">Prev
-					Project</a> <a class="pull-right  btn ${nextProjectId?:'disabled'}"
+                                        id:prevProjectId,  'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress])}"><i class="icon-backward"></i>Prev
+					</a> <a class="pull-right  btn ${nextProjectId?:'disabled'}"
 					href="${uGroup.createLink([action:"show", controller:"project",
-									id:nextProjectId,  'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress])}">Next
-					Project</a> <a class="btn"
+                                        id:nextProjectId,  'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress])}">Next <i style="margin-right: 0px; margin-left: 3px;" class="icon-forward"></i>
+					</a> <a class="btn"
 					href="${uGroup.createLink([action:'list', controller:'project'])}"
-					style="text-align: center; display: block; width: 125px; margin: 0 auto;">List
-					Projects</a>
+					style="text-align: center; display: block; margin: 0 auto;">List</a>
 
 			</div>
 
@@ -143,6 +142,7 @@
 				</div>
 			</g:if>
 
+                        <div class="observation_story sidebar_section">
 			<g:if test="${projectInstance?.summary}">
 
 				<div>
@@ -159,13 +159,14 @@
 					model="['instance': projectInstance, 'controller': 'project', 'action':'list']" />
 
 			</g:if>
+                        </div>
 
 			<g:if test="${projectInstance.locations.size()}">
 				<div class="sidebar_section">
 					<a class="speciesFieldHeader" data-toggle="collapse"
 						href="#locations"><h5>Project Sites</h5></a>
 					<div id="locations" class="speciesField collapse in">
-						<table class="table table-hover" style="margin-left: 0px;">
+						<table class="table table-hover" style="margin: 0px;">
 							<thead>
 								<tr>
 									<th>Site Name</th>
@@ -210,8 +211,8 @@
 
 							<table>
 								<tr>
-									<td class="prop"><span class="grid_3 name">Organization</td>
-									<td class="linktext">
+									<td class="prop"><span class=" name">Organization</td>
+									<td>
 										${projectInstance?.granteeOrganization}
 									</td>
 								</tr>
@@ -222,22 +223,21 @@
 
 			</g:if>
 			<div class="sidebar_section">
-				<a data-toggle="collapse" href="#project-details"><h5>Project
-						Details</h5></a>
+				<a data-toggle="collapse" href="#project-details"><h5>Project Details</h5></a>
 				<div id="project-details" class="speciesField in collapse">
 					<table>
 						<g:if test="${projectInstance.grantFrom || projectInstance.grantTo}">
 						<tr>
-							<td class="prop"><span class="grid_3 name">Grant Term</span></td>
-							<td class="linktext">
+							<td class="prop"><span class=" name">Grant Term</span></td>
+							<td>
 								${projectInstance?.grantFrom} - ${projectInstance?.grantTo}
 							</td>
 						</tr>
 						</g:if>
 						<g:if test="${projectInstance.grantedAmount}">
 						<tr>
-							<td class="prop"><span class="grid_3 name">Amount</td>
-							<td class="linktext">$ ${projectInstance?.grantedAmount}
+							<td class="prop"><span class=" name">Amount</td>
+							<td>$ ${projectInstance?.grantedAmount}
 							</td>
 						</tr>
 						</g:if>
@@ -254,13 +254,14 @@
 					<div id="proposal" class="speciesField collapse in">
 
 						<g:if test="${projectInstance?.projectProposal}">
-							<div class="textarea-value">
+							<div class="notes_view linktext">
 								${projectInstance?.projectProposal}
 							</div>
 						</g:if>
 
 						<g:if test="${projectInstance?.proposalFiles}">
 							<b>Files</b>
+
 							<g:each in="${projectInstance?.proposalFiles}" var="proposalFile">
 								<g:render template="/document/showDocument"
 									model="['documentInstance':proposalFile]" />
@@ -280,7 +281,7 @@
 					<div id="report" class="speciesField collapse in">
 
 						<g:if test="${projectInstance?.projectReport}">
-							<div class="textarea-value">
+							<div class="notes_view linktext">
 								${projectInstance?.projectReport}
 							</div>
 						</g:if>
@@ -313,7 +314,7 @@
 									${dataLink.description}
 								</dd>
 								<dt>URL</dt>
-								<dd>
+								<dd class="linktext">
 									${dataLink.url}
 								</dd>
 							</dl>
@@ -331,7 +332,7 @@
 					<a data-toggle="collapse" href="#misc"><h5>Miscellaneous</h5></a>
 					<div id="misc" class="speciesField collapse in">
 						<g:if test="${projectInstance?.misc}">
-							<div class="textarea-value">
+							<div class="notes_view linktext">
 								${projectInstance?.misc}
 							</div>
 						</g:if>

@@ -36,15 +36,32 @@
 			model="['entityName':'Western Ghats CEPF Projects']" />
 		<uGroup:rightSidebar />
 		<div class="span8 right-shadow-box"
-			style="margin: 0px; padding-right: 5px;">
+			style="margin: 0px;">
 			<g:render template="/project/search" model="['params':params]" />
 			
 			<obv:showObservationFilterMessage />
 			
-			<g:render template="/project/projectListTemplate" />
+			<div class="observations_list_wrapper" style="top: 0px;">
+                            <g:render template="/project/projectListTemplate" />
+                        </div>
 
 		</div>
 		<g:render template="/project/projectSidebar" />
 	</div>
+	<r:script>
+
+$(document).ready(function(){
+
+	$(".list_view").show();
+	
+    $('.observations_list_wrapper').on('updatedGallery', function(event) {
+    	$(".list_view").show();
+    });
+	
+});
+
+
+</r:script>
+
 </body>
 </html>

@@ -86,8 +86,8 @@
 
 		</g:else>
 	</div>
-	<div style="text-align: center;">
-		<input type="button" class="btn btn-primary" value="Add location"
+	<div style="text-align: center;clear:both;">
+		<input type="button" class="btn btn-primary" value="Add Location"
 			onclick="addlocation();" />
 	</div>
 </div>
