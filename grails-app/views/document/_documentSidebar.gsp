@@ -37,9 +37,9 @@
 
         <g:if test="${documentInstance}">
         <div class="sidebar_section" style="overflow:hidden">
+            <a class="speciesFieldHeader" href="#tags" data-toggle="collapse"><h5>Document Tags</h5></a>
             <g:if test="${documentInstance?.tags}">
 
-            <a class="speciesFieldHeader" href="#tags" data-toggle="collapse"><h5>Tags</h5></a>
             <div id="tags" class="speciesField collapse in">
                 <table>
                     <tr>
@@ -52,7 +52,7 @@
             </div>
             </g:if>
             <g:else>
-            <span class="msg" style="padding-left: 50px;">No tags</span>
+            <span class="msg" style="padding-left: 50px;">No tags on this document</span>
             </g:else>
             <span class="pull-right"><a href="/document/tagcloud">all
                     tags</a></span>
@@ -76,7 +76,7 @@
         <g:else>
 
 	<div class="sidebar_section" style="overflow:hidden">
-		<h5>Document Tags</h5>
+		<h5>All Document Tags</h5>
 		<%
 			params.offset = 0	
 		%>
