@@ -96,6 +96,9 @@ function galleryImageLoadFinish() {
 
 function refreshRating($container) {
         var form = $container.parent()
+        
+            if(form.length == 0) return;
+
         var action = form.attr('action');
 
         $.ajax ({

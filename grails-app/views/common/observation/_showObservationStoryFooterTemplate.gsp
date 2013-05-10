@@ -8,16 +8,16 @@
    	<g:if test="${showDetails}">
 		<div class="footer-item">
 			<i class="icon-eye-open" title="No of page views"></i>
-                        <span class="badge">${observationInstance.getPageVisitCount()}</span>
+                        <span class="">${observationInstance.getPageVisitCount()}</span>
 		</div>
 		<div class="footer-item">
 			<i class="icon-check" title="No of name suggestions"></i>
-                        <span class="badge">${observationInstance.getRecommendationCount()}</span>
+                        <span class="">${observationInstance.getRecommendationCount()}</span>
 	
 		</div>
 		<div class="footer-item">
 			<i class="icon-comment" title="No of comments"></i>
-                        <span class="badge">${observationInstance.fetchCommentCount()}</span>
+                        <span class="">${observationInstance.fetchCommentCount()}</span>
 		</div>
 		<div class="footer-item"">
 				<obv:addFlag model="['observationInstance':observationInstance]" />

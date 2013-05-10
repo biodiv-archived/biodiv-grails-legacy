@@ -122,9 +122,9 @@ $(document).ready(function(){
 		more_link : '<a class="more readmore">&nbsp;More</a>'
 	});
         
-        $("#toc").tocify({
+        /*$("#toc").tocify({
             selectors:'h5,h6',
-        }).data("toc-tocify");
+        }).data("toc-tocify");*/
         
         //$("#tocContainer").affix();
         
@@ -276,10 +276,10 @@ $(document).ready(function(){
      if(${sparse}) {
     	 if(occurrenceCount > 0) {
             showOccurence('${speciesName}');
-            //$("#map .message").html("Showing "+occurrenceCount+" occurrence records for <i>${speciesName}</i>.");
+            //$("#map .alert").html("Showing "+occurrenceCount+" occurrence records for <i>${speciesName}</i>.");
     	} else {
-            //$("#map .message").html("Currently no occurrence records for <i>${speciesName}</i> is available on the portal.");
-            //$('#map1311326056727').hide();
+            $("#map .alert").html("Currently no occurrence records are available right now. Please check back with us after some time or provide us if you have any.");
+            $('#map1311326056727').hide();
     	}
      } else {
     	 showSpeciesConcept($(".defaultSpeciesConcept").attr("id"))
@@ -505,7 +505,8 @@ $(document).ready(function(){
 				    ${speciesInstance.findSummary() }
                                 </div>
                             </div>
-
+                        </div>
+                        <div class="span12" style="margin-left:0px">
 				<%def nameRecords = fields.get(grailsApplication.config.speciesPortal.fields.NOMENCLATURE_AND_CLASSIFICATION)?.get(grailsApplication.config.speciesPortal.fields.TAXON_RECORD_NAME).collect{it.value.get('speciesFieldInstance')[0]} %>
 				<g:if test="${nameRecords}">
 				<div class="sidebar_section" style="clear:both;">
@@ -632,15 +633,6 @@ $(document).ready(function(){
 						</g:else>
 					</g:each>
 				</ul>
-                                <div class="sidebar_section">
-                                        <h5>Related Observations</h5>
-                                        <div class="tile" style="clear: both">
-                                                <obv:showRelatedStory
-                                                        model="['speciesId':speciesInstance.id, 'controller':'observation', 'action':'getRelatedObservation', 'filterProperty': 'taxonConcept',  'filterPropertyValue': speciesInstance.taxonConcept.id, 'id':'a','userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress]" />
-                                        </div>
-                                </div>
-
-					
 			</div>			
 			
 			<g:if test="${!sparse}">
@@ -648,13 +640,13 @@ $(document).ready(function(){
 			</g:if>
 
 	                <!-- right side bar -->
-			<div class="span4 classifications">
-                            <div id="tocContainer" class="sidebar_section">
+			<div class="span12 classifications" style="margin-left:0px;">
+                            <!--div id="tocContainer" class="sidebar_section">
                                 <div id="toc" class="tile"></div>
-                            </div>
+                            </div-->
 
 
-                            <div id="map" class="sidebar_section">
+                            <!--div id="map" class="sidebar_section">
                                 <h5>Occurrence Map</h5>
                                     <div id="mapSpinner" class="spinner">
                                         <center>
@@ -672,7 +664,7 @@ $(document).ready(function(){
  
                                 <comment:showCommentPopup model="['commentHolder':[objectType:ActivityFeedService.SPECIES_MAPS, id:speciesInstance.id], 'rootHolder':speciesInstance]" />	
 
-                            </div>
+                            </div-->
 
                            <div class="sidebar_section">
                                 <h5> Activity </h5>

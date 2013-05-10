@@ -23,7 +23,7 @@
 			</g:if>
 			<g:else>
 				<g:each in="${concept.value}" var="category">
-					<g:if test="${!category.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.SUMMARY)  && !category.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.OCCURRENCE_RECORDS)}">
+					<g:if test="${!category.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.SUMMARY)}">
 
 						<div id="speciesField${conceptCounter}_${fieldCounter++}" class="clearfix speciesCategory">
 
@@ -70,6 +70,26 @@
 									<g:elseif
 										test="${category.key.equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.OCCURRENCE_RECORDS)}">
 										<g:showSpeciesFieldToolbar model="${category.value[0]}" />
+                                                                                <br />
+                                                                                <div id="map">
+                                                                                    <div id="map1311326056727" class="occurenceMap"
+                                                                                        style="height: 600px; width: 100%"></div>
+                                                                                    <div class="alert alert-info">
+                                                                                        The current map showing distribution of species is only indicative.
+                                                                                    </div>
+
+                                                                                    <comment:showCommentPopup model="['commentHolder':[objectType:ActivityFeedService.SPECIES_MAPS, id:speciesInstance.id], 'rootHolder':speciesInstance]" />       
+                                                                                </div>
+                                                                                <%--                                                                            --%>
+                                                                                <%--                                                                            <obv:showObservationsList  model="['observationInstanceList':observationInstanceList, 'instanceTotal':instanceTotal, 'queryParams':queryParams, 'activeFilters':activeFilters, 'userGroupWebaddress':userGroupWebaddress]"  />--%>
+
+                                                                                <div class="sidebar_section">
+                                                                                    <h5>Related Observations</h5>
+                                                                                    <div class="tile" style="clear: both">
+                                                                                        <obv:showRelatedStory
+                                                                                        model="['speciesId':speciesInstance.id, 'controller':'observation', 'action':'getRelatedObservation', 'filterProperty': 'taxonConcept',  'filterPropertyValue': speciesInstance.taxonConcept.id, 'id':'a','userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress]" />
+                                                                                    </div>
+                                                                                </div>
                                        
 									</g:elseif>
 
