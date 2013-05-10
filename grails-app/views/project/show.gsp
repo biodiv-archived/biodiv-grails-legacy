@@ -43,6 +43,9 @@
 
 					<s:showHeadingAndSubHeading
 						model="['heading':projectInstance.title, 'subHeading':subHeading, 'headingClass':headingClass, 'subHeadingClass':subHeadingClass]" />
+                                                <small>submitted by <a href="${uGroup.createLink(controller:'user', action:'show', id:projectInstance.author.id, userGroupWebaddress:params.webaddress)}">${projectInstance.author.name}</a> on                    
+                                                    <g:formatDate type="datetime" date="${projectInstance.dateCreated} style="MEDIUM"/>
+</small>
 				</div>
 				<sUser:isCEPFAdmin>
 
@@ -53,7 +56,7 @@
 						Project
 					</a>
 
-					<div style="clear:both; float: right; margin: 10px 0;">
+					<div style="float: right; margin: 10px 0;">
 
 						<a class="btn btn-primary pull-right"
 							href="${uGroup.createLink(controller:'project', action:'edit', id:projectInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
@@ -343,5 +346,12 @@
 
 		<g:render template="/project/projectSidebar" />
 	</div>
+	<r:script>
+		$(document).ready(function() {
+	//		window.params.tagsLink = "${uGroup.createLink(controller:'observation', action: 'tags')}";
+	//		initRelativeTime("${uGroup.createLink(controller:'activityFeed', action:'getServerTime')}");
+		});
+	</r:script>
+
 </body>
 </html>

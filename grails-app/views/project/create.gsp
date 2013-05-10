@@ -18,7 +18,7 @@
     position:relative;
     overflow:hidden;
     margin-bottom:5px;
-    padding:5px 0px;
+    padding:5px 5px;
 }
 
 .block label {
@@ -146,6 +146,7 @@
 										</li>
 									</g:each>
 								</ul>
+                                                                <div id="tags_ac" style="z-index:10"></div>
 							</div>
 						</div>
 					</div>
@@ -464,23 +465,23 @@
         	placeholderText:'Add some tags',
         	fieldName: 'tags', 
         	autocomplete:{
-        		source: '/project/tags'
+                    source: '/project/tags',
+                    appendTo: "#tags_ac"
         	}, 
         	triggerKeys:['enter', 'comma', 'tab'], 
         	maxLength:30
-        });
-		$(".tagit-hiddenSelect").css('display','none');
-		
+            });
+            $(".tagit-hiddenSelect").css('display','none');
+            $( ".date-popup" ).datepicker({ 
+                            changeMonth: true,
+                            changeYear: true,
+                            dateFormat: 'dd/mm/yy' 
+            });
+
 
 		
         });
         
-        $( ".date-popup" ).datepicker({ 
-			changeMonth: true,
-			changeYear: true,
-			dateFormat: 'dd/mm/yy' 
-	});
-
 
         </r:script>
 
