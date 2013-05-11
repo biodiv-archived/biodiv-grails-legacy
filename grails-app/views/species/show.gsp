@@ -54,10 +54,6 @@
 	background-color : #fff;
 }
 
-.thumbnails > .thumbnail {
-    margin: 0 0 10px 10px;
-    width: inherit;
-}
 </style>
 
 <!--[if lt IE 8]><style>

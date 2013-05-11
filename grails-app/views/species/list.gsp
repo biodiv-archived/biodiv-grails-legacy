@@ -18,6 +18,13 @@
 <title>Species List</title>
 </head>
 <body>
+<style  type="text/css">
+.thumbnails>.thumbnail {
+	margin: 0 10px 10px 0px;
+        width:inherit;
+        }
+</style>
+
 	<div class="span12">
 		<s:showSubmenuTemplate model="['entityName':'Species']" />
 		<uGroup:rightSidebar/>
