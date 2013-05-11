@@ -1,13 +1,5 @@
 <div class="observation-icons pull-right" style="position: absolute;bottom: -80px;right: 0px;">
 
-    <%
-    if(!userGroupInstance.isAttached()) {
-        userGroupInstance.attach();
-    }
-        %>
-	<sec:permitted className='species.groups.UserGroup'
-		id='${userGroupInstance.id}'
-		permission='${org.springframework.security.acls.domain.BasePermission.WRITE}'>
 
 		<a id="inviteMembers" class="btn btn-large btn-primary" href="#inviteMembersDialog" role="button" data-toggle="modal"><i
 			class="icon-envelope"></i> <g:message code="userGroup.members.label"
@@ -36,7 +28,6 @@
 				<a href="#" id="invite" class="btn btn-primary">Invite</a>
 			</div>
 		</div>
-	</sec:permitted>
 
 	
 

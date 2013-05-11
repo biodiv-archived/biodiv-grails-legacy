@@ -80,7 +80,6 @@ class UrlMappings {
 			controller='userGroup'
 			action='user'
 		}
-		
 		"/group/$webaddress/user" {
 			controller='userGroup'
 			action='user'
@@ -142,6 +141,10 @@ class UrlMappings {
         controller = 'document'
         action = 'browser'
     }
+		"/group/$webaddress/document/list" {
+			controller='document'
+			action='browser'
+		}
 
     }
 }

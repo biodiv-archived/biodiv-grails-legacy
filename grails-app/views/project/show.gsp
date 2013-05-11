@@ -132,6 +132,7 @@
 				</div>
 			</g:if>
 
+			<g:if test="${projectInstance?.summary || projectInstance.tags}">
                         <div class="observation_story sidebar_section">
 			<g:if test="${projectInstance?.summary}">
 
@@ -150,6 +151,7 @@
 
 			</g:if>
                         </div>
+                       </g:if>
 
 			<g:if test="${projectInstance.locations.size()}">
 				<div class="sidebar_section">

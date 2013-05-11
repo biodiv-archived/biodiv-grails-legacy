@@ -18,7 +18,7 @@
 		if((${isAjaxLoad?:'false'} == 'false') || (!${isAjaxLoad?1:0})){
 			 $("li.tagit-choice").click(function(){
 			 	var tg = $(this).contents().first().text();
-	         	window.location.href = "${uGroup.createLink(controller:'observation', action: 'list')}?tag=" + tg ;
+	         	window.location.href = "${uGroup.createLink(controller:'observation', action: 'list', 'userGroupWebaddress':params.webaddress)}?tag=" + tg ;
 	         });
          }
 	})
