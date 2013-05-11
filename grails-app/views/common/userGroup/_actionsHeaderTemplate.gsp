@@ -1,5 +1,10 @@
 <div class="observation-icons pull-right" style="position: absolute;bottom: -80px;right: 0px;">
 
+    <%
+    if(!userGroupInstance.isAttached()) {
+        userGroupInstance.attach();
+    }
+        %>
 	<sec:permitted className='species.groups.UserGroup'
 		id='${userGroupInstance.id}'
 		permission='${org.springframework.security.acls.domain.BasePermission.WRITE}'>
