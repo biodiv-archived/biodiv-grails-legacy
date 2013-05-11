@@ -82,7 +82,7 @@ class ActivityFeed {
 					eq('subRootHolderType', params.subRootHolderType)
 					eq('subRootHolderId', params.subRootHolderId)
 				}else{
-	 				switch (feedType) {
+					switch (feedType) {
 						case ActivityFeedService.GENERIC:
 							eq('rootHolderType', params.rootHolderType)
 							break
@@ -107,6 +107,7 @@ class ActivityFeed {
 									}
 								}
 							}
+							break
 						case ActivityFeedService.USER:
 							eq('author', SUser.read(params.user.toLong()))
                             break
