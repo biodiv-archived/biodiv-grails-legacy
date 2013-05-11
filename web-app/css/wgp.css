@@ -1667,10 +1667,6 @@ li#userOrEmail-new {
 	margin-left: 10px;
 }
 
-.thumbnails>.thumbnail {
-	margin: 0 0 10px 0px;
-        width:100%;
-}
 
 .login-box {
 	font-weight: normal;
@@ -1915,4 +1911,8 @@ div.noOfRatings {
    text-align:center; 
    background-color:whitesmoke;
    box-shadow: 0 4px 3px -3px #5e5e5e;
+}
+
+.thumbnails > li {
+    margin: 0 0 10px 10px;
 }
