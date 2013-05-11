@@ -100,7 +100,7 @@ input.dms_field {
 
 
 					<div
-						class="control-group ${hasErrors(bean: documentInstance.uFile, field: 'path', 'error')}">
+						class="control-group ${hasErrors(bean: documentInstance, field: 'uFile', 'error')}">
 						<label class="control-label" for="file"> Resource <span
 							class="req">*</span></label>
 						<div class="controls" style="">
@@ -110,7 +110,7 @@ input.dms_field {
 
 							</div>
 							<div class="span1">(OR)</div>
-							<div class="span6 control-group" style="width: 480px;">
+							<div class="span6 control-group ${hasErrors(bean: documentInstance, field: 'uri', 'error')}" style="width: 480px;">
 								<label class="control-label" for="uri" style="width: 40px;">URL</label>
 								<div class="controls" style="margin-left: 55px;">
 									<input type="text" class="input-block-level" name="uri"
@@ -118,7 +118,11 @@ input.dms_field {
 										value="${documentInstance?.uri}" />
 								</div>
 							</div>
-
+							<div class="help-inline">
+								<g:hasErrors bean="${documentInstance}" field="uFile">
+									<g:message code="fileOrUrl.validator.invalid" />
+								</g:hasErrors>
+							</div>
 						</div>
 					</div>
 

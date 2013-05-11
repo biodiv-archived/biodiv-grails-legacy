@@ -68,8 +68,13 @@ class Document implements Taggable {
 
 	static constraints = {
 		title nullable:false, blank:false
-		uFile nullable:true
-		uri nullable:true
+		uFile validator : {val, obj -> 
+			if(!(val || obj.uri))
+				return 'fileOrUrl.validator.invalid' 
+		},nullable:true
+		uri validator : {val, obj -> 
+			val || obj.uFile
+		},nullable:true
 		contributors nullable:true
 		attribution nullable:true	
 		sourceHolderId nullable:true
