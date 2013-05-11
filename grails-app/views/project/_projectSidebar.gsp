@@ -20,8 +20,8 @@
 		<h5>Project Tags</h5>
 		<g:if test="${tags}">
 			<tc:tagCloud bean="${Project}" controller="project" action="list"
-				sort="${true}" style color="${[start: '#084B91', end: '#9FBBE5']}"
-				size="${[start: 12, end: 30, unit: 'px']}" paramName='tag' />
+				sort="${true}" color="${[start: '#084B91', end: '#9FBBE5']}"
+				size="${[start: 12, end: 30, unit: 'px']}" paramName='tag'/>
 
 			<span class="pull-right"><a href="/project/tagcloud">more
 					tags</a></span>
