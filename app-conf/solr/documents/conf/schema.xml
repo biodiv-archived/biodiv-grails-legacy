@@ -210,7 +210,14 @@
 		<field name="title" type="text" indexed="true" stored="true"
 			required="true" multiValued="false" />
 
-		<field name="description" type="text" indexed="true" required="false" />
+		<field name="type" type="text" indexed="true" required="true" stored="true" multiValued="false"/>
+		<field name="description" type="text" indexed="true" required="false" stored="true"/>
+		
+		<field name="contributor" type="text" indexed="true" required="false" stored="true" multiValued="false" />
+		<field name="attribution" type="text" indexed="true" required="false" stored="true" multiValued="false"/>
+
+		<field name="group" type="long" indexed="true" stored="true"  multiValued="true"/>
+		<field name="group_webaddress" type="string" indexed="true" stored="true" multiValued="true"/>
 
 
 		<field name="tag" type="string" indexed="true" required="false"
@@ -223,11 +230,13 @@
 		<copyField source="description" dest="text" />
 		<copyField source="tag" dest="text" />
 
-
 		<field name="autocomplete" type="textSpell" indexed="true"
 			stored="true" multiValued="true" />
 		<copyField source="title" dest="autocomplete" />
 		<copyField source="description" dest="autocomplete" />
+		<copyField source="attribution" dest="autocomplete" />
+		<copyField source="contributor" dest="autocomplete" />
+		<copyField source="type" dest="autocomplete" />
 		<copyField source="tag" dest="autocomplete" />
 
 

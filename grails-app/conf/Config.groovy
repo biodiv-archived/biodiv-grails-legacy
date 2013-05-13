@@ -390,6 +390,7 @@ speciesPortal {
 		SITENAME = "sitename"
 		CORRIDOR = "corridor"
 		DESCRIPTION = "description"
+		TYPE = "type"
 	}
 
 	nameSearchFields {

@@ -12,6 +12,7 @@ class DocumentController {
 	def documentService
 	def springSecurityService
 	def userGroupService
+	def SUserService
 	
 	def index = {
 		redirect(action: "browser", params: params)
@@ -77,9 +78,11 @@ class DocumentController {
 		if (!documentInstance) {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'document.label', default: 'Document'), params.id])}"
 			redirect(action: "browser")
-		}
-		else {
+		} else if(SUserService.ifOwns(documentInstance.author)) {
 			render(view: "create", model: [documentInstance: documentInstance])
+		} else {
+			flash.message = "${message(code: 'edit.denied.message')}"
+			redirect (url:uGroup.createLink(action:'show', controller:"document", id:documentInstance.id, 'userGroupWebaddress':params.webaddress))
 		}
 	}
 
