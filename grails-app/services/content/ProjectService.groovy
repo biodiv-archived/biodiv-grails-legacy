@@ -1,6 +1,7 @@
 package content
 
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.transaction.annotation.Transactional;
@@ -12,6 +13,7 @@ import species.utils.Utils;
 
 
 
+import content.eml.Document;
 import content.eml.UFile;
 import content.eml.DocumentService;
 
@@ -24,6 +26,7 @@ class ProjectService {
 	def projectSearchService
 	
 	def documentService
+	def userGroupService
 	
 	def createProject(params) {
 
@@ -285,7 +288,7 @@ class ProjectService {
 			queryParams["name"] = params.name
 			activeFilters["name"] = params.name
 		}
-/*
+
 		if(params.uGroup) {
 			if(params.uGroup == "THIS_GROUP") {
 				String uGroup = params.webaddress
@@ -301,13 +304,6 @@ class ProjectService {
 			}
 		}
 
-		if(params.query && params.startsWith && params.startsWith != "A-Z"){
-			params.query = params.query + " AND "+searchFieldsConfig.TITLE+":"+params.startsWith+"*"
-			//paramsList.add('fq', searchFieldsConfig.TITLE+":"+params.startsWith+"*");
-			queryParams["startsWith"] = params.startsWith
-			activeFilters["startsWith"] = params.startsWith
-		}
-		*/
 		log.debug "Along with faceting params : "+paramsList;
 		try {
 			def queryResponse = projectSearchService.search(paramsList);
@@ -337,6 +333,38 @@ class ProjectService {
 		if(sortParam.equalsIgnoreCase("grantee") || sortParam.equalsIgnoreCase('lastUpdated'))
 			return true;
 		return false;
+	}
+
+
+	/**
+	 * Set usergroups to project and project documents also	
+	 */
+	def setUserGroups(Project projectInstance, List userGroupIds) {
+		if(!projectInstance) return
+
+		def projInUserGroups = projectInstance.userGroups.collect { it.id + ""}
+		println projInUserGroups;
+		def toRemainInUserGroups =  projInUserGroups.intersect(userGroupIds);
+		if(userGroupIds.size() == 0) {
+			println 'removing project from usergroups'
+			userGroupService.removeProjectFromUserGroups(projectInstance, projInUserGroups);
+
+		} else {
+			userGroupIds.removeAll(toRemainInUserGroups)
+			userGroupService.postProjecttoUserGroups(projectInstance, userGroupIds);
+			projInUserGroups.removeAll(toRemainInUserGroups)
+			userGroupService.removeProjectFromUserGroups(projectInstance, projInUserGroups);
+		}
+		
+		//set usergroups to project documents
+		for(doc in projectInstance.proposalFiles) 
+			documentService.setUserGroups(doc, userGroupIds)
+			
+		for(doc in projectInstance.reportFiles)
+			documentService.setUserGroups(doc, userGroupIds)
+			
+		for(doc in projectInstance.miscFiles)
+			documentService.setUserGroups(doc, userGroupIds)
 	}
 
 
