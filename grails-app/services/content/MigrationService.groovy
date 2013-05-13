@@ -16,8 +16,8 @@ import content.eml.Document.DocumentType
 import species.License
 import species.utils.Utils
 import species.auth.SUser
-
-//import org.lorecraft.phparser.SerializedPhpParser;
+import species.groups.UserGroup
+import org.lorecraft.phparser.SerializedPhpParser;
 
 class MigrationService {
 
@@ -216,7 +216,7 @@ def migrateProjects() {
 				if(row.metadata) {
 					println "metadata is "+ row.metadata
 
-	/*				SerializedPhpParser serializedPhpParser = new SerializedPhpParser(row.metadata);
+					SerializedPhpParser serializedPhpParser = new SerializedPhpParser(row.metadata);
 					Object result = serializedPhpParser.parse();
 					document.title = result.description;
 					document.description = result.shortnote.body
@@ -231,7 +231,7 @@ def migrateProjects() {
 						println "tags of file are "+ tags
 						document.setTags(tags)
 					}
-*/
+
 
 				}
 
@@ -277,13 +277,16 @@ def migrateProjects() {
 	def setSourceToProjectDocuments(Project proj)
 	{
 
+		def userGroup = UserGroup.findByName('The Western Ghats')
 		
 		for( file in proj.miscFiles) {
 			file.setSource(proj)
 			file.contributors = proj.granteeOrganization
 			file.attribution = proj.granteeOrganization
-		
 			
+			userGroup.addToDocuments(file);
+			
+					
 			if(!file.save(flush:true)){
 				throw new Exception()
 			}
@@ -293,6 +296,8 @@ def migrateProjects() {
 			file.setSource(proj)
 			file.contributors = proj.granteeContact
 			file.attribution = proj.granteeContact
+			
+			userGroup.addToDocuments(file);
 			
 			
 			if(!file.save(flush:true)){
@@ -304,6 +309,9 @@ def migrateProjects() {
 			file.setSource(proj)
 			file.contributors = proj.granteeContact
 			file.attribution = proj.granteeContact
+			
+
+			userGroup.addToDocuments(file);
 			
 			if(!file.save(flush:true)){
 				throw new Exception()
