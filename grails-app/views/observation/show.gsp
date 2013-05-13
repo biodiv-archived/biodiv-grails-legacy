@@ -16,13 +16,13 @@
 <%
 def r = observationInstance.mainImage();
 
-def thumbnail = r.thumbnailUrl()?:null;
+def gThumbnail = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.gallery.suffix)?:null;
 def imagePath = '';
-if(r && thumbnail) {
+if(r && gThumbnail) {
 	if(r.type == ResourceType.IMAGE) {
-		imagePath = g.createLinkTo(base:grailsApplication.config.speciesPortal.observations.serverURL,	file: thumbnail)
+		imagePath = g.createLinkTo(base:grailsApplication.config.speciesPortal.observations.serverURL,	file: gThumbnail)
 	} else if(r.type == ResourceType.VIDEO){
-		imagePath = g.createLinkTo(base:thumbnail,	file: '')
+		imagePath = g.createLinkTo(base:gThumbnail,	file: '')
 	}
 }
 

@@ -63,6 +63,26 @@
 
 
                 <div class="span8 right-shadow-box observation" style="margin:0;">
+                    <% 
+                    def curr_id = documentInstance.id
+                    def prevId =  Document.countByIdLessThan(curr_id)>0?Document.findAllByIdLessThan(curr_id, ['max':1, 'sort':'id', 'order':'desc'])?.last()?.id:''
+                    def nextId = Document.countByIdGreaterThan(curr_id)>0?Document.findByIdGreaterThan(curr_id, ['max':1, 'sort':'id'])?.id:''
+
+                    %>
+                    <div class="nav" style="width: 100%;">
+
+                        <a class="pull-left btn ${prevId?:'disabled'}"
+                            href="${uGroup.createLink([action:"show", controller:"document",
+                            id:prevId,  'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress])}"><i class="icon-backward"></i>Prev
+                            </a> <a class="pull-right  btn ${nextId?:'disabled'}"
+                            href="${uGroup.createLink([action:"show", controller:"document",
+                            id:nextId,  'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress])}">Next <i style="margin-right: 0px; margin-left: 3px;" class="icon-forward"></i>
+                            </a> <a class="btn"
+                            href="${uGroup.createLink([action:'list', controller:'document'])}"
+                            style="text-align: center; display: block; margin: 0 auto;">List</a>
+
+                    </div>
+
 
 		        <g:render template="/document/showDocument" model="['documentInstance':documentInstance]"/>
 			<g:if

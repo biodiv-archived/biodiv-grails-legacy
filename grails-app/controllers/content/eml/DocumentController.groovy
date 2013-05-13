@@ -182,7 +182,15 @@ class DocumentController {
 		
 				def totalDocumentInstanceList = documentService.getFilteredDocuments(params, -1, -1).documentInstanceList
 				def count = totalDocumentInstanceList.size()
-		
+				if(params.append?.toBoolean()) {
+                    session["doc_ids_list"].addAll(documentInstanceList.collect {it.id});
+                } else {
+                    session["doc_ids_list_params"] = params.clone();
+                    session["doc_ids_list"] = documentInstanceList.collect {it.id};
+                }
+
+        		log.debug "Storing all doc ids list in session ${session['doc_ids_list']} for params ${params}";
+
 				return [totalDocumentInstanceList:totalDocumentInstanceList, documentInstanceList: documentInstanceList, instanceTotal: count, queryParams: queryParams, activeFilters:activeFilters, resultType:'document']
 		
 			}

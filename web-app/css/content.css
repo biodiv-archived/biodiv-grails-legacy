@@ -50,7 +50,7 @@ ul.file-tags {
 }
 
 #tc_tagcloud {
-	max-height: 310px;
+	max-height: 300px;
 	overflow:hidden;
 }
 

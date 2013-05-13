@@ -12,7 +12,7 @@
 	<div class="paginateButtons centered" style="clear: both; padding-top: 30px;">
 		<p:paginate controller="project" action="list"
 			total="${instanceTotal}" userGroup="${userGroup}"
-			userGroupWebaddress="${userGroupWebaddress}" params="${params}"
+			userGroupWebaddress="${params.webaddress}" params="${params}"
 			max="${queryParams.max }" maxsteps="12" />
 	</div>
 </div>
