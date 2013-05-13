@@ -11,8 +11,8 @@
 				code="project.dataLink.description.label" default="Description" /> </label>
 
 		<div class="controls">
-			<textArea rows="4" name='dataLinksList[${i}].description' class="description input-xlarge"
-				 >${dataLink?.description}</textArea>
+                    <textArea rows="4" name='dataLinksList[${i}].description' class="description input-xlarge" 
+                        placeholder="Enter a brief description about datalink" >${dataLink?.description}</textArea>
 		</div>
 	</div>
 	<div class="control-group span5">
@@ -21,7 +21,7 @@
 
 		<div class="controls">
 			<input type="url" name='dataLinksList[${i}].url' id='dataLinksList[${i}].url' class="input-xlarge"
-				value='${dataLink?.url}' />
+				placeholder="Enter url for the datalink" value='${dataLink?.url}' />
 		</div>
 	</div>
 

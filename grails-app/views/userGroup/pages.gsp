@@ -29,7 +29,7 @@
 
 						<a style="margin-bottom: 10px;"
 							href="${uGroup.createLink(mapping:"userGroup", action:"pageCreate", 'userGroup':userGroupInstance)}"
-							class="btn  btn-info"> <i class="icon-plus"></i>Add
+							class="btn  btn-success"> <i class="icon-plus"></i>Add
 							a Page</a>
 					</sec:permitted>
 				</g:if>
@@ -37,7 +37,7 @@
 					<sUser:isAdmin>
 						<a style="margin-bottom: 10px;"
 							href="${uGroup.createLink(mapping:"userGroupGeneric", controller:'userGroup', action:"pageCreate") }"
-							class="btn btn-info"> <i class="icon-plus"></i>Add
+							class="btn btn-success"> <i class="icon-plus"></i>Add
 							a Page</a>
 					</sUser:isAdmin>
 				</g:else>
@@ -47,15 +47,15 @@
 
             					<ul class="nav nav-tabs sidebar_section span4" id="pageTabs">
                                                 <li><h5>Pages</h5></li>
-						<g:if test="${userGroupInstance && userGroupInstance.name.equals('The Western Ghats')}">
-							<li><a href="/project/list">Western Ghats CEPF
-									Projects</a></li>
-						</g:if>
-						<li><a href="/document/browser">Browse Documents</a></li>
 						<g:each in="${newsletters}" var="newsletterInstance" status="i">
 							<li><a data-toggle="tab" class="pageTab" href="#${newsletterInstance.id}">
 									${fieldValue(bean: newsletterInstance, field: "title")} </a></li>
 						</g:each>
+                                                <g:if test="${userGroupInstance && userGroupInstance.name.equals('The Western Ghats')}">
+							<li><a href="/project/list">Western Ghats CEPF
+									Projects</a></li>
+						</g:if>
+
                                             </ul>
 					<div class="tab-content">
 						<g:each in="${newsletters}" var="newsletterInstance" status="i">

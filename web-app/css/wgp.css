@@ -1916,3 +1916,16 @@ div.noOfRatings {
 .thumbnails > li {
     margin: 0 0 10px 10px;
 }
+
+#contributeMenu {
+    background: whitesmoke;
+    border-bottom: 3px solid white;
+}
+
+#contributeMenu .container {
+    display: block;
+    margin: 0 auto;
+    padding: 14px;
+    text-align:center;
+    width:inherit;
+}

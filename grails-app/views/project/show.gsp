@@ -37,74 +37,65 @@
 
 	<div class="span12">
 
-		<div class="page-header clearfix" style="margin-bottom:0px;">
-			<div style="width: 100%;">
-				<div class="main_heading span8" style="margin-left: 0px;">
+            <div class="page-header clearfix" style="margin-bottom:0px;">
+                <div style="width: 100%;">
+                    <div class="main_heading" style="margin-left: 0px;">
+                        <div class="pull-right">
+                            <sUser:isCEPFAdmin>
 
-					<s:showHeadingAndSubHeading
-						model="['heading':projectInstance.title, 'subHeading':subHeading, 'headingClass':headingClass, 'subHeadingClass':subHeadingClass]" />
-                                                <small>submitted by <a href="${uGroup.createLink(controller:'user', action:'show', id:projectInstance.author.id, userGroupWebaddress:params.webaddress)}">${projectInstance.author.name}</a> on                    
-                                                    <g:formatDate type="datetime" date="${projectInstance.dateCreated} style="MEDIUM"/>
-</small>
-				</div>
-				<sUser:isCEPFAdmin>
+                            <a class="btn btn-success pull-right" title="Add CEPF Project"
+                                href="${uGroup.createLink(
+                                controller:'project', action:'create', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"
+                                > <i class="icon-plus"></i>Add CEPF Project
 
-					<a class="btn btn-success pull-right"
-						href="${uGroup.createLink(
-						controller:'project', action:'create', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"
-						style="margin-left: 8px;"> <i class="icon-plus"></i>Add CEPF
-						Project
-					</a>
-
-					<div style="float: right; margin: 10px 0;">
-
-						<a class="btn btn-primary pull-right"
-							href="${uGroup.createLink(controller:'project', action:'edit', id:projectInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
-							<i class="icon-edit"></i>Edit
-						</a> 
-						
-						<a class="btn btn-danger"  href="#" style="margin-right: 5px; margin-bottom: 10px;"
-							onclick="deleteProject(); return false;">
-							<i class="icon-trash"></i>Delete
-						</a>
-							
-						<form
-							action="${uGroup.createLink(controller:'project', action:'delete')}"
-							method='POST' name='deleteForm'>
-							<input type="hidden" name="id" value="${projectInstance.id}" />
-						</form>
-						
-						<r:script>
-						function deleteProject(){
-							if(confirm('This project will be deleted. Are you sure ?')){
-								document.forms.deleteForm.submit();
-							}
-						}
-						</r:script>
+                            </a>
 
 
-					</div>
+                            <a class="btn btn-primary pull-right" title="Edit CEPF Project" style="margin-right: 5px;"
+                                href="${uGroup.createLink(controller:'project', action:'edit', id:projectInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
+                                <i class="icon-edit"></i>Edit
+
+                            </a> 
+
+                            <a class="btn btn-danger pull-right"  href="#" title="Delete CEPF Project"  style="margin-right: 5px;"
+                                onclick="deleteProject(); return false;">
+                                <i class="icon-trash"></i>Delete
+                            </a>
+
+                            <form
+                                action="${uGroup.createLink(controller:'project', action:'delete')}"
+                                method='POST' name='deleteForm'>
+                                <input type="hidden" name="id" value="${projectInstance.id}" />
+                            </form>
+
+                            <r:script>
+                            function deleteProject(){
+                            if(confirm('This project will be deleted. Are you sure ?')){
+                            document.forms.deleteForm.submit();
+                            }
+                            }
+                            </r:script>
 
 
-				</sUser:isCEPFAdmin>
-			</div>
-		</div>
+                        </div>
 
 
+                        </sUser:isCEPFAdmin>
 
-		<uGroup:rightSidebar />
-		<div class="span8 right-shadow-box observation"
-			style="margin: 0px;">
-
-
-
+                        <s:showHeadingAndSubHeading
+                            model="['heading':projectInstance.title, 'subHeading':subHeading, 'headingClass':headingClass, 'subHeadingClass':subHeadingClass]" />
+                            <small>submitted by <a href="${uGroup.createLink(controller:'user', action:'show', id:projectInstance.author.id, userGroupWebaddress:params.webaddress)}">${projectInstance.author.name}</a> on                    
+                                <g:formatDate type="datetime" date="${projectInstance.dateCreated} style="MEDIUM"/>
+                            </small>
+                        </div>
+                    </div>
 			<% 
 	def curr_id = projectInstance.id
-	def prevProjectId =  Project.countByIdLessThan(curr_id)>0?Project.findAllByIdLessThan(curr_id)?.last()?.id:''
-	def nextProjectId = Project.countByIdGreaterThan(curr_id)>0?Project.findByIdGreaterThan(curr_id)?.id:''
+	def prevProjectId =  Project.countByIdLessThan(curr_id)>0?Project.findAllByIdLessThan(curr_id, ['max':1, 'sort':'id', 'order':'desc'])?.last()?.id:''
+	def nextProjectId = Project.countByIdGreaterThan(curr_id)>0?Project.findByIdGreaterThan(curr_id, ['max':1, 'sort':'id', 'order':'asc'])?.id:''
 	
 	 %>
-			<div class="nav" style="width: 100%;">
+			<div class="nav" style="width: 100%;margin-top:10px;">
 
 				<a class="pull-left btn ${prevProjectId?:'disabled'}"
 					href="${uGroup.createLink([action:"show", controller:"project",
@@ -117,6 +108,17 @@
 					style="text-align: center; display: block; margin: 0 auto;">List</a>
 
 			</div>
+
+
+
+                </div>
+
+
+
+		<uGroup:rightSidebar />
+		<div class="span8 right-shadow-box observation"
+			style="margin: 0px;">
+
 
 
 			<g:if test="${projectInstance?.direction}">
