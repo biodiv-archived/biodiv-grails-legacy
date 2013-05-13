@@ -50,6 +50,7 @@ import species.utils.ImageUtils;
 import species.utils.Utils;
 import utils.Newsletter;
 import content.eml.Document
+import content.Project
 
 class UserGroupService {
 
@@ -1135,6 +1136,63 @@ class UserGroupService {
 		return Document.executeQuery(query, queryParams)[0]
 	}
 	
+	
+	
+	/////////////// PROJECTS RELATED /////////////////
+	void postProjecttoUserGroups(Project project, List userGroupIds) {
+		log.debug "Posting ${project} to userGroups ${userGroupIds}"
+		userGroupIds.each {
+			if(it) {
+				def userGroup = UserGroup.read(Long.parseLong(it));
+				if(userGroup) {
+					postProjectToUserGroup(project, userGroup)
+				}
+			}
+		}
+	}
+
+	@Transactional
+	@PreAuthorize("hasPermission(#userGroup, write)")
+	void postProjectToUserGroup(Project project, UserGroup userGroup) {
+		userGroup.addToProjects(project);
+		if(!userGroup.save()) {
+			log.error "Could not add ${project} to ${usergroup}"
+			log.error  userGroup.errors.allErrors.each { log.error it }
+		} else {
+			//activityFeedService.addActivityFeed(document, userGroup, document.author, activityFeedService.OBSERVATION_POSTED_ON_GROUP);
+			log.debug "Added ${project} to userGroup ${userGroup}"
+		}
+	}
+
+	void removeProjectFromUserGroups(Project project, List userGroupIds) {
+		log.debug "Removing ${project} from userGroups ${userGroupIds}"
+		userGroupIds.each {
+			if(it) {
+				def userGroup = UserGroup.read(Long.parseLong("" + it));
+				if(userGroup) {
+					removeProjectFromUserGroup(project, userGroup)
+				}
+			}
+		}
+	}
+
+	@Transactional
+	@PreAuthorize("hasPermission(#userGroup, write)")
+	void removeProjectFromUserGroup(Project project, UserGroup userGroup) {
+		userGroup.projects.remove(project);
+		if(!userGroup.save()) {
+			log.error "Could not remove ${project} from ${usergroup}"
+			log.error  userGroup.errors.allErrors.each { log.error it }
+		} else {
+			//activityFeedService.addActivityFeed(document, userGroup, document.author, activityFeedService.OBSERVATION_REMOVED_FROM_GROUP);
+			log.debug "Removed ${project} from userGroup ${userGroup}"
+		}
+	}
+
+	def getProjectUserGroups(Project projectInstance, int max, long offset) {
+		//TODO
+		return projectInstance.userGroups;
+	}
 
 
 }

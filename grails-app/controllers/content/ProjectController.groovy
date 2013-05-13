@@ -61,6 +61,18 @@ class ProjectController {
 			flash.message = "${message(code: 'default.created.message', args: [message(code: 'project.label', default: 'Project'), projectInstance.id])}"
 			projectInstance.setTags(tags);
 
+			if(params.groupsWithSharingNotAllowed) {
+				projectService.setUserGroups(projectInstance, [
+					params.groupsWithSharingNotAllowed
+				]);
+			} else {
+				if(params.userGroupsList) {
+					def userGroups = (params.userGroupsList != null) ? params.userGroupsList.split(',').collect{k->k} : new ArrayList();
+
+					projectService.setUserGroups(projectInstance, userGroups);
+				}
+			}
+			
 			params.sourceHolderId = projectInstance.id
 			params.sourceHolderType = projectInstance.class.getCanonicalName()
 			projectInstance.updateDocuments()

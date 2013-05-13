@@ -66,7 +66,7 @@
 			model="['entityName':form_title]" />
 		<uGroup:rightSidebar />
 
-		<form action="${form_action}" method="POST" id="create-project"
+		<form action="${form_action}" method="POST" id="projectForm"
 			onsubmit="document.getElementById('projectFormSubmit').disabled = 1;"
 			class="project-form form-horizontal" enctype="multipart/form-data">
 
@@ -412,6 +412,26 @@ CKEDITOR.replace('misc', config);
 
 
 
+
+			<uGroup:isUserGroupMember>
+				<div class="span12 super-section"
+					style="clear: both; margin-left: 0px;">
+					<div class="section" style="position: relative; overflow: visible;">
+						<h3>Post to User Groups</h3>
+						<div>
+							<%
+									def projActionMarkerClass = (params.action == 'create' || params.action == 'save')? 'create' : '' 
+								%>
+							<div id="userGroups" class="${projActionMarkerClass}"
+								name="userGroups" style="list-style: none; clear: both;">
+								<uGroup:getCurrentUserUserGroups
+									model="['observationInstance':projectInstance]" />
+							</div>
+						</div>
+					</div>
+				</div>
+			</uGroup:isUserGroupMember>
+
 	<div class="span12" style="margin-top: 20px; margin-bottom: 40px;">
 
 		<g:if test="${projectInstance?.id}">
@@ -441,6 +461,25 @@ CKEDITOR.replace('misc', config);
 
 
 	<r:script>
+	
+			
+		function getSelectedUserGroups() {
+		    var userGroups = []; 
+		    $('.userGroups button[class~="btn-success"]').each (function() {
+	            userGroups.push($(this).attr('value'));
+		    });
+		    return userGroups;	
+		}
+		
+		
+			$("#projectFormSubmit").click(function(){
+				$("#userGroupsList").val(getSelectedUserGroups());	       	
+		       	
+		        $("#projectForm").submit();
+		        return false;
+			});
+		
+		
         $(document).ready(function(){ 
              $("#tags").tagit({
         	select:true, 

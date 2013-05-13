@@ -74,30 +74,27 @@ class FileManagerTagLib {
 	
 		if(filePath){
 		  def extension = filePath.split("\\.")[-1]
+		  def path = g.createLinkTo(base:grailsApplication.config.speciesPortal.content.serverURL, file: filePath)
 	
 		  switch(extension.toUpperCase()){
 			case ["JPG", "PNG", "GIF"]:
 				 def html = """
              <p>
                <img src="${filePath}"
-                    alt="${fileName}"
+                    alt="${path}"
                     title="${fileName}" />
              </p>
              """
 	
 				 out << html
 				 break
-	
-			case "HTML":
-				 out << "p>html</p>"
-				 break
+
 			case "PDF":
-				def href = g.createLinkTo(base:grailsApplication.config.speciesPortal.content.serverURL, file: filePath)
 							
-				out <<'<a href='+href+'><span class="pdficon" style="display:inline-block; margin-left: 5px; margin-right:5px;"></span>'+ fileName +'</a>' 
+				out <<'<a href='+path+'><span class="pdficon" style="display:inline-block; margin-left: 5px; margin-right:5px;"></span>'+ fileName +'</a>' 
 					break
 			default:
-				 out << "<p>file</p>"
+				out <<'<a href='+path+'>'+ fileName +'</a>' 
 				 break
 		  }
 		}else{
