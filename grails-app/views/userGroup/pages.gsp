@@ -29,7 +29,7 @@
 
 						<a style="margin-bottom: 10px;"
 							href="${uGroup.createLink(mapping:"userGroup", action:"pageCreate", 'userGroup':userGroupInstance)}"
-							class="btn  btn-info"> <i class="icon-plus"></i>Add
+							class="btn  btn-success"> <i class="icon-plus"></i>Add
 							a Page</a>
 					</sec:permitted>
 				</g:if>
@@ -37,7 +37,7 @@
 					<sUser:isAdmin>
 						<a style="margin-bottom: 10px;"
 							href="${uGroup.createLink(mapping:"userGroupGeneric", controller:'userGroup', action:"pageCreate") }"
-							class="btn btn-info"> <i class="icon-plus"></i>Add
+							class="btn btn-success"> <i class="icon-plus"></i>Add
 							a Page</a>
 					</sUser:isAdmin>
 				</g:else>

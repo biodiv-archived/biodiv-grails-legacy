@@ -2,33 +2,33 @@
 <div  class="block-tagadelic ">
 
 	<form id="advSearchForm" method="get"  title="Search"
-		action="${uGroup.createLink(controller:'project', action:'search') }"
+		action="${uGroup.createLink(controller:params.controller, action:params.action) }"
 		class="searchbox">
 		<label class="control-label" for="name">Title</label>
 			<input id="aq.title"
 			data-provide="typeahead" type="text" class="input-block-level"
 			name="aq.title" 
-			placeholder="Search by Project title" value="${params.title}" />
+			placeholder="Search by Project title" value="${(queryParams?.get('aq.title'))?.encodeAsHTML() }" />
 			
-		<label class="control-label" for="grantee">Grantee</label> <input id="aq.grantee"
+		<label class="control-label" for="grantee">Grantee</label> <input id="aq.grantee_organization"
 			data-provide="typeahead" type="text" class="input-block-level"
 			name="aq.grantee_organization"
-			placeholder="Search by Grantee" value="${params.grantee}"/>
+			placeholder="Search by Grantee" value="${(queryParams?.get('aq.grantee_organization'))?.encodeAsHTML()}"/>
 
 		<label class="control-label" for="sitename">Site Name</label> <input id="aq.sitename"
 			data-provide="typeahead" type="text" class="input-block-level"
 			name="aq.sitename"
-			placeholder="Search by Site Name" value="${params.sitename}"/>
+			placeholder="Search by Site Name" value="${(queryParams?.get('aq.sitename'))?.encodeAsHTML()}"/>
 			
 		<label class="control-label" for="corridor">Corridor</label> <input id="aq.corridor"
 			data-provide="typeahead" type="text" class="input-block-level"
 			name="aq.corridor"
-			placeholder="Search by Corridior" value="${params.corridor}" />
+			placeholder="Search by Corridior" value="${(queryParams?.get('aq.corridor'))?.encodeAsHTML()}" />
 			
-		<label class="control-label" for="keywords">Keywords</label> <input id="aq.keywords"
+		<label class="control-label" for="keywords">Tags</label> <input id="aq.tag"
 			data-provide="typeahead" type="text" class="input-block-level"
 			name="aq.tag"
-			placeholder="Search by Keywords" value="${params.keywords}" />
+			placeholder="Search by Keywords" value="${(queryParams?.get('aq.tag'))?.encodeAsHTML()}" />
 
 	<%--		<g:hiddenField name="offset" value="0" />--%>
 	<%--	<g:hiddenField name="max" value="12" /> --%>

@@ -17,12 +17,12 @@
 					<dd>
 						<g:if test="${showDetails}">
 							<fileManager:displayFile
-								filePath="${ documentInstance?.uFile?.path}"
-								fileName="${ documentInstance?.title}"></fileManager:displayFile>
+								filePath="${ documentInstance?.uFile?.path}"></fileManager:displayFile>
 						</g:if>
 						<g:else>
 							<fileManager:displayFile
-								filePath="${ documentInstance?.uFile?.path}"></fileManager:displayFile>
+								filePath="${ documentInstance?.uFile?.path}"
+								fileName="${ documentInstance?.title}"></fileManager:displayFile>
 						</g:else>
 						
 					</dd>

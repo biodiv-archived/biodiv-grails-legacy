@@ -62,34 +62,23 @@
 	<div id="postToUGroup" class="overlay" style="display: none;">
         <i class="icon-plus"></i>
     </div>
-    
+<%
+String supportEmail = "";
+String domain = Utils.getDomain(request);
+if(domain.equals(grailsApplication.config.wgp.domain)) {
+	supportEmail = grailsApplication.config.speciesPortal.wgp.supportEmail;
+} else if(domain.equals(grailsApplication.config.ibp.domain)) {
+	supportEmail =  grailsApplication.config.speciesPortal.ibp.supportEmail;
+}
+%>
+
 	<div id="species_main_wrapper" style="clear: both;">
 		<domain:showIBPHeader model="['userGroupInstance':userGroupInstance]" />
 
-		<div class="container outer-wrapper">
-                    <!--div class="pull-down">
-                        <h5 data-toggle="collapse" data-target="#pull-down-menu">Do you have any biodiversity related information? Help us in conserving it by providing that informtation here.</h5>
-                        <div id="pull-down-menu" class="collapse">
-    			<a class="btn btn-success pull-right"
-				href="${uGroup.createLink(
-						controller:'observation', action:'create', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"
-				class="btn btn-info" style="margin-top: 10px;margin-bottom:-1px; margin-left: 5px;"> <i class="icon-plus"></i>Add an Observation</a>
-	
-                            <a class="btn btn-success "
-                                href="${uGroup.createLink(
-                                controller:'document', action:'create', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"
-                                class="btn btn-info"
-                                style="margin-top: 10px; margin-bottom: -1px; margin-left: 30px;">
-                                <i class="icon-plus"></i>Add Document
-                            </a>
-
-                        </div>
-
-                    </div-->
-
+                <div class="container outer-wrapper">
+                
 
 			<div>
-
 				<div style="padding: 10px 0px; margin-left: -20px">
 					<g:layoutBody />
 				</div>

@@ -172,29 +172,27 @@ class DocumentController {
 	}
 
 	protected def getDocumentList(params) {
+		def max = Math.min(params.max ? params.int('max') : 12, 100)
+		def offset = params.offset ? params.int('offset') : 0
+		def filteredDocument = documentService.getFilteredDocuments(params, max, offset)
 		
-				def max = Math.min(params.max ? params.int('max') : 12, 100)
-				def offset = params.offset ? params.int('offset') : 0
-				def filteredDocument = documentService.getFilteredDocuments(params, max, offset)
-				def documentInstanceList = filteredDocument.documentInstanceList
-				def queryParams = filteredDocument.queryParams
-				def activeFilters = filteredDocument.activeFilters
+		def documentInstanceList = filteredDocument.documentInstanceList
+		def queryParams = filteredDocument.queryParams
+		def activeFilters = filteredDocument.activeFilters
 		
-				def totalDocumentInstanceList = documentService.getFilteredDocuments(params, -1, -1).documentInstanceList
-				def count = totalDocumentInstanceList.size()
-				if(params.append?.toBoolean()) {
-                    session["doc_ids_list"].addAll(documentInstanceList.collect {it.id});
-                } else {
-                    session["doc_ids_list_params"] = params.clone();
-                    session["doc_ids_list"] = documentInstanceList.collect {it.id};
-                }
+		def count = documentService.getFilteredDocuments(params, -1, -1).documentInstanceList.size()
+		if(params.append?.toBoolean()) {
+            session["doc_ids_list"].addAll(documentInstanceList.collect {it.id});
+        } else {
+            session["doc_ids_list_params"] = params.clone();
+            session["doc_ids_list"] = documentInstanceList.collect {it.id};
+        }
 
-        		log.debug "Storing all doc ids list in session ${session['doc_ids_list']} for params ${params}";
+		log.debug "Storing all doc ids list in session ${session['doc_ids_list']} for params ${params}";
 
-				return [totalDocumentInstanceList:totalDocumentInstanceList, documentInstanceList: documentInstanceList, instanceTotal: count, queryParams: queryParams, activeFilters:activeFilters, resultType:'document']
-		
-			}
-		
+		return [documentInstanceList: documentInstanceList, instanceTotal: count, queryParams: queryParams, activeFilters:activeFilters, resultType:'document']
+
+	}
 
 
 	def tags = {
@@ -208,33 +206,36 @@ class DocumentController {
 	//// SEARCH //////
 	/**
 	 * 	
-	 */
-	def search = {
-		log.debug params;
-		def model = documentService.search(params)
-		model['isSearch'] = true;
-
-		if(params.loadMore?.toBoolean()){
-			params.remove('isGalleryUpdate');
-			render(template:"/document/documentListTemplate", model:model);
-			return;
-
-		} else if(!params.isGalleryUpdate?.toBoolean()){
-			params.remove('isGalleryUpdate');
-			render (view:"browser", model:model)
-			return;
-		} else {
-			params.remove('isGalleryUpdate');
-			def obvListHtml =  g.render(template:"/document/documentListTemplate", model:model);
-			model.resultType = "document"
-			def obvFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
-
-			def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml]
-
-			render (result as JSON)
-			return;
-		}
-	}
+//	 */
+//	def search = {
+//		log.debug params;
+//		def model = documentService.search(params)
+//		model['isSearch'] = true;
+//
+//		if(params.loadMore?.toBoolean()){
+//			println "======================================== 11"
+//			params.remove('isGalleryUpdate');
+//			render(template:"/document/documentListTemplate", model:model);
+//			return;
+//
+//		} else if(!params.isGalleryUpdate?.toBoolean()){
+//		println "======================================== 22"
+//			params.remove('isGalleryUpdate');
+//			render (view:"browser", model:model)
+//			return;
+//		} else {
+//		println "======================================== 33"
+//			params.remove('isGalleryUpdate');
+//			def obvListHtml =  g.render(template:"/document/documentListTemplate", model:model);
+//			model.resultType = "document"
+//			def obvFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
+//
+//			def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml]
+//
+//			render (result as JSON)
+//			return;
+//		}
+//	}
 	
 	
 	def terms = {

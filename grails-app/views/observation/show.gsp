@@ -98,54 +98,56 @@ if(r && gThumbnail) {
 				<obv:showSubmenuTemplate/>
 
 				<div class="page-header clearfix">
-					<div style="width:100%;">
-						<div class="span8 main_heading" style="margin-left:0px;">
-							<obv:showSpeciesName
-								model="['observationInstance':observationInstance, 'isHeading':true]" />
-						</div>
-							<a class="btn btn-success pull-right"
-				href="${uGroup.createLink(
-						controller:'observation', action:'create', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"
-				class="btn btn-info" style="margin-top: 10px;margin-bottom:-1px; margin-left: 5px;"> <i class="icon-plus"></i>Add an Observation</a>
-						<div style="float:right;margin:10px 0;">
-							<sUser:ifOwns model="['user':observationInstance.author]">
-								
-								<a class="btn btn-primary pull-right"
-									href="${uGroup.createLink(controller:'observation', action:'edit', id:observationInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
-									<i class="icon-edit"></i>Edit</a>
-	
-									<a class="btn btn-danger btn-primary pull-right" style="margin-right: 5px;margin-bottom:10px;"
-										href="${uGroup.createLink(controller:'observation', action:'flagDeleted', id:observationInstance.id)}"
-										onclick="return confirm('${message(code: 'default.observatoin.delete.confirm.message', default: 'This observation will be deleted. Are you sure ?')}');"><i class="icon-trash"></i>Delete</a>
-										
-							</sUser:ifOwns>
-						</div>
-					</div>
-					<div style="clear:both;"></div>
-					<g:if test="${params.pos && lastListParams}">
-						<div class="nav" style="width:100%;margin-top: 10px;">
-							<g:if test="${test}">
-								<a class="pull-left btn ${prevObservationId?:'disabled'}" href="${uGroup.createLink([action:"show", controller:"observation", id:prevObservationId, 'pos':params.int('pos')-1, 'userGroupWebaddress':(userGroup?userGroup.webaddress:userGroupWebaddress)])}"><i class="icon-backward"></i>Prev</a>
-								<a class="pull-right  btn ${nextObservationId?:'disabled'}"  href="${uGroup.createLink([action:"show", controller:"observation",
-									id:nextObservationId, 'pos':params.int('pos')+1, 'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress])}">Next <i style="margin-right: 0px; margin-left: 3px;" class="icon-forward"></i></a>
-								<%lastListParams.put('userGroupWebaddress', userGroup?userGroup.webaddress:userGroupWebaddress);
-									lastListParams.put('fragment', params.pos);
-								 %>
-								<a class="btn" href="${uGroup.createLink(lastListParams)}" style="text-align: center;display: block;width: 30pxpx;margin: 0 auto;">List</a>
-							</g:if>
-							<g:else>
-								<a class="pull-left btn ${prevObservationId?:'disabled'}" href="${uGroup.createLink([action:"show", controller:"observation",
-									id:prevObservationId, 'pos':params.int('pos')-1, 'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress])}"><i class="icon-backward"></i>Prev</a>
-								<a class="pull-right  btn ${nextObservationId?:'disabled'}"  href="${uGroup.createLink([action:"show", controller:"observation",
-									id:nextObservationId, 'pos':params.int('pos')+1, 'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress])}">Next<i style="margin-right: 0px; margin-left: 3px;" class="icon-forward"></i></a>
-								<%lastListParams.put('userGroupWebaddress', userGroup?userGroup.webaddress:userGroupWebaddress);
-								lastListParams.put('fragment', params.pos);	 
-								%>
-								<a class="btn" href="${uGroup.createLink(lastListParams)}" style="text-align: center;display: block;margin: 0 auto;">List</a>
-							</g:else>
-						</div>
-					</g:if>
+                                    <div style="width:100%;">
+                                        <div class="main_heading" style="margin-left:0px;">
+                                            <div class="pull-right">
+                                                <a class="btn btn-success pull-right"
+                                                    href="${uGroup.createLink(
+                                                    controller:'observation', action:'create', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}" class="btn btn-info"> <i class="icon-plus"></i>Add an Observation</a>
+ 
+                                                <sUser:ifOwns model="['user':observationInstance.author]">
+                                                <a class="btn btn-primary pull-right" style="margin-right: 5px;"
+                                                   href="${uGroup.createLink(controller:'observation', action:'edit', id:observationInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
+                                                    <i class="icon-edit"></i>Edit</a>
+
+                                                <a class="btn btn-danger btn-primary pull-right" style="margin-right: 5px;"
+                                                    href="${uGroup.createLink(controller:'observation', action:'flagDeleted', id:observationInstance.id)}"
+                                                    onclick="return confirm('${message(code: 'default.observatoin.delete.confirm.message', default: 'This observation will be deleted. Are you sure ?')}');"><i class="icon-trash"></i>Delete</a>
+
+                                                </sUser:ifOwns>
+
+                                            </div>
+                                           <obv:showSpeciesName
+                                            model="['observationInstance':observationInstance, 'isHeading':true]" />
+
+
+                                        </div>
                                     </div>
+                                    <div style="clear:both;"></div>
+                                    <g:if test="${params.pos && lastListParams}">
+                                    <div class="nav" style="width:100%;margin-top: 10px;">
+                                        <g:if test="${test}">
+                                        <a class="pull-left btn ${prevObservationId?:'disabled'}" href="${uGroup.createLink([action:"show", controller:"observation", id:prevObservationId, 'pos':params.int('pos')-1, 'userGroupWebaddress':(userGroup?userGroup.webaddress:userGroupWebaddress)])}"><i class="icon-backward"></i>Prev</a>
+                                        <a class="pull-right  btn ${nextObservationId?:'disabled'}"  href="${uGroup.createLink([action:"show", controller:"observation",
+                                            id:nextObservationId, 'pos':params.int('pos')+1, 'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress])}">Next <i style="margin-right: 0px; margin-left: 3px;" class="icon-forward"></i></a>
+                                        <%lastListParams.put('userGroupWebaddress', userGroup?userGroup.webaddress:userGroupWebaddress);
+                                        lastListParams.put('fragment', params.pos);
+                                        %>
+                                        <a class="btn" href="${uGroup.createLink(lastListParams)}" style="text-align: center;display: block;width: 30pxpx;margin: 0 auto;">List</a>
+                                        </g:if>
+                                        <g:else>
+                                        <a class="pull-left btn ${prevObservationId?:'disabled'}" href="${uGroup.createLink([action:"show", controller:"observation",
+                                            id:prevObservationId, 'pos':params.int('pos')-1, 'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress])}"><i class="icon-backward"></i>Prev</a>
+                                        <a class="pull-right  btn ${nextObservationId?:'disabled'}"  href="${uGroup.createLink([action:"show", controller:"observation",
+                                            id:nextObservationId, 'pos':params.int('pos')+1, 'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress])}">Next<i style="margin-right: 0px; margin-left: 3px;" class="icon-forward"></i></a>
+                                        <%lastListParams.put('userGroupWebaddress', userGroup?userGroup.webaddress:userGroupWebaddress);
+                                        lastListParams.put('fragment', params.pos);	 
+                                        %>
+                                        <a class="btn" href="${uGroup.createLink(lastListParams)}" style="text-align: center;display: block;margin: 0 auto;">List</a>
+                                        </g:else>
+                                    </div>
+                                    </g:if>
+                                </div>
 				
 				<div class="span8 right-shadow-box" style="margin: 0;">
 

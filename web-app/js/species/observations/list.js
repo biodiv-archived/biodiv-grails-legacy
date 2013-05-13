@@ -155,13 +155,13 @@ $(document).ready(function(){
     });
     
     $("#removeQueryFilter").live('click', function(){
-    	$( "#searchTextField" ).val('');
     	var removeParam = undefined;
     	if($($(this).attr('data-target').replace('.','\\.')).length != 0)
     		$($(this).attr('data-target').replace('.','\\.')).val('')
     	else {
-    		removeParam = $(this).attr('data-target').replace('#','');
+    		$( "#searchTextField" ).val('');	
     	}
+    	removeParam = $(this).attr('data-target').replace('#','');
     	updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate, undefined, undefined, undefined, removeParam);
     	return false;
     });
@@ -364,10 +364,10 @@ function getSelectedUserGroup() {
 
 function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSort, isRegularSearch, removeParam) {
     var params = url.param();
+    
     if(removeParam) {
     	delete params[removeParam]
     }
-    
     removeSort = (typeof removeSort === "undefined") ? false : removeSort;
 
     if(!removeSort) {
@@ -508,7 +508,7 @@ function updateListPage(activeTag) {
 }
 
 function updateGallery(target, limit, offset, removeUser, isGalleryUpdate, removeObv, removeSort, isRegularSearch, removeParam) {
-    if(target === undefined) {
+	if(target === undefined) {
             target = window.location.pathname + window.location.search;
     }
     

@@ -1,28 +1,41 @@
 
 <div class="block-tagadelic ">
-
 	<form id="advSearchForm" method="get" title="Search"
-		action="${uGroup.createLink(controller:'document', action:'search') }"
+		action="${uGroup.createLink(controller:params.controller, action:params.action)}"
 		class="searchbox">
 
 
 		<label class="control-label" for="title">Title</label> <input
 			id="aq.title" data-provide="typeahead" type="text"
 			class="input-block-level" name="aq.title"
-			placeholder="Search by Document title" value="${params.title}" />
+			placeholder="Search by Document title" value="${(queryParams?.get('aq.title'))?.encodeAsHTML() }" />
 		
+		<label
+			class="control-label" for="grantee">Type</label> <input
+			id="aq.type" data-provide="typeahead" type="text"
+			class="input-block-level" name="aq.type"
+			placeholder="Search by Description" value="${(queryParams?.get('aq.type'))?.encodeAsHTML()}" />
+			
 		<label
 			class="control-label" for="grantee">Description</label> <input
 			id="aq.description" data-provide="typeahead" type="text"
-			class="input-block-level" name="aq.descriptionn"
-			placeholder="Search by Description" value="${params.description}" />
+			class="input-block-level" name="aq.description"
+			placeholder="Search by Description" value="${(queryParams?.get('aq.description'))?.encodeAsHTML()}" />
 
+		<label
+			class="control-label" for="aq.contributor">Contributor</label> <input data-provide="typeahead" id="aq.contributor"
+			type="text" class="input-block-level" name="aq.contributor" value="${(queryParams?.get('aq.contributor'))?.encodeAsHTML()}" 
+			placeholder="Field to search all contributors" />
+		
+		<label
+			class="control-label" for="aq.attribution">Attributions</label> <input data-provide="typeahead" id="aq.attribution"
+			type="text" class="input-block-level" name="aq.attribution" value="${(queryParams?.get('aq.attribution'))?.encodeAsHTML() }"
+			placeholder="Field to search all attributions" />
 
-
-		<label class="control-label" for="keywords">Keywords</label> <input
-			id="aq.keywords" data-provide="typeahead" type="text"
+		<label class="control-label" for="keywords">Tags</label> <input
+			id="aq.tag" data-provide="typeahead" type="text"
 			class="input-block-level" name="aq.tag"
-			placeholder="Search by Keywords" value="${params.keywords}" />
+			placeholder="Search by Keywords" value="${(queryParams?.get('aq.tag'))?.encodeAsHTML()}" />
 
 <%--		<g:hiddenField name="offset" value="0" />--%>
 <%--		<g:hiddenField name="max" value="12" />--%>
