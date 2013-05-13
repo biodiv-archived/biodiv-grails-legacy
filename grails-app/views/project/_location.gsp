@@ -11,7 +11,7 @@
 				code="project.location.siteName.label" default="Site Name" /> </label>
 
 		<div class="controls">
-			<g:textField name='locationsList[${i}].siteName' class="site-name input-xlarge"
+			<g:textField name='locationsList[${i}].siteName' class="site-name input-xlarge" placeholder="Enter the siteName"
 				value='${location?.siteName}' />
 		</div>
 	</div>
@@ -21,7 +21,7 @@
 				code="project.location.corridor.label" default="Corridor" /> </label>
 
 		<div class="controls">
-			<g:textField name='locationsList[${i}].corridor' class="corridor input-xlarge"
+			<g:textField name='locationsList[${i}].corridor' class="corridor input-xlarge" placeholder="Enter the corridor"
 				value='${location?.corridor}' />
 		</div>
 	</div>

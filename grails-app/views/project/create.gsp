@@ -83,7 +83,7 @@
 									code="project.direction.label" default="Strategic Direction" /></label>
 
 							<div class="controls">
-								<g:select name="direction.id" class="input-block-level"
+								<g:select name="direction.id" class="input-block-level" placeholder="Select strategic direction for this project"
 									from="${content.StrategicDirection.list()}" optionKey="id"
 									value="${projectInstance?.direction?.id}" />
 							</div>
@@ -96,7 +96,7 @@
 								class="req">*</span></label>
 							<div class="controls">
 
-								<input type="text" class="input-block-level" name="title"
+								<input type="text" class="input-block-level" name="title" placeholder="Enter the title for the project"
 									value="${projectInstance?.title}" required />
 
 								<div class="help-inline">
@@ -109,24 +109,22 @@
 						</div>
 
 						<div
-							class="row control-group ${hasErrors(bean: projectInstance, field: 'summary', 'error')}">
+							class="control-group ${hasErrors(bean: projectInstance, field: 'summary', 'error')}">
 
 							<label class="control-label" for="summary"><g:message
 									code="project.summary.label" default="Summary of the Project" /></label>
 
-							<div class="controls" style="max-width: 100%;">
+                                                                    <div class="controls">
 
+                                                                        <textarea id="summary" name="summary" class="input-block-level" style="height:200px;padding:4px 6px;" placeholder="Write a small summary about the project.">${projectInstance?.summary}</textarea>
 
-								<ckeditor:config var="toolbar_editorToolbar">
-									[
-    									[ 'Bold', 'Italic', 'Image' ]
-									]
-									</ckeditor:config>
-								<ckeditor:editor name="summary" height="200px" width="100%"
-									toolbar="editorToolbar">
-									${projectInstance?.summary}
-								</ckeditor:editor>
-							</div>
+                                                                        <script type='text/javascript'>
+                                                                            CKEDITOR.plugins.addExternal( 'confighelper', '${request.contextPath}/js/ckeditor/plugins/confighelper/' );
+
+                                                                            var image_config = { extraPlugins: 'confighelper', toolbar:'EditorToolbar', toolbar_EditorToolbar:[[ 'Bold', 'Italic', 'Image' ]]};
+CKEDITOR.replace('summary', image_config);
+</script>
+                                                        </div>
 						</div>
 
 						<div
@@ -175,7 +173,7 @@
 
 							<div class="controls">
 
-								<g:textField name="granteeOrganization" class="input-xlarge"
+								<g:textField name="granteeOrganization" class="input-xlarge" placeholder="Enter the grantee organization details"
 									value="${projectInstance?.granteeOrganization}" />
 							</div>
 						</div>
@@ -188,7 +186,7 @@
 
 							<div class="controls">
 
-								<g:textField name="granteeContact" class="input-xlarge"
+								<g:textField name="granteeContact" class="input-xlarge" placeholder="Enter the gratee contact details"
 									value="${projectInstance?.granteeContact}" />
 							</div>
 						</div>
@@ -203,7 +201,7 @@
 								<div class="input-prepend">
 									<span class="add-on"><i class="icon-envelope"></i></span>
 
-									<g:textField name="granteeEmail" class="input-xlarge"
+									<g:textField name="granteeEmail" class="input-xlarge" placeholder="Enter the gratee email address"
 										value="${projectInstance?.granteeEmail}" />
 									<div class="help-inline">
 										<g:hasErrors bean="${projectInstance}" field="title">
@@ -298,16 +296,12 @@
 
 						<div class="controls" style="max-width: 100%;">
 
-							<ckeditor:config var="toolbar_editorToolbar">
-									[
-    									[ 'Bold', 'Italic' ]
-									]
-									</ckeditor:config>
-							<ckeditor:editor name="projectProposal" height="200px"
-								toolbar="editorToolbar">
-								${projectInstance?.projectProposal}
-							</ckeditor:editor>
+                                                    <textarea id="projectProposal" name="projectProposal" class="input-block-level" style="height:200px;" placeholder="Write a small description about the project proposal.">${projectInstance?.projectProposal}</textarea>
 
+                                                    <script type='text/javascript'>
+                                                        var config = { extraPlugins: 'confighelper', toolbar:'EditorToolbar', toolbar_EditorToolbar:[[ 'Bold', 'Italic']]};
+CKEDITOR.replace('projectProposal', config);
+</script>
 
 						</div>
 					</div>
@@ -340,16 +334,13 @@
 						<label class="control-label" for="projectReport"><g:message
 								code="project.projectReport.label" default="Project Report" /></label>
 						<div class="controls" style="max-width: 100%;">
-							<ckeditor:config var="toolbar_editorToolbar">
-									[
-    									[ 'Bold', 'Italic' ]
-									]
-									</ckeditor:config>
-							<ckeditor:editor name="projectReport" height="200px" width="100%"
-								toolbar="editorToolbar">
-								${projectInstance?.projectReport}
-							</ckeditor:editor>
 
+                                                    <textarea id="projectReport" name="projectReport" class="input-block-level" style="height:200px;" placeholder="Write a small description about the project report.">${projectInstance?.projectReport}</textarea>
+
+                                                    <script type='text/javascript'>
+                                                        var config = { extraPlugins: 'confighelper', toolbar:'EditorToolbar', toolbar_EditorToolbar:[[ 'Bold', 'Italic']]};
+CKEDITOR.replace('projectReport', config);
+</script>
 						</div>
 
 					</div>
@@ -391,19 +382,11 @@
 						<label class="control-label" for="misc"><g:message
 								code="project.misc.label" default="Miscellaneous" /></label>
 						<div class="controls">
+                                                    <textarea id="misc" name="misc" class="input-block-level" style="height:200px;" placeholder="Any other miscellaneous details regarding the project can be give here.">${projectInstance?.misc}</textarea>
 
-
-							<ckeditor:config var="toolbar_editorToolbar">
-									[
-    									[ 'Bold', 'Italic' ]
-									]
-									</ckeditor:config>
-							<ckeditor:editor name="misc" height="200px"
-								toolbar="editorToolbar">
-								${projectInstance?.misc}
-							</ckeditor:editor>
-
-
+                                                    <script type='text/javascript'>
+CKEDITOR.replace('misc', config);
+</script>
 
 						</div>
 					</div>

@@ -1,9 +1,5 @@
 <%@page import="species.utils.Utils"%>
 <div class="story-footer" style="width: 100%">
-        <div class="footer-item">
-            <obv:like model="['resource':observationInstance]"/>
-        </div>
-
 
    	<g:if test="${showDetails}">
 		<div class="footer-item">
@@ -32,4 +28,9 @@
 				width="450" show_faces="true"></fb:like>
 		</div-->
 	</g:if>
+        <div class="footer-item">
+            <obv:like model="['resource':observationInstance]"/>
+        </div>
+
+
 </div>

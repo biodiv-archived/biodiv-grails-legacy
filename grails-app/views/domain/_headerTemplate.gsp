@@ -78,29 +78,29 @@
 						title="About Us">About Us</a>
 					</li>
 					
-					<li
-						class="${((params.controller == 'userGroup' && params.action == 'chart') ||(params.controller == 'chart'))?' active':''}"><a
-						href="${uGroup.createLink('mapping':'userGroup', 'action':'chart', 'userGroup':userGroupInstance)}"
-						title="Stats">Stats</a>
-					</li>
 
-<%--					<li class="dropdown"><a href="#" class="dropdown-toggle"--%>
-<%--						data-toggle="dropdown"> More <b class="caret"></b> </a>--%>
-<%--						<ul class="dropdown-menu" style="text-align: left;">--%>
-<%--							<!-- li--%>
-<%--								class="${(params.controller == 'userGroup' && params.action == 'user')?' active':''}"><a--%>
-<%--								href="${uGroup.createLink(mapping:"userGroup", 'action':"user", 'userGroup':userGroupInstance)}"--%>
-<%--								title="Members">Members</a>--%>
-<%--							</li-->--%>
-<%--							--%>
-<%--							<li--%>
-<%--								class="${(request.getHeader('referer')?.contains('/calendar') && params.action == 'header')?' active':''}"><a--%>
-<%--								href="/calendar" title="Events">Events</a></li>--%>
-<%--							<li--%>
-<%--								class="${(request.getHeader('referer')?.contains('/biodiversity_news') && params.action == 'header')?' active':''}"><a--%>
-<%--								href="/biodiversity_news" title="News">News</a></li>--%>
-<%--							--%>
-<%--						</ul></li>--%>
+					<li class="dropdown"><a href="#" class="dropdown-toggle"
+						data-toggle="dropdown"> More <b class="caret"></b> </a>
+						<ul class="dropdown-menu" style="text-align: left;">
+                                                    <li
+                                                    class="${((params.controller == 'user' && params.action == 'list') ||(params.controller == 'user'))?' active':''}"><a
+                                                        href="${uGroup.createLink('controller':'user', 'action':'list', 'userGroup':userGroupInstance)}"
+                                                        title="Members">Members</a>
+                                                    </li>
+
+                                                    <li
+                                                    class="${((params.controller == 'document' && params.action == 'browser') ||(params.controller == 'browser'))?' active':''}"><a
+                                                        href="${uGroup.createLink('controller':'document', 'action':'browser', 'userGroup':userGroupInstance)}"
+                                                        title="Document Browser">Document Browser</a>
+                                                    </li>
+
+                                                    <li
+                                                    class="${((params.controller == 'userGroup' && params.action == 'chart') ||(params.controller == 'chart'))?' active':''}"><a
+                                                        href="${uGroup.createLink('mapping':'userGroup', 'action':'chart', 'userGroup':userGroupInstance)}"
+                                                        title="Stats">Stats</a>
+                                                    </li>
+						
+						</ul></li>
 				</ul>
 
 			</g:if>

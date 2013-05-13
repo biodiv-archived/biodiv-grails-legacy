@@ -72,7 +72,7 @@ input.dms_field {
 						<label class="control-label" for="type"><g:message
 								code="document.type.label" default="Type" /><span class="req">*</span></label>
 						<div class="controls">
-							<g:select name="type"
+							<g:select name="type" class="input-block-level" placeholder="Select document type"
 								from="${content.eml.Document$DocumentType?.values()}"
 								keys="${content.eml.Document$DocumentType?.values()*.value()}"
 								value="${documentInstance?.type?.value()}" />
@@ -86,7 +86,7 @@ input.dms_field {
 								code="document.title.label" default="Title" /><span class="req">*</span></label>
 						<div class="controls">
 
-							<input type="text" class="input-block-level" name="title"
+							<input type="text" class="input-block-level" name="title" placeholder="Enter the title for the document"
 								value="${documentInstance?.title}" required />
 
 							<div class="help-inline">
@@ -132,7 +132,7 @@ input.dms_field {
 						<label class="control-label" for="contributors">Contributors</label>
 						<div class="controls">
 							<g:textField name="contributors" class="input-block-level"
-								value="${documentInstance?.contributors }" />
+								value="${documentInstance?.contributors }" placeholder="Enter the contirbutors for the document"/>
 						</div>
 					</div>
 
@@ -142,7 +142,7 @@ input.dms_field {
 						class="control-group ${hasErrors(bean: documentInstance, field: 'attribution', 'error')}">
 						<label class="control-label" for="attribution">Attribution</label>
 						<div class="controls">
-							<g:textField name="attribution" class="input-block-level"
+							<g:textField name="attribution" class="input-block-level" placeholder="Enter the attribution to be given for this document"
 								value="${documentInstance?.attribution}" />
 						</div>
 					</div>
@@ -189,17 +189,22 @@ input.dms_field {
 						<label class="control-label" for="description">Description
 						</label>
 						<div class="controls">
-
-
-							<ckeditor:config var="toolbar_editorToolbar">
-									[
-    									[ 'Bold', 'Italic' ]
-									]
-									</ckeditor:config>
-							<ckeditor:editor name="description" height="200px"
-								toolbar="editorToolbar">
-								${documentInstance?.description}
-							</ckeditor:editor>
+	
+                                                        <textarea id="description" name="description" placeholder="Write a small description about the document.">${documentInstance?.description}</textarea>
+                                                        
+                                                        <script type='text/javascript'>
+                                                                CKEDITOR.plugins.addExternal( 'confighelper', '${request.contextPath}/js/ckeditor/plugins/confighelper/' );
+                                                                
+                                                                var config = { extraPlugins: 'confighelper', toolbar:'EditorToolbar', toolbar_EditorToolbar:[[ 'Bold', 'Italic' ]]};
+                                                                CKEDITOR.replace('description', config);
+                                                        </script>
+                                                        <div class="help-inline">
+                                                                <g:hasErrors bean="${userGroupInstance}" field="description">
+                                                                        <g:eachError bean="${userGroupInstance}" field="description">
+                                                                                <li><g:message error="${it}" /></li>
+                                                                        </g:eachError>
+                                                                </g:hasErrors>
+                                                        </div>
 
 						</div>
 
