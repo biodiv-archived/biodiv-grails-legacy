@@ -340,6 +340,37 @@ class ProjectService {
 		return false;
 	}
 
+	
+	/**
+	 * Set usergroups to project and project documents also
+	 */
+	def setUserGroups(Project projectInstance, List userGroupIds) {
+		if(!projectInstance) return
+
+		def projInUserGroups = projectInstance.userGroups.collect { it.id + ""}
+		println projInUserGroups;
+		def toRemainInUserGroups =  projInUserGroups.intersect(userGroupIds);
+		if(userGroupIds.size() == 0) {
+			println 'removing project from usergroups'
+			userGroupService.removeProjectFromUserGroups(projectInstance, projInUserGroups);
+
+		} else {
+			userGroupIds.removeAll(toRemainInUserGroups)
+			userGroupService.postProjecttoUserGroups(projectInstance, userGroupIds);
+			projInUserGroups.removeAll(toRemainInUserGroups)
+			userGroupService.removeProjectFromUserGroups(projectInstance, projInUserGroups);
+		}
+		
+		//set usergroups to project documents
+		for(doc in projectInstance.proposalFiles)
+			documentService.setUserGroups(doc, userGroupIds)
+			
+		for(doc in projectInstance.reportFiles)
+			documentService.setUserGroups(doc, userGroupIds)
+			
+		for(doc in projectInstance.miscFiles)
+			documentService.setUserGroups(doc, userGroupIds)
+	}
 
 
 
