@@ -62,24 +62,40 @@
 	<div id="postToUGroup" class="overlay" style="display: none;">
         <i class="icon-plus"></i>
     </div>
-    
+<%
+String supportEmail = "";
+String domain = Utils.getDomain(request);
+if(domain.equals(grailsApplication.config.wgp.domain)) {
+	supportEmail = grailsApplication.config.speciesPortal.wgp.supportEmail;
+} else if(domain.equals(grailsApplication.config.ibp.domain)) {
+	supportEmail =  grailsApplication.config.speciesPortal.ibp.supportEmail;
+}
+%>
+
 	<div id="species_main_wrapper" style="clear: both;">
 		<domain:showIBPHeader model="['userGroupInstance':userGroupInstance]" />
 
 		<div class="container outer-wrapper">
-                    <div id="contributeMenu" class="collapse in">
+                    <div id="contributeMenu" class="collapse">
                         <div class="container">
+                            <ul style="list-style:none;">
+                                <li>
+                                Do you have an interesting picture of a species ... you can share it by uploading it here
                         <a class="btn btn-success"
                             href="${uGroup.createLink(
                             controller:'observation', action:'create', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}" class="btn btn-info"> <i class="icon-plus"></i>Add an Observation</a>
-
-
+                            </li>
+                            <li>
+                            or have any document related to biodiversity like any project report or presentations or posters share them here
                         <a class="btn btn-success"
                             href="${uGroup.createLink(
                             controller:'document', action:'create', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"
                             class="btn btn-info" title="Add Document">
                             <i class="icon-plus"></i> Add Document
                         </a>
+                        </li>
+                        <li>
+                        Have an interesting story post it here.
                         <g:if test="${userGroupInstance}">
                         <sec:permitted className='species.groups.UserGroup'
                         id='${userGroupInstance.id}'
@@ -99,6 +115,10 @@
                             a Page</a>
                         </sUser:isAdmin>
                         </g:else>
+                        </li>
+                        <li>Every small bit of information helps in planning for biodiversity conservation. So please contribute and if you have any suggestions or feedback please don't hesistate in share it with us at <span class="mailme">${supportEmail}</span>
+</li>
+                    </ul>
                         </div>
 
                     </div>

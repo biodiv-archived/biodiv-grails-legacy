@@ -1919,7 +1919,6 @@ div.noOfRatings {
 
 #contributeMenu {
     background: whitesmoke;
-    color: white;
     border-bottom: 3px solid white;
 }
 
@@ -1928,4 +1927,5 @@ div.noOfRatings {
     margin: 0 auto;
     padding: 14px;
     text-align:center;
+    width:inherit;
 }
