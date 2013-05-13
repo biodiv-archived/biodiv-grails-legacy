@@ -17,7 +17,7 @@ import species.License
 import species.utils.Utils
 import species.auth.SUser
 import species.groups.UserGroup
-import org.lorecraft.phparser.SerializedPhpParser;
+//import org.lorecraft.phparser.SerializedPhpParser;
 
 class MigrationService {
 
@@ -216,7 +216,7 @@ def migrateProjects() {
 				if(row.metadata) {
 					println "metadata is "+ row.metadata
 
-					SerializedPhpParser serializedPhpParser = new SerializedPhpParser(row.metadata);
+/*:					SerializedPhpParser serializedPhpParser = new SerializedPhpParser(row.metadata);
 					Object result = serializedPhpParser.parse();
 					document.title = result.description;
 					document.description = result.shortnote.body
@@ -231,7 +231,7 @@ def migrateProjects() {
 						println "tags of file are "+ tags
 						document.setTags(tags)
 					}
-
+*/
 
 				}
 

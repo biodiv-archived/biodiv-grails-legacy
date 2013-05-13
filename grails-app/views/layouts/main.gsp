@@ -67,29 +67,44 @@
 		<domain:showIBPHeader model="['userGroupInstance':userGroupInstance]" />
 
 		<div class="container outer-wrapper">
-                    <!--div class="pull-down">
-                        <h5 data-toggle="collapse" data-target="#pull-down-menu">Do you have any biodiversity related information? Help us in conserving it by providing that informtation here.</h5>
-                        <div id="pull-down-menu" class="collapse">
-    			<a class="btn btn-success pull-right"
-				href="${uGroup.createLink(
-						controller:'observation', action:'create', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"
-				class="btn btn-info" style="margin-top: 10px;margin-bottom:-1px; margin-left: 5px;"> <i class="icon-plus"></i>Add an Observation</a>
-	
-                            <a class="btn btn-success "
-                                href="${uGroup.createLink(
-                                controller:'document', action:'create', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"
-                                class="btn btn-info"
-                                style="margin-top: 10px; margin-bottom: -1px; margin-left: 30px;">
-                                <i class="icon-plus"></i>Add Document
-                            </a>
+                    <div id="contributeMenu" class="collapse in">
+                        <div class="container">
+                        <a class="btn btn-success"
+                            href="${uGroup.createLink(
+                            controller:'observation', action:'create', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}" class="btn btn-info"> <i class="icon-plus"></i>Add an Observation</a>
 
+
+                        <a class="btn btn-success"
+                            href="${uGroup.createLink(
+                            controller:'document', action:'create', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"
+                            class="btn btn-info" title="Add Document">
+                            <i class="icon-plus"></i> Add Document
+                        </a>
+                        <g:if test="${userGroupInstance}">
+                        <sec:permitted className='species.groups.UserGroup'
+                        id='${userGroupInstance.id}'
+                        permission='${org.springframework.security.acls.domain.BasePermission.ADMINISTRATION}'>
+
+                        <a 
+                            href="${uGroup.createLink(mapping:"userGroup", action:"pageCreate", 'userGroup':userGroupInstance)}"
+                            class="btn  btn-success"> <i class="icon-plus"></i>Add
+                            a Page</a>
+                        </sec:permitted>
+                        </g:if>
+                        <g:else>
+                        <sUser:isAdmin>
+                        <a
+                            href="${uGroup.createLink(mapping:"userGroupGeneric", controller:'userGroup', action:"pageCreate") }"
+                            class="btn btn-success"> <i class="icon-plus"></i>Add
+                            a Page</a>
+                        </sUser:isAdmin>
+                        </g:else>
                         </div>
 
-                    </div-->
+                    </div>
 
 
 			<div>
-
 				<div style="padding: 10px 0px; margin-left: -20px">
 					<g:layoutBody />
 				</div>

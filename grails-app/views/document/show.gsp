@@ -15,32 +15,25 @@
 
 		<div class="page-header clearfix">
 			<div style="width: 100%;">
-				<div class="span8 main_heading" style="margin-left: 0px;">
-					<s:showHeadingAndSubHeading
-						model="['heading':documentInstance.title, 'subHeading':documentInstance.attribution, 'headingClass':headingClass, 'subHeadingClass':subHeadingClass]" />
-
-				</div>
-				<a class="btn btn-success pull-right"
-					href="${uGroup.createLink(
-						controller:'document', action:'create', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"
-					class="btn btn-info"
-					style="margin-top: 10px; margin-bottom: -1px; margin-left: 30px;">
-					<i class="icon-plus"></i>Add Document
-				</a>
-				
-
-
-				<div style="float: right; margin: 10px 0;">
+				<div class="main_heading" style="margin-left: 0px;">
 					<sUser:ifOwns model="['user':documentInstance.author]">
+                                            <div class="pull-right">
+                                                <a class="btn btn-success pull-right"
+                                                        href="${uGroup.createLink(
+                                                                controller:'document', action:'create', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"
+                                                        class="btn btn-info" title="Add Document">
+                                                        <i class="icon-plus"></i> Add Document
+                                                </a>
 
-						<a class="btn btn-primary pull-right"
+						<a class="btn btn-primary pull-right" title="Edit Document" style="margin-right: 5px;"
 							href="${uGroup.createLink(controller:'document', action:'edit', id:documentInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
-							<i class="icon-edit"></i>Edit
+							<i class="icon-edit"></i> Edit
 						</a>
 						
-						<a class="btn btn-danger"  href="#" style="margin-right: 5px; margin-bottom: 10px;"
+						<a class="btn btn-danger pull-right"  href="#" title="Delete Document" style="margin-right: 5px;"
+
 							onclick="deleteDocument(); return false;">
-							<i class="icon-trash"></i>Delete
+							<i class="icon-trash"></i> Delete
 						</a>
 							
 						<form action="${uGroup.createLink(controller:'document', action:'delete')}" method='POST' name='deleteForm'>
@@ -53,38 +46,45 @@
 							}
 						}
 						</r:script>
-						
-					</sUser:ifOwns>
-				</div>
+	                                        </div>					
+						<s:showHeadingAndSubHeading
+						model="['heading':documentInstance.title, 'subHeading':documentInstance.attribution, 'headingClass':headingClass, 'subHeadingClass':subHeadingClass]" />
+
+				</sUser:ifOwns>
+
+
+                            </div>
+
 			</div>
+                        <div style="clear:both"></div>
+                        <% 
+                        def curr_id = documentInstance.id
+                        def prevId =  Document.countByIdLessThan(curr_id)>0?Document.findAllByIdLessThan(curr_id, ['max':1, 'sort':'id', 'order':'desc'])?.last()?.id:''
+                        def nextId = Document.countByIdGreaterThan(curr_id)>0?Document.findByIdGreaterThan(curr_id, ['max':1, 'sort':'id'])?.id:''
+
+                        %>
+                        <div class="nav" style="width: 100%;margin-top:10px;">
+
+                            <a class="pull-left btn ${prevId?:'disabled'}"
+                                href="${uGroup.createLink([action:"show", controller:"document",
+                                id:prevId,  'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress])}"><i class="icon-backward"></i>Prev
+                                </a> <a class="pull-right  btn ${nextId?:'disabled'}"
+                                href="${uGroup.createLink([action:"show", controller:"document",
+                                id:nextId,  'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress])}">Next <i style="margin-right: 0px; margin-left: 3px;" class="icon-forward"></i>
+                                </a> <a class="btn"
+                                href="${uGroup.createLink([action:'list', controller:'document'])}"
+                                style="text-align: center; display: block; margin: 0 auto;">List</a>
+
+                        </div>
+
+
 
 		</div>
 
 
 
                 <div class="span8 right-shadow-box observation" style="margin:0;">
-                    <% 
-                    def curr_id = documentInstance.id
-                    def prevId =  Document.countByIdLessThan(curr_id)>0?Document.findAllByIdLessThan(curr_id, ['max':1, 'sort':'id', 'order':'desc'])?.last()?.id:''
-                    def nextId = Document.countByIdGreaterThan(curr_id)>0?Document.findByIdGreaterThan(curr_id, ['max':1, 'sort':'id'])?.id:''
-
-                    %>
-                    <div class="nav" style="width: 100%;">
-
-                        <a class="pull-left btn ${prevId?:'disabled'}"
-                            href="${uGroup.createLink([action:"show", controller:"document",
-                            id:prevId,  'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress])}"><i class="icon-backward"></i>Prev
-                            </a> <a class="pull-right  btn ${nextId?:'disabled'}"
-                            href="${uGroup.createLink([action:"show", controller:"document",
-                            id:nextId,  'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress])}">Next <i style="margin-right: 0px; margin-left: 3px;" class="icon-forward"></i>
-                            </a> <a class="btn"
-                            href="${uGroup.createLink([action:'list', controller:'document'])}"
-                            style="text-align: center; display: block; margin: 0 auto;">List</a>
-
-                    </div>
-
-
-		        <g:render template="/document/showDocument" model="['documentInstance':documentInstance]"/>
+                    		        <g:render template="/document/showDocument" model="['documentInstance':documentInstance]"/>
 			<g:if
 				test="${documentInstance?.coverage?.speciesGroups || documentInstance.coverage?.habitats || documentInstance.coverage?.placeName }">
 

@@ -59,6 +59,14 @@
 
 
 				</ul>
+                                <ul class="nav" style="background-color:whitesmoke;">
+                                    <li>
+                                    <a href="#contributeMenu" data-toggle="collapse">
+                                        <i class="icon-list"></i>
+                                        Contribute
+                                    </a>
+                                    </li>
+                                </ul>
 				<ul class="nav pull-right">
 					<!--li class="menu-449 first"><a href="/" title="">Home</a></li-->
 
@@ -170,7 +178,6 @@
 		</div>
 	</div>
 </div>
-
 <g:javascript>
 $(document).ready(function(){
 	//IMP:Header is loaded in drupal pages as well. Any code in this block is not run when loaded by ajax
