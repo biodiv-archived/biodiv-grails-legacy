@@ -47,29 +47,7 @@
                                     <i class="icon-plus"></i> Add Document
                                 </a>
                                 </li>
-                                <li>
-                                Have an interesting story post it here.
-                                <g:if test="${userGroupInstance}">
-                                <sec:permitted className='species.groups.UserGroup'
-                                id='${userGroupInstance.id}'
-                                permission='${org.springframework.security.acls.domain.BasePermission.ADMINISTRATION}'>
-
-                                <a 
-                                    href="${uGroup.createLink(mapping:"userGroup", action:"pageCreate", 'userGroup':userGroupInstance)}"
-                                    class="btn  btn-success"> <i class="icon-plus"></i>Add
-                                    a Page</a>
-                                </sec:permitted>
-                                </g:if>
-                                <g:else>
-                                <sUser:isAdmin>
-                                <a
-                                    href="${uGroup.createLink(mapping:"userGroupGeneric", controller:'userGroup', action:"pageCreate") }"
-                                    class="btn btn-success"> <i class="icon-plus"></i>Add
-                                    a Page</a>
-                                </sUser:isAdmin>
-                                </g:else>
-                                </li>
-                                <li>Every small bit of information helps in planning for biodiversity conservation. So please contribute and if you have any suggestions or feedback please don't hesistate in share it with us at <span class="mailme">${supportEmail}</span>
+                                <li>Every small bit of information helps in planning biodiversity conservation. So please contribute and if you have any suggestions or feedback please don't hesistate in share it with us at <span class="mailme">${supportEmail}</span>
                                 </li>
                             </ul>
                         </div>
