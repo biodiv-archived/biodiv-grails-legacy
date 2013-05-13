@@ -114,7 +114,15 @@ class ProjectService {
 	 * @return
 	 */
 	Map getFilteredProjects(params, max, offset) {
-
+		if(!params.aq){
+			return getProjectListFromDB(params, max, offset)
+		}
+		
+		//get result from solr search
+		return search(params)
+	}
+	
+	private getProjectListFromDB(params, max, offset){
 		def queryParts = getProjectsFilterQuery(params)
 		String query = queryParts.query;
 
@@ -126,7 +134,7 @@ class ProjectService {
 			queryParts.queryParams["offset"] = offset
 
 
-		log.debug "Project Query >>>>>>>>>"+ query + " >>>>>params " + queryParts.queryParams
+		log.debug "Project Query "+ query + " params " + queryParts.queryParams
 		def projectInstanceList = Project.executeQuery(query, queryParts.queryParams)
 
 		return [projectInstanceList:projectInstanceList, queryParams:queryParts.queryParams, activeFilters:queryParts.activeFilters]
@@ -154,46 +162,41 @@ class ProjectService {
 			activeFilters["tag"] = params.tag
 		}
 
-		if(params.keywords) {
-			query = "select proj from Project proj,  TagLink tagLink "
-			//TODO - contains
-			filterQuery += " and proj.id = tagLink.tagRef and tagLink.type = :tagType and tagLink.tag.name = :keywords "
-			queryParams["keywords"] = params.tag
-			queryParams["tagType"] = GrailsNameUtils.getPropertyName(Project.class)
-			activeFilters["keywords"] = params.tag
-		}
+//		if(params.keywords) {
+//			query = "select proj from Project proj,  TagLink tagLink "
+//			//TODO - contains
+//			filterQuery += " and proj.id = tagLink.tagRef and tagLink.type = :tagType and tagLink.tag.name = :keywords "
+//			queryParams["keywords"] = params.tag
+//			queryParams["tagType"] = GrailsNameUtils.getPropertyName(Project.class)
+//			activeFilters["keywords"] = params.tag
+//		}
+//		
+//		
+//		if(params.sitename) {
+//			query = "select proj from Project proj,  Location location"
+//			
+//			filterQuery += " and location.siteName = :sitename and location in proj.locations"
+//			queryParams["sitename"] = params.sitename
+//			activeFilters["sitename"] = params.sitename
+//		}
+//		
+//		if(params.title) {
+//			filterQuery += " and proj.title like :title "
+//			queryParams["title"] = '%' + params.title + '%' 
+//			activeFilters["title"] = params.title
+//		}
+//		
+//		if(params.grantee) {
+//			filterQuery += " and proj.granteeOrganization like :grantee "
+//			queryParams["grantee"] = '%' +params.grantee + '%'
+//			activeFilters["grantee"] = params.grantee
+//		}
 		
-		/*
-		if(params.sitename) {
-			query = "select proj from Project proj,  Location location"
-			
-			filterQuery += " and location.siteName = :sitename and location in proj.locations"
-			queryParams["sitename"] = params.sitename
-			activeFilters["sitename"] = params.sitename
-		}
-		*/
-		if(params.title) {
-			filterQuery += " and proj.title like :title "
-			queryParams["title"] = '%' + params.title + '%' 
-			activeFilters["title"] = params.title
-		}
-		
-		if(params.grantee) {
-			filterQuery += " and proj.granteeOrganization like :grantee "
-			queryParams["grantee"] = '%' +params.grantee + '%'
-			activeFilters["grantee"] = params.grantee
-		}
-		
-		
-
 		def sortBy = params.sort ? params.sort : " lastUpdated "
-
 		def sortOrder = (sortBy=='granteeOrganization')?" asc ":" desc "
-
 		def orderByClause = " order by proj." + sortBy +  sortOrder +", proj.id asc"
 
 		return [query:query,filterQuery:filterQuery, orderByClause:orderByClause, queryParams:queryParams, activeFilters:activeFilters]
-
 	}
 
 
@@ -230,7 +233,6 @@ class ProjectService {
 		String aq = "";
 		int i=0;
 		if(params.aq instanceof GrailsParameterMap) {
-			println '-----------------'
 			params.aq.each { key, value ->
 				queryParams["aq."+key] = value;
 				activeFilters["aq."+key] = value;
@@ -267,47 +269,43 @@ class ProjectService {
 		queryParams["offset"] = offset
 
 		paramsList.add('fl', params['fl']?:"id");
-/*
-		if(params.sGroup) {
-			params.sGroup = params.sGroup.toLong()
-			def groupId = observationService.getSpeciesGroupIds(params.sGroup)
-			if(!groupId){
-				log.debug("No groups for id " + params.sGroup)
-			} else{
-				paramsList.add('fq', searchFieldsConfig.SGROUP+":"+groupId);
-				queryParams["groupId"] = groupId
-				activeFilters["sGroup"] = groupId
-			}
+		
+		//filters
+		if(params.tag) {
+			paramsList.add('fq', searchFieldsConfig.TAG+":"+params.tag);
+			queryParams["tag"] = params.tag
+			queryParams["tagType"] = GrailsNameUtils.getPropertyName(Project.class)
+			activeFilters["tag"] = params.tag
 		}
-*/
-		if(params.name) {
-			paramsList.add('fq', searchFieldsConfig.NAME+":"+params.name);
-			queryParams["name"] = params.name
-			activeFilters["name"] = params.name
-		}
-/*
-		if(params.uGroup) {
-			if(params.uGroup == "THIS_GROUP") {
-				String uGroup = params.webaddress
-				if(uGroup) {
-					//AS we dont have selecting species for group ... we are ignoring this filter
-					//paramsList.add('fq', searchFieldsConfig.USER_GROUP_WEBADDRESS+":"+uGroup);
-				}
-				queryParams["uGroup"] = params.uGroup
-				activeFilters["uGroup"] = params.uGroup
-			} else {
-				queryParams["uGroup"] = "ALL"
-				activeFilters["uGroup"] = "ALL"
-			}
-		}
+	
+//		if(params.name) {
+//			paramsList.add('fq', searchFieldsConfig.NAME+":"+params.name);
+//			queryParams["name"] = params.name
+//			activeFilters["name"] = params.name
+//		}
+//
+//		if(params.uGroup) {
+//			if(params.uGroup == "THIS_GROUP") {
+//				String uGroup = params.webaddress
+//				if(uGroup) {
+//					//AS we dont have selecting species for group ... we are ignoring this filter
+//					//paramsList.add('fq', searchFieldsConfig.USER_GROUP_WEBADDRESS+":"+uGroup);
+//				}
+//				queryParams["uGroup"] = params.uGroup
+//				activeFilters["uGroup"] = params.uGroup
+//			} else {
+//				queryParams["uGroup"] = "ALL"
+//				activeFilters["uGroup"] = "ALL"
+//			}
+//		}
+//
+//		if(params.query && params.startsWith && params.startsWith != "A-Z"){
+//			params.query = params.query + " AND "+searchFieldsConfig.TITLE+":"+params.startsWith+"*"
+//			//paramsList.add('fq', searchFieldsConfig.TITLE+":"+params.startsWith+"*");
+//			queryParams["startsWith"] = params.startsWith
+//			activeFilters["startsWith"] = params.startsWith
+//		}
 
-		if(params.query && params.startsWith && params.startsWith != "A-Z"){
-			params.query = params.query + " AND "+searchFieldsConfig.TITLE+":"+params.startsWith+"*"
-			//paramsList.add('fq', searchFieldsConfig.TITLE+":"+params.startsWith+"*");
-			queryParams["startsWith"] = params.startsWith
-			activeFilters["startsWith"] = params.startsWith
-		}
-		*/
 		log.debug "Along with faceting params : "+paramsList;
 		try {
 			def queryResponse = projectSearchService.search(paramsList);

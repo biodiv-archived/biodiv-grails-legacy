@@ -209,7 +209,6 @@ class DocumentService {
 		String aq = "";
 		int i=0;
 		if(params.aq instanceof GrailsParameterMap) {
-			println '-----------------'
 			params.aq.each { key, value ->
 				queryParams["aq."+key] = value;
 				activeFilters["aq."+key] = value;
@@ -246,46 +245,15 @@ class DocumentService {
 		queryParams["offset"] = offset
 
 		paramsList.add('fl', params['fl']?:"id");
-		/*
-		 if(params.sGroup) {
-		 params.sGroup = params.sGroup.toLong()
-		 def groupId = observationService.getSpeciesGroupIds(params.sGroup)
-		 if(!groupId){
-		 log.debug("No groups for id " + params.sGroup)
-		 } else{
-		 paramsList.add('fq', searchFieldsConfig.SGROUP+":"+groupId);
-		 queryParams["groupId"] = groupId
-		 activeFilters["sGroup"] = groupId
-		 }
-		 }
-		 */
-		if(params.title) {
-			paramsList.add('fq', searchFieldsConfig.title+":"+params.title);
-			queryParams["title"] = params.title
-			activeFilters["title"] = params.title
+		
+		//filters
+		if(params.tag) {
+			paramsList.add('fq', searchFieldsConfig.TAG+":"+params.tag);
+			queryParams["tag"] = params.tag
+			queryParams["tagType"] = GrailsNameUtils.getPropertyName(Document.class)
+			activeFilters["tag"] = params.tag
 		}
-		/*
-		 if(params.uGroup) {
-		 if(params.uGroup == "THIS_GROUP") {
-		 String uGroup = params.webaddress
-		 if(uGroup) {
-		 //AS we dont have selecting species for group ... we are ignoring this filter
-		 //paramsList.add('fq', searchFieldsConfig.USER_GROUP_WEBADDRESS+":"+uGroup);
-		 }
-		 queryParams["uGroup"] = params.uGroup
-		 activeFilters["uGroup"] = params.uGroup
-		 } else {
-		 queryParams["uGroup"] = "ALL"
-		 activeFilters["uGroup"] = "ALL"
-		 }
-		 }
-		 if(params.query && params.startsWith && params.startsWith != "A-Z"){
-		 params.query = params.query + " AND "+searchFieldsConfig.TITLE+":"+params.startsWith+"*"
-		 //paramsList.add('fq', searchFieldsConfig.TITLE+":"+params.startsWith+"*");
-		 queryParams["startsWith"] = params.startsWith
-		 activeFilters["startsWith"] = params.startsWith
-		 }
-		 */
+		
 		log.debug "Along with faceting params : "+paramsList;
 		try {
 			def queryResponse = documentSearchService.search(paramsList);
@@ -298,14 +266,14 @@ class DocumentService {
 				if(documentInstance)
 					documentInstanceList.add(documentInstance);
 			}
-
+			
 			result = [queryParams:queryParams, activeFilters:activeFilters, instanceTotal:queryResponse.getResults().getNumFound(), documentInstanceList:documentInstanceList, snippets:queryResponse.getHighlighting()]
 			log.debug "result returned from search: "+ result
 			return result;
 		} catch(SolrException e) {
 			e.printStackTrace();
 		}
-
+		
 		result = [queryParams:queryParams, activeFilters:activeFilters, instanceTotal:0, speciesInstanceList:[]];
 		return result;
 	}
@@ -330,8 +298,6 @@ class DocumentService {
 	}
 
 
-
-
 	/**
 	 * Handle the filtering on Documetns
 	 * @param params
@@ -340,7 +306,14 @@ class DocumentService {
 	 * @return
 	 */
 	Map getFilteredDocuments(params, max, offset) {
-
+		if(!params.aq){
+			return getDocsFromDB(params, max, offset)
+		}
+		//returning docs from solr search
+		return search(params)
+	}
+	
+	private getDocsFromDB(params, max, offset){
 		def queryParts = getDocumentsFilterQuery(params)
 		String query = queryParts.query;
 
@@ -352,7 +325,7 @@ class DocumentService {
 			queryParts.queryParams["offset"] = offset
 
 
-		log.debug "Document Query >>>>>>>>>"+ query + " >>>>>params " + queryParts.queryParams
+		log.debug "Document Query "+ query + "  params " + queryParts.queryParams
 		def documentInstanceList = Document.executeQuery(query, queryParts.queryParams)
 
 		return [documentInstanceList:documentInstanceList, queryParams:queryParts.queryParams, activeFilters:queryParts.activeFilters]
@@ -370,46 +343,40 @@ class DocumentService {
 		def activeFilters = [:]
 		def filterQuery = "where document.id is not NULL "  //Dummy stmt
 
-
 		if(params.tag){
 			query = "select document from Document document,  TagLink tagLink "
-			//TODO -
 			filterQuery += " and document.id = tagLink.tagRef and tagLink.type = :tagType and tagLink.tag.name = :tag "
 			queryParams["tag"] = params.tag
 			queryParams["tagType"] = GrailsNameUtils.getPropertyName(Document.class)
 			activeFilters["tag"] = params.tag
 		}
-
-		if(params.keywords) {
-			query = "select document from Document document,  TagLink tagLink "
-			//TODO - contains
-			filterQuery += " and document.id = tagLink.tagRef and tagLink.type = :tagType and tagLink.tag.name = :keywords "
-			queryParams["keywords"] = params.tag
-			queryParams["tagType"] = GrailsNameUtils.getPropertyName(Document.class)
-			activeFilters["keywords"] = params.tag
-		}
-
-
-		if(params.title) {
-			filterQuery += " and document.title like :title "
-			queryParams["title"] = '%'+params.title + '%'
-			activeFilters["title"] = params.title
-		}
-
-		if(params.description) {
-			filterQuery += " and document.description like :description "
-			queryParams["description"] = '%'+ params.description+'%'
-			activeFilters["description"] = params.description
-		}
-
-
+		
+//
+//		if(params.keywords) {
+//			query = "select document from Document document,  TagLink tagLink "
+//			//TODO - contains
+//			filterQuery += " and document.id = tagLink.tagRef and tagLink.type = :tagType and tagLink.tag.name = :keywords "
+//			queryParams["keywords"] = params.tag
+//			queryParams["tagType"] = GrailsNameUtils.getPropertyName(Document.class)
+//			activeFilters["keywords"] = params.tag
+//		}
+//
+//
+//		if(params.title) {
+//			filterQuery += " and document.title like :title "
+//			queryParams["title"] = '%'+params.title + '%'
+//			activeFilters["title"] = params.title
+//		}
+//
+//		if(params.description) {
+//			filterQuery += " and document.description like :description "
+//			queryParams["description"] = '%'+ params.description+'%'
+//			activeFilters["description"] = params.description
+//		}
 
 		def sortBy = params.sort ? params.sort : "dateCreated "
-
 		def orderByClause = " order by document." + sortBy +  " desc, document.id asc"
-
 		return [query:query,filterQuery:filterQuery, orderByClause:orderByClause, queryParams:queryParams, activeFilters:activeFilters]
-
 	}
 
 

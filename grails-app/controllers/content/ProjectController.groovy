@@ -49,7 +49,6 @@ class ProjectController {
 
 	@Secured(['ROLE_CEPF_ADMIN'])
 	def save = {
-		log.debug ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
 		log.debug params
 
 		params.author = springSecurityService.currentUser;
@@ -169,35 +168,35 @@ class ProjectController {
 		render (corridorsFound as JSON)
 	}
 
-	/**
-	 *
-	 */
-	def search = {
-		log.debug params;
-		def model = projectService.search(params)
-		model['isSearch'] = true;
-
-		if(params.loadMore?.toBoolean()){
-			params.remove('isGalleryUpdate');
-			render(template:"/project/projectListTemplate", model:model);
-			return;
-		} else if(!params.isGalleryUpdate?.toBoolean()){
-			params.remove('isGalleryUpdate');
-			render (view:"list", model:model)
-			return;
-		} else {
-			log.debug "going to gallery update in controller"
-			params.remove('isGalleryUpdate');
-			def obvListHtml =  g.render(template:"/project/projectListTemplate", model:model);
-			model.resultType = "project"
-			def obvFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
-
-			def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml]
-
-			render (result as JSON)
-			return;
-		}
-	}
+//	/**
+//	 *
+//	 */
+//	def search = {
+//		log.debug params;
+//		def model = projectService.search(params)
+//		model['isSearch'] = true;
+//
+//		if(params.loadMore?.toBoolean()){
+//			params.remove('isGalleryUpdate');
+//			render(template:"/project/projectListTemplate", model:model);
+//			return;
+//		} else if(!params.isGalleryUpdate?.toBoolean()){
+//			params.remove('isGalleryUpdate');
+//			render (view:"list", model:model)
+//			return;
+//		} else {
+//			log.debug "going to gallery update in controller"
+//			params.remove('isGalleryUpdate');
+//			def obvListHtml =  g.render(template:"/project/projectListTemplate", model:model);
+//			model.resultType = "project"
+//			def obvFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
+//
+//			def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml]
+//
+//			render (result as JSON)
+//			return;
+//		}
+//	}
 
 	def terms = {
 		log.debug params;
@@ -218,14 +217,14 @@ class ProjectController {
 		def max = Math.min(params.max ? params.int('max') : 12, 100)
 		def offset = params.offset ? params.int('offset') : 0
 		def filteredProject = projectService.getFilteredProjects(params, max, offset)
+		
 		def projectInstanceList = filteredProject.projectInstanceList
 		def queryParams = filteredProject.queryParams
 		def activeFilters = filteredProject.activeFilters
 		activeFilters.put("append", true);//needed for adding new page proj ids into existing session["proj_ids_list"]
 
-		def totalProjectInstanceList = projectService.getFilteredProjects(params, -1, -1).projectInstanceList
-		def count = totalProjectInstanceList.size()
-
+		def count = projectService.getFilteredProjects(params, -1, -1).projectInstanceList.size()
+		
 		//storing this filtered proj ids list in session for next and prev links
 		//http://grepcode.com/file/repo1.maven.org/maven2/org.codehaus.groovy/groovy-all/1.8.2/org/codehaus/groovy/runtime/DefaultGroovyMethods.java
 		//returns an arraylist and invalidates prev listing result
@@ -237,7 +236,7 @@ class ProjectController {
 		}
 
 		log.debug "Storing all project ids list in session ${session['proj_ids_list']} for params ${params}";
-		return [totalProjectInstanceList:totalProjectInstanceList, projectInstanceList: projectInstanceList, instanceTotal: count, queryParams: queryParams, activeFilters:activeFilters, , resultType:'project']
+		return [projectInstanceList: projectInstanceList, instanceTotal: count, queryParams: queryParams, activeFilters:activeFilters, , resultType:'project']
 	}
 
 }
