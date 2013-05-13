@@ -17,7 +17,7 @@ import species.License
 import species.utils.Utils
 import species.auth.SUser
 import species.groups.UserGroup
-import org.lorecraft.phparser.SerializedPhpParser;
+//import org.lorecraft.phparser.SerializedPhpParser;
 
 class MigrationService {
 
@@ -93,7 +93,7 @@ def migrateProjects() {
 		Project proj = new Project();
 
 		proj.title = nodeRow.title;
-		proj.summary = row.field_project_summary_value
+		proj.summary = row.field_project_summary_value?row.field_project_summary_value:null
 
 		int direction_nid = row.field_strategic_direction_nid
 
@@ -140,10 +140,12 @@ def migrateProjects() {
 
 		sql.eachRow(locationsQuery) { lrow ->
 			Location location = new Location()
-			location.siteName = lrow.sitename
-			location.corridor = lrow.corridor
-
-			locations.add(location)
+			
+			location.siteName = lrow.sitename?lrow.sitename:null
+			location.corridor = lrow.corridor?lrow.corridor:null
+			
+			if(location.siteName || location.corridor)
+				locations.add(location)
 		}
 
 		proj.locations = locations
@@ -216,7 +218,7 @@ def migrateProjects() {
 				if(row.metadata) {
 					println "metadata is "+ row.metadata
 
-					SerializedPhpParser serializedPhpParser = new SerializedPhpParser(row.metadata);
+	/*				SerializedPhpParser serializedPhpParser = new SerializedPhpParser(row.metadata);
 					Object result = serializedPhpParser.parse();
 					document.title = result.description;
 					document.description = result.shortnote.body
@@ -231,7 +233,7 @@ def migrateProjects() {
 						println "tags of file are "+ tags
 						document.setTags(tags)
 					}
-
+*/
 
 				}
 
