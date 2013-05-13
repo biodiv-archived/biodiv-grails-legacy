@@ -259,9 +259,27 @@ class DocumentService {
 			queryParams["tagType"] = GrailsNameUtils.getPropertyName(Document.class)
 			activeFilters["tag"] = params.tag
 		}
+<<<<<<< ours
 
 
 
+=======
+		
+		if(params.uGroup) {
+			if(params.uGroup == "THIS_GROUP") {
+				String uGroup = params.webaddress
+				if(uGroup) {
+					paramsList.add('fq', searchFieldsConfig.USER_GROUP_WEBADDRESS+":"+uGroup);
+				}
+				queryParams["uGroup"] = params.uGroup
+				activeFilters["uGroup"] = params.uGroup
+			} else {
+				queryParams["uGroup"] = "ALL"
+				activeFilters["uGroup"] = "ALL"
+			}
+		}
+		
+>>>>>>> theirs
 		log.debug "Along with faceting params : "+paramsList;
 		try {
 			def queryResponse = documentSearchService.search(paramsList);
@@ -358,6 +376,18 @@ class DocumentService {
 			queryParams["tagType"] = GrailsNameUtils.getPropertyName(Document.class)
 			activeFilters["tag"] = params.tag
 		}
+		
+		if(params.webaddress) {
+			def userGroupInstance = userGroupService.get(params.webaddress)
+			if(userGroupInstance){
+				queryParams['userGroup'] = userGroupInstance
+				//queryParams['isDeleted'] = false;
+		
+				query += " join document.userGroups userGroup "
+				filterQuery += " and userGroup=:userGroup "
+			}
+		}
+		
 		
 //
 //		if(params.keywords) {
