@@ -135,6 +135,14 @@
 <%--						class="${(params.controller == 'chart')?'active':''}"><a--%>
 <%--						href='${uGroup.createLink("controller":"chart")}' title="Stats">Stats</a></li>--%>
 				</ul>
+                                <ul class="nav" style="background-color:whitesmoke;">
+                                    <li>
+                                    <a href="#contributeMenu" data-toggle="collapse">
+                                        <i class="icon-list"></i>
+                                        Contribute
+                                    </a>
+                                    </li>
+                                </ul>
 
 				<ul class="nav pull-right">
 					<li class=" ${(params.controller == 'activityFeed')?'active':''}"><a
