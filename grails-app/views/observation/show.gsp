@@ -133,7 +133,7 @@ if(r && gThumbnail) {
                                         <%lastListParams.put('userGroupWebaddress', userGroup?userGroup.webaddress:userGroupWebaddress);
                                         lastListParams.put('fragment', params.pos);
                                         %>
-                                        <a class="btn" href="${uGroup.createLink(lastListParams)}" style="text-align: center;display: block;width: 30pxpx;margin: 0 auto;">List</a>
+                                        <a class="btn" href="${uGroup.createLink(lastListParams)}" style="text-align: center;display: block;margin: 0 auto;">List</a>
                                         </g:if>
                                         <g:else>
                                         <a class="pull-left btn ${prevObservationId?:'disabled'}" href="${uGroup.createLink([action:"show", controller:"observation",

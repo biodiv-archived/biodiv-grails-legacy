@@ -64,6 +64,7 @@
                                     <a href="#contributeMenu" data-toggle="collapse">
                                         <i class="icon-list"></i>
                                         Contribute
+                                        <i class="caret"></i>
                                     </a>
                                     </li>
                                 </ul>
@@ -140,6 +141,7 @@
                                     <a href="#contributeMenu" data-toggle="collapse">
                                         <i class="icon-list"></i>
                                         Contribute
+                                        <i class="caret"></i>
                                     </a>
                                     </li>
                                 </ul>

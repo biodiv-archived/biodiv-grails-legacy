@@ -259,6 +259,19 @@ function last_actions() {
 	    }
 	});
 	
+        $('#contributeMenu.collapse').on({
+	    shown: function(){
+		$.cookie("contribute", "show", {path    : '/'});
+	    },
+	    hide: function(){
+		$.cookie("contribute", "hide", {path    : '/'});
+	    }
+	});
+	
+        if ( !$.cookie("contribute") || $.cookie("contribute") == "show" ) {
+            $('#contributeMenu.collapse').collapse('show');
+        }
+
 	$('.yj-message-body').linkify();
 	$('.linktext').linkify(); 
 	//applying table sorting
