@@ -10,13 +10,45 @@ class RatingController extends RateableController {
     
 	@Secured(['ROLE_USER'])
     def rate = {
+        log.debug params;
         def result =  rateIt(params.id.toLong(), params.type, params.rating);
+        render result as JSON
+    }
+
+    @Secured(['ROLE_USER'])
+    def unrate = {
+        log.debug params
+        def rater = evaluateRater()
+
+        def id = params.id.toLong();
+        String type = params.type
+
+        if(id && type && rater) {
+
+            Rating.withTransaction {
+                def ratingLinks = RatingLink.withCriteria {
+                       createAlias("rating", "r")
+                        eq "ratingRef", id
+                        eq "type", type
+                        if(rater) eq "r.raterId", rater.id.toLong()
+                    }
+
+                if(ratingLinks){
+                    ratingLinks.each { rl ->
+                        def rating = rl.rating
+                        rl.delete();
+                        rating.delete();
+                    }
+                }
+            } 
+        }
+        def result = formatRatings(getRatings(id, type));
         render result as JSON
     }
 
     def fetchRate = {
         log.debug params;
-        def result = getRatings(params.id.toLong(), params.type);
+        def result = formatRatings(getRatings(params.id.toLong(), params.type));
         render result as JSON
     }
 
@@ -24,19 +56,10 @@ class RatingController extends RateableController {
         def rater = evaluateRater()
         Rating.withTransaction {
             // for an existing rating, update it
-            def rating = RatingLink.createCriteria().get {
-                createAlias("rating", "r")
-                projections {
-                    property "rating"
-                }
-                eq "ratingRef", id
-                eq "type", type
-                eq "r.raterId", rater.id.toLong()
-                cache true
-            }
+            def rating = getRatings(id, type, rater);
             if (rating && rate) {
-                rating.stars = rate.toDouble()
-                assert rating.save()
+                rating[0].stars = rate.toDouble()
+                assert rating[0].save()
             }
             // create a new one otherwise
             else if(rate) {
@@ -47,19 +70,23 @@ class RatingController extends RateableController {
                 assert link.save()
             }
         }
-        return getRatings(id, type);
+        return formatRatings(getRatings(id, type));
     }
 
-    private def getRatings(long id, String type) {
-        def allRatings = RatingLink.withCriteria {
+    private def getRatings(long id, String type, rater=null) {
+        return RatingLink.withCriteria {
+            createAlias("rating", "r")
             projections {
                 property 'rating'
             }
             eq "ratingRef", id
             eq "type", type
+            if(rater) eq "r.raterId", rater.id.toLong()
             cache true
         }
+    }
 
+    private Map formatRatings(List allRatings) {
         def avg = allRatings.size() ? allRatings*.stars.sum() / allRatings.size() : 0
         return ['status':'success', 'avg':avg, 'noOfRatings':allRatings.size()]
     }

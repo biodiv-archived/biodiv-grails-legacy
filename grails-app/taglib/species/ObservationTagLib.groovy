@@ -233,15 +233,14 @@ class ObservationTagLib {
             """
 
             if(!hideForm) {
-                out << """<form class="ratingForm" method="get" title="Rate it"
-                    action="${uGroup.createLink(controller:'rating', action:'rate', id:resource.id, type:GrailsNameUtils.getPropertyName(resource.class)) }">
+                out << """<form class="ratingForm" method="get" title="Rate it">
                     """
             }
             String name = index?(resource.id?'rating_'+index:'rating_{{>i}}'):'rating'
 
             out << """
                <span class="star_${divClass} 
-                    title="Rate" data-score='${averageRating}' data-input-name="${name}"></span>
+                    title="Rate" data-score='${averageRating}' data-input-name="${name}"  data-id="${resource.id}" data-type="${GrailsNameUtils.getPropertyName(resource.class)}" data-action="like" ></span>
                     <div class="noOfRatings">(${resource.totalRatings ?: 0} rating${resource.totalRatings!=1?'s':''})</div>
                 """
             if(!hideForm) {
@@ -266,14 +265,13 @@ class ObservationTagLib {
             """
 
             if(!hideForm) {
-                out << """<form class="ratingForm" method="get" title="Rate it"
-                    action="${uGroup.createLink(controller:'rating', action:'rate', id:resource.id, type:GrailsNameUtils.getPropertyName(resource.class)) }">
+                out << """<form class="ratingForm" method="get" title="Rate it">
                     """
             }
             out << """
                 <span class="like_${divClass} 
-                    title="Like" ${(userRating==1)?"data-score='1'":""}></span>
-                    <span class="noOfRatings badge" title='No of likes'>${resource.totalRatings ?: 0}</span>
+                    title="${(userRating>0)?'Unlike':'Like'}" ${(userRating==1)?"data-score='1'":""} data-id="${resource.id}" data-type="${GrailsNameUtils.getPropertyName(resource.class)}" data-action="${(userRating>0)?'unlike':'like'}"></span>
+                    <span class="noOfRatings" title='No of likes'>${resource.totalRatings ?: 0}</span>
                 """
             if(!hideForm) {
                 out << "</form>"

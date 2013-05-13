@@ -476,7 +476,7 @@ ul#recoSummary {
 	font-weight: bold;
 	line-height: 200%;
 	text-align: justify;
-	padding-right: 10px;
+	padding: 10px;
 }
 
 .observation_story,.species_story {

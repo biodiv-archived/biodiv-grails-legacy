@@ -6,29 +6,39 @@ $(document).ready(function(){
 
 function rateCallback(ele, successHandler) {
     var form = ele.parent();
-            if(form.prop("tagName") == 'FORM') {
-                form.ajaxSubmit({ 
-                    type: 'GET',
-                    dataType:'json',
-                    success: function(data, statusText, xhr, form) {
-                        console.log('success'+data.avg);
-                        updateRating(data.avg, data.noOfRatings, ele)
-                        if(successHandler) {
-                            console.log(successHandler)
-                            successHandler(data.avg, data.noOfRatings, rateFn, form);
+    var action = (ele.data('action') == 'unlike')?'unrate':'rate'
+    var url = "/rating/"+action+'/'+ele.data('id');
+    if(form.prop("tagName") == 'FORM') {
+        form.ajaxSubmit({
+            url: url,
+            type: 'GET',
+            dataType:'json',
+            data:{type:ele.data('type')},
+            success: function(data, statusText, xhr, form) {
+                updateRating(data.avg, data.noOfRatings, ele)
+                if(successHandler) {
+                    successHandler(data.avg, data.noOfRatings, rateFn, form);
+                }
+                if(ele.data('action') === 'unlike') {
+                    ele.data('action', 'like');
+                    ele.attr('title', 'Like');
+                    ele.raty('cancel', true);
+                } else if(ele.data('action') === 'like') {
+                    ele.data('action', 'unlike');
+                    ele.attr('title', 'Unlike');
+                }
+            }, error:function (xhr, ajaxOptions, thrownError){
+                    handleError(xhr, ajaxOptions, thrownError, this.success, function() {
+                        var response = $.parseJSON(xhr.responseText);
+                        if(response.error){
                         }
-                    }, error:function (xhr, ajaxOptions, thrownError){
-                            handleError(xhr, ajaxOptions, thrownError, this.success, function() {
-                                var response = $.parseJSON(xhr.responseText);
-                                if(response.error){
-                                }
-                            }, function(){
-                                $(ele).raty('reload');
-                                //refreshRating (ele);
-                            });
-                    } 
-                });  
-            }
+                    }, function(){
+                        $(ele).raty('reload');
+                        //refreshRating (ele);
+                    });
+            } 
+        });  
+    }
 }
 
 function like(ele, successHandler) {
@@ -40,7 +50,11 @@ function like(ele, successHandler) {
             return $(this).attr('data-score');
         },
         click: function(score, evt) {
-            rateCallback($(evt.target).parent(), successHandler);
+            if(score != null) {
+                rateCallback($(evt.target).parent(), successHandler);
+            } else {
+                //cancel rating
+            }
         },
         hints: ['Like'],
         starOff  : 'like-icon.png',
@@ -96,13 +110,12 @@ function galleryImageLoadFinish() {
 
 function refreshRating($container) {
         var form = $container.parent()
-        
-            if(form.length == 0) return;
-
-        var action = form.attr('action');
+        if(form.length == 0) return;
+        var url = "/rating/fetchRate/"+$container.data('id');
 
         $.ajax ({
-            url:action.replace('/rating/rate', '/rating/fetchRate'),
+            url:url,
+            data:{type:$container.data('type')},
             success: function(data, statusText, xhr) {
                 var imgRating = rate($container);            
                 updateRating(data.avg, data.noOfRatings, $container)
@@ -117,10 +130,7 @@ function refreshRating($container) {
 }
 
 function updateRating (avgrate, noofratings, imgRating, ratingContainer) {
-    console.log(imgRating);
-    console.log('updating rating'+avgrate);
     imgRating.raty('score', avgrate);
-    console.log(imgRating.raty('score'))
     if(!ratingContainer) 
         ratingContainer = imgRating.parent();
     if(ratingContainer.find('.like_rating').length != 0)
