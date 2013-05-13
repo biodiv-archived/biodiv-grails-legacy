@@ -28,6 +28,16 @@
 	</div>
 	<domain:showHeader model="['userGroupInstance':userGroupInstance]" />
          <div class="">
+<%
+String supportEmail = "";
+String domain = Utils.getDomain(request);
+if(domain.equals(grailsApplication.config.wgp.domain)) {
+	supportEmail = grailsApplication.config.speciesPortal.wgp.supportEmail;
+} else if(domain.equals(grailsApplication.config.ibp.domain)) {
+	supportEmail =  grailsApplication.config.speciesPortal.ibp.supportEmail;
+}
+%>
+
 
         <div id="contributeMenu" class="collapse">
                         <div class="container">
@@ -70,7 +80,6 @@
     </div>
 	<g:set var="fbAppId" value="" />
 	<%
-String domain = Utils.getDomain(request);
 if(domain.equals(grailsApplication.config.wgp.domain)) {
 	fbAppId = grailsApplication.config.speciesPortal.wgp.facebook.appId;
 } else { //if(domain.equals(grailsApplication.config.ibp.domain)) {

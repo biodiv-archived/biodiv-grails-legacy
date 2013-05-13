@@ -62,16 +62,6 @@
 	<div id="postToUGroup" class="overlay" style="display: none;">
         <i class="icon-plus"></i>
     </div>
-<%
-String supportEmail = "";
-String domain = Utils.getDomain(request);
-if(domain.equals(grailsApplication.config.wgp.domain)) {
-	supportEmail = grailsApplication.config.speciesPortal.wgp.supportEmail;
-} else if(domain.equals(grailsApplication.config.ibp.domain)) {
-	supportEmail =  grailsApplication.config.speciesPortal.ibp.supportEmail;
-}
-%>
-
 	<div id="species_main_wrapper" style="clear: both;">
 		<domain:showIBPHeader model="['userGroupInstance':userGroupInstance]" />
 

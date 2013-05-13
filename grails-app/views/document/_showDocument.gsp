@@ -15,7 +15,7 @@
 
 					<dt>File</dt>
 					<dd>
-						<g:if test="${showDetails}">
+						<g:if test="${!showDetails}">
 							<fileManager:displayFile
 								filePath="${ documentInstance?.uFile?.path}"></fileManager:displayFile>
 						</g:if>
@@ -40,7 +40,7 @@
 		</div>
 	</g:if>
 
-	<g:if test="${showDetails}">
+	<g:if test="${!showDetails}">
 		<div class="prop">
 			<span class="name">Type</span>
 			<div class="value">
