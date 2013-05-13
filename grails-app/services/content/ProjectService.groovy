@@ -1,6 +1,7 @@
 package content
 
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.transaction.annotation.Transactional;
@@ -12,6 +13,7 @@ import species.utils.Utils;
 
 
 
+import content.eml.Document;
 import content.eml.UFile;
 import content.eml.DocumentService;
 
@@ -24,6 +26,7 @@ class ProjectService {
 	def projectSearchService
 	
 	def documentService
+	def userGroupService
 	
 	def createProject(params) {
 
@@ -269,7 +272,7 @@ class ProjectService {
 		queryParams["offset"] = offset
 
 		paramsList.add('fl', params['fl']?:"id");
-		
+
 		//filters
 		if(params.tag) {
 			paramsList.add('fq', searchFieldsConfig.TAG+":"+params.tag);
@@ -336,6 +339,39 @@ class ProjectService {
 			return true;
 		return false;
 	}
+
+	
+	/**
+	 * Set usergroups to project and project documents also
+	 */
+	def setUserGroups(Project projectInstance, List userGroupIds) {
+		if(!projectInstance) return
+
+		def projInUserGroups = projectInstance.userGroups.collect { it.id + ""}
+		println projInUserGroups;
+		def toRemainInUserGroups =  projInUserGroups.intersect(userGroupIds);
+		if(userGroupIds.size() == 0) {
+			println 'removing project from usergroups'
+			userGroupService.removeProjectFromUserGroups(projectInstance, projInUserGroups);
+
+		} else {
+			userGroupIds.removeAll(toRemainInUserGroups)
+			userGroupService.postProjecttoUserGroups(projectInstance, userGroupIds);
+			projInUserGroups.removeAll(toRemainInUserGroups)
+			userGroupService.removeProjectFromUserGroups(projectInstance, projInUserGroups);
+		}
+		
+		//set usergroups to project documents
+		for(doc in projectInstance.proposalFiles)
+			documentService.setUserGroups(doc, userGroupIds)
+			
+		for(doc in projectInstance.reportFiles)
+			documentService.setUserGroups(doc, userGroupIds)
+			
+		for(doc in projectInstance.miscFiles)
+			documentService.setUserGroups(doc, userGroupIds)
+	}
+
 
 
 }

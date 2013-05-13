@@ -77,12 +77,24 @@ class DocumentSearchService {
 				doc.addField(searchFieldsConfig.ID, document.id.toString());
 				doc.addField(searchFieldsConfig.TITLE, document.title);
 				doc.addField(searchFieldsConfig.DESCRIPTION, document.description);
+				doc.addField(searchFieldsConfig.TYPE, document.type.value());
 				
+				if(document.attribution){
+					doc.addField(searchFieldsConfig.ATTRIBUTION, document.attribution);
+				}
+				
+				if(document.contributors){
+					doc.addField(searchFieldsConfig.CONTRIBUTOR, document.contributors);
+				}
 				
 				document.tags.each { tag ->
 					doc.addField(searchFieldsConfig.TAG, tag);
 				}
-					
+				
+				document.userGroups.each { userGroup ->
+					doc.addField(searchFieldsConfig.USER_GROUP, userGroup.id);
+					doc.addField(searchFieldsConfig.USER_GROUP_WEBADDRESS, userGroup.webaddress);
+				}
 				docs.add(doc);
 			
 		}

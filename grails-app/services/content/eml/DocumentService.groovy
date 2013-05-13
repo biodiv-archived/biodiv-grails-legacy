@@ -32,26 +32,26 @@ class DocumentService {
 
 	Document createDocument(params) {
 
-		
+
 		def document = new Document()
 		updateDocument(document, params)
-		
+
 		return document
 	}
 
-	
+
 	def updateDocument(document, params) {
-		
+
 		document.properties = params
 		document.coverage.location = 'POINT(' + params.coverage.longitude + ' ' + params.coverage.latitude + ')'
 		document.coverage.reverseGeocodedName = params.coverage.reverse_geocoded_name
 		document.coverage.locationAccuracy = params.coverage.location_accuracy
-		
-		
-		
+
+
+
 		document.license  = (new XMLConverter()).getLicenseByType(params.licenseName, false)
 		//document.license = License.findByName(License.LicenseType(params.licenseName))
-			
+
 		if(params.description) {
 			def description = params.description.trim()
 			if(description)
@@ -59,7 +59,7 @@ class DocumentService {
 			else
 				document.description = null
 		}
-		
+
 		if(params.contributors) {
 			def contributors = params.contributors.trim()
 			if(contributors)
@@ -67,7 +67,7 @@ class DocumentService {
 			else
 				document.contributors = null
 		}
-		
+
 		if(params.attribution) {
 			def attribution = params.attribution.trim()
 			if(attribution)
@@ -75,7 +75,7 @@ class DocumentService {
 			else
 				document.attribution = null
 		}
-					
+
 
 		document.coverage.speciesGroups = []
 		params.speciesGroup.each {key, value ->
@@ -88,8 +88,8 @@ class DocumentService {
 			document.coverage.addToHabitats(Habitat.read(value.toLong()));
 		}
 	}
-	
-	
+
+
 	def setUserGroups(Document documentInstance, List userGroupIds) {
 		if(!documentInstance) return
 
@@ -121,65 +121,71 @@ class DocumentService {
 
 		def docs = []
 		def docsList = (params.docs != null) ? Arrays.asList(params.docs) : new ArrayList()
-		
+
 		for(docId in docsList) {
 			def documentInstance = Document.get(docId)
-				
-				if(params."${docId}.title") {
-					documentInstance.title = params."${docId}.title"
-				}
 
-				if(params."${docId}.description") {
-					documentInstance.description = params."${docId}.description"
-				}
+			if(params."${docId}.title") {
+				documentInstance.title = params."${docId}.title"
+			}
 
-				if(params."${docId}.contributors") {
-					documentInstance.contributors = params."${docId}.contributors"
-				}
+			if(params."${docId}.description") {
+				documentInstance.description = params."${docId}.description"
+			}
 
-				if(params."${docId}.attribution") {
-					documentInstance.attribution = params."${docId}.attribution"
-				}
+			if(params."${docId}.contributors") {
+				documentInstance.contributors = params."${docId}.contributors"
+			}
 
-				if(params."${docId}.license") {
-					documentInstance.license = params."${docId}.license"
-				}
-				
-				if(params."${docId}.licenseName") {
-					documentInstance.license  = (new XMLConverter()).getLicenseByType(params."${docId}.licenseName", false)
-				}
+			if(params."${docId}.attribution") {
+				documentInstance.attribution = params."${docId}.attribution"
+			}
+
+			if(params."${docId}.license") {
+				documentInstance.license = params."${docId}.license"
+			}
+
+			if(params."${docId}.licenseName") {
+				documentInstance.license  = (new XMLConverter()).getLicenseByType(params."${docId}.licenseName", false)
+			}
 
 
-				if(params."${docId}.tags") {
-					def tags = (params."${docId}.tags" != null) ? Arrays.asList(params."${docId}.tags") : new ArrayList();
-					documentInstance.setTags(tags);
-				}
-				
-				if(params."${docId}.deleted") {
+			if(params."${docId}.tags") {
+				def tags = (params."${docId}.tags" != null) ? Arrays.asList(params."${docId}.tags") : new ArrayList();
+				documentInstance.setTags(tags);
+			}
+
+			if(params."${docId}.deleted") {
 				//	TODO: Actual delete should be handled by parent form controllers.
-					documentInstance.deleted = (params."${docId}.deleted").toBoolean()
-				}
+				documentInstance.deleted = (params."${docId}.deleted").toBoolean()
+			}
 
-				if(params."sourceHolderId") {
-					documentInstance.sourceHolderId = params.sourceHolderId
-				}
+			if(params."sourceHolderId") {
+				documentInstance.sourceHolderId = params.sourceHolderId
+			}
 
-				if(params."sourceHolderType") {
-					documentInstance.sourceHolderType = params.sourceHolderType
-				}
+			if(params."sourceHolderType") {
+				documentInstance.sourceHolderType = params.sourceHolderType
+			}
+
+			//set usergroup from parent
+			
+			if(params.userGroup) {
+				
+			}
 
 
-				if (documentInstance.save(flush: true)) {
-					//flash.message = "${message(code: 'default.created.message', args: [message(code: 'UFile.label', default: 'UFile'), uFileInstance.id])}"
-					log.info "documentInstance saved" + documentInstance.dump()
-				}
-				else {
-					flash.message = "${message(code: 'error')}";
-					documentInstance.errors.allErrors.each { log.error it }
-					def errorMsg = "Errors in saving documentInstance"
-					throw new GrailsTagException(errorMsg)
-				}
-	
+			if (documentInstance.save(flush: true)) {
+				//flash.message = "${message(code: 'default.created.message', args: [message(code: 'UFile.label', default: 'UFile'), uFileInstance.id])}"
+				log.info "documentInstance saved" + documentInstance.dump()
+			}
+			else {
+				flash.message = "${message(code: 'error')}";
+				documentInstance.errors.allErrors.each { log.error it }
+				def errorMsg = "Errors in saving documentInstance"
+				throw new GrailsTagException(errorMsg)
+			}
+
 			log.info "Document properties updated from form: "+ documentInstance.dump()
 			docs.add(documentInstance)
 		}
@@ -253,7 +259,27 @@ class DocumentService {
 			queryParams["tagType"] = GrailsNameUtils.getPropertyName(Document.class)
 			activeFilters["tag"] = params.tag
 		}
+<<<<<<< ours
+
+
+
+=======
 		
+		if(params.uGroup) {
+			if(params.uGroup == "THIS_GROUP") {
+				String uGroup = params.webaddress
+				if(uGroup) {
+					paramsList.add('fq', searchFieldsConfig.USER_GROUP_WEBADDRESS+":"+uGroup);
+				}
+				queryParams["uGroup"] = params.uGroup
+				activeFilters["uGroup"] = params.uGroup
+			} else {
+				queryParams["uGroup"] = "ALL"
+				activeFilters["uGroup"] = "ALL"
+			}
+		}
+		
+>>>>>>> theirs
 		log.debug "Along with faceting params : "+paramsList;
 		try {
 			def queryResponse = documentSearchService.search(paramsList);
@@ -350,6 +376,18 @@ class DocumentService {
 			queryParams["tagType"] = GrailsNameUtils.getPropertyName(Document.class)
 			activeFilters["tag"] = params.tag
 		}
+		
+		if(params.webaddress) {
+			def userGroupInstance = userGroupService.get(params.webaddress)
+			if(userGroupInstance){
+				queryParams['userGroup'] = userGroupInstance
+				//queryParams['isDeleted'] = false;
+		
+				query += " join document.userGroups userGroup "
+				filterQuery += " and userGroup=:userGroup "
+			}
+		}
+		
 		
 //
 //		if(params.keywords) {
