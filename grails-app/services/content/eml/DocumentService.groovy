@@ -259,11 +259,7 @@ class DocumentService {
 			queryParams["tagType"] = GrailsNameUtils.getPropertyName(Document.class)
 			activeFilters["tag"] = params.tag
 		}
-<<<<<<< ours
 
-
-
-=======
 		
 		if(params.uGroup) {
 			if(params.uGroup == "THIS_GROUP") {
@@ -279,7 +275,6 @@ class DocumentService {
 			}
 		}
 		
->>>>>>> theirs
 		log.debug "Along with faceting params : "+paramsList;
 		try {
 			def queryResponse = documentSearchService.search(paramsList);

@@ -281,33 +281,22 @@ class ProjectService {
 			activeFilters["tag"] = params.tag
 		}
 	
-//		if(params.name) {
-//			paramsList.add('fq', searchFieldsConfig.NAME+":"+params.name);
-//			queryParams["name"] = params.name
-//			activeFilters["name"] = params.name
-//		}
-//
-//		if(params.uGroup) {
-//			if(params.uGroup == "THIS_GROUP") {
-//				String uGroup = params.webaddress
-//				if(uGroup) {
-//					//AS we dont have selecting species for group ... we are ignoring this filter
-//					//paramsList.add('fq', searchFieldsConfig.USER_GROUP_WEBADDRESS+":"+uGroup);
-//				}
-//				queryParams["uGroup"] = params.uGroup
-//				activeFilters["uGroup"] = params.uGroup
-//			} else {
-//				queryParams["uGroup"] = "ALL"
-//				activeFilters["uGroup"] = "ALL"
-//			}
-//		}
-//
-//		if(params.query && params.startsWith && params.startsWith != "A-Z"){
-//			params.query = params.query + " AND "+searchFieldsConfig.TITLE+":"+params.startsWith+"*"
-//			//paramsList.add('fq', searchFieldsConfig.TITLE+":"+params.startsWith+"*");
-//			queryParams["startsWith"] = params.startsWith
-//			activeFilters["startsWith"] = params.startsWith
-//		}
+
+		if(params.uGroup) {
+			if(params.uGroup == "THIS_GROUP") {
+				String uGroup = params.webaddress
+				if(uGroup) {
+					//AS we dont have selecting species for group ... we are ignoring this filter
+					//paramsList.add('fq', searchFieldsConfig.USER_GROUP_WEBADDRESS+":"+uGroup);
+				}
+				queryParams["uGroup"] = params.uGroup
+				activeFilters["uGroup"] = params.uGroup
+			} else {
+				queryParams["uGroup"] = "ALL"
+				activeFilters["uGroup"] = "ALL"
+			}
+		}
+
 
 		log.debug "Along with faceting params : "+paramsList;
 		try {

@@ -25,10 +25,17 @@
 			name="aq.corridor"
 			placeholder="Search by Corridior" value="${(queryParams?.get('aq.corridor'))?.encodeAsHTML()}" />
 			
-		<label class="control-label" for="keywords">Tags</label> <input id="aq.tag"
+		<label class="control-label" for="tags">Tags</label> <input id="aq.tag"
 			data-provide="typeahead" type="text" class="input-block-level"
 			name="aq.tag"
-			placeholder="Search by Keywords" value="${(queryParams?.get('aq.tag'))?.encodeAsHTML()}" />
+			placeholder="Search by Tags" value="${(queryParams?.get('aq.tag'))?.encodeAsHTML()}" />
+			
+					<div style="${params.webaddress?:'display:none;'}">
+		<label class="radio inline"> <input type="radio" id="uGroup_ALL" name="uGroup" 
+			value="ALL"> Search in all groups </label> <label
+			class="radio inline"> <input type="radio" id="uGroup_THIS_GROUP" name="uGroup" 
+			value="THIS_GROUP"> Search within this group </label>
+		</div>
 
 	<%--		<g:hiddenField name="offset" value="0" />--%>
 	<%--	<g:hiddenField name="max" value="12" /> --%>

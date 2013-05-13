@@ -32,10 +32,10 @@
 			type="text" class="input-block-level" name="aq.attribution" value="${(queryParams?.get('aq.attribution'))?.encodeAsHTML() }"
 			placeholder="Field to search all attributions" />
 
-		<label class="control-label" for="keywords">Tags</label> <input
+		<label class="control-label" for="tags">Tags</label> <input
 			id="aq.tag" data-provide="typeahead" type="text"
 			class="input-block-level" name="aq.tag"
-			placeholder="Search by Keywords" value="${(queryParams?.get('aq.tag'))?.encodeAsHTML()}" />
+			placeholder="Search by Tags" value="${(queryParams?.get('aq.tag'))?.encodeAsHTML()}" />
 			
 		<div style="${params.webaddress?:'display:none;'}">
 		<label class="radio inline"> <input type="radio" id="uGroup_ALL" name="uGroup" 

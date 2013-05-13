@@ -216,6 +216,10 @@
 			multiValued="true" />
 
 		<field name="tag" type="string" indexed="true" required="false" multiValued="true" />
+		
+		
+		<field name="group" type="long" indexed="true" stored="true"  multiValued="true"/>
+		<field name="group_webaddress" type="string" indexed="true" stored="true" multiValued="true"/>
 
 
 		<field name="text" type="text" indexed="true" stored="true"

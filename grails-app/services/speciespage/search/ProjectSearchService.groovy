@@ -89,6 +89,11 @@ class ProjectSearchService {
 					doc.addField(searchFieldsConfig.TAG, tag);
 				}
 					
+				
+				proj.userGroups.each { userGroup ->
+					proj.addField(searchFieldsConfig.USER_GROUP, userGroup.id);
+					proj.addField(searchFieldsConfig.USER_GROUP_WEBADDRESS, userGroup.webaddress);
+				}
 				docs.add(doc);
 			
 		}
