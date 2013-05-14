@@ -129,19 +129,29 @@ class Project implements Taggable{
 		return title
 	}
 
+	/**
+	 * Update project documents
+	 * @return
+	 */
 	def updateDocuments(){
-		proposalFiles.each {
-			it.setSource(this)
-			it.save(flush:true)
+		proposalFiles.each { doc->
+			doc.setSource(this)
+			doc.save(flush:true)
+			this.userGroups.each{it.addToDocuments(doc)}
 		}
-		miscFiles.each {
-			it.setSource(this)
-			it.save(flush:true)
+		reportFiles.each {doc ->
+			doc.setSource(this)
+			doc.save(flush:true)
+			this.userGroups.each{it.addToDocuments(doc)}			
+			
 		}
-		proposalFiles.each {
-			it.setSource(this)
-			it.save(flush:true)
+		miscFiles.each { doc->
+			doc.setSource(this)
+			doc.save(flush:true)
+			this.userGroups.each{it.addToDocuments(doc)}
+						
 		}
+
 	}	
 
 }

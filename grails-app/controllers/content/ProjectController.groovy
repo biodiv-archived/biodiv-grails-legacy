@@ -5,6 +5,7 @@ import grails.converters.JSON
 import content.Location
 import grails.plugins.springsecurity.Secured
 import org.grails.taggable.*
+import species.groups.UserGroup
 
 class ProjectController {
 
@@ -60,22 +61,13 @@ class ProjectController {
 			flash.message = "${message(code: 'default.created.message', args: [message(code: 'project.label', default: 'Project'), projectInstance.id])}"
 			projectInstance.setTags(tags);
 
-			if(params.groupsWithSharingNotAllowed) {
-				projectService.setUserGroups(projectInstance, [
-					params.groupsWithSharingNotAllowed
-				]);
-			} else {
-				if(params.userGroupsList) {
-					def userGroups = (params.userGroupsList != null) ? params.userGroupsList.split(',').collect{k->k} : new ArrayList();
-
-					projectService.setUserGroups(projectInstance, userGroups);
-				}
-			}
+			//XXX: Hard coding project groups to western ghats currently
+			def userGroup = UserGroup.findByName('The Western Ghats')
+			userGroup.addToProjects(projectInstance)
 			
 			params.sourceHolderId = projectInstance.id
 			params.sourceHolderType = projectInstance.class.getCanonicalName()
 			projectInstance.updateDocuments()
-			//def uFiles = UFileService.updateUFiles(params)
 			redirect(action: "show", id: projectInstance.id)
 		}
 		else {

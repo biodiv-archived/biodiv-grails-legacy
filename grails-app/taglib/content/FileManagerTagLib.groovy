@@ -91,10 +91,10 @@ class FileManagerTagLib {
 
 			case "PDF":
 							
-				out <<'<a href='+path+'><span class="pdficon" style="display:inline-block; margin-left: 5px; margin-right:5px;"></span>'+ fileName +'</a>' 
+				out <<'<a href='+path+' target="_blank"><span class="pdficon" style="display:inline-block; margin-left: 5px; margin-right:5px;"></span>'+ fileName +'</a>' 
 					break
 			default:
-				out <<'<a href='+path+'>'+ fileName +'</a>' 
+				out <<'<a href='+path+' target="_blank">'+ fileName +'</a>' 
 				 break
 		  }
 		}else{
