@@ -246,8 +246,8 @@ speciesPortal {
 	}
 
 	content{
-		rootDir = "${app.rootDir}/contents"
-		serverURL = "http://localhost/${appName}/contents"
+		rootDir = "${app.rootDir}/content"
+		serverURL = "http://localhost/${appName}/content"
 		MAX_DOC_SIZE = 10*1024*1024 //10 mb
 		MAX_IMG_SIZE = 2*1024*1024 // 2mb
 	}	
@@ -616,8 +616,8 @@ environments {
 				serverURL = "http://indiabiodiversity.saturn.strandls.com/${appName}/users"
 			}
 			content{
-				rootDir = "${app.rootDir}/contents"
-				serverURL = "http://indiabiodiversity.saturn.strandls.com/${appName}/contents"
+				rootDir = "${app.rootDir}/content"
+				serverURL = "http://indiabiodiversity.saturn.strandls.com/${appName}/content"
 			}	
 
 			search.serverURL="http://saturn.strandls.com:8080/solrPamba"
@@ -695,8 +695,8 @@ environments {
 			}
 
 			content{
-				rootDir = "${app.rootDir}/contents"
-				serverURL = "http://thewesternghats.in/${appName}/contents"
+				rootDir = "${app.rootDir}/content"
+				serverURL = "http://thewesternghats.in/${appName}/content"
 			}	
 
 			search.serverURL="http://thewesternghats.in:8080/solr"

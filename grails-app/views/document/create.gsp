@@ -60,8 +60,7 @@ input.dms_field {
 
 
 		<form id="documentForm" action="${form_action}" method="POST"
-				onsubmit="document.getElementById('documentFormSubmit').disabled = 1;"
-		
+			onsubmit="document.getElementById('documentFormSubmit').disabled = 1;"
 			class="form-horizontal">
 
 			<div class="span12 super-section" style="margin-left: 0px;">
@@ -72,7 +71,8 @@ input.dms_field {
 						<label class="control-label" for="type"><g:message
 								code="document.type.label" default="Type" /><span class="req">*</span></label>
 						<div class="controls">
-							<g:select name="type" class="input-block-level" placeholder="Select document type"
+							<g:select name="type" class="input-block-level"
+								placeholder="Select document type"
 								from="${content.eml.Document$DocumentType?.values()}"
 								keys="${content.eml.Document$DocumentType?.values()*.value()}"
 								value="${documentInstance?.type?.value()}" />
@@ -86,7 +86,8 @@ input.dms_field {
 								code="document.title.label" default="Title" /><span class="req">*</span></label>
 						<div class="controls">
 
-							<input type="text" class="input-block-level" name="title" placeholder="Enter the title for the document"
+							<input type="text" class="input-block-level" name="title"
+								placeholder="Enter the title for the document"
 								value="${documentInstance?.title}" required />
 
 							<div class="help-inline">
@@ -110,7 +111,9 @@ input.dms_field {
 
 							</div>
 							<div class="span1">(OR)</div>
-							<div class="span6 control-group ${hasErrors(bean: documentInstance, field: 'uri', 'error')}" style="width: 480px;">
+							<div
+								class="span6 control-group ${hasErrors(bean: documentInstance, field: 'uri', 'error')}"
+								style="width: 480px;">
 								<label class="control-label" for="uri" style="width: 40px;">URL</label>
 								<div class="controls" style="margin-left: 55px;">
 									<input type="text" class="input-block-level" name="uri"
@@ -132,7 +135,8 @@ input.dms_field {
 						<label class="control-label" for="contributors">Contributors</label>
 						<div class="controls">
 							<g:textField name="contributors" class="input-block-level"
-								value="${documentInstance?.contributors }" placeholder="Enter the contirbutors for the document"/>
+								value="${documentInstance?.contributors }"
+								placeholder="Enter the contirbutors for the document" />
 						</div>
 					</div>
 
@@ -142,7 +146,8 @@ input.dms_field {
 						class="control-group ${hasErrors(bean: documentInstance, field: 'attribution', 'error')}">
 						<label class="control-label" for="attribution">Attribution</label>
 						<div class="controls">
-							<g:textField name="attribution" class="input-block-level" placeholder="Enter the attribution to be given for this document"
+							<g:textField name="attribution" class="input-block-level"
+								placeholder="Enter the attribution to be given for this document"
 								value="${documentInstance?.attribution}" />
 						</div>
 					</div>
@@ -155,15 +160,13 @@ input.dms_field {
 
 							<div id="licenseDiv" class="licence_div dropdown">
 
-								<a id="selected_license"
-									class="btn dropdown-toggle btn-mini" data-toggle="dropdown">
-									<img
+								<a id="selected_license" class="btn dropdown-toggle btn-mini"
+									data-toggle="dropdown"> <img
 									src="${documentInstance.license?resource(dir:'images/license',file:documentInstance.license.name.getIconFilename()+'.png'):resource(dir:'images/license',file:'cc_by.png', absolute:true)}"
 									title="Set a license for this file" /> <b class="caret"></b>
 								</a>
 
-								<ul id="license_options"
-									class="dropdown-menu license_options">
+								<ul id="license_options" class="dropdown-menu license_options">
 									<span>Choose a license</span>
 									<g:each in="${species.License.list()}" var="l">
 										<li class="license_option"
@@ -175,9 +178,10 @@ input.dms_field {
 										</li>
 									</g:each>
 								</ul>
-								
-								<input id="license" type="hidden" name="licenseName" value="${documentInstance.license?.name?.value()}"></input>
-								
+
+								<input id="license" type="hidden" name="licenseName"
+									value="${documentInstance.license?.name?.value()}"></input>
+
 							</div>
 						</div>
 					</div>
@@ -189,22 +193,25 @@ input.dms_field {
 						<label class="control-label" for="description">Description
 						</label>
 						<div class="controls">
-	
-                                                        <textarea id="description" name="description" placeholder="Write a small description about the document.">${documentInstance?.description}</textarea>
-                                                        
-                                                        <script type='text/javascript'>
+
+							<textarea id="description" name="description"
+								placeholder="Write a small description about the document.">
+								${documentInstance?.description}
+							</textarea>
+
+							<script type='text/javascript'>
                                                                 CKEDITOR.plugins.addExternal( 'confighelper', '${request.contextPath}/js/ckeditor/plugins/confighelper/' );
                                                                 
                                                                 var config = { extraPlugins: 'confighelper', toolbar:'EditorToolbar', toolbar_EditorToolbar:[[ 'Bold', 'Italic' ]]};
                                                                 CKEDITOR.replace('description', config);
                                                         </script>
-                                                        <div class="help-inline">
-                                                                <g:hasErrors bean="${userGroupInstance}" field="description">
-                                                                        <g:eachError bean="${userGroupInstance}" field="description">
-                                                                                <li><g:message error="${it}" /></li>
-                                                                        </g:eachError>
-                                                                </g:hasErrors>
-                                                        </div>
+							<div class="help-inline">
+								<g:hasErrors bean="${userGroupInstance}" field="description">
+									<g:eachError bean="${userGroupInstance}" field="description">
+										<li><g:message error="${it}" /></li>
+									</g:eachError>
+								</g:hasErrors>
+							</div>
 
 						</div>
 
@@ -238,7 +245,24 @@ input.dms_field {
 
 
 
-
+			<uGroup:isUserGroupMember>
+				<div class="span12 super-section"
+					style="clear: both; margin-left: 0px;">
+					<div class="section" style="position: relative; overflow: visible;">
+						<h3>Post to User Groups</h3>
+						<div>
+							<%
+                  def docActionMarkerClass = (params.action == 'create' || params.action == 'save')? 'create' : '' 
+                %>
+							<div id="userGroups" class="${docActionMarkerClass}"
+								name="userGroups" style="list-style: none; clear: both;">
+								<uGroup:getCurrentUserUserGroups
+									model="['observationInstance':documentInstance]" />
+							</div>
+						</div>
+					</div>
+				</div>
+			</uGroup:isUserGroupMember>
 
 
 
