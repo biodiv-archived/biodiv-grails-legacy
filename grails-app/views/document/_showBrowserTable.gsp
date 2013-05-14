@@ -34,36 +34,38 @@
 				</td>
 				<%
 
-	def className = documentInstance.sourceHolderType
+                                def className = documentInstance.sourceHolderType
 
-									def id = documentInstance.sourceHolderId
-												def controller = 'project'
+                                def id = documentInstance.sourceHolderId
+                                def controller = 'project'
+                                String title = ""
 
+                                switch(className) {
+                                    case Project.class.getCanonicalName():
+                                        controller = 'project'
+                                        title="Project : "
+                                        break
 
-	switch(className) {
-		case Project.class.getCanonicalName():
-			controller = 'project'
-			break
+                                    default:
+                                        className = 'document'
+                                        id = documentInstance.id
+                                        controller = 'document'
+                                        title = "Document : "
+                                        break
+                                }
 
-		default:
-			className = 'document'
-			id = documentInstance.id
-			controller = 'document'
-			break
-	}
-									
-								def sourceObj = grailsApplication.getArtefact("Domain",className)?.getClazz()?.read(id)
-								//XXX Needs to be made generic.
-	
-	def parentLink = uGroup.createLink(controller: controller, action:"show", id:id, 'userGroupWebaddress':params?.webaddress)
+                                def sourceObj = grailsApplication.getArtefact("Domain",className)?.getClazz()?.read(id)
+                                //XXX Needs to be made generic.
+
+                                def parentLink = uGroup.createLink(controller: controller, action:"show", id:id, 'userGroupWebaddress':params?.webaddress)
  %>
 
 				<td><g:if test="${sourceObj}">
 
-						<a href="${parentLink}"> ${sourceObj}</a>
+                                    <a href="${parentLink}"> <span class="name" style="color: #b1b1b1;">${title}</span>${sourceObj}</a>
 
 					</g:if> <g:else>
-Generic
+
 </g:else></td>
 
 

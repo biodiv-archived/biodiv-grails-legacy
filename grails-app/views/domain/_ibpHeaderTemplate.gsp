@@ -41,24 +41,26 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 
         <div id="contributeMenu" class="collapse">
                         <div class="container">
-                            <ul style="list-style:none;">
-                                <li>
-                                Do you have an interesting picture of a species ... you can share it by uploading it here
-                                <a class="btn btn-success"
+    <a class="btn btn-success" data-toggle="popover" data-placement="right" data-content=" If you are an expert or a researcher interested in species and have any scientific information regarding species please share them with us here." data-trigger="hover"
                                     href="${uGroup.createLink(
-                                    controller:'observation', action:'create', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}" class="btn btn-info"> <i class="icon-plus"></i>Add an Observation</a>
-                                </li>
-                                <li>
-                                or have any document related to biodiversity like any project report or presentations or posters share them here
-                                <a class="btn btn-success"
+                                    controller:'species', action:'contribute', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}" data-original-title="Contribute to Species pages" title="Contribute to Species pages"> <i class="icon-plus"></i>Contribute to Species pages</a>
+
+                                <a class="btn btn-success" data-toggle="popover" data-placement="right" data-content="Do you have an interesting picture of a species ... you can share it by uploading it here" data-trigger="hover"
+                                    href="${uGroup.createLink(
+                                    controller:'observation', action:'create', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}" data-original-title="Add an Observation" title="Add an Observation"> <i class="icon-plus"></i>Add an Observation</a>
+                                <a class="btn btn-success" data-toggle="popover" data-placement="right" data-content="
+                                    Have any biodiversity related document like project reports or presentations or posters share them here" data-trigger="hover"
                                     href="${uGroup.createLink(
                                     controller:'document', action:'create', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"
-                                    class="btn btn-info" title="Add Document">
+                                    data-original-title="Add Document" title="Add Document">
                                     <i class="icon-plus"></i> Add Document
                                 </a>
-                                </li>
-                                <li>Every small bit of information helps in planning biodiversity conservation. So please contribute and if you have any suggestions or feedback please don't hesistate in share it with us at <span class="mailme">${supportEmail}</span>
-                                </li>
+                                <a class="btn btn-success" data-toggle="popover" data-placement="right" data-content="
+                                    Have any suggestions or feedback for improvements tell us here" data-trigger="hover"
+                                    href="/feedback_form"
+                                    data-original-title="Provide Feedback" title="Provide Feedback">
+                                    <i class="icon-plus"></i> Provide Feedback
+                                </a>
                             </ul>
                         </div>
 

@@ -1,5 +1,4 @@
-
-
+<%@page import="java.util.Arrays"%>
 <%@ page import="content.eml.Document"%>
 <html>
 <head>
@@ -216,7 +215,12 @@ input.dms_field {
 						</div>
 
 					</div>
-
+					<%
+							def docTags = documentInstance?.tags
+							if(params.action == 'save' && params.tags){
+								docTags = Arrays.asList(params.tags)
+							}				
+					%>
 					<div
 						class="control-group ${hasErrors(bean: documentInstance, field: 'tags', 'error')}">
 						<label class="control-label" for='tags'> <i
@@ -225,7 +229,7 @@ input.dms_field {
 						<div class="controls">
 							<ul class='file-tags' id="tags" name="tags">
 								<g:if test='${documentInstance}'>
-									<g:each in="${documentInstance?.tags}" var="tag">
+									<g:each in="${docTags}" var="tag">
 										<li>
 											${tag}
 										</li>
