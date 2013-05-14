@@ -68,7 +68,6 @@ class UserGroupService {
 	def activityFeedService;
 
 
-
 	private void addPermission(UserGroup userGroup, SUser user, int permission) {
 		addPermission userGroup, user, aclPermissionFactory.buildFromMask(permission)
 	}
@@ -1193,6 +1192,11 @@ class UserGroupService {
 		//TODO
 		return projectInstance.userGroups;
 	}
-
-
+	
+	//XXX same call from taglib leadind to no session errro. to avoid that puttins same checkin in service and exposing through domain object 
+	def boolean hasPermission(object, permission){
+		def secTagLib = grailsApplication.mainContext.getBean('species.CustomSecurityAclTagLib');
+		return secTagLib.hasPermission(['permission':permission, 'object':object], 'permitted')
+	}
+	
 }

@@ -282,8 +282,8 @@ class UserGroup implements Taggable {
 	}
 
 	//TODO:remove
-	boolean hasPermission(SUser user, Permission permission) {
-		return aclUtilService.hasPermission(gormUserDetailsService.loadUserByUsername(user.email, true), this, permission)
+	boolean hasPermission(permission) {
+		return userGroupService.hasPermission(this, permission);
 	}
 
 	private getUserList(int max, long offset, String sortBy, roleId){

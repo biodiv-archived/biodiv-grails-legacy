@@ -149,4 +149,9 @@ class CustomSecurityAclTagLib extends SecurityAclTagLib {
 		}
 		return isPermitted;
 	}
+	
+	boolean hasPermission(attrs, String tagName) {
+		return super.hasPermission(attrs, tagName)
+	}
+	
 }
