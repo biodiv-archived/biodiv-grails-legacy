@@ -277,5 +277,7 @@ function last_actions() {
 	//applying table sorting
 	$("table.tablesorter").tablesorter();
         rating();
+
+        $("#contributeMenu .btn").popover();
 }
 

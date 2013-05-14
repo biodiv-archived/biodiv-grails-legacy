@@ -25,7 +25,7 @@
 	<div class="navbar-inner"
 		style="box-shadow: none; background-color: transparent; background-image: none;">
 		<div class="container outer-wrapper"
-			style="background-color: transparent; padding-bottom: 0px;">
+			style="background-color: transparent; padding-bottom: 0px;text-align:center;">
 			<g:if test="${userGroupInstance && userGroupInstance.id}">
 
 				<ul class="nav pull-left">
@@ -59,7 +59,7 @@
 
 
 				</ul>
-                                <ul class="nav" style="background-color:whitesmoke;">
+                                <ul class="nav" style="background-color:whitesmoke;float:none;display:inline-block;">
                                     <li>
                                     <a href="#contributeMenu" data-toggle="collapse">
                                         <i class="icon-list"></i>
@@ -100,7 +100,7 @@
                                                     <li
                                                     class="${((params.controller == 'document' && params.action == 'browser') ||(params.controller == 'browser'))?' active':''}"><a
                                                         href="${uGroup.createLink('controller':'document', 'action':'browser', 'userGroup':userGroupInstance)}"
-                                                        title="Document Browser">Document Browser</a>
+                                                        title="Documents">Documents</a>
                                                     </li>
 
                                                     <li
@@ -136,7 +136,7 @@
 <%--						class="${(params.controller == 'chart')?'active':''}"><a--%>
 <%--						href='${uGroup.createLink("controller":"chart")}' title="Stats">Stats</a></li>--%>
 				</ul>
-                                <ul class="nav" style="background-color:whitesmoke;">
+                                <ul class="nav" style="background-color:whitesmoke;float:none;display:inline-block;">
                                     <li>
                                     <a href="#contributeMenu" data-toggle="collapse">
                                         <i class="icon-list"></i>
@@ -174,6 +174,13 @@
 							<li
 								class="${(request.getHeader('referer')?.contains('/biodiversity_news') && params.action == 'header')?' active':''}"><a
 								href="/biodiversity_news" title="News">News</a></li>
+
+                                                        <li
+                                                        class="${((params.controller == 'document' && params.action == 'browser') ||(params.controller == 'browser'))?' active':''}"><a
+                                                            href="${uGroup.createLink('controller':'document', 'action':'browser', 'userGroup':userGroupInstance)}"
+                                                            title="Documents">Documents</a>
+                                                        </li>
+
 							
 							<li
 								class="${(params.controller == 'chart')?' active':''}"><a

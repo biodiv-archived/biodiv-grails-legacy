@@ -1137,6 +1137,7 @@ span.cke_skin_kama {
 .notes_view { /* clear: both; */
 	background-color: #fdfdfd;
 	padding: 10px;
+        word-wrap:break-word;
 }
 
 #wg_logo {
