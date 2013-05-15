@@ -31,24 +31,6 @@
 <r:require modules="observations_list" />
 <!-- script src="http://cdn.wibiya.com/Toolbars/dir_1100/Toolbar_1100354/Loader_1100354.js" type="text/javascript"></script><noscript><a href="http://www.wibiya.com/">Web Toolbar by Wibiya</a></noscript-->
 <g:set var="userGroupInstance" value="${userGroupInstance}"/>
-<%
-	//TODO: conditions needs to be cleaned 
-		if(!userGroupInstance) {
-			if(userGroup) {
-				userGroupInstance = userGroup
-			} else if(params.userGroup) {
-				if(params.userGroup instanceof UserGroup) {
-					userGroupInstance = params.userGroup	
-				} else {
-					userGroupInstance = UserGroup.get(params.long('userGroup'));
-				}
-			} else if(params.webaddress) {
-				userGroupInstance = UserGroup.findByWebaddress(params.webaddress);
-			} else if(params.userGroupWebaddress) {
-				userGroupInstance = UserGroup.findByWebaddress(params.userGroupWebaddress);
-			}
-		}
-	%>
 <g:if test="${userGroupInstance && userGroupInstance.theme}">
 	<link rel="stylesheet" type="text/css"
 		href="${resource(dir:'group-themes', file:userGroupInstance.theme + '.css')}" />
@@ -80,8 +62,6 @@
 
 	</div>
 	<div id="feedback_button" onclick="location.href='/feedback_form';" style="left: -10px;"></div>
-
-
 	<r:layoutResources />
 </body>
 </html>

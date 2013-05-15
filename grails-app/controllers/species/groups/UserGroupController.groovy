@@ -1124,9 +1124,11 @@ class UserGroupController {
 	   return [oldUsers, newUsers]
    }
    
-   
+   @Secured(['ROLE_USER'])
    def test = {
-	   render generateLink("observation", "list", [userGroup:UserGroup.read(2)], [], request);
+	   //println userGroupService.hasPermission(UserGroup.read(1), org.springframework.security.acls.domain.BasePermission.WRITE)
+	   //['userGroupInstance':UserGroup.read(1)]
+	   //render (view:"layouts/main.gsp", model:['userGroupInstance':UserGroup.read(1)])
    } 
    
 	   
