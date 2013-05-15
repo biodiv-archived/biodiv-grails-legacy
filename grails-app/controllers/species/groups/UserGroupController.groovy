@@ -1123,13 +1123,7 @@ class UserGroupController {
 	   }
 	   return [oldUsers, newUsers]
    }
-   
-   
-   def test = {
-	   render generateLink("observation", "list", [userGroup:UserGroup.read(2)], [], request);
-   } 
-   
-	   
+      
 }
 
 class UserGroupCommand {

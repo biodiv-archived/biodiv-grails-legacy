@@ -1,6 +1,9 @@
 package species
 
+import grails.util.Environment;
+
 import species.utils.Utils;
+import species.groups.UserGroup;
 
 class SecurityFilters {
 
@@ -23,11 +26,39 @@ class SecurityFilters {
 //				   }
 				
             }
-            after = {
-				
+            after = { model ->
+				//setting user group and permission for view
+				if(model){
+					def userGroupInstance = model.userGroupInstance
+					def userGroup = model.userGroup
+					if(!userGroupInstance) {
+						if(userGroup) {
+							userGroupInstance = userGroup
+						} else if(params.userGroup) {
+							if(params.userGroup instanceof UserGroup) {
+								userGroupInstance = params.userGroup
+							} else {
+								userGroupInstance = UserGroup.get(params.long('userGroup'));
+							}
+						} else if(params.webaddress) {
+							userGroupInstance = UserGroup.findByWebaddress(params.webaddress);
+						} else if(params.userGroupWebaddress) {
+							userGroupInstance =UserGroup.findByWebaddress(params.userGroupWebaddress);
+						}
+					}
+					
+					if(userGroupInstance){
+						model.userGroupInstance = userGroupInstance
+						def secTagLib = grailsApplication.mainContext.getBean('species.CustomSecurityAclTagLib');
+						model.canEditUserGroup = secTagLib.hasPermission(['permission':org.springframework.security.acls.domain.BasePermission.WRITE, 'object':userGroupInstance], 'permitted')
+					}
+				}
+				if (!Environment.getCurrent().getName().startsWith("pamba")) {
+					log.debug "before view rendering "
+				}  
             }
+			
             afterView = {
-                
             }
         }
     }
