@@ -1,5 +1,7 @@
 package species
 
+import grails.util.Environment;
+
 import species.utils.Utils;
 import species.groups.UserGroup;
 
@@ -25,7 +27,6 @@ class SecurityFilters {
 				
             }
             after = { model ->
-				//println "before view " + model + params
 				//setting user group and permission for view
 				if(model){
 					def userGroupInstance = model.userGroupInstance
@@ -52,8 +53,9 @@ class SecurityFilters {
 						model.canEditUserGroup = secTagLib.hasPermission(['permission':org.springframework.security.acls.domain.BasePermission.WRITE, 'object':userGroupInstance], 'permitted')
 					}
 				}
-				//XXX do not remove this debug statment
-				log.debug "before view rendering "  
+				if (!Environment.getCurrent().getName().startsWith("pamba")) {
+					log.debug "before view rendering "
+				}  
             }
 			
             afterView = {
