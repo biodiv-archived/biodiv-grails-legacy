@@ -18,6 +18,7 @@ import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.authentication.event.InteractiveAuthenticationSuccessEvent;
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.security.web.DefaultRedirectStrategy
@@ -29,6 +30,20 @@ import org.springframework.util.Assert;
 import org.springframework.web.filter.GenericFilterBean
 
 import com.the6hours.grails.springsecurity.facebook.FacebookAuthToken
+
+import org.springframework.social.oauth2.Spring30OAuth2RequestFactory;
+import org.springframework.social.facebook.api.impl.FacebookTemplate;
+import org.springframework.social.support.ClientHttpRequestFactorySelector;
+import org.springframework.util.StringUtils;
+import species.auth.Role
+import species.auth.SUser
+import species.auth.SUserRole
+import species.utils.Utils;
+
+
+import com.the6hours.grails.springsecurity.facebook.FacebookAuthToken;
+import org.springframework.social.facebook.api.FacebookProfile;
+
 
 /**
  * TODO
@@ -50,6 +65,7 @@ class FacebookAuthCookieFilter extends GenericFilterBean implements ApplicationE
 	private AuthenticationFailureHandler failureHandler = new SimpleUrlAuthenticationFailureHandler();
 
 	def grailsApplication
+    def facebookService
 
 	void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, javax.servlet.FilterChain chain) {
 		HttpServletRequest request = servletRequest
@@ -68,6 +84,7 @@ class FacebookAuthCookieFilter extends GenericFilterBean implements ApplicationE
 					FacebookAuthToken token = facebookAuthUtils.build(request, cookie.value)
 					if (token != null) {
 						logger.debug("Got fbAuthToken $token");
+                        token.user = request.getSession().getAttribute("LAST_FACEBOOK_USER");
 						Authentication authentication = authenticationManager.authenticate(token);
 						// Store to SecurityContextHolder
 						SecurityContextHolder.context.authentication = authentication;
@@ -106,6 +123,12 @@ class FacebookAuthCookieFilter extends GenericFilterBean implements ApplicationE
 					}
 				} catch (BadCredentialsException e) {
 					logger.info("Invalid cookie, skip. Message was: $e.message")
+					unsuccessfulAuthentication(request, response, e);
+                    return;
+				} catch (AuthenticationServiceException e) {
+					logger.info("Message : $e.message")
+			//		unsuccessfulAuthentication(request, response, e);
+            //        return;
 				} catch(AuthenticationException e) {
 					logger.info("Auth exception. Message was: $e.message")
 					unsuccessfulAuthentication(request, response, e);
@@ -161,4 +184,51 @@ class FacebookAuthCookieFilter extends GenericFilterBean implements ApplicationE
 		Assert.notNull(failureHandler, "failureHandler cannot be null");
 		this.failureHandler = failureHandler;
 	}
+
+    private temp(token) {
+
+		if (!token) {
+			flash.error = 'Sorry, problem fetching access token from facebook'
+			return
+		}
+
+		logger.debug ("Processing facebook registration in createAccount")
+		FacebookTemplate facebook = new FacebookTemplate(token.accessToken);
+		facebook.setRequestFactory(new Spring30OAuth2RequestFactory(ClientHttpRequestFactorySelector.getRequestFactory(), token.accessToken, facebook.getOAuth2Version()));
+		FacebookProfile fbProfile = facebook.userOperations().getUserProfile();
+
+		//TODO: if there are multiple email accounts available choose among them
+		String email = fbProfile.email;
+
+		if (!email) {
+			flash.error = 'Sorry, an email id is necessary for an account'
+			return
+		}
+
+		def user;
+		if(email) {
+			user = SUser.findByEmail(email)
+		}
+
+		if(user) {
+			logger.info( "Found existing user with same emailId $email")
+			logger.info( "Merging details with existing account $user")
+//			facebookAuthService.mergeFacebookUserDetails user, fbProfile
+//			registerAccountOpenId user.email, fbProfile.link
+//			facebookAuthService.registerFacebookUser token, user
+
+//			def usernamePropertyName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
+//			authenticateAndRedirect user."$usernamePropertyName"
+		} else {
+			logger.info ("Redirecting to register")
+			CustomRegisterCommand command = new CustomRegisterCommand();
+			facebookAuthService.copyFromFacebookProfile command, fbProfile
+			command.openId = fbProfile.link
+			command.facebookUser = true;
+			logger.debug ("register command : $command")
+			flash.chainedParams = [command: command]
+			chain ( controller:"register");
+		}
+
+    }
 }

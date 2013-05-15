@@ -1135,7 +1135,7 @@ span.cke_skin_kama {
 }
 
 .notes_view { /* clear: both; */
-	background-color: #fdfdfd;
+	background-color: whitesmoke;
 	padding: 10px;
         word-wrap:break-word;
 }
@@ -1919,7 +1919,6 @@ div.noOfRatings {
 }
 
 #contributeMenu {
-    background: whitesmoke;
     border-bottom: 3px solid white;
 }
 

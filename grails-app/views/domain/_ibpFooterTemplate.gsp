@@ -73,6 +73,25 @@
 
 	</div>
 </div>
+<r:script type="text/javascript">
+stLight.options({
+    publisher: "f95fc4fb-33db-409f-9373-82017fa64851", 
+    hashAddressBar: false
+});
+</r:script>
+<r:script>
+var options = 
+{ 
+    "publisher": "f95fc4fb-33db-409f-9373-82017fa64851", 
+    "shorten":false,
+    "position": "right", 
+    "tracking":'google',
+    "chicklets": { "items": ["facebook", "twitter", "googleplus", "pinterest", "email"]}
+};
+    var st_hover_widget = new sharethis.widgets.hoverbuttons(options);
+    stLight.subscribe("click",function(){});
+</r:script>
+
 <r:script>
 $(document).ready(function(){
 	$(".youtube_container").each(function(){

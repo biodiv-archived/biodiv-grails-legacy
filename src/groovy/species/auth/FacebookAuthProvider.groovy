@@ -15,6 +15,7 @@ import org.codehaus.groovy.grails.plugins.springsecurity.DefaultPostAuthenticati
 import org.codehaus.groovy.grails.plugins.springsecurity.DefaultPreAuthenticationChecks;
 import org.codehaus.groovy.grails.plugins.springsecurity.GrailsUser;
 import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
+import org.springframework.security.authentication.AuthenticationServiceException;
 
 import com.the6hours.grails.springsecurity.facebook.FacebookAuthDao;
 import com.the6hours.grails.springsecurity.facebook.FacebookAuthToken;
@@ -34,10 +35,12 @@ public class FacebookAuthProvider implements AuthenticationProvider {
 		FacebookAuthToken token = authentication
 
 		def user = facebookAuthDao.findUser(token.uid as Long)
-
 		if (user == null) {
 			//log.debug "New person $token.uid"
-			if (createNew) {
+            if(token.user != null) {
+					throw new AuthenticationServiceException("Registering from Facebook");
+            }
+            else if (createNew) {
 				log.info "Create new facebook user with uid $token.uid"
 				log.info "Setting domain specific applicationId and secret"
 				String applicationId = facebookAuthUtils.getFacebookAppIdForDomain(token.domain);
@@ -51,7 +54,7 @@ public class FacebookAuthProvider implements AuthenticationProvider {
 				}
 			} else {
 				log.error "User $token.uid not exists - not authenticated"
-			}
+			} 
 		}
 		if (user != null) {
 			UserDetails userDetails = createUserDetails(user, token.code)
