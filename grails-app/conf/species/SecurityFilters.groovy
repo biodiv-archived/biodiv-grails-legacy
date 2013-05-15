@@ -54,7 +54,7 @@ class SecurityFilters {
 					}
 				}
 				if (!Environment.getCurrent().getName().startsWith("pamba")) {
-					log.debug "before view rendering "
+					//log.debug "before view rendering "
 				}  
             }
 			

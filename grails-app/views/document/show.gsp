@@ -7,7 +7,7 @@
 <g:set var="entityName"
 	value="${message(code: 'document.label', default: 'Document')}" />
 <title><g:message code="default.show.label" args="[entityName]" /></title>
-<r:require modules="content_view" />
+<r:require modules="content_view, activityfeed, comment" />
 </head>
 <body>
 	<div class="span12">
@@ -84,7 +84,7 @@
 
 
                 <div class="span8 right-shadow-box observation" style="margin:0;">
-                    		        <g:render template="/document/showDocument" model="['documentInstance':documentInstance]"/>
+                    		        <g:render template="/document/showDocument" model="['documentInstance':documentInstance, showDetails:true]"/>
 			<g:if
 				test="${documentInstance?.coverage?.speciesGroups || documentInstance.coverage?.habitats || documentInstance.coverage?.placeName }">
 
@@ -156,7 +156,13 @@
 
 			</g:if>
 
-
+			<div class="union-comment">
+				<feed:showAllActivityFeeds model="['rootHolder':documentInstance, feedType:'Specific', refreshType:'manual', 'feedPermission':'editable']" />
+				<%
+					def canPostComment = customsecurity.hasPermissionAsPerGroups([object:documentInstance, permission:org.springframework.security.acls.domain.BasePermission.WRITE]).toBoolean()
+				%>
+				<comment:showAllComments model="['commentHolder':documentInstance, commentType:'super', 'canPostComment':canPostComment, 'showCommentList':false]" />
+			</div>
 		</div>
 		<g:render template="/document/documentSidebar" model="['documentInstance':documentInstance]"/>
 

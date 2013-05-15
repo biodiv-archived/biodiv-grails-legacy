@@ -927,16 +927,22 @@ class ObservationController {
 	
 	def unsubscribeToIdentificationMail = {
 		log.debug "$params"
+		def user
 		if(params.userId){
-			def user = SUser.get(params.userId.toLong())
+			user = SUser.get(params.userId.toLong())
+		}
+		BlockedMails bm = new BlockedMails(email:params.email);
+		if(bm){
+			user = SUser.findByEmail(bm.email)
+			if(!bm.save(flush:true)){
+				this.errors.allErrors.each { log.error it }
+			}
+		}
+		if(user){
 			user.allowIdentifactionMail = false;
 			if(!user.save(flush:true)){
 				this.errors.allErrors.each { log.error it }
 			}
-		}
-		BlockedMails bm = new BlockedMails(email:params.email);
-		if(!bm.save(flush:true)){
-			this.errors.allErrors.each { log.error it }
 		}
 		render "${message(code: 'user.unsubscribe.identificationMail', args: [params.email])}"
 	}

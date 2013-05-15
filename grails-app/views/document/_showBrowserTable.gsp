@@ -1,21 +1,12 @@
 <%@page import="content.Project"%>
 <%@page import="content.eml.Document"%>
 
-<table class="table table-hover">
+<table class="table table-hover tablesorter">
 	<thead>
 		<tr>
-
-			<g:sortableColumn property="title"
-				title="${message(code: 'Document.title.label', default: 'Title')}" />
-
-			<g:sortableColumn property="type"
-				title="${message(code: 'Dcoument.type.label', default: 'Document Type')}" />
-
-			<g:sortableColumn property="description"
-				title="${message(code: 'Dcoument.source.label', default: 'Source')}" />
-
-
-
+			<th title="${message(code: 'Dcoument.title.label', default: 'Title')}">${message(code: 'Dcoument.title.label', default: 'Title')}</th>
+			<th title="${message(code: 'Dcoument.type.label', default: 'Document Type')}">${message(code: 'Dcoument.type.label', default: 'Document Type')}</th>
+			<th title="${message(code: 'Dcoument.source.label', default: 'Source')}">${message(code: 'Dcoument.source.label', default: 'Source')}</th>
 		</tr>
 	</thead>
 
