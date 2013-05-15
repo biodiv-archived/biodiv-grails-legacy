@@ -31,10 +31,6 @@ import org.springframework.web.filter.GenericFilterBean
 
 import com.the6hours.grails.springsecurity.facebook.FacebookAuthToken
 
-import org.springframework.social.oauth2.Spring30OAuth2RequestFactory;
-import org.springframework.social.facebook.api.impl.FacebookTemplate;
-import org.springframework.social.support.ClientHttpRequestFactorySelector;
-import org.springframework.util.StringUtils;
 import species.auth.Role
 import species.auth.SUser
 import species.auth.SUserRole
@@ -185,50 +181,4 @@ class FacebookAuthCookieFilter extends GenericFilterBean implements ApplicationE
 		this.failureHandler = failureHandler;
 	}
 
-    private temp(token) {
-
-		if (!token) {
-			flash.error = 'Sorry, problem fetching access token from facebook'
-			return
-		}
-
-		logger.debug ("Processing facebook registration in createAccount")
-		FacebookTemplate facebook = new FacebookTemplate(token.accessToken);
-		facebook.setRequestFactory(new Spring30OAuth2RequestFactory(ClientHttpRequestFactorySelector.getRequestFactory(), token.accessToken, facebook.getOAuth2Version()));
-		FacebookProfile fbProfile = facebook.userOperations().getUserProfile();
-
-		//TODO: if there are multiple email accounts available choose among them
-		String email = fbProfile.email;
-
-		if (!email) {
-			flash.error = 'Sorry, an email id is necessary for an account'
-			return
-		}
-
-		def user;
-		if(email) {
-			user = SUser.findByEmail(email)
-		}
-
-		if(user) {
-			logger.info( "Found existing user with same emailId $email")
-			logger.info( "Merging details with existing account $user")
-//			facebookAuthService.mergeFacebookUserDetails user, fbProfile
-//			registerAccountOpenId user.email, fbProfile.link
-//			facebookAuthService.registerFacebookUser token, user
-
-//			def usernamePropertyName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
-//			authenticateAndRedirect user."$usernamePropertyName"
-		} else {
-			logger.info ("Redirecting to register")
-			CustomRegisterCommand command = new CustomRegisterCommand();
-			facebookAuthService.copyFromFacebookProfile command, fbProfile
-			command.openId = fbProfile.link
-			command.facebookUser = true;
-			logger.debug ("register command : $command")
-			flash.chainedParams = [command: command]
-			chain ( controller:"register");
-		}
-
-    }
 }
