@@ -13,7 +13,46 @@
 
 <html>
 <head>
-<link rel="canonical" href="${Utils.getIBPServerDomain() + createLink(controller:'species', action:'show', id:speciesInstance.id)}" />
+<g:set var="canonicalUrl" value="${uGroup.createLink([controller:'species', action:'show', id:speciesInstance.id, base:Utils.getIBPServerDomain()])}"/>
+<link rel="canonical" href="${canonicalUrl}" />
+<g:set var="title" value="${speciesInstance.taxonConcept.name}"/>
+<meta property="og:type" content="article" />
+<meta property="og:title" content=${title}"/>
+<meta property="og:url" content="${canonicalUrl}" />
+<%
+def r = speciesInstance.mainImage();
+def imagePath = '';
+if(r) {
+    def gThumbnail = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.gallery.suffix)?:null;
+    if(r && gThumbnail) {
+            if(r.type == ResourceType.IMAGE) {
+                    imagePath = g.createLinkTo(base:grailsApplication.config.speciesPortal.resources.serverURL,	file: gThumbnail)
+            } else if(r.type == ResourceType.VIDEO){
+                    imagePath = g.createLinkTo(base:gThumbnail,	file: '')
+            }
+    }
+}
+%>
+<meta property="og:image" content="${imagePath}" />
+<meta property="og:site_name" content="${Utils.getDomainName(request)}" />
+
+<g:set var="domain" value="${Utils.getDomain(request)}" />
+<g:set var="fbAppId"/>
+<%
+		
+		if(domain.equals(grailsApplication.config.wgp.domain)) {
+			fbAppId = grailsApplication.config.speciesPortal.wgp.facebook.appId;
+                } else { 
+			fbAppId =  grailsApplication.config.speciesPortal.ibp.facebook.appId;
+		}
+		
+%>
+<g:set var="description" value="${speciesInstance.findSummary()}" />
+
+<meta property="fb:app_id" content="${fbAppId }" />
+<meta property="fb:admins" content="581308415,100000607869577" />
+<meta property="og:description"
+          content='${description}'/>
 <meta name="layout" content="main" />
 <r:require modules="species_show"/>
 
@@ -146,6 +185,7 @@ $(document).ready(function(){
                         minScaleRatio : 1,
                         _toggleInfo: false,
                         wait:true,
+                        idleMode:false,
 			youtube:{
                             modestbranding: 1,
                             autohide: 1,
@@ -316,7 +356,7 @@ $(document).ready(function(){
 	  );
   	
   	try {
-		$(".contributor_ellipsis").trunk8({width:35});
+		$(".contributor_ellipsis").trunk8();
 	} catch(e) {
   		console.log(e)
 	}  	
@@ -393,7 +433,7 @@ $(document).ready(function(){
 	 }
 </style>
 <title>
-	${speciesName}
+    ${title}
 </title>
 
 </head>
@@ -403,7 +443,6 @@ $(document).ready(function(){
 <div class="span12">
 			<s:showSubmenuTemplate model="['entityName':speciesInstance.taxonConcept.italicisedForm , 'subHeading':CommonNames.findByTaxonConceptAndLanguage(speciesInstance.taxonConcept, Language.findByThreeLetterCode('eng'))?.name, 'headingClass':'sci_name']"/>
 			
-			<div class="pull-right" style="margin-top:-40px; margin-right: 12px;"><feed:follow model="['sourceObject':speciesInstance]" /></div>					
 			<g:if test="${!speciesInstance.percentOfInfo}">
 				<div
 					class="poor_species_content alert">
@@ -412,6 +451,12 @@ $(document).ready(function(){
 					
 				</div>
 			</g:if>
+                        
+                        <div class="span12" style="margin-left:0px">
+                                   <g:render template="/common/observation/showObservationStoryActionsTemplate"
+                                   model="['instance':speciesInstance, 'href':canonicalUrl, 'title':title, 'description':description, 'hideFlag':true, 'hideDownload':true]" />
+                        </div>
+
 
                         <div class="span4 pull-right">
                             <t:showTaxonBrowser model="['speciesInstance':speciesInstance, 'expandSpecies':true, 'expandAll':false, 'speciesId':speciesInstance.taxonConcept?.id, expandAllIcon:false]"/>
@@ -419,6 +464,7 @@ $(document).ready(function(){
 
 			<!-- media gallery -->
 			<div class="span8 right-shadow-box" style="margin:0px;">
+
 				<div style="padding-bottom:10px;height:430px;">
                                     <center>
                                         <div id="gallerySpinner" class="spinner">

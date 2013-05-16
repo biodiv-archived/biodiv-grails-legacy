@@ -668,12 +668,12 @@ ul#recoSummary {
 	/* opacity:0.5;        */
 }
 
-.story-footer .footer-item {
+.footer-item {
 	float: left;
-	margin-right: 10px;
+	margin: 0 2px;
 }
 
-.story-footer i {
+.footer-item i {
 	margin-right: 3px;
 }
 
@@ -1928,4 +1928,16 @@ div.noOfRatings {
     padding: 14px;
     text-align:center;
     width:inherit;
+}
+
+.footer-item .btn-link {
+    display: block;
+    padding: 2px 5px;
+    border: 1px solid #ccc;
+    font-size: 11px;
+    color: black;
+    text-decoration: none;
+    background-color: whiteSmoke;
+    line-height:15px;
+    border-radius:5px;
 }

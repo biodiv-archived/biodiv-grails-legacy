@@ -8,24 +8,25 @@
 
 <html>
 <head>
-<link rel="canonical" href="${Utils.getIBPServerDomain() + uGroup.createLink(controller:'observation', action:'show', id:observationInstance.id)}" />
+<g:set var="canonicalUrl" value="${uGroup.createLink([controller:'observation', action:'show', id:observationInstance.id, base:Utils.getIBPServerDomain()])}"/>
+<g:set var="title" value="${(!observationInstance.fetchSpeciesCall()?.equalsIgnoreCase('Unknown'))?observationInstance.fetchSpeciesCall():'Help Identify'}"/>
+<link rel="canonical" href="${canonicalUrl}" />
 <meta property="og:type" content="article" />
-<meta property="og:title" content="${(!observationInstance.fetchSpeciesCall()?.equalsIgnoreCase('Unknown'))?observationInstance.fetchSpeciesCall():'Help Identify'}"/>
-<meta property="og:url" content="${uGroup.createLink([controller:'observation', action:'show', id:observationInstance.id, base:Utils.getDomainServerUrl(request), 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress])}" />
-<g:set var="fbImagePath" value="" />
+<meta property="og:title" content="${title}"/>
+<meta property="og:url" content="${canonicalUrl}" />
 <%
 def r = observationInstance.mainImage();
-
-def gThumbnail = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.gallery.suffix)?:null;
 def imagePath = '';
-if(r && gThumbnail) {
-	if(r.type == ResourceType.IMAGE) {
-		imagePath = g.createLinkTo(base:grailsApplication.config.speciesPortal.observations.serverURL,	file: gThumbnail)
-	} else if(r.type == ResourceType.VIDEO){
-		imagePath = g.createLinkTo(base:gThumbnail,	file: '')
-	}
+if(r) {
+    def gThumbnail = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.gallery.suffix)?:null;
+    if(r && gThumbnail) {
+            if(r.type == ResourceType.IMAGE) {
+                    imagePath = g.createLinkTo(base:grailsApplication.config.speciesPortal.observations.serverURL,	file: gThumbnail)
+            } else if(r.type == ResourceType.VIDEO){
+                    imagePath = g.createLinkTo(base:gThumbnail,	file: '')
+            }
+    }
 }
-
 %>
 <meta property="og:image" content="${imagePath}" />
 <meta property="og:site_name" content="${Utils.getDomainName(request)}" />
@@ -59,7 +60,7 @@ if(r && gThumbnail) {
 
 <g:set var="entityName"
 	value="${message(code: 'observation.label', default: 'Observation')}" />
-<title><g:message code="default.show.label" args="[entityName]" />
+        <title>${title}
 </title>
 
 
@@ -124,33 +125,14 @@ if(r && gThumbnail) {
                                         </div>
                                     </div>
                                     <div style="clear:both;"></div>
-                                    <g:if test="${params.pos && lastListParams}">
-                                    <div class="nav" style="width:100%;margin-top: 10px;">
-                                        <g:if test="${test}">
-                                        <a class="pull-left btn ${prevObservationId?:'disabled'}" href="${uGroup.createLink([action:"show", controller:"observation", id:prevObservationId, 'pos':params.int('pos')-1, 'userGroupWebaddress':(userGroup?userGroup.webaddress:userGroupWebaddress)])}"><i class="icon-backward"></i>Prev</a>
-                                        <a class="pull-right  btn ${nextObservationId?:'disabled'}"  href="${uGroup.createLink([action:"show", controller:"observation",
-                                            id:nextObservationId, 'pos':params.int('pos')+1, 'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress])}">Next <i style="margin-right: 0px; margin-left: 3px;" class="icon-forward"></i></a>
-                                        <%lastListParams.put('userGroupWebaddress', userGroup?userGroup.webaddress:userGroupWebaddress);
-                                        lastListParams.put('fragment', params.pos);
-                                        %>
-                                        <a class="btn" href="${uGroup.createLink(lastListParams)}" style="text-align: center;display: block;margin: 0 auto;">List</a>
-                                        </g:if>
-                                        <g:else>
-                                        <a class="pull-left btn ${prevObservationId?:'disabled'}" href="${uGroup.createLink([action:"show", controller:"observation",
-                                            id:prevObservationId, 'pos':params.int('pos')-1, 'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress])}"><i class="icon-backward"></i>Prev</a>
-                                        <a class="pull-right  btn ${nextObservationId?:'disabled'}"  href="${uGroup.createLink([action:"show", controller:"observation",
-                                            id:nextObservationId, 'pos':params.int('pos')+1, 'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress])}">Next<i style="margin-right: 0px; margin-left: 3px;" class="icon-forward"></i></a>
-                                        <%lastListParams.put('userGroupWebaddress', userGroup?userGroup.webaddress:userGroupWebaddress);
-                                        lastListParams.put('fragment', params.pos);	 
-                                        %>
-                                        <a class="btn" href="${uGroup.createLink(lastListParams)}" style="text-align: center;display: block;margin: 0 auto;">List</a>
-                                        </g:else>
-                                    </div>
-                                    </g:if>
-                                </div>
-				
-				<div class="span8 right-shadow-box" style="margin: 0;">
+                               </div>
+                               
+                               <div class="span12" style="margin-left:0px">
+                                   <g:render template="/common/observation/showObservationStoryActionsTemplate"
+                                   model="['instance':observationInstance, 'href':canonicalUrl, 'title':title, 'description':description, 'showDetails':true,'hideDownload':true]" />
+                               </div>
 
+				<div class="span8 right-shadow-box" style="margin: 0;">
 
 					<div id="gallery1">
 						<g:if test="${observationInstance.resource}">
@@ -235,8 +217,8 @@ if(r && gThumbnail) {
 					</div>
 				</div>
 
-				<div class="span4">
-					
+                                <div class="span4">
+
 					<div class="sidebar_section">
 						<obv:showLocation
 							model="['observationInstance':observationInstance]" />
@@ -276,12 +258,6 @@ if(r && gThumbnail) {
 						</div>
 					</g:if>
 					
-					<div class="sidebar_section">
-						<h5>Actions</h5>
-						<div class="tile" style="clear: both">
-							<feed:follow model="['sourceObject':observationInstance]" />
-						</div>
-					</div>	
 					<!-- obv:showTagsSummary model="['observationInstance':observationInstance]" /-->
 					<!-- obv:showObvStats  model="['observationInstance':observationInstance]"/-->
 
@@ -319,6 +295,8 @@ if(r && gThumbnail) {
 			minScaleRatio : 1,
                         _toggleInfo: false,
                         thumbnails:false,
+                        showCounter:true,
+                        idleMode:false,
 			youtube : {
                             modestbranding: 1,
                             autohide: 1,

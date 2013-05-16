@@ -36,7 +36,6 @@ class SUser {
 	Date dateCreated = new Date();
 	Date lastLoginDate = new Date();
 	String profilePic
-	String fbProfilePic
 	String icon
 
 	String website;
@@ -58,7 +57,6 @@ class SUser {
 		password blank: false
 		email email: true, blank: false, unique: true, nullable:false
 		profilePic nullable:true
-		fbProfilePic nullable:true
 		icon nullable:true
 		website nullable:true
 		timezone nullable:true

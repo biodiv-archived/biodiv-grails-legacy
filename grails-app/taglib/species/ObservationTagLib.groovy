@@ -192,7 +192,7 @@ class ObservationTagLib {
 	}
 	
 	def identificationByEmail = {attrs, body->
-		def emailInfoModel = observationService.getIdentificationEmailInfo(attrs.model, attrs.model.requestObject, "");
+		def emailInfoModel = observationService.getIdentificationEmailInfo(attrs.model, attrs.model.requestObject, "", params.controller, params.action);
 		attrs.model.each { key, value ->
 			emailInfoModel[key] = value;
 		}
