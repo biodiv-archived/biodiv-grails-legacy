@@ -285,10 +285,18 @@ input.dms_field {
 					</a>
 				</g:else>
 
-				<button id="documentFormSubmit" type="submit"
-					class="btn btn-primary" style="float: right; margin-right: 5px;">
-					${form_button_name}
-				</button>
+				<a id="documentFormSubmit" class="btn btn-primary"
+					style="float: right; margin-right: 5px;"> ${form_button_name}
+				</a>
+				<div class="row control-group" style="clear: none;">
+					<label class="checkbox" style="text-align: left;"> <g:checkBox
+							style="margin-left:0px;" name="agreeTerms"
+							value="${documentInstance.agreeTerms}" /> <span
+						class="policy-text"> By submitting this form, you agree
+							that the document you are submitting is owned by you, or you have
+							the permission of the copyright holder to distribute on creative
+							commons licenses. </span></label>
+				</div>
 			</div>
 
 		</form>
@@ -307,23 +315,33 @@ input.dms_field {
             }
     });
     
+    	   
+    
     			$("#documentFormSubmit").click(function(){
-				var speciesGroups = getSelectedGroup();
-		        var habitats = getSelectedHabitat();
+    			
+    				if (document.getElementById('agreeTerms').checked){
+    			
+						var speciesGroups = getSelectedGroup();
+		        		var habitats = getSelectedHabitat();
 		        
-		       	$.each(speciesGroups, function(index){
-		       		var input = $("<input>").attr("type", "hidden").attr("name", "speciesGroup."+index).val(this);
-					$('#documentForm').append($(input));	
-		       	})
+		       			$.each(speciesGroups, function(index){
+		       				var input = $("<input>").attr("type", "hidden").attr("name", "speciesGroup."+index).val(this);
+							$('#documentForm').append($(input));	
+		       			})
 		        
-		       	$.each(habitats, function(index){
-		       		var input = $("<input>").attr("type", "hidden").attr("name", "habitat."+index).val(this);
-					$('#documentForm').append($(input));	
-		       	})
-		       					$("#userGroupsList").val(getSelectedUserGroups());	       	
+		       			$.each(habitats, function(index){
+		       				var input = $("<input>").attr("type", "hidden").attr("name", "habitat."+index).val(this);
+							$('#documentForm').append($(input));	
+		       			})
+		       			$("#userGroupsList").val(getSelectedUserGroups());	
+		       			       					
+				        $("#documentForm").submit();
+			    	    return false;
+					} else {
+						alert("Please agree to the terms mentioned at the end of the form to submit the document.")
+					}       	
 		       	
-		        $("#documentForm").submit();
-		        return false;
+	
 			});
 			
 			

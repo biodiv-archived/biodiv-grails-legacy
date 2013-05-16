@@ -63,6 +63,8 @@ class Document implements Taggable {
 	
 	boolean deleted
 	
+	boolean agreeTerms = false	
+	
 	static transients = [ 'deleted' ]
 
 
@@ -84,6 +86,8 @@ class Document implements Taggable {
 		description nullable:true
 		doi nullable:true
 		license nullable:true
+		
+		agreeTerms nullable:true
 		
 	}
 	
