@@ -12,8 +12,10 @@ import species.auth.SUser
 import species.groups.SpeciesGroup
 import species.groups.UserGroup;
 import species.participation.ActivityFeedService
+import org.grails.rateable.*
 
-class Checklist {
+
+class Checklist implements Rateable {
 	
 	private static final String KEY_PREFIX = "## "
 	private static final String SEPARATOR = ":"

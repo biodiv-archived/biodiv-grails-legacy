@@ -340,9 +340,9 @@ function followObject(className, id, comp, url){
 
 function toggleFollowButton(comp){
 	if(($(comp).text() == 'Unfollow')){
-		$(comp).html('Follow')
+		$(comp).html('<i class="icon-play-circle"></i>Follow')
 	}else{
-		$(comp).html('Unfollow')
+		$(comp).html('<i class="icon-play-circle"></i>Unfollow')
 	}
 }
 

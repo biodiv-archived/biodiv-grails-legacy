@@ -857,7 +857,7 @@ grails.plugins.springsecurity.password.algorithm = 'MD5'
 grails.plugins.springsecurity.ui.password.minLength=6
 grails.plugins.springsecurity.ui.password.maxLength=64
 grails.plugins.springsecurity.ui.password.validationRegex='^.*$'
-grails.plugins.springsecurity.ui.register.postRegisterUrl  = "${grails.serverURL}/group/list" // use defaultTargetUrl if not set
+grails.plugins.springsecurity.ui.register.postRegisterUrl  = "${grails.serverURL}/user/myprofile" // use defaultTargetUrl if not set
 grails.plugins.springsecurity.ui.register.defaultRoleNames = ['ROLE_USER']
 
 grails.plugins.springsecurity.ui.notification.emailFrom = 'notification@indiabiodiversity.org'

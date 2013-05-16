@@ -73,24 +73,6 @@
 
 	</div>
 </div>
-<r:script type="text/javascript">
-stLight.options({
-    publisher: "f95fc4fb-33db-409f-9373-82017fa64851", 
-    hashAddressBar: false
-});
-</r:script>
-<r:script>
-var options = 
-{ 
-    "publisher": "f95fc4fb-33db-409f-9373-82017fa64851", 
-    "shorten":false,
-    "position": "right", 
-    "tracking":'google',
-    "chicklets": { "items": ["facebook", "twitter", "googleplus", "pinterest", "email"]}
-};
-    var st_hover_widget = new sharethis.widgets.hoverbuttons(options);
-    stLight.subscribe("click",function(){});
-</r:script>
 
 <r:script>
 $(document).ready(function(){
@@ -99,5 +81,23 @@ $(document).ready(function(){
 	});
 	
 	last_actions();
+
 });
+
+</r:script>
+
+<r:script>
+//Twitter
+!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');
+
+//google plus
+(function() {
+var po = document.createElement('script'); 
+po.type = 'text/javascript'; po.async = true;
+po.src = 'https://apis.google.com/js/plusone.js?onload=renderGooglePlus';
+var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+})();
+function renderGooglePlus() {
+    gapi.plusone.render("googleplus", {size:'medium',annotation:'none'});
+}
 </r:script>

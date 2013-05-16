@@ -1,5 +1,5 @@
 <div id="download-box" class="btn-group"  style="z-index: 10; margin-left: 5px;${instanceTotal == 0 ? 'display:none;' :'' }">
-		<a id="download-action" class="btn dropdown-toggle" data-toggle="dropdown"
+    <a id="download-action" class="btn ${(params.action=='show')?'btn-link':''} dropdown-toggle" data-toggle="dropdown"
 			href="#"> <i class=" icon-download-alt"></i>
 			Download
 		</a>

@@ -26,7 +26,7 @@ class Species implements Rateable {
 	Date updatedOn;
 	Date createdOn = new Date();
 	Date dateCreated;
-	Date lastUpdated ;
+	Date lastUpdated;
 	
 	def grailsApplication; 
 	def springSecurityService;

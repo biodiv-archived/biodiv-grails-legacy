@@ -3,12 +3,38 @@
 
 <html>
 <head>
-<link rel="canonical" href="${Utils.getIBPServerDomain() + createLink(controller:'checklist', action:'show', id:checklistInstance.id)}" />
+<g:set var="canonicalUrl" value="${uGroup.createLink([controller:'checklist', action:'show', id:checklistInstance.id, base:Utils.getIBPServerDomain()])}"/>
+<g:set var="title" value="${checklistInstance.title}"/>
+<link rel="canonical" href="${canonicalUrl}" />
+<meta property="og:type" content="article" />
+<meta property="og:title" content="${title}"/>
+<meta property="og:url" content="${canonicalUrl}" />
+<meta property="og:site_name" content="${Utils.getDomainName(request)}" />
+
+<g:set var="domain" value="${Utils.getDomain(request)}" />
+<g:set var="fbAppId"/>
+<%
+		
+		if(domain.equals(grailsApplication.config.wgp.domain)) {
+			fbAppId = grailsApplication.config.speciesPortal.wgp.facebook.appId;
+		} else { //if(domain.equals(grailsApplication.config.ibp.domain)) {
+			fbAppId =  grailsApplication.config.speciesPortal.ibp.facebook.appId;
+		}
+		
+%>
+<g:set var="description" value="${checklistInstance.description}" />
+
+<meta property="fb:app_id" content="${fbAppId }" />
+<meta property="fb:admins" content="581308415,100000607869577" />
+<meta property="og:description"
+          content='${description}'/>
+
+<link rel="canonical" href="${canonicalUrl}" />
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="main" />
 <g:set var="entityName"
 	value="${message(code: 'checklistShow.label', default: 'Checklist Show')}" />
-<title><g:message code="default.list.label" args="[entityName]" />
+        <title>${title}
 </title>
 <r:require modules="checklist"/>
 </head>
@@ -21,43 +47,17 @@
 
                                         <s:showHeadingAndSubHeading
 						model="['heading':checklistInstance.title, 'subHeading':checklistInstance.attribution, 'headingClass':headingClass, 'subHeadingClass':subHeadingClass]" />
-                                            <div class="pull-right" style="margin-top: -35px;">
-                                                <obv:download
-                                                model="['source':'Checklist', 'requestObject':request, 'downloadTypes':[DownloadType.CSV, DownloadType.PDF], downloadObjectId:checklistInstance.id ]" />
-                                            </div>		
-
-
-
-                                        <div style="clear:both;"></div>
-                                        <g:if test="${params.pos && lastListParams}">
-                                        <div class="nav" style="width:100%;margin-top:10px;">
-                                            <g:if test="${test}">
-                                            <a class="pull-left btn ${prevObservationId?:'disabled'}" href="${uGroup.createLink([action:"show", controller:"checklist", id:prevObservationId, 'pos':params.int('pos')-1, 'userGroupWebaddress':(userGroup?userGroup.webaddress:userGroupWebaddress)])}"><i class="icon-backward"></i>Prev</a>
-                                            <a class="pull-right  btn ${nextObservationId?:'disabled'}"  href="${uGroup.createLink([action:"show", controller:"checklist",
-                                                id:nextObservationId, 'pos':params.int('pos')+1, 'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress])}"><i style="margin-right: 0px; margin-left: 3px;" class="icon-forward"></i>Next</a>
-                                            <%lastListParams.put('userGroupWebaddress', userGroup?userGroup.webaddress:userGroupWebaddress);
-                                            lastListParams.put('fragment', params.pos);
-                                            %>
-                                            <a class="btn" href="${uGroup.createLink(lastListParams)}" style="text-align: center;display: block;width: 125px;margin: 0 auto;">List</a>
-                                            </g:if>
-                                            <g:else>
-                                            <a class="pull-left btn ${prevObservationId?:'disabled'}" href="${uGroup.createLink([action:"show", controller:"checklist",
-                                                id:prevObservationId, 'pos':params.int('pos')-1, 'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress])}"><i class="icon-backward"></i>Prev</a>
-                                            <a class="pull-right  btn ${nextObservationId?:'disabled'}"  href="${uGroup.createLink([action:"show", controller:"checklist",
-                                                id:nextObservationId, 'pos':params.int('pos')+1, 'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress])}"><i style="margin-right: 0px; margin-left: 3px;" class="icon-forward"></i>Next</a>
-                                            <%lastListParams.put('userGroupWebaddress', userGroup?userGroup.webaddress:userGroupWebaddress);
-                                            lastListParams.put('fragment', params.pos);	 
-                                            %>
-                                            <a class="btn" href="${uGroup.createLink(lastListParams)}" style="text-align: center;display: block;margin: 0 auto;">List</a>
-                                            </g:else>
-                                        </div>
-                                        </g:if>
-
 
                                     </div>
                                 </div>
 
                         </div>	
+                        <div class="span12" style="margin-left:0px; padding:4px; background-color:whitesmoke">
+                                   <g:render template="/common/observation/showObservationStoryActionsTemplate"
+                                   model="['instance':checklistInstance, 'href':canonicalUrl, 'title':title, 'description':description, 'hideFlag':true, 'hideDownload':false, 'hideFollow':true]" />
+                        </div>
+
+
 			<div>	
 				<table class="table table-hover" style="margin-left: 0px;">
 					<thead>
@@ -152,10 +152,9 @@
 			
 			</div>
 	</div>	
-	<g:javascript>
+	<r:script>
 	$(document).ready(function(){
-		window.params = {};
 	});
-	</g:javascript>
+	</r:script>
 </body>
 </html>

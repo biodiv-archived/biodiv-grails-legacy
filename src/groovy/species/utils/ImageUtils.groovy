@@ -31,7 +31,10 @@ class ImageUtils {
 		
 		log.debug "Creating thumbnail image";
 		def extension = config.thumbnail.suffix
-		String name = fileName.substring(0, lastIndex);
+		String name = fileName;
+        if(lastIndex != -1) {
+            name = fileName.substring(0, lastIndex);
+        }
 		ImageUtils.convert(imageFile, new File(dir, name+extension ), config.thumbnail.width, config.thumbnail.height, 100);
 
 		log.debug "Creating gallery image";

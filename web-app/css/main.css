@@ -540,10 +540,6 @@ html.busy,html.busy * {
 /* 	opacity: 0.9 !important; */
 /* } */
 
-.fb_edge_widget_with_comment {
-	padding: 10px !important;
-}
-
 .big_title {
 	padding: 30px 15px 30px 25px;
 	vertical-align: top;

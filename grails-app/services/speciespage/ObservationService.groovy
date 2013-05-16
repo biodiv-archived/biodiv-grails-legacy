@@ -729,7 +729,7 @@ class ObservationService {
 		}
 	}
 	
-	Map getIdentificationEmailInfo(m, requestObj, unsubscribeUrl){
+	Map getIdentificationEmailInfo(m, requestObj, unsubscribeUrl, controller="", action=""){
 		def source = m.source;
 		
 		def mailSubject = ""
@@ -759,6 +759,9 @@ class ObservationService {
 				mailSubject = "Invitation to join group"
 				activitySource = "user group"
 				break
+            case controller+action.capitalize():
+                mailSubject = "Share "+controller
+                activitySource = controller
 			default:
 				log.debug "invalid source type"
 		}
@@ -768,7 +771,7 @@ class ObservationService {
 		def staticMessage = conf.ui.askIdentification.staticMessage
 		if (staticMessage.contains('$')) {
 			staticMessage = evaluate(staticMessage, templateMap)
-		}
+		} 
 		
 		templateMap["activitySourceUrl"] = m.sourcePageUrl?: ""
 		templateMap["unsubscribeUrl"] = unsubscribeUrl ?: ""

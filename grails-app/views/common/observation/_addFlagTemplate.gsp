@@ -3,7 +3,7 @@
 <%@page import="species.utils.ImageType"%>
 <div>
 	<div class="btn-group">
-		<a id="flag-action" class="btn btn-mini" data-toggle="dropdown"
+		<a id="flag-action" class="btn btn-link" data-toggle="dropdown"
 			href="#"> <g:if test="${observationInstance.flagCount>0}">
 				<i class="icon-flag icon-red"></i>
 			</g:if> <g:else>

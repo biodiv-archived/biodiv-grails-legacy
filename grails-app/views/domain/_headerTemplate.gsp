@@ -59,7 +59,7 @@
 
 
 				</ul>
-                                <ul class="nav" style="background-color:whitesmoke;float:none;display:inline-block;">
+                                <ul class="nav" style="float:none;display:inline-block;">
                                     <li>
                                     <a href="#contributeMenu" data-toggle="collapse">
                                         <i class="icon-list"></i>
@@ -136,7 +136,7 @@
 <%--						class="${(params.controller == 'chart')?'active':''}"><a--%>
 <%--						href='${uGroup.createLink("controller":"chart")}' title="Stats">Stats</a></li>--%>
 				</ul>
-                                <ul class="nav" style="background-color:whitesmoke;float:none;display:inline-block;">
+                                <ul class="nav" style="float:none;display:inline-block;">
                                     <li>
                                     <a href="#contributeMenu" data-toggle="collapse">
                                         <i class="icon-list"></i>
