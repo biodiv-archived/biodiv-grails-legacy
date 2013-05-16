@@ -59,7 +59,7 @@
 
 
 				</ul>
-                                <ul class="nav" style="background-color:#5BB75B;float:none;display:inline-block;">
+                                <ul class="nav" style="float:none;display:inline-block;">
                                     <li>
                                     <a href="#contributeMenu" data-toggle="collapse">
                                         <i class="icon-list"></i>
