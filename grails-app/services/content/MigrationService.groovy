@@ -217,6 +217,8 @@ def migrateProjects() {
 
 				document.license = License.findByName(License.LicenseType.CC_BY)
 				
+				document.agreeTerms = true			
+				
 				def metadata = row.metadata
 
 				
@@ -269,7 +271,7 @@ def migrateProjects() {
 		File src = new File("/data/augmenetedmaps/"+filePath)
 		if(!src.exists()) {
 			log.error " src file "+ filePath+" does not exist"
-			return "dummy"
+			return "Empty File"
 		}	
 				
 		if(!Utils.copy(new File("/var/www/biodiv/"+filePath), dst)) {
