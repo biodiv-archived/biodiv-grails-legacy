@@ -880,6 +880,11 @@ class SUserController extends UserController {
 		}
 	}
 
+	@Secured(['ROLE_USER'])
+    def myprofile = {
+		def user = springSecurityService.currentUser
+		redirect (url:uGroup.createLink(action:'show', controller:"user", id:user.id, 'userGroupWebaddress':params.webaddress))
+    }
 
 }
 
