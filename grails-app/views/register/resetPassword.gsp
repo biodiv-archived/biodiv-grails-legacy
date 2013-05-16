@@ -41,7 +41,7 @@
 						<label class="control-label" for="password"><g:message
 								code='user.password.label' default='Password *' /> </label>
 						<div class="controls">
-							<input class="input-large" id="password" type="password"
+							<input class="input-block-level" id="password" type="password"
 								value="${command.password}" name="password"
 								placeholder="Enter your password...">
 
@@ -57,7 +57,7 @@
 						<label class="control-label" for="password2"><g:message
 								code='user.password2.label' default='Password (again)*' /> </label>
 						<div class="controls">
-							<input class="input-large" id="password2" type="password"
+							<input class="input-block-level" id="password2" type="password"
 								value="${command.password2}" name="password2"
 								placeholder="Enter your password again...">
 

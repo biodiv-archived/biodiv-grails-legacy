@@ -23,7 +23,7 @@
 <div class="navbar navbar-static-top btn"
 	style="margin-bottom: 0px; position: relative; width: 100%;padding: 0px; border-left-width:0; border-right-width: 0;">
 	<div class="navbar-inner"
-		style="box-shadow: none; background-color: transparent; background-image: none;">
+		style="box-shadow: none; background-color: transparent; background-image: none;height:40px;">
 		<div class="container outer-wrapper"
 			style="background-color: transparent; padding-bottom: 0px;text-align:center;">
 			<g:if test="${userGroupInstance && userGroupInstance.id}">
@@ -59,7 +59,7 @@
 
 
 				</ul>
-                                <ul class="nav" style="float:none;display:inline-block;">
+                                <ul class="nav" style="background-color:#5BB75B;float:none;display:inline-block;">
                                     <li>
                                     <a href="#contributeMenu" data-toggle="collapse">
                                         <i class="icon-list"></i>
@@ -136,7 +136,7 @@
 <%--						class="${(params.controller == 'chart')?'active':''}"><a--%>
 <%--						href='${uGroup.createLink("controller":"chart")}' title="Stats">Stats</a></li>--%>
 				</ul>
-                                <ul class="nav" style="float:none;display:inline-block;">
+                                <ul class="nav" style="background-color:#5BB75B;float:none;display:inline-block;">
                                     <li>
                                     <a href="#contributeMenu" data-toggle="collapse">
                                         <i class="icon-list"></i>

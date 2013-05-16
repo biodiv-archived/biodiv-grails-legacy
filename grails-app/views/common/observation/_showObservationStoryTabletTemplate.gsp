@@ -35,4 +35,15 @@
 <%--            </div>--%>
 <%--        </div>--%>
 <%----%>
-       <obv:showFooter model="['observationInstance':observationInstance, 'showDetails':false]"/>
+
+<div class="story-footer" style="width: 100%">
+        <div class="footer-item pull-left">
+            <obv:like model="['resource':observationInstance]"/>
+        </div>
+</div>
+
+
+
+<%--
+<obv:showFooter model="['observationInstance':observationInstance, 'showDetails':false]"/>
+--%>
