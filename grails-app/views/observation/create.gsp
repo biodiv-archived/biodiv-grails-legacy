@@ -384,26 +384,32 @@ if(r && thumbnail) {
 				<div class="span12 super-section" style="clear: both;">
 					<div class="section">
 						<h3>Where did you find this observation?</h3>
+							<div class="span6" style="margin-left:0px;">
+                                    <div class="map_search">
+                                        <div id="geotagged_images">
+                                                <div class="title" style="display: none">Use location
+                                                        from geo-tagged image:</div>
+                                                <div class="msg" style="display: none">Select image if
+                                                        you want to use location information embedded in it</div>
+                                        </div>
 
-						<div class="span6" style="margin:0px";>
+                                        <div id="current_location" class="section-item">
+                                                <div class="location_picker_button"><a href="#" onclick="return false;">Use current location</a></div>
+                                        </div>
+                                        <input id="address" type="text" title="Find by place name"  class="input-block-level"
+                                                class="section-item" />
+                                                                              
+										<div id="map_area">
+                        					<div id="map_canvas"></div>
+                    					</div>
+	                    	</div>
+	                </div>
+	                
+						<div class="span6 sidebar-section section block" style="margin:0px; width:430px; padding-top:10px;">
 						
-
-							<div class="row control-group">
-								<%
-									def obvInfoFeeder = lastCreatedObv ? lastCreatedObv : observationInstance
-	                            	def defaultPlaceName = (obvInfoFeeder) ? obvInfoFeeder.placeName : ""
-	                            %>
-	                            <label for="place_name" class="control-label"> <i class="icon-map-marker"></i><g:message
-									code="observation.location.label"
-									default="Location title" /> </label>
-									
-								<div class="controls textbox">
-									<input id="place_name" type="text" name="place_name" class="input-block-level"
-										value="${defaultPlaceName}"></input>
-								</div>
-
-							</div>
-
+							<%
+								def obvInfoFeeder = lastCreatedObv ? lastCreatedObv : observationInstance
+                            %>
 							<div class="row control-group">
 								<%
 	                              	def defaultAccuracy = (obvInfoFeeder?.locationAccuracy) ? obvInfoFeeder.locationAccuracy : "Approximate"
@@ -453,7 +459,7 @@ if(r && thumbnail) {
 	                            <div class="controls textbox">             
 	                                <!-- div class="location_picker_value" id="latitude"></div>
 	                                <input id="latitude_field" type="hidden" name="latitude"></input-->
-	                                <input class="degree_field input-block-level" id="latitude_field" type="text" name="latitude"></input>
+	                                <input class="degree_field input-block-level" style="width: 260px;" id="latitude_field" type="text" name="latitude"></input>
 	                                <input class="dms_field" id="latitude_deg_field" type="text" name="latitude_deg" placeholder="deg"></input>
 	                                <input class="dms_field" id="latitude_min_field" type="text" name="latitude_min" placeholder="min"></input>
 	                                <input class="dms_field" id="latitude_sec_field" type="text" name="latitude_sec" placeholder="sec"></input>
@@ -472,7 +478,7 @@ if(r && thumbnail) {
 	                            <div class="controls textbox">               
 	                                <!--div class="location_picker_value" id="longitude"></div>
 	                                <input id="longitude_field" type="hidden" name="longitude"></input-->
-	                                <input class="degree_field input-block-level" id="longitude_field" type="text" name="longitude"></input>
+	                                <input class="degree_field input-block-level" style="width: 260px;" id="longitude_field" type="text" name="longitude"></input>
 	                                <input class="dms_field" id="longitude_deg_field" type="text" name="longitude_deg" placeholder="deg"></input>
 	                                <input class="dms_field" id="longitude_min_field" type="text" name="longitude_min" placeholder="min"></input>
 	                                <input class="dms_field" id="longitude_sec_field" type="text" name="longitude_sec" placeholder="sec"></input>
@@ -486,28 +492,7 @@ if(r && thumbnail) {
 	                        </div>
 	                  
 	                </div>
-	                	<div class=" span6 sidebar-section section" style="padding:0;width:430px;">
-                                    <div class="map_search">
-                                            <div id="geotagged_images" style="padding:10px;">
-                                                    <div class="title" style="display: none">Use location
-                                                            from geo-tagged image:</div>
-                                                    <div class="msg" style="display: none">Select image if
-                                                            you want to use location information embedded in it</div>
-                                            </div>
-
-                                            <div id="current_location" class="section-item">
-                                                    <div class="location_picker_button"><a href="#" onclick="return false;">Use current location</a></div>
-                                            </div>
-                                            <input id="address" type="text" title="Find by place name"  class="input-block-level"
-                                                    class="section-item" />
-                                                                               
-
-
-	                    	<div id="map_area">
-	                        	<div id="map_canvas"></div>
-	                    	</div>
-	                    	</div>
-	                    </div>
+	                	
 	                </div>
 	            </div>    
       

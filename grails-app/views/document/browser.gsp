@@ -22,7 +22,7 @@
 <body>
 
 	<div class="span12">
-		<g:render template="/document/documentSubMenuTemplate" model="['entityName':'Browse Documents']" />
+		<g:render template="/document/documentSubMenuTemplate" model="['entityName':'Documents']" />
 		<uGroup:rightSidebar/>
 		
 
