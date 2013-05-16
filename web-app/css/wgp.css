@@ -1941,3 +1941,16 @@ div.noOfRatings {
     line-height:15px;
     border-radius:5px;
 }
+
+.contributeButton {
+/*    background-color:#5BB75B;*/
+    color:white;
+    display:inline-block;
+    float:none;
+}
+.contributeButton .btn{
+    margin-top:0px;
+}
+.fb_edge_widget_with_comment {
+    z-index:10;
+}
