@@ -34,6 +34,9 @@ class ActivityFeedService {
 	static final String MEMBER_LEFT = "Left Group"
 	static final String MEMBER_ROLE_UPDATED = "Role updated"
 	
+	//observation related
+	static final String DOCUMENT_CREATED = "Document created"
+	static final String DOCUMENT_UPDATED = "Document updated"
 	
 	static final String OLDER = "older"
 	static final String NEWER = "newer"

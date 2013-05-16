@@ -26,7 +26,7 @@ class ImageUtils {
 		
 		def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.resources.images
 		
-		String fileName = Utils.cleanFileName(imageFile.getName());
+		String fileName = imageFile.getName();
 		int lastIndex = fileName.lastIndexOf('.');
 		
 		log.debug "Creating thumbnail image";

@@ -13,6 +13,8 @@ class DocumentController {
 	def springSecurityService
 	def userGroupService
 	def SUserService
+	def activityFeedService
+	def observationService
 	
 	def index = {
 		redirect(action: "browser", params: params)
@@ -39,7 +41,7 @@ class DocumentController {
 		if (documentInstance.save(flush: true)) {
 
 			flash.message = "${message(code: 'default.created.message', args: [message(code: 'document.label', default: 'Document'), documentInstance.id])}"
-			redirect(action: "show", id: documentInstance.id)
+			activityFeedService.addActivityFeed(documentInstance, null, documentInstance.author, activityFeedService.DOCUMENT_CREATED);
 
 			def tags = (params.tags != null) ? Arrays.asList(params.tags) : new ArrayList();
 			
@@ -55,6 +57,8 @@ class DocumentController {
 					documentService.setUserGroups(documentInstance, userGroups);
 				}
 			}
+			observationService.sendNotificationMail(activityFeedService.DOCUMENT_CREATED, documentInstance, request, params.webaddress);
+			redirect(action: "show", id: documentInstance.id)
 		}
 		else {
 			render(view: "create", model: [documentInstance: documentInstance])
@@ -104,7 +108,7 @@ class DocumentController {
 			//documentInstance.properties = params
 			documentService.updateDocument(documentInstance, params)
 			if (!documentInstance.hasErrors() && documentInstance.save(flush: true)) {
-				
+				activityFeedService.addActivityFeed(documentInstance, null, springSecurityService.currentUser, activityFeedService.DOCUMENT_UPDATED);
 				def tags = (params.tags != null) ? Arrays.asList(params.tags) : new ArrayList();
 				
 				documentInstance.setTags(tags)

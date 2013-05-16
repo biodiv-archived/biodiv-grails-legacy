@@ -1248,7 +1248,12 @@ class ObservationService {
 				toUsers.add(getOwner(obv))
 				templateMap['userProfileUrl'] = ObvUtilService.createHardLink('user', 'show', obv.author.id)
 				break;
-
+			
+			case activityFeedService.DOCUMENT_CREATED:
+				mailSubject = conf.ui.addDocument.emailSubject
+				bodyContent = conf.ui.addDocument.emailBody
+				toUsers.add(getOwner(obv))
+				break
 				
 			default:
 				log.debug "invalid notification type"
