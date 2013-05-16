@@ -37,73 +37,79 @@
 
 	<div class="span12">
 
-            <div class="page-header clearfix" style="margin-bottom:0px;">
-                <div style="width: 100%;">
-                    <div class="main_heading" style="margin-left: 0px;">
-                        <div class="pull-right">
-                            <sUser:isCEPFAdmin>
+		<div class="page-header clearfix" style="margin-bottom: 0px;">
+			<div style="width: 100%;">
+				<div class="main_heading" style="margin-left: 0px;">
+					<div class="pull-right">
+						<sUser:isCEPFAdmin>
 
-                            <a class="btn btn-success pull-right" title="Add CEPF Project"
-                                href="${uGroup.createLink(
-                                controller:'project', action:'create', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"
-                                > <i class="icon-plus"></i>Add CEPF Project
+							<a class="btn btn-success pull-right" title="Add CEPF Project"
+								href="${uGroup.createLink(
+                                controller:'project', action:'create', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
+								<i class="icon-plus"></i>Add CEPF Project
 
-                            </a>
+							</a>
 
 
-                            <a class="btn btn-primary pull-right" title="Edit CEPF Project" style="margin-right: 5px;"
-                                href="${uGroup.createLink(controller:'project', action:'edit', id:projectInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
-                                <i class="icon-edit"></i>Edit
+							<a class="btn btn-primary pull-right" title="Edit CEPF Project"
+								style="margin-right: 5px;"
+								href="${uGroup.createLink(controller:'project', action:'edit', id:projectInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
+								<i class="icon-edit"></i>Edit
 
-                            </a> 
+							</a>
 
-                            <a class="btn btn-danger pull-right"  href="#" title="Delete CEPF Project"  style="margin-right: 5px;"
-                                onclick="deleteProject(); return false;">
-                                <i class="icon-trash"></i>Delete
-                            </a>
+							<a class="btn btn-danger pull-right" href="#"
+								title="Delete CEPF Project" style="margin-right: 5px;"
+								onclick="deleteProject(); return false;"> <i
+								class="icon-trash"></i>Delete
+							</a>
 
-                            <form
-                                action="${uGroup.createLink(controller:'project', action:'delete')}"
-                                method='POST' name='deleteForm'>
-                                <input type="hidden" name="id" value="${projectInstance.id}" />
-                            </form>
+							<form
+								action="${uGroup.createLink(controller:'project', action:'delete')}"
+								method='POST' name='deleteForm'>
+								<input type="hidden" name="id" value="${projectInstance.id}" />
+							</form>
 
-                            <r:script>
+							<r:script>
                             function deleteProject(){
                             if(confirm('This project will be deleted. Are you sure ?')){
                             document.forms.deleteForm.submit();
                             }
                             }
                             </r:script>
+						</sUser:isCEPFAdmin>
+
+					</div>
 
 
-                        </div>
-
-
-                        </sUser:isCEPFAdmin>
-
-                        <s:showHeadingAndSubHeading
-                            model="['heading':projectInstance.title, 'subHeading':subHeading, 'headingClass':headingClass, 'subHeadingClass':subHeadingClass]" />
-                            <small>submitted by <a href="${uGroup.createLink(controller:'user', action:'show', id:projectInstance.author.id, userGroupWebaddress:params.webaddress)}">${projectInstance.author.name}</a> on                    
-                                <g:formatDate type="datetime" date="${projectInstance.dateCreated} style="MEDIUM"/>
-                            </small>
-                        </div>
-                    </div>
+					<s:showHeadingAndSubHeading
+						model="['heading':projectInstance.title, 'subHeading':subHeading, 'headingClass':headingClass, 'subHeadingClass':subHeadingClass]" />
+					<small>submitted by <a
+						href="${uGroup.createLink(controller:'user', action:'show', id:projectInstance.author.id, userGroupWebaddress:params.webaddress)}">
+							${projectInstance.author.name}
+					</a> on <g:formatDate type="datetime"
+							date="${projectInstance.dateCreated}" style=" MEDIUM" />
+					</small>
+				</div>
+			</div>
 			<% 
 	def curr_id = projectInstance.id
 	def prevProjectId =  Project.countByIdLessThan(curr_id)>0?Project.findAllByIdLessThan(curr_id, ['max':1, 'sort':'id', 'order':'desc'])?.last()?.id:''
 	def nextProjectId = Project.countByIdGreaterThan(curr_id)>0?Project.findByIdGreaterThan(curr_id, ['max':1, 'sort':'id', 'order':'asc'])?.id:''
 	
 	 %>
-			<div class="nav" style="width: 100%;margin-top:10px;">
+			<div class="nav" style="width: 100%; margin-top: 10px;">
 
 				<a class="pull-left btn ${prevProjectId?:'disabled'}"
 					href="${uGroup.createLink([action:"show", controller:"project",
-                                        id:prevProjectId,  'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress])}"><i class="icon-backward"></i>Prev
-					</a> <a class="pull-right  btn ${nextProjectId?:'disabled'}"
+                                        id:prevProjectId,  'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress])}"><i
+					class="icon-backward"></i>Prev </a> <a
+					class="pull-right  btn ${nextProjectId?:'disabled'}"
 					href="${uGroup.createLink([action:"show", controller:"project",
-                                        id:nextProjectId,  'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress])}">Next <i style="margin-right: 0px; margin-left: 3px;" class="icon-forward"></i>
-					</a> <a class="btn"
+                                        id:nextProjectId,  'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress])}">Next
+					<i style="margin-right: 0px; margin-left: 3px;"
+					class="icon-forward"></i>
+				</a> <a class="btn"
 					href="${uGroup.createLink([action:'list', controller:'project'])}"
 					style="text-align: center; display: block; margin: 0 auto;">List</a>
 
@@ -111,13 +117,12 @@
 
 
 
-                </div>
+		</div>
 
 
 
 		<uGroup:rightSidebar />
-		<div class="span8 right-shadow-box observation"
-			style="margin: 0px;">
+		<div class="span8 right-shadow-box observation" style="margin: 0px;">
 
 
 
@@ -135,25 +140,25 @@
 			</g:if>
 
 			<g:if test="${projectInstance?.summary || projectInstance.tags}">
-                        <div class="observation_story sidebar_section">
-			<g:if test="${projectInstance?.summary}">
+				<div class="observation_story sidebar_section">
+					<g:if test="${projectInstance?.summary}">
 
-				<div>
-					<h4>Summary</h4>
-					<p>
-						${projectInstance?.summary}
-					</p>
+						<div>
+							<h4>Summary</h4>
+							<p>
+								${projectInstance?.summary}
+							</p>
+						</div>
+					</g:if>
+					<g:if test="${projectInstance.tags}">
+						<b>Keywords : </b>
+
+						<g:render template="/project/showTagsList"
+							model="['instance': projectInstance, 'controller': 'project', 'action':'list']" />
+
+					</g:if>
 				</div>
 			</g:if>
-			<g:if test="${projectInstance.tags}">
-				<b>Keywords : </b>
-
-				<g:render template="/project/showTagsList"
-					model="['instance': projectInstance, 'controller': 'project', 'action':'list']" />
-
-			</g:if>
-                        </div>
-                       </g:if>
 
 			<g:if test="${projectInstance.locations.size()}">
 				<div class="sidebar_section">
@@ -217,23 +222,25 @@
 
 			</g:if>
 			<div class="sidebar_section">
-				<a data-toggle="collapse" href="#project-details"><h5>Project Details</h5></a>
+				<a data-toggle="collapse" href="#project-details"><h5>Project
+						Details</h5></a>
 				<div id="project-details" class="speciesField in collapse">
 					<table>
-						<g:if test="${projectInstance.grantFrom || projectInstance.grantTo}">
-						<tr>
-							<td class="prop"><span class=" name">Grant Term</span></td>
-							<td>
-								${projectInstance?.grantFrom} - ${projectInstance?.grantTo}
-							</td>
-						</tr>
+						<g:if
+							test="${projectInstance.grantFrom || projectInstance.grantTo}">
+							<tr>
+								<td class="prop"><span class=" name">Grant Term</span></td>
+								<td>
+									${projectInstance?.grantFrom} - ${projectInstance?.grantTo}
+								</td>
+							</tr>
 						</g:if>
 						<g:if test="${projectInstance.grantedAmount}">
-						<tr>
-							<td class="prop"><span class=" name">Amount</td>
-							<td>$ ${projectInstance?.grantedAmount}
-							</td>
-						</tr>
+							<tr>
+								<td class="prop"><span class=" name">Amount</td>
+								<td>$ ${projectInstance?.grantedAmount}
+								</td>
+							</tr>
 						</g:if>
 					</table>
 				</div>
@@ -356,6 +363,7 @@
 	//		initRelativeTime("${uGroup.createLink(controller:'activityFeed', action:'getServerTime')}");
 		});
 	</r:script>
+
 
 </body>
 </html>
