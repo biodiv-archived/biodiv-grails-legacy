@@ -50,27 +50,13 @@
             </g:if>
         </g:if>
         <g:else>
-
-	<div class="sidebar_section" style="overflow:hidden">
-		<h5>All Document Tags</h5>
-		<%
-			params.offset = 0	
-		%>
-		<g:if test="${tags}">
-			<tc:tagCloud bean="${Document}" 
-				action="browser" sort="${true}" style
-				color="${[start: '#084B91', end: '#9FBBE5']}"
-				size="${[start: 12, end: 30, unit: 'px']}" paramName='tag' />
-
-			<span class="pull-right"><a href="/document/tagcloud">more
-					tags</a></span>
-		</g:if>
-		<g:else>
-			<span class="msg" style="padding-left: 50px;">No tags</span>
-		</g:else>
-	</div>
+       		<%
+					params.offset = 0	
+			%>
+			<div class="sidebar_section" style="overflow:hidden">
+				<h5>All Document Tags</h5>
+				<project:showTagsCloud model="[tagType:'document', showMoreTagPageLink:uGroup.createLink(controller:'document', action:'tagcloud', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)]"></project:showTagsCloud>
+			</div>
         </g:else>
-
-
 </div>
 

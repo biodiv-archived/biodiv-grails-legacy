@@ -12,23 +12,12 @@
 
             </ul>
     </div>
-
 	<%
 		params.offset = 0
 	%>
 	<div class="sidebar_section" style="overflow:hidden;">
 		<h5>Project Tags</h5>
-		<g:if test="${tags}">
-			<tc:tagCloud bean="${Project}" controller="project" action="list"
-				sort="${true}" color="${[start: '#084B91', end: '#9FBBE5']}"
-				size="${[start: 12, end: 30, unit: 'px']}" paramName='tag'/>
-
-			<span class="pull-right"><a href="/project/tagcloud">more
-					tags</a></span>
-		</g:if>
-		<g:else>
-			<span class="msg" style="padding-left: 50px;">No tags</span>
-		</g:else>
+		<project:showTagsCloud model="[tagType:'project', showMoreTagPageLink:uGroup.createLink(controller:'project', action:'tagcloud', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)]"></project:showTagsCloud>
 	</div>
 </div>
 
