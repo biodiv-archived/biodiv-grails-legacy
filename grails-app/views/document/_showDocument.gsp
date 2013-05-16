@@ -74,6 +74,20 @@
 			</div>
 		</div>
 	</g:if>
+	
+	<g:if test="${showDetails && documentInstance?.fetchSource()}">
+		<div class="prop">
+			<span class="name">Source</span>
+			<%	
+				def sourceObj = documentInstance.fetchSource()
+				def className = sourceObj.class.getSimpleName()
+			%>
+			<div class="value">
+				<a href="${uGroup.createLink(controller: className.toLowerCase(), action:"show", id:sourceObj.id, 'userGroupWebaddress':params?.webaddress)}"><b>${className + ": "}</b>${sourceObj}</a>
+			</div>
+		</div>
+	</g:if>
+	 
 	<g:if test="${showDetails && documentInstance?.tags}">
 		<div class="prop">
 			<span class="name">Tags</span>

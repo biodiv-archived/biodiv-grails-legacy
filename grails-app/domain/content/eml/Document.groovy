@@ -14,6 +14,7 @@ import org.grails.taggable.Taggable;
  *
  */
 class Document implements Taggable {
+	def grailsApplication
 	
 	public enum DocumentType {
 		Report("Report"),
@@ -108,5 +109,11 @@ class Document implements Taggable {
 	def setSource(parent) {
 		this.sourceHolderId = parent.id
 		this.sourceHolderType = parent.class.getCanonicalName()
+	}
+	
+	def fetchSource(){
+		if(sourceHolderId && sourceHolderType){
+			return grailsApplication.getArtefact("Domain",sourceHolderType)?.getClazz()?.read(sourceHolderId)
+		}
 	}
 }
