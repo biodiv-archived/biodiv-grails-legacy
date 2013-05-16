@@ -43,7 +43,7 @@ def migrateProjects() {
 		def sql = Sql.newInstance(connectionUrl, userName, password, "org.postgresql.Driver");
 		migrateDirections(sql)
 		int i=0
-		sql.eachRow("select nid, vid, title from node where type = 'project' order by nid asc") { row ->
+		sql.eachRow("select nid, vid, title, created, changed from node where type = 'project' order by nid asc") { row ->
 			log.debug " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>     title ===  $i  $row.title  nid == $row.nid , vid == $row.vid"
 			try{
 				Project project = createProjectFromRow(row, sql)
@@ -158,9 +158,14 @@ def migrateProjects() {
 
 		//set author for the project
 		//TODO: Get CEPF RIT member id while migration
-		proj.author = SUser.get("3077")
+		proj.author = SUser.get("1107")
+		
+		proj.dateCreated = getDateFromTimestamp(nodeRow.created)
+		proj.lastUpdated = getDateFromTimestamp(nodeRow.changed)
 
 
+		log.debug " ######## Exporting project: "+ proj.dump()
+		
 		if(!proj.save(flush:true)){
 			proj.errors.allErrors.each { log.error it }
 			return null
@@ -218,7 +223,7 @@ def migrateProjects() {
 				if(row.metadata) {
 					println "metadata is "+ row.metadata
 
-	/*				SerializedPhpParser serializedPhpParser = new SerializedPhpParser(row.metadata);
+				/*	SerializedPhpParser serializedPhpParser = new SerializedPhpParser(row.metadata);
 					Object result = serializedPhpParser.parse();
 					document.title = result.description;
 					document.description = result.shortnote.body
@@ -322,14 +327,19 @@ def migrateProjects() {
 	}
 	
 	private Date parseDBDate(date){
-		try {
-			return date? Date.parse("yyyy-mm-dd'T'HH:mm:ss", date):new Date();
+		try {			
+			return date? Date.parse("yyyy-mm-dd'T'HH:mm:ss", date):null;
 		} catch (Exception e) {
 			// TODO: handle exception
 			print e.toString();
-			throw new Exception();
+			throw e;
 		}
 		return null;
+	}
+	
+	private Date getDateFromTimestamp(timestamp) {
+		Date date =  new Date(new Long(timestamp)*1000)
+		return date
 	}
 }
 
