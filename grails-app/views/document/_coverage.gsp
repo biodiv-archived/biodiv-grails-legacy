@@ -15,7 +15,6 @@
 		</div>
 	</div>
 	<hr>
-	============================== ${ coverageInstance}
 	<obv:showMapInput model="[observationInstance:coverageInstance, obvInfoFeeder:coverageInstance, locationHeading:'Geographical Coverage']"></obv:showMapInput>
 </div>
 

@@ -51,6 +51,8 @@ class DocumentService {
 		document.coverage.location = 'POINT(' + params.longitude + ' ' + params.latitude + ')'
 		document.coverage.reverseGeocodedName = params.reverse_geocoded_name
 		document.coverage.locationAccuracy = params.location_accuracy
+		document.coverage.latitude = params.latitude.toFloat()
+		document.coverage.longitude = params.longitude.toFloat()
 		//document.coverage.geoPrivacy = params.geo_privacy
 
 

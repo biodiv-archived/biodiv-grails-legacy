@@ -21,7 +21,7 @@
                 	</div>
             </div>
             
-	<div class="span6 sidebar-section section block" style="margin:0px; width:430px; padding-top:10px;">
+	<div class="span6 sidebar-section section" style="margin:0px; width:430px; padding-top:10px;">
 	
 		<div class="row control-group">
 			<%
