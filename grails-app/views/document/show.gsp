@@ -138,7 +138,7 @@
 								</tr>
 							</g:if>
 
-
+							===========${documentInstance.coverage}
 							<g:if test="${documentInstance.coverage?.placeName || documentInstance.coverage.reverseGeocodedName}">
 								<tr>
 

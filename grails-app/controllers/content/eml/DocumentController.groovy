@@ -5,6 +5,8 @@ import grails.plugins.springsecurity.Secured
 import grails.converters.JSON
 import org.grails.taggable.*
 
+import speciespage.search.DocumentSearchService;
+
 class DocumentController {
 
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
@@ -15,7 +17,7 @@ class DocumentController {
 	def SUserService
 	def activityFeedService
 	def observationService
-	
+	def documentSearchService
 	def index = {
 		redirect(action: "browser", params: params)
 	}
@@ -58,6 +60,7 @@ class DocumentController {
 				}
 			}
 			observationService.sendNotificationMail(activityFeedService.DOCUMENT_CREATED, documentInstance, request, params.webaddress);
+			documentSearchService.publishSearchIndex(documentInstance, true)
 			redirect(action: "show", id: documentInstance.id)
 		}
 		else {
@@ -122,7 +125,7 @@ class DocumentController {
 						documentService.setUserGroups(documentInstance, userGroups);
 					}
 				}
-				
+				documentSearchService.publishSearchIndex(documentInstance, true) 
 				flash.message = "${message(code: 'default.updated.message', args: [message(code: 'document.label', default: 'Document'), documentInstance.id])}"
 				redirect(action: "show", id: documentInstance.id)
 			}

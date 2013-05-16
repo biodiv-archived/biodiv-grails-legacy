@@ -68,6 +68,7 @@ class ProjectController {
 			params.sourceHolderId = projectInstance.id
 			params.sourceHolderType = projectInstance.class.getCanonicalName()
 			projectInstance.updateDocuments()
+			projectSearchService.publishSearchIndex(projectInstance, true);
 			redirect(action: "show", id: projectInstance.id)
 		}
 		else {
@@ -120,6 +121,7 @@ class ProjectController {
 			if (!projectInstance.hasErrors() && projectInstance.save(flush: true)) {
 				projectInstance.setTags(tags);
 				flash.message = "${message(code: 'default.updated.message', args: [message(code: 'project.label', default: 'Project'), projectInstance.id])}"
+				projectSearchService.publishSearchIndex(projectInstance, true);
 				redirect(action: "show", id: projectInstance.id)
 			}
 			else {
