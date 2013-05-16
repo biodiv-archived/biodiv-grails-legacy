@@ -5,50 +5,39 @@
      documentInstance = Document.read(documentInstance.id)
     %>
 
-
-	<g:if test="${documentInstance.uFile || documentInstance.uri}">
-		<div class="sidebar_section" style="margin-left: 0px;">
-
-			<g:if test="${documentInstance.uFile}">
-
-				<dl class="dl-horizontal">
-
-					<dt>File</dt>
-					<dd>
-						<g:if test="${!showDetails}">
-							<fileManager:displayFile
-								filePath="${ documentInstance?.uFile?.path}"></fileManager:displayFile>
-						</g:if>
-						<g:else>
-							<fileManager:displayFile
-								filePath="${ documentInstance?.uFile?.path}"
-								fileName="${ documentInstance?.title}"></fileManager:displayFile>
-						</g:else>
-						
-					</dd>
-				</dl>
-			</g:if>
-			<g:if test="${documentInstance.uri}">
-				<dl class="dl-horizontal">
-
-					<dt>URL</dt>
-					<dd class="linktext">
-						${documentInstance.uri}
-					</dd>
-				</dl>
-			</g:if>
+	<g:if test="${documentInstance.uFile}">
+		<div class="prop">
+			<span class="name">File</span>
+			<div class="value">
+			<g:if test="${!showDetails}">
+				<fileManager:displayFile
+					filePath="${ documentInstance?.uFile?.path}"></fileManager:displayFile>
+				</g:if>
+				<g:else>
+					<fileManager:displayFile
+						filePath="${ documentInstance?.uFile?.path}"
+						fileName="${ documentInstance?.title}"></fileManager:displayFile>
+				</g:else>
+			</div>
 		</div>
 	</g:if>
-
-	<g:if test="${!showDetails}">
+		
+	<g:if test="${documentInstance.uri}">
 		<div class="prop">
-			<span class="name">Type</span>
+			<span class="name">URL</span>
 			<div class="value">
-				${documentInstance.type?.value }
+				<span class="linktext">${documentInstance.uri}</span>
 			</div>
 		</div>
 	</g:if>
 
+	<div class="prop">
+		<span class="name">Type</span>
+		<div class="value">
+			${documentInstance.type?.value }
+		</div>
+	</div>
+	
 	<g:if
 		test="${documentInstance?.description && documentInstance?.description.trim() != ''}">
 		<div class="prop">
@@ -85,9 +74,21 @@
 			</div>
 		</div>
 	</g:if>
-
-	<g:if test="${documentInstance?.tags}">
-
+	
+	<g:if test="${showDetails && documentInstance?.fetchSource()}">
+		<div class="prop">
+			<span class="name">Source</span>
+			<%	
+				def sourceObj = documentInstance.fetchSource()
+				def className = sourceObj.class.getSimpleName()
+			%>
+			<div class="value">
+				<a href="${uGroup.createLink(controller: className.toLowerCase(), action:"show", id:sourceObj.id, 'userGroupWebaddress':params?.webaddress)}"><b>${className + ": "}</b>${sourceObj}</a>
+			</div>
+		</div>
+	</g:if>
+	 
+	<g:if test="${showDetails && documentInstance?.tags}">
 		<div class="prop">
 			<span class="name">Tags</span>
 
@@ -97,5 +98,4 @@
 			</div>
 		</div>
 	</g:if>
-
 </div>

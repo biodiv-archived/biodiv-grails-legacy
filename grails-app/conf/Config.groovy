@@ -1078,6 +1078,20 @@ Hi $username,<br/>
 -The portal team
 '''
 
+grails.plugins.springsecurity.ui.addDocument.emailSubject = 'Document added'
+grails.plugins.springsecurity.ui.addDocument.emailBody = '''
+Hi $username,<br/>
+<br/>
+You have uploaded a document to <b>$domain</b> and it is available <a href="$obvUrl">here</a><br/>
+<br/>
+You will be notified by mail on any social activity on the document.<br/>
+If you do not want to receive notifications please go to your <a href="$userProfileUrl">user profile</a> and switch it off.<br/>
+<br/>
+Thank you for your contribution to the portal.<br/>
+<br/>
+-The portal team'''
+
+
 
 grails.plugins.springsecurity.ui.encodePassword = false
 

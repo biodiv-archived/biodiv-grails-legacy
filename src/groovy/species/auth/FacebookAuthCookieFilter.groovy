@@ -18,6 +18,7 @@ import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.authentication.event.InteractiveAuthenticationSuccessEvent;
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.security.web.DefaultRedirectStrategy
@@ -29,6 +30,16 @@ import org.springframework.util.Assert;
 import org.springframework.web.filter.GenericFilterBean
 
 import com.the6hours.grails.springsecurity.facebook.FacebookAuthToken
+
+import species.auth.Role
+import species.auth.SUser
+import species.auth.SUserRole
+import species.utils.Utils;
+
+
+import com.the6hours.grails.springsecurity.facebook.FacebookAuthToken;
+import org.springframework.social.facebook.api.FacebookProfile;
+
 
 /**
  * TODO
@@ -50,6 +61,7 @@ class FacebookAuthCookieFilter extends GenericFilterBean implements ApplicationE
 	private AuthenticationFailureHandler failureHandler = new SimpleUrlAuthenticationFailureHandler();
 
 	def grailsApplication
+    def facebookService
 
 	void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, javax.servlet.FilterChain chain) {
 		HttpServletRequest request = servletRequest
@@ -68,6 +80,7 @@ class FacebookAuthCookieFilter extends GenericFilterBean implements ApplicationE
 					FacebookAuthToken token = facebookAuthUtils.build(request, cookie.value)
 					if (token != null) {
 						logger.debug("Got fbAuthToken $token");
+                        token.user = request.getSession().getAttribute("LAST_FACEBOOK_USER");
 						Authentication authentication = authenticationManager.authenticate(token);
 						// Store to SecurityContextHolder
 						SecurityContextHolder.context.authentication = authentication;
@@ -106,6 +119,12 @@ class FacebookAuthCookieFilter extends GenericFilterBean implements ApplicationE
 					}
 				} catch (BadCredentialsException e) {
 					logger.info("Invalid cookie, skip. Message was: $e.message")
+					unsuccessfulAuthentication(request, response, e);
+                    return;
+				} catch (AuthenticationServiceException e) {
+					logger.info("Message : $e.message")
+			//		unsuccessfulAuthentication(request, response, e);
+            //        return;
 				} catch(AuthenticationException e) {
 					logger.info("Auth exception. Message was: $e.message")
 					unsuccessfulAuthentication(request, response, e);
@@ -161,4 +180,5 @@ class FacebookAuthCookieFilter extends GenericFilterBean implements ApplicationE
 		Assert.notNull(failureHandler, "failureHandler cannot be null");
 		this.failureHandler = failureHandler;
 	}
+
 }

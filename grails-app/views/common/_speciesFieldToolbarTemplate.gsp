@@ -6,7 +6,7 @@
 	
 	<div class="toolbar">
 
-		<div class="span4" style="height:40px;margin-left:0px;overflow:hidden">
+		<div class="span8 pull-left" style="height:40px;margin-left:0px;overflow:hidden">
 			<g:set var="ca" value="${speciesFieldInstance?.attributors?:speciesFieldInstance?.contributors }"></g:set>
 			<g:if test="${ca}">
 				<ul class="tagit" style="list-style:none;display:inline-block;margin-left:0px;width:100%">
@@ -19,7 +19,7 @@
 				</ul>
 			</g:if>
 		</div>
-		<div class="pull-right">
+		<div class="span3 pull-right">
                         <obv:rating model="['resource':speciesFieldInstance]"/>
 			<g:if test="${speciesFieldInstance?.licenses.size() > 0}">
 				<g:each in="${speciesFieldInstance?.licenses}" var="license">

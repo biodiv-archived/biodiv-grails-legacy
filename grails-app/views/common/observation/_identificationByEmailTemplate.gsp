@@ -2,7 +2,7 @@
 	<div class="btn-group"
 		style="z-index: 10; float: left; margin-left: 5px;">
 		<a id="identification-email"
-			class="${(source == 'observationShow')?'btn btn-mini' : 'btn'} dropdown-toggle"
+			class="${(params.action == 'show')?'btn btn-link' : 'btn'} dropdown-toggle"
 			data-toggle="dropdown" href="#"><i class="icon-envelope"></i>Share</a>
 		<form id="email-form" name="email-form" class="popup-form"
 			style="display: none; background-color: #F2F2F2;">

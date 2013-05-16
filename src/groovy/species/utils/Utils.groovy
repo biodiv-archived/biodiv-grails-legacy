@@ -36,7 +36,8 @@ class Utils {
 
 	private static final log = LogFactory.getLog(this);
 	private static final NamesParser namesParser = new NamesParser();
-
+	private static final Random FILE_NAME_GENEROTR = new Random();
+	
 	def grailsApplication;
 
 	static boolean copy(File src, File dst) throws IOException {
@@ -76,8 +77,14 @@ class Utils {
 	}
 
 	static String cleanFileName(String name) {
-		name = name?.replaceAll("\u00A0|\u2007|\u202F", " ").replaceAll("\\s+", "_").trim();
-		return name;
+		//returning random integer (between 1-1000) as file name along with original extension
+		name = name.trim()
+		def beginIndex = name.lastIndexOf(".")
+		def extension = (beginIndex > -1) ? name.substring(beginIndex) : ""
+		return "" + (FILE_NAME_GENEROTR.nextInt(1000-1+1)+1) + extension 
+
+//		name = name?.replaceAll("\u00A0|\u2007|\u202F", " ").replaceAll("\\s+", "_").trim();
+//		return name;
 	}
 
 	static String cleanSearchQuery(String name) {

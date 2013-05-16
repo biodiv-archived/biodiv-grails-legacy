@@ -407,7 +407,7 @@ class DocumentService {
 //			activeFilters["description"] = params.description
 //		}
 
-		def sortBy = params.sort ? params.sort : "dateCreated "
+		def sortBy = params.sort ? params.sort : "lastUpdated "
 		def orderByClause = " order by document." + sortBy +  " desc, document.id asc"
 		return [query:query,filterQuery:filterQuery, orderByClause:orderByClause, queryParams:queryParams, activeFilters:activeFilters]
 	}

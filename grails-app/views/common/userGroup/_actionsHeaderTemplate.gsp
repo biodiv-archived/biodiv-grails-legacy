@@ -1,5 +1,5 @@
 <div class="observation-icons pull-right" style="position: absolute;bottom: -80px;right: 0px;">
-	<g:if test="${userGroupInstance.hasPermission(org.springframework.security.acls.domain.BasePermission.WRITE)}">
+	<g:if test="${canEditUserGroup}">
 		<a id="inviteMembers" class="btn btn-large btn-primary" href="#inviteMembersDialog" role="button" data-toggle="modal"><i
 			class="icon-envelope"></i> <g:message code="userGroup.members.label"
 				default="Invite Friends" /> </a>
@@ -28,7 +28,6 @@
 			</div>
 		</div>
 	</g:if>
-
 	<uGroup:joinLeaveGroupTemplate model="['showLeave':false, 'showJoin':true, 'userGroupInstance':userGroupInstance]" />
 	<div class="modal hide fade in" id="leaveUsModalDialog" tabindex="-1" role="dialog" aria-labelledby="leaveUsModalDialogLabel" >
 		<div class="modal-header">

@@ -20,7 +20,7 @@ import species.auth.Role
 import species.auth.SUser
 import species.auth.SUserRole
 import species.utils.Utils;
-
+import species.auth.CustomRegisterCommand;
 /**
  * Manages associating OpenIDs with application users, both by creating a new local user
  * associated with an OpenID and also by associating a new OpenID to an existing account.

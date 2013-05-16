@@ -1,13 +1,41 @@
 
+<%@page import="species.utils.Utils"%>
 <%@ page import="content.eml.Document"%>
 <html>
 <head>
+<g:set var="canonicalUrl" value="${uGroup.createLink([controller:'document', action:'show', id:documentInstance.id, base:Utils.getIBPServerDomain()])}"/>
+<g:set var="title" value="${documentInstance.title}"/>
+<link rel="canonical" href="${canonicalUrl}" />
+<meta property="og:type" content="article" />
+<meta property="og:title" content="${title}"/>
+<meta property="og:url" content="${canonicalUrl}" />
+<meta property="og:site_name" content="${Utils.getDomainName(request)}" />
+
+<g:set var="domain" value="${Utils.getDomain(request)}" />
+<g:set var="fbAppId"/>
+<%
+		
+		if(domain.equals(grailsApplication.config.wgp.domain)) {
+			fbAppId = grailsApplication.config.speciesPortal.wgp.facebook.appId;
+		} else { //if(domain.equals(grailsApplication.config.ibp.domain)) {
+			fbAppId =  grailsApplication.config.speciesPortal.ibp.facebook.appId;
+		}
+		
+%>
+<g:set var="description" value="${documentInstance.description }" />
+
+<meta property="fb:app_id" content="${fbAppId }" />
+<meta property="fb:admins" content="581308415,100000607869577" />
+<meta property="og:description"
+          content='${description}'/>
+
+
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="main" />
 <g:set var="entityName"
 	value="${message(code: 'document.label', default: 'Document')}" />
-<title><g:message code="default.show.label" args="[entityName]" /></title>
-<r:require modules="content_view" />
+        <title>${title}</title>
+<r:require modules="content_view, activityfeed, comment" />
 </head>
 <body>
 	<div class="span12">
@@ -56,35 +84,17 @@
                             </div>
 
 			</div>
-                        <div style="clear:both"></div>
-                        <% 
-                        def curr_id = documentInstance.id
-                        def prevId =  Document.countByIdLessThan(curr_id)>0?Document.findAllByIdLessThan(curr_id, ['max':1, 'sort':'id', 'order':'desc'])?.last()?.id:''
-                        def nextId = Document.countByIdGreaterThan(curr_id)>0?Document.findByIdGreaterThan(curr_id, ['max':1, 'sort':'id'])?.id:''
-
-                        %>
-                        <div class="nav" style="width: 100%;margin-top:10px;">
-
-                            <a class="pull-left btn ${prevId?:'disabled'}"
-                                href="${uGroup.createLink([action:"show", controller:"document",
-                                id:prevId,  'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress])}"><i class="icon-backward"></i>Prev
-                                </a> <a class="pull-right  btn ${nextId?:'disabled'}"
-                                href="${uGroup.createLink([action:"show", controller:"document",
-                                id:nextId,  'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress])}">Next <i style="margin-right: 0px; margin-left: 3px;" class="icon-forward"></i>
-                                </a> <a class="btn"
-                                href="${uGroup.createLink([action:'list', controller:'document'])}"
-                                style="text-align: center; display: block; margin: 0 auto;">List</a>
-
-                        </div>
-
-
-
 		</div>
+
+                <div class="span12" style="margin-left:0px">
+                    <g:render template="/common/observation/showObservationStoryActionsTemplate"
+                    model="['instance':documentInstance, 'href':canonicalUrl, 'title':title, 'description':description, 'hideFlag':true, 'hideDownload':true, 'hideFollow':true]" />
+                </div>
 
 
 
                 <div class="span8 right-shadow-box observation" style="margin:0;">
-                    		        <g:render template="/document/showDocument" model="['documentInstance':documentInstance]"/>
+                    		        <g:render template="/document/showDocument" model="['documentInstance':documentInstance, showDetails:true]"/>
 			<g:if
 				test="${documentInstance?.coverage?.speciesGroups || documentInstance.coverage?.habitats || documentInstance.coverage?.placeName }">
 
@@ -156,7 +166,13 @@
 
 			</g:if>
 
-
+			<div class="union-comment">
+				<feed:showAllActivityFeeds model="['rootHolder':documentInstance, feedType:'Specific', refreshType:'manual', 'feedPermission':'editable']" />
+				<%
+					def canPostComment = customsecurity.hasPermissionAsPerGroups([object:documentInstance, permission:org.springframework.security.acls.domain.BasePermission.WRITE]).toBoolean()
+				%>
+				<comment:showAllComments model="['commentHolder':documentInstance, commentType:'super', 'canPostComment':canPostComment, 'showCommentList':false]" />
+			</div>
 		</div>
 		<g:render template="/document/documentSidebar" model="['documentInstance':documentInstance]"/>
 

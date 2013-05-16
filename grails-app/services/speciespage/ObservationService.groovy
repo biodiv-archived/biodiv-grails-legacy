@@ -92,8 +92,8 @@ class ObservationService {
 		observation.group = SpeciesGroup.get(params.group_id);
 		observation.notes = params.notes;
 		observation.observedOn = parseDate(params.observedOn);
-		observation.placeName = params.place_name;
 		observation.reverseGeocodedName = params.reverse_geocoded_name;
+		observation.placeName = params.place_name?:observation.reverseGeocodedName;
 		observation.location = 'POINT(' + params.longitude + ' ' + params.latitude + ')'
 		observation.latitude = params.latitude.toFloat();
 		observation.longitude = params.longitude.toFloat();
@@ -729,7 +729,7 @@ class ObservationService {
 		}
 	}
 	
-	Map getIdentificationEmailInfo(m, requestObj, unsubscribeUrl){
+	Map getIdentificationEmailInfo(m, requestObj, unsubscribeUrl, controller="", action=""){
 		def source = m.source;
 		
 		def mailSubject = ""
@@ -759,6 +759,9 @@ class ObservationService {
 				mailSubject = "Invitation to join group"
 				activitySource = "user group"
 				break
+            case controller+action.capitalize():
+                mailSubject = "Share "+controller
+                activitySource = controller
 			default:
 				log.debug "invalid source type"
 		}
@@ -768,7 +771,7 @@ class ObservationService {
 		def staticMessage = conf.ui.askIdentification.staticMessage
 		if (staticMessage.contains('$')) {
 			staticMessage = evaluate(staticMessage, templateMap)
-		}
+		} 
 		
 		templateMap["activitySourceUrl"] = m.sourcePageUrl?: ""
 		templateMap["unsubscribeUrl"] = unsubscribeUrl ?: ""
@@ -1245,7 +1248,12 @@ class ObservationService {
 				toUsers.add(getOwner(obv))
 				templateMap['userProfileUrl'] = ObvUtilService.createHardLink('user', 'show', obv.author.id)
 				break;
-
+			
+			case activityFeedService.DOCUMENT_CREATED:
+				mailSubject = conf.ui.addDocument.emailSubject
+				bodyContent = conf.ui.addDocument.emailBody
+				toUsers.add(getOwner(obv))
+				break
 				
 			default:
 				log.debug "invalid notification type"

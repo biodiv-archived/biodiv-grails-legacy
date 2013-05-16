@@ -7,7 +7,7 @@
 <meta name="layout" content="main" />
 <g:set var="entityName"
 	value="${message(code: 'Document.label', default: 'Document')}" />
-<title>Document Browser</title>
+<title>Document</title>
 <r:require modules="add_file" />
 <uploader:head />
 <style type="text/css">
@@ -22,7 +22,7 @@
 <body>
 
 	<div class="span12">
-		<g:render template="/document/documentSubMenuTemplate" model="['entityName':'Browse Documents']" />
+		<g:render template="/document/documentSubMenuTemplate" model="['entityName':'Documents']" />
 		<uGroup:rightSidebar/>
 		
 

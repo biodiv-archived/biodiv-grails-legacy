@@ -1,3 +1,5 @@
+package species.auth;
+
 import grails.util.Environment;
 
 import org.codehaus.groovy.grails.plugins.springsecurity.NullSaltSource;
@@ -217,47 +219,6 @@ class RegisterController extends grails.plugins.springsecurity.ui.RegisterContro
 		[emailSent: true]
 	}
 	
-	def resetPassword = { ResetPasswordCommand command ->
-		log.debug params
-		String token = params.t
-
-		def registrationCode = token ? RegistrationCode.findByToken(token) : null
-		if (!registrationCode) {
-			flash.error = message(code: 'spring.security.ui.resetPassword.badCode')
-			redirect uri: SpringSecurityUtils.securityConfig.successHandler.defaultTargetUrl
-			return
-		}
-
-		if (!request.post) {
-			return [token: token, command: new ResetPasswordCommand()]
-		}
-
-		String usernamePropertyName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
-		def command2 = new ResetPasswordCommand(username:registrationCode.username, password:command.password, password2:command.password2);
-		command2.validate()
-
-		if (command2.hasErrors()) {
-			return [token: token, command: command]
-		}
-
-		String salt = saltSource instanceof NullSaltSource ? null : registrationCode.username
-		RegistrationCode.withTransaction { status ->
-			def user = lookupUserClass().findWhere((usernamePropertyName): registrationCode.username)
-			user.password = springSecurityUiService.encodePassword(command.password, salt)
-			user.accountLocked = false;
-			user.save()
-			registrationCode.delete()
-		}
-
-		springSecurityService.reauthenticate registrationCode.username
-
-		flash.message = message(code: 'spring.security.ui.resetPassword.success')
-
-		def conf = SpringSecurityUtils.securityConfig
-		String postResetUrl = conf.ui.register.postResetUrl ?: conf.successHandler.defaultTargetUrl
-		redirect uri: postResetUrl
-	}
-
 	protected String generateLink(String controller, String action, linkParams, request) {
 		uGroup.createLink(base: Utils.getDomainServerUrl(request),
 				controller: controller, action: action, 'userGroupWebaddress':params.webaddress,
@@ -403,14 +364,3 @@ class CustomRegisterCommand {
 }
 
 
-class ResetPasswordCommand {
-	String username
-	String password
-	String password2
-
-	static constraints = {
-		username nullable: false, email: true
-		password blank: false, nullable: false, validator: grails.plugins.springsecurity.ui.RegisterController.passwordValidator
-		password2 validator: RegisterController.password2Validator
-	}
-}

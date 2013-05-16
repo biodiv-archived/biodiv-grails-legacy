@@ -9,6 +9,7 @@ import org.springframework.social.oauth2.Spring30OAuth2RequestFactory
 import org.springframework.social.support.ClientHttpRequestFactorySelector
 
 import species.auth.SUser
+import species.auth.CustomRegisterCommand;
 
 import com.the6hours.grails.springsecurity.facebook.FacebookAuthToken
 
@@ -159,11 +160,13 @@ class FacebookAuthService {
 		if(!appUser['timezone'] && fbProfile.timezone) {
 			appUser['timezone'] = fbProfile.timezone;
 		}
-		
-		appUser[securityConf.userLookup.enabledPropertyName] = true
-		appUser[securityConf.userLookup.accountExpiredPropertyName] = false
-		appUser[securityConf.userLookup.accountLockedPropertyName] = false
-		appUser[securityConf.userLookup.passwordExpiredPropertyName] = false
+	
+        if(!appUser instanceof CustomRegisterCommand) {
+            appUser[securityConf.userLookup.enabledPropertyName] = true
+            appUser[securityConf.userLookup.accountExpiredPropertyName] = false
+            appUser[securityConf.userLookup.accountLockedPropertyName] = false
+            appUser[securityConf.userLookup.passwordExpiredPropertyName] = false
+        }
 	}
 	
 }

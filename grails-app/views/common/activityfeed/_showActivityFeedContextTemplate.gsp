@@ -4,6 +4,7 @@
 <%@page import="species.groups.UserGroup"%>
 <%@page import="species.Species"%>
 <%@page import="species.participation.ActivityFeedService"%>
+<%@page import="content.eml.Document"%>
 
 <div class="activityFeedContext thumbnails" >
 	<div class="feedParentContext thumbnail clearfix">
@@ -39,6 +40,10 @@
 		</g:elseif>
 		<g:elseif test="${feedInstance.rootHolderType ==  Species.class.getCanonicalName()}" >
 			<s:showSnippet model="['speciesInstance':feedParentInstance]" />
+		</g:elseif>
+		<g:elseif test="${feedInstance.rootHolderType ==  Document.class.getCanonicalName()}" >
+			<a href='${uGroup.createLink([action:"show", controller:"document", id:feedParentInstance.id,  'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress])}'><b>Document</b></a>
+			<g:render template="/document/showDocument" model="['documentInstance':feedParentInstance]"/>
 		</g:elseif>
 		<g:else>
 			${feedInstance.rootHolderType}
