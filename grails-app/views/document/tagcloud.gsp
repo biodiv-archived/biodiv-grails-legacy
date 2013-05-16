@@ -1,4 +1,3 @@
-
 <%@ page import="content.eml.Document"%>
 <html>
 <head>
@@ -8,22 +7,15 @@
 	value="${message(code: 'project.label', default: 'Document')}" />
 <title><g:message code="default.show.label" args="[entityName]" /></title>
 <r:require modules="core" />
-
-
 </head>
 <body>
-
-
-		<div class="page-header" style="margin-left:20px;">
-			<h1>
-				Document Tags
-			</h1>
-		</div>
+	<div class="page-header" style="margin-left:20px;">
+		<h1>
+			Document Tags
+		</h1>
+	</div>
 	<div style="margin-left:20px">
-			<tc:tagCloud bean="${Document}" action="browser" sort="${true}" style
-				color="${[start: '#084B91', end: '#9FBBE5']}"
-				size="${[start: 12, end: 30, unit: 'px']}" paramName='tag' />
-
+		<project:showTagsCloud model="[tagType:'document']"></project:showTagsCloud>
 	</div>
 </body>
 </html>

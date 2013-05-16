@@ -4,6 +4,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.codehaus.groovy.grails.web.taglib.exceptions.GrailsTagException
+import org.grails.tagcloud.TagCloudUtil
+import groovy.sql.Sql
+
 import content.eml.Document
 import species.groups.SpeciesGroup;
 import species.Habitat
@@ -17,6 +20,7 @@ import org.apache.solr.common.util.NamedList;
 import species.participation.Observation;
 import species.utils.Utils;
 import species.License
+import content.Project
 
 import species.sourcehandler.XMLConverter
 
@@ -28,7 +32,7 @@ class DocumentService {
 	def documentSearchService
 	def grailsApplication
 	def userGroupsService
-
+	def dataSource
 
 	Document createDocument(params) {
 
@@ -383,37 +387,56 @@ class DocumentService {
 			}
 		}
 		
-		
-//
-//		if(params.keywords) {
-//			query = "select document from Document document,  TagLink tagLink "
-//			//TODO - contains
-//			filterQuery += " and document.id = tagLink.tagRef and tagLink.type = :tagType and tagLink.tag.name = :keywords "
-//			queryParams["keywords"] = params.tag
-//			queryParams["tagType"] = GrailsNameUtils.getPropertyName(Document.class)
-//			activeFilters["keywords"] = params.tag
-//		}
-//
-//
-//		if(params.title) {
-//			filterQuery += " and document.title like :title "
-//			queryParams["title"] = '%'+params.title + '%'
-//			activeFilters["title"] = params.title
-//		}
-//
-//		if(params.description) {
-//			filterQuery += " and document.description like :description "
-//			queryParams["description"] = '%'+ params.description+'%'
-//			activeFilters["description"] = params.description
-//		}
-
 		def sortBy = params.sort ? params.sort : "lastUpdated "
 		def orderByClause = " order by document." + sortBy +  " desc, document.id asc"
 		return [query:query,filterQuery:filterQuery, orderByClause:orderByClause, queryParams:queryParams, activeFilters:activeFilters]
 	}
 
+	
+	def getFilteredTagsByUserGroup(groupWebAddress, tagType){
+		def tags = [:]
+		def userGroupInstance = groupWebAddress ? userGroupService.get(groupWebAddress) : null
+		switch(tagType){
+			case GrailsNameUtils.getPropertyName(Document.class).toLowerCase():
+				if(!userGroupInstance){
+					tags = TagCloudUtil.tags(Document)
+				}else{
+					tags = getTags(userGroupInstance.documents?.collect{it.id}, tagType)
+				}
+				break
+			case GrailsNameUtils.getPropertyName(Project.class).toLowerCase():
+				if(!userGroupInstance){
+					tags = TagCloudUtil.tags(Project)
+				}else{
+					tags = getTags(userGroupInstance.projects?.collect{it.id}, tagType)
+				}
+				break
+			default:
+				break
+		}
+		
+		return tags
+	}
+	
+	private Map getTags(ids, tagType){
+		int tagsLimit = 1000;
+		LinkedHashMap tags = [:]
+		if(!ids){
+			return tags
+		}
 
+		def sql =  Sql.newInstance(dataSource);
+		String query = "select t.name as name, count(t.name) as obv_count from tag_links as tl, tags as t, " + tagType + " obv where tl.tag_ref in " + getSqlInCluase(ids)  + " and  tl.type = '" + tagType +"' and t.id = tl.tag_id group by t.name order by count(t.name) desc, t.name asc limit " + tagsLimit;
 
+		sql.rows(query, ids).each{
+			tags[it.getProperty("name")] = it.getProperty("obv_count");
+		};
+		return tags;
+	}
+	
+	private String getSqlInCluase(list){
+		return "(" + list.collect {'?'}.join(", ") + ")"
+	}
 
 
 }
