@@ -6,14 +6,14 @@ import species.License;
 import species.auth.SUser;
 import species.groups.UserGroup;
 import org.grails.taggable.Taggable;
-
+import org.grails.rateable.*
 /**
  * eml-literature module
  * http://knb.ecoinformatics.org/software/eml/eml-2.1.1/eml-literature.html
  * http://knb.ecoinformatics.org/software/eml/eml-2.1.1/index.html
  *
  */
-class Document implements Taggable {
+class Document implements Taggable, Rateable {
 	def grailsApplication
 	
 	public enum DocumentType {
