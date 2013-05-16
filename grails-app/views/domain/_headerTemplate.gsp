@@ -59,9 +59,9 @@
 
 
 				</ul>
-                                <ul class="nav" style="float:none;display:inline-block;">
+                                <ul class="nav contributeButton"  style="float:none;display:inline-block">
                                     <li>
-                                    <a href="#contributeMenu" data-toggle="collapse">
+                                    <a href="#contributeMenu" data-toggle="collapse" class="btn btn-success" style="margin-top:0px">
                                         <i class="icon-list"></i>
                                         Contribute
                                         <i class="caret"></i>
@@ -136,9 +136,9 @@
 <%--						class="${(params.controller == 'chart')?'active':''}"><a--%>
 <%--						href='${uGroup.createLink("controller":"chart")}' title="Stats">Stats</a></li>--%>
 				</ul>
-                                <ul class="nav" style="background-color:#5BB75B;float:none;display:inline-block;">
+                                <ul class="nav contributeButton" style="float:none;display:inline-block">
                                     <li>
-                                    <a href="#contributeMenu" data-toggle="collapse">
+                                    <a href="#contributeMenu" data-toggle="collapse" class="btn"  style="margin-top:0px">
                                         <i class="icon-list"></i>
                                         Contribute
                                         <i class="caret"></i>

@@ -268,7 +268,7 @@ function last_actions() {
 	    }
 	});
 	
-        if ( !$.cookie("contribute") || $.cookie("contribute") == "show" ) {
+        if ($.cookie("contribute") == "show" ) {
             $('#contributeMenu.collapse').collapse('show');
         }
 
