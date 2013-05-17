@@ -53,8 +53,8 @@
                 def curr_id = instance.id
                 def prevId, nextId;
                 def clazz = instance.class
-                if(pos>=0 && (previousObservationId || nextObservationId)) {
-                    prevId = previousObservationId;
+                if(pos>=0 && (prevObservationId || nextObservationId)) {
+                    prevId = prevObservationId;
                     nextId = nextObservationId
                 } else {
                     prevId =  clazz.countByIdLessThan(curr_id)>0?clazz.findAllByIdLessThan(curr_id, ['max':1, 'sort':'id', 'order':'desc'])?.last()?.id:''
@@ -68,13 +68,13 @@
         %>
         
         <% navParams['id'] = prevId; 
-        if(pos>=0 && (previousObservationId || nextObservationId)) 
+        if(pos>=0 && (prevObservationId || nextObservationId)) 
             navParams['pos'] = pos-1; 
         %>
         <a class="pull-left btn  btn-mini ${prevId?:'disabled'}" href="${uGroup.createLink([navParams.clone()])}"><i class="icon-backward"></i>Prev</a>
 
         <% navParams['id'] = nextId; 
-        if(pos>=0 && (previousObservationId || nextObservationId))
+        if(pos>=0 && (prevObservationId || nextObservationId))
             navParams['pos'] = pos+1; 
         %>
         <a class="pull-right  btn btn-mini ${nextId?:'disabled'}"  href="${uGroup.createLink([navParams.clone()])}">Next<i style="margin-right: 0px; margin-left: 3px;" class="icon-forward"></i></a>

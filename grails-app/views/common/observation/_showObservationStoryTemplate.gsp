@@ -157,7 +157,7 @@
         </div>
         <div class="row" style="margin-left:0px;">
             <obv:showFooter
-            model="['observationInstance':observationInstance, 'showDetails':showDetails]" />
+            model="['observationInstance':observationInstance, 'showDetails':showDetails, 'showLike':true]" />
             <div style="float: right; clear: both;">
                 <sUser:showUserTemplate
                 model="['userInstance':observationInstance.author, 'userGroup':userGroup]" />

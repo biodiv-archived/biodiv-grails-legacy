@@ -58,7 +58,7 @@
                         </div>
 
 
-			<div>	
+			<div style="clear:both;">	
 				<table class="table table-hover" style="margin-left: 0px;">
 					<thead>
 						<tr>
