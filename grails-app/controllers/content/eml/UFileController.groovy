@@ -90,18 +90,17 @@ class UFileController {
 			ajaxUploaderService.upload(inputStream, uploaded)
 
 
-
 			String relPath = uploaded.absolutePath.replace(contentRootDir, "")
 
 			//def url = uGroup.createLink(uri:uploaded.getPath() , 'userGroup':params.userGroupInstance, 'userGroupWebaddress':params.webaddress)
 			def url = g.createLinkTo(base:config.speciesPortal.content.serverURL, file: relPath)
 			//log.debug "url for uploaded file >>>>>>>>>>>>>>>>>>>>>>>>"+ url
 
-			return render(text: [success:true, filePath:relPath, fileURL: url, fileSize:UFileService.getFileSize(uploaded)] as JSON, contentType:'text/json')
+			return render(text: [success:true, filePath:relPath, fileURL: url, fileSize:UFileService.getFileSize(uploaded)] as JSON, contentType:'text/html')
 		} catch (FileUploadException e) {
 
 			log.error("Failed to upload file.", e)
-			return render(text: [success:false] as JSON, contentType:'text/json')
+			return render(text: [success:false] as JSON, contentType:'text/html')
 		}
 	}
 
@@ -172,11 +171,11 @@ class UFileController {
 
 			log.debug " parameters to projectDoc block >>>> Path - "+ uFileInstance.path + " ,  Id: "+ documentInstance.id + ", fileSize:"+uFileInstance.size+", docName:"+documentInstance.title
 
-			return render(text: [success:true, filePath:relPath, docId:documentInstance.id, fileSize:uFileInstance.size, docName:documentInstance.title] as JSON, contentType:'text/json')
+			return render(text: [success:true, filePath:relPath, docId:documentInstance.id, fileSize:uFileInstance.size, docName:documentInstance.title] as JSON, contentType:'text/html')
 		} catch (FileUploadException e) {
 
 			log.error("Failed to upload file.", e)
-			return render(text: [success:false] as JSON, contentType:'text/json')
+			return render(text: [success:false] as JSON, contentType:'text/html')
 		}
 	}
 
