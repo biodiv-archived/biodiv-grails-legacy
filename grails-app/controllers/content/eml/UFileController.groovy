@@ -90,7 +90,6 @@ class UFileController {
 			ajaxUploaderService.upload(inputStream, uploaded)
 
 
-
 			String relPath = uploaded.absolutePath.replace(contentRootDir, "")
 
 			//def url = uGroup.createLink(uri:uploaded.getPath() , 'userGroup':params.userGroupInstance, 'userGroupWebaddress':params.webaddress)
@@ -119,7 +118,7 @@ class UFileController {
 			if (params.qqfile instanceof org.springframework.web.multipart.commons.CommonsMultipartFile){
 				log.debug "Multipart"
 				//content = params.qqfile.getBytes()
-				originalFilename = params.qqfile.originalFilename
+				originalFilename = params.qqfile.filename
 			}
 			else{
 				log.debug "normal"

@@ -91,8 +91,8 @@ class ProjectSearchService {
 					
 				
 				proj.userGroups.each { userGroup ->
-					proj.addField(searchFieldsConfig.USER_GROUP, userGroup.id);
-					proj.addField(searchFieldsConfig.USER_GROUP_WEBADDRESS, userGroup.webaddress);
+					doc.addField(searchFieldsConfig.USER_GROUP, userGroup.id);
+					doc.addField(searchFieldsConfig.USER_GROUP_WEBADDRESS, userGroup.webaddress);
 				}
 				docs.add(doc);
 			
