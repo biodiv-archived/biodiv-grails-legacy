@@ -47,10 +47,13 @@ class DocumentService {
 	def updateDocument(document, params) {
 
 		document.properties = params
-		document.coverage.location = 'POINT(' + params.coverage.longitude + ' ' + params.coverage.latitude + ')'
-		document.coverage.reverseGeocodedName = params.coverage.reverse_geocoded_name
-		document.coverage.locationAccuracy = params.coverage.location_accuracy
-
+		document.coverage = document.coverage ?: new Coverage()
+		document.coverage.location = 'POINT(' + params.longitude + ' ' + params.latitude + ')'
+		document.coverage.reverseGeocodedName = params.reverse_geocoded_name
+		document.coverage.locationAccuracy = params.location_accuracy
+		document.coverage.latitude = params.latitude.toFloat()
+		document.coverage.longitude = params.longitude.toFloat()
+		//document.coverage.geoPrivacy = params.geo_privacy
 
 
 		document.license  = (new XMLConverter()).getLicenseByType(params.licenseName, false)

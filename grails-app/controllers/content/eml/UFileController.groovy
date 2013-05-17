@@ -72,7 +72,19 @@ class UFileController {
 		log.debug params
 		try {
 
-			File uploaded = createFile(params.qqfile, params.uploadDir)
+			//IE handling: for IE qqfile sends the whole file
+			String originalFilename = ""
+			if (params.qqfile instanceof org.springframework.web.multipart.commons.CommonsMultipartFile){
+				log.debug "Multipart"
+				//content = params.qqfile.getBytes()
+				originalFilename = params.qqfile.originalFilename
+			}
+			else{
+				log.debug "normal"
+				//content = request.inputStream.getBytes()
+				originalFilename = params.qqfile
+			}
+			File uploaded = createFile(originalFilename, params.uploadDir)
 			InputStream inputStream = selectInputStream(request)
 
 			ajaxUploaderService.upload(inputStream, uploaded)
@@ -102,7 +114,19 @@ class UFileController {
 		log.debug "&&&&&&&&&&&&&&&&&&& <><><<>>params in upload of file" +  params
 		try {
 
-			File uploaded = createFile(params.qqfile, params.uploadDir)
+			//IE handling: for IE qqfile sends the whole file
+			String originalFilename = ""
+			if (params.qqfile instanceof org.springframework.web.multipart.commons.CommonsMultipartFile){
+				log.debug "Multipart"
+				//content = params.qqfile.getBytes()
+				originalFilename = params.qqfile.originalFilename
+			}
+			else{
+				log.debug "normal"
+				//content = request.inputStream.getBytes()
+				originalFilename = params.qqfile
+			}
+			File uploaded = createFile(originalFilename, params.uploadDir)
 			InputStream inputStream = selectInputStream(request)
 			//check for file size and file type
 

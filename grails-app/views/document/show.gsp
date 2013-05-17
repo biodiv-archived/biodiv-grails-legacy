@@ -26,9 +26,9 @@
 
 <meta property="fb:app_id" content="${fbAppId }" />
 <meta property="fb:admins" content="581308415,100000607869577" />
+
 <meta property="og:description"
           content='${description}'/>
-
 
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="main" />
@@ -137,7 +137,6 @@
 										</g:each></td>
 								</tr>
 							</g:if>
-
 
 							<g:if test="${documentInstance.coverage?.placeName || documentInstance.coverage.reverseGeocodedName}">
 								<tr>

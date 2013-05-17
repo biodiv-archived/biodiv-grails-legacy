@@ -219,6 +219,10 @@ class ObservationTagLib {
 		out << render(template:"/common/downloadTableTemplate", model:attrs.model);
 	}
 	
+	def showMapInput = {attrs, body->
+		out << render(template:"/common/observation/showMapInputTemplate",model:attrs.model);
+	}
+	
 	def rating = {attrs, body->
 		//out << render(template:"/common/ratingTemplate", model:attrs.model);
         def resource = attrs.model.resource
