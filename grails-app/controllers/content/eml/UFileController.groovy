@@ -96,11 +96,11 @@ class UFileController {
 			def url = g.createLinkTo(base:config.speciesPortal.content.serverURL, file: relPath)
 			//log.debug "url for uploaded file >>>>>>>>>>>>>>>>>>>>>>>>"+ url
 
-			return render(text: [success:true, filePath:relPath, fileURL: url, fileSize:UFileService.getFileSize(uploaded)] as JSON, contentType:'text/json')
+			return render(text: [success:true, filePath:relPath, fileURL: url, fileSize:UFileService.getFileSize(uploaded)] as JSON, contentType:'text/html')
 		} catch (FileUploadException e) {
 
 			log.error("Failed to upload file.", e)
-			return render(text: [success:false] as JSON, contentType:'text/json')
+			return render(text: [success:false] as JSON, contentType:'text/html')
 		}
 	}
 
@@ -118,7 +118,7 @@ class UFileController {
 			if (params.qqfile instanceof org.springframework.web.multipart.commons.CommonsMultipartFile){
 				log.debug "Multipart"
 				//content = params.qqfile.getBytes()
-				originalFilename = params.qqfile.filename
+				originalFilename = params.qqfile.originalFilename
 			}
 			else{
 				log.debug "normal"
@@ -171,11 +171,11 @@ class UFileController {
 
 			log.debug " parameters to projectDoc block >>>> Path - "+ uFileInstance.path + " ,  Id: "+ documentInstance.id + ", fileSize:"+uFileInstance.size+", docName:"+documentInstance.title
 
-			return render(text: [success:true, filePath:relPath, docId:documentInstance.id, fileSize:uFileInstance.size, docName:documentInstance.title] as JSON, contentType:'text/json')
+			return render(text: [success:true, filePath:relPath, docId:documentInstance.id, fileSize:uFileInstance.size, docName:documentInstance.title] as JSON, contentType:'text/html')
 		} catch (FileUploadException e) {
 
 			log.error("Failed to upload file.", e)
-			return render(text: [success:false] as JSON, contentType:'text/json')
+			return render(text: [success:false] as JSON, contentType:'text/html')
 		}
 	}
 
