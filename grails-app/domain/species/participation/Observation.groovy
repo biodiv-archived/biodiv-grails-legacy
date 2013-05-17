@@ -423,9 +423,7 @@ class Observation implements Taggable, Rateable {
         def clazz = Resource.class;
         def type = GrailsNameUtils.getPropertyName(clazz);
 
-        println type;
-
-		def sql =  Sql.newInstance(dataSource);
+        def sql =  Sql.newInstance(dataSource);
         params['cache'] = true;
         params['type'] = type;
         def results = sql.rows("select resource_id, observation_id, rating_ref, (case when avg is null then 0 else avg end) as avg, (case when count is null then 0 else count end) as count from observation_resource o left outer join (select rating_link.rating_ref, avg(rating.stars), count(rating.stars) from rating_link , rating  where rating_link.type='$type' and rating_link.rating_id = rating.id  group by rating_link.rating_ref) c on o.resource_id =  c.rating_ref where observation_id=:obvId order by avg desc, resource_id asc", [obvId:this.id]);
