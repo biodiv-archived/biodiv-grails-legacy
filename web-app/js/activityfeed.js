@@ -64,7 +64,6 @@ function loadNewerFeedsInAjax(targetComp, checkFeed){
 				if(data.feedAvailable){
 					newFeedProcessing = true;
 					$(targetComp).children('.activiyfeednewermsg').show();
-                                        $("#activityTicker").html("New");
 				}
 			}
 			else if(data.showFeedListHtml){

@@ -148,7 +148,7 @@
 
 				<ul class="nav pull-right">
 					<li class=" ${(params.controller == 'activityFeed')?'active':''}"><a
-                                            href="${uGroup.createLink("controller":"activityFeed")}" title="Activity">Activity<span id="activityTicker" class="badge badge-important" style="position:absolute;top:-9px;right:220px"></span></a>
+                                            href="${uGroup.createLink("controller":"activityFeed")}" title="Activity">Activity</a>
 					</li>
 
 					<!--li class="menu-449 first"><a href="/" title="">Home</a></li-->
