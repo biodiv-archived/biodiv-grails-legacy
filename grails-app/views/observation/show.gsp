@@ -133,8 +133,16 @@ if(r) {
                                </div>
 
 				<div class="span8 right-shadow-box" style="margin: 0;">
+				<div style="height:400px;">
+                                    <center>
+                                        <div id="gallerySpinner" class="spinner">
+                                        <img src="${resource(dir:'images',file:'spinner.gif', absolute:true)}"
+                                            alt="${message(code:'spinner.alt',default:'Loading...')}" />
+                                        </div>
+                                    </center>
 
-					<div id="gallery1">
+
+					<div id="gallery1" style="visibility:hidden">
 						<g:if test="${observationInstance.resource}">
 							<g:each in="${observationInstance.listResourcesByRating()}" var="r">
 								<g:if test="${r.type == ResourceType.IMAGE}">
@@ -166,7 +174,7 @@ if(r) {
 						</g:else>
 
 					</div>
-
+                                </div>
 					<obv:showStory
 						model="['observationInstance':observationInstance, 'showDetails':true, 'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress]" />
 			
@@ -323,6 +331,11 @@ if(r) {
                             })
                         }
                 });
+                Galleria.ready(function() {
+                    $("#gallerySpinner").hide();
+                    $("#gallery1").css('visibility', 'visible');
+                });
+	
 
         
         $('#voteCountLink').click(function() {

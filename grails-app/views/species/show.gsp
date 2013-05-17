@@ -47,7 +47,7 @@ if(r) {
 		}
 		
 %>
-<g:set var="description" value="${speciesInstance.findSummary()}" />
+<g:set var="description" value="${speciesInstance.findSummary()?:''}" />
 
 <meta property="fb:app_id" content="${fbAppId }" />
 <meta property="fb:admins" content="581308415,100000607869577" />

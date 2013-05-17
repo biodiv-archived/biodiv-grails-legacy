@@ -88,3 +88,8 @@
 
 
 </div>
+<r:script>
+function renderGooglePlus() {
+    gapi.plusone.render("googleplus", {size:'medium',annotation:'none', url:"${canonicalUrl}"});
+}
+</r:script>

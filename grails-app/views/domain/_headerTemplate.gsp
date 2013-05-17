@@ -61,7 +61,7 @@
 				</ul>
                                 <ul class="nav contributeButton"  style="float:none;display:inline-block">
                                     <li>
-                                    <a href="#contributeMenu" data-toggle="collapse" class="btn btn-success" style="margin-top:0px">
+                                    <a href="#contributeMenu" data-toggle="collapse" style="margin-top:0px;color:white;">
                                         <i class="icon-list"></i>
                                         Contribute
                                         <i class="caret"></i>
@@ -138,7 +138,7 @@
 				</ul>
                                 <ul class="nav contributeButton" style="float:none;display:inline-block">
                                     <li>
-                                    <a href="#contributeMenu" data-toggle="collapse" class="btn"  style="margin-top:0px">
+                                    <a href="#contributeMenu" data-toggle="collapse" style="margin-top:0px;color:white">
                                         <i class="icon-list"></i>
                                         Contribute
                                         <i class="caret"></i>
