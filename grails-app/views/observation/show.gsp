@@ -389,62 +389,8 @@ if(r) {
 	     	});
 	     	event.preventDefault();
      	});
-     	
-     	
-     	window.fbEnsure(function() {
-			FB.Event.subscribe('comment.create', function(response) {
-				//console.log(response);
-	  			/*FB.api('comments', {'ids': response.href}, function(res) {
-	  			 	console.log(res);
-			        var data = res[response.href].comments.data;
-			        console.log(data);
-			        console.log(data.pop().from.name);
-			    });*/
-	  			$.ajax({
-	  				url: "${uGroup.createLink(controller:params.controller, action:'newComment')}",
-	  				method:"POST",
-	  				dataType:'json',
-	  				data:{'obvId':${observationInstance.id}, 'href':response.href, 'commentId':response.commentID},
-					error: function (xhr, status, thrownError){
-						console.log("Error while callback to new comment"+xhr.responseText)
-					}
-				});
-			});
-			
-			FB.Event.subscribe('comment.remove', function(response) {
-	  			//console.log(response);
-	  			$.ajax({
-	  				url: "${uGroup.createLink(controller:params.controller, action:'removeComment')}",
-	  				method:"POST",
-	  				data:{'obvId':${observationInstance.id}, 'href':response.href, 'commentId':response.commentID},
-					error: function (xhr, status, thrownError){
-						console.log("Error while callback to remove comment"+xhr.responseText)
-					}
-				});
-			});
-			
-			if('${params.postToFB}' === 'on') {
-				FB.ui(
-				  {
-				    method: 'feed',
-				    name: "${(!observationInstance.fetchSpeciesCall()?.equalsIgnoreCase('Unknown'))?observationInstance.fetchSpeciesCall():'Help Identify'}",
-				    link: "${uGroup.createLink(controller:'observation', action:'show', id:observationInstance.id, base:Utils.getDomainServerUrl(request), 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress)}",
-				    picture: "${createLinkTo(file: fbImagePath, base:grailsApplication.config.speciesPortal.observations.serverURL)}",
-				    caption: "${Utils.getDomainName(request)}",
-				    description: "${description.replaceAll("\\n", " ")}"
-				  },
-				  function(response) {
-				    if (response && response.post_id) {
-				      //alert('Post was published.');
-				    } else {
-				      //alert('Could not published to the FB wall.');
-				    }
-				  }
-				);
-			}
-		});
-		
-		$(".nav a.disabled").click(function() {
+        
+                $(".nav a.disabled").click(function() {
 			return false;
 		})
 

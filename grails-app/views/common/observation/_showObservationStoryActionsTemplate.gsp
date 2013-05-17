@@ -90,6 +90,6 @@
 </div>
 <r:script>
 function renderGooglePlus() {
-    gapi.plusone.render("googleplus", {size:'medium',annotation:'none', url:"${canonicalUrl}"});
+    gapi.plusone.render("googleplus", {size:'medium',annotation:'none', href:"${canonicalUrl}"});
 }
 </r:script>
