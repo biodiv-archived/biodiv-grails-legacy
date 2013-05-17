@@ -9,24 +9,21 @@
 		<div class="prop">
 			<span class="name">File</span>
 			<div class="value">
-			<g:if test="${!showDetails}">
-				<fileManager:displayFile
-					filePath="${ documentInstance?.uFile?.path}"></fileManager:displayFile>
-				</g:if>
-				<g:else>
+
 					<fileManager:displayFile
 						filePath="${ documentInstance?.uFile?.path}"
 						fileName="${ documentInstance?.title}"></fileManager:displayFile>
-				</g:else>
 			</div>
 		</div>
 	</g:if>
-		
+
 	<g:if test="${documentInstance.uri}">
 		<div class="prop">
 			<span class="name">URL</span>
 			<div class="value">
-				<span class="linktext">${documentInstance.uri}</span>
+				<span class="linktext">
+					${documentInstance.uri}
+				</span>
 			</div>
 		</div>
 	</g:if>
@@ -37,7 +34,7 @@
 			${documentInstance.type?.value }
 		</div>
 	</div>
-	
+
 	<g:if
 		test="${documentInstance?.description && documentInstance?.description.trim() != ''}">
 		<div class="prop">
@@ -74,7 +71,7 @@
 			</div>
 		</div>
 	</g:if>
-	
+
 	<g:if test="${showDetails && documentInstance?.fetchSource()}">
 		<div class="prop">
 			<span class="name">Source</span>
@@ -83,11 +80,15 @@
 				def className = sourceObj.class.getSimpleName()
 			%>
 			<div class="value">
-				<a href="${uGroup.createLink(controller: className.toLowerCase(), action:"show", id:sourceObj.id, 'userGroupWebaddress':params?.webaddress)}"><b>${className + ": "}</b>${sourceObj}</a>
+				<a
+					href="${uGroup.createLink(controller: className.toLowerCase(), action:"show", id:sourceObj.id, 'userGroupWebaddress':params?.webaddress)}"><b>
+						${className + ": "}
+				</b>
+					${sourceObj}</a>
 			</div>
 		</div>
 	</g:if>
-	 
+
 	<g:if test="${showDetails && documentInstance?.tags}">
 		<div class="prop">
 			<span class="name">Tags</span>

@@ -18,7 +18,7 @@ import species.utils.Utils
 import species.auth.SUser
 import species.groups.UserGroup
 import org.codehaus.groovy.grails.orm.hibernate.cfg.GrailsDomainBinder
-import org.lorecraft.phparser.SerializedPhpParser;
+//import org.lorecraft.phparser.SerializedPhpParser;
 
 class MigrationService {
 
@@ -171,9 +171,10 @@ def migrateProjects() {
 		
 		if(!proj.save(flush:true)){
 			proj.errors.allErrors.each { log.error it }
-			  changeTimestamping(proj, true)
 			return null
 		}else{
+			changeTimestamping(proj, true)
+		
 			String tagsQuery = "select term_data.name from term_data, term_node where term_data.tid=term_node.tid and term_node.nid=$nodeRow.nid and term_node.vid=$nodeRow.vid"
 
 			def tagsRows = sql.rows(tagsQuery)
@@ -235,7 +236,7 @@ def migrateProjects() {
 				if(row.metadata) {
 					println "metadata is "+ row.metadata
 
-					SerializedPhpParser serializedPhpParser = new SerializedPhpParser(row.metadata);
+	/*				SerializedPhpParser serializedPhpParser = new SerializedPhpParser(row.metadata);
 					Object result = serializedPhpParser.parse();
 					
 					String title =""
@@ -258,7 +259,7 @@ def migrateProjects() {
 						println "tags of file are "+ tags
 						document.setTags(tags)
 					}
-
+*/
 
 				}
 
