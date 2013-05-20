@@ -61,7 +61,7 @@ String imagePath = Utils.getIBPServerDomain()+'/sites/all/themes/ibp/images/map-
                         </div>
 
 
-			<div>	
+			<div style="clear:both;">	
 				<table class="table table-hover" style="margin-left: 0px;">
 					<thead>
 						<tr>

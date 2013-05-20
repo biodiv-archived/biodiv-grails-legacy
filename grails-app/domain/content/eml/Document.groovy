@@ -14,7 +14,9 @@ import org.grails.rateable.*
  *
  */
 class Document implements Taggable, Rateable {
+	
 	def grailsApplication
+	def activityFeedService
 	
 	public enum DocumentType {
 		Report("Report"),
@@ -120,4 +122,9 @@ class Document implements Taggable, Rateable {
 			return grailsApplication.getArtefact("Domain",sourceHolderType)?.getClazz()?.read(sourceHolderId)
 		}
 	}
+	
+	def afterDelete(){
+		activityFeedService.deleteFeed(this)
+	}
+	
 }

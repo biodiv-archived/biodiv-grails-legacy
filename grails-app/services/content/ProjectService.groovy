@@ -165,6 +165,16 @@ class ProjectService {
 			activeFilters["tag"] = params.tag
 		}
 
+		if(params.webaddress) {
+			def userGroupInstance = userGroupService.get(params.webaddress)
+			if(userGroupInstance){
+				queryParams['userGroup'] = userGroupInstance
+				//queryParams['isDeleted'] = false;
+		
+				query += " join proj.userGroups userGroup "
+				filterQuery += " and userGroup=:userGroup "
+			}
+		}
 //		if(params.keywords) {
 //			query = "select proj from Project proj,  TagLink tagLink "
 //			//TODO - contains

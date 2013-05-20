@@ -317,7 +317,6 @@ class ObservationController {
 				nextObservationId = (pos+1 < session[listKey].size()) ? session[listKey][pos+1] : null;
 			}
 			def prevObservationId = pos > 0 ? session[listKey][pos-1] : null;
-			
 			lastListParams.remove('isGalleryUpdate');
 			lastListParams.remove("append");
 			lastListParams['max'] = noOfObvs;

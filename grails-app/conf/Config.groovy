@@ -248,7 +248,7 @@ speciesPortal {
 	content{
 		rootDir = "${app.rootDir}/content"
 		serverURL = "http://localhost/${appName}/content"
-		MAX_DOC_SIZE = 10*1024*1024 //10 mb
+		MAX_DOC_SIZE = 50*1024*1024 //10 mb
 		MAX_IMG_SIZE = 2*1024*1024 // 2mb
 	}	
 		

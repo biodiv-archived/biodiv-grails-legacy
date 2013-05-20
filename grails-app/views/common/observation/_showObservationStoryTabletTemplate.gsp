@@ -36,8 +36,6 @@
     <%--        </div>--%>
 <%----%>
 
-<%--</div>--%>
-
-
 
 <obv:showFooter model="['observationInstance':observationInstance, 'showDetails':false, 'showLike':true]"/>
+

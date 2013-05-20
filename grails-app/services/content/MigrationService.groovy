@@ -17,6 +17,7 @@ import species.License
 import species.utils.Utils
 import species.auth.SUser
 import species.groups.UserGroup
+import org.codehaus.groovy.grails.orm.hibernate.cfg.GrailsDomainBinder
 //import org.lorecraft.phparser.SerializedPhpParser;
 
 class MigrationService {
@@ -104,7 +105,7 @@ def migrateProjects() {
 
 		proj.grantFrom = parseDBDate(row.field_grantterm_value)
 		proj.grantTo = parseDBDate(row.field_grantterm_value2)
-		proj.grantedAmount = row.field_project_amount_value
+		proj.grantedAmount = row.field_project_amount_value?row.field_project_amount_value:0
 
 		proj.projectProposal = row.field_project_proposal_value
 
@@ -160,16 +161,20 @@ def migrateProjects() {
 		//TODO: Get CEPF RIT member id while migration
 		proj.author = SUser.get("1107")
 		
+		changeTimestamping(proj, false)
 		proj.dateCreated = getDateFromTimestamp(nodeRow.created)
 		proj.lastUpdated = getDateFromTimestamp(nodeRow.changed)
 
 
 		log.debug " ######## Exporting project: "+ proj.dump()
+
 		
 		if(!proj.save(flush:true)){
 			proj.errors.allErrors.each { log.error it }
 			return null
 		}else{
+			changeTimestamping(proj, true)
+		
 			String tagsQuery = "select term_data.name from term_data, term_node where term_data.tid=term_node.tid and term_node.nid=$nodeRow.nid and term_node.vid=$nodeRow.vid"
 
 			def tagsRows = sql.rows(tagsQuery)
@@ -182,6 +187,11 @@ def migrateProjects() {
 			return proj
 		}
 	}
+
+  private void changeTimestamping(Object domainObjectInstance, boolean shouldTimestamp) {
+        def m = GrailsDomainBinder.getMapping(domainObjectInstance.getClass())
+        m.autoTimestamp = shouldTimestamp
+    }
 
 	/**
 	 * Copy files and metadata from drupal tables to grails
@@ -210,7 +220,7 @@ def migrateProjects() {
 				String copiedFileName = transferProjectFileToGrails(filedata.filepath, projectDir)
 				document.uFile = new UFile();
 				document.type = type
-				document.title = filedata.filename?filedata.filename:copiedFileName
+				//document.title = filedata.filename?filedata.filename:copiedFileName
 				document.uFile.path = projectDir.replace(contentRootDir, "") + "/"+copiedFileName 				
 				document.uFile.size = filedata.filesize
 				document.uFile.mimetype = filedata.filemime
@@ -218,6 +228,7 @@ def migrateProjects() {
 				document.license = License.findByName(License.LicenseType.CC_BY)
 				
 				document.agreeTerms = true			
+				document.author = SUser.get("1107")
 				
 				def metadata = row.metadata
 
@@ -225,9 +236,17 @@ def migrateProjects() {
 				if(row.metadata) {
 					println "metadata is "+ row.metadata
 
-				/*	SerializedPhpParser serializedPhpParser = new SerializedPhpParser(row.metadata);
+	/*				SerializedPhpParser serializedPhpParser = new SerializedPhpParser(row.metadata);
 					Object result = serializedPhpParser.parse();
-					document.title = result.description;
+					
+					String title =""
+					if(result.description) {
+						title = result.description
+					} else {
+						title = copiedFileName
+					}
+					document.title = title
+					
 					document.description = result.shortnote.body
 					//before setting tags object should be saved
 					if(!document.save(flush:true)){
@@ -244,6 +263,7 @@ def migrateProjects() {
 
 				}
 
+				log.info "##Document to be added : "+ document.dump()
 				docs.add(document)
 			}
 		}
@@ -268,14 +288,14 @@ def migrateProjects() {
 		File dst = observationService.getUniqueFile(projectDir, Utils.cleanFileName(fileName));
 		
 		//TODO : get domain url 
-		File src = new File("/data/augmenetedmaps/"+filePath)
+		File src = new File("/data/augmentedmaps/"+filePath)
 		if(!src.exists()) {
-			log.error " src file "+ filePath+" does not exist"
+			log.error " src file "+src.getPath()+" does not exist"
 			return "Empty File"
 		}	
 				
-		if(!Utils.copy(new File("/var/www/biodiv/"+filePath), dst)) {
-			log.error "Tranferring project file "+ filePath +" from drupal to " + dst.getName()+ " failed"
+		if(!Utils.copy(src, dst)) {
+			log.error "Tranferring project file "+ src.getPath() +" from drupal to " + dst.getName()+ " failed"
 			throw new Exception();
 		}
 		

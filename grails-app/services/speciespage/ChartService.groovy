@@ -155,7 +155,7 @@ println result;
             filterParams['user'] = user.id;
         }
 
-        boolean isUnidentified = (res.columns[2][2] == "UnIdentified")?:false
+        boolean isUnidentified = (res.columns[2][1] == "UnIdentified")?:false
 		res.data.each{ r ->
 			htmlData.add([getSpeciesGroupImage(r[0]), getHyperLink(r[0], r[0], false, true, filterParams), getHyperLink(r[0], r[1], false, true, filterParams), getHyperLink(r[0], r[2], isUnidentified, true, filterParams)])
 		}
