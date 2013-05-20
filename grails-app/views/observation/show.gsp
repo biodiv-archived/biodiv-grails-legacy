@@ -26,6 +26,8 @@ if(r) {
                     imagePath = g.createLinkTo(base:gThumbnail,	file: '')
             }
     }
+} else{
+    imagePath = Utils.getIBPServerDomain()+'/sites/all/themes/ibp/images/map-logo.gif';
 }
 %>
 <meta property="og:image" content="${imagePath}" />
@@ -45,7 +47,7 @@ if(r) {
 		String location = "Observed at '" + (observationInstance.placeName.trim()?:observationInstance.reverseGeocodedName) +"'"
 		String desc = "- "+ location +" by "+observationInstance.author.name.capitalize()+" in species group "+observationInstance.group.name + " and habitat "+ observationInstance.habitat.name;
 %>
-<g:set var="description" value="${observationInstance.notes?observationInstance.notes+' '+desc:desc }" />
+<g:set var="description" value="${Utils.stripHTML(observationInstance.notes?observationInstance.notes+' '+desc:desc)?:'' }" />
 
 <meta property="fb:app_id" content="${fbAppId }" />
 <meta property="fb:admins" content="581308415,100000607869577" />

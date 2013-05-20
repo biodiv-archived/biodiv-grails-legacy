@@ -10,7 +10,10 @@
 <meta property="og:title" content="${title}"/>
 <meta property="og:url" content="${canonicalUrl}" />
 <meta property="og:site_name" content="${Utils.getDomainName(request)}" />
-
+<%
+String imagePath = Utils.getIBPServerDomain()+'/sites/all/themes/ibp/images/map-logo.gif';
+%>
+<meta property="og:image" content="${imagePath}" />
 <g:set var="domain" value="${Utils.getDomain(request)}" />
 <g:set var="fbAppId"/>
 <%
@@ -22,7 +25,7 @@
 		}
 		
 %>
-<g:set var="description" value="${checklistInstance.description?:''}" />
+<g:set var="description" value="${Utils.stripHTML(checklistInstance.description?:'')}" />
 
 <meta property="fb:app_id" content="${fbAppId }" />
 <meta property="fb:admins" content="581308415,100000607869577" />

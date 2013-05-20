@@ -335,5 +335,8 @@ class Utils {
 		return text;
 	}
 
+    public static stripHTML(String text) {
+        if(!text) return text;
+        return text.replaceAll("<(.|\n)*?>", '');
+    }
 }
-

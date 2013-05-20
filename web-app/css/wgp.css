@@ -753,7 +753,7 @@ ul#recoSummary {
 }
 
 .licence_div {
-	z-index: 4;
+	z-index: 11;
 	cursor: pointer;
 }
 
@@ -1968,3 +1968,8 @@ div.noOfRatings {
 .fb_edge_widget_with_comment {
     z-index:10;
 }
+
+
+
+
+

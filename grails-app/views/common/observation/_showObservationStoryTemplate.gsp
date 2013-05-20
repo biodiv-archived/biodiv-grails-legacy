@@ -96,68 +96,61 @@
             </div>
 
             <g:if test="${showDetails}">
-            <div class="prop">
-                <g:if test="${showDetails}">
-                <span class="name"><i class="icon-time"></i>Submitted</span>
-                </g:if>
-                <g:else>
-                <i class="pull-left icon-time"></i>
-                </g:else>
-                <div class="value">
-                    <time class="timeago"
-                    datetime="${observationInstance.createdOn.getTime()}"></time>
+                <div class="prop">
+                    <g:if test="${showDetails}">
+                    <span class="name"><i class="icon-time"></i>Submitted</span>
+                    </g:if>
+                    <g:else>
+                    <i class="pull-left icon-time"></i>
+                    </g:else>
+                    <div class="value">
+                        <time class="timeago"
+                        datetime="${observationInstance.createdOn.getTime()}"></time>
+                    </div>
                 </div>
-            </div>
 
-            <div class="prop">
-                <g:if test="${showDetails}">
-                <span class="name"><i class="icon-time"></i>Updated</span>
-                </g:if>
-                <g:else>
-                <i class="pull-left icon-time"></i>
-                </g:else>
-                <div class="value">
-                    <time class="timeago"
-                    datetime="${observationInstance.lastRevised?.getTime()}"></time>
+                <div class="prop">
+                    <g:if test="${showDetails}">
+                    <span class="name"><i class="icon-time"></i>Updated</span>
+                    </g:if>
+                    <g:else>
+                    <i class="pull-left icon-time"></i>
+                    </g:else>
+                    <div class="value">
+                        <time class="timeago"
+                        datetime="${observationInstance.lastRevised?.getTime()}"></time>
+                    </div>
                 </div>
-            </div>
+            </g:if>
+
             <g:if test="${observationInstance.notes}">
-            <div class="prop">
-                <span class="name"><i class="icon-info-sign"></i>Notes</span>
-                <div class="notes_view linktext">
-                    ${Utils.linkifyYoutubeLink(observationInstance.notes)}
+                <div class="prop">
+                    <g:if test="${showDetails}">
+                    <span class="name"><i class="icon-info-sign"></i>Notes</span>
+                    <div class="notes_view linktext">
+                        ${Utils.linkifyYoutubeLink(observationInstance.notes)}
+                    </div>
+                    </g:if>
+                    <g:else>
+                    <div class="notes_view linktext ${showDetails?'':'ellipsis multiline'}">
+                        ${Utils.stripHTML(observationInstance.notes)}
+                    </div>
+
+                    </g:else>
                 </div>
-            </div>
             </g:if>
-            </g:if>
+
             <g:if test="${showDetails}">
-            <div class="prop">
-            <obv:showTagsSummary
-            model="['observationInstance':observationInstance, 'isAjaxLoad':false]" />
-            </div>
+                <div class="prop">
+                <obv:showTagsSummary
+                model="['observationInstance':observationInstance, 'isAjaxLoad':false]" />
+                </div>
             </g:if>
 
-            <g:if test="${!showDetails}">
-            <div class="prop">
-                <i class="pull-left icon-eye-open"></i>
-                <div class="value">
-                    ${observationInstance.getPageVisitCount()}
-                </div>
-            </div>
-
-            <g:if test="${observationInstance.flagCount>0}">
-            <div id="show-flag-count" class="prop">
-                <i class="pull-left icon-flag"></i>
-                <div class="value">
-                    ${observationInstance.flagCount}
-                </div>
-            </div>
-            </g:if>
-            </g:if>
         </div>
         <div class="row" style="margin-left:0px;">
             <obv:showFooter
-            model="['observationInstance':observationInstance, 'showDetails':showDetails]" />
+            model="['observationInstance':observationInstance, 'showDetails':showDetails, 'showLike':true]" />
             <div style="float: right; clear: both;">
                 <sUser:showUserTemplate
                 model="['userInstance':observationInstance.author, 'userGroup':userGroup]" />

@@ -37,11 +37,10 @@
 					<i class="icon-check"></i>
 					<obv:showNoOfRecommendationsOfUser model="['user':userInstance]" />
 				</div>
-<%--				--%>
-<%--				<div class="footer-item" title="No of Identifications">--%>
-<%--					<i class="icon-comment"></i>--%>
-<%--					${userInstance.fetchCommentCount()}--%>
-<%--				</div>--%>
+				<div class="footer-item" title="No of Identifications">
+					<i class="icon-comment"></i>
+					${userInstance.fetchCommentCount()}
+				</div>
 				
 			</div>
 

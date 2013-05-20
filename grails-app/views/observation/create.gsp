@@ -217,7 +217,7 @@ if(r && thumbnail) {
 										</li>
 										<g:set var="i" value="${i+1}" />
 									</g:each>
-									<li id="add_file" class="addedResource">
+									<li id="add_file" class="addedResource" style="z-index:10">
 										<div id="add_file_container">
 											<div id="add_image"></div> 
 											<div style="text-align:center;">
@@ -557,7 +557,7 @@ if(r && thumbnail) {
 	
 	<r:script>
 	
-    var add_file_button = '<li id="add_file" class="addedResource" style="display:none;"><div id="add_file_container"><div id="add_image"></div><div id="add_video" class="editable"></div></div><div class="progress"><div id="translucent_box"></div><div id="progress_bar"></div ><div id="progress_msg"></div ></div></li>';
+    var add_file_button = '<li id="add_file" class="addedResource" style="display:none;z-index:10;"><div id="add_file_container"><div id="add_image"></div><div id="add_video" class="editable"></div></div><div class="progress"><div id="translucent_box"></div><div id="progress_bar"></div ><div id="progress_msg"></div ></div></li>';
 
 	$(document).ready(function(){
 		$('.dropdown-toggle').dropdown();

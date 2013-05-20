@@ -31,6 +31,8 @@ if(r) {
                     imagePath = g.createLinkTo(base:gThumbnail,	file: '')
             }
     }
+} else {
+    imagePath = Utils.getIBPServerDomain()+'/sites/all/themes/ibp/images/map-logo.gif';
 }
 %>
 <meta property="og:image" content="${imagePath}" />
@@ -47,7 +49,7 @@ if(r) {
 		}
 		
 %>
-<g:set var="description" value="${speciesInstance.findSummary()?:''}" />
+<g:set var="description" value="${Utils.stripHTML(speciesInstance.findSummary()?:'')}" />
 
 <meta property="fb:app_id" content="${fbAppId }" />
 <meta property="fb:admins" content="581308415,100000607869577" />
@@ -536,7 +538,6 @@ $(document).ready(function(){
 						<g:if test="${speciesInstance.taxonConcept.threatenedStatus}">
 						  		<s:showThreatenedStatus model="['threatenedStatus':speciesInstance.taxonConcept.threatenedStatus]"/>
 						</g:if>
-                                                <obv:like model="['resource':speciesInstance]"/>
 					</div>
 				</div>
 				<div style="margin:5px 0px;">

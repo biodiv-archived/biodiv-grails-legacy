@@ -245,8 +245,21 @@ function rating() {
 
 function last_actions() {
 	$(".ellipsis.multiline").trunk8({
-		lines:2,		
+		lines:2,
+                tooltip:false,
+                fill: '&hellip; <a id="read-more" href="#">more</a>'
 	});
+        $('#read-more').live('click', function (event) {
+              $(this).parent().trunk8('revert').append(' <a id="read-less" href="#">read less</a>');
+                
+                return false;
+        });
+
+        $('#read-less').live('click', function (event) {
+              $(this).parent().trunk8();
+                
+                return false;
+        });
 	
 	$(".ellipsis:not(.multiline)").trunk8();
 	

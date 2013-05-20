@@ -15,7 +15,7 @@ def http = new HTTPBuilder()
 def rootDir = grailsApplication.config.speciesPortal.users.rootDir.toString()
 File userDir = new File(rootDir);
 SUser.withTransaction {
-    SUser.findAllByProfilePicLike('http://graph.facebook%', [sort:"id", max:1]).each { user ->
+    SUser.findAllByProfilePicLike('http://graph.facebook%', [sort:"id"]).each { user ->
         def fbUser = FacebookUser.findByUser(user);
         String relPath = fbUser.uid.toString()+File.separator+"resources"
         File usersDir = new File(userDir, relPath); 
