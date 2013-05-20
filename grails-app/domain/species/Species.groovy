@@ -31,6 +31,7 @@ class Species implements Rateable {
 	def grailsApplication; 
 	def springSecurityService;
 	def dataSource
+	def activityFeedService
 	
 	private static final log = LogFactory.getLog(this);
 	
@@ -171,4 +172,9 @@ class Species implements Rateable {
 	def boolean fetchIsFollowing(SUser user=springSecurityService.currentUser){
 		return Follow.fetchIsFollowing(this, user)
 	}
+	
+	def afterDelete(){
+		activityFeedService.deleteFeed(this)
+	}
+	
 }

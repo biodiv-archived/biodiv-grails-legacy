@@ -22,6 +22,7 @@ import utils.Newsletter;
 class UserGroup implements Taggable {
 	
 	def dataSource;
+	def activityFeedService
 	
 	String name;
 	String description;
@@ -323,6 +324,10 @@ class UserGroup implements Taggable {
 	
 	def fetchHomePageTitle(){
 		return userGroupService.fetchHomePageTitle(this)
+	}
+	
+	def afterDelete(){
+		activityFeedService.deleteFeed(this)
 	}
 	
 }
