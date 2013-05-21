@@ -290,6 +290,7 @@ println result;
 			def link = observationService.generateLink("SUser", "show", ["id": r[0].id], request)
 			link =  "" + '<a  href="' +  link +'"><i>' + r[0].name + "</i></a>"
 			finalResult.add([ getUserImage(r[0]), link, getHyperLinkForUser(r[0].id, startDate, r[1], request)])
+			r[0] = r[0].name
 		}
 		
 		return [data : result, htmlData:finalResult, columns : [
