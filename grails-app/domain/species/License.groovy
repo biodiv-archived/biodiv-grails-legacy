@@ -49,6 +49,24 @@ class License {
 		public String getIconFilename(){
 			return this.value().replaceAll(/ /, "_").replaceAll('.') { it.toLowerCase()}
 		}
+
+        public String getTooltip() {
+            switch(this) {
+                case CC_PUBLIC_DOMAIN : return "Public Domain"
+
+        		case CC_BY : return "Attribution"
+
+            	case CC_BY_SA : return "Attribution-ShareAlike"
+
+        		case CC_BY_ND : return "Attribution-NoDerivs"
+
+        		case CC_BY_NC : return "Attribution-NonCommercial"
+
+        		case CC_BY_NC_SA : return "Attribution-NonCommercial-ShareAlike"
+
+        		case CC_BY_NC_ND : return "Attribution-NonCommercial-NoDerivs"
+            }
+        }
 	}
 
 	LicenseType name;

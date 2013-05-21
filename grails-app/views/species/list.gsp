@@ -6,16 +6,13 @@
 <%@page import="species.utils.Utils"%>
 <html>
 <head>
-<link rel="canonical" href="${Utils.getIBPServerDomain() + createLink(controller:'species', action:'list')}" />
-<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-<meta name="layout" content="main" />
-
+<g:set var="canonicalUrl" value="${uGroup.createLink([controller:'species', action:'list', base:Utils.getIBPServerDomain()])}" />
+<g:set var="title" value="List"/>
+<g:render template="/common/titleTemplate" model="['title':title, 'description':'', 'canonicalUrl':canonicalUrl, 'imagePath':'']"/>
+<title>${title} | ${params.controller.capitalize()} | ${Utils.getDomainName(request)}</title>
 
 <r:require modules="species_list" />
 
-<g:set var="entityName"
-	value="${message(code: 'species.label', default: 'Species')}" />
-<title>Species List</title>
 </head>
 <body>
 <style  type="text/css">

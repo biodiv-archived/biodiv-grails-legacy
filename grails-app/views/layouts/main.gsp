@@ -6,34 +6,38 @@
 <html  xmlns="http://www.w3.org/1999/xhtml" xmlns:og="http://ogp.me/ns#" 
       xmlns:fb="https://www.facebook.com/2008/fbml">
 <head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
-<title>
-	${Utils.getDomainName(request)}
-</title>
+    
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-<meta name="description" content="Welcome to the India Biodiversity Portal (IBP) - A repository of information designed to harness and disseminate collective intelligence on the biodiversity of the Indian subcontinent.">
+
+<g:layoutHead />
+
 <r:layoutResources />
 <ckeditor:resources />
+
 <g:set var="domain" value="${Utils.getDomain(request)}"/>
 <g:if test="${domain.equals(grailsApplication.config.ibp.domain) }">
-	<link rel="shortcut icon" href="/sites/default/files/ibp_favicon_2.png"
+    <link rel="shortcut icon" href="/sites/default/files/ibp_favicon_2.png"
 		type="image/x-icon" />
 </g:if>
 <g:else>
-	<link rel="shortcut icon"
+    <link rel="shortcut icon"
 		href="/sites/all/themes/wg/images/favicon.png" type="image/x-icon" />
 </g:else>
-<!-- The standard Google Loader script. --> 
-<script src="https://www.google.com/jsapi"
-		type="text/javascript"></script>
 
-<g:layoutHead />
+<script src="https://www.google.com/jsapi" type="text/javascript"></script>
+
 <r:require modules="observations_list" />
-<!-- script src="http://cdn.wibiya.com/Toolbars/dir_1100/Toolbar_1100354/Loader_1100354.js" type="text/javascript"></script><noscript><a href="http://www.wibiya.com/">Web Toolbar by Wibiya</a></noscript-->
+
 <g:set var="userGroupInstance" value="${userGroupInstance}"/>
 <g:if test="${userGroupInstance && userGroupInstance.theme}">
 	<link rel="stylesheet" type="text/css"
 		href="${resource(dir:'group-themes', file:userGroupInstance.theme + '.css')}" />
 </g:if>
+
+<g:if test="${params.action !='show'}">
+    <meta name="description" content="Welcome to the India Biodiversity Portal (IBP) - A repository of information designed to harness and disseminate collective intelligence on the biodiversity of the Indian subcontinent.">
+</g:if>
+
 
 </head>
 <body>
@@ -60,7 +64,7 @@
 		<domain:showIBPFooter />
 
 	</div>
-	<div id="feedback_button" onclick="location.href='/feedback_form';" style="left: -10px;"></div>
+	<div id="feedback_button" onclick="location.href='/feedback_form';" style="left: -10px;z-index:1000;"></div>
 	<r:layoutResources />
 </body>
 </html>

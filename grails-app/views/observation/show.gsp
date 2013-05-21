@@ -10,10 +10,6 @@
 <head>
 <g:set var="canonicalUrl" value="${uGroup.createLink([controller:'observation', action:'show', id:observationInstance.id, base:Utils.getIBPServerDomain()])}"/>
 <g:set var="title" value="${(!observationInstance.fetchSpeciesCall()?.equalsIgnoreCase('Unknown'))?observationInstance.fetchSpeciesCall():'Help Identify'}"/>
-<link rel="canonical" href="${canonicalUrl}" />
-<meta property="og:type" content="article" />
-<meta property="og:title" content="${title}"/>
-<meta property="og:url" content="${canonicalUrl}" />
 <%
 def r = observationInstance.mainImage();
 def imagePath = '';
@@ -29,42 +25,19 @@ if(r) {
 } else{
     imagePath = Utils.getIBPServerDomain()+'/sites/all/themes/ibp/images/map-logo.gif';
 }
-%>
-<meta property="og:image" content="${imagePath}" />
-<meta property="og:site_name" content="${Utils.getDomainName(request)}" />
-
-<g:set var="domain" value="${Utils.getDomain(request)}" />
-<g:set var="fbAppId"/>
-<%
-		
-		if(domain.equals(grailsApplication.config.wgp.domain)) {
-			fbAppId = grailsApplication.config.speciesPortal.wgp.facebook.appId;
-		} else { //if(domain.equals(grailsApplication.config.ibp.domain)) {
-			fbAppId =  grailsApplication.config.speciesPortal.ibp.facebook.appId;
-		}
-		
-		//description = observationInstance.notes.trim() ;
-		String location = "Observed at '" + (observationInstance.placeName.trim()?:observationInstance.reverseGeocodedName) +"'"
-		String desc = "- "+ location +" by "+observationInstance.author.name.capitalize()+" in species group "+observationInstance.group.name + " and habitat "+ observationInstance.habitat.name;
+	
+String location = "Observed at '" + (observationInstance.placeName.trim()?:observationInstance.reverseGeocodedName) +"'"
+String desc = "- "+ location +" by "+observationInstance.author.name.capitalize()+" in species group "+observationInstance.group.name + " and habitat "+ observationInstance.habitat.name;
 %>
 <g:set var="description" value="${Utils.stripHTML(observationInstance.notes?observationInstance.notes+' '+desc:desc)?:'' }" />
 
-<meta property="fb:app_id" content="${fbAppId }" />
-<meta property="fb:admins" content="581308415,100000607869577" />
-<meta property="og:description"
-          content='${description}'/>
+<g:render template="/common/titleTemplate" model="['title':title, 'description':description, 'canonicalUrl':canonicalUrl, 'imagePath':imagePath]"/>
+<title>${title} | ${params.controller.capitalize()} | ${Utils.getDomainName(request)}</title>
+
 <meta property="og:latitude" content="${observationInstance.latitude}"/>
 <meta property="og:longitude" content="${observationInstance.longitude }"/>
 
-<meta name="layout" content="main" />
 <r:require modules="observations_show"/>
-<link rel="image_src" href="${createLinkTo(file: gallImagePath, base:grailsApplication.config.speciesPortal.observations.serverURL)}" />
-
-<g:set var="entityName"
-	value="${message(code: 'observation.label', default: 'Observation')}" />
-        <title>${title}
-</title>
-
 
 <style>
 .nameContainer {
@@ -137,7 +110,7 @@ if(r) {
 				<div class="span8 right-shadow-box" style="margin: 0;">
 				<div style="height:400px;position:relative">
 
-                                    <g:render template="/common/observation/noOfResources" model="['instance':observationInstance]"/>
+                                    <g:render template="/common/observation/noOfResources" model="['instance':observationInstance, 'bottom':'bottom:55px;']"/>
                                     <center>
                                         <div id="gallerySpinner" class="spinner">
                                         <img src="${resource(dir:'images',file:'spinner.gif', absolute:true)}"
@@ -333,7 +306,6 @@ if(r) {
                             
                             this.bind('loadfinish', function(e){
                                 galleryImageLoadFinish();
-                                $(".slideUp").click();
                             })
                         }
                 });

@@ -1,13 +1,15 @@
 <%@ page import="content.eml.UFile"%>
+<%@page import="species.utils.Utils"%>
 <%@ page import="org.grails.taggable.Tag"%>
 <%@ page import="species.participation.ActivityFeedService"%>
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="layout" content="main" />
-<g:set var="entityName"
-	value="${message(code: 'Document.label', default: 'Document')}" />
-<title>Document</title>
+<g:set var="canonicalUrl" value="${uGroup.createLink([controller:'document', action:'browser', base:Utils.getIBPServerDomain()])}" />
+<g:set var="title" value="List"/>
+<g:render template="/common/titleTemplate" model="['title':title, 'description':'', 'canonicalUrl':canonicalUrl, 'imagePath':'']"/>
+<title>${title} | ${params.controller.capitalize()} | ${Utils.getDomainName(request)}</title>
+
+
 <r:require modules="add_file" />
 <uploader:head />
 <style type="text/css">

@@ -5,40 +5,9 @@
 <head>
 <g:set var="canonicalUrl" value="${uGroup.createLink([controller:'document', action:'show', id:documentInstance.id, base:Utils.getIBPServerDomain()])}"/>
 <g:set var="title" value="${documentInstance.title}"/>
-<link rel="canonical" href="${canonicalUrl}" />
-<meta property="og:type" content="article" />
-<meta property="og:title" content="${title}"/>
-<meta property="og:url" content="${canonicalUrl}" />
-<meta property="og:site_name" content="${Utils.getDomainName(request)}" />
-<%
-String imagePath = Utils.getIBPServerDomain()+'/sites/all/themes/ibp/images/map-logo.gif';
-%>
-<meta property="og:image" content="${imagePath}" />
-
-<g:set var="domain" value="${Utils.getDomain(request)}" />
-<g:set var="fbAppId"/>
-<%
-		
-		if(domain.equals(grailsApplication.config.wgp.domain)) {
-			fbAppId = grailsApplication.config.speciesPortal.wgp.facebook.appId;
-		} else { //if(domain.equals(grailsApplication.config.ibp.domain)) {
-			fbAppId =  grailsApplication.config.speciesPortal.ibp.facebook.appId;
-		}
-		
-%>
 <g:set var="description" value="${Utils.stripHTML(documentInstance.description?:'') }" />
-
-<meta property="fb:app_id" content="${fbAppId }" />
-<meta property="fb:admins" content="581308415,100000607869577" />
-
-<meta property="og:description"
-          content='${description}'/>
-
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="layout" content="main" />
-<g:set var="entityName"
-	value="${message(code: 'document.label', default: 'Document')}" />
-        <title>${title}</title>
+<g:render template="/common/titleTemplate" model="['title':title, 'description':description, 'canonicalUrl':canonicalUrl, 'imagePath':null]"/>
+<title>${title} | ${params.controller.capitalize()} | ${Utils.getDomainName(request)}</title>
 <r:require modules="content_view, activityfeed, comment" />
 </head>
 <body>

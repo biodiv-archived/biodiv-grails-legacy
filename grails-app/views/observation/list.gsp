@@ -2,44 +2,16 @@
 <%@page import="species.Resource.ResourceType"%>
 <html>
 <head>
-<link rel="canonical" href="${Utils.getIBPServerDomain() + uGroup.createLink(controller:'observation', action:'list')}" />
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="layout" content="main" />
-
-
-<meta property="og:type" content="article" />
-<meta property="og:title" content="${Utils.getDomainName(request)}" />
-<meta property="og:url"
-	content="${uGroup.createLink(action:params.action, controller:params.controller?:'observation', userGroupWebaddress:params.webaddress,absolute:true)}" />
-<meta property="og:site_name" content="Observations (${Utils.getDomainName(request)})" />
-
-<g:set var="domain" value="${Utils.getDomain(request)}" />
-<%
-				String fbAppId;
-				if(domain.equals(grailsApplication.config.wgp.domain)) {
-					fbAppId = grailsApplication.config.speciesPortal.wgp.facebook.appId;
-				} else { //if(domain.equals(grailsApplication.config.ibp.domain)) {
-					fbAppId =  grailsApplication.config.speciesPortal.ibp.facebook.appId;
-				}
-		%>
-<meta property="og:image" content="${Utils.getDomainServerUrl(request)}/sites/default/files/ibp_favicon_2.png" />
-<meta property="og:description" content='Welcome to the India Biodiversity Portal (IBP) - A repository of information designed to harness and disseminate collective intelligence on the biodiversity of the Indian subcontinent.'/>
-
-<meta property="fb:app_id" content="${fbAppId }" />
-<meta property="fb:admins" content="581308415,100000607869577" />
-
-
-
-<g:set var="entityName"
-	value="${message(code: 'observation.label', default: 'Observations')}" />
-<title><g:message code="default.list.label" args="[entityName]" />
-</title>
+<g:set var="canonicalUrl" value="${uGroup.createLink([controller:'observation', action:'list', base:Utils.getIBPServerDomain()])}" />
+<g:set var="title" value="List"/>
+<g:render template="/common/titleTemplate" model="['title':title, 'description':'', 'canonicalUrl':canonicalUrl, 'imagePath':'']"/>
+<title>${title} | ${params.controller.capitalize()} | ${Utils.getDomainName(request)}</title>
 <r:require modules="observations_list" />
 </head>
 <body>
 
 	<div class="span12">
-		<obv:showSubmenuTemplate model="['entityName':entityName]" />
+		<obv:showSubmenuTemplate model="['entityName':'Observations']" />
 		<uGroup:rightSidebar/>
 		<obv:showObservationsListWrapper />
 	</div>

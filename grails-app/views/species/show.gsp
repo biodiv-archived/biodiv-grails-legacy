@@ -14,11 +14,8 @@
 <html>
 <head>
 <g:set var="canonicalUrl" value="${uGroup.createLink([controller:'species', action:'show', id:speciesInstance.id, base:Utils.getIBPServerDomain()])}"/>
-<link rel="canonical" href="${canonicalUrl}" />
 <g:set var="title" value="${speciesInstance.taxonConcept.name}"/>
-<meta property="og:type" content="article" />
-<meta property="og:title" content=${title}"/>
-<meta property="og:url" content="${canonicalUrl}" />
+<g:set var="description" value="${Utils.stripHTML(speciesInstance.findSummary()?:'')}" />
 <%
 def r = speciesInstance.mainImage();
 def imagePath = '';
@@ -35,27 +32,10 @@ if(r) {
     imagePath = Utils.getIBPServerDomain()+'/sites/all/themes/ibp/images/map-logo.gif';
 }
 %>
-<meta property="og:image" content="${imagePath}" />
-<meta property="og:site_name" content="${Utils.getDomainName(request)}" />
 
-<g:set var="domain" value="${Utils.getDomain(request)}" />
-<g:set var="fbAppId"/>
-<%
-		
-		if(domain.equals(grailsApplication.config.wgp.domain)) {
-			fbAppId = grailsApplication.config.speciesPortal.wgp.facebook.appId;
-                } else { 
-			fbAppId =  grailsApplication.config.speciesPortal.ibp.facebook.appId;
-		}
-		
-%>
-<g:set var="description" value="${Utils.stripHTML(speciesInstance.findSummary()?:'')}" />
+<g:render template="/common/titleTemplate" model="['title':title, 'description':description, 'canonicalUrl':canonicalUrl, 'imagePath':imagePath]"/>
+<title>${title} | ${params.controller.capitalize()} | ${Utils.getDomainName(request)}</title>
 
-<meta property="fb:app_id" content="${fbAppId }" />
-<meta property="fb:admins" content="581308415,100000607869577" />
-<meta property="og:description"
-          content='${description}'/>
-<meta name="layout" content="main" />
 <r:require modules="species_show"/>
 
 <style>
