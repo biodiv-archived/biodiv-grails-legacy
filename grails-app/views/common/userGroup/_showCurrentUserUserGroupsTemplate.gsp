@@ -4,6 +4,7 @@ def exclusiveUsergroups =  userGroups[false]
 def otherUsergroups =  userGroups[true] 
 def obvActionMarkerClass = (params.action == 'create' || params.action == 'save')? 'create' : ''
 List userGroupsList = params.userGroupsList?params.userGroupsList.split(','):[]
+def parentGroupId = ''
 %>
 <input type="hidden" id="userGroupsList" name="userGroupsList" value="${params.userGroupsList}" />
 <g:if test="${exclusiveUsergroups}">
@@ -31,11 +32,14 @@ List userGroupsList = params.userGroupsList?params.userGroupsList.split(','):[]
                 }
 		
 		if( params.webaddress) {
-			checked = checked || params.webaddress == userGroup.key.webaddress
+			boolean isParentGroup =  (params.webaddress == userGroup.key.webaddress)
+			checked = checked || isParentGroup
+			parentGroupId = isParentGroup ? userGroup.key.id :""
+			
 		}
 	 %>  <label class="radio">
 						<button type="button"
-							class="btn input-prepend ${checked?'active btn-success ' + obvActionMarkerClass :''} single-post"
+							class="btn input-prepend ${checked?'active btn-success ' + obvActionMarkerClass + ' ' + parentGroupId :''} single-post"
 							value="${userGroup.key.id}"
 							style="padding: 0px; height: 52px; border-radius: 6px;">
 
@@ -79,11 +83,13 @@ List userGroupsList = params.userGroupsList?params.userGroupsList.split(','):[]
 
 		
 		if( params.webaddress) {
-			checked = checked || params.webaddress == userGroup.key.webaddress
+			boolean isParentGroup =  (params.webaddress == userGroup.key.webaddress)
+			checked = checked || isParentGroup
+			parentGroupId = isParentGroup ? userGroup.key.id :""
 		}
 	 %> <label class="checkbox">
 					<button type="button"
-						class="btn input-prepend ${checked? 'active btn-success ' + obvActionMarkerClass :''} multi-post"
+						class="btn input-prepend ${checked? 'active btn-success ' + obvActionMarkerClass + ' ' + parentGroupId :''} multi-post"
 						value="${userGroup.key.id}"
 						style="padding: 0px; height: 52px; border-radius: 6px;">
 
@@ -114,7 +120,7 @@ $(document).ready (function(){
 			//if on obv create page	and one group is coming as parent group		
 			if($("#userGroups").hasClass('create') && ($("#userGroups button.create").length > 0)){
 				//this group is parent group
-				if($(this).hasClass('create')){
+				if($(this).hasClass('create') && ${parentGroupId != ''} && $(this).hasClass('${parentGroupId}')){
 					alert("Can't unselect parent group");
 				}else{
 					//un selecting other group
