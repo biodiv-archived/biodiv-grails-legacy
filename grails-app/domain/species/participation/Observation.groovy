@@ -22,7 +22,8 @@ class Observation implements Taggable, Rateable {
 	def commentService;
 	def activityFeedService;
 	def springSecurityService;
-	
+    def resourceService;
+
 	public enum OccurrenceStatus {
 		ABSENT ("Absent"),	//http://rs.gbif.org/terms/1.0/occurrenceStatus#absent
 		CASUAL ("Casual"),	// http://rs.gbif.org/terms/1.0/occurrenceStatus#casual
@@ -427,7 +428,6 @@ class Observation implements Taggable, Rateable {
         params['cache'] = true;
         params['type'] = type;
         def results = sql.rows("select resource_id, observation_id, rating_ref, (case when avg is null then 0 else avg end) as avg, (case when count is null then 0 else count end) as count from observation_resource o left outer join (select rating_link.rating_ref, avg(rating.stars), count(rating.stars) from rating_link , rating  where rating_link.type='$type' and rating_link.rating_id = rating.id  group by rating_link.rating_ref) c on o.resource_id =  c.rating_ref where observation_id=:obvId order by avg desc, resource_id asc", [obvId:this.id]);
-        println results
         def idList = results.collect { it[0] }
 
         if(idList) {
@@ -440,4 +440,11 @@ class Observation implements Taggable, Rateable {
             []
         }
     }
+
+	def fetchResourceCount(){
+        def result = Observation.executeQuery ('''
+            select r.type, count(*) from Observation obv join obv.resource r where obv.id=:obvId group by r.type order by r.type
+            ''', [obvId:this.id]);
+        return result;
+	}
 }

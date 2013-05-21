@@ -135,7 +135,9 @@ if(r) {
                                </div>
 
 				<div class="span8 right-shadow-box" style="margin: 0;">
-				<div style="height:400px;">
+				<div style="height:400px;position:relative">
+
+                                    <g:render template="/common/observation/noOfResources" model="['instance':observationInstance]"/>
                                     <center>
                                         <div id="gallerySpinner" class="spinner">
                                         <img src="${resource(dir:'images',file:'spinner.gif', absolute:true)}"
@@ -145,6 +147,7 @@ if(r) {
 
 
 					<div id="gallery1" style="visibility:hidden">
+
 						<g:if test="${observationInstance.resource}">
 							<g:each in="${observationInstance.listResourcesByRating()}" var="r">
 								<g:if test="${r.type == ResourceType.IMAGE}">

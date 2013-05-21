@@ -84,8 +84,6 @@ class Species implements Rateable {
         def clazz = Resource.class;
         def type = GrailsNameUtils.getPropertyName(clazz);
 
-        println type;
-
 		def sql =  Sql.newInstance(dataSource);
         params['cache'] = true;
         params['type'] = type;

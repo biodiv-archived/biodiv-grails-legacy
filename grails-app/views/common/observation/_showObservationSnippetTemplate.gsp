@@ -11,6 +11,7 @@ if(mainImage.type == ResourceType.IMAGE) {
 }
 %>
 
+<g:render template="/common/observation/noOfResources" model="['instance':observationInstance]"/>
 <div class="figure span3 observation_story_image" style="display: table;height:220px;" 
 	title='<g:if test="${obvTitle != null}">${obvTitle}</g:if>'>
 	<g:link url="${uGroup.createLink(controller:'observation', action:'show', id:observationInstance.id, 'pos':pos, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress) }" name="l${pos}"

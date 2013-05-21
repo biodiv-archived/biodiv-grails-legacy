@@ -21,6 +21,15 @@ class Resource implements Rateable {
 		public String value() {
 			return this.value;
 		}
+
+        public iconClass() {
+            switch(this) {
+                case ICON : return 'icon-picture'
+                case IMAGE : return 'icon-picture'
+                case VIDEO : return 'icon-film'
+                case AUDIO : return 'icon-music'
+            }
+        }
 	}
 	
 	ResourceType type;

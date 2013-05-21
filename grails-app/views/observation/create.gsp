@@ -147,7 +147,7 @@ input.dms_field {
 
 						<div>
 							<i class="icon-picture"></i><span>Upload photos of a
-								single observation and species</span>
+								single observation and species and rate images inorder to order them.</span>
 					
 					
 							<div
