@@ -120,7 +120,6 @@ $(document).ready(function(){
 	});
 	
 	$("#uGroup_${queryParams.uGroup?:(params.webaddress?'THIS_GROUP':'ALL')}").click();
-	
-        $(".range_inputs input").removeAttr('disabled')	
+
 });
 </r:script>

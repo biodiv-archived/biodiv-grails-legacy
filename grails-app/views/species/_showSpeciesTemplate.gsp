@@ -88,7 +88,7 @@
                         </div>
                     </g:if>
                 </div>
-                <div class="story-footer" style="width: 100%">
+                <div class="story-footer">
                     <div class="footer-item">
                         <obv:like model="['resource':speciesInstance]"/>
                     </div>

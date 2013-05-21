@@ -32,13 +32,6 @@ ul.file-tags {
 	display: none;
 }
 
-.pdficon {
-	width: 16px;
-	height: 16px;
-	background: url(../images/pdficon.jpg);
-	cursor: pointer;
-}
-
 .show-ufile {
 	background-color: #f7f7f7;
 	margin: 5px;

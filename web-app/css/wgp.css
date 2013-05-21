@@ -1972,7 +1972,11 @@ div.noOfRatings {
     z-index:10;
 }
 
-
-
+.pdficon {
+	width: 16px;
+	height: 16px;
+	background: url(../images/pdficon.jpg);
+	cursor: pointer;
+}
 
 
