@@ -93,7 +93,7 @@ $(document).ready(function(){
         });
 
 	
-    $('#uploadedOn span.date').html(startDate.toString('dd/MM/yyyy') + ' - ' +endDate.toString('dd/MM/yyyy'));
+        $('#uploadedOn span.date').html(startDate.toString('dd/MM/yyyy') + ' - ' +endDate.toString('dd/MM/yyyy'));
 	
 	$('#advSearchForm :input:not(input[type=hidden])').each(function(index, ele) {
 		var field = $(this).attr('name');
@@ -121,6 +121,6 @@ $(document).ready(function(){
 	
 	$("#uGroup_${queryParams.uGroup?:(params.webaddress?'THIS_GROUP':'ALL')}").click();
 	
-	
+        $(".range_inputs input").removeAttr('disabled')	
 });
 </r:script>

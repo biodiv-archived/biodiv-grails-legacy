@@ -206,6 +206,7 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 		def jsonData = []
 		String username = params.term
 
+        if(username) {
 		String usernameFieldName = 'name';//SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
 		String userId = 'id';
 
@@ -221,7 +222,7 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 		for (result in results) {
 			jsonData << [value: result[0], label:result[0] , userId:result[1] , "category":"Members"]
 		}
-
+        }
 		return jsonData;
 	}
 

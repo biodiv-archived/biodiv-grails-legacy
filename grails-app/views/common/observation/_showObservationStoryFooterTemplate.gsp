@@ -1,5 +1,5 @@
 <%@page import="species.utils.Utils"%>
-<div class="story-footer" style="width: 100%">
+<div class="story-footer">
 	<g:if test="${showLike && !showDetails}">
 	        <div class="footer-item pull-left">
 	            <obv:like model="['resource':observationInstance]"/>

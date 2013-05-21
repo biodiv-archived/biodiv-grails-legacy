@@ -925,7 +925,7 @@ class ObservationService {
 		paramsList.add('fl', params['fl']?:"id");
 		
 		//Facets
-		params["facet.field"] = params["facet.field"] ?: searchFieldsConfig.TAG;
+		/*params["facet.field"] = params["facet.field"] ?: searchFieldsConfig.TAG;
 		paramsList.add('facet.field', params["facet.field"]);
 		paramsList.add('facet', "true");
 		params["facet.limit"] = params["facet.limit"] ?: 50;
@@ -933,7 +933,8 @@ class ObservationService {
 		params["facet.offset"] = params["facet.offset"] ?: 0;
 		paramsList.add('facet.offset', params["facet.offset"]);
 		paramsList.add('facet.mincount', "1");
-		
+		*/
+
 		//Filters
 		if(params.sGroup) {
 			params.sGroup = params.sGroup.toLong()
@@ -1010,7 +1011,7 @@ class ObservationService {
 		def totalObservationIdList = [];
 		def facetResults = [:], responseHeader
 		long noOfResults = 0;
-		if(paramsList.get('q')) {
+		if(paramsList) {
 			def queryResponse = observationsSearchService.search(paramsList);
 			
 			Iterator iter = queryResponse.getResults().listIterator();
@@ -1023,11 +1024,11 @@ class ObservationService {
 				}
 			}
 			
-			List facets = queryResponse.getFacetField(params["facet.field"]).getValues()
+			/*List facets = queryResponse.getFacetField(params["facet.field"]).getValues()
 			
 			facets.each {
 				facetResults.put(it.getName(),it.getCount());
-			}
+			}*/
 			
 			responseHeader = queryResponse?.responseHeader;
 			noOfResults = queryResponse.getResults().getNumFound()

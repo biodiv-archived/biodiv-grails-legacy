@@ -1,7 +1,7 @@
 <%@page import="species.utils.Utils"%>
 <%@ page import="species.participation.DownloadLog.DownloadType"%>
 <div class="story-actions clearfix" style="width: 100%;">
-    <div class="span8" style="margin-left:0px">
+    <div class="span8" style="margin-left:0px;position:relative">
         <div class="footer-item pull-left">
             <obv:like model="['resource':instance]"/>
         </div>
@@ -32,7 +32,7 @@
         </g:if>
 
         <g:if test="${!hideSocial}">
-		<div class="footer-item" style="float:right">
+		<div class="footer-item" style="position:absolute;right:0px;">
                     <fb:like layout="button_count" href="${href}" width="450" show_faces="true"></fb:like>
                     <div id="googleplus" class="pull-left"></div>
                     <% String twitterDesc = title?:'';

@@ -333,6 +333,7 @@ if(r) {
                             
                             this.bind('loadfinish', function(e){
                                 galleryImageLoadFinish();
+                                $(".slideUp").click();
                             })
                         }
                 });
