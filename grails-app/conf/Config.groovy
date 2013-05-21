@@ -444,7 +444,7 @@ environments {
 			}
 		}
 		google.analytics.enabled = false
-
+		grails.resources.debug = true
 		
 		grails {
 			mail {
