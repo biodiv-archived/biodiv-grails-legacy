@@ -3,9 +3,9 @@
 def exclusiveUsergroups =  userGroups[false]
 def otherUsergroups =  userGroups[true] 
 def obvActionMarkerClass = (params.action == 'create' || params.action == 'save')? 'create' : ''
+List userGroupsList = params.userGroupsList?params.userGroupsList.split(','):[]
 %>
-
-<input type="hidden" id="userGroupsList" name="userGroupsList" value="" />
+<input type="hidden" id="userGroupsList" name="userGroupsList" value="${params.userGroupsList}" />
 <g:if test="${exclusiveUsergroups}">
 	<div>Share with either of these groups</div>
 	<div id="groupsWithSharingNotAllowed" class="btn-group userGroups"
@@ -24,7 +24,11 @@ def obvActionMarkerClass = (params.action == 'create' || params.action == 'save'
 			} else {
 				checked = checked || params.userGroupId.containsValue(String.valueOf(userGroup.key.id))
 			}
-		}
+                        
+                } else {
+                    if(userGroupsList.contains(String.valueOf(userGroup.key.id)))
+			checked = true
+                }
 		
 		if( params.webaddress) {
 			checked = checked || params.webaddress == userGroup.key.webaddress
@@ -68,7 +72,11 @@ def obvActionMarkerClass = (params.action == 'create' || params.action == 'save'
 			} else {
 				checked = checked || params.userGroupId.containsValue(String.valueOf(userGroup.key.id))
 			}
-		}
+		} else {
+                    if(userGroupsList.contains(String.valueOf(userGroup.key.id)))
+			checked = true
+                }
+
 		
 		if( params.webaddress) {
 			checked = checked || params.webaddress == userGroup.key.webaddress

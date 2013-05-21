@@ -1093,7 +1093,7 @@ class ObservationController {
 				def body = observationService.getIdentificationEmailInfo(params, request, entry.getValue()).mailBody
 				mailService.sendMail {
 					to entry.getKey()
-					bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com", "thomas.vee@gmail.com"
+					bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com", "thomas.vee@gmail.com", "sandeept@strandls.com"
 					from conf.ui.notification.emailFrom
 					replyTo currentUserMailId
 					subject mailSubject

@@ -442,7 +442,6 @@ if(r && thumbnail) {
 							
 					</div>
 					</div>
-
 				<uGroup:isUserGroupMember>
 					<div class="span12 super-section"  style="clear: both">
 						<div class="section" style="position: relative; overflow: visible;">
@@ -479,7 +478,6 @@ if(r && thumbnail) {
 								Observation </a>
 						</div>
 					</g:if>
-					
 					<a id="addObservationSubmit" class="btn btn-primary"
 						style="float: right; margin-right: 5px;"> ${form_button_val} </a>
 				

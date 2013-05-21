@@ -159,7 +159,7 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 
 					mailService.sendMail {
 						to user.email
-						bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com","thomas.vee@gmail.com"
+						bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com","thomas.vee@gmail.com", "sandeept@strandls.com"
 						from conf.ui.notification.emailFrom
 						subject mailSubject
 						body(view:"/emailtemplates/welcomeEmail", model:templateMap)
@@ -181,7 +181,7 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 
 				if ( Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
 					mailService.sendMail {
-						bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com","thomas.vee@gmail.com"
+						bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com","thomas.vee@gmail.com","sandeept@strandls.com"
 						from conf.ui.notification.emailFrom
 						subject mailSubject
 						html bodyContent.toString()

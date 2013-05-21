@@ -1272,7 +1272,7 @@ class ObservationService {
 					mailService.sendMail {
 						to toUser.email
 						if(index == 0) {
-							bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com", "thomas.vee@gmail.com"
+							bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com", "thomas.vee@gmail.com", "sandeept@strandls.com"
 							//bcc "sravanthi@strandls.com"
 						}
 						from conf.ui.notification.emailFrom
