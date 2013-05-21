@@ -447,4 +447,8 @@ class Observation implements Taggable, Rateable {
             ''', [obvId:this.id]);
         return result;
 	}
+	
+	def fetchRecoVoteOwnerCount(){
+		return RecommendationVote.countByObservation(this)
+	}
 }
