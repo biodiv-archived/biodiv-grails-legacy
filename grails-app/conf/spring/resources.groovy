@@ -5,6 +5,7 @@ import org.codehaus.groovy.grails.plugins.springsecurity.DefaultPostAuthenticati
 import org.codehaus.groovy.grails.plugins.springsecurity.DefaultPreAuthenticationChecks;
 import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
 import org.codehaus.groovy.grails.plugins.springsecurity.openid.OpenIdUserDetailsService;
+import species.auth.DefaultAjaxAwareRedirectStrategy;
 import org.springframework.social.connect.support.ConnectionFactoryRegistry;
 import org.springframework.social.facebook.api.Facebook;
 import org.springframework.social.facebook.connect.FacebookConnectionFactory;
@@ -210,5 +211,9 @@ beans = {
 	documentSearchService(speciespage.search.DocumentSearchService) {
 		solrServer = ref('documentSolrServer');
 	}
+
+    redirectStrategy(DefaultAjaxAwareRedirectStrategy) {
+        contextRelative = conf.redirectStrategy.contextRelative // false
+    }
 
 }

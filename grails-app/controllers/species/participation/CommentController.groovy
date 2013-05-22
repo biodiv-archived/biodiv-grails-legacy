@@ -21,7 +21,10 @@ class CommentController {
 			def c = commentService.addComment(params);
 			result = getResultForResponse(params);
 			result["clearForm"] = true;
-		}else{
+		} else if(params.ajax_login_error == "1") {
+			result["success"] = true;
+			result["status"] = 401;
+		} else{
 			result["success"] = true;
 		}
 		render result as JSON;

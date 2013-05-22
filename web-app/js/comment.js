@@ -56,7 +56,7 @@ function updateUnionComment(postComp, url){
 
 function postAsAjax(postComp, url, newCommentUrl, update){
 	var targetComp = $(postComp).closest('.comment');
-	$(postComp).ajaxSubmit({ 
+	var options = { 
      	url:url,
 		dataType: 'json', 
 //		clearForm: true,
@@ -66,7 +66,10 @@ function postAsAjax(postComp, url, newCommentUrl, update){
 			return true;
 		}, 
         success: function(data, statusText, xhr, form) {
-        	if(data.showCommentListHtml){
+        	if(data.status == 401) {
+        		$(postComp).ajaxSubmit(options);
+        	}
+        	else if(data.showCommentListHtml){
     			var htmlData = $(data.showCommentListHtml);
     			//dcorateCommentBody(htmlData.find('.yj-message-body'));
     			$(targetComp).children('ul').prepend(htmlData);
@@ -86,9 +89,12 @@ function postAsAjax(postComp, url, newCommentUrl, update){
         error:function (xhr, ajaxOptions, thrownError){
         	//successHandler is used when ajax login succedes
         	var successHandler = this.success, errorHandler = undefined;
-        	handleError(xhr, ajaxOptions, thrownError, successHandler, errorHandler);
+        	handleError(xhr, ajaxOptions, thrownError, successHandler, function(){
+        		
+        	});
 		} 
- 	});
+ 	}
+	$(postComp).ajaxSubmit(options);
 }
 
 function updateCountOnPopup(postComp, newlyAddedCount){
@@ -127,13 +133,15 @@ function replyOnComment(comp, parentId, url){
 	params["commentBody"] = $(comp).siblings(".comment-textbox").val();
 	params["parentId"] = parentId;
 	
-	$.ajax({
+	var options = {
  		url: url,
 		dataType: "json",
 		data: params,
 		type: 'POST',
 		success: function(data) {
-			if(data.success){
+			if(data.status == 401) {
+				$.ajax(options);
+			} else if(data.success){
 				updateFeeds();
 			}
 		},
@@ -142,7 +150,8 @@ function replyOnComment(comp, parentId, url){
         	var successHandler = this.success, errorHandler = null;
         	handleError(xhr, ajaxOptions, thrownError, successHandler, errorHandler);
 		}
-	});
+	}
+	$.ajax(options);
 }
  
 
