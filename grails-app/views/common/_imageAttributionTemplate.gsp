@@ -25,7 +25,7 @@
 			<ol>
 				<g:each in="${resource.contributors}" var="a">
 					<li>
-						${a?.name}
+                                        ${a.username}						${a?.name}
 					</li>
 				</g:each>
 			</ol>

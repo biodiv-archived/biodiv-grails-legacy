@@ -9,10 +9,11 @@
     
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
 
-<g:layoutHead />
 
 <r:layoutResources />
 <ckeditor:resources />
+
+<g:layoutHead />
 
 <g:set var="domain" value="${Utils.getDomain(request)}"/>
 <g:if test="${domain.equals(grailsApplication.config.ibp.domain) }">
