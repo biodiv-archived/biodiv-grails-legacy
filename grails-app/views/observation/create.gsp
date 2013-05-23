@@ -711,7 +711,8 @@ if(r && thumbnail) {
 				$(responseXML).find('resources').find('res').each(function() {
 					var fileName = $(this).attr('fileName');
 					var type = $(this).attr('type');					
-  					images.push({i:++i, file:obvDir + "/" + fileName, url:$(this).attr('url'), thumbnail:$(this).attr('thumbnail'), type:type, title:fileName});
+					var thumbnail = rootDir + obvDir + "/" + fileName.replace(/\.[a-zA-Z]{3,4}$/, "${grailsApplication.config.speciesPortal.resources.images.thumbnail.suffix}");
+  					images.push({i:++i, file:obvDir + "/" + fileName, url:$(this).attr('url'), thumbnail:thumbnail, type:type, title:fileName});
 				});
 				
 				var html = $( "#metadataTmpl" ).render( images );
@@ -720,12 +721,12 @@ if(r && thumbnail) {
 					$('.geotagged_image', this).load(function(){
 						update_geotagged_images_list($(this));		
 					});
-                                        var $ratingContainer = $(this).find('.star_obvcreate');
-                                        rate($ratingContainer)
+                    var $ratingContainer = $(this).find('.star_obvcreate');
+                    rate($ratingContainer)
 				})
 				$( "#imagesList li:last" ).before (metadataEle);
 
-/*                if (navigator.appName.indexOf('Microsoft') == -1) {
+                /*if (navigator.appName.indexOf('Microsoft') == -1) {
                     $( "#imagesList" ).append (add_file_button);
                 }*/
                 $( "#add_file" ).fadeIn(3000);
@@ -735,31 +736,34 @@ if(r && thumbnail) {
 				$('#videoUrl').val('');
 				$('#add_video').editable('setValue','', false);		
 			}, error:function (xhr, ajaxOptions, thrownError){
-					$("#addObservationSubmit").removeClass('disabled');
-					$("#upload_resource input[name='resources']").remove();
-					$('#videoUrl').val('');
-					$(".progress").css('z-index',90);
-					$('#add_video').editable('setValue','', false);
-					//xhr.upload.removeEventListener( 'progress', progressHandlingFunction, false); 
-					
-					//successHandler is used when ajax login succedes
-	            	var successHandler = this.success, errorHandler;
-	            	handleError(xhr, ajaxOptions, thrownError, successHandler, function() {
-						var response = $.parseJSON(xhr.responseText);
-						if(response.error){
-							$("#image-resources-msg").parent(".resources").addClass("error");
-							$("#image-resources-msg").html(response.error);
-						}
-						
-						var messageNode = $(".message .resources");
-						if(messageNode.length == 0 ) {
-							$("#upload_resource").prepend('<div class="message">'+(response?response.error:"Error")+'</div>');
-						} else {
-							messageNode.append(response?response.error:"Error");
-						}
-						
-						
-					});
+	            	    var successHandler = this.success, errorHandler;
+	            	    handleError(xhr, ajaxOptions, thrownError, successHandler, function(data) {
+                                    if(data && data.status == 401) {
+                                            $('#upload_resource').submit();
+                                            return; 
+                                    }
+                                    $("#addObservationSubmit").removeClass('disabled');
+                                    $("#upload_resource input[name='resources']").remove();
+                                    $('#videoUrl').val('');
+                                    $(".progress").css('z-index',90);
+                                    $('#add_video').editable('setValue','', false);
+                                    //xhr.upload.removeEventListener( 'progress', progressHandlingFunction, false); 
+
+                                    var response = $.parseJSON(xhr.responseText);
+                                    if(response.error){
+                                            $("#image-resources-msg").parent(".resources").addClass("error");
+                                            $("#image-resources-msg").html(response.error);
+                                    }
+                                    
+                                    var messageNode = $(".message .resources");
+                                    if(messageNode.length == 0 ) {
+                                            $("#upload_resource").prepend('<div class="message">'+(response?response.error:"Error")+'</div>');
+                                    } else {
+                                            messageNode.append(response?response.error:"Error");
+                                    }
+                                    
+                                    
+                            });
            } 
 
            

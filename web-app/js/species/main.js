@@ -70,7 +70,10 @@ var ajaxLoginSuccessHandler = function(json, statusText, xhr, $form) {
 					statusText, xhr);
 			ajaxLoginSuccessCallbackFunction = undefined;
 		}
-	} else if (json.error || json.status == 'error') {
+	} else if(json.error && json.status === 401) {
+		updateLoginInfo()
+                ajaxLoginErrorCallbackFunction(json);
+        } else if (json.error || json.status == 'error') {
 		$('#loginMessage').html(json.error).removeClass().addClass('alter alert-error').show();
 	} else {
 		$('#loginMessage').html(json).removeClass().addClass('alter alert-info').show();

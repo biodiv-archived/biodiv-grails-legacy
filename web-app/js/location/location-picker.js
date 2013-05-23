@@ -216,7 +216,6 @@ function update_geotagged_images_list(image) {
 }
 
 function get_latlng_from_image(img) {
-        
         var gps_lat = $(img).exif("GPSLatitude");
         var gps_lng = $(img).exif("GPSLongitude");
         var gps_lat_ref = $(img).exif("GPSLatitudeRef");

@@ -33,7 +33,7 @@
 
         <g:if test="${!hideSocial}">
 		<div class="footer-item" style="position:absolute;right:0px;">
-                    <fb:like layout="button_count" href="${href}" width="450" show_faces="true"></fb:like>
+                    <fb:like layout="button_count" href="${href}" width="450" show_faces="true" data-send="true"></fb:like>
                     <div id="googleplus" class="pull-left"></div>
                     <% String twitterDesc = title?:'';
                     if(twitterDesc && description) twitterDesc += " - "

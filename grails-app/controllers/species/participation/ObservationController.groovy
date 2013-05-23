@@ -14,6 +14,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest
 import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
 
 import grails.converters.JSON;
+import grails.converters.XML;
 
 import grails.plugins.springsecurity.Secured
 import grails.util.Environment;
@@ -380,7 +381,11 @@ class ObservationController {
 	def upload_resource = {
 		log.debug params;
 		def message;
-		if(!params.resources && !params.videoUrl) {
+		if(params.ajax_login_error == "1") {
+            message = [status:401, error:'Please login to continue']
+			render message as JSON 
+			return;
+		} else if(!params.resources && !params.videoUrl) {
 			message = g.message(code: 'no.file.attached', default:'No file is attached')
 			response.setStatus(500)
 			message = [error:message]
@@ -1033,52 +1038,6 @@ class ObservationController {
 		}
 	}
 
-	/**
-	 * 
-	 */
-	def newComment = {
-		log.debug params;
-		if(!params.obvId) {
-			log.error  "No Observation selected"
-			response.setStatus(500)
-			render (['error':"Coudn't find the specified observation with id $params.obvId"] as JSON);
-		}
-		def observationInstance = Observation.read(params.long('obvId'));
-		if(observationInstance) {
-			observationInstance.updateObservationTimeStamp();
-			//observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
-			observationService.sendNotificationMail(activityFeedService.COMMENT_ADDED, observationInstance, request, params.webaddress);
-			render (['success:true']as JSON);
-		} else {
-			response.setStatus(500)
-			render (['error':"Coudn't find the specified observation with id $params.obvId"] as JSON);
-		}
-	}
-
-	/**
-	 *
-	 */
-	def removeComment = {
-		log.debug params;
-		if(!params.obvId) {
-			log.error "No Observation selected"
-			response.setStatus(500)
-			render (['error':"Coudn't find the specified observation with id $params.obvId"] as JSON);
-		}
-
-		def observationInstance = Observation.read(params.long('obvId'));
-		if(observationInstance) {
-
-			observationInstance.updateObservationTimeStamp();
-			//observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
-			observationService.sendNotificationMail(observationService.SPECIES_REMOVE_COMMENT, observationInstance, request, params.webaddress);
-			render (['success:true']as JSON);
-		} else {
-			response.setStatus(500)
-			render (['error':"Coudn't find the specified observation with id $params.obvId"] as JSON);
-		}
-	}
-	
 	@Secured(['ROLE_USER'])
 	def sendIdentificationMail = {
 		log.debug params;

@@ -218,7 +218,7 @@ h6 .btn-link, h5 .btn-link {
 
                                     </h6>
                                     <obv:showRelatedStory
-                                    model="['controller':'SUser', 'action':'getRecommendationVotes', 'filterProperty': 'user', 'filterPropertyValue':user.id, 'id':'userIds', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress, 'hideShowAll':true]" />
+                                    model="['controller':'SUser', 'resultController':'observation', 'action':'getRecommendationVotes', 'filterProperty': 'user', 'filterPropertyValue':user.id, 'id':'userIds', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress, 'hideShowAll':true]" />
 
                                 </div>
                                 
