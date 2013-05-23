@@ -194,14 +194,14 @@ class UFileController {
 			File fileDir = new File(contentRootDir + "/"+ uploadDir)
 			if(!fileDir.exists())
 				fileDir.mkdirs()
-			uploaded = observationService.getUniqueFile(fileDir, Utils.cleanFileName(fileName));
+			uploaded = observationService.getUniqueFile(fileDir, Utils.generateSafeFileName(fileName));
 
 		} else {
 
 			File fileDir = new File(contentRootDir)
 			if(!fileDir.exists())
 				fileDir.mkdirs()
-			uploaded = observationService.getUniqueFile(fileDir, Utils.cleanFileName(fileName));
+			uploaded = observationService.getUniqueFile(fileDir, Utils.generateSafeFileName(fileName));
 			//uploaded = File.createTempFile('grails', 'ajaxupload')
 		}
 		

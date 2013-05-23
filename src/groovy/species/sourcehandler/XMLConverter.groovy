@@ -704,7 +704,7 @@ println rate+"++++++++++++++"
 
         if(tempFile && tempFile.exists()) {
             //copying file
-            relImagesFolder = Utils.cleanFileName(relImagesFolder.trim());
+            relImagesFolder = relImagesFolder.trim();
 
             File root = new File(resourcesRootDir , relImagesFolder);
             if(!root.exists() && !root.mkdirs()) {

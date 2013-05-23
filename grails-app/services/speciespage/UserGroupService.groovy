@@ -141,7 +141,7 @@ class UserGroupService {
 		def resource = null;
 		def rootDir = grailsApplication.config.speciesPortal.userGroups.rootDir
 
-		File iconFile = new File(rootDir , Utils.cleanFileName(icon));
+		File iconFile = new File(rootDir , Utils.generateSafeFileName(icon));
 		if(!iconFile.exists()) {
 			log.error "COULD NOT locate icon file ${iconFile.getAbsolutePath()}";
 		}
@@ -1191,6 +1191,12 @@ class UserGroupService {
 	def getProjectUserGroups(Project projectInstance, int max, long offset) {
 		//TODO
 		return projectInstance.userGroups;
+	}
+	
+	
+	def boolean hasPermissionAsPerGroup(object, permission){
+		def secTagLib = grailsApplication.mainContext.getBean('species.CustomSecurityAclTagLib');
+		return secTagLib.hasPermissionAsPerGroup(['permission':permission, 'object':object], 'permitted')
 	}
 	
 	//XXX same call from taglib leadind to no session errro. to avoid that puttins same checkin in service and exposing through domain object 

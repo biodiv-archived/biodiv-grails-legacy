@@ -76,17 +76,45 @@ class Utils {
 		return name?.replaceAll(/<.*?>/, '').replaceAll("\u00A0|\u2007|\u202F", " ").replaceAll("\\n","").replaceAll("\\s+", " ").replaceAll("\\*", "").trim();
 	}
 
-	static String cleanFileName(String name) {
+	static String generateSafeFileName(String name) {
 		//returning random integer (between 1-1000) as file name along with original extension
-		name = name.trim()
-		def beginIndex = name.lastIndexOf(".")
-		def extension = (beginIndex > -1) ? name.substring(beginIndex) : ""
-		return "" + (FILE_NAME_GENEROTR.nextInt(1000-1+1)+1) + extension 
-
-//		name = name?.replaceAll("\u00A0|\u2007|\u202F", " ").replaceAll("\\s+", "_").trim();
-//		return name;
+		return "" + (FILE_NAME_GENEROTR.nextInt(1000-1+1)+1) + getCleanFileExtension(name) 
 	}
 
+	static String cleanFileName(String name){
+		name = name?.replaceAll("\u00A0|\u2007|\u202F", " ").replaceAll("\\s+", "_").trim();
+		//if name starting with .
+		if(name.startsWith(".")){
+			name = name.replaceFirst(".", "_")
+		}
+		
+		int beginIndex = name.lastIndexOf(".")
+		name =  (beginIndex > -1) ? name.substring(0, beginIndex) + getCleanFileExtension(name) : name
+		return name;
+	}
+	  
+	/**
+	 * @param fileName
+	 * @return after validation either return empty string or an extension starting with . and not more than 4 chars. 
+	 * if more than 4 chars then return a string starting with _
+	 */
+	
+	private static getCleanFileExtension(String fileName){
+		String extension = ""
+		fileName = fileName?.trim()
+		if(!fileName || fileName == "")
+			return extension
+		
+		int beginIndex = fileName.lastIndexOf(".")
+		extension = (beginIndex > -1) ? fileName.substring(beginIndex) : ""
+		if(extension.size() > 5 || extension.size() == 1){
+			extension =  extension.replace(".", "_")
+		}
+		return extension
+	}
+	
+	
+	
 	static String cleanSearchQuery(String name) {
 		name = cleanName(name);
 		name = name.replaceAll("[^\\x20-\\x7e]", "");	//removing all non ascii characters

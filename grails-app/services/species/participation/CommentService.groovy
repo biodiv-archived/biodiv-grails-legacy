@@ -7,10 +7,16 @@ class CommentService {
 	def grailsApplication
 	def activityFeedService
 	def observationService
+	def userGroupService
 	
 	def addComment(params){
 		log.debug "Adding comment ${params}"
 		validateParams(params);
+		
+		if(!validatePermission(params)){
+			return ['success': false, 'msg': ${message(code: 'default.comment.not.permitted.message')}]
+		}
+		
 		Comment c = new Comment(author:params.author, body:params.commentBody.trim(), commentHolderId:params.commentHolderId, \
 						commentHolderType:params.commentHolderType, rootHolderId:params.rootHolderId, rootHolderType:params.rootHolderType, \
 						parentId:params.parentId, mainParentId:params.mainParentId);
@@ -26,7 +32,7 @@ class CommentService {
 
 		if(!c.save(flush:true)){
 			c.errors.allErrors.each { log.error it }
-			return null
+			return ['success': false, 'msg': 'Error in saving']
 		}else{
 			try {
 				def commentHolderType = getDomainObject(params.commentHolderType, params.commentHolderId)
@@ -37,7 +43,7 @@ class CommentService {
 			def domainObject = activityFeedService.getDomainObject(c.rootHolderType, c.rootHolderId)
 			def feedInstance = activityFeedService.addActivityFeed(activityFeedService.getDomainObject(c.rootHolderType, c.rootHolderId), c, c.author, activityFeedService.COMMENT_ADDED)
 			observationService.sendNotificationMail(activityFeedService.COMMENT_ADDED, domainObject, null, params.webaddress, feedInstance);
-			return c
+			return ['success': true, 'commentObj' :c]
 		}
 	}
 
@@ -112,6 +118,22 @@ class CommentService {
 			params.rootHolderId = parentComment.rootHolderId
 			params.rootHolderType = parentComment.rootHolderType
 		} 
+	}
+	
+	
+	private boolean validatePermission(params){
+		//if comment thread
+		def object 
+		if(params.parentId){
+			object = getDomainObject(params.rootHolderType, params.rootHolderId)
+		}else{
+			object = getDomainObject(params.commentHolderType, params.commentHolderId)
+		}
+		
+		if (!grailsApplication.isDomainClass(object.getClass())){
+			return true
+		}
+		return userGroupService.hasPermissionAsPerGroup(object, org.springframework.security.acls.domain.BasePermission.WRITE)
 	}
 	
 	private setDefaultRange(params){

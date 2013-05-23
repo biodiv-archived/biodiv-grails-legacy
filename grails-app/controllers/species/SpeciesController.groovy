@@ -591,7 +591,7 @@ class SpeciesController {
 						}
 					}
 
-					File file = observationService.getUniqueFile(obvDir, Utils.cleanFileName(f.originalFilename));
+					File file = observationService.getUniqueFile(obvDir, Utils.generateSafeFileName(f.originalFilename));
 					data_file.transferTo( file );
 
 				}

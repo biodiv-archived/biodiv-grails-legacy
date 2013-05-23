@@ -196,10 +196,7 @@ String desc = "- "+ location +" by "+observationInstance.author.name.capitalize(
 					</div>
 					<div class="union-comment">
 					<feed:showAllActivityFeeds model="['rootHolder':observationInstance, feedType:'Specific', refreshType:'manual', 'feedPermission':'editable']" />
-					<%
-						def canPostComment = customsecurity.hasPermissionAsPerGroups([object:observationInstance, permission:org.springframework.security.acls.domain.BasePermission.WRITE]).toBoolean()
-					%>
-					<comment:showAllComments model="['commentHolder':observationInstance, commentType:'super', 'canPostComment':canPostComment, 'showCommentList':false]" />
+					<comment:showAllComments model="['commentHolder':observationInstance, commentType:'super','showCommentList':false]" />
 					</div>
 				</div>
 

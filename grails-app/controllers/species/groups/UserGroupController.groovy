@@ -755,7 +755,7 @@ class UserGroupController {
 							}
 						}
 
-						File file = observationService.getUniqueFile(userGroupDir, Utils.cleanFileName(f.originalFilename));
+						File file = observationService.getUniqueFile(userGroupDir, Utils.generateSafeFileName(f.originalFilename));
 						f.transferTo( file );
 						ImageUtils.createScaledImages(file, userGroupDir);
 						resourcesInfo.add([fileName:file.name, size:f.size]);

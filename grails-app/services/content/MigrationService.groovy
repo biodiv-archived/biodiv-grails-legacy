@@ -285,7 +285,7 @@ def migrateProjects() {
 		File projectDir = new File(projectDirPath)
 		if(!projectDir.exists())
 			projectDir.mkdirs()
-		File dst = observationService.getUniqueFile(projectDir, Utils.cleanFileName(fileName));
+		File dst = observationService.getUniqueFile(projectDir, Utils.generateSafeFileName(fileName));
 		
 		//TODO : get domain url 
 		File src = new File("/data/augmentedmaps/"+filePath)

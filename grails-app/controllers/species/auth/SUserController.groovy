@@ -721,7 +721,7 @@ class SUserController extends UserController {
 							}
 						}
 
-						File file = observationService.getUniqueFile(usersDir, Utils.cleanFileName(f.originalFilename));
+						File file = observationService.getUniqueFile(usersDir, Utils.generateSafeFileName(f.originalFilename));
 						f.transferTo( file );
 						ImageUtils.createScaledImages(file, usersDir);
 						resourcesInfo.add([fileName:file.name, size:f.size]);
@@ -807,7 +807,7 @@ class SUserController extends UserController {
 		def resource = null;
 		def rootDir = grailsApplication.config.speciesPortal.users.rootDir
 
-		File iconFile = new File(rootDir , Utils.cleanFileName(icon));
+		File iconFile = new File(rootDir , Utils.generateSafeFileName(icon));
 		if(!iconFile.exists()) {
 			log.error "COULD NOT locate icon file ${iconFile.getAbsolutePath()}";
 		}
