@@ -133,6 +133,11 @@ function replyOnComment(comp, parentId, url){
 	params["commentBody"] = $(comp).siblings(".comment-textbox").val();
 	params["parentId"] = parentId;
 	
+	if($.trim(params["commentBody"]) === ""){
+		$(comp).prev().addClass('comment-textEmpty').next('span').show();
+		return false;
+	}
+	
 	var options = {
  		url: url,
 		dataType: "json",
@@ -142,6 +147,7 @@ function replyOnComment(comp, parentId, url){
 			if(data.status == 401) {
 				$.ajax(options);
 			} else if(data.success){
+				$(comp).parent().hide().prev().show();
 				updateFeeds();
 			}
 		},

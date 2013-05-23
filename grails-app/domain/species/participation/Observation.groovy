@@ -23,7 +23,8 @@ class Observation implements Taggable, Rateable {
 	def activityFeedService;
 	def springSecurityService;
     def resourceService;
-
+	def observationsSearchService;
+	
 	public enum OccurrenceStatus {
 		ABSENT ("Absent"),	//http://rs.gbif.org/terms/1.0/occurrenceStatus#absent
 		CASUAL ("Casual"),	// http://rs.gbif.org/terms/1.0/occurrenceStatus#casual
@@ -304,6 +305,7 @@ class Observation implements Taggable, Rateable {
 	private updateObservationTimeStamp(){
 		lastRevised = new Date();
 		saveConcurrently();
+		observationsSearchService.publishSearchIndex(this, true);
 	}
 
 	String fetchSpeciesCall(){
