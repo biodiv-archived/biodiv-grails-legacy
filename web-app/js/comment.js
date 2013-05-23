@@ -68,6 +68,8 @@ function postAsAjax(postComp, url, newCommentUrl, update){
         success: function(data, statusText, xhr, form) {
         	if(data.status == 401) {
         		$(postComp).ajaxSubmit(options);
+        	}else if(data.status === 'Error'){
+        		alert(data.msg);
         	}
         	else if(data.showCommentListHtml){
     			var htmlData = $(data.showCommentListHtml);
@@ -146,7 +148,10 @@ function replyOnComment(comp, parentId, url){
 		success: function(data) {
 			if(data.status == 401) {
 				$.ajax(options);
-			} else if(data.success){
+			}else if(data.status === 'Error'){
+        		alert(data.msg);
+        	}
+			else if(data.success){
 				$(comp).parent().hide().prev().show();
 				updateFeeds();
 			}

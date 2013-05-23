@@ -33,7 +33,7 @@ class CustomSecurityAclTagLib extends SecurityAclTagLib {
 	}
 
 	//resolving permissions basing on the usergroups object belongs to in most liberal fashion
-	protected boolean hasPermissionAsPerGroup(attrs, String tagName) {
+	boolean hasPermissionAsPerGroup(attrs, String tagName) {
 
 		if (!springSecurityService.isLoggedIn()) {
 			return false
@@ -86,7 +86,9 @@ class CustomSecurityAclTagLib extends SecurityAclTagLib {
 	}
 
 	protected def getObjectUserGroups(object) {
-		return object.getUserGroups();
+		if(object.metaClass.respondsTo(object, "getUserGroups")){
+			return object.getUserGroups();
+		}
 	}
 	
 	def hasPermissionToMakeSpeciesCall = {attrs ->

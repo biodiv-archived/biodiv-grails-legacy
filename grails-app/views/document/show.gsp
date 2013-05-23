@@ -140,10 +140,7 @@
 
 			<div class="union-comment">
 				<feed:showAllActivityFeeds model="['rootHolder':documentInstance, feedType:'Specific', refreshType:'manual', 'feedPermission':'editable']" />
-				<%
-					def canPostComment = customsecurity.hasPermissionAsPerGroups([object:documentInstance, permission:org.springframework.security.acls.domain.BasePermission.WRITE]).toBoolean()
-				%>
-				<comment:showAllComments model="['commentHolder':documentInstance, commentType:'super', 'canPostComment':canPostComment, 'showCommentList':false]" />
+				<comment:showAllComments model="['commentHolder':documentInstance, commentType:'super','showCommentList':false]" />
 			</div>
 		</div>
 		<g:render template="/document/documentSidebar" model="['documentInstance':documentInstance]"/>

@@ -18,9 +18,14 @@ class CommentController {
 		//XXX on ajax pop up login post request is not sending all params 
 		// in such cases checking params and handling gracefully 
 		if(params.commentBody && params.commentBody.trim().length() > 0){
-			def c = commentService.addComment(params);
-			result = getResultForResponse(params);
-			result["clearForm"] = true;
+			def commentRes = commentService.addComment(params);
+			if(!commentRes['success']){
+				result['msg'] = commentRes['msg']
+				result["status"] = 'Error'
+			}else{
+				result = getResultForResponse(params);
+				result["clearForm"] = true;
+			}
 		} else if(params.ajax_login_error == "1") {
 			result["success"] = true;
 			result["status"] = 401;

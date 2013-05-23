@@ -453,7 +453,7 @@ class ObservationController {
 							}
 						}
 
-						File file = observationService.getUniqueFile(obvDir, Utils.cleanFileName(f.filename));
+						File file = observationService.getUniqueFile(obvDir, Utils.generateSafeFileName(f.filename));
 						download(f.url, file );
 						ImageUtils.createScaledImages(file, obvDir);
 						

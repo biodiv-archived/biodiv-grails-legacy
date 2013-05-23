@@ -697,10 +697,7 @@ $(document).ready(function(){
                                 <h5> Activity </h5>
                                     <div class="union-comment">
                                         <feed:showAllActivityFeeds model="['rootHolder':speciesInstance, feedType:'Specific', refreshType:'manual', 'feedPermission':'editable']" />
-                                            <%
-                                            def canPostComment = true //customsecurity.hasPermissionAsPerGroups([object:speciesInstance, permission:org.springframework.security.acls.domain.BasePermission.WRITE]).toBoolean()
-                                            %>
-                                            <comment:showAllComments model="['commentHolder':speciesInstance, commentType:'super', 'canPostComment':canPostComment, 'showCommentList':false]" />
+                                            <comment:showAllComments model="['commentHolder':speciesInstance, commentType:'super','showCommentList':false]" />
                                     </div>
                             </div>
  

@@ -116,10 +116,7 @@
 				
 			<div class="union-comment">
 				<feed:showAllActivityFeeds model="['rootHolder':checklistInstance, feedType:'Specific', refreshType:'manual', 'feedPermission':'editable']" />
-				<%
-					def canPostComment = customsecurity.hasPermissionAsPerGroups([object:checklistInstance, permission:org.springframework.security.acls.domain.BasePermission.WRITE]).toBoolean()
-				%>
-				<comment:showAllComments model="['commentHolder':checklistInstance, commentType:'super', 'canPostComment':canPostComment, 'showCommentList':false]" />
+				<comment:showAllComments model="['commentHolder':checklistInstance, commentType:'super','showCommentList':false]" />
 			</div>
 			
 			</div>

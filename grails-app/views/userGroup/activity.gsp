@@ -22,11 +22,8 @@
 		<uGroup:rightSidebar model="['userGroupInstance':userGroupInstance]"/>
 		<div class="userGroup-section">
 			<div>
-				<%
-					def canPostComment = customsecurity.hasPermissionForAction([object:userGroupInstance, permission:org.springframework.security.acls.domain.BasePermission.WRITE]).toBoolean()
-				%>
 				<comment:showAllComments
-					model="['commentHolder':userGroupInstance, commentType:'super', 'canPostComment':canPostComment, 'showCommentList':false]" />
+					model="['commentHolder':userGroupInstance, commentType:'super', 'showCommentList':false]" />
 			</div>
 			<feed:showFeedWithFilter model="['rootHolder':userGroupInstance, feedType:'GroupSpecific', feedPermission:'editable', feedCategory:'All','feedOrder':'latestFirst']" />
 		</div>	
