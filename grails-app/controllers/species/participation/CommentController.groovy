@@ -20,7 +20,7 @@ class CommentController {
 		if(params.commentBody && params.commentBody.trim().length() > 0){
 			def commentRes = commentService.addComment(params);
 			if(!commentRes['success']){
-				result['msg'] = commentRes['msg']
+				result['msg'] = commentRes['msgCode']? "${message(code: commentRes['msgCode'])}":'Error in saving'
 				result["status"] = 'Error'
 			}else{
 				result = getResultForResponse(params);
