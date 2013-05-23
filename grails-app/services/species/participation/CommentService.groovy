@@ -14,7 +14,7 @@ class CommentService {
 		validateParams(params);
 		
 		if(!validatePermission(params)){
-			return ['success': false, 'msg': ${message(code: 'default.comment.not.permitted.message')}]
+			return ['success': false, 'msgCode': 'default.comment.not.permitted.message']
 		}
 		
 		Comment c = new Comment(author:params.author, body:params.commentBody.trim(), commentHolderId:params.commentHolderId, \
@@ -32,7 +32,7 @@ class CommentService {
 
 		if(!c.save(flush:true)){
 			c.errors.allErrors.each { log.error it }
-			return ['success': false, 'msg': 'Error in saving']
+			return ['success': false]
 		}else{
 			try {
 				def commentHolderType = getDomainObject(params.commentHolderType, params.commentHolderId)

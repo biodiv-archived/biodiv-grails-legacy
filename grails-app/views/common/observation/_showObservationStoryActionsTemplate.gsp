@@ -57,8 +57,34 @@
                     prevId = prevObservationId;
                     nextId = nextObservationId
                 } else {
-                    prevId =  clazz.countByIdLessThan(curr_id)>0?clazz.findAllByIdLessThan(curr_id, ['max':1, 'sort':'id', 'order':'desc'])?.last()?.id:''
-                    nextId = clazz.countByIdGreaterThan(curr_id)>0?clazz.findByIdGreaterThan(curr_id, ['max':1, 'sort':'id'])?.id:''
+                    def prevIdList = clazz.withCriteria(){
+								projections {
+									property('id')
+								}
+								and{
+									 lt('id', curr_id)
+									 if(clazz.hasProperty('isDeleted')){
+										 eq('isDeleted', false)
+									 }
+			 					}
+								maxResults 1
+								order 'id', 'desc'
+		                    } 
+					def nextIdList = clazz.withCriteria(){
+							projections {
+								property('id')
+							}
+							and{
+								 gt('id', curr_id)
+								 if(clazz.hasProperty('isDeleted')){
+									 eq('isDeleted', false)
+								 }
+							 }
+							maxResults 1
+							order 'id', 'asc'
+						}
+					prevId = prevIdList.isEmpty() ? '' : prevIdList[0]
+					nextId = nextIdList.isEmpty() ? '' : nextIdList[0]
                 }
                 if(!lastListParams) {
                     lastListParams = [:]
