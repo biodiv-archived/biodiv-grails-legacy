@@ -113,9 +113,8 @@ class ChartService {
 	 * @return
 	 */
 	private getFilteredRecommendationStats(SUser author){
-        def result = RecommendationVote.executeQuery("select g.id, count(*) from RecommendationVote r, Observation o, SpeciesGroup g where r.observation = o and o.group = g and r.author=:author group by g.id", [author:author]);
-println result;
-        result.each {it->
+        def result = RecommendationVote.executeQuery("select g.id, count(*) from RecommendationVote r, Observation o, SpeciesGroup g where r.observation = o and o.group = g and r.author=:author and o.isDeleted = false group by g.id", [author:author]);
+		result.each {it->
             it[0] = SpeciesGroup.read(it[0]);
         }
 		return getFormattedResult(result)
@@ -135,7 +134,7 @@ println result;
 
 
 	private mergeResult(allResult, unidentifiedResult){
-
+		createUnion(allResult, unidentifiedResult)
 		allResult.data.each{ r ->
 			String speciesGroup = r[0]
 			int unIdentified = serachInList(unidentifiedResult, speciesGroup)
@@ -145,9 +144,15 @@ println result;
 			//adding unidentified
 			r.add(unIdentified)
 		}
-
 	}
 
+	private createUnion(allResult, unidentifiedResult){
+		Set allResultKeys = new HashSet(allResult.data.collect{it[0]})
+		Set unidentifiedResultKeys = new HashSet(unidentifiedResult.data.collect{it[0]})
+		unidentifiedResultKeys.removeAll(allResultKeys)
+		unidentifiedResultKeys.each { allResult.data.add([it, 0]) }
+	}
+	
 	private addHtmlResultForObv(Map res, request, SUser user=null){
 		List htmlData = []
         def filterParams = [:]
