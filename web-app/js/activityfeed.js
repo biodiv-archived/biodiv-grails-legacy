@@ -303,6 +303,7 @@ function updateFeeds(){
 function updateFeedComponent(targetComp, feedCategory){
 	 $(targetComp).children('input[name="feedCategory"]').val(feedCategory);
 	 setUpTimeRef(targetComp);
+	 $(targetComp).children('.activiyfeedNoMoreFeedmsg').hide();
 	 $(targetComp).children('ul').empty();
 	 loadOlderFeedsInAjax(targetComp);
 }
