@@ -203,7 +203,6 @@ window.fbEnsure = function(callback) {
                 $('#loginMessage').html("Logging in ...").removeClass().addClass('alter alert-info').show();
                 var authParams = window.mynewparams;
                 console.log(authParams);
-<%--			authParams["openid.return_to"] = 'http://indiabiodiversity.localhost.org/biodiv/j_spring_openid_security_check' --%>
                     $.ajax({
         url:  "${Utils.getDomainServerUrlWithContext(request)}/j_spring_openid_security_check" ,
         method: "POST",

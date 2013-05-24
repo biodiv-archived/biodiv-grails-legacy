@@ -1,5 +1,5 @@
 <g:javascript>
-    window.appContext = '${request.contextPath}';
+    window.appContext = '';
     window.appIBPDomain = '${grailsApplication.config.ibp.domain}'
     window.appWGPDomain = '${grailsApplication.config.wgp.domain}'
 </g:javascript>

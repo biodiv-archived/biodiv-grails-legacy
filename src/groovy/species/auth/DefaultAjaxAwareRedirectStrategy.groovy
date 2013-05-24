@@ -18,9 +18,17 @@ class DefaultAjaxAwareRedirectStrategy extends DefaultRedirectStrategy {
     public void sendRedirect(HttpServletRequest request, HttpServletResponse response, String url) throws IOException {
 		String redirectUrl = calculateRedirectUrl(request.getContextPath(), url);
 		String ajaxHeaderName = (String)ReflectionUtils.getConfigProperty("ajaxHeader");
-		if(!request.getHeader(ajaxHeaderName)?.isEmpty() && request.getMethod() == 'POST') {
+		
+		println "::::::::::::::::::::::"
+		println request.getRequestURL();
+        def ajaxHeader = request.getHeader(ajaxHeaderName)
+		if(ajaxHeader && ajaxHeader != '') { //  && request.getMethod() == 'POST' .. request is the currentRequest & not the savedRequest
 			logger.debug ("Request is an ajax request. Ading extra parameter ajax_login_error to handle")
-			redirectUrl += "?ajax_login_error=1"
+			if(url.lastIndexOf('?') != -1) {
+				redirectUrl += "&ajax_login_error=1"
+			} else {
+				redirectUrl += "?ajax_login_error=1"
+			}
 		}
 		redirectUrl = response.encodeRedirectURL(redirectUrl);
 

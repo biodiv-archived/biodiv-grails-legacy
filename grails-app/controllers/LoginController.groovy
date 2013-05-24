@@ -16,6 +16,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.savedrequest.SavedRequest;
 import org.springframework.util.StringUtils;
 
+import species.auth.DefaultAjaxAwareRedirectStrategy;
+
 class LoginController {
 
 	/**
@@ -69,14 +71,14 @@ class LoginController {
 				}
 				
 				log.debug "Redirecting to target : $targetUrl";
-				(new DefaultRedirectStrategy()).sendRedirect(request, response, targetUrl);
+				(new DefaultAjaxAwareRedirectStrategy()).sendRedirect(request, response, targetUrl);
 				return;
 			}
 
 			def defaultSavedRequest = request.getSession()?.getAttribute(WebAttributes.SAVED_REQUEST)
 			log.debug "Redirecting to DefaultSavedRequest : $defaultSavedRequest";
 			if(defaultSavedRequest) {
-				(new DefaultRedirectStrategy()).sendRedirect(request, response, defaultSavedRequest.getRedirectUrl());
+				(new DefaultAjaxAwareRedirectStrategy()).sendRedirect(request, response, defaultSavedRequest.getRedirectUrl());
 				return
 			} else {
 				redirect uri:"/";

@@ -8,6 +8,10 @@ body { /*     background-color: #ffffff; */
 	font-size: 14px;
 }
 
+body.busy, body.busy * {  
+  cursor: wait !important;  
+}
+
 a {
 	color: #16509E;
 	text-decoration: none;

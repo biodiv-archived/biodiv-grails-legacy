@@ -62,18 +62,18 @@ var reloadLoginInfo = function() {
 }
 		
 var ajaxLoginSuccessHandler = function(json, statusText, xhr, $form) {
-	if (json.success || json.status == 'success') {
-		updateLoginInfo()
-		
+	if (json.success || json.status == 'success') {		
 		if (ajaxLoginSuccessCallbackFunction) {
 			ajaxLoginSuccessCallbackFunction(json,
 					statusText, xhr);
 			ajaxLoginSuccessCallbackFunction = undefined;
 		}
-	} else if(json.error && json.status === 401) {
 		updateLoginInfo()
-                ajaxLoginErrorCallbackFunction(json);
-        } else if (json.error || json.status == 'error') {
+	} else if(json.error && json.status === 401) {
+		$('#loginMessage').html("Resending previous request").removeClass().addClass('alter alert-info').show();
+		ajaxLoginErrorCallbackFunction(json);		
+		//updateLoginInfo()                
+    } else if (json.error || json.status == 'error') {
 		$('#loginMessage').html(json.error).removeClass().addClass('alter alert-error').show();
 	} else {
 		$('#loginMessage').html(json).removeClass().addClass('alter alert-info').show();
@@ -120,6 +120,11 @@ jQuery(document).ready(function($) {
 	
 	// IE caching the request in ajax so setting it false globally for all browser
 	$.ajaxSetup({cache:false});
+	 $("body").bind("ajaxStart", function(){
+	     $(this).addClass('busy');
+	  }).bind("ajaxStop", function(){
+	     $(this).removeClass('busy');
+	  });
 	
 });
 
