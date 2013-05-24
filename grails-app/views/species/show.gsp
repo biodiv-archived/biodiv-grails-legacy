@@ -414,10 +414,6 @@ $(document).ready(function(){
 	 	width:940px;
 	 }
 </style>
-<title>
-    ${title}
-</title>
-
 </head>
 
 <body>

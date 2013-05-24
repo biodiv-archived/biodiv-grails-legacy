@@ -83,7 +83,7 @@ class ChecklistService {
 		def startDate = new Date()
 		def sql = Sql.newInstance(connectionUrl, userName, password, "org.postgresql.Driver");
 		int i=0;
-		sql.eachRow("select nid, vid, title from node where type = 'checklist' and nid = 1821") { row ->
+		sql.eachRow("select nid, vid, title from node where type = 'checklist' order by nid asc offset $startOffset") { row ->
 			log.debug " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>     title ===  $i  $row.title  nid == $row.nid , vid == $row.vid"
 			try{
 				Checklist checklist = createCheckList(row, sql)

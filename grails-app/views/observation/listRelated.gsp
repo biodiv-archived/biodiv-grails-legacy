@@ -1,4 +1,4 @@
-
+<%@page import="species.utils.Utils"%>
 <%@ page import="species.participation.Observation"%>
 <%@ page import="species.groups.SpeciesGroup"%>
 <%@ page import="species.Habitat"%>
@@ -11,8 +11,7 @@
 <r:require modules="observations_list" />
 <g:set var="entityName"
 	value="${message(code: 'observation.label', default: 'Related Observations')}" />
-<title><g:message code="default.list.label" args="[entityName]" />
-</title>
+<title>${entityName} | ${Utils.getDomainName(request)}</title>
 
 <style>
 .observations_list {

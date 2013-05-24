@@ -1,3 +1,4 @@
+<%@page import="species.utils.Utils"%>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -5,8 +6,8 @@
 <r:require modules="observations_list" />
 <g:set var="entityName"
 	value="${message(code: 'observation.label', default: 'Search Results')}" />
-<title><g:message code="default.list.label" args="[entityName]" />
-</title>
+<title>${entityName} | ${Utils.getDomainName(request)}</title>
+
 </head>
 <body>
 

@@ -2,7 +2,7 @@
 <html>
 <head>
 <g:set var="canonicalUrl" value="${uGroup.createLink([controller:'checklist', action:'list', base:Utils.getIBPServerDomain()])}" />
-<g:set var="title" value="List"/>
+<g:set var="title" value="Checklist"/>
 <g:render template="/common/titleTemplate" model="['title':title, 'description':'', 'canonicalUrl':canonicalUrl, 'imagePath':'']"/>
 <title>${title} | ${params.controller.capitalize()} | ${Utils.getDomainName(request)}</title>
 

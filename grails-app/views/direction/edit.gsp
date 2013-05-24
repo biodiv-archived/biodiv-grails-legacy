@@ -1,4 +1,4 @@
-
+<%@page import="species.utils.Utils"%>
 
 <%@ page import="content.StrategicDirection" %>
 <html>

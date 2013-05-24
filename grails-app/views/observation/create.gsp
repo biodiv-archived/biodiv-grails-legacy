@@ -21,10 +21,7 @@
 
 <g:set var="entityName"
 	value="${message(code: 'observation.label', default: 'Observation')}" />
-<title><g:message code="default.create.label"
-		args="[entityName]" />
-</title>
-
+<title>${entityName} | ${Utils.getDomainName(request)}</title>
 <style>
 .btn-group.open .dropdown-menu {
 	top: 43px;

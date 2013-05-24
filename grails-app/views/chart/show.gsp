@@ -8,8 +8,7 @@
 <meta name="layout" content="main" />
 <g:set var="entityName"
 	value="${message(code: 'charts.label', default: 'Statistics')}" />
-<title><g:message code="default.list.label" args="[entityName]" />
-</title>
+<title>${entityName} | ${Utils.getDomainName(request)}</title>
 <r:require modules="chart" />
 <gvisualization:apiImport />
 </head>

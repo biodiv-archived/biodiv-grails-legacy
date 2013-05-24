@@ -1,9 +1,10 @@
+<%@page import="species.utils.Utils"%>
 <html>
 <head>
 
 <meta name="layout" content="main" />
 <r:require modules="species, species_list" />
-<title>Search Species</title>
+<title>Search Results | ${Utils.getDomainName(request)}</title>
 </head>
 <body>
 	<div class="span12">

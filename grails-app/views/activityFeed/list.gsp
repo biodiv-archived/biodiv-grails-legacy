@@ -6,9 +6,7 @@
 <meta name="layout" content="main" />
 <g:set var="entityName"
 	value="${message(code: 'feeds.label', default: 'Activity')}" />
-<title><g:message code="default.list.label" args="[entityName]" />
-</title>
-<%--<script src="http://maps.google.com/maps/api/js?sensor=true"></script>--%>
+<title>${entityName}</title>
 <r:require modules="activityfeed,comment"/>
 </head>
 <body>

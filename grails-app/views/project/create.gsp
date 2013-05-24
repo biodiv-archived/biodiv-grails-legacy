@@ -1,4 +1,4 @@
-
+<%@page import="species.utils.Utils"%>
 
 <%@ page import="content.Project"%>
 <%@ page import="content.eml.Document.DocumentType"%>
@@ -8,8 +8,7 @@
 <meta name="layout" content="main" />
 <g:set var="entityName"
 	value="${message(code: 'project.label', default: 'Project')}" />
-<title><g:message code="default.create.label"
-		args="[entityName]" /></title>
+<title>${entityName} | ${Utils.getDomainName(request)}</title>
 <r:require modules="add_file" />
 <uploader:head />
 <style type="text/css">

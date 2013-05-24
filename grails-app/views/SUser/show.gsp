@@ -3,19 +3,38 @@
 <%@ page import="species.utils.Utils"%>
 <%@page import="species.participation.DownloadLog"%>
 <%@page import="species.participation.ActivityFeedService"%>
-
+<%@page import="species.utils.ImageType"%>
+<%@page import="species.Resource.ResourceType"%>
 <html>
 <head>
-<link rel="canonical"
-	href="${Utils.getIBPServerDomain() + createLink(controller:'SUser', action:'show', id:user.id)}" />
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="layout" content="main" />
+
+<g:set var="canonicalUrl" value="${uGroup.createLink([controller:'SUser', action:'show', id:user.id, base:Utils.getIBPServerDomain()])}"/>
+<g:set var="title" value="${user.name}"/>
+<%
+def r = user.mainImage();
+def imagePath = '';
+if(r) {
+    def gThumbnail = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.gallery.suffix)?:null;
+    if(r && gThumbnail) {
+            if(r.type == ResourceType.IMAGE) {
+                    imagePath = gThumbnail
+            }
+    }
+} else{
+    imagePath = Utils.getIBPServerDomain()+'/sites/all/themes/ibp/images/map-logo.gif';
+}
+
+%>
+<g:set var="description" value="${Utils.stripHTML(user.aboutMe)?:'' }" />
+
+<g:render template="/common/titleTemplate" model="['title':title, 'description':description, 'canonicalUrl':canonicalUrl, 'imagePath':imagePath]"/>
+<title>${title} | User | ${Utils.getDomainName(request)}</title>
+
+
 <r:require modules="observations_show,chart" />
 <gvisualization:apiImport />
 <g:set var="entityName"
 	value="${message(code: 'SUser.label', default: 'SUser')}" />
-<title><g:message code="default.show.label" args="[entityName]" />
-</title>
 
 <style>
 .prop .name {

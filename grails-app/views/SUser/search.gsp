@@ -1,9 +1,10 @@
+<%@ page import="species.utils.Utils"%>
 <html>
 
 <head>
 <meta name='layout' content='main' />
-<title><g:message code='spring.security.ui.user.search' />
-</title>
+<title>${entityName} | ${Utils.getDomainName(request)}</title>
+
 <r:require modules="susers_list" />
 <g:set var="entityName"
 	value="${message(code: 'searchlabel', default: 'Search Results')}" />

@@ -9,7 +9,7 @@
     
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
 
-
+<title><g:layoutTitle/></title>
 <r:layoutResources />
 <ckeditor:resources />
 

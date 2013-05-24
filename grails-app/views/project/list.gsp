@@ -1,4 +1,4 @@
-
+<%@page import="species.utils.Utils"%>
 <%@ page import="content.Project"%>
 <html>
 <head>
@@ -6,7 +6,7 @@
 <meta name="layout" content="main" />
 <g:set var="entityName"
 	value="${message(code: 'project.label', default: 'Project')}" />
-<title><g:message code="default.list.label" args="[entityName]" /></title>
+<title>${entityName} | ${Utils.getDomainName(request)}</title>
 <r:require modules="content_view" />
 
 <style>

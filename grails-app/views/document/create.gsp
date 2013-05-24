@@ -1,13 +1,13 @@
 <%@page import="java.util.Arrays"%>
 <%@ page import="content.eml.Document"%>
+<%@page import="species.utils.Utils"%>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="main" />
 <g:set var="entityName"
 	value="${message(code: 'document.label', default: 'Document')}" />
-<title><g:message code="default.create.label"
-		args="[entityName]" /></title>
+<title>${entityName} | ${Utils.getDomainName(request)}</title>
 
 <r:require modules="add_file" />
 <uploader:head />
