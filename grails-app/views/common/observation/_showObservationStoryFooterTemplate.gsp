@@ -10,7 +10,7 @@
                         <span class="">${observationInstance.fetchCommentCount()}</span>
 		</div>
 		<div class="footer-item">
-			<i class="icon-check" title="No of votes"></i>
+			<i class="icon-check" title="No of species calls"></i>
                         <span class="">${observationInstance.fetchRecoVoteOwnerCount()}</span>
 	
 		</div>

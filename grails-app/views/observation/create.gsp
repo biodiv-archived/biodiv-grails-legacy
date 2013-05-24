@@ -162,7 +162,7 @@ def thumbnail = r.thumbnailUrl()?:null;
 def imagePath = '';
 if(r && thumbnail) {
 	if(r.type == ResourceType.IMAGE) {
-		imagePath = g.createLinkTo(base:grailsApplication.config.speciesPortal.observations.serverURL,	file: thumbnail)
+        imagePath = g.createLinkTo(base:Utils.getDomainServerUrlWithContext(request) + '/observations',file: thumbnail)
 	} else if(r.type == ResourceType.VIDEO){
 		imagePath = g.createLinkTo(base:thumbnail,	file: '')
 	}
@@ -873,6 +873,10 @@ if(r && thumbnail) {
         });
         
         filepicker.setKey('AXCVl73JWSwe7mTPb2kXdz');
+	$('.geotagged_image', this).load(function(){
+        	update_geotagged_images_list($(this));		
+	});
+
 	});
 
 

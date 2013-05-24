@@ -197,7 +197,7 @@ class ActivityFeedService {
 		def text = null
 		def activityTitle = null
 		
-		log.debug "=== feed === $feedInstance.id === $feedInstance.activityType"
+		//log.debug "=== feed === $feedInstance.id === $feedInstance.activityType"
 		switch (activityType) {
 			case COMMENT_ADDED:
 				activityTitle = COMMENT_ADDED  + getCommentContext(activityDomainObj, params)
