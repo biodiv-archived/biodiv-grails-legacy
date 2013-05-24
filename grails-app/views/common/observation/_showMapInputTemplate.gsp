@@ -3,10 +3,10 @@
 		<div class="span6" style="margin-left:0px;">
                                <div class="map_search">
                                    <div id="geotagged_images">
-                                           <div class="title" style="display: none">Use location
+                                           <div class="title" style="display: none">Use location and date
                                                    from geo-tagged image:</div>
                                            <div class="msg" style="display: none">Select image if
-                                                   you want to use location information embedded in it</div>
+                                                   you want to use location and date information embedded in it</div>
                                    </div>
 
                                    <div id="current_location" class="section-item">

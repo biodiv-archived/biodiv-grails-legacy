@@ -63,9 +63,6 @@ String desc = "- "+ location +" by "+observationInstance.author.name.capitalize(
 .nameContainer .combobox-container {
 	left:210px;
 }
-.observation .union-comment {
-	width:99%
-}
 </style>
 </head>
 <body>

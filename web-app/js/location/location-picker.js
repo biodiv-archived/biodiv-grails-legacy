@@ -139,6 +139,11 @@ function set_location(lat, lng) {
 
 }
 
+function set_date(date){
+	$('#observedOn').datepicker("setDate", Date.parse(date));
+}
+
+
 function get_integer_part(n) {
     if (n < 0) {
         return Math.ceil(n);
@@ -202,16 +207,29 @@ function update_geotagged_images_list() {
 
 function update_geotagged_images_list(image) {
 		$(image).exifLoad(function() {
-    		var latlng = get_latlng_from_image(image); 
+    		var latlng = get_latlng_from_image(image);
+    		var imageDate =  $(image).exif("DateTimeOriginal")[0].split(" ")[0];
+    		var display = "";
+    		var html = "";
+    		
             if (latlng) {            	
-                var latlng_display = "Lat: " + latlng.lat.toFixed(2) + ", Lon: " + latlng.lng.toFixed(2)
-            	var func = "set_location(" + latlng.lat+"," +latlng.lng+ "); $(this).addClass('active_location_picker_button')";
-                var html = '<div id=' + $(image).attr("id") +' class="location_picker_button" style="display:inline-block;" onclick="' + func + '"><div style="width:40px; height:40px;float:left;"><img style="width:100%; height:100%;" src="' + $(image).attr('src') + '"/></div><div style="float:left; padding:10px;">' + latlng_display + '</div></div>';
-                $("#geotagged_images>.title").show();
+                display = "Lat: " + latlng.lat.toFixed(2) + ", Lon: " + latlng.lng.toFixed(2)
+            	func = "set_location(" + latlng.lat+"," +latlng.lng+ "); $(this).addClass('active_location_picker_button');";
+            }
+            
+    		if(imageDate){
+            	imageDate = imageDate.replace(/:/g, "-");
+            	display += " and " + $.datepicker.formatDate('dd M yy', Date.parse(imageDate));
+            	func += " set_date('" + imageDate + "')";
+            }
+    		
+    		if(latlng || imageDate){
+    			html = '<div id=' + $(image).attr("id") +' class="location_picker_button" style="display:inline-block;" onclick="' + func + '"><div style="width:40px; height:40px;float:left;"><img style="width:100%; height:100%;" src="' + $(image).attr('src') + '"/></div><div style="float:left; padding:10px;">' + display + '</div></div>';
+    			$("#geotagged_images>.title").show();
                 $("#geotagged_images>.msg").show();
                 $("#geotagged_images").append(html);
                 $("#geotagged_images").trigger('update_map');
-            }
+    		}
     	})
 }
 
@@ -222,7 +240,7 @@ function get_latlng_from_image(img) {
         var gps_lng_ref = $(img).exif("GPSLongitudeRef");
 
         var latlng;
-
+        
         if (gps_lat != '' && gps_lng != ''){
             var lat_dms = gps_lat.last();
             var lng_dms = gps_lng.last();
@@ -380,6 +398,7 @@ $(document).ready(function() {
     $('#longitude_field').change(function(){
         set_location($('#latitude_field').val(), $(this).val());
     });
+    
 
     function set_dms_latitude() {
             var lat = convert_DMS_to_DD($('#latitude_deg_field').val(), $('#latitude_min_field').val(), $('#latitude_sec_field').val(), $('#latitude_direction_field').val());

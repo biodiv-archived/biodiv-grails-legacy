@@ -560,7 +560,7 @@ if(r && thumbnail) {
 
 	$(document).ready(function(){
 		$('.dropdown-toggle').dropdown();
-
+		
 		var filePick = function() {
 			filepicker.pickMultiple({
 			    mimetypes: ['image/*'],
