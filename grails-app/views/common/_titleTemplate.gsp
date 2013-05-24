@@ -16,8 +16,9 @@ description = description?:"Welcome to the India Biodiversity Portal (IBP) - A r
 
 <meta name="layout" content="main" />
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-
-<link rel="canonical" href="${canonicalUrl}" />
+<g:if test="${canonicalUrl}">
+	<link rel="canonical" href="${canonicalUrl}" />
+</g:if>	
 <link rel="image_src" href="${imagePath}" />
 
 <meta name="description" content="${description}">

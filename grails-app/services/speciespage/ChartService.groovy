@@ -172,7 +172,7 @@ class ChartService {
         res.columns.each { col -> 
             res.htmlColumns.add(['string', col[1]]);
         }
-        println res;
+        //println res;
 	}
 	
 	private getHyperLink(String speciesGroup, count, boolean isUnIdentified, boolean isObv, Map filterParams=[:]){

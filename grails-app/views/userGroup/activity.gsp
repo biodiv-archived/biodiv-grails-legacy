@@ -5,10 +5,11 @@
 <html>
 <head>
 <meta name="layout" content="main" />
-<g:set var="entityName" value="${userGroupInstance.name}" />
-<title><g:message code="default.show.label"
-		args="[userGroupInstance.name]" />
-</title>
+<g:set var="title" value="Activity Stream - ${userGroupInstance.name} "/>
+<%def imagePath = userGroupInstance.mainImage()?.fileName;%>
+<g:set var="description" value="${userGroupInstance.description.replaceAll(/<.*?>/, '').trim() }" />
+<g:render template="/common/titleTemplate" model="['title':title, 'description':description, 'canonicalUrl':'', 'imagePath':imagePath]"/>
+<title>${title} | ${params.controller.capitalize()} | ${Utils.getDomainName(request)}</title>
 <r:require modules="userGroups_show,comment" />
 <style>
 .comment-textbox {

@@ -2,11 +2,11 @@
 <html>
 <head>
 <link rel="canonical" href="${Utils.getIBPServerDomain() + createLink(controller:'activityFeed', action:'list')}" />
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="layout" content="main" />
+<g:set var="title" value="Activity"/>
+<g:render template="/common/titleTemplate" model="['title':title, 'description':'', 'canonicalUrl':'', 'imagePath':'']"/>
+<title>${title} | ${Utils.getDomainName(request)}</title>
 <g:set var="entityName"
 	value="${message(code: 'feeds.label', default: 'Activity')}" />
-<title>${entityName}</title>
 <r:require modules="activityfeed,comment"/>
 </head>
 <body>
