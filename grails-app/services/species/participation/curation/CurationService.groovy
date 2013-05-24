@@ -13,6 +13,7 @@ class CurationService {
 	def grailsApplication
 	
 	def add(Recommendation recoForSciName,  Recommendation recoForCommonName, refObject, author){
+		/*
 		UnCuratedScientificNames unSciName;
 		UnCuratedCommonNames unCn;
 
@@ -48,6 +49,7 @@ class CurationService {
 		}
 
 		addUnCuratedRecommendationVote(unSciName, unCn, refObject, author);
+		*/
 	}
 
 	private boolean isAuthenticRecos(Recommendation recoForSciName, Recommendation recoForCommonName){

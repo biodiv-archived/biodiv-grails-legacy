@@ -6,11 +6,9 @@ import species.participation.*
 import species.formatReader.SpreadsheetReader;
 import species.utils.*;
 
-//def checklistService = ctx.getBean("checklistService");
+def checklistService = ctx.getBean("checklistService");
 
 //checklistService.updateUncuratedVotesTable()
-
-//checklistService.migrateChecklist()
 
 //checklistService.updateLocation()
 
@@ -18,3 +16,12 @@ import species.utils.*;
 
 //checklistService.mCn()
 
+def deleteChecklist()  {
+	try{
+		Checklist.get(284).delete(flush:true)
+	}catch (Exception e) {
+		e.printStackTrace()
+	}
+}
+deleteChecklist()
+checklistService.migrateChecklist(10)
