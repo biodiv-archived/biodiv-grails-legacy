@@ -40,7 +40,6 @@
 .feedParentContext {
 	background-color:#ffffff;
 	display:table;
-	width:100%;
 }
 
 .feedSubParentContext, .feedSubParentContext .yj-message-body pre {

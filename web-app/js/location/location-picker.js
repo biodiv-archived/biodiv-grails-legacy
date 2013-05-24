@@ -208,7 +208,7 @@ function update_geotagged_images_list() {
 function update_geotagged_images_list(image) {
 		$(image).exifLoad(function() {
     		var latlng = get_latlng_from_image(image);
-    		var imageDate =  $(image).exif("DateTimeOriginal")[0].split(" ")[0];
+    		var imageDate =  $(image).exif("DateTimeOriginal")[0];
     		var display = "";
     		var html = "";
     		
@@ -218,9 +218,11 @@ function update_geotagged_images_list(image) {
             }
             
     		if(imageDate){
-            	imageDate = imageDate.replace(/:/g, "-");
-            	display += " and " + $.datepicker.formatDate('dd M yy', Date.parse(imageDate));
-            	func += " set_date('" + imageDate + "')";
+    			var date = imageDate.split(" ")[0];
+    			var time = imageDate.split(" ")[1];
+            	date = date.replace(/:/g, "-");
+            	display += " and " + $.datepicker.formatDate('dd M yy', Date.parse(date));
+            	func += " set_date('" + date + " " + time + "')";
             }
     		
     		if(latlng || imageDate){
