@@ -2,18 +2,26 @@ var newFeedProcessing = false;
 var oldFeedProcessing = false;
 var oldFeedRetry = 0;
 var maxOldFeedRetry = 3;
+var noMoreOldFeeds = false;
 
 function loadOlderFeedsInAjax(targetComp){
 	var url = $(targetComp).children('input[name="feedUrl"]').val();
 	var feedType = $(targetComp).children('input[name="feedType"]').val();
 	var feedOrder = $(targetComp).children('input[name="feedOrder"]').val();
 	
+	if(noMoreOldFeeds && feedType === "auto"){
+		return;
+	}
+	
 	$.ajax({
  		url: url,
 		dataType: "json",
 		data: getFeedParams("older", targetComp),
 		success: function(data) {
-			if(data.showFeedListHtml){
+			if(!data.showFeedListHtml){
+				noMoreOldFeeds = true;
+				$(targetComp).children('.activiyfeedNoMoreFeedmsg').show();
+			}else{ 
 				var htmlData = $(data.showFeedListHtml);
 				htmlData = removeDuplicateFeed($(targetComp).children('ul'), htmlData, feedType, "older", targetComp);
 				if(feedOrder === "latestFirst"){
