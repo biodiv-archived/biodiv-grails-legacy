@@ -166,6 +166,10 @@ $(document).ready(function(){
     	return false;
     });
    
+    $('select[name="limit"]').live('change', function() {
+        updateGallery(undefined, $(this).val(), window.params.offset, false, window.params.isGalleryUpdate);
+    });
+
    var tmpTarget =  window.location.pathname + window.location.search;
    setActiveTag($('<a href="'+ tmpTarget +'"></a>').url().param()["tag"]);
    
@@ -396,14 +400,7 @@ function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSo
             params['habitat'] = habitat;
     }
 
-    if(limit != undefined) {
-        params['max'] = limit.toString();
-    } 
 
-    if(offset != undefined) {
-        params['offset'] = offset.toString();
-    }
-	
 	var tag = getSelectedTag();
 	if(tag){
 		params['tag'] = tag;
@@ -442,6 +439,14 @@ function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSo
 			delete params['daterangepicker_end'];
 		}
 	}
+	
+        if(limit != undefined) {
+            params['max'] = limit.toString();
+        } 
+
+        if(offset != undefined) {
+            params['offset'] = offset.toString();
+        }
 	
 	if(removeUser){
 		if(params['user'] != undefined){
@@ -516,6 +521,7 @@ function updateGallery(target, limit, offset, removeUser, isGalleryUpdate, remov
     var url = a.url();
     var href = url.attr('path');
     var params = getFilterParameters(url, limit, offset, removeUser, removeObv, removeSort, isRegularSearch, removeParam);
+    console.log(params);
     // alert(" tag in params " + params['tag'] );
     isGalleryUpdate = (isGalleryUpdate == undefined)?true:isGalleryUpdate
     if(isGalleryUpdate)

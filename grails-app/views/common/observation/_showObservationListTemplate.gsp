@@ -1,6 +1,8 @@
 <div class="observations_list observation" style="clear: both;">
+
 	<div class="btn-group button-bar" data-toggle="buttons-radio"
 		style="float: right;">
+                
 		<button class="list_view_bttn btn list_style_button active">
 			<i class="icon-align-justify"></i>
 		</button>
@@ -8,6 +10,18 @@
 			<i class="icon-th-large"></i>
 		</button>
 	</div>
+        <div class="btn-group button-bar pull-right" style="z-index: 10; margin-right:3px;">
+                    <div class="controls">
+                        <g:select name="limit" class="input-mini"
+                            placeholder="Select no of observations to show"
+                            from="${[12,36,48,60]}"
+                            value="${queryParams?.max}" />
+
+                    </div>
+
+                </div>
+
+
 	<div class="mainContentList">
 		<div class="mainContent" name="p${params?.offset}">
 		
