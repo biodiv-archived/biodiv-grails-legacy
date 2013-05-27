@@ -14,7 +14,7 @@
                     <div class="controls">
                         <g:select name="limit" class="input-mini"
                             placeholder="Select no of observations to show"
-                            from="${[12,36,48,60]}"
+                            from="${[12,36,48,60, 72, 84, 96]}"
                             value="${queryParams?.max}" />
 
                     </div>
