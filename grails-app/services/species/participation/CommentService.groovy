@@ -133,7 +133,7 @@ class CommentService {
 		if (!grailsApplication.isDomainClass(object.getClass())){
 			return true
 		}
-		return userGroupService.hasPermissionAsPerGroup(object, org.springframework.security.acls.domain.BasePermission.WRITE)
+		return userGroupService.hasPermissionAsPerGroup(object, 'allowNonMembersToComment', org.springframework.security.acls.domain.BasePermission.WRITE)
 	}
 	
 	private setDefaultRange(params){

@@ -176,13 +176,14 @@ class ChartService {
 	}
 	
 	private getHyperLink(String speciesGroup, count, boolean isUnIdentified, boolean isObv, Map filterParams=[:]){
+		def filterParamsForHyperLink = new HashMap(filterParams)
 		if(isUnIdentified){
 			if(isObv){
-				filterParams.speciesName="Unknown"
+				filterParamsForHyperLink.speciesName="Unknown"
 			}
 		}
-		filterParams.sGroup = SpeciesGroup.findByName(speciesGroup).id
-		def link = observationService.generateLink((isObv)?"observation":"species", "list", filterParams, null)
+		filterParamsForHyperLink.sGroup = SpeciesGroup.findByName(speciesGroup).id
+		def link = observationService.generateLink((isObv)?"observation":"species", "list", filterParamsForHyperLink, null)
 		return "" + '<a href="' +  link +'">' + count + "</a>"
 	}
 	
@@ -289,6 +290,24 @@ class ChartService {
 			order 'total', 'desc'
 		}
 		
+		def obvCount = Observation.withCriteria(){
+			projections {
+				rowCount('total') //alias given to count
+			}
+			and{
+				// taking undeleted observation
+				eq('isDeleted', false)
+				ge('createdOn', startDate)
+
+				//filter by usergroup
+				if(userGroupInstance){
+					userGroups{
+						eq('id', userGroupInstance.id)
+					}
+				}
+			}
+			maxResults 1
+		}[0]
 		
 		def finalResult = []
 		result.each { r ->
@@ -298,7 +317,7 @@ class ChartService {
 			r[0] = r[0].name
 		}
 		
-		return [data : result, htmlData:finalResult, columns : [
+		return [obvCount:obvCount, data : result, htmlData:finalResult, columns : [
 					['string', 'User'],
 					['number', 'Observations']
 				],

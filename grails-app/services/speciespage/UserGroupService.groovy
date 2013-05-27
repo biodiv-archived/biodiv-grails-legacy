@@ -1194,9 +1194,9 @@ class UserGroupService {
 	}
 	
 	
-	def boolean hasPermissionAsPerGroup(object, permission){
+	def boolean hasPermissionAsPerGroup(object, property, permission){
 		def secTagLib = grailsApplication.mainContext.getBean('species.CustomSecurityAclTagLib');
-		return secTagLib.hasPermissionAsPerGroup(['permission':permission, 'object':object], 'permitted')
+		return secTagLib.hasPermissionAsPerGroup(['permission':permission, 'object':object, 'property':property], 'permitted')
 	}
 	
 	//XXX same call from taglib leadind to no session errro. to avoid that puttins same checkin in service and exposing through domain object 
