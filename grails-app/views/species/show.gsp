@@ -105,7 +105,7 @@ if(r) {
 <g:set var="entityName"
 	value="${message(code: 'species.label', default: 'Species')}" />
 <g:set var="speciesName"
-	value="${speciesInstance.taxonConcept.binomialForm}" />
+	value="${speciesInstance.taxonConcept.canonicalForm}" />
 
 <g:set var="conceptCounter" value="${1}" />
 

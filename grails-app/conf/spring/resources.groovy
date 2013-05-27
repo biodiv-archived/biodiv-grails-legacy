@@ -25,7 +25,9 @@ import species.auth.drupal.DrupalAuthCookieFilter;
 import species.auth.drupal.DrupalAuthUtils;
 import species.participation.EmailConfirmationService;
 import speciespage.FacebookAuthService;
+import com.the6hours.grails.springsecurity.facebook.DefaultFacebookAuthDao
 
+        
 // Place your Spring DSL code here
 beans = {
 	def conf = SpringSecurityUtils.securityConfig;
@@ -94,6 +96,21 @@ beans = {
 
 	preAuthenticationChecks(DefaultPreAuthenticationChecks)
 	postAuthenticationChecks(DefaultPostAuthenticationChecks)
+
+    SpringSecurityUtils.loadSecondaryConfig 'DefaultFacebookSecurityConfig'
+    // have to get again after overlaying DefaultFacebookecurityConfig
+    def dbConf = SpringSecurityUtils.securityConfig
+
+    if (!dbConf.facebook.bean.dao) {
+        println "facebookAuthDao"
+        dbConf.facebook.bean.dao = 'facebookAuthDao'
+        facebookAuthDao(DefaultFacebookAuthDao) {
+            domainClassName = dbConf.facebook.domain.classname
+            connectionPropertyName = dbConf.facebook.domain.connectionPropertyName
+            userDomainClassName = dbConf.userLookup.userDomainClassName
+            rolesPropertyName = dbConf.userLookup.authoritiesPropertyName
+        }
+    }
 
 	facebookAuthUtils(FacebookAuthUtils) { grailsApplication = ref('grailsApplication') }
 
