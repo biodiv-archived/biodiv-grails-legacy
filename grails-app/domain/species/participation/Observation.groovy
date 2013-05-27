@@ -109,19 +109,9 @@ class Observation implements Taggable, Rateable {
 	 * @return
 	 */
 	Resource mainImage() {
-		def reprImage;
-		Iterator iterator = resource?.iterator();
-		if(iterator.hasNext()) {
-			reprImage = iterator.next();
-		}
-		
-		return reprImage;
-//
-//		if(reprImage && (new File(grailsApplication.config.speciesPortal.observations.rootDir+reprImage.fileName.trim())).exists()) {
-//			return reprImage;
-//		} else {
-//			return null;
-//		}
+		def res = listResourcesByRating(1);
+        if(res) 
+            return res[0]
 	}
 
 	/**
@@ -421,7 +411,7 @@ class Observation implements Taggable, Rateable {
 		return Follow.fetchIsFollowing(this, user)
 	}
 
-    def listResourcesByRating() {
+    def listResourcesByRating(max = -1) {
         def params = [:]
         def clazz = Resource.class;
         def type = GrailsNameUtils.getPropertyName(clazz);
@@ -429,7 +419,17 @@ class Observation implements Taggable, Rateable {
         def sql =  Sql.newInstance(dataSource);
         params['cache'] = true;
         params['type'] = type;
-        def results = sql.rows("select resource_id, observation_id, rating_ref, (case when avg is null then 0 else avg end) as avg, (case when count is null then 0 else count end) as count from observation_resource o left outer join (select rating_link.rating_ref, avg(rating.stars), count(rating.stars) from rating_link , rating  where rating_link.type='$type' and rating_link.rating_id = rating.id  group by rating_link.rating_ref) c on o.resource_id =  c.rating_ref where observation_id=:obvId order by avg desc, resource_id asc", [obvId:this.id]);
+
+        def queryParams = [:];
+        queryParams['obvId'] = this.id;
+        
+        def query = "select resource_id, observation_id, rating_ref, (case when avg is null then 0 else avg end) as avg, (case when count is null then 0 else count end) as count from observation_resource o left outer join (select rating_link.rating_ref, avg(rating.stars), count(rating.stars) from rating_link , rating  where rating_link.type='$type' and rating_link.rating_id = rating.id  group by rating_link.rating_ref) c on o.resource_id =  c.rating_ref where observation_id=:obvId order by avg desc, resource_id asc";
+        if(max && max > 0) {
+            query += " limit :max"
+            queryParams['max'] = max;
+        }
+
+        def results = sql.rows(query, queryParams);
         def idList = results.collect { it[0] }
 
         if(idList) {
