@@ -440,7 +440,9 @@ function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSo
 		}
 	}
 	
-        if(limit != undefined) {
+        if($("#limit").length != 0) {
+            params['max'] = $('select[name="limit"]').val();
+        } else if(limit != undefined) {
             params['max'] = limit.toString();
         } 
 
