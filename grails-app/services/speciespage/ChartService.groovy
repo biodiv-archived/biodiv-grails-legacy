@@ -1,6 +1,8 @@
 package speciespage
 
 import java.text.SimpleDateFormat
+
+import org.codehaus.groovy.grails.web.util.WebUtils;
 import org.codehaus.groovy.runtime.DateGroovyMethods;
 import org.hibernate.Hibernate;
 import org.hibernate.criterion.DetachedCriteria
@@ -20,6 +22,12 @@ class ChartService {
 
 	private static final Date PORTAL_START_DATE = new Date(111, 7, 8)
 
+	static final String ACTIVE_USER_STATS = "Active user stats"
+	static final String OBSERVATION_STATS = "Observation stats"
+	static final String SPECIES_STATS = "Species stats"
+	static final String USER_OBSERVATION_BY_SPECIESGROUP = "User observation by species group"
+	
+	
 	def userGroupService
 	def observationService
 	
@@ -188,11 +196,14 @@ class ChartService {
 	}
 	
 	
-	private getHyperLinkForUser(userId, Date startDate, count, request){
+	private getHyperLinkForUser(userId, Date startDate, count, request, speciesGroup=null){
 		def fitlerParams = [:]
 		if(startDate){
 			fitlerParams.daterangepicker_start = new SimpleDateFormat("dd/MM/yyyy").format(startDate)
 			fitlerParams.daterangepicker_end = new SimpleDateFormat("dd/MM/yyyy").format(new Date())
+		}
+		if(speciesGroup){
+			fitlerParams.sGroup = speciesGroup.id
 		}
 		fitlerParams.user = userId
 		def link = observationService.generateLink("observation", "list", fitlerParams, request)
@@ -428,5 +439,77 @@ class ChartService {
 				]
 			]
 	}
+	
+	def activeUserStatsBySpeciesGroup(speciesGroupId, params=null){
+//		UserGroup userGroupInstance
+//		if(params.webaddress) {
+//			userGroupInstance = userGroupService.get(params.webaddress);
+//		}
+		int max = 5
+		def sGroup =  SpeciesGroup.get(speciesGroupId)
+		def request = WebUtils.retrieveGrailsWebRequest()?.getCurrentRequest()
+		def result = Observation.withCriteria(){
+			projections {
+				groupProperty('author')
+				rowCount('total') //alias given to count
+			}
+			and{
+				// taking undeleted observation
+				eq('isDeleted', false)
+				eq('group', sGroup)
+				
+//				//filter by usergroup
+//				if(userGroupInstance){
+//					userGroups{
+//						eq('id', userGroupInstance.id)
+//					}
+//				}
+			}
+			maxResults max
+			order 'total', 'desc'
+		}
+		
+		def finalResult = []
+		result.each { r ->
+			def link = observationService.generateLink("SUser", "show", ["id": r[0].id], request)
+			link =  "" + '<a  href="' +  link +'"><i>' + r[0].name + "</i></a>"
+			finalResult.add([ getUserImage(r[0]), link, getHyperLinkForUser(r[0].id, null, r[1], request, sGroup)])
+			r[0] = r[0].name
+		}
+		
+		return [data : result, htmlData:finalResult, columns : [
+					['string', 'User'],
+					['number', 'Observations']
+				],
+				htmlColumns : [
+					['string', ''],
+					['string', 'User'],
+					['string', 'Observations']
+				]
+			]
+	}
 
+	
+	def populateData(model){
+		if(model.data || model.htmlData){
+			return
+		}
+		def params = model.params
+		switch (model.statsType) {
+			case USER_OBSERVATION_BY_SPECIESGROUP:
+				model.putAll(activeUserStatsBySpeciesGroup(model.speciesGroupId, params))
+				break
+			case ACTIVE_USER_STATS:
+				model.putAll(activeUserStats(params, null))
+				break
+			case OBSERVATION_STATS:
+				model.putAll(getObservationStats(params, null, null))
+				break
+			case SPECIES_STATS:
+				model.putAll(getSpeciesPageStats(params, null))
+				break
+			default:
+				break
+		}
+	}
 }

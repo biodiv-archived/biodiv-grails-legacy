@@ -6,6 +6,7 @@ class ChartTagLib {
 	def chartService
 	
 	def showStats = {attrs, body->
+		chartService.populateData(attrs.model)
 		out << render(template:"/chart/genericStatTemplate", model:attrs.model);
 	}
 	

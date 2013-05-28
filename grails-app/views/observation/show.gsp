@@ -5,6 +5,7 @@
 <%@ page import="species.participation.RecommendationVote"%>
 <%@page import="species.Resource.ResourceType"%>
 <%@page import="species.Resource"%>
+<%@page import="speciespage.ChartService"%>
 
 <html>
 <head>
@@ -238,6 +239,10 @@ String desc = "- "+ location +" by "+observationInstance.author.name.capitalize(
 						</div>
 					</g:if>
 					
+<%--					<div class="sidebar_section">--%>
+<%--						<h5>Top 5 Contributors of ${observationInstance.group.name}</h5>--%>
+<%--						<chart:showStats model="['title':'Top 5 Contributors', statsType:ChartService.USER_OBSERVATION_BY_SPECIESGROUP,  speciesGroupId:observationInstance.group.id, hAxisTitle:'User', hideBarChart:true, width:300, hideTitle:true]"/>--%>
+<%--					</div>--%>
 					<!-- obv:showTagsSummary model="['observationInstance':observationInstance]" /-->
 					<!-- obv:showObvStats  model="['observationInstance':observationInstance]"/-->
 
