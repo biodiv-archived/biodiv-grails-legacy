@@ -4,6 +4,20 @@ dataSource {
     username = "postgres"
     password = "postgres123"
 //	logSql = true
+    properties {
+        //TODO: following params to be enabled after testing for connection leak
+        //maxActive = 50
+        //maxIdle = 25
+        //minIdle = 5
+        //initialSize = 5
+        validationQuery="SELECT 1"
+        testOnBorrow=true
+        testOnReturn=false
+        testWhileIdle=false
+
+        timeBetweenEvictionRunsMillis = 1000 * 60 * 30
+        maxWait = 30000
+    }
 }
 
 hibernate {
