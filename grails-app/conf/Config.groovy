@@ -316,7 +316,6 @@ speciesPortal {
 		OCCURRENCE_RECORDS = 'Occurrence Records'
 		BRIEF = "Brief"
 		SUMMARY = "Summary"
-		REFERENCES = "References"
 		TAXONRECORDID = "TaxonRecordID"
 		GLOBALUNIQUEIDENTIFIER = "GlobalUniqueIdentifier"
 		NOMENCLATURE_AND_CLASSIFICATION = "Nomenclature and Classification"

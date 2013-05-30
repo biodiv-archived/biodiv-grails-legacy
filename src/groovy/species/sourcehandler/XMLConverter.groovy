@@ -309,7 +309,7 @@ class XMLConverter extends SourceConverter {
             List<Reference> references = getReferences(dataNode, true,s.taxonConcept, synonyms);
             List<Contributor> attributors = getAttributions(dataNode, true);
             SpeciesField speciesField;
-println "${field}"
+
             def temp = []
             //TODO:HACK just for keystone
             String dt = data.replaceAll("</?p>","");
@@ -331,13 +331,13 @@ println "${field}"
                         s.removeFromFields(sField);
                         sField.delete();
 
-                    } else */if(sField.description.contains(dt)){
+                    } else if(sField.description.contains(dt)){
                         log.debug "Field already contains given text"
-                    } else {
+                    } *///else {
                         log.debug "Merging description from existing ${sField}. Removing all metadata associate with previous field."
                         data = sField.description + "<br/>" + data
                         speciesField = sField
-                    }
+                    //}
                     }
                 } else {
                     for(sField in temp) {
@@ -374,7 +374,7 @@ println "${field}"
                 audienceTypes.each { speciesField.addToAudienceTypes(it); }
                 attributors.each {  speciesField.addToAttributors(it); }
                 resources.each {  speciesField.addToResources(it); }
-                references.each {  speciesField.addToReferences(it); }
+                references.each { println it; speciesField.addToReferences(it); }
                 speciesFields.add(speciesField);
                 println "----${speciesField.field.category}......${speciesField.contributors}"
             } else {
@@ -1022,15 +1022,18 @@ println rate+"++++++++++++++"
         List<Reference> references = new ArrayList<Reference>();
 
         NodeList refs = dataNode.reference;
-        refs.each {
-            String title = cleanData(it?.title?.text().trim(), taxon, synonyms);
-            String url = it?.url?.text().trim();
-            if(title || url) {
-                def ref = new Reference(title:title, url:url);
-                references.add(ref);
+        if(!refs) {
+            refs.each {
+                String title = cleanData(it?.title?.text().trim(), taxon, synonyms);
+                String url = it?.url?.text().trim();
+                if(title || url) {
+                    def ref = new Reference(title:title, url:url);
+                    references.add(ref);
+                }
             }
+            println "@@@@ ${taxon.name}"
+            println references
         }
-
         return references;
     }
 

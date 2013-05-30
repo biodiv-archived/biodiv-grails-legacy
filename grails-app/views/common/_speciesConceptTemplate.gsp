@@ -105,8 +105,9 @@
 												}
 											}
 										};
-									
-										if(category.value.get('speciesFieldInstance')[0]?.description) {
+
+                                                                                //printing only if references are not available.. using description
+										if(category.value.get('speciesFieldInstance')[0]?.description && !category.value.get('speciesFieldInstance')[0]?.references) {
 											category.value.get('speciesFieldInstance')[0]?.description?.replaceAll(/<.*?>/, '\n').split('\n').each() {
 												if(it) {
 												if(it.startsWith("http://")) {
