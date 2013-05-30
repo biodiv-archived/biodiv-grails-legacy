@@ -340,7 +340,7 @@ class ObservationService {
 			def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 			Resource image = param['observation'].mainImage()
 			if(image.type == ResourceType.IMAGE) {
-				item.imageLink = iconBasePath +  image.thumbnailUrl()
+				item.imageLink = image.thumbnailUrl(iconBasePath)
 			} else if(image.type == ResourceType.VIDEO) {
 				item.imageLink = image.thumbnailUrl()
 			}			

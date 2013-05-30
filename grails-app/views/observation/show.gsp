@@ -5,6 +5,7 @@
 <%@ page import="species.participation.RecommendationVote"%>
 <%@page import="species.Resource.ResourceType"%>
 <%@page import="species.Resource"%>
+<%@page import="speciespage.ChartService"%>
 
 <html>
 <head>
@@ -12,14 +13,15 @@
 <g:set var="title" value="${(!observationInstance.fetchSpeciesCall()?.equalsIgnoreCase('Unknown'))?observationInstance.fetchSpeciesCall():'Help Identify'}"/>
 <%
 def r = observationInstance.mainImage();
-def imagePath = '';
+def imagePath = '', videoPath='';
 if(r) {
     def gThumbnail = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.gallery.suffix)?:null;
     if(r && gThumbnail) {
             if(r.type == ResourceType.IMAGE) {
-                    imagePath = g.createLinkTo(base:grailsApplication.config.speciesPortal.observations.serverURL,	file: gThumbnail)
+                    imagePath = g.createLinkTo(base:grailsApplication.config.speciesPortal.observations.serverURL, file: gThumbnail)
             } else if(r.type == ResourceType.VIDEO){
-                    imagePath = g.createLinkTo(base:gThumbnail,	file: '')
+                imagePath = r.thumbnailUrl()
+                videoPath = r.getUrl();
             }
     }
 } else{
@@ -31,7 +33,7 @@ String desc = "- "+ location +" by "+observationInstance.author.name.capitalize(
 %>
 <g:set var="description" value="${Utils.stripHTML(observationInstance.notes?observationInstance.notes+' '+desc:desc)?:'' }" />
 
-<g:render template="/common/titleTemplate" model="['title':title, 'description':description, 'canonicalUrl':canonicalUrl, 'imagePath':imagePath]"/>
+<g:render template="/common/titleTemplate" model="['title':title, 'description':description, 'canonicalUrl':canonicalUrl, 'imagePath':imagePath, 'videoPath':videoPath]"/>
 <title>${title} | ${params.controller.capitalize()} | ${Utils.getDomainName(request)}</title>
 
 <meta property="og:latitude" content="${observationInstance.latitude}"/>
@@ -238,6 +240,10 @@ String desc = "- "+ location +" by "+observationInstance.author.name.capitalize(
 						</div>
 					</g:if>
 					
+<%--					<div class="sidebar_section">--%>
+<%--						<h5>Top 5 Contributors of ${observationInstance.group.name}</h5>--%>
+<%--						<chart:showStats model="['title':'Top 5 Contributors', statsType:ChartService.USER_OBSERVATION_BY_SPECIESGROUP,  speciesGroupId:observationInstance.group.id, hAxisTitle:'User', hideBarChart:true, width:300, hideTitle:true]"/>--%>
+<%--					</div>--%>
 					<!-- obv:showTagsSummary model="['observationInstance':observationInstance]" /-->
 					<!-- obv:showObvStats  model="['observationInstance':observationInstance]"/-->
 

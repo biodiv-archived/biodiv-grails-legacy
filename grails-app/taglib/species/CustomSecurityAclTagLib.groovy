@@ -73,7 +73,7 @@ class CustomSecurityAclTagLib extends SecurityAclTagLib {
 		String userGroupClass = UserGroup.getCanonicalName();
 		boolean isPermitted = false;
 		userGroups.each { userGroup ->
-			if(specialProperty && userGroup."${specialProperty}") isPermitted = true;
+			//if(specialProperty && userGroup."${specialProperty}") isPermitted = true;
 			if(specialProperty && userGroup."${specialProperty}") isPermitted = true;
 			else {
 				if(permissionEvaluator.hasPermission(auth, userGroup.id, userGroupClass, permissions)) isPermitted = true;

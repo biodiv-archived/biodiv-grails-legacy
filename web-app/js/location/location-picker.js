@@ -140,6 +140,7 @@ function set_location(lat, lng) {
 }
 
 function set_date(date){
+	$(".location_picker_button").removeClass("active_location_picker_button");
 	$('#observedOn').datepicker("setDate", Date.parse(date));
 }
 
@@ -211,28 +212,34 @@ function update_geotagged_images_list(image) {
     		var imageDate =  $(image).exif("DateTimeOriginal")[0];
     		var display = "";
     		var html = "";
+    		var func = "";
     		
-            if (latlng) {            	
-                display = "Lat: " + latlng.lat.toFixed(2) + ", Lon: " + latlng.lng.toFixed(2)
-            	func = "set_location(" + latlng.lat+"," +latlng.lng+ "); $(this).addClass('active_location_picker_button');";
+    		if (latlng) {            	
+                display += "Lat: " + latlng.lat.toFixed(2) + ", Lon: " + latlng.lng.toFixed(2)
+            	func += "set_location(" + latlng.lat+"," +latlng.lng+ ");";
             }
-            
+    		
+    		
     		if(imageDate){
     			var date = imageDate.split(" ")[0];
     			var time = imageDate.split(" ")[1];
             	date = date.replace(/:/g, "-");
-            	display += " and " + $.datepicker.formatDate('dd M yy', Date.parse(date));
-            	func += " set_date('" + date + " " + time + "')";
+            	if(display.length > 0){
+            		display += " and "  
+            	}
+            	display += $.datepicker.formatDate('dd M yy', Date.parse(date));
+            	func += "set_date('" + date + " " + time + "');";
             }
-    		
+
     		if(latlng || imageDate){
+    			func += "$(this).addClass('active_location_picker_button');";
     			html = '<div id=' + $(image).attr("id") +' class="location_picker_button" style="display:inline-block;" onclick="' + func + '"><div style="width:40px; height:40px;float:left;"><img style="width:100%; height:100%;" src="' + $(image).attr('src') + '"/></div><div style="float:left; padding:10px;">' + display + '</div></div>';
     			$("#geotagged_images>.title").show();
                 $("#geotagged_images>.msg").show();
                 $("#geotagged_images").append(html);
                 $("#geotagged_images").trigger('update_map');
-    		}
-    	})
+    		}    		
+    	});
 }
 
 function get_latlng_from_image(img) {

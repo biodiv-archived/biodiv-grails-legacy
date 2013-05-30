@@ -73,7 +73,9 @@ class SpeciesController {
 		params.sort = params.sort?:"percentOfInfo"
 		if(params.sort.equals('lastrevised')) {
 			params.sort = 'lastUpdated'
-		}
+		} else if(params.sort.equals('percentofinfo')) {
+			params.sort = 'percentOfInfo'
+        }
 		params.order = (params.sort.equals("percentOfInfo")||params.sort.equals("lastUpdated"))?"desc":params.sort.equals("title")?"asc":"asc"
 
 		log.debug params

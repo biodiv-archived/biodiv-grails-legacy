@@ -5,7 +5,7 @@
 <r:require modules="observations_list" />
 <g:set var="entityName"
 	value="${message(code: 'observation.label', default: 'Search Results')}" />
-<title>${entityName} | ${Utils.getDomainName(request)}</title>
+<title>Observations | ${entityName} | ${Utils.getDomainName(request)}</title>
 </head>
 <body>
 

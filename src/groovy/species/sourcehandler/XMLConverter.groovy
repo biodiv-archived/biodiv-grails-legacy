@@ -309,7 +309,7 @@ class XMLConverter extends SourceConverter {
             List<Reference> references = getReferences(dataNode, true,s.taxonConcept, synonyms);
             List<Contributor> attributors = getAttributions(dataNode, true);
             SpeciesField speciesField;
-
+println "${field}"
             def temp = []
             //TODO:HACK just for keystone
             String dt = data.replaceAll("</?p>","");
@@ -408,7 +408,7 @@ class XMLConverter extends SourceConverter {
         * Resetting contributor back to the fields contributors.
         * TODO: need to remove
         **/
-        i/*for(c1 in sField.contributors) {
+        /*for(c1 in sField.contributors) {
             if((c1.name.equals("dummy")||c1.name.equals("pearlsravanthi"))) {
                 println 'is dummy node'
                 println sField.description

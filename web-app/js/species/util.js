@@ -128,7 +128,10 @@ function loadGoogleMapsAPI(callback) {
     //    console.log("google maps already loaded")
     //} else {
         console.log("loading google maps")
-        google.load("maps", "3", {'callback':callback, other_params: "sensor=true"});
+        google.load("maps", "3.12", {'callback':function() {
+            google.maps.visualRefresh = true;
+            callback();
+        }, other_params: "sensor=true"});
     //}
 }
 

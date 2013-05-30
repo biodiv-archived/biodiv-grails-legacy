@@ -80,11 +80,13 @@ class ObservationController {
 		} else{
 			def obvListHtml =  g.render(template:"/common/observation/showObservationListTemplate", model:model);
 			def obvFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
-
-			def filteredTags = observationService.getTagsFromObservation(model.totalObservationInstanceList.collect{it[0]})
-			def tagsHtml = g.render(template:"/common/observation/showAllTagsTemplate", model:[count: count, tags:filteredTags, isAjaxLoad:true]);
+			def tagsHtml = "";
+			if(model.showTags) {
+				def filteredTags = observationService.getTagsFromObservation(model.totalObservationInstanceList.collect{it[0]})
+				tagsHtml = g.render(template:"/common/observation/showAllTagsTemplate", model:[count: count, tags:filteredTags, isAjaxLoad:true]);
+			}
 			def mapViewHtml = g.render(template:"/common/observation/showObservationMultipleLocationTemplate", model:[observationInstanceList:model.totalObservationInstanceList]);
-
+			
 			def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml, tagsHtml:tagsHtml, mapViewHtml:mapViewHtml, instanceTotal:model.instanceTotal]
 			render result as JSON
 			return;
@@ -464,8 +466,9 @@ class ObservationController {
 						
 						String obvDirPath = obvDir.absolutePath.replace(rootDir, "")
 						def res = new Resource(fileName:obvDirPath+"/"+file.name, type:ResourceType.IMAGE);
-						def baseUrl = grailsApplication.config.speciesPortal.observations.serverURL						
-						def thumbnail = baseUrl + res.thumbnailUrl();
+                        //context specific baseUrl for location picker script to work
+						def baseUrl = Utils.getDomainServerUrlWithContext(request) + '/observations'
+						def thumbnail = res.thumbnailUrl(baseUrl);
 						
 						resourcesInfo.add([fileName:file.name, url:'', thumbnail:thumbnail ,type:ResourceType.IMAGE]);
 					}
@@ -1123,9 +1126,11 @@ class ObservationController {
 			params.remove('isGalleryUpdate');
 			def obvListHtml =  g.render(template:"/common/observation/showObservationListTemplate", model:model);
 			def obvFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
-	
-			def filteredTags = observationService.getTagsFromObservation(model.totalObservationInstanceList.collect{it[0]})
-			def tagsHtml = g.render(template:"/common/observation/showAllTagsTemplate", model:[count: count, tags:filteredTags, isAjaxLoad:true]);
+			def tagsHtml = "";
+			if(model.showTags) {
+				def filteredTags = observationService.getTagsFromObservation(model.totalObservationInstanceList.collect{it[0]})
+				tagsHtml = g.render(template:"/common/observation/showAllTagsTemplate", model:[count: count, tags:filteredTags, isAjaxLoad:true]);
+			}
 			def mapViewHtml = g.render(template:"/common/observation/showObservationMultipleLocationTemplate", model:[observationInstanceList:model.totalObservationInstanceList]);
 			
 			def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml, tagsHtml:tagsHtml, mapViewHtml:mapViewHtml, instanceTotal:model.instanceTotal]

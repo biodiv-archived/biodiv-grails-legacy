@@ -25,7 +25,7 @@ if(r) {
             if(r.type == ResourceType.IMAGE) {
                     imagePath = g.createLinkTo(base:grailsApplication.config.speciesPortal.resources.serverURL,	file: gThumbnail)
             } else if(r.type == ResourceType.VIDEO){
-                    imagePath = g.createLinkTo(base:gThumbnail,	file: '')
+                    imagePath = r.thumbnailUrl()
             }
     }
 } else {
@@ -105,7 +105,7 @@ if(r) {
 <g:set var="entityName"
 	value="${message(code: 'species.label', default: 'Species')}" />
 <g:set var="speciesName"
-	value="${speciesInstance.taxonConcept.binomialForm}" />
+	value="${speciesInstance.taxonConcept.canonicalForm}" />
 
 <g:set var="conceptCounter" value="${1}" />
 

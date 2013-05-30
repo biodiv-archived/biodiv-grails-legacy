@@ -8,8 +8,9 @@ function loadOlderFeedsInAjax(targetComp){
 	var url = $(targetComp).children('input[name="feedUrl"]').val();
 	var feedType = $(targetComp).children('input[name="feedType"]').val();
 	var feedOrder = $(targetComp).children('input[name="feedOrder"]').val();
+	var refreshType = $(targetComp).children('input[name="refreshType"]').val();
 	
-	if(noMoreOldFeeds && feedType === "auto"){
+	if(noMoreOldFeeds && refreshType === "auto"){
 		return;
 	}
 	

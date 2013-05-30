@@ -1,15 +1,6 @@
 <%@page import="species.Resource.ResourceType"%>
 <g:set var="mainImage" value="${observationInstance.mainImage()}" />
-<%def path = mainImage?mainImage.thumbnailUrl(): null;
-def imagePath;
-if(mainImage) {
-if(mainImage.type == ResourceType.IMAGE) {
-	imagePath = g.createLinkTo(base:grailsApplication.config.speciesPortal.observations.serverURL,	file: path)
-} else if(mainImage.type == ResourceType.VIDEO){
-	imagePath = g.createLinkTo(base:path,	file: '')
-        }
-}
-%>
+<%def imagePath = mainImage?mainImage.thumbnailUrl(): null;%>
 
 <div style="position:relative;overflow:hidden">
     <g:render template="/common/observation/noOfResources" model="['instance':observationInstance]"/>
