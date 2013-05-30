@@ -116,4 +116,8 @@ class SpeciesTagLib {
 	def showSpeciesExternalLink = {attrs, body->
 		out << render(template:"/species/showSpeciesExternalLinkTemplate", model:attrs.model);
 	}
+	
+	def showDownloadAction = {attrs, body->
+		out << render(template:"/species/showDownloadAction", model:attrs.model);
+	}
 }

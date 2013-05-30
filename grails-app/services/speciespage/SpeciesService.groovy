@@ -39,6 +39,7 @@ import org.apache.log4j.RollingFileAppender;
 import org.apache.log4j.spi.LoggerFactory;
 import org.apache.log4j.Logger;
 import org.apache.log4j.FileAppender;
+import species.participation.DownloadLog;
 
 class SpeciesService {
 
@@ -97,7 +98,7 @@ class SpeciesService {
 				}
 			}
 		}
-		
+
 		SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 		String lastRevisedStartDate = '';
 		String lastRevisedEndDate = '';
@@ -114,9 +115,9 @@ class SpeciesService {
 			//DateUtil.formatDate(s, cal, str1)
 			//println str1
 			//lastRevisedStartDate = str1;
-			
+
 		}
-		
+
 		if(params.daterangepicker_end) {
 			Calendar cal = Calendar.getInstance(); // locale-specific
 			Date e = DateUtil.parseDate(params.daterangepicker_end, ['dd/MM/yyyy']);
@@ -125,12 +126,12 @@ class SpeciesService {
 			cal.set(Calendar.MINUTE, 59);
 			cal.set(Calendar.MINUTE, 59);
 			e = new Date(cal.getTimeInMillis())
-//			StringWriter str2 = new StringWriter();
-//			DateUtil.formatDate(e, cal, str2)
-//			println str2
+			//			StringWriter str2 = new StringWriter();
+			//			DateUtil.formatDate(e, cal, str2)
+			//			println str2
 			lastRevisedEndDate = dateFormatter.format(e);
 		}
-		
+
 		if(lastRevisedStartDate && lastRevisedEndDate) {
 			if(i > 0) aq += " AND";
 			aq += " lastrevised:["+lastRevisedStartDate+" TO "+lastRevisedEndDate+"]";
@@ -138,7 +139,6 @@ class SpeciesService {
 			queryParams['daterangepicker_end'] = params.daterangepicker_end;
 			activeFilters['daterangepicker_start'] = params.daterangepicker_start;
 			activeFilters['daterangepicker_end'] = params.daterangepicker_end;
-			
 		} else if(lastRevisedStartDate) {
 			if(i > 0) aq += " AND";
 			//String lastRevisedStartDate = dateFormatter.format(DateTools.dateToString(DateUtil.parseDate(params.daterangepicker_start, ['dd/MM/yyyy']), DateTools.Resolution.DAY));
@@ -152,7 +152,7 @@ class SpeciesService {
 			queryParams['daterangepicker_end'] = params.daterangepicker_end;
 			activeFilters['daterangepicker_end'] = params.daterangepicker_end;
 		}
-		
+
 		if(params.query && aq) {
 			params.query = params.query + " AND "+aq
 		} else if (aq) {
@@ -261,19 +261,7 @@ class SpeciesService {
 			return true;
 		return false;
 	}
-	/**
-	 * export species data
-	 */
-	def exportSpeciesData(String directory) {
-		DwCAExporter.getInstance().exportSpeciesData(directory)
-	}
 
-	/**
-	 * export species data
-	 */
-	def exportSpeciesData(String directory, List<Species> species) {
-		DwCAExporter.getInstance().exportSpeciesData(directory, species)
-	}
 
 	def updateContributor(long contributorId, long speciesFieldId, def value, String type) {
 		if(!value) {
@@ -393,6 +381,50 @@ class SpeciesService {
 		XMLConverter converter = new XMLConverter();
 		converter.setResourcesRootDir(grailsApplication.config.speciesPortal.resources.rootDir);
 		return converter.createMedia(resourcesXML, relImagesContext);
+	}
+
+	///////////////////////////////////////////////////////////////////////
+	/////////////////////////////// Export ////////////////////////////////
+	///////////////////////////////////////////////////////////////////////
+
+
+	def requestExport(params){
+		log.debug(params)
+		log.debug "creating species download request"
+		DownloadLog.createLog(springSecurityService.currentUser, params.filterUrl, params.downloadType, params.notes, params.source, params)
+	}
+
+
+
+	def export(params, dl){
+		log.debug(params)
+		def speciesInstanceList = getSpeciesList(params, dl)
+		log.debug " Species total $speciesInstanceList.size "
+		return exportSpeciesData(speciesInstanceList, null, dl.type)
+	}
+
+
+
+	private getSpeciesList(params, dl){
+		String action = new URL(dl.filterUrl).getPath().split("/")[2]
+		//getting result from solr
+		def speciesInstanceList = search(params).speciesInstanceList
+
+		return speciesInstanceList
+	}
+	
+	/**
+	 * export species data
+	 */
+	def exportSpeciesData(String directory) {
+		DwCAExporter.getInstance().exportSpeciesData(directory)
+	}
+
+	/**
+	 * export species data
+	 */
+	def exportSpeciesData(List<Species> species, String directory, String archiveType) {
+		DwCAExporter.getInstance().exportSpeciesData(species, directory)
 	}
 
 }

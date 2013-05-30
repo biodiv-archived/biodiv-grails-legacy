@@ -9,6 +9,7 @@ class ExportJob {
 	
 	private final static String OBSERVATION_LIST = "Observations"
 	private final static String CHECKLIST = "Checklist"
+	private final static String SPECIES = "Species"
 	
 	def obvUtilService
 	def observationService
@@ -37,6 +38,8 @@ class ExportJob {
 					case CHECKLIST:
 						f = checklistService.export(dl.fetchMapFromText(), dl)
 						break
+					case SPECIES:
+						f = specieService.export(dl.fetchMapFromText(), dl)
 					default:
 						log.debug "Invalid source Type $dl.sourceType"
 				}

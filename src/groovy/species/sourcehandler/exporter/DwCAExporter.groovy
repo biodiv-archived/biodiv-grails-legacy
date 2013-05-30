@@ -5,6 +5,9 @@ import species.Contributor
 import species.TaxonomyDefinition.TaxonomyRank
 import java.util.HashSet
 
+import java.util.zip.ZipOutputStream
+import java.util.zip.ZipEntry
+import java.nio.channels.FileChannel
 import au.com.bytecode.opencsv.CSVWriter
 
 /**
@@ -39,37 +42,66 @@ class DwCAExporter {
 	}
 
 
+
 	public void exportSpeciesData(String directory) {
-		exportSpeciesData(directory, Species.findAllByPercentOfInfoGreaterThan(0));
+		exportSpeciesData(Species.findAllByPercentOfInfoGreaterThan(0), directory, null);
 	}
 
 	/**
 	 * Export species
-	 * #TODO : Iterate over species and export one at a time or export everything at once?
-	 *
+	 * Iterate over each species and export related data
 	 */
-	public void exportSpeciesData(String directory, List<Species> speciesList) {
+	public void exportSpeciesData(List<Species> speciesList, String directory, String archiveType) {
+
+
+		if(!directory) {
+
+			File targetDir = grailsApplication.config.speciesPortal.species.speciesDownloadDir + "dwc_"+ + new Date().getTime()
+			targetDir.createDirs()
+			directory = targetDir.getPath()
+
+		}
 
 		initWriters(directory)
 		fillHeaders()
-
-		// percentOfInfo>0 - one way
-		//["query":"contributor:chitra OR contributor:Seena", "webaddress":"the_western_ghats", "action":"search", "controller":"species"]
-		//List<Species> speciesList = Species.findAllByPercentOfInfoGreaterThan(0)
 
 		for(Species specie: speciesList) {
 			exportSpecies(specie)
 		}
 		exportAgents(directory)
+
+
 		closeWriters()
 
+		//Archive the directory and return the file
+		archive(directory, archiveType)
+
+	}
+
+	def archive(directory, archiveType) {
+		String zipFileName = "file.zip"
+		String inputDir = directory
+
+		ZipOutputStream zipFile = new ZipOutputStream(new FileOutputStream(zipFileName))
+		new File(inputDir).eachFile() { file ->
+			zipFile.putNextEntry(new ZipEntry(file.getName()))
+			def buffer = new byte[1024]
+			file.withInputStream { i ->
+				def l = i.read(buffer)
+				// check wether the file is empty
+				if (l > 0) {
+					zipFile.write(buffer, 0, l)
+				}
+			}
+			zipFile.closeEntry()
+		}
+		zipFile.close()
 	}
 
 
 	/**
 	 * 
-	 * @param species
-	 * @param directory
+	 * @param species	
 	 */
 	public void exportSpecies(Species species) {
 
@@ -300,12 +332,12 @@ class DwCAExporter {
 				contributorsSet.add(contributor)
 			}
 			row[22] = contributors.join(",")
-                        def attributors = []
-                        for(Contributor attributor: media.attributors) {
-                            attributors.add(String.valueOf(attributor.id))
-                            contributorsSet.add(attributor)
-                        }
-                        row[23] = attributors.join(",")
+			def attributors = []
+			for(Contributor attributor: media.attributors) {
+				attributors.add(String.valueOf(attributor.id))
+				contributorsSet.add(attributor)
+			}
+			row[23] = attributors.join(",")
 			//Creator
 			//AgentID
 			//LocationCreated
@@ -392,12 +424,12 @@ class DwCAExporter {
 					contributorsSet.add(contributor)
 				}
 				row[22] = contributors.join(",")
-                                def attributors = []
-                                for(Contributor attributor: speciesField.attributors) {
-                                    attributors.add(String.valueOf(attributor.id))
-                                    contributorsSet.add(attributor)
-                                }
-                                row[23] = attributors.join(",")
+				def attributors = []
+				for(Contributor attributor: speciesField.attributors) {
+					attributors.add(String.valueOf(attributor.id))
+					contributorsSet.add(attributor)
+				}
+				row[23] = attributors.join(",")
 
 				//Creator
 				//AgentID
@@ -576,7 +608,7 @@ class DwCAExporter {
 			"BibliographicCitation",
 			"Publisher",
 			"Contributor",
-                        "Attributor",
+			"Attributor",
 			"Creator",
 			"AgentID",
 			"LocationCreated",
