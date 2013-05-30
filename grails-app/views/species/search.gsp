@@ -4,7 +4,7 @@
 
 <meta name="layout" content="main" />
 <r:require modules="species, species_list" />
-<title>Search Results | ${Utils.getDomainName(request)}</title>
+<title>Species | Search Results | ${Utils.getDomainName(request)}</title>
 </head>
 <body>
 	<div class="span12">
