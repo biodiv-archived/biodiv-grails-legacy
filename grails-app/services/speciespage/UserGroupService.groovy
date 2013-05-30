@@ -207,7 +207,7 @@ class UserGroupService {
 	@Transactional
 	def getSuggestedUserGroups(SUser userInstance) {
 
-		def conn = new Sql(sessionFactory.currentSession.connection())
+		def conn = new Sql(dataSource)
 
 		List userGroups = [];
 

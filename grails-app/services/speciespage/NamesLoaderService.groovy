@@ -14,7 +14,8 @@ class NamesLoaderService {
 	def grailsApplication
 	def sessionFactory
 	def recommendationService;
-
+	def dataSource
+	
 	static transactional = false
 
 	private static final log = LogFactory.getLog(this);
@@ -53,7 +54,7 @@ class NamesLoaderService {
 		
 		int limit = BATCH_SIZE, offset = 0, noOfNames = 0;
 		def recos = new ArrayList<Recommendation>();
-		def conn = new Sql(sessionFactory.currentSession.connection())
+		def conn = new Sql(dataSource)
 		def tmpTableName = "tmp_taxon_concept"
 		conn.executeUpdate("CREATE TABLE " + tmpTableName +  " as select t.name as name, t.canonical_Form as canonicalForm, t.normalized_Form as normalizedForm, t.binomial_Form as binomialForm, t.id as id from Taxonomy_Definition as t left outer join recommendation r on t.id = r.taxon_concept_id where r.name is null order by t.id ");
 		while(true) {
@@ -102,7 +103,7 @@ class NamesLoaderService {
 		queryList.each{ query ->
 			int offset = 0
 			def recos = new ArrayList<Recommendation>();
-			def conn = new Sql(sessionFactory.currentSession.connection())
+			def conn = new Sql(dataSource)
 			def tmpTableName = "tmp_table_update_taxonconcept"
 			try {
 				conn.executeUpdate("CREATE TABLE " + tmpTableName +  " as " + query);
@@ -140,7 +141,7 @@ class NamesLoaderService {
 		log.info "Importing synonyms into recommendations"
 		def recos = new ArrayList<Recommendation>();
 		int offset = 0, noOfNames = 0, limit = BATCH_SIZE;
-		def conn = new Sql(sessionFactory.currentSession.connection())
+		def conn = new Sql(dataSource)
 		
 		def tmpTableName = "tmp_synonyms"
 		conn.executeUpdate("CREATE TABLE " + tmpTableName +  " as select n.canonical_form as canonical_form, n.taxon_concept_id as taxonConcept from synonyms n left outer join recommendation r on n.canonical_form = r.name and n.taxon_concept_id = r.taxon_concept_id where r.name is null and n.canonical_form is not null group by n.canonical_form, n.taxon_concept_id order by n.taxon_concept_id");
@@ -173,7 +174,7 @@ class NamesLoaderService {
 		log.info "Importing common names into recommendations"
 		def recos = new ArrayList<Recommendation>();
 		int offset = 0, noOfNames = 0, limit=BATCH_SIZE;
-		def conn = new Sql(sessionFactory.currentSession.connection())
+		def conn = new Sql(dataSource)
 		def tmpTableName = "tmp_common_names"
 		def selectQuery = """
 		select n.name as name, n.taxon_concept_id as taxonConcept, n.language_id as language from common_names n left outer join recommendation r on 
