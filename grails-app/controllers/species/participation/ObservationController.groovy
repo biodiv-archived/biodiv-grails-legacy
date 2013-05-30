@@ -464,8 +464,9 @@ class ObservationController {
 						
 						String obvDirPath = obvDir.absolutePath.replace(rootDir, "")
 						def res = new Resource(fileName:obvDirPath+"/"+file.name, type:ResourceType.IMAGE);
-						def baseUrl = grailsApplication.config.speciesPortal.observations.serverURL						
-						def thumbnail = baseUrl + res.thumbnailUrl();
+                        //context specific baseUrl for location picker script to work
+						def baseUrl = Utils.getDomainServerUrlWithContext(request) + '/observations'
+						def thumbnail = res.thumbnailUrl(baseUrl);
 						
 						resourcesInfo.add([fileName:file.name, url:'', thumbnail:thumbnail ,type:ResourceType.IMAGE]);
 					}

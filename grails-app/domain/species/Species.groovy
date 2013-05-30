@@ -76,7 +76,7 @@ class Species implements Rateable {
 		}
 	}
 
-    /**
+    /** 
     * Ordering resources basing on rating
     **/
 	List<Resource> getImages() { 

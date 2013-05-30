@@ -16,7 +16,7 @@ dataSource {
         testWhileIdle=false
 
         timeBetweenEvictionRunsMillis = 1000 * 60 * 30
-        maxWait = 30000
+//        maxWait = 30000
     }
 }
 

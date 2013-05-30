@@ -155,14 +155,9 @@ input.dms_field {
 									<g:each in="${observationInstance?.resource}" var="r">
 										<li class="addedResource thumbnail">
 <%
-def thumbnail = r.thumbnailUrl()?:null;
 def imagePath = '';
-if(r && thumbnail) {
-	if(r.type == ResourceType.IMAGE) {
-        imagePath = g.createLinkTo(base:Utils.getDomainServerUrlWithContext(request) + '/observations',file: thumbnail)
-	} else if(r.type == ResourceType.VIDEO){
-		imagePath = g.createLinkTo(base:thumbnail,	file: '')
-	}
+if(r) {
+    imagePath = r.thumbnailUrl(Utils.getDomainServerUrlWithContext(request) + '/observations')?:null;
 }
 %>
 											
@@ -692,7 +687,7 @@ if(r && thumbnail) {
 				$('#progress_msg').html('');
 				$("#iemsg").html("");
 				//var rootDir = '${grailsApplication.config.speciesPortal.observations.serverURL}'
-				var rootDir = '${Utils.getDomainServerUrlWithContext(request)}' + '/observations'
+				//var rootDir = '${Utils.getDomainServerUrlWithContext(request)}' + '/observations'
 				var obvDir = $(responseXML).find('dir').text();
 				var obvDirInput = $('#upload_resource input[name="obvDir"]');
 				if(!obvDirInput.val()){
@@ -708,8 +703,8 @@ if(r && thumbnail) {
 				$(responseXML).find('resources').find('res').each(function() {
 					var fileName = $(this).attr('fileName');
 					var type = $(this).attr('type');					
-					var thumbnail = rootDir + obvDir + "/" + fileName.replace(/\.[a-zA-Z]{3,4}$/, "${grailsApplication.config.speciesPortal.resources.images.thumbnail.suffix}");
-  					images.push({i:++i, file:obvDir + "/" + fileName, url:$(this).attr('url'), thumbnail:thumbnail, type:type, title:fileName});
+					//var thumbnail = rootDir + obvDir + "/" + fileName.replace(/\.[a-zA-Z]{3,4}$/, "${grailsApplication.config.speciesPortal.resources.images.thumbnail.suffix}");
+  					images.push({i:++i, file:obvDir + "/" + fileName, url:$(this).attr('url'), thumbnail:$(this).attr('thumbnail'), type:type, title:fileName});
 				});
 				
 				var html = $( "#metadataTmpl" ).render( images );

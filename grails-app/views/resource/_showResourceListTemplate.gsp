@@ -24,15 +24,13 @@
                 <g:else>
                 <li class="thumbnail" style="${!inGroupMap || inGroupMap[resourceInstance.id]?'':'background-color:transparent;'}">
                 </g:else>
-                <%def path = resourceInstance?resourceInstance.thumbnailUrl(): null;
+                <%def imagePath = resourceInstance?resourceInstance.thumbnailUrl(grailsApplication.config.speciesPortal.observations.serverURL): null;
                 def fullUrl =  resourceInstance?resourceInstance.url: null;
 
-                def imagePath, fullImagePath;
+                def fullImagePath;
                 if(resourceInstance.type == ResourceType.IMAGE) {
-                    imagePath = g.createLinkTo(base:grailsApplication.config.speciesPortal.observations.serverURL,	file: path)
                     fullImagePath = g.createLinkTo(base:grailsApplication.config.speciesPortal.observations.serverURL,	file: resourceInstance.fileName)
                 } else if(resourceInstance.type == ResourceType.VIDEO){
-                    imagePath = g.createLinkTo(base:path,	file: '')
                     fullImagePath = g.createLinkTo(base:fullUrl,	file: '')
                 }
                 %>

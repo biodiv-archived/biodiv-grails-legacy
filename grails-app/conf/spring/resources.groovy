@@ -101,7 +101,7 @@ beans = {
     // have to get again after overlaying DefaultFacebookecurityConfig
     def dbConf = SpringSecurityUtils.securityConfig
 
-    if (!dbConf.facebook.bean.dao) {
+//    if (!dbConf.facebook.bean.dao) {
         println "facebookAuthDao"
         dbConf.facebook.bean.dao = 'facebookAuthDao'
         facebookAuthDao(DefaultFacebookAuthDao) {
@@ -110,7 +110,7 @@ beans = {
             userDomainClassName = dbConf.userLookup.userDomainClassName
             rolesPropertyName = dbConf.userLookup.authoritiesPropertyName
         }
-    }
+ //   }
 
 	facebookAuthUtils(FacebookAuthUtils) { grailsApplication = ref('grailsApplication') }
 

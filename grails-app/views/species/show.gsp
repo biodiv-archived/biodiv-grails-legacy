@@ -25,7 +25,7 @@ if(r) {
             if(r.type == ResourceType.IMAGE) {
                     imagePath = g.createLinkTo(base:grailsApplication.config.speciesPortal.resources.serverURL,	file: gThumbnail)
             } else if(r.type == ResourceType.VIDEO){
-                    imagePath = g.createLinkTo(base:gThumbnail,	file: '')
+                    imagePath = r.thumbnailUrl()
             }
     }
 } else {

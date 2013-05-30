@@ -58,11 +58,14 @@ class Resource implements Rateable {
         rating(nullable:false, min:0, max:5);
     }
 	
-	String thumbnailUrl() {
+	String thumbnailUrl(String baseUrl=null) {
 		String thumbnailUrl = '';
+        if(!baseUrl) 
+            baseUrl = grailsApplication.config.speciesPortal.observations.serverURL
+
 		switch(type) {
 			case  ResourceType.IMAGE :
-				thumbnailUrl = this.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.thumbnail.suffix);
+				thumbnailUrl = baseUrl + "/" + this.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.thumbnail.suffix);
 				break;
 			case ResourceType.VIDEO :				
 				String videoId = Utils.getYouTubeVideoId(this.url);

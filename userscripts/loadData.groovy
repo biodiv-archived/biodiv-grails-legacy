@@ -36,10 +36,10 @@ def speciesUploadService = ctx.getBean("speciesUploadService");
 //String mappingFile = grailsApplication.config.speciesPortal.data.rootDir+"/keystone/1.0/keystone_mapping.xlsx";
 //speciesUploadService.uploadKeyStoneData("jdbc:mysql://localhost:3306/ezpz", "sravanthi", "sra123", mappingFile, 0, 0);
 
-def fa = speciesUploadService.getLogFileAppender("zoooutreach.1.1.primates");
-speciesUploadService.setLogAppender(fa);
-speciesUploadService.uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/zoooutreach/1.1/primates.xlsx", grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/zoooutreach/1.1/primates_mappingfile.xls", 0, 0, 0, 0,-1);
-speciesUploadService.uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/zoooutreach/1.1/smallmammals.xls", grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/zoooutreach/1.1/smallmammals_mappingfile.xls", 0, 0, 0, 0,-1);
+//def fa = speciesUploadService.getLogFileAppender("zoooutreach.1.1.primates");
+//speciesUploadService.setLogAppender(fa);
+//speciesUploadService.uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/zoooutreach/1.1/primates.xlsx", grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/zoooutreach/1.1/primates_mappingfile.xls", 0, 0, 0, 0,-1);
+//speciesUploadService.uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/zoooutreach/1.1/smallmammals.xls", grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/zoooutreach/1.1/smallmammals_mappingfile.xls", 0, 0, 0, 0,-1);
 
 //speciesUploadService.uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/abct/uploadready/abctrust_amphibians.xls", grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/abct/uploadready/abctrust_amphibians_mappingfile.xls", 0, 0, 0, 0);
 
@@ -65,7 +65,7 @@ speciesUploadService.uploadMappedSpreadsheet(grailsApplication.config.speciesPor
 //grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/chitra/indian_birds/uploadready/india_birds_cr1_images";
 //speciesUploadService.uploadNewSimpleSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/chitra/indian_birds/uploadready/india_birds_cr1.xls");
 
-//speciesUploadService.uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/zoooutreach/uploadready/aquaticplants.xls", grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/zoooutreach/uploadready/aquaticplants_mapping.xls", 0, 0, 0, 0);
+speciesUploadService.uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/zoooutreach/1.6/aquaticplants.xls", grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/zoooutreach/1.6/aquaticplants_mapping.xls", 0, 0, 0, 0);
 //speciesUploadService.uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/zoooutreach/uploadready/fish_dk.xls", grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/zoooutreach/uploadready/fish_mapping.xls", 0, 0, 0, 0);
 
 //grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+" /datarep/species/thomas/uploadready/images";
