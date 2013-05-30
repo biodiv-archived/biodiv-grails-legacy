@@ -90,7 +90,7 @@ class Checklist implements Rateable {
 		refText type:'text';
 		sourceText type:'text';
 		columnNames type:'text';
-		row lazy: false;
+		//row lazy: false;
 	}
 	
 	def fetchColumnNames(){
