@@ -13,14 +13,15 @@
 <g:set var="title" value="${(!observationInstance.fetchSpeciesCall()?.equalsIgnoreCase('Unknown'))?observationInstance.fetchSpeciesCall():'Help Identify'}"/>
 <%
 def r = observationInstance.mainImage();
-def imagePath = '';
+def imagePath = '', videoPath='';
 if(r) {
     def gThumbnail = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.gallery.suffix)?:null;
     if(r && gThumbnail) {
             if(r.type == ResourceType.IMAGE) {
                     imagePath = g.createLinkTo(base:grailsApplication.config.speciesPortal.observations.serverURL, file: gThumbnail)
             } else if(r.type == ResourceType.VIDEO){
-                    imagePath = r.thumbnailUrl()
+                imagePath = r.thumbnailUrl()
+                videoPath = r.getUrl();
             }
     }
 } else{
@@ -32,7 +33,7 @@ String desc = "- "+ location +" by "+observationInstance.author.name.capitalize(
 %>
 <g:set var="description" value="${Utils.stripHTML(observationInstance.notes?observationInstance.notes+' '+desc:desc)?:'' }" />
 
-<g:render template="/common/titleTemplate" model="['title':title, 'description':description, 'canonicalUrl':canonicalUrl, 'imagePath':imagePath]"/>
+<g:render template="/common/titleTemplate" model="['title':title, 'description':description, 'canonicalUrl':canonicalUrl, 'imagePath':imagePath, 'videoPath':videoPath]"/>
 <title>${title} | ${params.controller.capitalize()} | ${Utils.getDomainName(request)}</title>
 
 <meta property="og:latitude" content="${observationInstance.latitude}"/>

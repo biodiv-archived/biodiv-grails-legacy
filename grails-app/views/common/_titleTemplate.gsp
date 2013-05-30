@@ -27,6 +27,9 @@ description = description?:"Welcome to the India Biodiversity Portal (IBP) - A r
 <meta property="og:title" content="${title}"/>
 <meta property="og:url" content="${canonicalUrl}" />
 <meta property="og:image" content="${imagePath}" />
+<g:if test="videoPath">
+<meta property="og:video" content="${videoPath}" />
+</g:if>
 <meta property="og:site_name" content="${siteName?:Utils.getDomainName(request)}" />
 <meta property="og:description" content="${description}"/>
 <meta property="fb:app_id" content="${fbAppId}" />
