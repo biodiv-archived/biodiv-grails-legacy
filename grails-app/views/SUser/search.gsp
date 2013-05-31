@@ -2,13 +2,9 @@
 <html>
 
 <head>
-<meta name='layout' content='main' />
-<title>${entityName} | ${Utils.getDomainName(request)}</title>
-
+<g:set var="title" value="User"/>
+<g:render template="/common/titleTemplate" model="['title':title]"/>
 <r:require modules="susers_list" />
-<g:set var="entityName"
-	value="${message(code: 'searchlabel', default: 'Search Results')}" />
-
 <style type="text/css">
 .snippet.tablet .figure img {
 	height: auto;

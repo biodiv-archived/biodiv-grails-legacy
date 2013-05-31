@@ -1,16 +1,13 @@
-
-<%@page import="org.springframework.security.acls.domain.BasePermission"%>
-
 <%@page import="org.springframework.security.acls.domain.BasePermission"%>
 <%@page import="species.utils.ImageType"%>
 <%@page import="species.utils.Utils"%>
 <%@ page import="species.groups.UserGroup"%>
 <html>
 <head>
-<meta name="layout" content="main" />
-<g:set var="entityName" value="${userGroupInstance.name}" />
-<title><g:message code="default.show.label"
-		args="[userGroupInstance.name]" /></title>
+<g:set var="title" value="AboutUs | ${userGroupInstance.name}"/>
+<g:render template="/common/titleTemplate" model="['title':title]"/>
+
+
 <r:require modules="userGroups_show" />
 </head>
 <body>

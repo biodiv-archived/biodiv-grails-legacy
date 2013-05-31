@@ -28,13 +28,10 @@ if(r) {
                     imagePath = r.thumbnailUrl()
             }
     }
-} else {
-    imagePath = Utils.getIBPServerDomain()+'/sites/all/themes/ibp/images/map-logo.gif';
 }
 %>
 
 <g:render template="/common/titleTemplate" model="['title':title, 'description':description, 'canonicalUrl':canonicalUrl, 'imagePath':imagePath]"/>
-<title>${title} | ${params.controller.capitalize()} | ${Utils.getDomainName(request)}</title>
 
 <r:require modules="species_show"/>
 

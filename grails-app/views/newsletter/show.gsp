@@ -3,14 +3,11 @@
 
 <html>
 <head>
-<link rel="canonical"
-	href="${Utils.getIBPServerDomain() + createLink(controller:'newsletter', action:'show', id:newsletterInstance.id)}" />
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="layout" content="main" />
-<g:set var="entityName"
-	value="${message(code: 'newsletter.label', default: 'Newsletter')}" />
-<title><g:message code="default.show.label" args="[entityName]" />
-</title>
+<g:set var="canonicalUrl" value="${uGroup.createLink([controller:'newsletter', action:'show', id:newsletterInstance.id, base:Utils.getIBPServerDomain()])}"/>
+<g:set var="title" value="${newsletterInstance.title}"/>
+<g:set var="description" value="${Utils.stripHTML(newsletterInstance.newsitem?:'')}" />
+<g:render template="/common/titleTemplate" model="['title':title, 'description':description, 'canonicalUrl':canonicalUrl]"/>
+
 <style>
 .newsletter_wrapper {
 	padding: 30px;

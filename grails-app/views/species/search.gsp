@@ -1,10 +1,9 @@
 <%@page import="species.utils.Utils"%>
 <html>
 <head>
-
-<meta name="layout" content="main" />
+<g:set var="title" value="Species"/>
+<g:render template="/common/titleTemplate" model="['title':title]"/>
 <r:require modules="species, species_list" />
-<title>Species | Search Results | ${Utils.getDomainName(request)}</title>
 </head>
 <body>
 	<div class="span12">

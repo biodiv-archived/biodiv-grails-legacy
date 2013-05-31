@@ -8,11 +8,12 @@
 <head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
     
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 
 <title><g:layoutTitle/></title>
+
 <r:layoutResources />
 <ckeditor:resources />
-
 <g:layoutHead />
 
 <g:set var="domain" value="${Utils.getDomain(request)}"/>

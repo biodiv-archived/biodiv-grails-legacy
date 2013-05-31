@@ -2,9 +2,8 @@
 <html>
 <head>
 <g:set var="canonicalUrl" value="${uGroup.createLink([controller:'SUser', action:'list', base:Utils.getIBPServerDomain()])}" />
-<g:set var="title" value="User List"/>
-<g:render template="/common/titleTemplate" model="['title':title, 'description':'', 'canonicalUrl':canonicalUrl, 'imagePath':'']"/>
-<title>${title} | ${Utils.getDomainName(request)}</title>
+<g:set var="title" value="Users"/>
+<g:render template="/common/titleTemplate" model="['title':title, 'canonicalUrl':canonicalUrl]"/>
 
 <r:require modules="susers_list"/>
 <g:set var="entityName"

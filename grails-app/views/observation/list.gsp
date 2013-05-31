@@ -2,16 +2,14 @@
 <%@page import="species.Resource.ResourceType"%>
 <html>
 <head>
-<g:set var="canonicalUrl" value="${uGroup.createLink([controller:'observation', action:'list', base:Utils.getIBPServerDomain()])}" />
-<g:set var="title" value="List"/>
-<g:render template="/common/titleTemplate" model="['title':title, 'description':'', 'canonicalUrl':canonicalUrl, 'imagePath':'']"/>
-<title>${title} | ${params.controller.capitalize()} | ${Utils.getDomainName(request)}</title>
+<g:set var="title" value="Observations"/>
+<g:render template="/common/titleTemplate" model="['title':title]"/>
 <r:require modules="observations_list" />
 </head>
 <body>
 
 	<div class="span12">
-		<obv:showSubmenuTemplate model="['entityName':'Observations']" />
+		<obv:showSubmenuTemplate model="['entityName':title]" />
 		<uGroup:rightSidebar/>
 		<obv:showObservationsListWrapper />
 	</div>

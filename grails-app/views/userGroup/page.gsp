@@ -1,19 +1,15 @@
-
-<%@page import="org.springframework.security.acls.domain.BasePermission"%>
-
 <%@page import="org.springframework.security.acls.domain.BasePermission"%>
 <%@page import="species.utils.ImageType"%>
 <%@page import="species.utils.Utils"%>
 <%@ page import="species.groups.UserGroup"%>
 <html>
 <head>
-<meta name="layout" content="main" />
 <g:set var="entityName"
 	value="${(userGroupInstance)?userGroupInstance.name:Utils.getDomainName(request)}" />
-<title><g:message code="default.show.label"
-		args="[(userGroupInstance)?userGroupInstance.name:Utils.getDomainName(request)]" />
-</title>
-<r:require modules="userGroups_show" />
+
+<g:set var="title" value="Pages | ${entityName} "/>
+<g:render template="/common/titleTemplate" model="['title':title]"/>
+
 </head>
 <body>
 

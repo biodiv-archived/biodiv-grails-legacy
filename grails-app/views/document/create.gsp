@@ -3,11 +3,8 @@
 <%@page import="species.utils.Utils"%>
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="layout" content="main" />
-<g:set var="entityName"
-	value="${message(code: 'document.label', default: 'Document')}" />
-<title>${entityName} | ${Utils.getDomainName(request)}</title>
+<g:set var="title" value="Documents"/>
+<g:render template="/common/titleTemplate" model="['title':title]"/>
 
 <r:require modules="add_file" />
 <uploader:head />

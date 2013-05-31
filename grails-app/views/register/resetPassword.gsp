@@ -1,9 +1,8 @@
 <html>
 
 <head>
-<title><g:message code='spring.security.ui.resetPassword.title' />
-</title>
-<meta name='layout' content='main' />
+<g:set var="title" value="Reset Password"/>
+<g:render template="/common/titleTemplate" model="['title':title]"/>
 <r:require modules="auth" />
 </head>
 

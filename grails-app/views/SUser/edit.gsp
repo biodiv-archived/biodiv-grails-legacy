@@ -10,14 +10,9 @@
 </sec:ifNotSwitched>
 
 <head>
-<meta name='layout' content='main' />
+<g:set var="title" value="User"/>
+<g:render template="/common/titleTemplate" model="['title':title]"/>
 <r:require modules="observations_show" />
-
-<g:set var="entityName"
-	value="${message(code: 'user.label', default: 'User')}" />
-<title><g:message code="default.edit.label" args="[entityName]" />
-</title>
-
 <style>
 .form-horizontal .control-label {
 	width: 90px;

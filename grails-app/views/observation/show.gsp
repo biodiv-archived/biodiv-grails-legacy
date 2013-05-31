@@ -24,8 +24,6 @@ if(r) {
                 videoPath = r.getUrl();
             }
     }
-} else{
-    imagePath = Utils.getIBPServerDomain()+'/sites/all/themes/ibp/images/map-logo.gif';
 }
 	
 String location = "Observed at '" + (observationInstance.placeName.trim()?:observationInstance.reverseGeocodedName) +"'"
@@ -34,10 +32,6 @@ String desc = "- "+ location +" by "+observationInstance.author.name.capitalize(
 <g:set var="description" value="${Utils.stripHTML(observationInstance.notes?observationInstance.notes+' '+desc:desc)?:'' }" />
 
 <g:render template="/common/titleTemplate" model="['title':title, 'description':description, 'canonicalUrl':canonicalUrl, 'imagePath':imagePath, 'videoPath':videoPath]"/>
-<title>${title} | ${params.controller.capitalize()} | ${Utils.getDomainName(request)}</title>
-
-<meta property="og:latitude" content="${observationInstance.latitude}"/>
-<meta property="og:longitude" content="${observationInstance.longitude }"/>
 
 <r:require modules="observations_show"/>
 
