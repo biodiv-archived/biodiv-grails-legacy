@@ -5,7 +5,7 @@
 <%@ page import="species.groups.UserGroup"%>
 <html>
 <head>
-<g:set var="title" value="Settings | ${userGroupInstance.name}"/>
+<g:set var="title" value="Settings"/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
 
 <r:require modules="userGroups_show" />

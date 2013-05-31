@@ -13,7 +13,7 @@
 	<div class="span12">
 		<div class="page-header clearfix">
 			<h1>
-				<g:message code="default.observation.heading" args="[entityName]" />
+				<g:message code="default.observation.heading" args="[title]" />
 			</h1>
 		</div>
 

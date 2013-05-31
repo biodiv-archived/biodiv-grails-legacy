@@ -7,7 +7,7 @@
 <g:set var="entityName"
 	value="${(userGroupInstance)?userGroupInstance.name:Utils.getDomainName(request)}" />
 
-<g:set var="title" value="Pages | ${entityName} "/>
+<g:set var="title" value="Pages"/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
 
 </head>

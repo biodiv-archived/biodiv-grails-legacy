@@ -26,7 +26,7 @@ if(description != null && description.length() > 300) {
 %>
 
 <meta name="layout" content="main" />
-<title>${title}<g:if test="${params.webaddress}"> | ${userGroupInstance.name} </g:if><g:if test="${params.action.equals('show')}"> | ${params.controller.capitalize()} </g:if> | ${Utils.getDomainName(request)}</title>
+<title>${title}<g:if test="${params.webaddress}"> | ${userGroupInstance.name} </g:if><g:if test="${params.action.equals('show')}"> | ${params.controller.capitalize()} </g:if> | India Biodiversity Portal</title>
 <g:if test="${canonicalUrl}">
 <link rel="canonical" href="${canonicalUrl}" />
 <meta property="og:url" content="${canonicalUrl}" />

@@ -5,7 +5,7 @@
 <html>
 <head>
 
-<g:set var="title" value="Observations | ${userGroupInstance.name}"/>
+<g:set var="title" value="Observations"/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
 
 <r:require modules="userGroups_show, observations_list" />
