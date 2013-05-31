@@ -331,13 +331,13 @@ class XMLConverter extends SourceConverter {
                         s.removeFromFields(sField);
                         sField.delete();
 
-                    } else if(sField.description.contains(dt)){
+                    } else*/ if(sField.description.contains(dt)){
                         log.debug "Field already contains given text"
-                    } *///else {
+                    } else {
                         log.debug "Merging description from existing ${sField}. Removing all metadata associate with previous field."
                         data = sField.description + "<br/>" + data
                         speciesField = sField
-                    //}
+                    }
                     }
                 } else {
                     for(sField in temp) {
@@ -1022,7 +1022,8 @@ println rate+"++++++++++++++"
         List<Reference> references = new ArrayList<Reference>();
 
         NodeList refs = dataNode.reference;
-        if(!refs) {
+        if(refs) {
+            println "Adding references from dataNode : ${refs}"
             refs.each {
                 String title = cleanData(it?.title?.text().trim(), taxon, synonyms);
                 String url = it?.url?.text().trim();
@@ -1031,6 +1032,8 @@ println rate+"++++++++++++++"
                     references.add(ref);
                 }
             }
+
+            log.debug "Got ${references.size()} references for ${taxon.name}"
             println "@@@@ ${taxon.name}"
             println references
         }
