@@ -1,8 +1,8 @@
 
-<g:if test="${speciesFieldInstance?.field.description}">
-	<div class="helpContent span11"  style="display:none;">
+<g:if test="${field}">
+	<div class="helpContent span7"  style="display:none;">
 		<div>
-		${speciesFieldInstance?.field.description.encodeAsHTML()}
+		${field.description.encodeAsHTML()}
 		</div>
 	</div>
 </g:if>

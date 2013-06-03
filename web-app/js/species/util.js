@@ -64,10 +64,27 @@ function updateRelativeTime(){
 }
 
 function feedPostProcess(){
+	$(".ellipsis.multiline").trunk8({
+		lines:2,
+                tooltip:false,
+                fill: '&hellip; <a id="read-more" href="#">more</a>'
+	});
+        $('#read-more').live('click', function (event) {
+              $(this).parent().trunk8('revert').append(' <a id="read-less" href="#">read less</a>');
+                
+                return false;
+        });
+
+        $('#read-less').live('click', function (event) {
+              $(this).parent().trunk8();
+                
+                return false;
+        });
+	
 	$('.linktext').linkify();  
 	$('.yj-message-body').linkify();
 	updateRelativeTime();
-	
+        rating();
 	$(".youtube_container").each(function(){
 		loadYoutube(this);
 	});
@@ -98,3 +115,24 @@ function feedPostProcess(){
 //			} 
 //		}); 
 //}
+
+function initLoader() {
+    var script = document.createElement("script");
+    script.src = "https://www.google.com/jsapi?callback=loadMaps";
+    script.type = "text/javascript";
+    document.getElementsByTagName("head")[0].appendChild(script);
+}
+
+function loadGoogleMapsAPI(callback) {
+    //if (typeof google === 'object' && typeof google.maps === 'object') {
+    //    console.log("google maps already loaded")
+    //} else {
+        console.log("loading google maps")
+        google.load("maps", "3.12", {'callback':function() {
+            google.maps.visualRefresh = true;
+            callback();
+        }, other_params: "sensor=true"});
+    //}
+}
+
+

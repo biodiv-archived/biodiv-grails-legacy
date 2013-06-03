@@ -3,13 +3,14 @@
 <%@page import="species.utils.ImageType"%>
 <div>
 	<div class="btn-group">
-		<a id="flag-action" class="btn btn-mini" data-toggle="dropdown"
+		<button id="flag-action" class="btn btn-link" data-toggle="dropdown"
+                        title="Report an inappropriate or erroneous contribution"
 			href="#"> <g:if test="${observationInstance.flagCount>0}">
 				<i class="icon-flag icon-red"></i>
 			</g:if> <g:else>
 				<i class="icon-flag"></i>
 			</g:else> Flag
-		</a>
+		</button>
 
 
 		<div id="flag-options" class="popup-form" style="display: none">

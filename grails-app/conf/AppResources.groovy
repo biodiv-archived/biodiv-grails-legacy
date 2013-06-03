@@ -33,20 +33,22 @@ modules = {
 //		resource url:[dir:'css',file:'jquery.safari-checkbox.css',plugin:'spring-security-ui']
 //		resource url:'/css/text.css'
 		resource url:'/css/navigation.css'
-		resource url:'/css/jquery.rating.css'
-		resource url:'/css/wgp.css'
+//		resource url:'/css/jquery.rating.css'
 		resource url:'/css/daterangepicker.css'
 		resource url:'/css/speciesGroups.css'
 		resource url:'/css/habitats.css'
 		resource url:'/css/tableSorter.css'
 		resource url:'/css/bootstrap-editable.css'
+		resource url:'/css/wgp.css'
 
 		resource url:'/bootstrap/js/bootstrap.min.js'
 		resource url:'/js/species/main.js'
 		resource url:'/js/species/util.js'
 		resource url:'/js/readmore/readmore.js'
 		resource url:'/js/jquery/jquery.form.js'
-		resource url:'/js/jquery/jquery.rating.js'
+//		resource url:'/js/jquery/jquery.rating.js'
+		resource url:'/js/jquery/jquery.raty.js'
+		resource url:'/js/species/rating.js'
 		resource url:'/js/jquery/jquery.cookie.js'
 		//resource url:'/js/jquery/jquery.checkbox.js'
 		resource url:'/js/jquery/jquery.ellipses.js'
@@ -72,7 +74,7 @@ modules = {
 	}
 
 	gallery {
-		resource url:[dir:'js/galleria/1.2.7/themes/classic/',file:'galleria.classic.css']
+//		resource url:[dir:'js/galleria/1.2.7/themes/classic/',file:'galleria.classic.css']
 		resource url:'/js/galleria/1.2.7/galleria-1.2.7.min.js'
 	}
 
@@ -152,9 +154,11 @@ modules = {
 		resource url:'/css/augmented-maps.css'
 		resource url:[dir:'js/jquery/jquery.jqGrid-4.1.2/css',file:'ui.jqgrid.css']
 		resource url:'/css/bootstrap-wysihtml5-0.0.2.css'
+		resource url:'/css/jquery.tocify.css'
 		
 		resource url:'/js/jquery/jquery.jqGrid-4.1.2/js/i18n/grid.locale-en.js'
 		resource url:'/js/jquery/jquery.jqGrid-4.1.2/js/jquery.jqGrid.src.js'
+		resource url:'/js/jquery/jquery.tocify.min.js'
 		resource url:'/js/galleria/1.2.7/plugins/flickr/galleria.flickr.min.js'
 		//resource url:'/js/jquery.collapser/jquery.collapser.min.js'
 		resource url:'/js/jquery/jquery.jqDock-1.8/jquery.jqDock.min.js'
@@ -226,4 +230,29 @@ modules = {
 		
 		resource url:'/js/chart.js'
 	}
+
+	add_file {
+		dependsOn 'core, tagit, list_utils'
+		
+		resource url:'/css/main.css'
+		resource url:'/css/content.css'
+		resource url:'/js/content.js'
+		resource url:'/css/location_picker.css'
+		resource url:'/js/location/location-picker.js'
+	}
+	
+	
+	content_view {
+		dependsOn 'core,  tagit'
+		resource url:'/css/main.css'
+		
+		resource url:'/css/content.css'
+		resource url:'/js/content.js'
+		
+	}
+
+    prettyPhoto {
+        resource url:'/css/prettyPhoto.css'
+		resource url:'/js/jquery/jquery.prettyPhoto.js'
+    }
 }

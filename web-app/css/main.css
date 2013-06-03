@@ -1,7 +1,7 @@
 
 #species_main_wrapper .readmore {
 	float: none;
-	margin: 0px;
+        border:0px;
 }
 
 #species_main_wrapper a.readmore {
@@ -9,16 +9,6 @@
 	font-weight: bold;
 }
 
-
-input,select,textarea {
-        /*	border: 1px solid #ccc; */
-	/* 	font: 12px Arial, Helvetica, sans-serif; */
-	/* padding: 5px; */
-}
-
-select {
-	padding: 2px 2px 2px 0;
-}
 
 textarea {
 	width: 250px;
@@ -126,7 +116,7 @@ th.name {
 	padding-left: 10px;
 }
 
-.prop .name {
+/*.prop .name {
 	float: left;
 	text-align: left;
 	width: 10em;
@@ -138,16 +128,16 @@ th.name {
 	width: auto;
 	padding-right: 3px;
 }
-
+*/
 #advSearchForm .prop .name {
 	float: right;
 	text-align: right;
 }
-
+/*
 .prop .value {
 	text-align: left;
 }
-
+*/
 
 .figure {
 	font-size: 80%;
@@ -180,13 +170,6 @@ th.name {
 	height: 50px;
 	border-radius: 5px;
 	box-shadow: 1px 1px 1px #999999;
-}
-
-.license .icon {
-	width: 80px !important;
-	height: 15px !important;
-	padding: 5px;
-	float: right;
 }
 
 .thumbwrap .icons .icon {
@@ -557,10 +540,6 @@ html.busy,html.busy * {
 /* 	opacity: 0.9 !important; */
 /* } */
 
-.fb_edge_widget_with_comment {
-	padding: 10px !important;
-}
-
 .big_title {
 	padding: 30px 15px 30px 25px;
 	vertical-align: top;
@@ -701,14 +680,6 @@ ul.thumbwrap li a {
 	display: block;
 }
 
-.taxonomyBrowser {
-	background-color: #D4EDC9;
-	border-radius: 5px;
-}
-
-#taxaHierarchy {
-	margin: 10px;
-}
 
 #taxonHierarchy td {
 	height: 30px;
@@ -742,10 +713,6 @@ td input.text:focus {
 
 .ui-icon-control:hover {
 	opacity: 0.9;
-}
-
-#gbox_taxonHierarchy {
-	margin-top: 10px;
 }
 
 .taxaHierarchy {
@@ -839,13 +806,8 @@ ul.thumbwrap li.poor_species_content div.poor_species_content {
 	z-index: 4 !important;
 }
 
-.super-section {
-	background-color: #ebebeb;
-	border-radius: 5px;
-	margin-bottom: 10px;
-}
 
-.section {
+/*.section {
 	margin-bottom: 10px;
 	padding-bottom: 20px;
 	padding-top: 20px;
@@ -871,7 +833,7 @@ ul.thumbwrap li.poor_species_content div.poor_species_content {
 .section .ui-widget-content {
 	margin: 0;
 }
-
+*/
 .bold_section label {
 	width: 300px;
 }

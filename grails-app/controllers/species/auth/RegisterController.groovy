@@ -1,3 +1,5 @@
+package species.auth;
+
 import grails.util.Environment;
 
 import org.codehaus.groovy.grails.plugins.springsecurity.NullSaltSource;
@@ -216,47 +218,50 @@ class RegisterController extends grails.plugins.springsecurity.ui.RegisterContro
 		
 		[emailSent: true]
 	}
-	
-	def resetPassword = { ResetPasswordCommand command ->
-		log.debug params
-		String token = params.t
 
-		def registrationCode = token ? RegistrationCode.findByToken(token) : null
-		if (!registrationCode) {
-			flash.error = message(code: 'spring.security.ui.resetPassword.badCode')
-			redirect uri: SpringSecurityUtils.securityConfig.successHandler.defaultTargetUrl
-			return
-		}
+    def resetPassword = { ResetPasswordCommand2 command ->
+        log.debug params
+        String token = params.t
 
-		if (!request.post) {
-			return [token: token, command: new ResetPasswordCommand()]
-		}
+        def registrationCode = token ? RegistrationCode.findByToken(token) : null
+        if (!registrationCode) {
+            flash.error = message(code: 'spring.security.ui.resetPassword.badCode')
+            redirect uri: SpringSecurityUtils.securityConfig.successHandler.defaultTargetUrl
+            return
+        }
 
-		String usernamePropertyName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
-		def command2 = new ResetPasswordCommand(username:registrationCode.username, password:command.password, password2:command.password2);
-		command2.validate()
+        if (!request.post) {
+            return [token: token, command: new ResetPasswordCommand2()]
+        }
 
-		if (command2.hasErrors()) {
-			return [token: token, command: command]
-		}
+        String usernamePropertyName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
+        def command2 = new ResetPasswordCommand2(username:registrationCode.username, password:command.password, password2:command.password2);
+        command2.validate()
 
-		String salt = saltSource instanceof NullSaltSource ? null : registrationCode.username
-		RegistrationCode.withTransaction { status ->
-			def user = lookupUserClass().findWhere((usernamePropertyName): registrationCode.username)
-			user.password = springSecurityUiService.encodePassword(command.password, salt)
-			user.accountLocked = false;
-			user.save()
-			registrationCode.delete()
-		}
+        if (command2.hasErrors()) {
+            command2.errors.allErrors.each {
+                log.error it
+            }
+            return [token: token, command: command]
+        }
+        String salt = saltSource instanceof NullSaltSource ? null : registrationCode.username
+        RegistrationCode.withTransaction { status ->
+            def user = lookupUserClass().findWhere((usernamePropertyName): registrationCode.username)
+            user.password = springSecurityUiService.encodePassword(command.password, salt)
+            user.accountLocked = false;
+            user.save()
+            registrationCode.delete()
+            SUserService.assignRoles(user);
+        }
 
-		springSecurityService.reauthenticate registrationCode.username
+        springSecurityService.reauthenticate registrationCode.username
 
-		flash.message = message(code: 'spring.security.ui.resetPassword.success')
+        flash.message = message(code: 'spring.security.ui.resetPassword.success')
 
-		def conf = SpringSecurityUtils.securityConfig
-		String postResetUrl = conf.ui.register.postResetUrl ?: conf.successHandler.defaultTargetUrl
-		redirect uri: postResetUrl
-	}
+        def conf = SpringSecurityUtils.securityConfig
+        String postResetUrl = conf.ui.register.postResetUrl ?: conf.successHandler.defaultTargetUrl
+        redirect uri: postResetUrl
+    }
 
 	protected String generateLink(String controller, String action, linkParams, request) {
 		uGroup.createLink(base: Utils.getDomainServerUrl(request),
@@ -403,14 +408,14 @@ class CustomRegisterCommand {
 }
 
 
-class ResetPasswordCommand {
-	String username
-	String password
-	String password2
+class ResetPasswordCommand2 {
+    String username
+    String password
+    String password2
 
-	static constraints = {
-		username nullable: false, email: true
-		password blank: false, nullable: false, validator: grails.plugins.springsecurity.ui.RegisterController.passwordValidator
-		password2 validator: RegisterController.password2Validator
-	}
+    static constraints = {
+        username nullable: false, email: true
+        password blank: false, nullable: false, validator: grails.plugins.springsecurity.ui.RegisterController.passwordValidator
+        password2 validator: RegisterController.password2Validator
+    }
 }

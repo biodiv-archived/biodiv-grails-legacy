@@ -1,4 +1,4 @@
-
+<%@page import="species.utils.Utils"%>
 <%@ page import="species.participation.Observation"%>
 <%@ page import="species.groups.SpeciesGroup"%>
 <%@ page import="species.Habitat"%>
@@ -6,26 +6,14 @@
 <%@ page import="species.Species"%>
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="layout" content="main" />
+<g:set var="title" value="Observations"/>
+<g:render template="/common/titleTemplate" model="['title':title]"/>
 <r:require modules="observations_list" />
-<g:set var="entityName"
-	value="${message(code: 'observation.label', default: 'Related Observations')}" />
-<title><g:message code="default.list.label" args="[entityName]" />
-</title>
-
 <style>
 .observations_list {
 	top: 0;
 }
 </style>
-<g:javascript>
-	$(document).ready(function() {
-
-		window.params.tagsLink = "${uGroup.createLink(controller:'observation', action: 'tags')}"
-	});
-</g:javascript>
-
 </head>
 <body>
 	<div class="span12">
@@ -67,6 +55,13 @@
 			</div>
 		</div>
 	</div>
+<g:javascript>
+	$(document).ready(function() {
+
+		window.params.tagsLink = "${uGroup.createLink(controller:'observation', action: 'tags')}"
+	});
+</g:javascript>
+
 
 	<r:script>
 	$(document).ready(function() {

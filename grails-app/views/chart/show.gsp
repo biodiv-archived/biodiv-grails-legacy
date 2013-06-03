@@ -3,13 +3,8 @@
 <%@page import="species.utils.Utils"%>
 <html>
 <head>
-<%--<link rel="canonical" href="${Utils.getIBPServerDomain() + createLink(controller:'activityFeed', action:'list')}" />--%>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="layout" content="main" />
-<g:set var="entityName"
-	value="${message(code: 'charts.label', default: 'Statistics')}" />
-<title><g:message code="default.list.label" args="[entityName]" />
-</title>
+<g:set var="title" value="Statistics"/>
+<g:render template="/common/titleTemplate" model="['title':title]"/>
 <r:require modules="chart" />
 <gvisualization:apiImport />
 </head>
@@ -18,7 +13,7 @@
 	<div class="span12">
 		<div class="page-header clearfix">
 			<h1>
-				<g:message code="default.observation.heading" args="[entityName]" />
+				<g:message code="default.observation.heading" args="[title]" />
 			</h1>
 		</div>
 
@@ -31,7 +26,7 @@
 		
 		<chart:showActivityStats model="['title':'Activity Monitor', columns:activityData.columns, data:activityData.data]"/>
 		
-		<chart:showStats model="['title':'User Stats (Last 7 days) ', columns:userData.columns, data:userData.data, hAxisTitle:'User', htmlData:userData.htmlData, htmlColumns:userData.htmlColumns]"/>
+		<chart:showStats model="['title':'User Stats : ' + userData.obvCount + ' Observations and top 10 Contributors of last 7 days', columns:userData.columns, data:userData.data, hAxisTitle:'User', htmlData:userData.htmlData, htmlColumns:userData.htmlColumns]"/>
 		
 		<chart:showStats model="['title':'Observations', columns:obvData.columns, data:obvData.data, htmlData:obvData.htmlData, htmlColumns:obvData.htmlColumns]"/>
 		

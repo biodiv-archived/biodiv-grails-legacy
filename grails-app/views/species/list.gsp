@@ -6,18 +6,22 @@
 <%@page import="species.utils.Utils"%>
 <html>
 <head>
-<link rel="canonical" href="${Utils.getIBPServerDomain() + createLink(controller:'species', action:'list')}" />
-<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-<meta name="layout" content="main" />
+<g:set var="canonicalUrl" value="${uGroup.createLink([controller:'species', action:'list', base:Utils.getIBPServerDomain()])}" />
+<g:set var="title" value="Species"/>
+<g:render template="/common/titleTemplate" model="['title':title, 'description':'', 'canonicalUrl':canonicalUrl, 'imagePath':'']"/>
 
-
+<r:require modules="species"/>
 <r:require modules="species_list" />
 
-<g:set var="entityName"
-	value="${message(code: 'species.label', default: 'Species')}" />
-<title>Species List</title>
 </head>
 <body>
+<style  type="text/css">
+.thumbnails>.thumbnail {
+	margin: 0 10px 10px 0px;
+        width:inherit;
+        }
+</style>
+
 	<div class="span12">
 		<s:showSubmenuTemplate model="['entityName':'Species']" />
 		<uGroup:rightSidebar/>
@@ -37,7 +41,7 @@
 						</div>
 				</div>
 				<div id="contribute" class="tab-pane">
-					<g:include controller="species" action="contribute" />
+                                    <g:render template="contributeTemplate"/>
 				</div>
 			</div>
 		</div>

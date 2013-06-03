@@ -23,7 +23,6 @@ import species.groups.SpeciesGroup;
 import species.participation.ActivityFeed;
 import species.participation.Follow;
 import species.participation.Observation;
-import species.participation.ObservationMetaData
 import species.participation.Recommendation;
 import species.participation.RecommendationVote;
 import species.participation.ObservationFlag.FlagType
@@ -93,8 +92,8 @@ class ObservationService {
 		observation.group = SpeciesGroup.get(params.group_id);
 		observation.notes = params.notes;
 		observation.observedOn = parseDate(params.observedOn);
-		observation.placeName = params.place_name;
 		observation.reverseGeocodedName = params.reverse_geocoded_name;
+		observation.placeName = params.place_name?:observation.reverseGeocodedName;
 		observation.location = 'POINT(' + params.longitude + ' ' + params.latitude + ')'
 		observation.latitude = params.latitude.toFloat();
 		observation.longitude = params.longitude.toFloat();
@@ -107,13 +106,10 @@ class ObservationService {
 		def resourcesXML = createResourcesXML(params);
 		def resources = saveResources(observation, resourcesXML);
 		
-		observation.resource = new HashSet()//[]//?.clear();
+		observation.resource?.clear();
 		resources.each { resource ->
 			observation.addToResource(resource);
 		}
-		observation.hasMedia = !observation.resource.isEmpty()
-		observation.sourceType = params.sourceType?:null
-		observation.sourceId = params.sourceId? params.sourceId.toLong() :null
 	}
 
 	/**
@@ -343,14 +339,10 @@ class ObservationService {
 			item.imageTitle = param['title']
 			def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 			Resource image = param['observation'].mainImage()
-			if(image){
 			if(image.type == ResourceType.IMAGE) {
-				item.imageLink = iconBasePath +  image.thumbnailUrl()
+				item.imageLink = image.thumbnailUrl(iconBasePath)
 			} else if(image.type == ResourceType.VIDEO) {
 				item.imageLink = image.thumbnailUrl()
-			}
-			}else{
-				item.imageLink = config.speciesPortal.resources.serverURL + "/no-image.jpg" 
 			}			
 			if(param.inGroup) {
 				item.inGroup = param.inGroup;
@@ -442,6 +434,7 @@ class ObservationService {
 		List licenses = [];
 		List type = [];
 		List url = []
+        List ratings = [];
 		params.each { key, val ->
 			int index = -1;
 			if(key.startsWith('file_')) {
@@ -454,6 +447,7 @@ class ObservationService {
 				licenses.add(params.get('license_'+index));
 				type.add(params.get('type_'+index));
 				url.add(params.get('url_'+index));
+				ratings.add(params.get('rating_'+index));
 			}
 		}
 		files.eachWithIndex { file, key ->
@@ -471,9 +465,11 @@ class ObservationService {
 				new Node(image, "caption", titles.getAt(key));
 				new Node(image, "contributor", params.author.username);
 				new Node(image, "license", licenses.getAt(key));
+				new Node(image, "rating", ratings.getAt(key));
+				new Node(image, "user", springSecurityService.currentUser?.id);
 			} else {
 				log.warn("No reference key for image : "+key);
-			}
+			} 
 		}
 
 		return resources;
@@ -740,7 +736,7 @@ class ObservationService {
 		}
 	}
 	
-	Map getIdentificationEmailInfo(m, requestObj, unsubscribeUrl){
+	Map getIdentificationEmailInfo(m, requestObj, unsubscribeUrl, controller="", action=""){
 		def source = m.source;
 		
 		def mailSubject = ""
@@ -770,6 +766,9 @@ class ObservationService {
 				mailSubject = "Invitation to join group"
 				activitySource = "user group"
 				break
+            case controller+action.capitalize():
+                mailSubject = "Share "+controller
+                activitySource = controller
 			default:
 				log.debug "invalid source type"
 		}
@@ -779,7 +778,7 @@ class ObservationService {
 		def staticMessage = conf.ui.askIdentification.staticMessage
 		if (staticMessage.contains('$')) {
 			staticMessage = evaluate(staticMessage, templateMap)
-		}
+		} 
 		
 		templateMap["activitySourceUrl"] = m.sourcePageUrl?: ""
 		templateMap["unsubscribeUrl"] = unsubscribeUrl ?: ""
@@ -933,7 +932,7 @@ class ObservationService {
 		paramsList.add('fl', params['fl']?:"id");
 		
 		//Facets
-		params["facet.field"] = params["facet.field"] ?: searchFieldsConfig.TAG;
+		/*params["facet.field"] = params["facet.field"] ?: searchFieldsConfig.TAG;
 		paramsList.add('facet.field', params["facet.field"]);
 		paramsList.add('facet', "true");
 		params["facet.limit"] = params["facet.limit"] ?: 50;
@@ -941,7 +940,8 @@ class ObservationService {
 		params["facet.offset"] = params["facet.offset"] ?: 0;
 		paramsList.add('facet.offset', params["facet.offset"]);
 		paramsList.add('facet.mincount', "1");
-		
+		*/
+
 		//Filters
 		if(params.sGroup) {
 			params.sGroup = params.sGroup.toLong()
@@ -1018,7 +1018,7 @@ class ObservationService {
 		def totalObservationIdList = [];
 		def facetResults = [:], responseHeader
 		long noOfResults = 0;
-		if(paramsList.get('q')) {
+		if(paramsList) {
 			def queryResponse = observationsSearchService.search(paramsList);
 			
 			Iterator iter = queryResponse.getResults().listIterator();
@@ -1031,11 +1031,11 @@ class ObservationService {
 				}
 			}
 			
-			List facets = queryResponse.getFacetField(params["facet.field"]).getValues()
+			/*List facets = queryResponse.getFacetField(params["facet.field"]).getValues()
 			
 			facets.each {
 				facetResults.put(it.getName(),it.getCount());
-			}
+			}*/
 			
 			responseHeader = queryResponse?.responseHeader;
 			noOfResults = queryResponse.getResults().getNumFound()
@@ -1256,7 +1256,12 @@ class ObservationService {
 				toUsers.add(getOwner(obv))
 				templateMap['userProfileUrl'] = ObvUtilService.createHardLink('user', 'show', obv.author.id)
 				break;
-
+			
+			case activityFeedService.DOCUMENT_CREATED:
+				mailSubject = conf.ui.addDocument.emailSubject
+				bodyContent = conf.ui.addDocument.emailBody
+				toUsers.add(getOwner(obv))
+				break
 				
 			default:
 				log.debug "invalid notification type"
@@ -1275,7 +1280,7 @@ class ObservationService {
 					mailService.sendMail {
 						to toUser.email
 						if(index == 0) {
-							bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com", "thomas.vee@gmail.com"
+							bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com", "thomas.vee@gmail.com", "sandeept@strandls.com"
 							//bcc "sravanthi@strandls.com"
 						}
 						from conf.ui.notification.emailFrom
@@ -1305,6 +1310,7 @@ class ObservationService {
 	}
 
 	public String generateLink( String controller, String action, linkParams, request) {
+		request = (request) ?:(WebUtils.retrieveGrailsWebRequest()?.getCurrentRequest())
 		userGroupService.userGroupBasedLink(base: Utils.getDomainServerUrl(request),
 				controller:controller, action: action,
 				params: linkParams)
@@ -1340,10 +1346,5 @@ class ObservationService {
 			return observation.name
 		} else
 			return null
-	}
-	
-	def addMetaData(params, Observation obv){
-		def omd = new ObservationMetaData(params)
-		obv.addToMetaData(omd);
 	}
 }

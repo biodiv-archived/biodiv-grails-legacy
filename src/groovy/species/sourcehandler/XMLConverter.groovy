@@ -331,7 +331,7 @@ class XMLConverter extends SourceConverter {
                         s.removeFromFields(sField);
                         sField.delete();
 
-                    } else */if(sField.description.contains(dt)){
+                    } else*/ if(sField.description.contains(dt)){
                         log.debug "Field already contains given text"
                     } else {
                         log.debug "Merging description from existing ${sField}. Removing all metadata associate with previous field."
@@ -374,7 +374,7 @@ class XMLConverter extends SourceConverter {
                 audienceTypes.each { speciesField.addToAudienceTypes(it); }
                 attributors.each {  speciesField.addToAttributors(it); }
                 resources.each {  speciesField.addToResources(it); }
-                references.each {  speciesField.addToReferences(it); }
+                references.each { println it; speciesField.addToReferences(it); }
                 speciesFields.add(speciesField);
                 println "----${speciesField.field.category}......${speciesField.contributors}"
             } else {
@@ -408,7 +408,7 @@ class XMLConverter extends SourceConverter {
         * Resetting contributor back to the fields contributors.
         * TODO: need to remove
         **/
-        i/*for(c1 in sField.contributors) {
+        /*for(c1 in sField.contributors) {
             if((c1.name.equals("dummy")||c1.name.equals("pearlsravanthi"))) {
                 println 'is dummy node'
                 println sField.description
@@ -697,12 +697,14 @@ class XMLConverter extends SourceConverter {
     private Resource createImage(Node imageNode, String relImagesFolder, resourceType) {
         File tempFile = getImageFile(imageNode);
         def sourceUrl = imageNode.source?.text() ? imageNode.source?.text() : "";
-
+        def rate = imageNode.rating?.text() ? imageNode.rating?.text() : "";
+        println imageNode
+println rate+"++++++++++++++"
         log.debug "Creating image resource : "+tempFile;
 
         if(tempFile && tempFile.exists()) {
             //copying file
-            relImagesFolder = Utils.cleanFileName(relImagesFolder.trim());
+            relImagesFolder = relImagesFolder.trim();
 
             File root = new File(resourcesRootDir , relImagesFolder);
             if(!root.exists() && !root.mkdirs()) {
@@ -728,6 +730,7 @@ class XMLConverter extends SourceConverter {
                 log.debug "Creating new resource"
                 res = new Resource(type : resourceType, fileName:path, description:imageNode.caption?.text(), mimeType:imageNode.mimeType?.text());
                 res.url = sourceUrl
+                if(rate) res.rating = Integer.parseInt(rate);
                 for(Contributor con : getContributors(imageNode, true)) {
                     res.addToContributors(con);
                 }
@@ -740,6 +743,7 @@ class XMLConverter extends SourceConverter {
             } else {
                 log.debug "Updating resource metadata"
                 res.url = sourceUrl
+                if(rate) res.rating = Integer.parseInt(rate);
                 res.description = imageNode.caption?.text();
                 res.licenses?.clear()
                 res.contributors?.clear()
@@ -837,6 +841,7 @@ class XMLConverter extends SourceConverter {
     private Resource createVideo(Node videoNode) {
         log.debug "Creating video from data $videoNode"
         def sourceUrl = videoNode.source?.text() ? videoNode.source?.text() : "";
+        def rate = videoNode.rating?.text() ? videoNode.rating?.text() : "";
 
         if(!sourceUrl) return;
 
@@ -846,6 +851,8 @@ class XMLConverter extends SourceConverter {
             def attributors = getAttributions(videoNode, true);
             res = new Resource(type : ResourceType.VIDEO, fileName:videoNode.get("fileName")?.text(), description:videoNode.get("caption"), license:getLicenses(videoNode, true), contributor:getContributors(videoNode, true));
             res.url = sourceUrl;
+            if(rate) res.rating = Integer.parseInt(rate);
+
             for(Contributor con : getContributors(videoNode, true)) {
                 res.addToContributors(con);
             }
@@ -858,6 +865,7 @@ class XMLConverter extends SourceConverter {
         } else {
             res.fileName = videoNode.get("fileName")?.text(); 
             res.url = sourceUrl
+            if(rate) res.rating = Integer.parseInt(rate);
             res.description = videoNode.caption?.text();
             res.licenses?.clear()
             res.contributors?.clear()
@@ -1014,15 +1022,21 @@ class XMLConverter extends SourceConverter {
         List<Reference> references = new ArrayList<Reference>();
 
         NodeList refs = dataNode.reference;
-        refs.each {
-            String title = cleanData(it?.title?.text().trim(), taxon, synonyms);
-            String url = it?.url?.text().trim();
-            if(title || url) {
-                def ref = new Reference(title:title, url:url);
-                references.add(ref);
+        if(refs) {
+            println "Adding references from dataNode : ${refs}"
+            refs.each {
+                String title = cleanData(it?.title?.text().trim(), taxon, synonyms);
+                String url = it?.url?.text().trim();
+                if(title || url) {
+                    def ref = new Reference(title:title, url:url);
+                    references.add(ref);
+                }
             }
-        }
 
+            log.debug "Got ${references.size()} references for ${taxon.name}"
+            println "@@@@ ${taxon.name}"
+            println references
+        }
         return references;
     }
 

@@ -1,14 +1,8 @@
 <%@page import="species.utils.Utils"%>
 <html>
 <head>
-<link rel="canonical" href="${Utils.getIBPServerDomain() + createLink(controller:'activityFeed', action:'list')}" />
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="layout" content="main" />
-<g:set var="entityName"
-	value="${message(code: 'feeds.label', default: 'Activity')}" />
-<title><g:message code="default.list.label" args="[entityName]" />
-</title>
-<%--<script src="http://maps.google.com/maps/api/js?sensor=true"></script>--%>
+<g:set var="title" value="Activity"/>
+<g:render template="/common/titleTemplate" model="['title':title]"/>
 <r:require modules="activityfeed,comment"/>
 </head>
 <body>
@@ -16,7 +10,7 @@
 			<div class="span12">
 				<div class="page-header clearfix">
 						<h1>
-							<g:message code="default.observation.heading" args="[entityName]" />
+							<g:message code="default.observation.heading" args="[title]" />
 						</h1>
 				</div>
 

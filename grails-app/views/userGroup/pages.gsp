@@ -7,12 +7,11 @@
 <%@ page import="species.groups.UserGroup"%>
 <html>
 <head>
-<meta name="layout" content="main" />
 <g:set var="entityName"
 	value="${(userGroupInstance)?userGroupInstance.name:Utils.getDomainName(request)}" />
-<title><g:message code="default.show.label"
-		args="[(userGroupInstance)?userGroupInstance.name:Utils.getDomainName(request)]" />
-</title>
+
+<g:set var="title" value="Pages"/>
+<g:render template="/common/titleTemplate" model="['title':title]"/>
 <r:require modules="userGroups_show" />
 </head>
 <body>
@@ -29,7 +28,7 @@
 
 						<a style="margin-bottom: 10px;"
 							href="${uGroup.createLink(mapping:"userGroup", action:"pageCreate", 'userGroup':userGroupInstance)}"
-							class="btn  btn-info"> <i class="icon-plus"></i>Add
+							class="btn  btn-success"> <i class="icon-plus"></i>Add
 							a Page</a>
 					</sec:permitted>
 				</g:if>
@@ -37,31 +36,33 @@
 					<sUser:isAdmin>
 						<a style="margin-bottom: 10px;"
 							href="${uGroup.createLink(mapping:"userGroupGeneric", controller:'userGroup', action:"pageCreate") }"
-							class="btn btn-info"> <i class="icon-plus"></i>Add
+							class="btn btn-success"> <i class="icon-plus"></i>Add
 							a Page</a>
 					</sUser:isAdmin>
 				</g:else>
 			</div>
 			<div class="list" style="clear: both;">
-
 				<div id="contentMenu" class="tabbable tabs-right" style="">
-					<ul class="nav nav-tabs sidebar" id="pageTabs">
-						<g:if test="${userGroupInstance && userGroupInstance.name.equals('The Western Ghats')}">
-							<li><a href="/cepf_grantee_database">Western Ghats CEPF
-									Projects</a></li>
-						</g:if>
+
+            					<ul class="nav nav-tabs sidebar_section span4" id="pageTabs">
+                                                <li><h5>Pages</h5></li>
 						<g:each in="${newsletters}" var="newsletterInstance" status="i">
 							<li><a data-toggle="tab" class="pageTab" href="#${newsletterInstance.id}">
 									${fieldValue(bean: newsletterInstance, field: "title")} </a></li>
 						</g:each>
-					</ul>
+                                                <g:if test="${userGroupInstance && userGroupInstance.name.equals('The Western Ghats')}">
+							<li><a href="/project/list">Western Ghats CEPF
+									Projects</a></li>
+						</g:if>
+
+                                            </ul>
 					<div class="tab-content">
 						<g:each in="${newsletters}" var="newsletterInstance" status="i">
 							<div class="tab-pane active" id=${newsletterInstance.id}></div>
 						</g:each>
-					</div>
+                                            </div>
 				</div>
-
+                            </div>
 			</div>
 		</div>
 	</div>

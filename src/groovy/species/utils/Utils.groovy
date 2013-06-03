@@ -28,6 +28,7 @@ import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 import species.auth.SUser;
 import species.NamesParser;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang.WordUtils
 
@@ -35,7 +36,8 @@ class Utils {
 
 	private static final log = LogFactory.getLog(this);
 	private static final NamesParser namesParser = new NamesParser();
-
+	private static final Random FILE_NAME_GENEROTR = new Random();
+	
 	def grailsApplication;
 
 	static boolean copy(File src, File dst) throws IOException {
@@ -74,11 +76,45 @@ class Utils {
 		return name?.replaceAll(/<.*?>/, '').replaceAll("\u00A0|\u2007|\u202F", " ").replaceAll("\\n","").replaceAll("\\s+", " ").replaceAll("\\*", "").trim();
 	}
 
-	static String cleanFileName(String name) {
-		name = name?.replaceAll("\u00A0|\u2007|\u202F", " ").replaceAll("\\s+", "_").trim();
-		return name;
+	static String generateSafeFileName(String name) {
+		//returning random integer (between 1-1000) as file name along with original extension
+		return "" + (FILE_NAME_GENEROTR.nextInt(1000-1+1)+1) + getCleanFileExtension(name) 
 	}
 
+	static String cleanFileName(String name){
+		name = name?.replaceAll("\u00A0|\u2007|\u202F", " ").replaceAll("\\s+", "_").trim();
+		//if name starting with .
+		if(name.startsWith(".")){
+			name = name.replaceFirst(".", "_")
+		}
+		
+		int beginIndex = name.lastIndexOf(".")
+		name =  (beginIndex > -1) ? name.substring(0, beginIndex) + getCleanFileExtension(name) : name
+		return name;
+	}
+	  
+	/**
+	 * @param fileName
+	 * @return after validation either return empty string or an extension starting with . and not more than 4 chars. 
+	 * if more than 4 chars then return a string starting with _
+	 */
+	
+	private static getCleanFileExtension(String fileName){
+		String extension = ""
+		fileName = fileName?.trim()
+		if(!fileName || fileName == "")
+			return extension
+		
+		int beginIndex = fileName.lastIndexOf(".")
+		extension = (beginIndex > -1) ? fileName.substring(beginIndex) : ""
+		if(extension.size() > 5 || extension.size() == 1){
+			extension =  extension.replace(".", "_")
+		}
+		return extension
+	}
+	
+	
+	
 	static String cleanSearchQuery(String name) {
 		name = cleanName(name);
 		name = name.replaceAll("[^\\x20-\\x7e]", "");	//removing all non ascii characters
@@ -202,6 +238,11 @@ class Utils {
 		return urlValidator.isValid(str) || urlValidator.isValid(defaultUrlPrefix + str);
 	}
 
+    static boolean isAbsoluteURL(String str) {
+        final URI u = new URI("str");
+        return u.isAbsolute()
+    }
+
 	static List getUsersList(String userIdsAndEmailIds) {
 		List result = [];
 		def emailValidator = EmailValidator.getInstance()
@@ -270,12 +311,34 @@ class Utils {
 	public static String getYouTubeEmbedUrl(String videoId, int height, int width) {
 		return "<iframe width='${width}' height='${height}' src='http://www.youtube.com/embed/${videoId}' frameborder='0' allowfullscreen></iframe>";
 	}
-	
+
+    /*
+    * http://stackoverflow.com/questions/5830387/how-to-find-all-youtube-video-ids-in-a-string-using-a-regex/5831191#5831191
+    https?://           # Required scheme. Either http or https.
+    (?:[0-9A-Z-]+\.)?   # Optional subdomain.
+    (?:                 # Group host alternatives.
+        youtu\.be/      # Either youtu.be,
+        | youtube\.com  # or youtube.com followed by
+        \S*             # Allow anything up to VIDEO_ID,
+        [^\w\-\s]       # but char before ID is non-ID char.
+    )                   # End host alternatives.
+    ([\w\-]{11})        # $1: VIDEO_ID is exactly 11 chars.
+    (?=[^\w\-]|$)       # Assert next char is non-ID or EOS.
+    (?!                 # Assert URL is not pre-linked.
+        [?=&+%\w]*      # Allow URL (query) remainder.
+        (?:             # Group pre-linked alternatives.
+            [\'"][^<>]*># Either inside a start tag,
+            | </a>      # or inside <a> element text contents.
+        )               # End recognized pre-linked alts.
+    )                   # End negative lookahead assertion.
+    [?=&+%\w-]*         # Consume any URL (query) remainder.
+    */
 	public static String linkifyYoutubeLink(String text) {
 		if(!text) return;
 		else {
-			String re = /https?:\/\/(?:[0-9A-Z-]+\.)?(?:www\.)?(?:youtu\.be\/|youtube\.com\S*[^\w\-\s])([\w\-]{11})(?=[^\w\-]|$)(?![?=&+%\w]*(?:['"][^<>]*>|<\/a>))[?=&+%\w-]*/;
-			text = text.replaceAll(~re, {
+            //Pattern re = ~/(?ix)https?:\/\/(?:[0-9A-Z-]+\.)?(?:www\.)?(?:youtu\.be\/|youtube\.com\S*[^\w\-\s])([\w\-]{11})(?=[^\w\-]|$)(?![?=&+%\w]*(?:['"][^<>]*>))[?=&+%\w-]*/;          
+            Pattern re = ~/(?ix)(?:<a.*>)?(?:https?:\/\/(?:[0-9A-Z-]+\.)?(?:www\.)?(?:youtu\.be\/|youtube\.com\S*[^\w\-\s])([\w\-]{11})(?=[^\w\-]|$))[?=&+%\w-;]*(?:<\/a>)?/;
+			text = text.replaceAll(re, {
 				//getYouTubeEmbedUrl(it[1], 295,480);
 				"""
 				<div class="youtube_container">
@@ -300,5 +363,8 @@ class Utils {
 		return text;
 	}
 
+    public static stripHTML(String text) {
+        if(!text) return text;
+        return text.replaceAll("<(.|\n)*?>", '');
+    }
 }
-

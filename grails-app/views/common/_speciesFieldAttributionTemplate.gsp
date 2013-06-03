@@ -8,7 +8,7 @@
 						<g:if test="${speciesFieldInstance.attributors.size() > 0}">
 							<div class="prop span11">
 								<div class="name span2">Attributions</div>
-								<div class="span8">
+								<div class="span7">
 									<ul style="list-style:none;margin-left:0px;">
 										<g:each in="${speciesFieldInstance.attributors}" var="r">
 											<li>
@@ -24,7 +24,7 @@
 						<g:if test="${speciesFieldInstance?.contributors}">
 							<div class="prop span11">
 								<div class="span2 name">Contributors</div>
-								<div class="span8 value">
+								<div class="span7 value">
 								<ul style="list-style:none;margin-left:0px;"><g:each
 										in="${ speciesFieldInstance?.contributors}" var="contributor">
 										<li>
@@ -38,7 +38,7 @@
 						<g:if test="${speciesFieldInstance?.status}">
 							<div class="prop span11">
 								<div class="span2 name">Status</div>
-								<div class="span8 value">${speciesFieldInstance?.status?.value()}
+								<div class="span7 value">${speciesFieldInstance?.status?.value()}
 								
 								</div>
 							</div>
@@ -46,7 +46,7 @@
 						<g:if test="${speciesFieldInstance?.audienceTypes}">
 							<div class="prop span11">
 								<div class="span2 name">Audiences</div>
-								<div class="span8 value"><g:each
+								<div class="span7 value"><g:each
 										in="${ speciesFieldInstance?.audienceTypes}"
 										var="audienceType">
 										${audienceType.value}
@@ -57,7 +57,7 @@
 						<g:if test="${speciesFieldInstance?.licenses.size() > 0}">
 							<div class="prop span11">
 								<div class="span2 name">Licenses</div>
-								<div class="span8 value"><g:each
+								<div class="span7 value"><g:each
 										in="${speciesFieldInstance?.licenses}" var="license">
 										<a class="license" href="${license?.url}" target="_blank"><img
 											class="icon" style="float: left;"
@@ -73,7 +73,7 @@
 						<g:if test="${speciesFieldInstance.references.size() > 0}">
 				<div class="prop span11">
 					<div class="name span2">References</div>
-					<div class="span8">
+					<div class="span7">
 						<ol>
 							<g:each in="${speciesFieldInstance.references}" var="r">
 								<li style="margin-left: 20px;" title="${r.title?:r.url}"><g:if

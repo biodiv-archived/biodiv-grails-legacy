@@ -482,7 +482,7 @@ class ObvUtilService {
 						obvDir.mkdir();
 					}
 
-					File file = observationService.getUniqueFile(obvDir, Utils.cleanFileName(f.getName()));
+					File file = observationService.getUniqueFile(obvDir, Utils.generateSafeFileName(f.getName()));
 					file << f.bytes
 					ImageUtils.createScaledImages(file, obvDir);
 					resourcesInfo.put("file_" + index, file.getAbsolutePath().replace(rootDir, ""))

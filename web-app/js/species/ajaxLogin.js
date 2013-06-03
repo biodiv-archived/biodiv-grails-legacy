@@ -66,6 +66,9 @@
 
 	$('#ajaxLogin').on('hidden', function () {
 		$('#ajaxLogin form')[0].reset();
+                if(ajaxLoginCancelCallbackFunction) {
+                    ajaxLoginCancelCallbackFunction();
+                }
 	})
 	
 	$(".s2ui_hidden_button").hide();

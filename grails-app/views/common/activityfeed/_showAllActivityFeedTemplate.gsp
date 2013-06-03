@@ -1,7 +1,6 @@
 <%@page import="species.groups.UserGroup"%>
 
 <div class="activityfeed activityfeed${feedType}">
-	<a class="activiyfeednewermsg yj-thread-replies-container yj-show-older-replies" style="display:none;" href="#" title="load new feeds" onclick='loadNewerFeedsInAjax($(this).closest(".activityfeed${feedType}"), false);return false;'>Click to see new feeds</a>
 
 	<input type="hidden" name='newerTimeRef' value="${newerTimeRef}"/>
 	<input type="hidden" name='olderTimeRef' value="${olderTimeRef}"/>
@@ -17,29 +16,37 @@
 	<input type="hidden" name='activityHolderType' value="${activityHolder?.class?.getCanonicalName()}"/>
 	<input type="hidden" name='feedUrl' value="${uGroup.createLink(controller:'activityFeed', action: 'getFeeds')}"/>
 	<input type="hidden" name='webaddress' value="${(rootHolder instanceof UserGroup) ? rootHolder.webaddress: null}"/>
+	<input type="hidden" name='user' value="${user}"/>
 	
 	<input type="hidden" name='isCommentThread' value="${isCommentThread}"/>
 	<input type="hidden" name='subRootHolderId' value="${subRootHolderId}"/>
 	<input type="hidden" name='subRootHolderType' value="${subRootHolderType}"/>
 	<input type="hidden" name='feedHomeObjectId' value="${rootHolder?.id}"/>
 	<input type="hidden" name='feedHomeObjectType' value="${rootHolder?.class?.getCanonicalName()}"/>
-	
-	<g:if test="${feedOrder == 'oldestFirst'}">	
-		<g:if test="${refreshType == 'manual' && remainingFeedCount > 0}" >
-			<a class="activiyfeedoldermsg yj-thread-replies-container yj-show-older-replies" href="#" title="show feeds" onclick='loadOlderFeedsInAjax($(this).closest(".activityfeed${feedType}"));return false;'>Show ${(feedType != 'GroupSpecific')?remainingFeedCount:''} older feeds >></a>
+
+    <g:if test="${!hideList}">
+		<a class="activiyfeednewermsg yj-thread-replies-container yj-show-older-replies" style="display:none;" href="#" title="load new feeds" onclick='loadNewerFeedsInAjax($(this).closest(".activityfeed${feedType}"), false);return false;'>Click to see new feeds</a>
+		<g:if test="${feedOrder == 'oldestFirst'}">	
+			<g:if test="${refreshType == 'manual' && remainingFeedCount > 0}" >
+				<a class="activiyfeedoldermsg yj-thread-replies-container yj-show-older-replies" href="#" title="show feeds" onclick='loadOlderFeedsInAjax($(this).closest(".activityfeed${feedType}"));return false;'>Show ${(feedType != 'GroupSpecific')?remainingFeedCount:''} older feeds >></a>
+			</g:if>
+			<ul>
+				<feed:showActivityFeedList model="['feeds':feeds, 'feedType':feedType, 'feedPermission':feedPermission, feedHomeObject:rootHolder]" />
+			</ul>
 		</g:if>
-		<ul>
-			<feed:showActivityFeedList model="['feeds':feeds, 'feedType':feedType, 'feedPermission':feedPermission, feedHomeObject:rootHolder]" />
-		</ul>
-	</g:if>
-	<g:else>
-		<ul>
-			<feed:showActivityFeedList model="['feeds':feeds, 'feedType':feedType, 'feedPermission':feedPermission, feedHomeObject:rootHolder]" />
-		</ul>
-		<g:if test="${refreshType == 'manual' && remainingFeedCount > 0}" >
-			<a class="activiyfeedoldermsg yj-thread-replies-container yj-show-older-replies" href="#" title="show feeds" onclick='loadOlderFeedsInAjax($(this).closest(".activityfeed${feedType}"));return false;'>Show ${(feedType != 'GroupSpecific')?remainingFeedCount:''} older feeds >></a>
-		</g:if>
-	</g:else>
+		<g:else>
+			<ul>
+				<feed:showActivityFeedList model="['feeds':feeds, 'feedType':feedType, 'feedPermission':feedPermission, feedHomeObject:rootHolder]" />
+			</ul>
+			<g:if test="${refreshType == 'manual' && remainingFeedCount > 0}" >
+				<a class="activiyfeedoldermsg yj-thread-replies-container yj-show-older-replies" href="#" title="show feeds" onclick='loadOlderFeedsInAjax($(this).closest(".activityfeed${feedType}"));return false;'>Show ${(feedType != 'GroupSpecific')?remainingFeedCount:''} older feeds >></a>
+			</g:if>
+	    </g:else>
+	    <g:if test="${refreshType == 'auto'}">
+	    	<span class="activiyfeedNoMoreFeedmsg yj-thread-replies-container yj-show-older-replies" style="display:none;">No more feeds</span>
+	    </g:if>
+	    
+    </g:if>
 </div>
 <r:script>
 	$(document).ready(function(){

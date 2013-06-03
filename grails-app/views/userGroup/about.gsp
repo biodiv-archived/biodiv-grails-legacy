@@ -1,17 +1,13 @@
-
-<%@page import="org.springframework.security.acls.domain.BasePermission"%>
-
 <%@page import="org.springframework.security.acls.domain.BasePermission"%>
 <%@page import="species.utils.ImageType"%>
 <%@page import="species.utils.Utils"%>
 <%@ page import="species.groups.UserGroup"%>
 <html>
 <head>
-<meta name="layout" content="main" />
-<g:set var="entityName" value="${userGroupInstance.name}" />
-<title><g:message code="default.show.label"
-		args="[userGroupInstance.name]" /></title>
-<script src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>
+<g:set var="title" value="AboutUs}"/>
+<g:render template="/common/titleTemplate" model="['title':title]"/>
+
+
 <r:require modules="userGroups_show" />
 </head>
 <body>
@@ -144,10 +140,8 @@
 					function(data) {
 			           	var html='';
 			           	$.each(data.result, function(i, item) {
-			           		html +="<a
-			href='"+"${createLink(controller:'SUser', action:'show')}/"+item.id+"'>"
-			+ "<img src='"+item.icon+"' class='pull-left small_profile_pic'
-			title='"+item.name+"'>"+ "</a>";
+			           		html +="<a href='"+"${createLink(controller:'SUser', action:'show')}/"+item.id+"'>"
+                                                + "<img src='"+item.icon+"' class='pull-left small_profile_pic' title='"+item.name+"'>"+ "</a>";
 			           	});
 			           	$("#members_sidebar").html(html);
 			           }, error: function(xhr, status, error) {
@@ -168,10 +162,8 @@
 			           success: function(data) {
 			           	var html = "";
 			           	$.each(data.result, function(i, item) {
-			           		html += "<a
-			href='"+"${createLink(controller:'SUser', action:'show')}/"+item.id+"'>"+
-			"<img src='"+item.icon+"' class='pull-left small_profile_pic'
-			title='"+item.name+"'>"+ "</a>";
+			           		html += "<a href='"+"${createLink(controller:'SUser', action:'show')}/"+item.id+"'>"+
+                        			"<img src='"+item.icon+"' class='pull-left small_profile_pic' title='"+item.name+"'>"+ "</a>";
 			           	});
 			           	$("#founders_sidebar").html(html);
 			           }, 

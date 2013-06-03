@@ -1,5 +1,5 @@
 <g:javascript>
-    window.appContext = '${request.contextPath}';
+    window.appContext = '';
     window.appIBPDomain = '${grailsApplication.config.ibp.domain}'
     window.appWGPDomain = '${grailsApplication.config.wgp.domain}'
 </g:javascript>
@@ -23,9 +23,9 @@
 <div class="navbar navbar-static-top btn"
 	style="margin-bottom: 0px; position: relative; width: 100%;padding: 0px; border-left-width:0; border-right-width: 0;">
 	<div class="navbar-inner"
-		style="box-shadow: none; background-color: transparent; background-image: none;">
+		style="box-shadow: none; background-color: transparent; background-image: none;height:40px;">
 		<div class="container outer-wrapper"
-			style="background-color: transparent; padding-bottom: 0px;">
+			style="background-color: transparent; padding-bottom: 0px;text-align:center;">
 			<g:if test="${userGroupInstance && userGroupInstance.id}">
 
 				<ul class="nav pull-left">
@@ -37,7 +37,8 @@
 					</li>
 					<li class="${((params.controller == 'userGroup' && params.action == 'observation') ||(params.controller == 'observation'))?' active':''}"><a
 						href="${uGroup.createLink('mapping':'userGroup', 'action':'observation', 'userGroup':userGroupInstance)}"
-                                                title="Observations">Observations</a> <a style="position:absolute;top:-18px;right:140px;box-shadow:none;background-color:transparent;" href="${uGroup.createLink('controller':'observation', 'action':'create', 'userGroup':userGroupInstance)}"><span class="badge badge-important" title="Add Observation"><i class="icon-add"></i></span></a> 
+                                                title="Observations">Observations</a> 
+                                            <!--a style="position:absolute;top:-18px;right:140px;box-shadow:none;background-color:transparent;" href="${uGroup.createLink('controller':'observation', 'action':'create', 'userGroup':userGroupInstance)}"><span class="badge badge-important" title="Add Observation"><i class="icon-add"></i></span></a--> 
 					</li>
 					<li
 						class="${((params.controller == 'SUser' && params.action == 'header') ||(params.controller == 'map'))?' active':''}"><a
@@ -58,6 +59,15 @@
 
 
 				</ul>
+                                <ul class="nav contributeButton"  style="float:none;display:inline-block">
+                                    <li>
+                                    <a href="#contributeMenu" data-toggle="collapse" style="margin-top:0px;color:white;">
+                                        <i class="icon-list"></i>
+                                        Contribute
+                                        <i class="caret"></i>
+                                    </a>
+                                    </li>
+                                </ul>
 				<ul class="nav pull-right">
 					<!--li class="menu-449 first"><a href="/" title="">Home</a></li-->
 
@@ -77,29 +87,29 @@
 						title="About Us">About Us</a>
 					</li>
 					
-					<li
-						class="${((params.controller == 'userGroup' && params.action == 'chart') ||(params.controller == 'chart'))?' active':''}"><a
-						href="${uGroup.createLink('mapping':'userGroup', 'action':'chart', 'userGroup':userGroupInstance)}"
-						title="Stats">Stats</a>
-					</li>
 
-<%--					<li class="dropdown"><a href="#" class="dropdown-toggle"--%>
-<%--						data-toggle="dropdown"> More <b class="caret"></b> </a>--%>
-<%--						<ul class="dropdown-menu" style="text-align: left;">--%>
-<%--							<!-- li--%>
-<%--								class="${(params.controller == 'userGroup' && params.action == 'user')?' active':''}"><a--%>
-<%--								href="${uGroup.createLink(mapping:"userGroup", 'action':"user", 'userGroup':userGroupInstance)}"--%>
-<%--								title="Members">Members</a>--%>
-<%--							</li-->--%>
-<%--							--%>
-<%--							<li--%>
-<%--								class="${(request.getHeader('referer')?.contains('/calendar') && params.action == 'header')?' active':''}"><a--%>
-<%--								href="/calendar" title="Events">Events</a></li>--%>
-<%--							<li--%>
-<%--								class="${(request.getHeader('referer')?.contains('/biodiversity_news') && params.action == 'header')?' active':''}"><a--%>
-<%--								href="/biodiversity_news" title="News">News</a></li>--%>
-<%--							--%>
-<%--						</ul></li>--%>
+					<li class="dropdown"><a href="#" class="dropdown-toggle"
+						data-toggle="dropdown"> More <b class="caret"></b> </a>
+						<ul class="dropdown-menu" style="text-align: left;">
+                                                    <li
+                                                    class="${((params.controller == 'user' && params.action == 'list') ||(params.controller == 'user'))?' active':''}"><a
+                                                        href="${uGroup.createLink('controller':'user', 'action':'list', 'userGroup':userGroupInstance)}"
+                                                        title="Members">Members</a>
+                                                    </li>
+
+                                                    <li
+                                                    class="${((params.controller == 'document' && params.action == 'browser') ||(params.controller == 'browser'))?' active':''}"><a
+                                                        href="${uGroup.createLink('controller':'document', 'action':'browser', 'userGroup':userGroupInstance)}"
+                                                        title="Documents">Documents</a>
+                                                    </li>
+
+                                                    <li
+                                                    class="${((params.controller == 'userGroup' && params.action == 'chart') ||(params.controller == 'chart'))?' active':''}"><a
+                                                        href="${uGroup.createLink('mapping':'userGroup', 'action':'chart', 'userGroup':userGroupInstance)}"
+                                                        title="Stats">Stats</a>
+                                                    </li>
+						
+						</ul></li>
 				</ul>
 
 			</g:if>
@@ -113,7 +123,8 @@
 							Species</a></li>
 					<li class="${(params.controller == 'observation')?'active':''}"><a
 						href="${uGroup.createLink("controller":"observation")}"
-                                                title="Observations">Observations</a><a  style="position:absolute;top:-18px;right:140px;box-shadow:none;background-color:transparent;" href="${uGroup.createLink('controller':'observation', 'action':'create', 'userGroup':userGroupInstance)}"><span class="badge badge-important" title="Add Observation"><i class="icon-plus"></i></span></a> 
+                                                title="Observations">Observations</a>
+                                            <!--a  style="position:absolute;top:-18px;right:140px;box-shadow:none;background-color:transparent;" href="${uGroup.createLink('controller':'observation', 'action':'create', 'userGroup':userGroupInstance)}"><span class="badge badge-important" title="Add Observation"><i class="icon-plus"></i></span></a--> 
 </li>
 					<li
 						class="${(request.getHeader('referer')?.contains('/map') && params.action == 'header')?' active':''}"><a
@@ -125,10 +136,19 @@
 <%--						class="${(params.controller == 'chart')?'active':''}"><a--%>
 <%--						href='${uGroup.createLink("controller":"chart")}' title="Stats">Stats</a></li>--%>
 				</ul>
+                                <ul class="nav contributeButton" style="float:none;display:inline-block">
+                                    <li>
+                                    <a href="#contributeMenu" data-toggle="collapse" style="margin-top:0px;color:white">
+                                        <i class="icon-list"></i>
+                                        Contribute
+                                        <i class="caret"></i>
+                                    </a>
+                                    </li>
+                                </ul>
 
 				<ul class="nav pull-right">
 					<li class=" ${(params.controller == 'activityFeed')?'active':''}"><a
-                                            href="${uGroup.createLink("controller":"activityFeed")}" title="Activity">Activity<span class="badge badge-important" style="position:absolute;top:-9px;right:220px"></span></a>
+                                            href="${uGroup.createLink("controller":"activityFeed")}" title="Activity">Activity</a>
 					</li>
 
 					<!--li class="menu-449 first"><a href="/" title="">Home</a></li-->
@@ -154,6 +174,13 @@
 							<li
 								class="${(request.getHeader('referer')?.contains('/biodiversity_news') && params.action == 'header')?' active':''}"><a
 								href="/biodiversity_news" title="News">News</a></li>
+
+                                                        <li
+                                                        class="${((params.controller == 'document' && params.action == 'browser') ||(params.controller == 'browser'))?' active':''}"><a
+                                                            href="${uGroup.createLink('controller':'document', 'action':'browser', 'userGroup':userGroupInstance)}"
+                                                            title="Documents">Documents</a>
+                                                        </li>
+
 							
 							<li
 								class="${(params.controller == 'chart')?' active':''}"><a
@@ -168,8 +195,6 @@
 		</div>
 	</div>
 </div>
-
-
 <g:javascript>
 $(document).ready(function(){
 	//IMP:Header is loaded in drupal pages as well. Any code in this block is not run when loaded by ajax

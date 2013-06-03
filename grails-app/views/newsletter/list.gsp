@@ -2,14 +2,8 @@
 <%@ page import="utils.Newsletter" %>
 <html>
     <head>
-    <link rel="canonical" href="${Utils.getIBPServerDomain() + createLink(controller:'newsletter', action:'list')}" />
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-        <meta name="layout" content="main" />
-        <link rel="stylesheet" type="text/css" media="all"
-	href="${resource(dir:'bootstrap/css',file:'bootstrap.css', absolute:true)}" />
-
-        <g:set var="entityName" value="${message(code: 'newsletter.label', default: 'Newsletter')}" />
-        <title><g:message code="default.list.label" args="[entityName]" /></title>
+<g:set var="title" value="Newsletters"/>
+<g:render template="/common/titleTemplate" model="['title':title]"/>
         <style>
         .body {
             padding: 10px;        

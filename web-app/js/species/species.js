@@ -91,27 +91,30 @@ var positionTOC = function() {
 }
 
 var showOccurence = function(speciesName) {
-	var mapOptions = {
-		popup_enabled : true,
-		toolbar_enabled : true,
-		bbox : "5801108.428222222,674216.547942332, 12138100.077777777, 4439106.786632658"
-	};
-	var layersOptions = [ {
-		title : 'Occurrence',
-		layers : 'ibp:occurrence',
-		styles : '',
-		cql_filter : "species_name='" + speciesName + "'",
-		opacity : 0.7
-	},
-	{
-		title : 'Observation',
-		layers : 'ibp:observation_locations',
-		styles : '',
-		cql_filter : "species_name='" + speciesName + "'",
-		opacity : 0.7
-	}
-	]
-	showMap("map1311326056727", mapOptions, layersOptions)
+        loadGoogleMapsAPI(function() {
+            var mapOptions = {
+                    popup_enabled : true,
+                    toolbar_enabled : true
+                    //bbox : "5801108.428222222,674216.547942332, 12138100.077777777, 4439106.786632658"
+            };
+            var layersOptions = [ {
+                    title : 'Occurrence',
+                    layers : 'ibp:occurrence',
+                    styles : '',
+                    cql_filter : "species_name like '" + speciesName + "%'",
+                    opacity : 0.7
+            },
+            {
+                    title : 'Observation',
+                    layers : 'ibp:observation_locations',
+                    styles : '',
+                    cql_filter : "species_name like '" + speciesName + "%'",
+                    opacity : 0.7
+            }
+            ]
+            showMap("map1311326056727", mapOptions, layersOptions)
+            $("#mapSpinner").hide();
+        });
 }
 
 var updateEditorContent = function() {

@@ -80,7 +80,6 @@ class UrlMappings {
 			controller='userGroup'
 			action='user'
 		}
-		
 		"/group/$webaddress/user" {
 			controller='userGroup'
 			action='user'
@@ -123,5 +122,29 @@ class UrlMappings {
 			controller = 'emailConfirmation'
 			action = "index"
 		}
-	}
+   
+    "/rating/rate/$id" {
+        controller = "rating"
+        action = "rate"
+    }
+
+    "/rating/fetchRate/$id" {
+        controller = "rating"
+        action = "fetchRate"
+    }
+
+    "/rating/$action/$id" {
+        controller = "rateable"
+    }
+
+    "/document/list" {
+        controller = 'document'
+        action = 'browser'
+    }
+		"/group/$webaddress/document/list" {
+			controller='document'
+			action='browser'
+		}
+
+    }
 }

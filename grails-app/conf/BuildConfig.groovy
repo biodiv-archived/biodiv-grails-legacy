@@ -52,4 +52,9 @@ grails.project.dependency.resolution = {
 	   compile('net.sf.opencsv:opencsv:2.3')
 	   compile('com.itextpdf:itextpdf:5.0.6')
     }
+    plugins { 
+        compile ":resources:1.1.6" 
+        compile ":spring-security-core:1.2.6" 
+        compile ":webxml:1.4.1" 
+    } 
 }

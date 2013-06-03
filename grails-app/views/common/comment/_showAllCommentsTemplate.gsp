@@ -1,9 +1,7 @@
 <%@page import="species.participation.Comment"%>
 <%@page import="species.participation.ActivityFeedService"%>
 <div class="comment">
-	<g:if test="${canPostComment}">
-		<comment:postComment model="['commentHolder':commentHolder, 'rootHolder':rootHolder, 'commentType':commentType, 'newerTimeRef': newerTimeRef]" />
-	</g:if>
+	<comment:postComment model="['commentHolder':commentHolder, 'rootHolder':rootHolder, 'commentType':commentType, 'newerTimeRef': newerTimeRef]" />
 	<g:if test="${showCommentList == true}">
 		<ul>
 			<comment:showCommentList model="['comments':comments]" />

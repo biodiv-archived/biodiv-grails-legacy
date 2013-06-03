@@ -2,24 +2,33 @@ var newFeedProcessing = false;
 var oldFeedProcessing = false;
 var oldFeedRetry = 0;
 var maxOldFeedRetry = 3;
+var noMoreOldFeeds = false;
 
 function loadOlderFeedsInAjax(targetComp){
 	var url = $(targetComp).children('input[name="feedUrl"]').val();
 	var feedType = $(targetComp).children('input[name="feedType"]').val();
 	var feedOrder = $(targetComp).children('input[name="feedOrder"]').val();
+	var refreshType = $(targetComp).children('input[name="refreshType"]').val();
+	
+	if(noMoreOldFeeds && refreshType === "auto"){
+		return;
+	}
 	
 	$.ajax({
  		url: url,
 		dataType: "json",
 		data: getFeedParams("older", targetComp),
 		success: function(data) {
-			if(data.showFeedListHtml){
+			if(!data.showFeedListHtml){
+				noMoreOldFeeds = true;
+				$(targetComp).children('.activiyfeedNoMoreFeedmsg').show();
+			}else{ 
 				var htmlData = $(data.showFeedListHtml);
 				htmlData = removeDuplicateFeed($(targetComp).children('ul'), htmlData, feedType, "older", targetComp);
 				if(feedOrder === "latestFirst"){
-					$(targetComp).children('ul').append(htmlData);
+					htmlData.appendTo($(targetComp).children('ul')).hide().slideDown(1000);
 				}else{
-					$(targetComp).children('ul').prepend(htmlData);
+					htmlData.prependTo($(targetComp).children('ul')).hide().slideDown(1000);
 				}
     			$(targetComp).children('input[name="olderTimeRef"]').val(data.olderTimeRef);
     			if(data.remainingFeedCount && data.remainingFeedCount > 0){
@@ -75,10 +84,10 @@ function loadNewerFeedsInAjax(targetComp, checkFeed){
     			var htmlData = $(data.showFeedListHtml);
     			htmlData = removeDuplicateFeed($(targetComp).children('ul'), htmlData, feedType, "newer", targetComp);
     			if(feedOrder === "latestFirst"){
-    				$(targetComp).children('ul').prepend(htmlData);
-				}else{
-					$(targetComp).children('ul').append(htmlData);
-				}
+    				htmlData.prependTo($(targetComp).children('ul')).hide().slideDown(1000);
+			}else{
+                                htmlData.appendTo($(targetComp).children('ul')).hide().slideDown(1000);
+			}
     			$(targetComp).children('input[name="newerTimeRef"]').val(data.newerTimeRef);
     			newFeedProcessing = false;
     			feedPostProcess();
@@ -175,6 +184,7 @@ function getFeedParams(timeLine, targetComp){
 	}else{
 		feedParams["refTime"] = $(targetComp).children('input[name="olderTimeRef"]').val();
 	}
+	feedParams["user"] = $(targetComp).children('input[name="user"]').val();
 	return feedParams;
 }
 
@@ -268,6 +278,11 @@ function getTargetComp(){
 	if(targetComp.length == 1){
 		return targetComp;
 	}
+        
+        targetComp = $('.activityfeedUser');
+	if(targetComp.length == 1){
+		return targetComp;
+	}
 	return null;
 }
 
@@ -289,6 +304,7 @@ function updateFeeds(){
 function updateFeedComponent(targetComp, feedCategory){
 	 $(targetComp).children('input[name="feedCategory"]').val(feedCategory);
 	 setUpTimeRef(targetComp);
+	 $(targetComp).children('.activiyfeedNoMoreFeedmsg').hide();
 	 $(targetComp).children('ul').empty();
 	 loadOlderFeedsInAjax(targetComp);
 }
@@ -333,9 +349,9 @@ function followObject(className, id, comp, url){
 
 function toggleFollowButton(comp){
 	if(($(comp).text() == 'Unfollow')){
-		$(comp).html('Follow')
+		$(comp).html('<i class="icon-play-circle"></i>Follow')
 	}else{
-		$(comp).html('Unfollow')
+		$(comp).html('<i class="icon-play-circle"></i>Unfollow')
 	}
 }
 

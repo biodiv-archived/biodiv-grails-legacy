@@ -15,6 +15,7 @@ import species.participation.curation.UnCuratedVotes;
 import species.utils.ImageType;
 import species.Habitat;
 import species.groups.SpeciesGroup;
+import content.eml.Document
 
 class SUser {
 
@@ -23,7 +24,7 @@ class SUser {
 	def grailsApplication;
 	def commentService;
 	def activityFeedService;
-	
+
 	String username
 	String name;
 	String password
@@ -36,7 +37,7 @@ class SUser {
 	Date lastLoginDate = new Date();
 	String profilePic
 	String icon
-	
+
 	String website;
 	float timezone=0;//offset
 	String aboutMe;
@@ -46,7 +47,7 @@ class SUser {
 	boolean allowIdentifactionMail = true;
 
 
-	static hasMany = [openIds: OpenID, flags:ObservationFlag, unCuratedVotes:UnCuratedVotes, observations:Observation, recoVotes:RecommendationVote, groups:UserGroup, speciesGroups:SpeciesGroup, habitats:Habitat]
+	static hasMany = [openIds: OpenID, flags:ObservationFlag, unCuratedVotes:UnCuratedVotes, observations:Observation, recoVotes:RecommendationVote, groups:UserGroup, speciesGroups:SpeciesGroup, habitats:Habitat, documents:Document ]
 	static belongsTo = [UserGroup]
 	//static hasOne = [facebookUser:FacebookUser]
 
@@ -103,7 +104,7 @@ class SUser {
 			encodePassword()
 		}
 	}
-	
+
 	def beforeDelete() {
 		activityFeedService.deleteFeed(this)
 		UserGroupMemberRole.removeAll(this);
@@ -126,8 +127,8 @@ class SUser {
 		if(iconPresent) {
 			return grailsApplication.config.speciesPortal.users.serverURL+this.icon //, type:ResourceType.ICON, title:this.name);
 		}
-		
-		
+
+
 		if(profilePic) {
 			return profilePic;
 		}
@@ -143,9 +144,9 @@ class SUser {
 
 	Set<UserGroup> getUserGroups() {
 		def orderedByName = [
-					compare:{ a,b ->
-						a.name<=>b.name }
-				] as Comparator
+			compare:{ a,b ->
+				a.name<=>b.name }
+		] as Comparator
 
 		def userGroups = new TreeSet(orderedByName)
 

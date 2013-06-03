@@ -1,5 +1,5 @@
 <%@page import="species.utils.Utils"%>
-<div class="story-footer" style="width: 100%">
+<div class="story-footer">
 	<div class="footer-item">
 		<i class="icon-eye-open"></i>
 		${userGroupInstance.getPageVisitCount()}

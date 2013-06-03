@@ -11,10 +11,10 @@ var marker;
 var latitude;
 var longitude;
 
-var swRestriction = new google.maps.LatLng('8', '69');
-var neRestriction = new google.maps.LatLng('36', '98');
-var allowedBounds = new google.maps.LatLngBounds(swRestriction, neRestriction);
-    
+var swRestriction;
+var neRestriction;
+var allowedBounds;
+
 function initialize(){
   var latlng = new google.maps.LatLng(21.07,79.27);
 
@@ -23,6 +23,9 @@ function initialize(){
     center: latlng,
     mapTypeId: google.maps.MapTypeId.HYBRID
   };
+  swRestriction = new google.maps.LatLng('8', '69');
+  neRestriction = new google.maps.LatLng('36', '98');
+  allowedBounds = new google.maps.LatLngBounds(swRestriction, neRestriction);
         
   map = new google.maps.Map(document.getElementById("map_canvas"), options);
         
@@ -53,6 +56,51 @@ function initialize(){
 
              map.setCenter(new google.maps.LatLng(y, x));
     }
+  set_location(21.07, 79.27);				  
+
+  var lastPosition = marker.getPosition();
+  //add listener to marker for reverse geocoding
+  google.maps.event.addListener(marker, 'drag', function() {
+    
+    if(!allowedBounds.contains(marker.getPosition())){
+        marker.setPosition(lastPosition);
+    }else {
+        lastPosition = marker.getPosition();
+    };
+    
+    $('#latitude_field').val(marker.getPosition().lat());
+    $('#longitude_field').val(marker.getPosition().lng());
+
+    var dms_lat = convert_DD_to_DMS(marker.getPosition().lat(), 'lat');
+    var dms_lng = convert_DD_to_DMS(marker.getPosition().lng(), 'lng');
+    $('#latitude_deg_field').val(dms_lat['deg']);
+    $('#latitude_min_field').val(dms_lat['min']);
+    $('#latitude_sec_field').val(dms_lat['sec']);
+    $('#latitude_direction_field').val(dms_lat['dir']);
+    $('#longitude_deg_field').val(dms_lng['deg']);
+    $('#longitude_min_field').val(dms_lng['min']);
+    $('#longitude_sec_field').val(dms_lng['sec']);
+    $('#longitude_direction_field').val(dms_lng['dir']);
+
+    geocoder.geocode({'latLng': marker.getPosition()}, function(results, status) {
+      if (status == google.maps.GeocoderStatus.OK) {
+        if (results[0]) {
+          //$('#place_name').val(results[0].formatted_address);
+          $('#reverse_geocoded_name').html(results[0].formatted_address);
+          //$('#latitude').html(marker.getPosition().lat().toFixed(2));
+          //$('#longitude').html(marker.getPosition().lng().toFixed(2));
+          $('#reverse_geocoded_name_field').val(results[0].formatted_address);
+              
+          
+        }
+      }
+    });
+
+    $(".location_picker_button").removeClass("active_location_picker_button");
+
+    $('#location_info').html('You have selected this location');
+  });
+  
 }
 
 function set_location(lat, lng) {
@@ -90,6 +138,12 @@ function set_location(lat, lng) {
         });
 
 }
+
+function set_date(date){
+	$(".location_picker_button").removeClass("active_location_picker_button");
+	$('#observedOn').datepicker("setDate", Date.parse(date));
+}
+
 
 function get_integer_part(n) {
     if (n < 0) {
@@ -154,28 +208,48 @@ function update_geotagged_images_list() {
 
 function update_geotagged_images_list(image) {
 		$(image).exifLoad(function() {
-    		var latlng = get_latlng_from_image(image); 
-            if (latlng) {            	
-                var latlng_display = "Lat: " + latlng.lat.toFixed(2) + ", Lon: " + latlng.lng.toFixed(2)
-            	var func = "set_location(" + latlng.lat+"," +latlng.lng+ "); $(this).addClass('active_location_picker_button')";
-                var html = '<div id=' + $(image).attr("id") +' class="location_picker_button" style="display:inline-block;" onclick="' + func + '"><div style="width:40px; height:40px;float:left;"><img style="width:100%; height:100%;" src="' + $(image).attr('src') + '"/></div><div style="float:left; padding:10px;">' + latlng_display + '</div></div>';
-                $("#geotagged_images>.title").show();
+    		var latlng = get_latlng_from_image(image);
+    		var imageDate =  $(image).exif("DateTimeOriginal")[0];
+    		var display = "";
+    		var html = "";
+    		var func = "";
+    		
+    		if (latlng) {            	
+                display += "Lat: " + latlng.lat.toFixed(2) + ", Lon: " + latlng.lng.toFixed(2)
+            	func += "set_location(" + latlng.lat+"," +latlng.lng+ ");";
+            }
+    		
+    		
+    		if(imageDate){
+    			var date = imageDate.split(" ")[0];
+    			var time = imageDate.split(" ")[1];
+            	date = date.replace(/:/g, "-");
+            	if(display.length > 0){
+            		display += " and "  
+            	}
+            	display += $.datepicker.formatDate('dd M yy', Date.parse(date));
+            	func += "set_date('" + date + " " + time + "');";
+            }
+
+    		if(latlng || imageDate){
+    			func += "$(this).addClass('active_location_picker_button');";
+    			html = '<div id=' + $(image).attr("id") +' class="location_picker_button" style="display:inline-block;" onclick="' + func + '"><div style="width:40px; height:40px;float:left;"><img style="width:100%; height:100%;" src="' + $(image).attr('src') + '"/></div><div style="float:left; padding:10px;">' + display + '</div></div>';
+    			$("#geotagged_images>.title").show();
                 $("#geotagged_images>.msg").show();
                 $("#geotagged_images").append(html);
                 $("#geotagged_images").trigger('update_map');
-            }
-    	})
+    		}    		
+    	});
 }
 
 function get_latlng_from_image(img) {
-        
         var gps_lat = $(img).exif("GPSLatitude");
         var gps_lng = $(img).exif("GPSLongitude");
         var gps_lat_ref = $(img).exif("GPSLatitudeRef");
         var gps_lng_ref = $(img).exif("GPSLongitudeRef");
 
         var latlng;
-
+        
         if (gps_lat != '' && gps_lng != ''){
             var lat_dms = gps_lat.last();
             var lng_dms = gps_lng.last();
@@ -196,7 +270,8 @@ $(document).ready(function() {
   
   $('#address').watermark('Search');
 
-  initialize();
+  //loadGoogleMapsAPI(initialize);
+  //initialize();
   //window.setTimeout(update_geotagged_images_list, 10);
     
   /*window.setTimeout(function() {
@@ -206,7 +281,6 @@ $(document).ready(function() {
         set_location(21.07, 79.27);
       } 
   }, 10);*/
-  set_location(21.07, 79.27);				  
   $(function() {
     $("#address").autocomplete({
       source: function(request, response) {
@@ -234,49 +308,6 @@ $(document).ready(function() {
     });
   });
 
-  var lastPosition = marker.getPosition();
-  //add listener to marker for reverse geocoding
-  google.maps.event.addListener(marker, 'drag', function() {
-    
-    if(!allowedBounds.contains(marker.getPosition())){
-        marker.setPosition(lastPosition);
-    }else {
-        lastPosition = marker.getPosition();
-    };
-    
-    $('#latitude_field').val(marker.getPosition().lat());
-    $('#longitude_field').val(marker.getPosition().lng());
-
-    var dms_lat = convert_DD_to_DMS(marker.getPosition().lat(), 'lat');
-    var dms_lng = convert_DD_to_DMS(marker.getPosition().lng(), 'lng');
-    $('#latitude_deg_field').val(dms_lat['deg']);
-    $('#latitude_min_field').val(dms_lat['min']);
-    $('#latitude_sec_field').val(dms_lat['sec']);
-    $('#latitude_direction_field').val(dms_lat['dir']);
-    $('#longitude_deg_field').val(dms_lng['deg']);
-    $('#longitude_min_field').val(dms_lng['min']);
-    $('#longitude_sec_field').val(dms_lng['sec']);
-    $('#longitude_direction_field').val(dms_lng['dir']);
-
-    geocoder.geocode({'latLng': marker.getPosition()}, function(results, status) {
-      if (status == google.maps.GeocoderStatus.OK) {
-        if (results[0]) {
-          //$('#place_name').val(results[0].formatted_address);
-          $('#reverse_geocoded_name').html(results[0].formatted_address);
-          //$('#latitude').html(marker.getPosition().lat().toFixed(2));
-          //$('#longitude').html(marker.getPosition().lng().toFixed(2));
-          $('#reverse_geocoded_name_field').val(results[0].formatted_address);
-              
-          
-        }
-      }
-    });
-
-    $(".location_picker_button").removeClass("active_location_picker_button");
-
-    $('#location_info').html('You have selected this location');
-  });
-  
   function onSuccess(position) {
         var lat = position.coords.latitude;
         var lng = position.coords.longitude;
@@ -376,6 +407,7 @@ $(document).ready(function() {
     $('#longitude_field').change(function(){
         set_location($('#latitude_field').val(), $(this).val());
     });
+    
 
     function set_dms_latitude() {
             var lat = convert_DMS_to_DD($('#latitude_deg_field').val(), $('#latitude_min_field').val(), $('#latitude_sec_field').val(), $('#latitude_direction_field').val());

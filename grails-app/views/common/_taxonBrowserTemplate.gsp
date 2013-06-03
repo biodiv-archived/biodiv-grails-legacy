@@ -102,15 +102,15 @@ var heirarchyLevelFormatter = function(el, cellVal, opts) {
 </r:script>
 
 
-<div class="taxonomyBrowser" style="position: relative;">
-	
+<div class="taxonomyBrowser sidebar_section" style="position: relative;">
+        <h5>Classifications</h5>	
 		<g:if test="${speciesInstance}">
 			<g:set var="classifications" value="${speciesInstance.classifications()}" />
 		</g:if><g:else>
 			<g:set var="classifications" value="${Classification.list()}" />
 		</g:else>
 		<select name="taxaHierarchy" id="taxaHierarchy"
-			class="value ui-corner-all">
+			class="value ui-corner-all" style="margin-bottom:0px;width:100%;background-color:whitesmoke;">
 			<g:each in="${classifications}" var="classification">
 				<option value="${classification.id}">
 					${classification.name}
@@ -133,8 +133,5 @@ var heirarchyLevelFormatter = function(el, cellVal, opts) {
 			</div>
 		</div>
 	
-
-	<br />
-
 	<table id="taxonHierarchy"></table>
 </div>

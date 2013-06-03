@@ -12,8 +12,11 @@ import species.groups.SpeciesGroup;
 import species.utils.ImageType;
 import species.utils.ImageUtils;
 import species.participation.Follow;
+import groovy.sql.Sql;
+import grails.util.GrailsNameUtils;
+import org.grails.rateable.*
 
-class Species {
+class Species implements Rateable {
 
 	String title; 
 	String guid; 
@@ -23,10 +26,12 @@ class Species {
 	Date updatedOn;
 	Date createdOn = new Date();
 	Date dateCreated;
-	Date lastUpdated ;
+	Date lastUpdated;
 	
 	def grailsApplication; 
 	def springSecurityService;
+	def dataSource
+	def activityFeedService
 	
 	private static final log = LogFactory.getLog(this);
 	
@@ -71,24 +76,31 @@ class Species {
 		}
 	}
 
+    /** 
+    * Ordering resources basing on rating
+    **/
 	List<Resource> getImages() { 
-		List<Resource> images = new ArrayList<Resource>();
-		
-		if(reprImage) { 
-			images.add(reprImage);
-		}
-		resources.each { resource ->
-			if(resource.type == species.Resource.ResourceType.IMAGE && resource.id != reprImage?.id) {
-				images.add(resource);
-			}
-		};
-		if(images) {
-			return images;	
-		} else {
-		//
-			//return [new Resource(fileName:"no-image.jpg", type:ResourceType.IMAGE, title:"You can contribute!!!")];
-		}
-	}
+        def params = [:]
+        def clazz = Resource.class;
+        def type = GrailsNameUtils.getPropertyName(clazz);
+
+		def sql =  Sql.newInstance(dataSource);
+        params['cache'] = true;
+        params['type'] = type;
+        def results = sql.rows("select resource_id, species_resources_id, rating_ref, (case when avg is null then 0 else avg end) as avg, (case when count is null then 0 else count end) as count from species_resource o left outer join (select rating_link.rating_ref, avg(rating.stars), count(rating.stars) from rating_link , rating  where rating_link.type='$type' and rating_link.rating_id = rating.id  group by rating_link.rating_ref) c on o.resource_id =  c.rating_ref, resource r where resource_id = r.id and r.type !='"+ResourceType.ICON+"' and species_resources_id=:id order by avg desc, resource_id asc", [id:this.id]);
+        
+        def idList = results.collect { it[0] }
+
+        if(idList) {
+            def instances = Resource.withCriteria {  
+                inList 'id', idList 
+                cache params.cache
+            }
+            results.collect {  r-> instances.find { i -> r[0] == i.id } }                           
+        } else {
+            []
+        }
+    }
 
 	List<Resource> getIcons() {
 		def icons = new ArrayList<Resource>();
@@ -158,4 +170,9 @@ class Species {
 	def boolean fetchIsFollowing(SUser user=springSecurityService.currentUser){
 		return Follow.fetchIsFollowing(this, user)
 	}
+	
+	def afterDelete(){
+		activityFeedService.deleteFeed(this)
+	}
+	
 }

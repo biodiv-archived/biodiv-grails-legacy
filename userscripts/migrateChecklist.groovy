@@ -10,8 +10,6 @@ def checklistService = ctx.getBean("checklistService");
 
 //checklistService.updateUncuratedVotesTable()
 
-//checklistService.migrateChecklist()
-
 //checklistService.updateLocation()
 
 //checklistService.changeCnName()
@@ -25,3 +23,13 @@ def checklistService = ctx.getBean("checklistService");
 //checklistService.udpateObv(cl)
 
 checklistService.migrateObv()
+
+def deleteChecklist()  {
+	try{
+		Checklist.get(284).delete(flush:true)
+	}catch (Exception e) {
+		e.printStackTrace()
+	}
+}
+deleteChecklist()
+checklistService.migrateChecklist(10)

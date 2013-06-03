@@ -12,14 +12,18 @@ import species.auth.SUser;
 import species.groups.SpeciesGroup;
 import species.groups.UserGroup;
 import speciespage.ObvUtilService;
+import grails.util.GrailsNameUtils;
+import org.grails.rateable.*
 
-class Observation implements Taggable{
+class Observation implements Taggable, Rateable {
 	
 	def dataSource
 	def grailsApplication;
 	def commentService;
 	def activityFeedService;
 	def springSecurityService;
+    def resourceService;
+	def observationsSearchService;
 	
 	public enum OccurrenceStatus {
 		ABSENT ("Absent"),	//http://rs.gbif.org/terms/1.0/occurrenceStatus#absent
@@ -64,21 +68,15 @@ class Observation implements Taggable{
 	String searchText;
 	Recommendation maxVotedReco;
 	boolean agreeTerms = false;
-	
-	//some observation may not have media
-	boolean hasMedia = true;
-	List metaData;
-	String sourceType;
-	Long sourceId;
-	
-	static hasMany = [resource:Resource, recommendationVote:RecommendationVote, obvFlags:ObservationFlag, userGroups:UserGroup, metaData:ObservationMetaData];
+    
+	static hasMany = [resource:Resource, recommendationVote:RecommendationVote, obvFlags:ObservationFlag, userGroups:UserGroup];
 	static belongsTo = [SUser, UserGroup]
 
 	static constraints = {
 		notes nullable:true
 		searchText nullable:true;
 		maxVotedReco nullable:true
-		//resource validator : { val, obj -> val && val.size() > 0 }
+		resource validator : { val, obj -> val && val.size() > 0 }
 		observedOn validator : {val -> val < new Date()}
 		latitude validator : { val, obj -> 
 			if(Float.isNaN(val)) {
@@ -97,9 +95,6 @@ class Observation implements Taggable{
 			}
 		}
 		agreeTerms nullable:true
-		metaData nullable:true
-		sourceType nullable:true
-		sourceId nullable:true
 	}
 
 	static mapping = {
@@ -107,7 +102,6 @@ class Observation implements Taggable{
 		notes type:'text'
 		searchText type:'text'
 		autoTimestamp false
-		metaData lazy: false
 	}
 
 	/**
@@ -115,19 +109,9 @@ class Observation implements Taggable{
 	 * @return
 	 */
 	Resource mainImage() {
-		def reprImage;
-		Iterator iterator = resource?.iterator();
-		if(iterator.hasNext()) {
-			reprImage = iterator.next();
-		}
-		
-		return reprImage;
-//
-//		if(reprImage && (new File(grailsApplication.config.speciesPortal.observations.rootDir+reprImage.fileName.trim())).exists()) {
-//			return reprImage;
-//		} else {
-//			return null;
-//		}
+		def res = listResourcesByRating(1);
+        if(res) 
+            return res[0]
 	}
 
 	/**
@@ -311,6 +295,7 @@ class Observation implements Taggable{
 	private updateObservationTimeStamp(){
 		lastRevised = new Date();
 		saveConcurrently();
+		observationsSearchService.publishSearchIndex(this, true);
 	}
 
 	String fetchSpeciesCall(){
@@ -424,5 +409,48 @@ class Observation implements Taggable{
 	
 	def boolean fetchIsFollowing(SUser user=springSecurityService.currentUser){
 		return Follow.fetchIsFollowing(this, user)
+	}
+
+    def listResourcesByRating(max = -1) {
+        def params = [:]
+        def clazz = Resource.class;
+        def type = GrailsNameUtils.getPropertyName(clazz);
+
+        def sql =  Sql.newInstance(dataSource);
+        params['cache'] = true;
+        params['type'] = type;
+
+        def queryParams = [:];
+        queryParams['obvId'] = this.id;
+        
+        def query = "select resource_id, observation_id, rating_ref, (case when avg is null then 0 else avg end) as avg, (case when count is null then 0 else count end) as count from observation_resource o left outer join (select rating_link.rating_ref, avg(rating.stars), count(rating.stars) from rating_link , rating  where rating_link.type='$type' and rating_link.rating_id = rating.id  group by rating_link.rating_ref) c on o.resource_id =  c.rating_ref where observation_id=:obvId order by avg desc, resource_id asc";
+        if(max && max > 0) {
+            query += " limit :max"
+            queryParams['max'] = max;
+        }
+
+        def results = sql.rows(query, queryParams);
+        def idList = results.collect { it[0] }
+
+        if(idList) {
+            def instances = Resource.withCriteria {  
+                inList 'id', idList 
+                cache params.cache
+            }
+            results.collect {  r-> instances.find { i -> r[0] == i.id } }                           
+        } else {
+            []
+        }
+    }
+
+	def fetchResourceCount(){
+        def result = Observation.executeQuery ('''
+            select r.type, count(*) from Observation obv join obv.resource r where obv.id=:obvId group by r.type order by r.type
+            ''', [obvId:this.id]);
+        return result;
+	}
+	
+	def fetchRecoVoteOwnerCount(){
+		return RecommendationVote.countByObservation(this)
 	}
 }

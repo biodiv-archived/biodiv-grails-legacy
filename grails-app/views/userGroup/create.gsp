@@ -3,14 +3,8 @@
 <%@ page import="species.Habitat"%>
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="layout" content="main" />
-<g:set var="entityName"
-	value="${message(code: 'userGroup.label', default: 'Create New Group')}" />
-<title>
-	${entityName}
-</title>
-<script src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>
+<g:set var="title" value="User groups "/>
+<g:render template="/common/titleTemplate" model="['title':title]"/>
 <r:require modules="userGroups_create" />
 <style>
 .btn-group.open .dropdown-menu {
@@ -339,6 +333,7 @@ max-width: 100%;
 												name="allowMembersToMakeSpeciesCall" checked="${userGroupInstance.allowMembersToMakeSpeciesCall}"/>
 								 <g:message code="userGroup.permissions.observations.allowMembersToMakeSpeciesCall" default="Can members make species call on Observations?" /> </label>
 						</div>
+						<sUser:isAdmin>
 						<div class="row control-group left-indent">
 							
 								<label class="checkbox" style="text-align: left;"> 
@@ -346,6 +341,7 @@ max-width: 100%;
 												name="allowNonMembersToComment" checked="${userGroupInstance.allowNonMembersToComment}"/>
 								 <g:message code="userGroup.permissions.comments.bynonmembers" default="Can non-members comment on Observations of the Group? " /> </label>
 						</div>
+						</sUser:isAdmin>
 						
 					</div>
 				</div>

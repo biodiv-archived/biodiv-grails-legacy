@@ -67,6 +67,8 @@ class ActivityFeed {
 	}
 	
 	static fetchRequiredFeeds(params){
+        //println params;
+        //println params.user
 		def feedType = params.feedType
 		
 		def refTime = getDate(params.refTime)
@@ -75,8 +77,8 @@ class ActivityFeed {
 		}
 		
 		return ActivityFeed.withCriteria(){
-			and{
-				if(params.isCommentThread){
+	 		and{
+	 			if(params.isCommentThread){
 					eq('subRootHolderType', params.subRootHolderType)
 					eq('subRootHolderId', params.subRootHolderId)
 				}else{
@@ -105,24 +107,28 @@ class ActivityFeed {
 									}
 								}
 							}
+							break
+						case ActivityFeedService.USER:
+							eq('author', SUser.read(params.user.toLong()))
+                            break
 						default:
 							break
 					}
 				}
 				if(params.feedCategory && params.feedCategory.trim() != ActivityFeedService.ALL){
 					eq('rootHolderType', params.feedCategory)
-				}
+	 			}
 				if(params.feedClass){
 					eq('activityHolderType', params.feedClass)
-				}
+	 			}
 				(params.timeLine == ActivityFeedService.OLDER) ? lt('lastUpdated', refTime) : gt('lastUpdated', refTime)
-			}
+	 		}
 			if(params.max){
 				maxResults params.max
-			}
+	 		}
 			order 'lastUpdated', 'desc'
-		}
-	}
+	 	}
+	} 
 	
 	//XXX: right now its only usable for specific type. Needs to handle it for aggregate(i.e generic, all) type
 	static int fetchCount(params){
@@ -149,6 +155,10 @@ class ActivityFeed {
 							eq('rootHolderType', params.rootHolderType)
 							eq('rootHolderId', params.rootHolderId.toLong())
 							break
+                        case ActivityFeedService.USER:
+							eq('author', SUser.read(params.user.toLong()))
+							break
+
 						default:
 							break
 					}
@@ -197,7 +207,11 @@ class ActivityFeed {
 				params.showUserFeed = true
 				params.typeToIdFilterMap = getGroupAndObsevations(groups)
 				break
-				
+            case ActivityFeedService.USER:
+                if(!params.user){
+					return false
+				}
+				break
 			default:
 				break
 		}

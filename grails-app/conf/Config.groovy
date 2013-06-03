@@ -10,7 +10,7 @@ import com.octo.captcha.component.image.fontgenerator.RandomFontGenerator
 import com.octo.captcha.component.image.backgroundgenerator.GradientBackgroundGenerator
 import com.octo.captcha.component.image.color.SingleColorGenerator
 import com.octo.captcha.component.image.textpaster.NonLinearTextPaster
-
+import grails.plugins.springsecurity.SecurityConfigType;
 import com.octo.captcha.service.sound.DefaultManageableSoundCaptchaService
 
 
@@ -136,13 +136,6 @@ grails.project.dependency.resolution = {
 	}
 }
 
-fileuploader {
-	docs {
-		maxSize = 1000 * 1024 * 1
-		allowedExtensions = ["xlsx"]
-		path = "/tmp/docs/"
-	}
-}
 
 // Prevent any client side caching for now
 cache.headers.enabled = true
@@ -252,7 +245,12 @@ speciesPortal {
 		checklistDownloadDir = "${download.rootDir}/checklist"
 	}
 
-	
+	content{
+		rootDir = "${app.rootDir}/content"
+		serverURL = "http://localhost/${appName}/content"
+		MAX_DOC_SIZE = 50*1024*1024 //10 mb
+		MAX_IMG_SIZE = 2*1024*1024 // 2mb
+	}	
 		
 	names.parser.serverURL = "127.0.0.1"
 	names.parser.port = 4334
@@ -318,7 +316,6 @@ speciesPortal {
 		OCCURRENCE_RECORDS = 'Occurrence Records'
 		BRIEF = "Brief"
 		SUMMARY = "Summary"
-		REFERENCES = "References"
 		TAXONRECORDID = "TaxonRecordID"
 		GLOBALUNIQUEIDENTIFIER = "GlobalUniqueIdentifier"
 		NOMENCLATURE_AND_CLASSIFICATION = "Nomenclature and Classification"
@@ -387,6 +384,12 @@ speciesPortal {
 		LATLONG = "latlong"
 		USER_GROUP = "group"
 		USER_GROUP_WEBADDRESS = "group_webaddress"
+		
+		GRANTEE_ORGANIZATION = "grantee_organization"
+		SITENAME = "sitename"
+		CORRIDOR = "corridor"
+		DESCRIPTION = "description"
+		TYPE = "type"
 	}
 
 	nameSearchFields {
@@ -440,7 +443,7 @@ environments {
 			}
 		}
 		google.analytics.enabled = false
-
+		//grails.resources.debug = true
 		
 		grails {
 			mail {
@@ -611,6 +614,11 @@ environments {
 				rootDir = "${app.rootDir}/users"
 				serverURL = "http://indiabiodiversity.saturn.strandls.com/${appName}/users"
 			}
+			content{
+				rootDir = "${app.rootDir}/content"
+				serverURL = "http://indiabiodiversity.saturn.strandls.com/${appName}/content"
+			}	
+
 			search.serverURL="http://saturn.strandls.com:8080/solrPamba"
 			grails.project.war.file = "/data/jetty-6.1.26/webapps/${appName}.war"
 			grails {
@@ -684,6 +692,12 @@ environments {
 				rootDir = "${app.rootDir}/users"
 				serverURL = "http://thewesternghats.in/${appName}/users"
 			}
+
+			content{
+				rootDir = "${app.rootDir}/content"
+				serverURL = "http://thewesternghats.in/${appName}/content"
+			}	
+
 			search.serverURL="http://thewesternghats.in:8080/solr"
 			grails {
 				mail {
@@ -729,6 +743,7 @@ environments {
 	}
 }
 
+/*
 navigation.species_dashboard = [
         [controller:'species', title:'Species Gallery', order:1, action:"list"],
         [controller:'species', title:'Taxonomy Browser', order:10, action:'taxonBrowser'],
@@ -776,6 +791,7 @@ navigation.dashboard = [
 	[group:'users', order:50, controller:'SUser', title:'Users', action:'list'],
 	[group:'search', order:60, controller:'search', title:'Advanced Search', action:'advSelect'],
 ]
+*/
 
 jquery {
 	sources = 'jquery'
@@ -840,7 +856,7 @@ grails.plugins.springsecurity.password.algorithm = 'MD5'
 grails.plugins.springsecurity.ui.password.minLength=6
 grails.plugins.springsecurity.ui.password.maxLength=64
 grails.plugins.springsecurity.ui.password.validationRegex='^.*$'
-grails.plugins.springsecurity.ui.register.postRegisterUrl  = "${grails.serverURL}/group/list" // use defaultTargetUrl if not set
+grails.plugins.springsecurity.ui.register.postRegisterUrl  = "${grails.serverURL}/user/myprofile" // use defaultTargetUrl if not set
 grails.plugins.springsecurity.ui.register.defaultRoleNames = ['ROLE_USER']
 
 grails.plugins.springsecurity.ui.notification.emailFrom = 'notification@indiabiodiversity.org'
@@ -1061,6 +1077,20 @@ Hi $username,<br/>
 -The portal team
 '''
 
+grails.plugins.springsecurity.ui.addDocument.emailSubject = 'Document added'
+grails.plugins.springsecurity.ui.addDocument.emailBody = '''
+Hi $username,<br/>
+<br/>
+You have uploaded a document to <b>$domain</b> and it is available <a href="$obvUrl">here</a><br/>
+<br/>
+You will be notified by mail on any social activity on the document.<br/>
+If you do not want to receive notifications please go to your <a href="$userProfileUrl">user profile</a> and switch it off.<br/>
+<br/>
+Thank you for your contribution to the portal.<br/>
+<br/>
+-The portal team'''
+
+
 
 grails.plugins.springsecurity.ui.encodePassword = false
 
@@ -1092,6 +1122,7 @@ grails.plugins.springsecurity.acl.authority.modifyAuditingDetails = 'ROLE_ADMIN'
 grails.plugins.springsecurity.acl.authority.changeOwnership =       'ROLE_ADMIN'
 grails.plugins.springsecurity.acl.authority.changeAclDetails =      'ROLE_RUN_AS_ADMIN'//'ROLE_ACL_CHANGE_DETAILS'
 
+grails.plugins.springsecurity.securityConfigType = SecurityConfigType.Annotation 
 grails.plugins.springsecurity.controllerAnnotations.staticRules = [
 	'/role/**': ['ROLE_ADMIN'],
 	'/persistentLogin/**': ['ROLE_ADMIN'],
@@ -1103,7 +1134,8 @@ grails.plugins.springsecurity.controllerAnnotations.staticRules = [
 	'/registrationCode/**': ['ROLE_ADMIN'],
 	'/requestmap/**': ['ROLE_ADMIN'],
 	'/securityInfo/**': ['ROLE_ADMIN'],
-	'/securityInfo/**': ['ROLE_ADMIN']
+	'/securityInfo/**': ['ROLE_ADMIN'],
+    '/rateable/rate/**': ['ROLE_USER']
  ]
 
 
@@ -1144,3 +1176,17 @@ jcaptchas {
 
 NamesIndexerService.FILENAME = "${appName}_tstLookup.dat";
 ObservationController.COMMIT = false;
+
+grails.rateable.rater.evaluator = { 
+	Class<?> User = SUser.class
+	if (!User) {
+		println "Can't find domain: $domainClassName"
+		return null
+    }
+    def u = org.springframework.security.core.context.SecurityContextHolder.context.authentication.principal
+    if(u && !(u instanceof String)) {
+        def user = User.get(u.id);
+        return user
+    }
+}
+

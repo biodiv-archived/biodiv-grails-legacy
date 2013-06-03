@@ -1,9 +1,10 @@
 <%@page import="species.utils.Utils"%>
 <html>
 <head>
-<link rel="canonical" href="${Utils.getIBPServerDomain() + createLink(controller:'SUser', action:'list')}" />
-<meta name='layout' content='main' />
-<title><g:message code='spring.security.ui.user.search' /></title>
+<g:set var="canonicalUrl" value="${uGroup.createLink([controller:'SUser', action:'list', base:Utils.getIBPServerDomain()])}" />
+<g:set var="title" value="Users"/>
+<g:render template="/common/titleTemplate" model="['title':title, 'canonicalUrl':canonicalUrl]"/>
+
 <r:require modules="susers_list"/>
 <g:set var="entityName"
 	value="${message(code: 'sUser.label', default: 'Users')}" />

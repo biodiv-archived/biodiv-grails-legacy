@@ -16,6 +16,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.savedrequest.SavedRequest;
 import org.springframework.util.StringUtils;
 
+import species.auth.DefaultAjaxAwareRedirectStrategy;
+
 class LoginController {
 
 	/**
@@ -69,14 +71,14 @@ class LoginController {
 				}
 				
 				log.debug "Redirecting to target : $targetUrl";
-				(new DefaultRedirectStrategy()).sendRedirect(request, response, targetUrl);
+				(new DefaultAjaxAwareRedirectStrategy()).sendRedirect(request, response, targetUrl);
 				return;
 			}
 
 			def defaultSavedRequest = request.getSession()?.getAttribute(WebAttributes.SAVED_REQUEST)
 			log.debug "Redirecting to DefaultSavedRequest : $defaultSavedRequest";
 			if(defaultSavedRequest) {
-				(new DefaultRedirectStrategy()).sendRedirect(request, response, defaultSavedRequest.getRedirectUrl());
+				(new DefaultAjaxAwareRedirectStrategy()).sendRedirect(request, response, defaultSavedRequest.getRedirectUrl());
 				return
 			} else {
 				redirect uri:"/";
@@ -123,8 +125,8 @@ class LoginController {
 		def username = session[UsernamePasswordAuthenticationFilter.SPRING_SECURITY_LAST_USERNAME_KEY]
 		String msg = ''
 		def exception = session[WebAttributes.AUTHENTICATION_EXCEPTION]
-		println '*********************'
-		println exception
+		log.debug exception
+
 		if (exception) {
 			if (exception instanceof AccountExpiredException) {
 				msg = g.message(code: "springSecurity.errors.login.expired")
@@ -139,11 +141,12 @@ class LoginController {
 				msg = g.message(code: "springSecurity.errors.login.locked")
 			}
 			else {
-				msg = g.message(code: "springSecurity.errors.login.fail")
+				msg = g.message(code: "springSecurity.errors.login.fail");
+                msg += " ("+exception.message+")"
 			}
 		}
-println msg;
-		if (springSecurityService.isAjax(request)) {
+		
+        if (springSecurityService.isAjax(request)) {
 			render([error: msg] as JSON)
 		}
 		else {

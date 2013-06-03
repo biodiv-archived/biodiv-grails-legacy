@@ -73,7 +73,9 @@ class SpeciesController {
 		params.sort = params.sort?:"percentOfInfo"
 		if(params.sort.equals('lastrevised')) {
 			params.sort = 'lastUpdated'
-		}
+		} else if(params.sort.equals('percentofinfo')) {
+			params.sort = 'percentOfInfo'
+        }
 		params.order = (params.sort.equals("percentOfInfo")||params.sort.equals("lastUpdated"))?"desc":params.sort.equals("title")?"asc":"asc"
 
 		log.debug params
@@ -240,14 +242,6 @@ class SpeciesController {
 					finalLoc.put('speciesFieldInstance', t);
 				}
 				t.add(sField);
-				/*
-				 def sfList;
-				 if(!(sfList = finalLoc.get('speciesFieldInstance'))) {
-				 sfList = new ArrayList(); 
-				 } 
-				 sfList.add(sField);
-				 finalLoc.put('speciesFieldInstance', sfList);
-				 */
 			}
 		}
 
@@ -257,13 +251,7 @@ class SpeciesController {
 			//log.debug "Concept : "+concept
 			Map newConceptMap = new LinkedHashMap();
 			if(hasContent(concept.value.get('speciesFieldInstance'))) {
-				//				List speciesFieldInstances = newConceptMap.get('speciesFieldInstance');
-				//				if(speciesFieldInstances == null) {
-				//					speciesFieldInstances = [];
-				//					newConceptMap.put('speciesFieldInstance', speciesFieldInstances);
-				//				}
-				//				speciesFieldInstances.add(concept.value.get('speciesFieldInstance'));
-				newConceptMap.put('speciesFieldInstance', concept.value.get('speciesFieldInstance'));
+				newConceptMap.put('speciesFieldInstance', sortAsPerRating(concept.value.get('speciesFieldInstance')));
 			}
 			for(category in concept.value) {
 				Map newCategoryMap = new LinkedHashMap();
@@ -286,13 +274,7 @@ class SpeciesController {
 						newConceptMap.put(category.key, category.value);
 					}
 				} else if(hasContent(category.value.get('speciesFieldInstance'))) {
-					//					List speciesFieldInstances = newCategoryMap.get('speciesFieldInstance');
-					//					if(speciesFieldInstances == null) {
-					//						speciesFieldInstances = [];
-					//						newCategoryMap.put('speciesFieldInstance', speciesFieldInstances);
-					//					}
-					//					speciesFieldInstances.add(category.value.get('speciesFieldInstance'));
-					newCategoryMap.put('speciesFieldInstance', category.value.get('speciesFieldInstance'));
+					newCategoryMap.put('speciesFieldInstance',  sortAsPerRating(category.value.get('speciesFieldInstance')));
 				}
 				for(subCategory in category.value) {
 
@@ -305,7 +287,8 @@ class SpeciesController {
 					(subCategory.key.equals(config.INDIAN_ENDEMICITY_GEOGRAPHIC_ENTITY) && speciesInstance.indianEndemicityEntities.size()>0)||
 					hasContent(subCategory.value.get('speciesFieldInstance'))) {
 						//						log.debug "Putting distribution entities ${subCategory.key}"
-						newCategoryMap.put(subCategory.key, subCategory.value)
+                        sortAsPerRating(subCategory.value.get('speciesFieldInstance'));
+						newCategoryMap.put(subCategory.key,  subCategory.value)
 					}
 				}
 				//log.debug 'NSC : '+newCategoryMap
@@ -332,6 +315,11 @@ class SpeciesController {
 		}
 		return false;
 	}
+
+    private sortAsPerRating(List fields) {
+        if(!fields) return;
+        fields.sort( { a, b -> b.averageRating <=> a.averageRating } as Comparator )
+    }
 
 	@Secured(['ROLE_USER'])
 	def edit = {
@@ -605,7 +593,7 @@ class SpeciesController {
 						}
 					}
 
-					File file = observationService.getUniqueFile(obvDir, Utils.cleanFileName(f.originalFilename));
+					File file = observationService.getUniqueFile(obvDir, Utils.generateSafeFileName(f.originalFilename));
 					data_file.transferTo( file );
 
 				}

@@ -1,4 +1,5 @@
 <%@page import="species.Resource.ResourceType"%>
+<%@page import="species.Resource"%>
 <%@page import="species.utils.ImageType"%>
 <%@page	import="org.springframework.web.context.request.RequestContextHolder"%>
 <%@page import="species.License"%>
@@ -13,17 +14,9 @@
 
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-
-<meta name="layout" content="main" />
-<script src="http://maps.google.com/maps/api/js?sensor=true"></script>
+<g:set var="title" value="Observations"/>
+<g:render template="/common/titleTemplate" model="['title':title]"/>
 <r:require modules="observations_create"/>
-
-<g:set var="entityName"
-	value="${message(code: 'observation.label', default: 'Observation')}" />
-<title><g:message code="default.create.label"
-		args="[entityName]" />
-</title>
 
 <style>
 .btn-group.open .dropdown-menu {
@@ -147,7 +140,7 @@ input.dms_field {
 
 						<div>
 							<i class="icon-picture"></i><span>Upload photos of a
-								single observation and species</span>
+								single observation and species and rate images inorder to order them.</span>
 					
 					
 							<div
@@ -158,14 +151,9 @@ input.dms_field {
 									<g:each in="${observationInstance?.resource}" var="r">
 										<li class="addedResource thumbnail">
 <%
-def thumbnail = r.thumbnailUrl()?:null;
 def imagePath = '';
-if(r && thumbnail) {
-	if(r.type == ResourceType.IMAGE) {
-		imagePath = g.createLinkTo(base:grailsApplication.config.speciesPortal.observations.serverURL,	file: thumbnail)
-	} else if(r.type == ResourceType.VIDEO){
-		imagePath = g.createLinkTo(base:thumbnail,	file: '')
-	}
+if(r) {
+    imagePath = r.thumbnailUrl(Utils.getDomainServerUrlWithContext(request) + '/observations')?:null;
 }
 %>
 											
@@ -177,12 +165,13 @@ if(r && thumbnail) {
 											
 
 											<div class='metadata prop'
-												style="position: relative; left: 5px; top: -30px;">
+												style="position: relative; top: -30px;">
 												<input name="file_${i}" type="hidden" value='${r.fileName}' />
 												<input name="url_${i}" type="hidden" value='${r.url}' />
 												<input name="type_${i}" type="hidden" value='${r.type}'/>
+                                                                                                <obv:rating model="['resource':r, class:'obvcreate', 'hideForm':true, index:i]"/>
 												<g:if test="${r.type == ResourceType.IMAGE}">
-												<div id="license_div_${i}" class="licence_div dropdown">
+												<div id="license_div_${i}" class="licence_div pull-left dropdown">
 
 													<a id="selected_license_${i}"
 														class="btn dropdown-toggle btn-mini"
@@ -199,7 +188,7 @@ if(r && thumbnail) {
 															<span>Choose a license</span>
 															<g:each in="${species.License.list()}" var="l">
 																<li class="license_option"
-																	onclick="$('#license_${i}').val($.trim($(this).text()));$('#selected_license_${i}').find('img:first').replaceWith($(this).html());">
+                                                                                                                                onclick="$('#license_${i}').val($.trim($(this).text()));$('#selected_license_${i}').find('img:first').replaceWith($(this).html());" title="${l.name.getTooltip()}">
 																	<img
 																	src="${resource(dir:'images/license',file:l?.name?.getIconFilename()+'.png', absolute:true)}" /><span style="display:none;">${l?.name?.value}</span> 
 																</li>
@@ -208,6 +197,7 @@ if(r && thumbnail) {
 													<input id="license_${i}" type="hidden" name="license_${i}" value="${r?.licenses?.asList().first()?.name}"></input>
 												</div>
 												</g:if>
+                                                                                                
 											</div> 
 											<div class="close_button"
 												onclick="removeResource(event, ${i});$('#geotagged_images').trigger('update_map');"></div>
@@ -215,7 +205,7 @@ if(r && thumbnail) {
 										</li>
 										<g:set var="i" value="${i+1}" />
 									</g:each>
-									<li id="add_file" class="addedResource">
+									<li id="add_file" class="addedResource" style="z-index:10">
 										<div id="add_file_container">
 											<div id="add_image"></div> 
 											<div style="text-align:center;">
@@ -377,138 +367,12 @@ if(r && thumbnail) {
 
 					</div>
 				
-
-
-				<div class="span12 super-section" style="clear: both;">
-					<div class="section">
-						<h3>Where did you find this observation?</h3>
-
-						<div class="span6" style="margin:0px";>
-						
-
-							<div class="row control-group">
-								<%
-									def obvInfoFeeder = lastCreatedObv ? lastCreatedObv : observationInstance
-	                            	def defaultPlaceName = (obvInfoFeeder) ? obvInfoFeeder.placeName : ""
-	                            %>
-	                            <label for="place_name" class="control-label"> <i class="icon-map-marker"></i><g:message
-									code="observation.location.label"
-									default="Location title" /> </label>
-									
-								<div class="controls textbox">
-									<input id="place_name" type="text" name="place_name" class="input-block-level"
-										value="${defaultPlaceName}"></input>
-								</div>
-
-							</div>
-
-							<div class="row control-group">
-								<%
-	                              	def defaultAccuracy = (obvInfoFeeder?.locationAccuracy) ? obvInfoFeeder.locationAccuracy : "Approximate"
-	                                def isAccurateChecked = (defaultAccuracy == "Accurate")? "checked" : ""
-	                                def isApproxChecked = (defaultAccuracy == "Approximate")? "checked" : ""
-	                            %>
-	                             <label for="location_accuracy" class="control-label" style="padding:0px"><g:message
-									code="observation.accuracy.label"
-									default="Accuracy" /> </label>
-									
-	                            <div class="controls">                
-	                                <input type="radio" name="location_accuracy" value="Accurate" ${isAccurateChecked} >Accurate 
-	                                <input type="radio" name="location_accuracy" value="Approximate" ${isApproxChecked} >Approximate<br />
-	                            </div>
-	                        </div>
-	
-	                        <div class="row control-group">
-	                        	<label for="location_accuracy" class="control-label" style="padding:0px"><g:message
-									code="observation.geoprivacy.label"
-									default="Geoprivacy" /> </label>
-	                                
-	                            <div class="controls">  
-                						<input type="checkbox" class="input-block-level"
-	                                        name="geo_privacy" value="geo_privacy" />
-                						Hide precise location
-	                            </div>
-	                        </div>
-	                        <hr>
-	                        <div class="row control-group">
-	                        	<label for="location_accuracy" class="control-label" style="padding:0px"><g:message
-									code="observation.geocode.label"
-									default="Geocode name" /> </label>
-								<div class="controls">                
-	                                <div class="location_picker_value" id="reverse_geocoded_name"></div>
-	                                <input id="reverse_geocoded_name_field" type="hidden"  class="input-block-level"
-	                                        name="reverse_geocoded_name" > </input>
-	                            </div>
-	                        </div>
-                                <div><input id="use_dms" class="input-block-level" type="checkbox" name="use_dms" value="use_dms" />
-                                    Use deg-min-sec format for lat/long
-	                        </div>
-
-	                        <div class="row control-group  ${hasErrors(bean: observationInstance, field: 'latitude', 'error')}">
-	                        	<label for="location_accuracy" class="control-label"><g:message
-									code="observation.latitude.label"
-									default="Latitude" /> </label>
-	                            <div class="controls textbox">             
-	                                <!-- div class="location_picker_value" id="latitude"></div>
-	                                <input id="latitude_field" type="hidden" name="latitude"></input-->
-	                                <input class="degree_field input-block-level" id="latitude_field" type="text" name="latitude"></input>
-	                                <input class="dms_field" id="latitude_deg_field" type="text" name="latitude_deg" placeholder="deg"></input>
-	                                <input class="dms_field" id="latitude_min_field" type="text" name="latitude_min" placeholder="min"></input>
-	                                <input class="dms_field" id="latitude_sec_field" type="text" name="latitude_sec" placeholder="sec"></input>
-	                                <input class="dms_field" id="latitude_direction_field" type="text" name="latitude_direction" placeholder="direction"></input>
-	                                <div class="help-inline">
-											<g:hasErrors bean="${observationInstance}" field="latitude">
-												<g:renderErrors bean="${observationInstance}" as="list" field="latitude"/>
-											</g:hasErrors>
-									</div>
-	                            </div>
-	                        </div>
-	                        <div class="row control-group ${hasErrors(bean: observationInstance, field: 'longitude', 'error')}">
-	                      	  <label for="location_accuracy" class="control-label"><g:message
-									code="observation.longitude.label"
-									default="Longitude" /> </label>
-	                            <div class="controls textbox">               
-	                                <!--div class="location_picker_value" id="longitude"></div>
-	                                <input id="longitude_field" type="hidden" name="longitude"></input-->
-	                                <input class="degree_field input-block-level" id="longitude_field" type="text" name="longitude"></input>
-	                                <input class="dms_field" id="longitude_deg_field" type="text" name="longitude_deg" placeholder="deg"></input>
-	                                <input class="dms_field" id="longitude_min_field" type="text" name="longitude_min" placeholder="min"></input>
-	                                <input class="dms_field" id="longitude_sec_field" type="text" name="longitude_sec" placeholder="sec"></input>
-	                                <input class="dms_field" id="longitude_direction_field" type="text" name="longitude_direction" placeholder="direction"></input>
-	                                 <div class="help-inline">
-											<g:hasErrors bean="${observationInstance}" field="longitude">
-												<g:renderErrors bean="${observationInstance}" as="list" field="longitude"/>
-											</g:hasErrors>
-									</div>
-	                            </div>
-	                        </div>
-	                  
-	                </div>
-	                	<div class=" span6 sidebar-section section" style="padding:0;width:430px;">
-                                    <div class="map_search">
-                                            <div id="geotagged_images" style="padding:10px;">
-                                                    <div class="title" style="display: none">Use location
-                                                            from geo-tagged image:</div>
-                                                    <div class="msg" style="display: none">Select image if
-                                                            you want to use location information embedded in it</div>
-                                            </div>
-
-                                            <div id="current_location" class="section-item">
-                                                    <div class="location_picker_button"><a href="#" onclick="return false;">Use current location</a></div>
-                                            </div>
-                                            <input id="address" type="text" title="Find by place name"  class="input-block-level"
-                                                    class="section-item" />
-                                                                               
-
-
-	                    	<div id="map_area">
-	                        	<div id="map_canvas"></div>
-	                    	</div>
-	                    	</div>
-	                    </div>
-	                </div>
-	            </div>    
-      
+					<%
+						def obvInfoFeeder = lastCreatedObv ? lastCreatedObv : observationInstance
+           			%>
+           			<div class="span12 super-section" style="clear: both;">
+						<obv:showMapInput model="[observationInstance:observationInstance, obvInfoFeeder:obvInfoFeeder, locationHeading:'Where did you find this observation?']"></obv:showMapInput>
+      				</div>
 					<div class="span12 super-section"  style="clear: both">
 						<div class="section" style="position: relative; overflow: visible;">
 							<h3>Describe your observation!</h3>
@@ -519,6 +383,7 @@ if(r && thumbnail) {
 								</h5><div class="section-item" style="margin-right: 10px;">
 									<!-- g:textArea name="notes" rows="10" value=""
 										class="text ui-corner-all" /-->
+
 									<ckeditor:config var="toolbar_editorToolbar">
 									[
     									[ 'Bold', 'Italic' ]
@@ -565,7 +430,6 @@ if(r && thumbnail) {
 							
 					</div>
 					</div>
-
 				<uGroup:isUserGroupMember>
 					<div class="span12 super-section"  style="clear: both">
 						<div class="section" style="position: relative; overflow: visible;">
@@ -602,7 +466,6 @@ if(r && thumbnail) {
 								Observation </a>
 						</div>
 					</g:if>
-					
 					<a id="addObservationSubmit" class="btn btn-primary"
 						style="float: right; margin-right: 5px;"> ${form_button_val} </a>
 				
@@ -619,7 +482,8 @@ if(r && thumbnail) {
 
             </form>
            <%
-				def obvTmpFileName = (observationInstance?.resource?.iterator()?.hasNext())? observationInstance.resource.iterator().next().fileName : null
+					
+				def obvTmpFileName = (observationInstance?.resource?.iterator()?.hasNext() ) ? (observationInstance.resource.iterator().next()?.fileName) : false 
 				def obvDir = obvTmpFileName ?  obvTmpFileName.substring(0, obvTmpFileName.lastIndexOf("/")) : ""
 	       %>
 
@@ -646,12 +510,15 @@ if(r && thumbnail) {
                 </span>
 	    </div>
 				
-	    <div class='metadata prop' style="position:relative; left: 5px; top:-30px;">
+	    <div class='metadata prop' style="position:relative; top:-30px;">
 	            <input name="file_{{>i}}" type="hidden" value='{{>file}}'/>
 	            <input name="url_{{>i}}" type="hidden" value='{{>url}}'/>
 				<input name="type_{{>i}}" type="hidden" value='{{>type}}'/>
+                                 <%def r = new Resource();%>
+                                        <obv:rating model="['resource':r, class:'obvcreate', 'hideForm':true, index:1]"/>
+
 				{{if type == '${ResourceType.IMAGE}'}}
-                <div id="license_div_{{>i}}" class="licence_div dropdown">
+                <div id="license_div_{{>i}}" class="licence_div pull-left dropdown">
                     <a id="selected_license_{{>i}}" class="btn dropdown-toggle btn-mini" data-toggle="dropdown">
                         <img src="${resource(dir:'images/license',file:'cc_by.png', absolute:true)}" title="Set a license for this image"/>
                         <b class="caret"></b>
@@ -665,7 +532,7 @@ if(r && thumbnail) {
                          </g:each>
                     </ul>
 					<input id="license_{{>i}}" type="hidden" name="license_{{>i}}" value="CC BY"></input>
-           		</div>	
+                  		</div>	
 				{{/if}}
 		</div>
        	<div class="close_button" onclick="removeResource(event, {{>i}});$('#geotagged_images').trigger('update_map');"></div>
@@ -677,11 +544,11 @@ if(r && thumbnail) {
 	
 	<r:script>
 	
-    var add_file_button = '<li id="add_file" class="addedResource" style="display:none;"><div id="add_file_container"><div id="add_image"></div><div id="add_video" class="editable"></div></div><div class="progress"><div id="translucent_box"></div><div id="progress_bar"></div ><div id="progress_msg"></div ></div></li>';
+    var add_file_button = '<li id="add_file" class="addedResource" style="display:none;z-index:10;"><div id="add_file_container"><div id="add_image"></div><div id="add_video" class="editable"></div></div><div class="progress"><div id="translucent_box"></div><div id="progress_bar"></div ><div id="progress_msg"></div ></div></li>';
 
 	$(document).ready(function(){
 		$('.dropdown-toggle').dropdown();
-
+		
 		var filePick = function() {
 			filepicker.pickMultiple({
 			    mimetypes: ['image/*'],
@@ -714,13 +581,14 @@ if(r && thumbnail) {
 		    type: 'text',
 		    mode:'popup',
 		    emptytext:'',
+                    placement:'bottom',
 		    url: function(params) {
    				var d = new $.Deferred;
    				if(!params.value) {
        				return d.reject('This field is required'); //returning error via deferred object
    				} else {
    					$('#videoUrl').val(params.value);
-       				$('#upload_resource').submit().find("span.msg").html("Uploading... Please wait...");
+       				        $('#upload_resource').submit().find("span.msg").html("Uploading... Please wait...");
 		  			$("#iemsg").html("Uploading... Please wait...");
 		  			$(".progress").css('z-index',110);
 		  			$('#progress_msg').html('Uploading ...');
@@ -735,8 +603,42 @@ if(r && thumbnail) {
 			},
 		    title: 'Enter YouTube watch url like http://www.youtube.com/watch?v=v8HVWDrGr6o'
 		}
-		
+                
+/*                   // Google Picker API for the Google Docs import
+                   function newPicker() {
+                        google.load('picker', '1', {"callback" : createPicker});
+                    }
+                    // Create and render a Picker object for searching images.
+                    function createPicker() {
+                        var picker = new google.picker.PickerBuilder().
+                        addView(google.picker.ViewId.YOUTUBE).
+                        setCallback(pickerCallback).
+                        build();
+                        picker.setVisible(true);
+                        //$(".picker-dialog-content").prepend("<div id='anyVideoUrl' class='editable'></div>");
+                        //$('#anyVideoUrl').editable(addVideoOptions);
+                    }
+
+                    // A simple callback implementation.
+                    function pickerCallback(data) {
+                            var url = 'nothing';
+                            if (data[google.picker.Response.ACTION] == google.picker.Action.PICKED) {
+                                var doc = data[google.picker.Response.DOCUMENTS][0];
+                                url = doc[google.picker.Document.URL];
+                                if(url) {
+                                    $('#videoUrl').val(url);
+                                    $('#upload_resource').submit().find("span.msg").html("Uploading... Please wait...");
+                                    $("#iemsg").html("Uploading... Please wait...");
+                                    $(".progress").css('z-index',110);
+                                    $('#progress_msg').html('Uploading ...');
+                                }
+                            }
+                    }
+*/
 		$('#add_video').editable(addVideoOptions);
+                //$('#add_video').click(function(){
+                //    newPicker();                    
+                //});
 		
 		$('#attachFiles').change(function(e){
   			$('#upload_resource').submit().find("span.msg").html("Uploading... Please wait...");
@@ -781,7 +683,7 @@ if(r && thumbnail) {
 				$('#progress_msg').html('');
 				$("#iemsg").html("");
 				//var rootDir = '${grailsApplication.config.speciesPortal.observations.serverURL}'
-				var rootDir = '${Utils.getDomainServerUrlWithContext(request)}' + '/observations'
+				//var rootDir = '${Utils.getDomainServerUrlWithContext(request)}' + '/observations'
 				var obvDir = $(responseXML).find('dir').text();
 				var obvDirInput = $('#upload_resource input[name="obvDir"]');
 				if(!obvDirInput.val()){
@@ -797,6 +699,7 @@ if(r && thumbnail) {
 				$(responseXML).find('resources').find('res').each(function() {
 					var fileName = $(this).attr('fileName');
 					var type = $(this).attr('type');					
+					//var thumbnail = rootDir + obvDir + "/" + fileName.replace(/\.[a-zA-Z]{3,4}$/, "${grailsApplication.config.speciesPortal.resources.images.thumbnail.suffix}");
   					images.push({i:++i, file:obvDir + "/" + fileName, url:$(this).attr('url'), thumbnail:$(this).attr('thumbnail'), type:type, title:fileName});
 				});
 				
@@ -806,10 +709,12 @@ if(r && thumbnail) {
 					$('.geotagged_image', this).load(function(){
 						update_geotagged_images_list($(this));		
 					});
+                    var $ratingContainer = $(this).find('.star_obvcreate');
+                    rate($ratingContainer)
 				})
 				$( "#imagesList li:last" ).before (metadataEle);
 
-/*                if (navigator.appName.indexOf('Microsoft') == -1) {
+                /*if (navigator.appName.indexOf('Microsoft') == -1) {
                     $( "#imagesList" ).append (add_file_button);
                 }*/
                 $( "#add_file" ).fadeIn(3000);
@@ -819,34 +724,40 @@ if(r && thumbnail) {
 				$('#videoUrl').val('');
 				$('#add_video').editable('setValue','', false);		
 			}, error:function (xhr, ajaxOptions, thrownError){
-					$("#addObservationSubmit").removeClass('disabled');
-					$("#upload_resource input[name='resources']").remove();
-					$('#videoUrl').val('');
-					$(".progress").css('z-index',90);
-					$('#add_video').editable('setValue','', false);
-					//xhr.upload.removeEventListener( 'progress', progressHandlingFunction, false); 
-					
-					//successHandler is used when ajax login succedes
-	            	var successHandler = this.success, errorHandler;
-	            	handleError(xhr, ajaxOptions, thrownError, successHandler, function() {
-						var response = $.parseJSON(xhr.responseText);
-						if(response.error){
-							$("#image-resources-msg").parent(".resources").addClass("error");
-							$("#image-resources-msg").html(response.error);
-						}
-						
-						var messageNode = $(".message .resources");
-						if(messageNode.length == 0 ) {
-							$("#upload_resource").prepend('<div class="message">'+(response?response.error:"Error")+'</div>');
-						} else {
-							messageNode.append(response?response.error:"Error");
-						}
-						
-						
-					});
+	            	    var successHandler = this.success, errorHandler;
+	            	    handleError(xhr, ajaxOptions, thrownError, successHandler, function(data) {
+                                    if(data && data.status == 401) {
+                                            $('#upload_resource').submit();
+                                            return; 
+                                    }
+                                    $("#addObservationSubmit").removeClass('disabled');
+                                    $("#upload_resource input[name='resources']").remove();
+                                    $('#videoUrl').val('');
+                                    $(".progress").css('z-index',90);
+                                    $('#add_video').editable('setValue','', false);
+                                    //xhr.upload.removeEventListener( 'progress', progressHandlingFunction, false); 
+
+                                    var response = $.parseJSON(xhr.responseText);
+                                    if(response.error){
+                                            $("#image-resources-msg").parent(".resources").addClass("error");
+                                            $("#image-resources-msg").html(response.error);
+                                    }
+                                    
+                                    var messageNode = $(".message .resources");
+                                    if(messageNode.length == 0 ) {
+                                            $("#upload_resource").prepend('<div class="message">'+(response?response.error:"Error")+'</div>');
+                                    } else {
+                                            messageNode.append(response?response.error:"Error");
+                                    }
+                                    
+                                    
+                            });
            } 
+
+           
+
      	});  
-		
+
         $(".group_option").click(function(){
                 $("#group_id").val($(this).val());
                 var caret = "<span class='caret'></span>";
@@ -854,6 +765,10 @@ if(r && thumbnail) {
                 //$("#group_options").hide();
                 $("#selected_group").css({'background-color':'#e5e5e5', 'border-bottom-color':'#aeaeae'});
                 
+        });
+        
+        $.each($('.star_obvcreate'), function(index, value){
+            rate($(value));
         });
 
        
@@ -868,10 +783,6 @@ if(r && thumbnail) {
         $("#name").watermark("Suggest a species name");
         $("#place_name").watermark("Set a title for this location");
        
-        if(${obvInfoFeeder?.latitude && obvInfoFeeder?.longitude}){
-        	set_location(${obvInfoFeeder?.latitude}, ${obvInfoFeeder?.longitude});
-        }
-       
         $("#help-identify input").click(function(){
                 if ($(this).is(':checked')){
                     $('.nameContainer input').val('');
@@ -882,18 +793,19 @@ if(r && thumbnail) {
         });
         
  		//$(".tagit-input").watermark("Add some tags");
-        $("#tags").tagit({
-        	select:true, 
-        	allowSpaces:true, 
-        	placeholderText:'Add some tags',
-        	fieldName: 'tags', 
-        	autocomplete:{
-        		source: '/observation/tags'
-        	}, 
-        	triggerKeys:['enter', 'comma', 'tab'], 
-        	maxLength:30
-        });
-		$(".tagit-hiddenSelect").css('display','none');
+                $("#tags").tagit({
+                        select:true, 
+                        allowSpaces:true, 
+                        placeholderText:'Add some tags',
+                        fieldName: 'tags', 
+                        autocomplete:{
+                                source: '/observation/tags'
+                        }, 
+                        triggerKeys:['enter', 'comma', 'tab'], 
+                        maxLength:30
+                });
+                
+                $(".tagit-hiddenSelect").css('display','none');
 
  		 $("#addObservationSubmit").click(function(event){
  		 	if($(this).hasClass('disabled')) {
@@ -945,9 +857,14 @@ if(r && thumbnail) {
                     $('.dms_field').hide();
                     $('.degree_field').fadeIn();
                 }
+
         });
         
         filepicker.setKey('AXCVl73JWSwe7mTPb2kXdz');
+	$('.geotagged_image', this).load(function(){
+        	update_geotagged_images_list($(this));		
+	});
+
 	});
 
 

@@ -14,11 +14,15 @@ import species.groups.UserGroupMemberRole.UserGroupMemberRoleType;
 import species.participation.Observation;
 import species.utils.ImageType;
 import species.utils.ImageUtils;
+import content.eml.Document
+import content.Project
+
 import utils.Newsletter;
 
 class UserGroup implements Taggable {
 	
 	def dataSource;
+	def activityFeedService
 	
 	String name;
 	String description;
@@ -47,7 +51,7 @@ class UserGroup implements Taggable {
 	def springSecurityService;
 	def userGroupService;
 
-	static hasMany = [speciesGroups:SpeciesGroup, habitats:Habitat, observations:Observation, newsletters:Newsletter]
+	static hasMany = [speciesGroups:SpeciesGroup, habitats:Habitat, observations:Observation, newsletters:Newsletter, documents:Document, projects:Project]
 
 	static constraints = {
 		name nullable: false, blank:false, unique:true
@@ -279,8 +283,8 @@ class UserGroup implements Taggable {
 	}
 
 	//TODO:remove
-	boolean hasPermission(SUser user, Permission permission) {
-		return aclUtilService.hasPermission(gormUserDetailsService.loadUserByUsername(user.email, true), this, permission)
+	boolean hasPermission(permission) {
+		return userGroupService.hasPermission(this, permission);
 	}
 
 	private getUserList(int max, long offset, String sortBy, roleId){
@@ -320,6 +324,10 @@ class UserGroup implements Taggable {
 	
 	def fetchHomePageTitle(){
 		return userGroupService.fetchHomePageTitle(this)
+	}
+	
+	def afterDelete(){
+		activityFeedService.deleteFeed(this)
 	}
 	
 }

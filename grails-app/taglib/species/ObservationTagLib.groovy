@@ -3,13 +3,18 @@ package species
 import species.participation.Observation;
 import species.participation.Recommendation;
 import species.participation.RecommendationVote;
+import grails.util.GrailsNameUtils;
+import org.grails.rateable.RatingException;
+import org.codehaus.groovy.grails.orm.hibernate.cfg.GrailsHibernateUtil; 
+import java.lang.Math;
 
 class ObservationTagLib {
 	static namespace = "obv"
 	
 	def observationService
 	def grailsApplication
-	
+    def springSecurityService;
+
 	def create = {attrs, body ->
 		out << render(template:"/common/observation/editObservationTemplate", model:attrs.model);
 	}
@@ -187,7 +192,7 @@ class ObservationTagLib {
 	}
 	
 	def identificationByEmail = {attrs, body->
-		def emailInfoModel = observationService.getIdentificationEmailInfo(attrs.model, attrs.model.requestObject, "");
+		def emailInfoModel = observationService.getIdentificationEmailInfo(attrs.model, attrs.model.requestObject, "", params.controller, params.action);
 		attrs.model.each { key, value ->
 			emailInfoModel[key] = value;
 		}
@@ -214,8 +219,73 @@ class ObservationTagLib {
 		out << render(template:"/common/downloadTableTemplate", model:attrs.model);
 	}
 	
-	def showMetaData = {attrs, body->
-		out << render(template:"/common/observation/showMetaDataTemplate", model:attrs.model);
+	def showMapInput = {attrs, body->
+		out << render(template:"/common/observation/showMapInputTemplate",model:attrs.model);
 	}
+	
+	def rating = {attrs, body->
+		//out << render(template:"/common/ratingTemplate", model:attrs.model);
+        def resource = attrs.model.resource
+        boolean hideForm = attrs.model.hideForm
+        int index = attrs.model.index
+        String divClass = attrs.model.class?:'rating'
+        if(resource) {
+            resource = GrailsHibernateUtil.unwrapIfProxy(resource);
+            long averageRating = resource.averageRating ?: 0
+            out << """
+                <div class="pull-right">
+            """
+
+            if(!hideForm) {
+                out << """<form class="ratingForm" method="get" title="Rate it">
+                    """
+            }
+            String name = index?(resource.id?'rating_'+index:'rating_{{>i}}'):'rating'
+
+            out << """
+               <span class="star_${divClass} 
+                    title="Rate" data-score='${averageRating}' data-input-name="${name}"  data-id="${resource.id}" data-type="${GrailsNameUtils.getPropertyName(resource.class)}" data-action="like" ></span>
+                    <div class="noOfRatings">(${resource.totalRatings ?: 0} rating${resource.totalRatings!=1?'s':''})</div>
+                """
+            if(!hideForm) {
+                out << "</form>"
+            } 
+            out <<  "</div>"
+        } else {
+            throw new RatingException("There must be a 'bean' domain object included in the ratings tag.")
+        }
+	}
+
+    def like = {attrs, body->
+        def resource = attrs.model.resource
+        String divClass = attrs.model.class?:'rating'
+        boolean hideForm = attrs.model.hideForm
+        if(resource) {
+            resource = GrailsHibernateUtil.unwrapIfProxy(resource);
+            int userRating = springSecurityService.currentUser?((resource.userRating(springSecurityService.currentUser).size()==1)?1:0):0;
+            
+            out << """
+                <div class="pull-right">
+            """
+
+            if(!hideForm) {
+                out << """<form class="ratingForm" method="get" title="Rate it">
+                    """
+            }
+            out << """
+                <span class="like_${divClass} 
+                    title="${(userRating>0)?'Unlike':'Like'}" ${(userRating==1)?"data-score='1'":""} data-id="${resource.id}" data-type="${GrailsNameUtils.getPropertyName(resource.class)}" data-action="${(userRating>0)?'unlike':'like'}"></span>
+                    <span class="noOfRatings" title='No of likes'>${resource.totalRatings ?: 0}</span>
+                """
+            if(!hideForm) {
+                out << "</form>"
+            } 
+            out <<  "</div>"
+ 
+        } else {
+            throw new RatingException("There must be a 'bean' domain object included in the ratings tag.")
+        }
+	}
+
 }
 

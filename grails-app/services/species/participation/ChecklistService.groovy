@@ -5,7 +5,6 @@ import java.text.SimpleDateFormat
 import java.util.Iterator;
 import java.util.List;
 
-import species.participation.RecommendationVote.ConfidenceType
 import species.participation.curation.UnCuratedCommonNames
 
 import org.apache.commons.httpclient.util.DateUtil;
@@ -26,8 +25,7 @@ import groovy.sql.Sql;
 import species.participation.curation.UnCuratedVotes;
 import species.utils.Utils;
 import species.formatReader.SpreadsheetReader;
-import species.Habitat;
-import species.Language;
+
 //csv related
 import au.com.bytecode.opencsv.CSVReader
 import au.com.bytecode.opencsv.CSVWriter;
@@ -42,6 +40,7 @@ import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Element;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.Image
+
 import com.itextpdf.text.ListItem;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Phrase;
@@ -60,7 +59,6 @@ class ChecklistService {
 	def recommendationService
 	def checklistSearchService;
 	def obvUtilService;
-	def activityFeedService;
 	
 	static final String SN_NAME = "scientific_name"
 	static final String CN_NAME = "common_name"
@@ -283,10 +281,8 @@ class ChecklistService {
 		
 
 		//handling scientific name infrastructre
-		if(snColumnOrder && snVal){
-			
+		if(snColumnOrder != null && snVal){
 			snVal = Utils.getCanonicalForm(snVal);
-			
 			if(sciNameSet.contains(snVal)){
 				println "========================== duplicate sn ==============================" + snVal
 				cleanUpGorm()
@@ -847,11 +843,11 @@ class ChecklistService {
 		PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(pdfFile))
 		
 		document.open()
-		Map m = cl.fetchExportableValue(true)
+		Map m = cl.fetchExportableValue()
 		
 		
 		//adding site banner
-		Image image2 = Image.getInstance(new URL(Utils.getIBPServerDomain() + "/sites/all/themes/ibp/images/map-logo.gif"));
+		Image image2 = Image.getInstance(grailsApplication.config.speciesPortal.app.rootDir + "/sites/all/themes/ibp/images/map-logo.gif");
 		//image2.scaleToFit(120f, 120f);
 		document.add(image2);
 		
@@ -863,16 +859,8 @@ class ChecklistService {
 		document.add(list)
 		
 		//writing data
-		def tmpColumnNames = cl.fetchColumnNames()
-		def columnNames = ["s.no"]
-		for(c in tmpColumnNames){
-			if(c.equalsIgnoreCase(ChecklistService.SN_NAME) || c.equalsIgnoreCase(ChecklistService.CN_NAME)){
-				columnNames.add(c)
-			}
-		}
-		columnNames.add("notes")
-		
-		PdfPTable t = new PdfPTable(columnNames.size())
+		def columnNames = cl.fetchColumnNames()
+		PdfPTable t = new PdfPTable(columnNames.length)
 		t.setSpacingBefore(25);
 		t.setSpacingAfter(25);
 		
@@ -898,7 +886,7 @@ class ChecklistService {
 		CSVWriter writer = obvUtilService.getCSVWriter(csvFile.getParent(), csvFile.getName())
 		log.debug "Writing csv checklist" + cl
 		
-		Map m = cl.fetchExportableValue(false)
+		Map m = cl.fetchExportableValue()
 		
 		for(item in m[cl.META_DATA]){
 			writer.writeNext(item.toArray(new String[0]))

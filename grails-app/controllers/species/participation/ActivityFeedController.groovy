@@ -9,7 +9,7 @@ class ActivityFeedController {
 	def springSecurityService;
 	
 	def getFeeds = {
-		log.debug params;
+		//log.debug params;
 		params.author = springSecurityService.currentUser;
 		
 		def feeds = activityFeedService.getActivityFeeds(params);

@@ -72,7 +72,7 @@
 				
 				<obv:download
 					model="['source':'Observations', 'requestObject':request, 'downloadTypes':[DownloadType.CSV, DownloadType.KML] ]" />
-					
+
 				<div id="observations_list_map" class="observation"
 					style="clear: both; display: none;">
 					<obv:showObservationsLocation
@@ -89,7 +89,5 @@
 <g:javascript>
 $(document).ready(function() {
 	window.params.tagsLink = "${uGroup.createLink(controller:'observation', action: 'tags')}"
-	
 });
 </g:javascript>
-

@@ -1,10 +1,14 @@
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
 import org.codehaus.groovy.grails.plugins.springsecurity.openid.OpenIdAuthenticationFailureHandler as OIAFH
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.AuthenticationException
+import org.springframework.security.web.DefaultRedirectStrategy;
 import org.springframework.security.web.PortResolver;
 import org.springframework.security.web.WebAttributes;
 import org.springframework.security.web.savedrequest.DefaultSavedRequest
@@ -16,11 +20,12 @@ import org.springframework.util.StringUtils;
 
 import com.the6hours.grails.springsecurity.facebook.FacebookAuthToken;
 
+import species.auth.DefaultAjaxAwareRedirectStrategy;
 import species.auth.Role
 import species.auth.SUser
 import species.auth.SUserRole
 import species.utils.Utils;
-
+import species.auth.CustomRegisterCommand;
 /**
  * Manages associating OpenIDs with application users, both by creating a new local user
  * associated with an OpenID and also by associating a new OpenID to an existing account.
@@ -138,7 +143,7 @@ class OpenIdController {
 			log.info "Merging details with existing account $user"
 			registerAccountOpenId user.email, openId
 			def usernamePropertyName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
-			authenticateAndRedirect user."$usernamePropertyName"
+			authenticateAndRedirect user."$usernamePropertyName", request, response
 		} else {
 			log.info "Redirecting to register"
 			CustomRegisterCommand command = new CustomRegisterCommand();
@@ -181,7 +186,7 @@ class OpenIdController {
 		}
 
 		def usernamePropertyName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
-		authenticateAndRedirect user."$usernamePropertyName"
+		authenticateAndRedirect user."$usernamePropertyName", request, response
 
 	}
 
@@ -220,7 +225,7 @@ class OpenIdController {
 			facebookAuthService.registerFacebookUser token, user
 
 			def usernamePropertyName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
-			authenticateAndRedirect user."$usernamePropertyName"
+			authenticateAndRedirect user."$usernamePropertyName", request, response
 		} else {
 			log.info "Redirecting to register"
 			CustomRegisterCommand command = new CustomRegisterCommand();
@@ -239,7 +244,7 @@ class OpenIdController {
 	 *
 	 * @param username the user's login name
 	 */
-	private void authenticateAndRedirect(String username) {
+	private void authenticateAndRedirect(String username, final HttpServletRequest request, final HttpServletResponse response) {
 		session.removeAttribute OIAFH.LAST_OPENID_USERNAME
 		session.removeAttribute OIAFH.LAST_OPENID_ATTRIBUTES
 		session.removeAttribute "LAST_FACEBOOK_USER"
@@ -250,7 +255,7 @@ class OpenIdController {
 
 		def savedRequest = session[DefaultSavedRequest.SPRING_SECURITY_SAVED_REQUEST_KEY]
 		if (savedRequest && !config.successHandler.alwaysUseDefault) {
-			redirect url: savedRequest.redirectUrl
+			(new DefaultAjaxAwareRedirectStrategy()).sendRedirect(request, response, savedRequest.getRedirectUrl());
 		}
 		else {
 			redirect uri: config.successHandler.defaultTargetUrl
@@ -314,6 +319,7 @@ class OpenIdController {
 			
 			user.addToOpenIds(url: openId)
 			if (!user.save(flush:true, failOnError:true)) {
+				log.error "Coudn't save user openIds"
 				status.setRollbackOnly()
 			}
 

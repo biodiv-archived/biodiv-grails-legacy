@@ -13,7 +13,6 @@ class CurationService {
 	def grailsApplication
 	
 	def add(Recommendation recoForSciName,  Recommendation recoForCommonName, refObject, author){
-		//commenting this method for optimization as all info can be generated from other tables 
 		/*
 		UnCuratedScientificNames unSciName;
 		UnCuratedCommonNames unCn;

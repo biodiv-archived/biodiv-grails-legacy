@@ -238,10 +238,28 @@ function loadYoutube(youtube_container) {
 	 });
 }
 
+function rating() {
+    rate($(".star_rating"));
+    like($(".like_rating"));
+}
+
 function last_actions() {
 	$(".ellipsis.multiline").trunk8({
-		lines:2,		
+		lines:2,
+                tooltip:false,
+                fill: '&hellip; <a id="read-more" href="#">more</a>'
 	});
+        $('#read-more').live('click', function (event) {
+              $(this).parent().trunk8('revert').append(' <a id="read-less" href="#">read less</a>');
+                
+                return false;
+        });
+
+        $('#read-less').live('click', function (event) {
+              $(this).parent().trunk8();
+                
+                return false;
+        });
 	
 	$(".ellipsis:not(.multiline)").trunk8();
 	
@@ -254,9 +272,25 @@ function last_actions() {
 	    }
 	});
 	
+        $('#contributeMenu.collapse').on({
+	    shown: function(){
+		$.cookie("contribute", "show", {path    : '/'});
+	    },
+	    hide: function(){
+		$.cookie("contribute", "hide", {path    : '/'});
+	    }
+	});
+	
+        if ($.cookie("contribute") == "show" ) {
+            $('#contributeMenu.collapse').collapse('show');
+        }
+
 	$('.yj-message-body').linkify();
 	$('.linktext').linkify(); 
 	//applying table sorting
 	$("table.tablesorter").tablesorter();
+        rating();
+
+        $("#contributeMenu .btn").popover();
 }
 

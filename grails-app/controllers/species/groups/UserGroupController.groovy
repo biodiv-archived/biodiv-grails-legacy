@@ -755,7 +755,7 @@ class UserGroupController {
 							}
 						}
 
-						File file = observationService.getUniqueFile(userGroupDir, Utils.cleanFileName(f.originalFilename));
+						File file = observationService.getUniqueFile(userGroupDir, Utils.generateSafeFileName(f.originalFilename));
 						f.transferTo( file );
 						ImageUtils.createScaledImages(file, userGroupDir);
 						resourcesInfo.add([fileName:file.name, size:f.size]);
@@ -1052,7 +1052,7 @@ class UserGroupController {
 	   //if ( Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
 		   mailService.sendMail {
 			   to user.email
-			   bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com","thomas.vee@gmail.com"
+			   bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com","thomas.vee@gmail.com","sandeept@strandls.com"
 			   from conf.ui.notification.emailFrom
 			   subject mailSubject
 			   html body.toString()
@@ -1123,13 +1123,7 @@ class UserGroupController {
 	   }
 	   return [oldUsers, newUsers]
    }
-   
-   
-   def test = {
-	   render generateLink("observation", "list", [userGroup:UserGroup.read(2)], [], request);
-   } 
-   
-	   
+      
 }
 
 class UserGroupCommand {

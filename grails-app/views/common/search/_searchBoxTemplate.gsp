@@ -46,7 +46,8 @@ $(document).ready(function() {
 		'IBPDomainUrl':"${Utils.getIBPServerDomain()}",
 		'searchController' : "${controller}",
 		'carousel':{maxHeight:75, maxWidth:75},
-                'observation':{}		 
+                'observation': {},
+                'imagesPath': "${resource(dir:'images', absolute:true)}"
 	}
 	$("#userGroupSelectFilter").val("${(queryParams && queryParams.uGroup)?queryParams.uGroup:(params.webaddress?'THIS_GROUP':'ALL')}");
 });

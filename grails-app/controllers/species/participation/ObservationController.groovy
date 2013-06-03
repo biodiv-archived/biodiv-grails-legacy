@@ -14,6 +14,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest
 import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
 
 import grails.converters.JSON;
+import grails.converters.XML;
 
 import grails.plugins.springsecurity.Secured
 import grails.util.Environment;
@@ -79,11 +80,13 @@ class ObservationController {
 		} else{
 			def obvListHtml =  g.render(template:"/common/observation/showObservationListTemplate", model:model);
 			def obvFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
-
-			def filteredTags = observationService.getTagsFromObservation(model.totalObservationInstanceList.collect{it[0]})
-			def tagsHtml = g.render(template:"/common/observation/showAllTagsTemplate", model:[count: count, tags:filteredTags, isAjaxLoad:true]);
+			def tagsHtml = "";
+			if(model.showTags) {
+				def filteredTags = observationService.getTagsFromObservation(model.totalObservationInstanceList.collect{it[0]})
+				tagsHtml = g.render(template:"/common/observation/showAllTagsTemplate", model:[count: count, tags:filteredTags, isAjaxLoad:true]);
+			}
 			def mapViewHtml = g.render(template:"/common/observation/showObservationMultipleLocationTemplate", model:[observationInstanceList:model.totalObservationInstanceList]);
-
+			
 			def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml, tagsHtml:tagsHtml, mapViewHtml:mapViewHtml, instanceTotal:model.instanceTotal]
 			render result as JSON
 			return;
@@ -156,7 +159,14 @@ class ObservationController {
 							observationService.setUserGroups(observationInstance, userGroups);
 						}	
 					}
-										
+				    
+                    log.debug "Saving ratings for the resources"
+                    observationInstance.resource.each { res ->
+                        if(res.rating) {
+                            res.rate(springSecurityService.currentUser, res.rating);
+                        }
+                    }
+						
 					
 					observationService.sendNotificationMail(observationService.OBSERVATION_ADDED, observationInstance, request, params.webaddress);
 					params["createNew"] = true
@@ -217,6 +227,13 @@ class ObservationController {
 							observationService.setUserGroups(observationInstance, []);
 						}
 					}
+                    
+                    log.debug "Saving ratings for the resources"
+                    observationInstance.resource.each { res ->
+                        if(res.rating) {
+                            res.rate(springSecurityService.currentUser, res.rating);
+                        }
+                    }
 					//redirect(action: "show", id: observationInstance.id)
 					params["createNew"] = true
 					chain(action: 'addRecommendationVote', model:['chainedParams':params]);
@@ -303,7 +320,6 @@ class ObservationController {
 				nextObservationId = (pos+1 < session[listKey].size()) ? session[listKey][pos+1] : null;
 			}
 			def prevObservationId = pos > 0 ? session[listKey][pos-1] : null;
-			
 			lastListParams.remove('isGalleryUpdate');
 			lastListParams.remove("append");
 			lastListParams['max'] = noOfObvs;
@@ -339,7 +355,7 @@ class ObservationController {
 		}
 	}
 
-	@Secured(['ROLE_ADMIN'])
+	@Secured(['ROLE_CEPF_ADMIN'])
 	def delete = {
 		def observationInstance = Observation.get(params.id)
 		if (observationInstance) {
@@ -367,7 +383,11 @@ class ObservationController {
 	def upload_resource = {
 		log.debug params;
 		def message;
-		if(!params.resources && !params.videoUrl) {
+		if(params.ajax_login_error == "1") {
+            message = [status:401, error:'Please login to continue']
+			render message as JSON 
+			return;
+		} else if(!params.resources && !params.videoUrl) {
 			message = g.message(code: 'no.file.attached', default:'No file is attached')
 			response.setStatus(500)
 			message = [error:message]
@@ -440,14 +460,15 @@ class ObservationController {
 							}
 						}
 
-						File file = observationService.getUniqueFile(obvDir, Utils.cleanFileName(f.filename));
+						File file = observationService.getUniqueFile(obvDir, Utils.generateSafeFileName(f.filename));
 						download(f.url, file );
 						ImageUtils.createScaledImages(file, obvDir);
 						
 						String obvDirPath = obvDir.absolutePath.replace(rootDir, "")
 						def res = new Resource(fileName:obvDirPath+"/"+file.name, type:ResourceType.IMAGE);
-						def baseUrl = grailsApplication.config.speciesPortal.observations.serverURL						
-						def thumbnail = baseUrl + res.thumbnailUrl();
+                        //context specific baseUrl for location picker script to work
+						def baseUrl = Utils.getDomainServerUrlWithContext(request) + '/observations'
+						def thumbnail = res.thumbnailUrl(baseUrl);
 						
 						resourcesInfo.add([fileName:file.name, url:'', thumbnail:thumbnail ,type:ResourceType.IMAGE]);
 					}
@@ -913,16 +934,22 @@ class ObservationController {
 	
 	def unsubscribeToIdentificationMail = {
 		log.debug "$params"
+		def user
 		if(params.userId){
-			def user = SUser.get(params.userId.toLong())
+			user = SUser.get(params.userId.toLong())
+		}
+		BlockedMails bm = new BlockedMails(email:params.email);
+		if(bm){
+			user = SUser.findByEmail(bm.email)
+			if(!bm.save(flush:true)){
+				this.errors.allErrors.each { log.error it }
+			}
+		}
+		if(user){
 			user.allowIdentifactionMail = false;
 			if(!user.save(flush:true)){
 				this.errors.allErrors.each { log.error it }
 			}
-		}
-		BlockedMails bm = new BlockedMails(email:params.email);
-		if(!bm.save(flush:true)){
-			this.errors.allErrors.each { log.error it }
 		}
 		render "${message(code: 'user.unsubscribe.identificationMail', args: [params.email])}"
 	}
@@ -1014,52 +1041,6 @@ class ObservationController {
 		}
 	}
 
-	/**
-	 * 
-	 */
-	def newComment = {
-		log.debug params;
-		if(!params.obvId) {
-			log.error  "No Observation selected"
-			response.setStatus(500)
-			render (['error':"Coudn't find the specified observation with id $params.obvId"] as JSON);
-		}
-		def observationInstance = Observation.read(params.long('obvId'));
-		if(observationInstance) {
-			observationInstance.updateObservationTimeStamp();
-			//observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
-			observationService.sendNotificationMail(activityFeedService.COMMENT_ADDED, observationInstance, request, params.webaddress);
-			render (['success:true']as JSON);
-		} else {
-			response.setStatus(500)
-			render (['error':"Coudn't find the specified observation with id $params.obvId"] as JSON);
-		}
-	}
-
-	/**
-	 *
-	 */
-	def removeComment = {
-		log.debug params;
-		if(!params.obvId) {
-			log.error "No Observation selected"
-			response.setStatus(500)
-			render (['error':"Coudn't find the specified observation with id $params.obvId"] as JSON);
-		}
-
-		def observationInstance = Observation.read(params.long('obvId'));
-		if(observationInstance) {
-
-			observationInstance.updateObservationTimeStamp();
-			//observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
-			observationService.sendNotificationMail(observationService.SPECIES_REMOVE_COMMENT, observationInstance, request, params.webaddress);
-			render (['success:true']as JSON);
-		} else {
-			response.setStatus(500)
-			render (['error':"Coudn't find the specified observation with id $params.obvId"] as JSON);
-		}
-	}
-	
 	@Secured(['ROLE_USER'])
 	def sendIdentificationMail = {
 		log.debug params;
@@ -1074,7 +1055,7 @@ class ObservationController {
 				def body = observationService.getIdentificationEmailInfo(params, request, entry.getValue()).mailBody
 				mailService.sendMail {
 					to entry.getKey()
-					bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com", "thomas.vee@gmail.com"
+					bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com", "thomas.vee@gmail.com", "sandeept@strandls.com"
 					from conf.ui.notification.emailFrom
 					replyTo currentUserMailId
 					subject mailSubject
@@ -1145,9 +1126,11 @@ class ObservationController {
 			params.remove('isGalleryUpdate');
 			def obvListHtml =  g.render(template:"/common/observation/showObservationListTemplate", model:model);
 			def obvFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
-	
-			def filteredTags = observationService.getTagsFromObservation(model.totalObservationInstanceList.collect{it[0]})
-			def tagsHtml = g.render(template:"/common/observation/showAllTagsTemplate", model:[count: count, tags:filteredTags, isAjaxLoad:true]);
+			def tagsHtml = "";
+			if(model.showTags) {
+				def filteredTags = observationService.getTagsFromObservation(model.totalObservationInstanceList.collect{it[0]})
+				tagsHtml = g.render(template:"/common/observation/showAllTagsTemplate", model:[count: count, tags:filteredTags, isAjaxLoad:true]);
+			}
 			def mapViewHtml = g.render(template:"/common/observation/showObservationMultipleLocationTemplate", model:[observationInstanceList:model.totalObservationInstanceList]);
 			
 			def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml, tagsHtml:tagsHtml, mapViewHtml:mapViewHtml, instanceTotal:model.instanceTotal]

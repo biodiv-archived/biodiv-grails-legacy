@@ -153,11 +153,11 @@ $(document).ready(function(){
     	return false;
     });
    
-   $('#tc_tagcloud a').live('click', function(){
-   		setActiveTag($(this).contents().first().text());
-		updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
-		return false;
-   });
+//   $('#tc_tagcloud a').live('click', function(){
+//   		setActiveTag($(this).contents().first().text());
+//		updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
+//		return false;
+//   });
    
     $("#removeTagFilter").live('click', function(){
     	var oldActiveTag = $("li.tagit-choice.active");
@@ -190,17 +190,21 @@ $(document).ready(function(){
     });
     
     $("#removeQueryFilter").live('click', function(){
-    	$( "#searchTextField" ).val('');
     	var removeParam = undefined;
     	if($($(this).attr('data-target').replace('.','\\.')).length != 0)
     		$($(this).attr('data-target').replace('.','\\.')).val('')
     	else {
-    		removeParam = $(this).attr('data-target').replace('#','');
+    		$( "#searchTextField" ).val('');	
     	}
+    	removeParam = $(this).attr('data-target').replace('#','');
     	updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate, undefined, undefined, undefined, removeParam);
     	return false;
     });
    
+    $('select[name="limit"]').live('change', function() {
+        updateGallery(undefined, $(this).val(), window.params.offset, false, window.params.isGalleryUpdate);
+    });
+
    var tmpTarget =  window.location.pathname + window.location.search;
    setActiveTag($('<a href="'+ tmpTarget +'"></a>').url().param()["tag"]);
    
@@ -282,7 +286,7 @@ $(document).ready(function(){
 		return false;
 	});
 	
-	last_actions();
+//	last_actions();
 	eatCookies();
 	$('.observations_list_wrapper').trigger('updatedGallery');
 });
@@ -408,10 +412,10 @@ function getSelectedUserGroup() {
 
 function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSort, isRegularSearch, removeParam) {
     var params = url.param();
+    
     if(removeParam) {
     	delete params[removeParam]
     }
-    
     removeSort = (typeof removeSort === "undefined") ? false : removeSort;
 
     if(!removeSort) {
@@ -446,14 +450,7 @@ function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSo
             params['habitat'] = habitat;
     }
 
-    if(limit != undefined) {
-        params['max'] = limit.toString();
-    } 
 
-    if(offset != undefined) {
-        params['offset'] = offset.toString();
-    }
-	
 	var tag = getSelectedTag();
 	if(tag){
 		params['tag'] = tag;
@@ -492,6 +489,16 @@ function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSo
 			delete params['daterangepicker_end'];
 		}
 	}
+	
+        if($("#limit").length != 0) {
+            params['max'] = $('select[name="limit"]').val();
+        } else if(limit != undefined) {
+            params['max'] = limit.toString();
+        } 
+
+        if(offset != undefined) {
+            params['offset'] = offset.toString();
+        }
 	
 	if(removeUser){
 		if(params['user'] != undefined){
@@ -558,7 +565,7 @@ function updateListPage(activeTag) {
 }
 
 function updateGallery(target, limit, offset, removeUser, isGalleryUpdate, removeObv, removeSort, isRegularSearch, removeParam) {
-    if(target === undefined) {
+	if(target === undefined) {
             target = window.location.pathname + window.location.search;
     }
     
@@ -566,6 +573,7 @@ function updateGallery(target, limit, offset, removeUser, isGalleryUpdate, remov
     var url = a.url();
     var href = url.attr('path');
     var params = getFilterParameters(url, limit, offset, removeUser, removeObv, removeSort, isRegularSearch, removeParam);
+    console.log(params);
     // alert(" tag in params " + params['tag'] );
     isGalleryUpdate = (isGalleryUpdate == undefined)?true:isGalleryUpdate
     if(isGalleryUpdate)

@@ -5,6 +5,7 @@ import org.codehaus.groovy.grails.plugins.springsecurity.DefaultPostAuthenticati
 import org.codehaus.groovy.grails.plugins.springsecurity.DefaultPreAuthenticationChecks;
 import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
 import org.codehaus.groovy.grails.plugins.springsecurity.openid.OpenIdUserDetailsService;
+import species.auth.DefaultAjaxAwareRedirectStrategy;
 import org.springframework.social.connect.support.ConnectionFactoryRegistry;
 import org.springframework.social.facebook.api.Facebook;
 import org.springframework.social.facebook.connect.FacebookConnectionFactory;
@@ -24,7 +25,9 @@ import species.auth.drupal.DrupalAuthCookieFilter;
 import species.auth.drupal.DrupalAuthUtils;
 import species.participation.EmailConfirmationService;
 import speciespage.FacebookAuthService;
+import com.the6hours.grails.springsecurity.facebook.DefaultFacebookAuthDao
 
+        
 // Place your Spring DSL code here
 beans = {
 	def conf = SpringSecurityUtils.securityConfig;
@@ -94,6 +97,21 @@ beans = {
 	preAuthenticationChecks(DefaultPreAuthenticationChecks)
 	postAuthenticationChecks(DefaultPostAuthenticationChecks)
 
+    SpringSecurityUtils.loadSecondaryConfig 'DefaultFacebookSecurityConfig'
+    // have to get again after overlaying DefaultFacebookecurityConfig
+    def dbConf = SpringSecurityUtils.securityConfig
+
+//    if (!dbConf.facebook.bean.dao) {
+        println "facebookAuthDao"
+        dbConf.facebook.bean.dao = 'facebookAuthDao'
+        facebookAuthDao(DefaultFacebookAuthDao) {
+            domainClassName = dbConf.facebook.domain.classname
+            connectionPropertyName = dbConf.facebook.domain.connectionPropertyName
+            userDomainClassName = dbConf.userLookup.userDomainClassName
+            rolesPropertyName = dbConf.userLookup.authoritiesPropertyName
+        }
+ //   }
+
 	facebookAuthUtils(FacebookAuthUtils) { grailsApplication = ref('grailsApplication') }
 
 	facebookAuthCookieLogout(FacebookAuthCookieLogoutHandler) { facebookAuthUtils = ref('facebookAuthUtils') }
@@ -162,7 +180,7 @@ beans = {
 	}
 
 	emailConfirmationService(EmailConfirmationService) { mailService = ref('mailService') }
-	
+
 	checklistSolrServer(org.apache.solr.client.solrj.impl.StreamingUpdateSolrServer,config.serverURL+"/checklists", config.queueSize, config.threadCount ) {
 		setSoTimeout(config.soTimeout);
 		setConnectionTimeout(config.connectionTimeout);
@@ -178,4 +196,41 @@ beans = {
 	checklistSearchService(speciespage.search.ChecklistSearchService) {
 		solrServer = ref('checklistSolrServer');
 	}
+
+	projectSolrServer(org.apache.solr.client.solrj.impl.StreamingUpdateSolrServer,config.serverURL +"/projects", config.queueSize, config.threadCount ) {
+		setSoTimeout(config.soTimeout);
+		setConnectionTimeout(config.connectionTimeout);
+		setDefaultMaxConnectionsPerHost(config.defaultMaxConnectionsPerHost);
+		setMaxTotalConnections(config.maxTotalConnections);
+		setFollowRedirects(config.followRedirects);
+		setAllowCompression(config.allowCompression);
+		setMaxRetries(config.maxRetries);
+		//setParser(new XMLResponseParser()); // binary parser is used by default
+		log.debug "Initialized search server to "+config.serverURL+"/projects"
+	}
+
+	projectSearchService(speciespage.search.ProjectSearchService) {
+		solrServer = ref('projectSolrServer');
+	}
+
+	documentSolrServer(org.apache.solr.client.solrj.impl.StreamingUpdateSolrServer,config.serverURL+"/documents", config.queueSize, config.threadCount ) {
+		setSoTimeout(config.soTimeout);
+		setConnectionTimeout(config.connectionTimeout);
+		setDefaultMaxConnectionsPerHost(config.defaultMaxConnectionsPerHost);
+		setMaxTotalConnections(config.maxTotalConnections);
+		setFollowRedirects(config.followRedirects);
+		setAllowCompression(config.allowCompression);
+		setMaxRetries(config.maxRetries);
+		//setParser(new XMLResponseParser()); // binary parser is used by default
+		log.debug "Initialized search server to "+config.serverURL+"/documents"
+	}
+
+	documentSearchService(speciespage.search.DocumentSearchService) {
+		solrServer = ref('documentSolrServer');
+	}
+
+    redirectStrategy(DefaultAjaxAwareRedirectStrategy) {
+        contextRelative = conf.redirectStrategy.contextRelative // false
+    }
+
 }

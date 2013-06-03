@@ -68,12 +68,16 @@ class MappedSpreadsheetConverter extends SourceConverter {
 				String fieldName = mappedField.get("field name(s)")
 				String delimiter = mappedField.get("content delimiter");
 				String customFormat = mappedField.get("content format");
+println fieldName;
 				if(fieldName && (customFormat || speciesContent.get(fieldName.toLowerCase()))) {
+println "----"+fieldName;
 					fieldName = fieldName.toLowerCase();
 					Node field = new Node(speciesElement, "field");
 					Node concept = new Node(field, "concept", mappedField.get("concept"));
 					Node category = new Node(field, "category", mappedField.get("category"));
 					Node subcategory = new Node(field, "subcategory", mappedField.get("subcategory"));
+                    println category.text()
+                    println field.category.text()
 					if (customFormat && mappedField.get("category")?.equalsIgnoreCase("images")) {
 						Node images = getImages(imagesMetaData, fieldName, 'images', customFormat, delimiter, speciesContent, speciesElement);
 					} else if (customFormat && category.text().equalsIgnoreCase("icons")) {
@@ -84,8 +88,9 @@ class MappedSpreadsheetConverter extends SourceConverter {
 					} else if (customFormat && category.text().equalsIgnoreCase("video")) {
 						//						Node images = getVideo(fieldName, customFormat, speciesContent);
 						//						new Node(speciesElement, video);
-					} else if (category.text().equalsIgnoreCase((String)fieldsConfig.INFORMATION_LISTING) && field.category.text().equalsIgnoreCase((String)fieldsConfig.REFERENCES)) {
-						Node data = new Node(field, "data", '');
+					} else if (concept.text().equalsIgnoreCase((String)fieldsConfig.INFORMATION_LISTING) && field.category.text().equalsIgnoreCase((String)fieldsConfig.REFERENCES)) {
+println "----"+fieldName;
+                        Node data = createDataNode(field, speciesContent.get(fieldName), speciesContent, mappedField);
 						createReferences(data, speciesContent, mappedField);
 					} else if(customFormat) {
 						String text = getCustomFormattedText(mappedField.get("field name(s)"), customFormat, speciesContent);
@@ -391,17 +396,22 @@ class MappedSpreadsheetConverter extends SourceConverter {
 	}
 	
 	private void createReferences(Node dataNode, speciesContent, mappedField) {
+        log.debug "Creating References"
 		def referenceFields = mappedField.get("field name(s)");		
 		if(referenceFields) {
 			referenceFields.split(",").each { referenceField ->
 				String references = speciesContent.get(referenceField.toLowerCase());
+                println references
 				String delimiter = mappedField.get("content delimiter") ?: "\n";
+                println "delimiter "+delimiter
 				references?.split(delimiter).each {
 					Node refNode = new Node(dataNode, "reference");
+                    println it;
 					getReferenceNode(refNode, it);
 				}
 			}
 		}
+        println "8888888"
 	}
 
     void setLogAppender(FileAppender fa) {

@@ -34,6 +34,9 @@ class ActivityFeedService {
 	static final String MEMBER_LEFT = "Left Group"
 	static final String MEMBER_ROLE_UPDATED = "Role updated"
 	
+	//observation related
+	static final String DOCUMENT_CREATED = "Document created"
+	static final String DOCUMENT_UPDATED = "Document updated"
 	
 	static final String OLDER = "older"
 	static final String NEWER = "newer"
@@ -52,6 +55,7 @@ class ActivityFeedService {
 	static final String SELECTED = "Selected"
 	static final String GROUP_SPECIFIC = "GroupSpecific"
 	static final String MY_FEEDS = "MyFeeds"
+	static final String USER = "User"
 	
 	
 	static final String ALL = "All"
@@ -73,7 +77,7 @@ class ActivityFeedService {
 	def springSecurityService
 	
 	def getActivityFeeds(params){
-		log.debug params;
+//		log.debug params;
 		def feeds = ActivityFeed.fetchFeeds(params)
 		if(params.feedOrder == OLDEST_FIRST){
 			feeds = feeds.reverse()
@@ -193,7 +197,7 @@ class ActivityFeedService {
 		def text = null
 		def activityTitle = null
 		
-		log.debug "=== feed === $feedInstance.id === $feedInstance.activityType"
+		//log.debug "=== feed === $feedInstance.id === $feedInstance.activityType"
 		switch (activityType) {
 			case COMMENT_ADDED:
 				activityTitle = COMMENT_ADDED  + getCommentContext(activityDomainObj, params)

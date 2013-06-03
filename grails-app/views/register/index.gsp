@@ -1,8 +1,8 @@
 <html>
 
 <head>
-<meta name='layout' content='main' />
-<title><g:message code='spring.security.ui.register.title' />
+<g:set var="title" value="Register"/>
+<g:render template="/common/titleTemplate" model="['title':title]"/>
 </title>
 
 <r:require modules="auth" />

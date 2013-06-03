@@ -6,13 +6,21 @@
 		<g:javascript>
                 var markers = [];
                 var big_map;
-                var nagpur_latlng = new google.maps.LatLng('21.07', '79.27');
-                var swRestriction = new google.maps.LatLng('8', '69');
-                var neRestriction = new google.maps.LatLng('36', '98');
+                var  nagpur_latlng, swRestriction, neRestriction, allowedBounds;
+  
+                $(document).ready(function() {
+                    loadGoogleMapsAPI(function() {
+                        initMap();
+                    });
+                });
+
+                function initMap() {
+                nagpur_latlng = new google.maps.LatLng('21.07', '79.27');
+                swRestriction = new google.maps.LatLng('8', '69');
+                neRestriction = new google.maps.LatLng('36', '98');
 
                 var allowedBounds = new google.maps.LatLngBounds(swRestriction, neRestriction);
                 
-                $(document).ready(function() {
                   var options = {
                     zoom: 4,
                     center: nagpur_latlng,
@@ -126,7 +134,7 @@
                      big_map.setCenter(new google.maps.LatLng(y, x));
                 }
 
-                });
+                }
                 </g:javascript>
         </div>        
 		<div class="map_wrapper">
@@ -135,7 +143,7 @@
 	</div>
 </div>
 </g:if>
-	<g:javascript>
+	<r:script>
             function refreshList(bounds){
             	<g:if test="{params.id}">
                 var url = "${uGroup.createLink( controller:'checklist', action: "filteredMapBasedChecklistList",'userGroupWebaddress':userGroup?.webaddress, id:params.id)}" + location.search
@@ -158,4 +166,4 @@
             $(function(){
                 refreshList();
             });
-        </g:javascript>
+        </r:script>

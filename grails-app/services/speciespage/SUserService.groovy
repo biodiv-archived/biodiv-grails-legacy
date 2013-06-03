@@ -128,6 +128,11 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 		if(!id) return false
 		return SpringSecurityUtils.ifAllGranted('ROLE_ADMIN')
 	}
+	
+	boolean isCEPFAdmin(id) {
+		if(!id) return false
+		return SpringSecurityUtils.ifAllGranted('ROLE_CEPF_ADMIN')
+	}
 
 	public void sendNotificationMail(String notificationType, SUser user, request, String userProfileUrl){
 		def conf = SpringSecurityUtils.securityConfig
@@ -154,7 +159,7 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 
 					mailService.sendMail {
 						to user.email
-						bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com","thomas.vee@gmail.com"
+						bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com","thomas.vee@gmail.com", "sandeept@strandls.com"
 						from conf.ui.notification.emailFrom
 						subject mailSubject
 						body(view:"/emailtemplates/welcomeEmail", model:templateMap)
@@ -176,7 +181,7 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 
 				if ( Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
 					mailService.sendMail {
-						bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com","thomas.vee@gmail.com"
+						bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com","thomas.vee@gmail.com","sandeept@strandls.com"
 						from conf.ui.notification.emailFrom
 						subject mailSubject
 						html bodyContent.toString()
@@ -201,6 +206,7 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 		def jsonData = []
 		String username = params.term
 
+        if(username) {
 		String usernameFieldName = 'name';//SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
 		String userId = 'id';
 
@@ -216,7 +222,7 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 		for (result in results) {
 			jsonData << [value: result[0], label:result[0] , userId:result[1] , "category":"Members"]
 		}
-
+        }
 		return jsonData;
 	}
 

@@ -4,64 +4,36 @@
 <%@ page import="species.participation.Recommendation"%>
 <%@ page import="species.participation.RecommendationVote"%>
 <%@page import="species.Resource.ResourceType"%>
+<%@page import="species.Resource"%>
+<%@page import="speciespage.ChartService"%>
 
 <html>
 <head>
-<link rel="canonical" href="${Utils.getIBPServerDomain() + uGroup.createLink(controller:'observation', action:'show', id:observationInstance.id)}" />
-<meta property="og:type" content="article" />
-<meta property="og:title" content="${(!observationInstance.fetchSpeciesCall()?.equalsIgnoreCase('Unknown'))?observationInstance.fetchSpeciesCall():'Help Identify'}"/>
-<meta property="og:url" content="${uGroup.createLink([controller:'observation', action:'show', id:observationInstance.id, base:Utils.getDomainServerUrl(request), 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress])}" />
-<g:set var="fbImagePath" value="" />
+<g:set var="canonicalUrl" value="${uGroup.createLink([controller:'observation', action:'show', id:observationInstance.id, base:Utils.getIBPServerDomain()])}"/>
+<g:set var="title" value="${(!observationInstance.fetchSpeciesCall()?.equalsIgnoreCase('Unknown'))?observationInstance.fetchSpeciesCall():'Help Identify'}"/>
 <%
 def r = observationInstance.mainImage();
-
-def thumbnail = (r && r.thumbnailUrl()) ? r.thumbnailUrl() :null;
-def imagePath = '';
-if(r && thumbnail) {
-	if(r.type == ResourceType.IMAGE) {
-		imagePath = g.createLinkTo(base:grailsApplication.config.speciesPortal.observations.serverURL,	file: thumbnail)
-	} else if(r.type == ResourceType.VIDEO){
-		imagePath = g.createLinkTo(base:thumbnail,	file: '')
-	}
+def imagePath = '', videoPath='';
+if(r) {
+    def gThumbnail = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.gallery.suffix)?:null;
+    if(r && gThumbnail) {
+            if(r.type == ResourceType.IMAGE) {
+                    imagePath = g.createLinkTo(base:grailsApplication.config.speciesPortal.observations.serverURL, file: gThumbnail)
+            } else if(r.type == ResourceType.VIDEO){
+                imagePath = r.thumbnailUrl()
+                videoPath = r.getUrl();
+            }
+    }
 }
-
+	
+String location = "Observed at '" + (observationInstance.placeName.trim()?:observationInstance.reverseGeocodedName) +"'"
+String desc = "- "+ location +" by "+observationInstance.author.name.capitalize()+" in species group "+observationInstance.group.name + " and habitat "+ observationInstance.habitat.name;
 %>
-<meta property="og:image" content="${imagePath}" />
-<meta property="og:site_name" content="${Utils.getDomainName(request)}" />
+<g:set var="description" value="${Utils.stripHTML(observationInstance.notes?observationInstance.notes+' '+desc:desc)?:'' }" />
 
-<g:set var="domain" value="${Utils.getDomain(request)}" />
-<g:set var="fbAppId"/>
-<%
-		
-		if(domain.equals(grailsApplication.config.wgp.domain)) {
-			fbAppId = grailsApplication.config.speciesPortal.wgp.facebook.appId;
-		} else { //if(domain.equals(grailsApplication.config.ibp.domain)) {
-			fbAppId =  grailsApplication.config.speciesPortal.ibp.facebook.appId;
-		}
-		
-		//description = observationInstance.notes.trim() ;
-		String location = "Observed at '" + (observationInstance.placeName.trim()?:observationInstance.reverseGeocodedName) +"'"
-		String desc = "- "+ location +" by "+observationInstance.author.name.capitalize()+" in species group "+observationInstance.group.name + " and habitat "+ observationInstance.habitat.name;
-%>
-<g:set var="description" value="${desc }" />
+<g:render template="/common/titleTemplate" model="['title':title, 'description':description, 'canonicalUrl':canonicalUrl, 'imagePath':imagePath, 'videoPath':videoPath]"/>
 
-<meta property="fb:app_id" content="${fbAppId }" />
-<meta property="fb:admins" content="581308415,100000607869577" />
-<meta property="og:description"
-          content='${description}'/>
-<meta property="og:latitude" content="${observationInstance.latitude}"/>
-<meta property="og:longitude" content="${observationInstance.longitude }"/>
-
-<meta name="layout" content="main" />
-<script src="http://maps.google.com/maps/api/js?sensor=true"></script>
 <r:require modules="observations_show"/>
-<link rel="image_src" href="${createLinkTo(file: gallImagePath, base:grailsApplication.config.speciesPortal.observations.serverURL)}" />
-
-<g:set var="entityName"
-	value="${message(code: 'observation.label', default: 'Observation')}" />
-<title><g:message code="default.show.label" args="[entityName]" />
-</title>
-
 
 <style>
 .nameContainer {
@@ -87,71 +59,63 @@ if(r && thumbnail) {
 .nameContainer .combobox-container {
 	left:210px;
 }
-.observation .union-comment {
-	width:99%
-}
 </style>
 </head>
 <body>
 	
 			<div class="observation  span12">
 				<obv:showSubmenuTemplate/>
+
 				<div class="page-header clearfix">
-					<div style="width:100%;">
-						<div class="span8 main_heading" style="margin-left:0px;">
-							<obv:showSpeciesName
-								model="['observationInstance':observationInstance, 'isHeading':true]" />
-						</div>
-							<a class="btn btn-success pull-right"
-				href="${uGroup.createLink(
-						controller:'observation', action:'create', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"
-				class="btn btn-info" style="margin-top: 10px; margin-left: 5px;"> <i class="icon-plus"></i>Add an Observation</a>
-						<div style="float:right;margin:10px 0;">
-							<sUser:ifOwns model="['user':observationInstance.author]">
-								
-								<a class="btn btn-primary pull-right"
-									href="${uGroup.createLink(controller:'observation', action:'edit', id:observationInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
-									<i class="icon-edit"></i>Edit</a>
-	
-									<a class="btn btn-danger btn-primary pull-right" style="margin-right: 5px;margin-bottom:10px;"
-										href="${uGroup.createLink(controller:'observation', action:'flagDeleted', id:observationInstance.id)}"
-										onclick="return confirm('${message(code: 'default.observatoin.delete.confirm.message', default: 'This observation will be deleted. Are you sure ?')}');"><i class="icon-trash"></i>Delete</a>
-										
-							</sUser:ifOwns>
-						</div>
-					</div>
-					<div style="clear:both;"></div>
-					<g:if test="${params.pos && lastListParams}">
-						<div class="nav" style="width:100%;">
-							<g:if test="${test}">
-								<a class="pull-left btn ${prevObservationId?:'disabled'}" href="${uGroup.createLink([action:"show", controller:"observation", id:prevObservationId, 'pos':params.int('pos')-1, 'userGroupWebaddress':(userGroup?userGroup.webaddress:userGroupWebaddress)])}"><i class="icon-backward"></i>Prev</a>
-								<a class="pull-right  btn ${nextObservationId?:'disabled'}"  href="${uGroup.createLink([action:"show", controller:"observation",
-									id:nextObservationId, 'pos':params.int('pos')+1, 'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress])}">Next <i style="margin-right: 0px; margin-left: 3px;" class="icon-forward"></i></a>
-								<%lastListParams.put('userGroupWebaddress', userGroup?userGroup.webaddress:userGroupWebaddress);
-									lastListParams.put('fragment', params.pos);
-								 %>
-								<a class="btn" href="${uGroup.createLink(lastListParams)}" style="text-align: center;display: block;width: 30pxpx;margin: 0 auto;">List</a>
-							</g:if>
-							<g:else>
-								<a class="pull-left btn ${prevObservationId?:'disabled'}" href="${uGroup.createLink([action:"show", controller:"observation",
-									id:prevObservationId, 'pos':params.int('pos')-1, 'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress])}"><i class="icon-backward"></i>Prev</a>
-								<a class="pull-right  btn ${nextObservationId?:'disabled'}"  href="${uGroup.createLink([action:"show", controller:"observation",
-									id:nextObservationId, 'pos':params.int('pos')+1, 'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress])}">Next<i style="margin-right: 0px; margin-left: 3px;" class="icon-forward"></i></a>
-								<%lastListParams.put('userGroupWebaddress', userGroup?userGroup.webaddress:userGroupWebaddress);
-								lastListParams.put('fragment', params.pos);	 
-								%>
-								<a class="btn" href="${uGroup.createLink(lastListParams)}" style="text-align: center;display: block;width: 30px;margin: 0 auto;">List</a>
-							</g:else>
-						</div>
-					</g:if>
-				</div>
-				
+                                    <div style="width:100%;">
+                                        <div class="main_heading" style="margin-left:0px;">
+                                            <div class="pull-right">
+                                                <a class="btn btn-success pull-right"
+                                                    href="${uGroup.createLink(
+                                                    controller:'observation', action:'create', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}" class="btn btn-info"> <i class="icon-plus"></i>Add an Observation</a>
+ 
+                                                <sUser:ifOwns model="['user':observationInstance.author]">
+                                                <a class="btn btn-primary pull-right" style="margin-right: 5px;"
+                                                   href="${uGroup.createLink(controller:'observation', action:'edit', id:observationInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
+                                                    <i class="icon-edit"></i>Edit</a>
+
+                                                <a class="btn btn-danger btn-primary pull-right" style="margin-right: 5px;"
+                                                    href="${uGroup.createLink(controller:'observation', action:'flagDeleted', id:observationInstance.id)}"
+                                                    onclick="return confirm('${message(code: 'default.observatoin.delete.confirm.message', default: 'This observation will be deleted. Are you sure ?')}');"><i class="icon-trash"></i>Delete</a>
+
+                                                </sUser:ifOwns>
+
+                                            </div>
+                                           <obv:showSpeciesName
+                                            model="['observationInstance':observationInstance, 'isHeading':true]" />
+
+
+                                        </div>
+                                    </div>
+                                    <div style="clear:both;"></div>
+                               </div>
+                               
+                               <div class="span12" style="margin-left:0px">
+                                   <g:render template="/common/observation/showObservationStoryActionsTemplate"
+                                   model="['instance':observationInstance, 'href':canonicalUrl, 'title':title, 'description':description, 'showDetails':true,'hideDownload':true]" />
+                               </div>
+
 				<div class="span8 right-shadow-box" style="margin: 0;">
+				<div style="height:400px;position:relative">
+
+                                    <g:render template="/common/observation/noOfResources" model="['instance':observationInstance, 'bottom':'bottom:55px;']"/>
+                                    <center>
+                                        <div id="gallerySpinner" class="spinner">
+                                        <img src="${resource(dir:'images',file:'spinner.gif', absolute:true)}"
+                                            alt="${message(code:'spinner.alt',default:'Loading...')}" />
+                                        </div>
+                                    </center>
 
 
-					<div id="gallery1">
+					<div id="gallery1" style="visibility:hidden">
+
 						<g:if test="${observationInstance.resource}">
-							<g:each in="${observationInstance.resource}" var="r">
+							<g:each in="${observationInstance.listResourcesByRating()}" var="r">
 								<g:if test="${r.type == ResourceType.IMAGE}">
 								<%def gallImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.gallery.suffix)%>
 								<%def gallThumbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.galleryThumbnail.suffix)%>
@@ -166,9 +130,12 @@ if(r && thumbnail) {
 								</g:if>
 								<g:elseif test="${r.type == ResourceType.VIDEO}">
 									<a href="${r.url }"><span class="video galleryImage">Watch this at YouTube</span></a>
-									<g:imageAttribution model="['resource':video]" />
+									<g:imageAttribution model="['resource':r]" />
 								</g:elseif>
-							</g:each>
+	
+
+                                                                </g:each>
+                                                
 						</g:if>
 						<g:else>
 							<img class="galleryImage"
@@ -178,12 +145,10 @@ if(r && thumbnail) {
 						</g:else>
 
 					</div>
-
-
-
+                                </div>
 					<obv:showStory
 						model="['observationInstance':observationInstance, 'showDetails':true, 'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress]" />
-					
+			
 					<div class="recommendations sidebar_section" style="overflow:visible;clear:both;">
 						<div>
 							<ul id="recoSummary" class="pollBars">
@@ -224,15 +189,12 @@ if(r && thumbnail) {
 					</div>
 					<div class="union-comment">
 					<feed:showAllActivityFeeds model="['rootHolder':observationInstance, feedType:'Specific', refreshType:'manual', 'feedPermission':'editable']" />
-					<%
-						def canPostComment = customsecurity.hasPermissionAsPerGroups([object:observationInstance, permission:org.springframework.security.acls.domain.BasePermission.WRITE]).toBoolean()
-					%>
-					<comment:showAllComments model="['commentHolder':observationInstance, commentType:'super', 'canPostComment':canPostComment, 'showCommentList':false]" />
+					<comment:showAllComments model="['commentHolder':observationInstance, commentType:'super','showCommentList':false]" />
 					</div>
 				</div>
 
-				<div class="span4">
-					
+                                <div class="span4">
+
 					<div class="sidebar_section">
 						<obv:showLocation
 							model="['observationInstance':observationInstance]" />
@@ -272,18 +234,10 @@ if(r && thumbnail) {
 						</div>
 					</g:if>
 					
-					<div class="sidebar_section">
-						<h5>Actions</h5>
-						<div class="tile" style="clear: both">
-							<feed:follow model="['sourceObject':observationInstance]" />
-						</div>
-					</div>
-					<div class="sidebar_section">
-						<h5>Meta data</h5>
-						<div class="tile" style="clear: both">
-							<obv:showMetaData model="['observationInstance':observationInstance]" />
-						</div>
-					</div>	
+<%--					<div class="sidebar_section">--%>
+<%--						<h5>Top 5 Contributors of ${observationInstance.group.name}</h5>--%>
+<%--						<chart:showStats model="['title':'Top 5 Contributors', statsType:ChartService.USER_OBSERVATION_BY_SPECIESGROUP,  speciesGroupId:observationInstance.group.id, hAxisTitle:'User', hideBarChart:true, width:300, hideTitle:true]"/>--%>
+<%--					</div>--%>
 					<!-- obv:showTagsSummary model="['observationInstance':observationInstance]" /-->
 					<!-- obv:showObvStats  model="['observationInstance':observationInstance]"/-->
 
@@ -319,32 +273,43 @@ if(r && thumbnail) {
 			thumbQuality : false,
 			maxScaleRatio : 1,
 			minScaleRatio : 1,
-			youtube:{
-		    	modestbranding: 1,
-		    	autohide: 1,
-		    	color: 'white',
-		    	hd: 1,
-		    	rel: 0,
-		    	showinfo: 0
+                        _toggleInfo: false,
+                        thumbnails:false,
+                        showCounter:true,
+                        idleMode:false,
+			youtube : {
+                            modestbranding: 1,
+                            autohide: 1,
+                            color: 'white',
+                            hd: 1,
+                            rel: 0,
+                            showinfo: 1
 			},
 			dataConfig : function(img) {
-				return {
-					// tell Galleria to grab the content from the .desc div as caption
-					description : $(img).parent().next('.notes').html()
-				};
+                            return {
+                                // tell Galleria to grab the content from the .desc div as caption
+                                description : $(img).parent().next('.notes').html()
+                            };
 			},
 			extend : function(options) {
-				// listen to when an image is shown
-				this.bind('image', function(e) {
-					// lets make galleria open a lightbox when clicking the main
-					// image:
-					$(e.imageTarget).click(this.proxy(function() {
-						this.openLightbox();
-					}));
-				});
-			}
-		});
+                            this.bind('image', function(e) {
+                                $(e.imageTarget).click(this.proxy(function() {
+                                        this.openLightbox();
+                                }));
+                            });
+                            
+                            this.bind('loadfinish', function(e){
+                                galleryImageLoadFinish();
+                            })
+                        }
+                });
+                Galleria.ready(function() {
+                    $("#gallerySpinner").hide();
+                    $("#gallery1").css('visibility', 'visible');
+                });
+	
 
+        
         $('#voteCountLink').click(function() {
         	$('#voteDetails').show();
         });
@@ -396,62 +361,8 @@ if(r && thumbnail) {
 	     	});
 	     	event.preventDefault();
      	});
-     	
-     	
-     	window.fbEnsure(function() {
-			FB.Event.subscribe('comment.create', function(response) {
-				//console.log(response);
-	  			/*FB.api('comments', {'ids': response.href}, function(res) {
-	  			 	console.log(res);
-			        var data = res[response.href].comments.data;
-			        console.log(data);
-			        console.log(data.pop().from.name);
-			    });*/
-	  			$.ajax({
-	  				url: "${uGroup.createLink(controller:params.controller, action:'newComment')}",
-	  				method:"POST",
-	  				dataType:'json',
-	  				data:{'obvId':${observationInstance.id}, 'href':response.href, 'commentId':response.commentID},
-					error: function (xhr, status, thrownError){
-						console.log("Error while callback to new comment"+xhr.responseText)
-					}
-				});
-			});
-			
-			FB.Event.subscribe('comment.remove', function(response) {
-	  			//console.log(response);
-	  			$.ajax({
-	  				url: "${uGroup.createLink(controller:params.controller, action:'removeComment')}",
-	  				method:"POST",
-	  				data:{'obvId':${observationInstance.id}, 'href':response.href, 'commentId':response.commentID},
-					error: function (xhr, status, thrownError){
-						console.log("Error while callback to remove comment"+xhr.responseText)
-					}
-				});
-			});
-			
-			if('${params.postToFB}' === 'on') {
-				FB.ui(
-				  {
-				    method: 'feed',
-				    name: "${(!observationInstance.fetchSpeciesCall()?.equalsIgnoreCase('Unknown'))?observationInstance.fetchSpeciesCall():'Help Identify'}",
-				    link: "${uGroup.createLink(controller:'observation', action:'show', id:observationInstance.id, base:Utils.getDomainServerUrl(request), 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress)}",
-				    picture: "${createLinkTo(file: fbImagePath, base:grailsApplication.config.speciesPortal.observations.serverURL)}",
-				    caption: "${Utils.getDomainName(request)}",
-				    description: "${description.replaceAll("\\n", " ")}"
-				  },
-				  function(response) {
-				    if (response && response.post_id) {
-				      //alert('Post was published.');
-				    } else {
-				      //alert('Could not published to the FB wall.');
-				    }
-				  }
-				);
-			}
-		});
-		
-		$(".nav a.disabled").click(function() {
+        
+                $(".nav a.disabled").click(function() {
 			return false;
 		})
 
@@ -460,7 +371,6 @@ if(r && thumbnail) {
                 });
 
                 preLoadRecos(3, 0, false);
-
 	});
 </r:script>
 <g:javascript>

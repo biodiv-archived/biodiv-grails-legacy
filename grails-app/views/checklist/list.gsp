@@ -1,19 +1,13 @@
 <%@page import="species.utils.Utils"%>
 <html>
 <head>
-<link rel="canonical" href="${Utils.getIBPServerDomain() + createLink(controller:'checklist', action:'list')}" />
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="layout" content="main" />
-<g:set var="entityName"
-	value="${message(code: 'checklistList.label', default: 'Checklist')}" />
-<title><g:message code="default.list.label" args="[entityName]" />
-</title>
-<script src="http://maps.google.com/maps/api/js?sensor=true"></script>
+<g:set var="title" value="Checklists"/>
+<g:render template="/common/titleTemplate" model="['title':title]"/>
 <r:require modules="checklist"/>
 </head>
 <body>
 <div class="span12">
-			<clist:showSubmenuTemplate model="['entityName':entityName]" />
+			<clist:showSubmenuTemplate model="['entityName':title]" />
 
 			<div class="gallerytoolbar">
 				<clist:filterTemplate />		

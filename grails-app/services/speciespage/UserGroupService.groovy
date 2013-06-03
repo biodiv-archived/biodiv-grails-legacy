@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import content.eml.Document
 import grails.plugins.springsecurity.Secured;
 import groovy.sql.Sql;
 
@@ -48,6 +49,8 @@ import species.participation.UserToken;
 import species.utils.ImageUtils;
 import species.utils.Utils;
 import utils.Newsletter;
+import content.eml.Document
+import content.Project
 
 class UserGroupService {
 
@@ -63,7 +66,6 @@ class UserGroupService {
 	def emailConfirmationService;
 	def sessionFactory
 	def activityFeedService;
-
 
 
 	private void addPermission(UserGroup userGroup, SUser user, int permission) {
@@ -139,7 +141,7 @@ class UserGroupService {
 		def resource = null;
 		def rootDir = grailsApplication.config.speciesPortal.userGroups.rootDir
 
-		File iconFile = new File(rootDir , Utils.cleanFileName(icon));
+		File iconFile = new File(rootDir , Utils.generateSafeFileName(icon));
 		if(!iconFile.exists()) {
 			log.error "COULD NOT locate icon file ${iconFile.getAbsolutePath()}";
 		}
@@ -423,7 +425,7 @@ class UserGroupService {
 			log.error  userGroup.errors.allErrors.each { log.error it }
 		} else {
 			def activityFeed = activityFeedService.addActivityFeed(observation, userGroup, observation.author, activityFeedService.OBSERVATION_POSTED_ON_GROUP);
-			observationService.sendNotificationMail(activityFeedService.OBSERVATION_POSTED_ON_GROUP, observation, null, null, activityFeed);
+			//observationService.sendNotificationMail(activityFeedService.OBSERVATION_POSTED_ON_GROUP, observation, null, null, activityFeed);
 			log.debug "Added ${observation} to userGroup ${userGroup}"
 		}
 	}
@@ -449,7 +451,7 @@ class UserGroupService {
 			log.error  userGroup.errors.allErrors.each { log.error it }
 		} else {
 			def activityFeed = activityFeedService.addActivityFeed(observation, userGroup, observation.author, activityFeedService.OBSERVATION_REMOVED_FROM_GROUP);
-			observationService.sendNotificationMail(activityFeedService.OBSERVATION_REMOVED_FROM_GROUP, observation, null, null, activityFeed);
+			//observationService.sendNotificationMail(activityFeedService.OBSERVATION_REMOVED_FROM_GROUP, observation, null, null, activityFeed);
 			log.debug "Removed ${observation} from userGroup ${userGroup}"
 		}
 	}
@@ -1058,4 +1060,149 @@ class UserGroupService {
 		}
 		bean
 	}
+	
+	
+	
+	/////////////// DOCUMENTS RELATED /////////////////
+	void postDocumenttoUserGroups(Document document, List userGroupIds) {
+		log.debug "Posting ${document} to userGroups ${userGroupIds}"
+		userGroupIds.each {
+			if(it) {
+				def userGroup = UserGroup.read(Long.parseLong(it));
+				if(userGroup) {
+					postDocumentToUserGroup(document, userGroup)
+				}
+			}
+		}
+	}
+
+	@Transactional
+	@PreAuthorize("hasPermission(#userGroup, write)")
+	void postDocumentToUserGroup(Document document, UserGroup userGroup) {
+		userGroup.addToDocuments(document);
+		if(!userGroup.save()) {
+			log.error "Could not add ${document} to ${usergroup}"
+			log.error  userGroup.errors.allErrors.each { log.error it }
+		} else {
+			//activityFeedService.addActivityFeed(document, userGroup, document.author, activityFeedService.OBSERVATION_POSTED_ON_GROUP);
+			log.debug "Added ${document} to userGroup ${userGroup}"
+		}
+	}
+
+	void removeDocumentFromUserGroups(Document document, List userGroupIds) {
+		log.debug "Removing ${document} from userGroups ${userGroupIds}"
+		userGroupIds.each {
+			if(it) {
+				def userGroup = UserGroup.read(Long.parseLong("" + it));
+				if(userGroup) {
+					removeDocumentFromUserGroup(document, userGroup)
+				}
+			}
+		}
+	}
+
+	@Transactional
+	@PreAuthorize("hasPermission(#userGroup, write)")
+	void removeDocumentFromUserGroup(Document document, UserGroup userGroup) {
+		userGroup.documents.remove(document);
+		if(!userGroup.save()) {
+			log.error "Could not remove ${document} from ${usergroup}"
+			log.error  userGroup.errors.allErrors.each { log.error it }
+		} else {
+			//activityFeedService.addActivityFeed(document, userGroup, document.author, activityFeedService.OBSERVATION_REMOVED_FROM_GROUP);
+			log.debug "Removed ${document} from userGroup ${userGroup}"
+		}
+	}
+
+	def getDocumentUserGroups(Document documentInstance, int max, long offset) {
+		return documentInstance.userGroups;
+	}
+
+	long getNoOfDocumentUserGroups(Document documentInstance) {
+		String countQuery = "select count(*) from UserGroup userGroup " +
+				"join userGroup.documents document " +
+				"where document=:document and document.isDeleted=:docIsDeleted	and userGroup.isDeleted=:userGroupIsDeleted";
+		def count = UserGroup.executeQuery(countQuery, [document:documentInstance, docIsDeleted:false, userGroupIsDeleted:false])
+		return count[0]
+	}
+
+	def long getDocumentCountByGroup(UserGroup userGroupInstance){
+		def queryParams = [:]
+		queryParams['userGroup'] = userGroupInstance
+		queryParams['isDeleted'] = false;
+		
+		def query = "select count(*) from Document doc join doc.userGroups userGroup where doc.isDeleted = :isDeleted and userGroup=:userGroup"
+		return Document.executeQuery(query, queryParams)[0]
+	}
+	
+	
+	
+	/////////////// PROJECTS RELATED /////////////////
+	void postProjecttoUserGroups(Project project, List userGroupIds) {
+		log.debug "Posting ${project} to userGroups ${userGroupIds}"
+		userGroupIds.each {
+			if(it) {
+				def userGroup = UserGroup.read(Long.parseLong(it));
+				if(userGroup) {
+					postProjectToUserGroup(project, userGroup)
+				}
+			}
+		}
+	}
+
+	@Transactional
+	@PreAuthorize("hasPermission(#userGroup, write)")
+	void postProjectToUserGroup(Project project, UserGroup userGroup) {
+		userGroup.addToProjects(project);
+		if(!userGroup.save()) {
+			log.error "Could not add ${project} to ${usergroup}"
+			log.error  userGroup.errors.allErrors.each { log.error it }
+		} else {
+			//activityFeedService.addActivityFeed(document, userGroup, document.author, activityFeedService.OBSERVATION_POSTED_ON_GROUP);
+			log.debug "Added ${project} to userGroup ${userGroup}"
+		}
+	}
+
+	void removeProjectFromUserGroups(Project project, List userGroupIds) {
+		log.debug "Removing ${project} from userGroups ${userGroupIds}"
+		userGroupIds.each {
+			if(it) {
+				def userGroup = UserGroup.read(Long.parseLong("" + it));
+				if(userGroup) {
+					removeProjectFromUserGroup(project, userGroup)
+				}
+			}
+		}
+	}
+
+	@Transactional
+	@PreAuthorize("hasPermission(#userGroup, write)")
+	void removeProjectFromUserGroup(Project project, UserGroup userGroup) {
+		userGroup.projects.remove(project);
+		if(!userGroup.save()) {
+			log.error "Could not remove ${project} from ${usergroup}"
+			log.error  userGroup.errors.allErrors.each { log.error it }
+		} else {
+			//activityFeedService.addActivityFeed(document, userGroup, document.author, activityFeedService.OBSERVATION_REMOVED_FROM_GROUP);
+			log.debug "Removed ${project} from userGroup ${userGroup}"
+		}
+	}
+
+	def getProjectUserGroups(Project projectInstance, int max, long offset) {
+		//TODO
+		return projectInstance.userGroups;
+	}
+	
+	
+	def boolean hasPermissionAsPerGroup(object, property, permission){
+		def secTagLib = grailsApplication.mainContext.getBean('species.CustomSecurityAclTagLib');
+		return secTagLib.hasPermissionAsPerGroup(['permission':permission, 'object':object, 'property':property], 'permitted')
+	}
+	
+	//XXX same call from taglib leadind to no session errro. to avoid that puttins same checkin in service and exposing through domain object 
+	def boolean hasPermission(object, permission){
+		def secTagLib = grailsApplication.mainContext.getBean('species.CustomSecurityAclTagLib');
+		return secTagLib.hasPermission(['permission':permission, 'object':object], 'permitted')
+	}
+	
 }

@@ -1,14 +1,8 @@
-<html>
+<%@page import="species.utils.Utils"%><html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="layout" content="main" />
+<g:set var="title" value="Observations"/>
+<g:render template="/common/titleTemplate" model="['title':title]"/>
 <r:require modules="observations_list" />
-<g:set var="entityName"
-	value="${message(code: 'observation.label', default: 'Search Results')}" />
-<title><g:message code="default.list.label" args="[entityName]" />
-</title>
-<script type="text/javascript"
-	src="http://maps.google.com/maps/api/js?sensor=true"></script>
 </head>
 <body>
 

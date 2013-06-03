@@ -23,25 +23,24 @@
 		</div>
 	</div>
 
-	<!-- script type="text/javascript"
-		src="http://maps.google.com/maps/api/js?sensor=true"></script-->
 	<r:script>
                 $(document).ready(function() {
-                  var latlng = new google.maps.LatLng(${observationInstance.latitude}, ${observationInstance.longitude});
-                  var options = {
-                    zoom: 13,
-                    center: latlng,
-                    mapTypeId: google.maps.MapTypeId.HYBRID
-                  };
-                  var map = new google.maps.Map(document.getElementById("map_canvas_${observationInstance.id}"), options);
-                  var marker = new google.maps.Marker({
-                    map: map,
-                    draggable: false
-                  });
-                
-                  marker.setPosition(latlng);
-                  map.setCenter(latlng);
-
+                    loadGoogleMapsAPI(function() {
+                        var latlng = new google.maps.LatLng(${observationInstance.latitude}, ${observationInstance.longitude});
+                        var options = {
+                            zoom: 13,
+                            center: latlng,
+                            mapTypeId: google.maps.MapTypeId.HYBRID
+                        };
+                        var map = new google.maps.Map(document.getElementById("map_canvas_${observationInstance.id}"), options);
+                        var marker = new google.maps.Marker({
+                            map: map,
+                            draggable: false
+                        });
+                        
+                        marker.setPosition(latlng);
+                        map.setCenter(latlng);
+                    });
                 });
         </r:script>
 

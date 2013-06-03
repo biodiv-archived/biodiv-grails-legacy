@@ -3,12 +3,8 @@
 <%@ page import="utils.Newsletter"%>
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="layout" content="main" />
-<g:set var="entityName"
-	value="${message(code: 'newsletter.label', default: 'Newsletter')}" />
-<title><g:message code="default.edit.label" args="[entityName]" />
-</title>
+<g:set var="title" value="Newsletter"/>
+<g:render template="/common/titleTemplate" model="['title':title]"/>
 <r:require modules="core" />
 </head>
 <body>

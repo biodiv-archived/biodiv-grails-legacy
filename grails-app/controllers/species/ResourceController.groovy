@@ -1,17 +1,50 @@
 package species
 
+import grails.converters.JSON;
+
+import grails.plugins.springsecurity.Secured
 class ResourceController {
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
+
+    def resourcesService;
 
     def index = {
         redirect(action: "list", params: params)
     }
 
-    def list = {
-        params.max = Math.min(params.max ? params.int('max') : 10, 100)
-        [resourceInstanceList: Resource.list(params), resourceInstanceTotal: Resource.count()]
-    }
+	def list = {
+		log.debug params
+		
+		def model = getResourceList(params);
+		if(params.loadMore?.toBoolean()){
+			render(template:"/resource/showResourceListTemplate", model:model);
+			return;
+		} else if(!params.isGalleryUpdate?.toBoolean()){
+			render (view:"list", model:model)
+			return;
+		} else{
+			def obvListHtml =  g.render(template:"/resource/showResourceListTemplate", model:model);
+
+			def result = [obvListHtml:obvListHtml, instanceTotal:model.instanceTotal]
+			render result as JSON
+			return;
+		}
+	}
+
+	protected def getResourceList(params) {
+		def max = Math.min(params.max ? params.int('max') : 12, 100)
+		def offset = params.offset ? params.int('offset') : 0
+		def filteredResource = resourcesService.getFilteredResources(params, max, offset, false)
+		def resourceInstanceList = filteredResource.resourceInstanceList
+		def queryParams = filteredResource.queryParams
+		def activeFilters = filteredResource.activeFilters
+		activeFilters.put("append", true);//needed for adding new page obv ids into existing session["obv_ids_list"]
+		def count = Resource.count()
+	println resourceInstanceList
+		return [resourceInstanceList: resourceInstanceList, instanceTotal: count, queryParams: queryParams, activeFilters:activeFilters]
+	}
+	
 
     def create = {
         def resourceInstance = new Resource()
@@ -41,6 +74,7 @@ class ResourceController {
         }
     }
 
+    @Secured("ROLE_USER")
     def edit = {
         def resourceInstance = Resource.get(params.id)
         if (!resourceInstance) {
@@ -52,6 +86,7 @@ class ResourceController {
         }
     }
 
+    @Secured("ROLE_USER")
     def update = {
         def resourceInstance = Resource.get(params.id)
         if (resourceInstance) {
@@ -79,6 +114,7 @@ class ResourceController {
         }
     }
 
+    @Secured("ROLE_ADMIN")
     def delete = {
         def resourceInstance = Resource.get(params.id)
         if (resourceInstance) {
@@ -95,6 +131,24 @@ class ResourceController {
         else {
             flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'resource.label', default: 'Resource'), params.id])}"
             redirect(action: "list")
+        }
+    }
+
+    def rate = {
+        def resourceInstance = Resource.get(params.id)
+        if (!resourceInstance) {
+				def message = ['status':'error', 'msg':g.message(code: 'error', default:'Error while processing the request.')];
+				render message as JSON
+        }
+        else {
+            int rate = params.int('rate');
+            if(rate) {
+                resourceInstance.rating = rate;
+                if (resourceInstance.save(flush: true)) {
+                    def message = ['status':'success', 'rating':rate, 'msg':'Successfully added rating'];
+				    render message as JSON
+                }
+            }
         }
     }
 }
