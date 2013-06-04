@@ -1,17 +1,13 @@
 <%@page import="species.utils.Utils"%>
 <html>
 <head>
-<g:set var="canonicalUrl" value="${uGroup.createLink([controller:'checklist', action:'list', base:Utils.getIBPServerDomain()])}" />
-<g:set var="title" value="Checklist"/>
-<g:render template="/common/titleTemplate" model="['title':title, 'description':'', 'canonicalUrl':canonicalUrl, 'imagePath':'']"/>
-<title>${title} | ${params.controller.capitalize()} | ${Utils.getDomainName(request)}</title>
-
-
+<g:set var="title" value="Checklists"/>
+<g:render template="/common/titleTemplate" model="['title':title]"/>
 <r:require modules="checklist"/>
 </head>
 <body>
 <div class="span12">
-			<clist:showSubmenuTemplate model="['entityName':'Checklists']" />
+			<clist:showSubmenuTemplate model="['entityName':title]" />
 
 			<div class="gallerytoolbar">
 				<clist:filterTemplate />		

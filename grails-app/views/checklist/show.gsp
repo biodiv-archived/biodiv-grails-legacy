@@ -7,7 +7,6 @@
 <g:set var="title" value="${checklistInstance.title}"/>
 <g:set var="description" value="${Utils.stripHTML(checklistInstance.description?:'')}" />
 <g:render template="/common/titleTemplate" model="['title':title, 'description':description, 'canonicalUrl':canonicalUrl, 'imagePath':null]"/>
-<title>${title} | ${params.controller.capitalize()} | ${Utils.getDomainName(request)}</title>
 <r:require modules="checklist"/>
 </head>
 <body>

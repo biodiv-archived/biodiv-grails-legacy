@@ -4,12 +4,8 @@
 <%@ page import="species.participation.ActivityFeedService"%>
 <html>
 <head>
-<g:set var="canonicalUrl" value="${uGroup.createLink([controller:'document', action:'browser', base:Utils.getIBPServerDomain()])}" />
-<g:set var="title" value="List"/>
-<g:render template="/common/titleTemplate" model="['title':title, 'description':'', 'canonicalUrl':canonicalUrl, 'imagePath':'']"/>
-<title>${title} | ${params.controller.capitalize()} | ${Utils.getDomainName(request)}</title>
-
-
+<g:set var="title" value="Documents"/>
+<g:render template="/common/titleTemplate" model="['title':title]"/>
 <r:require modules="add_file" />
 <uploader:head />
 <style type="text/css">

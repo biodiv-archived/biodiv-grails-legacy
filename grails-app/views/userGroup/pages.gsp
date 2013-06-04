@@ -7,12 +7,11 @@
 <%@ page import="species.groups.UserGroup"%>
 <html>
 <head>
-<meta name="layout" content="main" />
 <g:set var="entityName"
 	value="${(userGroupInstance)?userGroupInstance.name:Utils.getDomainName(request)}" />
-<title><g:message code="default.show.label"
-		args="[(userGroupInstance)?userGroupInstance.name:Utils.getDomainName(request)]" />
-</title>
+
+<g:set var="title" value="Pages"/>
+<g:render template="/common/titleTemplate" model="['title':title]"/>
 <r:require modules="userGroups_show" />
 </head>
 <body>

@@ -14,14 +14,10 @@
 
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-
-<meta name="layout" content="main" />
+<g:set var="title" value="Observations"/>
+<g:render template="/common/titleTemplate" model="['title':title]"/>
 <r:require modules="observations_create"/>
 
-<g:set var="entityName"
-	value="${message(code: 'observation.label', default: 'Observation')}" />
-<title>${entityName} | ${Utils.getDomainName(request)}</title>
 <style>
 .btn-group.open .dropdown-menu {
 	top: 43px;

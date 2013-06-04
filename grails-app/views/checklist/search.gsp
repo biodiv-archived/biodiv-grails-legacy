@@ -1,13 +1,9 @@
 <%@page import="species.utils.Utils"%>
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="layout" content="main" />
+<g:set var="title" value="Checklists"/>
+<g:render template="/common/titleTemplate" model="['title':title]"/>
 <r:require modules="observations_list" />
-<g:set var="entityName"
-	value="${message(code: 'observation.label', default: 'Search Results')}" />
-<title> Checklists | ${entityName} | ${Utils.getDomainName(request)}</title>
-
 </head>
 <body>
 

@@ -14,7 +14,6 @@
 <g:set var="description" value="${Utils.stripHTML(user.aboutMe)?:'' }" />
 
 <g:render template="/common/titleTemplate" model="['title':title, 'description':description, 'canonicalUrl':canonicalUrl, 'imagePath':imagePath]"/>
-<title>${title} | User | ${Utils.getDomainName(request)}</title>
 
 
 <r:require modules="observations_show,chart" />

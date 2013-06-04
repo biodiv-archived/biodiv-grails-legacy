@@ -1,15 +1,11 @@
-
-
+<%@page import="species.utils.Utils"%>
 <%@page import="species.groups.UserGroup"%>
 <%@ page import="utils.Newsletter"%>
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="layout" content="main" />
-<g:set var="entityName"
-	value="${message(code: 'newsletter.label', default: 'Newsletter')}" />
-<title><g:message code="default.create.label"
-		args="[entityName]" /></title>
+<g:set var="title" value="Newsletter"/>
+<g:render template="/common/titleTemplate" model="['title':title]"/>
+
 <style>
 .body {
 	padding: 10px;

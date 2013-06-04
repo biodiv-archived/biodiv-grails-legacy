@@ -4,15 +4,9 @@
 <%@ page import="species.groups.UserGroup"%>
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="layout" content="main" />
+<g:set var="title" value="Members"/>
+<g:render template="/common/titleTemplate" model="['title':title]"/>
 
-<link rel="image_src"
-	href="${createLinkTo(file: gallImagePath, base:grailsApplication.config.speciesPortal.observations.serverURL)}" />
-
-<g:set var="entityName" value="${userGroupInstance.name}" />
-<title><g:message code="default.show.label"
-		args="[userGroupInstance.name]" /></title>
 <r:require modules="userGroups_show, susers_list" />
 <style>
 .thumbnail {

@@ -9,10 +9,10 @@
 <html>
 <head>
 <g:set var="canonicalUrl" value="${uGroup.createLink([controller:'species', action:'list', base:Utils.getIBPServerDomain()])}" />
-<g:set var="title" value="List"/>
+<g:set var="title" value="Species"/>
 <g:render template="/common/titleTemplate" model="['title':title, 'description':'', 'canonicalUrl':canonicalUrl, 'imagePath':'']"/>
-<title>${title} | ${params.controller.capitalize()} | ${Utils.getDomainName(request)}</title>
 
+<r:require modules="species"/>
 <r:require modules="species_list" />
 
 </head>
@@ -46,7 +46,7 @@
 						</div>
 				</div>
 				<div id="contribute" class="tab-pane">
-					<g:include controller="species" action="contribute" />
+                                    <g:render template="contributeTemplate"/>
 				</div>
 			</div>
 		</div>

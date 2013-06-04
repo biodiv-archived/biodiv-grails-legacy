@@ -4,12 +4,8 @@
 <%@ page import="species.groups.UserGroup"%>
 <html>
 <head>
-<meta name="layout" content="main" />
-<g:set var="title" value="Activity Stream - ${userGroupInstance.name} "/>
-<%def imagePath = userGroupInstance.mainImage()?.fileName;%>
-<g:set var="description" value="${userGroupInstance.description.replaceAll(/<.*?>/, '').trim() }" />
-<g:render template="/common/titleTemplate" model="['title':title, 'description':description, 'canonicalUrl':'', 'imagePath':imagePath]"/>
-<title>${title} | ${params.controller.capitalize()} | ${Utils.getDomainName(request)}</title>
+<g:set var="title" value="Activity"/>
+<g:render template="/common/titleTemplate" model="['title':title]"/>
 <r:require modules="userGroups_show,comment" />
 <style>
 .comment-textbox {

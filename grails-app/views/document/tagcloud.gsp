@@ -2,11 +2,8 @@
 <%@page import="species.utils.Utils"%>
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="layout" content="main" />
-<g:set var="entityName"
-	value="${message(code: 'project.label', default: 'Document Tags')}" />
-<title>${entityName} | ${Utils.getDomainName(request)}</title>
+<g:set var="title" value="Document Tags"/>
+<g:render template="/common/titleTemplate" model="['title':title]"/>
 <r:require modules="core" />
 </head>
 <body>

@@ -3,12 +3,8 @@
 <%@page import="species.utils.Utils"%>
 <html>
 <head>
-<%--<link rel="canonical" href="${Utils.getIBPServerDomain() + createLink(controller:'activityFeed', action:'list')}" />--%>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="layout" content="main" />
-<g:set var="entityName"
-	value="${message(code: 'charts.label', default: 'Statistics')}" />
-<title>${entityName} | ${Utils.getDomainName(request)}</title>
+<g:set var="title" value="Statistics"/>
+<g:render template="/common/titleTemplate" model="['title':title]"/>
 <r:require modules="chart" />
 <gvisualization:apiImport />
 </head>
@@ -17,7 +13,7 @@
 	<div class="span12">
 		<div class="page-header clearfix">
 			<h1>
-				<g:message code="default.observation.heading" args="[entityName]" />
+				<g:message code="default.observation.heading" args="[title]" />
 			</h1>
 		</div>
 

@@ -7,7 +7,6 @@
 <g:set var="title" value="${documentInstance.title}"/>
 <g:set var="description" value="${Utils.stripHTML(documentInstance.description?:'') }" />
 <g:render template="/common/titleTemplate" model="['title':title, 'description':description, 'canonicalUrl':canonicalUrl, 'imagePath':null]"/>
-<title>${title} | ${params.controller.capitalize()} | ${Utils.getDomainName(request)}</title>
 <r:require modules="content_view, activityfeed, comment" />
 </head>
 <body>

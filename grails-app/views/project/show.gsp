@@ -2,12 +2,10 @@
 <%@ page import="content.Project"%>
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <g:set var="canonicalUrl" value="${uGroup.createLink([controller:'project', action:'show', id:projectInstance.id, base:Utils.getIBPServerDomain()])}"/>
 <g:set var="title" value="${projectInstance.title}"/>
 <g:set var="description" value="${Utils.stripHTML(projectInstance.summary?:'')?:''}" />
-<g:render template="/common/titleTemplate" model="['title':title, 'description':description, 'canonicalUrl':canonicalUrl, 'imagePath':null]"/>
-<title>${title} | ${params.controller.capitalize()} | ${Utils.getDomainName(request)}</title>
+<g:render template="/common/titleTemplate" model="['title':title, 'description':description, 'canonicalUrl':canonicalUrl]"/>
 
 <r:require modules="content_view" />
 

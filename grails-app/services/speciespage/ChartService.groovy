@@ -403,13 +403,16 @@ class ChartService {
 	}
 
 	private int getPassedDays(params, UserGroup userGroupInstance){
+		if(params.days)
+			return params.days.toInteger()
+			
 		Date startDate = PORTAL_START_DATE
 		if(userGroupInstance){
 			startDate = new Date(userGroupInstance.foundedOn.getTime())
 			DateGroovyMethods.clearTime(startDate)
 		}
 
-		return params.days ? params.days.toInteger() : ((new Date().getTime() - startDate.getTime())/((1000 * 60 * 60 * 24)))
+		return ((new Date().getTime() - startDate.getTime())/((1000 * 60 * 60 * 24)))
 	}
 	
 	def combineStats(params, request){

@@ -4,11 +4,8 @@
 <%@ page import="content.eml.Document.DocumentType"%>
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="layout" content="main" />
-<g:set var="entityName"
-	value="${message(code: 'project.label', default: 'Project')}" />
-<title>${entityName} | ${Utils.getDomainName(request)}</title>
+<g:set var="title" value="Projects"/>
+<g:render template="/common/titleTemplate" model="['title':title]"/>
 <r:require modules="add_file" />
 <uploader:head />
 <style type="text/css">
