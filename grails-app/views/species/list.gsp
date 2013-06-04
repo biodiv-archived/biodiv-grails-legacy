@@ -38,7 +38,9 @@
 			<div class="tab-content">
 				<div id="list" class="tab-pane active">
 						<s:speciesFilter></s:speciesFilter>
-						<s:showDownloadAction model="['source':'Species', 'requestObject':request, 'downloadTypes':[DownloadType.ZIP, DownloadType.TAR] ]" /> 
+						<sUser:isAdmin>
+							<s:showDownloadAction model="['source':'Species', 'requestObject':request ]" />
+						</sUser:isAdmin> 
 						<div class="observations_list_wrapper" style="top: 0px;">
 							<s:showSpeciesList></s:showSpeciesList>
 						</div>

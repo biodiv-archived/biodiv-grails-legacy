@@ -9,6 +9,8 @@ import java.util.zip.ZipOutputStream
 import java.util.zip.ZipEntry
 import java.nio.channels.FileChannel
 import au.com.bytecode.opencsv.CSVWriter
+import org.apache.commons.logging.LogFactory
+
 
 /**
  * Exports data into Darwin core format
@@ -16,8 +18,11 @@ import au.com.bytecode.opencsv.CSVWriter
 
 class DwCAExporter {
 
+	private static log = LogFactory.getLog(this);
+	
 	def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 	def fieldsConfig = config.speciesPortal.fields
+	def grailsApplication
 
 	protected static DwCAExporter _instance
 	private HashSet contributorsSet
@@ -43,26 +48,35 @@ class DwCAExporter {
 
 
 
-	public void exportSpeciesData(String directory) {
-		exportSpeciesData(Species.findAllByPercentOfInfoGreaterThan(0), directory, null);
+	public void exportSpeciesData(String directory) {		
+		exportSpeciesData(Species.findAllByPercentOfInfoGreaterThan(0), directory);
 	}
 
 	/**
 	 * Export species
 	 * Iterate over each species and export related data
 	 */
-	public void exportSpeciesData(List<Species> speciesList, String directory, String archiveType) {
-
+	public void exportSpeciesData(List<Species> speciesList, String directory) {
+		
+		log.info "Darwin Core export started"
 
 		if(!directory) {
 
-			File targetDir = grailsApplication.config.speciesPortal.species.speciesDownloadDir + "dwc_"+ + new Date().getTime()
+			/*
+			File targetDir = new File(config.speciesPortal.species.speciesDownloadDir)
 			targetDir.createDirs()
 			directory = targetDir.getPath()
+			*/
+			
+			directory = config.speciesPortal.species.speciesDownloadDir
 
 		}
+		
+		String folderName = "dwc_"+ + new Date().getTime()
+		
+		String folderPath = directory + "/"+ folderName
 
-		initWriters(directory)
+		initWriters(folderPath)
 		fillHeaders()
 
 		for(Species specie: speciesList) {
@@ -74,15 +88,16 @@ class DwCAExporter {
 		closeWriters()
 
 		//Archive the directory and return the file
-		archive(directory, archiveType)
+		archive(directory, folderName)
 
 	}
 
-	def archive(directory, archiveType) {
-		String zipFileName = "file.zip"
-		String inputDir = directory
+	def archive(directory, folderName) {
+		String zipFileName = folderName+ ".zip"
+		String inputDir = directory + "/" + folderName
+		
 
-		ZipOutputStream zipFile = new ZipOutputStream(new FileOutputStream(zipFileName))
+		ZipOutputStream zipFile = new ZipOutputStream(new FileOutputStream(directory+"/"+zipFileName))
 		new File(inputDir).eachFile() { file ->
 			zipFile.putNextEntry(new ZipEntry(file.getName()))
 			def buffer = new byte[1024]
@@ -674,6 +689,10 @@ class DwCAExporter {
 	}
 
 	protected void initWriters(String targetDir) {
+		
+		File target = new File(targetDir)
+		if(!target.exists())
+			target.mkdirs()
 
 		taxaWriter = getCSVWriter(targetDir, 'taxa.txt')
 		mediaWriter = getCSVWriter(targetDir, 'media.txt')

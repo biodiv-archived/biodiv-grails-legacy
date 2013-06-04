@@ -13,9 +13,9 @@
 					style="padding: 5px; margin-bottom: 10px;">The download link
 					will be available on your user profile page</span>
 			</div>
-<!-- 
+ 
 			<input type="hidden" name="downloadType" value="ZIP" /> <br />
-			 -->
+			 
 			<textarea class="comment-textbox"
 				placeholder="Please let us know how you intend to use this data"
 				name="notes"></textarea>

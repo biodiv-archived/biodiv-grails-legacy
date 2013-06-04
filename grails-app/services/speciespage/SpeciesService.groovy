@@ -400,12 +400,12 @@ class SpeciesService {
 		log.debug(params)
 		def speciesInstanceList = getSpeciesList(params, dl)
 		log.debug " Species total $speciesInstanceList.size "
-		return exportSpeciesData(speciesInstanceList, null, dl.type)
+		return exportSpeciesData(speciesInstanceList, null)
 	}
 
 
 
-	private getSpeciesList(params, dl){
+	def getSpeciesList(params, dl){
 		String action = new URL(dl.filterUrl).getPath().split("/")[2]
 		//getting result from solr
 		def speciesInstanceList = search(params).speciesInstanceList
@@ -423,7 +423,7 @@ class SpeciesService {
 	/**
 	 * export species data
 	 */
-	def exportSpeciesData(List<Species> species, String directory, String archiveType) {
+	def exportSpeciesData(List<Species> species, String directory) {
 		DwCAExporter.getInstance().exportSpeciesData(species, directory)
 	}
 
