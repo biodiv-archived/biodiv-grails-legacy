@@ -57,14 +57,24 @@ $(document).ready(function(){
 </g:if>
 
 <g:if test="${forObservations}">
-	<div id="observationMediaFilter" class="btn-group"
+<%--	<div id="observationMediaFilter" class="btn-group"--%>
+<%--		style="float: right; margin-right: 5px; z-index: 10; position: absolute; margin-top: -65px; right: 250px;">--%>
+<%--		<input type="text" id="observationMediaFilter"--%>
+<%--			value="${params.isMediaFilter}" style="display: none" />--%>
+<%--		<button id="observationMediaAllFilterButton" class="btn"--%>
+<%--			rel="tooltip" data-original-title="Show all observations">All</button>--%>
+<%--		<button id="observationMediaOnlyFilterButton" class="btn" rel="tooltip"--%>
+<%--			data-original-title="Show only observations with images">With Images</button>--%>
+<%--	</div>--%>
+
+	<div id="observationAllChecklistFilter" class="btn-group"
 		style="float: right; margin-right: 5px; z-index: 10; position: absolute; margin-top: -65px; right: 250px;">
-		<input type="text" id="observationMediaFilter"
-			value="${params.isMediaFilter}" style="display: none" />
-		<button id="observationMediaAllFilterButton" class="btn"
+		<input type="text" id="observationAllChecklistFilter"
+			value="${params.isChecklistOnly}" style="display: none" />
+		<button id="observationAllButton" class="btn"
 			rel="tooltip" data-original-title="Show all observations">All</button>
-		<button id="observationMediaOnlyFilterButton" class="btn" rel="tooltip"
-			data-original-title="Show only observations with images">With Images</button>
+		<button id="observationChecklistOnlyButton" class="btn" rel="tooltip"
+			data-original-title="Show only checklist">Checklist</button>
 	</div>
 	
 	<div id="speciesNameFilter" class="btn-group"
@@ -79,7 +89,7 @@ $(document).ready(function(){
 	<div id="observationFlagFilter" class="btn-group"
 		style="float: right; margin-right: 5px; z-index: 10; position: absolute; margin-top: -30px; right: 0;">
 		<input type="text" id="observationFlagFilter"
-			value="${params.noMediaFilter}" style="display: none" />
+			value="${params.isFlagged}" style="display: none" />
 		<button id="observationWithNoFlagFilterButton" class="btn"
 			rel="tooltip" data-original-title="Show all observations">All</button>
 		<button id="observationFlaggedButton" class="btn" rel="tooltip"

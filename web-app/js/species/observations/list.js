@@ -22,6 +22,46 @@ $(document).ready(function(){
 		$("#observationWithNoFlagFilterButton").addClass('active')
 	}
 
+    
+	$('#observationAllChecklistFilter').button();
+    if(window.params.isChecklistOnly == 'true' ){
+		$("#observationChecklistOnlyButton").addClass('active');
+		$("#observationAllButton").removeClass('active')
+	}else{
+		$("#observationChecklistOnlyButton").removeClass('active');
+		$("#observationAllButton").addClass('active')
+	}
+    
+	   $("#observationChecklistOnlyButton").click(function() {
+		    if($("#observationChecklistOnlyButton").hasClass('active')){
+		    	return false;
+		    }
+		    $("#observationAllChecklistFilter").val('true')
+		    $("#observationAllButton").removeClass('active')
+		    $("#observationChecklistOnlyButton").addClass('active')
+
+		    updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
+		    	return false;
+			});
+
+
+	   
+		$("#observationAllButton").click(function() {
+	   		if($("#observationAllButton").hasClass('active')){
+	   			return false;
+	   		}
+			$("#observationAllChecklistFilter").val('false');
+			$("#observationChecklistOnlyButton").removeClass('active');
+			$("#observationAllButton").addClass('active');
+			
+			updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
+	        return false;
+		});
+
+
+    
+    
+
     $('#observationMediaFilter').button();
     if(window.params.isMediaFilter ==  undefined || window.params.isMediaFilter == 'true' ){
 		$("#observationMediaAllFilterButton").removeClass('active');
@@ -81,6 +121,8 @@ $(document).ready(function(){
 		updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
         return false;
 	});
+
+
 	
 	$("#speciesNameAllButton").click(function() {
    		if($("#speciesNameAllButton").hasClass('active')){
@@ -376,6 +418,15 @@ function getSelectedFlag() {
     }	
 }
 
+function getSelectedAllChecklistFlag() {
+    var flag = ''; 
+	flag = $("#observationAllChecklistFilter").attr('value');
+	if(flag) {
+    	flag = flag.replace(/\s*\,\s*$/,'');
+    	return flag;
+    }	
+}
+
 function getSelectedMedia() {
     var media = ''; 
     media = $("#observationMediaFilter").attr('value');
@@ -435,10 +486,15 @@ function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSo
             params['isFlagged'] = flag;
     }
     
-    var mediaFilter = getSelectedMedia();
-    if(mediaFilter) {
-            params['isMediaFilter'] = mediaFilter;
+    var allChecklistFlag = getSelectedAllChecklistFlag();
+    if(allChecklistFlag) {
+            params['isChecklistOnly'] = allChecklistFlag;
     }
+    
+//    var mediaFilter = getSelectedMedia();
+//    if(mediaFilter) {
+//            params['isMediaFilter'] = mediaFilter;
+//    }
     
     var grp = getSelectedGroup();
     if(grp) {

@@ -5,11 +5,13 @@ import java.text.SimpleDateFormat
 import java.util.Iterator;
 import java.util.List;
 
+import species.participation.RecommendationVote.ConfidenceType
 import species.participation.curation.UnCuratedCommonNames
 
 import org.apache.commons.httpclient.util.DateUtil;
 import org.apache.solr.common.SolrException;
 import org.apache.solr.common.util.NamedList;
+import org.codehaus.groovy.grails.orm.hibernate.cfg.GrailsDomainBinder;
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +21,8 @@ import species.Species;
 import species.groups.SpeciesGroup;
 import species.groups.UserGroup;
 import species.CommonNames;
+import species.Habitat;
+import species.Language;
 import species.License;
 import species.Reference;
 import groovy.sql.Sql;
@@ -59,8 +63,10 @@ class ChecklistService {
 	def recommendationService
 	def checklistSearchService;
 	def obvUtilService;
+	def activityFeedService;
 	
-	static final String SN_NAME = "scientific_name"
+	static final String SN_NAME_KEY = "scientific_name" 
+	static final String SN_NAME = "scientific_name" //"scientific_names" //"Scientific Name" //"scientific_name"
 	static final String CN_NAME = "common_name"
 
 	String connectionUrl =  "jdbc:postgresql://localhost/ibp";
@@ -68,6 +74,7 @@ class ChecklistService {
 	String password = "postgres123";
 
 	def dateFormatStrings =  Arrays.asList("yyyy-MM-dd'T'HH:mm:ss")
+	def flushImmediately  = false // grailsApplication.config.speciesPortal.flushImmediately
 	
 	
 	def migrateNewChecklist(params){
@@ -83,7 +90,7 @@ class ChecklistService {
 		def startDate = new Date()
 		def sql = Sql.newInstance(connectionUrl, userName, password, "org.postgresql.Driver");
 		int i=0;
-		sql.eachRow("select nid, vid, title from node where type = 'checklist' order by nid asc offset $startOffset") { row ->
+		sql.eachRow("select nid, vid, title from node where type = 'checklist' and nid = $startOffset") { row ->
 			log.debug " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>     title ===  $i  $row.title  nid == $row.nid , vid == $row.vid"
 			try{
 				Checklist checklist = createCheckList(row, sql)
@@ -309,7 +316,7 @@ class ChecklistService {
 //			log.debug "===================== reco info ========================" + reco
 //			log.debug " species id " + reco.taxonConcept?.findSpeciesId()
 //			log.debug " cannonical form " + reco.taxonConcept?.canonicalForm
-			cl.addToRow(new ChecklistRowData(key:snKey, value:snVal, rowId:rowId, reco:reco, columnOrderId:snColumnOrder))
+			cl.addToRow(new ChecklistRowData(key:SN_NAME_KEY, value:snVal, rowId:rowId, reco:reco, columnOrderId:snColumnOrder))
 		}
 	}
 
@@ -486,20 +493,17 @@ class ChecklistService {
 	}
 	
 	def updateLocation(){
-		SpreadsheetReader.readSpreadSheet("/tmp/checklist_location_byThomas.xls").get(0).each{ m ->
-			//println "title === " + m.title + "||||| lat === $m.lat  ||||| long === " + m.long
-			def cl = Checklist.findByTitle(m.title.trim())
+		SpreadsheetReader.readSpreadSheet("/tmp/checklist_locations.xls").get(0).each{ m ->
+			def cl = Checklist.get(m.id.toString().trim().toLong())
 			if(cl){
-				cl.latitude = m.lat.toFloat()
-				cl.longitude = m.long.toFloat() 
+				cl.latitude = m.lat.trim().toFloat()
+				cl.longitude = m.long.trim().toFloat()
+				cl.placeName = m.place.trim()
+				
 				if(!cl.save(flush:true)){
 					cl.errors.allErrors.each { log.error it }
 				}
-			}else{
-				//cl = Checklist.read(m.id.toFloat().toLong())
-				log.error " no cheklist $m.id === $m.title   ||| cl ==" + cl?.title 
-				
-				
+				log.debug "saving $cl"
 			}
 		}
 	}
@@ -908,26 +912,72 @@ class ChecklistService {
 	////////////////////////////////// create observation from checklist row //////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	def migrateObv(){
+	def migrateObservationFromChecklist(){
 		def startTime = new Date()
-		Checklist.listOrderById().each { Checklist cl ->
+		
+		int created =0, error =0,  ignored =0
+		def ignoreset = []
+		def errorset = []
+		//Checklist.withTransaction(){
+		log.debug "   start time $startTime "
+		
+		def m = GrailsDomainBinder.getMapping(ActivityFeed.class)
+		m.autoTimestamp = false
+		//[Checklist.get(4)].each { Checklist cl ->
+		def cids = [306, 307]
+		//def cids = Checklist.listOrderById().collect { it.id}
+		cids.each { id ->
+			//loading all rows in one query
+			Checklist cl = Checklist.findById(id, [fetch: [row: 'join']])
 			if(!cl.latitude || !cl.longitude || !cl.placeName){
 				log.debug " ingnoring cheklist $cl.id   $cl.title"
+				ignored++
+				ignoreset << cl.id
 			}else{
-				log.debug " STARTING cheklist $cl.id   $cl.title"
+				log.debug " =============================================  STARTING cheklist $cl.id   $cl.title"
+				log.debug " =============================================  observations " +  cl.speciesCount
 				try{
+					createMetaObservation(cl)
 					createObservationFromChecklist(cl)
-					udpateObv(cl)
-					log.debug " FINISH cheklist $cl.id   $cl.title"
+					log.debug " =============================================  FINISH cheklist $cl.id   $cl.title"
+					created++
+					if(!cl.save(flush:flushImmediately)){
+						cl.errors.allErrors.each { log.error it }
+					}
+					
 				}catch (Exception e) {
 					log.debug " ERROR cheklist $cl.id   $cl.title ================"
 					e.printStackTrace()
-					// TODO: handle exception
+					error++
+					errorset << cl.id
 				}
+				cleanUpGorm(true)
 			}
 		}
-		
+		m.autoTimestamp = true
 		log.debug "   start time $startTime    endTime " + new Date()
+		//}
+		println "========================= $created   $ignored  $error"
+		println "============ ingnore set " + ignoreset
+		println "============ error set " + errorset
+	}
+	
+	@Transactional
+	private createMetaObservation(Checklist cl){
+		def basicData = getBasicObvData(cl)
+		basicData.isChecklist = '' + true
+		def observationInstance = observationService.createObservation(basicData)
+		observationInstance.createdOn = observationInstance.lastRevised = observationInstance.observedOn
+		//XXX commnet this when going on production
+		//observationInstance.createdOn = observationInstance.lastRevised = new Date()
+		if(!observationInstance.hasErrors() && observationInstance.save(flush:flushImmediately)) {
+			log.debug "saved observation $observationInstance  $observationInstance.group.name"
+			cl.refObservation = observationInstance
+			//activityFeedService.addActivityFeed(observationInstance, null, observationInstance.author, activityFeedService.OBSERVATION_CREATED);
+		}else{
+			observationInstance.errors.allErrors.each { log.error it }
+			throw new RuntimeException("Error during checklist meta observation save");
+		}
 	}
 	
 	@Transactional
@@ -950,32 +1000,27 @@ class ChecklistService {
 		createObservationFromRow(rowData, cl)
 	}
 	
-	@Transactional
-	def udpateObv(Checklist cl){
-		Observation.findAllBySourceTypeAndSourceId(cl.class.getCanonicalName(), cl.id).each { Observation obv ->
-			obv.calculateMaxVotedSpeciesName()
-		}
-	}
 	
 	private createObservationFromRow(List rowData, Checklist cl){
 		def basicData = getBasicObvData(cl)
 		def observationInstance = observationService.createObservation(basicData)
-		observationInstance.createdOn = observationInstance.lastRevised = observationInstance.observedOn
-		if(!observationInstance.hasErrors() && observationInstance.save(flush:true )) {
-			log.debug "saved observation $observationInstance"
-			activityFeedService.addActivityFeed(observationInstance, null, observationInstance.author, activityFeedService.OBSERVATION_CREATED);
+		observationInstance.createdOn = observationInstance.lastRevised = observationInstance.observedOn// = new Date()
+		if(!observationInstance.hasErrors() && observationInstance.save(flush:flushImmediately)) {
+			log.debug "saved observation $observationInstance.id"
+			addActivityFeed(observationInstance, null, observationInstance.author, activityFeedService.OBSERVATION_CREATED, observationInstance.observedOn);
 			//saving recommendation
 			saveRecoVote(observationInstance, rowData)
 			//saveMetaData
 			saveMetaData(observationInstance, rowData)
-			//species call
-			//observationInstance.calculateMaxVotedSpeciesName()
+			//XXX: uncomment this 
+			//Follow.addFollower(observationInstance, observationInstance.author)
+			//adding observation to checklist replacing checklist row
+			cl.addToObservations(observationInstance)
 		}else{
 			observationInstance.errors.allErrors.each { log.error it }
 			throw new RuntimeException("Error during observation save");
 		}
 	}
-	
 	
 	private saveRecoVote(Observation obv, List rowData){
 		ChecklistRowData snData, cnData
@@ -987,37 +1032,32 @@ class ChecklistService {
 			}
 		}
 		
-		rowData.remove(snData)
-		rowData.remove(cnData)
-		
-		
-		def cnReco
-		if(cnData){
-			def languageId = Language.getLanguage(null).id;
-			cnReco = recommendationService.findReco(cnData.value, false, languageId, null);
-		}
-		
-		ConfidenceType confidence = observationService.getConfidenceType(ConfidenceType.CERTAIN.name());
-		RecommendationVote recommendationVoteInstance = new RecommendationVote(observation:obv, recommendation:snData.reco, commonNameReco:cnReco, author:obv.author, confidence:confidence, votedOn:obv.observedOn);
-		if(!recommendationVoteInstance.hasErrors() && recommendationVoteInstance.save(flush:true)) {
-			log.debug "Successfully added reco vote : "+recommendationVoteInstance
-			activityFeedService.addActivityFeed(obv, recommendationVoteInstance, recommendationVoteInstance.author, activityFeedService.SPECIES_RECOMMENDED);
-			
-			//saving max voted species name for observation instance
-			//obv.calculateMaxVotedSpeciesName();
-			
-		}else{
-			recommendationVoteInstance.errors.allErrors.each { log.error it }
-			throw new RuntimeException("Error during reco vote save");
+		if(snData.reco){
+			def cnReco
+			if(cnData){
+				def languageId = Language.getLanguage(null).id;
+				cnReco = recommendationService.findReco(cnData.value, false, languageId, null);
+			}
+			//println " ============ saving    $snData.value     $snData.reco  $obv   $snData"
+			ConfidenceType confidence = observationService.getConfidenceType(ConfidenceType.CERTAIN.name());
+			RecommendationVote recommendationVoteInstance = new RecommendationVote(observation:obv, recommendation:snData.reco, commonNameReco:cnReco, author:obv.author, confidence:confidence, votedOn:obv.observedOn);
+			if(!recommendationVoteInstance.hasErrors() && recommendationVoteInstance.save(flush:flushImmediately)) {
+				log.debug "Successfully added reco vote : "+recommendationVoteInstance.id
+				addActivityFeed(obv, recommendationVoteInstance, recommendationVoteInstance.author, activityFeedService.SPECIES_RECOMMENDED, new Date(obv.observedOn.getTime() + 1));
+				//saving max voted species name for observation instance
+				obv.maxVotedReco = snData.reco
+			}else{
+				recommendationVoteInstance.errors.allErrors.each { log.error it }
+				throw new RuntimeException("Error during reco vote save");
+			}
 		}
 	}
 	
 	private saveMetaData(obv, List rowData){
 		rowData.each { ChecklistRowData r ->
-			observationService.addMetaData(['key': r.key, 'value': r.value, 'rowId':r.rowId, 'columnOrderId':r.columnOrderId, 'source': Checklist.class.getCanonicalName()], obv)
+			observationService.addAnnotation(['key': r.key, 'value': r.value, 'columnOrder':r.columnOrderId, 'sourceType': Checklist.class.getCanonicalName()], obv)
 		}
-		
-		if(!obv.hasErrors() && obv.save(flush:true)) {
+		if(!obv.hasErrors() && obv.save(flush:flushImmediately)) {
 			log.debug "saved observation meta data $obv"
 		}else{
 			obv.errors.allErrors.each { log.error it }
@@ -1049,6 +1089,56 @@ class ChecklistService {
 		def date = (cl.fromDate ?:(cl.toDate?:cl.lastUpdated))
 		return date.format("dd/MM/yyyy")
 	}
+	
+	//XXX this method is to add activity on back date only for checklist to observation migration
+	private addActivityFeed(rootHolder, activityHolder, author, activityType, date){
+		//to support discussion on comment thread
+		def subRootHolderType = rootHolder?.class?.getCanonicalName()
+		def subRootHolderId = rootHolder?.id
+		if(activityHolder?.class?.getCanonicalName() == Comment.class.getCanonicalName()){
+			subRootHolderType = activityHolder.class.getCanonicalName()
+			subRootHolderId = (activityHolder.isMainThread())? activityHolder.id : activityHolder.fetchMainThread().id
+		}
+		
+		ActivityFeed af = new ActivityFeed(author:author, activityHolderId:activityHolder?.id, \
+						activityHolderType:activityHolder?.class?.getCanonicalName(), \
+						rootHolderId:rootHolder?.id, rootHolderType:rootHolder?.class?.getCanonicalName(), \
+						activityType:activityType, subRootHolderType:subRootHolderType, subRootHolderId:subRootHolderId,
+						dateCreated :date, lastUpdated:date);
+					
+		if(!af.save(flush:flushImmediately)){
+			af.errors.allErrors.each { log.error it }
+			return null
+		}
+		//Follow.addFollower(rootHolder, author)
+		return af
+	}
+	
+	def addFollow(){
+		def admin = SUser.findByUsername('admin')
+		Observation.findByAuthor(admin).each { obv ->
+			Follow.addFollower(obv, admin)
+		}
+	}
+	
+	def addRefObseravtionToChecklist(){
+		Observation.findAllByIsChecklist(true).each { Observation obv ->
+			Checklist cl = activityFeedService.getDomainObject(obv.sourceType, obv.sourceId)
+			cl.refObservation = obv
+			if(!cl.save(flush:true)){
+				cl.errors.allErrors.each { log.error it }
+			}
+			
+		}
+	}
+	
+	//	@Transactional
+	//	def udpateObv(Checklist cl){
+	//		Observation.findAllBySourceTypeAndSourceId(cl.class.getCanonicalName(), cl.id).each { Observation obv ->
+	//			obv.calculateMaxVotedSpeciesName()
+	//		}
+	//	}
+	
 
 }
 /*

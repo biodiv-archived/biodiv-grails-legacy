@@ -5,6 +5,7 @@ import species.participation.curation.*
 import species.participation.*
 import species.formatReader.SpreadsheetReader;
 import species.utils.*;
+import speciespage.*
 
 def checklistService = ctx.getBean("checklistService");
 
@@ -20,16 +21,37 @@ def checklistService = ctx.getBean("checklistService");
 //println  cl
 ////
 //checklistService.createObservationFromChecklist(cl)
-//checklistService.udpateObv(cl)
 
-checklistService.migrateObv()
+//checklistService.migrateObservationFromChecklist()
+//checklistService.addFollow()
+checklistService.addRefObseravtionToChecklist()
 
-def deleteChecklist()  {
+
+def correctRow(){
+	def snVal = 'Aethopyga vigorsii'
+	def observationService = ctx.getBean("observationService");
+	def reco = observationService.getRecommendation([recoName:snVal, canName:snVal, commonName:null]).mainReco
+	def row = new ChecklistRowData(key:'scientific_name', value:snVal, rowId:25, columnOrderId:2, reco:reco)
+	def cl = Checklist.get(23).addToRow(row)
+	if(!cl.save(flush:true)){
+		cl.errors.allErrors.each { println  it }
+	}
+}
+
+def deleteChecklist(id)  {
 	try{
-		Checklist.get(284).delete(flush:true)
+		Checklist.get(id).delete(flush:true)
 	}catch (Exception e) {
 		e.printStackTrace()
 	}
 }
-deleteChecklist()
-checklistService.migrateChecklist(10)
+
+def correctChecklist(deleteId, migrateId){
+	def checklistService = ctx.getBean("checklistService");
+	deleteChecklist(deleteId)
+	checklistService.migrateChecklist(migrateId)
+}
+
+//correctRow()
+//correctChecklist(41, 1277 ) //Scientific Name
+//correctChecklist(62, 1298) //scientific_names

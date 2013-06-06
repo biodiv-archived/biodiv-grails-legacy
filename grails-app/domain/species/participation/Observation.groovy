@@ -68,15 +68,27 @@ class Observation implements Taggable, Rateable {
 	String searchText;
 	Recommendation maxVotedReco;
 	boolean agreeTerms = false;
+	
+	//if true observation comes on view otherwise not
+	boolean isShowable;
+	
+	//source of observation if coming from checklist then checklist object otherwise null
+	String sourceType;
+	Long sourceId;
+	
+	//if observation representing checklist then this flag is true
+	boolean isChecklist = false
     
-	static hasMany = [resource:Resource, recommendationVote:RecommendationVote, obvFlags:ObservationFlag, userGroups:UserGroup];
-	static belongsTo = [SUser, UserGroup]
+	static hasMany = [resource:Resource, recommendationVote:RecommendationVote, obvFlags:ObservationFlag, userGroups:UserGroup, annotations:Annotation];
+	static belongsTo = [SUser, UserGroup, Checklist]
 
 	static constraints = {
 		notes nullable:true
-		searchText nullable:true;
+		searchText nullable:true
 		maxVotedReco nullable:true
-		resource validator : { val, obj -> val && val.size() > 0 }
+		sourceType nullable:true
+		sourceId nullable:true
+		//resource validator : { val, obj -> val && val.size() > 0 }
 		observedOn validator : {val -> val < new Date()}
 		latitude validator : { val, obj -> 
 			if(Float.isNaN(val)) {
@@ -274,12 +286,18 @@ class Observation implements Taggable, Rateable {
 		visitCount++
 	}
 
-	def beforeUpdate(){
-		if(isDirty() && !isDirty('visitCount')){
-			lastRevised = new Date();
-		}
+	//XXX: comment this method before checklist migration
+//	def beforeUpdate(){
+//		if(isDirty() && !isDirty('visitCount')){
+//			updateIsShowable()
+//			lastRevised = new Date();
+//		}
+//	}
+	
+	def beforeInsert(){
+		updateIsShowable()
 	}
-
+	
 	def getPageVisitCount(){
 		return visitCount;
 	}
@@ -296,6 +314,10 @@ class Observation implements Taggable, Rateable {
 		lastRevised = new Date();
 		saveConcurrently();
 		observationsSearchService.publishSearchIndex(this, true);
+	}
+	
+	private updateIsShowable(){
+		isShowable = (isChecklist || (resource && !resource.isEmpty())) ? true : false
 	}
 
 	String fetchSpeciesCall(){
@@ -452,5 +474,13 @@ class Observation implements Taggable, Rateable {
 	
 	def fetchRecoVoteOwnerCount(){
 		return RecommendationVote.countByObservation(this)
+	}
+	
+	def fetchChecklistAnnotation(){
+		return Annotation.findAllBySourceTypeAndObservation(Checklist.class.getCanonicalName(), this, [sort:'columnOrder', order:'asc'])
+	}
+	
+	def fetchSourceChecklistTitle(){
+		activityFeedService.getDomainObject(sourceType, sourceId).title
 	}
 }

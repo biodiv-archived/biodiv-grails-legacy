@@ -57,7 +57,13 @@ class Checklist implements Rateable {
 	//others
 	String reservesValue;
 	
-	static hasMany = [row:ChecklistRowData, state : String, district:String, taluka: String, userGroups:UserGroup, speciesGroups:SpeciesGroup]
+	//to maintain order
+	List observations;
+	
+	//represing observation for this chekclist
+	Observation refObservation
+	
+	static hasMany = [observations:Observation, row:ChecklistRowData, state : String, district:String, taluka: String, userGroups:UserGroup, speciesGroups:SpeciesGroup]
 	static belongsTo = [author:SUser];
 
 	static constraints = {
@@ -81,6 +87,7 @@ class Checklist implements Rateable {
 		publicationDate  nullable:true;
 		latitude nullable:true;
 		longitude nullable:true;
+		refObservation nullable:true;
 	}
 
 	static mapping = {
@@ -90,7 +97,6 @@ class Checklist implements Rateable {
 		refText type:'text';
 		sourceText type:'text';
 		columnNames type:'text';
-		//row lazy: false;
 	}
 	
 	def fetchColumnNames(){
@@ -166,8 +172,30 @@ class Checklist implements Rateable {
 		return data
 	}
 	
-	def afterDelete(){
-		activityFeedService.deleteFeed(this)
+	def afterUpdate(){
+		//this method will put reference observation in sync with checklist current state
+		
+		//update species group
+		
+		//update date
+		
+		//update location centroid and placename
 	}
 	
+	def afterDelete(){
+		activityFeedService.deleteFeed(this)
+		
+		//deleting reference observation
+		Observation.withNewSession {
+			try{
+				refObservation.delete(flush:true)
+			}catch(Exception e){
+				e.printStackTrace()
+			}
+		}
+	}
+	
+	def onAddComment(comment){
+		refObservation.onAddComment(comment)
+	}
 }

@@ -27,6 +27,7 @@ import species.participation.Recommendation;
 import species.participation.RecommendationVote;
 import species.participation.ObservationFlag.FlagType
 import species.participation.RecommendationVote.ConfidenceType;
+import species.participation.Annotation
 import species.sourcehandler.XMLConverter;
 import species.utils.ImageType;
 import species.utils.Utils;
@@ -103,6 +104,10 @@ class ObservationService {
 
 		observation.agreeTerms = (params.agreeTerms?.equals('on'))?true:false;
 		
+		observation.isChecklist = params.isChecklist ? params.isChecklist.toBoolean() : false
+		observation.sourceType = params.sourceType ?: null
+		observation.sourceId = params.sourceId ? params.sourceId.toLong() : null
+		
 		def resourcesXML = createResourcesXML(params);
 		def resources = saveResources(observation, resourcesXML);
 		
@@ -110,6 +115,8 @@ class ObservationService {
 		resources.each { resource ->
 			observation.addToResource(resource);
 		}
+		
+		
 	}
 
 	/**
@@ -285,6 +292,7 @@ class ObservationService {
 			and {
 				eq("maxVotedReco", maxVotedReco)
 				eq("isDeleted", false)
+				eq("isChecklist", false)
 				if(obvId) ne("id", obvId)
 			}
 			order("lastRevised", "desc")
@@ -307,6 +315,7 @@ class ObservationService {
 				and {
 					'in'("maxVotedReco", scientificNameRecos)
 					eq("isDeleted", false)
+					eq("isChecklist", false)
 				}
 				order("lastRevised", "desc")
 			}
@@ -339,10 +348,14 @@ class ObservationService {
 			item.imageTitle = param['title']
 			def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 			Resource image = param['observation'].mainImage()
-			if(image.type == ResourceType.IMAGE) {
-				item.imageLink = image.thumbnailUrl(iconBasePath)
-			} else if(image.type == ResourceType.VIDEO) {
-				item.imageLink = image.thumbnailUrl()
+			if(image){
+				if(image.type == ResourceType.IMAGE) {
+					item.imageLink = image.thumbnailUrl(iconBasePath)
+				} else if(image.type == ResourceType.VIDEO) {
+					item.imageLink = image.thumbnailUrl()
+				}
+			}else{
+				item.imageLink =  config.speciesPortal.resources.serverURL + "/" + "no-image.jpg"
 			}			
 			if(param.inGroup) {
 				item.inGroup = param.inGroup;
@@ -502,7 +515,7 @@ class ObservationService {
 		def rows = sql.rows("select count(*) as count from observation_locations as g1, observation_locations as g2 where ROUND(ST_Distance_Sphere(g1.st_geomfromtext, g2.st_geomfromtext)/1000) < :maxRadius and g2.is_deleted = false and g1.id = :observationId and g1.id <> g2.id", [observationId: Long.parseLong(observationId), maxRadius:maxRadius]);
 		def totalResultCount = Math.min(rows[0].getProperty("count"), maxObvs);
 		limit = Math.min(limit, maxObvs - offset);
-		def resultSet = sql.rows("select g2.id,  ROUND(ST_Distance_Sphere(g1.st_geomfromtext, g2.st_geomfromtext)/1000) as distance from observation_locations as g1, observation_locations as g2 where  ROUND(ST_Distance_Sphere(g1.st_geomfromtext, g2.st_geomfromtext)/1000) < :maxRadius and g2.is_deleted = false and g1.id = :observationId and g1.id <> g2.id order by ST_Distance(g1.st_geomfromtext, g2.st_geomfromtext) limit :max offset :offset", [observationId: Long.parseLong(observationId), maxRadius:maxRadius, max:limit, offset:offset])
+		def resultSet = sql.rows("select g2.id,  ROUND(ST_Distance_Sphere(g1.st_geomfromtext, g2.st_geomfromtext)/1000) as distance from observation_locations as g1, observation_locations as g2 where  ROUND(ST_Distance_Sphere(g1.st_geomfromtext, g2.st_geomfromtext)/1000) < :maxRadius and g2.is_deleted = false and g1.id = :observationId and g1.id <> g2.id order by ST_Distance(g1.st_geomfromtext, g2.st_geomfromtext), g2.last_revised desc limit :max offset :offset", [observationId: Long.parseLong(observationId), maxRadius:maxRadius, max:limit, offset:offset])
 
 		def nearbyObservations = []
 		for (row in resultSet){
@@ -612,10 +625,10 @@ class ObservationService {
 		params.habitat = params.habitat.toLong()
 		//params.userName = springSecurityService.currentUser.username;
 
-		def query = "select obv from Observation obv "
-		def mapViewQuery = "select obv.id, obv.latitude, obv.longitude from Observation obv "
+		def query = "select obv from Observation obv where obv.isDeleted = :isDeleted and isShowable = true "
+		def mapViewQuery = "select obv.id, obv.latitude, obv.longitude from Observation obv  where obv.isDeleted = :isDeleted "
 		def queryParams = [isDeleted : false]
-		def filterQuery = " where obv.isDeleted = :isDeleted "
+		def filterQuery = " "
 		def activeFilters = [:]
 
 		if(params.sGroup){
@@ -654,7 +667,7 @@ class ObservationService {
 		}
 
 		if(params.speciesName && (params.speciesName != grailsApplication.config.speciesPortal.group.ALL)){
-			filterQuery += " and obv.maxVotedReco is null "
+			filterQuery += " and (obv.isChecklist = false and obv.maxVotedReco is null) "
 			//queryParams["speciesName"] = params.speciesName
 			activeFilters["speciesName"] = params.speciesName
 		}
@@ -664,11 +677,17 @@ class ObservationService {
 			activeFilters["isFlagged"] = params.isFlagged.toBoolean()
 		}
 		
-		// by default adding media filter if its null
-		if(params.isMediaFilter == null || params.isMediaFilter.toBoolean()){
-			filterQuery += " and obv.hasMedia = true "
-			activeFilters["isMediaFilter"] = params.isMediaFilter? params.isMediaFilter.toBoolean() : false
+		if(params.isChecklistOnly && params.isChecklistOnly.toBoolean()){
+			filterQuery += " and obv.isChecklist = true "
+			activeFilters["isChecklistOnly"] = params.isChecklistOnly.toBoolean()
 		}
+
+		
+//		// by default adding media filter if its null
+//		if(params.isMediaFilter == null || params.isMediaFilter.toBoolean()){
+//			filterQuery += " and obv.hasMedia = true "
+//			activeFilters["isMediaFilter"] = params.isMediaFilter? params.isMediaFilter.toBoolean() : false
+//		}
 		
 		
 		if(params.daterangepicker_start && params.daterangepicker_end){
@@ -1347,4 +1366,9 @@ class ObservationService {
 		} else
 			return null
 	}
+	
+	def addAnnotation(params, Observation obv){
+		def ann = new Annotation(params)
+			obv.addToAnnotations(ann);
+		}
 }

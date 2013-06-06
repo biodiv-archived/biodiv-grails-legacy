@@ -1271,4 +1271,8 @@ class ObservationController {
 			response.outputStream.flush()
 		}
 	}
+	
+	def test = {
+		render "rr  "  + Checklist.get(49).speciesGroups //.iterator().next().id
+	}
 }

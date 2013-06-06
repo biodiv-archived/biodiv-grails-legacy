@@ -426,7 +426,7 @@ environments {
 		grails.serverURL = "http://indiabiodiversity.localhost.org/${appName}"
 		speciesPortal {
 			search.serverURL = "http://localhost:8090/solr"
-			names.parser.serverURL = "127.0.0.1"
+			names.parser.serverURL = "saturn.strandls.com"
 			wgp {
 				facebook {
 					appId= "424071494335902"
@@ -443,7 +443,7 @@ environments {
 			}
 		}
 		google.analytics.enabled = false
-		//grails.resources.debug = true
+		grails.resources.debug = true
 		
 		grails {
 			mail {
