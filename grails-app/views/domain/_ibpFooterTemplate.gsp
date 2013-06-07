@@ -280,6 +280,7 @@ var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po
         _gaq.push(['_setAccount', 'UA-23009417-1']);
     }
 
+    _gaq.push(['_setDomainName', 'indiabiodiversity.org']);
     _gaq.push(['_trackPageview']);
 
     (function() {
