@@ -95,8 +95,12 @@ class ObservationService {
 		observation.reverseGeocodedName = params.reverse_geocoded_name;
 		observation.placeName = params.place_name?:observation.reverseGeocodedName;
 		observation.location = 'POINT(' + params.longitude + ' ' + params.latitude + ')'
-		observation.latitude = params.latitude.toFloat();
-		observation.longitude = params.longitude.toFloat();
+		if(params.latitude) {
+            observation.latitude = params.latitude?.toFloat();
+        }
+        if(params.longitude) {
+    		observation.longitude = params.longitude?.toFloat();
+        }
 		observation.locationAccuracy = params.location_accuracy;
 		observation.geoPrivacy = false;
 		observation.habitat = Habitat.get(params.habitat_id);
@@ -1340,4 +1344,19 @@ class ObservationService {
 		} else
 			return null
 	}
+
+	def locations(params) {
+		List result = new ArrayList();
+		
+		def queryResponse = observationsSearchService.terms(params.term, params.field, params.max);
+		NamedList tags = (NamedList) ((NamedList)queryResponse.getResponse().terms)[params.field];
+		for (Iterator iterator = tags.iterator(); iterator.hasNext();) {
+			Map.Entry tag = (Map.Entry) iterator.next();
+			result.add([value:tag.getKey().toString(), label:tag.getKey().toString(),  "category":"Observations"]);
+		}
+		return result;
+	} 
+
+
+
 }

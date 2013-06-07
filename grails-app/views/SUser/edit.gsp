@@ -75,7 +75,6 @@
 											<span>Upload picture of size < 2MB</span>
 										</div>
 									</a>
-									<a href="${uGroup.createLink(controller:'SUser', action:'resetPassword', id:user.id) }">Change Password</a>
 								</div>
 								
 								<input id="icon" name="icon" type="hidden" value='${thumbnail}' />
@@ -181,7 +180,7 @@
 							<h5>
 								<i class="icon-user"></i>About Me
 							</h5>
-							<textarea cols='70' rows='3' style="width: 100%" name="aboutMe"
+							<textarea cols='70' rows='3' style="width: 99%" name="aboutMe"
 								id="aboutMe">
 								${user.aboutMe }
 							</textarea>
@@ -260,13 +259,21 @@
 								</div>
 							</div>
 						</div>
+						<div class="super-section" style="clear: both;">
+							<h5>
+								<i class="icon-cog"></i>Actions
+							</h5>
+                                                        <ul>
+                                                            <li><a href="${uGroup.createLink(controller:'SUser', action:'resetPassword', id:user.id) }">Change Password</a></li>
+                                                        </ul>
 
+                                                </div>
 
 						<sUser:isAdmin model="['user':user]">
 							<div class="super-section" style="clear: both;">
 								<h5>
 									<i class="icon-cog"></i>
-									<g:message code="default.edit.label" args="[entityName]" />
+									<g:message code="default.edit.label" args="[title]" />
 								</h5>
 								<%
 	def tabData = []
@@ -386,7 +393,7 @@
 				
 				
 				<form id="upload_resource" enctype="multipart/form-data"
-					title="Add a logo for this group" method="post"
+					title="Upload profile picture" method="post"
 					class="${hasErrors(bean: user, field: 'profilePic', 'errors')}">
 					<input type="file" id="attachFile" name="resources" accept="image/*"/> 
 					<span class="msg" style="float: right"></span> 
@@ -478,11 +485,11 @@
 			beforeSubmit: function(formData, jqForm, options) {
 				return true;
 			}, 
-            xhr: function() {  // custom xhr
-                myXhr = $.ajaxSettings.xhr();
-                return myXhr;
-            },
-			success: function(responseXML, statusText, xhr, form) {
+                        xhr: function() {  // custom xhr
+                            myXhr = $.ajaxSettings.xhr();
+                            return myXhr;
+                        },
+                        success: function(responseXML, statusText, xhr, form) {
 				$(form).find("span.msg").html("");
 				var rootDir = '${grailsApplication.config.speciesPortal.users.serverURL}'
 				var dir = $(responseXML).find('dir').text();
@@ -498,11 +505,11 @@
 					$("#thumbnail").attr("src", thumbnail);
 				});
 				$("#image-resources-msg").parent(".resources").removeClass("error");
-                $("#image-resources-msg").html("");
+                                $("#image-resources-msg").html("");
 			}, error:function (xhr, ajaxOptions, thrownError){
 					//successHandler is used when ajax login succedes
-	            	var successHandler = this.success, errorHandler;
-	            	handleError(xhr, ajaxOptions, thrownError, successHandler, function() {
+                                        var successHandler = this.success, errorHandler;
+                                        handleError(xhr, ajaxOptions, thrownError, successHandler, function() {
 						var response = $.parseJSON(xhr.responseText);
 						if(response.error){
 							$("#image-resources-msg").parent(".resources").addClass("error");

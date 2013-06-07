@@ -1,10 +1,8 @@
 <%@page import="species.utils.Utils"%>
 <html>
 <head>
-<title>Error</title>
-<g:javascript src="species/util.js" />
 <meta name="layout" content="main" />
-<r:require modules="core"/>
+<title>Error</title>
 </head>
 
 <body>
@@ -20,8 +18,8 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 
 			<div class="observation  span12">
 				<p class="message">
-					Oops!!! There seems to be some problem. <br /> Please mail us the
-					following message as bug report here <span class="mailme">${supportEmail }</span><br />
+					Oops!!! There seems to be some problem. <br /> Please send the
+                                        following message and other required information to reproduce this error on our side to <span class="mailme">${supportEmail }</span>.<br/> One of us will work on it asap.<br />
 					<br />
 				</p>
 				<div class="errors">
