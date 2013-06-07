@@ -9,10 +9,12 @@ class ExportJob {
 	
 	private final static String OBSERVATION_LIST = "Observations"
 	private final static String CHECKLIST = "Checklist"
+	private final static String SPECIES = "Species"
 	
 	def obvUtilService
 	def observationService
 	def checklistService
+	def speciesService
 	
     static triggers = {
       simple startDelay: 600l, repeatInterval: 5000l // starts after 5 minutes and execute job once in 5 seconds 
@@ -27,7 +29,7 @@ class ExportJob {
 		
 		scheduledTaskList.each { DownloadLog dl ->
 			try{
-				log.debug "strating task $dl"
+				log.debug "starting task $dl"
 				File f
 				
 				switch (dl.sourceType) {
@@ -37,6 +39,9 @@ class ExportJob {
 					case CHECKLIST:
 						f = checklistService.export(dl.fetchMapFromText(), dl)
 						break
+					case SPECIES:
+						log.info "Initiating Species export."
+						f = speciesService.export(dl.fetchMapFromText(), dl)
 					default:
 						log.debug "Invalid source Type $dl.sourceType"
 				}

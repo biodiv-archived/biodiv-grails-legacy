@@ -607,6 +607,15 @@ class SpeciesController {
 			render message as JSON
 		}
 	}
+	
+	@Secured(['ROLE_ADMIN'])
+	def requestExport = {
+		log.debug "Export of species requested" + params
+		speciesService.requestExport(params)
+		def r = [:]
+		r['msg']= "${message(code: 'species.download.requsted', default: 'Processing... You will be notified by email when it is completed. Login and check your user profile for download link.')}"
+		render r as JSON
+	}
 
 	
 }

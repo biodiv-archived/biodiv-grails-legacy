@@ -6,13 +6,17 @@ import grails.converters.JSON;
 import species.auth.SUser;
 import speciespage.ObvUtilService;
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap;
+import org.apache.commons.logging.LogFactory
 
 class DownloadLog {
+	private static log = LogFactory.getLog(this);
 	
 	public enum DownloadType {
 		CSV("CSV"),
 		KML("KML"),
-		PDF("PDF")
+		PDF("PDF"),
+		ZIP("ZIP"),
+		TAR("TAR")
 		private String value;
 
 		DownloadType(String value) {
@@ -56,6 +60,7 @@ class DownloadLog {
 	
 	static createLog(SUser author, String filePath, String filterUrl, String downloadTypeString, String notes,  String sourceType, Date createdOn, String status, params){
 		def paramsMapAsText = getTextFromMap(params)
+		log.debug "params in download log "+ paramsMapAsText
 		DownloadLog dl = new DownloadLog (author:author, filePath:filePath, filterUrl:filterUrl, type:getType(downloadTypeString), notes:notes, createdOn:createdOn, status:status, sourceType:sourceType, paramsMapAsText:paramsMapAsText)
 		if(!dl.save(flush:true)){
 			dl.errors.allErrors.each { println it }

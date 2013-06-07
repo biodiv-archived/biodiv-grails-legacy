@@ -4,6 +4,8 @@
 <%@ page import="species.Species"%>
 <%@ page import="species.groups.SpeciesGroup"%>
 <%@page import="species.utils.Utils"%>
+<%@ page import="species.participation.DownloadLog.DownloadType"%>
+
 <html>
 <head>
 <g:set var="canonicalUrl" value="${uGroup.createLink([controller:'species', action:'list', base:Utils.getIBPServerDomain()])}" />
@@ -36,6 +38,9 @@
 			<div class="tab-content">
 				<div id="list" class="tab-pane active">
 						<s:speciesFilter></s:speciesFilter>
+						<sUser:isAdmin>
+							<s:showDownloadAction model="['source':'Species', 'requestObject':request ]" />
+						</sUser:isAdmin> 
 						<div class="observations_list_wrapper" style="top: 0px;">
 							<s:showSpeciesList></s:showSpeciesList>
 						</div>
