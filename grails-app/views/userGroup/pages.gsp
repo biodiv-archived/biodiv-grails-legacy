@@ -85,7 +85,7 @@
 	  				e.preventDefault();
 	  				var History = window.History; 
 		           	$(contentID).load(baseURL+'/'+contentID.replace('#','')+' #pageContent', function(){
-				    	History.pushState({state:1}, "Species Portal", pageURL+'/'+contentID.replace('#',''));
+				    	History.pushState({state:1}, document.title, pageURL+'/'+contentID.replace('#',''));
 		            	me.tab('show');
 		           	});
 	           	} 
