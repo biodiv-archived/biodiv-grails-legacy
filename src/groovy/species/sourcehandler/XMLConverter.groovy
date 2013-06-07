@@ -698,8 +698,7 @@ class XMLConverter extends SourceConverter {
         File tempFile = getImageFile(imageNode);
         def sourceUrl = imageNode.source?.text() ? imageNode.source?.text() : "";
         def rate = imageNode.rating?.text() ? imageNode.rating?.text() : "";
-        println imageNode
-println rate+"++++++++++++++"
+        
         log.debug "Creating image resource : "+tempFile;
 
         if(tempFile && tempFile.exists()) {
@@ -905,8 +904,8 @@ println rate+"++++++++++++++"
         if(!imagesRefNode || !imagesNode) return resources;
         imagesRefNode.each {
             String fileName = it?.text()?.trim();
-
             def imageNode = imagesNode.image.find { it?.refKey?.text()?.trim() == fileName };
+println imageNode;
 
             if(imageNode) {
                 def res;
@@ -920,6 +919,17 @@ println rate+"++++++++++++++"
                     log.error "IMAGE NOT FOUND : "+imageNode
                 }
 
+            } else {
+                File tempFile = getImageFile(it);
+                if(tempFile) {
+                    //check if the fileName is a physical file on disk and create a resource from it
+                    def resource = createImage(it, s.taxonConcept.canonicalForm, ResourceType.IMAGE);
+                    if(resource) {
+                        return [resource];
+                    }
+                } else {
+                    log.error "COULD NOT FIND REFERENCE TO THE IMAGE ${fileName}"
+                }
             }
         }
         return resources;

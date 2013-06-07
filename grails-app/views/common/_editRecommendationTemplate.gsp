@@ -141,10 +141,10 @@ $(document).ready(function() {
 			}
 		}
 		if(params.action == 'save'){
-			species_sn_name = saveParams.recoName
-			species_cn_name =  saveParams.commonName
-			species_call_comment = saveParams.recoComment
-			species_canonical_name = saveParams.canName
+			species_sn_name = saveParams?.recoName
+			species_cn_name =  saveParams?.commonName
+			species_call_comment = saveParams?.recoComment
+			species_canonical_name = saveParams?.canName
 		}
 	%>
 

@@ -13,11 +13,11 @@ canonicalUrl = canonicalUrl ?: uGroup.createLink(action:params.action, controlle
 if(params.webaddress) {
     imagePath = imagePath?:userGroupInstance.mainImage()?.fileName
     description = description?: userGroupInstance.description.replaceAll(/<.*?>/, '').trim()
-    siteName = userGroupInstance.name +' - '+Utils.getDomainName(request);
+    siteName = userGroupInstance.name +' - India Biodiversity Portal';
 } else {
     imagePath = imagePath?:(Utils.getIBPServerDomain()+'/sites/all/themes/ibp/images/map-logo.gif')
     description = description?:"Welcome to the India Biodiversity Portal (IBP) - A repository of information designed to harness and disseminate collective intelligence on the biodiversity of the Indian subcontinent."
-    siteName = siteName ?: Utils.getDomainName(request);
+    siteName = siteName ?: "India Biodiversity Portal";
 }
 
 if(description != null && description.length() > 300) {
@@ -26,7 +26,7 @@ if(description != null && description.length() > 300) {
 %>
 
 <meta name="layout" content="main" />
-<title>${title}<g:if test="${params.webaddress}"> | ${userGroupInstance.name} </g:if><g:if test="${params.action.equals('show')}"> | ${params.controller.capitalize()} </g:if> | India Biodiversity Portal</title>
+<title>${title}<g:if test="${params.action.equals('show')}"><g:if test="${params.webaddress && !title.equals(userGroupInstance.name)}"> | ${userGroupInstance.name} </g:if> | ${params.controller.capitalize()} </g:if> | India Biodiversity Portal</title>
 <g:if test="${canonicalUrl}">
 <link rel="canonical" href="${canonicalUrl}" />
 <meta property="og:url" content="${canonicalUrl}" />
