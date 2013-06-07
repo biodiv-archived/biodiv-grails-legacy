@@ -641,7 +641,6 @@ environments {
 				}
 				supportEmail = "support(at)indiabiodiversity(dot)org"
 			}
-			flushImmediately = false
 		}
 		google.analytics.enabled = false
 

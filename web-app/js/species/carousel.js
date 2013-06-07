@@ -111,7 +111,7 @@ function resizeImage(item) {
 var getItemHTML = function(contextFreeUrl, contextGroup, item) {
 	var imageTag = '<img class=img-polaroid src="' + item.imageLink + '" title="' + item.imageTitle  +'" alt="" />';
 	var notes = item.notes?item.notes:''
-	return '<div class=thumbnail><div class="'+'snippet tablet'+'"><div class=figure><a href='+contextFreeUrl +'/'+ item.obvId + '>' + imageTag + '</a></div><div class="'+'ellipsis multiline caption'+'">'+notes+'</div></div></div>';
+	return '<div class=thumbnail><div class="'+'snippet tablet'+'"><div class=figure><a href='+ item.url + '>' + imageTag + '</a></div><div class="'+'ellipsis multiline caption'+'">'+notes+'</div></div></div>';
 };
 
 var reloadCarousel = function(carousel, fitlerProperty, filterPropertyValue){

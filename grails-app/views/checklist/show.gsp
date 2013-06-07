@@ -5,7 +5,7 @@
 <head>
 <g:set var="canonicalUrl" value="${uGroup.createLink([controller:'checklist', action:'show', id:checklistInstance.id, base:Utils.getIBPServerDomain()])}"/>
 <g:set var="title" value="${checklistInstance.title}"/>
-<g:set var="description" value="${Utils.stripHTML(checklistInstance.description?:'')}" />
+<g:set var="description" value="${Utils.stripHTML(checklistInstance.notes?:'')}" />
 <g:render template="/common/titleTemplate" model="['title':title, 'description':description, 'canonicalUrl':canonicalUrl, 'imagePath':null]"/>
 <r:require modules="checklist"/>
 </head>
@@ -43,12 +43,14 @@
 					</thead>
 					<tbody>
 							<tr>
-								<td><sUser:interestedSpeciesGroups model="['userInstance':checklistInstance]"/></td>
+								<td><button class="btn species_groups_sprites ${checklistInstance.group.iconClass()} active"
+									id="${"group_" + checklistInstance.group.id}" value="${checklistInstance.group.id}"
+									title="${checklistInstance.group.name}"></button></td>
 								<td>${checklistInstance.speciesCount}</td>
 								<td>${checklistInstance.placeName}</td>
-								<td>${checklistInstance.state.join(",")}</td>
-								<td>${checklistInstance.district.join(",")}</td>
-								<td>${checklistInstance.taluka.join(",")}</td>
+								<td>${checklistInstance.states.join(",")}</td>
+								<td>${checklistInstance.districts.join(",")}</td>
+								<td>${checklistInstance.talukas.join(",")}</td>
 							</tr>
 					</tbody>
 				</table>
@@ -87,7 +89,7 @@
 						<a class="speciesFieldHeader" data-toggle="collapse" href="#checklist_details"><h5>Checklist details</h5></a>
 						<div id="checklist_details" class="speciesField collapse in">
 							<dl class="dl linktext">
-								<dd>${checklistInstance.description}</dd>
+								<dd>${checklistInstance.notes}</dd>
     						</dl>
     					</div>
     			</div>

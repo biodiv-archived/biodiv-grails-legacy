@@ -15,72 +15,66 @@ import species.participation.ActivityFeedService
 import org.grails.rateable.*
 
 
-class Checklist implements Rateable {
+class Checklists extends Observation {
 	
 	private static final String KEY_PREFIX = "## "
 	private static final String SEPARATOR = ":"
 	private static final String META_DATA = "checklist_metadata"
 	private static final String DATA = "checklist_data"
 	
-	
 	def activityFeedService;
 	def obvUtilService;
 	
 	String title;
 	int speciesCount;
-	String description; //info;
+	
 	String attribution;
-	 
+	License license;
+	
 	String refText;
 	String sourceText;
 	String rawChecklist;
+	String columnNames;
 	
-	License license;
-	//SpeciesGroup speciesGroup;
-	SUser validator;
-	
-	//location related
-	float latitude;
-	float longitude;
-	String placeName;
+	//to maintain order
+	List observations;
 	
 	//dates
 	Date fromDate;
 	Date toDate;
 	Date publicationDate;
-	Date lastUpdated; 
-	
-	//content data
-	SortedSet row;
-	String columnNames 
 	
 	//others
 	String reservesValue;
 	
-	static hasMany = [row:ChecklistRowData, state : String, district:String, taluka: String, userGroups:UserGroup, speciesGroups:SpeciesGroup]
-	static belongsTo = [author:SUser];
-
+	//will map to last revised in observation
+	//Date lastUpdated; 
+	//will map to notes in observation
+	//String description; //info;
+	
+	static hasMany = [observations:Observation, states : String, districts:String, talukas: String]
+	
 	static constraints = {
+		//XXX this is extended class so have strictly say nullable false
+		title nullable:false;
+		speciesCount nullable:false;
+		columnNames  nullable:false ;
+		rawChecklist nullable:false;
+		license  nullable:false;
+		
 		fromDate nullable:true;
 		toDate nullable:true;
-		validator nullable:true;
-		description nullable:true;
 		attribution nullable:true;
 		reservesValue nullable:true;
-		placeName nullable:true;
-		state nullable:true;
-		district nullable:true;
-		taluka nullable:true;
+		states nullable:true;
+		districts nullable:true;
+		talukas nullable:true;
 		
 		refText nullable:true;
 		sourceText nullable:true;
-		columnNames  nullable:true;
 		
 		//XXX to be removed
-		rawChecklist nullable:true; 
 		publicationDate  nullable:true;
-		latitude nullable:true;
-		longitude nullable:true;
 	}
 
 	static mapping = {
@@ -98,7 +92,7 @@ class Checklist implements Rateable {
 	
 	def Map fetchExportableValue(){
 		Map res = [:]
-		Checklist cl = this
+		Checklists cl = this
 		
 		List metaDataList = []
 		
@@ -143,7 +137,7 @@ class Checklist implements Rateable {
 	}
 		
 	private List fetchData(){
-		Checklist cl = this
+		Checklists cl = this
 		List data = []
 		
 		int prevRowId = -1
@@ -164,9 +158,4 @@ class Checklist implements Rateable {
 		data.add(valueList)
 		return data
 	}
-	
-	def afterDelete(){
-		activityFeedService.deleteFeed(this)
-	}
-
 }

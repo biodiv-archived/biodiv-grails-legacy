@@ -12,6 +12,7 @@
 				<g:each in="${checklistInstance.fetchColumnNames()}" var="cName">
 					<th title="${cName}">${cName.replaceAll("_", " ")}</th>
 				</g:each>
+				<th title="Observation">Observation</th>
 				<th title="Comments">Comments</th>
 			</tr>
 		</thead>
@@ -35,6 +36,10 @@
 							</g:else>
 						</td>
 					</g:each>
+					<td>
+						<a href="${uGroup.createLink(action:'show', controller:'observation', id:observation.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
+							url</a>
+					</td>
 					<td>
 						<comment:showCommentPopup model="['commentHolder':observation, 'rootHolder':checklistInstance]" />
 					</td>

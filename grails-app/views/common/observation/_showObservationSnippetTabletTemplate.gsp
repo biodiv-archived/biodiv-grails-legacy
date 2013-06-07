@@ -3,7 +3,7 @@
 <%
 def imagePath = mainImage?mainImage.thumbnailUrl(): null;
 def controller = observationInstance.isChecklist ? 'checklist' :'observation'
-def obvId = observationInstance.isChecklist ? observationInstance.sourceId: observationInstance.id
+def obvId = observationInstance.id
 %>
 <div class="snippet tablet">
         <g:render template="/common/observation/noOfResources" model="['instance':observationInstance]"/>

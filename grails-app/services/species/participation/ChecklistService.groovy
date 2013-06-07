@@ -2,6 +2,7 @@ package species.participation
 
 import java.io.File;
 import java.text.SimpleDateFormat
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -924,7 +925,7 @@ class ChecklistService {
 		def m = GrailsDomainBinder.getMapping(ActivityFeed.class)
 		m.autoTimestamp = false
 		//[Checklist.get(4)].each { Checklist cl ->
-		def cids = [306, 307]
+		def cids = [12, 13]
 		//def cids = Checklist.listOrderById().collect { it.id}
 		cids.each { id ->
 			//loading all rows in one query
@@ -937,12 +938,12 @@ class ChecklistService {
 				log.debug " =============================================  STARTING cheklist $cl.id   $cl.title"
 				log.debug " =============================================  observations " +  cl.speciesCount
 				try{
-					createMetaObservation(cl)
-					createObservationFromChecklist(cl)
+					def newChecklist = Checklists.get(cl.id)
+					createObservationFromChecklist(cl, newChecklist)
 					log.debug " =============================================  FINISH cheklist $cl.id   $cl.title"
 					created++
-					if(!cl.save(flush:flushImmediately)){
-						cl.errors.allErrors.each { log.error it }
+					if(!newChecklist.save(flush:flushImmediately)){
+						newChecklist.errors.allErrors.each { log.error it }
 					}
 					
 				}catch (Exception e) {
@@ -962,26 +963,59 @@ class ChecklistService {
 		println "============ error set " + errorset
 	}
 	
+	def migrateChecklistAsObs(){
+		def startTime = new Date()
+		int created =0, error =0,  ignored =0
+		def ignoreset = []
+		def errorset = []
+		def cids = Checklist.listOrderById().each{Checklist cl ->
+			if(!cl.latitude || !cl.longitude || !cl.placeName){
+				log.debug " ingnoring cheklist $cl.id   $cl.title"
+				ignored++
+				ignoreset << cl.id
+			}else{
+				log.debug " =============================================  STARTING cheklist $cl.id   $cl.title"
+				log.debug " =============================================  observations " +  cl.speciesCount
+				try{
+					createMetaObservation(cl)
+					created++
+				}catch (Exception e) {
+					log.debug " ERROR cheklist $cl.id   $cl.title ================"
+					e.printStackTrace()
+					error++
+					errorset << cl.id
+				}
+			}
+		}
+		cleanUpGorm(true)
+		log.debug "   start time $startTime    endTime " + new Date()
+		println "========================= $created   $ignored  $error"
+		println "============ ingnore set " + ignoreset
+		println "============ error set " + errorset
+	}
+	
+	
+	
 	@Transactional
-	private createMetaObservation(Checklist cl){
-		def basicData = getBasicObvData(cl)
-		basicData.isChecklist = '' + true
-		def observationInstance = observationService.createObservation(basicData)
-		observationInstance.createdOn = observationInstance.lastRevised = observationInstance.observedOn
+	private Checklists createMetaObservation(Checklist cl){
+		Checklists newChecklist = new Checklists()
+		updateMetaObservation(getBasicObvData(cl), cl, newChecklist)
+		newChecklist.isChecklist = true
+		
 		//XXX commnet this when going on production
 		//observationInstance.createdOn = observationInstance.lastRevised = new Date()
-		if(!observationInstance.hasErrors() && observationInstance.save(flush:flushImmediately)) {
-			log.debug "saved observation $observationInstance  $observationInstance.group.name"
-			cl.refObservation = observationInstance
+		if(!newChecklist.hasErrors() && newChecklist.save(flush:flushImmediately)) {
+			log.debug "saved observation $newChecklist "
 			//activityFeedService.addActivityFeed(observationInstance, null, observationInstance.author, activityFeedService.OBSERVATION_CREATED);
 		}else{
-			observationInstance.errors.allErrors.each { log.error it }
+			newChecklist.errors.allErrors.each { log.error it }
 			throw new RuntimeException("Error during checklist meta observation save");
 		}
+		return newChecklist
 	}
 	
 	@Transactional
-	def createObservationFromChecklist(Checklist cl){
+	def createObservationFromChecklist(Checklist cl, Checklists newChecklist){
 		int prevRowId = -1
 		def rowData = []
 		cl.row.each { ChecklistRowData r ->
@@ -990,21 +1024,23 @@ class ChecklistService {
 			}
 			
 			if(prevRowId != r.rowId){
-				createObservationFromRow(rowData, cl)
+				createObservationFromRow(rowData, cl, newChecklist)
 				rowData = []
 				prevRowId = r.rowId
 			}
 			rowData.add(r)
 		}
 		//create obs from last row
-		createObservationFromRow(rowData, cl)
+		createObservationFromRow(rowData, cl, newChecklist)
 	}
 	
 	
-	private createObservationFromRow(List rowData, Checklist cl){
+	private createObservationFromRow(List rowData, Checklist cl, Checklists newChecklist){
 		def basicData = getBasicObvData(cl)
 		def observationInstance = observationService.createObservation(basicData)
-		observationInstance.createdOn = observationInstance.lastRevised = observationInstance.observedOn// = new Date()
+		observationInstance.createdOn = observationInstance.lastRevised = observationInstance.observedOn
+		observationInstance.sourceId = newChecklist.id
+		
 		if(!observationInstance.hasErrors() && observationInstance.save(flush:flushImmediately)) {
 			log.debug "saved observation $observationInstance.id"
 			addActivityFeed(observationInstance, null, observationInstance.author, activityFeedService.OBSERVATION_CREATED, observationInstance.observedOn);
@@ -1015,7 +1051,8 @@ class ChecklistService {
 			//XXX: uncomment this 
 			//Follow.addFollower(observationInstance, observationInstance.author)
 			//adding observation to checklist replacing checklist row
-			cl.addToObservations(observationInstance)
+			newChecklist.addToObservations(observationInstance)
+			
 		}else{
 			observationInstance.errors.allErrors.each { log.error it }
 			throw new RuntimeException("Error during observation save");
@@ -1055,7 +1092,7 @@ class ChecklistService {
 	
 	private saveMetaData(obv, List rowData){
 		rowData.each { ChecklistRowData r ->
-			observationService.addAnnotation(['key': r.key, 'value': r.value, 'columnOrder':r.columnOrderId, 'sourceType': Checklist.class.getCanonicalName()], obv)
+			observationService.addAnnotation(['key': r.key, 'value': r.value, 'columnOrder':r.columnOrderId, 'sourceType': Checklists.class.getCanonicalName()], obv)
 		}
 		if(!obv.hasErrors() && obv.save(flush:flushImmediately)) {
 			log.debug "saved observation meta data $obv"
@@ -1069,25 +1106,80 @@ class ChecklistService {
 		def observation = [:]
 		observation.author = cl.author
 		observation.group_id= cl.speciesGroups.iterator().next().id
-		//observation.notes = params.notes;
+		observation.notes = cl.description
 		observation.observedOn = parseDate(cl);
 		observation.place_name = cl.placeName;
 		observation.reverse_geocoded_name = cl.placeName;
-		//observation.location = 'POINT(' + params.longitude + ' ' + params.latitude + ')'
 		observation.latitude = '' + cl.latitude;
 		observation.longitude = '' +  cl.longitude;
 		observation.location_accuracy = 'Approximate' 
 		observation.habitat_id = Habitat.findByName("Others").id
 		observation.agreeTerms = 'on'
-		observation.sourceType = cl.class.getCanonicalName()
-		observation.sourceId = '' + cl.id
 		return observation
 	}
 	
 	
+	private updateMetaObservation(params, Checklist oldCl, Checklists observation){
+		if(params.author)  {
+			observation.author = params.author;
+		}
+
+		if(params.url) {
+			observation.url = params.url;
+		}
+		observation.group = SpeciesGroup.get(params.group_id);
+		observation.notes = params.notes;
+		observation.observedOn = parseDate1(params.observedOn);
+		observation.reverseGeocodedName = params.reverse_geocoded_name;
+		observation.placeName = params.place_name?:observation.reverseGeocodedName;
+		observation.location = 'POINT(' + params.longitude + ' ' + params.latitude + ')'
+		observation.latitude = params.latitude.toFloat();
+		observation.longitude = params.longitude.toFloat();
+		observation.locationAccuracy = params.location_accuracy;
+		observation.geoPrivacy = false;
+		observation.habitat = Habitat.get(params.habitat_id);
+		observation.agreeTerms = (params.agreeTerms?.equals('on'))?true:false;
+		observation.createdOn = observation.lastRevised = observation.observedOn
+		
+		def newChecklist = observation
+		newChecklist.id =  oldCl.id
+		
+		newChecklist.title =  oldCl.title
+		newChecklist.speciesCount =  oldCl.speciesCount
+		newChecklist.attribution =  oldCl.attribution
+		newChecklist.license =  oldCl.license
+		newChecklist.refText =  oldCl.refText
+		newChecklist.sourceText =  oldCl.sourceText
+		newChecklist.rawChecklist =  oldCl.rawChecklist
+		newChecklist.columnNames =  oldCl.columnNames
+		newChecklist.fromDate =  oldCl.fromDate
+		newChecklist.toDate =  oldCl.toDate
+		newChecklist.publicationDate =  oldCl.publicationDate
+		newChecklist.reservesValue =  oldCl.reservesValue
+		
+		if(oldCl.state) {
+			oldCl.state.each { newChecklist.addToStates(it) } 
+		}
+		if(oldCl.district) {
+			oldCl.district.each { newChecklist.addToDistricts(it) }
+		}
+		if(oldCl.taluka) {
+			oldCl.taluka.each { newChecklist.addToTalukas(it) }
+		}
+	}
+	
 	private parseDate(Checklist cl){
 		def date = (cl.fromDate ?:(cl.toDate?:cl.lastUpdated))
 		return date.format("dd/MM/yyyy")
+	}
+	
+	private Date parseDate1(date){
+		try {
+			return date? Date.parse("dd/MM/yyyy", date):new Date();
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+		return null;
 	}
 	
 	//XXX this method is to add activity on back date only for checklist to observation migration

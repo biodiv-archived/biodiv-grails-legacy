@@ -42,13 +42,13 @@ class ChecklistController {
 		log.debug params
 		if(params.id){
 			//def checklistInstance = Checklist.read(params.id.toLong())
-			def checklistInstance = Checklist.findById(params.id.toLong(), [fetch: [observations: 'join']])
+			def checklistInstance = Checklists.findById(params.id.toLong(), [fetch: [observations: 'join']])
 			if (!checklistInstance) {
 				flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'checklist.label', default: 'Checklist'), params.id])}"
 				redirect (url:uGroup.createLink(action:'list', controller:"checklist", 'userGroupWebaddress':params.webaddress))
 			}
 			else {
-				checklistInstance.refObservation.incrementPageVisit()
+				checklistInstance.incrementPageVisit()
 				def userGroupInstance;
 				if(params.webaddress) {
 					userGroupInstance = userGroupService.get(params.webaddress);
@@ -70,7 +70,7 @@ class ChecklistController {
 
 	def snippet = {
 		log.debug params
-		def checklistInstance = Checklist.read(params.id)
+		def checklistInstance = Checklists.read(params.id)
 		render (template:"/common/checklist/showChecklistSnippetTabletTemplate", model:[checklistInstance:checklistInstance, 'userGroupWebaddress':params.webaddress]);
 	}
 	

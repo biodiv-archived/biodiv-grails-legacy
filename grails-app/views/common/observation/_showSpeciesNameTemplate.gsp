@@ -1,13 +1,13 @@
 <%@ page import="species.participation.Checklist"%>
 <div class="species_title">
 	<%
-		def commonName = observationInstance.isChecklist ? observationInstance.fetchSourceChecklistTitle() :observationInstance.fetchSuggestedCommonNames()
+		def commonName = observationInstance.isChecklist ? observationInstance.title :observationInstance.fetchSuggestedCommonNames()
 		def speciesId = observationInstance.maxVotedReco?.taxonConcept?.findSpeciesId();
 		def speciesLink = " "
 		if(speciesId && !isHeading){
 			speciesLink += '<a class="species-page-link" style="font-style: normal;" href="' + uGroup.createLink(controller:'species', action:'show', id:speciesId, 'userGroupWebaddress':params?.webaddress, absolute:true) + '">' + "<i class='icon-info-sign' style='margin-right: 1px; margin-left: 10px;'></i>See species page" + "</a>"
 		} 
-		if(observationInstance.sourceType == Checklist.class.getCanonicalName() && !isHeading){
+		if(observationInstance.id != observationInstance.sourceId && !isHeading){
 			speciesLink += '<a class="species-page-link" title="source checklist" style="font-style: normal;" href="' + uGroup.createLink(controller:'checklist', action:'show', id:observationInstance.sourceId, 'userGroupWebaddress':params?.webaddress, absolute:true) + '">' + "<i class='icon-info-sign' style='margin-right: 1px; margin-left: 10px;'></i>See checklist" + "</a>"
 		}
 	%>

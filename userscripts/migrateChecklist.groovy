@@ -1,3 +1,5 @@
+import org.codehaus.groovy.grails.orm.hibernate.cfg.GrailsDomainBinder;
+
 import species.CommonNames;
 import species.Language;
 import species.participation.ChecklistService
@@ -22,9 +24,9 @@ def checklistService = ctx.getBean("checklistService");
 ////
 //checklistService.createObservationFromChecklist(cl)
 
-//checklistService.migrateObservationFromChecklist()
+
 //checklistService.addFollow()
-checklistService.addRefObseravtionToChecklist()
+//checklistService.addRefObseravtionToChecklist()
 
 
 def correctRow(){
@@ -55,3 +57,10 @@ def correctChecklist(deleteId, migrateId){
 //correctRow()
 //correctChecklist(41, 1277 ) //Scientific Name
 //correctChecklist(62, 1298) //scientific_names
+
+
+
+ 	
+//checklistService.migrateChecklistAsObs()
+checklistService.migrateObservationFromChecklist()
+println "================ done "
