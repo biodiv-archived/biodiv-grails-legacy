@@ -10,7 +10,7 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 
 canonicalUrl = canonicalUrl ?: uGroup.createLink(action:params.action, controller:params.controller, userGroup:userGroupInstance,absolute:true)
 
-if(params.webaddress) {
+if(params.webaddress && userGroupInstance) {
     imagePath = imagePath?:userGroupInstance.mainImage()?.fileName
     description = description?: userGroupInstance.description.replaceAll(/<.*?>/, '').trim()
     siteName = userGroupInstance.name +' - India Biodiversity Portal';
@@ -26,7 +26,7 @@ if(description != null && description.length() > 300) {
 %>
 
 <meta name="layout" content="main" />
-<title>${title}<g:if test="${params.action.equals('show')}"> | ${params.controller.capitalize()} </g:if> <g:if test="${params.webaddress && !title.equals(userGroupInstance.name)}"> | ${userGroupInstance.name} </g:if> | India Biodiversity Portal</title>
+<title>${title}<g:if test="${params.action.equals('show')}"> | ${params.controller.capitalize()} </g:if> <g:if test="${params.webaddress && userGroupInstance && !title.equals(userGroupInstance?.name)}"> | ${userGroupInstance.name} </g:if> | India Biodiversity Portal</title>
 <g:if test="${canonicalUrl}">
 <link rel="canonical" href="${canonicalUrl}" />
 <meta property="og:url" content="${canonicalUrl}" />
