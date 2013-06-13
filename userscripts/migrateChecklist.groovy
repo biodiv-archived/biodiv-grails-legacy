@@ -2,31 +2,31 @@ import org.codehaus.groovy.grails.orm.hibernate.cfg.GrailsDomainBinder;
 
 import species.CommonNames;
 import species.Language;
-import species.participation.ChecklistService
+//import species.participation.checklistUtilService
 import species.participation.curation.*
 import species.participation.*
 import species.formatReader.SpreadsheetReader;
 import species.utils.*;
 import speciespage.*
 
-def checklistService = ctx.getBean("checklistService");
+def checklistUtilService = ctx.getBean("checklistUtilService");
 
-//checklistService.updateUncuratedVotesTable()
+//checklistUtilService.updateUncuratedVotesTable()
 
-//checklistService.updateLocation()
+//checklistUtilService.updateLocation()
 
-//checklistService.changeCnName()
+//checklistUtilService.changeCnName()
 
-//checklistService.mCn()
+//checklistUtilService.mCn()
 //
 //def cl = Checklist.get(174)
 //println  cl
 ////
-//checklistService.createObservationFromChecklist(cl)
+//checklistUtilService.createObservationFromChecklist(cl)
 
 
-//checklistService.addFollow()
-//checklistService.addRefObseravtionToChecklist()
+//checklistUtilService.addFollow()
+//checklistUtilService.addRefObseravtionToChecklist()
 
 
 def correctRow(){
@@ -49,9 +49,9 @@ def deleteChecklist(id)  {
 }
 
 def correctChecklist(deleteId, migrateId){
-	def checklistService = ctx.getBean("checklistService");
+	def checklistUtilService = ctx.getBean("checklistUtilService");
 	deleteChecklist(deleteId)
-	checklistService.migrateChecklist(migrateId)
+	checklistUtilService.migrateChecklist(migrateId)
 }
 
 //correctRow()
@@ -61,6 +61,6 @@ def correctChecklist(deleteId, migrateId){
 
 
  	
-//checklistService.migrateChecklistAsObs()
-checklistService.migrateObservationFromChecklist()
+//checklistUtilService.migrateChecklistAsObs()
+checklistUtilService.migrateObservationFromChecklist()
 println "================ done "
