@@ -16,7 +16,7 @@
                 </div>
                 <div  style="position:relative; text-align:center;width:100%">
                     <div class="address input-append control-group ${hasErrors(bean: observationInstance, field: 'placeName', 'error')}" style="z-index:3">
-                            <input id="placeName" name="placeName" type="text" title="Find by place name"  class="input-block-level"
+                            <input id="placeName" name="placeName" type="text" title="Find by place name"  class="input-block-level" style="width:94%"
                             class="section-item" value="${observationInstance?.placeName}"/>
                             <span class="add-on" style="vertical-align:middle;"><i class="icon-chevron-down"></i></span>
                             <div id="suggestions" style="display: block;white-space:normal;font-size:14px;text-align:left;z-index:3;"></div>
@@ -93,7 +93,7 @@
                     </div>
                     </div>
                     
-                    <input id="areas" type="hidden" name="areas" value="${Utils.GeometryAsWKT(observationInstance?.coverage.areas)}"></input>
+                    <input id="areas" type="hidden" name="areas" value="${Utils.GeometryAsWKT(observationInstance?.coverage?.areas)}"></input>
             
             </div>
  
