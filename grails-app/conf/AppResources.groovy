@@ -110,17 +110,18 @@ modules = {
 	}
 
 	observations_show {
-		dependsOn 'observations, gallery, carousel, comment, activityfeed'
+		dependsOn 'observations, gallery, carousel, comment, activityfeed, leaflet'
 
 		resource url:'/js/jsrender.js'
 		resource url:'/js/species/observations/show.js'
+		resource url:'/css/location_picker.css'
+		resource url:'/js/location/location-picker.js'
 	} 
 
 	observations_create {
 		dependsOn 'observations, leaflet'
 
 		resource url:'/css/location_picker.css'
-		resource url:'/js/location/google/StyledMarker.js'
 		resource url:'/js/location/location-picker.js'
 		resource url:'/js/jquery/jquery.exif.js'
 	}
@@ -239,7 +240,6 @@ modules = {
 		resource url:'/css/content.css'
 		resource url:'/js/content.js'
 		resource url:'/css/location_picker.css'
-		resource url:'/js/location/google/StyledMarker.js'
 		resource url:'/js/location/location-picker.js'
 	}
 	

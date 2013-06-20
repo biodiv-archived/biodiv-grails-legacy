@@ -1,4 +1,4 @@
-
+<%@ page import="species.utils.Utils"%>
 <div class="observation_location">
 
 	<div id="map_canvas_${observationInstance.id}" style="height: 170px;"></div>
@@ -21,11 +21,17 @@
 		<div class="value">${observationInstance.latitude},
 			${observationInstance.longitude}
 		</div>
+                
+                <input class="degree_field" id="latitude_field" type="hidden" name="latitude" value="${observationInstance?.latitude}"></input>
+                <input class="degree_field" id="longitude_field" type="hidden" name="longitude" style="width:193px;" value="${observationInstance?.longitude}"></input>
+                <input id="areas" type="hidden" name="areas" value="${Utils.GeometryAsWKT(observationInstance?.coverage?.areas)}"></input>
 	</div>
 
 	<r:script>
                 $(document).ready(function() {
                     loadGoogleMapsAPI(function() {
+                        initialize(document.getElementById("map_canvas_${observationInstance.id}"), false);
+                        /*
                         var latlng = new google.maps.LatLng(${observationInstance.latitude}, ${observationInstance.longitude});
                         var options = {
                             zoom: 13,
@@ -40,6 +46,7 @@
                         
                         marker.setPosition(latlng);
                         map.setCenter(latlng);
+                        */
                     });
                 });
         </r:script>

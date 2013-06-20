@@ -108,7 +108,7 @@
 <r:script>
 $(document).ready(function() {
     loadGoogleMapsAPI(function() {
-    	initialize(true);
+    	initialize(document.getElementById("map_canvas"), true);
         $('.geotagged_image').each(function(index){
                 update_geotagged_images_list($(this));		
         });

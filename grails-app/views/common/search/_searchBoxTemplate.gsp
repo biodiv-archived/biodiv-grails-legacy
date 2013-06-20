@@ -48,7 +48,8 @@ $(document).ready(function() {
 		'carousel':{maxHeight:75, maxWidth:75},
                 'observation': {},
                 'imagesPath': "${resource(dir:'images', absolute:true)}",
-		'locationsUrl': "${uGroup.createLink(controller:'observation', action: 'locations')}"
+                'locationsUrl': "${uGroup.createLink(controller:'observation', action: 'locations')}",
+                'defaultMarkerIcon':"${resource(dir:'js/Leaflet/dist/images', file:'')}"
 	}
 	$("#userGroupSelectFilter").val("${(queryParams && queryParams.uGroup)?queryParams.uGroup:(params.webaddress?'THIS_GROUP':'ALL')}");
 });

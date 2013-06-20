@@ -21,9 +21,10 @@ var selectedIcon,prevIcon;
 var markers,searchMarker;
 var drawnItems;
 
-function initialize(drawable){
+function initialize(element, drawable){
     G = google.maps;
     M = L;
+    L.Icon.Default.imagePath = window.params.defaultMarkerIcon;
     var latlng = new M.LatLng(21.07,79.27);
 
     var options = {
@@ -34,7 +35,7 @@ function initialize(drawable){
     neRestriction = new M.LatLng('36', '98');
     allowedBounds = new M.LatLngBounds(swRestriction, neRestriction);
 
-    map = new M.Map(document.getElementById("map_canvas"), options);
+    map = new M.Map(element, options);
     var ggl = new L.Google('HYBRID', {});
     map.addLayer(ggl).fitBounds(allowedBounds);
     //L.control.coordinates().addTo(map);
@@ -80,42 +81,41 @@ function initialize(drawable){
     var longitude = $('#longitude_field').val();
 
     if(latitude && longitude){
-        searchMarker = set_location(latitude, longitude, searchMarker, {label:'Selected Location', opacity:1, draggable:true, selected:true});
+        searchMarker = set_location(latitude, longitude, searchMarker, {label:'Selected Location', opacity:1, draggable:drawable, selected:drawable});
     }
 
-    
-
-    if(drawable) {
-        drawnItems = new L.FeatureGroup();
-        var areas = $('input#areas').val()
-        if(areas) {
-            var wkt = new Wkt.Wkt();
-            try { // Catch any malformed WKT strings
-                wkt.read(areas);
-            } catch (e1) {
-                try {
-                    wkt.read(el.value.replace('\n', '').replace('\r', '').replace('\t', ''));
-                } catch (e2) {
-                    if (e2.name === 'WKTError') {
-                        alert('Wicket could not understand the WKT string you entered. Check that you have parentheses balanced, and try removing tabs and newline characters.');
-                        return;
-                    }
+    drawnItems = new L.FeatureGroup();
+    var areas = $('input#areas').val()
+    if(areas) {
+        var wkt = new Wkt.Wkt();
+        try { // Catch any malformed WKT strings
+            wkt.read(areas);
+        } catch (e1) {
+            try {
+                wkt.read(el.value.replace('\n', '').replace('\r', '').replace('\t', ''));
+            } catch (e2) {
+                if (e2.name === 'WKTError') {
+                    alert('Wicket could not understand the WKT string you entered. Check that you have parentheses balanced, and try removing tabs and newline characters.');
+                    return;
                 }
-            }
-            obj = wkt.toObject(); // Make an object
-            if (Wkt.isArray(obj)) { // Distinguish multigeometries (Arrays) from objects
-                for (i in obj) {
-                    if (obj.hasOwnProperty(i) && !Wkt.isArray(obj[i])) {
-                        drawnItems.addLayer(obj[i]);
-                    }
-                }
-            } else {
-                drawnItems.addLayer(obj);
             }
         }
+        obj = wkt.toObject(); // Make an object
+        if (Wkt.isArray(obj)) { // Distinguish multigeometries (Arrays) from objects
+            for (i in obj) {
+                if (obj.hasOwnProperty(i) && !Wkt.isArray(obj[i])) {
+                    drawnItems.addLayer(obj[i]);
+                }
+            }
+        } else {
+            drawnItems.addLayer(obj);
+            map.fitBounds(obj.getBounds());                   
+        }
+    }
 
+    map.addLayer(drawnItems);
 
-        map.addLayer(drawnItems);
+    if(drawable) {
         var drawControl = new M.Control.Draw({
             draw:{
                 polyline:false,
@@ -363,7 +363,7 @@ function update_geotagged_images_list(image) {
             $("#geotagged_images").append(html);
             if(latlng) {
                 var iconUrl = $(image).attr('src').replace(/_th.jpg$/, '_gall_th.jpg');
-                addMarker(latlng.lat, latlng.lng, {label:display, icon:new L.Icon({'iconUrl':iconUrl,  iconSize: [50, 50],iconAnchor: [0, 94],popupAnchor: [-3, -76], shadowUrl: 'http://indiabiodiversity.localhost.org/biodiv/js/Leaflet/dist/images/marker-icon.png', shadowAnchor: [12, 44], className:'geotaggedImage'}), draggable:false, layer:'Geotagged Image'});
+                addMarker(latlng.lat, latlng.lng, {label:display, icon:new L.Icon({'iconUrl':iconUrl,  iconSize: [50, 50],iconAnchor: [0, 94],popupAnchor: [-3, -76], shadowUrl: window.params.defaultMarkerIcon+"marker-icon.png", shadowAnchor: [12, 44], className:'geotaggedImage'}), draggable:false, layer:'Geotagged Image'});
             }
             //$("#geotagged_images").trigger('update_map');
         }    		
