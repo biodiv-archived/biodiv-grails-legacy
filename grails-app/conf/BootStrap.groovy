@@ -35,7 +35,8 @@ class BootStrap {
 		initNames();
 		initFilters();
 		initEmailConfirmationService();
-	}
+
+       	}
 
 	def initDefs() {
 		if(Field.count() == 0) {
@@ -136,12 +137,6 @@ class BootStrap {
 				userToken.params.confirmationToken = confirmationToken;
 				def userGroupController = new UserGroupController();
 				def userGroup = userGroupController.findInstance(Long.parseLong(userToken.params.userGroupInstanceId), null, false);
-				println "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&"
-				println userGroup
-				println userToken.params
-				println userToken.controller
-				println userToken.action
-				println userGroupService.userGroupBasedLink(mapping: 'userGroupGeneric', controller:userToken.controller, action:userToken.action, userGroup:userGroup, params:userToken.params)
 				return [url: userGroupService.userGroupBasedLink(mapping: 'userGroupGeneric', controller:userToken.controller, action:userToken.action, userGroup:userGroup, params:userToken.params)]
 			} else {
 				//TODO

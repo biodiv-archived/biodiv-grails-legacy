@@ -127,11 +127,13 @@ function loadGoogleMapsAPI(callback) {
     //if (typeof google === 'object' && typeof google.maps === 'object') {
     //    console.log("google maps already loaded")
     //} else {
-        console.log("loading google maps")
-        google.load("maps", "3.12", {'callback':function() {
-            google.maps.visualRefresh = true;
-            callback();
-        }, other_params: "sensor=true"});
+        if(google != undefined) {
+            console.log("loading google maps")
+            google.load("maps", "3.12", {'callback':function() {
+                google.maps.visualRefresh = true;
+                callback();
+            }, other_params: "sensor=true"});
+        }
     //}
 }
 

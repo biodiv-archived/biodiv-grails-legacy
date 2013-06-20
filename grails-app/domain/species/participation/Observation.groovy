@@ -14,6 +14,7 @@ import species.groups.UserGroup;
 import speciespage.ObvUtilService;
 import grails.util.GrailsNameUtils;
 import org.grails.rateable.*
+import content.eml.Coverage;
 
 class Observation implements Taggable, Rateable {
 	
@@ -68,6 +69,7 @@ class Observation implements Taggable, Rateable {
 	String searchText;
 	Recommendation maxVotedReco;
 	boolean agreeTerms = false;
+	Coverage coverage 	//Coverage Information
     
 	static hasMany = [resource:Resource, recommendationVote:RecommendationVote, obvFlags:ObservationFlag, userGroups:UserGroup];
 	static belongsTo = [SUser, UserGroup]
@@ -79,8 +81,6 @@ class Observation implements Taggable, Rateable {
 		resource validator : { val, obj -> val && val.size() > 0 }
 		observedOn validator : {val -> val < new Date()}
 		latitude validator : { val, obj -> 
-            println "&&&&&"
-            println val;
             if(!val) {
                 println "not valid"
                 return ['default.blank.message', 'Latitude']
@@ -93,9 +93,6 @@ class Observation implements Taggable, Rateable {
 			}
 		}
 		longitude validator : { val, obj ->  
-            println "&&&&&"
-            println val;
-
             if(!val) {
                 println "not valid"
                 return ['default.blank.message', 'Longitude']
@@ -107,7 +104,9 @@ class Observation implements Taggable, Rateable {
 				return ['value.not.in.range', 'Longitude', '68.03215', '97.40238']
 			}
 		}
+        placeName blank:false
 		agreeTerms nullable:true
+		coverage nullable:true	
 	}
 
 	static mapping = {

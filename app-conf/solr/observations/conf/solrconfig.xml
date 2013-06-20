@@ -705,6 +705,39 @@
     </arr>
   </requestHandler>
 
+
+<searchComponent class="solr.SpellCheckComponent" name="suggest">
+    <lst name="spellchecker">
+            <str name="name">suggest</str>
+            <str name="classname">org.apache.solr.spelling.suggest.Suggester</str>
+            <str name="lookupImpl">org.apache.solr.spelling.suggest.fst.WFSTLookupFactory</str>
+            <str name="storeDir">locations</str>
+            <str name="buildOnCommit">false</str>
+
+            <!-- Suggester properties -->
+            <bool name="exactMatchFirst">true</bool>
+            <str name="field">location_exact</str>  <!-- the indexed field to derive suggestions from -->
+            <float name="threshold">0.005</float>
+          <str name="sourceLocation">locations_suggest</str>
+          <!-- specify a fieldtype using keywordtokenizer + lowercase + cleanup -->
+          <str name="queryAnalyzerFieldType">terms</str>
+    </lst>
+</searchComponent>
+
+<requestHandler class="org.apache.solr.handler.component.SearchHandler" name="/suggest">
+    <lst name="defaults">
+        <str name="spellcheck">true</str>
+        <str name="spellcheck.dictionary">suggest</str>
+        <str name="spellcheck.onlyMorePopular">true</str>
+        <str name="spellcheck.count">5</str>
+        <str name="spellcheck.collate">false</str>
+    </lst>
+    <arr name="components">
+        <str>suggest</str>
+    </arr>
+</requestHandler>
+
+
   <searchComponent name="tvComponent" class="org.apache.solr.handler.component.TermVectorComponent"/>
   <!-- A Req Handler for working with the tvComponent.  This is purely as an example.
   You will likely want to add the component to your already specified request handlers. -->

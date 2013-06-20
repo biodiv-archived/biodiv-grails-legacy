@@ -47,7 +47,8 @@ $(document).ready(function() {
 		'searchController' : "${controller}",
 		'carousel':{maxHeight:75, maxWidth:75},
                 'observation': {},
-                'imagesPath': "${resource(dir:'images', absolute:true)}"
+                'imagesPath': "${resource(dir:'images', absolute:true)}",
+		'locationsUrl': "${uGroup.createLink(controller:'observation', action: 'locations')}"
 	}
 	$("#userGroupSelectFilter").val("${(queryParams && queryParams.uGroup)?queryParams.uGroup:(params.webaddress?'THIS_GROUP':'ALL')}");
 });

@@ -3,6 +3,10 @@ package content.eml
 import species.groups.SpeciesGroup
 import species.Habitat
 
+import org.hibernatespatial.GeometryUserType
+import com.vividsolutions.jts.geom.Point;
+import species.participation.Observation
+import com.vividsolutions.jts.geom.MultiPolygon;
 /**
  * 
  * Geographical and taxonomic coverage of resources
@@ -17,7 +21,9 @@ class Coverage {
 	float longitude;
 	boolean geoPrivacy = false;
 	String locationAccuracy;
-	
+    Point loc;
+    MultiPolygon areas;
+
 	static hasMany = [speciesGroups:SpeciesGroup, habitats:Habitat]
 	
 
@@ -28,7 +34,16 @@ class Coverage {
 		latitude(nullable: true)
 		longitude(nullable:true)
 		locationAccuracy(nullable: true)
+		loc(nullable: true)
+		areas(nullable: true)
     }
 	
-	static belongsTo = [Document]
+    static mapping = {
+        columns {
+            loc type: GeometryUserType, sqlType: "Geometry"
+            area type: GeometryUserType, sqlType: "Geometry"
+        }
+    }
+
+	static belongsTo = [Document, Observation]
 }
