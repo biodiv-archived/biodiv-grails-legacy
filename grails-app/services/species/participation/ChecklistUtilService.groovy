@@ -72,8 +72,8 @@ class ChecklistUtilService {
 		def m = GrailsDomainBinder.getMapping(ActivityFeed.class)
 		m.autoTimestamp = false
 		//[Checklist.get(4)].each { Checklist cl ->
-		def cids = [12, 13]
-		//def cids = Checklist.listOrderById().collect { it.id}
+		//def cids = [12, 13]
+		def cids = Checklist.listOrderById().collect { it.id}
 		cids.each { id ->
 			//loading all rows in one query
 			Checklist cl = Checklist.findById(id, [fetch: [row: 'join']])
@@ -185,12 +185,12 @@ class ChecklistUtilService {
 	private createObservationFromRow(List rowData, Checklist cl, Checklists newChecklist){
 		def basicData = getBasicObvData(cl)
 		def observationInstance = observationService.createObservation(basicData)
-		observationInstance.createdOn = observationInstance.lastRevised = observationInstance.observedOn
+		observationInstance.createdOn = observationInstance.lastRevised = observationInstance.fromDate
 		observationInstance.sourceId = newChecklist.id
 		
 		if(!observationInstance.hasErrors() && observationInstance.save(flush:flushImmediately)) {
 			log.debug "saved observation $observationInstance.id"
-			addActivityFeed(observationInstance, null, observationInstance.author, activityFeedService.OBSERVATION_CREATED, observationInstance.observedOn);
+			addActivityFeed(observationInstance, null, observationInstance.author, activityFeedService.OBSERVATION_CREATED, observationInstance.fromDate);
 			//saving recommendation
 			saveRecoVote(observationInstance, rowData)
 			//saveMetaData
@@ -224,10 +224,10 @@ class ChecklistUtilService {
 			}
 			//println " ============ saving    $snData.value     $snData.reco  $obv   $snData"
 			ConfidenceType confidence = observationService.getConfidenceType(ConfidenceType.CERTAIN.name());
-			RecommendationVote recommendationVoteInstance = new RecommendationVote(observation:obv, recommendation:snData.reco, commonNameReco:cnReco, author:obv.author, confidence:confidence, votedOn:obv.observedOn);
+			RecommendationVote recommendationVoteInstance = new RecommendationVote(observation:obv, recommendation:snData.reco, commonNameReco:cnReco, author:obv.author, confidence:confidence, votedOn:obv.fromDate);
 			if(!recommendationVoteInstance.hasErrors() && recommendationVoteInstance.save(flush:flushImmediately)) {
 				log.debug "Successfully added reco vote : "+recommendationVoteInstance.id
-				addActivityFeed(obv, recommendationVoteInstance, recommendationVoteInstance.author, activityFeedService.SPECIES_RECOMMENDED, new Date(obv.observedOn.getTime() + 1));
+				addActivityFeed(obv, recommendationVoteInstance, recommendationVoteInstance.author, activityFeedService.SPECIES_RECOMMENDED, new Date(obv.fromDate.getTime() + 1));
 				//saving max voted species name for observation instance
 				obv.maxVotedReco = snData.reco
 			}else{
@@ -255,7 +255,7 @@ class ChecklistUtilService {
 		observation.group_id= cl.speciesGroups.iterator().next().id
 		observation.notes = cl.description
 		observation.observedOn = parseDate(cl);
-		observation.place_name = cl.placeName;
+		observation.placeName = cl.placeName;
 		observation.reverse_geocoded_name = cl.placeName;
 		observation.latitude = '' + cl.latitude;
 		observation.longitude = '' +  cl.longitude;
@@ -276,7 +276,7 @@ class ChecklistUtilService {
 		}
 		observation.group = SpeciesGroup.get(params.group_id);
 		observation.notes = params.notes;
-		observation.observedOn = parseDate1(params.observedOn);
+		
 		observation.reverseGeocodedName = params.reverse_geocoded_name;
 		observation.placeName = params.place_name?:observation.reverseGeocodedName;
 		observation.location = 'POINT(' + params.longitude + ' ' + params.latitude + ')'
@@ -286,7 +286,7 @@ class ChecklistUtilService {
 		observation.geoPrivacy = false;
 		observation.habitat = Habitat.get(params.habitat_id);
 		observation.agreeTerms = (params.agreeTerms?.equals('on'))?true:false;
-		observation.createdOn = observation.lastRevised = observation.observedOn
+		
 		
 		def newChecklist = observation
 		newChecklist.id =  oldCl.id
@@ -303,6 +303,8 @@ class ChecklistUtilService {
 		newChecklist.toDate =  oldCl.toDate
 		newChecklist.publicationDate =  oldCl.publicationDate
 		newChecklist.reservesValue =  oldCl.reservesValue
+		observation.fromDate = observation.fromDate ?: parseDate1(params.observedOn);
+		observation.createdOn = observation.lastRevised = observation.fromDate
 		
 		if(oldCl.state) {
 			oldCl.state.each { newChecklist.addToStates(it) }

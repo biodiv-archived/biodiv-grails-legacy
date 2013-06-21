@@ -62,5 +62,5 @@ def correctChecklist(deleteId, migrateId){
 
  	
 //checklistUtilService.migrateChecklistAsObs()
-checklistUtilService.migrateObservationFromChecklist()
+//checklistUtilService.migrateObservationFromChecklist()
 println "================ done "

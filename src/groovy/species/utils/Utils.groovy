@@ -31,6 +31,8 @@ import species.NamesParser;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang.WordUtils
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.io.WKTWriter;
 
 class Utils {
 
@@ -366,5 +368,11 @@ class Utils {
     public static stripHTML(String text) {
         if(!text) return text;
         return text.replaceAll("<(.|\n)*?>", '');
+    }
+
+    public static GeometryAsWKT(Geometry geom) {
+        if(!geom) return;
+        WKTWriter wktWriter = new WKTWriter();
+        return wktWriter.write(geom);
     }
 }

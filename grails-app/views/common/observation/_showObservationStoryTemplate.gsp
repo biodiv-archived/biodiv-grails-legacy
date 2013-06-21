@@ -91,7 +91,7 @@
                 </g:else>
                 <div class="value">
                     <time class="timeago"
-                    datetime="${observationInstance.observedOn.getTime()}"></time>
+                    datetime="${observationInstance.fromDate.getTime()}"></time>
                 </div>
             </div>
 

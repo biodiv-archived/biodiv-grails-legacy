@@ -86,8 +86,9 @@ class ObservationsSearchService {
 				addNameToDoc(obv, doc);
 	
 				doc.addField(searchFieldsConfig.AUTHOR, obv.author.name);
+				doc.addField(searchFieldsConfig.AUTHOR+"_id", obv.author.id);
 				doc.addField(searchFieldsConfig.CONTRIBUTOR, obv.author.name);
-				doc.addField(searchFieldsConfig.OBSERVED_ON, obv.observedOn);
+				doc.addField(searchFieldsConfig.OBSERVED_ON, obv.fromDate);
 				doc.addField(searchFieldsConfig.UPLOADED_ON, obv.createdOn);
 				doc.addField(searchFieldsConfig.UPDATED_ON, obv.lastRevised);
 				if(obv.notes) {

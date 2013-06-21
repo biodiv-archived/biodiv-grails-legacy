@@ -44,6 +44,14 @@ import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap;
 import org.codehaus.groovy.grails.web.util.WebUtils;
 
+import com.vividsolutions.jts.geom.Coordinate
+import com.vividsolutions.jts.geom.GeometryFactory
+import content.eml.Coverage;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.io.WKTReader;
+import com.vividsolutions.jts.io.ParseException;
+import com.vividsolutions.jts.geom.MultiPolygon;
+
 class ObservationService {
 
 	static transactional = false
@@ -73,7 +81,7 @@ class ObservationService {
 	 * @return
 	 */
 	Observation createObservation(params) {
-		log.info "Creating observations from params : "+params
+		//log.info "Creating observations from params : "+params
 		Observation observation = new Observation();
 		updateObservation(params, observation);
 		return observation;
@@ -91,11 +99,11 @@ class ObservationService {
 		if(params.url) {
 			observation.url = params.url;
 		}
-		observation.group = SpeciesGroup.get(params.group_id);
+		observation.group = params.group?:SpeciesGroup.get(params.group_id);
 		observation.notes = params.notes;
-		observation.observedOn = parseDate(params.observedOn);
-		observation.reverseGeocodedName = params.reverse_geocoded_name;
-		observation.placeName = params.place_name?:observation.reverseGeocodedName;
+		observation.fromDate = observation.toDate = parseDate(params.observedOn);
+		observation.reverseGeocodedName = params.reverse_geocoded_name?:params.reverseGeocodedName;
+		observation.placeName = params.placeName;//?:observation.reverseGeocodedName;
 		observation.location = 'POINT(' + params.longitude + ' ' + params.latitude + ')'
 		if(params.latitude) {
             observation.latitude = params.latitude?.toFloat();
@@ -103,11 +111,29 @@ class ObservationService {
         if(params.longitude) {
     		observation.longitude = params.longitude?.toFloat();
         }
-		observation.locationAccuracy = params.location_accuracy;
+		observation.locationAccuracy = params.location_accuracy?:params.locationAccuracy;
 		observation.geoPrivacy = false;
-		observation.habitat = Habitat.get(params.habitat_id);
+		observation.habitat = params.habitat?:Habitat.get(params.habitat_id);
+
 		observation.agreeTerms = (params.agreeTerms?.equals('on'))?true:false;
 		
+        GeometryFactory geometryFactory = new GeometryFactory();
+        observation.loc = geometryFactory.createPoint(new Coordinate(observation.latitude, observation.longitude));
+
+        if(params.areas) {
+            WKTReader wkt = new WKTReader();
+            try {
+                Geometry geom = wkt.read(params.areas);
+                if(geom instanceof MultiPolygon) {
+                    observation.areas = geom;
+                } else {
+                    log.error "Coverage only supports multipolygon"
+                }
+            } catch(ParseException e) {
+                log.error "Error parsing polygon wkt : ${params.areas}"
+            }
+        }
+
 		def resourcesXML = createResourcesXML(params);
 		def resources = saveResources(observation, resourcesXML);
 		
@@ -1316,7 +1342,6 @@ class ObservationService {
 				log.debug "invalid notification type"
 		}
 		
-		log.debug "Sending email to ${toUsers}"
 		toUsers.eachWithIndex { toUser, index ->
 			if(toUser) {
 				templateMap['username'] = toUser.name.capitalize();
@@ -1326,6 +1351,7 @@ class ObservationService {
 				
 				if ( Environment.getCurrent().getName().startsWith("pamba")) {
 				//if ( Environment.getCurrent().getName().equalsIgnoreCase("development")) {
+		            log.debug "Sending email to ${toUser}"
 					mailService.sendMail {
 						to toUser.email
 						if(index == 0) {
@@ -1405,13 +1431,48 @@ class ObservationService {
 	def locations(params) {
 		List result = new ArrayList();
 		
-		def queryResponse = observationsSearchService.terms(params.term, params.field, params.max);
-		NamedList tags = (NamedList) ((NamedList)queryResponse.getResponse().terms)[params.field];
-		for (Iterator iterator = tags.iterator(); iterator.hasNext();) {
-			Map.Entry tag = (Map.Entry) iterator.next();
-			result.add([value:tag.getKey().toString(), label:tag.getKey().toString(),  "category":"Observations"]);
+		NamedList paramsList = new NamedList();
+/*        paramsList.add('fl', 'location_exact');
+        if(springSecurityService.currentUser){
+            paramsList.add('q', "author_id:"+springSecurityService.currentUser.id.toLong())
+        } else {
+            paramsList.add('q', "*:*");
+        }
+        paramsList.add('facet', "true");
+        paramsList.add('facet.field', "location_exact")
+        paramsList.add('facet.mincount', "1")
+        paramsList.add('facet.prefix', params.term?:'*');
+        paramsList.add('facet.limit', 5);
+
+        def facetResults = []
+		if(paramsList) {
+			def queryResponse = observationsSearchService.search(paramsList);
+			List facets = queryResponse.getFacetField('location_exact').getValues()
+			
+			facets.each {
+			    facetResults.add([value:it.getName(), label:it.getName()+'('+it.getCount()+')',  "category":"My Locations"]);
+			}
+			
 		}
-		return result;
+*/
+        paramsList.add("q", "location_exact:"+params.term+'*'?:'*');
+        paramsList.add("fl", "location_exact,latlong");
+        paramsList.add("start", 0);
+        paramsList.add("rows", 5);
+	
+        def results = [];
+        if(paramsList) {
+			def queryResponse = observationsSearchService.search(paramsList);
+	
+			Iterator iter = queryResponse.getResults().listIterator();
+			while(iter.hasNext()) {
+				def doc = iter.next();
+                results.add([location:doc.getFieldValue('location_exact'), latlong:doc.getFieldValue('latlong'), category:'My Locations']);
+			}
+
+	    }
+		
+		return results
 	} 
 
 }

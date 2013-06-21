@@ -101,10 +101,14 @@ class ActivityFeedService {
 			subRootHolderType = activityHolder.class.getCanonicalName()
 			subRootHolderId = (activityHolder.isMainThread())? activityHolder.id : activityHolder.fetchMainThread().id
 		}
-			
+		
+		def date = new Date()
+		
 		ActivityFeed af = new ActivityFeed(author:author, activityHolderId:activityHolder?.id, \
 						activityHolderType:activityHolder?.class?.getCanonicalName(), \
 						rootHolderId:rootHolder?.id, rootHolderType:rootHolder?.class?.getCanonicalName(), \
+						//comment this line after migration on same jvm
+						dateCreated: date, lastUpdated:date,\
 						activityType:activityType, subRootHolderType:subRootHolderType, subRootHolderId:subRootHolderId, activityDescrption:description);
 					
 		ActivityFeed.withNewSession {

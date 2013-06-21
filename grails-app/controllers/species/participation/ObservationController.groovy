@@ -126,8 +126,9 @@ class ObservationController {
 		def observationInstance = new Observation()
 		observationInstance.properties = params;
 		def author = springSecurityService.currentUser;
-		def lastCreatedObv = Observation.find("from Observation as obv where obv.author=:author order by obv.createdOn desc ",[author:author]);
-		return [observationInstance: observationInstance,lastCreatedObv:lastCreatedObv, 'springSecurityService':springSecurityService]
+//		def lastCreatedObv = Observation.find("from Observation as obv where obv.author=:author order by obv.createdOn desc ",[author:author]);
+		return [observationInstance: observationInstance, 'springSecurityService':springSecurityService]
+		return [observationInstance: observationInstance, 'springSecurityService':springSecurityService]
 	}
 	
 
@@ -1278,8 +1279,9 @@ class ObservationController {
 			response.outputStream.flush()
 		}
 	}
-	
-	def test = {
-		render "rr  "  + Checklist.get(49).speciesGroups //.iterator().next().id
-	}
+
+    def locations = {
+        def locations = observationService.locations(params);
+        render locations as JSON
+    }
 }

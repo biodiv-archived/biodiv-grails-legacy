@@ -17,7 +17,6 @@
 <g:set var="title" value="Observations"/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
 <r:require modules="observations_create"/>
-
 <style>
 .btn-group.open .dropdown-menu {
 	top: 43px;
@@ -81,8 +80,11 @@
 .left-indent {
 	margin-left:100px;
 }
+
 .control-group.error  .help-inline {
-	padding-top : 15px
+    padding-top : 15px;
+    font-size:14px;
+    display:block;
 }
 
 .cke_skin_kama .cke_editor {
@@ -90,7 +92,7 @@ display: table !important;
 }
 
 input.dms_field {
-	width: 19%;
+	width: 15%;
 	display: none;       
 }
 .btn .combobox-clear {
@@ -324,7 +326,7 @@ if(r) {
 						</div>
 						
 						<div
-							class="row control-group ${hasErrors(bean: observationInstance, field: 'observedOn', 'error')}">
+							class="row control-group ${hasErrors(bean: observationInstance, field: 'fromDate', 'error')}">
 
 							<label for="observedOn" class="control-label"><i
 								class="icon-calendar"></i>
@@ -333,12 +335,12 @@ if(r) {
 
 							<div class="controls textbox">
 								<input name="observedOn" type="text" id="observedOn" class="input-block-level"
-									value="${observationInstance?.observedOn?.format('dd/MM/yyyy')}"
+									value="${observationInstance?.fromDate?.format('dd/MM/yyyy')}"
 									placeholder="Select date of observation (dd/MM/yyyy)" />
 								
 								<div class="help-inline">
 									<g:hasErrors bean="${observationInstance}" field="observedOn">
-									<g:if test="${observationInstance.observedOn == null}">
+									<g:if test="${observationInstance.fromDate == null}">
 										<g:message code="observation.observedOn.validator.invalid_date" />
 									</g:if>
 									<g:else>
@@ -371,7 +373,7 @@ if(r) {
 						def obvInfoFeeder = lastCreatedObv ? lastCreatedObv : observationInstance
            			%>
            			<div class="span12 super-section" style="clear: both;">
-						<obv:showMapInput model="[observationInstance:observationInstance, obvInfoFeeder:obvInfoFeeder, locationHeading:'Where did you find this observation?']"></obv:showMapInput>
+                                    <obv:showMapInput model="[observationInstance:observationInstance, userObservationInstanceList: totalObservationInstanceList, obvInfoFeeder:obvInfoFeeder, locationHeading:'Where did you find this observation?']"></obv:showMapInput>
       				</div>
 					<div class="span12 super-section"  style="clear: both">
 						<div class="section" style="position: relative; overflow: visible;">
@@ -395,8 +397,8 @@ if(r) {
 								</div>
 							</div>
 							<%
-								def obvTags = observationInstance.tags
-								if(params.action == 'save' && saveParams.tags){
+								def obvTags = observationInstance?.tags
+								if(params.action == 'save' && saveParams?.tags){
 									obvTags = Arrays.asList(saveParams.tags)
 								}				
 							%>
@@ -472,7 +474,7 @@ if(r) {
 						<div class="row control-group">
 								<label class="checkbox" style="text-align: left;"> 
 								 <g:checkBox style="margin-left:0px;"
-									name="agreeTerms" value="${observationInstance.agreeTerms}"/>
+									name="agreeTerms" value="${observationInstance?.agreeTerms}"/>
 								 <span class="policy-text"> By submitting this form, you agree that the photos or videos you are submitting are taken by you, or you have permission of the copyright holder to upload them on creative commons licenses. </span></label>
 						</div>
 					
@@ -547,6 +549,7 @@ if(r) {
     var add_file_button = '<li id="add_file" class="addedResource" style="display:none;z-index:10;"><div id="add_file_container"><div id="add_image"></div><div id="add_video" class="editable"></div></div><div class="progress"><div id="translucent_box"></div><div id="progress_bar"></div ><div id="progress_msg"></div ></div></li>';
 
 	$(document).ready(function(){
+
 		$('.dropdown-toggle').dropdown();
 		
 		var filePick = function() {
@@ -781,7 +784,6 @@ if(r) {
         });
        
         $("#name").watermark("Suggest a species name");
-        $("#place_name").watermark("Set a title for this location");
        
         $("#help-identify input").click(function(){
                 if ($(this).is(':checked')){
@@ -821,7 +823,17 @@ if(r) {
 					$('#addObservation').append($(input));	
 	        	})
 	        	*/
-				$("#userGroupsList").val(getSelectedUserGroups());	       	
+                        $("#userGroupsList").val(getSelectedUserGroups())
+                        if(drawnItems) {
+                            var areaBounds = new Array();
+                            drawnItems.eachLayer(function(layer){
+                                areaBounds.push(layer.getLatLngs());    
+                            })
+                            var areas = new L.MultiPolygon(areaBounds);
+                            var wkt = new Wkt.Wkt();
+                            wkt.fromObject(areas);
+                            $("input#areas").val(wkt.write());
+                        }
 	        	$("#addObservation").submit();        	
 	        	return false;
 			} else {
@@ -861,10 +873,6 @@ if(r) {
         });
         
         filepicker.setKey('AXCVl73JWSwe7mTPb2kXdz');
-	$('.geotagged_image', this).load(function(){
-        	update_geotagged_images_list($(this));		
-	});
-
 	});
 
 

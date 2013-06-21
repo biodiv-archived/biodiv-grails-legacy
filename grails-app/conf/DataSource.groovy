@@ -1,9 +1,11 @@
 dataSource {
     pooled = true
-    driverClassName = "org.postgresql.Driver"
+    //Added bu hibernatespatial plugin
+// //     driverClassName = "org.postgis.DriverWrapper"
+    dialect = org.hibernatespatial.postgis.PostgisDialect
     username = "postgres"
     password = "postgres123"
-//	logSql = true
+    //	logSql = true
     properties {
         //TODO: following params to be enabled after testing for connection leak
         //maxActive = 50
@@ -16,7 +18,7 @@ dataSource {
         testWhileIdle=false
 
         timeBetweenEvictionRunsMillis = 1000 * 60 * 30
-//        maxWait = 30000
+        //        maxWait = 30000
     }
 }
 
@@ -36,7 +38,7 @@ environments {
     }
     test {
         dataSource {
-			dbCreate = "update" // one of 'create', 'create-drop','update'
+            dbCreate = "update" // one of 'create', 'create-drop','update'
             url = "jdbc:postgresql://localhost:5432/${appName}"
         }
     }
@@ -46,22 +48,27 @@ environments {
             url = "jdbc:postgresql://localhost:5432/${appName}"
         }
     }
-	saturn {
-		dataSource {
-			dbCreate = "update" // one of 'create', 'create-drop','update'
-			url = "jdbc:postgresql://localhost:5432/${appName}"
-		}
-	}
-	pamba {
-		dataSource {
-			dbCreate = "update" // one of 'create', 'create-drop','update'
-			url = "jdbc:postgresql://localhost:5432/${appName}"
-		}
-	}
-	pambaTest {
-		dataSource {
-			dbCreate = "update" // one of 'create', 'create-drop','update'
-			url = "jdbc:postgresql://localhost:5432/${appName}"
-		}
-	}
+    saturn {
+        dataSource {
+            dbCreate = "update" // one of 'create', 'create-drop','update'
+            url = "jdbc:postgresql://localhost:5432/${appName}"
+        }
+    }
+    pamba {
+        dataSource {
+            dbCreate = "update" // one of 'create', 'create-drop','update'
+            url = "jdbc:postgresql://localhost:5432/${appName}"
+        }
+    }
+    pambaTest {
+        dataSource {
+            dbCreate = "update" // one of 'create', 'create-drop','update'
+            url = "jdbc:postgresql://localhost:5432/${appName}"
+        }
+    }
+}
+
+/* Added by the Hibernate Spatial Plugin. */
+dataSource {
+   driverClassName = "org.postgresql.Driver"
 }

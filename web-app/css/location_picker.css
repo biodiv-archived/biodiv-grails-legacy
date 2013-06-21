@@ -1,10 +1,32 @@
-#address {
-    width: 442px;
-    margin: 0px 10px;
+.address {
+    width: 500px;
+    margin: auto;
+    position:absolute;
+    top:20px;
+    left:0;
+    right:0;
+    z-index:1;
 }    
 
+#latlng {
+    margin: auto;
+    width: 500px;
+    top: 50px;
+    position: absolute;
+    z-index: 1;
+    left: 0;
+    right: 0;
+	background-color: rgba(255, 255, 255, 0.85);
+	background: transparent\9;/*IE9*/
+	-ms-filter:"progid:DXImageTransform.Microsoft.gradient(startColorstr=#ffffff,endColorstr=#ffffff)"; /*IE8*/
+	filter: progid : DXImageTransform.Microsoft.gradient (startColorstr ='#ffffff', endColorstr = '#ffffff' ); /*IE6 & IE7*/
+	zoom: 1;
+	box-shadow: 0 4px 3px -3px #5e5e5e;
+	border-radius: 5px;
+}
+
 #map_canvas {
-    height:300px;     
+    height:500px;     
     clear:both; 
     border: 2px solid #ffffff;      
 }
@@ -49,6 +71,7 @@ padding:5px;
 
 #map_area {
 padding:10px;
+text-align:left;
 }
 
 .location_picker_button {
@@ -106,4 +129,18 @@ padding: 0;
 
 #current_location.location_picker_button {
 width: 150px;	
+}
+.leaflet-draw-toolbar a {
+    width: 22px;
+    height: 22px;
+    text-align: center;
+    text-decoration: none;
+    color: black;
+}
+.leaflet-bar   a {
+    background-color: rgba(255, 255, 255, 0.8);
+    border-bottom: 1px solid #aaa;
+}
+.leaflet-bar   a:hover {
+    background-color: rgba(255, 255, 255);
 }

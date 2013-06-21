@@ -40,8 +40,6 @@ class Checklists extends Observation {
 	List observations;
 	
 	//dates
-	Date fromDate;
-	Date toDate;
 	Date publicationDate;
 	
 	//others
@@ -62,8 +60,6 @@ class Checklists extends Observation {
 		rawChecklist nullable:false;
 		license  nullable:false;
 		
-		fromDate nullable:true;
-		toDate nullable:true;
 		attribution nullable:true;
 		reservesValue nullable:true;
 		states nullable:true;

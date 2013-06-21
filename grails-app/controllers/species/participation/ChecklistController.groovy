@@ -11,7 +11,7 @@ class ChecklistController {
 	def springSecurityService;
 	def checklistService;
 	def grailsApplication
-	
+	def checklistUtilService
 	def index = {
 		redirect(action:list, params: params)
 	}
@@ -280,4 +280,11 @@ class ChecklistController {
 //		log.debug params;
 //	}
 	
+	
+	@Secured(['ROLE_ADMIN'])
+	def breakChecklist = {
+		log.debug params
+		checklistUtilService.migrateObservationFromChecklist()
+		render "=== done "
+	}
 }

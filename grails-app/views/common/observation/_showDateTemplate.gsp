@@ -5,7 +5,7 @@
 		if(propertyName == "createdOn")
 			serverDate =  observationInstance.createdOn
 		else if(propertyName == "observedOn")
-			serverDate =  observationInstance.observedOn
+			serverDate =  observationInstance.fromDate
 		else if(propertyName == "lastRevised")
 			serverDate =  observationInstance.lastRevised
 		else if(propertyName == "foundedOn")

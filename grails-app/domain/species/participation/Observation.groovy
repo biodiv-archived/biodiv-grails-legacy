@@ -14,8 +14,10 @@ import species.groups.UserGroup;
 import speciespage.ObvUtilService;
 import grails.util.GrailsNameUtils;
 import org.grails.rateable.*
+import content.eml.Coverage;
+import species.Metadata;
 
-class Observation implements Taggable, Rateable {
+class Observation extends Metadata implements Taggable, Rateable {
 	
 	def dataSource
 	def grailsApplication;
@@ -47,21 +49,9 @@ class Observation implements Taggable, Rateable {
 		}
 	}
 
-	SUser author;
-	Date observedOn;
-	Date createdOn = new Date();
-	Date lastRevised = createdOn;
+    SUser author;
 	String notes;
-	SpeciesGroup group;
 	int rating;
-	String placeName;
-	String reverseGeocodedName
-	String location;
-	float latitude;
-	float longitude;
-	boolean geoPrivacy = false;
-	String locationAccuracy;
-	Habitat habitat;
 	long visitCount = 0;
 	boolean isDeleted = false;
 	int flagCount = 0;
@@ -86,12 +76,9 @@ class Observation implements Taggable, Rateable {
 		//to insert observation without db exception
 		sourceId nullable:true
 		//resource validator : { val, obj -> val && val.size() > 0 }
-		observedOn validator : {val -> val < new Date()}
+		fromDate validator : {val -> val < new Date()}
 		latitude validator : { val, obj -> 
-            println "&&&&&"
-            println val;
-            if(!val) {
-                println "not valid"
+            if(!val && !areas) {
                 return ['default.blank.message', 'Latitude']
             }
 			if(Float.isNaN(val)) {
@@ -102,11 +89,7 @@ class Observation implements Taggable, Rateable {
 			}
 		}
 		longitude validator : { val, obj ->  
-            println "&&&&&"
-            println val;
-
-            if(!val) {
-                println "not valid"
+            if(!val && !areas) {
                 return ['default.blank.message', 'Longitude']
             }
 			if(Float.isNaN(val)) { 
@@ -116,6 +99,7 @@ class Observation implements Taggable, Rateable {
 				return ['value.not.in.range', 'Longitude', '68.03215', '97.40238']
 			}
 		}
+        placeName blank:false
 		agreeTerms nullable:true
 	}
 
@@ -358,7 +342,7 @@ class Observation implements Taggable, Rateable {
 		
 		res[ObvUtilService.SPECIES_GROUP] = group.name
 		res[ObvUtilService.HABITAT] = habitat.name
-		res[ObvUtilService.OBSERVED_ON] = new SimpleDateFormat("dd/MM/yyyy").format(observedOn)
+		res[ObvUtilService.OBSERVED_ON] = new SimpleDateFormat("dd/MM/yyyy").format(fromDate)
 		
 		def snName = ""
 		def cnName = ""

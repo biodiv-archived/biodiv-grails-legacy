@@ -15,9 +15,9 @@ import speciespage.search.DocumentSearchService
 //newsletterSearchService.deleteIndex();
 //newsletterSearchService.publishSearchIndex();
 //
-//def observationsSearchService = ctx.getBean("observationsSearchService");
-//observationsSearchService.deleteIndex();
-//observationsSearchService.publishSearchIndex();
+def observationsSearchService = ctx.getBean("observationsSearchService");
+observationsSearchService.deleteIndex();
+observationsSearchService.publishSearchIndex();
 
 //def cSearchService = ctx.getBean("checklistSearchService");
 //cSearchService.deleteIndex();
@@ -29,6 +29,6 @@ import speciespage.search.DocumentSearchService
 //projectSearchService.deleteIndex();
 //projectSearchService.publishSearchIndex();
 
-def documentSearchService = ctx.getBean("documentSearchService");
-documentSearchService.deleteIndex();
-documentSearchService.publishSearchIndex();
+//def documentSearchService = ctx.getBean("documentSearchService");
+//documentSearchService.deleteIndex();
+//documentSearchService.publishSearchIndex();
