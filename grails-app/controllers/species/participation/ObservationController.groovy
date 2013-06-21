@@ -102,8 +102,9 @@ class ObservationController {
 		def activeFilters = filteredObservation.activeFilters
 		activeFilters.put("append", true);//needed for adding new page obv ids into existing session["obv_ids_list"]
 		
-		def totalObservationInstanceList = observationService.getFilteredObservations(params, -1, -1, true).observationInstanceList
-		def count = totalObservationInstanceList.size()
+		def queryResult = observationService.getFilteredObservations(params, -1, -1, true)
+		def count = queryResult.observationInstanceList.size()
+		def checklistCount =  queryResult.checklistCount
 		
 		//storing this filtered obvs ids list in session for next and prev links
 		//http://grepcode.com/file/repo1.maven.org/maven2/org.codehaus.groovy/groovy-all/1.8.2/org/codehaus/groovy/runtime/DefaultGroovyMethods.java
@@ -116,7 +117,7 @@ class ObservationController {
 		}
 		
 		log.debug "Storing all observations ids list in session ${session['obv_ids_list']} for params ${params}";
-		return [totalObservationInstanceList:totalObservationInstanceList, observationInstanceList: observationInstanceList, instanceTotal: count, queryParams: queryParams, activeFilters:activeFilters]
+		return [totalObservationInstanceList:queryResult.observationInstanceList, observationInstanceList: observationInstanceList, instanceTotal: count, checklistCount:checklistCount, observationCount: count-checklistCount ,queryParams: queryParams, activeFilters:activeFilters, resultType:'observation']
 	}
 	
 

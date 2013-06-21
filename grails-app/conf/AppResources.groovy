@@ -216,6 +216,22 @@ modules = {
 		resource url:'/js/activityfeed.js'
 	}
 	
+//	slickgrid {
+//		resource url:'/js/SlickGrid/slick.grid.css'
+//		resource url:'/js/SlickGrid/css/smoothness/jquery-ui-1.8.16.custom.css'
+//		resource url:'/js/SlickGrid/examples/examples.css'
+//		
+//		resource url:'/js/SlickGrid/lib/jquery.event.drag-2.2.js'
+//		resource url:'/js/SlickGrid/slick.core.js'
+//		resource url:'/js/SlickGrid/slick.formatters.js'
+//		resource url:'/js/SlickGrid/slick.editors.js'
+//		resource url:'/js/SlickGrid/slick.grid.js'
+//		resource url:'/js/SlickGrid/plugins/slick.cellrangedecorator.js'
+//		resource url:'/js/SlickGrid/plugins/slick.cellrangeselector.js'
+//		resource url:'/js/SlickGrid/plugins/slick.cellselectionmodel.js'
+//		
+//	}
+	
 	checklist {
 		dependsOn 'core, location_utils, list_utils, tagit, comment, activityfeed'
 		
@@ -224,6 +240,12 @@ modules = {
 		resource url:'/js/species/observations/list.js'
 		resource url:'/js/species/checklist.js'
 	}
+	
+//	checklist_create {
+//		dependsOn 'observations_create, checklist, slickgrid, add_file'
+//		
+//		resource url:'/js/species/parseUtil.js'
+//	}
 	
 	chart {
 		dependsOn 'core'

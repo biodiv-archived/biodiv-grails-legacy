@@ -260,7 +260,7 @@ class ChecklistUtilService {
 		observation.latitude = '' + cl.latitude;
 		observation.longitude = '' +  cl.longitude;
 		observation.location_accuracy = 'Approximate'
-		observation.habitat_id = Habitat.findByName("Others").id
+		observation.habitat_id = Habitat.findByName("All").id
 		observation.agreeTerms = 'on'
 		return observation
 	}

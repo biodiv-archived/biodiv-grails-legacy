@@ -321,7 +321,7 @@ class ObservationService {
 				and {
 					'in'("maxVotedReco", scientificNameRecos)
 					eq("isDeleted", false)
-					eq("isChecklist", false)
+					eq("isShowable", true)
 				}
 				order("lastRevised", "desc")
 			}
@@ -329,8 +329,13 @@ class ObservationService {
 			observations.each {
 				result.add(['observation':it, 'title':it.fetchSpeciesCall()]);
 			}
-			def count = Observation.countByMaxVotedRecoInListAndIsDeleted(scientificNameRecos, false);
-			
+			def count = Observation.createCriteria().count {
+				and {
+					'in'("maxVotedReco", scientificNameRecos)
+					eq("isDeleted", false)
+					eq("isShowable", true)
+				}
+			}
 			return ['observations':result, 'count':count]
 		} else {
 			return ['observations':[], 'count':0]
@@ -615,9 +620,10 @@ class ObservationService {
 
 		def queryParts = getFilteredObservationsFilterQuery(params) 
 		String query = queryParts.query;
-		
+		long checklistCount = 0
 		if(isMapView) {
 			query = queryParts.mapViewQuery + queryParts.filterQuery + queryParts.orderByClause
+			checklistCount = Observation.executeQuery(queryParts.checklistCountQuery, queryParts.queryParams)[0]
 		} else {
 			query += queryParts.filterQuery + queryParts.orderByClause
 			if(max != -1)
@@ -634,7 +640,7 @@ class ObservationService {
 			queryParts.queryParams["daterangepicker_end"] =  params.daterangepicker_end
 		}
 		
-		return [observationInstanceList:observationInstanceList, queryParams:queryParts.queryParams, activeFilters:queryParts.activeFilters]
+		return [observationInstanceList:observationInstanceList, checklistCount:checklistCount, queryParams:queryParts.queryParams, activeFilters:queryParts.activeFilters]
 	}
 
 	def getFilteredObservationsFilterQuery(params) {
@@ -644,7 +650,7 @@ class ObservationService {
 		//params.userName = springSecurityService.currentUser.username;
 
 		def query = "select obv from Observation obv "
-		def mapViewQuery = "select obv.id, obv.latitude, obv.longitude from Observation obv "
+		def mapViewQuery = "select obv.id, obv.latitude, obv.longitude, obv.isChecklist from Observation obv "
 		def queryParams = [isDeleted : false]
 		def filterQuery = " where obv.isDeleted = :isDeleted and isShowable = true "
 		def activeFilters = [:]
@@ -701,13 +707,6 @@ class ObservationService {
 		}
 
 		
-//		// by default adding media filter if its null
-//		if(params.isMediaFilter == null || params.isMediaFilter.toBoolean()){
-//			filterQuery += " and obv.hasMedia = true "
-//			activeFilters["isMediaFilter"] = params.isMediaFilter? params.isMediaFilter.toBoolean() : false
-//		}
-		
-		
 		if(params.daterangepicker_start && params.daterangepicker_end){
 			def df = new SimpleDateFormat("dd/MM/yyyy")
 			def startDate = df.parse(params.daterangepicker_start)
@@ -740,8 +739,10 @@ class ObservationService {
 		}
 		
 		def orderByClause = " order by obv." + (params.sort ? params.sort : "lastRevised") +  " desc, obv.id asc"
-
-		return [query:query, mapViewQuery:mapViewQuery, filterQuery:filterQuery, orderByClause:orderByClause, queryParams:queryParams, activeFilters:activeFilters]
+		
+		def checklistCountQuery = "select count(*) from Observation obv " + filterQuery + " and obv.isChecklist = true "
+		
+		return [query:query, mapViewQuery:mapViewQuery, checklistCountQuery:checklistCountQuery, filterQuery:filterQuery, orderByClause:orderByClause, queryParams:queryParams, activeFilters:activeFilters]
 
 	}
 	
@@ -755,20 +756,27 @@ class ObservationService {
 	}
 	
 	long getAllObservationsOfUser(SUser user) {
-		return (long)Observation.countByAuthorAndIsDeleted(user, false);
+		return (long) Observation.createCriteria().count {
+			and {
+				eq("author", user)
+				eq("isDeleted", false)
+				eq("isShowable", true)
+			}
+		}
+		//return (long)Observation.countByAuthorAndIsDeleted(user, false);
 	}
 
 	long getAllRecommendationsOfUser(SUser user) {
-		def result = RecommendationVote.executeQuery("select count(recoVote) from RecommendationVote recoVote where recoVote.author.id = :userId and recoVote.observation.isDeleted = :isDeleted", [userId:user.id, isDeleted:false]);
+		def result = RecommendationVote.executeQuery("select count(recoVote) from RecommendationVote recoVote where recoVote.author.id = :userId and recoVote.observation.isDeleted = :isDeleted and recoVote.observation.isShowable = :isShowable", [userId:user.id, isDeleted:false, isShowable:true]);
 		return (long)result[0];
 	}
 	
 	List getRecommendationsOfUser(SUser user, int max, long offset) {
 		if(max == -1) {
-			def recommendationVotesList = RecommendationVote.executeQuery("select recoVote from RecommendationVote recoVote where recoVote.author.id = :userId and recoVote.observation.isDeleted = :isDeleted order by recoVote.votedOn desc", [userId:user.id, isDeleted:false]);
+			def recommendationVotesList = RecommendationVote.executeQuery("select recoVote from RecommendationVote recoVote where recoVote.author.id = :userId and recoVote.observation.isDeleted = :isDeleted and recoVote.observation.isShowable = :isShowable order by recoVote.votedOn desc", [userId:user.id, isDeleted:false, isShowable:true]);
 			return recommendationVotesList;
 		} else {
-			def recommendationVotesList = RecommendationVote.executeQuery("select recoVote from RecommendationVote recoVote where recoVote.author.id = :userId and recoVote.observation.isDeleted = :isDeleted order by recoVote.votedOn desc", [userId:user.id, isDeleted:false], [max:max, offset:offset]);
+			def recommendationVotesList = RecommendationVote.executeQuery("select recoVote from RecommendationVote recoVote where recoVote.author.id = :userId and recoVote.observation.isDeleted = :isDeleted and recoVote.observation.isShowable = :isShowable order by recoVote.votedOn desc", [userId:user.id, isDeleted:false, isShowable:true], [max:max, offset:offset]);
 			return recommendationVotesList;
 		}
 	}
