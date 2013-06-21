@@ -639,7 +639,7 @@ function updateGallery(target, limit, offset, removeUser, isGalleryUpdate, remov
     var doc_url = href+'?'+recursiveDecoded;
     var History = window.History;
     delete params["isGalleryUpdate"]
-    History.pushState({state:1}, "Species Portal", '?'+decodeURIComponent($.param(params))); 
+    History.pushState({state:1}, document.title, '?'+decodeURIComponent($.param(params))); 
     console.log("doc_url " + doc_url);
     if(isGalleryUpdate) {
        	$.ajax({

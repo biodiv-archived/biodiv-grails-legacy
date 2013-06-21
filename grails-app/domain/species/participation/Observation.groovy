@@ -88,16 +88,29 @@ class Observation implements Taggable, Rateable {
 		//resource validator : { val, obj -> val && val.size() > 0 }
 		observedOn validator : {val -> val < new Date()}
 		latitude validator : { val, obj -> 
+            println "&&&&&"
+            println val;
+            if(!val) {
+                println "not valid"
+                return ['default.blank.message', 'Latitude']
+            }
 			if(Float.isNaN(val)) {
-				return 'typeMismatch.java.lang.Integer'
+				return ['typeMismatch.java.lang.Integer','Latitude']
 			}
 			if( val < 6.74678 || val > 35.51769) {
 				return ['value.not.in.range', 'Latitude', '6.74678', '35.51769']
 			}
 		}
-		longitude validator : { val, obj -> 
-			if(Float.isNaN(val)) {
-				return 'typeMismatch.java.lang.Integer'
+		longitude validator : { val, obj ->  
+            println "&&&&&"
+            println val;
+
+            if(!val) {
+                println "not valid"
+                return ['default.blank.message', 'Longitude']
+            }
+			if(Float.isNaN(val)) { 
+				return ['typeMismatch.java.lang.Integer', 'Longitude']
 			}
 			if( val < 68.03215 || val > 97.40238) {
 				return ['value.not.in.range', 'Longitude', '68.03215', '97.40238']

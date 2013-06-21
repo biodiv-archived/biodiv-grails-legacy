@@ -34,7 +34,7 @@
 		}
 	}
 	if(params.action == 'save'){
-		species_sn_lang = saveParams.languageName
+		species_sn_lang = saveParams?.languageName
 	}
 %>
 <r:script>

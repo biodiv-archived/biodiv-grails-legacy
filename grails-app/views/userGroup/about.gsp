@@ -4,7 +4,7 @@
 <%@ page import="species.groups.UserGroup"%>
 <html>
 <head>
-<g:set var="title" value="AboutUs}"/>
+<g:set var="title" value="AboutUs"/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
 
 

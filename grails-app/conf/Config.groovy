@@ -189,6 +189,10 @@ speciesPortal {
 	app.rootDir = "${userHome}/species"
 	data.rootDir = "${app.rootDir}/data"
 	download.rootDir = "${data.rootDir}/datarep/downloads"
+	
+	species {
+		speciesDownloadDir = "${download.rootDir}/species"
+	}
 	domain = "localhost"
 	resources {
 		rootDir = "${app.rootDir}/images"

@@ -19,7 +19,7 @@ class ChecklistController {
 	def list = {
 		log.debug params
 		params.isChecklistOnly = "" + true
-		redirect(cotroller:'observation', action:list, params: params)
+		redirect(controller:'observation', action:list, params: params)
 		/*
 		def model = getFilteredChecklist(params)
 		if(params.loadMore?.toBoolean()){

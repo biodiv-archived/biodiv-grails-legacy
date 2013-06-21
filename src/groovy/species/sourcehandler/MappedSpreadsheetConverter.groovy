@@ -32,7 +32,6 @@ class MappedSpreadsheetConverter extends SourceConverter {
 		if(imageMetaDataSheetNo && imageMetaDataSheetNo  >= 0) {
 			imagesMetaData = SpreadsheetReader.readSpreadSheet(file, imageMetaDataSheetNo, 0);
 		}
-		
 		return convertSpecies(content, mappingConfig, imagesMetaData);
 	}
 
@@ -278,8 +277,9 @@ println "----"+fieldName;
 
 	private Node getImages(List<Map> imagesMetaData, String fieldName, String fieldType, String customFormat, String delimiter, Map speciesContent, Node speciesElement) {
 		Node images = new Node(speciesElement, fieldType);
-
+println customFormat
 		def result = getCustomFormat(customFormat);
+        println "%%%%%%"+result
 		int group = result.get("group") ? Integer.parseInt(result.get("group")?.toString()):-1
 		int location = result.get("location") ? Integer.parseInt(result.get("location")?.toString())-1:-1
 		int source = result.get("source") ? Integer.parseInt(result.get("source")?.toString())-1:-1
@@ -289,16 +289,26 @@ println "----"+fieldName;
 		int license = result.get("license") ? Integer.parseInt(result.get("license")?.toString())-1:-1
 		int name = result.get("name") ? Integer.parseInt(result.get("name")?.toString())-1:-1
 		boolean incremental = result.get("incremental") ? new Boolean(result.get("incremental")) : false
-		boolean imagesmetadatasheet = result.get("imagesmetadatasheet") ? new Boolean(result.get("imagesmetadatasheet")) : false
+		String imagesmetadatasheet = result.get("imagesmetadatasheet") ?: null
+        
+        println "&&&&&imagesmetadatasheet"+imagesmetadatasheet
 		if(imagesmetadatasheet && imagesMetaData) {
 			//TODO:This is getting repeated for every row in spreadsheet costly
+            println fieldName
 			fieldName.split(",").eachWithIndex { t, index ->
 				String txt = speciesContent.get(t);
-				txt.split(delimiter).each { loc ->
-					if(loc) {
-						createImages(images, loc, imagesMetaData);
-					}
-				}
+                println txt
+                println "####"+delimiter
+                if(delimiter) {
+                    txt.split(delimiter).each { loc ->
+                        println 'loc:'+loc
+                        if(loc) {
+                            createImages(images, loc, imagesMetaData);
+                        }
+                    }
+                } else {
+						createImages(images, txt, imagesMetaData);
+                }
 			}
 		} else {
 			List<String> groupValues = new ArrayList<String>();
@@ -364,6 +374,7 @@ println "----"+fieldName;
 	}
 
 	private void createImages(Node images, String imageId, List<Map> imageMetaData) {
+        println '======='+imageId
 		def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 		String uploadDir = config.speciesPortal.images.uploadDir;
 		imageMetaData.each { imageData ->
@@ -372,6 +383,7 @@ println "----"+fieldName;
 				Node image = new Node(images, "image");
 				String loc = imageData.get("imageno.")?:imageData.get("image")?:imageData.get("id");
 				File file = new File(uploadDir, cleanLoc(loc));
+                println ')))))'+loc
 				new Node(image, "refKey", refKey);
 				new Node(image, "fileName", file.getAbsolutePath());
 				new Node(image, "source", imageData.get("source")?:imageData.get("url"));
