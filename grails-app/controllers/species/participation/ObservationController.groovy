@@ -1038,7 +1038,13 @@ class ObservationController {
 		if(userGroup){
 			render userGroupService.getObservationCountByGroup(userGroup);
 		}else{
-			render Observation.countByIsDeleted(false);
+			render Observation.createCriteria().count {
+				and {
+					eq("isDeleted", false)
+					eq("isShowable", true)
+					eq("isChecklist", false)
+				}
+			}
 		}
 	}
 

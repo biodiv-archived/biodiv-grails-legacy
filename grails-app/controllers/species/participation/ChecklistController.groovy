@@ -18,8 +18,10 @@ class ChecklistController {
 
 	def list = {
 		log.debug params
+		params.isChecklistOnly = "" + true
+		redirect(cotroller:'observation', action:list, params: params)
+		/*
 		def model = getFilteredChecklist(params)
-		
 		if(params.loadMore?.toBoolean()){
 			render(template:"/common/checklist/showChecklistListTemplate", model:model);
 			return;
@@ -35,6 +37,7 @@ class ChecklistController {
 			render result as JSON
 			return;
 		}
+		*/
 	}
 
 
@@ -140,12 +143,10 @@ class ChecklistController {
 
 	
 	private getChecklist(speciesGroup, userGroupInstance, max, offset){
-		return Checklist.withCriteria(){
+		return Checklists.withCriteria(){
 			and{
 				if(speciesGroup){
-					speciesGroups{
-						eq('id', speciesGroup.id)
-					}
+					eq('group', speciesGroup)
 				}
 				if(userGroupInstance){
 					userGroups{
@@ -165,15 +166,13 @@ class ChecklistController {
 	}
 	
 	private getChecklistCount(speciesGroup, userGroupInstance){
-		return Checklist.withCriteria(){
+		return Checklists.withCriteria(){
 			projections {
 				count('id')
 			}
 			and{
 				if(speciesGroup){
-					speciesGroups{
-						eq('id', speciesGroup.id)
-					}
+					eq('group', speciesGroup)
 				}
 				if(userGroupInstance){
 					userGroups{
@@ -197,10 +196,6 @@ class ChecklistController {
 		render "=== done "
 	}
 	
-	def test1 ={
-		def flushImmediately  = grailsApplication.config.speciesPortal.flushImmediately
-		render flushImmediately
-	}
 	/*
 	@Secured(['ROLE_USER'])
 	def test = {
@@ -224,7 +219,7 @@ class ChecklistController {
 		if(userGroup){
 			render getChecklistCount(null, userGroup)
 		}else{
-			render Checklist.count();
+			render Checklists.count();
 		}
 	}
 
