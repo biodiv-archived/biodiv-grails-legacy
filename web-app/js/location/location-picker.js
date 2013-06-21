@@ -118,12 +118,11 @@ function initialize(element, drawable){
     if(drawable) {
         var drawControl = new M.Control.Draw({
             draw:{
-                polyline:false,
                 circle:false,
+                rectangle:false,
                 polygon: {
                     allowIntersection: false // Restricts shapes to simple polygons
-                },
-                marker:false
+                }
             },
             edit: {
                featureGroup: drawnItems

@@ -115,38 +115,21 @@ class ObservationService {
 
 		observation.agreeTerms = (params.agreeTerms?.equals('on'))?true:false;
 		
-		observation.coverage = observation.coverage ?: new Coverage()
-		observation.coverage.location = 'POINT(' + params.longitude + ' ' + params.latitude + ')'
-		observation.coverage.reverseGeocodedName = params.reverse_geocoded_name?:params.reverseGeocodedName
-		observation.coverage.locationAccuracy = params.location_accuracy?:params.locationAccuracy
-		observation.coverage.latitude = params.latitude.toFloat()
-		observation.coverage.longitude = params.longitude.toFloat()
-		//observation.coverage.geoPrivacy = params.geo_privacy
         GeometryFactory geometryFactory = new GeometryFactory();
-        observation.coverage.loc = geometryFactory.createPoint(new Coordinate(observation.coverage.latitude, observation.coverage.longitude));
+        observation.loc = geometryFactory.createPoint(new Coordinate(observation.latitude, observation.longitude));
 
         if(params.areas) {
             WKTReader wkt = new WKTReader();
             try {
                 Geometry geom = wkt.read(params.areas);
                 if(geom instanceof MultiPolygon) {
-                    observation.coverage.areas = geom;
+                    observation.areas = geom;
                 } else {
                     log.error "Coverage only supports multipolygon"
                 }
             } catch(ParseException e) {
                 log.error "Error parsing polygon wkt : ${params.areas}"
             }
-        }
-
-        if(params.group_id) {
-        observation.coverage.speciesGroups = []
-		observation.coverage.addToSpeciesGroups(params.group?:SpeciesGroup.get(params.group_id));
-        }
-
-        if(params.habitat_id) {
-		observation.coverage.habitats  = []
-		observation.coverage.addToHabitats(params.habitat?:Habitat.get(params.habitat_id));
         }
 
 		def resourcesXML = createResourcesXML(params);

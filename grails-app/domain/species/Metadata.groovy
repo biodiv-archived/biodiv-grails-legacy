@@ -1,4 +1,4 @@
-package content.eml
+package species;
 
 import species.groups.SpeciesGroup
 import species.Habitat
@@ -7,13 +7,11 @@ import org.hibernatespatial.GeometryUserType
 import com.vividsolutions.jts.geom.Point;
 import species.participation.Observation
 import com.vividsolutions.jts.geom.MultiPolygon;
-/**
- * 
- * Geographical and taxonomic coverage of resources
- *
- */
-class Coverage {
+
+
+abstract class Metadata {
 	
+    //Geographic Coverage
 	String placeName;
 	String reverseGeocodedName
 	String location;
@@ -23,9 +21,16 @@ class Coverage {
 	String locationAccuracy;
     Point loc;
     MultiPolygon areas;
+    
+    //Taxonomic Coverage
+    SpeciesGroup group;
+	Habitat habitat;
 
-	static hasMany = [speciesGroups:SpeciesGroup, habitats:Habitat]
-	
+    //TODO: Temporal Coverage
+    Date createdOn = new Date();
+	Date lastRevised = createdOn;
+
+    //TODO: Controbutions and Attributions
 
     static constraints = {
 		placeName(nullable:true)
@@ -45,5 +50,4 @@ class Coverage {
         }
     }
 
-	static belongsTo = [Document]
 }

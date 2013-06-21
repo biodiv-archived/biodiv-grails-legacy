@@ -93,7 +93,7 @@
                     </div>
                     </div>
                     
-                    <input id="areas" type="hidden" name="areas" value="${Utils.GeometryAsWKT(observationInstance?.coverage?.areas)}"></input>
+                    <input id="areas" type="hidden" name="areas" value="${Utils.GeometryAsWKT(observationInstance?.areas)}"></input>
             
             </div>
  

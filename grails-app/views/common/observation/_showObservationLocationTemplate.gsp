@@ -24,7 +24,7 @@
                 
                 <input class="degree_field" id="latitude_field" type="hidden" name="latitude" value="${observationInstance?.latitude}"></input>
                 <input class="degree_field" id="longitude_field" type="hidden" name="longitude" style="width:193px;" value="${observationInstance?.longitude}"></input>
-                <input id="areas" type="hidden" name="areas" value="${Utils.GeometryAsWKT(observationInstance?.coverage?.areas)}"></input>
+                <input id="areas" type="hidden" name="areas" value="${Utils.GeometryAsWKT(observationInstance?.areas)}"></input>
 	</div>
 
 	<r:script>

@@ -15,8 +15,9 @@ import speciespage.ObvUtilService;
 import grails.util.GrailsNameUtils;
 import org.grails.rateable.*
 import content.eml.Coverage;
+import species.Metadata;
 
-class Observation implements Taggable, Rateable {
+class Observation extends Metadata implements Taggable, Rateable {
 	
 	def dataSource
 	def grailsApplication;
@@ -48,28 +49,16 @@ class Observation implements Taggable, Rateable {
 		}
 	}
 
-	SUser author;
+    SUser author;
 	Date observedOn;
-	Date createdOn = new Date();
-	Date lastRevised = createdOn;
 	String notes;
-	SpeciesGroup group;
 	int rating;
-	String placeName;
-	String reverseGeocodedName
-	String location;
-	float latitude;
-	float longitude;
-	boolean geoPrivacy = false;
-	String locationAccuracy;
-	Habitat habitat;
 	long visitCount = 0;
 	boolean isDeleted = false;
 	int flagCount = 0;
 	String searchText;
 	Recommendation maxVotedReco;
 	boolean agreeTerms = false;
-	Coverage coverage 	//Coverage Information
     
 	static hasMany = [resource:Resource, recommendationVote:RecommendationVote, obvFlags:ObservationFlag, userGroups:UserGroup];
 	static belongsTo = [SUser, UserGroup]
@@ -81,8 +70,7 @@ class Observation implements Taggable, Rateable {
 		resource validator : { val, obj -> val && val.size() > 0 }
 		observedOn validator : {val -> val < new Date()}
 		latitude validator : { val, obj -> 
-            if(!val) {
-                println "not valid"
+            if(!val && !areas) {
                 return ['default.blank.message', 'Latitude']
             }
 			if(Float.isNaN(val)) {
@@ -93,8 +81,7 @@ class Observation implements Taggable, Rateable {
 			}
 		}
 		longitude validator : { val, obj ->  
-            if(!val) {
-                println "not valid"
+            if(!val && !areas) {
                 return ['default.blank.message', 'Longitude']
             }
 			if(Float.isNaN(val)) { 
@@ -106,7 +93,6 @@ class Observation implements Taggable, Rateable {
 		}
         placeName blank:false
 		agreeTerms nullable:true
-		coverage nullable:true	
 	}
 
 	static mapping = {
