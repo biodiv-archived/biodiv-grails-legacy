@@ -900,7 +900,7 @@ class ObservationService {
 		params.sGroup = (params.sGroup)? params.sGroup : SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.ALL).id
 		params.habitat = (params.habitat)? params.habitat : Habitat.findByName(grailsApplication.config.speciesPortal.group.ALL).id
 		params.habitat = params.habitat.toLong()
-		def queryParams = [isDeleted : false]
+		def queryParams = [isDeleted : false, isShowable:true]
 		
 		def activeFilters = [:]
 		
@@ -1056,6 +1056,12 @@ class ObservationService {
 			activeFilters["isFlagged"] = params.isFlagged.toBoolean()
 		}
 
+		if(params.isChecklistOnly && params.isChecklistOnly.toBoolean()){
+			paramsList.add('fq', searchFieldsConfig.IS_CHECKLIST+":"+params.isChecklistOnly.toBoolean());
+			activeFilters["isChecklistOnly"] = params.isChecklistOnly.toBoolean()
+		}
+
+		
 		if(params.bounds){
 			def bounds = params.bounds.split(",")
 			 def swLat = bounds[0]
@@ -1093,6 +1099,7 @@ class ObservationService {
 		def totalObservationIdList = [];
 		def facetResults = [:], responseHeader
 		long noOfResults = 0;
+		long checklistCount = 0
 		if(paramsList) {
 			def queryResponse = observationsSearchService.search(paramsList);
 			
@@ -1103,6 +1110,9 @@ class ObservationService {
 				if(instance) {
 					totalObservationIdList.add(Long.parseLong(doc.getFieldValue("id")+""));
 					instanceList.add(instance);
+					if(instance.isChecklist){
+						checklistCount++ 
+					}
 				}
 			}
 			
@@ -1119,7 +1129,7 @@ class ObservationService {
 			responseHeader.params.remove('q');
 		}*/
 		
-		return [responseHeader:responseHeader, observationInstanceList:instanceList, instanceTotal:noOfResults, queryParams:queryParams, activeFilters:activeFilters, tags:facetResults, totalObservationIdList:totalObservationIdList]
+		return [responseHeader:responseHeader, observationInstanceList:instanceList, resultType:'observation', instanceTotal:noOfResults, checklistCount:checklistCount, observationCount: noOfResults-checklistCount , queryParams:queryParams, activeFilters:activeFilters, tags:facetResults, totalObservationIdList:totalObservationIdList]
 	}
 	
 	private boolean isValidSortParam(String sortParam) {

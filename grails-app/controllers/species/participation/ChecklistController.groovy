@@ -12,6 +12,7 @@ class ChecklistController {
 	def checklistService;
 	def grailsApplication
 	def checklistUtilService
+	
 	def index = {
 		redirect(action:list, params: params)
 	}
@@ -287,4 +288,5 @@ class ChecklistController {
 		checklistUtilService.migrateObservationFromChecklist()
 		render "=== done "
 	}
+	
 }

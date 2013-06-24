@@ -17,7 +17,7 @@
                                     <div class="main_heading" style="margin-left:0px;">
 
                                         <s:showHeadingAndSubHeading
-						model="['heading':checklistInstance.title, 'subHeading':checklistInstance.attribution, 'headingClass':headingClass, 'subHeadingClass':subHeadingClass]" />
+						model="['heading':checklistInstance.title, 'subHeading':checklistInstance.fetchAttributions(), 'headingClass':headingClass, 'subHeadingClass':subHeadingClass]" />
 
                                     </div>
                                 </div>
@@ -63,7 +63,7 @@
 							<table>
 								<tr>
 									<td class="prop"><span class="grid_3 name">Attribution</span></td> 
-									<td class="linktext">${checklistInstance.attribution}</td>
+									<td class="linktext">${checklistInstance.fetchAttributions()}</td>
 								</tr>
 								<tr>
 									<td class="prop"><span class="grid_3 name">License</span></td> 

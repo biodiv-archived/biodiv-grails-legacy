@@ -7,6 +7,7 @@ import org.hibernate.criterion.DetachedCriteria
 
 import species.License;
 import species.Reference;
+import species.Contributor;
 
 import species.auth.SUser
 import species.groups.SpeciesGroup
@@ -28,7 +29,7 @@ class Checklists extends Observation {
 	String title;
 	int speciesCount;
 	
-	String attribution;
+	//String attribution;
 	License license;
 	
 	String refText;
@@ -50,7 +51,7 @@ class Checklists extends Observation {
 	//will map to notes in observation
 	//String description; //info;
 	
-	static hasMany = [observations:Observation, states : String, districts:String, talukas: String]
+	static hasMany = [observations:Observation, contributors:SUser, attributions:Contributor, states : String, districts:String, talukas: String]
 	
 	static constraints = {
 		//XXX this is extended class so have strictly say nullable false
@@ -60,7 +61,7 @@ class Checklists extends Observation {
 		rawChecklist nullable:false;
 		license  nullable:false;
 		
-		attribution nullable:true;
+		//attribution nullable:true;
 		reservesValue nullable:true;
 		states nullable:true;
 		districts nullable:true;
@@ -76,7 +77,7 @@ class Checklists extends Observation {
 	static mapping = {
 		version : false;
 		description type:'text';
-		attribution type:'text';
+		//attribution type:'text';
 		refText type:'text';
 		sourceText type:'text';
 		columnNames type:'text';
@@ -86,6 +87,22 @@ class Checklists extends Observation {
 		return columnNames.split("\t")
 	}
 	
+	def fetchAttributions(){
+		def attributionsString = ""
+		if(!attributions){
+			return attributionsString
+		}
+		def itr = attributions?.iterator()
+		int count = 0
+		while(itr.hasNext()){
+			attributionsString = (count == 0) ? attributionsString : attributionsString + ", "
+			attributionsString += itr.next().name
+			count++
+		}
+		return attributionsString
+	}
+	
+	/*
 	def Map fetchExportableValue(){
 		Map res = [:]
 		Checklists cl = this
@@ -154,4 +171,5 @@ class Checklists extends Observation {
 		data.add(valueList)
 		return data
 	}
+	*/
 }

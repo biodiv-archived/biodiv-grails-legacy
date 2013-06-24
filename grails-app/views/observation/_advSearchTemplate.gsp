@@ -9,6 +9,12 @@
 			data-provide="typeahead" type="text" class="input-block-level"
 			name="aq.name" value="${queryParams['aq.name']?.encodeAsHTML() }"
 			placeholder="Search by species name" />
+			
+		<label class="control-label" for="title">Title</label> <input id="aq.title"
+			data-provide="typeahead" type="text" class="input-block-level"
+			name="aq.title" value="${queryParams['aq.title']?.encodeAsHTML() }"
+			placeholder="Search by title" />
+			
 		<label class="control-label" for="contributor">Contributor</label> <input id="aq.contributor"
 			data-provide="typeahead" type="text" class="input-block-level"
 			name="aq.contributor" value="${queryParams['aq.contributor']?.encodeAsHTML() }"

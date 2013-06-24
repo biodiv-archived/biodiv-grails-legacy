@@ -17,6 +17,7 @@ import species.Species;
 import species.groups.SpeciesGroup;
 import species.groups.UserGroup;
 import species.CommonNames;
+import species.Contributor
 import species.Habitat;
 import species.Language;
 import species.License;
@@ -293,7 +294,6 @@ class ChecklistUtilService {
 		
 		newChecklist.title =  oldCl.title
 		newChecklist.speciesCount =  oldCl.speciesCount
-		newChecklist.attribution =  oldCl.attribution
 		newChecklist.license =  oldCl.license
 		newChecklist.refText =  oldCl.refText
 		newChecklist.sourceText =  oldCl.sourceText
@@ -305,6 +305,12 @@ class ChecklistUtilService {
 		newChecklist.reservesValue =  oldCl.reservesValue
 		observation.fromDate = observation.fromDate ?: parseDate1(params.observedOn);
 		observation.createdOn = observation.lastRevised = observation.fromDate
+		
+		if(oldCl.attribution){
+			def contributor = new Contributor(name:oldCl.attribution)
+			contributor.save()
+			newChecklist.addToAttributions(contributor)
+		}
 		
 		if(oldCl.state) {
 			oldCl.state.each { newChecklist.addToStates(it) }

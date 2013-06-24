@@ -20,7 +20,7 @@ class SearchController {
 	def namesIndexerService;
 	def observationService;
 	def speciesService;
-	def checklistService;
+	//def checklistService;
 	def SUserService;
 	def userGroupService;
 	def newsletterService;
@@ -41,7 +41,7 @@ class SearchController {
 		suggestions.addAll(namesLookupResults);
 		suggestions.addAll(speciesService.nameTerms(params));
 		suggestions.addAll(observationService.nameTerms(params));
-		suggestions.addAll(checklistService.nameTerms(params));
+		//suggestions.addAll(checklistService.nameTerms(params));
 		suggestions.addAll(userGroupService.nameTerms(params));
 		suggestions.addAll(newsletterService.nameTerms(params));
 		suggestions.addAll(SUserService.nameTerms(params));
