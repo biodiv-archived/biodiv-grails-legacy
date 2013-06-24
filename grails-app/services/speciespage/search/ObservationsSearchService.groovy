@@ -35,7 +35,7 @@ class ObservationsSearchService {
 	
 	private SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 	
-	static int BATCH_SIZE = 50;
+	static int BATCH_SIZE = 10;
 
 	/**
 	 * 
@@ -44,7 +44,7 @@ class ObservationsSearchService {
 		log.info "Initializing publishing to observations search index"
 		
 		//TODO: change limit
-		int limit = 10//Observation.count()+1, 
+		int limit = BATCH_SIZE//Observation.count()+1, 
 		int offset = 0;
 		
 		def observations;

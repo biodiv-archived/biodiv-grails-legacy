@@ -1359,7 +1359,7 @@ class ObservationService {
 					templateMap['userProfileUrl'] = generateLink("SUser", "show", ["id": toUser.id], request)
 				}
 				
-				if ( Environment.getCurrent().getName().startsWith("pamba")) {
+				if ( Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
 				//if ( Environment.getCurrent().getName().equalsIgnoreCase("development")) {
 		            log.debug "Sending email to ${toUser}"
 					mailService.sendMail {
