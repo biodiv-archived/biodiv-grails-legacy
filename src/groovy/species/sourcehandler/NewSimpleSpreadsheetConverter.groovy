@@ -109,12 +109,15 @@ class NewSimpleSpreadsheetConverter extends SourceConverter {
 			log.debug "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
 			XMLConverter converter = new XMLConverter();
 			Species s = converter.convertSpecies(speciesElement)
-			if(s)
+			if(s) {
+                println "Species Title: ${s.title}   ${s.taxonConcept.name}"
 				species.add(s);
+            }
 //			if(i==0)break;
 //			i++
 		}
-		return species;
+	
+        return species;
 	}
 
 	private Node createDataNode(Node field, String text) {
