@@ -77,26 +77,30 @@ class Observation extends Metadata implements Taggable, Rateable {
 		sourceId nullable:true
 		//resource validator : { val, obj -> val && val.size() > 0 }
 		fromDate validator : {val -> val < new Date()}
-		latitude validator : { val, obj -> 
-            if(!val && !obj.areas) {
+		latitude validator : { val, obj ->
+			if(!val && !obj.areas) {
                 return ['default.blank.message', 'Latitude']
             }
-			if(Float.isNaN(val)) {
-				return ['typeMismatch.java.lang.Integer','Latitude']
-			}
-			if( val < 6.74678 || val > 35.51769) {
-				return ['value.not.in.range', 'Latitude', '6.74678', '35.51769']
+			if(val){
+				if(Float.isNaN(val)) {
+					return ['typeMismatch.java.lang.Integer','Latitude']
+				}
+				if( val < 6.74678 || val > 35.51769) {
+					return ['value.not.in.range', 'Latitude', '6.74678', '35.51769']
+				}
 			}
 		}
 		longitude validator : { val, obj ->  
             if(!val && !obj.areas) {
                 return ['default.blank.message', 'Longitude']
             }
-			if(Float.isNaN(val)) { 
-				return ['typeMismatch.java.lang.Integer', 'Longitude']
-			}
-			if( val < 68.03215 || val > 97.40238) {
-				return ['value.not.in.range', 'Longitude', '68.03215', '97.40238']
+			if(val){
+				if(Float.isNaN(val)) { 
+					return ['typeMismatch.java.lang.Integer', 'Longitude']
+				}
+				if( val < 68.03215 || val > 97.40238) {
+					return ['value.not.in.range', 'Longitude', '68.03215', '97.40238']
+				}
 			}
 		}
         placeName blank:false

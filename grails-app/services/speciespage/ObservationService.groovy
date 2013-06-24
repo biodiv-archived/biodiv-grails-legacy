@@ -102,8 +102,9 @@ class ObservationService {
 		observation.group = params.group?:SpeciesGroup.get(params.group_id);
 		observation.notes = params.notes;
 		observation.fromDate = observation.toDate = parseDate(params.observedOn);
-		observation.reverseGeocodedName = params.reverse_geocoded_name?:params.reverseGeocodedName;
 		observation.placeName = params.placeName;//?:observation.reverseGeocodedName;
+		observation.reverseGeocodedName = params.reverse_geocoded_name?:observation.placeName
+		
 		observation.location = 'POINT(' + params.longitude + ' ' + params.latitude + ')'
 		if(params.latitude) {
             observation.latitude = params.latitude?.toFloat();
