@@ -51,7 +51,7 @@ abstract class Metadata {
     static mapping = {
         columns {
             loc type: GeometryUserType, sqlType: "Geometry"
-            area type: GeometryUserType, sqlType: "Geometry"
+            areas type: GeometryUserType, sqlType: "Geometry"
         }
     }
 
