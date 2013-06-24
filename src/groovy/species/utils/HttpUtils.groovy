@@ -9,7 +9,7 @@ class HttpUtils {
 	static File download(String address, File directory, boolean forceDownload, String filename=null)
 	{
         if(!filename) {
-            filename = address.tokenize("/")[-1]
+            filename = Utils.generateSafeFileName(address.tokenize("/")[-1])
         }
 		def file = new File(directory, filename);
 		if(file.exists() && !forceDownload) {

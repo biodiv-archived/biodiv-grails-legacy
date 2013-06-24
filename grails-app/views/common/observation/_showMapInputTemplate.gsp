@@ -33,7 +33,7 @@
                             <span class="add-on" style="vertical-align:middle;">Lat</span>
                             <!-- div class="location_picker_value" id="latitude"></div>
                             <input id="latitude_field" type="hidden" name="latitude"></input-->
-                            <input class="degree_field" id="latitude_field" type="text" name="latitude" value="${observationInstance?.latitude}"></input>
+                            <input class="degree_field" id="latitude_field" type="text" name="latitude" value="${observationInstance?.latitude?:''}"></input>
                             <input class="dms_field" id="latitude_deg_field" type="text" name="latitude_deg" placeholder="deg"></input>
                             <input class="dms_field" id="latitude_min_field" type="text" name="latitude_min" placeholder="min"></input>
                             <input class="dms_field" id="latitude_sec_field" type="text" name="latitude_sec" placeholder="sec"></input>
@@ -48,7 +48,7 @@
                             <span class="add-on" style="vertical-align:middle;">Long</span>
                             <!--div class="location_picker_value" id="longitude"></div>
                             <input id="longitude_field" type="hidden" name="longitude"></input-->
-                            <input class="degree_field" id="longitude_field" type="text" name="longitude" style="width:193px;" value="${observationInstance?.longitude}"></input>
+                            <input class="degree_field" id="longitude_field" type="text" name="longitude" style="width:193px;" value="${observationInstance?.longitude?:''}"></input>
                             <input class="dms_field" id="longitude_deg_field" type="text" name="longitude_deg" placeholder="deg"></input>
                             <input class="dms_field" id="longitude_min_field" type="text" name="longitude_min" placeholder="min"></input>
                             <input class="dms_field" id="longitude_sec_field" type="text" name="longitude_sec" placeholder="sec"></input>
@@ -112,7 +112,8 @@ $(document).ready(function() {
         $('.geotagged_image').each(function(index){
                 update_geotagged_images_list($(this));		
         });
-        locate();
+        //locate();
+//        $("#map_canvas").resizable();
     });
 
     $(".address .add-on").click(function(){

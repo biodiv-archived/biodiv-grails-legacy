@@ -778,7 +778,17 @@ class XMLConverter extends SourceConverter {
         if(!fileName && !sourceUrl) return;
 
         File tempFile;
-        if(!fileName) {
+        if(fileName) {
+            tempFile = new File(fileName);
+            if(!tempFile.exists()) {
+                tempFile = new File(fileName+".jpg");
+                if(!tempFile.exists()) {
+                    tempFile = new File(fileName+".png");
+                }
+            }
+        } 
+
+        if(!tempFile.exists() && sourceUrl) {
             //downloading from web
             def tempdir = new File(config.speciesPortal.images.uploadDir, "images");
             if(!tempdir.exists()) {
@@ -789,14 +799,7 @@ class XMLConverter extends SourceConverter {
             } catch (FileNotFoundException e) {
                 log.error e.getMessage();
             }
-        } else {
-            tempFile = new File(fileName);
-            if(!tempFile.exists()) {
-                tempFile = new File(fileName+".jpg");
-                if(!tempFile.exists()) {
-                    tempFile = new File(fileName+".png");
-                }
-            }
+
         }
         return tempFile;
     }

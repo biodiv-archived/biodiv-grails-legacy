@@ -207,7 +207,7 @@ if(r) {
 										</li>
 										<g:set var="i" value="${i+1}" />
 									</g:each>
-									<li id="add_file" class="addedResource" style="z-index:10">
+									<li id="add_file" class="addedResource" style="z-index:40">
 										<div id="add_file_container">
 											<div id="add_image"></div> 
 											<div style="text-align:center;">
@@ -236,7 +236,7 @@ if(r) {
 									code="observation.group.label" default="Group" /> </label>
 
 							<div class="controls">
-								<div id="groups_div" class="btn-group" style="z-index: 3;">
+								<div id="groups_div" class="btn-group" style="z-index: 30;">
 									<%
                                         def defaultGroup = observationInstance?.group
                                         //def defaultGroupIconFileName = (defaultGroupId)? SpeciesGroup.read(defaultGroupId).icon(ImageType.VERY_SMALL)?.fileName?.trim() : SpeciesGroup.findByName('All').icon(ImageType.VERY_SMALL)?.fileName?.trim()
@@ -285,7 +285,7 @@ if(r) {
 									code="observation.habitat.label" default="Habitat" /> </label>
 
 							<div class="controls">
-									<div id="habitat_div" class="btn-group" style="z-index: 2;">
+									<div id="habitat_div" class="btn-group" style="z-index: 20;">
 										<%
                                             def defaultHabitat = observationInstance?.habitat;
                                             //def defaultHabitatIconFileName = (defaultHabitatId)? defaultHabitat.icon(ImageType.VERY_SMALL)?.fileName?.trim() : Habitat.findByName('All').icon(ImageType.VERY_SMALL)?.fileName?.trim()

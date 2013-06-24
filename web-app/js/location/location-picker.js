@@ -9,9 +9,6 @@ var geocoder;
 var map;
 var latitude;
 var longitude;
-
-var swRestriction;
-var neRestriction;
 var allowedBounds;
 var selectedMarker;
 var G, M;
@@ -24,25 +21,28 @@ var drawnItems;
 function initialize(element, drawable){
     G = google.maps;
     M = L;
-    L.Icon.Default.imagePath = window.params.defaultMarkerIcon;
-    var latlng = new M.LatLng(21.07,79.27);
-
-    var options = {
-        zoom: 4,
-        center: latlng
-    };
-    swRestriction = new M.LatLng('8', '69');
-    neRestriction = new M.LatLng('36', '98');
-    allowedBounds = new M.LatLngBounds(swRestriction, neRestriction);
-
-    map = new M.Map(element, options);
-    var ggl = new L.Google('HYBRID', {});
-    map.addLayer(ggl).fitBounds(allowedBounds);
-    //L.control.coordinates().addTo(map);
-    //layersControl = L.control.layers(undefined, undefined, {collapsed:false}).addTo(map)
-
+    M.Icon.Default.imagePath = window.params.defaultMarkerIcon;
+    allowedBounds = new M.LatLngBounds(new M.LatLng('6.74678', '68.03215'), new M.LatLng('35.51769', '97.40238'));
+    var viewBounds = new M.LatLngBounds(new M.LatLng('8', '59'), new M.LatLng('45', '105'));
+    var ggl = new M.Google('HYBRID');
+    map = new M.Map(element, {
+        center:allowedBounds.getCenter(),
+        maxBounds:viewBounds,
+        zoom:5,
+        noWrap:true
+    });
+    map.addLayer(ggl).fitBounds(viewBounds);
+    layersControl = M.control.layers({'Google':ggl, 'OpenStreetMap':L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+                        attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+                                noWrap: true
+                                        })}, {}, {collapsed:true}).addTo(map)
+    
+//    L.marker(new M.LatLng('6', '68')).addTo(map);
+//    L.marker(new M.LatLng('35', '97')).addTo(map);
+    
+//    M.control.coordinates().addTo(map);
     geocoder = new G.Geocoder();
-    map.on('dragend', function () {
+/*    map.on('dragend', function () {
         if (allowedBounds.contains(map.getCenter())) return;
 
         var c = map.getCenter(),
@@ -60,7 +60,7 @@ function initialize(element, drawable){
 
         map.panTo(new M.LatLng(y, x));
     });
-
+*/
 
     //set_location(21.07, 79.27);				  
     //StyledMarkerInit();
@@ -69,6 +69,7 @@ function initialize(element, drawable){
         icon: 'ok', 
         color: 'red'
     });
+    
 //    markers = new M.MarkerClusterGroup();
 //    markers.addTo(map);
     
@@ -77,13 +78,7 @@ function initialize(element, drawable){
           title: 'View fullscreen !'
     }).addTo(map);
 
-    var latitude = $('#latitude_field').val();
-    var longitude = $('#longitude_field').val();
-
-    if(latitude && longitude){
-        searchMarker = set_location(latitude, longitude, searchMarker, {label:'Selected Location', opacity:1, draggable:drawable, selected:drawable});
-    }
-
+    initLocation(drawable);
     drawnItems = new L.FeatureGroup();
     var areas = $('input#areas').val()
     if(areas) {
@@ -120,6 +115,7 @@ function initialize(element, drawable){
             draw:{
                 circle:false,
                 rectangle:false,
+                polyline:false,
                 polygon: {
                     allowIntersection: false // Restricts shapes to simple polygons
                 }
@@ -141,13 +137,33 @@ function initialize(element, drawable){
             layer = e.layer;
 
             if (type === 'marker') {
-                select_location(layer);
+                var latlng = layer.getLatLng();
+                searchMarker = set_location(latlng.lat, latlng.lng, searchMarker, {label:'', draggable:true, layer:'Search Marker. Drag Me to set location', selected:true});
+            } else {
+                drawnItems.addLayer(layer);
             }
-            drawnItems.addLayer(layer);
         });
 
  
     }
+
+}
+
+function initLocation(drawable) {
+    var latitude = $('#latitude_field').val();
+    var longitude = $('#longitude_field').val();
+    if(latitude && longitude) {
+        searchMarker = set_location(latitude, longitude, searchMarker, {label:'Selected Location', opacity:1, draggable:drawable, selected:drawable, clickable:drawable});
+        map.panTo(searchMarker.getLatLng());
+        map.on('enterFullscreen', function(){
+            map.panTo(searchMarker.getLatLng());
+        });
+
+        map.on('exitFullscreen', function(){
+            map.panTo(searchMarker.getLatLng());
+        });
+    }
+
 }
 
 function addMarker(lat, lng, options) {
@@ -157,7 +173,8 @@ function addMarker(lat, lng, options) {
     
     options = $.extend({}, {
         title:options.layer?options.layer:'Use this location',
-        opacity:0.8
+        opacity:0.8,
+        clickable:true
     }, options);
 
     var marker = L.marker(location, options).addTo(map);
@@ -190,9 +207,11 @@ function addMarker(lat, lng, options) {
         });
     }
 
-    marker.on('click', function() {
-        select_location(this);
-    });
+    if(options.clickable) {
+        marker.on('click', function() {
+            select_location(this);
+        });
+    }
 
     //markers.addLayer(marker);
     return marker;
@@ -501,12 +520,12 @@ $(document).ready(function() {
   $("#placeName,#latitude_field,#longitude_field").keypress(function(e) {
         code= (e.keyCode ? e.keyCode : e.which);
         if (code == 13) {
-            //'Enter key was pressed.'
+           initLocation(); 
             e.preventDefault();
         }
   });
 
-  $('#current_location').click(locate); 
+//  $('#current_location').click(locate); 
   
   $('#image_location').click(function() {
       $(".geotagged_image").each(function() {
