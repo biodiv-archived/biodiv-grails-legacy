@@ -17,14 +17,37 @@
 	</div>
 
 	<div class="prop">
-		<span class="name"><i class="icon-map-marker"> </i>Coordinates</span>
-		<div class="value">${observationInstance.latitude},
-			${observationInstance.longitude}
-		</div>
-                
-                <input class="degree_field" id="latitude_field" type="hidden" name="latitude" value="${observationInstance?.latitude}"></input>
-                <input class="degree_field" id="longitude_field" type="hidden" name="longitude" style="width:193px;" value="${observationInstance?.longitude}"></input>
-                <input id="areas" type="hidden" name="areas" value="${Utils.GeometryAsWKT(observationInstance?.topology)}"></input>
+                <%
+                    def latitude='',longitude='',areas='';
+                    if(observationInstance?.topology instanceof  com.vividsolutions.jts.geom.Point) {
+                        latitude = observationInstance.topology.getX()
+                        longitude = observationInstance.topology.getY()
+                    } else { 
+                        if(observationInstance?.topology){ 
+                            areas = Utils.GeometryAsWKT(observationInstance?.topology)
+                        } else if(params.areas) {
+                            areas = params.areas
+                        }
+                        if(params.latitude) latitude = params.latitude
+                        if(params.longitude) longitude = params.longitude
+                    }
+
+                %>
+                <g:if test="${latitude && longitude}">
+		    <span class="name"><i class="icon-map-marker"> </i>Coordinates</span>
+                    <div class="value">${latitude},${longitude}</div>
+                </g:if>
+                <g:elseif test="${areas}">
+                     <span class="name"><i class="icon-map-marker"> </i>Centroid</span>
+                     <%def centroid = observationInstance.topology.getCentroid()%>
+                     <div class="value">${(double)Math.round(centroid.getX() * 1000000) / 1000000},${(double)Math.round(centroid.getY() * 1000000) / 1000000}</div>
+
+                </g:elseif>
+
+                <input id='areas' type='hidden' name='areas' value='${areas}'></input>
+               
+                <input class="degree_field" id="latitude_field" type="hidden" name="latitude" value="${latitude}"></input>
+                <input class="degree_field" id="longitude_field" type="hidden" name="longitude" style="width:193px;" value="${longitude}"></input>
 	</div>
 
 	<r:script>

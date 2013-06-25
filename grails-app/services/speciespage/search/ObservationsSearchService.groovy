@@ -24,6 +24,7 @@ import species.groups.SpeciesGroup;
 import species.participation.Observation;
 import species.participation.Recommendation;
 import species.participation.RecommendationVote.ConfidenceType;
+import com.vividsolutions.jts.geom.Point
 
 class ObservationsSearchService {
 
@@ -105,7 +106,18 @@ class ObservationsSearchService {
 				doc.addField(searchFieldsConfig.LOCATION, obv.placeName);
 				doc.addField(searchFieldsConfig.LOCATION, obv.reverseGeocodedName);
 				doc.addField(searchFieldsConfig.ISFLAGGED, (obv.flagCount > 0));
-				doc.addField(searchFieldsConfig.LATLONG, obv.latitude+","+obv.longitude);
+
+                if(observationInstance?.topology instanceof com.vividsolutions.jts.geom.Point) {
+                    def topology = observationInstance.topology;
+                    def latitude = topology.getX();
+                    def longitude = topology.getY();
+    				doc.addField(searchFieldsConfig.LATLONG, latitude+","+longitude);
+                } else {
+                    def topology = observationInstance.topology;
+                    def latitude = topology.getCentroid().getX();
+                    def longitude = topology.getCentroid().getY();
+    				doc.addField(searchFieldsConfig.LATLONG, latitude+","+longitude);
+                }
 				
 				doc.addField(searchFieldsConfig.IS_CHECKLIST, obv.isChecklist);
 				doc.addField(searchFieldsConfig.IS_SHOWABLE, obv.isShowable);

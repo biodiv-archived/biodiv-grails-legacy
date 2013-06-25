@@ -106,12 +106,6 @@ class ObservationService {
 		observation.reverseGeocodedName = params.reverse_geocoded_name?:observation.placeName
 		
 		observation.location = 'POINT(' + params.longitude + ' ' + params.latitude + ')'
-		if(params.latitude) {
-            observation.latitude = params.latitude?.toFloat();
-        }
-        if(params.longitude) {
-    		observation.longitude = params.longitude?.toFloat();
-        }
 		observation.locationAccuracy = params.location_accuracy?:params.locationAccuracy;
 		observation.geoPrivacy = false;
 		observation.habitat = params.habitat?:Habitat.get(params.habitat_id);
@@ -753,7 +747,7 @@ class ObservationService {
 			activeFilters["daterangepicker_end"] =  params.daterangepicker_end
 		}
 		
-		if(params.bounds){
+		if(params.bounds) {
 			def bounds = params.bounds.split(",")
 
 			def swLat = bounds[0]
@@ -763,7 +757,7 @@ class ObservationService {
 
 			filterQuery += " and obv.latitude > " + swLat + " and  obv.latitude < " + neLat + " and obv.longitude > " + swLon + " and obv.longitude < " + neLon
 			activeFilters["bounds"] = params.bounds
-		}
+		} 
 		
 		def orderByClause = " order by obv." + (params.sort ? params.sort : "lastRevised") +  " desc, obv.id asc"
 		
