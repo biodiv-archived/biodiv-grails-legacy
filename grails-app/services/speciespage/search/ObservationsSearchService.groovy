@@ -25,6 +25,7 @@ import species.participation.Observation;
 import species.participation.Recommendation;
 import species.participation.RecommendationVote.ConfidenceType;
 import com.vividsolutions.jts.geom.Point
+import com.vividsolutions.jts.io.WKTWriter;
 
 class ObservationsSearchService {
 
@@ -107,16 +108,17 @@ class ObservationsSearchService {
 				doc.addField(searchFieldsConfig.LOCATION, obv.reverseGeocodedName);
 				doc.addField(searchFieldsConfig.ISFLAGGED, (obv.flagCount > 0));
 
-                if(observationInstance?.topology instanceof com.vividsolutions.jts.geom.Point) {
-                    def topology = observationInstance.topology;
-                    def latitude = topology.getX();
-                    def longitude = topology.getY();
-    				doc.addField(searchFieldsConfig.LATLONG, latitude+","+longitude);
-                } else {
-                    def topology = observationInstance.topology;
-                    def latitude = topology.getCentroid().getX();
-                    def longitude = topology.getCentroid().getY();
-    				doc.addField(searchFieldsConfig.LATLONG, latitude+","+longitude);
+                def topology = obv.topology;
+                def latitude = topology.getCentroid().getX();
+                def longitude = topology.getCentroid().getY();
+                doc.addField(searchFieldsConfig.LATLONG, latitude+","+longitude);
+                
+                WKTWriter wkt = new WKTWriter();
+                try {
+                    String geomStr = wkt.write(obv.topology);
+                    doc.addField(searchFieldsConfig.TOPOLOGY, geomStr);
+                } catch(Exception e) {
+                    log.error "Error writing polygon wkt : ${observationInstance}"
                 }
 				
 				doc.addField(searchFieldsConfig.IS_CHECKLIST, obv.isChecklist);
@@ -141,19 +143,21 @@ class ObservationsSearchService {
 
 		//log.debug docs;
 
-		try {
-			solrServer.add(docs);
-			if(commit) {
-				//commit ...server is configured to do an autocommit after 10000 docs or 1hr
-				solrServer.blockUntilFinished();
-				solrServer.commit();
-				log.info "Finished committing to observations solr core"
-			}
-		} catch(SolrServerException e) {
-			e.printStackTrace();
-		} catch(IOException e) {
-			e.printStackTrace();
-		}
+        if(docs) {
+            try {
+                solrServer.add(docs);
+                if(commit) {
+                    //commit ...server is configured to do an autocommit after 10000 docs or 1hr
+                    solrServer.blockUntilFinished();
+                    solrServer.commit();
+                    log.info "Finished committing to observations solr core"
+                }
+            } catch(SolrServerException e) {
+                e.printStackTrace();
+            } catch(IOException e) {
+                e.printStackTrace();
+            }
+        }
 	}
 
 	/**

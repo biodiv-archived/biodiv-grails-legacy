@@ -7,6 +7,7 @@ import org.hibernatespatial.GeometryUserType
 import com.vividsolutions.jts.geom.Point;
 import species.participation.Observation
 import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Geometry;
 /**
  * 
  * Geographical and taxonomic coverage of resources
@@ -21,8 +22,7 @@ class Coverage {
 	float longitude;
 	boolean geoPrivacy = false;
 	String locationAccuracy;
-    Point loc;
-    MultiPolygon areas;
+    Geometry topology;
 
 	static hasMany = [speciesGroups:SpeciesGroup, habitats:Habitat]
 	
@@ -34,14 +34,12 @@ class Coverage {
 		latitude(nullable: true)
 		longitude(nullable:true)
 		locationAccuracy(nullable: true)
-		loc(nullable: true)
-		areas(nullable: true)
+		topology(nullable: true)
     }
 	
     static mapping = {
         columns {
-            loc type: GeometryUserType, sqlType: "Geometry"
-            area type: GeometryUserType, sqlType: "Geometry"
+            topology (type:org.hibernatespatial.GeometryUserType, class:com.vividsolutions.jts.geom.Geometry)
         }
     }
 

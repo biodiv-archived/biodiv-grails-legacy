@@ -24,6 +24,15 @@ import content.Project
 
 import species.sourcehandler.XMLConverter
 
+import com.vividsolutions.jts.geom.Coordinate
+import com.vividsolutions.jts.geom.GeometryFactory
+import content.eml.Coverage;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.io.WKTReader;
+import com.vividsolutions.jts.io.ParseException;
+import com.vividsolutions.jts.geom.MultiPolygon;
+
+
 
 class DocumentService {
 
@@ -51,10 +60,24 @@ class DocumentService {
 		document.coverage.location = 'POINT(' + params.longitude + ' ' + params.latitude + ')'
 		document.coverage.reverseGeocodedName = params.reverse_geocoded_name
 		document.coverage.locationAccuracy = params.location_accuracy
-		document.coverage.latitude = params.latitude.toFloat()
-		document.coverage.longitude = params.longitude.toFloat()
+        if(params.latitude) 
+    		document.coverage.latitude = params.latitude.toFloat()
+        if(params.longitude)
+    		document.coverage.longitude = params.longitude.toFloat()
 		//document.coverage.geoPrivacy = params.geo_privacy
 
+        GeometryFactory geometryFactory = new GeometryFactory();
+        if(params.latitude && params.longitude) {
+            document.coverage.topology = geometryFactory.createPoint(new Coordinate(params.latitude?.toFloat(), params.longitude?.toFloat()));
+        } else if(params.areas) {
+            WKTReader wkt = new WKTReader();
+            try {
+                Geometry geom = wkt.read(params.areas);
+                document.coverage.topology = geom;
+            } catch(ParseException e) {
+                log.error "Error parsing polygon wkt : ${params.areas}"
+            }
+        }
 
 		document.license  = (new XMLConverter()).getLicenseByType(params.licenseName, false)
 		//document.license = License.findByName(License.LicenseType(params.licenseName))

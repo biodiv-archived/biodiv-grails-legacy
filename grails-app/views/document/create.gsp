@@ -331,7 +331,25 @@ input.dms_field {
 							$('#documentForm').append($(input));	
 		       			})
 		       			$("#userGroupsList").val(getSelectedUserGroups());	
-		       			       					
+                                        
+                                        
+                                        if(drawnItems) {
+                                            var areaBounds = new Array();
+                                            drawnItems.eachLayer(function(layer){
+                                                if(layer.constructor === L.MultiPolygon) {
+                                                    for(var l in layer._layers) {
+                                                        areaBounds.push(layer._layers[l].getLatLngs());    
+                                                    }
+                                                } else
+                                                    areaBounds.push(layer.getLatLngs());    
+                                            })
+                                            var areas = new L.MultiPolygon(areaBounds);
+                                            var wkt = new Wkt.Wkt();
+                                            wkt.fromObject(areas);
+                                            $("input#areas").val(wkt.write());
+                                        }
+
+                                        
 				        $("#documentForm").submit();
 			    	    return false;
 					} else {

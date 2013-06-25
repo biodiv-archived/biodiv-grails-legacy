@@ -837,8 +837,6 @@ if(r) {
                             var areas = new L.MultiPolygon(areaBounds);
                             var wkt = new Wkt.Wkt();
                             wkt.fromObject(areas);
-                            console.log("writing polygon")
-                            console.log(wkt.write())
                             $("input#areas").val(wkt.write());
                         }
 	        	$("#addObservation").submit();        	

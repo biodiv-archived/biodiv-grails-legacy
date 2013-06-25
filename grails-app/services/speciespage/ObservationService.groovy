@@ -642,7 +642,8 @@ class ObservationService {
 		def queryParts = getFilteredObservationsFilterQuery(params) 
 		String query = queryParts.query;
 		long checklistCount = 0
-		if(isMapView) {
+
+        if(isMapView) {
 			query = queryParts.mapViewQuery + queryParts.filterQuery + queryParts.orderByClause
 			checklistCount = Observation.executeQuery(queryParts.checklistCountQuery, queryParts.queryParams)[0]
 		} else {
@@ -660,7 +661,16 @@ class ObservationService {
 		if(params.daterangepicker_end){
 			queryParts.queryParams["daterangepicker_end"] =  params.daterangepicker_end
 		}
-		
+
+        //HACK:TODO to be removed by handling spatial query
+        if(isMapView) {
+		    def l = [];
+            observationInstanceList.each {
+                l << [it.id, it.latitude, it.longitude, it.isChecklist]
+            }
+            observationInstanceList = l
+        }
+
 		return [observationInstanceList:observationInstanceList, checklistCount:checklistCount, queryParams:queryParts.queryParams, activeFilters:queryParts.activeFilters]
 	}
 
@@ -671,7 +681,7 @@ class ObservationService {
 		//params.userName = springSecurityService.currentUser.username;
 
 		def query = "select obv from Observation obv "
-		def mapViewQuery = "select obv.id, obv.latitude, obv.longitude, obv.isChecklist from Observation obv "
+		def mapViewQuery = "select obv from Observation obv "
 		def queryParams = [isDeleted : false]
 		def filterQuery = " where obv.isDeleted = :isDeleted and isShowable = true "
 		def activeFilters = [:]
@@ -690,7 +700,7 @@ class ObservationService {
 
 		if(params.tag){
 			query = "select obv from Observation obv,  TagLink tagLink "
-			mapViewQuery = "select obv.id, obv.latitude, obv.longitude from Observation obv, TagLink tagLink "
+			mapViewQuery = "select obv from Observation obv, TagLink tagLink "
 			filterQuery +=  " and obv.id = tagLink.tagRef and tagLink.type = :tagType and tagLink.tag.name = :tag "
 
 			queryParams["tag"] = params.tag
@@ -755,7 +765,7 @@ class ObservationService {
 			def neLat = bounds[2]
 			def neLon = bounds[3]
 
-			filterQuery += " and obv.latitude > " + swLat + " and  obv.latitude < " + neLat + " and obv.longitude > " + swLon + " and obv.longitude < " + neLon
+			filterQuery += " and 1=0 ";// and obv.latitude > " + swLat + " and  obv.latitude < " + neLat + " and obv.longitude > " + swLon + " and obv.longitude < " + neLon
 			activeFilters["bounds"] = params.bounds
 		} 
 		
@@ -1457,7 +1467,7 @@ class ObservationService {
 		}
 */
         paramsList.add("q", "location_exact:"+params.term+'*'?:'*');
-        paramsList.add("fl", "location_exact,latlong");
+        paramsList.add("fl", "location_exact,latlong,topology");
         paramsList.add("start", 0);
         paramsList.add("rows", 5);
 	
@@ -1468,7 +1478,7 @@ class ObservationService {
 			Iterator iter = queryResponse.getResults().listIterator();
 			while(iter.hasNext()) {
 				def doc = iter.next();
-                results.add([location:doc.getFieldValue('location_exact'), latlong:doc.getFieldValue('latlong'), category:'My Locations']);
+                results.add([location:doc.getFieldValue('location_exact'), topology:doc.getFieldValue('topology'), category:'My Locations']);
 			}
 
 	    }
