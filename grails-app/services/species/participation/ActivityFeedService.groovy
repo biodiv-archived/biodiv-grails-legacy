@@ -75,6 +75,7 @@ class ActivityFeedService {
 	
 	def grailsApplication
 	def springSecurityService
+	def observationService
 	
 	def getActivityFeeds(params){
 //		log.debug params;
@@ -100,10 +101,14 @@ class ActivityFeedService {
 			subRootHolderType = activityHolder.class.getCanonicalName()
 			subRootHolderId = (activityHolder.isMainThread())? activityHolder.id : activityHolder.fetchMainThread().id
 		}
-			
+		
+		def date = new Date()
+		
 		ActivityFeed af = new ActivityFeed(author:author, activityHolderId:activityHolder?.id, \
 						activityHolderType:activityHolder?.class?.getCanonicalName(), \
 						rootHolderId:rootHolder?.id, rootHolderType:rootHolder?.class?.getCanonicalName(), \
+						//comment this line after migration on same jvm
+						dateCreated: date, lastUpdated:date,\
 						activityType:activityType, subRootHolderType:subRootHolderType, subRootHolderId:subRootHolderId, activityDescrption:description);
 					
 		ActivityFeed.withNewSession {
@@ -154,7 +159,7 @@ class ActivityFeedService {
 		Set otherFeedSet = new HashSet()
 		def retList = []
 		feeds.each { it ->
-			if(it.rootHolderType == Observation.class.getCanonicalName() || it.rootHolderType == Checklist.class.getCanonicalName() || it.rootHolderType == Species.class.getCanonicalName()){
+			if(it.rootHolderType == Observation.class.getCanonicalName() || it.rootHolderType == Checklists.class.getCanonicalName() || it.rootHolderType == Species.class.getCanonicalName()){
 				//aggregating observation object
 				def feedKey = it.rootHolderType + it.rootHolderId;
 				if(!genericFeedSet.contains(feedKey)){
@@ -258,10 +263,11 @@ class ActivityFeedService {
 	def getCommentContext(Comment comment, params){
 		String result = ""
 		switch (comment.commentHolderType) {
-			case ChecklistRowData.class.getCanonicalName():
-				def checklistRow = getDomainObject(comment.commentHolderType,comment.commentHolderId)
-				if(checklistRow.reco){
-					result += " on " + getSpeciesNameHtmlFromReco(checklistRow.reco, params) + ": Row " + (checklistRow.rowId + 1) 
+			case Observation.class.getCanonicalName():
+				def rootObj = getDomainObject(comment.rootHolderType,comment.rootHolderId)
+				if(rootObj.instanceOf(Checklists)){
+					def obv = getDomainObject(comment.commentHolderType,comment.commentHolderId)
+					result += " on " + getSpeciesNameHtmlFromReco(obv.maxVotedReco, params) + ": Row " + (rootObj.observations.indexOf(obv) + 1) 
 				}
 				break
 			case SpeciesField.class.getCanonicalName():
@@ -288,9 +294,8 @@ class ActivityFeedService {
 		
 		def speciesId = reco?.taxonConcept?.findSpeciesId();
 		String sb = ""
-		def uGroup = grailsApplication.mainContext.getBean('species.UserGroupTagLib');
 		if(speciesId != null){
-			sb =  '<a href="' + uGroup.createLink(controller:"species", action:"show", id:speciesId, 'userGroupWebaddress':params?.webaddress, absolute:true) + '">' + "<i>$reco.name</i>" + "</a>"
+			sb =  '<a href="' + observationService.generateLink("species", "show", [id:speciesId, 'userGroupWebaddress':params?.webaddress]) + '">' + "<i>$reco.name</i>" + "</a>"
 		}else if(reco.isScientificName){
 			sb = "<i>$reco.name</i>"
 		}else{
@@ -300,13 +305,11 @@ class ActivityFeedService {
 	}
 	
 	def getUserHyperLink(user, userGroup){
-		def uGroup = grailsApplication.mainContext.getBean('species.UserGroupTagLib');
-		return '<a href="' + uGroup.createLink(controller:'SUser', action:'show', id:user.id, userGroup:userGroup, 'userGroupWebaddress':userGroup?.webaddress, absolute:true)  + '">' + "<i>$user.name</i>" + "</a>"
+		return '<a href="' +  observationService.generateLink("SUser", "show", ["id": user.id, userGroup:userGroup, 'userGroupWebaddress':userGroup?.webaddress])  + '">' + "<i>$user.name</i>" + "</a>"
 	}
 	
-	def getUserGroupHyperLink(userGroupInstance){
-		def uGroup = grailsApplication.mainContext.getBean('species.UserGroupTagLib');
-		return '<a href="' + uGroup.createLink(mapping:'userGroup',  action:'show', 'userGroup':userGroupInstance, absolute:true) + '">' + "<i>$userGroupInstance.name</i>" + "</a>"
+	def getUserGroupHyperLink(userGroup){
+		return '<a href="' + observationService.generateLink("userGroup", "show", ["mapping":"userGroup", userGroup:userGroup, 'userGroupWebaddress':userGroup?.webaddress]) + '">' + "<i>$userGroup.name</i>" + "</a>"
 	}
 	
 	

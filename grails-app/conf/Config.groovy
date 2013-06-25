@@ -398,6 +398,10 @@ speciesPortal {
 		MAX_VOTED_SPECIES_NAME = "maxvotedspeciesname"
 		TAG = "tag"
 		ISFLAGGED = "isflagged"
+		IS_CHECKLIST = "ischecklist"
+		IS_SHOWABLE = "isshowable"
+		SOURCE_ID = "source_id"
+		SOURCE_TEXT = "source_text"
 		LATLONG = "latlong"
 		USER_GROUP = "group"
 		USER_GROUP_WEBADDRESS = "group_webaddress"
@@ -443,7 +447,7 @@ environments {
 		grails.serverURL = "http://indiabiodiversity.localhost.org/${appName}"
 		speciesPortal {
 			search.serverURL = "http://localhost:8090/solr"
-			names.parser.serverURL = "127.0.0.1"
+			names.parser.serverURL = "saturn.strandls.com"
 			wgp {
 				facebook {
 					appId= "424071494335902"
@@ -460,7 +464,7 @@ environments {
 			}
 		}
 		google.analytics.enabled = false
-		//grails.resources.debug = true
+		grails.resources.debug = true
 		
 		grails {
 			mail {
@@ -658,7 +662,6 @@ environments {
 				}
 				supportEmail = "support(at)indiabiodiversity(dot)org"
 			}
-			flushImmediately = false
 		}
 		google.analytics.enabled = false
 

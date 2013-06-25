@@ -788,7 +788,7 @@ class XMLConverter extends SourceConverter {
             }
         } 
 
-        if(!tempFile.exists())
+        if(!tempFile.exists()) {
             if(sourceUrl) {
                 //downloading from web
                 def tempdir = new File(config.speciesPortal.images.uploadDir, "images");

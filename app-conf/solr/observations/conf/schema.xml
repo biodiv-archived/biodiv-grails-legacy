@@ -5,7 +5,8 @@
 	<types>
 		<fieldType name="string" class="solr.StrField"
 			sortMissingLast="true" omitNorms="true" />
- 		
+ 		<fieldType name="boolean" class="solr.BoolField"
+ 			sortMissingLast="true" omitNorms="true"/>
 		<!-- The optional sortMissingLast and sortMissingFirst attributes are currently 
 			supported on types that are sorted internally as strings. This includes "string","boolean","sint","slong","sfloat","sdouble","pdate" 
 			- If sortMissingLast="true", then a sort on this field will cause documents 
@@ -235,6 +236,8 @@
 		<copyField source="location" dest="location_exact" />
 		<field name="observedon" type="tdate" indexed="true" required="true"/>
 		<field name="createdon" type="tdate" indexed="true" required="true"/>
+		<field name="fromdate" type="tdate" indexed="true" />
+		<field name="todate" type="tdate" indexed="true" />
 		<field name="lastrevised" type="tdate" indexed="true" required="true"/>
 		<field name="sgroup" type="long" indexed="true" required="true"/>
 		<field name="habitat" type="long" indexed="true" required="true"/>
@@ -251,6 +254,14 @@
 		
 		<field name="tag" type="string" indexed="true" multiValued="true" />
 		
+		<field name="title" type="taxonText" indexed="true" stored="true" multiValued="false" />
+		<field name="ischecklist" type="boolean" indexed="true" required="true" stored="true"/>
+		<field name="isshowable" type="boolean" indexed="true" required="true" stored="true"/>
+		<field name="isflagged" type="boolean" indexed="true" stored="true"/>
+		<field name="source_id" type="long" indexed="true" stored="true"/>
+		<field name="reference" type="taxonText" indexed="true" stored="true" multiValued="true"/>
+		<field name="source_text" type="taxonText" indexed="true" stored="true" multiValued="true"/>
+		
 		<!-- using stored=true for highlighting...needs to change -->
 		<field name="text" type="text" indexed="true" stored="true" required="true" multiValued="true"  termVectors="true" termPositions="true" termOffsets="true"/>
 		<copyField source="contributor" dest="text" />
@@ -260,7 +271,10 @@
 		<copyField source="tag" dest="text" />
 		<copyField source="sgroup" dest="text" />
 		<copyField source="habitat" dest="text" />
-
+		<copyField source="title" dest="text" />
+		<copyField source="attribution" dest="text" />
+		<copyField source="reference" dest="text" />
+		<copyField source="source_text" dest="text" />
 		
 		<field name="autocomplete" type="textSpell" indexed="true" stored="true" multiValued="true"/>
 		<copyField source="*_exact" dest="autocomplete" />

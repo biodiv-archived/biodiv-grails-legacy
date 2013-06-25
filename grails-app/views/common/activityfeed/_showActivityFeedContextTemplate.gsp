@@ -1,4 +1,4 @@
-<%@page import="species.participation.Checklist"%>
+<%@page import="species.participation.Checklists"%>
 <%@page import="species.participation.Observation"%>
 <%@page import="species.participation.Comment"%>
 <%@page import="species.groups.UserGroup"%>
@@ -8,7 +8,7 @@
 
 <div class="activityFeedContext thumbnails" >
 	<div class="feedParentContext thumbnail clearfix">
-		<g:if test="${feedInstance.rootHolderType ==  Observation.class.getCanonicalName()}" >
+		<g:if test="${feedInstance.rootHolderType ==  Observation.class.getCanonicalName() || feedInstance.rootHolderType ==  Checklists.class.getCanonicalName() }" >
 			<%
 				def tmpUserGroup = (feedHomeObject && feedHomeObject.class.getCanonicalName() == UserGroup.class.getCanonicalName()) ? feedHomeObject : null
 			%>
@@ -33,11 +33,11 @@
 			</table>
 		</div>
 		</g:elseif>
-		<g:elseif test="${feedInstance.rootHolderType ==  Checklist.class.getCanonicalName()}" >
-			<div class="span10">
-				<clist:showSnippet model="['checklistInstance':feedParentInstance, userGroup:tmpUserGroup]"></clist:showSnippet>
-			</div>	
-		</g:elseif>
+<%--		<g:elseif test="${feedInstance.rootHolderType ==  Checklist.class.getCanonicalName()}" >--%>
+<%--			<div class="span10">--%>
+<%--				<clist:showSnippet model="['checklistInstance':feedParentInstance, userGroup:tmpUserGroup]"></clist:showSnippet>--%>
+<%--			</div>	--%>
+<%--		</g:elseif>--%>
 		<g:elseif test="${feedInstance.rootHolderType ==  Species.class.getCanonicalName()}" >
 			<s:showSnippet model="['speciesInstance':feedParentInstance]" />
 		</g:elseif>

@@ -41,7 +41,7 @@ class CommentService {
 				//e.printStackTrace();
 			}
 			def domainObject = activityFeedService.getDomainObject(c.rootHolderType, c.rootHolderId)
-			def feedInstance = activityFeedService.addActivityFeed(activityFeedService.getDomainObject(c.rootHolderType, c.rootHolderId), c, c.author, activityFeedService.COMMENT_ADDED)
+			def feedInstance = activityFeedService.addActivityFeed(domainObject, c, c.author, activityFeedService.COMMENT_ADDED)
 			observationService.sendNotificationMail(activityFeedService.COMMENT_ADDED, domainObject, null, params.webaddress, feedInstance);
 			return ['success': true, 'commentObj' :c]
 		}

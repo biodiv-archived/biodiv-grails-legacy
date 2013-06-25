@@ -35,7 +35,7 @@ class ObservationsSearchService {
 	
 	private SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 	
-	static int BATCH_SIZE = 50;
+	static int BATCH_SIZE = 10;
 
 	/**
 	 * 
@@ -44,12 +44,13 @@ class ObservationsSearchService {
 		log.info "Initializing publishing to observations search index"
 		
 		//TODO: change limit
-		int limit = Observation.count()+1, offset = 0;
+		int limit = BATCH_SIZE//Observation.count()+1, 
+		int offset = 0;
 		
 		def observations;
 		def startTime = System.currentTimeMillis()
 		while(true) {
-			observations = Observation.list(max:limit, offset:offset);
+			observations = Observation.findAllByIsShowable(true, [max:limit, offset:offset, sort:'id']);
 			if(!observations) break;
 			publishSearchIndex(observations, true);
 			observations.clear();
@@ -71,7 +72,7 @@ class ObservationsSearchService {
 		if(!obvs) return;
 		log.info "Initializing publishing to observations search index : "+obvs.size();
 
-		def fieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.fields
+		//def fieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.fields
 		def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields
 
 		Collection<SolrInputDocument> docs = new ArrayList<SolrInputDocument>();
@@ -80,7 +81,7 @@ class ObservationsSearchService {
 
 		obvs.each { obv ->
 			log.debug "Reading Observation : "+obv.id;
-			if(!obv.isDeleted) {
+			if(!obv.isDeleted && obv.isShowable) {
 				SolrInputDocument doc = new SolrInputDocument();
 				doc.addField(searchFieldsConfig.ID, obv.id.toString());
 				addNameToDoc(obv, doc);
@@ -88,7 +89,11 @@ class ObservationsSearchService {
 				doc.addField(searchFieldsConfig.AUTHOR, obv.author.name);
 				doc.addField(searchFieldsConfig.AUTHOR+"_id", obv.author.id);
 				doc.addField(searchFieldsConfig.CONTRIBUTOR, obv.author.name);
-				doc.addField(searchFieldsConfig.OBSERVED_ON, obv.observedOn);
+				
+				doc.addField(searchFieldsConfig.FROM_DATE, obv.fromDate);
+				doc.addField(searchFieldsConfig.TO_DATE, obv.toDate);
+				
+				doc.addField(searchFieldsConfig.OBSERVED_ON, obv.fromDate);
 				doc.addField(searchFieldsConfig.UPLOADED_ON, obv.createdOn);
 				doc.addField(searchFieldsConfig.UPDATED_ON, obv.lastRevised);
 				if(obv.notes) {
@@ -101,6 +106,10 @@ class ObservationsSearchService {
 				doc.addField(searchFieldsConfig.LOCATION, obv.reverseGeocodedName);
 				doc.addField(searchFieldsConfig.ISFLAGGED, (obv.flagCount > 0));
 				doc.addField(searchFieldsConfig.LATLONG, obv.latitude+","+obv.longitude);
+				
+				doc.addField(searchFieldsConfig.IS_CHECKLIST, obv.isChecklist);
+				doc.addField(searchFieldsConfig.IS_SHOWABLE, obv.isShowable);
+				doc.addField(searchFieldsConfig.SOURCE_ID, obv.sourceId);
 				//boolean geoPrivacy = false;
 				//String locationAccuracy;
 				obv.tags.each { tag ->
@@ -111,6 +120,9 @@ class ObservationsSearchService {
 					doc.addField(searchFieldsConfig.USER_GROUP, userGroup.id);
 					doc.addField(searchFieldsConfig.USER_GROUP_WEBADDRESS, userGroup.webaddress);
 				}
+				
+				addChecklistData(obv, doc)
+				
 				docs.add(doc);
 			}
 		}
@@ -150,6 +162,42 @@ class ObservationsSearchService {
 		}
 	}
 
+	
+	private addChecklistData(Observation obv, SolrInputDocument doc){
+		if(!obv.isChecklist) return
+		
+		def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields
+		def chk = obv 
+		
+		doc.addField(searchFieldsConfig.TITLE, chk.title);
+		doc.removeField(searchFieldsConfig.UPLOADED_ON);
+		doc.addField(searchFieldsConfig.UPLOADED_ON, chk.publicationDate?:chk.createdOn);
+		doc.addField(searchFieldsConfig.REFERENCE, chk.refText);
+		doc.addField(searchFieldsConfig.SOURCE_TEXT, chk.sourceText);
+		
+		chk.contributors.each { s ->
+			doc.addField(searchFieldsConfig.CONTRIBUTOR, s.name);
+		}
+		chk.attributions.each { s ->
+			doc.addField(searchFieldsConfig.ATTRIBUTION, s.name);
+		}
+		
+		chk.observations.each { row ->
+			addNameToDoc(row, doc)
+		}
+		
+		chk.states.each { s->
+			doc.addField(searchFieldsConfig.LOCATION, s);
+		}
+		chk.districts.each { s->
+			doc.addField(searchFieldsConfig.LOCATION, s);
+		}
+		chk.talukas.each { s->
+			doc.addField(searchFieldsConfig.LOCATION, s);
+		}
+			
+	}
+	
 	/**
 	 * 
 	 * @param query

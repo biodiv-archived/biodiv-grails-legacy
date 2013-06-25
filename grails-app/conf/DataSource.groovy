@@ -1,7 +1,7 @@
 dataSource {
     pooled = true
     //Added bu hibernatespatial plugin
-    driverClassName = "org.postgis.DriverWrapper"
+// //     driverClassName = "org.postgis.DriverWrapper"
     dialect = org.hibernatespatial.postgis.PostgisDialect
     username = "postgres"
     password = "postgres123"
@@ -66,4 +66,9 @@ environments {
             url = "jdbc:postgresql://localhost:5432/${appName}"
         }
     }
+}
+
+/* Added by the Hibernate Spatial Plugin. */
+dataSource {
+   driverClassName = "org.postgresql.Driver"
 }

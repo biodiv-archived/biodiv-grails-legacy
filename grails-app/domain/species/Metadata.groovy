@@ -7,7 +7,7 @@ import org.hibernatespatial.GeometryUserType
 import com.vividsolutions.jts.geom.Point;
 import species.participation.Observation
 import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.GeometryCollection
+import com.vividsolutions.jts.geom.Geometry
 
 abstract class Metadata {
 	
@@ -19,15 +19,16 @@ abstract class Metadata {
 	float longitude;
 	boolean geoPrivacy = false;
 	String locationAccuracy;
-    Point loc;
-    MultiPolygon areas;
     Geometry topology;
      
     //Taxonomic Coverage
     SpeciesGroup group;
 	Habitat habitat;
 
-    //TODO: Temporal Coverage
+    //Temporal Coverage
+	Date fromDate;
+	Date toDate;
+	
     Date createdOn = new Date();
 	Date lastRevised = createdOn;
 
@@ -40,15 +41,13 @@ abstract class Metadata {
 		latitude(nullable: true)
 		longitude(nullable:true)
 		locationAccuracy(nullable: true)
-		loc(nullable: true)
-		areas(nullable: true)
-        topology(nullable:false)
+        //topology(nullable:false)
+		fromDate (nullable:true)
+		toDate (nullable:true)
     }
 	
     static mapping = {
         columns {
-            loc type: GeometryUserType, sqlType: "Geometry"
-            area type: GeometryUserType, sqlType: "Geometry"
             topology (type:org.hibernatespatial.GeometryUserType, class:com.vividsolutions.jts.geom.Geometry)
         }
     }

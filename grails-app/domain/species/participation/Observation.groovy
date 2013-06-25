@@ -50,7 +50,6 @@ class Observation extends Metadata implements Taggable, Rateable {
 	}
 
     SUser author;
-	Date observedOn;
 	String notes;
 	int rating;
 	long visitCount = 0;
@@ -59,39 +58,52 @@ class Observation extends Metadata implements Taggable, Rateable {
 	String searchText;
 	Recommendation maxVotedReco;
 	boolean agreeTerms = false;
+	
+	//if true observation comes on view otherwise not
+	boolean isShowable;
+	//if observation representing checklist then this flag is true
+	boolean isChecklist = false;
+	//observation generated from checklist will have source as checklist other will point to themself
+	Long sourceId;
     
-	static hasMany = [resource:Resource, recommendationVote:RecommendationVote, obvFlags:ObservationFlag, userGroups:UserGroup];
-	static belongsTo = [SUser, UserGroup]
+	static hasMany = [resource:Resource, recommendationVote:RecommendationVote, obvFlags:ObservationFlag, userGroups:UserGroup, annotations:Annotation];
+	static belongsTo = [SUser, UserGroup, Checklists]
 
 	static constraints = {
 		notes nullable:true
-		searchText nullable:true;
+		searchText nullable:true
 		maxVotedReco nullable:true
-		resource validator : { val, obj -> val && val.size() > 0 }
-		observedOn validator : {val -> val < new Date()}
-		latitude validator : { val, obj -> 
-            println obj
-            if(!val && !obj.areas) {
+		//to insert observation without db exception
+		sourceId nullable:true
+		//resource validator : { val, obj -> val && val.size() > 0 }
+		fromDate validator : {val -> val < new Date()}
+/*		latitude validator : { val, obj ->
+			if(!val) {
                 return ['default.blank.message', 'Latitude']
             }
-			if(Float.isNaN(val)) {
-				return ['typeMismatch.java.lang.Integer','Latitude']
-			}
-			if( val < 6.74678 || val > 35.51769) {
-				return ['value.not.in.range', 'Latitude', '6.74678', '35.51769']
+			if(val){
+				if(Float.isNaN(val)) {
+					return ['typeMismatch.java.lang.Integer','Latitude']
+				}
+				if( val < 6.74678 || val > 35.51769) {
+					return ['value.not.in.range', 'Latitude', '6.74678', '35.51769']
+				}
 			}
 		}
 		longitude validator : { val, obj ->  
-            if(!val && !obj.areas) {
+            if(!val) {
                 return ['default.blank.message', 'Longitude']
             }
-			if(Float.isNaN(val)) { 
-				return ['typeMismatch.java.lang.Integer', 'Longitude']
-			}
-			if( val < 68.03215 || val > 97.40238) {
-				return ['value.not.in.range', 'Longitude', '68.03215', '97.40238']
+			if(val){
+				if(Float.isNaN(val)) { 
+					return ['typeMismatch.java.lang.Integer', 'Longitude']
+				}
+				if( val < 68.03215 || val > 97.40238) {
+					return ['value.not.in.range', 'Longitude', '68.03215', '97.40238']
+				}
 			}
 		}
+*/
         placeName blank:false
 		agreeTerms nullable:true
 	}
@@ -101,6 +113,9 @@ class Observation extends Metadata implements Taggable, Rateable {
 		notes type:'text'
 		searchText type:'text'
 		autoTimestamp false
+		tablePerHierarchy false
+		//XXX uncomment this only for metachecklist migration to reatain id in old url
+		//id generator:'assigned'
 	}
 
 	/**
@@ -235,16 +250,6 @@ class Observation extends Metadata implements Taggable, Rateable {
 			recoVoteCount = sql.rows("select recoVote.recommendation_id as recoId, count(*) as votecount from recommendation_vote as recoVote where recoVote.observation_id = :obvId group by recoVote.recommendation_id order by votecount desc limit :max offset :offset", [obvId:this.id, max:limit, offset:offset])
 		}
 
-		//		def recoVoteCount = RecommendationVote.executeQuery("select recoVote.recommendation.id as recoId, count(*) as votecount from RecommendationVote as recoVote where recoVote.observation.id = :obvId group by recoVote.recommendation", [obvId:this.id]);
-
-		//		def recoVoteCount = RecommendationVote.createCriteria().list {
-		//			projections {
-		//				groupProperty("recommendation")
-		//				count 'id', 'voteCount'
-		//			}
-		//			eq('observation', this)
-		//			order 'voteCount', 'desc'
-		//		}
 		def currentUser = springSecurityService.currentUser;
 		def result = [];
 		recoVoteCount.each { recoVote ->
@@ -273,12 +278,22 @@ class Observation extends Metadata implements Taggable, Rateable {
 		visitCount++
 	}
 
+	//XXX: comment this method before checklist migration
 	def beforeUpdate(){
 		if(isDirty() && !isDirty('visitCount')){
+			updateIsShowable()
 			lastRevised = new Date();
 		}
 	}
-
+	
+	def beforeInsert(){
+		updateIsShowable()
+	}
+	
+	def afterInsert(){
+		sourceId = sourceId ?:id
+	}
+	
 	def getPageVisitCount(){
 		return visitCount;
 	}
@@ -296,7 +311,11 @@ class Observation extends Metadata implements Taggable, Rateable {
 		saveConcurrently();
 		observationsSearchService.publishSearchIndex(this, true);
 	}
-
+	
+	private updateIsShowable(){
+		isShowable = (isChecklist || (resource && !resource.isEmpty())) ? true : false
+	}
+	
 	String fetchSpeciesCall(){
 		return maxVotedReco ? maxVotedReco.name : "Unknown"
 	}
@@ -328,7 +347,7 @@ class Observation extends Metadata implements Taggable, Rateable {
 		
 		res[ObvUtilService.SPECIES_GROUP] = group.name
 		res[ObvUtilService.HABITAT] = habitat.name
-		res[ObvUtilService.OBSERVED_ON] = new SimpleDateFormat("dd/MM/yyyy").format(observedOn)
+		res[ObvUtilService.OBSERVED_ON] = new SimpleDateFormat("dd/MM/yyyy").format(fromDate)
 		
 		def snName = ""
 		def cnName = ""
@@ -452,4 +471,12 @@ class Observation extends Metadata implements Taggable, Rateable {
 	def fetchRecoVoteOwnerCount(){
 		return RecommendationVote.countByObservation(this)
 	}
+	
+	def fetchChecklistAnnotation(){
+		return Annotation.findAllBySourceTypeAndObservation(Checklists.class.getCanonicalName(), this, [sort:'columnOrder', order:'asc'])
+	}
+//	
+//	def fetchSourceChecklistTitle(){
+//		activityFeedService.getDomainObject(sourceType, sourceId).title
+//	}
 }

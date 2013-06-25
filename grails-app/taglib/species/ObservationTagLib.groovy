@@ -223,6 +223,10 @@ class ObservationTagLib {
 		out << render(template:"/common/observation/showMapInputTemplate",model:attrs.model);
 	}
 	
+	def showAnnotation = {attrs, body->
+		out << render(template:"/common/observation/showAnnotationTemplate", model:attrs.model);
+	}
+	
 	def rating = {attrs, body->
 		//out << render(template:"/common/ratingTemplate", model:attrs.model);
         def resource = attrs.model.resource

@@ -44,11 +44,17 @@
 						class="${((params.controller == 'SUser' && params.action == 'header') ||(params.controller == 'map'))?' active':''}"><a
 						href="${uGroup.createLink('mapping':'userGroup', 'action':'map', 'userGroup':userGroupInstance)}" title="Maps">Maps</a></li>
 					
-					<li
-						class="${((params.controller == 'userGroup' && params.action == 'checklist') ||(params.controller == 'checklist'))?' active':''}"><a
-						href="${uGroup.createLink('mapping':'userGroup', 'action':'checklist', 'userGroup':userGroupInstance)}"
-						title="Checklists">Checklists</a>
-					</li>
+			 		<li
+                    	class="${((params.controller == 'document' && params.action == 'browser') ||(params.controller == 'browser'))?' active':''}"><a
+                        href="${uGroup.createLink('controller':'document', 'action':'browser', 'userGroup':userGroupInstance)}"
+                        title="Documents">Documents</a>
+                    </li>
+					
+<%--					<li--%>
+<%--						class="${((params.controller == 'userGroup' && params.action == 'checklist') ||(params.controller == 'checklist'))?' active':''}"><a--%>
+<%--						href="${uGroup.createLink('mapping':'userGroup', 'action':'checklist', 'userGroup':userGroupInstance)}"--%>
+<%--						title="Checklists">Checklists</a>--%>
+<%--					</li>--%>
 <%----%>
 <%--					<li--%>
 <%--						class="${((params.controller == 'userGroup' && params.action == 'chart') ||(params.controller == 'chart'))?' active':''}"><a--%>
@@ -97,11 +103,7 @@
                                                         title="Members">Members</a>
                                                     </li>
 
-                                                    <li
-                                                    class="${((params.controller == 'document' && params.action == 'browser') ||(params.controller == 'browser'))?' active':''}"><a
-                                                        href="${uGroup.createLink('controller':'document', 'action':'browser', 'userGroup':userGroupInstance)}"
-                                                        title="Documents">Documents</a>
-                                                    </li>
+                                                   
 
                                                     <li
                                                     class="${((params.controller == 'userGroup' && params.action == 'chart') ||(params.controller == 'chart'))?' active':''}"><a
@@ -129,9 +131,14 @@
 					<li
 						class="${(request.getHeader('referer')?.contains('/map') && params.action == 'header')?' active':''}"><a
 						href="/map" title="Maps">Maps</a></li>
+						
 					<li
-						class="${(params.controller == 'checklist')?'active':''}"><a
-						href='${uGroup.createLink("controller":"checklist")}' title="Checklists">Checklists</a></li>
+                    	class="${((params.controller == 'document' && params.action == 'browser') ||(params.controller == 'browser'))?' active':''}"><a
+                    	href="${uGroup.createLink('controller':'document', 'action':'browser', 'userGroup':userGroupInstance)}"
+                        title="Documents">Documents</a></li>	
+<%--					<li--%>
+<%--						class="${(params.controller == 'checklist')?'active':''}"><a--%>
+<%--						href='${uGroup.createLink("controller":"checklist")}' title="Checklists">Checklists</a></li>--%>
 <%--					<li--%>
 <%--						class="${(params.controller == 'chart')?'active':''}"><a--%>
 <%--						href='${uGroup.createLink("controller":"chart")}' title="Stats">Stats</a></li>--%>
@@ -175,11 +182,7 @@
 								class="${(request.getHeader('referer')?.contains('/biodiversity_news') && params.action == 'header')?' active':''}"><a
 								href="/biodiversity_news" title="News">News</a></li>
 
-                                                        <li
-                                                        class="${((params.controller == 'document' && params.action == 'browser') ||(params.controller == 'browser'))?' active':''}"><a
-                                                            href="${uGroup.createLink('controller':'document', 'action':'browser', 'userGroup':userGroupInstance)}"
-                                                            title="Documents">Documents</a>
-                                                        </li>
+                            
 
 							
 							<li

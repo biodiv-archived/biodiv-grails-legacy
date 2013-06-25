@@ -15,7 +15,7 @@
 			<div class="observation">
 				<div>
 					<obv:showObservationFilterMessage
-						model="['observationInstanceList':observationInstanceList, 'observationInstanceTotal':observationInstanceTotal, 'queryParams':queryParams]" />
+						model="['observationInstanceList':observationInstanceList, 'observationInstanceTotal':observationInstanceTotal, 'queryParams':queryParams, resultType:'observation']" />
 						
 				</div>
 				<div style="clear: both;"></div>

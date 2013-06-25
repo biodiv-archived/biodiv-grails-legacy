@@ -11,6 +11,7 @@ class ChecklistController {
 	def springSecurityService;
 	def checklistService;
 	def grailsApplication
+	def checklistUtilService
 	
 	def index = {
 		redirect(action:list, params: params)
@@ -18,8 +19,10 @@ class ChecklistController {
 
 	def list = {
 		log.debug params
+		params.isChecklistOnly = "" + true
+		redirect(controller:'observation', action:list, params: params)
+		/*
 		def model = getFilteredChecklist(params)
-		
 		if(params.loadMore?.toBoolean()){
 			render(template:"/common/checklist/showChecklistListTemplate", model:model);
 			return;
@@ -35,6 +38,7 @@ class ChecklistController {
 			render result as JSON
 			return;
 		}
+		*/
 	}
 
 
@@ -42,12 +46,13 @@ class ChecklistController {
 		log.debug params
 		if(params.id){
 			//def checklistInstance = Checklist.read(params.id.toLong())
-			def checklistInstance = Checklist.findById(params.id.toLong(), [fetch: [row: 'join']])
+			def checklistInstance = Checklists.findById(params.id.toLong(), [fetch: [observations: 'join']])
 			if (!checklistInstance) {
 				flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'checklist.label', default: 'Checklist'), params.id])}"
 				redirect (url:uGroup.createLink(action:'list', controller:"checklist", 'userGroupWebaddress':params.webaddress))
 			}
 			else {
+				checklistInstance.incrementPageVisit()
 				def userGroupInstance;
 				if(params.webaddress) {
 					userGroupInstance = userGroupService.get(params.webaddress);
@@ -69,7 +74,7 @@ class ChecklistController {
 
 	def snippet = {
 		log.debug params
-		def checklistInstance = Checklist.read(params.id)
+		def checklistInstance = Checklists.read(params.id)
 		render (template:"/common/checklist/showChecklistSnippetTabletTemplate", model:[checklistInstance:checklistInstance, 'userGroupWebaddress':params.webaddress]);
 	}
 	
@@ -139,12 +144,10 @@ class ChecklistController {
 
 	
 	private getChecklist(speciesGroup, userGroupInstance, max, offset){
-		return Checklist.withCriteria(){
+		return Checklists.withCriteria(){
 			and{
 				if(speciesGroup){
-					speciesGroups{
-						eq('id', speciesGroup.id)
-					}
+					eq('group', speciesGroup)
 				}
 				if(userGroupInstance){
 					userGroups{
@@ -164,15 +167,13 @@ class ChecklistController {
 	}
 	
 	private getChecklistCount(speciesGroup, userGroupInstance){
-		return Checklist.withCriteria(){
+		return Checklists.withCriteria(){
 			projections {
 				count('id')
 			}
 			and{
 				if(speciesGroup){
-					speciesGroups{
-						eq('id', speciesGroup.id)
-					}
+					eq('group', speciesGroup)
 				}
 				if(userGroupInstance){
 					userGroups{
@@ -196,10 +197,6 @@ class ChecklistController {
 		render "=== done "
 	}
 	
-	def test1 ={
-		def flushImmediately  = grailsApplication.config.speciesPortal.flushImmediately
-		render flushImmediately
-	}
 	/*
 	@Secured(['ROLE_USER'])
 	def test = {
@@ -223,7 +220,7 @@ class ChecklistController {
 		if(userGroup){
 			render getChecklistCount(null, userGroup)
 		}else{
-			render Checklist.count();
+			render Checklists.count();
 		}
 	}
 
@@ -280,6 +277,16 @@ class ChecklistController {
 	////////////////////////////// SEARCH END /////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////
 	
-
+//	def create = {
+//		log.debug params;
+//	}
+	
+	
+	@Secured(['ROLE_ADMIN'])
+	def breakChecklist = {
+		log.debug params
+		checklistUtilService.migrateObservationFromChecklist()
+		render "=== done "
+	}
 	
 }

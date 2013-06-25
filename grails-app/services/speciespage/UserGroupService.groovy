@@ -472,8 +472,10 @@ class UserGroupService {
 		def queryParams = [:]
 		queryParams['userGroup'] = userGroupInstance
 		queryParams['isDeleted'] = false;
+		queryParams['isChecklist'] = false;
+		queryParams['isShowable'] = true;
 		
-		def query = "select count(*) from Observation obv join obv.userGroups userGroup where obv.isDeleted = :isDeleted and userGroup=:userGroup"
+		def query = "select count(*) from Observation obv join obv.userGroups userGroup where obv.isDeleted = :isDeleted and obv.isChecklist = :isChecklist and obv.isShowable = :isShowable and userGroup=:userGroup"
 		return Observation.executeQuery(query, queryParams)[0]
 	}
 	

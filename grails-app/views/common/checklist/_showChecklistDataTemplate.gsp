@@ -12,57 +12,39 @@
 				<g:each in="${checklistInstance.fetchColumnNames()}" var="cName">
 					<th title="${cName}">${cName.replaceAll("_", " ")}</th>
 				</g:each>
+				<th title="Observation">Observation</th>
 				<th title="Comments">Comments</th>
 			</tr>
 		</thead>
 		<tbody>
-			<%
-				def preRowNo = -1
-				def snRow = null
-				def totalRows = checklistInstance.row.size()
-			%>
-			<g:each in="${checklistInstance.row}"  status="i" var="row">
-				<%
-					def currentRowNo = row.rowId
-				%>
-				<g:if test="${preRowNo !=  currentRowNo}">
-					<g:if test="${preRowNo != -1}">
+			<g:each in="${checklistInstance.observations}" var="observation">
+				<tr>
+					<g:each in="${observation.fetchChecklistAnnotation()}" var="annot">
 						<td>
-							<comment:showCommentPopup model="['commentHolder':snRow, 'rootHolder':checklistInstance]" />
+							<g:if test="${annot.key.equalsIgnoreCase('scientific_name')}">
+								<g:if test="${observation.maxVotedReco?.taxonConcept && observation.maxVotedReco.taxonConcept?.canonicalForm != null}">
+									<a href="${uGroup.createLink(action:'show', controller:'species', id:observation.maxVotedReco.taxonConcept.findSpeciesId(), 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
+										<i> ${observation.maxVotedReco.taxonConcept.canonicalForm}</i>
+									</a>
+								</g:if>
+								<g:else>
+									<i>${annot.value}</i>
+								</g:else>
+							</g:if>
+							<g:else>
+								${annot.value}
+							</g:else>
 						</td>
-						</tr>
-					</g:if>
-					<%
-						preRowNo = currentRowNo
-					%>
-					<tr>
-				</g:if>
-				<%
-					if(row.key.equalsIgnoreCase("scientific_name")){
-						snRow = row
-					}
-				%>
-				<g:if test="${row.reco}">
-					<g:if test="${row.reco.taxonConcept && row.reco.taxonConcept.canonicalForm != null}">
-						<td>
-						<a href="${uGroup.createLink(action:'show', controller:'species', id:row.reco.taxonConcept.findSpeciesId(), 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
-							<i> ${row.reco.taxonConcept.canonicalForm}</i>
-						</a>
-						</td>
-					</g:if>
-					<g:else>
-						<td><i>${row.value}</i></td>
-					</g:else>
-				</g:if>
-				<g:else>
-					<td>${row.value}</td>
-				</g:else>
-				<g:if test="${totalRows > 1 && i == (totalRows-1)}">
+					</g:each>
 					<td>
-						<comment:showCommentPopup model="['commentHolder':snRow, 'rootHolder':checklistInstance]" />
+						<a href="${uGroup.createLink(action:'show', controller:'observation', id:observation.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
+							url</a>
 					</td>
-				</g:if>
-			</g:each>
+					<td>
+						<comment:showCommentPopup model="['commentHolder':observation, 'rootHolder':checklistInstance]" />
+					</td>
+				</tr>
+			</g:each>	
 		</tbody>
 	</table>
 </div>

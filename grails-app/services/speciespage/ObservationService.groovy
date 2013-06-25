@@ -23,10 +23,12 @@ import species.groups.SpeciesGroup;
 import species.participation.ActivityFeed;
 import species.participation.Follow;
 import species.participation.Observation;
+import species.participation.Checklists;
 import species.participation.Recommendation;
 import species.participation.RecommendationVote;
 import species.participation.ObservationFlag.FlagType
 import species.participation.RecommendationVote.ConfidenceType;
+import species.participation.Annotation
 import species.sourcehandler.XMLConverter;
 import species.utils.ImageType;
 import species.utils.Utils;
@@ -79,7 +81,7 @@ class ObservationService {
 	 * @return
 	 */
 	Observation createObservation(params) {
-		log.info "Creating observations from params : "+params
+		//log.info "Creating observations from params : "+params
 		Observation observation = new Observation();
 		updateObservation(params, observation);
 		return observation;
@@ -99,9 +101,10 @@ class ObservationService {
 		}
 		observation.group = params.group?:SpeciesGroup.get(params.group_id);
 		observation.notes = params.notes;
-		observation.observedOn = parseDate(params.observedOn);
-		observation.reverseGeocodedName = params.reverse_geocoded_name?:params.reverseGeocodedName;
-		observation.placeName = params.placeName;//?:observation.reverseGeocodedName;
+		observation.fromDate = observation.toDate = parseDate(params.observedOn);
+		observation.placeName = params.placeName//?:observation.reverseGeocodedName;
+		observation.reverseGeocodedName = params.reverse_geocoded_name?:observation.placeName
+		
 		observation.location = 'POINT(' + params.longitude + ' ' + params.latitude + ')'
 		if(params.latitude) {
             observation.latitude = params.latitude?.toFloat();
@@ -211,14 +214,15 @@ class ObservationService {
 	Map getRelatedObservationByUser(long userId, int limit, long offset, String sort){
 		//getting count
 		def queryParams = [isDeleted:false]
-		def countQuery = "select count(*) from Observation obv where obv.author.id = :userId and obv.isDeleted = :isDeleted "
+		def countQuery = "select count(*) from Observation obv where obv.author.id = :userId and obv.isDeleted = :isDeleted and obv.isShowable = :isShowable "
 		queryParams["userId"] = userId
 		queryParams["isDeleted"] = false;
+		queryParams["isShowable"] = true;
 		def count = Observation.executeQuery(countQuery, queryParams)
 
-
+		
 		//getting observations
-		def query = "from Observation obv where obv.author.id = :userId and obv.isDeleted = :isDeleted "
+		def query = "from Observation obv where obv.author.id = :userId and obv.isDeleted = :isDeleted and obv.isShowable = :isShowable "
 		def orderByClause = "order by obv." + (sort ? sort : "createdOn") +  " desc"
 		query += orderByClause
 
@@ -307,18 +311,30 @@ class ObservationService {
 	
 	private Map getRelatedObservationByReco(long obvId, Recommendation maxVotedReco, int limit, long offset){
 		def observations = Observation.withCriteria (max: limit, offset: offset) {
+			projections {
+				groupProperty('sourceId')
+			}
 			and {
 				eq("maxVotedReco", maxVotedReco)
 				eq("isDeleted", false)
 				if(obvId) ne("id", obvId)
 			}
-			order("lastRevised", "desc")
+			//order("lastRevised", "desc")
 		}
 		def result = [];
 		observations.each {
-			result.add(['observation':it, 'title':it.fetchSpeciesCall()]);
+			result.add(['observation':Observation.get(it), 'title':maxVotedReco.name]);
 		}
-		def count = Observation.countByMaxVotedRecoAndIsDeleted(maxVotedReco, false) - 1;
+		def count = Observation.createCriteria().count {
+			projections {
+				count(groupProperty('sourceId'))
+			}
+			and {
+				eq("maxVotedReco", maxVotedReco)
+				eq("isDeleted", false)
+				if(obvId) ne("id", obvId)
+			}
+		}
 		return ["observations":result, "count":count]
 	}
 	
@@ -332,6 +348,7 @@ class ObservationService {
 				and {
 					'in'("maxVotedReco", scientificNameRecos)
 					eq("isDeleted", false)
+					eq("isShowable", true)
 				}
 				order("lastRevised", "desc")
 			}
@@ -339,8 +356,13 @@ class ObservationService {
 			observations.each {
 				result.add(['observation':it, 'title':it.fetchSpeciesCall()]);
 			}
-			def count = Observation.countByMaxVotedRecoInListAndIsDeleted(scientificNameRecos, false);
-			
+			def count = Observation.createCriteria().count {
+				and {
+					'in'("maxVotedReco", scientificNameRecos)
+					eq("isDeleted", false)
+					eq("isShowable", true)
+				}
+			}
 			return ['observations':result, 'count':count]
 		} else {
 			return ['observations':[], 'count':0]
@@ -360,14 +382,18 @@ class ObservationService {
 		List urlList = []
 		for(param in observations){
 			def item = [:];
-			item.obvId = param['observation'].id
+			item.url = "/" + getTargetController(param['observation']) + "/show/" + param['observation'].id
 			item.imageTitle = param['title']
 			def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 			Resource image = param['observation'].mainImage()
-			if(image.type == ResourceType.IMAGE) {
-				item.imageLink = image.thumbnailUrl(iconBasePath)
-			} else if(image.type == ResourceType.VIDEO) {
-				item.imageLink = image.thumbnailUrl()
+			if(image){
+				if(image.type == ResourceType.IMAGE) {
+					item.imageLink = image.thumbnailUrl(iconBasePath)
+				} else if(image.type == ResourceType.VIDEO) {
+					item.imageLink = image.thumbnailUrl()
+				}
+			}else{
+				item.imageLink =  config.speciesPortal.resources.serverURL + "/" + "no-image.jpg"
 			}			
 			if(param.inGroup) {
 				item.inGroup = param.inGroup;
@@ -384,6 +410,18 @@ class ObservationService {
 		return urlList
 	}
 
+	//XXX for new checklists doamin object and controller name is not same as grails convention so using this method 
+	// to resolve controller name
+	private static getTargetController(domainObj){
+		if(domainObj.instanceOf(Checklists)){
+			return "checklist"
+		}else if(domainObj.instanceOf(SUser)){
+			return "user"
+		}else{
+			return domainObj.class.getSimpleName().toLowerCase()
+		}
+	}
+	
 	private Map getRecommendation(params){
 		def recoName = params.recoName;
 		def canName = params.canName;
@@ -524,10 +562,10 @@ class ObservationService {
 		int maxRadius = 200;
 		int maxObvs = 50;
 		def sql =  Sql.newInstance(dataSource);
-		def rows = sql.rows("select count(*) as count from observation_locations as g1, observation_locations as g2 where ROUND(ST_Distance_Sphere(g1.st_geomfromtext, g2.st_geomfromtext)/1000) < :maxRadius and g2.is_deleted = false and g1.id = :observationId and g1.id <> g2.id", [observationId: Long.parseLong(observationId), maxRadius:maxRadius]);
+		def rows = sql.rows("select count(*) as count from observation_locations as g1, observation_locations as g2 where ROUND(ST_Distance_Sphere(g1.st_geomfromtext, g2.st_geomfromtext)/1000) < :maxRadius and g2.is_deleted = false and g2.is_showable = true and g1.id = :observationId and g1.id <> g2.id", [observationId: Long.parseLong(observationId), maxRadius:maxRadius]);
 		def totalResultCount = Math.min(rows[0].getProperty("count"), maxObvs);
 		limit = Math.min(limit, maxObvs - offset);
-		def resultSet = sql.rows("select g2.id,  ROUND(ST_Distance_Sphere(g1.st_geomfromtext, g2.st_geomfromtext)/1000) as distance from observation_locations as g1, observation_locations as g2 where  ROUND(ST_Distance_Sphere(g1.st_geomfromtext, g2.st_geomfromtext)/1000) < :maxRadius and g2.is_deleted = false and g1.id = :observationId and g1.id <> g2.id order by ST_Distance(g1.st_geomfromtext, g2.st_geomfromtext) limit :max offset :offset", [observationId: Long.parseLong(observationId), maxRadius:maxRadius, max:limit, offset:offset])
+		def resultSet = sql.rows("select g2.id,  ROUND(ST_Distance_Sphere(g1.st_geomfromtext, g2.st_geomfromtext)/1000) as distance from observation_locations as g1, observation_locations as g2 where  ROUND(ST_Distance_Sphere(g1.st_geomfromtext, g2.st_geomfromtext)/1000) < :maxRadius and g2.is_deleted = false and g2.is_showable = true and g1.id = :observationId and g1.id <> g2.id order by ST_Distance(g1.st_geomfromtext, g2.st_geomfromtext), g2.last_revised desc limit :max offset :offset", [observationId: Long.parseLong(observationId), maxRadius:maxRadius, max:limit, offset:offset])
 
 		def nearbyObservations = []
 		for (row in resultSet){
@@ -609,9 +647,10 @@ class ObservationService {
 
 		def queryParts = getFilteredObservationsFilterQuery(params) 
 		String query = queryParts.query;
-		
+		long checklistCount = 0
 		if(isMapView) {
 			query = queryParts.mapViewQuery + queryParts.filterQuery + queryParts.orderByClause
+			checklistCount = Observation.executeQuery(queryParts.checklistCountQuery, queryParts.queryParams)[0]
 		} else {
 			query += queryParts.filterQuery + queryParts.orderByClause
 			if(max != -1)
@@ -628,7 +667,7 @@ class ObservationService {
 			queryParts.queryParams["daterangepicker_end"] =  params.daterangepicker_end
 		}
 		
-		return [observationInstanceList:observationInstanceList, queryParams:queryParts.queryParams, activeFilters:queryParts.activeFilters]
+		return [observationInstanceList:observationInstanceList, checklistCount:checklistCount, queryParams:queryParts.queryParams, activeFilters:queryParts.activeFilters]
 	}
 
 	def getFilteredObservationsFilterQuery(params) {
@@ -638,9 +677,9 @@ class ObservationService {
 		//params.userName = springSecurityService.currentUser.username;
 
 		def query = "select obv from Observation obv "
-		def mapViewQuery = "select obv.id, obv.latitude, obv.longitude from Observation obv "
+		def mapViewQuery = "select obv.id, obv.latitude, obv.longitude, obv.isChecklist from Observation obv "
 		def queryParams = [isDeleted : false]
-		def filterQuery = " where obv.isDeleted = :isDeleted "
+		def filterQuery = " where obv.isDeleted = :isDeleted and isShowable = true "
 		def activeFilters = [:]
 
 		if(params.sGroup){
@@ -679,7 +718,7 @@ class ObservationService {
 		}
 
 		if(params.speciesName && (params.speciesName != grailsApplication.config.speciesPortal.group.ALL)){
-			filterQuery += " and obv.maxVotedReco is null "
+			filterQuery += " and (obv.isChecklist = false and obv.maxVotedReco is null) "
 			//queryParams["speciesName"] = params.speciesName
 			activeFilters["speciesName"] = params.speciesName
 		}
@@ -688,6 +727,12 @@ class ObservationService {
 			filterQuery += " and obv.flagCount > 0 "
 			activeFilters["isFlagged"] = params.isFlagged.toBoolean()
 		}
+		
+		if(params.isChecklistOnly && params.isChecklistOnly.toBoolean()){
+			filterQuery += " and obv.isChecklist = true "
+			activeFilters["isChecklistOnly"] = params.isChecklistOnly.toBoolean()
+		}
+
 		
 		if(params.daterangepicker_start && params.daterangepicker_end){
 			def df = new SimpleDateFormat("dd/MM/yyyy")
@@ -721,8 +766,10 @@ class ObservationService {
 		}
 		
 		def orderByClause = " order by obv." + (params.sort ? params.sort : "lastRevised") +  " desc, obv.id asc"
-
-		return [query:query, mapViewQuery:mapViewQuery, filterQuery:filterQuery, orderByClause:orderByClause, queryParams:queryParams, activeFilters:activeFilters]
+		
+		def checklistCountQuery = "select count(*) from Observation obv " + filterQuery + " and obv.isChecklist = true "
+		
+		return [query:query, mapViewQuery:mapViewQuery, checklistCountQuery:checklistCountQuery, filterQuery:filterQuery, orderByClause:orderByClause, queryParams:queryParams, activeFilters:activeFilters]
 
 	}
 	
@@ -736,20 +783,27 @@ class ObservationService {
 	}
 	
 	long getAllObservationsOfUser(SUser user) {
-		return (long)Observation.countByAuthorAndIsDeleted(user, false);
+		return (long) Observation.createCriteria().count {
+			and {
+				eq("author", user)
+				eq("isDeleted", false)
+				eq("isShowable", true)
+			}
+		}
+		//return (long)Observation.countByAuthorAndIsDeleted(user, false);
 	}
 
 	long getAllRecommendationsOfUser(SUser user) {
-		def result = RecommendationVote.executeQuery("select count(recoVote) from RecommendationVote recoVote where recoVote.author.id = :userId and recoVote.observation.isDeleted = :isDeleted", [userId:user.id, isDeleted:false]);
+		def result = RecommendationVote.executeQuery("select count(recoVote) from RecommendationVote recoVote where recoVote.author.id = :userId and recoVote.observation.isDeleted = :isDeleted and recoVote.observation.isShowable = :isShowable", [userId:user.id, isDeleted:false, isShowable:true]);
 		return (long)result[0];
 	}
 	
 	List getRecommendationsOfUser(SUser user, int max, long offset) {
 		if(max == -1) {
-			def recommendationVotesList = RecommendationVote.executeQuery("select recoVote from RecommendationVote recoVote where recoVote.author.id = :userId and recoVote.observation.isDeleted = :isDeleted order by recoVote.votedOn desc", [userId:user.id, isDeleted:false]);
+			def recommendationVotesList = RecommendationVote.executeQuery("select recoVote from RecommendationVote recoVote where recoVote.author.id = :userId and recoVote.observation.isDeleted = :isDeleted and recoVote.observation.isShowable = :isShowable order by recoVote.votedOn desc", [userId:user.id, isDeleted:false, isShowable:true]);
 			return recommendationVotesList;
 		} else {
-			def recommendationVotesList = RecommendationVote.executeQuery("select recoVote from RecommendationVote recoVote where recoVote.author.id = :userId and recoVote.observation.isDeleted = :isDeleted order by recoVote.votedOn desc", [userId:user.id, isDeleted:false], [max:max, offset:offset]);
+			def recommendationVotesList = RecommendationVote.executeQuery("select recoVote from RecommendationVote recoVote where recoVote.author.id = :userId and recoVote.observation.isDeleted = :isDeleted and recoVote.observation.isShowable = :isShowable order by recoVote.votedOn desc", [userId:user.id, isDeleted:false, isShowable:true], [max:max, offset:offset]);
 			return recommendationVotesList;
 		}
 	}
@@ -843,7 +897,7 @@ class ObservationService {
 		params.sGroup = (params.sGroup)? params.sGroup : SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.ALL).id
 		params.habitat = (params.habitat)? params.habitat : Habitat.findByName(grailsApplication.config.speciesPortal.group.ALL).id
 		params.habitat = params.habitat.toLong()
-		def queryParams = [isDeleted : false]
+		def queryParams = [isDeleted : false, isShowable:true]
 		
 		def activeFilters = [:]
 		
@@ -999,6 +1053,12 @@ class ObservationService {
 			activeFilters["isFlagged"] = params.isFlagged.toBoolean()
 		}
 
+		if(params.isChecklistOnly && params.isChecklistOnly.toBoolean()){
+			paramsList.add('fq', searchFieldsConfig.IS_CHECKLIST+":"+params.isChecklistOnly.toBoolean());
+			activeFilters["isChecklistOnly"] = params.isChecklistOnly.toBoolean()
+		}
+
+		
 		if(params.bounds){
 			def bounds = params.bounds.split(",")
 			 def swLat = bounds[0]
@@ -1036,6 +1096,7 @@ class ObservationService {
 		def totalObservationIdList = [];
 		def facetResults = [:], responseHeader
 		long noOfResults = 0;
+		long checklistCount = 0
 		if(paramsList) {
 			def queryResponse = observationsSearchService.search(paramsList);
 			
@@ -1046,6 +1107,9 @@ class ObservationService {
 				if(instance) {
 					totalObservationIdList.add(Long.parseLong(doc.getFieldValue("id")+""));
 					instanceList.add(instance);
+					if(instance.isChecklist){
+						checklistCount++ 
+					}
 				}
 			}
 			
@@ -1062,7 +1126,7 @@ class ObservationService {
 			responseHeader.params.remove('q');
 		}*/
 		
-		return [responseHeader:responseHeader, observationInstanceList:instanceList, instanceTotal:noOfResults, queryParams:queryParams, activeFilters:activeFilters, tags:facetResults, totalObservationIdList:totalObservationIdList]
+		return [responseHeader:responseHeader, observationInstanceList:instanceList, resultType:'observation', instanceTotal:noOfResults, checklistCount:checklistCount, observationCount: noOfResults-checklistCount , queryParams:queryParams, activeFilters:activeFilters, tags:facetResults, totalObservationIdList:totalObservationIdList]
 	}
 	
 	private boolean isValidSortParam(String sortParam) {
@@ -1292,7 +1356,7 @@ class ObservationService {
 					templateMap['userProfileUrl'] = generateLink("SUser", "show", ["id": toUser.id], request)
 				}
 				
-				if ( Environment.getCurrent().getName().equals("pamba")) {
+		if ( Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
 				//if ( Environment.getCurrent().getName().equalsIgnoreCase("development")) {
 		            log.debug "Sending email to ${toUser}"
 					mailService.sendMail {
@@ -1327,7 +1391,7 @@ class ObservationService {
 		}
 	}
 
-	public String generateLink( String controller, String action, linkParams, request) {
+	public String generateLink( String controller, String action, linkParams, request=null) {
 		request = (request) ?:(WebUtils.retrieveGrailsWebRequest()?.getCurrentRequest())
 		userGroupService.userGroupBasedLink(base: Utils.getDomainServerUrl(request),
 				controller:controller, action: action,
@@ -1365,6 +1429,11 @@ class ObservationService {
 		} else
 			return null
 	}
+	
+	def addAnnotation(params, Observation obv){
+		def ann = new Annotation(params)
+			obv.addToAnnotations(ann);
+		}
 
 	def locations(params) {
 		List result = new ArrayList();

@@ -326,7 +326,7 @@ if(r) {
 						</div>
 						
 						<div
-							class="row control-group ${hasErrors(bean: observationInstance, field: 'observedOn', 'error')}">
+							class="row control-group ${hasErrors(bean: observationInstance, field: 'fromDate', 'error')}">
 
 							<label for="observedOn" class="control-label"><i
 								class="icon-calendar"></i>
@@ -335,12 +335,12 @@ if(r) {
 
 							<div class="controls textbox">
 								<input name="observedOn" type="text" id="observedOn" class="input-block-level"
-									value="${observationInstance?.observedOn?.format('dd/MM/yyyy')}"
+									value="${observationInstance?.fromDate?.format('dd/MM/yyyy')}"
 									placeholder="Select date of observation (dd/MM/yyyy)" />
 								
 								<div class="help-inline">
 									<g:hasErrors bean="${observationInstance}" field="observedOn">
-									<g:if test="${observationInstance.observedOn == null}">
+									<g:if test="${observationInstance.fromDate == null}">
 										<g:message code="observation.observedOn.validator.invalid_date" />
 									</g:if>
 									<g:else>

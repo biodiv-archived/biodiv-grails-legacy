@@ -20,9 +20,21 @@
 		<g:if test="${speciesCountWithContent }"><span class="name" style="color: #b1b1b1;"><i
 			class="icon-search"></i></span> ${speciesCountWithContent} species page<g:if test="${speciesCountWithContent>1}">s</g:if> and ${instanceTotal- speciesCountWithContent} species stubs are found</g:if>
 		<g:else>
-		<span class="name" style="color: #b1b1b1;"><i
-			class="icon-search"></i></span> <g:if test="${instanceTotal==0}">No results </g:if><g:else>${instanceTotal} ${resultType?:'observation'}<g:if test="${instanceTotal>1 && resultType != 'species'}">s</g:if></g:else> 
-		 found 
+			<span class="name" style="color: #b1b1b1;"><i
+				class="icon-search"></i></span> <g:if test="${instanceTotal==0}">No results </g:if>
+				<g:elseif test="${resultType != 'observation' }">
+					${instanceTotal} ${resultType}<g:if test="${instanceTotal>1 && resultType != 'species'}">s</g:if>
+				</g:elseif>
+				<g:else>
+					<g:if test="${observationCount}">
+						${observationCount} observation<g:if test="${observationCount>1}">s</g:if>
+					</g:if>
+					<g:if test="${checklistCount}">
+						<g:if test="${observationCount}"> and </g:if>
+						${checklistCount} checklist<g:if test="${checklistCount>1}">s</g:if>
+					</g:if>
+				</g:else> 
+			 found 
 		</g:else>
 		<%
 			boolean dateRangeSet = false	

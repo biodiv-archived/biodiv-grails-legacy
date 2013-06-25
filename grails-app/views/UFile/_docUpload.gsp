@@ -1,5 +1,4 @@
-<% def allowedExtensions = "[ 'pdf']"  %>
-
+<% def allowedExtensions = allowedExtensions?:"[ 'pdf']"  %>
 
 <uploader:uploader id="${name}_uploader"
 	url="${uGroup.createLink(controller:'UFile', action:'fileUpload', userGroupWebaddress:params.webaddress)}"
@@ -19,7 +18,11 @@
 					$('#${name}_path').val(responseJSON.filePath);
 					$('#${name}_name').val(fileName);
 					
-				}			
+				}
+				
+				<g:if test="${uploadCallBack}">
+					${uploadCallBack}
+				</g:if>			
 
 		</uploader:onComplete>	
 </uploader:uploader>

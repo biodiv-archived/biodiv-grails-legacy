@@ -231,7 +231,7 @@ class ObvUtilService {
 									value(obv.reverseGeocodedName)
 								}
 								Data(name:'Observed on') {
-									value(String.format('%tA %<te %<tB %<ty', obv.observedOn))
+									value(String.format('%tA %<te %<tB %<ty', obv.fromDate))
 								}
 								Data(name:'Notes') {
 									value() {
