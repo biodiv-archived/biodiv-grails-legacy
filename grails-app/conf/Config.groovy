@@ -427,7 +427,7 @@ speciesPortal {
 	drupal {
 		getAuthentication = "/getAuthentication.php"
 	}
-	flushImmediately = true
+	flushImmediately = false
 }
 
 speciesPortal.validCrossDomainOrigins = [

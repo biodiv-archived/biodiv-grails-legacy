@@ -63,19 +63,24 @@ def correctChecklist(deleteId, migrateId){
  	
 //checklistUtilService.migrateChecklistAsObs()
 //checklistUtilService.migrateObservationFromChecklist()
-println "================ done "
 
 
 
 
 def migrateObvLocation() {
-   Observation.findAllByTopologyIsNull().each{obv->
-        GeometryFactory geometryFactory = new GeometryFactory();
-        obv.topology = geometryFactory.createPoint(new Coordinate(obv.latitude, obv.longitude));
-		obv.placeName = obv.placeName?:obv.reverseGeocodedName;
-        if(!obv.save(flush:true)) {
-		    obv.errors.allErrors.each { println  it }
-        }
-   }
+	Observation.withTransaction(){
+	   Observation.findAllByTopologyIsNull().each{obv->
+	        GeometryFactory geometryFactory = new GeometryFactory();
+	        obv.topology = geometryFactory.createPoint(new Coordinate(obv.latitude, obv.longitude));
+			obv.placeName = obv.placeName?:obv.reverseGeocodedName;
+	        if(!obv.save(flush:true)) {
+			    obv.errors.allErrors.each { println  it }
+	        }
+	   }
+	}
 }
 migrateObvLocation();
+
+
+println "================ done "
+
