@@ -171,7 +171,7 @@ class ObservationsSearchService {
 		
 		doc.addField(searchFieldsConfig.TITLE, chk.title);
 		doc.removeField(searchFieldsConfig.UPLOADED_ON);
-		doc.addField(searchFieldsConfig.UPLOADED_ON, chk.publicationDate);
+		doc.addField(searchFieldsConfig.UPLOADED_ON, chk.publicationDate?:chk.createdOn);
 		doc.addField(searchFieldsConfig.REFERENCE, chk.refText);
 		doc.addField(searchFieldsConfig.SOURCE_TEXT, chk.sourceText);
 		
