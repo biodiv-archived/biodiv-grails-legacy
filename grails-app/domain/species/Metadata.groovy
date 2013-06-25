@@ -10,13 +10,13 @@ import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Geometry
 
 abstract class Metadata {
-	
+
+    static transients = ['latitude','longitude']
+
     //Geographic Coverage
 	String placeName;
 	String reverseGeocodedName
 	String location;
-	float latitude;
-	float longitude;
 	boolean geoPrivacy = false;
 	String locationAccuracy;
     Geometry topology;
@@ -50,6 +50,16 @@ abstract class Metadata {
         columns {
             topology (type:org.hibernatespatial.GeometryUserType, class:com.vividsolutions.jts.geom.Geometry)
         }
+    }
+
+    double getLatitude() {
+        if(topology)
+            return topology.getCentroid().getX();
+    }
+
+    double getLongitude() {
+        if(topology) 
+            return topology.getCentroid().getY();
     }
 
 }

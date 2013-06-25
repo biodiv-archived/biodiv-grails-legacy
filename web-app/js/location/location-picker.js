@@ -126,15 +126,7 @@ function initArea(drawable) {
             }
         });
         drawControl.addTo(map);
-        map.on('draw:drawstart', function (e) {
-            drawnItems.eachLayer(function (layer) {
-               map.removeLayer(layer)
-            });
-            drawnItems.clearLayers();
-            if(searchMarker)
-                map.removeLayer(searchMarker);
-        });
-
+        map.on('draw:drawstart', clearDrawnItems);
         map.on('draw:created', function (e) {
             var type = e.layerType,
             layer = e.layer;
@@ -143,6 +135,7 @@ function initArea(drawable) {
                 var latlng = layer.getLatLng();
                 searchMarker = set_location(latlng.lat, latlng.lng, searchMarker, {label:'', draggable:true, layer:'Search Marker. Drag Me to set location', selected:true});
             } else {
+                setLatLngFields('','');
                 drawnItems.addLayer(layer);
             }
         });
@@ -155,7 +148,7 @@ function initArea(drawable) {
 }
 
 function adjustBounds() {
-        map.on('dragend', function () {
+    map.on('dragend', function () {
         if (allowedBounds.contains(map.getCenter())) return;
 
         var c = map.getCenter(),
@@ -177,6 +170,18 @@ function adjustBounds() {
 
 
 }
+
+function clearDrawnItems() {
+    if(drawnItems) {
+        drawnItems.eachLayer(function (layer) {
+            map.removeLayer(layer)
+        });
+        drawnItems.clearLayers();
+        if(searchMarker)
+            map.removeLayer(searchMarker);
+    }
+}
+
 
 function addMarker(lat, lng, options) {
     if(!lat || !lng) return;
@@ -234,11 +239,12 @@ function set_location(lat, lng, marker, markerOptions) {
     if(!lat || !lng) return;
 
     $(".location_picker_button").removeClass("active_location_picker_button");
-    if(marker == undefined)
+    if(marker == undefined) {
+        //Dirty HACK to draw either a marker or a polygon
+        clearDrawnItems();
         marker = addMarker(lat, lng, markerOptions);
-    else {
+    } else {
         marker.setLatLng(new M.LatLng(lat, lng));
-        drawnItems(marker);
     }
     if(markerOptions && markerOptions.selected) {
         select_location(marker);
@@ -283,10 +289,15 @@ function select_location(marker) {
         }
     });
 
-    $('#latitude_field').val(marker.getLatLng().lat);
-    $('#longitude_field').val(marker.getLatLng().lng);
-    var dms_lat = convert_DD_to_DMS(marker.getLatLng().lat, 'lat');
-    var dms_lng = convert_DD_to_DMS(marker.getLatLng().lng, 'lng');
+    setLatLngFields(marker.getLatLng().lat, marker.getLatLng().lng);
+   $('#latlng').show();
+}
+
+function setLatLngFields(lat, lng) {
+    $('#latitude_field').val(lat);
+    $('#longitude_field').val(lng);
+    var dms_lat = convert_DD_to_DMS(lat, 'lat');
+    var dms_lng = convert_DD_to_DMS(lng, 'lng');
     $('#latitude_deg_field').val(dms_lat['deg']);
     $('#latitude_min_field').val(dms_lat['min']);
     $('#latitude_sec_field').val(dms_lat['sec']);
@@ -295,7 +306,6 @@ function select_location(marker) {
     $('#longitude_min_field').val(dms_lng['min']);
     $('#longitude_sec_field').val(dms_lng['sec']);
     $('#longitude_direction_field').val(dms_lng['dir']);
-    $('#latlng').show();
 }
 
 function set_date(date){

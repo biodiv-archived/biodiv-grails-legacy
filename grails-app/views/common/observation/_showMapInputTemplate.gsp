@@ -27,13 +27,28 @@
                                 <g:renderErrors bean="${observationInstance}" as="list" field="placeName"/>
                                 </g:hasErrors>
                             </div>
+                    <%
+                    def latitude='',longitude='',areas='';
+                    if(observationInstance?.topology instanceof  com.vividsolutions.jts.geom.Point) {
+                        latitude = observationInstance.topology.getX()
+                        longitude = observationInstance.topology.getY()
+                    } else { 
+                        if(observationInstance?.topology){ 
+                            areas = Utils.GeometryAsWKT(observationInstance?.topology)
+                        } else if(params.areas) {
+                            areas = params.areas
+                        }
+                        if(params.latitude) latitude = params.latitude
+                        if(params.longitude) longitude = params.longitude
+                    }
+                    %>
+                    <input id='areas' type='hidden' name='areas' value='${areas}'></input>
 
-
-                           <div class="input-prepend pull-left control-group ${hasErrors(bean: observationInstance, field: 'latitude', 'error')}" style="width:250px;">
+                    <div class="input-prepend pull-left control-group ${(!latitude && !areas)?'error':''}" style="width:250px;">
                             <span class="add-on" style="vertical-align:middle;">Lat</span>
                             <!-- div class="location_picker_value" id="latitude"></div>
                             <input id="latitude_field" type="hidden" name="latitude"></input-->
-                            <input class="degree_field" id="latitude_field" type="text" name="latitude" value="${observationInstance?.latitude?:''}"></input>
+                            <input class="degree_field" id="latitude_field" type="text" name="latitude" value="${latitude}"></input>
                             <input class="dms_field" id="latitude_deg_field" type="text" name="latitude_deg" placeholder="deg"></input>
                             <input class="dms_field" id="latitude_min_field" type="text" name="latitude_min" placeholder="min"></input>
                             <input class="dms_field" id="latitude_sec_field" type="text" name="latitude_sec" placeholder="sec"></input>
@@ -44,11 +59,11 @@
                                 </g:hasErrors>
 			    </div>
                     </div>
-                    <div class="input-prepend pull-left control-group ${hasErrors(bean: observationInstance, field: 'longitude', 'error')}" style="width:240px;">
+                    <div class="input-prepend pull-left control-group  ${(!longitude && !areas)?'error':''}" style="width:240px;">
                             <span class="add-on" style="vertical-align:middle;">Long</span>
                             <!--div class="location_picker_value" id="longitude"></div>
                             <input id="longitude_field" type="hidden" name="longitude"></input-->
-                            <input class="degree_field" id="longitude_field" type="text" name="longitude" style="width:193px;" value="${observationInstance?.longitude?:''}"></input>
+                            <input class="degree_field" id="longitude_field" type="text" name="longitude" style="width:193px;" value="${longitude}"></input>
                             <input class="dms_field" id="longitude_deg_field" type="text" name="longitude_deg" placeholder="deg"></input>
                             <input class="dms_field" id="longitude_min_field" type="text" name="longitude_min" placeholder="min"></input>
                             <input class="dms_field" id="longitude_sec_field" type="text" name="longitude_sec" placeholder="sec"></input>
@@ -92,8 +107,7 @@
                         </div>
                     </div>
                     </div>
-                    
-                    <input id="areas" type="hidden" name="areas" value="${Utils.GeometryAsWKT(observationInstance?.topology)}"></input>
+
             
             </div>
  
