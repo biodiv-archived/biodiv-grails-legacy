@@ -70,7 +70,8 @@ class Observation extends Metadata implements Taggable, Rateable {
 		resource validator : { val, obj -> val && val.size() > 0 }
 		observedOn validator : {val -> val < new Date()}
 		latitude validator : { val, obj -> 
-            if(!val && !areas) {
+            println obj
+            if(!val && !obj.areas) {
                 return ['default.blank.message', 'Latitude']
             }
 			if(Float.isNaN(val)) {
@@ -81,7 +82,7 @@ class Observation extends Metadata implements Taggable, Rateable {
 			}
 		}
 		longitude validator : { val, obj ->  
-            if(!val && !areas) {
+            if(!val && !obj.areas) {
                 return ['default.blank.message', 'Longitude']
             }
 			if(Float.isNaN(val)) { 

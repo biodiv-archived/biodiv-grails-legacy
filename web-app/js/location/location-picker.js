@@ -39,46 +39,47 @@ function initialize(element, drawable){
     
 //    L.marker(new M.LatLng('6', '68')).addTo(map);
 //    L.marker(new M.LatLng('35', '97')).addTo(map);
-    
-//    M.control.coordinates().addTo(map);
+    initControls();
+    initLocation(drawable);
+    initArea(drawable);
+    //adjustBounds();
+ }
+
+function initControls() {
     geocoder = new G.Geocoder();
-/*    map.on('dragend', function () {
-        if (allowedBounds.contains(map.getCenter())) return;
-
-        var c = map.getCenter(),
-            x = c.lng,
-            y = c.lat,
-            maxX = allowedBounds.getNorthEast().lng,
-            maxY = allowedBounds.getNorthEast().lat,
-            minX = allowedBounds.getSouthWest().lng,
-            minY = allowedBounds.getSouthWest().lat;
-
-        if (x < minX) x = minX;
-        if (x > maxX) x = maxX;
-        if (y < minY) y = minY;
-        if (y > maxY) y = maxY;
-
-        map.panTo(new M.LatLng(y, x));
-    });
-*/
-
-    //set_location(21.07, 79.27);				  
-    //StyledMarkerInit();
-    //M.control.locate().addTo(map);
+//  M.control.coordinates().addTo(map);
+//  M.control.locate().addTo(map);
     selectedIcon = M.AwesomeMarkers.icon({
         icon: 'ok', 
         color: 'red'
     });
     
-//    markers = new M.MarkerClusterGroup();
-//    markers.addTo(map);
+//  markers = new M.MarkerClusterGroup();
+//  markers.addTo(map);
     
     M.control.fullscreen({
           position: 'topleft',
           title: 'View fullscreen !'
     }).addTo(map);
+}
 
-    initLocation(drawable);
+function initLocation(drawable) {
+    var latitude = $('#latitude_field').val();
+    var longitude = $('#longitude_field').val();
+    if(latitude && longitude) {
+        searchMarker = set_location(latitude, longitude, searchMarker, {label:'Selected Location', opacity:1, draggable:drawable, selected:drawable, clickable:drawable});
+        map.panTo(searchMarker.getLatLng());
+        map.on('enterFullscreen', function(){
+            map.panTo(searchMarker.getLatLng());
+        });
+
+        map.on('exitFullscreen', function(){
+            map.panTo(searchMarker.getLatLng());
+        });
+    }
+}
+
+function initArea(drawable) {
     drawnItems = new L.FeatureGroup();
     var areas = $('input#areas').val()
     if(areas) {
@@ -130,6 +131,8 @@ function initialize(element, drawable){
                map.removeLayer(layer)
             });
             drawnItems.clearLayers();
+            if(searchMarker)
+                map.removeLayer(searchMarker);
         });
 
         map.on('draw:created', function (e) {
@@ -147,22 +150,31 @@ function initialize(element, drawable){
  
     }
 
+
+
 }
 
-function initLocation(drawable) {
-    var latitude = $('#latitude_field').val();
-    var longitude = $('#longitude_field').val();
-    if(latitude && longitude) {
-        searchMarker = set_location(latitude, longitude, searchMarker, {label:'Selected Location', opacity:1, draggable:drawable, selected:drawable, clickable:drawable});
-        map.panTo(searchMarker.getLatLng());
-        map.on('enterFullscreen', function(){
-            map.panTo(searchMarker.getLatLng());
-        });
+function adjustBounds() {
+        map.on('dragend', function () {
+        if (allowedBounds.contains(map.getCenter())) return;
 
-        map.on('exitFullscreen', function(){
-            map.panTo(searchMarker.getLatLng());
-        });
-    }
+        var c = map.getCenter(),
+            x = c.lng,
+            y = c.lat,
+            maxX = allowedBounds.getNorthEast().lng,
+            maxY = allowedBounds.getNorthEast().lat,
+            minX = allowedBounds.getSouthWest().lng,
+            minY = allowedBounds.getSouthWest().lat;
+
+        if (x < minX) x = minX;
+        if (x > maxX) x = maxX;
+        if (y < minY) y = minY;
+        if (y > maxY) y = maxY;
+
+        map.panTo(new M.LatLng(y, x));
+    });
+
+
 
 }
 
@@ -177,15 +189,16 @@ function addMarker(lat, lng, options) {
         clickable:true
     }, options);
 
-    var marker = L.marker(location, options).addTo(map);
+    //var marker = new L.Draw.Marker(map, {})._mouseMarker;
+
+    var marker = new L.marker(location, options)
     if(options.label) {
         //marker.bindLabel(options.label).showLabel();
     }
 
 /*    if(options.layer) {
-        if(!overlays[options.layer]) {
-            var layerGroup = new L.LayerGroup([marker])
-            layersControl.addOverlay(layerGroup, options.layer);
+        if(!overlays[optionsa
+            aayersControl.addOverlay(layerGroup, options.layer);
             overlays[options.layer] = layerGroup
         } else {
             overlays[options.layer].addLayer(marker);
@@ -218,11 +231,14 @@ function addMarker(lat, lng, options) {
 }
 
 function set_location(lat, lng, marker, markerOptions) {
+    if(!lat || !lng) return;
+
     $(".location_picker_button").removeClass("active_location_picker_button");
     if(marker == undefined)
         marker = addMarker(lat, lng, markerOptions);
     else {
         marker.setLatLng(new M.LatLng(lat, lng));
+        drawnItems(marker);
     }
     if(markerOptions && markerOptions.selected) {
         select_location(marker);
@@ -231,54 +247,55 @@ function set_location(lat, lng, marker, markerOptions) {
 }
 
 function select_location(marker) {
-        if(marker == undefined) return;
-        if(selectedMarker) { 
-            selectedMarker.setIcon(prevIcon).setOpacity(0.8);
-        }
-        selectedMarker = marker;
-        prevIcon = marker.options.icon;
-        /*if(prevIcon.options.shadowUrl) {
-            //prevIcon.options.shadowUrl = 
-            //selectedMarker.setIcon().setOpacity(1);
-        } else {
-          */  selectedMarker.setIcon(selectedIcon).setOpacity(1);
-       // }
-        var position = selectedMarker.getLatLng();
-        geocoder.geocode({'latLng': new google.maps.LatLng(position.lat, position.lng)}, function(results, status) {
-            if (status == G.GeocoderStatus.OK) {
-                if (results) {
-                    var content = '<ul>';
-                    for(var i=0; i<Math.max(results.length,5); i++) {
-                        content += '<li><span>'+results[i].formatted_address+'</span> <a onclick="useLocation(this);">Use as title</a></li>'
-                    }
-                    content += '</ul>';
-                    selectedMarker.bindPopup(content).openPopup();
-                    
-                    if (results[0]) {
-                        //$('#place_name').val(results[0].formatted_address);
-                        $('#reverse_geocoded_name').html(results[0].formatted_address);
-                        //$('#latitude').html(marker.getLatLng().lat.toFixed(2));
-                        //$('#longitude').html(marker.getLatLng().lng.toFixed(2));
-                        $('#reverse_geocoded_name_field').val(results[0].formatted_address);
-                    }
-
+    if(marker == undefined) return;
+    if(selectedMarker) { 
+        selectedMarker.setIcon(prevIcon).setOpacity(0.8);
+    }
+    selectedMarker = marker;
+    prevIcon = marker.options.icon;
+    /*if(prevIcon.options.shadowUrl) {
+    //prevIcon.options.shadowUrl = 
+    //selectedMarker.setIcon().setOpacity(1);
+    } else {
+    */  selectedMarker.setIcon(selectedIcon).setOpacity(1);
+    // }
+    map.panTo(selectedMarker.getLatLng());
+    var position = selectedMarker.getLatLng();
+    geocoder.geocode({'latLng': new google.maps.LatLng(position.lat, position.lng)}, function(results, status) {
+        if (status == G.GeocoderStatus.OK) {
+            if (results) {
+                var content = '<ul>';
+                for(var i=0; i<Math.max(results.length,5); i++) {
+                    content += '<li><span>'+results[i].formatted_address+'</span> <a onclick="useLocation(this);">Use as title</a></li>'
                 }
-            }
-        });
+                content += '</ul>';
+                selectedMarker.bindPopup(content).openPopup();
 
-        $('#latitude_field').val(marker.getLatLng().lat);
-        $('#longitude_field').val(marker.getLatLng().lng);
-        var dms_lat = convert_DD_to_DMS(marker.getLatLng().lat, 'lat');
-        var dms_lng = convert_DD_to_DMS(marker.getLatLng().lng, 'lng');
-        $('#latitude_deg_field').val(dms_lat['deg']);
-        $('#latitude_min_field').val(dms_lat['min']);
-        $('#latitude_sec_field').val(dms_lat['sec']);
-        $('#latitude_direction_field').val(dms_lat['dir']);
-        $('#longitude_deg_field').val(dms_lng['deg']);
-        $('#longitude_min_field').val(dms_lng['min']);
-        $('#longitude_sec_field').val(dms_lng['sec']);
-        $('#longitude_direction_field').val(dms_lng['dir']);
-        $('#latlng').show();
+                if (results[0]) {
+                    //$('#place_name').val(results[0].formatted_address);
+                    $('#reverse_geocoded_name').html(results[0].formatted_address);
+                    //$('#latitude').html(marker.getLatLng().lat.toFixed(2));
+                    //$('#longitude').html(marker.getLatLng().lng.toFixed(2));
+                    $('#reverse_geocoded_name_field').val(results[0].formatted_address);
+                }
+
+            }
+        }
+    });
+
+    $('#latitude_field').val(marker.getLatLng().lat);
+    $('#longitude_field').val(marker.getLatLng().lng);
+    var dms_lat = convert_DD_to_DMS(marker.getLatLng().lat, 'lat');
+    var dms_lng = convert_DD_to_DMS(marker.getLatLng().lng, 'lng');
+    $('#latitude_deg_field').val(dms_lat['deg']);
+    $('#latitude_min_field').val(dms_lat['min']);
+    $('#latitude_sec_field').val(dms_lat['sec']);
+    $('#latitude_direction_field').val(dms_lat['dir']);
+    $('#longitude_deg_field').val(dms_lng['deg']);
+    $('#longitude_min_field').val(dms_lng['min']);
+    $('#longitude_sec_field').val(dms_lng['sec']);
+    $('#longitude_direction_field').val(dms_lng['dir']);
+    $('#latlng').show();
 }
 
 function set_date(date){
@@ -358,7 +375,7 @@ function update_geotagged_images_list(image) {
 
         if (latlng) {            	
             display += "Lat: " + latlng.lat.toFixed(2) + ", Lon: " + latlng.lng.toFixed(2);
-            func += "set_location(" + latlng.lat+"," +latlng.lng+ ");";
+            func += "set_location(" + latlng.lat+"," +latlng.lng+ ",searchMarker,{selected:true, draggable:true});";
         }
 
 
@@ -375,15 +392,16 @@ function update_geotagged_images_list(image) {
 
         if(latlng || imageDate){
             func += "$(this).addClass('active_location_picker_button');";
-            html = '<div id=' + $(image).attr("id") +' class="location_picker_button" style="display:inline-block;" onclick="' + func + '"><div style="width:40px; height:40px;float:left;"><img style="width:100%; height:100%;" src="' + $(image).attr('src') + '"/></div><div style="float:left; padding:10px;">' + display + '</div></div>';
+            html = '<div class="leaflet-control location_picker_button" style="display:inline-block;" onclick="' + func + '"><div style="width:40px; height:40px;float:left;"><img style="width:100%; height:100%;" src="' + $(image).attr('src') + '"/></div></div>';
             $("#geotagged_images>.title").show();
             $("#geotagged_images>.msg").show();
             $("#geotagged_images").append(html);
             if(latlng) {
                 var iconUrl = $(image).attr('src').replace(/_th.jpg$/, '_gall_th.jpg');
-                addMarker(latlng.lat, latlng.lng, {label:display, icon:new L.Icon({'iconUrl':iconUrl,  iconSize: [50, 50],iconAnchor: [0, 94],popupAnchor: [-3, -76], shadowUrl: window.params.defaultMarkerIcon+"marker-icon.png", shadowAnchor: [12, 44], className:'geotaggedImage'}), draggable:false, layer:'Geotagged Image'});
+                $(".leaflet-control-container .leaflet-top.leaflet-left").append(html);
+            //    addMarker(latlng.lat, latlng.lng, {label:display, icon:new L.Icon({'iconUrl':iconUrl,  iconSize: [50, 50],iconAnchor: [0, 94],popupAnchor: [-3, -76], shadowUrl: window.params.defaultMarkerIcon+"marker-icon.png", shadowAnchor: [12, 44], className:'geotaggedImage'}), draggable:false, layer:'Geotagged Image'});
             }
-            //$("#geotagged_images").trigger('update_map');
+            $("#geotagged_images").trigger('update_map');
         }    		
     });
 }
@@ -409,49 +427,33 @@ function get_latlng_from_image(img) {
 }
 
 
-  function onSuccess(position) {
-      var lat = position.coords.latitude;
-      var lng = position.coords.longitude;
-      var marker = set_location(lat, lng, undefined, {label:'Current Location', layer:'Current Location'});
-      $('#current_location').addClass('active_location_picker_button');  
-      $('#location_info').html('Using auto-detected current location');
-      /*geocoder.geocode({'latLng': marker.getLatLng()}, function(results, status) {
-          if (status == G.GeocoderStatus.OK) {
-              if (results[0]) {
-                  //$('#place_name').val(results[0].formatted_address);
-              }
-          }
-      });*/
-  }
+function onSuccess(position) {
+    var lat = position.coords.latitude;
+    var lng = position.coords.longitude;
+    var marker = set_location(lat, lng, undefined, {label:'Current Location', layer:'Current Location'});
+    $('#current_location').addClass('active_location_picker_button');  
+    $('#location_info').html('Using auto-detected current location');
+}
 
-  function onError(position) {
-      if (google.loader.ClientLocation) {
-          ipLocated = true;
-          var lat = google.loader.ClientLocation.latitude;
-          var lng = google.loader.ClientLocation.longitude;
-          var marker = set_location(lat, lng, undefined, {label:'Current location', layer:'Current Location'});
-          $('#location_info').html('Using auto-detected current location');
-          /*var position = marker.getLatLng();
-          geocoder.geocode({'latLng':  new google.maps.LatLng(position.lat, position.lng)}, function(results, status) {
-              if (status == G.GeocoderStatus.OK) {
-                  if (results[0]) {
-                      $('#place_name').val(results[0].formatted_address);
-                  }
-              }
-          });*/
+function onError(position) {
+    if (google.loader.ClientLocation) {
+        ipLocated = true;
+        var lat = google.loader.ClientLocation.latitude;
+        var lng = google.loader.ClientLocation.longitude;
+        var marker = set_location(lat, lng, undefined, {label:'Current location', layer:'Current Location'});
+        $('#location_info').html('Using auto-detected current location');
+    } else {
+        alert("Unable to detect current location");
+    }
+}
 
-      } else {
-          alert("Unable to detect current location");
-      }
-  }
-
-   function locate() {
-      if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition(onSuccess, onError);
-      } else {
-          alert("Unable to detect current location");
-      }
-  }
+function locate() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(onSuccess, onError);
+    } else {
+        alert("Unable to detect current location");
+    }
+}
 
 function useLocation(obj) {
     $('#placeName').val($(obj).prev().text());

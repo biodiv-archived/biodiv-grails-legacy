@@ -116,17 +116,13 @@ class ObservationService {
 		observation.agreeTerms = (params.agreeTerms?.equals('on'))?true:false;
 		
         GeometryFactory geometryFactory = new GeometryFactory();
-        observation.loc = geometryFactory.createPoint(new Coordinate(observation.latitude, observation.longitude));
-
-        if(params.areas) {
+        if(params.latitude && params.longitude) {
+            observation.topology = geometryFactory.createPoint(new Coordinate(params.latitude?.toFloat(), params.longitude?.toFloat()));
+        } else if(params.areas) {
             WKTReader wkt = new WKTReader();
             try {
                 Geometry geom = wkt.read(params.areas);
-                if(geom instanceof MultiPolygon) {
-                    observation.areas = geom;
-                } else {
-                    log.error "Coverage only supports multipolygon"
-                }
+                observation.topology = geom;
             } catch(ParseException e) {
                 log.error "Error parsing polygon wkt : ${params.areas}"
             }
@@ -1296,7 +1292,7 @@ class ObservationService {
 					templateMap['userProfileUrl'] = generateLink("SUser", "show", ["id": toUser.id], request)
 				}
 				
-				if ( Environment.getCurrent().getName().startsWith("pamba")) {
+				if ( Environment.getCurrent().getName().equals("pamba")) {
 				//if ( Environment.getCurrent().getName().equalsIgnoreCase("development")) {
 		            log.debug "Sending email to ${toUser}"
 					mailService.sendMail {

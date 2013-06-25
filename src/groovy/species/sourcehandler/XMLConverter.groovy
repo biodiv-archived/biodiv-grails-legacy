@@ -788,18 +788,22 @@ class XMLConverter extends SourceConverter {
             }
         } 
 
-        if(!tempFile.exists() && sourceUrl) {
-            //downloading from web
-            def tempdir = new File(config.speciesPortal.images.uploadDir, "images");
-            if(!tempdir.exists()) {
-                tempdir.mkdir();
+        if(!tempFile.exists())
+            if(sourceUrl) {
+                //downloading from web
+                def tempdir = new File(config.speciesPortal.images.uploadDir, "images");
+                if(!tempdir.exists()) {
+                    tempdir.mkdir();
+                }
+                try {
+                    tempFile = HttpUtils.download(sourceUrl, tempdir, false);
+                } catch (FileNotFoundException e) {
+                    log.error e.getMessage();
+                    tempFile = null;
+                }
+            } else {
+                tempFile = null;
             }
-            try {
-                tempFile = HttpUtils.download(sourceUrl, tempdir, false);
-            } catch (FileNotFoundException e) {
-                log.error e.getMessage();
-            }
-
         }
         return tempFile;
     }
