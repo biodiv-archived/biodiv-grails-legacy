@@ -26,5 +26,26 @@
 		</div>
 
 	</g:if>
+	
+	<g:if test="${projectInstance.proposalFiles}">
+		<div class="file-image">
+			Project Proposal
+		</div>
+
+	</g:if>
+	
+	<g:if test="${projectInstance.reportFiles}">
+	
+		<div class="file-image">	
+				Project Report
+		</div>
+
+	</g:if>
+	
+	<g:if test="${projectInstance.miscFiles}">
+		<div class="file-image">Miscellaneous</div>
+
+
+	</g:if>
 
 </div>

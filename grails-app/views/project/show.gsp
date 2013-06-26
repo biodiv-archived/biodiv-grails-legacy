@@ -2,10 +2,13 @@
 <%@ page import="content.Project"%>
 <html>
 <head>
-<g:set var="canonicalUrl" value="${uGroup.createLink([controller:'project', action:'show', id:projectInstance.id, base:Utils.getIBPServerDomain()])}"/>
-<g:set var="title" value="${projectInstance.title}"/>
-<g:set var="description" value="${Utils.stripHTML(projectInstance.summary?:'')?:''}" />
-<g:render template="/common/titleTemplate" model="['title':title, 'description':description, 'canonicalUrl':canonicalUrl]"/>
+<g:set var="canonicalUrl"
+	value="${uGroup.createLink([controller:'project', action:'show', id:projectInstance.id, base:Utils.getIBPServerDomain()])}" />
+<g:set var="title" value="${projectInstance.title}" />
+<g:set var="description"
+	value="${Utils.stripHTML(projectInstance.summary?:'')?:''}" />
+<g:render template="/common/titleTemplate"
+	model="['title':title, 'description':description, 'canonicalUrl':canonicalUrl]" />
 
 <r:require modules="content_view" />
 
@@ -309,16 +312,20 @@
 					<div id="data-links" class="speciesField collapse in">
 
 						<g:each in="${projectInstance?.dataLinks}" var="dataLink">
-							<dl class="dl-horizontal">
-								<dt>Description</dt>
-								<dd>
-									${dataLink.description}
-								</dd>
-								<dt>URL</dt>
-								<dd class="linktext">
-									${dataLink.url}
-								</dd>
-							</dl>
+							<table>
+								<tr>
+									<td class="prop" style="vertical-align:top;"><span class="name">Description</span></td>
+									<td>
+										${dataLink.description}
+									</td>
+								</tr>
+								<tr>
+									<td></td>
+									<td class="linktext">
+										<a target="_blank" href="${dataLink.url}">DataLink</a>
+									</td>
+								</tr>
+							</table>
 						</g:each>
 					</div>
 				</div>

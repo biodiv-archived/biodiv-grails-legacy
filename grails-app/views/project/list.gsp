@@ -2,8 +2,8 @@
 <%@ page import="content.Project"%>
 <html>
 <head>
-<g:set var="title" value="Projects"/>
-<g:render template="/common/titleTemplate" model="['title':title]"/>
+<g:set var="title" value="Projects" />
+<g:render template="/common/titleTemplate" model="['title':title]" />
 <r:require modules="content_view" />
 
 <style>
@@ -26,11 +26,17 @@
 
 .thumbnails>.thumbnail {
 	margin: 0 0 10px 0px;
-        width:100%;
+	width: 100%;
 }
 
-
-
+.file-image {
+	float: left;
+	background-image: url(/biodiv/images/tick.png);
+	background-repeat: no-repeat;
+	padding: 10px 10px 10px 28px;
+	margin: 10px;
+	font-weight: bold;
+}
 </style>
 
 </head>
@@ -40,15 +46,14 @@
 		<g:render template="/project/projectSubMenuTemplate"
 			model="['entityName':'Western Ghats CEPF Projects']" />
 		<uGroup:rightSidebar />
-		<div class="span8 right-shadow-box"
-			style="margin: 0px;">
+		<div class="span8 right-shadow-box" style="margin: 0px;">
 			<g:render template="/project/search" model="['params':params]" />
-			
+
 			<obv:showObservationFilterMessage />
-			
+
 			<div class="observations_list_wrapper" style="top: 0px;">
-                            <g:render template="/project/projectListTemplate" />
-                        </div>
+				<g:render template="/project/projectListTemplate" />
+			</div>
 
 		</div>
 		<g:render template="/project/projectSidebar" />
