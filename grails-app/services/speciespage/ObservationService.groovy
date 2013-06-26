@@ -115,7 +115,7 @@ class ObservationService {
 
 		observation.agreeTerms = (params.agreeTerms?.equals('on'))?true:false;
 		
-        GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4240);
+        GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), grailsApplication.config.speciesPortal.maps.SRID);
         if(params.latitude && params.longitude) {
             observation.topology = geometryFactory.createPoint(new Coordinate(params.latitude?.toFloat(), params.longitude?.toFloat()));
         } else if(params.areas) {
@@ -816,7 +816,7 @@ class ObservationService {
         arr[2] = p3
         arr[3] = p4
         arr[4] = p1
-        def gf = new GeometryFactory(new PrecisionModel(), 4240)
+        def gf = new GeometryFactory(new PrecisionModel(), grailsApplication.config.speciesPortal.maps.SRID)
         def lr = gf.createLinearRing(arr)
         def pl = gf.createPolygon(lr, null)
         return pl

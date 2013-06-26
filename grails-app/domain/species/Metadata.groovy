@@ -66,10 +66,4 @@ abstract class Metadata {
         if(topology) 
             return topology.getCentroid().getY();
     }
-<<<<<<< HEAD
-
-=======
-*/	
-	
->>>>>>> 64a00c45ec3ca8f933baab6df7914356a2353efe
 }
