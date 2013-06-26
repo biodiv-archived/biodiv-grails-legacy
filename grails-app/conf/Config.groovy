@@ -411,6 +411,7 @@ speciesPortal {
 		CORRIDOR = "corridor"
 		DESCRIPTION = "description"
 		TYPE = "type"
+        TOPOLOGY = "topology"
 	}
 
 	nameSearchFields {

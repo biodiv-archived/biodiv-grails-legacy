@@ -40,8 +40,8 @@ function initialize(element, drawable){
 //    L.marker(new M.LatLng('6', '68')).addTo(map);
 //    L.marker(new M.LatLng('35', '97')).addTo(map);
     initControls();
-    initLocation(drawable);
     initArea(drawable);
+    initLocation(drawable);
     //adjustBounds();
  }
 
@@ -81,36 +81,7 @@ function initLocation(drawable) {
 
 function initArea(drawable) {
     drawnItems = new L.FeatureGroup();
-    var areas = $('input#areas').val()
-    if(areas) {
-        var wkt = new Wkt.Wkt();
-        try { // Catch any malformed WKT strings
-            wkt.read(areas);
-        } catch (e1) {
-            try {
-                wkt.read(el.value.replace('\n', '').replace('\r', '').replace('\t', ''));
-            } catch (e2) {
-                if (e2.name === 'WKTError') {
-                    alert('Wicket could not understand the WKT string you entered. Check that you have parentheses balanced, and try removing tabs and newline characters.');
-                    return;
-                }
-            }
-        }
-        obj = wkt.toObject(); // Make an object
-        if (Wkt.isArray(obj)) { // Distinguish multigeometries (Arrays) from objects
-            for (i in obj) {
-                if (obj.hasOwnProperty(i) && !Wkt.isArray(obj[i])) {
-                    drawnItems.addLayer(obj[i]);
-                }
-            }
-        } else {
-            drawnItems.addLayer(obj);
-            map.fitBounds(obj.getBounds());                   
-        }
-    }
-
-    map.addLayer(drawnItems);
-
+    
     if(drawable) {
         var drawControl = new M.Control.Draw({
             draw:{
@@ -139,12 +110,52 @@ function initArea(drawable) {
                 drawnItems.addLayer(layer);
             }
         });
-
- 
     }
+    
+    var areas = $('input#areas').val()
+    if(areas) {
+        drawArea(areas);
+     }
+    map.addLayer(drawnItems);
+}
 
-
-
+function drawArea(areas) {
+    if(!areas) return;
+    var wkt = new Wkt.Wkt();
+    try { // Catch any malformed WKT strings
+        wkt.read(areas);
+    } catch (e1) {
+        try {
+            wkt.read(el.value.replace('\n', '').replace('\r', '').replace('\t', ''));
+        } catch (e2) {
+            if (e2.name === 'WKTError') {
+                alert('Wicket could not understand the WKT string you entered. Check that you have parentheses balanced, and try removing tabs and newline characters.');
+                return;
+            }
+        }
+    }
+    obj = wkt.toObject(); // Make an object
+    //TODO:For now assuming ui will restrict creation of geometry collection
+/*    if (Wkt.isArray(obj)) { // Distinguish multigeometries (Arrays) from objects
+        for (i in obj) {
+            if (obj.hasOwnProperty(i) && !Wkt.isArray(obj[i])) {
+                drawnItems.addLayer(obj[i]);
+            }
+        }
+    } else {*/
+        if(obj.constructor === L.Marker || obj.constructor === L.marker) {
+            console.log('setting marker')
+            console.log(obj);
+            var latlng = obj.getLatLng();
+            searchMarker = set_location(latlng.lng, latlng.lat, searchMarker, {draggable:true, layer:'Search Marker. Drag Me to set location', selected:true});
+            setLatLngFields(latlng.lng, latlng.lat);
+            map.panTo(obj.getLatLng());                   
+        } else {
+            drawnItems.addLayer(obj);
+            $('input#areas').val(areas);
+            map.fitBounds(obj.getBounds());                   
+        }
+//    }
 }
 
 function adjustBounds() {
@@ -271,7 +282,7 @@ function select_location(marker) {
         if (status == G.GeocoderStatus.OK) {
             if (results) {
                 var content = '<ul>';
-                for(var i=0; i<Math.max(results.length,5); i++) {
+                for(var i=0; i<Math.min(results.length,5); i++) {
                     content += '<li><span>'+results[i].formatted_address+'</span> <a onclick="useLocation(this);">Use as title</a></li>'
                 }
                 content += '</ul>';
@@ -502,8 +513,7 @@ $(document).ready(function() {
                     r.push( {
                         label: item.location[0]+' ('+item.location[1]+')',
                         value: item.location[0],
-                        latitude: item.latlong.split(',')[0],
-                        longitude: item.latlong.split(',')[1],
+                        topology:item.topology,
                         category:item.category
                     })
                 })
@@ -515,8 +525,11 @@ $(document).ready(function() {
       },
 
       select: function(event, ui) {
-        searchMarker = set_location(ui.item.latitude, ui.item.longitude, searchMarker, {label:ui.item.label, draggable:true, layer:'Search Marker. Drag Me to set location', selected:true});
-        $('#location_info').html('You have selected this location');
+        var latitude='', longitude='';
+        if(ui.item.topology) {
+            drawArea(ui.item.topology);
+            $('input#areas').val(ui.item.topology);
+        } 
       },
 
     focus: function(event, ui) {

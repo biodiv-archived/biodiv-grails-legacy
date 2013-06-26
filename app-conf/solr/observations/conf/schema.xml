@@ -243,6 +243,7 @@
 		<field name="habitat" type="long" indexed="true" required="true"/>
 		<!-- fieldtype location cannot be multivalued -->
 		<field name="latlong" type="location" indexed="true" multiValued="false"/>
+		<field name="topology" type="textExact" indexed="true" multiValued="false" />
 				
 		<field name="name" type="taxonText" indexed="true" multiValued="true" />
 		<field name="common_name" type="taxonText" indexed="true" multiValued="true" />
