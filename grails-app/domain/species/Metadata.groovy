@@ -10,9 +10,7 @@ import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Geometry
 
 abstract class Metadata {
-	//static transients = ['latitude','longitude']  
-
-    static transients = ['latitude', 'longitude']
+	static transients = ['latitude', 'longitude']
 
     //Geographic Coverage
 	String placeName;
@@ -43,10 +41,10 @@ abstract class Metadata {
 		placeName(nullable:true)
 		reverseGeocodedName(nullable:true)
 		//location(nullable: true, blank:true)
-		latitude(nullable: true)
-		longitude(nullable:true)
+		//latitude(nullable: true)
+		//longitude(nullable:true)
 		locationAccuracy(nullable: true)
-        //topology(nullable:false)
+        topology(nullable:false)
 		fromDate (nullable:true)
 		toDate (nullable:true)
     }
@@ -66,10 +64,5 @@ abstract class Metadata {
         if(topology) 
             return topology.getCentroid().getY();
     }
-<<<<<<< HEAD
 
-=======
-*/	
-	
->>>>>>> 64a00c45ec3ca8f933baab6df7914356a2353efe
 }

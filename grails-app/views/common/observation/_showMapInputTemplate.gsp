@@ -21,7 +21,7 @@
                             <span class="add-on" style="vertical-align:middle;"><i class="icon-chevron-down"></i></span>
                             <div id="suggestions" style="display: block;white-space:normal;font-size:14px;text-align:left;z-index:3;"></div>
                     </div>
-                    <div id="latlng" class="control-group ${hasErrors(bean: observationInstance, field: 'placeName', 'error')}" style="${(hasErrors(bean: observationInstance, field: 'placeName', 'error')||  hasErrors(bean: observationInstance, field: 'latitude', 'error')|| hasErrors(bean: observationInstance, field: 'longitude', 'error'))?'':'display:none'}">
+                    <div id="latlng" class="control-group ${hasErrors(bean: observationInstance, field: 'placeName', 'error')}" style="${(hasErrors(bean: observationInstance, field: 'topology', 'error'))?'':'display:none'}">
                             <div class="help-inline">
                                 <g:hasErrors bean="${observationInstance}" field="placeName">
                                 <g:renderErrors bean="${observationInstance}" as="list" field="placeName"/>
@@ -29,7 +29,7 @@
                             </div>
                     <input id='areas' type='hidden' name='areas' value='${observationInstance?.topology?Utils.GeometryAsWKT(observationInstance?.topology):params.areas}'></input>
 
-                    <div class="input-prepend pull-left control-group" style="width:250px;">
+                    <div class="input-prepend pull-left control-group  ${hasErrors(bean: observationInstance, field: 'topology', 'error')}" style="width:250px;">
                             <span class="add-on" style="vertical-align:middle;">Lat</span>
                             <!-- div class="location_picker_value" id="latitude"></div>
                             <input id="latitude_field" type="hidden" name="latitude"></input-->
@@ -39,12 +39,12 @@
                             <input class="dms_field" id="latitude_sec_field" type="text" name="latitude_sec" placeholder="sec"></input>
                             <input class="dms_field" id="latitude_direction_field" type="text" name="latitude_direction" placeholder="N/E"></input>
                             <div class="help-inline">
-                                <g:hasErrors bean="${observationInstance}" field="latitude">
-                                <g:renderErrors bean="${observationInstance}" as="list" field="latitude"/>
+                                <g:hasErrors bean="${observationInstance}" field="topology">
+                                	<g:message code="observation.suggest.location" />
                                 </g:hasErrors>
 			    </div>
                     </div>
-                    <div class="input-prepend pull-left control-group" style="width:240px;">
+                    <div class="input-prepend pull-left control-group ${hasErrors(bean: observationInstance, field: 'topology', 'error')}" style="width:240px;">
                             <span class="add-on" style="vertical-align:middle;">Long</span>
                             <!--div class="location_picker_value" id="longitude"></div>
                             <input id="longitude_field" type="hidden" name="longitude"></input-->
@@ -54,8 +54,7 @@
                             <input class="dms_field" id="longitude_sec_field" type="text" name="longitude_sec" placeholder="sec"></input>
                             <input class="dms_field" id="longitude_direction_field" type="text" name="longitude_direction" placeholder="N/E"></input>
                             <div class="help-inline">
-                                <g:hasErrors bean="${observationInstance}" field="longitude">
-                                <g:renderErrors bean="${observationInstance}" as="list" field="longitude"/>
+                                <g:hasErrors bean="${observationInstance}" field="topology">
                                 </g:hasErrors>
                             </div>
                     </div>

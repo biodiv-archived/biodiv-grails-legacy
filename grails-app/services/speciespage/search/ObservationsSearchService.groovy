@@ -83,7 +83,7 @@ class ObservationsSearchService {
 
 		obvs.each { obv ->
 			log.debug "Reading Observation : "+obv.id;
-			if(!obv.isDeleted && obv.isShowable) {
+			if(!obv.isDeleted) {
 				SolrInputDocument doc = new SolrInputDocument();
 				doc.addField(searchFieldsConfig.ID, obv.id.toString());
 				addNameToDoc(obv, doc);
