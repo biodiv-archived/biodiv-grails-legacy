@@ -81,7 +81,7 @@ class ChecklistUtilService {
 		def m = GrailsDomainBinder.getMapping(ActivityFeed.class)
 		m.autoTimestamp = false
 		//[Checklist.get(4)].each { Checklist cl ->
-		//def cids = [12, 13]
+		//def cids = [1]
 		def cids = Checklist.listOrderById().collect { it.id}
 		cids.each { id ->
 			//loading all rows in one query
@@ -288,13 +288,13 @@ class ChecklistUtilService {
 		
 		observation.reverseGeocodedName = params.reverse_geocoded_name;
 		observation.placeName = params.place_name?:observation.reverseGeocodedName;
-		observation.location = 'POINT(' + params.longitude + ' ' + params.latitude + ')'
+		//observation.location = 'POINT(' + params.longitude + ' ' + params.latitude + ')'
 		observation.locationAccuracy = params.location_accuracy;
 		observation.geoPrivacy = false;
 
 		
-		observation.latitude = params.latitude.toFloat();
-		observation.longitude = params.longitude.toFloat();
+		//observation.latitude = params.latitude.toFloat();
+		//observation.longitude = params.longitude.toFloat();
 		
 				
 		GeometryFactory geometryFactory = new GeometryFactory();

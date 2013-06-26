@@ -279,12 +279,12 @@ class Observation extends Metadata implements Taggable, Rateable {
 	}
 
 	//XXX: comment this method before checklist migration
-	def beforeUpdate(){
-		if(isDirty() && !isDirty('visitCount')){
-			updateIsShowable()
-			lastRevised = new Date();
-		}
-	}
+//	def beforeUpdate(){
+//		if(isDirty() && !isDirty('visitCount')){
+//			updateIsShowable()
+//			lastRevised = new Date();
+//		}
+//	}
 	
 	def beforeInsert(){
 		updateIsShowable()
