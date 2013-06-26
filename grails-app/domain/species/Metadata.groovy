@@ -14,7 +14,7 @@ abstract class Metadata {
     //Geographic Coverage
 	String placeName;
 	String reverseGeocodedName
-	String location;
+	//String location;
 	boolean geoPrivacy = false;
 	String locationAccuracy;
     Geometry topology;
@@ -39,7 +39,7 @@ abstract class Metadata {
     static constraints = {
 		placeName(nullable:true)
 		reverseGeocodedName(nullable:true)
-		location(nullable: true)
+		//location(nullable: true, blank:true)
 		latitude(nullable: true)
 		longitude(nullable:true)
 		locationAccuracy(nullable: true)
@@ -63,5 +63,14 @@ abstract class Metadata {
         if(topology) 
             return topology.getCentroid().getY();
     }
-*/
+	
+	def setLatitude(latitude) {
+		//println "===" + Thread.dumpStack()
+	}
+
+	def setLongitude(longitude) {
+		//println Thread.dumpStack()
+	}
+*/	
+	
 }
