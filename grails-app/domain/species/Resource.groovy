@@ -1,6 +1,7 @@
 package species
 
 import species.participation.Observation;
+import species.utils.ImageUtils;
 import species.utils.Utils;
 import org.grails.rateable.*
 
@@ -38,7 +39,7 @@ class Resource implements Rateable {
 	String description;
 	String mimeType; //TODO:validate
     int rating = 0;
-
+	String baseUrl; 
 	def grailsApplication
 
 	static hasMany = [contributors:Contributor, attributors:Contributor, speciesFields:SpeciesField, observation:Observation, licenses:License];
@@ -58,14 +59,15 @@ class Resource implements Rateable {
         rating(nullable:false, min:0, max:5);
     }
 	
-	String thumbnailUrl(String baseUrl=null) {
+	static transients = ['baseUrl']
+	
+	String thumbnailUrl() {
 		String thumbnailUrl = '';
-        if(!baseUrl) 
-            baseUrl = grailsApplication.config.speciesPortal.observations.serverURL
-
+		this.baseUrl = this.baseUrl ?:grailsApplication.config.speciesPortal.observations.serverURL
 		switch(type) {
 			case  ResourceType.IMAGE :
-				thumbnailUrl = baseUrl + "/" + this.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.thumbnail.suffix);
+				thumbnailUrl = this.baseUrl + "/" + ImageUtils.getFileName(this.fileName, null, null)
+				//thumbnailUrl = baseUrl + "/" + this.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.thumbnail.suffix);
 				break;
 			case ResourceType.VIDEO :				
 				String videoId = Utils.getYouTubeVideoId(this.url);

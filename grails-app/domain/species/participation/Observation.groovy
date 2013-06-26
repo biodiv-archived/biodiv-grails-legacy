@@ -1,5 +1,6 @@
 package species.participation
 
+import species.utils.ImageType;
 import species.utils.Utils
 import org.grails.taggable.*
 import groovy.sql.Sql;
@@ -122,10 +123,12 @@ class Observation extends Metadata implements Taggable, Rateable {
 	 * TODO: return resources in rating order and choose first
 	 * @return
 	 */
-	Resource mainImage() {
+	Resource mainImage(ImageType type = ImageType.NORMAL) {
 		def res = listResourcesByRating(1);
         if(res) 
             return res[0]
+		else
+			return group.icon(type)
 	}
 
 	/**

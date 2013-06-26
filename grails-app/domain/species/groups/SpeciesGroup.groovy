@@ -42,7 +42,7 @@ class SpeciesGroup {
 			name = ImageUtils.getFileName(name, type, '.png');
 		}
 		
-		return new Resource(fileName:"group_icons/speciesGroups/${name}", type:ResourceType.ICON, title:"You can contribute!!!");
+		return new Resource(fileName:"group_icons/speciesGroups/${name}", type:ResourceType.IMAGE, title:"You can contribute!!!", baseUrl:grailsApplication.config.grails.serverURL+'/images');
 	}
 
 	/* (non-Javadoc)
