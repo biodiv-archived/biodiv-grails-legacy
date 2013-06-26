@@ -26,6 +26,7 @@ function initialize(element, drawable){
     var viewBounds = new M.LatLngBounds(new M.LatLng('8', '59'), new M.LatLng('45', '105'));
     var ggl = new M.Google('HYBRID');
     map = new M.Map(element, {
+        crs:L.CRS.EPSG4326,
         center:allowedBounds.getCenter(),
         maxBounds:viewBounds,
         zoom:5,

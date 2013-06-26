@@ -30,7 +30,6 @@
 
                         if(!latitude && params.latitude) latitude = params.latitude
                         if(!longitude && params.longitude) longitude = params.longitude
-            
 
                 %>
                 <span class="name"><i class="icon-map-marker"> </i>Coordinates</span>

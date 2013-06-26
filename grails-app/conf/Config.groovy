@@ -238,8 +238,8 @@ speciesPortal {
 		serverURL = "http://localhost/${appName}/observations"
 		//serverURL = "http://localhost/${appName}/observations"
 		MAX_IMAGE_SIZE = 104857600
-	}
-	userGroups {
+	} 
+	 userGroups {
 		rootDir = "${app.rootDir}/userGroups"
 		serverURL = "http://localhost/${appName}/userGroups"
 		//serverURL = "http://localhost/${appName}/userGroups"
@@ -261,6 +261,10 @@ speciesPortal {
 		serverURL = "http://localhost/${appName}/checklist"
 		checklistDownloadDir = "${download.rootDir}/checklist"
 	}
+
+    maps {
+        SRID = 4326;
+    }
 
 	content{
 		rootDir = "${app.rootDir}/content"
@@ -465,7 +469,7 @@ environments {
 			}
 		}
 		google.analytics.enabled = false
-		grails.resources.debug = true
+		grails.resources.debug = false
 		
 		grails {
 			mail {
