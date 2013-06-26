@@ -10,6 +10,7 @@ import java.util.List;
 //csv related
 import au.com.bytecode.opencsv.CSVReader
 import au.com.bytecode.opencsv.CSVWriter;
+import com.vividsolutions.jts.geom.Coordinate
 
 
 import species.auth.SUser
@@ -27,6 +28,13 @@ import species.participation.curation.UnCuratedVotes;
 import species.utils.Utils;
 import species.participation.RecommendationVote.ConfidenceType
 import species.participation.curation.UnCuratedCommonNames
+
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.io.WKTReader;
+import com.vividsolutions.jts.io.ParseException;
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Coordinate
+import com.vividsolutions.jts.geom.GeometryFactory
 
 import static species.participation.ChecklistService.*
 /**
@@ -123,7 +131,7 @@ class ChecklistUtilService {
 				ignoreset << cl.id
 			}else{
 				log.debug " =============================================  STARTING cheklist $cl.id   $cl.title"
-				log.debug " =============================================  observations " +  cl.speciesCount
+				//log.debug " =============================================  observations " +  cl.speciesCount
 				try{
 					createMetaObservation(cl)
 					created++
@@ -281,10 +289,31 @@ class ChecklistUtilService {
 		observation.reverseGeocodedName = params.reverse_geocoded_name;
 		observation.placeName = params.place_name?:observation.reverseGeocodedName;
 		observation.location = 'POINT(' + params.longitude + ' ' + params.latitude + ')'
-		observation.latitude = params.latitude.toFloat();
-		observation.longitude = params.longitude.toFloat();
 		observation.locationAccuracy = params.location_accuracy;
 		observation.geoPrivacy = false;
+
+		
+		observation.latitude = params.latitude.toFloat();
+		observation.longitude = params.longitude.toFloat();
+		
+				
+		GeometryFactory geometryFactory = new GeometryFactory();
+		if(params.latitude && params.longitude) {
+			observation.topology = geometryFactory.createPoint(new Coordinate(params.latitude?.toFloat(), params.longitude?.toFloat()));
+		} else if(params.areas) {
+			WKTReader wkt = new WKTReader();
+			try {
+				Geometry geom = wkt.read(params.areas);
+				observation.topology = geom;
+			} catch(ParseException e) {
+				log.error "Error parsing polygon wkt : ${params.areas}"
+			}
+		}
+		
+		if(!observation.topology){
+			println  "error ============================================= " + oldCl
+		}
+		
 		observation.habitat = Habitat.get(params.habitat_id);
 		observation.agreeTerms = (params.agreeTerms?.equals('on'))?true:false;
 		

@@ -108,6 +108,17 @@ class ObservationService {
 		observation.location = 'POINT(' + params.longitude + ' ' + params.latitude + ')'
 		observation.locationAccuracy = params.location_accuracy?:params.locationAccuracy;
 		observation.geoPrivacy = false;
+
+		//XXX remove this after migration		
+		if(params.latitude) {
+          observation.latitude = params.latitude?.toFloat();
+       }
+       if(params.longitude) {
+        observation.longitude = params.longitude?.toFloat();
+      }
+		
+		
+		
 		observation.habitat = params.habitat?:Habitat.get(params.habitat_id);
 
 		observation.agreeTerms = (params.agreeTerms?.equals('on'))?true:false;
