@@ -10,6 +10,7 @@ import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Geometry
 
 abstract class Metadata {
+	//static transients = ['latitude','longitude']  
 
     //Geographic Coverage
 	String placeName;
@@ -63,14 +64,6 @@ abstract class Metadata {
         if(topology) 
             return topology.getCentroid().getY();
     }
-	
-	def setLatitude(latitude) {
-		//println "===" + Thread.dumpStack()
-	}
-
-	def setLongitude(longitude) {
-		//println Thread.dumpStack()
-	}
 */	
 	
 }
