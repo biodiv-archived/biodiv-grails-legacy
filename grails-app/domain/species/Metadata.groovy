@@ -11,6 +11,8 @@ import com.vividsolutions.jts.geom.Geometry
 
 abstract class Metadata {
 
+    static transients = ['latitude', 'longitude']
+
     //Geographic Coverage
 	String placeName;
 	String reverseGeocodedName
@@ -20,8 +22,8 @@ abstract class Metadata {
     Geometry topology;
      
 	//XXX to be remove after all migration and api changes
-	float latitude;
-	float longitude;
+//	float latitude;
+//	float longitude;
 	
     //Taxonomic Coverage
     SpeciesGroup group;
@@ -53,7 +55,7 @@ abstract class Metadata {
             topology (type:org.hibernatespatial.GeometryUserType, class:com.vividsolutions.jts.geom.Geometry)
         }
     }
-/*
+
     double getLatitude() {
         if(topology)
             return topology.getCentroid().getX();
@@ -63,5 +65,5 @@ abstract class Metadata {
         if(topology) 
             return topology.getCentroid().getY();
     }
-*/
+
 }

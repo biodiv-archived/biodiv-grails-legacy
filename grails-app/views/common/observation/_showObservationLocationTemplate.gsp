@@ -19,30 +19,22 @@
 	<div class="prop">
                 <%
                     def latitude='',longitude='',areas='';
-                    if(observationInstance?.topology instanceof  com.vividsolutions.jts.geom.Point) {
-                        latitude = observationInstance.topology.getX()
-                        longitude = observationInstance.topology.getY()
-                    } else { 
+                        latitude = observationInstance.latitude
+                        longitude = observationInstance.latitude
+                        
                         if(observationInstance?.topology){ 
                             areas = Utils.GeometryAsWKT(observationInstance?.topology)
                         } else if(params.areas) {
                             areas = params.areas
                         }
-                        if(params.latitude) latitude = params.latitude
-                        if(params.longitude) longitude = params.longitude
+
+                        if(!latitude && params.latitude) latitude = params.latitude
+                        if(!longitude && params.longitude) longitude = params.longitude
                     }
 
                 %>
-                <g:if test="${latitude && longitude}">
-		    <span class="name"><i class="icon-map-marker"> </i>Coordinates</span>
-                    <div class="value">${latitude},${longitude}</div>
-                </g:if>
-                <g:elseif test="${areas}">
-                     <span class="name"><i class="icon-map-marker"> </i>Centroid</span>
-                     <%def centroid = observationInstance.topology.getCentroid()%>
-                     <div class="value">${(double)Math.round(centroid.getX() * 1000000) / 1000000},${(double)Math.round(centroid.getY() * 1000000) / 1000000}</div>
-
-                </g:elseif>
+                <span class="name"><i class="icon-map-marker"> </i>Coordinates</span>
+                <div class="value">${latitude},${longitude}</div>
 
                 <input id='areas' type='hidden' name='areas' value='${areas}'></input>
                

@@ -51,6 +51,7 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.io.WKTReader;
 import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.PrecisionModel;
 
 class ObservationService {
 
@@ -66,6 +67,7 @@ class ObservationService {
 	def userGroupService;
 	def activityFeedService;
 	def mailService;
+	def sessionFactory;
 	
 	static final String OBSERVATION_ADDED = "observationAdded";
 	static final String SPECIES_RECOMMENDED = "speciesRecommended";
@@ -123,11 +125,11 @@ class ObservationService {
 
 		observation.agreeTerms = (params.agreeTerms?.equals('on'))?true:false;
 		
-        GeometryFactory geometryFactory = new GeometryFactory();
+        GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4240);
         if(params.latitude && params.longitude) {
             observation.topology = geometryFactory.createPoint(new Coordinate(params.latitude?.toFloat(), params.longitude?.toFloat()));
         } else if(params.areas) {
-            WKTReader wkt = new WKTReader();
+            WKTReader wkt = new WKTReader(geometryFactory);
             try {
                 Geometry geom = wkt.read(params.areas);
                 observation.topology = geom;
@@ -647,6 +649,13 @@ class ObservationService {
 	 * max: limit results to max: if max = -1 return all results
 	 * offset: offset results: if offset = -1 its not passed to the 
 	 * executing query
+     Spatial Query format 
+        //create your query 
+        Query q = session.createQuery(< your hql > ); 
+        Geometry geom = < your parameter value> 
+        //now first create a custom type 
+        Type geometryType = new CustomType(GeometryUserType.class, null); 
+        q.setParameter(:geoExp0, geom, geometryType); 
 	 */
 	Map getFilteredObservations(params, max, offset, isMapView) {
 
@@ -656,7 +665,6 @@ class ObservationService {
 
         if(isMapView) {
 			query = queryParts.mapViewQuery + queryParts.filterQuery + queryParts.orderByClause
-			checklistCount = Observation.executeQuery(queryParts.checklistCountQuery, queryParts.queryParams)[0]
 		} else {
 			query += queryParts.filterQuery + queryParts.orderByClause
 			if(max != -1)
@@ -664,27 +672,40 @@ class ObservationService {
 			if(offset != -1)
 				queryParts.queryParams["offset"] = offset
 		}
-		
-		def observationInstanceList = Observation.executeQuery(query, queryParts.queryParams)
+
+        println query;
+        println queryParts.queryParams;
+        
+        def boundGeometry = queryParts.queryParams.remove('boundGeometry'); 
+
+        def hqlQuery = sessionFactory.currentSession.createQuery(query)
+        if(params.bounds && boundGeometry) {
+            hqlQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(org.hibernatespatial.GeometryUserType, null))
+            def checklistCountQuery = sessionFactory.currentSession.createQuery(queryParts.checklistCountQuery)
+             checklistCountQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(org.hibernatespatial.GeometryUserType, null))
+            checklistCountQuery.setProperties(queryParts.queryParams)
+			checklistCount = checklistCountQuery.list()[0]
+        } else {
+            if(max > -1) hqlQuery.setMaxResults(max);
+            if(offset > -1) hqlQuery.setFirstResult(offset);
+        }
+
+        hqlQuery.setProperties(queryParts.queryParams);
+
+		def observationInstanceList = hqlQuery.list();
+
 		if(params.daterangepicker_start){
 			queryParts.queryParams["daterangepicker_start"] = params.daterangepicker_start
 		}
 		if(params.daterangepicker_end){
 			queryParts.queryParams["daterangepicker_end"] =  params.daterangepicker_end
 		}
-
-        //HACK:TODO to be removed by handling spatial query
-        if(isMapView) {
-		    def l = [];
-            observationInstanceList.each {
-                l << [it.id, it.latitude, it.longitude, it.isChecklist]
-            }
-            observationInstanceList = l
-        }
-
 		return [observationInstanceList:observationInstanceList, checklistCount:checklistCount, queryParams:queryParts.queryParams, activeFilters:queryParts.activeFilters]
 	}
 
+    /**
+    *
+    **/
 	def getFilteredObservationsFilterQuery(params) {
 		params.sGroup = (params.sGroup)? params.sGroup : SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.ALL).id
 		params.habitat = (params.habitat)? params.habitat : Habitat.findByName(grailsApplication.config.speciesPortal.group.ALL).id
@@ -692,7 +713,7 @@ class ObservationService {
 		//params.userName = springSecurityService.currentUser.username;
 
 		def query = "select obv from Observation obv "
-		def mapViewQuery = "select obv from Observation obv "
+		def mapViewQuery = "select obv.id, obv.topology, obv.isChecklist from Observation obv "
 		def queryParams = [isDeleted : false]
 		def filterQuery = " where obv.isDeleted = :isDeleted and isShowable = true "
 		def activeFilters = [:]
@@ -711,7 +732,7 @@ class ObservationService {
 
 		if(params.tag){
 			query = "select obv from Observation obv,  TagLink tagLink "
-			mapViewQuery = "select obv from Observation obv, TagLink tagLink "
+			mapViewQuery = "select obv.topology from Observation obv, TagLink tagLink "
 			filterQuery +=  " and obv.id = tagLink.tagRef and tagLink.type = :tagType and tagLink.tag.name = :tag "
 
 			queryParams["tag"] = params.tag
@@ -771,23 +792,46 @@ class ObservationService {
 		if(params.bounds) {
 			def bounds = params.bounds.split(",")
 
-			def swLat = bounds[0]
-			def swLon = bounds[1]
-			def neLat = bounds[2]
-			def neLon = bounds[3]
+			def swLat = bounds[0].toFloat()
+			def swLon = bounds[1].toFloat()
+			def neLat = bounds[2].toFloat()
+			def neLon = bounds[3].toFloat()
 
-			filterQuery += " and 1=0 ";// and obv.latitude > " + swLat + " and  obv.latitude < " + neLat + " and obv.longitude > " + swLon + " and obv.longitude < " + neLon
+            def boundGeometry = getBoundGeometry(swLat, swLon, neLat, neLon)
+            filterQuery += " and within (obv.topology, :boundGeometry) = true " //) ST_Contains( :boundGeomety,  obv.topology) "
+			//filterQuery += " and 1=0 ";// and obv.latitude > " + swLat + " and  obv.latitude < " + neLat + " and obv.longitude > " + swLon + " and obv.longitude < " + neLon
+            queryParams['boundGeometry'] = boundGeometry
 			activeFilters["bounds"] = params.bounds
 		} 
 		
 		def orderByClause = " order by obv." + (params.sort ? params.sort : "lastRevised") +  " desc, obv.id asc"
 		
 		def checklistCountQuery = "select count(*) from Observation obv " + filterQuery + " and obv.isChecklist = true "
-		
+	
 		return [query:query, mapViewQuery:mapViewQuery, checklistCountQuery:checklistCountQuery, filterQuery:filterQuery, orderByClause:orderByClause, queryParams:queryParams, activeFilters:activeFilters]
 
 	}
-	
+
+    /**
+    *
+    **/
+    private getBoundGeometry(x1, y1, x2, y2){
+        def p1 = new Coordinate( x1,  y1)
+        def p2 = new Coordinate( x2,  y1)
+        def p3 = new Coordinate( x2,  y2)
+        def p4 = new Coordinate( x1,  y2)
+        Coordinate[] arr = new Coordinate[5]
+        arr[0] = p1
+        arr[1] = p2
+        arr[2] = p3
+        arr[3] = p4
+        arr[4] = p1
+        def gf = new GeometryFactory(new PrecisionModel(), 4240)
+        def lr = gf.createLinearRing(arr)
+        def pl = gf.createPolygon(lr, null)
+        return pl
+    }
+
 	private Date parseDate(date){
 		try {
 			return date? Date.parse("dd/MM/yyyy", date):new Date();

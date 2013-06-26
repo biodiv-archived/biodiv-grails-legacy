@@ -1,4 +1,3 @@
-<div class="observation_location_wrapper">
 	<div class="observation_location">
 		<g:set var="snippetUrl" value="${uGroup.createLink(controller:'observation', action:'snippet', 'userGroupWebaddress':userGroup?.webaddress) }"/>
 		<g:javascript>
@@ -72,7 +71,7 @@
                   }  
                   <g:each in="${observationInstanceList}" status="i"
 						var="observationInstance">
-                        addMarker(${observationInstance[0]}, ${observationInstance[1]},  ${observationInstance[2]}); 
+                        addMarker(${observationInstance[0]}, ${observationInstance[1].getCentroid().getX()},  ${observationInstance[1].getCentroid().getY()}); 
 		    	</g:each>	
                     
                     <g:if test="${!ignoreMouseOutListener}">
