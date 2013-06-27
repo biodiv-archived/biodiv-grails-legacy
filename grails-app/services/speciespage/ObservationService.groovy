@@ -117,7 +117,7 @@ class ObservationService {
 		
         GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), grailsApplication.config.speciesPortal.maps.SRID);
         if(params.latitude && params.longitude) {
-            observation.topology = geometryFactory.createPoint(new Coordinate(params.latitude?.toFloat(), params.longitude?.toFloat()));
+            observation.topology = geometryFactory.createPoint(new Coordinate(params.longitude?.toFloat(), params.latitude?.toFloat()));
         } else if(params.areas) {
             WKTReader wkt = new WKTReader(geometryFactory);
             try {

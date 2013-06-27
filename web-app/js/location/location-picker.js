@@ -147,7 +147,7 @@ function drawArea(areas, drawable) {
     } else {*/
         if(obj.constructor === L.Marker || obj.constructor === L.marker) {
             var latlng = obj.getLatLng();
-            searchMarker = set_location(latlng.lng, latlng.lat, searchMarker, {draggable:drawable, layer:'Search Marker. Drag Me to set location', selected:drawable, clickable:drawable});
+            searchMarker = set_location(latlng.lat, latlng.lng, searchMarker, {draggable:drawable, layer:'Search Marker. Drag Me to set location', selected:drawable, clickable:drawable});
             setLatLngFields(latlng.lng, latlng.lat);
             map.setView(latlng, 13); 
         } else {

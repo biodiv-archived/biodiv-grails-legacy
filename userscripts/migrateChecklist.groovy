@@ -71,13 +71,16 @@ def migrateObvLocation() {
 	Observation.withTransaction(){
 	   Observation.findAllByTopologyIsNull().each{obv->
 	        GeometryFactory geometryFactory = new GeometryFactory();
-	        obv.topology = geometryFactory.createPoint(new Coordinate(obv.latitude, obv.longitude));
+	        obv.topology = geometryFactory.createPoint(new Coordinate(obv.longitude, obv.latitude));
 			obv.placeName = obv.placeName?:obv.reverseGeocodedName;
 	        if(!obv.save(flush:true)) {
 			    obv.errors.allErrors.each { println  it }
 	        }
 	   }
 	}
+	
+	//or use
+	//update observation set topology = ST_GeomFromText('SRID=4326;POINT(' || logitude ||  latitude)|| ')');
 }
 //migrateObvLocation();
 

@@ -71,7 +71,7 @@
                   }  
                   <g:each in="${observationInstanceList}" status="i"
 						var="observationInstance">
-                        addMarker(${observationInstance[0]}, ${observationInstance[1].getCentroid().getX()},  ${observationInstance[1].getCentroid().getY()}); 
+                        addMarker(${observationInstance[0]}, ${observationInstance[1].getCentroid().getY()},  ${observationInstance[1].getCentroid().getX()}); 
 		    	</g:each>	
                     
                     <g:if test="${!ignoreMouseOutListener}">
