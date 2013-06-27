@@ -1,5 +1,6 @@
 import org.codehaus.groovy.grails.orm.hibernate.cfg.GrailsDomainBinder;
 
+import com.vividsolutions.jts.geom.PrecisionModel;
 import species.CommonNames;
 import species.Language;
 //import species.participation.checklistUtilService
@@ -68,9 +69,9 @@ checklistUtilService.migrateObservationFromChecklist()
 
 
 def migrateObvLocation() {
+	GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
 	Observation.withTransaction(){
 	   Observation.findAllByTopologyIsNull().each{obv->
-	        GeometryFactory geometryFactory = new GeometryFactory();
 	        obv.topology = geometryFactory.createPoint(new Coordinate(obv.longitude, obv.latitude));
 			obv.placeName = obv.placeName?:obv.reverseGeocodedName;
 	        if(!obv.save(flush:true)) {

@@ -10,7 +10,7 @@ import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Geometry
 
 abstract class Metadata {
-	static transients = ['latitude', 'longitude']
+	//static transients = ['latitude', 'longitude']
 
     //Geographic Coverage
 	String placeName;
@@ -21,8 +21,8 @@ abstract class Metadata {
     Geometry topology;
      
 	//XXX to be remove after all migration and api changes
-//	float latitude;
-//	float longitude;
+	float latitude;
+	float longitude;
 	
     //Taxonomic Coverage
     SpeciesGroup group;
@@ -41,10 +41,10 @@ abstract class Metadata {
 		placeName(nullable:true)
 		reverseGeocodedName(nullable:true)
 		//location(nullable: true, blank:true)
-		//latitude(nullable: true)
-		//longitude(nullable:true)
+		latitude(nullable: true)
+		longitude(nullable:true)
 		locationAccuracy(nullable: true)
-        topology(nullable:false)
+        topology(nullable:true)
 		fromDate (nullable:true)
 		toDate (nullable:true)
     }

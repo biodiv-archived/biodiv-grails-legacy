@@ -35,6 +35,7 @@ import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Coordinate
 import com.vividsolutions.jts.geom.GeometryFactory
+import com.vividsolutions.jts.geom.PrecisionModel;
 
 import static species.participation.ChecklistService.*
 /**
@@ -297,7 +298,7 @@ class ChecklistUtilService {
 		//observation.longitude = params.longitude.toFloat();
 		
 				
-		GeometryFactory geometryFactory = new GeometryFactory();
+		GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), grailsApplication.config.speciesPortal.maps.SRID);
 		if(params.latitude && params.longitude) {
 			observation.topology = geometryFactory.createPoint(new Coordinate(params.longitude?.toFloat(), params.latitude?.toFloat()));
 		} else if(params.areas) {
