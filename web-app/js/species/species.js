@@ -98,7 +98,6 @@ var showOccurence = function(speciesName) {
                     //bbox : "5801108.428222222,674216.547942332, 12138100.077777777, 4439106.786632658"
             };
             var layersOptions = [
-            /*                     
             {
                     title : 'Occurrence',
                     layers : 'ibp:occurrence',
@@ -106,7 +105,6 @@ var showOccurence = function(speciesName) {
                     cql_filter : "species_name='" + speciesName + "'",
                     opacity : 0.7
             },
-            */
             {
                     title : 'Observation',
                     layers : 'ibp:observation_locations',

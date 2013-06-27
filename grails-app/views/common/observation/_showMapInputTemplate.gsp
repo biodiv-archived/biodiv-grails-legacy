@@ -107,6 +107,7 @@
 $(document).ready(function() {
     loadGoogleMapsAPI(function() {
     	initialize(document.getElementById("map_canvas"), true);
+        initArea(true);
         $('.geotagged_image').each(function(index){
                 update_geotagged_images_list($(this));		
         });

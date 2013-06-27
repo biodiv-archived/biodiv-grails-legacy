@@ -20,7 +20,7 @@
                 <%
                     def latitude='',longitude='',areas='';
                         latitude = observationInstance.latitude
-                        longitude = observationInstance.latitude
+                        longitude = observationInstance.longitude
                         
                         if(observationInstance?.topology){ 
                             areas = Utils.GeometryAsWKT(observationInstance?.topology)
@@ -33,7 +33,7 @@
 
                 %>
                 <span class="name"><i class="icon-map-marker"> </i>Coordinates</span>
-                <div class="value">${latitude},${longitude}</div>
+                <div class="value">${latitude.toFloat()},${longitude.toFloat()}</div>
 
                 <input id='areas' type='hidden' name='areas' value='${areas}'></input>
                
@@ -45,6 +45,7 @@
                 $(document).ready(function() {
                     loadGoogleMapsAPI(function() {
                         initialize(document.getElementById("map_canvas_${observationInstance.id}"), false);
+                        initArea(false);
                         /*
                         var latlng = new google.maps.LatLng(${observationInstance.latitude}, ${observationInstance.longitude});
                         var options = {

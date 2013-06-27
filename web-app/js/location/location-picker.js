@@ -41,8 +41,7 @@ function initialize(element, drawable){
 //    L.marker(new M.LatLng('6', '68')).addTo(map);
 //    L.marker(new M.LatLng('35', '97')).addTo(map);
     initControls();
-    initArea(drawable);
-    initLocation(drawable);
+    //initLocation(drawable);
     //adjustBounds();
  }
 
@@ -62,6 +61,15 @@ function initControls() {
           position: 'topleft',
           title: 'View fullscreen !'
     }).addTo(map);
+
+    map.on('enterFullscreen', function(){
+        map.panTo(searchMarker.getLatLng());
+    });
+
+    map.on('exitFullscreen', function(){
+        map.panTo(searchMarker.getLatLng());
+    });
+
 }
 
 function initLocation(drawable) {
@@ -69,14 +77,6 @@ function initLocation(drawable) {
     var longitude = $('#longitude_field').val();
     if(latitude && longitude) {
         searchMarker = set_location(latitude, longitude, searchMarker, {label:'Selected Location', opacity:1, draggable:drawable, selected:drawable, clickable:drawable});
-        map.panTo(searchMarker.getLatLng());
-        map.on('enterFullscreen', function(){
-            map.panTo(searchMarker.getLatLng());
-        });
-
-        map.on('exitFullscreen', function(){
-            map.panTo(searchMarker.getLatLng());
-        });
     }
 }
 
@@ -105,7 +105,7 @@ function initArea(drawable) {
 
             if (type === 'marker') {
                 var latlng = layer.getLatLng();
-                searchMarker = set_location(latlng.lat, latlng.lng, searchMarker, {label:'', draggable:true, layer:'Search Marker. Drag Me to set location', selected:true});
+                searchMarker = set_location(latlng.lat, latlng.lng, searchMarker, {draggable:true, selected:true});
             } else {
                 setLatLngFields('','');
                 drawnItems.addLayer(layer);
@@ -113,31 +113,32 @@ function initArea(drawable) {
         });
     }
     
+    map.addLayer(drawnItems);
+
     var areas = $('input#areas').val()
     if(areas) {
-        drawArea(areas);
+        drawArea(areas, drawable);
      }
-    map.addLayer(drawnItems);
 }
 
-function drawArea(areas) {
+function drawArea(areas, drawable) {
     if(!areas) return;
     var wkt = new Wkt.Wkt();
-    try { // Catch any malformed WKT strings
+    try { 
         wkt.read(areas);
     } catch (e1) {
         try {
             wkt.read(el.value.replace('\n', '').replace('\r', '').replace('\t', ''));
         } catch (e2) {
             if (e2.name === 'WKTError') {
-                alert('Wicket could not understand the WKT string you entered. Check that you have parentheses balanced, and try removing tabs and newline characters.');
+                console.log('Wicket could not understand the WKT string you entered. Check that you have parentheses balanced, and try removing tabs and newline characters.');
                 return;
             }
         }
     }
-    obj = wkt.toObject(); // Make an object
-    //TODO:For now assuming ui will restrict creation of geometry collection
-/*    if (Wkt.isArray(obj)) { // Distinguish multigeometries (Arrays) from objects
+    obj = wkt.toObject(); 
+/*    //TODO:For now assuming ui will restrict creation of geometry collection
+    if (Wkt.isArray(obj)) { // Distinguish multigeometries (Arrays) from objects
         for (i in obj) {
             if (obj.hasOwnProperty(i) && !Wkt.isArray(obj[i])) {
                 drawnItems.addLayer(obj[i]);
@@ -145,12 +146,10 @@ function drawArea(areas) {
         }
     } else {*/
         if(obj.constructor === L.Marker || obj.constructor === L.marker) {
-            console.log('setting marker')
-            console.log(obj);
             var latlng = obj.getLatLng();
-            searchMarker = set_location(latlng.lng, latlng.lat, searchMarker, {draggable:true, layer:'Search Marker. Drag Me to set location', selected:true});
+            searchMarker = set_location(latlng.lng, latlng.lat, searchMarker, {draggable:drawable, layer:'Search Marker. Drag Me to set location', selected:drawable, clickable:drawable});
             setLatLngFields(latlng.lng, latlng.lat);
-            map.panTo(obj.getLatLng());                   
+            map.setView(latlng, 13); 
         } else {
             drawnItems.addLayer(obj);
             $('input#areas').val(areas);
@@ -265,6 +264,7 @@ function set_location(lat, lng, marker, markerOptions) {
 }
 
 function select_location(marker) {
+    console.log('select_location')
     if(marker == undefined) return;
     if(selectedMarker) { 
         selectedMarker.setIcon(prevIcon).setOpacity(0.8);
@@ -277,7 +277,7 @@ function select_location(marker) {
     } else {
     */  selectedMarker.setIcon(selectedIcon).setOpacity(1);
     // }
-    map.panTo(selectedMarker.getLatLng());
+    map.setView(selectedMarker.getLatLng(), 13);
     var position = selectedMarker.getLatLng();
     geocoder.geocode({'latLng': new google.maps.LatLng(position.lat, position.lng)}, function(results, status) {
         if (status == G.GeocoderStatus.OK) {
@@ -528,7 +528,7 @@ $(document).ready(function() {
       select: function(event, ui) {
         var latitude='', longitude='';
         if(ui.item.topology) {
-            drawArea(ui.item.topology);
+            drawArea(ui.item.topology, false);
             $('input#areas').val(ui.item.topology);
         } 
       },
