@@ -67,6 +67,7 @@ class SpeciesController {
 		//cache "taxonomy_results"
 		params.startsWith = params.startsWith?:"A-Z"
 		def allGroup = SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.ALL);
+		def othersGroup = SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.OTHERS);
 		params.sGroup = params.sGroup ?: allGroup.id+""
 		params.max = Math.min(params.max ? params.int('max') : 40, 100);
 		params.offset = params.offset ? params.int('offset') : 0
@@ -93,6 +94,14 @@ class SpeciesController {
 					query = "select s from Species s where s.title like '<i>${params.startsWith}%' order by s.${params.sort} ${params.order}";
 					countQuery = "select s.percentOfInfo, count(*) as count from Species s where s.title like '<i>${params.startsWith}%'  group by s.percentOfInfo"
 				}
+            } else if(groupIds.size() == 1 && groupIds[0] == othersGroup.id) {
+                if(params.startsWith == "A-Z") {
+                    query = "select s from Species s, TaxonomyDefinition t where s.taxonConcept = t and t.group.id  is null order by s.${params.sort} ${params.order}"
+                    countQuery = "select s.percentOfInfo, count(*) as count from Species s, TaxonomyDefinition t where s.taxonConcept = t and t.group.id  is null  group by s.percentOfInfo";
+                } else {
+                    query = "select s from Species s, TaxonomyDefinition t where title like '<i>${params.startsWith}%' and s.taxonConcept = t and t.group.id  is null order by s.${params.sort} ${params.order}"
+                    countQuery = "select s.percentOfInfo, count(*) as count from Species s, TaxonomyDefinition t where s.title like '<i>${params.startsWith}%' and s.taxonConcept = t and t.group.id  is null group by s.percentOfInfo";
+				}
 			} else {
 				if(params.startsWith == "A-Z") {
 					query = "select s from Species s, TaxonomyDefinition t where s.taxonConcept = t and t.group.id  in (:sGroup) order by s.${params.sort} ${params.order}"
@@ -104,7 +113,7 @@ class SpeciesController {
 			}
 
 			def speciesInstanceList, rs;
-			if(groupIds.size() == 1 && groupIds[0] == allGroup.id) {
+			if(groupIds.size() == 1 && (groupIds[0] == allGroup.id || groupIds[0] == othersGroup.id)) {
 				speciesInstanceList = Species.executeQuery(query, [max:params.max, offset:params.offset]);
 				rs = Species.executeQuery(countQuery)
 			} else {
