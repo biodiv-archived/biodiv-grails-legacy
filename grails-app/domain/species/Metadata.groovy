@@ -58,15 +58,15 @@ abstract class Metadata {
     float getLatitude() {
 		if(latitude)
 			return latitude
-			
-        if(topology)
+
+		if(topology)
             return (float) topology.getCentroid().getY();
     }
 
     float getLongitude() {
 		if(longitude)
 			return longitude
-			
+
         if(topology) 
             return (float) topology.getCentroid().getX();
     }

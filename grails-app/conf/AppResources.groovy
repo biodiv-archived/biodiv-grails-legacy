@@ -294,9 +294,9 @@ modules = {
         resource url:'js/Leaflet/plugins/leaflet-locatecontrol/src/L.Control.Locate.js'
         resource url:'js/Leaflet/plugins/Leaflet.awesome-markers/dist/leaflet.awesome-markers.css'
         resource url:'js/Leaflet/plugins/Leaflet.awesome-markers/dist/leaflet.awesome-markers.min.js'
-        resource url:'js/Leaflet/plugins/Leaflet.markercluster/dist/leaflet.markercluster.js'
-        resource url:'js/Leaflet/plugins/Leaflet.markercluster/dist/MarkerCluster.css'
-        resource url:'js/Leaflet/plugins/Leaflet.markercluster/dist/MarkerCluster.Default.css'
+//        resource url:'js/Leaflet/plugins/Leaflet.markercluster/dist/leaflet.markercluster.js'
+//        resource url:'js/Leaflet/plugins/Leaflet.markercluster/dist/MarkerCluster.css'
+//        resource url:'js/Leaflet/plugins/Leaflet.markercluster/dist/MarkerCluster.Default.css'
         resource url:'js/Leaflet/plugins/Leaflet.markercluster/dist/MarkerCluster.Default.ie.css', wrapper: { s -> "<!--[if lt IE]>$s<![endif]-->" }
         resource url:'js/Leaflet/plugins/leaflet.fullscreen/Control.FullScreen.js'
         resource url:'js/Leaflet/plugins/leaflet.fullscreen/Control.FullScreen.css'
