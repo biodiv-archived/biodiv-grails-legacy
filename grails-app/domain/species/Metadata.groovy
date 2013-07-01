@@ -55,13 +55,19 @@ abstract class Metadata {
         }
     }
 
-    double getLatitude() {
+    float getLatitude() {
+		if(latitude)
+			return latitude
+			
         if(topology)
-            return topology.getCentroid().getY();
+            return (float) topology.getCentroid().getY();
     }
 
-    double getLongitude() {
+    float getLongitude() {
+		if(longitude)
+			return longitude
+			
         if(topology) 
-            return topology.getCentroid().getX();
+            return (float) topology.getCentroid().getX();
     }
 }
