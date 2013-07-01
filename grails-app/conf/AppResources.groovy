@@ -127,14 +127,19 @@ modules = {
 	}
 
 	observations_list { 
-		dependsOn 'observations, location_utils, list_utils, comment'
+		dependsOn 'observations, list_utils, comment,leaflet'
 		
-		resource url:'/js/species/observations/list.js'
+        resource url:'/css/location_picker.css'
+        resource url:'/js/location/location-picker.js'
+        resource url:'/js/species/observations/list.js'
 	}
 
 	susers_list { 
 		dependsOn 'core, list_utils'
-		
+	
+        resource url:'/css/location_picker.css'
+        resource url:'/js/location/location-picker.js'
+	
 		resource url:'/js/species/observations/list.js'
 		//resource url:'/js/species/users/list.js'
 	}
@@ -294,9 +299,9 @@ modules = {
         resource url:'js/Leaflet/plugins/leaflet-locatecontrol/src/L.Control.Locate.js'
         resource url:'js/Leaflet/plugins/Leaflet.awesome-markers/dist/leaflet.awesome-markers.css'
         resource url:'js/Leaflet/plugins/Leaflet.awesome-markers/dist/leaflet.awesome-markers.min.js'
-//        resource url:'js/Leaflet/plugins/Leaflet.markercluster/dist/leaflet.markercluster.js'
-//        resource url:'js/Leaflet/plugins/Leaflet.markercluster/dist/MarkerCluster.css'
-//        resource url:'js/Leaflet/plugins/Leaflet.markercluster/dist/MarkerCluster.Default.css'
+        resource url:'js/Leaflet/plugins/Leaflet.markercluster/dist/leaflet.markercluster.js'
+        resource url:'js/Leaflet/plugins/Leaflet.markercluster/dist/MarkerCluster.css'
+        resource url:'js/Leaflet/plugins/Leaflet.markercluster/dist/MarkerCluster.Default.css'
         resource url:'js/Leaflet/plugins/Leaflet.markercluster/dist/MarkerCluster.Default.ie.css', wrapper: { s -> "<!--[if lt IE]>$s<![endif]-->" }
         resource url:'js/Leaflet/plugins/leaflet.fullscreen/Control.FullScreen.js'
         resource url:'js/Leaflet/plugins/leaflet.fullscreen/Control.FullScreen.css'

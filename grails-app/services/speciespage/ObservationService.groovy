@@ -627,6 +627,7 @@ class ObservationService {
 	}
 
 	Map getFilteredTags(params){
+        //TODO:FIXIT ... doesnt return all tags as the last param true is not handled
 		return getTagsFromObservation(getFilteredObservations(params, -1, -1, true).observationInstanceList.collect{it[0]});
 	}
 	
@@ -647,50 +648,57 @@ class ObservationService {
         Type geometryType = new CustomType(GeometryUserType.class, null); 
         q.setParameter(:geoExp0, geom, geometryType); 
 	 */
-	Map getFilteredObservations(params, max, offset, isMapView) {
+	Map getFilteredObservations(params, max, offset, isMapView = false) {
 
 		def queryParts = getFilteredObservationsFilterQuery(params) 
 		String query = queryParts.query;
-		long checklistCount = 0
+		long checklistCount = 0, allObservationCount = 0;
 
-        if(isMapView) {
-			query = queryParts.mapViewQuery + queryParts.filterQuery + queryParts.orderByClause
-		} else {
+        def boundGeometry = queryParts.queryParams.remove('boundGeometry'); 
+/*        if(isMapView) {//To get id, topology of all markers
+			query = queryParts.mapViewQuery + queryParts.filterQuery;// + queryParts.orderByClause
+		} else {*/
 			query += queryParts.filterQuery + queryParts.orderByClause
-			if(max != -1)
-				queryParts.queryParams["max"] = max
-			if(offset != -1)
-				queryParts.queryParams["offset"] = offset
-		}
+//		}
 
         println query;
         println queryParts.queryParams;
         
-        def boundGeometry = queryParts.queryParams.remove('boundGeometry'); 
+        def checklistCountQuery = sessionFactory.currentSession.createQuery(queryParts.checklistCountQuery)
+        def allObservationCountQuery = sessionFactory.currentSession.createQuery(queryParts.allObservationCountQuery)
 
         def hqlQuery = sessionFactory.currentSession.createQuery(query)
         if(params.bounds && boundGeometry) {
             hqlQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(org.hibernatespatial.GeometryUserType, null))
-            def checklistCountQuery = sessionFactory.currentSession.createQuery(queryParts.checklistCountQuery)
             checklistCountQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(org.hibernatespatial.GeometryUserType, null))
-            checklistCountQuery.setProperties(queryParts.queryParams)
-			checklistCount = checklistCountQuery.list()[0]
-        } else {
-            if(max > -1) hqlQuery.setMaxResults(max);
-            if(offset > -1) hqlQuery.setFirstResult(offset);
+            allObservationCountQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(org.hibernatespatial.GeometryUserType, null))
+        } 
+
+        if(max > -1){
+            hqlQuery.setMaxResults(max);
+			queryParts.queryParams["max"] = max
+        }
+        if(offset > -1) {
+            hqlQuery.setFirstResult(offset);
+			queryParts.queryParams["offset"] = offset
         }
 
         hqlQuery.setProperties(queryParts.queryParams);
-
 		def observationInstanceList = hqlQuery.list();
 		
+        checklistCountQuery.setProperties(queryParts.queryParams)
+		checklistCount = checklistCountQuery.list()[0]
+
+        allObservationCountQuery.setProperties(queryParts.queryParams)
+		allObservationCount = allObservationCountQuery.list()[0]
+
 		if(params.daterangepicker_start){
 			queryParts.queryParams["daterangepicker_start"] = params.daterangepicker_start
 		}
 		if(params.daterangepicker_end){
 			queryParts.queryParams["daterangepicker_end"] =  params.daterangepicker_end
 		}
-		return [observationInstanceList:observationInstanceList, checklistCount:checklistCount, queryParams:queryParts.queryParams, activeFilters:queryParts.activeFilters]
+		return [observationInstanceList:observationInstanceList, allObservationCount:allObservationCount, checklistCount:checklistCount, queryParams:queryParts.queryParams, activeFilters:queryParts.activeFilters]
 	}
 
     /**
@@ -702,11 +710,24 @@ class ObservationService {
 		params.habitat = params.habitat.toLong()
 		//params.userName = springSecurityService.currentUser.username;
 
-		def query = "select obv from Observation obv "
-		def mapViewQuery = "select obv.id, obv.topology, obv.isChecklist from Observation obv "
 		def queryParams = [isDeleted : false]
-		def filterQuery = " where obv.isDeleted = :isDeleted and isShowable = true "
 		def activeFilters = [:]
+
+		def query = "select "
+        if(params.fetchField) {
+            query += " obv.id,"
+            params.fetchField.split(",").each { fetchField ->
+                if(!fetchField.equalsIgnoreCase('id'))
+                    query += " obv."+fetchField+","
+            }
+            query = query [0..-2];
+            queryParams['fetchField'] = params.fetchField
+        } else {
+            query += " obv "
+        }
+        query += " from Observation obv "
+		//def mapViewQuery = "select obv.id, obv.topology, obv.isChecklist from Observation obv "
+		def filterQuery = " where obv.isDeleted = :isDeleted and isShowable = true "
 
 		if(params.sGroup){
 			params.sGroup = params.sGroup.toLong()
@@ -797,8 +818,9 @@ class ObservationService {
 		def orderByClause = " order by obv." + (params.sort ? params.sort : "lastRevised") +  " desc, obv.id asc"
 		
 		def checklistCountQuery = "select count(*) from Observation obv " + filterQuery + " and obv.isChecklist = true "
+		def allObservationCountQuery = "select count(*) from Observation obv " + filterQuery
 	
-		return [query:query, mapViewQuery:mapViewQuery, checklistCountQuery:checklistCountQuery, filterQuery:filterQuery, orderByClause:orderByClause, queryParams:queryParams, activeFilters:activeFilters]
+		return [query:query, allObservationCountQuery:allObservationCountQuery, checklistCountQuery:checklistCountQuery, filterQuery:filterQuery, orderByClause:orderByClause, queryParams:queryParams, activeFilters:activeFilters]
 
 	}
 

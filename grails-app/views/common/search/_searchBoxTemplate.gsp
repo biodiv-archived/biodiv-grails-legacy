@@ -49,7 +49,10 @@ $(document).ready(function() {
                 'observation': {},
                 'imagesPath': "${resource(dir:'images', absolute:true)}",
                 'locationsUrl': "${uGroup.createLink(controller:'observation', action: 'locations')}",
-                'defaultMarkerIcon':"${resource(dir:'js/Leaflet/dist/images', file:'')}"
+                'defaultMarkerIcon':"${resource(dir:'js/Leaflet/dist/images', file:'')}",
+                'observation':{
+                    listUrl:"${uGroup.createLink(controller:'observation', action: 'listJSON')}"
+                }
 	}
 	$("#userGroupSelectFilter").val("${(queryParams && queryParams.uGroup)?queryParams.uGroup:(params.webaddress?'THIS_GROUP':'ALL')}");
 });

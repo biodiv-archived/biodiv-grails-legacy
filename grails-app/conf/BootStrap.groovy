@@ -12,6 +12,9 @@ import species.groups.UserGroupController;
 import species.groups.UserGroupMemberRole.UserGroupMemberRoleType;
 import species.participation.UserToken;
 import org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib
+import com.vividsolutions.jts.geom.Geometry
+import com.vividsolutions.jts.io.WKTWriter;
+import grails.converters.JSON;
 
 class BootStrap {
 
@@ -35,7 +38,7 @@ class BootStrap {
 		initNames();
 		initFilters();
 		initEmailConfirmationService();
-
+        initJSONMarshallers();
        	}
 
 	def initDefs() {
@@ -150,6 +153,19 @@ class BootStrap {
 		  }
 	}
 	
+    def initJSONMarshallers() {
+        JSON.registerObjectMarshaller(Geometry) {
+            String geomStr = "error"
+            WKTWriter wkt = new WKTWriter();
+            try {
+                geomStr = wkt.write(it);
+            } catch(Exception e) {
+                log.error "Error writing polygon wkt : ${it}"
+            }
+            return geomStr;
+        }
+    }
+
 	/**
 	 * 
 	 */

@@ -684,9 +684,125 @@ function showMapView() {
 			$('div.observations > div.observations_list').html('');
 			// alert("showing map view");
 		}
+                loadGoogleMapsAPI(function() {
+                        //var markers = [];
+                        var big_map;
+                        initialize(document.getElementById("big_map_canvas"), false);
+                    	//initMap();
 
-		google.maps.event.trigger(big_map, 'resize');
-		big_map.setCenter(nagpur_latlng);
+                        function addAllMarkers() {
+                            var url = window.params.observation.listUrl+"?fetchField=id,latitude,longitude,isChecklist"
+                            $.ajax({
+                                    url: url,
+                                    dataType: "json",
+                                    success: function(data) {
+                                        for(var i=0; i<data.observationInstanceList.length; i++) {
+                                            var obv = data.observationInstanceList[i];
+                                            console.log('adding markers'+obv);
+                                            var marker = addMarker(obv[1], obv[2], {
+                                                    draggable: false,
+                                                    clusterable: true,
+                                                    clickable:function() {
+                                                        load_content(marker, obv[0]); 
+                                                    }
+                                                });
+                                        }
+                          //              markers.push(marker);
+                                    }
+                                });
+
+                        }
+
+                        addAllMarkers();
+
+                        function refreshList(bounds){
+                            if (bounds !== undefined){
+                                var sep = (location.search == "") ? "?" : "&";
+                                var url = window.params.filteredMapBasedObservationsListUrl 
+                                url = url + sep + "bounds=" + bounds
+                                    $.ajax({
+                                        url: url,
+                                        dataType: "html",
+                                        success: function(data) {
+                                            $("#map_results_list").html(data);
+                                        }
+                                    });
+                            }    
+                        }
+
+                            
+                       map.on('mouseout', function() {
+                            refreshList(getSelectedBounds());
+                        });
+                       refreshList();
+
+/*                        function getRandomNumber(){
+                            return ((Math.random() -.5) / 200);
+                        }
+
+                        function jitterCloseMarker(big_map){
+                                var zoomLevel = big_map.getZoom();
+                                if(zoomLevel >= 13){
+                                        var markerKeys = [];
+                                        var mapBounds = big_map.getBounds()
+                                        for (var i = 0; i < markers.length; i++) {
+                                        var pos = markers[i].getPosition();
+                                        if(mapBounds.contains(pos)){
+                                                                                if($.inArray(pos.toString(), markerKeys) != -1){
+                                                                                        markers[i].setPosition(new google.maps.LatLng(pos.lat() + getRandomNumber(), pos.lng() + getRandomNumber()));
+                                                                                }else{
+                                                                                        markerKeys.push(pos.toString());
+                                                                                }
+                                    }
+                                                }
+                            }
+                        }  
+                           
+                           
+                            google.maps.event.addListener(big_map, 'zoom_changed', function() {
+                                jitterCloseMarker(big_map);
+                                
+                            });
+                        var markerCluster = new MarkerClusterer(big_map, markers, {gridSize: 30, maxZoom:13});
+*/                       
+                            
+                        function load_content(marker, id){
+                            $.ajax({
+                                url: window.params.snippetUrl+"/"+id,
+                                success: function(data){
+                                    marker.bindPopup("<div id='info-content' class='thumbnail'>" + data + "</div>").openPopup();;
+                                }
+                            });
+                        }
+/*
+
+                        google.maps.event.addListener(big_map, 'dragend', function() { checkBounds(); });
+                        
+                        function checkBounds() {
+                            if (allowedBounds.contains(big_map.getCenter())) return;
+
+                            var c = big_map.getCenter(),
+                            x = c.lng(),
+                            y = c.lat(),
+                            maxX = allowedBounds.getNorthEast().lng(),
+                            maxY = allowedBounds.getNorthEast().lat(),
+                            minX = allowedBounds.getSouthWest().lng(),
+                            minY = allowedBounds.getSouthWest().lat();
+
+                            if (x < minX) x = minX;
+                            if (x > maxX) x = maxX;
+                            if (y < minY) y = minY;
+                            if (y > maxY) y = maxY;
+
+                            big_map.setCenter(new google.maps.LatLng(y, x));
+                        }
+*/
+                        
+
+                    });//end of loadGoogleMapsAPI
+
+//		google.maps.event.trigger(big_map, 'resize');
+//		big_map.setCenter(nagpur_latlng);
 	});
 }
 

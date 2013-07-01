@@ -26,7 +26,7 @@ function initialize(element, drawable){
     var viewBounds = new M.LatLngBounds(new M.LatLng('8', '59'), new M.LatLng('45', '105'));
     var ggl = new M.Google('HYBRID');
     map = new M.Map(element, {
-        crs:L.CRS.EPSG4326,
+//        crs:L.CRS.EPSG4326,
         center:allowedBounds.getCenter(),
         maxBounds:viewBounds,
         zoom:5,
@@ -54,8 +54,8 @@ function initControls() {
         color: 'red'
     });
     
-//  markers = new M.MarkerClusterGroup();
-//  markers.addTo(map);
+    markers = new M.MarkerClusterGroup();
+    markers.addTo(map);
     
     M.control.fullscreen({
           position: 'topleft',
@@ -63,11 +63,11 @@ function initControls() {
     }).addTo(map);
 
     map.on('enterFullscreen', function(){
-        map.panTo(searchMarker.getLatLng());
+        if(searchMarker) map.panTo(searchMarker.getLatLng());
     });
 
     map.on('exitFullscreen', function(){
-        map.panTo(searchMarker.getLatLng());
+        if(searchMarker) map.panTo(searchMarker.getLatLng());
     });
 
 }
@@ -237,12 +237,12 @@ function addMarker(lat, lng, options) {
     }
 
     if(options.clickable) {
-        marker.on('click', function() {
-            select_location(this);
-        });
+        marker.on('click', $.isFunction(options.clickable)?options.clickable:select_location);
     }
 
-    //markers.addLayer(marker);
+    if(options.clusterable) {
+        markers.addLayer(marker);
+    }
     return marker;
 }
 
@@ -642,3 +642,16 @@ $(document).ready(function() {
     });
 
 });
+
+function getSelectedBounds() {
+    var bounds = '';
+    var swLat = map.getBounds().getSouthWest().lat;
+    var swLng = map.getBounds().getSouthWest().lng;
+    var neLat = map.getBounds().getNorthEast().lat;
+    var neLng = map.getBounds().getNorthEast().lng;
+
+    bounds = [swLat, swLng, neLat, neLng].join()
+        return bounds;    
+}
+
+

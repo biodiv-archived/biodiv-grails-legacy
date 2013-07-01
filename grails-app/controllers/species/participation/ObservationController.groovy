@@ -82,15 +82,21 @@ class ObservationController {
 			def obvFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
 			def tagsHtml = "";
 			if(model.showTags) {
-				def filteredTags = observationService.getTagsFromObservation(model.totalObservationInstanceList.collect{it[0]})
-				tagsHtml = g.render(template:"/common/observation/showAllTagsTemplate", model:[count: count, tags:filteredTags, isAjaxLoad:true]);
+//				def filteredTags = observationService.getTagsFromObservation(model.totalObservationInstanceList.collect{it[0]})
+//				tagsHtml = g.render(template:"/common/observation/showAllTagsTemplate", model:[count: count, tags:filteredTags, isAjaxLoad:true]);
 			}
-			def mapViewHtml = g.render(template:"/common/observation/showObservationMultipleLocationTemplate", model:[observationInstanceList:model.totalObservationInstanceList]);
+//			def mapViewHtml = g.render(template:"/common/observation/showObservationMultipleLocationTemplate", model:[observationInstanceList:model.totalObservationInstanceList]);
 			
-			def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml, tagsHtml:tagsHtml, mapViewHtml:mapViewHtml, instanceTotal:model.instanceTotal]
+			def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml, tagsHtml:tagsHtml, instanceTotal:model.instanceTotal]
 			render result as JSON
 			return;
 		}
+	}
+
+	def listJSON = {
+		log.debug params
+		def model = getObservationList(params);
+		render model as JSON
 	}
 
 	protected def getObservationList(params) {
@@ -102,22 +108,27 @@ class ObservationController {
 		def activeFilters = filteredObservation.activeFilters
 		activeFilters.put("append", true);//needed for adding new page obv ids into existing session["obv_ids_list"]
 		
-		def queryResult = observationService.getFilteredObservations(params, -1, -1, true)
-		def count = queryResult.observationInstanceList.size()
-		def checklistCount =  queryResult.checklistCount
+//		def queryResult = observationService.getFilteredObservations(params, -1, -1, false)
+//		def count = queryResult.observationInstanceList.size()
+        def checklistCount =  filteredObservation.checklistCount
+		def allObservationCount =  filteredObservation.allObservationCount
 		
 		//storing this filtered obvs ids list in session for next and prev links
 		//http://grepcode.com/file/repo1.maven.org/maven2/org.codehaus.groovy/groovy-all/1.8.2/org/codehaus/groovy/runtime/DefaultGroovyMethods.java
 		//returns an arraylist and invalidates prev listing result
 		if(params.append?.toBoolean() && session["obv_ids_list"]) {
-    		session["obv_ids_list"].addAll(observationInstanceList.collect {it.id});
+    		session["obv_ids_list"].addAll(observationInstanceList.collect {
+                params.fetchField?it[0]:it.id
+            }); 
 		} else {
 			session["obv_ids_list_params"] = params.clone();
-			session["obv_ids_list"] = observationInstanceList.collect {it.id};
+			session["obv_ids_list"] = observationInstanceList.collect {
+                params.fetchField?it[0]:it.id
+            };
 		}
 		
 		log.debug "Storing all observations ids list in session ${session['obv_ids_list']} for params ${params}";
-		return [totalObservationInstanceList:queryResult.observationInstanceList, observationInstanceList: observationInstanceList, instanceTotal: count, checklistCount:checklistCount, observationCount: count-checklistCount ,queryParams: queryParams, activeFilters:activeFilters, resultType:'observation']
+		return [observationInstanceList: observationInstanceList, instanceTotal: allObservationCount, checklistCount:checklistCount, observationCount: allObservationCount-checklistCount ,queryParams: queryParams, activeFilters:activeFilters, resultType:'observation']
 	}
 	
 
@@ -1136,12 +1147,12 @@ class ObservationController {
 			def obvFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
 			def tagsHtml = "";
 			if(model.showTags) {
-				def filteredTags = observationService.getTagsFromObservation(model.totalObservationInstanceList.collect{it[0]})
-				tagsHtml = g.render(template:"/common/observation/showAllTagsTemplate", model:[count: count, tags:filteredTags, isAjaxLoad:true]);
+//				def filteredTags = observationService.getTagsFromObservation(model.totalObservationInstanceList.collect{it[0]})
+//				tagsHtml = g.render(template:"/common/observation/showAllTagsTemplate", model:[count: count, tags:filteredTags, isAjaxLoad:true]);
 			}
-			def mapViewHtml = g.render(template:"/common/observation/showObservationMultipleLocationTemplate", model:[observationInstanceList:model.totalObservationInstanceList]);
+//			def mapViewHtml = g.render(template:"/common/observation/showObservationMultipleLocationTemplate", model:[observationInstanceList:model.totalObservationInstanceList]);
 			
-			def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml, tagsHtml:tagsHtml, mapViewHtml:mapViewHtml, instanceTotal:model.instanceTotal]
+			def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml, tagsHtml:tagsHtml, instanceTotal:model.instanceTotal]
 			render result as JSON
 			return;
 		}
