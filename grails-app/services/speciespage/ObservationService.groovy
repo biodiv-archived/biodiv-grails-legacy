@@ -672,7 +672,7 @@ class ObservationService {
         if(params.bounds && boundGeometry) {
             hqlQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(org.hibernatespatial.GeometryUserType, null))
             def checklistCountQuery = sessionFactory.currentSession.createQuery(queryParts.checklistCountQuery)
-             checklistCountQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(org.hibernatespatial.GeometryUserType, null))
+            checklistCountQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(org.hibernatespatial.GeometryUserType, null))
             checklistCountQuery.setProperties(queryParts.queryParams)
 			checklistCount = checklistCountQuery.list()[0]
         } else {
@@ -683,7 +683,7 @@ class ObservationService {
         hqlQuery.setProperties(queryParts.queryParams);
 
 		def observationInstanceList = hqlQuery.list();
-
+		
 		if(params.daterangepicker_start){
 			queryParts.queryParams["daterangepicker_start"] = params.daterangepicker_start
 		}
@@ -781,7 +781,7 @@ class ObservationService {
 		
 		if(params.bounds) {
 			def bounds = params.bounds.split(",")
-
+			
 			def swLat = bounds[0].toFloat()
 			def swLon = bounds[1].toFloat()
 			def neLat = bounds[2].toFloat()
@@ -806,10 +806,10 @@ class ObservationService {
     *
     **/
     private getBoundGeometry(x1, y1, x2, y2){
-        def p1 = new Coordinate( x1,  y1)
-        def p2 = new Coordinate( x2,  y1)
-        def p3 = new Coordinate( x2,  y2)
-        def p4 = new Coordinate( x1,  y2)
+        def p1 = new Coordinate(y1, x1)
+        def p2 = new Coordinate(y1, x2)
+        def p3 = new Coordinate(y2, x2)
+        def p4 = new Coordinate(y2, x1)
         Coordinate[] arr = new Coordinate[5]
         arr[0] = p1
         arr[1] = p2
