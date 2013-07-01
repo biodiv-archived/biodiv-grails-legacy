@@ -55,6 +55,12 @@ class NewSimpleSpreadsheetConverter extends SourceConverter {
 		
 		int i=0;
 		for(int index = 4; index < content.size(); index++) {
+            contributors = [];
+            attributions = [];
+            licenses = [];
+            audiences = [];
+            status = [];
+            imageIds = [];
 			List<String> speciesContent = content.get(index);
 			//log.debug speciesContent;
 			Node speciesElement = builder.createNode("species");
