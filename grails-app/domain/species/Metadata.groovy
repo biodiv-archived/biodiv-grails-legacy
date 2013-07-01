@@ -41,10 +41,10 @@ abstract class Metadata {
 		placeName(nullable:true)
 		reverseGeocodedName(nullable:true)
 		//location(nullable: true, blank:true)
-		latitude(nullable: true)
-		longitude(nullable:true)
+		latitude(nullable: false)
+		longitude(nullable:false)
 		locationAccuracy(nullable: true)
-        topology(nullable:true)
+        topology(nullable:false)
 		fromDate (nullable:true)
 		toDate (nullable:true)
     }
@@ -55,19 +55,13 @@ abstract class Metadata {
         }
     }
 
-    float getLatitude() {
-		if(latitude)
-			return latitude
-
-		if(topology)
-            return (float) topology.getCentroid().getY();
+	/*
+    def setLatitude(float lat) {
+		log.error " should not call this"
     }
 
-    float getLongitude() {
-		if(longitude)
-			return longitude
-
-        if(topology) 
-            return (float) topology.getCentroid().getX();
+    def setLongitude(float longitude) {
+		log.error " should not call this"
     }
+    */
 }

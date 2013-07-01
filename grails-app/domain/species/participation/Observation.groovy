@@ -123,12 +123,12 @@ class Observation extends Metadata implements Taggable, Rateable {
 	 * TODO: return resources in rating order and choose first
 	 * @return
 	 */
-	Resource mainImage(ImageType type = ImageType.NORMAL) {
+	Resource mainImage() {
 		def res = listResourcesByRating(1);
         if(res) 
             return res[0]
 		else
-			return group.icon(type)
+			return group.icon(ImageType.ORIGINAL)
 	}
 
 	/**
@@ -285,12 +285,17 @@ class Observation extends Metadata implements Taggable, Rateable {
 	def beforeUpdate(){
 		if(isDirty() && !isDirty('visitCount')){
 			updateIsShowable()
+			
+			if(isDirty('topology')){
+				updateLatLong()
+			}
 			lastRevised = new Date();
 		}
 	}
 	
 	def beforeInsert(){
 		updateIsShowable()
+		updateLatLong()
 	}
 	
 	def afterInsert(){
@@ -317,6 +322,12 @@ class Observation extends Metadata implements Taggable, Rateable {
 	
 	private updateIsShowable(){
 		isShowable = (isChecklist || (resource && !resource.isEmpty())) ? true : false
+	}
+	
+	private  updateLatLong(){
+		def centroid =  topology.getCentroid()
+		latitude = (float) centroid.getY()
+		longitude = (float) centroid.getY()
 	}
 	
 	String fetchSpeciesCall(){

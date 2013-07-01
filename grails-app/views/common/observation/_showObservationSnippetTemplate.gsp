@@ -1,14 +1,14 @@
 <%@page import="species.Resource.ResourceType"%>
 <g:set var="mainImage" value="${observationInstance.mainImage()}" />
 <%
-def imagePath = mainImage?mainImage.thumbnailUrl(): null;
+def imagePath = mainImage?mainImage.thumbnailUrl(null, observationInstance.isChecklist ? '.png' :null): null;
 def controller = observationInstance.isChecklist ? 'checklist' :'observation'
 def obvId = observationInstance.id
 %>
 
 <div style="position:relative;overflow:hidden">
     <g:render template="/common/observation/noOfResources" model="['instance':observationInstance]"/>
-    <div class="figure span3 observation_story_image" style="display: table;height:220px;" 
+    <div class="figure span3 observation_story_image" style="display: table;height:220px; ${observationInstance.isChecklist? 'opacity:0.7;' :''}" 
             title='<g:if test="${obvTitle != null}">${obvTitle}</g:if>'>
             <g:link url="${uGroup.createLink(controller:controller, action:'show', id:obvId, 'pos':pos, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress) }" name="l${pos}"
                     >

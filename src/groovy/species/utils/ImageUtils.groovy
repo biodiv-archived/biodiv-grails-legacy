@@ -240,6 +240,10 @@ class ImageUtils {
 					name = name?.plus(ImageType.LARGE.getSuffix()).replaceFirst('.'+config.speciesPortal.resources.images.defaultType, defaultFileType);
 				}
 				break;
+			case ImageType.ORIGINAL :
+			default:
+				name = name + defaultFileType;
+				 
 		}
 		return name;
 	}
@@ -248,11 +252,12 @@ class ImageUtils {
 
 
 public enum ImageType {
-	NORMAL,SMALL,VERY_SMALL, LARGE
+	ORIGINAL, NORMAL,SMALL,VERY_SMALL, LARGE
 	def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 	
 	public String getSuffix() {
 		switch(this) {
+			case ORIGINAL : return ""
 			case NORMAL : return config.speciesPortal.resources.images.thumbnail.suffix
 			case SMALL : return config.speciesPortal.resources.images.galleryThumbnail.suffix
 			case VERY_SMALL : return '_32X32'+'.'+config.speciesPortal.resources.images.defaultType

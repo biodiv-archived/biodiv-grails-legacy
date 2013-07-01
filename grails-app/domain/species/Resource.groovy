@@ -61,12 +61,12 @@ class Resource implements Rateable {
 	
 	static transients = ['baseUrl']
 	
-	String thumbnailUrl(String newBaseUrl=null) {
+	String thumbnailUrl(String newBaseUrl=null, String defaultFileType=null) {
 		String thumbnailUrl = '';
 		newBaseUrl = newBaseUrl?:(this.baseUrl?:grailsApplication.config.speciesPortal.observations.serverURL)
 		switch(type) {
 			case  ResourceType.IMAGE :
-				thumbnailUrl = newBaseUrl + "/" + ImageUtils.getFileName(this.fileName, null, null)
+				thumbnailUrl = newBaseUrl + "/" + ImageUtils.getFileName(this.fileName, null, defaultFileType)
 				//thumbnailUrl = baseUrl + "/" + this.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.thumbnail.suffix);
 				break;
 			case ResourceType.VIDEO :				

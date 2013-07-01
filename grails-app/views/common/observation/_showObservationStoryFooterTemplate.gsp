@@ -10,8 +10,14 @@
                         <span class="">${observationInstance.fetchCommentCount()}</span>
 		</div>
 		<div class="footer-item">
+		<g:if test="${!observationInstance.isChecklist}">
 			<i class="icon-check" title="No of species calls"></i>
-                        <span class="">${observationInstance.fetchRecoVoteOwnerCount()}</span>
+            <span class="">${observationInstance.fetchRecoVoteOwnerCount()}</span>
+        </g:if>
+        <g:else>
+    		<i class="icon-screenshot" title="Observations"></i>
+    		<span class="">${observationInstance.speciesCount}</span>
+        </g:else>                
 	
 		</div>
 
