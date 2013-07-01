@@ -672,18 +672,17 @@ function updateGallery(target, limit, offset, removeUser, isGalleryUpdate, remov
 function showMapView() {
 	$('#observations_list_map').slideToggle(function() {
 
-		if ($(this).is(':hidden')) {
-			$('div.observations > div.observations_list').show();
-			$('#map_view_bttn').css('background-color', 'transparent');
-			$('#map_results_list > div.observations_list').remove();
-			updateGallery(undefined, undefined, 0, undefined, window.params.isGalleryUpdate);
-			// alert(" hiding map view");
-			
-		} else {
-			$('div.observations > div.observations_list').hide();
-			$('div.observations > div.observations_list').html('');
-			// alert("showing map view");
-		}
+	    if ($(this).is(':hidden')) {
+                $('div.observations > div.observations_list').show();
+                $('#map_view_bttn').css('background-color', 'transparent');
+                $('#map_results_list > div.observations_list').remove();
+                updateGallery(undefined, undefined, 0, undefined, window.params.isGalleryUpdate);
+                // alert(" hiding map view");
+            } else {
+                $('div.observations > div.observations_list').hide();
+                $('div.observations > div.observations_list').html('');
+                // alert("showing map view");
+
                 loadGoogleMapsAPI(function() {
                         //var markers = [];
                         var big_map;
@@ -692,6 +691,15 @@ function showMapView() {
 
                         function addAllMarkers() {
                             var url = window.params.observation.listUrl+"?fetchField=id,latitude,longitude,isChecklist"
+                            var pointMarker = M.AwesomeMarkers.icon({
+                                icon: 'ok', 
+                                color: 'blue'
+                            });
+                            var checklistMarker = M.AwesomeMarkers.icon({
+                                icon: 'list', 
+                                color: 'green'
+                            });
+
                             $.ajax({
                                     url: url,
                                     dataType: "json",
@@ -699,9 +707,11 @@ function showMapView() {
                                         for(var i=0; i<data.observationInstanceList.length; i++) {
                                             var obv = data.observationInstanceList[i];
                                             console.log('adding markers'+obv);
+
                                             var marker = addMarker(obv[1], obv[2], {
                                                     draggable: false,
                                                     clusterable: true,
+                                                    icon:obv[3]?checklistMarker:pointMarker,
                                                     clickable:function() {
                                                         load_content(marker, obv[0]); 
                                                     }
@@ -800,9 +810,7 @@ function showMapView() {
                         
 
                     });//end of loadGoogleMapsAPI
-
-//		google.maps.event.trigger(big_map, 'resize');
-//		big_map.setCenter(nagpur_latlng);
+            }
 	});
 }
 

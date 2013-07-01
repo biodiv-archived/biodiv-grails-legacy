@@ -200,8 +200,7 @@ function addMarker(lat, lng, options) {
     var location = new M.LatLng(lat, lng);
     
     options = $.extend({}, {
-        title:options.layer?options.layer:'Use this location',
-        opacity:0.8,
+        title:options.layer?options.layer:'',
         clickable:true
     }, options);
 

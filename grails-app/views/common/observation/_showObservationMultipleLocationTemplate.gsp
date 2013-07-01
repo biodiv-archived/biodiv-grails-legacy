@@ -11,12 +11,12 @@
                     </g:else>
                 });
 
-                function addMarkers() {
+                /*  function addMarkers() {
                     console.log("adding markers");
                     <g:each in="${observationInstanceList}" status="i" var="observationInstance">
                      addMarker(${observationInstance[0]}, ${observationInstance[1].getCentroid().getY()},  ${observationInstance[1].getCentroid().getX()}); 
                     </g:each>
-                }
+                }*/
 
                 function initMap() {
 /*                   nagpur_latlng = new google.maps.LatLng('21.07', '79.27');
