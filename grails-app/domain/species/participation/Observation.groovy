@@ -366,9 +366,9 @@ class Observation extends Metadata implements Taggable, Rateable {
 		res[ObvUtilService.SN] =snName
 		
 		
-		res[ObvUtilService.LOCATION] =placeName
-		res[ObvUtilService.LONGITUDE] = "" + longitude
-		res[ObvUtilService.LATITUDE] = "" + latitude
+		res[ObvUtilService.LOCATION] = placeName
+		res[ObvUtilService.LONGITUDE] = "" + this.longitude
+		res[ObvUtilService.LATITUDE] = "" + this.latitude
 		res[ObvUtilService.NOTES] = notes
 		
 		

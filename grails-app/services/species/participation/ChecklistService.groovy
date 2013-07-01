@@ -221,7 +221,7 @@ class ChecklistService {
 
 	def export(params, DownloadLog dlog){
 		log.debug(params)
-		def cl = Checklist.read(params.downloadObjectId.toLong())
+		def cl = Checklists.read(params.downloadObjectId.toLong())
 		if(!cl){
 			return null
 		}
@@ -237,14 +237,14 @@ class ChecklistService {
 		}
 	}
 
-	private File exportAsPDF(Checklist cl, downloadDir){
+	private File exportAsPDF(Checklists cl, downloadDir){
 		log.debug "Writing pdf checklist" + cl
 		File pdfFile = new File(downloadDir, "checklist_" + new Date().getTime() + ".pdf")
 		Document document = new Document()
 		PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(pdfFile))
 
 		document.open()
-		Map m = cl.fetchExportableValue()
+		Map m = cl.fetchExportableValue(true)
 
 
 		//adding site banner
@@ -260,8 +260,15 @@ class ChecklistService {
 		document.add(list)
 
 		//writing data
-		def columnNames = cl.fetchColumnNames()
-		PdfPTable t = new PdfPTable(columnNames.length)
+		def tmpColumnNames = cl.fetchColumnNames()
+		def columnNames = ["s.no"]
+		for(c in tmpColumnNames){
+			if(c.equalsIgnoreCase(ChecklistService.SN_NAME) || c.equalsIgnoreCase(ChecklistService.CN_NAME)){
+				columnNames.add(c)
+			}
+		}
+		columnNames.add("notes")
+		PdfPTable t = new PdfPTable(columnNames.size())
 		t.setSpacingBefore(25);
 		t.setSpacingAfter(25);
 
@@ -282,7 +289,7 @@ class ChecklistService {
 		return pdfFile
 	}
 
-	private File exportAsCSV(Checklist cl, downloadDir){
+	private File exportAsCSV(Checklists cl, downloadDir){
 		File csvFile = new File(downloadDir, "checklist_" + new Date().getTime() + ".csv")
 		CSVWriter writer = obvUtilService.getCSVWriter(csvFile.getParent(), csvFile.getName())
 		log.debug "Writing csv checklist" + cl
