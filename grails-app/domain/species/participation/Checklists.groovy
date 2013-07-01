@@ -102,74 +102,74 @@ class Checklists extends Observation {
 		return attributionsString
 	}
 	
-	/*
-	def Map fetchExportableValue(){
+	
+	def Map fetchExportableValue(boolean isPdf=false){
 		Map res = [:]
 		Checklists cl = this
-		
+		def keyPrefix = (!isPdf) ? KEY_PREFIX : ""
+			
 		List metaDataList = []
 		
-		metaDataList.add([KEY_PREFIX + "title" + SEPARATOR,  cl.title] )
-		metaDataList.add([KEY_PREFIX + "license" + SEPARATOR,  "" + cl.license.name] )
-		metaDataList.add([KEY_PREFIX + "attribution" + SEPARATOR,  "" + cl.attribution] )
+		metaDataList.add([keyPrefix + "title" + SEPARATOR,  cl.title] )
+		metaDataList.add([keyPrefix + "license" + SEPARATOR,  "" + cl.license.name] )
+		metaDataList.add([keyPrefix + "attribution" + SEPARATOR,  "" + cl.fetchAttributions()] )
 		
-		metaDataList.add([KEY_PREFIX + "speciesCount" + SEPARATOR, "" + cl.speciesCount] )
-		metaDataList.add([KEY_PREFIX + "description" + SEPARATOR,  cl.description])
-		metaDataList.add([KEY_PREFIX + "refText" + SEPARATOR,  cl.refText])
-		metaDataList.add([KEY_PREFIX + "sourceText" + SEPARATOR,  cl.sourceText])
-		metaDataList.add([KEY_PREFIX + "reservesValue" + SEPARATOR,  "" + cl.reservesValue])
+		metaDataList.add([keyPrefix + "speciesGroup" + SEPARATOR,  cl.group.name])
+		metaDataList.add([keyPrefix + "speciesCount" + SEPARATOR, "" + cl.speciesCount] )
+		metaDataList.add([keyPrefix + "description" + SEPARATOR,  cl.notes])
+		metaDataList.add([keyPrefix + "refText" + SEPARATOR,  cl.refText])
+		metaDataList.add([keyPrefix + "sourceText" + SEPARATOR,  cl.sourceText])
+		metaDataList.add([keyPrefix + "reservesValue" + SEPARATOR,  "" + cl.reservesValue])
 		
-		metaDataList.add([KEY_PREFIX + "latitude" + SEPARATOR, "" + cl.latitude])
-		metaDataList.add([KEY_PREFIX + "longitude" + SEPARATOR, "" + cl.longitude])
-		metaDataList.add([KEY_PREFIX + "placeName" + SEPARATOR, cl.placeName])
-		metaDataList.add([KEY_PREFIX + "state" + SEPARATOR,  cl.state.join(", ")])
-		metaDataList.add([KEY_PREFIX + "district" + SEPARATOR,  cl.district.join(", ")])
-		metaDataList.add([KEY_PREFIX + "taluka" + SEPARATOR,  cl.taluka.join(", ")])
+		metaDataList.add([keyPrefix + "latitude" + SEPARATOR, "" + cl.latitude])
+		metaDataList.add([keyPrefix + "longitude" + SEPARATOR, "" + cl.longitude])
+		metaDataList.add([keyPrefix + "placeName" + SEPARATOR, cl.placeName])
+		metaDataList.add([keyPrefix + "state" + SEPARATOR,  cl.states.join(", ")])
+		metaDataList.add([keyPrefix + "district" + SEPARATOR,  cl.districts.join(", ")])
+		metaDataList.add([keyPrefix + "taluka" + SEPARATOR,  cl.talukas.join(", ")])
 		
 		
-		metaDataList.add([KEY_PREFIX + "fromDate" + SEPARATOR,  "" + cl.fromDate])
-		metaDataList.add([KEY_PREFIX + "toDate" + SEPARATOR,  "" + cl.toDate])
-		metaDataList.add([KEY_PREFIX + "publicationDate" + SEPARATOR,  "" + cl.publicationDate])
+		metaDataList.add([keyPrefix + "fromDate" + SEPARATOR,  "" + cl.fromDate])
+		metaDataList.add([keyPrefix + "toDate" + SEPARATOR,  "" + cl.toDate])
+		metaDataList.add([keyPrefix + "publicationDate" + SEPARATOR,  "" + cl.publicationDate])
 		
 		
 		def ug = []
 		cl.userGroups.collect{ ug.add(it.name)}
+		metaDataList.add([keyPrefix + "userGroups" + SEPARATOR,  ug.join(", ")])
 		
-		def sg = []
-		cl.speciesGroups.collect{ sg.add(it.name)}
-		
-		metaDataList.add([KEY_PREFIX + "userGroups" + SEPARATOR,  ug.join(", ")])
-		metaDataList.add([KEY_PREFIX + "speciesGroups" + SEPARATOR,  sg.join(", ")])
-		
-		metaDataList.add([KEY_PREFIX + obvUtilService.AUTHOR_URL + SEPARATOR, obvUtilService.createHardLink('user', 'show', cl.author.id)])
-		metaDataList.add([KEY_PREFIX + obvUtilService.AUTHOR_NAME + SEPARATOR, cl.author.name])
+		metaDataList.add([keyPrefix + obvUtilService.AUTHOR_URL + SEPARATOR, obvUtilService.createHardLink('user', 'show', cl.author.id)])
+		metaDataList.add([keyPrefix + obvUtilService.AUTHOR_NAME + SEPARATOR, cl.author.name])
 		
 		res[META_DATA] = metaDataList
-		res[DATA] = fetchData()
+		res[DATA] = fetchData(isPdf)
 		return res
 	}
 		
-	private List fetchData(){
+	private List fetchData(boolean isPdf){
 		Checklists cl = this
 		List data = []
-		
-		int prevRowId = -1
-		def valueList = []
-		cl.row.each { ChecklistRowData r ->
-			if(prevRowId == -1){
-				prevRowId = r.rowId
+		int i = 0
+		cl.observations.each { Observation obv ->
+			if(!isPdf){
+				data << obv.fetchChecklistAnnotation().collect { it.value}
+			}else{
+				data << getLimitedColumnForPdf(obv, ++i)		
 			}
-			
-			if(prevRowId != r.rowId){
-				data.add(valueList)
-				valueList = []
-				prevRowId = r.rowId
-			}
-			valueList.add(r.value)
 		}
-		
-		data.add(valueList)
 		return data
 	}
-	*/
+	
+	private List getLimitedColumnForPdf(Observation obv, int serialNo){
+		def res = []
+		obv.fetchChecklistAnnotation().each { Annotation annot ->
+			if(annot.key.equalsIgnoreCase(ChecklistService.SN_NAME) || annot.key.equalsIgnoreCase(ChecklistService.CN_NAME)){
+				res.add(annot.value)
+			}
+		}
+		res.add(0, "" + serialNo)
+		res.add("")
+		return res
+	}
+	
 }

@@ -104,9 +104,20 @@ class ObvUtilService {
 	}
 	
 	private File exportObservation(List obvList, exportType){
-		if(! obvList || obvList.isEmpty())
+		if(! obvList)
 			return null
-			
+		
+		//removing checklist
+		def obvWithoutChecklist = []	
+		obvList.each { obv ->
+			if(!obv.isChecklist)
+				obvWithoutChecklist << obv
+		}
+		obvList = obvWithoutChecklist
+		
+		if(obvList.isEmpty())
+			return null
+		
 		File downloadDir = new File(grailsApplication.config.speciesPortal.observations.observationDownloadDir)
 		if(!downloadDir.exists()){
 			downloadDir.mkdirs()
