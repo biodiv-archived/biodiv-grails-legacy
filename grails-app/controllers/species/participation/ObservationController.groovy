@@ -1088,11 +1088,11 @@ class ObservationController {
 		Map emailList = getUnBlockedMailList(params.userIdsAndEmailIds, request);
 		if(emailList.isEmpty()){
 			log.debug "No valid email specified for identification."
-		}else if (Environment.getCurrent().getName().equalsIgnoreCase("pamba") || Environment.getCurrent().getName().equalsIgnoreCase("development")) {
+		}else if (Environment.getCurrent().getName().equalsIgnoreCase("pamba") || Environment.getCurrent().getName().equalsIgnoreCase("saturn")) {
 			def conf = SpringSecurityUtils.securityConfig
 			def mailSubject = params.mailSubject
 			for(entry in emailList.entrySet()){
-				def body = observationService.getIdentificationEmailInfo(params, request, entry.getValue()).mailBody
+				def body = observationService.getIdentificationEmailInfo(params, request, entry.getValue(), params.sourceController?:'observation', params.sourceAction?:'show').mailBody
 				mailService.sendMail {
 					to entry.getKey()
 					bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com", "thomas.vee@gmail.com", "sandeept@strandls.com"

@@ -113,7 +113,7 @@ $(function() {
          	url:"${uGroup.createLink(controller:'observation', action:'sendIdentificationMail')}",
 			dataType: 'json', 
 			type: 'POST',
-			data:{sourcePageUrl : window.location.href, source:"${source}"},
+                        data:{sourcePageUrl : window.location.href, source:"${source}", 'sourceController':'${params.controller}', 'sourceAction':'${params.action}'},
 			resetForm: true,
 			success: function(data, statusText, xhr, form) {
 				//showRecoUpdateStatus('Email sent to respective person', 'success');

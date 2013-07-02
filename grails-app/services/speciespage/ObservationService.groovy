@@ -914,7 +914,7 @@ class ObservationService {
                 mailSubject = "Share "+controller
                 activitySource = controller
 			default:
-				log.debug "invalid source type"
+				log.debug "invalid source type ${source}"
 		}
 		def currentUser = springSecurityService.currentUser?:""
 		def templateMap = [currentUser:currentUser, activitySource:activitySource, domain:Utils.getDomainName(requestObj)]
