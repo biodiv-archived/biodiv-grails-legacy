@@ -763,9 +763,8 @@ function refreshMarkers(p) {
                     draggable: false,
                     clusterable: true,
                     icon:obv[3]?checklistMarker:pointMarker,
-                    clickable:function() {
-                        load_content(marker, obv[0]); 
-                    }
+                    clickable:load_content,
+                    data:{id:obv[0]}
                 });
                 if(marker) markers.addLayer(marker);
             }
@@ -830,12 +829,13 @@ function mapViewSlideToggleHandler() {
                           var markerCluster = new MarkerClusterer(big_map, markers, {gridSize: 30, maxZoom:13});
                           */                       
 
-function load_content(marker, id){
+function load_content(params){
+    var marker = this
     $.ajax({
-        url: window.params.snippetUrl+"/"+id,
-    success: function(data){
-        marker.bindPopup("<div id='info-content' class='thumbnail'>" + data + "</div>").openPopup();;
-    }
+        url: window.params.snippetUrl+"/"+params.id,
+        success: function(data){
+            marker.bindPopup("<div id='info-content' class='thumbnail'>" + data + "</div>").openPopup();;
+        }
     });
 }
 /*

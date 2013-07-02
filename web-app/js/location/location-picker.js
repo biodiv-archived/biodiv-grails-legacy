@@ -243,7 +243,9 @@ function createMarker(lat, lng, options) {
     }
 
     if(options.clickable) {
-        marker.on('click', $.isFunction(options.clickable)?options.clickable:select_location);
+        marker.on('click', $.isFunction(options.clickable)?function(){
+            options.clickable.call(this, options.data)
+        }:select_location);
     }
 
     return marker;
@@ -267,7 +269,6 @@ function set_location(lat, lng, marker, markerOptions) {
 }
 
 function select_location(marker) {
-    console.log('select_location')
     if(marker == undefined) return;
     if(selectedMarker) { 
         selectedMarker.setIcon(prevIcon).setOpacity(0.8);
