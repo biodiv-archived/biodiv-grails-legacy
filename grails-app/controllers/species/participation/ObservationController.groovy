@@ -57,14 +57,33 @@ class ObservationController {
 	}
 
 	def filteredMapBasedObservationsList = {
-		def result;
+		def model;
 		//TODO: Dirty hack to feed results through solr if the request is from search
 		if(params.action == 'search') {
-			result = observationService.getObservationsFromSearch(params)
+			model = observationService.getObservationsFromSearch(params)
 		} else {
-			result = getObservationList(params);
+			 model = getObservationList(params);
 		}
-		render (template:"/common/observation/showObservationListTemplate", model:result);
+        if(params.loadMore?.toBoolean()){
+			render(template:"/common/observation/showObservationListTemplate", model:model);
+			return;
+		} else if(!params.isGalleryUpdate?.toBoolean()){
+			render (view:"list", model:model)
+			return;
+		} else{
+			def obvListHtml =  g.render(template:"/common/observation/showObservationListTemplate", model:model);
+			def obvFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
+			def tagsHtml = "";
+			if(model.showTags) {
+//				def filteredTags = observationService.getTagsFromObservation(model.totalObservationInstanceList.collect{it[0]})
+//				tagsHtml = g.render(template:"/common/observation/showAllTagsTemplate", model:[count: count, tags:filteredTags, isAjaxLoad:true]);
+			}
+//			def mapViewHtml = g.render(template:"/common/observation/showObservationMultipleLocationTemplate", model:[observationInstanceList:model.totalObservationInstanceList]);
+			
+			def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml, tagsHtml:tagsHtml, instanceTotal:model.instanceTotal]
+			render result as JSON
+			return;
+		}
 	}
 
 	def list = {
@@ -116,16 +135,18 @@ class ObservationController {
 		//storing this filtered obvs ids list in session for next and prev links
 		//http://grepcode.com/file/repo1.maven.org/maven2/org.codehaus.groovy/groovy-all/1.8.2/org/codehaus/groovy/runtime/DefaultGroovyMethods.java
 		//returns an arraylist and invalidates prev listing result
-		if(params.append?.toBoolean() && session["obv_ids_list"]) {
-    		session["obv_ids_list"].addAll(observationInstanceList.collect {
-                params.fetchField?it[0]:it.id
-            }); 
-		} else {
-			session["obv_ids_list_params"] = params.clone();
-			session["obv_ids_list"] = observationInstanceList.collect {
-                params.fetchField?it[0]:it.id
-            };
-		}
+        if(max != -1) {
+            if(params.append?.toBoolean() && session["obv_ids_list"]) {
+                session["obv_ids_list"].addAll(observationInstanceList.collect {
+                    params.fetchField?it[0]:it.id
+                }); 
+            } else {
+                session["obv_ids_list_params"] = params.clone();
+                session["obv_ids_list"] = observationInstanceList.collect {
+                    params.fetchField?it[0]:it.id
+                };
+            }
+        }
 		
 		log.debug "Storing all observations ids list in session ${session['obv_ids_list']} for params ${params}";
 		return [observationInstanceList: observationInstanceList, instanceTotal: allObservationCount, checklistCount:checklistCount, observationCount: allObservationCount-checklistCount ,queryParams: queryParams, activeFilters:activeFilters, resultType:'observation']

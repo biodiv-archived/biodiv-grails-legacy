@@ -17,6 +17,7 @@ var overlays = {};
 var selectedIcon,prevIcon;
 var markers,searchMarker;
 var drawnItems;
+var isMapViewLoaded = false;
 
 function initialize(element, drawable){
     G = google.maps;
@@ -43,6 +44,7 @@ function initialize(element, drawable){
     initControls();
     //initLocation(drawable);
     //adjustBounds();
+    isMapViewLoaded=true;
  }
 
 function initControls() {
@@ -54,8 +56,8 @@ function initControls() {
         color: 'red'
     });
     
-    markers = new M.MarkerClusterGroup();
-    markers.addTo(map);
+//    markers = new M.MarkerClusterGroup();
+//    markers.addTo(map);
     
     M.control.fullscreen({
           position: 'topleft',
@@ -195,6 +197,12 @@ function clearDrawnItems() {
 
 
 function addMarker(lat, lng, options) {
+    var marker = createMarker(lat, lng, options)
+    if(marker)
+        marker.addTo(map);
+}
+
+function createMarker(lat, lng, options) {
     if(!lat || !lng) return;
     if(options == undefined) options = {};
     var location = new M.LatLng(lat, lng);
@@ -222,7 +230,6 @@ function addMarker(lat, lng, options) {
         delete options['layer'];
     }
 */
-    marker.addTo(map);
     if(options.draggable) {
         var lastPosition = marker.getLatLng();
         marker.on("dragend", function(event) {
@@ -239,9 +246,6 @@ function addMarker(lat, lng, options) {
         marker.on('click', $.isFunction(options.clickable)?options.clickable:select_location);
     }
 
-    if(options.clusterable) {
-        markers.addLayer(marker);
-    }
     return marker;
 }
 
@@ -650,7 +654,7 @@ function getSelectedBounds() {
     var neLng = map.getBounds().getNorthEast().lng;
 
     bounds = [swLat, swLng, neLat, neLng].join()
-        return bounds;    
+    return bounds;    
 }
 
 

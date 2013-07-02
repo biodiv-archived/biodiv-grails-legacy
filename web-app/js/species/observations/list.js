@@ -481,9 +481,9 @@ function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSo
             params['speciesName'] = sName;
     }
 	
-	var flag = getSelectedFlag();
+    var flag = getSelectedFlag();
     if(flag) {
-            params['isFlagged'] = flag;
+        params['isFlagged'] = flag;
     }
     
     var allChecklistFlag = getSelectedAllChecklistFlag();
@@ -507,129 +507,138 @@ function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSo
     }
 
 
-	var tag = getSelectedTag();
-	if(tag){
-		params['tag'] = tag;
-	}else{
-		// removing old tag from url
-		if(params['tag'] != undefined){
-			delete params['tag'];
-		}
-	}
-	
-	var query = $( "#searchTextField" ).val();
-	if(query){
-		params['query'] = query;
-	}else{
-		// removing old tag from url
-		if(params['query'] != undefined){
-			delete params['query'];
-		}
-	}
-	
-	if(!isRegularSearch) {
-	$("#advSearchForm :input").each(function(index, ele) {
-		var field = $(this).attr('name');
-		var query = $( this ).val();
-		if(query){
-			params[field] = query;
-		} else {
-			// removing old tag from url
-			if(params[field] != undefined){
-				delete params[field];
-			}
-		}
-		});
-		if((params['daterangepicker_start'] === new Date(0).toString('dd/MM/yyyy')) && (params['daterangepicker_end'] === Date.today().toString('dd/MM/yyyy'))){
-			delete params['daterangepicker_start'];
-			delete params['daterangepicker_end'];
-		}
-	}
-	
-        if($("#limit").length != 0) {
-            params['max'] = $('select[name="limit"]').val();
-        } else if(limit != undefined) {
-            params['max'] = limit.toString();
-        } 
-
-        if(offset != undefined) {
-            params['offset'] = offset.toString();
+    var tag = getSelectedTag();
+    if(tag){
+        params['tag'] = tag;
+    }else{
+        // removing old tag from url
+        if(params['tag'] != undefined){
+            delete params['tag'];
         }
-	
-	if(removeUser){
-		if(params['user'] != undefined){
-			delete params['user'];
-		}
-	}
-	
-	if(removeObv){
-		if(params['observation'] != undefined){
-			delete params['observation'];
-		}
-	}
-	
-	var uGroup = getSelectedUserGroup();
-    if(uGroup) {
-    	params['uGroup'] = uGroup;
-    } else {
-		if(params['uGroup'] != undefined){
-			delete params['uGroup'];
-		}
     }
-	return params;
+
+    var query = $( "#searchTextField" ).val();
+    if(query){
+        params['query'] = query;
+    }else{
+        // removing old tag from url
+        if(params['query'] != undefined){
+            delete params['query'];
+        }
+    }
+
+    if(!isRegularSearch) {
+        $("#advSearchForm :input").each(function(index, ele) {
+            var field = $(this).attr('name');
+            var query = $( this ).val();
+            if(query){
+                params[field] = query;
+            } else {
+                // removing old tag from url
+                if(params[field] != undefined){
+                    delete params[field];
+                }
+            }
+        });
+        if((params['daterangepicker_start'] === new Date(0).toString('dd/MM/yyyy')) && (params['daterangepicker_end'] === Date.today().toString('dd/MM/yyyy'))){
+            delete params['daterangepicker_start'];
+            delete params['daterangepicker_end'];
+        }
+    }
+
+    if($("#limit").length != 0) {
+        params['max'] = $('select[name="limit"]').val();
+    } else if(limit != undefined) {
+        params['max'] = limit.toString();
+    } 
+
+    if(offset != undefined) {
+        params['offset'] = offset.toString();
+    }
+
+    if(removeUser){
+        if(params['user'] != undefined){
+            delete params['user'];
+        }
+    }
+
+    if(removeObv){
+        if(params['observation'] != undefined){
+            delete params['observation'];
+        }
+    }
+
+    var uGroup = getSelectedUserGroup();
+    if(uGroup) {
+        params['uGroup'] = uGroup;
+    } else {
+        if(params['uGroup'] != undefined){
+            delete params['uGroup'];
+        }
+    }
+   
+    var bounds = $("#bounds").val();
+    if(bounds) {
+        params['bounds'] = bounds;
+    } else {
+        delete params['bounds'];
+    }
+
+    params['isMapView'] = $("#isMapView").val()
+
+    return params;
 }	
 
 function setActiveTag(activeTag){
-	if(activeTag != undefined){
-				$('li.tagit-choice').each (function() {
-					if(stringTrim($(this).contents().first().text()) == stringTrim(activeTag)) {
-       				$(this).addClass('active');
-       			}
-       			else{
-       				if($(this).hasClass('active')){
-       					$(this).removeClass('active');
-       				}
-       			}
-       		});
-       		
-       		$('#tc_tagcloud a').each(function() {
-					if(stringTrim($(this).contents().first().text()) == stringTrim(activeTag)) {
-       				$(this).addClass('active');
-       			}else{
-       				if($(this).hasClass('active')){
-       					$(this).removeClass('active');
-       				}
-       			}
-			});
-			
- 		}
+    if(activeTag != undefined){
+        $('li.tagit-choice').each (function() {
+            if(stringTrim($(this).contents().first().text()) == stringTrim(activeTag)) {
+                $(this).addClass('active');
+            }
+            else{
+                if($(this).hasClass('active')){
+                    $(this).removeClass('active');
+                }
+            }
+        });
+
+        $('#tc_tagcloud a').each(function() {
+            if(stringTrim($(this).contents().first().text()) == stringTrim(activeTag)) {
+                $(this).addClass('active');
+            }else{
+                if($(this).hasClass('active')){
+                    $(this).removeClass('active');
+                }
+            }
+        });
+
+    }
 }
 
 function updateListPage(activeTag) {
-		return function (data) {
-			$('.observations_list').replaceWith(data.obvListHtml);
-			$('#info-message').replaceWith(data.obvFilterMsgHtml);
-			$('#tags_section').replaceWith(data.tagsHtml);
-			$('.observation_location_wrapper').replaceWith(data.mapViewHtml);
-			setActiveTag(activeTag);
-			updateDownloadBox(data.instanceTotal)
-			updateRelativeTime();
-			last_actions();
-			eatCookies();			
-			$('.observations_list_wrapper').trigger('updatedGallery');
-	}
+    return function (data) {
+        $('.observations_list').replaceWith(data.obvListHtml);
+        $('#info-message').replaceWith(data.obvFilterMsgHtml);
+        $('#tags_section').replaceWith(data.tagsHtml);
+        //$('.observation_location_wrapper').replaceWith(data.mapViewHtml);
+        setActiveTag(activeTag);
+        updateDownloadBox(data.instanceTotal);
+        updateRelativeTime();
+        last_actions();
+        eatCookies();			
+        $('.observations_list_wrapper').trigger('updatedGallery');
+    }
 }
 
 function updateGallery(target, limit, offset, removeUser, isGalleryUpdate, removeObv, removeSort, isRegularSearch, removeParam) {
-	if(target === undefined) {
-            target = window.location.pathname + window.location.search;
+    if(target === undefined) {
+        target = window.location.pathname + window.location.search;
     }
-    
+
     var a = $('<a href="'+target+'"></a>');
     var url = a.url();
     var href = url.attr('path');
     var params = getFilterParameters(url, limit, offset, removeUser, removeObv, removeSort, isRegularSearch, removeParam);
-    console.log(params);
     // alert(" tag in params " + params['tag'] );
     isGalleryUpdate = (isGalleryUpdate == undefined)?true:isGalleryUpdate
     if(isGalleryUpdate)
@@ -642,177 +651,216 @@ function updateGallery(target, limit, offset, removeUser, isGalleryUpdate, remov
     History.pushState({state:1}, document.title, '?'+decodeURIComponent($.param(params))); 
     console.log("doc_url " + doc_url);
     if(isGalleryUpdate) {
-       	$.ajax({
-				url: doc_url,
-				dataType: 'json',
-				
-				beforeSend : function(){
-					$('.observations_list').css({"opacity": 0.5});
-					$('#tags_section').css({"opacity": 0.5});
-				},
-				
-				success: updateListPage(params["tag"]),
-			statusCode: {
-				401: function() {
-					show_login_dialog();
-				}	    				    			
-			},
-			error: function(xhr, status, error) {
-				var msg = $.parseJSON(xhr.responseText);
-				$('.message').html(msg);
-			}
-		});
-	} else {
-		window.location = url.attr('base')+doc_url;
-	}
+        $.ajax({
+            url: doc_url,
+            dataType: 'json',
+
+            beforeSend : function(){
+                $('.observations_list').css({"opacity": 0.5});
+                $('#tags_section').css({"opacity": 0.5});
+            },
+            success: updateListPage(params["tag"]),
+            statusCode: {
+                401: function() {
+                    show_login_dialog();
+                }	    				    			
+            },
+            error: function(xhr, status, error) {
+                var msg = $.parseJSON(xhr.responseText);
+                $('.message').html(msg);
+            }
+        });
+        if(params.isMapView === "true" || params.bounds != undefined) {
+            updateMapView(params);
+        }
+    } else {
+        window.location = url.attr('base')+doc_url;
+    }
 }
-   
-        
-		
+ 
+var oldParams = {}
+function updateMapView (params) {
+    var isCollapsed = false;
+    if($('#observations_list_map').is(':hidden')) {
+        $('#observations_list_map').slideToggle(mapViewSlideToggleHandler);
+        isCollapsed = true
+    }
+    if(isMapViewLoaded === false) {
+        loadGoogleMapsAPI(function() {
+            initialize(document.getElementById("big_map_canvas"), false);
+            map.on('mouseout', function() {
+                refreshList(getSelectedBounds());
+            });
+            refreshMarkers(params);
+            refreshMapBounds()
+        });
+    } else {
+        //order of params is important for this test to pass
+        var p = jQuery.extend({}, params);
+        delete p.bounds
+        delete oldParams.bounds
+        console.log(JSON.stringify(oldParams))
+        console.log(JSON.stringify(p))
+        if(JSON.stringify(oldParams) != JSON.stringify(p))
+            refreshMarkers(p);
+        refreshMapBounds()
+    }
+    oldParams = params
+}
+
+function refreshMapBounds() {
+    var bounds = $('#bounds').val();
+    if(bounds) {
+        bounds = bounds.split(',');
+        if(bounds.length == 4) {
+            map.fitBounds([
+                    [bounds[0], bounds[1]],
+                    [bounds[2], bounds[3]]
+                    ]);
+        }
+    } else {
+        map.setZoom(map.getMinZoom());
+    }
+}
+
 function showMapView() {
-	$('#observations_list_map').slideToggle(function() {
+    $('#observations_list_map').slideToggle(function() {
+        mapViewSlideToggleHandler()
+        updateGallery(undefined, undefined, 0, undefined, window.params.isGalleryUpdate);
+    });
+}
 
-	    if ($(this).is(':hidden')) {
-                $('div.observations > div.observations_list').show();
-                $('#map_view_bttn').css('background-color', 'transparent');
-                $('#map_results_list > div.observations_list').remove();
-                updateGallery(undefined, undefined, 0, undefined, window.params.isGalleryUpdate);
-                // alert(" hiding map view");
-            } else {
-                $('div.observations > div.observations_list').hide();
-                $('div.observations > div.observations_list').html('');
-                // alert("showing map view");
+ 
+function refreshMarkers(p) {
+    if(!p) p = new Array()
 
-                loadGoogleMapsAPI(function() {
-                        //var markers = [];
-                        var big_map;
-                        initialize(document.getElementById("big_map_canvas"), false);
-                    	//initMap();
+    p['fetchField'] = "id,latitude,longitude,isChecklist";
+    p['max'] = -1;
+    delete p['bounds']
+    
+    var url = window.params.observation.listUrl+'?'+decodeURIComponent($.param(p));
 
-                        function addAllMarkers() {
-                            var url = window.params.observation.listUrl+"?fetchField=id,latitude,longitude,isChecklist"
-                            var pointMarker = M.AwesomeMarkers.icon({
-                                icon: 'ok', 
-                                color: 'blue'
-                            });
-                            var checklistMarker = M.AwesomeMarkers.icon({
-                                icon: 'list', 
-                                color: 'green'
-                            });
+    if(markers)
+        markers.clearLayers();
+    else 
+        markers = new M.MarkerClusterGroup();
+    var pointMarker = M.AwesomeMarkers.icon({
+        icon: 'ok', 
+        color: 'blue'
+    });
+    var checklistMarker = M.AwesomeMarkers.icon({
+        icon: 'list', 
+        color: 'green'
+    });
 
-                            $.ajax({
-                                    url: url,
-                                    dataType: "json",
-                                    success: function(data) {
-                                        for(var i=0; i<data.observationInstanceList.length; i++) {
-                                            var obv = data.observationInstanceList[i];
-                                            console.log('adding markers'+obv);
+    $.ajax({
+        url: url,
+        dataType: "json",
+        success: function(data) {
+            for(var i=0; i<data.observationInstanceList.length; i++) {
+                var obv = data.observationInstanceList[i];
+                var marker = createMarker(obv[1], obv[2], {
+                    draggable: false,
+                    clusterable: true,
+                    icon:obv[3]?checklistMarker:pointMarker,
+                    clickable:function() {
+                        load_content(marker, obv[0]); 
+                    }
+                });
+                if(marker) markers.addLayer(marker);
+            }
+            markers.addTo(map);
+        }
+    });
+}
 
-                                            var marker = addMarker(obv[1], obv[2], {
-                                                    draggable: false,
-                                                    clusterable: true,
-                                                    icon:obv[3]?checklistMarker:pointMarker,
-                                                    clickable:function() {
-                                                        load_content(marker, obv[0]); 
-                                                    }
-                                                });
-                                        }
-                          //              markers.push(marker);
-                                    }
-                                });
 
-                        }
+function refreshList(bounds){
+    if (bounds !== undefined){
+        $("#bounds").val(bounds);
+    } else {
+        $("#bounds").val('');
+    }
+    updateGallery(undefined, undefined, 0, undefined, window.params.isGalleryUpdate);
+}
 
-                        addAllMarkers();
-
-                        function refreshList(bounds){
-                            if (bounds !== undefined){
-                                var sep = (location.search == "") ? "?" : "&";
-                                var url = window.params.filteredMapBasedObservationsListUrl 
-                                url = url + sep + "bounds=" + bounds
-                                    $.ajax({
-                                        url: url,
-                                        dataType: "html",
-                                        success: function(data) {
-                                            $("#map_results_list").html(data);
-                                        }
-                                    });
-                            }    
-                        }
-
-                            
-                       map.on('mouseout', function() {
-                            refreshList(getSelectedBounds());
-                        });
-                       refreshList();
+function mapViewSlideToggleHandler() {
+    console.log("mapview slide toggle"+$("#isMapView").val());
+    if ($('#observations_list_map').is(':hidden')) {
+        $('div.observations > div.observations_list').show();
+        $('#map_view_bttn').css('background-color', 'transparent');
+        $('#map_results_list > div.observations_list').remove();
+        console.log("setting mapview false")
+        $("#isMapView").val("false");
+        $('#bounds').val('');
+    } else {
+        $('div.observations > div.observations_list').hide();
+        $('div.observations > div.observations_list').html('');
+        $("#isMapView").val("true");
+    }
+}
 
 /*                        function getRandomNumber(){
-                            return ((Math.random() -.5) / 200);
-                        }
+                          return ((Math.random() -.5) / 200);
+                          }
 
-                        function jitterCloseMarker(big_map){
-                                var zoomLevel = big_map.getZoom();
-                                if(zoomLevel >= 13){
-                                        var markerKeys = [];
-                                        var mapBounds = big_map.getBounds()
-                                        for (var i = 0; i < markers.length; i++) {
-                                        var pos = markers[i].getPosition();
-                                        if(mapBounds.contains(pos)){
-                                                                                if($.inArray(pos.toString(), markerKeys) != -1){
-                                                                                        markers[i].setPosition(new google.maps.LatLng(pos.lat() + getRandomNumber(), pos.lng() + getRandomNumber()));
-                                                                                }else{
-                                                                                        markerKeys.push(pos.toString());
-                                                                                }
-                                    }
-                                                }
-                            }
-                        }  
-                           
-                           
-                            google.maps.event.addListener(big_map, 'zoom_changed', function() {
-                                jitterCloseMarker(big_map);
-                                
-                            });
-                        var markerCluster = new MarkerClusterer(big_map, markers, {gridSize: 30, maxZoom:13});
-*/                       
-                            
-                        function load_content(marker, id){
-                            $.ajax({
-                                url: window.params.snippetUrl+"/"+id,
-                                success: function(data){
-                                    marker.bindPopup("<div id='info-content' class='thumbnail'>" + data + "</div>").openPopup();;
-                                }
-                            });
-                        }
+                          function jitterCloseMarker(big_map){
+                          var zoomLevel = big_map.getZoom();
+                          if(zoomLevel >= 13){
+                          var markerKeys = [];
+                          var mapBounds = big_map.getBounds()
+                          for (var i = 0; i < markers.length; i++) {
+                          var pos = markers[i].getPosition();
+                          if(mapBounds.contains(pos)){
+                          if($.inArray(pos.toString(), markerKeys) != -1){
+                          markers[i].setPosition(new google.maps.LatLng(pos.lat() + getRandomNumber(), pos.lng() + getRandomNumber()));
+                          }else{
+                          markerKeys.push(pos.toString());
+                          }
+                          }
+                          }
+                          }
+                          }  
+
+
+                          google.maps.event.addListener(big_map, 'zoom_changed', function() {
+                          jitterCloseMarker(big_map);
+
+                          });
+                          var markerCluster = new MarkerClusterer(big_map, markers, {gridSize: 30, maxZoom:13});
+                          */                       
+
+function load_content(marker, id){
+    $.ajax({
+        url: window.params.snippetUrl+"/"+id,
+    success: function(data){
+        marker.bindPopup("<div id='info-content' class='thumbnail'>" + data + "</div>").openPopup();;
+    }
+    });
+}
 /*
 
-                        google.maps.event.addListener(big_map, 'dragend', function() { checkBounds(); });
-                        
-                        function checkBounds() {
-                            if (allowedBounds.contains(big_map.getCenter())) return;
+   google.maps.event.addListener(big_map, 'dragend', function() { checkBounds(); });
 
-                            var c = big_map.getCenter(),
-                            x = c.lng(),
-                            y = c.lat(),
-                            maxX = allowedBounds.getNorthEast().lng(),
-                            maxY = allowedBounds.getNorthEast().lat(),
-                            minX = allowedBounds.getSouthWest().lng(),
-                            minY = allowedBounds.getSouthWest().lat();
+   function checkBounds() {
+   if (allowedBounds.contains(big_map.getCenter())) return;
 
-                            if (x < minX) x = minX;
-                            if (x > maxX) x = maxX;
-                            if (y < minY) y = minY;
-                            if (y > maxY) y = maxY;
+   var c = big_map.getCenter(),
+   x = c.lng(),
+   y = c.lat(),
+   maxX = allowedBounds.getNorthEast().lng(),
+   maxY = allowedBounds.getNorthEast().lat(),
+   minX = allowedBounds.getSouthWest().lng(),
+   minY = allowedBounds.getSouthWest().lat();
 
-                            big_map.setCenter(new google.maps.LatLng(y, x));
-                        }
-*/
-                        
+   if (x < minX) x = minX;
+   if (x > maxX) x = maxX;
+   if (y < minY) y = minY;
+   if (y > maxY) y = maxY;
 
-                    });//end of loadGoogleMapsAPI
-            }
-	});
-}
+   big_map.setCenter(new google.maps.LatLng(y, x));
+   }
+   */
 
 function speciesHabitatInterestHandler(){
 	if($(this).hasClass('active')) {
@@ -843,4 +891,8 @@ function updateDownloadBox(instanceTotal){
 //$(".observations_list .thumbnail").hover(function() {
 //	
 //	$("#postToUGroup").fadeToggle("fast");
-//})
+//})/
+
+$(document).ready(function(){
+});
+    
