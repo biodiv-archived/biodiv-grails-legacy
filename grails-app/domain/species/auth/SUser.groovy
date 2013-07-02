@@ -36,6 +36,7 @@ class SUser {
 	Date dateCreated = new Date();
 	Date lastLoginDate = new Date();
 	String profilePic
+	String fbProfilePic
 	String icon
 
 	String website;
@@ -118,11 +119,11 @@ class SUser {
 		return new Resource(fileName:icon());
 	}
 
-	def icon() {
-		return icon(ImageType.NORMAL);
+	def profilePicture() {
+		return profilePicture(ImageType.NORMAL);
 	}
 
-	def icon(ImageType type) {
+	def profilePicture(ImageType type) {
 		boolean iconPresent = (new File(grailsApplication.config.speciesPortal.users.rootDir.toString()+this.icon)).exists()
 		if(iconPresent) {
 			return grailsApplication.config.speciesPortal.users.serverURL+this.icon //, type:ResourceType.ICON, title:this.name);

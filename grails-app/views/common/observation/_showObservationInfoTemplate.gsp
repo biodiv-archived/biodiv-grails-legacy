@@ -16,7 +16,7 @@
 
 		<div class="user-icon">
 			<a href=/biodiv/SUser/show/${observationInstance.author.id}> <img
-				src="${observationInstance.author.icon()}" class="small_profile_pic"
+				src="${observationInstance.author.profilePicture()}" class="small_profile_pic"
 				title="${observationInstance.author.username}" /> </a>
 		</div>
 	</div>

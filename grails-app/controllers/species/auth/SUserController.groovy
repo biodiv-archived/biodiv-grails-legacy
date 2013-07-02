@@ -129,8 +129,8 @@ class SUserController extends UserController {
 			def result = buildUserModel(SUserInstance)
 			result.put('userGroupWebaddress', params.webaddress)
             result.put('obvData', chartService.getUserStats(SUserInstance));
-            def totalObservationInstanceList = observationService.getFilteredObservations(['user':SUserInstance.id.toString()], -1, -1, true).observationInstanceList
-            result.put('totalObservationInstanceList', totalObservationInstanceList); 
+//            def totalObservationInstanceList = observationService.getFilteredObservations(['user':SUserInstance.id.toString()], -1, -1, true).observationInstanceList
+//            result.put('totalObservationInstanceList', totalObservationInstanceList); 
 			return result
 		}
 	}

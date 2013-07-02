@@ -48,7 +48,7 @@
 							<span class="flagInstanceClass">
 							<a href="${uGroup.createLink(controller:"SUser", action:"show", id:flagInstance.author?.id)}">
 							<img class="small_profile_pic"
-								src="${flagInstance.author?.icon(ImageType.VERY_SMALL)}"
+								src="${flagInstance.author?.profilePicture(ImageType.VERY_SMALL)}"
 								title="${flagInstance.author.name}"/></a> : ${flagInstance.flag.value()} ${flagInstance.notes ? ": " + flagInstance.notes : ""}</span>
 							<sUser:ifOwns model="['user':flagInstance.author]">
 								<a href="#" onclick="removeFlag(${flagInstance.id}, ${flagInstance.observation.id}, $(this).parent()); return false;"><span class="deleteFlagIcon" data-original-title="Remove this flag" ><i class="icon-trash"></i></span></a>

@@ -10,7 +10,7 @@
 
             	<div class="user-icon">
                     <a href="${uGroup.createLink(controller:'SUser', action:'show', id:checklistInstance.author.id, 'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress)}"> <img
-                            src="${checklistInstance.author.icon()}" class="small_profile_pic"
+                            src="${checklistInstance.author.profilePicture()}" class="small_profile_pic"
                             title="${checklistInstance.author.name}" />
                     </a>
             	</div>

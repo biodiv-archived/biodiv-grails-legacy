@@ -9,7 +9,7 @@
 </div>
 <div class="user-icon pull-right">
     <a href="${uGroup.createLink(controller:'SUser', action:'show', id:observationInstance.author.id, 'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress)}"> <img
-        src="${observationInstance.author.icon()}" class="small_profile_pic"
+        src="${observationInstance.author.profilePicture()}" class="small_profile_pic"
         title="${observationInstance.author.name}" /> </a>
 
 </div>
@@ -29,7 +29,7 @@
     <%----%>
     <%--            <div class="user-icon pull-right">--%>
         <%--                    <a href="${uGroup.createLink(controller:'SUser', action:'show', id:observationInstance.author.id, 'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress)}"> <img--%>
-            <%--                            src="${observationInstance.author.icon()}" class="small_profile_pic"--%>
+            <%--                            src="${observationInstance.author.profilePicture()}" class="small_profile_pic"--%>
             <%--                            title="${observationInstance.author.name}" /> </a>--%>
         <%--                    --%>
         <%--            </div>--%>

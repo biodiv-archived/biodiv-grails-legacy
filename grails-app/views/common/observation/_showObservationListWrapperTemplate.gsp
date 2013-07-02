@@ -25,8 +25,7 @@
 				<g:if test="${!isSearch}">
 					<div id="map_view_bttn" class="btn-group">
 						<a class="btn btn-success dropdown-toggle" data-toggle="dropdown"
-							href="#"
-							onclick="$(this).parent().css('background-color', '#9acc57'); showMapView(); return false;">
+							href="#">
 							Map view <span class="caret"></span> </a>
 					</div>
 				</g:if>
@@ -74,7 +73,7 @@
 					model="['source':'Observations', 'requestObject':request, 'downloadTypes':[DownloadType.CSV, DownloadType.KML] ]" />
 
 				<div id="observations_list_map" class="observation"
-                                    style="clear: both; ${(params.isMapView?.equalsIgnoreCase('true'))?:'display:none'}">
+                                    style="clear: both; display:none}">
 					<obv:showObservationsLocation
 						model="['observationInstanceList':totalObservationInstanceList, 'userGroup':userGroup]">
 					</obv:showObservationsLocation>
@@ -91,6 +90,19 @@
 <g:javascript>
 $(document).ready(function() {
     window.params.tagsLink = "${uGroup.createLink(controller:'observation', action: 'tags')}"
-    updateGallery(undefined, undefined, 0, undefined, window.params.isGalleryUpdate);
+
+    $("#map_view_bttn a").click(function(){
+        $(this).parent().css('background-color', '#9acc57');
+        $('#observations_list_map').slideToggle(mapViewSlideToggleHandler);
+    });
+    <g:if test="${params.isMapView?.equalsIgnoreCase('true') || params.bounds}">
+        $("#map_view_bttn a").click();
+    </g:if>
+
+    $('#big_map_canvas').on('maploaded', function(){
+        map.on('mouseout', function() {
+            refreshList(getSelectedBounds());
+        });
+    });
 });
 </g:javascript>

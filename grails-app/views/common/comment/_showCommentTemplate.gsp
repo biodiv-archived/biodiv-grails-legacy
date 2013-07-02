@@ -6,7 +6,7 @@
 			<g:link controller="SUser" action="show"
 				id="${commentInstance.author.id}">
 				<img class="small_profile_pic"
-					src="${commentInstance.author.icon(ImageType.SMALL)}"
+					src="${commentInstance.author.profilePicture(ImageType.SMALL)}"
 					title="${commentInstance.author.name}" />
 			</g:link>
 		</div>

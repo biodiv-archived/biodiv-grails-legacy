@@ -679,33 +679,32 @@ function updateGallery(target, limit, offset, removeUser, isGalleryUpdate, remov
 }
  
 var oldParams = {}
-function updateMapView (params) {
-    var isCollapsed = false;
-    if($('#observations_list_map').is(':hidden')) {
-        $('#observations_list_map').slideToggle(mapViewSlideToggleHandler);
-        isCollapsed = true
-    }
-    if(isMapViewLoaded === false) {
+function updateMapView (params, callback) {
+//    if($('#observations_list_map').is(':hidden')) {
+//        $('#observations_list_map').slideToggle(mapViewSlideToggleHandler);
+//    }
+    var p = jQuery.extend({}, params);
+//    delete p.bounds;
+//    delete oldParams.bounds;
+    console.log(JSON.stringify(oldParams));
+    console.log(JSON.stringify(p));
+    if(isMapViewLoaded !== true) {
         loadGoogleMapsAPI(function() {
             initialize(document.getElementById("big_map_canvas"), false);
-            map.on('mouseout', function() {
-                refreshList(getSelectedBounds());
-            });
-            refreshMarkers(params);
-            refreshMapBounds()
-        });
+            refreshMarkers(p);
+            refreshMapBounds();
+            oldParams = params;
+	    $('#big_map_canvas').trigger('maploaded');
+        })
+
     } else {
+        //TODO:remove bounds before comparision
         //order of params is important for this test to pass
-        var p = jQuery.extend({}, params);
-        delete p.bounds
-        delete oldParams.bounds
-        console.log(JSON.stringify(oldParams))
-        console.log(JSON.stringify(p))
         if(JSON.stringify(oldParams) != JSON.stringify(p))
             refreshMarkers(p);
-        refreshMapBounds()
+        refreshMapBounds();
+        oldParams = params;
     }
-    oldParams = params
 }
 
 function refreshMapBounds() {
@@ -724,10 +723,7 @@ function refreshMapBounds() {
 }
 
 function showMapView() {
-    $('#observations_list_map').slideToggle(function() {
-        mapViewSlideToggleHandler()
-        updateGallery(undefined, undefined, 0, undefined, window.params.isGalleryUpdate);
-    });
+    updateGallery(undefined, undefined, 0, undefined, window.params.isGalleryUpdate);
 }
 
  
@@ -784,18 +780,17 @@ function refreshList(bounds){
 }
 
 function mapViewSlideToggleHandler() {
-    console.log("mapview slide toggle"+$("#isMapView").val());
     if ($('#observations_list_map').is(':hidden')) {
         $('div.observations > div.observations_list').show();
         $('#map_view_bttn').css('background-color', 'transparent');
         $('#map_results_list > div.observations_list').remove();
-        console.log("setting mapview false")
         $("#isMapView").val("false");
         $('#bounds').val('');
     } else {
         $('div.observations > div.observations_list').hide();
         $('div.observations > div.observations_list').html('');
         $("#isMapView").val("true");
+        showMapView();
     }
 }
 

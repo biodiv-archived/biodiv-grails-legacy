@@ -16,7 +16,7 @@
 							class="flagInstanceClass ellipsis multiline">
 							<g:link url="${uGroup.createLink(controller:"SUser", action:"show", id:recoVoteInstance.author?.id)}">
 							<img class="small_profile_pic"
-								src="${recoVoteInstance.author?.icon(ImageType.VERY_SMALL)}"
+								src="${recoVoteInstance.author?.profilePicture(ImageType.VERY_SMALL)}"
 								title="${recoVoteInstance.author.name}"/>
 							</g:link> on <g:formatDate date="${recoVoteInstance.votedOn}" type="datetime" style="LONG" timeStyle="SHORT"/> : ${recoVoteInstance.comment} 
 						</span>

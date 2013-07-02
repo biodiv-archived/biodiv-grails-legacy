@@ -10,7 +10,7 @@
 
 <g:set var="canonicalUrl" value="${uGroup.createLink([controller:'SUser', action:'show', id:user.id, base:Utils.getIBPServerDomain()])}"/>
 <g:set var="title" value="${user.name}"/>
-<%def imagePath = user.icon();%>
+<%def imagePath = user.profilePicture();%>
 <g:set var="description" value="${Utils.stripHTML(user.aboutMe)?:'' }" />
 
 <g:render template="/common/titleTemplate" model="['title':title, 'description':description, 'canonicalUrl':canonicalUrl, 'imagePath':imagePath]"/>
@@ -76,7 +76,7 @@ h6 .btn-link, h5 .btn-link {
 					style="float: left; max-height: 220px; max-width: 220px">
 					<a
 						href="${uGroup.createLink(action:"show", controller:"SUser", id:user.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
-						<img class="normal_profile_pic" src="${user.icon()}" /> </a>
+						<img class="normal_profile_pic" src="${user.profilePicture()}" /> </a>
 
 					<%--						<div class="prop">--%>
 					<%--							<span class="name">Member since </span> <span class="value">--%>
@@ -266,7 +266,8 @@ h6 .btn-link, h5 .btn-link {
 
 	<r:script>
 	var userRecoffset = 0;
-    $(document).ready(function() {
+        $(document).ready(function() {
+            updateMapView({'user':'${user?.id}'});
 		$("#seeMoreMessage").hide();
 		$('#tc_tagcloud a').click(function(){
 			var tg = $(this).contents().first().text();
