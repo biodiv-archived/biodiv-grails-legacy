@@ -22,7 +22,7 @@ modules = {
 	}
 
 	core {
-		dependsOn 'jquery, jquery-ui,carousel'
+		dependsOn 'jquery, jquery-ui,carousel,leaflet'
 		defaultBundle 'core'
 
 		resource url:'/bootstrap/css/bootstrap.min.css'
@@ -102,7 +102,8 @@ modules = {
 		dependsOn 'core, tagit'
 		defaultBundle 'core'
 
-		
+        resource url:'/css/location_picker.css'
+        resource url:'/js/location/location-picker.js'
 		resource url:'/js/jquery/jquery.watermark.min.js'
 		resource url:'/js/jsrender.js'
 		//resource url:'/js/bootstrap-typeahead.js'
@@ -110,27 +111,21 @@ modules = {
 	}
 
 	observations_show {
-		dependsOn 'observations, gallery, carousel, comment, activityfeed, leaflet'
+		dependsOn 'observations, gallery, carousel, comment, activityfeed'
 
 		resource url:'/js/jsrender.js'
 		resource url:'/js/species/observations/show.js'
-		resource url:'/css/location_picker.css'
-		resource url:'/js/location/location-picker.js'
 	} 
 
 	observations_create {
-		dependsOn 'observations, leaflet'
+		dependsOn 'observations'
 
-		resource url:'/css/location_picker.css'
-		resource url:'/js/location/location-picker.js'
 		resource url:'/js/jquery/jquery.exif.js'
 	}
 
 	observations_list { 
-		dependsOn 'observations, list_utils, comment,leaflet'
+		dependsOn 'observations, list_utils, comment'
 		
-        resource url:'/css/location_picker.css'
-        resource url:'/js/location/location-picker.js'
         resource url:'/js/species/observations/list.js'
 	}
 
@@ -261,7 +256,7 @@ modules = {
 	}
 
 	add_file {
-		dependsOn 'core, tagit, list_utils, leaflet'
+		dependsOn 'core, tagit, list_utils'
 		
 		resource url:'/css/main.css'
 		resource url:'/css/content.css'
@@ -299,10 +294,6 @@ modules = {
         resource url:'js/Leaflet/plugins/leaflet-locatecontrol/src/L.Control.Locate.js'
         resource url:'js/Leaflet/plugins/Leaflet.awesome-markers/dist/leaflet.awesome-markers.css'
         resource url:'js/Leaflet/plugins/Leaflet.awesome-markers/dist/leaflet.awesome-markers.min.js'
-        resource url:'js/Leaflet/plugins/Leaflet.markercluster/dist/leaflet.markercluster.js'
-        resource url:'js/Leaflet/plugins/Leaflet.markercluster/dist/MarkerCluster.css'
-        resource url:'js/Leaflet/plugins/Leaflet.markercluster/dist/MarkerCluster.Default.css'
-        resource url:'js/Leaflet/plugins/Leaflet.markercluster/dist/MarkerCluster.Default.ie.css', wrapper: { s -> "<!--[if lt IE]>$s<![endif]-->" }
         resource url:'js/Leaflet/plugins/leaflet.fullscreen/Control.FullScreen.js'
         resource url:'js/Leaflet/plugins/leaflet.fullscreen/Control.FullScreen.css'
         resource url:'js/Leaflet/plugins/Leaflet.draw/dist/leaflet.draw.css'
@@ -310,5 +301,10 @@ modules = {
         resource url:'js/Leaflet/plugins/Leaflet.draw/dist/leaflet.draw.js'
         resource url:'js/Wicket/wicket.js'
         resource url:'js/Wicket/wicket-leaflet.js'
+        resource url:'js/Leaflet/plugins/Leaflet.markercluster/dist/leaflet.markercluster.js'
+        resource url:'js/Leaflet/plugins/Leaflet.markercluster/dist/MarkerCluster.css'
+        resource url:'js/Leaflet/plugins/Leaflet.markercluster/dist/MarkerCluster.Default.css'
+        resource url:'js/Leaflet/plugins/Leaflet.markercluster/dist/MarkerCluster.Default.ie.css', wrapper: { s -> "<!--[if lt IE]>$s<![endif]-->" }
+ 
     }
 }
