@@ -301,7 +301,7 @@ modules = {
         resource url:'js/Leaflet/plugins/Leaflet.draw/dist/leaflet.draw.js'
         resource url:'js/Wicket/wicket.js'
         resource url:'js/Wicket/wicket-leaflet.js'
-        resource url:'js/Leaflet/plugins/Leaflet.markercluster/dist/leaflet.markercluster.js'
+        resource url:'js/Leaflet/plugins/Leaflet.markercluster/dist/leaflet.markercluster-src.js'
         resource url:'js/Leaflet/plugins/Leaflet.markercluster/dist/MarkerCluster.css'
         resource url:'js/Leaflet/plugins/Leaflet.markercluster/dist/MarkerCluster.Default.css'
         resource url:'js/Leaflet/plugins/Leaflet.markercluster/dist/MarkerCluster.Default.ie.css', wrapper: { s -> "<!--[if lt IE]>$s<![endif]-->" }

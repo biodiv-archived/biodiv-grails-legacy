@@ -1088,7 +1088,7 @@ class ObservationController {
 		Map emailList = getUnBlockedMailList(params.userIdsAndEmailIds, request);
 		if(emailList.isEmpty()){
 			log.debug "No valid email specified for identification."
-		}else if (Environment.getCurrent().getName().equalsIgnoreCase("pamba") || Environment.getCurrent().getName().equalsIgnoreCase("saturn")) {
+		}else if (Environment.getCurrent().getName().equalsIgnoreCase("pamba") || Environment.getCurrent().getName().equalsIgnoreCase("development")) {
 			def conf = SpringSecurityUtils.securityConfig
 			def mailSubject = params.mailSubject
 			for(entry in emailList.entrySet()){
