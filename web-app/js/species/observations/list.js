@@ -743,7 +743,7 @@ function refreshMarkers(p) {
     if(markers)
         markers.clearLayers();
     else 
-        markers = new M.MarkerClusterGroup();
+        markers = new M.MarkerClusterGroup({maxClusterRadius:50});
     var pointMarker = M.AwesomeMarkers.icon({
         icon: 'ok', 
         color: 'blue'
