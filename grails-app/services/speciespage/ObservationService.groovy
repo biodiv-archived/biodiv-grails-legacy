@@ -881,7 +881,8 @@ class ObservationService {
 	
 	Map getIdentificationEmailInfo(m, requestObj, unsubscribeUrl, controller="", action=""){
 		def source = m.source;
-		
+        println "************************"
+	println m	
 		def mailSubject = ""
 		def activitySource = ""
 

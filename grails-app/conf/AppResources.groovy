@@ -288,7 +288,7 @@ modules = {
     leaflet {
         resource url:'js/Leaflet/dist/leaflet.css'
         resource url:'js/Leaflet/dist/leaflet.ie.css', wrapper: { s -> "<!--[if lt IE]>$s<![endif]-->" }
-        resource url:'js/Leaflet/dist/leaflet-src.js'
+        resource url:'js/Leaflet/dist/leaflet.js'
         resource url:'js/Leaflet/plugins/leaflet-plugins/layer/tile/Google.js'
         resource url:'js/Leaflet/plugins/Leaflet.Coordinates/dist/Leaflet.Coordinates-0.1.1.css'
         resource url:'js/Leaflet/plugins/Leaflet.Coordinates/dist/Leaflet.Coordinates-0.1.1.min.js'
