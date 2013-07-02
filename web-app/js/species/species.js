@@ -111,6 +111,13 @@ var showOccurence = function(speciesName) {
                     styles : '',
                     cql_filter : "species_name='" + speciesName + "'",
                     opacity : 0.7
+            },
+            {
+                    title : 'Checklist',
+                    layers : 'ibp:checklist_species_locations',
+                    styles : '',
+                    cql_filter : "species_name='" + speciesName + "'",
+                    opacity : 0.7
             }
             ]
             showMap("map1311326056727", mapOptions, layersOptions)
