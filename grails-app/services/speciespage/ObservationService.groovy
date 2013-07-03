@@ -382,8 +382,10 @@ class ObservationService {
 		List urlList = []
 		for(param in observations){
 			def item = [:];
-			item.url = "/" + getTargetController(param['observation']) + "/show/" + param['observation'].id
+            def controller = getTargetController(param['observation']);
+			item.url = "/" + controller + "/show/" + param['observation'].id
 			item.imageTitle = param['title']
+            item.type = controller
 			def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 			Resource image = param['observation'].mainImage()
 			if(image){
@@ -871,8 +873,12 @@ class ObservationService {
 		}
 		return null;
 	}
-	
+
+    /**
+    * Gets all obvs from all groups
+    **/
 	long getAllObservationsOfUser(SUser user) {
+        //TODO: filter on usergroup if required
 		return (long) Observation.createCriteria().count {
 			and {
 				eq("author", user)
@@ -883,7 +889,11 @@ class ObservationService {
 		//return (long)Observation.countByAuthorAndIsDeleted(user, false);
 	}
 
+    /**
+    * Gets all recommendations of user made in all groups
+    **/
 	long getAllRecommendationsOfUser(SUser user) {
+        //TODO: filter on usergroup if required
 		def result = RecommendationVote.executeQuery("select count(recoVote) from RecommendationVote recoVote where recoVote.author.id = :userId and recoVote.observation.isDeleted = :isDeleted and recoVote.observation.isShowable = :isShowable", [userId:user.id, isDeleted:false, isShowable:true]);
 		return (long)result[0];
 	}

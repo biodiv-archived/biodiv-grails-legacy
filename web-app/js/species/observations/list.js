@@ -584,8 +584,12 @@ function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSo
         delete params['bounds'];
     }
 
-    params['isMapView'] = $("#isMapView").val()
-
+    var isMapView = $("#isMapView").val()
+    if(isMapView) {
+        params['isMapView'] = isMapView
+    } else {
+        delete params['isMapView']
+    }
     return params;
 }	
 
