@@ -2,7 +2,7 @@
     width: 500px;
     margin: auto;
     position:absolute;
-    top:20px;
+    top:10px;
     left:0;
     right:0;
     z-index:1;
@@ -11,7 +11,7 @@
 #latlng {
     margin: auto;
     width: 500px;
-    top: 50px;
+    top: 40px;
     position: absolute;
     z-index: 1;
     left: 0;
@@ -129,9 +129,10 @@ padding: 0;
 #current_location.location_picker_button {
 width: 150px;	
 }
+
 .leaflet-draw-toolbar a {
-    width: 22px;
-    height: 22px;
+    width: 26px;
+    height: 26px;
     text-align: center;
     text-decoration: none;
     color: black;
