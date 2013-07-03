@@ -282,7 +282,7 @@ modules = {
 
     leaflet {
         resource url:'js/Leaflet/dist/leaflet.css'
-        resource url:'js/Leaflet/dist/leaflet.ie.css', wrapper: { s -> "<!--[if lt IE]>$s<![endif]-->" }
+        resource url:'js/Leaflet/dist/leaflet.ie.css', wrapper: { s -> "<!--[if lte IE 8]>$s<![endif]-->" }
         resource url:'js/Leaflet/dist/leaflet.js'
         resource url:'js/Leaflet/plugins/leaflet-plugins/layer/tile/Google.js'
         resource url:'js/Leaflet/plugins/Leaflet.Coordinates/dist/Leaflet.Coordinates-0.1.1.css'
@@ -290,21 +290,21 @@ modules = {
         resource url:'js/Leaflet/plugins/Leaflet.label/dist/leaflet.label.css'
         resource url:'js/Leaflet/plugins/Leaflet.label/dist/leaflet.label.js'
         resource url:'js/Leaflet/plugins/leaflet-locatecontrol/src/L.Control.Locate.css'
-        resource url:'js/Leaflet/plugins/leaflet-locatecontrol/src/L.Control.Locate.ie.css', wrapper: { s -> "<!--[if lt IE]>$s<![endif]-->" }
+        resource url:'js/Leaflet/plugins/leaflet-locatecontrol/src/L.Control.Locate.ie.css', wrapper: { s -> "<!--[if lte IE 8]>$s<![endif]-->" }
         resource url:'js/Leaflet/plugins/leaflet-locatecontrol/src/L.Control.Locate.js'
         resource url:'js/Leaflet/plugins/Leaflet.awesome-markers/dist/leaflet.awesome-markers.css'
         resource url:'js/Leaflet/plugins/Leaflet.awesome-markers/dist/leaflet.awesome-markers.min.js'
         resource url:'js/Leaflet/plugins/leaflet.fullscreen/Control.FullScreen.js'
         resource url:'js/Leaflet/plugins/leaflet.fullscreen/Control.FullScreen.css'
         resource url:'js/Leaflet/plugins/Leaflet.draw/dist/leaflet.draw.css'
-        resource url:'js/Leaflet/plugins/Leaflet.draw/dist/leaflet.draw.ie.css', wrapper: { s -> "<!--[if lt IE]>$s<![endif]-->" }
+        resource url:'js/Leaflet/plugins/Leaflet.draw/dist/leaflet.draw.ie.css', wrapper: { s -> "<!--[if lte IE 8]>$s<![endif]-->" }
         resource url:'js/Leaflet/plugins/Leaflet.draw/dist/leaflet.draw.js'
         resource url:'js/Wicket/wicket.js'
         resource url:'js/Wicket/wicket-leaflet.js'
         resource url:'js/Leaflet/plugins/Leaflet.markercluster/dist/leaflet.markercluster-src.js'
         resource url:'js/Leaflet/plugins/Leaflet.markercluster/dist/MarkerCluster.css'
         resource url:'js/Leaflet/plugins/Leaflet.markercluster/dist/MarkerCluster.Default.css'
-        resource url:'js/Leaflet/plugins/Leaflet.markercluster/dist/MarkerCluster.Default.ie.css', wrapper: { s -> "<!--[if lt IE]>$s<![endif]-->" }
+        resource url:'js/Leaflet/plugins/Leaflet.markercluster/dist/MarkerCluster.Default.ie.css', wrapper: { s -> "<!--[if lte IE 8]>$s<![endif]-->" }
  
     }
 }
