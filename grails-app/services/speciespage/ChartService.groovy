@@ -89,6 +89,8 @@ class ChartService {
 			and{
 				// taking undeleted observation
 				eq('isDeleted', false)
+				eq('isShowable', true)
+				eq('isChecklist', false)
 
 				//filter by author
 				if(author){
