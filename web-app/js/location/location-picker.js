@@ -35,7 +35,7 @@ function initialize(element, drawable){
 //        maxBounds:viewBounds,
         zoom:4,
         minZoom:4,
-        maxZoom:15,
+//       maxZoom:15,
         noWrap:true
     });
     map.addLayer(ggl).fitBounds(allowedBounds);
@@ -103,10 +103,11 @@ function initArea(drawable) {
                 polygon: {
                     allowIntersection: false // Restricts shapes to simple polygons
                 }*/
-            },
+            }
+            /*,
             edit: {
                featureGroup: drawnItems
-            }
+            }*/
         });
         drawControl.addTo(map);
         map.on('draw:drawstart', clearDrawnItems);
@@ -292,7 +293,7 @@ function set_location(lat, lng, marker, markerOptions) {
         marker.setLatLng(new M.LatLng(lat, lng));
     }
 
-    map.setView(marker.getLatLng(), 13).panBy([0,-80]); 
+    map.setView(marker.getLatLng(), 13).panBy([0,-60]); 
 
     if(markerOptions && markerOptions.selected) {
         select_location(marker);
