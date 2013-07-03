@@ -59,7 +59,7 @@
 <%--					<li--%>
 <%--						class="${((params.controller == 'userGroup' && params.action == 'chart') ||(params.controller == 'chart'))?' active':''}"><a--%>
 <%--						href="${uGroup.createLink('mapping':'userGroup', 'action':'chart', 'userGroup':userGroupInstance)}"--%>
-<%--						title="Stats">Stats</a>--%>
+<%--						title="Dashboard">Dashboard</a>--%>
 <%--					</li>--%>
 
 
@@ -108,7 +108,7 @@
                                                     <li
                                                     class="${((params.controller == 'userGroup' && params.action == 'chart') ||(params.controller == 'chart'))?' active':''}"><a
                                                         href="${uGroup.createLink('mapping':'userGroup', 'action':'chart', 'userGroup':userGroupInstance)}"
-                                                        title="Stats">Stats</a>
+                                                        title="Dashboard">Dashboard</a>
                                                     </li>
 						
 						</ul></li>
@@ -141,7 +141,7 @@
 <%--						href='${uGroup.createLink("controller":"checklist")}' title="Checklists">Checklists</a></li>--%>
 <%--					<li--%>
 <%--						class="${(params.controller == 'chart')?'active':''}"><a--%>
-<%--						href='${uGroup.createLink("controller":"chart")}' title="Stats">Stats</a></li>--%>
+<%--						href='${uGroup.createLink("controller":"chart")}' title="Dashboard">Dashboard</a></li>--%>
 				</ul>
                                 <ul class="nav contributeButton" style="float:none;display:inline-block">
                                     <li>
@@ -188,7 +188,7 @@
 							<li
 								class="${(params.controller == 'chart')?' active':''}"><a
 								href="${uGroup.createLink(controller:'chart')}"
-								title="Stats">Stats</a> </li>
+								title="Dashboard">Dashboard</a> </li>
 						</ul>
 					</li>
 				</ul>

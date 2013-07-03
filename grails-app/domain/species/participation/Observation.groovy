@@ -76,7 +76,13 @@ class Observation extends Metadata implements Taggable, Rateable {
 		maxVotedReco nullable:true
 		//to insert observation without db exception
 		sourceId nullable:true
-		//resource validator : { val, obj -> val && val.size() > 0 }
+		resource validator : { val, obj ->
+			//XXX ignoring validator for checklist and its child observation. 
+			//all the observation generated from checklist will have source id in advance based on that we are ignoring validation.
+			// Genuine observation will not have source id and checklist as false
+			if(!obj.sourceId && !obj.isChecklist) 
+				val && val.size() > 0 
+		}
 		fromDate validator : {val -> val < new Date()}
 /*		latitude validator : { val, obj ->
 			if(!val) {
