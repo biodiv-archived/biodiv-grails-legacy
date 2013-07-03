@@ -46,6 +46,8 @@
                     loadGoogleMapsAPI(function() {
                         initialize(document.getElementById("map_canvas_${observationInstance.id}"), false);
                         initArea(false);
+                        //HACK
+                        map.panTo(searchMarker.getLatLng());
                         /*
                         var latlng = new google.maps.LatLng(${observationInstance.latitude}, ${observationInstance.longitude});
                         var options = {
