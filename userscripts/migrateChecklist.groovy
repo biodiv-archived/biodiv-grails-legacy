@@ -11,6 +11,7 @@ import species.utils.*;
 import speciespage.*
 import com.vividsolutions.jts.geom.*
 import content.eml.Coverage
+import content.eml.Document
 
 def checklistUtilService = ctx.getBean("checklistUtilService");
 
@@ -65,7 +66,7 @@ def correctChecklist(deleteId, migrateId){
 
  	
 //checklistUtilService.migrateChecklistAsObs()
-checklistUtilService.migrateObservationFromChecklist()
+//checklistUtilService.migrateObservationFromChecklist()
 
 
 
@@ -91,7 +92,7 @@ def migrateObvLocation() {
 
 def migrateDocLocation() {
 	GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
-	Observation.withTransaction(){
+	Document.withTransaction(){
 	   Coverage.findAllByTopologyIsNull().each{obv->
 			obv.topology = geometryFactory.createPoint(new Coordinate(obv.longitude, obv.latitude));
 			obv.placeName = obv.placeName?:obv.reverseGeocodedName;
@@ -107,4 +108,4 @@ def migrateDocLocation() {
 
 
 println "================ done "
-
+migrateDocLocation();

@@ -56,6 +56,7 @@ class DocumentService {
 
 		document.properties = params
 		document.coverage = document.coverage ?: new Coverage()
+		document.coverage.placeName = params.placeName
 		document.coverage.reverseGeocodedName = params.reverse_geocoded_name
 		document.coverage.locationAccuracy = params.location_accuracy
 		
