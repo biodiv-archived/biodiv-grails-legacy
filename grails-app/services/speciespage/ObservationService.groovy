@@ -388,7 +388,7 @@ class ObservationService {
 			Resource image = param['observation'].mainImage()
 			if(image){
 				if(image.type == ResourceType.IMAGE) {
-					item.imageLink = image.thumbnailUrl(iconBasePath)
+					item.imageLink = image.thumbnailUrl(param['observation'].isChecklist ? null: iconBasePath, param['observation'].isChecklist ? '.png' :null)//thumbnailUrl(iconBasePath)
 				} else if(image.type == ResourceType.VIDEO) {
 					item.imageLink = image.thumbnailUrl()
 				}

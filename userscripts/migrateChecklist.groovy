@@ -12,6 +12,8 @@ import speciespage.*
 import com.vividsolutions.jts.geom.*
 import content.eml.Coverage
 import content.eml.Document
+import species.groups.UserGroup
+
 
 def checklistUtilService = ctx.getBean("checklistUtilService");
 
@@ -107,5 +109,26 @@ def migrateDocLocation() {
 }
 
 
+
+def postChecklistToWGPGroup(){
+	def userGroupInstance = UserGroup.findByName('The Western Ghats')
+	def oldcls = Checklist.withCriteria(){
+		and{
+			if(userGroupInstance){
+				userGroups{
+					eq('id', userGroupInstance.id)
+				}
+			}
+		}
+		order 'id', 'asc'
+	}
+	Checklists.withTransaction {
+		oldcls.each { Checklist oldCl ->
+			println "============= adding  $oldCl" 
+			userGroupInstance.addToObservations(Checklists.get(oldCl.id));
+		}
+	}
+}
+
+postChecklistToWGPGroup()
 println "================ done "
-migrateDocLocation();
