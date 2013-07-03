@@ -53,6 +53,9 @@ import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.PrecisionModel;
 
+import species.groups.UserGroupController;
+import species.groups.UserGroup;
+
 class ObservationService {
 
 	static transactional = false
@@ -648,7 +651,7 @@ class ObservationService {
         Type geometryType = new CustomType(GeometryUserType.class, null); 
         q.setParameter(:geoExp0, geom, geometryType); 
 	 */
-	Map getFilteredObservations(params, max, offset, isMapView = false) {
+	Map getFilteredObservations(def params, max, offset, isMapView = false) {
 
 		def queryParts = getFilteredObservationsFilterQuery(params) 
 		String query = queryParts.query;
@@ -661,8 +664,8 @@ class ObservationService {
 			query += queryParts.filterQuery + queryParts.orderByClause
 //		}
 
-        println query;
-        println queryParts.queryParams;
+        log.debug query;
+        log.debug queryParts.queryParams;
         
         def checklistCountQuery = sessionFactory.currentSession.createQuery(queryParts.checklistCountQuery)
         def allObservationCountQuery = sessionFactory.currentSession.createQuery(queryParts.allObservationCountQuery)
@@ -727,7 +730,8 @@ class ObservationService {
         }
         query += " from Observation obv "
 		//def mapViewQuery = "select obv.id, obv.topology, obv.isChecklist from Observation obv "
-		def filterQuery = " where obv.isDeleted = :isDeleted and isShowable = true "
+        def userGroupQuery = " ";
+		def filterQuery = " where obv.isDeleted = :isDeleted and obv.isShowable = true "
 
 		if(params.sGroup){
 			params.sGroup = params.sGroup.toLong()
@@ -743,13 +747,28 @@ class ObservationService {
 
 		if(params.tag){
 			query = "select obv from Observation obv,  TagLink tagLink "
-			mapViewQuery = "select obv.topology from Observation obv, TagLink tagLink "
+			//mapViewQuery = "select obv.topology from Observation obv, TagLink tagLink "
 			filterQuery +=  " and obv.id = tagLink.tagRef and tagLink.type = :tagType and tagLink.tag.name = :tag "
 
 			queryParams["tag"] = params.tag
 			queryParams["tagType"] = GrailsNameUtils.getPropertyName(Observation.class);
 			activeFilters["tag"] = params.tag
 		}
+
+        println "*************************"
+        println params.webaddress;
+        if(params.userGroup || params.webaddress) {
+            if(!(params.userGroup instanceof UserGroup) && (params.userGroup instanceof String || params.userGroup instanceof Long || params.webaddress)) {
+    			def userGroupController = new UserGroupController();
+	    		params.userGroup = userGroupController.findInstance(params.userGroup, params.webaddress);
+            }
+            log.debug "Filtering from usergourp : ${params.usergroup}"
+		    userGroupQuery = " join obv.userGroups userGroup "
+            query += userGroupQuery
+		    filterQuery += " and userGroup.id =:userGroupId "
+		    queryParams['userGroupId'] = params.userGroup.id
+		    queryParams['userGroup'] = params.userGroup
+        }
 
 
 		if(params.habitat && (params.habitat != Habitat.findByName(grailsApplication.config.speciesPortal.group.ALL).id)){
@@ -817,8 +836,8 @@ class ObservationService {
 		
 		def orderByClause = " order by obv." + (params.sort ? params.sort : "lastRevised") +  " desc, obv.id asc"
 		
-		def checklistCountQuery = "select count(*) from Observation obv " + filterQuery + " and obv.isChecklist = true "
-		def allObservationCountQuery = "select count(*) from Observation obv " + filterQuery
+		def checklistCountQuery = "select count(*) from Observation obv " + userGroupQuery +" "+filterQuery + " and obv.isChecklist = true "
+		def allObservationCountQuery = "select count(*) from Observation obv " + userGroupQuery +" "+filterQuery
 	
 		return [query:query, allObservationCountQuery:allObservationCountQuery, checklistCountQuery:checklistCountQuery, filterQuery:filterQuery, orderByClause:orderByClause, queryParams:queryParams, activeFilters:activeFilters]
 
@@ -881,8 +900,6 @@ class ObservationService {
 	
 	Map getIdentificationEmailInfo(m, requestObj, unsubscribeUrl, controller="", action=""){
 		def source = m.source;
-        println "************************"
-	println m	
 		def mailSubject = ""
 		def activitySource = ""
 
@@ -927,7 +944,6 @@ class ObservationService {
 		templateMap["activitySourceUrl"] = m.sourcePageUrl?: ""
 		templateMap["unsubscribeUrl"] = unsubscribeUrl ?: ""
 		templateMap["userMessage"] = m.userMessage?: ""
-        println templateMap;
 		def body = conf.ui.askIdentification.emailBody
 		if (body.contains('$')) {
 			body = evaluate(body, templateMap)

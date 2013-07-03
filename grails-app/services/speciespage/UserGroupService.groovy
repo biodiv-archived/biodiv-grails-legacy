@@ -479,10 +479,14 @@ class UserGroupService {
 		return Observation.executeQuery(query, queryParams)[0]
 	}
 	
-	def getUserGroupObservations(UserGroup userGroupInstance, params, int max, long offset, boolean isMapView=false) {
+	def getUserGroupObservations(UserGroup userGroupInstance, params, max, offset, isMapView=false) {
 
 		if(!userGroupInstance) return;
-
+        println params
+        params['userGroup'] = userGroupInstance;
+        println params.getClass()
+        return observationService.getFilteredObservations(params, max, offset, isMapView); 
+/*
 		def queryParts = observationService.getFilteredObservationsFilterQuery(params);
 		queryParts.queryParams['userGroup'] = userGroupInstance
 		queryParts.queryParams['isDeleted'] = false;
@@ -515,10 +519,12 @@ class UserGroupService {
 		//			"join observation.userGroups userGroup " +
 		//			"where userGroup=:userGroup and observation.isDeleted=:obvIsDeleted	";
 		log.debug query;
+        log.debug queryParts.queryParams;
 
 		def result=['userGroupInstance':userGroupInstance, 'observationInstanceList': Observation.executeQuery(query, queryParts.queryParams), 'queryParams':queryParts.queryParams, 'activeFilters':queryParts.activeFilters, 'showTags':false];
 
 		return result;
+        */
 	}
 
 

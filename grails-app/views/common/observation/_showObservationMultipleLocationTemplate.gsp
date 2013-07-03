@@ -5,9 +5,9 @@
                 $(document).ready(function() {
                     window.params.snippetUrl = "${uGroup.createLink(controller:'observation', action:'snippet', 'userGroupWebaddress':userGroup?.webaddress) }"
                     <g:if test="{params.id}">
-                    window.params.filteredMapBasedObservationsListUrl = "${uGroup.createLink( controller:'observation', action: "list",'userGroupWebaddress':userGroup?.webaddress, id:params.id)}" + location.search
+                    window.params.filteredMapBasedObservationsListUrl = "${uGroup.createLink( controller:'observation', action: "list",'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress, id:params.id)}" + location.search
                     </g:if><g:else>
-                    window.params.filteredMapBasedObservationsListUrl = "${uGroup.createLink( controller:'observation', action: "list", 'userGroupWebaddress':userGroup?.webaddress)}" + location.search
+                    window.params.filteredMapBasedObservationsListUrl = "${uGroup.createLink( controller:'observation', action: "list", 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}" + location.search
                     </g:else>
                 });
                 </g:javascript>

@@ -72,10 +72,11 @@ class UrlMappings {
 			controller = 'userGroup'
 		}
 		
-		"/group/$webaddress/observation/list" {
+/*		"/group/$webaddress/observation/list" {
 			controller='userGroup'
 			action='observation'
-		}
+		}*/
+
 		"/group/$webaddress/user/list" {
 			controller='userGroup'
 			action='user'

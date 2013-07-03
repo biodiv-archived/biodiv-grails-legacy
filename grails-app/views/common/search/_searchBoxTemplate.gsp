@@ -51,7 +51,7 @@ $(document).ready(function() {
                 'locationsUrl': "${uGroup.createLink(controller:'observation', action: 'locations')}",
                 'defaultMarkerIcon':"${resource(dir:'js/Leaflet/dist/images', file:'')}",
                 'observation':{
-                    listUrl:"${uGroup.createLink(controller:'observation', action: 'listJSON')}"
+                    listUrl:"${uGroup.createLink(controller:'observation', action: 'listJSON', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"
                 }
 	}
 	$("#userGroupSelectFilter").val("${(queryParams && queryParams.uGroup)?queryParams.uGroup:(params.webaddress?'THIS_GROUP':'ALL')}");

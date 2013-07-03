@@ -295,10 +295,10 @@ class UserGroupController {
 			if(id instanceof String) {
 				id = Long.parseLong(id);
 			}
-			userGroup = userGroupService.get(id)
+			userGroup = UserGroup.get(id)
 		} 
 		if(webaddress) {
-			userGroup = userGroupService.get(webaddress)
+			userGroup = UserGroup.findByWebaddress(webaddress)
 		}
 		
 		if (!userGroup && redirectToList) {
@@ -397,9 +397,7 @@ class UserGroupController {
 
 	def observation = {
 		log.debug params;
-		def r = getUserGroupObservationsList(params);
-		def model = r.model
-		def model2 = r.model2; 
+		def model = getUserGroupObservationsList(params);
 		if(params.loadMore?.toBoolean()){
 			render(template:"/common/observation/showObservationListTemplate", model:model);
 			return;
@@ -411,12 +409,12 @@ class UserGroupController {
 			def obvFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
 			def tagsHtml = "";
 			if(model.showTags) {
-				def filteredTags = observationService.getTagsFromObservation(model.totalObservationInstanceList.collect{it[0]})
-				tagsHtml = g.render(template:"/common/observation/showAllTagsTemplate", model:[count: count, tags:filteredTags, isAjaxLoad:true, 'userGroup':model.userGroup]);
+			//	def filteredTags = observationService.getTagsFromObservation(model.totalObservationInstanceList.collect{it[0]})
+			//	tagsHtml = g.render(template:"/common/observation/showAllTagsTemplate", model:[count: count, tags:filteredTags, isAjaxLoad:true, 'userGroup':model.userGroup]);
 			}
-			def mapViewHtml = g.render(template:"/common/observation/showObservationMultipleLocationTemplate", model:[observationInstanceList:model2.observationInstanceList, 'userGroup':model2.userGroup]);
+			//def mapViewHtml = g.render(template:"/common/observation/showObservationMultipleLocationTemplate", model:[observationInstanceList:model2.observationInstanceList, 'userGroup':model2.userGroup]);
 
-			def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml, tagsHtml:tagsHtml, mapViewHtml:mapViewHtml, instanceTotal: model.instanceTotal]
+			def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml, tagsHtml:tagsHtml, instanceTotal: model.instanceTotal]
 			render result as JSON
 			return;
 		}
@@ -431,13 +429,17 @@ class UserGroupController {
 		params.offset = params.offset ? params.int('offset') : 0
 		
 		def model = userGroupService.getUserGroupObservations(userGroupInstance, params, params.max, params.offset);
-		def model2 = userGroupService.getUserGroupObservations(userGroupInstance, params, -1, -1, true);
-		def observationInstanceTotal = model2.observationInstanceList.size();
-		model['instanceTotal'] = observationInstanceTotal
-		model['totalObservationInstanceList'] = model2.observationInstanceList;
-		model['userGroup'] = userGroupInstance;
-		model2['userGroup'] = userGroupInstance;
+		//def model2 = userGroupService.getUserGroupObservations(userGroupInstance, params, -1, -1, true);
+        def checklistCount =  model.checklistCount
+		def allObservationCount =  model.allObservationCount
+		model['checklistCount'] = checklistCount
+		model['instanceTotal'] = allObservationCount
+		model['observationCount'] = allObservationCount-checklistCount
+		//model['totalObservationInstanceList'] = model2.observationInstanceList;
+		model['userGroupInstance'] = userGroupInstance;
+		//model2['userGroup'] = userGroupInstance;
 		
+
 		if(params.append?.toBoolean()) {
 			session[userGroupInstance.webaddress+"obv_ids_list"].addAll(model.observationInstanceList.collect {it.id});
 		} else {
@@ -446,15 +448,11 @@ class UserGroupController {
 		}
 		
 		log.debug "Storing all observations ids list in session ${session[userGroupInstance.webaddress+'obv_ids_list']} for params ${params}";
-		return [model:model, model2:model2];
+		return model;
 	}
 	
 	def filteredMapBasedObservationsList = {
-		def r = getUserGroupObservationsList(params);
-		def model = r.model
-		def model2 = r.model2; 
-		def totalCount = model2.observationInstanceList.size();
-		model['observationInstanceTotal'] = totalCount
+		def model = getUserGroupObservationsList(params);
 
 		render (template:"/common/observation/showObservationListTemplate", model:model);
 	}

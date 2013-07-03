@@ -312,14 +312,14 @@ function select_location(marker) {
         if (status == G.GeocoderStatus.OK) {
             if (results) {
                 var content = '<ul>';
-                for(var i=0; i<Math.min(results.length,5); i++) {
+                for(var i=0; i<Math.min(results.length,2); i++) {
                     content += '<li><span>'+results[i].formatted_address+'</span> <a onclick="useLocation(this);">Use as title</a></li>'
                 }
                 content += '</ul>';
                 selectedMarker.bindPopup(content).openPopup();
 
                 if (results[0]) {
-                    //$('#place_name').val(results[0].formatted_address);
+                    $('#place_name').val(results[0].formatted_address);
                     $('#reverse_geocoded_name').html(results[0].formatted_address);
                     //$('#latitude').html(marker.getLatLng().lat.toFixed(2));
                     //$('#longitude').html(marker.getLatLng().lng.toFixed(2));
