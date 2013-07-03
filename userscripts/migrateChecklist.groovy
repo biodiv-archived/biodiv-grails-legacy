@@ -10,6 +10,8 @@ import species.formatReader.SpreadsheetReader;
 import species.utils.*;
 import speciespage.*
 import com.vividsolutions.jts.geom.*
+import content.eml.Coverage
+
 def checklistUtilService = ctx.getBean("checklistUtilService");
 
 //checklistUtilService.updateUncuratedVotesTable()
@@ -84,6 +86,24 @@ def migrateObvLocation() {
 	//update observation set topology = ST_GeomFromText('SRID=4326;POINT(' || logitude ||  latitude)|| ')');
 }
 //migrateObvLocation();
+
+
+
+def migrateDocLocation() {
+	GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
+	Observation.withTransaction(){
+	   Coverage.findAllByTopologyIsNull().each{obv->
+			obv.topology = geometryFactory.createPoint(new Coordinate(obv.longitude, obv.latitude));
+			obv.placeName = obv.placeName?:obv.reverseGeocodedName;
+			if(!obv.save(flush:true)) {
+				obv.errors.allErrors.each { println  it }
+			}
+	   }
+	}
+	
+	//or use
+	//update observation set topology = ST_GeomFromText('SRID=4326;POINT(' || logitude ||  latitude)|| ')');
+}
 
 
 println "================ done "

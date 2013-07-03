@@ -31,8 +31,7 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.io.WKTReader;
 import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.geom.MultiPolygon;
-
-
+import com.vividsolutions.jts.geom.PrecisionModel;
 
 class DocumentService {
 
@@ -57,27 +56,28 @@ class DocumentService {
 
 		document.properties = params
 		document.coverage = document.coverage ?: new Coverage()
-		document.coverage.location = 'POINT(' + params.longitude + ' ' + params.latitude + ')'
 		document.coverage.reverseGeocodedName = params.reverse_geocoded_name
 		document.coverage.locationAccuracy = params.location_accuracy
-        if(params.latitude) 
-    		document.coverage.latitude = params.latitude.toFloat()
-        if(params.longitude)
-    		document.coverage.longitude = params.longitude.toFloat()
+		
+		//document.coverage.location = 'POINT(' + params.longitude + ' ' + params.latitude + ')'
+//		if(params.latitude) 
+//    		document.coverage.latitude = params.latitude.toFloat()
+//        if(params.longitude)
+//    		document.coverage.longitude = params.longitude.toFloat()
 		//document.coverage.geoPrivacy = params.geo_privacy
 
-        GeometryFactory geometryFactory = new GeometryFactory();
-        if(params.latitude && params.longitude) {
-            document.coverage.topology = geometryFactory.createPoint(new Coordinate(params.latitude?.toFloat(), params.longitude?.toFloat()));
-        } else if(params.areas) {
-            WKTReader wkt = new WKTReader();
-            try {
-                Geometry geom = wkt.read(params.areas);
-                document.coverage.topology = geom;
-            } catch(ParseException e) {
-                log.error "Error parsing polygon wkt : ${params.areas}"
-            }
-        }
+		GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), grailsApplication.config.speciesPortal.maps.SRID);
+		if(params.latitude && params.longitude) {
+			document.coverage.topology = geometryFactory.createPoint(new Coordinate(params.longitude?.toFloat(), params.latitude?.toFloat()));
+		} else if(params.areas) {
+			WKTReader wkt = new WKTReader(geometryFactory);
+			try {
+				Geometry geom = wkt.read(params.areas);
+				document.coverage.topology = geom;
+			} catch(ParseException e) {
+				log.error "Error parsing polygon wkt : ${params.areas}"
+			}
+		}
 
 		document.license  = (new XMLConverter()).getLicenseByType(params.licenseName, false)
 		//document.license = License.findByName(License.LicenseType(params.licenseName))
