@@ -36,7 +36,7 @@
 						title="Species">Species</a>
 					</li>
 					<li class="${((params.controller == 'userGroup' && params.action == 'observation') ||(params.controller == 'observation'))?' active':''}"><a
-						href="${uGroup.createLink('mapping':'userGroup', 'action':'observation', 'userGroup':userGroupInstance)}"
+						href="${uGroup.createLink('controller':'observation', 'action':'list', 'userGroup':userGroupInstance)}"
                                                 title="Observations">Observations</a> 
                                             <!--a style="position:absolute;top:-18px;right:140px;box-shadow:none;background-color:transparent;" href="${uGroup.createLink('controller':'observation', 'action':'create', 'userGroup':userGroupInstance)}"><span class="badge badge-important" title="Add Observation"><i class="icon-add"></i></span></a--> 
 					</li>
@@ -79,17 +79,17 @@
 
 					<li
 						class="${(params.controller == 'userGroup' && params.action == 'activity')?' active':''}"><a
-						href="${uGroup.createLink(mapping:"userGroup", 'action':"activity", 'userGroup':userGroupInstance)}"
+						href="${uGroup.createLink(mapping:'userGroup', 'action':'activity', 'userGroup':userGroupInstance)}"
 						title="Activity">Activity</a>
 					</li>
 					
 					<li class="${(params.controller == 'userGroup' && params.action == 'pages')?' active':''}"><a
-								href="${uGroup.createLink(mapping:"userGroup", 'action':"pages", 'userGroup':userGroupInstance)}"
+								href="${uGroup.createLink(mapping:'userGroup', 'action':'pages', 'userGroup':userGroupInstance)}"
 								title="Pages">Pages</a>
 					</li>
 
 					<li class="${(params.controller == 'userGroup' && params.action == 'about')?' active':''}"><a
-						href="${uGroup.createLink(mapping:"userGroup", 'action':"about", 'userGroup':userGroupInstance)}"
+						href="${uGroup.createLink(mapping:'userGroup', 'action':'about', 'userGroup':userGroupInstance)}"
 						title="About Us">About Us</a>
 					</li>
 					
@@ -121,10 +121,10 @@
 				</ul>
 				<ul class="nav">
 					<li class=" ${(params.controller == 'species')?'active':''}"><a
-						href="${uGroup.createLink("controller":"species")}" title="Species">
+						href="${uGroup.createLink('controller':'species')}" title="Species">
 							Species</a></li>
 					<li class="${(params.controller == 'observation')?'active':''}"><a
-						href="${uGroup.createLink("controller":"observation")}"
+						href="${uGroup.createLink('controller':'observation')}"
                                                 title="Observations">Observations</a>
                                             <!--a  style="position:absolute;top:-18px;right:140px;box-shadow:none;background-color:transparent;" href="${uGroup.createLink('controller':'observation', 'action':'create', 'userGroup':userGroupInstance)}"><span class="badge badge-important" title="Add Observation"><i class="icon-plus"></i></span></a--> 
 </li>
