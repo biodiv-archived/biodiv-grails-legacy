@@ -684,8 +684,8 @@ function updateMapView (params, callback) {
 //        $('#observations_list_map').slideToggle(mapViewSlideToggleHandler);
 //    }
     var p = jQuery.extend({}, params);
-//    delete p.bounds;
-//    delete oldParams.bounds;
+    delete p.bounds;
+    delete oldParams.bounds;
     console.log(JSON.stringify(oldParams));
     console.log(JSON.stringify(p));
     if(isMapViewLoaded !== true) {
@@ -718,7 +718,7 @@ function refreshMapBounds() {
                     ]);
         }
     } else {
-        map.setZoom(map.getMinZoom());
+        resetMap();
     }
 }
 

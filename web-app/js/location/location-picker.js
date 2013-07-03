@@ -24,16 +24,21 @@ function initialize(element, drawable){
     M = L;
     M.Icon.Default.imagePath = window.params.defaultMarkerIcon;
     allowedBounds = new M.LatLngBounds(new M.LatLng('6.74678', '68.03215'), new M.LatLng('35.51769', '97.40238'));
-    var viewBounds = new M.LatLngBounds(new M.LatLng('8', '59'), new M.LatLng('45', '105'));
+    //var viewBounds = new M.LatLngBounds(new M.LatLng('8', '59'), new M.LatLng('45', '105'));
+    var viewBounds = new M.LatLngBounds(new M.LatLng('8', '69'), new M.LatLng('36', '98'));
+    var nagpur_latlng = new M.LatLng('21.07', '79.27');                
+
     var ggl = new M.Google('HYBRID');
     map = new M.Map(element, {
 //        crs:L.CRS.EPSG4326,
         center:allowedBounds.getCenter(),
-        maxBounds:viewBounds,
-        zoom:5,
+//        maxBounds:viewBounds,
+        zoom:4,
+        minZoom:4,
+        maxZoom:15,
         noWrap:true
     });
-    map.addLayer(ggl).fitBounds(viewBounds);
+    map.addLayer(ggl).fitBounds(allowedBounds);
     layersControl = M.control.layers({'Google':ggl, 'OpenStreetMap':L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
                         attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
                                 noWrap: true
@@ -43,7 +48,7 @@ function initialize(element, drawable){
 //    L.marker(new M.LatLng('35', '97')).addTo(map);
     initControls();
     //initLocation(drawable);
-    //adjustBounds();
+    adjustBounds();
     isMapViewLoaded=true;
  }
 
@@ -66,10 +71,12 @@ function initControls() {
 
     map.on('enterFullscreen', function(){
         if(searchMarker) map.panTo(searchMarker.getLatLng());
+        else resetMap()
     });
 
     map.on('exitFullscreen', function(){
         if(searchMarker) map.panTo(searchMarker.getLatLng());
+        else resetMap();
     });
 
 }
@@ -658,4 +665,6 @@ function getSelectedBounds() {
     return bounds;    
 }
 
-
+function resetMap(){
+    map.fitBounds(allowedBounds)//.setView(allowedBounds.getCenter());
+}

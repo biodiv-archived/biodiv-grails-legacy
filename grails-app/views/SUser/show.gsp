@@ -150,7 +150,7 @@ h6 .btn-link, h5 .btn-link {
                             </div>
                         </div>
                         <div class="container">
-                            <div id="aboutMe" class="super-section" style="overflow:auto;padding-bottom:10px;">
+                            <div id="aboutMe" class="super-section" style="overflow:hidden;padding-bottom:10px;">
                                 <h5>
                                     <i class="icon-user"></i>About Me
                 			<sUser:ifOwns model="['user':user]">
@@ -180,7 +180,7 @@ h6 .btn-link, h5 .btn-link {
                                         Observations Spread
                                     </h6>
         			    <obv:showObservationsLocation
-						model="['observationInstanceList':totalObservationInstanceList, 'ignoreMouseOutListener':true, width:420, height:400]">
+						model="['observationInstanceList':totalObservationInstanceList, 'ignoreMouseOutListener':true, width:460, height:400]">
 				    </obv:showObservationsLocation>
                                 </div>
                                 <div id="expertice" class="section span6" style="margin:0px;margin-left:20px;width:420px;">
