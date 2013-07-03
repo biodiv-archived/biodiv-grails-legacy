@@ -21,7 +21,7 @@
 		<div class="prop">
 			<span class="name">URL</span>
 			<div class="value">
-				<span class="linktext">
+				<span class="linktext" style="word-wrap: break-word;">
 					${documentInstance.uri}
 				</span>
 			</div>
