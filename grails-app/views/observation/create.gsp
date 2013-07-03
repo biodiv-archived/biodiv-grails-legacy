@@ -160,7 +160,7 @@ if(r) {
 %>
 											
 											<div class='figure' style="height: 200px; overflow: hidden;">
-												<span> <img style="width: auto; height: auto;"
+                                                                                            <span> <img id="image_${i}" style="width: auto; height: auto;"
 													src='${imagePath}'
 													class='geotagged_image' exif='true' /> </span>
 											</div>
@@ -890,8 +890,9 @@ if(r) {
 		if (!event) var event = window.event;
 		if (event.target) targ = event.target;
 		else if (event.srcElement) targ = event.srcElement; //for IE
-		$(targ).parent('.addedResource').remove();
-		$("#image_"+imageId).remove();
+                
+                $(targ).parent('.addedResource').remove();
+		$(".image_"+imageId).remove();
 	}
 	
 	$( "#observedOn" ).datepicker({ 

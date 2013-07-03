@@ -28,7 +28,6 @@
                                 </g:hasErrors>
                             </div>
                     <input id='areas' type='hidden' name='areas' value='${observationInstance?.topology?Utils.GeometryAsWKT(observationInstance?.topology):params.areas}'></input>
-
                     <div class="input-prepend pull-left control-group  ${hasErrors(bean: observationInstance, field: 'topology', 'error')}" style="width:250px;">
                             <span class="add-on" style="vertical-align:middle;">Lat</span>
                             <!-- div class="location_picker_value" id="latitude"></div>
