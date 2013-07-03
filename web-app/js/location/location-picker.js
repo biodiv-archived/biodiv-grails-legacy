@@ -127,11 +127,11 @@ function initArea(drawable) {
 
     var areas = $('input#areas').val()
     if(areas) {
-        drawArea(areas, drawable);
+        drawArea(areas, drawable, true, true);
      }
 }
 
-function drawArea(areas, drawable) {
+function drawArea(areas, drawable, selected, clickable) {
     if(!areas) return;
     console.log('drawing area : '+areas);
     var wkt = new Wkt.Wkt();
@@ -156,9 +156,10 @@ function drawArea(areas, drawable) {
             }
         }
     } else {*/
+    if(obj) {
         if(obj.constructor === L.Marker || obj.constructor === L.marker) {
             var latlng = obj.getLatLng();
-            searchMarker = set_location(latlng.lat, latlng.lng, searchMarker, {draggable:drawable, layer:'Search Marker. Drag Me to set location', selected:drawable, clickable:drawable});
+            searchMarker = set_location(latlng.lat, latlng.lng, searchMarker, {draggable:drawable, layer:'Search Marker. Drag Me to set location', selected:selected, clickable:clickable});
             setLatLngFields(latlng.lng, latlng.lat);
             map.setView(latlng, 13); 
         } else {
@@ -166,7 +167,7 @@ function drawArea(areas, drawable) {
             $('input#areas').val(areas);
             map.fitBounds(obj.getBounds());                   
         }
-//    }
+    }
 }
 
 function adjustBounds() {
@@ -547,7 +548,7 @@ $(document).ready(function() {
       select: function(event, ui) {
         var latitude='', longitude='';
         if(ui.item.topology) {
-            drawArea(ui.item.topology, false);
+            drawArea(ui.item.topology, true, true, true);
             $('input#areas').val(ui.item.topology);
         } 
       },

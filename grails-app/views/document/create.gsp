@@ -334,7 +334,7 @@ input.dms_field {
                                         
                                         
                                         if(drawnItems) {
-                                            var areaBounds = new Array();
+                                          /*var areaBounds = new Array();
                                             drawnItems.eachLayer(function(layer){
                                                 if(layer.constructor === L.MultiPolygon) {
                                                     for(var l in layer._layers) {
@@ -344,9 +344,13 @@ input.dms_field {
                                                     areaBounds.push(layer.getLatLngs());    
                                             })
                                             var areas = new L.MultiPolygon(areaBounds);
-                                            var wkt = new Wkt.Wkt();
-                                            wkt.fromObject(areas);
-                                            $("input#areas").val(wkt.write());
+                                            */
+                                            var areas = drawnItems.getLayers();
+                                            if(areas.length > 0) {
+                                                var wkt = new Wkt.Wkt();
+                                                wkt.fromObject(areas);
+                                                $("input#areas").val(wkt.write());
+                                            }
                                         }
 
                                         
