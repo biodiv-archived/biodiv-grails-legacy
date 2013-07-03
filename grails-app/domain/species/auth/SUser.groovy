@@ -116,7 +116,7 @@ class SUser {
 	}
 
 	Resource mainImage() {
-		return new Resource(fileName:icon());
+		return new Resource(fileName:profilePicture());
 	}
 
 	def profilePicture() {

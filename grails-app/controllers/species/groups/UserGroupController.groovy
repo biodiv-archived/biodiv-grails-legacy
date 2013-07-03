@@ -327,7 +327,7 @@ class UserGroupController {
 		if(params.isAjaxLoad?.toBoolean()) {
 			def membersJSON = []
 			for(m in allMembers) {
-				membersJSON << ['id':m.id, 'name':m.name, 'icon':m.icon()]
+				membersJSON << ['id':m.id, 'name':m.name, 'icon':m.profilePicture()]
 			}
 			render ([result:membersJSON] as JSON);
 			return;
@@ -374,7 +374,7 @@ class UserGroupController {
 		if(params.isAjaxLoad?.toBoolean()) {
 			def foundersJSON = []
 			for(m in founders) {
-				foundersJSON << ['id':m.id, 'name':m.name, 'icon':m.icon()]
+				foundersJSON << ['id':m.id, 'name':m.name, 'icon':m.profilePicture()]
 			}
 			render ([result:foundersJSON] as JSON);
 			return;

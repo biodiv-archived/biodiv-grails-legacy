@@ -341,7 +341,7 @@ class ChartService {
 	}
 
 	private getUserImage(SUser actor){
-		return '<img style="max-height: 32px; min-height: 16px; max-width: 32px; width: auto;" src="' + actor.icon(ImageType.SMALL) +'" title="' + actor.name + '" />'
+		return '<img style="max-height: 32px; min-height: 16px; max-width: 32px; width: auto;" src="' + actor.profilePicture(ImageType.SMALL) +'" title="' + actor.name + '" />'
 	}
 	
 	def getPortalActivityStatsByDay(params){
