@@ -333,7 +333,7 @@ class Observation extends Metadata implements Taggable, Rateable {
 	private  updateLatLong(){
 		def centroid =  topology.getCentroid()
 		latitude = (float) centroid.getY()
-		longitude = (float) centroid.getY()
+		longitude = (float) centroid.getX()
 	}
 	
 	String fetchSpeciesCall(){
