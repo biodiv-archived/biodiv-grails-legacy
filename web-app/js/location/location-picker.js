@@ -14,7 +14,7 @@ var selectedMarker;
 var G, M;
 var layersControl;
 var overlays = {}; 
-var selectedIcon,prevIcon;
+var selectedIcon;//,prevIcon;
 var markers,searchMarker;
 var drawnItems;
 var isMapViewLoaded = false;
@@ -115,6 +115,7 @@ function initArea(drawable) {
             if (type === 'marker') {
                 var latlng = layer.getLatLng();
                 searchMarker = set_location(latlng.lat, latlng.lng, searchMarker, {draggable:true, selected:true});
+                drawnItems.addLayer(searchMarker);
             } else {
                 setLatLngFields('','');
                 drawnItems.addLayer(layer);
@@ -132,6 +133,7 @@ function initArea(drawable) {
 
 function drawArea(areas, drawable) {
     if(!areas) return;
+    console.log('drawing area : '+areas);
     var wkt = new Wkt.Wkt();
     try { 
         wkt.read(areas);
@@ -192,6 +194,7 @@ function adjustBounds() {
 }
 
 function clearDrawnItems() {
+    console.log('drawcreated');
     if(drawnItems) {
         drawnItems.eachLayer(function (layer) {
             map.removeLayer(layer)
@@ -207,6 +210,7 @@ function addMarker(lat, lng, options) {
     var marker = createMarker(lat, lng, options)
     if(marker)
         marker.addTo(map);
+    return marker;
 }
 
 function createMarker(lat, lng, options) {
@@ -245,14 +249,18 @@ function createMarker(lat, lng, options) {
             }else {
                 lastPosition = marker.getLatLng();
             };
-            select_location(marker);
+            //select_location(marker);
         });
     }
 
     if(options.clickable) {
-        marker.on('click', $.isFunction(options.clickable)?function(){
-            options.clickable.call(this, options.data)
-        }:select_location);
+        marker.on('click', function() {
+            if($.isFunction(options.clickable)) {
+                options.clickable.call(this, options.data);
+            } else {
+                select_location(marker);
+            }
+        });
     }
 
     return marker;
@@ -277,11 +285,11 @@ function set_location(lat, lng, marker, markerOptions) {
 
 function select_location(marker) {
     if(marker == undefined) return;
-    if(selectedMarker) { 
-        selectedMarker.setIcon(prevIcon).setOpacity(0.8);
-    }
+//    if(selectedMarker) { 
+//        selectedMarker.setIcon(prevIcon).setOpacity(0.8);
+//    }
     selectedMarker = marker;
-    prevIcon = marker.options.icon;
+    //prevIcon = marker.options.icon;
     /*if(prevIcon.options.shadowUrl) {
     //prevIcon.options.shadowUrl = 
     //selectedMarker.setIcon().setOpacity(1);

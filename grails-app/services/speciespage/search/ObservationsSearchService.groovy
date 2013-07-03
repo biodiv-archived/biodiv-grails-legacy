@@ -109,9 +109,7 @@ class ObservationsSearchService {
 				doc.addField(searchFieldsConfig.ISFLAGGED, (obv.flagCount > 0));
 
                 def topology = obv.topology;
-                def latitude = topology.getCentroid().getX();
-                def longitude = topology.getCentroid().getY();
-                doc.addField(searchFieldsConfig.LATLONG, latitude+","+longitude);
+                doc.addField(searchFieldsConfig.LATLONG, obv.latitude+","+obv.longitude);
                 
                 WKTWriter wkt = new WKTWriter();
                 try {

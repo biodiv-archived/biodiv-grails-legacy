@@ -18,6 +18,7 @@ import speciespage.search.DocumentSearchService
 def observationsSearchService = ctx.getBean("observationsSearchService");
 observationsSearchService.deleteIndex();
 observationsSearchService.publishSearchIndex();
+observationsSearchService.optimize();
 
 //def cSearchService = ctx.getBean("checklistSearchService");
 //cSearchService.deleteIndex();
