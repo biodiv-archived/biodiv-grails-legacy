@@ -348,7 +348,7 @@ input.dms_field {
                                             var areas = drawnItems.getLayers();
                                             if(areas.length > 0) {
                                                 var wkt = new Wkt.Wkt();
-                                                wkt.fromObject(areas);
+                                                wkt.fromObject(areas[0]);
                                                 $("input#areas").val(wkt.write());
                                             }
                                         }

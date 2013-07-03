@@ -1324,7 +1324,7 @@ class ObservationService {
 				mailSubject = conf.ui.addRecommendationVote.emailSubject
 				templateMap['actor'] = feedInstance.author;
 				templateMap["actorProfileUrl"] = generateLink("SUser", "show", ["id": feedInstance.author.id], request)
-				templateMap["actorIconUrl"] = feedInstance.author.icon(ImageType.SMALL)
+				templateMap["actorIconUrl"] = feedInstance.author.profilePicture(ImageType.SMALL)
 				templateMap["actorName"] = feedInstance.author.name
 				templateMap["activity"] = activityFeedService.getContextInfo(feedInstance, [webaddress:userGroupWebaddress])
 				templateMap["userGroupWebaddress"] = userGroupWebaddress
@@ -1338,7 +1338,7 @@ class ObservationService {
 				mailSubject = conf.ui.addRecommendationVote.emailSubject
 				templateMap['actor'] = feedInstance.author;
 				templateMap["actorProfileUrl"] = generateLink("SUser", "show", ["id": feedInstance.author.id], request)
-				templateMap["actorIconUrl"] = feedInstance.author.icon(ImageType.SMALL)
+				templateMap["actorIconUrl"] = feedInstance.author.profilePicture(ImageType.SMALL)
 				templateMap["actorName"] = feedInstance.author.name
 				templateMap["userGroupWebaddress"] = userGroupWebaddress
 				templateMap["activity"] = activityFeedService.getContextInfo(feedInstance, [webaddress:userGroupWebaddress])
@@ -1365,7 +1365,7 @@ class ObservationService {
 				//templateMap["userGroupWebaddress"] = userGroupWebaddress
 				//templateMap["activity"] = activityFeedService.getContextInfo(feedInstance, [webaddress:userGroupWebaddress])
 				//templateMap['actor'] = feedInstance.author;
-				//templateMap["actorIconUrl"] = feedInstance.author.icon(ImageType.SMALL)
+				//templateMap["actorIconUrl"] = feedInstance.author.profilePicture(ImageType.SMALL)
 				toUsers.addAll(getParticipants(obv))
 				break
 
@@ -1378,7 +1378,7 @@ class ObservationService {
 				//templateMap["userGroupWebaddress"] = userGroupWebaddress
 				//templateMap["activity"] = activityFeedService.getContextInfo(feedInstance, [webaddress:userGroupWebaddress])
 				//templateMap['actor'] = feedInstance.author;
-				//templateMap["actorIconUrl"] = feedInstance.author.icon(ImageType.SMALL)
+				//templateMap["actorIconUrl"] = feedInstance.author.profilePicture(ImageType.SMALL)
 				toUsers.addAll(getParticipants(obv))
 				break
 
@@ -1388,7 +1388,7 @@ class ObservationService {
 				bodyView = "/emailtemplates/addComment"
 				templateMap['actor'] = feedInstance.author;
 				templateMap["actorProfileUrl"] = generateLink("SUser", "show", ["id": feedInstance.author.id], request)
-				templateMap["actorIconUrl"] = feedInstance.author.icon(ImageType.SMALL)
+				templateMap["actorIconUrl"] = feedInstance.author.profilePicture(ImageType.SMALL)
 				templateMap["actorName"] = feedInstance.author.name
 				templateMap["userGroupWebaddress"] = userGroupWebaddress
 				templateMap["activity"] = activityFeedService.getContextInfo(feedInstance, [webaddress:userGroupWebaddress])
