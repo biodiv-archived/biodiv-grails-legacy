@@ -1564,18 +1564,27 @@ class ObservationService {
         paramsList.add("q", "location_exact:"+params.term+'*'?:'*');
         paramsList.add("fl", "location_exact,latlong,topology");
         paramsList.add("start", 0);
-        paramsList.add("rows", 5);
-	
+        paramsList.add("rows", 20);
+	    if(springSecurityService.currentUser){
+            paramsList.add('q', "author_id:"+springSecurityService.currentUser.id.toLong())
+        } else {
+            //paramsList.add('q', "*:*");
+        }
+
         def results = [];
+        Map temp = [:]
         if(paramsList) {
 			def queryResponse = observationsSearchService.search(paramsList);
 	
 			Iterator iter = queryResponse.getResults().listIterator();
 			while(iter.hasNext()) {
 				def doc = iter.next();
-                results.add([location:doc.getFieldValue('location_exact'), topology:doc.getFieldValue('topology'), category:'My Locations']);
+                if(results.size() >= 5) break;
+                if(!temp[doc.getFieldValue('location_exact')]) {
+                    results.add([location:doc.getFieldValue('location_exact'), topology:doc.getFieldValue('topology'), category:'My Locations']);
+                    temp[doc.getFieldValue('location_exact')] = true;
+                }
 			}
-
 	    }
 		
 		return results

@@ -653,7 +653,7 @@ function updateGallery(target, limit, offset, removeUser, isGalleryUpdate, remov
     var History = window.History;
     delete params["isGalleryUpdate"]
     History.pushState({state:1}, document.title, '?'+decodeURIComponent($.param(params))); 
-    console.log("doc_url " + doc_url);
+    //console.log("doc_url " + doc_url);
     if(isGalleryUpdate) {
         $.ajax({
             url: doc_url,
@@ -690,8 +690,8 @@ function updateMapView (params, callback) {
     var p = jQuery.extend({}, params);
     delete p.bounds;
     delete oldParams.bounds;
-    console.log(JSON.stringify(oldParams));
-    console.log(JSON.stringify(p));
+    //console.log(JSON.stringify(oldParams));
+    //console.log(JSON.stringify(p));
     if(isMapViewLoaded !== true) {
         loadGoogleMapsAPI(function() {
             initialize(document.getElementById("big_map_canvas"), false);

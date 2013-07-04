@@ -124,7 +124,6 @@ function initArea(drawable) {
 
 function drawArea(areas, drawable, selected, clickable) {
     if(!areas) return;
-    console.log('drawing area : '+areas);
     var wkt = new Wkt.Wkt();
     try { 
         wkt.read(areas);
@@ -185,7 +184,6 @@ function adjustBounds() {
 }
 
 function clearDrawnItems() {
-    console.log('drawcreated');
     if(drawnItems) {
         drawnItems.eachLayer(function (layer) {
             map.removeLayer(layer)
@@ -529,6 +527,7 @@ $(document).ready(function() {
         geocoder.geocode( {'address': request.term +'+india', 'region':'in'}, function(results, status) {
             var r = [];
             $.each(results, function(index, item) {
+                if(r.length >= 5) return;
                 r.push( {
                     label:  item.formatted_address,
                     value: item.formatted_address,
