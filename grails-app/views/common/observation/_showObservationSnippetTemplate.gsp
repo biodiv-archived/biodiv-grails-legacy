@@ -12,6 +12,7 @@ def obvId = observationInstance.id
             title='<g:if test="${obvTitle != null}">${obvTitle}</g:if>'>
             <g:link url="${uGroup.createLink(controller:controller, action:'show', id:obvId, 'pos':pos, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress) }" name="l${pos}"
                     >
+                    <div style="${observationInstance.isChecklist?'height:150px;width:150px':''}position:relative;margin:auto;">
                     <g:if
                             test="${imagePath}">
                             <img class="img-polaroid" style=" ${observationInstance.isChecklist? 'opacity:0.7;' :''}"
@@ -26,6 +27,7 @@ def obvId = observationInstance.id
                         <g:if test="${observationInstance.isChecklist}">
                         <div class="checklistCount">${observationInstance.speciesCount}</div>
                         </g:if>
+                    </div>
 
             </g:link>
 

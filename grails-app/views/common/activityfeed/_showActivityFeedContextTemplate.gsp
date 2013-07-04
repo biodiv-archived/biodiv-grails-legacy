@@ -19,7 +19,8 @@
 			<table class="table" style="margin-left: 0px;">
 				<thead>
 					<tr>
-						<th>Group</th>
+						<th style="width:20%">Group</th>
+						<th style="width:20%">Name</th>
 						<th>Species Groups</th>
 						<th>Habitats</th>
 						<th>Members</th>
