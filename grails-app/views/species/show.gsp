@@ -119,7 +119,7 @@ if(r) {
 
 occurrenceCount = undefined
 function getOccurrenceCount(data) {
-	occurrenceCount = data.count;
+	occurrenceCount = ${speciesInstance.fetchOccurrence()} + data.count;
 }
 
 window.is_species_admin = ${SpringSecurityUtils.ifAllGranted('ROLE_SPECIES_ADMIN')} 
@@ -294,7 +294,7 @@ $(document).ready(function(){
             
      if(${sparse}) {
     	 if(occurrenceCount > 0) {
-            showOccurence('${speciesName}');
+    	 	showOccurence('${speciesName}');
             //$("#map .alert").html("Showing "+occurrenceCount+" occurrence records for <i>${speciesName}</i>.");
     	} else {
             $("#map .alert").html("Currently no occurrence records are available right now. Please check back with us after some time or provide us if you have any.");

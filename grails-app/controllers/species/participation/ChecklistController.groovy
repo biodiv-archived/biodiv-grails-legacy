@@ -72,6 +72,7 @@ class ChecklistController {
 				count('id')
 			}
 			and{
+				eq('isDeleted', false)
 				if(speciesGroup){
 					eq('group', speciesGroup)
 				}
@@ -94,7 +95,7 @@ class ChecklistController {
 		if(userGroup){
 			render getChecklistCount(null, userGroup)
 		}else{
-			render Checklists.count();
+			render Checklists.countByIsDeleted(false);
 		}
 	}
 

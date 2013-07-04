@@ -1319,18 +1319,4 @@ class ObservationController {
         def locations = observationService.locations(params);
         render locations as JSON
     }
-	
-	@Secured(['ROLE_ADMIN'])
-	def testSearch = {
-		log.debug params
-		try {
-			observationsSearchService.publishSearchIndex();
-			flash.message = "Successfully created observations search index"
-		} catch(e) {
-			e.printStackTrace();
-			flash.message = e.getMessage()
-		}
-		render "=== done "
-	}
-	
 }
