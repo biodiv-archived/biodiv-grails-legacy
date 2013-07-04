@@ -21,7 +21,7 @@ def obvId = observationInstance.id
 					title="You can contribute!!!" />
 			</g:else>
                         <g:if test="${observationInstance.isChecklist}">
-                        <div class="checklistCount"><p style="height:150px;">${observationInstance.speciesCount}</p></div>
+                        <div class="checklistCount">${observationInstance.speciesCount}</div>
                         </g:if>
 		</g:link>
 	</div>
