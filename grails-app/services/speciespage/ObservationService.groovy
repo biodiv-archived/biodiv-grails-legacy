@@ -914,8 +914,8 @@ class ObservationService {
 		def source = m.source;
 		def mailSubject = ""
 		def activitySource = ""
-
-		switch (source) {
+		
+        switch (source) {
 			case "observationShow":
 				mailSubject = "Share Observation"
 				activitySource = "observation"
@@ -942,6 +942,7 @@ class ObservationService {
             case controller+action.capitalize():
                 mailSubject = "Share "+controller
                 activitySource = controller
+                break;
 			default:
 				log.debug "invalid source type ${source}"
 		}

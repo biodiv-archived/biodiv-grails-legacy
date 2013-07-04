@@ -115,6 +115,7 @@ class ObservationController {
 	def listJSON = {
 		log.debug params
 		def model = getObservationList(params);
+        model.queryParams.remove('userGroup');
 		render model as JSON
 	}
 

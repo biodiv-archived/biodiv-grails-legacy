@@ -1,75 +1,69 @@
 $(document).ready(function(){
-	$('#selected_sort').tooltip({placement:'top'});
+    $('#selected_sort').tooltip({placement:'top'});
     $('button').tooltip();
     $('.dropdown-toggle').dropdown();
-    	
+
     $('#speciesNameFilter').button();
     if(window.params.speciesName == 'Unknown'){
-		$("#speciesNameFilterButton").addClass('active');
-		$("#speciesNameAllButton").removeClass('active');
-	}else {
-		$("#speciesNameFilterButton").removeClass('active');
-		$("#speciesNameAllButton").addClass('active');
+        $("#speciesNameFilterButton").addClass('active');
+        $("#speciesNameAllButton").removeClass('active');
+    }else {
+        $("#speciesNameFilterButton").removeClass('active');
+        $("#speciesNameAllButton").addClass('active');
     }
     $("#speciesNameFilter").val(window.params.speciesName);
-    
-	$('#observationFlagFilter').button();
+
+    $('#observationFlagFilter').button();
     if(window.params.isFlagged == 'true' ){
-		$("#observationFlaggedButton").addClass('active');
-		$("#observationWithNoFlagFilterButton").removeClass('active')
-	}else{
-		$("#observationFlaggedButton").removeClass('active');
-		$("#observationWithNoFlagFilterButton").addClass('active')
-	}
+        $("#observationFlaggedButton").addClass('active');
+        $("#observationWithNoFlagFilterButton").removeClass('active')
+    }else{
+        $("#observationFlaggedButton").removeClass('active');
+        $("#observationWithNoFlagFilterButton").addClass('active')
+    }
 
-    
-	$('#observationAllChecklistFilter').button();
+
+    $('#observationAllChecklistFilter').button();
     if(window.params.isChecklistOnly == 'true' ){
-		$("#observationChecklistOnlyButton").addClass('active');
-		$("#observationAllButton").removeClass('active')
-	}else{
-		$("#observationChecklistOnlyButton").removeClass('active');
-		$("#observationAllButton").addClass('active')
-	}
-    
-	   $("#observationChecklistOnlyButton").click(function() {
-		    if($("#observationChecklistOnlyButton").hasClass('active')){
-		    	return false;
-		    }
-		    $("#observationAllChecklistFilter").val('true')
-		    $("#observationAllButton").removeClass('active')
-		    $("#observationChecklistOnlyButton").addClass('active')
+        $("#observationChecklistOnlyButton").addClass('active');
+        $("#observationAllButton").removeClass('active')
+    }else{
+        $("#observationChecklistOnlyButton").removeClass('active');
+        $("#observationAllButton").addClass('active')
+    }
 
-		    updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
-		    	return false;
-			});
+    $("#observationChecklistOnlyButton").click(function() {
+        if($("#observationChecklistOnlyButton").hasClass('active')){
+            return false;
+        }
+        $("#observationAllChecklistFilter").val('true')
+        $("#observationAllButton").removeClass('active')
+        $("#observationChecklistOnlyButton").addClass('active')
 
+        updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
+    return false;
+    });
 
-	   
-		$("#observationAllButton").click(function() {
-	   		if($("#observationAllButton").hasClass('active')){
-	   			return false;
-	   		}
-			$("#observationAllChecklistFilter").val('false');
-			$("#observationChecklistOnlyButton").removeClass('active');
-			$("#observationAllButton").addClass('active');
-			
-			updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
-	        return false;
-		});
+    $("#observationAllButton").click(function() {
+        if($("#observationAllButton").hasClass('active')){
+            return false;
+        }
+        $("#observationAllChecklistFilter").val('false');
+        $("#observationChecklistOnlyButton").removeClass('active');
+        $("#observationAllButton").addClass('active');
 
-
-    
-    
+        updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
+        return false;
+    });
 
     $('#observationMediaFilter').button();
     if(window.params.isMediaFilter ==  undefined || window.params.isMediaFilter == 'true' ){
-		$("#observationMediaAllFilterButton").removeClass('active');
-		$("#observationMediaOnlyFilterButton").addClass('active');
-	}else{
-		$("#observationMediaAllFilterButton").addClass('active');
-		$("#observationMediaOnlyFilterButton").removeClass('active');
-	}
+        $("#observationMediaAllFilterButton").removeClass('active');
+        $("#observationMediaOnlyFilterButton").addClass('active');
+    }else{
+        $("#observationMediaAllFilterButton").addClass('active');
+        $("#observationMediaOnlyFilterButton").removeClass('active');
+    }
     
     $("#observationMediaAllFilterButton").click(function() {
    		if($("#observationMediaAllFilterButton").hasClass('active')){
@@ -653,7 +647,7 @@ function updateGallery(target, limit, offset, removeUser, isGalleryUpdate, remov
     var History = window.History;
     delete params["isGalleryUpdate"]
     History.pushState({state:1}, document.title, '?'+decodeURIComponent($.param(params))); 
-    //console.log("doc_url " + doc_url);
+    console.log("doc_url " + doc_url);
     if(isGalleryUpdate) {
         $.ajax({
             url: doc_url,

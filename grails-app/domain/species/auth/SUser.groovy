@@ -36,7 +36,6 @@ class SUser {
 	Date dateCreated = new Date();
 	Date lastLoginDate = new Date();
 	String profilePic
-	String fbProfilePic
 	String icon
 
 	String website;
