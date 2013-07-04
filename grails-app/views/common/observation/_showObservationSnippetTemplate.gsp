@@ -14,7 +14,7 @@ def obvId = observationInstance.id
                     >
                     <g:if
                             test="${imagePath}">
-                            <img class="img-polaroid" style=" ${observationInstance.isChecklist? 'opacity:0.2;' :''}"
+                            <img class="img-polaroid" style=" ${observationInstance.isChecklist? 'opacity:0.7;' :''}"
                                     src="${imagePath}"
                                     />
                     </g:if>
@@ -24,7 +24,7 @@ def obvId = observationInstance.id
                                     title="You can contribute!!!" />
                     </g:else>
                         <g:if test="${observationInstance.isChecklist}">
-                        <div class="checklistCount"><p>${observationInstance.speciesCount}</p></div>
+                        <div class="checklistCount">${observationInstance.speciesCount}</div>
                         </g:if>
 
             </g:link>

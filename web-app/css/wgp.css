@@ -2027,16 +2027,16 @@ div.noOfRatings {
 
 .checklistCount {
     position: absolute;
-    top: 0px;
-    font-size: 5em;
-    /*text-align:center;
-    width:220px;
-    height:220px;
-    */
-}
-.checklistCount p{
-    width:220px;
-    height:220px;
-    display: table-cell;
-    vertical-align: middle;
+    font-size: 3em;
+    font-style: normal;
+    opacity: 0.7;
+    right: 0;
+    bottom: 0;
+    height: 55px;
+/*    background-color: whitesmoke;
+    border: solid grey 1px;
+*/    line-height:2.5;
+    background-image: url('../images/stack.png');
+    padding-left: 20px;
+
 }
