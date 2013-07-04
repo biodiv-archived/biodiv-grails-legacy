@@ -171,6 +171,11 @@ class Species implements Rateable {
 		return Follow.fetchIsFollowing(this, user)
 	}
 	
+	def fetchOccurrence(){
+		def query = "select count(*) from Observation obv where obv.maxVotedReco.taxonConcept.id = :taxOnConceptId and obv.isDeleted = false "
+		return Species.executeQuery(query, ['taxOnConceptId':taxonConcept.id])[0]
+	}
+	
 	def afterDelete(){
 		activityFeedService.deleteFeed(this)
 	}
