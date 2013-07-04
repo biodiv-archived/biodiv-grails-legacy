@@ -8,13 +8,13 @@ def obvId = observationInstance.id
 
 <div style="position:relative;overflow:hidden">
     <g:render template="/common/observation/noOfResources" model="['instance':observationInstance]"/>
-    <div class="figure span3 observation_story_image" style="display: table;height:220px; ${observationInstance.isChecklist? 'opacity:0.7;' :''}" 
+    <div class="figure span3 observation_story_image" style="display: table;height:220px;" 
             title='<g:if test="${obvTitle != null}">${obvTitle}</g:if>'>
             <g:link url="${uGroup.createLink(controller:controller, action:'show', id:obvId, 'pos':pos, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress) }" name="l${pos}"
                     >
                     <g:if
                             test="${imagePath}">
-                            <img class="img-polaroid"
+                            <img class="img-polaroid" style=" ${observationInstance.isChecklist? 'opacity:0.2;' :''}"
                                     src="${imagePath}"
                                     />
                     </g:if>
@@ -23,6 +23,10 @@ def obvId = observationInstance.id
                                     src="${createLinkTo( file:"no-image.jpg", base:grailsApplication.config.speciesPortal.resources.serverURL)}"
                                     title="You can contribute!!!" />
                     </g:else>
+                        <g:if test="${observationInstance.isChecklist}">
+                        <div class="checklistCount"><p>${observationInstance.speciesCount}</p></div>
+                        </g:if>
+
             </g:link>
 
     </div>

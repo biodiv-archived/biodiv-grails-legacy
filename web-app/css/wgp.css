@@ -2024,3 +2024,19 @@ div.noOfRatings {
     opacity: 0.5;
     filter: alpha(opacity = 50);      
 }
+
+.checklistCount {
+    position: absolute;
+    top: 0px;
+    font-size: 5em;
+    /*text-align:center;
+    width:220px;
+    height:220px;
+    */
+}
+.checklistCount p{
+    width:220px;
+    height:220px;
+    display: table-cell;
+    vertical-align: middle;
+}
