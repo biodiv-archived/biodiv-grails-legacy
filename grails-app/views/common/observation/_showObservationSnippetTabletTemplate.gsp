@@ -12,7 +12,7 @@ def obvId = observationInstance.id
                 <g:link url="${uGroup.createLink(controller:controller, action:'show', id:obvId, 'pos':pos, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress) }" name="g${pos}">
 			<g:if
 				test="${imagePath}">
-				<img class="img-polaroid" style=" ${observationInstance.isChecklist? 'opacity:0.5;' :''}"
+				<img class="img-polaroid" style=" ${observationInstance.isChecklist? 'opacity:0.7;' :''}"
 					src="${imagePath}" />
 			</g:if>
 			<g:else>
