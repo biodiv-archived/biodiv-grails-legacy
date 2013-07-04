@@ -14,7 +14,7 @@ def obvId = observationInstance.id
                     >
                     <g:if
                             test="${imagePath}">
-                            <img class="img-polaroid" style=" ${observationInstance.isChecklist? 'opacity:0.2;' :''}"
+                            <img class="img-polaroid" style=" ${observationInstance.isChecklist? 'opacity:0.5;' :''}"
                                     src="${imagePath}"
                                     />
                     </g:if>

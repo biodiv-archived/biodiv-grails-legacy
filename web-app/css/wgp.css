@@ -2029,10 +2029,8 @@ div.noOfRatings {
     position: absolute;
     top: 0px;
     font-size: 5em;
-    /*text-align:center;
-    width:220px;
-    height:220px;
-    */
+    font-style:normal;
+    opacity:0.7;
 }
 .checklistCount p{
     width:220px;
