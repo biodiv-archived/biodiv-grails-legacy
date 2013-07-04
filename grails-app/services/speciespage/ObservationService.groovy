@@ -313,17 +313,19 @@ class ObservationService {
 		def observations = Observation.withCriteria (max: limit, offset: offset) {
 			projections {
 				groupProperty('sourceId')
+				groupProperty('isShowable')
 			}
 			and {
 				eq("maxVotedReco", maxVotedReco)
 				eq("isDeleted", false)
 				if(obvId) ne("id", obvId)
 			}
-			//order("lastRevised", "desc")
+			order("isShowable", "desc")
 		}
 		def result = [];
 		observations.each {
-			result.add(['observation':Observation.get(it), 'title':maxVotedReco.name]);
+			def obv = Observation.get(it[0])
+			result.add(['observation':obv, 'title':(obv.isChecklist)? obv.title : maxVotedReco.name]);
 		}
 		def count = Observation.createCriteria().count {
 			projections {

@@ -53,18 +53,22 @@
                 def curr_id = instance.id
                 def prevId, nextId;
                 def clazz = instance.class
+				def obj = instance
                 if(pos>=0 && (prevObservationId || nextObservationId)) {
                     prevId = prevObservationId;
                     nextId = nextObservationId
-                } else {
-                    def prevIdList = clazz.withCriteria(){
+				} else {
+					def prevIdList = clazz.withCriteria(){
 								projections {
 									property('id')
 								}
 								and{
 									 lt('id', curr_id)
-									 if(clazz.hasProperty('isDeleted')){
+									 if(obj.hasProperty('isDeleted')){
 										 eq('isDeleted', false)
+									 }
+									 if(obj.hasProperty('isShowable')){
+										 eq('isShowable', true)
 									 }
 			 					}
 								maxResults 1
@@ -76,8 +80,11 @@
 							}
 							and{
 								 gt('id', curr_id)
-								 if(clazz.hasProperty('isDeleted')){
+								 if(obj.hasProperty('isDeleted')){
 									 eq('isDeleted', false)
+								 }
+								 if(obj.hasProperty('isShowable')){
+									 eq('isShowable', true)
 								 }
 							 }
 							maxResults 1

@@ -297,6 +297,10 @@ class ObservationController {
 				//redirect(action: "list")
 			}
 			else {
+				if(observationInstance.instanceOf(Checklists)){
+					redirect(controller:'checklist', action:show, params: params)
+					return
+				}
 				observationInstance.incrementPageVisit()
 				def userGroupInstance;
 				if(params.webaddress) {
@@ -323,8 +327,7 @@ class ObservationController {
 	 * @param pos
 	 * @return
 	 */
-	private def getPrevNextObservations(int pos, String userGroupWebaddress) {
-		
+	def getPrevNextObservations(int pos, String userGroupWebaddress) {
 		String listKey = "obv_ids_list";
 		String listParamsKey = "obv_ids_list_params"
 		if(userGroupWebaddress) {
