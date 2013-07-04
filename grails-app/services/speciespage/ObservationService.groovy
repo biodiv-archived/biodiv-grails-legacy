@@ -1564,16 +1564,18 @@ class ObservationService {
 			
 		}
 */
-        paramsList.add("q", "location_exact:"+params.term+'*'?:'*');
-        paramsList.add("fl", "location_exact,latlong,topology");
-        paramsList.add("start", 0);
-        paramsList.add("rows", 20);
+        String query = ""
 	    if(springSecurityService.currentUser){
-            paramsList.add('q', "author_id:"+springSecurityService.currentUser.id.toLong())
+            query += "author_id:"+springSecurityService.currentUser.id.toLong()
         } else {
             //paramsList.add('q', "*:*");
         }
+        query += " AND " + "location_exact:"+params.term+'*'?:'*';
 
+        paramsList.add("q", query);
+        paramsList.add("fl", "location_exact,latlong,topology");
+        paramsList.add("start", 0);
+        paramsList.add("rows", 20);
         def results = [];
         Map temp = [:]
         if(paramsList) {
