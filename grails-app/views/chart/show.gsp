@@ -24,7 +24,7 @@
 		</g:if>
 		
 		
-<%--		<chart:showActivityStats model="['title':'Activity Monitor', columns:activityData.columns, data:activityData.data]"/>--%>
+		<chart:showActivityStats model="['title':'Activity Monitor', columns:activityData.columns, data:activityData.data]"/>
 		
 		<chart:showStats model="['title':'User Stats : ' + userData.obvCount + ' Observations and top 10 Contributors of last 7 days', columns:userData.columns, data:userData.data, hAxisTitle:'User', htmlData:userData.htmlData, htmlColumns:userData.htmlColumns]"/>
 		

@@ -123,7 +123,7 @@ class ChartService {
 	 * @return
 	 */
 	private getFilteredRecommendationStats(SUser author){
-        def result = RecommendationVote.executeQuery("select g.id, count(*) from RecommendationVote r, Observation o, SpeciesGroup g where r.observation = o and o.group = g and r.author=:author and o.isDeleted = false group by g.id", [author:author]);
+        def result = RecommendationVote.executeQuery("select g.id, count(*) from RecommendationVote r, Observation o, SpeciesGroup g where r.observation = o and o.group = g and r.author=:author and o.isDeleted = false and o.isShowable = true and o.isChecklist = false group by g.id", [author:author]);
 		result.each {it->
             it[0] = SpeciesGroup.read(it[0]);
         }
@@ -290,7 +290,11 @@ class ChartService {
 			and{
 				// taking undeleted observation
 				eq('isDeleted', false)
+				eq('isShowable', true)
+				eq('isChecklist', false)
+
 				ge('createdOn', startDate)
+				
 
 				//filter by usergroup
 				if(userGroupInstance){
@@ -310,6 +314,9 @@ class ChartService {
 			and{
 				// taking undeleted observation
 				eq('isDeleted', false)
+				eq('isShowable', true)
+				eq('isChecklist', false)
+				
 				ge('createdOn', startDate)
 
 				//filter by usergroup
@@ -355,9 +362,9 @@ class ChartService {
 			typeToIdFilterMap = ActivityFeed.getGroupAndObsevations([userGroupInstance])
 		}
 
-		int days = getPassedDays(params, userGroupInstance)
-
-		log.debug "days $days"
+		int days = getPassedDays(params, userGroupInstance) 
+		log.debug "passed days $days"
+		days = (days > 500) ? 500 : days
 		
 		def result = []
 		Date currentDate = new Date()
@@ -461,6 +468,9 @@ class ChartService {
 			and{
 				// taking undeleted observation
 				eq('isDeleted', false)
+				eq('isShowable', true)
+				eq('isChecklist', false)
+				
 				eq('group', sGroup)
 				
 //				//filter by usergroup
