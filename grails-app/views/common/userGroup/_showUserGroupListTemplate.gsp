@@ -15,11 +15,12 @@
 			<table class="table table-hover span8" style="margin-left: 0px;">
 				<thead>
 					<tr>
-						<th>Group</th>
+						<th style="width:20%">Group</th>
+						<th style="width:20%">Name</th>
 						<th>Species Groups</th>
 						<th>Habitats</th>
 						<th>Members</th>
-						<th>Join</th>
+						<th style="width:20%">Join</th>
 					</tr>
 				</thead>
 				<tbody class="mainContentList">

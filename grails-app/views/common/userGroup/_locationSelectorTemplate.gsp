@@ -1,9 +1,13 @@
-<script>
+<g:javascript>
+    $(document).ready(function(){
+    loadGoogleMapsAPI(function(){
     var swRestriction = new google.maps.LatLng('8', '69');
     var neRestriction = new google.maps.LatLng('36', '98');
     var allowedBounds = new google.maps.LatLngBounds(swRestriction, neRestriction);
+    initialize();
 
       function initialize() {
+      
         var mapOptions = {
           center: new google.maps.LatLng(21.07,79.27),
           zoom: 4,
@@ -80,9 +84,10 @@
         }
 
       }
+      });
+      });
 
-      google.maps.event.addDomListener(window, 'load', initialize);
-</script>
+</g:javascript>
 <div class="observation_location">
 <div id="map_canvas" style="width:100%; height: 300px;"></div>
 </div>

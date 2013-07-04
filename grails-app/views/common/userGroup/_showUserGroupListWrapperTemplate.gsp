@@ -63,16 +63,7 @@
 <!--container end-->
 <g:javascript>
 $(document).ready(function() {
-	def p = {
-	<%
-		params.each { key, value ->
-			println '"'+key+'":"'+value+'",'
-		}
-	%>
-		"tagsLink":"${g.createLink(action: 'tags')}",
-		"queryParamsMax":"${queryParams?.max}"
-        }
-        jQuery.extend(window.params, p);
+	window.params.tagsLink = "${uGroup.createLink(controller:'userGroup', action: 'tags')}";
 
 });
 

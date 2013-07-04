@@ -20,24 +20,16 @@
 
 	<g:javascript>
 		$(document).ready(function(){
-			def p = {
-			<%
-				params.each { key, value ->
-					println '"'+key+'":"'+value+'",'
-				}
-			%>
-				"tagsLink":"${g.createLink(action: 'tags')}",
-                        }
-                        jQuery.extend(window.params, p);
+			window.params.tagsLink = "${uGroup.createLink(controller:'userGroup', action: 'tags')}";
 		});
 	</g:javascript>
 	<r:script>
-		$( "#search" ).unbind('click');
+/*		$( "#search" ).unbind('click');
 		$( "#search" ).click(function() {          
 			var target = "${createLink(action:'search')}" + window.location.search;
 			//updateGallery(target, ${queryParams.max}, 0, undefined, false);
         	return false;
-		});
+		});*/
 	</r:script>
 
 </body>

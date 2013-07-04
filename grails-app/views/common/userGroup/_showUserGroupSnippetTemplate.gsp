@@ -4,9 +4,18 @@
 
 <td
 	title='<g:if test="${userGroupTitle != null}">${userGroupTitle}</g:if>'>
+	<div class="figure pull-left" style="display: table; width:100%;height:100px;">
+		<a
+			href="${uGroup.createLink(mapping:'userGroup', controller:'userGroup', action:'show', base:userGroupInstance.domainName, 'userGroup':userGroupInstance, 'pos':pos)}">
+			<img
+			class="normal_profile_pic}"
+			src="${userGroupInstance.mainImage()?.fileName}" title="${userGroupInstance.name}"
+			alt="${userGroupInstance.name}" /> </a>
+	</div>
 
-	<uGroup:showUserGroupSignature
-		model="[ 'userGroup':userGroupInstance, 'pos':pos, 'showDetails':true]" />
+</td>
+<td>
+    ${userGroupInstance.name}
 </td>
 
 <uGroup:showStory

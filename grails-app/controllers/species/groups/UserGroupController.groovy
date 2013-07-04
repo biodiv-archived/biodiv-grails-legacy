@@ -109,7 +109,7 @@ class UserGroupController {
 		}
 
 		log.debug "Storing all userGroup ids list in session ${session['uGroup_ids_list']} for params ${params}";
-		return [totalUserGroupInstanceList:totalUserGroupInstanceList, userGroupInstanceList: userGroupInstanceList, instanceTotal: count, queryParams: queryParams, activeFilters:activeFilters]
+		return [totalUserGroupInstanceList:totalUserGroupInstanceList, userGroupInstanceList: userGroupInstanceList, instanceTotal: count, queryParams: queryParams, activeFilters:activeFilters, 'resultType':'user group']
 	}
 
 	def listRelated = {
