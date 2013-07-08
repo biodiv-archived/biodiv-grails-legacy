@@ -1,0 +1,106 @@
+Simple Habitat Types
+====================
+
+Forest
+Thicket
+Savanna
+Grassland
+Swamp
+Aquatic
+Desert
+Rocky
+Agriculture
+Others
+
+
+=========================================================================
+1 Forest
+2 Savanna
+3 Shrubland
+4 Grassland
+5 Wetlands (inland)
+6 Rocky Areas [e.g. inland cliffs, mountain peaks]
+7 Caves and Subterranean Habitats (non-aquatic)
+8 Desert
+8.3 Cold
+9 Marine Neritic (Submergent Nearshore Continental Shelf or Oceanic Island)
+10 Marine Oceanic
+11 Marine Deep Benthic
+12 Marine Intertidal
+13 Marine Coastal/Supratidal
+14 Artificial - Terrestrial
+15 Artificial - Aquatic
+16 Introduced Vegetation
+17 Other
+18 Unknown
+
+
+================================================================
+
+Dervied and adapted from IUCN Habitat Classification Scheme Version 3
+http://www.iucnredlist.org/technical-documents/classification-schemes/habitats-classification-scheme-ver3
+
+
+1 Forest
+1.5 Subtropical/Tropical Dry
+1.6 Subtropical/Tropical Moist Lowland
+1.7 Subtropical/Tropical Mangrove Vegetation Above High Tide Level
+1.8 Subtropical/Tropical Swamp
+1.9 Subtropical/Tropical Moist Montane
+ 
+2 Savanna
+2.1 Dry Savanna
+2.2 Moist Savana
+ 
+3 Shrubland
+3.5 Subtropical/Tropical Dry
+3.6 Subtropical/Tropical Moist
+3.7 Subtropical/Tropical High Altitude
+3.8 Mediterranean-type Shrubby Vegetation
+ 
+4 Grassland
+4.5 Subtropical/Tropical Dry Lowland
+4.6 Subtropical/Tropical Seasonally Wet/Flooded Lowland
+4.7 Subtropical/Tropical High Altitude
+ 
+5 Wetlands (inland)
+ 
+6 Rocky Areas [e.g. inland cliffs, mountain peaks]
+ 
+7 Caves and Subterranean Habitats (non-aquatic)
+ 
+8 Desert
+8.1 Hot
+8.2 Temperate
+8.3 Cold
+ 
+9 Marine Neritic (Submergent Nearshore Continental Shelf or Oceanic Island)
+ 
+10 Marine Oceanic
+ 
+11 Marine Deep Benthic
+ 
+12 Marine Intertidal
+ 
+13 Marine Coastal/Supratidal
+13.1 Sea Cliffs and Rocky Offshore Islands
+13.2 Coastal Caves/Karst
+13.3 Coastal Sand Dunes
+13.4 Coastal Brackish/Saline Lagoons/Marine Lakes
+13.5 Coastal Freshwater Lakes
+ 
+14 Artificial - Terrestrial
+14.1 Arable Land
+14.2 Pastureland
+14.3 Plantations
+14.4 Rural Gardens
+14.5 Urban Areas
+14.6 Subtropical/Tropical Heavily Degraded Former Forest
+ 
+15 Artificial - Aquatic
+ 
+16 Introduced Vegetation
+ 
+17 Other
+ 
+18 Unknown
