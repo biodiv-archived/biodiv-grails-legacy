@@ -13,9 +13,9 @@ alias gra='git remote add'
 alias grr='git remote rm'
 alias gpu='git pull'
 alias gcl='git clone'
-alias ra='cd ~/git/biodiv; grails run-app ~/git/biodiv &> ~/git/biodiv/logs/app.log &;tail -f ~/git/biodiv/logs/app.log'
+alias ra='cd ~/git/biodiv; grails run-app ~/git/biodiv &> ~/git/biodiv/logs/app.log &'
 _run-script () {  
-    cd ~/git/biodiv; grails run-script ~/git/biodiv/userscripts/$1.groovy &> ~/git/biodiv/logs/script.log &;tail -f ~/git/biodiv/logs/script.log;
+    cd ~/git/biodiv; grails run-script ~/git/biodiv/userscripts/$1.groovy &> ~/git/biodiv/logs/script.log &
 }
 alias rs=_run-script
 _dropdb () {  
