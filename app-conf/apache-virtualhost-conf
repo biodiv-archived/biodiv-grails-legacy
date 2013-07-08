@@ -11,12 +11,6 @@
 
     RewriteEngine on
 
-    RewriteCond %{REQUEST_URI} ^/(species|observation|activity|activityFeed|SUser|user|page|pages|requestMembership|joinUs|leaveUs|inviteMembers|login|logout|register|static|group|j_spring_security_logout|recommendation|comment|newsletter|emailConfirmation|search|checklist|jcaptcha|openId|data|chart|admin|curation|resource|rateable|rating|document|project|UFile|direction|biodivAdmin).*
-    RewriteRule ^(.*)$ http://indiabiodiversity.localhost.org:8080/biodiv$1 [P,L]
-    ProxyPassReverse / http://indiabiodiversity.localhost.org:8080/biodiv/
-    ProxyPassReverse / http://indiabiodiversity.localhost.org:8080/
-
-
     RewriteCond %{REQUEST_URI} ^/biodiv/(static|plugins|data|bootstrap|js|css|j_spring_security_check|j_spring_openid_security_check|images|j_spring_security_logout|observation/upload_resource|emailConfirmation|ck).*
     RewriteRule ^/biodiv(.*)$ http://indiabiodiversity.localhost.org:8080/biodiv$1 [P]
     ProxyPassReverse /biodiv http://indiabiodiversity.localhost.org:8080/biodiv
@@ -26,17 +20,15 @@
     RewriteRule ^/biodiv/(.*)$ /$1 [R=301,L]
     ProxyPassReverse / http://indiabiodiversity.localhost.org:8080/biodiv/
 
-    ProxyPassReverseCookiePath /biodiv /
+#    RewriteCond %{REQUEST_URI} ^/(species|observation|activity|activityFeed|SUser|user|page|pages|requestMembership|joinUs|leaveUs|inviteMembers|login|logout|register|static|group|j_spring_security_logout|recommendation|comment|newsletter|emailConfirmation|search|checklist|jcaptcha|openId|data|chart|admin|curation|resource|rateable|rating|document|project|UFile|direction|biodivAdmin).*
+    RewriteCond %{REQUEST_URI} ^/.*
+    RewriteCond %{REQUEST_URI} !(^(/biodiv))
+    RewriteRule ^(.*)$ http://indiabiodiversity.localhost.org:8080/biodiv$1 [P,L]
+    ProxyPassReverse / http://indiabiodiversity.localhost.org:8080/biodiv/
+    ProxyPassReverse / http://indiabiodiversity.localhost.org:8080/
 
-    <IfModule mod_proxy.c>
-        ProxyRequests Off
-        <Proxy *>
-            Order deny,allow
-            Deny from all
-            Allow from localhost
-        </Proxy>
-        ProxyVia On
-    </IfModule>
+
+    ProxyPassReverseCookiePath /biodiv /
 
 </VirtualHost>
 
@@ -89,26 +81,6 @@ RewriteCond %{REQUEST_URI} !(^/(species|observation|activity|SUser|user|page|pag
 
     RewriteCond %{REQUEST_URI} ^/user/login
     RewriteRule ^(.*)$ $1 [QSA,L]
-
-
-    <Location /geoserver>
-        Order allow,deny 
-        Allow from all 
-    </Location>
-    <Location /biodiv>
-        Order allow,deny 
-        Allow from all 
-    </Location>
-    <Location /biodiv>
-        Order allow,deny 
-        Allow from all 
-    </Location>
-
-    <Location />
-        Order allow,deny 
-        Allow from all 
-    </Location>
-
 </VirtualHost>
 
 <VirtualHost *:80>

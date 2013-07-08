@@ -18,3 +18,5 @@ _run-script () {
     cd ~/git/biodiv; grails run-script ~/git/biodiv/userscripts/$1.groovy &> ~/Desktop/op1.txt &
 }
 alias rs=_run-script
+
+export GRAILS_OPTS="-XX:MaxPermSize=256m -Xmx1024M"

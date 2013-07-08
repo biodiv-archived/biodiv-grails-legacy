@@ -17,15 +17,6 @@
 <g:layoutHead />
 
 <g:set var="domain" value="${Utils.getDomain(request)}"/>
-<g:if test="${domain.equals(grailsApplication.config.ibp.domain) }">
-    <link rel="shortcut icon" href="/sites/default/files/ibp_favicon_2.png"
-		type="image/x-icon" />
-</g:if>
-<g:else>
-    <link rel="shortcut icon"
-		href="/sites/all/themes/wg/images/favicon.png" type="image/x-icon" />
-</g:else>
-
 <script src="https://www.google.com/jsapi" type="text/javascript"></script>
 
 <r:require modules="observations_list" />

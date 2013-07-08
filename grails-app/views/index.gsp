@@ -2,15 +2,15 @@
 <html>
     <head>
         <meta name="layout" content="main" />
-        <title>Biodiversity Portal</title>
+        <title>${grailsApplication.config.speciesPortal.app.siteName}</title>
+        <r:require modules="core" />
     </head>
 
     <body>
-
         <div class="observation  span12">
-            <p class="message">
-                Welcome to Biodiversity Portal
-            </p>
+            <center>
+                <b>Welcome to ${grailsApplication.config.speciesPortal.app.siteName}</b>
+            </center>
         </div>
     </body>
 </html>

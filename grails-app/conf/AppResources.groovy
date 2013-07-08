@@ -4,7 +4,10 @@
 //
 modules = {
 	overrides {
-		jquery { defaultBundle 'core' }
+		jquery { 
+            defaultBundle 'core' 
+        }
+
 		'jquery-ui' {
 			defaultBundle 'core'
 			resource id:'js', url:[dir:'plugins',file:'jquery-ui-1.8.15/jquery-ui/js/jquery-ui-1.8.15.custom.min.js'],
