@@ -371,6 +371,7 @@ speciesPortal {
 		COMMON_NAME = "common_name"
 		COMMON_NAME_EXACT = "common_name_exact"
 		LOCATION = "location"
+		LOCATION_EXACT = "location_exact"
 		ATTRIBUTION = "attribution"
 		PERCENT_OF_INFO = "percent_of_info"
 		
@@ -382,6 +383,7 @@ speciesPortal {
 		UNINOMIAL = "uninomial"
 		UNINOMIAL_EXACT = "uninomial_exact"
 		AUTHOR = "author"
+		AUTHOR_ID = "author_id"
 		YEAR = "year"
 		GENUS = "genus"
 		SPECIES = "species"
@@ -416,6 +418,7 @@ speciesPortal {
 		DESCRIPTION = "description"
 		TYPE = "type"
         TOPOLOGY = "topology"
+        SCORE = "score"
 	}
 
 	nameSearchFields {
