@@ -36,7 +36,7 @@
 		href="${resource(dir:'group-themes', file:userGroupInstance.theme + '.css')}" />
 </g:if>
 
-<g:if test="${params.action !='show'}">
+<g:if test="${params?.action !='show'}">
     <meta name="description" content="Welcome to the India Biodiversity Portal (IBP) - A repository of information designed to harness and disseminate collective intelligence on the biodiversity of the Indian subcontinent.">
 </g:if>
 

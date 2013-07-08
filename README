@@ -5,9 +5,40 @@
 3. Go to grails home directory
 	a. git clone https://github.com/strandls/biodiv.git
 	b. cd biodiv; grails upgrade
-	
-4. install solr
-	http://wiki.apache.org/solr/SolrInstall
-	
-5. copy spreadsheets from saturn and run load script
+
+4. Install postgresql http://wiki.postgresql.org/wiki/Detailed_installation_guides 
+        a. sudo apt-get install postgresql
+        b. sudo apt-get install postgresql-client
+        c. sudo apt-get install pgadmin3
+        d. sudo -u postgres psql postgres
+            # \password postgres
+        e. createdb biodiv
+
+5. Install postGIS
+        a. /etc/init.d/postgresql stop
+        b. apt-get install postgresql-9.1-postgis
+
+6. Run following to make biodiv a spatially enabled database.
+    a. createlang plpgsql biodiv;
+    b. pslq -d biodiv -f /usr/share/postgresql/9.1/contrib/postgis-1.5/postgis.sql
+    c. pslq -d biodiv -f /usr/share/postgresql/9.1/contrib/postgis-1.5/spatial_ref_sys.sql
+
+7. Run application 
+    a. cd ~/git/biodiv
+    b. grails run-app
+
+8. Setting for development on local machine
+    sudo vim /etc/hosts
+    127.0.0.1       indiabiodiversity.localhost.org localibp
+    127.0.0.1       thewesternghats.indiabiodiversity.localhost.org localwbp
+
+9. Setting the host configuration 
+    sudo ln -s ~/git/biodiv/app-conf/apache-virtualhost-conf /etc/apache2/sites-available/
+    sudo ln -s ~/git/biodiv/app-conf/apache-virtualhost-conf /etc/apache2/sites-enabled/
+    sudo a2enmod proxy
+    sudo a2enmod rewrite
+    edit ~/git/biodiv/app-conf/apache-virtualhost-conf and change DocumentRoot to your dataDir
+    sudo /etc/init.d/apache2 restart
+
+8. Loading species pages using script
 	

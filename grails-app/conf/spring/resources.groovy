@@ -26,209 +26,225 @@ import species.auth.drupal.DrupalAuthUtils;
 import species.participation.EmailConfirmationService;
 import speciespage.FacebookAuthService;
 import com.the6hours.grails.springsecurity.facebook.DefaultFacebookAuthDao
+import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
+import org.apache.solr.core.CoreContainer;
+import grails.util.Environment
 
-        
+
 // Place your Spring DSL code here
 beans = {
-	def conf = SpringSecurityUtils.securityConfig;
+    def conf = SpringSecurityUtils.securityConfig;
 
-	authenticationSuccessHandler(species.auth.AjaxAwareAuthenticationSuccessHandler) {
-		requestCache = ref('requestCache')
-		defaultTargetUrl = conf.successHandler.defaultTargetUrl // '/'
-		alwaysUseDefaultTargetUrl = conf.successHandler.alwaysUseDefault // false
-		targetUrlParameter = conf.successHandler.targetUrlParameter // 'spring-security-redirect'
-		ajaxSuccessUrl = conf.successHandler.ajaxSuccessUrl // '/login/ajaxSuccess'
-		useReferer = true // false
-		redirectStrategy = ref('redirectStrategy')
-	}
+    authenticationSuccessHandler(species.auth.AjaxAwareAuthenticationSuccessHandler) {
+        requestCache = ref('requestCache')
+        defaultTargetUrl = conf.successHandler.defaultTargetUrl // '/'
+        alwaysUseDefaultTargetUrl = conf.successHandler.alwaysUseDefault // false
+        targetUrlParameter = conf.successHandler.targetUrlParameter // 'spring-security-redirect'
+        ajaxSuccessUrl = conf.successHandler.ajaxSuccessUrl // '/login/ajaxSuccess'
+        useReferer = true // false
+        redirectStrategy = ref('redirectStrategy')
+    }
 
-	userDetailsService(OpenIdUserDetailsService) { grailsApplication = ref('grailsApplication') }
+    userDetailsService(OpenIdUserDetailsService) { grailsApplication = ref('grailsApplication') }
 
-	def configRoot = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
-	def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.search
-	speciesSolrServer(org.apache.solr.client.solrj.impl.StreamingUpdateSolrServer,config.serverURL+"/species", config.queueSize, config.threadCount ) {
-		setSoTimeout(config.soTimeout);
-		setConnectionTimeout(config.connectionTimeout);
-		setDefaultMaxConnectionsPerHost(config.defaultMaxConnectionsPerHost);
-		setMaxTotalConnections(config.maxTotalConnections);
-		setFollowRedirects(config.followRedirects);
-		setAllowCompression(config.allowCompression);
-		setMaxRetries(config.maxRetries);
-		//setParser(new XMLResponseParser()); // binary parser is used by default
-		log.debug "Initialized search server to "+config.serverURL+"/species"
-	}
+    def configRoot = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+    def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.search
 
-	speciesSearchService(speciespage.search.SpeciesSearchService) {
-		solrServer = ref('speciesSolrServer');
-	}
+    /*def speciesSolrServer, observationSolrServer, newsletterSolrServer, projectSolrServer, checklistSolrServer, documentSolrServer
+    if (Environment.current == Environment.DEVELOPMENT) {
+        // In development we use messageLocalService as implementation
+        // of MessageService.
+        File home = new File("${configRoot.speciesPortal.app.rootDir}/solr" );
+        File f = new File( home, "solr.xml" );
+        CoreContainer container = new CoreContainer();
+        container.load( "${configRoot.speciesPortal.app.rootDir}/solr", f );
 
-	observationsSolrServer(org.apache.solr.client.solrj.impl.StreamingUpdateSolrServer,config.serverURL+"/observations", config.queueSize, config.threadCount ) {
-		setSoTimeout(config.soTimeout);
-		setConnectionTimeout(config.connectionTimeout);
-		setDefaultMaxConnectionsPerHost(config.defaultMaxConnectionsPerHost);
-		setMaxTotalConnections(config.maxTotalConnections);
-		setFollowRedirects(config.followRedirects);
-		setAllowCompression(config.allowCompression);
-		setMaxRetries(config.maxRetries);
-		//setParser(new XMLResponseParser()); // binary parser is used by default
-		log.debug "Initialized search server to "+config.serverURL+"/observations"
-	}
+        speciesSolrServer = new EmbeddedSolrServer( container, "species" );
+        observationSolrServer = new EmbeddedSolrServer( container, "observations" );
+        newsletterSolrServer = new EmbeddedSolrServer( container, "newsletters" );
+        projectSolrServer = new EmbeddedSolrServer( container, "projects" );
+        checklistSolrServer = new EmbeddedSolrServer( container, "checklists" );
+        documentSolrServer = new EmbeddedSolrServer( container, "documents" );
+    } else {*/
+        speciesSolrServer(org.apache.solr.client.solrj.impl.StreamingUpdateSolrServer,config.serverURL+"/species", config.queueSize, config.threadCount ) {
+            setSoTimeout(config.soTimeout);
+            setConnectionTimeout(config.connectionTimeout);
+            setDefaultMaxConnectionsPerHost(config.defaultMaxConnectionsPerHost);
+            setMaxTotalConnections(config.maxTotalConnections);
+            setFollowRedirects(config.followRedirects);
+            setAllowCompression(config.allowCompression);
+            setMaxRetries(config.maxRetries);
+            //setParser(new XMLResponseParser()); // binary parser is used by default
+            log.debug "Initialized search server to "+config.serverURL+"/species"
+        }
 
-	observationsSearchService(speciespage.search.ObservationsSearchService) {
-		solrServer = ref('observationsSolrServer');
-	}
+        observationsSolrServer(org.apache.solr.client.solrj.impl.StreamingUpdateSolrServer,config.serverURL+"/observations", config.queueSize, config.threadCount ) {
+            setSoTimeout(config.soTimeout);
+            setConnectionTimeout(config.connectionTimeout);
+            setDefaultMaxConnectionsPerHost(config.defaultMaxConnectionsPerHost);
+            setMaxTotalConnections(config.maxTotalConnections);
+            setFollowRedirects(config.followRedirects);
+            setAllowCompression(config.allowCompression);
+            setMaxRetries(config.maxRetries);
+            //setParser(new XMLResponseParser()); // binary parser is used by default
+            log.debug "Initialized search server to "+config.serverURL+"/observations"
+        }
 
-	newsletterSolrServer(org.apache.solr.client.solrj.impl.StreamingUpdateSolrServer,config.serverURL+"/newsletters", config.queueSize, config.threadCount ) {
-		setSoTimeout(config.soTimeout);
-		setConnectionTimeout(config.connectionTimeout);
-		setDefaultMaxConnectionsPerHost(config.defaultMaxConnectionsPerHost);
-		setMaxTotalConnections(config.maxTotalConnections);
-		setFollowRedirects(config.followRedirects);
-		setAllowCompression(config.allowCompression);
-		setMaxRetries(config.maxRetries);
-		//setParser(new XMLResponseParser()); // binary parser is used by default
-		log.debug "Initialized search server to "+config.serverURL+"/newsletters"
-	}
+        newsletterSolrServer(org.apache.solr.client.solrj.impl.StreamingUpdateSolrServer,config.serverURL+"/newsletters", config.queueSize, config.threadCount ) {
+            setSoTimeout(config.soTimeout);
+            setConnectionTimeout(config.connectionTimeout);
+            setDefaultMaxConnectionsPerHost(config.defaultMaxConnectionsPerHost);
+            setMaxTotalConnections(config.maxTotalConnections);
+            setFollowRedirects(config.followRedirects);
+            setAllowCompression(config.allowCompression);
+            setMaxRetries(config.maxRetries);
+            //setParser(new XMLResponseParser()); // binary parser is used by default
+            log.debug "Initialized search server to "+config.serverURL+"/newsletters"
+        }
 
-	newsletterSearchService(speciespage.search.NewsletterSearchService) {
-		solrServer = ref('newsletterSolrServer');
-	}
+        checklistSolrServer(org.apache.solr.client.solrj.impl.StreamingUpdateSolrServer,config.serverURL+"/checklists", config.queueSize, config.threadCount ) {
+            setSoTimeout(config.soTimeout);
+            setConnectionTimeout(config.connectionTimeout);
+            setDefaultMaxConnectionsPerHost(config.defaultMaxConnectionsPerHost);
+            setMaxTotalConnections(config.maxTotalConnections);
+            setFollowRedirects(config.followRedirects);
+            setAllowCompression(config.allowCompression);
+            setMaxRetries(config.maxRetries);
+            //setParser(new XMLResponseParser()); // binary parser is used by default
+            log.debug "Initialized search server to "+config.serverURL+"/checklists"
+        }
 
-	preAuthenticationChecks(DefaultPreAuthenticationChecks)
-	postAuthenticationChecks(DefaultPostAuthenticationChecks)
+        projectSolrServer(org.apache.solr.client.solrj.impl.StreamingUpdateSolrServer,config.serverURL +"/projects", config.queueSize, config.threadCount ) {
+            setSoTimeout(config.soTimeout);
+            setConnectionTimeout(config.connectionTimeout);
+            setDefaultMaxConnectionsPerHost(config.defaultMaxConnectionsPerHost);
+            setMaxTotalConnections(config.maxTotalConnections);
+            setFollowRedirects(config.followRedirects);
+            setAllowCompression(config.allowCompression);
+            setMaxRetries(config.maxRetries);
+            //setParser(new XMLResponseParser()); // binary parser is used by default
+            log.debug "Initialized search server to "+config.serverURL+"/projects"
+        }
+
+        documentSolrServer(org.apache.solr.client.solrj.impl.StreamingUpdateSolrServer,config.serverURL+"/documents", config.queueSize, config.threadCount ) {
+            setSoTimeout(config.soTimeout);
+            setConnectionTimeout(config.connectionTimeout);
+            setDefaultMaxConnectionsPerHost(config.defaultMaxConnectionsPerHost);
+            setMaxTotalConnections(config.maxTotalConnections);
+            setFollowRedirects(config.followRedirects);
+            setAllowCompression(config.allowCompression);
+            setMaxRetries(config.maxRetries);
+            //setParser(new XMLResponseParser()); // binary parser is used by default
+            log.debug "Initialized search server to "+config.serverURL+"/documents"
+        }
+//    }//end of initializing solr Server
+
+    speciesSearchService(speciespage.search.SpeciesSearchService) {
+        solrServer = ref('speciesSolrServer');
+    }
+    observationsSearchService(speciespage.search.ObservationsSearchService) {
+        solrServer = ref('observationsSolrServer');
+    }
+    checklistSearchService(speciespage.search.ChecklistSearchService) {
+        solrServer = ref('checklistSolrServer');
+    }
+    newsletterSearchService(speciespage.search.NewsletterSearchService) {
+        solrServer = ref('newsletterSolrServer');
+    }
+    projectSearchService(speciespage.search.ProjectSearchService) {
+        solrServer = ref('projectSolrServer');
+    }
+
+    documentSearchService(speciespage.search.DocumentSearchService) {
+        solrServer = ref('documentSolrServer');
+    }
+
+
+    preAuthenticationChecks(DefaultPreAuthenticationChecks)
+    postAuthenticationChecks(DefaultPostAuthenticationChecks)
 
     SpringSecurityUtils.loadSecondaryConfig 'DefaultFacebookSecurityConfig'
     // have to get again after overlaying DefaultFacebookecurityConfig
     def dbConf = SpringSecurityUtils.securityConfig
 
-//    if (!dbConf.facebook.bean.dao) {
-        println "facebookAuthDao"
-        dbConf.facebook.bean.dao = 'facebookAuthDao'
-        facebookAuthDao(DefaultFacebookAuthDao) {
-            domainClassName = dbConf.facebook.domain.classname
-            connectionPropertyName = dbConf.facebook.domain.connectionPropertyName
-            userDomainClassName = dbConf.userLookup.userDomainClassName
-            rolesPropertyName = dbConf.userLookup.authoritiesPropertyName
-        }
- //   }
+    //    if (!dbConf.facebook.bean.dao) {
+    dbConf.facebook.bean.dao = 'facebookAuthDao'
+    facebookAuthDao(DefaultFacebookAuthDao) {
+        domainClassName = dbConf.facebook.domain.classname
+        connectionPropertyName = dbConf.facebook.domain.connectionPropertyName
+        userDomainClassName = dbConf.userLookup.userDomainClassName
+        rolesPropertyName = dbConf.userLookup.authoritiesPropertyName
+    }
+    //   }
 
-	facebookAuthUtils(FacebookAuthUtils) { grailsApplication = ref('grailsApplication') }
+    facebookAuthUtils(FacebookAuthUtils) { grailsApplication = ref('grailsApplication') }
 
-	facebookAuthCookieLogout(FacebookAuthCookieLogoutHandler) { facebookAuthUtils = ref('facebookAuthUtils') }
-	SpringSecurityUtils.registerLogoutHandler('facebookAuthCookieLogout')
+    facebookAuthCookieLogout(FacebookAuthCookieLogoutHandler) { facebookAuthUtils = ref('facebookAuthUtils') }
+    SpringSecurityUtils.registerLogoutHandler('facebookAuthCookieLogout')
 
-	fbAuthenticationFailureHandler(AjaxAwareAuthenticationFailureHandler) {
-		redirectStrategy = ref('redirectStrategy')
-		defaultFailureUrl = conf.failureHandler.defaultFailureUrl //'/login/authfail?login_error=1'
-		useForward = conf.failureHandler.useForward // false
-		ajaxAuthenticationFailureUrl = conf.failureHandler.ajaxAuthFailUrl // '/login/authfail?ajax=true'
-		exceptionMappings = conf.failureHandler.exceptionMappings // [:]
-	}
+    fbAuthenticationFailureHandler(AjaxAwareAuthenticationFailureHandler) {
+        redirectStrategy = ref('redirectStrategy')
+        defaultFailureUrl = conf.failureHandler.defaultFailureUrl //'/login/authfail?login_error=1'
+        useForward = conf.failureHandler.useForward // false
+        ajaxAuthenticationFailureUrl = conf.failureHandler.ajaxAuthFailUrl // '/login/authfail?ajax=true'
+        exceptionMappings = conf.failureHandler.exceptionMappings // [:]
+    }
 
-	facebookAuthCookieFilter(FacebookAuthCookieFilter) {
-		grailsApplication = ref('grailsApplication')
-		authenticationManager = ref('authenticationManager')
-		facebookAuthUtils = ref('facebookAuthUtils')
-		logoutUrl = 'j_spring_security_logout'
-		createAccountUrl = '/login/facebookCreateAccount'
-		registerUrl = '/register'
-		authenticationFailureHandler = ref('fbAuthenticationFailureHandler')
-	}
+    facebookAuthCookieFilter(FacebookAuthCookieFilter) {
+        grailsApplication = ref('grailsApplication')
+        authenticationManager = ref('authenticationManager')
+        facebookAuthUtils = ref('facebookAuthUtils')
+        logoutUrl = 'j_spring_security_logout'
+        createAccountUrl = '/login/facebookCreateAccount'
+        registerUrl = '/register'
+        authenticationFailureHandler = ref('fbAuthenticationFailureHandler')
+    }
 
-	facebookAuthService(FacebookAuthService) {
-		grailsApplication = ref('grailsApplication')
-		userDomainClassName = conf.userLookup.userDomainClassName
-	}
-
-
-
-	facebookAuthProvider(FacebookAuthProvider) {
-		facebookAuthDao = ref('facebookAuthDao')
-		facebookAuthUtils = ref('facebookAuthUtils')
-		preAuthenticationChecks = ref('preAuthenticationChecks')
-		postAuthenticationChecks = ref('postAuthenticationChecks')
-	}
-
-	openIDConsumerManager(ConsumerManager) { nonceVerifier = ref('openIDNonceVerifier') }
-
-	openIdAuthenticationFailureHandler(OpenIdAuthenticationFailureHandler) {
-		redirectStrategy = ref('redirectStrategy')
-		defaultFailureUrl = conf.failureHandler.defaultFailureUrl //'/login/authfail?login_error=1'
-		useForward = conf.failureHandler.useForward // false
-		ajaxAuthenticationFailureUrl = conf.failureHandler.ajaxAuthFailUrl // '/login/authfail?ajax=true'
-		exceptionMappings = conf.failureHandler.exceptionMappings // [:]
-	}
+    facebookAuthService(FacebookAuthService) {
+        grailsApplication = ref('grailsApplication')
+        userDomainClassName = conf.userLookup.userDomainClassName
+    }
 
 
 
-	openIDAuthProvider(OpenIDAuthenticationProvider) {
-		userDetailsService = ref('userDetailsService')
-		preAuthenticationChecks 	= ref('preAuthenticationChecks')
-		postAuthenticationChecks = ref('postAuthenticationChecks')
-	}
+    facebookAuthProvider(FacebookAuthProvider) {
+        facebookAuthDao = ref('facebookAuthDao')
+        facebookAuthUtils = ref('facebookAuthUtils')
+        preAuthenticationChecks = ref('preAuthenticationChecks')
+        postAuthenticationChecks = ref('postAuthenticationChecks')
+    }
 
-	openIDAuthenticationFilter(OpenIDAuthenticationFilter) {
-		//claimedIdentityFieldName = conf.openid.claimedIdentityFieldName // openid_identifier
-		consumer = ref('openIDConsumer')
-		rememberMeServices = ref('rememberMeServices')
-		authenticationManager = ref('authenticationManager')
-		authenticationSuccessHandler = ref('authenticationSuccessHandler')
-		authenticationFailureHandler = ref('openIdAuthenticationFailureHandler')
-		authenticationDetailsSource = ref('authenticationDetailsSource')
-		sessionAuthenticationStrategy = ref('sessionAuthenticationStrategy')
-		filterProcessesUrl = '/j_spring_openid_security_check' // not configurable
-	}
+    openIDConsumerManager(ConsumerManager) { nonceVerifier = ref('openIDNonceVerifier') }
 
-	emailConfirmationService(EmailConfirmationService) { mailService = ref('mailService') }
+    openIdAuthenticationFailureHandler(OpenIdAuthenticationFailureHandler) {
+        redirectStrategy = ref('redirectStrategy')
+        defaultFailureUrl = conf.failureHandler.defaultFailureUrl //'/login/authfail?login_error=1'
+        useForward = conf.failureHandler.useForward // false
+        ajaxAuthenticationFailureUrl = conf.failureHandler.ajaxAuthFailUrl // '/login/authfail?ajax=true'
+        exceptionMappings = conf.failureHandler.exceptionMappings // [:]
+    }
 
-	checklistSolrServer(org.apache.solr.client.solrj.impl.StreamingUpdateSolrServer,config.serverURL+"/checklists", config.queueSize, config.threadCount ) {
-		setSoTimeout(config.soTimeout);
-		setConnectionTimeout(config.connectionTimeout);
-		setDefaultMaxConnectionsPerHost(config.defaultMaxConnectionsPerHost);
-		setMaxTotalConnections(config.maxTotalConnections);
-		setFollowRedirects(config.followRedirects);
-		setAllowCompression(config.allowCompression);
-		setMaxRetries(config.maxRetries);
-		//setParser(new XMLResponseParser()); // binary parser is used by default
-		log.debug "Initialized search server to "+config.serverURL+"/checklists"
-	}
 
-	checklistSearchService(speciespage.search.ChecklistSearchService) {
-		solrServer = ref('checklistSolrServer');
-	}
 
-	projectSolrServer(org.apache.solr.client.solrj.impl.StreamingUpdateSolrServer,config.serverURL +"/projects", config.queueSize, config.threadCount ) {
-		setSoTimeout(config.soTimeout);
-		setConnectionTimeout(config.connectionTimeout);
-		setDefaultMaxConnectionsPerHost(config.defaultMaxConnectionsPerHost);
-		setMaxTotalConnections(config.maxTotalConnections);
-		setFollowRedirects(config.followRedirects);
-		setAllowCompression(config.allowCompression);
-		setMaxRetries(config.maxRetries);
-		//setParser(new XMLResponseParser()); // binary parser is used by default
-		log.debug "Initialized search server to "+config.serverURL+"/projects"
-	}
+    openIDAuthProvider(OpenIDAuthenticationProvider) {
+        userDetailsService = ref('userDetailsService')
+        preAuthenticationChecks 	= ref('preAuthenticationChecks')
+        postAuthenticationChecks = ref('postAuthenticationChecks')
+    }
 
-	projectSearchService(speciespage.search.ProjectSearchService) {
-		solrServer = ref('projectSolrServer');
-	}
+    openIDAuthenticationFilter(OpenIDAuthenticationFilter) {
+        //claimedIdentityFieldName = conf.openid.claimedIdentityFieldName // openid_identifier
+        consumer = ref('openIDConsumer')
+        rememberMeServices = ref('rememberMeServices')
+        authenticationManager = ref('authenticationManager')
+        authenticationSuccessHandler = ref('authenticationSuccessHandler')
+        authenticationFailureHandler = ref('openIdAuthenticationFailureHandler')
+        authenticationDetailsSource = ref('authenticationDetailsSource')
+        sessionAuthenticationStrategy = ref('sessionAuthenticationStrategy')
+        filterProcessesUrl = '/j_spring_openid_security_check' // not configurable
+    }
 
-	documentSolrServer(org.apache.solr.client.solrj.impl.StreamingUpdateSolrServer,config.serverURL+"/documents", config.queueSize, config.threadCount ) {
-		setSoTimeout(config.soTimeout);
-		setConnectionTimeout(config.connectionTimeout);
-		setDefaultMaxConnectionsPerHost(config.defaultMaxConnectionsPerHost);
-		setMaxTotalConnections(config.maxTotalConnections);
-		setFollowRedirects(config.followRedirects);
-		setAllowCompression(config.allowCompression);
-		setMaxRetries(config.maxRetries);
-		//setParser(new XMLResponseParser()); // binary parser is used by default
-		log.debug "Initialized search server to "+config.serverURL+"/documents"
-	}
-
-	documentSearchService(speciespage.search.DocumentSearchService) {
-		solrServer = ref('documentSolrServer');
-	}
-
+    emailConfirmationService(EmailConfirmationService) { mailService = ref('mailService') }
     redirectStrategy(DefaultAjaxAwareRedirectStrategy) {
         contextRelative = conf.redirectStrategy.contextRelative // false
     }

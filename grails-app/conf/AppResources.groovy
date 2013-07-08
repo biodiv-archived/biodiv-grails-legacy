@@ -96,7 +96,9 @@ modules = {
 		resource url:'/js/jquery/jquery.autopager-1.0.0.js'
 	}
 
-	location_utils { resource url:'/js/location/google/markerclusterer.js'		 }
+	location_utils { 
+        resource url:'/js/location/google/markerclusterer.js'		 
+    }
 
 	observations {
 		dependsOn 'core, tagit'

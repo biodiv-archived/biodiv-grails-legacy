@@ -1,2 +1,16 @@
 <%@page import="species.utils.Utils"%>
-<meta http-equiv="refresh" content="0; url=..">
+<html>
+    <head>
+        <meta name="layout" content="main" />
+        <title>Biodiversity Portal</title>
+    </head>
+
+    <body>
+
+        <div class="observation  span12">
+            <p class="message">
+                Welcome to Biodiversity Portal
+            </p>
+        </div>
+    </body>
+</html>

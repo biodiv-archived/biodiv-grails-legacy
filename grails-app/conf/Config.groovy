@@ -199,7 +199,7 @@ else {
 
 
 speciesPortal {
-	app.rootDir = "${userHome}/species"
+	app.rootDir = "${userHome}/git/biodiv/app-conf"
 	data.rootDir = "${app.rootDir}/data"
 	download.rootDir = "${data.rootDir}/datarep/downloads"
 	
