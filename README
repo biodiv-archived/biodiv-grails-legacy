@@ -15,13 +15,13 @@
     c. cd biodiv; 
     d. grails upgrade
 
-* Install postGIS (required for Map module)
+* Install postGIS
     a. /etc/init.d/postgresql stop
     b. apt-get install postgresql-9.1-postgis
     c. Run following to make biodiv a spatially enabled database (required for map module)
-        a. createlang plpgsql biodiv;
-        b. pslq -d biodiv -f /usr/share/postgresql/9.1/contrib/postgis-1.5/postgis.sql
-        c. pslq -d biodiv -f /usr/share/postgresql/9.1/contrib/postgis-1.5/spatial_ref_sys.sql
+        a. createlang -Upostgres plpgsql biodiv;
+        b. psql -Upostgres -d biodiv -f /usr/share/postgresql/9.1/contrib/postgis-1.5/postgis.sql
+        c. psql -Upostgres -d biodiv -f /usr/share/postgresql/9.1/contrib/postgis-1.5/spatial_ref_sys.sql
 
 * Tune jvm memory settings for the application. Some of the commands that would be useful for development are mentioned in repoHome/.bashrc file. Add it to your bashrc profile settings as shown below  
     a. vim ~/.bashrc
@@ -35,9 +35,8 @@
 * Setting the apache virtual host configuration 
     sudo ln -s ~/git/biodiv/app-conf/apache-virtualhost-conf /etc/apache2/sites-available/
     sudo ln -s ~/git/biodiv/app-conf/apache-virtualhost-conf /etc/apache2/sites-enabled/
-    sudo a2enmod proxy proxy_connect proxy_ftp proxy_http
-    sudo a2enmod reqrite include expires headers
-    edit ~/git/biodiv/app-conf/apache-virtualhost-conf and change DocumentRoot to your dataDir
+    sudo a2enmod proxy proxy_connect proxy_ftp proxy_http rewrite include expires headers
+    edit ~/git/biodiv/app-conf/apache-virtualhost-conf and change DocumentRoot to your dataDir (~/species)
     sudo /etc/init.d/apache2 restart
 
 * Setting up host locally for dev  

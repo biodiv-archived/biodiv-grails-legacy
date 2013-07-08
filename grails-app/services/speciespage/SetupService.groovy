@@ -43,7 +43,7 @@ class SetupService {
 		allGroup.save(flush:true, failOnError:true);
 		def othersGroup = new SpeciesGroup(name:"Others", parentGroup:allGroup);
 		othersGroup.save(flush:true, failOnError:true);
-		groupHandlerService.loadGroups(grailsApplication.config.speciesPortal.data.rootDir+"/templates/Groups.xlsx", 0, 0);
+		groupHandlerService.loadGroups(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/templates/Groups.xlsx", 0, 0);
 
 		//speciesService.loadData();
 		//taxonService.loadTaxon();
@@ -160,6 +160,7 @@ class SetupService {
 		log.info "Uploading classifications"
 		List<Map> content = SpreadsheetReader.readSpreadSheet(classificationsFile, contentSheetNo, contentHeaderRowNo);
 		for (Map row : content) {
+            println row;
 			def classification = Classification.findByName(row.get('name'));
 			if(!classification) {
 				classification = new Classification(name : row.get("name"), citation:row.get('citation'));
