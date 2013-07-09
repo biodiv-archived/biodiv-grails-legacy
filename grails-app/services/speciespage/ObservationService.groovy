@@ -1457,7 +1457,6 @@ class ObservationService {
 				if(request){
 					templateMap['userProfileUrl'] = generateLink("SUser", "show", ["id": toUser.id], request)
 				}
-				
 		//if ( Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
 				if ( Environment.getCurrent().getName().equalsIgnoreCase("development")) {
 		            log.debug "Sending email to ${toUser}"
@@ -1465,7 +1464,7 @@ class ObservationService {
 						to toUser.email
 						if(index == 0) {
 							//bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com", "thomas.vee@gmail.com", "sandeept@strandls.com"
-                            bcc grailsApplication.config.speciesPortal.notifiers_bcc.toArray()
+                            bcc grailsApplication.config.speciesPortal.app.notifiers_bcc.toArray()
 							//bcc "sravanthi@strandls.com"
 						}
 						from conf.ui.notification.emailFrom
