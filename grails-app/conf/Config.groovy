@@ -207,7 +207,9 @@ speciesPortal {
 	app.rootDir = "${userHome}/git/biodiv/app-conf"
 	data.rootDir = "${app.rootDir}/data"
 	download.rootDir = "${data.rootDir}/datarep/downloads"
-	
+    
+    app.notifiers_bcc = "prabha.prabhakar@gmail.com", "sravanthi@strandls.com", "thomas.vee@gmail.com", "sandeept@strandls.com", "balachandert@gmail.com"
+
 	species {
 		speciesDownloadDir = "${download.rootDir}/species"
 	}

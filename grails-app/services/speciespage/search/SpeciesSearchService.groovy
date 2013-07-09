@@ -20,6 +20,7 @@ import species.NamesParser
 import species.Species
 import species.Synonyms
 import species.TaxonomyDefinition
+import org.apache.solr.client.solrj.impl.StreamingUpdateSolrServer;
 
 class SpeciesSearchService {
 
@@ -184,7 +185,9 @@ class SpeciesSearchService {
 		try {
 			solrServer.add(docs);
 			//commit ...server is configured to do an autocommit after 10000 docs or 1hr
-			solrServer.blockUntilFinished();
+            if(solrServer instanceof StreamingUpdateSolrServer) {
+    			solrServer.blockUntilFinished();
+            }
 			solrServer.commit();
 			log.info "Finished committing to solr species core"
 		} catch(SolrServerException e) {
