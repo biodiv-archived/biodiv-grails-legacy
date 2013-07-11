@@ -1,5 +1,6 @@
 <%@page import="species.utils.Utils"%>
 <div id="ibp-footer" class="gradient-bg-reverse navbar">
+
 	<div class="container outer-wrapper" style="width:940px">
 		<div class="links_box_column">
 			<ul>
@@ -72,6 +73,11 @@
 
 
             </div>
+<div class="powered" style="text-align:center;">
+	<p> <a href="http://thewesternghats.in" target="_blank">thewesternghats.in</a> | <a href="http://indiabiodiversity.org" target="_blank">indiabiodiversity.org</a><br />
+Best supported on Google Chrome, Firefox 3.0+, Internet Explorer 8.0+, Safari 4.0+, Opera 10+.<br />
+Powered by the open source <a href="https://github.com/strandls/biodiv" target="_blank">Biodiversity Informatics Platform.</a></p>
+	</div>
 </div>
 <r:script>
 $(document).ready(function(){
