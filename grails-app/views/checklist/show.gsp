@@ -124,6 +124,11 @@
 	</div>	
 	<r:script>
 	$(document).ready(function(){
+		var speciesName = $.url(decodeURIComponent(window.location.search)).param()["speciesName"]
+		if(speciesName){
+			speciesName = $.trim(speciesName).replace(/ /g, '_') 
+			$(".checklist-data ." + speciesName).css("background-color","#66FF66");
+		}
 	});
 	</r:script>
 </body>
