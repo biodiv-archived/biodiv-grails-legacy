@@ -5,7 +5,7 @@
 }
 </style>
 <div style="overflow:auto;">
-	<table class="table table-hover tablesorter" style="margin-left: 0px;">
+	<table class="table table-hover tablesorter checklist-data" style="margin-left: 0px;">
 		
 		<thead>
 			<tr>
@@ -18,7 +18,7 @@
 		</thead>
 		<tbody>
 			<g:each in="${checklistInstance.observations}" var="observation">
-				<tr>
+				<tr class="${observation?.maxVotedReco?.name?.replaceAll(' ', '_')}">
 					<g:each in="${observation.fetchChecklistAnnotation()}" var="annot">
 						<td>
 							<g:if test="${annot.key.equalsIgnoreCase('scientific_name')}">
