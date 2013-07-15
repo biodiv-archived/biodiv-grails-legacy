@@ -27,24 +27,24 @@ class NewSpreadsheetConverter extends SourceConverter {
 		return _instance;
 	}
 
-	public List<Species> convertSpecies(String file) {
+	public List<Species> convertSpecies(String file, String imagesDir="") {
 		List<List<Map>> content = SpreadsheetReader.readSpreadSheet(file);
-		convertSpecies(content);
+		convertSpecies(content, imagesDir);
 	}
 
-	public List<Species> convertSpecies(List<List<Map>> sheetContent) {
+	public List<Species> convertSpecies(List<List<Map>> sheetContent, String imagesDir="") {
 		List<Species> species = new ArrayList<Species>();
 		List<Node> speciesElements = createSpeciesXML(sheetContent);
 		XMLConverter converter = new XMLConverter();
 		for(Node speciesElement : speciesElements) {			
-			Species s = converter.convertSpecies(speciesElement)
+			Species s = converter.convertSpecies(speciesElement, imagesDir)
 			if(s)
 				species.add(s);
 		}
 		return species;		
 	}
 	
-	public List<Node> createSpeciesXML(List<List<Map>> sheetContent) {
+	public List<Node> createSpeciesXML(List<List<Map>> sheetContent, String imagesDir="") {
 		
 		List<Node> speciesElements = new ArrayList<Node>();
 		NodeBuilder builder = NodeBuilder.newInstance();
@@ -89,7 +89,7 @@ class NewSpreadsheetConverter extends SourceConverter {
 				createDataNode(field, getDescription(row), row, attributions, references);
 			}
 		}
-		createImages(speciesElement, sheetContent.get(1));
+		createImages(speciesElement, sheetContent.get(1), imagesDir);
 
 		log.debug speciesElement;
 		if(speciesElement) {
@@ -178,28 +178,7 @@ class NewSpreadsheetConverter extends SourceConverter {
 		return row.get(field)?:"";
 	}
 
-	private void createImages(Node speciesElement, List<Map> imageMetaData) {
-		Node images = new Node(speciesElement, "images");
-		def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
-		String uploadDir = config.speciesPortal.images.uploadDir;
-		imageMetaData.each { imageData ->
-			Node image = new Node(images, "image");
-			String refKey = imageData.get("imageno.");
-			if(refKey) {
-				File file = new File(uploadDir, refKey);
-				new Node(image, "refKey", refKey);
-				new Node(image, "fileName", file.getAbsolutePath());
-				new Node(image, "source", imageData.get("source"));
-				new Node(image, "caption", imageData.get("possiblecaption"));
-				new Node(image, "attribution", imageData.get("attribution"));
-				new Node(image, "license", imageData.get("license"));
-			} else {
-				log.warn("No reference key for image : "+imageData);
-			}
-		}
-	}
-
-	private void createReferences(Node data, Map speciesContent, Map references) {
+	protected void createReferences(Node data, Map speciesContent, Map references) {
 		String refs = speciesContent.get("references");
 		if(refs && !refs.equals("")) {
 			for(String ref : refs.split(",")) {
@@ -214,11 +193,11 @@ class NewSpreadsheetConverter extends SourceConverter {
 		}
 	}
 
-	private void createAttributions(Node data, Map map, Map attributions) {
+	protected void createAttributions(Node data, Map map, Map attributions) {
 
 	}
 
-	private void createSynonyms(Node field, List<Map> content, Map attributions, Map references) {
+	protected void createSynonyms(Node field, List<Map> content, Map attributions, Map references) {
 		log.debug '#### Creating Synonyms'
 		content.each { row ->
 			log.debug row;
@@ -236,7 +215,7 @@ class NewSpreadsheetConverter extends SourceConverter {
 
 	}
 
-	private void createCommonNames(Node field, List<Map> content, Map attributions, Map references) {
+	protected void createCommonNames(Node field, List<Map> content, Map attributions, Map references) {
 		content.each { row ->
 			String cmnName = getDescription(row, "common name");
 			String lang = getDescription(row, "language name");
@@ -254,7 +233,7 @@ class NewSpreadsheetConverter extends SourceConverter {
 
 	}
 
-	private void createCountryGeoEntity(Node field, List<Map> content, Map attributions, Map references) {
+	protected void createCountryGeoEntity(Node field, List<Map> content, Map attributions, Map references) {
 		content.each { row ->
 			String countryName = getDescription(row, "country");
 			String twoLetterCode = getDescription(row, "two letter code");

@@ -1,6 +1,6 @@
 <div class="observation-icons pull-right" style="position: absolute;bottom: -80px;right: 0px;">
 	<g:if test="${canEditUserGroup}">
-		<a id="inviteMembers" class="btn btn-large btn-primary" href="#inviteMembersDialog" role="button" data-toggle="modal"><i
+		<a id="inviteMembers" class="btn btn-primary" href="#inviteMembersDialog" role="button" data-toggle="modal"><i
 			class="icon-envelope"></i> <g:message code="userGroup.members.label"
 				default="Invite Friends" /> </a>
 		<div class="modal hide fade" id="inviteMembersDialog" tabindex='-1'

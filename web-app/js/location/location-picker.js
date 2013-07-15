@@ -70,12 +70,20 @@ function initControls() {
     }).addTo(map);
 
     map.on('enterFullscreen', function(){
-        if(searchMarker) map.panTo(searchMarker.getLatLng());
+        if(searchMarker) {
+            console.log("enterFullscreen : panning to ");
+            console.log(searchMarker.getLatLng());
+            map.panTo(searchMarker.getLatLng());
+        }
         else resetMap()
     });
 
     map.on('exitFullscreen', function(){
-        if(searchMarker) map.panTo(searchMarker.getLatLng());
+        if(searchMarker) {
+            map.panTo(searchMarker.getLatLng());
+            console.log(searchMarker.getLatLng());
+            console.log("enterFullscreen : panning to "+searchMarker)
+        }
         else resetMap();
     });
 

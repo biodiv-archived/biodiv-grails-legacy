@@ -79,7 +79,7 @@ class NewsletterController {
 					postProcessNewsletter(newsletterInstance);
 					flash.message = "${message(code: 'default.created.message', args: [message(code: 'newsletter.label', default: 'Newsletter'), newsletterInstance.title])}"
 					//redirect url: uGroup.createLink(mapping:'userGroupPageShow', params:['webaddress':newsletterInstance.userGroup.webaddress, 'newsletterId':newsletterInstance.id])
-					redirect url:uGroup.createLink(controller:"userGroup", action: "page", 'userGroup':userGroupInstance, params:['newsletterId':newsletterInstance.id])
+					redirect url:uGroup.createLink(controller:"userGroup", action: "pages", 'userGroup':userGroupInstance, params:['newsletterId':newsletterInstance.id])
 				}
 				else {
 					render(view: "create", model: ['userGroup':userGroupInstance, newsletterInstance: newsletterInstance])
@@ -137,7 +137,7 @@ class NewsletterController {
 					[userGroupInstance:newsletterInstance.userGroup, newsletterInstance: newsletterInstance]
 				} else {
 					flash.message = "${message(code: 'edit.denied.message')}"
-					redirect url:uGroup.createLink(controller:"userGroup", action: "page", 'userGroup':userGroupInstance, params:['newsletterId':newsletterInstance.id])
+					redirect url:uGroup.createLink(controller:"userGroup", action: "pages", 'userGroup':userGroupInstance, params:['newsletterId':newsletterInstance.id])
 				}
 			}
 			else if(SUserService.isAdmin(springSecurityService.currentUser)) {

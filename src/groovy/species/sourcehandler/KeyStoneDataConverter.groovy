@@ -215,21 +215,6 @@ class KeyStoneDataConverter extends SourceConverter {
 
 	/**
 	 * 
-	 * @param customFormat
-	 * @return
-	 */
-	private Map getCustomFormat(String customFormat) {
-		return customFormat.split(';').inject([:]) { map, token ->
-			token = token.toLowerCase();
-			token.split('=').with {
-				map[it[0]] = it[1];
-			}
-			map
-		}
-	}
-
-	/**
-	 * 
 	 * @param fieldName
 	 * @param customFormat
 	 * @param metadataRows

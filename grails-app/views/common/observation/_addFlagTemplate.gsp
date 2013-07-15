@@ -19,20 +19,20 @@
 				action="${uGroup.createLink(controller:'observation', action:'flagObservation', id:observationInstance.id)}">
 				<g:each in="${FlagType.list() }" var="flag" status="i">
 					<g:if test="${i > 0}">
-						<input type="radio" style="margin-top: 0px;" name="obvFlag" value="${flag}">
-						${flag.value()}</input>
+						<input type="radio" style="margin-top: 0px;" name="obvFlag" value="${flag}"/>
+						${flag.value()}
 						<br />
 					</g:if>
 					<g:else>
-						<input type="radio" style="margin-top: 0px;" name="obvFlag" value="${flag}" CHECKED>
-						${flag.value()}</input>
+						<input type="radio" style="margin-top: 0px;" name="obvFlag" value="${flag}" CHECKED/>
+						${flag.value()}
 						<br />
 					</g:else>
 				</g:each>
 				<br/>
 				<textarea class="comment-textbox" placeholder="Any other reason" name="notes"></textarea>
 <%--				<input type="text" name="notes" placeholder="Any other reason"></input><br />--%>
-				<input class="btn btn-danger pull-right" type="submit" value="Flag"></input>
+				<input class="btn btn-danger pull-right" type="submit" value="Flag"/>
 				<div id="flag-close" class="popup-form-close" value="close">
 					<i class="icon-remove"></i>
 				</div>

@@ -11,7 +11,7 @@
 
     RewriteEngine on
 
-    RewriteCond %{REQUEST_URI} ^/biodiv/(static|plugins|data|bootstrap|js|css|j_spring_security_check|j_spring_openid_security_check|images|j_spring_security_logout|observation/upload_resource|emailConfirmation|ck).*
+    RewriteCond %{REQUEST_URI} ^/biodiv/(static|plugins|data|bootstrap|js|css|j_spring_security_check|j_spring_openid_security_check|images|j_spring_security_logout|observation/upload_resource|group/upload_resource|userGroup/upload_resource|emailConfirmation|ck).*
     RewriteRule ^/biodiv(.*)$ http://indiabiodiversity.localhost.org:8080/biodiv$1 [P]
     ProxyPassReverse /biodiv http://indiabiodiversity.localhost.org:8080/biodiv
 
@@ -22,7 +22,7 @@
 
 #    RewriteCond %{REQUEST_URI} ^/(species|observation|activity|activityFeed|SUser|user|page|pages|requestMembership|joinUs|leaveUs|inviteMembers|login|logout|register|static|group|j_spring_security_logout|recommendation|comment|newsletter|emailConfirmation|search|checklist|jcaptcha|openId|data|chart|admin|curation|resource|rateable|rating|document|project|UFile|direction|biodivAdmin).*
     RewriteCond %{REQUEST_URI} ^/.*
-    RewriteCond %{REQUEST_URI} !(^(/biodiv))
+    RewriteCond %{REQUEST_URI} !(^(/(biodiv|logo/)))
     RewriteRule ^(.*)$ http://indiabiodiversity.localhost.org:8080/biodiv$1 [P,L]
     ProxyPassReverse / http://indiabiodiversity.localhost.org:8080/biodiv/
     ProxyPassReverse / http://indiabiodiversity.localhost.org:8080/
@@ -66,7 +66,7 @@
     ProxyPassReverse / http://localhost:8080/biodiv/group/the_western_ghats
 
     RewriteCond %{REQUEST_URI} ^/biodiv
-RewriteCond %{REQUEST_URI} !(^/biodiv/(observations|newsletters|group-themes|users|userGroups|images|content))
+RewriteCond %{REQUEST_URI} !(^/biodiv/(logo$|observations|newsletters|group-themes|users|userGroups|images|content))
     RewriteRule ^/biodiv(.*)$ $1 [R=301]
     ProxyPassReverse / http://localhost:8080/biodiv
 

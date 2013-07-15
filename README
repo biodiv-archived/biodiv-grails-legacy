@@ -23,6 +23,10 @@
         b. psql -Upostgres -d biodiv -f /usr/share/postgresql/9.1/contrib/postgis-1.5/postgis.sql
         c. psql -Upostgres -d biodiv -f /usr/share/postgresql/9.1/contrib/postgis-1.5/spatial_ref_sys.sql
 
+* Install following plugins to convert and optimize images 
+    a. audo apt-get install imagemagick
+    b. sudo apt-get install jpegoptim
+
 * Tune jvm memory settings for the application. Some of the commands that would be useful for development are mentioned in repoHome/.bashrc file. Add it to your bashrc profile settings as shown below  
     a. vim ~/.bashrc
     b. add line : source ~/git/biodiv/.bashrc

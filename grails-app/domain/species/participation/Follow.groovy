@@ -80,4 +80,8 @@ class Follow {
 	static List<SUser> getFollowers(objectType, objectId){
 		return Follow.findAllByObjectTypeAndObjectId(objectType, objectId).collect{ it.user }
 	}
+
+	static void deleteAll(SUser user) {
+		executeUpdate 'DELETE FROM Follow WHERE user=:user', [user: user]
+	}
 }

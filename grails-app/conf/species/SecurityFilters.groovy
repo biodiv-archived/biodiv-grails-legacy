@@ -47,7 +47,7 @@ class SecurityFilters {
 						}
 					}
 					
-					if(userGroupInstance){
+                    if(userGroupInstance && userGroupInstance.id){
 						model.userGroupInstance = userGroupInstance
 						def secTagLib = grailsApplication.mainContext.getBean('species.CustomSecurityAclTagLib');
 						model.canEditUserGroup = secTagLib.hasPermission(['permission':org.springframework.security.acls.domain.BasePermission.WRITE, 'object':userGroupInstance], 'permitted')

@@ -30,7 +30,7 @@ var itemAddCallback = function(carousel, first, last, data, state) {
 	for (i = 0; i < items.length; i++) {
 		var actualIndex = first + i;
 		if (!carousel.has(actualIndex)) {
-			var item = carousel.add(actualIndex, getItemHTML(carousel.options.contextFreeUrl, carousel.options.contextGroupWebaddress, items[i]));
+			var item = carousel.add(actualIndex, getItemHTML(carousel, items[i]));
 			resizeImage(item);
 		}
 	}
@@ -108,10 +108,14 @@ function resizeImage(item) {
 
 }
 
-var getItemHTML = function(contextFreeUrl, contextGroup, item) {
-	var imageTag = '<img class=img-polaroid src="' + item.imageLink + '" title="' + item.imageTitle  +'" alt="" />';
+var getItemHTML = function(carousel, item) {
+	var paramsString = "";
+	if(carousel.options.filterProperty === "speciesName"){
+		paramsString = "?" + encodeURIComponent("species=" + carousel.options.filterPropertyValue);	
+	}
+	var imageTag = '<img class=img-polaroid src="' + item.imageLink + paramsString  + '" title="' + item.imageTitle  +'" alt="" />';
 	var notes = item.notes?item.notes:''
-	return '<div class=thumbnail><div class="'+item.type.replace(' ','_')+'_th snippet tablet'+'"><div class=figure><a href='+ item.url + '>' + imageTag + '</a></div><div class="'+'ellipsis multiline caption'+'">'+notes+'</div></div></div>';
+	return '<div class=thumbnail><div class="'+item.type.replace(' ','_')+'_th snippet tablet'+'"><div class=figure><a href='+ item.url + paramsString + '>' + imageTag + '</a></div><div class="'+'ellipsis multiline caption'+'">'+notes+'</div></div></div>';
 };
 
 var reloadCarousel = function(carousel, fitlerProperty, filterPropertyValue){

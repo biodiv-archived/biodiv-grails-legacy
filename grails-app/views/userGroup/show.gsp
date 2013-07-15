@@ -23,16 +23,15 @@
 	<g:javascript>
 		$(document).ready(function() {
 			window.params.tagsLink = "${g.createLink(action: 'tags')}";
-			var url = "${userGroupInstance.homePage ?: uGroup.createLink(mapping:'userGroup', controller:'userGroup', action:'about', userGroup:userGroupInstance)}";
-			$.get(url, function(data) {
-				$('.homepage-content').append($(data).find('.bodymarker'));
-			});
 		});
 	</g:javascript>
 	
 	<r:script>
 		$(document).ready(function(){
-			//showMapView();
+                	var url = "${userGroupInstance.homePage ?: uGroup.createLink(mapping:'userGroup', controller:'userGroup', action:'about', userGroup:userGroupInstance)}";
+			$.get(url, function(data) {
+			    $('.homepage-content').html($(data).find('.bodymarker'));
+			});
 		});
 	</r:script>
 </body>

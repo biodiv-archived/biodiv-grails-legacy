@@ -667,13 +667,16 @@ class ObservationService {
 		} else {*/
 			query += queryParts.filterQuery + queryParts.orderByClause
 //		}
+        
+        log.debug "checklistCountQuery : "+queryParts.checklistCountQuery;
+        log.debug "allObservationCountQuery : "+queryParts.allObservationCountQuery;
 
         log.debug query;
         log.debug queryParts.queryParams;
         
         def checklistCountQuery = sessionFactory.currentSession.createQuery(queryParts.checklistCountQuery)
         def allObservationCountQuery = sessionFactory.currentSession.createQuery(queryParts.allObservationCountQuery)
-
+       
         def hqlQuery = sessionFactory.currentSession.createQuery(query)
         if(params.bounds && boundGeometry) {
             hqlQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(org.hibernatespatial.GeometryUserType, null))
@@ -734,7 +737,7 @@ class ObservationService {
         }
         query += " from Observation obv "
 		//def mapViewQuery = "select obv.id, obv.topology, obv.isChecklist from Observation obv "
-        def userGroupQuery = " ";
+        def userGroupQuery = " ", tagQuery = '';
 		def filterQuery = " where obv.isDeleted = :isDeleted and obv.isShowable = true "
 
 		if(params.sGroup){
@@ -747,16 +750,6 @@ class ObservationService {
 				queryParams["groupId"] = groupId
 				activeFilters["sGroup"] = groupId
 			}
-		}
-
-		if(params.tag){
-			query = "select obv from Observation obv,  TagLink tagLink "
-			//mapViewQuery = "select obv.topology from Observation obv, TagLink tagLink "
-			filterQuery +=  " and obv.id = tagLink.tagRef and tagLink.type = :tagType and tagLink.tag.name = :tag "
-
-			queryParams["tag"] = params.tag
-			queryParams["tagType"] = GrailsNameUtils.getPropertyName(Observation.class);
-			activeFilters["tag"] = params.tag
 		}
 
         println "*************************"
@@ -773,6 +766,17 @@ class ObservationService {
 		    queryParams['userGroupId'] = params.userGroup.id
 		    queryParams['userGroup'] = params.userGroup
         }
+
+		if(params.tag){
+			tagQuery = ",  TagLink tagLink "
+            query += tagQuery;
+			//mapViewQuery = "select obv.topology from Observation obv, TagLink tagLink "
+			filterQuery +=  " and obv.id = tagLink.tagRef and tagLink.type = :tagType and tagLink.tag.name = :tag "
+
+			queryParams["tag"] = params.tag
+			queryParams["tagType"] = GrailsNameUtils.getPropertyName(Observation.class);
+			activeFilters["tag"] = params.tag
+		}
 
 
 		if(params.habitat && (params.habitat != Habitat.findByName(grailsApplication.config.speciesPortal.group.ALL).id)){
@@ -840,8 +844,8 @@ class ObservationService {
 		
 		def orderByClause = " order by obv." + (params.sort ? params.sort : "lastRevised") +  " desc, obv.id asc"
 		
-		def checklistCountQuery = "select count(*) from Observation obv " + userGroupQuery +" "+filterQuery + " and obv.isChecklist = true "
-		def allObservationCountQuery = "select count(*) from Observation obv " + userGroupQuery +" "+filterQuery
+		def checklistCountQuery = "select count(*) from Observation obv " + userGroupQuery +" "+((params.tag)?tagQuery:'')+filterQuery + " and obv.isChecklist = true "
+		def allObservationCountQuery = "select count(*) from Observation obv " + userGroupQuery +" "+((params.tag)?tagQuery:'')+filterQuery
 	
 		return [query:query, allObservationCountQuery:allObservationCountQuery, checklistCountQuery:checklistCountQuery, filterQuery:filterQuery, orderByClause:orderByClause, queryParams:queryParams, activeFilters:activeFilters]
 
@@ -1305,8 +1309,12 @@ class ObservationService {
 		def targetController =  obv.getClass().getCanonicalName().split('\\.')[-1]
 		targetController = targetController.replaceFirst(targetController[0], targetController[0].toLowerCase());
 		def obvUrl, domain
-		
-		request = (request) ?:(WebUtils.retrieveGrailsWebRequest()?.getCurrentRequest())
+	
+        try {
+		    request = (request) ?:(WebUtils.retrieveGrailsWebRequest()?.getCurrentRequest())
+        } catch(IllegalStateException e) {
+            log.error e.getMessage();
+        }
 		if(request){
 			 obvUrl = generateLink(targetController, "show", ["id": obv.id], request)
 			 domain = Utils.getDomainName(request)
@@ -1322,8 +1330,6 @@ class ObservationService {
 		Set toUsers = []
 		//Set bcc = ["xyz@xyz.com"];
 		//def activityModel = ['feedInstance':feedInstance, 'feedType':ActivityFeedService.GENERIC, 'feedPermission':ActivityFeedService.READ_ONLY, feedHomeObject:null]
-		
-		log.debug "before switch "
 		
 		switch ( notificationType ) {
 			case OBSERVATION_ADDED:
@@ -1457,8 +1463,8 @@ class ObservationService {
 				if(request){
 					templateMap['userProfileUrl'] = generateLink("SUser", "show", ["id": toUser.id], request)
 				}
-		//if ( Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
-				if ( Environment.getCurrent().getName().equalsIgnoreCase("development")) {
+		        if ( Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
+				//if ( Environment.getCurrent().getName().equalsIgnoreCase("development")) {
 		            log.debug "Sending email to ${toUser}"
 					mailService.sendMail {
 						to toUser.email
