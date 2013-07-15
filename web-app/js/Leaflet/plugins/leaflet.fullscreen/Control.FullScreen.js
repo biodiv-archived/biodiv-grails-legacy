@@ -8,23 +8,17 @@ L.Control.FullScreen = L.Control.extend({
 	onAdd: function (map) {
 		// Do nothing if we can't
 		if (!fullScreenApi.supportsFullScreen)
-			return map.zoomControl._container;
+			return map.zoomControl ? map.zoomControl._container : L.DomUtil.create('div', '');
 		
-		var containerClass = 'leaflet-control-zoom', className, container;
+		var className = 'leaflet-control-zoom-fullscreen', container;
 		
 		if(map.zoomControl && !this.options.forceSeparateButton) {
 			container = map.zoomControl._container;
-			className = '-fullscreen leaflet-bar-part leaflet-bar-part-bottom last';
-			// Update class of the zoom out button (Leaflet v0.5)
-			if (map.zoomControl._zoomOutButton) {
-				L.DomUtil.removeClass(map.zoomControl._zoomOutButton, 'leaflet-bar-part-bottom');
-			}
 		} else {
-			container = L.DomUtil.create('div', containerClass);
-			className = '-fullscreen leaflet-bar leaflet-bar-part last';
+			container = L.DomUtil.create('div', 'leaflet-bar');
 		}
 		
-		this._createButton(this.options.title, containerClass + className, container, this.toogleFullScreen, map);
+		this._createButton(this.options.title, className, container, this.toogleFullScreen, map);
 
 		return container;
 	},

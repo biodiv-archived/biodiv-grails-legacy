@@ -29,6 +29,7 @@ class SpeciesController {
 	def grailsApplication
 	def speciesSearchService;
 	def namesIndexerService;
+    def speciesUploadService;
 	def speciesService;
 	def observationService;
 	
@@ -544,77 +545,28 @@ class SpeciesController {
 
 	@Secured(['ROLE_SPECIES_ADMIN'])
 	def upload = {
-		log.debug params
-		try {
-			if(ServletFileUpload.isMultipartContent(request)) {
-				def rs = [:]
-				Utils.populateHttpServletRequestParams(request, rs);
-				def resourcesInfo = [];
-				def rootDir = grailsApplication.config.speciesPortal.species.rootDir
-				File obvDir
-				def message;
+        log.debug params;
+        /*List contributors;
+        if(!params.contributorIds) {
+			contributors = Utils.getUsersList(params.contributorIds);
+        } else {
+            contributors << springSecurityService.currentUser
+        }
+        */
 
-				if(!params.data_file) {
-					message = g.message(code: 'no.file.attached', default:'No file is attached')
-				}
-				def data_file = params.data_file
+        if(params.uFile) {
+            String contentRootDir = grailsApplication.config.speciesPortal.content.rootDir
+            File speciesDataFile = new File(contentRootDir, params.uFile.path[0])
+            if(/*contributors && */speciesDataFile.exists()) {
+                if(params.uFile.path[1]) {
+                    File mappingFile = new File(contentRootDir, params.uFile.path[1])
+                    speciesUploadService.uploadMappedSpreadsheet(speciesDataFile.getAbsolutePath(), mappingFile.getAbsolutePath(), 0,0,0,0,params.imagesDir?1:-1, params.imagesDir);
+                } else {
+                    speciesUploadService.uploadNewSimpleSpreadsheet(speciesDataFile.getAbsolutePath(), params.imagesDir);
+                }
+            }
+        }
 
-				log.debug "Saving species spreadsheet data file ${data_file.originalFilename}"
-
-				// List of OK mime-types
-				//TODO Move to config
-				def okcontents = [
-					'image/png',
-					'image/jpeg',
-					'image/pjpeg',
-					'image/gif',
-					'image/jpg'
-				]
-
-				if (! okcontents.contains(data_file.contentType)) {
-					message = g.message(code: 'resource.file.invalid.extension.message', args: [
-						okcontents,
-						f.originalFilename
-					])
-				}
-				else if(data_file.size > grailsApplication.config.speciesPortal.observations.MAX_IMAGE_SIZE) {
-					message = g.message(code: 'resource.file.invalid.max.message', args: [
-						grailsApplication.config.speciesPortal.observations.MAX_IMAGE_SIZE/1024,
-						data_file.originalFilename,
-						data_file.size/1024
-					], default:'File size cannot exceed ${104857600/1024}KB');
-				}
-				else if(data_file.empty) {
-					message = g.message(code: 'file.empty.message', default:'File cannot be empty');
-				}
-				else {
-					if(!obvDir) {
-						if(!params.obvDir) {
-							obvDir = new File(rootDir);
-							if(!obvDir.exists()) {
-								obvDir.mkdir();
-							}
-							obvDir = new File(obvDir, UUID.randomUUID().toString());
-							obvDir.mkdir();
-						} else {
-							obvDir = new File(rootDir, params.obvDir);
-							obvDir.mkdir();
-						}
-					}
-
-					File file = observationService.getUniqueFile(obvDir, Utils.generateSafeFileName(f.originalFilename));
-					data_file.transferTo( file );
-
-				}
-			}
-
-
-		} catch(e) {
-			e.printStackTrace();
-			response.setStatus(500)
-			def message = [error:g.message(code: 'file.upload.fail', default:'Error while processing the request.')]
-			render message as JSON
-		}
 	}
 	
 	@Secured(['ROLE_ADMIN'])
@@ -625,6 +577,4 @@ class SpeciesController {
 		r['msg']= "${message(code: 'species.download.requsted', default: 'Processing... You will be notified by email when it is completed. Login and check your user profile for download link.')}"
 		render r as JSON
 	}
-
-	
 }

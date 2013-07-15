@@ -6,8 +6,8 @@ body { /*     background-color: #ffffff; */
 	height: 100%;
 	background-repeat: no-repeat;
 	font-size: 14px;
+	background-color: rgb(106, 201, 162, 0.15);
 	background-color: rgba(106, 201, 162, 0.15);
-	background: transparent\9;
 	-ms-filter:"progid:DXImageTransform.Microsoft.gradient(startColorstr='#266AC9A2',endColorstr='#266AC9A2')";	/* IE8 */
 	filter: progid : DXImageTransform.Microsoft.gradient(startColorstr = '#266AC9A2', endColorstr = '#266AC9A2' );/* IE6 & 7 */
 	zoom: 1;
@@ -53,8 +53,8 @@ h6 {
 
 .filters {
 	padding: 10px;
+	background-color: rgb(106, 201, 162);
 	background-color: rgba(106, 201, 162, 0.15);
-	background: transparent\9;/*IE9*/
 	-ms-filter:"progid:DXImageTransform.Microsoft.gradient(startColorstr=#336AC9A2,endColorstr=#336AC9A2)"; /*IE8*/
 	filter: progid : DXImageTransform.Microsoft.gradient (startColorstr ='#336AC9A2', endColorstr = '#336AC9A2' ); /*IE6 & IE7*/
 	zoom: 1;
@@ -305,8 +305,8 @@ div.errors {
 }
 
 .super-section {
+	background-color: rgb(106, 201, 162);
 	background-color: rgba(106, 201, 162, 0.2);
-	background: transparent\9;
 	-ms-filter:
 		"progid:DXImageTransform.Microsoft.gradient(startColorstr=#336AC9A2,endColorstr=#336AC9A2)";
 	/* IE8 */
@@ -538,8 +538,8 @@ ul#recoSummary {
 }
 
 .sidebar_section h5  {
+	background: rgb(106, 201, 162);
 	background: rgba(106, 201, 162, 0.2);
-	background: transparent\9;
 	-ms-filter:
 		"progid:DXImageTransform.Microsoft.gradient(startColorstr=#336AC9A2,endColorstr=#336AC9A2)";
 	/* IE8 */
@@ -676,6 +676,7 @@ ul#recoSummary {
 .footer-item {
 	float: left;
 	margin: 0 2px;
+        z-index:1001; /*leaflet controls had 1000 as z-index. This had to be more than that*/
 }
 
 .footer-item i {
@@ -895,7 +896,7 @@ td.errors textarea {
 	padding-left: 5px;
 	padding-top: 2px;
 	text-align: left;
-	max-width: 175px;
+	max-width: 200px;
 	height: 50px;
 }
 
@@ -933,6 +934,7 @@ input,button,select,textarea {
 }
 
 .navigation li a {
+	background-color: rgb(173, 219, 192);
 	background-color: rgba(173, 219, 192, 0.7);
 	background-image: -webkit-gradient(linear, left top, left bottom, from(#3ebb8c),
 		to(#addbc6) ); /* Saf4+, Chrome */
@@ -949,6 +951,7 @@ input,button,select,textarea {
 }
 
 .navigation li.navigation_active a {
+	background-color: rgb(62, 187, 142);
 	background-color: rgba(62, 187, 142, 0.7);
 	background-image: -webkit-gradient(linear, left top, left bottom, from(#addbc6),
 		to(#3ebb8c) ); /* Saf4+, Chrome */
@@ -1116,8 +1119,8 @@ span.cke_skin_kama {
 }
 
 .galleria-info-text {
+    background-color: rgb(0, 0, 0);
     background-color: rgba(0, 0, 0, 0.1);
-    background: transparent\9;/*IE9*/
     -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#19000000,endColorstr=#19000000)"; /* IE8 */
         filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#19000000,endColorstr=#19000000);   /* IE6 & 7 */
     zoom: 1;
@@ -1586,9 +1589,9 @@ li#userOrEmail-new {
 }
 
 .signature {
-	max-width: 170px;
+	max-width: 200px;
+	background-color: rgb(106, 201, 162);
 	background-color: rgba(106, 201, 162, 0.2);
-	background: transparent\9;
 	-ms-filter:
 		"progid:DXImageTransform.Microsoft.gradient(startColorstr=#336AC9A2,endColorstr=#336AC9A2)";
 	/* IE8 */
@@ -1805,8 +1808,8 @@ li#userOrEmail-new {
     right:0;
     bottom:0;
     
+    background-color:rgb(0, 0, 0);
     background-color:rgba(0, 0, 0, 0.85);
-    background-color:transparent\9;
 	-ms-filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#D8000000,endColorstr=#D8000000);
 	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#D8000000,endColorstr=#D8000000);
 	zoom: 1;
@@ -1994,7 +1997,11 @@ div.noOfRatings {
     z-index:1000;
 }
 .leaflet-label {
+    background: rgb(235, 235, 235);
     background: rgba(235, 235, 235, 0.81);
+    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#CEEBEBEB,endColorstr=#CEEBEBEB)"; /* IE8 */
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#CEEBEBEB,endColorstr=#CEEBEBEB);   /* IE6 & 7 */
+    zoom: 1;
     background-clip: padding-box;
     border: 1px solid whitesmoke !important;
     border-radius: 4px;

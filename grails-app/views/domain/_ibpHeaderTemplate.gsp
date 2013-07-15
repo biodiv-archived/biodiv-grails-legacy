@@ -60,7 +60,6 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
                                     data-original-title="Provide Feedback" title="Provide Feedback">
                                     <i class="icon-plus"></i> Provide Feedback
                                 </a>
-                            </ul>
                         </div>
 
                     </div>

@@ -9,9 +9,9 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
     fbAppId =  grailsApplication.config.speciesPortal.ibp.facebook.appId;
 }
 
-canonicalUrl = canonicalUrl ?: uGroup.createLink(action:params.action, controller:params.controller, userGroup:userGroupInstance,absolute:true)
+canonicalUrl = canonicalUrl ?: uGroup.createLink('controller':params.controller, 'action':params.action, userGroup:userGroupInstance,absolute:true)
 
-if(params.webaddress && userGroupInstance) {
+if(params.webaddress && userGroupInstance && userGroupInstance.id) {
     imagePath = imagePath?:userGroupInstance.mainImage()?.fileName
     favIconPath = favIconPath?:userGroupInstance.icon(ImageType.SMALL)?.fileName;
     description = description?: userGroupInstance.description.replaceAll(/<.*?>/, '').trim()
