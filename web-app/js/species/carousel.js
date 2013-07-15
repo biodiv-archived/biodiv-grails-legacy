@@ -109,7 +109,10 @@ function resizeImage(item) {
 }
 
 var getItemHTML = function(carousel, item) {
-	var paramsString = "?" + encodeURIComponent(carousel.options.filterProperty + "=" + carousel.options.filterPropertyValue);
+	var paramsString = "";
+	if(carousel.options.filterProperty === "speciesName"){
+		paramsString = "?" + encodeURIComponent("species=" + carousel.options.filterPropertyValue);	
+	}
 	var imageTag = '<img class=img-polaroid src="' + item.imageLink + paramsString  + '" title="' + item.imageTitle  +'" alt="" />';
 	var notes = item.notes?item.notes:''
 	return '<div class=thumbnail><div class="'+item.type.replace(' ','_')+'_th snippet tablet'+'"><div class=figure><a href='+ item.url + paramsString + '>' + imageTag + '</a></div><div class="'+'ellipsis multiline caption'+'">'+notes+'</div></div></div>';

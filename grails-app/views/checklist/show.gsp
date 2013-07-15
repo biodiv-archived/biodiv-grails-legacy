@@ -124,10 +124,10 @@
 	</div>	
 	<r:script>
 	$(document).ready(function(){
-		var speciesName = $.url(decodeURIComponent(window.location.search)).param()["speciesName"]
-		if(speciesName){
-			speciesName = $.trim(speciesName).replace(/ /g, '_') 
-			$(".checklist-data ." + speciesName).css("background-color","#66FF66");
+		var species = $.url(decodeURIComponent(window.location.search)).param()["species"]
+		if(species){
+			species = $.trim(species).replace(/ /g, '_') 
+			$(".checklist-data ." + species).css("background-color","#66FF66");
 		}
 	});
 	</r:script>
