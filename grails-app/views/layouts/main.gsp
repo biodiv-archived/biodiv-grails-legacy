@@ -17,15 +17,6 @@
 <g:layoutHead />
 
 <g:set var="domain" value="${Utils.getDomain(request)}"/>
-<g:if test="${domain.equals(grailsApplication.config.ibp.domain) }">
-    <link rel="shortcut icon" href="/sites/default/files/ibp_favicon_2.png"
-		type="image/x-icon" />
-</g:if>
-<g:else>
-    <link rel="shortcut icon"
-		href="/sites/all/themes/wg/images/favicon.png" type="image/x-icon" />
-</g:else>
-
 <script src="https://www.google.com/jsapi" type="text/javascript"></script>
 
 <r:require modules="observations_list" />
@@ -36,8 +27,8 @@
 		href="${resource(dir:'group-themes', file:userGroupInstance.theme + '.css')}" />
 </g:if>
 
-<g:if test="${params.action !='show'}">
-    <meta name="description" content="Welcome to the India Biodiversity Portal (IBP) - A repository of information designed to harness and disseminate collective intelligence on the biodiversity of the Indian subcontinent.">
+<g:if test="${params?.action !='show'}">
+    <meta name="description" content="${grailsApplication.config.speciesPortal.app.description}">
 </g:if>
 
 

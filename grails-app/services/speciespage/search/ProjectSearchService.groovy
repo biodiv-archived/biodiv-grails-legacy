@@ -14,6 +14,7 @@ import org.apache.solr.client.solrj.SolrServerException
 import org.apache.solr.common.SolrInputDocument
 import org.apache.solr.common.params.SolrParams
 import org.apache.solr.common.params.TermsParams
+import org.apache.solr.client.solrj.impl.StreamingUpdateSolrServer
 
 import content.Project
 
@@ -104,7 +105,8 @@ class ProjectSearchService {
 			solrServer.add(docs);
 			if(commit) {
 				//commit ...server is configured to do an autocommit after 10000 docs or 1hr
-				solrServer.blockUntilFinished();
+                if(solrServer instanceof StreamingUpdateSolrServer)
+    				solrServer.blockUntilFinished();
 				solrServer.commit();
 				log.info "Finished committing to project solr core"
 			}

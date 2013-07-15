@@ -1,4 +1,5 @@
 <%@page import="species.utils.Utils"%>
+<%@page import="species.utils.ImageType"%>
 <g:set var="domain" value="${Utils.getDomain(request)}" />
 <g:set var="fbAppId"/>
 <%
@@ -12,12 +13,14 @@ canonicalUrl = canonicalUrl ?: uGroup.createLink(action:params.action, controlle
 
 if(params.webaddress && userGroupInstance) {
     imagePath = imagePath?:userGroupInstance.mainImage()?.fileName
+    favIconPath = favIconPath?:userGroupInstance.icon(ImageType.SMALL)?.fileName;
     description = description?: userGroupInstance.description.replaceAll(/<.*?>/, '').trim()
-    siteName = userGroupInstance.name +' - India Biodiversity Portal';
+    siteName = userGroupInstance.name +' - '+ grailsApplication.config.speciesPortal.app.siteName;
 } else {
-    imagePath = imagePath?:(Utils.getIBPServerDomain()+'/sites/all/themes/ibp/images/map-logo.gif')
-    description = description?:"Welcome to the India Biodiversity Portal (IBP) - A repository of information designed to harness and disseminate collective intelligence on the biodiversity of the Indian subcontinent."
-    siteName = siteName ?: "India Biodiversity Portal";
+    imagePath = imagePath?:(Utils.getIBPServerDomain()+'/'+grailsApplication.config.speciesPortal.app.logo)
+    favIconPath = favIconPath?:(Utils.getIBPServerDomain()+'/'+grailsApplication.config.speciesPortal.app.favicon)
+    description = description?:grailsApplication.config.speciesPortal.app.siteDescription
+    siteName = siteName ?: grailsApplication.config.speciesPortal.app.siteName;
 }
 
 if(description != null && description.length() > 300) {
@@ -26,7 +29,11 @@ if(description != null && description.length() > 300) {
 %>
 
 <meta name="layout" content="main" />
-<title>${title}<g:if test="${params.action.equals('show')}"> | ${params.controller.capitalize()} </g:if> <g:if test="${params.webaddress && userGroupInstance && !title.equals(userGroupInstance?.name)}"> | ${userGroupInstance.name} </g:if> | India Biodiversity Portal</title>
+<title>${title}<g:if test="${params.action.equals('show')}"> | ${params.controller.capitalize()} </g:if> <g:if test="${params.webaddress && userGroupInstance && !title.equals(userGroupInstance?.name)}"> | ${userGroupInstance.name} </g:if> | ${grailsApplication.config.speciesPortal.app.siteName}</title>
+
+<g:if test="${favIconPath}">
+<link rel="shortcut icon" href="${favIconPath}" type="image/x-icon" />
+</g:if>
 <g:if test="${canonicalUrl}">
 <link rel="canonical" href="${canonicalUrl}" />
 <meta property="og:url" content="${canonicalUrl}" />

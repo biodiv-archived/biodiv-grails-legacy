@@ -4,7 +4,10 @@
 //
 modules = {
 	overrides {
-		jquery { defaultBundle 'core' }
+		jquery { 
+            defaultBundle 'core' 
+        }
+
 		'jquery-ui' {
 			defaultBundle 'core'
 			resource id:'js', url:[dir:'plugins',file:'jquery-ui-1.8.15/jquery-ui/js/jquery-ui-1.8.15.custom.min.js'],
@@ -96,7 +99,9 @@ modules = {
 		resource url:'/js/jquery/jquery.autopager-1.0.0.js'
 	}
 
-	location_utils { resource url:'/js/location/google/markerclusterer.js'		 }
+	location_utils { 
+        resource url:'/js/location/google/markerclusterer.js'		 
+    }
 
 	observations {
 		dependsOn 'core, tagit'

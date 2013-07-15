@@ -1050,7 +1050,8 @@ class UserGroupController {
 	   //if ( Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
 		   mailService.sendMail {
 			   to user.email
-			   bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com","thomas.vee@gmail.com","sandeept@strandls.com"
+               bcc grailsApplication.config.speciesPortal.app.notifiers_bcc.toArray()
+			   //bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com","thomas.vee@gmail.com","sandeept@strandls.com","balachandert@gmail.com"
 			   from conf.ui.notification.emailFrom
 			   subject mailSubject
 			   html body.toString()

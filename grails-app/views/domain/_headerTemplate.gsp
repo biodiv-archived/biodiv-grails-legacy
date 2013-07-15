@@ -1,3 +1,4 @@
+<%@page import="species.utils.Utils"%>
 <g:javascript>
     window.appContext = '';
     window.appIBPDomain = '${grailsApplication.config.ibp.domain}'
@@ -11,11 +12,11 @@
 		</g:if>
 		<g:else>
 			<a class="pull-left" href="${createLink(url:grailsApplication.config.grails.serverURL+"/..") }" style="margin-left: 0px;"> <img
-				class="logo" src="/sites/all/themes/ibp/images/map-logo.gif"
-				title="India Biodiversity Portal" alt="India Biodiversity Portal">
+                            class="logo" src="${Utils.getIBPServerDomain()+'/'+grailsApplication.config.speciesPortal.app.logo}"
+                            title="${grailsApplication.config.speciesPortal.app.siteName}" alt="${grailsApplication.config.speciesPortal.app.siteName}">
 			</a>
 			<a href="${createLink(url:grailsApplication.config.grails.serverURL+"/..") }" class="brand">
-				<h1>India Biodiversity Portal</h1>
+                            <h1>${grailsApplication.config.speciesPortal.app.siteName}</h1>
 			</a>
 		</g:else>
 	</div>

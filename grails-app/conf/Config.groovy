@@ -115,7 +115,7 @@ log4j = {
 //			"org.springframework.security.acls",
 //			"org.springframework.security.access"
 			//'com.the6hours.grails.springsecurity.facebook'
-	
+            //"org.grails.plugin.resource"	
     info    'species.auth'	
 
 }
@@ -199,10 +199,17 @@ else {
 
 
 speciesPortal {
-	app.rootDir = "${userHome}/species"
+    app.siteName = "India Biodiversity Portal"
+    app.logo = "logo/logo.gif"
+    app.favicon = "logo/favicon.ico"
+    app.siteDescription = "Welcome to the India Biodiversity Portal (IBP) - A repository of information designed to harness and disseminate collective intelligence on the biodiversity of the Indian subcontinent."
+
+	app.rootDir = "${userHome}/git/biodiv/app-conf"
 	data.rootDir = "${app.rootDir}/data"
 	download.rootDir = "${data.rootDir}/datarep/downloads"
-	
+    
+    app.notifiers_bcc = ["prabha.prabhakar@gmail.com", "sravanthi@strandls.com", "thomas.vee@gmail.com", "sandeept@strandls.com", "balachandert@gmail.com"]
+
 	species {
 		speciesDownloadDir = "${download.rootDir}/species"
 	}
@@ -210,7 +217,6 @@ speciesPortal {
 	resources {
 		rootDir = "${app.rootDir}/images"
 		serverURL = "http://localhost/${appName}/images"
-		//serverURL = "http://localhost/${appName}/images"
 		images {
 			defaultType = "jpg"
 			thumbnail {
@@ -371,6 +377,7 @@ speciesPortal {
 		COMMON_NAME = "common_name"
 		COMMON_NAME_EXACT = "common_name_exact"
 		LOCATION = "location"
+		LOCATION_EXACT = "location_exact"
 		ATTRIBUTION = "attribution"
 		PERCENT_OF_INFO = "percent_of_info"
 		
@@ -382,6 +389,7 @@ speciesPortal {
 		UNINOMIAL = "uninomial"
 		UNINOMIAL_EXACT = "uninomial_exact"
 		AUTHOR = "author"
+		AUTHOR_ID = "author_id"
 		YEAR = "year"
 		GENUS = "genus"
 		SPECIES = "species"
@@ -416,6 +424,7 @@ speciesPortal {
 		DESCRIPTION = "description"
 		TYPE = "type"
         TOPOLOGY = "topology"
+        SCORE = "score"
 	}
 
 	nameSearchFields {

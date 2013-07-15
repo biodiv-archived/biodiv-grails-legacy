@@ -1457,14 +1457,14 @@ class ObservationService {
 				if(request){
 					templateMap['userProfileUrl'] = generateLink("SUser", "show", ["id": toUser.id], request)
 				}
-				
-		if ( Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
-				//if ( Environment.getCurrent().getName().equalsIgnoreCase("development")) {
+		//if ( Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
+				if ( Environment.getCurrent().getName().equalsIgnoreCase("development")) {
 		            log.debug "Sending email to ${toUser}"
 					mailService.sendMail {
 						to toUser.email
 						if(index == 0) {
-							bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com", "thomas.vee@gmail.com", "sandeept@strandls.com"
+							//bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com", "thomas.vee@gmail.com", "sandeept@strandls.com"
+                            bcc grailsApplication.config.speciesPortal.app.notifiers_bcc.toArray()
 							//bcc "sravanthi@strandls.com"
 						}
 						from conf.ui.notification.emailFrom
@@ -1539,7 +1539,9 @@ class ObservationService {
 
 	def locations(params) {
 		List result = new ArrayList();
-		
+
+        if(!params.term) return result;
+
 		NamedList paramsList = new NamedList();
 /*        paramsList.add('fl', 'location_exact');
         if(springSecurityService.currentUser){
@@ -1564,18 +1566,22 @@ class ObservationService {
 			
 		}
 */
+
+		def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields
         String query = ""
 	    if(springSecurityService.currentUser){
-            query += "author_id:"+springSecurityService.currentUser.id.toLong()
+            query += searchFieldsConfig.AUTHOR_ID+":"+springSecurityService.currentUser.id.toLong()+" AND "
         } else {
-            //paramsList.add('q', "*:*");
-        }
-        query += " AND " + "location_exact:"+params.term+'*'?:'*';
+           //query += "*:*";
+         }
+        query += searchFieldsConfig.LOCATION_EXACT+":"+params.term+'*'?:'*';
 
         paramsList.add("q", query);
-        paramsList.add("fl", "location_exact,latlong,topology");
+        paramsList.add("fl", searchFieldsConfig.LOCATION_EXACT+','+searchFieldsConfig.LATLONG+','+searchFieldsConfig.TOPOLOGY);
         paramsList.add("start", 0);
         paramsList.add("rows", 20);
+        paramsList.add("sort", searchFieldsConfig.UPDATED_ON+' desc,'+searchFieldsConfig.SCORE + " desc ");
+
         def results = [];
         Map temp = [:]
         if(paramsList) {
@@ -1585,9 +1591,9 @@ class ObservationService {
 			while(iter.hasNext()) {
 				def doc = iter.next();
                 if(results.size() >= 5) break;
-                if(!temp[doc.getFieldValue('location_exact')]) {
-                    results.add([location:doc.getFieldValue('location_exact'), topology:doc.getFieldValue('topology'), category:'My Locations']);
-                    temp[doc.getFieldValue('location_exact')] = true;
+                if(!temp[doc.getFieldValue(searchFieldsConfig.LOCATION_EXACT)]) {
+                    results.add(['location':doc.getFieldValue(searchFieldsConfig.LOCATION_EXACT), 'topology':doc.getFieldValue(searchFieldsConfig.TOPOLOGY), 'category':'My Locations']);
+                    temp[doc.getFieldValue(searchFieldsConfig.LOCATION_EXACT)] = true;
                 }
 			}
 	    }

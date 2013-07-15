@@ -7,7 +7,7 @@ grails.project.dependency.resolution = {
     inherits("global") {
         // uncomment to disable ehcache
         // excludes 'ehcache'
-        excludes 'xml-apis', 'xercesImpl', 'xmlParserAPIs', 'hibernate'
+        excludes 'xml-apis', 'xercesImpl', 'xmlParserAPIs', 'hibernate', 'stax-api'
 
     }
 
@@ -37,6 +37,11 @@ grails.project.dependency.resolution = {
         compile ('org.apache.solr:solr-solrj:3.6.0') {
             excludes 'slf4j-api', 'jcl-over-slf4j'
         }
+        if (Environment.current == Environment.DEVELOPMENT) {
+                compile ('org.apache.solr:solr-core:3.6.0') {
+                    excludes 'slf4j-api', 'jcl-over-slf4j', 'geronimo-stax-api_1.0_spec'
+                }
+        }
         compile ('org.quartz-scheduler:quartz:1.8.4') {
             excludes 'slf4j-api', 'jcl-over-slf4j'
         }
@@ -45,7 +50,9 @@ grails.project.dependency.resolution = {
         compile group:'org.apache.poi', name:'poi', version:'3.7'
         compile group:'org.apache.poi', name:'poi-contrib', version:'3.6'
         compile group:'org.apache.poi', name:'poi-scratchpad', version:'3.7'
-        compile(group:'org.apache.poi', name:'poi-ooxml', version:'3.7')
+        compile(group:'org.apache.poi', name:'poi-ooxml', version:'3.7') {
+            excludes 'geronimo-stax-api_1.0_spec'
+        }
         compile ('org.springframework.social:spring-social-facebook:1.0.0.RELEASE') {
             excludes 'spring-web' 
             //'org.springframework.web-3.0.5.RELEASE', 'spring-aop-3.0.3.RELEASE', 'spring-beans-3.0.3.RELEASE','spring-core-3.0.3.RELEASE', 'spring-tx-3.0.3.RELEASE','spring-asm-3.0.3.RELEASE','spring-context-3.0.3.RELEASE', 'spring-expression-3.0.3.RELEASE','spring-web-3.0.3.RELEASE'

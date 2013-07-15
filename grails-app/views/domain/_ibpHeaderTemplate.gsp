@@ -8,7 +8,7 @@
 					data-target=".nav-collapse"> <span class="icon-bar"></span> </a> <a
 					class="brand"
 					href="${createLink(url:Utils.getIBPServerDomain()) }">
-					India Biodiversity Portal</a>
+                                        ${grailsApplication.config.speciesPortal.app.siteName}</a>
 				
 				<div class="nav-collapse">
 				
