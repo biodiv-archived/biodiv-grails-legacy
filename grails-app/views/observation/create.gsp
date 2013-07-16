@@ -680,52 +680,52 @@ if(r) {
                 return myXhr;
             },*/
 			success: function(responseXML, statusText, xhr, form) {
-				$("#addObservationSubmit").removeClass('disabled');
-				$(form).find("span.msg").html("");
-				$(".progress").css('z-index',90);
-				$('#progress_msg').html('');
-				$("#iemsg").html("");
-				//var rootDir = '${grailsApplication.config.speciesPortal.observations.serverURL}'
-				//var rootDir = '${Utils.getDomainServerUrlWithContext(request)}' + '/observations'
-				var obvDir = $(responseXML).find('dir').text();
-				var obvDirInput = $('#upload_resource input[name="obvDir"]');
-				if(!obvDirInput.val()){
-					$(obvDirInput).val(obvDir);
-				}
-				var images = []
-				var metadata = $(".metadata");
-				var i = 0;
-				if(metadata.length > 0) {
-					var file_id = $(metadata.get(-1)).children("input").first().attr("name");
-					i = parseInt(file_id.substring(file_id.indexOf("_")+1));
-				}
-				$(responseXML).find('resources').find('res').each(function() {
-					var fileName = $(this).attr('fileName');
-					var type = $(this).attr('type');					
-					//var thumbnail = rootDir + obvDir + "/" + fileName.replace(/\.[a-zA-Z]{3,4}$/, "${grailsApplication.config.speciesPortal.resources.images.thumbnail.suffix}");
-  					images.push({i:++i, file:obvDir + "/" + fileName, url:$(this).attr('url'), thumbnail:$(this).attr('thumbnail'), type:type, title:fileName});
-				});
-				
-				var html = $( "#metadataTmpl" ).render( images );
-				var metadataEle = $(html)
-				metadataEle.each(function() {
-					$('.geotagged_image', this).load(function(){
-						update_geotagged_images_list($(this));		
-					});
-                    var $ratingContainer = $(this).find('.star_obvcreate');
-                    rate($ratingContainer)
-				})
-				$( "#imagesList li:last" ).before (metadataEle);
+                            $("#addObservationSubmit").removeClass('disabled');
+                            $(form).find("span.msg").html("");
+                            $(".progress").css('z-index',90);
+                            $('#progress_msg').html('');
+                            $("#iemsg").html("");
+                            //var rootDir = '${grailsApplication.config.speciesPortal.observations.serverURL}'
+                            //var rootDir = '${Utils.getDomainServerUrlWithContext(request)}' + '/observations'
+                            var obvDir = $(responseXML).find('dir').text();
+                            var obvDirInput = $('#upload_resource input[name="obvDir"]');
+                            if(!obvDirInput.val()){
+                                $(obvDirInput).val(obvDir);
+                            }
+                            var images = []
+                            var metadata = $(".metadata");
+                            var i = 0;
+                            if(metadata.length > 0) {
+                                var file_id = $(metadata.get(-1)).children("input").first().attr("name");
+                                i = parseInt(file_id.substring(file_id.indexOf("_")+1));
+                            }
+                            $(responseXML).find('resources').find('res').each(function() {
+                                var fileName = $(this).attr('fileName');
+                                var type = $(this).attr('type');					
+                                //var thumbnail = rootDir + obvDir + "/" + fileName.replace(/\.[a-zA-Z]{3,4}$/, "${grailsApplication.config.speciesPortal.resources.images.thumbnail.suffix}");
+                                images.push({i:++i, file:obvDir + "/" + fileName, url:$(this).attr('url'), thumbnail:$(this).attr('thumbnail'), type:type, title:fileName});
+                            });
 
-                /*if (navigator.appName.indexOf('Microsoft') == -1) {
-                    $( "#imagesList" ).append (add_file_button);
-                }*/
-                $( "#add_file" ).fadeIn(3000);
-                $("#image-resources-msg").parent(".resources").removeClass("error");
-                $("#image-resources-msg").html("");
-				$("#upload_resource input[name='resources']").remove();
-				$('#videoUrl').val('');
-				$('#add_video').editable('setValue','', false);		
+                            var html = $( "#metadataTmpl" ).render( images );
+                            var metadataEle = $(html)
+                            metadataEle.each(function() {
+                                $('.geotagged_image', this).load(function(){
+                                    update_geotagged_images_list($(this));		
+                                });
+                                var $ratingContainer = $(this).find('.star_obvcreate');
+                                rate($ratingContainer)
+                            })
+                            $( "#imagesList li:last" ).before (metadataEle);
+
+                            /*if (navigator.appName.indexOf('Microsoft') == -1) {
+                            $( "#imagesList" ).append (add_file_button);
+                            }*/
+                            $( "#add_file" ).fadeIn(3000);
+                            $("#image-resources-msg").parent(".resources").removeClass("error");
+                            $("#image-resources-msg").html("");
+                            $("#upload_resource input[name='resources']").remove();
+                            $('#videoUrl').val('');
+                            $('#add_video').editable('setValue','', false);		
 			}, error:function (xhr, ajaxOptions, thrownError){
 	            	    var successHandler = this.success, errorHandler;
 	            	    handleError(xhr, ajaxOptions, thrownError, successHandler, function(data) {

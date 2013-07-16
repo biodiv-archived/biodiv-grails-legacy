@@ -3,6 +3,7 @@
 <head>
 <meta name="layout" content="main" />
 <title>Error</title>
+<r:require modules="core" />
 </head>
 
 <body>

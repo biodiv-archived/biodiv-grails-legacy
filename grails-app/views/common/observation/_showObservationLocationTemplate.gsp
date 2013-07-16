@@ -35,10 +35,10 @@
                 <span class="name"><i class="icon-map-marker"> </i>Coordinates</span>
                 <div class="value">${latitude.toFloat()},${longitude.toFloat()}</div>
 
-                <input id='areas' type='hidden' name='areas' value='${areas}'></input>
+                <input id='areas' type='hidden' name='areas' value='${areas}'/>
                
-                <input class="degree_field" id="latitude_field" type="hidden" name="latitude" value="${latitude}"></input>
-                <input class="degree_field" id="longitude_field" type="hidden" name="longitude" style="width:193px;" value="${longitude}"></input>
+                <input class="degree_field" id="latitude_field" type="hidden" name="latitude" value="${latitude}"/>
+                <input class="degree_field" id="longitude_field" type="hidden" name="longitude" style="width:193px;" value="${longitude}"/>
 	</div>
 
 	<r:script>

@@ -9,7 +9,7 @@
 
 <g:set var="title" value="Pages"/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
-
+<r:require modules="userGroups_show" />
 </head>
 <body>
 

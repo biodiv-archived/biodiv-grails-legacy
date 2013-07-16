@@ -6,7 +6,7 @@ class SpeciesField implements Rateable {
 
 	public enum Status {
 		UNDER_CREATION("Under Creation"),
-		CREATION_COMPLETE("Creation Complete"),
+		PUBLISHED("Published"),
 		UNDER_VALIDATION("Under Validation"),
 		VALIDATED("Validated");
 		

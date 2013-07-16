@@ -28,6 +28,7 @@ import species.utils.Utils;
 import species.utils.ImageUtils;
 import species.Habitat;
 import species.groups.SpeciesGroup;
+import species.participation.Follow;
 
 class SUserController extends UserController {
 
@@ -225,13 +226,13 @@ class SUserController extends UserController {
 		try {
 			List obvToUpdate = [];
 			lookupUserClass().withTransaction { status ->
-				user.observations.each { obv ->
+/*				user.observations.each { obv ->
 					UnCuratedVotes.findAllByObv(obv).each { vote ->
 						log.debug "deleting $vote"
 						vote.delete();
 					}
 				}
-
+*/
 				user.recoVotes.each { vote ->
 					if(vote.observation.author.id != user.id) {
 						obvToUpdate.add(vote.observation);
@@ -240,6 +241,7 @@ class SUserController extends UserController {
 
 				FacebookUser.removeAll user;
 				lookupUserRoleClass().removeAll user
+                Follow.deleteAll user;
 
 				SUserService.sendNotificationMail(SUserService.USER_DELETED, user, request, "");
 				user.delete();

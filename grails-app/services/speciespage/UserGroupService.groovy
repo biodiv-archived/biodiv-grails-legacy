@@ -141,7 +141,7 @@ class UserGroupService {
 		def resource = null;
 		def rootDir = grailsApplication.config.speciesPortal.userGroups.rootDir
 
-		File iconFile = new File(rootDir , Utils.generateSafeFileName(icon));
+		File iconFile = new File(rootDir , icon);
 		if(!iconFile.exists()) {
 			log.error "COULD NOT locate icon file ${iconFile.getAbsolutePath()}";
 		}
@@ -815,7 +815,7 @@ class UserGroupService {
 		//		println attrs
 		String url = "";
 
-		if(attrs.userGroup) {
+		if(attrs.userGroup && attrs.userGroup.id) {
 			attrs.webaddress = attrs.userGroup.webaddress
 			String base = attrs.remove('base')
 			String controller = attrs.remove('controller')

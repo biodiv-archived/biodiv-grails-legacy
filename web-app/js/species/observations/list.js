@@ -194,19 +194,20 @@ $(document).ready(function(){
 //		updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
 //		return false;
 //   });
-   
-    $("#removeTagFilter").live('click', function(){
-    	var oldActiveTag = $("li.tagit-choice.active");
-		if(oldActiveTag){
-			oldActiveTag.removeClass('active');
-		}
-		var oldActiveTag = $("#tc_tagcloud a.active");
-		if(oldActiveTag){
-			oldActiveTag.removeClass('active');
-		}
-		updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
-    	return false;
-    });
+
+        $("#removeTagFilter").live('click', function(){
+            var oldActiveTag = $("li.tagit-choice.active");
+            if(oldActiveTag){
+                oldActiveTag.removeClass('active');
+            }
+            var oldActiveTag = $("#tc_tagcloud a.active");
+            if(oldActiveTag){
+                oldActiveTag.removeClass('active');
+            }
+            $("input#tag").val('');
+            updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
+            return false;
+        });
  
     $("#removeUserFilter").live('click', function(){
     	updateGallery(undefined, window.params.queryParamsMax, window.params.offset, true, window.params.isGalleryUpdate);
@@ -440,15 +441,16 @@ function getSelectedSpeciesName() {
 } 
 	
 function getSelectedTag() {
-	var tag = ''; 
-	tag = $("li.tagit-choice.active").contents().first().text();
-	if(!tag){
-		tag = $("#tc_tagcloud a.active").contents().first().text();	
-	}
-	if(tag) {
-    	tag = stringTrim(tag.replace(/\s*\,\s*$/,''));
-    	return tag;
-    }	
+    var tag = $("li.tagit-choice.active").contents().first().text();
+    if(!tag){
+        tag = $("#tc_tagcloud a.active").contents().first().text();	
+    }  
+    if(tag) {
+        tag = stringTrim(tag.replace(/\s*\,\s*$/,''));
+        return tag;
+    } else {
+        return $("input#tag").val()
+    }
 } 
 
 function getSelectedUserGroup() {

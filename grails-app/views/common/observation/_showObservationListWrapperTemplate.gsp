@@ -73,12 +73,13 @@
 					model="['source':'Observations', 'requestObject':request, 'downloadTypes':[DownloadType.CSV, DownloadType.KML] ]" />
 
 				<div id="observations_list_map" class="observation"
-                                    style="clear: both; display:none}">
+                                    style="clear: both; display:none">
 					<obv:showObservationsLocation
 						model="['observationInstanceList':totalObservationInstanceList, 'userGroup':userGroup]">
 					</obv:showObservationsLocation>
                                         <input id="isMapView" name="isMapView" value="${params.isMapView}" type="hidden"/>
                                         <input id="bounds" name="bounds" value="${activeFilters?.bounds}" type="hidden"/>
+                                        <input id="tag" name="tag" value="${params.tag}" type="hidden"/>
 				</div>
 			</div>
 			<obv:showObservationsList  model="['totalObservationInstanceList':totalObservationInstanceList, 'observationInstanceList':observationInstanceList, 'instanceTotal':instanceTotal, 'queryParams':queryParams, 'activeFilters':activeFilters, 'userGroup':userGroup]"  />

@@ -27,10 +27,10 @@ def queryParams = [username: username, enabled: enabled, accountExpired: account
 							<g:elseif test="${params.sort == 'name'}">
                                                 Name
                                             </g:elseif>
-                            <g:elseif test="${params.sort == 'score'}">
+                                            <g:elseif test="${params.sort == 'score'}">
                                                 Relevancy
-                            </g:elseif>
-							<g:else>
+                                            </g:elseif>
+				            <g:else>
                                                 Activity
                                             </g:else>
 							<span class="caret"></span>

@@ -732,7 +732,7 @@ class UserGroupController {
 						message = g.message(code: 'resource.file.invalid.max.message', args: [
 							grailsApplication.config.speciesPortal.userGroups.logo.MAX_IMAGE_SIZE/1024,
 							f.originalFilename,
-							f.size/1024
+							((int)f.size/1024)+'KB'
 						], default:"File size cannot exceed ${grailsApplication.config.speciesPortal.userGroups.logo.MAX_IMAGE_SIZE/1024}KB");
 					}
 					else if(f.empty) {

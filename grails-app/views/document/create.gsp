@@ -316,11 +316,15 @@ input.dms_field {
     
     			$("#documentFormSubmit").click(function(){
     			
+    				//Disable click on the button. 
+    				$("#documentFormSubmit").unbind("click");
+    			
     				if (document.getElementById('agreeTerms').checked){
     			
 						var speciesGroups = getSelectedGroup();
 		        		var habitats = getSelectedHabitat();
 		        
+		        		
 		       			$.each(speciesGroups, function(index){
 		       				var input = $("<input>").attr("type", "hidden").attr("name", "speciesGroup."+index).val(this);
 							$('#documentForm').append($(input));	

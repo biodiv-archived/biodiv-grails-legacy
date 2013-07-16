@@ -27,16 +27,16 @@
                                 <g:renderErrors bean="${observationInstance}" as="list" field="placeName"/>
                                 </g:hasErrors>
                             </div>
-                    <input id='areas' type='hidden' name='areas' value='${observationInstance?.topology?Utils.GeometryAsWKT(observationInstance?.topology):params.areas}'></input>
+                    <input id='areas' type='hidden' name='areas' value='${observationInstance?.topology?Utils.GeometryAsWKT(observationInstance?.topology):params.areas}'/>
                     <div class="input-prepend pull-left control-group  ${hasErrors(bean: observationInstance, field: 'topology', 'error')}" style="width:250px;">
                             <span class="add-on" style="vertical-align:middle;">Lat</span>
                             <!-- div class="location_picker_value" id="latitude"></div>
-                            <input id="latitude_field" type="hidden" name="latitude"></input-->
-                            <input class="degree_field" id="latitude_field" type="text" name="latitude" value="${params.latitude}"></input>
-                            <input class="dms_field" id="latitude_deg_field" type="text" name="latitude_deg" placeholder="deg"></input>
-                            <input class="dms_field" id="latitude_min_field" type="text" name="latitude_min" placeholder="min"></input>
-                            <input class="dms_field" id="latitude_sec_field" type="text" name="latitude_sec" placeholder="sec"></input>
-                            <input class="dms_field" id="latitude_direction_field" type="text" name="latitude_direction" placeholder="N/E"></input>
+                            <input id="latitude_field" type="hidden" name="latitude"/-->
+                            <input class="degree_field" id="latitude_field" type="text" name="latitude" value="${params.latitude}"/>
+                            <input class="dms_field" id="latitude_deg_field" type="text" name="latitude_deg" placeholder="deg"/>
+                            <input class="dms_field" id="latitude_min_field" type="text" name="latitude_min" placeholder="min"/>
+                            <input class="dms_field" id="latitude_sec_field" type="text" name="latitude_sec" placeholder="sec"/>
+                            <input class="dms_field" id="latitude_direction_field" type="text" name="latitude_direction" placeholder="N/E"/>
                             <div class="help-inline">
                                 <g:hasErrors bean="${observationInstance}" field="topology">
                                 	<g:message code="observation.suggest.location" />
@@ -46,12 +46,12 @@
                     <div class="input-prepend pull-left control-group ${hasErrors(bean: observationInstance, field: 'topology', 'error')}" style="width:240px;">
                             <span class="add-on" style="vertical-align:middle;">Long</span>
                             <!--div class="location_picker_value" id="longitude"></div>
-                            <input id="longitude_field" type="hidden" name="longitude"></input-->
+                            <input id="longitude_field" type="hidden" name="longitude"/-->
                             <input class="degree_field" id="longitude_field" type="text" name="longitude" style="width:193px;" value="${params.longitude}"></input>
-                            <input class="dms_field" id="longitude_deg_field" type="text" name="longitude_deg" placeholder="deg"></input>
-                            <input class="dms_field" id="longitude_min_field" type="text" name="longitude_min" placeholder="min"></input>
-                            <input class="dms_field" id="longitude_sec_field" type="text" name="longitude_sec" placeholder="sec"></input>
-                            <input class="dms_field" id="longitude_direction_field" type="text" name="longitude_direction" placeholder="N/E"></input>
+                            <input class="dms_field" id="longitude_deg_field" type="text" name="longitude_deg" placeholder="deg"/>
+                            <input class="dms_field" id="longitude_min_field" type="text" name="longitude_min" placeholder="min"/>
+                            <input class="dms_field" id="longitude_sec_field" type="text" name="longitude_sec" placeholder="sec"/>
+                            <input class="dms_field" id="longitude_direction_field" type="text" name="longitude_direction" placeholder="N/E"/>
                             <div class="help-inline">
                                 <g:hasErrors bean="${observationInstance}" field="topology">
                                 </g:hasErrors>
@@ -72,8 +72,8 @@
 				code="observation.accuracy.label"
 				default="Accuracy" /> </label-->
 				
-                            <input type="radio" name="location_accuracy" value="Accurate" ${isAccurateChecked} >Accurate 
-                            <input type="radio" name="location_accuracy" value="Approximate" ${isApproxChecked} >Approximate
+                            <input type="radio" name="location_accuracy" value="Accurate" ${isAccurateChecked} />Accurate 
+                            <input type="radio" name="location_accuracy" value="Approximate" ${isApproxChecked} />Approximate
                             <input type="checkbox" class="input-block-level" name="geo_privacy" value="geo_privacy" />
            						Hide precise location
 
@@ -85,7 +85,7 @@
                             <div class="controls">                
                                 <div class="location_picker_value"id="reverse_geocoded_name"></div>
                                 <input id="reverse_geocoded_name_field" type="hidden"  class="input-block-level"
-                                        name="reverse_geocoded_name" > </input>
+                                        name="reverse_geocoded_name" />
                             </div>
                         </div>
                     </div>
