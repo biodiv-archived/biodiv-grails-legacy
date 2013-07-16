@@ -224,19 +224,20 @@ modules = {
 	}
 	
 	slickgrid {
-		resource url:'/js/SlickGrid/slick.grid.css'
-		resource url:'/js/SlickGrid/css/smoothness/jquery-ui-1.8.16.custom.css'
-		resource url:'/js/SlickGrid/examples/examples.css'
+		resource url:'/js/SlickGrid-2.0.2/slick.grid.css'
+		resource url:'/js/SlickGrid-2.0.2/css/smoothness/jquery-ui-1.8.16.custom.css'
+		resource url:'/js/SlickGrid-2.0.2/examples/examples.css'
 		
-		resource url:'/js/SlickGrid/lib/jquery.event.drag-2.0.min.js'
-		resource url:'/js/SlickGrid/slick.core.js'
-		resource url:'/js/SlickGrid/slick.formatters.js'
-		resource url:'/js/SlickGrid/slick.editors.js'
-		resource url:'/js/SlickGrid/slick.grid.js'
-		resource url:'/js/SlickGrid/plugins/slick.cellrangedecorator.js'
-		resource url:'/js/SlickGrid/plugins/slick.cellrangeselector.js'
-		resource url:'/js/SlickGrid/plugins/slick.cellselectionmodel.js'
+		resource url:'/js/SlickGrid-2.0.2/lib/jquery.event.drag-2.0.min.js'
 		
+		resource url:'/js/SlickGrid-2.0.2/slick.core.js'
+		resource url:'/js/SlickGrid-2.0.2/slick.formatters.js'
+		resource url:'/js/SlickGrid-2.0.2/slick.editors.js'
+		resource url:'/js/SlickGrid-2.0.2/slick.grid.js'
+		
+		resource url:'/js/SlickGrid-2.0.2/plugins/slick.cellrangedecorator.js'
+		resource url:'/js/SlickGrid-2.0.2/plugins/slick.cellrangeselector.js'
+		resource url:'/js/SlickGrid-2.0.2/plugins/slick.cellselectionmodel.js'
 	}
 	
 	checklist {

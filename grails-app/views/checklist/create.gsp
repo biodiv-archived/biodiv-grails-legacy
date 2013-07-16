@@ -37,7 +37,7 @@
 				%>
 				<g:render template='/UFile/docUpload' model="['name': 'checklistStartFile', allowedExtensions:allowedExtensions,uploadCallBack:'showGrid()']" />
 				<div>
-  					<div>
+  					<div class="checklist-slickgrid">
 						<div id="myGrid" style="width:620px;height:350px;display:none;"></div>
 					</div>
 						<%
