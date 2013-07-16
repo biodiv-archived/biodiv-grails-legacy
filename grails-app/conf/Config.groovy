@@ -199,12 +199,12 @@ else {
 
 
 speciesPortal {
-    app.siteName = "India Biodiversity Portal"
+    app.siteName = "Bhutan Biodiversity Portal"
     app.logo = "logo/logo.gif"
     app.favicon = "logo/favicon.ico"
-    app.siteDescription = "Welcome to the India Biodiversity Portal (IBP) - A repository of information designed to harness and disseminate collective intelligence on the biodiversity of the Indian subcontinent."
+    app.siteDescription = "Welcome to the Bhutan Biodiversity Portal (BBP) - A repository of information designed to harness and disseminate collective intelligence on the biodiversity of Bhutan."
 
-	app.rootDir = "${userHome}/git/biodiv/app-conf"
+	app.rootDir = "${userHome}/git/${appName}/app-conf"
 	data.rootDir = "${app.rootDir}/data"
 	download.rootDir = "${data.rootDir}/datarep/downloads"
     
