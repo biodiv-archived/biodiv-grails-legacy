@@ -881,7 +881,7 @@ if(r) {
 
         });
         
-        filepicker.setKey('AXCVl73JWSwe7mTPb2kXdz');
+        filepicker.setKey("${grailsApplication.config.speciesPortal.observations.filePicker.key}");
 	});
 
 
