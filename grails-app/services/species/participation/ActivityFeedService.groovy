@@ -14,6 +14,10 @@ class ActivityFeedService {
 	static final String COMMENT_IN_REPLY_TO = "In reply to"
 	
 	
+	//checklist related
+	static final String CHECKLIST_CREATED = "Checklist created"
+	static final String CHECKLIST_UPDATED = "Checklist updated"
+	
 	//observation related
 	static final String OBSERVATION_CREATED = "Observation created"
 	static final String OBSERVATION_UPDATED = "Observation updated"

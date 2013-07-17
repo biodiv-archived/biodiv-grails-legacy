@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.httpclient.util.DateUtil;
 import org.apache.solr.common.SolrException;
@@ -15,7 +16,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 
 import species.Reference;
-import species.Species
+import species.Species;
+import species.Contributor;
+import species.participation.RecommendationVote.ConfidenceType;
 import species.utils.Utils;
 import species.formatReader.SpreadsheetReader;
 
@@ -51,9 +54,136 @@ class ChecklistService {
 	def observationService
 	def checklistSearchService;
 	def obvUtilService;
+	def springSecurityService;
+	def activityFeedService;
 	
 	///////////////////////////////////////////////////////////////////////////////
-	////////////////////////////// Search realted /////////////////////////////////
+	////////////////////////////// Create ///////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////
+
+	
+	Checklists createChecklist(params) {
+		Checklists checklist = new Checklists();
+		updateChecklist(params, checklist);
+		return checklist
+	}
+	
+	void updateChecklist(params, Checklists checklist){
+		observationService.updateObservation(params, checklist)
+		
+		checklist.title =  params.title
+		//checklist.license =  params.license
+		checklist.refText =  params.refText
+		checklist.sourceText =  params.sourceText
+		checklist.rawChecklist =  params.rawChecklist
+		checklist.columnNames =  params.columnNames
+		checklist.publicationDate =  params.publicationDate ? observationService.parseDate(params.publicationDate) : null
+		checklist.reservesValue =  params.reservesValue
+		
+		if(params.attribution){
+			def contributor = new Contributor(name:params.attribution)
+			contributor.save()
+			checklist.addToAttributions(contributor)
+		}
+		
+		checklist.isChecklist = true
+	}
+	
+	Map saveChecklist(params){
+		params.author = springSecurityService.currentUser;
+		def checklistInstance, feedType, sendMail, feedAuthor;
+		try {
+			
+			if(params.action == "save"){
+				checklistInstance = createChecklist(params);
+				feedType = activityFeedService.CHECKLIST_CREATED
+				feedAuthor = checklistInstance.author
+				sendMail = true
+			}else{
+				checklistInstance = Checklists.get(params.id.toLong())
+				updateChecklist(params, checklistInstance)
+				feedType = activityFeedService.CHECKLIST_UPDATED
+				feedAuthor = springSecurityService.currentUser
+				sendMail = false
+			}
+			
+			if(!checklistInstance.hasErrors() && checklistInstance.save(flush:true)) {
+				log.debug "Successfully created checklistInstance : "+checklistInstance
+				//activityFeedService.addActivityFeed(checklistInstance, null, feedAuthor, feedType);
+				
+				observationService.saveObservationAssociation(params, checklistInstance)
+//				if(sendMail)
+//					observationService.sendNotificationMail(OBSERVATION_ADDED, checklistInstance, null, params.webaddress);
+				
+				saveObservationFromChecklist(params, checklistInstance)
+					
+				return ['success' : true, checklistInstance:checklistInstance]
+			} else {
+				checklistInstance.errors.allErrors.each { log.error it }
+				return ['success' : false, checklistInstance:checklistInstance]
+			}
+		} catch(e) {
+			e.printStackTrace();
+			return ['success' : false, checklistInstance:checklistInstance]
+		}
+	}
+	
+	@Transactional
+	private saveObservationFromChecklist(params, checklistInstance){
+		if(!params.checklistData)
+			return
+		
+		Checklists.withTransaction() {
+			int count = 0
+			params.checklistData.each { Map m ->
+				def res = observationService.saveObservation(params)
+				Observation observationInstance = res.observationInstance
+				observationInstance.sourceId = checklistInstance.id
+				saveReco(observationInstance, m)
+				saveObservationAnnotation(observationInstance, m)
+				checklistInstance.addToObservations(observationInstance)
+				count++
+			}
+			checklistInstance.speciesCount = count 
+		}
+		log.debug "saved checklist observation  "
+	}
+	
+	private saveReco(Observation obv, Map m){
+		def res = observationService.getRecommendation([recoName:m[SN_NAME], commonName: m[CN_NAME]])
+		def reco = res.mainReco
+		def cnReco = res.commonNameReco
+		
+		ConfidenceType confidence = observationService.getConfidenceType(ConfidenceType.CERTAIN.name());
+		RecommendationVote recommendationVoteInstance = new RecommendationVote(observation:obv, recommendation:reco, commonNameReco:cnReco, author:obv.author, confidence:confidence, votedOn:obv.fromDate);
+		
+		if(!recommendationVoteInstance.hasErrors() && recommendationVoteInstance.save(flush:true)) {
+			log.debug "Successfully added reco vote : "+recommendationVoteInstance.id
+			activityFeedService.addActivityFeed(obv, recommendationVoteInstance, recommendationVoteInstance.author, activityFeedService.SPECIES_RECOMMENDED);
+			//saving max voted species name for observation instance
+			obv.maxVotedReco = reco
+		}else{
+			recommendationVoteInstance.errors.allErrors.each { log.error it }
+			throw new RuntimeException("Error during reco vote save");
+		}
+	}
+	
+	private saveObservationAnnotation(obv, Map m){
+		int columnOrder = 0
+		m.each { k, v ->
+			observationService.addAnnotation(['key': k, 'value': v, 'columnOrder':columnOrder++, 'sourceType': Checklists.class.getCanonicalName()], obv)
+		}
+		if(!obv.hasErrors() && obv.save(flush:true)) {
+			log.debug "saved observation meta data $obv"
+		}else{
+			obv.errors.allErrors.each { log.error it }
+			throw new RuntimeException("Error during meta data save");
+		}
+	}
+	
+	
+	///////////////////////////////////////////////////////////////////////////////
+	////////////////////////////// Search related /////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////
 
 	def nameTerms(params) {

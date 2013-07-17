@@ -56,8 +56,8 @@
 						<a id="addObservationSubmit" class="btn btn-primary"
 							style="float: right; margin-right: 5px;"> ${form_button_val} </a>
 						
-						<input id="checklist-data" name="checklist-data" type="hidden" value='' />
-						<input id="checklist-column" name="checklist-column" type="hidden" value='' />
+						<input id="checklistData" name="checklistData" type="hidden" value='' />
+						<input id="checklistColumns" name="checklistColumns" type="hidden" value='' />
 						
 					</form>
 				</div>

@@ -398,8 +398,8 @@ if(r) {
 							</div>
 							<%
 								def obvTags = observationInstance?.tags
-								if(params.action == 'save' && saveParams?.tags){
-									obvTags = Arrays.asList(saveParams.tags)
+								if(params.action == 'save' && params?.tags){
+									obvTags = Arrays.asList(params.tags)
 								}				
 							%>
 								

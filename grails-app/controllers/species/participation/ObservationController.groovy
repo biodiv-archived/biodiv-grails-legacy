@@ -168,65 +168,9 @@ class ObservationController {
 	def save = {
 		log.debug params;
 		if(request.method == 'POST') {
-			//TODO:edit also calls here...handle that wrt other domain objects
-
-			params.author = springSecurityService.currentUser;
-			def observationInstance;
-			try {
-				observationInstance =  observationService.createObservation(params);
-
-				if(!observationInstance.hasErrors() && observationInstance.save(flush:true)) {
-					//flash.message = "${message(code: 'default.created.message', args: [message(code: 'observation.label', default: 'Observation'), observationInstance.id])}"
-					log.debug "Successfully created observation : "+observationInstance
-					params.obvId = observationInstance.id
-					activityFeedService.addActivityFeed(observationInstance, null, observationInstance.author, activityFeedService.OBSERVATION_CREATED);
-					
-					def tags = (params.tags != null) ? Arrays.asList(params.tags) : new ArrayList();
-					observationInstance.setTags(tags);
-
-					if(params.groupsWithSharingNotAllowed) {
-						observationService.setUserGroups(observationInstance, [params.groupsWithSharingNotAllowed]);
-					} else {
-						if(params.userGroupsList) {
-							def userGroups = (params.userGroupsList != null) ? params.userGroupsList.split(',').collect{k->k} : new ArrayList();
-							
-							observationService.setUserGroups(observationInstance, userGroups);
-						}	
-					}
-				    
-                    log.debug "Saving ratings for the resources"
-                    observationInstance.resource.each { res ->
-                        if(res.rating) {
-                            res.rate(springSecurityService.currentUser, res.rating);
-                        }
-                    }
-						
-					
-					observationService.sendNotificationMail(observationService.OBSERVATION_ADDED, observationInstance, request, params.webaddress);
-					params["createNew"] = true
-					chain(action: 'addRecommendationVote', model:['chainedParams':params]);
-				} else {
-					observationInstance.errors.allErrors.each { log.error it }
-					if(params["isMobileApp"]?.toBoolean()){
-						render (['error:true']as JSON);
-						return
-					}else{
-						render(view: "create", model: [observationInstance: observationInstance, saveParams:params, lastCreatedObv:null])
-					}
-				}
-			} catch(e) {
-				e.printStackTrace();
-				if(params["isMobileApp"]?.toBoolean()){
-					render (['error:true']as JSON);
-					return
-				}else{
-					flash.message = "${message(code: 'error')}";
-					render(view: "create", model: [observationInstance: observationInstance, lastCreatedObv:null])
-				}
-			}
+			saveAndRender(params)
 		} else {
 			redirect (url:uGroup.createLink(action:'create', controller:"observation", 'userGroupWebaddress':params.webaddress))
-			//redirect(action: "create")
 		}
 	}
 
@@ -234,58 +178,23 @@ class ObservationController {
 	@Secured(['ROLE_USER'])
 	def update = {
 		log.debug params;
-
 		def observationInstance = Observation.get(params.id.toLong())
-		def currentUser = springSecurityService.currentUser
-		params.author = observationInstance.author;
 		if(observationInstance)	{
-			try {
-				observationService.updateObservation(params, observationInstance);
-
-				if(!observationInstance.hasErrors() && observationInstance.save(flush:true)) {
-					flash.message = "${message(code: 'default.updated.message', args: [message(code: 'observation.label', default: 'Observation'), observationInstance.id])}"
-					log.debug "Successfully updated observation : "+observationInstance
-
-					params.obvId = observationInstance.id
-					def tags = (params.tags != null) ? Arrays.asList(params.tags) : new ArrayList();
-					observationInstance.setTags(tags);
-					activityFeedService.addActivityFeed(observationInstance, null, currentUser, activityFeedService.OBSERVATION_UPDATED);
-					
-					if(params.groupsWithSharingNotAllowed) {
-						observationService.setUserGroups(observationInstance, [params.groupsWithSharingNotAllowed]);
-					} else {
-						if(params.userGroupsList) {
-							def userGroups = (params.userGroupsList != null) ? params.userGroupsList.split(',').collect{k->k} : new ArrayList();
-							observationService.setUserGroups(observationInstance, userGroups);
-						} else {
-							observationService.setUserGroups(observationInstance, []);
-						}
-					}
-                    
-                    log.debug "Saving ratings for the resources"
-                    observationInstance.resource.each { res ->
-                        if(res.rating) {
-                            res.rate(springSecurityService.currentUser, res.rating);
-                        }
-                    }
-					//redirect(action: "show", id: observationInstance.id)
-					params["createNew"] = true
-					chain(action: 'addRecommendationVote', model:['chainedParams':params]);
-				} else {
-					observationInstance.errors.allErrors.each { log.error it }
-					render(view: "create", model: [observationInstance: observationInstance])
-				}
-			} catch(e) {
-				e.printStackTrace();
-				flash.message = "${message(code: 'error')}";
-				render(view: "create", model: [observationInstance: observationInstance])
-			}
+			saveAndRender(params)
 		}else {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
 			redirect (url:uGroup.createLink(action:'list', controller:"observation", 'userGroupWebaddress':params.webaddress))
-			//redirect(action: "list")
 		}
-		render(view: "create", model: [observationInstance: observationInstance])
+	}
+	
+	private saveAndRender(params){
+		def result = observationService.saveObservation(params)
+		if(result.success){
+			chain(action: 'addRecommendationVote', model:['chainedParams':params]);
+		}else{
+			//flash.message = "${message(code: 'error')}";
+			render(view: "create", model: [observationInstance: result.observationInstance, lastCreatedObv:null])
+		}
 	}
 
 	def show = {

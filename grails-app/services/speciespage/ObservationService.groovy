@@ -106,7 +106,8 @@ class ObservationService {
 		}
 		observation.group = params.group?:SpeciesGroup.get(params.group_id);
 		observation.notes = params.notes;
-		observation.fromDate = observation.toDate = parseDate(params.observedOn);
+		observation.fromDate = parseDate(params.observedOn);
+		observation.toDate = params.toDate ? parseDate(params.toDate) : observation.fromDate
 		observation.placeName = params.placeName//?:observation.reverseGeocodedName;
 		observation.reverseGeocodedName = params.reverse_geocoded_name?:observation.placeName
 		
@@ -137,6 +138,75 @@ class ObservationService {
 		observation.resource?.clear();
 		resources.each { resource ->
 			observation.addToResource(resource);
+		}
+	}
+	
+	Map saveObservation(params){
+		//TODO:edit also calls here...handle that wrt other domain objects
+		params.author = springSecurityService.currentUser;
+		def observationInstance, feedType, sendMail, feedAuthor; 
+		try {
+			
+			if(params.action == "save"){
+				observationInstance = createObservation(params);
+				feedType = activityFeedService.OBSERVATION_CREATED
+				feedAuthor = observationInstance.author
+				sendMail = true
+			}else{
+				observationInstance = Observation.get(params.id.toLong())
+				updateObservation(params, observationInstance)
+				feedType = activityFeedService.OBSERVATION_UPDATED
+				feedAuthor = springSecurityService.currentUser
+				sendMail = false
+			}
+			
+			if(!observationInstance.hasErrors() && observationInstance.save(flush:true)) {
+				//flash.message = "${message(code: 'default.created.message', args: [message(code: 'observation.label', default: 'Observation'), observationInstance.id])}"
+				log.debug "Successfully created observation : "+observationInstance
+				params.obvId = observationInstance.id
+				activityFeedService.addActivityFeed(observationInstance, null, feedAuthor, feedType);
+				
+				saveObservationAssociation(params, observationInstance)
+								
+				if(sendMail)
+					sendNotificationMail(OBSERVATION_ADDED, observationInstance, null, params.webaddress);
+					
+				params["createNew"] = true
+				return ['success' : true, observationInstance:observationInstance]
+			} else {
+				observationInstance.errors.allErrors.each { log.error it }
+				return ['success' : false, observationInstance:observationInstance]
+			}
+		} catch(e) {
+			e.printStackTrace();
+			return ['success' : false, observationInstance:observationInstance]
+		}
+	}
+	
+	/**
+	 * @param params
+	 * @param observationInstance
+	 * @return
+	 * saving Groups, tags and resources
+	 */
+	def saveObservationAssociation(params, observationInstance){
+		def tags = (params.tags != null) ? Arrays.asList(params.tags) : new ArrayList();
+		observationInstance.setTags(tags);
+
+		if(params.groupsWithSharingNotAllowed) {
+			setUserGroups(observationInstance, [params.groupsWithSharingNotAllowed]);
+		} else {
+			if(params.userGroupsList) {
+				def userGroups = (params.userGroupsList != null) ? params.userGroupsList.split(',').collect{k->k} : new ArrayList();
+				setUserGroups(observationInstance, userGroups);
+			}
+		}
+		
+		log.debug "Saving ratings for the resources"
+		observationInstance?.resource?.each { res ->
+			if(res.rating) {
+				res.rate(springSecurityService.currentUser, res.rating);
+			}
 		}
 	}
 
@@ -426,7 +496,7 @@ class ObservationService {
 		}
 	}
 	
-	private Map getRecommendation(params){
+	Map getRecommendation(params){
 		def recoName = params.recoName;
 		def canName = params.canName;
 		def commonName = params.commonName;
@@ -871,7 +941,7 @@ class ObservationService {
         return pl
     }
 
-	private Date parseDate(date){
+	Date parseDate(date){
 		try {
 			return date? Date.parse("dd/MM/yyyy", date):new Date();
 		} catch (Exception e) {
