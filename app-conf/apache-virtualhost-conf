@@ -4,7 +4,6 @@
     ProxyPassReverse /geoserver http://saturn.strandls.com:8080/geoserver
     ServerName indiabiodiversity.localhost.org
     ServerAlias www.indiabiodiversity.localhost.org
-    DocumentRoot /home/sravanthi/species
     DirectoryIndex index.php index.html index.html index.htm index.shtml
     ScriptAlias /cgi-bin/ /usr/lib/cgi-bin/
 
