@@ -15,6 +15,7 @@ import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap;
 import org.springframework.transaction.annotation.Transactional;
 
 
+import species.License;
 import species.Reference;
 import species.Species;
 import species.Contributor;
@@ -72,7 +73,7 @@ class ChecklistService {
 		observationService.updateObservation(params, checklist)
 		
 		checklist.title =  params.title
-		//checklist.license =  params.license
+		checklist.license = License.findByName(params.license)  
 		checklist.refText =  params.refText
 		checklist.sourceText =  params.sourceText
 		checklist.rawChecklist =  params.rawChecklist
@@ -87,6 +88,7 @@ class ChecklistService {
 		}
 		
 		checklist.isChecklist = true
+		checklist.speciesCount = 0
 	}
 	
 	Map saveChecklist(params){
@@ -135,12 +137,13 @@ class ChecklistService {
 		
 		Checklists.withTransaction() {
 			int count = 0
+			params.sourceId = checklistInstance.id
 			params.checklistData.each { Map m ->
 				def res = observationService.saveObservation(params)
 				Observation observationInstance = res.observationInstance
 				observationInstance.sourceId = checklistInstance.id
 				saveReco(observationInstance, m)
-				saveObservationAnnotation(observationInstance, m)
+				saveObservationAnnotation(observationInstance, m, Arrays.asList(checklistInstance.fetchColumnNames()))
 				checklistInstance.addToObservations(observationInstance)
 				count++
 			}
@@ -168,10 +171,9 @@ class ChecklistService {
 		}
 	}
 	
-	private saveObservationAnnotation(obv, Map m){
-		int columnOrder = 0
+	private saveObservationAnnotation(obv, Map m, List columns){
 		m.each { k, v ->
-			observationService.addAnnotation(['key': k, 'value': v, 'columnOrder':columnOrder++, 'sourceType': Checklists.class.getCanonicalName()], obv)
+			observationService.addAnnotation(['key': k, 'value': v, 'columnOrder':columns.indexOf(k), 'sourceType': Checklists.class.getCanonicalName()], obv)
 		}
 		if(!obv.hasErrors() && obv.save(flush:true)) {
 			log.debug "saved observation meta data $obv"

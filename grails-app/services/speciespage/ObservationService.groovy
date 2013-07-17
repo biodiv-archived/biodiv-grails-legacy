@@ -118,6 +118,7 @@ class ObservationService {
 		observation.habitat = params.habitat?:Habitat.get(params.habitat_id);
 
 		observation.agreeTerms = (params.agreeTerms?.equals('on'))?true:false;
+		observation.sourceId = params.sourceId ?: null
 		
         GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), grailsApplication.config.speciesPortal.maps.SRID);
         if(params.latitude && params.longitude) {

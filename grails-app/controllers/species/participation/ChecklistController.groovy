@@ -1,6 +1,7 @@
 package species.participation
 
 import grails.converters.JSON
+import species.License;
 import species.groups.SpeciesGroup;
 import grails.plugins.springsecurity.Secured;
 
@@ -112,12 +113,16 @@ class ChecklistController {
 	@Secured(['ROLE_USER'])
 	def save = {
 		log.debug params;
+		params.checklistData = JSON.parse(params.checklistData)
+		params.checklistColumns = JSON.parse(params.checklistColumns)
+		
 		setDummyParams(params)
 		if(request.method == 'POST') {
 			saveAndRender(params)
 		} else {
 			redirect (url:uGroup.createLink(action:'create', controller:"checklist", 'userGroupWebaddress':params.webaddress))
 		}
+		
 	}
 
 	private saveAndRender(params){
@@ -132,21 +137,21 @@ class ChecklistController {
 	
 	private setDummyParams(params){
 		
-		params.group = params.group_id = 841 //params.group?:SpeciesGroup.get(params.group_id);
+		params.group_id = "841" //params.group?:SpeciesGroup.get(params.group_id);
 		params.placeName = "honey valley " 
 		params.location_accuracy = params.locationAccuracy  = "Accurate" 
 		
-		params.habitat = params.habitat_id = 267836;
+		params.habitat_id = "267836";
 		params.agreeTerms = 'on'
 		params.latitude = "" + 23.314
 		params.longitude = "" + 77.74
 		
 		params.title =  "cl title" 
-		//checklist.license =  params.license
+		params.license = License.LicenseType.CC_BY
 		params.refText =  "ref text " //params.refText
 		params.sourceText =  "source text " // params.sourceText
 		params.rawChecklist =  "checklist raw file" //params.rawChecklist
-		params.columnNames =  params.checklistColumns.collect { it.name }
+		params.columnNames =  params.checklistColumns.collect { it.name }.join("\t")
 		params.publicationDate =  null //params.publicationDate ? observationService.parseDate(params.publicationDate) : null
 		params.reservesValue =  null //params.reservesValue
 	}

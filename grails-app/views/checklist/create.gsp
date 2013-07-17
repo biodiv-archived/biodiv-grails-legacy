@@ -110,8 +110,8 @@ function requiredFieldValidator(value) {
 
 $(document).ready(function(){
 		$("#addObservationSubmit").click(function(event){
-		$("#checklist-column").val(JSON.stringify(grid.getColumns()))
-		$("#checklist-data").val(JSON.stringify(grid.getData()))
+		$("#checklistColumns").val(JSON.stringify(grid.getColumns()))
+		$("#checklistData").val(JSON.stringify(grid.getData()))
  		$("#addChecklist").submit();  
 	});
 });		
