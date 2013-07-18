@@ -1,0 +1,93 @@
+.btn-group.open .dropdown-menu {
+	top: 43px;
+}
+
+.group_option a {
+	text-align: left;
+	line-height:33px;
+}
+
+.btn-large .caret {
+	margin-top: 15px;
+	position: absolute;
+	right: 10px;
+}
+
+.btn-group .btn-large.dropdown-toggle {
+	width: 300px;
+	height:44px;
+	text-align: left;
+	line-height:33px;
+	padding:5px;
+}
+
+.textbox input{
+	text-align: left;
+	/*width: 290px;*/
+	height:34px;
+	padding:5px;
+}
+
+.form-horizontal .control-label {
+	padding-top: 15px;
+}
+
+.block {
+	border-radius: 5px;
+	background-color: #a6dfc8; 
+	margin: 0px;
+}
+
+.block label {
+	float: left; 
+	text-align: left; 
+	padding: 10px; 
+	width: auto;
+}
+
+.block small{
+    color: #444444;
+}
+
+#help-identify {
+	height: 0;
+    left: 139px;
+    padding: 0;
+    position: relative;
+    top: -25px;
+}
+
+.left-indent {
+	margin-left:100px;
+}
+
+.control-group.error  .help-inline {
+    padding-top : 15px;
+    font-size:14px;
+    display:block;
+}
+
+.cke_skin_kama .cke_editor {
+display: table !important;
+}
+
+input.dms_field {
+	width: 15%;
+	display: none;       
+}
+.btn .combobox-clear {
+    margin-top: 12px;
+}
+#ui-datepicker-div {
+	width: 16%;
+}
+
+.observation_create .super-section {
+	margin-left:0px;
+}
+.sidebar-section {
+	width: 450px;
+	margin: 0px 0px 20px -10px;
+	float: right;
+}
+

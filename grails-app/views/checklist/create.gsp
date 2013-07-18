@@ -87,7 +87,7 @@
                         <div class="btn btn-danger"
                             style="float: right; margin-right: 5px;">
                             <a
-                                href="${uGroup.createLink(controller:'observation', action:'flagDeleted', id:observationInstance.id)}"
+                                href="${uGroup.createLink(controller:'checklist', action:'flagDeleted', id:observationInstance.id)}"
                                 onclick="return confirm('${message(code: 'default.observatoin.delete.confirm.message', default: 'This observation will be deleted. Are you sure ?')}');">Delete
                                 Observation </a>
                         </div>
