@@ -28,7 +28,7 @@ if(r) {
 }
 	
 String location = "Observed at '" + (observationInstance.placeName.trim()?:observationInstance.reverseGeocodedName) +"'"
-String desc = "- "+ location +" by "+observationInstance.author.name.capitalize()+" in species group "+observationInstance.group.name + " and habitat "+ observationInstance.habitat.name;
+String desc = "- "+ location +" by "+observationInstance.author.name.capitalize()+" on "+observationInstance.fromDate.format('dd/MM/yyyy');
 %>
 <g:set var="description" value="${Utils.stripHTML(observationInstance.notes?observationInstance.notes+' '+desc:desc)?:'' }" />
 
