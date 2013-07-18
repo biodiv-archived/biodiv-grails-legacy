@@ -1,5 +1,6 @@
 <%@page import="species.utils.ImageType"%>
 <%@page import="species.utils.Utils"%>
+<%@page import="species.utils.ImageUtils"%>
 <%@ page import="species.participation.Observation"%>
 <%@ page import="species.participation.Recommendation"%>
 <%@ page import="species.participation.RecommendationVote"%>
@@ -15,7 +16,7 @@
 def r = observationInstance.mainImage();
 def imagePath = '', videoPath='';
 if(r) {
-    def gThumbnail = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.gallery.suffix)?:null;
+    def gThumbnail = ImageUtils.getFileName(r.fileName.trim(),ImageType.LARGE)?:null;
     if(r && gThumbnail) {
             if(r.type == ResourceType.IMAGE) {
                     imagePath = g.createLinkTo(base:grailsApplication.config.speciesPortal.observations.serverURL, file: gThumbnail)
@@ -117,8 +118,8 @@ String desc = "- "+ location +" by "+observationInstance.author.name.capitalize(
 						<g:if test="${observationInstance.resource}">
 							<g:each in="${observationInstance.listResourcesByRating()}" var="r">
 								<g:if test="${r.type == ResourceType.IMAGE}">
-								<%def gallImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.gallery.suffix)%>
-								<%def gallThumbImagePath = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.galleryThumbnail.suffix)%>
+								<%def gallImagePath = ImageUtils.getFileName(r.fileName.trim(), ImageType.LARGE)%>
+								<%def gallThumbImagePath = ImageUtils.getFileName(r.fileName.trim(), ImageType.SMALL)%>
 								<a target="_blank"
 									rel="${createLinkTo(file: r.fileName.trim(), base:grailsApplication.config.speciesPortal.observations.serverURL)}"
 									href="${createLinkTo(file: gallImagePath, base:grailsApplication.config.speciesPortal.observations.serverURL)}">

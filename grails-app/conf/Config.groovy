@@ -245,9 +245,7 @@ speciesPortal {
 		serverURL = "http://localhost/${appName}/observations"
 		//serverURL = "http://localhost/${appName}/observations"
 		MAX_IMAGE_SIZE = 104857600
-        filePicker = {
-            key = 'AXCVl73JWSwe7mTPb2kXdz'
-        }
+        filePicker.key = 'AXCVl73JWSwe7mTPb2kXdz'
 	} 
 	 userGroups {
 		rootDir = "${app.rootDir}/userGroups"
