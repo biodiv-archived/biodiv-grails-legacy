@@ -234,12 +234,11 @@ String desc = "- "+ location +" by "+observationInstance.author.name.capitalize(
 									model="['observationInstance':observationInstance, 'observationId': observationInstance.id, 'controller':'userGroup', 'action':'getRelatedUserGroups', 'filterProperty': 'obvRelatedUserGroups', 'id':'relatedGroups']" /-->
 						</div>
 					</g:if>
-					<g:set var="annotations" value="${observationInstance.fetchChecklistAnnotation()}"/>
 					<g:if test="${observationInstance.annotations?.size() > 0}">
 						<div class="sidebar_section">
 							<h5>Annotations</h5>
 							<div class="tile" style="clear: both">
-								<obv:showAnnotation model="[annotations:annotations]" />
+								<obv:showAnnotation model="[annotations:observationInstance.annotations]" />
 							</div>
 						</div>	
 					</g:if>
