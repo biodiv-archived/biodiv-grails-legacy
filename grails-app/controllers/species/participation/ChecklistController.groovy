@@ -137,14 +137,14 @@ class ChecklistController {
 	
 	private setDummyParams(params){
 		
-		params.group_id = "841" //params.group?:SpeciesGroup.get(params.group_id);
-		params.placeName = "honey valley " 
-		params.location_accuracy = params.locationAccuracy  = "Accurate" 
+		//params.group_id = "841" //params.group?:SpeciesGroup.get(params.group_id);
+		//params.placeName = "honey valley " 
+		//params.location_accuracy = params.locationAccuracy  = "Accurate" 
 		
-		params.habitat_id = "267836";
-		params.agreeTerms = 'on'
-		params.latitude = "" + 23.314
-		params.longitude = "" + 77.74
+		//params.habitat_id = "267836";
+		//params.agreeTerms = 'on'
+		//params.latitude = "" + 23.314
+		//params.longitude = "" + 77.74
 		
 		params.title =  "cl title" 
 		params.license = License.LicenseType.CC_BY

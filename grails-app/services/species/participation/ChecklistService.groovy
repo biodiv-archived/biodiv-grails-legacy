@@ -57,6 +57,7 @@ class ChecklistService {
 	def obvUtilService;
 	def springSecurityService;
 	def activityFeedService;
+	def observationsSearchService
 	
 	///////////////////////////////////////////////////////////////////////////////
 	////////////////////////////// Create ///////////////////////////////
@@ -118,6 +119,7 @@ class ChecklistService {
 //					observationService.sendNotificationMail(OBSERVATION_ADDED, checklistInstance, null, params.webaddress);
 				
 				saveObservationFromChecklist(params, checklistInstance)
+				observationsSearchService.publishSearchIndex(checklistInstance, true);
 					
 				return ['success' : true, checklistInstance:checklistInstance]
 			} else {
@@ -137,19 +139,33 @@ class ChecklistService {
 		
 		Checklists.withTransaction() {
 			int count = 0
-			params.sourceId = checklistInstance.id
+			def obsParams = getParamsForObv(params, checklistInstance)
+			
 			params.checklistData.each { Map m ->
-				def res = observationService.saveObservation(params)
+				def res = observationService.saveObservation(obsParams)
 				Observation observationInstance = res.observationInstance
-				observationInstance.sourceId = checklistInstance.id
 				saveReco(observationInstance, m)
 				saveObservationAnnotation(observationInstance, m, Arrays.asList(checklistInstance.fetchColumnNames()))
 				checklistInstance.addToObservations(observationInstance)
 				count++
 			}
-			checklistInstance.speciesCount = count 
+			checklistInstance.speciesCount = count
 		}
 		log.debug "saved checklist observation  "
+	}
+	
+	private Map getParamsForObv(params, checklistInstance){
+		Map obvParams = new HashMap(params)
+		obvParams.sourceId = checklistInstance.id
+		
+		obvParams.remove("checklistData")
+		obvParams.remove("checklistColumns")
+		
+		obvParams.remove("tags")
+		obvParams.remove("userGroupsList")
+		obvParams.remove("groupsWithSharingNotAllowed")
+		
+		return obvParams
 	}
 	
 	private saveReco(Observation obv, Map m){
@@ -228,30 +244,7 @@ class ChecklistService {
 		}
 
 		SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-		//		if(params.daterangepicker_start && params.daterangepicker_end) {
-		//			if(i > 0) aq += " AND";
-		//			String lastRevisedStartDate = dateFormatter.format(DateUtil.parseDate(params.daterangepicker_start, ['dd/MM/yyyy']));
-		//			String lastRevisedEndDate = dateFormatter.format(DateUtil.parseDate(params.daterangepicker_end, ['dd/MM/yyyy']));
-		//			aq += " fromdate:["+lastRevisedStartDate+" TO *] AND todate:[* TO "+lastRevisedEndDate+"]";
-		//			queryParams['daterangepicker_start'] = params.daterangepicker_start;
-		//			queryParams['daterangepicker_end'] = params.daterangepicker_end;
-		//			activeFilters['daterangepicker_start'] = params.daterangepicker_start;
-		//			activeFilters['daterangepicker_end'] = params.daterangepicker_end;
-		//
-		//		} else if(params.daterangepicker_start) {
-		//			if(i > 0) aq += " AND";
-		//			String lastRevisedStartDate = dateFormatter.format(DateTools.dateToString(DateUtil.parseDate(params.daterangepicker_start, ['dd/MM/yyyy']), DateTools.Resolution.DAY));
-		//			aq += " fromdate:["+lastRevisedStartDate+" TO NOW]";
-		//			queryParams['daterangepicker_start'] = params.daterangepicker_start;
-		//			activeFilters['daterangepicker_start'] = params.daterangepicker_endparams.daterangepicker_end;
-		//		} else if (params.daterangepicker_end) {
-		//			if(i > 0) aq += " AND";
-		//			String lastRevisedEndDate = dateFormatter.format(DateTools.dateToString(DateUtil.parseDate(params.daterangepicker_end, ['dd/MM/yyyy']), DateTools.Resolution.DAY));
-		//			aq += " todate:[NOW TO "+lastRevisedEndDate+"]";
-		//			queryParams['daterangepicker_end'] = params.daterangepicker_end;
-		//			activeFilters['daterangepicker_end'] = params.daterangepicker_end;
-		//		}
-		//
+
 		if(params.query && aq) {
 			params.query = params.query + " AND "+aq
 		} else if (aq) {
