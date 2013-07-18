@@ -21,14 +21,14 @@ alias rs=_run-script
 _dropdb () {  
     dropdb -Upostgres bhutanbiodiv;
 }
-alias dropdb=_dropdb
+alias dropdatabase=_dropdb
 _createdb () {  
     createdb -Upostgres bhutanbiodiv;
     psql -Upostgres -d bhutanbiodiv -f /usr/share/postgresql/9.1/contrib/postgis-1.5/postgis.sql;
     psql -Upostgres -d bhutanbiodiv -f /usr/share/postgresql/9.1/contrib/postgis-1.5/spatial_ref_sys.sql;
 }
-alias createdb=_createdb
+alias createdatabase=_createdb
 export GRAILS_OPTS="-XX:MaxPermSize=256m -Xmx1024M"
-#
-#
-#
+
+
+
