@@ -915,10 +915,11 @@ class ObservationService {
 	}
 	
 	Map getIdentificationEmailInfo(m, requestObj, unsubscribeUrl, controller="", action=""){
+	println "in fn"
 		def source = m.source;
 		def mailSubject = ""
 		def activitySource = ""
-		
+		println source
         switch (source) {
 			case "observationShow":
 				mailSubject = "Share Observation"
@@ -953,7 +954,10 @@ class ObservationService {
 		def currentUser = springSecurityService.currentUser?:""
 		def templateMap = [currentUser:currentUser, activitySource:activitySource, domain:Utils.getDomainName(requestObj)]
 		def conf = SpringSecurityUtils.securityConfig
+		println conf
 		def staticMessage = conf.ui.askIdentification.staticMessage
+		println staticMessage
+		println templateMap
 		if (staticMessage.contains('$')) {
 			staticMessage = evaluate(staticMessage, templateMap)
 		} 
@@ -961,10 +965,14 @@ class ObservationService {
 		templateMap["activitySourceUrl"] = m.sourcePageUrl?: ""
 		templateMap["unsubscribeUrl"] = unsubscribeUrl ?: ""
 		templateMap["userMessage"] = m.userMessage?: ""
+//println "***********************"+templateMap 
 		def body = conf.ui.askIdentification.emailBody
+
+//println "***********************"+body 
 		if (body.contains('$')) {
 			body = evaluate(body, templateMap)
 		}
+//println "***********************"+templateMap 
 		return [mailSubject:mailSubject, mailBody:body, staticMessage:staticMessage, source:source]
 	}
 
