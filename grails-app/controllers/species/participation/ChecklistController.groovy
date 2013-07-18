@@ -1,6 +1,7 @@
 package species.participation
 
 import grails.converters.JSON
+import species.License;
 import species.groups.SpeciesGroup;
 import grails.plugins.springsecurity.Secured;
 
@@ -112,73 +113,49 @@ class ChecklistController {
 	@Secured(['ROLE_USER'])
 	def save = {
 		log.debug params;
-		render "            $params"
-		/*
+		params.checklistData = JSON.parse(params.checklistData)
+		params.checklistColumns = JSON.parse(params.checklistColumns)
+		
+		setDummyParams(params)
 		if(request.method == 'POST') {
-			//TODO:edit also calls here...handle that wrt other domain objects
-
-			params.author = springSecurityService.currentUser;
-			def observationInstance;
-			try {
-				observationInstance =  observationService.createObservation(params);
-
-				if(!observationInstance.hasErrors() && observationInstance.save(flush:true)) {
-					//flash.message = "${message(code: 'default.created.message', args: [message(code: 'observation.label', default: 'Observation'), observationInstance.id])}"
-					log.debug "Successfully created observation : "+observationInstance
-					params.obvId = observationInstance.id
-					activityFeedService.addActivityFeed(observationInstance, null, observationInstance.author, activityFeedService.OBSERVATION_CREATED);
-					
-					def tags = (params.tags != null) ? Arrays.asList(params.tags) : new ArrayList();
-					observationInstance.setTags(tags);
-
-					if(params.groupsWithSharingNotAllowed) {
-						observationService.setUserGroups(observationInstance, [params.groupsWithSharingNotAllowed]);
-					} else {
-						if(params.userGroupsList) {
-							def userGroups = (params.userGroupsList != null) ? params.userGroupsList.split(',').collect{k->k} : new ArrayList();
-							
-							observationService.setUserGroups(observationInstance, userGroups);
-						}
-					}
-					
-					log.debug "Saving ratings for the resources"
-					observationInstance.resource.each { res ->
-						if(res.rating) {
-							res.rate(springSecurityService.currentUser, res.rating);
-						}
-					}
-						
-					
-					observationService.sendNotificationMail(observationService.OBSERVATION_ADDED, observationInstance, request, params.webaddress);
-					params["createNew"] = true
-					chain(action: 'addRecommendationVote', model:['chainedParams':params]);
-				} else {
-					observationInstance.errors.allErrors.each { log.error it }
-					if(params["isMobileApp"]?.toBoolean()){
-						render (['error:true']as JSON);
-						return
-					}else{
-						render(view: "create", model: [observationInstance: observationInstance, saveParams:params, lastCreatedObv:null])
-					}
-				}
-			} catch(e) {
-				e.printStackTrace();
-				if(params["isMobileApp"]?.toBoolean()){
-					render (['error:true']as JSON);
-					return
-				}else{
-					flash.message = "${message(code: 'error')}";
-					render(view: "create", model: [observationInstance: observationInstance, lastCreatedObv:null])
-				}
-			}
+			saveAndRender(params)
 		} else {
-			redirect (url:uGroup.createLink(action:'create', controller:"observation", 'userGroupWebaddress':params.webaddress))
-			//redirect(action: "create")
+			redirect (url:uGroup.createLink(action:'create', controller:"checklist", 'userGroupWebaddress':params.webaddress))
 		}
-		*/
+		
+	}
+
+	private saveAndRender(params){
+		def result = checklistService.saveChecklist(params)
+		if(result.success){
+			redirect (url:uGroup.createLink(action:'show', controller:"checklist", id:result.checklistInstance.id, 'userGroupWebaddress':params.webaddress, postToFB:(params.postToFB?:false)))
+		}else{
+			//flash.message = "${message(code: 'error')}";
+			render(view: "create", model: [checklistInstance: result.checklistInstance])
+		}
 	}
 	
-	
+	private setDummyParams(params){
+		
+		params.group_id = "841" //params.group?:SpeciesGroup.get(params.group_id);
+		params.placeName = "honey valley " 
+		params.location_accuracy = params.locationAccuracy  = "Accurate" 
+		
+		params.habitat_id = "267836";
+		params.agreeTerms = 'on'
+		params.latitude = "" + 23.314
+		params.longitude = "" + 77.74
+		
+		params.title =  "cl title" 
+		params.license = License.LicenseType.CC_BY
+		params.refText =  "ref text " //params.refText
+		params.sourceText =  "source text " // params.sourceText
+		params.rawChecklist =  "checklist raw file" //params.rawChecklist
+		params.columnNames =  params.checklistColumns.collect { it.name }.join("\t")
+		params.publicationDate =  null //params.publicationDate ? observationService.parseDate(params.publicationDate) : null
+		params.reservesValue =  null //params.reservesValue
+	}
+		
 	///////////////////////////////////////////////////////////////////////////////
 	////////////////////////////// SEARCH /////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////

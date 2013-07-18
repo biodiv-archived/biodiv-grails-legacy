@@ -46,11 +46,6 @@ class Checklists extends Observation {
 	//others
 	String reservesValue;
 	
-	//will map to last revised in observation
-	//Date lastUpdated; 
-	//will map to notes in observation
-	//String description; //info;
-	
 	static hasMany = [observations:Observation, contributors:SUser, attributions:Contributor, states : String, districts:String, talukas: String]
 	
 	static constraints = {

@@ -74,9 +74,9 @@ class MappedSpreadsheetConverter extends SourceConverter {
 					Node category = new Node(field, "category", mappedField.get("category"));
 					Node subcategory = new Node(field, "subcategory", mappedField.get("subcategory"));
 					if (customFormat && mappedField.get("category")?.equalsIgnoreCase("images")) {
-						Node images = getImages(imagesMetaData, fieldName, 'images', customFormat, delimiter, speciesContent, speciesElement);
+						Node images = getImages(imagesMetaData, fieldName, 'images', customFormat, delimiter, speciesContent, speciesElement, imagesDir);
 					} else if (customFormat && category.text().equalsIgnoreCase("icons")) {
-						Node icons = getImages(imagesMetaData, fieldName, 'icons', customFormat, delimiter, speciesContent, speciesElement);
+						Node icons = getImages(imagesMetaData, fieldName, 'icons', customFormat, delimiter, speciesContent, speciesElement, imagesDir);
 					} else if (customFormat && category.text().equalsIgnoreCase("audio")) {
 						//						Node images = getAudio(fieldName, customFormat, speciesContent);
 						//						new Node(speciesElement, audio);

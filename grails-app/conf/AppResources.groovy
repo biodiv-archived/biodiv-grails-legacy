@@ -126,6 +126,8 @@ modules = {
 		dependsOn 'observations'
 
 		resource url:'/js/jquery/jquery.exif.js'
+		resource url:'/js/species/observations/create.js'
+		resource url:'/css/create.css'
 	}
 
 	observations_list { 
@@ -243,8 +245,6 @@ modules = {
 	checklist {
 		dependsOn 'core, location_utils, list_utils, tagit, comment, activityfeed'
 		
-		resource url:'/css/main.css'
-		
 		resource url:'/js/species/observations/list.js'
 		resource url:'/js/species/checklist.js'
 	}
@@ -264,7 +264,6 @@ modules = {
 	add_file {
 		dependsOn 'core, tagit, list_utils'
 		
-		resource url:'/css/main.css'
 		resource url:'/css/content.css'
 		resource url:'/js/content.js'
 		resource url:'/css/location_picker.css'

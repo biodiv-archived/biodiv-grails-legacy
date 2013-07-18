@@ -121,8 +121,6 @@ class Observation extends Metadata implements Taggable, Rateable {
 		searchText type:'text'
 		autoTimestamp false
 		tablePerHierarchy false
-		//XXX uncomment this only for metachecklist migration to reatain id in old url
-		//id generator:'assigned'
 	}
 
 	/**
@@ -358,6 +356,7 @@ class Observation extends Metadata implements Taggable, Rateable {
 	
 	def afterDelete(){
 		activityFeedService.deleteFeed(this)
+        //TODO:delete follow links
 	}
 	
 	def Map fetchExportableValue(){
