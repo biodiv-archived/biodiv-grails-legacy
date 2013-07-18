@@ -358,6 +358,7 @@ class Observation extends Metadata implements Taggable, Rateable {
 	
 	def afterDelete(){
 		activityFeedService.deleteFeed(this)
+        //TODO:delete follow links
 	}
 	
 	def Map fetchExportableValue(){
