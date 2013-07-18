@@ -202,7 +202,7 @@ speciesPortal {
     app.favicon = "logo/favicon.ico"
     app.siteDescription = "Welcome to the Bhutan Biodiversity Portal (BBP) - A repository of information designed to harness and disseminate collective intelligence on the biodiversity of Bhutan."
 
-	app.rootDir = "${userHome}/git/bhutanbiodiv/app-conf"
+	app.rootDir = "${userHome}/git/${appName}/app-conf"
 	data.rootDir = "${app.rootDir}/data"
 	download.rootDir = "${data.rootDir}/datarep/downloads"
  

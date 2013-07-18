@@ -20,7 +20,7 @@
     RewriteRule ^/bhutanbiodiv/(.*)$ /$1 [R=301,L]
     ProxyPassReverse / http://bhutanbiodiversity.localhost.org:8080/bhutanbiodiv/
 
-#    RewriteCond %{REQUEST_URI} ^/(species|observation|activity|activityFeed|SUser|user|page|pages|requestMembership|joinUs|leaveUs|inviteMembers|login|logout|register|static|group|j_spring_security_logout|recommendation|comment|newsletter|emailConfirmation|search|checklist|jcaptcha|openId|data|chart|admin|curation|resource|rateable|rating|document|project|UFile|direction|biodivAdmin).*
+#    RewriteCond %{REQUEST_URI} ^/(species|observation|activity|activityFeed|SUser|user|page|pages|requestMembership|joinUs|leaveUs|inviteMembers|login|logout|register|static|group|j_spring_security_logout|recommendation|comment|newsletter|emailConfirmation|search|checklist|jcaptcha|openId|data|chart|admin|curation|resource|rateable|rating|document|project|UFile|direction|bhutanbiodivAdmin).*
     RewriteCond %{REQUEST_URI} ^/.*
     RewriteCond %{REQUEST_URI} !(^(/(bhutanbiodiv|logo/)))
     RewriteRule ^(.*)$ http://bhutanbiodiversity.localhost.org:8080/bhutanbiodiv$1 [P,L]
