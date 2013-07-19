@@ -41,13 +41,13 @@ class SpreadsheetConverter extends SourceConverter {
 		return _instance;
 	}
 
-	public List<Species> convertSpecies(String file, int contentSheetNo, int contentHeaderRowNo, int imageMetadataSheetNo, int imageMetaDataHeaderRowNo) {
+	public List<Species> convertSpecies(String file, int contentSheetNo, int contentHeaderRowNo, int imageMetadataSheetNo, int imageMetaDataHeaderRowNo, String imagesDir="") {
 		List<Map> content = SpreadsheetReader.readSpreadSheet(file, contentSheetNo, contentHeaderRowNo);
 		List<Map> imageMetaData = SpreadsheetReader.readSpreadSheet(file, imageMetadataSheetNo, imageMetaDataHeaderRowNo);
-		convertSpecies(content, imageMetaData);
+		convertSpecies(content, imagesDir, imageMetaData);
 	}
 
-	public List<Species> convertSpecies(List<Map> content, List<Map> imageMetaData) {
+	public List<Species> convertSpecies(List<Map> content, List<Map> imageMetaData, String imagesDir="") {
 
 		List<Species> species = new ArrayList<Species>();
 
@@ -80,7 +80,7 @@ class SpreadsheetConverter extends SourceConverter {
 				createDataNode(field, getDescription(row), row);
 			}
 		}
-		createImages(speciesElement, imageMetaData);
+		createImages(speciesElement, imageMetaData, imagesDir);
 
 		XMLConverter converter = new XMLConverter();
 		Species s = converter.convertSpecies(speciesElement)
@@ -97,92 +97,12 @@ class SpreadsheetConverter extends SourceConverter {
 		return data;
 	}
 
-	private void attachMetadata(Node data, Map speciesContent, Map mappedField) {
-
-		String contributorField = "contributor";
-		if(contributorField) {
-			String contributors = speciesContent.get(contributorField.toLowerCase())
-			String delimiter = mappedField.get("content delimiter") ?: "\n";
-			contributors.split(delimiter).each {
-				new Node(data, "contributor", it);
-			}
-		}
-
-		//		String attributionField = "attribution";
-		//		if(attributionField) {
-		//			String attribution = speciesContent.get(attributionField.toLowerCase())
-		//			String delimiter = mappedField.get("content delimiter") ?: "\n";
-		//			attribution.split(delimiter).each {
-		//				new Node(data, "attribution", it);
-		//			}
-		//		}
-
-		String licenseField = "license";
-		if(licenseField) {
-			String licenses = speciesContent.get(licenseField.toLowerCase());
-			String delimiter = mappedField.get("content delimiter") ?: ",|;|\n";
-			licenses.split(delimiter).each {
-				new Node(data, "license", it);
-			}
-		}
-
-		String audienceTypeField = "audience";
-		if(audienceTypeField) {
-			String audience = speciesContent.get(audienceTypeField.toLowerCase());
-			String delimiter = mappedField.get("content delimiter") ?: ",|;|\n";
-			audience.split(delimiter).each {
-				new Node(data, "audienceType", it);
-			}
-		}
-
-		createReferences(data, speciesContent);
-
-		String imagesField = "images";
-		if(imagesField) {
-			String images = speciesContent.get(imagesField.toLowerCase());
-			if(images) {
-				def imagesNode = new Node(data, "images");
-				images.split(",").each { imageField ->
-					new Node(imagesNode, "image", imageField);
-				}
-			}
-		}
-
-		String iconsField = "icons";
-		if(iconsField) {
-			String icons = speciesContent.get(iconsField.toLowerCase());
-			if(icons) {
-				def iconsNode = new Node(data, "icons");
-				icons.split(",").each { iconField ->
-					new Node(iconsNode, "icon", iconField.trim());
-				}
-			}
-		}
-	}
-
 	private String getDescription(Map row) {
 		return row.get("entries")?:"";
 	}
 
-	private void createImages(Node speciesElement, List<Map> imageMetaData) {
-		Node images = new Node(speciesElement, "images");
-		def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
-		String uploadDir = config.speciesPortal.images.uploadDir;
-		imageMetaData.each{ imageData ->
-			Node image = new Node(images, "image");
-			String refKey = imageData.get("imageno.");
-			File file = new File(uploadDir, refKey);
-			new Node(image, "refKey", refKey);
-			new Node(image, "fileName", file.getAbsolutePath());
-			new Node(image, "source", imageData.get("source"));
-			new Node(image, "caption", imageData.get("possiblecaption"));
-			new Node(image, "attribution", imageData.get("attribution"));
-			new Node(image, "license", imageData.get("license"));
-		}
-	}
-
 	private void createReferences(Node data, Map map) {
-		List<String> attrs = getAttributionsList(map);
+		List<String> attrs = getAttributionsList(map.get("attribution"));
 		String refs = map.get("reference url");
 		if(refs && !refs.equals("")) {
 			int i=0;
@@ -221,69 +141,5 @@ class SpreadsheetConverter extends SourceConverter {
 
 	private void createAttributions(Node data, Map map) {
 
-	}
-
-	private void createSynonyms(Node field, String text, Map speciesContent, Map relationshipsRow) {
-		String[] relationships = getDescription(relationshipsRow)?.split("\\\n");
-		if(text && !text.equals("")) {
-			text.split("\\\n").eachWithIndex { syn, index ->
-				Node dataNode = createDataNode(field, syn, speciesContent)
-				if(relationships && index < relationships.length) {
-					new Node(dataNode, "relationship", relationships[index]);
-				}
-			}
-		}
-	}
-
-	private void createCommonNames(Node field, String text, Map speciesContent) {
-		if(text && !text.equals("")) {
-			text.split("\\\n").each { 
-				def commonNames = it.split(":", 2);
-				if(commonNames.length == 2) {
-					commonNames[1].split(",|;").each {
-						Node data = createDataNode(field, it.replaceAll('"', ''), speciesContent);
-						if(data)
-							createLanguage(data, commonNames[0]);
-					}
-				} else {
-					commonNames[0].split(",|;").each {
-						createDataNode(field, it, speciesContent);
-					}
-				}
-			}
-		}
-	}
-	private void createLanguage(Node dataNode, String s) {
-		if(!s || s.equals("")) return null; //|| !s.trim().matches(".+\\(.+\\)")
-		String[] str = s.split("\\(|\\)");
-		
-		Node langNode = new Node(dataNode, "language");
-		if(str.length >1) {
-			new Node(langNode, "threeLetterCode", str[1]?.trim());
-		}
-		new Node(langNode, "name", str[0]?.trim())
-	}
-
-
-	private void createCountryGeoEntity(Node field, String text, Map speciesContent) {
-		if(text) {
-			text.split("\\\n").each {
-				it = it.split("-", 2);
-				String[] codes = it[0].split(',');
-				String countryName = it[1];
-				if(codes[0] && codes[1] && codes[2] && countryName) {
-					countryName = countryName.replaceAll('"', '').trim();
-
-					Node dataNode = createDataNode(field, "", speciesContent)
-					if(dataNode) {
-						Node country = new Node(dataNode, "country");
-						new Node(country, "name", countryName);
-						new Node(country, "twoLetterCode", codes[0]);
-						new Node(country, "threeLetterCode", codes[1]);
-						new Node(country, "threeDigitCode", Integer.parseInt(codes[2].trim()));
-					}
-				}
-			}
-		}
 	}
 }

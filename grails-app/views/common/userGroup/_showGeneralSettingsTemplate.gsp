@@ -8,18 +8,18 @@
 					<button id="homePageSelector" class="btn dropdown-toggle"
 						data-toggle="dropdown" href="#" rel="tooltip"
 						data-original-title="Home page">
-						${userGroupInstance.fetchHomePageTitle() ?: 'Select home page '}<span
+                                                ${userGroupInstance?.fetchHomePageTitle() ?: 'Select home page '}<span
 							class="caret"></span>
 					</button>
 					<ul class="dropdown-menu" style="width: auto;">
 						<li class="group_option"><a class=" home_page_label"
-							value="${uGroup.createLink(mapping:'userGroup', action:'about', params:['webaddress':userGroupInstance?.webaddress])}">
-								${uGroup.createLink(mapping:'userGroup', action:'about', params:['webaddress':userGroupInstance?.webaddress])}
+							value="${uGroup.createLink(controller:'userGroup', action:'about', 'userGroup':userGroupInstance)}">
+								${uGroup.createLink(controller:'userGroup', action:'about', 'userGroup':userGroupInstance)}
 						</a>
 						</li>
 						<li class="group_option"><a class=" home_page_label"
-							value="${uGroup.createLink(mapping:'userGroup', action:'activity', params:['webaddress':userGroupInstance?.webaddress])}">
-								${uGroup.createLink(mapping:'userGroup', action:'activity', params:['webaddress':userGroupInstance?.webaddress])}
+							value="${uGroup.createLink(controller:'userGroup', action:'activity', 'userGroup':userGroupInstance)}">
+								${uGroup.createLink(controller:'userGroup', action:'activity', 'userGroup':userGroupInstance)}
 						</a>
 						</li>
 						<li class="divider"></li>

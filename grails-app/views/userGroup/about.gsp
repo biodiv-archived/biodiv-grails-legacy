@@ -24,7 +24,7 @@
 					<a class="btn btn-info pull-right"
 						href="${uGroup.createLink(mapping:'userGroup', action:'edit', userGroup:userGroupInstance)}">
 						<i class="icon-edit"></i>Edit Group </a>
-					<!-- a class="btn btn-large btn-primary" href="${uGroup.createLink(mapping:'userGroup', action:'settings', userGroup:userGroupInstance)}"><i class="icon-cog"></i>Settings</a-->
+					<!-- a class="btn btn-primary" href="${uGroup.createLink(mapping:'userGroup', action:'settings', userGroup:userGroupInstance)}"><i class="icon-cog"></i>Settings</a-->
 				</sec:permitted>
 
 			</div>

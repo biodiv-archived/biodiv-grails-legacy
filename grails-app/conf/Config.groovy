@@ -200,14 +200,17 @@ else {
 
 speciesPortal {
     app.siteName = "India Biodiversity Portal"
-    app.logo = "logo/logo.gif"
-    app.favicon = "logo/favicon.ico"
     app.siteDescription = "Welcome to the India Biodiversity Portal (IBP) - A repository of information designed to harness and disseminate collective intelligence on the biodiversity of the Indian subcontinent."
 
 	app.rootDir = "${userHome}/git/biodiv/app-conf"
 	data.rootDir = "${app.rootDir}/data"
 	download.rootDir = "${data.rootDir}/datarep/downloads"
-	
+ 
+    app.logo = "logo/IBP.png"
+    app.favicon = "logo/favicon.png"
+   
+    app.notifiers_bcc = ["prabha.prabhakar@gmail.com", "sravanthi@strandls.com", "thomas.vee@gmail.com", "sandeept@strandls.com", "balachandert@gmail.com"]
+
 	species {
 		speciesDownloadDir = "${download.rootDir}/species"
 	}
@@ -242,6 +245,7 @@ speciesPortal {
 		serverURL = "http://localhost/${appName}/observations"
 		//serverURL = "http://localhost/${appName}/observations"
 		MAX_IMAGE_SIZE = 104857600
+        filePicker.key = 'AXCVl73JWSwe7mTPb2kXdz'
 	} 
 	 userGroups {
 		rootDir = "${app.rootDir}/userGroups"
@@ -459,7 +463,7 @@ environments {
 		grails.serverURL = "http://bhutanbiodiversity.localhost.org/${appName}"
 		speciesPortal {
 			search.serverURL = "http://localhost:8090/solr"
-			names.parser.serverURL = "saturn.strandls.com"
+			names.parser.serverURL = "127.0.0.1"
 			wgp {
 				facebook {
 					appId= "424071494335902"

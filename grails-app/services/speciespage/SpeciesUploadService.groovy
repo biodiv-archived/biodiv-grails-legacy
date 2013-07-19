@@ -145,7 +145,6 @@ class SpeciesUploadService {
 		return noOfInsertions;
 	}
 
-
 	/**
 	 * 
 	 * @param file
@@ -156,7 +155,7 @@ class SpeciesUploadService {
 	 * @param contentHeaderRowNo
 	 * @return
 	 */
-	int uploadMappedSpreadsheet (String file, String mappingFile, int mappingSheetNo, int mappingHeaderRowNo, int contentSheetNo, int contentHeaderRowNo, int imageMetaDataSheetNo = -1) {
+	int uploadMappedSpreadsheet (String file, String mappingFile, int mappingSheetNo, int mappingHeaderRowNo, int contentSheetNo, int contentHeaderRowNo, int imageMetaDataSheetNo = -1, String imagesDir="") {
         log.info "Uploading mapped spreadsheet : "+file;
 
 		List<Species> species = new ArrayList<Species>();
@@ -170,7 +169,7 @@ class SpeciesUploadService {
 			converter.imagesMetaData = SpreadsheetReader.readSpreadSheet(file, imageMetaDataSheetNo, 0);
 		}
 
-		return saveSpecies(converter, content);
+		return saveSpecies(converter, content, imagesDir);
 	}
 
 	/**
@@ -182,9 +181,9 @@ class SpeciesUploadService {
 	 * @param imageMetaDataHeaderRowNo
 	 * @return
 	 */
-	int uploadSpreadsheet (String file, int contentSheetNo, int contentHeaderRowNo, int imageMetadataSheetNo, int imageMetaDataHeaderRowNo) {
+	int uploadSpreadsheet (String file, int contentSheetNo, int contentHeaderRowNo, int imageMetadataSheetNo, int imageMetaDataHeaderRowNo, String imagesDir="") {
 		log.info "Uploading spreadsheet : "+file;
-		List<Species> species = SpreadsheetConverter.getInstance().convertSpecies(file, contentSheetNo, contentHeaderRowNo, imageMetadataSheetNo, imageMetaDataHeaderRowNo);
+		List<Species> species = SpreadsheetConverter.getInstance().convertSpecies(file, contentSheetNo, contentHeaderRowNo, imageMetadataSheetNo, imageMetaDataHeaderRowNo, imagesDir);
 		return saveSpecies(species);
 	}
 
@@ -193,11 +192,11 @@ class SpeciesUploadService {
 	 * @param file
 	 * @return
 	 */
-	int uploadNewSpreadsheet (String file) {
+	int uploadNewSpreadsheet (String file, String imagesDir="") {
 		log.info "Uploading new spreadsheet : "+file;
 		def converter = NewSpreadsheetConverter.getInstance();
 		List<List<Map>> content = SpreadsheetReader.readSpreadSheet(file);
-		List<Node> species = NewSpreadsheetConverter.getInstance().convertSpecies(content);
+		List<Node> species = NewSpreadsheetConverter.getInstance().convertSpecies(content, imagesDir);
 		return saveSpecies(species);
 		
 	}
@@ -207,9 +206,9 @@ class SpeciesUploadService {
 	 * @param file
 	 * @return
 	 */
-	int uploadNewSimpleSpreadsheet (String file) {
+	int uploadNewSimpleSpreadsheet (String file, String imagesDir="") {
 		log.info "Uploading new simple spreadsheet : "+file;
-		List<Species> species = NewSimpleSpreadsheetConverter.getInstance().convertSpecies(file);
+		List<Species> species = NewSimpleSpreadsheetConverter.getInstance().convertSpecies(file, imagesDir);
 		return saveSpecies(species);
 	}
 
@@ -229,7 +228,7 @@ class SpeciesUploadService {
 		return saveSpecies(species);
 	}
 
-	private int saveSpecies(SourceConverter converter, List content) {
+	int saveSpecies(SourceConverter converter, List content, String imagesDir="") {
         converter.setLogAppender(fa);
 		def startTime = System.currentTimeMillis()
 		int noOfInsertions = 0;
@@ -243,7 +242,7 @@ class SpeciesUploadService {
 			}
 
 			def speciesContent = content.get(i);
-			Node speciesElement = converter.createSpeciesXML(speciesContent);
+			Node speciesElement = converter.createSpeciesXML(speciesContent, imagesDir);
 			if(speciesElement)
 				speciesElements.add(speciesElement);
 		}

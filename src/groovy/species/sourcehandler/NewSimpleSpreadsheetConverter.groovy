@@ -28,13 +28,13 @@ class NewSimpleSpreadsheetConverter extends SourceConverter {
 		return _instance;
 	}
 
-	public List<Species> convertSpecies(String file) {
+	public List<Species> convertSpecies(String file, String imagesDir = "") {
 		List<List<String>> content = SpreadsheetReader.readSpreadSheet(file, 0);
 		List<Map> imageMetaData = SpreadsheetReader.readSpreadSheet(file, 1, 0);
-		return convertSpecies(content, imageMetaData);
+		return convertSpecies(content, imageMetaData, imagesDir);
 	}
 
-	public List<Species> convertSpecies(List<List<String>> content, List<Map> imageMetaData) {
+	public List<Species> convertSpecies(List<List<String>> content, List<Map> imageMetaData, String imagesDir="") {
 
 		List<Species> species = new ArrayList<Species>();
 
@@ -109,7 +109,7 @@ class NewSimpleSpreadsheetConverter extends SourceConverter {
 				}
 			}
 			
-			createImages(speciesElement, imageIds, imageMetaData);
+			createImages(speciesElement, imageIds, imageMetaData, imagesDir);
 			log.debug "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
 			log.debug speciesElement;
 			log.debug "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
@@ -124,231 +124,5 @@ class NewSimpleSpreadsheetConverter extends SourceConverter {
 		}
 	
         return species;
-	}
-
-	private Node createDataNode(Node field, String text) {
-		if(!text) return;
-
-		Node data = new Node(field, "data", text);
-		return data;
-	}
-
-	private void attachMetadata(Node data, List<String> contributors, List<String> attributions, List<String> licenses, List<String> audiences, List<String> status) {
-		log.debug "Attaching metadata $contributors $attributions $licenses $audiences $status"
-		for(contributor in contributors) {
-			new Node(data, "contributor", contributor);
-		}
-		for(attribution in attributions) {
-			new Node(data, "attribution", attribution);
-		}
-		for(license in licenses) {
-			new Node(data, "license", license);
-		}
-		for(audience in audiences) {
-			new Node(data, "audienceType", audience);
-		}
-		for(s in status) {
-			new Node(data, "status", s);
-		}
-	}
-	
-	private List<String> getContributors(String text, String delimiter="\n") {
-		log.debug "Creating contributors ${text}"
-		List<String> contributors = []; 
-		if(text) {
-			text.split(delimiter).each {
-				if(it.matches("^\\d+\\..*")) {
-					it = it.split("^\\d+\\.", 2);
-					contributors << it[1].trim();
-				} else if(!it.trim().equals("")){
-					contributors << it.trim();
-				}
-			}
-		}
-		return contributors;
-	}
-
-	private List<String> getAttributions(String text, String delimiter="\n") {
-		log.debug "Creating attributions ${text}"
-		List<String> attributions = []; 
-		if(text) {
-			text.split(delimiter).each {
-				if(it.matches("^\\d+\\..*")) {
-					it = it.split("^\\d+\\.", 2);
-					attributions << it[1].trim();
-				} else if(!it.trim().equals("")){
-					attributions << it.trim();
-				}
-			}
-		}
-		return attributions;
-	}
-	
-	private List<String> getLicenses(String text, String delimiter=",|;|\n") {
-		log.debug "Creating licenses ${text}"
-		List<String> licenses = [];
-		if(text) {
-			text.split(delimiter).each {
-				if(it) {
-					if(!it.startsWith("CC")) {
-						licenses << "CC "+it.trim()
-					} else {
-						licenses << it.trim()
-					}
-				}
-			}
-		}
-		return licenses;
-	}
-
-	private List<String> getAudience(String text, String delimiter=",|;|\n") {
-		log.debug "Creating audience ${text}"
-		List<String> audiences = [];
-		if(text) {
-			text.split(delimiter).each {
-				if(it)
-					audiences << it.trim()
-			}
-		}
-		return audiences;
-	}
-	
-	private List<String> getImages(String text, String delimiter=",|;|\n|\\s{3,}") {
-		log.debug "Creating images ${text}"
-		List<String> imageIds = [];
-		if(text) {
-			text.split(delimiter).each {
-				if(it) 
-					imageIds << it.trim()
-			}
-		}
-		return imageIds;
-	}
-
-	private void createCommonNames(Node field, String text, String delimiter="\n") {
-		log.debug "Creating commonNames ${text}"
-		if(text) {
-			for(String part : text.split(delimiter)) {
-				if(part) {
-					String[] commonNames = part.split(":");
-					if(commonNames.length == 2) {
-						commonNames[1].split(",|;").each {
-							Node data = createDataNode(field, it.trim());
-							createLanguage(data, commonNames[0]);
-						}
-					} else {
-						commonNames[0].split(",|;").each {
-							createDataNode(field, it.trim());
-						}
-					}
-					
-				}
-			}
-		}
-	}
-	
-	private void createLanguage(Node dataNode, String s) {
-		log.debug "Getting language $s"
-		if(!s || s.equals("")) return null;
-		String[] str = s.split("\\(|\\)");
-		Node langNode = new Node(dataNode, "language");
-		if(str.length > 1)
-			new Node(langNode, "threeLetterCode", str[1]?.trim());
-		new Node(langNode, "name", str[0]?.trim())
-	}
-	
-	
-	private void createSynonyms(Node field, String text, String delimiter="\n|\\s{3,}") {
-		log.debug "Creating synonyms ${text}"
-		if(text) {
-			for(String part : text.split(delimiter)) {
-				if(part) {
-					part = part.trim();
-					createDataNode(field, part);
-				}
-			}
-		}
-	}
-	
-	
-	private void createImages(Node speciesElement, List<String> imageIds, List<Map> imageMetaData) {
-		log.debug "Creating images ${imageIds}"
-		
-		if(!imageIds) return;
-		
-		Node images = new Node(speciesElement, "images");
-		def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
-		String uploadDir = config.speciesPortal.images.uploadDir;
-		imageMetaData.each { imageData ->
-			String refKey = imageData.get("id");
-			if(imageIds.contains(refKey)) {
-				Node image = new Node(images, "image");		
-				String imagePath =  imageData.get("image")?:refKey;
-				File file = new File(uploadDir, imagePath);
-				new Node(image, "refKey", refKey);
-				new Node(image, "fileName", file.getAbsolutePath());
-				new Node(image, "source", imageData.get("source"));
-				new Node(image, "caption", imageData.get("caption"));
-				
-				List<String> contributors = getContributors(imageData.get("contributor"));
-				for(c in contributors) {
-					new Node(image, "contributor", c);
-				}
-				
-				List<String> attributions = getAttributions(imageData.get("attribution"));
-				for(a in attributions) {
-					new Node(image, "attribution", a);
-				}
-				
-				List<String> licenses = getLicenses(imageData.get('license'))
-				for (l in licenses) {
-					new Node(image, "license", l);
-				}
-			}
-		}
-		log.debug images
-	}
-
-	
-	private void createReferences(Node field, String text) {
-		log.debug "Creating references ${text}"
-		List<String> attrs = getAttributionsList(text);
-		if(text && !text.equals("")) {
-			int i=0;
-			for(String ref : text.split("\\\n")) {
-				if(!ref.trim().equals("")) {
-				//TODO : remove other protocols as well if present
-//				if(!ref.startsWith("http://") && ref.indexOf("http://") != -1) {
-//					ref = ref.substring(ref.indexOf("http://"));
-//				}
-
-//				if(ref.startsWith("http://")) {
-//					def refNode = new Node(field, "reference")
-//					new Node(refNode, "title", attrs?attrs.get(i):"");
-//					new Node(refNode, "url", ref);
-//				} else {
-					def refNode = new Node(field, "reference")
-					new Node(refNode, "title", attrs?attrs.get(i):"");
-//				}
-				i++;
-				}
-			}
-		}
-	}
-	private List<String> getAttributionsList(String text) {
-		
-		if(text && !text.equals("")) {
-
-			List<String> newAttrsList = new ArrayList();
-			text.split("\\\n").each {
-				if(it.matches("^\\d+\\..*")) {
-					it = it.split("^\\d+\\.", 2);
-					newAttrsList.add(it[1].trim());
-				} else if(!it.trim().equals("")){
-					newAttrsList.add(it.trim());
-				}
-			}
-			return newAttrsList;
-		}
 	}
 }

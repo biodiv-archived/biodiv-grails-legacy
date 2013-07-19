@@ -50,7 +50,6 @@ beans = {
     def configRoot = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
     def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.search
 
-    /*def speciesSolrServer, observationSolrServer, newsletterSolrServer, projectSolrServer, checklistSolrServer, documentSolrServer
     if (Environment.current == Environment.DEVELOPMENT) {
         // In development we use messageLocalService as implementation
         // of MessageService.
@@ -59,13 +58,13 @@ beans = {
         CoreContainer container = new CoreContainer();
         container.load( "${configRoot.speciesPortal.app.rootDir}/solr", f );
 
-        speciesSolrServer = new EmbeddedSolrServer( container, "species" );
-        observationSolrServer = new EmbeddedSolrServer( container, "observations" );
-        newsletterSolrServer = new EmbeddedSolrServer( container, "newsletters" );
-        projectSolrServer = new EmbeddedSolrServer( container, "projects" );
-        checklistSolrServer = new EmbeddedSolrServer( container, "checklists" );
-        documentSolrServer = new EmbeddedSolrServer( container, "documents" );
-    } else {*/
+        speciesSolrServer(EmbeddedSolrServer, container, "species" )
+        observationsSolrServer(EmbeddedSolrServer, container, "observations" );
+        newsletterSolrServer(EmbeddedSolrServer, container, "newsletters" );
+        projectSolrServer(EmbeddedSolrServer, container, "projects" );
+        checklistSolrServer(EmbeddedSolrServer, container, "checklists" );
+        documentSolrServer(EmbeddedSolrServer, container, "documents" );
+    } else {
         speciesSolrServer(org.apache.solr.client.solrj.impl.StreamingUpdateSolrServer,config.serverURL+"/species", config.queueSize, config.threadCount ) {
             setSoTimeout(config.soTimeout);
             setConnectionTimeout(config.connectionTimeout);
@@ -136,8 +135,8 @@ beans = {
             setMaxRetries(config.maxRetries);
             //setParser(new XMLResponseParser()); // binary parser is used by default
             log.debug "Initialized search server to "+config.serverURL+"/documents"
-        }
-//    }//end of initializing solr Server
+         }
+    }//end of initializing solr Server
 
     speciesSearchService(speciespage.search.SpeciesSearchService) {
         solrServer = ref('speciesSolrServer');

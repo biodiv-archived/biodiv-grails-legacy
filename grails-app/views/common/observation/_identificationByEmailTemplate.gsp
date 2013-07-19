@@ -18,7 +18,7 @@
 			<div class="form-row">
 				<span class="keyname" style="clear: both">Subject</span><input
 					type="text" style="width: 97%" name="mailSubject"
-					value="${mailSubject}"></input>
+					value="${mailSubject}"/>
 			</div>
 
 			<div class="form-row">
@@ -42,7 +42,7 @@
 			</div>
 			<input type="hidden" name="userIdsAndEmailIds"
 				id="userIdsAndEmailIds" /> <input class="btn btn-mini btn-primary"
-				type="submit" value="SEND" style="margin: 10px; float: right" /> </input>
+				type="submit" value="SEND" style="margin: 10px; float: right" />
 			<div id="email-form-close" class="popup-form-close" value="close">
 				<i class="icon-remove"></i>
 

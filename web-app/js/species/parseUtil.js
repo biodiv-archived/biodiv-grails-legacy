@@ -60,7 +60,7 @@ function parseData(csvFile, options) {
 			}
 		});
 		if (error) {
-			alert(error);
+			alert("Error: "+error);
 		}
 		if(options.callBack){
 			options.callBack(rowData, columns);

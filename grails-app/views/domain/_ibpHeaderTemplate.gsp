@@ -8,7 +8,7 @@
 					data-target=".nav-collapse"> <span class="icon-bar"></span> </a> <a
 					class="brand"
 					href="${createLink(url:Utils.getIBPServerDomain()) }">
-					India Biodiversity Portal</a>
+                                        ${grailsApplication.config.speciesPortal.app.siteName}</a>
 				
 				<div class="nav-collapse">
 				
@@ -60,7 +60,6 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
                                     data-original-title="Provide Feedback" title="Provide Feedback">
                                     <i class="icon-plus"></i> Provide Feedback
                                 </a>
-                            </ul>
                         </div>
 
                     </div>

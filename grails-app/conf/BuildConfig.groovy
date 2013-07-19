@@ -81,9 +81,9 @@ grails.project.dependency.resolution = {
         //}
     }
     plugins { 
-        compile ":resources:1.1.6" 
-        compile ":spring-security-core:1.2.6" 
-        compile ":webxml:1.4.1" 
+        compile ":spring-security-core:1.2.7.3" 
+        runtime ":resources:1.1.6" 
+        runtime ":webxml:1.4.1" 
         compile ':plugin-config:0.1.5'
     } 
 

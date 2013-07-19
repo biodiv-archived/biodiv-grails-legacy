@@ -696,7 +696,7 @@ class XMLConverter extends SourceConverter {
      * @return
      */
     private Resource createImage(Node imageNode, String relImagesFolder, resourceType) {
-        File tempFile = getImageFile(imageNode);
+        File tempFile = getImageFile(imageNode, relImagesFolder);
         def sourceUrl = imageNode.source?.text() ? imageNode.source?.text() : "";
         def rate = imageNode.rating?.text() ? imageNode.rating?.text() : "";
         
@@ -773,7 +773,7 @@ class XMLConverter extends SourceConverter {
      * @param imageNode
      * @return
      */
-    File getImageFile(Node imageNode) {
+    File getImageFile(Node imageNode, String imagesDir="") {
         String fileName = imageNode?.fileName?.text()?.trim();
         String sourceUrl = imageNode.source?.text();
         if(!fileName && !sourceUrl) return;
@@ -792,9 +792,9 @@ class XMLConverter extends SourceConverter {
         if(!tempFile.exists()) {
             if(sourceUrl) {
                 //downloading from web
-                def tempdir = new File(config.speciesPortal.images.uploadDir, "images");
+                def tempdir = new File(config.speciesPortal.content.rootDir+File.separator+"species"+File.separator+imagesDir?:'', "images");
                 if(!tempdir.exists()) {
-                    tempdir.mkdir();
+                    tempdir.mkdirs();
                 }
                 try {
                     tempFile = HttpUtils.download(sourceUrl, tempdir, false);

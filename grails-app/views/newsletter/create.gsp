@@ -3,9 +3,8 @@
 <%@ page import="utils.Newsletter"%>
 <html>
 <head>
-<g:set var="title" value="Newsletter"/>
-<g:render template="/common/titleTemplate" model="['title':title]"/>
-
+<g:set var="title" value="Page"/>
+<title>Create Newsletter</title>
 <style>
 .body {
 	padding: 10px;
@@ -17,7 +16,7 @@
 	<div class="span11">
 		<div class="page-header">
 		<h1>
-			<g:message code="default.create.label" args="[entityName]" />
+			<g:message code="default.create.label" args="[title]" />
 		</h1>
 		</div>
 		<g:if test="${flash.message}">

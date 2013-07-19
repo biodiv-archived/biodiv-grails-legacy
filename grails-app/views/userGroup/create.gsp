@@ -3,7 +3,7 @@
 <%@ page import="species.Habitat"%>
 <html>
 <head>
-<g:set var="title" value="User groups "/>
+<g:set var="title" value="User groups"/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
 <r:require modules="userGroups_create" />
 <style>
@@ -171,7 +171,7 @@ max-width: 100%;
 							<label for="webaddress" class="control-label"><g:message
 									code="userGroup.webaddress.label" default="Web Address" /> </label>
 							<div class="controls  textbox">
-								<div id="groups_div" class="btn-group" style="z-index: 3;">
+								<div class="btn-group" style="z-index: 3;">
 									<span class="whiteboard"> <g:createLink action='show'
 											base="${Utils.getDomainServerUrl(request)}"></g:createLink>/</span>
 									<g:textField name="webaddress"
@@ -193,16 +193,16 @@ max-width: 100%;
 							<label for="icon" class="control-label"><g:message
 									code="userGroup.icon.label" default="Icon" /> </label>
 							<div class="controls">
-								<div id="groups_div" class="btn-group" style="z-index: 3;">
+								<div style="z-index: 3;">
 										<div
 											class="resources control-group ${hasErrors(bean: userGroupInstance, field: 'icon', 'error')}">
 
 											<%def thumbnail = userGroupInstance.icon%>
 											<div style="max-height:100px; width:auto;margin-left: 0px;">
-												<a id="change_picture" onclick="$('#attachFile').select()[0].click();return false;">
+												<a id="change_picture">
 													<img id="thumbnail"
 													src='${createLink(url: userGroupInstance.mainImage().fileName)}' class='logo '/>
-													<div><i class="icon-picture"></i>Upload group icon preferably of dimensions 150px X 50px and size < 50KB</div>
+                                                                                                        <div><i class="icon-picture"></i>Upload group icon preferably of dimensions 200px X 200px and size < ${grailsApplication.config.speciesPortal.userGroups.logo.MAX_IMAGE_SIZE/1024}KB</div>
 												</a>
 												
 											</div>
@@ -399,10 +399,15 @@ $(document).ready(function() {
             $('#upload_resource').css({'visibility':'hidden'});
             //$('#change_picture').show();
         }
-		
-		$('#attachFile').change(function(e){
-  			$('#upload_resource').submit().find("span.msg").html("Uploading... Please wait...");
-		});
+
+        $('#change_picture').bind('click', function(){
+            $('#attachFile').click();
+            return false;
+        });
+        
+        $('#attachFile').change(function(e){
+                $('#upload_resource').submit().find("span.msg").html("Uploading... Please wait...");
+        });
 
      	$('#upload_resource').ajaxForm({ 
 			url:'${g.createLink(controller:'userGroup', action:'upload_resource')}',
@@ -412,13 +417,15 @@ $(document).ready(function() {
 			type: 'POST',
 			 
 			beforeSubmit: function(formData, jqForm, options) {
+                        	$("#createGroupSubmit").addClass('disabled');
 				return true;
 			}, 
-            xhr: function() {  // custom xhr
-                myXhr = $.ajaxSettings.xhr();
-                return myXhr;
-            },
+                        xhr: function() {  // custom xhr
+                            myXhr = $.ajaxSettings.xhr();
+                            return myXhr;
+                        },
 			success: function(responseXML, statusText, xhr, form) {
+                        	$("#createGroupSubmit").removeClass('disabled');
 				$(form).find("span.msg").html("");
 				var rootDir = '${grailsApplication.config.speciesPortal.userGroups.serverURL}'
 				var dir = $(responseXML).find('dir').text();
@@ -434,25 +441,27 @@ $(document).ready(function() {
 					$("#thumbnail").attr("src", thumbnail);
 				});
 				$("#image-resources-msg").parent(".resources").removeClass("error");
-                $("#image-resources-msg").html("");
-			}, error:function (xhr, ajaxOptions, thrownError){
-					//successHandler is used when ajax login succedes
-	            	var successHandler = this.success, errorHandler;
-	            	handleError(xhr, ajaxOptions, thrownError, successHandler, function() {
-						var response = $.parseJSON(xhr.responseText);
-						if(response.error){
-							$("#image-resources-msg").parent(".resources").addClass("error");
-							$("#image-resources-msg").html(response.error);
-						}
-						
-						var messageNode = $(".message .resources");
-						if(messageNode.length == 0 ) {
-							$("#upload_resource").prepend('<div class="message">'+(response?response.error:"Error")+'</div>');
-						} else {
-							messageNode.append(response?response.error:"Error");
-						}
-					});
-           } 
+                                $("#image-resources-msg").html("");
+			}, error:function (xhr, ajaxOptions, thrownError) {
+                            //successHandler is used when ajax login succedes
+                            var successHandler = this.success, errorHandler;
+                            handleError(xhr, ajaxOptions, thrownError, successHandler, function(data) {
+                                var response = $.parseJSON(xhr.responseText);
+                                $("#addObservationSubmit").removeClass('disabled');
+
+                                if(response.error){
+                                    $("#image-resources-msg").parent(".resources").addClass("error");
+                                    $("#image-resources-msg").html(response.error);
+                                }
+
+                                var messageNode = $(".message .resources");
+                                if(messageNode.length == 0 ) {
+                                    $("#upload_resource").prepend('<div class="message">'+(response?response.error:"Error")+'</div>');
+                                } else {
+                                    messageNode.append(response?response.error:"Error");
+                                }
+                            });
+                    } 
      	});  
      	
      	
