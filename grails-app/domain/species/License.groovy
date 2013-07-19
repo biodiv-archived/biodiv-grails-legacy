@@ -78,5 +78,13 @@ class License {
 	}
 
 	static mapping = { version false; }
+	
+	
+	static LicenseType fetchLicenseType(String value){
+		for(LicenseType l : LicenseType){
+			if(l.value().equalsIgnoreCase(value))
+				return l
+		}
+	}
 }
 

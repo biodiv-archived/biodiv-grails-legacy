@@ -569,12 +569,7 @@ class XMLConverter extends SourceConverter {
             if(!licenseType.startsWith("CC")) {
                 licenseType = "CC "+licenseType.trim()
             }
-            for(LicenseType t : LicenseType) {
-                if(t.value().equalsIgnoreCase(licenseType)) {
-                    type = t;
-                    break;
-                }
-            }
+			type = License.fetchLicenseType(licenseType)
         }
 
         if(!type) return null;

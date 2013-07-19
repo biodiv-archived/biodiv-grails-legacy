@@ -142,23 +142,22 @@ class ObservationService {
 		}
 	}
 	
-	Map saveObservation(params){
+	Map saveObservation(params, sendMail=true){
 		//TODO:edit also calls here...handle that wrt other domain objects
 		params.author = springSecurityService.currentUser;
-		def observationInstance, feedType, sendMail, feedAuthor; 
+		def observationInstance, feedType, feedAuthor, mailType; 
 		try {
 			
 			if(params.action == "save"){
 				observationInstance = createObservation(params);
 				feedType = activityFeedService.OBSERVATION_CREATED
 				feedAuthor = observationInstance.author
-				sendMail = true
+				mailType = OBSERVATION_ADDED
 			}else{
 				observationInstance = Observation.get(params.id.toLong())
 				updateObservation(params, observationInstance)
 				feedType = activityFeedService.OBSERVATION_UPDATED
 				feedAuthor = springSecurityService.currentUser
-				sendMail = false
 			}
 			
 			if(!observationInstance.hasErrors() && observationInstance.save(flush:true)) {
@@ -170,7 +169,7 @@ class ObservationService {
 				saveObservationAssociation(params, observationInstance)
 								
 				if(sendMail)
-					sendNotificationMail(OBSERVATION_ADDED, observationInstance, null, params.webaddress);
+					sendNotificationMail(mailType, observationInstance, null, params.webaddress);
 					
 				params["createNew"] = true
 				return ['success' : true, observationInstance:observationInstance]

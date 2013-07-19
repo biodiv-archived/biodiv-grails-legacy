@@ -180,15 +180,15 @@ class ObservationController {
 		log.debug params;
 		def observationInstance = Observation.get(params.id.toLong())
 		if(observationInstance)	{
-			saveAndRender(params)
+			saveAndRender(params, false)
 		}else {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
 			redirect (url:uGroup.createLink(action:'list', controller:"observation", 'userGroupWebaddress':params.webaddress))
 		}
 	}
 	
-	private saveAndRender(params){
-		def result = observationService.saveObservation(params)
+	private saveAndRender(params, sendMail=true){
+		def result = observationService.saveObservation(params, sendMail)
 		if(result.success){
 			chain(action: 'addRecommendationVote', model:['chainedParams':params]);
 		}else{

@@ -104,9 +104,9 @@ class ChecklistController {
 	@Secured(['ROLE_USER'])
 	def create = {
 		log.debug params
-		def checklistInstance = new Checklists()
+		def checklistInstance = new Checklists(license:License.findByName(License.LicenseType.CC_BY))
 		checklistInstance.properties = params;
-		return [checklistInstance: checklistInstance]
+		return [observationInstance: checklistInstance]
 	}
 	
 	
@@ -147,13 +147,12 @@ class ChecklistController {
 		//params.longitude = "" + 77.74
 		
 		//params.rawChecklist =  "checklist raw file" //params.rawChecklist
-		params.title =  "cl title" 
-		params.license = License.LicenseType.CC_BY
-		params.refText =  "ref text " //params.refText
-		params.sourceText =  "source text " // params.sourceText
+		//params.title =  "cl title" 
+		//params.refText =  "ref text " //params.refText
+		//params.sourceText =  "source text " // params.sourceText
 		params.columnNames =  params.checklistColumns.collect { it.name }.join("\t")
-		params.publicationDate =  null //params.publicationDate ? observationService.parseDate(params.publicationDate) : null
-		params.reservesValue =  null //params.reservesValue
+		//params.publicationDate =  null //params.publicationDate ? observationService.parseDate(params.publicationDate) : null
+		//params.reservesValue =  null //params.reservesValue
 	}
 		
 	///////////////////////////////////////////////////////////////////////////////
