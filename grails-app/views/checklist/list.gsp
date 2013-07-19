@@ -3,7 +3,7 @@
 <head>
 <g:set var="title" value="Checklists"/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
-<r:require modules="checklist"/>
+<r:require modules="checklist_list"/>
 </head>
 <body>
 <div class="span12">

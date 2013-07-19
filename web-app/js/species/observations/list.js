@@ -66,115 +66,115 @@ $(document).ready(function(){
     }
     
     $("#observationMediaAllFilterButton").click(function() {
-   		if($("#observationMediaAllFilterButton").hasClass('active')){
-   			return false;
-   		}
-		$("#observationMediaFilter").val('false');
-		$("#observationMediaOnlyFilterButton").removeClass('active');
-		$("#observationMediaAllFilterButton").addClass('active');
-		
-		updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
-        return false;
-	});
-	
-   
-   $("#observationMediaOnlyFilterButton").click(function() {
-   		if($("#observationMediaOnlyFilterButton").hasClass('active')){
-   			return false;
-   		}
-		$("#observationMediaFilter").val('true');
-		$("#observationMediaAllFilterButton").removeClass('active');
-		$("#observationMediaOnlyFilterButton").addClass('active');
-		
-		updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
-        return false;
-	});
-	
-   $("#observationFlaggedButton").click(function() {
-	    if($("#observationFlaggedButton").hasClass('active')){
-	    return false;
-	    }
-	    $("#observationFlagFilter").val('true')
-	    $("#observationWithNoFlagFilterButton").removeClass('active')
-	    $("#observationFlaggedButton").addClass('active')
+        if($("#observationMediaAllFilterButton").hasClass('active')){
+            return false;
+        }
+        $("#observationMediaFilter").val('false');
+        $("#observationMediaOnlyFilterButton").removeClass('active');
+        $("#observationMediaAllFilterButton").addClass('active');
 
-	    updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
-	    	return false;
-		});
-
-
-   
-	$("#observationWithNoFlagFilterButton").click(function() {
-   		if($("#observationWithNoFlagFilterButton").hasClass('active')){
-   			return false;
-   		}
-		$("#observationFlagFilter").val('false');
-		$("#observationFlaggedButton").removeClass('active');
-		$("#observationWithNoFlagFilterButton").addClass('active');
-		
-		updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
-        return false;
-	});
-
-
-	
-	$("#speciesNameAllButton").click(function() {
-   		if($("#speciesNameAllButton").hasClass('active')){
-   			return false;
-   		}
-		$("#speciesNameFilter").val('All');
-		$("#speciesNameFilterButton").removeClass('active');
-		$("#speciesNameAllButton").addClass('active');
-		
-		updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
-        return false;
-	});
-	
-	$("#speciesNameFilterButton").click(function() {
-		if($("#speciesNameFilterButton").hasClass('active')){
-   			return false;
-   		}
-	    $("#speciesNameFilter").val('Unknown');
-		$("#speciesNameFilterButton").addClass('active');
-	    $("#speciesNameAllButton").removeClass('active');
-			
-		updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
-        return false;
-	});
-	                
-	$('#speciesGroupFilter button').click(function(){
-		if($(this).hasClass('active')){
-			return false;
-		}
-		$('#speciesGroupFilter button.active').removeClass('active');
-    	$(this).addClass('active');
-    	
-    	updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
-    	return false;
- 	});
-        
- 	$('#habitatFilter button').click(function(){
- 		if($(this).hasClass('active')){
-			return false;
-		}
- 		$('#habitatFilter button.active').removeClass('active');
-    	$(this).addClass('active');
-    	updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
-    	return false;
- 	});
-        
-   $('.sort_filter_label').click(function(){
-   		var caret = '<span class="caret"></span>'
-   		if(stringTrim(($(this).html())) == stringTrim($("#selected_sort").html().replace(caret, ''))){
-   			return true;
-		}
-		$('.sort_filter_label.active').removeClass('active');
-		$(this).addClass('active');
-        $("#selected_sort").html($(this).html() + caret);
         updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
-        return true;   
-   });
-        
+        return false;
+    });
+
+
+    $("#observationMediaOnlyFilterButton").click(function() {
+        if($("#observationMediaOnlyFilterButton").hasClass('active')){
+            return false;
+        }
+        $("#observationMediaFilter").val('true');
+        $("#observationMediaAllFilterButton").removeClass('active');
+        $("#observationMediaOnlyFilterButton").addClass('active');
+
+        updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
+        return false;
+    });
+
+    $("#observationFlaggedButton").click(function() {
+        if($("#observationFlaggedButton").hasClass('active')){
+            return false;
+        }
+        $("#observationFlagFilter").val('true')
+        $("#observationWithNoFlagFilterButton").removeClass('active')
+        $("#observationFlaggedButton").addClass('active')
+
+        updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
+    return false;
+    });
+
+
+
+    $("#observationWithNoFlagFilterButton").click(function() {
+        if($("#observationWithNoFlagFilterButton").hasClass('active')){
+            return false;
+        }
+        $("#observationFlagFilter").val('false');
+        $("#observationFlaggedButton").removeClass('active');
+        $("#observationWithNoFlagFilterButton").addClass('active');
+
+        updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
+        return false;
+    });
+
+
+
+    $("#speciesNameAllButton").click(function() {
+        if($("#speciesNameAllButton").hasClass('active')){
+            return false;
+        }
+        $("#speciesNameFilter").val('All');
+        $("#speciesNameFilterButton").removeClass('active');
+        $("#speciesNameAllButton").addClass('active');
+
+        updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
+        return false;
+    });
+
+    $("#speciesNameFilterButton").click(function() {
+        if($("#speciesNameFilterButton").hasClass('active')){
+            return false;
+        }
+        $("#speciesNameFilter").val('Unknown');
+        $("#speciesNameFilterButton").addClass('active');
+        $("#speciesNameAllButton").removeClass('active');
+
+        updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
+        return false;
+    });
+
+    $('#speciesGroupFilter button').click(function(){
+        if($(this).hasClass('active')){
+            return false;
+        }
+        $('#speciesGroupFilter button.active').removeClass('active');
+        $(this).addClass('active');
+
+        updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
+        return false;
+    });
+
+    $('#habitatFilter button').click(function(){
+        if($(this).hasClass('active')){
+            return false;
+        }
+        $('#habitatFilter button.active').removeClass('active');
+        $(this).addClass('active');
+        updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
+        return false;
+    });
+
+    $('.sort_filter_label').click(function(){
+        var caret = '<span class="caret"></span>'
+        if(stringTrim(($(this).html())) == stringTrim($("#selected_sort").html().replace(caret, ''))){
+            return true;
+        }
+    $('.sort_filter_label.active').removeClass('active');
+    $(this).addClass('active');
+    $("#selected_sort").html($(this).html() + caret);
+    updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
+    return true;   
+    });
+
     $(".paginateButtons a").click(function() {
     	$('.paginateButtons a.active').removeClass('active');
     	$(this).addClass('active');
@@ -183,221 +183,221 @@ $(document).ready(function(){
     });
     
 //    $("ul[name='tags']").tagit({select:true,  tagSource: window.params.tagsLink});
-	$(".observation_story li.tagit-choice").live('click', function(){
-   		setActiveTag($(this).contents().first().text());
-    	updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
-    	return false;
+    $(".observation_story li.tagit-choice").live('click', function(){
+        setActiveTag($(this).contents().first().text());
+        updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
+        return false;
     });
-   
+
 //   $('#tc_tagcloud a').live('click', function(){
 //   		setActiveTag($(this).contents().first().text());
 //		updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
 //		return false;
 //   });
 
-        $("#removeTagFilter").live('click', function(){
-            var oldActiveTag = $("li.tagit-choice.active");
-            if(oldActiveTag){
-                oldActiveTag.removeClass('active');
-            }
-            var oldActiveTag = $("#tc_tagcloud a.active");
-            if(oldActiveTag){
-                oldActiveTag.removeClass('active');
-            }
-            $("input#tag").val('');
-            updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
-            return false;
-        });
- 
+    $("#removeTagFilter").live('click', function(){
+        var oldActiveTag = $("li.tagit-choice.active");
+        if(oldActiveTag){
+            oldActiveTag.removeClass('active');
+        }
+        var oldActiveTag = $("#tc_tagcloud a.active");
+        if(oldActiveTag){
+            oldActiveTag.removeClass('active');
+        }
+        $("input#tag").val('');
+        updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
+        return false;
+    });
+
     $("#removeUserFilter").live('click', function(){
-    	updateGallery(undefined, window.params.queryParamsMax, window.params.offset, true, window.params.isGalleryUpdate);
-    	return false;
+        updateGallery(undefined, window.params.queryParamsMax, window.params.offset, true, window.params.isGalleryUpdate);
+        return false;
     });
-    
+
     $("#removeObvFilter").live('click', function(){
-    	updateGallery(undefined, window.params.queryParamsMax, window.params.offset, false, window.params.isGalleryUpdate, true);
-    	return false;
+        updateGallery(undefined, window.params.queryParamsMax, window.params.offset, false, window.params.isGalleryUpdate, true);
+        return false;
     });
-    
+
     $("#removeDateRange").live('click', function(){
-    	$("input[name='daterangepicker_start']").val("");
+        $("input[name='daterangepicker_start']").val("");
         $("input[name='daterangepicker_end']").val("");
         updateGallery(undefined, window.params.queryParamsMax, window.params.offset, false, window.params.isGalleryUpdate);
-    	return false;
+        return false;
     });
-    
+
     $("#removeQueryFilter").live('click', function(){
-    	var removeParam = undefined;
-    	if($($(this).attr('data-target').replace('.','\\.')).length != 0)
-    		$($(this).attr('data-target').replace('.','\\.')).val('')
-    	else {
-    		$( "#searchTextField" ).val('');	
-    	}
-    	removeParam = $(this).attr('data-target').replace('#','');
-    	updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate, undefined, undefined, undefined, removeParam);
-    	return false;
+        var removeParam = undefined;
+        if($($(this).attr('data-target').replace('.','\\.')).length != 0)
+        $($(this).attr('data-target').replace('.','\\.')).val('')
+        else {
+            $( "#searchTextField" ).val('');	
+        }
+    removeParam = $(this).attr('data-target').replace('#','');
+    updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate, undefined, undefined, undefined, removeParam);
+    return false;
     });
-   
+
     $('select[name="limit"]').live('change', function() {
         updateGallery(undefined, $(this).val(), window.params.offset, false, window.params.isGalleryUpdate);
     });
 
-   var tmpTarget =  window.location.pathname + window.location.search;
-   setActiveTag($('<a href="'+ tmpTarget +'"></a>').url().param()["tag"]);
-   
-   $('.list_view_bttn').live('click', function() {
-		$('.grid_view').hide();
-		$('.list_view').show();
-		$(this).addClass('active');
-		$('.grid_view_bttn').removeClass('active');
-		$.cookie("listing", "list", {path    : '/'});
-		adjustHeight();
-	});
+    var tmpTarget =  window.location.pathname + window.location.search;
+    setActiveTag($('<a href="'+ tmpTarget +'"></a>').url().param()["tag"]);
 
-	$('.grid_view_bttn').live('click', function() {
-		$('.grid_view').show();
-		$('.list_view').hide();
-		$(this).addClass('active');
-		$('.list_view_bttn').removeClass('active');
-		$.cookie("listing", "grid", {path    : '/'});
-	});
-	
-	$('.loadMore').live('click', function() {
-		$.autopager({
+    $('.list_view_bttn').live('click', function() {
+        $('.grid_view').hide();
+        $('.list_view').show();
+        $(this).addClass('active');
+        $('.grid_view_bttn').removeClass('active');
+        $.cookie("listing", "list", {path    : '/'});
+        adjustHeight();
+    });
 
-			autoLoad : false,
-			// a selector that matches a element of next page link
-			link : 'div.paginateButtons a.nextLink',
+    $('.grid_view_bttn').live('click', function() {
+        $('.grid_view').show();
+        $('.list_view').hide();
+        $(this).addClass('active');
+        $('.list_view_bttn').removeClass('active');
+        $.cookie("listing", "grid", {path    : '/'});
+    });
 
-			// a selector that matches page contents
-			content : '.mainContent',
-			
-			//insertBefore: 'div.checklist_list_main > .table > .table-footer', 
-			appendTo : '.mainContentList',
+    $('.loadMore').live('click', function() {
+        $.autopager({
 
-			// a callback function to be triggered when loading start 
-			start : function(current, next) {
+            autoLoad : false,
+            // a selector that matches a element of next page link
+            link : 'div.paginateButtons a.nextLink',
 
-				$(".loadMore .progress").show();
-				$(".loadMore .buttonTitle").hide();
-			},
+            // a selector that matches page contents
+            content : '.mainContent',
 
-			// a function to be executed when next page was loaded. 
-			// "this" points to the element of loaded content.
-			load : function(current, next) {
-				$(".mainContent:last").hide().fadeIn(3000);
-				
-				$("div.paginateButtons a.nextLink").attr('href', next.url);
-				if (next.url == undefined) {
-					$(".loadMore").hide();
-				} else {
-					$(".loadMore .progress").hide();
-					$(".loadMore .buttonTitle").show();
-				}
-				if ($('.grid_view_bttn.active')[0]) {
-					$('.grid_view').show();
-					$('.list_view').hide();
-				} else {
-					$('.grid_view').hide();
-					$('.list_view').show();
-				}
-					
-				var a = $('<a href="'+current.url+'"></a>');
-			    var url = a.url();
-			    var params = url.param();
-			    delete params["append"]
-			    delete params["loadMore"]
-			    params['max'] = parseInt(params['offset'])+parseInt(params['max']);
-			    params['offset'] = 0
-			    var History = window.History;
-			    History.pushState({state:1}, "Species Portal", '?'+decodeURIComponent($.param(params))); 
-				updateRelativeTime();
-				last_actions();
-				eatCookies();
-				$('.observations_list_wrapper').trigger('updatedGallery');
-			
-			}
-		});
+            //insertBefore: 'div.checklist_list_main > .table > .table-footer', 
+            appendTo : '.mainContentList',
 
-		$.autopager('load');
-		return false;
-	});
-	
-//	last_actions();
-	eatCookies();
-	$('.observations_list_wrapper').trigger('updatedGallery');
+            // a callback function to be triggered when loading start 
+            start : function(current, next) {
+
+                $(".loadMore .progress").show();
+                $(".loadMore .buttonTitle").hide();
+            },
+
+            // a function to be executed when next page was loaded. 
+            // "this" points to the element of loaded content.
+            load : function(current, next) {
+                $(".mainContent:last").hide().fadeIn(3000);
+
+                $("div.paginateButtons a.nextLink").attr('href', next.url);
+                if (next.url == undefined) {
+                    $(".loadMore").hide();
+                } else {
+                    $(".loadMore .progress").hide();
+                    $(".loadMore .buttonTitle").show();
+                }
+                if ($('.grid_view_bttn.active')[0]) {
+                    $('.grid_view').show();
+                    $('.list_view').hide();
+                } else {
+                    $('.grid_view').hide();
+                    $('.list_view').show();
+                }
+
+                var a = $('<a href="'+current.url+'"></a>');
+                var url = a.url();
+                var params = url.param();
+                delete params["append"]
+                    delete params["loadMore"]
+                    params['max'] = parseInt(params['offset'])+parseInt(params['max']);
+                params['offset'] = 0
+                    var History = window.History;
+                History.pushState({state:1}, "Species Portal", '?'+decodeURIComponent($.param(params))); 
+                updateRelativeTime();
+                last_actions();
+                eatCookies();
+                $('.observations_list_wrapper').trigger('updatedGallery');
+
+            }
+        });
+
+        $.autopager('load');
+        return false;
+    });
+
+    //	last_actions();
+    eatCookies();
+    $('.observations_list_wrapper').trigger('updatedGallery');
 });
 
 if (typeof String.prototype.startsWith != 'function') {
-	  // see below for better implementation!
-	  String.prototype.startsWith = function (str){
-	    return this.indexOf(str) == 0;
-	  };
-	}
+    // see below for better implementation!
+    String.prototype.startsWith = function (str){
+        return this.indexOf(str) == 0;
+    };
+}
 
 function eatCookies() {	
-	var hashString = window.location.hash.substring(1)
-	if ($.cookie("listing") == "list") {
-		if(!hashString.startsWith('l')) {
-			if(hashString.startsWith('g')) {
-				window.location.hash = "l"+hashString.substring(1);
-			} else if(hashString){
-				window.location.hash = "l"+hashString;
-			}
-		}
-		$('.list_view').show();
-		$('.grid_view').hide();
-		$('.grid_view_bttn').removeClass('active');
-		$('.list_view_bttn').addClass('active');
-	} else {
-		if(!hashString.startsWith('g')) {
-			if(hashString.startsWith('l')) {
-				window.location.hash = "g"+hashString.substring(1);
-			} else if(hashString){
-				window.location.hash = "g"+hashString;
-			}
-		}
-		$('.grid_view').show();
-		$('.list_view').not('.single_list_view').hide();
-		$('.grid_view_bttn').addClass('active');
-		$('.list_view_bttn').removeClass('active');
-	}
-	adjustHeight();
+    var hashString = window.location.hash.substring(1)
+        if ($.cookie("listing") == "list") {
+            if(!hashString.startsWith('l')) {
+                if(hashString.startsWith('g')) {
+                    window.location.hash = "l"+hashString.substring(1);
+                } else if(hashString){
+                    window.location.hash = "l"+hashString;
+                }
+            }
+            $('.list_view').show();
+            $('.grid_view').hide();
+            $('.grid_view_bttn').removeClass('active');
+            $('.list_view_bttn').addClass('active');
+        } else {
+            if(!hashString.startsWith('g')) {
+                if(hashString.startsWith('l')) {
+                    window.location.hash = "g"+hashString.substring(1);
+                } else if(hashString){
+                    window.location.hash = "g"+hashString;
+                }
+            }
+            $('.grid_view').show();
+            $('.list_view').not('.single_list_view').hide();
+            $('.grid_view_bttn').addClass('active');
+            $('.list_view_bttn').removeClass('active');
+        }
+    adjustHeight();
 }
 
 function stringTrim(s){
-	return $.trim(s);
+    return $.trim(s);
 }
 
 function getSelectedGroup() {
     var grp = ''; 
     $('#speciesGroupFilter button').each (function() {
-            if($(this).hasClass('active')) {
-                    grp += $(this).attr('value') + ',';
-            }
+        if($(this).hasClass('active')) {
+            grp += $(this).attr('value') + ',';
+        }
     });
 
     grp = grp.replace(/\s*\,\s*$/,'');
     return grp;	
 } 
-    
+
 function getSelectedHabitat() {
     var hbt = ''; 
     $('#habitatFilter button').each (function() {
-            if($(this).hasClass('active')) {
-                    hbt += $(this).attr('value') + ',';
-            }
+        if($(this).hasClass('active')) {
+            hbt += $(this).attr('value') + ',';
+        }
     });
     hbt = hbt.replace(/\s*\,\s*$/,'');
     return hbt;	
 } 
-    
+
 function getSelectedSortBy() {
     var sortBy = ''; 
-     $('.sort_filter_label').each (function() {
-            if($(this).hasClass('active')) {
-                sortBy += $(this).attr('value') + ',';
-            }
+    $('.sort_filter_label').each (function() {
+        if($(this).hasClass('active')) {
+            sortBy += $(this).attr('value') + ',';
+        }
     });
 
     sortBy = sortBy.replace(/\s*\,\s*$/,'');
@@ -406,40 +406,40 @@ function getSelectedSortBy() {
 
 function getSelectedFlag() {
     var flag = ''; 
-	flag = $("#observationFlagFilter").attr('value');
-	if(flag) {
-    	flag = flag.replace(/\s*\,\s*$/,'');
-    	return flag;
+    flag = $("#observationFlagFilter").attr('value');
+    if(flag) {
+        flag = flag.replace(/\s*\,\s*$/,'');
+        return flag;
     }	
 }
 
 function getSelectedAllChecklistFlag() {
     var flag = ''; 
-	flag = $("#observationAllChecklistFilter").attr('value');
-	if(flag) {
-    	flag = flag.replace(/\s*\,\s*$/,'');
-    	return flag;
+    flag = $("#observationAllChecklistFilter").attr('value');
+    if(flag) {
+        flag = flag.replace(/\s*\,\s*$/,'');
+        return flag;
     }	
 }
 
 function getSelectedMedia() {
     var media = ''; 
     media = $("#observationMediaFilter").attr('value');
-	if(media) {
-		media = media.replace(/\s*\,\s*$/,'');
-    	return media;
+    if(media) {
+        media = media.replace(/\s*\,\s*$/,'');
+        return media;
     }	
 }
-    
+
 function getSelectedSpeciesName() {
     var sName = ''; 
-	sName = $("#speciesNameFilter").attr('value');
-	if(sName) {
-    	sName = sName.replace(/\s*\,\s*$/,'');
-    	return sName;
+    sName = $("#speciesNameFilter").attr('value');
+    if(sName) {
+        sName = sName.replace(/\s*\,\s*$/,'');
+        return sName;
     }	
 } 
-	
+
 function getSelectedTag() {
     var tag = $("li.tagit-choice.active").contents().first().text();
     if(!tag){
@@ -454,52 +454,52 @@ function getSelectedTag() {
 } 
 
 function getSelectedUserGroup() {
-	return $('#advSearchForm input[name=uGroup]:radio:checked').val()
+    return $('#advSearchForm input[name=uGroup]:radio:checked').val()
 } 
 
 function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSort, isRegularSearch, removeParam) {
     var params = url.param();
-    
+
     if(removeParam) {
-    	delete params[removeParam]
+        delete params[removeParam]
     }
     removeSort = (typeof removeSort === "undefined") ? false : removeSort;
 
     if(!removeSort) {
-	    var sortBy = getSelectedSortBy();
-	    if(sortBy) {
-	            params['sort'] = sortBy;
-	    }
+        var sortBy = getSelectedSortBy();
+        if(sortBy) {
+            params['sort'] = sortBy;
+        }
     }
 
     var sName = getSelectedSpeciesName();
     if(sName) {
-            params['speciesName'] = sName;
+        params['speciesName'] = sName;
     }
-	
+
     var flag = getSelectedFlag();
     if(flag) {
         params['isFlagged'] = flag;
     }
-    
+
     var allChecklistFlag = getSelectedAllChecklistFlag();
     if(allChecklistFlag) {
-            params['isChecklistOnly'] = allChecklistFlag;
+        params['isChecklistOnly'] = allChecklistFlag;
     }
-    
-//    var mediaFilter = getSelectedMedia();
-//    if(mediaFilter) {
-//            params['isMediaFilter'] = mediaFilter;
-//    }
-    
+
+    //    var mediaFilter = getSelectedMedia();
+    //    if(mediaFilter) {
+    //            params['isMediaFilter'] = mediaFilter;
+    //    }
+
     var grp = getSelectedGroup();
     if(grp) {
-            params['sGroup'] = grp;
+        params['sGroup'] = grp;
     }
 
     var habitat = getSelectedHabitat();
     if(habitat) {
-            params['habitat'] = habitat;
+        params['habitat'] = habitat;
     }
 
 
@@ -572,7 +572,7 @@ function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSo
             delete params['uGroup'];
         }
     }
-   
+
     var bounds = $("#bounds").val();
     if(bounds) {
         params['bounds'] = bounds;
@@ -581,11 +581,11 @@ function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSo
     }
 
     var isMapView = $("#isMapView").val()
-    if(isMapView) {
-        params['isMapView'] = isMapView
-    } else {
-        delete params['isMapView']
-    }
+        if(isMapView) {
+            params['isMapView'] = isMapView
+        } else {
+            delete params['isMapView']
+        }
     return params;
 }	
 
@@ -857,29 +857,34 @@ function load_content(params){
    }
    */
 
-function speciesHabitatInterestHandler(){
-	if($(this).hasClass('active')) {
-		$(this).removeClass('active');
-	} else {
-		$(this).addClass('active');
-	}
-	return false;
+function speciesHabitatInterestHandler(event){
+    if(!event.data.multiSelect) 
+        $(event.data.button_group).find('button.active').removeClass('active');
+    if($(this).hasClass('active')) {
+        $(this).removeClass('active');
+    } else {
+        $(this).addClass('active');
+    }
+    return false;
 }
 
-function intializesSeciesHabitatInterest(){
-	$('#speciesGroupFilter button').unbind('click');
-	$('#speciesGroupFilter button').attr('data-toggle', 'buttons-checkbox').click(speciesHabitatInterestHandler);
-	
+function intializesSpeciesHabitatInterest(multiSelect){
+    
+    multiSelect = typeof multiSelect !== 'undefined' ? multiSelect : true;
+
+    $('#speciesGroupFilter button').unbind('click');
+    $('#speciesGroupFilter button').attr('data-toggle', 'buttons-checkbox').click({'button_group':$('#speciesGroupFilter'), 'multiSelect':multiSelect}, speciesHabitatInterestHandler);
+
     $('#habitatFilter button').unbind('click');
-    $('#habitatFilter button').attr('data-toggle', 'buttons-checkbox').click(speciesHabitatInterestHandler);
+    $('#habitatFilter button').attr('data-toggle', 'buttons-checkbox').click({'button_group':$('#habitatFilter'), 'multiSelect':multiSelect}, speciesHabitatInterestHandler);
 }
 
 function updateDownloadBox(instanceTotal){
-	if(instanceTotal > 0){
-		$('#download-box').show();
-	}else{
-		$('#download-box').hide();
-	}
+    if(instanceTotal > 0){
+        $('#download-box').show();
+    }else{
+        $('#download-box').hide();
+    }
 }
 	
 //

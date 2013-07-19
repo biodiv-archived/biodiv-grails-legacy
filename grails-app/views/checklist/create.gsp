@@ -66,7 +66,7 @@
                         <%
                         def obvInfoFeeder = lastCreatedObv ? lastCreatedObv : observationInstance
                         %>
-                        <obv:showMapInput model="[observationInstance:observationInstance, userObservationInstanceList: totalObservationInstanceList, obvInfoFeeder:obvInfoFeeder, locationHeading:'Where did you find this observation?']"></obv:showMapInput>
+                        <obv:showMapInput model="[observationInstance:observationInstance, userObservationInstanceList: totalObservationInstanceList, obvInfoFeeder:obvInfoFeeder, locationHeading:'Where did you find these observations?']"></obv:showMapInput>
                     </div>
                     <div class="span12 super-section"  style="clear: both">
                         <g:render template="/observation/addNotes" model="['observationInstance':observationInstance]"/>
@@ -111,11 +111,21 @@
 
         <r:script>
         $(document).ready(function(){
-                $("#addObservationSubmit").click(function(event){
+           <%
+           if(observationInstance?.group) {
+           out << "jQuery('#group_${observationInstance.group.id}').addClass('active');";
+           }
+           if(observationInstance?.habitat) {
+           out << "jQuery('#habitat_${observationInstance.habitat.id}').addClass('active');";
+           }
+	   %>
+
+            $("#addObservationSubmit").click(function(event){
                 $("#checklistColumns").val(JSON.stringify(grid.getColumns()))
                 $("#checklistData").val(JSON.stringify(grid.getData()))
                 $("#addChecklist").submit();  
             });
+   
         });
 
 

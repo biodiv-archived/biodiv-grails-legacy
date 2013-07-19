@@ -169,6 +169,15 @@
 
 
 $(document).ready(function(){
+     <%
+           if(observationInstance?.group) {
+           out << "jQuery('#group_${observationInstance.group.id}').addClass('active');";
+           }
+           if(observationInstance?.habitat) {
+           out << "jQuery('#habitat_${observationInstance.habitat.id}').addClass('active');";
+           }
+    %>
+
 
     $('#attachFiles').change(function(e){
         $('#upload_resource').submit().find("span.msg").html("Uploading... Please wait...");

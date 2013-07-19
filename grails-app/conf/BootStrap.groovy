@@ -144,6 +144,8 @@ class BootStrap {
 			}
 		  }
 		  emailConfirmationService.onInvalid = { uid ->
+//        	return [url: userGroupService.userGroupBasedLink('controller':'userGroup', action:'members', userGroup:userGroup, params:userToken.params)]
+
 			log.warn("User with id $uid failed to confirm email address after 30 days")
 		  }
 		  emailConfirmationService.onTimeout = { email, uid ->

@@ -106,7 +106,7 @@ class ObservationService {
 		}
 		observation.group = params.group?:SpeciesGroup.get(params.group_id);
 		observation.notes = params.notes;
-		observation.fromDate = parseDate(params.observedOn);
+		observation.fromDate = parseDate(params.fromDate);
 		observation.toDate = params.toDate ? parseDate(params.toDate) : observation.fromDate
 		observation.placeName = params.placeName//?:observation.reverseGeocodedName;
 		observation.reverseGeocodedName = params.reverse_geocoded_name?:observation.placeName

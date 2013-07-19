@@ -49,7 +49,7 @@ function removeResource(event, imageId) {
     $(".image_"+imageId).remove();
 }
 
-$( "#observedOn" ).datepicker({ 
+$( ".date" ).datepicker({ 
     changeMonth: true,
 changeYear: true,
 format: 'dd/mm/yyyy' 
@@ -135,12 +135,33 @@ function pickerCallback(data) {
     }
 }
 
+function getSelectedGroup() {
+    var grp = []; 
+    $('#speciesGroupFilter button').each (function() {
+        if($(this).hasClass('active')) {
+            grp.push($(this).attr('value'));
+        }
+    });
+    return grp;	
+} 
+
+function getSelectedHabitat() {
+    var hbt = []; 
+    $('#habitatFilter button').each (function() {
+        if($(this).hasClass('active')) {
+            hbt.push($(this).attr('value'));
+        }
+    });
+    return hbt;	
+}
+	
 /**
  * document ready
  */
 $(document).ready(function(){
     $('.dropdown-toggle').dropdown();
     $('#add_image').bind('click', filePick);
+    intializesSpeciesHabitatInterest(false);
 
     var onVideoAddSuccess = function(params) {
         var d = new $.Deferred;
@@ -178,8 +199,7 @@ $(document).ready(function(){
     //    newPicker();                    
     //});
 
-
-    $(".group_option").click(function(){
+/*    $(".group_option").click(function(){
         $("#group_id").val($(this).val());
         var caret = "<span class='caret'></span>";
         $("#selected_group").html($(this).html() + caret);
@@ -196,7 +216,7 @@ $(document).ready(function(){
         //$("#habitat_options").hide();
         $("#selected_habitat").css({'background-color':'#e5e5e5', 'border-bottom-color':'#aeaeae'});
     });
-
+*/
     $.each($('.star_obvcreate'), function(index, value){
         rate($(value));
     });
@@ -263,8 +283,24 @@ $(document).ready(function(){
             event.preventDefault();
             return false; 		 		
         }
+
         if (document.getElementById('agreeTerms').checked){
             $(this).addClass("disabled");
+
+            var speciesGroups = getSelectedGroup();
+            var habitats = getSelectedHabitat();
+
+            $.each(speciesGroups, function(index){
+                var input = $("<input>").attr("type", "hidden").attr("name", "group_id").val(this);
+                $('#addObservation').append($(input));	
+            })
+
+            $.each(habitats, function(index){
+                var input = $("<input>").attr("type", "hidden").attr("name", "habitat_id").val(this);
+                $('#addObservation').append($(input));	
+            })
+
+
             $("#userGroupsList").val(getSelectedUserGroups());
             if(drawnItems) {
                 var areas = drawnItems.getLayers();

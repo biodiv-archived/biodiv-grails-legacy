@@ -243,12 +243,18 @@ modules = {
 	}
 	
 	checklist {
-		dependsOn 'core, location_utils, list_utils, tagit, comment, activityfeed'
-		
-		resource url:'/js/species/observations/list.js'
+		dependsOn 'location_utils, list_utils, tagit, comment, activityfeed'
+
 		resource url:'/js/species/checklist.js'
 	}
 	
+    checklist_list {
+		dependsOn 'checklist'
+
+		resource url:'/js/species/observations/list.js'
+    }
+
+
 	checklist_create {
 		dependsOn 'observations_create, checklist, slickgrid, add_file'
 		
