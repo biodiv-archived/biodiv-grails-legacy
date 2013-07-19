@@ -34,8 +34,9 @@
                 <obv:showSubmenuTemplate model="['entityName':(params.action == 'edit' || params.action == 'update')?'Edit Observation':'Add Observation']"/>
                 <%
                 def allowedExtensions = "['csv']"
+				def fileParams = [uploadDir:'checklist']
                 %>
-                <g:render template='/UFile/docUpload' model="['name': 'checklistStartFile', allowedExtensions:allowedExtensions,uploadCallBack:'showGrid()']" />
+                <g:render template='/UFile/docUpload' model="['name': 'checklistStartFile', fileParams:fileParams, allowedExtensions:allowedExtensions,uploadCallBack:'showGrid()']" />
                 <%
                 def form_id = "addChecklist"
                 def form_action = uGroup.createLink(action:'save', controller:'checklist', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)
@@ -54,6 +55,7 @@
 
                         <div class="section checklist-slickgrid">
                             <div id="myGrid" style="width:620px;height:350px;display:none;"></div>
+                            <input id="rawChecklist" name="rawChecklist" type="hidden" value='' />
                             <input id="checklistData" name="checklistData" type="hidden" value='' />
                             <input id="checklistColumns" name="checklistColumns" type="hidden" value='' />
                         </div>
@@ -123,6 +125,7 @@
             $("#addObservationSubmit").click(function(event){
                 $("#checklistColumns").val(JSON.stringify(grid.getColumns()))
                 $("#checklistData").val(JSON.stringify(grid.getData()))
+                $("#rawChecklist").val($("#checklistStartFile_path").val())
                 $("#addChecklist").submit();  
             });
    
