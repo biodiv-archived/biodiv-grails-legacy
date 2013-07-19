@@ -456,7 +456,7 @@ jpegOptimProg = "/usr/bin/jpegoptim";
 
 environments {
 	development {
-		grails.serverURL = "http://indiabiodiversity.localhost.org/${appName}"
+		grails.serverURL = "http://bhutanbiodiversity.localhost.org/${appName}"
 		speciesPortal {
 			search.serverURL = "http://localhost:8090/solr"
 			names.parser.serverURL = "saturn.strandls.com"
@@ -472,7 +472,7 @@ environments {
 					appId= "347177228674021"
 					secret= "82d91308b5437649bfe891a027205501"
 				}
-				supportEmail = "support(at)indiabiodiversity(dot)org"
+				supportEmail = "support(at)bhutanbiodiversity(dot)org"
 			}
 		}
 		google.analytics.enabled = false
@@ -485,8 +485,8 @@ environments {
 			}
 		}
 
-        ibp.domain='indiabiodiversity.localhost.org'
-        wgp.domain='thewesternghats.indiabiodiversity.localhost.org'
+        ibp.domain='bhutanbiodiversity.localhost.org'
+        wgp.domain='thewesternghats.bhutanbiodiversity.localhost.com'
 		//grails.resources.debug=true
 		grails.resources.mappers.hashandcache.excludes = ['**']
 		//grails.resources.flatten = false
@@ -506,11 +506,11 @@ environments {
 
 	}
 	test {
-		grails.serverURL = "http://indiabiodiversity.localhost.org/${appName}"
+		grails.serverURL = "http://bhutanbiodiversity.localhost.com/${appName}"
 		google.analytics.enabled = false
 	}
 	production {
-		grails.serverURL = "http://indiabiodiversity.localhost.org/${appName}"
+		grails.serverURL = "http://bhutanbiodiversity.localhost.com/${appName}"
 		speciesPortal {
 			search.serverURL = "http://localhost:8090/solr"
 			names.parser.serverURL = "127.0.0.1"
@@ -526,7 +526,7 @@ environments {
 					appId= "347177228674021"
 					secret= "82d91308b5437649bfe891a027205501"
 				}
-				supportEmail = "support(at)indiabiodiversity(dot)org"
+				supportEmail = "support(at)bhutanbiodiversity(dot)org"
 			}
 		}
 		google.analytics.enabled = false
@@ -539,8 +539,8 @@ environments {
 			}
 		}
 
-        ibp.domain='indiabiodiversity.localhost.org'
-        wgp.domain='thewesternghats.indiabiodiversity.localhost.org'
+        ibp.domain='bhutanbiodiversity.localhost.com'
+        wgp.domain='thewesternghats.bhutanbiodiversity.localhost.com'
 		//grails.resources.debug=true
 		grails.resources.mappers.hashandcache.excludes = ['**']
 		//grails.resources.flatten = false
@@ -595,7 +595,7 @@ environments {
 					appId= "310694198984953"
 					secret= "eedf76e46272190fbd26e578ae764a60"
 				}
-				supportEmail = "support(at)indiabiodiversity(dot)org"
+				supportEmail = "support(at)bhutanbiodiversity(dot)org"
 			}
 		}
 		google.analytics.enabled = false
@@ -620,7 +620,7 @@ environments {
 	}
 	pambaTest {
 		appName = "biodiv_test"
-		grails.serverURL = "http://indiabiodiversity.saturn.strandls.com/${appName}"
+		grails.serverURL = "http://bhutanbiodiversity.saturn.strandls.com/${appName}"
 		
 		speciesPortal {
 			app.rootDir = "/data/pambaTest/species"
@@ -635,21 +635,21 @@ environments {
 
 			observations {
 				rootDir = "${app.rootDir}/observations"
-				serverURL = "http://indiabiodiversity.saturn.strandls.com/${appName}/observations"
+				serverURL = "http://bhutanbiodiversity.saturn.strandls.com/${appName}/observations"
 				//serverURL = "http://localhost/${appName}/observations"
 			}
 			userGroups {
 				rootDir = "${app.rootDir}/userGroups"
-				serverURL = "http://indiabiodiversity.saturn.strandls.com/${appName}/userGroups"
+				serverURL = "http://bhutanbiodiversity.saturn.strandls.com/${appName}/userGroups"
 				//serverURL = "http://localhost/${appName}/observations"
 			}
 			users {
 				rootDir = "${app.rootDir}/users"
-				serverURL = "http://indiabiodiversity.saturn.strandls.com/${appName}/users"
+				serverURL = "http://bhutanbiodiversity.saturn.strandls.com/${appName}/users"
 			}
 			content{
 				rootDir = "${app.rootDir}/content"
-				serverURL = "http://indiabiodiversity.saturn.strandls.com/${appName}/content"
+				serverURL = "http://bhutanbiodiversity.saturn.strandls.com/${appName}/content"
 			}	
 
 			search.serverURL="http://saturn.strandls.com:8080/solrPamba"
@@ -672,13 +672,13 @@ environments {
 					appId= "310694198984953"
 					secret= "eedf76e46272190fbd26e578ae764a60"
 				}
-				supportEmail = "support(at)indiabiodiversity(dot)org"
+				supportEmail = "support(at)bhutanbiodiversity(dot)org"
 			}
 		}
 		google.analytics.enabled = false
 
-	    ibp.domain='indiabiodiversity.saturn.strandls.com'
-            wgp.domain='thewesternghats.indiabiodiversity.saturn.strandls.com' 
+	    ibp.domain='bhutanbiodiversity.saturn.strandls.com'
+            wgp.domain='thewesternghats.bhutanbiodiversity.saturn.strandls.com' 
 		
 		grails.plugins.springsecurity.successHandler.defaultTargetUrl = "/"
 		grails.plugins.springsecurity.logout.afterLogoutUrl = '/'
@@ -699,7 +699,7 @@ environments {
 
 
 	pamba {
-		grails.serverURL = "http://indiabiodiversity.org/${appName}"
+		grails.serverURL = "http://bhutanbiodiversity.org/${appName}"
 		jpegOptimProg = '/usr/local/bin/jpegoptim'
 		
 		speciesPortal {
@@ -751,12 +751,12 @@ environments {
 					appId= "320284831369968"
 					secret= "900d0811194fe28503006b31792690ae"
 				}
-				supportEmail = "support(at)indiabiodiversity(dot)org"
+				supportEmail = "support(at)bhutanbiodiversity(dot)org"
 			}
 		}
 		
-        ibp.domain='indiabiodiversity.org'
-        wgp.domain='thewesternghats.indiabiodiversity.org'   
+        ibp.domain='bhutanbiodiversity.org'
+        wgp.domain='thewesternghats.bhutanbiodiversity.org'   
 		
 		grails.plugins.springsecurity.successHandler.defaultTargetUrl = "/"
 		grails.plugins.springsecurity.logout.afterLogoutUrl = '/'
@@ -880,8 +880,8 @@ grails.plugins.springsecurity.facebook.domain.classname='species.auth.FacebookUs
 grails.taggable.tag.autoImport=true
 grails.taggable.tagLink.autoImport=true
 
-grails.mail.default.from="notification@indiabiodiversity.org"
-emailConfirmation.from="notification@indiabiodiversity.org"
+grails.mail.default.from="notification@bhutanbiodiversity.org"
+emailConfirmation.from="notification@bhutanbiodiversity.org"
 
 grails.plugins.springsecurity.password.algorithm = 'MD5'
 
@@ -891,11 +891,11 @@ grails.plugins.springsecurity.ui.password.validationRegex='^.*$'
 grails.plugins.springsecurity.ui.register.postRegisterUrl  = "${grails.serverURL}/user/myprofile" // use defaultTargetUrl if not set
 grails.plugins.springsecurity.ui.register.defaultRoleNames = ['ROLE_USER']
 
-grails.plugins.springsecurity.ui.notification.emailFrom = 'notification@indiabiodiversity.org'
+grails.plugins.springsecurity.ui.notification.emailFrom = 'notification@bhutanbiodiversity.org'
 grails.plugins.springsecurity.ui.notification.emailReplyTo = "prabha.prabhakar@gmail.com";
 
 grails.plugins.springsecurity.ui.register.emailBody = '''Hi $username,<br/><br/>You (or someone pretending to be you) created an account with this email address.<br/><br/>If you made the request, please click <a href="$url">here</a> to finish the registration and activate your account.'''
-grails.plugins.springsecurity.ui.register.emailFrom = 'notification@indiabiodiversity.org'
+grails.plugins.springsecurity.ui.register.emailFrom = 'notification@bhutanbiodiversity.org'
 grails.plugins.springsecurity.ui.register.emailSubject = 'Activate your account with $domain'
 
 grails.plugins.springsecurity.ui.newuser.emailBody = '''\
@@ -911,7 +911,7 @@ Please update your <a href="$userProfileUrl">user profile</a>.<br/>
 If you do not want to receive notifications please go to your <a href="$userProfileUrl">user profile</a> and switch it off.<br/>
 <br/>
 -The portal team'''
-grails.plugins.springsecurity.ui.newuser.emailFrom = 'notification@indiabiodiversity.org'
+grails.plugins.springsecurity.ui.newuser.emailFrom = 'notification@bhutanbiodiversity.org'
 grails.plugins.springsecurity.ui.newuser.emailSubject = 'Welcome to $domain'
 
 grails.plugins.springsecurity.ui.userdeleted.emailBody = '''\
@@ -920,7 +920,7 @@ Hi Admin,<br/>
 A user with email address $email is being deleted from <b>$domain</b>.<br/>
 <br/>
 -The portal team'''
-grails.plugins.springsecurity.ui.userdeleted.emailFrom = 'notification@indiabiodiversity.org'
+grails.plugins.springsecurity.ui.userdeleted.emailFrom = 'notification@bhutanbiodiversity.org'
 grails.plugins.springsecurity.ui.userdeleted.emailSubject = 'User is being deleted on $domain'
 
 grails.plugins.springsecurity.ui.forgotPassword.emailBody = '''\
@@ -932,7 +932,7 @@ If you didn't make this request then ignore the email; no changes have been made
 <br/>
 If you did make the request, then click <a href="$url">here</a> to reset your password.
 '''
-grails.plugins.springsecurity.ui.forgotPassword.emailFrom = 'notification@indiabiodiversity.org'
+grails.plugins.springsecurity.ui.forgotPassword.emailFrom = 'notification@bhutanbiodiversity.org'
 grails.plugins.springsecurity.ui.forgotPassword.emailSubject = "Password Reset"
 
 grails.plugins.springsecurity.ui.addObservation.emailSubject = 'Observation added'
@@ -1047,7 +1047,7 @@ $user has invited you to be founder of the group <a href="$groupUrl">$group</a> 
 If you do not want to receive notifications please go to your <a href="$userProfileUrl">user profile</a> and switch it off.<br/>
 <br/>
 -The portal team'''
-grails.plugins.springsecurity.ui.bBird.emailSubject = 'Welcome to the India Biodiversity Portal'
+grails.plugins.springsecurity.ui.bBird.emailSubject = 'Welcome to the Bhutan Biodiversity Portal'
 grails.plugins.springsecurity.ui.bBird.emailBody = '''\
 Hi $username,<br/>
 <br/>
