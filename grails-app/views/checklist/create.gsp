@@ -31,7 +31,7 @@
     <body>
         <div class="observation_create">
             <div class="span12">
-                <obv:showSubmenuTemplate model="['entityName':(params.action == 'edit' || params.action == 'update')?'Edit Observation':'Add Observation']"/>
+                <obv:showSubmenuTemplate model="['entityName':(params.action == 'edit' || params.action == 'update')?'Edit Checklist':'Add Checklist']"/>
                 <%
                 def allowedExtensions = "['csv']"
                 %>
@@ -62,6 +62,14 @@
                             <g:render template="/observation/selectGroupHabitatDate" model="['observationInstance':observationInstance]"/>
                         </div>
                     </div>
+                    <div class="span12 super-section" style="clear:both">
+                        <h3>Save this list as ...</h3>
+
+                        <div class="section">
+                            <g:render template="/checklist/details" model="['observationInstance':observationInstance]"/>
+                        </div>
+                    </div>
+ 
                     <div class="span12 super-section" style="clear: both;">
                         <%
                         def obvInfoFeeder = lastCreatedObv ? lastCreatedObv : observationInstance

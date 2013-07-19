@@ -105,13 +105,25 @@
 <r:script>
 $(document).ready(function() {
     loadGoogleMapsAPI(function() {
-    	initialize(document.getElementById("map_canvas"), true);
-        initArea(true);
+        initialize(document.getElementById("map_canvas"), true);
+        var drawControls, editControls;
+        <g:if test="${params.controller == 'checklist'}">
+            drawControls = {
+                marker:true,
+                circle:true,
+                rectangle:true,
+                polyline:false,
+                polygon:true
+            }
+        
+            editControls = {featureGroup: new L.FeatureGroup()}
+        </g:if>
+        initArea(true, drawControls, editControls);
         $('.geotagged_image').each(function(index){
                 update_geotagged_images_list($(this));		
         });
         //locate();
-//        $("#map_canvas").resizable();
+        //$("#map_canvas").resizable();
     });
 
     $(".address .add-on").click(function(){

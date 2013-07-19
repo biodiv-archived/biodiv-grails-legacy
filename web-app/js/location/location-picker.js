@@ -97,31 +97,35 @@ function initLocation(drawable) {
     }
 }
 
-function initArea(drawable) {
-    drawnItems = new L.FeatureGroup();
+function initArea(drawable, drawControls, editControls) {
+    drawnItems = (editControls != undefined) ? editControls.featureGroup : new L.FeatureGroup();
     
     if(drawable) {
-        var drawControl = new M.Control.Draw({
-            draw:{
-                circle:false,
-                rectangle:false,
-                polyline:false,
-                polygon:false
-                /*
-                polygon: {
-                    allowIntersection: false // Restricts shapes to simple polygons
-                }*/
-            }
-            /*,
-            edit: {
-               featureGroup: drawnItems
-            }*/
-        });
+        if(drawControls == undefined) drawControls = {};
+        
+        drawControls = $.extend({}, {
+            marker:true,
+            circle:false,
+            rectangle:false,
+            polyline:false,
+            polygon:false
+        }, drawControls);
+
+        var drawControl;
+        if(editControls) {
+            drawControl = new M.Control.Draw({
+                draw:drawControls,
+                edit:editControls
+            });
+        } else {
+            drawControl = new M.Control.Draw({
+                draw:drawControls
+            });
+        }
         drawControl.addTo(map);
         map.on('draw:drawstart', clearDrawnItems);
         map.on('draw:created', addDrawnItems);
     }
-    
     map.addLayer(drawnItems);
 
     var areas = $('input#areas').val()

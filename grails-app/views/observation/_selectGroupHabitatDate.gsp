@@ -38,7 +38,7 @@
         placeholder="Select from date (dd/MM/yyyy)" />
 
         <div class="help-inline">
-            <g:hasErrors bean="${observationInstance}" field="fromOn">
+            <g:hasErrors bean="${observationInstance}" field="fromDate">
             <g:if test="${observationInstance.fromDate == null}">
             <g:message code="observation.observedOn.validator.invalid_date" />
             </g:if>
