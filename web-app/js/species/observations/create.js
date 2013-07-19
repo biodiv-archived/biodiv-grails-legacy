@@ -284,7 +284,7 @@ $(document).ready(function(){
             return false; 		 		
         }
 
-        if (document.getElementById('agreeTerms').checked){
+        if (document.getElementById('agreeTerms').checked) {
             $(this).addClass("disabled");
 
             var speciesGroups = getSelectedGroup();
@@ -310,6 +310,13 @@ $(document).ready(function(){
                     $("input#areas").val(wkt.write());
                 }
             }
+
+
+            //checklist related data
+            $("#checklistColumns").val(JSON.stringify(grid.getColumns()));
+            $("#checklistData").val(JSON.stringify(grid.getData()));
+            $("#rawChecklist").val($("#checklistStartFile_path").val());
+ 
             $("#addObservation").submit();        	
             return false;
         } else {

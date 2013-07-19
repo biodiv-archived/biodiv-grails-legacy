@@ -129,17 +129,7 @@
            out << "jQuery('#habitat_${observationInstance.habitat.id}').addClass('active');";
            }
 	   %>
-
-            $("#addObservationSubmit").click(function(event){
-                $("#checklistColumns").val(JSON.stringify(grid.getColumns()))
-                $("#checklistData").val(JSON.stringify(grid.getData()))
-                $("#rawChecklist").val($("#checklistStartFile_path").val())
-                $("#addChecklist").submit();  
-            });
-   
         });
-
-
         </r:script>
     </body>
 </html>
