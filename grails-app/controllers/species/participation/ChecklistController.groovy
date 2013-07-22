@@ -131,7 +131,7 @@ class ChecklistController {
 			redirect (url:uGroup.createLink(action:'show', controller:"checklist", id:result.checklistInstance.id, 'userGroupWebaddress':params.webaddress, postToFB:(params.postToFB?:false)))
 		}else{
 			//flash.message = "${message(code: 'error')}";
-			render(view: "create", model: [checklistInstance: result.checklistInstance])
+			render(view: "create", model: [observationInstance: result.checklistInstance])
 		}
 	}
 	

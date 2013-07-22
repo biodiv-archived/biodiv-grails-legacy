@@ -325,7 +325,8 @@ class Observation extends Metadata implements Taggable, Rateable {
 	}
 	
 	private updateIsShowable(){
-		isShowable = (isChecklist || (resource && !resource.isEmpty())) ? true : false
+		boolean isChecklistObs = (id && sourceId != id) ||  (!id && sourceId)
+		isShowable = (isChecklist || (!isChecklistObs && resource && !resource.isEmpty())) ? true : false
 	}
 	
 	private  updateLatLong(){

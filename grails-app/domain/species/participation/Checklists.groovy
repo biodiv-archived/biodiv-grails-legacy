@@ -50,11 +50,11 @@ class Checklists extends Observation {
 	
 	static constraints = {
 		//XXX this is extended class so have strictly say nullable false
-		title nullable:false;
+		title nullable:false, blank:false;
 		speciesCount nullable:false;
 		columnNames  nullable:false ;
-		rawChecklist nullable:false;
-		license  nullable:false;
+		rawChecklist nullable:true;
+		license  nullable:false, blank:false;;
 		
 		//attribution nullable:true;
 		reservesValue nullable:true;

@@ -405,10 +405,11 @@ $(document).ready(function(){
 
 
             //checklist related data
-            $("#checklistColumns").val(JSON.stringify(grid.getColumns()));
-            $("#checklistData").val(JSON.stringify(grid.getData()));
-            $("#rawChecklist").val($("#checklistStartFile_path").val());
-
+            if(grid){
+	            $("#checklistColumns").val(JSON.stringify(grid.getColumns()));
+	            $("#checklistData").val(JSON.stringify(grid.getData()));
+	            $("#rawChecklist").val($("#checklistStartFile_path").val());
+            }
             $("#addObservation").submit();        	
             return false;
         } else {
