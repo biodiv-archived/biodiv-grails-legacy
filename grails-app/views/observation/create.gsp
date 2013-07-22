@@ -373,7 +373,7 @@ if(r) {
 						def obvInfoFeeder = lastCreatedObv ? lastCreatedObv : observationInstance
            			%>
            			<div class="span12 super-section" style="clear: both;">
-                                    <obv:showMapInput model="[observationInstance:observationInstance, userObservationInstanceList: totalObservationInstanceList, obvInfoFeeder:obvInfoFeeder, locationHeading:'Where did you find this observation?']"></obv:showMapInput>
+                                    <obv:showMapInput model="[observationInstance:obvInfoFeeder, userObservationInstanceList: totalObservationInstanceList, obvInfoFeeder:obvInfoFeeder, locationHeading:'Where did you find this observation?']"></obv:showMapInput>
       				</div>
 					<div class="span12 super-section"  style="clear: both">
 						<div class="section" style="position: relative; overflow: visible;">
