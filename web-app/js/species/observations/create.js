@@ -152,7 +152,7 @@ function pickerCallback(data) {
     }
 }
 
-function getSelectedGroup() {
+function getSelectedGroupArr() {
     var grp = []; 
     $('#speciesGroupFilter button').each (function() {
         if($(this).hasClass('active')) {
@@ -162,7 +162,7 @@ function getSelectedGroup() {
     return grp;	
 } 
 
-function getSelectedHabitat() {
+function getSelectedHabitatArr() {
     var hbt = []; 
     $('#habitatFilter button').each (function() {
         if($(this).hasClass('active')) {
@@ -379,16 +379,16 @@ $(document).ready(function(){
         if (document.getElementById('agreeTerms').checked) {
             $(this).addClass("disabled");
 
-            var speciesGroups = getSelectedGroup();
-            var habitats = getSelectedHabitat();
+            var speciesGroups = getSelectedGroupArr();
+            var habitats = getSelectedHabitatArr();
 
-            $.each(speciesGroups, function(index){
-                var input = $("<input>").attr("type", "hidden").attr("name", "group_id").val(this);
+            $.each(speciesGroups, function(index, element){
+                var input = $("<input>").attr("type", "hidden").attr("name", "group_id").val(element);
                 $('#addObservation').append($(input));	
             })
 
-            $.each(habitats, function(index){
-                var input = $("<input>").attr("type", "hidden").attr("name", "habitat_id").val(this);
+            $.each(habitats, function(index, element){
+                var input = $("<input>").attr("type", "hidden").attr("name", "habitat_id").val(element);
                 $('#addObservation').append($(input));	
             })
 

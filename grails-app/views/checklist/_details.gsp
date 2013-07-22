@@ -20,8 +20,7 @@
     <label for="license" class="control-label"><g:message
         code="checklist.license.label" default="License" /> </label>
     <div class="controls">
-
-        <g:render template="/observation/selectLicense" model="['i':1, 'selectedLicense':observationInstance?.license]"/>
+		<g:render template="/observation/selectLicense" model="['i':1, 'selectedLicense':observationInstance?.license]"/>
         <div class="help-inline">
             <g:hasErrors bean="${observationInstance}" field="license">
             <g:eachError bean="${observationInstance}" field="license">
@@ -65,10 +64,10 @@
     <label for="title" class="control-label"><g:message
         code="checklist.attribution.label" default="Attribution" /> </label>
     <div class="controls textbox">
-        <g:textField name="attribution" value="${observationInstance?.attribution}" class="input-block-level" placeholder="Enter attribution for this checklist..." />
+        <g:textField name="attributions" value="${observationInstance?.attributions}" class="input-block-level" placeholder="Enter attribution for this checklist..." />
         <div class="help-inline">
-            <g:hasErrors bean="${observationInstance}" field="attribution">
-            <g:eachError bean="${observationInstance}" field="attribution">
+            <g:hasErrors bean="${observationInstance}" field="attributions">
+            <g:eachError bean="${observationInstance}" field="attributions">
             <li><g:message error="${it}" /></li>
             </g:eachError>
             </g:hasErrors>

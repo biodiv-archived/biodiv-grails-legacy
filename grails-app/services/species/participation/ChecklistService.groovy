@@ -74,7 +74,7 @@ class ChecklistService {
 		observationService.updateObservation(params, checklist)
 		
 		checklist.title =  params.title
-		checklist.license = License.findByName(params.license)  
+		checklist.license = License.findByName(License.fetchLicenseType(params.license_1))  
 		checklist.refText =  params.refText
 		checklist.sourceText =  params.sourceText
 		checklist.rawChecklist =  params.rawChecklist
@@ -82,8 +82,8 @@ class ChecklistService {
 		checklist.publicationDate =  params.publicationDate ? observationService.parseDate(params.publicationDate) : null
 		checklist.reservesValue =  params.reservesValue
 		
-		if(params.attribution){
-			def contributor = new Contributor(name:params.attribution)
+		if(params.attributions){
+			def contributor = new Contributor(name:params.attributions)
 			contributor.save()
 			checklist.addToAttributions(contributor)
 		}
@@ -142,7 +142,7 @@ class ChecklistService {
 			def obsParams = getParamsForObv(params, checklistInstance)
 			
 			params.checklistData.each { Map m ->
-				def res = observationService.saveObservation(obsParams)
+				def res = observationService.saveObservation(obsParams, false)
 				Observation observationInstance = res.observationInstance
 				saveReco(observationInstance, m)
 				saveObservationAnnotation(observationInstance, m, Arrays.asList(checklistInstance.fetchColumnNames()))

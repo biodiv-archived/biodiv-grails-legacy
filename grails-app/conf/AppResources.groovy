@@ -259,6 +259,7 @@ modules = {
 		dependsOn 'observations_create, checklist, slickgrid, add_file'
 		
 		resource url:'/js/species/parseUtil.js'
+		resource url:'/js/species/jquery.csv-0.71.min.js'
 	}
 	
 	chart {

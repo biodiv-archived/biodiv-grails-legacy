@@ -36,14 +36,14 @@ function parseData(csvFile, options) {
 		var error = '';
 		$.each(lines, function(lineCount, line) {
 			if ((lineCount == options.startLine) && (typeof(options.headers) == 'undefined')) {
-				var headers = line.splitCSV(options.separator);
+				var headers = $.csv.toArray(line);
 				headerCount = headers.length;
 				$.each(headers, function(headerCount, header) {
 					columns.push({id:header, name: header, field: header, editor: Slick.Editors.Text, minWidth: 200});
 					//console.log(columns.length)
 				});
 			} else if (lineCount >= options.startLine) {
-				var items = line.splitCSV(options.separator);
+				var items = $.csv.toArray(line);
 				//console.log(items)
 				if (items.length > 1) {
 					printedLines++;
