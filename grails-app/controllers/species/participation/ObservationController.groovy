@@ -159,8 +159,8 @@ class ObservationController {
 		def observationInstance = new Observation()
 		observationInstance.properties = params;
 		def author = springSecurityService.currentUser;
-//		def lastCreatedObv = Observation.find("from Observation as obv where obv.author=:author order by obv.createdOn desc ",[author:author]);
-		return [observationInstance: observationInstance, 'springSecurityService':springSecurityService]
+		def lastCreatedObv = Observation.find("from Observation as obv where obv.author=:author and obv.isDeleted=:isDeleted order by obv.createdOn desc ",[author:author, isDeleted:false]);
+		return [observationInstance: observationInstance, 'lastCreatedObv':lastCreatedObv, 'springSecurityService':springSecurityService]
 	}
 	
 
