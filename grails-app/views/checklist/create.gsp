@@ -38,7 +38,7 @@
                 %>
                 <g:render template='/UFile/docUpload' model="['name': 'checklistStartFile', fileParams:fileParams, allowedExtensions:allowedExtensions,uploadCallBack:'showGrid()']" />
                 <%
-                def form_id = "addChecklist"
+                def form_id = "addObservation"
                 def form_action = uGroup.createLink(action:'save', controller:'checklist', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)
                 def form_button_name = "Add Checklist"
                 def form_button_val = "Add Checklist"
@@ -54,13 +54,17 @@
                         <h3>What did you observe?</h3>
 
                         <div class="section checklist-slickgrid">
-                            <div id="myGrid" style="width:620px;height:350px;display:none;"></div>
+                            <span id="addNewColumn" class="btn-link">+ Add New Column</span>
+                            <div id="myGrid" class="span7" style="height:350px;display:none;"></div>
                             <input id="rawChecklist" name="rawChecklist" type="hidden" value='' />
                             <input id="checklistData" name="checklistData" type="hidden" value='' />
                             <input id="checklistColumns" name="checklistColumns" type="hidden" value='' />
                         </div>
 
-                        <div class="section">
+                        <div class="section span4">
+                            <g:render template="/observation/addPhoto" model="['observationInstance':observationInstance]"/>
+                        </div>
+                        <div class="section" style="clear:both;">
                             <g:render template="/observation/selectGroupHabitatDate" model="['observationInstance':observationInstance]"/>
                         </div>
                     </div>
@@ -115,10 +119,20 @@
                     </div>
 
                 </form>
+                <form id="upload_resource" 
+                    title="Add a photo for this observation"
+                    method="POST"
+                    class="${hasErrors(bean: observationInstance, field: 'resource', 'errors')}">
+
+                    <span class="msg" style="float: right"></span>
+                    <input id="videoUrl" type="hidden" name='videoUrl'value="" />
+                    <input type="hidden" name='obvDir' value="${obvDir}" />
+                </form>
 
             </div>
         </div>
 
+<script type="text/javascript" src="//api.filepicker.io/v1/filepicker.js"></script>
         <r:script>
         $(document).ready(function(){
            <%
@@ -129,6 +143,13 @@
            out << "jQuery('#habitat_${observationInstance.habitat.id}').addClass('active');";
            }
 	   %>
+
+           f([], [{id: "sciName", name: "Scientific Name", field: "sciName", width:150},
+               {id: "commonName", name: "Common Name", field: "commonName", width:150},
+               {id: "notes", name: "Notes", field: "notes", width: 100, editor: Slick.Editors.LongText, width:240}//,
+               //{id: "addMedia", name: "Add Media", field: "addMedia"}
+               ]);
+
         });
         </r:script>
     </body>

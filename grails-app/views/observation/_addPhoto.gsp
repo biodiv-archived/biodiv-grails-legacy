@@ -16,7 +16,7 @@
             <%
             def imagePath = '';
             if(r) {
-                imagePath = r.thumbnailUrl(Utils.getDomainServerUrlWithContext(request) + '/observations')?:null;
+            imagePath = r.thumbnailUrl(Utils.getDomainServerUrlWithContext(request) + '/observations')?:null;
             }
             %>
 
@@ -34,7 +34,7 @@
                 <input name="type_${i}" type="hidden" value='${r.type}'/>
                 <obv:rating model="['resource':r, class:'obvcreate', 'hideForm':true, index:i]"/>
                 <g:if test="${r.type == ResourceType.IMAGE}">
-                    <g:render template="/observation/selectLicense" model="['i':i, 'selectedLicense':r?.licenses?.asList().first()]"/>
+                <g:render template="/observation/selectLicense" model="['i':i, 'selectedLicense':r?.licenses?.asList().first()]"/>
                 </g:if>
 
             </div> 
@@ -66,4 +66,44 @@
         </div>
     </div>
 </div>
+<!--====== Template ======-->
+<script id="metadataTmpl" type="text/x-jquery-tmpl">
+    <li class="addedResource thumbnail">
+    <div class='figure' style='height: 200px; overflow:hidden;'>
+        <span> 
+            <img id='image_{{>i}}' style="width:auto; height: auto;" src='{{>thumbnail}}' class='geotagged_image' exif='true'/> 
+        </span>
+    </div>
+
+    <div class='metadata prop' style="position:relative; top:-30px;">
+        <input name="file_{{>i}}" type="hidden" value='{{>file}}'/>
+        <input name="url_{{>i}}" type="hidden" value='{{>url}}'/>
+        <input name="type_{{>i}}" type="hidden" value='{{>type}}'/>
+        <%def r = new Resource();%>
+        <obv:rating model="['resource':r, class:'obvcreate', 'hideForm':true, index:1]"/>
+
+        {{if type == '${ResourceType.IMAGE}'}}
+        <div id="license_div_{{>i}}" class="licence_div pull-left dropdown">
+            <a id="selected_license_{{>i}}" class="btn dropdown-toggle btn-mini" data-toggle="dropdown">
+                <img src="${resource(dir:'images/license',file:'cc_by.png', absolute:true)}" title="Set a license for this image"/>
+                <b class="caret"></b>
+            </a>
+            <ul id="license_options_{{>i}}" class="dropdown-menu license_options">
+                <span>Choose a license</span>
+                <g:each in="${species.License.list()}" var="l">
+                <li class="license_option" onclick="$('#license_{{>i}}').val($.trim($(this).text()));$('#selected_license_{{>i}}').find('img:first').replaceWith($(this).html());">
+                <img src="${resource(dir:'images/license',file:l?.name.getIconFilename()+'.png', absolute:true)}"/><span style="display:none;">${l?.name?.value}</span>
+                </li>
+                </g:each>
+            </ul>
+            <input id="license_{{>i}}" type="hidden" name="license_{{>i}}" value="CC BY"></input>
+        </div>	
+        {{/if}}
+    </div>
+    <div class="close_button" onclick="removeResource(event, {{>i}});$('#geotagged_images').trigger('update_map');"></div>
+    </li>
+
+</script>
+
+	
 

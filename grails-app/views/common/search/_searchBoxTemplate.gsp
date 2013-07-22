@@ -51,7 +51,8 @@ $(document).ready(function() {
                 'defaultMarkerIcon':"${resource(dir:'js/Leaflet/dist/images', file:'')}",
                 'isChecklistOnly':"${params.isChecklistOnly?.toBoolean()?.toString()}",
                 'observation':{
-                    listUrl:"${uGroup.createLink(controller:'observation', action: 'listJSON', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"
+                    listUrl:"${uGroup.createLink(controller:'observation', action: 'listJSON', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}",
+                    uploadUrl:"${g.createLink(controller:'observation', action:'upload_resource')}"
                 }
 	}
 	$("#userGroupSelectFilter").val("${(queryParams && queryParams.uGroup)?queryParams.uGroup:(params.webaddress?'THIS_GROUP':'ALL')}");

@@ -21,6 +21,19 @@ function f(data, columns){
             grid.render();
         });
 
+        grid.addNewColumn = function(){
+            var newColumnName = prompt('New Column Name','');
+            if(newColumnName == null||newColumnName==''){
+                return;
+            }
+            console.log(columns);
+            var newColumn = [{id:newColumnName,name:newColumnName,field:newColumnName,editor: Slick.Editors.TextCellEditor,sortable:true}];
+            $.merge(columns,newColumn);
+            grid.setColumns(columns);
+            grid.render();
+        };
+
+
         $("#myGrid").show();
         $('#checklistStartFile_uploaded').hide();
     });
@@ -39,6 +52,10 @@ function requiredFieldValidator(value) {
     }
 }
 
+$('#addNewColumn').unbind('click').click(function(){
+    grid.addNewColumn();
+}); 
+
 function removeResource(event, imageId) {
     var targ;
     if (!event) var event = window.event;
@@ -51,8 +68,8 @@ function removeResource(event, imageId) {
 
 $( ".date" ).datepicker({ 
     changeMonth: true,
-changeYear: true,
-format: 'dd/mm/yyyy' 
+    changeYear: true,
+    format: 'dd/mm/yyyy' 
 });
 
 
@@ -154,7 +171,7 @@ function getSelectedHabitat() {
     });
     return hbt;	
 }
-	
+
 /**
  * document ready
  */
@@ -195,28 +212,6 @@ $(document).ready(function(){
     }
 
     $('#add_video').editable(addVideoOptions);
-    //$('#add_video').click(function(){
-    //    newPicker();                    
-    //});
-
-/*    $(".group_option").click(function(){
-        $("#group_id").val($(this).val());
-        var caret = "<span class='caret'></span>";
-        $("#selected_group").html($(this).html() + caret);
-        //$("#group_options").hide();
-        $("#selected_group").css({'background-color':'#e5e5e5', 'border-bottom-color':'#aeaeae'});
-
-    });
-
-
-    $(".habitat_option").click(function(){
-        $("#habitat_id").val($(this).val());
-        var caret = "<span class='caret'></span>";
-        $("#selected_habitat").html($(this).html() + caret);
-        //$("#habitat_options").hide();
-        $("#selected_habitat").css({'background-color':'#e5e5e5', 'border-bottom-color':'#aeaeae'});
-    });
-*/
     $.each($('.star_obvcreate'), function(index, value){
         rate($(value));
     });
@@ -277,6 +272,103 @@ $(document).ready(function(){
         }
     });
 
+
+    $('#attachFiles').change(function(e){
+        $('#upload_resource').submit().find("span.msg").html("Uploading... Please wait...");
+        $("#iemsg").html("Uploading... Please wait...");
+    });
+
+    var onUploadResourceSuccess = function(responseXML, statusText, xhr, form) {
+        $("#addObservationSubmit").removeClass('disabled');
+        $(form).find("span.msg").html("");
+        $(".progress").css('z-index',90);
+        $('#progress_msg').html('');
+        $("#iemsg").html("");
+        //var rootDir = '${grailsApplication.config.speciesPortal.observations.serverURL}'
+        //var rootDir = '${Utils.getDomainServerUrlWithContext(request)}' + '/observations'
+        var obvDir = $(responseXML).find('dir').text();
+        var obvDirInput = $('#upload_resource input[name="obvDir"]');
+        if(!obvDirInput.val()){
+            $(obvDirInput).val(obvDir);
+        }
+        var images = []
+            var metadata = $(".metadata");
+        var i = 0;
+        if(metadata.length > 0) {
+            var file_id = $(metadata.get(-1)).children("input").first().attr("name");
+            i = parseInt(file_id.substring(file_id.indexOf("_")+1));
+        }
+        $(responseXML).find('resources').find('res').each(function() {
+            var fileName = $(this).attr('fileName');
+            var type = $(this).attr('type');					
+            images.push({i:++i, file:obvDir + "/" + fileName, url:$(this).attr('url'), thumbnail:$(this).attr('thumbnail'), type:type, title:fileName});
+        });
+
+        var html = $( "#metadataTmpl" ).render( images );
+        var metadataEle = $(html)
+            metadataEle.each(function() {
+                $('.geotagged_image', this).load(function(){
+                    update_geotagged_images_list($(this));		
+                });
+                var $ratingContainer = $(this).find('.star_obvcreate');
+                rate($ratingContainer)
+            })
+        $( "#imagesList li:last" ).before (metadataEle);
+        $( "#add_file" ).fadeIn(3000);
+        $("#image-resources-msg").parent(".resources").removeClass("error");
+        $("#image-resources-msg").html("");
+        $("#upload_resource input[name='resources']").remove();
+        $('#videoUrl').val('');
+        $('#add_video').editable('setValue','', false);		
+    }
+
+    var onUploadResourceError = function (xhr, ajaxOptions, thrownError){
+        var successHandler = this.success, errorHandler;
+        handleError(xhr, ajaxOptions, thrownError, successHandler, function(data) {
+            if(data && data.status == 401) {
+                $('#upload_resource').submit();
+                return; 
+            }
+            $("#addObservationSubmit").removeClass('disabled');
+            $("#upload_resource input[name='resources']").remove();
+            $('#videoUrl').val('');
+            $(".progress").css('z-index',90);
+            $('#add_video').editable('setValue','', false);
+            //xhr.upload.removeEventListener( 'progress', progressHandlingFunction, false); 
+
+            var response = $.parseJSON(xhr.responseText);
+            if(response.error){
+                $("#image-resources-msg").parent(".resources").addClass("error");
+                $("#image-resources-msg").html(response.error);
+            }
+
+            var messageNode = $(".message .resources");
+            if(messageNode.length == 0 ) {
+                $("#upload_resource").prepend('<div class="message">'+(response?response.error:"Error")+'</div>');
+            } else {
+                messageNode.append(response?response.error:"Error");
+            }
+
+        });
+    } 
+
+    console.log($('#upload_resource'));
+    $('#upload_resource').ajaxForm({ 
+        url:window.params.observation.uploadUrl,
+        dataType: 'xml',//could not parse json wih this form plugin 
+        clearForm: true,
+        resetForm: true,
+        type: 'POST',
+
+        beforeSubmit: function(formData, jqForm, options) {
+            $("#addObservationSubmit").addClass('disabled');
+            return true;
+        }, 
+        success:onUploadResourceSuccess,
+        error:onUploadResourceError
+    });  
+
+
     $("#addObservationSubmit").click(function(event){
         if($(this).hasClass('disabled')) {
             alert("Uploading is in progress. Please submit after it is over.");
@@ -316,7 +408,7 @@ $(document).ready(function(){
             $("#checklistColumns").val(JSON.stringify(grid.getColumns()));
             $("#checklistData").val(JSON.stringify(grid.getData()));
             $("#rawChecklist").val($("#checklistStartFile_path").val());
- 
+
             $("#addObservation").submit();        	
             return false;
         } else {
