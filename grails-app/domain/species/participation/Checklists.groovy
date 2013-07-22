@@ -66,7 +66,13 @@ class Checklists extends Observation {
 		sourceText nullable:true;
 		
 		//XXX to be removed
-		publicationDate  nullable:true;
+		publicationDate  nullable:true, validator : {val, obj -> 
+			if(!val){
+				return true
+			}else{
+			 	return val < new Date() 
+			}
+		}
 	}
 
 	static mapping = {

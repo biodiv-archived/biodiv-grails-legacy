@@ -83,7 +83,6 @@ class Observation extends Metadata implements Taggable, Rateable {
 			if(!obj.sourceId && !obj.isChecklist) 
 				val && val.size() > 0 
 		}
-		fromDate validator : {val -> val < new Date()}
 /*		latitude validator : { val, obj ->
 			if(!val) {
                 return ['default.blank.message', 'Latitude']
@@ -325,6 +324,7 @@ class Observation extends Metadata implements Taggable, Rateable {
 	}
 	
 	private updateIsShowable(){
+		//supprssing all checklist generated observation even if they have media
 		boolean isChecklistObs = (id && sourceId != id) ||  (!id && sourceId)
 		isShowable = (isChecklist || (!isChecklistObs && resource && !resource.isEmpty())) ? true : false
 	}

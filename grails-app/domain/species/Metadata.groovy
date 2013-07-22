@@ -45,8 +45,14 @@ abstract class Metadata {
 		longitude(nullable:false)
 		locationAccuracy(nullable: true)
         topology(nullable:false)
-		fromDate (nullable:true)
-		toDate (nullable:true)
+		fromDate validator : {val, obj -> val < new Date()}
+		toDate nullable:true, validator : {val, obj ->
+			if(!val){
+				return true
+			}else{
+			 	return val < new Date() && val >= obj.fromDate
+			}
+		}
     }
 	
     static mapping = {
