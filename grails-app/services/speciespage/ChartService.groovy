@@ -13,6 +13,7 @@ import species.groups.SpeciesGroup;
 import species.groups.UserGroup;
 import species.utils.ImageType;
 import species.participation.ActivityFeed;
+import species.participation.ActivityFeedService;
 import species.participation.Observation;
 import species.participation.RecommendationVote;
 
@@ -375,25 +376,28 @@ class ChartService {
 			Date startDate = currentDate.minus(i+1)
 			result.add([
 				startDate,
-				getActivityCount(startDate, endDate, typeToIdFilterMap, userGroupInstance)
+				getActivityCount(startDate, endDate, typeToIdFilterMap, userGroupInstance),
+				getActivityCount(startDate, endDate, typeToIdFilterMap, userGroupInstance, ActivityFeedService.OBSERVATION_CREATED),
 			])
 		}
 
 		return [data:result, columns : [
 				['date', 'Date'],
-				[
-					'number',
-					'Activity Count']
-			]]
+				['number','Activity'],
+				['number','Observation']
+				]
+			]
 	}
 
-	private int getActivityCount(startDate, endDate, typeToIdFilterMap, userGroupInstance){
+	private int getActivityCount(startDate, endDate, typeToIdFilterMap, userGroupInstance, feedType=null){
 		return ActivityFeed.withCriteria(){
 			projections { rowCount('total') //alias given to count
 			}
 			and{
 				between('lastUpdated', startDate, endDate)
-
+				if(feedType){
+					eq('activityType', feedType)
+				}
 				//filter by usergroup
 				if(userGroupInstance){
 					or{
