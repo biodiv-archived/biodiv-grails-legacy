@@ -308,10 +308,7 @@ class ChartService {
 			order 'total', 'desc'
 		}
 		
-		def obvCount = Observation.withCriteria(){
-			projections {
-				rowCount('total') //alias given to count
-			}
+		def obvCount = Observation.createCriteria().count {
 			and{
 				// taking undeleted observation
 				eq('isDeleted', false)
@@ -327,8 +324,7 @@ class ChartService {
 					}
 				}
 			}
-			maxResults 1
-		}[0]
+		}
 		
 		def finalResult = []
 		result.each { r ->
@@ -371,28 +367,38 @@ class ChartService {
 		Date currentDate = new Date()
 		DateGroovyMethods.clearTime(currentDate)
 		
+		
+		
 		for(int i = -1; i <= days ; i++){
 			Date endDate = currentDate.minus(i)
 			Date startDate = currentDate.minus(i+1)
+			
+			def userCount
+			if(userGroupInstance){
+				userCount = getActivityCount(startDate, endDate, typeToIdFilterMap, userGroupInstance, ActivityFeedService.MEMBER_JOINED)
+			}else{
+				userCount = getRegisterUserCount(startDate, endDate)
+			}
+			
 			result.add([
 				startDate,
 				getActivityCount(startDate, endDate, typeToIdFilterMap, userGroupInstance),
 				getActivityCount(startDate, endDate, typeToIdFilterMap, userGroupInstance, ActivityFeedService.OBSERVATION_CREATED),
+				userCount
 			])
 		}
 
 		return [data:result, columns : [
 				['date', 'Date'],
 				['number','Activity'],
-				['number','Observation']
+				['number','Observation'],
+				['number', 'Users']
 				]
 			]
 	}
 
 	private int getActivityCount(startDate, endDate, typeToIdFilterMap, userGroupInstance, feedType=null){
-		return ActivityFeed.withCriteria(){
-			projections { rowCount('total') //alias given to count
-			}
+		return ActivityFeed.createCriteria().count{
 			and{
 				between('lastUpdated', startDate, endDate)
 				if(feedType){
@@ -412,9 +418,17 @@ class ChartService {
 					}
 				}
 			}
-		}[0]
+		}
 	}
 
+	private int getRegisterUserCount(startDate, endDate){
+		return SUser.createCriteria().count {
+				and{
+					between('dateCreated', startDate, endDate)
+				}
+			}
+	}
+	
 	private int getPassedDays(params, UserGroup userGroupInstance){
 		if(params.days)
 			return params.days.toInteger()
