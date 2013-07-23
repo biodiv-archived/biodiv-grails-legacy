@@ -22,7 +22,7 @@
 </div>
 
 <div
-    class="row control-group ${hasErrors(bean: observationInstance, field: 'fromDate', 'error')}">
+    class="row control-group ${hasErrors(bean: observationInstance, field: 'fromDate', 'error')} ${hasErrors(bean: observationInstance, field: 'toDate', 'error')}">
 
     <label for="fromOn" class="control-label"><i
             class="icon-calendar"></i>
@@ -55,12 +55,15 @@
         placeholder="Select to date (dd/MM/yyyy)" />
 
         <div class="help-inline">
-            <g:hasErrors bean="${observationInstance}" field="toOn">
+            <g:hasErrors bean="${observationInstance}" field="toDate">
             <g:if test="${observationInstance.toDate == null}">
-            <g:message code="observation.observedOn.validator.invalid_date" />
+            	<g:message code="observation.observedOn.validator.invalid_date" />
             </g:if>
+            <g:elseif test="${observationInstance.toDate < observationInstance.fromDate}">
+            	<g:message code="observation.toDate.validator.invalid_date_range" />
+            </g:elseif>
             <g:else>
-            <g:message code="observation.observedOn.validator.future_date" />
+            	<g:message code="observation.observedOn.validator.future_date" />
             </g:else>
 
             </g:hasErrors>

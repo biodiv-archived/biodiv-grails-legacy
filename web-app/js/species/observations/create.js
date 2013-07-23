@@ -429,14 +429,12 @@ $(document).ready(function(){
                 }
             }
 
-
-            if(grid) {
-                //checklist related data
-                $("#checklistColumns").val(JSON.stringify(grid.getColumns()));
-                $("#checklistData").val(JSON.stringify(grid.getData()));
-                $("#rawChecklist").val($("#checklistStartFile_path").val());
+            //checklist related data
+            if(grid){
+	            $("#checklistColumns").val(JSON.stringify(grid.getColumns()));
+	            $("#checklistData").val(JSON.stringify(grid.getData()));
+	            $("#rawChecklist").val($("#checklistStartFile_path").val());
             }
-
             $("#addObservation").submit();        	
             return false;
         } else {

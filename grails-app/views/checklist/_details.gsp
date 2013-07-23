@@ -64,7 +64,7 @@
     <label for="title" class="control-label"><g:message
         code="checklist.attribution.label" default="Attribution" /> </label>
     <div class="controls textbox">
-        <g:textField name="attributions" value="${observationInstance?.attributions}" class="input-block-level" placeholder="Enter attribution for this checklist..." />
+        <g:textField name="attributions" value="${observationInstance?.attributions?.collect{ it.name}?.join(', ') }" class="input-block-level" placeholder="Enter attribution for this checklist..." />
         <div class="help-inline">
             <g:hasErrors bean="${observationInstance}" field="attributions">
             <g:eachError bean="${observationInstance}" field="attributions">
@@ -85,7 +85,7 @@
         [ 'Bold', 'Italic' ]
         ]
         </ckeditor:config>
-        <ckeditor:editor name="references" height="53px" toolbar="editorToolbar">
+        <ckeditor:editor name="refText" height="53px" toolbar="editorToolbar">
         ${observationInstance?.refText}
         </ckeditor:editor>
     </div>

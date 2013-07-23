@@ -50,11 +50,11 @@ class Checklists extends Observation {
 	
 	static constraints = {
 		//XXX this is extended class so have strictly say nullable false
-		title nullable:false;
+		title nullable:false, blank:false;
 		speciesCount nullable:false;
 		columnNames  nullable:false ;
-		rawChecklist nullable:false;
-		license  nullable:false;
+		rawChecklist nullable:true;
+		license  nullable:false, blank:false;;
 		
 		//attribution nullable:true;
 		reservesValue nullable:true;
@@ -66,7 +66,13 @@ class Checklists extends Observation {
 		sourceText nullable:true;
 		
 		//XXX to be removed
-		publicationDate  nullable:true;
+		publicationDate  nullable:true, validator : {val, obj -> 
+			if(!val){
+				return true
+			}else{
+			 	return val < new Date() 
+			}
+		}
 	}
 
 	static mapping = {

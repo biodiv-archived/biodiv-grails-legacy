@@ -83,6 +83,7 @@ class ChecklistService {
 		checklist.reservesValue =  params.reservesValue
 		
 		if(params.attributions){
+			checklist.attributions?.clear();
 			def contributor = new Contributor(name:params.attributions)
 			contributor.save()
 			checklist.addToAttributions(contributor)
