@@ -55,18 +55,35 @@
 
                         <div class="section checklist-slickgrid">
                             <span id="addNewColumn" class="btn-link">+ Add New Column</span>
-                            <div id="myGrid" class="span7" style="height:350px;display:none;"></div>
+                            <div id="myGrid" class="span8" style="height:350px;display:none;"></div>
                             <input id="rawChecklist" name="rawChecklist" type="hidden" value='' />
                             <input id="checklistData" name="checklistData" type="hidden" value='' />
                             <input id="checklistColumns" name="checklistColumns" type="hidden" value='' />
                         </div>
 
-                        <div class="section span4">
+                        <div class="section span3">
                             <g:render template="/observation/addPhoto" model="['observationInstance':observationInstance]"/>
                         </div>
+
+                        <div class="section" style="clear:both;">
+                            <div class="row control-group">
+                                <label for="group" class="control-label"><g:message
+                                    code="observation.groupHabitat.label" default="Scientific Name Column" /> </label>
+                                <div class="controls">
+                                    <select id="sciNameColumn" class="markColumn" name="sciNameColumn"></select>
+                                    <select id="commonNameColumn" class="markColumn" name="commonNameColumn"></select>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="section" style="clear:both;">
                             <g:render template="/observation/selectGroupHabitatDate" model="['observationInstance':observationInstance]"/>
                         </div>
+
+                        <a id="parseNames" class="btn btn-primary"
+                            style="float: right; margin-right: 5px;">Parse Names</a>
+
+
                     </div>
                     <div class="span12 super-section" style="clear:both">
                         <h3>Save this list as ...</h3>

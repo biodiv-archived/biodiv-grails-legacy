@@ -352,7 +352,6 @@ $(document).ready(function(){
         });
     } 
 
-    console.log($('#upload_resource'));
     $('#upload_resource').ajaxForm({ 
         url:window.params.observation.uploadUrl,
         dataType: 'xml',//could not parse json wih this form plugin 
@@ -368,6 +367,33 @@ $(document).ready(function(){
         error:onUploadResourceError
     });  
 
+
+    function selectColumn(){
+        var markColumnSelect = this;
+        var columns = grid.getColumns();
+        $(markColumnSelect).empty();
+        $.each(columns, function(index, column) {
+            $(markColumnSelect).append($("<option />").val(column.id).text(column.name));
+        });
+    };
+
+    $("#sciNameColumn").focus(selectColumn);
+    $("#commonNameColumn").focus(selectColumn);
+
+    $('#parseNames').click(function() {
+        $.ajax({
+            url : window.params.recommendation.getRecos,
+            method : 'post', 
+            dataType: 'json',
+            data : {'names':grid.getData()},
+            success : function(data) {
+                console.log(data);
+            },
+            error: function(xhr, textStatus, errorThrown) {
+                alert(xhr);
+            }
+        });
+    });
 
     $("#addObservationSubmit").click(function(event){
         if($(this).hasClass('disabled')) {
@@ -404,10 +430,12 @@ $(document).ready(function(){
             }
 
 
-            //checklist related data
-            $("#checklistColumns").val(JSON.stringify(grid.getColumns()));
-            $("#checklistData").val(JSON.stringify(grid.getData()));
-            $("#rawChecklist").val($("#checklistStartFile_path").val());
+            if(grid) {
+                //checklist related data
+                $("#checklistColumns").val(JSON.stringify(grid.getColumns()));
+                $("#checklistData").val(JSON.stringify(grid.getData()));
+                $("#rawChecklist").val($("#checklistStartFile_path").val());
+            }
 
             $("#addObservation").submit();        	
             return false;

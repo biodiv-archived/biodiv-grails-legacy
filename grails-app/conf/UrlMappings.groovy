@@ -23,11 +23,6 @@ class UrlMappings {
 		//"/login/$action?"(controller: "login")
 		"/logout/$action?"(controller: "logout")
 
-		"/$controller/$action?/$id?"{ constraints { // apply constraints here
-			} }
-
-
-		
 		"500"(view:'/error')
 		"403"(view:'/error')
 		"404"(view:'/notfound')

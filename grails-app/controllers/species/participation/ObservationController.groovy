@@ -969,8 +969,8 @@ class ObservationController {
 			}
 		}
 	}
-
-	/**
+   
+    /**
 	 * Count   
 	 */
 	def count = {
