@@ -913,6 +913,7 @@ input,button,select,textarea {
 
 .highlight {
 	font-weight: bold;
+        background-color:blue;
 }
 
 .info-message {
@@ -2047,3 +2048,4 @@ div.noOfRatings {
     padding-left: 20px;
     color: #0c8040;
 }
+

@@ -1,6 +1,8 @@
 package species.participation
 
 import grails.converters.JSON
+
+import java.util.List;
 import java.util.Map;
 
 import org.hibernate.Hibernate;
@@ -176,8 +178,8 @@ class Checklists extends Observation {
 	
 	private List getLimitedColumnForPdf(Observation obv, int serialNo){
 		def res = []
-		obv.fetchChecklistAnnotation().each { Annotation annot ->
-			if(annot.key.equalsIgnoreCase(ChecklistService.SN_NAME) || annot.key.equalsIgnoreCase(ChecklistService.CN_NAME)){
+		obv.fetchChecklistAnnotation().each { annot ->
+			if(annot.key.equalsIgnoreCase(sciNameColumn) || annot.key.equalsIgnoreCase(commonNameColumn)){
 				res.add(annot.value)
 			}
 		}
@@ -185,5 +187,14 @@ class Checklists extends Observation {
 		res.add("")
 		return res
 	}
+	
+	/**
+	* @return
+	* List of dirty fields that should update observation.
+	*/
+   static List fetchDirtyFields(){
+	   return ["fromDate", "geoPrivacy", "group", "habitat", "latitude", "locationAccuracy", "longitude", "placeName", "reverseGeocodedName", "toDate", "topology", "sciNameColumn", "commonNameColumn"]
+   }
+
 	
 }

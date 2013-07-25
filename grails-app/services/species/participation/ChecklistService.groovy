@@ -259,7 +259,7 @@ class ChecklistService {
 		def user = springSecurityService.currentUser;	
 		def oldRecoVote = RecommendationVote.findWhere(observation:obv, author:user)
 		
-		if(!oldRecoVote || oldRecoVote.recommendation.name != reco.name || oldRecoVote.commonNameReco.name != cnReco.name)
+		if(!oldRecoVote || oldRecoVote.recommendation.name != reco.name || oldRecoVote.commonNameReco?.name != cnReco?.name)
 			return true
 		
 		return false
@@ -276,7 +276,7 @@ class ChecklistService {
 		if(!cl.isDirty()){
 			return false
 		}
-		List dirtyPropList = Metadata.fetchDirtyFields()
+		List dirtyPropList = Checklists.fetchDirtyFields()
 		for (String prop : dirtyPropList) {
 			if(cl.isDirty(prop)){
 				//println "================diry prop " + prop
@@ -503,7 +503,7 @@ class ChecklistService {
 		def tmpColumnNames = cl.fetchColumnNames()
 		def columnNames = ["s.no"]
 		for(c in tmpColumnNames){
-			if(c.equalsIgnoreCase(ChecklistService.SN_NAME) || c.equalsIgnoreCase(ChecklistService.CN_NAME)){
+			if(c.equalsIgnoreCase(cl.sciNameColumn) || c.equalsIgnoreCase(cl.commonNameColumn)){
 				columnNames.add(c)
 			}
 		}

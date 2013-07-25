@@ -526,8 +526,10 @@ class Observation extends Metadata implements Taggable, Rateable {
 				res.put(name, m[name])
 			}
 			return res
+		}else{
+			//XXX to be removed after migration
+			return Annotation.findAllBySourceTypeAndObservation(Checklists.class.getCanonicalName(), this, [sort:'columnOrder', order:'asc'])
 		}
-		//return Annotation.findAllBySourceTypeAndObservation(Checklists.class.getCanonicalName(), this, [sort:'columnOrder', order:'asc'])
 	}
 //	
 //	def fetchSourceChecklistTitle(){

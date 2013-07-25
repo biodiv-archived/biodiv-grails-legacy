@@ -548,7 +548,6 @@ class XMLConverter extends SourceConverter {
             licenses.add(getLicenseByType(LicenseType.CC_BY, createNew));
         }
 
-        println "****returning ${licenses}";
         return licenses;
     }
 
@@ -566,7 +565,7 @@ class XMLConverter extends SourceConverter {
             type = licenseType
         } else {
             licenseType = licenseType?.toString().trim();
-            if(!licenseType.startsWith("CC")) {
+            if(!licenseType.startsWith("CC") && !licenseType.equals(LicenseType.CC_PUBLIC_DOMAIN.value())) {
                 licenseType = "CC "+licenseType.trim()
             }
 			type = License.fetchLicenseType(licenseType)

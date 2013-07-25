@@ -58,25 +58,37 @@
 
                         <div class="section checklist-slickgrid">
                             <span id="addNewColumn" class="btn-link">+ Add New Column</span>
-                            <div id="myGrid" class="span7" style="height:350px;display:none;"></div>
+                            <div id="myGrid" class="" style="height:350px;width:100%;display:none;"></div>
                             <input id="rawChecklist" name="rawChecklist" type="hidden" value='' />
                             <input id="checklistData" name="checklistData" type="hidden" value='' />
                             <input id="checklistColumns" name="checklistColumns" type="hidden" value='' />
                         </div>
 
-                        <div class="section span4">
+                        <!--div class="section span3">
                             <g:render template="/observation/addPhoto" model="['observationInstance':observationInstance]"/>
+                        </div-->
+
+                        <div class="section" style="clear:both;">
+                            <div class="row control-group">
+                                <label for="group" class="control-label"><g:message
+                                    code="observation.groupHabitat.label" default="Mark Columns" /> </label>
+                                <div class="controls">
+                                    <select id="sciNameColumn" class="markColumn" name="sciNameColumn" value="${observationInstance.sciNameColumn}"></select>
+                                    <select id="commonNameColumn" class="markColumn" name="commonNameColumn" value="${observationInstance.commonNameColumn}"></select>
+                                </div>
+                            </div>
                         </div>
+                    
+                        <a id="parseNames" class="btn btn-primary"
+                            style="float: right; margin-right: 5px;">Parse Names</a>
+                    </div>
+                    <div class="span12 super-section" style="clear:both">
+                        <h3>What is this list about</h3>
+
                         <div class="section" style="clear:both;">
                             <g:render template="/observation/selectGroupHabitatDate" model="['observationInstance':observationInstance]"/>
                         </div>
-                    </div>
-                    <div class="span12 super-section" style="clear:both">
-                        <h3>Save this list as ...</h3>
 
-                        <div class="section">
-                            <g:render template="/checklist/details" model="['observationInstance':observationInstance]"/>
-                        </div>
                     </div>
  
                     <div class="span12 super-section" style="clear: both;">
@@ -85,9 +97,20 @@
                         %>
                         <obv:showMapInput model="[observationInstance:observationInstance, userObservationInstanceList: totalObservationInstanceList, obvInfoFeeder:obvInfoFeeder, locationHeading:'Where did you find these observations?']"></obv:showMapInput>
                     </div>
+ 
                     <div class="span12 super-section"  style="clear: both">
                         <g:render template="/observation/addNotes" model="['observationInstance':observationInstance]"/>
                     </div>
+
+                   
+                    <div class="span12 super-section" style="clear:both">
+                        <h3>Save this list as ...</h3>
+
+                        <div class="section">
+                            <g:render template="/checklist/details" model="['observationInstance':observationInstance]"/>
+                        </div>
+                    </div>
+ 
                     <g:render template="/observation/postToUserGroups" model="['observationInstance':obervationInstance]"/>
                     <div class="span12" style="margin-top: 20px; margin-bottom: 40px;">
 
@@ -147,10 +170,10 @@
            }
 	   %>
 
-           initGrid([], [{id: "sciName", name: "Scientific Name", field: "sciName", width:150},
-               {id: "commonName", name: "Common Name", field: "commonName", width:150},
-               {id: "notes", name: "Notes", field: "notes", width: 100, editor: Slick.Editors.LongText, width:240}//,
-               //{id: "addMedia", name: "Add Media", field: "addMedia"}
+           initGrid([], [{id: "sciName", name: "Scientific Name", field: "sciName", editor: Slick.Editors.Text, width:150, formatter:sciNameFormatter},
+               {id: "commonName", name: "Common Name", field: "commonName", editor: Slick.Editors.Text, width:150},
+               {id: "notes", name: "Notes", field: "notes", width: 100, editor: Slick.Editors.LongText, width:240},
+               {id: "addMedia", name: "Add Media", field: "addMedia"}
                ]);
 
         });

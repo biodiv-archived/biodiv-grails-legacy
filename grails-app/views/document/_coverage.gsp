@@ -20,7 +20,7 @@
 
 <r:script>
 $(document).ready(function() {
-	intializesSeciesHabitatInterest();
+	intializesSpeciesHabitatInterest();
 	
 });
 </r:script>

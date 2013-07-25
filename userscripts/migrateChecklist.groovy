@@ -13,7 +13,7 @@ import com.vividsolutions.jts.geom.*
 import content.eml.Coverage
 import content.eml.Document
 import species.groups.UserGroup
-
+import grails.converters.JSON
 
 def checklistUtilService = ctx.getBean("checklistUtilService");
 
@@ -130,5 +130,37 @@ def postChecklistToWGPGroup(){
 	}
 }
 
-postChecklistToWGPGroup()
+//postChecklistToWGPGroup()
+
+def serializeChecklist(){
+	def clIdList = [2]
+//	Checklist.listOrderById(order: "asc").each{ Checklist cl ->
+//			clIdList.add(cl.id)
+//	}
+	clIdList.each {  id ->
+		Checklists.withTransaction(){
+			def cl = Checklists.findByIdAndIsDeleted(id, false, [fetch: [observations: 'join']])
+			def cns = Arrays.asList(cl.columnNames.split("\t"))
+			if(cns.contains("scientific_name")){
+				cl.sciNameColumn = "scientific_name"
+			}
+			if(cns.contains("common_name")){
+				cl.sciNameColumn = "common_name"
+			}
+			
+			cl.columns = cns as JSON
+			def m = [:]
+			cl.observations.each { obv ->
+				println obv
+				obv.fetchChecklistAnnotation().each { a ->
+					m.put(a.key, a.value)
+				}
+				obv.checklistAnnotations = m as JSON
+				obv.save(flush:true)
+			}
+			cl.save(flush:true)
+		}
+	}
+}
+serializeChecklist()
 println "================ done "

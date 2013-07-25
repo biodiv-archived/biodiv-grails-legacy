@@ -12,12 +12,13 @@ import species.Synonyms;
 import species.TaxonomyDefinition;
 import species.participation.Recommendation;
 import species.utils.Utils;
+import species.NamesParser;
+import species.Language;
 
 class RecommendationService {
 
 	def grailsApplication
 	def sessionFactory
-
 	def namesIndexerService;
 
 	static transactional = false
@@ -143,7 +144,7 @@ class RecommendationService {
 	}
 	
 	
-	public Recommendation getRecoForScientificName(String recoName, String canonicalName, Recommendation commonNameReco){
+	public Recommendation getRecoForScientificName(String recoName,  String canonicalName, Recommendation commonNameReco){
 		def reco, taxonConcept;
 		//
 		
@@ -158,7 +159,7 @@ class RecommendationService {
 		}
 		
 		//it may possible certain common name may point to species id in that case getting the SN for it
-		if(commonNameReco && commonNameReco.taxonConcept){
+		if(commonNameReco && commonNameReco.taxonConcept) {
 			TaxonomyDefinition taxOnConcept = commonNameReco.taxonConcept
 			return findReco(taxOnConcept.canonicalForm, true, null, taxOnConcept)
 		}
@@ -166,7 +167,86 @@ class RecommendationService {
 		return null;
 	}
 	
-	public Recommendation findReco(name, isScientificName, languageId, taxonConceptForNewReco){
+    /**
+    *   @param recoName a pair of sciName and commonName for it
+    *   { 1:{
+    *           'sciName':'Mangifera Indica'
+    *           'commonName' : 'aam'
+    *           'languageName' : ''
+    *       }
+    *   }
+    *   @result map of key and reco for that keyset. reco can also be null
+    */
+    public Map<Integer, Recommendation> getRecosForNames(def names) {
+        Map result = [:]
+        List sciNames = []
+
+        if(!names) return result;
+
+        names.each { value -> 
+            sciNames << value.sciName
+        }
+
+        //names parsing
+        List<TaxonomyDefinition> parsedNames;
+        try {
+	        NamesParser namesParser = new NamesParser();
+            parsedNames = namesParser.parse(sciNames); 
+        } catch(Exception e) {
+			log.error e.printStackTrace();
+        }
+        int index = 0;
+
+        //finding recos
+        names.eachWithIndex { value, key ->
+            def reco;
+            String canonicalName;
+            
+            log.debug "Getting reco for :${value}"
+
+            if(value.sciName) {
+                if(parsedNames && parsedNames[key]) {
+                    def taxonDef = parsedNames[key];
+                    canonicalName = taxonDef.canonicalForm ?:taxonDef.name
+                } else {
+                    canonicalName = Utils.cleanName(value.sciName);
+                }
+            }
+println canonicalName
+            //first searching by canonical name. this name is present if user select from auto suggest
+            if(canonicalName && (canonicalName.trim() != "")){
+                reco = searchReco(canonicalName, true, null, null);
+            } 
+
+            //searching on whatever user typed in scientific name text box
+            else if(value.sciName) {
+                reco = searchReco(value.sciName, true, null, null);
+             }
+
+            //it may possible certain common name may point to species id in that case getting the SN for it
+            else {
+                if(!value.languageName)
+                    value.languageName = 'English'
+		        Long languageId = Language.getLanguage(value.languageName).id;
+		        Recommendation commonNameReco = searchReco(value.commonName, false, languageId, null);
+                if(commonNameReco && commonNameReco.taxonConcept) {
+                    TaxonomyDefinition taxOnConcept = commonNameReco.taxonConcept
+                    reco = searchReco(taxOnConcept.canonicalForm, true, null, taxOnConcept);
+                } else {
+                    reco = commonNameReco;
+                 }
+            } 
+println reco 
+            if(reco) {
+                result.put(key, reco);
+            } else {
+                log.debug "Couldn't get reco for ${value}"
+            }
+        }
+        return result;
+    }
+
+    public Recommendation findReco(name, isScientificName, languageId, taxonConceptForNewReco, boolean createNew=true){
 		if(name){
 			// if sn then only sending to names parser for common name only cleaning
 			//XXX setting language id null for scientific name
@@ -178,7 +258,7 @@ class RecommendationService {
 				name = Utils.getTitleCase(Utils.cleanName(name));
 			}
 			def reco = searchReco(name, isScientificName, languageId, taxonConceptForNewReco)
-			if(!reco) {
+			if(!reco && createNew) {
 				reco = new Recommendation(name:name, taxonConcept:taxonConceptForNewReco, isScientificName:isScientificName, languageId:languageId);
 				if(!save(reco)) {
 					reco = null;
@@ -190,6 +270,8 @@ class RecommendationService {
 	}
 	
 	private Recommendation searchReco(name, isScientificName, languageId, taxonConcept){
+        if(!name) return;
+
 		def c = Recommendation.createCriteria();
 		def recoList = c.list {
 			ilike('name', name);

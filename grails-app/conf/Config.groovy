@@ -86,19 +86,19 @@ log4j = {
 	}
 
 	error  	'org.codehaus.groovy.grails.web.pages', //  GSP
-	'org.codehaus.groovy.grails.web.sitemesh', //  layouts
-	'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
-	'org.codehaus.groovy.grails.web.mapping', // URL mapping
-	'org.codehaus.groovy.grails.commons', // core / classloading
-	'org.codehaus.groovy.grails.plugins', // plugins
-	'org.codehaus.groovy.grails.orm.hibernate', // hibernate integration
-	'org.hibernate',
-	'net.sf.ehcache.hibernate',
-	'org.springframework.security',
-	'org.codehaus.groovy.grails.web.servlet',  //  controllers
-	'grails.plugin',
-	'org.springframework.security.web',
-	'grails.app.tagLib.org.grails.plugin.resource'
+            'org.codehaus.groovy.grails.web.sitemesh', //  layouts
+            'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
+            'org.codehaus.groovy.grails.web.mapping', // URL mapping
+            'org.codehaus.groovy.grails.commons', // core / classloading
+            'org.codehaus.groovy.grails.plugins', // plugins
+            'org.codehaus.groovy.grails.orm.hibernate', // hibernate integration
+            'org.hibernate',
+            'net.sf.ehcache.hibernate',
+            'org.springframework.security',
+            'org.codehaus.groovy.grails.web.servlet',  //  controllers
+            'grails.plugin',
+            'org.springframework.security.web',
+            'grails.app.tagLib.org.grails.plugin.resource'
 
 
 	warn   'org.mortbay.log'

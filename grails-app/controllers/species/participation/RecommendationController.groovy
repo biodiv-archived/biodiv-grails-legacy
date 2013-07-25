@@ -15,7 +15,7 @@ class RecommendationController {
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
 	def namesIndexerService;
-	def recomendationService;
+	def recommendationService;
 	def searchFieldsConfig = grailsApplication.config.speciesPortal.nameSearchFields
 
     def index = {
@@ -118,8 +118,40 @@ class RecommendationController {
             redirect(action: "list")
         }
     }
-	
+
+    /**
+    * suggest recommendations
+    */
 	def suggest = {
 		render namesIndexerService.suggest(params) as JSON;
 	}
+ 
+    /**
+    * parse names and find out a matching a reco
+    */
+    def getRecos = {
+        log.debug params;
+        def names = JSON.parse(params.names);
+        println names;
+        def recos = recommendationService.getRecosForNames(names)
+        def result = new HashMap(recos.size())
+        recos.each { key, reco ->
+            def r = new HashMap(4);
+            r['id'] = reco.id
+            if(reco.taxonConcept) {
+                r['name'] = reco.taxonConcept.canonicalForm
+                def speciesId = reco.taxonConcept.findSpeciesId();
+                if(speciesId)
+                    r['speciesId'] = speciesId
+            } else {
+                r['name'] = reco.name
+            }
+            result[key] = r
+        }
+        render result as JSON
+    }
+
+    def p = {
+        render "asd"
+    }
 }

@@ -59,13 +59,5 @@ abstract class Metadata {
         }
     }
 
-	/**
-	 * 
-	 * @return
-	 * List of dirty fields that should update observation.
-	 */
-	static List fetchDirtyFields(){
-		return ["fromDate", "geoPrivacy", "group", "habitat", "latitude", "locationAccuracy", "longitude", "placeName", "reverseGeocodedName", "toDate", "topology"]
-    }	
-
+	
 }

@@ -1,4 +1,5 @@
 var grid;
+var canBeColumnName = 'CanBe';
 var dirtyRows;
 
 //only returning modified data
@@ -26,11 +27,12 @@ function initGrid(data, columns){
         enableAddRow: true,
         enableCellNavigation: true,
         asyncEditorLoading: false,
-        autoEdit: false
+        autoEdit: true
     };
 
     $(function () {
         grid = new Slick.Grid("#myGrid", data, columns, options);
+        grid.autosizeColumns()
 
         grid.setSelectionModel(new Slick.CellSelectionModel());
 
@@ -48,26 +50,55 @@ function initGrid(data, columns){
 	        });
         }
 
-        grid.addNewColumn = function(){
-            var newColumnName = prompt('New Column Name','');
+        grid.addNewColumn = function(newColumnName, options, position){
+            if(newColumnName == undefined)
+                newColumnName = prompt('New Column Name','');
+
             if(newColumnName == null||newColumnName==''){
                 return;
             }
-            var newColumn = [{id:newColumnName,name:newColumnName,field:newColumnName,sortable:true}];
-            $.merge(columns,newColumn);
-            grid.setColumns(columns);
-            grid.render();
+        
+	        var newColumn = grid.getColumns()[grid.getColumnIndex(newColumnName)]
+	
+	        if(newColumn) return newColumn;
+	        else {
+	            options = $.extend({}, {
+	                    id:newColumnName,
+	                    name:newColumnName,
+	                    field:newColumnName,
+	                    editor: Slick.Editors.TextCellEditor
+	                }, options);
+	            
+	            newColumn = options;
+	            
+	            if(typeof position === 'number' && position % 1 == 0 && position < columns.length)
+	                columns.splice(position, 0 , newColumn);
+	            else {
+	                newColumn = [newColumn]
+	                $.merge(columns,newColumn);
+	            }
+	
+	            grid.setColumns(columns);
+	            grid.render();
+	            return newColumn;
+	        }
         };
-
 
         $("#myGrid").show();
         $('#checklistStartFile_uploaded').hide();
     });
 } 
 
+function sciNameFormatter(row, cell, value, columnDef, dataContext) {
+    if (value == null || value == undefined || !value.length)
+        return '';
+    else
+        return '<i>'+value+'</i>';
+}
+
 function showGrid(){
     var input = $("#checklistStartFile_path").val(); 
-    parseData("/biodiv/content" + input , {callBack:initGrid});
+    parseData(  window.params.content.url + input , {callBack:initGrid});
 }
 
 function requiredFieldValidator(value) {
@@ -306,8 +337,8 @@ $(document).ready(function(){
         $(this).attr('previousValue', $(this).attr('checked'));
     });
 
-
-
+    /**
+     */
     $('#use_dms').click(function(){
         if ($('#use_dms').is(':checked')) {
             $('.dms_field').fadeIn();
@@ -320,6 +351,8 @@ $(document).ready(function(){
     });
     $("#name").watermark("Suggest a species name");
 
+    /**
+     */
     $("#help-identify input").click(function(){
         if ($(this).is(':checked')){
             $('.nameContainer input').val('');
@@ -330,11 +363,15 @@ $(document).ready(function(){
     });
 
 
+    /**
+     */
     $('#attachFiles').change(function(e){
         $('#upload_resource').submit().find("span.msg").html("Uploading... Please wait...");
         $("#iemsg").html("Uploading... Please wait...");
     });
 
+    /**
+     */
     var onUploadResourceSuccess = function(responseXML, statusText, xhr, form) {
         $("#addObservationSubmit").removeClass('disabled');
         $(form).find("span.msg").html("");
@@ -409,7 +446,6 @@ $(document).ready(function(){
         });
     } 
 
-    console.log($('#upload_resource'));
     $('#upload_resource').ajaxForm({ 
         url:window.params.observation.uploadUrl,
         dataType: 'xml',//could not parse json wih this form plugin 
@@ -425,7 +461,93 @@ $(document).ready(function(){
         error:onUploadResourceError
     });  
 
+    /**
+    *
+    */
+    function selectColumn(){
+        var markColumnSelect = this;
+        var columns = grid.getColumns();
+        $(markColumnSelect).empty();
+        $.each(columns, function(index, column) {
+            if(column.id != canBeColumnName)
+                $(markColumnSelect).append($("<option />").val(column.id).text(column.name));
+        });
+        //$('select[name="sciNameColumn"]').find('option[value="scientific_name"]').attr("selected",true);
+        //$('select[name="commonNameColumn"]').find('option[value="common_name"]').attr("selected",true);
+    };
 
+    $("#sciNameColumn").focus(selectColumn);
+    $("#commonNameColumn").focus(selectColumn);
+
+    /**
+     *
+     */
+    function getNames() {
+        var names = [];
+        var sciNameColumn = $('#sciNameColumn').val();
+        var commonNameColumn = $('#commonNameColumn').val();
+
+        $.each(grid.getData(), function(i, item) {
+            names[i] = {}
+            if(item[sciNameColumn] != undefined && item[sciNameColumn] != '')
+                names[i]['sciName'] = item[sciNameColumn]
+            if(item[commonNameColumn] != undefined && item[commonNameColumn] != '')
+                names[i]['commonName'] = item[commonNameColumn]
+        });
+        return names
+    }
+
+    /**
+     *
+     */
+    $('#parseNames').click(function() {
+        var sciNameColumn = $('#sciNameColumn').val();
+        var commonNameColumn = $('#commonNameColumn').val();
+
+        if(((typeof(sciNameColumn) == 'undefined') || (sciNameColumn == null)) || ((typeof(commonNameColumn) == 'undefined') || (commonNameColumn == null))) {
+            confirm("Please mark scientific name column or common name column in the list");
+            return
+        }
+
+        $.ajax({
+            url : window.params.recommendation.getRecos,
+            type : 'post', 
+            dataType: 'json',
+            data : {'names':JSON.stringify(getNames())},
+            success : function(data) {
+                var gridData = grid.getData();
+                var sciNameColumnIndex = grid.getColumnIndex($('#sciNameColumn').val());
+                var column = grid.addNewColumn(canBeColumnName, {formatter:sciNameFormatter}, sciNameColumnIndex+1);
+                var rows = [];
+                for(rowId in data) {
+                    if(data.hasOwnProperty(rowId)) {
+                        rowId = parseInt(rowId, 10);
+                        rows.push(rowId);
+                        console.log(data[rowId])
+                        grid.setCellCssStyles("validReco", {
+                            rowId : {
+                                sciNameColumnIndex : 'highlight',
+                                canBeColumnName : 'highlight'
+                            }
+                        })
+                        if(data[rowId].speciesId)
+                            gridData[rowId][column.id] = "<a href='"+window.params.species.url + '/' + data[rowId].speciesId+"' target='_blank'>"+data[rowId].name+"</a> "
+                        else
+                            gridData[rowId][column.id] = data[rowId].name
+                    }
+                }
+                grid.invalidateRows(rows);
+                grid.render();
+            },
+            error: function(xhr, textStatus, errorThrown) {
+                alert(xhr);
+            }
+        });
+    });
+
+    /**
+     *
+     */
     $("#addObservationSubmit").click(function(event){
         if($(this).hasClass('disabled')) {
             alert("Uploading is in progress. Please submit after it is over.");
