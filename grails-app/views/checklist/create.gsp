@@ -56,6 +56,7 @@
                         <div class="section checklist-slickgrid">
                             <span id="addNewColumn" class="btn-link">+ Add New Column</span>
                             <div id="myGrid" class="" style="height:350px;width:100%;display:none;"></div>
+                            <div id="nameSuggestions" style="display: block;"></div>
                             <input id="rawChecklist" name="rawChecklist" type="hidden" value='' />
                             <input id="checklistData" name="checklistData" type="hidden" value='' />
                             <input id="checklistColumns" name="checklistColumns" type="hidden" value='' />
@@ -167,8 +168,8 @@
            }
 	   %>
 
-           f([], [{id: "sciName", name: "Scientific Name", field: "sciName", editor: Slick.Editors.Text, width:150, formatter:sciNameFormatter},
-               {id: "commonName", name: "Common Name", field: "commonName", editor: Slick.Editors.Text, width:150},
+           f([], [{id: "sciName", name: "Scientific Name", field: "sciName", editor: AutoCompleteEditor, width:150, formatter:sciNameFormatter},
+               {id: "commonName", name: "Common Name", field: "commonName", editor: AutoCompleteEditor, width:150},
                {id: "notes", name: "Notes", field: "notes", width: 100, editor: Slick.Editors.LongText, width:240},
                {id: "addMedia", name: "Add Media", field: "addMedia"}
                ]);

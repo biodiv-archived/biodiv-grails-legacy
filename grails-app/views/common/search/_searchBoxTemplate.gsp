@@ -53,7 +53,6 @@ $(document).ready(function() {
                 'species':{
                     'url':"${uGroup.createLink('controller':'species', action:'show', 'userGroup':userGroupInstance)}"
                 },
-
                 'content':{
                     'url':"${uGroup.createLink('controller':'content', 'userGroup':userGroupInstance)}"
                 },
@@ -62,7 +61,8 @@ $(document).ready(function() {
                     uploadUrl:"${g.createLink(controller:'observation', action:'upload_resource')}"
                 },
                 'recommendation': {
-                    'getRecos' : "${uGroup.createLink(controller:'recommendation', action:'getRecos')}" 
+                    'getRecos' : "${uGroup.createLink(controller:'recommendation', action:'getRecos', userGroup:userGroupInstance)}",
+                    'suggest' : "${uGroup.createLink(controller:'recommendation', action: 'suggest', userGroup:userGroupInstance)}"
                 }
 	}
 	$("#userGroupSelectFilter").val("${(queryParams && queryParams.uGroup)?queryParams.uGroup:(params.webaddress?'THIS_GROUP':'ALL')}");
