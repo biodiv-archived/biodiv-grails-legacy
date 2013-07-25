@@ -10,7 +10,6 @@ import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Geometry
 
 abstract class Metadata {
-	//static transients = ['latitude', 'longitude']
 
     //Geographic Coverage
 	String placeName;
@@ -20,7 +19,6 @@ abstract class Metadata {
 	String locationAccuracy;
     Geometry topology;
      
-	//XXX to be remove after all migration and api changes
 	float latitude;
 	float longitude;
 	
@@ -61,13 +59,5 @@ abstract class Metadata {
         }
     }
 
-	/*
-    def setLatitude(float lat) {
-		log.error " should not call this"
-    }
-
-    def setLongitude(float longitude) {
-		log.error " should not call this"
-    }
-    */
+	
 }

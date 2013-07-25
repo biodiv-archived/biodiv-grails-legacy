@@ -1,3 +1,20 @@
+Array.prototype.contains = function(v) {
+    for(var i = 0; i < this.length; i++) {
+        if(this[i] === v) return true;
+    }
+    return false;
+};
+
+Array.prototype.unique = function() {
+    var arr = [];
+    for(var i = 0; i < this.length; i++) {
+        if(!arr.contains(this[i])) {
+            arr.push(this[i]);
+        }
+    }
+    return arr; 
+}
+
 String.prototype.splitCSV = function(sep) {
 	for (var thisCSV = this.split(sep = sep || ","), x = thisCSV.length - 1, tl; x >= 0; x--) {
 		if (thisCSV[x].replace(/"\s+$/, '"').charAt(thisCSV[x].length - 1) == '"') {
@@ -39,7 +56,7 @@ function parseData(csvFile, options) {
 				var headers = $.csv.toArray(line);
 				headerCount = headers.length;
 				$.each(headers, function(headerCount, header) {
-					columns.push({id:header, name: header, field: header, editor: Slick.Editors.Text, minWidth: 200});
+					columns.push({id:header, name: header, field: header, editor: Slick.Editors.Text, sortable:true, minWidth: 200});
 					//console.log(columns.length)
 				});
 			} else if (lineCount >= options.startLine) {

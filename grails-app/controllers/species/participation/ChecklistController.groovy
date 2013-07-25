@@ -14,6 +14,8 @@ class ChecklistController {
 	def grailsApplication
 	def checklistUtilService
 	def observationService
+	def SUserService
+	
 	def index = {
 		redirect(action:list, params: params)
 	}
@@ -113,10 +115,6 @@ class ChecklistController {
 	@Secured(['ROLE_USER'])
 	def save = {
 		log.debug params;
-		params.checklistData = JSON.parse(params.checklistData)
-		params.checklistColumns = JSON.parse(params.checklistColumns)
-		
-		setDummyParams(params)
 		if(request.method == 'POST') {
 			saveAndRender(params)
 		} else {
@@ -125,8 +123,9 @@ class ChecklistController {
 		
 	}
 
-	private saveAndRender(params){
-		def result = checklistService.saveChecklist(params)
+	private saveAndRender(params, sendMail=true){
+		updateParams(params)
+		def result = checklistService.saveChecklist(params, sendMail=true)
 		if(result.success){
 			redirect (url:uGroup.createLink(action:'show', controller:"checklist", id:result.checklistInstance.id, 'userGroupWebaddress':params.webaddress, postToFB:(params.postToFB?:false)))
 		}else{
@@ -135,7 +134,28 @@ class ChecklistController {
 		}
 	}
 	
-	private setDummyParams(params){
+	private updateParams(params){
+		params.checklistData = JSON.parse(params.checklistData)
+		params.checklistColumns = JSON.parse(params.checklistColumns)
+		def columnList = params.checklistColumns.collect { it.name }
+		
+		if(columnList.contains("CanBe")){
+			columnList.remove("CanBe");
+			params.checklistData.each { m ->
+				m.remove("CanBe");
+			}
+		}
+		
+		if(params.action == 'edit' ||params.action == 'update'){
+			if(columnList.indexOf(ChecklistService.OBSERVATION_COLUMN) == 0){
+				columnList.remove(0);
+			}
+		}
+		params.columnNames =  columnList.join("\t")
+		params.columns =  columnList
+		
+		//params.sciNameColumn = params.sciNameColumn ?: "scientific_name"
+		//params.commonNameColumn = params.commonNameColumn ?: "common_name"
 		
 		//params.group_id = "841" //params.group?:SpeciesGroup.get(params.group_id);
 		//params.placeName = "honey valley " 
@@ -150,11 +170,58 @@ class ChecklistController {
 		//params.title =  "cl title" 
 		//params.refText =  "ref text " //params.refText
 		//params.sourceText =  "source text " // params.sourceText
-		params.columnNames =  params.checklistColumns.collect { it.name }.join("\t")
+		
 		//params.publicationDate =  null //params.publicationDate ? observationService.parseDate(params.publicationDate) : null
 		//params.reservesValue =  null //params.reservesValue
 	}
+	
+	@Secured(['ROLE_USER'])
+	def edit = {
+		def observationInstance = Checklists.findByIdAndIsDeleted(params.id.toLong(), false)
+		if (!observationInstance) {
+			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
+			redirect (url:uGroup.createLink(action:'list', controller:"observation", 'userGroupWebaddress':params.webaddress))
+		} else if(SUserService.ifOwns(observationInstance.author)) {
+			render(view: "create", model: [observationInstance: observationInstance, 'springSecurityService':springSecurityService])
+		} else {
+			flash.message = "${message(code: 'edit.denied.message')}"
+			redirect (url:uGroup.createLink(action:'show', controller:"checlist", id:observationInstance.id, 'userGroupWebaddress':params.webaddress))
+		}
+	}
+	
+	@Secured(['ROLE_USER'])
+	def update = {
+		log.debug params;
+		def observationInstance = Checklists.findByIdAndIsDeleted(params.id.toLong(), false)
+		if(observationInstance)	{
+			saveAndRender(params, false)
+		}else {
+			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
+			redirect (url:uGroup.createLink(action:'list', controller:"observation", 'userGroupWebaddress':params.webaddress))
+		}
+	}
+	
+	def getObservationGrid = {
+		log.debug params
+		String obv_id = ChecklistService.OBSERVATION_COLUMN
+		Checklists cl = Checklists.findByIdAndIsDeleted(params.id.toLong(), false, [fetch: [observations: 'join']])
+		def obvData = []
+		cl.observations.each {Observation obv ->
+			def tMap = [:]
+			tMap[ChecklistService.OBSERVATION_COLUMN] = obv.id
+			obv.fetchChecklistAnnotation().each { ann ->
+				tMap[ann.key] = ann.value
+			}
+			obvData.add(tMap)
+		}
 		
+		List columns = [obv_id]
+		cl.fetchColumnNames().each { columns.add(it) }
+		
+		def res = [columns: columns, data :obvData]
+		render res as JSON
+	}
+	
 	///////////////////////////////////////////////////////////////////////////////
 	////////////////////////////// SEARCH /////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////
@@ -203,6 +270,10 @@ class ChecklistController {
 		render result.value as JSON;
 	}
 	
+	
+	def test = {
+		render Checklists.get(324174).columns
+	}
 	///////////////////////////////////////////////////////////////////////////////
 	////////////////////////////// SEARCH END /////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////
