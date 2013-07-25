@@ -134,12 +134,13 @@ def postChecklistToWGPGroup(){
 
 def serializeChecklist(){
 	def clIdList = [2]
-//	Checklist.listOrderById(order: "asc").each{ Checklist cl ->
-//			clIdList.add(cl.id)
-//	}
+	Checklist.listOrderById(order: "asc").each{ Checklist cl ->
+			clIdList.add(cl.id)
+	}
 	clIdList.each {  id ->
 		Checklists.withTransaction(){
 			def cl = Checklists.findByIdAndIsDeleted(id, false, [fetch: [observations: 'join']])
+			println cl
 			def cns = Arrays.asList(cl.columnNames.split("\t"))
 			if(cns.contains("scientific_name")){
 				cl.sciNameColumn = "scientific_name"
@@ -151,7 +152,6 @@ def serializeChecklist(){
 			cl.columns = cns as JSON
 			def m = [:]
 			cl.observations.each { obv ->
-				println obv
 				obv.fetchChecklistAnnotation().each { a ->
 					m.put(a.key, a.value)
 				}
