@@ -1,5 +1,26 @@
 var grid;
-function f(data, columns){
+var dirtyRows;
+
+//only returning modified data
+function getDataFromGrid(){
+	if(!dirtyRows){
+		return grid.getData();
+	}
+	
+	var selectedRows = grid.getSelectedRows()
+	if(selectedRows.length > 0){
+		dirtyRows.push(selectedRows.last());
+	}
+	
+	dirtyRows = dirtyRows.unique();
+	var data = new Array();
+	$.each(dirtyRows, function(index, rowId) {
+		data.push(grid.getDataItem(rowId));
+	});
+	return data;
+}
+
+function initGrid(data, columns){
     var options = {
         editable: true,
         enableAddRow: true,
@@ -20,14 +41,19 @@ function f(data, columns){
             grid.updateRowCount();
             grid.render();
         });
+        
+        if(dirtyRows){
+	        grid.onCellChange.subscribe(function (e, args) {
+	        	dirtyRows.push(args.row);
+	        });
+        }
 
         grid.addNewColumn = function(){
             var newColumnName = prompt('New Column Name','');
             if(newColumnName == null||newColumnName==''){
                 return;
             }
-            console.log(columns);
-            var newColumn = [{id:newColumnName,name:newColumnName,field:newColumnName,editor: Slick.Editors.TextCellEditor,sortable:true}];
+            var newColumn = [{id:newColumnName,name:newColumnName,field:newColumnName,sortable:true}];
             $.merge(columns,newColumn);
             grid.setColumns(columns);
             grid.render();
@@ -41,7 +67,7 @@ function f(data, columns){
 
 function showGrid(){
     var input = $("#checklistStartFile_path").val(); 
-    parseData("/biodiv/content" + input , {callBack:f});
+    parseData("/biodiv/content" + input , {callBack:initGrid});
 }
 
 function requiredFieldValidator(value) {
@@ -51,6 +77,37 @@ function requiredFieldValidator(value) {
         return {valid: true, msg: null};
     }
 }
+
+function loadGrid(url, id){
+	dirtyRows = new Array();
+	$.ajax({
+		url: url,
+		data:{id:id},
+		success: function(data){
+			var headers = data.columns;
+			var columns = new Array();
+			var finalCols =  new Array();
+			var editor = Slick.Editors.Text
+			$.each(headers, function(index, header) {
+				if(index > 0){
+					finalCols.push({id:header, name: header, field: header, editor:editor, sortable:true, minWidth: 200});
+				}
+				columns.push({id:header, name: header, field: header, editor:editor, sortable:true, minWidth: 200});
+			});
+			initGrid(data.data, columns);
+			grid.setColumns(finalCols);
+            grid.render();
+			return true;
+		},
+		error: function(xhr, status, error) {
+			var msg = $.parseJSON(xhr.responseText);
+			alert(msg);
+			return false;
+		}
+	});
+}
+
+
 
 $('#addNewColumn').unbind('click').click(function(){
     grid.addNewColumn();
@@ -403,11 +460,10 @@ $(document).ready(function(){
                 }
             }
 
-
             //checklist related data
             if(grid){
 	            $("#checklistColumns").val(JSON.stringify(grid.getColumns()));
-	            $("#checklistData").val(JSON.stringify(grid.getData()));
+	            $("#checklistData").val(JSON.stringify(getDataFromGrid()));
 	            $("#rawChecklist").val($("#checklistStartFile_path").val());
             }
             $("#addObservation").submit();        	

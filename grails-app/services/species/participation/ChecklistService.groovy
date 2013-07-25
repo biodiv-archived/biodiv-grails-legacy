@@ -1,5 +1,6 @@
 package species.participation
 
+import grails.converters.JSON
 import java.io.File;
 import java.text.SimpleDateFormat
 import java.util.Date;
@@ -18,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import species.License;
 import species.Reference;
 import species.Species;
+import species.Metadata;
 import species.Contributor;
 import species.participation.RecommendationVote.ConfidenceType;
 import species.utils.Utils;
@@ -50,6 +52,7 @@ class ChecklistService {
 	static final String SN_NAME_KEY = "scientific_name"
 	static final String SN_NAME = "scientific_name" //"scientific_names" //"Scientific Name" //"scientific_name"
 	static final String CN_NAME = "common_name"
+	static final String OBSERVATION_COLUMN = "Observation_id_column"
 	
 	def grailsApplication
 	def observationService
@@ -71,16 +74,23 @@ class ChecklistService {
 	}
 	
 	void updateChecklist(params, Checklists checklist){
+		//removing time component from date
+		params.fromDate = observationService.parseDate(params.fromDate)?.format("dd/MM/yyyy");
+		params.toDate =  observationService.parseDate(params.toDate)?.format("dd/MM/yyyy");
+		
 		observationService.updateObservation(params, checklist)
 		
 		checklist.title =  params.title
 		checklist.license = License.findByName(License.fetchLicenseType(params.license_1))  
 		checklist.refText =  params.refText
 		checklist.sourceText =  params.sourceText
-		checklist.rawChecklist =  params.rawChecklist
-		checklist.columnNames =  params.columnNames
+		checklist.rawChecklist =  params.rawChecklist ?:checklist.rawChecklist
 		checklist.publicationDate =  params.publicationDate ? observationService.parseDate(params.publicationDate) : null
 		checklist.reservesValue =  params.reservesValue
+		checklist.sciNameColumn =  params.sciNameColumn
+		checklist.commonNameColumn =  params.commonNameColumn
+		checklist.columnNames =  params.columnNames ?:checklist.columnNames
+		checklist.columns =  params.columns?params.columns as JSON:checklist.columns
 		
 		if(params.attributions){
 			checklist.attributions?.clear();
@@ -90,26 +100,28 @@ class ChecklistService {
 		}
 		
 		checklist.isChecklist = true
-		checklist.speciesCount = 0
 	}
 	
-	Map saveChecklist(params){
+	Map saveChecklist(params, sendMail=true){
 		params.author = springSecurityService.currentUser;
-		def checklistInstance, feedType, sendMail, feedAuthor;
+		def checklistInstance, feedType, feedAuthor, isGlobalUpdate = false;
 		try {
 			
 			if(params.action == "save"){
+				//create new checklist 
 				checklistInstance = createChecklist(params);
 				feedType = activityFeedService.CHECKLIST_CREATED
 				feedAuthor = checklistInstance.author
-				sendMail = true
 			}else{
+				//updates old checklist
 				checklistInstance = Checklists.get(params.id.toLong())
 				updateChecklist(params, checklistInstance)
 				feedType = activityFeedService.CHECKLIST_UPDATED
 				feedAuthor = springSecurityService.currentUser
-				sendMail = false
+				//to say if all obv needs to be updated because some change in MetaData properties
+				isGlobalUpdate = isGlobalUpdateForObv(checklistInstance)
 			}
+			
 			
 			if(!checklistInstance.hasErrors() && checklistInstance.save(flush:true)) {
 				log.debug "Successfully created checklistInstance : "+checklistInstance
@@ -119,7 +131,7 @@ class ChecklistService {
 //				if(sendMail)
 //					observationService.sendNotificationMail(OBSERVATION_ADDED, checklistInstance, null, params.webaddress);
 				
-				saveObservationFromChecklist(params, checklistInstance)
+				saveObservationFromChecklist(params, checklistInstance, isGlobalUpdate)
 				observationsSearchService.publishSearchIndex(checklistInstance, true);
 					
 				return ['success' : true, checklistInstance:checklistInstance]
@@ -133,24 +145,57 @@ class ChecklistService {
 		}
 	}
 	
+	
+	
+	
 	@Transactional
-	private saveObservationFromChecklist(params, checklistInstance){
-		if(!params.checklistData)
+	private saveObservationFromChecklist(params, checklistInstance, boolean isGlobalUpdate){
+		if(!params.checklistData && !isGlobalUpdate)
 			return
 		
 		Checklists.withTransaction() {
-			int count = 0
+			Set updatedObv = new HashSet()
+			Set newObv = new HashSet()
 			def obsParams = getParamsForObv(params, checklistInstance)
 			
-			params.checklistData.each { Map m ->
+			//Each entry in checklistData represent one observatoin
+			// if it has observation id column then those observation needs to be updated else new observation will be created
+			// checklist Edit page will return only dirty list that needs to be updated + new rows that will create new observation
+			// checklist save page will have all new rows that will create new observation
+			params.checklistData.each {  Map m ->
+				def oldObvId = m.remove(OBSERVATION_COLUMN)
+				// for old observation
+				if(oldObvId){
+					obsParams.action = "update"
+					obsParams.id = oldObvId
+					updatedObv.add(oldObvId)
+				}else{
+					obsParams.action = "save"
+				}	
+				obsParams.checklistAnnotations = m as JSON
 				def res = observationService.saveObservation(obsParams, false)
 				Observation observationInstance = res.observationInstance
-				saveReco(observationInstance, m)
-				saveObservationAnnotation(observationInstance, m, Arrays.asList(checklistInstance.fetchColumnNames()))
-				checklistInstance.addToObservations(observationInstance)
-				count++
+				saveReco(observationInstance, m, checklistInstance)
+				//saveObservationAnnotation(observationInstance, m, Arrays.asList(checklistInstance.fetchColumnNames()))
+				
+				if(!oldObvId){
+					checklistInstance.addToObservations(observationInstance)
+					newObv.add(observationInstance.id)
+				}
 			}
-			checklistInstance.speciesCount = count
+			//if any global thing (ie. species group, habitat) changes then updating all the observation
+			if(isGlobalUpdate){
+				obsParams.action = "update"
+				obsParams.checklistAnnotations = null
+				checklistInstance.observations.each { obv ->
+					if(!updatedObv.contains(obv.id) && !(newObv.contains(obv.id))){
+						obsParams.id = obv.id
+						observationService.saveObservation(obsParams, false)
+					}
+				}
+			}
+			//updating obv count
+			checklistInstance.speciesCount = checklistInstance.observations.size()
 		}
 		log.debug "saved checklist observation  "
 	}
@@ -169,14 +214,23 @@ class ChecklistService {
 		return obvParams
 	}
 	
-	private saveReco(Observation obv, Map m){
-		def res = observationService.getRecommendation([recoName:m[SN_NAME], commonName: m[CN_NAME]])
+	private saveReco(Observation obv, Map m, Checklists cl){
+		def res = observationService.getRecommendation([recoName:m[cl.sciNameColumn], commonName: m[cl.commonNameColumn]])
+		
+		if(!isNewReco(obv,res))
+			return
+		
 		def reco = res.mainReco
 		def cnReco = res.commonNameReco
 		
 		ConfidenceType confidence = observationService.getConfidenceType(ConfidenceType.CERTAIN.name());
 		RecommendationVote recommendationVoteInstance = new RecommendationVote(observation:obv, recommendation:reco, commonNameReco:cnReco, author:obv.author, confidence:confidence, votedOn:obv.fromDate);
 		
+		def user = springSecurityService.currentUser;
+		def oldRecoVote = RecommendationVote.findWhere(observation:obv, author:user)
+		if(oldRecoVote){
+			oldRecoVote.delete(flush:true)
+		}
 		if(!recommendationVoteInstance.hasErrors() && recommendationVoteInstance.save(flush:true)) {
 			log.debug "Successfully added reco vote : "+recommendationVoteInstance.id
 			activityFeedService.addActivityFeed(obv, recommendationVoteInstance, recommendationVoteInstance.author, activityFeedService.SPECIES_RECOMMENDED);
@@ -188,7 +242,66 @@ class ChecklistService {
 		}
 	}
 	
+	/**
+	 * 
+	 * @param obv
+	 * @param res
+	 * @return 
+	 * To check if any thing got changed in marked column of grid . if yes then saving new recoVote
+	 */
+	private boolean isNewReco(Observation obv, Map res){
+		def reco = res.mainReco
+		def cnReco = res.commonNameReco
+		
+		if(obv.fetchSpeciesCall() != reco.name)
+			return true
+		
+		def user = springSecurityService.currentUser;	
+		def oldRecoVote = RecommendationVote.findWhere(observation:obv, author:user)
+		
+		if(!oldRecoVote || oldRecoVote.recommendation.name != reco.name || oldRecoVote.commonNameReco.name != cnReco.name)
+			return true
+		
+		return false
+	}
+	
+	/**
+	 * 
+	 * @param cl
+	 * @return
+	 * Flag to tell if some thing got changes in checklist which must be update on all of its observation
+	 */
+	
+	private boolean isGlobalUpdateForObv(Checklists cl){
+		if(!cl.isDirty()){
+			return false
+		}
+		List dirtyPropList = Metadata.fetchDirtyFields()
+		for (String prop : dirtyPropList) {
+			if(cl.isDirty(prop)){
+				//println "================diry prop " + prop
+				return true
+			}
+		}
+		return false
+	}
+	
+	/**
+	 * 
+	 * @param obv
+	 * @param m
+	 * @param columns
+	 * @return
+	 * this method will store fresh annotations .clear any old annotation if exist
+	 * XXX have to change this method to store serialize map for checklist row data
+	 */
+	
 	private saveObservationAnnotation(obv, Map m, List columns){
+		obv.checklistAnnotations = m
+		/*
+		obv.annotations = []
+		obv.save(flush:true)
+		
 		m.each { k, v ->
 			observationService.addAnnotation(['key': k, 'value': v, 'columnOrder':columns.indexOf(k), 'sourceType': Checklists.class.getCanonicalName()], obv)
 		}
@@ -198,6 +311,7 @@ class ChecklistService {
 			obv.errors.allErrors.each { log.error it }
 			throw new RuntimeException("Error during meta data save");
 		}
+		*/
 	}
 	
 	

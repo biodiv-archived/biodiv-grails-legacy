@@ -35,9 +35,6 @@
                 <%
                 def allowedExtensions = "['csv']"
 				def fileParams = [uploadDir:'checklist']
-                %>
-                <g:render template='/UFile/docUpload' model="['name': 'checklistStartFile', fileParams:fileParams, allowedExtensions:allowedExtensions,uploadCallBack:'showGrid()']" />
-                <%
                 def form_id = "addObservation"
                 def form_action = uGroup.createLink(action:'save', controller:'checklist', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)
                 def form_button_name = "Add Checklist"
@@ -49,6 +46,12 @@
                 }
 
                 %>
+                <g:if test="${ params.action == 'edit' || params.action == 'update'}">
+                	<g:render template="/checklist/showEditGrid" model="['observationInstance':observationInstance]"/>
+                </g:if>
+                <g:else>
+                	<g:render template='/UFile/docUpload' model="['name': 'checklistStartFile', fileParams:fileParams, allowedExtensions:allowedExtensions,uploadCallBack:'showGrid()']" />
+                </g:else>
                 <form id="${form_id}" action="${form_action}" method="POST" class="form-horizontal">
                     <div class="span12 super-section">
                         <h3>What did you observe?</h3>
@@ -103,7 +106,7 @@
                             <a
                                 href="${uGroup.createLink(controller:'checklist', action:'flagDeleted', id:observationInstance.id)}"
                                 onclick="return confirm('${message(code: 'default.observatoin.delete.confirm.message', default: 'This observation will be deleted. Are you sure ?')}');">Delete
-                                Observation </a>
+                                Checklist </a>
                         </div>
                         </g:if>
                         <a id="addObservationSubmit" class="btn btn-primary"
@@ -144,7 +147,7 @@
            }
 	   %>
 
-           f([], [{id: "sciName", name: "Scientific Name", field: "sciName", width:150},
+           initGrid([], [{id: "sciName", name: "Scientific Name", field: "sciName", width:150},
                {id: "commonName", name: "Common Name", field: "commonName", width:150},
                {id: "notes", name: "Notes", field: "notes", width: 100, editor: Slick.Editors.LongText, width:240}//,
                //{id: "addMedia", name: "Add Media", field: "addMedia"}

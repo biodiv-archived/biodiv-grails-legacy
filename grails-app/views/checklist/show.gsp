@@ -15,7 +15,23 @@
                             <div class="page-header clearfix">
                                 <div style="width:100%;">
                                     <div class="main_heading" style="margin-left:0px;">
+                                     <div class="pull-right">
+                                                <a class="btn btn-success pull-right"
+                                                    href="${uGroup.createLink(
+                                                    controller:'checklist', action:'create', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}" class="btn btn-info"> <i class="icon-plus"></i>Add an Checklist</a>
+ 
+                                                <sUser:ifOwns model="['user':checklistInstance.author]">
+                                                <a class="btn btn-primary pull-right" style="margin-right: 5px;"
+                                                   href="${uGroup.createLink(controller:'checklist', action:'edit', id:checklistInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
+                                                    <i class="icon-edit"></i>Edit</a>
 
+<%--                                                <a class="btn btn-danger btn-primary pull-right" style="margin-right: 5px;"--%>
+<%--                                                    href="${uGroup.createLink(controller:'checklist', action:'delete', id:checklistInstance.id)}"--%>
+<%--                                                    onclick="return confirm('${message(code: 'default.observatoin.delete.confirm.message', default: 'This checklist will be deleted. Are you sure ?')}');"><i class="icon-trash"></i>Delete</a>--%>
+
+                                                </sUser:ifOwns>
+
+                                        </div>
                                         <s:showHeadingAndSubHeading
 						model="['heading':checklistInstance.title, 'subHeading':checklistInstance.fetchAttributions(), 'headingClass':headingClass, 'subHeadingClass':subHeadingClass]" />
 

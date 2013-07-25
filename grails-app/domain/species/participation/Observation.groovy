@@ -13,6 +13,7 @@ import species.auth.SUser;
 import species.groups.SpeciesGroup;
 import species.groups.UserGroup;
 import speciespage.ObvUtilService;
+import grails.converters.JSON
 import grails.util.GrailsNameUtils;
 import org.grails.rateable.*
 import content.eml.Coverage;
@@ -66,6 +67,9 @@ class Observation extends Metadata implements Taggable, Rateable {
 	boolean isChecklist = false;
 	//observation generated from checklist will have source as checklist other will point to themself
 	Long sourceId;
+	
+	//column to store checklist key value pair in serialized object
+	String checklistAnnotations;
     
 	static hasMany = [resource:Resource, recommendationVote:RecommendationVote, obvFlags:ObservationFlag, userGroups:UserGroup, annotations:Annotation];
 	static belongsTo = [SUser, UserGroup, Checklists]
@@ -112,12 +116,14 @@ class Observation extends Metadata implements Taggable, Rateable {
 */
         placeName blank:false
 		agreeTerms nullable:true
+		checklistAnnotations nullable:true
 	}
 
 	static mapping = {
 		version : false;
 		notes type:'text'
 		searchText type:'text'
+		checklistAnnotations type:'text'
 		autoTimestamp false
 		tablePerHierarchy false
 	}
@@ -166,7 +172,9 @@ class Observation extends Metadata implements Taggable, Rateable {
 
 		//getting latest recoVote
 		query = "from RecommendationVote as recoVote where recoVote.observation = :observation and recoVote.recommendation.id in (:recoIds) order by recoVote.votedOn desc "
-		return RecommendationVote.find(query, [observation:this, recoIds:recoIds]).recommendation
+		def recoVote = RecommendationVote.find(query, [observation:this, recoIds:recoIds])
+		updateChecklistAnnotation(recoVote)
+		return recoVote.recommendation
 	}
 
 	void calculateMaxVotedSpeciesName(){
@@ -335,6 +343,23 @@ class Observation extends Metadata implements Taggable, Rateable {
 		longitude = (float) centroid.getX()
 	}
 	
+	private updateChecklistAnnotation(recoVote){
+		def m = fetchChecklistAnnotation()
+		if(!m){
+			return
+		}
+		
+		Checklists cl = Checklists.read(sourceId)
+		if(cl.sciNameColumn && recoVote.recommendation.isScientificName){
+			m[cl.sciNameColumn] = recoVote.recommendation.name
+		}
+		if(cl.commonNameColumn && recoVote.commonNameReco){
+			m[cl.commonNameColumn] = recoVote.commonNameReco.name
+		}
+		
+		checklistAnnotations = m as JSON
+	}
+	
 	String fetchSpeciesCall(){
 		return maxVotedReco ? maxVotedReco.name : "Unknown"
 	}
@@ -493,7 +518,16 @@ class Observation extends Metadata implements Taggable, Rateable {
 	}
 	
 	def fetchChecklistAnnotation(){
-		return Annotation.findAllBySourceTypeAndObservation(Checklists.class.getCanonicalName(), this, [sort:'columnOrder', order:'asc'])
+		if(checklistAnnotations){
+			def m = JSON.parse(checklistAnnotations)
+			Checklists cl = Checklists.read(sourceId)
+			def res = [:]
+			cl.fetchColumnNames().each { name ->
+				res.put(name, m[name])
+			}
+			return res
+		}
+		//return Annotation.findAllBySourceTypeAndObservation(Checklists.class.getCanonicalName(), this, [sort:'columnOrder', order:'asc'])
 	}
 //	
 //	def fetchSourceChecklistTitle(){

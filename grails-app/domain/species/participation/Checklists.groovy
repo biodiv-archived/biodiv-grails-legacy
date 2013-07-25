@@ -1,5 +1,6 @@
 package species.participation
 
+import grails.converters.JSON
 import java.util.Map;
 
 import org.hibernate.Hibernate;
@@ -27,7 +28,7 @@ class Checklists extends Observation {
 	def obvUtilService;
 	
 	String title;
-	int speciesCount;
+	int speciesCount = 0;
 	
 	//String attribution;
 	License license;
@@ -46,6 +47,13 @@ class Checklists extends Observation {
 	//others
 	String reservesValue;
 	
+	// marked column for parsing name
+	String sciNameColumn;
+	String commonNameColumn;
+	
+	//serialized object to store list of column names
+	String columns;
+	
 	static hasMany = [observations:Observation, contributors:SUser, attributions:Contributor, states : String, districts:String, talukas: String]
 	
 	static constraints = {
@@ -54,7 +62,8 @@ class Checklists extends Observation {
 		speciesCount nullable:false;
 		columnNames  nullable:false ;
 		rawChecklist nullable:true;
-		license  nullable:false, blank:false;;
+		license  nullable:false, blank:false;
+		columns nullable:false, blank:false;
 		
 		//attribution nullable:true;
 		reservesValue nullable:true;
@@ -73,6 +82,9 @@ class Checklists extends Observation {
 			 	return val < new Date() 
 			}
 		}
+		//at least one of the column name must present 
+		sciNameColumn validator : {val, obj -> val || obj.commonNameColumn }, nullable:true, blank:false;
+		commonNameColumn nullable:true, blank:false;
 	}
 
 	static mapping = {
@@ -82,10 +94,11 @@ class Checklists extends Observation {
 		refText type:'text';
 		sourceText type:'text';
 		columnNames type:'text';
+		columns type:'text';
 	}
-	
+
 	def fetchColumnNames(){
-		return columnNames.split("\t")
+		return JSON.parse(columns) //columnNames.split("\t")
 	}
 	
 	def fetchAttributions(){
