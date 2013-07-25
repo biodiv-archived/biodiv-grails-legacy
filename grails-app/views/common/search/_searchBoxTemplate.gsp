@@ -50,6 +50,13 @@ $(document).ready(function() {
                 'locationsUrl': "${uGroup.createLink(controller:'observation', action: 'locations')}",
                 'defaultMarkerIcon':"${resource(dir:'js/Leaflet/dist/images', file:'')}",
                 'isChecklistOnly':"${params.isChecklistOnly?.toBoolean()?.toString()}",
+                'species':{
+                    'url':"${uGroup.createLink('controller':'species', action:'show', 'userGroup':userGroupInstance)}"
+                },
+
+                'content':{
+                    'url':"${uGroup.createLink('controller':'content', 'userGroup':userGroupInstance)}"
+                },
                 'observation':{
                     listUrl:"${uGroup.createLink(controller:'observation', action: 'listJSON', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}",
                     uploadUrl:"${g.createLink(controller:'observation', action:'upload_resource')}"

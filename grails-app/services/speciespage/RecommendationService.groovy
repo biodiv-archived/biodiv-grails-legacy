@@ -13,6 +13,7 @@ import species.TaxonomyDefinition;
 import species.participation.Recommendation;
 import species.utils.Utils;
 import species.NamesParser;
+import species.Language;
 
 class RecommendationService {
 
@@ -176,13 +177,13 @@ class RecommendationService {
     *   }
     *   @result map of key and reco for that keyset. reco can also be null
     */
-    public Map<Integer, Recommendation> getRecosForNames(Map<Integer, Map<String,String>> names) {
+    public Map<Integer, Recommendation> getRecosForNames(def names) {
         Map result = [:]
         List sciNames = []
 
         if(!names) return result;
 
-        names.collectEntries( sciNames ) { k,v -> 
+        names.each { value -> 
             sciNames << value.sciName
         }
 
@@ -197,20 +198,21 @@ class RecommendationService {
         int index = 0;
 
         //finding recos
-        names.each { key, value ->
+        names.eachWithIndex { value, key ->
             def reco;
             String canonicalName;
+            
+            log.debug "Getting reco for :${value}"
 
             if(value.sciName) {
-                if(parsedNames && parsedNames[index]) {
-                    def taxonDef = parsedNames[index];
+                if(parsedNames && parsedNames[key]) {
+                    def taxonDef = parsedNames[key];
                     canonicalName = taxonDef.canonicalForm ?:taxonDef.name
                 } else {
                     canonicalName = Utils.cleanName(value.sciName);
                 }
             }
-            index ++;
-
+println canonicalName
             //first searching by canonical name. this name is present if user select from auto suggest
             if(canonicalName && (canonicalName.trim() != "")){
                 reco = searchReco(canonicalName, true, null, null);
@@ -223,7 +225,9 @@ class RecommendationService {
 
             //it may possible certain common name may point to species id in that case getting the SN for it
             else {
-		        def languageId = Language.getLanguage(value.languageName).id;
+                if(!value.languageName)
+                    value.languageName = 'English'
+		        Long languageId = Language.getLanguage(value.languageName).id;
 		        Recommendation commonNameReco = searchReco(value.commonName, false, languageId, null);
                 if(commonNameReco && commonNameReco.taxonConcept) {
                     TaxonomyDefinition taxOnConcept = commonNameReco.taxonConcept
@@ -232,10 +236,12 @@ class RecommendationService {
                     reco = commonNameReco;
                  }
             } 
- 
+println reco 
             if(reco) {
                 result.put(key, reco);
-            } 
+            } else {
+                log.debug "Couldn't get reco for ${value}"
+            }
         }
         return result;
     }
@@ -264,6 +270,8 @@ class RecommendationService {
 	}
 	
 	private Recommendation searchReco(name, isScientificName, languageId, taxonConcept){
+        if(!name) return;
+
 		def c = Recommendation.createCriteria();
 		def recoList = c.list {
 			ilike('name', name);

@@ -48,6 +48,7 @@
     127.0.0.1       indiabiodiversity.localhost.org biodiv
 
 * Install names parer https://github.com/GlobalNamesArchitecture/biodiversity 
+    a. sudo gem install biodiversity
 
 * app.rootDir in grails-app/conf/Config.groovy points to a directory where all application specific data files, templates and configuration files are stored. By default in development mode it points to app-conf folder in this repository.
 

@@ -1,7 +1,6 @@
 <% def allowedExtensions = allowedExtensions?:"[ 'pdf']"  %>
-
 <uploader:uploader id="${name}_uploader"
-	url="${uGroup.createLink(controller:'UFile', action:'fileUpload', userGroupWebaddress:params.webaddress)}"
+	url="${uGroup.createLink(controller:'UFile', action:'fileUpload', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"
 	multiple="false"
 	allowedExtensions="${allowedExtensions}" 
 	params="${fileParams}"
