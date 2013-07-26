@@ -98,7 +98,24 @@ function sciNameFormatter(row, cell, value, columnDef, dataContext) {
 
 function showGrid(){
     var input = $("#checklistStartFile_path").val(); 
-    parseData(  window.params.content.url + input , {callBack:initGrid});
+    if($('#myGrid').length == 0)
+        parseData(  window.params.content.url + input , {callBack:function(data, columns){
+            var cols = '', d = ''
+            $.each(columns, function(i, n){
+                cols = cols + ',' + n.name
+            });
+            $.each(data, function(i, n){
+                var line = ''
+                $.each(n, function(key, element) {
+                    line = line + ',' + element;
+                });
+                d = d + '\n' + line
+            });
+           $("#checklistData").val(d); 
+           $("#checklistColumns").val(cols); 
+        }});
+    else
+        parseData(  window.params.content.url + input , {callBack:initGrid});
 }
 
 function requiredFieldValidator(value) {
@@ -466,11 +483,12 @@ $(document).ready(function(){
     */
     function selectColumn(){
         var markColumnSelect = this;
-        var columns = grid.getColumns();
+        var columns = $('#checklistColumns').val().split(',')//grid.getColumns();
         $(markColumnSelect).empty();
         $.each(columns, function(index, column) {
-            if(column.id != canBeColumnName)
-                $(markColumnSelect).append($("<option />").val(column.id).text(column.name));
+            //if(column.id != canBeColumnName)
+            //    $(markColumnSelect).append($("<option />").val(column.id).text(column.name));
+                $(markColumnSelect).append($("<option />").val(column).text(column));
         });
         //$('select[name="sciNameColumn"]').find('option[value="scientific_name"]').attr("selected",true);
         //$('select[name="commonNameColumn"]').find('option[value="common_name"]').attr("selected",true);

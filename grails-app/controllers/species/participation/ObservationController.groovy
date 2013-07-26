@@ -1230,19 +1230,4 @@ class ObservationController {
         render locations as JSON
     }
 
-    def createWizardFlow = {
-        mainpage {
-            render(view:"/observation/createWizard/main")
-            on('listWizard').to "listWizard"
-            on('obvWizard').to"obvWizard"
-        }
-
-        listWizard {
-            redirect(controller:"checklist", action:"create")
-        }
-
-        obvWizard {
-            redirect(controller:"observation", action:"create")
-        }
-    }
 }

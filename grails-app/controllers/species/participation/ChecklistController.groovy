@@ -116,7 +116,13 @@ class ChecklistController {
 	def save = {
 		log.debug params;
 		if(request.method == 'POST') {
-			saveAndRender(params)
+			def result = saveAndRender(params)
+            if(result.success){
+                redirect (url:uGroup.createLink(action:'edit', controller:"checklist", id:result.checklistInstance.id, 'userGroupWebaddress':params.webaddress, postToFB:(params.postToFB?:false)))
+            }else{
+                //flash.message = "${message(code: 'error')}";
+                render(view: "create", model: [observationInstance: result.checklistInstance])
+            }
 		} else {
 			redirect (url:uGroup.createLink(action:'create', controller:"checklist", 'userGroupWebaddress':params.webaddress))
 		}
@@ -125,13 +131,7 @@ class ChecklistController {
 
 	private saveAndRender(params, sendMail=true){
 		updateParams(params)
-		def result = checklistService.saveChecklist(params, sendMail=true)
-		if(result.success){
-			redirect (url:uGroup.createLink(action:'show', controller:"checklist", id:result.checklistInstance.id, 'userGroupWebaddress':params.webaddress, postToFB:(params.postToFB?:false)))
-		}else{
-			//flash.message = "${message(code: 'error')}";
-			render(view: "create", model: [observationInstance: result.checklistInstance])
-		}
+		return checklistService.saveChecklist(params, sendMail=true)
 	}
 	
 	private updateParams(params){
@@ -195,6 +195,13 @@ class ChecklistController {
 		def observationInstance = Checklists.findByIdAndIsDeleted(params.id.toLong(), false)
 		if(observationInstance)	{
 			saveAndRender(params, false)
+            if(result.success){
+                redirect (url:uGroup.createLink(action:'show', controller:"checklist", id:result.checklistInstance.id, 'userGroupWebaddress':params.webaddress, postToFB:(params.postToFB?:false)))
+            }else{
+                //flash.message = "${message(code: 'error')}";
+                render(view: "create", model: [observationInstance: result.checklistInstance])
+            }
+
 		}else {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
 			redirect (url:uGroup.createLink(action:'list', controller:"observation", 'userGroupWebaddress':params.webaddress))
@@ -407,5 +414,21 @@ class ChecklistController {
 			render "=== done "
 		}
 		*/
-	
+
+    /*
+    def createWizardFlow = {
+        main {
+            on('createChecklist').to "createChecklist"
+        }
+
+        createChecklist {
+			on('submit') {
+                def result = saveAndRender(params)
+                if(result.success) show()
+                else createFlow()
+            }
+            on('show').to 'show'
+            on('createFlow').to 'createChecklist'
+        }
+    }*/
 }
