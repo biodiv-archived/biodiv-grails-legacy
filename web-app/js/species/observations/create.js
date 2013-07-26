@@ -145,6 +145,7 @@ function loadGrid(url, id){
 			initGrid(data.data, columns);
 			grid.setColumns(finalCols);
             grid.render();
+            grid.autosizeColumns();
 			return true;
 		},
 		error: function(xhr, status, error) {
@@ -490,8 +491,10 @@ $(document).ready(function(){
             //    $(markColumnSelect).append($("<option />").val(column.id).text(column.name));
                 $(markColumnSelect).append($("<option />").val(column).text(column));
         });
-        //$('select[name="sciNameColumn"]').find('option[value="scientific_name"]').attr("selected",true);
-        //$('select[name="commonNameColumn"]').find('option[value="common_name"]').attr("selected",true);
+        var snVal =  $('select[name="sciNameColumn"]').val();
+        var cnVal =  $('select[name="commonNameColumn"]').val();
+        //$('select[name="sciNameColumn"]').find('option[value="' +  snVal '"]').attr("selected",true);
+        //$('select[name="commonNameColumn"]').find('option[value="' + cnVal '"]').attr("selected",true);
     };
 
     $("#sciNameColumn").focus(selectColumn);
@@ -527,7 +530,7 @@ $(document).ready(function(){
         var sciNameColumn = $('#sciNameColumn').val();
         var commonNameColumn = $('#commonNameColumn').val();
 
-        if(((typeof(sciNameColumn) == 'undefined') || (sciNameColumn == null)) || ((typeof(commonNameColumn) == 'undefined') || (commonNameColumn == null))) {
+        if(((typeof(sciNameColumn) == 'undefined') || (sciNameColumn == null)) && ((typeof(commonNameColumn) == 'undefined') || (commonNameColumn == null))) {
             confirm("Please mark scientific name column or common name column in the list");
             return
         }
@@ -617,7 +620,7 @@ $(document).ready(function(){
             alert("Please agree to the terms mentioned at the end of the form to submit the observation.")
         }
     });
-
+	
 });	
 
  function AutoCompleteEditor(args) {

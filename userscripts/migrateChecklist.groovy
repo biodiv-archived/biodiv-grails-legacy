@@ -133,7 +133,7 @@ def postChecklistToWGPGroup(){
 //postChecklistToWGPGroup()
 
 def serializeChecklist(){
-	def clIdList = [2]
+	def clIdList = []
 	Checklist.listOrderById(order: "asc").each{ Checklist cl ->
 			clIdList.add(cl.id)
 	}
@@ -150,14 +150,6 @@ def serializeChecklist(){
 			}
 			
 			cl.columns = cns as JSON
-			def m = [:]
-			cl.observations.each { obv ->
-				obv.fetchChecklistAnnotation().each { a ->
-					m.put(a.key, a.value)
-				}
-				obv.checklistAnnotations = m as JSON
-				obv.save(flush:true)
-			}
 			cl.save(flush:true)
 		}
 	}
