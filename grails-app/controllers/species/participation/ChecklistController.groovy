@@ -270,9 +270,10 @@ class ChecklistController {
 		render result.value as JSON;
 	}
 	
-	
+	@Secured(['ROLE_ADMIN'])
 	def test = {
-		render Checklists.get(324174).columns
+		checklistService.serializeClData()
+		render " done  "
 	}
 	///////////////////////////////////////////////////////////////////////////////
 	////////////////////////////// SEARCH END /////////////////////////////////////////

@@ -551,4 +551,24 @@ class ChecklistService {
 
 		return csvFile
 	}
+	
+	//////////////////////////////////// Migrate related ////////////////////////////////////////
+	def serializeClData(){
+		def clIdList = Checklist.listOrderById(order: "asc").collect{it.id}
+		clIdList.each {  id ->
+			def cl = Checklists.findById(id, [fetch: [observations: 'join']])
+			println cl
+			Checklists.withTransaction(){
+				cl.observations.each { obv ->
+					def m = [:]
+					obv.fetchChecklistAnnotation().each { a ->
+						m.put(a.key, a.value)
+					}
+					obv.checklistAnnotations = m as JSON
+					obv.save(flush:true)
+				}
+			}	
+		}
+	}
+	
 }

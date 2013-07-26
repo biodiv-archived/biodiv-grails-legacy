@@ -70,14 +70,19 @@
                         </div-->
 
                         <div class="section" style="clear:both;">
-                            <div class="row control-group">
+                            <div class="row control-group ${hasErrors(bean: observationInstance, field: 'sciNameColumn', 'error')}">
                                 <label for="group" class="control-label"><g:message
                                     code="observation.groupHabitat.label" default="Mark Columns" /> </label>
                                 <div class="controls">
                                     <select id="sciNameColumn" class="markColumn" name="sciNameColumn" value="${observationInstance.sciNameColumn}"></select>
                                     <select id="commonNameColumn" class="markColumn" name="commonNameColumn" value="${observationInstance.commonNameColumn}"></select>
-                                </div>
-                            </div>
+                                	<div class="help-inline">
+							            <g:hasErrors bean="${observationInstance}" field="sciNameColumn">
+							            	<g:message code="checklist.scientific_name.validator.invalid" />
+							            </g:hasErrors>
+						        	</div>
+                            	</div>
+                            </div>	
                         </div>
                     
                         <a id="parseNames" class="btn btn-primary"
@@ -169,14 +174,14 @@
            if(observationInstance?.habitat) {
            out << "jQuery('#habitat_${observationInstance.habitat.id}').addClass('active');";
            }
-	   %>
-
-           initGrid([], [{id: "sciName", name: "Scientific Name", field: "sciName", editor: AutoCompleteEditor, width:150, formatter:sciNameFormatter},
+	   		%>
+	   		var data = []
+	   		var columns = [{id: "sciName", name: "Scientific Name", field: "sciName", editor: AutoCompleteEditor, width:150, formatter:sciNameFormatter},
                {id: "commonName", name: "Common Name", field: "commonName", editor: AutoCompleteEditor, width:150},
                {id: "notes", name: "Notes", field: "notes", width: 100, editor: Slick.Editors.LongText, width:240},
-               {id: "addMedia", name: "Add Media", field: "addMedia"}
-               ]);
-
+               {id: "addMedia", name: "Add Media", field: "addMedia"}]
+			
+           	initGrid(data, columns);
         });
         </r:script>
     </body>
