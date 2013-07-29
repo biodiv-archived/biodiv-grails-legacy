@@ -463,7 +463,7 @@ environments {
 		grails.serverURL = "http://indiabiodiversity.localhost.org/${appName}"
 		speciesPortal {
 			search.serverURL = "http://localhost:8090/solr"
-			names.parser.serverURL = "127.0.0.1"
+			names.parser.serverURL = "saturn.strandls.com"
 			wgp {
 				facebook {
 					appId= "424071494335902"
@@ -951,6 +951,21 @@ If you do not want to receive notifications please go to your <a href="$userProf
 Thank you for your contribution to the portal.<br/>
 <br/>
 -The portal team'''
+
+grails.plugins.springsecurity.ui.addChecklist.emailSubject = 'Checklist added'
+grails.plugins.springsecurity.ui.addChecklist.emailBody = '''
+Hi $username,<br/>
+<br/>
+You have uploaded a checklist to <b>$domain</b> and it is available <a href="$obvUrl">here</a><br/>
+<br/>
+You will be notified by mail on any social activity on the observation.<br/>
+If you do not want to receive notifications please go to your <a href="$userProfileUrl">user profile</a> and switch it off.<br/>
+<br/>
+Thank you for your contribution to the portal.<br/>
+<br/>
+-The portal team'''
+
+
 grails.plugins.springsecurity.ui.addRecommendationVote.emailSubject = 'Species name suggested'
 grails.plugins.springsecurity.ui.addRecommendationVote.emailBody = '''
 Hi $username,<br/>
@@ -1099,19 +1114,39 @@ grails.plugins.springsecurity.ui.observationPostedToGroup.emailSubject = 'Observ
 grails.plugins.springsecurity.ui.observationPostedToGroup.emailBody = '''\
 Hi $username,<br/>
 <br/>
-<a href="$actorProfileUrl">$actorName</a> has posted an <a href="$obvUrl">observation</a> to $groupNameWithlink.
+<a href="$actorProfileUrl">$actorName</a> has posted an <a href="$obvUrl">$actionObject</a> to $groupNameWithlink.
 <br/><br/>
 -The portal team
 '''
+
+grails.plugins.springsecurity.ui.checklistPostedToGroup.emailSubject = 'Checklist posted to group'
+grails.plugins.springsecurity.ui.checklistPostedToGroup.emailBody = '''\
+Hi $username,<br/>
+<br/>
+<a href="$actorProfileUrl">$actorName</a> has posted a <a href="$obvUrl">$actionObject</a> to $groupNameWithlink.
+<br/><br/>
+-The portal team
+'''
+
 
 grails.plugins.springsecurity.ui.observationRemovedFromGroup.emailSubject = 'Observation removed from group'
 grails.plugins.springsecurity.ui.observationRemovedFromGroup.emailBody = '''\
 Hi $username,<br/>
 <br/>
-<a href="$actorProfileUrl">$actorName</a> has removed an <a href="$obvUrl">observation</a> from $groupNameWithlink.
+<a href="$actorProfileUrl">$actorName</a> has removed an <a href="$obvUrl">$actionObject</a> from $groupNameWithlink.
 <br/><br/>
 -The portal team
 '''
+
+grails.plugins.springsecurity.ui.checklistRemovedFromGroup.emailSubject = 'Checklist removed from group'
+grails.plugins.springsecurity.ui.checklistRemovedFromGroup.emailBody = '''\
+Hi $username,<br/>
+<br/>
+<a href="$actorProfileUrl">$actorName</a> has removed a <a href="$obvUrl">$actionObject</a> from $groupNameWithlink.
+<br/><br/>
+-The portal team
+'''
+
 
 grails.plugins.springsecurity.ui.addDocument.emailSubject = 'Document added'
 grails.plugins.springsecurity.ui.addDocument.emailBody = '''

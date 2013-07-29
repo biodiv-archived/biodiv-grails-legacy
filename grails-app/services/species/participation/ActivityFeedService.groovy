@@ -17,6 +17,9 @@ class ActivityFeedService {
 	//checklist related
 	static final String CHECKLIST_CREATED = "Checklist created"
 	static final String CHECKLIST_UPDATED = "Checklist updated"
+	static final String CHECKLIST_POSTED_ON_GROUP = "Posted checklist to group"
+	static final String CHECKLIST_REMOVED_FROM_GROUP = "Removed checklist from group"
+	
 	
 	//observation related
 	static final String OBSERVATION_CREATED = "Observation created"
@@ -30,6 +33,7 @@ class ActivityFeedService {
 	static final String RECOMMENDATION_REMOVED = "Suggestion removed"
 	static final String OBSERVATION_POSTED_ON_GROUP = "Posted observation to group"
 	static final String OBSERVATION_REMOVED_FROM_GROUP = "Removed observation from group"
+	
 	
 	//group related
 	static final String USERGROUP_CREATED = "Group created"
@@ -235,8 +239,17 @@ class ActivityFeedService {
 			case OBSERVATION_POSTED_ON_GROUP:
 				activityTitle = OBSERVATION_POSTED_ON_GROUP + " " + getUserGroupHyperLink(activityDomainObj)
 				break
+			
 			case OBSERVATION_REMOVED_FROM_GROUP:
 				activityTitle = OBSERVATION_REMOVED_FROM_GROUP + " " + getUserGroupHyperLink(activityDomainObj)
+				break
+			
+			case CHECKLIST_REMOVED_FROM_GROUP:
+				activityTitle = CHECKLIST_REMOVED_FROM_GROUP + " " + getUserGroupHyperLink(activityDomainObj)
+				break
+			
+			case CHECKLIST_POSTED_ON_GROUP:
+				activityTitle = CHECKLIST_POSTED_ON_GROUP + " " + getUserGroupHyperLink(activityDomainObj)
 				break
 			case MEMBER_JOINED:
 				activityTitle = "Joined group " + getUserGroupHyperLink(activityRootObj)

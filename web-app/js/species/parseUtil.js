@@ -59,22 +59,23 @@ function parseCSVData(data, options) {
     var headerCount = 0;
     var error = '';
     $.each(lines, function(lineCount, line) {
+    	line = $.trim(line);
     	try{
 	        if ((lineCount == options.startLine) && (typeof(options.headers) == 'undefined')) {
-		            var headers = $.csv.toArray($.trim(line));
+	        		var headers = $.csv.toArray(line);
 		            headerCount = headers.length;
 		            $.each(headers, function(headerCount, header) {
 		                columns.push({id:header, name: header, field: header, editor: Slick.Editors.Text, sortable:false, minWidth: 100});
 		            });
 	        	
 	        } else if (lineCount >= options.startLine) {
-	            var items = $.csv.toArray($.trim(line));
-	            if (items.length > 0) {
-	                printedLines++;
+	        	var items = $.csv.toArray(line);
+	            if (line !== '' && items.length > 0) {
+	            	printedLines++;
 	                if (items.length != headerCount) {
 	                    error += 'Error on line ' + lineCount + ': Item count (' + items.length + ') does not match header count (' + headerCount + ') \n';
 	                }
-	                var d = (rowData[lineCount-1] = {});
+	                var d = (rowData[printedLines-1] = {});
 	                $.each(items, function(itemCount, item) {
 	                    var dataKey = columns[itemCount]['field']
 	                    d[dataKey] = item;

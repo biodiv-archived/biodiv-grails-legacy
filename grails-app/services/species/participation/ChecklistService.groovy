@@ -104,7 +104,7 @@ class ChecklistService {
 	
 	Map saveChecklist(params, sendMail=true){
 		params.author = springSecurityService.currentUser;
-		def checklistInstance, feedType, feedAuthor, isGlobalUpdate = false;
+		def checklistInstance, feedType, feedAuthor, mailType, isGlobalUpdate = false;
 		try {
 			
 			if(params.action == "save"){
@@ -112,6 +112,7 @@ class ChecklistService {
 				checklistInstance = createChecklist(params);
 				feedType = activityFeedService.CHECKLIST_CREATED
 				feedAuthor = checklistInstance.author
+				mailType = feedType 
 			}else{
 				//updates old checklist
 				checklistInstance = Checklists.get(params.id.toLong())
@@ -125,11 +126,12 @@ class ChecklistService {
 			
 			if(!checklistInstance.hasErrors() && checklistInstance.save(flush:true)) {
 				log.debug "Successfully created checklistInstance : "+checklistInstance
-				//activityFeedService.addActivityFeed(checklistInstance, null, feedAuthor, feedType);
+				activityFeedService.addActivityFeed(checklistInstance, null, feedAuthor, feedType);
 				
 				observationService.saveObservationAssociation(params, checklistInstance)
-//				if(sendMail)
-//					observationService.sendNotificationMail(OBSERVATION_ADDED, checklistInstance, null, params.webaddress);
+				
+				if(sendMail)
+					observationService.sendNotificationMail(mailType, checklistInstance, null, params.webaddress);
 				
 				saveObservationFromChecklist(params, checklistInstance, isGlobalUpdate)
 				observationsSearchService.publishSearchIndex(checklistInstance, true);

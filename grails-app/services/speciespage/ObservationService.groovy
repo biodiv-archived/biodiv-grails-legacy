@@ -1377,7 +1377,7 @@ class ObservationService {
 		log.debug "Sending email"
 		try {
 			
-		def targetController =  obv.getClass().getCanonicalName().split('\\.')[-1]
+		def targetController =  getTargetController(obv)//obv.getClass().getCanonicalName().split('\\.')[-1]
 		targetController = targetController.replaceFirst(targetController[0], targetController[0].toLowerCase());
 		def obvUrl, domain
 	
@@ -1409,6 +1409,13 @@ class ObservationService {
 				toUsers.add(getOwner(obv))
 				break
 
+			case activityFeedService.CHECKLIST_CREATED:
+				mailSubject = conf.ui.addChecklist.emailSubject
+				bodyContent = conf.ui.addChecklist.emailBody
+				toUsers.add(getOwner(obv))
+				break
+
+				
 			case OBSERVATION_FLAGGED :
 				mailSubject = "Observation flagged"
 				bodyContent = conf.ui.observationFlagged.emailBody
@@ -1465,29 +1472,42 @@ class ObservationService {
 			case activityFeedService.OBSERVATION_POSTED_ON_GROUP:
 				mailSubject = conf.ui.observationPostedToGroup.emailSubject
 				bodyContent = conf.ui.observationPostedToGroup.emailBody
+				templateMap["actionObject"] = 'observation'
 				templateMap["actorProfileUrl"] = generateLink("SUser", "show", ["id": feedInstance.author.id], request)
 				templateMap["actorName"] = feedInstance.author.name
 				templateMap["groupNameWithlink"] = activityFeedService.getUserGroupHyperLink(activityFeedService.getDomainObject(feedInstance.activityHolderType, feedInstance.activityHolderId))
-				//templateMap["userGroupWebaddress"] = userGroupWebaddress
-				//templateMap["activity"] = activityFeedService.getContextInfo(feedInstance, [webaddress:userGroupWebaddress])
-				//templateMap['actor'] = feedInstance.author;
-				//templateMap["actorIconUrl"] = feedInstance.author.profilePicture(ImageType.SMALL)
 				toUsers.addAll(getParticipants(obv))
 				break
 
 			case activityFeedService.OBSERVATION_REMOVED_FROM_GROUP:
 				mailSubject = conf.ui.observationRemovedFromGroup.emailSubject
 				bodyContent = conf.ui.observationRemovedFromGroup.emailBody
+				templateMap["actionObject"] = 'observation'
 				templateMap["actorProfileUrl"] = generateLink("SUser", "show", ["id": feedInstance.author.id], request)
 				templateMap["actorName"] = feedInstance.author.name
 				templateMap["groupNameWithlink"] = activityFeedService.getUserGroupHyperLink(activityFeedService.getDomainObject(feedInstance.activityHolderType, feedInstance.activityHolderId))
-				//templateMap["userGroupWebaddress"] = userGroupWebaddress
-				//templateMap["activity"] = activityFeedService.getContextInfo(feedInstance, [webaddress:userGroupWebaddress])
-				//templateMap['actor'] = feedInstance.author;
-				//templateMap["actorIconUrl"] = feedInstance.author.profilePicture(ImageType.SMALL)
 				toUsers.addAll(getParticipants(obv))
 				break
 
+			case activityFeedService.CHECKLIST_POSTED_ON_GROUP:
+				mailSubject = conf.ui.checklistPostedToGroup.emailSubject
+				bodyContent = conf.ui.checklistPostedToGroup.emailBody
+				templateMap["actionObject"] = 'checklist'
+				templateMap["actorProfileUrl"] = generateLink("SUser", "show", ["id": feedInstance.author.id], request)
+				templateMap["actorName"] = feedInstance.author.name
+				templateMap["groupNameWithlink"] = activityFeedService.getUserGroupHyperLink(activityFeedService.getDomainObject(feedInstance.activityHolderType, feedInstance.activityHolderId))
+				toUsers.addAll(getParticipants(obv))
+				break
+
+			case activityFeedService.CHECKLIST_REMOVED_FROM_GROUP:
+				mailSubject = conf.ui.checklistRemovedFromGroup.emailSubject
+				bodyContent = conf.ui.checklistRemovedFromGroup.emailBody
+				templateMap["actionObject"] = 'checklist'
+				templateMap["actorProfileUrl"] = generateLink("SUser", "show", ["id": feedInstance.author.id], request)
+				templateMap["actorName"] = feedInstance.author.name
+				templateMap["groupNameWithlink"] = activityFeedService.getUserGroupHyperLink(activityFeedService.getDomainObject(feedInstance.activityHolderType, feedInstance.activityHolderId))
+				toUsers.addAll(getParticipants(obv))
+				break
 
 
 			case activityFeedService.COMMENT_ADDED:				
