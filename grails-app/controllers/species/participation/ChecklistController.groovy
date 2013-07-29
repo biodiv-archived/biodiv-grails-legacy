@@ -120,7 +120,7 @@ class ChecklistController {
                 redirect (url:uGroup.createLink(action:'show', controller:"checklist", id:result.checklistInstance.id, 'userGroupWebaddress':params.webaddress, postToFB:(params.postToFB?:false)))
             }else{
                 //flash.message = "${message(code: 'error')}";
-                render(view: "create", model: [observationInstance: result.checklistInstance, checklistData:params.checklistData.encodeAsJSON(), checklistColumns:params.checklistColumns])
+                render(view: "create", model: [observationInstance: result.checklistInstance, checklistData:params.checklistData.encodeAsJSON(), checklistColumns:params.checklistColumns, sciNameColumn:params.sciNameColumn, commonNameColumn:params.commonNameColumn])
             }
 		} else {
 			redirect (url:uGroup.createLink(action:'create', controller:"checklist", 'userGroupWebaddress':params.webaddress))
@@ -210,7 +210,7 @@ class ChecklistController {
                 redirect (url:uGroup.createLink(action:'show', controller:"checklist", id:result.checklistInstance.id, 'userGroupWebaddress':params.webaddress, postToFB:(params.postToFB?:false)))
             }else{
                 //flash.message = "${message(code: 'error')}";
-                render(view: "create", model: [observationInstance: result.checklistInstance, checklistData:params.checklistData, checklistColumns:params.checklistColumns])
+                render(view: "create", model: [observationInstance: result.checklistInstance, checklistData:params.checklistData, checklistColumns:params.checklistColumns, sciNameColumn:params.sciNameColumn, commonNameColumn:params.commonNameColumn])
             }
 
 		}else {

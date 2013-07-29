@@ -20,7 +20,7 @@ function getDataFromGrid(){
 	return data;
 }
 
-function initGrid(data, columns){
+function initGrid(data, columns, sciNameColumn, commonNameColumn) {
     console.log('initGrid');
     var options = {
         editable: true,
@@ -86,9 +86,16 @@ console.log($.type(columns));
 	            return newColumn;
 	        }
         };
-
+        
         $("#myGrid").show();
         $('#checklistStartFile_uploaded').hide();
+        if(sciNameColumn) {
+            selectColumn($('#sciNameColumn'), sciNameColumn);
+        }
+        if(commonNameColumn) {
+            selectColumn($('#commonNameColumn'), commonNameColumn);
+        }
+
     });
 } 
 
@@ -111,7 +118,7 @@ function showGrid(){
         parseData(  window.params.content.url + input , {callBack:initGrid});
 }
 
-function loadDataToGrid(data, columns) {
+function loadDataToGrid(data, columns, sciNameColumn, commonNameColumn) {
     var cols = '', d = '';
     
     $.each(columns, function(i, n){
@@ -130,12 +137,12 @@ function loadDataToGrid(data, columns) {
     $("#checklistData").val(d);
     $("#checklistColumns").val(cols.slice(1));
    
-    loadTextToGrid(data, columns)
+    loadTextToGrid(data, columns, sciNameColumn, commonNameColumn);
 }
 
-function loadTextToGrid(data, columns) {
+function loadTextToGrid(data, columns, sciNameColumn, commonNameColumn) {
     $("#gridSection").show();
-    initGrid(data, columns)
+    initGrid(data, columns, sciNameColumn, commonNameColumn)
     $("#textAreaSection").hide();
     $("#addNames").hide();
     $("#parseNames").show();
@@ -166,12 +173,10 @@ function loadGrid(url, id){
 				}
 				columns.push({id:header, name: header, field: header, editor:editor, sortable:true, minWidth: 200});
 			});
-                        loadTextToGrid(data.data, columns);
+                        loadTextToGrid(data.data, columns, data.sciNameColumn, data.commonNameColumn);
                         grid.setColumns(finalCols);
                         grid.render();
                         grid.autosizeColumns();
-                        selectColumn($('#sciNameColumn'), data.sciNameColumn);
-                        selectColumn($('#commonNameColumn'), data.commonNameColumn);
 			return true;
 		},
 		error: function(xhr, status, error) {
