@@ -59,34 +59,37 @@ function parseCSVData(data, options) {
     var headerCount = 0;
     var error = '';
     $.each(lines, function(lineCount, line) {
-        if ((lineCount == options.startLine) && (typeof(options.headers) == 'undefined')) {
-            var headers = $.csv.toArray(line);
-            headerCount = headers.length;
-            $.each(headers, function(headerCount, header) {
-                columns.push({id:header, name: header, field: header, editor: Slick.Editors.Text, sortable:false, minWidth: 100});
-                //console.log(columns.length)
-            });
-        } else if (lineCount >= options.startLine) {
-            var items = $.csv.toArray(line);
-            //console.log(items)
-            if (items.length > 1) {
-                printedLines++;
-                if (items.length != headerCount) {
-                    error += 'error on line ' + lineCount + ': Item count (' + items.length + ') does not match header count (' + headerCount + ') \n';
-                }
-                var d = (rowData[lineCount-1] = {});
-                $.each(items, function(itemCount, item) {
-                    var dataKey = columns[itemCount]['field']
-                    d[dataKey] = item;
-                });
-                //console.log(rowData.length)
-            }
-        }
+    	try{
+	        if ((lineCount == options.startLine) && (typeof(options.headers) == 'undefined')) {
+		            var headers = $.csv.toArray($.trim(line));
+		            headerCount = headers.length;
+		            $.each(headers, function(headerCount, header) {
+		                columns.push({id:header, name: header, field: header, editor: Slick.Editors.Text, sortable:false, minWidth: 100});
+		            });
+	        	
+	        } else if (lineCount >= options.startLine) {
+	            var items = $.csv.toArray($.trim(line));
+	            if (items.length > 0) {
+	                printedLines++;
+	                if (items.length != headerCount) {
+	                    error += 'Error on line ' + lineCount + ': Item count (' + items.length + ') does not match header count (' + headerCount + ') \n';
+	                }
+	                var d = (rowData[lineCount-1] = {});
+	                $.each(items, function(itemCount, item) {
+	                    var dataKey = columns[itemCount]['field']
+	                    d[dataKey] = item;
+	                });
+	            }
+	        }
+    	}catch(e){
+    		error += e + '\n';
+    	}
     });
     if (error) {
-        alert("Error: "+error);
-    }
-    if(options.callBack){
-        options.callBack(rowData, columns);
+        alert(error);
+    }else{
+	    if(options.callBack){
+	        options.callBack(rowData, columns);
+	    }
     }
 }
