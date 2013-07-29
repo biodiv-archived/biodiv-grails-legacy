@@ -54,7 +54,7 @@
                             <i class="icon-picture"></i><span>
                                 Put in a line for each species and any other information associated for it or 
                             </span>
-                <g:if test="${ params.action == 'edit' || params.action == 'update'}">
+                <g:if test="${ params.action != 'create'}">
                 	<g:render template="/checklist/showEditGrid" model="['observationInstance':observationInstance]"/>
                 </g:if>
                 <g:else>
@@ -102,7 +102,7 @@
                         </div>
                     </div>
 
-                    <div id="restOfForm" class="pull-left" style="${params.action == 'create'}?'display:none;':''">
+                    <div id="restOfForm" class="pull-left" style="${(params.action == 'create')?'display:none;':''}">
                         <div class="span12 super-section" style="clear:both">
                             <h3>What is this list about</h3>
 

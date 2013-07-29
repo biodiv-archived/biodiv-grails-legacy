@@ -30,7 +30,9 @@ function initGrid(data, columns){
         autoEdit: true,
         fullWidthRows:true
     };
-
+    console.log(data);
+console.log($.type(data));
+console.log($.type(columns));
     $(function () {
         grid = new Slick.Grid("#myGrid", data, columns, options);
         grid.autosizeColumns();
@@ -316,8 +318,10 @@ function selectColumn(selector, selectedColumn){
     $.each(columns, function(index, column) {
         $(markColumnSelect).append($("<option />").val(column.id).text(column.name));
     });
-    $(markColumnSelect).find('option[value="' +  selectedColumn +'"]').attr("selected",true);
-    $(markColumnSelect).trigger('change');
+    if(selectedColumn) {
+        $(markColumnSelect).find('option[value="' +  selectedColumn +'"]').attr("selected",true);
+        $(markColumnSelect).trigger('change');
+    }
 };
 
 
@@ -551,8 +555,11 @@ $(document).ready(function(){
         $('#wizardButtons').hide();
     });
 
-    $("#sciNameColumn").focus(selectColumn);
-    $("#commonNameColumn").focus(selectColumn);
+    function selectColumn2(event) {
+        selectColumn(this);
+    }
+    $("#sciNameColumn").focus(selectColumn2);
+    $("#commonNameColumn").focus(selectColumn2);
     
     $("#sciNameColumn").change(function() {
         console.log('sciName column change');
