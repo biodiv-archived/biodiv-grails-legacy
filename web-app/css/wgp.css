@@ -2048,3 +2048,7 @@ div.noOfRatings {
     color: #0c8040;
 }
 
+.validReco {
+    background-color : yellow;
+    font-weight:bold;
+}

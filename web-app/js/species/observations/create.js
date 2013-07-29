@@ -1,5 +1,4 @@
 var grid;
-var canBeColumnName = 'CanBe';
 var dirtyRows;
 
 //only returning modified data
@@ -22,17 +21,19 @@ function getDataFromGrid(){
 }
 
 function initGrid(data, columns){
+    console.log('initGrid');
     var options = {
         editable: true,
         enableAddRow: true,
         enableCellNavigation: true,
         asyncEditorLoading: false,
-        autoEdit: true
+        autoEdit: true,
+        fullWidthRows:true
     };
 
     $(function () {
         grid = new Slick.Grid("#myGrid", data, columns, options);
-
+        grid.autosizeColumns();
         grid.setSelectionModel(new Slick.CellSelectionModel());
 
         grid.onAddNewRow.subscribe(function (e, args) {
@@ -50,6 +51,7 @@ function initGrid(data, columns){
         }
 
         grid.addNewColumn = function(newColumnName, options, position){
+            columns = grid.getColumns();
             if(newColumnName == undefined)
                 newColumnName = prompt('New Column Name','');
 
@@ -79,7 +81,6 @@ function initGrid(data, columns){
 	
 	            grid.setColumns(columns);
 	            grid.render();
-                    grid.autosizeColumns()
 	            return newColumn;
 	        }
         };
@@ -92,6 +93,10 @@ function initGrid(data, columns){
 function sciNameFormatter(row, cell, value, columnDef, dataContext) {
     if (value == null || value == undefined || !value.length)
         return '';
+    else if(dataContext.speciesId)
+        return "<a href='"+window.params.species.url + '/' + dataContext.speciesId+"' target='_blank' title='"+dataContext.speciesTitle+"'><i>"+value+"</i></a> "
+    else if(dataContext.speciesTitle)
+        return "<span title='"+dataContext.speciesTitle+"'><i>"+value+"</i></span>"
     else
         return '<i>'+value+'</i>';
 }
@@ -127,7 +132,10 @@ function loadDataToGrid(data, columns) {
 }
 
 function loadTextToGrid(data, columns) {
-    initGrid(data, columns);
+    grid.setColumns(columns);
+    grid.setData(data);
+    grid.invalidate();
+    grid.autosizeColumns();
     $("#textAreaSection").hide();
     $("#gridSection").show();
     $("#addNames").hide();
@@ -146,6 +154,7 @@ function loadGrid(url, id){
 	dirtyRows = new Array();
 	$.ajax({
 		url: url,
+                dataType: 'json',
 		data:{id:id},
 		success: function(data){
 			var headers = data.columns;
@@ -158,10 +167,9 @@ function loadGrid(url, id){
 				}
 				columns.push({id:header, name: header, field: header, editor:editor, sortable:true, minWidth: 200});
 			});
-			loadTextToGrid(data.data, columns);
-            grid.setColumns(finalCols);
-            grid.render();
-            grid.autosizeColumns();
+                        initGrid(data.data, columns);
+                        grid.setColumns(finalCols);
+                        grid.render();
 			return true;
 		},
 		error: function(xhr, status, error) {
@@ -532,9 +540,7 @@ $(document).ready(function(){
         var columns = grid.getColumns();
         $(markColumnSelect).empty();
         $.each(columns, function(index, column) {
-            if(column.id != canBeColumnName)
-                $(markColumnSelect).append($("<option />").val(column.id).text(column.name));
-            //    $(markColumnSelect).append($("<option />").val(column).text(column));
+            $(markColumnSelect).append($("<option />").val(column.id).text(column.name));
         });
         var snVal =  $('select[name="sciNameColumn"]').val();
         var cnVal =  $('select[name="commonNameColumn"]').val();
@@ -546,9 +552,11 @@ $(document).ready(function(){
     $("#commonNameColumn").focus(selectColumn);
     
     $("#sciNameColumn").change(function() {
+        console.log('sciName column change');
         var column = grid.getColumns()[grid.getColumnIndex($("#sciNameColumn").val())];
         column.editor = AutoCompleteEditor;
         column.formatter = sciNameFormatter;
+        grid.invalidate();
     });
     
     /**
@@ -590,24 +598,25 @@ $(document).ready(function(){
                 var gridData = grid.getData();
                 var sciNameColumnIndex = grid.getColumnIndex($('#sciNameColumn').val());
                 var column = grid.getColumns()[sciNameColumnIndex];
-                    //grid.addNewColumn(canBeColumnName, {formatter:sciNameFormatter}, sciNameColumnIndex+1);
-                var rows = [];
+                var changes = {};
                 for(rowId in data) {
                     if(data.hasOwnProperty(rowId)) {
+                        var columnId = column.id
                         rowId = parseInt(rowId, 10);
-                        rows.push(rowId);
-                        grid.setCellCssStyles("validReco", {
-                            rowId : {
-                                sciNameColumnIndex : 'sciNameColumn'
-                            }
-                        })
+                        if(!changes[rowId])
+                            changes[rowId] = {}
+                        changes[rowId][column.id] = 'validReco'
+console.log(gridData[rowId][column.id]);
+       
+                        var dataItem = grid.getDataItem(rowId);
                         if(data[rowId].speciesId)
-                            gridData[rowId][column.id] = "<a href='"+window.params.species.url + '/' + data[rowId].speciesId+"' target='_blank' title='"+data[rowId].name+"'>"+gridData[rowId][column.id]+"</a> "
-                        else
-                            gridData[rowId][column.id] = "<span title='"+data[rowId].name+"'>"+gridData[rowId][column.id]+"</span>"
+                            dataItem.speciesId = data[rowId].speciesId;
+                        dataItem.speciesTitle = data[rowId].name;
                     }
+                    grid.invalidateRow(rowId);
                 }
-                grid.invalidateRows(rows);
+
+                grid.setCellCssStyles("highlight", changes);
                 grid.render();
                 $('#createChecklist').show();
             },
