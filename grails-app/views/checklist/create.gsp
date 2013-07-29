@@ -68,7 +68,7 @@
                             <input id="rawChecklist" name="rawChecklist" type="hidden" value='' />
                         </div>
                       
-                        <div id="gridSection" class="section checklist-slickgrid" style="display:none;">
+                        <div id="gridSection" class="section checklist-slickgrid" style="">
                             <span id="addNewColumn" class="btn-link">+ Add New Column</span>
                             <div id="myGrid" class="" style="width:100%;height:350px;"></div>
                             <div id="nameSuggestions" style="display: block;"></div>
@@ -105,7 +105,7 @@
                         </div>
                     </div>
 
-                    <div id="restOfForm" style="display:none;">
+                    <div id="restOfForm" class="pull-left" style="display:none;">
                         <div class="span12 super-section" style="clear:both">
                             <h3>What is this list about</h3>
 
@@ -194,14 +194,15 @@
            if(observationInstance?.habitat) {
            out << "jQuery('#habitat_${observationInstance.habitat.id}').addClass('active');";
            }
-	   		%>
-	   		var data = []
-	   		var columns = [{id: "sciName", name: "Scientific Name", field: "sciName", editor: AutoCompleteEditor, width:150, formatter:sciNameFormatter},
-               {id: "commonName", name: "Common Name", field: "commonName", editor: AutoCompleteEditor, width:150},
-               {id: "notes", name: "Notes", field: "notes", width: 100, editor: Slick.Editors.LongText, width:240},
-               {id: "addMedia", name: "Add Media", field: "addMedia"}]
-			
-           	initGrid(data, columns);
+	    %>
+            var data = []
+            var columns = [{id: "sciName", name: "Scientific Name", field: "sciName", editor: AutoCompleteEditor, width:250, formatter:sciNameFormatter},
+            {id: "commonName", name: "Common Name", field: "commonName", editor: AutoCompleteEditor, width:250},
+            {id: "addMedia", name: "Add Media", field: "addMedia", width:100},
+            {id: "notes", name: "Notes", field: "notes", editor: Slick.Editors.LongText, width:200}
+            ]
+
+            initGrid(data, columns);
         });
         </r:script>
 

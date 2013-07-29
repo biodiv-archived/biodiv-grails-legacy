@@ -63,7 +63,7 @@ function parseCSVData(data, options) {
             var headers = $.csv.toArray(line);
             headerCount = headers.length;
             $.each(headers, function(headerCount, header) {
-                columns.push({id:header, name: header, field: header, editor: Slick.Editors.Text, sortable:true, minWidth: 200});
+                columns.push({id:header, name: header, field: header, editor: Slick.Editors.Text, sortable:false, minWidth: 100});
                 //console.log(columns.length)
             });
         } else if (lineCount >= options.startLine) {
