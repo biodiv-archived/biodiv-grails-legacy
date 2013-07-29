@@ -32,7 +32,6 @@ function initGrid(data, columns){
 
     $(function () {
         grid = new Slick.Grid("#myGrid", data, columns, options);
-        grid.autosizeColumns()
 
         grid.setSelectionModel(new Slick.CellSelectionModel());
 
@@ -43,11 +42,11 @@ function initGrid(data, columns){
             grid.updateRowCount();
             grid.render();
         });
-        
+
         if(dirtyRows){
-	        grid.onCellChange.subscribe(function (e, args) {
-	        	dirtyRows.push(args.row);
-	        });
+            grid.onCellChange.subscribe(function (e, args) {
+                dirtyRows.push(args.row);
+            });
         }
 
         grid.addNewColumn = function(newColumnName, options, position){
@@ -80,6 +79,7 @@ function initGrid(data, columns){
 	
 	            grid.setColumns(columns);
 	            grid.render();
+                    grid.autosizeColumns()
 	            return newColumn;
 	        }
         };
@@ -98,24 +98,40 @@ function sciNameFormatter(row, cell, value, columnDef, dataContext) {
 
 function showGrid(){
     var input = $("#checklistStartFile_path").val(); 
-    if($('#myGrid').length == 0)
-        parseData(  window.params.content.url + input , {callBack:function(data, columns){
-            var cols = '', d = ''
-            $.each(columns, function(i, n){
-                cols = cols + ',' + n.name
-            });
-            $.each(data, function(i, n){
-                var line = ''
-                $.each(n, function(key, element) {
-                    line = line + ',' + element;
-                });
-                d = d + '\n' + line
-            });
-           $("#checklistData").val(d); 
-           $("#checklistColumns").val(cols); 
-        }});
+    if($('#textAreaSection').is(':visible'))
+        parseData(  window.params.content.url + input , {callBack:loadDataToGrid});
     else
         parseData(  window.params.content.url + input , {callBack:initGrid});
+}
+
+function loadDataToGrid(data, columns) {
+    var cols = '', d = '';
+    
+    $.each(columns, function(i, n){
+        cols = cols + ',' + n.name
+    });
+    
+    $.each(data, function(i, n){
+        var line = ''
+        $.each(n, function(key, element) {
+            line = line + ',' + element;
+        });
+        line = line.slice(1);
+        d = d + '\n' + line
+    });
+
+    $("#checklistData").val(d);
+    $("#checklistColumns").val(cols.slice(1));
+   
+    loadTextToGrid(data, columns)
+}
+
+function loadTextToGrid(data, columns) {
+    initGrid(data, columns);
+    $("#textAreaSection").hide();
+    $("#gridSection").show();
+    $("#addNames").hide();
+    $("#parseNames").show();
 }
 
 function requiredFieldValidator(value) {
@@ -142,10 +158,10 @@ function loadGrid(url, id){
 				}
 				columns.push({id:header, name: header, field: header, editor:editor, sortable:true, minWidth: 200});
 			});
-			initGrid(data.data, columns);
-			grid.setColumns(finalCols);
-            grid.render();
-            grid.autosizeColumns();
+                        initGrid(data.data, columns);
+                        grid.setColumns(finalCols);
+                        grid.render();
+                        grid.autosizeColumns();
 			return true;
 		},
 		error: function(xhr, status, error) {
@@ -480,16 +496,45 @@ $(document).ready(function(){
     });  
 
     /**
+     *
+     */
+    $("#addNames").click(function() {
+        var cols = $('#checklistColumns').val();
+        var data = $("#checklistData").val();
+
+        if(!data || !cols) {
+            alert("Please load the column names and data");
+            event.preventDefault();
+            return false; 		 		
+        }
+
+        data = cols + '\n' + data
+        parseCSVData(data, {callBack:loadTextToGrid});
+    })
+
+    /**
+     *
+     */
+    $("#createChecklist").click(function() {
+        $('#restOfForm').show();
+        $('html, body').animate({
+            scrollTop: $("#restOfForm").offset().top
+        }, 2000);
+        loadMapInput();
+        $('#wizardButtons').hide();
+    });
+
+    /**
     *
     */
     function selectColumn(){
         var markColumnSelect = this;
-        var columns = $('#checklistColumns').val().split(',')//grid.getColumns();
+        var columns = grid.getColumns();
         $(markColumnSelect).empty();
         $.each(columns, function(index, column) {
-            //if(column.id != canBeColumnName)
-            //    $(markColumnSelect).append($("<option />").val(column.id).text(column.name));
-                $(markColumnSelect).append($("<option />").val(column).text(column));
+            if(column.id != canBeColumnName)
+                $(markColumnSelect).append($("<option />").val(column.id).text(column.name));
+            //    $(markColumnSelect).append($("<option />").val(column).text(column));
         });
         var snVal =  $('select[name="sciNameColumn"]').val();
         var cnVal =  $('select[name="commonNameColumn"]').val();
@@ -502,7 +547,8 @@ $(document).ready(function(){
     
     $("#sciNameColumn").change(function() {
         var column = grid.getColumns()[grid.getColumnIndex($("#sciNameColumn").val())];
-        column.editor = AutoCompleteEditor
+        column.editor = AutoCompleteEditor;
+        column.formatter = sciNameFormatter;
     });
     
     /**
@@ -543,27 +589,27 @@ $(document).ready(function(){
             success : function(data) {
                 var gridData = grid.getData();
                 var sciNameColumnIndex = grid.getColumnIndex($('#sciNameColumn').val());
-                var column = grid.addNewColumn(canBeColumnName, {formatter:sciNameFormatter}, sciNameColumnIndex+1);
+                var column = grid.getColumns()[sciNameColumnIndex];
+                    //grid.addNewColumn(canBeColumnName, {formatter:sciNameFormatter}, sciNameColumnIndex+1);
                 var rows = [];
                 for(rowId in data) {
                     if(data.hasOwnProperty(rowId)) {
                         rowId = parseInt(rowId, 10);
                         rows.push(rowId);
-                        console.log(data[rowId])
                         grid.setCellCssStyles("validReco", {
                             rowId : {
-                                sciNameColumnIndex : 'highlight',
-                                canBeColumnName : 'highlight'
+                                sciNameColumnIndex : 'sciNameColumn'
                             }
                         })
                         if(data[rowId].speciesId)
-                            gridData[rowId][column.id] = "<a href='"+window.params.species.url + '/' + data[rowId].speciesId+"' target='_blank'>"+data[rowId].name+"</a> "
+                            gridData[rowId][column.id] = "<a href='"+window.params.species.url + '/' + data[rowId].speciesId+"' target='_blank' title='"+data[rowId].name+"'>"+gridData[rowId][column.id]+"</a> "
                         else
-                            gridData[rowId][column.id] = data[rowId].name
+                            gridData[rowId][column.id] = "<span title='"+data[rowId].name+"'>"+gridData[rowId][column.id]+"</span>"
                     }
                 }
                 grid.invalidateRows(rows);
                 grid.render();
+                $('#createChecklist').show();
             },
             error: function(xhr, textStatus, errorThrown) {
                 alert(xhr);
@@ -702,6 +748,3 @@ $(document).ready(function(){
 
     this.init();
   }
-
-
-

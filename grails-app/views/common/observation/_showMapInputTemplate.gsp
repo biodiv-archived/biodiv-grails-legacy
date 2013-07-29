@@ -103,7 +103,7 @@
     </div>
           
 <r:script>
-$(document).ready(function() {
+function loadMapInput() {
     loadGoogleMapsAPI(function() {
         initialize(document.getElementById("map_canvas"), true);
         var drawControls, editControls;
@@ -125,10 +125,15 @@ $(document).ready(function() {
         //locate();
         //$("#map_canvas").resizable();
     });
+}
 
-    $(".address .add-on").click(function(){
-        $("#latlng").toggle();
-    })
+$(document).ready(function() {
+    if($('#map_canvas').is(':visible')) {
+        loadMapInput();
+        $(".address .add-on").click(function(){
+            $("#latlng").toggle();
+        })
+    }
 });
 </r:script>
           

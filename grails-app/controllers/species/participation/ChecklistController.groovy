@@ -111,7 +111,6 @@ class ChecklistController {
 		return [observationInstance: checklistInstance]
 	}
 	
-	
 	@Secured(['ROLE_USER'])
 	def save = {
 		log.debug params;

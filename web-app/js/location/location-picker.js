@@ -20,6 +20,7 @@ var drawnItems;
 var isMapViewLoaded = false;
 
 function initialize(element, drawable){
+    console.log('initializing map');
     G = google.maps;
     M = L;
     M.Icon.Default.imagePath = window.params.defaultMarkerIcon;

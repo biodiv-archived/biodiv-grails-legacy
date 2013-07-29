@@ -46,119 +46,139 @@
                 }
 
                 %>
+               <form id="${form_id}" action="${form_action}" method="POST" class="form-horizontal">
+                    <div class="span12 super-section">
+                        <h3>What did you observe?</h3>
+
+                        <div id="textAreaSection" class="section">
+                            <i class="icon-picture"></i><span>
+                                Put in a line for each species and any other information associated for it or 
+                            </span>
                 <g:if test="${ params.action == 'edit' || params.action == 'update'}">
                 	<g:render template="/checklist/showEditGrid" model="['observationInstance':observationInstance]"/>
                 </g:if>
                 <g:else>
                 	<g:render template='/UFile/docUpload' model="['name': 'checklistStartFile', fileParams:fileParams, allowedExtensions:allowedExtensions,uploadCallBack:'showGrid()']" />
                 </g:else>
-                <form id="${form_id}" action="${form_action}" method="POST" class="form-horizontal">
-                    <div class="span12 super-section">
-                        <h3>What did you observe?</h3>
-
-                        <div class="section checklist-slickgrid">
+ 
+                            <div>
+                                <input id="checklistColumns" name="checklistColumns" class="input-block-level" value='' placeHolder="Headers : Scientific Name, Common Name, ...."/>
+                            </div>
+                            <g:textArea id="checklistData" name="checklistData" rows="5" class="input-block-level" placeholder="Data : ..."/>
+                            <input id="rawChecklist" name="rawChecklist" type="hidden" value='' />
+                        </div>
+                      
+                        <div id="gridSection" class="section checklist-slickgrid" style="display:none;">
                             <span id="addNewColumn" class="btn-link">+ Add New Column</span>
-                            <div id="myGrid" class="" style="height:350px;width:100%;display:none;"></div>
+                            <div id="myGrid" class="" style="width:100%;height:350px;"></div>
                             <div id="nameSuggestions" style="display: block;"></div>
                             <input id="rawChecklist" name="rawChecklist" type="hidden" value='' />
                             <input id="checklistData" name="checklistData" type="hidden" value='' />
                             <input id="checklistColumns" name="checklistColumns" type="hidden" value='' />
+                        
+                            <div class="section" style="clear:both;">
+                                <div class="row control-group ${hasErrors(bean: observationInstance, field: 'sciNameColumn', 'error')}">
+                                    <label for="group" class="control-label"><g:message
+                                        code="observation.mark.sciNameColumn.label" default="Mark Scientific Name Column" /> </label>
+                                    <div class="controls">
+                                        <select id="sciNameColumn" class="markColumn" name="sciNameColumn" value="${observationInstance.sciNameColumn}"></select>
+                                        <div class="help-inline">
+                                            <g:hasErrors bean="${observationInstance}" field="sciNameColumn">
+                                            <g:message code="checklist.scientific_name.validator.invalid" />
+                                            </g:hasErrors>
+                                        </div>
+                                    </div>
+                                </div>	
+                                <div class="row control-group ${hasErrors(bean: observationInstance, field: 'commonNameColumn', 'error')}">
+                                    <label for="group" class="control-label"><g:message
+                                        code="observation.mark.commonNameColumn.label" default="Mark Common Name Column" /> </label>
+                                    <div class="controls">
+                                        <select id="commonNameColumn" class="markColumn" name="commonNameColumn" value="${observationInstance.commonNameColumn}"></select>
+                                        <div class="help-inline">
+                                            <g:hasErrors bean="${observationInstance}" field="commonNameColumn">
+                                            <g:message code="checklist.scientific_name.validator.invalid" />
+                                            </g:hasErrors>
+                                        </div>
+                                    </div>
+                                </div>	
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="restOfForm" style="display:none;">
+                        <div class="span12 super-section" style="clear:both">
+                            <h3>What is this list about</h3>
+
+                            <div class="section" style="clear:both;">
+                                <g:render template="/observation/selectGroupHabitatDate" model="['observationInstance':observationInstance]"/>
+                            </div>
+
                         </div>
 
-                        <!--div class="section span3">
-                            <g:render template="/observation/addPhoto" model="['observationInstance':observationInstance]"/>
-                        </div-->
-
-                        <div class="section" style="clear:both;">
-                            <div class="row control-group ${hasErrors(bean: observationInstance, field: 'sciNameColumn', 'error')}">
-                                <label for="group" class="control-label"><g:message
-                                    code="observation.groupHabitat.label" default="Mark Columns" /> </label>
-                                <div class="controls">
-                                    <select id="sciNameColumn" class="markColumn" name="sciNameColumn" value="${observationInstance.sciNameColumn}"></select>
-                                    <select id="commonNameColumn" class="markColumn" name="commonNameColumn" value="${observationInstance.commonNameColumn}"></select>
-                                	<div class="help-inline">
-							            <g:hasErrors bean="${observationInstance}" field="sciNameColumn">
-							            	<g:message code="checklist.scientific_name.validator.invalid" />
-							            </g:hasErrors>
-						        	</div>
-                            	</div>
-                            </div>	
+                        <div class="span12 super-section" style="clear: both;">
+                            <%
+                            def obvInfoFeeder = lastCreatedObv ? lastCreatedObv : observationInstance
+                            %>
+                            <obv:showMapInput model="[observationInstance:observationInstance, userObservationInstanceList: totalObservationInstanceList, obvInfoFeeder:obvInfoFeeder, locationHeading:'Where did you find these observations?']"></obv:showMapInput>
                         </div>
-                    
+
+                        <div class="span12 super-section"  style="clear: both">
+                            <g:render template="/observation/addNotes" model="['observationInstance':observationInstance]"/>
+                        </div>
+
+
+                        <div class="span12 super-section" style="clear:both">
+                            <h3>Save this list as ...</h3>
+
+                            <div class="section">
+                                <g:render template="/checklist/details" model="['observationInstance':observationInstance]"/>
+                            </div>
+                        </div>
+
+                        <g:render template="/observation/postToUserGroups" model="['observationInstance':obervationInstance]"/>
+                        <div class="span12" style="margin-top: 20px; margin-bottom: 40px;">
+
+                            <g:if test="${observationInstance?.id}">
+                            <a href="${uGroup.createLink(controller:params.controller, action:'show', id:observationInstance.id)}" class="btn"
+                                style="float: right; margin-right: 30px;"> Cancel </a>
+                            </g:if>
+                            <g:else>
+                            <a href="${uGroup.createLink(controller:params.controller, action:'list')}" class="btn"
+                                style="float: right; margin-right: 30px;"> Cancel </a>
+                            </g:else>
+
+                            <g:if test="${observationInstance?.id}">
+                            <div class="btn btn-danger"
+                                style="float: right; margin-right: 5px;">
+                                <a
+                                    href="${uGroup.createLink(controller:'checklist', action:'flagDeleted', id:observationInstance.id)}"
+                                    onclick="return confirm('${message(code: 'default.observatoin.delete.confirm.message', default: 'This observation will be deleted. Are you sure ?')}');">Delete
+                                    Checklist </a>
+                            </div>
+                            </g:if>
+
+                            <a id="addObservationSubmit" class="btn btn-primary"
+                                style="float: right; margin-right: 5px;"> ${form_button_val} </a>
+
+                            <div class="row control-group">
+                                <label class="checkbox" style="text-align: left;"> 
+                                    <g:checkBox style="margin-left:0px;"
+                                    name="agreeTerms" value="${observationInstance?.agreeTerms}"/>
+                                    <span class="policy-text"> By submitting this form, you agree that the photos or videos you are submitting are taken by you, or you have permission of the copyright holder to upload them on creative commons licenses. </span></label>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div id="wizardButtons" class="span12" style="margin-top: 20px; margin-bottom: 40px;">
+                        <a id="addNames" class="btn btn-primary"
+                            style="float: right; margin-right: 5px;">Add names</a>
+                        <a id="createChecklist" class="btn btn-primary"
+                            style="float: right; margin-right: 5px;display:none;"> Create Checklist </a>
                         <a id="parseNames" class="btn btn-primary"
-                            style="float: right; margin-right: 5px;">Parse Names</a>
-                    </div>
-                    <div class="span12 super-section" style="clear:both">
-                        <h3>What is this list about</h3>
-
-                        <div class="section" style="clear:both;">
-                            <g:render template="/observation/selectGroupHabitatDate" model="['observationInstance':observationInstance]"/>
-                        </div>
-
-                    </div>
- 
-                    <div class="span12 super-section" style="clear: both;">
-                        <%
-                        def obvInfoFeeder = lastCreatedObv ? lastCreatedObv : observationInstance
-                        %>
-                        <obv:showMapInput model="[observationInstance:observationInstance, userObservationInstanceList: totalObservationInstanceList, obvInfoFeeder:obvInfoFeeder, locationHeading:'Where did you find these observations?']"></obv:showMapInput>
-                    </div>
- 
-                    <div class="span12 super-section"  style="clear: both">
-                        <g:render template="/observation/addNotes" model="['observationInstance':observationInstance]"/>
+                            style="float: right; margin-right: 5px;display:none;">Parse Names</a>
                     </div>
 
-                   
-                    <div class="span12 super-section" style="clear:both">
-                        <h3>Save this list as ...</h3>
-
-                        <div class="section">
-                            <g:render template="/checklist/details" model="['observationInstance':observationInstance]"/>
-                        </div>
-                    </div>
- 
-                    <g:render template="/observation/postToUserGroups" model="['observationInstance':obervationInstance]"/>
-                    <div class="span12" style="margin-top: 20px; margin-bottom: 40px;">
-
-                        <g:if test="${observationInstance?.id}">
-                        <a href="${uGroup.createLink(controller:params.controller, action:'show', id:observationInstance.id)}" class="btn"
-                            style="float: right; margin-right: 30px;"> Cancel </a>
-                        </g:if>
-                        <g:else>
-                        <a href="${uGroup.createLink(controller:params.controller, action:'list')}" class="btn"
-                            style="float: right; margin-right: 30px;"> Cancel </a>
-                        </g:else>
-
-                        <g:if test="${observationInstance?.id}">
-                        <div class="btn btn-danger"
-                            style="float: right; margin-right: 5px;">
-                            <a
-                                href="${uGroup.createLink(controller:'checklist', action:'flagDeleted', id:observationInstance.id)}"
-                                onclick="return confirm('${message(code: 'default.observatoin.delete.confirm.message', default: 'This observation will be deleted. Are you sure ?')}');">Delete
-                                Checklist </a>
-                        </div>
-                        </g:if>
-                        <a id="addObservationSubmit" class="btn btn-primary"
-                            style="float: right; margin-right: 5px;"> ${form_button_val} </a>
-
-                        <div class="row control-group">
-                            <label class="checkbox" style="text-align: left;"> 
-                                <g:checkBox style="margin-left:0px;"
-                                name="agreeTerms" value="${observationInstance?.agreeTerms}"/>
-                                <span class="policy-text"> By submitting this form, you agree that the photos or videos you are submitting are taken by you, or you have permission of the copyright holder to upload them on creative commons licenses. </span></label>
-                        </div>
-
-                    </div>
-
-                </form>
-                <form id="upload_resource" 
-                    title="Add a photo for this observation"
-                    method="POST"
-                    class="${hasErrors(bean: observationInstance, field: 'resource', 'errors')}">
-
-                    <span class="msg" style="float: right"></span>
-                    <input id="videoUrl" type="hidden" name='videoUrl'value="" />
-                    <input type="hidden" name='obvDir' value="${obvDir}" />
                 </form>
 
             </div>
@@ -184,5 +204,6 @@
            	initGrid(data, columns);
         });
         </r:script>
+
     </body>
 </html>
