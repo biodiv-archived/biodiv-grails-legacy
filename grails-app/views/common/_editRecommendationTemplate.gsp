@@ -41,7 +41,7 @@
 
                     <input type="text" name="commonName" id="commonName"
                         value="${species_cn_name}" placeholder='Suggest a common name'
-                        class="input-xlarge ${hasErrors(bean: recommendationInstance, field: 'name', 'errors')} ${hasErrors(bean: recommendationVoteInstance, field: 'recommendation', 'errors')}" />
+                        class="input-block-level ${hasErrors(bean: recommendationInstance, field: 'name', 'errors')} ${hasErrors(bean: recommendationVoteInstance, field: 'recommendation', 'errors')}" />
                     <input type="hidden" id="mappedRecoNameForcanName" />
 
                     <div style="width:90px;">
@@ -65,7 +65,7 @@
                         <g:set var="species_sn_lang" value="${species_sn_lang}" />
                         <input type="text" name="recoName" id="name" value="${species_sn_name}"
                             placeholder='Suggest a scientific name'
-                            class="input-xlarge ${hasErrors(bean: recommendationInstance, field: 'name', 'errors')} ${hasErrors(bean: recommendationVoteInstance, field: 'recommendation', 'errors')}" />
+                            class="input-block-level ${hasErrors(bean: recommendationInstance, field: 'name', 'errors')} ${hasErrors(bean: recommendationVoteInstance, field: 'recommendation', 'errors')}" />
                         <input type="hidden" name="canName" id="canName" value="${species_canonical_name }"/>
                         <div id="nameSuggestions" style="display: block;"></div>
 
@@ -82,7 +82,7 @@
                     <div class="nameContainer textbox">
 
                         <input type="text" name="recoComment" id="recoComment" value="${species_call_comment}"
-                        class="input-xlarge ${hasErrors(bean: recommendationInstance, field: 'name', 'errors')} ${hasErrors(bean: recommendationVoteInstance, field: 'recommendation', 'errors')}"
+                        class="input-block-level ${hasErrors(bean: recommendationInstance, field: 'name', 'errors')} ${hasErrors(bean: recommendationVoteInstance, field: 'recommendation', 'errors')}"
                         placeholder="Write comment on species call"/>
                     </div>
                 </div>

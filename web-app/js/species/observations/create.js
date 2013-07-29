@@ -30,9 +30,7 @@ function initGrid(data, columns, sciNameColumn, commonNameColumn) {
         autoEdit: true,
         fullWidthRows:true
     };
-    console.log(data);
-console.log($.type(data));
-console.log($.type(columns));
+    
     $(function () {
         grid = new Slick.Grid("#myGrid", data, columns, options);
         grid.autosizeColumns();
@@ -60,38 +58,40 @@ console.log($.type(columns));
             if(newColumnName == null||newColumnName==''){
                 return;
             }
-        
-	        var newColumn = grid.getColumns()[grid.getColumnIndex(newColumnName)]
-	
-	        if(newColumn) return newColumn;
-	        else {
-	            options = $.extend({}, {
-	                    id:newColumnName,
-	                    name:newColumnName,
-	                    field:newColumnName,
-	                    editor: Slick.Editors.TextCellEditor
-	                }, options);
-	            
-	            newColumn = options;
-	            
-	            if(typeof position === 'number' && position % 1 == 0 && position < columns.length)
-	                columns.splice(position, 0 , newColumn);
-	            else {
-	                newColumn = [newColumn]
-	                $.merge(columns,newColumn);
-	            }
-	
-	            grid.setColumns(columns);
-	            grid.render();
-	            return newColumn;
-	        }
+
+            var newColumn = grid.getColumns()[grid.getColumnIndex(newColumnName)]
+
+                if(newColumn) return newColumn;
+                else {
+                    options = $.extend({}, {
+                        id:newColumnName,
+                        name:newColumnName,
+                        field:newColumnName,
+                        editor: Slick.Editors.TextCellEditor
+                    }, options);
+
+                    newColumn = options;
+
+                    if(typeof position === 'number' && position % 1 == 0 && position < columns.length)
+                        columns.splice(position, 0 , newColumn);
+                    else {
+                        newColumn = [newColumn]
+                            $.merge(columns,newColumn);
+                    }
+
+                    grid.setColumns(columns);
+                    grid.render();
+                    return newColumn;
+                }
         };
-        
+
         $("#myGrid").show();
         $('#checklistStartFile_uploaded').hide();
+
         if(sciNameColumn) {
             selectColumn($('#sciNameColumn'), sciNameColumn);
         }
+
         if(commonNameColumn) {
             selectColumn($('#commonNameColumn'), commonNameColumn);
         }
@@ -317,15 +317,14 @@ function getSelectedHabitatArr() {
  */
 function selectColumn(selector, selectedColumn){
     var markColumnSelect = selector ? selector : this;
-    console.log(this);
+    console.log(markColumnSelect);
     var columns = grid.getColumns();
     $(markColumnSelect).empty();
     $.each(columns, function(index, column) {
         $(markColumnSelect).append($("<option />").val(column.id).text(column.name));
     });
     if(selectedColumn) {
-        $(markColumnSelect).find('option[value="' +  selectedColumn +'"]').attr("selected",true);
-        $(markColumnSelect).trigger('change');
+        $(markColumnSelect).val(selectedColumn).change();
     }
 };
 
@@ -555,7 +554,7 @@ $(document).ready(function(){
         $('#restOfForm').show();
         $('html, body').animate({
             scrollTop: $("#restOfForm").offset().top
-        }, 2000);
+        }, 1000);
         loadMapInput();
         $('#wizardButtons').hide();
     });
@@ -567,10 +566,19 @@ $(document).ready(function(){
     $("#commonNameColumn").focus(selectColumn2);
     
     $("#sciNameColumn").change(function() {
-        console.log('sciName column change');
-        var column = grid.getColumns()[grid.getColumnIndex($("#sciNameColumn").val())];
-        column.editor = AutoCompleteEditor;
-        column.formatter = sciNameFormatter;
+        console.log('sciNameColumn changed');
+        var columns = grid.getColumns();
+        var sciNameColumn = $('#sciNameColumn').val();
+        for (var i = 0, len = columns.length; i < len; i++) {
+             var column = columns[i];
+             if(column.editor == AutoCompleteEditor && sciNameColumn != column.id) {
+                column.editor = Slick.Editors.Text
+                column.formatter = undefined
+             } else if(sciNameColumn == column.id){
+                column.editor = AutoCompleteEditor;
+                column.formatter = sciNameFormatter;
+             }
+        };
         grid.invalidate();
     });
     
@@ -705,7 +713,7 @@ $(document).ready(function(){
       $input = $("<INPUT type=text class='editor-text' />")
           .appendTo(args.container)
           .bind("keydown.nav", function (e) {
-            if (e.keyCode === $.ui.keyCode.LEFT || e.keyCode === $.ui.keyCode.RIGHT) {
+            if (e.keyCode === $.ui.keyCode.LEFT || e.keyCode === $.ui.keyCode.RIGHT || e.keyCode === $.ui.keyCode.DOWN || e.keyCode === $.ui.keyCode.UP) {
               e.stopImmediatePropagation();
             }
           })
@@ -716,8 +724,18 @@ $(document).ready(function(){
             'appendTo' : '#nameSuggestions',
             'nameFilter':args.column.id,
             focus: function( event, ui ) {
+                console.log(ui);
+                return false;
             }, select: function( event, ui ) {
+                console.log(ui);
+                console.log($input)
+                console.log(args);
+                if(ui.item.speciesId) {
+                    args.item.speciesId = ui.item.speciesId
+                    args.item.speciesTitle = ui.item.value
+                }
             }, open: function(event, ui) {
+                console.log(ui);
                 $("#nameSuggestions ul").css({'display': 'block','width':'300px'}); 
             }
         }); 

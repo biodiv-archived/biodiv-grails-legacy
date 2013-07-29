@@ -69,7 +69,7 @@ function parseCSVData(data, options) {
         } else if (lineCount >= options.startLine) {
             var items = $.csv.toArray(line);
             //console.log(items)
-            if (items.length > 1) {
+            if (items.length > 0) {
                 printedLines++;
                 if (items.length != headerCount) {
                     error += 'error on line ' + lineCount + ': Item count (' + items.length + ') does not match header count (' + headerCount + ') \n';

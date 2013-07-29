@@ -193,7 +193,7 @@ class ChecklistController {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
 			redirect (url:uGroup.createLink(action:'list', controller:"observation", 'userGroupWebaddress':params.webaddress))
 		} else if(SUserService.ifOwns(observationInstance.author)) {
-			render(view: "create", model: [observationInstance: observationInstance, 'springSecurityService':springSecurityService])
+			render(view: "create", model: [observationInstance: observationInstance, 'springSecurityService':springSecurityService, sciNameColumn:observationInstance.sciNameColumn, commonNameColumn:observationInstance.commonNameColumn])
 		} else {
 			flash.message = "${message(code: 'edit.denied.message')}"
 			redirect (url:uGroup.createLink(action:'show', controller:"checlist", id:observationInstance.id, 'userGroupWebaddress':params.webaddress))

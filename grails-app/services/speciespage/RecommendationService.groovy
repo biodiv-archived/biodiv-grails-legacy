@@ -244,7 +244,7 @@ class RecommendationService {
                 log.debug "Couldn't get reco for ${value}"
             }
 
-            recoInfo['parsed'] = (parsedNames && parsedNames[key])?true:false                
+            recoInfo['parsed'] = (parsedNames && parsedNames[key] && parsedNames[key].canonicalForm)?true:false                
             result.put(key, recoInfo)
         }
         return result;
