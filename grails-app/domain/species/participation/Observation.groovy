@@ -520,6 +520,7 @@ class Observation extends Metadata implements Taggable, Rateable {
 	def fetchChecklistAnnotation(){
 		if(checklistAnnotations){
 			def m = JSON.parse(checklistAnnotations)
+			
 			Checklists cl = Checklists.read(sourceId)
 			def res = [:]
 			cl.fetchColumnNames().each { name ->

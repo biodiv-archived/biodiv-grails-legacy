@@ -557,15 +557,17 @@ class ChecklistService {
 		def clIdList = Checklist.listOrderById(order: "asc").collect{it.id}
 		clIdList.each {  id ->
 			def cl = Checklists.findById(id, [fetch: [observations: 'join']])
-			println cl
-			Checklists.withTransaction(){
-				cl.observations.each { obv ->
-					def m = [:]
-					obv.fetchChecklistAnnotation().each { a ->
-						m.put(a.key, a.value)
+			if(!cl.observations.iterator().next().checklistAnnotations){
+				println cl
+				Checklists.withTransaction(){
+					cl.observations.each { obv ->
+						def m = [:]
+						obv.fetchChecklistAnnotation().each { a ->
+							m.put(a.key, a.value)
+						}
+						obv.checklistAnnotations = m as JSON
+						obv.save(flush:true)
 					}
-					obv.checklistAnnotations = m as JSON
-					obv.save(flush:true)
 				}
 			}	
 		}

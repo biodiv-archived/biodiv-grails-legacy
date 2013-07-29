@@ -136,7 +136,7 @@ class ChecklistController {
 	private updateParams(params){
 		params.checklistData = JSON.parse(params.checklistData)
 		params.checklistColumns = JSON.parse(params.checklistColumns)
-		def columnList = params.checklistColumns.collect { it.name }
+		List columnList = params.checklistColumns.collect { it.name }
 		
 		if(columnList.contains("CanBe")){
 			columnList.remove("CanBe");
@@ -150,6 +150,18 @@ class ChecklistController {
 				columnList.remove(0);
 			}
 		}
+		
+		//getting sn and cn column in front of checklist
+		if(params.commonNameColumn){
+			columnList.remove(params.commonNameColumn)
+			columnList.add(0, params.commonNameColumn)
+		}
+		
+		if(params.sciNameColumn){
+			columnList.remove(params.sciNameColumn)
+			columnList.add(0, params.sciNameColumn)
+		}
+		
 		params.columnNames =  columnList.join("\t")
 		params.columns =  columnList
 		

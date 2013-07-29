@@ -139,14 +139,19 @@ def serializeChecklist(){
 	}
 	clIdList.each {  id ->
 		Checklists.withTransaction(){
-			def cl = Checklists.findByIdAndIsDeleted(id, false, [fetch: [observations: 'join']])
+			def cl = Checklists.findByIdAndIsDeleted(id, false)
 			println cl
-			def cns = Arrays.asList(cl.columnNames.split("\t"))
+			List cns = new ArrayList(Arrays.asList(cl.columnNames.split("\t")))
+			if(cns.contains("common_name")){
+				cl.commonNameColumn = "common_name"
+				cns.remove("common_name")
+				cns.add(0, "common_name")
+			}
+			
 			if(cns.contains("scientific_name")){
 				cl.sciNameColumn = "scientific_name"
-			}
-			if(cns.contains("common_name")){
-				cl.sciNameColumn = "common_name"
+				cns.remove("scientific_name")
+				cns.add(0, "scientific_name")
 			}
 			
 			cl.columns = cns as JSON

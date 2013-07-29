@@ -54,12 +54,9 @@
                             <i class="icon-picture"></i><span>
                                 Put in a line for each species and any other information associated for it or 
                             </span>
-                <g:if test="${ params.action == 'edit' || params.action == 'update'}">
-                	<g:render template="/checklist/showEditGrid" model="['observationInstance':observationInstance]"/>
-                </g:if>
-                <g:else>
-                	<g:render template='/UFile/docUpload' model="['name': 'checklistStartFile', fileParams:fileParams, allowedExtensions:allowedExtensions,uploadCallBack:'showGrid()']" />
-                </g:else>
+	                <g:if test="${ params.action == 'create' || params.action == 'save'}">
+	                	<g:render template='/UFile/docUpload' model="['name': 'checklistStartFile', fileParams:fileParams, allowedExtensions:allowedExtensions,uploadCallBack:'showGrid()']" />
+	                </g:if>
  
                             <div>
                                 <input id="checklistColumns" name="checklistColumns" class="input-block-level" value='' placeHolder="Headers : Scientific Name, Common Name, ...."/>
@@ -105,7 +102,7 @@
                         </div>
                     </div>
 
-                    <div id="restOfForm" style="display:none;">
+                    <div id="restOfForm" style="${params.action == 'create' ? 'display:none;' : ''}">
                         <div class="span12 super-section" style="clear:both">
                             <h3>What is this list about</h3>
 
@@ -195,13 +192,20 @@
            out << "jQuery('#habitat_${observationInstance.habitat.id}').addClass('active');";
            }
 	   		%>
-	   		var data = []
-	   		var columns = [{id: "sciName", name: "Scientific Name", field: "sciName", editor: AutoCompleteEditor, width:150, formatter:sciNameFormatter},
-               {id: "commonName", name: "Common Name", field: "commonName", editor: AutoCompleteEditor, width:150},
-               {id: "notes", name: "Notes", field: "notes", width: 100, editor: Slick.Editors.LongText, width:240},
-               {id: "addMedia", name: "Add Media", field: "addMedia"}]
-			
-           	initGrid(data, columns);
+	   		
+	   		if(${params.action == 'edit'  || params.action == 'update'}){
+	   			loadGrid("${uGroup.createLink(controller:'checklist', action:'getObservationGrid')}", "${observationInstance.id}");
+	   		}
+	   		else{
+	   			var data = []
+		   		var columns = [{id: "sciName", name: "Scientific Name", field: "sciName", editor: AutoCompleteEditor, width:150, formatter:sciNameFormatter},
+	               {id: "commonName", name: "Common Name", field: "commonName", editor: AutoCompleteEditor, width:150},
+	               {id: "notes", name: "Notes", field: "notes", width: 100, editor: Slick.Editors.LongText, width:240},
+	               {id: "addMedia", name: "Add Media", field: "addMedia"}]
+				
+	           	initGrid(data, columns);
+	        }
+           	
         });
         </r:script>
 

@@ -158,10 +158,10 @@ function loadGrid(url, id){
 				}
 				columns.push({id:header, name: header, field: header, editor:editor, sortable:true, minWidth: 200});
 			});
-                        initGrid(data.data, columns);
-                        grid.setColumns(finalCols);
-                        grid.render();
-                        grid.autosizeColumns();
+			loadTextToGrid(data.data, columns);
+            grid.setColumns(finalCols);
+            grid.render();
+            grid.autosizeColumns();
 			return true;
 		},
 		error: function(xhr, status, error) {
