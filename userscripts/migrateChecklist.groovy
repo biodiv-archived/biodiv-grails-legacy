@@ -15,7 +15,7 @@ import content.eml.Document
 import species.groups.UserGroup
 import grails.converters.JSON
 
-def checklistUtilService = ctx.getBean("checklistUtilService");
+//def checklistUtilService = ctx.getBean("checklistUtilService");
 
 //checklistUtilService.updateUncuratedVotesTable()
 
@@ -159,5 +159,38 @@ def serializeChecklist(){
 		}
 	}
 }
+
+
+def addFeedToChecklist(){
+	def checklistUtilService = ctx.getBean("checklistUtilService");
+	
+	def m = GrailsDomainBinder.getMapping(ActivityFeed.class)
+	m.autoTimestamp = false
+	
+	def clIdList = []
+	Checklist.listOrderById(order: "asc").each{ Checklist cl ->
+			clIdList.add(cl.id)
+	}
+	clIdList.each {  id ->
+		Checklists.withTransaction(){
+			def cl = Checklists.findByIdAndIsDeleted(id, false)
+			println cl
+			checklistUtilService.addActivityFeed(cl, cl, cl.author, ActivityFeedService.CHECKLIST_CREATED, cl.fromDate)
+			def ugs = cl.userGroups 
+			if(ugs){
+				ugs.each { ug ->
+					def tDate = new Date(cl.fromDate.getTime() + 10)
+					checklistUtilService.addActivityFeed(cl, cl, cl.author, ActivityFeedService.OBSERVATION_POSTED_ON_GROUP, tDate)
+				}
+			}
+			cl.save(flush:true)
+		}
+	}
+	m.autoTimestamp = true
+	
+}
+
+addFeedToChecklist()
 serializeChecklist()
+
 println "================ done "
