@@ -107,13 +107,13 @@ modules = {
 		dependsOn 'core, tagit'
 		defaultBundle 'core'
 
+		resource url:'/js/species/names.js'
         resource url:'/css/location_picker.css'
         resource url:'/js/location/location-picker.js'
 		resource url:'/js/jquery/jquery.watermark.min.js'
 		resource url:'/js/jsrender.js'
 		//resource url:'/js/bootstrap-typeahead.js'
 		resource url:'/js/bootstrap-combobox.js'
-		resource url:'/js/species/names.js'
 	}
 
 	observations_show {

@@ -71,10 +71,6 @@ String desc = "- "+ location +" by "+observationInstance.author.name.capitalize(
                                     <div style="width:100%;">
                                         <div class="main_heading" style="margin-left:0px;">
                                             <div class="pull-right">
-                                                <a class="btn btn-success pull-right"
-                                                    href="${uGroup.createLink(
-                                                    controller:'observation', action:'create', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}" class="btn btn-info"> <i class="icon-plus"></i>Add an Observation</a>
- 
                                                 <sUser:ifOwns model="['user':observationInstance.author]">
                                                 <a class="btn btn-primary pull-right" style="margin-right: 5px;"
                                                    href="${uGroup.createLink(controller:'observation', action:'edit', id:observationInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">

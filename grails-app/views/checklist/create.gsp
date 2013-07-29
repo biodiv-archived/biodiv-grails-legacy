@@ -32,6 +32,8 @@
         <div class="observation_create">
             <div class="span12">
                 <obv:showSubmenuTemplate model="['entityName':(params.action == 'edit' || params.action == 'update')?'Edit Checklist':'Add Checklist']"/>
+
+                <g:render template="/observation/addObservationMenu"/>
                 <%
                 def allowedExtensions = "['csv']"
 				def fileParams = [uploadDir:'checklist']
@@ -54,13 +56,13 @@
                             <i class="icon-picture"></i><span>
                                 Put in a line for each species and any other information associated for it or 
                             </span>
-                <g:if test="${ params.action != 'create'}">
-                	<g:render template="/checklist/showEditGrid" model="['observationInstance':observationInstance]"/>
-                </g:if>
-                <g:else>
-                	<g:render template='/UFile/docUpload' model="['name': 'checklistStartFile', fileParams:fileParams, allowedExtensions:allowedExtensions,uploadCallBack:'showGrid()']" />
-                </g:else>
- 
+                            <g:if test="${ params.action != 'create'}">
+                                <g:render template="/checklist/showEditGrid" model="['observationInstance':observationInstance]"/>
+                            </g:if>
+                            <g:else>
+                                <g:render template='/UFile/docUpload' model="['name': 'checklistStartFile', fileParams:fileParams, allowedExtensions:allowedExtensions,uploadCallBack:'showGrid()']" />
+                            </g:else>
+
                             <div>
                                 <input id="checklistColumns" name="checklistColumns" class="input-block-level" value='' placeHolder="Headers : Scientific Name, Common Name, ...."/>
                             </div>
@@ -73,8 +75,8 @@
                             <div id="myGrid" class="" style="width:100%;height:350px;"></div>
                             <div id="nameSuggestions" style="display: block;"></div>
                         
-                            <div class="section" style="clear:both;">
-                                <div class="row control-group ${hasErrors(bean: observationInstance, field: 'sciNameColumn', 'error')}">
+                            <div class="section ${hasErrors(bean: observationInstance, field: 'sciNameColumn', 'error')}" style="clear:both;">
+                                <div class="row control-group span5">
                                     <label for="group" class="control-label"><g:message
                                         code="observation.mark.sciNameColumn.label" default="Mark Scientific Name Column" /> </label>
                                     <div class="controls">
@@ -86,19 +88,17 @@
                                         </div>
                                     </div>
                                 </div>	
-                                <div class="row control-group ${hasErrors(bean: observationInstance, field: 'commonNameColumn', 'error')}">
+                                <div class="row control-group span5">
                                     <label for="group" class="control-label"><g:message
                                         code="observation.mark.commonNameColumn.label" default="Mark Common Name Column" /> </label>
                                     <div class="controls">
                                         <select id="commonNameColumn" class="markColumn" name="commonNameColumn" value="${observationInstance.commonNameColumn}"></select>
-                                        <div class="help-inline">
-                                            <g:hasErrors bean="${observationInstance}" field="commonNameColumn">
-                                            <g:message code="checklist.scientific_name.validator.invalid" />
-                                            </g:hasErrors>
-                                        </div>
                                     </div>
                                 </div>	
                             </div>
+                            <a id="parseNames" class="btn btn-primary"
+                                style="float: right; margin-right: 5px;display:none;">Validate Names</a>
+ 
                         </div>
                     </div>
 
@@ -132,7 +132,7 @@
                             </div>
                         </div>
 
-                        <g:render template="/observation/postToUserGroups" model="['observationInstance':obervationInstance]"/>
+                        <g:render template="/observation/postToUserGroups" model="['observationInstance':observationInstance]"/>
                         <div class="span12" style="margin-top: 20px; margin-bottom: 40px;">
 
                             <g:if test="${observationInstance?.id}">
@@ -167,14 +167,12 @@
                         </div>
                     </div>
 
-                    <div id="wizardButtons" class="span12" style="margin-top: 20px; margin-bottom: 40px;">
+                    <div id="wizardButtons" class="span12" style="margin-top: 20px; margin-bottom: 40px;${params.action=='create'?:'display:none;'}">
                         <a id="addNames" class="btn btn-primary"
                             style="float: right; margin-right: 5px;">Add names</a>
                         <a id="createChecklist" class="btn btn-primary"
                             style="float: right; margin-right: 5px;display:none;"> Create Checklist </a>
-                        <a id="parseNames" class="btn btn-primary"
-                            style="float: right; margin-right: 5px;display:none;">Parse Names</a>
-                    </div>
+                   </div>
 
                 </form>
 

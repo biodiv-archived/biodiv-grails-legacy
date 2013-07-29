@@ -12,10 +12,12 @@
 <r:require modules="observations_create"/>
 </head>
 <body>
+
     <div class="observation_create">
         <div class="span12">
-            <obv:showSubmenuTemplate model="['entityName':(params.action == 'edit' || params.action == 'update')?'Edit Observation':'Add Observation']"/>
 
+            <obv:showSubmenuTemplate model="['entityName':(params.action == 'edit' || params.action == 'update')?'Edit Observation':'Add Observation']"/>
+            <g:render template="/observation/addObservationMenu"/>
 
             <%
             def form_id = "addObservation"
@@ -40,10 +42,10 @@
 
                         <g:render template="addPhoto" model="['observationInstance':observationInstance]"/>
 
-                        <div class="span6" style="margin:0px";>
+                        <div class="section" style="margin:0px";>
                             <g:render template="selectGroupHabitatDate" model="['observationInstance':observationInstance]"/>
                         </div>
-                        <div class="span6 sidebar-section" style="margin-top:-5px;">
+                        <div class="section" style="margin:0px;">
                             <g:if
                             test="${observationInstance?.fetchSpeciesCall() == 'Unknown'}">
                             <div id="help-identify" class="control-label">
