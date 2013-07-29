@@ -2049,6 +2049,9 @@ div.noOfRatings {
 }
 
 .validReco {
-    background-color : yellow;
+    background-color : green;
     font-weight:bold;
+}
+.parsed {
+    background-color : yellow;
 }
