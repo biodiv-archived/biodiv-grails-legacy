@@ -132,12 +132,9 @@ function loadDataToGrid(data, columns) {
 }
 
 function loadTextToGrid(data, columns) {
-    grid.setColumns(columns);
-    grid.setData(data);
-    grid.invalidate();
-    grid.autosizeColumns();
-    $("#textAreaSection").hide();
     $("#gridSection").show();
+    initGrid(data, columns)
+    $("#textAreaSection").hide();
     $("#addNames").hide();
     $("#parseNames").show();
 }
@@ -167,9 +164,12 @@ function loadGrid(url, id){
 				}
 				columns.push({id:header, name: header, field: header, editor:editor, sortable:true, minWidth: 200});
 			});
-                        initGrid(data.data, columns);
+                        loadTextToGrid(data.data, columns);
                         grid.setColumns(finalCols);
                         grid.render();
+                        grid.autosizeColumns();
+                        selectColumn($('#sciNameColumn'), data.sciNameColumn);
+                        selectColumn($('#commonNameColumn'), data.commonNameColumn);
 			return true;
 		},
 		error: function(xhr, status, error) {
@@ -282,6 +282,9 @@ function pickerCallback(data) {
     }
 }
 
+/**
+ *
+ */
 function getSelectedGroupArr() {
     var grp = []; 
     $('#speciesGroupFilter button').each (function() {
@@ -301,6 +304,22 @@ function getSelectedHabitatArr() {
     });
     return hbt;	
 }
+
+/**
+ *
+ */
+function selectColumn(selector, selectedColumn){
+    var markColumnSelect = selector ? selector : this;
+    console.log(this);
+    var columns = grid.getColumns();
+    $(markColumnSelect).empty();
+    $.each(columns, function(index, column) {
+        $(markColumnSelect).append($("<option />").val(column.id).text(column.name));
+    });
+    $(markColumnSelect).find('option[value="' +  selectedColumn +'"]').attr("selected",true);
+    $(markColumnSelect).trigger('change');
+};
+
 
 /**
  * document ready
@@ -532,22 +551,6 @@ $(document).ready(function(){
         $('#wizardButtons').hide();
     });
 
-    /**
-    *
-    */
-    function selectColumn(){
-        var markColumnSelect = this;
-        var columns = grid.getColumns();
-        $(markColumnSelect).empty();
-        $.each(columns, function(index, column) {
-            $(markColumnSelect).append($("<option />").val(column.id).text(column.name));
-        });
-        var snVal =  $('select[name="sciNameColumn"]').val();
-        var cnVal =  $('select[name="commonNameColumn"]').val();
-        //$('select[name="sciNameColumn"]').find('option[value="' +  snVal '"]').attr("selected",true);
-        //$('select[name="commonNameColumn"]').find('option[value="' + cnVal '"]').attr("selected",true);
-    };
-
     $("#sciNameColumn").focus(selectColumn);
     $("#commonNameColumn").focus(selectColumn);
     
@@ -605,13 +608,16 @@ $(document).ready(function(){
                         rowId = parseInt(rowId, 10);
                         if(!changes[rowId])
                             changes[rowId] = {}
-                        changes[rowId][column.id] = 'validReco'
-console.log(gridData[rowId][column.id]);
+                        if(data[rowId].id) {
+                            changes[rowId][column.id] = 'validReco'
        
-                        var dataItem = grid.getDataItem(rowId);
-                        if(data[rowId].speciesId)
-                            dataItem.speciesId = data[rowId].speciesId;
-                        dataItem.speciesTitle = data[rowId].name;
+                            var dataItem = grid.getDataItem(rowId);
+                            if(data[rowId].speciesId)
+                                dataItem.speciesId = data[rowId].speciesId;
+                            dataItem.speciesTitle = data[rowId].name;
+                        } else if (data[rowId].parsed) {
+                            changes[rowId][column.id] = 'parsed'
+                        }
                     }
                     grid.invalidateRow(rowId);
                 }

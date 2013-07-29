@@ -212,7 +212,7 @@ class RecommendationService {
                     canonicalName = Utils.cleanName(value.sciName);
                 }
             }
-println canonicalName
+
             //first searching by canonical name. this name is present if user select from auto suggest
             if(canonicalName && (canonicalName.trim() != "")){
                 reco = searchReco(canonicalName, true, null, null);
@@ -236,12 +236,16 @@ println canonicalName
                     reco = commonNameReco;
                  }
             } 
-println reco 
+
+            def recoInfo = [:]
             if(reco) {
-                result.put(key, reco);
+                recoInfo['reco'] = reco;
             } else {
                 log.debug "Couldn't get reco for ${value}"
             }
+
+            recoInfo['parsed'] = (parsedNames && parsedNames[key])?true:false                
+            result.put(key, recoInfo)
         }
         return result;
     }

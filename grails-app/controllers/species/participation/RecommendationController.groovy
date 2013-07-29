@@ -132,26 +132,26 @@ class RecommendationController {
     def getRecos = {
         log.debug params;
         def names = JSON.parse(params.names);
-        println names;
-        def recos = recommendationService.getRecosForNames(names)
-        def result = new HashMap(recos.size())
-        recos.each { key, reco ->
-            def r = new HashMap(4);
-            r['id'] = reco.id
-            if(reco.taxonConcept) {
-                r['name'] = reco.taxonConcept.canonicalForm
-                def speciesId = reco.taxonConcept.findSpeciesId();
-                if(speciesId)
-                    r['speciesId'] = speciesId
-            } else {
-                r['name'] = reco.name
+        def recoInfos = recommendationService.getRecosForNames(names)
+        def result = new HashMap(recoInfos.size())
+        recoInfos.each { key, recoInfo ->
+            def r = new HashMap(5);
+            def reco = recoInfo.reco
+            if(reco) {
+                r['id'] = reco.id
+                if(reco.taxonConcept) {
+                    r['name'] = reco.taxonConcept.canonicalForm
+                    def speciesId = reco.taxonConcept.findSpeciesId();
+                    if(speciesId)
+                        r['speciesId'] = speciesId
+                } else {
+                    r['name'] = reco.name
+                }
             }
+            r['parsed'] = recoInfo.parsed
+
             result[key] = r
         }
         render result as JSON
-    }
-
-    def p = {
-        render "asd"
     }
 }

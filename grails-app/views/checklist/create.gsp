@@ -68,13 +68,10 @@
                             <input id="rawChecklist" name="rawChecklist" type="hidden" value='' />
                         </div>
                       
-                        <div id="gridSection" class="section checklist-slickgrid" style="">
+                        <div id="gridSection" class="section checklist-slickgrid" style="display:none;">
                             <span id="addNewColumn" class="btn-link">+ Add New Column</span>
                             <div id="myGrid" class="" style="width:100%;height:350px;"></div>
                             <div id="nameSuggestions" style="display: block;"></div>
-                            <input id="rawChecklist" name="rawChecklist" type="hidden" value='' />
-                            <input id="checklistData" name="checklistData" type="hidden" value='' />
-                            <input id="checklistColumns" name="checklistColumns" type="hidden" value='' />
                         
                             <div class="section" style="clear:both;">
                                 <div class="row control-group ${hasErrors(bean: observationInstance, field: 'sciNameColumn', 'error')}">
@@ -105,7 +102,7 @@
                         </div>
                     </div>
 
-                    <div id="restOfForm" class="pull-left" style="display:none;">
+                    <div id="restOfForm" class="pull-left" style="${params.action == 'create'}?'display:none;':''">
                         <div class="span12 super-section" style="clear:both">
                             <h3>What is this list about</h3>
 
@@ -202,7 +199,7 @@
             {id: "notes", name: "Notes", field: "notes", editor: Slick.Editors.LongText, width:200}
             ]
 
-            initGrid(data, columns);
+//            initGrid(data, columns);
         });
         </r:script>
 

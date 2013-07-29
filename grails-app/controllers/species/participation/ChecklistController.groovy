@@ -117,7 +117,7 @@ class ChecklistController {
 		if(request.method == 'POST') {
 			def result = saveAndRender(params)
             if(result.success){
-                redirect (url:uGroup.createLink(action:'edit', controller:"checklist", id:result.checklistInstance.id, 'userGroupWebaddress':params.webaddress, postToFB:(params.postToFB?:false)))
+                redirect (url:uGroup.createLink(action:'show', controller:"checklist", id:result.checklistInstance.id, 'userGroupWebaddress':params.webaddress, postToFB:(params.postToFB?:false)))
             }else{
                 //flash.message = "${message(code: 'error')}";
                 render(view: "create", model: [observationInstance: result.checklistInstance])
@@ -224,7 +224,7 @@ class ChecklistController {
 		List columns = [obv_id]
 		cl.fetchColumnNames().each { columns.add(it) }
 		
-		def res = [columns: columns, data :obvData]
+		def res = [columns: columns, data :obvData, sciNameColumn:cl.sciNameColumn, commonNameColumn:cl.commonNameColumn]
 		render res as JSON
 	}
 	
