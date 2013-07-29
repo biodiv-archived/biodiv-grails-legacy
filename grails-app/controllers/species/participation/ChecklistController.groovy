@@ -205,7 +205,7 @@ class ChecklistController {
 		log.debug params;
 		def observationInstance = Checklists.findByIdAndIsDeleted(params.id.toLong(), false)
 		if(observationInstance)	{
-			saveAndRender(params, false)
+			def result = saveAndRender(params, false)
             if(result.success){
                 redirect (url:uGroup.createLink(action:'show', controller:"checklist", id:result.checklistInstance.id, 'userGroupWebaddress':params.webaddress, postToFB:(params.postToFB?:false)))
             }else{

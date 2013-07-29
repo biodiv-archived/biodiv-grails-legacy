@@ -1,7 +1,7 @@
 <r:script>
 $(document).ready(function(){
-    var columns = ${params.checklistColumns}
-    var data = ${params.checklistData}
+    var columns = ${params.checklistColumns ?: 'undefined'} 
+    var data = ${params.checklistData ?: 'undefined'}
     if(data && columns) {
         data = eval(data);
         columns = eval(columns);
