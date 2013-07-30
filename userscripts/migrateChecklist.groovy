@@ -180,7 +180,7 @@ def addFeedToChecklist(){
 			if(ugs){
 				ugs.each { ug ->
 					def tDate = new Date(cl.fromDate.getTime() + 10)
-					checklistUtilService.addActivityFeed(cl, cl, cl.author, ActivityFeedService.OBSERVATION_POSTED_ON_GROUP, tDate)
+					checklistUtilService.addActivityFeed(cl, ug, cl.author, ActivityFeedService.CHECKLIST_POSTED_ON_GROUP, tDate)
 				}
 			}
 			cl.save(flush:true)
@@ -189,6 +189,7 @@ def addFeedToChecklist(){
 	m.autoTimestamp = true
 	
 }
+
 
 addFeedToChecklist()
 serializeChecklist()

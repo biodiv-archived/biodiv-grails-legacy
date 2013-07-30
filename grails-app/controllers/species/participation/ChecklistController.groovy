@@ -41,7 +41,7 @@ class ChecklistController {
 					return
 				}
 				//refetching checklist and  all observation in one query
-				checklistInstance = Checklists.findByIdAndIsDeleted(params.id.toLong(), false, [fetch: [observations: 'join']])
+				//checklistInstance = Checklists.findByIdAndIsDeleted(params.id.toLong(), false, [fetch: [observations: 'join']])
 				checklistInstance.incrementPageVisit()
 				def userGroupInstance;
 				if(params.webaddress) {
@@ -245,6 +245,14 @@ class ChecklistController {
 		def result = observationService.delete(params)
 		flash.message = result.message
 		redirect (url:result.url)
+	}
+	
+	
+	def observationData = {
+		log.debug params
+		def observations = checklistService.getObservationData(params.id, params)
+		def model =[observations:observations, checklistInstance:Checklists.read(params.id.toLong())]
+		render(template:"/common/checklist/showChecklistDataTemplate", model:model);
 	}
 	///////////////////////////////////////////////////////////////////////////////
 	////////////////////////////// SEARCH /////////////////////////////////////////

@@ -16,9 +16,9 @@
 				<th title="Comments">Comments</th>
 			</tr>
 		</thead>
-		<tbody>
-			<g:each in="${checklistInstance.observations}" var="observation">
-				<tr class="${observation?.maxVotedReco?.name?.replaceAll(' ', '_')}">
+		<tbody class="mainContentList" name="p${params?.offset}">
+			<g:each in="${observations}" var="observation">
+				<tr class="${'mainContent ' + observation?.maxVotedReco?.name?.replaceAll(' ', '_')}">
 					<g:each in="${observation.fetchChecklistAnnotation()}" var="annot">
 						<td>
 							<g:if test="${annot.key.equalsIgnoreCase(checklistInstance.sciNameColumn)}">
@@ -57,9 +57,8 @@
         </g:if>
 
         <div class="paginateButtons" style="visibility: hidden; clear: both">
-            <p:paginate total="${checklistInstance.speciesCount?:0}" action="${params.action}" controller="${params.controller?:'checklist'}"
+            <p:paginate total="${checklistInstance.speciesCount?:0}" action="${'observationData'}" controller="${params.controller?:'checklist'}"
             userGroup="${userGroupInstance}" userGroupWebaddress="${userGroupWebaddress?:params.webaddress}"
-            max="${params.max}"/>
+            max="${params.max}"  params="${[id:checklistInstance.id]}"/>
         </div>
-
 </div>
