@@ -99,6 +99,7 @@ class ObservationService {
 	 * @param observation
 	 */
 	void updateObservation(params, observation){
+        log.debug "Updating obv with params ${params}"
 		if(params.author)  {
 			observation.author = params.author;
 		}
@@ -563,6 +564,7 @@ class ObservationService {
 	 * 
 	 */
 	private def createResourcesXML(params) {
+        println params
 		NodeBuilder builder = NodeBuilder.newInstance();
 		XMLConverter converter = new XMLConverter();
 		def resources = builder.createNode("resources");

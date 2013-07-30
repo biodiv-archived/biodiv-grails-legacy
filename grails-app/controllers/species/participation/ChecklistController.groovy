@@ -138,11 +138,14 @@ class ChecklistController {
 		params.checklistColumns = JSON.parse(params.checklistColumns)
 		List columnList = params.checklistColumns.collect { it.name }
 		
-		if(columnList.contains("CanBe")){
-			columnList.remove("CanBe");
-			params.checklistData.each { m ->
-				m.remove("CanBe");
-			}
+		if(columnList.contains("addMedia")){
+			columnList.remove("addMedia");
+			/*params.checklistData.each { m ->
+				def media = m.remove("addMedia");
+                if(media) {
+                    
+                }
+			}*/
 		}
 		
 		if(params.action == 'edit' ||params.action == 'update'){

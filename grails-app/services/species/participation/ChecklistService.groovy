@@ -168,6 +168,14 @@ class ChecklistService {
 			// checklist save page will have all new rows that will create new observation
 			params.checklistData.each {  Map m ->
 				def oldObvId = m.remove(OBSERVATION_COLUMN)
+				def media = m.remove('media');
+
+                println "----------------------- ${media}"
+                Map p = new HashMap(obsParams);
+                if(media) {
+                    p.putAll(media);
+                }
+
 				// for old observation
 				if(oldObvId){
 					obsParams.action = "update"
@@ -177,7 +185,7 @@ class ChecklistService {
 					obsParams.action = "save"
 				}	
 				obsParams.checklistAnnotations = m as JSON
-				def res = observationService.saveObservation(obsParams, false)
+				def res = observationService.saveObservation(p, false)
 				Observation observationInstance = res.observationInstance
 				saveReco(observationInstance, m, checklistInstance)
 				//saveObservationAnnotation(observationInstance, m, Arrays.asList(checklistInstance.fetchColumnNames()))

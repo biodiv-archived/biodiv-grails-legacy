@@ -110,7 +110,7 @@ function sciNameFormatter(row, cell, value, columnDef, dataContext) {
 }
 
 function addMediaFormatter(row, cell, value, columnDef, dataContext) {
-        return "<button class='btn btn-mini addMedia'  title='Add Media' onClick='filePick("+dataContext.id+");return false;'>Add Media</button>"
+        return "<button class='btn btn-mini media'  title='Add Media' data-toggle='modal' data-target='#addResources'  onClick='openDetails("+row+","+cell+");return false;'>Add/Edit Media</button>"
 }
 
 function showGrid(){
@@ -172,14 +172,22 @@ function loadGrid(url, id){
 			var editor = Slick.Editors.Text
 			$.each(headers, function(index, header) {
 				if(index > 0){
-					finalCols.push({id:header, name: header, field: header, editor:editor, sortable:true, minWidth: 200});
+					finalCols.push({id:header, name: header, field: header, editor:editor, sortable:false, minWidth: 100});
 				}
-				columns.push({id:header, name: header, field: header, editor:editor, sortable:true, minWidth: 200});
+
+                                var column;
+                                if(header == 'Add/Edit Media') {
+                                    column = getMediaColumnOptions()
+                                } else {
+                                    column = {id:header, name: header, field: header, editor:editor, sortable:false, minWidth: 100};
+                                }
+                                
+				columns.push(column);
 			});
                         loadTextToGrid(data.data, columns, data.sciNameColumn, data.commonNameColumn);
-                        grid.setColumns(finalCols);
-                        grid.render();
-                        grid.autosizeColumns();
+                        //grid.setColumns(finalCols);
+                        //grid.render();
+                        //grid.autosizeColumns();
 			return true;
 		},
 		error: function(xhr, status, error) {
@@ -245,17 +253,15 @@ function filePick() {
     }
 
     filepicker.pickMultiple({
-        mimetypes: ['image/*'],
-                            maxSize: 104857600,
-    //debug:true,
-    services:['COMPUTER', 'FACEBOOK', 'FLICKR', 'PICASA', 'GOOGLE_DRIVE', 'DROPBOX'],
-    }, onSuccess 
-    ,
-    function(FPError){
-    console.log(FPError.toString());
-    }
-    );	
-    }
+            mimetypes: ['image/*'],
+            maxSize: 104857600,
+            services:['COMPUTER', 'FACEBOOK', 'FLICKR', 'PICASA', 'GOOGLE_DRIVE', 'DROPBOX'],
+        }, onSuccess, 
+        function(FPError){
+            console.log(FPError.toString());
+        }
+    );//end of pickMultiple	
+}
 
     /**
      * Google Picker API for the Google Docs import
@@ -433,7 +439,6 @@ $(document).ready(function(){
             $('.nameContainer input').removeAttr('disabled');
         }
     });
-
 
     /**
      */
@@ -796,3 +801,38 @@ $(document).ready(function(){
 
     this.init();
   }
+
+
+function openDetails(row, cell) {
+    var columns = grid.getColumns()
+    if (grid.getEditorLock().isActive() && !grid.getEditorLock().commitCurrentEdit()) {
+        return;
+    }
+
+    $('#addResourcesModal').data({'row':row, 'cell':cell}).modal('show');
+
+    return false;
+}
+
+$(document).ready(function() {
+/**
+     *
+     */
+    $('#addResourcesModalSubmit').click(function(){
+       var row = $('#addResourcesModal').data().row;    
+       var cell = $('#addResourcesModal').data().cell;
+       if(row === undefined || cell === undefined) {
+           alert('Either row or cell is missing');
+           $('#addResourcesModal').modal('toggle');
+           return false;
+       }
+        var data = grid.getData()[row]
+        data.media = {};
+        $.each($('#addResourcesModal').find('input'), function(index, input){
+            data.media[$(input).attr('name')] = $(input).val();
+        });
+        $('#addResourcesModal').modal('toggle');
+        $('#addResourcesModal #imagesList').remove();
+    });
+
+});

@@ -89,18 +89,23 @@ function parseCSVData(data, options) {
     if (error) {
         alert(error);
     }else{
-        columns.push({
-            id: "addMedia",
-            name: "Add Media",
-            width: 100,
-            selectable: false,
-            resizable: false,
-            formatter:addMediaFormatter
-          });
+        columns.push(getMediaColumnOptions());
 
 
 	    if(options.callBack){
 	        options.callBack(rowData, columns);
 	    }
     }
+}
+
+function getMediaColumnOptions() {
+    return {
+    id: "Media",
+    name: "Media",
+    field:'Media',
+    width: 100,
+    selectable: false,
+    resizable: false,
+    formatter:addMediaFormatter
+  }
 }

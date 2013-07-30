@@ -129,6 +129,7 @@ modules = {
 		resource url:'/js/jquery/jquery.exif.js'
 		resource url:'/js/species/observations/create.js'
 		resource url:'/css/create.css'
+		resource url:'/js/jquery/jquery.tmpl.min.js'
 	}
 
 	observations_list { 

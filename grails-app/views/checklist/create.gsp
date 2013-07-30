@@ -98,8 +98,8 @@
                         </div>
                     </div>
 
-                    <div id="restOfForm" class="pull-left" style="${(params.action == 'create')?'display:none;':''}">
-                        <div class="span12 super-section" style="clear:both">
+                <div id="restOfForm" class="pull-left" style="${(params.action == 'create')?'display:none;':''}">
+                    <div class="span12 super-section" style="clear:both">
                             <h3>What is this list about</h3>
 
                             <div class="section" style="clear:both;">
@@ -170,6 +170,7 @@
 
                 </form>
                 
+                <g:render template="/checklist/addPhoto"/>
                 <form id="upload_resource" 
                     title="Add a photo for this observation"
                     method="post"
@@ -203,7 +204,8 @@
             {id: "addMedia", name: "Add Media", field: "addMedia", width:100}
             ]
 
-//            initGrid(data, columns);
+//          initGrid(data, columns);
+            $('#addResourcesModal').modal({show:false});
         });
         </r:script>
 
