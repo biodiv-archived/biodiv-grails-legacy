@@ -40,7 +40,7 @@
 
             <div class="prop">
                 <g:if test="${showDetails}">
-                <span class="name"><i class="icon-share-alt"></i>Species Name</span>
+                <span class="name"><i class="icon-share-alt"></i>Name</span>
                 </g:if>
                 <g:else>
                 <i class="pull-left icon-share-alt"></i>
@@ -141,10 +141,38 @@
             </g:if>
 
             <g:if test="${showDetails}">
-                <div class="prop">
-                <obv:showTagsSummary
-                model="['observationInstance':observationInstance, 'isAjaxLoad':false]" />
+                <g:if test="${observationInstance.isChecklist && observationInstance.fetchAttributions()}">
+                <div class="prop" >
+                    <span class="name"><i class="icon-info-sign"></i>Attribution</span>
+                    <div class="value linktext">
+                        ${observationInstance.fetchAttributions()}
+                    </div>
                 </div>
+                </g:if>
+
+                <g:if test="${observationInstance.isChecklist && observationInstance.sourceText}" >
+                <div class="prop">
+                    <span class="name"><i class="icon-info-sign"></i>Source</span>
+                    <div class="value linktext">
+                        ${observationInstance.sourceText}
+                    </div>
+                </div>
+                </g:if>
+                <g:if test="${observationInstance.isChecklist && observationInstance.refText}" >
+                <div class="prop">
+                    <span class="name"><i class="icon-info-sign"></i>References</span>
+                    <div class="value linktext">
+                        ${checklistInstance.refText}
+                    </div>		
+                </div>
+                </g:if>
+
+                <div class="prop">
+                    <obv:showTagsSummary
+                    model="['observationInstance':observationInstance, 'isAjaxLoad':false]" />
+                </div>
+
+
             </g:if>
 
         </div>

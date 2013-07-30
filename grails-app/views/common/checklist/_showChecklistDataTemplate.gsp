@@ -47,4 +47,19 @@
 			</g:each>	
 		</tbody>
 	</table>
+        <g:if test="${checklistInstance.speciesCount > (params.max?:0)}">
+        <div class="centered">
+            <div class="btn loadMore">
+                <span class="progress" style="display: none;">Loading ... </span> <span
+                    class="buttonTitle">Load more</span>
+            </div>
+        </div>
+        </g:if>
+
+        <div class="paginateButtons" style="visibility: hidden; clear: both">
+            <p:paginate total="${checklistInstance.speciesCount?:0}" action="${params.action}" controller="${params.controller?:'checklist'}"
+            userGroup="${userGroupInstance}" userGroupWebaddress="${userGroupWebaddress?:params.webaddress}"
+            max="${params.max}"/>
+        </div>
+
 </div>
