@@ -11,7 +11,6 @@
 #latlng {
     margin: auto;
     width: 500px;
-    top: 40px;
     position: absolute;
     z-index: 1;
     left: 0;
