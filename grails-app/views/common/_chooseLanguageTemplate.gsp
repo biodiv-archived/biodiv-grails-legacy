@@ -14,12 +14,12 @@
 .combobox-container .add-on {
 	position: absolute;
 	right: -26px;
-	height: 20px;
+	height: 22px;
 }
 
-#addObservation .combobox-container .add-on {
+/*#addObservation .combobox-container .add-on {
 	height:36px;
-}
+}*/
 .caret {
 	vertical-align: middle;
 }

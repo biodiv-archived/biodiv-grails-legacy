@@ -245,6 +245,7 @@ class RecommendationService {
             }
 
             recoInfo['parsed'] = (parsedNames && parsedNames[key] && parsedNames[key].canonicalForm)?true:false                
+            log.debug "Returning recoInfo ${recoInfo}"
             result.put(key, recoInfo)
         }
         return result;
