@@ -267,7 +267,7 @@ CKEDITOR.replace('description', config);
 
 
 
-                                    <div class="span12" style="margin-top: 20px; margin-bottom: 40px;">
+                                    <div class="span12 submitButtons">
 
                                         <g:if test="${documentInstance?.id}">
                                         <a
@@ -285,7 +285,7 @@ CKEDITOR.replace('description', config);
                                         <a id="documentFormSubmit" class="btn btn-primary"
                                             style="float: right; margin-right: 5px;"> ${form_button_name}
                                         </a>
-                                        <div class="row control-group" style="clear: none;">
+                                        <div class="control-group" style="clear: none;">
                                             <label class="checkbox" style="text-align: left;"> <g:checkBox
                                                 style="margin-left:0px;" name="agreeTerms"
                                                 value="${documentInstance.agreeTerms}" /> <span

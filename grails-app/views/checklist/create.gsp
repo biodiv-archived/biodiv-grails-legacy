@@ -18,15 +18,6 @@
         <g:render template="/common/titleTemplate" model="['title':title]"/>
         <r:require modules="checklist_create"/>
         <uploader:head />
-        <%-- <style>--%>
-            <%--    .cell-title {--%>
-            <%--      font-weight: bold;--%>
-            <%--    }--%>
-            <%----%>
-            <%--    .cell-effort-driven {--%>
-            <%--      text-align: center;--%>
-            <%--    }--%>
-            <%--  </style>--%>
     </head>
     <body>
         <div class="observation_create">
@@ -53,16 +44,22 @@
                         <h3>What did you observe?</h3>
 
                         <div id="textAreaSection" class="section">
-                            <i class="icon-picture"></i><span>
+                            <div>
+                                <i class="icon-picture"></i>
                                 Put in a line for each species and any other information associated for it or 
-                            </span>
                             <g:if test="${ params.action != 'create'}">
                                 <g:render template="/checklist/showEditGrid" model="['observationInstance':observationInstance]"/>
                             </g:if>
                             <g:else>
+                                <div style="display:inline-block">
                                 <g:render template='/UFile/docUpload' model="['name': 'checklistStartFile', fileParams:fileParams, allowedExtensions:allowedExtensions,uploadCallBack:'showGrid()']" />
+                                </div>
                             </g:else>
-
+                                <ul class="help-block">
+                                    <li><small>Please put in a comma separated values</small></li>
+                                    <li><small>Please use '"' around if text itself as a ','</small></li>
+                                </ul>
+                            </div>
                             <div>
                                 <input id="checklistColumns" name="checklistColumns" class="input-block-level" value='' placeHolder="Headers : Scientific Name, Common Name, ...."/>
                             </div>
@@ -131,7 +128,7 @@
                         </div>
 
                         <g:render template="/observation/postToUserGroups" model="['observationInstance':observationInstance]"/>
-                        <div class="span12" style="margin-top: 20px; margin-bottom: 40px;">
+                        <div class="span12 submitButtons">
 
                             <g:if test="${observationInstance?.id}">
                             <a href="${uGroup.createLink(controller:params.controller, action:'show', id:observationInstance.id)}" class="btn"
@@ -155,7 +152,7 @@
                             <a id="addObservationSubmit" class="btn btn-primary"
                                 style="float: right; margin-right: 5px;"> ${form_button_val} </a>
 
-                            <div class="row control-group">
+                            <div class="control-group">
                                 <label class="checkbox" style="text-align: left;"> 
                                     <g:checkBox style="margin-left:0px;"
                                     name="agreeTerms" value="${observationInstance?.agreeTerms}"/>
@@ -167,7 +164,7 @@
 
                     <div id="wizardButtons" class="span12" style="margin-top: 20px; margin-bottom: 40px;${params.action=='create'?:'display:none;'}">
                         <a id="addNames" class="btn btn-primary"
-                            style="float: right; margin-right: 5px;">Add names</a>
+                            style="float: right; margin-right: 5px;">Add Names</a>
                         <a id="createChecklist" class="btn btn-primary"
                             style="float: right; margin-right: 5px;display:none;"> Create Checklist </a>
                    </div>
