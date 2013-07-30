@@ -69,7 +69,7 @@
                 </div>
 
                 <g:render template="postToUserGroups" model="['observationInstance':obervationInstance]"/>
-                <div class="span12" style="margin-top: 20px; margin-bottom: 40px;">
+                <div class="span12 submitButtons">
 
                     <g:if test="${observationInstance?.id}">
                     <a href="${uGroup.createLink(controller:params.controller, action:'show', id:observationInstance.id)}" class="btn"
@@ -92,7 +92,7 @@
                     <a id="addObservationSubmit" class="btn btn-primary"
                         style="float: right; margin-right: 5px;"> ${form_button_val} </a>
 
-                    <div class="row control-group">
+                    <div class="control-group">
                         <label class="checkbox" style="text-align: left;"> 
                             <g:checkBox style="margin-left:0px;"
                             name="agreeTerms" value="${observationInstance?.agreeTerms}"/>

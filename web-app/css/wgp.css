@@ -2055,3 +2055,9 @@ div.noOfRatings {
 .parsed {
     background-color : yellow;
 }
+
+.span12 .submitButtons {
+    margin-top: 20px; 
+    margin-bottom: 40px;
+    margin-left:0px;
+}
