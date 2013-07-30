@@ -71,6 +71,7 @@ class ObservationService {
 	def activityFeedService;
 	def mailService;
 	def sessionFactory;
+	def SUserService;
 	
 	static final String OBSERVATION_ADDED = "observationAdded";
 	static final String SPECIES_RECOMMENDED = "speciesRecommended";
@@ -79,6 +80,7 @@ class ObservationService {
 	static final String SPECIES_REMOVE_COMMENT = "speciesRemoveComment";
 	static final String OBSERVATION_FLAGGED = "observationFlagged";
 	static final String OBSERVATION_DELETED = "observationDeleted";
+	static final String CHECKLIST_DELETED= "checklistDeleted";
 	static final String DOWNLOAD_REQUEST = "downloadRequest";
 	/**
 	 * 
@@ -1370,6 +1372,33 @@ class ObservationService {
 		return result;
 	} 
 
+	def delete(params){
+		def messageCode, url, label = Utils.getTitleCase(params.controller)
+		def messageArgs = [label, params.id]
+		def observationInstance = Observation.get(params.id.toLong())
+		if (observationInstance && SUserService.ifOwns(observationInstance.author)) {
+			def mailType = observationInstance.instanceOf(Observation) ? OBSERVATION_DELETED : CHECKLIST_DELETED
+			try {
+				observationInstance.isDeleted = true;
+				observationInstance.save(flush: true)
+				sendNotificationMail(mailType, observationInstance, null, params.webaddress);
+				observationsSearchService.delete(observationInstance.id);
+				messageCode = 'default.deleted.message'
+				url = generateLink(params.controller, 'list', [])
+			}
+			catch (org.springframework.dao.DataIntegrityViolationException e) {
+				messageCode = 'default.not.deleted.message'
+				url = generateLink(params.controller, 'show', [id: params.id])
+			}
+		}
+		else {
+			messageCode = 'default.not.found.message'
+			url = generateLink(params.controller, 'list', [])
+		}
+		
+		return [url:url, messageCode:messageCode, messageArgs: messageArgs]
+	}
+	
 	//////////////////////////////////////////////////////////////////////////////////////////////
 	
 	public sendNotificationMail(String notificationType, def obv, request, String userGroupWebaddress, ActivityFeed feedInstance=null){
@@ -1431,6 +1460,15 @@ class ObservationService {
 				//replyTo = templateMap["currentUser"].email
 				toUsers.add(getOwner(obv))
 				break
+				
+			case CHECKLIST_DELETED :
+				mailSubject = conf.ui.checklistDeleted.emailSubject
+				bodyContent = conf.ui.checklistDeleted.emailBody
+				templateMap["currentUser"] = springSecurityService.currentUser
+				//replyTo = templateMap["currentUser"].email
+				toUsers.add(getOwner(obv))
+				break
+
 
 			case SPECIES_RECOMMENDED :
 				bodyView = "/emailtemplates/addRecommendation"

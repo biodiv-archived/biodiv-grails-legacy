@@ -763,31 +763,9 @@ class ObservationController {
 
 	@Secured(['ROLE_USER'])
 	def flagDeleted = {
-		log.debug params;
-		//params.author = springSecurityService.currentUser;
-		def observationInstance = Observation.get(params.id.toLong())
-		if (observationInstance && SUserService.ifOwns(observationInstance.author)) {
-			try {
-				observationInstance.isDeleted = true;
-				observationInstance.save(flush: true)
-				observationService.sendNotificationMail(observationService.OBSERVATION_DELETED, observationInstance, request, params.webaddress);
-				activityFeedService.deleteFeed(observationInstance);
-				observationsSearchService.delete(observationInstance.id);
-				flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
-				redirect (url:uGroup.createLink(action:'list', controller:"observation", 'userGroupWebaddress':params.webaddress))
-				//redirect(action: "list")
-			}
-			catch (org.springframework.dao.DataIntegrityViolationException e) {
-				flash.message = "${message(code: 'default.not.deleted.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
-				redirect (url:uGroup.createLink(action:'show', controller:"observation",  id: params.id, 'userGroupWebaddress':params.webaddress))
-				//redirect(action: "show", id: params.id)
-			}
-		}
-		else {
-			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
-			redirect (url:uGroup.createLink(action:'list', controller:"observation", 'userGroupWebaddress':params.webaddress))
-			//redirect(action: "list")
-		}
+		def result = observationService.delete(params)
+		flash.message = result.message
+		redirect (url:result.url)
 	}
 
 	@Secured(['ROLE_USER'])

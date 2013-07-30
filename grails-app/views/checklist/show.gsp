@@ -22,8 +22,8 @@
                                                     <i class="icon-edit"></i>Edit</a>
 
                                                 <a class="btn btn-danger btn-primary pull-right" style="margin-right: 5px;"
-                                                    href="${uGroup.createLink(controller:'checklist', action:'delete', id:checklistInstance.id)}"
-                                                    onclick="return confirm('${message(code: 'default.observatoin.delete.confirm.message', default: 'This checklist will be deleted. Are you sure ?')}');"><i class="icon-trash"></i>Delete</a>
+                                                    href="${uGroup.createLink(controller:'checklist', action:'flagDeleted', id:checklistInstance.id)}"
+                                                    onclick="return confirm('${message(code: 'default.checklist.delete.confirm.message', default: 'This checklist will be deleted. Are you sure ?')}');"><i class="icon-trash"></i>Delete</a>
 
                                                 </sUser:ifOwns>
 

@@ -513,7 +513,7 @@ class XMLConverter extends SourceConverter {
      * @param createNew
      * @return
      */
-    public Contributor getContributorByName(String contributorName, boolean createNew) {
+    public static Contributor getContributorByName(String contributorName, boolean createNew) {
         if(!contributorName) return;
 
         def contributor = Contributor.findByName(contributorName);

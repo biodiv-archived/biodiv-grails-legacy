@@ -23,6 +23,7 @@ import species.Metadata;
 import species.Contributor;
 import species.participation.RecommendationVote.ConfidenceType;
 import species.utils.Utils;
+import species.sourcehandler.XMLConverter;
 import species.formatReader.SpreadsheetReader;
 
 //pdf related
@@ -92,13 +93,7 @@ class ChecklistService {
 		checklist.columnNames =  params.columnNames ?:checklist.columnNames
 		checklist.columns =  params.columns?params.columns as JSON:checklist.columns
 		
-		if(params.attributions){
-			checklist.attributions?.clear();
-			def contributor = new Contributor(name:params.attributions)
-			contributor.save()
-			checklist.addToAttributions(contributor)
-		}
-		
+
 		checklist.isChecklist = true
 	}
 	
@@ -128,6 +123,7 @@ class ChecklistService {
 				log.debug "Successfully created checklistInstance : "+checklistInstance
 				activityFeedService.addActivityFeed(checklistInstance, null, feedAuthor, feedType);
 				
+				saveAttributions(params, checklistInstance)
 				observationService.saveObservationAssociation(params, checklistInstance)
 				
 				if(sendMail)
@@ -147,8 +143,14 @@ class ChecklistService {
 		}
 	}
 	
-	
-	
+	@Transactional
+	private saveAttributions(params, checklist){
+		if(params.attributions){
+			checklist.attributions?.clear()
+			def contributor =  XMLConverter.getContributorByName(params.attributions.trim(), true)
+			checklist.addToAttributions(contributor)
+		}
+	}
 	
 	@Transactional
 	private saveObservationFromChecklist(params, checklistInstance, boolean isGlobalUpdate){

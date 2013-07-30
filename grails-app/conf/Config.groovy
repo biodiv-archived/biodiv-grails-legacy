@@ -1047,6 +1047,17 @@ If you do not want to receive notifications please go to your <a href="$userProf
 <br/>
 -The portal team'''
 
+grails.plugins.springsecurity.ui.checklistDeleted.emailSubject = 'Checklist deleted'
+grails.plugins.springsecurity.ui.checklistDeleted.emailBody = '''
+Hi $username,<br/>
+<br/>
+Your <a href="$obvUrl">checklist</a> has been deleted on <b>$domain</b>.<br/>
+<br/>
+If you do not want to receive notifications please go to your <a href="$userProfileUrl">user profile</a> and switch it off.<br/>
+<br/>
+-The portal team'''
+
+
 grails.plugins.springsecurity.ui.userGroup.inviteMember.emailSubject = 'Request to join the group'
 grails.plugins.springsecurity.ui.userGroup.inviteMember.emailBody = '''
 Hi $username,<br/>
