@@ -1,18 +1,36 @@
-<div class="pull-right btn-group">
-    <span class="name" style="color: #b1b1b1;font-size:14px;vertical-align:middle;">Add: </span>
-    <g:if test="${!(params.controller=='observation' && params.action=='create')}">
-    <a class="btn btn-link"
-        href="${uGroup.createLink(
-        controller:'observation', action:'create', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"
-        > <i class="icon-plus"></i>Single Observation</a>
-    </g:if>
-    <g:if test="${!(params.controller=='checklist' && params.action=='create')}">
-    <a class="btn btn-link"
-        href="${uGroup.createLink(
-        controller:'checklist', action:'create', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"
-        > <i class="icon-plus"></i>Checklist</a>
-    </g:if>
 
+<g:if test="${entityName}">
+<div class="page-header clearfix">
+    <div style="width: 100%;">
+        <div class="main_heading navbar" style="margin: 0px;">
+            <h1>
+                <g:if test="${(params.action=='create' || params.action == 'save')}">
+                <ul class="nav">
+                    <li class="${params.controller == 'observation'?'active':''}"><a
+                        href="${uGroup.createLink(
+                        controller:'observation', action:'create', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"
+                        > Add Observation</a>
+                    </li>
+                    <li class="divider-vertical"></li>
+                    <li class="${params.controller == 'checklist'?'active':''}"><a
+                        href="${uGroup.createLink(
+                        controller:'checklist', action:'create', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"
+                        > Add List</a></li>
+                </ul>
+                </g:if>
+                <g:else>
+                    ${entityName}
+                </g:else>
+            </h1>
+        </div>
+    </div>
+    </g:if>
+    <g:hasErrors bean="${observationInstance}">
+    <i class="icon-warning-sign"></i>
+    <span class="label label-important"> <g:message
+        code="fix.errors.before.proceeding" default="Fix errors" /> </span>
+    <%--<g:renderErrors bean="${observationInstance}" as="list" />--%>
+    </g:hasErrors>
 </div>
 
 

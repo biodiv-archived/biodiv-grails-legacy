@@ -4,7 +4,7 @@
 	right:0;
 }
 </style>
-<div style="overflow:auto;">
+<div class="resizable" style="overflow:auto;height:400px;">
 	<table class="table table-hover tablesorter checklist-data" style="margin-left: 0px;">
 		
 		<thead>

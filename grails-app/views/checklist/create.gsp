@@ -22,9 +22,8 @@
     <body>
         <div class="observation_create">
             <div class="span12">
-                <obv:showSubmenuTemplate model="['entityName':(params.action == 'edit' || params.action == 'update')?'Edit Checklist':'Add Checklist']"/>
+                <g:render template="/observation/addObservationMenu" model="['entityName':(params.action == 'edit' || params.action == 'update')?'Edit List':'Add List']"/>
 
-                <g:render template="/observation/addObservationMenu"/>
                 <%
                 def allowedExtensions = "['csv']"
 				def fileParams = [uploadDir:'checklist']
@@ -46,7 +45,7 @@
                         <div id="textAreaSection" class="section">
                             <div>
                                 <i class="icon-picture"></i>
-                                Put in a line for each species and any other information associated for it or 
+                                Put a line for each species or 
                             <g:if test="${ params.action != 'create'}">
                                 <g:render template="/checklist/showEditGrid" model="['observationInstance':observationInstance]"/>
                             </g:if>
@@ -56,8 +55,8 @@
                                 </div>
                             </g:else>
                                 <ul class="help-block">
-                                    <li><small>Please put in a comma separated values</small></li>
-                                    <li><small>Please use '"' around if text itself as a ','</small></li>
+                                    <li><small>Please add comma separated values</small></li>
+                                    <li><small>Please use " around if text itself has a ','</small></li>
                                 </ul>
                             </div>
                             <div>
@@ -170,6 +169,17 @@
                    </div>
 
                 </form>
+                
+                <form id="upload_resource" 
+                    title="Add a photo for this observation"
+                    method="post"
+                    class="${hasErrors(bean: observationInstance, field: 'resource', 'errors')}">
+
+                    <span class="msg" style="float: right"></span>
+                    <input id="videoUrl" type="hidden" name='videoUrl'value="" />
+                    <input type="hidden" name='obvDir' value="${obvDir}" />
+                </form>
+
 
             </div>
         </div>
@@ -185,11 +195,12 @@
            out << "jQuery('#habitat_${observationInstance.habitat.id}').addClass('active');";
            }
 	    %>
+            filepicker.setKey("${grailsApplication.config.speciesPortal.observations.filePicker.key}");
             var data = []
             var columns = [{id: "sciName", name: "Scientific Name", field: "sciName", editor: AutoCompleteEditor, width:250, formatter:sciNameFormatter},
             {id: "commonName", name: "Common Name", field: "commonName", editor: AutoCompleteEditor, width:250},
-            {id: "addMedia", name: "Add Media", field: "addMedia", width:100},
-            {id: "notes", name: "Notes", field: "notes", editor: Slick.Editors.LongText, width:200}
+            {id: "notes", name: "Notes", field: "notes", editor: Slick.Editors.LongText, width:200},
+            {id: "addMedia", name: "Add Media", field: "addMedia", width:100}
             ]
 
 //            initGrid(data, columns);

@@ -16,8 +16,7 @@
     <div class="observation_create">
         <div class="span12">
 
-            <obv:showSubmenuTemplate model="['entityName':(params.action == 'edit' || params.action == 'update')?'Edit Observation':'Add Observation']"/>
-            <g:render template="/observation/addObservationMenu"/>
+            <g:render template="/observation/addObservationMenu" model="['entityName':(params.action == 'edit' || params.action == 'update')?'Edit Observation':'Add Observation']"/>
 
             <%
             def form_id = "addObservation"
@@ -41,6 +40,10 @@
                         <h3>What did you observe?</h3>
 
                         <g:render template="addPhoto" model="['observationInstance':observationInstance]"/>
+                         <div class="section" style="margin:0px";>
+                            <g:render template="selectGroupHabitatDate" model="['observationInstance':observationInstance]"/>
+                        </div>
+
 
                         <div class="section" style="margin:0px;">
                             <g:if
@@ -53,10 +56,7 @@
                             <reco:create />
                         </div>
                         <div class="section" style="margin:0px";>
-                            <g:render template="selectGroupHabitatDate" model="['observationInstance':observationInstance]"/>
-                        </div>
-
-                        <div class="section" style="margin:0px";>
+                            <g:render template="dateInput" model="['observationInstance':observationInstance]"/>
                             <%
                             def obvInfoFeeder = lastCreatedObv ? lastCreatedObv : observationInstance
                             %>

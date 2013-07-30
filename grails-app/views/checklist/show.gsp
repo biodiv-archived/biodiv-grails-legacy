@@ -40,16 +40,16 @@
                 <div class="span12" style="margin-left:0px; padding:4px; background-color:whitesmoke">
                     <g:render template="/common/observation/showObservationStoryActionsTemplate"
                     model="['instance':checklistInstance, 'href':canonicalUrl, 'title':title, 'description':description, 'hideFlag':true, 'hideDownload':false, 'hideFollow':true]" />
+
                 </div>
 
 
                 <div class="span8 observation" style="margin:0">
                     <div class="observation_story">
-                        <obv:showStory
-                        model="['observationInstance':checklistInstance, 'showDetails':true, 'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress]" />
-
                         <clist:showData model="['checklistInstance':checklistInstance]"/>
 
+                        <obv:showStory
+                        model="['observationInstance':checklistInstance, 'showDetails':true, 'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress]" />
                     </div>
 
 

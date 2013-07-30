@@ -21,7 +21,6 @@ function getDataFromGrid(){
 }
 
 function initGrid(data, columns, sciNameColumn, commonNameColumn) {
-    console.log('initGrid');
     var options = {
         editable: true,
         enableAddRow: true,
@@ -108,6 +107,10 @@ function sciNameFormatter(row, cell, value, columnDef, dataContext) {
         return "<span title='"+dataContext.speciesTitle+"'><i>"+value+"</i></span>"
     else
         return '<i>'+value+'</i>';
+}
+
+function addMediaFormatter(row, cell, value, columnDef, dataContext) {
+        return "<button class='btn btn-mini addMedia'  title='Add Media' onClick='filePick("+dataContext.id+");return false;'>Add Media</button>"
 }
 
 function showGrid(){

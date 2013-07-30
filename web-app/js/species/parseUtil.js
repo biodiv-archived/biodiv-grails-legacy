@@ -89,6 +89,16 @@ function parseCSVData(data, options) {
     if (error) {
         alert(error);
     }else{
+        columns.push({
+            id: "addMedia",
+            name: "Add Media",
+            width: 100,
+            selectable: false,
+            resizable: false,
+            formatter:addMediaFormatter
+          });
+
+
 	    if(options.callBack){
 	        options.callBack(rowData, columns);
 	    }
