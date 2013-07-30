@@ -3,7 +3,7 @@
 
 
 <div class="section" style="position: relative; overflow: visible;">
-    <h3>Describe your observation!</h3>
+    <h3>Additional Information </h3>
     <div class="span6 block">
         <!--label for="notes"><g:message code="observation.notes.label" default="Notes" /></label-->
         <h5><label><i

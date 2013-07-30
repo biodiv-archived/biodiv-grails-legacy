@@ -42,9 +42,6 @@
 
                         <g:render template="addPhoto" model="['observationInstance':observationInstance]"/>
 
-                        <div class="section" style="margin:0px";>
-                            <g:render template="selectGroupHabitatDate" model="['observationInstance':observationInstance]"/>
-                        </div>
                         <div class="section" style="margin:0px;">
                             <g:if
                             test="${observationInstance?.fetchSpeciesCall() == 'Unknown'}">
@@ -55,16 +52,17 @@
                             </g:if>
                             <reco:create />
                         </div>
+                        <div class="section" style="margin:0px";>
+                            <g:render template="selectGroupHabitatDate" model="['observationInstance':observationInstance]"/>
+                        </div>
 
+                        <div class="section" style="margin:0px";>
+                            <%
+                            def obvInfoFeeder = lastCreatedObv ? lastCreatedObv : observationInstance
+                            %>
+                            <obv:showMapInput model="[observationInstance:observationInstance, userObservationInstanceList: totalObservationInstanceList, obvInfoFeeder:obvInfoFeeder, locationHeading:'Where did you find this observation?']"></obv:showMapInput>
+                        </div>
                     </div>
-                </div>
-
-
-                <div class="span12 super-section" style="clear: both;">
-                    <%
-                    def obvInfoFeeder = lastCreatedObv ? lastCreatedObv : observationInstance
-                    %>
-                    <obv:showMapInput model="[observationInstance:observationInstance, userObservationInstanceList: totalObservationInstanceList, obvInfoFeeder:obvInfoFeeder, locationHeading:'Where did you find this observation?']"></obv:showMapInput>
                 </div>
                 <div class="span12 super-section"  style="clear: both">
                     <g:render template="addNotes" model="['observationInstance':observationInstance]"/>

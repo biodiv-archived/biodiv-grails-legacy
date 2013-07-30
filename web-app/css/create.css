@@ -23,13 +23,13 @@
 
 .textbox input{
 	text-align: left;
-	/*width: 290px;*/
-	height:34px;
+	/*width: 290px;
+	height:34px;*/
 	padding:5px;
 }
 
-.form-horizontal .control-label {
-	padding-top: 15px;
+.form-horizontal .row {
+	margin-top: 15px;
 }
 
 .block {

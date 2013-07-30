@@ -109,14 +109,12 @@
                             <div class="section" style="clear:both;">
                                 <g:render template="/observation/selectGroupHabitatDate" model="['observationInstance':observationInstance]"/>
                             </div>
-
-                        </div>
-
-                        <div class="span12 super-section" style="clear: both;">
+                            <div class="section" style="clear:both;">
                             <%
                             def obvInfoFeeder = lastCreatedObv ? lastCreatedObv : observationInstance
                             %>
                             <obv:showMapInput model="[observationInstance:observationInstance, userObservationInstanceList: totalObservationInstanceList, obvInfoFeeder:obvInfoFeeder, locationHeading:'Where did you find these observations?']"></obv:showMapInput>
+                            </div>
                         </div>
 
                         <div class="span12 super-section"  style="clear: both">

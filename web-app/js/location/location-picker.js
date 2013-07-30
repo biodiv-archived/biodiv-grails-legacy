@@ -579,7 +579,7 @@ $(document).ready(function() {
     focus: function(event, ui) {
         //set_location(ui.item.latitude, ui.item.longitude);
     },open: function(event, ui) {
-        $("#suggestions ul").removeAttr('style').css({'display': 'block','width':'500px'}); 
+        $("#suggestions ul").removeAttr('style').css({'display': 'block','width':'100%','z-index':'1001'}); 
     }
 
 
@@ -634,7 +634,9 @@ $(document).ready(function() {
     
     $('#geotagged_images').on('update_map', function() {
         if($(this).children(".location_picker_button").length >0){
-            $(this).children(":last").trigger("click");
+            var $geotagged_images = $(this)
+            if(isMapViewLoaded)
+                $geotagged_images.children(":last").trigger("click");
         }else{
             $("#geotagged_images>.title").hide();
             $("#geotagged_images>.msg").hide();
