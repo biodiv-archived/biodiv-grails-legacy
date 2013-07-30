@@ -2,146 +2,107 @@
 <%@ page import="species.participation.DownloadLog.DownloadType"%>
 
 <html>
-<head>
-<g:set var="canonicalUrl" value="${uGroup.createLink([controller:'checklist', action:'show', id:checklistInstance.id, base:Utils.getIBPServerDomain()])}"/>
-<g:set var="title" value="${checklistInstance.title}"/>
-<g:set var="description" value="${Utils.stripHTML(checklistInstance.notes?:'')}" />
-<g:render template="/common/titleTemplate" model="['title':title, 'description':description, 'canonicalUrl':canonicalUrl, 'imagePath':null]"/>
-<r:require modules="checklist"/>
-</head>
-<body>
-	
-			<div class="span12">
-                            <div class="page-header clearfix">
-                                <div style="width:100%;">
-                                    <div class="main_heading" style="margin-left:0px;">
-                                     <div class="pull-right">
-                                                <sUser:ifOwns model="['user':checklistInstance.author]">
-                                                <a class="btn btn-primary pull-right" style="margin-right: 5px;"
-                                                   href="${uGroup.createLink(controller:'checklist', action:'edit', id:checklistInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
-                                                    <i class="icon-edit"></i>Edit</a>
+    <head>
+        <g:set var="canonicalUrl" value="${uGroup.createLink([controller:'checklist', action:'show', id:checklistInstance.id, base:Utils.getIBPServerDomain()])}"/>
+        <g:set var="title" value="${checklistInstance.title}"/>
+        <g:set var="description" value="${Utils.stripHTML(checklistInstance.notes?:'')}" />
+        <g:render template="/common/titleTemplate" model="['title':title, 'description':description, 'canonicalUrl':canonicalUrl, 'imagePath':null]"/>
+        <r:require modules="checklist"/>
+    </head>
+    <body>
 
-                                                <a class="btn btn-danger btn-primary pull-right" style="margin-right: 5px;"
-                                                    href="${uGroup.createLink(controller:'checklist', action:'flagDeleted', id:checklistInstance.id)}"
-                                                    onclick="return confirm('${message(code: 'default.checklist.delete.confirm.message', default: 'This checklist will be deleted. Are you sure ?')}');"><i class="icon-trash"></i>Delete</a>
+        <div class="span12">
 
-                                                </sUser:ifOwns>
+	    <clist:showSubmenuTemplate />
+            <div class="page-header clearfix">
+                <div style="width:100%;">
+                    <div class="main_heading" style="margin-left:0px;">
+                        <div class="pull-right">
+                            <sUser:ifOwns model="['user':checklistInstance.author]">
+                            <a class="btn btn-primary pull-right" style="margin-right: 5px;"
+                                href="${uGroup.createLink(controller:'checklist', action:'edit', id:checklistInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
+                                <i class="icon-edit"></i>Edit</a>
 
-                                        </div>
-                                        <s:showHeadingAndSubHeading
-						model="['heading':checklistInstance.title, 'subHeading':checklistInstance.fetchAttributions(), 'headingClass':headingClass, 'subHeadingClass':subHeadingClass]" />
+                            <a class="btn btn-danger btn-primary pull-right" style="margin-right: 5px;"
+                                href="${uGroup.createLink(controller:'checklist', action:'flagDeleted', id:checklistInstance.id)}"
+                                onclick="return confirm('${message(code: 'default.checklist.delete.confirm.message', default: 'This checklist will be deleted. Are you sure ?')}');"><i class="icon-trash"></i>Delete</a>
 
-                                    </div>
-                                </div>
+                            </sUser:ifOwns>
 
-                        </div>	
-                        <div class="span12" style="margin-left:0px; padding:4px; background-color:whitesmoke">
-                                   <g:render template="/common/observation/showObservationStoryActionsTemplate"
-                                   model="['instance':checklistInstance, 'href':canonicalUrl, 'title':title, 'description':description, 'hideFlag':true, 'hideDownload':false, 'hideFollow':true]" />
                         </div>
+                        <s:showHeadingAndSubHeading
+                            model="['heading':checklistInstance.title, 'subHeading':checklistInstance.fetchAttributions(), 'headingClass':headingClass, 'subHeadingClass':subHeadingClass]" />
+
+                        </div>
+                    </div>
+                    <div style="clear:both;"></div>
+                </div>	
+                <div class="span12" style="margin-left:0px; padding:4px; background-color:whitesmoke">
+                    <g:render template="/common/observation/showObservationStoryActionsTemplate"
+                    model="['instance':checklistInstance, 'href':canonicalUrl, 'title':title, 'description':description, 'hideFlag':true, 'hideDownload':false, 'hideFollow':true]" />
+                </div>
 
 
-			<div style="clear:both;">	
-				<table class="table table-hover" style="margin-left: 0px;">
-					<thead>
-						<tr>
-							<th>Species Group</th>
-							<th>No. of Species</th>
-							<th>Place Name</th>
-							<th>State(s)</th>
-							<th>District(s)</th>
-							<th>Taluk(s)</th>
-						</tr>
-					</thead>
-					<tbody>
-							<tr>
-								<td><button class="btn species_groups_sprites ${checklistInstance.group.iconClass()} active"
-									id="${"group_" + checklistInstance.group.id}" value="${checklistInstance.group.id}"
-									title="${checklistInstance.group.name}"></button></td>
-								<td>${checklistInstance.speciesCount}</td>
-								<td>${checklistInstance.placeName}</td>
-								<td>${checklistInstance.states.join(",")}</td>
-								<td>${checklistInstance.districts.join(",")}</td>
-								<td>${checklistInstance.talukas.join(",")}</td>
-							</tr>
-					</tbody>
-				</table>
-			</div>
-			
-			<div>
-				<div class="sidebar_section" >
-					<a class="speciesFieldHeader" data-toggle="collapse" href="#license_information"><h5>License information</h5></a>
-					<div id="license_information" class="speciesField collapse in">
-							<table>
-								<tr>
-									<td class="prop"><span class="grid_3 name">Attribution</span></td> 
-									<td class="linktext">${checklistInstance.fetchAttributions()}</td>
-								</tr>
-								<tr>
-									<td class="prop"><span class="grid_3 name">License</span></td> 
-									<td><img src="${resource(dir:'images/license',file:checklistInstance?.license?.name?.getIconFilename()+'.png', absolute:true)}"
-										title="${checklistInstance.license.name}"/></td>
-								</tr>
-							</table>
-					</div>
-				</div>	
-				
-				<g:if test="${checklistInstance.sourceText}" >
-					<div class="sidebar_section">
-						<a class="speciesFieldHeader" data-toggle="collapse" href="#source"><h5>Source</h5></a>
-						<div id="source" class="speciesField collapse in">
-							<dl class="dl linktext">
-								<dd>${checklistInstance.sourceText}</dd>
-							</dl>
-						</div>
-					</div>		
-				</g:if>
-				
-				<div class="sidebar_section">
-						<a class="speciesFieldHeader" data-toggle="collapse" href="#checklist_details"><h5>Checklist details</h5></a>
-						<div id="checklist_details" class="speciesField collapse in">
-							<dl class="dl linktext">
-								<dd>${checklistInstance.notes}</dd>
-    						</dl>
-    					</div>
-    			</div>
-				
-				<div class="sidebar_section">
-						<a class="speciesFieldHeader" data-toggle="collapse" href="#checklistdata"><h5>Checklist</h5></a>
-					<div id="checklistdata" class="speciesField collapse in">
-					<clist:showData
-						model="['checklistInstance':checklistInstance]">
-					</clist:showData>
-				</div>
-			</div>
-			
-			<g:if test="${checklistInstance.refText}" >
-				<div class="sidebar_section">
-						<a class="speciesFieldHeader" data-toggle="collapse" href="#references"><h5>References</h5></a>
-					<div id="references" class="speciesField collapse in">
-						<dl class="dl linktext">
-							<dd>${checklistInstance.refText}</dd>
-						</dl>
-						</div>
-					</div>		
-			</g:if>
-				
-				
-			<div class="union-comment">
-				<feed:showAllActivityFeeds model="['rootHolder':checklistInstance, feedType:'Specific', refreshType:'manual', 'feedPermission':'editable']" />
-				<comment:showAllComments model="['commentHolder':checklistInstance, commentType:'super','showCommentList':false]" />
-			</div>
-			
-			</div>
-	</div>	
-	<r:script>
-	$(document).ready(function(){
-		var species = $.url(decodeURIComponent(window.location.search)).param()["species"]
-		if(species){
-			species = $.trim(species).replace(/ /g, '_') 
-			$(".checklist-data ." + species).css("background-color","#66FF66");
-		}
-	});
-	</r:script>
-</body>
-</html>
+                <div class="span8 observation" style="margin:0">
+                    <div class="observation_story">
+                        <obv:showStory
+                        model="['observationInstance':checklistInstance, 'showDetails':true, 'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress]" />
+
+                        <clist:showData model="['checklistInstance':checklistInstance]"/>
+
+                    </div>
+
+
+                    <div class="union-comment">
+                        <feed:showAllActivityFeeds model="['rootHolder':checklistInstance, feedType:'Specific', refreshType:'manual', 'feedPermission':'editable']" />
+                        <comment:showAllComments model="['commentHolder':checklistInstance, commentType:'super','showCommentList':false]" />
+                    </div>
+
+                </div>
+
+                <div class="span4">
+
+                    <div class="sidebar_section">
+                        <obv:showLocation
+                            model="['observationInstance':checklistInstance]" />
+                    </div>
+                    <g:if test="${checklistInstance.userGroups}">
+                    <div class="sidebar_section">
+                        <h5>Is in groups</h5>
+                        <ul class="tile" style="list-style:none; padding-left: 10px;">
+                            <g:each in="${checklistInstance.userGroups}" var="userGroup">
+                            <li class="">
+                            <uGroup:showUserGroupSignature  model="[ 'userGroup':userGroup]" />
+                            </li>
+                            </g:each>
+                        </ul>
+                        <!-- obv:showRelatedStory
+                        model="['observationInstance':checklistInstance, 'observationId': checklistInstance.id, 'controller':'userGroup', 'action':'getRelatedUserGroups', 'filterProperty': 'obvRelatedUserGroups', 'id':'relatedGroups']" /-->
+                    </div>
+                    </g:if>
+                    <%
+                    def annotations = checklistInstance.fetchChecklistAnnotation()
+                    %>
+                    <g:if test="${annotations?.size() > 0}">
+                    <div class="sidebar_section">
+                        <h5>Annotations</h5>
+                        <div class="tile" style="clear: both">
+                            <obv:showAnnotation model="[annotations:annotations]" />
+                        </div>
+                    </div>	
+                    </g:if>
+
+                </div>
+
+            </div>	
+            <r:script>
+            $(document).ready(function(){
+            var species = $.url(decodeURIComponent(window.location.search)).param()["species"]
+            if(species){
+            species = $.trim(species).replace(/ /g, '_') 
+            $(".checklist-data ." + species).css("background-color","#66FF66");
+            }
+            });
+            </r:script>
+        </body>
+    </html>
