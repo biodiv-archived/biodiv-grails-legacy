@@ -368,7 +368,7 @@ class ChecklistUtilService {
 	}
 	
 	//XXX this method is to add activity on back date only for checklist to observation migration
-	private addActivityFeed(rootHolder, activityHolder, author, activityType, date){
+	public addActivityFeed(rootHolder, activityHolder, author, activityType, date){
 		//to support discussion on comment thread
 		def subRootHolderType = rootHolder?.class?.getCanonicalName()
 		def subRootHolderId = rootHolder?.id
