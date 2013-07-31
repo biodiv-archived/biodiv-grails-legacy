@@ -230,21 +230,20 @@ class ChecklistController {
 		cl.observations.each {Observation obv ->
 			def tMap = [:]
 			tMap[ChecklistService.OBSERVATION_COLUMN] = obv.id
+			tMap['obvDir'] = '';
             if(obv.resource) {
-			    tMap[ChecklistService.MEDIA] = new HashMap()
+			    tMap[ChecklistService.MEDIA_COLUMN] = new HashMap()
                 Iterator iterator = obv.resource?.iterator();
                 int index = 1;
                 while(iterator.hasNext()) {
-/*                    def res = iterator.next();
-                    thumbnail
-                    file
-                    url 
-                    type
-
-                    tMap[ChecklistService.MEDIA]['file_'+index] = res.fileName;
-                    tMap[ChecklistService.MEDIA]['license_'+index] = res.fileName;
-                    tMap[ChecklistService.MEDIA]['rating_'+index] = res.fileName;
-  */              }
+                    def res = iterator.next();
+                    tMap[ChecklistService.MEDIA_COLUMN]['file_'+index] = res.fileName;
+                    tMap[ChecklistService.MEDIA_COLUMN]['thumbnail_'+index] = res.thumbnailUrl();
+                    tMap[ChecklistService.MEDIA_COLUMN]['url_'+index] = res.url;
+                    tMap[ChecklistService.MEDIA_COLUMN]['license_'+index] = res.licenses.collect { it.name }.join(',');
+                    tMap[ChecklistService.MEDIA_COLUMN]['type_'+index] = res.type.value();
+                    tMap[ChecklistService.MEDIA_COLUMN]['rating_'+index] = res.rating;
+                }
             }
 			obv.fetchChecklistAnnotation().each { ann ->
 				tMap[ann.key] = ann.value

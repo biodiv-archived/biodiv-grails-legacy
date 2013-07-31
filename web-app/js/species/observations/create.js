@@ -27,7 +27,8 @@ function initGrid(data, columns, sciNameColumn, commonNameColumn) {
         enableCellNavigation: true,
         asyncEditorLoading: false,
         autoEdit: true,
-        fullWidthRows:true
+        fullWidthRows:true,
+        rowHeight:32
     };
     
     $(function () {
@@ -109,14 +110,27 @@ function sciNameFormatter(row, cell, value, columnDef, dataContext) {
         return '<i>'+value+'</i>';
 }
 
+/**
+ */
 function addMediaFormatter(row, cell, value, columnDef, dataContext) {
-    var html = ''
-        if(value)
-            html = value
-        html += "<button class='btn btn-mini media'  title='Add Media' data-toggle='modal' data-target='#addResources'  onClick='openDetails("+row+","+cell+");return false;'>Add/Edit Media</button>"
-        return html;
+    var html = '';
+    if(value) {
+        //HACK
+        var len = Object.keys(value).length;
+        for (var i=1; i<=len/6; i++) {
+            console.log(value);
+            if(value['type_'+i] == 'VIDEO')
+                html += "<img class='small_profile_pic' src='"+value['url_'+i]+"'/>";
+            else 
+                html += "<img class='small_profile_pic' src='"+value['thumbnail_'+i]+"'/>";
+        }
+    }
+    html += "<button class='btn btn-mini'  title='Add Media' data-toggle='modal' data-target='#addResources'  onClick='openDetails("+row+","+cell+");return false;'>Add/Edit Media</button>";
+    return html;
 }
 
+/**
+ */
 function showGrid(){
     var input = $("#checklistStartFile_path").val(); 
     if($('#textAreaSection').is(':visible'))
@@ -466,8 +480,8 @@ $(document).ready(function(){
         if(!obvDirInput.val()){
             $(obvDirInput).val(obvDir);
         }
-        var images = []
-            var metadata = $(".metadata");
+        var images = [];
+        var metadata = $(".metadata");
         var i = 0;
         if(metadata.length > 0) {
             var file_id = $(metadata.get(-1)).children("input").first().attr("name");
@@ -480,16 +494,17 @@ $(document).ready(function(){
         });
 
         var html = $( "#metadataTmpl" ).render( images );
-        var metadataEle = $(html)
-            metadataEle.each(function() {
-                $('.geotagged_image', this).load(function(){
-                    update_geotagged_images_list($(this));		
-                });
-                var $ratingContainer = $(this).find('.star_obvcreate');
-                rate($ratingContainer)
-            })
-        $( "#imagesList li:last" ).before (metadataEle);
-        $( "#add_file" ).fadeIn(3000);
+        var metadataEle = $(html);
+        metadataEle.each(function() {
+            $('.geotagged_image', this).load(function(){
+                update_geotagged_images_list($(this));		
+            });
+            var $ratingContainer = $(this).find('.star_obvcreate');
+            rate($ratingContainer)
+        })
+
+        $("#imagesList li:last" ).before (metadataEle);
+        $("#add_file" ).fadeIn(3000);
         $("#image-resources-msg").parent(".resources").removeClass("error");
         $("#image-resources-msg").html("");
         $("#upload_resource input[name='resources']").remove();
@@ -812,6 +827,51 @@ function openDetails(row, cell) {
     if (grid.getEditorLock().isActive() && !grid.getEditorLock().commitCurrentEdit()) {
         return;
     }
+    if(row === undefined || cell === undefined) {
+        alert('Either row or cell is missing');
+        $('#addResourcesModal').modal('toggle');
+        return false;
+    }
+
+    $('#addResourcesModal #imagesList').remove('.addedResource');
+
+    var data = grid.getData()[row];
+    var media = data.Media
+    var obvDir = data.obvDir;
+    var obvDirInput = $('#upload_resource input[name="obvDir"]');
+    if(!obvDirInput.val()){
+        $(obvDirInput).val(obvDir);
+    }
+    
+    var images = [];
+    var metadata = $(".metadata");
+    var i = 0;
+    if(metadata.length > 0) {
+        var file_id = $(metadata.get(-1)).children("input").first().attr("name");
+        i = parseInt(file_id.substring(file_id.indexOf("_")+1));
+    }
+   
+    var len = Object.keys(media).length
+    for(var i=1; i<=len/6; i++) {
+        var fileName = media['file_'+i]
+        var type =  media['type_'+i]
+        var thumbnail =  media['thumbnail_'+i]
+        var url =  media['url_'+i]
+        images.push({i:i++, file:obvDir + "/" + fileName, url:url, thumbnail:thumbnail, type:type, title:fileName});
+    };
+
+    var html = $( "#metadataTmpl" ).render( images );
+    var metadataEle = $(html);
+    metadataEle.each(function() {
+        //$('.geotagged_image', this).load(function(){
+        //    update_geotagged_images_list($(this));		
+        //});
+        var $ratingContainer = $(this).find('.star_obvcreate');
+        rate($ratingContainer)
+    })
+
+    $("#imagesList li:last" ).before (metadataEle);
+
 
     $('#addResourcesModal').data({'row':row, 'cell':cell}).modal('show');
 
@@ -819,7 +879,7 @@ function openDetails(row, cell) {
 }
 
 $(document).ready(function() {
-/**
+    /**
      *
      */
     $('#addResourcesModalSubmit').click(function(){
@@ -831,12 +891,12 @@ $(document).ready(function() {
            return false;
        }
         var data = grid.getData()[row]
-        data.media = {};
+        data.Media = {};
         $.each($('#addResourcesModal').find('input'), function(index, input){
-            data.media[$(input).attr('name')] = $(input).val();
+            data.Media[$(input).attr('name')] = $(input).val();
         });
         $('#addResourcesModal').modal('toggle');
-        $('#addResourcesModal #imagesList').remove();
+        $('#addResourcesModal #imagesList').remove('.addedResource');
     });
 
 });
