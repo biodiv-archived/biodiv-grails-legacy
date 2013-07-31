@@ -102,13 +102,12 @@ function initGrid(data, columns, sciNameColumn, commonNameColumn) {
         var headerMenuPlugin = new Slick.Plugins.HeaderMenu({buttonImage:'/biodiv/images/dropdown_active.gif'});
         headerMenuPlugin.onBeforeMenuShow.subscribe(function(e, args) {
             var menu = args.menu;
-            console.log(menu);
             var i = menu.items.length;
-            menu.items.push({
-                title: "Menu item " + i,
-                command: "item" + i
-            });
+            var iconClass = undefined
+            menu.items[0].iconImage = (args.column.name === $("#sciNameColumn").val())?'/biodiv/images/cancel-on.png':undefined
+            menu.items[1].iconImage = (args.column.name === $("#commonNameColumn").val())?'/biodiv/images/cancel-on.png':undefined
         });
+
         headerMenuPlugin.onCommand.subscribe(function(e, args) {
             if(args.command === 'sciNameColumn') {
                 $('#sciNameColumn').val(args.column.name);
