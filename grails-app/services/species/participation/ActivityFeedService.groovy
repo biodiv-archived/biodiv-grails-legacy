@@ -103,7 +103,7 @@ class ActivityFeedService {
 		def subRootHolderType = rootHolder?.class?.getCanonicalName()
 		def subRootHolderId = rootHolder?.id
 		if(activityHolder?.class?.getCanonicalName() == Comment.class.getCanonicalName()){
-			subRootHolderType = activityHolder.class.getCanonicalName()
+			subRootHolderType = getType(activityHolder)
 			subRootHolderId = (activityHolder.isMainThread())? activityHolder.id : activityHolder.fetchMainThread().id
 		}
 		
@@ -111,8 +111,8 @@ class ActivityFeedService {
 		boolean isShowable= (rootHolder.hasProperty('isShowable') && rootHolder.isShowable != null)? rootHolder.isShowable : true
 		
 		ActivityFeed af = new ActivityFeed(author:author, activityHolderId:activityHolder?.id, \
-						activityHolderType:activityHolder?.class?.getCanonicalName(), \
-						rootHolderId:rootHolder?.id, rootHolderType:rootHolder?.class?.getCanonicalName(), \
+						activityHolderType:getType(activityHolder), \
+						rootHolderId:rootHolder?.id, rootHolderType:getType(rootHolder), \
 						isShowable:isShowable,\
 						activityType:activityType, subRootHolderType:subRootHolderType, subRootHolderId:subRootHolderId, activityDescrption:description);
 					
@@ -146,6 +146,8 @@ class ActivityFeedService {
 	
 	// this will return class of object in general used in comment framework
 	static getType(obj){
+		if(!obj) return null
+		
 		if(obj instanceof Map){
 			return obj.objectType
 		}

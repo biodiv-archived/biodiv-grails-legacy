@@ -378,7 +378,7 @@ class ChecklistUtilService {
 		}
 		
 		ActivityFeed af = new ActivityFeed(author:author, activityHolderId:activityHolder?.id, \
-						activityHolderType:activityHolder?.class?.getCanonicalName(), \
+						activityHolderType:ActivityFeedService.getType(activityHolder), \
 						rootHolderId:rootHolder?.id, rootHolderType:rootHolder?.class?.getCanonicalName(), \
 						activityType:activityType, subRootHolderType:subRootHolderType, subRootHolderId:subRootHolderId,
 						dateCreated :date, lastUpdated:date);
