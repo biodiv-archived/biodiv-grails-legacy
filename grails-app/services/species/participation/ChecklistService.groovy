@@ -58,7 +58,8 @@ class ChecklistService {
 	static final String CN_NAME = "common_name"
 	static final String OBSERVATION_COLUMN = "Id"
 	static final String MEDIA_COLUMN = "Media"
-	
+	static final String SPECIES_TITLE_COLUMN = "speciesTitle"
+	static final String SPECIES_ID_COLUMN = "speciesId"
 	def grailsApplication
 	def observationService
 	def checklistSearchService;
@@ -173,8 +174,9 @@ class ChecklistService {
 			params.checklistData.each {  Map m ->
 				def oldObvId = m.remove(OBSERVATION_COLUMN)
 				def media = m.remove(MEDIA_COLUMN);
-
-                println "----------------------- ${media}"
+				m.remove(SPECIES_TITLE_COLUMN);
+				m.remove(SPECIES_ID_COLUMN);
+                println "------------media----------- ${media}"
                 Map obsParams = new HashMap(commonObsParams);
                 if(media) {
                     media.eachWithIndex{ item, index ->
@@ -192,7 +194,7 @@ class ChecklistService {
 				}else{
 					obsParams.action = "save"
 				}	
-				obsParams.checklistAnnotations = m as JSON
+				obsParams.checklistAnnotations =  m as JSON
 				def res = observationService.saveObservation(obsParams, false)
 				Observation observationInstance = res.observationInstance
 				saveReco(observationInstance, m, checklistInstance)

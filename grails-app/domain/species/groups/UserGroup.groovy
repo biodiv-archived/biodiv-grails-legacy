@@ -303,7 +303,7 @@ class UserGroup implements Taggable {
 			query += (roleId) ? " and umg.role_id $roleId" : ""
 			query += " group by umg.s_user_id  order by activitycount desc limit $max offset $offset"
 			
-			log.debug "Getting users list : $query"
+			//log.debug "Getting users list : $query"
 			def sql =  Sql.newInstance(dataSource);
 			sql.rows(query).each{
 				res.add(SUser.read(it.getProperty("user")));
@@ -331,7 +331,7 @@ class UserGroup implements Taggable {
 		return userGroupService.fetchHomePageTitle(this)
 	}
 	
-	def afterDelete(){
+	def beforeDelete(){
 		activityFeedService.deleteFeed(this)
 	}
 	

@@ -142,7 +142,7 @@ class Comment{
 		//activityFeedService.addActivityFeed(activityFeedService.getDomainObject(rootHolderType, rootHolderId), this, author, activityFeedService.COMMENT_ADDED)
 	}
 	
-	def afterDelete(){
+	def beforeDelete(){
 		activityFeedService.deleteFeed(this);
 	
 	}

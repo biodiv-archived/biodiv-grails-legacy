@@ -313,6 +313,12 @@ class Observation extends Metadata implements Taggable, Rateable {
 		sourceId = sourceId ?:id
 	}
 	
+	def afterUpdate(){
+		//XXX uncomment this method when u actully abt to change isShowable variable
+		// (ie. if media added to obv of checklist then this method should be uncommented)
+		//activityFeedService.updateIsShowable(this)
+	}
+	
 	def getPageVisitCount(){
 		return visitCount;
 	}
@@ -380,9 +386,8 @@ class Observation extends Metadata implements Taggable, Rateable {
 		updateObservationTimeStamp()
 	}
 	
-	def afterDelete(){
+	def beforeDelete(){
 		activityFeedService.deleteFeed(this)
-        //TODO:delete follow links
 	}
 	
 	def Map fetchExportableValue(){

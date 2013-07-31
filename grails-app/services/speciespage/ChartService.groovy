@@ -400,6 +400,7 @@ class ChartService {
 	private int getActivityCount(startDate, endDate, typeToIdFilterMap, userGroupInstance, feedType=null){
 		return ActivityFeed.createCriteria().count{
 			and{
+				eq('isShowable', true)
 				between('lastUpdated', startDate, endDate)
 				if(feedType){
 					eq('activityType', feedType)
@@ -544,5 +545,20 @@ class ChartService {
 			default:
 				break
 		}
+	}
+	
+	def List getUserByRank(max, offset){
+		return ActivityFeed.withCriteria(){
+			projections {
+				groupProperty('author')
+				rowCount('total') //alias given to count
+			}
+			and{
+				eq('isShowable', true)
+			}
+			maxResults max
+			firstResult offset
+			order 'total', 'desc'
+		}.collect { it[0]}
 	}
 }

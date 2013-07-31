@@ -97,11 +97,8 @@ class ActivityFeedService {
 	def getCount(params){
 		return ActivityFeed.fetchCount(params)
 	}
-	def addActivityFeed(rootHolder, activityHolder, author, activityType){
-		return addActivityFeed(rootHolder, activityHolder, author, activityType, null)
-	}
 	
-	def addActivityFeed(rootHolder, activityHolder, author, activityType, description){
+	def addActivityFeed(rootHolder, activityHolder, author, activityType, description=null){
 		//to support discussion on comment thread
 		def subRootHolderType = rootHolder?.class?.getCanonicalName()
 		def subRootHolderId = rootHolder?.id
@@ -110,13 +107,13 @@ class ActivityFeedService {
 			subRootHolderId = (activityHolder.isMainThread())? activityHolder.id : activityHolder.fetchMainThread().id
 		}
 		
-		def date = new Date()
+		//to hide any object who has isShowable = false in all other cases making feed showable
+		boolean isShowable= (rootHolder.hasProperty('isShowable') && rootHolder.isShowable != null)? rootHolder.isShowable : true
 		
 		ActivityFeed af = new ActivityFeed(author:author, activityHolderId:activityHolder?.id, \
 						activityHolderType:activityHolder?.class?.getCanonicalName(), \
 						rootHolderId:rootHolder?.id, rootHolderType:rootHolder?.class?.getCanonicalName(), \
-						//comment this line after migration on same jvm
-						dateCreated: date, lastUpdated:date,\
+						isShowable:isShowable,\
 						activityType:activityType, subRootHolderType:subRootHolderType, subRootHolderId:subRootHolderId, activityDescrption:description);
 					
 		ActivityFeed.withNewSession {
@@ -200,6 +197,9 @@ class ActivityFeedService {
 		ActivityFeed.deleteFeed(obj);
 	}
 	
+	def updateIsShowable(obj){
+		ActivityFeed.updateIsShowable(obj);
+	}
 	
 	def getContextInfo(ActivityFeed feedInstance, params){
 		

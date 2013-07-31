@@ -47,7 +47,7 @@ class RecommendationVote {
 		comment type:'text';
 	}
 	
-	def afterDelete(){
+	def beforeDelete(){
 		activityFeedService.deleteFeed(this)
 	}
 

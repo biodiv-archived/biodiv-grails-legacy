@@ -12,7 +12,7 @@
                 <g:each in="${checklistInstance.fetchColumnNames()}" var="cName">
                 <th title="${cName}">${cName.replaceAll("_", " ")}</th>
                 </g:each>
-                <th title="Observation">Media</th>
+                <th title="Media">Media</th>
                 <th title="Observation">Observation</th>
                 <th title="Comments">Comments</th>
             </tr>
@@ -38,13 +38,13 @@
                 </td>
                 </g:each>
                 <td>
+                    <g:render template="/observation/showObservationImagesList" model="['observationInstance':observation]"/>
+                </td>
+				<td>
                     <a href="${uGroup.createLink(action:'show', controller:'observation', id:observation.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
                         url</a>
                 </td>
-                <td>
-                    <g:render template="/observation/showObservationImagesList" model="['observationInstance':observation]"/>
-                </td>
-
+                
                 <td>
                     <comment:showCommentPopup model="['commentHolder':observation, 'rootHolder':checklistInstance]" />
                 </td>
