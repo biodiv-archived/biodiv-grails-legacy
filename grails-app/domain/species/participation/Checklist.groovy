@@ -165,7 +165,7 @@ class Checklist implements Rateable {
 		return data
 	}
 	
-	def afterDelete(){
+	def beforeDelete(){
 		activityFeedService.deleteFeed(this)
 	}
 

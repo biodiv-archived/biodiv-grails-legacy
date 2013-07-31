@@ -123,7 +123,7 @@ class Document implements Taggable, Rateable {
 		}
 	}
 	
-	def afterDelete(){
+	def beforeDelete(){
 		activityFeedService.deleteFeed(this)
 	}
 	

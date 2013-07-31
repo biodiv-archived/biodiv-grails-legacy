@@ -388,12 +388,7 @@ class SUserController extends UserController {
 
 
 			if(params.sort == 'activity') {
-				String query = "select u.id, u.$usernameFieldName from Observation obv right outer join obv.author u WHERE 1=1 $cond and (obv.isDeleted = false or obv.isDeleted is null) group by u.id, u.$usernameFieldName order by count(obv.id)  desc, u.$usernameFieldName asc";
-				log.debug "UserQuery : ${query} with params ${queryParams}"
-				def uids =  lookupUserClass().executeQuery(query, queryParams, [max: max, offset: offset])
-				uids.each {
-					results.add(SUser.read(it[0]));
-				}
+				results = chartService.getUserByRank(max, offset)
 			} else {
 				String query = "SELECT DISTINCT u $hql $orderBy";
 				log.debug "UserQuery : ${query} with params ${queryParams}"
