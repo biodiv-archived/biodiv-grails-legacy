@@ -4,8 +4,8 @@
     right:0;
     }
 </style>
-<div class="resizable" style="overflow:auto;max-height:400px;">
-    <table class="table table-hover tablesorter checklist-data" style="margin-left: 0px;">
+<div class="resizable sidebar_section" style="overflow:auto;max-height:400px;margin-bottom:0px;">
+    <table class="table table-striped table-hover tablesorter checklist-data" style="margin-left: 0px;">
 
         <thead>
             <tr>

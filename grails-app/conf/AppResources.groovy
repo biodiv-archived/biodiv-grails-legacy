@@ -238,7 +238,11 @@ modules = {
 		resource url:'/js/SlickGrid-2.0.2/slick.formatters.js'
 		resource url:'/js/SlickGrid-2.0.2/slick.editors.js'
 		resource url:'/js/SlickGrid-2.0.2/slick.grid.js'
-		
+		resource url:'/js/SlickGrid-2.0.2/plugins/slick.headerbuttons.js'
+		resource url:'/js/SlickGrid-2.0.2/plugins/slick.headermenu.js'
+		resource url:'/js/SlickGrid-2.0.2/plugins/slick.headerbuttons.css'
+		resource url:'/js/SlickGrid-2.0.2/plugins/slick.headermenu.css'
+
 		resource url:'/js/SlickGrid-2.0.2/plugins/slick.cellrangedecorator.js'
 		resource url:'/js/SlickGrid-2.0.2/plugins/slick.cellrangeselector.js'
 		resource url:'/js/SlickGrid-2.0.2/plugins/slick.cellselectionmodel.js'

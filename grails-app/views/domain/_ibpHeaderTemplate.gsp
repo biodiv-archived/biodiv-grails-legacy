@@ -48,6 +48,10 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
                                 <a class="btn btn-success" data-toggle="popover" data-placement="right" data-content="An observation is an individual sighting of a species, submitted as an image or video." data-trigger="hover"
                                     href="${uGroup.createLink(
                                     controller:'observation', action:'create', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}" data-original-title="Add an Observation" title="Add an Observation"> <i class="icon-plus"></i>Add an Observation</a>
+                                <a class="btn btn-success" data-toggle="popover" data-placement="right" data-content="" data-trigger="hover"
+                                    href="${uGroup.createLink(
+                                    controller:'checklist', action:'create', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}" data-original-title="Add a List" title="Add a List"> <i class="icon-plus"></i>Add a List</a>
+ 
                                 <a class="btn btn-success" data-toggle="popover" data-placement="right" data-content="Upload biodiversity related reports, presentations, posters etc." data-trigger="hover"
                                     href="${uGroup.createLink(
                                     controller:'document', action:'create', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"

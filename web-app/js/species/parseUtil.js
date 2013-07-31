@@ -60,31 +60,32 @@ function parseCSVData(data, options) {
     var error = '';
     $.each(lines, function(lineCount, line) {
     	line = $.trim(line);
-    	try{
-	        if ((lineCount == options.startLine) && (typeof(options.headers) == 'undefined')) {
-	        		var headers = $.csv.toArray(line);
-		            headerCount = headers.length;
-		            $.each(headers, function(headerCount, header) {
-		                columns.push({id:header, name: header, field: header, editor: Slick.Editors.Text, sortable:false, minWidth: 100});
-		            });
-	        	
-	        } else if (lineCount >= options.startLine) {
-	        	var items = $.csv.toArray(line);
-	            if (line !== '' && items.length > 0) {
-	            	printedLines++;
-	                if (items.length != headerCount) {
-	                    error += 'Error on line ' + lineCount + ': Item count (' + items.length + ') does not match header count (' + headerCount + ') \n';
-	                }
-	                var d = (rowData[printedLines-1] = {});
-	                $.each(items, function(itemCount, item) {
-	                    var dataKey = columns[itemCount]['field']
-	                    d[dataKey] = item;
-	                });
-	            }
-	        }
-    	}catch(e){
-    		error += e + '\n';
-    	}
+        try{
+            if ((lineCount == options.startLine) && (typeof(options.headers) == 'undefined')) {
+                var headers = $.csv.toArray(line);
+                headerCount = headers.length;
+                $.each(headers, function(headerCount, header) {
+                    columns.push({id:header, name: header, field: header, editor: Slick.Editors.Text, sortable:false, minWidth: 100, header:getHeaderMenuOptions()});
+                    console.log(columns);
+                });
+
+            } else if (lineCount >= options.startLine) {
+                var items = $.csv.toArray(line);
+                if (line !== '' && items.length > 0) {
+                    printedLines++;
+                    if (items.length != headerCount) {
+                        error += 'Error on line ' + lineCount + ': Item count (' + items.length + ') does not match header count (' + headerCount + ') \n';
+                    }
+                    var d = (rowData[printedLines-1] = {});
+                    $.each(items, function(itemCount, item) {
+                        var dataKey = columns[itemCount]['field']
+                        d[dataKey] = item;
+                    });
+                }
+            }
+        }catch(e){
+            error += e + '\n';
+        }
     });
     if (error) {
         alert(error);
@@ -108,4 +109,26 @@ function getMediaColumnOptions() {
     resizable: true,
     formatter:addMediaFormatter
   }
+}
+
+function getHeaderMenuOptions() {
+    return {
+        menu: {
+            items: [
+            {
+                title: "Scientific Name",
+                command: "sciNameColumn"
+            },
+            {
+                title: "Common Name",
+                command: "commonNameColumn"
+            },
+            {
+                iconCssClass: "icon-help",
+                title: "Help",
+                command: "help"
+            }
+            ]
+        }
+    }
 }

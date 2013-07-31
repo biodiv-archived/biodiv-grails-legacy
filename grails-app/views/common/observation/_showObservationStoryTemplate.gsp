@@ -121,26 +121,6 @@
                         datetime="${observationInstance.lastRevised?.getTime()}"></time>
                     </div>
                 </div>
-            </g:if>
-
-            <g:if test="${observationInstance.notes}">
-                <div class="prop">
-                    <g:if test="${showDetails}">
-                    <span class="name"><i class="icon-info-sign"></i>Notes</span>
-                    <div class="notes_view linktext">
-                        ${Utils.linkifyYoutubeLink(observationInstance.notes)}
-                    </div>
-                    </g:if>
-                    <g:else>
-                    <div class="notes_view linktext ${showDetails?'':'ellipsis multiline'}">
-                        ${Utils.stripHTML(observationInstance.notes)}
-                    </div>
-
-                    </g:else>
-                </div>
-            </g:if>
-
-            <g:if test="${showDetails}">
                 <g:if test="${observationInstance.isChecklist && observationInstance.fetchAttributions()}">
                 <div class="prop" >
                     <span class="name"><i class="icon-info-sign"></i>Attribution</span>
@@ -158,6 +138,27 @@
                     </div>
                 </div>
                 </g:if>
+            </g:if>
+
+            <g:if test="${observationInstance.notes}">
+                <div class="prop">
+                    <g:if test="${showDetails}">
+                    <span class="name"><i class="icon-info-sign"></i>Notes</span>
+                    <div class="value notes_view linktext">
+                        ${Utils.linkifyYoutubeLink(observationInstance.notes)}
+                    </div>
+                    </g:if>
+                    <g:else>
+                    <div class="value notes_view linktext ${showDetails?'':'ellipsis multiline'}">
+                        ${Utils.stripHTML(observationInstance.notes)}
+                    </div>
+
+                    </g:else>
+                </div>
+            </g:if>
+
+            <g:if test="${showDetails}">
+
                 <g:if test="${observationInstance.isChecklist && observationInstance.refText}" >
                 <div class="prop">
                     <span class="name"><i class="icon-info-sign"></i>References</span>

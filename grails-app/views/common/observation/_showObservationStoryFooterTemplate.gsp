@@ -24,6 +24,11 @@
         </div>
         <g:if test="${observationInstance.isChecklist}">
             <div class="footer-item"> 
+                <i class="icon-screenshot" title="Species"></i>
+                <span class="">${observationInstance.speciesCount}</span>
+            </div>
+
+            <div class="footer-item"> 
                 <img src="${resource(dir:'images/license',file:observationInstance?.license?.name?.getIconFilename()+'.png', absolute:true)}"
                 title="${observationInstance.license.name}"/>
             </div>

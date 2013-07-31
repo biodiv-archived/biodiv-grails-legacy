@@ -18,6 +18,12 @@
         <g:render template="/common/titleTemplate" model="['title':title]"/>
         <r:require modules="checklist_create"/>
         <uploader:head />
+        <style>
+            .upload_file div {
+                display:inline-block;
+            }
+        </style>
+
     </head>
     <body>
         <div class="observation_create">
@@ -49,8 +55,8 @@
                             <g:if test="${ params.action != 'create'}">
                                 <g:render template="/checklist/showEditGrid" model="['observationInstance':observationInstance]"/>
                             </g:if>
-                            <g:else>
-                                <div style="display:inline-block">
+                        <g:else>
+                                <div class="upload_file" style="display:inline-block">
                                 <g:render template='/UFile/docUpload' model="['name': 'checklistStartFile', fileParams:fileParams, allowedExtensions:allowedExtensions,uploadCallBack:'showGrid()']" />
                                 </div>
                             </g:else>
@@ -71,24 +77,18 @@
                             <div id="myGrid" class="" style="width:100%;height:350px;"></div>
                             <div id="nameSuggestions" style="display: block;"></div>
                         
-                            <div class="section ${hasErrors(bean: observationInstance, field: 'sciNameColumn', 'error')}" style="clear:both;">
-                                <div class="row control-group span5">
-                                    <label for="group" class="control-label"><g:message
-                                        code="observation.mark.sciNameColumn.label" default="Mark Scientific Name Column" /> </label>
-                                    <div class="controls">
-                                        <select id="sciNameColumn" class="markColumn" name="sciNameColumn" value="${observationInstance.sciNameColumn}"></select>
+                            <div class="section ${hasErrors(bean: observationInstance, field: 'sciNameColumn', 'error')}" style="clear:both;margin:0;">
+                                <div class="row control-group">
+                                    <span class="pull-left span3"><g:message
+                                        code="observation.mark.sciNameColumn.label" default="Marked Scientific & Common Name Columns:" /></span>
+                                    <div class="controls" style="margin-left:260px;">
+                                        <input type="text" id="sciNameColumn" class="markColumn" name="sciNameColumn" disabled value="${observationInstance.sciNameColumn}"/>
+                                        <input type="text" id="commonNameColumn" class="markColumn" name="commonNameColumn" disabled value="${observationInstance.commonNameColumn}"/>
                                         <div class="help-inline">
                                             <g:hasErrors bean="${observationInstance}" field="sciNameColumn">
                                             <g:message code="checklist.scientific_name.validator.invalid" />
                                             </g:hasErrors>
                                         </div>
-                                    </div>
-                                </div>	
-                                <div class="row control-group span5">
-                                    <label for="group" class="control-label"><g:message
-                                        code="observation.mark.commonNameColumn.label" default="Mark Common Name Column" /> </label>
-                                    <div class="controls">
-                                        <select id="commonNameColumn" class="markColumn" name="commonNameColumn" value="${observationInstance.commonNameColumn}"></select>
                                     </div>
                                 </div>	
                             </div>

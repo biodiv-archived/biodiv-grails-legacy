@@ -98,15 +98,39 @@ function initGrid(data, columns, sciNameColumn, commonNameColumn) {
                 }
         };
 
+
+        var headerMenuPlugin = new Slick.Plugins.HeaderMenu({buttonImage:'/biodiv/images/dropdown_active.gif'});
+        headerMenuPlugin.onBeforeMenuShow.subscribe(function(e, args) {
+            var menu = args.menu;
+            console.log(menu);
+            var i = menu.items.length;
+            menu.items.push({
+                title: "Menu item " + i,
+                command: "item" + i
+            });
+        });
+        headerMenuPlugin.onCommand.subscribe(function(e, args) {
+            if(args.command === 'sciNameColumn') {
+                $('#sciNameColumn').val(args.column.name);
+                selectSciNameColumn();
+            } else if(args.command === 'commonNameColumn') {
+                $('#commonNameColumn').val(args.column.name);
+            }
+        });
+
+        grid.registerPlugin(headerMenuPlugin);
+
+        
+        
         $("#myGrid").show();
         $('#checklistStartFile_uploaded').hide();
 
         if(sciNameColumn) {
-            selectColumn($('#sciNameColumn'), sciNameColumn);
+            $('#sciNameColumn').val(sciNameColumn);
         }
 
         if(commonNameColumn) {
-            selectColumn($('#commonNameColumn'), commonNameColumn);
+            $('#commonNameColumn').val(commonNameColumn);
         }
 
     });
@@ -200,7 +224,7 @@ function loadGrid(url, id){
 			var columns = new Array();
 			var editor = Slick.Editors.Text
 			$.each(headers, function(index, header) {
-                            columns.push({id:header, name: header, field: header, editor:editor, sortable:false, minWidth: 100});
+                            columns.push({id:header, name: header, field: header, editor:editor, sortable:false, minWidth: 100, 'header':getHeaderMenuOptions()});
 			});
                         columns.push(getMediaColumnOptions());
                         loadTextToGrid(data.data, columns, data.sciNameColumn, data.commonNameColumn);
@@ -345,15 +369,31 @@ function getSelectedHabitatArr() {
  */
 function selectColumn(selector, selectedColumn){
     var markColumnSelect = selector ? selector : this;
-    var columns = grid.getColumns();
+    /*var columns = grid.getColumns();
     $(markColumnSelect).empty();
     $.each(columns, function(index, column) {
         $(markColumnSelect).append($("<option />").val(column.id).text(column.name));
-    });
+    });*/
     if(selectedColumn) {
-        $(markColumnSelect).val(selectedColumn).change();
+        $(markColumnSelect).val(selectedColumn);
     }
 };
+
+function selectSciNameColumn() {
+    var columns = grid.getColumns();
+    var sciNameColumn = $('#sciNameColumn').val();
+    for (var i = 0, len = columns.length; i < len; i++) {
+        var column = columns[i];
+        if(column.editor == AutoCompleteEditor && sciNameColumn != column.id) {
+            column.editor = Slick.Editors.Text;
+            column.formatter = undefined;
+        } else if(sciNameColumn == column.id){
+            column.editor = AutoCompleteEditor;
+            column.formatter = sciNameFormatter;
+        }
+    };
+    grid.invalidate();
+}
 
 
 /**
@@ -586,28 +626,14 @@ $(document).ready(function(){
         $('#wizardButtons').hide();
     });
 
-    function selectColumn2(event) {
+    /*function selectColumn2(event) {
         selectColumn(this);
     }
     $("#sciNameColumn").focus(selectColumn2);
     $("#commonNameColumn").focus(selectColumn2);
     
-    $("#sciNameColumn").change(function() {
-        var columns = grid.getColumns();
-        var sciNameColumn = $('#sciNameColumn').val();
-        for (var i = 0, len = columns.length; i < len; i++) {
-             var column = columns[i];
-             if(column.editor == AutoCompleteEditor && sciNameColumn != column.id) {
-                column.editor = Slick.Editors.Text
-                column.formatter = undefined
-             } else if(sciNameColumn == column.id){
-                column.editor = AutoCompleteEditor;
-                column.formatter = sciNameFormatter;
-             }
-        };
-        grid.invalidate();
-    });
-    
+    $("#sciNameColumn").change(selectSciNameColumn);
+    */ 
     /**
      *
      */
