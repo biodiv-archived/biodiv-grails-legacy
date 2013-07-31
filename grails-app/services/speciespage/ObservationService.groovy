@@ -480,7 +480,7 @@ class ObservationService {
 				item.notes = param['observation'].notes
 			} else {
 				String location = "Observed at '" + (param['observation'].placeName.trim()?:param['observation'].reverseGeocodedName) +"'"
-				String desc = "- "+ location +" by "+param['observation'].author.name.capitalize()+" in species group "+param['observation'].group.name + " and habitat "+ param['observation'].habitat.name;
+				String desc = "- "+ location +" by "+param['observation'].author.name.capitalize()+" on "+param['observation'].fromDate.format('dd/MM/yyyy');
 				item.notes = desc;				
 			}
 			urlList << item;
