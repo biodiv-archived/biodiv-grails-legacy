@@ -199,11 +199,7 @@ function loadGrid(url, id){
 			var columns = new Array();
 			var editor = Slick.Editors.Text
 			$.each(headers, function(index, header) {
-				if(index > 0){
-					finalCols.push({id:header, name: header, field: header, editor:editor, sortable:false, minWidth: 100});
-				}
-                                var column = {id:header, name: header, field: header, editor:editor, sortable:false, minWidth: 100};
-				columns.push(column);
+                            columns.push({id:header, name: header, field: header, editor:editor, sortable:false, minWidth: 100});
 			});
                         columns.push(getMediaColumnOptions());
                         loadTextToGrid(data.data, columns, data.sciNameColumn, data.commonNameColumn);
@@ -910,7 +906,7 @@ $(document).ready(function() {
 
         console.log(data.Media);
         grid.getEditController().commitCurrentEdit();
-        console.log(grid.getData()[row].Media);
+        grid.invalidateRow(row);
         $('#addResourcesModal').modal('toggle');
     });
 
