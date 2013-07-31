@@ -106,7 +106,7 @@
                                 <g:render template="/observation/selectGroupHabitatDate" model="['observationInstance':observationInstance]"/>
                             </div>
                             <div class="section" style="clear:both;">
-                            <g:render template="dateInput" model="['observationInstance':observationInstance]"/>
+                            <g:render template="/observation/dateInput" model="['observationInstance':observationInstance]"/>
                             <%
                             def obvInfoFeeder = lastCreatedObv ? lastCreatedObv : observationInstance
                             %>

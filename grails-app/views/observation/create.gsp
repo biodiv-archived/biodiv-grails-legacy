@@ -40,12 +40,12 @@
                         <h3>What did you observe?</h3>
 
                         <g:render template="addPhoto" model="['observationInstance':observationInstance]"/>
-                         <div class="section" style="margin:0px";>
+                         <div class="section" style="margin:0px;">
                             <g:render template="selectGroupHabitatDate" model="['observationInstance':observationInstance]"/>
                         </div>
 
 
-                        <div class="section" style="margin:0px;">
+                        <div class="section" style="margin:40px 0 0;">
                             <g:if
                             test="${observationInstance?.fetchSpeciesCall() == 'Unknown'}">
                             <div id="help-identify" class="control-label">
@@ -55,12 +55,14 @@
                             </g:if>
                             <reco:create />
                         </div>
-                        <div class="section" style="margin:0px";>
+                        <div class="section" style="margin:0px;">
                             <g:render template="dateInput" model="['observationInstance':observationInstance]"/>
                             <%
                             def obvInfoFeeder = lastCreatedObv ? lastCreatedObv : observationInstance
                             %>
-                            <obv:showMapInput model="[observationInstance:obvInfoFeeder, userObservationInstanceList: totalObservationInstanceList, obvInfoFeeder:obvInfoFeeder, locationHeading:'Where did you find this observation?']"></obv:showMapInput>
+                            <div style="margin-top: -30px;">
+                            	<obv:showMapInput model="[observationInstance:obvInfoFeeder, userObservationInstanceList: totalObservationInstanceList, obvInfoFeeder:obvInfoFeeder, locationHeading:'Where did you find this observation?']"></obv:showMapInput>
+                            </div>
                         </div>
                     </div>
                 </div>
