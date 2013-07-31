@@ -20,6 +20,9 @@ function getDataFromGrid(){
 	return data;
 }
 
+function addDirtyRows(e, args) {
+    dirtyRows.push(args.row);
+};
 
 function initGrid(data, columns, sciNameColumn, commonNameColumn) {
     var options = {
@@ -56,9 +59,7 @@ function initGrid(data, columns, sciNameColumn, commonNameColumn) {
         });
 
         if(dirtyRows){
-            grid.onCellChange.subscribe(function (e, args) {
-                dirtyRows.push(args.row);
-            });
+            grid.onCellChange.subscribe(addDirtyRows)
         }
 
         grid.addNewColumn = function(newColumnName, options, position){
@@ -129,7 +130,6 @@ function addMediaFormatter(row, cell, value, columnDef, dataContext) {
         //HACK
         var len = value.length;
         for (var i=0; i<len; i++) {
-            console.log(value[i]);
             html += "<img class='small_profile_pic' src='"+value[i]['thumbnail']+"'/>";
         }
     }
@@ -751,18 +751,13 @@ $(document).ready(function(){
             'appendTo' : '#nameSuggestions',
             'nameFilter':args.column.id,
             focus: function( event, ui ) {
-                console.log(ui);
                 return false;
             }, select: function( event, ui ) {
-                console.log(ui);
-                console.log($input)
-                console.log(args);
                 if(ui.item.speciesId) {
                     args.item.speciesId = ui.item.speciesId
                     args.item.speciesTitle = ui.item.value
                 }
             }, open: function(event, ui) {
-                console.log(ui);
                 $("#nameSuggestions ul").css({'display': 'block','width':'300px'}); 
             }
         }); 
@@ -906,7 +901,9 @@ $(document).ready(function() {
 
         console.log(data.Media);
         grid.getEditController().commitCurrentEdit();
+        addDirtyRows(undefined, {row:row});
         grid.invalidateRow(row);
+        grid.render();
         $('#addResourcesModal').modal('toggle');
     });
 
