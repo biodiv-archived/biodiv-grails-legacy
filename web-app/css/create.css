@@ -102,6 +102,7 @@ input.dms_field {
 
 .slick-header-menubutton {
     background-image: url(../../images/dropdown_active.gif);
+    display:visible;
 }
 
 .slick-header-menuitem {

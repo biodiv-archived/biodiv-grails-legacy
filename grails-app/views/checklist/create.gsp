@@ -89,12 +89,14 @@
                                             <g:message code="checklist.scientific_name.validator.invalid" />
                                             </g:hasErrors>
                                         </div>
+                                    <a id="parseNames" class="btn btn-primary"
+                                        style="float: right; margin-right: 5px;display:none;">Validate Names</a>
+ 
                                     </div>
+   
                                 </div>	
                             </div>
-                            <a id="parseNames" class="btn btn-primary"
-                                style="float: right; margin-right: 5px;display:none;">Validate Names</a>
- 
+
                         </div>
                     </div>
 

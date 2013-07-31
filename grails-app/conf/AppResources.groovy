@@ -126,9 +126,9 @@ modules = {
 	observations_create {
 		dependsOn 'observations'
 
+		resource url:'/css/create.css'
 		resource url:'/js/jquery/jquery.exif.js'
 		resource url:'/js/species/observations/create.js'
-		resource url:'/css/create.css'
 		resource url:'/js/jquery/jquery.tmpl.min.js'
 	}
 
@@ -231,18 +231,17 @@ modules = {
 		resource url:'/js/SlickGrid-2.0.2/slick.grid.css'
 		resource url:'/js/SlickGrid-2.0.2/css/smoothness/jquery-ui-1.8.16.custom.css'
 		resource url:'/js/SlickGrid-2.0.2/examples/examples.css'
-		
+		resource url:'/js/SlickGrid-2.0.2/plugins/slick.headerbuttons.css'
+		resource url:'/js/SlickGrid-2.0.2/plugins/slick.headermenu.css'
+
+
 		resource url:'/js/SlickGrid-2.0.2/lib/jquery.event.drag-2.0.min.js'
-		
 		resource url:'/js/SlickGrid-2.0.2/slick.core.js'
 		resource url:'/js/SlickGrid-2.0.2/slick.formatters.js'
 		resource url:'/js/SlickGrid-2.0.2/slick.editors.js'
 		resource url:'/js/SlickGrid-2.0.2/slick.grid.js'
 		resource url:'/js/SlickGrid-2.0.2/plugins/slick.headerbuttons.js'
 		resource url:'/js/SlickGrid-2.0.2/plugins/slick.headermenu.js'
-		resource url:'/js/SlickGrid-2.0.2/plugins/slick.headerbuttons.css'
-		resource url:'/js/SlickGrid-2.0.2/plugins/slick.headermenu.css'
-
 		resource url:'/js/SlickGrid-2.0.2/plugins/slick.cellrangedecorator.js'
 		resource url:'/js/SlickGrid-2.0.2/plugins/slick.cellrangeselector.js'
 		resource url:'/js/SlickGrid-2.0.2/plugins/slick.cellselectionmodel.js'
