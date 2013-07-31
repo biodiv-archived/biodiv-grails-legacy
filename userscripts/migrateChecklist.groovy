@@ -140,22 +140,26 @@ def serializeChecklist(){
 	clIdList.each {  id ->
 		Checklists.withTransaction(){
 			def cl = Checklists.findByIdAndIsDeleted(id, false)
-			println cl
-			List cns = new ArrayList(Arrays.asList(cl.columnNames.split("\t")))
-			if(cns.contains("common_name")){
-				cl.commonNameColumn = "common_name"
-				cns.remove("common_name")
-				cns.add(0, "common_name")
+			if(!cl.columns){
+				println cl
+				List cns = new ArrayList(Arrays.asList(cl.columnNames.split("\t"))).collect{ it.trim()}
+				if(cns.contains("common_name")){
+					cl.commonNameColumn = "common_name"
+					cns.remove("common_name")
+					cns.add(0, "common_name")
+				}
+				
+				if(cns.contains("scientific_name")){
+					cl.sciNameColumn = "scientific_name"
+					cns.remove("scientific_name")
+					cns.add(0, "scientific_name")
+				}
+				
+				cl.columns = cns as JSON
+				if(!cl.save(flush:true)){
+					cl.errors.allErrors.each { println it }
+				}
 			}
-			
-			if(cns.contains("scientific_name")){
-				cl.sciNameColumn = "scientific_name"
-				cns.remove("scientific_name")
-				cns.add(0, "scientific_name")
-			}
-			
-			cl.columns = cns as JSON
-			cl.save(flush:true)
 		}
 	}
 }
@@ -179,11 +183,14 @@ def addFeedToChecklist(){
 			def ugs = cl.userGroups 
 			if(ugs){
 				ugs.each { ug ->
+					println "============= user group " + ug.name
 					def tDate = new Date(cl.fromDate.getTime() + 10)
 					checklistUtilService.addActivityFeed(cl, ug, cl.author, ActivityFeedService.CHECKLIST_POSTED_ON_GROUP, tDate)
 				}
 			}
-			cl.save(flush:true)
+			if(!cl.save(flush:true)){
+				cl.errors.allErrors.each { println it }
+			}
 		}
 	}
 	m.autoTimestamp = true
@@ -191,7 +198,7 @@ def addFeedToChecklist(){
 }
 
 
-addFeedToChecklist()
-serializeChecklist()
+//addFeedToChecklist()
+//serializeChecklist()
 
 println "================ done "
