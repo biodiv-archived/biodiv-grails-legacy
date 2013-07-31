@@ -183,6 +183,7 @@ def addFeedToChecklist(){
 			def ugs = cl.userGroups 
 			if(ugs){
 				ugs.each { ug ->
+					println "============= user group " + ug.name
 					def tDate = new Date(cl.fromDate.getTime() + 10)
 					checklistUtilService.addActivityFeed(cl, ug, cl.author, ActivityFeedService.CHECKLIST_POSTED_ON_GROUP, tDate)
 				}
