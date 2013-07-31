@@ -21,7 +21,8 @@ function getDataFromGrid(){
 }
 
 function addDirtyRows(e, args) {
-    dirtyRows.push(args.row);
+    if(dirtyRows)
+        dirtyRows.push(args.row);
 };
 
 function initGrid(data, columns, sciNameColumn, commonNameColumn) {
