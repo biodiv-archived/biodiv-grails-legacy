@@ -99,7 +99,7 @@ class ObservationService {
 	 * @param observation
 	 */
 	void updateObservation(params, observation){
-        log.debug "Updating obv with params ${params}"
+        //log.debug "Updating obv with params ${params}"
 		if(params.author)  {
 			observation.author = params.author;
 		}

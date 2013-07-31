@@ -20,6 +20,7 @@ function getDataFromGrid(){
 	return data;
 }
 
+
 function initGrid(data, columns, sciNameColumn, commonNameColumn) {
     var options = {
         editable: true,
@@ -30,8 +31,18 @@ function initGrid(data, columns, sciNameColumn, commonNameColumn) {
         fullWidthRows:true,
         rowHeight:32
     };
+
+    function setUnEditableColumn(columns){
+    	var unEditableColumn = "Id"
+    	$.each(columns, function(index, column) {
+    		if(column.name === unEditableColumn){
+    			column.editor = null;
+    		}	
+    	});
+    }
     
     $(function () {
+    	setUnEditableColumn(columns);
         grid = new Slick.Grid("#myGrid", data, columns, options);
         grid.autosizeColumns();
         grid.setSelectionModel(new Slick.CellSelectionModel());
@@ -174,16 +185,18 @@ function requiredFieldValidator(value) {
     }
 }
 
+/*
+ * This function is called in edit checklist page
+ */
 function loadGrid(url, id){
 	dirtyRows = new Array();
 	$.ajax({
 		url: url,
-                dataType: 'json',
+        dataType: 'json',
 		data:{id:id},
 		success: function(data){
 			var headers = data.columns;
 			var columns = new Array();
-			var finalCols =  new Array();
 			var editor = Slick.Editors.Text
 			$.each(headers, function(index, header) {
 				if(index > 0){

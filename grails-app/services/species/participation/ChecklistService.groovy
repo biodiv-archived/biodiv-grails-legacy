@@ -56,7 +56,7 @@ class ChecklistService {
 	static final String SN_NAME_KEY = "scientific_name"
 	static final String SN_NAME = "scientific_name" //"scientific_names" //"Scientific Name" //"scientific_name"
 	static final String CN_NAME = "common_name"
-	static final String OBSERVATION_COLUMN = "Observation_id_column"
+	static final String OBSERVATION_COLUMN = "Id"
 	static final String MEDIA_COLUMN = "Media"
 	
 	def grailsApplication
