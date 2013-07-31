@@ -76,7 +76,7 @@ input.dms_field {
 	display: none;       
 }
 .btn .combobox-clear {
-    margin-top: 12px;
+    margin-top: 5px;
 }
 #ui-datepicker-div {
 	width: 16%;
@@ -124,3 +124,7 @@ input.dms_field {
 .icon-help {
     background-image: url(../images/help.png);
 }
+.combobox-container .add-on {
+	right: -26px;
+}
+

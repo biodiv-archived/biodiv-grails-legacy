@@ -92,6 +92,9 @@
                 <div class="value">
                     <time class="timeago"
                     datetime="${observationInstance.fromDate.getTime()}"></time>
+                    <g:if test="${observationInstance.fromDate !=  observationInstance.toDate}">&nbsp;
+                    <b>-</b>&nbsp; <time class="timeago" datetime="${observationInstance.toDate.getTime()}"></time>
+                    </g:if>
                 </div>
             </div>
 
