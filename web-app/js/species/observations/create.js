@@ -345,7 +345,6 @@ function getSelectedHabitatArr() {
  */
 function selectColumn(selector, selectedColumn){
     var markColumnSelect = selector ? selector : this;
-    console.log(markColumnSelect);
     var columns = grid.getColumns();
     $(markColumnSelect).empty();
     $.each(columns, function(index, column) {
@@ -594,7 +593,6 @@ $(document).ready(function(){
     $("#commonNameColumn").focus(selectColumn2);
     
     $("#sciNameColumn").change(function() {
-        console.log('sciNameColumn changed');
         var columns = grid.getColumns();
         var sciNameColumn = $('#sciNameColumn').val();
         for (var i = 0, len = columns.length; i < len; i++) {
@@ -833,7 +831,6 @@ function openDetails(row, cell) {
 
     var data = grid.getData()[row];
 
-        console.log(grid.getData()[row].Media);
     var media = data.Media;
     if(media) {
         var obvDir = data.obvDir;
@@ -851,7 +848,6 @@ function openDetails(row, cell) {
           }*/
         for(i=0; i< media.length; i++) {
             var m = media[i];
-            console.log(m)
             //TODO:push rating also
             images.push({i:i+1, file:obvDir + "/" + m['file'], url:m['url'], thumbnail:m['thumbnail'], type:m['type'], title:m['fileName']});
         };
@@ -900,7 +896,6 @@ $(document).ready(function() {
             data.Media[j-1]['thumbnail'] = $('#image_'+j).attr('src');
         });
 
-        console.log(data.Media);
         grid.getEditController().commitCurrentEdit();
         addDirtyRows(undefined, {row:row});
         grid.invalidateRow(row);
@@ -909,3 +904,8 @@ $(document).ready(function() {
     });
 
 });
+function selectLicense($this, i) {
+    $('#license_'+i).val($.trim($this.text()));
+    $('#selected_license_'+i).find('img:first').replaceWith($this.html());
+    return false;
+}

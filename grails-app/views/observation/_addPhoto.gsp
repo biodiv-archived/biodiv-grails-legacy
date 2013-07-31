@@ -91,7 +91,7 @@
             <ul id="license_options_{{>i}}" class="dropdown-menu license_options">
                 <span>Choose a license</span>
                 <g:each in="${species.License.list()}" var="l">
-                <li class="license_option" onclick="$('#license_{{>i}}').val($.trim($(this).text()));$('#selected_license_{{>i}}').find('img:first').replaceWith($(this).html());">
+                <li class="license_option" onclick="console.log(this); selectLicense($(this), {{>i}})">
                 <img src="${resource(dir:'images/license',file:l?.name.getIconFilename()+'.png', absolute:true)}"/><span style="display:none;">${l?.name?.value}</span>
                 </li>
                 </g:each>

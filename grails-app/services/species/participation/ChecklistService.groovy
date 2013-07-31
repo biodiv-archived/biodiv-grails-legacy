@@ -87,7 +87,7 @@ class ChecklistService {
 		observationService.updateObservation(params, checklist)
 		
 		checklist.title =  params.title
-		checklist.license = License.findByName(License.fetchLicenseType(params.license_1))  
+		checklist.license = License.findByName(License.fetchLicenseType(params.license_0))  
 		checklist.refText =  params.refText
 		checklist.sourceText =  params.sourceText
 		checklist.rawChecklist =  params.rawChecklist ?:checklist.rawChecklist

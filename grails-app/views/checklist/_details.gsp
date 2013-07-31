@@ -20,7 +20,7 @@
     <label for="license" class="control-label"><g:message
         code="checklist.license.label" default="License" /> </label>
     <div class="controls">
-		<g:render template="/observation/selectLicense" model="['i':1, 'selectedLicense':observationInstance?.license]"/>
+		<g:render template="/observation/selectLicense" model="['i':0, 'selectedLicense':observationInstance?.license]"/>
         <div class="help-inline">
             <g:hasErrors bean="${observationInstance}" field="license">
             <g:eachError bean="${observationInstance}" field="license">
