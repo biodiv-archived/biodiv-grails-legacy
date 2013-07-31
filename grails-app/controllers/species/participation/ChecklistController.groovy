@@ -233,10 +233,18 @@ class ChecklistController {
             if(obv.resource) {
 			    tMap[ChecklistService.MEDIA] = new HashMap()
                 Iterator iterator = obv.resource?.iterator();
+                int index = 1;
                 while(iterator.hasNext()) {
-                    def res = iterator.next();
+/*                    def res = iterator.next();
+                    thumbnail
+                    file
+                    url 
+                    type
 
-                }
+                    tMap[ChecklistService.MEDIA]['file_'+index] = res.fileName;
+                    tMap[ChecklistService.MEDIA]['license_'+index] = res.fileName;
+                    tMap[ChecklistService.MEDIA]['rating_'+index] = res.fileName;
+  */              }
             }
 			obv.fetchChecklistAnnotation().each { ann ->
 				tMap[ann.key] = ann.value
