@@ -7,7 +7,7 @@ $(document).ready(function(){
         columns = eval(columns);
         loadDataToGrid(data, columns, '${params.sciNameColumn}', '${params.commonNameColumn}');
     } else {
-        loadGrid("${uGroup.createLink(controller:'checklist', action:'getObservationGrid')}", "${observationInstance.id}");
+    	loadGrid("${uGroup.createLink(controller:'checklist', action:'getObservationGrid')}", "${observationInstance.id}");
     }
 });
 </r:script>

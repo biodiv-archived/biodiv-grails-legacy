@@ -20,6 +20,7 @@ function getDataFromGrid(){
 	return data;
 }
 
+
 function initGrid(data, columns, sciNameColumn, commonNameColumn) {
     var options = {
         editable: true,
@@ -29,8 +30,18 @@ function initGrid(data, columns, sciNameColumn, commonNameColumn) {
         autoEdit: true,
         fullWidthRows:true
     };
+
+    function setUnEditableColumn(columns){
+    	var unEditableColumn = "Id"
+    	$.each(columns, function(index, column) {
+    		if(column.name === unEditableColumn){
+    			column.editor = null;
+    		}	
+    	});
+    }
     
     $(function () {
+    	setUnEditableColumn(columns);
         grid = new Slick.Grid("#myGrid", data, columns, options);
         grid.autosizeColumns();
         grid.setSelectionModel(new Slick.CellSelectionModel());
@@ -163,35 +174,32 @@ function requiredFieldValidator(value) {
     }
 }
 
+/*
+ * This function is called in edit checklist page
+ */
 function loadGrid(url, id){
 	dirtyRows = new Array();
 	$.ajax({
 		url: url,
-                dataType: 'json',
+        dataType: 'json',
 		data:{id:id},
 		success: function(data){
 			var headers = data.columns;
 			var columns = new Array();
-			var finalCols =  new Array();
 			var editor = Slick.Editors.Text
 			$.each(headers, function(index, header) {
-				if(index > 0){
-					finalCols.push({id:header, name: header, field: header, editor:editor, sortable:false, minWidth: 100});
-				}
-
-                                var column;
-                                if(header == 'Media') {
-                                    column = getMediaColumnOptions()
-                                } else {
-                                    column = {id:header, name: header, field: header, editor:editor, sortable:false, minWidth: 100};
-                                }
-                                
+                var column;
+                if(header == 'Media') {
+                    column = getMediaColumnOptions()
+                } else {
+                    column = {id:header, name: header, field: header, editor:editor, sortable:false, minWidth: 100};
+                }
 				columns.push(column);
 			});
-                        loadTextToGrid(data.data, columns, data.sciNameColumn, data.commonNameColumn);
-                        //grid.setColumns(finalCols);
-                        //grid.render();
-                        //grid.autosizeColumns();
+            loadTextToGrid(data.data, columns, data.sciNameColumn, data.commonNameColumn);
+            //grid.setColumns(finalCols);
+            //grid.render();
+            //grid.autosizeColumns();
 			return true;
 		},
 		error: function(xhr, status, error) {
