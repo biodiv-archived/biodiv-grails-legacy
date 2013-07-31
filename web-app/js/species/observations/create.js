@@ -110,7 +110,11 @@ function sciNameFormatter(row, cell, value, columnDef, dataContext) {
 }
 
 function addMediaFormatter(row, cell, value, columnDef, dataContext) {
-        return "<button class='btn btn-mini media'  title='Add Media' data-toggle='modal' data-target='#addResources'  onClick='openDetails("+row+","+cell+");return false;'>Add/Edit Media</button>"
+    var html = ''
+        if(value)
+            html = value
+        html += "<button class='btn btn-mini media'  title='Add Media' data-toggle='modal' data-target='#addResources'  onClick='openDetails("+row+","+cell+");return false;'>Add/Edit Media</button>"
+        return html;
 }
 
 function showGrid(){
@@ -176,7 +180,7 @@ function loadGrid(url, id){
 				}
 
                                 var column;
-                                if(header == 'Add/Edit Media') {
+                                if(header == 'Media') {
                                     column = getMediaColumnOptions()
                                 } else {
                                     column = {id:header, name: header, field: header, editor:editor, sortable:false, minWidth: 100};

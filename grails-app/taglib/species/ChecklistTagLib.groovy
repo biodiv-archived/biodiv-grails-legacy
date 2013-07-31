@@ -3,6 +3,8 @@ package species
 class ChecklistTagLib {
 	static namespace = "clist"
 	
+	def checklistService
+	
 	def showFilteredCheckList = {attrs, body->
 		out << render(template:"/common/checklist/showFilteredChecklistTemplate", model:attrs.model);
 	}
@@ -17,6 +19,9 @@ class ChecklistTagLib {
 	}
 	
 	def showData= {attrs, body->
+		if(!attrs.model.observations){
+			attrs.model.observations = checklistService.getObservationData(attrs.model.checklistInstance.id)
+		}
 		out << render(template:"/common/checklist/showChecklistDataTemplate", model:attrs.model);
 	}
 	

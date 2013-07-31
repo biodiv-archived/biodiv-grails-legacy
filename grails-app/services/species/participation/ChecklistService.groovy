@@ -1,6 +1,9 @@
 package species.participation
 
+
+import groovy.sql.Sql
 import grails.converters.JSON
+
 import java.io.File;
 import java.text.SimpleDateFormat
 import java.util.Date;
@@ -54,6 +57,7 @@ class ChecklistService {
 	static final String SN_NAME = "scientific_name" //"scientific_names" //"Scientific Name" //"scientific_name"
 	static final String CN_NAME = "common_name"
 	static final String OBSERVATION_COLUMN = "Observation_id_column"
+	static final String MEDIA_COLUMN = "Media"
 	
 	def grailsApplication
 	def observationService
@@ -61,7 +65,8 @@ class ChecklistService {
 	def obvUtilService;
 	def springSecurityService;
 	def activityFeedService;
-	def observationsSearchService
+	def observationsSearchService;
+	def dataSource;
 	
 	///////////////////////////////////////////////////////////////////////////////
 	////////////////////////////// Create ///////////////////////////////
@@ -168,7 +173,7 @@ class ChecklistService {
 			// checklist save page will have all new rows that will create new observation
 			params.checklistData.each {  Map m ->
 				def oldObvId = m.remove(OBSERVATION_COLUMN)
-				def media = m.remove('media');
+				def media = m.remove(MEDIA_COLUMN);
 
                 println "----------------------- ${media}"
                 Map p = new HashMap(obsParams);
@@ -466,6 +471,18 @@ class ChecklistService {
 			return false;
 	}
 
+	
+	def List getObservationData(id, params=[:]){
+		params.max = params.max ? params.max.toInteger() :10
+		params.offset = params.offset ? params.offset.toInteger() :0
+		def sql =  Sql.newInstance(dataSource);
+		def query = "select observation_id  as obv_id from checklists_observation where checklists_observations_id = " + id + " order by observations_idx limit " + params.max + " offset " + params.offset;
+		def res = []
+		sql.rows(query).each{
+			res << Observation.read(it.getProperty("obv_id"));
+		}
+		return res 
+	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	///////////////////////////////////////////  Export ////////////////////////////////////////////
