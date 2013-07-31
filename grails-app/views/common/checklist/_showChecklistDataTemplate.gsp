@@ -4,7 +4,7 @@
     right:0;
     }
 </style>
-<div class="resizable" style="overflow:auto;height:400px;">
+<div class="resizable" style="overflow:auto;max-height:400px;">
     <table class="table table-hover tablesorter checklist-data" style="margin-left: 0px;">
 
         <thead>
@@ -12,6 +12,7 @@
                 <g:each in="${checklistInstance.fetchColumnNames()}" var="cName">
                 <th title="${cName}">${cName.replaceAll("_", " ")}</th>
                 </g:each>
+                <th title="Observation">Media</th>
                 <th title="Observation">Observation</th>
                 <th title="Comments">Comments</th>
             </tr>

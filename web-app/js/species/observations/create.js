@@ -116,16 +116,13 @@ function addMediaFormatter(row, cell, value, columnDef, dataContext) {
     var html = '';
     if(value) {
         //HACK
-        var len = Object.keys(value).length;
-        for (var i=1; i<=len/6; i++) {
-            console.log(value);
-            if(value['type_'+i] == 'VIDEO')
-                html += "<img class='small_profile_pic' src='"+value['url_'+i]+"'/>";
-            else 
-                html += "<img class='small_profile_pic' src='"+value['thumbnail_'+i]+"'/>";
+        var len = value.length;
+        for (var i=0; i<len; i++) {
+            console.log(value[i]);
+            html += "<img class='small_profile_pic' src='"+value[i]['thumbnail']+"'/>";
         }
     }
-    html += "<button class='btn btn-mini'  title='Add Media' data-toggle='modal' data-target='#addResources'  onClick='openDetails("+row+","+cell+");return false;'>Add/Edit Media</button>";
+    html += "<button class='btn btn-mini'  title='Add Media' data-toggle='modal' data-target='#addResources'  onclick='openDetails("+row+","+cell+");return false;'>Add/Edit Media</button>";
     return html;
 }
 
@@ -192,16 +189,10 @@ function loadGrid(url, id){
 				if(index > 0){
 					finalCols.push({id:header, name: header, field: header, editor:editor, sortable:false, minWidth: 100});
 				}
-
-                                var column;
-                                if(header == 'Media') {
-                                    column = getMediaColumnOptions()
-                                } else {
-                                    column = {id:header, name: header, field: header, editor:editor, sortable:false, minWidth: 100};
-                                }
-                                
+                                var column = {id:header, name: header, field: header, editor:editor, sortable:false, minWidth: 100};
 				columns.push(column);
 			});
+                        columns.push(getMediaColumnOptions());
                         loadTextToGrid(data.data, columns, data.sciNameColumn, data.commonNameColumn);
                         //grid.setColumns(finalCols);
                         //grid.render();
@@ -833,45 +824,45 @@ function openDetails(row, cell) {
         return false;
     }
 
-    $('#addResourcesModal #imagesList').remove('.addedResource');
+    $('#addResourcesModal ul#imagesList>li.addedResource.thumbnail').remove();
 
     var data = grid.getData()[row];
-    var media = data.Media
-    var obvDir = data.obvDir;
-    var obvDirInput = $('#upload_resource input[name="obvDir"]');
-    if(!obvDirInput.val()){
-        $(obvDirInput).val(obvDir);
+
+        console.log(grid.getData()[row].Media);
+    var media = data.Media;
+    if(media) {
+        var obvDir = data.obvDir;
+        var obvDirInput = $('#upload_resource input[name="obvDir"]');
+        if(!obvDirInput.val()){
+            $(obvDirInput).val(obvDir);
+        }
+
+        var images = [];
+        var metadata = $(".metadata");
+        var i = 0;
+        /*if(metadata.length > 0) {
+          var file_id = $(metadata.get(-1)).children("input").first().attr("name");
+          i = parseInt(file_id.substring(file_id.indexOf("_")+1));
+          }*/
+        for(i=0; i< media.length; i++) {
+            var m = media[i];
+            console.log(m)
+            //TODO:push rating also
+            images.push({i:i+1, file:obvDir + "/" + m['file'], url:m['url'], thumbnail:m['thumbnail'], type:m['type'], title:m['fileName']});
+        };
+
+        var html = $( "#metadataTmpl" ).render( images );
+        var metadataEle = $(html);
+        metadataEle.each(function() {
+            //$('.geotagged_image', this).load(function(){
+            //    update_geotagged_images_list($(this));		
+            //});
+            var $ratingContainer = $(this).find('.star_obvcreate');
+            rate($ratingContainer)
+        })
+
+        $("#imagesList li:last" ).before (metadataEle);
     }
-    
-    var images = [];
-    var metadata = $(".metadata");
-    var i = 0;
-    if(metadata.length > 0) {
-        var file_id = $(metadata.get(-1)).children("input").first().attr("name");
-        i = parseInt(file_id.substring(file_id.indexOf("_")+1));
-    }
-   
-    var len = Object.keys(media).length
-    for(var i=1; i<=len/6; i++) {
-        var fileName = media['file_'+i]
-        var type =  media['type_'+i]
-        var thumbnail =  media['thumbnail_'+i]
-        var url =  media['url_'+i]
-        images.push({i:i++, file:obvDir + "/" + fileName, url:url, thumbnail:thumbnail, type:type, title:fileName});
-    };
-
-    var html = $( "#metadataTmpl" ).render( images );
-    var metadataEle = $(html);
-    metadataEle.each(function() {
-        //$('.geotagged_image', this).load(function(){
-        //    update_geotagged_images_list($(this));		
-        //});
-        var $ratingContainer = $(this).find('.star_obvcreate');
-        rate($ratingContainer)
-    })
-
-    $("#imagesList li:last" ).before (metadataEle);
-
 
     $('#addResourcesModal').data({'row':row, 'cell':cell}).modal('show');
 
@@ -891,12 +882,23 @@ $(document).ready(function() {
            return false;
        }
         var data = grid.getData()[row]
-        data.Media = {};
-        $.each($('#addResourcesModal').find('input'), function(index, input){
-            data.Media[$(input).attr('name')] = $(input).val();
+        var addedResources = $('#addResourcesModal ul#imagesList>li');
+        data.Media = new Array($(addedResources).length-1);
+        for(var i=0; i<$(addedResources).length-1; i++) {
+            data.Media[i] = {};
+        }
+        $.each($(addedResources).find('input'), function(index, input){
+            var name = $(input).attr('name');
+            var n = name.substring(0, name.lastIndexOf("_"));
+            var j = parseInt(name.substring(name.indexOf("_")+1));
+            data.Media[j-1][n] = $(input).val();
+            data.Media[j-1]['thumbnail'] = $('#image_'+j).attr('src');
         });
+
+        console.log(data.Media);
+        grid.getEditController().commitCurrentEdit();
+        console.log(grid.getData()[row].Media);
         $('#addResourcesModal').modal('toggle');
-        $('#addResourcesModal #imagesList').remove('.addedResource');
     });
 
 });

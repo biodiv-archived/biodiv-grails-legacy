@@ -68,7 +68,7 @@
 </div>
 <!--====== Template ======-->
 <script id="metadataTmpl" type="text/x-jquery-tmpl">
-    <li class="addedResource thumbnail">
+    <li class="addedResource thumbnail addedResource_{{>i}}">
     <div class='figure' style='height: 200px; overflow:hidden;'>
         <span> 
             <img id='image_{{>i}}' style="width:auto; height: auto;" src='{{>thumbnail}}' class='geotagged_image' exif='true'/> 

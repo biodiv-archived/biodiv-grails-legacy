@@ -4,6 +4,7 @@ import grails.converters.JSON
 import species.License;
 import species.groups.SpeciesGroup;
 import grails.plugins.springsecurity.Secured;
+import species.Resource.ResourceType;
 
 class ChecklistController {
 	
@@ -225,20 +226,28 @@ class ChecklistController {
 		cl.observations.each {Observation obv ->
 			def tMap = [:]
 			tMap[ChecklistService.OBSERVATION_COLUMN] = obv.id
-			tMap['obvDir'] = '';
             if(obv.resource) {
-			    tMap[ChecklistService.MEDIA_COLUMN] = new HashMap()
+			    tMap[ChecklistService.MEDIA_COLUMN] = [obv.resource.size()];
                 Iterator iterator = obv.resource?.iterator();
-                int index = 1;
+                int index = 0;
+                String obvDir;
                 while(iterator.hasNext()) {
                     def res = iterator.next();
-                    tMap[ChecklistService.MEDIA_COLUMN]['file_'+index] = res.fileName;
-                    tMap[ChecklistService.MEDIA_COLUMN]['thumbnail_'+index] = res.thumbnailUrl();
-                    tMap[ChecklistService.MEDIA_COLUMN]['url_'+index] = res.url;
-                    tMap[ChecklistService.MEDIA_COLUMN]['license_'+index] = res.licenses.collect { it.name }.join(',');
-                    tMap[ChecklistService.MEDIA_COLUMN]['type_'+index] = res.type.value();
-                    tMap[ChecklistService.MEDIA_COLUMN]['rating_'+index] = res.rating;
+                    def r = new HashMap()
+                    r['file'] = res.fileName;
+                    r['thumbnail'] = res.thumbnailUrl();
+                    r['url'] = res.url;
+                    r['license'] = res.licenses.collect { it.name }.join(',');
+                    r['type'] = res.type.name();
+                    r['rating'] = res.rating;
+                    if(res.type != ResourceType.VIDEO) {
+                        obvDir = res.fileName.split('/')[1];
+                    }
+                    tMap[ChecklistService.MEDIA_COLUMN][index] = r
+                    index++
                 }
+                if(obvDir)
+			        tMap['obvDir'] = obvDir;
             }
 			obv.fetchChecklistAnnotation().each { ann ->
 				tMap[ann.key] = ann.value
