@@ -98,7 +98,6 @@ class ChecklistService {
 		checklist.columnNames =  params.columnNames ?:checklist.columnNames
 		checklist.columns =  params.columns?params.columns as JSON:checklist.columns
 		
-
 		checklist.isChecklist = true
 	}
 	
@@ -165,7 +164,7 @@ class ChecklistService {
 		Checklists.withTransaction() {
 			Set updatedObv = new HashSet()
 			Set newObv = new HashSet()
-			def obsParams = getParamsForObv(params, checklistInstance)
+			def commonObsParams = getParamsForObv(params, checklistInstance)
 			
 			//Each entry in checklistData represent one observatoin
 			// if it has observation id column then those observation needs to be updated else new observation will be created
@@ -176,9 +175,9 @@ class ChecklistService {
 				def media = m.remove(MEDIA_COLUMN);
 
                 println "----------------------- ${media}"
-                Map p = new HashMap(obsParams);
+                Map obsParams = new HashMap(commonObsParams);
                 if(media) {
-                    p.putAll(media);
+                    obsParams.putAll(media);
                 }
 
 				// for old observation
@@ -190,7 +189,7 @@ class ChecklistService {
 					obsParams.action = "save"
 				}	
 				obsParams.checklistAnnotations = m as JSON
-				def res = observationService.saveObservation(p, false)
+				def res = observationService.saveObservation(obsParams, false)
 				Observation observationInstance = res.observationInstance
 				saveReco(observationInstance, m, checklistInstance)
 				//saveObservationAnnotation(observationInstance, m, Arrays.asList(checklistInstance.fetchColumnNames()))
@@ -202,12 +201,12 @@ class ChecklistService {
 			}
 			//if any global thing (ie. species group, habitat) changes then updating all the observation
 			if(isGlobalUpdate){
-				obsParams.action = "update"
-				obsParams.checklistAnnotations = null
+				commonObsParams.action = "update"
+				commonObsParams.checklistAnnotations = null
 				checklistInstance.observations.each { obv ->
 					if(!updatedObv.contains(obv.id) && !(newObv.contains(obv.id))){
-						obsParams.id = obv.id
-						observationService.saveObservation(obsParams, false)
+						commonObsParams.id = obv.id
+						observationService.saveObservation(commonObsParams, false)
 					}
 				}
 			}
@@ -476,7 +475,7 @@ class ChecklistService {
 
 	
 	def List getObservationData(id, params=[:]){
-		params.max = params.max ? params.max.toInteger() :10
+		params.max = params.max ? params.max.toInteger() :50
 		params.offset = params.offset ? params.offset.toInteger() :0
 		def sql =  Sql.newInstance(dataSource);
 		def query = "select observation_id  as obv_id from checklists_observation where checklists_observations_id = " + id + " order by observations_idx limit " + params.max + " offset " + params.offset;
