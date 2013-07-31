@@ -601,7 +601,7 @@ class ChecklistService {
 						def m = [:]
 						obv.fetchChecklistAnnotation().each { a ->
 							if(a.value){
-								m.put(a.key, a.value)
+								m.put(a.key.trim(), a.value.trim())
 							}
 						}
 						obv.checklistAnnotations = m as JSON
