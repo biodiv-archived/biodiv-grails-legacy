@@ -51,7 +51,7 @@
             </g:each>	
         </tbody>
     </table>
-    <g:if test="${checklistInstance.speciesCount > (params.max?:10)}">
+    <g:if test="${checklistInstance.speciesCount > (params.max?:50)}">
     <div class="centered">
         <div class="btn loadMore">
             <span class="progress" style="display: none;">Loading ... </span> <span

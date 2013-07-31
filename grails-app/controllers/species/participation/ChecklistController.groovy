@@ -44,6 +44,7 @@ class ChecklistController {
 				//checklistInstance = Checklists.findByIdAndIsDeleted(params.id.toLong(), false, [fetch: [observations: 'join']])
 				checklistInstance.incrementPageVisit()
 				def userGroupInstance;
+				params.max = params.max?params.max.toInteger():50 
 				if(params.webaddress) {
 					userGroupInstance = userGroupService.get(params.webaddress);
 				}
@@ -138,14 +139,8 @@ class ChecklistController {
 		params.checklistColumns = JSON.parse(params.checklistColumns)
 		List columnList = params.checklistColumns.collect { it.name }
 		
-		if(columnList.contains("addMedia")){
-			columnList.remove("addMedia");
-			/*params.checklistData.each { m ->
-				def media = m.remove("addMedia");
-                if(media) {
-                    
-                }
-			}*/
+		if(columnList.contains(ChecklistService.MEDIA_COLUMN)){
+			columnList.remove(ChecklistService.MEDIA_COLUMN);
 		}
 		
 		if(params.action == 'edit' ||params.action == 'update'){
