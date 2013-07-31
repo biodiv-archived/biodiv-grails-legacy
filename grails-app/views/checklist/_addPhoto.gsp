@@ -1,6 +1,7 @@
 
 <div id="addResourcesModal" class="modal hide fade span8">
      <div class="modal-header">
+         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
      </div>
      <div class="modal-body">
         <g:render template="/observation/addPhoto"/>

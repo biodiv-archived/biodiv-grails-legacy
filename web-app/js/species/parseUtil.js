@@ -105,7 +105,7 @@ function getMediaColumnOptions() {
     field:'Media',
     width: 100,
     selectable: false,
-    resizable: false,
+    resizable: true,
     formatter:addMediaFormatter
   }
 }

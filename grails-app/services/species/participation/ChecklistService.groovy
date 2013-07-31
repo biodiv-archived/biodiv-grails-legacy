@@ -177,7 +177,11 @@ class ChecklistService {
                 println "----------------------- ${media}"
                 Map obsParams = new HashMap(commonObsParams);
                 if(media) {
-                    obsParams.putAll(media);
+                    media.eachWithIndex{ item, index ->
+                        item.each { key, value ->
+                            obsParams.put(key+'_'+index, value);
+                        }
+                    }
                 }
 
 				// for old observation

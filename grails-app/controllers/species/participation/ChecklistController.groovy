@@ -4,6 +4,7 @@ import grails.converters.JSON
 import species.License;
 import species.groups.SpeciesGroup;
 import grails.plugins.springsecurity.Secured;
+import species.Resource.ResourceType;
 
 class ChecklistController {
 	
@@ -226,20 +227,27 @@ class ChecklistController {
 			def tMap = [:]
 			tMap[ChecklistService.OBSERVATION_COLUMN] = obv.id
             if(obv.resource) {
-			    tMap[ChecklistService.MEDIA] = new HashMap()
+			    tMap[ChecklistService.MEDIA_COLUMN] = [obv.resource.size()];
                 Iterator iterator = obv.resource?.iterator();
-                int index = 1;
+                int index = 0;
+                String obvDir;
                 while(iterator.hasNext()) {
-/*                    def res = iterator.next();
-                    thumbnail
-                    file
-                    url 
-                    type
-
-                    tMap[ChecklistService.MEDIA]['file_'+index] = res.fileName;
-                    tMap[ChecklistService.MEDIA]['license_'+index] = res.fileName;
-                    tMap[ChecklistService.MEDIA]['rating_'+index] = res.fileName;
-  */              }
+                    def res = iterator.next();
+                    def r = new HashMap()
+                    r['file'] = res.fileName;
+                    r['thumbnail'] = res.thumbnailUrl();
+                    r['url'] = res.url;
+                    r['license'] = res.licenses.collect { it.name }.join(',');
+                    r['type'] = res.type.name();
+                    r['rating'] = res.rating;
+                    if(res.type != ResourceType.VIDEO) {
+                        obvDir = res.fileName.split('/')[1];
+                    }
+                    tMap[ChecklistService.MEDIA_COLUMN][index] = r
+                    index++
+                }
+                if(obvDir)
+			        tMap['obvDir'] = obvDir;
             }
 			obv.fetchChecklistAnnotation().each { ann ->
 				tMap[ann.key] = ann.value
