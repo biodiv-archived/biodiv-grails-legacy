@@ -104,16 +104,17 @@ function initGrid(data, columns, sciNameColumn, commonNameColumn) {
             var menu = args.menu;
             var i = menu.items.length;
             var iconClass = undefined
-            menu.items[0].iconImage = (args.column.name === $("#sciNameColumn").val())?'/biodiv/images/cancel-on.png':undefined
-            menu.items[1].iconImage = (args.column.name === $("#commonNameColumn").val())?'/biodiv/images/cancel-on.png':undefined
+            menu.items[0].iconCssClass = (args.column.name === $("#sciNameColumn").val())?'icon-check':undefined
+            menu.items[1].iconCssClass = (args.column.name === $("#commonNameColumn").val())?'icon-check':undefined
         });
 
         headerMenuPlugin.onCommand.subscribe(function(e, args) {
             if(args.command === 'sciNameColumn') {
                 $('#sciNameColumn').val(args.column.name);
-                selectSciNameColumn();
+                selectNameColumn($('#sciNameColumn'), sciNameFormatter);
             } else if(args.command === 'commonNameColumn') {
                 $('#commonNameColumn').val(args.column.name);
+                selectNameColumn($('#commonNameColumn'), commonNameFormatter);
             }
         });
 
@@ -145,6 +146,17 @@ function sciNameFormatter(row, cell, value, columnDef, dataContext) {
     else
         return '<i>'+value+'</i>';
 }
+function commonNameFormatter(row, cell, value, columnDef, dataContext) {
+    if (value == null || value == undefined || !value.length)
+        return '';
+    else if(dataContext.speciesId)
+        return "<a href='"+window.params.species.url + '/' + dataContext.speciesId+"' target='_blank' title='"+dataContext.speciesTitle+"'>"+value+"</a> "
+    else if(dataContext.speciesTitle)
+        return "<span title='"+dataContext.speciesTitle+"'>"+value+"</span>"
+    else
+        return value;
+}
+
 
 /**
  */
@@ -378,17 +390,17 @@ function selectColumn(selector, selectedColumn){
     }
 };
 
-function selectSciNameColumn() {
+function selectNameColumn(selectedColumn, formatter) {
     var columns = grid.getColumns();
-    var sciNameColumn = $('#sciNameColumn').val();
+    var nameColumn = $(selectedColumn).val();
     for (var i = 0, len = columns.length; i < len; i++) {
         var column = columns[i];
-        if(column.editor == AutoCompleteEditor && sciNameColumn != column.id) {
+        if(column.editor == AutoCompleteEditor && nameColumn != column.id) {
             column.editor = Slick.Editors.Text;
             column.formatter = undefined;
-        } else if(sciNameColumn == column.id){
+        } else if(nameColumn == column.id){
             column.editor = AutoCompleteEditor;
-            column.formatter = sciNameFormatter;
+            column.formatter = formatter;
         }
     };
     grid.invalidate();
@@ -658,9 +670,13 @@ $(document).ready(function(){
         var sciNameColumn = $('#sciNameColumn').val();
         var commonNameColumn = $('#commonNameColumn').val();
 
-        if(((typeof(sciNameColumn) == 'undefined') || (sciNameColumn == null)) && ((typeof(commonNameColumn) == 'undefined') || (commonNameColumn == null))) {
+        if(((typeof(sciNameColumn) == 'undefined') || (sciNameColumn == '')) && ((typeof(commonNameColumn) == 'undefined') || (commonNameColumn == ''))) {
             confirm("Please mark scientific name column or common name column in the list");
-            return
+            return;
+        }
+        if(sciNameColumn === commonNameColumn) {
+            alert('Same column is mentioned as scientific name and common name.');
+            return;
         }
 
         $.ajax({
@@ -671,23 +687,27 @@ $(document).ready(function(){
             success : function(data) {
                 var gridData = grid.getData();
                 var sciNameColumnIndex = grid.getColumnIndex($('#sciNameColumn').val());
-                var column = grid.getColumns()[sciNameColumnIndex];
+                var sciNameColumn = grid.getColumns()[sciNameColumnIndex];
+                var commonNameColumnIndex = grid.getColumnIndex($('#commonNameColumn').val());
+                var commonNameColumn = grid.getColumns()[commonNameColumnIndex];
                 var changes = {};
                 for(rowId in data) {
                     if(data.hasOwnProperty(rowId)) {
-                        var columnId = column.id
                         rowId = parseInt(rowId, 10);
                         if(!changes[rowId])
                             changes[rowId] = {}
+                        
                         if(data[rowId].id) {
-                            changes[rowId][column.id] = 'validReco'
+                            if(sciNameColumn) changes[rowId][sciNameColumn.id] = 'validReco'
+                            if(commonNameColumn) changes[rowId][commonNameColumn.id] = 'validReco'
        
                             var dataItem = grid.getDataItem(rowId);
                             if(data[rowId].speciesId)
                                 dataItem.speciesId = data[rowId].speciesId;
                             dataItem.speciesTitle = data[rowId].name;
                         } else if (data[rowId].parsed) {
-                            changes[rowId][column.id] = 'parsed'
+                            if(sciNameColumn) changes[rowId][sciNameColumn.id] = 'parsed'
+                            if(commonNameColumn) changes[rowId][commonNameColumn.id] = 'parsed'
                         }
                     }
                     grid.invalidateRow(rowId);
@@ -695,7 +715,7 @@ $(document).ready(function(){
 
                 grid.setCellCssStyles("highlight", changes);
                 grid.render();
-                $('#createChecklist').show();
+                $('#createChecklist').trigger('click');
             },
             error: function(xhr, textStatus, errorThrown) {
                 alert(xhr);

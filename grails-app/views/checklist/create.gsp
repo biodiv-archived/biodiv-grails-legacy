@@ -89,12 +89,14 @@
                                             <g:message code="checklist.scientific_name.validator.invalid" />
                                             </g:hasErrors>
                                         </div>
+                                    <a id="parseNames" class="btn btn-primary"
+                                        style="float: right; margin-right: 5px;display:none;">Validate Names</a>
+ 
                                     </div>
+   
                                 </div>	
                             </div>
-                            <a id="parseNames" class="btn btn-primary"
-                                style="float: right; margin-right: 5px;display:none;">Validate Names</a>
- 
+
                         </div>
                     </div>
 
@@ -106,7 +108,7 @@
                                 <g:render template="/observation/selectGroupHabitatDate" model="['observationInstance':observationInstance]"/>
                             </div>
                             <div class="section" style="clear:both;">
-                            <g:render template="dateInput" model="['observationInstance':observationInstance]"/>
+                            <g:render template="/observation/dateInput" model="['observationInstance':observationInstance]"/>
                             <%
                             def obvInfoFeeder = lastCreatedObv ? lastCreatedObv : observationInstance
                             %>
