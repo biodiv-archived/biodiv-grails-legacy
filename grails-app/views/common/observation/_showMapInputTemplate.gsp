@@ -129,6 +129,8 @@ function loadMapInput() {
             var drawControls, editControls;
             <g:if test="${params.controller == 'checklist'}">
                 drawControls = {
+                    rectangle:true,
+                    circle:true,
                     polygon:true,
                     polyline:true,
                     marker:false

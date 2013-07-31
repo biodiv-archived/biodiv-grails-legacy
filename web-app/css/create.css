@@ -121,6 +121,14 @@ input.dms_field {
     background: inherit !important;
 }
 
+.slick-header-column > .slick-header-menubutton {
+    display:inline-block    
+}
+
+.slick-header-menuitem>.slick-header-menuicon.icon-check {
+    background-position:-144px -72px;
+}
+
 .icon-help {
     background-image: url(../images/help.png);
 }
