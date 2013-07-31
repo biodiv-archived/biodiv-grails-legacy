@@ -65,7 +65,8 @@ class Checklists extends Observation {
 		columnNames  nullable:false ;
 		rawChecklist nullable:true;
 		license  nullable:false, blank:false;
-		columns nullable:false, blank:false;
+		//make this false after migration
+		columns nullable:true, blank:false;
 		
 		//attribution nullable:true;
 		reservesValue nullable:true;
@@ -85,7 +86,8 @@ class Checklists extends Observation {
 			}
 		}
 		//at least one of the column name must present 
-		sciNameColumn validator : {val, obj -> val || obj.commonNameColumn }, nullable:true, blank:false;
+		//sciNameColumn validator : {val, obj -> val || obj.commonNameColumn }, nullable:true, blank:false;
+		sciNameColumn nullable:true, blank:false;
 		commonNameColumn nullable:true, blank:false;
 	}
 
