@@ -493,7 +493,7 @@ ul#recoSummary {
 	background-color: #ffffff;
 }
 
-#addObservation #imagesList {
+#addObservation #imagesList, #addResourcesModal #imagesList {
 	background-color: #fefad5;
 	border-bottom: 1px solid #9E9E9E;
 	border-top: 1px solid #9E9E9E;
@@ -732,6 +732,7 @@ ul#recoSummary {
 	min-height: 16px;
 	max-width: 32px;
 	width: auto;
+        margin:2px;
 }
 
 .very_small_profile_pic {
@@ -2066,7 +2067,7 @@ div.noOfRatings {
     font-weight:bold;
 }
 
-#addResourcesModal{
+#addResourcesModal {
     width:725px;
     left:40%;
 }
