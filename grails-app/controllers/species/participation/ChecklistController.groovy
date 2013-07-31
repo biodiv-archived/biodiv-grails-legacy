@@ -230,6 +230,14 @@ class ChecklistController {
 		cl.observations.each {Observation obv ->
 			def tMap = [:]
 			tMap[ChecklistService.OBSERVATION_COLUMN] = obv.id
+            if(obv.resource) {
+			    tMap[ChecklistService.MEDIA] = new HashMap()
+                Iterator iterator = obv.resource?.iterator();
+                while(iterator.hasNext()) {
+                    def res = iterator.next();
+
+                }
+            }
 			obv.fetchChecklistAnnotation().each { ann ->
 				tMap[ann.key] = ann.value
 			}

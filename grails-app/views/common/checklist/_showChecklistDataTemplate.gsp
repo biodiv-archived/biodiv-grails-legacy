@@ -4,7 +4,7 @@
     right:0;
     }
 </style>
-<div class="resizable" style="overflow:auto;maxHeight:400px;">
+<div class="resizable" style="overflow:auto;height:400px;">
     <table class="table table-hover tablesorter checklist-data" style="margin-left: 0px;">
 
         <thead>
@@ -42,7 +42,8 @@
                 </td>
                 <td>
                     <g:render template="/observation/showObservationImagesList" model="['observationInstance':observation]"/>
-               </td>
+                </td>
+
                 <td>
                     <comment:showCommentPopup model="['commentHolder':observation, 'rootHolder':checklistInstance]" />
                 </td>
@@ -50,7 +51,7 @@
             </g:each>	
         </tbody>
     </table>
-    <g:if test="${checklistInstance.speciesCount > (params.max?:0)}">
+    <g:if test="${checklistInstance.speciesCount > (params.max?:10)}">
     <div class="centered">
         <div class="btn loadMore">
             <span class="progress" style="display: none;">Loading ... </span> <span
@@ -58,7 +59,6 @@
         </div>
     </div>
     </g:if>
-
     <div class="paginateButtons" style="visibility: hidden; clear: both">
         <p:paginate total="${checklistInstance.speciesCount?:0}" action="${'observationData'}" controller="${params.controller?:'checklist'}"
         userGroup="${userGroupInstance}" userGroupWebaddress="${userGroupWebaddress?:params.webaddress}"

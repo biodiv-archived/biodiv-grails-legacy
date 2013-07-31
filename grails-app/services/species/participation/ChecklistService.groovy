@@ -270,6 +270,10 @@ class ChecklistService {
 		def reco = res.mainReco
 		def cnReco = res.commonNameReco
 		
+		if(!reco){
+			return false
+		}
+		
 		if(obv.fetchSpeciesCall() != reco.name)
 			return true
 		
@@ -296,7 +300,6 @@ class ChecklistService {
 		List dirtyPropList = Checklists.fetchDirtyFields()
 		for (String prop : dirtyPropList) {
 			if(cl.isDirty(prop)){
-				//println "================diry prop " + prop
 				return true
 			}
 		}
@@ -592,7 +595,9 @@ class ChecklistService {
 					cl.observations.each { obv ->
 						def m = [:]
 						obv.fetchChecklistAnnotation().each { a ->
-							m.put(a.key, a.value)
+							if(a.value){
+								m.put(a.key, a.value)
+							}
 						}
 						obv.checklistAnnotations = m as JSON
 						obv.save(flush:true)
