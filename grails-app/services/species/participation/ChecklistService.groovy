@@ -229,7 +229,7 @@ class ChecklistService {
 	private getSafeAnnotation(Map m){
 		def newMap = [:]
 		m.each { k, v ->
-			if(v && v.trim() != ""){
+			if(v && !m.isNull(k)){
 				newMap.put(k.trim(), v.trim())
 			}
 		}

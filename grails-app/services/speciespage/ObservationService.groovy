@@ -1380,7 +1380,7 @@ class ObservationService {
 		def messageArgs = [label, params.id]
 		def observationInstance = Observation.get(params.id.toLong())
 		if (observationInstance && SUserService.ifOwns(observationInstance.author)) {
-			def mailType = observationInstance.instanceOf(Checklists) ? OBSERVATION_DELETED : CHECKLIST_DELETED
+			def mailType = observationInstance.instanceOf(Checklists) ? CHECKLIST_DELETED : OBSERVATION_DELETED
 			try {
 				observationInstance.isDeleted = true;
 				observationInstance.save(flush: true)
