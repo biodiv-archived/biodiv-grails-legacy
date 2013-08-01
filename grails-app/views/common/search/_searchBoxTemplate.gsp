@@ -55,7 +55,7 @@ $(document).ready(function() {
                     'url':"${uGroup.createLink('controller':'species', action:'show', 'userGroup':userGroupInstance)}"
                 },
                 'content':{
-                    'url':"${uGroup.createLink('controller':'content', 'userGroup':userGroupInstance)}"
+                    'url':"${uGroup.createLink('controller':'content')}"
                 },
                 'observation':{
                     listUrl:"${uGroup.createLink(controller:'observation', action: 'listJSON', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}",
