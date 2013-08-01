@@ -1380,7 +1380,7 @@ class ObservationService {
 		def messageArgs = [label, params.id]
 		def observationInstance = Observation.get(params.id.toLong())
 		if (observationInstance && SUserService.ifOwns(observationInstance.author)) {
-			def mailType = observationInstance.instanceOf(Observation) ? OBSERVATION_DELETED : CHECKLIST_DELETED
+			def mailType = observationInstance.instanceOf(Checklists) ? OBSERVATION_DELETED : CHECKLIST_DELETED
 			try {
 				observationInstance.isDeleted = true;
 				observationInstance.save(flush: true)
@@ -1410,7 +1410,6 @@ class ObservationService {
 		try {
 			
 		def targetController =  getTargetController(obv)//obv.getClass().getCanonicalName().split('\\.')[-1]
-		targetController = targetController.replaceFirst(targetController[0], targetController[0].toLowerCase());
 		def obvUrl, domain
 	
         try {
@@ -1560,7 +1559,7 @@ class ObservationService {
 				templateMap["userGroupWebaddress"] = userGroupWebaddress
 				templateMap["activity"] = activityFeedService.getContextInfo(feedInstance, [webaddress:userGroupWebaddress])
 				templateMap['domainObjectTitle'] = getTitle(activityFeedService.getDomainObject(feedInstance.rootHolderType, feedInstance.rootHolderId))
-				templateMap['domainObjectType'] = feedInstance.rootHolderType.split('\\.')[-1].toLowerCase()
+				templateMap['domainObjectType'] = targetController
 				mailSubject = "New comment in ${templateMap['domainObjectType']}"
 				toUsers.addAll(getParticipants(obv))
 				break;
