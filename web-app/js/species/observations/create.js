@@ -81,7 +81,8 @@ function initGrid(data, columns, sciNameColumn, commonNameColumn) {
                         id:newColumnName,
                         name:newColumnName,
                         field:newColumnName,
-                        editor: Slick.Editors.TextCellEditor
+                        editor: Slick.Editors.TextCellEditor,
+                        header:getHeaderMenuOptions()
                     }, options);
 
                     newColumn = options;
@@ -809,11 +810,6 @@ $(document).ready(function(){
     this.init = function () {
       $input = $("<INPUT type=text class='editor-text' />")
           .appendTo(args.container)
-          .bind("keydown.nav", function (e) {
-            if (e.keyCode === $.ui.keyCode.LEFT || e.keyCode === $.ui.keyCode.RIGHT || e.keyCode === $.ui.keyCode.DOWN || e.keyCode === $.ui.keyCode.UP) {
-              e.stopImmediatePropagation();
-            }
-          })
           .focus()
           .select();
 
@@ -827,10 +823,18 @@ $(document).ready(function(){
                     args.item.speciesId = ui.item.speciesId
                     args.item.speciesTitle = ui.item.value
                 }
+                //CHANGING item value itself
+                ui.item.value = ui.item.label.replace(/<.*?>/g,"");
             }, open: function(event, ui) {
                 $("#nameSuggestions ul").css({'display': 'block','width':'300px'}); 
             }
-        }); 
+        });
+        $input.bind("keydown.nav", function (e) {
+            if (e.keyCode === $.ui.keyCode.LEFT || e.keyCode === $.ui.keyCode.RIGHT || e.keyCode === $.ui.keyCode.DOWN || e.keyCode === $.ui.keyCode.UP) {
+              e.stopImmediatePropagation();
+            }
+          })
+
     };
 
     this.destroy = function () {
@@ -973,8 +977,8 @@ $(document).ready(function() {
         grid.render();
         $('#addResourcesModal').modal('toggle');
     });
-
 });
+
 function selectLicense($this, i) {
     $('#license_'+i).val($.trim($this.text()));
     $('#selected_license_'+i).find('img:first').replaceWith($this.html());

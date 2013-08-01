@@ -53,10 +53,10 @@
                                 <i class="icon-picture"></i>
                                 Type your list below
                                 <g:if test="${ params.action != 'create'}">
-                                or
                                 <g:render template="/checklist/showEditGrid" model="['observationInstance':observationInstance, 'checklistData':checklistData, 'checklistColumns':checklistColumns, 'sciNameColumn':sciNamecolumn, 'commonNameColumn':commonNameColumn]"/>
                                 </g:if>
                                 <g:else>
+                                or
                                 <div class="upload_file" style="display:inline-block">
                                     <g:render template='/UFile/docUpload' model="['name': 'checklistStartFile', fileParams:fileParams, allowedExtensions:allowedExtensions,uploadCallBack:'showGrid()']" />
                                 </div>
@@ -65,7 +65,7 @@
                             <div>
                                 <input id="checklistColumns" name="checklistColumns" class="input-block-level" value='' placeHolder="Enter column headers separated by commas. Eg: scientific name,  common name, notes,.... "/>
                             </div>
-                            <g:textArea id="checklistData" name="checklistData" rows="5" class="input-block-level" placeholder='Enter one line per species (Scientific name and/or common name), additional columns separated by &quot;,&quot;.'/>
+                            <g:textArea id="checklistData" name="checklistData" rows="5" class="input-block-level" placeholder="Enter one line per species (Scientific name and/or common name), additional columns separated by ','."/>
                             <input id="rawChecklist" name="rawChecklist" type="hidden" value='' />
                             <ul class="help-block">
                                 <li><small>Please add comma separated values</small></li>
