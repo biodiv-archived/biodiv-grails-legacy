@@ -524,6 +524,11 @@ class Observation extends Metadata implements Taggable, Rateable {
 	
 	def fetchChecklistAnnotation(){
 		def res = [:]
+		// if this observation does not belong to any checklist
+		if(id == sourceId){
+			return res
+		}
+		
 		Checklists cl = Checklists.read(sourceId)
 		if(checklistAnnotations){
 			def m = JSON.parse(checklistAnnotations)
