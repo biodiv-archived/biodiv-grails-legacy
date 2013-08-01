@@ -178,7 +178,7 @@ class ObservationController {
 	@Secured(['ROLE_USER'])
 	def update = {
 		log.debug params;
-		def observationInstance = Observation.get(params.id.toLong())
+		def observationInstance = Observation.get(params.id?.toLong())
 		if(observationInstance)	{
 			saveAndRender(params, false)
 		}else {
@@ -288,7 +288,7 @@ class ObservationController {
 	
 	@Secured(['ROLE_USER'])
 	def edit = {
-		def observationInstance = Observation.findWhere(id:params.id.toLong(), isDeleted:false)
+		def observationInstance = Observation.findWhere(id:params.id?.toLong(), isDeleted:false)
 		if (!observationInstance) {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
 			redirect (url:uGroup.createLink(action:'list', controller:"observation", 'userGroupWebaddress':params.webaddress))

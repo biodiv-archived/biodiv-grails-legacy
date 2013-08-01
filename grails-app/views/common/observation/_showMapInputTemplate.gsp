@@ -120,6 +120,7 @@
 
 <r:script>
 function loadMapInput() {
+console.log('loadMapInput');
     $("#map_canvas").show();
     $("#latlng").show();
     if(!isMapViewLoaded) {
@@ -147,6 +148,14 @@ function loadMapInput() {
 }
 
 $(document).ready(function() {
+    $(".address .add-on").click(function(){
+        if($("#map_canvas").is(':visible')) {
+            $("#map_canvas").hide();
+            $("#latlng").hide();
+            return false;
+        }
+    });
+
     $(".address").click(loadMapInput);
 });
 </r:script>

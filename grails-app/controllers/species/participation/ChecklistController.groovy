@@ -188,7 +188,7 @@ class ChecklistController {
 	@Secured(['ROLE_USER'])
 	def edit = {
         log.debug params;
-		def observationInstance = Checklists.findByIdAndIsDeleted(params.id.toLong(), false)
+		def observationInstance = Checklists.findByIdAndIsDeleted(params.id?.toLong(), false)
 		if (!observationInstance) {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
 			redirect (url:uGroup.createLink(action:'list', controller:"observation", 'userGroupWebaddress':params.webaddress))
@@ -204,7 +204,7 @@ class ChecklistController {
 	@Secured(['ROLE_USER'])
 	def update = {
 		log.debug params;
-		def observationInstance = Checklists.findByIdAndIsDeleted(params.id.toLong(), false)
+		def observationInstance = Checklists.findByIdAndIsDeleted(params.id?.toLong(), false)
 		if(observationInstance)	{
 			def result = saveAndRender(params, false)
             if(result.success){
