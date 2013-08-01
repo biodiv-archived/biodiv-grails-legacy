@@ -21,7 +21,7 @@
             <tr class="${'mainContent ' + observation?.maxVotedReco?.name?.replaceAll(' ', '_')}">
                 <g:each in="${observation.fetchChecklistAnnotation()}" var="annot">
                     <g:if test="${annot.key.equalsIgnoreCase(checklistInstance.sciNameColumn)}">
-                        <td class="nameColumn">
+                        <td class="nameColumn nolink">
                         <g:if test="${observation.maxVotedReco?.taxonConcept && observation.maxVotedReco.taxonConcept?.canonicalForm != null}">
                         <a href="${uGroup.createLink(action:'show', controller:'species', id:observation.maxVotedReco.taxonConcept.findSpeciesId(), 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
                             <i> ${observation.maxVotedReco.taxonConcept.canonicalForm}</i>
