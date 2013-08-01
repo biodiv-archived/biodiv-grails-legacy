@@ -99,11 +99,11 @@ Enter column headers separated by commas. Eg: scientific name,  common name, use
                                 <span class="incorrectName badge">Incorrect Names</span>
                             </div>
 
-                            <div class="section hide ${hasErrors(bean: observationInstance, field: 'sciNameColumn', 'error')}" style="clear:both;margin:0;">
-                                <div class="row control-group">
-                                    <span class="pull-left span3"><g:message
-                                        code="observation.mark.sciNameColumn.label" default="Marked Scientific & Common Name Columns:" /></span>
-                                    <div class="controls" style="margin-left:260px;">
+                            <div class="section" style="clear:both;margin:0;">
+                                <div class="row control-group ${hasErrors(bean: observationInstance, field: 'sciNameColumn', 'error')}">
+                                    <!--span class="pull-left span3"><g:message
+                                        code="observation.mark.sciNameColumn.label" default="Marked Scientific & Common Name Columns:" /></span-->
+                                    <div class="controls">
                                         <input type="hidden" id="sciNameColumn" class="markColumn" name="sciNameColumn" value="${observationInstance.sciNameColumn}"/>
                                         <input type="hidden" id="commonNameColumn" class="markColumn" name="commonNameColumn" value="${observationInstance.commonNameColumn}"/>
                                         <div class="help-inline">

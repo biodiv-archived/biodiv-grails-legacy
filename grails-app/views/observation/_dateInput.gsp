@@ -5,7 +5,7 @@
     <label for="fromOn" class="control-label"><i
             class="icon-calendar"></i>
         <g:message code="observation.observedOn.label"
-        default="Observed on" /></label>
+        default="Observed on" /><span class="req">*</span></label>
 
 
     <div class="controls textbox">

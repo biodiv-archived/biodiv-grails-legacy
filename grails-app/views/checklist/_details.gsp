@@ -2,7 +2,7 @@
     class="row control-group ${hasErrors(bean: observationInstance, field: 'title', 'error')}">
 
     <label for="title" class="control-label"><g:message
-        code="checklist.title.label" default="Title" /> </label>
+        code="checklist.title.label" default="Title" /> <span class="req">*</span></label>
     <div class="controls textbox">
         <g:textField name="title" value="${observationInstance?.title}" class="input-block-level" placeholder="Enter a name for the checklist..." />
         <div class="help-inline">
@@ -18,7 +18,7 @@
     class="row control-group ${hasErrors(bean: observationInstance, field: 'license', 'error')}">
 
     <label for="license" class="control-label"><g:message
-        code="checklist.license.label" default="License" /> </label>
+        code="checklist.license.label" default="License" /> <span class="req">*</span></label>
     <div class="controls">
 	<g:render template="/observation/selectLicense" model="['i':0, 'selectedLicense':observationInstance?.license]"/>
         <div class="help-inline">

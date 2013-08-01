@@ -5,7 +5,7 @@
     <label for="topology" class="control-label">
         <i class="icon-map-marker"></i>
         <g:message
-        code="observation.topology.label" default="Observed At" /> </label>
+        code="observation.topology.label" default="Observed At" /> <span class="req">*</span></label>
     <div class="controls ">
  
     <div style="margin-left:0px;">

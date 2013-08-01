@@ -12,12 +12,11 @@
                 <g:each in="${checklistInstance.fetchColumnNames()}" var="cName">
                 <th title="${cName}">${cName.replaceAll("_", " ")}</th>
                 </g:each>
-                <th title="Media">Media</th>
                 <th title="Observation">Observation</th>
                 <th title="Comments">Comments</th>
             </tr>
         </thead>
-        <tbody class="mainContentList" name="p${params?.offset}">
+        <tbody class="mainContentList rowlink" name="p${params?.offset}">
             <g:each in="${observations}" var="observation">
             <tr class="${'mainContent ' + observation?.maxVotedReco?.name?.replaceAll(' ', '_')}">
                 <g:each in="${observation.fetchChecklistAnnotation()}" var="annot">
@@ -40,15 +39,12 @@
                     </g:else>
                 </td>
                 </g:each>
-                <td>
+		<td>
                     <g:render template="/observation/showObservationImagesList" model="['observationInstance':observation]"/>
-                </td>
-				<td>
-                    <a href="${uGroup.createLink(action:'show', controller:'observation', id:observation.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
-                        url</a>
+                    <a href="${uGroup.createLink(action:'show', controller:'observation', id:observation.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"></a>
                 </td>
                 
-                <td>
+                <td class="nolink">
                     <comment:showCommentPopup model="['commentHolder':observation, 'rootHolder':checklistInstance]" />
                 </td>
             </tr>
@@ -69,3 +65,8 @@
         max="${params.max}"  params="${[id:checklistInstance.id]}"/>
     </div>
 </div>
+<r:script>
+$(document).ready(function() {
+    $('tbody.rowlink').rowlink()
+});
+</r:script>

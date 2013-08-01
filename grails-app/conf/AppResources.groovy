@@ -250,7 +250,9 @@ modules = {
 	checklist {
 		dependsOn 'location_utils, list_utils, tagit, comment, activityfeed'
 
+		resource url:'/js/bootstrap-rowlink.min.css'
 		resource url:'/js/species/checklist.js'
+		resource url:'/js/bootstrap-rowlink.min.js'
 	}
 	
     checklist_list {
