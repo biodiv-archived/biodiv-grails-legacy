@@ -857,7 +857,7 @@ class ChecklistUtilService {
 		cleanUpGorm(true)
 	}
 	
-	private void cleanUpGorm(boolean clearSession) {
+	public void cleanUpGorm(boolean clearSession) {
 		
 				def hibSession = sessionFactory?.getCurrentSession();
 		

@@ -80,17 +80,17 @@
                         model="['observationInstance':checklistInstance, 'observationId': checklistInstance.id, 'controller':'userGroup', 'action':'getRelatedUserGroups', 'filterProperty': 'obvRelatedUserGroups', 'id':'relatedGroups']" /-->
                     </div>
                     </g:if>
-                    <%
-                    def annotations = checklistInstance.fetchChecklistAnnotation()
-                    %>
-                    <g:if test="${annotations?.size() > 0}">
-                    <div class="sidebar_section">
-                        <h5>Annotations</h5>
-                        <div class="tile" style="clear: both">
-                            <obv:showAnnotation model="[annotations:annotations]" />
-                        </div>
-                    </div>	
-                    </g:if>
+<%--                    <%--%>
+<%--                    def annotations = checklistInstance.fetchChecklistAnnotation()--%>
+<%--                    %>--%>
+<%--                    <g:if test="${annotations?.size() > 0}">--%>
+<%--                    <div class="sidebar_section">--%>
+<%--                        <h5>Annotations</h5>--%>
+<%--                        <div class="tile" style="clear: both">--%>
+<%--                            <obv:showAnnotation model="[annotations:annotations]" />--%>
+<%--                        </div>--%>
+<%--                    </div>	--%>
+<%--                    </g:if>--%>
 
                 </div>
 
