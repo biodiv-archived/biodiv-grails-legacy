@@ -217,7 +217,7 @@ speciesPortal {
 	domain = "localhost"
 	resources {
 		rootDir = "${app.rootDir}/images"
-		serverURL = "http://localhost/${appName}/images"
+		serverURL = "http://indiabiodiversity.localhost.org/${appName}/images"
 		images {
 			defaultType = "jpg"
 			thumbnail {
@@ -242,14 +242,14 @@ speciesPortal {
 	observations {
 		rootDir = "${app.rootDir}/observations"
 		observationDownloadDir = "${download.rootDir}/observations"
-		serverURL = "http://localhost/${appName}/observations"
+		serverURL = "http://indiabiodiversity.localhost.org/${appName}/observations"
 		//serverURL = "http://localhost/${appName}/observations"
 		MAX_IMAGE_SIZE = 104857600
         filePicker.key = 'AXCVl73JWSwe7mTPb2kXdz'
 	} 
 	 userGroups {
 		rootDir = "${app.rootDir}/userGroups"
-		serverURL = "http://localhost/${appName}/userGroups"
+		serverURL = "http://indiabiodiversity.localhost.org/${appName}/userGroups"
 		//serverURL = "http://localhost/${appName}/userGroups"
 		logo {
 			MAX_IMAGE_SIZE = 51200

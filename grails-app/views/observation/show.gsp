@@ -138,7 +138,11 @@ String desc = "- "+ location +" by "+observationInstance.author.name.capitalize(
                                                 
 						</g:if>
 						<g:else>
-                                                <img class="galleryImage" style=" ${observationInstance.isChecklist? 'opacity:0.7;' :''}"
+                                                ${observationInstance.mainImage().fileName}
+                                                ${observationInstance.listResourcesByRating(1)}
+                                                ${observationInstance.group.icon().fileName}
+                                                ${observationInstance.group.id}
+                                                <img class="galleryImage" style=" ${observationInstance.sourceId? 'opacity:0.7;' :''}"
                                                 src="${observationInstance.mainImage()?.thumbnailUrl(null, observationInstance.sourceId ? '.png' :null)}" />
 
 						</g:else>

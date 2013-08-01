@@ -187,15 +187,17 @@ class ChecklistController {
 	
 	@Secured(['ROLE_USER'])
 	def edit = {
+        log.debug params;
 		def observationInstance = Checklists.findByIdAndIsDeleted(params.id.toLong(), false)
 		if (!observationInstance) {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
 			redirect (url:uGroup.createLink(action:'list', controller:"observation", 'userGroupWebaddress':params.webaddress))
 		} else if(SUserService.ifOwns(observationInstance.author)) {
+            def checklist = getChecklistData(params.id.toLong());
 			render(view: "create", model: [observationInstance: observationInstance, 'springSecurityService':springSecurityService, sciNameColumn:observationInstance.sciNameColumn, commonNameColumn:observationInstance.commonNameColumn])
 		} else {
 			flash.message = "${message(code: 'edit.denied.message')}"
-			redirect (url:uGroup.createLink(action:'show', controller:"checlist", id:observationInstance.id, 'userGroupWebaddress':params.webaddress))
+			redirect (url:uGroup.createLink(action:'show', controller:"checklist", id:observationInstance.id, 'userGroupWebaddress':params.webaddress))
 		}
 	}
 	
@@ -217,49 +219,57 @@ class ChecklistController {
 			redirect (url:uGroup.createLink(action:'list', controller:"observation", 'userGroupWebaddress':params.webaddress))
 		}
 	}
-	
-	def getObservationGrid = {
-		log.debug params
+
+    private getChecklistData(Long id) {
+        if(!id) return [];
+
 		String obv_id = ChecklistService.OBSERVATION_COLUMN
-		Checklists cl = Checklists.findByIdAndIsDeleted(params.id.toLong(), false, [fetch: [observations: 'join']])
-		def obvData = []
-		cl.observations.each {Observation obv ->
-			def tMap = [:]
-			tMap[ChecklistService.OBSERVATION_COLUMN] = obv.id
-            if(obv.resource) {
-			    tMap[ChecklistService.MEDIA_COLUMN] = [obv.resource.size()];
-                Iterator iterator = obv.resource?.iterator();
-                int index = 0;
-                String obvDir;
-                while(iterator.hasNext()) {
-                    def res = iterator.next();
-                    def r = new HashMap()
-                    r['file'] = res.fileName;
-                    r['thumbnail'] = res.thumbnailUrl();
-                    r['url'] = res.url;
-                    r['license'] = res.licenses.collect { it.name }.join(',');
-                    r['type'] = res.type.name();
-                    r['rating'] = res.rating;
-                    if(res.type != ResourceType.VIDEO) {
-                        obvDir = res.fileName.split('/')[1];
+		Checklists cl = Checklists.findByIdAndIsDeleted(id, false, [fetch: [observations: 'join']])
+        if(cl) {
+            def obvData = []
+            cl.observations.each {Observation obv ->
+                def tMap = [:]
+                tMap[ChecklistService.OBSERVATION_COLUMN] = obv.id
+                if(obv.resource) {
+                    tMap[ChecklistService.MEDIA_COLUMN] = [obv.resource.size()];
+                    Iterator iterator = obv.resource?.iterator();
+                    int index = 0;
+                    String obvDir;
+                    while(iterator.hasNext()) {
+                        def res = iterator.next();
+                        def r = new HashMap()
+                        r['file'] = res.fileName;
+                        r['thumbnail'] = res.thumbnailUrl();
+                        r['url'] = res.url;
+                        r['license'] = res.licenses.collect { it.name }.join(',');
+                        r['type'] = res.type.name();
+                        r['rating'] = res.rating;
+                        if(res.type != ResourceType.VIDEO) {
+                            obvDir = res.fileName.split('/')[1];
+                        }
+                        tMap[ChecklistService.MEDIA_COLUMN][index] = r
+                        index++
                     }
-                    tMap[ChecklistService.MEDIA_COLUMN][index] = r
-                    index++
+                    if(obvDir)
+                        tMap['obvDir'] = obvDir;
                 }
-                if(obvDir)
-			        tMap['obvDir'] = obvDir;
+                obv.fetchChecklistAnnotation().each { ann ->
+                    tMap[ann.key] = ann.value
+                }
+                obvData.add(tMap)
             }
-			obv.fetchChecklistAnnotation().each { ann ->
-				tMap[ann.key] = ann.value
-			}
-			obvData.add(tMap)
-		}
-		
-		List columns = [obv_id]
-		cl.fetchColumnNames().each { columns.add(it) }
-		
-		def res = [columns: columns, data :obvData, sciNameColumn:cl.sciNameColumn, commonNameColumn:cl.commonNameColumn]
-		render res as JSON
+            
+            List columns = [obv_id]
+            cl.fetchColumnNames().each { columns.add(it) }
+            
+            return [columns: columns, data :obvData, sciNameColumn:cl.sciNameColumn, commonNameColumn:cl.commonNameColumn]
+        }
+        return ['error':"Couldn't find checklist with this id"];
+    }
+
+	def getObservationGrid =  {
+		log.debug params
+		render getChecklistData(params.id?.toLong()) as JSON
 	}
 	
 	@Secured(['ROLE_USER'])
