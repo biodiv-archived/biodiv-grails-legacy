@@ -197,7 +197,7 @@ class ChecklistService {
 				}else{
 					obsParams.action = "save"
 				}	
-				obsParams.checklistAnnotations =  m as JSON
+				obsParams.checklistAnnotations =  getSafeAnnotation(m)
 				def res = observationService.saveObservation(obsParams, false)
 				Observation observationInstance = res.observationInstance
 				saveReco(observationInstance, m, checklistInstance)
@@ -223,6 +223,17 @@ class ChecklistService {
 			checklistInstance.speciesCount = checklistInstance.observations.size()
 		}
 		log.debug "saved checklist observation  "
+	}
+	
+	
+	private getSafeAnnotation(Map m){
+		def newMap = [:]
+		m.each { k, v ->
+			if(v && v.trim() != ""){
+				newMap.put(k.trim(), v.trim())
+			}
+		}
+		return newMap as JSON
 	}
 	
 	private Map getParamsForObv(params, checklistInstance){
