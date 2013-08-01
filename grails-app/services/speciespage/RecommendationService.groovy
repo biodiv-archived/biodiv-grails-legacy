@@ -184,9 +184,11 @@ class RecommendationService {
         if(!names) return result;
 
         names.each { value -> 
-            sciNames << value.sciName
+            if(value.sciName)
+                sciNames << value.sciName
+            else
+                sciNames << ''
         }
-
         //names parsing
         List<TaxonomyDefinition> parsedNames;
         try {

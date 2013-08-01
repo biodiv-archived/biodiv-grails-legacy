@@ -53,7 +53,7 @@
                                 <i class="icon-picture"></i>
                                 Type your list below
                                 <g:if test="${ params.action != 'create'}">
-                                <g:render template="/checklist/showEditGrid" model="['observationInstance':observationInstance, 'checklistData':checklistData, 'checklistColumns':checklistColumns, 'sciNameColumn':sciNamecolumn, 'commonNameColumn':commonNameColumn]"/>
+                                <g:render template="/checklist/showEditGrid" model="['observationInstance':observationInstance, 'checklistData':checklistData, 'checklistColumns':checklistColumns, 'sciNameColumn':sciNameColumn, 'commonNameColumn':commonNameColumn]"/>
                                 </g:if>
                                 <g:else>
                                 or
@@ -62,49 +62,63 @@
                                 </div>
                                 </g:else>
                             </div>
-                            <div>
-                                <input id="checklistColumns" name="checklistColumns" class="input-block-level" value='' placeHolder="Enter column headers separated by commas. Eg: scientific name,  common name, notes,.... "/>
-                            </div>
-                            <g:textArea id="checklistData" name="checklistData" rows="5" class="input-block-level" placeholder="Enter one line per species (Scientific name and/or common name), additional columns separated by ','."/>
-                            <input id="rawChecklist" name="rawChecklist" type="hidden" value='' />
-                            <ul class="help-block">
-                                <li><small>Please add comma separated values</small></li>
-                                <li><small>Please use " around if text itself has a ','</small></li>
-                            </ul>
+                            
+                            <div
+                                class="row control-group ${hasErrors(bean: observationInstance, field: 'checklistColumns', 'error')}">
+                                <label for="checklistColumns" class="control-label"><g:message
+                                    code="checklist.checklistColumns.label" default="Headers" />
+                                </label>
+                                <div class="controls">
+                                    <input id="checklistColumns" name="checklistColumns" class="input-block-level" value='' placeHolder="scientific name, common name, uses, notes,.... " title='Enter column headers separated by commas. Eg: scientific name,  common name, uses, notes,....'/>
+                                    <small class="help-inline">
+Enter column headers separated by commas. Eg: scientific name,  common name, uses, notes,....
+                                </small> 
 
+                                </div>
+                            </div>
+                            <div
+                                class="row control-group ${hasErrors(bean: observationInstance, field: 'checklistData', 'error')}">
+                                <label for="checklistData" class="control-label"><g:message
+                                    code="checklist.checklistData.label" default="Data" /></label>
+                                <div class="controls">
+                                    <g:textArea id="checklistData" name="checklistData" rows="5" class="input-block-level" placeholder='Mangifera indica, Mango, Fruits are edible, Have this in my backyard'
+                                    title='Enter one line per species (scientific name and/or common name), additional columns separated by comas. (if comas are part of text wrap with ,).' />
+<small class="help-inline"> Enter one line per species (scientific name and/or common name), additional columns separated by comas. (if comas are part of text wrap with ","). </small> 
+                                    <input id="rawChecklist" name="rawChecklist" type="hidden" value='' />
+                                </div>
+                            </div>
                         </div>
 
                         <div id="gridSection" class="section checklist-slickgrid ${params.action=='create'?'hide':''}">
                             <span id="addNewColumn" class="btn-link">+ Add New Column</span>
+                            <span class="help-inline"> (Mark scientific and common name column using <img src='${createLinkTo(file:"dropdown_active.gif", base:grailsApplication.config.speciesPortal.resources.serverURL)}'/>)</span>
                             
                             <div id="myGrid" class="" style="width:100%;height:350px;"></div>
                             <div id="nameSuggestions" style="display: block;"></div>
-                            <div id="legend" class="pull-right hide">
-                                <span class="validReco badge">Valid Reco</span>
-                                <span class="parsed badge">Parsed</span>
+                            <div id="legend" class="hide">
+                                <span class="incorrectName badge">Incorrect Names</span>
                             </div>
 
-                            <div class="section ${hasErrors(bean: observationInstance, field: 'sciNameColumn', 'error')}" style="clear:both;margin:0;">
+                            <div class="section hide ${hasErrors(bean: observationInstance, field: 'sciNameColumn', 'error')}" style="clear:both;margin:0;">
                                 <div class="row control-group">
                                     <span class="pull-left span3"><g:message
                                         code="observation.mark.sciNameColumn.label" default="Marked Scientific & Common Name Columns:" /></span>
                                     <div class="controls" style="margin-left:260px;">
-                                        <input type="text" id="sciNameColumn" class="markColumn" name="sciNameColumn" disabled value="${observationInstance.sciNameColumn}"/>
-                                        <input type="text" id="commonNameColumn" class="markColumn" name="commonNameColumn" disabled value="${observationInstance.commonNameColumn}"/>
+                                        <input type="hidden" id="sciNameColumn" class="markColumn" name="sciNameColumn" value="${observationInstance.sciNameColumn}"/>
+                                        <input type="hidden" id="commonNameColumn" class="markColumn" name="commonNameColumn" value="${observationInstance.commonNameColumn}"/>
                                         <div class="help-inline">
                                             <g:hasErrors bean="${observationInstance}" field="sciNameColumn">
                                             <g:message code="checklist.scientific_name.validator.invalid" />
                                             </g:hasErrors>
                                         </div>
-                                       
-                                        <a id="parseNames" class="btn btn-primary"
-                                            style="float: right; margin-right: 5px;display:none;">Validate Names</a>
-
+                                      
                                     </div>
    
                                 </div>	
-                            </div>
-
+                            </div> 
+                                <a id="parseNames" class="btn btn-primary"
+                                            style="float: right; margin: 5px;display:none;">Validate Names</a>
+         
                         </div>
                     </div>
 
@@ -166,7 +180,7 @@
                                 <label class="checkbox" style="text-align: left;"> 
                                     <g:checkBox style="margin-left:0px;"
                                     name="agreeTerms" value="${observationInstance?.agreeTerms}"/>
-                                    <span class="policy-text"> By submitting this form, you agree that the photos or videos you are submitting are taken by you, or you have permission of the copyright holder to upload them on creative commons licenses. </span></label>
+                                    <span class="policy-text"> By submitting this form, you agree that any supporting media submitted as photos or videos are taken by you, or you have permission of the copyright holder to upload them on creative commons licenses.</span></label>
                             </div>
 
                         </div>

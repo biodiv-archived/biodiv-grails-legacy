@@ -81,7 +81,7 @@ function initGrid(data, columns, sciNameColumn, commonNameColumn) {
                         id:newColumnName,
                         name:newColumnName,
                         field:newColumnName,
-                        editor: Slick.Editors.TextCellEditor,
+                        editor: Slick.Editors.Text,
                         header:getHeaderMenuOptions()
                     }, options);
 
@@ -183,7 +183,7 @@ function addMediaFormatter(row, cell, value, columnDef, dataContext) {
             html += "<img class='small_profile_pic' src='"+value[i]['thumbnail']+"'/>";
         }
     }
-    html += "<button class='btn btn-mini'  title='Add Media' data-toggle='modal' data-target='#addResources'  onclick='openDetails("+row+","+cell+");return false;'>Add/Edit Media</button>";
+    html += "<button class='btn btn-link'  title='Add Media' data-toggle='modal' data-target='#addResources'  onclick='openDetails("+row+","+cell+");return false;'><i class='icon-plus'></i></button>";
     return html;
 }
 
@@ -655,10 +655,10 @@ $(document).ready(function(){
      */
     $("#createChecklist").click(function() {
         $('#restOfForm').show();
-        $('html, body').animate({
+        /*$('html, body').animate({
             scrollTop: $("#restOfForm").offset().top
-        }, 1000);
-        loadMapInput();
+        }, 1000);*/
+        //loadMapInput();
         $('#wizardButtons').hide();
     });
 
@@ -718,24 +718,26 @@ $(document).ready(function(){
                 var commonNameColumnIndex = grid.getColumnIndex($('#commonNameColumn').val());
                 var commonNameColumn = grid.getColumns()[commonNameColumnIndex];
                 var changes = {};
-                for(rowId in data) {
-                    if(data.hasOwnProperty(rowId)) {
-                        rowId = parseInt(rowId, 10);
+                for(var rowId=0; rowId<gridData.length; rowId++) {
+                    if(data.hasOwnProperty(rowId+'')) {
                         if(!changes[rowId])
                             changes[rowId] = {}
                         
                         if(data[rowId].id) {
-                            if(sciNameColumn) changes[rowId][sciNameColumn.id] = 'validReco'
-                            if(commonNameColumn) changes[rowId][commonNameColumn.id] = 'validReco'
+                            //if(sciNameColumn) changes[rowId][sciNameColumn.id] = 'validReco'
+                            //if(commonNameColumn) changes[rowId][commonNameColumn.id] = 'validReco'
        
                             var dataItem = grid.getDataItem(rowId);
                             if(data[rowId].speciesId)
                                 dataItem.speciesId = data[rowId].speciesId;
                             dataItem.speciesTitle = data[rowId].name;
-                        } else if (data[rowId].parsed) {
-                            if(sciNameColumn) changes[rowId][sciNameColumn.id] = 'parsed'
-                            if(commonNameColumn) changes[rowId][commonNameColumn.id] = 'parsed'
+                        } 
+                        else {
+                            if(sciNameColumn && !data[rowId].parsed ) changes[rowId][sciNameColumn.id] = 'incorrectName' ;
+                            if(commonNameColumn && !data[rowId].parsed) changes[rowId][commonNameColumn.id] = 'incorrectName';
                         }
+                    } else {
+                        changes[rowId][sciNameColumn.id] = 'incorrectName'
                     }
                     grid.invalidateRow(rowId);
                 }

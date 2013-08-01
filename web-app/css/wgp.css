@@ -2074,3 +2074,6 @@ div.noOfRatings {
 .table-striped tbody>tr:nth-child(odd)>td.nameColumn, .nameColumn {
     background-color : lightyellow;
 }
+.incorrectName {
+    background-color : #FA8072;
+}
