@@ -139,3 +139,6 @@ input.dms_field {
     width:90%;
     display: initial;
 }
+.slick-cell.nameColumn a{
+    color:#0000FF;
+}

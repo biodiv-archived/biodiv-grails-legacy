@@ -711,7 +711,6 @@ $(document).ready(function(){
             dataType: 'json',
             data : {'names':JSON.stringify(getNames())},
             success : function(data) {
-                $('#legend').show();
                 var gridData = grid.getData();
                 var sciNameColumnIndex = grid.getColumnIndex($('#sciNameColumn').val());
                 var sciNameColumn = grid.getColumns()[sciNameColumnIndex];
@@ -752,7 +751,8 @@ $(document).ready(function(){
                 grid.setCellCssStyles("highlight", changes);
                 grid.render();
                 if(incorrectNames === true)
-                    $('#createChecklist').trigger('click');
+                    $('#legend').show();
+                $('#createChecklist').trigger('click');
             },
             error: function(xhr, textStatus, errorThrown) {
                 alert(xhr);
