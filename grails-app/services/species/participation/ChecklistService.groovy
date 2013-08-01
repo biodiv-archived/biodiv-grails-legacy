@@ -68,6 +68,7 @@ class ChecklistService {
 	def activityFeedService;
 	def observationsSearchService;
 	def dataSource;
+	def checklistUtilService
 	
 	///////////////////////////////////////////////////////////////////////////////
 	////////////////////////////// Create ///////////////////////////////
@@ -119,6 +120,8 @@ class ChecklistService {
 				updateChecklist(params, checklistInstance)
 				feedType = activityFeedService.CHECKLIST_UPDATED
 				feedAuthor = springSecurityService.currentUser
+				//so that original author of checklist should not change
+				params.author = checklistInstance.author;
 				//to say if all obv needs to be updated because some change in MetaData properties
 				isGlobalUpdate = isGlobalUpdateForObv(checklistInstance)
 			}
@@ -591,7 +594,8 @@ class ChecklistService {
 	
 	//////////////////////////////////// Migrate related ////////////////////////////////////////
 	def serializeClData(){
-		def clIdList = Checklist.listOrderById(order: "asc").collect{it.id}
+		List  clIdList = Checklist.listOrderById(order: "asc").collect{it.id}
+		clIdList.removeAll( [ 20, 72, 129, 221, 267, 304, 305])
 		clIdList.each {  id ->
 			def cl = Checklists.findById(id, [fetch: [observations: 'join']])
 			if(!cl.observations.iterator().next().checklistAnnotations){
@@ -607,8 +611,19 @@ class ChecklistService {
 						obv.checklistAnnotations = m as JSON
 						obv.save(flush:true)
 					}
-					cl.columns = cl.fetchColumnNames().collect { it.trim() } as JSON
-					cl.save(flush:true)
+					
+				}
+				
+				checklistUtilService.cleanUpGorm(true)
+				
+				Checklists.withTransaction(){ 
+					cl = Checklists.get(id)
+					cl.columns = new ArrayList(cl.fetchColumnNames()).collect { it.trim() } as JSON
+					cl.sciNameColumn = cl.sciNameColumn.trim()
+					cl.commonNameColumn = cl.commonNameColumn ? cl.commonNameColumn.trim() : null
+					if(!cl.save(flush:true)){
+						cl.errors.allErrors.each { println it }
+					}
 				}
 			}	
 		}

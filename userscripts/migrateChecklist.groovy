@@ -208,7 +208,56 @@ def addFeedToChecklist(){
 }
 
 
-//addFeedToChecklist()
-serializeChecklist()
+def corChecklist(){
+	def checklistUtilService = ctx.getBean("checklistUtilService");
+	def clIdList = [20, 72, 129, 221, 267, 304, 305]
+	clIdList.each {  id ->
+			def cl = Checklists.findById(id, [fetch: [observations: 'join']])
+			println cl
+			Checklists.withTransaction(){
+				cl.observations.each { obv ->
+					def m = [:]
+					obv.fetchChecklistAnnotation().each { a ->
+						if(a.value){
+							m.put(a.key.trim(), a.value.trim())
+						}
+					}
+					m.put(cl.sciNameColumn.trim(), obv.fetchSpeciesCall())
+					if(cl.commonNameColumn){
+						def cnReco = RecommendationVote.findByAuthorAndObservation(obv.author, obv).commonNameReco
+						if(cnReco){
+							m.put(cl.commonNameColumn.trim(), cnReco.name)
+						}
+					}
+					
+					obv.checklistAnnotations = m as JSON
+					if(!obv.save(flush:true)){
+						obv.errors.allErrors.each { println it }
+					}
+				}
+				println "=== done observations "
+			}
+			
+			checklistUtilService.cleanUpGorm(true)
+			
+			Checklists.withTransaction(){
+				cl =Checklists.get(id)
+				println "== cl before " +  cl.columns
+				cl.columns = new ArrayList(cl.fetchColumnNames()).collect {it.trim() } as JSON
+				println  " colsss  " + cl.columns
+				cl.sciNameColumn = cl.sciNameColumn.trim()
+				cl.commonNameColumn =  cl.commonNameColumn ? cl.commonNameColumn.trim() : null
+				if(!cl.save(flush:true)){
+					cl.errors.allErrors.each { println it }
+				}
+				println  "after save " + cl.columns 
+			}
+		
+	}
+}
 
+
+//addFeedToChecklist()
+//serializeChecklist()
+corChecklist()
 println "================ done "

@@ -162,6 +162,7 @@ class ObservationService {
 				updateObservation(params, observationInstance)
 				feedType = activityFeedService.OBSERVATION_UPDATED
 				feedAuthor = springSecurityService.currentUser
+				params.author = observationInstance.author;
 			}
 			
 			if(!observationInstance.hasErrors() && observationInstance.save(flush:true)) {
