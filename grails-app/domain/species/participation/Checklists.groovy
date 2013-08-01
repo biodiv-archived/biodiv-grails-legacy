@@ -86,7 +86,6 @@ class Checklists extends Observation {
 			}
 		}
 		//at least one of the column name must present 
-		//sciNameColumn validator : {val, obj -> val || obj.commonNameColumn }, nullable:true, blank:false;
 		sciNameColumn nullable:true, blank:true;
 		commonNameColumn nullable:true, blank:true;
 	}

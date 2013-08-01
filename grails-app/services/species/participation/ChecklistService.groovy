@@ -120,6 +120,8 @@ class ChecklistService {
 				updateChecklist(params, checklistInstance)
 				feedType = activityFeedService.CHECKLIST_UPDATED
 				feedAuthor = springSecurityService.currentUser
+				//so that original author of checklist should not change
+				params.author = checklistInstance.author;
 				//to say if all obv needs to be updated because some change in MetaData properties
 				isGlobalUpdate = isGlobalUpdateForObv(checklistInstance)
 			}
