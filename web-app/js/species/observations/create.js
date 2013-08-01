@@ -100,7 +100,7 @@ function initGrid(data, columns, sciNameColumn, commonNameColumn) {
         };
 
 
-        var headerMenuPlugin = new Slick.Plugins.HeaderMenu({buttonImage:'/biodiv/images/dropdown_active.gif'});
+        var headerMenuPlugin = new Slick.Plugins.HeaderMenu({buttonImage:window.params.dropDownIconUrl});
         headerMenuPlugin.onBeforeMenuShow.subscribe(function(e, args) {
             var menu = args.menu;
             var i = menu.items.length;
