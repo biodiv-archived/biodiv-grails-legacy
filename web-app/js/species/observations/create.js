@@ -252,8 +252,6 @@ function loadGrid(url, id){
                             columns.push({id:header, name: header, field: header, editor:editor, sortable:false, minWidth: 100, 'header':getHeaderMenuOptions()});
 			});
                         columns.push(getMediaColumnOptions());
-                        console.log(data.sciNameColumn);
-                        console.log(data.commonNameColumn);
                         loadTextToGrid(data.data, columns, data.sciNameColumn, data.commonNameColumn);
                         //grid.setColumns(finalCols);
                         //grid.render();
@@ -704,6 +702,7 @@ $(document).ready(function(){
             return;
         }
 
+        $('#legend').hide();
         var me = this
         $.ajax({
             url : window.params.recommendation.getRecos,
@@ -742,8 +741,10 @@ $(document).ready(function(){
                             }
                         }
                     } else {
-                        changes[rowId][sciNameColumn.id] = 'incorrectName'
-                        incorrectNames = true;
+                        if(!data[rowId].parsed) {
+                            changes[rowId][sciNameColumn.id] = 'incorrectName'
+                            incorrectNames = true;
+                        }
                     }
                     grid.invalidateRow(rowId);
                 }
@@ -755,7 +756,8 @@ $(document).ready(function(){
                 $('#createChecklist').trigger('click');
             },
             error: function(xhr, textStatus, errorThrown) {
-                alert(xhr);
+                alert('Error while validating names');
+                console.log(xhr);
             }
         });
     });
