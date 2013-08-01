@@ -21,7 +21,8 @@
             <tr class="${'mainContent ' + observation?.maxVotedReco?.name?.replaceAll(' ', '_')}">
                 <g:each in="${observation.fetchChecklistAnnotation()}" var="annot">
                     <g:if test="${annot.key.equalsIgnoreCase(checklistInstance.sciNameColumn)}">
-                        <td class="nameColumn nolink">
+                        <td class="nameColumn">
+                        <a href="${uGroup.createLink(action:'show', controller:'observation', id:observation.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"></a>
                         <g:if test="${observation.maxVotedReco?.taxonConcept && observation.maxVotedReco.taxonConcept?.canonicalForm != null}">
                         <a href="${uGroup.createLink(action:'show', controller:'species', id:observation.maxVotedReco.taxonConcept.findSpeciesId(), 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
                             <i> ${observation.maxVotedReco.taxonConcept.canonicalForm}</i>
@@ -41,7 +42,6 @@
                 </g:each>
 		<td>
                     <g:render template="/observation/showObservationImagesList" model="['observationInstance':observation]"/>
-                    <a href="${uGroup.createLink(action:'show', controller:'observation', id:observation.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"></a>
                 </td>
                 
                 <td class="nolink">

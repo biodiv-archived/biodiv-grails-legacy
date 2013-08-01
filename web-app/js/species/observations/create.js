@@ -717,7 +717,7 @@ $(document).ready(function(){
                 var sciNameColumn = grid.getColumns()[sciNameColumnIndex];
                 var commonNameColumnIndex = grid.getColumnIndex($('#commonNameColumn').val());
                 var commonNameColumn = grid.getColumns()[commonNameColumnIndex];
-                var changes = {};
+                var changes = {}; var incorrectNames = false;
                 for(var rowId=0; rowId<gridData.length; rowId++) {
                     if(data.hasOwnProperty(rowId+'')) {
                         if(!changes[rowId])
@@ -733,18 +733,26 @@ $(document).ready(function(){
                             dataItem.speciesTitle = data[rowId].name;
                         } 
                         else {
-                            if(sciNameColumn && !data[rowId].parsed ) changes[rowId][sciNameColumn.id] = 'incorrectName' ;
-                            if(commonNameColumn && !data[rowId].parsed) changes[rowId][commonNameColumn.id] = 'incorrectName';
+                            if(sciNameColumn && !data[rowId].parsed ) {
+                                changes[rowId][sciNameColumn.id] = 'incorrectName';
+                                incorrectNames = true;
+                            }
+                            if(commonNameColumn && !data[rowId].parsed) {
+                                changes[rowId][commonNameColumn.id] = 'incorrectName';
+                                incorrectNames = true;
+                            }
                         }
                     } else {
                         changes[rowId][sciNameColumn.id] = 'incorrectName'
+                        incorrectNames = true;
                     }
                     grid.invalidateRow(rowId);
                 }
 
                 grid.setCellCssStyles("highlight", changes);
                 grid.render();
-                $('#createChecklist').trigger('click');
+                if(incorrectNames === true)
+                    $('#createChecklist').trigger('click');
             },
             error: function(xhr, textStatus, errorThrown) {
                 alert(xhr);

@@ -82,8 +82,8 @@ Enter column headers separated by commas. Eg: scientific name,  common name, use
                                     code="checklist.checklistData.label" default="Data" /></label>
                                 <div class="controls">
                                     <g:textArea id="checklistData" name="checklistData" rows="5" class="input-block-level" placeholder='Mangifera indica, Mango, Fruits are edible, Have this in my backyard'
-                                    title='Enter one line per species (scientific name and/or common name), additional columns separated by comas. (if comas are part of text wrap with ,).' />
-<small class="help-inline"> Enter one line per species (scientific name and/or common name), additional columns separated by comas. (if comas are part of text wrap with ","). </small> 
+                                    title='Enter one line per species (scientific name and/or common name), additional columns separated by commas. (if commas are part of text wrap with ,).' />
+<small class="help-inline"> Enter one line per species (scientific name and/or common name), additional columns separated by commas. (if commas are part of text wrap with ","). </small> 
                                     <input id="rawChecklist" name="rawChecklist" type="hidden" value='' />
                                 </div>
                             </div>
