@@ -607,6 +607,8 @@ class ChecklistService {
 						obv.checklistAnnotations = m as JSON
 						obv.save(flush:true)
 					}
+					cl.columns = cl.fetchColumnNames().collect { it.trim() } as JSON
+					cl.save(flush:true)
 				}
 			}	
 		}
