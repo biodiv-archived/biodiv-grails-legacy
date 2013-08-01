@@ -132,10 +132,10 @@ def postChecklistToWGPGroup(){
 
 
 def serachInList(l1){
-	List snList =  ["scientific_names" "Scientific Name" "scientific_name"]
-	snList.each { 
-		if(l1.contains(it)){
-			return it
+	List snList =  ["scientific_names", "Scientific Name", "scientific_name", "scientific_name "]
+	for(sn in snList){ 
+		if(l1.contains(sn)){
+			return sn
 		}
 	}
 	return null 
@@ -144,7 +144,6 @@ def serachInList(l1){
 //postChecklistToWGPGroup()
 
 def serializeChecklist(){
-	
 	def clIdList = []
 	Checklist.listOrderById(order: "asc").each{ Checklist cl ->
 			clIdList.add(cl.id)
@@ -152,9 +151,9 @@ def serializeChecklist(){
 	clIdList.each {  id ->
 		Checklists.withTransaction(){
 			def cl = Checklists.findByIdAndIsDeleted(id, false)
-			if(!cl.columns){
+			//if(!cl.columns){
 				println cl
-				List cns = new ArrayList(Arrays.asList(cl.columnNames.split("\t"))).collect{ it.trim()}
+				List cns = new ArrayList(Arrays.asList(cl.columnNames.split("\t"))).collect{ it}
 				if(cns.contains("common_name")){
 					cl.commonNameColumn = "common_name"
 					cns.remove("common_name")
@@ -166,12 +165,11 @@ def serializeChecklist(){
 					cns.remove(snCol)
 					cns.add(0, snCol)
 				}
-				
 				cl.columns = cns as JSON
 				if(!cl.save(flush:true)){
 					cl.errors.allErrors.each { println it }
 				}
-			}
+			//}
 		}
 	}
 }
@@ -210,7 +208,7 @@ def addFeedToChecklist(){
 }
 
 
-addFeedToChecklist()
+//addFeedToChecklist()
 serializeChecklist()
 
 println "================ done "
