@@ -958,7 +958,7 @@ Hi $username,<br/>
 <br/>
 You have uploaded a checklist to <b>$domain</b> and it is available <a href="$obvUrl">here</a><br/>
 <br/>
-You will be notified by mail on any social activity on the observation.<br/>
+You will be notified by mail on any social activity on the checklist.<br/>
 If you do not want to receive notifications please go to your <a href="$userProfileUrl">user profile</a> and switch it off.<br/>
 <br/>
 Thank you for your contribution to the portal.<br/>
