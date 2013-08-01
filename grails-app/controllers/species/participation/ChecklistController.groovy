@@ -162,7 +162,7 @@ class ChecklistController {
 		}
 		
 		params.columnNames =  columnList.join("\t")
-		params.columns =  columnList
+		params.columns =  columnList.collect { it.trim() }
 		
 		//params.sciNameColumn = params.sciNameColumn ?: "scientific_name"
 		//params.commonNameColumn = params.commonNameColumn ?: "common_name"
