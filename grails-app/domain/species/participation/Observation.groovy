@@ -523,19 +523,21 @@ class Observation extends Metadata implements Taggable, Rateable {
 	}
 	
 	def fetchChecklistAnnotation(){
+		def res = [:]
+		Checklists cl = Checklists.read(sourceId)
 		if(checklistAnnotations){
 			def m = JSON.parse(checklistAnnotations)
-			
-			Checklists cl = Checklists.read(sourceId)
-			def res = [:]
 			cl.fetchColumnNames().each { name ->
 				res.put(name, m[name])
 			}
-			return res
 		}else{
 			//XXX to be removed after migration
-			return Annotation.findAllBySourceTypeAndObservation(Checklists.class.getCanonicalName(), this, [sort:'columnOrder', order:'asc'])
+			cl.fetchColumnNames().each { col ->
+				def ann = Annotation.findWhere(key:col, sourceType:Checklists.class.getCanonicalName(), observation:this)
+				res.put(col, ann?.value)
+			}
 		}
+		return res
 	}
 //	
 //	def fetchSourceChecklistTitle(){

@@ -130,9 +130,21 @@ def postChecklistToWGPGroup(){
 	}
 }
 
+
+def serachInList(l1){
+	List snList =  ["scientific_names" "Scientific Name" "scientific_name"]
+	snList.each { 
+		if(l1.contains(it)){
+			return it
+		}
+	}
+	return null 
+}
+
 //postChecklistToWGPGroup()
 
 def serializeChecklist(){
+	
 	def clIdList = []
 	Checklist.listOrderById(order: "asc").each{ Checklist cl ->
 			clIdList.add(cl.id)
@@ -148,11 +160,11 @@ def serializeChecklist(){
 					cns.remove("common_name")
 					cns.add(0, "common_name")
 				}
-				
-				if(cns.contains("scientific_name")){
-					cl.sciNameColumn = "scientific_name"
-					cns.remove("scientific_name")
-					cns.add(0, "scientific_name")
+				def snCol = serachInList(cns)
+				if(snCol){
+					cl.sciNameColumn = snCol
+					cns.remove(snCol)
+					cns.add(0, snCol)
 				}
 				
 				cl.columns = cns as JSON
@@ -199,6 +211,6 @@ def addFeedToChecklist(){
 
 
 addFeedToChecklist()
-//serializeChecklist()
+serializeChecklist()
 
 println "================ done "
