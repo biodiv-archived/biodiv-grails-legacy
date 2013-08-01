@@ -122,12 +122,13 @@ function getHeaderMenuOptions() {
             {
                 title: "Common Name",
                 command: "commonNameColumn"
-            },
+            }
+            /*,
             {
                 iconCssClass: "icon-help",
                 title: "Help",
                 command: "help"
-            }
+            }*/
             ]
         }
     }

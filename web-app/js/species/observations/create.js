@@ -1,23 +1,24 @@
 var grid;
 var dirtyRows;
+var prevNameColumn = {};
 
 //only returning modified data
 function getDataFromGrid(){
-	if(!dirtyRows){
-		return grid.getData();
-	}
-	
-	var selectedRows = grid.getSelectedRows()
-	if(selectedRows.length > 0){
-		dirtyRows.push(selectedRows.last());
-	}
-	
-	dirtyRows = dirtyRows.unique();
-	var data = new Array();
-	$.each(dirtyRows, function(index, rowId) {
-		data.push(grid.getDataItem(rowId));
-	});
-	return data;
+    if(!dirtyRows){
+        return grid.getData();
+    }
+
+    var selectedRows = grid.getSelectedRows()
+        if(selectedRows.length > 0){
+            dirtyRows.push(selectedRows.last());
+        }
+
+    dirtyRows = dirtyRows.unique();
+    var data = new Array();
+    $.each(dirtyRows, function(index, rowId) {
+        data.push(grid.getDataItem(rowId));
+    });
+    return data;
 }
 
 function addDirtyRows(e, args) {
@@ -109,13 +110,23 @@ function initGrid(data, columns, sciNameColumn, commonNameColumn) {
         });
 
         headerMenuPlugin.onCommand.subscribe(function(e, args) {
+            var name = args.column.name
+            
             if(args.command === 'sciNameColumn') {
-                $('#sciNameColumn').val(args.column.name);
-                selectNameColumn($('#sciNameColumn'), sciNameFormatter);
+                if(args.column.name == $('#sciNameColumn').val())
+                    name = ''
+                if(args.column.name == $('#commonNameColumn').val())
+                    $('#commonNameColumn').val('');
+                $('#sciNameColumn').val(name);
             } else if(args.command === 'commonNameColumn') {
-                $('#commonNameColumn').val(args.column.name);
-                selectNameColumn($('#commonNameColumn'), commonNameFormatter);
+                if(args.column.name == $('#commonNameColumn').val())
+                    name = ''
+                if(args.column.name == $('#sciNameColumn').val())
+                    $('#sciNameColumn').val('');
+                $('#commonNameColumn').val(name);
             }
+            selectNameColumn($('#commonNameColumn'), commonNameFormatter);
+            selectNameColumn($('#sciNameColumn'), sciNameFormatter);
         });
 
         grid.registerPlugin(headerMenuPlugin);
@@ -127,10 +138,12 @@ function initGrid(data, columns, sciNameColumn, commonNameColumn) {
 
         if(sciNameColumn) {
             $('#sciNameColumn').val(sciNameColumn);
+            selectNameColumn($('#sciNameColumn'), sciNameFormatter);
         }
 
         if(commonNameColumn) {
             $('#commonNameColumn').val(commonNameColumn);
+            selectNameColumn($('#commonNameColumn'), commonNameFormatter);
         }
 
     });
@@ -238,6 +251,8 @@ function loadGrid(url, id){
                             columns.push({id:header, name: header, field: header, editor:editor, sortable:false, minWidth: 100, 'header':getHeaderMenuOptions()});
 			});
                         columns.push(getMediaColumnOptions());
+                        console.log(data.sciNameColumn);
+                        console.log(data.commonNameColumn);
                         loadTextToGrid(data.data, columns, data.sciNameColumn, data.commonNameColumn);
                         //grid.setColumns(finalCols);
                         //grid.render();
@@ -393,16 +408,25 @@ function selectColumn(selector, selectedColumn){
 function selectNameColumn(selectedColumn, formatter) {
     var columns = grid.getColumns();
     var nameColumn = $(selectedColumn).val();
+    var command = $(selectedColumn).attr('id');
+    if(prevNameColumn[command]) {
+        for (var i = 0, len = columns.length; i < len; i++) {
+            var column = columns[i];
+            if(prevNameColumn[command].id == column.id) {
+                columns[i] = prevNameColumn[command]
+            }
+        }
+    }
     for (var i = 0, len = columns.length; i < len; i++) {
         var column = columns[i];
-        if(column.editor == AutoCompleteEditor && nameColumn != column.id) {
-            column.editor = Slick.Editors.Text;
-            column.formatter = undefined;
-        } else if(nameColumn == column.id){
+        if(nameColumn == column.id) {
+            prevNameColumn[command] = $.extend({},column);
             column.editor = AutoCompleteEditor;
+            column.cssClass = 'nameColumn';
             column.formatter = formatter;
         }
     };
+
     grid.invalidate();
 }
 
@@ -679,12 +703,14 @@ $(document).ready(function(){
             return;
         }
 
+        var me = this
         $.ajax({
             url : window.params.recommendation.getRecos,
             type : 'post', 
             dataType: 'json',
             data : {'names':JSON.stringify(getNames())},
             success : function(data) {
+                $('#legend').show();
                 var gridData = grid.getData();
                 var sciNameColumnIndex = grid.getColumnIndex($('#sciNameColumn').val());
                 var sciNameColumn = grid.getColumns()[sciNameColumnIndex];

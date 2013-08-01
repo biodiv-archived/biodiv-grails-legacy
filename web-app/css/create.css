@@ -135,4 +135,7 @@ input.dms_field {
 .combobox-container .add-on {
 	right: -26px;
 }
-
+.slick-header-column>.slick-column-name {
+    width:90%;
+    display: initial;
+}

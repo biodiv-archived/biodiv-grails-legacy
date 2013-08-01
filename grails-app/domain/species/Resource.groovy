@@ -2,6 +2,7 @@ package species
 
 import species.participation.Observation;
 import species.utils.ImageUtils;
+import species.utils.ImageType;
 import species.utils.Utils;
 import org.grails.rateable.*
 
@@ -61,12 +62,12 @@ class Resource implements Rateable {
 	
 	static transients = ['baseUrl']
 	
-	String thumbnailUrl(String newBaseUrl=null, String defaultFileType=null) {
+	String thumbnailUrl(String newBaseUrl=null, String defaultFileType=null, ImageType imageType = ImageType.NORMAL) {
 		String thumbnailUrl = '';
 		newBaseUrl = newBaseUrl?:(this.baseUrl?:grailsApplication.config.speciesPortal.observations.serverURL)
 		switch(type) {
 			case  ResourceType.IMAGE :
-				thumbnailUrl = newBaseUrl + "/" + ImageUtils.getFileName(this.fileName, null, defaultFileType)
+				thumbnailUrl = newBaseUrl + "/" + ImageUtils.getFileName(this.fileName, imageType, defaultFileType)
 				//thumbnailUrl = baseUrl + "/" + this.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.thumbnail.suffix);
 				break;
 			case ResourceType.VIDEO :				

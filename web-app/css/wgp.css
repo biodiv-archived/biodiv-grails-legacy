@@ -2049,7 +2049,7 @@ div.noOfRatings {
     color: #0c8040;
 }
 
-.validReco {
+.slick-cell.validReco, .validReco {
     background-color : green;
     font-weight:bold;
 }
@@ -2070,4 +2070,7 @@ div.noOfRatings {
 #addResourcesModal {
     width:725px;
     left:40%;
+}
+.table-striped tbody>tr:nth-child(odd)>td.nameColumn, .nameColumn {
+    background-color : lightyellow;
 }

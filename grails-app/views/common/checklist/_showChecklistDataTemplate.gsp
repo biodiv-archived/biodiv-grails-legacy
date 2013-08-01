@@ -8,7 +8,7 @@
     <table class="table table-striped table-hover tablesorter checklist-data" style="margin-left: 0px;">
 
         <thead>
-            <tr>
+            <tr class="filters">
                 <g:each in="${checklistInstance.fetchColumnNames()}" var="cName">
                 <th title="${cName}">${cName.replaceAll("_", " ")}</th>
                 </g:each>
@@ -21,19 +21,22 @@
             <g:each in="${observations}" var="observation">
             <tr class="${'mainContent ' + observation?.maxVotedReco?.name?.replaceAll(' ', '_')}">
                 <g:each in="${observation.fetchChecklistAnnotation()}" var="annot">
-                <td>
                     <g:if test="${annot.key.equalsIgnoreCase(checklistInstance.sciNameColumn)}">
-                    <g:if test="${observation.maxVotedReco?.taxonConcept && observation.maxVotedReco.taxonConcept?.canonicalForm != null}">
-                    <a href="${uGroup.createLink(action:'show', controller:'species', id:observation.maxVotedReco.taxonConcept.findSpeciesId(), 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
-                        <i> ${observation.maxVotedReco.taxonConcept.canonicalForm}</i>
-                    </a>
+                        <td class="nameColumn">
+                        <g:if test="${observation.maxVotedReco?.taxonConcept && observation.maxVotedReco.taxonConcept?.canonicalForm != null}">
+                        <a href="${uGroup.createLink(action:'show', controller:'species', id:observation.maxVotedReco.taxonConcept.findSpeciesId(), 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
+                            <i> ${observation.maxVotedReco.taxonConcept.canonicalForm}</i>
+                        </a>
+                        </g:if>
+                        <g:else>
+                        <i>${annot.value}</i>
+                        </g:else>
+                    </td>
                     </g:if>
                     <g:else>
-                    <i>${annot.value}</i>
-                    </g:else>
-                    </g:if>
-                    <g:else>
-                    ${annot.value}
+                    <td>
+                        ${annot.value}
+                    </td>
                     </g:else>
                 </td>
                 </g:each>

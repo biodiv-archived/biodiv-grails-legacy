@@ -12,18 +12,16 @@
 <head>
 <g:set var="canonicalUrl" value="${uGroup.createLink([controller:'observation', action:'show', id:observationInstance.id, base:Utils.getIBPServerDomain()])}"/>
 <g:set var="title" value="${(!observationInstance.fetchSpeciesCall()?.equalsIgnoreCase('Unknown'))?observationInstance.fetchSpeciesCall():'Help Identify'}"/>
+
 <%
 def r = observationInstance.mainImage();
 def imagePath = '', videoPath='';
 if(r) {
-    def gThumbnail = ImageUtils.getFileName(r.fileName.trim(),ImageType.LARGE)?:null;
-    if(r && gThumbnail) {
-            if(r.type == ResourceType.IMAGE) {
-                    imagePath = g.createLinkTo(base:grailsApplication.config.speciesPortal.observations.serverURL, file: gThumbnail)
-            } else if(r.type == ResourceType.VIDEO){
-                imagePath = r.thumbnailUrl()
-                videoPath = r.getUrl();
-            }
+    if(r.type == ResourceType.IMAGE) {
+        imagePath = r.thumbnailUrl(null, observationInstance.sourceId ? '.png' :null, ImageType.LARGE)
+    } else if(r.type == ResourceType.VIDEO){
+        imagePath = r.thumbnailUrl()
+        videoPath = r.getUrl();
     }
 }
 	
@@ -140,9 +138,8 @@ String desc = "- "+ location +" by "+observationInstance.author.name.capitalize(
                                                 
 						</g:if>
 						<g:else>
-							<img class="galleryImage"
-								src="${createLinkTo(file:"no-image.jpg", base:grailsApplication.config.speciesPortal.resources.serverURL)}"
-								title="You can contribute!!!" />
+                                                <img class="galleryImage" style=" ${observationInstance.isChecklist? 'opacity:0.7;' :''}"
+                                                src="${observationInstance.mainImage()?.thumbnailUrl(null, observationInstance.sourceId ? '.png' :null)}" />
 
 						</g:else>
 

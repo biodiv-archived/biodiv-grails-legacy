@@ -51,32 +51,39 @@
                         <div id="textAreaSection" class="section">
                             <div>
                                 <i class="icon-picture"></i>
-                                Put a line for each species or 
-                            <g:if test="${ params.action != 'create'}">
-                                <g:render template="/checklist/showEditGrid" model="['observationInstance':observationInstance]"/>
-                            </g:if>
-                        <g:else>
-                                <div class="upload_file" style="display:inline-block">
-                                <g:render template='/UFile/docUpload' model="['name': 'checklistStartFile', fileParams:fileParams, allowedExtensions:allowedExtensions,uploadCallBack:'showGrid()']" />
-                                </div>
-                            </g:else>
-                                <ul class="help-block">
+                                 Type your list below
+                                 <g:if test="${ params.action != 'create'}">
+                                 or
+                                 <g:render template="/checklist/showEditGrid" model="['observationInstance':observationInstance]"/>
+                                 </g:if>
+                                 <g:else>
+                                 <div class="upload_file" style="display:inline-block">
+                                     <g:render template='/UFile/docUpload' model="['name': 'checklistStartFile', fileParams:fileParams, allowedExtensions:allowedExtensions,uploadCallBack:'showGrid()']" />
+                                 </div>
+                                 </g:else>
+                           </div>
+                            <div>
+                                <input id="checklistColumns" name="checklistColumns" class="input-block-level" value='' placeHolder="Enter column headers separated by commas. Eg: scientific name,  common name, notes,.... "/>
+                            </div>
+                            <g:textArea id="checklistData" name="checklistData" rows="5" class="input-block-level" placeholder='Enter one line per species (Scientific name and/or common name), additional columns separated by comas. (if comas are part of text wrap with &quot;,&quot;'/>
+                            <input id="rawChecklist" name="rawChecklist" type="hidden" value='' />
+                                 <ul class="help-block">
                                     <li><small>Please add comma separated values</small></li>
                                     <li><small>Please use " around if text itself has a ','</small></li>
                                 </ul>
-                            </div>
-                            <div>
-                                <input id="checklistColumns" name="checklistColumns" class="input-block-level" value='' placeHolder="Headers : Scientific Name, Common Name, ...."/>
-                            </div>
-                            <g:textArea id="checklistData" name="checklistData" rows="5" class="input-block-level" placeholder="Data : ..."/>
-                            <input id="rawChecklist" name="rawChecklist" type="hidden" value='' />
+ 
                         </div>
                       
                         <div id="gridSection" class="section checklist-slickgrid" style="display:none;">
                             <span id="addNewColumn" class="btn-link">+ Add New Column</span>
+                            
                             <div id="myGrid" class="" style="width:100%;height:350px;"></div>
                             <div id="nameSuggestions" style="display: block;"></div>
-                        
+                             <div id="legend" class="pull-right hide">
+                                            <span class="validReco badge">Valid Reco</span>
+                                            <span class="parsed badge">Parsed</span>
+                                        </div>
+
                             <div class="section ${hasErrors(bean: observationInstance, field: 'sciNameColumn', 'error')}" style="clear:both;margin:0;">
                                 <div class="row control-group">
                                     <span class="pull-left span3"><g:message
@@ -89,9 +96,10 @@
                                             <g:message code="checklist.scientific_name.validator.invalid" />
                                             </g:hasErrors>
                                         </div>
-                                    <a id="parseNames" class="btn btn-primary"
-                                        style="float: right; margin-right: 5px;display:none;">Validate Names</a>
- 
+                                       
+                                        <a id="parseNames" class="btn btn-primary"
+                                            style="float: right; margin-right: 5px;display:none;">Validate Names</a>
+
                                     </div>
    
                                 </div>	
@@ -166,7 +174,7 @@
 
                     <div id="wizardButtons" class="span12" style="margin-top: 20px; margin-bottom: 40px;${params.action=='create'?:'display:none;'}">
                         <a id="addNames" class="btn btn-primary"
-                            style="float: right; margin-right: 5px;">Add Names</a>
+                            style="float: right; margin-right: 5px;">Load List</a>
                         <a id="createChecklist" class="btn btn-primary"
                             style="float: right; margin-right: 5px;display:none;"> Create Checklist </a>
                    </div>
