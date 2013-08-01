@@ -91,7 +91,7 @@
             <ul id="license_options_{{>i}}" class="dropdown-menu license_options">
                 <span>Choose a license</span>
                 <g:each in="${species.License.list()}" var="l">
-                <li class="license_option" onclick="console.log(this); selectLicense($(this), {{>i}})">
+                <li class="license_option" onclick="selectLicense($(this), {{>i}})">
                 <img src="${resource(dir:'images/license',file:l?.name.getIconFilename()+'.png', absolute:true)}"/><span style="display:none;">${l?.name?.value}</span>
                 </li>
                 </g:each>
@@ -99,6 +99,7 @@
             <input id="license_{{>i}}" type="hidden" name="license_{{>i}}" value="CC BY"></input>
         </div>	
         {{/if}}
+   
     </div>
     <div class="close_button" onclick="removeResource(event, {{>i}});$('#geotagged_images').trigger('update_map');"></div>
     </li>
