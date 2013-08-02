@@ -56,6 +56,12 @@ class Checklists extends Observation {
 	//serialized object to store list of column names
 	String columns;
 	
+	//backword reference to drupal checklist for all old checlist 
+	long drupalId = -1; 
+	
+	//XXX tmp contributor should be removed after migration 
+	long uid = -1 ;
+	
 	static hasMany = [observations:Observation, contributors:SUser, attributions:Contributor, states : String, districts:String, talukas: String]
 	
 	static constraints = {
@@ -88,6 +94,8 @@ class Checklists extends Observation {
 		//at least one of the column name must present 
 		sciNameColumn nullable:true, blank:true;
 		commonNameColumn nullable:true, blank:true;
+		drupalId nullable:true, blank:true;
+		uid nullable:true, blank:true;
 	}
 
 	static mapping = {
