@@ -291,5 +291,33 @@ class ObservationTagLib {
         }
 	}
 
+    def getStats = { attrs, body ->
+        def noOfTags = observationService.getAllTagsOfUser(attrs.model.user.id.toLong()).size()	
+        def noOfObvs = observationService.getAllObservationsOfUser(attrs.model.user);
+		def noOfUserRecos = observationService.getAllRecommendationsOfUser(attrs.model.user);
+        def noOfComments = attrs.model.user.fetchCommentCount()
+        int totalActivity = noOfTags+noOfObvs+noOfUserRecos+noOfComments
+        out << """
+
+        <div class="footer">
+            <span class="footer-item" title="Total Activity"> <i
+                    class="icon-leaf"></i> 
+                ${totalActivity}	 </span>
+            <span class="footer-item">:</span>
+
+            <span class="footer-item" title="Observations"> <i
+                    class="icon-screenshot"></i> ${noOfObvs}
+                 </span> <span class="footer-item"
+                title="Tags"> <i class="icon-tags"></i> 
+                ${noOfTags}</span> <span class="footer-item"
+                title="Identifications"> <i class="icon-check"></i> 
+                ${noOfUserRecos} </span>
+            <span class="footer-item" title="Comments"> <i class="icon-comment"></i> 
+                ${noOfComments}
+        </div>
+
+        """
+        
+    }
 }
 

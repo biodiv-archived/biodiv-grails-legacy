@@ -6,4 +6,5 @@
 		href="${uGroup.createLink([action:'show', controller:'SUser', id:userInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':userGroupWebaddress])}"
 		title="${userInstance.name}"> ${userInstance.name}
 	</a>
+
 </h5>
