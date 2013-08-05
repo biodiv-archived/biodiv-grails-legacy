@@ -2077,3 +2077,6 @@ div.noOfRatings {
 .incorrectName {
     background-color : #FA8072;
 }
+.dropdown-menu {
+    z-index:3000;
+}
