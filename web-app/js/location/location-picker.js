@@ -363,7 +363,7 @@ function setLatLngFields(lat, lng) {
 
 function set_date(date){
 	$(".location_picker_button").removeClass("active_location_picker_button");
-	$('#observedOn').datepicker("setDate", Date.parse(date));
+	$('#fromDate').datepicker("setDate", Date.parse(date));
 }
 
 
