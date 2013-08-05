@@ -431,6 +431,32 @@ class ChecklistUtilService {
 		migrateChecklist(startId.toLong())
 	}
 
+	def setDrupalRef(){
+		def startDate = new Date()
+		def sql = Sql.newInstance(connectionUrl, userName, password, "org.postgresql.Driver");
+		int i=0;
+		def uidMap = [13814:1426, 328:1099, 1:1, 314:1103]
+		Checklists.withTransaction(){
+			sql.eachRow("select nid, vid, uid, title from node where type = 'checklist' order by nid asc") { row ->
+			//log.debug " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>     title ===  $i  $row.title  nid == $row.nid , vid == $row.vid"
+				def drupalTitle = row.title
+				def cl = Checklists.findByTitle(drupalTitle)
+				if(!cl){
+					println "================ cl not found " + cl
+					i++
+				}else{
+					println "====== found "
+					cl.drupalId = row.nid
+					cl.uid = uidMap.get(row.uid)
+					if(!cl.save(flush:true)){
+						cl.errors.allErrors.each { println it }
+					}
+				}
+			}
+		}
+		println "=== total   $i"
+	}
+	
 	def migrateChecklist(startOffset){
 		def startDate = new Date()
 		def sql = Sql.newInstance(connectionUrl, userName, password, "org.postgresql.Driver");
