@@ -197,6 +197,10 @@ class Checklists extends Observation {
 		return res
 	}
 	
+	String fetchSpeciesCall(){
+		return title
+	}
+	
 	/**
 	* @return
 	* List of dirty fields that should update observation.
@@ -205,9 +209,6 @@ class Checklists extends Observation {
 	   return ["fromDate", "geoPrivacy", "group", "habitat", "latitude", "locationAccuracy", "longitude", "placeName", "reverseGeocodedName", "toDate", "topology", "sciNameColumn", "commonNameColumn"]
    }
 
-   
-   //XXX remove this method after migration
-   def beforeUpdate(){	
-   } 
 	
+   	
 }
