@@ -495,7 +495,7 @@ class ChecklistService {
 
 	
 	def List getObservationData(id, params=[:]){
-		params.max = params.max ? params.max.toInteger() :20
+		params.max = params.max ? params.max.toInteger() :50
 		params.offset = params.offset ? params.offset.toInteger() :0
 		def sql =  Sql.newInstance(dataSource);
 		def query = "select observation_id  as obv_id from checklists_observation where checklists_observations_id = " + id + " order by observations_idx limit " + params.max + " offset " + params.offset;
