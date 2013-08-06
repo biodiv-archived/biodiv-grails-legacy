@@ -38,7 +38,6 @@ class Checklists extends Observation {
 	String refText;
 	String sourceText;
 	String rawChecklist;
-	String columnNames;
 	
 	//to maintain order
 	List observations;
@@ -59,20 +58,16 @@ class Checklists extends Observation {
 	//backword reference to drupal checklist for all old checlist 
 	long drupalId = -1; 
 	
-	//XXX tmp contributor should be removed after migration 
-	long uid = -1 ;
-	
 	static hasMany = [observations:Observation, contributors:SUser, attributions:Contributor, states : String, districts:String, talukas: String]
 	
 	static constraints = {
 		//XXX this is extended class so have strictly say nullable false
 		title nullable:false, blank:false;
 		speciesCount nullable:false;
-		columnNames  nullable:false ;
 		rawChecklist nullable:true;
 		license  nullable:false, blank:false;
 		//make this false after migration
-		columns nullable:true, blank:false;
+		columns nullable:false, blank:false;
 		
 		//attribution nullable:true;
 		reservesValue nullable:true;
@@ -95,21 +90,18 @@ class Checklists extends Observation {
 		sciNameColumn nullable:true, blank:true;
 		commonNameColumn nullable:true, blank:true;
 		drupalId nullable:true, blank:true;
-		uid nullable:true, blank:true;
 	}
 
 	static mapping = {
 		version : false;
 		description type:'text';
-		//attribution type:'text';
 		refText type:'text';
 		sourceText type:'text';
-		columnNames type:'text';
 		columns type:'text';
 	}
 
 	def fetchColumnNames(){
-		return JSON.parse(columns) //columnNames.split("\t")
+		return JSON.parse(columns)
 	}
 	
 	def fetchAttributions(){

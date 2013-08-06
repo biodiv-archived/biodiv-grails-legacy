@@ -21,7 +21,6 @@ import species.Synonyms
 import species.TaxonomyDefinition
 import species.auth.SUser;
 import species.groups.SpeciesGroup;
-import species.participation.Checklist;
 import species.participation.ChecklistService;
 import species.participation.Observation;
 import species.participation.Recommendation;

@@ -97,7 +97,6 @@ class ChecklistService {
 		checklist.reservesValue =  params.reservesValue
 		checklist.sciNameColumn =  params.sciNameColumn
 		checklist.commonNameColumn =  params.commonNameColumn
-		checklist.columnNames =  params.columnNames ?:checklist.columnNames
 		checklist.columns =  params.columns?params.columns as JSON:checklist.columns
 		
 		checklist.isChecklist = true
