@@ -1207,5 +1207,5 @@ class ObservationController {
         def locations = observationService.locations(params);
         render locations as JSON
     }
-
+	
 }
