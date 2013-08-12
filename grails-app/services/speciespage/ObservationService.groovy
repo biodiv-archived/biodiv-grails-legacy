@@ -1383,11 +1383,12 @@ class ObservationService {
 			def mailType = observationInstance.instanceOf(Checklists) ? CHECKLIST_DELETED : OBSERVATION_DELETED
 			try {
 				observationInstance.isDeleted = true;
-				observationInstance.save(flush: true)
+				observationInstance.save(flush: true);
 				sendNotificationMail(mailType, observationInstance, null, params.webaddress);
 				observationsSearchService.delete(observationInstance.id);
 				messageCode = 'default.deleted.message'
 				url = generateLink(params.controller, 'list', [])
+				ActivityFeed.updateIsDeleted(observationInstance)
 			}
 			catch (org.springframework.dao.DataIntegrityViolationException e) {
 				messageCode = 'default.not.deleted.message'
