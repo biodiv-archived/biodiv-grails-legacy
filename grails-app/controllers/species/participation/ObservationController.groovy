@@ -224,9 +224,9 @@ class ObservationController {
 					render(view: "create", model: [observationInstance: observationInstance, lastCreatedObv:null])
 				}
 			}
+			saveAndRender(params)
 		} else {
 			redirect (url:uGroup.createLink(action:'create', controller:"observation", 'userGroupWebaddress':params.webaddress))
-			//redirect(action: "create")
 		}
 	}
 
@@ -234,58 +234,23 @@ class ObservationController {
 	@Secured(['ROLE_USER'])
 	def update = {
 		log.debug params;
-
-		def observationInstance = Observation.get(params.id.toLong())
-		def currentUser = springSecurityService.currentUser
-		params.author = observationInstance.author;
+		def observationInstance = Observation.get(params.id?.toLong())
 		if(observationInstance)	{
-			try {
-				observationService.updateObservation(params, observationInstance);
-
-				if(!observationInstance.hasErrors() && observationInstance.save(flush:true)) {
-					flash.message = "${message(code: 'default.updated.message', args: [message(code: 'observation.label', default: 'Observation'), observationInstance.id])}"
-					log.debug "Successfully updated observation : "+observationInstance
-
-					params.obvId = observationInstance.id
-					def tags = (params.tags != null) ? Arrays.asList(params.tags) : new ArrayList();
-					observationInstance.setTags(tags);
-					activityFeedService.addActivityFeed(observationInstance, null, currentUser, activityFeedService.OBSERVATION_UPDATED);
-					
-					if(params.groupsWithSharingNotAllowed) {
-						observationService.setUserGroups(observationInstance, [params.groupsWithSharingNotAllowed]);
-					} else {
-						if(params.userGroupsList) {
-							def userGroups = (params.userGroupsList != null) ? params.userGroupsList.split(',').collect{k->k} : new ArrayList();
-							observationService.setUserGroups(observationInstance, userGroups);
-						} else {
-							observationService.setUserGroups(observationInstance, []);
-						}
-					}
-                    
-                    log.debug "Saving ratings for the resources"
-                    observationInstance.resource.each { res ->
-                        if(res.rating) {
-                            res.rate(springSecurityService.currentUser, res.rating);
-                        }
-                    }
-					//redirect(action: "show", id: observationInstance.id)
-					params["createNew"] = true
-					chain(action: 'addRecommendationVote', model:['chainedParams':params]);
-				} else {
-					observationInstance.errors.allErrors.each { log.error it }
-					render(view: "create", model: [observationInstance: observationInstance])
-				}
-			} catch(e) {
-				e.printStackTrace();
-				flash.message = "${message(code: 'error')}";
-				render(view: "create", model: [observationInstance: observationInstance])
-			}
+			saveAndRender(params, false)
 		}else {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
 			redirect (url:uGroup.createLink(action:'list', controller:"observation", 'userGroupWebaddress':params.webaddress))
-			//redirect(action: "list")
 		}
-		render(view: "create", model: [observationInstance: observationInstance])
+	}
+	
+	private saveAndRender(params, sendMail=true){
+		def result = observationService.saveObservation(params, sendMail)
+		if(result.success){
+			chain(action: 'addRecommendationVote', model:['chainedParams':params]);
+		}else{
+			//flash.message = "${message(code: 'error')}";
+			render(view: "create", model: [observationInstance: result.observationInstance, lastCreatedObv:null])
+		}
 	}
 
 	def show = {
@@ -379,7 +344,7 @@ class ObservationController {
 	
 	@Secured(['ROLE_USER'])
 	def edit = {
-		def observationInstance = Observation.findWhere(id:params.id.toLong(), isDeleted:false)
+		def observationInstance = Observation.findWhere(id:params.id?.toLong(), isDeleted:false)
 		if (!observationInstance) {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
 			redirect (url:uGroup.createLink(action:'list', controller:"observation", 'userGroupWebaddress':params.webaddress))
@@ -863,31 +828,9 @@ class ObservationController {
 
 	@Secured(['ROLE_USER'])
 	def flagDeleted = {
-		log.debug params;
-		//params.author = springSecurityService.currentUser;
-		def observationInstance = Observation.get(params.id.toLong())
-		if (observationInstance && SUserService.ifOwns(observationInstance.author)) {
-			try {
-				observationInstance.isDeleted = true;
-				observationInstance.save(flush: true)
-				observationService.sendNotificationMail(observationService.OBSERVATION_DELETED, observationInstance, request, params.webaddress);
-				activityFeedService.deleteFeed(observationInstance);
-				observationsSearchService.delete(observationInstance.id);
-				flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
-				redirect (url:uGroup.createLink(action:'list', controller:"observation", 'userGroupWebaddress':params.webaddress))
-				//redirect(action: "list")
-			}
-			catch (org.springframework.dao.DataIntegrityViolationException e) {
-				flash.message = "${message(code: 'default.not.deleted.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
-				redirect (url:uGroup.createLink(action:'show', controller:"observation",  id: params.id, 'userGroupWebaddress':params.webaddress))
-				//redirect(action: "show", id: params.id)
-			}
-		}
-		else {
-			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
-			redirect (url:uGroup.createLink(action:'list', controller:"observation", 'userGroupWebaddress':params.webaddress))
-			//redirect(action: "list")
-		}
+		def result = observationService.delete(params)
+		flash.message = result.message
+		redirect (url:result.url)
 	}
 
 	@Secured(['ROLE_USER'])
@@ -1069,8 +1012,8 @@ class ObservationController {
 			}
 		}
 	}
-
-	/**
+   
+    /**
 	 * Count   
 	 */
 	def count = {
@@ -1329,4 +1272,5 @@ class ObservationController {
         def locations = observationService.locations(params);
         render locations as JSON
     }
+	
 }

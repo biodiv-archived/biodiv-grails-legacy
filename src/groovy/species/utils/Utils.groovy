@@ -39,6 +39,8 @@ class Utils {
 	private static final log = LogFactory.getLog(this);
 	private static final NamesParser namesParser = new NamesParser();
 	private static final Random FILE_NAME_GENEROTR = new Random();
+	private static final MIN_FLOAT = 0.2;
+	private static final MAX_FLOAT = 0.7;
 	
 	def grailsApplication;
 
@@ -93,6 +95,11 @@ class Utils {
 		int beginIndex = name.lastIndexOf(".")
 		name =  (beginIndex > -1) ? name.substring(0, beginIndex) + getCleanFileExtension(name) : name
 		return name;
+	}
+	
+	static float getRandomFloat(){
+		def f = FILE_NAME_GENEROTR.nextFloat()
+		return (f < MIN_FLOAT) ? f + MIN_FLOAT : (f > MAX_FLOAT ? f - MAX_FLOAT + MIN_FLOAT : f)
 	}
 	  
 	/**

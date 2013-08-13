@@ -513,7 +513,7 @@ class XMLConverter extends SourceConverter {
      * @param createNew
      * @return
      */
-    public Contributor getContributorByName(String contributorName, boolean createNew) {
+    public static Contributor getContributorByName(String contributorName, boolean createNew) {
         if(!contributorName) return;
 
         def contributor = Contributor.findByName(contributorName);
@@ -548,7 +548,6 @@ class XMLConverter extends SourceConverter {
             licenses.add(getLicenseByType(LicenseType.CC_BY, createNew));
         }
 
-        println "****returning ${licenses}";
         return licenses;
     }
 
@@ -566,15 +565,10 @@ class XMLConverter extends SourceConverter {
             type = licenseType
         } else {
             licenseType = licenseType?.toString().trim();
-            if(!licenseType.startsWith("CC")) {
+            if(!licenseType.startsWith("CC") && !licenseType.equals(LicenseType.CC_PUBLIC_DOMAIN.value())) {
                 licenseType = "CC "+licenseType.trim()
             }
-            for(LicenseType t : LicenseType) {
-                if(t.value().equalsIgnoreCase(licenseType)) {
-                    type = t;
-                    break;
-                }
-            }
+			type = License.fetchLicenseType(licenseType)
         }
 
         if(!type) return null;

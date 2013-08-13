@@ -71,6 +71,7 @@ class ObservationService {
 	def activityFeedService;
 	def mailService;
 	def sessionFactory;
+	def SUserService;
 	
 	static final String OBSERVATION_ADDED = "observationAdded";
 	static final String SPECIES_RECOMMENDED = "speciesRecommended";
@@ -79,6 +80,7 @@ class ObservationService {
 	static final String SPECIES_REMOVE_COMMENT = "speciesRemoveComment";
 	static final String OBSERVATION_FLAGGED = "observationFlagged";
 	static final String OBSERVATION_DELETED = "observationDeleted";
+	static final String CHECKLIST_DELETED= "checklistDeleted";
 	static final String DOWNLOAD_REQUEST = "downloadRequest";
 	/**
 	 * 
@@ -97,6 +99,7 @@ class ObservationService {
 	 * @param observation
 	 */
 	void updateObservation(params, observation){
+        //log.debug "Updating obv with params ${params}"
 		if(params.author)  {
 			observation.author = params.author;
 		}
@@ -106,7 +109,8 @@ class ObservationService {
 		}
 		observation.group = params.group?:SpeciesGroup.get(params.group_id);
 		observation.notes = params.notes;
-		observation.fromDate = observation.toDate = parseDate(params.observedOn);
+		observation.fromDate = parseDate(params.fromDate);
+		observation.toDate = params.toDate ? parseDate(params.toDate) : observation.fromDate
 		observation.placeName = params.placeName//?:observation.reverseGeocodedName;
 		observation.reverseGeocodedName = params.reverse_geocoded_name?:observation.placeName
 		
@@ -117,6 +121,8 @@ class ObservationService {
 		observation.habitat = params.habitat?:Habitat.get(params.habitat_id);
 
 		observation.agreeTerms = (params.agreeTerms?.equals('on'))?true:false;
+		observation.sourceId = params.sourceId ?: observation.sourceId
+		observation.checklistAnnotations = params.checklistAnnotations?:observation.checklistAnnotations
 		
         GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), grailsApplication.config.speciesPortal.maps.SRID);
         if(params.latitude && params.longitude) {
@@ -137,6 +143,75 @@ class ObservationService {
 		observation.resource?.clear();
 		resources.each { resource ->
 			observation.addToResource(resource);
+		}
+	}
+	
+	Map saveObservation(params, sendMail=true){
+		//TODO:edit also calls here...handle that wrt other domain objects
+		params.author = springSecurityService.currentUser;
+		def observationInstance, feedType, feedAuthor, mailType; 
+		try {
+			
+			if(params.action == "save"){
+				observationInstance = createObservation(params);
+				feedType = activityFeedService.OBSERVATION_CREATED
+				feedAuthor = observationInstance.author
+				mailType = OBSERVATION_ADDED
+			}else{
+				observationInstance = Observation.get(params.id.toLong())
+				updateObservation(params, observationInstance)
+				feedType = activityFeedService.OBSERVATION_UPDATED
+				feedAuthor = springSecurityService.currentUser
+				params.author = observationInstance.author;
+			}
+			
+			if(!observationInstance.hasErrors() && observationInstance.save(flush:true)) {
+				//flash.message = "${message(code: 'default.created.message', args: [message(code: 'observation.label', default: 'Observation'), observationInstance.id])}"
+				log.debug "Successfully created observation : "+observationInstance
+				params.obvId = observationInstance.id
+				activityFeedService.addActivityFeed(observationInstance, null, feedAuthor, feedType);
+				
+				saveObservationAssociation(params, observationInstance)
+								
+				if(sendMail)
+					sendNotificationMail(mailType, observationInstance, null, params.webaddress);
+					
+				params["createNew"] = true
+				return ['success' : true, observationInstance:observationInstance]
+			} else {
+				observationInstance.errors.allErrors.each { log.error it }
+				return ['success' : false, observationInstance:observationInstance]
+			}
+		} catch(e) {
+			e.printStackTrace();
+			return ['success' : false, observationInstance:observationInstance]
+		}
+	}
+	
+	/**
+	 * @param params
+	 * @param observationInstance
+	 * @return
+	 * saving Groups, tags and resources
+	 */
+	def saveObservationAssociation(params, observationInstance){
+		def tags = (params.tags != null) ? Arrays.asList(params.tags) : new ArrayList();
+		observationInstance.setTags(tags);
+
+		if(params.groupsWithSharingNotAllowed) {
+			setUserGroups(observationInstance, [params.groupsWithSharingNotAllowed]);
+		} else {
+			if(params.userGroupsList) {
+				def userGroups = (params.userGroupsList != null) ? params.userGroupsList.split(',').collect{k->k} : new ArrayList();
+				setUserGroups(observationInstance, userGroups);
+			}
+		}
+		
+		log.debug "Saving ratings for the resources"
+		observationInstance?.resource?.each { res ->
+			if(res.rating) {
+				res.rate(springSecurityService.currentUser, res.rating);
+			}
 		}
 	}
 
@@ -426,20 +501,20 @@ class ObservationService {
 		}
 	}
 	
-	private Map getRecommendation(params){
+	Map getRecommendation(params){
 		def recoName = params.recoName;
 		def canName = params.canName;
 		def commonName = params.commonName;
 		def languageId = Language.getLanguage(params.languageName).id;
-		def refObject = params.observation?:Observation.get(params.obvId);
+//		def refObject = params.observation?:Observation.get(params.obvId);
 		
 		//if source of recommendation is other that observation (i.e Checklist)
-		refObject = refObject ?: params.refObject
+//		refObject = refObject ?: params.refObject
 		
 		Recommendation commonNameReco = recommendationService.findReco(commonName, false, languageId, null);
 		Recommendation scientificNameReco = recommendationService.getRecoForScientificName(recoName, canName, commonNameReco);
 		
-		curationService.add(scientificNameReco, commonNameReco, refObject, springSecurityService.currentUser);
+//		curationService.add(scientificNameReco, commonNameReco, refObject, springSecurityService.currentUser);
 		
 		//giving priority to scientific name if its available. same will be used in determining species call
 		return [mainReco : (scientificNameReco ?:commonNameReco), commonNameReco:commonNameReco];
@@ -490,6 +565,7 @@ class ObservationService {
 	 * 
 	 */
 	private def createResourcesXML(params) {
+        println params
 		NodeBuilder builder = NodeBuilder.newInstance();
 		XMLConverter converter = new XMLConverter();
 		def resources = builder.createNode("resources");
@@ -871,7 +947,7 @@ class ObservationService {
         return pl
     }
 
-	private Date parseDate(date){
+	Date parseDate(date){
 		try {
 			return date? Date.parse("dd/MM/yyyy", date):new Date();
 		} catch (Exception e) {
@@ -1299,6 +1375,34 @@ class ObservationService {
 		return result;
 	} 
 
+	def delete(params){
+		def messageCode, url, label = Utils.getTitleCase(params.controller)
+		def messageArgs = [label, params.id]
+		def observationInstance = Observation.get(params.id.toLong())
+		if (observationInstance && SUserService.ifOwns(observationInstance.author)) {
+			def mailType = observationInstance.instanceOf(Checklists) ? CHECKLIST_DELETED : OBSERVATION_DELETED
+			try {
+				observationInstance.isDeleted = true;
+				observationInstance.save(flush: true);
+				sendNotificationMail(mailType, observationInstance, null, params.webaddress);
+				observationsSearchService.delete(observationInstance.id);
+				messageCode = 'default.deleted.message'
+				url = generateLink(params.controller, 'list', [])
+				ActivityFeed.updateIsDeleted(observationInstance)
+			}
+			catch (org.springframework.dao.DataIntegrityViolationException e) {
+				messageCode = 'default.not.deleted.message'
+				url = generateLink(params.controller, 'show', [id: params.id])
+			}
+		}
+		else {
+			messageCode = 'default.not.found.message'
+			url = generateLink(params.controller, 'list', [])
+		}
+		
+		return [url:url, messageCode:messageCode, messageArgs: messageArgs]
+	}
+	
 	//////////////////////////////////////////////////////////////////////////////////////////////
 	
 	public sendNotificationMail(String notificationType, def obv, request, String userGroupWebaddress, ActivityFeed feedInstance=null){
@@ -1306,8 +1410,7 @@ class ObservationService {
 		log.debug "Sending email"
 		try {
 			
-		def targetController =  obv.getClass().getCanonicalName().split('\\.')[-1]
-		targetController = targetController.replaceFirst(targetController[0], targetController[0].toLowerCase());
+		def targetController =  getTargetController(obv)//obv.getClass().getCanonicalName().split('\\.')[-1]
 		def obvUrl, domain
 	
         try {
@@ -1341,6 +1444,13 @@ class ObservationService {
 				toUsers.add(getOwner(obv))
 				break
 
+			case activityFeedService.CHECKLIST_CREATED:
+				mailSubject = conf.ui.addChecklist.emailSubject
+				bodyContent = conf.ui.addChecklist.emailBody
+				toUsers.add(getOwner(obv))
+				break
+
+				
 			case OBSERVATION_FLAGGED :
 				mailSubject = "Observation flagged"
 				bodyView = "/emailtemplates/addObservation"
@@ -1356,6 +1466,15 @@ class ObservationService {
 				populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
 				toUsers.add(getOwner(obv))
 				break
+				
+			case CHECKLIST_DELETED :
+				mailSubject = conf.ui.checklistDeleted.emailSubject
+				bodyContent = conf.ui.checklistDeleted.emailBody
+				templateMap["currentUser"] = springSecurityService.currentUser
+				//replyTo = templateMap["currentUser"].email
+				toUsers.add(getOwner(obv))
+				break
+
 
 			case SPECIES_RECOMMENDED :
 				bodyView = "/emailtemplates/addObservation"
@@ -1382,6 +1501,7 @@ class ObservationService {
 				mailSubject = conf.ui.observationPostedToGroup.emailSubject
 				bodyView = "/emailtemplates/addObservation"
 				populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
+				templateMap["actionObject"] = 'observation'
 				templateMap["groupNameWithlink"] = activityFeedService.getUserGroupHyperLink(activityFeedService.getDomainObject(feedInstance.activityHolderType, feedInstance.activityHolderId))
 				toUsers.addAll(getParticipants(obv))
 				break
@@ -1390,6 +1510,27 @@ class ObservationService {
 				bodyView = "/emailtemplates/addObservation"
 				mailSubject = conf.ui.observationRemovedFromGroup.emailSubject
 				populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
+				templateMap["actionObject"] = 'observation'
+				templateMap["groupNameWithlink"] = activityFeedService.getUserGroupHyperLink(activityFeedService.getDomainObject(feedInstance.activityHolderType, feedInstance.activityHolderId))
+				toUsers.addAll(getParticipants(obv))
+				break
+
+			case activityFeedService.CHECKLIST_POSTED_ON_GROUP:
+				mailSubject = conf.ui.checklistPostedToGroup.emailSubject
+				bodyContent = conf.ui.checklistPostedToGroup.emailBody
+				templateMap["actionObject"] = 'checklist'
+				templateMap["actorProfileUrl"] = generateLink("SUser", "show", ["id": feedInstance.author.id], request)
+				templateMap["actorName"] = feedInstance.author.name
+				templateMap["groupNameWithlink"] = activityFeedService.getUserGroupHyperLink(activityFeedService.getDomainObject(feedInstance.activityHolderType, feedInstance.activityHolderId))
+				toUsers.addAll(getParticipants(obv))
+				break
+
+			case activityFeedService.CHECKLIST_REMOVED_FROM_GROUP:
+				mailSubject = conf.ui.checklistRemovedFromGroup.emailSubject
+				bodyContent = conf.ui.checklistRemovedFromGroup.emailBody
+				templateMap["actionObject"] = 'checklist'
+				templateMap["actorProfileUrl"] = generateLink("SUser", "show", ["id": feedInstance.author.id], request)
+				templateMap["actorName"] = feedInstance.author.name
 				templateMap["groupNameWithlink"] = activityFeedService.getUserGroupHyperLink(activityFeedService.getDomainObject(feedInstance.activityHolderType, feedInstance.activityHolderId))
 				toUsers.addAll(getParticipants(obv))
 				break
@@ -1397,7 +1538,8 @@ class ObservationService {
 			case activityFeedService.COMMENT_ADDED:				
 				bodyView = "/emailtemplates/addObservation"
 				populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
-				mailSubject = "New comment" 
+				templateMap["userGroupWebaddress"] = userGroupWebaddress
+				mailSubject = "New comment in ${templateMap['domainObjectType']}"
 				templateMap['message'] = " added a comment to the page listed below."
 				toUsers.addAll(getParticipants(obv))
 				break;

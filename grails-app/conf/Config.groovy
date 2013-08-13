@@ -86,19 +86,19 @@ log4j = {
 	}
 
 	error  	'org.codehaus.groovy.grails.web.pages', //  GSP
-	'org.codehaus.groovy.grails.web.sitemesh', //  layouts
-	'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
-	'org.codehaus.groovy.grails.web.mapping', // URL mapping
-	'org.codehaus.groovy.grails.commons', // core / classloading
-	'org.codehaus.groovy.grails.plugins', // plugins
-	'org.codehaus.groovy.grails.orm.hibernate', // hibernate integration
-	'org.hibernate',
-	'net.sf.ehcache.hibernate',
-	'org.springframework.security',
-	'org.codehaus.groovy.grails.web.servlet',  //  controllers
-	'grails.plugin',
-	'org.springframework.security.web',
-	'grails.app.tagLib.org.grails.plugin.resource'
+            'org.codehaus.groovy.grails.web.sitemesh', //  layouts
+            'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
+            'org.codehaus.groovy.grails.web.mapping', // URL mapping
+            'org.codehaus.groovy.grails.commons', // core / classloading
+            'org.codehaus.groovy.grails.plugins', // plugins
+            'org.codehaus.groovy.grails.orm.hibernate', // hibernate integration
+            'org.hibernate',
+            'net.sf.ehcache.hibernate',
+            'org.springframework.security',
+            'org.codehaus.groovy.grails.web.servlet',  //  controllers
+            'grails.plugin',
+            'org.springframework.security.web',
+            'grails.app.tagLib.org.grails.plugin.resource'
 
 
 	warn   'org.mortbay.log'
@@ -217,7 +217,7 @@ speciesPortal {
 	domain = "localhost"
 	resources {
 		rootDir = "${app.rootDir}/images"
-		serverURL = "http://localhost/${appName}/images"
+		serverURL = "http://indiabiodiversity.localhost.org/${appName}/images"
 		images {
 			defaultType = "jpg"
 			thumbnail {
@@ -242,14 +242,14 @@ speciesPortal {
 	observations {
 		rootDir = "${app.rootDir}/observations"
 		observationDownloadDir = "${download.rootDir}/observations"
-		serverURL = "http://localhost/${appName}/observations"
+		serverURL = "http://indiabiodiversity.localhost.org/${appName}/observations"
 		//serverURL = "http://localhost/${appName}/observations"
 		MAX_IMAGE_SIZE = 104857600
         filePicker.key = 'AXCVl73JWSwe7mTPb2kXdz'
 	} 
 	 userGroups {
 		rootDir = "${app.rootDir}/userGroups"
-		serverURL = "http://localhost/${appName}/userGroups"
+		serverURL = "http://indiabiodiversity.localhost.org/${appName}/userGroups"
 		//serverURL = "http://localhost/${appName}/userGroups"
 		logo {
 			MAX_IMAGE_SIZE = 51200
@@ -463,7 +463,7 @@ environments {
 		grails.serverURL = "http://indiabiodiversity.localhost.org/${appName}"
 		speciesPortal {
 			search.serverURL = "http://localhost:8090/solr"
-			names.parser.serverURL = "127.0.0.1"
+			names.parser.serverURL = "saturn.strandls.com"
 			wgp {
 				facebook {
 					appId= "424071494335902"
@@ -957,6 +957,21 @@ If you do not want to receive notifications please go to your <a href="$userProf
 Thank you for your contribution to the portal.<br/>
 <br/>
 -The portal team'''
+
+grails.plugins.springsecurity.ui.addChecklist.emailSubject = 'Checklist added'
+grails.plugins.springsecurity.ui.addChecklist.emailBody = '''
+Hi $username,<br/>
+<br/>
+You have uploaded a checklist to <b>$domain</b> and it is available <a href="$obvUrl">here</a><br/>
+<br/>
+You will be notified by mail on any social activity on the checklist.<br/>
+If you do not want to receive notifications please go to your <a href="$userProfileUrl">user profile</a> and switch it off.<br/>
+<br/>
+Thank you for your contribution to the portal.<br/>
+<br/>
+-The portal team'''
+
+
 grails.plugins.springsecurity.ui.addRecommendationVote.emailSubject = 'Species name suggested'
 grails.plugins.springsecurity.ui.addRecommendationVote.emailBody = '''
 Hi $username,<br/>
@@ -1038,6 +1053,17 @@ If you do not want to receive notifications please go to your <a href="$userProf
 <br/>
 -The portal team'''
 
+grails.plugins.springsecurity.ui.checklistDeleted.emailSubject = 'Checklist deleted'
+grails.plugins.springsecurity.ui.checklistDeleted.emailBody = '''
+Hi $username,<br/>
+<br/>
+Your <a href="$obvUrl">checklist</a> has been deleted on <b>$domain</b>.<br/>
+<br/>
+If you do not want to receive notifications please go to your <a href="$userProfileUrl">user profile</a> and switch it off.<br/>
+<br/>
+-The portal team'''
+
+
 grails.plugins.springsecurity.ui.userGroup.inviteMember.emailSubject = 'Request to join the group'
 grails.plugins.springsecurity.ui.userGroup.inviteMember.emailBody = '''
 Hi $username,<br/>
@@ -1106,19 +1132,39 @@ grails.plugins.springsecurity.ui.observationPostedToGroup.emailSubject = 'Observ
 grails.plugins.springsecurity.ui.observationPostedToGroup.emailBody = '''\
 Hi $username,<br/>
 <br/>
-<a href="$actorProfileUrl">$actorName</a> has posted an <a href="$obvUrl">observation</a> to $groupNameWithlink.
+<a href="$actorProfileUrl">$actorName</a> has posted an <a href="$obvUrl">$actionObject</a> to $groupNameWithlink.
 <br/><br/>
 -The portal team
 '''
+
+grails.plugins.springsecurity.ui.checklistPostedToGroup.emailSubject = 'Checklist posted to group'
+grails.plugins.springsecurity.ui.checklistPostedToGroup.emailBody = '''\
+Hi $username,<br/>
+<br/>
+<a href="$actorProfileUrl">$actorName</a> has posted a <a href="$obvUrl">$actionObject</a> to $groupNameWithlink.
+<br/><br/>
+-The portal team
+'''
+
 
 grails.plugins.springsecurity.ui.observationRemovedFromGroup.emailSubject = 'Observation removed from group'
 grails.plugins.springsecurity.ui.observationRemovedFromGroup.emailBody = '''\
 Hi $username,<br/>
 <br/>
-<a href="$actorProfileUrl">$actorName</a> has removed an <a href="$obvUrl">observation</a> from $groupNameWithlink.
+<a href="$actorProfileUrl">$actorName</a> has removed an <a href="$obvUrl">$actionObject</a> from $groupNameWithlink.
 <br/><br/>
 -The portal team
 '''
+
+grails.plugins.springsecurity.ui.checklistRemovedFromGroup.emailSubject = 'Checklist removed from group'
+grails.plugins.springsecurity.ui.checklistRemovedFromGroup.emailBody = '''\
+Hi $username,<br/>
+<br/>
+<a href="$actorProfileUrl">$actorName</a> has removed a <a href="$obvUrl">$actionObject</a> from $groupNameWithlink.
+<br/><br/>
+-The portal team
+'''
+
 
 grails.plugins.springsecurity.ui.addDocument.emailSubject = 'Document added'
 grails.plugins.springsecurity.ui.addDocument.emailBody = '''

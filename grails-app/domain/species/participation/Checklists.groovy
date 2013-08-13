@@ -1,5 +1,8 @@
 package species.participation
 
+import grails.converters.JSON
+
+import java.util.List;
 import java.util.Map;
 
 import org.hibernate.Hibernate;
@@ -27,7 +30,7 @@ class Checklists extends Observation {
 	def obvUtilService;
 	
 	String title;
-	int speciesCount;
+	int speciesCount = 0;
 	
 	//String attribution;
 	License license;
@@ -35,7 +38,6 @@ class Checklists extends Observation {
 	String refText;
 	String sourceText;
 	String rawChecklist;
-	String columnNames;
 	
 	//to maintain order
 	List observations;
@@ -46,20 +48,26 @@ class Checklists extends Observation {
 	//others
 	String reservesValue;
 	
-	//will map to last revised in observation
-	//Date lastUpdated; 
-	//will map to notes in observation
-	//String description; //info;
+	// marked column for parsing name
+	String sciNameColumn;
+	String commonNameColumn;
+	
+	//serialized object to store list of column names
+	String columns;
+	
+	//backword reference to drupal checklist for all old checlist 
+	long drupalId = -1; 
 	
 	static hasMany = [observations:Observation, contributors:SUser, attributions:Contributor, states : String, districts:String, talukas: String]
 	
 	static constraints = {
 		//XXX this is extended class so have strictly say nullable false
-		title nullable:false;
+		title nullable:false, blank:false;
 		speciesCount nullable:false;
-		columnNames  nullable:false ;
-		rawChecklist nullable:false;
-		license  nullable:false;
+		rawChecklist nullable:true;
+		license  nullable:false, blank:false;
+		//make this false after migration
+		columns nullable:false, blank:false;
 		
 		//attribution nullable:true;
 		reservesValue nullable:true;
@@ -71,20 +79,29 @@ class Checklists extends Observation {
 		sourceText nullable:true;
 		
 		//XXX to be removed
-		publicationDate  nullable:true;
+		publicationDate  nullable:true, validator : {val, obj -> 
+			if(!val){
+				return true
+			}else{
+			 	return val < new Date() 
+			}
+		}
+		//at least one of the column name must present 
+		sciNameColumn nullable:true, blank:true;
+		commonNameColumn nullable:true, blank:true;
+		drupalId nullable:true, blank:true;
 	}
 
 	static mapping = {
 		version : false;
 		description type:'text';
-		//attribution type:'text';
 		refText type:'text';
 		sourceText type:'text';
-		columnNames type:'text';
+		columns type:'text';
 	}
-	
+
 	def fetchColumnNames(){
-		return columnNames.split("\t")
+		return JSON.parse(columns)
 	}
 	
 	def fetchAttributions(){
@@ -162,8 +179,8 @@ class Checklists extends Observation {
 	
 	private List getLimitedColumnForPdf(Observation obv, int serialNo){
 		def res = []
-		obv.fetchChecklistAnnotation().each { Annotation annot ->
-			if(annot.key.equalsIgnoreCase(ChecklistService.SN_NAME) || annot.key.equalsIgnoreCase(ChecklistService.CN_NAME)){
+		obv.fetchChecklistAnnotation().each { annot ->
+			if(annot.key.equalsIgnoreCase(sciNameColumn) || annot.key.equalsIgnoreCase(commonNameColumn)){
 				res.add(annot.value)
 			}
 		}
@@ -172,4 +189,18 @@ class Checklists extends Observation {
 		return res
 	}
 	
+	String fetchSpeciesCall(){
+		return title
+	}
+	
+	/**
+	* @return
+	* List of dirty fields that should update observation.
+	*/
+   static List fetchDirtyFields(){
+	   return ["fromDate", "geoPrivacy", "group", "habitat", "latitude", "locationAccuracy", "longitude", "placeName", "reverseGeocodedName", "toDate", "topology", "sciNameColumn", "commonNameColumn"]
+   }
+
+	
+   	
 }

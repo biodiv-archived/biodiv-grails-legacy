@@ -1,10 +1,15 @@
 package species.participation
 
+
+import groovy.sql.Sql
+import grails.converters.JSON
+
 import java.io.File;
 import java.text.SimpleDateFormat
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.httpclient.util.DateUtil;
 import org.apache.solr.common.SolrException;
@@ -14,9 +19,14 @@ import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap;
 import org.springframework.transaction.annotation.Transactional;
 
 
+import species.License;
 import species.Reference;
-import species.Species
+import species.Species;
+import species.Metadata;
+import species.Contributor;
+import species.participation.RecommendationVote.ConfidenceType;
 import species.utils.Utils;
+import species.sourcehandler.XMLConverter;
 import species.formatReader.SpreadsheetReader;
 
 //pdf related
@@ -46,14 +56,305 @@ class ChecklistService {
 	static final String SN_NAME_KEY = "scientific_name"
 	static final String SN_NAME = "scientific_name" //"scientific_names" //"Scientific Name" //"scientific_name"
 	static final String CN_NAME = "common_name"
-	
+	static final String OBSERVATION_COLUMN = "Id"
+	static final String MEDIA_COLUMN = "Media"
+	static final String SPECIES_TITLE_COLUMN = "speciesTitle"
+	static final String SPECIES_ID_COLUMN = "speciesId"
 	def grailsApplication
 	def observationService
 	def checklistSearchService;
 	def obvUtilService;
+	def springSecurityService;
+	def activityFeedService;
+	def observationsSearchService;
+	def dataSource;
+	def checklistUtilService
 	
 	///////////////////////////////////////////////////////////////////////////////
-	////////////////////////////// Search realted /////////////////////////////////
+	////////////////////////////// Create ///////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////
+
+	
+	Checklists createChecklist(params) {
+		Checklists checklist = new Checklists();
+		updateChecklist(params, checklist);
+		return checklist
+	}
+	
+	void updateChecklist(params, Checklists checklist){
+		//removing time component from date
+		params.fromDate = observationService.parseDate(params.fromDate)?.format("dd/MM/yyyy");
+		params.toDate =  observationService.parseDate(params.toDate)?.format("dd/MM/yyyy");
+		
+		observationService.updateObservation(params, checklist)
+		
+		checklist.title =  params.title
+		checklist.license = License.findByName(License.fetchLicenseType(params.license_0))  
+		checklist.refText =  params.refText
+		checklist.sourceText =  params.sourceText
+		checklist.rawChecklist =  params.rawChecklist ?:checklist.rawChecklist
+		checklist.publicationDate =  params.publicationDate ? observationService.parseDate(params.publicationDate) : null
+		checklist.reservesValue =  params.reservesValue
+		checklist.sciNameColumn =  params.sciNameColumn
+		checklist.commonNameColumn =  params.commonNameColumn
+		checklist.columns =  params.columns?params.columns as JSON:checklist.columns
+		
+		checklist.isChecklist = true
+	}
+	
+	Map saveChecklist(params, sendMail=true){
+		params.author = springSecurityService.currentUser;
+		def checklistInstance, feedType, feedAuthor, mailType, isGlobalUpdate = false;
+		try {
+			
+			if(params.action == "save"){
+				//create new checklist 
+				checklistInstance = createChecklist(params);
+				feedType = activityFeedService.CHECKLIST_CREATED
+				feedAuthor = checklistInstance.author
+				mailType = feedType 
+			}else{
+				//updates old checklist
+				checklistInstance = Checklists.get(params.id.toLong())
+				updateChecklist(params, checklistInstance)
+				feedType = activityFeedService.CHECKLIST_UPDATED
+				feedAuthor = springSecurityService.currentUser
+				//so that original author of checklist should not change
+				params.author = checklistInstance.author;
+				//to say if all obv needs to be updated because some change in MetaData properties
+				isGlobalUpdate = isGlobalUpdateForObv(checklistInstance)
+			}
+			
+			
+			if(!checklistInstance.hasErrors() && checklistInstance.save(flush:true)) {
+				log.debug "Successfully created checklistInstance : "+checklistInstance
+				activityFeedService.addActivityFeed(checklistInstance, null, feedAuthor, feedType);
+				
+				saveAttributions(params, checklistInstance)
+				observationService.saveObservationAssociation(params, checklistInstance)
+				
+				if(sendMail)
+					observationService.sendNotificationMail(mailType, checklistInstance, null, params.webaddress);
+				
+				saveObservationFromChecklist(params, checklistInstance, isGlobalUpdate)
+				observationsSearchService.publishSearchIndex(checklistInstance, true);
+					
+				return ['success' : true, checklistInstance:checklistInstance]
+			} else {
+				checklistInstance.errors.allErrors.each { log.error it }
+				return ['success' : false, checklistInstance:checklistInstance]
+			}
+		} catch(e) {
+			e.printStackTrace();
+			return ['success' : false, checklistInstance:checklistInstance]
+		}
+	}
+	
+	@Transactional
+	private saveAttributions(params, checklist){
+		if(params.attributions){
+			checklist.attributions?.clear()
+			def contributor =  XMLConverter.getContributorByName(params.attributions.trim(), true)
+			checklist.addToAttributions(contributor)
+		}
+	}
+	
+	@Transactional
+	private saveObservationFromChecklist(params, checklistInstance, boolean isGlobalUpdate){
+		if(!params.checklistData && !isGlobalUpdate)
+			return
+		
+		Checklists.withTransaction() {
+			Set updatedObv = new HashSet()
+			Set newObv = new HashSet()
+			def commonObsParams = getParamsForObv(params, checklistInstance)
+			
+			//Each entry in checklistData represent one observatoin
+			// if it has observation id column then those observation needs to be updated else new observation will be created
+			// checklist Edit page will return only dirty list that needs to be updated + new rows that will create new observation
+			// checklist save page will have all new rows that will create new observation
+			params.checklistData.each {  Map m ->
+				def oldObvId = m.remove(OBSERVATION_COLUMN)
+				def media = m.remove(MEDIA_COLUMN);
+				m.remove(SPECIES_TITLE_COLUMN);
+				m.remove(SPECIES_ID_COLUMN);
+                println "------------media----------- ${media}"
+                Map obsParams = new HashMap(commonObsParams);
+                if(media) {
+                    media.eachWithIndex{ item, index ->
+                        item.each { key, value ->
+                            obsParams.put(key+'_'+index, value);
+                        }
+                    }
+                }
+
+				// for old observation
+				if(oldObvId){
+					obsParams.action = "update"
+					obsParams.id = oldObvId
+					updatedObv.add(oldObvId)
+				}else{
+					obsParams.action = "save"
+				}	
+				obsParams.checklistAnnotations =  getSafeAnnotation(m)
+				def res = observationService.saveObservation(obsParams, false)
+				Observation observationInstance = res.observationInstance
+				saveReco(observationInstance, m, checklistInstance)
+				//saveObservationAnnotation(observationInstance, m, Arrays.asList(checklistInstance.fetchColumnNames()))
+				
+				if(!oldObvId){
+					checklistInstance.addToObservations(observationInstance)
+					newObv.add(observationInstance.id)
+				}
+			}
+			//if any global thing (ie. species group, habitat) changes then updating all the observation
+			if(isGlobalUpdate){
+				commonObsParams.action = "update"
+				commonObsParams.checklistAnnotations = null
+				checklistInstance.observations.each { obv ->
+					if(!updatedObv.contains(obv.id) && !(newObv.contains(obv.id))){
+						commonObsParams.id = obv.id
+						observationService.saveObservation(commonObsParams, false)
+					}
+				}
+			}
+			//updating obv count
+			checklistInstance.speciesCount = checklistInstance.observations.size()
+		}
+		log.debug "saved checklist observation  "
+	}
+	
+	
+	private getSafeAnnotation(Map m){
+		def newMap = [:]
+		m.each { k, v ->
+			if(v && !m.isNull(k)){
+				newMap.put(k.trim(), v.trim())
+			}
+		}
+		return newMap as JSON
+	}
+	
+	private Map getParamsForObv(params, checklistInstance){
+		Map obvParams = new HashMap(params)
+		obvParams.sourceId = checklistInstance.id
+		
+		obvParams.remove("checklistData")
+		obvParams.remove("checklistColumns")
+		
+		obvParams.remove("tags")
+		obvParams.remove("userGroupsList")
+		obvParams.remove("groupsWithSharingNotAllowed")
+		
+		return obvParams
+	}
+	
+	private saveReco(Observation obv, Map m, Checklists cl){
+		def res = observationService.getRecommendation([recoName:m[cl.sciNameColumn], commonName: m[cl.commonNameColumn]])
+		
+		if(!isNewReco(obv,res))
+			return
+		
+		def reco = res.mainReco
+		def cnReco = res.commonNameReco
+		
+		ConfidenceType confidence = observationService.getConfidenceType(ConfidenceType.CERTAIN.name());
+		RecommendationVote recommendationVoteInstance = new RecommendationVote(observation:obv, recommendation:reco, commonNameReco:cnReco, author:obv.author, confidence:confidence, votedOn:obv.fromDate);
+		
+		def user = springSecurityService.currentUser;
+		def oldRecoVote = RecommendationVote.findWhere(observation:obv, author:user)
+		if(oldRecoVote){
+			oldRecoVote.delete(flush:true)
+		}
+		if(!recommendationVoteInstance.hasErrors() && recommendationVoteInstance.save(flush:true)) {
+			log.debug "Successfully added reco vote : "+recommendationVoteInstance.id
+			activityFeedService.addActivityFeed(obv, recommendationVoteInstance, recommendationVoteInstance.author, activityFeedService.SPECIES_RECOMMENDED);
+			//saving max voted species name for observation instance
+			obv.maxVotedReco = reco
+		}else{
+			recommendationVoteInstance.errors.allErrors.each { log.error it }
+			throw new RuntimeException("Error during reco vote save");
+		}
+	}
+	
+	/**
+	 * 
+	 * @param obv
+	 * @param res
+	 * @return 
+	 * To check if any thing got changed in marked column of grid . if yes then saving new recoVote
+	 */
+	private boolean isNewReco(Observation obv, Map res){
+		def reco = res.mainReco
+		def cnReco = res.commonNameReco
+		
+		if(!reco){
+			return false
+		}
+		
+		if(obv.fetchSpeciesCall() != reco.name)
+			return true
+		
+		def user = springSecurityService.currentUser;	
+		def oldRecoVote = RecommendationVote.findWhere(observation:obv, author:user)
+		
+		if(!oldRecoVote || oldRecoVote.recommendation.name != reco.name || oldRecoVote.commonNameReco?.name != cnReco?.name)
+			return true
+		
+		return false
+	}
+	
+	/**
+	 * 
+	 * @param cl
+	 * @return
+	 * Flag to tell if some thing got changes in checklist which must be update on all of its observation
+	 */
+	
+	private boolean isGlobalUpdateForObv(Checklists cl){
+		if(!cl.isDirty()){
+			return false
+		}
+		List dirtyPropList = Checklists.fetchDirtyFields()
+		for (String prop : dirtyPropList) {
+			if(cl.isDirty(prop)){
+				return true
+			}
+		}
+		return false
+	}
+	
+	/**
+	 * 
+	 * @param obv
+	 * @param m
+	 * @param columns
+	 * @return
+	 * this method will store fresh annotations .clear any old annotation if exist
+	 * XXX have to change this method to store serialize map for checklist row data
+	 */
+	
+	private saveObservationAnnotation(obv, Map m, List columns){
+		obv.checklistAnnotations = m
+		/*
+		obv.annotations = []
+		obv.save(flush:true)
+		
+		m.each { k, v ->
+			observationService.addAnnotation(['key': k, 'value': v, 'columnOrder':columns.indexOf(k), 'sourceType': Checklists.class.getCanonicalName()], obv)
+		}
+		if(!obv.hasErrors() && obv.save(flush:true)) {
+			log.debug "saved observation meta data $obv"
+		}else{
+			obv.errors.allErrors.each { log.error it }
+			throw new RuntimeException("Error during meta data save");
+		}
+		*/
+	}
+	
+	
+	///////////////////////////////////////////////////////////////////////////////
+	////////////////////////////// Search related /////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////
 
 	def nameTerms(params) {
@@ -96,30 +397,7 @@ class ChecklistService {
 		}
 
 		SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-		//		if(params.daterangepicker_start && params.daterangepicker_end) {
-		//			if(i > 0) aq += " AND";
-		//			String lastRevisedStartDate = dateFormatter.format(DateUtil.parseDate(params.daterangepicker_start, ['dd/MM/yyyy']));
-		//			String lastRevisedEndDate = dateFormatter.format(DateUtil.parseDate(params.daterangepicker_end, ['dd/MM/yyyy']));
-		//			aq += " fromdate:["+lastRevisedStartDate+" TO *] AND todate:[* TO "+lastRevisedEndDate+"]";
-		//			queryParams['daterangepicker_start'] = params.daterangepicker_start;
-		//			queryParams['daterangepicker_end'] = params.daterangepicker_end;
-		//			activeFilters['daterangepicker_start'] = params.daterangepicker_start;
-		//			activeFilters['daterangepicker_end'] = params.daterangepicker_end;
-		//
-		//		} else if(params.daterangepicker_start) {
-		//			if(i > 0) aq += " AND";
-		//			String lastRevisedStartDate = dateFormatter.format(DateTools.dateToString(DateUtil.parseDate(params.daterangepicker_start, ['dd/MM/yyyy']), DateTools.Resolution.DAY));
-		//			aq += " fromdate:["+lastRevisedStartDate+" TO NOW]";
-		//			queryParams['daterangepicker_start'] = params.daterangepicker_start;
-		//			activeFilters['daterangepicker_start'] = params.daterangepicker_endparams.daterangepicker_end;
-		//		} else if (params.daterangepicker_end) {
-		//			if(i > 0) aq += " AND";
-		//			String lastRevisedEndDate = dateFormatter.format(DateTools.dateToString(DateUtil.parseDate(params.daterangepicker_end, ['dd/MM/yyyy']), DateTools.Resolution.DAY));
-		//			aq += " todate:[NOW TO "+lastRevisedEndDate+"]";
-		//			queryParams['daterangepicker_end'] = params.daterangepicker_end;
-		//			activeFilters['daterangepicker_end'] = params.daterangepicker_end;
-		//		}
-		//
+
 		if(params.query && aq) {
 			params.query = params.query + " AND "+aq
 		} else if (aq) {
@@ -214,6 +492,18 @@ class ChecklistService {
 			return false;
 	}
 
+	
+	def List getObservationData(id, params=[:]){
+		params.max = params.max ? params.max.toInteger() :50
+		params.offset = params.offset ? params.offset.toInteger() :0
+		def sql =  Sql.newInstance(dataSource);
+		def query = "select observation_id  as obv_id from checklists_observation where checklists_observations_id = " + id + " order by observations_idx limit " + params.max + " offset " + params.offset;
+		def res = []
+		sql.rows(query).each{
+			res << Observation.read(it.getProperty("obv_id"));
+		}
+		return res 
+	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	///////////////////////////////////////////  Export ////////////////////////////////////////////
@@ -263,7 +553,7 @@ class ChecklistService {
 		def tmpColumnNames = cl.fetchColumnNames()
 		def columnNames = ["s.no"]
 		for(c in tmpColumnNames){
-			if(c.equalsIgnoreCase(ChecklistService.SN_NAME) || c.equalsIgnoreCase(ChecklistService.CN_NAME)){
+			if(c.equalsIgnoreCase(cl.sciNameColumn) || c.equalsIgnoreCase(cl.commonNameColumn)){
 				columnNames.add(c)
 			}
 		}
@@ -311,4 +601,42 @@ class ChecklistService {
 
 		return csvFile
 	}
+	
+	//////////////////////////////////// Migrate related ////////////////////////////////////////
+	def serializeClData(){
+		List  clIdList = Checklist.listOrderById(order: "asc").collect{it.id}
+		clIdList.removeAll( [ 20, 72, 129, 221, 267, 304, 305])
+		clIdList.each {  id ->
+			def cl = Checklists.findById(id, [fetch: [observations: 'join']])
+			if(!cl.observations.iterator().next().checklistAnnotations){
+				println cl
+				Checklists.withTransaction(){
+					cl.observations.each { obv ->
+						def m = [:]
+						obv.fetchChecklistAnnotation().each { a ->
+							if(a.value){
+								m.put(a.key.trim(), a.value.trim())
+							}
+						}
+						obv.checklistAnnotations = m as JSON
+						obv.save(flush:true)
+					}
+					
+				}
+				
+				checklistUtilService.cleanUpGorm(true)
+				
+				Checklists.withTransaction(){ 
+					cl = Checklists.get(id)
+					cl.columns = new ArrayList(cl.fetchColumnNames()).collect { it.trim() } as JSON
+					cl.sciNameColumn = cl.sciNameColumn.trim()
+					cl.commonNameColumn = cl.commonNameColumn ? cl.commonNameColumn.trim() : null
+					if(!cl.save(flush:true)){
+						cl.errors.allErrors.each { println it }
+					}
+				}
+			}	
+		}
+	}
+	
 }

@@ -176,7 +176,7 @@ class Species implements Rateable {
 		return Species.executeQuery(query, ['taxOnConceptId':taxonConcept.id])[0]
 	}
 	
-	def afterDelete(){
+	def beforeDelete(){
 		activityFeedService.deleteFeed(this)
 	}
 	

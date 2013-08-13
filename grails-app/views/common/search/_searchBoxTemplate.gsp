@@ -43,6 +43,7 @@ $(document).ready(function() {
 		'isFlagged':"${params.isFlagged?.toBoolean()?.toString()}",
 		'nameTermsUrl': "${uGroup.createLink(controller:'search', action: 'nameTerms')}",
 		'noImageUrl' : "${createLinkTo(file:"no-image.jpg", base:grailsApplication.config.speciesPortal.resources.serverURL)}",
+		'dropDownIconUrl' : "${createLinkTo(file:"dropdown_active.gif", base:grailsApplication.config.speciesPortal.resources.serverURL)}",
 		'IBPDomainUrl':"${Utils.getIBPServerDomain()}",
 		'searchController' : "${controller}",
 		'carousel':{maxHeight:75, maxWidth:75},
@@ -50,8 +51,19 @@ $(document).ready(function() {
                 'locationsUrl': "${uGroup.createLink(controller:'observation', action: 'locations')}",
                 'defaultMarkerIcon':"${resource(dir:'js/Leaflet/dist/images', file:'')}",
                 'isChecklistOnly':"${params.isChecklistOnly?.toBoolean()?.toString()}",
+                'species':{
+                    'url':"${uGroup.createLink('controller':'species', action:'show', 'userGroup':userGroupInstance)}"
+                },
+                'content':{
+                    'url':"${uGroup.createLink('controller':'content')}"
+                },
                 'observation':{
-                    listUrl:"${uGroup.createLink(controller:'observation', action: 'listJSON', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"
+                    listUrl:"${uGroup.createLink(controller:'observation', action: 'listJSON', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}",
+                    uploadUrl:"${g.createLink(controller:'observation', action:'upload_resource')}"
+                },
+                'recommendation': {
+                    'getRecos' : "${uGroup.createLink(controller:'recommendation', action:'getRecos', userGroup:userGroupInstance)}",
+                    'suggest' : "${uGroup.createLink(controller:'recommendation', action: 'suggest', userGroup:userGroupInstance)}"
                 }
 	}
 	$("#userGroupSelectFilter").val("${(queryParams && queryParams.uGroup)?queryParams.uGroup:(params.webaddress?'THIS_GROUP':'ALL')}");

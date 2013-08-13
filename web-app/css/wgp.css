@@ -493,7 +493,7 @@ ul#recoSummary {
 	background-color: #ffffff;
 }
 
-#addObservation #imagesList {
+#addObservation #imagesList, #addResourcesModal #imagesList {
 	background-color: #fefad5;
 	border-bottom: 1px solid #9E9E9E;
 	border-top: 1px solid #9E9E9E;
@@ -732,6 +732,7 @@ ul#recoSummary {
 	min-height: 16px;
 	max-width: 32px;
 	width: auto;
+        margin:2px;
 }
 
 .very_small_profile_pic {
@@ -1652,7 +1653,7 @@ li#userOrEmail-new {
 }
 
 #commonName {
-	width: 180px;
+	width: 87%;
 }
 
 #group_options,#habitat_options {
@@ -2046,4 +2047,36 @@ div.noOfRatings {
     background-image: url('../images/stack.png');
     padding-left: 20px;
     color: #0c8040;
+}
+
+.slick-cell.validReco, .validReco {
+    background-color : green;
+    font-weight:bold;
+}
+.parsed {
+    background-color : yellow;
+}
+
+.span12 .submitButtons {
+    margin-top: 20px; 
+    margin-bottom: 40px;
+    margin-left:0px;
+}
+
+.addObvMenu {
+    font-weight:bold;
+}
+
+#addResourcesModal {
+    width:725px;
+    left:40%;
+}
+.table-striped tbody>tr:nth-child(odd)>td.nameColumn, .nameColumn {
+    background-color : lightyellow;
+}
+.incorrectName {
+    background-color : #FA8072;
+}
+.dropdown-menu {
+    z-index:3000;
 }

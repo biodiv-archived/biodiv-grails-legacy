@@ -1,4 +1,3 @@
-<%@ page import="species.participation.Checklist"%>
 <div class="species_title">
 	<%
 		def commonName = observationInstance.isChecklist ? observationInstance.title :observationInstance.fetchSuggestedCommonNames()

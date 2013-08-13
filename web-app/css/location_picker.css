@@ -1,9 +1,9 @@
 .address {
-    width: 500px;
-    margin: auto;
+    width: 100%;
+/*    margin: auto;
     position:absolute;
     top:10px;
-    left:0;
+*/    left:0;
     right:0;
     z-index:1;
 }    
@@ -11,7 +11,6 @@
 #latlng {
     margin: auto;
     width: 500px;
-    top: 40px;
     position: absolute;
     z-index: 1;
     left: 0;
@@ -70,7 +69,7 @@ padding:5px;
 }
 
 #map_area {
-padding:10px;
+/*padding:10px;*/
 text-align:left;
 }
 

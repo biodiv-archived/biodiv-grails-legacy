@@ -12,18 +12,16 @@
 <head>
 <g:set var="canonicalUrl" value="${uGroup.createLink([controller:'observation', action:'show', id:observationInstance.id, base:Utils.getIBPServerDomain()])}"/>
 <g:set var="title" value="${(!observationInstance.fetchSpeciesCall()?.equalsIgnoreCase('Unknown'))?observationInstance.fetchSpeciesCall():'Help Identify'}"/>
+
 <%
 def r = observationInstance.mainImage();
 def imagePath = '', videoPath='';
 if(r) {
-    def gThumbnail = ImageUtils.getFileName(r.fileName.trim(),ImageType.LARGE)?:null;
-    if(r && gThumbnail) {
-            if(r.type == ResourceType.IMAGE) {
-                    imagePath = g.createLinkTo(base:grailsApplication.config.speciesPortal.observations.serverURL, file: gThumbnail)
-            } else if(r.type == ResourceType.VIDEO){
-                imagePath = r.thumbnailUrl()
-                videoPath = r.getUrl();
-            }
+    if(r.type == ResourceType.IMAGE) {
+        imagePath = r.thumbnailUrl(null, observationInstance.sourceId ? '.png' :null, ImageType.LARGE)
+    } else if(r.type == ResourceType.VIDEO){
+        imagePath = r.thumbnailUrl()
+        videoPath = r.getUrl();
     }
 }
 	
@@ -58,8 +56,13 @@ String desc = "- "+ location +" by "+observationInstance.author.name.capitalize(
 	width: 200px;
 }
 .nameContainer .combobox-container {
-	left:210px;
+	left:198px;
 }
+
+.combobox-container .add-on {
+	right: -91px;
+}
+
 </style>
 </head>
 <body>
@@ -71,10 +74,6 @@ String desc = "- "+ location +" by "+observationInstance.author.name.capitalize(
                                     <div style="width:100%;">
                                         <div class="main_heading" style="margin-left:0px;">
                                             <div class="pull-right">
-                                                <a class="btn btn-success pull-right"
-                                                    href="${uGroup.createLink(
-                                                    controller:'observation', action:'create', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}" class="btn btn-info"> <i class="icon-plus"></i>Add an Observation</a>
- 
                                                 <sUser:ifOwns model="['user':observationInstance.author]">
                                                 <a class="btn btn-primary pull-right" style="margin-right: 5px;"
                                                    href="${uGroup.createLink(controller:'observation', action:'edit', id:observationInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
@@ -139,10 +138,8 @@ String desc = "- "+ location +" by "+observationInstance.author.name.capitalize(
                                                 
 						</g:if>
 						<g:else>
-							<img class="galleryImage"
-								src="${createLinkTo(file:"no-image.jpg", base:grailsApplication.config.speciesPortal.resources.serverURL)}"
-								title="You can contribute!!!" />
-
+                                                <img class="galleryImage" style=" ${observationInstance.sourceId? 'opacity:0.7;' :''}"
+                                                src="${observationInstance.mainImage()?.thumbnailUrl(null, observationInstance.sourceId ? '.png' :null, ImageType.LARGE)}" />
 						</g:else>
 
 					</div>
@@ -234,11 +231,14 @@ String desc = "- "+ location +" by "+observationInstance.author.name.capitalize(
 									model="['observationInstance':observationInstance, 'observationId': observationInstance.id, 'controller':'userGroup', 'action':'getRelatedUserGroups', 'filterProperty': 'obvRelatedUserGroups', 'id':'relatedGroups']" /-->
 						</div>
 					</g:if>
-					<g:if test="${observationInstance.annotations?.size() > 0}">
+					<%
+						def annotations = observationInstance.fetchChecklistAnnotation()
+					%>
+					<g:if test="${annotations?.size() > 0}">
 						<div class="sidebar_section">
 							<h5>Annotations</h5>
 							<div class="tile" style="clear: both">
-								<obv:showAnnotation model="[annotations:observationInstance.annotations]" />
+								<obv:showAnnotation model="[annotations:annotations]" />
 							</div>
 						</div>	
 					</g:if>

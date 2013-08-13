@@ -44,7 +44,7 @@ class ObservationFlag {
 	
 	static belongsTo = [author:SUser, observation:Observation]
 	
-	def afterDelete(){
+	def beforeDelete(){
 		activityFeedService.deleteFeed(this)
 	}
 }

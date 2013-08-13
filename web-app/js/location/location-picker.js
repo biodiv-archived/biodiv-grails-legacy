@@ -20,6 +20,7 @@ var drawnItems;
 var isMapViewLoaded = false;
 
 function initialize(element, drawable){
+    console.log('initializing map');
     G = google.maps;
     M = L;
     M.Icon.Default.imagePath = window.params.defaultMarkerIcon;
@@ -97,31 +98,35 @@ function initLocation(drawable) {
     }
 }
 
-function initArea(drawable) {
-    drawnItems = new L.FeatureGroup();
+function initArea(drawable, drawControls, editControls) {
+    drawnItems = (editControls != undefined) ? editControls.featureGroup : new L.FeatureGroup();
     
     if(drawable) {
-        var drawControl = new M.Control.Draw({
-            draw:{
-                circle:false,
-                rectangle:false,
-                polyline:false,
-                polygon:false
-                /*
-                polygon: {
-                    allowIntersection: false // Restricts shapes to simple polygons
-                }*/
-            }
-            /*,
-            edit: {
-               featureGroup: drawnItems
-            }*/
-        });
+        if(drawControls == undefined) drawControls = {};
+        
+        drawControls = $.extend({}, {
+            marker:true,
+            circle:false,
+            rectangle:false,
+            polyline:false,
+            polygon:false
+        }, drawControls);
+
+        var drawControl;
+        if(editControls) {
+            drawControl = new M.Control.Draw({
+                draw:drawControls,
+                edit:editControls
+            });
+        } else {
+            drawControl = new M.Control.Draw({
+                draw:drawControls
+            });
+        }
         drawControl.addTo(map);
         map.on('draw:drawstart', clearDrawnItems);
         map.on('draw:created', addDrawnItems);
     }
-    
     map.addLayer(drawnItems);
 
     var areas = $('input#areas').val()
@@ -358,7 +363,7 @@ function setLatLngFields(lat, lng) {
 
 function set_date(date){
 	$(".location_picker_button").removeClass("active_location_picker_button");
-	$('#observedOn').datepicker("setDate", Date.parse(date));
+	$('#fromDate').datepicker("setDate", Date.parse(date));
 }
 
 
@@ -574,7 +579,7 @@ $(document).ready(function() {
     focus: function(event, ui) {
         //set_location(ui.item.latitude, ui.item.longitude);
     },open: function(event, ui) {
-        $("#suggestions ul").removeAttr('style').css({'display': 'block','width':'500px'}); 
+        $("#suggestions ul").removeAttr('style').css({'display': 'block','width':'100%','z-index':'1001'}); 
     }
 
 
@@ -629,7 +634,9 @@ $(document).ready(function() {
     
     $('#geotagged_images').on('update_map', function() {
         if($(this).children(".location_picker_button").length >0){
-            $(this).children(":last").trigger("click");
+            var $geotagged_images = $(this)
+            if(isMapViewLoaded)
+                $geotagged_images.children(":last").trigger("click");
         }else{
             $("#geotagged_images>.title").hide();
             $("#geotagged_images>.msg").hide();

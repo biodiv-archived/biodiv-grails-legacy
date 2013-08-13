@@ -19,8 +19,9 @@
 	<div class="prop">
                 <%
                     def latitude='',longitude='',areas='';
-                        latitude = observationInstance.latitude
-                        longitude = observationInstance.longitude
+					def randomNum = (!observationInstance.geoPrivacy)?0:Utils.getRandomFloat()
+					latitude = observationInstance.latitude + randomNum
+                    longitude = observationInstance.longitude + randomNum
                         
                         if(observationInstance?.topology){ 
                             areas = Utils.GeometryAsWKT(observationInstance?.topology)
@@ -47,9 +48,10 @@
                         initialize(document.getElementById("map_canvas_${observationInstance.id}"), false);
                         initArea(false);
                         //HACK
-                        map.panTo(searchMarker.getLatLng());
+                        if(searchMarker)
+                            map.panTo(searchMarker.getLatLng());
                         /*
-                        var latlng = new google.maps.LatLng(${observationInstance.latitude}, ${observationInstance.longitude});
+                        var latlng = new google.maps.LatLng(${latitude}, ${longitude});
                         var options = {
                             zoom: 13,
                             center: latlng,

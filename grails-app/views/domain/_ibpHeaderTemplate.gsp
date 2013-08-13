@@ -48,18 +48,22 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
                                 <a class="btn btn-success" data-toggle="popover" data-placement="right" data-content="An observation is an individual sighting of a species, submitted as an image or video." data-trigger="hover"
                                     href="${uGroup.createLink(
                                     controller:'observation', action:'create', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}" data-original-title="Add an Observation" title="Add an Observation"> <i class="icon-plus"></i>Add an Observation</a>
+                                <a class="btn btn-success" data-toggle="popover" data-placement="right" data-content="A list is a collection of sightings recorded from an area over a time period submitted with or without supporting media." data-trigger="hover"
+                                    href="${uGroup.createLink(
+                                    controller:'checklist', action:'create', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}" data-original-title="Add a List" title="Add a List"> <i class="icon-plus"></i>Add a List</a>
+ 
                                 <a class="btn btn-success" data-toggle="popover" data-placement="right" data-content="Upload biodiversity related reports, presentations, posters etc." data-trigger="hover"
                                     href="${uGroup.createLink(
                                     controller:'document', action:'create', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"
                                     data-original-title="Add Document" title="Add Document">
                                     <i class="icon-plus"></i> Add Document
                                 </a>
-                                <a class="btn btn-success" data-toggle="popover" data-placement="right" data-content="
+                                <!--a class="btn btn-success" data-toggle="popover" data-placement="right" data-content="
                                     Suggest feedback on using and improving the portal." data-trigger="hover"
                                     href="/feedback_form"
                                     data-original-title="Provide Feedback" title="Provide Feedback">
                                     <i class="icon-plus"></i> Provide Feedback
-                                </a>
+                                </a-->
                         </div>
 
                     </div>

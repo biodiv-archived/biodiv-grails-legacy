@@ -13,6 +13,7 @@ import species.groups.SpeciesGroup;
 import species.groups.UserGroup;
 import species.utils.ImageType;
 import species.participation.ActivityFeed;
+import species.participation.ActivityFeedService;
 import species.participation.Observation;
 import species.participation.RecommendationVote;
 
@@ -307,10 +308,7 @@ class ChartService {
 			order 'total', 'desc'
 		}
 		
-		def obvCount = Observation.withCriteria(){
-			projections {
-				rowCount('total') //alias given to count
-			}
+		def obvCount = Observation.createCriteria().count {
 			and{
 				// taking undeleted observation
 				eq('isDeleted', false)
@@ -326,8 +324,7 @@ class ChartService {
 					}
 				}
 			}
-			maxResults 1
-		}[0]
+		}
 		
 		def finalResult = []
 		result.each { r ->
@@ -370,30 +367,44 @@ class ChartService {
 		Date currentDate = new Date()
 		DateGroovyMethods.clearTime(currentDate)
 		
+		
+		
 		for(int i = -1; i <= days ; i++){
 			Date endDate = currentDate.minus(i)
 			Date startDate = currentDate.minus(i+1)
+			
+			def userCount
+			if(userGroupInstance){
+				userCount = getActivityCount(startDate, endDate, typeToIdFilterMap, userGroupInstance, ActivityFeedService.MEMBER_JOINED)
+			}else{
+				userCount = getRegisterUserCount(startDate, endDate)
+			}
+			
 			result.add([
 				startDate,
-				getActivityCount(startDate, endDate, typeToIdFilterMap, userGroupInstance)
+				getActivityCount(startDate, endDate, typeToIdFilterMap, userGroupInstance),
+				getActivityCount(startDate, endDate, typeToIdFilterMap, userGroupInstance, ActivityFeedService.OBSERVATION_CREATED),
+				userCount
 			])
 		}
 
 		return [data:result, columns : [
 				['date', 'Date'],
-				[
-					'number',
-					'Activity Count']
-			]]
+				['number','Activity'],
+				['number','Observation'],
+				['number', 'Users']
+				]
+			]
 	}
 
-	private int getActivityCount(startDate, endDate, typeToIdFilterMap, userGroupInstance){
-		return ActivityFeed.withCriteria(){
-			projections { rowCount('total') //alias given to count
-			}
+	private int getActivityCount(startDate, endDate, typeToIdFilterMap, userGroupInstance, feedType=null){
+		return ActivityFeed.createCriteria().count{
 			and{
+				eq('isShowable', true)
 				between('lastUpdated', startDate, endDate)
-
+				if(feedType){
+					eq('activityType', feedType)
+				}
 				//filter by usergroup
 				if(userGroupInstance){
 					or{
@@ -408,9 +419,17 @@ class ChartService {
 					}
 				}
 			}
-		}[0]
+		}
 	}
 
+	private int getRegisterUserCount(startDate, endDate){
+		return SUser.createCriteria().count {
+				and{
+					between('dateCreated', startDate, endDate)
+				}
+			}
+	}
+	
 	private int getPassedDays(params, UserGroup userGroupInstance){
 		if(params.days)
 			return params.days.toInteger()
@@ -527,4 +546,25 @@ class ChartService {
 				break
 		}
 	}
+	
+	def List getUserByRank(max, offset){
+		return ActivityFeed.withCriteria(){
+			projections {
+				groupProperty('author')
+				rowCount('total') //alias given to count
+			}
+			and{
+				eq('isShowable', true)
+			}
+			maxResults max
+			firstResult offset
+			order 'total', 'desc'
+		}.collect { it[0]}
+	}
+
+
+	def long getUserActivityCount(user){
+		return ActivityFeed.countByAuthorAndIsShowable(user,true);
+	}
+
 }

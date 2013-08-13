@@ -31,6 +31,8 @@ class ActivityFeed {
 	Long subRootHolderId;
 	String subRootHolderType;
 	
+	boolean isShowable = true;
+	
 	static belongsTo = [author:SUser];
 
 	static constraints = {
@@ -78,6 +80,10 @@ class ActivityFeed {
 		
 		return ActivityFeed.withCriteria(){
 	 		and{
+				if(params.isShowableOnly){
+					eq('isShowable', true)
+				}
+				 
 	 			if(params.isCommentThread){
 					eq('subRootHolderType', params.subRootHolderType)
 					eq('subRootHolderId', params.subRootHolderId)
@@ -138,11 +144,12 @@ class ActivityFeed {
 		if(!refTime){
 			return 0
 		}
-		return ActivityFeed.withCriteria(){
-			projections {
-				count('id')
-			}
+		return ActivityFeed.createCriteria().count{
 			and{
+				if(params.isShowableOnly){
+					eq('isShowable', true)
+				}
+				
 				if(params.isCommentThread != null && params.isCommentThread.toBoolean()){
 					eq('subRootHolderType', params.subRootHolderType)
 					eq('subRootHolderId', params.subRootHolderId)
@@ -165,13 +172,15 @@ class ActivityFeed {
 				}
 				(params.timeLine == ActivityFeedService.OLDER) ? lt('lastUpdated', refTime) : gt('lastUpdated', refTime)
 			}
-		}[0]
+		}
 	}
 
 	private static validateParams(params){
 		params.feedType = params.feedType ?: ActivityFeedService.ALL
 		params.checkFeed = (params.checkFeed != null)? params.checkFeed.toBoolean() : false
 		params.isCommentThread = (params.isCommentThread != null)? params.isCommentThread.toBoolean() : false
+		// in default showing only feeds having isShowable = true 
+		params.isShowableOnly = true
 		
 		if(params.isCommentThread){
 			params.subRootHolderId = params.subRootHolderId.toLong()
@@ -189,6 +198,8 @@ class ActivityFeed {
 				if(!params.rootHolderType || params.rootHolderType.trim() == "" || !params.rootHolderId || params.rootHolderId.trim() == ""){
 					return false
 				}
+				//in this perticular case showing all feeds
+				params.isShowableOnly = false
 				break
 			
 			case ActivityFeedService.GROUP_SPECIFIC:
@@ -302,4 +313,48 @@ class ActivityFeed {
 			}
 		}
 	}
+	
+	
+	static updateIsDeleted(obj){
+		if(!obj || !obj.hasProperty('isDeleted')){
+			return
+		}
+		setShowable(obj, !obj.isDeleted)
+	}
+
+	
+	static updateIsShowable(obj){
+		if(!obj || !obj.hasProperty('isShowable')){
+			return
+		}
+		setShowable(obj, obj.isShowable)
+	}
+	
+	private static setShowable(obj, boolean isShowable){
+		def type = obj.class.getCanonicalName()
+		def id = obj.id
+		ActivityFeed.withTransaction {
+			List<ActivityFeed> feeds = ActivityFeed.withCriteria(){
+				or{
+					and{
+						eq('rootHolderType', type)
+						eq('rootHolderId', id)
+					}
+					and{
+						eq('activityHolderType', type)
+						eq('activityHolderId', id)
+					}
+					and{
+						eq('subRootHolderType', type)
+						eq('subRootHolderId', id)
+					}
+				}
+			}
+			feeds.each{ af ->
+					af.isShowable = isShowable
+					af.save(flush:true)
+			}
+		}
+	}
+	
 }

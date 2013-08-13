@@ -14,6 +14,13 @@ class ActivityFeedService {
 	static final String COMMENT_IN_REPLY_TO = "In reply to"
 	
 	
+	//checklist related
+	static final String CHECKLIST_CREATED = "Checklist created"
+	static final String CHECKLIST_UPDATED = "Checklist updated"
+	static final String CHECKLIST_POSTED_ON_GROUP = "Posted checklist to group"
+	static final String CHECKLIST_REMOVED_FROM_GROUP = "Removed checklist from group"
+	
+	
 	//observation related
 	static final String OBSERVATION_CREATED = "Observation created"
 	static final String OBSERVATION_UPDATED = "Observation updated"
@@ -26,6 +33,7 @@ class ActivityFeedService {
 	static final String RECOMMENDATION_REMOVED = "Suggestion removed"
 	static final String OBSERVATION_POSTED_ON_GROUP = "Posted observation to group"
 	static final String OBSERVATION_REMOVED_FROM_GROUP = "Removed observation from group"
+	
 	
 	//group related
 	static final String USERGROUP_CREATED = "Group created"
@@ -89,26 +97,23 @@ class ActivityFeedService {
 	def getCount(params){
 		return ActivityFeed.fetchCount(params)
 	}
-	def addActivityFeed(rootHolder, activityHolder, author, activityType){
-		return addActivityFeed(rootHolder, activityHolder, author, activityType, null)
-	}
 	
-	def addActivityFeed(rootHolder, activityHolder, author, activityType, description){
+	def addActivityFeed(rootHolder, activityHolder, author, activityType, description=null){
 		//to support discussion on comment thread
 		def subRootHolderType = rootHolder?.class?.getCanonicalName()
 		def subRootHolderId = rootHolder?.id
 		if(activityHolder?.class?.getCanonicalName() == Comment.class.getCanonicalName()){
-			subRootHolderType = activityHolder.class.getCanonicalName()
+			subRootHolderType = getType(activityHolder)
 			subRootHolderId = (activityHolder.isMainThread())? activityHolder.id : activityHolder.fetchMainThread().id
 		}
 		
-		def date = new Date()
+		//to hide any object who has isShowable = false in all other cases making feed showable
+		boolean isShowable= (rootHolder.hasProperty('isShowable') && rootHolder.isShowable != null)? rootHolder.isShowable : true
 		
 		ActivityFeed af = new ActivityFeed(author:author, activityHolderId:activityHolder?.id, \
-						activityHolderType:activityHolder?.class?.getCanonicalName(), \
-						rootHolderId:rootHolder?.id, rootHolderType:rootHolder?.class?.getCanonicalName(), \
-						//comment this line after migration on same jvm
-						dateCreated: date, lastUpdated:date,\
+						activityHolderType:getType(activityHolder), \
+						rootHolderId:rootHolder?.id, rootHolderType:getType(rootHolder), \
+						isShowable:isShowable,\
 						activityType:activityType, subRootHolderType:subRootHolderType, subRootHolderId:subRootHolderId, activityDescrption:description);
 					
 		ActivityFeed.withNewSession {
@@ -141,6 +146,8 @@ class ActivityFeedService {
 	
 	// this will return class of object in general used in comment framework
 	static getType(obj){
+		if(!obj) return null
+		
 		if(obj instanceof Map){
 			return obj.objectType
 		}
@@ -192,6 +199,9 @@ class ActivityFeedService {
 		ActivityFeed.deleteFeed(obj);
 	}
 	
+	def updateIsShowable(obj){
+		ActivityFeed.updateIsShowable(obj);
+	}
 	
 	def getContextInfo(ActivityFeed feedInstance, params){
 		
@@ -231,8 +241,17 @@ class ActivityFeedService {
 			case OBSERVATION_POSTED_ON_GROUP:
 				activityTitle = OBSERVATION_POSTED_ON_GROUP + " " + getUserGroupHyperLink(activityDomainObj)
 				break
+			
 			case OBSERVATION_REMOVED_FROM_GROUP:
 				activityTitle = OBSERVATION_REMOVED_FROM_GROUP + " " + getUserGroupHyperLink(activityDomainObj)
+				break
+			
+			case CHECKLIST_REMOVED_FROM_GROUP:
+				activityTitle = CHECKLIST_REMOVED_FROM_GROUP + " " + getUserGroupHyperLink(activityDomainObj)
+				break
+			
+			case CHECKLIST_POSTED_ON_GROUP:
+				activityTitle = CHECKLIST_POSTED_ON_GROUP + " " + getUserGroupHyperLink(activityDomainObj)
 				break
 			case MEMBER_JOINED:
 				activityTitle = "Joined group " + getUserGroupHyperLink(activityRootObj)

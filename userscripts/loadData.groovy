@@ -3,6 +3,8 @@ import org.codehaus.groovy.grails.commons.ApplicationHolder;
 import speciespage.SpeciesUploadService;
 import speciespage.SetupService;
 import species.Species;
+import species.*;
+import species.sourcehandler.XMLConverter;
 
 //def s = ctx.getBean("setupService");
 //s.uploadHabitats();
@@ -104,8 +106,39 @@ def speciesUploadService = ctx.getBean("speciesUploadService");
 
 //speciesUploadService.uploadNewSimpleSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep2/species/thomas/rawdata/BirdsspeciesPages.xlsx",grailsApplication.config.speciesPortal.data.rootDir+"/datarep2/species/thomas/rawdata/bird_images");
 
-speciesUploadService.uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep2/species/zoooutreach/uploadready/odonates.xls", grailsApplication.config.speciesPortal.data.rootDir+"/datarep2/species/zoooutreach/uploadready/odonates_mapping.xls", 0, 0, 0, 0,1,grailsApplication.config.speciesPortal.data.rootDir+"/datarep2/species/zoooutreach/uploadready/odonates.xls");
+//speciesUploadService.uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep2/species/zoooutreach/uploadready/odonates.xls", grailsApplication.config.speciesPortal.data.rootDir+"/datarep2/species/zoooutreach/uploadready/odonates_mapping.xls", 0, 0, 0, 0,1,grailsApplication.config.speciesPortal.data.rootDir+"/datarep2/species/zoooutreach/uploadready/odonates.xls");
 
 //speciesUploadService.uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep2/species/PHCC/uploadready/associate_plants_of_grasslands_of_palni_hills.xlsx", grailsApplication.config.speciesPortal.data.rootDir+"/datarep2/species/PHCC/uploadready/associate_plants_of_grasslands_of_Palni_hills_mapping.xlsx", 0, 0, 0, 0,-1,grailsApplication.config.speciesPortal.data.rootDir+"/datarep2/species/PHCC/uploadready/associate_plants_of_grasslands_of_Palni_hills");
 
 //speciesUploadService.uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep2/species/PHCC/uploadready/grasses_of_palni_hills.xlsx", grailsApplication.config.speciesPortal.data.rootDir+"/datarep2/species/PHCC/uploadready/grasses_of_palni_hills_mapping.xlsx", 0, 0, 0, 0,-1,grailsApplication.config.speciesPortal.data.rootDir+"/datarep2/species/PHCC/uploadready/grasses_of_palni_hills");
+
+def updateLicense(licencesFile) {
+    XMLConverter converter = new XMLConverter();
+    new File(licencesFile).splitEachLine("\\t") {
+        getContributor(it[1].trim());
+        /*
+        def sFields = getContributorContributions(it[1]);
+        sFields.each { sField ->
+            sField.licenses.clear();
+            License l = converter.getLicenseByType(it[0]);
+            sField.addToLicecnses(l);
+            if(!sField.save(flush:true)) {
+                sField.errors.each { println it} 
+            }            
+        }*/
+    }
+}
+
+def getContributor(contributor) {
+    def contribs = Contributor.findAllByNameIlike('%'+contributor+'%');
+    println contributor+"> : "+contribs
+}
+
+def getContributorContributions(contributor) {
+    def sFields = SpeciesField.withCriteria {
+        contributors {
+            like('name', '%'+contributor+'%')
+        }
+    }
+}
+updateLicense('licenses.csv');

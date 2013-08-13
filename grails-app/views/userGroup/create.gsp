@@ -548,7 +548,7 @@ $(document).ready(function() {
 	});
 	$(".tagit-hiddenSelect").css('display','none');
 	
-	intializesSeciesHabitatInterest()
+	intializesSpeciesHabitatInterest()
 	
  	<%
  		userGroupInstance.speciesGroups.each {
