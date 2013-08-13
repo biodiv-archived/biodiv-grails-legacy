@@ -2,23 +2,27 @@
     ProxyRequests Off
     ProxyPass /geoserver http://saturn.strandls.com:8080/geoserver
     ProxyPassReverse /geoserver http://saturn.strandls.com:8080/geoserver
-    ServerName bhutanbiodiversity.localhost.org
-    ServerAlias www.bhutanbiodiversity.localhost.org
-    DocumentRoot /home/kinley/species
+    ServerName indiabiodiversity.localhost.org
+    ServerAlias www.indiabiodiversity.localhost.org
     DirectoryIndex index.php index.html index.html index.htm index.shtml
     ScriptAlias /cgi-bin/ /usr/lib/cgi-bin/
-
-
+	
+	DocumentRoot /var/www
+	
     RewriteEngine on
+
     RewriteCond %{REQUEST_URI} ^/biodiv/(static|plugins|data|bootstrap|js|css|j_spring_security_check|j_spring_openid_security_check|images|j_spring_security_logout|.*/upload_resource|emailConfirmation|ck).*
     RewriteRule ^/biodiv(.*)$ http://indiabiodiversity.localhost.org:8080/biodiv$1 [P]
     ProxyPassReverse /biodiv http://indiabiodiversity.localhost.org:8080/biodiv
 
+	RewriteRule (^(/biodiv/(observations|newsletters|group-themes|users|userGroups|images|content)|(wgp_maps|geoserver))) - [L]
+    
     RewriteCond %{REQUEST_URI} ^/biodiv
-    RewriteCond %{REQUEST_URI} !(^(/biodiv/(observations|newsletters|group-themes|users|userGroups|images|content)|(wgp_maps|geoserver)))
+#    RewriteCond %{REQUEST_URI} !(^(/biodiv/(observations|newsletters|group-themes|users|userGroups|images|content)|(wgp_maps|geoserver)))
     RewriteRule ^/biodiv/(.*)$ /$1 [R=301,L]
-    ProxyPassReverse / http://bhutanbiodiversity.localhost.org:8080/biodiv/
+    ProxyPassReverse / http://indiabiodiversity.localhost.org:8080/biodiv/
 
+#    RewriteCond %{REQUEST_URI} ^/(species|observation|activity|activityFeed|SUser|user|page|pages|requestMembership|joinUs|leaveUs|inviteMembers|login|logout|register|static|group|j_spring_security_logout|recommendation|comment|newsletter|emailConfirmation|search|checklist|jcaptcha|openId|data|chart|admin|curation|resource|rateable|rating|document|project|UFile|direction|biodivAdmin).*
     RewriteCond %{REQUEST_URI} ^/.*
     RewriteCond %{REQUEST_URI} !(^(/(biodiv|logo/)))
     RewriteRule ^(.*)$ http://indiabiodiversity.localhost.org:8080/biodiv$1 [P,L]
@@ -35,9 +39,10 @@
 
     ServerName thewesternghats.indiabiodiversity.localhost.org
     ServerAlias www.thewesternghats.indiabiodiversity.localhost.org
-    DocumentRoot /home/sravanthi/species
     DirectoryIndex index.php index.html index.html index.htm index.shtml
     ScriptAlias /cgi-bin/ /usr/lib/cgi-bin/
+    
+    DocumentRoot /var/www
 
     ProxyPass /geoserver http://saturn.strandls.com:8080/geoserver
     ProxyPassReverse /geoserver http://saturn.strandls.com:8080/geoserver
@@ -63,8 +68,10 @@
     RewriteRule ^/biodiv/group/the_western_ghats(.*)$ $1 [R=301]
     ProxyPassReverse / http://localhost:8080/biodiv/group/the_western_ghats
 
+	RewriteRule (^(/biodiv/(logo$|observations|newsletters|group-themes|users|userGroups|images|content))) - [L]
+	
     RewriteCond %{REQUEST_URI} ^/biodiv
-RewriteCond %{REQUEST_URI} !(^/biodiv/(logo$|observations|newsletters|group-themes|users|userGroups|images|content))
+#	RewriteCond %{REQUEST_URI} !(^/biodiv/(logo$|observations|newsletters|group-themes|users|userGroups|images|content))
     RewriteRule ^/biodiv(.*)$ $1 [R=301]
     ProxyPassReverse / http://localhost:8080/biodiv
 
@@ -85,10 +92,11 @@ RewriteCond %{REQUEST_URI} !(^/(species|observation|activity|SUser|user|page|pag
     ProxyRequests Off
     ServerName thewesternghats.localhost.in
     ServerAlias www.thewesternghats.localhost.in
-    DocumentRoot /home/sravanthi/species
     DirectoryIndex index.php index.html index.html index.htm index.shtml
     ScriptAlias /cgi-bin/ /usr/lib/cgi-bin/
 
+	DocumentRoot /var/www
+	
     RewriteEngine on
 
     RewriteCond %{REQUEST_URI} ^/
