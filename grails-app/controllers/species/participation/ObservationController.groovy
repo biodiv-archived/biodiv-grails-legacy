@@ -202,7 +202,7 @@ class ObservationController {
                     }
 						
 					
-					observationService.sendNotificationMail(observationService.OBSERVATION_ADDED, observationInstance, request, params.webaddress);
+				//	observationService.sendNotificationMail(observationService.OBSERVATION_ADDED, observationInstance, request, params.webaddress);
 					params["createNew"] = true
 					chain(action: 'addRecommendationVote', model:['chainedParams':params]);
 				} else {
@@ -597,16 +597,20 @@ class ObservationController {
 			
 			def observationInstance = Observation.get(params.obvId);
 			log.debug params;
+			def mailType;
 			try {
 				if(!recommendationVoteInstance) {
 					//saving max voted species name for observation instance needed when observation created without species name
 					//observationInstance.calculateMaxVotedSpeciesName();
 					observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
 
+				        if(params["createNew"])  {
+						mailType = observationService.OBSERVATION_ADDED;
+					        observationService.sendNotificationMail(mailType, observationInstance, request, params.webaddress);
+					}
+
 					if(!params["createNew"]){
 						redirect(action:getRecommendationVotes, id:params.obvId, params:[max:3, offset:0, msg:msg, canMakeSpeciesCall:canMakeSpeciesCall])
-					}else if(params["isMobileApp"]?.toBoolean()){
-						render (['status':'success', 'success':'true', 'obvId':observationInstance.id]as JSON);
 					}else{
 						redirect (url:uGroup.createLink(action:'show', controller:"observation", id:observationInstance.id, 'userGroupWebaddress':params.webaddress, postToFB:(params.postToFB?:false)))
 						//redirect(action: "show", id: observationInstance.id, params:[postToFB:(params.postToFB?:false)]);
@@ -620,13 +624,18 @@ class ObservationController {
 					observationInstance.calculateMaxVotedSpeciesName();
 					def activityFeed = activityFeedService.addActivityFeed(observationInstance, recommendationVoteInstance, recommendationVoteInstance.author, activityFeedService.SPECIES_RECOMMENDED);
 					observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
+				
+					//sending email
+				        if(params["createNew"])  {
+						mailType = observationService.OBSERVATION_ADDED;
+					} else {
+						mailType = observationService.SPECIES_RECOMMENDED;
+					}
+					observationService.sendNotificationMail(mailType, observationInstance, request, params.webaddress, activityFeed);
 					
+					//redirecting / rendering					
 					if(!params["createNew"]){
-						//sending mail to user
-						observationService.sendNotificationMail(observationService.SPECIES_RECOMMENDED, observationInstance, request, params.webaddress, activityFeed);
 						redirect(action:getRecommendationVotes, id:params.obvId, params:[max:3, offset:0, msg:msg, canMakeSpeciesCall:canMakeSpeciesCall])
-					}else if(params["isMobileApp"]?.toBoolean()){
-						render (['status':'success', 'success':'true', 'obvId':observationInstance.id] as JSON);
 					}else{
 						redirect (url:uGroup.createLink(action:'show', controller:"observation", id:observationInstance.id, 'userGroupWebaddress':params.webaddress, postToFB:(params.postToFB?:false)))
 						//redirect(action: "show", id: observationInstance.id, params:[postToFB:(params.postToFB?:false)]);
@@ -656,7 +665,7 @@ class ObservationController {
 
 	/**
 	 * adds a recommendation and 1 vote to it attributed to the logged in user
-	 * saves recommendation if it doesn't exist
+	 *  recommendation if it doesn't exist
 	 */
 	@Secured(['ROLE_USER'])
 	def addAgreeRecommendationVote = {
@@ -693,7 +702,7 @@ class ObservationController {
 					def activityFeed = activityFeedService.addActivityFeed(observationInstance, recommendationVoteInstance, recommendationVoteInstance.author, activityFeedService.SPECIES_AGREED_ON);
 					observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
 					
-					//sending mail to user
+					// mail to user
 					observationService.sendNotificationMail(observationService.SPECIES_AGREED_ON, observationInstance, request, params.webaddress, activityFeed);
 					def r = [
 						status : 'success',

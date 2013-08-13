@@ -1321,7 +1321,8 @@ class ObservationService {
 		}
 
 		def templateMap = [obvUrl:obvUrl, domain:domain]
-
+		templateMap["currentUser"] = springSecurityService.currentUser
+		templateMap["action"] = notificationType;
 		def mailSubject = ""
 		def bodyContent = ""
 		String htmlContent = ""
@@ -1334,144 +1335,117 @@ class ObservationService {
 		switch ( notificationType ) {
 			case OBSERVATION_ADDED:
 				mailSubject = conf.ui.addObservation.emailSubject
-				bodyContent = conf.ui.addObservation.emailBody
+				bodyView = "/emailtemplates/addObservation"
+				templateMap["message"] = " added the following observation:"
+				populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
 				toUsers.add(getOwner(obv))
 				break
 
 			case OBSERVATION_FLAGGED :
 				mailSubject = "Observation flagged"
-				bodyContent = conf.ui.observationFlagged.emailBody
-				templateMap["currentUser"] = springSecurityService.currentUser
-				//replyTo = templateMap["currentUser"].email
+				bodyView = "/emailtemplates/addObservation"
 				toUsers.add(getOwner(obv))
+				templateMap["message"] = " flagged your observation shown below:"
+				populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
 				break
 
 			case OBSERVATION_DELETED :
 				mailSubject = conf.ui.observationDeleted.emailSubject
-				bodyContent = conf.ui.observationDeleted.emailBody
-				templateMap["currentUser"] = springSecurityService.currentUser
-				//replyTo = templateMap["currentUser"].email
+				bodyView = "/emailtemplates/addObservation"
+				templateMap["message"] = " deleted the following observation:"
+				populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
 				toUsers.add(getOwner(obv))
 				break
 
 			case SPECIES_RECOMMENDED :
-				bodyView = "/emailtemplates/addRecommendation"
+				bodyView = "/emailtemplates/addObservation"
 				mailSubject = conf.ui.addRecommendationVote.emailSubject
-				templateMap['actor'] = feedInstance.author;
-				templateMap["actorProfileUrl"] = generateLink("SUser", "show", ["id": feedInstance.author.id], request)
-				templateMap["actorIconUrl"] = feedInstance.author.profilePicture(ImageType.SMALL)
-				templateMap["actorName"] = feedInstance.author.name
-				templateMap["activity"] = activityFeedService.getContextInfo(feedInstance, [webaddress:userGroupWebaddress])
-				templateMap["userGroupWebaddress"] = userGroupWebaddress
-				//mailSubject = feedInstance.author.name +" : "+ templateMap["activity"].activityTitle.replaceAll(/<.*?>/, '')
-				//replyTo = templateMap["currentUser"].email
+				populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
 				toUsers.addAll(getParticipants(obv))
 				break
 
 			case SPECIES_AGREED_ON:
-				bodyView = "/emailtemplates/addRecommendation"
+				bodyView = "/emailtemplates/addObservation"
 				mailSubject = conf.ui.addRecommendationVote.emailSubject
-				templateMap['actor'] = feedInstance.author;
-				templateMap["actorProfileUrl"] = generateLink("SUser", "show", ["id": feedInstance.author.id], request)
-				templateMap["actorIconUrl"] = feedInstance.author.profilePicture(ImageType.SMALL)
-				templateMap["actorName"] = feedInstance.author.name
-				templateMap["userGroupWebaddress"] = userGroupWebaddress
-				templateMap["activity"] = activityFeedService.getContextInfo(feedInstance, [webaddress:userGroupWebaddress])
-				//mailSubject = feedInstance.author.name +" : "+ templateMap["activity"].activityTitle.replaceAll(/<.*?>/, '')
-				//replyTo = templateMap["currentUser"].email
+				populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
 				toUsers.addAll(getParticipants(obv))
 				break
 				
 			case activityFeedService.RECOMMENDATION_REMOVED:
-				bodyView = "/emailtemplates/addRecommendation"
+				bodyView = "/emailtemplates/addObservation"
+				populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
 				mailSubject = conf.ui.removeRecommendationVote.emailSubject
-				templateMap['actor'] = feedInstance.author;
-				templateMap["userGroupWebaddress"] = userGroupWebaddress
-				templateMap["activity"] = activityFeedService.getContextInfo(feedInstance, [webaddress:userGroupWebaddress])
 				toUsers.addAll(getParticipants(obv))
 				break
 			
 			case activityFeedService.OBSERVATION_POSTED_ON_GROUP:
 				mailSubject = conf.ui.observationPostedToGroup.emailSubject
-				bodyContent = conf.ui.observationPostedToGroup.emailBody
-				templateMap["actorProfileUrl"] = generateLink("SUser", "show", ["id": feedInstance.author.id], request)
-				templateMap["actorName"] = feedInstance.author.name
+				bodyView = "/emailtemplates/addObservation"
+				populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
 				templateMap["groupNameWithlink"] = activityFeedService.getUserGroupHyperLink(activityFeedService.getDomainObject(feedInstance.activityHolderType, feedInstance.activityHolderId))
-				//templateMap["userGroupWebaddress"] = userGroupWebaddress
-				//templateMap["activity"] = activityFeedService.getContextInfo(feedInstance, [webaddress:userGroupWebaddress])
-				//templateMap['actor'] = feedInstance.author;
-				//templateMap["actorIconUrl"] = feedInstance.author.profilePicture(ImageType.SMALL)
 				toUsers.addAll(getParticipants(obv))
 				break
 
 			case activityFeedService.OBSERVATION_REMOVED_FROM_GROUP:
+				bodyView = "/emailtemplates/addObservation"
 				mailSubject = conf.ui.observationRemovedFromGroup.emailSubject
-				bodyContent = conf.ui.observationRemovedFromGroup.emailBody
-				templateMap["actorProfileUrl"] = generateLink("SUser", "show", ["id": feedInstance.author.id], request)
-				templateMap["actorName"] = feedInstance.author.name
+				populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
 				templateMap["groupNameWithlink"] = activityFeedService.getUserGroupHyperLink(activityFeedService.getDomainObject(feedInstance.activityHolderType, feedInstance.activityHolderId))
-				//templateMap["userGroupWebaddress"] = userGroupWebaddress
-				//templateMap["activity"] = activityFeedService.getContextInfo(feedInstance, [webaddress:userGroupWebaddress])
-				//templateMap['actor'] = feedInstance.author;
-				//templateMap["actorIconUrl"] = feedInstance.author.profilePicture(ImageType.SMALL)
 				toUsers.addAll(getParticipants(obv))
 				break
 
-
-
 			case activityFeedService.COMMENT_ADDED:				
-				bodyView = "/emailtemplates/addComment"
-				templateMap['actor'] = feedInstance.author;
-				templateMap["actorProfileUrl"] = generateLink("SUser", "show", ["id": feedInstance.author.id], request)
-				templateMap["actorIconUrl"] = feedInstance.author.profilePicture(ImageType.SMALL)
-				templateMap["actorName"] = feedInstance.author.name
-				templateMap["userGroupWebaddress"] = userGroupWebaddress
-				templateMap["activity"] = activityFeedService.getContextInfo(feedInstance, [webaddress:userGroupWebaddress])
-				templateMap['domainObjectTitle'] = getTitle(activityFeedService.getDomainObject(feedInstance.rootHolderType, feedInstance.rootHolderId))
-				templateMap['domainObjectType'] = feedInstance.rootHolderType.split('\\.')[-1].toLowerCase()
-				mailSubject = "New comment in ${templateMap['domainObjectType']}"
+				bodyView = "/emailtemplates/addObservation"
+				populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
+				mailSubject = "New comment" 
+				templateMap['message'] = " added a comment to the page listed below."
 				toUsers.addAll(getParticipants(obv))
 				break;
 				
 			case SPECIES_REMOVE_COMMENT:
 				mailSubject = conf.ui.removeComment.emailSubject
+				//bodyView = "/emailtemplates/addObservation"
+				//populateTemplateMap(obv, templateMap)
 				bodyContent = conf.ui.removeComment.emailBody
 				toUsers.add(getOwner(obv))
 				break;
 			
 			case DOWNLOAD_REQUEST:
 				mailSubject = conf.ui.downloadRequest.emailSubject
-				bodyContent = conf.ui.downloadRequest.emailBody
-				templateMap['domain'] = "India Biodiversity Portal"
+				bodyView = "/emailtemplates/addObservation"
 				toUsers.add(getOwner(obv))
 				templateMap['userProfileUrl'] = ObvUtilService.createHardLink('user', 'show', obv.author.id)
+				templateMap['message'] = conf.ui.downloadRequest.message 
 				break;
 			
 			case activityFeedService.DOCUMENT_CREATED:
 				mailSubject = conf.ui.addDocument.emailSubject
-				bodyContent = conf.ui.addDocument.emailBody
+				bodyView = "/emailtemplates/addObservation"
+				templateMap["message"] = " uploaded a document to ${domain}. Thank you for your contribution."
 				toUsers.add(getOwner(obv))
 				break
 				
 			default:
 				log.debug "invalid notification type"
 		}
-		
+	
 		toUsers.eachWithIndex { toUser, index ->
 			if(toUser) {
 				templateMap['username'] = toUser.name.capitalize();
+				templateMap['tousername'] = toUser.username;
 				if(request){
 					templateMap['userProfileUrl'] = generateLink("SUser", "show", ["id": toUser.id], request)
 				}
-		        if ( Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
-				//if ( Environment.getCurrent().getName().equalsIgnoreCase("development")) {
+		        //if ( Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
+			if ( Environment.getCurrent().getName().equalsIgnoreCase("development")) {
 		            log.debug "Sending email to ${toUser}"
 					mailService.sendMail {
 						to toUser.email
+						to "kxt5258@yahoo.com"
 						if(index == 0) {
 							//bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com", "thomas.vee@gmail.com", "sandeept@strandls.com"
-                            bcc grailsApplication.config.speciesPortal.app.notifiers_bcc.toArray()
-							//bcc "sravanthi@strandls.com"
+                            				//bcc grailsApplication.config.speciesPortal.app.notifiers_bcc.toArray()
+							//bcc "kxt5258@gmail.com"
 						}
 						from conf.ui.notification.emailFrom
 						//replyTo replyTo
@@ -1496,6 +1470,29 @@ class ObservationService {
 		} catch (e) {
 			log.error "Error sending email $e.message"
 			e.printStackTrace();
+		}
+	}
+
+	private  void  populateTemplate(def obv, def templateMap, String userGroupWebaddress="", def feed=null, def request=null)  {
+		if(obv?.getClass() == Observation)  {
+			def values = obv?.fetchExportableValue();
+			templateMap["obvOwner"] = values[ObvUtilService.AUTHOR_NAME];
+			templateMap["obvOwnUrl"] = values[ObvUtilService.AUTHOR_URL];
+			templateMap["obvSName"] =  values[ObvUtilService.SN]
+			templateMap["obvCName"] =  values[ObvUtilService.CN]
+			templateMap["obvPlace"] = values[ObvUtilService.LOCATION]
+			templateMap["obvDate"] = values[ObvUtilService.OBSERVED_ON]
+			templateMap["obvNotes"] = Utils.stripHTML(values[ObvUtilService.NOTES])
+			templateMap["obvImage"] = obv.mainImage().thumbnailUrl() 
+		}
+		if(feed) {
+			templateMap['actor'] = feed.author;
+                        templateMap["actorProfileUrl"] = generateLink("SUser", "show", ["id": feed.author.id], request)
+                        templateMap["actorIconUrl"] = feed.author.profilePicture(ImageType.SMALL)
+                        templateMap["actorName"] = feed.author.name
+                        templateMap["activity"] = activityFeedService.getContextInfo(feed, [webaddress:userGroupWebaddress])
+                        templateMap['domainObjectTitle'] = getTitle(activityFeedService.getDomainObject(feed.rootHolderType, feed.rootHolderId))
+                        templateMap['domainObjectType'] = feed.rootHolderType.split('\\.')[-1].toLowerCase()
 		}
 	}
 
