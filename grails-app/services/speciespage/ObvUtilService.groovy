@@ -41,7 +41,6 @@ class ObvUtilService {
 	static final String TAGS   = "tags"
 	static final String AUTHOR_EMAIL   = "user email"
 	static final String AUTHOR_URL   = "user"
-	static final String AUTHOR   = "user username"
 	static final String AUTHOR_NAME   = "user name"
 	//task related
 	static final String  SUCCESS = "Success";
