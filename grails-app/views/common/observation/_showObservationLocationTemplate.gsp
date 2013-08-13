@@ -19,9 +19,9 @@
 	<div class="prop">
                 <%
                     def latitude='',longitude='',areas='';
-					def randomNum = (!observationInstance.geoPrivacy)?0:Utils.getRandomFloat()
-					latitude = observationInstance.latitude + randomNum
-                    longitude = observationInstance.longitude + randomNum
+					def geoPrivacyAdjustment = observationInstance.fetchGeoPrivacyAdjustment()
+					latitude = observationInstance.latitude + geoPrivacyAdjustment
+                    longitude = observationInstance.longitude + geoPrivacyAdjustment
                         
                         if(observationInstance?.topology){ 
                             areas = Utils.GeometryAsWKT(observationInstance?.topology)
@@ -34,7 +34,7 @@
 
                 %>
                 <span class="name"><i class="icon-map-marker"> </i>Coordinates</span>
-                <div class="value">${latitude.toFloat()},${longitude.toFloat()}</div>
+                <div class="value">${(geoPrivacyAdjustment != 0) ? 'Geoprivacy enabled' : latitude.toFloat() + ',' + longitude.toFloat()}</div>
 
                 <input id='areas' type='hidden' name='areas' value='${areas}'/>
                
@@ -45,8 +45,12 @@
 	<r:script>
                 $(document).ready(function() {
                     loadGoogleMapsAPI(function() {
-                        initialize(document.getElementById("map_canvas_${observationInstance.id}"), false);
-                        initArea(false);
+                    	initialize(document.getElementById("map_canvas_${observationInstance.id}"), false);
+                        var icon;
+                    	if(${observationInstance.geoPrivacy}){
+                    		icon = (${observationInstance.isChecklist})?geoPrivacyChecklistIcon:geoPrivacyPointIcon
+                    	}
+                    	initArea(false, undefined, undefined, {icon:icon});
                         //HACK
                         if(searchMarker)
                             map.panTo(searchMarker.getLatLng());

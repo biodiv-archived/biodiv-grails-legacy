@@ -84,6 +84,7 @@ class ActivityFeedService {
 	def grailsApplication
 	def springSecurityService
 	def observationService
+	def userGroupService
 	
 	def getActivityFeeds(params){
 //		log.debug params;
@@ -328,7 +329,7 @@ class ActivityFeedService {
 	}
 	
 	def getUserGroupHyperLink(userGroup){
-		return '<a href="' + observationService.generateLink("userGroup", "show", ["mapping":"userGroup", userGroup:userGroup, 'userGroupWebaddress':userGroup?.webaddress]) + '">' + "<i>$userGroup.name</i>" + "</a>"
+		return '<a href="' + userGroupService.userGroupBasedLink([controller:"userGroup", action:"show", mapping:"userGroup", userGroup:userGroup, userGroupWebaddress:userGroup?.webaddress]) + '">' + "<i>$userGroup.name</i>" + "</a>"
 	}
 	
 	

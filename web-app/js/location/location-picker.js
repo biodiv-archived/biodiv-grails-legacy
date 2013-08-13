@@ -5,6 +5,8 @@ if(!Array.prototype.last) {
     }
 }
 
+
+var pointIcon, checklistIcon, geoPrivacyPointIcon, geoPrivacyChecklistIcon;
 var geocoder;
 var map;
 var latitude;
@@ -51,6 +53,23 @@ function initialize(element, drawable){
     //initLocation(drawable);
     adjustBounds();
     isMapViewLoaded=true;
+    
+    pointIcon = M.AwesomeMarkers.icon({
+        icon: 'ok', 
+        color: 'blue'
+    });
+    checklistIcon = M.AwesomeMarkers.icon({
+        icon: 'list', 
+        color: 'green'
+    });
+    geoPrivacyPointIcon = M.AwesomeMarkers.icon({
+        icon: 'ok', 
+        color: 'purple'
+    });
+    geoPrivacyChecklistIcon = M.AwesomeMarkers.icon({
+        icon: 'list', 
+        color: 'purple'
+    });
  }
 
 function initControls() {
@@ -98,7 +117,7 @@ function initLocation(drawable) {
     }
 }
 
-function initArea(drawable, drawControls, editControls) {
+function initArea(drawable, drawControls, editControls, areaOptions) {
     drawnItems = (editControls != undefined) ? editControls.featureGroup : new L.FeatureGroup();
     
     if(drawable) {
@@ -131,11 +150,11 @@ function initArea(drawable, drawControls, editControls) {
 
     var areas = $('input#areas').val()
     if(areas) {
-        drawArea(areas, drawable, drawable, drawable);
+        drawArea(areas, drawable, drawable, drawable, areaOptions);
      }
 }
 
-function drawArea(areas, drawable, selected, clickable) {
+function drawArea(areas, drawable, selected, clickable, areaOptions) {
     if(!areas) return;
     var wkt = new Wkt.Wkt();
     try { 
@@ -162,8 +181,16 @@ function drawArea(areas, drawable, selected, clickable) {
     if(obj) {
         if(obj.constructor === L.Marker || obj.constructor === L.marker) {
             var latlng = obj.getLatLng();
-
-            addSearchMarker(latlng, {draggable:drawable, layer:'Search Marker. Drag Me to set location', selected:selected, clickable:clickable});
+            
+            if(areaOptions == undefined) areaOptions = {};
+            areaOptions = $.extend({}, {
+            	draggable:drawable, 
+            	layer:'Search Marker. Drag Me to set location',
+            	selected:selected,
+            	clickable:clickable
+            	}, areaOptions);
+            
+            addSearchMarker(latlng, areaOptions);
         } else {
             drawnItems.addLayer(obj);
             $('input#areas').val(areas);

@@ -1,5 +1,7 @@
 package species.participation
 
+import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
+
 import species.utils.ImageType;
 import species.utils.Utils
 import org.grails.taggable.*
@@ -28,6 +30,7 @@ class Observation extends Metadata implements Taggable, Rateable {
 	def springSecurityService;
     def resourceService;
 	def observationsSearchService;
+	def SUserService;
 	
 	public enum OccurrenceStatus {
 		ABSENT ("Absent"),	//http://rs.gbif.org/terms/1.0/occurrenceStatus#absent
@@ -390,7 +393,7 @@ class Observation extends Metadata implements Taggable, Rateable {
 		activityFeedService.deleteFeed(this)
 	}
 	
-	def Map fetchExportableValue(){
+	def Map fetchExportableValue(SUser reqUser=null){
 		Map res = [:]
 		
 		res[ObvUtilService.IMAGE_PATH] = fetchImageUrlList().join(", ")
@@ -412,10 +415,11 @@ class Observation extends Metadata implements Taggable, Rateable {
 		res[ObvUtilService.CN] =cnName
 		res[ObvUtilService.SN] =snName
 		
-		
+		res[ObvUtilService.GEO_PRIVACY] = "" + geoPrivacy
 		res[ObvUtilService.LOCATION] = placeName
-		res[ObvUtilService.LONGITUDE] = "" + this.longitude
-		res[ObvUtilService.LATITUDE] = "" + this.latitude
+		def geoPrivacyAdjust = fetchGeoPrivacyAdjustment(reqUser)
+		res[ObvUtilService.LONGITUDE] = "" + (this.longitude + geoPrivacyAdjust)
+		res[ObvUtilService.LATITUDE] = "" + (this.latitude + geoPrivacyAdjust)
 		res[ObvUtilService.NOTES] = notes
 		
 		
@@ -532,6 +536,18 @@ class Observation extends Metadata implements Taggable, Rateable {
 			}
 		}
 		return res
+	}
+	
+	def fetchGeoPrivacyAdjustment(SUser reqUser=null){
+		if(!geoPrivacy || SUserService.ifOwns(author)){
+			return 0
+		}
+		//for backend thred e.g download request reqUser will be passed as argument
+		if(reqUser && (reqUser.id == author.id || reqUser.id == 1)){
+			return 0
+		}
+		
+		return Utils.getRandomFloat()
 	}
 //	
 //	def fetchSourceChecklistTitle(){
