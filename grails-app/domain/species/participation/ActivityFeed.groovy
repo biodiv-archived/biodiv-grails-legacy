@@ -315,15 +315,43 @@ class ActivityFeed {
 	}
 	
 	
+	static updateIsDeleted(obj){
+		if(!obj || !obj.hasProperty('isDeleted')){
+			return
+		}
+		setShowable(obj, !obj.isDeleted)
+	}
+
+	
 	static updateIsShowable(obj){
 		if(!obj || !obj.hasProperty('isShowable')){
 			return
 		}
+		setShowable(obj, obj.isShowable)
+	}
+	
+	private static setShowable(obj, boolean isShowable){
 		def type = obj.class.getCanonicalName()
 		def id = obj.id
 		ActivityFeed.withTransaction {
-			ActivityFeed.findAllByRootHolderIdAndRootHolderType(id, type).each{ af ->
-					af.isShowable = obj.isShowable
+			List<ActivityFeed> feeds = ActivityFeed.withCriteria(){
+				or{
+					and{
+						eq('rootHolderType', type)
+						eq('rootHolderId', id)
+					}
+					and{
+						eq('activityHolderType', type)
+						eq('activityHolderId', id)
+					}
+					and{
+						eq('subRootHolderType', type)
+						eq('subRootHolderId', id)
+					}
+				}
+			}
+			feeds.each{ af ->
+					af.isShowable = isShowable
 					af.save(flush:true)
 			}
 		}

@@ -14,7 +14,7 @@ abstract class Metadata {
     //Geographic Coverage
 	String placeName;
 	String reverseGeocodedName
-	//String location;
+	
 	boolean geoPrivacy = false;
 	String locationAccuracy;
     Geometry topology;
@@ -38,7 +38,6 @@ abstract class Metadata {
     static constraints = {
 		placeName(nullable:true)
 		reverseGeocodedName(nullable:true)
-		//location(nullable: true, blank:true)
 		latitude(nullable: false)
 		longitude(nullable:false)
 		locationAccuracy(nullable: true)
@@ -58,6 +57,5 @@ abstract class Metadata {
             topology (type:org.hibernatespatial.GeometryUserType, class:com.vividsolutions.jts.geom.Geometry)
         }
     }
-
 	
 }

@@ -69,7 +69,7 @@ function initGrid(data, columns, sciNameColumn, commonNameColumn) {
             if(newColumnName == undefined)
                 newColumnName = prompt('New Column Name','');
 
-            if(newColumnName == null||newColumnName==''){
+            if(newColumnName == null||$.trim(newColumnName)==''){
                 return;
             }
 

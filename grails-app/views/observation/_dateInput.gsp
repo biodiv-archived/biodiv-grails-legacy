@@ -50,7 +50,7 @@
         </g:if>
         <g:else>
 
-        <input name="fromDate" type="text" id="fromDate" class="input-block-level"
+        <input name="fromDate" type="text" id="fromDate" class="date" class="input-block-level"
         value="${observationInstance?.fromDate?.format('dd/MM/yyyy')}"
         placeholder="Select date (dd/MM/yyyy)" />
 

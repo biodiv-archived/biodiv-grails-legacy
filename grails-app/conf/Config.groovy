@@ -484,8 +484,14 @@ environments {
 		
 		grails {
 			mail {
-				 host = "127.0.0.1"
-				 port = 25
+				 host = "smtp.gmail.com"
+				 port = 465
+				 username = "kxt5258@gmail.com"
+			         password = "Tangsibi1"
+				 props = ["mail.smtp.auth":"true", 					   
+			                  "mail.smtp.socketFactory.port":"465",
+			                  "mail.smtp.socketFactory.class":"javax.net.ssl.SSLSocketFactory",
+			                  "mail.smtp.socketFactory.fallback":"false"]
 			}
 		}
 
@@ -1107,6 +1113,7 @@ We will appreciate any feedback you may have to offer.<br/><br/>
 '''
 
 grails.plugins.springsecurity.ui.downloadRequest.emailSubject = 'Download request'
+grails.plugins.springsecurity.ui.downloadRequest.message = "Your data download request has been processed. The download link will be visible once you log in to your profile."
 grails.plugins.springsecurity.ui.downloadRequest.emailBody = '''\
 Hi $username,<br/>
 <br/>

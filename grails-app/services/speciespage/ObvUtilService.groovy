@@ -41,6 +41,7 @@ class ObvUtilService {
 	static final String TAGS   = "tags"
 	static final String AUTHOR_EMAIL   = "user email"
 	static final String AUTHOR_URL   = "user"
+	static final String AUTHOR   = "user username"
 	static final String AUTHOR_NAME   = "user name"
 	//task related
 	static final String  SUCCESS = "Success";
@@ -368,7 +369,7 @@ class ObvUtilService {
 		obvParams['longitude'] = (m[LONGITUDE] ?:"76.658279")
 		obvParams['latitude'] = (m[LATITUDE] ?: "12.32112")
 		obvParams['location_accuracy'] = 'Approximate'
-		obvParams['place_name'] = m[LOCATION]
+		obvParams['placeName'] = m[LOCATION]
 		obvParams['reverse_geocoded_name'] = (m[LOCATION] ?: "National Highway 6, Maharashtra, India")
 		
 		//reco related
@@ -378,10 +379,10 @@ class ObvUtilService {
 		
 		//tags, grouplist, notes
 		obvParams['notes'] = m[NOTES]
-		obvParams['tags'] = (m[TAGS] ? m[TAGS].trim().split(",") : null)
+		obvParams['tags'] = (m[TAGS] ? m[TAGS].trim().split(",").collect { it.trim() } : null)
 		obvParams['userGroupsList'] = getUserGroupIds(m[USER_GROUPS])
 		
-		obvParams['observedOn'] = m[OBSERVED_ON]
+		obvParams['fromDate'] = m[OBSERVED_ON]
 		
 		//author
 		obvParams['author'] = SUser.findByEmail(m[AUTHOR_EMAIL].trim())
@@ -422,8 +423,9 @@ class ObvUtilService {
 				params.obvId = observationInstance.id
 				activityFeedService.addActivityFeed(observationInstance, null, observationInstance.author, activityFeedService.OBSERVATION_CREATED);
 				addReco(params, observationInstance)
-
-				def tags = (params.tags != null) ? Arrays.asList(params.tags) : new ArrayList();
+				println "==============   tags " + params.tags 
+				def tags = (params.tags != null) ? new ArrayList(params.tags) : new ArrayList();
+				println "==============after    tags " + tags
 				observationInstance.setTags(tags);
 
 				if(params.groupsWithSharingNotAllowed) {
@@ -433,6 +435,9 @@ class ObvUtilService {
 						def userGroups = (params.userGroupsList != null) ? params.userGroupsList.split(',').collect{k->k} : new ArrayList();
 						observationService.setUserGroups(observationInstance, userGroups);
 					}
+				}
+				if(!observationInstance.save(flush:true)){
+					observationInstance.errors.allErrors.each { log.error it }
 				}
 			}else {
 					observationInstance.errors.allErrors.each { log.error it }
@@ -498,6 +503,7 @@ class ObvUtilService {
 					ImageUtils.createScaledImages(file, obvDir);
 					resourcesInfo.put("file_" + index, file.getAbsolutePath().replace(rootDir, ""))
 					resourcesInfo.put("license_" + index, license)
+					resourcesInfo.put("type_" + index, "image")
 					index++
 				}
 			}

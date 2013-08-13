@@ -97,7 +97,6 @@ class ChecklistService {
 		checklist.reservesValue =  params.reservesValue
 		checklist.sciNameColumn =  params.sciNameColumn
 		checklist.commonNameColumn =  params.commonNameColumn
-		checklist.columnNames =  params.columnNames ?:checklist.columnNames
 		checklist.columns =  params.columns?params.columns as JSON:checklist.columns
 		
 		checklist.isChecklist = true
@@ -229,7 +228,7 @@ class ChecklistService {
 	private getSafeAnnotation(Map m){
 		def newMap = [:]
 		m.each { k, v ->
-			if(v && v.trim() != ""){
+			if(v && !m.isNull(k)){
 				newMap.put(k.trim(), v.trim())
 			}
 		}
@@ -495,7 +494,7 @@ class ChecklistService {
 
 	
 	def List getObservationData(id, params=[:]){
-		params.max = params.max ? params.max.toInteger() :20
+		params.max = params.max ? params.max.toInteger() :50
 		params.offset = params.offset ? params.offset.toInteger() :0
 		def sql =  Sql.newInstance(dataSource);
 		def query = "select observation_id  as obv_id from checklists_observation where checklists_observations_id = " + id + " order by observations_idx limit " + params.max + " offset " + params.offset;
