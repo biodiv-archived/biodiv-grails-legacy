@@ -284,7 +284,7 @@ class RegisterController extends grails.plugins.springsecurity.ui.RegisterContro
 
 	protected void registerAndEmail(String username, String email, request) {
 		RegistrationCode registrationCode = SUserService.register(email)
-
+		println "Registration Code is: " + registrationCode
 		if (registrationCode == null || registrationCode.hasErrors()) {
 			flash.error = message(code: 'spring.security.ui.register.miscError')
 			flash.chainedParams = params

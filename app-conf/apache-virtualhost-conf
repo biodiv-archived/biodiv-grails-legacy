@@ -8,13 +8,13 @@
     ScriptAlias /cgi-bin/ /usr/lib/cgi-bin/
 	
     DocumentRoot /var/www
-	
     RewriteEngine on
 
     RewriteCond %{REQUEST_URI} ^/biodiv/(static|plugins|data|bootstrap|js|css|j_spring_security_check|j_spring_openid_security_check|images|j_spring_security_logout|.*/upload_resource|emailConfirmation|ck).*
     RewriteRule ^/biodiv(.*)$ http://indiabiodiversity.localhost.org:8080/biodiv$1 [P]
     ProxyPassReverse /biodiv http://indiabiodiversity.localhost.org:8080/biodiv
 
+#   RewriteCond %{REQUEST_URI} !(^(/biodiv/(observations|newsletters|group-themes|users|userGroups|images|content)|(wgp_maps|geoserver)))
     RewriteRule (^(/biodiv/(observations|newsletters|group-themes|users|userGroups|images|content)|(wgp_maps|geoserver))) - [L]
     
     RewriteCond %{REQUEST_URI} ^/content
@@ -97,7 +97,7 @@ RewriteCond %{REQUEST_URI} !(^/(species|observation|activity|SUser|user|page|pag
     DirectoryIndex index.php index.html index.html index.htm index.shtml
     ScriptAlias /cgi-bin/ /usr/lib/cgi-bin/
 
-	DocumentRoot /var/www
+    DocumentRoot /var/www
 	
     RewriteEngine on
 

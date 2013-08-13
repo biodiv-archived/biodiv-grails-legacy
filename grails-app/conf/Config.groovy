@@ -1107,6 +1107,7 @@ We will appreciate any feedback you may have to offer.<br/><br/>
 '''
 
 grails.plugins.springsecurity.ui.downloadRequest.emailSubject = 'Download request'
+grails.plugins.springsecurity.ui.downloadRequest.message = "Your data download request has been processed. The download link will be visible once you log in to your profile."
 grails.plugins.springsecurity.ui.downloadRequest.emailBody = '''\
 Hi $username,<br/>
 <br/>
