@@ -161,7 +161,6 @@ class ChecklistController {
 			columnList.add(0, params.sciNameColumn)
 		}
 		
-		params.columnNames =  columnList.join("\t")
 		params.columns =  columnList.collect { it.trim() }
 		
 		//params.sciNameColumn = params.sciNameColumn ?: "scientific_name"

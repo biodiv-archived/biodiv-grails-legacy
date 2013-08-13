@@ -256,8 +256,17 @@ def corChecklist(){
 	}
 }
 
+def addDrupalId(){
+	def checklistUtilService = ctx.getBean("checklistUtilService");
+	checklistUtilService.setDrupalRef()
+	println " =========== done "
+}
+
+
 
 //addFeedToChecklist()
 //serializeChecklist()
-corChecklist()
+//corChecklist()
+addDrupalId()
+
 println "================ done "

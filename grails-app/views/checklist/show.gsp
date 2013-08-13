@@ -31,7 +31,7 @@
 
                         </div>
                         <s:showHeadingAndSubHeading
-                            model="['heading':checklistInstance.title, 'subHeading':checklistInstance.fetchAttributions(), 'headingClass':headingClass, 'subHeadingClass':subHeadingClass]" />
+                            model="['heading':checklistInstance.title, 'headingClass':headingClass, 'subHeadingClass':subHeadingClass]" />
 
                         </div>
                     </div>

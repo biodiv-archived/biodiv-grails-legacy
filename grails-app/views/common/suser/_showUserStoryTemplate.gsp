@@ -91,17 +91,9 @@
 			</g:if>
 		</g:if>
 	</div>
-	<g:if test="${!showDetails }">
-		<div class="">
-			<span class="footer-item" title="No of Observations"> <i
-				class="icon-screenshot"></i> <obv:showNoOfObservationsOfUser
-					model="['user':userInstance]" /> </span> <span class="footer-item"
-				title="No of Tags"> <i class="icon-tags"></i> <obv:showNoOfTagsOfUser
-					model="['userId':userInstance.id]" /> </span> <span class="footer-item"
-				title="No of Identifications"> <i class="icon-check"></i> <obv:showNoOfRecommendationsOfUser
-					model="['user':userInstance]" /> </span>
-		</div>
-	</g:if>
+        <g:if test="${!showDetails }">
+            <obv:getStats model="['user':userInstance]"/>
+        </g:if>
 </div>
 
 

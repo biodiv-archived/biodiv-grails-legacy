@@ -1,6 +1,5 @@
 package species
 
-import species.participation.ChecklistRowData;
 import species.participation.Comment
 
 class ActivityFeedTagLib {

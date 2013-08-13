@@ -561,4 +561,10 @@ class ChartService {
 			order 'total', 'desc'
 		}.collect { it[0]}
 	}
+
+
+	def long getUserActivityCount(user){
+		return ActivityFeed.countByAuthorAndIsShowable(user,true);
+	}
+
 }
