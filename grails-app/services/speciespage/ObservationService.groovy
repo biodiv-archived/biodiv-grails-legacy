@@ -1583,7 +1583,6 @@ class ObservationService {
 		            log.debug "Sending email to ${toUser}"
 					mailService.sendMail {
 						to toUser.email
-						to "kxt5258@yahoo.com"
 						if(index == 0) {
 							//bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com", "thomas.vee@gmail.com", "sandeept@strandls.com"
                             				//bcc grailsApplication.config.speciesPortal.app.notifiers_bcc.toArray()

@@ -8,6 +8,7 @@ import org.codehaus.groovy.grails.plugins.springsecurity.ui.RegistrationCode;
 import org.springframework.security.web.savedrequest.DefaultSavedRequest;
 import org.codehaus.groovy.grails.plugins.springsecurity.openid.OpenIdAuthenticationFailureHandler as OIAFH
 import org.springframework.web.context.request.RequestContextHolder as RCH
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 
 import species.auth.SUser;
 import species.participation.Observation;
@@ -133,6 +134,7 @@ class RegisterController extends grails.plugins.springsecurity.ui.RegisterContro
 		}
 
 	}
+
 
 	def verifyRegistration = {
 		if (springSecurityService.isLoggedIn()) {
@@ -284,7 +286,6 @@ class RegisterController extends grails.plugins.springsecurity.ui.RegisterContro
 
 	protected void registerAndEmail(String username, String email, request) {
 		RegistrationCode registrationCode = SUserService.register(email)
-		println "Registration Code is: " + registrationCode
 		if (registrationCode == null || registrationCode.hasErrors()) {
 			flash.error = message(code: 'spring.security.ui.register.miscError')
 			flash.chainedParams = params
@@ -293,6 +294,17 @@ class RegisterController extends grails.plugins.springsecurity.ui.RegisterContro
 		}
 
 		String url = generateLink('register', 'verifyRegistration', [t: registrationCode.token], request)
+		sendVerificationMail(username,email,url,request)
+	}
+	
+	def resend = {
+		def username = session[UsernamePasswordAuthenticationFilter.SPRING_SECURITY_LAST_USERNAME_KEY]?.decodeHTML()
+		def registrationCode = RegistrationCode.findByUsername(username)
+		String url = generateLink('register', 'verifyRegistration', [t: registrationCode.token], request)
+		sendVerificationMail(username,username,url,request)
+	}
+
+	protected void sendVerificationMail(String username, String email, String url, request)  {
 
 		def conf = SpringSecurityUtils.securityConfig
 		def body = conf.ui.register.emailBody
@@ -313,8 +325,7 @@ class RegisterController extends grails.plugins.springsecurity.ui.RegisterContro
 		}
 		clearRegistrationInfoFromSession()
 	}
-	
-	
+
 	/**
 	 * Authenticate the user for real now that the account exists/is linked and redirect
 	 * to the originally-requested uri if there's a SavedRequest.

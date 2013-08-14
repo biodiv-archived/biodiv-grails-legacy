@@ -15,6 +15,8 @@ import org.springframework.security.web.authentication.AbstractAuthenticationTar
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 import org.springframework.security.web.savedrequest.SavedRequest;
 import org.springframework.util.StringUtils;
+import org.codehaus.groovy.grails.plugins.springsecurity.ui.RegistrationCode;
+import species.utils.Utils;
 
 import species.auth.DefaultAjaxAwareRedirectStrategy;
 
@@ -138,7 +140,13 @@ class LoginController {
 				msg = g.message(code: "springSecurity.errors.login.disabled")
 			}
 			else if (exception instanceof LockedException) {
-				msg = g.message(code: "springSecurity.errors.login.locked")
+				//check if the email has been verified and give option to resend the email
+				def registerationCode = RegistrationCode.findAllByUsername(username.decodeHTML()) 
+				if(registerationCode) {
+					def url = Utils.getDomainServerUrl(request) + "/register/resend"	
+					msg = g.message(code: "You have not verified your email yet! <a href=\"${url}\">Resend Verification Email</a>")
+				}else 
+					msg = g.message(code: "springSecurity.errors.login.locked")
 			}
 			else {
 				msg = g.message(code: "springSecurity.errors.login.fail");
