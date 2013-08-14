@@ -1578,14 +1578,14 @@ class ObservationService {
 				if(request){
 					templateMap['userProfileUrl'] = generateLink("SUser", "show", ["id": toUser.id], request)
 				}
-		        if ( Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
+		    if ( Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
 			//if ( Environment.getCurrent().getName().equalsIgnoreCase("development")) {
 		            log.debug "Sending email to ${toUser}"
 					mailService.sendMail {
 						to toUser.email
 						if(index == 0) {
 							//bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com", "thomas.vee@gmail.com", "sandeept@strandls.com"
-                            				//bcc grailsApplication.config.speciesPortal.app.notifiers_bcc.toArray()
+                            bcc grailsApplication.config.speciesPortal.app.notifiers_bcc.toArray()
 							//bcc "kxt5258@gmail.com"
 						}
 						from conf.ui.notification.emailFrom
@@ -1648,13 +1648,14 @@ class ObservationService {
 		List participants = [];
 		//def result = ActivityFeed.findAllByRootHolderIdAndRootHolderType(observation.id, observation.class.getCanonicalName())*.author.unique()
 
-		if ( Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
-		def result = Follow.getFollowers(observation)
-		result.each { user ->
-			if(user.sendNotification && !participants.contains(user)){
-				participants << user
-			}
-		} else {
+        if ( Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
+            def result = Follow.getFollowers(observation)
+            result.each { user ->
+                if(user.sendNotification && !participants.contains(user)){
+                    participants << user
+                }
+            }
+        } else {
             participants << getOwner(observation);
         }
         
