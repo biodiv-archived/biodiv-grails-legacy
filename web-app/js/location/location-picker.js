@@ -348,8 +348,8 @@ function select_location(marker) {
     
     var position = selectedMarker.getLatLng();
     geocoder.geocode({'latLng': new google.maps.LatLng(position.lat, position.lng)}, function(results, status) {
-        if (status == G.GeocoderStatus.OK) {
-            if (results) {
+    	if (status == G.GeocoderStatus.OK) {
+        	if (results) {
                 var content = '<ul>';
                 for(var i=0; i<Math.min(results.length,2); i++) {
                     content += '<li><span>'+results[i].formatted_address+'</span> <a onclick="useLocation(this);">Use as title</a></li>'
@@ -358,11 +358,11 @@ function select_location(marker) {
                 selectedMarker.bindPopup(content).openPopup();
 
                 if (results[0]) {
-                    $('#place_name').val(results[0].formatted_address);
-                    $('#reverse_geocoded_name').html(results[0].formatted_address);
+                    $('#placeName').val(results[0].formatted_address);
+                    //$('#reverse_geocoded_name').html(results[0].formatted_address);
                     //$('#latitude').html(marker.getLatLng().lat.toFixed(2));
                     //$('#longitude').html(marker.getLatLng().lng.toFixed(2));
-                    $('#reverse_geocoded_name_field').val(results[0].formatted_address);
+                    //$('#reverse_geocoded_name_field').val(results[0].formatted_address);
                 }
 
             }
@@ -462,10 +462,11 @@ function update_geotagged_images_list(image) {
         var display = "";
         var html = "";
         var func = "";
-
+        var inputHtml = ""
         if (latlng) {            	
             display += "Lat: " + latlng.lat.toFixed(2) + ", Lon: " + latlng.lng.toFixed(2);
-            func += "addSearchMarker({lat:" + latlng.lat+",lng:" +latlng.lng+ "});";
+            inputHtml += '<input type="hidden" name="latitudteFromImage" value="' +  latlng.lat + '"/>'
+            inputHtml += '<input type="hidden" name="longitudeFromImage" value="' +  latlng.lng + '"/>'
         }
 
 
@@ -477,12 +478,13 @@ function update_geotagged_images_list(image) {
                 display += " and "  
             }
             display += $.datepicker.formatDate('dd M yy', Date.parse(date));
-            func += "set_date('" + date + " " + time + "');";
+            inputHtml += '<input type="hidden" name="dateFromImage" value="' + date + " " + time + '"/>'
         }
 
         if(latlng || imageDate){
-            func += "$(this).addClass('active_location_picker_button');";
-            html = '<div  class="' + $(image).attr("id") +' leaflet-control location_picker_button" style="display:inline-block;" onclick="' + func + '"><div style="width:40px; height:40px;float:left;"><img style="width:100%; height:100%;" src="' + $(image).attr('src') + '"/></div></div>';
+            //func += "$(this).addClass('active_location_picker_button');";
+        	func += "setInfoFromImage($(this));";
+            html = '<div  class="' + $(image).attr("id") +' leaflet-control location_picker_button " style="display:inline-block;" onclick="' + func + '">' + inputHtml + '<div style="width:40px; height:40px;float:left;"><img style="width:100%; height:100%;" src="' + $(image).attr('src') + '"/></div></div>';
             $("#geotagged_images>.title").show();
             $("#geotagged_images>.msg").show();
             $("#geotagged_images").append(html);
@@ -662,8 +664,7 @@ $(document).ready(function() {
     $('#geotagged_images').on('update_map', function() {
         if($(this).children(".location_picker_button").length >0){
             var $geotagged_images = $(this)
-            if(isMapViewLoaded)
-                $geotagged_images.children(":last").trigger("click");
+            $geotagged_images.children(":last").trigger("click");
         }else{
             $("#geotagged_images>.title").hide();
             $("#geotagged_images>.msg").hide();
@@ -728,4 +729,25 @@ function getSelectedBounds() {
 
 function resetMap(){
     map.fitBounds(allowedBounds)//.setView(allowedBounds.getCenter());
+}
+
+function setInfoFromImage(image){
+	var date = $(image).children('input[name="dateFromImage"]').val();
+	if(date){
+		set_date(date);
+	}
+	
+	var lat = $(image).children('input[name="latitudteFromImage"]').val();
+	var lng = $(image).children('input[name="longitudeFromImage"]').val();
+	if(lat && lng){
+		if(isMapViewLoaded){
+			addSearchMarker({lat:lat,lng:lng});
+		}else{
+			$(".address").trigger("click");
+		}		
+	}
+	
+	if(date || (lat && lng)){
+		$(image).addClass('active_location_picker_button');
+	}
 }

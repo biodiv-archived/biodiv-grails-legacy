@@ -120,7 +120,6 @@
 
 <r:script>
 function loadMapInput() {
-console.log('loadMapInput');
     $("#map_canvas").show();
     $("#latlng").show();
     if(!isMapViewLoaded) {
