@@ -48,15 +48,15 @@ class DwCAExporter {
 
 
 
-	public void exportSpeciesData(String directory) {		
-		exportSpeciesData(Species.findAllByPercentOfInfoGreaterThan(0), directory);
+	public File exportSpeciesData(String directory) {		
+		return exportSpeciesData(Species.findAllByPercentOfInfoGreaterThan(0), directory);
 	}
 
 	/**
 	 * Export species
 	 * Iterate over each species and export related data
 	 */
-	public void exportSpeciesData(List<Species> speciesList, String directory) {
+	public File exportSpeciesData(List<Species> speciesList, String directory) {
 		
 		log.info "Darwin Core export started"
 
@@ -73,7 +73,10 @@ class DwCAExporter {
 		}
 		
 		String folderName = "dwc_"+ + new Date().getTime()
-		
+	    
+        if(!directory)
+            directory = File.createTempFile('','');
+
 		String folderPath = directory + "/"+ folderName
 
 		initWriters(folderPath)
@@ -88,7 +91,7 @@ class DwCAExporter {
 		closeWriters()
 
 		//Archive the directory and return the file
-		archive(directory, folderName)
+		return archive(directory, folderName)
 
 	}
 
@@ -96,8 +99,8 @@ class DwCAExporter {
 		String zipFileName = folderName+ ".zip"
 		String inputDir = directory + "/" + folderName
 		
-
-		ZipOutputStream zipFile = new ZipOutputStream(new FileOutputStream(directory+"/"+zipFileName))
+        File f = new File(directory+"/"+zipFileName);
+		ZipOutputStream zipFile = new ZipOutputStream(new FileOutputStream(f))
 		new File(inputDir).eachFile() { file ->
 			zipFile.putNextEntry(new ZipEntry(file.getName()))
 			def buffer = new byte[1024]
@@ -106,12 +109,13 @@ class DwCAExporter {
 				// check wether the file is empty
 				if (l > 0) {
 					zipFile.write(buffer, 0, l)
-				}
-			}
+	 			}
+	  		}
 			zipFile.closeEntry()
-		}
+	 	}
 		zipFile.close()
-	}
+        return f;
+	} 
 
 
 	/**
@@ -125,7 +129,7 @@ class DwCAExporter {
 		exportCommonNames(species.taxonConcept)
 		exportMedia(species)
 		exportReferences(species)
-	}
+	} 
 
 
 	/**
