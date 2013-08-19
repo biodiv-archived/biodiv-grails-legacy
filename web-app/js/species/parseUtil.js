@@ -58,20 +58,24 @@ function parseCSVData(data, options) {
     var printedLines = 0;
     var headerCount = 0;
     var error = '';
+    var foundHeader = false;
     $.each(lines, function(lineCount, line) {
     	line = $.trim(line);
         try{
-            if ((lineCount == options.startLine) && (typeof(options.headers) == 'undefined')) {
+            if ((!foundHeader) || (lineCount == options.startLine) && (typeof(options.headers) == 'undefined')) {
                 var headers = $.csv.toArray(line);
-                headerCount = headers.length;
-                $.each(headers, function(headerCount, header) {
-                    columns.push({id:header, name: header, field: header, editor: Slick.Editors.Text, sortable:false, minWidth: 100, header:getHeaderMenuOptions()});
-                    console.log(columns);
-                });
-
+                foundHeader = isValidRow(headers);
+                if(foundHeader){
+	                headerCount = headers.length;
+	                $.each(headers, function(headerCount, header) {
+	                	var columnName = $.trim(header);
+	                    columns.push({id:columnName, name: columnName, field: columnName, editor: Slick.Editors.Text, sortable:false, minWidth: 100, header:getHeaderMenuOptions()});
+	                    console.log(columns);
+	                });
+                }
             } else if (lineCount >= options.startLine) {
                 var items = $.csv.toArray(line);
-                if (line !== '' && items.length > 0) {
+                if(isValidRow(items)) {
                     printedLines++;
                     if (items.length != headerCount) {
                         error += 'Error on line ' + lineCount + ': Item count (' + items.length + ') does not match header count (' + headerCount + ') \n';
@@ -98,6 +102,40 @@ function parseCSVData(data, options) {
 	    }
     }
 }
+
+function isValidRow(array){
+	var isValid = false;
+	$.each(array, function(index, value) {
+		if(value !== undefined && value !== ''){
+			isValid = true
+			return false;
+		}
+	});
+	return isValid
+}
+
+/*
+function getValidData(data){
+	var validData = new Array();
+	 $.each(data, function(index, value) {
+		 if(isValidCollection(value)){
+			 validData.push(value);
+		 }
+	 });
+	 return validData;
+}
+
+function isValidCollection(obj){
+	var isValid = false;
+	$.each( obj, function( key, value ) {
+		if(value !== undefined && value !== ''){
+			isValid = true;
+			return false;
+		}
+	});
+	return isValid;
+}
+*/
 
 function getMediaColumnOptions() {
     return {
