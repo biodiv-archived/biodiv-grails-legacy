@@ -547,7 +547,7 @@ class ChartService {
 		}
 	}
 	
-	def List getUserByRank(max, offset){
+	def List getUserByRank(max, offset, userName = null){
 		return ActivityFeed.withCriteria(){
 			projections {
 				groupProperty('author')
@@ -555,6 +555,11 @@ class ChartService {
 			}
 			and{
 				eq('isShowable', true)
+				if(userName){
+					author{
+						ilike("username", userName)
+					}
+				}
 			}
 			maxResults max
 			firstResult offset
