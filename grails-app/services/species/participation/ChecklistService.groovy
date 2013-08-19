@@ -116,11 +116,11 @@ class ChecklistService {
 			}else{
 				//updates old checklist
 				checklistInstance = Checklists.get(params.id.toLong())
+				params.author = checklistInstance.author;
 				updateChecklist(params, checklistInstance)
 				feedType = activityFeedService.CHECKLIST_UPDATED
 				feedAuthor = springSecurityService.currentUser
 				//so that original author of checklist should not change
-				params.author = checklistInstance.author;
 				//to say if all obv needs to be updated because some change in MetaData properties
 				isGlobalUpdate = isGlobalUpdateForObv(checklistInstance)
 			}
@@ -273,7 +273,7 @@ class ChecklistService {
 		ConfidenceType confidence = observationService.getConfidenceType(ConfidenceType.CERTAIN.name());
 		RecommendationVote recommendationVoteInstance = new RecommendationVote(observation:obv, recommendation:reco, commonNameReco:cnReco, author:obv.author, confidence:confidence, votedOn:obv.fromDate);
 		
-		def user = springSecurityService.currentUser;
+		def user = obv.author;
 		def oldRecoVote = RecommendationVote.findWhere(observation:obv, author:user)
 		if(oldRecoVote){
 			oldRecoVote.delete(flush:true)
@@ -307,7 +307,7 @@ class ChecklistService {
 		if(obv.fetchSpeciesCall() != reco.name)
 			return true
 		
-		def user = springSecurityService.currentUser;	
+		def user = obv.author;
 		def oldRecoVote = RecommendationVote.findWhere(observation:obv, author:user)
 		
 		if(!oldRecoVote || oldRecoVote.recommendation.name != reco.name || oldRecoVote.commonNameReco?.name != cnReco?.name)

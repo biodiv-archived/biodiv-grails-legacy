@@ -159,10 +159,11 @@ class ObservationService {
 				mailType = OBSERVATION_ADDED
 			}else{
 				observationInstance = Observation.get(params.id.toLong())
+				params.author = observationInstance.author;
 				updateObservation(params, observationInstance)
 				feedType = activityFeedService.OBSERVATION_UPDATED
 				feedAuthor = springSecurityService.currentUser
-				params.author = observationInstance.author;
+				
 			}
 			
 			if(!observationInstance.hasErrors() && observationInstance.save(flush:true)) {

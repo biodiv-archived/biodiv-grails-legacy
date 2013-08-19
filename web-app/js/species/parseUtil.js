@@ -65,10 +65,11 @@ function parseCSVData(data, options) {
             if ((!foundHeader) || (lineCount == options.startLine) && (typeof(options.headers) == 'undefined')) {
                 var headers = $.csv.toArray(line);
                 foundHeader = isValidRow(headers);
+                headers = getSafeHeaders(headers);
                 if(foundHeader){
 	                headerCount = headers.length;
 	                $.each(headers, function(headerCount, header) {
-	                	var columnName = $.trim(header);
+	                	var columnName = header;
 	                    columns.push({id:columnName, name: columnName, field: columnName, editor: Slick.Editors.Text, sortable:false, minWidth: 100, header:getHeaderMenuOptions()});
 	                    console.log(columns);
 	                });
@@ -101,6 +102,26 @@ function parseCSVData(data, options) {
 	        options.callBack(rowData, columns);
 	    }
     }
+}
+
+function getSafeHeaders(array){
+	var newArray = new Array();
+	$.each(array, function(index, value) {
+		if(value === undefined || value.trim() === ''){
+			value = getDefaultColumnName(newArray, array.length)
+		}
+		newArray.push($.trim(value))
+	});
+	return newArray
+}
+
+function getDefaultColumnName(array, maxLength){
+	for (var i=1;i<=maxLength;i++){
+		var columnName = 'column' + i
+		if(!array.contains(columnName)){
+			return columnName
+		}
+	}
 }
 
 function isValidRow(array){
