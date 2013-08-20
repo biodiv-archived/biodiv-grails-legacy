@@ -23,6 +23,7 @@ class RegisterController extends grails.plugins.springsecurity.ui.RegisterContro
 	def springSecurityService;
 	def openIDAuthenticationFilter;
 	def jcaptchaService;
+	def activityFeedService;
 	//def recaptchaService;	
 	
 	def index = {
@@ -120,6 +121,7 @@ class RegisterController extends grails.plugins.springsecurity.ui.RegisterContro
 		//recaptchaService.cleanUp(session)
 		
 		def userProfileUrl = generateLink("SUser", "show", ["id": user.id], request)
+		activityFeedService.addActivityFeed(user, user, user, activityFeedService.USER_REGISTERED);
 		SUserService.sendNotificationMail(SUserService.NEW_USER, user, request, userProfileUrl);
 		
 		if(command.openId) {

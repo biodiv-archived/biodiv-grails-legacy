@@ -423,8 +423,9 @@ class ChartService {
 	}
 
 	private int getRegisterUserCount(startDate, endDate){
-		return SUser.createCriteria().count {
+		return ActivityFeed.createCriteria().count {
 				and{
+					eq('activityType', ActivityFeedService.USER_REGISTERED)
 					between('dateCreated', startDate, endDate)
 				}
 			}
@@ -557,7 +558,10 @@ class ChartService {
 				eq('isShowable', true)
 				if(userName){
 					author{
-						ilike("username", userName)
+						or{
+							ilike("username", userName)
+							ilike("name", userName)
+						}
 					}
 				}
 			}

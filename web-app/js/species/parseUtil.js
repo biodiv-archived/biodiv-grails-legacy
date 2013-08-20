@@ -107,15 +107,17 @@ function parseCSVData(data, options) {
 function getSafeHeaders(array){
 	var newArray = new Array();
 	$.each(array, function(index, value) {
-		if(value === undefined || value.trim() === ''){
-			value = getDefaultColumnName(newArray, array.length)
-		}
+		value = getDefaultColumnName(newArray, array.length, value)
 		newArray.push($.trim(value))
 	});
 	return newArray
 }
 
-function getDefaultColumnName(array, maxLength){
+function getDefaultColumnName(array, maxLength, name){
+	if(name !== undefined && $.trim(name) !== '' && !array.contains($.trim(name))){
+		return $.trim(name)
+	}
+	
 	for (var i=1;i<=maxLength;i++){
 		var columnName = 'column' + i
 		if(!array.contains(columnName)){
