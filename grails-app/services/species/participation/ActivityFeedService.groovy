@@ -220,10 +220,10 @@ class ActivityFeedService {
 				text = activityDomainObj.body
 				break
 			case SPECIES_RECOMMENDED:
-				activityTitle = SPECIES_RECOMMENDED + " " + getSpeciesNameHtml(activityDomainObj, params)
+				activityTitle = SPECIES_RECOMMENDED + " " + (activityDomainObj ? getSpeciesNameHtml(activityDomainObj, params):feedInstance.activityDescrption)
 				break
 			case SPECIES_AGREED_ON:
-				activityTitle =  SPECIES_AGREED_ON + " " + getSpeciesNameHtml(activityDomainObj, params)
+				activityTitle =  SPECIES_AGREED_ON + " " + (activityDomainObj ? getSpeciesNameHtml(activityDomainObj, params):feedInstance.activityDescrption)
 				break
 			case OBSERVATION_FLAGGED:
 				activityTitle = OBSERVATION_FLAGGED
