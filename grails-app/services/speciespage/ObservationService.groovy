@@ -4,7 +4,7 @@ import grails.util.Environment;
 import grails.util.GrailsNameUtils;
 import groovy.sql.Sql
 import groovy.text.SimpleTemplateEngine
-
+import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.grails.taggable.TagLink;
 
 import java.util.Date;
@@ -125,9 +125,10 @@ class ObservationService {
 		observation.checklistAnnotations = params.checklistAnnotations?:observation.checklistAnnotations
 		
         GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), grailsApplication.config.speciesPortal.maps.SRID);
-        if(params.latitude && params.longitude) {
-            observation.topology = geometryFactory.createPoint(new Coordinate(params.longitude?.toFloat(), params.latitude?.toFloat()));
-        } else if(params.areas) {
+//        if(params.latitude && params.longitude) {
+//            observation.topology = geometryFactory.createPoint(new Coordinate(params.longitude?.toFloat(), params.latitude?.toFloat()));
+//        } else 
+		if(params.areas) {
             WKTReader wkt = new WKTReader(geometryFactory);
             try {
                 Geometry geom = wkt.read(params.areas);
@@ -931,7 +932,9 @@ class ObservationService {
     /**
     *
     **/
-    private getBoundGeometry(x1, y1, x2, y2){
+	
+	
+	private static getBoundGeometry(x1, y1, x2, y2){
         def p1 = new Coordinate(y1, x1)
         def p2 = new Coordinate(y1, x2)
         def p3 = new Coordinate(y2, x2)
@@ -942,12 +945,12 @@ class ObservationService {
         arr[2] = p3
         arr[3] = p4
         arr[4] = p1
-        def gf = new GeometryFactory(new PrecisionModel(), grailsApplication.config.speciesPortal.maps.SRID)
+        def gf = new GeometryFactory(new PrecisionModel(), ConfigurationHolder.getConfig().speciesPortal.maps.SRID)
         def lr = gf.createLinearRing(arr)
         def pl = gf.createPolygon(lr, null)
         return pl
     }
-
+	
 	Date parseDate(date){
 		try {
 			return date? Date.parse("dd/MM/yyyy", date):new Date();
@@ -1738,6 +1741,20 @@ class ObservationService {
 	    }
 		
 		return results
-	} 
+	}
+	
+	/*
+	 * To validate topology in all domain class
+	 * 
+	 */
+	public static validateLocation(Geometry gm, obj){
+		if(!gm){
+			return ['observation.suggest.location']
+		}
+		Geometry indiaBoundry = getBoundGeometry(6.74678, 68.03215, 35.51769, 97.40238)
+		if(!indiaBoundry.covers(gm)){
+			return ['location.value.not.in.india', '6.74678', '35.51769', '68.03215', '97.40238']
+		}
+	}
 
 }

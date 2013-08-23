@@ -1207,4 +1207,5 @@ class ObservationController {
         render locations as JSON
     }
 	
+	
 }

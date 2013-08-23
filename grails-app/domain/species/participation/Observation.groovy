@@ -18,8 +18,10 @@ import speciespage.ObvUtilService;
 import grails.converters.JSON
 import grails.util.GrailsNameUtils;
 import org.grails.rateable.*
+import com.vividsolutions.jts.geom.Geometry
 import content.eml.Coverage;
 import species.Metadata;
+
 
 class Observation extends Metadata implements Taggable, Rateable {
 	
@@ -90,34 +92,7 @@ class Observation extends Metadata implements Taggable, Rateable {
 			if(!obj.sourceId && !obj.isChecklist) 
 				val && val.size() > 0 
 		}
-/*		latitude validator : { val, obj ->
-			if(!val) {
-                return ['default.blank.message', 'Latitude']
-            }
-			if(val){
-				if(Float.isNaN(val)) {
-					return ['typeMismatch.java.lang.Integer','Latitude']
-				}
-				if( val < 6.74678 || val > 35.51769) {
-					return ['value.not.in.range', 'Latitude', '6.74678', '35.51769']
-				}
-			}
-		}
-		longitude validator : { val, obj ->  
-            if(!val) {
-                return ['default.blank.message', 'Longitude']
-            }
-			if(val){
-				if(Float.isNaN(val)) { 
-					return ['typeMismatch.java.lang.Integer', 'Longitude']
-				}
-				if( val < 68.03215 || val > 97.40238) {
-					return ['value.not.in.range', 'Longitude', '68.03215', '97.40238']
-				}
-			}
-		}
-*/
-        placeName blank:false
+		placeName blank:false
 		agreeTerms nullable:true
 		checklistAnnotations nullable:true
 	}
