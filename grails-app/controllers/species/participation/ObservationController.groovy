@@ -49,7 +49,8 @@ class ObservationController {
 	def activityFeedService;
 	def SUserService;
 	def obvUtilService;
-	
+    def chartService;
+
 	static allowedMethods = [save:"POST", update: "POST", delete: "POST"]
 
 	def index = {
@@ -94,6 +95,8 @@ class ObservationController {
 			render(template:"/common/observation/showObservationListTemplate", model:model);
 			return;
 		} else if(!params.isGalleryUpdate?.toBoolean()){
+            model['width'] = 300;
+            model['height'] = 200;
 			render (view:"list", model:model)
 			return;
 		} else{
@@ -103,10 +106,15 @@ class ObservationController {
 			if(model.showTags) {
 //				def filteredTags = observationService.getTagsFromObservation(model.totalObservationInstanceList.collect{it[0]})
 //				tagsHtml = g.render(template:"/common/observation/showAllTagsTemplate", model:[count: count, tags:filteredTags, isAjaxLoad:true]);
-			}
+			 }
 //			def mapViewHtml = g.render(template:"/common/observation/showObservationMultipleLocationTemplate", model:[observationInstanceList:model.totalObservationInstanceList]);
-			
-			def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml, tagsHtml:tagsHtml, instanceTotal:model.instanceTotal]
+	        def chartModel = model.speciesGroupCountList
+            chartModel['width'] = 300;
+            chartModel['height'] = 200;
+
+            def distinctRecoListHtml = g.render(template:"/observation/distinctRecoTableTemplate", model:model);
+
+			def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml, tagsHtml:tagsHtml, instanceTotal:model.instanceTotal, chartModel:chartModel, distinctRecoListHtml:distinctRecoListHtml]
 			render result as JSON
 			return;
 		}
@@ -120,7 +128,7 @@ class ObservationController {
 	}
 
 	protected def getObservationList(params) {
-		def max = Math.min(params.max ? params.int('max') : 12, 100)
+		def max = Math.min(params.max ? params.int('max') : 24, 100)
 		def offset = params.offset ? params.int('offset') : 0
 		def filteredObservation = observationService.getFilteredObservations(params, max, offset, false)
 		def observationInstanceList = filteredObservation.observationInstanceList
@@ -148,9 +156,8 @@ class ObservationController {
                 };
             }
         }
-		
 		log.debug "Storing all observations ids list in session ${session['obv_ids_list']} for params ${params}";
-		return [observationInstanceList: observationInstanceList, instanceTotal: allObservationCount, checklistCount:checklistCount, observationCount: allObservationCount-checklistCount ,queryParams: queryParams, activeFilters:activeFilters, resultType:'observation']
+		return [observationInstanceList: observationInstanceList, instanceTotal: allObservationCount, checklistCount:checklistCount, observationCount: allObservationCount-checklistCount, distinctRecoList:filteredObservation.distinctRecoList, speciesGroupCountList:filteredObservation.speciesGroupCountList, queryParams: queryParams, activeFilters:activeFilters, resultType:'observation', geoPrivacyAdjust:Utils.getRandomFloat()]
 	}
 	
 
@@ -168,62 +175,6 @@ class ObservationController {
 	def save = {
 		log.debug params;
 		if(request.method == 'POST') {
-			//TODO:edit also calls here...handle that wrt other domain objects
-
-			params.author = springSecurityService.currentUser;
-			def observationInstance;
-			try {
-				observationInstance =  observationService.createObservation(params);
-
-				if(!observationInstance.hasErrors() && observationInstance.save(flush:true)) {
-					//flash.message = "${message(code: 'default.created.message', args: [message(code: 'observation.label', default: 'Observation'), observationInstance.id])}"
-					log.debug "Successfully created observation : "+observationInstance
-					params.obvId = observationInstance.id
-					activityFeedService.addActivityFeed(observationInstance, null, observationInstance.author, activityFeedService.OBSERVATION_CREATED);
-					
-					def tags = (params.tags != null) ? Arrays.asList(params.tags) : new ArrayList();
-					observationInstance.setTags(tags);
-
-					if(params.groupsWithSharingNotAllowed) {
-						observationService.setUserGroups(observationInstance, [params.groupsWithSharingNotAllowed]);
-					} else {
-						if(params.userGroupsList) {
-							def userGroups = (params.userGroupsList != null) ? params.userGroupsList.split(',').collect{k->k} : new ArrayList();
-							
-							observationService.setUserGroups(observationInstance, userGroups);
-						}	
-					}
-				    
-                    log.debug "Saving ratings for the resources"
-                    observationInstance.resource.each { res ->
-                        if(res.rating) {
-                            res.rate(springSecurityService.currentUser, res.rating);
-                        }
-                    }
-						
-					
-				//	observationService.sendNotificationMail(observationService.OBSERVATION_ADDED, observationInstance, request, params.webaddress);
-					params["createNew"] = true
-					chain(action: 'addRecommendationVote', model:['chainedParams':params]);
-				} else {
-					observationInstance.errors.allErrors.each { log.error it }
-					if(params["isMobileApp"]?.toBoolean()){
-						render (['error:true']as JSON);
-						return
-					}else{
-						render(view: "create", model: [observationInstance: observationInstance, saveParams:params, lastCreatedObv:null])
-					}
-				}
-			} catch(e) {
-				e.printStackTrace();
-				if(params["isMobileApp"]?.toBoolean()){
-					render (['error:true']as JSON);
-					return
-				}else{
-					flash.message = "${message(code: 'error')}";
-					render(view: "create", model: [observationInstance: observationInstance, lastCreatedObv:null])
-				}
-			}
 			saveAndRender(params)
 		} else {
 			redirect (url:uGroup.createLink(action:'create', controller:"observation", 'userGroupWebaddress':params.webaddress))
@@ -562,20 +513,16 @@ class ObservationController {
 			
 			def observationInstance = Observation.get(params.obvId);
 			log.debug params;
-			def mailType;
 			try {
 				if(!recommendationVoteInstance) {
 					//saving max voted species name for observation instance needed when observation created without species name
 					//observationInstance.calculateMaxVotedSpeciesName();
 					observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
 
-				        if(params["createNew"])  {
-						mailType = observationService.OBSERVATION_ADDED;
-					        observationService.sendNotificationMail(mailType, observationInstance, request, params.webaddress);
-					}
-
 					if(!params["createNew"]){
 						redirect(action:getRecommendationVotes, id:params.obvId, params:[max:3, offset:0, msg:msg, canMakeSpeciesCall:canMakeSpeciesCall])
+					}else if(params["isMobileApp"]?.toBoolean()){
+						render (['status':'success', 'success':'true', 'obvId':observationInstance.id]as JSON);
 					}else{
 						redirect (url:uGroup.createLink(action:'show', controller:"observation", id:observationInstance.id, 'userGroupWebaddress':params.webaddress, postToFB:(params.postToFB?:false)))
 						//redirect(action: "show", id: observationInstance.id, params:[postToFB:(params.postToFB?:false)]);
@@ -587,20 +534,15 @@ class ObservationController {
 					observationService.addRecoComment(recommendationVoteInstance.recommendation, observationInstance, params.recoComment);
 					//saving max voted species name for observation instance
 					observationInstance.calculateMaxVotedSpeciesName();
-					def activityFeed = activityFeedService.addActivityFeed(observationInstance, recommendationVoteInstance, recommendationVoteInstance.author, activityFeedService.SPECIES_RECOMMENDED);
+					def activityFeed = activityFeedService.addActivityFeed(observationInstance, recommendationVoteInstance, recommendationVoteInstance.author, activityFeedService.SPECIES_RECOMMENDED, activityFeedService.getSpeciesNameHtmlFromReco(recommendationVoteInstance.recommendation, null));
 					observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
-				
-					//sending email
-				        if(params["createNew"])  {
-						mailType = observationService.OBSERVATION_ADDED;
-					} else {
-						mailType = observationService.SPECIES_RECOMMENDED;
-					}
-					observationService.sendNotificationMail(mailType, observationInstance, request, params.webaddress, activityFeed);
 					
-					//redirecting / rendering					
 					if(!params["createNew"]){
+						//sending mail to user
+						observationService.sendNotificationMail(observationService.SPECIES_RECOMMENDED, observationInstance, request, params.webaddress, activityFeed);
 						redirect(action:getRecommendationVotes, id:params.obvId, params:[max:3, offset:0, msg:msg, canMakeSpeciesCall:canMakeSpeciesCall])
+					}else if(params["isMobileApp"]?.toBoolean()){
+						render (['status':'success', 'success':'true', 'obvId':observationInstance.id] as JSON);
 					}else{
 						redirect (url:uGroup.createLink(action:'show', controller:"observation", id:observationInstance.id, 'userGroupWebaddress':params.webaddress, postToFB:(params.postToFB?:false)))
 						//redirect(action: "show", id: observationInstance.id, params:[postToFB:(params.postToFB?:false)]);
@@ -630,7 +572,7 @@ class ObservationController {
 
 	/**
 	 * adds a recommendation and 1 vote to it attributed to the logged in user
-	 *  recommendation if it doesn't exist
+	 * saves recommendation if it doesn't exist
 	 */
 	@Secured(['ROLE_USER'])
 	def addAgreeRecommendationVote = {
@@ -664,10 +606,10 @@ class ObservationController {
 				}else if(recommendationVoteInstance.save(flush: true)) {
 					log.debug "Successfully added reco vote : "+recommendationVoteInstance
 					observationInstance.calculateMaxVotedSpeciesName();
-					def activityFeed = activityFeedService.addActivityFeed(observationInstance, recommendationVoteInstance, recommendationVoteInstance.author, activityFeedService.SPECIES_AGREED_ON);
+					def activityFeed = activityFeedService.addActivityFeed(observationInstance, recommendationVoteInstance, recommendationVoteInstance.author, activityFeedService.SPECIES_AGREED_ON, activityFeedService.getSpeciesNameHtmlFromReco(recommendationVoteInstance.recommendation, null));
 					observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
 					
-					// mail to user
+					//sending mail to user
 					observationService.sendNotificationMail(observationService.SPECIES_AGREED_ON, observationInstance, request, params.webaddress, activityFeed);
 					def r = [
 						status : 'success',
@@ -1272,5 +1214,4 @@ class ObservationController {
         def locations = observationService.locations(params);
         render locations as JSON
     }
-	
 }

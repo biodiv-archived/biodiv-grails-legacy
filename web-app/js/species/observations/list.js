@@ -620,6 +620,18 @@ function updateListPage(activeTag) {
         $('.observations_list').replaceWith(data.obvListHtml);
         $('#info-message').replaceWith(data.obvFilterMsgHtml);
         $('#tags_section').replaceWith(data.tagsHtml);
+        if(data.chartModel) {
+            visualization_data = new google.visualization.DataTable();
+            $.each(data.chartModel.columns, function(index, item) {
+                visualization_data.addColumn( item[0], item[1]);
+            });
+
+            $.each(data.chartModel.data, function(index, item) {
+                visualization_data.addRow(item);
+            });
+            visualization.draw(visualization_data, {legend: 'bottom'});
+        }
+        $('#distinctRecoList').html(data.distinctRecoListHtml);
         //$('.observation_location_wrapper').replaceWith(data.mapViewHtml);
         setActiveTag(activeTag);
         updateDownloadBox(data.instanceTotal);
@@ -894,5 +906,8 @@ function updateDownloadBox(instanceTotal){
 //})/
 
 $(document).ready(function(){
+    $(".snippet.tablet .figure").hover(function() {
+        $(this).children('.mouseover').stop().toggle('slow')
+    });
 });
     

@@ -93,18 +93,24 @@ h6 {
 }
 
 .snippet.tablet {
-	width: 210px;
-	height: 220px;
+	width: 140px;
+	height: 150px;
 	overflow: hidden;
 	position: relative;
 }
 
 .snippet.tablet .figure {
-	height:150px;
+	height:100px;
 	width:auto;
 }
 .snippet.tablet .caption {
-	height:40px;
+	height:30px;
+        padding:9px 0px;
+}
+
+.snippet.tablet .caption .story-footer {
+        right:32px;
+        left:0px;
 }
 
 .thumbnail .figure { /* 	margin-bottom: 5px; */
@@ -118,17 +124,31 @@ h6 {
 .thumbnail .figure a, .thumbnail .figure span {
 	display: table-cell;
 	vertical-align: middle;
-	max-height: 150px;
-	max-width: 200px;
+	max-height: 100px;
+	max-width: 140px;
 }
 
 .thumbnail .figure .img-polaroid {
-	max-height: 140px;
-	max-width: 190px;
+	max-height: 100px;
+	max-width: 140px;
+        padding:0px;
 /* 	height:100%; */
 /* 	width: auto; */
 	display: -moz-inline-box; /* Firefox 2 */
 	display: inline-block;
+}
+
+.thumbnail .figure .mouseover {
+    padding-left: 0px;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background-color: whitesmoke;
+    opacity: 0.8;
+    height: 100%;
+    text-align: justify;
+    width: 100%;
 }
 
 .grid_view.thumbnails {
@@ -151,6 +171,7 @@ h6 {
 .thumbnail .observation_story {
 	display: table-cell;
 	vertical-align: middle;
+        width:100%;
 }
 
 .button-bar {

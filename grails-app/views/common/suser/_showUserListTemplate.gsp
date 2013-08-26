@@ -9,7 +9,7 @@
 		</button>
 	</div>
 	
-	<div class="mainContentList">
+	<div class="mainContentList" style="clear:both;">
 		<div class="mainContent" name="p${params?.offset}">
 
 			<ul class="grid_view thumbnails">

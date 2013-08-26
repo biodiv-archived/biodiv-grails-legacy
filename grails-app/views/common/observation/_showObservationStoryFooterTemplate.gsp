@@ -1,6 +1,11 @@
 <%@page import="species.utils.Utils"%>
 <%@page import="species.participation.Checklists"%>
+
+    
 <div class="story-footer">
+
+    <g:render template="/common/observation/noOfResources" model="['instance':observationInstance]"/>
+
     <g:if test="${showLike && !showDetails}">
     <div class="footer-item pull-left">
         <obv:like model="['resource':observationInstance]"/>

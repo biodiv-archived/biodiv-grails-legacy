@@ -14,16 +14,16 @@
         this.options = _options;
         cache[this.options.nameFilter] = {}
         return $(this).catcomplete({
-            appendTo:_options.appendTo,
+               appendTo:_options.appendTo,
                source:function( request, response ) {
                    var term = request.term;
-
+                   
                    if ( term in cache[_options.nameFilter] ) {
                        response( cache[_options.nameFilter][ term ] );
                        return;
                    }
                    request.nameFilter = _options.nameFilter;
-                   lastXhrSN = $.getJSON( window.params.recommendation.suggest, request, function( data, status, xhr ) {
+                   lastXhr = $.getJSON( window.params.recommendation.suggest, request, function( data, status, xhr ) {
                        cache[_options.nameFilter][ term ] = data;
                        if ( xhr === lastXhr ) {
                            response( data );

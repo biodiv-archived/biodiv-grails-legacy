@@ -565,7 +565,7 @@ class XMLConverter extends SourceConverter {
             type = licenseType
         } else {
             licenseType = licenseType?.toString().trim();
-            if(!licenseType.startsWith("CC") && !licenseType.equals(LicenseType.CC_PUBLIC_DOMAIN.value())) {
+            if(!licenseType.startsWith("CC") && !licenseType.equalsIgnoreCase(LicenseType.CC_PUBLIC_DOMAIN.value())) {
                 licenseType = "CC "+licenseType.trim()
             }
 			type = License.fetchLicenseType(licenseType)
@@ -1046,8 +1046,6 @@ println imageNode;
             }
 
             log.debug "Got ${references.size()} references for ${taxon.name}"
-            println "@@@@ ${taxon.name}"
-            println references
         }
         return references;
     }

@@ -36,7 +36,7 @@
                 
             </div>
         </div>
-        <div class="span7">
+        <div class="${showDetails?'span7':'span5'}">
 
             <div class="prop">
                 <g:if test="${showDetails}">
