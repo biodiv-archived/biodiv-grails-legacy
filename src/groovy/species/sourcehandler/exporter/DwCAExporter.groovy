@@ -321,7 +321,7 @@ class DwCAExporter {
 		for(Resource media: resources) {
 			row = new String[32]
 			// Media ID
-			row[0] = media.id
+			row[0] = '200'+media.id
 
 			//TaxonID
 			row[1] = species.taxonConcept.id
@@ -427,7 +427,7 @@ class DwCAExporter {
 				row = new String[32]
 
 				// Media ID
-				row[0] = speciesField.id
+				row[0] = '100'+speciesField.id
 
 				//TaxonID
 				row[1] = species.taxonConcept.id

@@ -930,16 +930,18 @@ class ObservationService {
 			activeFilters["bounds"] = params.bounds
 		} 
 		
+		def distinctRecoQuery = "select obv.maxVotedReco.id, count(*) from Observation obv  "+ userGroupQuery +" "+((params.tag)?tagQuery:'')+filterQuery+ "and obv.isChecklist=false and obv.maxVotedReco is not null group by obv.maxVotedReco order by count(*) desc";
+
+	    filterQuery += " and obv.isShowable = true "; 
+
 		def orderByClause = " order by obv." + (params.sort ? params.sort : "lastRevised") +  " desc, obv.id asc"
 		
 		def checklistCountQuery = "select count(*) from Observation obv " + userGroupQuery +" "+((params.tag)?tagQuery:'')+filterQuery + " and obv.isChecklist = true "
 		def allObservationCountQuery = "select count(*) from Observation obv " + userGroupQuery +" "+((params.tag)?tagQuery:'')+filterQuery
 
-		def distinctRecoQuery = "select obv.maxVotedReco.id, count(*) from Observation obv  "+ userGroupQuery +" "+((params.tag)?tagQuery:'')+filterQuery+ "and obv.isChecklist=false and obv.maxVotedReco is not null group by obv.maxVotedReco order by count(*) desc";
 		
         def speciesGroupCountQuery = "select obv.group.name, count(*),(case when obv.maxVotedReco.id is not null  then 1 else 2 end) from Observation obv  "+ userGroupQuery +" "+((params.tag)?tagQuery:'')+filterQuery+ "and obv.isChecklist=false group by obv.group.name,(case when obv.maxVotedReco.id is not null  then 1 else 2 end) order by obv.group.name desc";
 
-	    filterQuery += " and obv.isShowable = true "; 
 		return [query:query, allObservationCountQuery:allObservationCountQuery, checklistCountQuery:checklistCountQuery, distinctRecoQuery:distinctRecoQuery, speciesGroupCountQuery:speciesGroupCountQuery, filterQuery:filterQuery, orderByClause:orderByClause, queryParams:queryParams, activeFilters:activeFilters]
 
 	}
