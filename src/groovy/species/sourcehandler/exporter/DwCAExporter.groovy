@@ -119,6 +119,10 @@ class DwCAExporter {
 		}
 		
 		String folderName = "dwc_"+ + new Date().getTime()
+	    
+        if(!directory)
+            directory = File.createTempFile('','');
+
 		String folderPath = directory + "/"+ folderName
 
 		initWriters(folderPath)
@@ -165,7 +169,6 @@ class DwCAExporter {
 	 * @param species	
 	 */
 	public void exportSpecies(Species species) {
-        println species.id
 		exportTaxon(species)
 
 		exportCommonNames(species.taxonConcept)

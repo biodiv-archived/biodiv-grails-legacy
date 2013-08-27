@@ -7,7 +7,8 @@ import org.hibernatespatial.GeometryUserType
 import com.vividsolutions.jts.geom.Point;
 import species.participation.Observation
 import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Geometry
+import com.vividsolutions.jts.geom.Geometry;
+import speciespage.ObservationService;
 
 abstract class Metadata {
 
@@ -41,8 +42,10 @@ abstract class Metadata {
 		latitude(nullable: false)
 		longitude(nullable:false)
 		locationAccuracy(nullable: true)
-        topology(nullable:false)
-		fromDate validator : {val, obj -> val < new Date()}
+		topology validator : { val, obj ->
+			return ObservationService.validateLocation(val, obj)
+		}
+        fromDate validator : {val, obj -> val < new Date()}
 		toDate nullable:true, validator : {val, obj ->
 			if(!val){
 				return true

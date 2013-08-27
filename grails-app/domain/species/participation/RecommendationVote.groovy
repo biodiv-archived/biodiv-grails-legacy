@@ -48,7 +48,8 @@ class RecommendationVote {
 	}
 	
 	def beforeDelete(){
-		activityFeedService.deleteFeed(this)
+		//XXX commenting this so that add/agree and remove both will be in sync
+		//activityFeedService.deleteFeed(this)
 	}
 
 }

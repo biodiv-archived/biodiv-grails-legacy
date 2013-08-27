@@ -161,7 +161,15 @@ class ChecklistController {
 			columnList.add(0, params.sciNameColumn)
 		}
 		
-		params.columns =  columnList.collect { it.trim() }
+		
+		def validColumnList = []
+		columnList.each{
+			def colName =  it.trim()
+			if(colName != "" && !validColumnList.contains(colName)){
+				validColumnList << colName
+			}
+		}
+		params.columns = validColumnList
 		
 		//params.sciNameColumn = params.sciNameColumn ?: "scientific_name"
 		//params.commonNameColumn = params.commonNameColumn ?: "common_name"

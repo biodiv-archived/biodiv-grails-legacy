@@ -30,6 +30,7 @@ class ObvUtilService {
 	static final String OBSERVED_ON   = "observed on"
 	static final String CN    = "common name"
 	static final String SN    = "scientific name"
+	static final String GEO_PRIVACY   = "Geoprivacy enabled"
 	static final String LOCATION   = "location title"
 	static final String LONGITUDE    = "longitude"
 	static final String LATITUDE   = "latitude"
@@ -75,7 +76,7 @@ class ObvUtilService {
 		log.debug(params)
 		def observationInstanceList = getObservationList(params, dl)
 		log.debug " Obv total $observationInstanceList.size " 
-		return exportObservation(observationInstanceList, dl.type)
+		return exportObservation(observationInstanceList, dl.type, dl.author)
 	}
 	
 	
@@ -103,7 +104,7 @@ class ObvUtilService {
 		}
 	}
 	
-	private File exportObservation(List obvList, exportType){
+	private File exportObservation(List obvList, exportType, reqUser){
 		if(! obvList)
 			return null
 		
@@ -124,20 +125,20 @@ class ObvUtilService {
 		}
 		log.debug "export type " + exportType 
 		if(exportType == DownloadLog.DownloadType.CSV){
-			return exportAsCSV(downloadDir, obvList)
+			return exportAsCSV(downloadDir, obvList, reqUser)
 		}else{
-			return exportAsKML(downloadDir, obvList)
+			return exportAsKML(downloadDir, obvList, reqUser)
 		}
 	}
 	
-	private File exportAsCSV(downloadDir, obvList){
+	private File exportAsCSV(downloadDir, obvList, reqUser){
 		File csvFile = new File(downloadDir, "obv_" + new Date().getTime() + ".csv")
 		CSVWriter writer = getCSVWriter(csvFile.getParent(), csvFile.getName())
 		
 		boolean headerAdded = false
 		obvList.each { obv ->
 			log.debug "Writting " + obv
-			Map m = obv.fetchExportableValue()
+			Map m = obv.fetchExportableValue(reqUser)
 			if(!headerAdded){
 				def header = []
 				for(entry in m){
@@ -163,7 +164,7 @@ class ObvUtilService {
 		return new CSVWriter(new FileWriter("$directory/$fileName"))//, separator);
 	}
 	
-	def exportAsKML(downloadDir, obvList){
+	def exportAsKML(downloadDir, obvList, reqUser){
 		def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 		String iconBasePath = config.speciesPortal.observations.serverURL
 		
@@ -209,6 +210,9 @@ class ObvUtilService {
 						def imagePath = mainImage?mainImage.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.thumbnail.suffix): null
 						def commonName = obv.fetchSuggestedCommonNames()
 						def base = grailsApplication.config.speciesPortal.observations.serverURL
+						def geoPrivacyAdjust = obv.fetchGeoPrivacyAdjustment(reqUser)
+						def obvLongitude = obv.longitude + geoPrivacyAdjust
+						def obvLatitude = obv.latitude + geoPrivacyAdjust
 						PhotoOverlay() {
 							name(obv.fetchSpeciesCall())
 							styleUrl('#displayName-value')
@@ -265,10 +269,13 @@ class ObvUtilService {
 								Data(name:'UserGroups') {
 									value(obv.userGroups*.name.join(','))
 								}
+								Data(name:'Geoprivacy enabled') {
+									value("" + obv.geoPrivacy)
+								}
 							}
 							Camera() {
-								longitude(obv.longitude)
-								latitude(obv.latitude)
+								longitude(obvLongitude)
+								latitude(obvLatitude)
 								altitude(5)
 								roll(0)
 								altitudeMode('relativeToGround')
@@ -282,7 +289,7 @@ class ObvUtilService {
 								//href(createLinkTo(base:grailsApplication.config.speciesPortal.observations.serverURL,	file: imagePath, absolute:true))
 							}
 							Point() {
-								coordinates(obv.longitude+","+obv.latitude)
+								coordinates(obvLongitude+","+obvLatitude)
 							}
 							Style() {
 								IconStyle() {

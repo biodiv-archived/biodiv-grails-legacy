@@ -68,9 +68,10 @@ class DocumentService {
 		//document.coverage.geoPrivacy = params.geo_privacy
 
 		GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), grailsApplication.config.speciesPortal.maps.SRID);
-		if(params.latitude && params.longitude) {
-			document.coverage.topology = geometryFactory.createPoint(new Coordinate(params.longitude?.toFloat(), params.latitude?.toFloat()));
-		} else if(params.areas) {
+//		if(params.latitude && params.longitude) {
+//			document.coverage.topology = geometryFactory.createPoint(new Coordinate(params.longitude?.toFloat(), params.latitude?.toFloat()));
+//		} else 
+		if(params.areas) {
 			WKTReader wkt = new WKTReader(geometryFactory);
 			try {
 				Geometry geom = wkt.read(params.areas);

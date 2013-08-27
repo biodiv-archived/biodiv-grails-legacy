@@ -1,5 +1,7 @@
 package species.participation
 
+import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
+
 import species.utils.ImageType;
 import species.utils.Utils
 import org.grails.taggable.*
@@ -16,8 +18,10 @@ import speciespage.ObvUtilService;
 import grails.converters.JSON
 import grails.util.GrailsNameUtils;
 import org.grails.rateable.*
+import com.vividsolutions.jts.geom.Geometry
 import content.eml.Coverage;
 import species.Metadata;
+
 
 class Observation extends Metadata implements Taggable, Rateable {
 	
@@ -28,6 +32,7 @@ class Observation extends Metadata implements Taggable, Rateable {
 	def springSecurityService;
     def resourceService;
 	def observationsSearchService;
+	def SUserService;
 	
 	public enum OccurrenceStatus {
 		ABSENT ("Absent"),	//http://rs.gbif.org/terms/1.0/occurrenceStatus#absent
@@ -87,34 +92,7 @@ class Observation extends Metadata implements Taggable, Rateable {
 			if(!obj.sourceId && !obj.isChecklist) 
 				val && val.size() > 0 
 		}
-/*		latitude validator : { val, obj ->
-			if(!val) {
-                return ['default.blank.message', 'Latitude']
-            }
-			if(val){
-				if(Float.isNaN(val)) {
-					return ['typeMismatch.java.lang.Integer','Latitude']
-				}
-				if( val < 6.74678 || val > 35.51769) {
-					return ['value.not.in.range', 'Latitude', '6.74678', '35.51769']
-				}
-			}
-		}
-		longitude validator : { val, obj ->  
-            if(!val) {
-                return ['default.blank.message', 'Longitude']
-            }
-			if(val){
-				if(Float.isNaN(val)) { 
-					return ['typeMismatch.java.lang.Integer', 'Longitude']
-				}
-				if( val < 68.03215 || val > 97.40238) {
-					return ['value.not.in.range', 'Longitude', '68.03215', '97.40238']
-				}
-			}
-		}
-*/
-        placeName blank:false
+		placeName blank:false
 		agreeTerms nullable:true
 		checklistAnnotations nullable:true
 	}
@@ -390,7 +368,7 @@ class Observation extends Metadata implements Taggable, Rateable {
 		activityFeedService.deleteFeed(this)
 	}
 	
-	def Map fetchExportableValue(){
+	def Map fetchExportableValue(SUser reqUser=null){
 		Map res = [:]
 		
 		res[ObvUtilService.IMAGE_PATH] = fetchImageUrlList().join(", ")
@@ -412,10 +390,11 @@ class Observation extends Metadata implements Taggable, Rateable {
 		res[ObvUtilService.CN] =cnName
 		res[ObvUtilService.SN] =snName
 		
-		
+		res[ObvUtilService.GEO_PRIVACY] = "" + geoPrivacy
 		res[ObvUtilService.LOCATION] = placeName
-		res[ObvUtilService.LONGITUDE] = "" + this.longitude
-		res[ObvUtilService.LATITUDE] = "" + this.latitude
+		def geoPrivacyAdjust = fetchGeoPrivacyAdjustment(reqUser)
+		res[ObvUtilService.LONGITUDE] = "" + (this.longitude + geoPrivacyAdjust)
+		res[ObvUtilService.LATITUDE] = "" + (this.latitude + geoPrivacyAdjust)
 		res[ObvUtilService.NOTES] = notes
 		
 		
@@ -532,6 +511,18 @@ class Observation extends Metadata implements Taggable, Rateable {
 			}
 		}
 		return res
+	}
+	
+	def fetchGeoPrivacyAdjustment(SUser reqUser=null){
+		if(!geoPrivacy || SUserService.ifOwns(author)){
+			return 0
+		}
+		//for backend thred e.g download request reqUser will be passed as argument
+		if(reqUser && (reqUser.id == author.id || reqUser.id == 1)){
+			return 0
+		}
+		
+		return Utils.getRandomFloat()
 	}
 //	
 //	def fetchSourceChecklistTitle(){
