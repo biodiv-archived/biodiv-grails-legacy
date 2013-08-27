@@ -6,13 +6,13 @@
 <!------------------------------------ 
 ---- HEADER --------------------------
 ------------------------------------->
-<table class="head-wrap" bgcolor="#FFFFFF" style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;width: 100%; border-top: 1px solid #A1A376; border-left: 1px solid #A1A376; border-right: 1px solid #A1A376; width:610px;">
+<table class="head-wrap" bgcolor="rgb(236, 233, 183)" style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;width: 100%; border-top: 1px solid #A1A376; border-bottom: 1px dashed #A1A376;border-left: 1px solid #A1A376; border-right: 1px solid #A1A376; width:610px;">
 	<tr style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;">
 		<td style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;"></td>
 		<td class="header container" style="margin: 0 auto;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;display: block;max-width: 600px;clear: both;">
 			
-			<div class="content" style="margin: 0 auto;padding: 2px;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;max-width: 600px;display: block;">
-			<a href="${domain}" style="margin: 0;padding: 0;font-family: &quot;HelveticaNeue-Light&quot;, &quot;Helvetica Neue Light&quot;, &quot;Helvetica Neue&quot;, Helvetica, Arial, &quot;Lucida Grande&quot;, sans-serif;line-height: 1;color: #000;font-weight: 200;font-size: 14px;"><img src="http://indiabiodiversity.org/biodiv/images/whatsnewbanner_3.gif" style="max-width:595px;"></img></a>
+			<div class="content" style="margin: 0 auto;padding: 2px;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;max-width: 600px;display: block; text-align:center;">
+			<a style="margin: 0;padding: 0;font-family: &quot;HelveticaNeue-Light&quot;, &quot;Helvetica Neue Light&quot;, &quot;Helvetica Neue&quot;, Helvetica, Arial, &quot;Lucida Grande&quot;, sans-serif;line-height: 1;color: #000;font-weight: 200;font-size: 20px;">${domain}</a>
 			</div>
 			
 		</td>
@@ -36,8 +36,9 @@
 							<p class="lead" style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;margin-bottom: 10px;font-weight: normal;font-size: 14px;line-height: 1;">
 Hi ${username},<br /><br />
 
-<g:set var="currentAction" value="${action}"></g:set>
+<a><img src="${currentUser?.profilePicture(ImageType.SMALL)}" style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif; max-width: 30px; max-height:30px; display:inline-block; vertical-align: middle;"></a>
 
+<g:set var="currentAction" value="${action}"></g:set>
 <g:if test="${currentAction == 'downloadRequest'}">
 </g:if>
 <g:elseif test="${currentUser?.username == tousername}">
@@ -83,6 +84,9 @@ ${activity?.activityTitle? activity?.activityTitle.toLowerCase():message.toLower
 <g:if test="${(currentAction == 'Document created' || currentAction == 'downloadRequest')}">
  		
 </g:if>
+<g:elseif test="${actionObject == 'checklist'}">
+	
+</g:elseif>
 <g:else>
 			<!-- COLUMN WRAP -->
 			<div class="column-wrap" style="margin: 0 auto;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;max-width: 600px;">
@@ -180,7 +184,7 @@ ${activity?.activityTitle? activity?.activityTitle.toLowerCase():message.toLower
 		You can log into your profile <a href="${userProfileUrl}" style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;color: #2BA6CB;font-weight: bold;"> Here &raquo;</a>
 </g:elseif>
 <g:else>
-								For more information, please visit the Observation page <a href="${obvUrl}" style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;color: #2BA6CB;font-weight: bold;">Here &raquo;</a>
+								For more information, please visit the page <a href="${obvUrl}" style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;color: #2BA6CB;font-weight: bold;">Here &raquo;</a>
 							</p><!-- /Callout Panel -->
 </g:else>
 			</div>

@@ -169,61 +169,6 @@ class ObservationController {
 		log.debug params;
 		if(request.method == 'POST') {
 			//TODO:edit also calls here...handle that wrt other domain objects
-
-			params.author = springSecurityService.currentUser;
-			def observationInstance;
-			try {
-				observationInstance =  observationService.createObservation(params);
-
-				if(!observationInstance.hasErrors() && observationInstance.save(flush:true)) {
-					//flash.message = "${message(code: 'default.created.message', args: [message(code: 'observation.label', default: 'Observation'), observationInstance.id])}"
-					log.debug "Successfully created observation : "+observationInstance
-					params.obvId = observationInstance.id
-					activityFeedService.addActivityFeed(observationInstance, null, observationInstance.author, activityFeedService.OBSERVATION_CREATED);
-					
-					def tags = (params.tags != null) ? Arrays.asList(params.tags) : new ArrayList();
-					observationInstance.setTags(tags);
-
-					if(params.groupsWithSharingNotAllowed) {
-						observationService.setUserGroups(observationInstance, [params.groupsWithSharingNotAllowed]);
-					} else {
-						if(params.userGroupsList) {
-							def userGroups = (params.userGroupsList != null) ? params.userGroupsList.split(',').collect{k->k} : new ArrayList();
-							
-							observationService.setUserGroups(observationInstance, userGroups);
-						}	
-					}
-				    
-                    log.debug "Saving ratings for the resources"
-                    observationInstance.resource.each { res ->
-                        if(res.rating) {
-                            res.rate(springSecurityService.currentUser, res.rating);
-                        }
-                    }
-						
-					
-				//	observationService.sendNotificationMail(observationService.OBSERVATION_ADDED, observationInstance, request, params.webaddress);
-					params["createNew"] = true
-					chain(action: 'addRecommendationVote', model:['chainedParams':params]);
-				} else {
-					observationInstance.errors.allErrors.each { log.error it }
-					if(params["isMobileApp"]?.toBoolean()){
-						render (['error:true']as JSON);
-						return
-					}else{
-						render(view: "create", model: [observationInstance: observationInstance, saveParams:params, lastCreatedObv:null])
-					}
-				}
-			} catch(e) {
-				e.printStackTrace();
-				if(params["isMobileApp"]?.toBoolean()){
-					render (['error:true']as JSON);
-					return
-				}else{
-					flash.message = "${message(code: 'error')}";
-					render(view: "create", model: [observationInstance: observationInstance, lastCreatedObv:null])
-				}
-			}
 			saveAndRender(params)
 		} else {
 			redirect (url:uGroup.createLink(action:'create', controller:"observation", 'userGroupWebaddress':params.webaddress))

@@ -35,15 +35,16 @@
 			</ul>
 		</div>
 	</div>
+		
+		<g:if test="${instanceTotal > searchQuery.max}">
+		    <div class="centered">
+		          <div class="btn loadMore">
+		             <span class="progress" style="display: none;">Loading ... </span> <span
+          		        class="buttonTitle">Load more</span>
+        		  </div>
+		    </div>
+		</g:if>
 
-	<g:if test="${instanceTotal > params.max}">
-		<div class="centered">
-			<div class="btn loadMore">
-				<span class="progress" style="display: none;">Loading ... </span> <span
-					class="buttonTitle">Load more</span>
-			</div>
-		</div>
-	</g:if>
 	<div class="paginateButtons" style="visibility: hidden; clear: both">
 		<p:paginate total="${instanceTotal}" max="${params.max}" action="${params.action}" controller="${params.controller?:'user'}"
 			userGroup="${userGroupInstance}" userGroupWebaddress="${userGroupWebaddress}"

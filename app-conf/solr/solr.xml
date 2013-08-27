@@ -35,5 +35,6 @@
     <core name="checklists" instanceDir="checklists" />
     <core name="projects" instanceDir="projects" />
     <core name="documents" instanceDir="documents" />
+    <core name="users" instanceDir="users" />
   </cores>
 </solr>

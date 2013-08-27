@@ -1,15 +1,8 @@
 package speciespage
 
-import java.util.List;
 
 import java.util.List
-
-import org.apache.solr.common.SolrException;
-import org.apache.solr.common.util.NamedList
-
 import org.apache.solr.common.util.DateUtil;
-import org.apache.solr.common.util.NamedList;
-
 import org.apache.commons.logging.LogFactory
 import org.apache.solr.common.SolrException;
 import org.apache.solr.common.util.NamedList;
@@ -62,7 +55,6 @@ class SpeciesService {
 
 	def nameTerms(params) {
 		List result = new ArrayList();
-
 		def queryResponse = speciesSearchService.terms(params.term, params.field, params.max);
 		NamedList tags = (NamedList) ((NamedList)queryResponse.getResponse().terms)[params.field];
 		for (Iterator iterator = tags.iterator(); iterator.hasNext();) {

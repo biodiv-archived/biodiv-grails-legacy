@@ -37,12 +37,14 @@ class NamesIndexerService {
 	 */
 	void rebuild() {
 		log.info "Publishing names to autocomplete index";
+		println "<<<<<<<<<<<<<<<<<<<<<<<INSIDE REBUILD METHOD>>>>>>>>>>>>>>>"
 		Lookup lookup1 = new TSTLookup();
 
 		setDirty(false);
 
-		def analyzer = new ShingleAnalyzerWrapper(Version.LUCENE_CURRENT, 2, 15)
-		analyzer.setOutputUnigrams(true);
+		def a = new ShingleAnalyzerWrapper(Version.LUCENE_CURRENT)
+		def analyzer = new ShingleAnalyzerWrapper(a, 2, 15, true, true)
+		//analyzer.setOutputUnigrams(true);
 
 		//TODO fetch in batches
 		def startTime = System.currentTimeMillis()
@@ -78,8 +80,13 @@ class NamesIndexerService {
 	 * @return
 	 */
 	boolean add(Recommendation reco) {
-		def analyzer = new ShingleAnalyzerWrapper(Version.LUCENE_CURRENT, 2, 15)
-		analyzer.setOutputUnigrams(true);
+		def a = new ShingleAnalyzerWrapper(Version.LUCENE_CURRENT)
+		/* setOutputUnigrams(boolean outputUnigrams) is deprecated....Confgure outputUnigrams during construction as shown below.*/
+		//def analyzer = new ShingleAnalyzerWrapper(Analyzer, minShingleSize, maxShingleSize, tokenSeprator, outputUnigram, outputUnigramsIfNoShingles)
+		println "<<<<<<<<<<<<<<<<<<<<<<<INSIDE ADD RECOMMENDATION>>>>>>>>>>>>>>>"
+		def analyzer = new ShingleAnalyzerWrapper(a, 2, 15, " ", true, true)
+		//analyzer.setOutputUnigrams(true);
+		println "<<<<<<<<<<<<<<<<<<<<<<<Calling  RECOMMENDATION>>>>>>>>>>>>>>>"
 		return add(reco, analyzer, lookup);
 	}
 
@@ -91,8 +98,10 @@ class NamesIndexerService {
 	 * @return
 	 */
 	private boolean add(Recommendation reco, Analyzer analyzer, lookup) {
+		println "<<<<<<<<<<<<<<<<<<<<<<<INSIDE SECOND add()>>>>>>>>>>>>>>>"
 		if(isDirty()) {
 			log.info "Rebuilding index as its dirty"
+			println "<<<<<<<<<<<<<<<<<<<<<<<Calling Rebuild method >>>>>>>>>>>>>>>"
 			rebuild();
 			return;
 		}
@@ -105,11 +114,13 @@ class NamesIndexerService {
 		def icon = getSpeciesIconPath(species);
 		//log.debug "Generating ngrams"
 		def tokenStream = analyzer.tokenStream("name", new StringReader(reco.name));
+		println "***************tokenStream is ${tokenStream}***********************"
 		OffsetAttribute offsetAttribute = tokenStream.getAttribute(OffsetAttribute.class);
 		CharTermAttribute charTermAttribute = tokenStream.getAttribute(CharTermAttribute.class);
 
 		def wt = 0;
 		while (tokenStream.incrementToken()) {
+			println "Inside the WHILE LOOP OF incrementToken************************"
 			int startOffset = offsetAttribute.startOffset();
 			int endOffset = offsetAttribute.endOffset();
 			String term = charTermAttribute.toString()?.replaceAll("\u00A0|\u2007|\u202F", " ");
@@ -118,6 +129,7 @@ class NamesIndexerService {
 				success |= lookup.add(term, new Record(originalName:reco.name, canonicalForm:reco.taxonConcept?.canonicalForm, isScientificName:reco.isScientificName, languageId:reco.languageId, icon:icon, wt:wt, speciesId:species?.id));
 			}
 		}
+		println "<<<<<<<<<<<<<<<<<<<<<<<<<<SUCCESSS : ${success}>>>>>>>>>>>>>>>>>>>"
 		return success;
 	}
 
