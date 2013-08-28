@@ -89,7 +89,7 @@ class NamesLoaderService {
 	
 	int updateTaxOnConceptForReco(){
 		String taxOnDefQuery = "select r.id as recoid, t.id as taxonid from recommendation as r, taxonomy_definition as t where r.name = t.canonical_form and r.taxon_concept_id is null and r.is_scientific_name = true"
-		String synonymQuery = "select r.id as recoid, t.id as taxonid from recommendation as r, taxonomy_definition as t where r.name = t.canonical_form and r.taxon_concept_id is null and r.is_scientific_name = true"
+		String synonymQuery = "select r.id as recoid, s.taxon_concept_id as taxonid from recommendation as r, synonyms as s where r.name = s.canonical_form and r.taxon_concept_id is null and r.is_scientific_name = true"
 		String commnonNameQuery = """
 		select r.id as recoid,  t.id as taxonid, r.language_id as rl, c.language_id as c_lang from recommendation as r, taxonomy_definition as t, common_names as c where 
 			r.name like c.name and 
