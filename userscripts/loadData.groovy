@@ -214,3 +214,109 @@ def updateLicense() {
 //def speciesService = ctx.getBean("speciesService");
 //println speciesService.export([query:'id:[0 TO 40000]', rows:40000], [source:'Species', downloadType:'ZIP', filterUrl:'http://indiabiodiversity.localhost.org/species/list?query=id:[0 TO 40000]']);
 
+}
+
+
+def checkLicense(sField) {
+	def isDirty = false;
+	if(sField.licenses.size() > 1) {
+		println "Multiple licenses exist.. not updating";
+		return;
+	}
+	def contributor, license;
+
+	if(sField.licenses) 
+		license = sField.licenses.iterator().next(); 	
+	if(sField.contributors) 
+		contributor = sField.contributors.iterator().next(); 	
+	if(contributor && license) {
+println '1---'
+println contributor.name+'  '+license.name;
+println '2---'
+
+		def lic = getLicense(contributor, license);
+		if(lic) {
+			change++;
+			sField.licenses.clear();
+			License l = converter.getLicenseByType(lic, false);
+			sField.addToLicenses(l);
+			isDirty = true;
+		} else {
+			noChange++;
+		}
+	} else {
+		if(sField.instanceOf(SpeciesField.class)) {
+			if(sField.field.id < 20 && sField.field.id>34) 
+				println "**************"+sField+"  "+sField.contributors+"  "+sField.licenses;
+		} else
+			println "**************"+sField+"  "+sField.contributors+"  "+sField.licenses;
+	}
+	
+	return isDirty;
+}
+def getLicense(contributor, license) {
+	boolean isChanged = false;
+	def l;
+	c.each {
+		def pattern = ".*${it[1].toLowerCase()}.*";
+		if(contributor.name.toLowerCase() =~ /${pattern}/) {
+			if(it[0] == license.name.value()) {
+				isChanged = false;
+			} else {
+				isChanged = true;
+				l = it[0];
+			}
+			return;
+		}
+	}
+	if(isChanged)
+		return l;
+}
+
+def updateLicense() {
+	int offset = 0,limit=10; int count = Species.count();
+	int noOfUpdations = 0;
+	while(offset<count) {
+		Species.withTransaction { status ->
+			Species.list(max: limit, offset: offset, sort: "id", order: "desc").each { species ->
+				println species.id;
+				boolean isDirty = false;
+				species.fields.each { sField ->
+					isDirty = checkLicense(sField);
+					sField.resources.each { res->
+						isDirty = checkLicense(res);
+					}			
+				}
+				species.resources.each {res ->
+					isDirty = checkLicense(res);
+				}
+				//change resources licenses
+				if(isDirty) {
+					if(species.save(flush:true)) {
+						println species.errors.each { println it}
+					}
+					noOfUpdations++;
+				}
+			}
+		}
+		offset += limit;
+	}
+	println change+"  "+noChange;
+	println noOfUpdations
+}
+
+def getContributor(contributor) {
+	def contribs = Contributor.findAllByNameIlike('%'+contributor+'%');
+	println contributor+"> : "+contribs.collect {it.name}.join(',')
+		println '---------------------------------------'
+}
+
+def getContributorContributions(contributor) {
+	def sFields = SpeciesField.withCriteria {
+		contributors {
+			like('name', '%'+contributor+'%')
+		}
+	}
+}
+updateLicense();
+>>>>>>> biodiv_usergroups

@@ -781,7 +781,7 @@ ul#recoSummary {
 }
 
 .licence_div {
-	z-index: 11;
+	z-index: 50;
 	cursor: pointer;
 }
 

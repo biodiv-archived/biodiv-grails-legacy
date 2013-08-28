@@ -80,6 +80,11 @@ class ActivityFeed {
 		
 		return ActivityFeed.withCriteria(){
 	 		and{
+				//removing all feeds of user as a root holder... user specific feeds captured by author condition.
+				//Can show user template as parent context and its activity on 2nd level but in that case all other activity 
+				// performed by user will not be aggregated and looks odd in UI
+				ne('rootHolderType', SUser.class.getCanonicalName())
+				 
 				if(params.isShowableOnly){
 					eq('isShowable', true)
 				}
@@ -146,6 +151,8 @@ class ActivityFeed {
 		}
 		return ActivityFeed.createCriteria().count{
 			and{
+				ne('rootHolderType', SUser.class.getCanonicalName())
+				
 				if(params.isShowableOnly){
 					eq('isShowable', true)
 				}

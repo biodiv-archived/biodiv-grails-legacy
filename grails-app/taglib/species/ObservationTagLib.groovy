@@ -3,6 +3,8 @@ package species
 import species.participation.Observation;
 import species.participation.Recommendation;
 import species.participation.RecommendationVote;
+import content.eml.Document;
+
 import grails.util.GrailsNameUtils;
 import org.grails.rateable.RatingException;
 import org.codehaus.groovy.grails.orm.hibernate.cfg.GrailsHibernateUtil; 
@@ -221,6 +223,10 @@ class ObservationTagLib {
 	}
 	
 	def showMapInput = {attrs, body->
+		def model = attrs.model
+		model.sourceInstance = model.sourceInstance ?: model.observationInstance
+		model.placeNameField = (model.sourceInstance.class.getCanonicalName() == Document.class.getCanonicalName()) ? 'coverage.placeName' : 'placeName'
+		model.topologyNameField = (model.sourceInstance.class.getCanonicalName() == Document.class.getCanonicalName()) ? 'coverage.topology' : 'topology'
 		out << render(template:"/common/observation/showMapInputTemplate",model:attrs.model);
 	}
 	

@@ -2,6 +2,7 @@ package content.eml
 
 import species.groups.SpeciesGroup
 import species.Habitat
+import speciespage.ObservationService
 
 import org.hibernatespatial.GeometryUserType
 import com.vividsolutions.jts.geom.Point;
@@ -35,6 +36,9 @@ class Coverage {
 		longitude(nullable:true)
 		locationAccuracy(nullable: true)
 		topology(nullable: true)
+//		topology validator : { val, obj ->
+//			return ObservationService.validateLocation(val, obj)
+//		}
     }
 	
     static mapping = {
