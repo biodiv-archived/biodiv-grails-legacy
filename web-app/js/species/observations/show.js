@@ -1,4 +1,5 @@
 function showRecos(data, textStatus) {
+        if(!data) return;
         if(textStatus && textStatus == 'append')
         	$('#recoSummary').append(data.recoHtml);
         else
