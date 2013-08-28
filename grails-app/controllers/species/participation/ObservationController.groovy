@@ -687,7 +687,7 @@ class ObservationController {
 					canMakeSpeciesCall:params.canMakeSpeciesCall,
 					recoHtml:html,
 					uniqueVotes:results.uniqueVotes,
-					msg:params.msg,
+					msg:params.msg?:'',
 					speciesNameTemplate:speciesNameHtml,
 					speciesExternalLinkHtml:speciesExternalLinkHtml,
 					speciesName:observationInstance.fetchSpeciesCall()]

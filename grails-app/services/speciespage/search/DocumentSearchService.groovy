@@ -10,6 +10,7 @@ import java.util.Map
 import org.apache.solr.client.solrj.SolrQuery
 import org.apache.solr.client.solrj.SolrServer
 import org.apache.solr.client.solrj.SolrServerException
+import org.apache.solr.common.SolrException
 import org.apache.solr.common.SolrInputDocument
 import org.apache.solr.common.params.SolrParams
 import org.apache.solr.common.params.TermsParams
@@ -126,7 +127,13 @@ class DocumentSearchService {
 	def search(query) {
 		def params = SolrParams.toSolrParams(query);
 		log.info "Running document search query : "+params
-		return solrServer.query( params );
+        def result;
+        try {
+		    result = solrServer.query( params );
+        } catch(SolrException e) {
+            log.error "Error: ${e.getMessage()}"
+        }
+        return result;
 	}
 
 	/**
@@ -177,6 +184,12 @@ class DocumentSearchService {
 				.set(TermsParams.TERMS_LIMIT, limit)
 				.set(TermsParams.TERMS_RAW, true);
 		log.info "Running document search query : "+q
-		return solrServer.query( q );
+        def result;
+        try {
+		    result = solrServer.query( q );
+        } catch(SolrException e) {
+            log.error "Error: ${e.getMessage()}"
+        }
+        return result;
 	}
 }

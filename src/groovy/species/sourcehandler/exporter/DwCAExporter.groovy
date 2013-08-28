@@ -275,7 +275,7 @@ class DwCAExporter {
 			taxonRow[1] = synonym.name
 
 			//parentTaxon
-			taxonRow[2] = taxon.id.toString();
+			taxonRow[2] = 'accepted_'+taxon.id.toString();
 
 			//		TaxonRank
 			taxonRow[9] = "Species"
@@ -321,10 +321,10 @@ class DwCAExporter {
 		for(Resource media: resources) {
 			row = new String[32]
 			// Media ID
-			row[0] = '200'+media.id
+			row[0] = 'res_'+media.id
 
 			//TaxonID
-			row[1] = species.taxonConcept.id
+			row[1] = 'accepted_'+species.taxonConcept.id
 
 			//Type  #TODO: confirm  -- There are resources of type ICON also(very few)
 			//row[2] = media.type.value()   //returns only as 'image'
@@ -427,10 +427,10 @@ class DwCAExporter {
 				row = new String[32]
 
 				// Media ID
-				row[0] = '100'+speciesField.id
+				row[0] = 'txt_'+speciesField.id
 
 				//TaxonID
-				row[1] = species.taxonConcept.id
+				row[1] = 'accepted_'+species.taxonConcept.id
 
 				//Type
 				row[2] = "http://purl.org/dc/dcmitype/Text"
@@ -544,7 +544,7 @@ class DwCAExporter {
 			row = new String[7]
 
 			//			taxonId
-			row[0] = cName.taxonConcept.id
+			row[0] = 'accepted_'+cName.taxonConcept.id
 
 			//			Name
 			row[1] = cName.name
@@ -554,7 +554,7 @@ class DwCAExporter {
 
 			//			Language
 			def languageCode = cName.language?.threeLetterCode?:''
-            if(languageCode instanceof String)
+            if(Utils.isInteger(languageCode))
                 row[3] = languageCode;
             
 			//			Language Code

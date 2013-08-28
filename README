@@ -40,7 +40,6 @@
     sudo ln -s ~/git/biodiv/app-conf/apache-virtualhost-conf /etc/apache2/sites-available/
     sudo ln -s ~/git/biodiv/app-conf/apache-virtualhost-conf /etc/apache2/sites-enabled/
     sudo a2enmod proxy proxy_connect proxy_ftp proxy_http rewrite include expires headers
-    edit ~/git/biodiv/app-conf/apache-virtualhost-conf and change DocumentRoot to your dataDir (~/species)
     sudo /etc/init.d/apache2 restart
 
 * Setting up host locally for dev  

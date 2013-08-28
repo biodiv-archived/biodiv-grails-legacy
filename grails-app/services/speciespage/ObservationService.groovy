@@ -938,7 +938,6 @@ class ObservationService {
 		
 		def checklistCountQuery = "select count(*) from Observation obv " + userGroupQuery +" "+((params.tag)?tagQuery:'')+filterQuery + " and obv.isChecklist = true "
 		def allObservationCountQuery = "select count(*) from Observation obv " + userGroupQuery +" "+((params.tag)?tagQuery:'')+filterQuery
-
 		
         def speciesGroupCountQuery = "select obv.group.name, count(*),(case when obv.maxVotedReco.id is not null  then 1 else 2 end) from Observation obv  "+ userGroupQuery +" "+((params.tag)?tagQuery:'')+filterQuery+ "and obv.isChecklist=false group by obv.group.name,(case when obv.maxVotedReco.id is not null  then 1 else 2 end) order by obv.group.name desc";
 
@@ -1233,22 +1232,26 @@ class ObservationService {
 			queryParams["habitat"] = params.habitat
 			activeFilters["habitat"] = params.habitat
 		}
+
 		if(params.tag) {
 			paramsList.add('fq', searchFieldsConfig.TAG+":"+params.tag);
 			queryParams["tag"] = params.tag
 			queryParams["tagType"] = 'observation'
 			activeFilters["tag"] = params.tag
 		}
+
 		if(params.user){
 			paramsList.add('fq', searchFieldsConfig.USER+":"+params.user);
 			queryParams["user"] = params.user.toLong()
 			activeFilters["user"] = params.user.toLong()
 		}
+
 		if(params.name && (params.name != grailsApplication.config.speciesPortal.group.ALL)) {
 			paramsList.add('fq', searchFieldsConfig.MAX_VOTED_SPECIES_NAME+":"+params.name);
 			queryParams["name"] = params.name
 			activeFilters["name"] = params.name
 		}
+
 		if(params.isFlagged && params.isFlagged.toBoolean()){
 			paramsList.add('fq', searchFieldsConfig.ISFLAGGED+":"+params.isFlagged.toBoolean());
 			activeFilters["isFlagged"] = params.isFlagged.toBoolean()
@@ -1258,7 +1261,6 @@ class ObservationService {
 			paramsList.add('fq', searchFieldsConfig.IS_CHECKLIST+":"+params.isChecklistOnly.toBoolean());
 			activeFilters["isChecklistOnly"] = params.isChecklistOnly.toBoolean()
 		}
-
 		
 		if(params.bounds){
 			def bounds = params.bounds.split(",")
@@ -1301,7 +1303,9 @@ class ObservationService {
 		if(paramsList) {
 			def queryResponse = observationsSearchService.search(paramsList);
 			
-			Iterator iter = queryResponse.getResults().listIterator();
+            paramsList.add('isChecklist', true);
+			def checklistCountResponse = observationsSearchService.search(paramsList);
+			/*Iterator iter = queryResponse.getResults().listIterator();
 			while(iter.hasNext()) {
 				def doc = iter.next();
 				def instance = Observation.read(Long.parseLong(doc.getFieldValue("id")+""));
@@ -1312,7 +1316,7 @@ class ObservationService {
 						checklistCount++ 
 					}
 				}
-			}
+			}*/
 			
 			/*List facets = queryResponse.getFacetField(params["facet.field"]).getValues()
 			
@@ -1322,6 +1326,7 @@ class ObservationService {
 			
 			responseHeader = queryResponse?.responseHeader;
 			noOfResults = queryResponse.getResults().getNumFound()
+			checklistCount = checklistCountResponse.getResults().getNumFound()
 		}
 		/*if(responseHeader?.params?.q == "*:*") {
 			responseHeader.params.remove('q');
