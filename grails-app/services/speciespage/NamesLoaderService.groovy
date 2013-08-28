@@ -56,7 +56,7 @@ class NamesLoaderService {
 		def recos = new ArrayList<Recommendation>();
 		def conn = new Sql(dataSource)
 		def tmpTableName = "tmp_taxon_concept"
-		conn.executeUpdate("CREATE TABLE " + tmpTableName +  " as select t.name as name, t.canonical_Form as canonicalForm, t.normalized_Form as normalizedForm, t.binomial_Form as binomialForm, t.id as id from Taxonomy_Definition as t left outer join recommendation r on t.id = r.taxon_concept_id where r.name is null order by t.id ");
+		conn.executeUpdate("CREATE VIEW " + tmpTableName +  " as select t.name as name, t.canonical_Form as canonicalForm, t.normalized_Form as normalizedForm, t.binomial_Form as binomialForm, t.id as id from Taxonomy_Definition as t left outer join recommendation r on t.id = r.taxon_concept_id where r.name is null order by t.id ");
 		while(true) {
 			def taxonConcepts = conn.rows("select name, canonicalForm, normalizedForm, binomialForm, id from " + tmpTableName + " order by id limit " + limit + " offset " + offset);
 			//def taxonConcepts = TaxonomyDefinition.findAll("from TaxonomyDefinition as taxonConcept where taxonConcept not in (select reco.taxonConcept from Recommendation as reco) and taxonConcept.rank >= :minRank", [minRank:minRankToImport])
@@ -83,7 +83,7 @@ class NamesLoaderService {
 			
 			if(!taxonConcepts) break; //no more results;
 		}
-		conn.executeUpdate("DROP TABLE IF EXISTS " + tmpTableName);	
+		conn.executeUpdate("DROP VIEW IF EXISTS " + tmpTableName);	
 		return noOfNames;
 	}
 	
@@ -106,7 +106,7 @@ class NamesLoaderService {
 			def conn = new Sql(dataSource)
 			def tmpTableName = "tmp_table_update_taxonconcept"
 			try {
-				conn.executeUpdate("CREATE TABLE " + tmpTableName +  " as " + query);
+				conn.executeUpdate("CREATE VIEW " + tmpTableName +  " as " + query);
 				while(true) {
 					def recommendationList = conn.rows("select recoid, taxonid from " + tmpTableName + " order by recoid limit " + limit + " offset " + offset);
 					recommendationList.each { r ->
@@ -125,7 +125,7 @@ class NamesLoaderService {
 				// TODO: handle exception
 				e.printStackTrace();
 			}finally{
-				conn.executeUpdate("DROP TABLE IF EXISTS " + tmpTableName);
+				conn.executeUpdate("DROP VIEW IF EXISTS " + tmpTableName);
 			}	
 		}
 		log.info "Total updated recommencation is $noOfNames"
@@ -144,7 +144,7 @@ class NamesLoaderService {
 		def conn = new Sql(dataSource)
 		
 		def tmpTableName = "tmp_synonyms"
-		conn.executeUpdate("CREATE TABLE " + tmpTableName +  " as select n.canonical_form as canonical_form, n.taxon_concept_id as taxonConcept from synonyms n left outer join recommendation r on n.canonical_form = r.name and n.taxon_concept_id = r.taxon_concept_id where r.name is null and n.canonical_form is not null group by n.canonical_form, n.taxon_concept_id order by n.taxon_concept_id");
+		conn.executeUpdate("CREATE VIEW " + tmpTableName +  " as select n.canonical_form as canonical_form, n.taxon_concept_id as taxonConcept from synonyms n left outer join recommendation r on n.canonical_form = r.name and n.taxon_concept_id = r.taxon_concept_id where r.name is null and n.canonical_form is not null group by n.canonical_form, n.taxon_concept_id order by n.taxon_concept_id");
 		
 		while(true) {
 			def synonyms = conn.rows("select canonical_form, taxonConcept from " + tmpTableName + " order by taxonConcept limit " + limit + " offset " + offset);
@@ -161,7 +161,7 @@ class NamesLoaderService {
 			if(!synonyms) break;
 		}
 		
-		conn.executeUpdate("DROP TABLE IF EXISTS " + tmpTableName);
+		conn.executeUpdate("DROP VIEW IF EXISTS " + tmpTableName);
 		log.info "Imported synonyms into recommendations : "+noOfNames
 		return noOfNames;
 	}
@@ -184,7 +184,7 @@ class NamesLoaderService {
 		where r.name is null 
 		group by n.name, n.taxon_concept_id, n.language_id, n.id order by n.taxon_concept_id
 		"""
-		conn.executeUpdate("CREATE TABLE " + tmpTableName +  " as " + selectQuery );
+		conn.executeUpdate("CREATE VIEW " + tmpTableName +  " as " + selectQuery );
 		
 		while(true) {
 			def commonNames = conn.rows("select name, taxonConcept, language from " + tmpTableName + " order by taxonConcept limit "+limit+" offset "+offset)
@@ -198,7 +198,7 @@ class NamesLoaderService {
 			if(!commonNames) break;
 		}
 		recommendationService.save(recos);
-		conn.executeUpdate("DROP TABLE IF EXISTS " + tmpTableName);
+		conn.executeUpdate("DROP VIEW IF EXISTS " + tmpTableName);
 		log.info "Imported common names into recommendations : "+noOfNames
 		return noOfNames
 	}
