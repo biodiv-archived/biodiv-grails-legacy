@@ -39,7 +39,7 @@
 					<g:else> users think</g:else> it is:</span><span class="highlight">
 					<g:if test="${r.canonicalForm}">
 						<a href="${uGroup.createLink(action:'show', controller:'species', id:r.speciesId, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
-							<i> ${r.canonicalForm} </i>
+							<i> ${r.name} </i>
 						</a>
 					</g:if>
 					<g:elseif test="${r.isScientificName}">

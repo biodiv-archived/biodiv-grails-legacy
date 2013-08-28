@@ -677,12 +677,12 @@ class ObservationController {
 				def result = [
 					'status' : 'success',
 					canMakeSpeciesCall:params.canMakeSpeciesCall,
-					recoHtml:html,
-					uniqueVotes:results.uniqueVotes,
-					msg:params.msg,
-					speciesNameTemplate:speciesNameHtml,
-					speciesExternalLinkHtml:speciesExternalLinkHtml,
-					speciesName:observationInstance.fetchSpeciesCall()]
+					recoHtml:html?:'',
+					uniqueVotes:results.uniqueVotes?:'',
+					msg:params.msg?:'',
+					speciesNameTemplate:speciesNameHtml?:'',
+					speciesExternalLinkHtml:speciesExternalLinkHtml?:'',
+					speciesName:observationInstance.fetchSpeciesCall()?:'']
 				
 				if(results?.recoVotes.size() > 0) {
 					render result as JSON

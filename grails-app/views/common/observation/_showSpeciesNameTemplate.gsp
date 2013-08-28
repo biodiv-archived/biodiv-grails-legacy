@@ -36,9 +36,9 @@
 			</div>
 		</g:elseif>
 		<g:else>
-				<div class="ellipsis" title="${sName}">
-					${sName}
-				</div>
+                        <div class="ellipsis" title="${sName}">
+                            ${sName}
+                        </div>
 		</g:else>
 	</g:elseif>
 	<g:else>
