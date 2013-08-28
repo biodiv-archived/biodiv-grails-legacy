@@ -257,8 +257,6 @@ class Observation extends Metadata implements Taggable, Rateable {
 		return ['recoVotes':result, 'totalVotes':this.recommendationVote.size(), 'uniqueVotes':getRecommendationCount()];
 	}
 
-
-
 	def getRecommendationCount(){
 		Sql sql =  Sql.newInstance(dataSource);
 		def result = sql.rows("select count(distinct(recoVote.recommendation_id)) from recommendation_vote as recoVote where recoVote.observation_id = :obvId", [obvId:id])

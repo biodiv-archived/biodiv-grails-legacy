@@ -50,9 +50,9 @@ class Recommendation {
 		   map.put("speciesId", this?.taxonConcept?.findSpeciesId());
 		   map.put("canonicalForm", this?.taxonConcept?.canonicalForm)
 	   } else {
-		   map.put("name", this?.name)
 	   }
 	   
+	   map.put("name", this?.name)
 	   def recos = RecommendationVote.withCriteria {
 		   eq('recommendation', this)
 		   eq('observation', obv)
