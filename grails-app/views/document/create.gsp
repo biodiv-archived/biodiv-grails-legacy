@@ -242,7 +242,7 @@ CKEDITOR.replace('description', config);
                                     </div>
 
                                     <g:render template="coverage"
-                                    model="['coverageInstance':documentInstance?.coverage]"></g:render>
+                                    model="['coverageInstance':documentInstance?.coverage, 'sourceInstance':documentInstance]"></g:render>
 
 
 

@@ -64,6 +64,7 @@ class DocumentController {
 			redirect(action: "show", id: documentInstance.id)
 		}
 		else {
+			documentInstance.errors.allErrors.each { log.error it }
 			render(view: "create", model: [documentInstance: documentInstance])
 		}
 	}

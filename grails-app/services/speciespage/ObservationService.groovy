@@ -4,7 +4,7 @@ import grails.util.Environment;
 import grails.util.GrailsNameUtils;
 import groovy.sql.Sql
 import groovy.text.SimpleTemplateEngine
-
+import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.grails.taggable.TagLink;
 
 import java.util.Date;
@@ -124,9 +124,10 @@ class ObservationService {
 		observation.checklistAnnotations = params.checklistAnnotations?:observation.checklistAnnotations
 		
         GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), grailsApplication.config.speciesPortal.maps.SRID);
-        if(params.latitude && params.longitude) {
-            observation.topology = geometryFactory.createPoint(new Coordinate(params.longitude?.toFloat(), params.latitude?.toFloat()));
-        } else if(params.areas) {
+//        if(params.latitude && params.longitude) {
+//            observation.topology = geometryFactory.createPoint(new Coordinate(params.longitude?.toFloat(), params.latitude?.toFloat()));
+//        } else 
+		if(params.areas) {
             WKTReader wkt = new WKTReader(geometryFactory);
             try {
                 Geometry geom = wkt.read(params.areas);
@@ -158,10 +159,11 @@ class ObservationService {
 				mailType = OBSERVATION_ADDED
 			}else{
 				observationInstance = Observation.get(params.id.toLong())
+				params.author = observationInstance.author;
 				updateObservation(params, observationInstance)
 				feedType = activityFeedService.OBSERVATION_UPDATED
 				feedAuthor = springSecurityService.currentUser
-				params.author = observationInstance.author;
+				
 			}
 			
 			if(!observationInstance.hasErrors() && observationInstance.save(flush:true)) {
@@ -509,7 +511,6 @@ class ObservationService {
 		
 		//if source of recommendation is other that observation (i.e Checklist)
 //		refObject = refObject ?: params.refObject
-		
 		Recommendation commonNameReco = recommendationService.findReco(commonName, false, languageId, null);
 		Recommendation scientificNameReco = recommendationService.getRecoForScientificName(recoName, canName, commonNameReco);
 		
@@ -827,8 +828,6 @@ class ObservationService {
 			}
 		}
 
-        println "*************************"
-        println params.webaddress;
         if(params.userGroup || params.webaddress) {
             if(!(params.userGroup instanceof UserGroup) && (params.userGroup instanceof String || params.userGroup instanceof Long || params.webaddress)) {
     			def userGroupController = new UserGroupController();
@@ -929,7 +928,9 @@ class ObservationService {
     /**
     *
     **/
-    private getBoundGeometry(x1, y1, x2, y2){
+	
+	
+	private static getBoundGeometry(x1, y1, x2, y2){
         def p1 = new Coordinate(y1, x1)
         def p2 = new Coordinate(y1, x2)
         def p3 = new Coordinate(y2, x2)
@@ -940,12 +941,12 @@ class ObservationService {
         arr[2] = p3
         arr[3] = p4
         arr[4] = p1
-        def gf = new GeometryFactory(new PrecisionModel(), grailsApplication.config.speciesPortal.maps.SRID)
+        def gf = new GeometryFactory(new PrecisionModel(), ConfigurationHolder.getConfig().speciesPortal.maps.SRID)
         def lr = gf.createLinearRing(arr)
         def pl = gf.createPolygon(lr, null)
         return pl
     }
-
+	
 	Date parseDate(date){
 		try {
 			return date? Date.parse("dd/MM/yyyy", date):new Date();
@@ -1410,7 +1411,7 @@ class ObservationService {
 		try {
 			
 		def targetController =  getTargetController(obv)//obv.getClass().getCanonicalName().split('\\.')[-1]
-		def obvUrl, domain
+		def obvUrl, domain, baseUrl
 	
         try {
 		    request = (request) ?:(WebUtils.retrieveGrailsWebRequest()?.getCurrentRequest())
@@ -1420,9 +1421,10 @@ class ObservationService {
 		if(request){
 			 obvUrl = generateLink(targetController, "show", ["id": obv.id], request)
 			 domain = Utils.getDomainName(request)
+			 baseUrl = Utils.getDomainServerUrl(request)
 		}
 
-		def templateMap = [obvUrl:obvUrl, domain:domain]
+		def templateMap = [obvUrl:obvUrl, domain:domain, baseUrl:baseUrl]
 		templateMap["currentUser"] = springSecurityService.currentUser
 		templateMap["action"] = notificationType;
 		def mailSubject = ""
@@ -1625,7 +1627,9 @@ class ObservationService {
 			templateMap["obvPlace"] = values[ObvUtilService.LOCATION]
 			templateMap["obvDate"] = values[ObvUtilService.OBSERVED_ON]
 			templateMap["obvNotes"] = Utils.stripHTML(values[ObvUtilService.NOTES])
-			templateMap["obvImage"] = obv.mainImage().thumbnailUrl() 
+			templateMap["obvImage"] = obv.mainImage().thumbnailUrl()
+			//get All the UserGroups an observation is part of
+			templateMap["groups"] = Observation.findById(obv.id).userGroups
 		}
 		if(feed) {
 			templateMap['actor'] = feed.author;
@@ -1744,6 +1748,20 @@ class ObservationService {
 	    }
 		
 		return results
-	} 
+	}
+	
+	/*
+	 * To validate topology in all domain class
+	 * 
+	 */
+	public static validateLocation(Geometry gm, obj){
+		if(!gm){
+			return ['observation.suggest.location']
+		}
+		Geometry indiaBoundry = getBoundGeometry(6.74678, 68.03215, 35.51769, 97.40238)
+		if(!indiaBoundry.covers(gm)){
+			return ['location.value.not.in.india', '6.74678', '35.51769', '68.03215', '97.40238']
+		}
+	}
 
 }

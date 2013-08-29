@@ -390,9 +390,8 @@ class SUserController extends UserController {
 
 
 			if(params.sort == 'activity') {
-				results = chartService.getUserByRank(max, offset)
-				//def userName = params['query'] ? (params['query'].toLowerCase() + '%') : null
-				//results = chartService.getUserByRank(max, offset, userName)
+				def userName = params['query'] ? (params['query'].toLowerCase() + '%') : null
+				results = chartService.getUserByRank(max, offset, userName)
 			} else {
 				String query = "SELECT DISTINCT u $hql $orderBy";
 				log.debug "UserQuery : ${query} with params ${queryParams}"

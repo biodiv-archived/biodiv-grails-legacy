@@ -23,7 +23,7 @@
                        return;
                    }
                    request.nameFilter = _options.nameFilter;
-                   lastXhrSN = $.getJSON( window.params.recommendation.suggest, request, function( data, status, xhr ) {
+                   lastXhr = $.getJSON( window.params.recommendation.suggest, request, function( data, status, xhr ) {
                        cache[_options.nameFilter][ term ] = data;
                        if ( xhr === lastXhr ) {
                            response( data );

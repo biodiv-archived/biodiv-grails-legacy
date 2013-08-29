@@ -116,11 +116,11 @@ class ChecklistService {
 			}else{
 				//updates old checklist
 				checklistInstance = Checklists.get(params.id.toLong())
+				params.author = checklistInstance.author;
 				updateChecklist(params, checklistInstance)
 				feedType = activityFeedService.CHECKLIST_UPDATED
 				feedAuthor = springSecurityService.currentUser
 				//so that original author of checklist should not change
-				params.author = checklistInstance.author;
 				//to say if all obv needs to be updated because some change in MetaData properties
 				isGlobalUpdate = isGlobalUpdateForObv(checklistInstance)
 			}
@@ -175,36 +175,38 @@ class ChecklistService {
 			// checklist save page will have all new rows that will create new observation
 			params.checklistData.each {  Map m ->
 				def oldObvId = m.remove(OBSERVATION_COLUMN)
-				def media = m.remove(MEDIA_COLUMN);
-				m.remove(SPECIES_TITLE_COLUMN);
-				m.remove(SPECIES_ID_COLUMN);
-                println "------------media----------- ${media}"
-                Map obsParams = new HashMap(commonObsParams);
-                if(media) {
-                    media.eachWithIndex{ item, index ->
-                        item.each { key, value ->
-                            obsParams.put(key+'_'+index, value);
-                        }
-                    }
-                }
-
-				// for old observation
-				if(oldObvId){
-					obsParams.action = "update"
-					obsParams.id = oldObvId
-					updatedObv.add(oldObvId)
-				}else{
-					obsParams.action = "save"
-				}	
-				obsParams.checklistAnnotations =  getSafeAnnotation(m)
-				def res = observationService.saveObservation(obsParams, false)
-				Observation observationInstance = res.observationInstance
-				saveReco(observationInstance, m, checklistInstance)
-				//saveObservationAnnotation(observationInstance, m, Arrays.asList(checklistInstance.fetchColumnNames()))
-				
-				if(!oldObvId){
-					checklistInstance.addToObservations(observationInstance)
-					newObv.add(observationInstance.id)
+				if(isValidObservation(m, oldObvId, checklistInstance)){
+					def media = m.remove(MEDIA_COLUMN);
+					m.remove(SPECIES_TITLE_COLUMN);
+					m.remove(SPECIES_ID_COLUMN);
+	                println "------------media----------- ${media}"
+	                Map obsParams = new HashMap(commonObsParams);
+	                if(media) {
+	                    media.eachWithIndex{ item, index ->
+	                        item.each { key, value ->
+	                            obsParams.put(key+'_'+index, value);
+	                        }
+	                    }
+	                }
+	
+					// for old observation
+					if(oldObvId){
+						obsParams.action = "update"
+						obsParams.id = oldObvId
+						updatedObv.add(oldObvId)
+					}else{
+						obsParams.action = "save"
+					}
+					
+					obsParams.checklistAnnotations =  getSafeAnnotation(m, checklistInstance.fetchColumnNames())
+					def res = observationService.saveObservation(obsParams, false)
+					Observation observationInstance = res.observationInstance
+					saveReco(observationInstance, m, checklistInstance)
+					
+					if(!oldObvId){
+						checklistInstance.addToObservations(observationInstance)
+						newObv.add(observationInstance.id)
+					}
 				}
 			}
 			//if any global thing (ie. species group, habitat) changes then updating all the observation
@@ -224,11 +226,21 @@ class ChecklistService {
 		log.debug "saved checklist observation  "
 	}
 	
+	private boolean isValidObservation(m, oldObvId, cl){
+		if(oldObvId){
+			return true
+		}
+		def media = m[MEDIA_COLUMN]
+		def snCol = m[cl.sciNameColumn]
+		def cnCol = m[cl.commonNameColumn]
+		
+		return snCol || snCol || media
+	}
 	
-	private getSafeAnnotation(Map m){
+	private getSafeAnnotation(Map m, List validColumns){
 		def newMap = [:]
 		m.each { k, v ->
-			if(v && !m.isNull(k)){
+			if(validColumns.contains(k.trim()) && v && !m.isNull(k)){
 				newMap.put(k.trim(), v.trim())
 			}
 		}
@@ -261,7 +273,7 @@ class ChecklistService {
 		ConfidenceType confidence = observationService.getConfidenceType(ConfidenceType.CERTAIN.name());
 		RecommendationVote recommendationVoteInstance = new RecommendationVote(observation:obv, recommendation:reco, commonNameReco:cnReco, author:obv.author, confidence:confidence, votedOn:obv.fromDate);
 		
-		def user = springSecurityService.currentUser;
+		def user = obv.author;
 		def oldRecoVote = RecommendationVote.findWhere(observation:obv, author:user)
 		if(oldRecoVote){
 			oldRecoVote.delete(flush:true)
@@ -295,7 +307,7 @@ class ChecklistService {
 		if(obv.fetchSpeciesCall() != reco.name)
 			return true
 		
-		def user = springSecurityService.currentUser;	
+		def user = obv.author;
 		def oldRecoVote = RecommendationVote.findWhere(observation:obv, author:user)
 		
 		if(!oldRecoVote || oldRecoVote.recommendation.name != reco.name || oldRecoVote.commonNameReco?.name != cnReco?.name)

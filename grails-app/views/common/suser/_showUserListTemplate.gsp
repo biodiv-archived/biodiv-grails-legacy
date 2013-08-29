@@ -36,7 +36,7 @@
 		</div>
 	</div>
 		
-		<g:if test="${instanceTotal > searchQuery.max}">
+		<g:if test="${instanceTotal > searchQuery?.max}">
 		    <div class="centered">
 		          <div class="btn loadMore">
 		             <span class="progress" style="display: none;">Loading ... </span> <span
