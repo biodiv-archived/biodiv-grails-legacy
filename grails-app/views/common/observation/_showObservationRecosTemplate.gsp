@@ -37,9 +37,9 @@
 				<span class="voteCount"><span id="votes_${r.recoId}">
 						${r.noOfVotes} </span> <g:if test="${r.noOfVotes <= 1}"> user thinks</g:if>
 					<g:else> users think</g:else> it is:</span><span class="highlight">
-					<g:if test="${r.canonicalForm}">
+					<g:if test="${r.speciesId}">
 						<a href="${uGroup.createLink(action:'show', controller:'species', id:r.speciesId, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
-							<i> ${r.canonicalForm} </i>
+							<i> ${r.name} </i>
 						</a>
 					</g:if>
 					<g:elseif test="${r.isScientificName}">

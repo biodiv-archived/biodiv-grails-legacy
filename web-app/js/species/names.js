@@ -14,10 +14,10 @@
         this.options = _options;
         cache[this.options.nameFilter] = {}
         return $(this).catcomplete({
-            appendTo:_options.appendTo,
+               appendTo:_options.appendTo,
                source:function( request, response ) {
                    var term = request.term;
-
+                   
                    if ( term in cache[_options.nameFilter] ) {
                        response( cache[_options.nameFilter][ term ] );
                        return;

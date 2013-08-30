@@ -1,5 +1,9 @@
 package species.sourcehandler.exporter
 
+import org.codehaus.groovy.grails.commons.ApplicationHolder;
+import org.hibernate.SessionFactory;
+import org.hibernate.exception.ConstraintViolationException;
+
 import species.*
 import species.Contributor
 import species.TaxonomyDefinition.TaxonomyRank
@@ -25,7 +29,7 @@ class DwCAExporter {
 	def grailsApplication
 
 	protected static DwCAExporter _instance
-	private HashSet contributorsSet
+	private HashMap contributorsSet
 
 	private CSVWriter taxaWriter
 	private CSVWriter mediaWriter
@@ -35,7 +39,7 @@ class DwCAExporter {
 
 
 	public DwCAExporter() {
-		contributorsSet = new HashSet()
+		contributorsSet = new HashMap()
 	}
 
 	//#TODO
@@ -48,9 +52,51 @@ class DwCAExporter {
 
 
 
-	public File exportSpeciesData(String directory) {		
-		return exportSpeciesData(Species.findAllByPercentOfInfoGreaterThan(0), directory);
-	}
+    public File exportSpeciesData(String directory) {
+        log.info "Darwin Core export started"
+
+        if(!directory) {
+
+            /*
+            File targetDir = new File(config.speciesPortal.species.speciesDownloadDir)
+            targetDir.createDirs()
+            directory = targetDir.getPath()
+             */
+
+            directory = config.speciesPortal.species.speciesDownloadDir
+
+        }
+
+        String folderName = "dwc_"+ + new Date().getTime()
+
+        if(!directory)
+            directory = File.createTempFile('','');
+
+        String folderPath = directory + "/"+ folderName
+
+        initWriters(folderPath)
+        fillHeaders()
+        int max = 10, offset = 0;
+        int total = Species.countByPercentOfInfoGreaterThan(0);
+        for(int i=0; i<total;) {
+            def speciesList = Species.findAllByPercentOfInfoGreaterThan(0, [max:max,offset:offset, sort:'id'])
+            for(Species specie: speciesList) {
+                println specie.id;
+                exportSpecies(specie)
+                i++;
+            }
+
+            offset = offset + max;
+            cleanUpGorm();
+            if(!speciesList) break;
+        }
+        exportAgents(directory)
+
+        closeWriters()
+
+        //Archive the directory and return the file
+        return archive(directory, folderName)
+    }
 
 	/**
 	 * Export species
@@ -123,7 +169,6 @@ class DwCAExporter {
 	 * @param species	
 	 */
 	public void exportSpecies(Species species) {
-
 		exportTaxon(species)
 
 		exportCommonNames(species.taxonConcept)
@@ -151,7 +196,7 @@ class DwCAExporter {
 		taxonRow = new String[15]
 
 		//		Taxon ID = taxon.id
-		taxonRow[0] = taxon.id
+		taxonRow[0] = 'accepted_'+taxon.id
 
 
 		// scientificName
@@ -207,12 +252,12 @@ class DwCAExporter {
 		//              referenceID
 		def referenceID = []
 		for(SpeciesField field: species.fields) {
-			for(Reference ref: field.references) {
-				if(field.id == 15) {
+		 	for(Reference ref: field.references) {
+		 		if(field.id == 15) {
 					referenceID.add(String.valueOf(ref.id))
 				}
-			}
-		}
+		  	}
+		} 
 
 		taxonRow[14] = referenceID.join(",")
 
@@ -226,14 +271,14 @@ class DwCAExporter {
 			taxonRow = new String[15]
 
 			// Taxon ID = taxon.id
-			taxonRow[0] = synonym.id
+			taxonRow[0] = synonym.relationship.value().toLowerCase() +'_'+synonym.id
 
 
 			// scientificName
 			taxonRow[1] = synonym.name
 
 			//parentTaxon
-			taxonRow[2] = taxon.id.toString();
+			taxonRow[2] = 'accepted_'+taxon.id.toString();
 
 			//		TaxonRank
 			taxonRow[9] = "Species"
@@ -259,7 +304,7 @@ class DwCAExporter {
 
 			taxaWriter.writeNext(taxonRow)
 
-		}
+		} 
 
 
 	}
@@ -279,10 +324,10 @@ class DwCAExporter {
 		for(Resource media: resources) {
 			row = new String[32]
 			// Media ID
-			row[0] = media.id
+			row[0] = 'res_'+media.id
 
 			//TaxonID
-			row[1] = species.taxonConcept.id
+			row[1] = 'accepted_'+species.taxonConcept.id
 
 			//Type  #TODO: confirm  -- There are resources of type ICON also(very few)
 			//row[2] = media.type.value()   //returns only as 'image'
@@ -311,10 +356,13 @@ class DwCAExporter {
 			//row[9] =""
 
 			//FurtherInformationURL #TODO - put thumbnail url
-			row[10] = media.url
+				row[10] = "${org.codehaus.groovy.grails.commons.ConfigurationHolder.config.grails.serverURL}/species/show/" + species.id
+				row[10] = row[10].replace(":8080", "");
+				row[10] = row[10].replace("/biodiv", "");
+
 
 			//DerivedFrom
-			//row[11] = ""
+			row[11] = media.url
 
 			//CreateDate
 			//row[12] = ""
@@ -346,15 +394,20 @@ class DwCAExporter {
 			//Contributor
 			def contributors = []
 			for(Contributor contributor: media.contributors) {
-				println contributor;
+                if(contributorsSet.containsKey(contributor.name)) {
+                    contributor = contributorsSet.get(contributor.name);
+                }
 				contributors.add(String.valueOf(contributor.id))
-				contributorsSet.add(contributor)
+				contributorsSet.put(contributor.name, contributor)
 			}
-			row[22] = contributors.join(",")
+			row[25] = contributors.join(",")
 			def attributors = []
 			for(Contributor attributor: media.attributors) {
+                if(contributorsSet.containsKey(attributor.name)) {
+                    attributor = contributorsSet.get(attributor.name);
+                }
 				attributors.add(String.valueOf(attributor.id))
-				contributorsSet.add(attributor)
+				contributorsSet.put(attributor.name, attributor)
 			}
 			row[23] = attributors.join(",")
 			//Creator
@@ -372,14 +425,15 @@ class DwCAExporter {
 
 		// SpeciesFields of a species
 		for(SpeciesField speciesField: species.fields) {
-			if((speciesField.field.id >= 3 && speciesField.field.id <= 10) || (speciesField.field.id >= 37 && speciesField.field.id <= 75) ) {
+			if((speciesField.field.id >= 3 && speciesField.field.id <= 10) || (speciesField.field.id >= 37 && speciesField.field.id <= 75 && speciesField.field.id != 65) ) {
+                if(speciesField.description) {
 				row = new String[32]
 
 				// Media ID
-				row[0] = speciesField.id
+				row[0] = 'txt_'+speciesField.id
 
 				//TaxonID
-				row[1] = species.taxonConcept.id
+				row[1] = 'accepted_'+species.taxonConcept.id
 
 				//Type
 				row[2] = "http://purl.org/dc/dcmitype/Text"
@@ -439,14 +493,20 @@ class DwCAExporter {
 				//Contributor = speciesField.contributors.join(",")
 				def contributors = []
 				for(Contributor contributor: speciesField.contributors) {
+                    if(contributorsSet.containsKey(contributor.name)) {
+                        contributor = contributorsSet.get(contributor.name);
+                    }
 					contributors.add(String.valueOf(contributor.id))
-					contributorsSet.add(contributor)
+					contributorsSet.put(contributor.name, contributor)
 				}
-				row[22] = contributors.join(",")
+				row[25] = contributors.join(",")
 				def attributors = []
 				for(Contributor attributor: speciesField.attributors) {
+                    if(contributorsSet.containsKey(attributor.name)) {
+                        attributor = contributorsSet.get(attributor.name);
+                    }
 					attributors.add(String.valueOf(attributor.id))
-					contributorsSet.add(attributor)
+					contributorsSet.put(attributor.name, attributor)
 				}
 				row[23] = attributors.join(",")
 
@@ -464,6 +524,7 @@ class DwCAExporter {
 				row[31] = referenceID.join(",")
 
 				mediaWriter.writeNext(row)
+                }
 			}
 
 		}
@@ -486,7 +547,7 @@ class DwCAExporter {
 			row = new String[7]
 
 			//			taxonId
-			row[0] = cName.taxonConcept.id
+			row[0] = 'accepted_'+cName.taxonConcept.id
 
 			//			Name
 			row[1] = cName.name
@@ -495,8 +556,10 @@ class DwCAExporter {
 			//row[2] = ""
 
 			//			Language
-			row[3] = cName.language?.threeLetterCode?:''
-
+			def languageCode = cName.language?.threeLetterCode?:''
+            if(Utils.isInteger(languageCode))
+                row[3] = languageCode;
+            
 			//			Language Code
 			//row[4] = cName.language?.threeLetterCode
 
@@ -534,6 +597,7 @@ class DwCAExporter {
 				//PublicationType
 				//Full Reference
 				row[2] = reference.title?.replaceAll("\\t|\\n", " ")
+                row[2] = row[2]?:reference.url
 				//PrimaryTitle
 				//row[3] = ""
 				//SecondaryTitle
@@ -566,7 +630,7 @@ class DwCAExporter {
 	protected void exportAgents(String targetDir) {
 
 		String[] row
-		for (Contributor agent: contributorsSet) {
+		contributorsSet.each {key, agent ->
 			row = new String[12]
 
 			//AgentID
@@ -722,6 +786,25 @@ class DwCAExporter {
 		CSVWriter writer = new CSVWriter(new FileWriter("$directory/$fileName"), separator, CSVWriter.NO_QUOTE_CHARACTER);
 		return writer
 	}
+
+
+    /**
+     *
+     */
+    private void cleanUpGorm() {
+        def ctx = ApplicationHolder.getApplication().getMainContext();
+        SessionFactory sessionFactory = ctx.getBean("sessionFactory")
+        def hibSession = sessionFactory?.getCurrentSession()
+        if(hibSession) {
+            log.debug "Flushing and clearing session"
+            try {
+                //hibSession.flush()
+            } catch(ConstraintViolationException e) {
+                e.printStackTrace()
+            }
+            hibSession.clear()
+        }
+    }
 
 
 

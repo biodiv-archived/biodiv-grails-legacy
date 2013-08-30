@@ -50,7 +50,7 @@ class SUserController extends UserController {
 	}
 
 	def list = {
-		params.max = Math.min(params.max ? params.int('max') : 12, 100)
+		params.max = Math.min(params.max ? params.int('max') : 24, 100)
 		//params.sort = params.sort && params.sort != 'score' ? params.sort : "activity";
 		params.query='%';
 		def model = getUsersList(params);
@@ -138,7 +138,6 @@ class SUserController extends UserController {
 
 	@Secured(['ROLE_USER', 'ROLE_ADMIN'])
 	def edit = {
-		println params
 		log.debug params;
 		String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
 
