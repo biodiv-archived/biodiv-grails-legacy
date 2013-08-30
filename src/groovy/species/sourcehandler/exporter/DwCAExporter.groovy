@@ -15,6 +15,7 @@ import java.nio.channels.FileChannel
 import au.com.bytecode.opencsv.CSVWriter
 import org.apache.commons.logging.LogFactory
 
+import species.utils.Utils;
 
 /**
  * Exports data into Darwin core format
