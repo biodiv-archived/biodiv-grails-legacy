@@ -9,21 +9,21 @@
     </thead>
     <tbody>
         <g:each in="${distinctRecoList}" var="r">
-        <g:set var="reco" value="${Recommendation.read(r[0])}"/>
+        <g:set var="reco" value="${r[0]}"/>
         <tr>
             <td>
-                <g:if test="${reco.isScientificName}">
-                <div class="sci_name ellipsis" title="${reco.name}">
-                    ${reco.name}
+                <g:if test="${r[1]}">
+                <div class="sci_name ellipsis" title="${r[0]}">
+                    ${r[0]}
                 </div>
                 </g:if>
                 <g:else>
-                <div class="ellipsis" title="${reco.name}">
-                    ${reco.name}
+                <div class="ellipsis" title="${r[0]}">
+                    ${r[0]}
                 </div>
                 </g:else>
             </td>
-            <td>${r[1]}</td>
+            <td>${r[2]}</td>
         </tr>
         </g:each>
     </tbody>
