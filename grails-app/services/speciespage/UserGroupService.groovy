@@ -67,8 +67,7 @@ class UserGroupService {
 	def emailConfirmationService;
 	def sessionFactory
 	def activityFeedService;
-
-
+	
 	private void addPermission(UserGroup userGroup, SUser user, int permission) {
 		addPermission userGroup, user, aclPermissionFactory.buildFromMask(permission)
 	}
@@ -1216,4 +1215,91 @@ class UserGroupService {
 		return secTagLib.hasPermission(['permission':permission, 'object':object], 'permitted')
 	}
 	
+	////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////// Bulk posting ////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////////
+	
+	private getObservationListForPost(params){
+		def filterUrl = new URL(params.filterUrl)
+		def paramsMap = Utils.getQueryMap(filterUrl)
+		String action = filterUrl.getPath().split("/")[2]
+		if("search".equalsIgnoreCase(action)){
+			//getting result from solr
+			def idList = observationService.getFilteredObservationsFromSearch(paramsMap, -1, 0, false).totalObservationIdList
+			def res = []
+			idList.each { obvId ->
+				res.add(Observation.read(obvId))
+			}
+			return res
+		}else if(params.webaddress){
+			def userGroupInstance =	get(params.webaddress)
+			if (!userGroupInstance){
+				log.error "user group not found for id  $params.id  and webaddress $params.webaddress"
+				return []
+			}
+			return getUserGroupObservations(userGroupInstance, paramsMap, -1, 0).observationInstanceList;
+		}
+		else{
+			return observationService.getFilteredObservations(paramsMap, -1, 0, false).observationInstanceList
+			
+		}
+	}
+
+	
+	private updateObservationOnGroup(params){
+		String submitType = params.submitType
+		List obvs = []
+		def objectIds = params['objectIds']
+		if(objectIds && objectIds != ""){
+			obvs = objectIds.split(",").collect { Observation.read(Long.parseLong(it)) }
+		}
+		List groups = params['userGroups'].split(",").collect {
+			UserGroup.read(Long.parseLong(it))
+		}
+		
+		if(params.selectionType == 'selectAll'){
+			List newList = getObservationListForPost(params)
+			newList.removeAll(obvs)
+			obvs = newList
+		}
+		
+		println "============ " +  obvs.size()
+		println "============== " + groups
+		groups.each { ug ->
+			
+			if(submitType == 'post'){
+				obvs.each { obv ->
+					ug.addToObservations(obv)
+				}
+			}else{
+				obvs.each { obv ->
+					ug.removeFromObservations(obv)
+				}
+			}
+			if(!ug.save()){
+				ug.errors.allErrors.each { log.error it }
+			}
+		}
+	}
+	
+	def updateResourceOnGroup(params){
+		def r = [:]
+		try{
+			String objectType = params.objectType
+			switch (objectType) {
+				case Observation.class.getCanonicalName():
+					updateObservationOnGroup(params)
+					break
+				default:
+					break
+			}
+			r['success'] = true
+			r['msgCode']=  (params.submitType == 'post') ? 'userGroup.default.multiple.posting.success' : 'userGroup.default.multiple.unposting.success'
+		}catch (Exception e) {
+			e.printStackTrace()
+			r['success'] = false
+			r['msgCode']= 'error'
+		}
+		return r
+	}
 }

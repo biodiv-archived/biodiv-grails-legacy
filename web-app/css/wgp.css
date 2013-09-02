@@ -2101,3 +2101,16 @@ div.noOfRatings {
 .dropdown-menu {
     z-index:3000;
 }
+
+.selectable {
+    background: url("../images/icons/plus.png") no-repeat scroll 50% 50% transparent;
+}
+/* .selectable:hover { */
+/*     background: url("../images/icons/check.png") no-repeat scroll 50% 50% transparent; */
+/* } */
+.selectedItem {
+    background: url("../images/icons/check.png") no-repeat scroll 50% 50% transparent;
+}
+.selectedItem:hover {
+    background: url("../images/icons/x.png") no-repeat scroll 50% 50% transparent;
+}

@@ -192,9 +192,8 @@ String desc = "- "+ location +" by "+observationInstance.author.name.capitalize(
 					</div>
 				</div>
 
-                                <div class="span4">
-
-					<div class="sidebar_section">
+              	<div class="span4">
+                    <div class="sidebar_section">
 						<obv:showLocation
 							model="['observationInstance':observationInstance]" />
 					</div>

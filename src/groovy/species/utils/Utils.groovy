@@ -394,6 +394,19 @@ class Utils {
         }
         return true;
     }
+	
+	public static Map getQueryMap(URL url){
+		def map = [:]
+		if(!url.query) return map
+		url.query.split('&').each{kv ->
+			def (key, value) = kv.split('=').toList()
+		    if(value != null) {
+				map[key] = URLDecoder.decode(value)
+		    }
+		}
+		return map
+	}
+	
 }
 
 

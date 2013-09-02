@@ -289,8 +289,10 @@ function last_actions() {
 	$('.linktext').linkify(); 
 	//applying table sorting
 	$("table.tablesorter").tablesorter();
-        rating();
+    rating();
 
-        $("#contributeMenu .btn").popover();
+    $("#contributeMenu .btn").popover();
+    
+    updateGroupPostSelection();
 }
 

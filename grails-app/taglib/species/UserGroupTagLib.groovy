@@ -370,5 +370,11 @@ class UserGroupTagLib {
 		out << userGroupService.userGroupBasedLink(attrs);
 	}
 	
+	def objectPost = {attrs, body->
+		out << render(template:"/common/objectPostTemplate", model:attrs.model);
+	}
 	
+	def objectPostToGroups = {attrs, body->
+		out << render(template:"/common/objectPostToGroupsTemplate", model:attrs.model);
+	}
 }

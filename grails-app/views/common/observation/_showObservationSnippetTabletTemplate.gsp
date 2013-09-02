@@ -28,11 +28,14 @@ def obvId = observationInstance.id
                         <obv:showSpeciesName
                         model="['observationInstance':observationInstance, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress,isListView:true]" />
                     </h5>
+					<uGroup:objectPost model="['objectInstance':observationInstance, 'userGroup':userGroup]" />				  	    			             
                 </div>
-
+               
 	</div>
-	<div class="caption" >
-		<obv:showStoryTablet
-			model="['observationInstance':observationInstance, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress]"></obv:showStoryTablet>
-	</div>
+	
+	    
+<%--	<div class="caption" >--%>
+<%--		<obv:showStoryTablet--%>
+<%--			model="['observationInstance':observationInstance, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress]"></obv:showStoryTablet>--%>
+<%--	</div>--%>
 </div>
