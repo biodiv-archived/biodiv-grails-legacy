@@ -33,13 +33,12 @@ import species.sourcehandler.XMLConverter;
 import species.utils.ImageType;
 import species.utils.Utils;
 
-import org.apache.lucene.document.DateField;
+//import org.apache.lucene.document.DateField;
 import org.apache.lucene.document.DateTools;
 import org.apache.solr.common.SolrException;
 import org.apache.solr.common.util.NamedList
 
 import org.apache.solr.common.util.DateUtil;
-import org.apache.solr.common.util.NamedList;
 import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap;
 import org.codehaus.groovy.grails.web.util.WebUtils;
@@ -512,7 +511,6 @@ class ObservationService {
 		
 		//if source of recommendation is other that observation (i.e Checklist)
 //		refObject = refObject ?: params.refObject
-		
 		Recommendation commonNameReco = recommendationService.findReco(commonName, false, languageId, null);
 		Recommendation scientificNameReco = recommendationService.getRecoForScientificName(recoName, canName, commonNameReco);
 		
@@ -1471,7 +1469,7 @@ class ObservationService {
 		try {
 			
 		def targetController =  getTargetController(obv)//obv.getClass().getCanonicalName().split('\\.')[-1]
-		def obvUrl, domain
+		def obvUrl, domain, baseUrl
 	
         try {
 		    request = (request) ?:(WebUtils.retrieveGrailsWebRequest()?.getCurrentRequest())
@@ -1481,9 +1479,10 @@ class ObservationService {
 		if(request){
 			 obvUrl = generateLink(targetController, "show", ["id": obv.id], request)
 			 domain = Utils.getDomainName(request)
+			 baseUrl = Utils.getDomainServerUrl(request)
 		}
 
-		def templateMap = [obvUrl:obvUrl, domain:domain]
+		def templateMap = [obvUrl:obvUrl, domain:domain, baseUrl:baseUrl]
 		templateMap["currentUser"] = springSecurityService.currentUser
 		templateMap["action"] = notificationType;
 		def mailSubject = ""
@@ -1506,7 +1505,9 @@ class ObservationService {
 
 			case activityFeedService.CHECKLIST_CREATED:
 				mailSubject = conf.ui.addChecklist.emailSubject
-				bodyContent = conf.ui.addChecklist.emailBody
+				bodyView = "/emailtemplates/addObservation"
+				templateMap["actionObject"] = "checklist"
+				templateMap["message"] = " uploaded a checklist to ${templateMap['domain']} and it is available <a href=\"${templateMap['obvUrl']}\"> here</a>"
 				toUsers.add(getOwner(obv))
 				break
 
@@ -1529,9 +1530,9 @@ class ObservationService {
 				
 			case CHECKLIST_DELETED :
 				mailSubject = conf.ui.checklistDeleted.emailSubject
-				bodyContent = conf.ui.checklistDeleted.emailBody
-				templateMap["currentUser"] = springSecurityService.currentUser
-				//replyTo = templateMap["currentUser"].email
+				bodyView = "/emailtemplates/addObservation"
+				templateMap["actionObject"] = "checklist"
+				templateMap["message"] = " deleted a checklist. The URL of the checklist was ${templateMap['obvUrl']}"
 				toUsers.add(getOwner(obv))
 				break
 
@@ -1684,7 +1685,9 @@ class ObservationService {
 			templateMap["obvPlace"] = values[ObvUtilService.LOCATION]
 			templateMap["obvDate"] = values[ObvUtilService.OBSERVED_ON]
 			templateMap["obvNotes"] = Utils.stripHTML(values[ObvUtilService.NOTES])
-			templateMap["obvImage"] = obv.mainImage().thumbnailUrl() 
+			templateMap["obvImage"] = obv.mainImage().thumbnailUrl()
+			//get All the UserGroups an observation is part of
+			templateMap["groups"] = Observation.findById(obv.id).userGroups
 		}
 		if(feed) {
 			templateMap['actor'] = feed.author;

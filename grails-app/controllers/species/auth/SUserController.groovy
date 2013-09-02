@@ -265,13 +265,13 @@ class SUserController extends UserController {
 	}
 
 	def search = {
-		println "search"
 		log.debug params
+		def searchFieldsConfig = grailsApplication.config.speciesPortal.searchFields
 
-		def model = getUsersList(params);
-
+		//def model = getUsersList(params);
+		def model = SUserService.getUsersFromSearch(params);
 		// add query params to model for paging
-		for (name in [
+		/*for (name in [
 			'username',
 			'enabled',
 			'accountExpired',
@@ -281,8 +281,9 @@ class SUserController extends UserController {
 			'order'
 		]) {
 			model[name] = params[name]
-		}
-		model['isSearch'] = true;
+		}*/
+		
+		//model['isSearch'] = true;
 		params.action = 'search'
 		params.controller = 'SUser'
 
@@ -309,7 +310,7 @@ class SUserController extends UserController {
 			return;
 		}
 	}
-
+/*
 	private def getUsersList(params) {
 		boolean useOffset = params.containsKey('offset')
 		setIfMissing 'max', 12, 100
@@ -375,7 +376,7 @@ class SUserController extends UserController {
 			 totalCount = lookupUserClass().executeQuery("SELECT COUNT(DISTINCT u) $hql", queryParams)[0]
 			 }*/
 
-			Integer max = params.int('max')
+			/*Integer max = params.int('max')
 			Integer offset = params.int('offset')
 
 			String orderBy = ''
@@ -407,7 +408,7 @@ class SUserController extends UserController {
 		return ['userInstanceList': results, instanceTotal: totalCount, queryParams:queryParams, searched: true]
 
 	}
-
+*/
 	// Define a closure that will do the sorting
 	def sorter = { SUser a, SUser b, String prefix ->
 		// Get the index into order for a and b

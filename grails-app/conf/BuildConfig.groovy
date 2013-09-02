@@ -28,21 +28,27 @@ grails.project.dependency.resolution = {
         mavenRepo "http://repository.jboss.com/maven2/"
         mavenRepo "https://repository.jboss.org/nexus/content/groups/public"
         mavenRepo "http://repo.marketcetera.org/maven/"
+        mavenRepo "http://maven.restlet.org/"
     }
     dependencies {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
 
 
         // runtime 'mysql:mysql-connector-java:5.1.13'
-        compile ('org.apache.solr:solr-solrj:3.6.0') {
+        compile ('org.apache.solr:solr-solrj:4.4.0') {
             excludes 'slf4j-api', 'jcl-over-slf4j'
         }
         if (Environment.current == Environment.DEVELOPMENT) {
-                compile ('org.apache.solr:solr-core:3.6.0') {
+                //compile ('org.apache.solr:solr-core:3.6.0') {
+                compile ('org.apache.solr:solr-core:4.4.0') {
                     excludes 'slf4j-api', 'jcl-over-slf4j', 'geronimo-stax-api_1.0_spec'
                 }
         }
-        compile ('org.quartz-scheduler:quartz:1.8.4') {
+        
+       compile 'org.restlet.jee:org.restlet:2.1.1'
+       compile 'org.restlet.jee:org.restlet.ext.servlet:2.1.1'
+
+	compile ('org.quartz-scheduler:quartz:1.8.4') {
             excludes 'slf4j-api', 'jcl-over-slf4j'
         }
         compile 'org.apache.lucene:lucene-analyzers:3.4.0'
