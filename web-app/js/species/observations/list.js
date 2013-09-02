@@ -730,7 +730,7 @@ function showMapView() {
 function refreshMarkers(p) {
     if(!p) p = new Array()
 
-    p['fetchField'] = "id,latitude,longitude,isChecklist";
+    p['fetchField'] = "id,latitude,longitude,isChecklist,geoPrivacy";
     p['max'] = -1;
     delete p['bounds']
     
@@ -740,14 +740,6 @@ function refreshMarkers(p) {
         markers.clearLayers();
     else 
         markers = new M.MarkerClusterGroup({maxClusterRadius:50});
-    var pointMarker = M.AwesomeMarkers.icon({
-        icon: 'ok', 
-        color: 'blue'
-    });
-    var checklistMarker = M.AwesomeMarkers.icon({
-        icon: 'list', 
-        color: 'green'
-    });
 
     $.ajax({
         url: url,
@@ -755,10 +747,21 @@ function refreshMarkers(p) {
         success: function(data) {
             for(var i=0; i<data.observationInstanceList.length; i++) {
                 var obv = data.observationInstanceList[i];
-                var marker = createMarker(obv[1], obv[2], {
+                var latitude = obv[1];
+            	var longitude = obv[2];
+            	var icon;
+                
+                if(obv[4]){
+                	icon = obv[3]?geoPrivacyChecklistIcon:geoPrivacyPointIcon;
+                	latitude += data.geoPrivacyAdjust;
+                	longitude += data.geoPrivacyAdjust;
+                }else{
+                	icon = obv[3]?checklistIcon:pointIcon;
+                }
+                var marker = createMarker(latitude, longitude, {
                     draggable: false,
                     clusterable: true,
-                    icon:obv[3]?checklistMarker:pointMarker,
+                    icon:icon,
                     clickable:load_content,
                     data:{id:obv[0]}
                 });

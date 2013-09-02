@@ -20,7 +20,7 @@ import species.NamesParser
 import species.Species
 import species.Synonyms
 import species.TaxonomyDefinition
-import org.apache.solr.client.solrj.impl.StreamingUpdateSolrServer;
+import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer
 
 class SpeciesSearchService {
 
@@ -185,7 +185,7 @@ class SpeciesSearchService {
 		try {
 			solrServer.add(docs);
 			//commit ...server is configured to do an autocommit after 10000 docs or 1hr
-            if(solrServer instanceof StreamingUpdateSolrServer) {
+            if(solrServer instanceof ConcurrentUpdateSolrServer) {
     			solrServer.blockUntilFinished();
             }
 			solrServer.commit();
@@ -274,6 +274,7 @@ class SpeciesSearchService {
 	 */
 	def terms(query, field, limit) {
 		field = field?:"autocomplete";
+		
 		SolrParams q = new SolrQuery().setQueryType("/terms")
 				.set(TermsParams.TERMS, true).set(TermsParams.TERMS_FIELD, field)
 				.set(TermsParams.TERMS_LOWER, query)

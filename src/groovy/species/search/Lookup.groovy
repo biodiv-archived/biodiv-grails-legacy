@@ -41,7 +41,7 @@ abstract class Lookup <E>{
 	public static final class LookupPriorityQueue extends PriorityQueue<LookupResult> {
 
 		public LookupPriorityQueue(int size) {
-			initialize(size);
+			super(size);
 		}
 
 		@Override

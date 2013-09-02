@@ -41,7 +41,7 @@ class ActivityFeedService {
 	static final String MEMBER_JOINED = "Joined group"
 	static final String MEMBER_LEFT = "Left Group"
 	static final String MEMBER_ROLE_UPDATED = "Role updated"
-	
+	static final String USER_REGISTERED = "Registered to portal"
 	//observation related
 	static final String DOCUMENT_CREATED = "Document created"
 	static final String DOCUMENT_UPDATED = "Document updated"
@@ -84,6 +84,7 @@ class ActivityFeedService {
 	def grailsApplication
 	def springSecurityService
 	def observationService
+	def userGroupService
 	
 	def getActivityFeeds(params){
 //		log.debug params;
@@ -219,10 +220,10 @@ class ActivityFeedService {
 				text = activityDomainObj.body
 				break
 			case SPECIES_RECOMMENDED:
-				activityTitle = SPECIES_RECOMMENDED + " " + getSpeciesNameHtml(activityDomainObj, params)
+				activityTitle = SPECIES_RECOMMENDED + " " + (activityDomainObj ? getSpeciesNameHtml(activityDomainObj, params):feedInstance.activityDescrption)
 				break
 			case SPECIES_AGREED_ON:
-				activityTitle =  SPECIES_AGREED_ON + " " + getSpeciesNameHtml(activityDomainObj, params)
+				activityTitle =  SPECIES_AGREED_ON + " " + (activityDomainObj ? getSpeciesNameHtml(activityDomainObj, params):feedInstance.activityDescrption)
 				break
 			case OBSERVATION_FLAGGED:
 				activityTitle = OBSERVATION_FLAGGED
@@ -328,7 +329,7 @@ class ActivityFeedService {
 	}
 	
 	def getUserGroupHyperLink(userGroup){
-		return '<a href="' + observationService.generateLink("userGroup", "show", ["mapping":"userGroup", userGroup:userGroup, 'userGroupWebaddress':userGroup?.webaddress]) + '">' + "<i>$userGroup.name</i>" + "</a>"
+		return '<a href="' + userGroupService.userGroupBasedLink([controller:"userGroup", action:"show", mapping:"userGroup", userGroup:userGroup, userGroupWebaddress:userGroup?.webaddress]) + '">' + "<i>$userGroup.name</i>" + "</a>"
 	}
 	
 	
