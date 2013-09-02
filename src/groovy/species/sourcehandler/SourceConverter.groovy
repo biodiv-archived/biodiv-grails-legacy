@@ -282,11 +282,7 @@ class SourceConverter {
 		if(text) {
 			text.split(delimiter).each {
 				if(it) {
-					if(!it.startsWith("CC")) {
-						licenses << "CC "+it.trim()
-					} else {
-						licenses << it.trim()
-					}
+					licenses << it.trim()
 				}
 			}
 		}

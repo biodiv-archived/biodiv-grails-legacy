@@ -8,6 +8,11 @@
 <r:require modules="susers_list"/>
 <g:set var="entityName"
 	value="${message(code: 'sUser.label', default: 'Users')}" />
+<style>
+    .snippet.tablet {
+        width: 135px;
+    }
+</style>
 </head>
 
 <body>

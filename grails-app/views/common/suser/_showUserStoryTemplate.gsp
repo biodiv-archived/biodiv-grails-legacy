@@ -9,7 +9,7 @@
 		</h5>
 	</g:if>
 
-	<div class="span8" style="padding-bottom: 10px;">
+	<div class="pull-left" style="padding-bottom: 10px;width:100%;">
 		<g:if test="${showDetails}">
 			<div class="prop">
 				<span class="name"><i class="icon-user"></i> <g:message
