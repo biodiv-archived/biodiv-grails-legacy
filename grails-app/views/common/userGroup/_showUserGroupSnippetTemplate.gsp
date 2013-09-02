@@ -8,7 +8,7 @@
 		<a
 			href="${uGroup.createLink(mapping:'userGroup', controller:'userGroup', action:'show', base:userGroupInstance.domainName, 'userGroup':userGroupInstance, 'pos':pos)}">
 			<img
-			class="normal_profile_pic}"
+			class="normal_profile_pic"
 			src="${userGroupInstance.mainImage()?.fileName}" title="${userGroupInstance.name}"
 			alt="${userGroupInstance.name}" /> </a>
 	</div>
