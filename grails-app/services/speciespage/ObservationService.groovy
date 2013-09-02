@@ -1218,8 +1218,10 @@ class ObservationService {
 		paramsList.add('facet.field', searchFieldsConfig.SGROUP);
 		paramsList.add('facet.field', searchFieldsConfig.IS_CHECKLIST);
 		paramsList.add('facet', "true");
-		params["facet.limit"] = params["facet.limit"] ?: 10;
-		paramsList.add('facet.limit', params["facet.limit"]);
+		//params["facet.${searchFieldsConfig.MAX_VOTED_SPECIES_NAME}.limit"] = params["facet.limit"] ?: 10;
+		//params["facet.${searchFieldsConfig.SGROUP}.limit"] = params["facet.limit"] ?: -1;
+		paramsList.add("f.${searchFieldsConfig.MAX_VOTED_SPECIES_NAME}.facet.limit", 10);
+		paramsList.add("f.${searchFieldsConfig.SGROUP}.facet.limit", -1);
 		params["facet.offset"] = params["facet.offset"] ?: 0;
 		paramsList.add('facet.offset', params["facet.offset"]);
 		paramsList.add('facet.mincount', "1");
@@ -1325,12 +1327,14 @@ class ObservationService {
 				}
 			}
 		
+            //TODO:handle isChecklist=false isShowable=true
 			List distinctRecoListFacets = queryResponse.getFacetField(searchFieldsConfig.MAX_VOTED_SPECIES_NAME).getValues()
 			distinctRecoListFacets.each {
                 //TODO second parameter
 				distinctRecoList.add([it.getName(), false, it.getCount()]);
 			}
 	
+            //TODO:handle isChecklist=false
             List speciesGroupCountListFacets = queryResponse.getFacetField(searchFieldsConfig.SGROUP).getValues()
 			speciesGroupCountListFacets.each {
                 //TODO identified and unidentified count
