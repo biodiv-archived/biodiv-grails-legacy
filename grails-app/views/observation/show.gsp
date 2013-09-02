@@ -18,7 +18,7 @@ def r = observationInstance.mainImage();
 def imagePath = '', videoPath='';
 if(r) {
     if(r.type == ResourceType.IMAGE) {
-        imagePath = r.thumbnailUrl(null, observationInstance.sourceId ? '.png' :null, ImageType.LARGE)
+        imagePath = r.thumbnailUrl(null, !observationInstance.resource ? '.png' :null, ImageType.LARGE)
     } else if(r.type == ResourceType.VIDEO){
         imagePath = r.thumbnailUrl()
         videoPath = r.getUrl();
@@ -139,7 +139,7 @@ String desc = "- "+ location +" by "+observationInstance.author.name.capitalize(
 						</g:if>
 						<g:else>
                                                 <img class="galleryImage" style=" ${observationInstance.sourceId? 'opacity:0.7;' :''}"
-                                                src="${observationInstance.mainImage()?.thumbnailUrl(null, observationInstance.sourceId ? '.png' :null, ImageType.LARGE)}" />
+                                                src="${observationInstance.mainImage()?.thumbnailUrl(null, !observationInstance.resource ? '.png' :null, ImageType.LARGE)}" />
 						</g:else>
 
 					</div>
