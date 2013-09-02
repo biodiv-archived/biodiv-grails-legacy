@@ -5,6 +5,8 @@ import java.awt.RenderingHints;
 import java.awt.Transparency;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import javax.imageio.ImageIO;
+import org.imgscalr.*;
 
 import org.apache.commons.logging.LogFactory;
 
@@ -35,7 +37,7 @@ class ImageUtils {
         if(lastIndex != -1) {
             name = fileName.substring(0, lastIndex);
         }
-		ImageUtils.convert(imageFile, new File(dir, name+extension ), config.thumbnail.width, config.thumbnail.height, 100);
+		ImageUtils.doResize(imageFile, new File(dir, name+extension), config.thumbnail.width, config.thumbnail.height);
 
 		log.debug "Creating gallery image";
 		extension = config.gallery.suffix
@@ -92,7 +94,73 @@ class ImageUtils {
 		return (proc.exitValue() == 0)
 	}
 
-	/**
+    /**
+    *Resizing Image to 200*200
+    */
+	public static void doResize(File inImg, File outImg, int width, int height) throws IOException {
+		log.debug "calling doResize function -------------------------------------------------"
+		//String fileName = inImg.getAbsolutePath();
+		//System.out.println(fileName);
+		//String name = fileName.split("[.]")[0];
+		//System.out.println(name);
+		String ext = "jpg";
+		BufferedImage im = null;
+		BufferedImage scaled = null;
+		BufferedImage cropped = null;
+		try {
+			im = ImageIO.read(inImg);
+		} catch (IOException e) {
+
+		}
+		int img_width = im.getWidth();
+		int img_height = im.getHeight();
+		float img_ratio = (img_width) / (float) (img_height);
+		//System.out.println(img_ratio);
+		
+		// Case 1: When Width greater than height of image.
+		if (img_width > img_height) {
+			int new_width = (int) (height * img_ratio);
+			
+			
+			scaled = Scalr.resize(im, Scalr.Method.AUTOMATIC, new_width, height);
+			int sca_height = scaled.getHeight();
+			int x = (new_width - sca_height) / 2;
+			int y = 0;
+			int rect_width = sca_height;
+			int rect_height = sca_height;
+			//System.out.println(x+" "+y+" "+rect_width+" "+rect_height);
+			//System.out.println(scaled.getWidth() +"  "+ scaled.getHeight());
+			//ImageIO.write(scaled, ext, outImg);
+			cropped = scaled.getSubimage(x, y, rect_width, rect_height);
+
+		} 
+		
+		// Case 2: When height greater than width of image.
+		else {
+			int new_height = (int) (width /img_ratio);
+			
+			
+			scaled = Scalr.resize(im, Scalr.Method.AUTOMATIC, width, new_height);
+			int sca_width = scaled.getWidth();
+			int x = 0;
+			int y = (new_height - sca_width) / 2;
+			
+			int rect_width = sca_width;
+			int rect_height = sca_width;
+			//System.out.println(x+" "+y+" "+rect_width+" "+rect_height);
+			//System.out.println(scaled.getWidth() +"  "+ scaled.getHeight());
+			cropped = scaled.getSubimage(x, y, rect_width, rect_height);
+		}
+		//File outputfile = new File(name + "_th1." + ext);
+		try {
+			ImageIO.write(cropped, ext, outImg);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+    /**
 	 * Uses a Runtime.exec()to use jpegoptim program to optimize 
 	 * size of jpg files by stripping off all meta data
 	 *
