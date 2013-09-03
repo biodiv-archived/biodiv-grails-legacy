@@ -7,7 +7,7 @@ import species.utils.Utils;
 import org.grails.rateable.*
 
 class Resource implements Rateable {
-
+	
 	public enum ResourceType {
 		ICON("Icon"),
 		IMAGE("Image"),
@@ -78,6 +78,26 @@ class Resource implements Rateable {
 				log.error "Not a valid type"
 		}		 
 		return thumbnailUrl;
+	}
+	
+	String absPath(){
+		//println "in abs path -----------------------------------------------------";
+		String path = '';
+		switch(this.type){
+			case ResourceType.IMAGE :
+				if(this.observation != null){
+					path = grailsApplication.config.speciesPortal.observations.rootDir + "/" + this.fileName;
+					return path;
+				}
+				else if(this.speciesFields != null){
+					path = grailsApplication.config.speciesPortal.resources.rootDir + "/" + this.fileName;
+					return path;
+				}
+			case ResourceType.VIDEO :
+				log.error "Type Video : Not Supported for now"
+			default :
+				log.error "Not a valid type"
+		}
 	}
 	
 	String getUrl() {
