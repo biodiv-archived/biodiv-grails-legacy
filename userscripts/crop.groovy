@@ -62,11 +62,11 @@ def doCrop(){
 	def sql =  Sql.newInstance(dataSoruce);
 	
 	//gettting all resource for species 
-	def query = "select distinct(resource_id) as id from species_resource";
-	def result = getResoruceId(query, sql)
-	query = "select distinct(resource_id) as id from species_field_resources";
-	result.addAll(getResoruceId(query, sql))
-	_doCrop(result, grailsApplication.config.speciesPortal.resources.rootDir)
+//	def query = "select distinct(resource_id) as id from species_resource";
+//	def result = getResoruceId(query, sql)
+//	query = "select distinct(resource_id) as id from species_field_resources";
+//	result.addAll(getResoruceId(query, sql))
+//	_doCrop(result, grailsApplication.config.speciesPortal.resources.rootDir)
 	
 	
 	query = "select distinct(resource_id) as id from observation_resource";
