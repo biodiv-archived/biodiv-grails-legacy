@@ -221,7 +221,7 @@ speciesPortal {
 		images {
 			defaultType = "jpg"
 			thumbnail {
-				suffix = "_th"+".${defaultType}"
+				suffix = "_th1"+".${defaultType}"
 				width = 200
 				height = 200
 			}
