@@ -5,13 +5,13 @@ import java.util.Date;
 import species.utils.ImageUtils;
 import java.util.*;
 
-def _doCrop(resourceList){
+def _doCrop(resourceList, relativePath){
 	println "===============" + resourceList.size()
 	
 	resourceList.each { res->
 		println "------------------------------------------------------------------"
 		//String fileName = res.fileName;
-		String fileName = res.absPath();
+		String fileName = relativePath + "/" + res.fileName;
 		File file = new File(fileName);
 
 		String name = file.getName();
@@ -57,6 +57,8 @@ def doCrop(){
 	System.out.println(startDate.toString());
 	
 	def dataSoruce = ctx.getBean("dataSource");
+	def grailsApplication = ctx.getBean("grailsApplication");
+	
 	def sql =  Sql.newInstance(dataSoruce);
 	
 	//gettting all resource for species 
@@ -64,12 +66,12 @@ def doCrop(){
 	def result = getResoruceId(query, sql)
 	query = "select distinct(resource_id) as id from species_field_resources";
 	result.addAll(getResoruceId(query, sql))
-	_doCrop(result)
+	_doCrop(result, grailsApplication.config.speciesPortal.resources.rootDir)
 	
 	
-//	query = "select distinct(resource_id) as id from observation_resource";
-//	result = getResoruceId(query, sql)
-//	_doCrop(result)
+	query = "select distinct(resource_id) as id from observation_resource";
+	result = getResoruceId(query, sql)
+	_doCrop(result, grailsApplication.config.speciesPortal.observations.rootDir)
 	
 	println "============= Start  Time " + startDate  + "          end time " + new Date()
 	
