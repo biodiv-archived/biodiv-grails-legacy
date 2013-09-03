@@ -7,6 +7,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import javax.imageio.ImageIO;
 import org.imgscalr.*;
+import java.awt.color.CMMException;
+import java.util.HashMap;
 
 import org.apache.commons.logging.LogFactory;
 
@@ -97,74 +99,77 @@ class ImageUtils {
     /**
     *Resizing Image to 200*200
     */
-	public static void doResize(File inImg, File outImg, int width, int height) throws IOException {
-		log.debug "calling doResize function "
+	public static void doResize(File inImg, File outImg, int width, int height) throws IOException,CMMException {
 		//String fileName = inImg.getAbsolutePath();
 		//System.out.println(fileName);
 		//String name = fileName.split("[.]")[0];
 		//System.out.println(name);
+		HashMap hm = new HashMap();
 		String ext = "jpg";
 		BufferedImage im = null;
 		BufferedImage scaled = null;
 		BufferedImage cropped = null;
 		try {
 			im = ImageIO.read(inImg);
+		
+		int img_width = im.getWidth();
+		int img_height = im.getHeight();
+		float img_ratio = (img_width) / (float) (img_height);
+		//System.out.println(img_ratio);
+		
+		// Case 1: When Width greater than height of image.
+		if (img_width > img_height) {
+			int new_width = (int) (height * img_ratio);
+			
+			
+			scaled = Scalr.resize(im, Scalr.Method.AUTOMATIC, new_width, height);
+			int sca_height = scaled.getHeight();
+			int x = (new_width - sca_height) / 2;
+			int y = 0;
+			int rect_width = sca_height;
+			int rect_height = sca_height;
+			//System.out.println(x+" "+y+" "+rect_width+" "+rect_height);
+			//System.out.println(scaled.getWidth() +"  "+ scaled.getHeight());
+			//ImageIO.write(scaled, ext, outImg);
+			cropped = scaled.getSubimage(x, y, rect_width, rect_height);
+
+		} 
+		
+		// Case 2: When height greater than width of image.
+		else {
+			int new_height = (int) (width /img_ratio);
+			
+			
+			scaled = Scalr.resize(im, Scalr.Method.AUTOMATIC, width, new_height);
+			int sca_width = scaled.getWidth();
+			int x = 0;
+			int y = (new_height - sca_width) / 2;
+			
+			int rect_width = sca_width;
+			int rect_height = sca_width;
+			//System.out.println(x+" "+y+" "+rect_width+" "+rect_height);
+			//System.out.println(scaled.getWidth() +"  "+ scaled.getHeight());
+			cropped = scaled.getSubimage(x, y, rect_width, rect_height);
+		}
+		//File outputfile = new File(name + "_th1." + ext);
+		try {
+			ImageIO.write(cropped, ext, outImg);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		} catch (IOException e) {
 
 		}
-		if(im == null){
-			log.error "RahulImageFile Null" + inImg ;
+		catch(CMMException cmme){
+			hm.put(inImg.getAbsolutePath(),cmme.getMessage());
+			System.out.println(cmme.getMessage());
 		}
-		else{
-			int img_width = im.getWidth();
-			int img_height = im.getHeight();
-			float img_ratio = (img_width) / (float) (img_height);
-			//System.out.println(img_ratio);
 		
-			// Case 1: When Width greater than height of image.
-			if (img_width > img_height) {
-				int new_width = (int) (height * img_ratio);
-			
-			
-				scaled = Scalr.resize(im, Scalr.Method.AUTOMATIC, new_width, height);
-				int sca_height = scaled.getHeight();
-				int x = (new_width - sca_height) / 2;
-				int y = 0;
-				int rect_width = sca_height;
-				int rect_height = sca_height;
-				//System.out.println(x+" "+y+" "+rect_width+" "+rect_height);
-				//System.out.println(scaled.getWidth() +"  "+ scaled.getHeight());
-				//ImageIO.write(scaled, ext, outImg);
-				cropped = scaled.getSubimage(x, y, rect_width, rect_height);
-
-			} 
+		System.out.println("====================Error ==================");
+		System.out.println(hm);
+		System.out.println("==================== End Error ==================");
 		
-			// Case 2: When height greater than width of image.
-			else {
-				int new_height = (int) (width /img_ratio);
-			
-			
-				scaled = Scalr.resize(im, Scalr.Method.AUTOMATIC, width, new_height);
-				int sca_width = scaled.getWidth();
-				int x = 0;
-				int y = (new_height - sca_width) / 2;
-			
-				int rect_width = sca_width;
-				int rect_height = sca_width;
-				//System.out.println(x+" "+y+" "+rect_width+" "+rect_height);
-				//System.out.println(scaled.getWidth() +"  "+ scaled.getHeight());
-				cropped = scaled.getSubimage(x, y, rect_width, rect_height);
-			}
-			//File outputfile = new File(name + "_th1." + ext);
-			try {
-				ImageIO.write(cropped, ext, outImg);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			jpegOptimize(outImg);
-		}
-
 	}
     /**
 	 * Uses a Runtime.exec()to use jpegoptim program to optimize 
