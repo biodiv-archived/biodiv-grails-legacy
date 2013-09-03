@@ -79,6 +79,10 @@ grails.project.dependency.resolution = {
         //runtime 'postgresql:postgis:2.0.0SVN' {
         //  runtime 'postgresql:postgresql:8.3-603.jdbc4'
         //}
+
+        compile 'org.imgscalr:imgscalr-lib:4.2'
+        
+
     }
     plugins { 
         compile ":spring-security-core:1.2.7.3" 
