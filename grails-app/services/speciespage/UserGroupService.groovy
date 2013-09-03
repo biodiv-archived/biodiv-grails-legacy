@@ -813,8 +813,8 @@ class UserGroupService {
 	def userGroupBasedLink(attrs) {
 		def g = new org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib()
 
-		//		println '-------------'
-		//		println attrs
+		//println '-------------'
+		//println attrs
 		String url = "";
 
 		if(attrs.userGroup && attrs.userGroup.id) {
@@ -1262,22 +1262,24 @@ class UserGroupService {
 			newList.removeAll(obvs)
 			obvs = newList
 		}
-		
 		println "============ " +  obvs.size()
 		println "============== " + groups
-		groups.each { ug ->
-			
-			if(submitType == 'post'){
-				obvs.each { obv ->
-					ug.addToObservations(obv)
+		UserGroup.withTransaction(){
+			groups.each { ug ->
+				if(submitType == 'post'){
+					obvs.removeAll(ug.observations)
+					println "==for group========== " +  obvs.size()
+					obvs.each { obv ->
+						ug.addToObservations(obv)
+					}
+				}else{
+					obvs.each { obv ->
+						ug.removeFromObservations(obv)
+					}
 				}
-			}else{
-				obvs.each { obv ->
-					ug.removeFromObservations(obv)
+				if(!ug.save()){
+					ug.errors.allErrors.each { log.error it }
 				}
-			}
-			if(!ug.save()){
-				ug.errors.allErrors.each { log.error it }
 			}
 		}
 	}

@@ -79,7 +79,7 @@
                         </div>
                         <div class="span4" style="position:relative;top:20px">
                  <div class="sidebar_section" style="clear:both;overflow:hidden;display:none;">
-                 	<uGroup:objectPostToGroups model="['objectType':Observation.class.canonicalName]"/>
+                 	<uGroup:objectPostToGroups model="['objectType':Observation.class.canonicalName, userGroup:params.userGroup]"/>
                  </div>       
 				<div id="observations_list_map" class="observation sidebar_section"
                                     style="clear:both;display:none;overflow:hidden;">

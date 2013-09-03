@@ -12,9 +12,9 @@
 	                <uGroup:getCurrentUserUserGroups model="[]"/>
 	            </div>
 	        </div>
-	    <a onclick="submitToGroups('post', '${objectType}', '${uGroup.createLink(controller:'userGroup', action:'bulkPost')}');return false;" class="btn btn-primary"
+	    <a onclick="submitToGroups('post', '${objectType}', '${uGroup.createLink(controller:'userGroup', action:'bulkPost', userGroup:userGroup)}');return false;" class="btn btn-primary"
                         style="float: right; margin-right: 5px;"> Post </a>
-	    <a onclick="submitToGroups('unpost', '${objectType}', '${uGroup.createLink(controller:'userGroup', action:'bulkPost')}');return false;" class="btn btn-danger"
+	    <a onclick="submitToGroups('unpost', '${objectType}', '${uGroup.createLink(controller:'userGroup', action:'bulkPost', userGroup:userGroup)}');return false;" class="btn btn-danger"
                         style="float: right; margin-right: 5px;"> Unpost </a>
        </div>
 	</uGroup:isUserGroupMember>

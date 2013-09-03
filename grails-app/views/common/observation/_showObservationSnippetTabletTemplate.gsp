@@ -32,10 +32,8 @@ def obvId = observationInstance.id
                 </div>
                
 	</div>
-	
-	    
-<%--	<div class="caption" >--%>
-<%--		<obv:showStoryTablet--%>
-<%--			model="['observationInstance':observationInstance, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress]"></obv:showStoryTablet>--%>
-<%--	</div>--%>
+	<div class="caption" >
+		<obv:showStoryTablet
+			model="['observationInstance':observationInstance, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress]"></obv:showStoryTablet>
+	</div>
 </div>
