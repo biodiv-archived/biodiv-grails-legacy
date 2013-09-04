@@ -208,7 +208,7 @@
 		<!--document reference annotations -->
 		<field name="id" type="string" indexed="true" stored="true"
 			required="true" multiValued="false" />
-				
+		<field name="_version_" type="long" indexed="true" stored="true" multiValued="false"/>		
 				
 		<field name="name" type="text" indexed="true" stored="true" required="true" multiValued="false" />					
 		<field name="text" type="text" indexed="true" stored="true" multiValued="true" />

@@ -5,8 +5,11 @@ target/
 target-eclipse/
 app-conf/solr/*/data/
 app-conf/data/
+app-conf/solr/\\
 .settings/
 /stacktrace.log
+*.bak
+error.txt
 
 *.svn
 
@@ -48,3 +51,5 @@ app-conf/data/
 Icon?
 ehthumbs.db
 Thumbs.db
+.swp
+.gsp~

@@ -136,9 +136,9 @@ class SUser {
 		def baseUrl = grailsApplication.config.speciesPortal.resources.serverURL;
 		switch(type) {
 			case ImageType.NORMAL :
-				case ImageType.LARGE : return baseUrl+"/users/user_large.png"
-			case ImageType.SMALL : return baseUrl+"/users/user.png"
-			case ImageType.VERY_SMALL : return baseUrl+"/users/user_small.png"
+				case ImageType.LARGE : return baseUrl+"/user_large.png"
+			case ImageType.SMALL : return baseUrl+"/user.png"
+			case ImageType.VERY_SMALL : return baseUrl+"/user_small.png"
 		}
 	}
 
