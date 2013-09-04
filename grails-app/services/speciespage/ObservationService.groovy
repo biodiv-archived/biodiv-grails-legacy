@@ -781,22 +781,25 @@ class ObservationService {
         hqlQuery.setProperties(queryParts.queryParams);
 		def observationInstanceList = hqlQuery.list();
 		
-        checklistCountQuery.setProperties(queryParts.queryParams)
-		checklistCount = checklistCountQuery.list()[0]
-
-        allObservationCountQuery.setProperties(queryParts.queryParams)
-		allObservationCount = allObservationCountQuery.list()[0]
-
-        distinctRecoQuery.setProperties(queryParts.queryParams)
-		def distinctRecoListResult = distinctRecoQuery.list()
         def distinctRecoList = [];
-        distinctRecoListResult.each {it->
-            def reco = Recommendation.read(it[0]);
-            distinctRecoList << [reco.name, reco.isScientificName, it[1]]
-        }
+        def speciesGroupCountList = [];
+		if(!params.loadMore?.toBoolean()) {
+            checklistCountQuery.setProperties(queryParts.queryParams)
+            checklistCount = checklistCountQuery.list()[0]
 
-        speciesGroupCountQuery.setProperties(queryParts.queryParams)
-		def speciesGroupCountList = getFormattedResult(speciesGroupCountQuery.list())
+            allObservationCountQuery.setProperties(queryParts.queryParams)
+            allObservationCount = allObservationCountQuery.list()[0]
+
+            distinctRecoQuery.setProperties(queryParts.queryParams)
+            def distinctRecoListResult = distinctRecoQuery.list()
+            distinctRecoListResult.each {it->
+                def reco = Recommendation.read(it[0]);
+                distinctRecoList << [reco.name, reco.isScientificName, it[1]]
+            }
+
+            speciesGroupCountQuery.setProperties(queryParts.queryParams)
+            speciesGroupCountList = getFormattedResult(speciesGroupCountQuery.list())
+        }
 
 		if(params.daterangepicker_start){
 			queryParts.queryParams["daterangepicker_start"] = params.daterangepicker_start
@@ -944,7 +947,7 @@ class ObservationService {
 		def checklistCountQuery = "select count(*) from Observation obv " + userGroupQuery +" "+((params.tag)?tagQuery:'')+filterQuery + " and obv.isChecklist = true "
 		def allObservationCountQuery = "select count(*) from Observation obv " + userGroupQuery +" "+((params.tag)?tagQuery:'')+filterQuery
 		
-        def speciesGroupCountQuery = "select obv.group.name, count(*),(case when obv.maxVotedReco.id is not null  then 1 else 2 end) from Observation obv  "+ userGroupQuery +" "+((params.tag)?tagQuery:'')+filterQuery+ "and obv.isChecklist=false group by obv.group.name,(case when obv.maxVotedReco.id is not null  then 1 else 2 end) order by obv.group.name desc";
+        def speciesGroupCountQuery = "select obv.group.name, count(*),(case when obv.maxVotedReco.id is not null  then 1 else 2 end) from Observation obv  "+ userGroupQuery +" "+((params.tag)?tagQuery:'')+filterQuery+ " and isChecklist=false group by obv.group.name,(case when obv.maxVotedReco.id is not null  then 1 else 2 end) order by obv.group.name desc";
 
 		return [query:query, allObservationCountQuery:allObservationCountQuery, checklistCountQuery:checklistCountQuery, distinctRecoQuery:distinctRecoQuery, speciesGroupCountQuery:speciesGroupCountQuery, filterQuery:filterQuery, orderByClause:orderByClause, queryParams:queryParams, activeFilters:activeFilters]
 
@@ -1110,7 +1113,6 @@ class ObservationService {
 		
 		
 		NamedList paramsList = new NamedList();
-	    paramsList.add(searchFieldsConfig.IS_SHOWABLE, true);
 
 		//params.userName = springSecurityService.currentUser.username;
 		queryParams["query"] = params.query
@@ -1210,19 +1212,7 @@ class ObservationService {
 		
 		paramsList.add('fl', params['fl']?:"id");
 		
-		//Facets
-		params["facet.field"] = params["facet.field"] ?: searchFieldsConfig.MAX_VOTED_SPECIES_NAME;
-		paramsList.add('facet.field', searchFieldsConfig.SGROUP);
-		paramsList.add("f.${searchFieldsConfig.SGROUP}.facet.limit", -1);
-		paramsList.add('facet.field', searchFieldsConfig.IS_CHECKLIST);
-		paramsList.add('facet', "true");
-		//params["facet.${searchFieldsConfig.MAX_VOTED_SPECIES_NAME}.limit"] = params["facet.limit"] ?: 10;
-		//params["facet.${searchFieldsConfig.SGROUP}.limit"] = params["facet.limit"] ?: -1;
-		params["facet.offset"] = params["facet.offset"] ?: 0;
-		paramsList.add('facet.offset', params["facet.offset"]);
-		paramsList.add('facet.mincount', "1");
 		
-
 		//Filters
 		if(params.sGroup) {
 			params.sGroup = params.sGroup.toLong()
@@ -1310,8 +1300,40 @@ class ObservationService {
 		long noOfResults = 0;
 		long checklistCount = 0
         List distinctRecoList = [];
-        def speciesGroupCountList = []
+        def speciesGroupCountList = [];
 		if(paramsList) {
+            //Facets
+            def speciesGroups;
+		    if(!params.loadMore?.toBoolean()){
+                paramsList.add('facet', "true");
+                params["facet.offset"] = params["facet.offset"] ?: 0;
+                paramsList.add('facet.offset', params["facet.offset"]);
+                paramsList.add('facet.mincount', "1");
+                    
+                paramsList.add(searchFieldsConfig.IS_CHECKLIST, false);
+                paramsList.add('facet.field', searchFieldsConfig.MAX_VOTED_SPECIES_NAME+"_exact");
+                paramsList.add("f.${searchFieldsConfig.MAX_VOTED_SPECIES_NAME}_exact.facet.limit", 10);
+                def qR = observationsSearchService.search(paramsList);
+                List distinctRecoListFacets = qR.getFacetField(searchFieldsConfig.MAX_VOTED_SPECIES_NAME+"_exact").getValues()
+                distinctRecoListFacets.each {
+                    //TODO second parameter, isScientificName
+                    distinctRecoList.add([it.getName(), true, it.getCount()]);
+                }
+                
+                paramsList.remove('facet.field');
+                paramsList.remove("f.${searchFieldsConfig.MAX_VOTED_SPECIES_NAME}_exact.facet.limit");
+
+                paramsList.add(searchFieldsConfig.IS_SHOWABLE, 'true');
+                paramsList.add('facet.field', searchFieldsConfig.SGROUP);
+                //paramsList.add("f.${searchFieldsConfig.SGROUP}.facet.limit", -1);
+                paramsList.add('facet.field', searchFieldsConfig.IS_CHECKLIST);
+                speciesGroups = SpeciesGroup.list();
+                speciesGroups.each {
+                    paramsList.add('facet.query', "${searchFieldsConfig.SGROUP}:${it.id} AND ${searchFieldsConfig.IS_CHECKLIST}:false AND ${searchFieldsConfig.MAX_VOTED_SPECIES_NAME}_exact:Unknown");
+                    paramsList.add('facet.query', "${searchFieldsConfig.SGROUP}:${it.id} AND ${searchFieldsConfig.IS_CHECKLIST}:false");
+                }
+            }
+
 			def queryResponse = observationsSearchService.search(paramsList);
 			Iterator iter = queryResponse.getResults().listIterator();
 			while(iter.hasNext()) {
@@ -1323,51 +1345,37 @@ class ObservationService {
 				}
 			}
 		
-            //TODO:handle isChecklist=false and isShowable = true
-            List speciesGroupCountListFacets = queryResponse.getFacetField(searchFieldsConfig.SGROUP).getValues()
-			speciesGroupCountListFacets.each {
-                //TODO identified and unidentified count
-				speciesGroupCountList.add([it.getName(),it.getCount(), 0]);
-			}
-		    speciesGroupCountList = getFormattedResult(speciesGroupCountList)
-
-            List isChecklistFacets = queryResponse.getFacetField(searchFieldsConfig.IS_CHECKLIST).getValues()
-			isChecklistFacets.each {
-                if(it.getName() == 'true')
-                    checklistCount = it.getCount()
+		    if(!params.loadMore?.toBoolean()){
+                //TODO:handle isChecklist=false and isShowable = true
+                List speciesGroupCountListFacets = queryResponse.getFacetField(searchFieldsConfig.SGROUP).getValues()
+                Map speciesGroupUnidentifiedCountListFacets = queryResponse.getFacetQuery()		
+                speciesGroups.each {
+                    if(it.name != grailsApplication.config.speciesPortal.group.ALL) {
+                        String key = "${searchFieldsConfig.SGROUP}:${it.id} AND ${searchFieldsConfig.IS_CHECKLIST}:false"
+                        String unidentifiedKey = "${searchFieldsConfig.SGROUP}:${it.id} AND ${searchFieldsConfig.IS_CHECKLIST}:false AND ${searchFieldsConfig.MAX_VOTED_SPECIES_NAME}_exact:Unknown";
+                        long all = speciesGroupUnidentifiedCountListFacets.get(key);
+                        long unIdentified = speciesGroupUnidentifiedCountListFacets.get(unidentifiedKey)
+                        if(all | unIdentified)
+                            speciesGroupCountList.add([it.name, all, unIdentified]);
+                    }
+                }
+               
+                speciesGroupCountList = speciesGroupCountList.sort {a,b->a[0]<=>b[0]}
+                speciesGroupCountList = [data:speciesGroupCountList?:[], columns:[
+                    ['string', 'Species Group'],
+                    ['number', 'All'],
+                    ['number', 'Unidentified']
+                ]]
+            
+                List isChecklistFacets = queryResponse.getFacetField(searchFieldsConfig.IS_CHECKLIST).getValues()
+                isChecklistFacets.each {
+                    if(it.getName() == 'true')
+                        checklistCount = it.getCount()
+                }
             }
 
 			responseHeader = queryResponse?.responseHeader;
 			noOfResults = queryResponse.getResults().getNumFound()
-	
-            //TODO:handle isChecklist=false isShowable=true or false
-            paramsList.remove(searchFieldsConfig.IS_SHOWABLE);
-            paramsList.add(searchFieldsConfig.IS_CHECKLIST, false);
-            paramsList.add('facet.field', searchFieldsConfig.MAX_VOTED_SPECIES_NAME);
-		    paramsList.add("f.${searchFieldsConfig.MAX_VOTED_SPECIES_NAME}.facet.limit", 10);
-			def qR = observationsSearchService.search(paramsList);
-			List distinctRecoListFacets = qR.getFacetField(searchFieldsConfig.MAX_VOTED_SPECIES_NAME).getValues()
-			distinctRecoListFacets.each {
-                //TODO second parameter, isScientificName
-				distinctRecoList.add([it.getName(), false, it.getCount()]);
-			}
-
-/*	
-		def distinctRecoQuery = "select obv.maxVotedReco.id, count(*) from Observation obv  "+ userGroupQuery +" "+((params.tag)?tagQuery:'')+filterQuery+ "and obv.isChecklist=false and obv.maxVotedReco is not null group by obv.maxVotedReco order by count(*) desc";
-
-	    filterQuery += " and obv.isShowable = true "; 
-
-		def orderByClause = " order by obv." + (params.sort ? params.sort : "lastRevised") +  " desc, obv.id asc"
-		
-		def checklistCountQuery = "select count(*) from Observation obv " + userGroupQuery +" "+((params.tag)?tagQuery:'')+filterQuery + " and obv.isChecklist = true "
-		def allObservationCountQuery = "select count(*) from Observation obv " + userGroupQuery +" "+((params.tag)?tagQuery:'')+filterQuery
-		
-        def speciesGroupCountQuery = "select obv.group.name, count(*),(case when obv.maxVotedReco.id is not null  then 1 else 2 end) from Observation obv  "+ userGroupQuery +" "+((params.tag)?tagQuery:'')+filterQuery+ "and obv.isChecklist=false group by obv.group.name,(case when obv.maxVotedReco.id is not null  then 1 else 2 end) order by obv.group.name desc";
-*/
-
-		//def distinctRecoList = distinctRecoQuery.list()
-
-
 
 		}
 		/*if(responseHeader?.params?.q == "*:*") {

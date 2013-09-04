@@ -467,7 +467,7 @@ environments {
 	development {
 		grails.serverURL = "http://indiabiodiversity.localhost.org/${appName}"
 		speciesPortal {
-			search.serverURL = "http://localhost:8081/solr"
+			search.serverURL = "http://localhost:8090/solr"
 			names.parser.serverURL = "saturn.strandls.com"
 			wgp {
 				facebook {
@@ -489,16 +489,16 @@ environments {
 		
 		grails {
 			mail {
-			 //host = "127.0.0.1"
-			 //port = 25
-			 host = "smtp.gmail.com"
+			 host = "127.0.0.1"
+			 port = 25
+			 /*host = "smtp.gmail.com"
 			 port = 465
 			 username = "kinleygrails@gmail.com"
 			 password = "Fl0w3rs123"
 			 props = ["mail.smtp.auth":"true", 					   
 			          "mail.smtp.socketFactory.port":"465",
 			          "mail.smtp.socketFactory.class":"javax.net.ssl.SSLSocketFactory",
-			          "mail.smtp.socketFactory.fallback":"false"]
+			          "mail.smtp.socketFactory.fallback":"false"]*/
 			}
 		}
 

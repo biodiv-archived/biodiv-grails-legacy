@@ -1071,7 +1071,6 @@ class ObservationController {
 		} else if(!params.isGalleryUpdate?.toBoolean()){
             model['width'] = 300;
             model['height'] = 200;
-
 			params.remove('isGalleryUpdate');
 			render (view:"search", model:model)
 			return;
