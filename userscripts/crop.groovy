@@ -6,18 +6,14 @@ import species.utils.ImageUtils;
 import java.util.*;
 
 def _doCrop(resourceList, relativePath){
-	println "===============" + resourceList.size()
-	HashMap hm = new HashMap();
+	println "=============== " + resourceList.size()
 	resourceList.each { res->
-		println "------------------------------------------------------------------"
-		//String fileName = res.fileName;
+		println "------------------------------------------------------------------ " + res.id
 		String fileName = relativePath + "/" + res.fileName;
 		File file = new File(fileName);
 
 		String name = file.getName();
 		String parent = file.getParent();
-		//println name;
-		//println parent;
 		String inName = name;
 		int lastIndex = name.lastIndexOf('.');
 		if(lastIndex != -1) {
@@ -25,26 +21,20 @@ def _doCrop(resourceList, relativePath){
 		}
 
 		String outName = inName + "_th1.jpg"
-		//println inName;
-		//println outName;
 		println file;
 		File dir = new File(parent);
 		File outImg = new File(dir,outName);
-		//println "out file full path";
 		println outImg;
 		try{
 			ImageUtils.doResize(file, outImg, 200, 200);
 		}catch (Exception e) {
-			hm.put(fileName.getAbsolutePath(), res + "  " + e.getMessage());
+			println "==========================ee=== " + e.getMessage()
 		}
-		System.out.println("====================Error ==================" + hm.size() );
-		System.out.println(hm);
-		System.out.println("==================== End Error ==================");
 	}
 }
 
 def getResoruceId(query, sql){
-	def result = new HashSet()
+	def result = []
 	sql.rows(query).each{
 		def res = Resource.read(it.getProperty("id"));
 		if(res.type == Resource.ResourceType.IMAGE){
@@ -66,20 +56,18 @@ def doCrop(){
 
 	def sql =  Sql.newInstance(dataSoruce);
 
-	//gettting all resource for species
-	//	def query = "select distinct(resource_id) as id from species_resource";
-	//	def result = getResoruceId(query, sql)
-	//	query = "select distinct(resource_id) as id from species_field_resources";
-	//	result.addAll(getResoruceId(query, sql))
-	//	_doCrop(result, grailsApplication.config.speciesPortal.resources.rootDir)
+	gettting all resource for species
+	def query = "select distinct(resource_id) as id from species_resource order by resource_id";
+	def result = getResoruceId(query, sql)
+	query = "select distinct(resource_id) as id from species_field_resources order by resource_id";
+	result.addAll(getResoruceId(query, sql))
+	_doCrop(result, grailsApplication.config.speciesPortal.resources.rootDir)
 
-
-	query = "select distinct(resource_id) as id from observation_resource";
+	query = "select distinct(resource_id) as id from observation_resource order by resource_id";
 	result = getResoruceId(query, sql)
 	_doCrop(result, grailsApplication.config.speciesPortal.observations.rootDir)
 
 	println "============= Start  Time " + startDate  + "          end time " + new Date()
-
 }
 
 doCrop();
