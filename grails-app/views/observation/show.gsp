@@ -273,7 +273,7 @@ String desc = "- "+ location +" by "+observationInstance.author.name.capitalize(
 		$('#gallery1').galleria({
 			height : 400,
 			preload : 1,
-			carousel : true,
+			carousel : false,
 			transition : 'pulse',
 			image_pan_smoothness : 5,
 			showInfo : true,
@@ -283,7 +283,7 @@ String desc = "- "+ location +" by "+observationInstance.author.name.capitalize(
 			maxScaleRatio : 1,
 			minScaleRatio : 1,
                         _toggleInfo: false,
-                        thumbnails:false,
+                        thumbnails:true,
                         showCounter:true,
                         idleMode:false,
 			youtube : {
@@ -313,8 +313,11 @@ String desc = "- "+ location +" by "+observationInstance.author.name.capitalize(
                         }
                 });
                 Galleria.ready(function() {
+                    
                     $("#gallerySpinner").hide();
                     $("#gallery1").css('visibility', 'visible');
+                    $(".galleria-thumbnails-container").hide();
+
                 });
 	
 
