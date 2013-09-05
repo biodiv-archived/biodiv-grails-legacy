@@ -36,11 +36,13 @@ grails.project.dependency.resolution = {
 
         // runtime 'mysql:mysql-connector-java:5.1.13'
         compile ('org.apache.solr:solr-solrj:4.4.0') {
+            //excludes 'slf4j-api', 'jcl-over-slf4j', 'slf4j-log4j12'
             excludes 'slf4j-api', 'jcl-over-slf4j'
         }
         if (Environment.current == Environment.DEVELOPMENT) {
                 //compile ('org.apache.solr:solr-core:3.6.0') {
                 compile ('org.apache.solr:solr-core:4.4.0') {
+                    //excludes 'slf4j-api', 'jcl-over-slf4j', 'geronimo-stax-api_1.0_spec', 'slf4j-log4j12'
                     excludes 'slf4j-api', 'jcl-over-slf4j', 'geronimo-stax-api_1.0_spec'
                 }
         }

@@ -41,16 +41,16 @@ class SUserSearchService {
 		
 		def susers;
 		def startTime = System.currentTimeMillis()
-		//while(true) {
-			susers = SUser.findAllWhere(accountLocked: false, accountExpired: false, enabled: true);
-			//susers = SUser.findAllByAccountLockedLikeAndAccountExpiredLikeAndEnabled(false, false, true, sort: "id");
-			//if(!susers) break;
+		while(true) {
+			//susers = SUser.findAllWhere(accountLocked: false, accountExpired: false, enabled: true);
+			susers = SUser.findAllByAccountLockedAndAccountExpiredAndEnabled(false, false, true, [max:limit, offset:offset, sort: "id"]);
+			if(!susers) break;
 			if(susers)  {
 				publishSearchIndex(susers, true);
 				susers.clear();
 			}
-			//offset += limit;
-		//}
+			offset += limit;
+		}
 		
 		log.info "Time taken to publish users search index is ${System.currentTimeMillis()-startTime}(msec)";
 	}

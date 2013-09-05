@@ -310,7 +310,7 @@ class SUserController extends UserController {
 			return;
 		}
 	}
-/*
+
 	private def getUsersList(params) {
 		boolean useOffset = params.containsKey('offset')
 		setIfMissing 'max', 12, 100
@@ -376,7 +376,7 @@ class SUserController extends UserController {
 			 totalCount = lookupUserClass().executeQuery("SELECT COUNT(DISTINCT u) $hql", queryParams)[0]
 			 }*/
 
-			/*Integer max = params.int('max')
+			Integer max = params.int('max')
 			Integer offset = params.int('offset')
 
 			String orderBy = ''
@@ -405,10 +405,10 @@ class SUserController extends UserController {
 			//		}
 		}
 
-		return ['userInstanceList': results, instanceTotal: totalCount, queryParams:queryParams, searched: true]
+		return ['userInstanceList': results, instanceTotal: totalCount, searchQuery:queryParams, searched: true]
 
 	}
-*/
+
 	// Define a closure that will do the sorting
 	def sorter = { SUser a, SUser b, String prefix ->
 		// Get the index into order for a and b
