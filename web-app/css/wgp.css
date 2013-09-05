@@ -93,10 +93,11 @@ h6 {
 }
 
 .snippet.tablet {
-	width: 140px;
-	height: 150px;
+	width: 150px;
+	height: 200px;
 	overflow: hidden;
 	position: relative;
+	border-radius: 5px;
 }
 
 .snippet.tablet .figure {
@@ -104,12 +105,11 @@ h6 {
 	width:auto;
 }
 .snippet.tablet .caption {
-	height:30px;
-        padding:9px 0px;
+	height:50px;
+        padding:0px 0px;
 }
 
 .snippet.tablet .caption .story-footer {
-        right:32px;
         left:0px;
 }
 
@@ -124,13 +124,13 @@ h6 {
 .thumbnail .figure a, .thumbnail .figure span {
 	display: table-cell;
 	vertical-align: middle;
-	max-height: 100px;
-	max-width: 140px;
+	max-height: 150px;
+	max-width: 150px;
 }
 
 .thumbnail .figure .img-polaroid {
-	max-height: 100px;
-	max-width: 140px;
+	max-height: 150px;
+	max-width: 150px;
         padding:0px;
 /* 	height:100%; */
 /* 	width: auto; */
@@ -1317,8 +1317,13 @@ span.cke_skin_kama {
 	border: 0px;
 }
 
+.tablet h5 {
+    margin:5px 0;
+}
+
 .tablet .species_title {
-	height: 38px;
+	height: 20px;
+        padding: 0px 2px 0 2px;
 }
 
 /*USER GROUP START*/

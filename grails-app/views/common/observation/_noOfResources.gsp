@@ -4,11 +4,12 @@
 def iconClass='';
 def noOfResources = instance.fetchResourceCount();
 %>
-<div class="story-footer" style="right:0px;${bottom?:''}z-index:5;${bottom?'background-color:whitesmoke':''}">
-    
-    <div id="viewThumbnails" class="footer-item">
+
+    <g:if test="${bottom}">
+    <button id="viewThumbnails" class="footer-item" style="margin-left:0px;">
         <i class="icon-th" title="View thumbnails"></i>
-    </div>
+    </button>
+    </g:if>
 
     <g:if test="${noOfResources}">
         <g:each in="${noOfResources}" var="no">
@@ -18,4 +19,3 @@ def noOfResources = instance.fetchResourceCount();
         </div>
         </g:each>
     </g:if>
-</div>

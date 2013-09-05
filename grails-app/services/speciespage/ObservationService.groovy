@@ -783,13 +783,13 @@ class ObservationService {
 		
         def distinctRecoList = [];
         def speciesGroupCountList = [];
+        checklistCountQuery.setProperties(queryParts.queryParams)
+        checklistCount = checklistCountQuery.list()[0]
+
+        allObservationCountQuery.setProperties(queryParts.queryParams)
+        allObservationCount = allObservationCountQuery.list()[0]
+
 		if(!params.loadMore?.toBoolean()) {
-            checklistCountQuery.setProperties(queryParts.queryParams)
-            checklistCount = checklistCountQuery.list()[0]
-
-            allObservationCountQuery.setProperties(queryParts.queryParams)
-            allObservationCount = allObservationCountQuery.list()[0]
-
             distinctRecoQuery.setProperties(queryParts.queryParams)
             def distinctRecoListResult = distinctRecoQuery.list()
             distinctRecoListResult.each {it->
@@ -1304,13 +1304,14 @@ class ObservationService {
 		if(paramsList) {
             //Facets
             def speciesGroups;
+            paramsList.add('facet', "true");
+            params["facet.offset"] = params["facet.offset"] ?: 0;
+            paramsList.add('facet.offset', params["facet.offset"]);
+            paramsList.add('facet.mincount', "1");
+                
+            paramsList.add(searchFieldsConfig.IS_CHECKLIST, false);
+
 		    if(!params.loadMore?.toBoolean()){
-                paramsList.add('facet', "true");
-                params["facet.offset"] = params["facet.offset"] ?: 0;
-                paramsList.add('facet.offset', params["facet.offset"]);
-                paramsList.add('facet.mincount', "1");
-                    
-                paramsList.add(searchFieldsConfig.IS_CHECKLIST, false);
                 paramsList.add('facet.field', searchFieldsConfig.MAX_VOTED_SPECIES_NAME+"_exact");
                 paramsList.add("f.${searchFieldsConfig.MAX_VOTED_SPECIES_NAME}_exact.facet.limit", 10);
                 def qR = observationsSearchService.search(paramsList);
