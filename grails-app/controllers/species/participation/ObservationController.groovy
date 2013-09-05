@@ -92,7 +92,6 @@ class ObservationController {
 		
 		def model = getObservationList(params);
 		if(params.loadMore?.toBoolean()){
-            println "++++++++++++++++++++"+model;
 			render(template:"/common/observation/showObservationListTemplate", model:model);
 			return;
 		} else if(!params.isGalleryUpdate?.toBoolean()){

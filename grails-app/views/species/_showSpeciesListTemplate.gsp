@@ -38,9 +38,9 @@
 											file: thumbnailPath)}"
 										title=" ${speciesInstance.taxonConcept.name.replaceAll('<.*>','')}" />
 								</g:if> <g:else>
-									<img class="img-polaroid"
+									<img class="img-polaroid" style="opacity:0.7;"
 										title="${speciesInstance.taxonConcept.name.replaceAll('<.*>','')}"
-										src="${createLinkTo(dir: 'images', file:speciesInstance.fetchSpeciesGroupIcon(ImageType.VERY_SMALL)?.fileName, absolute:true)}"></img>
+										src="${createLinkTo(dir: 'images', file:speciesInstance.fetchSpeciesGroupIcon(ImageType.NORMAL)?.fileName, absolute:true)}"></img>
 								</g:else> </a>
 						</div>
 						<a
