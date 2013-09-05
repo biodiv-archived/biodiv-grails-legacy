@@ -6,8 +6,8 @@ def controller = observationInstance.isChecklist ? 'checklist' :'observation'
 def obvId = observationInstance.id
 %>
 <div class="snippet tablet">
-	<div class="figure" style="height:150px;"
-		title='<g:if test="${obvTitle != null}">${obvTitle}</g:if>'>
+    <div class="figure"
+        title='<g:if test="${obvTitle != null}">${obvTitle}</g:if>'>
                 <g:link url="${uGroup.createLink(controller:controller, action:'show', id:obvId, 'pos':pos, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress) }" name="g${pos}">
 			<g:if
 				test="${imagePath}">

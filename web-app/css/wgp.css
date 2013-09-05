@@ -92,6 +92,11 @@ h6 {
 	/* width: 630px;          */
 }
 
+.thumbnails>li {
+    margin:0 2px 2px 0px;
+    padding:0px;
+}
+
 .snippet.tablet {
 	width: 150px;
 	height: 200px;
@@ -101,7 +106,7 @@ h6 {
 }
 
 .snippet.tablet .figure {
-	height:100px;
+	height:150px;
 	width:auto;
 }
 .snippet.tablet .caption {
@@ -1965,10 +1970,6 @@ div.noOfRatings {
    text-align:center; 
    background-color:whitesmoke;
    box-shadow: 0 4px 3px -3px #5e5e5e;
-}
-
-.thumbnails > li {
-    margin: 0 0 10px 10px;
 }
 
 #contributeMenu {
