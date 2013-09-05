@@ -1658,6 +1658,7 @@ class ObservationService {
 		    if ( Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
 			//if ( Environment.getCurrent().getName().equalsIgnoreCase("development")) {
 		            log.debug "Sending email to ${toUser}"
+                    try{
 					mailService.sendMail {
 						to toUser.email
 						if(index == 0) {
@@ -1681,6 +1682,10 @@ class ObservationService {
 							html bodyContent
 						}
 					}
+                    } catch(Exception e) {
+                        log.error "Error sending message ${e.getMessage()} toUser : ${toUser} "
+                        e.printStackTrace();
+                    }
 				}
 			}
 		}
