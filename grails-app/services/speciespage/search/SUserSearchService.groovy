@@ -37,13 +37,12 @@ class SUserSearchService {
 		log.info "Initializing publishing to ufiles search index"
 		
 		//TODO: change limit
-		int limit = 10, offset = 0;
+		int limit = BATCH_SIZE, offset = 0;
 		
 		def susers;
 		def startTime = System.currentTimeMillis()
 		while(true) {
-			//susers = SUser.findAllWhere(accountLocked: false, accountExpired: false, enabled: true);
-			susers = SUser.findAllByAccountLockedAndAccountExpiredAndEnabled(false, false, true, [max:limit, offset:offset, sort: "id"]);
+			susers = SUser.findAll("from SUser as u where u.accountLocked =:ae and u.accountExpired =:al and u.enabled=:en", [ae:false, al:false, en:true], [max:limit, offset:offset, sort: "id"]);
 			if(!susers) break;
 			if(susers)  {
 				publishSearchIndex(susers, true);
