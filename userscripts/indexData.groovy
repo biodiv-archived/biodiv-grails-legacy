@@ -31,6 +31,7 @@ def projectSearchService = ctx.getBean("projectSearchService");
 projectSearchService.deleteIndex();
 projectSearchService.publishSearchIndex();
 */
+
 /*def documentSearchService = ctx.getBean("documentSearchService");
 documentSearchService.deleteIndex();
 documentSearchService.publishSearchIndex();
