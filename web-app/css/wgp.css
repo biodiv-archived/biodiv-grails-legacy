@@ -2103,24 +2103,30 @@ div.noOfRatings {
     z-index:3000;
 }
 
-.selectable {
-    background: url("../images/icons/plus.png") no-repeat scroll 50% 50% transparent;
-    background-color: transparent;
-    color: #FFFFFF;
-    opacity: 0.5;
-}
-/* .selectable:hover { */
-/*     background: url("../images/icons/check.png") no-repeat scroll 50% 50% transparent; */
+.thumbnail .selectable  .checkbox {
+	margin-bottom: 0px;
+	min-height: 5px;
+	padding-left: 20px;
+} 
+
+/* .selectable { */
+/*     background: url("../images/icons/plus.png") no-repeat scroll 50% 50% transparent; */
+/*     background-color: transparent; */
+/*     color: #FFFFFF; */
+/*     opacity: 0.5; */
 /* } */
-.selectedItem {
-    background: url("../images/icons/check.png") no-repeat scroll 50% 50% transparent;
-    background-color: transparent;
-    color: #FFFFFF;
-    opacity: 0.5;
-}
-.selectedItem:hover {
-    background: url("../images/icons/x.png") no-repeat scroll 50% 50% transparent;
-    background-color: transparent;
-    color: #FFFFFF;
-    opacity: 0.5;
-}
+/* /* .selectable:hover { */ */
+/* /*     background: url("../images/icons/check.png") no-repeat scroll 50% 50% transparent; */ */
+/* /* } */ */
+/* .selectedItem { */
+/*     background: url("../images/icons/check.png") no-repeat scroll 50% 50% transparent; */
+/*     background-color: transparent; */
+/*     color: #FFFFFF; */
+/*     opacity: 0.5; */
+/* } */
+/* .selectedItem:hover { */
+/*     background: url("../images/icons/x.png") no-repeat scroll 50% 50% transparent; */
+/*     background-color: transparent; */
+/*     color: #FFFFFF; */
+/*     opacity: 0.5; */
+/* } */
