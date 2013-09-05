@@ -303,7 +303,7 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 	}
         
 	private boolean isValidSortParam(String sortParam) {
-	    if(sortParam.equalsIgnoreCase("score") || sortParam.equalsIgnoreCase("name")  || sortParam.equalsIgnoreCase("lastLoginDate") || sortParam.equalsIgnoreCase("activity") )
+	    if(sortParam.equalsIgnoreCase("score") || sortParam.equalsIgnoreCase("name")  || sortParam.equalsIgnoreCase("lastLoginDate") )
 	          return true;
 	    return false;
 	}
