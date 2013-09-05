@@ -120,10 +120,12 @@ String desc = "- "+ location +" by "+observationInstance.author.name.capitalize(
 								<%def gallImagePath = ImageUtils.getFileName(r.fileName.trim(), ImageType.LARGE)%>
 								<%def gallThumbImagePath = ImageUtils.getFileName(r.fileName.trim(), ImageType.SMALL)%>
 								<a target="_blank"
-									rel="${createLinkTo(file: r.fileName.trim(), base:grailsApplication.config.speciesPortal.observations.serverURL)}"
-									href="${createLinkTo(file: gallImagePath, base:grailsApplication.config.speciesPortal.observations.serverURL)}">
+                                                                    rel="${createLinkTo(file: gallImagePath, base:grailsApplication.config.speciesPortal.observations.serverURL)}"
+                                                                    href="${createLinkTo(file: gallImagePath, base:grailsApplication.config.speciesPortal.observations.serverURL)}">
+                                                                    
 									<img class="galleryImage"
-									src="${createLinkTo(file: gallThumbImagePath, base:grailsApplication.config.speciesPortal.observations.serverURL)}"
+									src="${createLinkTo(file: gallThumbImagePath, base:grailsApplication.config.speciesPortal.observations.serverURL)}" 
+									data-original="${createLinkTo(file: r.fileName.trim(), base:grailsApplication.config.speciesPortal.observations.serverURL)}" 
 									title="${r?.description}" /> </a>
 
 								<g:imageAttribution model="['resource':r]" />
@@ -273,7 +275,7 @@ String desc = "- "+ location +" by "+observationInstance.author.name.capitalize(
 		$('#gallery1').galleria({
 			height : 400,
 			preload : 1,
-			carousel : false,
+			carousel : true,
 			transition : 'pulse',
 			image_pan_smoothness : 5,
 			showInfo : true,
@@ -297,7 +299,8 @@ String desc = "- "+ location +" by "+observationInstance.author.name.capitalize(
 			dataConfig : function(img) {
                             return {
                                 // tell Galleria to grab the content from the .desc div as caption
-                                description : $(img).parent().next('.notes').html()
+                                description : $(img).parent().next('.notes').html(),
+                                _biodiv_url:$(img).data('original')
                             };
 			},
 			extend : function(options) {
@@ -309,7 +312,15 @@ String desc = "- "+ location +" by "+observationInstance.author.name.capitalize(
                             
                             this.bind('loadfinish', function(e){
                                 galleryImageLoadFinish();
+                                //console.log("here in loadfinish");
+                            });
+
+                            this.bind('lightbox_image', function(e){
+                                //console.log("here in lightbox IMAGE");
+                                //console.log(e);
+                                $(".galleria-lightbox-title").append('<a target="_blank" href="'+Galleria.get(0).getData()._biodiv_url+'">View Full Image</a>');
                             })
+
                         }
                 });
                 Galleria.ready(function() {
