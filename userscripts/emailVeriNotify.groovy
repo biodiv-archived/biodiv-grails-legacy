@@ -13,12 +13,15 @@ users.each()  {
 
 	String url = "${domain}/register/verifyRegistration?t=${it.token}"
 	def toUser = it.username
-	
-	mailService.sendMail {
-		to toUser 
-		from ""
-		subject "Please activite your account on ${domain}"
-		html "Hello here, <br /> we have noticed that you haven\'t yet verified your email address on ${domain} <br /> Please <a href=\"${url}\">click here</a> to activate to activate it now"
+	try {	
+		mailService.sendMail {
+			to toUser 
+			from ""
+			subject "Please activite your account on ${domain}"
+			html "Hello here, <br /> we have noticed that you haven\'t yet verified your email address on ${domain} <br /> Please <a href=\"${url}\">click here</a> to activate to activate it now"
+		}
+	}catch(all)  {
+		all.printStackTrace();	
 	}
 }
 

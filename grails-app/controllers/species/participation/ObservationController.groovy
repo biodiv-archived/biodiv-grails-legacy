@@ -1002,16 +1002,20 @@ class ObservationController {
 			def mailSubject = params.mailSubject
 			for(entry in emailList.entrySet()){
 				def body = observationService.getIdentificationEmailInfo(params, request, entry.getValue(), params.sourceController?:'observation', params.sourceAction?:'show').mailBody
-				mailService.sendMail {
-					to entry.getKey()
-                    bcc grailsApplication.config.speciesPortal.app.notifiers_bcc.toArray()
-					//bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com", "thomas.vee@gmail.com", "sandeept@strandls.com"
-					from conf.ui.notification.emailFrom
-					replyTo currentUserMailId
-					subject mailSubject
-					html body.toString()
+				try {
+					mailService.sendMail {
+						to entry.getKey()
+	                    			bcc grailsApplication.config.speciesPortal.app.notifiers_bcc.toArray()
+						//bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com", "thomas.vee@gmail.com", "sandeept@strandls.com"
+						from conf.ui.notification.emailFrom
+						replyTo currentUserMailId
+						subject mailSubject
+						html body.toString()
+					}
+					log.debug " mail sent for identification "
+				}catch(all)  {
+				    log.error all.getMessage()
 				}
-				log.debug " mail sent for identification "
 			}
 		}
 		render (['success:true']as JSON);
