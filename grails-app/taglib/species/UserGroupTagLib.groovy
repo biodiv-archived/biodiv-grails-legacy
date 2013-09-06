@@ -248,9 +248,12 @@ class UserGroupTagLib {
 //				return;
 //			}
 //		}
-		
+		out << render(template:"/common/userGroup/showSuggestedUserGroupsTemplate", model:attrs.model);
+	}
+	
+	def showSuggestedUserGroupsList = {attrs, body ->
 		def gList = userGroupService.getSuggestedUserGroups(null)
-		out << render(template:"/common/userGroup/showSuggestedUserGroupsTemplate", model:['userGroups':gList]);
+		out << render(template:"/common/userGroup/showSuggestedUserGroupsListTemplate", model:['userGroups':gList]);
 	}
 	
 	def isUserGroupMember = { attrs, body->

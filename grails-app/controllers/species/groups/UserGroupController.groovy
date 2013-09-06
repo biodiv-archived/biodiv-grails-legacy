@@ -947,6 +947,13 @@ class UserGroupController {
 		if (!userGroupInstance) return;
 		render (view:'myGroups', model:['userGroupInstance':userGroupInstance])
    }
+   
+   def suggestedGroups = {
+	   log.debug params;
+	   def gList = userGroupService.getSuggestedUserGroups(null)
+	   def res =[suggestedGroupsHtml: g.render(template:"/common/userGroup/showSuggestedUserGroupsListTemplate", model:['userGroups':gList])];
+	   render res as JSON
+   }
 
 //   def species = {
 //	   log.debug params;

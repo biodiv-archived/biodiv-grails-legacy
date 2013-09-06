@@ -1,7 +1,7 @@
 <sec:ifLoggedIn>
 	<uGroup:isUserGroupMember>
 	    <div class="post-to-groups">
-	    	<a href="#" onclick="$(this).next('.post-main-content').toggle();return false;">
+	    	<a href="#" onclick="$(this).next('.post-main-content').toggle(300);return false;">
 	    		<h5>Post to User Groups<span class="caret" style="margin-top: 8px;"></span></h5>
 	    	</a>
 	    	<div class="post-main-content">
