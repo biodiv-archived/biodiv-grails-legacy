@@ -1,5 +1,5 @@
 
-<li class="dropdown" style="height:50px;"><a class="dropdown-toggle"  style="height:30px;top:10px"
+<li class="dropdown" style="height:32px;"><a class="dropdown-toggle"  style="height:30px;top:10px"
 	data-toggle="dropdown"
 	href="${uGroup.createLink(controller:'userGroup', absolute:'true', action:'list')}">
 		<i class="icon-group"></i> Groups <b class="caret"

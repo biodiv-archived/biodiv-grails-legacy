@@ -26,9 +26,9 @@
 	</sec:ifNotLoggedIn>
 	<sec:ifLoggedIn>
 		<li><div class="login-box">
-				<sUser:renderProfileLink />
+				<sUser:renderProfileLink model="['hideDetails':true]"/>
 			</div></li>
-		<li class="dropdown"  style="height:50px;">
+		<li class="dropdown"  style="height:32px;">
 		
 		<a href="#" class="dropdown-toggle"  style="height:30px;"
 			data-toggle="dropdown"> <%--			<i class="icon-home" title="Home"></i>--%>

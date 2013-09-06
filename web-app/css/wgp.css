@@ -41,6 +41,10 @@ h6 {
 	font-size: 17px;
 }
 
+.page-header {
+    margin:10px 0 20px;
+}
+
 .page-footer {
 	height: 221px;
 	width: 725px;
@@ -52,13 +56,14 @@ h6 {
 }
 
 .filters {
-	padding: 10px;
+	padding: 0px;
 	background-color: rgb(106, 201, 162);
 	background-color: rgba(106, 201, 162, 0.15);
 	-ms-filter:"progid:DXImageTransform.Microsoft.gradient(startColorstr=#336AC9A2,endColorstr=#336AC9A2)"; /*IE8*/
 	filter: progid : DXImageTransform.Microsoft.gradient (startColorstr ='#336AC9A2', endColorstr = '#336AC9A2' ); /*IE6 & IE7*/
 	zoom: 1;
 	box-shadow: 0 4px 3px -3px #5e5e5e;
+        border-radius:3px;
 }
 
 .filterBar .ui-button,.group_icon {
@@ -1658,6 +1663,7 @@ li#userOrEmail-new {
 
 .login-box .signature {
 	background-color: transparent;
+        padding:0px;
 }
 
 .signature:hover {
