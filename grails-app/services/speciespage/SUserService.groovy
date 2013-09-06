@@ -161,18 +161,21 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 				}
 
 				if ( Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
-
-					mailService.sendMail {
-						to user.email
-                        bcc grailsApplication.config.speciesPortal.app.notifiers_bcc.toArray()
-						//bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com","thomas.vee@gmail.com", "sandeept@strandls.com"
-						from conf.ui.notification.emailFrom
-						subject mailSubject
-						body(view:"/emailtemplates/welcomeEmail", model:templateMap)
+					try {
+						mailService.sendMail {
+							to user.email
+	                        			bcc grailsApplication.config.speciesPortal.app.notifiers_bcc.toArray()
+							//bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com","thomas.vee@gmail.com", "sandeept@strandls.com"
+							from conf.ui.notification.emailFrom
+							subject mailSubject
+							body(view:"/emailtemplates/welcomeEmail", model:templateMap)
+						}
+						log.debug "Sent mail for notificationType ${notificationType} to ${user.email}"
+					}catch(all)  {
+					    log.error all.getMessage()
 					}
 				}
 
-				log.debug "Sent mail for notificationType ${notificationType} to ${user.email}"
 				return;
 			case USER_DELETED:
 				mailSubject = conf.ui.userdeleted.emailSubject
@@ -186,12 +189,16 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 				}
 
 				if ( Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
-					mailService.sendMail {
-                        bcc grailsApplication.config.speciesPortal.app.notifiers_bcc.toArray()
-						//bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com","thomas.vee@gmail.com","sandeept@strandls.com"
-						from conf.ui.notification.emailFrom
-						subject mailSubject
-						html bodyContent.toString()
+					try {
+						mailService.sendMail {
+	                        			bcc grailsApplication.config.speciesPortal.app.notifiers_bcc.toArray()
+							//bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com","thomas.vee@gmail.com","sandeept@strandls.com"
+							from conf.ui.notification.emailFrom
+							subject mailSubject
+							html bodyContent.toString()
+						}
+					}catch(all)  {
+					    log.error all.getMessage()
 					}
 				}
 				break
