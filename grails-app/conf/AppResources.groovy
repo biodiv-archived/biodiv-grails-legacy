@@ -119,7 +119,6 @@ modules = {
 	observations_show {
 		dependsOn 'observations, gallery, carousel, comment, activityfeed'
 
-		resource url:'/js/jsrender.js'
 		resource url:'/js/species/observations/show.js'
 	} 
 

@@ -1073,6 +1073,8 @@ class ObservationController {
 			render(template:"/common/observation/showObservationListTemplate", model:model);
 			return;
 		} else if(!params.isGalleryUpdate?.toBoolean()){
+            model['width'] = 300;
+            model['height'] = 200;
 			params.remove('isGalleryUpdate');
 			render (view:"search", model:model)
 			return;
@@ -1086,8 +1088,13 @@ class ObservationController {
 //				tagsHtml = g.render(template:"/common/observation/showAllTagsTemplate", model:[count: count, tags:filteredTags, isAjaxLoad:true]);
 			}
 //			def mapViewHtml = g.render(template:"/common/observation/showObservationMultipleLocationTemplate", model:[observationInstanceList:model.totalObservationInstanceList]);
-			
-			def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml, tagsHtml:tagsHtml, instanceTotal:model.instanceTotal]
+			def chartModel = model.speciesGroupCountList
+            chartModel['width'] = 300;
+            chartModel['height'] = 200;
+
+            def distinctRecoListHtml = g.render(template:"/observation/distinctRecoTableTemplate", model:model);
+
+			def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml, tagsHtml:tagsHtml, instanceTotal:model.instanceTotal, chartModel:chartModel, distinctRecoListHtml:distinctRecoListHtml]
 			render result as JSON
 			return;
 		}

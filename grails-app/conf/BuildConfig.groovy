@@ -36,12 +36,12 @@ grails.project.dependency.resolution = {
 
         // runtime 'mysql:mysql-connector-java:5.1.13'
         compile ('org.apache.solr:solr-solrj:4.4.0') {
-            excludes 'slf4j-api', 'jcl-over-slf4j', 'slf4j-log4j12'
+            excludes 'slf4j-log4j12', 'slf4j-api', 'jcl-over-slf4j'
         }
         if (Environment.current == Environment.DEVELOPMENT) {
                 //compile ('org.apache.solr:solr-core:3.6.0') {
                 compile ('org.apache.solr:solr-core:4.4.0') {
-                    excludes 'slf4j-api', 'jcl-over-slf4j', 'geronimo-stax-api_1.0_spec', 'slf4j-log4j12'
+                    excludes 'slf4j-log4j12', 'slf4j-api', 'jcl-over-slf4j', 'geronimo-stax-api_1.0_spec'
                 }
         }
         
@@ -85,6 +85,10 @@ grails.project.dependency.resolution = {
         //runtime 'postgresql:postgis:2.0.0SVN' {
         //  runtime 'postgresql:postgresql:8.3-603.jdbc4'
         //}
+
+        compile 'org.imgscalr:imgscalr-lib:4.2'
+        
+
     }
     plugins { 
         compile ":spring-security-core:1.2.7.3" 
@@ -94,6 +98,12 @@ grails.project.dependency.resolution = {
     } 
 
     grails.war.resources = { stagingDir ->
+        for (name in ['log4j', 'slf4j', 'jcl-over-slf4j', 'jul-to-slf4j']) {
+            delete {
+                fileset dir: "$stagingDir/WEB-INF/lib/",
+                includes: "$name*.jar"
+            }
+        }
         //        delete(file:"${stagingDir}/WEB-INF/lib/hibernate-core-3.3.1.GA.jar")
     }
 }

@@ -7,8 +7,11 @@
 <r:require modules="observations_list" />
 <style>
     .thumbnails>li {
-        margin:2px;
+        margin:0 2px 2px 0px;
+        padding:0px;
     }
+
+
     .map_wrapper {
         margin-bottom: 0px;
     }

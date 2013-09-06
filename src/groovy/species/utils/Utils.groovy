@@ -125,7 +125,7 @@ class Utils {
 	
 	
 	static String cleanSearchQuery(String name) {
-		name = cleanName(name);
+		name = name?.replaceAll(/<.*?>/, '').replaceAll("\u00A0|\u2007|\u202F", " ").replaceAll("\\n","").replaceAll("\\s+", " ").trim();
 		name = name.replaceAll("[^\\x20-\\x7e]", "");	//removing all non ascii characters
 		return name;
 	}

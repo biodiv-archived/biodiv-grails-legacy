@@ -17,6 +17,7 @@ File userDir = new File(rootDir);
 SUser.withTransaction {
     SUser.findAllByProfilePicLike('http://graph.facebook%', [sort:"id"]).each { user ->
         def fbUser = FacebookUser.findByUser(user);
+        if(fbUser) {
         String relPath = fbUser.uid.toString()+File.separator+"resources"
         File usersDir = new File(userDir, relPath); 
         usersDir.mkdirs();              
@@ -28,5 +29,6 @@ SUser.withTransaction {
         println filePath;
         user.icon = filePath
         user.save();
+        }
     }
 }

@@ -70,7 +70,7 @@ class SpeciesController {
 		def allGroup = SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.ALL);
 		def othersGroup = SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.OTHERS);
 		params.sGroup = params.sGroup ?: allGroup.id+""
-		params.max = Math.min(params.max ? params.int('max') : 40, 100);
+		params.max = Math.min(params.max ? params.int('max') : 42, 100);
 		params.offset = params.offset ? params.int('offset') : 0
 		params.sort = params.sort?:"percentOfInfo"
 		if(params.sort.equals('lastrevised')) {
@@ -131,7 +131,7 @@ class SpeciesController {
 			return [speciesInstanceList: speciesInstanceList, instanceTotal: count, speciesCountWithContent:speciesCountWithContent, 'userGroupWebaddress':params.webaddress]
 		} else {
 			//Not being used for now
-			params.max = Math.min(params.max ? params.int('max') : 40, 100)
+			params.max = Math.min(params.max ? params.int('max') : 42, 100)
 			return [speciesInstanceList: Species.list(params), instanceTotal: Species.count(),  'userGroupWebaddress':params.webaddress]
 		}
 	}

@@ -2,19 +2,20 @@
 <%@page import="species.participation.Checklists"%>
 
     
-<div class="story-footer">
-
-    <g:render template="/common/observation/noOfResources" model="['instance':observationInstance]"/>
+<div class="story-footer" style="width:100%">
 
     <g:if test="${showLike && !showDetails}">
     <div class="footer-item pull-left">
         <obv:like model="['resource':observationInstance]"/>
     </div>	
     </g:if>
+
+    <g:if test="${showDetails}">
     <div class="footer-item">
         <i class="icon-comment" title="Comments"></i>
         <span class="">${observationInstance.fetchCommentCount()}</span>
     </div>
+    </g:if>
     <div class="footer-item">
         <g:if test="${!observationInstance.isChecklist}">
         <i class="icon-check" title="Species calls"></i>
@@ -40,4 +41,7 @@
         </g:if>
     </g:if>
 
+    <g:if test="${!showDetails}">
+    <g:render template="/common/observation/noOfResources" model="['instance':observationInstance]"/>
+    </g:if>
 </div>
