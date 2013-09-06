@@ -49,7 +49,7 @@ class SUserSearchService {
 				susers.clear();
 			}
 			offset += limit;
-		//}
+		}
 		
 		log.info "Time taken to publish users search index is ${System.currentTimeMillis()-startTime}(msec)";
 	}
