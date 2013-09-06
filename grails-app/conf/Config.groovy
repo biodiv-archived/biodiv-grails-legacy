@@ -221,7 +221,7 @@ speciesPortal {
 		images {
 			defaultType = "jpg"
 			thumbnail {
-				suffix = "_th"+".${defaultType}"
+				suffix = "_th1"+".${defaultType}"
 				width = 200
 				height = 200
 			}
@@ -425,8 +425,13 @@ speciesPortal {
 		CORRIDOR = "corridor"
 		DESCRIPTION = "description"
 		TYPE = "type"
-        TOPOLOGY = "topology"
-        SCORE = "score"
+        	TOPOLOGY = "topology"
+        	SCORE = "score"
+
+		EMAIL = "email"
+		USERNAME = "username"
+		ABOUT_ME = "about_me"
+		LAST_LOGIN = "lastlogindate"
 	}
 
 	nameSearchFields {
@@ -463,7 +468,7 @@ environments {
 		grails.serverURL = "http://indiabiodiversity.localhost.org/${appName}"
 		speciesPortal {
 			search.serverURL = "http://localhost:8090/solr"
-			names.parser.serverURL = "127.0.0.1"
+			names.parser.serverURL = "saturn.strandls.com"
 			wgp {
 				facebook {
 					appId= "424071494335902"
@@ -484,8 +489,8 @@ environments {
 		
 		grails {
 			mail {
-				 host = "127.0.0.1"
-				 port = 25
+			 host = "127.0.0.1"
+			 port = 25
 			}
 		}
 

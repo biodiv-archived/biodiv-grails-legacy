@@ -6,9 +6,9 @@ def controller = observationInstance.isChecklist ? 'checklist' :'observation'
 def obvId = observationInstance.id
 %>
 <div class="snippet tablet">
-	<uGroup:objectPost model="['objectInstance':observationInstance, 'userGroup':userGroup]" />
-	<div class="figure" style="height:100px;"
-		title='<g:if test="${obvTitle != null}">${obvTitle}</g:if>'>
+    <uGroup:objectPost model="['objectInstance':observationInstance, 'userGroup':userGroup]" />
+    <div class="figure"
+        title='<g:if test="${obvTitle != null}">${obvTitle}</g:if>'>
                 <g:link url="${uGroup.createLink(controller:controller, action:'show', id:obvId, 'pos':pos, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress) }" name="g${pos}">
 			<g:if
 				test="${imagePath}">
@@ -24,14 +24,9 @@ def obvId = observationInstance.id
                         <div class="checklistCount">${observationInstance.speciesCount}</div>
                         </g:if>
 		</g:link>
-                <div class="mouseover" style="padding-left:0px;display:none;">
-                    <h5>
-                        <obv:showSpeciesName
-                        model="['observationInstance':observationInstance, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress,isListView:true]" />
-                    </h5>
-						
-                </div>
-               
+                <!--div class="mouseover" style="padding-left:0px;">
+                </div-->
+
 	</div>
 	<div class="caption" >
 		<obv:showStoryTablet

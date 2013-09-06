@@ -175,7 +175,8 @@ class ObservationController {
 	def save = {
 		log.debug params;
 		if(request.method == 'POST') {
-			saveAndRender(params)
+			//TODO:edit also calls here...handle that wrt other domain objects
+			saveAndRender(params, false)
 		} else {
 			redirect (url:uGroup.createLink(action:'create', controller:"observation", 'userGroupWebaddress':params.webaddress))
 		}
@@ -489,7 +490,6 @@ class ObservationController {
 	 */
 	@Secured(['ROLE_USER'])
 	def addRecommendationVote = {
-
 		if(chainModel?.chainedParams) {
 			//need to change... dont pass on params
 			chainModel.chainedParams.each {
@@ -502,7 +502,6 @@ class ObservationController {
 
 		if(params.obvId) {
 			boolean canMakeSpeciesCall = getSpeciesCallPermission(params.obvId)
-			
 			//Saves recommendation if its not present
 			def recVoteResult, recommendationVoteInstance, msg
 			if(canMakeSpeciesCall){
@@ -513,11 +512,17 @@ class ObservationController {
 			
 			def observationInstance = Observation.get(params.obvId);
 			log.debug params;
+			def mailType
 			try {
 				if(!recommendationVoteInstance) {
 					//saving max voted species name for observation instance needed when observation created without species name
 					//observationInstance.calculateMaxVotedSpeciesName();
 					observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
+					
+					if(params["createNew"]) {
+						mailType = observationService.OBSERVATION_ADDED;
+						observationService.sendNotificationMail(mailType, observationInstance, request, params.webaddress);
+					}
 
 					if(!params["createNew"]){
 						redirect(action:getRecommendationVotes, id:params.obvId, params:[max:3, offset:0, msg:msg, canMakeSpeciesCall:canMakeSpeciesCall])
@@ -537,13 +542,20 @@ class ObservationController {
 					def activityFeed = activityFeedService.addActivityFeed(observationInstance, recommendationVoteInstance, recommendationVoteInstance.author, activityFeedService.SPECIES_RECOMMENDED, activityFeedService.getSpeciesNameHtmlFromReco(recommendationVoteInstance.recommendation, null));
 					observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
 					
+					//sending email
+					if(params["createNew"]) {
+						mailType = observationService.OBSERVATION_ADDED;
+					} else {
+						mailType = observationService.SPECIES_RECOMMENDED;
+					}
+					observationService.sendNotificationMail(mailType, observationInstance, request, params.webaddress, activityFeed);
+
 					if(!params["createNew"]){
-						//sending mail to user
-						observationService.sendNotificationMail(observationService.SPECIES_RECOMMENDED, observationInstance, request, params.webaddress, activityFeed);
+						//observationService.sendNotificationMail(observationService.SPECIES_RECOMMENDED, observationInstance, request, params.webaddress, activityFeed);
 						redirect(action:getRecommendationVotes, id:params.obvId, params:[max:3, offset:0, msg:msg, canMakeSpeciesCall:canMakeSpeciesCall])
 					}else if(params["isMobileApp"]?.toBoolean()){
 						render (['status':'success', 'success':'true', 'obvId':observationInstance.id] as JSON);
-					}else{
+					}else {
 						redirect (url:uGroup.createLink(action:'show', controller:"observation", id:observationInstance.id, 'userGroupWebaddress':params.webaddress, postToFB:(params.postToFB?:false)))
 						//redirect(action: "show", id: observationInstance.id, params:[postToFB:(params.postToFB?:false)]);
 					}
@@ -990,16 +1002,20 @@ class ObservationController {
 			def mailSubject = params.mailSubject
 			for(entry in emailList.entrySet()){
 				def body = observationService.getIdentificationEmailInfo(params, request, entry.getValue(), params.sourceController?:'observation', params.sourceAction?:'show').mailBody
-				mailService.sendMail {
-					to entry.getKey()
-                    bcc grailsApplication.config.speciesPortal.app.notifiers_bcc.toArray()
-					//bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com", "thomas.vee@gmail.com", "sandeept@strandls.com"
-					from conf.ui.notification.emailFrom
-					replyTo currentUserMailId
-					subject mailSubject
-					html body.toString()
+				try {
+					mailService.sendMail {
+						to entry.getKey()
+	                    			bcc grailsApplication.config.speciesPortal.app.notifiers_bcc.toArray()
+						//bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com", "thomas.vee@gmail.com", "sandeept@strandls.com"
+						from conf.ui.notification.emailFrom
+						replyTo currentUserMailId
+						subject mailSubject
+						html body.toString()
+					}
+					log.debug " mail sent for identification "
+				}catch(all)  {
+				    log.error all.getMessage()
 				}
-				log.debug " mail sent for identification "
 			}
 		}
 		render (['success:true']as JSON);
@@ -1057,6 +1073,8 @@ class ObservationController {
 			render(template:"/common/observation/showObservationListTemplate", model:model);
 			return;
 		} else if(!params.isGalleryUpdate?.toBoolean()){
+            model['width'] = 300;
+            model['height'] = 200;
 			params.remove('isGalleryUpdate');
 			render (view:"search", model:model)
 			return;
@@ -1070,8 +1088,13 @@ class ObservationController {
 //				tagsHtml = g.render(template:"/common/observation/showAllTagsTemplate", model:[count: count, tags:filteredTags, isAjaxLoad:true]);
 			}
 //			def mapViewHtml = g.render(template:"/common/observation/showObservationMultipleLocationTemplate", model:[observationInstanceList:model.totalObservationInstanceList]);
-			
-			def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml, tagsHtml:tagsHtml, instanceTotal:model.instanceTotal]
+			def chartModel = model.speciesGroupCountList
+            chartModel['width'] = 300;
+            chartModel['height'] = 200;
+
+            def distinctRecoListHtml = g.render(template:"/observation/distinctRecoTableTemplate", model:model);
+
+			def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml, tagsHtml:tagsHtml, instanceTotal:model.instanceTotal, chartModel:chartModel, distinctRecoListHtml:distinctRecoListHtml]
 			render result as JSON
 			return;
 		}

@@ -27,7 +27,7 @@ import species.participation.Recommendation;
 import species.participation.RecommendationVote.ConfidenceType;
 import com.vividsolutions.jts.geom.Point
 import com.vividsolutions.jts.io.WKTWriter;
-import org.apache.solr.client.solrj.impl.StreamingUpdateSolrServer;
+import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer
 
 class ObservationsSearchService {
 
@@ -148,7 +148,7 @@ class ObservationsSearchService {
                 solrServer.add(docs);
                 if(commit) {
                     //commit ...server is configured to do an autocommit after 10000 docs or 1hr
-                    if(solrServer instanceof StreamingUpdateSolrServer) {
+                    if(solrServer instanceof ConcurrentUpdateSolrServer) {
                         solrServer.blockUntilFinished();
                     }
                     solrServer.commit();

@@ -11,8 +11,12 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib
 
+import org.apache.solr.common.SolrException;
+import org.apache.solr.common.util.NamedList
+
 import species.auth.SUser;
 import species.utils.Utils;
+import speciespage.search.SUserSearchService;
 
 class SUserService extends SpringSecurityUiService implements ApplicationContextAware {
 
@@ -20,6 +24,7 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 
 	def springSecurityService
 	def mailService
+	def usersSearchService
 	private ApplicationTagLib g
 	ApplicationContext applicationContext
 
@@ -156,18 +161,21 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 				}
 
 				if ( Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
-
-					mailService.sendMail {
-						to user.email
-                        bcc grailsApplication.config.speciesPortal.app.notifiers_bcc.toArray()
-						//bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com","thomas.vee@gmail.com", "sandeept@strandls.com"
-						from conf.ui.notification.emailFrom
-						subject mailSubject
-						body(view:"/emailtemplates/welcomeEmail", model:templateMap)
+					try {
+						mailService.sendMail {
+							to user.email
+	                        			bcc grailsApplication.config.speciesPortal.app.notifiers_bcc.toArray()
+							//bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com","thomas.vee@gmail.com", "sandeept@strandls.com"
+							from conf.ui.notification.emailFrom
+							subject mailSubject
+							body(view:"/emailtemplates/welcomeEmail", model:templateMap)
+						}
+						log.debug "Sent mail for notificationType ${notificationType} to ${user.email}"
+					}catch(all)  {
+					    log.error all.getMessage()
 					}
 				}
 
-				log.debug "Sent mail for notificationType ${notificationType} to ${user.email}"
 				return;
 			case USER_DELETED:
 				mailSubject = conf.ui.userdeleted.emailSubject
@@ -181,12 +189,16 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 				}
 
 				if ( Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
-					mailService.sendMail {
-                        bcc grailsApplication.config.speciesPortal.app.notifiers_bcc.toArray()
-						//bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com","thomas.vee@gmail.com","sandeept@strandls.com"
-						from conf.ui.notification.emailFrom
-						subject mailSubject
-						html bodyContent.toString()
+					try {
+						mailService.sendMail {
+	                        			bcc grailsApplication.config.speciesPortal.app.notifiers_bcc.toArray()
+							//bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com","thomas.vee@gmail.com","sandeept@strandls.com"
+							from conf.ui.notification.emailFrom
+							subject mailSubject
+							html bodyContent.toString()
+						}
+					}catch(all)  {
+					    log.error all.getMessage()
 					}
 				}
 				break
@@ -227,5 +239,81 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
         }
 		return jsonData;
 	}
+	
+	/**
+	 * User Search 
+	 **/
+
+	 def getUsersFromSearch(params)  {
+		def max = Math.min(params.max ? params.max.toInteger() : 12, 100)
+		def offset = params.offset ? params.offset.toLong() : 0
+		def model;
+		try {
+		    model = getFilteredUsersFromSearch(params, max, offset);
+		} catch(SolrException e) {
+		    e.printStackTrace();
+		}
+		return model;
+	 }
+
+         /**
+	   * Filter observations by group, habitat, tag, user, species
+	   * max: limit results to max: if max = -1 return all results
+	   * offset: offset results: if offset = -1 its not passed to the
+	   * executing query
+	   */
+	 Map getFilteredUsersFromSearch(params, max, offset){
+	 	def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields
+		//Store all teh parameter list here
+		NamedList paramsList = new NamedList();
+		//Check for the parameters passed by user and convert them to solr queries
+		def queryParams = [:]
+		queryParams["query"] = params.query
+		queryParams["max"]  = max
+
+		params.query = params.query ?:""
+		paramsList.add('q', Utils.cleanSearchQuery(params.query))
+		paramsList.add('start', offset);
+		paramsList.add('rows', max);
+		params['sort'] = params['sort']?:"score"
+		String sort = params['sort'].toLowerCase();
+		if(isValidSortParam(sort)) {
+		     if(sort.indexOf(' desc') == -1) {
+		            sort += " desc";
+		     }
+		     paramsList.add('sort', sort);
+		}
+		
+		List<SUser> userList = new ArrayList<SUser>();
+		def totalUserList = []
+		def responseHeader
+		long noOfResults = 0
+		if(paramsList)  {
+			def queryResult = usersSearchService.search(paramsList);
+
+			Iterator it = queryResult.getResults().listIterator();
+
+			while(it.hasNext()) {
+				def doc = it.next()
+				def user = SUser.read(Long.parseLong(doc.getFieldValue("id") + ""))
+
+				if(user)  {
+					totalUserList.add(Long.parseLong(doc.getFieldValue("id") + ""))
+					userList.add(user)
+				}
+			}
+			responseHeader = queryResult?.responseHeader
+			noOfResults = queryResult?.getResults().getNumFound()
+		}
+
+		return [responseHeader:responseHeader, userInstanceList:userList, resultType:'user', instanceTotal:noOfResults, searchQuery:queryParams, totalUserIdList:totalUserList, searched:true, isSearch:true ] 
+	}
+        
+	private boolean isValidSortParam(String sortParam) {
+	    if(sortParam.equalsIgnoreCase("score") || sortParam.equalsIgnoreCase("name")  || sortParam.equalsIgnoreCase("lastLoginDate") )
+	          return true;
+	    return false;
+	}
+
 
 }

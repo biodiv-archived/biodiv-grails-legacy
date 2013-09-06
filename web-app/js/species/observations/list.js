@@ -910,7 +910,7 @@ function updateDownloadBox(instanceTotal){
 
 $(document).ready(function(){
     $(".snippet.tablet .figure").hover(function() {
-        $(this).children('.mouseover').stop().toggle('slow')
+        $(this).children('.mouseover').toggle('slow')
     });
 });
     

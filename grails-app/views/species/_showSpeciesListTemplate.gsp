@@ -15,9 +15,7 @@
 				style="list-style: none; text-align: left">
 				<g:each in="${speciesInstanceList}" status="i" var="speciesInstance">
 
-
-
-					<g:if test="${i%4 == 0}">
+					<g:if test="${i%6 == 0}">
 						<li
 							class="clearfix thumbnail ${speciesInstance.percentOfInfo > 0?'rich_species_content':'poor_species_content'}">
 					</g:if>
@@ -26,32 +24,29 @@
 							class="thumbnail ${speciesInstance.percentOfInfo > 0?'rich_species_content':'poor_species_content'}">
 					</g:else>
 					<g:set var="mainImage" value="${speciesInstance.mainImage()}" />
-					<%def thumbnailPath = ImageUtils.getFileName(mainImage?.fileName, ImageType.SMALL, null)%>
+					<%def thumbnailPath = ImageUtils.getFileName(mainImage?.fileName, ImageType.NORMAL, null)%>
 
-					<div class="snippet tablet " style="display: table; height: 80px;">
-						<div class="pull-left figure"
-							style="height: 80px; display: table;">
+					<div class="snippet tablet">
+                                                <div class="figure">
 							<a
 								href="${uGroup.createLink([controller:'species', action:'show', id:speciesInstance.id, userGroup:userGroup, userGroupWebaddress:userGroupWebaddress])}">
 
 
 								<g:if test="${thumbnailPath }">
-									<img class="span1 img-polaroid pull-left"
-										style="max-height: 80px; margin-left: 0px; width: auto;"
+									<img class="img-polaroid"
 										src="${createLinkTo( base:grailsApplication.config.speciesPortal.resources.serverURL,
 											file: thumbnailPath)}"
 										title=" ${speciesInstance.taxonConcept.name.replaceAll('<.*>','')}" />
 								</g:if> <g:else>
-									<img class="span1 img-polaroid pull-left"
-										style="max-height: 80px; margin-left: 0px; width: auto;"
+									<img class="img-polaroid" style="opacity:0.7;"
 										title="${speciesInstance.taxonConcept.name.replaceAll('<.*>','')}"
-										src="${createLinkTo(dir: 'images', file:speciesInstance.fetchSpeciesGroupIcon(ImageType.VERY_SMALL)?.fileName, absolute:true)}"></img>
+										src="${createLinkTo(dir: 'images', file:speciesInstance.fetchSpeciesGroupIcon(ImageType.NORMAL)?.fileName, absolute:true)}"></img>
 								</g:else> </a>
 						</div>
 						<a
 							href="${uGroup.createLink([controller:'species', action:'show', id:speciesInstance.id, userGroup:userGroup, userGroupWebaddress:userGroupWebaddress])}" style="display:block;">
 							<span class="species_story ellipsis multiline sci_name"
-							style="display: block;height:60px;width:100px;" title="${speciesInstance.taxonConcept.name.replaceAll('<.*>','')}">${speciesInstance.taxonConcept.name.trim()}</span> </a>
+							style="display: block;height:6=50px;" title="${speciesInstance.taxonConcept.name.replaceAll('<.*>','')}">${speciesInstance.taxonConcept.name.trim()}</span> </a>
 						<div class="poor_species_content" style="display: none;">No
 							information yet</div>
 					</div>

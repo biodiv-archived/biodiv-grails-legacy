@@ -33,13 +33,12 @@ import species.sourcehandler.XMLConverter;
 import species.utils.ImageType;
 import species.utils.Utils;
 
-import org.apache.lucene.document.DateField;
+//import org.apache.lucene.document.DateField;
 import org.apache.lucene.document.DateTools;
 import org.apache.solr.common.SolrException;
 import org.apache.solr.common.util.NamedList
 
 import org.apache.solr.common.util.DateUtil;
-import org.apache.solr.common.util.NamedList;
 import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap;
 import org.codehaus.groovy.grails.web.util.WebUtils;
@@ -512,7 +511,6 @@ class ObservationService {
 		
 		//if source of recommendation is other that observation (i.e Checklist)
 //		refObject = refObject ?: params.refObject
-		
 		Recommendation commonNameReco = recommendationService.findReco(commonName, false, languageId, null);
 		Recommendation scientificNameReco = recommendationService.getRecoForScientificName(recoName, canName, commonNameReco);
 		
@@ -783,22 +781,25 @@ class ObservationService {
         hqlQuery.setProperties(queryParts.queryParams);
 		def observationInstanceList = hqlQuery.list();
 		
+        def distinctRecoList = [];
+        def speciesGroupCountList = [];
         checklistCountQuery.setProperties(queryParts.queryParams)
-		checklistCount = checklistCountQuery.list()[0]
+        checklistCount = checklistCountQuery.list()[0]
 
         allObservationCountQuery.setProperties(queryParts.queryParams)
-		allObservationCount = allObservationCountQuery.list()[0]
+        allObservationCount = allObservationCountQuery.list()[0]
 
-        distinctRecoQuery.setProperties(queryParts.queryParams)
-		def distinctRecoListResult = distinctRecoQuery.list()
-        def distinctRecoList = [];
-        distinctRecoListResult.each {it->
-            def reco = Recommendation.read(it[0]);
-            distinctRecoList << [reco.name, reco.isScientificName, it[1]]
+		if(!params.loadMore?.toBoolean()) {
+            distinctRecoQuery.setProperties(queryParts.queryParams)
+            def distinctRecoListResult = distinctRecoQuery.list()
+            distinctRecoListResult.each {it->
+                def reco = Recommendation.read(it[0]);
+                distinctRecoList << [reco.name, reco.isScientificName, it[1]]
+            }
+
+            speciesGroupCountQuery.setProperties(queryParts.queryParams)
+            speciesGroupCountList = getFormattedResult(speciesGroupCountQuery.list())
         }
-
-        speciesGroupCountQuery.setProperties(queryParts.queryParams)
-		def speciesGroupCountList = getFormattedResult(speciesGroupCountQuery.list())
 
 		if(params.daterangepicker_start){
 			queryParts.queryParams["daterangepicker_start"] = params.daterangepicker_start
@@ -946,7 +947,7 @@ class ObservationService {
 		def checklistCountQuery = "select count(*) from Observation obv " + userGroupQuery +" "+((params.tag)?tagQuery:'')+filterQuery + " and obv.isChecklist = true "
 		def allObservationCountQuery = "select count(*) from Observation obv " + userGroupQuery +" "+((params.tag)?tagQuery:'')+filterQuery
 		
-        def speciesGroupCountQuery = "select obv.group.name, count(*),(case when obv.maxVotedReco.id is not null  then 1 else 2 end) from Observation obv  "+ userGroupQuery +" "+((params.tag)?tagQuery:'')+filterQuery+ "and obv.isChecklist=false group by obv.group.name,(case when obv.maxVotedReco.id is not null  then 1 else 2 end) order by obv.group.name desc";
+        def speciesGroupCountQuery = "select obv.group.name, count(*),(case when obv.maxVotedReco.id is not null  then 1 else 2 end) from Observation obv  "+ userGroupQuery +" "+((params.tag)?tagQuery:'')+filterQuery+ " and isChecklist=false group by obv.group.name,(case when obv.maxVotedReco.id is not null  then 1 else 2 end) order by obv.group.name desc";
 
 		return [query:query, allObservationCountQuery:allObservationCountQuery, checklistCountQuery:checklistCountQuery, distinctRecoQuery:distinctRecoQuery, speciesGroupCountQuery:speciesGroupCountQuery, filterQuery:filterQuery, orderByClause:orderByClause, queryParams:queryParams, activeFilters:activeFilters]
 
@@ -1112,7 +1113,6 @@ class ObservationService {
 		
 		
 		NamedList paramsList = new NamedList();
-	    paramsList.add(searchFieldsConfig.IS_SHOWABLE, true);
 
 		//params.userName = springSecurityService.currentUser.username;
 		queryParams["query"] = params.query
@@ -1212,19 +1212,7 @@ class ObservationService {
 		
 		paramsList.add('fl', params['fl']?:"id");
 		
-		//Facets
-		params["facet.field"] = params["facet.field"] ?: searchFieldsConfig.MAX_VOTED_SPECIES_NAME;
-		paramsList.add('facet.field', params["facet.field"]);
-		paramsList.add('facet.field', searchFieldsConfig.SGROUP);
-		paramsList.add('facet.field', searchFieldsConfig.IS_CHECKLIST);
-		paramsList.add('facet', "true");
-		params["facet.limit"] = params["facet.limit"] ?: 10;
-		paramsList.add('facet.limit', params["facet.limit"]);
-		params["facet.offset"] = params["facet.offset"] ?: 0;
-		paramsList.add('facet.offset', params["facet.offset"]);
-		paramsList.add('facet.mincount', "1");
 		
-
 		//Filters
 		if(params.sGroup) {
 			params.sGroup = params.sGroup.toLong()
@@ -1312,8 +1300,41 @@ class ObservationService {
 		long noOfResults = 0;
 		long checklistCount = 0
         List distinctRecoList = [];
-        def speciesGroupCountList = []
+        def speciesGroupCountList = [];
 		if(paramsList) {
+            //Facets
+            def speciesGroups;
+            paramsList.add('facet', "true");
+            params["facet.offset"] = params["facet.offset"] ?: 0;
+            paramsList.add('facet.offset', params["facet.offset"]);
+            paramsList.add('facet.mincount', "1");
+                
+            paramsList.add(searchFieldsConfig.IS_CHECKLIST, false);
+
+		    if(!params.loadMore?.toBoolean()){
+                paramsList.add('facet.field', searchFieldsConfig.MAX_VOTED_SPECIES_NAME+"_exact");
+                paramsList.add("f.${searchFieldsConfig.MAX_VOTED_SPECIES_NAME}_exact.facet.limit", 10);
+                def qR = observationsSearchService.search(paramsList);
+                List distinctRecoListFacets = qR.getFacetField(searchFieldsConfig.MAX_VOTED_SPECIES_NAME+"_exact").getValues()
+                distinctRecoListFacets.each {
+                    //TODO second parameter, isScientificName
+                    distinctRecoList.add([it.getName(), true, it.getCount()]);
+                }
+                
+                paramsList.remove('facet.field');
+                paramsList.remove("f.${searchFieldsConfig.MAX_VOTED_SPECIES_NAME}_exact.facet.limit");
+
+                paramsList.add(searchFieldsConfig.IS_SHOWABLE, 'true');
+                paramsList.add('facet.field', searchFieldsConfig.SGROUP);
+                //paramsList.add("f.${searchFieldsConfig.SGROUP}.facet.limit", -1);
+                paramsList.add('facet.field', searchFieldsConfig.IS_CHECKLIST);
+                speciesGroups = SpeciesGroup.list();
+                speciesGroups.each {
+                    paramsList.add('facet.query', "${searchFieldsConfig.SGROUP}:${it.id} AND ${searchFieldsConfig.IS_CHECKLIST}:false AND ${searchFieldsConfig.MAX_VOTED_SPECIES_NAME}_exact:Unknown");
+                    paramsList.add('facet.query', "${searchFieldsConfig.SGROUP}:${it.id} AND ${searchFieldsConfig.IS_CHECKLIST}:false");
+                }
+            }
+
 			def queryResponse = observationsSearchService.search(paramsList);
 			Iterator iter = queryResponse.getResults().listIterator();
 			while(iter.hasNext()) {
@@ -1325,43 +1346,37 @@ class ObservationService {
 				}
 			}
 		
-			List distinctRecoListFacets = queryResponse.getFacetField(searchFieldsConfig.MAX_VOTED_SPECIES_NAME).getValues()
-			distinctRecoListFacets.each {
-                //TODO second parameter
-				distinctRecoList.add([it.getName(), false, it.getCount()]);
-			}
-	
-            List speciesGroupCountListFacets = queryResponse.getFacetField(searchFieldsConfig.SGROUP).getValues()
-			speciesGroupCountListFacets.each {
-                //TODO identified and unidentified count
-				speciesGroupCountList.add([it.getName(),it.getCount(), 0]);
-			}
-		    speciesGroupCountList = getFormattedResult(speciesGroupCountList)
-
-            List isChecklistFacets = queryResponse.getFacetField(searchFieldsConfig.IS_CHECKLIST).getValues()
-			isChecklistFacets.each {
-                if(it.getName() == 'true')
-                    checklistCount = it.getCount()
+		    if(!params.loadMore?.toBoolean()){
+                //TODO:handle isChecklist=false and isShowable = true
+                List speciesGroupCountListFacets = queryResponse.getFacetField(searchFieldsConfig.SGROUP).getValues()
+                Map speciesGroupUnidentifiedCountListFacets = queryResponse.getFacetQuery()		
+                speciesGroups.each {
+                    if(it.name != grailsApplication.config.speciesPortal.group.ALL) {
+                        String key = "${searchFieldsConfig.SGROUP}:${it.id} AND ${searchFieldsConfig.IS_CHECKLIST}:false"
+                        String unidentifiedKey = "${searchFieldsConfig.SGROUP}:${it.id} AND ${searchFieldsConfig.IS_CHECKLIST}:false AND ${searchFieldsConfig.MAX_VOTED_SPECIES_NAME}_exact:Unknown";
+                        long all = speciesGroupUnidentifiedCountListFacets.get(key);
+                        long unIdentified = speciesGroupUnidentifiedCountListFacets.get(unidentifiedKey)
+                        if(all | unIdentified)
+                            speciesGroupCountList.add([it.name, all, unIdentified]);
+                    }
+                }
+               
+                speciesGroupCountList = speciesGroupCountList.sort {a,b->a[0]<=>b[0]}
+                speciesGroupCountList = [data:speciesGroupCountList?:[], columns:[
+                    ['string', 'Species Group'],
+                    ['number', 'All'],
+                    ['number', 'Unidentified']
+                ]]
+            
+                List isChecklistFacets = queryResponse.getFacetField(searchFieldsConfig.IS_CHECKLIST).getValues()
+                isChecklistFacets.each {
+                    if(it.getName() == 'true')
+                        checklistCount = it.getCount()
+                }
             }
 
 			responseHeader = queryResponse?.responseHeader;
 			noOfResults = queryResponse.getResults().getNumFound()
-/*	
-		def distinctRecoQuery = "select obv.maxVotedReco.id, count(*) from Observation obv  "+ userGroupQuery +" "+((params.tag)?tagQuery:'')+filterQuery+ "and obv.isChecklist=false and obv.maxVotedReco is not null group by obv.maxVotedReco order by count(*) desc";
-
-	    filterQuery += " and obv.isShowable = true "; 
-
-		def orderByClause = " order by obv." + (params.sort ? params.sort : "lastRevised") +  " desc, obv.id asc"
-		
-		def checklistCountQuery = "select count(*) from Observation obv " + userGroupQuery +" "+((params.tag)?tagQuery:'')+filterQuery + " and obv.isChecklist = true "
-		def allObservationCountQuery = "select count(*) from Observation obv " + userGroupQuery +" "+((params.tag)?tagQuery:'')+filterQuery
-		
-        def speciesGroupCountQuery = "select obv.group.name, count(*),(case when obv.maxVotedReco.id is not null  then 1 else 2 end) from Observation obv  "+ userGroupQuery +" "+((params.tag)?tagQuery:'')+filterQuery+ "and obv.isChecklist=false group by obv.group.name,(case when obv.maxVotedReco.id is not null  then 1 else 2 end) order by obv.group.name desc";
-*/
-
-		//def distinctRecoList = distinctRecoQuery.list()
-
-
 
 		}
 		/*if(responseHeader?.params?.q == "*:*") {
@@ -1471,7 +1486,7 @@ class ObservationService {
 		try {
 			
 		def targetController =  getTargetController(obv)//obv.getClass().getCanonicalName().split('\\.')[-1]
-		def obvUrl, domain
+		def obvUrl, domain, baseUrl
 	
         try {
 		    request = (request) ?:(WebUtils.retrieveGrailsWebRequest()?.getCurrentRequest())
@@ -1481,9 +1496,10 @@ class ObservationService {
 		if(request){
 			 obvUrl = generateLink(targetController, "show", ["id": obv.id], request)
 			 domain = Utils.getDomainName(request)
+			 baseUrl = Utils.getDomainServerUrl(request)
 		}
 
-		def templateMap = [obvUrl:obvUrl, domain:domain]
+		def templateMap = [obvUrl:obvUrl, domain:domain, baseUrl:baseUrl]
 		templateMap["currentUser"] = springSecurityService.currentUser
 		templateMap["action"] = notificationType;
 		def mailSubject = ""
@@ -1506,7 +1522,9 @@ class ObservationService {
 
 			case activityFeedService.CHECKLIST_CREATED:
 				mailSubject = conf.ui.addChecklist.emailSubject
-				bodyContent = conf.ui.addChecklist.emailBody
+				bodyView = "/emailtemplates/addObservation"
+				templateMap["actionObject"] = "checklist"
+				templateMap["message"] = " uploaded a checklist to ${templateMap['domain']} and it is available <a href=\"${templateMap['obvUrl']}\"> here</a>"
 				toUsers.add(getOwner(obv))
 				break
 
@@ -1529,9 +1547,9 @@ class ObservationService {
 				
 			case CHECKLIST_DELETED :
 				mailSubject = conf.ui.checklistDeleted.emailSubject
-				bodyContent = conf.ui.checklistDeleted.emailBody
-				templateMap["currentUser"] = springSecurityService.currentUser
-				//replyTo = templateMap["currentUser"].email
+				bodyView = "/emailtemplates/addObservation"
+				templateMap["actionObject"] = "checklist"
+				templateMap["message"] = " deleted a checklist. The URL of the checklist was ${templateMap['obvUrl']}"
 				toUsers.add(getOwner(obv))
 				break
 
@@ -1638,15 +1656,14 @@ class ObservationService {
 				if(request){
 					templateMap['userProfileUrl'] = generateLink("SUser", "show", ["id": toUser.id], request)
 				}
-		    if ( Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
+		    //if ( Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
 			//if ( Environment.getCurrent().getName().equalsIgnoreCase("development")) {
 		            log.debug "Sending email to ${toUser}"
+                    try{
 					mailService.sendMail {
 						to toUser.email
 						if(index == 0) {
-							//bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com", "thomas.vee@gmail.com", "sandeept@strandls.com"
-                            bcc grailsApplication.config.speciesPortal.app.notifiers_bcc.toArray()
-							//bcc "kxt5258@gmail.com"
+                            				bcc grailsApplication.config.speciesPortal.app.notifiers_bcc.toArray()
 						}
 						from conf.ui.notification.emailFrom
 						//replyTo replyTo
@@ -1664,8 +1681,12 @@ class ObservationService {
 							html bodyContent
 						}
 					}
+                    } catch(Exception e) {
+                        log.error "Error sending message ${e.getMessage()} toUser : ${toUser} "
+                        e.printStackTrace();
+                    }
 				}
-			}
+			//}
 		}
 		
 		} catch (e) {
@@ -1684,7 +1705,9 @@ class ObservationService {
 			templateMap["obvPlace"] = values[ObvUtilService.LOCATION]
 			templateMap["obvDate"] = values[ObvUtilService.OBSERVED_ON]
 			templateMap["obvNotes"] = Utils.stripHTML(values[ObvUtilService.NOTES])
-			templateMap["obvImage"] = obv.mainImage().thumbnailUrl() 
+			templateMap["obvImage"] = obv.mainImage().thumbnailUrl()
+			//get All the UserGroups an observation is part of
+			templateMap["groups"] = obv.userGroups
 		}
 		if(feed) {
 			templateMap['actor'] = feed.author;
@@ -1716,7 +1739,7 @@ class ObservationService {
                 }
             }
         } else {
-            participants << getOwner(observation);
+            participants << springSecurityService.currentUser;
         }
         
 		return participants;
@@ -1724,14 +1747,18 @@ class ObservationService {
 	
 	private SUser getOwner(observation) {
 		def author = null;
-		if(observation.metaClass.hasProperty(observation, 'author')) {
-			author = observation.author;
-			if(!author.sendNotification) {
-				author = null;
-			}
-		}
+        if ( Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
+            if(observation.metaClass.hasProperty(observation, 'author')) {
+                author = observation.author;
+                if(!author.sendNotification) {
+                    author = null;
+                }
+            }
+        } else {
+            author = springSecurityService.currentUser;
+        }
 		return author;
-	}
+	} 
 	
 	private String getTitle(observation) {
 		if(observation.metaClass.hasProperty(observation, 'title')) {
