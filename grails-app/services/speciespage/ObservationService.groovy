@@ -1645,9 +1645,7 @@ class ObservationService {
 					mailService.sendMail {
 						to toUser.email
 						if(index == 0) {
-							//bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com", "thomas.vee@gmail.com", "sandeept@strandls.com"
-                            bcc grailsApplication.config.speciesPortal.app.notifiers_bcc.toArray()
-							//bcc "kxt5258@gmail.com"
+                            				bcc grailsApplication.config.speciesPortal.app.notifiers_bcc.toArray()
 						}
 						from conf.ui.notification.emailFrom
 						//replyTo replyTo
@@ -1687,7 +1685,7 @@ class ObservationService {
 			templateMap["obvNotes"] = Utils.stripHTML(values[ObvUtilService.NOTES])
 			templateMap["obvImage"] = obv.mainImage().thumbnailUrl()
 			//get All the UserGroups an observation is part of
-			templateMap["groups"] = Observation.findById(obv.id).userGroups
+			templateMap["groups"] = obv.userGroups
 		}
 		if(feed) {
 			templateMap['actor'] = feed.author;

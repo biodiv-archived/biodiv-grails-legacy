@@ -213,14 +213,19 @@ class RegisterController extends grails.plugins.springsecurity.ui.RegisterContro
 			body = evaluate(body, [username: user.name.capitalize(), url: url])
 		}
 		
-		mailService.sendMail {
-			to user.email
-			from conf.ui.forgotPassword.emailFrom
-			subject conf.ui.forgotPassword.emailSubject
-			html body.toString()
-		}
+		try {
+			mailService.sendMail {
+				to user.email
+				from conf.ui.forgotPassword.emailFrom
+				subject conf.ui.forgotPassword.emailSubject
+				html body.toString()
+			}
 		
-		[emailSent: true]
+			[emailSent: true]
+		}catch(all)  {
+		      log.error all.getMessage()
+		      [emailSent:false]
+		}
 	}
 
     def resetPassword = { ResetPasswordCommand2 command ->
@@ -319,13 +324,17 @@ class RegisterController extends grails.plugins.springsecurity.ui.RegisterContro
 			sub = evaluate(sub, [domain: Utils.getDomainName(request)])
 		}
 		
-		mailService.sendMail {
-			to email
-			from conf.ui.register.emailFrom
-			subject sub.toString()
-			html body.toString()
+		try {
+			mailService.sendMail {
+				to email
+				from conf.ui.register.emailFrom
+				subject sub.toString()
+				html body.toString()
+			}
+			clearRegistrationInfoFromSession()
+		}catch(all)  {
+		    log.error all.getMessage()
 		}
-		clearRegistrationInfoFromSession()
 	}
 
 	/**

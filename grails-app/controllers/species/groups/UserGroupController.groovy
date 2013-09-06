@@ -1048,13 +1048,17 @@ class UserGroupController {
 	   }
 
 	   //if ( Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
-		   mailService.sendMail {
+		   try {
+		   	mailService.sendMail {
 			   to user.email
-               bcc grailsApplication.config.speciesPortal.app.notifiers_bcc.toArray()
+               		   bcc grailsApplication.config.speciesPortal.app.notifiers_bcc.toArray()
 			   //bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com","thomas.vee@gmail.com","sandeept@strandls.com","balachandert@gmail.com"
 			   from conf.ui.notification.emailFrom
 			   subject mailSubject
 			   html body.toString()
+			}
+		   }catch(all)  {
+		       log.error all.getMessage()
 		   }
 	   //}
 		//   log.debug "Sent mail for notificationType ${notificationType} to ${user.email}"
