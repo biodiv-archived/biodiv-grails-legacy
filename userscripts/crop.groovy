@@ -15,12 +15,9 @@ def geUserResoruceId(){
       }
 
 def _doCrop(resourceList, relativePath){
-<<<<<<< HEAD
+
 	println "=======================================" + resourceList.size()
 	HashMap hm = new HashMap();
-=======
-	println "=============== " + resourceList.size()
->>>>>>> 6ce35dc693da3223b1934c53e94e5cd14f10f620
 	resourceList.each { res->
 		println "------------------------------------------------------------------ " + res.id
 		String fileName = relativePath + "/" + res.fileName;
