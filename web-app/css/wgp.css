@@ -93,7 +93,7 @@ h6 {
 }
 
 .thumbnails>li {
-    margin:0 1px 5px 0px;
+    margin:0 5px 5px 0px;
     padding:0px;
 }
 
@@ -560,7 +560,8 @@ ul#recoSummary {
 .sidebar_section { /* 	overflow: visible; */
 	/* 	padding-bottom: 10px; */
 	margin-bottom: 20px;
-	border: 1px solid #CECECE;
+	/*border: 1px solid #CECECE;*/
+        border-radius: 3px;
 }
 
 .sidebar_section h5  {
@@ -615,7 +616,6 @@ ul#recoSummary {
 }
 
 .map_wrapper {
-	padding: 10px;
 	border-radius: 5px;
 	border-top-left-radius: 0;
 	margin-bottom: 40px;
@@ -776,7 +776,6 @@ ul#recoSummary {
 .observations_list {
 	position: relative;
 	top: -40px;
-	padding-right: 10px;
 	/* box-shadow: 8px 0 6px -6px #5e5e5e; */
 	/* background-color: rgba(106, 201, 162, 0.1); */
 }

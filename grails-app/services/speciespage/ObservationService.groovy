@@ -1656,7 +1656,7 @@ class ObservationService {
 				if(request){
 					templateMap['userProfileUrl'] = generateLink("SUser", "show", ["id": toUser.id], request)
 				}
-		    if ( Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
+		    //if ( Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
 			//if ( Environment.getCurrent().getName().equalsIgnoreCase("development")) {
 		            log.debug "Sending email to ${toUser}"
                     try{
@@ -1688,7 +1688,7 @@ class ObservationService {
                         e.printStackTrace();
                     }
 				}
-			}
+			//}
 		}
 		
 		} catch (e) {
@@ -1741,7 +1741,7 @@ class ObservationService {
                 }
             }
         } else {
-            participants << getOwner(observation);
+            participants << springSecurityService.currentUser;
         }
         
 		return participants;
@@ -1749,14 +1749,18 @@ class ObservationService {
 	
 	private SUser getOwner(observation) {
 		def author = null;
-		if(observation.metaClass.hasProperty(observation, 'author')) {
-			author = observation.author;
-			if(!author.sendNotification) {
-				author = null;
-			}
-		}
+        if ( Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
+            if(observation.metaClass.hasProperty(observation, 'author')) {
+                author = observation.author;
+                if(!author.sendNotification) {
+                    author = null;
+                }
+            }
+        } else {
+            author = springSecurityService.currentUser;
+        }
 		return author;
-	}
+	} 
 	
 	private String getTitle(observation) {
 		if(observation.metaClass.hasProperty(observation, 'title')) {

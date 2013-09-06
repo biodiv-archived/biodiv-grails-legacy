@@ -81,8 +81,12 @@
 				<div id="observations_list_map" class="observation sidebar_section"
                                     style="clear:both;overflow:hidden;display:none;">
 					<obv:showObservationsLocation
-						model="['observationInstanceList':totalObservationInstanceList, 'userGroup':userGroup, 'width':280]">
+						model="['observationInstanceList':totalObservationInstanceList, 'userGroup':userGroup]">
 					</obv:showObservationsLocation>
+                                        <a id="refreshListForBounds" data-toggle="dropdown"
+                                            href="#"><i class="icon-refresh"></i>
+							Filter list to the bounds</a>
+
                                         <input id="isMapView" name="isMapView" value="${params.isMapView}" type="hidden"/>
                                         <input id="bounds" name="bounds" value="${activeFilters?.bounds}" type="hidden"/>
                                         <input id="tag" name="tag" value="${params.tag}" type="hidden"/>
@@ -110,9 +114,14 @@ $(document).ready(function() {
         $("#map_view_bttn a").click();
 
     $('#big_map_canvas').on('maploaded', function(){
-        map.on('viewreset', function() {
+        /*map.on('viewreset', function() {
             refreshList(getSelectedBounds());
-        });
+        });*/
     });
+    
+    $("#refreshListForBounds").click(function() {
+        refreshList(getSelectedBounds());
+    });
+
 });
 </g:javascript>
