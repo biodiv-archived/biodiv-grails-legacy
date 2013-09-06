@@ -4,8 +4,8 @@
 <div class="signature clearfix thumbnail">
 		<div class="figure user-icon pull-left" style="display:table;height:32px;">
 			<a href="${uGroup.createLink( 'controller':'SUser', action:'show', id:userInstance.id, userGroup:userGroup, 'userGroupWebaddress':userGroupWebaddress)}"> <img
-				style="float: left;" src="${userInstance.profilePicture(ImageType.SMALL)}"
-				class="small_profile_pic" title="${userInstance.name}" /></a>
+				src="${userInstance.profilePicture(ImageType.SMALL)}"
+				class="small_profile_pic pull-left" title="${userInstance.name}" /></a>
 		</div>
                 <g:if test="${!hideDetails}">
 		<div class="story" style="margin-left:35px">

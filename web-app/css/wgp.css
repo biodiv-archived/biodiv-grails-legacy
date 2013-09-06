@@ -1598,20 +1598,27 @@ li#userOrEmail-new {
 	color: #fefefe;
 }
 
-/* #ibp-header .navbar .nav>li>a { */
-/* 	color: #111; */
-/* } */
+#ibp-header .navbar-inner {
+    min-height:30px;
+}
 
-/* #ibp-header .navbar .nav>li>a:hover { */
-/* 	color: #fefefe; */
-/* } */
+#ibp-header .navbar .nav>li>a {
+ 	color: #111; 
+        padding:5px 15px 5px;
+}
 
-/* #ibp-header .navbar .nav .active > a{ */
-/* 	color: #ffffff; */
-/* } */
-#ibp-header .brand { /* 	font-size: 16px; */
+#ibp-header .navbar .nav>li>a:hover {
+ 	color: #fefefe; 
+ } 
+
+ #ibp-header .navbar .nav .active > a{ 
+ 	color: #ffffff; 
+ }
+#ibp-header .brand {  	
+        /*      font-size: 16px; */
 	/* 	font-weight: bold; */
 	color: #111111;
+        padding: 5px 20px 5px
 }
 
 .navbar .nav .dropdown-toggle .caret,.navbar .nav .open.dropdown .caret
@@ -1664,6 +1671,7 @@ li#userOrEmail-new {
 .login-box .signature {
 	background-color: transparent;
         padding:0px;
+        border:0px;
 }
 
 .signature:hover {
@@ -1756,12 +1764,18 @@ li#userOrEmail-new {
 	max-height: 32px;
 	min-height: 16px;
 	max-width: 32px;
+        margin:0px;
+        float:none;
 }
 
 .loginLink {
 	margin: 0;
 	position: relative;
 	float: right;
+}
+
+#ibp-header .navbar .btn, .navbar .btn-group {
+    margin-top:0px;
 }
 
 .register {

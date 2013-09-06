@@ -1,6 +1,6 @@
 <%@page import="species.utils.Utils"%>
 <div id="ibp-header" class="gradient-bg">
-	<div id="ibp-header-bar" class="navbar navbar-static-top" style="margin-bottom: 0px;">
+	<div id="ibp-header-bar" class="navbar navbar-static-top" style="margin-bottom: 0px;border-bottom:0px;">
 		<div class="navbar-inner"
 			style="box-shadow: none; background-color: #dddbbb; background-image: none; padding: 0px 5px;  filter: progid :DXImageTransform.Microsoft.gradient (startColorstr = '#dddbbb', endColorstr = '#dddbbb' );">
 			<div class="container" style="width: 100%">
@@ -11,15 +11,8 @@
                                         ${grailsApplication.config.speciesPortal.app.siteName}</a>
 				
 				<div class="nav-collapse">
-				
-				
 					<ul class="nav pull-right">
-						
-						
 						<li><uGroup:showSidebar /></li>
-<%--						<li><sUser:userLoginBox--%>
-<%--								model="['userGroup':userGroupInstance]" /></li>--%>
-
 					</ul>
 				</div>
 			</div>
@@ -39,7 +32,7 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 %>
 
 
-        <div id="contributeMenu" class="collapse">
+        <div id="contributeMenu" class="collapse" style="border-bottom:0px;">
                         <div class="container">
     <a class="btn btn-success" data-toggle="popover" data-placement="right" data-content="Species pages intend to provide detailed information on every species in India." data-trigger="hover"
                                     href="${uGroup.createLink(
