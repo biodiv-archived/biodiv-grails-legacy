@@ -67,26 +67,24 @@ def doCrop(){
 
 	def sql =  Sql.newInstance(dataSoruce);
 
-	gettting all resource for species
+	//gettting all resource for species
 	def query = "select distinct(resource_id) as id from species_resource order by resource_id";
 	def result = getResoruceId(query, sql)
 	query = "select distinct(resource_id) as id from species_field_resources order by resource_id";
 	result.addAll(getResoruceId(query, sql))
 	_doCrop(result, grailsApplication.config.speciesPortal.resources.rootDir)
 
-<<<<<<< HEAD
 
-	//query = "select distinct(resource_id) as id from observation_resource";
-	//result = getResoruceId(query, sql)
-	//_doCrop(result, grailsApplication.config.speciesPortal.observations.rootDir)
+	query = "select distinct(resource_id) as id from observation_resource";
+	result = getResoruceId(query, sql)
+	_doCrop(result, grailsApplication.config.speciesPortal.observations.rootDir)
 
 	result = geUserResoruceId()
 	_doCrop(result, grailsApplication.config.speciesPortal.users.rootDir)
-=======
-	query = "select distinct(resource_id) as id from observation_resource order by resource_id";
-	result = getResoruceId(query, sql)
-	_doCrop(result, grailsApplication.config.speciesPortal.observations.rootDir)
->>>>>>> 6ce35dc693da3223b1934c53e94e5cd14f10f620
+
+	//query = "select distinct(resource_id) as id from observation_resource order by resource_id";
+	//result = getResoruceId(query, sql)
+	//_doCrop(result, grailsApplication.config.speciesPortal.observations.rootDir)
 
 	println "============= Start  Time " + startDate  + "          end time " + new Date()
 }
