@@ -5,7 +5,7 @@
     <g:if test="${!showDetails}">
 
     .observation .prop .value {
-    margin-left:10px;
+        margin-left:10px;
     }
 
     </g:if>
@@ -36,7 +36,7 @@
                 
             </div>
         </div>
-        <div class="span7">
+        <div class="${showDetails?'span7':'span5'}">
 
             <div class="prop">
                 <g:if test="${showDetails}">
@@ -182,16 +182,10 @@
         </div>
         <div class="row" style="margin-left:0px;">
             <obv:showFooter
-            model="['observationInstance':observationInstance, 'showDetails':showDetails, 'showLike':true]" />
+                model="['observationInstance':observationInstance, 'showDetails':showDetails, 'showLike':true]" />
             <div style="float: right; clear: both;">
                 <sUser:showUserTemplate
                 model="['userInstance':observationInstance.author, 'userGroup':userGroup]" />
             </div>
         </div>
-
-
-
-
-
-
     </div>

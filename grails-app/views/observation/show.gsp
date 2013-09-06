@@ -102,8 +102,9 @@ String desc = "- "+ location +" by "+observationInstance.author.name.capitalize(
 
 				<div class="span8 right-shadow-box" style="margin: 0;">
 				<div style="height:400px;position:relative">
-
+                                    <div class="story-footer" style="right:0;bottom:55px;z-index:5;background-color:whitesmoke" >
                                     <g:render template="/common/observation/noOfResources" model="['instance':observationInstance, 'bottom':'bottom:55px;']"/>
+                                    </div>
                                     <center>
                                         <div id="gallerySpinner" class="spinner">
                                         <img src="${resource(dir:'images',file:'spinner.gif', absolute:true)}"

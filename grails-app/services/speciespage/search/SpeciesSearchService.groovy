@@ -9,6 +9,7 @@ import java.util.Map
 import org.apache.solr.client.solrj.SolrQuery
 import org.apache.solr.client.solrj.SolrServer
 import org.apache.solr.client.solrj.SolrServerException
+import org.apache.solr.common.SolrException
 import org.apache.solr.common.SolrInputDocument
 import org.apache.solr.common.params.SolrParams
 import org.apache.solr.common.params.TermsParams
@@ -20,7 +21,7 @@ import species.NamesParser
 import species.Species
 import species.Synonyms
 import species.TaxonomyDefinition
-import org.apache.solr.client.solrj.impl.StreamingUpdateSolrServer;
+import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer
 
 class SpeciesSearchService {
 
@@ -185,7 +186,7 @@ class SpeciesSearchService {
 		try {
 			solrServer.add(docs);
 			//commit ...server is configured to do an autocommit after 10000 docs or 1hr
-            if(solrServer instanceof StreamingUpdateSolrServer) {
+            if(solrServer instanceof ConcurrentUpdateSolrServer) {
     			solrServer.blockUntilFinished();
             }
 			solrServer.commit();
@@ -245,7 +246,13 @@ class SpeciesSearchService {
 	def search(query) {
 		def params = SolrParams.toSolrParams(query);
 		log.info "Running search query : "+params
-		return solrServer.query( params );
+        def result;
+        try {
+		    result = solrServer.query( params );
+        } catch(SolrException e) {
+            log.error "Error: ${e.getMessage()}"
+        }
+        return result;
 	}
 
 	/**
@@ -274,6 +281,7 @@ class SpeciesSearchService {
 	 */
 	def terms(query, field, limit) {
 		field = field?:"autocomplete";
+		
 		SolrParams q = new SolrQuery().setQueryType("/terms")
 				.set(TermsParams.TERMS, true).set(TermsParams.TERMS_FIELD, field)
 				.set(TermsParams.TERMS_LOWER, query)
@@ -283,6 +291,12 @@ class SpeciesSearchService {
 				.set(TermsParams.TERMS_LIMIT, limit)
 				.set(TermsParams.TERMS_RAW, true);
 		log.info "Running species search query : "+q
-		return solrServer.query( q );
+        def result;
+        try {
+		   result = solrServer.query( q );
+        } catch(SolrException e) {
+            log.error "Error: ${e.getMessage()}"
+        }
+        return result;
 	}
 }

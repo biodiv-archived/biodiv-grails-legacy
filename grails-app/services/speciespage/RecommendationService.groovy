@@ -147,7 +147,6 @@ class RecommendationService {
 	public Recommendation getRecoForScientificName(String recoName,  String canonicalName, Recommendation commonNameReco){
 		def reco, taxonConcept;
 		//
-		
 		//first searching by canonical name. this name is present if user select from auto suggest
 		if(canonicalName && (canonicalName.trim() != "")){
 			return findReco(canonicalName, true, null, taxonConcept);
@@ -278,7 +277,6 @@ class RecommendationService {
 	
 	private Recommendation searchReco(name, isScientificName, languageId, taxonConcept){
         if(!name) return;
-
 		def c = Recommendation.createCriteria();
 		def recoList = c.list {
 			ilike('name', name);

@@ -125,7 +125,7 @@ class SpeciesUploadService {
         //grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/careearth/1.0";
         //noOfInsertions += uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/careearth/1.0/species accounts188.xlsx", grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/careearth/1.0/speciesaccount188_mapping.xlsx", 0, 0, 0, 0, 1);
 
-        grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/aparnawatve/uploadready/images";
+     /*   grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/aparnawatve/uploadready/images";
         noOfInsertions += uploadNewSimpleSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/aparnawatve/uploadready/aparnawatve.xlsx");
 
         grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/thomas/uploadready/bird_images";
@@ -140,6 +140,13 @@ class SpeciesUploadService {
 
         grailsApplication.config.speciesPortal.images.uploadDir = grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/PHCC/uploadready/grasses_of_palni_hills";
         noOfInsertions += uploadMappedSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/PHCC/uploadready/grasses_of_palni_hills.xlsx", grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/PHCC/uploadready/grasses_of_palni_hills_mapping.xlsx", 0, 0, 0, 0,-1);
+*/
+        noOfInsertions += uploadNewSimpleSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep2/species/thomas/1.6/MammalsspeciesPages.xlsx",grailsApplication.config.speciesPortal.data.rootDir+"/datarep2/species/thomas/1.6/images");
+
+      //  noOfInsertions += uploadNewSimpleSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep2/species/chitra/ne_butterflies/1.5/Northeast Butterflies-RG4.xlsx",grailsApplication.config.speciesPortal.data.rootDir+"/datarep2/species/chitra/ne_butterflies/1.5/NE_Butterflies_RG4");
+
+        //noOfInsertions += uploadNewSimpleSpreadsheet(grailsApplication.config.speciesPortal.data.rootDir+"/datarep2/species/chitra/ne_butterflies/1.6/NortheastButterflies-RG25.xlsx",grailsApplication.config.speciesPortal.data.rootDir+"/datarep2/species/chitra/ne_butterflies/1.6/NE_Butterflies_RG25");
+
 
 
 		return noOfInsertions;
@@ -341,7 +348,12 @@ class SpeciesUploadService {
 
 		for(Species s in batch) {
 			try {
-				externalLinksService.updateExternalLinks(s.taxonConcept);
+                def taxonConcept = TaxonomyDefinition.get(s.taxonConcept.id);
+                if(externalLinksService.updateExternalLinks(taxonConcept)) {
+                    s.taxonConcept = taxonConcept;
+                }
+
+				externalLinksService.updateExternalLinks(taxonConcept);
 			} catch(e) {
 				e.printStackTrace()
 			}

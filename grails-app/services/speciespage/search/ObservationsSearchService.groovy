@@ -10,6 +10,7 @@ import java.util.Map
 import org.apache.solr.client.solrj.SolrQuery
 import org.apache.solr.client.solrj.SolrServer
 import org.apache.solr.client.solrj.SolrServerException
+import org.apache.solr.common.SolrException
 import org.apache.solr.common.SolrInputDocument
 import org.apache.solr.common.params.SolrParams
 import org.apache.solr.common.params.TermsParams
@@ -26,7 +27,7 @@ import species.participation.Recommendation;
 import species.participation.RecommendationVote.ConfidenceType;
 import com.vividsolutions.jts.geom.Point
 import com.vividsolutions.jts.io.WKTWriter;
-import org.apache.solr.client.solrj.impl.StreamingUpdateSolrServer;
+import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer
 
 class ObservationsSearchService {
 
@@ -147,7 +148,7 @@ class ObservationsSearchService {
                 solrServer.add(docs);
                 if(commit) {
                     //commit ...server is configured to do an autocommit after 10000 docs or 1hr
-                    if(solrServer instanceof StreamingUpdateSolrServer) {
+                    if(solrServer instanceof ConcurrentUpdateSolrServer) {
                         solrServer.blockUntilFinished();
                     }
                     solrServer.commit();
@@ -223,7 +224,13 @@ class ObservationsSearchService {
 	def search(query) {
 		def params = SolrParams.toSolrParams(query);
 		log.info "Running observation search query : "+params
-		return solrServer.query( params );
+        def result;
+        try {
+		    result = solrServer.query( params );
+        } catch(SolrException e) {
+            log.error "Error: ${e.getMessage()}"
+        }
+        return result;
 	}
 
 	/**
@@ -271,6 +278,12 @@ class ObservationsSearchService {
 				.set(TermsParams.TERMS_LIMIT, limit)
 				.set(TermsParams.TERMS_RAW, true);
 		log.info "Running observation search query : "+q
-		return solrServer.query( q );
+        def result;
+        try{
+		    result = solrServer.query( q );
+        } catch(SolrException e) {
+            log.error "Error: ${e.getMessage()}"
+        }
+        return result;
 	}
 }

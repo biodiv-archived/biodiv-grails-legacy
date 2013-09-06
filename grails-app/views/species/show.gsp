@@ -552,7 +552,7 @@ $(document).ready(function(){
 									
 								</g:elseif> 
 								<g:elseif test="${it?.field?.subCategory?.equalsIgnoreCase('year')}">
-									<td><span class="grid_3 name">${it?.field?.subCategory} </span></td> <td> ${(int)Float.parseFloat(it?.description)}</td>
+									<td><span class="grid_3 name">${it?.field?.subCategory} </span></td> <td> ${it?.description}</td>
 								</g:elseif> 
 								<g:else>
 									<td><span class="grid_3 name">${it?.field?.subCategory} </span></td> <td> ${it?.description}</td>

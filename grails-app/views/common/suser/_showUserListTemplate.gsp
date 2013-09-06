@@ -9,13 +9,13 @@
 		</button>
 	</div>
 	
-	<div class="mainContentList">
+	<div class="mainContentList" style="clear:both;">
 		<div class="mainContent" name="p${params?.offset}">
 
 			<ul class="grid_view thumbnails">
 	
 				<g:each in="${userInstanceList}" status="i" var="userInstance">
-					<g:if test="${i% ((params.controller != 'userGroup')?4:4) == 0}">
+					<g:if test="${i% ((params.controller != 'userGroup')?6:6) == 0}">
 						<li class="thumbnail" style="clear: both;margin-left:0px;">
 					</g:if>
 					<g:else>
@@ -35,15 +35,16 @@
 			</ul>
 		</div>
 	</div>
+		
+		<g:if test="${instanceTotal > searchQuery?.max}">
+		    <div class="centered">
+		          <div class="btn loadMore">
+		             <span class="progress" style="display: none;">Loading ... </span> <span
+          		        class="buttonTitle">Load more</span>
+        		  </div>
+		    </div>
+		</g:if>
 
-	<g:if test="${instanceTotal > params.max}">
-		<div class="centered">
-			<div class="btn loadMore">
-				<span class="progress" style="display: none;">Loading ... </span> <span
-					class="buttonTitle">Load more</span>
-			</div>
-		</div>
-	</g:if>
 	<div class="paginateButtons" style="visibility: hidden; clear: both">
 		<p:paginate total="${instanceTotal}" max="${params.max}" action="${params.action}" controller="${params.controller?:'user'}"
 			userGroup="${userGroupInstance}" userGroupWebaddress="${userGroupWebaddress}"

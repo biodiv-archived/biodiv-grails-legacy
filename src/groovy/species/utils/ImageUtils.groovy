@@ -101,16 +101,11 @@ class ImageUtils {
 	 */
 
 	public static void doResize(File inImg, File outImg, int width, int height) throws Exception{
-		//String fileName = inImg.getAbsolutePath();
-		//System.out.println(fileName);
-		//String name = fileName.split("[.]")[0];
-		//System.out.println(name);
-
 		String ext = "jpg";
 		BufferedImage im = null;
 		BufferedImage scaled = null;
 		BufferedImage cropped = null;
-		//try {
+
 		im = ImageIO.read(inImg);
 		int img_width = im.getWidth();
 		int img_height = im.getHeight();
@@ -125,11 +120,7 @@ class ImageUtils {
 			int y = 0;
 			int rect_width = sca_height;
 			int rect_height = sca_height;
-			//System.out.println(x+" "+y+" "+rect_width+" "+rect_height);
-			//System.out.println(scaled.getWidth() +"  "+ scaled.getHeight());
-			//ImageIO.write(scaled, ext, outImg);
 			cropped = scaled.getSubimage(x, y, rect_width, rect_height);
-
 		}
 		// Case 2: When height greater than width of image.
 		else {
@@ -140,11 +131,8 @@ class ImageUtils {
 			int y = (new_height - sca_width) / 2;
 			int rect_width = sca_width;
 			int rect_height = sca_width;
-			//System.out.println(x+" "+y+" "+rect_width+" "+rect_height);
-			//System.out.println(scaled.getWidth() +"  "+ scaled.getHeight());
 			cropped = scaled.getSubimage(x, y, rect_width, rect_height);
 		}
-		//File outputfile = new File(name + "_th1." + ext);
 		ImageIO.write(cropped, ext, outImg);
         jpegOptimize(outImg);
 

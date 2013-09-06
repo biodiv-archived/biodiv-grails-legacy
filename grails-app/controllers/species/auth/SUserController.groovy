@@ -50,7 +50,7 @@ class SUserController extends UserController {
 	}
 
 	def list = {
-		params.max = Math.min(params.max ? params.int('max') : 12, 100)
+		params.max = Math.min(params.max ? params.int('max') : 24, 100)
 		//params.sort = params.sort && params.sort != 'score' ? params.sort : "activity";
 		params.query='%';
 		def model = getUsersList(params);
@@ -265,13 +265,13 @@ class SUserController extends UserController {
 	}
 
 	def search = {
-		println "search"
 		log.debug params
+		def searchFieldsConfig = grailsApplication.config.speciesPortal.searchFields
 
-		def model = getUsersList(params);
-
+		//def model = getUsersList(params);
+		def model = SUserService.getUsersFromSearch(params);
 		// add query params to model for paging
-		for (name in [
+		/*for (name in [
 			'username',
 			'enabled',
 			'accountExpired',
@@ -281,8 +281,9 @@ class SUserController extends UserController {
 			'order'
 		]) {
 			model[name] = params[name]
-		}
-		model['isSearch'] = true;
+		}*/
+		
+		//model['isSearch'] = true;
 		params.action = 'search'
 		params.controller = 'SUser'
 
@@ -404,7 +405,7 @@ class SUserController extends UserController {
 			//		}
 		}
 
-		return ['userInstanceList': results, instanceTotal: totalCount, queryParams:queryParams, searched: true]
+		return ['userInstanceList': results, instanceTotal: totalCount, searchQuery:queryParams, searched: true]
 
 	}
 

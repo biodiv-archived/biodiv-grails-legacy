@@ -7,12 +7,11 @@ def obvId = observationInstance.id
 %>
 
 <div style="position:relative;overflow:hidden">
-    <g:render template="/common/observation/noOfResources" model="['instance':observationInstance]"/>
-    <div class="figure span3 observation_story_image" style="display: table;height:220px;" 
+    <div class="figure span2 observation_story_image" style="display: table;height:220px;" 
             title='<g:if test="${obvTitle != null}">${obvTitle}</g:if>'>
             <g:link url="${uGroup.createLink(controller:controller, action:'show', id:obvId, 'pos':pos, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress) }" name="l${pos}"
                     >
-                    <div style="${observationInstance.isChecklist?'height:150px;width:150px;':''}position:relative;margin:auto;">
+                    <div style="${observationInstance.isChecklist?'height:100px;width:100px;':''}position:relative;margin:auto;">
                     <g:if
                             test="${imagePath}">
                             <img class="img-polaroid" style=" ${observationInstance.isChecklist? 'opacity:0.7;' :''}"

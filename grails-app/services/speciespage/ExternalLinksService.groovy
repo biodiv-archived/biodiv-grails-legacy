@@ -60,18 +60,19 @@ class ExternalLinksService {
 	boolean updateExternalLinks(TaxonomyDefinition taxonConcept) {
 		def http = new HTTPBuilder();
 
-		if(!Environment.getCurrent().getName().startsWith("development")) {
+		//if(!Environment.getCurrent().getName().startsWith("development")) {
 			updateEOLId(http, taxonConcept);
 			if(taxonConcept.externalLinks?.eolId) {
 				updateOtherIdsFromEOL(http, taxonConcept.externalLinks?.eolId, taxonConcept);
 			}
 
 			//taxonConcept = session.merge(taxonConcept);
+            if(!taxonConcept.isAttached()) taxonConcept.attach();
 			if(!taxonConcept.save()) {
 				taxonConcept.errors.each { log.error it};
 				return false;
 			}
-		}
+		//}
 		return true;
 	}
 
@@ -97,6 +98,7 @@ class ExternalLinksService {
 	 * @return
 	 */
 	def updateExternalLink(TaxonomyDefinition taxonConcept, String idType, String idVal, boolean persist, Date eolFetchDate) {
+
 
 		if(!taxonConcept.externalLinks) {
 			taxonConcept.externalLinks = new ExternalLinks(noOfDataObjects : 0);
@@ -131,9 +133,11 @@ class ExternalLinksService {
 				break;
 		}
 
+		if(persist) {
 
-		if(persist && !taxonConcept.save()) {
-			taxonConcept.errors.each { log.error it};
+            if(!taxonConcept.isAttached()) taxonConcept.attach();
+            if(!taxonConcept.save()) 
+			    taxonConcept.errors.each { log.error it};
 		}
 	}
 
@@ -200,6 +204,7 @@ class ExternalLinksService {
 							}
 						}
 						log.debug "No of data objects  : "+json.dataObjects.size();
+                        if(!taxonConcept.isAttached()) taxonConcept.attach();
 						taxonConcept.externalLinks.noOfDataObjects = json.dataObjects.size();
 					}
 				}

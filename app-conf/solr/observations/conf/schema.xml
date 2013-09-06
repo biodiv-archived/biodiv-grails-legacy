@@ -148,12 +148,10 @@
 		<fieldType name="textExact" class="solr.TextField">
 			<analyzer type="index">
 				<tokenizer class="solr.KeywordTokenizerFactory" />
-				<filter class="solr.LowerCaseFilterFactory" />
 				<filter class="solr.TrimFilterFactory" />
 			</analyzer>
 			<analyzer type="query">
 				<tokenizer class="solr.KeywordTokenizerFactory" />
-				<filter class="solr.LowerCaseFilterFactory" />
 				<filter class="solr.TrimFilterFactory" />
 			</analyzer>
 		</fieldType>
@@ -224,7 +222,7 @@
 		<!--document reference annotations -->
 		<field name="id" type="string" indexed="true" stored="true"
 			required="true" multiValued="false" />
-			
+		<field name="_version_" type="long" indexed="true" stored="true" multiValued="false"/>			
 		<field name="author" type="taxonText" indexed="true" required="true" stored="true"/>
 		<field name="author_id" type="long" indexed="true" required="true" stored="true"/>
 		<field name="contributor" type="taxonText" indexed="true" multiValued="true" />
@@ -252,7 +250,11 @@
 		<copyField source="name" dest="name_exact" />
 		<field name="common_name_exact" type="textExact" indexed="true" multiValued="true" />
 		<copyField source="common_name" dest="common_name_exact" />
-		
+                
+                <field name="maxvotedspeciesname" type="taxonText" indexed="true" multiValued="true" />
+		<field name="maxvotedspeciesname_exact" type="textExact" indexed="true" multiValued="true" />
+		<copyField source="maxvotedspeciesname" dest="maxvotedspeciesname_exact" />
+
 		<field name="tag" type="string" indexed="true" multiValued="true" />
 		
 		<field name="title" type="taxonText" indexed="true" stored="true" multiValued="false" />

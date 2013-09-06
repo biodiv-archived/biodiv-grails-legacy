@@ -1,6 +1,5 @@
 package speciespage.search
 
-
 import static groovyx.net.http.ContentType.JSON
 
 import java.text.SimpleDateFormat
@@ -11,16 +10,15 @@ import java.util.Map
 import org.apache.solr.client.solrj.SolrQuery
 import org.apache.solr.client.solrj.SolrServer
 import org.apache.solr.client.solrj.SolrServerException
-import org.apache.solr.common.SolrException
-
 import org.apache.solr.common.SolrInputDocument
 import org.apache.solr.common.params.SolrParams
 import org.apache.solr.common.params.TermsParams
+
+import species.auth.SUser;
+//import org.apache.solr.client.solrj.impl.StreamingUpdateSolrServer
 import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer
 
-import content.Project
-
-class ProjectSearchService {
+class SUserSearchService {
 
 	static transactional = false
 
@@ -36,69 +34,56 @@ class ProjectSearchService {
 	 *
 	 */
 	def publishSearchIndex() {
-		log.info "Initializing publishing to projects search index"
+		log.info "Initializing publishing to ufiles search index"
 		
 		//TODO: change limit
-		int limit = Project.count()+1, offset = 0;
+		int limit = BATCH_SIZE, offset = 0;
 		
-		def projects;
+		def susers;
 		def startTime = System.currentTimeMillis()
 		while(true) {
-			projects = Project.list(max:limit, offset:offset);
-			if(!projects) break;
-			publishSearchIndex(projects, true);
-			projects.clear();
+			susers = SUser.findAll("from SUser as u where u.accountLocked =:ae and u.accountExpired =:al and u.enabled=:en", [ae:false, al:false, en:true], [max:limit, offset:offset, sort: "id"]);
+			if(!susers) break;
+			if(susers)  {
+				publishSearchIndex(susers, true);
+				susers.clear();
+			}
 			offset += limit;
 		}
 		
-		log.info "Time taken to publish projects search index is ${System.currentTimeMillis()-startTime}(msec)";
+		log.info "Time taken to publish users search index is ${System.currentTimeMillis()-startTime}(msec)";
 	}
 
-	def publishSearchIndex(Project proj, boolean commit) {
-		return publishSearchIndex([proj], commit);
+	def publishSearchIndex(SUser suser, boolean commit) {
+		return publishSearchIndex([suser], commit);
 	}
-
-	/**
-	 * 
-	 * @param projects
+	
+	/**	
+	 *
+	 * @param ufiles
 	 * @param commit
 	 * @return
 	 */
-	def publishSearchIndex(List<Project> projects, boolean commit) {
-		if(!projects) return;
-		log.info "Initializing publishing to projects search index : "+projects.size();
+	def publishSearchIndex(List<SUser> susers, boolean commit) {
+		if(!susers) return;
+		log.info "Initializing publishing to Users search index : "+susers.size();
 
-		def fieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.fields
 		def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields
 
 		Collection<SolrInputDocument> docs = new ArrayList<SolrInputDocument>();
 		Map names = [:];
 		Map docsMap = [:]
-		projects.each { proj ->
-			log.debug "Reading Project : "+proj.id;
-
+		susers.each { suser ->
+			log.debug "Reading User : "+suser.id;
 				SolrInputDocument doc = new SolrInputDocument();
-				doc.addField(searchFieldsConfig.ID, proj.id.toString());
-				doc.addField(searchFieldsConfig.TITLE, proj.title);
-				doc.addField(searchFieldsConfig.GRANTEE_ORGANIZATION, proj.granteeOrganization);
+				doc.addField(searchFieldsConfig.ID, suser.id.toString());
+				doc.addField(searchFieldsConfig.NAME, suser.name);
+				doc.addField(searchFieldsConfig.USERNAME, suser.username);
+				doc.addField(searchFieldsConfig.EMAIL, suser.email);
+				doc.addField(searchFieldsConfig.ABOUT_ME, suser.aboutMe);
+				doc.addField(searchFieldsConfig.LAST_LOGIN, suser.lastLoginDate);
 				
-				proj.locations.each { location ->
-					doc.addField(searchFieldsConfig.SITENAME, location.siteName);				
-					doc.addField(searchFieldsConfig.CORRIDOR, location.corridor);
-				}				
-
-				
-				proj.tags.each { tag ->
-					doc.addField(searchFieldsConfig.TAG, tag);
-				}
-					
-				
-				proj.userGroups.each { userGroup ->
-					doc.addField(searchFieldsConfig.USER_GROUP, userGroup.id);
-					doc.addField(searchFieldsConfig.USER_GROUP_WEBADDRESS, userGroup.webaddress);
-				}
 				docs.add(doc);
-			
 		}
 
 		log.debug docs;
@@ -107,10 +92,10 @@ class ProjectSearchService {
 			solrServer.add(docs);
 			if(commit) {
 				//commit ...server is configured to do an autocommit after 10000 docs or 1hr
-                if(solrServer instanceof ConcurrentUpdateSolrServer)
+                	if(solrServer instanceof ConcurrentUpdateSolrServer)
     				solrServer.blockUntilFinished();
 				solrServer.commit();
-				log.info "Finished committing to project solr core"
+				log.info "Finished committing to SUser solr core"
 			}
 		} catch(SolrServerException e) {
 			e.printStackTrace();
@@ -126,14 +111,8 @@ class ProjectSearchService {
 	 */
 	def search(query) {
 		def params = SolrParams.toSolrParams(query);
-		log.info "Running project search query : "+params
-        def result;
-        try {
-		    result = solrServer.query( params );
-        } catch(SolrException e) {
-            log.error "Error: ${e.getMessage()}"
-        }
-        return result;
+		log.info "Running user search query : "+params
+		return solrServer.query( params );
 	}
 
 	/**
@@ -142,7 +121,7 @@ class ProjectSearchService {
 	* @return
 	*/
    def delete(long id) {
-	   log.info "Deleting project from search index"
+	   log.info "Deleting user from search index"
 	   solrServer.deleteByQuery("id:${id}");
 	   solrServer.commit();
    }
@@ -152,7 +131,7 @@ class ProjectSearchService {
 	 * @return
 	 */
 	def deleteIndex() {
-		log.info "Deleting project search index"
+		log.info "Deleting user search index"
 		solrServer.deleteByQuery("*:*")
 		solrServer.commit();
 	}
@@ -162,12 +141,12 @@ class ProjectSearchService {
 	 * @return
 	 */
 	def optimize() {
-		log.info "Optimizing project search index"
+		log.info "Optimizing user search index"
 		solrServer.optimize();
 	}
 
 	/**
-	 * 
+	 *
 	 * @param query
 	 * @param field
 	 * @param limit
@@ -183,13 +162,7 @@ class ProjectSearchService {
 				.set(TermsParams.TERMS_REGEXP_FLAG, "case_insensitive")
 				.set(TermsParams.TERMS_LIMIT, limit)
 				.set(TermsParams.TERMS_RAW, true);
-		log.info "Running project search query : "+q
-        def result;
-        try {
-		    result = solrServer.query( q );
-        } catch(SolrException e) {
-            log.error "Error: ${e.getMessage()}"
-        }
-        return result;
+		log.info "Running user search query : "+q
+		return solrServer.query( q );
 	}
 }
