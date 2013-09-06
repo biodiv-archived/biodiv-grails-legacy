@@ -16,6 +16,7 @@ import species.utils.ImageType;
 import species.Habitat;
 import species.groups.SpeciesGroup;
 import content.eml.Document
+import species.utils.ImageUtils;
 
 class SUser {
 
@@ -125,7 +126,8 @@ class SUser {
 	def profilePicture(ImageType type) {
 		boolean iconPresent = (new File(grailsApplication.config.speciesPortal.users.rootDir.toString()+this.icon)).exists()
 		if(iconPresent) {
-			return grailsApplication.config.speciesPortal.users.serverURL+this.icon //, type:ResourceType.ICON, title:this.name);
+			def thumbnailUrl =  grailsApplication.config.speciesPortal.users.serverURL + "/" + ImageUtils.getFileName(this.icon, type, null)
+			return thumbnailUrl;
 		}
 
 
