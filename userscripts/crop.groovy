@@ -16,7 +16,7 @@ def geUserResoruceId(){
 
 def _doCrop(resourceList, relativePath){
 
-	println "=======================================" + resourceList.size()
+	println "==============Resource List Size==================" + resourceList.size()
 	HashMap hm = new HashMap();
 	resourceList.each { res->
 		println "------------------------------------------------------------------ " + res.id
@@ -40,8 +40,12 @@ def _doCrop(resourceList, relativePath){
 			ImageUtils.doResize(file, outImg, 200, 200);
 		}catch (Exception e) {
 			println "==========================ee=== " + e.getMessage()
+			hm.put(file , e.getMessage());
 		}
 	}
+	println "===================ERROR COUNT============= " + hm.size()
+	println hm
+	println "====================ERROR END========================"
 }
 
 def getResoruceId(query, sql){
