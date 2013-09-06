@@ -454,7 +454,7 @@
 			    });
 			    return hbt;	
 			}
-			intializesSeciesHabitatInterest()
+			intializesSpeciesHabitatInterest()
 			<%
 				user.speciesGroups.each {
 					out << "jQuery('#group_${it.id}').addClass('active');";

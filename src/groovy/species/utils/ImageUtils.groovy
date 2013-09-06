@@ -146,6 +146,7 @@ class ImageUtils {
 		}
 		//File outputfile = new File(name + "_th1." + ext);
 		ImageIO.write(cropped, ext, outImg);
+        jpegOptimize(outImg);
 
 		//		} catch(Exception e){
 		//

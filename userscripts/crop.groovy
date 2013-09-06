@@ -1,12 +1,21 @@
 import species.Resource;
+import species.auth.SUser;
 import groovy.sql.Sql;
 
 import java.util.Date;
 import species.utils.ImageUtils;
 import java.util.*;
 
+def geUserResoruceId(){
+              def result = []
+              SUser.findAllByIconIsNotNull().each { user ->
+                      result << [id:user.id, fileName:user.icon]
+              }
+              return result
+      }
+
 def _doCrop(resourceList, relativePath){
-	println "===============" + resourceList.size()
+	println "=======================================" + resourceList.size()
 	HashMap hm = new HashMap();
 	resourceList.each { res->
 		println "------------------------------------------------------------------"
@@ -59,7 +68,7 @@ def doCrop(){
 	// Instantiate a Date object
 	Date startDate = new Date();
 	// display time and date using toString()
-	System.out.println(startDate.toString());
+	//System.out.println(startDate.toString());
 
 	def dataSoruce = ctx.getBean("dataSource");
 	def grailsApplication = ctx.getBean("grailsApplication");
@@ -74,9 +83,12 @@ def doCrop(){
 	//	_doCrop(result, grailsApplication.config.speciesPortal.resources.rootDir)
 
 
-	query = "select distinct(resource_id) as id from observation_resource";
-	result = getResoruceId(query, sql)
-	_doCrop(result, grailsApplication.config.speciesPortal.observations.rootDir)
+	//query = "select distinct(resource_id) as id from observation_resource";
+	//result = getResoruceId(query, sql)
+	//_doCrop(result, grailsApplication.config.speciesPortal.observations.rootDir)
+
+	result = geUserResoruceId()
+	_doCrop(result, grailsApplication.config.speciesPortal.users.rootDir)
 
 	println "============= Start  Time " + startDate  + "          end time " + new Date()
 
