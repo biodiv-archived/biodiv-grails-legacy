@@ -747,7 +747,7 @@ class ObservationService {
         log.debug "query : "+query;
         log.debug "checklistCountQuery : "+queryParts.checklistCountQuery;
         log.debug "allObservationCountQuery : "+queryParts.allObservationCountQuery;
-        log.debug "distinctRecoQuery : "+queryParts.distinctRecoQuery;
+        //log.debug "distinctRecoQuery : "+queryParts.distinctRecoQuery;
         log.debug "speciesGroupCountQuery : "+queryParts.speciesGroupCountQuery;
 
         log.debug query;
@@ -755,7 +755,7 @@ class ObservationService {
         
         def checklistCountQuery = sessionFactory.currentSession.createQuery(queryParts.checklistCountQuery)
         def allObservationCountQuery = sessionFactory.currentSession.createQuery(queryParts.allObservationCountQuery)
-        def distinctRecoQuery = sessionFactory.currentSession.createQuery(queryParts.distinctRecoQuery)
+        //def distinctRecoQuery = sessionFactory.currentSession.createQuery(queryParts.distinctRecoQuery)
         def speciesGroupCountQuery = sessionFactory.currentSession.createQuery(queryParts.speciesGroupCountQuery)
        
         def hqlQuery = sessionFactory.currentSession.createQuery(query)
@@ -763,18 +763,18 @@ class ObservationService {
             hqlQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(org.hibernatespatial.GeometryUserType, null))
             checklistCountQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(org.hibernatespatial.GeometryUserType, null))
             allObservationCountQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(org.hibernatespatial.GeometryUserType, null))
-            distinctRecoQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(org.hibernatespatial.GeometryUserType, null))
+            //distinctRecoQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(org.hibernatespatial.GeometryUserType, null))
             speciesGroupCountQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(org.hibernatespatial.GeometryUserType, null))
         } 
 
         if(max > -1){
             hqlQuery.setMaxResults(max);
-            distinctRecoQuery.setMaxResults(10);
+            //distinctRecoQuery.setMaxResults(10);
 			queryParts.queryParams["max"] = max
         }
         if(offset > -1) {
             hqlQuery.setFirstResult(offset);
-            distinctRecoQuery.setFirstResult(offset);
+            //distinctRecoQuery.setFirstResult(0);
 			queryParts.queryParams["offset"] = offset
         }
 
@@ -789,14 +789,14 @@ class ObservationService {
         allObservationCountQuery.setProperties(queryParts.queryParams)
         allObservationCount = allObservationCountQuery.list()[0]
 
-		if(!params.loadMore?.toBoolean()) {
-            distinctRecoQuery.setProperties(queryParts.queryParams)
+		 if(!params.loadMore?.toBoolean()) {
+            /*distinctRecoQuery.setProperties(queryParts.queryParams)
             def distinctRecoListResult = distinctRecoQuery.list()
             distinctRecoListResult.each {it->
                 def reco = Recommendation.read(it[0]);
                 distinctRecoList << [reco.name, reco.isScientificName, it[1]]
-            }
-
+            } 
+            */
             speciesGroupCountQuery.setProperties(queryParts.queryParams)
             speciesGroupCountList = getFormattedResult(speciesGroupCountQuery.list())
         }
@@ -938,7 +938,7 @@ class ObservationService {
 			activeFilters["bounds"] = params.bounds
 		} 
 		
-		def distinctRecoQuery = "select obv.maxVotedReco.id, count(*) from Observation obv  "+ userGroupQuery +" "+((params.tag)?tagQuery:'')+filterQuery+ "and obv.isChecklist=false and obv.maxVotedReco is not null group by obv.maxVotedReco order by count(*) desc";
+		def distinctRecoQuery = "select obv.maxVotedReco.id, count(*) from Observation obv  "+ userGroupQuery +" "+((params.tag)?tagQuery:'')+filterQuery+ "and obv.isChecklist=false and obv.maxVotedReco is not null group by obv.maxVotedReco order by count(*) desc,obv.maxVotedReco.id asc";
 
 	    filterQuery += " and obv.isShowable = true "; 
 
@@ -1881,4 +1881,34 @@ class ObservationService {
 				['number', 'Unidentified']
 			]]
 	}
+
+    def getDistinctRecoList(params, int max, int offset) {
+        def queryParts = getFilteredObservationsFilterQuery(params) 
+        def boundGeometry = queryParts.queryParams.remove('boundGeometry'); 
+
+        log.debug "distinctRecoQuery : "+queryParts.distinctRecoQuery;
+
+        def distinctRecoQuery = sessionFactory.currentSession.createQuery(queryParts.distinctRecoQuery)
+
+        if(params.bounds && boundGeometry) {
+            distinctRecoQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(org.hibernatespatial.GeometryUserType, null))
+        } 
+
+        if(max > -1){
+            distinctRecoQuery.setMaxResults(max);
+        }
+        if(offset > -1) {
+            distinctRecoQuery.setFirstResult(offset);
+        }
+
+        def distinctRecoList = [];
+        distinctRecoQuery.setProperties(queryParts.queryParams)
+        def distinctRecoListResult = distinctRecoQuery.list()
+        distinctRecoListResult.each {it->
+            def reco = Recommendation.read(it[0]);
+            distinctRecoList << [reco.name, reco.isScientificName, it[1]]
+        }
+
+        return distinctRecoList;
+    }
 }

@@ -1237,4 +1237,30 @@ class ObservationController {
         def locations = observationService.locations(params);
         render locations as JSON
     }
+
+    def distinctReco = {
+        log.debug params
+        def max = Math.min(params.max ? params.int('max') : 10, 100)
+        def offset = params.offset ? params.int('offset') : 0
+        Map result = [:];
+        try {
+            def distinctRecoList = observationService.getDistinctRecoList(params, max, offset);
+            if(distinctRecoList.size() > 0) {
+                result = [distinctRecoList:distinctRecoList, 'next':offset+max, status:'success', msg:'success']
+            } else {
+                def message = "";
+                if(params.offset > 0) {
+                    message = g.message(code: 'recommendations.nomore.message', default:'No more distinct species. Please contribute');
+                } else {
+                    message = g.message(code: 'recommendations.zero.message', default:'No species. Please contribute');
+                }
+                result = [msg:message]
+            }
+
+        } catch(e) {
+            log.error e.getMessage();
+            result = ['status':'error', 'msg':g.message(code: 'error', default:'Error while processing the request.')];
+        }
+        render result as JSON
+    }
 }
