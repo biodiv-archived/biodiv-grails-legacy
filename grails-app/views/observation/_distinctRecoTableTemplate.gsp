@@ -1,7 +1,7 @@
 
 <%@ page import="species.participation.Recommendation"%>
 
-<div id="distinctRecoList" class="sidebar_section" style="clear:both">
+<div id="distinctRecoList" class="sidebar_section" style="clear:both; border:1px solid #CECECE;overflow:hidden">
     <h5>Distinct Species</h5>
 <table id="distinctRecoTable" class="table table-bordered table-condensed table-striped">
     <tbody>
@@ -25,5 +25,5 @@
         </g:each>
     </tbody>
 </table>
-            <button id="distinctRecoTableAction" class="btn btn-mini pull-right" data-offset='0'>Load More</button>
+<button id="distinctRecoTableAction" class="btn btn-mini pull-right" data-offset='0'>Load More</button>
 </div>
