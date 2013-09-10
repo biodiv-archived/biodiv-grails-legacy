@@ -1103,6 +1103,113 @@ class ObservationService {
 	 * executing query
 	 */
 	Map getFilteredObservationsFromSearch(params, max, offset, isMapView){
+        def queryParts = getFilteredObservationsQueryFromSearch(params, max, offset, isMapView);
+        def paramsList = queryParts.paramsList
+        def queryParams = queryParts.queryParams
+        def activeFilters = queryParts.activeFilters
+
+        if(isMapView) {
+			//query = mapViewQuery + filterQuery + orderByClause
+		} else {
+			//query += filterQuery + orderByClause
+			queryParams["max"] = max
+			queryParams["offset"] = offset
+		}
+
+		List<Observation> instanceList = new ArrayList<Observation>();
+		def totalObservationIdList = [];
+		def facetResults = [:], responseHeader
+		long noOfResults = 0;
+		long checklistCount = 0
+        List distinctRecoList = [];
+        def speciesGroupCountList = [];
+		if(paramsList) {
+            //Facets
+            def speciesGroups;
+            paramsList.add('facet', "true");
+            params["facet.offset"] = params["facet.offset"] ?: 0;
+            paramsList.add('facet.offset', params["facet.offset"]);
+            paramsList.add('facet.mincount', "1");
+                
+            paramsList.add(searchFieldsConfig.IS_CHECKLIST, false);
+
+		    if(!params.loadMore?.toBoolean()){
+                paramsList.add('facet.field', searchFieldsConfig.MAX_VOTED_SPECIES_NAME+"_exact");
+                paramsList.add("f.${searchFieldsConfig.MAX_VOTED_SPECIES_NAME}_exact.facet.limit", 10);
+                def qR = observationsSearchService.search(paramsList);
+                List distinctRecoListFacets = qR.getFacetField(searchFieldsConfig.MAX_VOTED_SPECIES_NAME+"_exact").getValues()
+                distinctRecoListFacets.each {
+                    //TODO second parameter, isScientificName
+                    distinctRecoList.add([it.getName(), true, it.getCount()]);
+                }
+                
+                paramsList.remove('facet.field');
+                paramsList.remove("f.${searchFieldsConfig.MAX_VOTED_SPECIES_NAME}_exact.facet.limit");
+
+                paramsList.add(searchFieldsConfig.IS_SHOWABLE, 'true');
+                paramsList.add('facet.field', searchFieldsConfig.SGROUP);
+                //paramsList.add("f.${searchFieldsConfig.SGROUP}.facet.limit", -1);
+                paramsList.add('facet.field', searchFieldsConfig.IS_CHECKLIST);
+                speciesGroups = SpeciesGroup.list();
+                speciesGroups.each {
+                    paramsList.add('facet.query', "${searchFieldsConfig.SGROUP}:${it.id} AND ${searchFieldsConfig.IS_CHECKLIST}:false AND ${searchFieldsConfig.MAX_VOTED_SPECIES_NAME}_exact:Unknown");
+                    paramsList.add('facet.query', "${searchFieldsConfig.SGROUP}:${it.id} AND ${searchFieldsConfig.IS_CHECKLIST}:false");
+                }
+            }
+
+			def queryResponse = observationsSearchService.search(paramsList);
+			Iterator iter = queryResponse.getResults().listIterator();
+			while(iter.hasNext()) {
+				def doc = iter.next();
+				def instance = Observation.read(Long.parseLong(doc.getFieldValue("id")+""));
+				if(instance) {
+					totalObservationIdList.add(Long.parseLong(doc.getFieldValue("id")+""));
+					instanceList.add(instance);
+				}
+			}
+		
+		    if(!params.loadMore?.toBoolean()){
+                //TODO:handle isChecklist=false and isShowable = true
+                List speciesGroupCountListFacets = queryResponse.getFacetField(searchFieldsConfig.SGROUP).getValues()
+                Map speciesGroupUnidentifiedCountListFacets = queryResponse.getFacetQuery()		
+                speciesGroups.each {
+                    if(it.name != grailsApplication.config.speciesPortal.group.ALL) {
+                        String key = "${searchFieldsConfig.SGROUP}:${it.id} AND ${searchFieldsConfig.IS_CHECKLIST}:false"
+                        String unidentifiedKey = "${searchFieldsConfig.SGROUP}:${it.id} AND ${searchFieldsConfig.IS_CHECKLIST}:false AND ${searchFieldsConfig.MAX_VOTED_SPECIES_NAME}_exact:Unknown";
+                        long all = speciesGroupUnidentifiedCountListFacets.get(key);
+                        long unIdentified = speciesGroupUnidentifiedCountListFacets.get(unidentifiedKey)
+                        if(all | unIdentified)
+                            speciesGroupCountList.add([it.name, all, unIdentified]);
+                    }
+                }
+               
+                speciesGroupCountList = speciesGroupCountList.sort {a,b->a[0]<=>b[0]}
+                speciesGroupCountList = [data:speciesGroupCountList?:[], columns:[
+                    ['string', 'Species Group'],
+                    ['number', 'All'],
+                    ['number', 'Unidentified']
+                ]]
+            
+                List isChecklistFacets = queryResponse.getFacetField(searchFieldsConfig.IS_CHECKLIST).getValues()
+                isChecklistFacets.each {
+                    if(it.getName() == 'true')
+                        checklistCount = it.getCount()
+                }
+            }
+
+			responseHeader = queryResponse?.responseHeader;
+			noOfResults = queryResponse.getResults().getNumFound()
+
+		}
+		/*if(responseHeader?.params?.q == "*:*") {
+			responseHeader.params.remove('q');
+		}*/
+		
+		return [responseHeader:responseHeader, observationInstanceList:instanceList, resultType:'observation', instanceTotal:noOfResults, checklistCount:checklistCount, observationCount: noOfResults-checklistCount , queryParams:queryParams, activeFilters:activeFilters, totalObservationIdList:totalObservationIdList, distinctRecoList:distinctRecoList, speciesGroupCountList:speciesGroupCountList]
+	
+    }
+
+	Map getFilteredObservationsQueryFromSearch(params, max, offset, isMapView){
 		def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields
 		params.sGroup = (params.sGroup)? params.sGroup : SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.ALL).id
 		params.habitat = (params.habitat)? params.habitat : Habitat.findByName(grailsApplication.config.speciesPortal.group.ALL).id
@@ -1212,7 +1319,6 @@ class ObservationService {
 		
 		paramsList.add('fl', params['fl']?:"id");
 		
-		
 		//Filters
 		if(params.sGroup) {
 			params.sGroup = params.sGroup.toLong()
@@ -1285,105 +1391,7 @@ class ObservationService {
 			}
 		}
 		log.debug "Along with faceting params : "+paramsList;
-		
-		if(isMapView) {
-			//query = mapViewQuery + filterQuery + orderByClause
-		} else {
-			//query += filterQuery + orderByClause
-			queryParams["max"] = max
-			queryParams["offset"] = offset
-		}
-
-		List<Observation> instanceList = new ArrayList<Observation>();
-		def totalObservationIdList = [];
-		def facetResults = [:], responseHeader
-		long noOfResults = 0;
-		long checklistCount = 0
-        List distinctRecoList = [];
-        def speciesGroupCountList = [];
-		if(paramsList) {
-            //Facets
-            def speciesGroups;
-            paramsList.add('facet', "true");
-            params["facet.offset"] = params["facet.offset"] ?: 0;
-            paramsList.add('facet.offset', params["facet.offset"]);
-            paramsList.add('facet.mincount', "1");
-                
-            paramsList.add(searchFieldsConfig.IS_CHECKLIST, false);
-
-		    if(!params.loadMore?.toBoolean()){
-                paramsList.add('facet.field', searchFieldsConfig.MAX_VOTED_SPECIES_NAME+"_exact");
-                paramsList.add("f.${searchFieldsConfig.MAX_VOTED_SPECIES_NAME}_exact.facet.limit", 10);
-                def qR = observationsSearchService.search(paramsList);
-                List distinctRecoListFacets = qR.getFacetField(searchFieldsConfig.MAX_VOTED_SPECIES_NAME+"_exact").getValues()
-                distinctRecoListFacets.each {
-                    //TODO second parameter, isScientificName
-                    distinctRecoList.add([it.getName(), true, it.getCount()]);
-                }
-                
-                paramsList.remove('facet.field');
-                paramsList.remove("f.${searchFieldsConfig.MAX_VOTED_SPECIES_NAME}_exact.facet.limit");
-
-                paramsList.add(searchFieldsConfig.IS_SHOWABLE, 'true');
-                paramsList.add('facet.field', searchFieldsConfig.SGROUP);
-                //paramsList.add("f.${searchFieldsConfig.SGROUP}.facet.limit", -1);
-                paramsList.add('facet.field', searchFieldsConfig.IS_CHECKLIST);
-                speciesGroups = SpeciesGroup.list();
-                speciesGroups.each {
-                    paramsList.add('facet.query', "${searchFieldsConfig.SGROUP}:${it.id} AND ${searchFieldsConfig.IS_CHECKLIST}:false AND ${searchFieldsConfig.MAX_VOTED_SPECIES_NAME}_exact:Unknown");
-                    paramsList.add('facet.query', "${searchFieldsConfig.SGROUP}:${it.id} AND ${searchFieldsConfig.IS_CHECKLIST}:false");
-                }
-            }
-
-			def queryResponse = observationsSearchService.search(paramsList);
-			Iterator iter = queryResponse.getResults().listIterator();
-			while(iter.hasNext()) {
-				def doc = iter.next();
-				def instance = Observation.read(Long.parseLong(doc.getFieldValue("id")+""));
-				if(instance) {
-					totalObservationIdList.add(Long.parseLong(doc.getFieldValue("id")+""));
-					instanceList.add(instance);
-				}
-			}
-		
-		    if(!params.loadMore?.toBoolean()){
-                //TODO:handle isChecklist=false and isShowable = true
-                List speciesGroupCountListFacets = queryResponse.getFacetField(searchFieldsConfig.SGROUP).getValues()
-                Map speciesGroupUnidentifiedCountListFacets = queryResponse.getFacetQuery()		
-                speciesGroups.each {
-                    if(it.name != grailsApplication.config.speciesPortal.group.ALL) {
-                        String key = "${searchFieldsConfig.SGROUP}:${it.id} AND ${searchFieldsConfig.IS_CHECKLIST}:false"
-                        String unidentifiedKey = "${searchFieldsConfig.SGROUP}:${it.id} AND ${searchFieldsConfig.IS_CHECKLIST}:false AND ${searchFieldsConfig.MAX_VOTED_SPECIES_NAME}_exact:Unknown";
-                        long all = speciesGroupUnidentifiedCountListFacets.get(key);
-                        long unIdentified = speciesGroupUnidentifiedCountListFacets.get(unidentifiedKey)
-                        if(all | unIdentified)
-                            speciesGroupCountList.add([it.name, all, unIdentified]);
-                    }
-                }
-               
-                speciesGroupCountList = speciesGroupCountList.sort {a,b->a[0]<=>b[0]}
-                speciesGroupCountList = [data:speciesGroupCountList?:[], columns:[
-                    ['string', 'Species Group'],
-                    ['number', 'All'],
-                    ['number', 'Unidentified']
-                ]]
-            
-                List isChecklistFacets = queryResponse.getFacetField(searchFieldsConfig.IS_CHECKLIST).getValues()
-                isChecklistFacets.each {
-                    if(it.getName() == 'true')
-                        checklistCount = it.getCount()
-                }
-            }
-
-			responseHeader = queryResponse?.responseHeader;
-			noOfResults = queryResponse.getResults().getNumFound()
-
-		}
-		/*if(responseHeader?.params?.q == "*:*") {
-			responseHeader.params.remove('q');
-		}*/
-		
-		return [responseHeader:responseHeader, observationInstanceList:instanceList, resultType:'observation', instanceTotal:noOfResults, checklistCount:checklistCount, observationCount: noOfResults-checklistCount , queryParams:queryParams, activeFilters:activeFilters, tags:facetResults, totalObservationIdList:totalObservationIdList, distinctRecoList:distinctRecoList, speciesGroupCountList:speciesGroupCountList]
+	    return paramsList;	
 	}
 	
 	private boolean isValidSortParam(String sortParam) {

@@ -466,8 +466,12 @@ $(document).ready(function(){
 						</ul>
 						<div id="resourceTabs-1">
 	<%--						<a href="#">Contribute Images</a>--%>
-							<div id="gallery1" class="gallery">
-								<g:if test="${speciesInstance.getImages()}">
+                                                        <g:set var="images" value="${speciesInstance.getImages()}"/>
+                                                        <div class="story-footer" style="right:0;bottom:55px;z-index:5;background-color:whitesmoke" >
+                                                            <g:render template="/common/observation/noOfResources" model="['instance':speciesInstance, 'bottom':'bottom:55px;', noOfResources:[[ResourceType.IMAGE,images.size()]]]"/>
+                                                        </div>
+                                                        <div id="gallery1" class="gallery">
+                                                                <g:if test="${images}">
 									<s:showSpeciesImages model="['speciesInstance':speciesInstance]"></s:showSpeciesImages>
 								</g:if>
 								<g:else>

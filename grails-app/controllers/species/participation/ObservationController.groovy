@@ -1244,7 +1244,13 @@ class ObservationController {
         def offset = params.offset ? params.int('offset') : 0
         Map result = [:];
         try {
-            def distinctRecoList = observationService.getDistinctRecoList(params, max, offset);
+            def distinctRecoList;
+		    if(params.act == 'search') {
+                distinctRecoList = observationService.getDistinctRecoList(params, max, offset);
+            } else {
+                distinctRecoList = observationService.getDistinctRecoListFromSearch(params, max, offset);
+            }
+
             if(distinctRecoList.size() > 0) {
                 result = [distinctRecoList:distinctRecoList, 'next':offset+max, status:'success', msg:'success']
             } else {
