@@ -693,6 +693,7 @@ function updateGallery(target, limit, offset, removeUser, isGalleryUpdate, remov
     History.pushState({state:1}, document.title, '?'+decodeURIComponent($.param(params))); 
     console.log("doc_url " + doc_url);
     if(isGalleryUpdate) {
+        if(params.bounds) {
         $.ajax({
             url: doc_url,
             dataType: 'json',
@@ -712,6 +713,7 @@ function updateGallery(target, limit, offset, removeUser, isGalleryUpdate, remov
                 $('.message').html(msg);
             }
         });
+        }
         if(params.isMapView === "true" || params.bounds != undefined) {
             updateMapView(params);
         }
