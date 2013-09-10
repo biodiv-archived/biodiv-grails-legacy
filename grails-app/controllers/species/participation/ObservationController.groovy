@@ -99,7 +99,7 @@ class ObservationController {
             model['height'] = 200;
 			render (view:"list", model:model)
 			return;
-		} else{
+		} else {
 			def obvListHtml =  g.render(template:"/common/observation/showObservationListTemplate", model:model);
 			def obvFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
 			def tagsHtml = "";
@@ -1248,7 +1248,7 @@ class ObservationController {
 		    if(params.actionType == 'search') {
                 distinctRecoList = observationService.getDistinctRecoListFromSearch(params, max, offset);
             } else {
-                distinctRecoList = observationService.getDistinctRecoListFromSearch(params, max, offset);
+                distinctRecoList = observationService.getDistinctRecoList(params, max, offset);
             }
 
             if(distinctRecoList.size() > 0) {
