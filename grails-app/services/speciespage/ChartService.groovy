@@ -361,7 +361,7 @@ class ChartService {
 
 		int days = getPassedDays(params, userGroupInstance) 
 		log.debug "passed days $days"
-		days = (days > 500) ? 500 : days
+		days = (days > 365) ? 365 : days
 		
 		def result = []
 		Date currentDate = new Date()
