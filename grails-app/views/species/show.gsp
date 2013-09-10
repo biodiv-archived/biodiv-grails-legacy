@@ -152,13 +152,13 @@ $(document).ready(function(){
 		$('.gallery').galleria({
 			height : 400,
 			preload : 1,
-			carousel : true,
+			carousel : false,
 			transition : 'pulse',
 			image_pan_smoothness : 5,
 			showInfo : true,
 			dataSelector : ".galleryImage",
                         debug : false,
-                        thumbnails:false,
+                        thumbnails:true,
 			thumbQuality : false,
 			maxScaleRatio : 1,
                         minScaleRatio : 1,
@@ -176,7 +176,8 @@ $(document).ready(function(){
 			dataConfig : function(img) {
 				return {
 					// tell Galleria to grab the content from the .desc div as caption
-					description : $(img).parent().next('.notes').html()
+					description : $(img).parent().next('.notes').html(),
+                                        _biodiv_url:$(img).data('original')
 				};
                         },
                         extend : function(options) {
@@ -190,12 +191,18 @@ $(document).ready(function(){
                             this.bind('loadfinish', function(e){
                                 galleryImageLoadFinish();
                             })
+                            this.bind('lightbox_image', function(e){
+                                $(".galleria-lightbox-title").append('<a target="_blank" href="'+Galleria.get(0).getData()._biodiv_url+'">View Full Image</a>');
+                            })
+
+
                         }
  
 		});	
                 Galleria.ready(function() {
                     $("#gallerySpinner").hide();
                     $("#resourceTabs").css('visibility', 'visible');
+                    $(".galleria-thumbnails-container").hide();
                 });
 			
 	} else {
@@ -460,8 +467,12 @@ $(document).ready(function(){
 						</ul>
 						<div id="resourceTabs-1">
 	<%--						<a href="#">Contribute Images</a>--%>
-							<div id="gallery1" class="gallery">
-								<g:if test="${speciesInstance.getImages()}">
+                                                        <g:set var="images" value="${speciesInstance.getImages()}"/>
+                                                        <div class="story-footer" style="right:0;bottom:55px;z-index:5;background-color:whitesmoke" >
+                                                            <g:render template="/common/observation/noOfResources" model="['instance':speciesInstance, 'bottom':'bottom:55px;', noOfResources:[[ResourceType.IMAGE, images.size()]]]"/>
+                                                        </div>
+                                                        <div id="gallery1" class="gallery">
+                                                                <g:if test="${images}">
 									<s:showSpeciesImages model="['speciesInstance':speciesInstance]"></s:showSpeciesImages>
 								</g:if>
 								<g:else>

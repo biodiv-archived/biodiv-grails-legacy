@@ -59,7 +59,9 @@ $(document).ready(function() {
                 },
                 'observation':{
                     listUrl:"${uGroup.createLink(controller:'observation', action: 'listJSON', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}",
-                    uploadUrl:"${g.createLink(controller:'observation', action:'upload_resource')}"
+                    uploadUrl:"${g.createLink(controller:'observation', action:'upload_resource')}",
+                    distinctRecoListUrl:"${uGroup.createLink(controller:'observation', action: 'distinctReco', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress, params:[actionType:params.action])}",
+
                 },
                 'recommendation': {
                     'getRecos' : "${uGroup.createLink(controller:'recommendation', action:'getRecos', userGroup:userGroupInstance)}",
