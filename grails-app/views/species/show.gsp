@@ -182,7 +182,8 @@ $(document).ready(function(){
                         extend : function(options) {
                             this.bind('image', function(e) {
                                 $(e.imageTarget).click(this.proxy(function() {
-                                        this.openLightbox();
+                                     window.open(Galleria.get(0).getData()._biodiv_url);
+                                    //this.openLightbox();
                                 }));
                             });
                             
