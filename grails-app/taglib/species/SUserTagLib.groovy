@@ -14,7 +14,7 @@ class SUserTagLib {
 	def renderProfileLink = { attrs ->
 		def currentUser = springSecurityService.getCurrentUser()
 		if(currentUser) {
-			out << showUserTemplate(model:['userInstance':currentUser]);
+			out << showUserTemplate(model:['userInstance':currentUser, 'hideDetails':attrs.model?.hideDetails]);
 		}
 	}
 

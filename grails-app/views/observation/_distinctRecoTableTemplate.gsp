@@ -1,12 +1,9 @@
 
 <%@ page import="species.participation.Recommendation"%>
-<table  class="table table-bordered table-condensed table-striped">
-    <thead>
-        <tr>
-            <th>Species</th>
-            <th>No</th>
-        </tr>
-    </thead>
+
+<div id="distinctRecoList" class="sidebar_section" style="clear:both; border:1px solid #CECECE;overflow:hidden">
+    <h5>Unique Species</h5>
+<table id="distinctRecoTable" class="table table-bordered table-condensed table-striped">
     <tbody>
         <g:each in="${distinctRecoList}" var="r">
         <g:set var="reco" value="${r[0]}"/>
@@ -28,3 +25,5 @@
         </g:each>
     </tbody>
 </table>
+<button id="distinctRecoTableAction" class="btn btn-mini pull-right" data-offset='0'>Load More</button>
+</div>

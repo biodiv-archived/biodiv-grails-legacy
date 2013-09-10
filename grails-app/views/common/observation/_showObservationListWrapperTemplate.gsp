@@ -24,7 +24,7 @@
 				
 				<!-- needs to be fixed -->
 				<g:if test="${!isSearch}">
-					<div id="map_view_bttn" class="btn-group" style="display:none;">
+					<div id="map_view_bttn" class="btn-group">
 						<a class="btn btn-success dropdown-toggle" data-toggle="dropdown"
 							href="#">
 							Map view <span class="caret"></span> </a>
@@ -97,9 +97,8 @@
                                 <div id="obvPerGroupChart" class="sidebar_section" style="clear:both;overflow:hidden;">
                                     <chart:showStats model="['title':'Observations by Species Group', columns:speciesGroupCountList.columns, data:speciesGroupCountList.data, width:width?:420, height:height?:420, 'hideTable':true, dynamicLoading:true]"/>
                                 </div>
-                                <div id="distinctRecoList" class="sidebar_section" style="clear:both">
-                                    <g:render template="/observation/distinctRecoTableTemplate" model="[distinctRecoList:distinctRecoList]"/>
-                                </div>
+                                <g:render template="/observation/distinctRecoTableTemplate" model="[distinctRecoList:distinctRecoList]"/>
+                                
                         </div>
 		</div>
 	</div>
@@ -114,7 +113,9 @@ $(document).ready(function() {
         $(this).parent().css('background-color', '#9acc57');
         $('#observations_list_map').slideToggle(mapViewSlideToggleHandler);
     });
+    <g:if test="${params.isMapView?.equalsIgnoreCase('true') || params.bounds}">
         $("#map_view_bttn a").click();
+    </g:if>
 
     $('#big_map_canvas').on('maploaded', function(){
         /*map.on('viewreset', function() {

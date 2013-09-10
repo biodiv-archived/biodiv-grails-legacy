@@ -6,6 +6,7 @@
 			<i class="icon-group"></i> Groups <b class="caret"
 			style="border-top-color: black; border-bottom-color: black;"></b>
 	</a>
+
 	<ul class="dropdown-menu" style="padding:5px">
 	</ul>
 </li>

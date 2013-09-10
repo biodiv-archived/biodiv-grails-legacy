@@ -2,11 +2,12 @@
 <%@page import="species.utils.ImageType"%>
 <%@page import="species.participation.Observation"%>
 <div class="signature clearfix thumbnail">
-		<div class="figure user-icon pull-left" style="display:table;height:40px;">
+		<div class="figure user-icon pull-left" style="display:table;height:32px;">
 			<a href="${uGroup.createLink( 'controller':'SUser', action:'show', id:userInstance.id, userGroup:userGroup, 'userGroupWebaddress':userGroupWebaddress)}"> <img
-				style="float: left;" src="${userInstance.profilePicture(ImageType.SMALL)}"
-				class="small_profile_pic" title="${userInstance.name}" /></a>
+				src="${userInstance.profilePicture(ImageType.SMALL)}"
+				class="small_profile_pic pull-left" title="${userInstance.name}" /></a>
 		</div>
+                <g:if test="${!hideDetails}">
 		<div class="story" style="margin-left:35px">
 
 		<a title="${userInstance.name}"
@@ -14,13 +15,6 @@
 			<span class="ellipsis" style="display:block;"> ${userInstance.name}
 		</span>
 			 </a>
-
-		<%--			<g:if test="${userInstance.location}">--%>
-<%--				<div>--%>
-<%--					<i class="icon-map-marker"></i>--%>
-<%--					${userInstance.location}--%>
-<%--				</div>--%>
-<%--			</g:if>--%>
 
 			<div class="story-footer" style="position:static;">
 				<div class="footer-item" title="Observations">
@@ -45,5 +39,5 @@
 			</div>
 
 		</div>
-
+                </g:if>
 	</div>

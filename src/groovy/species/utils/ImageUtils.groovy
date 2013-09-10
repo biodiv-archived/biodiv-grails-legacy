@@ -134,7 +134,13 @@ class ImageUtils {
 			cropped = scaled.getSubimage(x, y, rect_width, rect_height);
 		}
 		ImageIO.write(cropped, ext, outImg);
-		jpegOptimize(outImg);
+        jpegOptimize(outImg);
+
+		//		} catch(Exception e){
+		//
+		//			//System.out.println(e.getMessage());
+		//		}
+
 	}
 
 	/**
