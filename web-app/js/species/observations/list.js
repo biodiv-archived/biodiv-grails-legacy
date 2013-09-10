@@ -342,6 +342,7 @@ $(document).ready(function(){
             data:params,
             success: function(data) {
                 if(data.status === 'success') {
+                	$('#distinctRecoList .distinctRecoHeading').html('<h5>Unique Species ' + data.totalRecoCount +'</h5>');
                     $.each(data.distinctRecoList, function(index, item) {
                         if(item[1])
                             $distinctRecoTable.append('<tr><td><i>'+item[0]+'</i></td><td>'+item[2]+'</td></tr>');  

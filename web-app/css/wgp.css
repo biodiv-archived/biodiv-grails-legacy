@@ -39,6 +39,8 @@ h6 {
 
 #ibp-header-bar .dropdown-toggle, #ibp-header-bar #loginLink {
 	font-size: 17px;
+	color:#bbb;
+	
 }
 
 .page-header {
@@ -1862,6 +1864,13 @@ li#userOrEmail-new {
 	width:22px;
 		
 }
+
+.icon-group-gray {
+	background-image: url('../images/glyphicons_043_group_gray.png');
+	background-position:0 0;
+	width:22px;
+}
+
 
 /* ul.nav li.dropdown:hover > ul.dropdown-menu{ */
 /*     display: block;     */

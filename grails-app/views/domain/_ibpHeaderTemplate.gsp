@@ -2,11 +2,11 @@
 <div id="ibp-header" class="gradient-bg">
 	<div id="ibp-header-bar" class="navbar navbar-static-top" style="margin-bottom: 0px;border-bottom:0px;">
 		<div class="navbar-inner"
-			style="box-shadow: none; background-color: #fafafa; background-image: none; padding: 0px 5px;  filter: progid :DXImageTransform.Microsoft.gradient (startColorstr = '#fafafa', endColorstr = '#fafafa' );">
+			style="box-shadow: none; background-color: #2d2d2d; background-image: none; padding: 0px 5px;  filter: progid :DXImageTransform.Microsoft.gradient (startColorstr = '#fafafa', endColorstr = '#fafafa' );">
 			<div class="container" style="width: 100%">
 				<a class="btn btn-navbar" data-toggle="collapse"
 					data-target=".nav-collapse"> <span class="icon-bar"></span> </a> <a
-					class="brand"
+					class="brand" style="color:#bbb;"
 					href="${createLink(url:Utils.getIBPServerDomain()) }">
                                         ${grailsApplication.config.speciesPortal.app.siteName}</a>
 				

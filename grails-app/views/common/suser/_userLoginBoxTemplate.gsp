@@ -32,7 +32,7 @@
 		
 		<a href="#" class="dropdown-toggle"  style="height:30px;"
 			data-toggle="dropdown"> <%--			<i class="icon-home" title="Home"></i>--%>
-                        <i class="icon-cog"></i>
+                        <i class="icon-cog icon-gray"></i>
 				 </a> <!--h5 class="nav-header">Home</h5-->
 			<ul class="dropdown-menu">
 

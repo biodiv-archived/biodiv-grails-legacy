@@ -97,7 +97,7 @@
                                 <div id="obvPerGroupChart" class="sidebar_section" style="clear:both;overflow:hidden;">
                                     <chart:showStats model="['title':'Observations by Species Group', columns:speciesGroupCountList.columns, data:speciesGroupCountList.data, width:width?:420, height:height?:420, 'hideTable':true, dynamicLoading:true]"/>
                                 </div>
-                                <g:render template="/observation/distinctRecoTableTemplate" model="[distinctRecoList:distinctRecoList]"/>
+                                <g:render template="/observation/distinctRecoTableTemplate" model="[distinctRecoList:distinctRecoList, totalCount:totalCount]"/>
                                 
                         </div>
 		</div>
