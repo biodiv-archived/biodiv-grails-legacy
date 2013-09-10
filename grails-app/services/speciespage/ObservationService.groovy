@@ -1103,6 +1103,7 @@ class ObservationService {
 	 * executing query
 	 */
 	Map getFilteredObservationsFromSearch(params, max, offset, isMapView){
+		def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields
         def queryParts = getFilteredObservationsQueryFromSearch(params, max, offset, isMapView);
         def paramsList = queryParts.paramsList
         def queryParams = queryParts.queryParams
@@ -1134,14 +1135,14 @@ class ObservationService {
             paramsList.add(searchFieldsConfig.IS_CHECKLIST, false);
 
 		    if(!params.loadMore?.toBoolean()){
-                paramsList.add('facet.field', searchFieldsConfig.MAX_VOTED_SPECIES_NAME+"_exact");
-                paramsList.add("f.${searchFieldsConfig.MAX_VOTED_SPECIES_NAME}_exact.facet.limit", 10);
-                def qR = observationsSearchService.search(paramsList);
-                List distinctRecoListFacets = qR.getFacetField(searchFieldsConfig.MAX_VOTED_SPECIES_NAME+"_exact").getValues()
-                distinctRecoListFacets.each {
+//                paramsList.add('facet.field', searchFieldsConfig.MAX_VOTED_SPECIES_NAME+"_exact");
+//                paramsList.add("f.${searchFieldsConfig.MAX_VOTED_SPECIES_NAME}_exact.facet.limit", 10);
+//                def qR = observationsSearchService.search(paramsList);
+//                List distinctRecoListFacets = qR.getFacetField(searchFieldsConfig.MAX_VOTED_SPECIES_NAME+"_exact").getValues()
+//                distinctRecoListFacets.each {
                     //TODO second parameter, isScientificName
-                    distinctRecoList.add([it.getName(), true, it.getCount()]);
-                }
+//                    distinctRecoList.add([it.getName(), true, it.getCount()]);
+//                }
                 
                 paramsList.remove('facet.field');
                 paramsList.remove("f.${searchFieldsConfig.MAX_VOTED_SPECIES_NAME}_exact.facet.limit");
@@ -1152,9 +1153,9 @@ class ObservationService {
                 paramsList.add('facet.field', searchFieldsConfig.IS_CHECKLIST);
                 speciesGroups = SpeciesGroup.list();
                 speciesGroups.each {
-                    paramsList.add('facet.query', "${searchFieldsConfig.SGROUP}:${it.id} AND ${searchFieldsConfig.IS_CHECKLIST}:false AND ${searchFieldsConfig.MAX_VOTED_SPECIES_NAME}_exact:Unknown");
+                     paramsList.add('facet.query', "${searchFieldsConfig.SGROUP}:${it.id} AND ${searchFieldsConfig.IS_CHECKLIST}:false AND ${searchFieldsConfig.MAX_VOTED_SPECIES_NAME}_exact:Unknown");
                     paramsList.add('facet.query', "${searchFieldsConfig.SGROUP}:${it.id} AND ${searchFieldsConfig.IS_CHECKLIST}:false");
-                }
+                 }
             }
 
 			def queryResponse = observationsSearchService.search(paramsList);
@@ -1209,7 +1210,7 @@ class ObservationService {
 	
     }
 
-	Map getFilteredObservationsQueryFromSearch(params, max, offset, isMapView){
+	private Map getFilteredObservationsQueryFromSearch(params, max, offset, isMapView) {
 		def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields
 		params.sGroup = (params.sGroup)? params.sGroup : SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.ALL).id
 		params.habitat = (params.habitat)? params.habitat : Habitat.findByName(grailsApplication.config.speciesPortal.group.ALL).id
@@ -1390,8 +1391,9 @@ class ObservationService {
 				activeFilters["uGroup"] = "ALL"
 			}
 		}
-		log.debug "Along with faceting params : "+paramsList;
-	    return paramsList;	
+	
+        log.debug "Along with faceting params : "+paramsList;
+	    return [paramsList:paramsList, queryParams:queryParams, activeFilters:activeFilters];	
 	}
 	
 	private boolean isValidSortParam(String sortParam) {
@@ -1919,4 +1921,41 @@ class ObservationService {
 
         return distinctRecoList;
     }
+
+    def getDistinctRecoListFromSearch(params, int max, int offset) {
+        def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields
+        def queryParts = getFilteredObservationsQueryFromSearch(params, max, offset, false);
+        def paramsList = queryParts.paramsList
+        def queryParams = queryParts.queryParams
+        def activeFilters = queryParts.activeFilters
+
+        queryParams["max"] = max
+        queryParams["offset"] = offset
+
+        def facetResults = [:], responseHeader
+        List distinctRecoList = [];
+        if(paramsList) {
+            //Facets
+            def speciesGroups;
+            paramsList.add('facet', "true");
+            paramsList.add('facet.offset', offset);
+            paramsList.add('facet.mincount', "1");
+
+            paramsList.add(searchFieldsConfig.IS_CHECKLIST, false);
+
+            paramsList.add('facet.field', searchFieldsConfig.MAX_VOTED_SPECIES_NAME+"_exact");
+            paramsList.add("f.${searchFieldsConfig.MAX_VOTED_SPECIES_NAME}_exact.facet.limit", max);
+            def qR = observationsSearchService.search(paramsList);
+            List distinctRecoListFacets = qR.getFacetField(searchFieldsConfig.MAX_VOTED_SPECIES_NAME+"_exact").getValues()
+            distinctRecoListFacets.each {
+                //TODO second parameter, isScientificName
+                distinctRecoList.add([it.getName(), true, it.getCount()]);
+            }
+
+        }
+
+        return distinctRecoList 
+    }
+
+
 }

@@ -1245,8 +1245,8 @@ class ObservationController {
         Map result = [:];
         try {
             def distinctRecoList;
-		    if(params.act == 'search') {
-                distinctRecoList = observationService.getDistinctRecoList(params, max, offset);
+		    if(params.actionType == 'search') {
+                distinctRecoList = observationService.getDistinctRecoListFromSearch(params, max, offset);
             } else {
                 distinctRecoList = observationService.getDistinctRecoListFromSearch(params, max, offset);
             }
