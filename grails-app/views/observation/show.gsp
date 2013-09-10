@@ -274,9 +274,9 @@ String desc = "- "+ location +" by "+observationInstance.author.name.capitalize(
 		
 		$('#gallery1').galleria({
 			height : 400,
-                        preload : 1,
-                        lightbox: false,
-			carousel : true,
+            preload : 1,
+            lightbox: false,
+			carousel : false,
 			transition : 'pulse',
 			image_pan_smoothness : 5,
 			showInfo : true,
@@ -308,18 +308,16 @@ String desc = "- "+ location +" by "+observationInstance.author.name.capitalize(
                             this.bind('image', function(e) {
                                 $(e.imageTarget).click(this.proxy(function() {
                                     window.open(Galleria.get(0).getData()._biodiv_url);
-                                    //alert("clicked");
                                     //this.openLightbox();
                                 }));
                             });
                             
                             this.bind('loadfinish', function(e){
                                 galleryImageLoadFinish();
-                                //console.log("here in loadfinish");
                             });
 
                             this.bind('lightbox_image', function(e){
-                            //$(".galleria-lightbox-title").append('<a target="_blank" href="'+Galleria.get(0).getData()._biodiv_url+'">View Full Image</a>');
+                            	//$(".galleria-lightbox-title").append('<a target="_blank" href="'+Galleria.get(0).getData()._biodiv_url+'">View Full Image</a>');
                             })
 
                         }
