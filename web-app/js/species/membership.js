@@ -289,8 +289,28 @@ function last_actions() {
 	$('.linktext').linkify(); 
 	//applying table sorting
 	$("table.tablesorter").tablesorter();
-        rating();
+    rating();
 
-        $("#contributeMenu .btn").popover();
+    $("#contributeMenu .btn").popover();
+    
+    updateGroupPostSelection();
 }
 
+function loadSuggestedGroups(targetComp, url){
+	var res = $(targetComp).children('li');
+	if(res.length > 0){
+		return 
+	}
+	$.ajax({
+ 		url: url,
+ 		type: 'POST',
+		dataType: "json",
+		success: function(data) {
+			$(targetComp).append($(data.suggestedGroupsHtml));
+			$(targetComp).show(1000);
+			return false;
+		}, error: function(xhr, status, error) {
+			alert(xhr.responseText);
+	   	}
+	});
+}
