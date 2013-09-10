@@ -32,8 +32,8 @@
 		
 		<a href="#" class="dropdown-toggle"  style="height:30px;"
 			data-toggle="dropdown"> <%--			<i class="icon-home" title="Home"></i>--%>
-				<b class="caret"
-				style="border-top-color: black; border-bottom-color: black;"></b> </a> <!--h5 class="nav-header">Home</h5-->
+                        <i class="icon-cog"></i>
+				 </a> <!--h5 class="nav-header">Home</h5-->
 			<ul class="dropdown-menu">
 
 
