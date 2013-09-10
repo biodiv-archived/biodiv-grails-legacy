@@ -26,11 +26,10 @@ function initialize(element, drawable){
     G = google.maps;
     M = L;
     M.Icon.Default.imagePath = window.params.defaultMarkerIcon;
-    allowedBounds = new M.LatLngBounds(new M.LatLng('6.74678', '68.03215'), new M.LatLng('35.51769', '97.40238'));
+    allowedBounds = new M.LatLngBounds(new M.LatLng('26.647', '88.692'), new M.LatLng('28.280', '92.170'));
     //var viewBounds = new M.LatLngBounds(new M.LatLng('8', '59'), new M.LatLng('45', '105'));
-    var viewBounds = new M.LatLngBounds(new M.LatLng('8', '69'), new M.LatLng('36', '98'));
-    var nagpur_latlng = new M.LatLng('21.07', '79.27');                
-
+    var viewBounds = new M.LatLngBounds(new M.LatLng('26.421', '88.505'), new M.LatLng('28.632', '92.433'));
+    var nagpur_latlng = new M.LatLng('27.445', '90.450'); 
     var ggl = new M.Google('HYBRID');
     map = new M.Map(element, {
 //        crs:L.CRS.EPSG4326,
