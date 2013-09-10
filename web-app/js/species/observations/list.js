@@ -672,7 +672,7 @@ function updateListPage(activeTag) {
     }
 }
 
-function updateGallery(target, limit, offset, removeUser, isGalleryUpdate, removeObv, removeSort, isRegularSearch, removeParam) {
+function getUpdateGalleryParams(target, limit, offset, removeUser, isGalleryUpdate, removeObv, removeSort, isRegularSearch, removeParam) {
     if(target === undefined) {
         target = window.location.pathname + window.location.search;
     }
@@ -681,10 +681,19 @@ function updateGallery(target, limit, offset, removeUser, isGalleryUpdate, remov
     var url = a.url();
     var href = url.attr('path');
     var params = getFilterParameters(url, limit, offset, removeUser, removeObv, removeSort, isRegularSearch, removeParam);
-    // alert(" tag in params " + params['tag'] );
+    params['href'] = href;
+    return params;
+}
+
+function updateGallery(target, limit, offset, removeUser, isGalleryUpdate, removeObv, removeSort, isRegularSearch, removeParam) {
+    
+    var params = getUpdateGalleryParams(target, limit, offset, removeUser, isGalleryUpdate, removeObv, removeSort, isRegularSearch, removeParam);
+
     isGalleryUpdate = (isGalleryUpdate == undefined)?true:isGalleryUpdate
     if(isGalleryUpdate)
     	params["isGalleryUpdate"] = isGalleryUpdate;
+    var href = params.href
+    delete params["href"]
     var recursiveDecoded = decodeURIComponent($.param(params));
     
     var doc_url = href+'?'+recursiveDecoded;
@@ -765,7 +774,7 @@ function refreshMapBounds() {
 }
 
 function showMapView() {
-    updateGallery(undefined, undefined, 0, undefined, window.params.isGalleryUpdate);
+    updateMapView(getUpdateGalleryParams(undefined, undefined, 0, undefined, window.params.isGalleryUpdate));
 }
 
  

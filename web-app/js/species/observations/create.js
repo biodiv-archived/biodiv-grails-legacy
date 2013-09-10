@@ -488,14 +488,6 @@ $(document).ready(function(){
 
     $(".tagit-hiddenSelect").css('display','none');
 
-    function getSelectedUserGroups() {
-        var userGroups = []; 
-        $('.userGroups button[class~="btn-success"]').each (function() {
-            userGroups.push($(this).attr('value'));
-        });
-        return userGroups;	
-    }
-
     $('input:radio[name=groupsWithSharingNotAllowed]').click(function() {
         var previousValue = $(this).attr('previousValue');
 

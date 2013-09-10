@@ -24,7 +24,7 @@
 				
 				<!-- needs to be fixed -->
 				<g:if test="${!isSearch}">
-					<div id="map_view_bttn" class="btn-group">
+					<div id="map_view_bttn" class="btn-group" style="display:none;">
 						<a class="btn btn-success dropdown-toggle" data-toggle="dropdown"
 							href="#">
 							Map view <span class="caret"></span> </a>
@@ -78,6 +78,9 @@
                             <obv:showObservationsList  model="['totalObservationInstanceList':totalObservationInstanceList, 'observationInstanceList':observationInstanceList, 'instanceTotal':instanceTotal, 'queryParams':queryParams, 'activeFilters':activeFilters, 'userGroup':userGroup]"  />
                         </div>
                         <div class="span4" style="position:relative;top:20px">
+                 <div class="sidebar_section" style="clear:both;overflow:hidden;display:none;">
+                 	<uGroup:objectPostToGroups model="['objectType':Observation.class.canonicalName, userGroup:params.userGroup]"/>
+                 </div>       
 				<div id="observations_list_map" class="observation sidebar_section"
                                     style="clear:both;overflow:hidden;display:none;">
 					<obv:showObservationsLocation
@@ -111,8 +114,8 @@ $(document).ready(function() {
         $('#observations_list_map').slideToggle(mapViewSlideToggleHandler);
     });
     <g:if test="${params.isMapView?.equalsIgnoreCase('true') || params.bounds}">
-        $("#map_view_bttn a").click();
     </g:if>
+        $("#map_view_bttn a").click();
 
     $('#big_map_canvas').on('maploaded', function(){
         /*map.on('viewreset', function() {
