@@ -2161,6 +2161,28 @@ div.noOfRatings {
 	padding-left: 20px;
 } 
 
+#ibp-header-bar .navbar-inner .brand, #ibp-header-bar .navbar-inner .dropdown-toggle {
+	color: #bbb;
+}
+
+#ibp-header-bar .navbar-inner .brand:hover, #ibp-header-bar .navbar-inner .dropdown-toggle:hover, #loginLink:hover{
+	color: #fff !important;
+}
+
+#ibp-header-bar .navbar-inner .dropdown .caret:hover{
+    border-top-color: #bbb; 
+    border-bottom-color: #bbb;
+}
+
+#ibp-header-bar .navbar-inner .dropdown .caret:hover{
+    border-top-color: #fff; 
+    border-bottom-color: #fff;
+}
+
+.icon-group-gray:hover {
+        background-image: url('../images/glyphicons_043_group_white.png');
+} 
+
 /* .selectable { */
 /*     background: url("../images/icons/plus.png") no-repeat scroll 50% 50% transparent; */
 /*     background-color: transparent; */

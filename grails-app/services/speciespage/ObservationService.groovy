@@ -807,7 +807,7 @@ class ObservationService {
 		if(params.daterangepicker_end){
 			queryParts.queryParams["daterangepicker_end"] =  params.daterangepicker_end
 		}
-		return [observationInstanceList:observationInstanceList, allObservationCount:allObservationCount, checklistCount:checklistCount, distinctRecoList:distinctRecoList, speciesGroupCountList:speciesGroupCountList, queryParams:queryParts.queryParams, activeFilters:queryParts.activeFilters]
+		return [observationInstanceList:observationInstanceList, allObservationCount:allObservationCount, checklistCount:checklistCount, speciesGroupCountList:speciesGroupCountList, queryParams:queryParts.queryParams, activeFilters:queryParts.activeFilters]
 	}
 
     /**
@@ -941,7 +941,7 @@ class ObservationService {
 		
 		def distinctRecoQuery = "select obv.maxVotedReco.id, count(*) from Observation obv  "+ userGroupQuery +" "+((params.tag)?tagQuery:'')+filterQuery+ " and obv.isChecklist=false and obv.maxVotedReco is not null group by obv.maxVotedReco order by count(*) desc,obv.maxVotedReco.id asc";
 
-		def distinctRecoCountQuery = "select distinct(obv.maxVotedReco.id)   from Observation obv  "+ userGroupQuery +" "+((params.tag)?tagQuery:'')+filterQuery+ " and obv.isChecklist=false and obv.maxVotedReco is not null ";
+		def distinctRecoCountQuery = "select count(distinct obv.maxVotedReco.id)   from Observation obv  "+ userGroupQuery +" "+((params.tag)?tagQuery:'')+filterQuery+ " and obv.isChecklist=false and obv.maxVotedReco is not null ";
 
 		def orderByClause = " order by obv." + (params.sort ? params.sort : "lastRevised") +  " desc, obv.id asc"
 		
@@ -1897,8 +1897,8 @@ class ObservationService {
         def queryParts = getFilteredObservationsFilterQuery(params) 
         def boundGeometry = queryParts.queryParams.remove('boundGeometry'); 
 
-        log.debug "distinctRecoQuery  : ==========="+queryParts.distinctRecoQuery;
-		log.debug "distinctRecoCountQuery  : ==========   ="+queryParts.distinctRecoCountQuery;
+        log.debug "distinctRecoQuery  : "+queryParts.distinctRecoQuery;
+		log.debug "distinctRecoCountQuery  : "+queryParts.distinctRecoCountQuery;
 
         def distinctRecoQuery = sessionFactory.currentSession.createQuery(queryParts.distinctRecoQuery)
 		def distinctRecoCountQuery = sessionFactory.currentSession.createQuery(queryParts.distinctRecoCountQuery)
@@ -1923,8 +1923,9 @@ class ObservationService {
             def reco = Recommendation.read(it[0]);
             distinctRecoList << [reco.name, reco.isScientificName, it[1]]
         }
-
-        return [distinctRecoList:distinctRecoList, totalCount:distinctRecoCountQuery.list().size()];
+		
+		def count = distinctRecoCountQuery.list()[0]
+		return [distinctRecoList:distinctRecoList, totalCount:count];
     }
 
     def getDistinctRecoListFromSearch(params, int max, int offset) {
@@ -1958,8 +1959,7 @@ class ObservationService {
             }
 
         }
-
-        return distinctRecoList 
+		return [distinctRecoList:distinctRecoList] 
     }
 
 

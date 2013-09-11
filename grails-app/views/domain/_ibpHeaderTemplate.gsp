@@ -6,7 +6,7 @@
 			<div class="container" style="width: 100%">
 				<a class="btn btn-navbar" data-toggle="collapse"
 					data-target=".nav-collapse"> <span class="icon-bar"></span> </a> <a
-					class="brand" style="color:#bbb;"
+					class="brand"
 					href="${createLink(url:Utils.getIBPServerDomain()) }">
                                         ${grailsApplication.config.speciesPortal.app.siteName}</a>
 				

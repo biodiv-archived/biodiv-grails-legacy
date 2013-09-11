@@ -153,6 +153,7 @@ $(document).ready(function(){
 			height : 400,
 			preload : 1,
 			carousel : false,
+			lightbox:false,
 			transition : 'pulse',
 			image_pan_smoothness : 5,
 			showInfo : true,
@@ -191,9 +192,9 @@ $(document).ready(function(){
                             this.bind('loadfinish', function(e){
                                 galleryImageLoadFinish();
                             })
-                            this.bind('lightbox_image', function(e){
-                                $(".galleria-lightbox-title").append('<a target="_blank" href="'+Galleria.get(0).getData()._biodiv_url+'">View Full Image</a>');
-                            })
+<%--                            this.bind('lightbox_image', function(e){--%>
+<%--                                $(".galleria-lightbox-title").append('<a target="_blank" href="'+Galleria.get(0).getData()._biodiv_url+'">View Full Image</a>');--%>
+<%--                            })--%>
 
 
                         }

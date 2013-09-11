@@ -112,9 +112,7 @@ class ObservationController {
             chartModel['width'] = 300;
             chartModel['height'] = 200;
 
-            def distinctRecoListHtml = g.render(template:"/observation/distinctRecoTableTemplate", model:model);
-
-			def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml, tagsHtml:tagsHtml, instanceTotal:model.instanceTotal, chartModel:chartModel, distinctRecoListHtml:distinctRecoListHtml]
+            def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml, tagsHtml:tagsHtml, instanceTotal:model.instanceTotal, chartModel:chartModel]
 			render result as JSON
 			return;
 		}
@@ -157,7 +155,7 @@ class ObservationController {
             }
         }
 		log.debug "Storing all observations ids list in session ${session['obv_ids_list']} for params ${params}";
-		return [observationInstanceList: observationInstanceList, instanceTotal: allObservationCount, checklistCount:checklistCount, observationCount: allObservationCount-checklistCount, distinctRecoList:filteredObservation.distinctRecoList, speciesGroupCountList:filteredObservation.speciesGroupCountList, queryParams: queryParams, activeFilters:activeFilters, resultType:'observation', geoPrivacyAdjust:Utils.getRandomFloat()]
+		return [observationInstanceList: observationInstanceList, instanceTotal: allObservationCount, checklistCount:checklistCount, observationCount: allObservationCount-checklistCount, speciesGroupCountList:filteredObservation.speciesGroupCountList, queryParams: queryParams, activeFilters:activeFilters, resultType:'observation', geoPrivacyAdjust:Utils.getRandomFloat()]
 	}
 	
 
@@ -1092,9 +1090,7 @@ class ObservationController {
             chartModel['width'] = 300;
             chartModel['height'] = 200;
 
-            def distinctRecoListHtml = g.render(template:"/observation/distinctRecoTableTemplate", model:model);
-
-			def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml, tagsHtml:tagsHtml, instanceTotal:model.instanceTotal, chartModel:chartModel, distinctRecoListHtml:distinctRecoListHtml]
+            def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml, tagsHtml:tagsHtml, instanceTotal:model.instanceTotal, chartModel:chartModel]
 			render result as JSON
 			return;
 		}
