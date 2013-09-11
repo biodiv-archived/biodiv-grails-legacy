@@ -129,7 +129,7 @@ String desc = "- "+ location +" by "+observationInstance.author.name.capitalize(
 									data-original="${createLinkTo(file: r.fileName.trim(), base:grailsApplication.config.speciesPortal.observations.serverURL)}" 
 									title="${r?.description}" /> </a>
 
-								<g:imageAttribution model="['resource':r]" />
+								<g:imageAttribution model="['resource':r, base:grailsApplication.config.speciesPortal.observations.serverURL]" />
 								</g:if>
 								<g:elseif test="${r.type == ResourceType.VIDEO}">
 									<a href="${r.url }"><span class="video galleryImage">Watch this at YouTube</span></a>
@@ -194,9 +194,8 @@ String desc = "- "+ location +" by "+observationInstance.author.name.capitalize(
 					</div>
 				</div>
 
-                                <div class="span4">
-
-					<div class="sidebar_section">
+              	<div class="span4">
+                    <div class="sidebar_section">
 						<obv:showLocation
 							model="['observationInstance':observationInstance]" />
 					</div>
@@ -275,8 +274,9 @@ String desc = "- "+ location +" by "+observationInstance.author.name.capitalize(
 		
 		$('#gallery1').galleria({
 			height : 400,
-			preload : 1,
-			carousel : true,
+            preload : 1,
+            lightbox: false,
+			carousel : false,
 			transition : 'pulse',
 			image_pan_smoothness : 5,
 			showInfo : true,
@@ -307,19 +307,17 @@ String desc = "- "+ location +" by "+observationInstance.author.name.capitalize(
 			extend : function(options) {
                             this.bind('image', function(e) {
                                 $(e.imageTarget).click(this.proxy(function() {
-                                        this.openLightbox();
+                                    window.open(Galleria.get(0).getData()._biodiv_url);
+                                    //this.openLightbox();
                                 }));
                             });
                             
                             this.bind('loadfinish', function(e){
                                 galleryImageLoadFinish();
-                                //console.log("here in loadfinish");
                             });
 
                             this.bind('lightbox_image', function(e){
-                                //console.log("here in lightbox IMAGE");
-                                //console.log(e);
-                                $(".galleria-lightbox-title").append('<a target="_blank" href="'+Galleria.get(0).getData()._biodiv_url+'">View Full Image</a>');
+                            	//$(".galleria-lightbox-title").append('<a target="_blank" href="'+Galleria.get(0).getData()._biodiv_url+'">View Full Image</a>');
                             })
 
                         }

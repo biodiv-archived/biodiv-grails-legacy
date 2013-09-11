@@ -99,7 +99,7 @@ class ObservationController {
             model['height'] = 200;
 			render (view:"list", model:model)
 			return;
-		} else{
+		} else {
 			def obvListHtml =  g.render(template:"/common/observation/showObservationListTemplate", model:model);
 			def obvFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
 			def tagsHtml = "";
@@ -112,9 +112,7 @@ class ObservationController {
             chartModel['width'] = 300;
             chartModel['height'] = 200;
 
-            def distinctRecoListHtml = g.render(template:"/observation/distinctRecoTableTemplate", model:model);
-
-			def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml, tagsHtml:tagsHtml, instanceTotal:model.instanceTotal, chartModel:chartModel, distinctRecoListHtml:distinctRecoListHtml]
+            def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml, tagsHtml:tagsHtml, instanceTotal:model.instanceTotal, chartModel:chartModel]
 			render result as JSON
 			return;
 		}
@@ -157,7 +155,7 @@ class ObservationController {
             }
         }
 		log.debug "Storing all observations ids list in session ${session['obv_ids_list']} for params ${params}";
-		return [observationInstanceList: observationInstanceList, instanceTotal: allObservationCount, checklistCount:checklistCount, observationCount: allObservationCount-checklistCount, distinctRecoList:filteredObservation.distinctRecoList, speciesGroupCountList:filteredObservation.speciesGroupCountList, queryParams: queryParams, activeFilters:activeFilters, resultType:'observation', geoPrivacyAdjust:Utils.getRandomFloat()]
+		return [observationInstanceList: observationInstanceList, instanceTotal: allObservationCount, checklistCount:checklistCount, observationCount: allObservationCount-checklistCount, speciesGroupCountList:filteredObservation.speciesGroupCountList, queryParams: queryParams, activeFilters:activeFilters, resultType:'observation', geoPrivacyAdjust:Utils.getRandomFloat()]
 	}
 	
 
@@ -1092,9 +1090,7 @@ class ObservationController {
             chartModel['width'] = 300;
             chartModel['height'] = 200;
 
-            def distinctRecoListHtml = g.render(template:"/observation/distinctRecoTableTemplate", model:model);
-
-			def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml, tagsHtml:tagsHtml, instanceTotal:model.instanceTotal, chartModel:chartModel, distinctRecoListHtml:distinctRecoListHtml]
+            def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml, tagsHtml:tagsHtml, instanceTotal:model.instanceTotal, chartModel:chartModel]
 			render result as JSON
 			return;
 		}
@@ -1236,5 +1232,37 @@ class ObservationController {
     def locations = {
         def locations = observationService.locations(params);
         render locations as JSON
+    }
+
+    def distinctReco = {
+        log.debug params
+        def max = Math.min(params.max ? params.int('max') : 10, 100)
+        def offset = params.offset ? params.int('offset') : 0
+        Map result = [:];
+        try {
+            def distinctRecoListResult;
+		    if(params.actionType == 'search') {
+                distinctRecoListResult = observationService.getDistinctRecoListFromSearch(params, max, offset);
+            } else {
+                distinctRecoListResult = observationService.getDistinctRecoList(params, max, offset);
+            }
+
+            if(distinctRecoListResult.distinctRecoList.size() > 0) {
+                result = [distinctRecoList:distinctRecoListResult.distinctRecoList, totalRecoCount:distinctRecoListResult.totalCount, 'next':offset+max, status:'success', msg:'success']
+            } else {
+                def message = "";
+                if(params.offset > 0) {
+                    message = g.message(code: 'recommendations.nomore.message', default:'No more distinct species. Please contribute');
+                } else {
+                    message = g.message(code: 'recommendations.zero.message', default:'No species. Please contribute');
+                }
+                result = [msg:message]
+            }
+
+        } catch(e) {
+            log.error e.getMessage();
+            result = ['status':'error', 'msg':g.message(code: 'error', default:'Error while processing the request.')];
+        }
+        render result as JSON
     }
 }

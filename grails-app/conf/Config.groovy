@@ -209,7 +209,7 @@ speciesPortal {
     app.logo = "logo/IBP.png"
     app.favicon = "logo/favicon.png"
    
-    app.notifiers_bcc = ["prabha.prabhakar@gmail.com", "sravanthi@strandls.com", "thomas.vee@gmail.com", "sandeept@strandls.com", "balachandert@gmail.com"]
+    app.notifiers_bcc = ["prabha.prabhakar@gmail.com", "thomas.vee@gmail.com", "sandeept@strandls.com", "balachandert@gmail.com"]
 
 	species {
 		speciesDownloadDir = "${download.rootDir}/species"
@@ -491,14 +491,6 @@ environments {
 			mail {
 			 host = "127.0.0.1"
 			 port = 25
-			 /*host = "smtp.gmail.com"
-			 port = 465
-			 username = "kinleygrails@gmail.com"
-			 password = "Fl0w3rs123"
-			 props = ["mail.smtp.auth":"true", 					   
-			          "mail.smtp.socketFactory.port":"465",
-			          "mail.smtp.socketFactory.class":"javax.net.ssl.SSLSocketFactory",
-			          "mail.smtp.socketFactory.fallback":"false"]*/
 			}
 		}
 

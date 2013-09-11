@@ -1,12 +1,23 @@
 import species.Resource;
+import species.auth.SUser;
 import groovy.sql.Sql;
 
 import java.util.Date;
 import species.utils.ImageUtils;
 import java.util.*;
 
+def geUserResoruceId(){
+              def result = []
+              SUser.findAllByIconIsNotNull().each { user ->
+                      result << [id:user.id, fileName:user.icon]
+              }
+              return result
+      }
+
 def _doCrop(resourceList, relativePath){
-	println "=============== " + resourceList.size()
+
+	println "==============Resource List Size==================" + resourceList.size()
+	//HashMap hm = new HashMap();
 	resourceList.each { res->
 		println "------------------------------------------------------------------ " + res.id
 		String fileName = relativePath + "/" + res.fileName;
@@ -28,9 +39,13 @@ def _doCrop(resourceList, relativePath){
 		try{
 			ImageUtils.doResize(file, outImg, 200, 200);
 		}catch (Exception e) {
-			println "==========================ee=== " + e.getMessage()
+			println "==============RahulImageException===== " + e.getMessage()
+			//hm.put(file , e.getMessage());
 		}
 	}
+	//println "===================ERROR COUNT============= " + hm.size()
+	//println hm
+	//println "====================ERROR END========================"
 }
 
 def getResoruceId(query, sql){
@@ -49,24 +64,37 @@ def doCrop(){
 	// Instantiate a Date object
 	Date startDate = new Date();
 	// display time and date using toString()
-	System.out.println(startDate.toString());
+	//System.out.println(startDate.toString());
 
 	def dataSoruce = ctx.getBean("dataSource");
 	def grailsApplication = ctx.getBean("grailsApplication");
 
 	def sql =  Sql.newInstance(dataSoruce);
-
-	gettting all resource for species
-	def query = "select distinct(resource_id) as id from species_resource order by resource_id";
+	def query
+/*
+	//gettting all resource for species
+	query = "select distinct(resource_id) as id from species_resource order by resource_id";
 	def result = getResoruceId(query, sql)
 	query = "select distinct(resource_id) as id from species_field_resources order by resource_id";
 	result.addAll(getResoruceId(query, sql))
 	_doCrop(result, grailsApplication.config.speciesPortal.resources.rootDir)
 
-	query = "select distinct(resource_id) as id from observation_resource order by resource_id";
-	result = getResoruceId(query, sql)
+	println "----------------DONE SPECIES-------------------------------------------------- "
+*/
+	//270543 to 270600 skipping
+	query = "select distinct(resource_id) as id from observation_resource  where resource_id > 290615 order by resource_id ";
+	def result = getResoruceId(query, sql)
 	_doCrop(result, grailsApplication.config.speciesPortal.observations.rootDir)
 
+	println "----------------DONE OBSERVATION-------------------------------------------------- "
+	result = geUserResoruceId()
+	_doCrop(result, grailsApplication.config.speciesPortal.users.rootDir)
+	println "----------------DONE USERS-------------------------------------------------- "
+	
+	result = Resource.list(type:Resource.ResourceType.ICON)
+	_doCrop(result, grailsApplication.config.speciesPortal.resources.rootDir)
+	println "----------------DONE ICONS-------------------------------------------------- "
+	
 	println "============= Start  Time " + startDate  + "          end time " + new Date()
 }
 
