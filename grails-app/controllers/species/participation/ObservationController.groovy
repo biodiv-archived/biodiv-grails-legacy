@@ -110,7 +110,7 @@ class ObservationController {
 //			def mapViewHtml = g.render(template:"/common/observation/showObservationMultipleLocationTemplate", model:[observationInstanceList:model.totalObservationInstanceList]);
 	        def chartModel = model.speciesGroupCountList
             chartModel['width'] = 300;
-            chartModel['height'] = 200;
+            chartModel['height'] = 270;
 
             def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml, tagsHtml:tagsHtml, instanceTotal:model.instanceTotal, chartModel:chartModel]
 			render result as JSON
@@ -1088,7 +1088,7 @@ class ObservationController {
 //			def mapViewHtml = g.render(template:"/common/observation/showObservationMultipleLocationTemplate", model:[observationInstanceList:model.totalObservationInstanceList]);
 			def chartModel = model.speciesGroupCountList
             chartModel['width'] = 300;
-            chartModel['height'] = 200;
+            chartModel['height'] = 270;
 
             def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml, tagsHtml:tagsHtml, instanceTotal:model.instanceTotal, chartModel:chartModel]
 			render result as JSON

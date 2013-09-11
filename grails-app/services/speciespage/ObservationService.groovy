@@ -1886,6 +1886,8 @@ class ObservationService {
             r[1] = (r[1]?:0)+r[2]
 			formattedResult.add(r)
 	 	}
+		formattedResult.sort { a, b -> b[1] - a[1]}
+		
 		return [data:formattedResult, columns:[
 				['string', 'Species Group'],
 				['number', 'All'],

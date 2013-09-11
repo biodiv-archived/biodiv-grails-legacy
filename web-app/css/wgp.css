@@ -1621,7 +1621,7 @@ li#userOrEmail-new {
         /*      font-size: 16px; */
 	/* 	font-weight: bold; */
 	color: #111111;
-        padding: 5px 20px 5px
+	padding: 8px 20px 5px
 }
 
 .navbar .nav .dropdown-toggle .caret,.navbar .nav .open.dropdown .caret
@@ -1640,6 +1640,12 @@ li#userOrEmail-new {
 
 #searchTextField {
 	border-radius: 0;
+	height:15px;
+	
+}
+
+#searchToggleBox {
+	margin-bottom: 0px;
 }
 
 #feedback_button {
@@ -2163,6 +2169,7 @@ div.noOfRatings {
 
 #ibp-header-bar .navbar-inner .brand, #ibp-header-bar .navbar-inner .dropdown-toggle {
 	color: #bbb;
+	text-shadow:none;
 }
 
 #ibp-header-bar .navbar-inner .brand:hover, #ibp-header-bar .navbar-inner .dropdown-toggle:hover, #loginLink:hover{
