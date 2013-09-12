@@ -420,7 +420,7 @@ class ObservationController {
 						def res = new Resource(fileName:obvDirPath+"/"+file.name, type:ResourceType.IMAGE);
                         //context specific baseUrl for location picker script to work
 						def baseUrl = Utils.getDomainServerUrlWithContext(request) + '/observations'
-						def thumbnail = res.thumbnailUrl(baseUrl);
+						def thumbnail = res.thumbnailUrl(baseUrl, null, ImageType.LARGE);
 						
 						resourcesInfo.add([fileName:file.name, url:'', thumbnail:thumbnail ,type:ResourceType.IMAGE]);
 					}
