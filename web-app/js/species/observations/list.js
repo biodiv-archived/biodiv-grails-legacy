@@ -341,16 +341,20 @@ $(document).ready(function(){
             dataType: "json",
             data:params,
             success: function(data) {
+            	$('#distinctRecoList .distinctRecoHeading').html(data.totalRecoCount?(' (' + data.totalRecoCount + ')'):'');
                 if(data.status === 'success') {
-                    $.each(data.distinctRecoList, function(index, item) {
+                	$.each(data.distinctRecoList, function(index, item) {
                         if(item[1])
                             $distinctRecoTable.append('<tr><td><i>'+item[0]+'</i></td><td>'+item[2]+'</td></tr>');  
                         else
-                            $distinctRecoTable.append('<tr><td>'+item[0]+'</td><td>'+item[2]+'</td></tr>');  
-                        $me.data('offset', data.next);
+                            $distinctRecoTable.append('<tr><td>'+item[0]+'</td><td>'+item[2]+'</td></tr>');
                     });
+                	$me.data('offset', data.next);
+                    if(data.totalRecoCount <= data.next){
+                    	$me.hide();
+                    }
                 } else {
-                    $me.hide();
+                	$me.hide();
                 }
             }
         });
@@ -661,8 +665,8 @@ function updateListPage(activeTag) {
             });
             visualization.draw(visualization_data, {legend: 'bottom'});
         }
-        $('#distinctRecoList').html(data.distinctRecoListHtml);
         //$('.observation_location_wrapper').replaceWith(data.mapViewHtml);
+        updateDistinctRecoTable();
         setActiveTag(activeTag);
         updateDownloadBox(data.instanceTotal);
         updateRelativeTime();
@@ -846,6 +850,14 @@ function mapViewSlideToggleHandler() {
         $("#isMapView").val("true");
         showMapView();
     }
+}
+
+function updateDistinctRecoTable(){
+	$('#distinctRecoTable tbody').empty();
+	var me = $('#distinctRecoTableAction');
+	$(me).show();
+	$(me).data('offset', 0);
+	$(me).click();
 }
 
 /*                        function getRandomNumber(){

@@ -83,21 +83,22 @@
                  </div>       
 				<div id="observations_list_map" class="observation sidebar_section"
                                     style="clear:both;overflow:hidden;display:none;">
+                    <h5>Species Distribution</h5>
 					<obv:showObservationsLocation
 						model="['observationInstanceList':totalObservationInstanceList, 'userGroup':userGroup]">
 					</obv:showObservationsLocation>
                                         <a id="refreshListForBounds" data-toggle="dropdown"
                                             href="#"><i class="icon-refresh"></i>
-							Filter list to the bounds</a>
+							Refresh list to map bounds</a>
 
                                         <input id="isMapView" name="isMapView" value="${params.isMapView}" type="hidden"/>
                                         <input id="bounds" name="bounds" value="${activeFilters?.bounds}" type="hidden"/>
                                         <input id="tag" name="tag" value="${params.tag}" type="hidden"/>
 				</div>
                                 <div id="obvPerGroupChart" class="sidebar_section" style="clear:both;overflow:hidden;">
-                                    <chart:showStats model="['title':'Observations by Species Group', columns:speciesGroupCountList.columns, data:speciesGroupCountList.data, width:width?:420, height:height?:420, 'hideTable':true, dynamicLoading:true]"/>
+                                    <chart:showStats model="['title':'Species Groups', columns:speciesGroupCountList.columns, data:speciesGroupCountList.data, width:300, height:270, 'hideTable':true, dynamicLoading:true]"/>
                                 </div>
-                                <g:render template="/observation/distinctRecoTableTemplate" model="[distinctRecoList:distinctRecoList]"/>
+                                <g:render template="/observation/distinctRecoTableTemplate" model="[distinctRecoList:distinctRecoList, totalCount:totalCount]"/>
                                 
                         </div>
 		</div>

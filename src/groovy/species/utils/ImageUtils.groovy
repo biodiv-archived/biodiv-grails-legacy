@@ -39,8 +39,13 @@ class ImageUtils {
 		if(lastIndex != -1) {
 			name = fileName.substring(0, lastIndex);
 		}
-		ImageUtils.doResize(imageFile, new File(dir, name+extension), config.thumbnail.width, config.thumbnail.height);
-
+		try {
+			doResize(imageFile, new File(dir, name+extension), config.thumbnail.width, config.thumbnail.height);
+		} catch (Exception e) {
+			log.error "Error whild resizing image $imageFile"
+			e.printStackTrace()
+		}
+		
 		log.debug "Creating gallery image";
 		extension = config.gallery.suffix
 		ImageUtils.convert(imageFile, new File(dir, name+extension), config.gallery.width, config.gallery.height, 100);
@@ -100,6 +105,7 @@ class ImageUtils {
 	 *Resizing Image to 200*200
 	 */
 
+	//XXX change this method to private after running migration script
 	public static void doResize(File inImg, File outImg, int width, int height) throws Exception{
 		String ext = "jpg";
 		BufferedImage im = null;

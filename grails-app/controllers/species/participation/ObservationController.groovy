@@ -110,11 +110,9 @@ class ObservationController {
 //			def mapViewHtml = g.render(template:"/common/observation/showObservationMultipleLocationTemplate", model:[observationInstanceList:model.totalObservationInstanceList]);
 	        def chartModel = model.speciesGroupCountList
             chartModel['width'] = 300;
-            chartModel['height'] = 200;
+            chartModel['height'] = 270;
 
-            def distinctRecoListHtml = g.render(template:"/observation/distinctRecoTableTemplate", model:model);
-
-			def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml, tagsHtml:tagsHtml, instanceTotal:model.instanceTotal, chartModel:chartModel, distinctRecoListHtml:distinctRecoListHtml]
+            def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml, tagsHtml:tagsHtml, instanceTotal:model.instanceTotal, chartModel:chartModel]
 			render result as JSON
 			return;
 		}
@@ -157,7 +155,7 @@ class ObservationController {
             }
         }
 		log.debug "Storing all observations ids list in session ${session['obv_ids_list']} for params ${params}";
-		return [observationInstanceList: observationInstanceList, instanceTotal: allObservationCount, checklistCount:checklistCount, observationCount: allObservationCount-checklistCount, distinctRecoList:filteredObservation.distinctRecoList, speciesGroupCountList:filteredObservation.speciesGroupCountList, queryParams: queryParams, activeFilters:activeFilters, resultType:'observation', geoPrivacyAdjust:Utils.getRandomFloat()]
+		return [observationInstanceList: observationInstanceList, instanceTotal: allObservationCount, checklistCount:checklistCount, observationCount: allObservationCount-checklistCount, speciesGroupCountList:filteredObservation.speciesGroupCountList, queryParams: queryParams, activeFilters:activeFilters, resultType:'observation', geoPrivacyAdjust:Utils.getRandomFloat()]
 	}
 	
 
@@ -1090,11 +1088,9 @@ class ObservationController {
 //			def mapViewHtml = g.render(template:"/common/observation/showObservationMultipleLocationTemplate", model:[observationInstanceList:model.totalObservationInstanceList]);
 			def chartModel = model.speciesGroupCountList
             chartModel['width'] = 300;
-            chartModel['height'] = 200;
+            chartModel['height'] = 270;
 
-            def distinctRecoListHtml = g.render(template:"/observation/distinctRecoTableTemplate", model:model);
-
-			def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml, tagsHtml:tagsHtml, instanceTotal:model.instanceTotal, chartModel:chartModel, distinctRecoListHtml:distinctRecoListHtml]
+            def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml, tagsHtml:tagsHtml, instanceTotal:model.instanceTotal, chartModel:chartModel]
 			render result as JSON
 			return;
 		}
@@ -1244,15 +1240,15 @@ class ObservationController {
         def offset = params.offset ? params.int('offset') : 0
         Map result = [:];
         try {
-            def distinctRecoList;
+            def distinctRecoListResult;
 		    if(params.actionType == 'search') {
-                distinctRecoList = observationService.getDistinctRecoListFromSearch(params, max, offset);
+                distinctRecoListResult = observationService.getDistinctRecoListFromSearch(params, max, offset);
             } else {
-                distinctRecoList = observationService.getDistinctRecoList(params, max, offset);
+                distinctRecoListResult = observationService.getDistinctRecoList(params, max, offset);
             }
 
-            if(distinctRecoList.size() > 0) {
-                result = [distinctRecoList:distinctRecoList, 'next':offset+max, status:'success', msg:'success']
+            if(distinctRecoListResult.distinctRecoList.size() > 0) {
+                result = [distinctRecoList:distinctRecoListResult.distinctRecoList, totalRecoCount:distinctRecoListResult.totalCount, 'next':offset+max, status:'success', msg:'success']
             } else {
                 def message = "";
                 if(params.offset > 0) {

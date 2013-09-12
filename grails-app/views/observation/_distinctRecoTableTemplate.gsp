@@ -2,7 +2,7 @@
 <%@ page import="species.participation.Recommendation"%>
 
 <div id="distinctRecoList" class="sidebar_section" style="clear:both; border:1px solid #CECECE;overflow:hidden">
-    <h5>Unique Species</h5>
+<h5>Unique Species<span class="distinctRecoHeading">${totalRecoCount?' (' + totalRecoCount + ')' :''}</span></h5>
 <table id="distinctRecoTable" class="table table-bordered table-condensed table-striped">
     <tbody>
         <g:each in="${distinctRecoList}" var="r">
