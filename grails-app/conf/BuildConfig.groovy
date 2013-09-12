@@ -7,7 +7,7 @@ grails.project.dependency.resolution = {
     inherits("global") {
         // uncomment to disable ehcache
         // excludes 'ehcache'
-        excludes 'xml-apis', 'xercesImpl', 'xmlParserAPIs', 'hibernate', 'stax-api'
+        excludes 'xml-apis', 'xercesImpl', 'xmlParserAPIs', 'hibernate', 'stax-api', 'lucene-spellchecker', 'lucene-analyzers'
 
     }
 
