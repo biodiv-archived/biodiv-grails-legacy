@@ -6,7 +6,7 @@
 <!------------------------------------ 
 ---- HEADER --------------------------
 ------------------------------------->
-<table class="head-wrap" bgcolor="#DDDBBB" style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;width: 100%; border-top: 1px solid #A1A376; border-left: 1px solid #A1A376; border-right: 1px solid #A1A376; width:610px;">
+<table class="head-wrap" bgcolor="#ECE9B7" style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;width: 100%; border-top: 1px solid #A1A376; border-left: 1px solid #A1A376; border-right: 1px solid #A1A376; width:610px;">
 	<tr style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;">
 		<td style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;"></td>
 		<td class="header container" style="margin: 0 auto;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;display: block;max-width: 600px;clear: both;">
@@ -36,7 +36,7 @@
 							<p class="lead" style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;margin-bottom: 10px;font-weight: normal;font-size: 14px;line-height: 1;">
 				Hi ${username},<br /><br />
 
-				<a href="${obvOwnUrl?: actorProfileUrl}"><img src="${currentUser?.profilePicture(ImageType.SMALL)}" style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif; max-width: 30px; max-height:30px; display:inline-block; vertical-align: middle;"></a>
+				<a href="${actorProfileUrl?: obvOwnUrl}"><img src="${currentUser?.profilePicture(ImageType.SMALL)}" style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif; max-width: 30px; max-height:30px; display:inline-block; vertical-align: middle;"></a>
 
 				<g:set var="currentAction" value="${action}"></g:set>
 				<g:if test="${currentAction == 'downloadRequest'}">
@@ -59,7 +59,7 @@
 				<g:if test="${activity?.text }">
 
 			<!-- Callout Panel -->
-			<p class="callout" style="margin: 0;padding: 5px;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;margin-bottom: 2px;font-weight: normal;font-size: 14px;line-height: 1; background-color: #ECE9B7;">
+			<p class="callout" style="margin: 0;padding: 5px;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;margin-bottom: 2px;font-weight: normal;font-size: 14px;line-height: 1; ">
 
 				<g:if test="${activity.text}"> 
 					<g:if test="${activity.text != null && activity.text.length() > 160}">
@@ -81,8 +81,20 @@
 				</table>
 			</div>
 			
-				<g:if test="${(currentAction == 'Document created' || currentAction == 'downloadRequest' || actionObject == 'checklist')}">
-				 		
+				<g:if test="${(currentAction == 'downloadRequest' || currentAction == 'Document created' || actionObject == 'checklist') || domainObjectType == 'document'}">
+				 		<div class="clear" class="content" style="margin: 0 auto;padding: 10px 0px;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;max-width: 600px;display: block; background-color:#D4ECE3; align:left; clear: both;">
+							<!-- Callout Panel -->
+							<p class="callout" style="margin: 0;padding: 0 5px;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;margin-bottom: 2px;font-weight: normal;font-size: 14px;line-height: 1; background-color: #D4ECE3;">
+
+								<g:if test="${domainObjectType == 'document' || currentAction == 'Document created'}">
+								 	Your document is located <a href="${obvUrl}" style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;color: #2BA6CB;font-weight: bold;"> here &raquo;</a> 
+								</g:if>
+								<g:if  test="${currentAction == 'downloadRequest'}">
+									You can log into your profile <a href="${userProfileUrl}" style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;color: #2BA6CB;font-weight: bold;"> here &raquo;</a>
+								</g:if>
+
+								</p><!-- /Callout Panel -->
+						</div>
 				</g:if>
 				<g:else>
 			<!-- COLUMN WRAP -->
@@ -141,22 +153,14 @@
 							<!-- Callout Panel -->
 							<p class="callout" style="margin: 0;padding: 0 5px;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;margin-bottom: 2px;font-weight: normal;font-size: 14px;line-height: 1; background-color: #D4ECE3;">
 
-								<g:if test="${currentAction == 'Document created'}">
-								 	You can get the documents <a href="${obvUrl}" style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;color: #2BA6CB;font-weight: bold;"> here &raquo;</a>
-								</g:if>
-								<g:elseif  test="${currentAction == 'downloadRequest'}">
-									You can log into your profile <a href="${userProfileUrl}" style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;color: #2BA6CB;font-weight: bold;"> here &raquo;</a>
-								</g:elseif>
-								<g:else>
 									For more information, please visit the page <a href="${obvUrl}" style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;color: #2BA6CB;font-weight: bold;">here &raquo;</a>							
-								</g:else>
-								</p><!-- /Callout Panel -->
+							</p><!-- /Callout Panel -->
 				</div>
 			</div><!-- /COLUMN WRAP -->	
 </g:else>
 				<g:if test="${groups}">
 				<div class="clear" style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif; clear: both; background-color: #D4ECE3;">
-					The above observation is a member of the following groups: <br />
+					<a style="padding:0 2px">The above observation is a member of the following groups: <a/><br />
 						<g:each in="${groups}">
 							<div style="height: 30px; width: 186px; border: 1px solid #A1A376; position: relative; background-color: #D4ECE3; float:left; margin:2px 6px; " >
 							    <a href="${baseUrl}/group/${it.webaddress}" style="text-decoration: none; color: #222222;"> 
@@ -213,7 +217,7 @@
 						<tr style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;">
 							<td align="left" style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;">
 								<p style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;margin-bottom: 10px;font-weight: normal;font-size: 12px;line-height: 1;">
-									If you don't want to recieve notifications from our portal, please unsubscribe by logging into <a href="${obvOwnUrl?:userProfileUrl}" style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;color: #2BA6CB;"><unsubscribe style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;"> your profile</unsubscribe></a>
+									If you don't want to recieve notifications from our portal, please unsubscribe by logging into <a href="${userProfileUrl?:obvOwnUrl}" style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;color: #2BA6CB;"><unsubscribe style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;"> your profile</unsubscribe></a>
 								</p>
 							</td>
 						</tr>
