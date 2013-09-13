@@ -25,7 +25,7 @@ class ImageUtils {
 	 * @param imageFile
 	 * @param dir
 	 */
-	static void createScaledImages(File imageFile, File dir) {
+	static void createScaledImages(  File imageFile, File dir) {
 		log.debug "Creating scaled versions of image : "+imageFile.getAbsolutePath();
 
 		def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.resources.images
@@ -36,10 +36,10 @@ class ImageUtils {
 		log.debug "Creating thumbnail image";
 		def extension = config.thumbnail.suffix
 		String name = fileName;
-		if(lastIndex != -1) {
+ 		if(lastIndex != -1) {
 			name = fileName.substring(0, lastIndex);
 		}
-		try {
+		try { 
 			doResize(imageFile, new File(dir, name+extension), config.thumbnail.width, config.thumbnail.height);
 		} catch (Exception e) {
 			log.error "Error whild resizing image $imageFile"
@@ -107,9 +107,11 @@ class ImageUtils {
 
 	//XXX change this method to private after running migration script
 	public static void doResize(File inImg, File outImg, int width, int height) throws Exception{
-	    String fileName = inImg.getAbsolutePath();
+	   if(inImg != null){
+        String fileName = inImg.getAbsolutePath();
 		//System.out.println(fileName);
-		String ext = fileName.split("[.]")[1];	
+		String ext = fileName.tokenize('.').last();
+        ext = ext.toLowerCase();
         //String ext = "jpg";
 		BufferedImage im = null;
 		BufferedImage scaled = null;
@@ -121,7 +123,7 @@ class ImageUtils {
 		float img_ratio = (img_width) / (float) (img_height);
 		//System.out.println(img_ratio);
 		// Case 1: When Width greater than height of image.
-		if (img_width > img_height) {
+ 		if (img_width > img_height) {
 			int new_width = (int) (height * img_ratio);
 			scaled = Scalr.resize(im, Scalr.Method.AUTOMATIC, new_width, height);
 			int sca_height = scaled.getHeight();
@@ -132,7 +134,7 @@ class ImageUtils {
 			cropped = scaled.getSubimage(x, y, rect_width, rect_height);
 		 }
 		// Case 2: When height greater than width of image.
-		else {
+ 		else {
 			int new_height = (int) (width /img_ratio);
 			scaled = Scalr.resize(im, Scalr.Method.AUTOMATIC, width, new_height);
 			int sca_width = scaled.getWidth();
@@ -149,7 +151,7 @@ class ImageUtils {
 		//
 		//			//System.out.println(e.getMessage());
 		//		}
-
+    }
 	}
 
 	/**
