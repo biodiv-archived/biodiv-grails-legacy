@@ -107,7 +107,10 @@ class ImageUtils {
 
 	//XXX change this method to private after running migration script
 	public static void doResize(File inImg, File outImg, int width, int height) throws Exception{
-		String ext = "jpg";
+	    String fileName = inImg.getAbsolutePath();
+		//System.out.println(fileName);
+		String ext = fileName.split("[.]")[1];	
+        //String ext = "jpg";
 		BufferedImage im = null;
 		BufferedImage scaled = null;
 		BufferedImage cropped = null;
@@ -127,7 +130,7 @@ class ImageUtils {
 			int rect_width = sca_height;
 			int rect_height = sca_height;
 			cropped = scaled.getSubimage(x, y, rect_width, rect_height);
-		}
+		 }
 		// Case 2: When height greater than width of image.
 		else {
 			int new_height = (int) (width /img_ratio);
@@ -138,7 +141,7 @@ class ImageUtils {
 			int rect_width = sca_width;
 			int rect_height = sca_width;
 			cropped = scaled.getSubimage(x, y, rect_width, rect_height);
-		}
+		} 
 		ImageIO.write(cropped, ext, outImg);
         jpegOptimize(outImg);
 
