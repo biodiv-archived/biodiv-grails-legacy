@@ -686,6 +686,7 @@ function getUpdateGalleryParams(target, limit, offset, removeUser, isGalleryUpda
     var href = url.attr('path');
     var params = getFilterParameters(url, limit, offset, removeUser, removeObv, removeSort, isRegularSearch, removeParam);
     params['href'] = href;
+    params['base'] = url.attr('base');
     return params;
 }
 
@@ -696,8 +697,10 @@ function updateGallery(target, limit, offset, removeUser, isGalleryUpdate, remov
     isGalleryUpdate = (isGalleryUpdate == undefined)?true:isGalleryUpdate
     if(isGalleryUpdate)
     	params["isGalleryUpdate"] = isGalleryUpdate;
-    var href = params.href
+    var href = params.href;
+    var base = params.base;
     delete params["href"]
+    delete params["base"]
     var recursiveDecoded = decodeURIComponent($.param(params));
     
     var doc_url = href+'?'+recursiveDecoded;
@@ -729,7 +732,7 @@ function updateGallery(target, limit, offset, removeUser, isGalleryUpdate, remov
             updateMapView(params);
         }
     } else {
-        window.location = url.attr('base')+doc_url;
+        window.location = base+doc_url;
     }
 }
  
