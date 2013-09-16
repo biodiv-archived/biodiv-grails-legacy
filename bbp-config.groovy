@@ -182,7 +182,8 @@ grails.plugins.springsecurity.ui.notification.emailReplyTo = "kxt5258@gmail.com"
 
 log4j = {
     appenders {
-        rollingFile name: "stacktrace", maxFileSize: 1024, file: "/var/logs/piws-stacktrace.log"
+        //rollingFile name: "stacktrace", maxFileSize: 1024, file: "/var/logs/piws-stacktrace.log"
+        rollingFile name: "stacktrace", maxFileSize: 1024, file: "/home/kinley/logs/bbp-stacktrace.log"
     }
 }
 
