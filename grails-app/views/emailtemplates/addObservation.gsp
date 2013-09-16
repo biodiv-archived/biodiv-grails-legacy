@@ -54,7 +54,7 @@
 					</g:else>
 				</g:else>
 
-				${message? message.toLowerCase(): activity?.activityTitle[0].toLowerCase() + activity?.activityTitle.substring(1)}
+				${message? message: activity?.activityTitle[0].toLowerCase() + activity?.activityTitle.substring(1)}
 
 
 				<g:if test="${activity?.text }">
@@ -82,16 +82,22 @@
 				</table>
 			</div>
 			
-				<g:if test="${(currentAction == 'downloadRequest' || currentAction == 'Document created' || actionObject == 'checklist') || domainObjectType == 'document'}">
+				<g:if test="${(currentAction == 'downloadRequest' || currentAction == 'Document created' || actionObject == 'checklist') || domainObjectType == 'document'} || domainObjectType == 'checklists' || domainObjectType == 'species'}}">
 				 		<div class="clear" class="content" style="margin: 0 auto;padding: 10px 0px;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;max-width: 600px;display: block; background-color:#D4ECE3; align:left; clear: both;">
 							<!-- Callout Panel -->
 							<p class="callout" style="margin: 0;padding: 0 5px;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;margin-bottom: 2px;font-weight: normal;font-size: 14px;line-height: 1; background-color: #D4ECE3;">
 
 								<g:if test="${domainObjectType == 'document' || currentAction == 'Document created'}">
-								 	Your document is located <a href="${obvUrl}" style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;color: #2BA6CB;font-weight: bold;"> here &raquo;</a> 
+								 	The document can be viewed <a href="${obvUrl}" style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;color: #2BA6CB;font-weight: bold;"> here &raquo;</a> 
 								</g:if>
 								<g:if  test="${currentAction == 'downloadRequest'}">
 									You can log into your profile <a href="${userProfileUrl}" style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;color: #2BA6CB;font-weight: bold;"> here &raquo;</a>
+								</g:if>
+								<g:if test="${domainObjectType == 'checklists'}">
+								 	The checklist can be viewed <a href="${obvUrl}" style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;color: #2BA6CB;font-weight: bold;"> here &raquo;</a> 
+								</g:if>
+								<g:if test="${domainObjectType == 'species'}">
+								 	The species can be viewed <a href="${obvUrl}" style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;color: #2BA6CB;font-weight: bold;"> here &raquo;</a> 
 								</g:if>
 
 								</p><!-- /Callout Panel -->
@@ -120,19 +126,25 @@
 								<p style="margin: 0;padding: 0;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;margin-bottom: 0px;font-weight: normal;font-size: 14px;line-height: 1.4;">
 
 								<g:set var="scientific" value="${obvSName}"></g:set>
+								<g:set var="common" value="${obvCName}"></g:set>
 
 								<g:if test="${scientific}"> 
 									<b>Scientific Name:</b> ${scientific} <br />
 								</g:if>
+								<g:elseif test="${common}"> 
+									<b>Scientific Name:</b>  <br />
+								</g:elseif>
 								<g:else>
 									<b>Scientific Name:</b> Help Identify <br />
 								</g:else>
 
-								<g:set var="common" value="${obvCName}"></g:set>
 
 								<g:if test="${common}"> 
 									<b>Common Name:</b> ${common}<br />
 								</g:if>
+								<g:elseif test="${scientific}"> 
+									<b>Common Name:</b> <br />
+								</g:elseif>
 								<g:else>
 									<b>Common Name:</b> Help Identify <br />
 								</g:else>
