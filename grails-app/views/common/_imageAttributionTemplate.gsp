@@ -16,9 +16,9 @@
                 alt="${l?.name.value()}" /> </a>
             </g:each>
 
-            <g:if test="${resource.type == ResourceType.IMAGE}">
-                <a href="${createLinkTo(file: resource.fileName.trim(), base:base)}" target="_blank">View original image</a> 
-            </g:if>
+<%--            <g:if test="${resource.type == ResourceType.IMAGE}">--%>
+<%--                <a href="${createLinkTo(file: resource.fileName.trim(), base:base)}" target="_blank">View original image</a> --%>
+<%--            </g:if>--%>
 
             <g:if test="${resource.description}">
                 <div class="span5 ellipsis multiline" style="margin-left:0px">${resource.description}</div>

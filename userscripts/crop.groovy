@@ -81,7 +81,6 @@ def doCrop(){
 
 	println "----------------DONE SPECIES-------------------------------------------------- "
 */
-	//270543 to 270600 skipping
 	query = "select distinct(resource_id) as id from observation_resource  where resource_id > 290615 order by resource_id ";
 	def result = getResoruceId(query, sql)
 	_doCrop(result, grailsApplication.config.speciesPortal.observations.rootDir)

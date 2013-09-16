@@ -320,9 +320,9 @@ $(document).ready(function(){
         this.bind('image', function(e) {
             // lets make galleria open a lightbox when clicking the main
 			// image:
-            $(e.imageTarget).click(this.proxy(function() {
-               this.openLightbox();
-            }));
+<%--            $(e.imageTarget).click(this.proxy(function() {--%>
+<%--               this.openLightbox();--%>
+<%--            }));--%>
         });
 	});
 
