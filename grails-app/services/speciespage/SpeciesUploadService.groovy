@@ -350,7 +350,7 @@ class SpeciesUploadService {
 		for(Species s in batch) {
 			try {
                 //def taxonConcept = TaxonomyDefinition.get(s.taxonConcept.id);
-                if(externalLinksService.updateExternalLinks(s.taxonConcept.id)) {
+                if(externalLinksService.updateExternalLinks(s.taxonConcept)) {
                     s.taxonConcept = TaxonomyDefinition.get(s.taxonConcept.id);
 //                    if(!s.taxonConcept.isAttached())
 //                        s.taxonConcept.attach();
