@@ -1896,6 +1896,13 @@ class ObservationService {
 	}
 
     def getDistinctRecoList(params, int max, int offset) {
+		def distinctRecoList = [];
+		
+		//for checklist filter not counting unique species
+		if(params.isChecklistOnly && params.isChecklistOnly.toBoolean()){
+			return [distinctRecoList:distinctRecoList, totalCount:0];
+		}
+		
         def queryParts = getFilteredObservationsFilterQuery(params) 
         def boundGeometry = queryParts.queryParams.remove('boundGeometry'); 
 
@@ -1917,7 +1924,6 @@ class ObservationService {
             distinctRecoQuery.setFirstResult(offset);
         }
 
-        def distinctRecoList = [];
         distinctRecoQuery.setProperties(queryParts.queryParams)
 		distinctRecoCountQuery.setProperties(queryParts.queryParams)
         def distinctRecoListResult = distinctRecoQuery.list()

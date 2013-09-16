@@ -9,6 +9,8 @@ import javax.imageio.ImageIO;
 import org.imgscalr.*;
 import java.awt.color.CMMException;
 import java.util.HashMap;
+import javax.imageio.IIOException;
+
 
 import org.apache.commons.logging.LogFactory;
 
@@ -39,20 +41,24 @@ class ImageUtils {
  		if(lastIndex != -1) {
 			name = fileName.substring(0, lastIndex);
 		}
-		try { 
-			doResize(imageFile, new File(dir, name+extension), config.thumbnail.width, config.thumbnail.height);
+		 
+		try{
+			 doResize(imageFile, new File(dir, name+extension), config.thumbnail.width, config.thumbnail.height);
 		} catch (Exception e) {
 			log.error "Error whild resizing image $imageFile"
 			e.printStackTrace()
 		}
-		
-		log.debug "Creating gallery image";
+		 
+		 
+        log.debug "Creating gallery image";
 		extension = config.gallery.suffix
 		ImageUtils.convert(imageFile, new File(dir, name+extension), config.gallery.width, config.gallery.height, 100);
 
 		log.debug "Creating gallery thumbnail image";
 		extension = config.galleryThumbnail.suffix
 		ImageUtils.convert(imageFile, new File(dir, name+extension), config.galleryThumbnail.width, config.galleryThumbnail.height, 100);
+
+		
 	}
 
 	/**
@@ -104,20 +110,35 @@ class ImageUtils {
 	/**
 	 *Resizing Image to 200*200
 	 */
-
-	//XXX change this method to private after running migration script
-	public static void doResize(File inImg, File outImg, int width, int height) throws Exception{
-	   if(inImg != null){
+    public static void doResize(File inImg, File outImg, int width, int height) throws Exception{
         String fileName = inImg.getAbsolutePath();
 		//System.out.println(fileName);
 		String ext = fileName.tokenize('.').last();
         ext = ext.toLowerCase();
+        BufferedImage im = null;
+        try{       
+            im = ImageIO.read(inImg);
+        }catch(IIOException e){
+            try{
+                im = JpegReader.readCMYKImage(inImg);
+            }catch(Exception my_e){
+                log.error "CMYK Image also couldnt be read";
+            }
+        }
+        doResize(im, outImg, width, height, ext);
+    }
+	//XXX change this method to private after running migration script
+    private static void doResize(BufferedImage im, File outImg, int width, int height,String ext) throws Exception{
+	   //if(inImg != null){
+        //String fileName = outImg.getAbsolutePath();
+		//System.out.println(fileName);
+		//String ext = fileName.tokenize('.').last();
+        //ext = ext.toLowerCase();
         //String ext = "jpg";
-		BufferedImage im = null;
+		
 		BufferedImage scaled = null;
 		BufferedImage cropped = null;
 
-		im = ImageIO.read(inImg);
 		int img_width = im.getWidth();
 		int img_height = im.getHeight();
 		float img_ratio = (img_width) / (float) (img_height);
@@ -151,7 +172,7 @@ class ImageUtils {
 		//
 		//			//System.out.println(e.getMessage());
 		//		}
-    }
+        //}
 	}
 
 	/**
