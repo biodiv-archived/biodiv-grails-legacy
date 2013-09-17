@@ -74,6 +74,7 @@ grails.spring.bean.packages = []
 // request parameters to mask when logging exceptions
 grails.exceptionresolver.params.exclude = ['password']
 
+/*
 // log4j configuration
 log4j = {
 	// Example of changing the log pattern for the default console
@@ -116,7 +117,7 @@ log4j = {
             //"org.grails.plugin.resource"	
     info    'species.auth'	
 
-}
+} */
 
 grails.gorm.default.mapping = {
 	cache true

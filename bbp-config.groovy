@@ -1,3 +1,5 @@
+import org.apache.log4j.Priority
+
 grails.mail.default.from="notification@biodiversity.bt"
 emailConfirmation.from="notification@biodiversity.bt"
 
@@ -20,6 +22,10 @@ speciesPortal.validCrossDomainOrigins = [
 ]
 
 jpegOptimProg = "/usr/sbin/jpegoptim";
+
+//log4j
+def log4jConsoleLogLevel = Priority.WARN
+def log4jAppFileLogLevel = Priority.INFO
 
 environments {
 	development {
@@ -67,14 +73,17 @@ environments {
 
                 ckeditor {
                     upload {
-                    basedir = "/newsletters/"
-                    image.browser = true
-                    image.upload = true    
-                    image.allowed = ['jpg', 'gif', 'jpeg', 'png']
-                    image.denied = []
-                }
+              		    basedir = "/newsletters/"
+                	    image.browser = true
+        	            image.upload = true    
+	                    image.allowed = ['jpg', 'gif', 'jpeg', 'png']
+        		    image.denied = []
+                    }
 		}
-
+		
+		//log4j logger config
+       		log4jConsoleLogLevel = Priority.DEBUG
+       		log4jAppFileLogLevel = Priority.DEBUG
 	}
 	production {
 		grails.serverURL = "http://biodiversity.bt/${appName}"
@@ -157,22 +166,22 @@ environments {
 			}
 		}
 		
-        ibp.domain='biodiversity.bt'
-        wgp.domain='biodiversity.bt'
+        	ibp.domain='biodiversity.bt'
+        	wgp.domain='biodiversity.bt'
 		
 		grails.plugins.springsecurity.successHandler.defaultTargetUrl = "/"
 		grails.plugins.springsecurity.logout.afterLogoutUrl = '/'
 
                 ckeditor {
-                    upload {
-                    baseurl = "/newsletters"
-                    basedir = "/data/bbp/species/newsletters/"
-                    image.browser = true
-                    image.upload = true    
-                    image.allowed = ['jpg', 'gif', 'jpeg', 'png']
-                    image.denied = []
-                }
-				}
+                	upload {
+        	            baseurl = "/newsletters"
+	                    basedir = "/data/bbp/species/newsletters/"
+                	    image.browser = true
+        	            image.upload = true    
+	                    image.allowed = ['jpg', 'gif', 'jpeg', 'png']
+                	    image.denied = []
+                	}
+		}
 		
 	}
 }
@@ -180,10 +189,51 @@ environments {
 grails.plugins.springsecurity.ui.notification.emailFrom = 'notification@biodiversity.bt'
 grails.plugins.springsecurity.ui.notification.emailReplyTo = "kxt5258@gmail.com";
 
+//log4j configuration
 log4j = {
-    appenders {
-        //rollingFile name: "stacktrace", maxFileSize: 1024, file: "/var/logs/piws-stacktrace.log"
-        rollingFile name: "stacktrace", maxFileSize: 1024, file: "/home/kinley/logs/bbp-stacktrace.log"
-    }
-}
+	error  	'org.codehaus.groovy.grails.web.pages', //  GSP
+            'org.codehaus.groovy.grails.web.sitemesh', //  layouts
+            'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
+            'org.codehaus.groovy.grails.web.mapping', // URL mapping
+            'org.codehaus.groovy.grails.commons', // core / classloading
+            'org.codehaus.groovy.grails.plugins', // plugins
+            'org.codehaus.groovy.grails.orm.hibernate', // hibernate integration
+            'org.hibernate',
+            'net.sf.ehcache.hibernate',
+            'org.springframework.security',
+            'org.codehaus.groovy.grails.web.servlet',  //  controllers
+            'grails.plugin',
+            'org.springframework.security.web',
+            'grails.app.tagLib.org.grails.plugin.resource'
 
+	warn   'org.mortbay.log'
+
+	debug	'species',
+		'speciespage',
+		'grails.app'
+    	
+	info    'species.auth'	
+	
+	appenders {
+		console name:'stdout', layout:pattern(conversionPattern: '%d [%t] %-5p %c - %m%n'), threshold: log4jConsoleLogLevel
+		rollingFile name: "bbplog", maxFileSize: '10MB', file: "/home/kinley/logs/bbp-stacktrace.log", layout:pattern(conversionPattern: '%d [%t] %-5p %c - %m%n'), threshold:log4jAppFileLogLevel 
+	}
+	
+	environments  {
+		development {
+			root {
+				error 'stdout', 'bbplog'
+			}
+		}
+		production {
+			root {
+				error 'stdout', 'bbplog'
+			}
+		}
+		pamba {
+			root {
+				error 'bbplog'
+			}
+		}
+	}
+}
