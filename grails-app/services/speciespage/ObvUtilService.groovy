@@ -60,7 +60,7 @@ class ObvUtilService {
 	static final String  SCHEDULED = "Scheduled";
 	static final String  EXECUTING = "Executing";
 	
-	//-1 to allow all download for without any cap 
+	//-1 to allow download without any limit 
 	static final int MAX_EXPORT_SIZE = -1;
 	
 	
