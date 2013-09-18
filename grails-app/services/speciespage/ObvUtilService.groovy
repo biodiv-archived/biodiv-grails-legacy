@@ -60,7 +60,8 @@ class ObvUtilService {
 	static final String  SCHEDULED = "Scheduled";
 	static final String  EXECUTING = "Executing";
 	
-	static final int MAX_EXPORT_SIZE = 5000;
+	//-1 to allow all download for without any cap 
+	static final int MAX_EXPORT_SIZE = -1;
 	
 	
 	def userGroupService
