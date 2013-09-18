@@ -24,12 +24,12 @@ speciesPortal {
 }
 
 speciesPortal.validCrossDomainOrigins = [
-	"localhost",
+	"localhost.org",
 	"biodiversity.bt",
 	"bhutanbiodiversity.bt"
 ]
 
-jpegOptimProg = "/usr/sbin/jpegoptim";
+//jpegOptimProg = "/usr/sbin/jpegoptim";
 
 //log4j
 def log4jConsoleLogLevel = Priority.WARN
@@ -222,7 +222,7 @@ log4j = {
 	
 	appenders {
 		console name:'stdout', layout:pattern(conversionPattern: '%d [%t] %-5p %c - %m%n'), threshold: log4jConsoleLogLevel
-		rollingFile name: "bbplog", maxFileSize: '10MB', file: "/home/kinley/logs/bbp-stacktrace.log", layout:pattern(conversionPattern: '%d [%t] %-5p %c - %m%n'), threshold:log4jAppFileLogLevel 
+		rollingFile name: "bbplog", maxFileSize: '10MB', file: "/home/kinley/logs/bbp-stacktrace.log".toString(), layout:pattern(conversionPattern: '%d [%t] %-5p %c - %m%n'), threshold:log4jAppFileLogLevel 
 	}
 	
 	environments  {
