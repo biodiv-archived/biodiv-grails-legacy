@@ -1,10 +1,18 @@
 import org.apache.log4j.Priority
 
+appName = grails.util.Metadata.current.getApplicationName()
+
 grails.mail.default.from="notification@biodiversity.bt"
 emailConfirmation.from="notification@biodiversity.bt"
+grails.plugins.springsecurity.ui.notification.emailFrom = 'notification@biodiversity.bt'
+grails.plugins.springsecurity.ui.notification.emailReplyTo = "kxt5258@gmail.com";
+grails.plugins.springsecurity.ui.newuser.emailFrom = 'notification@biodiversity.bt'
+grails.plugins.springsecurity.ui.userdeleted.emailFrom = 'notification@biodiversity.bt'
+grails.plugins.springsecurity.ui.forgotPassword.emailFrom = 'notification@biodiversity.bt'
 
 speciesPortal {
 	app.siteName = "Bhutan Biodiversity Portal BETA"
+	app.siteName2 = "Bhutan Biodiversity Portal BETA2"
         app.logo = "images/demo.png"
 	app.favicon = "images/favicon.ico"
 	app.siteDescription = "Welcome to the Bhutan Biodiversity Portal (BBP) - A repository of information designed to harness and disseminate collective intelligence on the      biodiversity of Bhutan."
@@ -186,8 +194,6 @@ environments {
 	}
 }
 
-grails.plugins.springsecurity.ui.notification.emailFrom = 'notification@biodiversity.bt'
-grails.plugins.springsecurity.ui.notification.emailReplyTo = "kxt5258@gmail.com";
 
 //log4j configuration
 log4j = {
