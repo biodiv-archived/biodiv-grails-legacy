@@ -6,7 +6,7 @@
 		<a  href="${uGroup.createLink(controller:'chart')}"> <h4>Activity Monitor: See top contributor | View observations stats | Explore species pages by group</h4> </a>
 	</div>
 	<div id="annotatedtimeline_activity" style='width: 870px; height: 180px;'></div>
-	<gvisualization:annotatedTimeLine  dynamicLoading="${true}"  elementId="annotatedtimeline_activity" columns="${activityData.columns}" data="${activityData.data}"/>
+	<gvisualization:annotatedTimeLine  dynamicLoading="${true}"  elementId="annotatedtimeline_activity" columns="${activityData.columns}" data="${activityData.data}" max="${max}" fill="${30}"/>
 <%----%>
 <%--	<br/>--%>
 <%--	<div style="clear:both;">--%>
