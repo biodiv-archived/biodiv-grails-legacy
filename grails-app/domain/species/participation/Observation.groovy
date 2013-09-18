@@ -33,7 +33,8 @@ class Observation extends Metadata implements Taggable, Rateable {
     def resourceService;
 	def observationsSearchService;
 	def SUserService;
-	
+    def observationService;
+
 	public enum OccurrenceStatus {
 		ABSENT ("Absent"),	//http://rs.gbif.org/terms/1.0/occurrenceStatus#absent
 		CASUAL ("Casual"),	// http://rs.gbif.org/terms/1.0/occurrenceStatus#casual
@@ -526,4 +527,8 @@ class Observation extends Metadata implements Taggable, Rateable {
 //	def fetchSourceChecklistTitle(){
 //		activityFeedService.getDomainObject(sourceType, sourceId).title
 //	}
+
+    def getObservationFeatures() {
+        return observationService.getObservationFeatures(this);
+    }
 }

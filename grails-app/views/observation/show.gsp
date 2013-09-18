@@ -244,7 +244,18 @@ String desc = "- "+ location +" by "+observationInstance.author.name.capitalize(
 							</div>
 						</div>	
 					</g:if>
-					
+						<div class="sidebar_section">
+							<h5>Location Information</h5>
+                                                            <table class="table table-bordered table-condensed table-striped">
+                                                            <g:each in="${observationInstance.getObservationFeatures()}" var="feature">
+                                                            <tr>
+                                                                <td>${feature.key}</td>
+                                                                <td>${feature.value}</td>
+                                                            </tr>
+                                                            </g:each>
+                                                        </table>
+						</div>	
+
 <%--					<div class="sidebar_section">--%>
 <%--						<h5>Top 5 Contributors of ${observationInstance.group.name}</h5>--%>
 <%--						<chart:showStats model="['title':'Top 5 Contributors', statsType:ChartService.USER_OBSERVATION_BY_SPECIESGROUP,  speciesGroupId:observationInstance.group.id, hAxisTitle:'User', hideBarChart:true, width:300, hideTitle:true]"/>--%>
@@ -274,8 +285,8 @@ String desc = "- "+ location +" by "+observationInstance.author.name.capitalize(
 		
 		$('#gallery1').galleria({
 			height : 400,
-            preload : 1,
-            lightbox: false,
+                        preload : 1,
+                        lightbox: false,
 			carousel : false,
 			transition : 'pulse',
 			image_pan_smoothness : 5,
@@ -393,6 +404,7 @@ String desc = "- "+ location +" by "+observationInstance.author.name.capitalize(
                 });
 
                 preLoadRecos(3, 0, false);
+
 	});
 </r:script>
 <g:javascript>
