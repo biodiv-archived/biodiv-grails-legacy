@@ -792,7 +792,7 @@ function refreshMarkers(p) {
     p['max'] = -1;
     delete p['bounds']
     
-    var url = window.params.observation.listUrl+'?'+decodeURIComponent($.param(p));
+    var url = window.params.observation.occurrencesUrl+'?'+decodeURIComponent($.param(p));
 
     if(markers)
         markers.clearLayers();

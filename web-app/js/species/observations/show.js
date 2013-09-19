@@ -145,4 +145,6 @@ function preLoadRecos(max, offset, seeAllClicked) {
         }
     });
 }
- 
+
+function showObservationMapView() {
+}

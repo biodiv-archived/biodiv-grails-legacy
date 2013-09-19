@@ -630,6 +630,7 @@ class ObservationService {
 		sql.rows(query).each{
 			tags[it.getProperty("name")] = it.getProperty("obv_count");
 		};
+        sql.close();
 		return tags;
 	}
 
@@ -1970,5 +1971,47 @@ class ObservationService {
 		return [distinctRecoList:distinctRecoList] 
     }
 
+    def getObservationFeatures(Observation obv) {
+		String query = "select t.type as type, t.feature as feature from map_layer_features t where ST_WITHIN('"+obv.topology.toText()+"', t.topology)order by t.type" ;
+        log.debug query;
+		def sql =  Sql.newInstance(dataSource);
+        //sql.in(new org.hibernate.type.CustomType(org.hibernatespatial.GeometryUserType, null), obv.topology)
+		def features = [:]
 
+		sql.rows(query).each {
+            switch (it.getProperty("type")) {
+                case "140" : features['Rainfall'] = it.getProperty("feature")+" mm";break;
+                case "138" : features['Soil'] = it.getProperty("feature");break;
+                case "161" : features['Temparature'] = it.getProperty("feature")+" C";break;
+                case "139" : features['Forest Type'] = it.getProperty("feature").toLowerCase().capitalize();break;
+                case "136" : features['Tahsil'] = it.getProperty("feature");break;
+            }
+		};
+        sql.close();
+        return features
+    }
+
+    /**
+    * Get map occurences within specified bounds
+    */
+    def getObservationOccurences(def params) {
+        def queryParts = getFilteredObservationsFilterQuery(params) 
+        String query = queryParts.query;
+
+        def boundGeometry = queryParts.queryParams.remove('boundGeometry'); 
+        query += queryParts.filterQuery + queryParts.orderByClause
+
+        log.debug "occurences query : "+query;
+        log.debug queryParts.queryParams;
+
+        def hqlQuery = sessionFactory.currentSession.createQuery(query)
+        if(params.bounds && boundGeometry) {
+            hqlQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(org.hibernatespatial.GeometryUserType, null))
+        } 
+
+        hqlQuery.setProperties(queryParts.queryParams);
+        def observationInstanceList = hqlQuery.list();
+
+        return [observationInstanceList:observationInstanceList]
+    }
 }
