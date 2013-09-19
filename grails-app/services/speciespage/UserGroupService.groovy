@@ -1257,7 +1257,7 @@ class UserGroupService {
 			UserGroup.read(Long.parseLong(it))
 		}
 		
-		if(params.selectionType == 'selectAll'){
+		if(params.pullType == 'bulk' && params.selectionType == 'selectAll'){
 			List newList = getObservationListForPost(params)
 			newList.removeAll(obvs)
 			obvs = newList
@@ -1304,4 +1304,39 @@ class UserGroupService {
 		}
 		return r
 	}
+	
+	private static boolean isFounderOrExpert(SUser user){
+		return UserGroupMemberRole.createCriteria().count {
+			and{
+				eq('sUser', user)
+				or{
+					eq('role', Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_FOUNDER.value()))
+					eq('role', Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_EXPERT.value()))
+				}
+			}
+		} > 0
+	}
+	
+	def boolean getResourcePullPermission(params, isBulkPull=true){
+		if(!springSecurityService.isLoggedIn()){
+			return false
+		}
+		
+		def currUser = springSecurityService.currentUser;
+		int groupCount = UserGroupMemberRole.countBySUser(currUser) 
+		if(groupCount == 0){
+			return false
+		}
+		
+		if(!isBulkPull){
+			return true
+		}
+		//if user is founder or expert in any group then retruing true permission for bulk upload 
+		//on list apge of any resource (i.e. obv, species, docs)
+		return isFounderOrExpert(currUser)
+	}
+	
+//	def getResourcePullPermission(params, isBulkPull=true){
+//		return getResourcePullPermission1(params, springSecurityService, isBulkPull)
+//	}
 }

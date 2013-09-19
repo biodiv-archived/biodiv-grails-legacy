@@ -374,10 +374,19 @@ class UserGroupTagLib {
 	}
 	
 	def objectPost = {attrs, body->
-		out << render(template:"/common/objectPostTemplate", model:attrs.model);
+		if(attrs.model.canPullResource){
+			out << render(template:"/common/objectPostTemplate", model:attrs.model);
+		}
 	}
 	
 	def objectPostToGroups = {attrs, body->
-		out << render(template:"/common/objectPostToGroupsTemplate", model:attrs.model);
+		def model = attrs.model
+		model.isBulkPull = (params.action == 'show')?false:true
+		if(model.canPullResource == null){
+			model.canPullResource = userGroupService.getResourcePullPermission(params)
+		}
+		if(model.canPullResource){
+			out << render(template:"/common/objectPostToGroupsTemplate", model:model);
+		}
 	}
 }

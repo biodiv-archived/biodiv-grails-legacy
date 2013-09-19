@@ -47,10 +47,15 @@ function updateListSelection(comp){
 	}
 }
 
-function submitToGroups(submitType, objectType, url){
-	if(!$('.post-to-groups .select-all').hasClass('active') && selectedObjects.length === 0){
-		alert('Please select at least one object');
-		return;
+function submitToGroups(submitType, objectType, url, isBulkPull, id=null){
+	if(isBulkPull){
+		if(!$('.post-to-groups .select-all').hasClass('active') && selectedObjects.length === 0){
+			alert('Please select at least one object');
+			return;
+		}	
+	}else{
+		selectedObjects = rejectedObjects = [id];
+		console.log(" adding or removing " + id);
 	}
 	
 	userGroups = getSelectedUserGroups();
@@ -65,6 +70,7 @@ function submitToGroups(submitType, objectType, url){
 		console.log("unposting " + selectedObjects +  ' on groups ' + userGroups);
 	}
 	
+	var pullType = (isBulkPull) ? 'bulk' : 'single'
 	var selectionType = $('.post-to-groups .select-all').hasClass('active') ? 'selectAll' : 'reset'
 	var objectIds = (selectionType === 'selectAll') ?  rejectedObjects : selectedObjects
 	var filterUrl = window.location.href	
@@ -72,7 +78,7 @@ function submitToGroups(submitType, objectType, url){
  		url: url,
  		type: 'POST',
 		dataType: "json",
-		data:{'selectionType':selectionType, 'objectType':objectType, 'objectIds':objectIds.join(","), 'submitType':submitType, 'userGroups':userGroups.join(","), 'filterUrl':filterUrl},
+		data:{'pullType':pullType, 'selectionType':selectionType, 'objectType':objectType, 'objectIds':objectIds.join(","), 'submitType':submitType, 'userGroups':userGroups.join(","), 'filterUrl':filterUrl},
 		success: function(data) {
 			if(data.success){
 				$(".alertMsg").removeClass('alert alert-error').addClass('alert alert-success').html(data.msg);
