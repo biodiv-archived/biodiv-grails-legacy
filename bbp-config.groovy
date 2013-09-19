@@ -33,7 +33,7 @@ speciesPortal.validCrossDomainOrigins = [
 
 //log4j
 def log4jConsoleLogLevel = Priority.WARN
-def log4jAppFileLogLevel = Priority.INFO
+def log4jAppFileLogLevel = Priority.DEBUG
 def logFile = "/home/kinley/logs/bbp-stacktrace.log".toString() 
 environments {
 	development {
@@ -127,7 +127,7 @@ environments {
 
 	pamba {
 		grails.serverURL = "http://biodiversity.bt/${appName}"
-		jpegOptimProg = '/usr/sbin/jpegoptim'
+		jpegOptimProg = "/usr/sbin/jpegoptim"
 		
 		speciesPortal {
 			app.rootDir = "/data/bbp/species"
@@ -158,7 +158,6 @@ environments {
 				serverURL = "http://biodiversity.bt/${appName}/content"
 			}	
 
-			search.serverURL="http://127.0.0.1:8080/solr"
 			grails {
 				mail {
 					 host = "127.0.0.1"
