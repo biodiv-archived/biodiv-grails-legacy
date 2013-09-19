@@ -199,6 +199,18 @@ String desc = "- "+ location +" by "+observationInstance.author.name.capitalize(
 						<obv:showLocation
 							model="['observationInstance':observationInstance]" />
 					</div>
+                                	<div class="sidebar_section">
+							<h5>Location Information</h5>
+                                                            <table class="table table-bordered table-condensed table-striped">
+                                                            <g:each in="${observationInstance.getObservationFeatures()}" var="feature">
+                                                            <tr>
+                                                                <td>${feature.key}</td>
+                                                                <td>${feature.value}</td>
+                                                            </tr>
+                                                            </g:each>
+                                                        </table>
+						</div>	
+
 
 					<!-- obv:showRating model="['observationInstance':observationInstance]" /-->
 					<!--  static species content -->
@@ -244,19 +256,7 @@ String desc = "- "+ location +" by "+observationInstance.author.name.capitalize(
 							</div>
 						</div>	
 					</g:if>
-						<div class="sidebar_section">
-							<h5>Location Information</h5>
-                                                            <table class="table table-bordered table-condensed table-striped">
-                                                            <g:each in="${observationInstance.getObservationFeatures()}" var="feature">
-                                                            <tr>
-                                                                <td>${feature.key}</td>
-                                                                <td>${feature.value}</td>
-                                                            </tr>
-                                                            </g:each>
-                                                        </table>
-						</div>	
-
-<%--					<div class="sidebar_section">--%>
+					<%--					<div class="sidebar_section">--%>
 <%--						<h5>Top 5 Contributors of ${observationInstance.group.name}</h5>--%>
 <%--						<chart:showStats model="['title':'Top 5 Contributors', statsType:ChartService.USER_OBSERVATION_BY_SPECIESGROUP,  speciesGroupId:observationInstance.group.id, hAxisTitle:'User', hideBarChart:true, width:300, hideTitle:true]"/>--%>
 <%--					</div>--%>
