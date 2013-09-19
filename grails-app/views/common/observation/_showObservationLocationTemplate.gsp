@@ -1,7 +1,6 @@
 <%@ page import="species.utils.Utils"%>
 
 <div class="sidebar_section">
-    <h5>Species Distribution</h5>
     <obv:showObservationsLocation model="['userGroup':userGroup]"></obv:showObservationsLocation>
     <h5>Location Information</h5>
     <table class="table table-bordered table-condensed table-striped">
