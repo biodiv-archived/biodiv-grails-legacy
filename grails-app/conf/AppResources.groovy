@@ -255,6 +255,7 @@ modules = {
 		resource url:'/js/species/checklist.js'
 		resource url:'/js/bootstrap-rowlink.min.js'
 		resource url:'/js/location/location-picker.js'
+		resource url:'/js/species/observations/map.js'
 	}
 	
     checklist_list {

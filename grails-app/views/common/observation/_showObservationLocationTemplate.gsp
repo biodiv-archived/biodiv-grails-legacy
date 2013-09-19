@@ -60,7 +60,9 @@
     $(document).ready(function() {
         loadGoogleMapsAPI(function() {
             initialize(document.getElementById("big_map_canvas"), false);
-            showObservationMapView("${observationInstance.id}");
+            <g:if test="${!observationInstance.isChecklist}">
+                showObservationMapView("${observationInstance.id}");
+            </g:if>
             var icon;
             
             var ptIcon = M.AwesomeMarkers.icon({
