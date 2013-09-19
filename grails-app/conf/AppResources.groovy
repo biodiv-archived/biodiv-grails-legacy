@@ -115,6 +115,7 @@ modules = {
 		resource url:'/js/jsrender.js'
 		//resource url:'/js/bootstrap-typeahead.js'
 		resource url:'/js/bootstrap-combobox.js'
+		resource url:'/js/species/observations/map.js'
 	}
 
 	observations_show {

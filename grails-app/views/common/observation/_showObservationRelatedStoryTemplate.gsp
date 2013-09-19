@@ -1,17 +1,17 @@
 <r:script> 
 $(document).ready(function() {
 	$('#carousel_${id}').jcarousel({
-		itemLoadCallback : itemLoadCallback,
-        url:"${uGroup.createLink(controller:controller, action:action, id:observationId, 'userGroup':userGroupInstance, 'userGroupWebaddress':userGroupWebaddress)}",
-        filterProperty:"${filterProperty}",
-        filterPropertyValue:"${filterPropertyValue}",
-        carouselDivId:"#carousel_" + "${id}",
-        carouselMsgDivId:"#relatedObservationMsg_" + "${id}",
-        carouselAddObvDivId:"#relatedObservationAddButton_" + "${id}",
-        itemFallbackDimension : window.params.carousel.maxWidth,
-        contextFreeUrl:"${uGroup.createLink(controller:resultController?:controller, action:'show')}",
-        contextGroupWebaddress:"${userGroupWebaddress}",
-        scroll:3    
+	    itemLoadCallback : itemLoadCallback,
+            url:"${uGroup.createLink(controller:controller, action:action, id:observationId, 'userGroup':userGroupInstance, 'userGroupWebaddress':userGroupWebaddress)}",
+            filterProperty:"${filterProperty}",
+            filterPropertyValue:"${filterPropertyValue}",
+            carouselDivId:"#carousel_" + "${id}",
+            carouselMsgDivId:"#relatedObservationMsg_" + "${id}",
+            carouselAddObvDivId:"#relatedObservationAddButton_" + "${id}",
+            itemFallbackDimension : window.params.carousel.maxWidth,
+            contextFreeUrl:"${uGroup.createLink(controller:resultController?:controller, action:'show')}",
+            contextGroupWebaddress:"${userGroupWebaddress}",
+            scroll:3    
 	});
 
 /*	$('#carousel_${id} img').hover( function () {

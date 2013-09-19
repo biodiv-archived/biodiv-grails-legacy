@@ -195,26 +195,8 @@ String desc = "- "+ location +" by "+observationInstance.author.name.capitalize(
 				</div>
 
                                 <div class="span4">
-                                    <div class="sidebar_section">
                                         <obv:showLocation
                                         model="['observationInstance':observationInstance]" />
-					<obv:showObservationsLocation
-						model="['userGroup':userGroup]">
-					</obv:showObservationsLocation>
-
-                                    </div>
-                                    <div class="sidebar_section">
-                                        <h5>Location Information</h5>
-                                        <table class="table table-bordered table-condensed table-striped">
-                                            <g:each in="${observationInstance.getObservationFeatures()}" var="feature">
-                                            <tr>
-                                                <td>${feature.key}</td>
-                                                <td>${feature.value}</td>
-                                            </tr>
-                                            </g:each>
-                                        </table>
-                                    </div>	
-
 
                                     <!-- obv:showRating model="['observationInstance':observationInstance]" /-->
                                     <!--  static species content -->
@@ -408,8 +390,9 @@ String desc = "- "+ location +" by "+observationInstance.author.name.capitalize(
                 });
 
                 preLoadRecos(3, 0, false);
-                showObservationMapView("${observationInstance.id}");
-	});
+                
+        });
+
 </r:script>
 <g:javascript>
 $(document).ready(function(){

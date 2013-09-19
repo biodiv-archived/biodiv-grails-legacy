@@ -160,8 +160,8 @@ class ObservationController {
 	
 	def occurrences = {
 		log.debug params
-		def observationInstanceList = observationService.getObservationOccurences(params)
-		render observationInstanceList as JSON
+		def result = observationService.getObservationOccurences(params)
+		render result as JSON
 	}
 
 	@Secured(['ROLE_USER'])
