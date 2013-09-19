@@ -3,6 +3,7 @@
 <div class="sidebar_section">
     <h5>Species Distribution</h5>
     <obv:showObservationsLocation model="['userGroup':userGroup]"></obv:showObservationsLocation>
+    <h5>Location Information</h5>
     <table class="table table-bordered table-condensed table-striped">
         <tr>
             <td>Place Name</td>
@@ -60,6 +61,7 @@
     $(document).ready(function() {
         loadGoogleMapsAPI(function() {
             initialize(document.getElementById("big_map_canvas"), false);
+            showObservationMapView("${observationInstance.id}");
             var icon;
             
             var ptIcon = M.AwesomeMarkers.icon({
@@ -77,11 +79,10 @@
                 icon = (${observationInstance.isChecklist})?ctIcon:ptIcon;
             }
 
-            initArea(false, undefined, undefined, {icon:icon});
+            initArea(false, undefined, undefined, {icon:icon, layer:'Current Observation' });
             //HACK
             //if(searchMarker)
                 //map.panTo(searchMarker.getLatLng());
-            showObservationMapView("${observationInstance.id}");
             resetMap();
         });
     });
