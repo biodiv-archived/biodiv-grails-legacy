@@ -1990,4 +1990,28 @@ class ObservationService {
         sql.close();
         return features
     }
+
+    /**
+    * Get map occurences within specified bounds
+    */
+    def getObservationOccurences(def params) {
+        def queryParts = getFilteredObservationsFilterQuery(params) 
+        String query = queryParts.query;
+
+        def boundGeometry = queryParts.queryParams.remove('boundGeometry'); 
+        query += queryParts.filterQuery + queryParts.orderByClause
+
+        log.debug "occurences query : "+query;
+        log.debug queryParts.queryParams;
+
+        def hqlQuery = sessionFactory.currentSession.createQuery(query)
+        if(params.bounds && boundGeometry) {
+            hqlQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(org.hibernatespatial.GeometryUserType, null))
+        } 
+
+        hqlQuery.setProperties(queryParts.queryParams);
+        def observationInstanceList = hqlQuery.list();
+
+        return [observationInstanceList:observationInstanceList]
+    }
 }

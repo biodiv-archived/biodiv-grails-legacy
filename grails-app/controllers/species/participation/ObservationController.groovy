@@ -158,6 +158,11 @@ class ObservationController {
 		return [observationInstanceList: observationInstanceList, instanceTotal: allObservationCount, checklistCount:checklistCount, observationCount: allObservationCount-checklistCount, speciesGroupCountList:filteredObservation.speciesGroupCountList, queryParams: queryParams, activeFilters:activeFilters, resultType:'observation', geoPrivacyAdjust:Utils.getRandomFloat()]
 	}
 	
+	def occurrences = {
+		log.debug params
+		def observationInstanceList = observationService.getObservationOccurences(params)
+		render observationInstanceList as JSON
+	}
 
 	@Secured(['ROLE_USER'])
 	def create = {
