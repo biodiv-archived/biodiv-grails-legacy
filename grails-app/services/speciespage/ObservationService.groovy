@@ -223,11 +223,11 @@ class ObservationService {
 	 */
 	Map getRelatedObservations(params) {
 		log.debug params;
-		def max = Math.min(params.limit ? params.limit.toInteger() : 12, 100)
-		def offset = params.offset ? params.offset.toInteger() : 0
+	    int max = Math.min(params.limit ? params.limit.toInteger() : 12, 100)
+		int offset = params.offset ? params.offset.toInteger() : 0
 
 		def relatedObv
-		if(params.filterProperty == "speciesName") {
+		 if(params.filterProperty == "speciesName") {
 			relatedObv = getRelatedObservationBySpeciesName(params.id.toLong(), max, offset)
 		} else if(params.filterProperty == "speciesGroup"){
 			relatedObv = getRelatedObservationBySpeciesGroup(params.filterPropertyValue.toLong(),  max, offset)
@@ -276,10 +276,7 @@ class ObservationService {
 	 * @param params
 	 * @return
 	 */
-	Map getRelatedObservationBySpeciesName(long obvId, int limit, long offset){
-		//String speciesName = getSpeciesNames(obvId)
-		//log.debug speciesName
-		//log.debug speciesName.getClass();
+	Map getRelatedObservationBySpeciesName(long obvId, int limit, int offset){
 		return getRelatedObservationBySpeciesNames(obvId, limit, offset)
 	}
 	/**
@@ -377,7 +374,7 @@ class ObservationService {
 	 * @param params
 	 * @return
 	 */
-	Map getRelatedObservationBySpeciesNames(long obvId, int limit, long offset){
+	Map getRelatedObservationBySpeciesNames(long obvId, int limit, int offset){
 		Observation parentObv = Observation.read(obvId);
 		if(!parentObv.maxVotedReco) {
 			return ["observations":[], "count":0];
@@ -385,8 +382,9 @@ class ObservationService {
 		return getRelatedObservationByReco(obvId, parentObv.maxVotedReco, limit, offset)
 	}
 	
-	private Map getRelatedObservationByReco(long obvId, Recommendation maxVotedReco, int limit, long offset){
-		def observations = Observation.withCriteria (max: limit, offset: offset) {
+	private Map getRelatedObservationByReco(long obvId, Recommendation maxVotedReco, int limit, int offset) {
+        def criteria = Observation.createCriteria();
+		def observations = criteria.list(offset:offset?:0) {
 			projections {
 				groupProperty('sourceId')
 				groupProperty('isShowable')
@@ -397,22 +395,19 @@ class ObservationService {
 				if(obvId) ne("id", obvId)
 			}
 			order("isShowable", "desc")
+            if(limit >= 0) maxResults(limit)
 		}
 		def result = [];
-		observations.each {
-			def obv = Observation.get(it[0])
+        def iter = observations.iterator();
+        while(iter.hasNext()){
+            def obv = iter.next();
 			result.add(['observation':obv, 'title':(obv.isChecklist)? obv.title : maxVotedReco.name]);
 		}
-		def count = Observation.createCriteria().count {
-			projections {
-				count(groupProperty('sourceId'))
-			}
-			and {
-				eq("maxVotedReco", maxVotedReco)
-				eq("isDeleted", false)
-				if(obvId) ne("id", obvId)
-			}
-		}
+        
+        if(limit < 0)
+		    return ["observations":result]
+        
+        def count = observations.totalCount;
 		return ["observations":result, "count":count]
 	}
 	
@@ -422,7 +417,8 @@ class ObservationService {
 		
 		List<Recommendation> scientificNameRecos = recommendationService.searchRecoByTaxonConcept(taxonConcept);
 		if(scientificNameRecos) {
-			def observations = Observation.withCriteria (max: limit, offset: offset) {
+            def criteria = Observation.createCriteria();
+			def observations = criteria.list (max: limit, offset: offset) {
 				and {
 					'in'("maxVotedReco", scientificNameRecos)
 					eq("isDeleted", false)
@@ -430,16 +426,12 @@ class ObservationService {
 				}
 				order("lastRevised", "desc")
 			}
+            def count = observations.totalCount;
 			def result = [];
-			observations.each {
-				result.add(['observation':it, 'title':it.fetchSpeciesCall()]);
-			}
-			def count = Observation.createCriteria().count {
-				and {
-					'in'("maxVotedReco", scientificNameRecos)
-					eq("isDeleted", false)
-					eq("isShowable", true)
-				}
+            def iter = observations.iterator();
+            while(iter.hasNext()){
+                def obv = iter.next();
+				result.add(['observation':obv, 'title':it.fetchSpeciesCall()]);
 			}
 			return ['observations':result, 'count':count]
 		} else {
@@ -447,16 +439,14 @@ class ObservationService {
 		}
 	}
 	
-	static List createUrlList2(observations){
+	static List createUrlList2(observations) {
 		def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 		String iconBasePath = config.speciesPortal.observations.serverURL
 		def urlList = createUrlList2(observations, iconBasePath)
-//		urlList.each {
-//			it.imageLink = it.imageLink.replaceFirst(/\.[a-zA-Z]{3,4}$/, config.speciesPortal.resources.images.thumbnail.suffix)
-//		}
 		return urlList
 	}
-	static List createUrlList2(observations, String iconBasePath){
+
+	static List createUrlList2(observations, String iconBasePath) {
 		List urlList = []
 		for(param in observations){
 			def item = [:];
@@ -464,6 +454,7 @@ class ObservationService {
 			item.url = "/" + controller + "/show/" + param['observation'].id
 			item.imageTitle = param['title']
             item.type = controller
+            item.id = param['observation'].id
 			def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 			Resource image = param['observation'].mainImage()
 			if(image){
@@ -485,6 +476,10 @@ class ObservationService {
 				String desc = "- "+ location +" by "+param['observation'].author.name.capitalize()+" on "+param['observation'].fromDate.format('dd/MM/yyyy');
 				item.notes = desc;				
 			}
+            item.lat = param['observation'].latitude
+            item.lng = param['observation'].longitude
+            item.geoPrivacy = param['observation'].geoPrivacy
+            item.isChecklist = param['observation'].isChecklist
 			urlList << item;
 		}
 		return urlList
@@ -617,7 +612,6 @@ class ObservationService {
 
 		return resources;
 	}
-
 
 
 	Map findAllTagsSortedByObservationCount(int max){
@@ -825,10 +819,10 @@ class ObservationService {
 
 		def query = "select "
         if(params.fetchField) {
-            query += " obv.id,"
+            query += " obv.id as id,"
             params.fetchField.split(",").each { fetchField ->
                 if(!fetchField.equalsIgnoreCase('id'))
-                    query += " obv."+fetchField+","
+                    query += " obv."+fetchField+" as "+fetchField+","
             }
             query = query [0..-2];
             queryParams['fetchField'] = params.fetchField
@@ -1489,9 +1483,9 @@ class ObservationService {
 		
 		return [url:url, messageCode:messageCode, messageArgs: messageArgs]
 	}
-	
-	//////////////////////////////////////////////////////////////////////////////////////////////
-	
+
+    /**
+    */
 	public sendNotificationMail(String notificationType, def obv, request, String userGroupWebaddress, ActivityFeed feedInstance=null){
 		def conf = SpringSecurityUtils.securityConfig
 		log.debug "Sending email"
@@ -2012,6 +2006,6 @@ class ObservationService {
         hqlQuery.setProperties(queryParts.queryParams);
         def observationInstanceList = hqlQuery.list();
 
-        return [observationInstanceList:observationInstanceList]
+        return [observations:observationInstanceList, geoPrivacyAdjust:Utils.getRandomFloat()]
     }
 }

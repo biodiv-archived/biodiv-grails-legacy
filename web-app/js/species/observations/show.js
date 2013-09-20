@@ -146,5 +146,10 @@ function preLoadRecos(max, offset, seeAllClicked) {
     });
 }
 
-function showObservationMapView() {
+function showObservationMapView(obvId) {
+    console.log(obvId);
+    var params = {filterProperty:'speciesName',limit:-1,id:obvId}
+    refreshMarkers(params, window.params.observation.relatedObservationsUrl);
+    $('#big_map_canvas').trigger('maploaded');
 }
+
