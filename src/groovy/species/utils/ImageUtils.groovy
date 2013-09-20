@@ -140,7 +140,13 @@ class ImageUtils {
 			cropped = scaled.getSubimage(x, y, rect_width, rect_height);
 		}
 		ImageIO.write(cropped, ext, outImg);
-        jpegOptimize(outImg);
+		try {
+			outImg.setReadable(true,false);
+		}
+		catch (Exception e) {
+			log.error outImg + "Couldn't change permision on " + outImg + "\n" + e.printStackTrace();
+		}
+        	jpegOptimize(outImg);
 
 		//		} catch(Exception e){
 		//
