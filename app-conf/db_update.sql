@@ -40,3 +40,16 @@ CREATE INDEX rowId_checklist_data_idx ON checklist_row_data(row_id);
 ANALYZE activity_feed;
 ANALYZE comment;
 ANALYZE checklist_row_data;
+
+CREATE VIEW map_layer_features AS
+  SELECT f.type, f.feature, f.topology
+    FROM dblink('hostaddr=10.0.0.9 port=5432 dbname=ibp user=postgres password=postgres123', 
+        '(select descriptio as feature, __mlocate__topology as topology, __mlocate__layer_id as layer_id from lyr_117_india_soils) union (select rain_range as feature, __mlocate__topology as topology, __mlocate__layer_id as layer_id from lyr_119_india_rainfallzone) union (select temp_c as feature,  __mlocate__topology as topology, __mlocate__layer_id as layer_id from lyr_162_india_temperature) union (select type_desc as feature, __mlocate__topology as topology,  __mlocate__layer_id as layer_id from lyr_118_india_foresttypes) union (select tahsil as feature, __mlocate__topology as topology, __mlocate__layer_id as layer_id from lyr_115_india_tahsils)') 
+        AS f(feature varchar(255), topology geometry, type varchar(255));
+
+
+CREATE VIEW map_layer_features AS
+  SELECT f.type, f.feature, f.topology
+    FROM dblink('dbname=ibp', 
+        '(select descriptio as feature, __mlocate__topology as topology, __mlocate__layer_id as layer_id from lyr_117_india_soils) union (select rain_range as feature, __mlocate__topology as topology, __mlocate__layer_id as layer_id from lyr_119_india_rainfallzone) union (select temp_c as feature,  __mlocate__topology as topology, __mlocate__layer_id as layer_id from lyr_162_india_temperature) union (select type_desc as feature, __mlocate__topology as topology,  __mlocate__layer_id as layer_id from lyr_118_india_foresttypes) union (select tahsil as feature, __mlocate__topology as topology, __mlocate__layer_id as layer_id from lyr_115_india_tahsils)') 
+        AS f(feature varchar(255), topology geometry, type varchar(255));

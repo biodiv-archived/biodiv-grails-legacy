@@ -209,7 +209,7 @@
 			multiValued="false" />
 
 		<field name="grantee_organization" type="text" indexed="true"
-			required="true" />
+			required="false" />
 
 		<field name="sitename" type="string" indexed="true" required="false"
 			multiValued="true" />

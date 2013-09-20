@@ -8,5 +8,7 @@
 	<core name="projects" instanceDir="projects" />
 	<core name="documents" instanceDir="documents" />
 	<core name="users" instanceDir="users" />
+	<core name="maps" instanceDir="maps" />
+	<core name="wgp_maps" instanceDir="wgp_maps" />
 </cores>
 </solr>

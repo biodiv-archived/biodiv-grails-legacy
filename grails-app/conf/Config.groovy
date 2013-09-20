@@ -16,15 +16,12 @@ import com.octo.captcha.service.sound.DefaultManageableSoundCaptchaService
 
 // locations to search for config files that get merged into the main config
 // config files can either be Java properties files or ConfigSlurper scripts
+grails.config.locations = ["file:${basedir}/${appName}-config.groovy"]
 
-// grails.config.locations = [ "classpath:${appName}-config.properties",
-//                             "classpath:${appName}-config.groovy",
-//                             "file:${userHome}/.grails/${appName}-config.properties",
-//                             "file:${userHome}/.grails/${appName}-config.groovy"]
-
-// if(System.properties["${appName}.config.location"]) {
-//    grails.config.locations << "file:" + System.properties["${appName}.config.location"]
-// }
+/*
+if(System.properties["${appName}.config.location"]) {
+    grails.config.locations << "file:" + System.properties["${appName}.config.location"]
+}*/
 
 grails.project.groupId = appName // change this to alter the default package name and Maven publishing destination
 grails.mime.file.extensions = false // enables the parsing of file extensions from URLs into the request format
@@ -76,6 +73,7 @@ grails.spring.bean.packages = []
 // request parameters to mask when logging exceptions
 grails.exceptionresolver.params.exclude = ['password']
 
+/*
 // log4j configuration
 log4j = {
 	// Example of changing the log pattern for the default console
@@ -118,7 +116,7 @@ log4j = {
             //"org.grails.plugin.resource"	
     info    'species.auth'	
 
-}
+} */
 
 grails.gorm.default.mapping = {
 	cache true
@@ -199,10 +197,12 @@ else {
 
 
 speciesPortal {
-    app.siteName = "India Biodiversity Portal"
-    app.siteDescription = "Welcome to the India Biodiversity Portal (IBP) - A repository of information designed to harness and disseminate collective intelligence on the biodiversity of the Indian subcontinent."
+    app.siteName = "Bhutan Biodiversity Portal"
+    app.logo = "logo/IBP.png"
+    app.favicon = "logo/favicon.ico"
+    app.siteDescription = "Welcome to the Bhutan Biodiversity Portal (BBP) - A repository of information designed to harness and disseminate collective intelligence on the biodiversity of Bhutan."
 
-	app.rootDir = "${userHome}/git/biodiv/app-conf"
+	app.rootDir = "${userHome}/git/${appName}/app-conf"
 	data.rootDir = "${app.rootDir}/data"
 	download.rootDir = "${data.rootDir}/datarep/downloads"
  
@@ -465,7 +465,7 @@ jpegOptimProg = "/usr/bin/jpegoptim";
 
 environments {
 	development {
-		grails.serverURL = "http://indiabiodiversity.localhost.org/${appName}"
+		grails.serverURL = "http://bhutanbiodiversity.localhost.org/${appName}"
 		speciesPortal {
 			search.serverURL = "http://localhost:8090/solr"
 			names.parser.serverURL = "saturn.strandls.com"
@@ -474,14 +474,14 @@ environments {
 					appId= "424071494335902"
 					secret= "bb87b98979ae30936342364178c7b170"
 				}
-				supportEmail = "team(at)thewesternghats(dot)in"
+				supportEmail = "team(at)bhutannbc(dot)bt"
 			}
 			ibp {
 				facebook {
 					appId= "347177228674021"
 					secret= "82d91308b5437649bfe891a027205501"
 				}
-				supportEmail = "support(at)indiabiodiversity(dot)org"
+				supportEmail = "support(at)bhutanbiodiversity(dot)org"
 			}
 		}
 		google.analytics.enabled = false
@@ -494,8 +494,8 @@ environments {
 			}
 		}
 
-        ibp.domain='indiabiodiversity.localhost.org'
-        wgp.domain='thewesternghats.indiabiodiversity.localhost.org'
+        ibp.domain='bhutanbiodiversity.localhost.org'
+        wgp.domain='thewesternghats.bhutanbiodiversity.localhost.org'
 		//grails.resources.debug=true
 		grails.resources.mappers.hashandcache.excludes = ['**']
 		//grails.resources.flatten = false
@@ -518,7 +518,7 @@ environments {
 		grails.serverURL = "http://indiabiodiversity.localhost.org/${appName}"
 		google.analytics.enabled = false
 	}
-	production {
+	/*production {
 		grails.serverURL = "http://indiabiodiversity.localhost.org/${appName}"
 		speciesPortal {
 			search.serverURL = "http://localhost:8090/solr"
@@ -555,7 +555,7 @@ environments {
 		//grails.resources.flatten = false
 		grails.resources.mappers.yuijsminify.disable=true
 	}
-
+*/
 	saturn {
 		grails.serverURL = "http://ibp.saturn.strandls.com/${appName}"
 		

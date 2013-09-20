@@ -158,6 +158,11 @@ class ObservationController {
 		return [observationInstanceList: observationInstanceList, instanceTotal: allObservationCount, checklistCount:checklistCount, observationCount: allObservationCount-checklistCount, speciesGroupCountList:filteredObservation.speciesGroupCountList, queryParams: queryParams, activeFilters:activeFilters, resultType:'observation', geoPrivacyAdjust:Utils.getRandomFloat()]
 	}
 	
+	def occurrences = {
+		log.debug params
+		def result = observationService.getObservationOccurences(params)
+		render result as JSON
+	}
 
 	@Secured(['ROLE_USER'])
 	def create = {
@@ -420,7 +425,7 @@ class ObservationController {
 						def res = new Resource(fileName:obvDirPath+"/"+file.name, type:ResourceType.IMAGE);
                         //context specific baseUrl for location picker script to work
 						def baseUrl = Utils.getDomainServerUrlWithContext(request) + '/observations'
-						def thumbnail = res.thumbnailUrl(baseUrl);
+						def thumbnail = res.thumbnailUrl(baseUrl, null, ImageType.LARGE);
 						
 						resourcesInfo.add([fileName:file.name, url:'', thumbnail:thumbnail ,type:ResourceType.IMAGE]);
 					}
