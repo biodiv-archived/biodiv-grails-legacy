@@ -78,21 +78,28 @@
                             <obv:showObservationsList  model="['totalObservationInstanceList':totalObservationInstanceList, 'observationInstanceList':observationInstanceList, 'instanceTotal':instanceTotal, 'queryParams':queryParams, 'activeFilters':activeFilters, 'userGroup':userGroup]"  />
                         </div>
                         <div class="span4" style="position:relative;top:20px">
+                 <div class="sidebar_section" style="clear:both;overflow:hidden;display:none;">
+                 	<uGroup:objectPostToGroups model="['objectType':Observation.class.canonicalName, userGroup:params.userGroup]"/>
+                 </div>       
 				<div id="observations_list_map" class="observation sidebar_section"
                                     style="clear:both;overflow:hidden;display:none;">
+                    <h5>Species Distribution</h5>
 					<obv:showObservationsLocation
-						model="['observationInstanceList':totalObservationInstanceList, 'userGroup':userGroup, 'width':280]">
+						model="['observationInstanceList':totalObservationInstanceList, 'userGroup':userGroup]">
 					</obv:showObservationsLocation>
+                                        <a id="refreshListForBounds" data-toggle="dropdown"
+                                            href="#"><i class="icon-refresh"></i>
+							Refresh list to map bounds</a>
+
                                         <input id="isMapView" name="isMapView" value="${params.isMapView}" type="hidden"/>
                                         <input id="bounds" name="bounds" value="${activeFilters?.bounds}" type="hidden"/>
                                         <input id="tag" name="tag" value="${params.tag}" type="hidden"/>
 				</div>
                                 <div id="obvPerGroupChart" class="sidebar_section" style="clear:both;overflow:hidden;">
-                                    <chart:showStats model="['title':'Observations by Species Group', columns:speciesGroupCountList.columns, data:speciesGroupCountList.data, width:width?:420, height:height?:420, 'hideTable':true, dynamicLoading:true]"/>
+                                    <chart:showStats model="['title':'Species Groups', columns:speciesGroupCountList.columns, data:speciesGroupCountList.data, width:300, height:270, 'hideTable':true, dynamicLoading:true]"/>
                                 </div>
-                                <div id="distinctRecoList" class="sidebar_section" style="clear:both">
-                                    <g:render template="/observation/distinctRecoTableTemplate" model="[distinctRecoList:distinctRecoList]"/>
-                                </div>
+                                <g:render template="/observation/distinctRecoTableTemplate" model="[distinctRecoList:distinctRecoList, totalCount:totalCount]"/>
+                                
                         </div>
 		</div>
 	</div>
@@ -107,12 +114,19 @@ $(document).ready(function() {
         $(this).parent().css('background-color', '#9acc57');
         $('#observations_list_map').slideToggle(mapViewSlideToggleHandler);
     });
+    <g:if test="${params.isMapView?.equalsIgnoreCase('true') || params.bounds}">
+    </g:if>
         $("#map_view_bttn a").click();
 
     $('#big_map_canvas').on('maploaded', function(){
-        map.on('viewreset', function() {
+        /*map.on('viewreset', function() {
             refreshList(getSelectedBounds());
-        });
+        });*/
     });
+    
+    $("#refreshListForBounds").click(function() {
+        refreshList(getSelectedBounds());
+    });
+
 });
 </g:javascript>

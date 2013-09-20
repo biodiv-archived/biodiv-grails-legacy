@@ -237,7 +237,7 @@ CKEDITOR.replace('summary', image_config);
 									code="project.grantFrom.label" default="Grant From" /></label>
 							<div class="controls">
 								<input name="grantFrom" type="text" id="grantFrom"
-									class="date-popup input-xlarge"
+									class="date input-xlarge"
 									value="${projectInstance?.grantFrom?.format('dd/MM/yyyy')}"
 									placeholder="Select date" />
 							</div>
@@ -250,7 +250,7 @@ CKEDITOR.replace('summary', image_config);
 									code="project.grantTo.label" default="Grant To" /></label>
 							<div class="controls">
 								<input name="grantTo" type="text" id="grantTo"
-									class="date-popup input-xlarge"
+									class="date input-xlarge"
 									value="${projectInstance?.grantTo?.format('dd/MM/yyyy')}"
 									placeholder="Select date" />
 							</div>
@@ -455,12 +455,12 @@ CKEDITOR.replace('misc', config);
         	maxLength:30
             });
             $(".tagit-hiddenSelect").css('display','none');
-            $( ".date-popup" ).datepicker({ 
-                            changeMonth: true,
-                            changeYear: true,
-                            dateFormat: 'dd/mm/yy' 
-            });
-
+            $( ".date" ).datepicker({ 
+    changeMonth: true,
+    changeYear: true,
+    format: 'dd/mm/yyyy' 
+});
+            
 
 		
         });

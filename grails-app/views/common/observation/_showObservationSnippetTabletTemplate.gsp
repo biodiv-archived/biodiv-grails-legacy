@@ -1,11 +1,12 @@
 <%@page import="species.Resource.ResourceType"%>
 <g:set var="mainImage" value="${observationInstance.mainImage()}" />
 <%
-def imagePath = mainImage?mainImage.thumbnailUrl(null, observationInstance.isChecklist ? '.png' :null): null;
+def imagePath = mainImage?mainImage.thumbnailUrl(null, !observationInstance.resource ? '.png' :null): null;
 def controller = observationInstance.isChecklist ? 'checklist' :'observation'
 def obvId = observationInstance.id
 %>
 <div class="snippet tablet">
+<%--    <uGroup:objectPost model="['objectInstance':observationInstance, 'userGroup':userGroup]" />--%>
     <div class="figure"
         title='<g:if test="${obvTitle != null}">${obvTitle}</g:if>'>
                 <g:link url="${uGroup.createLink(controller:controller, action:'show', id:obvId, 'pos':pos, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress) }" name="g${pos}">

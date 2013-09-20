@@ -6,18 +6,12 @@
 <g:render template="/common/titleTemplate" model="['title':title]"/>
 <r:require modules="susers_list" />
 <style type="text/css">
-.snippet.tablet .figure img {
-	height: auto;
-}
-
-.figure .thumbnail {
-	height: 120px;
-	margin: 0 auto;
-	text-align: center;
-	*font-size: 120px;
-	line-height: 120px;
-}
+.thumbnails>li {
+        margin:0 1px 5px 0px;
+        padding:0px;
+    }
 </style>
+
 
 </head>
 

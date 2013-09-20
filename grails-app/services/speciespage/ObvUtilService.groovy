@@ -19,6 +19,17 @@ import species.formatReader.SpreadsheetReader;
 import species.utils.ImageType;
 import species.utils.ImageUtils
 
+
+import com.vividsolutions.jts.geom.Coordinate
+import com.vividsolutions.jts.geom.GeometryFactory
+import content.eml.Coverage;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.io.WKTReader;
+import com.vividsolutions.jts.io.ParseException;
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.PrecisionModel;
+
+
 class ObvUtilService {
 
 	static transactional = false
@@ -49,7 +60,8 @@ class ObvUtilService {
 	static final String  SCHEDULED = "Scheduled";
 	static final String  EXECUTING = "Executing";
 	
-	static final int MAX_EXPORT_SIZE = 5000;
+	//-1 to allow download without any limit 
+	static final int MAX_EXPORT_SIZE = -1;
 	
 	
 	def userGroupService
@@ -352,7 +364,8 @@ class ObvUtilService {
 		}
 		
 		SpreadsheetReader.readSpreadSheet(spreadSheet.getAbsolutePath()).get(0).each{ m ->
-			uploadObservation(imageDir, m)
+			if(m[IMAGE_FILE_NAMES].trim() != "")
+				uploadObservation(imageDir, m)
 		}
 	}
 	
@@ -392,6 +405,11 @@ class ObvUtilService {
 		
 		//author
 		obvParams['author'] = SUser.findByEmail(m[AUTHOR_EMAIL].trim())
+		
+		GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), grailsApplication.config.speciesPortal.maps.SRID);
+        if(obvParams.latitude && obvParams.longitude) {
+            obvParams.areas = Utils.GeometryAsWKT(geometryFactory.createPoint(new Coordinate(obvParams.longitude?.toFloat(), obvParams.latitude?.toFloat())));
+        } 
  	}
 	
 	private getUserGroupIds(String names){

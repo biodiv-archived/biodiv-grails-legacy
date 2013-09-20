@@ -1,7 +1,10 @@
 <%@page import="species.utils.Utils"%>
+<%@page import="species.Resource.ResourceType"%>
+
 <g:if test="${resource}">
 <div class="notes" style="text-align: left;">
     <div>
+
         <div class="license license_div">
             <i class="slideUp icon-chevron-up pull-right"></i>
 
@@ -12,10 +15,15 @@
                 src="${createLinkTo(dir:'images/license', file: l?.name.value().toLowerCase().replaceAll('\\s+','')+'.png', absolute:true)}"
                 alt="${l?.name.value()}" /> </a>
             </g:each>
-            <g:if test="${resource.description}">
-            <div class="span5 ellipsis multiline" style="margin-left:0px">${resource.description}</div>
 
-            <div style="clear:both;"></div>
+<%--            <g:if test="${resource.type == ResourceType.IMAGE}">--%>
+<%--                <a href="${createLinkTo(file: resource.fileName.trim(), base:base)}" target="_blank">View original image</a> --%>
+<%--            </g:if>--%>
+
+            <g:if test="${resource.description}">
+                <div class="span5 ellipsis multiline" style="margin-left:0px">${resource.description}</div>
+
+                <div style="clear:both;"></div>
             </g:if>
 
 

@@ -42,6 +42,6 @@
     </g:if>
 
     <g:if test="${!showDetails}">
-    <g:render template="/common/observation/noOfResources" model="['instance':observationInstance]"/>
+        <g:render template="/common/observation/noOfResources" model="['instance':observationInstance]"/>
     </g:if>
 </div>

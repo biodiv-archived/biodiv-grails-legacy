@@ -306,16 +306,15 @@ $(document).ready(function(){
                 var url = a.url();
                 var params = url.param();
                 delete params["append"]
-                    delete params["loadMore"]
-                    params['max'] = parseInt(params['offset'])+parseInt(params['max']);
+                delete params["loadMore"]
+                params['max'] = parseInt(params['offset'])+parseInt(params['max']);
                 params['offset'] = 0
-                    var History = window.History;
+                var History = window.History;
                 History.pushState({state:1}, "Species Portal", '?'+decodeURIComponent($.param(params))); 
                 updateRelativeTime();
                 last_actions();
                 eatCookies();
                 $('.observations_list_wrapper').trigger('updatedGallery');
-
             }
         });
 
@@ -326,6 +325,41 @@ $(document).ready(function(){
     //	last_actions();
     eatCookies();
     $('.observations_list_wrapper').trigger('updatedGallery');
+
+    $('#distinctRecoTableAction').click(function(){
+        var $me = $(this);
+        var target = window.location.pathname + window.location.search;
+        var a = $('<a href="'+target+'"></a>');
+        var url = a.url();
+        var href = url.attr('path');
+        var params = getFilterParameters(url);
+        params['max'] = $(this).data('max');
+        params['offset'] = $(this).data('offset');
+        var $distinctRecoTable = $('#distinctRecoTable');
+        $.ajax({
+            url:window.params.observation.distinctRecoListUrl,
+            dataType: "json",
+            data:params,
+            success: function(data) {
+            	$('#distinctRecoList .distinctRecoHeading').html(data.totalRecoCount?(' (' + data.totalRecoCount + ')'):'');
+                if(data.status === 'success') {
+                	$.each(data.distinctRecoList, function(index, item) {
+                        if(item[1])
+                            $distinctRecoTable.append('<tr><td><i>'+item[0]+'</i></td><td>'+item[2]+'</td></tr>');  
+                        else
+                            $distinctRecoTable.append('<tr><td>'+item[0]+'</td><td>'+item[2]+'</td></tr>');
+                    });
+                	$me.data('offset', data.next);
+                    if(data.totalRecoCount <= data.next){
+                    	$me.hide();
+                    }
+                } else {
+                	$me.hide();
+                }
+            }
+        });
+    });
+    $('#distinctRecoTableAction').click();
 });
 
 if (typeof String.prototype.startsWith != 'function') {
@@ -631,8 +665,8 @@ function updateListPage(activeTag) {
             });
             visualization.draw(visualization_data, {legend: 'bottom'});
         }
-        $('#distinctRecoList').html(data.distinctRecoListHtml);
         //$('.observation_location_wrapper').replaceWith(data.mapViewHtml);
+        updateDistinctRecoTable();
         setActiveTag(activeTag);
         updateDownloadBox(data.instanceTotal);
         updateRelativeTime();
@@ -642,7 +676,7 @@ function updateListPage(activeTag) {
     }
 }
 
-function updateGallery(target, limit, offset, removeUser, isGalleryUpdate, removeObv, removeSort, isRegularSearch, removeParam) {
+function getUpdateGalleryParams(target, limit, offset, removeUser, isGalleryUpdate, removeObv, removeSort, isRegularSearch, removeParam) {
     if(target === undefined) {
         target = window.location.pathname + window.location.search;
     }
@@ -651,10 +685,22 @@ function updateGallery(target, limit, offset, removeUser, isGalleryUpdate, remov
     var url = a.url();
     var href = url.attr('path');
     var params = getFilterParameters(url, limit, offset, removeUser, removeObv, removeSort, isRegularSearch, removeParam);
-    // alert(" tag in params " + params['tag'] );
+    params['href'] = href;
+    params['base'] = url.attr('base');
+    return params;
+}
+
+function updateGallery(target, limit, offset, removeUser, isGalleryUpdate, removeObv, removeSort, isRegularSearch, removeParam) {
+    
+    var params = getUpdateGalleryParams(target, limit, offset, removeUser, isGalleryUpdate, removeObv, removeSort, isRegularSearch, removeParam);
+
     isGalleryUpdate = (isGalleryUpdate == undefined)?true:isGalleryUpdate
     if(isGalleryUpdate)
     	params["isGalleryUpdate"] = isGalleryUpdate;
+    var href = params.href;
+    var base = params.base;
+    delete params["href"]
+    delete params["base"]
     var recursiveDecoded = decodeURIComponent($.param(params));
     
     var doc_url = href+'?'+recursiveDecoded;
@@ -686,7 +732,7 @@ function updateGallery(target, limit, offset, removeUser, isGalleryUpdate, remov
             updateMapView(params);
         }
     } else {
-        window.location = url.attr('base')+doc_url;
+        window.location = base+doc_url;
     }
 }
  
@@ -735,55 +781,8 @@ function refreshMapBounds() {
 }
 
 function showMapView() {
-    updateGallery(undefined, undefined, 0, undefined, window.params.isGalleryUpdate);
+    updateMapView(getUpdateGalleryParams(undefined, undefined, 0, undefined, window.params.isGalleryUpdate));
 }
-
- 
-function refreshMarkers(p) {
-    if(!p) p = new Array()
-
-    p['fetchField'] = "id,latitude,longitude,isChecklist,geoPrivacy";
-    p['max'] = -1;
-    delete p['bounds']
-    
-    var url = window.params.observation.listUrl+'?'+decodeURIComponent($.param(p));
-
-    if(markers)
-        markers.clearLayers();
-    else 
-        markers = new M.MarkerClusterGroup({maxClusterRadius:50});
-
-    $.ajax({
-        url: url,
-        dataType: "json",
-        success: function(data) {
-            for(var i=0; i<data.observationInstanceList.length; i++) {
-                var obv = data.observationInstanceList[i];
-                var latitude = obv[1];
-            	var longitude = obv[2];
-            	var icon;
-                
-                if(obv[4]){
-                	icon = obv[3]?geoPrivacyChecklistIcon:geoPrivacyPointIcon;
-                	latitude += data.geoPrivacyAdjust;
-                	longitude += data.geoPrivacyAdjust;
-                }else{
-                	icon = obv[3]?checklistIcon:pointIcon;
-                }
-                var marker = createMarker(latitude, longitude, {
-                    draggable: false,
-                    clusterable: true,
-                    icon:icon,
-                    clickable:load_content,
-                    data:{id:obv[0]}
-                });
-                if(marker) markers.addLayer(marker);
-            }
-            markers.addTo(map);
-        }
-    });
-}
-
 
 function refreshList(bounds){
     if (bounds !== undefined){
@@ -807,6 +806,14 @@ function mapViewSlideToggleHandler() {
         $("#isMapView").val("true");
         showMapView();
     }
+}
+
+function updateDistinctRecoTable(){
+	$('#distinctRecoTable tbody').empty();
+	var me = $('#distinctRecoTableAction');
+	$(me).show();
+	$(me).data('offset', 0);
+	$(me).click();
 }
 
 /*                        function getRandomNumber(){
@@ -912,5 +919,6 @@ $(document).ready(function(){
     $(".snippet.tablet .figure").hover(function() {
         $(this).children('.mouseover').toggle('slow')
     });
+
 });
     

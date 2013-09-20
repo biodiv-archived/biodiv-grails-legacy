@@ -6,12 +6,7 @@
 <g:render template="/common/titleTemplate" model="['title':title]"/>
 <r:require modules="observations_list" />
 <style>
-    .thumbnails>li {
-        margin:0 2px 2px 0px;
-        padding:0px;
-    }
-
-
+    
     .map_wrapper {
         margin-bottom: 0px;
     }

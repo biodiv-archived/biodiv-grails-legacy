@@ -7,7 +7,9 @@
 			href="${createLinkTo(file: gallImagePath, base:grailsApplication.config.speciesPortal.resources.serverURL)}">
 			<img class="galleryImage"
 			src="${createLinkTo(file: gallThumbImagePath, base:grailsApplication.config.speciesPortal.resources.serverURL)}"
+
+			data-original="${createLinkTo(file: r.fileName.trim(), base:grailsApplication.config.speciesPortal.resources.serverURL)}" 
 			/> </a>
 
-		<g:imageAttribution model="['resource':r]" />
+		<g:imageAttribution model="['resource':r, base:grailsApplication.config.speciesPortal.resources.serverURL]" />
 	</g:each>

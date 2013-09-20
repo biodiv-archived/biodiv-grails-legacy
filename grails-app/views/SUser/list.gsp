@@ -8,8 +8,15 @@
 <r:require modules="susers_list"/>
 <g:set var="entityName"
 	value="${message(code: 'sUser.label', default: 'Users')}" />
-</head>
+<style>
+.thumbnails>li {
+        margin:0 1px 5px 0px;
+        padding:0px;
+    }
+</style>
 
+
+</head>
 <body>
 
 	<div class="span12">

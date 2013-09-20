@@ -1,7 +1,7 @@
 <%@page import="species.utils.Utils"%>
-<button id="searchToggle" class="btn btn-link" type="button" style="${((queryParams?.query)?:((queryParams?.q)?:params.query))?'display:none;':''}"><i class="icon-search"></i></button>
+<%--<button id="searchToggle" class="btn btn-link" type="button" style="${((queryParams?.query)?:((queryParams?.q)?:params.query))?'display:none;':''}"><i class="icon-search"></i></button>--%>
 
-<div id='searchToggleBox' class="input-append" style="${((queryParams?.query)?:((queryParams?.q)?:params.query))?'':'display:none;'}">
+<div id='searchToggleBox' class="input-append">
 	<form method="get"
 		action="${uGroup.createLink(controller:controller, action:'search') }"
 		id="searchbox" class="navbar-search" style="float: none;">
@@ -16,7 +16,7 @@
 			value="${((queryParams?.query)?:((queryParams?.q)?:params.query))?.encodeAsHTML()}"
 			class="search-query span3" placeholder="Search" />
 		
-		<button id="search" class="btn btn-link" type="button"><i class="icon-search"></i></button>
+		<button id="search" class="btn btn-link" type="button"><i class="icon-search icon-gray"></i></button>
 		<input type="hidden" name="fl" value="id" />
 		<g:hiddenField name="category" value="${controller}" />
 		
@@ -59,7 +59,11 @@ $(document).ready(function() {
                 },
                 'observation':{
                     listUrl:"${uGroup.createLink(controller:'observation', action: 'listJSON', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}",
-                    uploadUrl:"${g.createLink(controller:'observation', action:'upload_resource')}"
+                    occurrencesUrl:"${uGroup.createLink(controller:'observation', action: 'occurrences', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}",
+                    relatedObservationsUrl:"${uGroup.createLink(controller:'observation', action: 'getRelatedObservation', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}",
+                    uploadUrl:"${g.createLink(controller:'observation', action:'upload_resource')}",
+                    distinctRecoListUrl:"${uGroup.createLink(controller:'observation', action: 'distinctReco', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress, params:[actionType:params.action])}",
+
                 },
                 'recommendation': {
                     'getRecos' : "${uGroup.createLink(controller:'recommendation', action:'getRecos', userGroup:userGroupInstance)}",
