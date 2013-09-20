@@ -147,9 +147,46 @@ function preLoadRecos(max, offset, seeAllClicked) {
 }
 
 function showObservationMapView(obvId) {
-    console.log(obvId);
     var params = {filterProperty:'speciesName',limit:-1,id:obvId}
-    refreshMarkers(params, window.params.observation.relatedObservationsUrl);
+    refreshMarkers(params, window.params.observation.relatedObservationsUrl, function(data){
+        google.load('visualization', '1', {packages: ['corechart'], callback:function(){
+            drawVisualization(data.observations);
+        }});
+    });
     $('#big_map_canvas').trigger('maploaded');
 }
+var months = [ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" ]; // Store month names in array
+
+function getMonth(someDate) {
+      return months[someDate.getMonth()];
+}
+
+function drawVisualization(rows) {
+    var data = new google.visualization.DataTable();
+    data.addColumn('date', 'Date');
+    data.addColumn('number', 'Observation');
+    if(rows) {
+        for(var i=0; i<rows.length; i++) {
+            data.addRow([new Date(rows[i].observedOn), 1]);
+        }
+        var grouped_dt = google.visualization.data.group (
+                data, [{column:0, modifier:getMonth, type:'string', label:'Month'}],
+                [{'column': 1, 'aggregation': google.visualization.data.sum, 'type': 'number', label:'#Observations'}]);
+
+        var columnChart = new google.visualization.ColumnChart(
+                document.getElementById('temporalDist'));
+
+        columnChart.draw(grouped_dt,  {
+            title:"No of observations of same species by month till date",
+            hAxis: {title: 'Month'},
+            legend:{position: 'bottom'}
+        });
+/*        var table = new google.visualization.Table(document.getElementById('table'));
+        table.draw(data, null);
+ 
+        var grouped_table = new google.visualization.Table(document.getElementById('grouped_table'));
+        grouped_table.draw(grouped_dt, null);
+*/    }
+}
+
 

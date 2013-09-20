@@ -480,6 +480,7 @@ class ObservationService {
             item.lng = param['observation'].longitude
             item.geoPrivacy = param['observation'].geoPrivacy
             item.isChecklist = param['observation'].isChecklist
+            item.observedOn = param['observation'].fromDate.getTime();
 			urlList << item;
 		}
 		return urlList

@@ -56,6 +56,10 @@
     </table>
 </div>	
 
+<div class="sidebar_section">
+    <h5>Temporal Distribution</h5>
+    <div id="temporalDist" style="height:300px;"></div>
+</div>
 
 <r:script>
     $(document).ready(function() {
