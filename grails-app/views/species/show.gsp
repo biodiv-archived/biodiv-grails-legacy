@@ -444,6 +444,8 @@ $(document).ready(function(){
 
                         <div class="span4 pull-right">
                             <t:showTaxonBrowser model="['speciesInstance':speciesInstance, 'expandSpecies':true, 'expandAll':false, 'speciesId':speciesInstance.taxonConcept?.id, expandAllIcon:false]"/>
+                            <uGroup:objectPostToGroupsWrapper 
+										model="[canPullResource:canPullResource, 'observationInstance':speciesInstance]" />
                         </div>
 
 			<!-- media gallery -->

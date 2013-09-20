@@ -203,8 +203,11 @@ class UserGroupTagLib {
 	}
 
 	def getCurrentUserUserGroups = {attrs, body ->
+		
+		println "===================================" + attrs.model.onlyExpertGroups
+		
 		def user = springSecurityService.getCurrentUser();
-		def userGroups = userGroupService.getUserGroups(user);
+		def userGroups = user.getUserGroups(attrs.model?.onlyExpertGroups);
 		def result = [:]
 		if(attrs.model?.observationInstance && attrs.model.observationInstance.userGroups) {
 			//check if the obv already belongs to userGroup and disable the control for it not to submit again
@@ -382,6 +385,7 @@ class UserGroupTagLib {
 	def objectPostToGroups = {attrs, body->
 		def model = attrs.model
 		model.isBulkPull = (params.action == 'show')?false:true
+		model.onlyExpertGroups = (model.isBulkPull || params.controller == 'species')?true:false
 		if(model.canPullResource == null){
 			model.canPullResource = userGroupService.getResourcePullPermission(params)
 		}
@@ -389,4 +393,8 @@ class UserGroupTagLib {
 			out << render(template:"/common/objectPostToGroupsTemplate", model:model);
 		}
 	}
+	def objectPostToGroupsWrapper = {attrs, body->
+		out << render(template:"/common/objectPostToGroupsWrapperTemplate", model:attrs.model);
+	}
+	
 }

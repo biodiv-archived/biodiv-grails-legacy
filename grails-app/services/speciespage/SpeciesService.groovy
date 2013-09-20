@@ -390,19 +390,20 @@ class SpeciesService {
 
 	def export(params, dl){
 		log.debug(params)
-		def speciesInstanceList = getSpeciesList(params, dl)
+		String action = new URL(dl.filterUrl).getPath().split("/")[2]
+		def speciesInstanceList = getSpeciesList(params, action).speciesInstanceList
 		log.debug " Species total $speciesInstanceList.size "
 		return exportSpeciesData(speciesInstanceList, null)
 	}
 
 
 
-	def getSpeciesList(params, dl){
-		String action = new URL(dl.filterUrl).getPath().split("/")[2]
-		//getting result from solr
-		def speciesInstanceList = search(params).speciesInstanceList
-
-		return speciesInstanceList
+	def getSpeciesList(params, String action){
+		if("search".equalsIgnoreCase(action)){
+			return search(params)
+		}else{
+			return getSpeciesList(params)
+		}
 	}
 	
 	/**
@@ -417,6 +418,78 @@ class SpeciesService {
 	 */
 	def exportSpeciesData(List<Species> species, String directory) {
 		return DwCAExporter.getInstance().exportSpeciesData(species, directory)
+	}
+	
+	private getSpeciesList(params) {
+		//cache "taxonomy_results"
+		params.startsWith = params.startsWith?:"A-Z"
+		def allGroup = SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.ALL);
+		def othersGroup = SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.OTHERS);
+		params.sGroup = params.sGroup ?: allGroup.id+""
+		params.max = Math.min(params.max ? params.int('max') : 42, 100);
+		params.offset = params.offset ? params.int('offset') : 0
+		params.sort = params.sort?:"percentOfInfo"
+		if(params.sort.equals('lastrevised')) {
+			params.sort = 'lastUpdated'
+		} else if(params.sort.equals('percentofinfo')) {
+			params.sort = 'percentOfInfo'
+		}
+		params.order = (params.sort.equals("percentOfInfo")||params.sort.equals("lastUpdated"))?"desc":params.sort.equals("title")?"asc":"asc"
+
+		log.debug params
+		def groupIds = params.sGroup.tokenize(',')?.collect {Long.parseLong(it)}
+
+		int count = 0;
+		if (params.startsWith && params.sGroup) {
+			String query, countQuery;
+
+			if(groupIds.size() == 1 && groupIds[0] == allGroup.id) {
+				if(params.startsWith == "A-Z") {
+					query = "select s from Species s order by s.${params.sort} ${params.order}";
+					countQuery = "select s.percentOfInfo, count(*) as count from Species s group by s.percentOfInfo"
+				} else {
+					query = "select s from Species s where s.title like '<i>${params.startsWith}%' order by s.${params.sort} ${params.order}";
+					countQuery = "select s.percentOfInfo, count(*) as count from Species s where s.title like '<i>${params.startsWith}%'  group by s.percentOfInfo"
+				}
+			} else if(groupIds.size() == 1 && groupIds[0] == othersGroup.id) {
+				if(params.startsWith == "A-Z") {
+					query = "select s from Species s, TaxonomyDefinition t where s.taxonConcept = t and t.group.id  is null order by s.${params.sort} ${params.order}"
+					countQuery = "select s.percentOfInfo, count(*) as count from Species s, TaxonomyDefinition t where s.taxonConcept = t and t.group.id  is null  group by s.percentOfInfo";
+				} else {
+					query = "select s from Species s, TaxonomyDefinition t where title like '<i>${params.startsWith}%' and s.taxonConcept = t and t.group.id  is null order by s.${params.sort} ${params.order}"
+					countQuery = "select s.percentOfInfo, count(*) as count from Species s, TaxonomyDefinition t where s.title like '<i>${params.startsWith}%' and s.taxonConcept = t and t.group.id  is null group by s.percentOfInfo";
+				}
+			} else {
+				if(params.startsWith == "A-Z") {
+					query = "select s from Species s, TaxonomyDefinition t where s.taxonConcept = t and t.group.id  in (:sGroup) order by s.${params.sort} ${params.order}"
+					countQuery = "select s.percentOfInfo, count(*) as count from Species s, TaxonomyDefinition t where s.taxonConcept = t and t.group.id  in (:sGroup)  group by s.percentOfInfo";
+				} else {
+					query = "select s from Species s, TaxonomyDefinition t where title like '<i>${params.startsWith}%' and s.taxonConcept = t and t.group.id  in (:sGroup) order by s.${params.sort} ${params.order}"
+					countQuery = "select s.percentOfInfo, count(*) as count from Species s, TaxonomyDefinition t where s.title like '<i>${params.startsWith}%' and s.taxonConcept = t and t.group.id  in (:sGroup)  group by s.percentOfInfo";
+				}
+			}
+
+			def speciesInstanceList, rs;
+			if(groupIds.size() == 1 && (groupIds[0] == allGroup.id || groupIds[0] == othersGroup.id)) {
+				speciesInstanceList = Species.executeQuery(query, [max:params.max, offset:params.offset]);
+				rs = Species.executeQuery(countQuery)
+			} else {
+				speciesInstanceList = Species.executeQuery(query, [sGroup:groupIds], [max:params.max, offset:params.offset]);
+				rs = Species.executeQuery(countQuery,[sGroup:groupIds]);
+			}
+			def speciesCountWithContent = 0;
+
+			for(c in rs) {
+				count += c[1];
+				if (c[0] >0)
+					speciesCountWithContent += c[1];
+			}
+			return [speciesInstanceList: speciesInstanceList, instanceTotal: count, speciesCountWithContent:speciesCountWithContent, 'userGroupWebaddress':params.webaddress, canPullResource:userGroupService.getResourcePullPermission(params)]
+		} else {
+			//Not being used for now
+			params.max = Math.min(params.max ? params.int('max') : 42, 100)
+			return [speciesInstanceList: Species.list(params), instanceTotal: Species.count(),  'userGroupWebaddress':params.webaddress, canPullResource:userGroupService.getResourcePullPermission(params)]
+		}
 	}
 
 }

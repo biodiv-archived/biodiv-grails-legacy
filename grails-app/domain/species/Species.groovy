@@ -12,6 +12,7 @@ import species.groups.SpeciesGroup;
 import species.utils.ImageType;
 import species.utils.ImageUtils;
 import species.participation.Follow;
+import species.groups.UserGroup;
 import groovy.sql.Sql;
 import grails.util.GrailsNameUtils;
 import org.grails.rateable.*
@@ -43,8 +44,11 @@ class Species implements Rateable {
 		indianDistributionEntities:GeographicEntity, 
 		indianEndemicityEntities:GeographicEntity, 
 		taxonomyRegistry:TaxonomyRegistry, 
-		resources:Resource];
+		resources:Resource,
+		userGroups:UserGroup];
 
+	static belongsTo = [UserGroup]
+	
 	static constraints = {
 		guid(blank: false, unique: true);
 		reprImage(nullable:true);

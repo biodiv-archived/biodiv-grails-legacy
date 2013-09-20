@@ -12,7 +12,7 @@
 		   	</g:if>
 	       	<hr/>
        		<div id="userGroups" name="userGroups" style="list-style:none;clear:both;">
-               <uGroup:getCurrentUserUserGroups model="[observationInstance:observationInstance]"/>
+               <uGroup:getCurrentUserUserGroups model="[observationInstance:observationInstance, onlyExpertGroups:onlyExpertGroups]"/>
            	</div>
         </div>
        	<a onclick="submitToGroups('post', '${objectType}', '${uGroup.createLink(controller:'userGroup', action:'bulkPost', userGroup:userGroup)}', ${isBulkPull} ,'${observationInstance?.id}');return false;" class="btn btn-primary"

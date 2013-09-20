@@ -37,13 +37,13 @@ import org.codehaus.groovy.grails.plugins.springsecurity.acl.AclObjectIdentity
 import species.Habitat;
 import species.Resource;
 import species.Resource.ResourceType;
+import species.Species;
 import species.auth.Role;
 import species.auth.SUser;
 import species.groups.SpeciesGroup;
 import species.groups.UserGroup;
 import species.groups.UserGroupController;
 import species.groups.UserGroupMemberRole;
-import species.groups.UserGroupMemberRole.UserGroupMemberRoleType;
 import species.participation.Observation;
 import species.participation.UserToken;
 import species.utils.ImageUtils;
@@ -67,6 +67,8 @@ class UserGroupService {
 	def emailConfirmationService;
 	def sessionFactory
 	def activityFeedService;
+	//def obvUtilService;
+	def speciesService;
 	
 	private void addPermission(UserGroup userGroup, SUser user, int permission) {
 		addPermission userGroup, user, aclPermissionFactory.buildFromMask(permission)
@@ -1223,50 +1225,57 @@ class UserGroupService {
 		def filterUrl = new URL(params.filterUrl)
 		def paramsMap = Utils.getQueryMap(filterUrl)
 		String action = filterUrl.getPath().split("/")[2]
-		if("search".equalsIgnoreCase(action)){
-			//getting result from solr
-			def idList = observationService.getFilteredObservationsFromSearch(paramsMap, -1, 0, false).totalObservationIdList
-			def res = []
-			idList.each { obvId ->
-				res.add(Observation.read(obvId))
-			}
-			return res
-		}else if(params.webaddress){
-			def userGroupInstance =	get(params.webaddress)
-			if (!userGroupInstance){
-				log.error "user group not found for id  $params.id  and webaddress $params.webaddress"
-				return []
-			}
-			return getUserGroupObservations(userGroupInstance, paramsMap, -1, 0).observationInstanceList;
-		}
-		else{
-			return observationService.getFilteredObservations(paramsMap, -1, 0, false).observationInstanceList
-			
-		}
+		return obvUtilService.getObservationList(paramsMap, action)
 	}
-
 	
-	private updateObservationOnGroup(params){
-		String submitType = params.submitType
-		List obvs = []
-		def objectIds = params['objectIds']
-		if(objectIds && objectIds != ""){
-			obvs = objectIds.split(",").collect { Observation.read(Long.parseLong(it)) }
-		}
-		List groups = params['userGroups'].split(",").collect {
-			UserGroup.read(Long.parseLong(it))
+	private getSpeciesListForPost(params){
+		def filterUrl = new URL(params.filterUrl)
+		def paramsMap = Utils.getQueryMap(filterUrl)
+		String action = filterUrl.getPath().split("/")[2]
+		return speciesService.getSpeciesList(paramsMap, action).speciesInstanceList
+	}
+	
+	private updateSpeciesOnGroup(params, groups, obvs){
+		if(params.pullType == 'bulk' && params.selectionType == 'selectAll'){
+			List newList = getSpeciesListForPost(params)
+			newList.removeAll(obvs)
+			obvs = newList
 		}
 		
+		println "============ " +  obvs.size()
+		println "============== " + groups
+		UserGroup.withTransaction(){
+			groups.each { ug ->
+				if(params.submitType == 'post'){
+					obvs.removeAll(ug.species)
+					println "==for group========== " +  obvs.size()
+					obvs.each { obv ->
+						ug.addToSpecies(obv)
+					}
+				}else{
+					obvs.each { obv ->
+						ug.removeFromSpecies(obv)
+					}
+				}
+				if(!ug.save()){
+					ug.errors.allErrors.each { log.error it }
+				}
+			}
+		}
+	}
+		
+	private updateObservationOnGroup(params, groups, obvs){
 		if(params.pullType == 'bulk' && params.selectionType == 'selectAll'){
 			List newList = getObservationListForPost(params)
 			newList.removeAll(obvs)
 			obvs = newList
 		}
+		
 		println "============ " +  obvs.size()
 		println "============== " + groups
 		UserGroup.withTransaction(){
 			groups.each { ug ->
-				if(submitType == 'post'){
+				if(params.submitType == 'post'){
 					obvs.removeAll(ug.observations)
 					println "==for group========== " +  obvs.size()
 					obvs.each { obv ->
@@ -1287,11 +1296,25 @@ class UserGroupService {
 	def updateResourceOnGroup(params){
 		def r = [:]
 		try{
+			List groups = params['userGroups'].split(",").collect {
+				UserGroup.read(Long.parseLong(it))
+			}
+			def objectIds = params['objectIds']
+			def domainClass = grailsApplication.getArtefact("Domain",params.objectType)?.getClazz()
+			List obvs = []
+			if(objectIds && objectIds != ""){
+				obvs = objectIds.split(",").collect { domainClass.read(Long.parseLong(it)) }
+			}
+			
 			String objectType = params.objectType
 			switch (objectType) {
 				case Observation.class.getCanonicalName():
-					updateObservationOnGroup(params)
+					updateObservationOnGroup(params, groups, obvs)
 					break
+				case Species.class.getCanonicalName():
+					updateSpeciesOnGroup(params, groups, obvs)
+					break
+					
 				default:
 					break
 			}
@@ -1305,35 +1328,25 @@ class UserGroupService {
 		return r
 	}
 	
-	private static boolean isFounderOrExpert(SUser user){
-		return UserGroupMemberRole.createCriteria().count {
-			and{
-				eq('sUser', user)
-				or{
-					eq('role', Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_FOUNDER.value()))
-					eq('role', Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_EXPERT.value()))
-				}
-			}
-		} > 0
-	}
+	
 	
 	def boolean getResourcePullPermission(params, isBulkPull=true){
 		if(!springSecurityService.isLoggedIn()){
 			return false
 		}
 		
-		def currUser = springSecurityService.currentUser;
+		SUser currUser = springSecurityService.currentUser;
 		int groupCount = UserGroupMemberRole.countBySUser(currUser) 
 		if(groupCount == 0){
 			return false
 		}
 		
-		if(!isBulkPull){
+		if(!isBulkPull && !params.controller == 'species'){
 			return true
 		}
 		//if user is founder or expert in any group then retruing true permission for bulk upload 
 		//on list apge of any resource (i.e. obv, species, docs)
-		return isFounderOrExpert(currUser)
+		return currUser.fetchIsFounderOrExpert()
 	}
 	
 //	def getResourcePullPermission(params, isBulkPull=true){

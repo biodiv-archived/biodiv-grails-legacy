@@ -233,22 +233,9 @@ String desc = "- "+ location +" by "+observationInstance.author.name.capitalize(
                                         </div>
 
                                     </div>
-
-                                    <g:if test="${observationInstance.userGroups}">
-                                    <div class="sidebar_section">
-                                        <h5>Observation is in groups</h5>
-                                        <!-- div class="title">This observation belongs to following groups</div-->
-                                        <ul class="tile" style="list-style:none; padding-left: 10px;">
-                                            <g:each in="${observationInstance.userGroups}" var="userGroup">
-                                            <li class="">
-                                            <uGroup:showUserGroupSignature  model="[ 'userGroup':userGroup]" />
-                                            </li>
-                                            </g:each>
-                                        </ul>
-                                        <!-- obv:showRelatedStory
-                                        model="['observationInstance':observationInstance, 'observationId': observationInstance.id, 'controller':'userGroup', 'action':'getRelatedUserGroups', 'filterProperty': 'obvRelatedUserGroups', 'id':'relatedGroups']" /-->
-                                    </div>
-                                    </g:if>
+                                    <uGroup:objectPostToGroupsWrapper 
+										model="[canPullResource:canPullResource, 'observationInstance':observationInstance]" />
+										
                                     <%
                                     def annotations = observationInstance.fetchChecklistAnnotation()
                                     %>
