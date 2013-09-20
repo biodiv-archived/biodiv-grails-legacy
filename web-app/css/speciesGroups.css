@@ -32,9 +32,9 @@
 .mammals_gall_th:hover { background-position: 0 -225px; }
 .mammals_gall_th.active, .mammals_gall_th:active { background-position: 0 -257px; }
 
-.molluscs_gall_th { width: 32px; height: 32px; background-position: 0 -578px; }
-.molluscs_gall_th:hover { background-position: 0 -610px; }
-.molluscs_gall_th.active, .molluscs_gall_th:active{ background-position: 0 -642px; }
+.mulluscs_gall_th { width: 32px; height: 32px; background-position: 0 -578px; }
+.mulluscs_gall_th:hover { background-position: 0 -610px; }
+.mulluscs_gall_th.active, .molluscs_gall_th:active{ background-position: 0 -642px; }
 
 .plants_gall_th { width: 32px; height: 32px; background-position: 0 -386px; }
 .plants_gall_th:hover { background-position: 0 -418px; }

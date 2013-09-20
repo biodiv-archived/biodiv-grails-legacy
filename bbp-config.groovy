@@ -1,22 +1,40 @@
+import org.apache.log4j.Priority
+
+appName = grails.util.Metadata.current.getApplicationName()
+
 grails.mail.default.from="notification@biodiversity.bt"
 emailConfirmation.from="notification@biodiversity.bt"
+grails.plugins.springsecurity.ui.notification.emailFrom = 'notification@biodiversity.bt'
+grails.plugins.springsecurity.ui.notification.emailReplyTo = "kxt5258@gmail.com";
+grails.plugins.springsecurity.ui.newuser.emailFrom = 'notification@biodiversity.bt'
+grails.plugins.springsecurity.ui.userdeleted.emailFrom = 'notification@biodiversity.bt'
+grails.plugins.springsecurity.ui.forgotPassword.emailFrom = 'notification@biodiversity.bt'
 
 speciesPortal {
-	app.siteName = "Bhutan Biodiversity Portal"
-        app.logo = "logo/IBP.png"
-	app.favicon = "logo/favicon.ico"
+	app.siteName = "Bhutan Biodiversity Portal BETA"
+	app.siteName2 = "Bhutan Biodiversity Portal BETA2"
+        app.logo = "images/demo.png"
+	app.favicon = "images/favicon.ico"
 	app.siteDescription = "Welcome to the Bhutan Biodiversity Portal (BBP) - A repository of information designed to harness and disseminate collective intelligence on the      biodiversity of Bhutan."
 	app.notifiers_bcc = ["kxt5258@gmail.com", "moafbhutan@gmail.com", "cd.drukpa@gmail.com"]
+	
+	observations {
+		filePicker.key = 'ASme8oTdcTSqSi3cTFIWkz'
+	}
 }
 
 speciesPortal.validCrossDomainOrigins = [
-	"localhost",
+	"localhost.org",
 	"biodiversity.bt",
 	"bhutanbiodiversity.bt"
 ]
 
-jpegOptimProg = "/usr/sbin/jpegoptim";
+//jpegOptimProg = "/usr/sbin/jpegoptim";
 
+//log4j
+def log4jConsoleLogLevel = Priority.WARN
+def log4jAppFileLogLevel = Priority.DEBUG
+def logFile = "/home/kinley/logs/bbp-stacktrace.log".toString() 
 environments {
 	development {
 		grails.serverURL = "http://bhutanbiodiversity.localhost.org/${appName}"
@@ -63,19 +81,22 @@ environments {
 
                 ckeditor {
                     upload {
-                    basedir = "/newsletters/"
-                    image.browser = true
-                    image.upload = true    
-                    image.allowed = ['jpg', 'gif', 'jpeg', 'png']
-                    image.denied = []
-                }
+              		    basedir = "/newsletters/"
+                	    image.browser = true
+        	            image.upload = true    
+	                    image.allowed = ['jpg', 'gif', 'jpeg', 'png']
+        		    image.denied = []
+                    }
 		}
-
+		
+		//log4j logger config
+       		log4jConsoleLogLevel = Priority.DEBUG
+       		log4jAppFileLogLevel = Priority.DEBUG
 	}
 	production {
 		grails.serverURL = "http://biodiversity.bt/${appName}"
 		speciesPortal {
-			search.serverURL = "http://localhost:8090/solr"
+			search.serverURL = "http://localhost:8080/solr"
 			names.parser.serverURL = "127.0.0.1"
 			ibp {
 				facebook {
@@ -106,11 +127,12 @@ environments {
 
 	pamba {
 		grails.serverURL = "http://biodiversity.bt/${appName}"
-		jpegOptimProg = '/usr/sbin/jpegoptim'
+		jpegOptimProg = "/usr/sbin/jpegoptim"
 		
 		speciesPortal {
-			app.rootDir = "/data/species"
+			app.rootDir = "/data/bbp/species"
 			data.rootDir = "${app.rootDir}/data"
+			search.serverURL = "http://localhost:8080/solr"
 			names.parser.serverURL = "172.0.0.1"
 			
 			resources {
@@ -136,7 +158,6 @@ environments {
 				serverURL = "http://biodiversity.bt/${appName}/content"
 			}	
 
-			search.serverURL="http://127.0.0.1:8080/solr"
 			grails {
 				mail {
 					 host = "127.0.0.1"
@@ -152,25 +173,58 @@ environments {
 			}
 		}
 		
-        ibp.domain='biodiversity.bt'
-        wgp.domain='biodiversity.bt'
+        	ibp.domain='biodiversity.bt'
+        	wgp.domain='biodiversity.bt'
 		
 		grails.plugins.springsecurity.successHandler.defaultTargetUrl = "/"
 		grails.plugins.springsecurity.logout.afterLogoutUrl = '/'
 
                 ckeditor {
-                    upload {
-                    baseurl = "/newsletters"
-                    basedir = "/data/species/newsletters/"
-                    image.browser = true
-                    image.upload = true    
-                    image.allowed = ['jpg', 'gif', 'jpeg', 'png']
-                    image.denied = []
-                }
-				}
-		
+                	upload {
+        	            baseurl = "/newsletters"
+	                    basedir = "/data/bbp/species/newsletters/"
+                	    image.browser = true
+        	            image.upload = true    
+	                    image.allowed = ['jpg', 'gif', 'jpeg', 'png']
+                	    image.denied = []
+                	}
+		}
+		logFile = "/data/bbp/logs/bbp-stacktrace.log".toString()	
 	}
 }
 
-grails.plugins.springsecurity.ui.notification.emailFrom = 'notification@biodiversity.bt'
-grails.plugins.springsecurity.ui.notification.emailReplyTo = "kxt5258@gmail.com";
+
+//log4j configuration
+log4j = {
+	error  	'org.codehaus.groovy.grails.web.pages', //  GSP
+            'org.codehaus.groovy.grails.web.sitemesh', //  layouts
+            'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
+            'org.codehaus.groovy.grails.web.mapping', // URL mapping
+            'org.codehaus.groovy.grails.commons', // core / classloading
+            'org.codehaus.groovy.grails.plugins', // plugins
+            'org.codehaus.groovy.grails.orm.hibernate', // hibernate integration
+            'org.hibernate',
+            'net.sf.ehcache.hibernate',
+            'org.springframework.security',
+            'org.codehaus.groovy.grails.web.servlet',  //  controllers
+            'grails.plugin',
+            'org.springframework.security.web',
+            'grails.app.tagLib.org.grails.plugin.resource'
+
+	warn   'org.mortbay.log'
+
+	debug	'species',
+		'speciespage',
+		'grails.app'
+    	
+	info    'species.auth'	
+	
+	appenders {
+		console name:'stdout', layout:pattern(conversionPattern: '%d [%t] %-5p %c - %m%n'), threshold: log4jConsoleLogLevel
+		rollingFile name: "bbplog", maxFileSize: '10MB', maxBackupIndex: 4, file: logFile, layout:pattern(conversionPattern: '%d [%t] %-5p %c - %m%n'), threshold:log4jAppFileLogLevel 
+	}
+
+	root {
+		error 'stdout', 'bbplog'
+	}
+}

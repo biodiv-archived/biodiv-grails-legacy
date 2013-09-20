@@ -2190,6 +2190,19 @@ div.noOfRatings {
         background-image: url('../images/glyphicons_043_group_white.png');
 } 
 
+/**
+ * Style used to position the map of bhutan
+ * */
+.span12  {
+	width:970px;
+}
+.span4 {
+	width:320px;
+}
+#big_map_canvas  {
+	height: 200px; 
+	width: 320px;
+}
 /* .selectable { */
 /*     background: url("../images/icons/plus.png") no-repeat scroll 50% 50% transparent; */
 /*     background-color: transparent; */
