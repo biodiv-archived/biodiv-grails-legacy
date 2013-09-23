@@ -381,36 +381,44 @@ class ObservationService {
 		}
 		return getRelatedObservationByReco(obvId, parentObv.maxVotedReco, limit, offset)
 	}
-	
-	private Map getRelatedObservationByReco(long obvId, Recommendation maxVotedReco, int limit, int offset) {
-        def criteria = Observation.createCriteria();
-		def observations = criteria.list(offset:offset?:0) {
-			projections {
-				groupProperty('sourceId')
-				groupProperty('isShowable')
-			}
-			and {
-				eq("maxVotedReco", maxVotedReco)
-				eq("isDeleted", false)
-				if(obvId) ne("id", obvId)
-			}
-			order("isShowable", "desc")
+    
+    private Map getRelatedObservationByReco(long obvId, Recommendation maxVotedReco, int limit, int offset) {
+        def observations = Observation.withCriteria (offset:offset?:0) {
+            projections {
+                groupProperty('sourceId')
+                groupProperty('isShowable')
+            }
+            and {
+                eq("maxVotedReco", maxVotedReco)
+                eq("isDeleted", false)
+                if(obvId) ne("id", obvId)
+            }
+            order("isShowable", "desc")
             if(limit >= 0) maxResults(limit)
-		}
-		def result = [];
-        def iter = observations.iterator();
-        while(iter.hasNext()){
-            def obv = iter.next();
-			result.add(['observation':obv, 'title':(obv.isChecklist)? obv.title : maxVotedReco.name]);
-		}
+        }
         
+        def result = [];
+        observations.each {
+            def obv = Observation.get(it[0])
+            result.add(['observation':obv, 'title':(obv.isChecklist)? obv.title : maxVotedReco.name]);
+        }
+
         if(limit < 0)
-		    return ["observations":result]
-        
-        def count = observations.totalCount;
-		return ["observations":result, "count":count]
-	}
-	
+            return ["observations":result];
+
+        def count = Observation.createCriteria().count {
+            projections {
+                count(groupProperty('sourceId'))
+            }
+            and {
+                eq("maxVotedReco", maxVotedReco)
+                eq("isDeleted", false)
+                if(obvId) ne("id", obvId)
+            }
+        }
+        return ["observations":result, "count":count]
+    }
+
 	Map getRelatedObservationByTaxonConcept(long taxonConceptId, int limit, long offset){
 		def taxonConcept = TaxonomyDefinition.read(taxonConceptId);
 		if(!taxonConcept) return ['observations':[], 'count':0]
@@ -431,7 +439,7 @@ class ObservationService {
             def iter = observations.iterator();
             while(iter.hasNext()){
                 def obv = iter.next();
-				result.add(['observation':obv, 'title':it.fetchSpeciesCall()]);
+				result.add(['observation':obv, 'title':obv.fetchSpeciesCall()]);
 			}
 			return ['observations':result, 'count':count]
 		} else {
@@ -1977,7 +1985,7 @@ class ObservationService {
             switch (it.getProperty("type")) {
                 case "140" : features['Rainfall'] = it.getProperty("feature")+" mm";break;
                 case "138" : features['Soil'] = it.getProperty("feature");break;
-                case "161" : features['Temparature'] = it.getProperty("feature")+" C";break;
+                case "161" : features['Temperature'] = it.getProperty("feature")+" C";break;
                 case "139" : features['Forest Type'] = it.getProperty("feature").toLowerCase().capitalize();break;
                 case "136" : features['Tahsil'] = it.getProperty("feature");break;
             }
