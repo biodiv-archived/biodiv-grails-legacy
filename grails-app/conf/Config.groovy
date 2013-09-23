@@ -197,10 +197,10 @@ else {
 
 
 speciesPortal {
-    app.siteName = "Bhutan Biodiversity Portal"
+    app.siteName = "India Biodiversity Portal"
     app.logo = "logo/IBP.png"
     app.favicon = "logo/favicon.ico"
-    app.siteDescription = "Welcome to the Bhutan Biodiversity Portal (BBP) - A repository of information designed to harness and disseminate collective intelligence on the biodiversity of Bhutan."
+    app.siteDescription = "Welcome to the India Biodiversity Portal (IBP) - A repository of information designed to harness and disseminate collective intelligence on the biodiversity of India."
 
 	app.rootDir = "${userHome}/git/${appName}/app-conf"
 	data.rootDir = "${app.rootDir}/data"
@@ -465,7 +465,7 @@ jpegOptimProg = "/usr/bin/jpegoptim";
 
 environments {
 	development {
-		grails.serverURL = "http://bhutanbiodiversity.localhost.org/${appName}"
+		grails.serverURL = "http://indiabiodiversity.localhost.org/${appName}"
 		speciesPortal {
 			search.serverURL = "http://localhost:8090/solr"
 			names.parser.serverURL = "saturn.strandls.com"
@@ -474,14 +474,14 @@ environments {
 					appId= "424071494335902"
 					secret= "bb87b98979ae30936342364178c7b170"
 				}
-				supportEmail = "team(at)bhutannbc(dot)bt"
+				supportEmail = "team(at)thewesternghats(dot)bt"
 			}
 			ibp {
 				facebook {
 					appId= "347177228674021"
 					secret= "82d91308b5437649bfe891a027205501"
 				}
-				supportEmail = "support(at)bhutanbiodiversity(dot)org"
+				supportEmail = "support(at)indiabiodiversity(dot)org"
 			}
 		}
 		google.analytics.enabled = false
@@ -494,8 +494,8 @@ environments {
 			}
 		}
 
-        ibp.domain='bhutanbiodiversity.localhost.org'
-        wgp.domain='thewesternghats.bhutanbiodiversity.localhost.org'
+        ibp.domain='indiabiodiversity.localhost.org'
+        wgp.domain='thewesternghats.indiabiodiversity.localhost.org'
 		//grails.resources.debug=true
 		grails.resources.mappers.hashandcache.excludes = ['**']
 		//grails.resources.flatten = false
@@ -518,7 +518,7 @@ environments {
 		grails.serverURL = "http://indiabiodiversity.localhost.org/${appName}"
 		google.analytics.enabled = false
 	}
-	/*production {
+	production {
 		grails.serverURL = "http://indiabiodiversity.localhost.org/${appName}"
 		speciesPortal {
 			search.serverURL = "http://localhost:8090/solr"
@@ -555,7 +555,7 @@ environments {
 		//grails.resources.flatten = false
 		grails.resources.mappers.yuijsminify.disable=true
 	}
-*/
+
 	saturn {
 		grails.serverURL = "http://ibp.saturn.strandls.com/${appName}"
 		
