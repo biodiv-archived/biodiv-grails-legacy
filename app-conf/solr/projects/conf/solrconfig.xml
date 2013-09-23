@@ -133,7 +133,7 @@
       (For backwards compatibility with Solr 1.2, 'simple' is the default
        if not specified.)
     -->
-    <lockType>simple</lockType>
+    <lockType>native</lockType>
     <!--
      Expert:
     Controls how often Lucene loads terms into memory -->
@@ -150,7 +150,7 @@
          used with care.
          This is not needed if lock type is 'none' or 'single'
      -->
-    <unlockOnStartup>true</unlockOnStartup>
+    <unlockOnStartup>false</unlockOnStartup>
     
     <!-- If true, IndexReaders will be reopened (often more efficient) instead
          of closed and then opened.  -->

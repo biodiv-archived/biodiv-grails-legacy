@@ -43,7 +43,7 @@ class NamesIndexerService {
 		setDirty(false);
 
 		def a = new StandardAnalyzer(Version.LUCENE_CURRENT)
-		def analyzer = new ShingleAnalyzerWrapper(a, 2, 15," ", true, true)
+		def analyzer = new ShingleAnalyzerWrapper(a, 2, 15, true, true)
 		//analyzer.setOutputUnigrams(true);
 
 		//TODO fetch in batches

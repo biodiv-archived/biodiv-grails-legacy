@@ -48,7 +48,7 @@ grails.project.dependency.resolution = {
        compile 'org.restlet.jee:org.restlet:2.1.1'
        compile 'org.restlet.jee:org.restlet.ext.servlet:2.1.1'
 
-compile ('org.quartz-scheduler:quartz:1.8.4') {
+	compile ('org.quartz-scheduler:quartz:1.8.4') {
             excludes 'slf4j-api', 'jcl-over-slf4j'
         }
         compile 'org.apache.lucene:lucene-analyzers:3.4.0'
@@ -60,22 +60,22 @@ compile ('org.quartz-scheduler:quartz:1.8.4') {
             excludes 'geronimo-stax-api_1.0_spec'
         }
         compile ('org.springframework.social:spring-social-facebook:1.0.0.RELEASE') {
-            excludes 'spring-web'
+            excludes 'spring-web' 
             //'org.springframework.web-3.0.5.RELEASE', 'spring-aop-3.0.3.RELEASE', 'spring-beans-3.0.3.RELEASE','spring-core-3.0.3.RELEASE', 'spring-tx-3.0.3.RELEASE','spring-asm-3.0.3.RELEASE','spring-context-3.0.3.RELEASE', 'spring-expression-3.0.3.RELEASE','spring-web-3.0.3.RELEASE'
         }
         compile('net.sf.opencsv:opencsv:2.3')
         compile('com.itextpdf:itextpdf:5.0.6')
-        /* compile('org.hibernatespatial:hibernate-spatial:1.0') {
-excludes 'slf4j-api', 'jcl-over-slf4j'
-}
+        /*   compile('org.hibernatespatial:hibernate-spatial:1.0') {
+             excludes 'slf4j-api', 'jcl-over-slf4j'
+        }
 
-compile('org.hibernatespatial:hibernate-spatial-postgis:1.0') {
-excludes 'slf4j-api', 'jcl-over-slf4j'
-}
-compile ('org.hibernate:hibernate-core:3.3.2.GA'){
-excludes 'ehcache', 'xml-apis', 'commons-logging'
-}
-*/
+        compile('org.hibernatespatial:hibernate-spatial-postgis:1.0') {
+        excludes 'slf4j-api', 'jcl-over-slf4j'
+        }
+        compile ('org.hibernate:hibernate-core:3.3.2.GA'){
+        excludes 'ehcache', 'xml-apis', 'commons-logging'
+        }
+         */
 
         runtime 'postgresql:postgresql:9.0-801.jdbc4'
         runtime ('org.postgis:postgis-jdbc:1.3.3') {
@@ -83,7 +83,7 @@ excludes 'ehcache', 'xml-apis', 'commons-logging'
         }
 
         //runtime 'postgresql:postgis:2.0.0SVN' {
-        // runtime 'postgresql:postgresql:8.3-603.jdbc4'
+        //  runtime 'postgresql:postgresql:8.3-603.jdbc4'
         //}
 
         compile 'org.imgscalr:imgscalr-lib:4.2'
@@ -91,20 +91,20 @@ excludes 'ehcache', 'xml-apis', 'commons-logging'
         
 
     }
-    plugins {
-        compile ":spring-security-core:1.2.7.3"
-        runtime ":resources:1.1.6"
-        runtime ":webxml:1.4.1"
+    plugins { 
+        compile ":spring-security-core:1.2.7.3" 
+        runtime ":resources:1.1.6" 
+        runtime ":webxml:1.4.1" 
         compile ':plugin-config:0.1.5'
-    }
+    } 
 
     grails.war.resources = { stagingDir ->
-        for (name in ['log4j', 'slf4j', 'jcl-over-slf4j', 'jul-to-slf4j', 'jsp-api-2.1', 'servlet-api-']) {
-	delete {
-		fileset dir: "$stagingDir/WEB-INF/lib/",
-		includes: "$name*.jar"
-	}
-    }
-        // delete(file:"${stagingDir}/WEB-INF/lib/hibernate-core-3.3.1.GA.jar")
+        /*for (name in ['log4j', 'slf4j', 'jcl-over-slf4j', 'jul-to-slf4j']) {
+            delete {
+                fileset dir: "$stagingDir/WEB-INF/lib/",
+                includes: "$name*.jar"
+            }
+        }*/
+        //        delete(file:"${stagingDir}/WEB-INF/lib/hibernate-core-3.3.1.GA.jar")
     }
 }

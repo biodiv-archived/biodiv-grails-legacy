@@ -234,9 +234,9 @@ class Utils {
 		def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 
 		if(domain.startsWith(config.wgp.domain)) {
-			return config.speciesPortal.app.siteName2
+			return "The Westernghats Portal"
 		} else {
-			return config.speciesPortal.app.siteName
+			return "India Biodiversity Portal"
 		}
 		return "";
 	}
