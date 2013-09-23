@@ -198,11 +198,11 @@ else {
 
 speciesPortal {
     app.siteName = "India Biodiversity Portal"
+    app.siteDescription = "Welcome to the India Biodiversity Portal (IBP) - A repository of information designed to harness and disseminate collective intelligence on the biodiversity of India."
     app.logo = "logo/IBP.png"
     app.favicon = "logo/favicon.ico"
-    app.siteDescription = "Welcome to the India Biodiversity Portal (IBP) - A repository of information designed to harness and disseminate collective intelligence on the biodiversity of India."
 
-	app.rootDir = "${userHome}/git/${appName}/app-conf"
+	app.rootDir = "${userHome}/git/ibiodiv/app-conf"
 	data.rootDir = "${app.rootDir}/data"
 	download.rootDir = "${data.rootDir}/datarep/downloads"
  
@@ -474,7 +474,7 @@ environments {
 					appId= "424071494335902"
 					secret= "bb87b98979ae30936342364178c7b170"
 				}
-				supportEmail = "team(at)thewesternghats(dot)bt"
+				supportEmail = "team(at)thewesternghats(dot)in"
 			}
 			ibp {
 				facebook {
