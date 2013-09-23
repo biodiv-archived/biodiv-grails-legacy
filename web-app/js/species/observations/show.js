@@ -200,10 +200,10 @@ function drawVisualization(rows) {
 
     columnChart.draw(view,  {
         title:"No of observations by month",
-        hAxis: {title: 'Month', slantedText:true},
+        hAxis: {title: 'Month', slantedText:true, showTextEvery:1},
         vAxis:{minValue:0, maxValue:5, format: '#'},
         legend:{position: 'none'},
-        theme:'maximized'
+        chartArea:{width:'90%'}
     });
     /*    var table = new google.visualization.Table(document.getElementById('table'));
           table.draw(view, null);
