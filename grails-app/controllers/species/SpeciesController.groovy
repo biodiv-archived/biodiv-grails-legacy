@@ -43,6 +43,7 @@ class SpeciesController {
 	def list = {
 		log.debug params
 		def model = speciesService.getSpeciesList(params, 'list');
+		model.canPullResource = userGroupService.getResourcePullPermission(params)
 		params.controller="species"
 		params.action="list"
 		if(params.loadMore?.toBoolean()){
@@ -410,6 +411,7 @@ class SpeciesController {
 	def search = {
 		log.debug params;
 		def model = speciesService.getSpeciesList(params, 'search')
+		model.canPullResource = userGroupService.getResourcePullPermission(params)
 		model['isSearch'] = true;
 
 		if(params.loadMore?.toBoolean()){

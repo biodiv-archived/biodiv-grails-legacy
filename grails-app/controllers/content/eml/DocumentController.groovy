@@ -190,6 +190,7 @@ class DocumentController {
 		def documentInstanceList = filteredDocument.documentInstanceList
 		def queryParams = filteredDocument.queryParams
 		def activeFilters = filteredDocument.activeFilters
+		def canPullResource = filteredDocument.canPullResource
 		
 		def count = documentService.getFilteredDocuments(params, -1, -1).documentInstanceList.size()
 		if(params.append?.toBoolean()) {
@@ -201,7 +202,7 @@ class DocumentController {
 
 		log.debug "Storing all doc ids list in session ${session['doc_ids_list']} for params ${params}";
 
-		return [documentInstanceList: documentInstanceList, instanceTotal: count, queryParams: queryParams, activeFilters:activeFilters, resultType:'document']
+		return [documentInstanceList: documentInstanceList, instanceTotal: count, queryParams: queryParams, activeFilters:activeFilters, resultType:'document', canPullResource:canPullResource]
 
 	}
 

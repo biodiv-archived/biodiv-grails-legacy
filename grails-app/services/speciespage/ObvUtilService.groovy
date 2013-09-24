@@ -60,10 +60,6 @@ class ObvUtilService {
 	static final String  SCHEDULED = "Scheduled";
 	static final String  EXECUTING = "Executing";
 	
-	//-1 to allow download without any limit 
-	static final int MAX_EXPORT_SIZE = -1;
-	
-	
 	def userGroupService
 	def observationService
 	def springSecurityService
@@ -93,28 +89,7 @@ class ObvUtilService {
 	}
 	
 	
-	def getObservationList(params, String action){
-		if("search".equalsIgnoreCase(action)){
-			//getting result from solr
-			def idList = observationService.getFilteredObservationsFromSearch(params, MAX_EXPORT_SIZE, 0, false).totalObservationIdList
-			def res = []
-			idList.each { obvId ->
-				res.add(Observation.read(obvId))
-			}
-			return res
-		}else if(params.webaddress){
-			def userGroupInstance =	userGroupService.get(params.webaddress)
-			if (!userGroupInstance){
-				log.error "user group not found for id  $params.id  and webaddress $params.webaddress"
-				return []
-			}
-			return userGroupService.getUserGroupObservations(userGroupInstance, params, MAX_EXPORT_SIZE, 0).observationInstanceList;
-		}
-		else{
-			return observationService.getFilteredObservations(params, MAX_EXPORT_SIZE, 0, false).observationInstanceList
-			
-		}
-	}
+
 	
 	private File exportObservation(List obvList, exportType, reqUser){
 		if(! obvList)
@@ -447,9 +422,7 @@ class ObvUtilService {
 				params.obvId = observationInstance.id
 				activityFeedService.addActivityFeed(observationInstance, null, observationInstance.author, activityFeedService.OBSERVATION_CREATED);
 				addReco(params, observationInstance)
-				println "==============   tags " + params.tags 
 				def tags = (params.tags != null) ? new ArrayList(params.tags) : new ArrayList();
-				println "==============after    tags " + tags
 				observationInstance.setTags(tags);
 
 				if(params.groupsWithSharingNotAllowed) {

@@ -7,6 +7,9 @@
 			<th title="${message(code: 'Dcoument.title.label', default: 'Title')}">${message(code: 'Dcoument.title.label', default: 'Title')}</th>
 			<th title="${message(code: 'Dcoument.type.label', default: 'Document Type')}">${message(code: 'Dcoument.type.label', default: 'Document Type')}</th>
 			<th title="${message(code: 'Dcoument.description.label', default: 'Description')}">${message(code: 'Dcoument.description.label', default: 'Description')}</th>
+			<g:if test="${canPullResource}">		
+				<th title="${message(code: 'Dcoument.pullToGroup.label', default: 'Post on Group')}">${message(code: 'Dcoument.pullToGroup.label', default: 'Post')}</th>
+			</g:if>
 		</tr>
 	</thead>
 
@@ -26,6 +29,11 @@
 				<td class="ellipsis multiline" style="max-width:300px;">
 					${documentInstance.description}
 				</td>
+				<g:if test="${canPullResource}">
+					<td>
+						<uGroup:objectPost model="['objectInstance':documentInstance, 'userGroup':userGroup, canPullResource:canPullResource]" />
+					</td>
+				</g:if>
 			</tr>
 		</g:each>
 	</tbody>

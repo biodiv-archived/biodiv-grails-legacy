@@ -30,7 +30,7 @@ function updateListSelection(comp){
 			$('.post-to-groups .select-all').addClass('active')
 			$('.post-to-groups .reset').removeClass('active')
 			//$('.observations_list .selectable').addClass('selectedItem');
-			$('.thumbnail .selectable input[type="checkbox"]').prop('checked', true);
+			$('.mainContentList .selectable input[type="checkbox"]').prop('checked', true);
 			//$('.snippet.tablet .figure .mouseover').removeClass('mouseover').addClass('mouseoverfix');
 			//$('.snippet.tablet .figure .mouseoverfix').show();
 			rejectedObjects = new Array();
@@ -42,7 +42,7 @@ function updateListSelection(comp){
 		//$('.observations_list .selectable').removeClass('selectedItem');
 		//$('.snippet.tablet .figure .mouseoverfix').removeClass('mouseoverfix').addClass('mouseover');
 		//$('.snippet.tablet .figure .mouseover').hide();
-		$('.thumbnail .selectable input[type="checkbox"]').prop('checked', false);
+		$('.mainContentList .selectable input[type="checkbox"]').prop('checked', false);
 		console.log("reset all");
 	}
 }
@@ -97,7 +97,7 @@ function submitToGroups(submitType, objectType, url, isBulkPull, id=null){
 function updateGroupPostSelection(){
 	var comp = $('.post-to-groups .select-all')
 	if(comp && comp.hasClass('active')){
-		$('.thumbnail .selectable input[type="checkbox"]').prop('checked', true);
+		$('.mainContentList .selectable input[type="checkbox"]').prop('checked', true);
 		//$('.observations_list .selectable').addClass('selectedItem');
 		//$('.snippet.tablet .figure .mouseover').removeClass('mouseover').addClass('mouseoverfix');
 		//$('.snippet.tablet .figure .mouseoverfix').show();

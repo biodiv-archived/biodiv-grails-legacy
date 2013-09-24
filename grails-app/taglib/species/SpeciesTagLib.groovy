@@ -103,7 +103,6 @@ class SpeciesTagLib {
 		out << render(template:"/species/speciesFilterTemplate", model:attrs.model);
 	}
 	def showSpeciesList = {attrs, body->
-		println "======================= $attrs.model"
 		out << render(template:"/species/showSpeciesListTemplate", model:attrs.model);
 	}
 	def showHeadingAndSubHeading = {attrs, body->

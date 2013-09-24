@@ -1,4 +1,5 @@
 <%@ page import="content.eml.UFile"%>
+<%@ page import="content.eml.Document"%>
 <%@page import="species.utils.Utils"%>
 <%@ page import="org.grails.taggable.Tag"%>
 <%@ page import="species.participation.ActivityFeedService"%>
@@ -32,7 +33,13 @@
 			<g:render template="/document/documentListTemplate" />
 		</div>
 		
-			<g:render template="/document/documentSidebar" />
+		<div class="span4">
+			<div class="sidebar_section" style="clear:both;overflow:hidden;display:none;border:1px solid #CECECE;">
+                 	<uGroup:objectPostToGroups model="['objectType':Document.class.canonicalName, userGroup:params.userGroup, canPullResource:canPullResource]"/>
+            </div>
+      	</div>
+      	<g:render template="/document/documentSidebar" />
+			
 	</div>
 
 </body>

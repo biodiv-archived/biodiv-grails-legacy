@@ -67,7 +67,6 @@ class UserGroupService {
 	def emailConfirmationService;
 	def sessionFactory
 	def activityFeedService;
-	//def obvUtilService;
 	def speciesService;
 	
 	private void addPermission(UserGroup userGroup, SUser user, int permission) {
@@ -1225,14 +1224,15 @@ class UserGroupService {
 		def filterUrl = new URL(params.filterUrl)
 		def paramsMap = Utils.getQueryMap(filterUrl)
 		String action = filterUrl.getPath().split("/")[2]
-		return obvUtilService.getObservationList(paramsMap, action)
+		return observationService.getObservationList(paramsMap, action)
 	}
 	
 	private getSpeciesListForPost(params){
 		def filterUrl = new URL(params.filterUrl)
 		def paramsMap = Utils.getQueryMap(filterUrl)
+		paramsMap.offset = 0
 		String action = filterUrl.getPath().split("/")[2]
-		return speciesService.getSpeciesList(paramsMap, action).speciesInstanceList
+		return speciesService.getSpeciesList(paramsMap, action, true).speciesInstanceList
 	}
 	
 	private updateSpeciesOnGroup(params, groups, obvs){
@@ -1263,7 +1263,39 @@ class UserGroupService {
 			}
 		}
 	}
+
+	private updateDocumentOnGroup(params, groups, obvs){
+		if(params.pullType == 'bulk' && params.selectionType == 'selectAll'){
+			def filterUrl = new URL(params.filterUrl)
+			def paramsMap = Utils.getQueryMap(filterUrl)
+			paramsMap.offset = 0
+			List newList = new Document().fetchList(paramsMap, -1, -1, true).documentInstanceList
+			newList.removeAll(obvs)
+			obvs = newList
+		}
 		
+		println "============ " +  obvs.size()
+		println "============== " + groups
+		UserGroup.withTransaction(){
+			groups.each { ug ->
+				if(params.submitType == 'post'){
+					obvs.removeAll(ug.documents)
+					println "==for group========== " +  obvs.size()
+					obvs.each { obv ->
+						ug.addToDocuments(obv)
+					}
+				}else{
+					obvs.each { obv ->
+						ug.removeFromDocuments(obv)
+					}
+				}
+				if(!ug.save()){
+					ug.errors.allErrors.each { log.error it }
+				}
+			}
+		}
+	}
+
 	private updateObservationOnGroup(params, groups, obvs){
 		if(params.pullType == 'bulk' && params.selectionType == 'selectAll'){
 			List newList = getObservationListForPost(params)
@@ -1314,7 +1346,9 @@ class UserGroupService {
 				case Species.class.getCanonicalName():
 					updateSpeciesOnGroup(params, groups, obvs)
 					break
-					
+				case Document.class.getCanonicalName():
+					updateDocumentOnGroup(params, groups, obvs)
+					break
 				default:
 					break
 			}
@@ -1348,8 +1382,5 @@ class UserGroupService {
 		//on list apge of any resource (i.e. obv, species, docs)
 		return currUser.fetchIsFounderOrExpert()
 	}
-	
-//	def getResourcePullPermission(params, isBulkPull=true){
-//		return getResourcePullPermission1(params, springSecurityService, isBulkPull)
-//	}
+
 }

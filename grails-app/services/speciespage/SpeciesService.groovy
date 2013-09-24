@@ -16,6 +16,7 @@ import species.Species
 import species.SpeciesField;
 import species.TaxonomyDefinition;
 import species.formatReader.SpreadsheetReader
+import species.groups.SpeciesGroup;
 import species.sourcehandler.KeyStoneDataConverter
 import species.sourcehandler.MappedSpreadsheetConverter
 import species.sourcehandler.NewSpreadsheetConverter
@@ -48,8 +49,8 @@ class SpeciesService {
 	def speciesSearchService;
 	def namesIndexerService;
 	def observationService;
-	def springSecurityService
-
+	def springSecurityService;
+	
 	static int BATCH_SIZE = 10;
 	int noOfFields = Field.count();
 
@@ -64,7 +65,7 @@ class SpeciesService {
 		return result;
 	}
 
-	def search(params) {
+	def search(params, noLimt) {
 		def result;
 		def searchFieldsConfig = grailsApplication.config.speciesPortal.searchFields
 		def queryParams = [:]
@@ -156,7 +157,9 @@ class SpeciesService {
 		paramsList.add('q', Utils.cleanSearchQuery(params.query));
 		paramsList.add('start', offset);
 		def max = Math.min(params.max ? params.int('max') : 12, 100)
-		paramsList.add('rows', max);
+		if(!noLimt){
+			paramsList.add('rows', max);
+		}
 		params['sort'] = params['sort']?:"score"
 		String sort = params['sort'].toLowerCase();
 		if(isValidSortParam(sort)) {
@@ -398,11 +401,11 @@ class SpeciesService {
 
 
 
-	def getSpeciesList(params, String action){
+	def getSpeciesList(params, String action, noLimit = false){
 		if("search".equalsIgnoreCase(action)){
-			return search(params)
+			return search(params, noLimit)
 		}else{
-			return getSpeciesList(params)
+			return _getSpeciesList(params, noLimit)
 		}
 	}
 	
@@ -420,7 +423,7 @@ class SpeciesService {
 		return DwCAExporter.getInstance().exportSpeciesData(species, directory)
 	}
 	
-	private getSpeciesList(params) {
+	private _getSpeciesList(params, noLimit) {
 		//cache "taxonomy_results"
 		params.startsWith = params.startsWith?:"A-Z"
 		def allGroup = SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.ALL);
@@ -470,11 +473,15 @@ class SpeciesService {
 			}
 
 			def speciesInstanceList, rs;
+			def queryParams = [offset:params.offset]
+			if(!noLimit){
+				queryParams.max  = params.max
+			}
 			if(groupIds.size() == 1 && (groupIds[0] == allGroup.id || groupIds[0] == othersGroup.id)) {
-				speciesInstanceList = Species.executeQuery(query, [max:params.max, offset:params.offset]);
+				speciesInstanceList = Species.executeQuery(query, queryParams);
 				rs = Species.executeQuery(countQuery)
 			} else {
-				speciesInstanceList = Species.executeQuery(query, [sGroup:groupIds], [max:params.max, offset:params.offset]);
+				speciesInstanceList = Species.executeQuery(query, [sGroup:groupIds], queryParams);
 				rs = Species.executeQuery(countQuery,[sGroup:groupIds]);
 			}
 			def speciesCountWithContent = 0;
@@ -484,11 +491,10 @@ class SpeciesService {
 				if (c[0] >0)
 					speciesCountWithContent += c[1];
 			}
-			return [speciesInstanceList: speciesInstanceList, instanceTotal: count, speciesCountWithContent:speciesCountWithContent, 'userGroupWebaddress':params.webaddress, canPullResource:userGroupService.getResourcePullPermission(params)]
+			return [speciesInstanceList: speciesInstanceList, instanceTotal: count, speciesCountWithContent:speciesCountWithContent, 'userGroupWebaddress':params.webaddress]
 		} else {
 			//Not being used for now
-			params.max = Math.min(params.max ? params.int('max') : 42, 100)
-			return [speciesInstanceList: Species.list(params), instanceTotal: Species.count(),  'userGroupWebaddress':params.webaddress, canPullResource:userGroupService.getResourcePullPermission(params)]
+			return [speciesInstanceList: Species.list(params), instanceTotal: Species.count(),  'userGroupWebaddress':params.webaddress]
 		}
 	}
 

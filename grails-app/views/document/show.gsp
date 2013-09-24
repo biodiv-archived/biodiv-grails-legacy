@@ -143,7 +143,10 @@
 			</div>
 		</div>
 		<g:render template="/document/documentSidebar" model="['documentInstance':documentInstance]"/>
-
+		<div class="span4">
+			<uGroup:objectPostToGroupsWrapper 
+				model="['observationInstance':documentInstance]" />
+		</div>
 	</div>
 
 </body>

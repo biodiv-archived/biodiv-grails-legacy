@@ -17,6 +17,7 @@ class Document implements Taggable, Rateable {
 	
 	def grailsApplication
 	def activityFeedService
+	def documentService
 	
 	public enum DocumentType {
 		Report("Report"),
@@ -127,4 +128,7 @@ class Document implements Taggable, Rateable {
 		activityFeedService.deleteFeed(this)
 	}
 	
+	def fetchList(params, max, offset, noLimit=false){
+		return documentService.getFilteredDocuments(params, max, offset, noLimit)
+	}
 }

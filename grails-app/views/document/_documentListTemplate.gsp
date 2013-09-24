@@ -1,6 +1,6 @@
 <div class="observations_list" style="top: 0px;">
 	<g:render template="/document/showBrowserTable"
-		model="['documentInstanceList':documentInstanceList]" />
+		model="['documentInstanceList':documentInstanceList, canPullResource:canPullResource]" />
 
 	<% params['isGalleryUpdate'] = false; %>
 	<div class="paginateButtons centered">
