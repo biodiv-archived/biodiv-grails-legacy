@@ -1,5 +1,5 @@
- 
-function refreshMarkers(p, url) {
+
+function refreshMarkers(p, url, callback) {
     if(!p) p = new Array()
 
     p['fetchField'] = "id,latitude,longitude,isChecklist,geoPrivacy";
@@ -44,6 +44,8 @@ function refreshMarkers(p, url) {
             }
             markers.addLayers(m);
             markers.addTo(map);
+            if(callback)
+                callback(data);
         }
     });
 }

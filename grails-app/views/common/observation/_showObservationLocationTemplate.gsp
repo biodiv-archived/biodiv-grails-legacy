@@ -56,6 +56,12 @@
     </table>
 </div>	
 
+<g:if test="${!observationInstance.isChecklist}">
+    <div class="sidebar_section">
+        <h5>Temporal Distribution</h5>
+        <div id="temporalDist" style="height:300px;"></div>
+    </div>
+</g:if>
 
 <r:script>
     $(document).ready(function() {
