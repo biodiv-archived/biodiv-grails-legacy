@@ -81,6 +81,9 @@ function submitToGroups(submitType, objectType, url, isBulkPull, id=null){
 		data:{'pullType':pullType, 'selectionType':selectionType, 'objectType':objectType, 'objectIds':objectIds.join(","), 'submitType':submitType, 'userGroups':userGroups.join(","), 'filterUrl':filterUrl},
 		success: function(data) {
 			if(data.success){
+				if(pullType === 'single'){
+					$(".resource_in_groups").replaceWith(data.resourceGroupHtml);
+				}
 				$(".alertMsg").removeClass('alert alert-error').addClass('alert alert-success').html(data.msg);
 			}else{
 				$(".alertMsg").removeClass('alert alert-success').addClass('alert alert-error').html(data.msg);

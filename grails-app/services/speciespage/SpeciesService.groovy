@@ -34,6 +34,7 @@ import org.apache.log4j.spi.LoggerFactory;
 import org.apache.log4j.Logger;
 import org.apache.log4j.FileAppender;
 import species.participation.DownloadLog;
+import species.groups.UserGroup;
 
 class SpeciesService {
 
@@ -445,45 +446,78 @@ class SpeciesService {
 		int count = 0;
 		if (params.startsWith && params.sGroup) {
 			String query, countQuery;
-
+			String filterQuery = " where s.id is not null " //dummy statement
+			String countFilterQuery = " where s.id is not null " //dummy statement
+			def queryParams = [offset:params.offset]
+			
 			if(groupIds.size() == 1 && groupIds[0] == allGroup.id) {
 				if(params.startsWith == "A-Z") {
-					query = "select s from Species s order by s.${params.sort} ${params.order}";
-					countQuery = "select s.percentOfInfo, count(*) as count from Species s group by s.percentOfInfo"
+					query = "select s from Species s ";
+					countQuery = "select s.percentOfInfo, count(*) as count from Species s "
 				} else {
-					query = "select s from Species s where s.title like '<i>${params.startsWith}%' order by s.${params.sort} ${params.order}";
-					countQuery = "select s.percentOfInfo, count(*) as count from Species s where s.title like '<i>${params.startsWith}%'  group by s.percentOfInfo"
+					query = "select s from Species s "
+					filterQuery += " and s.title like '<i>${params.startsWith}%' ";
+					countQuery = "select s.percentOfInfo, count(*) as count from Species s "
+					countFilterQuery += " and s.title like '<i>${params.startsWith}%' "
 				}
 			} else if(groupIds.size() == 1 && groupIds[0] == othersGroup.id) {
 				if(params.startsWith == "A-Z") {
-					query = "select s from Species s, TaxonomyDefinition t where s.taxonConcept = t and t.group.id  is null order by s.${params.sort} ${params.order}"
-					countQuery = "select s.percentOfInfo, count(*) as count from Species s, TaxonomyDefinition t where s.taxonConcept = t and t.group.id  is null  group by s.percentOfInfo";
+					query = "select s from Species s, TaxonomyDefinition t " 
+					filterQuery += " and s.taxonConcept = t and t.group.id  is null "
+					countQuery = "select s.percentOfInfo, count(*) as count from Species s, TaxonomyDefinition t "
+					countFilterQuery += " and s.taxonConcept = t and t.group.id  is null ";
 				} else {
-					query = "select s from Species s, TaxonomyDefinition t where title like '<i>${params.startsWith}%' and s.taxonConcept = t and t.group.id  is null order by s.${params.sort} ${params.order}"
-					countQuery = "select s.percentOfInfo, count(*) as count from Species s, TaxonomyDefinition t where s.title like '<i>${params.startsWith}%' and s.taxonConcept = t and t.group.id  is null group by s.percentOfInfo";
+					query = "select s from Species s, TaxonomyDefinition t "
+					filterQuery += " and title like '<i>${params.startsWith}%' and s.taxonConcept = t and t.group.id  is null "
+					countQuery = "select s.percentOfInfo, count(*) as count from Species s, TaxonomyDefinition t "
+					countFilterQuery += " and s.title like '<i>${params.startsWith}%' and s.taxonConcept = t and t.group.id  is null ";
 				}
 			} else {
 				if(params.startsWith == "A-Z") {
-					query = "select s from Species s, TaxonomyDefinition t where s.taxonConcept = t and t.group.id  in (:sGroup) order by s.${params.sort} ${params.order}"
-					countQuery = "select s.percentOfInfo, count(*) as count from Species s, TaxonomyDefinition t where s.taxonConcept = t and t.group.id  in (:sGroup)  group by s.percentOfInfo";
+					query = "select s from Species s, TaxonomyDefinition t "
+					filterQuery += " and s.taxonConcept = t and t.group.id  in (:sGroup) "
+					countQuery = "select s.percentOfInfo, count(*) as count from Species s, TaxonomyDefinition t "
+					countFilterQuery += " and s.taxonConcept = t and t.group.id  in (:sGroup)  ";
+					
 				} else {
-					query = "select s from Species s, TaxonomyDefinition t where title like '<i>${params.startsWith}%' and s.taxonConcept = t and t.group.id  in (:sGroup) order by s.${params.sort} ${params.order}"
-					countQuery = "select s.percentOfInfo, count(*) as count from Species s, TaxonomyDefinition t where s.title like '<i>${params.startsWith}%' and s.taxonConcept = t and t.group.id  in (:sGroup)  group by s.percentOfInfo";
+					query = "select s from Species s, TaxonomyDefinition t "
+					filterQuery += " and title like '<i>${params.startsWith}%' and s.taxonConcept = t and t.group.id  in (:sGroup) "
+					countQuery = "select s.percentOfInfo, count(*) as count from Species s, TaxonomyDefinition t "
+					countFilterQuery += " and s.title like '<i>${params.startsWith}%' and s.taxonConcept = t and t.group.id  in (:sGroup)  ";
 				}
+				queryParams.sGroup  = groupIds
 			}
 
+			
+			if(params.webaddress) {
+				def userGroupInstance = UserGroup.findByWebaddress(params.webaddress)
+				if(userGroupInstance){
+					queryParams['userGroup'] = userGroupInstance
+					query += " join s.userGroups userGroup "
+					filterQuery += " and userGroup=:userGroup "
+					countQuery += " join s.userGroups userGroup "
+					countFilterQuery += " and userGroup=:userGroup "
+				}
+			}
+			
+			query += filterQuery + " order by s.${params.sort} ${params.order}"
+			countQuery += countFilterQuery + " group by s.percentOfInfo"
+			
 			def speciesInstanceList, rs;
-			def queryParams = [offset:params.offset]
+			
 			if(!noLimit){
 				queryParams.max  = params.max
 			}
 			if(groupIds.size() == 1 && (groupIds[0] == allGroup.id || groupIds[0] == othersGroup.id)) {
 				speciesInstanceList = Species.executeQuery(query, queryParams);
-				rs = Species.executeQuery(countQuery)
+				queryParams.remove('max');
+				rs = Species.executeQuery(countQuery, queryParams)
 			} else {
-				speciesInstanceList = Species.executeQuery(query, [sGroup:groupIds], queryParams);
-				rs = Species.executeQuery(countQuery,[sGroup:groupIds]);
+				speciesInstanceList = Species.executeQuery(query, queryParams);
+				queryParams.remove('max')
+				rs = Species.executeQuery(countQuery, queryParams);
 			}
+			
 			def speciesCountWithContent = 0;
 
 			for(c in rs) {

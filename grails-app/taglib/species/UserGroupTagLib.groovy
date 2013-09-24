@@ -393,8 +393,13 @@ class UserGroupTagLib {
 			out << render(template:"/common/objectPostToGroupsTemplate", model:model);
 		}
 	}
+	
 	def objectPostToGroupsWrapper = {attrs, body->
 		out << render(template:"/common/objectPostToGroupsWrapperTemplate", model:attrs.model);
+	}
+	
+	def resourceInGroups = {attrs, body->
+		out << render(template:"/common/resourceInGroupsTemplate", model:attrs.model);
 	}
 	
 }

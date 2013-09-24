@@ -81,9 +81,6 @@ class ObservationService {
 	static final String OBSERVATION_DELETED = "observationDeleted";
 	static final String CHECKLIST_DELETED= "checklistDeleted";
 	static final String DOWNLOAD_REQUEST = "downloadRequest";
-	//-1 to allow download without any limit
-	static final int MAX_EXPORT_SIZE = -1;
-	
 	/**
 	 * 
 	 * @param params
@@ -384,6 +381,46 @@ class ObservationService {
 		}
 		return getRelatedObservationByReco(obvId, parentObv.maxVotedReco, limit, offset)
 	}
+    
+    private Map getRelatedObservationByReco(long obvId, Recommendation maxVotedReco, int limit, int offset) {
+        def observations = Observation.withCriteria (offset:offset?:0) {
+            projections {
+                groupProperty('sourceId')
+                groupProperty('isShowable')
+            }
+            and {
+                eq("maxVotedReco", maxVotedReco)
+                eq("isDeleted", false)
+                if(obvId) ne("id", obvId)
+            }
+            order("isShowable", "desc")
+            if(limit >= 0) maxResults(limit)
+        }
+        
+        def result = [];
+        observations.each {
+            def obv = Observation.get(it[0])
+            result.add(['observation':obv, 'title':(obv.isChecklist)? obv.title : maxVotedReco.name]);
+        }
+
+        if(limit < 0)
+            return ["observations":result];
+
+        def count = Observation.createCriteria().count {
+            projections {
+                count(groupProperty('sourceId'))
+            }
+            and {
+                eq("maxVotedReco", maxVotedReco)
+                eq("isDeleted", false)
+                if(obvId) ne("id", obvId)
+            }
+        }
+        return ["observations":result, "count":count]
+    }
+
+	Map getRelatedObservationByTaxonConcept(long taxonConceptId, int limit, long offset){
+		def taxonConcept = TaxonomyDefinition.read(taxonConceptId);
 		if(!taxonConcept) return ['observations':[], 'count':0]
 		
 		List<Recommendation> scientificNameRecos = recommendationService.searchRecoByTaxonConcept(taxonConcept);
@@ -1980,30 +2017,4 @@ class ObservationService {
 
         return [observations:observationInstanceList, geoPrivacyAdjust:Utils.getRandomFloat()]
     }
-	
-	/*
-	 * get observations for download and group post
-	 */
-	def getObservationList(params, String action){
-		if("search".equalsIgnoreCase(action)){
-			//getting result from solr
-			def idList = getFilteredObservationsFromSearch(params, MAX_EXPORT_SIZE, 0, false).totalObservationIdList
-			def res = []
-			idList.each { obvId ->
-				res.add(Observation.read(obvId))
-			}
-			return res
-		}else if(params.webaddress){
-			def userGroupInstance =	userGroupService.get(params.webaddress)
-			if (!userGroupInstance){
-				log.error "user group not found for id  $params.id  and webaddress $params.webaddress"
-				return []
-			}
-			return userGroupService.getUserGroupObservations(userGroupInstance, params, MAX_EXPORT_SIZE, 0).observationInstanceList;
-		}
-		else{
-			return getFilteredObservations(params, MAX_EXPORT_SIZE, 0, false).observationInstanceList
-			
-		}
-	}
 }

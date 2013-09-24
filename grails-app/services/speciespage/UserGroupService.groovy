@@ -1337,6 +1337,7 @@ class UserGroupService {
 			if(objectIds && objectIds != ""){
 				obvs = objectIds.split(",").collect { domainClass.read(Long.parseLong(it)) }
 			}
+			r['resourceObj'] = (params.pullType == 'single')? obvs[0]:null
 			
 			String objectType = params.objectType
 			switch (objectType) {
