@@ -189,6 +189,7 @@ function drawVisualization(rows) {
     for (var i=0;i<12;i++){
         if(m[i] == false || m[i] == undefined)
             grouped_dt.addRows([[i,0,months[i]]]);
+        //grouped_dt.setValue(i,1, Math.floor((Math.random()*100)+1));
     }
     grouped_dt.sort([{column:0}]);
 
@@ -203,7 +204,7 @@ function drawVisualization(rows) {
         hAxis: {title: 'Month', slantedText:true, minTextSpacing:8, showTextEvery:1},
         vAxis:{minValue:0, maxValue:5, format: '#'},
         legend:{position: 'none'},
-        chartArea:{width:'85%'}
+        chartArea:{width:'80%'}
     });
     /*    var table = new google.visualization.Table(document.getElementById('table'));
           table.draw(view, null);
