@@ -174,6 +174,7 @@ function drawVisualization(rows) {
             data.addRow([new Date(rows[i].observedOn), 1]);
         }
     }
+    if(data.getNumberOfRows() > 0) {
     var grouped_dt = google.visualization.data.group (
             data, [{column:0, modifier:getMonth, type:'number', label:'MonthNo'}],
             [{'column': 1, 'aggregation': google.visualization.data.sum, type: 'number', label:'#Observations'}, {'column': 0, 'aggregation': getMonthName, type: 'string', label:'Month'}]
@@ -189,7 +190,7 @@ function drawVisualization(rows) {
     for (var i=0;i<12;i++){
         if(m[i] == false || m[i] == undefined)
             grouped_dt.addRows([[i,0,months[i]]]);
-        //grouped_dt.setValue(i,1, Math.floor((Math.random()*100)+1));
+//        grouped_dt.setValue(i,1, Math.floor((Math.random()*100)+1));
     }
     grouped_dt.sort([{column:0}]);
 
@@ -201,7 +202,7 @@ function drawVisualization(rows) {
 
     columnChart.draw(view,  {
         title:"No of observations by month",
-        hAxis: {title: 'Month', slantedText:true, minTextSpacing:8, showTextEvery:1},
+        hAxis: {title: 'Month', slantedText:true, showTextEvery:1},
         vAxis:{minValue:0, maxValue:5, format: '#'},
         legend:{position: 'none'},
         chartArea:{width:'80%'}
@@ -212,6 +213,9 @@ function drawVisualization(rows) {
           var grouped_table = new google.visualization.Table(document.getElementById('grouped_table'));
           grouped_table.draw(view, null);
           */
+    } else {
+        $("#grouped_table").html('<div id="relatedObservationMsg_a" class="alert alert-info" style="">No observations</div>');
+    }
 }
 
 
