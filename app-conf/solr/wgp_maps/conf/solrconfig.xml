@@ -18,7 +18,7 @@
 
 <config>
 
-  <luceneMatchVersion>LUCENE_CURRENT</luceneMatchVersion>
+  <luceneMatchVersion>LUCENE_44</luceneMatchVersion>
 
   <jmx />
 
@@ -31,9 +31,11 @@
      -->
   <abortOnConfigurationError>${solr.abortOnConfigurationError:true}</abortOnConfigurationError>
 
-  <lib dir="/home/rahul/opt/apache-solr-3.4.0/dist" regex="apache-solr-dataimporthandler-.*\.jar" />
+<!-- Make sure the solr-dataimporthandlers are visible to solr -->
 
-  <indexDefaults>
+  <!--lib dir="/home/kinley/apps/tomcat/lib/" regex="solr-dataimporthandler-\d.*\.jar" /-->
+
+  <indexConfig>
    <!-- Values here affect all index writers and act as a default unless overridden. -->
     <useCompoundFile>false</useCompoundFile>
 
@@ -88,9 +90,7 @@
       ('simple' is the default for backwards compatibility with Solr 1.2)
     -->
     <lockType>single</lockType>
-  </indexDefaults>
 
-  <mainIndex>
     <!-- options specific to the main on-disk lucene index -->
     <useCompoundFile>false</useCompoundFile>
     <ramBufferSizeMB>32</ramBufferSizeMB>
@@ -107,7 +107,7 @@
          This is not needed if lock type is 'none' or 'single'
      -->
     <unlockOnStartup>false</unlockOnStartup>
-  </mainIndex>
+  </indexConfig>
 
   <!-- the default high-performance update handler -->
   <updateHandler class="solr.DirectUpdateHandler2">
@@ -359,8 +359,9 @@
        for simple user-entered phrases. 
        see http://wiki.apache.org/solr/DisMaxRequestHandler
    -->
-  <requestHandler name="dismax" class="solr.DisMaxRequestHandler" >
+  <requestHandler name="dismax" class="solr.SearchHandler">
     <lst name="defaults">
+     <str name="defType">dismax</str>
      <str name="echoParams">explicit</str>
      <float name="tie">0.01</float>
      <str name="qf">
@@ -394,8 +395,9 @@
   <!-- Note how you can register the same handler multiple times with
        different names (and different init parameters)
     -->
-  <requestHandler name="partitioned" class="solr.DisMaxRequestHandler" >
+  <requestHandler name="partitioned" class="solr.SearchHandler" >
     <lst name="defaults">
+     <str name="defType">dismax</str>
      <str name="echoParams">explicit</str>
      <str name="qf">text^0.5 features^1.0 name^1.2 sku^1.5 id^10.0</str>
      <str name="mm">2&lt;-1 5&lt;-2 6&lt;90%</str>
@@ -444,10 +446,11 @@
     </lst>
   </requestHandler>
   
-  <requestHandler name="instock" class="solr.DisMaxRequestHandler" >
+  <requestHandler name="instock" class="solr.SearchHandler" >
     <!-- for legacy reasons, DisMaxRequestHandler will assume all init
          params are "defaults" if you don't explicitly specify any defaults.
       -->
+     <str name="defType">dismax</str>
      <str name="fq">
         inStock:true
      </str>
@@ -605,7 +608,7 @@
        "update.processor.class" is the class name for the UpdateRequestProcessor.  It is initalized
        only once.  This can not be changed for each request.
     -->
-  <requestHandler name="/update" class="solr.XmlUpdateRequestHandler" >
+  <requestHandler name="/update" class="solr.UpdateRequestHandler" >
     <!--
     <str name="update.processor.class">org.apache.solr.handler.UpdateRequestProcessor</str>
     -->
@@ -615,7 +618,7 @@
    Analysis request handler.  Since Solr 1.3.  Use to returnhow a document is analyzed.  Useful
    for debugging and as a token server for other types of applications
    -->
-  <requestHandler name="/analysis" class="solr.AnalysisRequestHandler" >
+  <requestHandler name="/analysis" class="solr.FieldAnalysisRequestHandler" >
     <!--
     <str name="update.processor.class">org.apache.solr.handler.UpdateRequestProcessor</str>
     -->
