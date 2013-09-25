@@ -34,4 +34,8 @@ cadb () {
     psql -Upostgres -d $1 -f /usr/share/postgresql/9.1/contrib/postgis-1.5/postgis.sql;
     psql -Upostgres -d $1 -f /usr/share/postgresql/9.1/contrib/postgis-1.5/spatial_ref_sys.sql;
 }
+
 export GRAILS_OPTS="-XX:MaxPermSize=256m -Xmx1024M"
+
+
+
