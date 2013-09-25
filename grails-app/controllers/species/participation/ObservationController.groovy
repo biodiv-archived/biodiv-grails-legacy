@@ -1134,7 +1134,8 @@ class ObservationController {
 	@Secured(['ROLE_USER'])
 	def getList = {
 		log.debug params;
-		render getObservationList(params) as JSON
+		def result = getObservationList(params)
+        render result as JSON
 	}
 	
 	@Secured(['ROLE_USER'])
@@ -1180,7 +1181,6 @@ class ObservationController {
 	def getUserImage = {
 		log.debug params;
 		render SUser.read(params.id.toLong()).icon() 
-		
 	}
 	
 	@Secured(['ROLE_USER'])
