@@ -1027,7 +1027,6 @@ class ObservationService {
 		def source = m.source;
 		def mailSubject = ""
 		def activitySource = ""
-		
         switch (source) {
 			case "observationShow":
 				mailSubject = "Share Observation"
@@ -1071,6 +1070,7 @@ class ObservationService {
 		templateMap["unsubscribeUrl"] = unsubscribeUrl ?: ""
 		templateMap["userMessage"] = m.userMessage?: ""
 		def body = conf.ui.askIdentification.emailBody
+
 		if (body.contains('$')) {
 			body = evaluate(body, templateMap)
 		}
