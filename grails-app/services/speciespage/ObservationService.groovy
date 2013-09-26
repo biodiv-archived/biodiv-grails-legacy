@@ -81,6 +81,8 @@ class ObservationService {
 	static final String OBSERVATION_DELETED = "observationDeleted";
 	static final String CHECKLIST_DELETED= "checklistDeleted";
 	static final String DOWNLOAD_REQUEST = "downloadRequest";
+	static final int MAX_EXPORT_SIZE = -1;
+	
 	/**
 	 * 
 	 * @param params
@@ -2017,4 +2019,30 @@ class ObservationService {
 
         return [observations:observationInstanceList, geoPrivacyAdjust:Utils.getRandomFloat()]
     }
+	
+	/*
+	 * used for download and post in bulk
+	 */
+	def getObservationList(params, String action){
+		if("search".equalsIgnoreCase(action)){
+			//getting result from solr
+			def idList = getFilteredObservationsFromSearch(params, MAX_EXPORT_SIZE, 0, false).totalObservationIdList
+			def res = []
+			idList.each { obvId ->
+				res.add(Observation.read(obvId))
+			}
+			return res
+		}else if(params.webaddress){
+			def userGroupInstance =	userGroupService.get(params.webaddress)
+			if (!userGroupInstance){
+				log.error "user group not found for id  $params.id  and webaddress $params.webaddress"
+				return []
+			}
+			return userGroupService.getUserGroupObservations(userGroupInstance, params, MAX_EXPORT_SIZE, 0).observationInstanceList;
+		}
+		else{
+			return getFilteredObservations(params, MAX_EXPORT_SIZE, 0, false).observationInstanceList
+			
+		}
+	}
 }

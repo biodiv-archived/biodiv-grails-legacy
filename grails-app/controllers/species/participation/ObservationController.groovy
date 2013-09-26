@@ -91,6 +91,7 @@ class ObservationController {
 		log.debug params
 		
 		def model = getObservationList(params);
+		
 		if(params.loadMore?.toBoolean()){
 			render(template:"/common/observation/showObservationListTemplate", model:model);
 			return;

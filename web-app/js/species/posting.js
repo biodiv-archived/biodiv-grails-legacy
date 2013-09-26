@@ -85,11 +85,12 @@ function submitToGroups(submitType, objectType, url, isBulkPull, id=null){
 					$(".resource_in_groups").replaceWith(data.resourceGroupHtml);
 				}else{
 					$(".alertMsg").removeClass('alert alert-error').addClass('alert alert-success').html(data.msg);
+					$("html, body").animate({ scrollTop: 0 });
 				}
 			}else{
 				$(".alertMsg").removeClass('alert alert-success').addClass('alert alert-error').html(data.msg);
+				$("html, body").animate({ scrollTop: 0 });
 			}
-			$("html, body").animate({ scrollTop: 0 });
 			return false;
 		}, error: function(xhr, status, error) {
 			alert(xhr.responseText);

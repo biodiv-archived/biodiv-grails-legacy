@@ -85,7 +85,7 @@ class ObvUtilService {
 	def export(params, dl){
 		log.debug(params)
 		String action = new URL(dl.filterUrl).getPath().split("/")[2]
-		def observationInstanceList = getObservationList(params, action)
+		def observationInstanceList = observationService.getObservationList(params, action)
 		log.debug " Obv total $observationInstanceList.size " 
 		return exportObservation(observationInstanceList, dl.type, dl.author)
 	}
