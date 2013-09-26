@@ -33,7 +33,7 @@
 
 <!-- Make sure the solr-dataimporthandlers are visible to solr -->
 
-  <!--lib dir="/home/kinley/apps/tomcat/lib/" regex="solr-dataimporthandler-\d.*\.jar" /-->
+  <lib dir="../lib/" regex="postgres*" />
 
   <indexConfig>
    <!-- Values here affect all index writers and act as a default unless overridden. -->
