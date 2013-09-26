@@ -56,7 +56,7 @@
     </table>
 </div>	
 
-<g:if test="${!observationInstance.isChecklist}">
+<g:if test="${!observationInstance.isChecklist && observationInstance.maxVotedReco}">
     <div class="sidebar_section">
         <h5>Temporal Distribution</h5>
         <div id="temporalDist" style="height:300px;"></div>

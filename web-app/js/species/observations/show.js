@@ -207,7 +207,7 @@ function drawVisualization(rows) {
 
     columnChart.draw(view,  {
         title:"No of observations by month",
-        hAxis: {title: 'Month', showTextEvery:1},
+        hAxis: {title: 'Month', slantedText:true, showTextEvery:1},
         vAxis:{minValue:0, maxValue:5, format: '#'},
         legend:{position: 'none'},
         chartArea:{width:'80%'}
