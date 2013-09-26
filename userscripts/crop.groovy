@@ -111,7 +111,9 @@ def doCrop(){
 	println "============= Start  Time " + startDate  + "          end time " + new Date()
 }
 
-doCrop();
+//doCrop();
+
+ImageUtils.createScaledImages(new File('/tmp/142.jpg'), new File('/tmp') )
 println "=========== DONE!!";
 
 /*

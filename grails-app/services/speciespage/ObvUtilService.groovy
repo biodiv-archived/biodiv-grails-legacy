@@ -60,13 +60,15 @@ class ObvUtilService {
 	static final String  SCHEDULED = "Scheduled";
 	static final String  EXECUTING = "Executing";
 	
+	private static final int BATCH_SIZE = 50
+	
 	def userGroupService
 	def observationService
 	def springSecurityService
 	def grailsApplication
 	def activityFeedService
 	def observationsSearchService
-	
+	def checklistUtilService
 	
 	
 	///////////////////////////////////////////////////////////////////////
@@ -338,19 +340,34 @@ class ObvUtilService {
 			return
 		}
 		
+		def resultObv = [] 
+		int i = 0;
 		SpreadsheetReader.readSpreadSheet(spreadSheet.getAbsolutePath()).get(0).each{ m ->
-			if(m[IMAGE_FILE_NAMES].trim() != "")
-				uploadObservation(imageDir, m)
+			if(m[IMAGE_FILE_NAMES].trim() != ""){
+				uploadObservation(imageDir, m,resultObv)
+				i++
+				if(i > BATCH_SIZE){
+					checklistUtilService.cleanUpGorm(true)
+					def obvs = resultObv.collect { Observation.read(it) }
+					try{
+						observationsSearchService.publishSearchIndex(obvs, true);
+					}catch (Exception e) {
+						log.error e.printStackTrace();
+					}
+					resultObv.clear();
+					i = 0;
+				}
+			}
 		}
 	}
 	
-	private uploadObservation(imageDir, Map m){
+	private uploadObservation(imageDir, Map m, resultObv){
 		Map obvParams = uploadImageFiles(imageDir, m[IMAGE_FILE_NAMES].trim().split(","), ("cc " + m[LICENSE]).toUpperCase())
 		if(obvParams.isEmpty()){
 			log.error "No image file .. aborting this obs upload with params " + m
 		}else{
 			populateParams(obvParams, m)
-			saveObv(obvParams)
+			saveObv(obvParams, resultObv)
 			log.debug "observation saved"
 		}
 	}
@@ -406,7 +423,7 @@ class ObvUtilService {
 		return gIds.join(",")
 	}
 	
-	private saveObv(Map params){
+	private saveObv(Map params, result){
 		if(!params.author){
 			log.error "Author not found for params $params"
 			return
@@ -436,6 +453,8 @@ class ObvUtilService {
 				if(!observationInstance.save(flush:true)){
 					observationInstance.errors.allErrors.each { log.error it }
 				}
+				result.add(observationInstance.id)
+				
 			}else {
 					observationInstance.errors.allErrors.each { log.error it }
 			}
@@ -464,11 +483,7 @@ class ObvUtilService {
 			observationInstance.calculateMaxVotedSpeciesName();
 			def activityFeed = activityFeedService.addActivityFeed(observationInstance, recommendationVoteInstance, recommendationVoteInstance.author, activityFeedService.SPECIES_RECOMMENDED);
 		}
-		try{
-			observationsSearchService.publishSearchIndex(observationInstance, ObservationController.COMMIT);
-		}catch (Exception e) {
-			log.error "Error in publishing ===== "
-		}	
+			
 	}
 
 	private uploadImageFiles(imageDir, imagePaths, license){

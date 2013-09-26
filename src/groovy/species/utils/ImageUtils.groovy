@@ -114,7 +114,7 @@ class ImageUtils {
         String fileName = inImg.getAbsolutePath();
 		//System.out.println(fileName);
 		String ext = Utils.getCleanFileExtension(fileName);
-        ext = ext?ext.toLowerCase():'jpg';
+        ext = ext?ext.replaceFirst(".", "").toLowerCase():'jpg';
         BufferedImage im = null;
         try{       
             im = ImageIO.read(inImg);
