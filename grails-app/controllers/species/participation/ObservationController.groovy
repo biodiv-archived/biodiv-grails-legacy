@@ -758,7 +758,7 @@ class ObservationController {
 			inGroupMap[(m.observation.id)] = m.inGroup == null ?'false':m.inGroup
 		}
 		
-		def model = [observationInstanceList: result.relatedObv.observations.observation, inGroupMap:inGroupMap, observationInstanceTotal: result.relatedObv.count, queryParams: [max:result.max], activeFilters:new HashMap(params), parentId:params.long('id'), filterProperty:params.filterProperty, initialParams:new HashMap(params)]
+		def model = [observationInstanceList: result.relatedObv.observations.observation, inGroupMap:inGroupMap, instanceTotal: result.relatedObv.count, queryParams: [max:result.max], activeFilters:new HashMap(params), parentId:params.long('id'), filterProperty:params.filterProperty, initialParams:new HashMap(params)]
 		render (view:'listRelated', model:model)
 	}
 
