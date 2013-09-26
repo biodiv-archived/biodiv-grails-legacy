@@ -113,8 +113,8 @@ class ImageUtils {
     public static void doResize(File inImg, File outImg, int width, int height) throws Exception{
         String fileName = inImg.getAbsolutePath();
 		//System.out.println(fileName);
-		String ext = fileName.tokenize('.').last();
-        ext = ext.toLowerCase();
+		String ext = Utils.getCleanFileExtension(fileName);
+        ext = ext?ext.toLowerCase():'jpg';
         BufferedImage im = null;
         try{       
             im = ImageIO.read(inImg);
@@ -290,35 +290,37 @@ class ImageUtils {
 
 		if(!defaultFileType) defaultFileType = '.'+config.speciesPortal.resources.images.defaultType;
 
+        String ext = Utils.getCleanFileExtension(name);
+
 		switch(type) {
 			case ImageType.NORMAL :
-				if(name =~ /\.[a-zA-Z]{3,4}$/) {
+				if(ext) {
 					//if filename already has an extention
-					name = name?.replaceFirst(/\.[a-zA-Z]{3,4}$/, ImageType.NORMAL.getSuffix()).replaceFirst('.'+config.speciesPortal.resources.images.defaultType, defaultFileType);
+					name = name?.replaceFirst(/\.[a-zA-Z]+$/, ImageType.NORMAL.getSuffix()).replaceFirst('.'+config.speciesPortal.resources.images.defaultType, defaultFileType);
 				} else {
 					name = name?.plus(ImageType.NORMAL.getSuffix()).replaceFirst('.'+config.speciesPortal.resources.images.defaultType, defaultFileType);
 				}
 				break;
 			case ImageType.SMALL :
-				if(name =~ /\.[a-zA-Z]{3,4}$/) {
+				if(ext) {
 					//if filename alreadyy has an extention
-					name = name?.replaceFirst(/\.[a-zA-Z]{3,4}$/, ImageType.SMALL.getSuffix()).replaceFirst('.'+config.speciesPortal.resources.images.defaultType, defaultFileType);
+					name = name?.replaceFirst(/\.[a-zA-Z]+$/, ImageType.SMALL.getSuffix()).replaceFirst('.'+config.speciesPortal.resources.images.defaultType, defaultFileType);
 				} else {
 					name = name?.plus(ImageType.SMALL.getSuffix()).replaceFirst('.'+config.speciesPortal.resources.images.defaultType, defaultFileType);
 				}
 				break;
 			case ImageType.VERY_SMALL :
-				if(name =~ /\.[a-zA-Z]{3,4}$/) {
+				if(ext) {
 					//if filename already has an extention
-					name = name?.replaceFirst(/\.[a-zA-Z]{3,4}$/, ImageType.VERY_SMALL.getSuffix()).replaceFirst('.'+config.speciesPortal.resources.images.defaultType, defaultFileType);
+					name = name?.replaceFirst(/\.[a-zA-Z]+$/, ImageType.VERY_SMALL.getSuffix()).replaceFirst('.'+config.speciesPortal.resources.images.defaultType, defaultFileType);
 				} else {
 					name = name?.plus(ImageType.VERY_SMALL.getSuffix()).replaceFirst('.'+config.speciesPortal.resources.images.defaultType, defaultFileType);
 				}
 				break;
 			case ImageType.LARGE :
-				if(name =~ /\.[a-zA-Z]{3,4}$/) {
+				if(ext) {
 					//if filename already has an extention
-					name = name?.replaceFirst(/\.[a-zA-Z]{3,4}$/, ImageType.LARGE.getSuffix()).replaceFirst('.'+config.speciesPortal.resources.images.defaultType, defaultFileType);
+					name = name?.replaceFirst(/\.[a-zA-Z]+$/, ImageType.LARGE.getSuffix()).replaceFirst('.'+config.speciesPortal.resources.images.defaultType, defaultFileType);
 				} else {
 					name = name?.plus(ImageType.LARGE.getSuffix()).replaceFirst('.'+config.speciesPortal.resources.images.defaultType, defaultFileType);
 				}

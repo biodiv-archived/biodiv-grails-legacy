@@ -190,8 +190,13 @@ function drawVisualization(rows) {
     for (var i=0;i<12;i++){
         if(m[i] == false || m[i] == undefined)
             grouped_dt.addRows([[i,0,months[i]]]);
-//        grouped_dt.setValue(i,1, Math.floor((Math.random()*100)+1));
     }
+    
+    //setting month name explicitly
+    for (var i=0;i<12;i++){
+    	grouped_dt.setValue(i, 2, months[grouped_dt.getValue(i, 0)]);
+    }
+    
     grouped_dt.sort([{column:0}]);
 
     var view = new google.visualization.DataView(grouped_dt);
@@ -202,7 +207,7 @@ function drawVisualization(rows) {
 
     columnChart.draw(view,  {
         title:"No of observations by month",
-        hAxis: {title: 'Month', slantedText:true, showTextEvery:1},
+        hAxis: {title: 'Month', showTextEvery:1},
         vAxis:{minValue:0, maxValue:5, format: '#'},
         legend:{position: 'none'},
         chartArea:{width:'80%'}
