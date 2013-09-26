@@ -448,7 +448,7 @@ class SpeciesService {
 			String query, countQuery;
 			String filterQuery = " where s.id is not null " //dummy statement
 			String countFilterQuery = " where s.id is not null " //dummy statement
-			def queryParams = [offset:params.offset]
+			def queryParams = [:]
 			
 			if(groupIds.size() == 1 && groupIds[0] == allGroup.id) {
 				if(params.startsWith == "A-Z") {
@@ -503,21 +503,14 @@ class SpeciesService {
 			query += filterQuery + " order by s.${params.sort} ${params.order}"
 			countQuery += countFilterQuery + " group by s.percentOfInfo"
 			
-			def speciesInstanceList, rs;
 			
+			def rs = Species.executeQuery(countQuery, queryParams);
 			if(!noLimit){
 				queryParams.max  = params.max
-			}
-			if(groupIds.size() == 1 && (groupIds[0] == allGroup.id || groupIds[0] == othersGroup.id)) {
-				speciesInstanceList = Species.executeQuery(query, queryParams);
-				queryParams.remove('max');
-				rs = Species.executeQuery(countQuery, queryParams)
-			} else {
-				speciesInstanceList = Species.executeQuery(query, queryParams);
-				queryParams.remove('max')
-				rs = Species.executeQuery(countQuery, queryParams);
+				queryParams.offset = params.offset
 			}
 			
+			def speciesInstanceList = Species.executeQuery(query, queryParams);
 			def speciesCountWithContent = 0;
 
 			for(c in rs) {

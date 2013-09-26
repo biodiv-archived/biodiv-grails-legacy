@@ -83,8 +83,9 @@ function submitToGroups(submitType, objectType, url, isBulkPull, id=null){
 			if(data.success){
 				if(pullType === 'single'){
 					$(".resource_in_groups").replaceWith(data.resourceGroupHtml);
+				}else{
+					$(".alertMsg").removeClass('alert alert-error').addClass('alert alert-success').html(data.msg);
 				}
-				$(".alertMsg").removeClass('alert alert-error').addClass('alert alert-success').html(data.msg);
 			}else{
 				$(".alertMsg").removeClass('alert alert-success').addClass('alert alert-error').html(data.msg);
 			}

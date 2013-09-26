@@ -62,7 +62,6 @@
 
 		</div>
 	</div>
-	<% params['isGalleryUpdate'] = false; %>
 	<div class="paginateButtons centered">
 		<p:paginate controller="species" action="list"
 			total="${instanceTotal}" userGroup="${userGroup}"
@@ -72,7 +71,7 @@
 	<div class="paginateButtons centered">
 		<p:paginateOnAlphabet controller="species" action="list"
 			total="${instanceTotal}" userGroup="${userGroup }" params="${params}"
-			userGroupWebaddress="${userGroupWebaddress}" />
+			userGroupWebaddress="${userGroupWebaddress}"/>
 
 	</div>
 

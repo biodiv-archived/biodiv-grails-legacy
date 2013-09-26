@@ -15,7 +15,6 @@
 			initRelativeTime("${uGroup.createLink(controller:'activityFeed', action:'getServerTime')}");
 	});
 </g:javascript>
- 
 <div class="info-message" id="info-message">
 		<g:if test="${speciesCountWithContent }"><span class="name" style="color: #b1b1b1;"><i
 			class="icon-search"></i></span> ${speciesCountWithContent} species page<g:if test="${speciesCountWithContent>1}">s</g:if> and ${instanceTotal- speciesCountWithContent} species stubs are found</g:if>

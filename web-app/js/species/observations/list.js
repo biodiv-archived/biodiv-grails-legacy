@@ -168,17 +168,17 @@ $(document).ready(function(){
         if(stringTrim(($(this).html())) == stringTrim($("#selected_sort").html().replace(caret, ''))){
             return true;
         }
-    $('.sort_filter_label.active').removeClass('active');
-    $(this).addClass('active');
-    $("#selected_sort").html($(this).html() + caret);
-    updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
-    return true;   
+	    $('.sort_filter_label.active').removeClass('active');
+	    $(this).addClass('active');
+	    $("#selected_sort").html($(this).html() + caret);
+	    updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
+	    return true;   
     });
 
-    $(".paginateButtons a").click(function() {
+    $(".paginateButtons a").live('click', function() {
     	$('.paginateButtons a.active').removeClass('active');
     	$(this).addClass('active');
-        updateGallery($(this).attr('href'), window.params.queryParamsMax, undefined, undefined, false);
+        updateGallery($(this).attr('href'), window.params.queryParamsMax, undefined, undefined, window.params.isGalleryUpdate);
         return false;
     });
     
