@@ -68,7 +68,7 @@
         loadGoogleMapsAPI(function() {
             initialize(document.getElementById("big_map_canvas"), false);
             <g:if test="${!observationInstance.isChecklist}">
-                showObservationMapView("${observationInstance.id}");
+            showObservationMapView("${observationInstance.id}", ${observationInstance.fromDate.getTime()});
             </g:if>
             var icon;
             
