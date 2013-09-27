@@ -20,7 +20,7 @@
 					<g:each in="${r.authors}" var="author">
 						<a href="${uGroup.createLink(controller:"SUser", action:"show", id:author?.id)}" title="${author?.name }">
 							<img class="small_profile_pic"
-								src="${author?.profilePicture(ImageType.VERY_SMALL)}"
+								src="${author?.profilePicture(ImageType.SMALL)}"
 								title="${author.name}" />
 						</a>
 					</g:each>

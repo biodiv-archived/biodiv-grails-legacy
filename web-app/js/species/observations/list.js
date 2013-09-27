@@ -686,6 +686,7 @@ function getUpdateGalleryParams(target, limit, offset, removeUser, isGalleryUpda
     var href = url.attr('path');
     var params = getFilterParameters(url, limit, offset, removeUser, removeObv, removeSort, isRegularSearch, removeParam);
     params['href'] = href;
+    params['base'] = url.attr('base');
     return params;
 }
 
@@ -696,8 +697,10 @@ function updateGallery(target, limit, offset, removeUser, isGalleryUpdate, remov
     isGalleryUpdate = (isGalleryUpdate == undefined)?true:isGalleryUpdate
     if(isGalleryUpdate)
     	params["isGalleryUpdate"] = isGalleryUpdate;
-    var href = params.href
+    var href = params.href;
+    var base = params.base;
     delete params["href"]
+    delete params["base"]
     var recursiveDecoded = decodeURIComponent($.param(params));
     
     var doc_url = href+'?'+recursiveDecoded;
@@ -729,7 +732,7 @@ function updateGallery(target, limit, offset, removeUser, isGalleryUpdate, remov
             updateMapView(params);
         }
     } else {
-        window.location = url.attr('base')+doc_url;
+        window.location = base+doc_url;
     }
 }
  
@@ -780,53 +783,6 @@ function refreshMapBounds() {
 function showMapView() {
     updateMapView(getUpdateGalleryParams(undefined, undefined, 0, undefined, window.params.isGalleryUpdate));
 }
-
- 
-function refreshMarkers(p) {
-    if(!p) p = new Array()
-
-    p['fetchField'] = "id,latitude,longitude,isChecklist,geoPrivacy";
-    p['max'] = -1;
-    delete p['bounds']
-    
-    var url = window.params.observation.listUrl+'?'+decodeURIComponent($.param(p));
-
-    if(markers)
-        markers.clearLayers();
-    else 
-        markers = new M.MarkerClusterGroup({maxClusterRadius:50});
-
-    $.ajax({
-        url: url,
-        dataType: "json",
-        success: function(data) {
-            for(var i=0; i<data.observationInstanceList.length; i++) {
-                var obv = data.observationInstanceList[i];
-                var latitude = obv[1];
-            	var longitude = obv[2];
-            	var icon;
-                
-                if(obv[4]){
-                	icon = obv[3]?geoPrivacyChecklistIcon:geoPrivacyPointIcon;
-                	latitude += data.geoPrivacyAdjust;
-                	longitude += data.geoPrivacyAdjust;
-                }else{
-                	icon = obv[3]?checklistIcon:pointIcon;
-                }
-                var marker = createMarker(latitude, longitude, {
-                    draggable: false,
-                    clusterable: true,
-                    icon:icon,
-                    clickable:load_content,
-                    data:{id:obv[0]}
-                });
-                if(marker) markers.addLayer(marker);
-            }
-            markers.addTo(map);
-        }
-    });
-}
-
 
 function refreshList(bounds){
     if (bounds !== undefined){

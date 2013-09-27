@@ -232,9 +232,9 @@
 						<g:if
 							test="${projectInstance.grantFrom || projectInstance.grantTo}">
 							<tr>
-								<td class="prop"><span class=" name">Grant Term</span></td>
+								<td class="prop"><span class=" name">Grant Term&nbsp;</span></td>
 								<td>
-									${projectInstance?.grantFrom} - ${projectInstance?.grantTo}
+									${projectInstance?.grantFrom?.format('dd/MM/yyyy')} - ${projectInstance?.grantTo?.format('dd/MM/yyyy')}
 								</td>
 							</tr>
 						</g:if>

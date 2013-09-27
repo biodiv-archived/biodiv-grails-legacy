@@ -158,6 +158,11 @@ class ObservationController {
 		return [observationInstanceList: observationInstanceList, instanceTotal: allObservationCount, checklistCount:checklistCount, observationCount: allObservationCount-checklistCount, speciesGroupCountList:filteredObservation.speciesGroupCountList, queryParams: queryParams, activeFilters:activeFilters, resultType:'observation', geoPrivacyAdjust:Utils.getRandomFloat()]
 	}
 	
+	def occurrences = {
+		log.debug params
+		def result = observationService.getObservationOccurences(params)
+		render result as JSON
+	}
 
 	@Secured(['ROLE_USER'])
 	def create = {
@@ -753,7 +758,7 @@ class ObservationController {
 			inGroupMap[(m.observation.id)] = m.inGroup == null ?'false':m.inGroup
 		}
 		
-		def model = [observationInstanceList: result.relatedObv.observations.observation, inGroupMap:inGroupMap, observationInstanceTotal: result.relatedObv.count, queryParams: [max:result.max], activeFilters:new HashMap(params), parentId:params.long('id'), filterProperty:params.filterProperty, initialParams:new HashMap(params)]
+		def model = [observationInstanceList: result.relatedObv.observations.observation, inGroupMap:inGroupMap, instanceTotal: result.relatedObv.count, queryParams: [max:result.max], activeFilters:new HashMap(params), parentId:params.long('id'), filterProperty:params.filterProperty, initialParams:new HashMap(params)]
 		render (view:'listRelated', model:model)
 	}
 
@@ -1129,7 +1134,8 @@ class ObservationController {
 	@Secured(['ROLE_USER'])
 	def getList = {
 		log.debug params;
-		render getObservationList(params) as JSON
+		def result = getObservationList(params)
+        render result as JSON
 	}
 	
 	@Secured(['ROLE_USER'])
@@ -1175,7 +1181,6 @@ class ObservationController {
 	def getUserImage = {
 		log.debug params;
 		render SUser.read(params.id.toLong()).icon() 
-		
 	}
 	
 	@Secured(['ROLE_USER'])
