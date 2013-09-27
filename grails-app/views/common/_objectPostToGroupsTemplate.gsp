@@ -2,7 +2,7 @@
   	<a href="#" onclick="$(this).next('.post-main-content').toggle(150);return false;">
   		<h5>Post to User Groups<span class="caret" style="margin-top: 8px;"></span></h5>
   	</a>
-  	<div class="post-main-content">
+  	<div class="post-main-content" >
        <div>
        		<g:if test="${isBulkPull}">
 		       	<div>

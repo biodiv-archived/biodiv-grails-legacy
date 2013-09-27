@@ -109,7 +109,7 @@ function updateGroupPostSelection(){
 	}
 }
 
-function getSelectedUserGroups() {
+function getSelectedUserGroups(){
     var userGroups = []; 
     $('.userGroups button[class~="btn-success"]').each (function() {
         userGroups.push($(this).attr('value'));

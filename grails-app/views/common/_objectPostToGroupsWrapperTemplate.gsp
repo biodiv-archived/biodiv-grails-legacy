@@ -1,5 +1,5 @@
 <uGroup:resourceInGroups
-		model="['observationInstance':observationInstance]" />
+		model="['observationInstance':observationInstance]"  />
 
 <div class="sidebar_section"
 	style="clear: both; overflow: hidden; border: 1px solid #CECECE;">
