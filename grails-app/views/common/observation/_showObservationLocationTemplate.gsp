@@ -89,8 +89,8 @@
 
             initArea(false, undefined, undefined, {icon:icon, layer:'Current Observation' });
             //HACK
-            //if(searchMarker)
-                //map.panTo(searchMarker.getLatLng());
+            if(searchMarker)
+                map.panTo(searchMarker.getLatLng());
 
             <g:if test="${!observationInstance.isChecklist}">
                 resetMap();
