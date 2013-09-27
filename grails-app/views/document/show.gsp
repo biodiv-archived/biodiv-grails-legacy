@@ -66,10 +66,16 @@
 
 
                 <div class="span8 right-shadow-box observation" style="margin:0;">
-                    		        <g:render template="/document/showDocument" model="['documentInstance':documentInstance, showDetails:true]"/>
+                    <g:render template="/document/showDocument" model="['documentInstance':documentInstance, showDetails:true]"/>
+                    <g:render template="/common/observation/showObservationStoryActionsTemplate"
+                                   model="['instance':documentInstance, 'href':canonicalUrl, 'title':title, 'description':description, 'showDetails':true,'hideDownload':true]" />
+
+                    <uGroup:featureUserGroups model="['observationInstance':documentInstance]"/>
+                    
+                    
 			<g:if
 				test="${documentInstance?.coverage?.speciesGroups || documentInstance.coverage?.habitats || documentInstance.coverage?.placeName }">
-
+                                
 				<div class="sidebar_section">
 					<a class="speciesFieldHeader" href="#coverageInfo"
 						data-toggle="collapse"><h5>Coverage Information</h5></a>
@@ -136,8 +142,7 @@
 				</div>
 
 			</g:if>
-
-			<div class="union-comment">
+                        			<div class="union-comment">
 				<feed:showAllActivityFeeds model="['rootHolder':documentInstance, feedType:'Specific', refreshType:'manual', 'feedPermission':'editable']" />
 				<comment:showAllComments model="['commentHolder':documentInstance, commentType:'super','showCommentList':false]" />
 			</div>

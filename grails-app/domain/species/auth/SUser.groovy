@@ -9,7 +9,7 @@ import species.Resource.ResourceType;
 import species.groups.UserGroup;
 import species.groups.UserGroupMemberRole;
 import species.participation.Observation;
-import species.participation.ObservationFlag;
+import species.participation.Flag;
 import species.participation.RecommendationVote;
 import species.participation.curation.UnCuratedVotes;
 import species.utils.ImageType;
@@ -48,7 +48,7 @@ class SUser {
 	boolean allowIdentifactionMail = true;
 
 
-	static hasMany = [openIds: OpenID, flags:ObservationFlag, unCuratedVotes:UnCuratedVotes, observations:Observation, recoVotes:RecommendationVote, groups:UserGroup, speciesGroups:SpeciesGroup, habitats:Habitat, documents:Document ]
+	static hasMany = [openIds: OpenID, flags:Flag, unCuratedVotes:UnCuratedVotes, observations:Observation, recoVotes:RecommendationVote, groups:UserGroup, speciesGroups:SpeciesGroup, habitats:Habitat, documents:Document ]
 	static belongsTo = [UserGroup]
 	//static hasOne = [facebookUser:FacebookUser]
 

@@ -7,6 +7,10 @@ import species.auth.SUser;
 import species.groups.UserGroup;
 import org.grails.taggable.Taggable;
 import org.grails.rateable.*
+import species.participation.Flag;
+import species.participation.Follow;
+import species.participation.Featured;
+
 /**
  * eml-literature module
  * http://knb.ecoinformatics.org/software/eml/eml-2.1.1/eml-literature.html
@@ -17,6 +21,8 @@ class Document implements Taggable, Rateable {
 	
 	def grailsApplication
 	def activityFeedService
+    def springSecurityService;
+
 	
 	public enum DocumentType {
 		Report("Report"),
@@ -37,7 +43,7 @@ class Document implements Taggable, Rateable {
 	}
 
 	DocumentType type
-
+    int flagCount = 0;
 
 	String title
 	SUser author;
@@ -102,8 +108,20 @@ class Document implements Taggable, Rateable {
 	static mapping = {
 		description type:"text"
 	}
-	
-	
+
+     List fetchAllFlags(){
+	    println "=============fLIST==========" 	
+        def fList = Flag.findAllWhere(objectId:this.id,objectType:this.class.getCanonicalName());
+        println "=============fLIST==========" 
+        println fList
+        return fList;
+	}
+
+    def boolean fetchIsFollowing(SUser user=springSecurityService.currentUser){
+		return Follow.fetchIsFollowing(this, user)
+	}
+
+
 	def getOwner() {
 		return author;
 	}

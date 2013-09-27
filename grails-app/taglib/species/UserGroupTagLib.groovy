@@ -11,6 +11,7 @@ import species.groups.UserGroupController;
 import species.groups.UserGroupMemberRole;
 import species.groups.UserGroupMemberRole.UserGroupMemberRoleType;
 import species.utils.Utils;
+import species.participation.Featured;
 
 class UserGroupTagLib {
 	static namespace = "uGroup";
@@ -152,6 +153,13 @@ class UserGroupTagLib {
 		out << render(template:"/common/userGroup/showGroupListTemplate", model:attrs.model);
 	}
 
+    def featureUserGroups = {attrs, body->
+        println "============sdvfsdfvsd=============="
+        println attrs.model
+		out << render(template:"/common/featureUserGroupsTemplate", model:attrs.model);
+	}
+
+
 	def showUserGroupFilterMessage = {attrs, body->
 		out << render(template:"/common/userGroup/showUserGroupFilterMsgTemplate", model:attrs.model);
 	}
@@ -220,6 +228,65 @@ class UserGroupTagLib {
 		}
 		out << render(template:"/common/userGroup/showCurrentUserUserGroupsTemplate", model:[userGroups:result]);
 	}
+
+    def getFeaturedUserGroups(id,type) {
+        println "=============== GET FEATURES ==============="
+        def f = Featured.findAllWhere(objectId: id, objectType: type);
+        //println "===============F List ==============="
+        //println f
+        List ug = f.collect{it.userGroup}
+        //println "=============== UG List ==============="
+        //println ug
+        return ug
+
+    }
+
+    def markFeaturedUserGroups = {attrs, body ->
+		println "=============== mark FEATURES ==============="
+        //println attrs.model.observationInstance
+        def user = springSecurityService.getCurrentUser();
+		def userGroups = userGroupService.getUserGroups(user);
+        List authorityUG = []
+        userGroups.each { ugroup ->
+            if(ugroup.isFounder(user) || ugroup.isExpert(user)){
+                authorityUG.add(ugroup)
+            }
+            
+        }
+        //println "==========authorityUG============"
+        //println authorityUG
+		def result = [:]
+		if(attrs.model.observationInstance) {
+            println "=============== INSIDE IF ==============="
+
+			//check if the obv already belongs to userGroup and disable the control for it not to submit again
+			def ug = getFeaturedUserGroups(attrs.model.observationInstance.id,attrs.model.observationInstance.class.getCanonicalName())
+            //println "==========UG from upper function============"
+            //println ug
+
+            def fUserGroups = ug.intersect(authorityUG)
+            //println "=============== fUserGroup LIst ==============="
+            //println fUserGroups
+			authorityUG.removeAll(fUserGroups);
+			fUserGroups.each {
+				result[it] = true;
+			}
+		}
+        else{
+            println "=============== ELSE IF ==============="
+
+        }
+
+		authorityUG.each {
+			result[it] = false;
+		}
+        //println "=============== RESULT ==============="
+
+        //println result
+		out << render(template:"/common/userGroup/showCurrentUserUserGroupsTemplate", model:[userGroups:result]);
+        println "%%%%%%%%%%%%%%%%%"
+	}
+    
 
 	def getCurrentUserUserGroupsSidebar = {attrs, body ->
 		def user = springSecurityService.getCurrentUser();

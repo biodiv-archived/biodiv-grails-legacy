@@ -1,8 +1,13 @@
 <r:script> 
 $(document).ready(function() {
+
+
+        url = "${uGroup.createLink(controller:controller, action:action, id:observationId, 'userGroup':userGroupInstance, 'userGroupWebaddress':userGroupWebaddress, 'instance':observationInstance)}"
+        console.log("URL")
+        console.log(url)
 	$('#carousel_${id}').jcarousel({
 		itemLoadCallback : itemLoadCallback,
-        url:"${uGroup.createLink(controller:controller, action:action, id:observationId, 'userGroup':userGroupInstance, 'userGroupWebaddress':userGroupWebaddress)}",
+        url:"${uGroup.createLink(controller:controller, action:action, id:observationId, 'userGroup':userGroupInstance, 'userGroupWebaddress':userGroupWebaddress, 'type':observationInstance.class.getCanonicalName())}",
         filterProperty:"${filterProperty}",
         filterPropertyValue:"${filterPropertyValue}",
         carouselDivId:"#carousel_" + "${id}",
@@ -11,8 +16,11 @@ $(document).ready(function() {
         itemFallbackDimension : window.params.carousel.maxWidth,
         contextFreeUrl:"${uGroup.createLink(controller:resultController?:controller, action:'show')}",
         contextGroupWebaddress:"${userGroupWebaddress}",
-        scroll:3    
-	});
+        scroll:3
+       
+        });
+
+
 
 /*	$('#carousel_${id} img').hover( function () {
     	$(this).append($("<span> ***</span>"));

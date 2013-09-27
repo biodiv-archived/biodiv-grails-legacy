@@ -19,6 +19,7 @@ import species.utils.Utils;
 import species.TaxonomyDefinition;
 import species.Resource.ResourceType;
 import species.auth.SUser;
+import species.participation.Featured;
 import species.groups.SpeciesGroup;
 import species.participation.ActivityFeed;
 import species.participation.Follow;
@@ -26,7 +27,7 @@ import species.participation.Observation;
 import species.participation.Checklists;
 import species.participation.Recommendation;
 import species.participation.RecommendationVote;
-import species.participation.ObservationFlag.FlagType
+import species.participation.Flag.FlagType
 import species.participation.RecommendationVote.ConfidenceType;
 import species.participation.Annotation
 import species.sourcehandler.XMLConverter;
@@ -231,13 +232,20 @@ class ObservationService {
 			relatedObv = getRelatedObservationBySpeciesName(params.id.toLong(), max, offset)
 		} else if(params.filterProperty == "speciesGroup"){
 			relatedObv = getRelatedObservationBySpeciesGroup(params.filterPropertyValue.toLong(),  max, offset)
-		}else if(params.filterProperty == "user"){
+		} else if(params.filterProperty == "featureBy") {
+            println "===========FILTER featureBy==========" +params.type
+            def ug = UserGroup.get(1)
+            relatedObv = getFeaturedObject(ug, max , offset,params.type)
+        } else if(params.filterProperty == "user"){
 			relatedObv = getRelatedObservationByUser(params.filterPropertyValue.toLong(), max, offset, params.sort)
-		}else if(params.filterProperty == "nearBy"){
+		} else if(params.filterProperty == "nearBy"){
+            println "===========FILTER nearBy=========="
+
 			relatedObv = getNearbyObservations(params.id, max, offset)
 		} else if(params.filterProperty == "taxonConcept") {
 			relatedObv = getRelatedObservationByTaxonConcept(params.filterPropertyValue.toLong(), max, offset)
-		} else{
+		}
+        else{
 			relatedObv = getRelatedObservation(params.filterProperty, params.id.toLong(), max, offset)
 		}
 		
@@ -270,6 +278,45 @@ class ObservationService {
 		}
 		return result
 	}
+    
+
+    Map getFeaturedObject(UserGroup ug, int limit, long offset, String type){
+
+
+        println "%%%%%%%%%%% FEATURED OBJECT ***************"
+        println ug
+        println "===================INSTANCE  =================" + type
+        def queryParams = ["ug": ug]
+        def countQuery = "select count(*) from Featured feat where feat.userGroup = :ug "
+		
+        def count = Featured.executeQuery(countQuery, queryParams)
+        
+        println "=====COUNT ++++++++++++=======  " + count[0]
+        queryParams["max"] = limit
+		queryParams["offset"] = offset
+        queryParams["type"] = type
+        def query = "from Featured feat where feat.userGroup = :ug and feat.objectType = :type "
+		def orderByClause = "order by feat.createdOn desc"
+		query += orderByClause
+    	
+        def featured = Featured.findAll(query, queryParams);
+        println "====== FEATURED LIST using query =========" + featured
+        def observations = []
+        featured.each{
+
+            println "TYPE CHECK %%%%%%%%%% " + it.objectType
+            observations.add(activityFeedService.getDomainObject(it.objectType,it.objectId))
+        }
+        println "+++++++++++++++" + observations
+        def result = []
+        observations.each {
+			result.add(['observation':it, 'title': "OBV Title"]);
+		}
+        println "========RESULT RETURNING=== " + result
+        return['observations':result,'count':count[0]]
+                		
+    }
+
 
 	/**
 	 * 
@@ -450,6 +497,7 @@ class ObservationService {
 	static List createUrlList2(observations){
 		def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 		String iconBasePath = config.speciesPortal.observations.serverURL
+        println "=======CREATE URL LIST ===" + observations +"   "+ iconBasePath
 		def urlList = createUrlList2(observations, iconBasePath)
 //		urlList.each {
 //			it.imageLink = it.imageLink.replaceFirst(/\.[a-zA-Z]{3,4}$/, config.speciesPortal.resources.images.thumbnail.suffix)
@@ -459,6 +507,7 @@ class ObservationService {
 	static List createUrlList2(observations, String iconBasePath){
 		List urlList = []
 		for(param in observations){
+            println "=====PARAM=========" + param
 			def item = [:];
             def controller = getTargetController(param['observation']);
 			item.url = "/" + controller + "/show/" + param['observation'].id
@@ -493,6 +542,7 @@ class ObservationService {
 	//XXX for new checklists doamin object and controller name is not same as grails convention so using this method 
 	// to resolve controller name
 	private static getTargetController(domainObj){
+        println "======DOMAIN OBJ====" + domainObj
 		if(domainObj.instanceOf(Checklists)){
 			return "checklist"
 		}else if(domainObj.instanceOf(SUser)){
@@ -949,7 +999,7 @@ class ObservationService {
 		def allObservationCountQuery = "select count(*) from Observation obv " + userGroupQuery +" "+((params.tag)?tagQuery:'')+filterQuery
 		
         def speciesGroupCountQuery = "select obv.group.name, count(*),(case when obv.maxVotedReco.id is not null  then 1 else 2 end) from Observation obv  "+ userGroupQuery +" "+((params.tag)?tagQuery:'')+filterQuery+ " and isChecklist=false group by obv.group.name,(case when obv.maxVotedReco.id is not null  then 1 else 2 end) order by obv.group.name desc";
-
+        println "===========SP COUNT QUERY=============" + speciesGroupCountQuery
 		return [query:query, allObservationCountQuery:allObservationCountQuery, checklistCountQuery:checklistCountQuery, distinctRecoQuery:distinctRecoQuery, distinctRecoCountQuery:distinctRecoCountQuery, speciesGroupCountQuery:speciesGroupCountQuery, filterQuery:filterQuery, orderByClause:orderByClause, queryParams:queryParams, activeFilters:activeFilters]
 
 	}

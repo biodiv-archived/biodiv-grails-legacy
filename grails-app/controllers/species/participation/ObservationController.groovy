@@ -19,7 +19,7 @@ import grails.converters.XML;
 import grails.plugins.springsecurity.Secured
 import grails.util.Environment;
 import species.participation.RecommendationVote.ConfidenceType
-import species.participation.ObservationFlag.FlagType
+import species.participation.Flag.FlagType
 import species.utils.ImageType;
 import species.utils.ImageUtils
 import species.utils.Utils;
@@ -34,6 +34,7 @@ import species.Resource.ResourceType;
 import species.auth.SUser;
 import org.apache.solr.common.SolrException;
 import org.apache.solr.common.util.NamedList
+import species.participation.Featured
 
 class ObservationController {
 	
@@ -178,6 +179,14 @@ class ObservationController {
 		} else {
 			redirect (url:uGroup.createLink(action:'create', controller:"observation", 'userGroupWebaddress':params.webaddress))
 		}
+	}
+
+    @Secured(['ROLE_USER'])
+	def flagDeleted = {
+        Featured.deleteFeatureOnObv(Observation.get(params.id.toLong()))
+		def result = observationService.delete(params)
+		flash.message = result.message
+		redirect (url:result.url)
 	}
 
 
@@ -762,10 +771,13 @@ class ObservationController {
 	 */
 	def getRelatedObservation = {
 		log.debug params;
+        println "==================RRRRRRRRRRRRRRRRRRRRRRRRRRRRRR==================="
 		def relatedObv = observationService.getRelatedObservations(params).relatedObv;
-		
+		println "%%%%%%%%%%%%%%  RELATED OBVS +++++++++++++++" + relatedObv
+
 		if(relatedObv) {
 			if(relatedObv.observations)
+                println "%%%%%%%%%%%%%%  IF mein IF +++++++++++++++"
 				relatedObv.observations = observationService.createUrlList2(relatedObv.observations);
 		} else {
 		}
@@ -778,71 +790,7 @@ class ObservationController {
 		render Tag.findAllByNameIlike("${params.term}%")*.name as JSON
 	}
 
-	@Secured(['ROLE_USER'])
-	def flagDeleted = {
-		def result = observationService.delete(params)
-		flash.message = result.message
-		redirect (url:result.url)
-	}
-
-	@Secured(['ROLE_USER'])
-	def flagObservation = {
-		log.debug params;
-		params.author = springSecurityService.currentUser;
-		def obv = Observation.get(params.id.toLong())
-		FlagType flag = observationService.getObservationFlagType(params.obvFlag?:FlagType.OBV_INAPPROPRIATE.name());
-		def observationFlagInstance = ObservationFlag.findByObservationAndAuthor(obv, params.author)
-		if (!observationFlagInstance) {
-			try {
-				observationFlagInstance = new ObservationFlag(observation:obv, author: params.author, flag:flag, notes:params.notes)
-				observationFlagInstance.save(flush: true)
-				obv.flagCount++
-				obv.save(flush:true)
-				activityFeedService.addActivityFeed(obv, observationFlagInstance, observationFlagInstance.author, activityFeedService.OBSERVATION_FLAGGED);
-				
-				observationsSearchService.publishSearchIndex(obv, COMMIT);
-				
-				observationService.sendNotificationMail(observationService.OBSERVATION_FLAGGED, obv, request, params.webaddress)
-				flash.message = "${message(code: 'observation.flag.added', default: 'Observation flag added')}"
-			}
-			catch (org.springframework.dao.DataIntegrityViolationException e) {
-				flash.message = "${message(code: 'observation.flag.error', default: 'Error during addition of flag')}"
-			}
-		}
-		else {
-			flash.message  = "${message(code: 'observation.flag.duplicate', default:'Already flagged')}"
-		}
-		redirect (url:uGroup.createLink(action:'show', controller:"observation", id: params.id, 'userGroupWebaddress':params.webaddress))
-		//redirect(action: "show", id: params.id)
-	}
-
-	@Secured(['ROLE_USER'])
-	def deleteObvFlag = {
-		log.debug params;
-		def obvFlag = ObservationFlag.get(params.id.toLong());
-		def obv = Observation.get(params.obvId.toLong());
-
-		if(!obvFlag){
-			//response.setStatus(500);
-			//def message = [info: g.message(code: 'observation.flag.alreadytDeleted', default:'Flag already deleted')];
-			render obv.flagCount;
-			return
-		}
-		try {
-			obvFlag.delete(flush: true);
-			obv.flagCount--;
-			obv.save(flush:true)
-			observationsSearchService.publishSearchIndex(obv, COMMIT);
-			render obv.flagCount;
-			return;
-		}catch (Exception e) {
-			e.printStackTrace();
-			response.setStatus(500);
-			def message = [error: g.message(code: 'observation.flag.error.onDelete', default:'Error on deleting observation flag')];
-			render message as JSON
-		}
-	}
-	
+		
 	@Secured(['ROLE_USER'])
 	def deleteRecoVoteComment = {
 		log.debug params;

@@ -76,7 +76,7 @@ class Observation extends Metadata implements Taggable, Rateable {
 	//column to store checklist key value pair in serialized object
 	String checklistAnnotations;
     
-	static hasMany = [resource:Resource, recommendationVote:RecommendationVote, obvFlags:ObservationFlag, userGroups:UserGroup, annotations:Annotation];
+	static hasMany = [resource:Resource, recommendationVote:RecommendationVote, userGroups:UserGroup, annotations:Annotation];
 	static belongsTo = [SUser, UserGroup, Checklists]
 
 	static constraints = {
@@ -302,11 +302,15 @@ class Observation extends Metadata implements Taggable, Rateable {
 	public static int getCountForGroup(groupId){
 		return Observation.executeQuery("select count(*) from Observation obv where obv.group.id = :groupId ", [groupId: groupId])[0]
 	}
-
-	List fetchAllFlags(){
-		return ObservationFlag.findAllWhere(observation:this);
+ 
+    List fetchAllFlags(){
+	    println "=============fLIST==========" 	
+        def fList = Flag.findAllWhere(objectId:this.id,objectType:this.class.getCanonicalName());
+        println "=============fLIST==========" 
+        println fList
+        return fList;
 	}
-
+	
 	private updateObservationTimeStamp(){
 		lastRevised = new Date();
 		saveConcurrently();

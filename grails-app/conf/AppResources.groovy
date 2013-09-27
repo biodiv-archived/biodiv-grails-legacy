@@ -71,6 +71,8 @@ modules = {
 		resource url:'/js/jquery.tablesorter.js'
 		resource url:'/js/bootstrap-editable.min.js'
 		resource url:'/js/species/posting.js'
+        resource url:'/js/feature.js'
+        resource url:'/js/flag.js'
 	}
 
 	auth {

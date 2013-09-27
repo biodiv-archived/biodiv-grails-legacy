@@ -15,6 +15,7 @@ import species.participation.Follow;
 import groovy.sql.Sql;
 import grails.util.GrailsNameUtils;
 import org.grails.rateable.*
+import species.participation.Flag;
 
 class Species implements Rateable {
 
@@ -23,7 +24,8 @@ class Species implements Rateable {
 	TaxonomyDefinition taxonConcept;
 	Resource reprImage;
 	Float percentOfInfo; 
-	Date updatedOn;
+	int flagCount = 0;
+    Date updatedOn;
 	Date createdOn = new Date();
 	Date dateCreated;
 	Date lastUpdated;
@@ -101,6 +103,10 @@ class Species implements Rateable {
             []
         }
     }
+
+    List fetchAllFlags(){
+		return Flag.findAllWhere(objectId:this.id,objectType:this.class.getCanonicalName());
+	}
 
 	List<Resource> getIcons() {
 		def icons = new ArrayList<Resource>();
