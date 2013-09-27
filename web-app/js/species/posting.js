@@ -11,7 +11,6 @@ function updateObjSelection(id, comp){
 		}else{
 			selectedObjects.splice(array.indexOf(id), 1);	
 		}
-		console.log("remove item " + selectedObjects);
 	}else{
 		$(comp).addClass('selectedItem');
 		if($('.post-to-groups .select-all').hasClass('active')){
@@ -19,7 +18,6 @@ function updateObjSelection(id, comp){
 		}else{
 			selectedObjects.push(id);	
 		}
-		console.log("add item " + selectedObjects);
 	}
 }
 
@@ -34,7 +32,6 @@ function updateListSelection(comp){
 			//$('.snippet.tablet .figure .mouseover').removeClass('mouseover').addClass('mouseoverfix');
 			//$('.snippet.tablet .figure .mouseoverfix').show();
 			rejectedObjects = new Array();
-			console.log("select all");
 		}
 	}else{
 		$('.post-to-groups .select-all').removeClass('active')
@@ -43,7 +40,6 @@ function updateListSelection(comp){
 		//$('.snippet.tablet .figure .mouseoverfix').removeClass('mouseoverfix').addClass('mouseover');
 		//$('.snippet.tablet .figure .mouseover').hide();
 		$('.mainContentList .selectable input[type="checkbox"]').prop('checked', false);
-		console.log("reset all");
 	}
 }
 
@@ -55,7 +51,6 @@ function submitToGroups(submitType, objectType, url, isBulkPull, id=null){
 		}	
 	}else{
 		selectedObjects = rejectedObjects = [id];
-		console.log(" adding or removing " + id);
 	}
 	
 	userGroups = getSelectedUserGroups();
@@ -64,11 +59,11 @@ function submitToGroups(submitType, objectType, url, isBulkPull, id=null){
 		return; 
 	}
 	
-	if(submitType === 'post'){
-		console.log("posting " + selectedObjects +  ' on groups ' + userGroups);
-	}else{
-		console.log("unposting " + selectedObjects +  ' on groups ' + userGroups);
-	}
+//	if(submitType === 'post'){
+//		console.log("posting " + selectedObjects +  ' on groups ' + userGroups);
+//	}else{
+//		console.log("unposting " + selectedObjects +  ' on groups ' + userGroups);
+//	}
 	
 	var pullType = (isBulkPull) ? 'bulk' : 'single'
 	var selectionType = $('.post-to-groups .select-all').hasClass('active') ? 'selectAll' : 'reset'
