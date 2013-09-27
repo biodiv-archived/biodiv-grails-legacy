@@ -10,7 +10,7 @@ import org.imgscalr.*;
 import java.awt.color.CMMException;
 import java.util.HashMap;
 import javax.imageio.IIOException;
-
+import net.sf.jmimemagic.Magic;
 
 import org.apache.commons.logging.LogFactory;
 
@@ -113,8 +113,7 @@ class ImageUtils {
     public static void doResize(File inImg, File outImg, int width, int height) throws Exception{
         String fileName = inImg.getAbsolutePath();
 		//System.out.println(fileName);
-		String ext = Utils.getCleanFileExtension(fileName);
-        ext = ext?ext.toLowerCase():'jpg';
+		String ext = checkMIME(inImg);
         BufferedImage im = null;
         try{       
             im = ImageIO.read(inImg);
@@ -173,6 +172,20 @@ class ImageUtils {
 		//			//System.out.println(e.getMessage());
 		//		}
         //}
+	}
+
+    private static String checkMIME(File inImg) {
+		String mimeType = "";
+		try {
+			mimeType = Magic.getMagicMatch(inImg, false).getMimeType();
+		} catch (Exception e){
+            e.printStackTrace();
+            mimeType = "image/jpg";
+		
+        } 
+       		mimeType = mimeType.split("/")[1];
+			return mimeType;
+		
 	}
 
 	/**
