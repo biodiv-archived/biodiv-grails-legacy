@@ -34,7 +34,7 @@
 		</div>
 		
 		<div class="span4">
-			<div class="sidebar_section" style="clear:both;overflow:hidden;display:none;border:1px solid #CECECE;">
+			<div class="sidebar_section" style="clear:both;overflow:hidden;border:1px solid #CECECE;">
                  	<uGroup:objectPostToGroups model="['objectType':Document.class.canonicalName, userGroup:params.userGroup, canPullResource:canPullResource]"/>
             </div>
       	</div>

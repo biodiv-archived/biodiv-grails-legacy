@@ -136,17 +136,14 @@
 				</div>
 
 			</g:if>
-
+			<uGroup:objectPostToGroupsWrapper 
+				model="['observationInstance':documentInstance]" />
 			<div class="union-comment">
 				<feed:showAllActivityFeeds model="['rootHolder':documentInstance, feedType:'Specific', refreshType:'manual', 'feedPermission':'editable']" />
 				<comment:showAllComments model="['commentHolder':documentInstance, commentType:'super','showCommentList':false]" />
 			</div>
 		</div>
 		<g:render template="/document/documentSidebar" model="['documentInstance':documentInstance]"/>
-		<div class="span4">
-			<uGroup:objectPostToGroupsWrapper 
-				model="['observationInstance':documentInstance]" />
-		</div>
 	</div>
 
 </body>

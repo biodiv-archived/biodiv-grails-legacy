@@ -78,7 +78,7 @@
                             <obv:showObservationsList  model="['totalObservationInstanceList':totalObservationInstanceList, 'observationInstanceList':observationInstanceList, 'instanceTotal':instanceTotal, 'queryParams':queryParams, 'activeFilters':activeFilters, 'userGroup':userGroup, canPullResource:canPullResource]"  />
                         </div>
                         <div class="span4" style="position:relative;top:20px">
-                 <div class="sidebar_section" style="clear:both;overflow:hidden;display:none;border:1px solid #CECECE;">
+                 <div class="sidebar_section" style="clear:both;overflow:hidden;border:1px solid #CECECE;">
                  	<uGroup:objectPostToGroups model="['objectType':Observation.class.canonicalName, userGroup:params.userGroup, canPullResource:canPullResource]"/>
                  </div>       
 				<div id="observations_list_map" class="observation sidebar_section"

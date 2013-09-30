@@ -2189,7 +2189,9 @@ div.noOfRatings {
 .icon-group-gray:hover {
         background-image: url('../images/glyphicons_043_group_white.png');
 } 
-
+.resource_in_groups .sidebar_section {
+	margin-bottom: 0px;
+}
 /* .selectable { */
 /*     background: url("../images/icons/plus.png") no-repeat scroll 50% 50% transparent; */
 /*     background-color: transparent; */

@@ -34,7 +34,7 @@
 						<sUser:isAdmin>
 							<s:showDownloadAction model="['source':'Species', 'requestObject':request ]" />
 						</sUser:isAdmin>
-						<div class="sidebar_section" style="clear:both;overflow:hidden;display:none;border:1px solid #CECECE;">
+						<div class="sidebar_section" style="clear:both;overflow:hidden;border:1px solid #CECECE;">
 							<uGroup:objectPostToGroups model="['objectType':Species.class.canonicalName, userGroup:params.userGroup, canPullResource:canPullResource]"/>
 						</div>	 
 						<div class="observations_list_wrapper" style="top: 0px;">

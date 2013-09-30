@@ -2,7 +2,8 @@ var selectedObjects = new Array();
 var rejectedObjects = new Array();
 
 function updateObjSelection(id, comp){
-	$('.post-to-groups').parent().slideDown(1000);
+	$('.post-to-groups .post-main-content').show(1000);
+	//$('.post-to-groups').parent().slideDown(1000);
 	$(comp).parent().removeClass('mouseover').addClass('mouseoverfix');
 	if($(comp).hasClass('selectedItem')){
 		$(comp).removeClass('selectedItem');
@@ -43,7 +44,7 @@ function updateListSelection(comp){
 	}
 }
 
-function submitToGroups(submitType, objectType, url, isBulkPull, id=null){
+function submitToGroups(submitType, objectType, url, isBulkPull, id){
 	if(isBulkPull){
 		if(!$('.post-to-groups .select-all').hasClass('active') && selectedObjects.length === 0){
 			alert('Please select at least one object');
