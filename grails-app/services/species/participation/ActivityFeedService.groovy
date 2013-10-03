@@ -354,13 +354,13 @@ class ActivityFeedService {
 			int oldCount = resCountMap.get(r.class.canonicalName)?:0
 			resCountMap.put(r.class.canonicalName, ++oldCount)
 			if(isShowable){
-				observationService.sendNotificationMail(activityType, r, null, null, af){
+				observationService.sendNotificationMail(activityType, r, null, null, af)
 			}
 		}
 		if(isBulkPull){
 			def description = getDescriptionForBulkResourcePull(isPost, resCountMap)
 			def af = addActivityFeed(ug, ug, author, activityType, description, true)
-			observationService.sendNotificationMail(activityType, ug, null, null, af){
+			observationService.sendNotificationMail(activityType, ug, null, null, af)
 		} 
 	}
 	
@@ -402,5 +402,5 @@ class ActivityFeedService {
 		}
 		desc +=  isPost ? " to group" : " from group"
 		return desc
-	}
+	}	
 }
