@@ -87,9 +87,10 @@ function submitToGroups(submitType, objectType, url, isBulkPull, id){
 				$(".alertMsg").removeClass('alert alert-success').addClass('alert alert-error').html(data.msg);
 				$("html, body").animate({ scrollTop: 0 });
 			}
+			updateFeeds();
 			return false;
 		}, error: function(xhr, status, error) {
-			alert(xhr.responseText);
+			console.log(xhr.responseText);
 	   	}
 	});
 }
@@ -113,4 +114,8 @@ function getSelectedUserGroups(){
     return userGroups;	
 }
 
+function reInitializeGroupPost(){
+	var selectedObjects = new Array();
+	var rejectedObjects = new Array();
+}
 

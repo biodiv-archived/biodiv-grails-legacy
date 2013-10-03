@@ -669,6 +669,7 @@ function updateListPage(activeTag) {
         updateDistinctRecoTable();
         setActiveTag(activeTag);
         updateDownloadBox(data.instanceTotal);
+        reInitializeGroupPost();
         updateRelativeTime();
         last_actions();
         eatCookies();			

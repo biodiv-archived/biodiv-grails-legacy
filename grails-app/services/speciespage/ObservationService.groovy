@@ -1592,43 +1592,44 @@ class ObservationService {
 				toUsers.addAll(getParticipants(obv))
 				break
 			
-			case activityFeedService.OBSERVATION_POSTED_ON_GROUP:
-				mailSubject = conf.ui.observationPostedToGroup.emailSubject
+			case [activityFeedService.RESOURCE_POSTED_ON_GROUP,  activityFeedService.RESOURCE_REMOVED_FROM_GROUP]:
+				mailSubject = "Resource posted on group"
 				bodyView = "/emailtemplates/addObservation"
 				populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
-				templateMap["actionObject"] = 'observation'
+				templateMap["actionObject"] = 'usergroup'
+				templateMap['message'] = feedInstance.activityDescrption
 				templateMap["groupNameWithlink"] = activityFeedService.getUserGroupHyperLink(activityFeedService.getDomainObject(feedInstance.activityHolderType, feedInstance.activityHolderId))
 				toUsers.addAll(getParticipants(obv))
 				break
 
-			case activityFeedService.OBSERVATION_REMOVED_FROM_GROUP:
-				bodyView = "/emailtemplates/addObservation"
-				mailSubject = conf.ui.observationRemovedFromGroup.emailSubject
-				populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
-				templateMap["actionObject"] = 'observation'
-				templateMap["groupNameWithlink"] = activityFeedService.getUserGroupHyperLink(activityFeedService.getDomainObject(feedInstance.activityHolderType, feedInstance.activityHolderId))
-				toUsers.addAll(getParticipants(obv))
-				break
-
-			case activityFeedService.CHECKLIST_POSTED_ON_GROUP:
-				mailSubject = conf.ui.checklistPostedToGroup.emailSubject
-				bodyContent = conf.ui.checklistPostedToGroup.emailBody
-				templateMap["actionObject"] = 'checklist'
-				templateMap["actorProfileUrl"] = generateLink("SUser", "show", ["id": feedInstance.author.id], request)
-				templateMap["actorName"] = feedInstance.author.name
-				templateMap["groupNameWithlink"] = activityFeedService.getUserGroupHyperLink(activityFeedService.getDomainObject(feedInstance.activityHolderType, feedInstance.activityHolderId))
-				toUsers.addAll(getParticipants(obv))
-				break
-
-			case activityFeedService.CHECKLIST_REMOVED_FROM_GROUP:
-				mailSubject = conf.ui.checklistRemovedFromGroup.emailSubject
-				bodyContent = conf.ui.checklistRemovedFromGroup.emailBody
-				templateMap["actionObject"] = 'checklist'
-				templateMap["actorProfileUrl"] = generateLink("SUser", "show", ["id": feedInstance.author.id], request)
-				templateMap["actorName"] = feedInstance.author.name
-				templateMap["groupNameWithlink"] = activityFeedService.getUserGroupHyperLink(activityFeedService.getDomainObject(feedInstance.activityHolderType, feedInstance.activityHolderId))
-				toUsers.addAll(getParticipants(obv))
-				break
+//			case activityFeedService.OBSERVATION_REMOVED_FROM_GROUP:
+//				bodyView = "/emailtemplates/addObservation"
+//				mailSubject = conf.ui.observationRemovedFromGroup.emailSubject
+//				populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
+//				templateMap["actionObject"] = 'observation'
+//				templateMap["groupNameWithlink"] = activityFeedService.getUserGroupHyperLink(activityFeedService.getDomainObject(feedInstance.activityHolderType, feedInstance.activityHolderId))
+//				toUsers.addAll(getParticipants(obv))
+//				break
+//
+//			case activityFeedService.CHECKLIST_POSTED_ON_GROUP:
+//				mailSubject = conf.ui.checklistPostedToGroup.emailSubject
+//				bodyContent = conf.ui.checklistPostedToGroup.emailBody
+//				templateMap["actionObject"] = 'checklist'
+//				templateMap["actorProfileUrl"] = generateLink("SUser", "show", ["id": feedInstance.author.id], request)
+//				templateMap["actorName"] = feedInstance.author.name
+//				templateMap["groupNameWithlink"] = activityFeedService.getUserGroupHyperLink(activityFeedService.getDomainObject(feedInstance.activityHolderType, feedInstance.activityHolderId))
+//				toUsers.addAll(getParticipants(obv))
+//				break
+//
+//			case activityFeedService.CHECKLIST_REMOVED_FROM_GROUP:
+//				mailSubject = conf.ui.checklistRemovedFromGroup.emailSubject
+//				bodyContent = conf.ui.checklistRemovedFromGroup.emailBody
+//				templateMap["actionObject"] = 'checklist'
+//				templateMap["actorProfileUrl"] = generateLink("SUser", "show", ["id": feedInstance.author.id], request)
+//				templateMap["actorName"] = feedInstance.author.name
+//				templateMap["groupNameWithlink"] = activityFeedService.getUserGroupHyperLink(activityFeedService.getDomainObject(feedInstance.activityHolderType, feedInstance.activityHolderId))
+//				toUsers.addAll(getParticipants(obv))
+//				break
 
 			case activityFeedService.COMMENT_ADDED:				
 				bodyView = "/emailtemplates/addObservation"

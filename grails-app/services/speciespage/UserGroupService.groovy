@@ -7,6 +7,7 @@ import java.util.Map;
 import content.eml.Document
 import grails.plugins.springsecurity.Secured;
 import groovy.sql.Sql;
+import groovy.util.Eval;
 
 import org.apache.solr.common.SolrException;
 import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
@@ -425,8 +426,7 @@ class UserGroupService {
 			log.error "Could not add ${observation} to ${usergroup}"
 			log.error  userGroup.errors.allErrors.each { log.error it }
 		} else {
-			def feedType = observation.instanceOf(Checklists) ? activityFeedService.CHECKLIST_POSTED_ON_GROUP :activityFeedService.OBSERVATION_POSTED_ON_GROUP 
-			def activityFeed = activityFeedService.addActivityFeed(observation, userGroup, observation.author, feedType);
+			activityFeedService.addFeedOnGroupResoucePull(observation, userGroup, observation.author, true);
 			//observationService.sendNotificationMail(activityFeedService.OBSERVATION_POSTED_ON_GROUP, observation, null, null, activityFeed);
 			log.debug "Added ${observation} to userGroup ${userGroup}"
 		}
@@ -452,8 +452,7 @@ class UserGroupService {
 			log.error "Could not remove ${observation} from ${usergroup}"
 			log.error  userGroup.errors.allErrors.each { log.error it }
 		} else {
-			def feedType = observation.instanceOf(Checklists) ? activityFeedService.CHECKLIST_REMOVED_FROM_GROUP : activityFeedService.OBSERVATION_REMOVED_FROM_GROUP
-			def activityFeed = activityFeedService.addActivityFeed(observation, userGroup, observation.author, feedType);
+			activityFeedService.addFeedOnGroupResoucePull(observation, userGroup, observation.author, false);
 			//observationService.sendNotificationMail(activityFeedService.OBSERVATION_REMOVED_FROM_GROUP, observation, null, null, activityFeed);
 			log.debug "Removed ${observation} from userGroup ${userGroup}"
 		}
@@ -1095,7 +1094,7 @@ class UserGroupService {
 			log.error "Could not add ${document} to ${usergroup}"
 			log.error  userGroup.errors.allErrors.each { log.error it }
 		} else {
-			//activityFeedService.addActivityFeed(document, userGroup, document.author, activityFeedService.OBSERVATION_POSTED_ON_GROUP);
+			activityFeedService.addFeedOnGroupResoucePull(document, userGroup, document.author, true);
 			log.debug "Added ${document} to userGroup ${userGroup}"
 		}
 	}
@@ -1120,7 +1119,7 @@ class UserGroupService {
 			log.error "Could not remove ${document} from ${usergroup}"
 			log.error  userGroup.errors.allErrors.each { log.error it }
 		} else {
-			//activityFeedService.addActivityFeed(document, userGroup, document.author, activityFeedService.OBSERVATION_REMOVED_FROM_GROUP);
+			activityFeedService.addFeedOnGroupResoucePull(document, userGroup, document.author, false);
 			log.debug "Removed ${document} from userGroup ${userGroup}"
 		}
 	}
@@ -1169,7 +1168,7 @@ class UserGroupService {
 			log.error "Could not add ${project} to ${usergroup}"
 			log.error  userGroup.errors.allErrors.each { log.error it }
 		} else {
-			//activityFeedService.addActivityFeed(document, userGroup, document.author, activityFeedService.OBSERVATION_POSTED_ON_GROUP);
+			//activityFeedService.addFeedOnGroupResoucePull(project, userGroup, project.author, true);
 			log.debug "Added ${project} to userGroup ${userGroup}"
 		}
 	}
@@ -1194,7 +1193,7 @@ class UserGroupService {
 			log.error "Could not remove ${project} from ${usergroup}"
 			log.error  userGroup.errors.allErrors.each { log.error it }
 		} else {
-			//activityFeedService.addActivityFeed(document, userGroup, document.author, activityFeedService.OBSERVATION_REMOVED_FROM_GROUP);
+			//activityFeedService.addFeedOnGroupResoucePull(project, userGroup, project.author, false);
 			log.debug "Removed ${project} from userGroup ${userGroup}"
 		}
 	}
@@ -1220,111 +1219,6 @@ class UserGroupService {
 	////////////////////////////////////// Bulk posting ////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////
 	
-	private getObservationListForPost(params){
-		def filterUrl = new URL(params.filterUrl)
-		def paramsMap = Utils.getQueryMap(filterUrl)
-		String action = filterUrl.getPath().split("/")[2]
-		return observationService.getObservationList(paramsMap, action)
-	}
-	
-	private getSpeciesListForPost(params){
-		def filterUrl = new URL(params.filterUrl)
-		def paramsMap = Utils.getQueryMap(filterUrl)
-		paramsMap.offset = 0
-		String action = filterUrl.getPath().split("/")[2]
-		return speciesService.getSpeciesList(paramsMap, action, true).speciesInstanceList
-	}
-	
-	private updateSpeciesOnGroup(params, groups, obvs){
-		if(params.pullType == 'bulk' && params.selectionType == 'selectAll'){
-			List newList = getSpeciesListForPost(params)
-			newList.removeAll(obvs)
-			obvs = newList
-		}
-		
-		println "============ " +  obvs.size()
-		println "============== " + groups
-		UserGroup.withTransaction(){
-			groups.each { ug ->
-				if(params.submitType == 'post'){
-					obvs.removeAll(ug.species)
-					println "==for group========== " +  obvs.size()
-					obvs.each { obv ->
-						ug.addToSpecies(obv)
-					}
-				}else{
-					obvs.each { obv ->
-						ug.removeFromSpecies(obv)
-					}
-				}
-				if(!ug.save()){
-					ug.errors.allErrors.each { log.error it }
-				}
-			}
-		}
-	}
-
-	private updateDocumentOnGroup(params, groups, obvs){
-		if(params.pullType == 'bulk' && params.selectionType == 'selectAll'){
-			def filterUrl = new URL(params.filterUrl)
-			def paramsMap = Utils.getQueryMap(filterUrl)
-			paramsMap.offset = 0
-			List newList = new Document().fetchList(paramsMap, -1, -1, true).documentInstanceList
-			newList.removeAll(obvs)
-			obvs = newList
-		}
-		
-		println "============ " +  obvs.size()
-		println "============== " + groups
-		UserGroup.withTransaction(){
-			groups.each { ug ->
-				if(params.submitType == 'post'){
-					obvs.removeAll(ug.documents)
-					println "==for group========== " +  obvs.size()
-					obvs.each { obv ->
-						ug.addToDocuments(obv)
-					}
-				}else{
-					obvs.each { obv ->
-						ug.removeFromDocuments(obv)
-					}
-				}
-				if(!ug.save()){
-					ug.errors.allErrors.each { log.error it }
-				}
-			}
-		}
-	}
-
-	private updateObservationOnGroup(params, groups, obvs){
-		if(params.pullType == 'bulk' && params.selectionType == 'selectAll'){
-			List newList = getObservationListForPost(params)
-			newList.removeAll(obvs)
-			obvs = newList
-		}
-		
-		println "============ " +  obvs.size()
-		println "============== " + groups
-		UserGroup.withTransaction(){
-			groups.each { ug ->
-				if(params.submitType == 'post'){
-					obvs.removeAll(ug.observations)
-					println "==for group========== " +  obvs.size()
-					obvs.each { obv ->
-						ug.addToObservations(obv)
-					}
-				}else{
-					obvs.each { obv ->
-						ug.removeFromObservations(obv)
-					}
-				}
-				if(!ug.save()){
-					ug.errors.allErrors.each { log.error it }
-				}
-			}
-		}
-	}
-	
 	def updateResourceOnGroup(params){
 		def r = [:]
 		try{
@@ -1339,22 +1233,34 @@ class UserGroupService {
 			}
 			r['resourceObj'] = (params.pullType == 'single')? obvs[0]:null
 			
+			String submitType = params.submitType
 			String objectType = params.objectType
+			String groupRes = ""
+			String functionString = ""
+			String listFunction
 			switch (objectType) {
 				case Observation.class.getCanonicalName():
-					updateObservationOnGroup(params, groups, obvs)
+					listFunction = 'getObservationListForPost'
+					groupRes += 'observations'
+					functionString += (submitType == 'post')? 'addToObservations' : 'removeFromObservations'
 					break
 				case Species.class.getCanonicalName():
-					updateSpeciesOnGroup(params, groups, obvs)
+					listFunction = 'getSpeciesListForPost'
+					groupRes += 'species'
+					functionString += (submitType == 'post')? 'addToSpecies' : 'removeFromSpecies'
 					break
 				case Document.class.getCanonicalName():
-					updateDocumentOnGroup(params, groups, obvs)
+					listFunction = 'getDocumentListForPost'
+					groupRes += 'documents'
+					functionString += (submitType == 'post')? 'addToDocuments' : 'removeFromDocuments'
 					break
 				default:
 					break
 			}
+			
+			new ResourceUpdate().updateResourceOnGroup(params, groups, obvs, listFunction, groupRes, functionString)
 			r['success'] = true
-			r['msgCode']=  (params.submitType == 'post') ? 'userGroup.default.multiple.posting.success' : 'userGroup.default.multiple.unposting.success'
+			r['msgCode']=  (submitType == 'post') ? 'userGroup.default.multiple.posting.success' : 'userGroup.default.multiple.unposting.success'
 		}catch (Exception e) {
 			e.printStackTrace()
 			r['success'] = false
@@ -1363,15 +1269,13 @@ class UserGroupService {
 		return r
 	}
 	
-	
-	
 	def boolean getResourcePullPermission(params, isBulkPull=true){
 		if(!springSecurityService.isLoggedIn()){
 			return false
 		}
 		
 		SUser currUser = springSecurityService.currentUser;
-		int groupCount = UserGroupMemberRole.countBySUser(currUser) 
+		int groupCount = UserGroupMemberRole.countBySUser(currUser)
 		if(groupCount == 0){
 			return false
 		}
@@ -1379,9 +1283,67 @@ class UserGroupService {
 		if(!isBulkPull && !params.controller == 'species'){
 			return true
 		}
-		//if user is founder or expert in any group then retruing true permission for bulk upload 
+		//if user is founder or expert in any group then retruing true permission for bulk upload
 		//on list apge of any resource (i.e. obv, species, docs)
 		return currUser.fetchIsFounderOrExpert()
+	}
+	
+	
+	private class  ResourceUpdate {
+	
+		def getObservationListForPost(params){
+			def filterUrl = new URL(params.filterUrl)
+			def paramsMap = Utils.getQueryMap(filterUrl)
+			String action = filterUrl.getPath().split("/")[2]
+			return observationService.getObservationList(paramsMap, action)
+		}
+		
+		def getSpeciesListForPost(params){
+			def filterUrl = new URL(params.filterUrl)
+			def paramsMap = Utils.getQueryMap(filterUrl)
+			paramsMap.offset = 0
+			String action = filterUrl.getPath().split("/")[2]
+			return speciesService.getSpeciesList(paramsMap, action, true).speciesInstanceList
+		}
+		
+		def getDocumentListForPost(params){
+			def filterUrl = new URL(params.filterUrl)
+			def paramsMap = Utils.getQueryMap(filterUrl)
+			paramsMap.offset = 0
+			return new Document().fetchList(paramsMap, -1, -1, true).documentInstanceList
+		}
+		
+		
+		def updateResourceOnGroup(params, groups, allObvs, listFunction, groupRes, updateFunction){
+			if(params.pullType == 'bulk' && params.selectionType == 'selectAll'){
+				List newList = Eval.xy(this, params, 'x.' + listFunction + '(y)')
+				newList.removeAll(allObvs)
+				allObvs = newList
+			}
+			
+			println "======= All Resouces " +  allObvs.size()
+			println "========All Groups " + groups
+			UserGroup.withTransaction(){
+				def obvs = new ArrayList(allObvs)
+				groups.each { UserGroup ug ->
+					if(params.submitType == 'post'){
+						obvs.removeAll(Eval.x(ug, 'x.' + groupRes))
+					}else{
+						obvs.retainAll(Eval.x(ug, 'x.' + groupRes))
+					}
+					println "== for group ==== ====== " + ug + "  resources size " +  obvs.size()
+					obvs.each { obv ->
+						Eval.xy(ug, obv,  'x.' + updateFunction + '(y)')
+					}
+					if(!ug.save()){
+						ug.errors.allErrors.each { println it }
+					}else{
+						//adding feed for each resource with isShowable = false flag
+						activityFeedService.addFeedOnGroupResoucePull(obvs, ug, springSecurityService.currentUser,params.submitType == 'post' ? true: false, false, params.pullType == 'bulk'?true:false)
+					}
+				}
+			}
+		}
 	}
 
 }

@@ -15,6 +15,7 @@ import content.eml.Document
 import species.groups.UserGroup
 import grails.converters.JSON
 import species.auth.*;
+import groovy.util.Eval;
 
 def addDrupalId(){
 	def checklistUtilService = ctx.getBean("checklistUtilService");
@@ -59,5 +60,17 @@ def addUserRegistrationFeed(){
 	m.autoTimestamp = true
 }
 
-addUserRegistrationFeed()
+//addUserRegistrationFeed()
+
+
+def testEval(){
+	def x = ctx.getBean("activityFeedService");
+	Eval.xy(x, 10, "x.testMy(y)")
+}
+
+
+testEval()
 println "================ done "
+
+
+

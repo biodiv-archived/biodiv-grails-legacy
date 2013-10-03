@@ -33,7 +33,7 @@ class Follow {
 		return follow ? true : false
 	}
 	
-	static SUser addFollower(object, SUser user){
+	static SUser addFollower(object, SUser user, flushImmidiatly=true){
 		if(fetchIsFollowing(object, user)){
 			return user
 		}
@@ -42,7 +42,7 @@ class Follow {
 		Long objectId = object.id
 		
 		Follow follow = new Follow(objectType:objectType, objectId:objectId, user:user)
-		if(!follow.save(flush:true)){
+		if(!follow.save(flush:flushImmidiatly)){
 			follow.errors.allErrors.each { log.error it }
 			return null
 		}
