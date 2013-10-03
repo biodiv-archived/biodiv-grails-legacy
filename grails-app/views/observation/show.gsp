@@ -217,9 +217,6 @@ String desc = "- "+ location +" by "+observationInstance.author.name.capitalize(
                                         </div>
 
                                     </div>
-                                    <uGroup:objectPostToGroupsWrapper 
-										model="[canPullResource:canPullResource, 'observationInstance':observationInstance]" />
-										
                                     <%
                                     def annotations = observationInstance.fetchChecklistAnnotation()
                                     %>
