@@ -134,7 +134,7 @@ body, td { font-family: 'Helvetica Neue', Arial, Helvetica, Geneva, sans-serif; 
 Welcome to the India Biodiversity Portal (IBP)! You are now part of an
 exciting initiative designed to facilitate participation and enable
 open access for all citizens in contributing information on Indian
-biodiversity for the benefit of science and society. The IBP offers the
+biodiversity for the benefit of science and society. The portal offers the
 following modules: </div>
 </td>
 </tr>

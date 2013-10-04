@@ -5,20 +5,12 @@ import species.groups.UserGroup;
 class DomainTagLib {
 	static namespace = "domain"
 
-	def showWGPHeader = { attrs ->
-		out << render(template:"/domain/wgpHeaderTemplate");
+	def showSiteHeader = { attrs ->
+		out << render(template:"/domain/${grailsApplication.config.speciesPortal.app.siteCode}HeaderTemplate", model:attrs.model);
 	}
 
-	def showWGPFooter = { attrs ->
-		out << render(template:"/domain/wgpFooterTemplate");
-	}
-
-	def showIBPHeader = { attrs ->
-		out << render(template:"/domain/ibpHeaderTemplate", model:attrs.model);
-	}
-
-	def showIBPFooter = { attrs ->
-		out << render(template:"/domain/ibpFooterTemplate");
+	def showSiteFooter = { attrs ->
+		out << render(template:"/domain/${grailsApplication.config.speciesPortal.app.siteCode}FooterTemplate");
 	}
 	
 	def showHeader = { attrs ->
