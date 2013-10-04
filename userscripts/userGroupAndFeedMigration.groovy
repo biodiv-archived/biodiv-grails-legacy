@@ -11,7 +11,8 @@ import species.participation.ActivityFeed
 import speciespage.UserGroupService
 import species.auth.SUser
 import species.groups.UserGroup
-
+import org.codehaus.groovy.grails.orm.hibernate.cfg.GrailsDomainBinder;
+import content.eml.*;
 /*
 def feedService = ctx.getBean("activityFeedService");
 def userGroupService = ctx.getBean("userGroupService");
@@ -176,8 +177,45 @@ def addFeedForObvCreate(){
 	}
 }
 
+def addUserRegistrationFeed(){
+	def checklistUtilService = ctx.getBean("checklistUtilService");
+	def m = GrailsDomainBinder.getMapping(ActivityFeed.class)
+	m.autoTimestamp = false
+	
+	SUser.withTransaction(){
+		SUser.list().each { user ->
+			println user
+			checklistUtilService.addActivityFeed(user, user, user, ActivityFeedService.USER_REGISTERED, user.dateCreated);
+		}
+	}
+	m.autoTimestamp = true
+}
+
+
+def addDocumentPostFeed(){
+	def checklistUtilService = ctx.getBean("checklistUtilService");
+	def m = GrailsDomainBinder.getMapping(ActivityFeed.class)
+	def desc = "Posted document to group"
+	m.autoTimestamp = false
+	Document.withTransaction(){
+		Document.list().each { doc ->
+			println doc
+			doc.userGroups.each { ug ->
+				checklistUtilService.addActivityFeed(doc, ug, doc.author, ActivityFeedService.RESOURCE_POSTED_ON_GROUP, new Date(doc.dateCreated.getTime() + 2) , desc);
+			}
+		}
+	}
+	m.autoTimestamp = true
+}
+
+
+
+addDocumentPostFeed()
+
+//addUserRegistrationFeed()
+
 //addFeedForObvCreate()
-correctObvActivityOrder()
+//correctObvActivityOrder()
 //migrate()
 
 /*

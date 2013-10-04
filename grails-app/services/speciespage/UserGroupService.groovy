@@ -1339,6 +1339,7 @@ class UserGroupService {
 						ug.errors.allErrors.each { println it }
 					}else{
 						//adding feed for each resource with isShowable = false flag
+						println "============= calling af...."
 						activityFeedService.addFeedOnGroupResoucePull(obvs, ug, springSecurityService.currentUser,params.submitType == 'post' ? true: false, false, params.pullType == 'bulk'?true:false)
 					}
 				}

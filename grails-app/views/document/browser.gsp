@@ -7,7 +7,7 @@
 <head>
 <g:set var="title" value="Documents"/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
-<r:require modules="add_file, content_view" />
+<r:require modules="add_file, content_view, activityfeed" />
 <uploader:head />
 <style type="text/css">
 .thumbnails>.thumbnail {

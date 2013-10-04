@@ -46,31 +46,6 @@ def updateGeoPrivacy(){
 	}
 }
 
-def addUserRegistrationFeed(){
-	def checklistUtilService = ctx.getBean("checklistUtilService");
-	def m = GrailsDomainBinder.getMapping(ActivityFeed.class)
-	m.autoTimestamp = false
-	
-	SUser.withTransaction(){
-		SUser.list().each { user ->
-			println user 
-			checklistUtilService.addActivityFeed(user, user, user, ActivityFeedService.USER_REGISTERED, user.dateCreated);
-		}
-	}
-	m.autoTimestamp = true
-}
-
-//addUserRegistrationFeed()
-
-
-def testEval(){
-	def x = ctx.getBean("activityFeedService");
-	Eval.xy(x, 10, "x.testMy(y)")
-}
-
-
-testEval()
-println "================ done "
 
 
 

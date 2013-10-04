@@ -112,7 +112,7 @@ class ActivityFeedService {
 		return ActivityFeed.fetchCount(params)
 	}
 	
-	def addActivityFeed(rootHolder, activityHolder, author, activityType, description=null, boolean isShowable=null, flushImmidiatly=true){
+	def addActivityFeed(rootHolder, activityHolder, author, activityType, description=null, isShowable=null, flushImmidiatly=true){
 		//to support discussion on comment thread
 		def subRootHolderType = rootHolder?.class?.getCanonicalName()
 		def subRootHolderId = rootHolder?.id
