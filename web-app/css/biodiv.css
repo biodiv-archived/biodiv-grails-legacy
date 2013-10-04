@@ -1,3 +1,8 @@
+/**
+ * All common style rules for biodiv application
+ * Any specific rules have to go into ${grailsApplication.config.speciesPortal.app.siteCode}.css
+ */
+
 body { /*     background-color: #ffffff; */
 	/*     background-image: url('../images/header.png'); */
 	/*background-color: #ffffff;*/

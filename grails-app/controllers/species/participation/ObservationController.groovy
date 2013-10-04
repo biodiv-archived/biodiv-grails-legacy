@@ -1254,7 +1254,8 @@ class ObservationController {
             }
 
             if(distinctRecoListResult.distinctRecoList.size() > 0) {
-                result = [distinctRecoList:distinctRecoListResult.distinctRecoList, totalRecoCount:distinctRecoListResult.totalCount, 'next':offset+max, status:'success', msg:'success']
+                result = [distinctRecoList:distinctRecoListResult.distinctRecoList, totalRecoCount:distinctRecoListResult.totalCount, status:'success', msg:'success', next:offset+max]
+                
             } else {
                 def message = "";
                 if(params.offset > 0) {

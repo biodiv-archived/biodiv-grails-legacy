@@ -10,7 +10,6 @@ function refreshMarkers(p, url, callback) {
     else url = url+'?'+decodeURIComponent($.param(p));
 
     if(markers) {
-        console.log('clearing');
         markers.clearLayers();
     } else 
         markers = new M.MarkerClusterGroup({maxClusterRadius:50});

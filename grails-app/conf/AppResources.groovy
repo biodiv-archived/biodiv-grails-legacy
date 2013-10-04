@@ -2,6 +2,7 @@
 //adhoc.patterns.excludes = ["*.css"]
 //mappers.hashandcache.excludes = ["**/*.css"]
 //
+
 modules = {
 	overrides {
 		jquery { 
@@ -42,7 +43,9 @@ modules = {
 		resource url:'/css/habitats.css'
 		resource url:'/css/tableSorter.css'
 		resource url:'/css/bootstrap-editable.css'
-		resource url:'/css/wgp.css'
+		resource url:'/css/biodiv.css'
+		resource url:"/css/${org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.app.siteCode}.css"
+
 
 		resource url:'/bootstrap/js/bootstrap.min.js'
 		resource url:'/js/species/main.js'
@@ -155,7 +158,7 @@ modules = {
 
 		resource url:'/css/960.css'
 		resource url:'/css/main.css'
-		resource url:'/css/wgp.css'
+		resource url:'/css/biodiv.css'
 
 		resource url:'/js/species/species.js'
 
