@@ -915,21 +915,23 @@ class UserGroupService {
 		def jsonData = []
 		String name = params.term
 
-		String usernameFieldName = 'name';//SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
-		String userId = 'id';
+        if(name) {
+            String usernameFieldName = 'name';//SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
+            String userId = 'id';
 
 
-		def results = UserGroup.executeQuery(
-				"SELECT DISTINCT u.$usernameFieldName, u.$userId " +
-				"FROM UserGroup u " +
-				"WHERE LOWER(u.$usernameFieldName) LIKE :name " +
-				"ORDER BY u.$usernameFieldName",
-				[name: "${name.toLowerCase()}%"],
-				[max: params.max])
+            def results = UserGroup.executeQuery(
+                    "SELECT DISTINCT u.$usernameFieldName, u.$userId " +
+                    "FROM UserGroup u " +
+                    "WHERE LOWER(u.$usernameFieldName) LIKE :name " +
+                    "ORDER BY u.$usernameFieldName",
+                    [name: "${name.toLowerCase()}%"],
+                    [max: params.max])
 
-		for (result in results) {
-			jsonData << [value: result[0], label:result[0] , userId:result[1] , "category":"Groups"]
-		}
+            for (result in results) {
+                jsonData << [value: result[0], label:result[0] , userId:result[1] , "category":"Groups"]
+            }
+        }
 
 		return jsonData;
 	}
