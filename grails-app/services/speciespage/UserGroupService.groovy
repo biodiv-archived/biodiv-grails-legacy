@@ -34,6 +34,7 @@ import org.springframework.security.acls.model.Sid;
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.util.Assert
 import org.codehaus.groovy.grails.plugins.springsecurity.acl.AclObjectIdentity
+import org.apache.commons.logging.LogFactory;
 
 import species.Habitat;
 import species.Resource;
@@ -484,9 +485,9 @@ class UserGroupService {
 	def getUserGroupObservations(UserGroup userGroupInstance, params, max, offset, isMapView=false) {
 
 		if(!userGroupInstance) return;
-        println params
+        log.debug params
         params['userGroup'] = userGroupInstance;
-        println params.getClass()
+        log.debug params.getClass()
         return observationService.getFilteredObservations(params, max, offset, isMapView); 
 /*
 		def queryParts = observationService.getFilteredObservationsFilterQuery(params);
@@ -1290,7 +1291,8 @@ class UserGroupService {
 	
 	
 	private class  ResourceUpdate {
-	
+		private static final log = LogFactory.getLog(this);
+		
 		def getObservationListForPost(params){
 			def filterUrl = new URL(params.filterUrl)
 			def paramsMap = Utils.getQueryMap(filterUrl)
@@ -1321,25 +1323,31 @@ class UserGroupService {
 				allObvs = newList
 			}
 			
-			println "======= All Resouces " +  allObvs.size()
-			println "========All Groups " + groups
-			UserGroup.withTransaction(){
+			log.debug "======= All Resouces " +  allObvs.size()
+			log.debug "========All Groups " + groups
+			
+			groups.each { UserGroup ug ->
 				def obvs = new ArrayList(allObvs)
-				groups.each { UserGroup ug ->
+				UserGroup.withTransaction(){  status ->
 					if(params.submitType == 'post'){
 						obvs.removeAll(Eval.x(ug, 'x.' + groupRes))
 					}else{
 						obvs.retainAll(Eval.x(ug, 'x.' + groupRes))
 					}
-					println "== for group ==== ====== " + ug + "  resources size " +  obvs.size()
+					log.debug params.submitType + "== for group ==== ====== " + ug + "  resources size " +  obvs.size() 
 					obvs.each { obv ->
 						Eval.xy(ug, obv,  'x.' + updateFunction + '(y)')
 					}
-					if(!ug.save()){
-						ug.errors.allErrors.each { println it }
-					}else{
+					try{
+						ug.save(flush:true, failOnError:true)
+					}catch(Exception e){
+						ug.errors.allErrors.each { log.debug it }
+						status.setRollbackOnly()
+						e.printStackTrace()
+					}
+					if(!ug.hasErrors()){
 						//adding feed for each resource with isShowable = false flag
-						println "============= calling af...."
+						log.debug "============= calling af...."
 						activityFeedService.addFeedOnGroupResoucePull(obvs, ug, springSecurityService.currentUser,params.submitType == 'post' ? true: false, false, params.pullType == 'bulk'?true:false)
 					}
 				}

@@ -33,7 +33,7 @@ class Follow {
 		return follow ? true : false
 	}
 	
-	static SUser addFollower(object, SUser user, flushImmidiatly=true){
+	static SUser addFollower(object, SUser user, boolean flushImmidiatly=true){
 		if(fetchIsFollowing(object, user)){
 			return user
 		}
