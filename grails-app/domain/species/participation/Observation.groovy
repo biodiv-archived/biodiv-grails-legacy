@@ -358,6 +358,10 @@ class Observation extends Metadata implements Taggable, Rateable {
 		return title;
 	}
 
+String notes() {
+    return this.notes
+}
+
 	def fetchCommentCount(){
 		return commentService.getCount(null, this, null, null)
 	}
@@ -514,7 +518,9 @@ class Observation extends Metadata implements Taggable, Rateable {
 		}
 		return res
 	}
-	
+
+    
+
 	def fetchGeoPrivacyAdjustment(SUser reqUser=null){
 		if(!geoPrivacy || SUserService.ifOwns(author)){
 			return 0

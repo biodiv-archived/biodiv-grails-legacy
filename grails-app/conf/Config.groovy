@@ -216,8 +216,8 @@ speciesPortal {
 	}
 	domain = "localhost"
 	resources {
-		rootDir = "${app.rootDir}/images"
-		serverURL = "http://indiabiodiversity.localhost.org/${appName}/images"
+		rootDir = "${app.rootDir}/img"
+		serverURL = "http://indiabiodiversity.localhost.org/${appName}/img"
 		images {
 			defaultType = "jpg"
 			thumbnail {

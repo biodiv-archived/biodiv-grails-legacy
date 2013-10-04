@@ -18,6 +18,8 @@
 			<a href="${createLink(url:grailsApplication.config.grails.serverURL+"/..") }" class="brand">
                             <h1>${grailsApplication.config.speciesPortal.app.siteName}</h1>
 			</a>
+        
+
 		</g:else>
 	</div>
 </div>

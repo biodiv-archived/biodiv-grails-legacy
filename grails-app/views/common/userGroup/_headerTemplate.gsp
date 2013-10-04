@@ -14,6 +14,9 @@
 </span-->
 
 <div id="actionsHeader" style="position: relative; overflow: visible;">
+        <div class="sidebar_section span4 pull-right"> 
+                                                                </div>
+
 	<uGroup:showActionsHeaderTemplate
 		model="['userGroupInstance':userGroupInstance, members_autofillUsersId:1]" />
 </div>

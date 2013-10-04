@@ -36,8 +36,15 @@ function feature(objectId, objectType, url) {
 		data:{'id':objectId, 'type':objectType, 'userGroup': userGroup.join(","), 'notes': featureNotes},
 		success: function(data) {
 			if(data.success){
-				alert("SUCCESS");
-				//alert()
+			    //console.log("HTML RETURNED");    
+                            //console.log($(".is-featured"));
+                            //alert(data.freshUGListHTML);
+                            $(".is-featured").replaceWith(data.freshUGListHTML);
+                            //alert($(".is-featured"));
+
+			    alert("SUCCESS");
+
+                                //alert()
 				//$(".alertMsg").removeClass('alert alert-error').addClass('alert alert-success').html(data.msg);
 			}else{
 				alert("FAILED MESSAGE");
@@ -87,7 +94,9 @@ function unfeature(objectId, objectType, url) {
 		data:{'id':objectId, 'type':objectType, 'userGroup':userGroup.join(",")},
 		success: function(data) {
 			if(data.success){
-				alert("SUCCESS");
+                            //console.log("UNFEATURE SUCCESS");
+                            $(".is-featured").replaceWith(data.freshUGListHTML);
+			    alert("SUCCESS");
 				//alert()
 				//$(".alertMsg").removeClass('alert alert-error').addClass('alert alert-success').html(data.msg);
 			}else{

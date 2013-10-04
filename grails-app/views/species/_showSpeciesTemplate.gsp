@@ -75,7 +75,7 @@
 
                     </div>
                     
-                    <g:set var="summary" value="${speciesInstance.findSummary()}"></g:set>
+                    <g:set var="summary" value="${speciesInstance.notes()}"></g:set>
 
                     <g:if test="${summary}">
                         <div class="ellipsis multiline clearfix notes_view">

@@ -54,7 +54,7 @@ class Follow {
 		if(!follow.save(flush:true)){
             println "%%%%%%%%%%%%%%%% NOT -- SAVED %%%%%%%%%%%%%%%%%%%%%%%%%%"
 
-			follow.errors.allErrors.each { println it }
+			follow.errors.allErrors.each { log.error it }
 			return null
 		}
 		
@@ -68,8 +68,6 @@ class Follow {
 		
 		String objectType = object.class.getCanonicalName()
 		Long objectId = object.id
-	    //println "=========DELETE FOLLOWER================================"
-        //println objectID
 	
 		Follow follow = Follow.findWhere(objectType:objectType, objectId:objectId, author:author)
 		try{

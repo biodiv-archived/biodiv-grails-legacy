@@ -208,7 +208,7 @@ h6 .btn-link, h5 .btn-link {
                                     </h6>
                                     
                                     <obv:showRelatedStory
-                                    model="['controller':'observation', 'action':'getRelatedObservation', 'filterProperty': 'user', 'filterPropertyValue':user.id, 'id':'user', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress]" />
+                                    model="['controller':'observation', 'action':'related', 'filterProperty': 'user', 'filterPropertyValue':user.id, 'id':'user', 'userGroupInstance':userGroupInstance]" />
                                 </div>
                                 <div id="identifications" class="section" style="clear:both;">
                                     <h6>
@@ -222,7 +222,7 @@ h6 .btn-link, h5 .btn-link {
 
                                     </h6>
                                     <obv:showRelatedStory
-                                    model="['controller':'SUser', 'resultController':'observation', 'action':'getRecommendationVotes', 'filterProperty': 'user', 'filterPropertyValue':user.id, 'id':'userIds', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress, 'hideShowAll':true]" />
+                                    model="['controller':'SUser', 'resultController':'observation', 'action':'getRecommendationVotes', 'filterProperty': 'user', 'filterPropertyValue':user.id, 'id':'userIds', 'userGroupInstance':userGroupInstance, 'userGroupWebaddress':params.webaddress, 'hideShowAll':true]" />
 
                                 </div>
                                 

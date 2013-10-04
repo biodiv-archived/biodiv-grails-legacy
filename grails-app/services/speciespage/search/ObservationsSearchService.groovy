@@ -151,6 +151,7 @@ class ObservationsSearchService {
                     if(solrServer instanceof ConcurrentUpdateSolrServer) {
                         solrServer.blockUntilFinished();
                     }
+                    println "======SOLR SERVER===="
                     solrServer.commit();
                     log.info "Finished committing to observations solr core"
                 }

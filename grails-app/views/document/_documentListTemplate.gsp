@@ -1,6 +1,10 @@
 <div class="observations_list" style="top: 0px;">
 	<g:render template="/document/showBrowserTable"
 		model="['documentInstanceList':documentInstanceList]" />
+        <div class="span7 pull-right"> 
+                                            <obv:showRelatedStory
+                                                model="['controller':params.controller, 'action':'related', 'filterProperty': 'featureBy', 'id':'featureBy', 'userGroupInstance':userGroupInstance]" />
+                            </div>
 
 	<% params['isGalleryUpdate'] = false; %>
 	<div class="paginateButtons centered">

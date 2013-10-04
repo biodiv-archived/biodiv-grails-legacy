@@ -1,5 +1,7 @@
 var itemLoadCallback = function(carousel, state) {
-	carousel.last = carousel.last?carousel.last:3;
+        console.log("ITEM LOAD CALL BACK");
+        
+        carousel.last = carousel.last?carousel.last:3;
 	var params = {
 		"limit" : carousel.last - carousel.first,
 		"offset" :carousel.first,
@@ -20,12 +22,16 @@ var itemLoadCallback = function(carousel, state) {
 		
 	var jqxhr = $.get(carousel.options.url, params, function(data) {
 		itemAddCallback(carousel, carousel.first, carousel.last, data, state);
+
+
 	});
 	// jqxhr.error(function() { alert("error"); });
 }
 
 var itemAddCallback = function(carousel, first, last, data, state) {
-	$(".jcarousel-item").css('width', window.params.carousel.maxWidth);
+     console.log("ITEM ADD CALL BACK");
+
+        $(".jcarousel-item").css('width', window.params.carousel.maxWidth);
 	var items = data["observations"];
 	for (i = 0; i < items.length; i++) {
 		var actualIndex = first + i;
@@ -50,10 +56,23 @@ var itemAddCallback = function(carousel, first, last, data, state) {
 	$(".jcarousel-item  .thumbnail .ellipsis.multiline").trunk8({
 		lines:3,		
 	});
+                    
+        $(".jcarousel-item").popover({ 
+            title: function() {
+                return $(this).find('img').attr('title')
+            },
+            content: function() {
+                return $(this).find(".caption").html()
+            },
+            trigger:(is_touch_device ? "click" : "hover"),
+            html:true,
+            container:'body'
+        });
 	
 }
 
 function resizeImage(item) {
+         console.log("ITEM RESIZE");
 
 	var ele = item.find('img');
 	var maxHeight=window.params.carousel.maxHeight;
@@ -108,17 +127,26 @@ function resizeImage(item) {
 
 }
 
+
+
 var getItemHTML = function(carousel, item) {
+     console.log("GET ITEM HTML");
+
 	var paramsString = "";
 	if(carousel.options.filterProperty === "speciesName"){
 		paramsString = "?" + encodeURIComponent("species=" + carousel.options.filterPropertyValue);	
 	}
 	var imageTag = '<img class=img-polaroid src="' + item.imageLink + paramsString  + '" title="' + item.imageTitle  +'" alt="" />';
+
 	var notes = item.notes?item.notes:''
+        //console.log("NOTES");
+        console.log(item.imageTitle);
 	return '<div class=thumbnail><div class="'+item.type.replace(' ','_')+'_th snippet tablet'+'"><div class=figure><a href='+ item.url + paramsString + '>' + imageTag + '</a></div><div class="'+'ellipsis multiline caption'+'">'+notes+'</div></div></div>';
 };
 
 var reloadCarousel = function(carousel, fitlerProperty, filterPropertyValue){
+         console.log("RELOAD CAROUSEL");
+
 	carousel.options.filterProperty = fitlerProperty;
 	carousel.options.filterPropertyValue = filterPropertyValue;
 	var visibleOffset = carousel.last - carousel.first;
@@ -129,7 +157,13 @@ var reloadCarousel = function(carousel, fitlerProperty, filterPropertyValue){
 }
 
 var itemAfterLoadCallback = function(carousel, state) {
+         console.log("ITEM AFTER LOAD CALL BACK");
+
 	$(".jcarousel-item  .thumbnail .ellipsis.multiline").trunk8({
 		lines:3,		
 	});
 }
+
+var setupCallback = function(carousel) {
+    //$("#carousel_featureBy").find('ul.jcarousel-list').css({"overflow" : "visible"}); 
+} 

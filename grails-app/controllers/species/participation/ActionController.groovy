@@ -44,6 +44,8 @@ class ActionController {
 	def springSecurityService;
 	def mailService;
 	def observationsSearchService;
+    def speciesSearchService;
+    def documentSearchService;
 	def namesIndexerService;
 	def userGroupService;
 	def activityFeedService;
@@ -98,7 +100,11 @@ class ActionController {
         }
         println "FEATURE function end sending msg==================================================="
         def r = ["success":true]
-	    r['msg'] = "dghgtiughvf" 
+        def observationInstance = activityFeedService.getDomainObject(params.type,params.id); 
+        def freshUGListHTML = g.render(template:"/common/showFeaturedTemplate" ,model:['observationInstance':observationInstance])
+        println "=======HTML RENDER ========== " + freshUGListHTML
+        r["freshUGListHTML"] = freshUGListHTML
+	    //r['msg'] = "dghgtiughvf" 
 	    render r as JSON
 
     }
@@ -128,16 +134,36 @@ class ActionController {
         }
         println "UNFEATURE function end sending msg==================================================="
         def r = ["success":true]
-	    r['msg'] = "dghgtiughvf" 
+        def observationInstance = activityFeedService.getDomainObject(params.type,params.id); 
+        def freshUGListHTML = g.render(template:"/common/showFeaturedTemplate" ,model:['observationInstance':observationInstance])
+        println "=======HTML RENDER ========== " + freshUGListHTML
+        r["freshUGListHTML"] = freshUGListHTML
 	    render r as JSON
 
     }
 
     
+    def searchIndex(type,obv){
+        if(type == "species.participation.Observation"){
+            println "======OBSERVATION ==========" + obv + " " + type
+            observationsSearchService.publishSearchIndex(obv, true);
+            println "=======DONE ==="
+        }
+        else if(type == "species.participation.Specie"){
+             speciesSearchService.publishSearchIndex(obv, true);
+        }
+        else if(type == "content.eml.Document") {
+            println "======DOCUMENT ==========" + obv + " " + type
+            documentSearchService.publishSearchIndex(obv, true);
+             println "=======DONE ==="
+
+        }
+    }
+
 	@Secured(['ROLE_USER'])
 	def flagIt = {
        	log.debug params;
-        println "============%%%%%%%%%%%TYPE%%%%%%%%%%%==========="
+        println "============%%%%%%%%%%%  FLAGGING  %%%%%%%%%%%==========="
         println params.type;
 		params.author = springSecurityService.currentUser;
 		def obv = activityFeedService.getDomainObject(params.type,params.id);     //GEt object instance ??
@@ -148,7 +174,6 @@ class ActionController {
 				FlagInstance = new Flag(objectId: params.id.toLong(),objectType: params.type, author: params.author, flag:flag, notes:params.notes)
 				FlagInstance.save(flush: true)
 				if(!FlagInstance.save(flush:true)){
-		            //println "FlagInstance Saving Error"
                     FlagInstance.errors.allErrors.each { println it }
 			        return null
 		        }
@@ -156,9 +181,8 @@ class ActionController {
                 obv.flagCount++
 				obv.save(flush:true)
 				activityFeedService.addActivityFeed(obv, FlagInstance, FlagInstance.author, activityFeedService.OBSERVATION_FLAGGED); //add activity
-				
-				//observationsSearchService.publishSearchIndex(obv, ObservationController.COMMIT);   //commit??
-				
+	            println "=======PUBLISH SEARCH START======"	
+                searchIndex(params.type,obv)				
 				observationService.sendNotificationMail(observationService.OBSERVATION_FLAGGED, obv, request, params.webaddress) //???
 				flash.message = "${message(code: 'flag.added', default: 'Observation flag added')}"
 			}
@@ -169,9 +193,12 @@ class ActionController {
 		else {
 			flash.message  = "${message(code: 'flag.duplicate', default:'Already flagged')}"    ///change message
 		}
-		println "FEATURE function end sending msg==================================================="
+		println "FLAG function end sending msg==================================================="
         def r = ["success":true]
-	    r['msg'] = "dghgtiughvf" 
+        def observationInstance = activityFeedService.getDomainObject(params.type,params.id); 
+        def flagListUsersHTML = g.render(template:"/common/observation/flagListUsersTemplate" ,model:['observationInstance':observationInstance])
+	    
+        r['flagListUsersHTML'] = flagListUsersHTML
 	    render r as JSON
 	}
 
@@ -195,7 +222,8 @@ class ActionController {
 
 			obv.flagCount--;
 			obv.save(flush:true)
-			//observationsSearchService.publishSearchIndex(obv, ObservationController.COMMIT);    //observation ke liye only
+            println "=======PUBLISH SEARCH START======"
+			searchIndex(params.type,obv);    //observation ke liye only
 			render obv.flagCount;
 			return;
 		}catch (Exception e) {

@@ -60,5 +60,9 @@ abstract class Metadata {
             topology (type:org.hibernatespatial.GeometryUserType, class:com.vividsolutions.jts.geom.Geometry)
         }
     }
+
+    String notes(){
+        return ""
+    }
 	
 }

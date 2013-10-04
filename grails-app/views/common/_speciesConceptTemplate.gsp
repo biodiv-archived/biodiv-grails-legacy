@@ -87,7 +87,7 @@
                                                                                     <h5>Related Observations</h5>
                                                                                     <div class="tile" style="clear: both">
                                                                                         <obv:showRelatedStory
-                                                                                        model="['speciesId':speciesInstance.id, 'controller':'observation', 'action':'getRelatedObservation', 'filterProperty': 'taxonConcept',  'filterPropertyValue': speciesInstance.taxonConcept.id, 'id':'a','userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress]" />
+                                                                                        model="['speciesId':speciesInstance.id, 'controller':'observation', 'action':'related', 'filterProperty': 'taxonConcept',  'filterPropertyValue': speciesInstance.taxonConcept.id, 'id':'a','userGroupInstance':userGroupInstance]" />
                                                                                     </div>
                                                                                 </div>
                                        

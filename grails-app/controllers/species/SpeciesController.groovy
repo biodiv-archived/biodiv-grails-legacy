@@ -23,7 +23,7 @@ import org.springframework.web.multipart.commons.CommonsMultipartFile;
 import species.utils.Utils;
 import grails.plugins.springsecurity.Secured
 
-class SpeciesController {
+class SpeciesController extends AbstractObjectController {
 
 	def dataSource
 	def grailsApplication

@@ -121,6 +121,10 @@ class Document implements Taggable, Rateable {
 		return Follow.fetchIsFollowing(this, user)
 	}
 
+    String fetchSpeciesCall(){
+		return this.title;
+	}
+
 
 	def getOwner() {
 		return author;
@@ -144,5 +148,9 @@ class Document implements Taggable, Rateable {
 	def beforeDelete(){
 		activityFeedService.deleteFeed(this)
 	}
-	
+
+    String notes() {
+        return this.description;
+    }
+
 }

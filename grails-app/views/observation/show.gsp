@@ -80,7 +80,7 @@ String desc = "- "+ location +" by "+observationInstance.author.name.capitalize(
                                                     <i class="icon-edit"></i>Edit</a>
 
                                                 <a class="btn btn-danger btn-primary pull-right" style="margin-right: 5px;"
-                                                    href="${uGroup.createLink(controller:'action', action:'flagDeleted', id:observationInstance.id)}"
+                                                    href="${uGroup.createLink(controller:'observation', action:'flagDeleted', id:observationInstance.id)}"
                                                     onclick="return confirm('${message(code: 'default.observatoin.delete.confirm.message', default: 'This observation will be deleted. Are you sure ?')}');"><i class="icon-trash"></i>Delete</a>
 
                                                 </sUser:ifOwns>
@@ -111,7 +111,7 @@ String desc = "- "+ location +" by "+observationInstance.author.name.capitalize(
                                             alt="${message(code:'spinner.alt',default:'Loading...')}" />
                                         </div>
                                     </center>
-                                    
+                                     
 					<div id="gallery1" style="visibility:hidden">
 
 						<g:if test="${observationInstance.resource}">
@@ -205,16 +205,23 @@ String desc = "- "+ location +" by "+observationInstance.author.name.capitalize(
 					<div class="sidebar_section">
 						<h5>Related observations</h5>
 						<div class="tile" style="clear: both">
-                                                        <div class="title">Featured Observations</div>
-                                                        <obv:showRelatedStory
-                                                                model="['observationInstance':observationInstance, 'observationId': observationInstance.id, 'controller':'observation', 'action':'getRelatedObservation', 'filterProperty': 'featureBy', 'id':'featureBy', 'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress]" />
-                                                </div>
- 
+							<div class="title">Other observations of the same species</div>
+							<obv:showRelatedStory
+								model="['observationInstance':observationInstance, 'observationId': observationInstance.id, 'controller':'observation', 'action':'related','filterProperty': 'speciesName', 'id':'a','userGroupInstance':userGroupInstance]" />
+						</div>
+						<div class="tile">
+							<div class="title">Observations nearby</div>
+							<obv:showRelatedStory
+								model="['observationInstance':observationInstance, 'observationId': observationInstance.id, 'controller':'observation', 'action':'related', 'filterProperty': 'nearBy', 'id':'nearBy', 'userGroupInstance':userGroupInstance]" />
+						</div>
                                                 
-					</div>
-				<uGroup:featureUserGroups model="['observationInstance':observationInstance]"/>
-	
-					<g:if test="${observationInstance.userGroups}">
+                                                
+                                            </div>
+                                            <g:render template="/common/showFeaturedTemplate" model="['observationInstance':observationInstance]"/>
+                                            <div class="tile">
+                                            <uGroup:featureUserGroups model="['observationInstance':observationInstance]"/>
+                                            </div>
+                                            <g:if test="${observationInstance.userGroups}">
 						<div class="sidebar_section">
 							<h5>Observation is in groups</h5>
 								<!-- div class="title">This observation belongs to following groups</div-->

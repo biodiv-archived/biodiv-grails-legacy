@@ -2,7 +2,7 @@
 <%@ page import="content.eml.Document"%>
 
 
-<div id="project-sidebar" class="span4">
+<div id="project-sidebar">
 
 
 	<div class="sidebar_section">
@@ -19,6 +19,7 @@
 		project. We welcome comments and suggestions from users to further
                 develop this function in the portal.
                 </p>
+                
 	</div>
 
 

@@ -422,6 +422,7 @@ class UserGroupController {
 	}
 	
 	def getUserGroupObservationsList(params) {
+        log.debug "+++++++++++++++++"+params
 		def userGroupInstance = findInstance(params.id, params.webaddress)
 		if (!userGroupInstance) return
 
@@ -441,6 +442,7 @@ class UserGroupController {
 		
 
 		if(params.append?.toBoolean()) {
+            println "==============MODEL OBJ===============" + model.observationInstanceList.collect {it.id}
 			session[userGroupInstance.webaddress+"obv_ids_list"].addAll(model.observationInstanceList.collect {it.id});
 		} else {
 			session[userGroupInstance.webaddress+"obv_ids_list_params"] = params.clone();

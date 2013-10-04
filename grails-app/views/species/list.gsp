@@ -17,6 +17,10 @@
 
 </head>
 <body>
+<div class="span7 pull-right"> 
+                                    <obv:showRelatedStory
+                                            model="['controller':params.controller, 'action':'related', 'filterProperty': 'featureBy', 'id':'featureBy', 'userGroupInstance':userGroupInstance]" />
+                            </div>
 	<div class="span12">
 		<s:showSubmenuTemplate model="['entityName':'Species']" />
 		<uGroup:rightSidebar/>

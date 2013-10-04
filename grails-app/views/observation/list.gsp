@@ -15,7 +15,26 @@
 <body>
 
 	<div class="span12">
-		<obv:showSubmenuTemplate model="['entityName':title]" />
+            <obv:showSubmenuTemplate/>
+
+				<div class="page-header clearfix">
+                                    <div style="width:100%;">
+                                        <div class="main_heading" style="margin-left:0px;">
+                                            <div class="span7 pull-right"> 
+                                            <obv:showRelatedStory
+                                                model="['controller':params.controller, 'action':'related', 'filterProperty': 'featureBy', 'id':'featureBy', 'userGroupInstance':userGroupInstance]" />
+                            </div>
+
+
+                            <h1>Observations</h1>
+
+                                        </div>
+                                    </div>
+                                    <div style="clear:both;"></div>
+                               </div>
+                               
+
+
 		<uGroup:rightSidebar/>
 		<obv:showObservationsListWrapper />
 	</div>

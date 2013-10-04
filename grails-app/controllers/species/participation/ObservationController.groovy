@@ -35,8 +35,9 @@ import species.auth.SUser;
 import org.apache.solr.common.SolrException;
 import org.apache.solr.common.util.NamedList
 import species.participation.Featured
+import species.AbstractObjectController;
 
-class ObservationController {
+class ObservationController extends AbstractObjectController {
 	
 	public static final boolean COMMIT = true;
 
@@ -769,22 +770,6 @@ class ObservationController {
 	/**
 	 * 
 	 */
-	def getRelatedObservation = {
-		log.debug params;
-        println "==================RRRRRRRRRRRRRRRRRRRRRRRRRRRRRR==================="
-		def relatedObv = observationService.getRelatedObservations(params).relatedObv;
-		println "%%%%%%%%%%%%%%  RELATED OBVS +++++++++++++++" + relatedObv
-
-		if(relatedObv) {
-			if(relatedObv.observations)
-                println "%%%%%%%%%%%%%%  IF mein IF +++++++++++++++"
-				relatedObv.observations = observationService.createUrlList2(relatedObv.observations);
-		} else {
-		}
-		//println relatedObv
-		render relatedObv as JSON
-	}
-
 	def tags = {
 		log.debug params;
 		render Tag.findAllByNameIlike("${params.term}%")*.name as JSON

@@ -8,6 +8,8 @@
 <%@ page import="species.CommonNames"%>
 <%@ page import="species.Language"%>
 <%@page import="species.utils.Utils"%>
+<%@page import="species.participation.Featured"%>
+<%@page import="species.participation.Observation"%>
 <%@page import="species.participation.ActivityFeedService"%>
 <%@page import="org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils"%>
 
@@ -15,7 +17,7 @@
 <head>
 <g:set var="canonicalUrl" value="${uGroup.createLink([controller:'species', action:'show', id:speciesInstance.id, base:Utils.getIBPServerDomain()])}"/>
 <g:set var="title" value="${speciesInstance.taxonConcept.name}"/>
-<g:set var="description" value="${Utils.stripHTML(speciesInstance.findSummary()?:'')}" />
+<g:set var="description" value="${Utils.stripHTML(speciesInstance.notes()?:'')}" />
 <%
 def r = speciesInstance.mainImage();
 def imagePath = '';
@@ -535,15 +537,17 @@ $(document).ready(function(){
 					</g:each>
 				</div>
                                 <div class="readmore sidebar_section notes_view">
-				    ${speciesInstance.findSummary() }
+				    ${speciesInstance.notes() }
                                 </div>
                             </div>
                         </div>
+                        <uGroup:featureUserGroups model="['observationInstance':speciesInstance]"/>
+
                         <div class="span12" style="margin-left:0px">
 				<%def nameRecords = fields.get(grailsApplication.config.speciesPortal.fields.NOMENCLATURE_AND_CLASSIFICATION)?.get(grailsApplication.config.speciesPortal.fields.TAXON_RECORD_NAME).collect{it.value.get('speciesFieldInstance')[0]} %>
 				<g:if test="${nameRecords}">
-				<div class="sidebar_section" style="clear:both;">
-					<a class="speciesFieldHeader"  data-toggle="collapse" href="#taxonRecordName">
+                                <div class="sidebar_section" style="clear:both;">
+                                    					<a class="speciesFieldHeader"  data-toggle="collapse" href="#taxonRecordName">
 						<h5>Taxon Record Name</h5>
 					</a>
 					

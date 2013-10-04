@@ -108,6 +108,11 @@ class Species implements Rateable {
 		return Flag.findAllWhere(objectId:this.id,objectType:this.class.getCanonicalName());
 	}
 
+    String fetchSpeciesCall(){
+		return this.title;
+	}
+
+
 	List<Resource> getIcons() {
 		def icons = new ArrayList<Resource>();
 		resources.each {
@@ -128,7 +133,7 @@ class Species implements Rateable {
 		return res;
 	}
 	
-	String findSummary() {
+	String notes() {
 		def f = this.fields.find { speciesField ->
 			Field field = speciesField.field;
 			field.concept.equalsIgnoreCase(fieldsConfig.OVERVIEW) && field.category.equalsIgnoreCase(fieldsConfig.SUMMARY)

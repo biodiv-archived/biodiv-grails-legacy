@@ -55,22 +55,19 @@ import com.vividsolutions.jts.geom.PrecisionModel;
 
 import species.groups.UserGroupController;
 import species.groups.UserGroup;
+import species.AbstractObjectService;
 
-class ObservationService {
+class ObservationService extends AbstractObjectService {
 
 	static transactional = false
 
 	def recommendationService;
 	def observationsSearchService;
-	def grailsApplication;
-	def dataSource;
-	def springSecurityService;
 	def curationService;
 	def commentService;
 	def userGroupService;
 	def activityFeedService;
 	def mailService;
-	def sessionFactory;
 	def SUserService;
 	
 	static final String OBSERVATION_ADDED = "observationAdded";
@@ -223,6 +220,8 @@ class ObservationService {
 	 * @return
 	 */
 	Map getRelatedObservations(params) {
+
+        println "=======IN OBV SERVICES ========"
 		log.debug params;
 		def max = Math.min(params.limit ? params.limit.toInteger() : 12, 100)
 		def offset = params.offset ? params.offset.toInteger() : 0
@@ -233,9 +232,12 @@ class ObservationService {
 		} else if(params.filterProperty == "speciesGroup"){
 			relatedObv = getRelatedObservationBySpeciesGroup(params.filterPropertyValue.toLong(),  max, offset)
 		} else if(params.filterProperty == "featureBy") {
-            println "===========FILTER featureBy==========" +params.type
-            def ug = UserGroup.get(1)
-            relatedObv = getFeaturedObject(ug, max , offset,params.type)
+            Long ugId;
+            if(!(params.userGroup instanceof UserGroup) && (params.userGroup instanceof String || params.userGroup instanceof Long || params.webaddress)) {
+    			def userGroupController = new UserGroupController();
+	    		ugId = userGroupController.findInstance(params.userGroup, params.webaddress)?.id;
+            }
+            relatedObv = getFeaturedObject(ugId, max, offset, params.controller)
         } else if(params.filterProperty == "user"){
 			relatedObv = getRelatedObservationByUser(params.filterPropertyValue.toLong(), max, offset, params.sort)
 		} else if(params.filterProperty == "nearBy"){
@@ -279,44 +281,6 @@ class ObservationService {
 		return result
 	}
     
-
-    Map getFeaturedObject(UserGroup ug, int limit, long offset, String type){
-
-
-        println "%%%%%%%%%%% FEATURED OBJECT ***************"
-        println ug
-        println "===================INSTANCE  =================" + type
-        def queryParams = ["ug": ug]
-        def countQuery = "select count(*) from Featured feat where feat.userGroup = :ug "
-		
-        def count = Featured.executeQuery(countQuery, queryParams)
-        
-        println "=====COUNT ++++++++++++=======  " + count[0]
-        queryParams["max"] = limit
-		queryParams["offset"] = offset
-        queryParams["type"] = type
-        def query = "from Featured feat where feat.userGroup = :ug and feat.objectType = :type "
-		def orderByClause = "order by feat.createdOn desc"
-		query += orderByClause
-    	
-        def featured = Featured.findAll(query, queryParams);
-        println "====== FEATURED LIST using query =========" + featured
-        def observations = []
-        featured.each{
-
-            println "TYPE CHECK %%%%%%%%%% " + it.objectType
-            observations.add(activityFeedService.getDomainObject(it.objectType,it.objectId))
-        }
-        println "+++++++++++++++" + observations
-        def result = []
-        observations.each {
-			result.add(['observation':it, 'title': "OBV Title"]);
-		}
-        println "========RESULT RETURNING=== " + result
-        return['observations':result,'count':count[0]]
-                		
-    }
-
 
 	/**
 	 * 
@@ -493,65 +457,8 @@ class ObservationService {
 			return ['observations':[], 'count':0]
 		}
 	}
-	
-	static List createUrlList2(observations){
-		def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
-		String iconBasePath = config.speciesPortal.observations.serverURL
-        println "=======CREATE URL LIST ===" + observations +"   "+ iconBasePath
-		def urlList = createUrlList2(observations, iconBasePath)
-//		urlList.each {
-//			it.imageLink = it.imageLink.replaceFirst(/\.[a-zA-Z]{3,4}$/, config.speciesPortal.resources.images.thumbnail.suffix)
-//		}
-		return urlList
-	}
-	static List createUrlList2(observations, String iconBasePath){
-		List urlList = []
-		for(param in observations){
-            println "=====PARAM=========" + param
-			def item = [:];
-            def controller = getTargetController(param['observation']);
-			item.url = "/" + controller + "/show/" + param['observation'].id
-			item.imageTitle = param['title']
-            item.type = controller
-			def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
-			Resource image = param['observation'].mainImage()
-			if(image){
-				if(image.type == ResourceType.IMAGE) {
-					item.imageLink = image.thumbnailUrl(param['observation'].isChecklist ? null: iconBasePath, param['observation'].isChecklist ? '.png' :null)//thumbnailUrl(iconBasePath)
-				} else if(image.type == ResourceType.VIDEO) {
-					item.imageLink = image.thumbnailUrl()
-				}
-			}else{
-				item.imageLink =  config.speciesPortal.resources.serverURL + "/" + "no-image.jpg"
-			}			
-			if(param.inGroup) {
-				item.inGroup = param.inGroup;
-			}
-			if(param['observation'].notes) {
-				item.notes = param['observation'].notes
-			} else {
-				String location = "Observed at '" + (param['observation'].placeName.trim()?:param['observation'].reverseGeocodedName) +"'"
-				String desc = "- "+ location +" by "+param['observation'].author.name.capitalize()+" on "+param['observation'].fromDate.format('dd/MM/yyyy');
-				item.notes = desc;				
-			}
-			urlList << item;
-		}
-		return urlList
-	}
 
-	//XXX for new checklists doamin object and controller name is not same as grails convention so using this method 
-	// to resolve controller name
-	private static getTargetController(domainObj){
-        println "======DOMAIN OBJ====" + domainObj
-		if(domainObj.instanceOf(Checklists)){
-			return "checklist"
-		}else if(domainObj.instanceOf(SUser)){
-			return "user"
-		}else{
-			return domainObj.class.getSimpleName().toLowerCase()
-		}
-	}
-	
+
 	Map getRecommendation(params){
 		def recoName = params.recoName;
 		def canName = params.canName;
@@ -998,7 +905,7 @@ class ObservationService {
 		def checklistCountQuery = "select count(*) from Observation obv " + userGroupQuery +" "+((params.tag)?tagQuery:'')+filterQuery + " and obv.isChecklist = true "
 		def allObservationCountQuery = "select count(*) from Observation obv " + userGroupQuery +" "+((params.tag)?tagQuery:'')+filterQuery
 		
-        def speciesGroupCountQuery = "select obv.group.name, count(*),(case when obv.maxVotedReco.id is not null  then 1 else 2 end) from Observation obv  "+ userGroupQuery +" "+((params.tag)?tagQuery:'')+filterQuery+ " and isChecklist=false group by obv.group.name,(case when obv.maxVotedReco.id is not null  then 1 else 2 end) order by obv.group.name desc";
+        def speciesGroupCountQuery = "select obv.group.name, count(*),(case when obv.maxVotedReco.id is not null  then 1 else 2 end) from Observation obv  "+ userGroupQuery +" "+((params.tag)?tagQuery:'')+filterQuery+ " and obv.isChecklist = false group by obv.group.name,(case when obv.maxVotedReco.id is not null  then 1 else 2 end) order by obv.group.name desc";
         println "===========SP COUNT QUERY=============" + speciesGroupCountQuery
 		return [query:query, allObservationCountQuery:allObservationCountQuery, checklistCountQuery:checklistCountQuery, distinctRecoQuery:distinctRecoQuery, distinctRecoCountQuery:distinctRecoCountQuery, speciesGroupCountQuery:speciesGroupCountQuery, filterQuery:filterQuery, orderByClause:orderByClause, queryParams:queryParams, activeFilters:activeFilters]
 

@@ -18,6 +18,7 @@ class UserGroupTagLib {
 
 	def springSecurityService
 	def userGroupService;
+    def activityFeedService;
 
 	def userGroups = { attrs, body ->
 		def userInstance = attrs.model?.userInstance
@@ -156,9 +157,11 @@ class UserGroupTagLib {
     def featureUserGroups = {attrs, body->
         println "============sdvfsdfvsd=============="
         println attrs.model
-		out << render(template:"/common/featureUserGroupsTemplate", model:attrs.model);
-	}
-
+        def featResult = getListToFeatureIn(attrs.model.observationInstance.id, attrs.model.observationInstance.class.getCanonicalName())
+		if(featResult.size() > 0){
+            out << render(template:"/common/featureUserGroupsTemplate", model:['observationInstance':attrs.model.observationInstance, 'featResult': featResult]);
+        }
+    }
 
 	def showUserGroupFilterMessage = {attrs, body->
 		out << render(template:"/common/userGroup/showUserGroupFilterMsgTemplate", model:attrs.model);
@@ -210,6 +213,68 @@ class UserGroupTagLib {
 		out << render(template:"/common/userGroup/sidebarTemplate", model:attrs.model);
 	}
 
+    Set getObjectsUserGroups(long id, String type) {
+        def object = activityFeedService.getDomainObject(type,id);
+        def f = object.findAllWhere(id: id);
+        return f[0].userGroups
+    }
+
+    List getFeaturedUserGroups(long id, String type) {
+        println "=============== GET FEATURES ==============="
+        def f = Featured.findAllWhere(objectId: id, objectType: type);
+        //println "===============F List ==============="
+        //println f
+        List ug = f.collect{it.userGroup}
+        println "=============== FEATURED List ==============="
+        println ug
+        return ug
+
+    }
+    Map test() {
+        return ['a':1,'b':2]
+    }
+    List getAuthorityUserGroups() {
+        def user = springSecurityService.getCurrentUser();
+		def userGroups = userGroupService.getUserGroups(user);
+        List authorityUG = []
+        userGroups.each { ugroup ->
+            if(ugroup.isFounder(user) || ugroup.isExpert(user)){
+                authorityUG.add(ugroup)
+            }
+            
+        }
+        println "========== AUTHORTIY UG ============ " + authorityUG
+        return authorityUG
+    }
+    
+    Map getListToFeatureIn(id, type) {
+        println "=======FUNC START =====" + id + " " + type
+        def result = [:]
+       	def ug = getFeaturedUserGroups(id, type)
+        //println "==========UG from upper function============"
+        //println ug
+        def objUserGroup = getObjectsUserGroups(id, type)
+        println "=======OBJ USER GROUP==========" + objUserGroup
+        
+        def authorityUG = getAuthorityUserGroups();
+        def allowedUserGroups = objUserGroup.intersect(authorityUG)
+        println "=======ALLOWED UG========= "  + allowedUserGroups
+        def fUserGroups = allowedUserGroups.intersect(ug)
+
+        println "=============== THIS SHOULD BE SELECTED ==============="
+        println fUserGroups
+        allowedUserGroups.removeAll(fUserGroups);
+        fUserGroups.each {
+            result[it] = true;
+        } 
+
+		allowedUserGroups.each {
+			result[it] = false;
+		}
+        println "=====FINAL RESULT============ " + result
+        return result;
+ 
+    } 
 	def getCurrentUserUserGroups = {attrs, body ->
 		def user = springSecurityService.getCurrentUser();
 		def userGroups = userGroupService.getUserGroups(user);
@@ -228,64 +293,22 @@ class UserGroupTagLib {
 		}
 		out << render(template:"/common/userGroup/showCurrentUserUserGroupsTemplate", model:[userGroups:result]);
 	}
-
-    def getFeaturedUserGroups(id,type) {
-        println "=============== GET FEATURES ==============="
-        def f = Featured.findAllWhere(objectId: id, objectType: type);
-        //println "===============F List ==============="
-        //println f
-        List ug = f.collect{it.userGroup}
-        //println "=============== UG List ==============="
-        //println ug
-        return ug
-
-    }
-
+    
+    
     def markFeaturedUserGroups = {attrs, body ->
-		println "=============== mark FEATURES ==============="
-        //println attrs.model.observationInstance
-        def user = springSecurityService.getCurrentUser();
-		def userGroups = userGroupService.getUserGroups(user);
-        List authorityUG = []
-        userGroups.each { ugroup ->
-            if(ugroup.isFounder(user) || ugroup.isExpert(user)){
-                authorityUG.add(ugroup)
-            }
-            
-        }
-        //println "==========authorityUG============"
-        //println authorityUG
-		def result = [:]
-		if(attrs.model.observationInstance) {
+		println "=============== mark FEATURES =============== " + attrs.model.observationInstance
+        
+		//def result = [:]
+        if(attrs.model.featResult) {
             println "=============== INSIDE IF ==============="
 
 			//check if the obv already belongs to userGroup and disable the control for it not to submit again
-			def ug = getFeaturedUserGroups(attrs.model.observationInstance.id,attrs.model.observationInstance.class.getCanonicalName())
-            //println "==========UG from upper function============"
-            //println ug
-
-            def fUserGroups = ug.intersect(authorityUG)
-            //println "=============== fUserGroup LIst ==============="
-            //println fUserGroups
-			authorityUG.removeAll(fUserGroups);
-			fUserGroups.each {
-				result[it] = true;
-			}
-		}
-        else{
-            println "=============== ELSE IF ==============="
-
-        }
-
-		authorityUG.each {
-			result[it] = false;
-		}
-        //println "=============== RESULT ==============="
-
-        //println result
-		out << render(template:"/common/userGroup/showCurrentUserUserGroupsTemplate", model:[userGroups:result]);
-        println "%%%%%%%%%%%%%%%%%"
-	}
+		    //result = getListToFeatureIn(attrs.model.observationInstance.id, attrs.model.observationInstance.class.getCanonicalName())
+            println "===============FEAT  RESULT =============== " +attrs.model.featResult
+		    out << render(template:"/common/userGroup/showCurrentUserUserGroupsTemplate", model:[userGroups:attrs.model.featResult]);
+            println "%%%%%%%%%%%%%%%%%"
+	    }
+    }
     
 
 	def getCurrentUserUserGroupsSidebar = {attrs, body ->

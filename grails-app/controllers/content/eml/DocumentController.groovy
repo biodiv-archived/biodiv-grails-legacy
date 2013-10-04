@@ -4,10 +4,10 @@ import grails.plugins.springsecurity.Secured
 
 import grails.converters.JSON
 import org.grails.taggable.*
-
+import species.AbstractObjectController;
 import speciespage.search.DocumentSearchService;
 
-class DocumentController {
+class DocumentController extends AbstractObjectController {
 
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
