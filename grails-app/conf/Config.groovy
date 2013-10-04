@@ -201,7 +201,10 @@ else {
 
 speciesPortal {
     app.siteName = "India Biodiversity Portal"
-    app.siteDescription = "Welcome to the India Biodiversity Portal (IBP) - A repository of information designed to harness and disseminate collective intelligence on the biodiversity of the Indian subcontinent."
+    app.siteDescription = "Welcome to the ${app.siteName} - A repository of information designed to harness and disseminate collective intelligence on the biodiversity of the Indian subcontinent."
+    app.twitterUrl = "https://twitter.com/thewesternghats"
+    app.facebookUrl = "https://www.facebook.com/pages/India-Biodiversity-Portal/130062180358038?fref=ts"
+    app.feedbackFormUrl = "http://indiabiodiversity.org/feedback_form"
 
 	app.rootDir = "${userHome}/git/biodiv/app-conf"
 	data.rootDir = "${app.rootDir}/data"
@@ -1084,7 +1087,7 @@ $user has invited you to be founder of the group <a href="$groupUrl">$group</a> 
 If you do not want to receive notifications please go to your <a href="$userProfileUrl">user profile</a> and switch it off.<br/>
 <br/>
 -The portal team'''
-grails.plugins.springsecurity.ui.bBird.emailSubject = 'Welcome to the India Biodiversity Portal'
+grails.plugins.springsecurity.ui.bBird.emailSubject = "Welcome to the ${app.siteName}"
 grails.plugins.springsecurity.ui.bBird.emailBody = '''\
 Hi $username,<br/>
 <br/>
@@ -1105,7 +1108,7 @@ We will appreciate any feedback you may have to offer.<br/><br/>
 grails.plugins.springsecurity.ui.bBirdExistingUser.emailBody = '''\
 Hi $username,<br/>
 <br/>
-You have been added as a member of the <a href="$bBirdUrl">Mumbai BirdRace 2013</a> group on the India Biodiversity Portal. Please use your existing credentials to login. <br/>
+You have been added as a member of the <a href="$bBirdUrl">Mumbai BirdRace 2013</a> group on the ${app.siteName}. Please use your existing credentials to login. <br/>
 <br/>
 We look forward to your contribution on the portal. You can add images of Birds observed during the BirdRace on the  <a href="$obvModuleUrl">Observation module</a>.<br/> 
 The portal is a public participatory portal that thrives by participation from users like you.<br/><br/>

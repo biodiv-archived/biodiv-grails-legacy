@@ -233,7 +233,7 @@ class Utils {
 		if(domain.startsWith(config.wgp.domain)) {
 			return "The Westernghats Portal"
 		} else {
-			return "India Biodiversity Portal"
+			return config.speciesPortal.app.siteName
 		}
 		return "";
 	}

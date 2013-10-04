@@ -108,7 +108,7 @@ body, td { font-family: 'Helvetica Neue', Arial, Helvetica, Geneva, sans-serif; 
 </td>
 </tr>
 <tr>
-<td id="header" class="w640" align="center" bgcolor="#ffffff" width="640"><a href="http://indiabiodiversity.org/"><img src="${resource(dir:'images', file:'whatsnewbanner_3.gif',absolute:'true' )}" alt="India Biodiversity Portal" style="border: 0px solid ; width: 639px; height: 53px;"></a></td>
+<td id="header" class="w640" align="center" bgcolor="#ffffff" width="640"><a href="http://indiabiodiversity.org/"><img src="${resource(dir:'images', file:'whatsnewbanner_3.gif',absolute:'true' )}" alt="${grailsApplication.config.speciesPortal.app.siteName}" style="border: 0px solid ; width: 639px; height: 53px;"></a></td>
 </tr>
 <tr>
 <td class="w580" style="width: 580px; height: 10px; background-color: white;"></td>
@@ -268,20 +268,20 @@ build and disseminate information. </div>
 <td class="w580" width="580">
 <div class="article-content" align="left">The portal is in a state of
 perpetual beta, with new features and improvements being constantly
-added. So, follow us on <a href="https://www.facebook.com/pages/India-Biodiversity-Portal/130062180358038?fref=ts">Facebook
-</a>or <a href="https://twitter.com/thewesternghats">Twitter
-</a>to stay updated. You can also leave <a href="http://indiabiodiversity.org/feedback_form">feedback</a>,
+added. So, follow us on <a href="${grailsApplication.config.speciesPortal.app.facebookUrl}">Facebook
+</a>or <a href="${grailsApplication.config.speciesPortal.app.twitterUrl}">Twitter
+</a>to stay updated. You can also leave <a href="${grailsApplication.config.speciesPortal.app.feedbackFormUrl}">feedback</a>,
 suggestions and feature requests.<br><br>
 We're excited to have you as a member. Please update your <a href="${userProfileUrl}">user profile</a>.
 Thank you for joining and we
 hope you enjoy using the portal.<br><br>
-Please add <a href="mailto:notification@indiabiodiversity.org/">notification@indiabiodiversity.org</a>
+Please add <a href="mailto:${grailsApplication.config.grails.mail.default.from}">${grailsApplication.config.grails.mail.default.from}</a>
 to your address book to ensure you continue to receive emails from us
 in your inbox.<br>
 <br>
 Sincerely,<br>
 <br><span style="font-weight: bold;">
-The India Biodiversity Portal Team</span> </div>
+The ${grailsApplication.config.speciesPortal.app.siteName} Team</span> </div>
 </td>
 </tr>
 
