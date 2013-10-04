@@ -356,14 +356,14 @@ class ActivityFeedService {
 			def af = addActivityFeed(r, ug, author, activityType, description, isShowable, false)
 			int oldCount = resCountMap.get(r.class.canonicalName)?:0
 			resCountMap.put(r.class.canonicalName, ++oldCount)
-			if(isShowable){
-				//observationService.sendNotificationMail(activityType, r, null, null, af)
+			if(!isBulkPull){
+				observationService.sendNotificationMail(activityType, r, null, null, af)
 			}
 		}
 		if(isBulkPull){
 			def description = getDescriptionForBulkResourcePull(isPost, resCountMap)
 			def af = addActivityFeed(ug, ug, author, activityType, description, true)
-			//observationService.sendNotificationMail(activityType, ug, null, null, af)
+			observationService.sendNotificationMail(activityType, ug, null, null, af)
 		} 
 	}
 	

@@ -1593,11 +1593,11 @@ class ObservationService {
 				break
 			
 			case [activityFeedService.RESOURCE_POSTED_ON_GROUP,  activityFeedService.RESOURCE_REMOVED_FROM_GROUP]:
-				mailSubject = "Resource posted on group"
+				mailSubject = feedInstance.activityDescrption
 				bodyView = "/emailtemplates/addObservation"
 				populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
 				templateMap["actionObject"] = 'usergroup'
-				templateMap['message'] = feedInstance.activityDescrption
+				//templateMap['message'] = activityFeedService.getContextInfo(feedInstance, [:])
 				templateMap["groupNameWithlink"] = activityFeedService.getUserGroupHyperLink(activityFeedService.getDomainObject(feedInstance.activityHolderType, feedInstance.activityHolderId))
 				toUsers.addAll(getParticipants(obv))
 				break
