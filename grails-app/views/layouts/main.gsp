@@ -41,11 +41,9 @@
         <i class="icon-plus"></i>
     </div>
 	<div id="species_main_wrapper" style="clear: both;">
-		<domain:showIBPHeader model="['userGroupInstance':userGroupInstance]" />
+		<domain:showSiteHeader model="['userGroupInstance':userGroupInstance]" />
 
                 <div class="container outer-wrapper">
-                
-
 			<div>
 				<div style="padding: 10px 0px; margin-left: -20px">
 					<g:layoutBody />
@@ -53,8 +51,7 @@
 			</div>
 		</div>
 
-
-		<domain:showIBPFooter />
+		<domain:showSiteFooter />
 
 	</div>
 	<div id="feedback_button" onclick="location.href='/feedback_form';" style="left: -10px;z-index:1000;"></div>

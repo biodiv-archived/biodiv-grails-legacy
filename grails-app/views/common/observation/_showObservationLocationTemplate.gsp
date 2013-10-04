@@ -68,7 +68,7 @@
         loadGoogleMapsAPI(function() {
             initialize(document.getElementById("big_map_canvas"), false);
             <g:if test="${!observationInstance.isChecklist}">
-                showObservationMapView("${observationInstance.id}");
+            showObservationMapView("${observationInstance.id}", ${observationInstance.fromDate.getTime()});
             </g:if>
             var icon;
             
@@ -89,8 +89,8 @@
 
             initArea(false, undefined, undefined, {icon:icon, layer:'Current Observation' });
             //HACK
-            //if(searchMarker)
-                //map.panTo(searchMarker.getLatLng());
+            if(searchMarker)
+                map.panTo(searchMarker.getLatLng());
 
             <g:if test="${!observationInstance.isChecklist}">
                 resetMap();

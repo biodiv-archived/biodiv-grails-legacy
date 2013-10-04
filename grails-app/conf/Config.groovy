@@ -201,7 +201,12 @@ else {
 
 speciesPortal {
     app.siteName = "India Biodiversity Portal"
-    app.siteDescription = "Welcome to the India Biodiversity Portal (IBP) - A repository of information designed to harness and disseminate collective intelligence on the biodiversity of the Indian subcontinent."
+    app.siteDescription = "Welcome to the ${app.siteName} - A repository of information designed to harness and disseminate collective intelligence on the biodiversity of the Indian subcontinent."
+    app.siteCode = 'ibp'
+
+    app.twitterUrl = "https://twitter.com/thewesternghats"
+    app.facebookUrl = "https://www.facebook.com/pages/India-Biodiversity-Portal/130062180358038?fref=ts"
+    app.feedbackFormUrl = "http://indiabiodiversity.org/feedback_form"
 
 	app.rootDir = "${userHome}/git/biodiv/app-conf"
 	data.rootDir = "${app.rootDir}/data"
@@ -902,11 +907,11 @@ grails.plugins.springsecurity.ui.password.validationRegex='^.*$'
 grails.plugins.springsecurity.ui.register.postRegisterUrl  = "${grails.serverURL}/user/myprofile" // use defaultTargetUrl if not set
 grails.plugins.springsecurity.ui.register.defaultRoleNames = ['ROLE_USER']
 
-grails.plugins.springsecurity.ui.notification.emailFrom = 'notification@indiabiodiversity.org'
+//grails.plugins.springsecurity.ui.notification.emailFrom = 'notification@indiabiodiversity.org'
 grails.plugins.springsecurity.ui.notification.emailReplyTo = "prabha.prabhakar@gmail.com";
 
 grails.plugins.springsecurity.ui.register.emailBody = '''Hi $username,<br/><br/>You (or someone pretending to be you) created an account with this email address.<br/><br/>If you made the request, please click <a href="$url">here</a> to finish the registration and activate your account.'''
-grails.plugins.springsecurity.ui.register.emailFrom = 'notification@indiabiodiversity.org'
+//grails.plugins.springsecurity.ui.register.emailFrom = 'notification@indiabiodiversity.org'
 grails.plugins.springsecurity.ui.register.emailSubject = 'Activate your account with $domain'
 
 grails.plugins.springsecurity.ui.newuser.emailBody = '''\
@@ -922,7 +927,7 @@ Please update your <a href="$userProfileUrl">user profile</a>.<br/>
 If you do not want to receive notifications please go to your <a href="$userProfileUrl">user profile</a> and switch it off.<br/>
 <br/>
 -The portal team'''
-grails.plugins.springsecurity.ui.newuser.emailFrom = 'notification@indiabiodiversity.org'
+//grails.plugins.springsecurity.ui.newuser.emailFrom = 'notification@indiabiodiversity.org'
 grails.plugins.springsecurity.ui.newuser.emailSubject = 'Welcome to $domain'
 
 grails.plugins.springsecurity.ui.userdeleted.emailBody = '''\
@@ -931,7 +936,7 @@ Hi Admin,<br/>
 A user with email address $email is being deleted from <b>$domain</b>.<br/>
 <br/>
 -The portal team'''
-grails.plugins.springsecurity.ui.userdeleted.emailFrom = 'notification@indiabiodiversity.org'
+//grails.plugins.springsecurity.ui.userdeleted.emailFrom = 'notification@indiabiodiversity.org'
 grails.plugins.springsecurity.ui.userdeleted.emailSubject = 'User is being deleted on $domain'
 
 grails.plugins.springsecurity.ui.forgotPassword.emailBody = '''\
@@ -943,7 +948,7 @@ If you didn't make this request then ignore the email; no changes have been made
 <br/>
 If you did make the request, then click <a href="$url">here</a> to reset your password.
 '''
-grails.plugins.springsecurity.ui.forgotPassword.emailFrom = 'notification@indiabiodiversity.org'
+//grails.plugins.springsecurity.ui.forgotPassword.emailFrom = 'notification@indiabiodiversity.org'
 grails.plugins.springsecurity.ui.forgotPassword.emailSubject = "Password Reset"
 
 grails.plugins.springsecurity.ui.addObservation.emailSubject = 'Observation added'
@@ -1084,7 +1089,7 @@ $user has invited you to be founder of the group <a href="$groupUrl">$group</a> 
 If you do not want to receive notifications please go to your <a href="$userProfileUrl">user profile</a> and switch it off.<br/>
 <br/>
 -The portal team'''
-grails.plugins.springsecurity.ui.bBird.emailSubject = 'Welcome to the India Biodiversity Portal'
+grails.plugins.springsecurity.ui.bBird.emailSubject = "Welcome to the ${app.siteName}"
 grails.plugins.springsecurity.ui.bBird.emailBody = '''\
 Hi $username,<br/>
 <br/>
@@ -1105,7 +1110,7 @@ We will appreciate any feedback you may have to offer.<br/><br/>
 grails.plugins.springsecurity.ui.bBirdExistingUser.emailBody = '''\
 Hi $username,<br/>
 <br/>
-You have been added as a member of the <a href="$bBirdUrl">Mumbai BirdRace 2013</a> group on the India Biodiversity Portal. Please use your existing credentials to login. <br/>
+You have been added as a member of the <a href="$bBirdUrl">Mumbai BirdRace 2013</a> group on the ${app.siteName}. Please use your existing credentials to login. <br/>
 <br/>
 We look forward to your contribution on the portal. You can add images of Birds observed during the BirdRace on the  <a href="$obvModuleUrl">Observation module</a>.<br/> 
 The portal is a public participatory portal that thrives by participation from users like you.<br/><br/>

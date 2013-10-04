@@ -146,10 +146,11 @@ function preLoadRecos(max, offset, seeAllClicked) {
     });
 }
 
-function showObservationMapView(obvId) {
+function showObservationMapView(obvId, observedOn) {
     var params = {filterProperty:'speciesName',limit:-1,id:obvId}
     refreshMarkers(params, window.params.observation.relatedObservationsUrl, function(data){
         google.load('visualization', '1', {packages: ['corechart', 'table'], callback:function(){
+            data.observations.push({'observedOn':observedOn});
             drawVisualization(data.observations);
         }});
     });

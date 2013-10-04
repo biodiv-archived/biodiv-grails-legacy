@@ -308,7 +308,8 @@ class RegisterController extends grails.plugins.springsecurity.ui.RegisterContro
 		def username = session[UsernamePasswordAuthenticationFilter.SPRING_SECURITY_LAST_USERNAME_KEY]?.decodeHTML()
 		def registrationCode = RegistrationCode.findByUsername(username)
 		String url = generateLink('register', 'verifyRegistration', [t: registrationCode.token], request)
-		sendVerificationMail(username,username,url,request)
+        SUser user = SUser.findByEmail(username);
+		sendVerificationMail(user.name, username, url, request)
 	}
 
 	protected void sendVerificationMail(String username, String email, String url, request)  {

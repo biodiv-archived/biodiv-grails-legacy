@@ -1,0 +1,16 @@
+/**
+ * All common style rules for biodiv application
+ * Any specific rules have to go into ${grailsApplication.config.speciesPortal.app.codeName}.css
+ */
+#big_map_canvas {
+    height: 400px;
+    width: 100%;
+}
+
+.span4 #big_map_canvas {
+    height: 400px;
+}
+
+.span6 #big_map_canvas {
+    height: 400px;
+}

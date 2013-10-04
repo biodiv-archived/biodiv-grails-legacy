@@ -349,8 +349,8 @@ $(document).ready(function(){
                         else
                             $distinctRecoTable.append('<tr><td>'+item[0]+'</td><td>'+item[2]+'</td></tr>');
                     });
-                	$me.data('offset', data.next);
-                    if(data.totalRecoCount <= data.next){
+                    $me.data('offset', data.next);
+                    if(!data.next){
                     	$me.hide();
                     }
                 } else {
