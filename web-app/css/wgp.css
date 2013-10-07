@@ -557,7 +557,7 @@ ul#recoSummary {
 
 .observation_location {
 	background-color: #FFFFFF;
-	padding: 10px;
+	/*padding: 10px;*/
 	box-shadow: 1px 1px 3px #5e5e5e inset;
 }
 
@@ -627,7 +627,7 @@ ul#recoSummary {
 .map_wrapper {
 	border-radius: 5px;
 	border-top-left-radius: 0;
-	margin-bottom: 40px;
+/*	margin-bottom: 40px;*/
 }
 
 #map_view_bttn {
@@ -2190,7 +2190,9 @@ div.noOfRatings {
 .icon-group-gray:hover {
         background-image: url('../images/glyphicons_043_group_white.png');
 } 
-
+.resource_in_groups .sidebar_section {
+	margin-bottom: 0px;
+}
 /* .selectable { */
 /*     background: url("../images/icons/plus.png") no-repeat scroll 50% 50% transparent; */
 /*     background-color: transparent; */

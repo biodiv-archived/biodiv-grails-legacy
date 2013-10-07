@@ -1,34 +1,13 @@
 function feature(objectId, objectType, url) {
-	console.log("feature function called");
+    console.log("feature function called");
     var featureNotes = document.getElementById("notes").value;
     console.log(featureNotes);
-    userGroup = getSelectedUserGroups();
+    userGroup = getSelectedUserGroups($("#featureIn"));
 	if(userGroup.length === 0){
 		alert('Please select at least one group')
 		return; 
 	}
 
-	/*if(!$('.post-to-groups .select-all').hasClass('active') && selectedObjects.length === 0){
-		alert('Please select at least one object');
-		return;
-	}
-	
-	userGroups = getSelectedUserGroups();
-	if(userGroups.length === 0){
-		alert('Please select at least one group')
-		return; 
-	}
-	
-	if(submitType === 'post'){
-		console.log("posting " + selectedObjects +  ' on groups ' + userGroups);
-	}else{
-		console.log("unposting " + selectedObjects +  ' on groups ' + userGroups);
-	}
-	
-	var selectionType = $('.post-to-groups .select-all').hasClass('active') ? 'selectAll' : 'reset'
-	var objectIds = (selectionType === 'selectAll') ?  rejectedObjects : selectedObjects
-	var filterUrl = window.location.href	
-	*/
 	$.ajax({
  		url: url,
  		type: 'POST',
@@ -36,78 +15,44 @@ function feature(objectId, objectType, url) {
 		data:{'id':objectId, 'type':objectType, 'userGroup': userGroup.join(","), 'notes': featureNotes},
 		success: function(data) {
 			if(data.success){
-			    //console.log("HTML RETURNED");    
-                            //console.log($(".is-featured"));
-                            //alert(data.freshUGListHTML);
-                            $(".is-featured").replaceWith(data.freshUGListHTML);
-                            //alert($(".is-featured"));
-
-			    alert("SUCCESS");
-
-                                //alert()
-				//$(".alertMsg").removeClass('alert alert-error').addClass('alert alert-success').html(data.msg);
-			}else{
+			    $(".is-featured").replaceWith(data.freshUGListHTML);
+                        }else{
 				alert("FAILED MESSAGE");
-				//$(".alertMsg").removeClass('alert alert-success').addClass('alert alert-error').html(data.msg);
 			}
-			//$("html, body").animate({ scrollTop: 0 });
-			return false;
-		}, error: function(xhr, status, error) {
-			alert("AJAX FAILED, Fatal Error");
-			//alert(xhr.responseText);
-	   	}
-	});
+			
+		        return false;
+		        }, error: function(xhr, status, error) {
+			    alert("AJAX FAILED, Fatal Error");
+			
+	   	        }
+	        });
 }
 
 function unfeature(objectId, objectType, url) {
 	console.log("unfeature function called");
-        userGroup = getSelectedUserGroups();
+        userGroup = getSelectedUserGroups($("#featureIn"));
 	if(userGroup.length === 0){
 		alert('Please select at least one group')
 		return; 
 	}
-	/*if(!$('.post-to-groups .select-all').hasClass('active') && selectedObjects.length === 0){
-		alert('Please select at least one object');
-		return;
-	}
-	
-	userGroups = getSelectedUserGroups();
-	if(userGroups.length === 0){
-		alert('Please select at least one group')
-		return; 
-	}
-	
-	if(submitType === 'post'){
-		console.log("posting " + selectedObjects +  ' on groups ' + userGroups);
-	}else{
-		console.log("unposting " + selectedObjects +  ' on groups ' + userGroups);
-	}
-	
-	var selectionType = $('.post-to-groups .select-all').hasClass('active') ? 'selectAll' : 'reset'
-	var objectIds = (selectionType === 'selectAll') ?  rejectedObjects : selectedObjects
-	var filterUrl = window.location.href	
-	*/
-	$.ajax({
+		$.ajax({
  		url: url,
  		type: 'POST',
 		dataType: "json",
 		data:{'id':objectId, 'type':objectType, 'userGroup':userGroup.join(",")},
 		success: function(data) {
 			if(data.success){
-                            //console.log("UNFEATURE SUCCESS");
                             $(".is-featured").replaceWith(data.freshUGListHTML);
-			    alert("SUCCESS");
-				//alert()
-				//$(".alertMsg").removeClass('alert alert-error').addClass('alert alert-success').html(data.msg);
+			   
 			}else{
-				alert("FAILED MESSAGE");
-				//$(".alertMsg").removeClass('alert alert-success').addClass('alert alert-error').html(data.msg);
+        			alert("FAILED MESSAGE");
+				
 			}
-			//$("html, body").animate({ scrollTop: 0 });
+			
 			return false;
 		}, error: function(xhr, status, error) {
 			alert("AJAX FAILED, Fatal Error");
-			//alert(xhr.responseText);
+			
 	   	}
 	});
 }

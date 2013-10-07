@@ -43,17 +43,13 @@ class AbstractObjectController {
     
     def related = {
 		log.debug params;
-        println "==================RRRRRRRRRRRRRRRRRRRRRRRRRRRRRR==================="
 		def relatedObv = observationService.getRelatedObservations(params).relatedObv;
-		println "%%%%%%%%%%%%%%  RELATED OBVS +++++++++++++++" + relatedObv
 
 		if(relatedObv) {
 			if(relatedObv.observations)
-                println "%%%%%%%%%%%%%%  IF mein IF +++++++++++++++"
 				relatedObv.observations = observationService.createUrlList2(relatedObv.observations, observationService.getIconBasePath(params.controller));
 		} else {
 		}
-		//println relatedObv
 		render relatedObv as JSON
 	}
 

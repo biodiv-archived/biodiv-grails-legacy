@@ -37,9 +37,10 @@
 						<s:speciesFilter></s:speciesFilter>
 						<sUser:isAdmin>
 							<s:showDownloadAction model="['source':'Species', 'requestObject':request ]" />
-						</sUser:isAdmin> 
+						</sUser:isAdmin>
+						<uGroup:objectPostToGroups model="['objectType':Species.class.canonicalName, userGroup:params.userGroup, canPullResource:canPullResource]"/>
 						<div class="observations_list_wrapper" style="top: 0px;">
-							<s:showSpeciesList></s:showSpeciesList>
+							<s:showSpeciesList/>
 						</div>
 				</div>
 				<div id="contribute" class="tab-pane">

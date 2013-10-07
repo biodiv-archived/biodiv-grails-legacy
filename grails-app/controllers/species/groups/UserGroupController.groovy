@@ -972,7 +972,8 @@ class UserGroupController {
    def bulkPost = {
 	   log.debug params;
 	   def r = userGroupService.updateResourceOnGroup(params)
-	   r['msg'] = "${message(code:r.remove('msgCode'))}" 
+	   r['resourceGroupHtml'] =  (params.pullType == 'single') ? g.render(template:"/common/resourceInGroupsTemplate", model:['observationInstance':r.remove('resourceObj')]):null;
+	   r['msg'] = "${message(code:r.remove('msgCode'))}"
 	   render r as JSON
    }
    /////////////////////////////////////////////////////////////////////////////////////////////

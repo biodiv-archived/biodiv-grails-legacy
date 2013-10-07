@@ -73,7 +73,7 @@
     RewriteRule (^(/biodiv/(logo$|observations|newsletters|group-themes|users|userGroups|img|content))) - [L]
 	
     RewriteCond %{REQUEST_URI} ^/biodiv
-#	RewriteCond %{REQUEST_URI} !(^/biodiv/(logo$|observations|newsletters|group-themes|users|userGroups|img|content))
+#       RewriteCond %{REQUEST_URI} !(^/biodiv/(logo$|observations|newsletters|group-themes|users|userGroups|images|group_icons|content))
     RewriteRule ^/biodiv(.*)$ $1 [R=301]
     ProxyPassReverse / http://localhost:8080/biodiv
 

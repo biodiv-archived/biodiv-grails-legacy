@@ -61,41 +61,68 @@ def getResoruceId(query, sql){
 
 
 def doCrop(){
-	// Instantiate a Date object
 	Date startDate = new Date();
-	// display time and date using toString()
-	//System.out.println(startDate.toString());
 
 	def dataSoruce = ctx.getBean("dataSource");
 	def grailsApplication = ctx.getBean("grailsApplication");
 
 	def sql =  Sql.newInstance(dataSoruce);
-	def query
+	def query, result
 /*
 	//gettting all resource for species
 	query = "select distinct(resource_id) as id from species_resource order by resource_id";
-	def result = getResoruceId(query, sql)
+	result = getResoruceId(query, sql)
 	query = "select distinct(resource_id) as id from species_field_resources order by resource_id";
 	result.addAll(getResoruceId(query, sql))
 	_doCrop(result, grailsApplication.config.speciesPortal.resources.rootDir)
 
 	println "----------------DONE SPECIES-------------------------------------------------- "
-*/
-	query = "select distinct(resource_id) as id from observation_resource  where resource_id > 290615 order by resource_id ";
-	def result = getResoruceId(query, sql)
+
+	query = "select distinct(resource_id) as id from observation_resource  where resource_id > 291108 order by resource_id ";
+	result = getResoruceId(query, sql)
 	_doCrop(result, grailsApplication.config.speciesPortal.observations.rootDir)
 
 	println "----------------DONE OBSERVATION-------------------------------------------------- "
 	result = geUserResoruceId()
 	_doCrop(result, grailsApplication.config.speciesPortal.users.rootDir)
 	println "----------------DONE USERS-------------------------------------------------- "
+
 	
-	result = Resource.list(type:Resource.ResourceType.ICON)
+	result = Resource.findAllByType(Resource.ResourceType.ICON)
 	_doCrop(result, grailsApplication.config.speciesPortal.resources.rootDir)
-	println "----------------DONE ICONS-------------------------------------------------- "
+	println "----------------DONE ICONS-------------------------------------------------- " + result.size()
+*/
+	
+	//PNG format
+	//species
+	query = "select resource_id from species_resource where resource_id in (select id from resource where file_name like '%png')";
+	result = getResoruceId(query, sql)
+	query = "select resource_id from species_field_resources where resource_id in (select id from resource where file_name like '%png')";
+	result.addAll(getResoruceId(query, sql))
+	query = "select repr_image_id as id from species where repr_image_id is not null and repr_image_id not in (select resource_id from species_resource) and repr_image_id not in (select resource_id from species_field_resources)"
+	result.addAll(getResoruceId(query, sql))
+	_doCrop(result, grailsApplication.config.speciesPortal.resources.rootDir)
+	
+	//observation
+	query = "select r.id from resource as r , observation_resource as obr  where file_name like '%png'  and r.id = obr.resource_id";
+	result = getResoruceId(query, sql)
+	_doCrop(result, grailsApplication.config.speciesPortal.observations.rootDir)
 	
 	println "============= Start  Time " + startDate  + "          end time " + new Date()
 }
 
-doCrop();
+//doCrop();
+
+ImageUtils.createScaledImages(new File('/tmp/142.jpg'), new File('/tmp') )
 println "=========== DONE!!";
+
+/*
+ 
+for unsupported exception
+select s.id, s.repr_image_id, r.file_name  from species as s, resource as r where s.repr_image_id = r.id and s.repr_image_id is not null and s.repr_image_id not in (select resource_id from species_resource) and repr_image_id not in (select resource_id from species_field_resources);
+
+for png file
+select id, file_name  from resource where file_name like '%png';
+
+
+*/

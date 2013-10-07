@@ -1,0 +1,1094 @@
+<dataConfig>
+    <dataSource type="JdbcDataSource" driver="org.postgresql.Driver" url="jdbc:postgresql://localhost:5432/ibp" user="postgres" password="postgres123" />
+    <document>
+
+<entity name="lyr_255_thiruvananthapuram_tirunelveli_floristictypes" query="select __mlocate__id,forest,floristic from lyr_255_thiruvananthapuram_tirunelveli_floristictypes" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_255_thiruvananthapuram_tirunelveli_floristictypes" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="forest" name="forest" />
+
+<field column="floristic" name="floristic" />
+
+<entity name="lyr_255_thiruvananthapuram_tirunelveli_floristictypes_metadata" query="select layer_name, layer_description, attribution, created_by from &quot;Meta_Layer&quot; where layer_tablename='lyr_255_thiruvananthapuram_tirunelveli_floristictypes'" transformer="TemplateTransformer">
+
+<field column="layer_name" name="layer_name" />
+
+<field column="layer_description" name="layer_description" />
+
+<field column="attribution" name="attribution" />
+
+<field column="created_by" name="created_by" />
+
+</entity>
+
+</entity>
+
+
+<entity name="lyr_256_mercara_mysore_physiognomy" query="select __mlocate__id,physio from lyr_256_mercara_mysore_physiognomy" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_256_mercara_mysore_physiognomy" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="physio" name="physio" />
+
+<entity name="lyr_256_mercara_mysore_physiognomy_metadata" query="select layer_name, layer_description, attribution, created_by from &quot;Meta_Layer&quot; where layer_tablename='lyr_256_mercara_mysore_physiognomy'" transformer="TemplateTransformer">
+
+<field column="layer_name" name="layer_name" />
+
+<field column="layer_description" name="layer_description" />
+
+<field column="attribution" name="attribution" />
+
+<field column="created_by" name="created_by" />
+
+</entity>
+
+</entity>
+
+
+<entity name="lyr_257_mercara_mysore_majorforest" query="select __mlocate__id,m_forest,s_forest from lyr_257_mercara_mysore_majorforest" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_257_mercara_mysore_majorforest" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="m_forest" name="m_forest" />
+
+<field column="s_forest" name="s_forest" />
+
+<entity name="lyr_257_mercara_mysore_majorforest_metadata" query="select layer_name, layer_description, attribution, created_by from &quot;Meta_Layer&quot; where layer_tablename='lyr_257_mercara_mysore_majorforest'" transformer="TemplateTransformer">
+
+<field column="layer_name" name="layer_name" />
+
+<field column="layer_description" name="layer_description" />
+
+<field column="attribution" name="attribution" />
+
+<field column="created_by" name="created_by" />
+
+</entity>
+
+</entity>
+
+
+<entity name="lyr_258_mercara_mysore_floristictypes" query="select __mlocate__id,forest,floristic from lyr_258_mercara_mysore_floristictypes" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_258_mercara_mysore_floristictypes" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="forest" name="forest" />
+
+<field column="floristic" name="floristic" />
+
+<entity name="lyr_258_mercara_mysore_floristictypes_metadata" query="select layer_name, layer_description, attribution, created_by from &quot;Meta_Layer&quot; where layer_tablename='lyr_258_mercara_mysore_floristictypes'" transformer="TemplateTransformer">
+
+<field column="layer_name" name="layer_name" />
+
+<field column="layer_description" name="layer_description" />
+
+<field column="attribution" name="attribution" />
+
+<field column="created_by" name="created_by" />
+
+</entity>
+
+</entity>
+
+
+<entity name="lyr_259_belgaum_dharwar_panaji_floristictypes" query="select __mlocate__id,forest,floristic from lyr_259_belgaum_dharwar_panaji_floristictypes" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_259_belgaum_dharwar_panaji_floristictypes" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="forest" name="forest" />
+
+<field column="floristic" name="floristic" />
+
+<entity name="lyr_259_belgaum_dharwar_panaji_floristictypes_metadata" query="select layer_name, layer_description, attribution, created_by from &quot;Meta_Layer&quot; where layer_tablename='lyr_259_belgaum_dharwar_panaji_floristictypes'" transformer="TemplateTransformer">
+
+<field column="layer_name" name="layer_name" />
+
+<field column="layer_description" name="layer_description" />
+
+<field column="attribution" name="attribution" />
+
+<field column="created_by" name="created_by" />
+
+</entity>
+
+</entity>
+
+
+<entity name="lyr_260_belgaum_dharwar_panaji_majorforest" query="select __mlocate__id,m_forest,s_forest from lyr_260_belgaum_dharwar_panaji_majorforest" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_260_belgaum_dharwar_panaji_majorforest" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="m_forest" name="m_forest" />
+
+<field column="s_forest" name="s_forest" />
+
+<entity name="lyr_260_belgaum_dharwar_panaji_majorforest_metadata" query="select layer_name, layer_description, attribution, created_by from &quot;Meta_Layer&quot; where layer_tablename='lyr_260_belgaum_dharwar_panaji_majorforest'" transformer="TemplateTransformer">
+
+<field column="layer_name" name="layer_name" />
+
+<field column="layer_description" name="layer_description" />
+
+<field column="attribution" name="attribution" />
+
+<field column="created_by" name="created_by" />
+
+</entity>
+
+</entity>
+
+
+<entity name="lyr_261_belgaum_dharwar_panaji_physiognomy" query="select __mlocate__id,physio from lyr_261_belgaum_dharwar_panaji_physiognomy" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_261_belgaum_dharwar_panaji_physiognomy" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="physio" name="physio" />
+
+<entity name="lyr_261_belgaum_dharwar_panaji_physiognomy_metadata" query="select layer_name, layer_description, attribution, created_by from &quot;Meta_Layer&quot; where layer_tablename='lyr_261_belgaum_dharwar_panaji_physiognomy'" transformer="TemplateTransformer">
+
+<field column="layer_name" name="layer_name" />
+
+<field column="layer_description" name="layer_description" />
+
+<field column="attribution" name="attribution" />
+
+<field column="created_by" name="created_by" />
+
+</entity>
+
+</entity>
+
+
+<entity name="lyr_262_wg_simple_14class_vegetation" query="select __mlocate__id,forest_typ from lyr_262_wg_simple_14class_vegetation" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_262_wg_simple_14class_vegetation" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="forest_typ" name="forest_typ" />
+
+<entity name="lyr_262_wg_simple_14class_vegetation_metadata" query="select layer_name, layer_description, attribution, created_by from &quot;Meta_Layer&quot; where layer_tablename='lyr_262_wg_simple_14class_vegetation'" transformer="TemplateTransformer">
+
+<field column="layer_name" name="layer_name" />
+
+<field column="layer_description" name="layer_description" />
+
+<field column="attribution" name="attribution" />
+
+<field column="created_by" name="created_by" />
+
+</entity>
+
+</entity>
+
+
+<entity name="lyr_2_wg_endemicsspsatlas" query="select __mlocate__id,species,source,family from lyr_2_wg_endemicsspsatlas" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_2_wg_endemicsspsatlas" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="species" name="species" />
+
+<field column="source" name="source" />
+
+<field column="family" name="family" />
+
+<entity name="lyr_2_wg_endemicsspsatlas_metadata" query="select layer_name, layer_description, attribution, created_by from &quot;Meta_Layer&quot; where layer_tablename='lyr_2_wg_endemicsspsatlas'" transformer="TemplateTransformer">
+
+<field column="layer_name" name="layer_name" />
+
+<field column="layer_description" name="layer_description" />
+
+<field column="attribution" name="attribution" />
+
+<field column="created_by" name="created_by" />
+
+</entity>
+
+</entity>
+
+
+<entity name="lyr_32_nbr_vegtype" query="select __mlocate__id,zone,sname,structure,type,sub_type from lyr_32_nbr_vegtype" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_32_nbr_vegtype" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="zone" name="zone" />
+
+<field column="sname" name="sname" />
+
+<field column="structure" name="structure" />
+
+<field column="type" name="type" />
+
+<field column="sub_type" name="sub_type" />
+
+<entity name="lyr_32_nbr_vegtype_metadata" query="select layer_name, layer_description, attribution, created_by from &quot;Meta_Layer&quot; where layer_tablename='lyr_32_nbr_vegtype'" transformer="TemplateTransformer">
+
+<field column="layer_name" name="layer_name" />
+
+<field column="layer_description" name="layer_description" />
+
+<field column="attribution" name="attribution" />
+
+<field column="created_by" name="created_by" />
+
+</entity>
+
+</entity>
+
+
+<entity name="lyr_33_nbr_vegsample" query="select __mlocate__id,location,ftype,disturbanc from lyr_33_nbr_vegsample" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_33_nbr_vegsample" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="location" name="location" />
+
+<field column="ftype" name="ftype" />
+
+<field column="disturbanc" name="disturbanc" />
+
+<entity name="lyr_33_nbr_vegsample_metadata" query="select layer_name, layer_description, attribution, created_by from &quot;Meta_Layer&quot; where layer_tablename='lyr_33_nbr_vegsample'" transformer="TemplateTransformer">
+
+<field column="layer_name" name="layer_name" />
+
+<field column="layer_description" name="layer_description" />
+
+<field column="attribution" name="attribution" />
+
+<field column="created_by" name="created_by" />
+
+</entity>
+
+</entity>
+
+
+<entity name="lyr_34_brt_boundary" query="select __mlocate__id,biogeograp,contact from lyr_34_brt_boundary" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_34_brt_boundary" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="biogeograp" name="biogeograp" />
+
+<field column="contact" name="contact" />
+
+<entity name="lyr_34_brt_boundary_metadata" query="select layer_name, layer_description, attribution, created_by from &quot;Meta_Layer&quot; where layer_tablename='lyr_34_brt_boundary'" transformer="TemplateTransformer">
+
+<field column="layer_name" name="layer_name" />
+
+<field column="layer_description" name="layer_description" />
+
+<field column="attribution" name="attribution" />
+
+<field column="created_by" name="created_by" />
+
+</entity>
+
+</entity>
+
+
+<entity name="lyr_35_brt_fire2001" query="select __mlocate__id,legend from lyr_35_brt_fire2001" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_35_brt_fire2001" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="legend" name="legend" />
+
+<entity name="lyr_35_brt_fire2001_metadata" query="select layer_name, layer_description, attribution, created_by from &quot;Meta_Layer&quot; where layer_tablename='lyr_35_brt_fire2001'" transformer="TemplateTransformer">
+
+<field column="layer_name" name="layer_name" />
+
+<field column="layer_description" name="layer_description" />
+
+<field column="attribution" name="attribution" />
+
+<field column="created_by" name="created_by" />
+
+</entity>
+
+</entity>
+
+
+<entity name="lyr_36_brt_fire2000" query="select __mlocate__id,legend from lyr_36_brt_fire2000" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_36_brt_fire2000" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="legend" name="legend" />
+
+<entity name="lyr_36_brt_fire2000_metadata" query="select layer_name, layer_description, attribution, created_by from &quot;Meta_Layer&quot; where layer_tablename='lyr_36_brt_fire2000'" transformer="TemplateTransformer">
+
+<field column="layer_name" name="layer_name" />
+
+<field column="layer_description" name="layer_description" />
+
+<field column="attribution" name="attribution" />
+
+<field column="created_by" name="created_by" />
+
+</entity>
+
+</entity>
+
+
+<entity name="lyr_37_brt_biomasschangepattern1973_98" query="select __mlocate__id,pattern from lyr_37_brt_biomasschangepattern1973_98" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_37_brt_biomasschangepattern1973_98" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="pattern" name="pattern" />
+
+<entity name="lyr_37_brt_biomasschangepattern1973_98_metadata" query="select layer_name, layer_description, attribution, created_by from &quot;Meta_Layer&quot; where layer_tablename='lyr_37_brt_biomasschangepattern1973_98'" transformer="TemplateTransformer">
+
+<field column="layer_name" name="layer_name" />
+
+<field column="layer_description" name="layer_description" />
+
+<field column="attribution" name="attribution" />
+
+<field column="created_by" name="created_by" />
+
+</entity>
+
+</entity>
+
+
+<entity name="lyr_38_brt_fire2007" query="select __mlocate__id,legend from lyr_38_brt_fire2007" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_38_brt_fire2007" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="legend" name="legend" />
+
+<entity name="lyr_38_brt_fire2007_metadata" query="select layer_name, layer_description, attribution, created_by from &quot;Meta_Layer&quot; where layer_tablename='lyr_38_brt_fire2007'" transformer="TemplateTransformer">
+
+<field column="layer_name" name="layer_name" />
+
+<field column="layer_description" name="layer_description" />
+
+<field column="attribution" name="attribution" />
+
+<field column="created_by" name="created_by" />
+
+</entity>
+
+</entity>
+
+
+<entity name="lyr_39_brt_biomasschange1973_98" query="select __mlocate__id,change from lyr_39_brt_biomasschange1973_98" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_39_brt_biomasschange1973_98" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="change" name="change" />
+
+<entity name="lyr_39_brt_biomasschange1973_98_metadata" query="select layer_name, layer_description, attribution, created_by from &quot;Meta_Layer&quot; where layer_tablename='lyr_39_brt_biomasschange1973_98'" transformer="TemplateTransformer">
+
+<field column="layer_name" name="layer_name" />
+
+<field column="layer_description" name="layer_description" />
+
+<field column="attribution" name="attribution" />
+
+<field column="created_by" name="created_by" />
+
+</entity>
+
+</entity>
+
+
+<entity name="lyr_3_wg_flow" query="select __mlocate__id,station,river from lyr_3_wg_flow" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_3_wg_flow" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="station" name="station" />
+
+<field column="river" name="river" />
+
+<entity name="lyr_3_wg_flow_metadata" query="select layer_name, layer_description, attribution, created_by from &quot;Meta_Layer&quot; where layer_tablename='lyr_3_wg_flow'" transformer="TemplateTransformer">
+
+<field column="layer_name" name="layer_name" />
+
+<field column="layer_description" name="layer_description" />
+
+<field column="attribution" name="attribution" />
+
+<field column="created_by" name="created_by" />
+
+</entity>
+
+</entity>
+
+
+<entity name="lyr_41_brt_lantanadistribution" query="select __mlocate__id,lantana from lyr_41_brt_lantanadistribution" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_41_brt_lantanadistribution" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="lantana" name="lantana" />
+
+<entity name="lyr_41_brt_lantanadistribution_metadata" query="select layer_name, layer_description, attribution, created_by from &quot;Meta_Layer&quot; where layer_tablename='lyr_41_brt_lantanadistribution'" transformer="TemplateTransformer">
+
+<field column="layer_name" name="layer_name" />
+
+<field column="layer_description" name="layer_description" />
+
+<field column="attribution" name="attribution" />
+
+<field column="created_by" name="created_by" />
+
+</entity>
+
+</entity>
+
+
+<entity name="lyr_42_brt_ranges" query="select __mlocate__id,ranges from lyr_42_brt_ranges" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_42_brt_ranges" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="ranges" name="ranges" />
+
+<entity name="lyr_42_brt_ranges_metadata" query="select layer_name, layer_description, attribution, created_by from &quot;Meta_Layer&quot; where layer_tablename='lyr_42_brt_ranges'" transformer="TemplateTransformer">
+
+<field column="layer_name" name="layer_name" />
+
+<field column="layer_description" name="layer_description" />
+
+<field column="attribution" name="attribution" />
+
+<field column="created_by" name="created_by" />
+
+</entity>
+
+</entity>
+
+
+<entity name="lyr_43_brt_fire2005" query="select __mlocate__id,legend from lyr_43_brt_fire2005" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_43_brt_fire2005" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="legend" name="legend" />
+
+<entity name="lyr_43_brt_fire2005_metadata" query="select layer_name, layer_description, attribution, created_by from &quot;Meta_Layer&quot; where layer_tablename='lyr_43_brt_fire2005'" transformer="TemplateTransformer">
+
+<field column="layer_name" name="layer_name" />
+
+<field column="layer_description" name="layer_description" />
+
+<field column="attribution" name="attribution" />
+
+<field column="created_by" name="created_by" />
+
+</entity>
+
+</entity>
+
+
+<entity name="lyr_44_brt_fire1999" query="select __mlocate__id,legend from lyr_44_brt_fire1999" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_44_brt_fire1999" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="legend" name="legend" />
+
+<entity name="lyr_44_brt_fire1999_metadata" query="select layer_name, layer_description, attribution, created_by from &quot;Meta_Layer&quot; where layer_tablename='lyr_44_brt_fire1999'" transformer="TemplateTransformer">
+
+<field column="layer_name" name="layer_name" />
+
+<field column="layer_description" name="layer_description" />
+
+<field column="attribution" name="attribution" />
+
+<field column="created_by" name="created_by" />
+
+</entity>
+
+</entity>
+
+
+<entity name="lyr_45_brt_fire2003" query="select __mlocate__id,legend from lyr_45_brt_fire2003" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_45_brt_fire2003" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="legend" name="legend" />
+
+<entity name="lyr_45_brt_fire2003_metadata" query="select layer_name, layer_description, attribution, created_by from &quot;Meta_Layer&quot; where layer_tablename='lyr_45_brt_fire2003'" transformer="TemplateTransformer">
+
+<field column="layer_name" name="layer_name" />
+
+<field column="layer_description" name="layer_description" />
+
+<field column="attribution" name="attribution" />
+
+<field column="created_by" name="created_by" />
+
+</entity>
+
+</entity>
+
+
+<entity name="lyr_48_vembanad_birdsurvey" query="select __mlocate__id,site from lyr_48_vembanad_birdsurvey" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_48_vembanad_birdsurvey" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="site" name="site" />
+
+<entity name="lyr_48_vembanad_birdsurvey_metadata" query="select layer_name, layer_description, attribution, created_by from &quot;Meta_Layer&quot; where layer_tablename='lyr_48_vembanad_birdsurvey'" transformer="TemplateTransformer">
+
+<field column="layer_name" name="layer_name" />
+
+<field column="layer_description" name="layer_description" />
+
+<field column="attribution" name="attribution" />
+
+<field column="created_by" name="created_by" />
+
+</entity>
+
+</entity>
+
+
+<entity name="lyr_49_vembanad_lake" query="select __mlocate__id,name,status,livelihood from lyr_49_vembanad_lake" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_49_vembanad_lake" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="name" name="name" />
+
+<field column="status" name="status" />
+
+<field column="livelihood" name="livelihood" />
+
+<entity name="lyr_49_vembanad_lake_metadata" query="select layer_name, layer_description, attribution, created_by from &quot;Meta_Layer&quot; where layer_tablename='lyr_49_vembanad_lake'" transformer="TemplateTransformer">
+
+<field column="layer_name" name="layer_name" />
+
+<field column="layer_description" name="layer_description" />
+
+<field column="attribution" name="attribution" />
+
+<field column="created_by" name="created_by" />
+
+</entity>
+
+</entity>
+
+
+<entity name="lyr_4_wg_cepfpriorsites" query="select __mlocate__id,name from lyr_4_wg_cepfpriorsites" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_4_wg_cepfpriorsites" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="name" name="name" />
+
+<entity name="lyr_4_wg_cepfpriorsites_metadata" query="select layer_name, layer_description, attribution, created_by from &quot;Meta_Layer&quot; where layer_tablename='lyr_4_wg_cepfpriorsites'" transformer="TemplateTransformer">
+
+<field column="layer_name" name="layer_name" />
+
+<field column="layer_description" name="layer_description" />
+
+<field column="attribution" name="attribution" />
+
+<field column="created_by" name="created_by" />
+
+</entity>
+
+</entity>
+
+
+<entity name="lyr_50_vembanad_basinstations" query="select __mlocate__id,location,community,type from lyr_50_vembanad_basinstations" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_50_vembanad_basinstations" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="location" name="location" />
+
+<field column="community" name="community" />
+
+<field column="type" name="type" />
+
+<entity name="lyr_50_vembanad_basinstations_metadata" query="select layer_name, layer_description, attribution, created_by from &quot;Meta_Layer&quot; where layer_tablename='lyr_50_vembanad_basinstations'" transformer="TemplateTransformer">
+
+<field column="layer_name" name="layer_name" />
+
+<field column="layer_description" name="layer_description" />
+
+<field column="attribution" name="attribution" />
+
+<field column="created_by" name="created_by" />
+
+</entity>
+
+</entity>
+
+
+<entity name="lyr_52_pench_alldholes_geog" query="select __mlocate__id,season from lyr_52_pench_alldholes_geog" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_52_pench_alldholes_geog" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="season" name="season" />
+
+<entity name="lyr_52_pench_alldholes_geog_metadata" query="select layer_name, layer_description, attribution, created_by from &quot;Meta_Layer&quot; where layer_tablename='lyr_52_pench_alldholes_geog'" transformer="TemplateTransformer">
+
+<field column="layer_name" name="layer_name" />
+
+<field column="layer_description" name="layer_description" />
+
+<field column="attribution" name="attribution" />
+
+<field column="created_by" name="created_by" />
+
+</entity>
+
+</entity>
+
+
+<entity name="lyr_55_bichhia_drain" query="select __mlocate__id,name from lyr_55_bichhia_drain" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_55_bichhia_drain" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="name" name="name" />
+
+<entity name="lyr_55_bichhia_drain_metadata" query="select layer_name, layer_description, attribution, created_by from &quot;Meta_Layer&quot; where layer_tablename='lyr_55_bichhia_drain'" transformer="TemplateTransformer">
+
+<field column="layer_name" name="layer_name" />
+
+<field column="layer_description" name="layer_description" />
+
+<field column="attribution" name="attribution" />
+
+<field column="created_by" name="created_by" />
+
+</entity>
+
+</entity>
+
+
+<entity name="lyr_5_wg_cepfcrtlinks" query="select __mlocate__id,lnk_no,lnkname from lyr_5_wg_cepfcrtlinks" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_5_wg_cepfcrtlinks" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="lnk_no" name="lnk_no" />
+
+<field column="lnkname" name="lnkname" />
+
+<entity name="lyr_5_wg_cepfcrtlinks_metadata" query="select layer_name, layer_description, attribution, created_by from &quot;Meta_Layer&quot; where layer_tablename='lyr_5_wg_cepfcrtlinks'" transformer="TemplateTransformer">
+
+<field column="layer_name" name="layer_name" />
+
+<field column="layer_description" name="layer_description" />
+
+<field column="attribution" name="attribution" />
+
+<field column="created_by" name="created_by" />
+
+</entity>
+
+</entity>
+
+
+<entity name="lyr_60_bandipur_villages" query="select __mlocate__id,name from lyr_60_bandipur_villages" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_60_bandipur_villages" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="name" name="name" />
+
+<entity name="lyr_60_bandipur_villages_metadata" query="select layer_name, layer_description, attribution, created_by from &quot;Meta_Layer&quot; where layer_tablename='lyr_60_bandipur_villages'" transformer="TemplateTransformer">
+
+<field column="layer_name" name="layer_name" />
+
+<field column="layer_description" name="layer_description" />
+
+<field column="attribution" name="attribution" />
+
+<field column="created_by" name="created_by" />
+
+</entity>
+
+</entity>
+
+
+<entity name="lyr_61_bandipur_apcwtfrh" query="select __mlocate__id,names,descri from lyr_61_bandipur_apcwtfrh" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_61_bandipur_apcwtfrh" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="names" name="names" />
+
+<field column="descri" name="descri" />
+
+<entity name="lyr_61_bandipur_apcwtfrh_metadata" query="select layer_name, layer_description, attribution, created_by from &quot;Meta_Layer&quot; where layer_tablename='lyr_61_bandipur_apcwtfrh'" transformer="TemplateTransformer">
+
+<field column="layer_name" name="layer_name" />
+
+<field column="layer_description" name="layer_description" />
+
+<field column="attribution" name="attribution" />
+
+<field column="created_by" name="created_by" />
+
+</entity>
+
+</entity>
+
+
+<entity name="lyr_62_bandipurtanks_polygon" query="select __mlocate__id,name from lyr_62_bandipurtanks_polygon" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_62_bandipurtanks_polygon" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="name" name="name" />
+
+<entity name="lyr_62_bandipurtanks_polygon_metadata" query="select layer_name, layer_description, attribution, created_by from &quot;Meta_Layer&quot; where layer_tablename='lyr_62_bandipurtanks_polygon'" transformer="TemplateTransformer">
+
+<field column="layer_name" name="layer_name" />
+
+<field column="layer_description" name="layer_description" />
+
+<field column="attribution" name="attribution" />
+
+<field column="created_by" name="created_by" />
+
+</entity>
+
+</entity>
+
+
+<entity name="lyr_63_bandipur_boundary" query="select __mlocate__id,name,state,district,biogeograp,protection from lyr_63_bandipur_boundary" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_63_bandipur_boundary" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="name" name="name" />
+
+<field column="state" name="state" />
+
+<field column="district" name="district" />
+
+<field column="biogeograp" name="biogeograp" />
+
+<field column="protection" name="protection" />
+
+<entity name="lyr_63_bandipur_boundary_metadata" query="select layer_name, layer_description, attribution, created_by from &quot;Meta_Layer&quot; where layer_tablename='lyr_63_bandipur_boundary'" transformer="TemplateTransformer">
+
+<field column="layer_name" name="layer_name" />
+
+<field column="layer_description" name="layer_description" />
+
+<field column="attribution" name="attribution" />
+
+<field column="created_by" name="created_by" />
+
+</entity>
+
+</entity>
+
+
+<entity name="lyr_64_bandipurtanks_point" query="select __mlocate__id,name from lyr_64_bandipurtanks_point" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_64_bandipurtanks_point" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="name" name="name" />
+
+<entity name="lyr_64_bandipurtanks_point_metadata" query="select layer_name, layer_description, attribution, created_by from &quot;Meta_Layer&quot; where layer_tablename='lyr_64_bandipurtanks_point'" transformer="TemplateTransformer">
+
+<field column="layer_name" name="layer_name" />
+
+<field column="layer_description" name="layer_description" />
+
+<field column="attribution" name="attribution" />
+
+<field column="created_by" name="created_by" />
+
+</entity>
+
+</entity>
+
+
+<entity name="lyr_69_agar_wells" query="select __mlocate__id,village,watshd_nam from lyr_69_agar_wells" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_69_agar_wells" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="village" name="village" />
+
+<field column="watshd_nam" name="watshd_nam" />
+
+<entity name="lyr_69_agar_wells_metadata" query="select layer_name, layer_description, attribution, created_by from &quot;Meta_Layer&quot; where layer_tablename='lyr_69_agar_wells'" transformer="TemplateTransformer">
+
+<field column="layer_name" name="layer_name" />
+
+<field column="layer_description" name="layer_description" />
+
+<field column="attribution" name="attribution" />
+
+<field column="created_by" name="created_by" />
+
+</entity>
+
+</entity>
+
+
+<entity name="lyr_6_wg_mammals_ncf" query="select __mlocate__id,state,areaofsurv,forestdivi,range,type_of_ob,location,locationde,sps_name,prey_sps from lyr_6_wg_mammals_ncf" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_6_wg_mammals_ncf" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="state" name="state" />
+
+<field column="areaofsurv" name="areaofsurv" />
+
+<field column="forestdivi" name="forestdivi" />
+
+<field column="range" name="range" />
+
+<field column="type_of_ob" name="type_of_ob" />
+
+<field column="location" name="location" />
+
+<field column="locationde" name="locationde" />
+
+<field column="sps_name" name="sps_name" />
+
+<field column="prey_sps" name="prey_sps" />
+
+<entity name="lyr_6_wg_mammals_ncf_metadata" query="select layer_name, layer_description, attribution, created_by from &quot;Meta_Layer&quot; where layer_tablename='lyr_6_wg_mammals_ncf'" transformer="TemplateTransformer">
+
+<field column="layer_name" name="layer_name" />
+
+<field column="layer_description" name="layer_description" />
+
+<field column="attribution" name="attribution" />
+
+<field column="created_by" name="created_by" />
+
+</entity>
+
+</entity>
+
+
+<entity name="lyr_74_india_whbpoints" query="select __mlocate__id,name,state,biogeo_pro from lyr_74_india_whbpoints" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_74_india_whbpoints" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="name" name="name" />
+
+<field column="state" name="state" />
+
+<field column="biogeo_pro" name="biogeo_pro" />
+
+<entity name="lyr_74_india_whbpoints_metadata" query="select layer_name, layer_description, attribution, created_by from &quot;Meta_Layer&quot; where layer_tablename='lyr_74_india_whbpoints'" transformer="TemplateTransformer">
+
+<field column="layer_name" name="layer_name" />
+
+<field column="layer_description" name="layer_description" />
+
+<field column="attribution" name="attribution" />
+
+<field column="created_by" name="created_by" />
+
+</entity>
+
+</entity>
+
+
+<entity name="lyr_7_wg_boundary" query="select __mlocate__id,name from lyr_7_wg_boundary" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_7_wg_boundary" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="name" name="name" />
+
+<entity name="lyr_7_wg_boundary_metadata" query="select layer_name, layer_description, attribution, created_by from &quot;Meta_Layer&quot; where layer_tablename='lyr_7_wg_boundary'" transformer="TemplateTransformer">
+
+<field column="layer_name" name="layer_name" />
+
+<field column="layer_description" name="layer_description" />
+
+<field column="attribution" name="attribution" />
+
+<field column="created_by" name="created_by" />
+
+</entity>
+
+</entity>
+
+
+<entity name="lyr_83_india_habitats" query="select __mlocate__id,habitat,photo_cred,habitat_ds from lyr_83_india_habitats" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_83_india_habitats" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="habitat" name="habitat" />
+
+<field column="photo_cred" name="photo_cred" />
+
+<field column="habitat_ds" name="habitat_ds" />
+
+<entity name="lyr_83_india_habitats_metadata" query="select layer_name, layer_description, attribution, created_by from &quot;Meta_Layer&quot; where layer_tablename='lyr_83_india_habitats'" transformer="TemplateTransformer">
+
+<field column="layer_name" name="layer_name" />
+
+<field column="layer_description" name="layer_description" />
+
+<field column="attribution" name="attribution" />
+
+<field column="created_by" name="created_by" />
+
+</entity>
+
+</entity>
+
+
+<entity name="lyr_85_india_papoints" query="select __mlocate__id,areaname,designate,status,source,district,state from lyr_85_india_papoints" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_85_india_papoints" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="areaname" name="areaname" />
+
+<field column="designate" name="designate" />
+
+<field column="status" name="status" />
+
+<field column="source" name="source" />
+
+<field column="district" name="district" />
+
+<field column="state" name="state" />
+
+<entity name="lyr_85_india_papoints_metadata" query="select layer_name, layer_description, attribution, created_by from &quot;Meta_Layer&quot; where layer_tablename='lyr_85_india_papoints'" transformer="TemplateTransformer">
+
+<field column="layer_name" name="layer_name" />
+
+<field column="layer_description" name="layer_description" />
+
+<field column="attribution" name="attribution" />
+
+<field column="created_by" name="created_by" />
+
+</entity>
+
+</entity>
+
+
+<entity name="lyr_8_wg_flow_catchments" query="select __mlocate__id,station,river from lyr_8_wg_flow_catchments" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_8_wg_flow_catchments" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="station" name="station" />
+
+<field column="river" name="river" />
+
+<entity name="lyr_8_wg_flow_catchments_metadata" query="select layer_name, layer_description, attribution, created_by from &quot;Meta_Layer&quot; where layer_tablename='lyr_8_wg_flow_catchments'" transformer="TemplateTransformer">
+
+<field column="layer_name" name="layer_name" />
+
+<field column="layer_description" name="layer_description" />
+
+<field column="attribution" name="attribution" />
+
+<field column="created_by" name="created_by" />
+
+</entity>
+
+</entity>
+
+
+<entity name="lyr_9_uttr_habpts" query="select __mlocate__id,state,district,tahsil,census_nam,local_name,level from lyr_9_uttr_habpts" transformer="TemplateTransformer">
+
+<field column="layer" template="lyr_9_uttr_habpts" />
+
+<field column="__mlocate__id" name="id" />
+
+<field column="state" name="state" />
+
+<field column="district" name="district" />
+
+<field column="tahsil" name="tahsil" />
+
+<field column="census_nam" name="census_nam" />
+
+<field column="local_name" name="local_name" />
+
+<field column="level" name="level" />
+
+<entity name="lyr_9_uttr_habpts_metadata" query="select layer_name, layer_description, attribution, created_by from &quot;Meta_Layer&quot; where layer_tablename='lyr_9_uttr_habpts'" transformer="TemplateTransformer">
+
+<field column="layer_name" name="layer_name" />
+
+<field column="layer_description" name="layer_description" />
+
+<field column="attribution" name="attribution" />
+
+<field column="created_by" name="created_by" />
+
+</entity>
+
+</entity>
+
+
+    </document>
+</dataConfig>
+

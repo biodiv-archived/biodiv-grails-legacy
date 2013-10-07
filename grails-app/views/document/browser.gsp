@@ -1,4 +1,5 @@
 <%@ page import="content.eml.UFile"%>
+<%@ page import="content.eml.Document"%>
 <%@page import="species.utils.Utils"%>
 <%@ page import="org.grails.taggable.Tag"%>
 <%@ page import="species.participation.ActivityFeedService"%>
@@ -6,7 +7,7 @@
 <head>
 <g:set var="title" value="Documents"/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
-<r:require modules="add_file" />
+<r:require modules="add_file, content_view, activityfeed" />
 <uploader:head />
 <style type="text/css">
 .thumbnails>.thumbnail {
@@ -32,7 +33,11 @@
 			<g:render template="/document/documentListTemplate" />
 		</div>
 		
-			<g:render template="/document/documentSidebar" />
+		<div class="span4">
+			<uGroup:objectPostToGroups model="['objectType':Document.class.canonicalName, userGroup:params.userGroup, canPullResource:canPullResource]"/>
+      	</div>
+      	<g:render template="/document/documentSidebar" />
+			
 	</div>
 
 </body>

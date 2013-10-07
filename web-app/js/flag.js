@@ -11,7 +11,8 @@ function flag(objectId, objectType, url) {
 			success: function(data) {
 				if(data.success){
                                         $(".flag-list-users").replaceWith(data.flagListUsersHTML);
-					alert("FLAG SUCCESS");
+                                        $("#flag-action>i").addClass("icon-red");
+					//alert("FLAG SUCCESS");
 					//alert()
 					//$(".alertMsg").removeClass('alert alert-error').addClass('alert alert-success').html(data.msg);
 				}else{

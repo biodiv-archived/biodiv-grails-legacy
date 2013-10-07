@@ -64,10 +64,14 @@ class PaginateTagLib {
 		def linkParams = [:];
 		if(attrs.params) linkParams = attrs.params
 		
+		//on click of alphabet offset should reset
+		linkParams.offset = 0
+		
 	   //if (attrs.params) linkParams.putAll(attrs.params)
 		if (params.sort) linkParams.sort = params.sort
 		if (params.order) linkParams.order = params.order
-		linkParams.isGalleryUpdate = false;
+		
+		linkParams.isGalleryUpdate = true;
 		
 		def linkTagAttrs = linkParams
 		linkTagAttrs['action'] = action;

@@ -541,8 +541,7 @@ $(document).ready(function(){
                                 </div>
                             </div>
                         </div>
-                        <uGroup:featureUserGroups model="['observationInstance':speciesInstance]"/>
-
+                                               
                         <div class="span12" style="margin-left:0px">
 				<%def nameRecords = fields.get(grailsApplication.config.speciesPortal.fields.NOMENCLATURE_AND_CLASSIFICATION)?.get(grailsApplication.config.speciesPortal.fields.TAXON_RECORD_NAME).collect{it.value.get('speciesFieldInstance')[0]} %>
 				<g:if test="${nameRecords}">
@@ -577,7 +576,15 @@ $(document).ready(function(){
 							</tr>
 						</g:each>
 						</table>
-					</div>
+                                            </div>
+                                             <div class="tile">
+                                           <g:render template="/common/showFeaturedTemplate" model="['observationInstance':speciesInstance]"/>
+                                        </div>
+                                        <div class="tile">
+                                            <uGroup:featureUserGroups model="['observationInstance':speciesInstance]"/>
+                                            </div>
+
+
 					<comment:showCommentPopup model="['commentHolder':[objectType:ActivityFeedService.SPECIES_TAXON_RECORD_NAME, id:speciesInstance.id], 'rootHolder':speciesInstance]" />
 				</div>
 				<br/>
@@ -702,7 +709,8 @@ $(document).ready(function(){
                                 <comment:showCommentPopup model="['commentHolder':[objectType:ActivityFeedService.SPECIES_MAPS, id:speciesInstance.id], 'rootHolder':speciesInstance]" />	
 
                             </div-->
-
+						   <uGroup:objectPostToGroupsWrapper 
+										model="[canPullResource:canPullResource, 'observationInstance':speciesInstance]" />
                            <div class="sidebar_section">
                                 <h5> Activity </h5>
                                     <div class="union-comment">

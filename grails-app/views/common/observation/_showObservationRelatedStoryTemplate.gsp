@@ -1,54 +1,30 @@
 <r:script> 
 $(document).ready(function() {
-
-
-        url = "${uGroup.createLink(controller:controller, action:action, id:observationId, 'userGroup':userGroupInstance, 'userGroupWebaddress':userGroupWebaddress, 'instance':observationInstance)}"
-        console.log("URL")
-        console.log(url)
-
-	$('#carousel_${id}').jcarousel({
-	    itemLoadCallback : itemLoadCallback,
-            url:"${uGroup.createLink(controller:controller, action:action, id:observationId, 'userGroup':userGroupInstance, 'userGroupWebaddress':userGroupWebaddress)}",
-            filterProperty:"${filterProperty}",
-            filterPropertyValue:"${filterPropertyValue}",
-            carouselDivId:"#carousel_" + "${id}",
-            carouselMsgDivId:"#relatedObservationMsg_" + "${id}",
-            carouselAddObvDivId:"#relatedObservationAddButton_" + "${id}",
-            itemFallbackDimension : window.params.carousel.maxWidth,
-            contextFreeUrl:"${uGroup.createLink(controller:resultController?:controller, action:'show')}",
-            contextGroupWebaddress:"${userGroupWebaddress}",
+    $('#carousel_${id}').jcarousel({
+        itemLoadCallback : itemLoadCallback,
+        setupCallback : setupCallback,
+        url:"${uGroup.createLink(controller:controller, action:action, id:observationId, 'userGroup':userGroupInstance, 'userGroupWebaddress':userGroupWebaddress)}",
+        filterProperty:"${filterProperty}",
+        filterPropertyValue:"${filterPropertyValue}",
+        carouselDivId:"#carousel_" + "${id}",
+        carouselMsgDivId:"#relatedObservationMsg_" + "${id}",
+        carouselAddObvDivId:"#relatedObservationAddButton_" + "${id}",
+        itemFallbackDimension : window.params.carousel.maxWidth,
+        contextFreeUrl:"${uGroup.createLink(controller:resultController?:controller, action:'show')}",
+        contextGroupWebaddress:"${userGroupWebaddress}",
+        <g:if test="${filterProperty == 'featureBy'}">
+            vertical:true,
+            scroll:1,
+            size:1,
+            getItemHTML:getSnippetHTML
+        </g:if>
+        <g:else>
             scroll:3,
-            setupCallback : setupCallback
-        });
+            getItemHTML:getSnippetTabletHTML,
+            horizontal:true
+        </g:else>
+    });
 
-
-
-/*	$('#carousel_${id} img').hover( function () {
-    	$(this).append($("<span> ***</span>"));
-  	}, 
-  	function () {
-    	$(this).find("span:last").remove();
-  	}
-	);
-
-	$('#carousel_${id} .jcarousel-item ').live('mouseenter', function(event) {		
-		$.ajax({
- 				url: "${uGroup.createLink(controller:controller, action:'snippet')}",
- 				method:"GET",
- 				dataType:'html',
- 				data:{'id':${observationId?:speciesId}},
- 				success : function(data, textStatus, xhr){
- 					console.log($(this));	  					
- 					$('#carouselItemDesc').html(data).popover('show');
- 				},
-			error: function (xhr, status, thrownError) {
-				console.log("Error while callback to new comment"+xhr.responseText)
-			}
-		});
-	}).live('mouseleave' , function(event){
-		//$("#carouselItemDesc").hide();
-	});
-*/	
 });
 </r:script>
 

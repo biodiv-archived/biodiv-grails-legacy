@@ -34,13 +34,12 @@ class Follow {
 		return follow ? true : false
 	}
 	
-	static SUser addFollower(object, SUser author){
+	static SUser addFollower(object, SUser author,boolean flushImmidiatly=true){
         println "add FOLLOWER STARTING ___________"
 
 		if(fetchIsFollowing(object, author)){
             println "FOLLOWING SO RETURNING HERE ONLY================"
 			return author
-		}
 		
 		String objectType = object.class.getCanonicalName()
 		Long objectId = object.id
@@ -50,16 +49,14 @@ class Follow {
         println author
 	
 		Follow follow = new Follow(objectType:objectType, objectId:objectId, author:author)
-        follow.save(flush:true)
-		if(!follow.save(flush:true)){
-            println "%%%%%%%%%%%%%%%% NOT -- SAVED %%%%%%%%%%%%%%%%%%%%%%%%%%"
-
+		if(!follow.save(flush:flushImmidiatly)){
 			follow.errors.allErrors.each { log.error it }
 			return null
 		}
 		
 		return follow.author
-	}	
+	}
+    }
 	
 	static  SUser deleteFollower(object, SUser author){
 		if(!fetchIsFollowing(object, author)){

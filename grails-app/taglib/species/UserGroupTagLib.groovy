@@ -235,8 +235,12 @@ class UserGroupTagLib {
     }
     List getAuthorityUserGroups() {
         def user = springSecurityService.getCurrentUser();
-		def userGroups = userGroupService.getUserGroups(user);
-        List authorityUG = []
+		List authorityUG = []
+        if(user == null){
+            return authorityUG
+        }
+        def userGroups = userGroupService.getUserGroups(user);
+        
         userGroups.each { ugroup ->
             if(ugroup.isFounder(user) || ugroup.isExpert(user)){
                 authorityUG.add(ugroup)
@@ -276,8 +280,11 @@ class UserGroupTagLib {
  
     } 
 	def getCurrentUserUserGroups = {attrs, body ->
+		
+		println "===================================" + attrs.model.onlyExpertGroups
+		
 		def user = springSecurityService.getCurrentUser();
-		def userGroups = userGroupService.getUserGroups(user);
+		def userGroups = user.getUserGroups(attrs.model?.onlyExpertGroups);
 		def result = [:]
 		if(attrs.model?.observationInstance && attrs.model.observationInstance.userGroups) {
 			//check if the obv already belongs to userGroup and disable the control for it not to submit again
@@ -464,10 +471,29 @@ class UserGroupTagLib {
 	}
 	
 	def objectPost = {attrs, body->
-		out << render(template:"/common/objectPostTemplate", model:attrs.model);
+		if(attrs.model.canPullResource){
+			out << render(template:"/common/objectPostTemplate", model:attrs.model);
+		}
 	}
 	
 	def objectPostToGroups = {attrs, body->
-		out << render(template:"/common/objectPostToGroupsTemplate", model:attrs.model);
+		def model = attrs.model
+		model.isBulkPull = (params.action == 'show')?false:true
+		model.onlyExpertGroups = (model.isBulkPull || params.controller == 'species')?true:false
+		if(model.canPullResource == null){
+			model.canPullResource = userGroupService.getResourcePullPermission(params)
+		}
+		if(model.canPullResource){
+			out << render(template:"/common/objectPostToGroupsTemplate", model:model);
+		}
 	}
+	
+	def objectPostToGroupsWrapper = {attrs, body->
+		out << render(template:"/common/objectPostToGroupsWrapperTemplate", model:attrs.model);
+	}
+	
+	def resourceInGroups = {attrs, body->
+		out << render(template:"/common/resourceInGroupsTemplate", model:attrs.model);
+	}
+	
 }

@@ -9,6 +9,8 @@ import javax.imageio.ImageIO;
 import org.imgscalr.*;
 import java.awt.color.CMMException;
 import java.util.HashMap;
+import javax.imageio.IIOException;
+
 
 import org.apache.commons.logging.LogFactory;
 
@@ -25,7 +27,7 @@ class ImageUtils {
 	 * @param imageFile
 	 * @param dir
 	 */
-	static void createScaledImages(File imageFile, File dir) {
+	static void createScaledImages(  File imageFile, File dir) {
 		log.debug "Creating scaled versions of image : "+imageFile.getAbsolutePath();
 
 		def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.resources.images
@@ -36,23 +38,27 @@ class ImageUtils {
 		log.debug "Creating thumbnail image";
 		def extension = config.thumbnail.suffix
 		String name = fileName;
-		if(lastIndex != -1) {
+ 		if(lastIndex != -1) {
 			name = fileName.substring(0, lastIndex);
 		}
-		try {
-			doResize(imageFile, new File(dir, name+extension), config.thumbnail.width, config.thumbnail.height);
+		 
+		try{
+			 doResize(imageFile, new File(dir, name+extension), config.thumbnail.width, config.thumbnail.height);
 		} catch (Exception e) {
 			log.error "Error whild resizing image $imageFile"
 			e.printStackTrace()
 		}
-		
-		log.debug "Creating gallery image";
+		 
+		 
+        log.debug "Creating gallery image";
 		extension = config.gallery.suffix
 		ImageUtils.convert(imageFile, new File(dir, name+extension), config.gallery.width, config.gallery.height, 100);
 
 		log.debug "Creating gallery thumbnail image";
 		extension = config.galleryThumbnail.suffix
 		ImageUtils.convert(imageFile, new File(dir, name+extension), config.galleryThumbnail.width, config.galleryThumbnail.height, 100);
+
+		
 	}
 
 	/**
@@ -104,21 +110,41 @@ class ImageUtils {
 	/**
 	 *Resizing Image to 200*200
 	 */
-
+    public static void doResize(File inImg, File outImg, int width, int height) throws Exception{
+        String fileName = inImg.getAbsolutePath();
+		//System.out.println(fileName);
+		String ext = Utils.getCleanFileExtension(fileName);
+        ext = ext?ext.replaceFirst(".", "").toLowerCase():'jpg';
+        BufferedImage im = null;
+        try{       
+            im = ImageIO.read(inImg);
+        }catch(IIOException e){
+            try{
+                im = JpegReader.readCMYKImage(inImg);
+            }catch(Exception my_e){
+                log.error "CMYK Image also couldnt be read";
+            }
+        }
+        doResize(im, outImg, width, height, ext);
+    }
 	//XXX change this method to private after running migration script
-	public static void doResize(File inImg, File outImg, int width, int height) throws Exception{
-		String ext = "jpg";
-		BufferedImage im = null;
+    private static void doResize(BufferedImage im, File outImg, int width, int height,String ext) throws Exception{
+	   //if(inImg != null){
+        //String fileName = outImg.getAbsolutePath();
+		//System.out.println(fileName);
+		//String ext = fileName.tokenize('.').last();
+        //ext = ext.toLowerCase();
+        //String ext = "jpg";
+		
 		BufferedImage scaled = null;
 		BufferedImage cropped = null;
 
-		im = ImageIO.read(inImg);
 		int img_width = im.getWidth();
 		int img_height = im.getHeight();
 		float img_ratio = (img_width) / (float) (img_height);
 		//System.out.println(img_ratio);
 		// Case 1: When Width greater than height of image.
-		if (img_width > img_height) {
+ 		if (img_width > img_height) {
 			int new_width = (int) (height * img_ratio);
 			scaled = Scalr.resize(im, Scalr.Method.AUTOMATIC, new_width, height);
 			int sca_height = scaled.getHeight();
@@ -127,9 +153,9 @@ class ImageUtils {
 			int rect_width = sca_height;
 			int rect_height = sca_height;
 			cropped = scaled.getSubimage(x, y, rect_width, rect_height);
-		}
+		 }
 		// Case 2: When height greater than width of image.
-		else {
+ 		else {
 			int new_height = (int) (width /img_ratio);
 			scaled = Scalr.resize(im, Scalr.Method.AUTOMATIC, width, new_height);
 			int sca_width = scaled.getWidth();
@@ -138,7 +164,7 @@ class ImageUtils {
 			int rect_width = sca_width;
 			int rect_height = sca_width;
 			cropped = scaled.getSubimage(x, y, rect_width, rect_height);
-		}
+		} 
 		ImageIO.write(cropped, ext, outImg);
         jpegOptimize(outImg);
 
@@ -146,7 +172,7 @@ class ImageUtils {
 		//
 		//			//System.out.println(e.getMessage());
 		//		}
-
+        //}
 	}
 
 	/**
@@ -264,35 +290,37 @@ class ImageUtils {
 
 		if(!defaultFileType) defaultFileType = '.'+config.speciesPortal.resources.images.defaultType;
 
+        String ext = Utils.getCleanFileExtension(name);
+
 		switch(type) {
 			case ImageType.NORMAL :
-				if(name =~ /\.[a-zA-Z]{3,4}$/) {
+				if(ext) {
 					//if filename already has an extention
-					name = name?.replaceFirst(/\.[a-zA-Z]{3,4}$/, ImageType.NORMAL.getSuffix()).replaceFirst('.'+config.speciesPortal.resources.images.defaultType, defaultFileType);
+					name = name?.replaceFirst(/\.[a-zA-Z]+$/, ImageType.NORMAL.getSuffix()).replaceFirst('.'+config.speciesPortal.resources.images.defaultType, defaultFileType);
 				} else {
 					name = name?.plus(ImageType.NORMAL.getSuffix()).replaceFirst('.'+config.speciesPortal.resources.images.defaultType, defaultFileType);
 				}
 				break;
 			case ImageType.SMALL :
-				if(name =~ /\.[a-zA-Z]{3,4}$/) {
+				if(ext) {
 					//if filename alreadyy has an extention
-					name = name?.replaceFirst(/\.[a-zA-Z]{3,4}$/, ImageType.SMALL.getSuffix()).replaceFirst('.'+config.speciesPortal.resources.images.defaultType, defaultFileType);
+					name = name?.replaceFirst(/\.[a-zA-Z]+$/, ImageType.SMALL.getSuffix()).replaceFirst('.'+config.speciesPortal.resources.images.defaultType, defaultFileType);
 				} else {
 					name = name?.plus(ImageType.SMALL.getSuffix()).replaceFirst('.'+config.speciesPortal.resources.images.defaultType, defaultFileType);
 				}
 				break;
 			case ImageType.VERY_SMALL :
-				if(name =~ /\.[a-zA-Z]{3,4}$/) {
+				if(ext) {
 					//if filename already has an extention
-					name = name?.replaceFirst(/\.[a-zA-Z]{3,4}$/, ImageType.VERY_SMALL.getSuffix()).replaceFirst('.'+config.speciesPortal.resources.images.defaultType, defaultFileType);
+					name = name?.replaceFirst(/\.[a-zA-Z]+$/, ImageType.VERY_SMALL.getSuffix()).replaceFirst('.'+config.speciesPortal.resources.images.defaultType, defaultFileType);
 				} else {
 					name = name?.plus(ImageType.VERY_SMALL.getSuffix()).replaceFirst('.'+config.speciesPortal.resources.images.defaultType, defaultFileType);
 				}
 				break;
 			case ImageType.LARGE :
-				if(name =~ /\.[a-zA-Z]{3,4}$/) {
+				if(ext) {
 					//if filename already has an extention
-					name = name?.replaceFirst(/\.[a-zA-Z]{3,4}$/, ImageType.LARGE.getSuffix()).replaceFirst('.'+config.speciesPortal.resources.images.defaultType, defaultFileType);
+					name = name?.replaceFirst(/\.[a-zA-Z]+$/, ImageType.LARGE.getSuffix()).replaceFirst('.'+config.speciesPortal.resources.images.defaultType, defaultFileType);
 				} else {
 					name = name?.plus(ImageType.LARGE.getSuffix()).replaceFirst('.'+config.speciesPortal.resources.images.defaultType, defaultFileType);
 				}

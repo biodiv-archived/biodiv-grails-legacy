@@ -117,6 +117,7 @@ modules = {
 		resource url:'/js/jsrender.js'
 		//resource url:'/js/bootstrap-typeahead.js'
 		resource url:'/js/bootstrap-combobox.js'
+		resource url:'/js/species/observations/map.js'
 	}
 
 	observations_show {
@@ -135,7 +136,7 @@ modules = {
 	}
 
 	observations_list { 
-		dependsOn 'observations, list_utils, comment'
+		dependsOn 'observations, list_utils, comment, activityfeed'
 		
         resource url:'/js/species/observations/list.js'
 	}
@@ -256,6 +257,7 @@ modules = {
 		resource url:'/js/species/checklist.js'
 		resource url:'/js/bootstrap-rowlink.min.js'
 		resource url:'/js/location/location-picker.js'
+		resource url:'/js/species/observations/map.js'
 	}
 	
     checklist_list {

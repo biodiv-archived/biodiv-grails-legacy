@@ -67,7 +67,7 @@ class ObservationController extends AbstractObjectController {
 		} else {
 			 model = getObservationList(params);
 		}
-        if(params.loadMore?.toBoolean()){
+		if(params.loadMore?.toBoolean()){
 			render(template:"/common/observation/showObservationListTemplate", model:model);
 			return;
 		} else if(!params.isGalleryUpdate?.toBoolean()){
@@ -93,6 +93,7 @@ class ObservationController extends AbstractObjectController {
 		log.debug params
 		
 		def model = getObservationList(params);
+		
 		if(params.loadMore?.toBoolean()){
 			render(template:"/common/observation/showObservationListTemplate", model:model);
 			return;
@@ -157,9 +158,14 @@ class ObservationController extends AbstractObjectController {
             }
         }
 		log.debug "Storing all observations ids list in session ${session['obv_ids_list']} for params ${params}";
-		return [observationInstanceList: observationInstanceList, instanceTotal: allObservationCount, checklistCount:checklistCount, observationCount: allObservationCount-checklistCount, speciesGroupCountList:filteredObservation.speciesGroupCountList, queryParams: queryParams, activeFilters:activeFilters, resultType:'observation', geoPrivacyAdjust:Utils.getRandomFloat()]
+		return [observationInstanceList: observationInstanceList, instanceTotal: allObservationCount, checklistCount:checklistCount, observationCount: allObservationCount-checklistCount, speciesGroupCountList:filteredObservation.speciesGroupCountList, queryParams: queryParams, activeFilters:activeFilters, resultType:'observation', geoPrivacyAdjust:Utils.getRandomFloat(), canPullResource:userGroupService.getResourcePullPermission(params)]
 	}
 	
+	def occurrences = {
+		log.debug params
+		def result = observationService.getObservationOccurences(params)
+		render result as JSON
+	}
 
 	@Secured(['ROLE_USER'])
 	def create = {
@@ -430,7 +436,7 @@ class ObservationController extends AbstractObjectController {
 						def res = new Resource(fileName:obvDirPath+"/"+file.name, type:ResourceType.IMAGE);
                         //context specific baseUrl for location picker script to work
 						def baseUrl = Utils.getDomainServerUrlWithContext(request) + '/observations'
-						def thumbnail = res.thumbnailUrl(baseUrl);
+						def thumbnail = res.thumbnailUrl(baseUrl, null, ImageType.LARGE);
 						
 						resourcesInfo.add([fileName:file.name, url:'', thumbnail:thumbnail ,type:ResourceType.IMAGE]);
 					}
@@ -763,7 +769,7 @@ class ObservationController extends AbstractObjectController {
 			inGroupMap[(m.observation.id)] = m.inGroup == null ?'false':m.inGroup
 		}
 		
-		def model = [observationInstanceList: result.relatedObv.observations.observation, inGroupMap:inGroupMap, observationInstanceTotal: result.relatedObv.count, queryParams: [max:result.max], activeFilters:new HashMap(params), parentId:params.long('id'), filterProperty:params.filterProperty, initialParams:new HashMap(params)]
+		def model = [observationInstanceList: result.relatedObv.observations.observation, inGroupMap:inGroupMap, instanceTotal: result.relatedObv.count, queryParams: [max:result.max], activeFilters:new HashMap(params), parentId:params.long('id'), filterProperty:params.filterProperty, initialParams:new HashMap(params)]
 		render (view:'listRelated', model:model)
 	}
 
@@ -1062,7 +1068,8 @@ class ObservationController extends AbstractObjectController {
 	@Secured(['ROLE_USER'])
 	def getList = {
 		log.debug params;
-		render getObservationList(params) as JSON
+		def result = getObservationList(params)
+        render result as JSON
 	}
 	
 	@Secured(['ROLE_USER'])
@@ -1108,7 +1115,6 @@ class ObservationController extends AbstractObjectController {
 	def getUserImage = {
 		log.debug params;
 		render SUser.read(params.id.toLong()).icon() 
-		
 	}
 	
 	@Secured(['ROLE_USER'])

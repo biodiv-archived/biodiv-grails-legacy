@@ -378,13 +378,6 @@ CKEDITOR.replace('description', config);
     		$(this).attr('previousValue', $(this).attr('checked'));
 		});
 		
-		function getSelectedUserGroups() {
-		    var userGroups = []; 
-		    $('.userGroups button[class~="btn-success"]').each (function() {
-	            userGroups.push($(this).attr('value'));
-		    });
-		    return userGroups;	
-		}
 		
 			
 		function getSelectedGroup() {

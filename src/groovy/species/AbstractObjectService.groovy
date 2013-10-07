@@ -184,6 +184,7 @@ class AbstractObjectService {
             println "TYPE CHECK %%%%%%%%%% " + it.objectType
             observations.add(activityFeedService.getDomainObject(it.objectType,it.objectId))
         }
+        println "+++++++++++++++" + featured
         println "+++++++++++++++" + observations
         def result = []
         def i = 0;
