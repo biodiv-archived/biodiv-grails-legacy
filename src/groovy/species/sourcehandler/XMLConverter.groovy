@@ -287,7 +287,7 @@ class XMLConverter extends SourceConverter {
         List<SpeciesField> speciesFields = new ArrayList<SpeciesField>();
         def field = getField(fieldNode, false);
         if(field == null) {
-            log.warn "NO SUCH FIELD : "+field;
+            log.warn "NO SUCH FIELD : "+field?.name;
             return;
         }
       
@@ -567,6 +567,9 @@ class XMLConverter extends SourceConverter {
             licenseType = licenseType?.toString().trim();
             if(!licenseType.startsWith("CC") && !licenseType.equalsIgnoreCase(LicenseType.CC_PUBLIC_DOMAIN.value())) {
                 licenseType = "CC "+licenseType.trim()
+            }
+            if(licenseType.startsWith('CC-')) {
+                licenseType = licenseType.replaceFirst('CC-','CC ');
             }
 			type = License.fetchLicenseType(licenseType)
         }

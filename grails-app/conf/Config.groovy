@@ -251,7 +251,7 @@ speciesPortal {
 		serverURL = "http://indiabiodiversity.localhost.org/${appName}/observations"
 		//serverURL = "http://localhost/${appName}/observations"
 		MAX_IMAGE_SIZE = 104857600
-        filePicker.key = 'AXCVl73JWSwe7mTPb2kXdz'
+        filePicker.key = 'Az2MIh1LOQC2OMDowCnioz'
 	} 
 	 userGroups {
 		rootDir = "${app.rootDir}/userGroups"
@@ -580,7 +580,8 @@ environments {
 			observations {
 				rootDir = "${app.rootDir}/observations"
 				serverURL = "http://wgp.saturn.strandls.com/${appName}/observations"
-				//serverURL = "http://localhost/${appName}/observations"
+                filePicker.key = 'AXCVl73JWSwe7mTPb2kXdz'
+	//serverURL = "http://localhost/${appName}/observations"
 			}
 			userGroups {
 				rootDir = "${app.rootDir}/userGroups"
@@ -653,6 +654,7 @@ environments {
 				rootDir = "${app.rootDir}/observations"
 				serverURL = "http://indiabiodiversity.saturn.strandls.com/${appName}/observations"
 				//serverURL = "http://localhost/${appName}/observations"
+                filePicker.key = 'AXCVl73JWSwe7mTPb2kXdz'
 			}
 			userGroups {
 				rootDir = "${app.rootDir}/userGroups"

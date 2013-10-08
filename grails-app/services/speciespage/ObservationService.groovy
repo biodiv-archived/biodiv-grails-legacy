@@ -1680,7 +1680,7 @@ class ObservationService {
 						if(index == 0) {
                             				bcc grailsApplication.config.speciesPortal.app.notifiers_bcc.toArray()
 						}
-						from conf.ui.notification.emailFrom
+						from grailsApplication.config.grails.mail.default.from
 						//replyTo replyTo
 						subject mailSubject
 						if(bodyView) {
