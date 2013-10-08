@@ -175,6 +175,7 @@ class SourceConverter {
 	}
 
 	protected Map getCustomFormat(String customFormat) {
+        if(!customFormat) return [:];
 		return customFormat.split(';').inject([:]) { map, token ->
 			token = token.toLowerCase();
 			token.split('=').with {
