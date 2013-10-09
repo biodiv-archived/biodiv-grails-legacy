@@ -1,6 +1,7 @@
 <head>
 <meta name='layout' content='main' />
 <title><g:message code="springSecurity.denied.title" /></title>
+<meta name='layout' content='register'/>
 </head>
 
 <body>
