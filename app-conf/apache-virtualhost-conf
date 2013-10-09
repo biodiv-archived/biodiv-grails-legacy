@@ -15,7 +15,7 @@
     ProxyPassReverse /biodiv http://indiabiodiversity.localhost.org:8080/biodiv
 
 #   RewriteCond %{REQUEST_URI} !(^(/biodiv/(observations|newsletters|group-themes|users|userGroups|images|content)|(wgp_maps|geoserver)))
-    RewriteRule (^(/biodiv/(observations|newsletters|group-themes|users|userGroups|images|content|group_icons)|(wgp_maps|geoserver))) - [L]
+    RewriteRule (^(/biodiv/(observations|newsletters|group-themes|users|userGroups|simg|images|content|group_icons)|(wgp_maps|geoserver))) - [L]
     
     RewriteCond %{REQUEST_URI} ^/content
     RewriteRule /(.*)$    http://localhost/biodiv/$1 [P,L]
@@ -70,7 +70,7 @@
     RewriteRule ^/biodiv/group/the_western_ghats(.*)$ $1 [R=301]
     ProxyPassReverse / http://localhost:8080/biodiv/group/the_western_ghats
 
-    RewriteRule (^(/biodiv/(logo$|observations|newsletters|group-themes|users|userGroups|images|content))) - [L]
+    RewriteRule (^(/biodiv/(logo$|observations|newsletters|group-themes|users|userGroups|simg|images|content))) - [L]
 	
     RewriteCond %{REQUEST_URI} ^/biodiv
 #	RewriteCond %{REQUEST_URI} !(^/biodiv/(logo$|observations|newsletters|group-themes|users|userGroups|images|group_icons|content))

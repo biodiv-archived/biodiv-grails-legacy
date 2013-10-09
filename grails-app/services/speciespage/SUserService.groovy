@@ -166,7 +166,7 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 							to user.email
 	                        bcc grailsApplication.config.speciesPortal.app.notifiers_bcc.toArray()
 							//bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com","thomas.vee@gmail.com", "sandeept@strandls.com"
-							from conf.ui.notification.emailFrom
+							from grailsApplication.config.grails.mail.default.from
 							subject mailSubject
 							body(view:"/emailtemplates/welcomeEmail", model:templateMap)
 						}

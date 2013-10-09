@@ -73,14 +73,14 @@ class MappedSpreadsheetConverter extends SourceConverter {
 					Node concept = new Node(field, "concept", mappedField.get("concept"));
 					Node category = new Node(field, "category", mappedField.get("category"));
 					Node subcategory = new Node(field, "subcategory", mappedField.get("subcategory"));
-					if (customFormat && mappedField.get("category")?.equalsIgnoreCase("images")) {
+					if (mappedField.get("category")?.equalsIgnoreCase("images")) {
 						Node images = getImages(imagesMetaData, fieldName, 'images', customFormat, delimiter, speciesContent, speciesElement, imagesDir);
-					} else if (customFormat && category.text().equalsIgnoreCase("icons")) {
+					} else if (category.text().equalsIgnoreCase("icons")) {
 						Node icons = getImages(imagesMetaData, fieldName, 'icons', customFormat, delimiter, speciesContent, speciesElement, imagesDir);
-					} else if (customFormat && category.text().equalsIgnoreCase("audio")) {
+					} else if (category.text().equalsIgnoreCase("audio")) {
 						//						Node images = getAudio(fieldName, customFormat, speciesContent);
 						//						new Node(speciesElement, audio);
-					} else if (customFormat && category.text().equalsIgnoreCase("video")) {
+					} else if (category.text().equalsIgnoreCase("video")) {
 						//						Node images = getVideo(fieldName, customFormat, speciesContent);
 						//						new Node(speciesElement, video);
 					} else if (concept.text().equalsIgnoreCase((String)fieldsConfig.INFORMATION_LISTING) && field.category.text().equalsIgnoreCase((String)fieldsConfig.REFERENCES)) {
@@ -153,6 +153,7 @@ class MappedSpreadsheetConverter extends SourceConverter {
 	}
 
 	private Node getImages(List<Map> imagesMetaData, String fieldName, String fieldType, String customFormat, String delimiter, Map speciesContent, Node speciesElement, String imagesDir) {
+        log.debug "Getting images"
 		Node images = new Node(speciesElement, fieldType);
 		def result = getCustomFormat(customFormat);
 		int group = result.get("group") ? Integer.parseInt(result.get("group")?.toString()):-1
@@ -164,9 +165,9 @@ class MappedSpreadsheetConverter extends SourceConverter {
 		int license = result.get("license") ? Integer.parseInt(result.get("license")?.toString())-1:-1
 		int name = result.get("name") ? Integer.parseInt(result.get("name")?.toString())-1:-1
 		boolean incremental = result.get("incremental") ? new Boolean(result.get("incremental")) : false
-		String imagesmetadatasheet = result.get("imagesmetadatasheet") ?: null
+		//String imagesmetadatasheet = result.get("imagesmetadatasheet") ?: null
         
-		if(imagesmetadatasheet && imagesMetaData) {
+		if(imagesMetaData) {
 			//TODO:This is getting repeated for every row in spreadsheet costly
 			fieldName.split(",").eachWithIndex { t, index ->
 				String txt = speciesContent.get(t);
@@ -240,7 +241,9 @@ class MappedSpreadsheetConverter extends SourceConverter {
 			if(attribution != -1 && groupValues.get(attribution)) new Node(image, "attribution", groupValues.get(attribution));
 			if(contributor != -1 && groupValues.get(contributor)) new Node(image, "contributor", groupValues.get(contributor));
 			if(license != -1 && groupValues.get(license)) new Node(image, "license", groupValues.get(license));
-		}
+		} else {
+            log.error "Image is not present at ${imagesLocation}"
+        }
 	}
 
     void setLogAppender(FileAppender fa) {
