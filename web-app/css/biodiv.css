@@ -1352,6 +1352,10 @@ span.cke_skin_kama {
 	margin-right: 16px;
 }
 /*USER GROUP END*/
+.page-header .sci_name{
+	font-style: normal;
+}
+
 .sci_name {
 	font-style: italic;
 }
