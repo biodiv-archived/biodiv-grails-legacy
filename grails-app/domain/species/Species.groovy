@@ -17,7 +17,6 @@ import grails.util.GrailsNameUtils;
 import org.grails.rateable.*
 
 class Species implements Rateable {
- 
 	String title; 
 	String guid; 
 	TaxonomyDefinition taxonConcept;
