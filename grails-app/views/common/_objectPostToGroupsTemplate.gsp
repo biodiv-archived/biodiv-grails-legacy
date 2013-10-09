@@ -1,4 +1,3 @@
-<div class="sidebar_section" style="clear:both;overflow:hidden;border:1px solid #CECECE;">
 	<div class="post-to-groups" >
 	  	<a href="#" onclick="$(this).next('.post-main-content').toggle(150);return false;">
 	  		<h5>Post to User Groups<span class="caret" style="margin-top: 8px;margin-left:5px;"></span></h5>
@@ -22,4 +21,3 @@
 	                     style="float: right; margin-right: 5px;"> Unpost </a>
 		</div>
 	</div>
-</div>

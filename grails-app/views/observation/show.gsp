@@ -189,7 +189,7 @@ String desc = "- "+ location +" by "+observationInstance.author.name.capitalize(
 						
 					</div>
 					<uGroup:objectPostToGroupsWrapper 
-										model="[canPullResource:canPullResource, 'observationInstance':observationInstance]" />
+										model="[canPullResource:canPullResource, 'observationInstance':observationInstance, 'objectType':observationInstance.class.canonicalName]" />
 					<div class="union-comment">
 					<feed:showAllActivityFeeds model="['rootHolder':observationInstance, feedType:'Specific', refreshType:'manual', 'feedPermission':'editable']" />
 					<comment:showAllComments model="['commentHolder':observationInstance, commentType:'super','showCommentList':false]" />

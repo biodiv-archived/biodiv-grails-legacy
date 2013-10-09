@@ -34,10 +34,10 @@
 		</div>
 		
 		<div class="span4">
-			<uGroup:objectPostToGroups model="['objectType':Document.class.canonicalName, userGroup:params.userGroup, canPullResource:canPullResource]"/>
+		<uGroup:objectPostToGroupsWrapper 
+			model="[canPullResource:canPullResource, 'objectType':Document.class.canonicalName]" />
       	</div>
       	<g:render template="/document/documentSidebar" />
-			
 	</div>
 
 </body>

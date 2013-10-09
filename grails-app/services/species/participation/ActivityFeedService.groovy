@@ -135,6 +135,14 @@ class ActivityFeedService {
 					return null
 				}
 		}
+		
+		//updating time stamp on object after addition of activity
+		try {
+			rootHolder.onAddActivity(af, flushImmidiatly)
+		}catch (MissingMethodException e) {
+			//e.printStackTrace();
+		}
+		
 		Follow.addFollower(rootHolder, author, flushImmidiatly)
 		return af
 	}
@@ -216,7 +224,7 @@ class ActivityFeedService {
 		ActivityFeed.updateIsShowable(obj);
 	}
 	
-	def getContextInfo(ActivityFeed feedInstance, params){
+	def getContextInfo(ActivityFeed feedInstance, params=null){
 		
 		def activityType = feedInstance.activityType
 		def activityDomainObj = getDomainObject(feedInstance.activityHolderType, feedInstance.activityHolderId)
@@ -351,9 +359,10 @@ class ActivityFeedService {
 		log.debug "Adding feed for resources " + resources.size()
 		def activityType = isPost ? RESOURCE_POSTED_ON_GROUP : RESOURCE_REMOVED_FROM_GROUP
 		Map resCountMap = [:]
+		def af 
 		resources.each { r->
 			def description = getDescriptionForResourcePull(r, isPost)
-			def af = addActivityFeed(r, ug, author, activityType, description, isShowable, false)
+			af = addActivityFeed(r, ug, author, activityType, description, isShowable, false)
 			int oldCount = resCountMap.get(r.class.canonicalName)?:0
 			resCountMap.put(r.class.canonicalName, ++oldCount)
 			if(!isBulkPull){
@@ -362,9 +371,10 @@ class ActivityFeedService {
 		}
 		if(isBulkPull){
 			def description = getDescriptionForBulkResourcePull(isPost, resCountMap)
-			def af = addActivityFeed(ug, ug, author, activityType, description, true)
+			af = addActivityFeed(ug, ug, author, activityType, description, true)
 			observationService.sendNotificationMail(activityType, ug, null, null, af)
 		} 
+		return af
 	}
 	
 	private String getDescriptionForBulkResourcePull(isPost, countMap){

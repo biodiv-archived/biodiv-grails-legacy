@@ -79,7 +79,8 @@
                         </div>
                         <div class="span4" style="position:relative;top:20px">
                  
-                 <uGroup:objectPostToGroups model="['objectType':Observation.class.canonicalName, userGroup:params.userGroup, canPullResource:canPullResource]"/>
+                 <uGroup:objectPostToGroupsWrapper 
+						model="[canPullResource:canPullResource, 'objectType':Observation.class.canonicalName]" />
                         
 				<div id="observations_list_map" class="observation sidebar_section"
                                     style="clear:both;overflow:hidden;display:none;">

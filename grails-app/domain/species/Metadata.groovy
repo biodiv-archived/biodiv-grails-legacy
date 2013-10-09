@@ -61,4 +61,34 @@ abstract class Metadata {
         }
     }
 	
+	
+	def onAddComment(comment){
+		//updateTimeStamp()
+	}
+	
+	def onAddActivity(af, flushImmidiatly=true){
+		updateTimeStamp(flushImmidiatly)
+	}
+	
+	private updateTimeStamp(flushImmidiatly=true){
+		lastRevised = new Date();
+		saveConcurrently(null, flushImmidiatly);
+	}
+	
+	private saveConcurrently(f = {}, flushImmidiatly=true){
+		try{
+			if(f) f()
+			if(!save(flush:flushImmidiatly)){
+				errors.allErrors.each { log.error it }
+			}
+		}catch(org.hibernate.StaleObjectStateException e){
+			attach()
+			def m = merge()
+			//refresh()
+			//f()
+			if(!m.save(flush:flushImmidiatly)){
+				m.errors.allErrors.each { log.error it }
+			}
+		}
+	}
 }

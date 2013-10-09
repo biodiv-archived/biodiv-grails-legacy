@@ -158,8 +158,6 @@ class Observation extends Metadata implements Taggable, Rateable {
 
 	void calculateMaxVotedSpeciesName(){
 		maxVotedReco = findMaxRepeatedReco();
-		lastRevised = new Date();
-		saveConcurrently();
 	}
 
 	String fetchSuggestedCommonNames(){
@@ -308,12 +306,6 @@ class Observation extends Metadata implements Taggable, Rateable {
 		return ObservationFlag.findAllWhere(observation:this);
 	}
 
-	private updateObservationTimeStamp(){
-		lastRevised = new Date();
-		saveConcurrently();
-		observationsSearchService.publishSearchIndex(this, true);
-	}
-	
 	private updateIsShowable(){
 		//supprssing all checklist generated observation even if they have media
 		boolean isChecklistObs = (id && sourceId != id) ||  (!id && sourceId)
@@ -357,10 +349,6 @@ class Observation extends Metadata implements Taggable, Rateable {
 
 	def fetchCommentCount(){
 		return commentService.getCount(null, this, null, null)
-	}
-	
-	def onAddComment(comment){
-		updateObservationTimeStamp()
 	}
 	
 	def beforeDelete(){
@@ -436,23 +424,7 @@ class Observation extends Metadata implements Taggable, Rateable {
 		return author;
 	}
 	
-	def saveConcurrently(f = {}){
-		try{
-			f()
-			if(!save(flush:true)){
-				errors.allErrors.each { log.error it }
-			}
-		}catch(org.hibernate.StaleObjectStateException e){
-			attach()
-			def m = merge()
-			//refresh()
-			//f()
-			if(!m.save(flush:true)){
-				m.errors.allErrors.each { log.error it }
-			}
-		}
-	}
-	
+
 	def boolean fetchIsFollowing(SUser user=springSecurityService.currentUser){
 		return Follow.fetchIsFollowing(this, user)
 	}
