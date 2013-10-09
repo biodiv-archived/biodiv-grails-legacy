@@ -24,7 +24,7 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 
 	def springSecurityService
 	def mailService
-	def usersSearchService
+	def SUserSearchService
 	private ApplicationTagLib g
 	ApplicationContext applicationContext
 
@@ -289,7 +289,7 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 		def responseHeader
 		long noOfResults = 0
 		if(paramsList)  {
-			def queryResult = usersSearchService.search(paramsList);
+			def queryResult = SUserSearchService.search(paramsList);
 
 			Iterator it = queryResult.getResults().listIterator();
 
