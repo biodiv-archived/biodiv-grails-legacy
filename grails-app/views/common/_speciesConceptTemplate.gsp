@@ -97,6 +97,7 @@
 										<g:if test="${category.value.get('speciesFieldInstance')}">
 										<g:showSpeciesFieldToolbar model="${category.value[0]}" />
 										<%def references = speciesInstance.fields.collect{it.references};
+                                                                                out<<eferences
 										Map refs = new LinkedHashMap();
 										references.each(){
 											if(it) {
