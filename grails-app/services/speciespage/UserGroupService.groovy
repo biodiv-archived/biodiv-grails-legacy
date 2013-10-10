@@ -1282,8 +1282,7 @@ class UserGroupService {
 		if(groupCount == 0){
 			return false
 		}
-		
-		if(!isBulkPull && !params.controller == 'species'){
+		if(!isBulkPull && !(params.controller == 'species')){
 			return true
 		}
 		//if user is founder or expert in any group then retruing true permission for bulk upload

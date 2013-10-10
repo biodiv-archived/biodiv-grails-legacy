@@ -51,10 +51,13 @@ class DocumentService {
 
 
 	def updateDocument(document, params) {
-
+		params.remove('latitude')
+		params.remove('longitude')
 		document.properties = params
 		document.group = null
 		document.habitat = null
+		//document.latitude = document.latitude ?:0.0
+		//document.longitude = document.longitude ?:0.0
 		document.placeName = params.placeName
 		document.reverseGeocodedName = params.reverse_geocoded_name
 		document.locationAccuracy = params.location_accuracy

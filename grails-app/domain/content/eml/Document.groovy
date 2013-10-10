@@ -60,7 +60,7 @@ class Document extends Metadata implements Taggable, Rateable {
 	String sourceHolderType;
 
 	//XXX uncmment it before migration
-	//Coverage coverage //<== extending metadata now	//Coverage Information
+	Coverage coverage //<== extending metadata now	//Coverage Information
 	
 	//Date createdOn  <=== dateCreated
 	//Date lastRevised <=== lastUpdated

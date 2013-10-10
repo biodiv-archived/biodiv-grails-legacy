@@ -384,7 +384,7 @@ class UserGroupTagLib {
 		model.isBulkPull = (params.action == 'show')?false:true
 		model.onlyExpertGroups = (model.isBulkPull || params.controller == 'species')?true:false
 		if(model.canPullResource == null){
-			model.canPullResource = userGroupService.getResourcePullPermission(params)
+			model.canPullResource = userGroupService.getResourcePullPermission(params, model.isBulkPull)
 		}
 		if(model.canPullResource){
 			out << render(template:"/common/objectPostToGroupsTemplate", model:model);

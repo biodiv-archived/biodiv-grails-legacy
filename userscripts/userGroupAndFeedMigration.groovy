@@ -201,7 +201,7 @@ def addDocumentPostFeed(){
 		Document.list().each { doc ->
 			println doc
 			doc.userGroups.each { ug ->
-				checklistUtilService.addActivityFeed(doc, ug, doc.author, ActivityFeedService.RESOURCE_POSTED_ON_GROUP, new Date(doc.dateCreated.getTime() + 2) , desc);
+				checklistUtilService.addActivityFeed(doc, ug, doc.author, ActivityFeedService.RESOURCE_POSTED_ON_GROUP, new Date(doc.createdOn.getTime() + 2) , desc);
 			}
 		}
 	}
@@ -244,8 +244,10 @@ def migrateCoverageToDoc(){
 }
 
 
+
+//migrateCoverageToDoc()
 //addDocumentPostFeed()
-migrateCoverageToDoc()
+
 
 //addUserRegistrationFeed()
 
