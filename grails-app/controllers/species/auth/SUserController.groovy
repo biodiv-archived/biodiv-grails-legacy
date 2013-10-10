@@ -555,6 +555,7 @@ class SUserController extends UserController {
 
 		for (String key in params.keySet()) {
 			if (key.contains('ROLE') && 'on' == params.get(key)) {
+                log.debug "Assigning role : ${key}" 
 				lookupUserRoleClass().create user, lookupRoleClass()."findBy$upperAuthorityFieldName"(key), true
 			}
 		}

@@ -1,11 +1,11 @@
 
 <g:if test="${heading}">
-	<h1 class="${headingClass?:''}" title="${heading}">
+    <h1 class="${headingClass?:''}" title="${heading.replaceAll('<.*>','')}">
 		${heading}
-	</h1>
+    </h1>
 </g:if>
 <g:if test="${subHeading}">
-	<h4 class="${subHeadingClass?:''}" title="${subHeading }">
+    <h4 class="${subHeadingClass?:''}" title="${subHeading.replaceAll('<.*>','')}">
 		${subHeading }
-	</h4>
+    </h4>
 </g:if>
