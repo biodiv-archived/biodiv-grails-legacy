@@ -230,7 +230,7 @@ class XMLConverter extends SourceConverter {
                     log.error "TaxonConcept is not found"
                 }
             } else {
-                log.error "IGNORING SPECIES AS SCIENTIFIC NAME COULD NOT BE PARSED : "+speciesName;
+                log.error "IGNORING SPECIES AS SCIENTIFIC NAME WAS NOT FOUND : "+speciesName;
             }
         } catch(Exception e) {
             log.error "ERROR CONVERTING SPECIES : "+e.getMessage();
@@ -1261,6 +1261,7 @@ println imageNode;
      * Saves any new taxondefinition found 
      */
     private List<TaxonomyRegistry> getClassifications(List speciesNodes, String scientificName, boolean saveHierarchy = true) {
+        log.debug "Getting classifications for ${scientificName}"
         def classifications = Classification.list();
         def taxonHierarchies = new ArrayList();
         classifications.each {
