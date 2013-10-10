@@ -1,3 +1,8 @@
+/**
+ * All common style rules for biodiv application
+ * Any specific rules have to go into ${grailsApplication.config.speciesPortal.app.siteCode}.css
+ */
+
 body { /*     background-color: #ffffff; */
 	/*     background-image: url('../images/header.png'); */
 	/*background-color: #ffffff;*/
@@ -1861,10 +1866,6 @@ li#userOrEmail-new {
 	clear: both;
 }
 
-.header_group .jcarousel-skin-ie7 img {
-	height : 65%;
-}
-
 .icon-group {
 	background-image: url('../images/glyphicons_043_group.png');
 	background-position:0 0;
@@ -1936,18 +1937,18 @@ li#userOrEmail-new {
 .jcarousel-skin-ie7 .jcarousel-item  .thumbnail .img-polaroid {
 	padding:0px;
 	border:0px;
-	max-width:75px;
-	max-height:75px;
+width:75px;
+height:75px;
 /* 	max-width:210px; */
 }
 
 .jcarousel-skin-ie7 .jcarousel-item  .thumbnail .figure a {
-	max-width:75px;
-	max-height:75px;
+width:75px;
+height:75px;
 }
 
 .jcarousel-skin-ie7 .jcarousel-item {
-	width:75px;
+        width:75px;
 	height:75px;
 }
 
@@ -1957,14 +1958,23 @@ li#userOrEmail-new {
 }
 
 .jcarousel-skin-ie7 .jcarousel-item .snippet.tablet .figure {
-	height:75px;
 	width:75px;
-}
-
-.jcarousel-skin-ie7 .jcarousel-clip-horizontal {
 	height:75px;
 }
 
+.jcarousel-skin-ie7 .jcarousel-item-horizontal, .jcarousel-skin-ie7 .jcarousel-clip-horizontal {
+	height:75px;
+        width:75px;
+}
+.jcarousel-skin-ie7 .jcarousel-clip-vertical {
+        width:75px;
+        height:75px;
+}
+
+.jcarousel-skin-ie7 .jcarousel-container-vertical {
+        width:75px;
+        height:75px;
+}
 
 .feedParentContext {
 	background-color: white;

@@ -577,14 +577,7 @@ $(document).ready(function(){
 						</g:each>
 						</table>
                                             </div>
-                                             <div class="tile">
-                                           <g:render template="/common/showFeaturedTemplate" model="['observationInstance':speciesInstance]"/>
-                                        </div>
-                                        <div class="tile">
-                                            <uGroup:featureUserGroups model="['observationInstance':speciesInstance]"/>
-                                            </div>
-
-
+                                             
 					<comment:showCommentPopup model="['commentHolder':[objectType:ActivityFeedService.SPECIES_TAXON_RECORD_NAME, id:speciesInstance.id], 'rootHolder':speciesInstance]" />
 				</div>
 				<br/>
@@ -709,8 +702,10 @@ $(document).ready(function(){
                                 <comment:showCommentPopup model="['commentHolder':[objectType:ActivityFeedService.SPECIES_MAPS, id:speciesInstance.id], 'rootHolder':speciesInstance]" />	
 
                             </div-->
-						   <uGroup:objectPostToGroupsWrapper 
-										model="[canPullResource:canPullResource, 'observationInstance':speciesInstance]" />
+				<uGroup:objectPostToGroupsWrapper 
+                                               model="[canPullResource:canPullResource, 'observationInstance':speciesInstance]" />
+                                <g:render template="/common/showFeaturedTemplate" model="['observationInstance':speciesInstance]"/>
+                                <uGroup:featureUserGroups model="['observationInstance':speciesInstance]"/>
                            <div class="sidebar_section">
                                 <h5> Activity </h5>
                                     <div class="union-comment">

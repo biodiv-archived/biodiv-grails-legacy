@@ -9,7 +9,10 @@ var itemLoadCallback = function(carousel, state) {
 		"filterPropertyValue": carousel.options.filterPropertyValue,
 		"contextGroupWebaddress":carousel.options.contextGroupWebaddress
 	}
-	
+        
+        if(params.limit == 0)
+            params.limit = 3;
+
 	if (state == 'prev'){
 		return;
 	}
@@ -32,7 +35,6 @@ var itemAddCallback = function(carousel, first, last, data, state) {
      console.log("ITEM ADD CALL BACK");
                     console.log(carousel);
 
-        $(".jcarousel-item").css('width', window.params.carousel.maxWidth);
 	var items = data["observations"];
 	for (i = 0; i < items.length; i++) {
 		var actualIndex = first + i;
@@ -54,7 +56,7 @@ var itemAddCallback = function(carousel, first, last, data, state) {
 			carousel.size(data["count"]);
 		}
 	}	
-	$(".jcarousel-item").css('width', window.params.carousel.maxWidth);
+	$(".jcarousel-item-horizontal").css('width', window.params.carousel.maxWidth);
 	$(".jcarousel-item  .thumbnail .ellipsis.multiline").trunk8({
 		lines:3,		
 	});

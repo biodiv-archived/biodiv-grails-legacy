@@ -38,7 +38,7 @@
 			</form>
 
 			<div id="flagged">
-				<g:if test="${observationInstance.flagCount>0}">
+				<g:if test="${observationInstance.flagCount> -1}">
 					<span id="flagHeadings" style="font-weight: bold">Who flagged and why:</span>
                                         </g:if>
                                         <div class = "flag-list-users">
@@ -73,14 +73,18 @@ function removeFlag(flagId, flagComponent){
 		url: "${uGroup.createLink(controller:'action', action:'deleteFlag')}",
 		data:{"id":flagId},
 		
-		success: function(data){
-			if(parseInt(data) == 0){
-				$("#flagHeadings").hide();
-				$("#flag-action>i").removeClass("icon-red");
+                success: function(data){
+                    console.log("zero count")
+
+                    if(parseInt(data.flagCount) == 0){
+                        console.log("zero count inside")
+                        $("#flagHeadings").hide();
+			$("#flag-action>i").removeClass("icon-red");
 			}
 			$(".deleteFlagIcon").tooltip('hide');
 			flagComponent.remove();
-			$("#flagMessage").html('');
+                        $("#flagMessage").html('');
+                        updateFeeds();  
 		},
 		
 		statusCode: {

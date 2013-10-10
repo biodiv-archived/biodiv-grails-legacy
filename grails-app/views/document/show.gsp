@@ -140,7 +140,11 @@
 
 			</g:if>
 			<uGroup:objectPostToGroupsWrapper 
-				model="['observationInstance':documentInstance]" />
+                        model="['observationInstance':documentInstance]" />
+                        
+                        <g:render template="/common/showFeaturedTemplate" model="['observationInstance':documentInstance]"/>
+                        <uGroup:featureUserGroups model="['observationInstance':documentInstance]"/>
+
 			<div class="union-comment">
 				<feed:showAllActivityFeeds model="['rootHolder':documentInstance, feedType:'Specific', refreshType:'manual', 'feedPermission':'editable']" />
 				<comment:showAllComments model="['commentHolder':documentInstance, commentType:'super','showCommentList':false]" />
@@ -148,8 +152,7 @@
 		</div>
                 <div class="span4">
                 <g:render template="/document/documentSidebar" model="['documentInstance':documentInstance]"/>
-                <uGroup:featureUserGroups model="['observationInstance':documentInstance]"/>
-                </div>
+                                </div>
 
 	</div>
 

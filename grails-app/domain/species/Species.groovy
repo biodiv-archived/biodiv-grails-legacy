@@ -52,6 +52,7 @@ class Species implements Rateable {
 	static belongsTo = [UserGroup]
 
 
+
 	static constraints = {
 		guid(blank: false, unique: true);
 		reprImage(nullable:true);
@@ -122,7 +123,7 @@ class Species implements Rateable {
 		def icons = new ArrayList<Resource>();
 		resources.each {
 			if(it?.type == species.Resource.ResourceType.ICON) {
-				icons.add(it);
+                icons.add(it);
 			}
 		}
 		return icons;

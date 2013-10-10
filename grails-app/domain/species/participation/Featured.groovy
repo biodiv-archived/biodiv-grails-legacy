@@ -28,11 +28,12 @@ class Featured {
     Date createdOn = new Date();
 	String notes;
     UserGroup userGroup;
-    
+
     static belongsTo = [author:SUser];
 
     static constraints = {
         author(unique: ['objectId', 'objectType', 'userGroup'])
+        userGroup nullable:true
         notes nullable:true, blank: true
         notes (size:0..400)
     }
@@ -52,16 +53,19 @@ class Featured {
     }
 
     static List isFeaturedIn(object){
+        println "=====CALLING IS FEAT IN======="
+        
         def f = Featured.findAllWhere(objectType: object.class.getCanonicalName(), objectId: object.id)
         def ugList = []
         f.each{
             if(it.notes == null) {
                 ugList.add(['userGroup':it.userGroup,'notes':"No Notes!!"])
-            }
+             }
             else {
                 ugList.add(['userGroup':it.userGroup,'notes':it.notes])
-            }
-        }
+             }
+        } 
+        println "==========IS FEATURED IN ========== " + ugList
         return ugList;
     }
 }

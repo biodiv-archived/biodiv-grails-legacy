@@ -12,15 +12,15 @@
 			<g:set var="mainImage" value="${speciesInstance.mainImage()}" />
 			<%def thumbnailPath = ImageUtils.getFileName(mainImage?.fileName, ImageType.NORMAL, null)%>
 
-			<g:if test="${thumbnailPath }">
+			<g:if test="${thumbnailPath}">
 				<img
 					src="${createLinkTo( base:grailsApplication.config.speciesPortal.resources.serverURL,
 						file: thumbnailPath)}"
 					title="${speciesInstance.taxonConcept.name }" />
 			</g:if> <g:else>
-				<img class="group_icon" style="opacity: 0.4;"
-					title="${speciesInstance.taxonConcept.name}"
-					src="${createLinkTo(dir:'images', file: speciesInstance.fetchSpeciesGroupIcon(ImageType.NORMAL)?.fileName, absolute:true)}" />
+                                <img class="img-polaroid" style="opacity:0.7;"
+                                        title="${speciesInstance.taxonConcept.name.replaceAll('<.*>','')}"
+                                        src="${createLinkTo(dir: '', file:speciesInstance.fetchSpeciesGroupIcon(ImageType.NORMAL)?.fileName, absolute:true)}"></img>
 			</g:else> </a>
 	</div>
 	<div class="observation_story"

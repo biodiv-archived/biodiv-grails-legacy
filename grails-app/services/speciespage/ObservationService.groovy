@@ -80,7 +80,8 @@ class ObservationService extends AbstractObjectService {
 	static final String CHECKLIST_DELETED= "checklistDeleted";
 	static final String DOWNLOAD_REQUEST = "downloadRequest";
 	static final int MAX_EXPORT_SIZE = -1;
-	
+	static final String FEATURED = "Featured";
+    static final String UNFEATURED = "UnFeatured";
 	/**
 	 * 
 	 * @param params
@@ -576,7 +577,6 @@ class ObservationService extends AbstractObjectService {
 		return resources;
 	}
 
-
 	Map findAllTagsSortedByObservationCount(int max){
 		def sql =  Sql.newInstance(dataSource);
 		//query with observation delete handle
@@ -890,12 +890,14 @@ class ObservationService extends AbstractObjectService {
             queryParams['boundGeometry'] = boundGeometry
 			activeFilters["bounds"] = params.bounds
 		} 
-		filterQuery += " and obv.isShowable = true ";
 		
-		def distinctRecoQuery = "select obv.maxVotedReco.id, count(*) from Observation obv  "+ userGroupQuery +" "+((params.tag)?tagQuery:'')+filterQuery+ " and obv.isChecklist=false and obv.maxVotedReco is not null group by obv.maxVotedReco order by count(*) desc,obv.maxVotedReco.id asc";
+		def distinctRecoQuery = "select obv.maxVotedReco.id, count(*) from Observation obv  "+ userGroupQuery +" "+((params.tag)?tagQuery:'')+filterQuery+ " and obv.maxVotedReco is not null group by obv.maxVotedReco order by count(*) desc,obv.maxVotedReco.id asc";
 
-		def distinctRecoCountQuery = "select count(distinct obv.maxVotedReco.id)   from Observation obv  "+ userGroupQuery +" "+((params.tag)?tagQuery:'')+filterQuery+ " and obv.isChecklist=false and obv.maxVotedReco is not null ";
+		def distinctRecoCountQuery = "select count(distinct obv.maxVotedReco.id)   from Observation obv  "+ userGroupQuery +" "+((params.tag)?tagQuery:'')+filterQuery+ " and obv.maxVotedReco is not null ";
 	
+		filterQuery += " and obv.isShowable = true ";
+
+        def speciesGroupCountQuery = "select obv.group.name, count(*),(case when obv.maxVotedReco.id is not null  then 1 else 2 end) from Observation obv  "+ userGroupQuery +" "+((params.tag)?tagQuery:'')+filterQuery+ " and obv.isChecklist=false group by obv.group.name,(case when obv.maxVotedReco.id is not null  then 1 else 2 end) order by obv.group.name desc";
 
 		if(params.isChecklistOnly && params.isChecklistOnly.toBoolean()){
 			filterQuery += " and obv.isChecklist = true "
@@ -907,8 +909,6 @@ class ObservationService extends AbstractObjectService {
 		def checklistCountQuery = "select count(*) from Observation obv " + userGroupQuery +" "+((params.tag)?tagQuery:'')+filterQuery + " and obv.isChecklist = true "
 		def allObservationCountQuery = "select count(*) from Observation obv " + userGroupQuery +" "+((params.tag)?tagQuery:'')+filterQuery
 		
-        def speciesGroupCountQuery = "select obv.group.name, count(*),(case when obv.maxVotedReco.id is not null  then 1 else 2 end) from Observation obv  "+ userGroupQuery +" "+((params.tag)?tagQuery:'')+filterQuery+ " and obv.isChecklist = false group by obv.group.name,(case when obv.maxVotedReco.id is not null  then 1 else 2 end) order by obv.group.name desc";
-        println "===========SP COUNT QUERY=============" + speciesGroupCountQuery
 		return [query:query, allObservationCountQuery:allObservationCountQuery, checklistCountQuery:checklistCountQuery, distinctRecoQuery:distinctRecoQuery, distinctRecoCountQuery:distinctRecoCountQuery, speciesGroupCountQuery:speciesGroupCountQuery, filterQuery:filterQuery, orderByClause:orderByClause, queryParams:queryParams, activeFilters:activeFilters]
 
 	}
@@ -1500,12 +1500,23 @@ class ObservationService extends AbstractObjectService {
 
 				
 			case OBSERVATION_FLAGGED :
-				mailSubject = "Observation flagged"
+                //Diff case for observation and document
+                if(obv?.getClass() == Observation) {
+                    mailSubject = "Observation flagged"
+                    templateMap["actionObject"] = 'obvSnippet'
+				    templateMap["message"] = " flagged your observation show below:"
+                }
+                else {
+                    mailSubject = "Document flagged"
+                    templateMap["actionObject"] = 'usergroup'
+				    templateMap["message"] = " flagged your document"
+
+                }
 				bodyView = "/emailtemplates/addObservation"
 				toUsers.add(getOwner(obv))
-				templateMap["message"] = " flagged your observation shown below:"
 				populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
-				break
+				println "======== FLAG KA MAIL SENT ====== "
+                break
 
 			case OBSERVATION_DELETED :
 				mailSubject = conf.ui.observationDeleted.emailSubject
@@ -1554,6 +1565,41 @@ class ObservationService extends AbstractObjectService {
 				templateMap["groupNameWithlink"] = activityFeedService.getUserGroupHyperLink(activityFeedService.getDomainObject(feedInstance.activityHolderType, feedInstance.activityHolderId))
 				toUsers.addAll(getParticipants(obv))
 				break
+
+            case [activityFeedService.FEATURED, activityFeedService.UNFEATURED]:
+                println "====GOING TO SEND MAIL ======"
+                println "=====OBV ==== " + obv
+                boolean a
+                if(notificationType == activityFeedService.FEATURED) {
+                    a = true
+                }
+                else { 
+                    a = false
+                }
+                mailSubject = activityFeedService.getMailSubject(obv, a)
+				bodyView = "/emailtemplates/addObservation"
+				populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
+				def ug = activityFeedService.getDomainObject(feedInstance.activityHolderType, feedInstance.activityHolderId)
+                def groupName
+                if(obv == ug){
+                    groupName = grailsApplication.config.speciesPortal.app.siteName 
+                }
+                else{
+                    groupName = activityFeedService.getUserGroupHyperLink(ug)
+                }
+                //templateMap["groupNameWithlink"] = groupName
+                if(obv?.getClass() == Observation) {
+                    templateMap["actionObject"] = 'obvSnippet'
+				    templateMap["message"] = activityFeedService.getDescriptionForFeature(obv, null, a) + " shown below in : " + groupName
+                }
+                else {
+				    templateMap["message"] = activityFeedService.getDescriptionForFeature(obv, null, a) + " in " + groupName
+                    templateMap["actionObject"] = 'usergroup'
+                }
+                                
+                toUsers.addAll(getParticipants(obv))
+                println "====SENT MAIL ====== " + mailSubject + " " + templateMap["groupNameWithlink"]
+                break
 
 //			case activityFeedService.OBSERVATION_REMOVED_FROM_GROUP:
 //				bodyView = "/emailtemplates/addObservation"
@@ -1633,10 +1679,10 @@ class ObservationService extends AbstractObjectService {
                     try{
 					mailService.sendMail {
 						to toUser.email
-						if(index == 0) {
+						if(index == 0 && Environment.getCurrent().getName().equalsIgnoreCase("pamba")) {
                             				bcc grailsApplication.config.speciesPortal.app.notifiers_bcc.toArray()
 						}
-						from conf.ui.notification.emailFrom
+						from grailsApplication.config.grails.mail.default.from
 						//replyTo replyTo
 						subject mailSubject
 						if(bodyView) {
@@ -1675,7 +1721,6 @@ class ObservationService extends AbstractObjectService {
 			templateMap["obvCName"] =  values[ObvUtilService.CN]
 			templateMap["obvPlace"] = values[ObvUtilService.LOCATION]
 			templateMap["obvDate"] = values[ObvUtilService.OBSERVED_ON]
-			templateMap["obvNotes"] = Utils.stripHTML(values[ObvUtilService.NOTES])
 			templateMap["obvImage"] = obv.mainImage().thumbnailUrl()
 			//get All the UserGroups an observation is part of
 			templateMap["groups"] = obv.userGroups
@@ -1713,6 +1758,7 @@ class ObservationService extends AbstractObjectService {
             participants << springSecurityService.currentUser;
         }
         
+        println "===PARTICIPATNTS == " + participants
 		return participants;
 	}
 	

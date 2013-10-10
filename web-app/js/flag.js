@@ -12,18 +12,13 @@ function flag(objectId, objectType, url) {
 				if(data.success){
                                         $(".flag-list-users").replaceWith(data.flagListUsersHTML);
                                         $("#flag-action>i").addClass("icon-red");
-					//alert("FLAG SUCCESS");
-					//alert()
-					//$(".alertMsg").removeClass('alert alert-error').addClass('alert alert-success').html(data.msg);
 				}else{
 					alert("FAILED MESSAGE");
-					//$(".alertMsg").removeClass('alert alert-success').addClass('alert alert-error').html(data.msg);
 				}
-				//$("html, body").animate({ scrollTop: 0 });
+                                updateFeeds();
 				return false;
 			}, error: function(xhr, status, error) {
 				alert("AJAX FAILED, Fatal Error");
-				//alert(xhr.responseText);
 		   	}
 		});
 

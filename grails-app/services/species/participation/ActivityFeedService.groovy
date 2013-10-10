@@ -24,8 +24,8 @@ class ActivityFeedService {
 	//observation related
 	static final String OBSERVATION_CREATED = "Observation created"
 	static final String OBSERVATION_UPDATED = "Observation updated"
-	static final String OBSERVATION_FLAGGED = "Observation flagged"
-	static final String OBSERVATION_FLAG_DELETED = "Observation flag deleted"
+	static final String OBSERVATION_FLAGGED = "Flagged"
+	static final String OBSERVATION_FLAG_DELETED = "Flag deleted"
 	static final String OBSERVATION_DELETED = "Deleted observation"
 	
 	static final String SPECIES_RECOMMENDED = "Suggested species name"
@@ -34,7 +34,10 @@ class ActivityFeedService {
 	//static final String OBSERVATION_POSTED_ON_GROUP = "Posted observation to group"
 	//static final String OBSERVATION_REMOVED_FROM_GROUP = "Removed observation from group"
 	
-	
+    //Feature Related
+    static final String FEATURED = "Featured";
+    static final String UNFEATURED = "UnFeatured";
+
 	//group related
 	static final String USERGROUP_CREATED = "Group created"
 	static final String USERGROUP_UPDATED = "Group updated"
@@ -272,7 +275,24 @@ class ActivityFeedService {
 			case [RESOURCE_POSTED_ON_GROUP, RESOURCE_REMOVED_FROM_GROUP]:
 				activityTitle = feedInstance.activityDescrption  + " " + getUserGroupHyperLink(activityDomainObj)
 				break
-			
+            case [FEATURED, UNFEATURED]:
+                boolean b
+                if(activityType == FEATURED){
+                    b = true
+                }
+                else {
+                    b = false
+                }
+                def rootHolder = getDomainObject(feedInstance.rootHolderType, feedInstance.rootHolderId)
+                def activityHolder = getDomainObject(feedInstance.activityHolderType, feedInstance.activityHolderId)
+                if(rootHolder != activityHolder) {
+                    activityTitle = getDescriptionForFeature(rootHolder, activityHolder , b) + " " + getUserGroupHyperLink(activityHolder)
+                }
+                else {
+                    activityTitle = getDescriptionForFeature(rootHolder, null , b) + " in " + "<font color= black><i>" +grailsApplication.config.speciesPortal.app.siteName + "</i></font>"
+                }
+                text = feedInstance.activityDescrption
+                break
 			default:
 				activityTitle = activityType
 				break
@@ -336,6 +356,9 @@ class ActivityFeedService {
 	}
 	
 	def getUserGroupHyperLink(userGroup){
+        if(!userGroup){
+            return ""
+        }
 		return '<a href="' + userGroupService.userGroupBasedLink([controller:"userGroup", action:"show", mapping:"userGroup", userGroup:userGroup, userGroupWebaddress:userGroup?.webaddress]) + '">' + "<i>$userGroup.name</i>" + "</a>"
 	}
 	
@@ -410,5 +433,38 @@ class ActivityFeedService {
 		}
 		desc +=  isPost ? " to group" : " from group"
 		return desc
-	}	
+	}
+
+    def getDescriptionForFeature(r, ug, isFeature) {
+		def desc = isFeature ? "Featured" : "Unfeatured"
+        switch(r.class.canonicalName){
+			case Checklists.class.canonicalName:
+				desc += " checklist"
+				break
+			default:
+				desc += " " + r.class.simpleName.toLowerCase()
+				break
+		}
+        if(ug == null) {
+            return desc
+        }
+		desc +=  isFeature ? " to group" : " from group"
+		return desc
+
+    
+    }
+
+    def getMailSubject(r, isFeature) {
+        def desc = ""
+        switch(r.class.canonicalName){
+			case Checklists.class.canonicalName:
+				desc += " checklist"
+				break
+			default:
+				desc += " " + r.class.simpleName
+				break
+		}
+        desc += isFeature ? " featured" : " unfeatured"
+		return desc
+    }
 }

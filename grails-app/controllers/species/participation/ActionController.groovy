@@ -17,6 +17,7 @@ import grails.converters.JSON;
 import grails.converters.XML;
 
 import species.participation.Flag.FlagType
+import species.participation.Follow
 import grails.plugins.springsecurity.Secured
 import grails.util.Environment;
 import species.participation.RecommendationVote.ConfidenceType
@@ -57,66 +58,97 @@ class ActionController {
 
     def index = { }
     
+    def searchIndex(type,obv){
+        if(type == "species.participation.Observation"){
+            observationsSearchService.publishSearchIndex(obv, true);
+        }
+        else if(type == "species.participation.Species"){
+             speciesSearchService.publishSearchIndex(obv, true);
+        }
+        else if(type == "content.eml.Document") {
+            documentSearchService.publishSearchIndex(obv, true);
+
+        }
+    } 
    
     @Secured(['ROLE_USER'])
-    def featureIt = {
+    def featureIt = { 
         log.debug params;
         params.author = springSecurityService.currentUser;
-        List groups = params['userGroup'].split(",").collect {
-			UserGroup.read(Long.parseLong(it))
-		}
+        def obv = activityFeedService.getDomainObject(params.type,params.id); 
+        def ugParam = params['userGroup']
+        def ugParamLen = ugParam.length()
+        List splitGroups = ugParam.split(",")
+        if(ugParamLen != 0){
+            if(ugParam[ugParamLen-1] == ',') {
+                splitGroups.add("")
+            }
+        }
+        List groups = splitGroups.collect {
+            if(it == ""){ 
+                null
+            }
+            else { 
+                UserGroup.read(Long.parseLong(it))
+            }
+        }
         def featuredInstance
         UserGroup.withTransaction(){
             groups.each { ug ->
-                println "@@@@@@@@@@@@@@@@@"
-                println ug
                 featuredInstance = Featured.findWhere(author: params.author,objectId: params.id.toLong(), objectType: params.type, userGroup: ug)
-                if(!featuredInstance){
-                    try{
-                        println "#################################################"
+                 if(!featuredInstance){
+                     try{
                         featuredInstance = new Featured(author:params.author, objectId: params.id.toLong(), objectType: params.type, userGroup: ug, notes: params.notes)
                         featuredInstance.save(flush: true)
                         if(!featuredInstance.save(flush:true)){
-                            println "%%%%%%%%%%%%%%%"
-				            featuredInstance.errors.allErrors.each { log.error it }
-			            }
-                        else{
-                             println "----------------------------"
-
+                            featuredInstance.errors.allErrors.each { log.error it }
+                          }
+                         else{
                             println featuredInstance.id
                         }
-
-
+                        def act = activityFeedService.addActivityFeed(obv, ug? ug : obv, featuredInstance.author, activityFeedService.FEATURED, featuredInstance.notes);
+                        println "====================="
+                        searchIndex(params.type,obv)
+                        Follow.addFollower(obv, params.author)
+                        observationService.sendNotificationMail(act.activityType, obv, null, null, act)
                     }catch (Exception e) {
-				        e.printStackTrace()
-                        //flash.message = "${message(code: 'featured.mark.error', args: [params.type], default: 'Error during Featuring')}"
-			        }
+                        e.printStackTrace()
+                     }
 
-                }
+                 }
                 else {
-			        flash.message  = "${message(code: 'featured.already', default:'Already featured')}"
-		        }
-            }
-        }
-        println "FEATURE function end sending msg==================================================="
-        def r = ["success":true]
-        def observationInstance = activityFeedService.getDomainObject(params.type,params.id); 
-        def freshUGListHTML = g.render(template:"/common/showFeaturedTemplate" ,model:['observationInstance':observationInstance])
-        println "=======HTML RENDER ========== " + freshUGListHTML
-        r["freshUGListHTML"] = freshUGListHTML
-	    //r['msg'] = "dghgtiughvf" 
-	    render r as JSON
+                    flash.message  = "${message(code: 'featured.already', default:'Already featured')}"
+                }
+                 }
+            } 
 
+        def r = ["success":true]
+        def freshUGListHTML = g.render(template:"/common/showFeaturedTemplate" ,model:['observationInstance':obv])
+        r["freshUGListHTML"] = freshUGListHTML
+	    render r as JSON
     }
 
     @Secured(['ROLE_USER'])
     def unfeatureIt = {
         log.debug params;
         params.author = springSecurityService.currentUser;
-        List groups = params['userGroup'].split(",").collect {
-		    UserGroup.read(Long.parseLong(it))
+        def obv = activityFeedService.getDomainObject(params.type, params.id);
+        def ugParam = params['userGroup']
+        def ugParamLen = ugParam.length()
+        List splitGroups = ugParam.split(",")
+        if(ugParamLen != 0){
+            if(ugParam[ugParamLen-1] == ',') {
+                splitGroups.add("")
+            }
+        }
+        List groups = splitGroups.collect {
+		     if(it == ""){
+                null
+            }
+            else {
+                UserGroup.read(Long.parseLong(it))
+            }
 		}
-
         def featuredInstance
         UserGroup.withTransaction() {
             groups.each { ug ->
@@ -125,46 +157,35 @@ class ActionController {
                     return
                 }
                 try {
-                    featuredInstance.delete(flush: true);
+                    //featuredInstance.delete(flush: true)
+                        if(!featuredInstance.delete(flush:true)){
+                            featuredInstance.errors.allErrors.each { log.error it }
+                    }
+
+                    //String actDesc = activityFeedService.getDescriptionForFeature(obv, ug, false) 
+                    //println "======ACT DESC ===== " + actDesc
+                    def act = activityFeedService.addActivityFeed(obv, ug? ug : obv, featuredInstance.author, activityFeedService.UNFEATURED, featuredInstance.notes);
+                    searchIndex(params.type,obv)
+                    observationService.sendNotificationMail(act.activityType, obv, null, null, act)
                     return
                 }catch (org.springframework.dao.DataIntegrityViolationException e) {
 				    flash.message = "${message(code: 'featured.delete.error', default: 'Error while unfeaturing')}"
 		        }
             }
         }
-        println "UNFEATURE function end sending msg==================================================="
         def r = ["success":true]
-        def observationInstance = activityFeedService.getDomainObject(params.type,params.id); 
-        def freshUGListHTML = g.render(template:"/common/showFeaturedTemplate" ,model:['observationInstance':observationInstance])
-        println "=======HTML RENDER ========== " + freshUGListHTML
+        def freshUGListHTML = g.render(template:"/common/showFeaturedTemplate" ,model:['observationInstance':obv])
         r["freshUGListHTML"] = freshUGListHTML
 	    render r as JSON
 
     }
 
     
-    def searchIndex(type,obv){
-        if(type == "species.participation.Observation"){
-            println "======OBSERVATION ==========" + obv + " " + type
-            observationsSearchService.publishSearchIndex(obv, true);
-            println "=======DONE ==="
-        }
-        else if(type == "species.participation.Specie"){
-             speciesSearchService.publishSearchIndex(obv, true);
-        }
-        else if(type == "content.eml.Document") {
-            println "======DOCUMENT ==========" + obv + " " + type
-            documentSearchService.publishSearchIndex(obv, true);
-             println "=======DONE ==="
-
-        }
-    }
+    
 
 	@Secured(['ROLE_USER'])
-	def flagIt = {
+	def flagIt = { 
        	log.debug params;
-        println "============%%%%%%%%%%%  FLAGGING  %%%%%%%%%%%==========="
-        println params.type;
 		params.author = springSecurityService.currentUser;
 		def obv = activityFeedService.getDomainObject(params.type,params.id);     //GEt object instance ??
 		FlagType flag = observationService.getObservationFlagType(params.obvFlag?:FlagType.OBV_INAPPROPRIATE.name());    //flag nikalne ki function observationservice mein hai ??
@@ -181,7 +202,6 @@ class ActionController {
                 obv.flagCount++
 				obv.save(flush:true)
 				activityFeedService.addActivityFeed(obv, FlagInstance, FlagInstance.author, activityFeedService.OBSERVATION_FLAGGED); //add activity
-	            println "=======PUBLISH SEARCH START======"	
                 searchIndex(params.type,obv)				
 				observationService.sendNotificationMail(observationService.OBSERVATION_FLAGGED, obv, request, params.webaddress) //???
 				flash.message = "${message(code: 'flag.added', default: 'Observation flag added')}"
@@ -193,7 +213,6 @@ class ActionController {
 		else {
 			flash.message  = "${message(code: 'flag.duplicate', default:'Already flagged')}"    ///change message
 		}
-		println "FLAG function end sending msg==================================================="
         def r = ["success":true]
         def observationInstance = activityFeedService.getDomainObject(params.type,params.id); 
         def flagListUsersHTML = g.render(template:"/common/observation/flagListUsersTemplate" ,model:['observationInstance':observationInstance])
@@ -203,7 +222,7 @@ class ActionController {
 	}
 
 	@Secured(['ROLE_USER'])
-	def deleteFlag = {
+	def deleteFlag  = {
 		log.debug params;
         params.author = springSecurityService.currentUser;
 		def FlagInstance = Flag.findWhere(id: params.id.toLong());  //kaun si kiski id hai???
@@ -211,26 +230,28 @@ class ActionController {
         
 
 		if(!FlagInstance){
-			//response.setStatus(500);
-			//def message = [info: g.message(code: 'flag.alreadytDeleted', default:'Flag already deleted')];
 			render obv.flagCount;
 			return
 		}
 		try {
 			FlagInstance.delete(flush: true);
             
-
-			obv.flagCount--;
+            println "=FLAG COUNT=== " +	obv.flagCount	
+            obv.flagCount--;
 			obv.save(flush:true)
-            println "=======PUBLISH SEARCH START======"
+            println "=FLAG COUNT=== " +	obv.flagCount
 			searchIndex(params.type,obv);    //observation ke liye only
-			render obv.flagCount;
+            def message = [:]
+            message['flagCount'] = obv.flagCount 
+            println "=FLAG COUNT=== " + message['flagCount']
+			render message as JSON;
 			return;
 		}catch (Exception e) {
 			e.printStackTrace();
 			response.setStatus(500);
 			def message = [error: g.message(code: 'flag.error.onDelete', default:'Error on deleting flag')];
-			render message as JSON
-		}
+			
+            render message as JSON
+		} 
 	}
 }

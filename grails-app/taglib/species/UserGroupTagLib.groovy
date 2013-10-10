@@ -1,5 +1,6 @@
 package species
 
+import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils;
 import org.springframework.security.acls.domain.GrantedAuthoritySid;
 import org.springframework.security.acls.domain.PrincipalSid;
 import org.springframework.security.acls.model.Sid;
@@ -220,18 +221,10 @@ class UserGroupTagLib {
     }
 
     List getFeaturedUserGroups(long id, String type) {
-        println "=============== GET FEATURES ==============="
         def f = Featured.findAllWhere(objectId: id, objectType: type);
-        //println "===============F List ==============="
-        //println f
         List ug = f.collect{it.userGroup}
-        println "=============== FEATURED List ==============="
-        println ug
         return ug
 
-    }
-    Map test() {
-        return ['a':1,'b':2]
     }
     List getAuthorityUserGroups() {
         def user = springSecurityService.getCurrentUser();
@@ -247,37 +240,33 @@ class UserGroupTagLib {
             }
             
         }
-        println "========== AUTHORTIY UG ============ " + authorityUG
         return authorityUG
     }
     
     Map getListToFeatureIn(id, type) {
-        println "=======FUNC START =====" + id + " " + type
         def result = [:]
        	def ug = getFeaturedUserGroups(id, type)
-        //println "==========UG from upper function============"
-        //println ug
         def objUserGroup = getObjectsUserGroups(id, type)
-        println "=======OBJ USER GROUP==========" + objUserGroup
-        
         def authorityUG = getAuthorityUserGroups();
         def allowedUserGroups = objUserGroup.intersect(authorityUG)
-        println "=======ALLOWED UG========= "  + allowedUserGroups
         def fUserGroups = allowedUserGroups.intersect(ug)
-
-        println "=============== THIS SHOULD BE SELECTED ==============="
-        println fUserGroups
         allowedUserGroups.removeAll(fUserGroups);
         fUserGroups.each {
             result[it] = true;
         } 
-
 		allowedUserGroups.each {
 			result[it] = false;
 		}
-        println "=====FINAL RESULT============ " + result
+        if(SpringSecurityUtils.ifAllGranted("Role_Admin")){
+            def ibpGroup =  new UserGroup(name:grailsApplication.config.speciesPortal.app.siteName);
+            if(ug.contains(null)) {
+                result[ibpGroup] = true;
+            }
+            else {
+                result[ibpGroup] = false;
+            }
+        }
         return result;
- 
     } 
 	def getCurrentUserUserGroups = {attrs, body ->
 		
@@ -303,17 +292,8 @@ class UserGroupTagLib {
     
     
     def markFeaturedUserGroups = {attrs, body ->
-		println "=============== mark FEATURES =============== " + attrs.model.observationInstance
-        
-		//def result = [:]
         if(attrs.model.featResult) {
-            println "=============== INSIDE IF ==============="
-
-			//check if the obv already belongs to userGroup and disable the control for it not to submit again
-		    //result = getListToFeatureIn(attrs.model.observationInstance.id, attrs.model.observationInstance.class.getCanonicalName())
-            println "===============FEAT  RESULT =============== " +attrs.model.featResult
 		    out << render(template:"/common/userGroup/showCurrentUserUserGroupsTemplate", model:[userGroups:attrs.model.featResult]);
-            println "%%%%%%%%%%%%%%%%%"
 	    }
     }
     

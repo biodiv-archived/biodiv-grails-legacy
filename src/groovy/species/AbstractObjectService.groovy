@@ -28,7 +28,6 @@ class AbstractObjectService {
     protected static List createUrlList2(observations){
 		def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 		String iconBasePath = config.speciesPortal.observations.serverURL
-        println "=======CREATE URL LIST ===" + observations +"   "+ iconBasePath
 		def urlList = createUrlList2(observations, iconBasePath)
 //		urlList.each {
 //			it.imageLink = it.imageLink.replaceFirst(/\.[a-zA-Z]{3,4}$/, config.speciesPortal.resources.images.thumbnail.suffix)
@@ -39,7 +38,6 @@ class AbstractObjectService {
 	protected static List createUrlList2(observations, String iconBasePath){
 		List urlList = []
 		for(param in observations){
-            println "=====PARAM=========" + param
 			def item = [:];
             def controller = getTargetController(param['observation']);
 			item.url = "/" + controller + "/show/" + param['observation'].id
@@ -68,12 +66,9 @@ class AbstractObjectService {
 				item.notes = desc;				
 			}
             if(param['featuredNotes'] ==  null) {
-                println "NULL FEATURED NOTES"
             }
             else {
-                 println "FEATURED NOTES PRESENT"
                 item.notes = param['featuredNotes']
-                println  "============"+ item.notes
             }
             
 			urlList << item;
@@ -125,7 +120,6 @@ class AbstractObjectService {
             type = "species.participation.Observation";
         }
         else if (controller == "species") {
-            println "=========IN SPECIES CONTROLLER============"
             type = "species.Species";
         }
         else if (controller == "document") {
@@ -139,14 +133,14 @@ class AbstractObjectService {
         def count;
         if(ugId == null) {
             def queryParams = ["type": type]
-            def countQuery = "select count(distinct feat.objectId) from Featured feat where feat.objectType = :type "
+            def countQuery = "select count(distinct feat.objectId) from Featured feat where feat.userGroup.id is null and feat.objectType = :type "
             log.debug "CountQuery:"+ countQuery + "params: "+queryParams
             
             count = Featured.executeQuery(countQuery, queryParams)
             
             queryParams["max"] = limit
             queryParams["offset"] = offset
-            def query = "select min(feat.id) from Featured feat where feat.objectType = :type group by feat.objectId "
+            def query = "select min(feat.id) from Featured feat where feat.userGroup.id is null and feat.objectType = :type group by feat.objectId "
             def orderByClause = "order by max(feat.createdOn) desc"
             query += orderByClause
             
@@ -162,10 +156,7 @@ class AbstractObjectService {
             queryParams["type"] = type
             def countQuery = "select count(distinct feat.objectId) from Featured feat where feat.userGroup.id = :ugId and feat.objectType = :type "
             log.debug "CountQuery:"+ countQuery + "params: "+queryParams
-            
             count = Featured.executeQuery(countQuery, queryParams)
-            
-            println "=====COUNT ++++++++++++=======  " + count[0]
             queryParams["max"] = limit
             queryParams["offset"] = offset
             def query = "from Featured feat where feat.userGroup.id = :ugId and feat.objectType = :type "
@@ -175,21 +166,16 @@ class AbstractObjectService {
             log.debug "FeaturedQuery:"+ query + "params: "+queryParams
 
             featured = Featured.executeQuery(query, queryParams);
-            println "====== FEATURED LIST using query UG PRESENT =========" + featured
             
         }
 
         def observations = []
         featured.each {
-            println "TYPE CHECK %%%%%%%%%% " + it.objectType
             observations.add(activityFeedService.getDomainObject(it.objectType,it.objectId))
         }
-        println "+++++++++++++++" + featured
-        println "+++++++++++++++" + observations
         def result = []
         def i = 0;
         observations.each {
-            println "++++++==========" + featured.notes[i] + "=========== " + i
             if(featured.notes[i] == null){
                 result.add([ 'observation':it, 'title': it.fetchSpeciesCall() ]);
             }
@@ -198,7 +184,6 @@ class AbstractObjectService {
             }
             i = i + 1;
         }
-        println "========RESULT RETURNING=== " + result
         return['observations':result,'count':count[0]]
                 		
     }

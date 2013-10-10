@@ -19,7 +19,7 @@ function feature(objectId, objectType, url) {
                         }else{
 				alert("FAILED MESSAGE");
 			}
-			
+		        updateFeeds();	
 		        return false;
 		        }, error: function(xhr, status, error) {
 			    alert("AJAX FAILED, Fatal Error");
@@ -48,7 +48,7 @@ function unfeature(objectId, objectType, url) {
         			alert("FAILED MESSAGE");
 				
 			}
-			
+		        updateFeeds();	
 			return false;
 		}, error: function(xhr, status, error) {
 			alert("AJAX FAILED, Fatal Error");

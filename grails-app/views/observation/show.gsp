@@ -186,9 +186,14 @@ String desc = "- "+ location +" by "+observationInstance.author.name.capitalize(
 							<uGroup:showUserGroupsListInModal model="['userGroupInstanceList':observationInstance.userGroups]" />
 						</div>
 						
-					</div>
+                                            </div>
+                                                                                       
 					<uGroup:objectPostToGroupsWrapper 
-										model="[canPullResource:canPullResource, 'observationInstance':observationInstance]" />
+                                        model="[canPullResource:canPullResource, 'observationInstance':observationInstance]" />
+
+                                        <g:render template="/common/showFeaturedTemplate" model="['observationInstance':observationInstance]"/>
+                                        <uGroup:featureUserGroups model="['observationInstance':observationInstance]"/>
+
 					<div class="union-comment">
 					<feed:showAllActivityFeeds model="['rootHolder':observationInstance, feedType:'Specific', refreshType:'manual', 'feedPermission':'editable']" />
 					<comment:showAllComments model="['commentHolder':observationInstance, commentType:'super','showCommentList':false]" />
@@ -214,12 +219,7 @@ String desc = "- "+ location +" by "+observationInstance.author.name.capitalize(
                                             <obv:showRelatedStory
                                             model="['observationInstance':observationInstance, 'observationId': observationInstance.id, 'controller':'observation', 'action':'related', 'filterProperty': 'nearBy', 'id':'nearBy', 'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress]" />
                                         </div>
-                                        <div class="tile">
-                                           <g:render template="/common/showFeaturedTemplate" model="['observationInstance':observationInstance]"/>
-                                        </div>
-                                        <div class="tile">
-                                            <uGroup:featureUserGroups model="['observationInstance':observationInstance]"/>
-                                            </div>
+                                        
                                     </div>
                                     <%
                                     def annotations = observationInstance.fetchChecklistAnnotation()

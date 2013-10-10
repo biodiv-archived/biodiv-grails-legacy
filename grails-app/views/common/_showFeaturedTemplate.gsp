@@ -1,17 +1,31 @@
 <%@page import="species.participation.Featured"%>
 <%@page import="species.participation.Observation"%>
+<%@page import="species.groups.UserGroup"%>
 
 <div class="is-featured">
-    <g:if test="${Featured.isFeaturedIn(observationInstance)}">
-    <a href="#" onclick="$(this).next('.featured-groups-name').toggle(300);return false;">
-	    		<h5>Featured in Groups : <span class="caret" style="margin-top: 3px;margin-left: 4px"></span></h5>
-        </a>
+    <g:set var="featuredInGroups" value="${Featured.isFeaturedIn(observationInstance)}">
+    </g:set>
+    <g:if test="${featuredInGroups}">
+    <div class="sidebar_section ">
+    	<h5>Featured in Groups</h5>
         <div class="featured-groups-name">
-            <g:each in="${Featured.isFeaturedIn(observationInstance)}" var="groupInfo">
+            <ul class="tile" style="list-style: none; padding-left: 10px;">
+            <g:each in="${featuredInGroups}" var="groupInfo">
+            <%
+                def ug
+                if(groupInfo.userGroup == null){
+                    ug = new UserGroup(name:grailsApplication.config.speciesPortal.app.siteName);
+                }
+                else {
+                    ug = groupInfo.userGroup    
+                }
+            %>
             <li title ="Why Featured : ${groupInfo.notes}" class=""><uGroup:showUserGroupSignature
-                    model="[ 'userGroup':groupInfo.userGroup]" /></li>
-            </g:each>        
+                    model="[ 'userGroup':ug]" /></li>
+                    
+                    </g:each> 
+            </ul>
         </div>
     </g:if>
 </div>
-
+</div>
