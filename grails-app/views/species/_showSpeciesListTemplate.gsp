@@ -44,8 +44,8 @@
 								</g:else> </a>
 						</div>
 						
-						<uGroup:objectPostToGroupsWrapper 
-							model="[canPullResource:canPullResource, 'objectType':Species.class.canonicalName]" />
+						<uGroup:objectPost model="['objectInstance':speciesInstance, 'userGroup':userGroup, canPullResource:canPullResource]" />
+						
 						<a
 							href="${uGroup.createLink([controller:'species', action:'show', id:speciesInstance.id, userGroup:userGroup, userGroupWebaddress:userGroupWebaddress])}" style="display:block;">
 							<span class="species_story ellipsis multiline sci_name"
