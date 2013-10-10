@@ -27,7 +27,7 @@
 					${documentInstance?.type?.value }
 				</td>
 				<td class="ellipsis multiline" style="max-width:220px;">
-					${documentInstance.description}
+					${documentInstance.notes}
 				</td>
 				<g:if test="${canPullResource}">
 					<td>

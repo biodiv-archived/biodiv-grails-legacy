@@ -21,7 +21,7 @@ import org.grails.rateable.*
 import com.vividsolutions.jts.geom.Geometry
 import content.eml.Coverage;
 import species.Metadata;
-
+import speciespage.ObservationService;
 
 class Observation extends Metadata implements Taggable, Rateable {
 	
@@ -93,6 +93,10 @@ class Observation extends Metadata implements Taggable, Rateable {
 			if(!obj.sourceId && !obj.isChecklist) 
 				val && val.size() > 0 
 		}
+		latitude nullable: false
+		longitude nullable:false
+		topology nullable:false
+		fromDate nullable:false
 		placeName blank:false
 		agreeTerms nullable:true
 		checklistAnnotations nullable:true
@@ -310,12 +314,6 @@ class Observation extends Metadata implements Taggable, Rateable {
 		//supprssing all checklist generated observation even if they have media
 		boolean isChecklistObs = (id && sourceId != id) ||  (!id && sourceId)
 		isShowable = (isChecklist || (!isChecklistObs && resource && !resource.isEmpty())) ? true : false
-	}
-	
-	private  updateLatLong(){
-		def centroid =  topology.getCentroid()
-		latitude = (float) centroid.getY()
-		longitude = (float) centroid.getX()
 	}
 	
 	private updateChecklistAnnotation(recoVote){
