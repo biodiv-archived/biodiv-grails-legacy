@@ -106,6 +106,7 @@ class ActionController {
                          else{
                             println featuredInstance.id
                         }
+                        //NOTE: Putting rootHolder & activity holder Same for IBP group case
                         def act = activityFeedService.addActivityFeed(obv, ug? ug : obv, featuredInstance.author, activityFeedService.FEATURED, featuredInstance.notes);
                         println "====================="
                         searchIndex(params.type,obv)
@@ -179,9 +180,6 @@ class ActionController {
 	    render r as JSON
 
     }
-
-    
-    
 
 	@Secured(['ROLE_USER'])
 	def flagIt = { 

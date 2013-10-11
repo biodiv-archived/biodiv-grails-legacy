@@ -18,12 +18,14 @@ class Coverage {
 	
 	String placeName;
 	String reverseGeocodedName
-	//String location;
-	float latitude;
-	float longitude;
+	
+	
 	boolean geoPrivacy = false;
 	String locationAccuracy;
     Geometry topology;
+	
+	float latitude;
+	float longitude;
 
 	static hasMany = [speciesGroups:SpeciesGroup, habitats:Habitat]
 	

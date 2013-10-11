@@ -223,8 +223,6 @@ class ObservationService extends AbstractObjectService {
 	 * @return
 	 */
 	Map getRelatedObservations(params) {
-
-        println "=======IN OBV SERVICES ========"
 		log.debug params;
 	    int max = Math.min(params.limit ? params.limit.toInteger() : 12, 100)
 		int offset = params.offset ? params.offset.toInteger() : 0
@@ -1515,7 +1513,6 @@ class ObservationService extends AbstractObjectService {
 				bodyView = "/emailtemplates/addObservation"
 				toUsers.add(getOwner(obv))
 				populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
-				println "======== FLAG KA MAIL SENT ====== "
                 break
 
 			case OBSERVATION_DELETED :
@@ -1567,8 +1564,6 @@ class ObservationService extends AbstractObjectService {
 				break
 
             case [activityFeedService.FEATURED, activityFeedService.UNFEATURED]:
-                println "====GOING TO SEND MAIL ======"
-                println "=====OBV ==== " + obv
                 boolean a
                 if(notificationType == activityFeedService.FEATURED) {
                     a = true
@@ -1596,9 +1591,7 @@ class ObservationService extends AbstractObjectService {
 				    templateMap["message"] = activityFeedService.getDescriptionForFeature(obv, null, a) + " in " + groupName
                     templateMap["actionObject"] = 'usergroup'
                 }
-                                
                 toUsers.addAll(getParticipants(obv))
-                println "====SENT MAIL ====== " + mailSubject + " " + templateMap["groupNameWithlink"]
                 break
 
 //			case activityFeedService.OBSERVATION_REMOVED_FROM_GROUP:
@@ -1757,8 +1750,6 @@ class ObservationService extends AbstractObjectService {
         } else {
             participants << springSecurityService.currentUser;
         }
-        
-        println "===PARTICIPATNTS == " + participants
 		return participants;
 	}
 	

@@ -14,6 +14,8 @@
 	    		<h5>Feature Item in Groups<span class="caret" style="margin-top: 8px;margin-left: 5px"></span></h5>
         </a>
         <div class="show-user-groups" >
+            	<hr/>
+
             <div id="userGroups" name="userGroups" style="list-style:none;clear:both;">
 	        <uGroup:markFeaturedUserGroups model="['observationInstance':observationInstance,'featResult': featResult]"/>
             </div>

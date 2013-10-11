@@ -3,8 +3,11 @@ package content.eml
 import java.util.Date;
 
 import species.License;
+import species.Metadata
 import species.auth.SUser;
 import species.groups.UserGroup;
+import species.groups.SpeciesGroup;
+import species.Habitat;
 import org.grails.taggable.Taggable;
 import org.grails.rateable.*
 import species.participation.Flag;
@@ -17,7 +20,7 @@ import species.participation.Featured;
  * http://knb.ecoinformatics.org/software/eml/eml-2.1.1/index.html
  *
  */
-class Document implements Taggable, Rateable {
+class Document extends Metadata implements Taggable, Rateable {
 	
 	def grailsApplication
 	def activityFeedService
@@ -49,26 +52,24 @@ class Document implements Taggable, Rateable {
 	SUser author;
 	
 	UFile uFile   //covers physical file formats
-	
 	String uri
 	
-	String description
+	String notes // <=== description
 	String contributors;
 	String attribution;
 	
 	License license
+	String doi
 	
-
 	//source holder(i.e project, group)
 	Long sourceHolderId;
 	String sourceHolderType;
 
-	Coverage coverage 	//Coverage Information
-
-	String doi
+	//XXX uncmment it before migration
+	//Coverage coverage //<== extending metadata now	//Coverage Information
 	
-	Date dateCreated
-	Date lastUpdated
+	//Date createdOn  <=== dateCreated
+	//Date lastRevised <=== lastUpdated
 	
 	boolean deleted
 	
@@ -76,7 +77,7 @@ class Document implements Taggable, Rateable {
 	
 	static transients = [ 'deleted' ]
 
-
+	
 	static constraints = {
 		title nullable:false, blank:false
 		uFile validator : {val, obj -> 
@@ -91,29 +92,29 @@ class Document implements Taggable, Rateable {
 		sourceHolderId nullable:true
 		sourceHolderType nullable:true
 		author nullable:true
-		coverage nullable:true	
-		description nullable:true
+		notes nullable:true
 		doi nullable:true
 		license nullable:true
 		
 		agreeTerms nullable:true
 		
+		//coverage related extended from metadata
+		placeName(nullable:true)
+		reverseGeocodedName(nullable:true)
+		fromDate(nullable: true)
+		group nullable:true
+		habitat nullable:true
 	}
 	
-	static hasMany =[userGroups:UserGroup]
-	
+	static hasMany = [speciesGroups:SpeciesGroup, habitats:Habitat, userGroups:UserGroup]
 	static belongsTo = [SUser, UserGroup]
 	
-	
 	static mapping = {
-		description type:"text"
+		notes type:"text"
 	}
 
      List fetchAllFlags(){
-	    println "=============fLIST==========" 	
         def fList = Flag.findAllWhere(objectId:this.id,objectType:this.class.getCanonicalName());
-        println "=============fLIST==========" 
-        println fList
         return fList;
 	}
 
@@ -150,9 +151,19 @@ class Document implements Taggable, Rateable {
 	}
 
     String notes() {
-        return this.description;
+        return this.notes;
     }
 
+	
+	def beforeUpdate(){
+		if(isDirty('topology')){
+			updateLatLong()
+		}
+	}
+	
+	def beforeInsert(){
+		updateLatLong()
+	}
 	
 	def fetchList(params, max, offset, noLimit=false){
 		return documentService.getFilteredDocuments(params, max, offset, noLimit)

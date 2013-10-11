@@ -26,7 +26,6 @@ import species.sourcehandler.XMLConverter
 
 import com.vividsolutions.jts.geom.Coordinate
 import com.vividsolutions.jts.geom.GeometryFactory
-import content.eml.Coverage;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.io.WKTReader;
 import com.vividsolutions.jts.io.ParseException;
@@ -52,29 +51,23 @@ class DocumentService {
 
 
 	def updateDocument(document, params) {
-
+		params.remove('latitude')
+		params.remove('longitude')
 		document.properties = params
-		document.coverage = document.coverage ?: new Coverage()
-		document.coverage.placeName = params.placeName
-		document.coverage.reverseGeocodedName = params.reverse_geocoded_name
-		document.coverage.locationAccuracy = params.location_accuracy
-		
-		//document.coverage.location = 'POINT(' + params.longitude + ' ' + params.latitude + ')'
-//		if(params.latitude) 
-//    		document.coverage.latitude = params.latitude.toFloat()
-//        if(params.longitude)
-//    		document.coverage.longitude = params.longitude.toFloat()
-		//document.coverage.geoPrivacy = params.geo_privacy
+		document.group = null
+		document.habitat = null
+		//document.latitude = document.latitude ?:0.0
+		//document.longitude = document.longitude ?:0.0
+		document.placeName = params.placeName
+		document.reverseGeocodedName = params.reverse_geocoded_name
+		document.locationAccuracy = params.location_accuracy
 
 		GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), grailsApplication.config.speciesPortal.maps.SRID);
-//		if(params.latitude && params.longitude) {
-//			document.coverage.topology = geometryFactory.createPoint(new Coordinate(params.longitude?.toFloat(), params.latitude?.toFloat()));
-//		} else 
 		if(params.areas) {
 			WKTReader wkt = new WKTReader(geometryFactory);
 			try {
 				Geometry geom = wkt.read(params.areas);
-				document.coverage.topology = geom;
+				document.topology = geom;
 			} catch(ParseException e) {
 				log.error "Error parsing polygon wkt : ${params.areas}"
 			}
@@ -83,40 +76,19 @@ class DocumentService {
 		document.license  = (new XMLConverter()).getLicenseByType(params.licenseName, false)
 		//document.license = License.findByName(License.LicenseType(params.licenseName))
 
-		if(params.description) {
-			def description = params.description.trim()
-			if(description)
-				document.description =description
-			else
-				document.description = null
-		}
-
-		if(params.contributors) {
-			def contributors = params.contributors.trim()
-			if(contributors)
-				document.contributors =contributors
-			else
-				document.contributors = null
-		}
-
-		if(params.attribution) {
-			def attribution = params.attribution.trim()
-			if(attribution)
-				document.attribution = attribution
-			else
-				document.attribution = null
-		}
-
-
-		document.coverage.speciesGroups = []
+		document.notes = params.description? params.description.trim() :null
+		document.contributors = params.contributors? params.contributors.trim() :null
+		document.attribution = params.attribution? params.attribution.trim() :null
+		
+		document.speciesGroups = []
 		params.speciesGroup.each {key, value ->
 			log.debug "Value: "+ value
-			document.coverage.addToSpeciesGroups(SpeciesGroup.read(value.toLong()));
+			document.addToSpeciesGroups(SpeciesGroup.read(value.toLong()));
 		}
 
-		document.coverage.habitats  = []
+		document.habitats  = []
 		params.habitat.each {key, value ->
-			document.coverage.addToHabitats(Habitat.read(value.toLong()));
+			document.addToHabitats(Habitat.read(value.toLong()));
 		}
 	}
 
@@ -124,8 +96,7 @@ class DocumentService {
 	def setUserGroups(Document documentInstance, List userGroupIds) {
 		if(!documentInstance) return
 
-			def docInUserGroups = documentInstance.userGroups.collect { it.id + ""}
-		println docInUserGroups;
+		def docInUserGroups = documentInstance.userGroups.collect { it.id + ""}
 		def toRemainInUserGroups =  docInUserGroups.intersect(userGroupIds);
 		if(userGroupIds.size() == 0) {
 			println 'removing document from usergroups'
@@ -161,7 +132,7 @@ class DocumentService {
 			}
 
 			if(params."${docId}.description") {
-				documentInstance.description = params."${docId}.description"
+				documentInstance.notes = params."${docId}.description"
 			}
 
 			if(params."${docId}.contributors") {
@@ -333,7 +304,7 @@ class DocumentService {
 	}
 
 	private boolean isValidSortParam(String sortParam) {
-		if(sortParam.equalsIgnoreCase('dateCreated'))
+		if(sortParam.equalsIgnoreCase('createdOn'))
 			return true;
 		return false;
 	}
@@ -420,7 +391,7 @@ class DocumentService {
 			}
 		}
 		
-		def sortBy = params.sort ? params.sort : "lastUpdated "
+		def sortBy = params.sort ? params.sort : "lastRevised "
 		def orderByClause = " order by document." + sortBy +  " desc, document.id asc"
 		return [query:query,filterQuery:filterQuery, orderByClause:orderByClause, queryParams:queryParams, activeFilters:activeFilters]
 	}

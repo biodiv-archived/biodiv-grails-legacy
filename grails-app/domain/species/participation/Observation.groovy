@@ -21,7 +21,7 @@ import org.grails.rateable.*
 import com.vividsolutions.jts.geom.Geometry
 import content.eml.Coverage;
 import species.Metadata;
-
+import speciespage.ObservationService;
 
 class Observation extends Metadata implements Taggable, Rateable {
 	
@@ -93,6 +93,10 @@ class Observation extends Metadata implements Taggable, Rateable {
 			if(!obj.sourceId && !obj.isChecklist) 
 				val && val.size() > 0 
 		}
+		latitude nullable: false
+		longitude nullable:false
+		topology nullable:false
+		fromDate nullable:false
 		placeName blank:false
 		agreeTerms nullable:true
 		checklistAnnotations nullable:true
@@ -158,8 +162,6 @@ class Observation extends Metadata implements Taggable, Rateable {
 
 	void calculateMaxVotedSpeciesName(){
 		maxVotedReco = findMaxRepeatedReco();
-		lastRevised = new Date();
-		saveConcurrently();
 	}
 
 	String fetchSuggestedCommonNames(){
@@ -305,29 +307,14 @@ class Observation extends Metadata implements Taggable, Rateable {
 	}
  
     List fetchAllFlags(){
-	    println "=============fLIST==========" 	
         def fList = Flag.findAllWhere(objectId:this.id,objectType:this.class.getCanonicalName());
-        println "=============fLIST==========" 
-        println fList
         return fList;
-	}
-	
-	private updateObservationTimeStamp(){
-		lastRevised = new Date();
-		saveConcurrently();
-		observationsSearchService.publishSearchIndex(this, true);
 	}
 	
 	private updateIsShowable(){
 		//supprssing all checklist generated observation even if they have media
 		boolean isChecklistObs = (id && sourceId != id) ||  (!id && sourceId)
 		isShowable = (isChecklist || (!isChecklistObs && resource && !resource.isEmpty())) ? true : false
-	}
-	
-	private  updateLatLong(){
-		def centroid =  topology.getCentroid()
-		latitude = (float) centroid.getY()
-		longitude = (float) centroid.getX()
 	}
 	
 	private updateChecklistAnnotation(recoVote){
@@ -365,10 +352,6 @@ String notes() {
 
 	def fetchCommentCount(){
 		return commentService.getCount(null, this, null, null)
-	}
-	
-	def onAddComment(comment){
-		updateObservationTimeStamp()
 	}
 	
 	def beforeDelete(){
@@ -444,23 +427,7 @@ String notes() {
 		return author;
 	}
 	
-	def saveConcurrently(f = {}){
-		try{
-			f()
-			if(!save(flush:true)){
-				errors.allErrors.each { log.error it }
-			}
-		}catch(org.hibernate.StaleObjectStateException e){
-			attach()
-			def m = merge()
-			//refresh()
-			//f()
-			if(!m.save(flush:true)){
-				m.errors.allErrors.each { log.error it }
-			}
-		}
-	}
-	
+
 	def boolean fetchIsFollowing(SUser user=springSecurityService.currentUser){
 		return Follow.fetchIsFollowing(this, user)
 	}

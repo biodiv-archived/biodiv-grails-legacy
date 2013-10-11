@@ -91,7 +91,7 @@ grails.project.dependency.resolution = {
         compile 'jmimemagic:jmimemagic:0.1.2'
         
         
-        compile 'net.sf.jtidy:jtidy:r938'
+        //compile 'net.sf.jtidy:jtidy:r938'
 
     }
     plugins { 

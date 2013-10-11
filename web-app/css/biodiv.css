@@ -1353,6 +1353,10 @@ span.cke_skin_kama {
 	margin-right: 16px;
 }
 /*USER GROUP END*/
+.page-header .sci_name{
+	font-style: normal;
+}
+
 .sci_name {
 	font-style: italic;
 }
@@ -2118,8 +2122,9 @@ div.noOfRatings {
 
 .jcarousel-item .checklist_th {
     background-color:#ffffff
+    border-radius:0;
 }
-.jcarousel-item .checklist_th .figure{
+.jcarousel-item .checklist_th .figure {
     opacity: 0.5;
     filter: alpha(opacity = 50);      
 }

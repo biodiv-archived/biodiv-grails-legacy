@@ -19,7 +19,6 @@ import org.grails.rateable.*
 import species.participation.Flag;
 
 class Species implements Rateable {
-
 	String title; 
 	String guid; 
 	TaxonomyDefinition taxonConcept;
@@ -50,8 +49,6 @@ class Species implements Rateable {
 		userGroups:UserGroup];
 
 	static belongsTo = [UserGroup]
-
-
 
 	static constraints = {
 		guid(blank: false, unique: true);

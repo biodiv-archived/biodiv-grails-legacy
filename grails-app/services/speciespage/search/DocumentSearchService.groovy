@@ -78,7 +78,7 @@ class DocumentSearchService {
 				SolrInputDocument doc = new SolrInputDocument();
 				doc.addField(searchFieldsConfig.ID, document.id.toString());
 				doc.addField(searchFieldsConfig.TITLE, document.title);
-				doc.addField(searchFieldsConfig.DESCRIPTION, document.description);
+				doc.addField(searchFieldsConfig.DESCRIPTION, document.notes);
 				doc.addField(searchFieldsConfig.TYPE, document.type.value());
 				
 				if(document.attribution){

@@ -53,8 +53,6 @@ class Featured {
     }
 
     static List isFeaturedIn(object){
-        println "=====CALLING IS FEAT IN======="
-        
         def f = Featured.findAllWhere(objectType: object.class.getCanonicalName(), objectId: object.id)
         def ugList = []
         f.each{
@@ -65,7 +63,6 @@ class Featured {
                 ugList.add(['userGroup':it.userGroup,'notes':it.notes])
              }
         } 
-        println "==========IS FEATURED IN ========== " + ugList
         return ugList;
     }
 }

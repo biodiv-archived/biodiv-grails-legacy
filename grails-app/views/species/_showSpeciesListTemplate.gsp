@@ -43,7 +43,9 @@
 										src="${createLinkTo(dir: '', file:speciesInstance.fetchSpeciesGroupIcon(ImageType.NORMAL)?.fileName, absolute:true)}"></img>
 								</g:else> </a>
 						</div>
+						
 						<uGroup:objectPost model="['objectInstance':speciesInstance, 'userGroup':userGroup, canPullResource:canPullResource]" />
+						
 						<a
 							href="${uGroup.createLink([controller:'species', action:'show', id:speciesInstance.id, userGroup:userGroup, userGroupWebaddress:userGroupWebaddress])}" style="display:block;">
 							<span class="species_story ellipsis multiline sci_name"

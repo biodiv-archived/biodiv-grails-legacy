@@ -156,8 +156,6 @@ class UserGroupTagLib {
 	}
 
     def featureUserGroups = {attrs, body->
-        println "============sdvfsdfvsd=============="
-        println attrs.model
         def featResult = getListToFeatureIn(attrs.model.observationInstance.id, attrs.model.observationInstance.class.getCanonicalName())
 		if(featResult.size() > 0){
             out << render(template:"/common/featureUserGroupsTemplate", model:['observationInstance':attrs.model.observationInstance, 'featResult': featResult]);
@@ -269,9 +267,6 @@ class UserGroupTagLib {
         return result;
     } 
 	def getCurrentUserUserGroups = {attrs, body ->
-		
-		println "===================================" + attrs.model.onlyExpertGroups
-		
 		def user = springSecurityService.getCurrentUser();
 		def userGroups = user.getUserGroups(attrs.model?.onlyExpertGroups);
 		def result = [:]
@@ -461,7 +456,7 @@ class UserGroupTagLib {
 		model.isBulkPull = (params.action == 'show')?false:true
 		model.onlyExpertGroups = (model.isBulkPull || params.controller == 'species')?true:false
 		if(model.canPullResource == null){
-			model.canPullResource = userGroupService.getResourcePullPermission(params)
+			model.canPullResource = userGroupService.getResourcePullPermission(params, model.isBulkPull)
 		}
 		if(model.canPullResource){
 			out << render(template:"/common/objectPostToGroupsTemplate", model:model);

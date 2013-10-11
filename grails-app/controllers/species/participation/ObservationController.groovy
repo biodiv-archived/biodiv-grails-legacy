@@ -944,7 +944,7 @@ class ObservationController extends AbstractObjectController {
 						to entry.getKey()
 	                    			bcc grailsApplication.config.speciesPortal.app.notifiers_bcc.toArray()
 						//bcc "prabha.prabhakar@gmail.com", "sravanthi@strandls.com", "thomas.vee@gmail.com", "sandeept@strandls.com"
-						from conf.ui.notification.emailFrom
+						from grailsApplication.config.grails.mail.default.from
 						replyTo currentUserMailId
 						subject mailSubject
 						html body.toString()

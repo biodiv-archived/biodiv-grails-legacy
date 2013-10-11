@@ -189,7 +189,7 @@ String desc = "- "+ location +" by "+observationInstance.author.name.capitalize(
                                             </div>
                                                                                        
 					<uGroup:objectPostToGroupsWrapper 
-                                        model="[canPullResource:canPullResource, 'observationInstance':observationInstance]" />
+										model="[canPullResource:canPullResource, 'observationInstance':observationInstance, 'objectType':observationInstance.class.canonicalName]" />
 
                                         <g:render template="/common/showFeaturedTemplate" model="['observationInstance':observationInstance]"/>
                                         <uGroup:featureUserGroups model="['observationInstance':observationInstance]"/>

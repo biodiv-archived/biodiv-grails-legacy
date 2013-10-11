@@ -1261,9 +1261,9 @@ class UserGroupService {
 					break
 			}
 			
-			new ResourceUpdate().updateResourceOnGroup(params, groups, obvs, listFunction, groupRes, functionString)
+			r['msgCode']= new ResourceUpdate().updateResourceOnGroup(params, groups, obvs, listFunction, groupRes, functionString)
 			r['success'] = true
-			r['msgCode']=  (submitType == 'post') ? 'userGroup.default.multiple.posting.success' : 'userGroup.default.multiple.unposting.success'
+			//r['msgCode']=  (submitType == 'post') ? 'userGroup.default.multiple.posting.success' : 'userGroup.default.multiple.unposting.success'
 		}catch (Exception e) {
 			e.printStackTrace()
 			r['success'] = false
@@ -1282,8 +1282,7 @@ class UserGroupService {
 		if(groupCount == 0){
 			return false
 		}
-		
-		if(!isBulkPull && !params.controller == 'species'){
+		if(!isBulkPull && !(params.controller == 'species')){
 			return true
 		}
 		//if user is founder or expert in any group then retruing true permission for bulk upload
@@ -1292,7 +1291,7 @@ class UserGroupService {
 	}
 	
 	
-	private class  ResourceUpdate {
+	private class ResourceUpdate {
 		private static final log = LogFactory.getLog(this);
 		
 		def getObservationListForPost(params){
@@ -1318,7 +1317,7 @@ class UserGroupService {
 		}
 		
 		
-		def updateResourceOnGroup(params, groups, allObvs, listFunction, groupRes, updateFunction){
+		def String updateResourceOnGroup(params, groups, allObvs, listFunction, groupRes, updateFunction){
 			if(params.pullType == 'bulk' && params.selectionType == 'selectAll'){
 				List newList = Eval.xy(this, params, 'x.' + listFunction + '(y)')
 				newList.removeAll(allObvs)
@@ -1327,7 +1326,7 @@ class UserGroupService {
 			
 			log.debug "======= All Resouces " +  allObvs.size()
 			log.debug "========All Groups " + groups
-			
+			def afDescriptionList = []
 			groups.each { UserGroup ug ->
 				def obvs = new ArrayList(allObvs)
 				UserGroup.withTransaction(){  status ->
@@ -1350,10 +1349,12 @@ class UserGroupService {
 					if(!ug.hasErrors()){
 						//adding feed for each resource with isShowable = false flag
 						log.debug "============= calling af...."
-						activityFeedService.addFeedOnGroupResoucePull(obvs, ug, springSecurityService.currentUser,params.submitType == 'post' ? true: false, false, params.pullType == 'bulk'?true:false)
+						def af = activityFeedService.addFeedOnGroupResoucePull(obvs, ug, springSecurityService.currentUser,params.submitType == 'post' ? true: false, false, params.pullType == 'bulk'?true:false)
+						if(af) afDescriptionList << activityFeedService.getContextInfo(af).activityTitle
 					}
 				}
 			}
+			return afDescriptionList.join(". ")
 		}
 	}
 

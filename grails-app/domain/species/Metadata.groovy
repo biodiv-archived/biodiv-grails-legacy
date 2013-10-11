@@ -39,19 +39,26 @@ abstract class Metadata {
     static constraints = {
 		placeName(nullable:true)
 		reverseGeocodedName(nullable:true)
-		latitude(nullable: false)
-		longitude(nullable:false)
+		latitude(nullable: true)
+		longitude(nullable:true)
 		locationAccuracy(nullable: true)
-		topology validator : { val, obj ->
+		topology nullable:true, validator : { val, obj ->
+			if(!val){
+				return true
+			}
 			return ObservationService.validateLocation(val, obj)
 		}
-        fromDate validator : {val, obj -> val < new Date()}
+        fromDate nullable:true, validator : {val, obj ->
+			if(!val){
+				return true
+			} 
+			return val < new Date()
+		}
 		toDate nullable:true, validator : {val, obj ->
 			if(!val){
 				return true
-			}else{
-			 	return val < new Date() && val >= obj.fromDate
 			}
+			return val < new Date() && val >= obj.fromDate
 		}
     }
 	
@@ -65,4 +72,41 @@ abstract class Metadata {
         return ""
     }
 	
+	
+	def onAddComment(comment){
+		//updateTimeStamp()
+	}
+	
+	def onAddActivity(af, flushImmidiatly=true){
+		updateTimeStamp(flushImmidiatly)
+	}
+	
+	private updateTimeStamp(flushImmidiatly=true){
+		lastRevised = new Date();
+		saveConcurrently(null, flushImmidiatly);
+	}
+	
+	def updateLatLong(){
+		if(!topology){
+			return
+		}
+		def centroid =  topology.getCentroid()
+		latitude = (float) centroid.getY()
+		longitude = (float) centroid.getX()
+	}
+	
+	private saveConcurrently(f = {}, flushImmidiatly=true){
+		try{
+			if(f) f()
+			if(!save(flush:flushImmidiatly)){
+				errors.allErrors.each { log.error it }
+			}
+		}catch(org.hibernate.StaleObjectStateException e){
+			attach()
+			def m = merge()
+			if(!m.save(flush:flushImmidiatly)){
+				m.errors.allErrors.each { log.error it }
+			}
+		}
+	}
 }

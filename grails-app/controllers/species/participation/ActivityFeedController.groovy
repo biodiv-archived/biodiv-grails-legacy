@@ -55,28 +55,20 @@ class ActivityFeedController {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 	@Secured(['ROLE_USER'])
 	def follow = {
-        println "++++++++++   FOLLLLLLLOOOOOOWWW ++++++++++"
 		log.debug params
 		def author = springSecurityService.currentUser;
 		def domainObj = activityFeedService.getDomainObject(params.className, params.id);
-		println domainObj
-        println author
         def msg
-	    println "CONTROLLER FOLLOW method"	
 		if(params.follow.toBoolean()){
-            println "CALLING ADD Follower"
 			Follow.addFollower(domainObj, author)
 			msg = "Followed..."
 			if(!author.sendNotification){
 				msg += " Please turn on notification mail from your profile page."
 			}
 		}else{
-            println "delete follower"
 			Follow.deleteFollower(domainObj, author)
 			msg = "Unfollowed..."
 		}
-		
-		println "ENDING++++++++++++++"
 		def r = [status:'success']
 		r['msg']= msg 
 		render r as JSON

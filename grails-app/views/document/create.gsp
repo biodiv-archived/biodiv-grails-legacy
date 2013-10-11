@@ -185,14 +185,14 @@ input.dms_field {
                     <hr>
 
                     <div
-                        class="control-group ${hasErrors(bean: documentInstance, field: 'description', 'error')}">
+                        class="control-group ${hasErrors(bean: documentInstance, field: 'notes', 'error')}">
                         <label class="control-label" for="description">Description
                         </label>
                         <div class="controls">
 
                             <textarea id="description" name="description"
                                 placeholder="Write a small description about the document.">
-                                ${documentInstance?.description}
+                                ${documentInstance?.notes}
                             </textarea>
 
                             <script type='text/javascript'>
@@ -202,8 +202,8 @@ input.dms_field {
 CKEDITOR.replace('description', config);
 </script>
 <div class="help-inline">
-    <g:hasErrors bean="${userGroupInstance}" field="description">
-    <g:eachError bean="${userGroupInstance}" field="description">
+    <g:hasErrors bean="${userGroupInstance}" field="notes">
+    <g:eachError bean="${userGroupInstance}" field="notes">
     <li><g:message error="${it}" /></li>
     </g:eachError>
     </g:hasErrors>
@@ -242,7 +242,7 @@ CKEDITOR.replace('description', config);
                                     </div>
 
                                     <g:render template="coverage"
-                                    model="['coverageInstance':documentInstance?.coverage, 'sourceInstance':documentInstance]"></g:render>
+                                    model="['coverageInstance':documentInstance, 'sourceInstance':documentInstance]"></g:render>
 
 
 
@@ -400,10 +400,10 @@ CKEDITOR.replace('description', config);
 			    return hbt;	
 			}
 			<%
-				documentInstance?.coverage?.speciesGroups.each {
+				documentInstance?.speciesGroups.each {
 					out << "jQuery('#group_${it.id}').addClass('active');";
 				}
-				documentInstance?.coverage?.habitats.each {
+				documentInstance?.habitats.each {
 					out << "jQuery('#habitat_${it.id}').addClass('active');";
 				}
 			%>

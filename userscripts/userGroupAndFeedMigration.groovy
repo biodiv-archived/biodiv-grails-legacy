@@ -201,7 +201,7 @@ def addDocumentPostFeed(){
 		Document.list().each { doc ->
 			println doc
 			doc.userGroups.each { ug ->
-				checklistUtilService.addActivityFeed(doc, ug, doc.author, ActivityFeedService.RESOURCE_POSTED_ON_GROUP, new Date(doc.dateCreated.getTime() + 2) , desc);
+				checklistUtilService.addActivityFeed(doc, ug, doc.author, ActivityFeedService.RESOURCE_POSTED_ON_GROUP, new Date(doc.createdOn.getTime() + 2) , desc);
 			}
 		}
 	}
@@ -210,7 +210,44 @@ def addDocumentPostFeed(){
 
 
 
-addDocumentPostFeed()
+def migrateCoverageToDoc(){
+	Document.withTransaction(){
+		Document.list().each { Document doc ->
+			println "=================================="
+			println doc
+			def cov = doc.coverage
+			if(cov){
+				println "========== got coverage properties  "
+				doc.placeName    = cov.placeName
+				doc.reverseGeocodedName   = cov.reverseGeocodedName
+				doc.latitude    = cov.latitude
+				doc.longitude  = cov.longitude
+				doc.topology    = cov.topology
+				doc.geoPrivacy    = cov.geoPrivacy
+				if(cov.habitats){
+					cov.habitats.each { 
+						doc.addToHabitats(it)
+					}
+				}
+				if(cov.speciesGroups){
+					cov.speciesGroups.each {
+						doc.addToSpeciesGroups(it)
+					}
+				}
+				if(!doc.save(flush:true)){
+					doc.errors.allErrors.each { println  it }
+				}
+			}
+			println "=================================="
+		}
+	}
+}
+
+
+
+//migrateCoverageToDoc()
+//addDocumentPostFeed()
+
 
 //addUserRegistrationFeed()
 
