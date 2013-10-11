@@ -1596,7 +1596,7 @@ class ObservationService {
 				mailSubject = feedInstance.activityDescrption
 				bodyView = "/emailtemplates/addObservation"
 				populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
-				templateMap["actionObject"] = 'usergroup'
+				templateMap["actionObject"] = obv.class.simpleName.toLowerCase()
 				//templateMap['message'] = activityFeedService.getContextInfo(feedInstance, [:])
 				templateMap["groupNameWithlink"] = activityFeedService.getUserGroupHyperLink(activityFeedService.getDomainObject(feedInstance.activityHolderType, feedInstance.activityHolderId))
 				toUsers.addAll(getParticipants(obv))

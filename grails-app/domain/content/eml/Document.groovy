@@ -132,7 +132,7 @@ class Document extends Metadata implements Taggable, Rateable {
 	}
 	
 	def beforeUpdate(){
-		if(isDirty('topology')){
+		if(topology && isDirty('topology')){
 			updateLatLong()
 		}
 	}

@@ -223,7 +223,7 @@ String desc = "- "+ location +" by "+observationInstance.author.name.capitalize(
                                     <g:if test="${annotations?.size() > 0}">
                                     <div class="sidebar_section">
                                         <h5>Annotations</h5>
-                                        <div class="tile" style="clear: both">
+                                        <div>
                                             <obv:showAnnotation model="[annotations:annotations]" />
                                         </div>
                                     </div>	

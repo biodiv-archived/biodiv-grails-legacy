@@ -1,7 +1,5 @@
 	<div class="post-to-groups" >
-	  	<a href="#" onclick="$(this).next('.post-main-content').toggle(150);return false;">
-	  		<h5>Post to User Groups<span class="caret" style="margin-top: 8px;margin-left:5px;"></span></h5>
-	  	</a>
+	  	<h5 onclick="$(this).next('.post-main-content').slideToggle(150);return false;">Post to User Groups<span class="caret" style="margin-top: 8px;margin-left:5px;"></span></h5>
 	  	<div class="post-main-content" style="display:none;" >
 	       <div>
 	       		<g:if test="${isBulkPull}">
@@ -10,8 +8,7 @@
 			       		<a class="reset" href="#" title="Reset" onclick='updateListSelection($(this));return false;'>Reset</a>
 			       	</div>
 			   	</g:if>
-		       	<hr/>
-	       		<div id="userGroups" name="userGroups" style="list-style:none;clear:both;">
+			   	<div id="userGroups" name="userGroups" style="list-style:none;clear:both;margin:10px 0;">
 	               <uGroup:getCurrentUserUserGroups model="[observationInstance:observationInstance, onlyExpertGroups:onlyExpertGroups]"/>
 	           	</div>
 	        </div>
